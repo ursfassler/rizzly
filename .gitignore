@@ -1,0 +1,16 @@
+*.aux
+*.bak
+*.dvi
+*.log
+*.ps
+*.toc
+*.class
+*.out
+*.blg
+*.bbl
+*~
+compiler/bin
+*.ast
+*.pst
+*.smt
+
