@@ -53,7 +53,7 @@ public class ComponentFilePrinter {
       StreamResult result = new StreamResult(new File(filename));
 
       transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-//      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
+      transformer.setOutputProperty(OutputKeys.INDENT, "yes");
       transformer.setOutputProperty(OutputKeys.DOCTYPE_SYSTEM, "http://www.w3.org/2002/04/xhtml-math-svg/xhtml-math-svg.dtd");
       transformer.setOutputProperty(OutputKeys.DOCTYPE_PUBLIC, "-//W3C//DTD XHTML 1.1 plus MathML 2.0 plus SVG 1.1//EN");
 
@@ -118,7 +118,8 @@ public class ComponentFilePrinter {
     title.appendChild(doc.createTextNode("Source"));
     body.appendChild(title);
 
-    Element pre = doc.createElement("pre");
+    Element pre = doc.createElement("div");
+    pre.setAttribute("class", "code");
     body.appendChild(pre);
     RXmlPrinter.print(comp, pre, kb);
   }
@@ -140,19 +141,27 @@ public class ComponentFilePrinter {
   public static void printCodeStyle(String path) {
     try {
       PrintStream wr = new PrintStream(path + CodeStyleName);
-      wr.println(".keyword {");
-      wr.println("  font-weight:bold;");
-      wr.println("  color:darkred;");
-      wr.println("}");
-      wr.println("pre {");
+      wr.println(".code {");
+      wr.println("  font-family: Sans-Serif;");
       wr.println("  border-width: 1px;");
       wr.println("  border-style: solid;");
       wr.println("  border-color: gray;");
       wr.println("}");
+      wr.println();
+      wr.println(".code div {");
+      wr.println("  padding-left: 1em;");
+      wr.println("}");
+      wr.println();
+      wr.println(".keyword {");
+      wr.println("  font-weight:bold;");
+      wr.println("  color:darkred;");
+      wr.println("}");
+      wr.println();
       wr.println("a[href] {");
       wr.println("  text-decoration: none;");
       wr.println("  color: darkblue;");
       wr.println("}");
+      wr.println();
       wr.close();
     } catch (FileNotFoundException e) {
       e.printStackTrace();

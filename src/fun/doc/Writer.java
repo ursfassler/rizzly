@@ -5,7 +5,7 @@ public interface Writer {
 
   public void nl();
 
-  public void emptyLine();
+  public void sectionSeparator();
 
   public void incIndent();
 
