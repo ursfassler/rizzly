@@ -2,22 +2,23 @@ package parser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import error.ErrorType;
 import error.RError;
 
 /**
- * 
+ *
  * @author urs
  */
 public abstract class Parser {
-  private PeekReader<Token> scanner;
+  private Scanner scanner;
 
-  public Parser(PeekReader<Token> scanner) {
+  public Parser(Scanner scanner) {
     this.scanner = scanner;
   }
 
-  protected PeekReader<Token> getScanner() {
+  protected Scanner getScanner() {
     return scanner;
   }
 
@@ -80,6 +81,10 @@ public abstract class Parser {
     }
     Token got = scanner.next();
     RError.err(ErrorType.Error, got.getInfo(), "expected " + type + " got " + got);
+  }
+
+  protected Map<String, String> getMetadata(){
+    return scanner.getMetadata();
   }
 
 }

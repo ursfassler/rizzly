@@ -2,6 +2,7 @@ package parser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import common.ElementInfo;
 
@@ -17,11 +18,11 @@ import fun.other.Component;
 
 public class ImplCompositionParser extends ImplBaseParser {
 
-  public ImplCompositionParser(PeekReader<Token> scanner) {
+  public ImplCompositionParser(Scanner scanner) {
     super(scanner);
   }
 
-  public static Component parse(PeekReader<Token> scanner) {
+  public static Component parse(Scanner scanner) {
     ImplCompositionParser parser = new ImplCompositionParser(scanner);
     return parser.parseImplementationComposition();
   }
@@ -29,6 +30,7 @@ public class ImplCompositionParser extends ImplBaseParser {
   // EBNF implementationComposition: "composition" { compDeclBlock | connectionDeclBlock }
   private ImplComposition parseImplementationComposition() {
     ElementInfo info = expect(TokenType.COMPOSITION).getInfo();
+    Map<String, String> meta = getMetadata();
     ImplComposition comp = new ImplComposition(info);
 
     while (true) {

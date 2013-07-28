@@ -17,6 +17,7 @@ public class Scanner implements PeekReader<Token> {
   private PeekReader<Symbol> reader;
   private Token next;
   private String source;
+  private Map<String, String> metadata = new HashMap<String, String>();
 
   {
     keywords.put("interface", TokenType.INTERFACE);
@@ -71,6 +72,10 @@ public class Scanner implements PeekReader<Token> {
     next();
   }
 
+  public Map<String, String> getMetadata() {
+    return new HashMap<String, String>(metadata);
+  }
+
   private Token token(TokenType value, Symbol sym) {
     return new Token(value, new ElementInfo(source, sym.line, sym.row));
   }
@@ -100,6 +105,8 @@ public class Scanner implements PeekReader<Token> {
   }
 
   public Token next() {
+    metadata = new HashMap<String, String>();
+
     Token res = next;
 
     do {
@@ -233,7 +240,7 @@ public class Scanner implements PeekReader<Token> {
       return token(TokenType.IGNORE, start);
     case '/':
       reader.next();
-      seekTilNewline();
+      parseMetadata(start);
       return token(TokenType.IGNORE, start);
     default:
       return token(TokenType.DIV, start);
@@ -321,14 +328,16 @@ public class Scanner implements PeekReader<Token> {
     return null;
   }
 
-  private void seekTilNewline() {
-    Symbol sym;
+  private String seekTilNewline() {
+    String data = "";
     do {
-      sym = reader.next();
-      if (sym.sym == '\n') {
-        return;
+      if (reader.peek().sym == '\n') {
+        return data;
+      } else {
+        data += reader.next().sym;
       }
     } while (reader.hasNext());
+    return data;
   }
 
   private void seekTilEndComment() {
@@ -344,4 +353,34 @@ public class Scanner implements PeekReader<Token> {
     } while (reader.hasNext());
     RError.err(ErrorType.Error, source, sym.line, sym.row, "end of file before end of comment");
   }
+
+  private void parseMetadata(Symbol start) {
+    String key = readMetaKey();
+    String data = seekTilNewline();
+
+    String value = metadata.get(key);
+    if (value == null) {
+      value = data;
+    } else {
+      value += " " + data;
+    }
+    metadata.put(key, value);
+  }
+
+  private String readMetaKey() {
+    String key = "";
+    while (true) {
+      switch (reader.peek().sym) {
+      case ' ':
+        reader.next();
+        return key;
+      case '\n':
+        return key;
+      default:
+        key += reader.next().sym;
+        break;
+      }
+    }
+  }
+
 }

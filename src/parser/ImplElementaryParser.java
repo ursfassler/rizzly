@@ -18,11 +18,11 @@ import fun.variable.StateVariable;
 
 public class ImplElementaryParser extends ImplBaseParser {
 
-  public ImplElementaryParser(PeekReader<Token> scanner) {
+  public ImplElementaryParser(Scanner scanner) {
     super(scanner);
   }
 
-  public static Component parse(PeekReader<Token> scanner) {
+  public static Component parse(Scanner scanner) {
     ImplElementaryParser parser = new ImplElementaryParser(scanner);
     return parser.parseImplementationElementary();
   }

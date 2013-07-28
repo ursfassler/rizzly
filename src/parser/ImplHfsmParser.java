@@ -29,11 +29,11 @@ import fun.statement.Block;
 import fun.variable.StateVariable;
 
 public class ImplHfsmParser extends ImplBaseParser {
-  public ImplHfsmParser(PeekReader<Token> scanner) {
+  public ImplHfsmParser(Scanner scanner) {
     super(scanner);
   }
 
-  public static Component parse(PeekReader<Token> scanner) {
+  public static Component parse(Scanner scanner) {
     ImplHfsmParser parser = new ImplHfsmParser(scanner);
     return parser.parseImplementationHfsm();
   }

@@ -28,7 +28,7 @@ import fun.variable.FuncVariable;
 
 public class StatementParser extends BaseParser {
 
-  public StatementParser(PeekReader<Token> scanner) {
+  public StatementParser(Scanner scanner) {
     super(scanner);
   }
 

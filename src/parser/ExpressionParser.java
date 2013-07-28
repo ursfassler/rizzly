@@ -25,7 +25,7 @@ import fun.expression.reference.ReferenceUnlinked;
 
 public class ExpressionParser extends Parser {
 
-  public ExpressionParser(PeekReader<Token> scanner) {
+  public ExpressionParser(Scanner scanner) {
     super(scanner);
   }
 

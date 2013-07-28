@@ -10,7 +10,7 @@ import fun.variable.Variable;
 
 abstract public class ImplBaseParser extends BaseParser {
 
-  public ImplBaseParser(PeekReader<Token> scanner) {
+  public ImplBaseParser(Scanner scanner) {
     super(scanner);
   }
 

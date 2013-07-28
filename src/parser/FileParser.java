@@ -23,7 +23,7 @@ public class FileParser extends BaseParser {
     return file;
   }
 
-  public FileParser(PeekReader<Token> scanner) {
+  public FileParser(Scanner scanner) {
     super(scanner);
   }
 

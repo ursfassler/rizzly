@@ -28,7 +28,7 @@ import fun.variable.IfaceUse;
 
 public class TypeParser extends BaseParser {
 
-  public TypeParser(PeekReader<Token> scanner) {
+  public TypeParser(Scanner scanner) {
     super(scanner);
   }
 
