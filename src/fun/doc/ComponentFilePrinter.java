@@ -3,6 +3,7 @@ package fun.doc;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
+import java.util.List;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -20,7 +21,13 @@ import org.w3c.dom.Element;
 
 import common.Designator;
 
+import fun.composition.ImplComposition;
+import fun.doc.compgraph.Positioning;
+import fun.doc.compgraph.WorldComp;
+import fun.generator.ComponentGenerator;
+import fun.knowledge.KnowFunPath;
 import fun.knowledge.KnowledgeBase;
+import fun.other.Component;
 import fun.other.RizzlyFile;
 
 public class ComponentFilePrinter {
@@ -124,18 +131,23 @@ public class ComponentFilePrinter {
     RXmlPrinter.print(comp, pre, kb);
   }
 
-  public void makePicture(RizzlyFile comp) {
-    // FIXME reimplement
-    // if (comp instanceof ImplComposition) {
-    // Element title = doc.createElement("h2");
-    // title.appendChild(doc.createTextNode("Picture"));
-    // body.appendChild(title);
-    //
-    // WorldComp g = CompositionGraphMaker.make((ImplComposition) comp, kb);
-    // Positioning.doPositioning(g);
-    // CompositionGraphPrinter pr = new CompositionGraphPrinter(doc);
-    // body.appendChild(pr.makeSvg(g));
-    // }
+  public void makePicture(RizzlyFile file) {
+    KnowFunPath kp = kb.getEntry(KnowFunPath.class);
+    List<ComponentGenerator> compgens = file.getCompfunc().getItems(ComponentGenerator.class);
+    for (ComponentGenerator compgen : compgens) {
+      Component comp = compgen.getItem();
+      if (comp instanceof ImplComposition) {
+        Element title = doc.createElement("h2");
+        title.appendChild(doc.createTextNode("Picture"));
+        body.appendChild(title);
+
+        Designator path = kp.get(compgen);
+        WorldComp g = CompositionGraphMaker.make( path, compgen.getName(), (ImplComposition) comp, kb);
+        Positioning.doPositioning(g);
+        CompositionGraphPrinter pr = new CompositionGraphPrinter(doc);
+        body.appendChild(pr.makeSvg(g));
+      }
+    }
   }
 
   public static void printCodeStyle(String path) {

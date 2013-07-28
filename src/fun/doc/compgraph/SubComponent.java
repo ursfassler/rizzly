@@ -10,8 +10,8 @@ final public class SubComponent extends Component {
   final private String instname;
   final private Point pos = new Point();
 
-  public SubComponent(String instname, Designator path, String classname) {
-    super(path,classname);
+  public SubComponent(String instname, Designator path, String classname, String metadata) {
+    super(path, classname, metadata);
     this.instname = instname;
   }
 
@@ -55,19 +55,28 @@ final public class SubComponent extends Component {
   }
 
   @Override
-  public Point getPort(Connection con) {
+  public Point getSrcPort(Connection con) {
+    assert (getOutEdges().contains(con));
     int x;
     int index;
-    if (getInEdges().contains(con)) {
-      x = -SUBCOMP_WIDTH / 2;
-      index = input.indexOf(con.getDst());
-    } else {
-      assert (getOutEdges().contains(con));
-      x = SUBCOMP_WIDTH / 2;
-      index = output.indexOf(con.getSrc());
-    }
+    x = SUBCOMP_WIDTH / 2;
+    index = output.indexOf(con.getSrc());
     assert (index >= 0);
-    return new Point(pos.x + x, pos.y + index * Y_IFACE_DIST + Y_SUBC_IFACE_OFFSET);
+    int y = pos.y + index * Y_IFACE_DIST + Y_SUBC_IFACE_OFFSET;
+    y += con.getSrc().getYOffset(con);
+    return new Point(pos.x + x, y);
   }
 
+  @Override
+  public Point getDstPort(Connection con) {
+    assert (getInEdges().contains(con));
+    int x;
+    int index;
+    x = -SUBCOMP_WIDTH / 2;
+    index = input.indexOf(con.getDst());
+    assert (index >= 0);
+    int y = pos.y + index * Y_IFACE_DIST + Y_SUBC_IFACE_OFFSET;
+    y += con.getDst().getYOffset(con);
+    return new Point(pos.x + x, y);
+  }
 }

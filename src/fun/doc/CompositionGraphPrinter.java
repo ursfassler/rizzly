@@ -16,6 +16,7 @@ import fun.doc.compgraph.Component;
 import fun.doc.compgraph.Connection;
 import fun.doc.compgraph.Interface;
 import fun.doc.compgraph.SubComponent;
+import fun.doc.compgraph.Vertex;
 import fun.doc.compgraph.WorldComp;
 
 //DOM
@@ -67,14 +68,21 @@ public class CompositionGraphPrinter {
   }
 
   private Element makeConnection(Connection con) {
-    Point src = con.getSrc().getOwner().getPort(con);
-    Point dst = con.getDst().getOwner().getPort(con);
+    Point src = con.getSrc().getOwner().getSrcPort(con);
+    Point dst = con.getDst().getOwner().getDstPort(con);
 
-    Element line = createElement("line");
-    line.setAttribute("x1", Integer.toString(src.x));
-    line.setAttribute("y1", Integer.toString(src.y));
-    line.setAttribute("x2", Integer.toString(dst.x));
-    line.setAttribute("y2", Integer.toString(dst.y));
+    Element line = createElement("path");
+    String path = "M";
+
+    path += " " + src.x + "," + src.y;
+
+    for( Vertex v : con.getVias() ){
+      path += " " + v.getPos().x + "," + v.getPos().y;
+    }
+
+    path += " " + dst.x + "," + dst.y;
+
+    line.setAttribute("d", path);
     line.setAttribute("class", ConnectorClassName);
 
     return line;

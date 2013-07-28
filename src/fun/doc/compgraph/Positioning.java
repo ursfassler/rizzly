@@ -1,14 +1,16 @@
 package fun.doc.compgraph;
 
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.StringTokenizer;
 
+import metadata.parser.SimpleMetaParser;
 import util.Pair;
 import util.Point;
 import util.SimpleGraph;
@@ -49,6 +51,79 @@ public class Positioning {
 
     g.getSize().x = (topolist.size() + 1) * xdist;
     g.getSize().y = height;
+
+    appendMeta(g);
+    for (SubComponent sub : g.getComp()) {
+      appendMeta(sub);
+    }
+    for (Connection con : g.getConn()) {
+      appendMeta(con);
+    }
+  }
+
+  private static void appendMeta(Connection con) {
+    if (con.getMetadata() == null) {
+      return;
+    }
+    Map<String, String> data = SimpleMetaParser.parse(con.getMetadata());
+
+    Point src = new Point(con.getSrc().getOwner().getSrcPort(con));
+    Point dst = new Point(con.getDst().getOwner().getDstPort(con));
+
+    int[] path = getPath(data);
+    assert (path.length % 2 == 1);
+    boolean setX = true;
+    Point lastPos = src;
+    for (int itr : path) {
+      Point nextPos;
+      if (setX) {
+        nextPos = new Point(itr, lastPos.y);
+      } else {
+        nextPos = new Point(lastPos.x, itr);
+      }
+      con.getVias().add(new Via(nextPos));
+      lastPos = nextPos;
+      setX = !setX;
+    }
+    con.getVias().add(new Via(new Point(lastPos.x, dst.y)));
+  }
+
+  private static int[] getPath(Map<String, String> data) {
+    assert (data.containsKey("path"));
+    String paths = data.get("path");
+    StringTokenizer st = new StringTokenizer(paths, " ");
+    int path[] = new int[st.countTokens()];
+    int i = 0;
+    while (st.hasMoreTokens()) {
+      path[i] = Integer.parseInt(st.nextToken());
+      i++;
+    }
+    return path;
+  }
+
+  private static void appendMeta(SubComponent sub) {
+    if (sub.getMetadata() == null) {
+      return;
+    }
+    Map<String, String> data = SimpleMetaParser.parse(sub.getMetadata());
+
+    sub.getPos().x = getInt(data, "x");
+    sub.getPos().y = getInt(data, "y");
+  }
+
+  private static void appendMeta(WorldComp g) {
+    if (g.getMetadata() == null) {
+      return;
+    }
+    Map<String, String> data = SimpleMetaParser.parse(g.getMetadata());
+
+    g.getSize().x = getInt(data, "width");
+    g.getSize().y = getInt(data, "height");
+  }
+
+  private static int getInt(Map<String, String> data, String key) {
+    assert (data.containsKey(key));
+    return Integer.parseInt(data.get(key));
   }
 
   private static List<List<SubComponent>> doToposort(WorldComp comp) {

@@ -136,6 +136,11 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  public void meta() {
+    compile("meta", "Meta", true, DEBUG_EVENT, false);
+  }
+
+  @Test
   public void rec_Rec() {
     compile("rec", "Rec", true, DEBUG_EVENT, false);
   }

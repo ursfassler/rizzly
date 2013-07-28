@@ -1,116 +1,79 @@
 package fun.doc;
 
-import java.util.HashSet;
+import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 
 import common.Designator;
+import common.Direction;
 
 import error.ErrorType;
 import error.RError;
-import fun.Fun;
-import fun.NullTraverser;
 import fun.composition.ImplComposition;
 import fun.doc.compgraph.Component;
 import fun.doc.compgraph.Interface;
+import fun.doc.compgraph.SubComponent;
 import fun.doc.compgraph.WorldComp;
+import fun.expression.Expression;
 import fun.expression.reference.RefName;
 import fun.expression.reference.Reference;
 import fun.expression.reference.ReferenceLinked;
+import fun.generator.ComponentGenerator;
+import fun.generator.InterfaceGenerator;
 import fun.knowledge.KnowFunPath;
 import fun.knowledge.KnowledgeBase;
-import fun.other.Namespace;
-import fun.type.Type;
+import fun.variable.CompUse;
 import fun.variable.IfaceUse;
 
-public class CompositionGraphMaker extends NullTraverser<Void, Void> {
-  private KnowFunPath kp;
-  private Set<WorldComp> compGraph = new HashSet<WorldComp>();
+public class CompositionGraphMaker {
+  public static final String METADATA_KEY = "geometry";
 
-  public CompositionGraphMaker(KnowledgeBase kb) {
-    kp = kb.getEntry(KnowFunPath.class);
+  public static WorldComp make(Designator path, String name, ImplComposition impl, KnowledgeBase kb) {
+    KnowFunPath kp = kb.getEntry(KnowFunPath.class);
+    WorldComp comp = new WorldComp(path, name, impl.getInfo().getMetadata().get(METADATA_KEY));
+
+    Map<CompUse, SubComponent> compmap = new HashMap<CompUse, SubComponent>();
+    Map<Designator, Interface> ifacemap = new HashMap<Designator, Interface>();
+
+    for (IfaceUse iface : impl.getIface(Direction.in)) {
+      Interface niface = makeIface(new Designator("Self"), comp, iface, ifacemap, kb);
+      comp.getInput().add(niface);
+    }
+    for (IfaceUse iface : impl.getIface(Direction.out)) {
+      Interface niface = makeIface(new Designator("Self"), comp, iface, ifacemap, kb);
+      comp.getOutput().add(niface);
+    }
+
+    for (CompUse use : impl.getComponent()) {
+      ComponentGenerator comptype = getComp(use.getType());
+      Designator subpath = kp.get(comptype);
+      SubComponent sub = new SubComponent(use.getName(), subpath, comptype.getName(),use.getInfo().getMetadata().get(METADATA_KEY));
+
+      for (IfaceUse iface : comptype.getItem().getIface(Direction.in)) {
+        Interface niface = makeIface(new Designator("Self", use.getName()), sub, iface, ifacemap, kb);
+        sub.getInput().add(niface);
+      }
+      for (IfaceUse iface : comptype.getItem().getIface(Direction.out)) {
+        Interface niface = makeIface(new Designator("Self", use.getName()), sub, iface, ifacemap, kb);
+        sub.getOutput().add(niface);
+      }
+
+      compmap.put(use, sub);
+      comp.getComp().add(sub);
+    }
+
+    for (fun.composition.Connection con : impl.getConnection()) {
+      Interface src = getIface(con.getEndpoint(Direction.in), ifacemap, kb);
+      Interface dst = getIface(con.getEndpoint(Direction.out), ifacemap, kb);
+      fun.doc.compgraph.Connection ncon = new fun.doc.compgraph.Connection(src, dst,con.getInfo().getMetadata().get(METADATA_KEY));
+      src.getConnection().add(ncon);
+      dst.getConnection().add(ncon);
+      comp.getConn().add(ncon);
+    }
+
+    return comp;
   }
 
-  public static Set<WorldComp> make(Namespace ast, KnowledgeBase kb) {
-    CompositionGraphMaker pp = new CompositionGraphMaker(kb);
-    pp.traverse(ast, null);
-    return pp.compGraph;
-  }
-
-  public static WorldComp make(ImplComposition ast, KnowledgeBase kb) {
-    CompositionGraphMaker pp = new CompositionGraphMaker(kb);
-    pp.traverse(ast, null);
-    assert (pp.compGraph.size() == 1);
-    return pp.compGraph.iterator().next();
-  }
-
-  @Override
-  protected Void visitDefault(Fun obj, Void param) {
-    return null;
-  }
-
-  @Override
-  protected Void visitNamespace(Namespace obj, Void param) {
-    visitItr(obj, param);
-    return null;
-  }
-
-  @Override
-  protected Void visitImplComposition(ImplComposition obj, Void param) {
-    WorldComp g = makeGraph(obj);
-    compGraph.add(g);
-    return null;
-  }
-
-  private WorldComp makeGraph(ImplComposition impl) {
-    //FIXME reimplement
-    throw new RuntimeException("Reimplement");
-//    Designator path = kp.get(impl);
-//    WorldComp comp = new WorldComp(path, impl.getName());
-//
-//    Map<CompUse, SubComponent> compmap = new HashMap<CompUse, SubComponent>();
-//    Map<Designator, Interface> ifacemap = new HashMap<Designator, Interface>();
-//
-//    for (IfaceUse iface : impl.getIface(Direction.in)) {
-//      Interface niface = makeIface(new Designator("Self"), comp, iface, ifacemap);
-//      comp.getInput().add(niface);
-//    }
-//    for (IfaceUse iface : impl.getIface(Direction.out)) {
-//      Interface niface = makeIface(new Designator("Self"), comp, iface, ifacemap);
-//      comp.getOutput().add(niface);
-//    }
-//
-//    for (CompUse use : impl.getComponent()) {
-//      fun.other.Component comptype = (fun.other.Component) getType(use.getType());
-//      Designator subpath = kp.get(comptype);
-//      SubComponent sub = new SubComponent(use.getName(), subpath, comptype.getName());
-//
-//      for (IfaceUse iface : comptype.getIface(Direction.in)) {
-//        Interface niface = makeIface(new Designator("Self", use.getName()), sub, iface, ifacemap);
-//        sub.getInput().add(niface);
-//      }
-//      for (IfaceUse iface : comptype.getIface(Direction.out)) {
-//        Interface niface = makeIface(new Designator("Self", use.getName()), sub, iface, ifacemap);
-//        sub.getOutput().add(niface);
-//      }
-//
-//      compmap.put(use, sub);
-//      comp.getComp().add(sub);
-//    }
-//
-//    for (fun.composition.Connection con : impl.getConnection()) {
-//      Interface src = getIface(con.getEndpoint(Direction.in), ifacemap);
-//      Interface dst = getIface(con.getEndpoint(Direction.out), ifacemap);
-//      fun.doc.compgraph.Connection ncon = new fun.doc.compgraph.Connection(src, dst);
-//      src.getConnection().add(ncon);
-//      dst.getConnection().add(ncon);
-//      comp.getConn().add(ncon);
-//    }
-//
-//    return comp;
-  }
-
-  private Interface getIface(Reference ep, Map<Designator, Interface> ifacemap) {
+  private static Interface getIface(Reference ep, Map<Designator, Interface> ifacemap, KnowledgeBase kb) {
     ReferenceLinked rl = (ReferenceLinked) ep;
     assert (rl.getOffset().size() <= 1);
 
@@ -126,22 +89,28 @@ public class CompositionGraphMaker extends NullTraverser<Void, Void> {
     return iface;
   }
 
-  private Interface makeIface(Designator name, Component sub, IfaceUse iface, Map<Designator, Interface> ifacemap) {
-    //FIXME reimplement
-    throw new RuntimeException("Reimplement");
-//    fun.other.Interface ifacetype = (fun.other.Interface) getType(iface.getType());
-//    Designator path = kp.get(ifacetype);
-//    Interface niface = new Interface(sub, iface.getName(), path, ifacetype.getName());
-//
-//    name = new Designator(name, iface.getName());
-//    assert (!ifacemap.containsKey(name));
-//    ifacemap.put(name, niface);
-//    return niface;
+  private static Interface makeIface(Designator name, Component sub, IfaceUse iface, Map<Designator, Interface> ifacemap, KnowledgeBase kb) {
+    KnowFunPath kp = kb.getEntry(KnowFunPath.class);
+    InterfaceGenerator ifacetype = getIface(iface.getType());
+    Designator path = kp.get(ifacetype);
+    Interface niface = new Interface(sub, iface.getName(), path, ifacetype.getName());
+
+    name = new Designator(name, iface.getName());
+    assert (!ifacemap.containsKey(name));
+    ifacemap.put(name, niface);
+    return niface;
   }
 
-  private Type getType(Reference reference) {
-    ReferenceLinked rl = (ReferenceLinked) reference;
-    return (Type) rl.getLink();
+  private static fun.generator.InterfaceGenerator getIface(Expression expr) {
+    ReferenceLinked reference = (ReferenceLinked) expr;
+    ReferenceLinked rl = reference;
+    return (InterfaceGenerator) rl.getLink();
+  }
+
+  private static fun.generator.ComponentGenerator getComp(Expression expr) {
+    ReferenceLinked reference = (ReferenceLinked) expr;
+    ReferenceLinked rl = reference;
+    return (ComponentGenerator) rl.getLink();
   }
 
 }
