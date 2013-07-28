@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import org.w3c.dom.Element;
 
@@ -166,6 +167,15 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
     }
   }
 
+  private void writeMeta(Fun obj) {
+    Map<String, String> meta = obj.getInfo().getMetadata();
+    for (String key : meta.keySet()) {
+      String data = meta.get(key);
+      xw.wc("//" + key + " " + data);
+      xw.nl();
+    }
+  }
+
   private void visitImports(List<Designator> imports, Designator param) {
     if (!imports.isEmpty()) {
       xw.kw("import");
@@ -259,6 +269,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
     visit(obj.getType(), null);
     xw.wr(";");
     xw.nl();
+    writeMeta(obj);
     return null;
   }
 
@@ -269,6 +280,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
     visit(obj.getType(), null);
     xw.wr(";");
     xw.nl();
+    writeMeta(obj);
     return null;
   }
 
@@ -308,6 +320,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   protected Void visitImplComposition(ImplComposition obj, Designator param) {
     xw.kw("implementation composition");
     xw.nl();
+    writeMeta(obj);
     xw.incIndent();
 
     visitNamedSection("component", obj.getComponent().getList());
@@ -337,6 +350,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
     visit(obj.getEndpoint(Direction.out), null);
     xw.wr(";");
     xw.nl();
+    writeMeta(obj);
     return null;
   }
 

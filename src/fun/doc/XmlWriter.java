@@ -18,7 +18,8 @@ public class XmlWriter implements Writer {
 
   public final static String CL_LINK = "link";
   public final static String CL_KEYWORD = "keyword";
-  public static final String extension = ".html";
+  public final static String CL_COMMENT = "comment";
+  public final static String extension = ".html";
 
   public XmlWriter(Element root) {
     super();
@@ -33,6 +34,23 @@ public class XmlWriter implements Writer {
     wroteSecSep.set(0, false);
   }
 
+  /**
+   * Write a comment
+   * @param text
+   */
+  public void wc(String text) {
+    newlines = 0;
+    Element kw = doc.createElement("span");
+    kw.setAttribute("class", CL_COMMENT);
+    kw.appendChild(doc.createTextNode(text));
+    root.appendChild(kw);
+    wroteSecSep.set(0, false);
+  }
+
+  /**
+   * Write a keyword
+   * @param s
+   */
   public void kw(String s) {
     newlines = 0;
     Element kw = doc.createElement("span");

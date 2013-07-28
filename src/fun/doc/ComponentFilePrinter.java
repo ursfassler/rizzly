@@ -152,9 +152,13 @@ public class ComponentFilePrinter {
       wr.println("  padding-left: 1em;");
       wr.println("}");
       wr.println();
-      wr.println(".keyword {");
+      wr.println("." + XmlWriter.CL_KEYWORD + " {");
       wr.println("  font-weight:bold;");
       wr.println("  color:darkred;");
+      wr.println("}");
+      wr.println();
+      wr.println("." + XmlWriter.CL_COMMENT + " {");
+      wr.println("  color:green;");
       wr.println("}");
       wr.println();
       wr.println("a[href] {");

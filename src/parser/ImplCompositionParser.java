@@ -31,6 +31,7 @@ public class ImplCompositionParser extends ImplBaseParser {
   private ImplComposition parseImplementationComposition() {
     ElementInfo info = expect(TokenType.COMPOSITION).getInfo();
     Map<String, String> meta = getMetadata();
+    info.addMetadata(meta);
     ImplComposition comp = new ImplComposition(info);
 
     while (true) {
@@ -67,6 +68,9 @@ public class ImplCompositionParser extends ImplBaseParser {
     MessageType type = parseMsgType();
     Reference dst = parseEndpoint();
     expect(TokenType.SEMI);
+
+    Map<String, String> meta = getMetadata();
+    info.addMetadata(meta);
 
     if (type != MessageType.sync) {
       RError.err(ErrorType.Fatal, info, "Only synchron messages supported at the moment");

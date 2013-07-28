@@ -2,6 +2,7 @@ package parser;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import util.Pair;
 import fun.Copy;
@@ -62,8 +63,15 @@ public class BaseParser extends Parser {
   protected <T extends Variable> List<T> parseFileUseList(Class<T> kind) {
     List<T> res = new ArrayList<T>();
     do {
-      res.addAll(stmt().parseVarDef(kind));
+      List<T> vardefs = stmt().parseVarDef(kind);
       expect(TokenType.SEMI);
+
+      Map<String, String> meta = getMetadata();
+      for( T var : vardefs ){
+        var.getInfo().addMetadata(meta);
+      }
+
+      res.addAll(vardefs);
     } while (peek().getType() == TokenType.IDENTIFIER);
     return res;
   }
