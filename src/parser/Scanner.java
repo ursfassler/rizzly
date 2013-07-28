@@ -71,24 +71,17 @@ public class Scanner implements PeekReader<Token> {
     next();
   }
 
-  private Token token(TokenType value) {
-    Symbol peek = reader.peek();
-    ElementInfo info;
-    if (peek != null) {
-      info = new ElementInfo(source, peek.line, peek.row);
-    } else {
-      info = new ElementInfo(source, 0, 0);
-    }
-    return new Token(value, info);
+  private Token token(TokenType value, Symbol sym) {
+    return new Token(value, new ElementInfo(source, sym.line, sym.row));
   }
 
-  private Token token(TokenType value, String id) {
-    ElementInfo info = new ElementInfo(source, reader.peek().line, reader.peek().row);
+  private Token token(TokenType value, String id, Symbol sym) {
+    ElementInfo info = new ElementInfo(source, sym.line, sym.row);
     return new Token(value, id, info);
   }
 
-  private Token token(TokenType value, int num) {
-    ElementInfo info = new ElementInfo(source, reader.peek().line, reader.peek().row);
+  private Token token(TokenType value, int num, Symbol sym) {
+    ElementInfo info = new ElementInfo(source, sym.line, sym.row);
     return new Token(value, num, info);
   }
 
@@ -100,25 +93,28 @@ public class Scanner implements PeekReader<Token> {
     return next;
   }
 
+  private Token specialToken(TokenType value) {
+    ElementInfo info;
+    info = new ElementInfo(source, 0, 0);
+    return new Token(value, info);
+  }
+
   public Token next() {
     Token res = next;
 
-    next = token(TokenType.IGNORE);
-
-    while (next.getType() == TokenType.IGNORE) {
+    do {
       if (!reader.hasNext()) {
-        next = token(TokenType.EOF);
+        next = specialToken(TokenType.EOF);
         break;
       }
       next = getNext();
-    }
-
+    } while (next.getType() == TokenType.IGNORE);
     return res;
   }
 
   private Token getNext() {
     if (!reader.hasNext()) {
-      return token(TokenType.EOF);
+      return specialToken(TokenType.EOF);
     }
     Symbol sym = reader.next();
     switch (sym.sym) {
@@ -126,70 +122,62 @@ public class Scanner implements PeekReader<Token> {
     case '\t':
     case 13:
     case '\n':
-      return token(TokenType.IGNORE);
+      return token(TokenType.IGNORE, sym);
     case '<':
-      return read_3C();
+      return read_3C(sym);
     case '=':
-      return token(TokenType.EQUAL);
+      return token(TokenType.EQUAL, sym);
     case '>':
-      return read_3E();
+      return read_3E(sym);
     case '-':
-      return read_2D();
+      return read_2D(sym);
     case ',':
-      return token(TokenType.COMMA);
+      return token(TokenType.COMMA, sym);
     case ':':
-      return read_3A();
+      return read_3A(sym);
     case ';':
-      return token(TokenType.SEMI);
+      return token(TokenType.SEMI, sym);
     case '\'':
-      return read_27();
+      return read_27(sym);
     case '/':
-      return read_2F();
+      return read_2F(sym);
     case '.':
-      return read_2E();
+      return read_2E(sym);
     case '(':
-      return token(TokenType.OPENPAREN);
+      return token(TokenType.OPENPAREN, sym);
     case ')':
-      return token(TokenType.CLOSEPAREN);
+      return token(TokenType.CLOSEPAREN, sym);
     case '{':
-      return token(TokenType.OPENCURLY);
+      return token(TokenType.OPENCURLY, sym);
     case '}':
-      return token(TokenType.CLOSECURLY);
+      return token(TokenType.CLOSECURLY, sym);
     case '[':
-      return token(TokenType.OPEN_ARRAY);
+      return token(TokenType.OPEN_ARRAY, sym);
     case ']':
-      return token(TokenType.CLOSE_ARRAY);
+      return token(TokenType.CLOSE_ARRAY, sym);
     case '*':
-      return token(TokenType.STAR);
+      return token(TokenType.STAR, sym);
     case '+':
-      return token(TokenType.PLUS);
+      return token(TokenType.PLUS, sym);
     default:
       if (isAlpha(sym.sym)) {
         String id = readIdentifier(Character.toString(sym.sym));
         if (keywords.containsKey(id)) {
-          return token(keywords.get(id));
+          return token(keywords.get(id), sym);
         } else {
           TokenType type;
           type = TokenType.IDENTIFIER;
-          Token toc = token(type, id);
+          Token toc = token(type, id, sym);
           return toc;
         }
       } else if (isNummeric(sym.sym)) {
-        return readNumber(sym.sym);
+        return readNumber(sym);
       } else {
         RError.err(ErrorType.Error, source, sym.line, sym.row, "Unexpected character: #" + Integer.toHexString((int) sym.sym) + " (" + sym.sym + ")");
-        return token(TokenType.IGNORE);
+        return specialToken(TokenType.IGNORE);
       }
     }
   }
-
-  // private boolean expect(char c) {
-  // Symbol sym = reader.next();
-  // if (sym.sym != c) {
-  // Error.err(ErrorType.Error, sym.line, sym.row, "Expected " + c + " found " + sym);
-  // }
-  // return true;
-  // }
 
   // EBNF id: alpha { alpha | numeric}
   private String readIdentifier(String prefix) {
@@ -215,8 +203,8 @@ public class Scanner implements PeekReader<Token> {
   }
 
   // EBNF number: numeric { numeric }
-  private Token readNumber(char sym) {
-    int num = sym - '0';
+  private Token readNumber(Symbol sym) {
+    int num = sym.sym - '0';
     while (isAlphaNummeric(reader.peek().sym)) {
       Symbol ne = reader.peek();
       if (!isNummeric(ne.sym)) {
@@ -225,96 +213,96 @@ public class Scanner implements PeekReader<Token> {
       }
       num = num * 10 + reader.next().sym - '0';
     }
-    Token res = token(TokenType.NUMBER, num);
+    Token res = token(TokenType.NUMBER, num, sym);
     return res;
   }
 
   // '
-  private Token read_27() {
+  private Token read_27(Symbol sym) {
     String value = readTilEndString();
-    return token(TokenType.STRING, value);
+    return token(TokenType.STRING, value, sym);
   }
 
   // /
-  private Token read_2F() {
+  private Token read_2F(Symbol start) {
     Symbol sym = reader.peek();
     switch (sym.sym) {
     case '*':
       reader.next();
       seekTilEndComment();
-      return token(TokenType.IGNORE);
+      return token(TokenType.IGNORE, start);
     case '/':
       reader.next();
       seekTilNewline();
-      return token(TokenType.IGNORE);
+      return token(TokenType.IGNORE, start);
     default:
-      return token(TokenType.DIV);
+      return token(TokenType.DIV, start);
     }
   }
 
   // .
-  private Token read_2E() {
+  private Token read_2E(Symbol start) {
     Symbol sym = reader.peek();
     switch (sym.sym) {
     case '.':
       reader.next();
-      return token(TokenType.RANGE);
+      return token(TokenType.RANGE, start);
     default:
-      return token(TokenType.PERIOD);
+      return token(TokenType.PERIOD, start);
     }
   }
 
   // :
-  private Token read_3A() {
+  private Token read_3A(Symbol start) {
     Symbol sym = reader.peek();
     switch (sym.sym) {
     case '=':
       reader.next();
-      return token(TokenType.BECOMES);
+      return token(TokenType.BECOMES, start);
     default:
-      return token(TokenType.COLON);
+      return token(TokenType.COLON, start);
     }
   }
 
   // <
-  private Token read_3C() {
+  private Token read_3C(Symbol start) {
     Symbol sym = reader.peek();
     switch (sym.sym) {
     case '=':
       reader.next();
-      return token(TokenType.LEQ);
+      return token(TokenType.LEQ, start);
     case '>':
       reader.next();
-      return token(TokenType.NEQ);
+      return token(TokenType.NEQ, start);
     default:
-      return token(TokenType.LOWER);
+      return token(TokenType.LOWER, start);
     }
   }
 
   // >
-  private Token read_3E() {
+  private Token read_3E(Symbol start) {
     Symbol sym = reader.peek();
     switch (sym.sym) {
     case '=':
       reader.next();
-      return token(TokenType.GEQ);
+      return token(TokenType.GEQ, start);
     case '>':
       reader.next();
-      return token(TokenType.ASYNC_MSG);
+      return token(TokenType.ASYNC_MSG, start);
     default:
-      return token(TokenType.GREATER);
+      return token(TokenType.GREATER, start);
     }
   }
 
   // -
-  private Token read_2D() {
+  private Token read_2D(Symbol start) {
     Symbol sym = reader.peek();
     switch (sym.sym) {
     case '>':
       reader.next();
-      return token(TokenType.SYNC_MSG);
+      return token(TokenType.SYNC_MSG, start);
     default:
-      return token(TokenType.MINUS);
+      return token(TokenType.MINUS, start);
     }
   }
 

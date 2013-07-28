@@ -6,9 +6,9 @@ package parser;
  * @author urs
  */
 public class Symbol {
-  char sym;
-  int line;
-  int row;
+  final char sym;
+  final int line;
+  final int row;
 
   public Symbol(char sym, int line, int row) {
     this.sym = sym;
