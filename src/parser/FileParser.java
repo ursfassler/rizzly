@@ -4,6 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import common.Designator;
+import common.ElementInfo;
+import common.Metadata;
 
 import error.ErrorType;
 import error.RError;
@@ -31,10 +33,12 @@ public class FileParser extends BaseParser {
 
   // EBNF file: import { ifacedefsec | compdefsec |  typesec | constDeclBlock | globalFunction }
   private RizzlyFile parseFile() {
-    Token tok = peek();
+    ElementInfo info = peek().getInfo();
+    ArrayList<Metadata> meta = getMetadata();
+    info.getMetadata().addAll(meta);
     List<Designator> imp = parseImport();
 
-    RizzlyFile ret = new RizzlyFile(tok.getInfo(), imp);
+    RizzlyFile ret = new RizzlyFile(info, imp);
 
     while (peek().getType() != TokenType.EOF) {
       switch (peek().getType()) {

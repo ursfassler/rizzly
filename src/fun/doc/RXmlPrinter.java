@@ -235,6 +235,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   @Override
   protected Void visitRizzlyFile(RizzlyFile obj, Designator param) {
     assert (param == null);
+    writeMeta(obj);
     visitImports(obj.getImports(), null);
     xw.sectionSeparator();
     visitNamedSection("const", obj.getConstant().getList());
