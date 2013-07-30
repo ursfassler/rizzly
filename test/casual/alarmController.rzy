@@ -1,0 +1,31 @@
+interface
+  TimeConfig
+    function getTime():U{17};
+    function time( seconds: U{17} );
+  end
+  
+component
+  AlarmController
+    input
+      config      : TimeConfig;
+    
+  implementation hfsm(Disabled)
+    entry
+      atime   := 0;
+    end
+    
+    var
+      atime   : U{17};
+      
+    function config.getTime():U{17}
+      return atime;
+    end
+    
+    state Disabled
+    end
+    
+    transition 
+      Disabled to Disabled by config.time( seconds: U{17} ) if 0 = seconds;
+    
+  end
+

@@ -1,0 +1,4 @@
+
+const
+  Answer : U{8} = 42;
+

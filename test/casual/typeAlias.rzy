@@ -1,0 +1,31 @@
+
+type
+  Byte = U{8};
+  Word = U{16};
+  Unsigned{T:Type{Natural}} = T;
+  
+interface
+  Iface
+    function foo();
+  end
+  
+component
+  TypeAlias
+    input
+      in  : Iface;
+  
+    implementation elementary
+
+    var
+      a : Byte;
+      b : Word;
+      c : Unsigned{U{32}};
+      
+    function in.foo()
+      a := 0;
+      b := 0;
+      c := 0;
+    end
+    
+  end
+

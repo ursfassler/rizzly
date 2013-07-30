@@ -1,0 +1,55 @@
+
+type
+  Point = Record
+    x : U{8};
+    y : U{8};
+  end
+
+interface
+  Tick
+    function tick( x: U{8} );
+    function tack():U{8};
+  end
+  
+  Tack
+    function tack():Point;
+    function tock();
+  end
+
+component
+  Expr
+    input
+      in  : Tick;
+    
+    output
+      out1 : Tick;
+      out2 : Tick;
+      out3 : Tick;
+      out4 : Tack;
+      
+    implementation elementary
+    
+    var
+      a : Array{10,Point};
+      f : U{8};
+    
+    function foo( x, y, z: U{8} ):U{8}
+      if x+2 > z-3 then
+        a[z*2-y].x := x;
+      else
+        a[out2.tack()-z].y := y + out4.tack().x;
+      end
+      return x + y * z - a[out1.tick(x)].y * a[out1.tick(y)].x;
+      // Error                  ^^^^: tick is not a query
+    end
+    
+    function in.tick( x: U{8} )
+      f := foo( out1.tick( x ), out2.tick( out3.tick(  x - 10 * 5 ) ), foo( 1, 2, 3) * 3 - x );
+    end
+
+    function in.tack():U{8}
+      return f;
+    end
+
+  end
+

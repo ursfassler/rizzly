@@ -1,0 +1,10 @@
+component
+  GenericSub{T:Type}
+    implementation elementary
+
+    var
+      sub: T;
+      
+  end
+
+

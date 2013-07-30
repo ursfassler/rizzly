@@ -1,0 +1,28 @@
+import
+  iface.iface0;
+
+component
+  Base1
+
+    input
+      in    : Iface0;
+
+    output
+      out   : Iface0;
+
+    implementation elementary
+
+    function sqr( x: U{8} ):U{8}
+     return x*x;
+    end
+
+    function in.foo( x: U{8} ):Point
+      return out.foo( sqr( x ) );
+    end
+
+    function in.bar( x: U{8} ):U{8}
+      return 0;
+    end
+
+  end
+  

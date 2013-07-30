@@ -8,7 +8,7 @@ public class HfsmTest extends BaseTest {
 
   @Override
   protected String getRootdir() {
-    return "/home/urs/projekte/rizzly/compiler/test/hfsm/";
+    return "hfsm/";
   }
 
   @Test
@@ -52,8 +52,8 @@ public class HfsmTest extends BaseTest {
   }
 
   @Test
-  public void entryExit01() {
-    compile("entryExit01", "EntryExit01", true, DEBUG_EVENT, false);
+  public void entryExit1() {
+    compile("entryExit1", "EntryExit1", true, DEBUG_EVENT, false);
   }
 
   @Test

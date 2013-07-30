@@ -1,0 +1,100 @@
+//test ok
+
+import
+  tick;
+  valueEvent;
+
+component
+  Hfsm
+
+  input
+    tick    : Tick;
+  
+  output
+    evt     : ValueEvent;
+
+  implementation hfsm(A)
+    transition 
+      AA to B.BB by tick.tick() do
+        evt.evt( 1 );
+      end
+      AA.BB to B by tick.tick() do
+        evt.evt( 2 );
+      end
+    
+    state A(AA)
+      entry
+        evt.evt( 10 );
+      end
+      exit
+        evt.evt( 19 );
+      end
+      
+      var
+        c : U{8};
+
+      function tuwas( x: U{8} ):U{8}
+        return x;
+      end
+      
+      state AA(AAA)
+        entry
+          evt.evt( 20 );
+        end
+        exit
+          evt.evt( 29 );
+        end
+        
+        state AAA
+          entry
+            evt.evt( 30 );
+          end
+          exit
+            evt.evt( 39 );
+          end
+        end
+        
+        transition 
+          AA to BB by tick.tick() do
+            evt.evt( 3 );
+          end
+    
+        state BB
+          entry
+            evt.evt( 40 );
+          end
+          exit
+            evt.evt( 49 );
+          end
+        end
+      end
+    end
+
+    state B(BB)
+      entry
+        evt.evt( 50 );
+      end
+      exit
+        evt.evt( 59 );
+      end
+
+      state BB(BBB)
+        entry
+          evt.evt( 60 );
+        end
+        exit
+          evt.evt( 69 );
+        end
+        
+        state BBB
+          entry
+            evt.evt( 70 );
+          end
+          exit
+            evt.evt( 79 );
+          end
+        end
+      end
+    end
+  end
+

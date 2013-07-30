@@ -1,0 +1,29 @@
+interface
+  Iface
+    function funcA();
+    function funcB();
+  end
+
+component
+  Sub
+    output
+      out: Iface;
+      
+    implementation elementary
+  end
+
+  Err7
+    implementation elementary
+    
+    component
+      a : Sub;
+      b : Sub;
+
+    function a.out.funcA()
+    end
+
+    function a.out.funcB()
+    end
+
+  end
+

@@ -1,0 +1,41 @@
+//test ok
+
+interface
+  Tick
+    function tick();
+  end
+
+component
+  Jump
+
+  input
+    in      : Tick;
+  
+  output
+    out     : Tick;
+    
+  implementation hfsm(A)
+    state A(X)
+      state X
+      end
+    end
+    
+    state B(Y)
+      state Y
+      end
+    end
+    
+    state C(Z)
+      state Z
+      end
+    end
+    
+    transition 
+      A to B by in.tick();
+      B to C by in.tick();
+      C to A by in.tick() do
+        out.tick();
+      end
+        
+  end
+

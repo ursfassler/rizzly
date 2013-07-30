@@ -1,0 +1,40 @@
+type
+  TheRecord{T:Type{Natural}} = Record
+    a : T;
+    b : U{8};
+  end
+
+  The2Record{T:Type{Natural};R:Type} = Record
+    a : T;
+    b : R;
+  end
+
+  The3Record{R:Type} = Record
+    a : U{8};
+    b : R;
+  end
+
+component
+  SmallGeneric{T:Type{Natural}}
+    implementation elementary
+
+    var
+      dat1: TheRecord{T};
+      dat2: The2Record{T,Boolean};
+      dat3: The2Record{T,T};
+      dat4: The3Record{Boolean};
+      dat5: The3Record{TheRecord{T}};
+      dat6: The3Record{The2Record{T,Boolean}};
+      dat7: The3Record{The2Record{T,TheRecord{T}}};
+      a: T;
+  end
+
+  SmallGenericUse
+    implementation elementary
+
+    component
+      gen1 : SmallGeneric{U{8}};
+      gen2 : SmallGeneric{U{16}};
+    
+  end
+

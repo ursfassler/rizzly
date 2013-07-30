@@ -1,0 +1,47 @@
+
+interface
+  Iface
+    function tick();
+  end
+  
+component
+  TransScope
+    input
+      in : Iface;
+    
+  implementation hfsm( A )
+  
+    transition
+      A to B by in.tick() if a = 0;
+      B to A by in.tick() if b = 0;
+  
+    state A
+      entry
+        a := 5;
+      end
+      
+      var
+        a : U{8};
+        
+      transition
+        A to A by in.tick() do
+          a := a - 1;
+        end
+    end
+      
+    state B
+      entry
+        b := 3;
+      end
+      
+      var
+        b : U{8};
+        
+      transition
+        B to B by in.tick() do
+          b := b - 1;
+        end
+    end
+
+  end
+

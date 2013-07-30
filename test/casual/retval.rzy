@@ -1,0 +1,21 @@
+interface
+  Iface
+    function foo():U{8};
+  end
+
+component  
+  Retval
+    input
+      in    : Iface;
+
+    output
+      out   : Iface;
+
+    implementation elementary
+ 
+    function in.foo():U{8}
+      x : U{8} = out.foo();
+      return x;
+    end
+  end
+

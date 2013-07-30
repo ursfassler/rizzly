@@ -1,0 +1,16 @@
+
+component
+  Linkorder
+      
+    implementation elementary
+    
+    function foo()
+      bar();
+    end
+    
+    function bar()
+      foo();
+    end
+
+  end
+

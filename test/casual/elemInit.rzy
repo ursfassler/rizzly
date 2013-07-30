@@ -1,0 +1,29 @@
+interface
+  Iface
+    function get():U{8};
+  end
+
+component
+  ElemInit 
+    input
+      in  : Iface;
+
+  implementation elementary
+    
+    var
+      x : U{8};
+      
+    entry
+      x := 42;
+    end
+    
+    exit
+      x := 23;
+    end
+    
+    function in.get():U{8}
+      return x;
+    end
+
+  end
+

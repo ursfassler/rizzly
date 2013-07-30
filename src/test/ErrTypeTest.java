@@ -5,7 +5,7 @@ import org.junit.Test;
 public class ErrTypeTest extends ErrorTest {
   @Override
   protected String getRootdir() {
-    return "/home/urs/projekte/rizzly/compiler/test/error/type/";
+    return "error/type/";
   }
 
   @Test

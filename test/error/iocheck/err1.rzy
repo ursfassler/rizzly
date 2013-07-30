@@ -1,0 +1,29 @@
+// Error: query is not allowed to output
+
+
+interface
+  IfaceEvent
+    function event();
+  end
+  
+  IfaceQuerry
+    function query():U{8};
+  end
+  
+component
+  Err1
+    input
+      in  : IfaceQuerry;
+    
+    output
+      out : IfaceEvent;
+      
+    implementation elementary
+    
+    function in.query():U{8}
+      out.event();
+      return 0;
+    end
+    
+  end
+

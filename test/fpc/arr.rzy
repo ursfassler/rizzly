@@ -1,0 +1,33 @@
+interface
+  Iface1
+    function foo( x: Array{10,U{8}} );
+  end
+
+  Iface2
+    function foo( x: Array{3,U{8}} );
+  end
+  
+component
+  Arr
+    input
+      in  : Iface1;
+    
+    output
+      out : Iface2;
+
+    implementation elementary
+    
+    var
+      a : Array{10,U{8}};
+    
+    function in.foo( x: Array{10,U{8}} )
+      a := x;
+      b : Array{3,U{8}};
+      b[0] := a[0];
+      b[1] := a[2];
+      b[2] := a[5];
+      out.foo( b );
+    end
+
+  end
+

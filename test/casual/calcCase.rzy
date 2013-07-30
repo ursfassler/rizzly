@@ -1,0 +1,32 @@
+interface
+  Tick
+    function tick( data: U{8} );
+  end
+
+component
+  CalcCase
+
+    input
+      in    : Tick;
+
+    output
+      out   : Tick;
+
+    implementation elementary
+
+    function in.tick( x: U{8} )
+      case x+2 of
+        0..10:
+          out.tick( 2 );
+        end
+        11:
+          out.tick( 3 );
+        end
+        12..20:
+          out.tick( 4 );
+        end
+      end
+    end
+
+  end
+

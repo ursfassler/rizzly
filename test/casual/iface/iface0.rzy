@@ -1,0 +1,14 @@
+
+type
+  Point = Record
+    x : U{8};
+    y : U{8};
+  end
+
+interface
+  Iface0
+    function foo( x: U{8} ):Point;
+    function bar( x: U{8} ):U{8};
+  end
+
+

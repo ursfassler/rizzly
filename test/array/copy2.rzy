@@ -1,0 +1,13 @@
+component
+  Copy
+
+    implementation elementary
+
+    function foo()
+      a, b : Array{10,U{8}};
+      b[0] := 1;
+      a := b;
+    end
+
+  end
+

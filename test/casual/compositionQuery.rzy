@@ -1,0 +1,45 @@
+interface
+  Iface
+    function foo( x: U{8}; y: U{13} );
+    function bar( x: U{16} ):U{15};
+  end
+
+component
+  DummyComp
+    input
+      in  : Iface;
+    
+    output
+      out : Iface;
+
+    implementation elementary
+
+    function in.foo( x: U{8}; y: U{13} )
+      out.foo( x, y );
+    end
+
+    function in.bar( x: U{16} ):U{15}
+      return out.bar( x );
+    end
+    
+  end
+
+  CompositionQuery
+    input
+      in  : Iface;
+    
+    output
+      out : Iface;
+
+    implementation composition
+    
+    component
+      a : DummyComp;
+      b : DummyComp;
+    
+    connection
+      in -> a.in;
+      a.out -> b.in;
+      b.out -> out;
+  end
+

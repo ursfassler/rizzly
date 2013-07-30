@@ -1,0 +1,28 @@
+//test ok
+
+
+import
+  tick;
+
+component
+  Elementary3
+
+  input
+    tickIn  : Tick;
+  
+  output
+    tickOut : Tick;
+
+  implementation elementary
+
+    var
+      count : U{8};
+
+    function tickIn.tick()
+      count := (count+1) mod 2;
+      if count = 0 then
+        tickOut.tick();
+      end
+    end
+  end
+  

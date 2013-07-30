@@ -1,0 +1,30 @@
+import
+  iface.iface0;
+
+component
+  While
+
+    input
+      in    : Iface0;
+
+    output
+      out   : Iface0;
+
+    implementation elementary
+
+    function in.foo( x: U{8} ):Point
+      ret : Point;
+      ret.x := 0;
+      ret.y := 0;
+      while x > 0 do
+        ret := out.foo( x );
+        x := x-1;
+      end
+      return ret;
+    end
+
+    function in.bar( x: U{8} ):U{8}
+      return 0;
+    end
+  end
+

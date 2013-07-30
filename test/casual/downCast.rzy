@@ -1,0 +1,34 @@
+
+interface
+  Tick
+    function tick( x: U{16} ):U{8};
+  end
+  
+component
+  DownCast
+    input
+      a   : Tick;
+      b   : Tick;
+      c   : Tick;
+      d   : Tick;
+    
+    implementation elementary
+    
+    function a.tick( x: U{16} ):U{8}
+      return x and 255;
+    end
+    
+    function b.tick( x: U{16} ):U{8}
+      return x mod 250;
+    end
+
+    function c.tick( x: U{16} ):U{8}
+      return x and 31;
+    end
+    
+    function d.tick( x: U{16} ):U{8}
+      return x mod 42;
+    end
+
+  end
+

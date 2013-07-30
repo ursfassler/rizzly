@@ -1,0 +1,43 @@
+//testcase
+
+interface
+  Tick
+    function tick;
+  end
+
+component
+  Forward
+    input
+      in  : Tick;                     //
+    output                            // 
+      out : Tick;
+      
+  implementation composition          //dummy meta1
+    connection
+      in -> out;
+  end
+
+  Meta
+    input
+      in1  : Tick;
+    output
+      out1 : Tick;
+      
+  implementation composition          //geometry width="420"
+  // bla bla 1
+  //geometry height="140"
+  // bla bla 2
+    component
+      a : Forward;                    //geometry x="140" y="20"
+      b : Forward;                    //geometry x="280" y="65"
+      
+    connection
+      in1 -> a.in;                    //geometry path="75"
+      a.out -> out1;                  
+      in1 -> b.in;
+      //geometry path="65"
+      a.out -> b.in;                  //geometry path="210"
+      b.out -> out1;                  //geometry path="350"
+
+  end
+

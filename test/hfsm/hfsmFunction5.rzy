@@ -1,0 +1,18 @@
+// ok
+
+component
+  HfsmFunction5
+
+  implementation hfsm(A)
+
+    state A
+      entry
+        tuwas();
+      end
+      
+      function tuwas()
+      end
+      
+    end
+  end
+

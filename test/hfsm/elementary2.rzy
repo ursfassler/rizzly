@@ -1,0 +1,22 @@
+//test ok
+
+import
+  tick;
+
+component
+  Elementary2
+
+  input
+    tickIn  : Tick;
+  
+  output
+    tickOut : Tick;
+
+  implementation elementary
+
+    function tickIn.tick()
+      tickOut.tick();
+    end
+
+  end
+

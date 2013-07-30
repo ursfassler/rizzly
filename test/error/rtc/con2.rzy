@@ -1,0 +1,38 @@
+// error: loop in connection graph for sub
+
+interface
+  Tick
+    function tick;
+  end
+
+component
+  Dummy
+    input
+      in  : Tick;
+    output
+      out : Tick;
+      
+  implementation elementary
+    function in.tick
+      out.tick();
+    end
+  end
+
+  Con2
+    input
+      in  : Tick;
+    output
+      out : Tick;
+      
+  implementation composition
+    component
+      sub1 : Dummy;
+      sub2 : Dummy;
+      
+    connection
+      in -> out;
+      sub1.out -> sub2.in;
+      sub2.out -> sub1.in;
+      
+  end
+

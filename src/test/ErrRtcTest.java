@@ -5,7 +5,7 @@ import org.junit.Test;
 public class ErrRtcTest extends ErrorTest {
   @Override
   protected String getRootdir() {
-    return "/home/urs/projekte/rizzly/compiler/test/error/rtc/";
+    return "error/rtc/";
   }
 
   @Test

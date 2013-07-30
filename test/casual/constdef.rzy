@@ -1,0 +1,18 @@
+
+const
+  Answer : U{8} = 42;
+
+component
+  Constdef
+
+    implementation elementary
+
+    const
+      BlaBla : U{8} = 23;
+
+    function foo()
+      bar : U{8} = Answer;
+    end
+
+  end
+

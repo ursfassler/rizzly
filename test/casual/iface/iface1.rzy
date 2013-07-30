@@ -1,0 +1,7 @@
+type
+  Point = Record
+    x : U{8};
+    y : U{8};
+  end
+
+

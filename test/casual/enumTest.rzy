@@ -1,0 +1,22 @@
+type
+  Color = Enum
+    Red;
+    Green;
+    Blue;
+  end
+  
+component
+  EnumTest
+
+    implementation elementary
+
+    function foo()
+      color : Color = Color.Red;
+      if color = Color.Green then
+        color := Color.Blue;  //TODO should also work with Blue only: no
+      end
+    end
+
+  end
+
+

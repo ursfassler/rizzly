@@ -1,0 +1,16 @@
+component
+  ArrayTest
+
+    implementation elementary
+
+    var
+      a : Array{20,U{8}};
+
+    function foo()
+      a[0] := 10;
+      a[2] := 4;
+      a[1] := a[0] + a[2];
+    end
+
+  end
+

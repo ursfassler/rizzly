@@ -1,0 +1,20 @@
+type
+  Point = Record
+    x : U{8};
+    y : U{8};
+  end
+
+component
+  Rec
+
+    implementation elementary
+
+    function foo( x: U{8} ):Point
+      res : Point;
+      res.x := x + 3;
+      res.y := res.x + 3;
+      return res;
+    end
+
+  end
+

@@ -1,0 +1,9 @@
+//test ok
+
+component
+  Elementary1
+
+  implementation elementary
+
+  end
+ 

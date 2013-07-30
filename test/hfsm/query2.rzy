@@ -1,0 +1,34 @@
+
+interface
+  Iface
+    function tick();
+    function read():U{8};
+  end
+  
+component
+  Query2
+    input
+      in : Iface;
+    
+  implementation hfsm( A )
+  
+    transition
+      A to B by in.tick();
+      B to C by in.tick();
+      C to A by in.tick();
+  
+    state A
+    end
+      
+    state B
+    end
+
+    state C
+    end
+    
+    function in.read():U{8}
+      return 0;
+    end
+  
+  end
+

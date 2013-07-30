@@ -1,0 +1,15 @@
+import
+  genericDef;
+
+component
+  GenericUse
+    implementation elementary
+    component
+      gen : GenericDef{U{8}};
+
+    function foo()
+      gen.in.set( 42 );
+      a : U{8} = gen.in.get();
+    end
+  end
+

@@ -7,7 +7,7 @@ public class ArrayTest extends BaseTest {
 
   @Override
   protected String getRootdir() {
-    return "/home/urs/projekte/rizzly/compiler/test/array/";
+    return "array/";
   }
 
   @Test

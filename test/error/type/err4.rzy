@@ -1,0 +1,25 @@
+type
+  Weekday = Enum
+    Monday;
+    Tuesday;
+    Wednesday;
+    Thursday;
+    Friday;
+    Saturday;
+    Sunday;
+  end
+
+component
+  Err4
+
+    implementation elementary
+
+    function foo( x: Weekday )
+      bar( x );
+    end
+
+    function bar( x: U{8} )
+    end
+
+  end
+

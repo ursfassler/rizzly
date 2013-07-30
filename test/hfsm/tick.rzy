@@ -1,0 +1,6 @@
+
+interface
+  Tick
+    function tick();
+  end
+

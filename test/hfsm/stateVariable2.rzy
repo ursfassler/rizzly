@@ -1,0 +1,30 @@
+import
+  tick;
+
+component
+  StateVariable2
+
+  input
+    tick    : Tick;
+
+  implementation hfsm(A)
+
+    state A
+      entry
+        a := a + 3;
+      end
+      
+      var
+        a : U{8};
+        
+      function tuwas()
+        a := a + 2;
+      end
+      
+      transition 
+        A to A by tick.tick() do
+          a := a + 1;
+        end
+    end
+  end
+

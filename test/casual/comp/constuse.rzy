@@ -1,0 +1,15 @@
+
+import
+  iface.constdef;
+
+component
+  ConstUse
+      
+    implementation elementary
+
+    var
+      blaBla : Array{Answer,U{8}};
+
+
+  end
+

@@ -1,0 +1,54 @@
+type
+  Rec = Record
+    a : U{8};
+    b : U{8};
+  end
+  
+  Uni = Union
+    dat1 : Rec;
+    dat2 : U{16};
+  end
+
+interface
+  Data
+    function set1( a, b: U{8} );
+    function set2( c: U{16} );
+    function get1a():U{8};
+    function get1b():U{8};
+    function get2():U{16};
+  end
+
+component
+  UnionTest 
+    input
+      in  : Data;
+
+    implementation elementary
+
+    var
+      data : Uni;
+  
+    function in.set1( a, b: U{8} )
+      data.dat1.a := a;
+      data.dat1.b := b;
+    end
+    
+    function in.set2( c: U{16} )
+      data.dat2 := c;
+    end
+    
+    function in.get1a():U{8}
+      return data.dat1.a;
+    end
+    
+    function in.get1b():U{8}
+      return data.dat1.b;
+    end
+    
+    function in.get2():U{16}
+      return data.dat2;
+    end
+    
+
+  end
+

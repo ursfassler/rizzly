@@ -1,0 +1,14 @@
+
+import
+  iface.constdef;
+  comp.constuse;
+
+component
+  ExtConst
+    implementation composition
+
+    component
+      comp : ConstUse;
+    
+  end
+

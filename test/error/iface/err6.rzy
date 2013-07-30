@@ -1,0 +1,24 @@
+interface
+  Iface
+    function funcA();
+    function funcB();
+  end
+
+component
+  Err6
+    input
+      in    : Iface;
+
+    implementation elementary
+
+    function in.funcA()
+    end
+
+    function in.funcB()
+    end
+    
+    function in2.funcA()
+    end
+    
+  end
+

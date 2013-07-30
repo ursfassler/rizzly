@@ -1,8 +1,5 @@
 package test;
 
-import java.io.File;
-import java.io.FilenameFilter;
-
 import org.junit.Test;
 
 public class CasualTest extends BaseTest {
@@ -15,27 +12,12 @@ public class CasualTest extends BaseTest {
 
   @Override
   protected String getRootdir() {
-    return "/home/urs/projekte/rizzly/compiler/test/casual/"; // TODO change path to new repo
+    return "casual/";
   }
 
   @Test
-  public void allTest() {
-    File root = new File(getRootdir());
-    FilenameFilter rzy = new FilenameFilter() {
-      @Override
-      public boolean accept(File file, String name) {
-        return name.endsWith(".rzy");
-      }
-    };
-    for (String file : root.list(rzy)) {
-      String ns = file.substring(0, file.length()-4);
-      String classname = Character.toUpperCase(ns.charAt(0)) + ns.substring(1);
-      test(ns,classname);
-    }
-  }
-
-  private void test(String filename, String classname) {
-    compile(filename, classname, true, DEBUG_EVENT, false);
+  public void meta() {
+    compile("meta", "Meta", true, DEBUG_EVENT, false);
   }
 
   @Test
@@ -134,8 +116,8 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
-  public void gencomp_GenericUse() {
-    compile("gencomp", "GenericUse", true, DEBUG_EVENT, false);
+  public void genericUse2() {
+    compile("genericUse2", "GenericUse2", true, DEBUG_EVENT, false);
   }
 
   @Test
@@ -156,11 +138,6 @@ public class CasualTest extends BaseTest {
   @Test
   public void ifacemap() {
     compile("ifacemap", "Ifacemap", true, DEBUG_EVENT, false);
-  }
-
-  @Test
-  public void meta() {
-    compile("meta", "Meta", true, DEBUG_EVENT, false);
   }
 
   @Test

@@ -1,0 +1,36 @@
+type
+  Color = Enum
+    Red;
+    Green;
+    Blue;
+  end
+
+interface
+  Iface1
+    function foo( x: U{8} );
+  end
+
+  Iface2
+    function foo( x: Color );
+  end
+  
+component
+  Enumt
+    input
+      in  : Iface1;
+    
+    output
+      out : Iface2;
+
+    implementation elementary
+    
+    function in.foo( x: U{8} )
+      case x of
+        0: out.foo( Color.Red ); end
+        1: out.foo( Color.Green ); end
+        2: out.foo( Color.Blue ); end
+      end
+    end
+    
+  end
+

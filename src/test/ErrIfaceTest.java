@@ -6,7 +6,7 @@ import org.junit.Test;
 public class ErrIfaceTest extends ErrorTest {
   @Override
   protected String getRootdir() {
-    return "/home/urs/projekte/rizzly/compiler/test/error/iface/";
+    return "error/iface/";
   }
 
   @Test

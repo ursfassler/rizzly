@@ -9,7 +9,7 @@ public class FpcTest extends BaseTest {
 
   @Override
   protected String getRootdir() {
-    return "/home/urs/projekte/rizzly/compiler/test/fpc/";
+    return "fpc/";
   }
 
   @Test

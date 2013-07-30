@@ -1,0 +1,27 @@
+interface
+  Tick
+    function tick( value: U{8} );
+  end
+
+component
+  Schmitt{Lower,Upper: U{8}}
+    input
+      in  : Tick;
+      
+  implementation hfsm( Low )
+    state Low end
+    state High end
+    
+    transition
+      Low to High by in.tick( value: U{8} ) do
+        a : U{8} = Upper;
+      end
+      High to Low by in.tick( value: U{8} ) if value <= Lower;
+  end
+  
+  Param
+  implementation elementary
+    component
+      schmitt : Schmitt{90,110};
+  end
+    

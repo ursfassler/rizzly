@@ -1,0 +1,91 @@
+component
+  VarInit
+
+    implementation elementary
+
+    function foo1( x: U{8} ):U{8}
+      a : U{8};
+      
+      if x > 20 then
+        a := 20;
+      ef x > 10 then
+        a := 10;
+      else
+        a := x;
+      end
+      
+      return a;
+    end
+
+    function foo2( x: U{8} ):U{8}
+      a : U{8};
+      
+      if x > 20 then
+        a := 20;
+      ef x > 10 then
+        a := 10;
+      else
+        return x;
+      end
+      
+      return a;
+    end
+
+    function foo3( x: U{8} ):U{8}
+      a : U{8};
+      
+      if x > 20 then
+        a := 20;
+      ef x > 10 then
+        return 10;
+      else
+        a := x;
+      end
+      
+      return a;
+    end
+
+    function foo4( x: U{8} ):U{8}
+      a : U{8};
+      
+      if x > 20 then
+       return 20;
+      ef x > 10 then
+        a := 10;
+      else
+        a := x;
+      end
+      
+      return a;
+    end
+
+    function foo5( x: U{8} ):U{8}
+      if x > 20 then
+        return 20;
+      ef x > 10 then
+        return 10;
+      else
+        return x;
+      end
+    end
+
+    function foo6( x: U{8} ):U{8}
+      a : U{8};
+      
+      case x of
+        20..29:
+          a := 20;
+        end
+        10..19:
+          a := 10;
+        end
+        0..9:
+          a := x;
+        end
+      end
+      
+      return a;
+    end
+
+  end
+

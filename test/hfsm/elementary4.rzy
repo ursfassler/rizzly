@@ -1,0 +1,25 @@
+//test ok
+
+import
+  valueEvent;
+
+component
+  Elementary4
+
+  input
+    evtIn   : ValueEvent;
+    
+  output
+    evtOut  : ValueEvent;
+
+  implementation elementary
+
+    function sqr( v: U{8} ):U{8}
+      return v*v;
+    end
+
+    function evtIn.evt( value: U{8} )
+      evtOut.evt( sqr( value ) );
+    end
+  end
+  

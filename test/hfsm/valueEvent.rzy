@@ -1,0 +1,6 @@
+
+interface
+  ValueEvent
+    function evt( value: U{8} );
+  end
+

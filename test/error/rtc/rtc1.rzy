@@ -1,0 +1,40 @@
+// error: loop in connection graph for sub
+
+interface
+  Tick
+    function tick;
+  end
+
+component
+  Dummy
+    input
+      in  : Tick;
+    output
+      out : Tick;
+      
+  implementation elementary
+    function in.tick
+      out.tick();
+    end
+  end
+
+  Rtc1
+    input
+      in  : Tick;
+    output
+      out : Tick;
+      
+  implementation elementary
+    component
+      sub : Dummy;
+      
+    function in.tick
+      out.tick();   //surpress errors or warnings about unused stuff
+    end
+    
+    function sub.out.tick
+      sub.in.tick();  // this is a circle
+    end
+
+  end
+

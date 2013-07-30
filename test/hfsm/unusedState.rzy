@@ -1,0 +1,53 @@
+// State BB, AB, CA, CB, C are never reached
+
+import
+  tick;
+
+component
+  UnusedState
+
+  input
+    tick    : Tick;
+
+  implementation hfsm(A)
+
+    state A(AA)
+      state AA
+        var
+          aa : U{8};
+      end
+
+      state AB
+      end
+    end
+
+    state B(BA)
+      var
+        b : U{8};
+
+      state BA
+      end
+
+      state BB
+        var
+          bb : U{8};
+      end
+    end
+
+    state C(CA)
+      var
+        c : U{8};
+
+      state CA
+      end
+
+      state CB
+      end
+    end
+
+    transition 
+      A to BA by tick.tick();
+      BA to A by tick.tick();
+      BB to A by tick.tick();
+  end
+

@@ -1,0 +1,29 @@
+// Error: query is not allowed to write state
+
+
+interface
+  IfaceQuerry
+    function query():U{8};
+  end
+  
+component
+  Err2
+    input
+      in  : IfaceQuerry;
+    
+    implementation elementary
+    
+    var
+      a : U{8};
+    
+    entry
+      a := 0;
+    end
+    
+    function in.query():U{8}
+      a := a + 1;
+      return a;
+    end
+    
+  end
+

@@ -1,0 +1,51 @@
+
+
+function something( x: U{8} ):U{8}
+  return x + 2;
+end
+
+const
+  Answer : U{8} = something( 42 );
+
+component
+  ConstInit
+
+    implementation elementary
+
+    const
+      BlaBla : U{8} = something( 23 );
+      BluBlu : U{8} = Answer;
+      BleBle : U{Answer} = 1;
+      BloBlo : U{8} = (Answer + 10) / 3;
+
+    var
+      a : U{Answer};
+      b : U{Answer+2};
+      
+    component
+      comp1 : Dummy{1};
+      comp2 : Dummy{Answer/2};
+
+    function foo()
+      bar : U{8} = Answer;
+      bar := something( bar );
+    end
+
+  end
+
+  Dummy{S:U{8}}
+  
+  implementation elementary
+  
+  const
+    Dodo : U{S} = 1;
+    Dudu : U{8} = S;
+    Dada : U{8} = something(S) - 1;
+  
+  var
+    a	 : U{S};
+    b : U{(S+10)/2};
+  
+  end
+
+

@@ -1,0 +1,20 @@
+interface
+  Iface
+    function foo();
+  end
+
+component
+  Nop
+    input
+      in  : Iface;
+    
+    output
+      out : Iface;
+
+    implementation composition
+    
+    connection
+      in -> out;
+
+  end
+

@@ -1,0 +1,7 @@
+
+interface
+  Iface2{T:Type{Natural}}
+    function in( x: T );
+    function out():T;
+  end
+

@@ -1,0 +1,7 @@
+
+interface
+  GenericIface{T:Type}
+    function set( item: T );
+    function get():T;
+  end
+

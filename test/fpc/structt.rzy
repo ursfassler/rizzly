@@ -1,0 +1,40 @@
+type
+  Point = Record
+    x : U{8};
+    y : U{8};
+  end
+
+interface
+  Iface1
+    function foo( x, y: U{8} );
+  end
+
+  Iface2
+    function foo( x: Point );
+  end
+  
+component
+  Structt
+    input
+      in1  : Iface1;
+      in2  : Iface2;
+    
+    output
+      out1 : Iface2;
+      out2 : Iface1;
+
+    implementation elementary
+    
+    function in1.foo( x, y: U{8} )
+      p : Point;
+      p.x := x;
+      p.y := y;
+      out1.foo( p );
+    end
+    
+    function in2.foo( p: Point )
+      out2.foo( p.x, p.y );
+    end
+
+  end
+

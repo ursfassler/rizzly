@@ -1,0 +1,19 @@
+interface
+  Iface
+    function foo( x: U{17} );
+  end
+  
+component
+  Bitred
+    input
+      in      : Iface;
+    
+  implementation hfsm(A)
+    state A
+    end
+    
+    transition 
+      A to A by in.foo( x: U{17} ) if x > 0;
+    
+  end
+

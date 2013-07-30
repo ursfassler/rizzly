@@ -1,0 +1,36 @@
+interface
+  GenericIface{T:Type}
+    function set( item: T );
+    function get():T;
+  end
+
+component
+  GenericDef{T:Type{Integer}}
+    input
+      in: GenericIface{T};
+
+    implementation elementary
+
+    var
+      data: T;
+
+    function in.set( item: T )
+      data := item;
+    end
+
+    function in.get():T
+      return data;
+    end
+  end
+  
+  GenericUse2
+    implementation elementary
+    component
+      gen : GenericDef{U{8}};
+
+    function foo()
+      gen.in.set( 42 );
+      a : U{8} = gen.in.get();
+    end
+  end
+

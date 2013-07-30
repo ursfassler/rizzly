@@ -1,0 +1,17 @@
+// ok
+component
+  HfsmFunction4
+
+  implementation hfsm(A)
+
+    state A
+      var
+        a : U{8};
+        
+      function tuwas()
+        a := a + 1;
+      end
+      
+    end
+  end
+

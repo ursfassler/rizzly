@@ -1,0 +1,35 @@
+const
+  data : Array{10,U{8}} = [
+    10,
+    20,
+    1,
+    2,
+    3,
+    4,
+    100,
+    5,
+    12,
+    7 
+  ];
+
+interface
+  Iface
+    function foo( x: U{8} );
+  end
+
+component
+  ArrayValue
+    input
+      in  : Iface;
+    
+    output
+      out : Iface;
+
+    implementation elementary
+    
+    function in.foo( x: U{8} )
+      out.foo( data[x] );
+    end
+
+  end
+

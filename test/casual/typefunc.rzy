@@ -1,0 +1,25 @@
+
+function getBits( nr: Natural ):Natural
+  bits : Natural = 0;
+  while nr <> 0 do
+    nr   := nr shr 1;
+    bits := bits + 1;
+  end
+  return bits;
+end
+
+type
+  Rec{T:Type} = Record
+    a : T;
+    b : T;
+  end
+
+component
+  Typefunc
+    implementation elementary
+      var
+        a : U{getBits( 42 )};
+        b : U{8};
+        c : Rec{U{8}};
+  end
+

@@ -1,0 +1,27 @@
+
+const
+  Name : String = 'Hallo';
+
+interface
+  Iface
+    function foo( value: String );
+  end
+
+component
+  Stringt
+    input
+      in    : Iface;
+    
+    output
+      out1   : Iface;
+      out2   : Iface;
+
+    implementation elementary
+
+    function in.foo( value: String )
+      out1.foo( value );
+      out2.foo( Name );
+    end
+    
+  end
+

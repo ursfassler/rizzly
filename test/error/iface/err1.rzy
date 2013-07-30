@@ -1,0 +1,18 @@
+interface
+  Iface
+    function funcA();
+    function funcB();
+  end
+
+component
+  Err1
+    input
+      in    : Iface;
+
+    implementation elementary
+
+    function in.funcA()
+    end
+
+  end
+

@@ -1,0 +1,12 @@
+
+component
+  Linkorder2
+      
+    implementation elementary
+    
+    function foo()
+      foo();
+    end
+    
+  end
+

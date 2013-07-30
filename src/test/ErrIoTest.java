@@ -5,7 +5,7 @@ import org.junit.Test;
 public class ErrIoTest extends ErrorTest {
   @Override
   protected String getRootdir() {
-    return "/home/urs/projekte/rizzly/compiler/test/error/iocheck/";
+    return "error/iocheck/";
   }
 
   @Test

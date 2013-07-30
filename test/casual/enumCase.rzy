@@ -1,0 +1,49 @@
+type
+  Weekday = Enum
+    Monday;
+    Tuesday;
+    Wednesday;
+    Thursday;
+    Friday;
+    Saturday;
+    Sunday;
+  end
+
+interface
+  Tick
+    function tick( data: Weekday );
+  end
+
+  Data
+    function data( value: U{8} );
+  end
+
+component
+  EnumCase
+    input
+      in    : Tick;
+
+    output
+      out   : Data;
+
+    implementation elementary
+
+    function in.tick( x: Weekday )
+      case x of
+        Weekday.Monday,Weekday.Wednesday:
+          out.data( 2 );
+        end
+        Weekday.Tuesday:
+          out.data( 0 );
+        end
+        Weekday.Thursday..Weekday.Saturday:
+          out.data( 1 );
+        end
+        else
+          out.data( 8 );
+        end
+      end
+    end
+
+  end
+

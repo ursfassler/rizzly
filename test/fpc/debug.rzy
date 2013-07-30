@@ -1,0 +1,56 @@
+
+interface
+  Iface
+    function foo();
+    function bar();
+    function poh();
+  end
+
+component
+  DummyComp
+    input
+      in    : Iface;
+    
+    output
+      out   : Iface;
+
+    implementation elementary
+
+    function in.foo()
+      out.foo();
+      out.bar();
+    end
+
+    function in.bar()
+      out.bar();
+      out.poh();
+    end
+
+    function in.poh()
+      out.bar();
+    end
+
+  end
+
+  Debug
+    input
+      in    : Iface;
+    
+    output
+      out   : Iface;
+
+    implementation composition
+    
+    component
+      a : DummyComp;
+      b : DummyComp;
+    
+    connection
+      in -> a.in;
+      in -> b.in;
+    
+      a.out -> b.in;
+      b.out -> out;
+    
+  end
+

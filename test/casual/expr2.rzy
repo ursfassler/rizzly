@@ -1,0 +1,60 @@
+
+type
+  Point = Record
+    x : U{8};
+    y : U{8};
+  end
+
+interface
+  Tick
+    function tick( x: U{8} );
+  end
+
+component
+  Expr2
+    input
+      in  : Tick;
+    
+    output
+      out : Tick;
+      
+    implementation elementary
+    
+    function in.tick( x: U{8} )
+      y1 : U{8} = +x;
+      y2 : U{8} = -x;
+
+      y4 : U{8};
+      case x of
+        0..1: y4 := x + 2; end
+        2..3: y4 := x - 2; end
+        4..5: y4 := x * 2; end
+        6..7: y4 := x / 2; end
+        8..9: y4 := x mod 2; end
+        10..11: y4 := x shr 2; end
+        12..13: y4 := x and 13; end
+        14..15: y4 := x or 14; end
+        16..17: y4 := x shl 2; end
+        else y4 := x; end
+      end
+      
+      y5 : Boolean;
+      case x of
+        0..1: y5 := y4 < 10; end
+        2..3: y5 := y4 <= 10; end
+        4..5: y5 := y4 > 10; end
+        6..7: y5 := y4 >= 10; end
+        8..9: y5 := y4 = 10; end
+        10..11: y5 := y4 <> 10; end
+        else y5 := not (y4 = 10); end
+      end
+        
+      if y5 then
+        out.tick( y1 + y2 + y4 );
+      else
+        out.tick( 42 );
+      end
+    end
+
+  end
+

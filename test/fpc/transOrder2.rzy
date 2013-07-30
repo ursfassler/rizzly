@@ -1,0 +1,32 @@
+//test ok
+
+interface
+  ValueEvent
+    function tick( val: U{8} );
+  end
+
+component
+  TransOrder2
+
+  input
+    in      : ValueEvent;
+  
+  output
+    out     : ValueEvent;
+    
+  implementation hfsm(A)
+    transition 
+      A.AA to A by in.tick( val: U{8} ) do
+        out.tick( 0 );
+      end
+      
+    state A(AA)
+      state AA
+        transition 
+          A to A by in.tick( val: U{8} ) do
+            out.tick( 1 );
+          end
+      end
+    end
+  end
+

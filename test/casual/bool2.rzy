@@ -1,0 +1,26 @@
+interface
+  Tick
+    function tick( x: U{8} );
+  end
+
+component
+  Bool2
+    input
+      tickIn  : Tick;
+    
+    output
+      tickOut : Tick;
+      
+    implementation elementary
+
+    function tickIn.tick( x: U{8} )
+      if (x = 0) = False then
+        tickOut.tick( 7 );
+      else
+        tickOut.tick( 8 );
+      end
+    end
+
+  end
+
+

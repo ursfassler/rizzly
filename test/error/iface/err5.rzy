@@ -1,0 +1,15 @@
+interface
+  Iface
+    function funcA();
+    function funcB();
+  end
+
+component
+  Err5
+    input
+      in    : Iface;
+
+    implementation elementary
+
+  end
+

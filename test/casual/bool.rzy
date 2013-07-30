@@ -1,0 +1,43 @@
+type
+  Rec = Record
+    a   : Boolean;
+    b   : Boolean;
+    c   : Boolean;
+  end
+  
+  TheBool = Boolean;
+  TheArray = Array{3,Boolean};
+
+interface  
+  Tick
+    function tick( x: U{8} );
+  end
+
+component
+  Bool
+    input
+      tickIn  : Tick;
+    
+    output
+      tickOut : Tick;
+      
+    implementation elementary
+
+    var
+      varA  : Rec;
+      varB  : Boolean;  //TODO what with TheBool?
+      varC  : Array{3,Boolean};  //TODO what with TheArray?
+    
+    function tickIn.tick( x: U{8} )
+      if x = 0 then
+        varA.a := True;
+        varA.b := varB;
+      else
+        varB   := varC[1];
+        tickOut.tick( 7 );
+      end
+    end
+
+  end
+
+

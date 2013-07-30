@@ -1,0 +1,13 @@
+interface
+  Foo
+    function bar();
+  end
+
+component
+  Linking
+    output
+      linking   : Foo;    // it has the same name as namespace, may cause problem
+
+  implementation elementary
+  end
+

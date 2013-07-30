@@ -1,0 +1,14 @@
+component
+  Copy
+
+    implementation elementary
+
+    var
+      a : Array{10,U{8}};
+
+    function foo()
+      b : Array{10,U{8}} = a;
+    end
+
+  end
+

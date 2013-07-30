@@ -1,0 +1,49 @@
+import
+  genericIface;
+  genericSub;
+
+type
+  TheRecord{T:Type{Integer}} = Record
+    a : T;
+    b : U{8};
+  end
+
+  The2Record{T,R:Type} = Record
+    a : T;
+    b : R;
+  end
+  
+  The3{T:Type{Integer};R:Type} = Record
+    a : T;
+    b : The2Record{T,R};
+  end
+
+component
+  GenericDef{T:Type{Integer}}
+    input
+      in: GenericIface{T};
+
+    implementation elementary
+
+    component
+      sub1 : GenericSub{T};
+      sub2 : GenericSub{U{16}};
+      sub3 : GenericSub{Boolean};
+      sub4 : GenericSub{TheRecord{T}};
+
+    var
+      data: T;
+      dat2: The2Record{T,Boolean};
+      dat3: The2Record{T,T};
+      dat4: The3{T,TheRecord{T}};
+
+    function in.set( item: T )
+      data := item;
+    end
+
+    function in.get():T
+      return data;
+    end
+  end
+
+
