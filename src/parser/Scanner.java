@@ -1,9 +1,11 @@
 package parser;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
 import common.ElementInfo;
+import common.Metadata;
 
 import error.ErrorType;
 import error.RError;
@@ -17,7 +19,7 @@ public class Scanner implements PeekReader<Token> {
   private PeekReader<Symbol> reader;
   private Token next;
   private String source;
-  private Map<String, String> metadata = new HashMap<String, String>();
+  private ArrayList<Metadata> metadata = new ArrayList<Metadata>();
 
   {
     keywords.put("interface", TokenType.INTERFACE);
@@ -72,8 +74,8 @@ public class Scanner implements PeekReader<Token> {
     next();
   }
 
-  public Map<String, String> getMetadata() {
-    return new HashMap<String, String>(metadata);
+  public ArrayList<Metadata> getMetadata() {
+    return new ArrayList<Metadata>(metadata);
   }
 
   private Token token(TokenType value, Symbol sym) {
@@ -105,7 +107,7 @@ public class Scanner implements PeekReader<Token> {
   }
 
   public Token next() {
-    metadata = new HashMap<String, String>();
+    metadata = new ArrayList<Metadata>();
 
     Token res = next;
 
@@ -355,16 +357,14 @@ public class Scanner implements PeekReader<Token> {
   }
 
   private void parseMetadata(Symbol start) {
+    Symbol sym = reader.peek();
+    ElementInfo info = new ElementInfo(source, sym.line, sym.row);
+
     String key = readMetaKey();
     String data = seekTilNewline();
 
-    String value = metadata.get(key);
-    if (value == null) {
-      value = data;
-    } else {
-      value += " " + data;
-    }
-    metadata.put(key, value);
+    Metadata meta = new Metadata(info, key, data);
+    metadata.add(meta);
   }
 
   private String readMetaKey() {

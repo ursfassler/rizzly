@@ -1,9 +1,11 @@
 package metadata.parser;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import common.ElementInfo;
+import common.Metadata;
 
 import error.ErrorType;
 import error.RError;
@@ -12,13 +14,13 @@ public class SimpleMetaParser {
   private Scanner scanner;
   private Map<String, String> data = new HashMap<String, String>();
 
-  public SimpleMetaParser(String data) {
+  public SimpleMetaParser(List<Metadata> metadata) {
     super();
-    scanner = new Scanner(new StringReader(data), data);
+    scanner = new Scanner(new MetadataReader(metadata));
   }
 
-  public static Map<String, String> parse(String data) {
-    SimpleMetaParser parser = new SimpleMetaParser(data);
+  public static Map<String, String> parse(List<Metadata> metadata) {
+    SimpleMetaParser parser = new SimpleMetaParser(metadata);
     parser.parse();
     return parser.data;
   }

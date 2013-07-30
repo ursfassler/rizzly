@@ -1,7 +1,6 @@
 package metadata.parser;
 
 import parser.PeekReader;
-import parser.Symbol;
 
 import common.ElementInfo;
 
@@ -13,22 +12,19 @@ import error.RError;
  * @author urs
  */
 public class Scanner implements PeekReader<Token> {
-  private StringReader reader;
+  private MetadataReader reader;
   private Token next;
-  private String source;
 
-  public Scanner(StringReader reader, String source) {
+  public Scanner(MetadataReader reader) {
     this.reader = reader;
-    this.source = source;
     next();
   }
 
-  private Token token(TokenType value, Symbol sym) {
-    return new Token(value, new ElementInfo(source, sym.line, sym.row));
+  private Token token(TokenType value, ElementInfo info) {
+    return new Token(value, info);
   }
 
-  private Token token(TokenType value, String id, Symbol sym) {
-    ElementInfo info = new ElementInfo(source, sym.line, sym.row);
+  private Token token(TokenType value, String id, ElementInfo info) {
     return new Token(value, id, info);
   }
 
@@ -42,7 +38,7 @@ public class Scanner implements PeekReader<Token> {
 
   private Token specialToken(TokenType value) {
     ElementInfo info;
-    info = new ElementInfo(source, 0, 0);
+    info = new ElementInfo("", 0, 0); // FIXME use correct filename
     return new Token(value, info);
   }
 
@@ -63,26 +59,27 @@ public class Scanner implements PeekReader<Token> {
     if (!reader.hasNext()) {
       return specialToken(TokenType.EOF);
     }
-    Symbol sym = reader.next();
-    switch (sym.sym) {
+    ElementInfo info = reader.getInfo();
+    Character sym = reader.next();
+    switch (sym) {
     case ' ':
     case '\t':
     case 13:
     case '\n':
-      return token(TokenType.IGNORE, sym);
+      return token(TokenType.IGNORE, info);
     case '=':
-      return token(TokenType.EQUAL, sym);
+      return token(TokenType.EQUAL, info);
     case '\"':
-      return read_22(sym);
+      return read_22(info);
     default:
-      if (isAlphaNummeric(sym.sym)) {
-        String id = readIdentifier(Character.toString(sym.sym));
+      if (isAlphaNummeric(sym)) {
+        String id = readIdentifier(Character.toString(sym));
         TokenType type;
         type = TokenType.IDENTIFIER;
-        Token toc = token(type, id, sym);
+        Token toc = token(type, id, info);
         return toc;
       } else {
-        RError.err(ErrorType.Error, source, sym.line, sym.row, "Unexpected character: #" + Integer.toHexString((int) sym.sym) + " (" + sym.sym + ")");
+        RError.err(ErrorType.Error, info, "Unexpected character: #" + Integer.toHexString((int) sym) + " (" + sym + ")");
         return specialToken(TokenType.IGNORE);
       }
     }
@@ -91,8 +88,8 @@ public class Scanner implements PeekReader<Token> {
   // EBNF id: alpha { alpha | numeric}
   private String readIdentifier(String prefix) {
     String text = prefix;
-    while (isAlphaNummeric(reader.peek().sym)) {
-      text = text + reader.next().sym;
+    while (isAlphaNummeric(reader.peek())) {
+      text = text + reader.next();
     }
     return text;
   }
@@ -112,23 +109,23 @@ public class Scanner implements PeekReader<Token> {
   }
 
   // "
-  private Token read_22(Symbol sym) {
+  private Token read_22(ElementInfo sym) {
     String value = readTilEndString();
     return token(TokenType.STRING, value, sym);
   }
 
   private String readTilEndString() {
     String ret = "";
-    Symbol sym;
-    do {
+    char sym;
+    while (reader.hasNext()) {
       sym = reader.next();
-      if (sym.sym == '\"') {
+      if (sym == '\"') {
         return ret;
       } else {
-        ret += sym.sym;
+        ret += sym;
       }
-    } while (reader.hasNext());
-    RError.err(ErrorType.Error, source, sym.line, sym.row, "String over end of file");
+    }
+    RError.err(ErrorType.Error, reader.getInfo(), "String over end of file");
     return null;
   }
 

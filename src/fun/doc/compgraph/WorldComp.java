@@ -8,6 +8,7 @@ import java.util.Set;
 import util.Point;
 
 import common.Designator;
+import common.Metadata;
 
 public class WorldComp extends Component {
   final private Point size = new Point(140, 35);
@@ -15,7 +16,7 @@ public class WorldComp extends Component {
   final private List<SubComponent> comp = new ArrayList<SubComponent>();
   final private Set<Connection> conn = new HashSet<Connection>();
 
-  public WorldComp(Designator path, String classname, String metadata) {
+  public WorldComp(Designator path, String classname, List<Metadata> metadata) {
     super(path, classname, metadata);
   }
 

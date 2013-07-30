@@ -62,7 +62,7 @@ public class Positioning {
   }
 
   private static void appendMeta(Connection con) {
-    if (con.getMetadata() == null) {
+    if (con.getMetadata().isEmpty()) {
       return;
     }
     Map<String, String> data = SimpleMetaParser.parse(con.getMetadata());
@@ -102,7 +102,7 @@ public class Positioning {
   }
 
   private static void appendMeta(SubComponent sub) {
-    if (sub.getMetadata() == null) {
+    if (sub.getMetadata().isEmpty()) {
       return;
     }
     Map<String, String> data = SimpleMetaParser.parse(sub.getMetadata());
@@ -112,7 +112,7 @@ public class Positioning {
   }
 
   private static void appendMeta(WorldComp g) {
-    if (g.getMetadata() == null) {
+    if (g.getMetadata().isEmpty()) {
       return;
     }
     Map<String, String> data = SimpleMetaParser.parse(g.getMetadata());

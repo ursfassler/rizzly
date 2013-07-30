@@ -2,9 +2,9 @@ package parser;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import common.ElementInfo;
+import common.Metadata;
 
 import error.ErrorType;
 import error.RError;
@@ -30,8 +30,8 @@ public class ImplCompositionParser extends ImplBaseParser {
   // EBNF implementationComposition: "composition" { compDeclBlock | connectionDeclBlock }
   private ImplComposition parseImplementationComposition() {
     ElementInfo info = expect(TokenType.COMPOSITION).getInfo();
-    Map<String, String> meta = getMetadata();
-    info.addMetadata(meta);
+    ArrayList<Metadata> meta = getMetadata();
+    info.getMetadata().addAll(meta);
     ImplComposition comp = new ImplComposition(info);
 
     while (true) {
@@ -69,8 +69,8 @@ public class ImplCompositionParser extends ImplBaseParser {
     Reference dst = parseEndpoint();
     expect(TokenType.SEMI);
 
-    Map<String, String> meta = getMetadata();
-    info.addMetadata(meta);
+    ArrayList<Metadata> meta = getMetadata();
+    info.getMetadata().addAll(meta);
 
     if (type != MessageType.sync) {
       RError.err(ErrorType.Fatal, info, "Only synchron messages supported at the moment");

@@ -17,10 +17,10 @@ abstract public class BaseTest {
 
   protected abstract String getRootdir();
 
-  public void compile(String file, String comp, boolean compileCfile, boolean debugEvent, boolean lazyModelCheck) {
+  public void compile(String namespace, String comp, boolean compileCfile, boolean debugEvent, boolean lazyModelCheck) {
     cleanup();
     ClaOption opt = new ClaOption();
-    opt.init(getRootdir(), new Designator(file, comp), debugEvent, lazyModelCheck);
+    opt.init(getRootdir(), new Designator(namespace, comp), debugEvent, lazyModelCheck);
     Main.compile(opt);
     if (compileCfile) {
       compileC();

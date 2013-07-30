@@ -2,7 +2,8 @@ package parser;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+
+import common.Metadata;
 
 import error.ErrorType;
 import error.RError;
@@ -83,7 +84,7 @@ public abstract class Parser {
     RError.err(ErrorType.Error, got.getInfo(), "expected " + type + " got " + got);
   }
 
-  protected Map<String, String> getMetadata(){
+  protected ArrayList<Metadata> getMetadata() {
     return scanner.getMetadata();
   }
 

@@ -2,9 +2,11 @@ package parser;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import util.Pair;
+
+import common.Metadata;
+
 import fun.Copy;
 import fun.expression.Expression;
 import fun.expression.reference.RefName;
@@ -66,9 +68,9 @@ public class BaseParser extends Parser {
       List<T> vardefs = stmt().parseVarDef(kind);
       expect(TokenType.SEMI);
 
-      Map<String, String> meta = getMetadata();
-      for( T var : vardefs ){
-        var.getInfo().addMetadata(meta);
+      ArrayList<Metadata> meta = getMetadata();
+      for (T var : vardefs) {
+        var.getInfo().getMetadata().addAll(meta);
       }
 
       res.addAll(vardefs);

@@ -1,16 +1,18 @@
 package fun.doc.compgraph;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import util.Point;
 
 import common.Designator;
+import common.Metadata;
 
 final public class SubComponent extends Component {
   final private String instname;
   final private Point pos = new Point();
 
-  public SubComponent(String instname, Designator path, String classname, String metadata) {
+  public SubComponent(String instname, Designator path, String classname, List<Metadata> metadata) {
     super(path, classname, metadata);
     this.instname = instname;
   }

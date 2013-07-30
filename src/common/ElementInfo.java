@@ -1,13 +1,12 @@
 package common;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
 
 public class ElementInfo {
   private String filename;
   private int line;
   private int row;
-  private Map<String, String> metadata = new HashMap<String, String>();
+  final private ArrayList<Metadata> metadata = new ArrayList<Metadata>();
 
   public ElementInfo(String filename, int line, int row) {
     super();
@@ -34,22 +33,18 @@ public class ElementInfo {
     return row;
   }
 
-  public Map<String, String> getMetadata() {
-    return new HashMap<String, String>(metadata);
+  public ArrayList<Metadata> getMetadata() {
+    return metadata;
   }
 
-  public void addMetadata(Map<String, String> meta) {
-    for (String key : meta.keySet()) {
-      String data = meta.get(key);
-
-      String value = metadata.get(key);
-      if (value == null) {
-        value = data;
-      } else {
-        value += " " + data;
+  public ArrayList<Metadata> getMetadata( String filterKey ) {
+    ArrayList<Metadata> ret = new ArrayList<Metadata>();
+    for( Metadata itr : metadata ){
+      if( itr.getKey().equals(filterKey) ){
+        ret.add(itr);
       }
-      metadata.put(key, value);
     }
+    return ret;
   }
 
   @Override

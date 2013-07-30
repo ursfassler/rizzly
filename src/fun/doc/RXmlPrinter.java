@@ -4,12 +4,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 import org.w3c.dom.Element;
 
 import common.Designator;
 import common.Direction;
+import common.Metadata;
 
 import error.ErrorType;
 import error.RError;
@@ -168,10 +168,9 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   private void writeMeta(Fun obj) {
-    Map<String, String> meta = obj.getInfo().getMetadata();
-    for (String key : meta.keySet()) {
-      String data = meta.get(key);
-      xw.wc("//" + key + " " + data);
+    ArrayList<Metadata> metadata = obj.getInfo().getMetadata();
+    for (Metadata meta : metadata) {
+      xw.wc("//" + meta.getKey() + " " + meta.getValue());
       xw.nl();
     }
   }

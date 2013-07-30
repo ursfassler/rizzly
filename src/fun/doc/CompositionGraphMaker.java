@@ -29,7 +29,7 @@ public class CompositionGraphMaker {
 
   public static WorldComp make(Designator path, String name, ImplComposition impl, KnowledgeBase kb) {
     KnowFunPath kp = kb.getEntry(KnowFunPath.class);
-    WorldComp comp = new WorldComp(path, name, impl.getInfo().getMetadata().get(METADATA_KEY));
+    WorldComp comp = new WorldComp(path, name, impl.getInfo().getMetadata(METADATA_KEY));
 
     Map<CompUse, SubComponent> compmap = new HashMap<CompUse, SubComponent>();
     Map<Designator, Interface> ifacemap = new HashMap<Designator, Interface>();
@@ -46,7 +46,7 @@ public class CompositionGraphMaker {
     for (CompUse use : impl.getComponent()) {
       ComponentGenerator comptype = getComp(use.getType());
       Designator subpath = kp.get(comptype);
-      SubComponent sub = new SubComponent(use.getName(), subpath, comptype.getName(),use.getInfo().getMetadata().get(METADATA_KEY));
+      SubComponent sub = new SubComponent(use.getName(), subpath, comptype.getName(),use.getInfo().getMetadata(METADATA_KEY));
 
       for (IfaceUse iface : comptype.getItem().getIface(Direction.in)) {
         Interface niface = makeIface(new Designator("Self", use.getName()), sub, iface, ifacemap, kb);
@@ -64,7 +64,7 @@ public class CompositionGraphMaker {
     for (fun.composition.Connection con : impl.getConnection()) {
       Interface src = getIface(con.getEndpoint(Direction.in), ifacemap, kb);
       Interface dst = getIface(con.getEndpoint(Direction.out), ifacemap, kb);
-      fun.doc.compgraph.Connection ncon = new fun.doc.compgraph.Connection(src, dst,con.getInfo().getMetadata().get(METADATA_KEY));
+      fun.doc.compgraph.Connection ncon = new fun.doc.compgraph.Connection(src, dst,con.getInfo().getMetadata(METADATA_KEY));
       src.getConnection().add(ncon);
       dst.getConnection().add(ncon);
       comp.getConn().add(ncon);

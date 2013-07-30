@@ -1,10 +1,12 @@
 package fun.doc.compgraph;
 
 import java.util.ArrayList;
+import java.util.List;
 
 import util.Point;
 
 import common.Designator;
+import common.Metadata;
 
 public abstract class Component implements Vertex {
   public static final int Y_IFACE_DIST = 25;
@@ -14,18 +16,18 @@ public abstract class Component implements Vertex {
 
   final protected Designator path;
   final protected String classname;
-  final protected String metadata;
+  final protected List<Metadata> metadata;
   final protected ArrayList<Interface> input = new ArrayList<Interface>();
   final protected ArrayList<Interface> output = new ArrayList<Interface>();
 
-  public Component(Designator path, String classname, String metadata) {
+  public Component(Designator path, String classname, List<Metadata> metadata) {
     super();
     this.path = path;
     this.classname = classname;
     this.metadata = metadata;
   }
 
-  public String getMetadata() {
+  public List<Metadata> getMetadata() {
     return metadata;
   }
 
