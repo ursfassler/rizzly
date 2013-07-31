@@ -8,7 +8,7 @@ type
 interface
   Tick
     function tick( x: U{8} );
-    function tack():U{8};
+    function tack( x: U{8} ):U{8};
   end
   
   Tack
@@ -37,17 +37,16 @@ component
       if x+2 > z-3 then
         a[z*2-y].x := x;
       else
-        a[out2.tack()-z].y := y + out4.tack().x;
+        a[out2.tack(x)-z].y := y + out4.tack().x;
       end
-      return x + y * z - a[out1.tick(x)].y * a[out1.tick(y)].x;
-      // Error                  ^^^^: tick is not a query
+      return x + y * z - a[out1.tack(x)].y * a[out1.tack(y)].x;
     end
     
     function in.tick( x: U{8} )
-      f := foo( out1.tick( x ), out2.tick( out3.tick(  x - 10 * 5 ) ), foo( 1, 2, 3) * 3 - x );
+      f := foo( out1.tack( x ), out2.tack( out3.tack(  x - 10 * 5 ) ), foo( 1, 2, 3) * 3 - x );
     end
 
-    function in.tack():U{8}
+    function in.tack( x: U{8} ):U{8}
       return f;
     end
 

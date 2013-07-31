@@ -87,7 +87,7 @@ public class CasualTest extends BaseTest {
 
   @Test
   public void expr_Expr() {
-    compile("expr", "Expr", true, DEBUG_EVENT, false);
+    compile("expr", "Expr", true, DEBUG_EVENT, true);
   }
 
   @Test

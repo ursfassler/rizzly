@@ -28,4 +28,9 @@ public class ErrTypeTest extends ErrorTest {
     testForError("err4", "Err4", "Data type to big or incompatible (argument 1, U{8} := Weekday{})");
   }
 
+  @Test
+  public void err5() {
+    testForError("err5", "Err5", "need integer type to index array, got: Void");
+  }
+
 }

@@ -97,7 +97,7 @@ public class RefTypeChecker extends NullTraverser<Type, Type> {
     Type index = ExpressionTypeChecker.process(obj.getIndex(), kb);
     if (sub instanceof Array) {
       if (!LeftIsContainerOfRightTest.process(kbi.getIntegerType(), index, kb)) {
-        RError.err(ErrorType.Error, obj.getInfo(), "need integer type to index array");
+        RError.err(ErrorType.Error, obj.getInfo(), "need integer type to index array, got: " + index.getName());
       }
       Type ret = visit(((Array) sub).getType(), null);
       return ret;

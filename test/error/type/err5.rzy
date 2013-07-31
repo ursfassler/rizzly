@@ -1,0 +1,26 @@
+// fail, use procedure to index array
+
+interface
+  Tick
+    function tick();
+  end
+  
+component
+  Err5
+    input
+      in  : Tick;
+    
+    output
+      out : Tick;
+      
+    implementation elementary
+    
+    var
+      a : Array{10,U{8}};
+    
+    function in.tick()
+      return a[out.tick()];
+    end
+    
+  end
+

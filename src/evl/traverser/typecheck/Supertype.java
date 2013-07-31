@@ -54,7 +54,8 @@ public class Supertype extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitVoidType(VoidType obj, Void param) {
-    throw new RuntimeException("not yet implemented");
+    assert( kbi.getVoidType() == obj );
+    return kbi.getVoidType();
   }
 
   @Override
