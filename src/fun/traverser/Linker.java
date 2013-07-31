@@ -2,12 +2,12 @@ package fun.traverser;
 
 import java.util.Iterator;
 
-import common.Direction;
 import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
 import fun.Fun;
+import fun.composition.ImplComposition;
 import fun.expression.Expression;
 import fun.expression.reference.Reference;
 import fun.expression.reference.ReferenceLinked;
@@ -84,9 +84,14 @@ public class Linker extends RefReplacer<SymbolTable<Named, String>> {
 
   @Override
   protected Expression visitComponent(Component obj, SymbolTable<Named, String> param) {
-    add(param, obj.getIface(Direction.out));
     addSelf(param, obj);
     super.visitComponent(obj, param);
+    return null;
+  }
+
+  @Override
+  protected Expression visitImplComposition(ImplComposition obj, SymbolTable<Named, String> param) {
+    super.visitImplComposition(obj, param);
     return null;
   }
 

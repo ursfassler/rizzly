@@ -13,6 +13,7 @@ import fun.composition.ImplComposition;
 import fun.expression.reference.ReferenceLinked;
 import fun.expression.reference.ReferenceUnlinked;
 import fun.function.FunctionHeader;
+import fun.generator.InterfaceGenerator;
 import fun.generator.TypeGenerator;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.State;
@@ -186,6 +187,13 @@ class KnowFunChildTraverser extends NullTraverser<Set<Named>, String> {
   @Override
   protected Set<Named> visitNamespace(Namespace obj, String param) {
     return retopt(obj.find(param));
+  }
+
+  @Override
+  protected Set<Named> visitInterfaceGenerator(InterfaceGenerator obj, String param) {
+    Set<Named> rset = visit(obj.getItem(), param);
+    addIfFound(obj.getParam().find(param), rset);
+    return rset;
   }
 
   @Override

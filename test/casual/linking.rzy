@@ -5,9 +5,17 @@ interface
 
 component
   Linking
-    output
-      linking   : Foo;    // it has the same name as namespace, may cause problem
+    input
+      in  : Foo;
 
+    output
+      linking   : Foo;    // it has the same name as namespace ("linking"), may cause problem; should not
+    
   implementation elementary
+  
+    function in.bar
+      linking.bar;
+    end
+  
   end
 
