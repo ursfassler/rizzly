@@ -32,11 +32,6 @@ public class HfsmTest extends BaseTest {
   }
 
   @Test
-  public void elementary5() {
-    compile("elementary5", "Elementary5", true, DEBUG_EVENT, false);   //FIXME implement upcasts
-  }
-
-  @Test
   public void hfsm() {
     compile("hfsm", "Hfsm", true, DEBUG_EVENT, false);
   }
