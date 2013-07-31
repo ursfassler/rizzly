@@ -11,6 +11,7 @@ import evl.Evl;
 import evl.NullTraverser;
 import evl.composition.ImplComposition;
 import evl.expression.ArithmeticOp;
+import evl.expression.BoolValue;
 import evl.expression.Expression;
 import evl.expression.Number;
 import evl.expression.Relation;
@@ -122,7 +123,7 @@ class StmtTraverser extends ExprReplacer<List<Statement>> {
     Designator path = ka.find(type);
 
     if (path == null) {
-      assert (type instanceof Unsigned);  // should not be Unsigned (more like type != VoidType)
+      assert (type instanceof Unsigned); // should not be Unsigned (more like type != VoidType)
       kb.getRoot().add(type);
     }
 
@@ -253,6 +254,11 @@ class CallDetector extends NullTraverser<Boolean, Void> {
 
   @Override
   protected Boolean visitNumber(Number obj, Void param) {
+    return false;
+  }
+
+  @Override
+  protected Boolean visitBoolValue(BoolValue obj, Void param) {
     return false;
   }
 
