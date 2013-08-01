@@ -37,7 +37,11 @@ component
       if x+2 > z-3 then
         a[z*2-y].x := x;
       else
-        a[out2.tack(x)-z].y := y + out4.tack().x;
+        t : R{0,510} = y + out4.tack().x;
+        if t > 255 then
+          t := 255;
+        end
+        a[out2.tack(x)-z].y := t;
       end
       return x + y * z - a[out1.tack(x)].y * a[out1.tack(y)].x;
     end

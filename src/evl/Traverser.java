@@ -73,7 +73,6 @@ import evl.type.base.FunctionTypeVoid;
 import evl.type.base.Range;
 import evl.type.base.StringType;
 import evl.type.base.TypeAlias;
-import evl.type.base.Unsigned;
 import evl.type.composed.NamedElement;
 import evl.type.composed.NamedElementType;
 import evl.type.composed.RecordType;
@@ -344,8 +343,6 @@ public abstract class Traverser<R, P> {
   protected R visitBaseType(BaseType obj, P param) {
     if (obj instanceof BooleanType)
       return visitBooleanType((BooleanType) obj, param);
-    else if (obj instanceof Unsigned)
-      return visitUnsigned((Unsigned) obj, param);
     else if (obj instanceof Range)
       return visitRange((Range) obj, param);
     else if (obj instanceof Array)
@@ -403,8 +400,6 @@ public abstract class Traverser<R, P> {
   abstract protected R visitInterfaceType(InterfaceType obj, P param);
 
   abstract protected R visitIntegerType(IntegerType obj, P param);
-
-  abstract protected R visitUnsigned(Unsigned obj, P param);
 
   abstract protected R visitRange(Range obj, P param);
 

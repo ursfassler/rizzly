@@ -1,5 +1,6 @@
 package pir.know;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import pir.expression.Number;
 import pir.expression.PExpression;
 import pir.expression.Reference;
 import pir.expression.Relation;
+import pir.expression.UnOp;
 import pir.expression.UnaryExpr;
 import pir.expression.reference.RefCall;
 import pir.expression.reference.RefHead;
@@ -25,8 +27,8 @@ import pir.type.BooleanType;
 import pir.type.FunctionType;
 import pir.type.NamedElemType;
 import pir.type.NamedElement;
+import pir.type.RangeType;
 import pir.type.Type;
-import pir.type.UnsignedType;
 import error.ErrorType;
 import error.RError;
 
@@ -48,8 +50,8 @@ public class KnowPirType extends NullTraverser<Type, Void> {
     for (FuncVariable var : obj.getArgument()) {
       arg.add(var.getType());
     }
-    assert( obj instanceof FuncWithRet );
-    return new FunctionType(arg, ((FuncWithRet)obj).getRetType());
+    assert (obj instanceof FuncWithRet);
+    return new FunctionType(arg, ((FuncWithRet) obj).getRetType());
   }
 
   @Override
@@ -69,13 +71,19 @@ public class KnowPirType extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitUnaryExpr(UnaryExpr obj, Void param) {
-    Type expr = visit(obj.getExpr(), param);
-    if (expr instanceof BooleanType) {
-      return expr;
-    } else if (expr instanceof UnsignedType) {
-      return expr; // TODO correct?
+    Type type = visit(obj.getExpr(), param);
+    if (type instanceof BooleanType) {
+      assert(obj.getOp() == UnOp.NOT);
+      return type;
+    } else if (type instanceof RangeType) {
+      assert( obj.getOp() == UnOp.MINUS );
+      BigInteger low = ((RangeType) type).getLow();
+      BigInteger high = ((RangeType) type).getHigh();
+      low = BigInteger.ZERO.subtract(low);
+      high = BigInteger.ZERO.subtract(high);
+      return new RangeType(high,low);
     } else {
-      RError.err(ErrorType.Fatal, "Unsupported type: " + expr.getClass().getCanonicalName() + " / " + expr);
+      RError.err(ErrorType.Fatal, "Unsupported type: " + type.getClass().getCanonicalName() + " / " + type);
       return null;
     }
   }
@@ -90,23 +98,10 @@ public class KnowPirType extends NullTraverser<Type, Void> {
     return obj.getType();
   }
 
-  static private int getBits(int value) {
-    int bit = 0;
-    while (value != 0) {
-      value >>= 1;
-      bit++;
-    }
-    return bit;
-  }
-
   @Override
   protected Type visitNumber(Number obj, Void param) {
-    if (obj.getValue() >= 0) {
-      int bits = getBits(obj.getValue());
-      return new UnsignedType(bits);
-    } else {
-      throw new RuntimeException("not yet implemented");
-    }
+    BigInteger value = BigInteger.valueOf(obj.getValue());
+    return new RangeType(value, value);
   }
 
   @Override

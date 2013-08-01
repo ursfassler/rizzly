@@ -27,7 +27,6 @@ import fun.type.composed.UnionType;
 import fun.type.genfunc.Array;
 import fun.type.genfunc.Range;
 import fun.type.genfunc.TypeType;
-import fun.type.genfunc.Unsigned;
 
 public class FunToEvlType extends NullTraverser<Type, String> {
   private Map<Fun, Evl> map;
@@ -103,13 +102,8 @@ public class FunToEvlType extends NullTraverser<Type, String> {
   }
 
   @Override
-  protected Type visitUnsigned(Unsigned obj, String param) {
-    return new evl.type.base.Unsigned(obj.getBits());
-  }
-
-  @Override
   protected Type visitRange(Range obj, String param) {
-    return new evl.type.base.Range(obj.getLow(),obj.getHigh());
+    return new evl.type.base.Range(obj.getLow(), obj.getHigh());
   }
 
   @Override

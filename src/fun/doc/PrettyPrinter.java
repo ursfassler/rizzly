@@ -82,7 +82,6 @@ import fun.type.genfunc.GenericTypeType;
 import fun.type.genfunc.GenericUnsigned;
 import fun.type.genfunc.Range;
 import fun.type.genfunc.TypeType;
-import fun.type.genfunc.Unsigned;
 import fun.variable.CompUse;
 import fun.variable.CompfuncParameter;
 import fun.variable.Constant;
@@ -465,12 +464,6 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitRange(Range obj, StreamWriter param) {
-    param.wr(obj.getName());
-    return null;
-  }
-
-  @Override
-  protected Void visitUnsigned(Unsigned obj, StreamWriter param) {
     param.wr(obj.getName());
     return null;
   }

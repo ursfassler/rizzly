@@ -36,6 +36,7 @@ import pir.type.BooleanType;
 import pir.type.EnumElement;
 import pir.type.EnumType;
 import pir.type.NamedElement;
+import pir.type.RangeType;
 import pir.type.StringType;
 import pir.type.StructType;
 import pir.type.TypeAlias;
@@ -223,6 +224,11 @@ abstract public class ExprReplacer<T> extends Traverser<PExpression, T> {
 
   @Override
   protected PExpression visitStringType(StringType obj, T param) {
+    return null;
+  }
+
+  @Override
+  protected PExpression visitRangeType(RangeType obj, T param) {
     return null;
   }
 

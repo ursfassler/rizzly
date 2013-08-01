@@ -82,7 +82,7 @@ import evl.traverser.typecheck.VarInitCheck;
 import evl.traverser.typecheck.specific.CompInterfaceTypeChecker;
 import evl.type.Type;
 import evl.type.base.Array;
-import evl.type.base.Unsigned;
+import evl.type.base.Range;
 import evl.variable.ConstGlobal;
 import evl.variable.Constant;
 import evl.variable.FuncVariable;
@@ -400,9 +400,9 @@ public class MainEvl {
     depth += 2;
     Collections.sort(names);
 
-    Unsigned symNameSizeType = kbi.getUnsignedType(getBits(names.size()));
+    Range symNameSizeType = kbi.getRangeType(names.size());
     Array arrayType = kbi.getArray(depth, symNameSizeType);
-    Unsigned sizeType = kbi.getUnsignedType(getBits(depth));
+    Range sizeType = kbi.getRangeType(depth);
 
     Interface debugIface;
     FuncProtoVoid recvFunc;
@@ -501,15 +501,6 @@ public class MainEvl {
     // evaluate(classes, debugdir);
 
     PrettyPrinter.print(classes, debugdir + "debug.rzy");
-  }
-
-  private static int getBits(int value) {
-    int bit = 0;
-    while (value != 0) {
-      value >>= 1;
-      bit++;
-    }
-    return bit;
   }
 
   private static RizzlyProgram instantiate(Component top, String rootdir, Namespace classes) {

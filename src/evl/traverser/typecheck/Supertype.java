@@ -1,5 +1,7 @@
 package evl.traverser.typecheck;
 
+import java.math.BigInteger;
+
 import evl.Evl;
 import evl.NullTraverser;
 import evl.knowledge.KnowBaseItem;
@@ -7,8 +9,8 @@ import evl.knowledge.KnowledgeBase;
 import evl.type.Type;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumType;
+import evl.type.base.Range;
 import evl.type.base.TypeAlias;
-import evl.type.base.Unsigned;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
 import evl.type.special.NaturalType;
@@ -33,8 +35,12 @@ public class Supertype extends NullTraverser<Type, Void> {
   }
 
   @Override
-  protected Type visitUnsigned(Unsigned obj, Void param) {
-    return kbi.getNaturalType();
+  protected Type visitRange(Range obj, Void param) {
+    if (obj.getLow().compareTo(BigInteger.ZERO) >= 0) {
+      return kbi.getNaturalType();
+    } else {
+      return kbi.getIntegerType();
+    }
   }
 
   @Override
@@ -49,12 +55,12 @@ public class Supertype extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitEnumType(EnumType obj, Void param) {
-    return kbi.getNaturalType();
+    return kbi.getRangeType(obj.getElement().size());
   }
 
   @Override
   protected Type visitVoidType(VoidType obj, Void param) {
-    assert( kbi.getVoidType() == obj );
+    assert (kbi.getVoidType() == obj);
     return kbi.getVoidType();
   }
 

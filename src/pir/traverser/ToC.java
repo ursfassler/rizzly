@@ -31,7 +31,7 @@ import pir.function.impl.FuncImplRet;
 import pir.function.impl.FuncImplVoid;
 import pir.function.impl.FuncProtoRet;
 import pir.function.impl.FuncProtoVoid;
-import pir.know.KnowPirType;
+import pir.know.IsBoolean;
 import pir.other.Constant;
 import pir.other.FuncVariable;
 import pir.other.Program;
@@ -56,6 +56,7 @@ import pir.type.BooleanType;
 import pir.type.EnumElement;
 import pir.type.EnumType;
 import pir.type.NamedElement;
+import pir.type.RangeType;
 import pir.type.StringType;
 import pir.type.StructType;
 import pir.type.Type;
@@ -231,8 +232,7 @@ public class ToC extends Traverser<CirBase, Void> {
 
   @Override
   protected CirBase visitUnaryExpr(UnaryExpr obj, Void param) {
-    Type typ = KnowPirType.get(obj);
-    boolean isBool = typ instanceof BooleanType;
+    boolean isBool = IsBoolean.test(obj);
     return new UnaryOp(toCOp(obj.getOp(), isBool), (Expression) visit(obj.getExpr(), param));
   }
 
@@ -253,8 +253,7 @@ public class ToC extends Traverser<CirBase, Void> {
 
   @Override
   protected CirBase visitArithmeticOp(ArithmeticOp obj, Void param) {
-    Type typ = KnowPirType.get(obj);
-    boolean isBool = typ instanceof BooleanType;
+    boolean isBool = IsBoolean.test(obj);
     return new BinaryOp((Expression) visit(obj.getLeft(), param), (Expression) visit(obj.getRight(), param), toCOp(obj.getOp(), isBool));
   }
 
@@ -511,6 +510,11 @@ public class ToC extends Traverser<CirBase, Void> {
 
   @Override
   protected CirBase visitFuncProtoRet(FuncProtoRet obj, Void param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected CirBase visitRangeType(RangeType obj, Void param) {
     throw new RuntimeException("not yet implemented");
   }
 

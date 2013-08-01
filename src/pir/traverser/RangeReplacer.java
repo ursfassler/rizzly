@@ -1,5 +1,6 @@
 package pir.traverser;
 
+import java.math.BigInteger;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,6 +11,7 @@ import pir.other.Program;
 import pir.type.Array;
 import pir.type.BooleanType;
 import pir.type.EnumType;
+import pir.type.RangeType;
 import pir.type.StringType;
 import pir.type.StructType;
 import pir.type.Type;
@@ -19,17 +21,17 @@ import pir.type.UnsignedType;
 import pir.type.VoidType;
 
 /**
- * Changes integer types to multiple of 8 bits
+ * Replaces range types with integer types
  *
  * @author urs
  *
  */
-public class BitChanger extends TypeReplacer<Void> {
+public class RangeReplacer extends TypeReplacer<Void> {
   private final Map<Integer, UnsignedType> uint = new HashMap<Integer, UnsignedType>();
 
-  public BitChanger(Collection<UnsignedType> uint) {
+  public RangeReplacer(Collection<UnsignedType> uint) {
     for (UnsignedType type : uint) {
-      this.uint.put(type.getBits(), type);
+      this.uint.put(type.getHigh(), type);
     }
   }
 
@@ -40,7 +42,8 @@ public class BitChanger extends TypeReplacer<Void> {
         return add(obj);
       }
     }).get(obj, null);
-    BitChanger changer = new BitChanger(uint);
+    assert (uint.isEmpty()); // TODO if so, remove code above
+    RangeReplacer changer = new RangeReplacer(uint);
     changer.traverse(obj, null);
   }
 
@@ -62,37 +65,38 @@ public class BitChanger extends TypeReplacer<Void> {
   }
 
   @Override
+  protected Type visitRangeType(RangeType obj, Void param) {
+    // TODO implement also for signed
+    // TODO add range offset movement (i.e. move R{10,20} to R{0,10})
+    assert (obj.getLow().compareTo(BigInteger.ZERO) >= 0);
+
+    int bits;
+
+    if (isLEQ(obj, 255)) {
+      bits = 8;
+    } else if (isLEQ(obj, 65535)) {
+      bits = 16;
+    } else if (isLEQ(obj, 4294967295l)) {
+      bits = 16;
+    } else {
+      throw new RuntimeException("not yet implemented");
+    }
+
+    UnsignedType ret = uint.get(bits);
+    if (ret == null) {
+      ret = new UnsignedType(bits);
+      uint.put(bits, ret);
+    }
+    return ret;
+  }
+
+  private boolean isLEQ(RangeType left, long right) {
+    return left.getHigh().compareTo(BigInteger.valueOf(right)) <= 0; // TODO ok?
+  }
+
+  @Override
   protected Type visitUnsignedType(UnsignedType obj, Void param) {
-    if (isBigPowerOfTwo(obj.getBits())) {
-      return obj;
-    }
-    int bits = nextBigPowerOf2(obj.getBits());
-
-    UnsignedType type = uint.get(bits);
-    if (type == null) {
-      type = new UnsignedType(bits);
-      uint.put(bits, type);
-    }
-
-    return type;
-  }
-
-  private boolean isBigPowerOfTwo(int number) {
-    int bits = Integer.bitCount(number);
-    return (bits <= 1) && (number >= 8);
-  }
-
-  private int nextBigPowerOf2(int number) {
-    assert (!isBigPowerOfTwo(number));
-    int log = 0;
-    while (number != 0) {
-      log++;
-      number = number >> 1;
-    }
-    if (log < 3) {
-      log = 3;
-    }
-    return 1 << log;
+    return obj;
   }
 
   @Override

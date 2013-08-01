@@ -35,7 +35,7 @@ import fun.type.NamedType;
 import fun.type.base.IntegerType;
 import fun.type.base.NaturalType;
 import fun.type.composed.NamedElement;
-import fun.type.genfunc.Unsigned;
+import fun.type.genfunc.Range;
 import fun.variable.Constant;
 import fun.variable.Variable;
 
@@ -150,8 +150,8 @@ public class ExprReplacer<T> extends DefGTraverser<Expression, T> {
 
   @Override
   protected Expression visitIfOption(IfOption obj, T param) {
-    obj.setCondition(visit(obj.getCondition(),param));
-    visit(obj.getCode(),param);
+    obj.setCondition(visit(obj.getCondition(), param));
+    visit(obj.getCode(), param);
     return null;
   }
 
@@ -195,7 +195,7 @@ public class ExprReplacer<T> extends DefGTraverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitUnsigned(Unsigned obj, T param) {
+  protected Expression visitRange(Range obj, T param) {
     return obj;
   }
 

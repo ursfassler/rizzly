@@ -12,11 +12,11 @@ import java.util.Set;
 import org.jgrapht.traverse.TopologicalOrderIterator;
 
 import pir.other.Program;
-import pir.traverser.BitChanger;
 import pir.traverser.BitStretcher;
 import pir.traverser.CaserangeReduction;
 import pir.traverser.EnumElementConstPropagation;
 import pir.traverser.PirPrinter;
+import pir.traverser.RangeReplacer;
 import pir.traverser.ToC;
 import pir.traverser.ToCEnum;
 import util.Pair;
@@ -49,12 +49,14 @@ import evl.other.Component;
 import fun.other.Namespace;
 import fun.toevl.FunToEvl;
 
+//TODO after FUN, translate into SSA
+//TODO maybe the PIR is no longer needed (since EVL is quite nice)
+
 //TODO add compiler self tests:
 //TODO -- check that no references to old stuff exists (check that parent of every object is in the namespace tree)
 //TODO -- do name randomization and compile to see if references go outside
 
 //TODO add compiler switch to select backend (like --backend=ansic --backend=funHtmlDoc)
-//TODO add range type: T{L,H:Type{Integer}}; a : R{0,20};
 
 public class Main {
 
@@ -123,7 +125,7 @@ public class Main {
     CaserangeReduction.process(prog);
     ToCEnum.process(prog);
     BitStretcher.process(prog);
-    BitChanger.process(prog);
+    RangeReplacer.process(prog);
 
     EnumElementConstPropagation.process(prog);
 

@@ -48,6 +48,7 @@ import pir.type.BooleanType;
 import pir.type.EnumElement;
 import pir.type.EnumType;
 import pir.type.NamedElement;
+import pir.type.RangeType;
 import pir.type.StringType;
 import pir.type.StructType;
 import pir.type.TypeAlias;
@@ -567,6 +568,11 @@ public class PirPrinter extends Traverser<Void, StreamWriter> {
 
   @Override
   protected Void visitFuncProtoRet(FuncProtoRet obj, StreamWriter param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Void visitRangeType(RangeType obj, StreamWriter param) {
     throw new RuntimeException("not yet implemented");
   }
 

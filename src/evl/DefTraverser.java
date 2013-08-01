@@ -67,7 +67,6 @@ import evl.type.base.FunctionTypeVoid;
 import evl.type.base.Range;
 import evl.type.base.StringType;
 import evl.type.base.TypeAlias;
-import evl.type.base.Unsigned;
 import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
@@ -237,11 +236,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitRefCall(RefCall obj, P param) {
     visitItr(obj.getActualParameter(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitUnsigned(Unsigned obj, P param) {
     return null;
   }
 

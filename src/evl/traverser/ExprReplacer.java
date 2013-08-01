@@ -28,8 +28,8 @@ import evl.statement.CaseStmt;
 import evl.statement.IfOption;
 import evl.statement.ReturnExpr;
 import evl.statement.While;
+import evl.type.base.Range;
 import evl.type.base.TypeAlias;
-import evl.type.base.Unsigned;
 import evl.variable.Constant;
 
 abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
@@ -166,7 +166,7 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitUnsigned(Unsigned obj, T param) {
+  protected Expression visitRange(Range obj, T param) {
     return null;
   }
 

@@ -1,5 +1,7 @@
 package evl.knowledge;
 
+import java.math.BigInteger;
+
 import common.ElementInfo;
 
 import error.ErrorType;
@@ -9,8 +11,8 @@ import evl.other.Named;
 import evl.type.Type;
 import evl.type.base.Array;
 import evl.type.base.BooleanType;
+import evl.type.base.Range;
 import evl.type.base.StringType;
-import evl.type.base.Unsigned;
 import evl.type.special.IntegerType;
 import evl.type.special.NaturalType;
 import evl.type.special.VoidType;
@@ -58,10 +60,28 @@ public class KnowBaseItem extends KnowledgeEntry {
     return ret;
   }
 
-  public Unsigned getUnsignedType(int bits) {
-    Unsigned ret = (Unsigned) findItem(Unsigned.makeName(bits));
+  /**
+   * Returns R{0,count-1}
+   *
+   * @param count
+   * @return
+   */
+  public Range getRangeType(int count) {
+    BigInteger low = BigInteger.ZERO;
+    BigInteger high = BigInteger.valueOf(count - 1);
+    return getRangeType(low, high);
+  }
+
+  /**
+   * Returns R{low,high}
+   *
+   * @param count
+   * @return
+   */
+  public Range getRangeType(BigInteger low, BigInteger high) {
+    Range ret = (Range) findItem(Range.makeName(low, high));
     if (ret == null) {
-      ret = new Unsigned(bits);
+      ret = new Range(low, high);
       addItem(ret);
     }
     return ret;

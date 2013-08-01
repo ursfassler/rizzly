@@ -31,17 +31,17 @@ import evl.statement.Block;
 import evl.statement.CallStmt;
 import evl.statement.VarDefStmt;
 import evl.type.base.Array;
-import evl.type.base.Unsigned;
+import evl.type.base.Range;
 import evl.variable.FuncVariable;
 
 public class DebugIfaceAdder extends NullTraverser<Void, Void> {
   private Interface debugIface;
   private Array arrayType;
-  private Unsigned sizeType;
+  private Range sizeType;
   private ArrayList<String> names;
   static private ElementInfo info = new ElementInfo();
 
-  public DebugIfaceAdder(Array arrayType, Unsigned sizeType, Interface debugIface, ArrayList<String> names) {
+  public DebugIfaceAdder(Array arrayType, Range sizeType, Interface debugIface, ArrayList<String> names) {
     super();
     this.names = names;
     this.debugIface = debugIface;
@@ -49,12 +49,12 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     this.sizeType = sizeType;
   }
 
-  public static void process(Evl obj, Array arrayType, Unsigned sizeType, Interface debugIface, ArrayList<String> names) {
+  public static void process(Evl obj, Array arrayType, Range sizeType, Interface debugIface, ArrayList<String> names) {
     DebugIfaceAdder reduction = new DebugIfaceAdder(arrayType, sizeType, debugIface, names);
     reduction.traverse(obj, null);
   }
 
-  public FuncSubHandlerEvent makeRecvProto(Array arrayType, Unsigned sizeType) {
+  public FuncSubHandlerEvent makeRecvProto(Array arrayType, Range sizeType) {
     ListOfNamed<FuncVariable> param = new ListOfNamed<FuncVariable>();
     FuncVariable sender = new FuncVariable(info, "receiver", arrayType);
     param.add(sender);
@@ -66,7 +66,7 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     return func;
   }
 
-  public FuncSubHandlerEvent makeSendProto(Array arrayType, Unsigned sizeType) {
+  public FuncSubHandlerEvent makeSendProto(Array arrayType, Range sizeType) {
     ListOfNamed<FuncVariable> param = new ListOfNamed<FuncVariable>();
     FuncVariable sender = new FuncVariable(info, "sender", arrayType);
     param.add(sender);
@@ -78,7 +78,7 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     return func;
   }
 
-  private FuncPrivateVoid makeDebugSend(String callname, Array arrayType, Unsigned sizeType, IfaceUse debugIfaceUse) {
+  private FuncPrivateVoid makeDebugSend(String callname, Array arrayType, Range sizeType, IfaceUse debugIfaceUse) {
     Block body = new Block(info);
 
     FuncVariable func = new FuncVariable(info, "func", sizeType);

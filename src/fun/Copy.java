@@ -78,10 +78,11 @@ import fun.type.composed.RecordType;
 import fun.type.composed.UnionType;
 import fun.type.genfunc.Array;
 import fun.type.genfunc.GenericArray;
+import fun.type.genfunc.GenericRange;
 import fun.type.genfunc.GenericTypeType;
 import fun.type.genfunc.GenericUnsigned;
+import fun.type.genfunc.Range;
 import fun.type.genfunc.TypeType;
-import fun.type.genfunc.Unsigned;
 import fun.variable.CompUse;
 import fun.variable.CompfuncParameter;
 import fun.variable.ConstGlobal;
@@ -258,11 +259,6 @@ class CopyFun extends Traverser<Fun, Void> {
 
   @Override
   protected Fun visitArray(Array obj, Void param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Fun visitUnsigned(Unsigned obj, Void param) {
     throw new RuntimeException("not yet implemented");
   }
 
@@ -590,6 +586,16 @@ class CopyFun extends Traverser<Fun, Void> {
 
   @Override
   protected Fun visitNamedComponent(NamedComponent obj, Void param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Fun visitRange(Range obj, Void param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Fun visitGenericRange(GenericRange obj, Void param) {
     throw new RuntimeException("not yet implemented");
   }
 

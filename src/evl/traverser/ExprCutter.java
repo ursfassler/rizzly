@@ -34,7 +34,7 @@ import evl.statement.Statement;
 import evl.statement.VarDefStmt;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.type.Type;
-import evl.type.base.Unsigned;
+import evl.type.base.Range;
 import evl.variable.FuncVariable;
 
 /**
@@ -123,7 +123,7 @@ class StmtTraverser extends ExprReplacer<List<Statement>> {
     Designator path = ka.find(type);
 
     if (path == null) {
-      assert (type instanceof Unsigned); // should not be Unsigned (more like type != VoidType)
+      assert (type instanceof Range); // should not be Unsigned (more like type != VoidType)
       kb.getRoot().add(type);
     }
 

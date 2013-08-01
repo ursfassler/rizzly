@@ -27,17 +27,4 @@ public class BiggerType {
     return bigger;
   }
 
-  //TODO correct for signed types?
-  static public Type getSmaller(Type lhs, Type rhs, ElementInfo info, KnowledgeBase kb) {
-    Type bigger = get(lhs, rhs, info, kb);
-    if (bigger == null) {
-      return null;
-    } else if (bigger == lhs) {
-      return rhs;
-    } else {
-      assert (bigger == rhs);
-      return lhs;
-    }
-  }
-
 }

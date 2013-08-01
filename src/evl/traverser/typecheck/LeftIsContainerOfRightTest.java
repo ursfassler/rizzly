@@ -17,7 +17,6 @@ import evl.type.base.FunctionTypeVoid;
 import evl.type.base.Range;
 import evl.type.base.StringType;
 import evl.type.base.TypeAlias;
-import evl.type.base.Unsigned;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
 import evl.type.special.IntegerType;
@@ -115,20 +114,11 @@ public class LeftIsContainerOfRightTest extends NullTraverser<Boolean, Type> {
   }
 
   @Override
-  protected Boolean visitUnsigned(Unsigned left, Type right) {
-    if (right instanceof Unsigned) {
-      return left.getBits() >= ((Unsigned) right).getBits();
-    } else {
-      return false; // TODO correct?
-    }
-  }
-
-  @Override
   protected Boolean visitRange(Range obj, Type right) {
     if (right instanceof Range) {
       int cmpLow = obj.getLow().compareTo(((Range) right).getLow());
       int cmpHigh = obj.getHigh().compareTo(((Range) right).getHigh());
-      return (cmpLow >= 0) && (cmpHigh <= 0); // TODO ok?
+      return (cmpLow <= 0) && (cmpHigh >= 0); // TODO ok?
     } else {
       return false; // TODO correct?
     }

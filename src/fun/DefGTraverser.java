@@ -77,7 +77,6 @@ import fun.type.genfunc.GenericTypeType;
 import fun.type.genfunc.GenericUnsigned;
 import fun.type.genfunc.Range;
 import fun.type.genfunc.TypeType;
-import fun.type.genfunc.Unsigned;
 import fun.variable.CompUse;
 import fun.variable.CompfuncParameter;
 import fun.variable.ConstGlobal;
@@ -266,11 +265,6 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitRefCall(RefCall obj, P param) {
     visitItr(obj.getActualParameter(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitUnsigned(Unsigned obj, P param) {
     return null;
   }
 

@@ -89,8 +89,8 @@ import fun.type.genfunc.Array;
 import fun.type.genfunc.GenericArray;
 import fun.type.genfunc.GenericTypeType;
 import fun.type.genfunc.GenericUnsigned;
+import fun.type.genfunc.Range;
 import fun.type.genfunc.TypeType;
-import fun.type.genfunc.Unsigned;
 import fun.variable.CompUse;
 import fun.variable.CompfuncParameter;
 import fun.variable.ConstGlobal;
@@ -587,8 +587,10 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
     xw.kw("end");
   }
 
+
+
   @Override
-  protected Void visitUnsigned(Unsigned obj, Designator param) {
+  protected Void visitRange(Range obj, Designator param) {
     xw.wr(obj.getName());
     return null;
   }

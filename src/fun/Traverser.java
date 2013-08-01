@@ -83,7 +83,6 @@ import fun.type.genfunc.GenericTypeType;
 import fun.type.genfunc.GenericUnsigned;
 import fun.type.genfunc.Range;
 import fun.type.genfunc.TypeType;
-import fun.type.genfunc.Unsigned;
 import fun.variable.CompUse;
 import fun.variable.CompfuncParameter;
 import fun.variable.ConstGlobal;
@@ -370,8 +369,6 @@ public abstract class Traverser<R, P> {
       return visitGenericRange((GenericRange) obj, param);
     else if (obj instanceof Range)
       return visitRange((Range) obj, param);
-    else if (obj instanceof Unsigned)
-      return visitUnsigned((Unsigned) obj, param);
     else if (obj instanceof Array)
       return visitArray((Array) obj, param);
     else if (obj instanceof StringType)
@@ -429,8 +426,6 @@ public abstract class Traverser<R, P> {
   abstract protected R visitArray(Array obj, P param);
 
   abstract protected R visitRange(Range obj, P param);
-
-  abstract protected R visitUnsigned(Unsigned obj, P param);
 
   abstract protected R visitBooleanType(BooleanType obj, P param);
 

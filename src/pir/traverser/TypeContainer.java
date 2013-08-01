@@ -33,9 +33,9 @@ public class TypeContainer extends NullTraverser<Boolean, Type> {
     if (param instanceof RangeType) {
       int cmpLow = obj.getLow().compareTo(((RangeType) param).getLow());
       int cmpHigh = obj.getHigh().compareTo(((RangeType) param).getHigh());
-      return (cmpLow >= 0) && (cmpHigh <= 0); // TODO ok?
+      return (cmpLow <= 0) && (cmpHigh >= 0); // TODO ok?
     } else {
-      return false;
+      return false; // TODO correct?
     }
   }
 

@@ -15,7 +15,7 @@ public class Range extends BaseType {
     this.high = high;
   }
 
-  private static String makeName(BigInteger low, BigInteger high) {
+  public static String makeName(BigInteger low, BigInteger high) {
     return "R{" + low.toString() + "," + high.toString() + "}";
   }
 

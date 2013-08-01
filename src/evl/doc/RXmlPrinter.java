@@ -69,7 +69,6 @@ import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.type.base.StringType;
 import evl.type.base.TypeAlias;
-import evl.type.base.Unsigned;
 import evl.type.composed.NamedElement;
 import evl.type.composed.NamedElementType;
 import evl.type.composed.RecordType;
@@ -511,12 +510,6 @@ public class RXmlPrinter extends NullTraverser<Void, XmlWriter> {
     visitList(obj.getElement(), param);
     param.decIndent();
     param.kw("end");
-  }
-
-  @Override
-  protected Void visitUnsigned(Unsigned obj, XmlWriter param) {
-    param.wr(obj.getName());
-    return null;
   }
 
   @Override

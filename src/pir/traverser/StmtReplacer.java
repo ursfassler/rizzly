@@ -42,6 +42,7 @@ import pir.type.BooleanType;
 import pir.type.EnumElement;
 import pir.type.EnumType;
 import pir.type.NamedElement;
+import pir.type.RangeType;
 import pir.type.StringType;
 import pir.type.StructType;
 import pir.type.TypeAlias;
@@ -228,7 +229,7 @@ public class StmtReplacer<P> extends Traverser<Statement, P> {
 
   @Override
   protected Statement visitIfStmtEntry(IfStmtEntry obj, P param) {
-    visit(obj.getCode(),param);
+    visit(obj.getCode(), param);
     return null;
   }
 
@@ -244,11 +245,6 @@ public class StmtReplacer<P> extends Traverser<Statement, P> {
 
   @Override
   protected Statement visitBooleanType(BooleanType obj, P param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Statement visitUnsignedType(UnsignedType obj, P param) {
     throw new RuntimeException("not yet implemented");
   }
 
@@ -269,8 +265,8 @@ public class StmtReplacer<P> extends Traverser<Statement, P> {
 
   @Override
   protected Statement visitFunction(Function obj, P param) {
-    if( obj instanceof FuncWithBody ){
-      visit( ((FuncWithBody) obj).getBody(), param ); //FIXME ok?
+    if (obj instanceof FuncWithBody) {
+      visit(((FuncWithBody) obj).getBody(), param); // FIXME ok?
     }
     return null;
   }
@@ -292,6 +288,16 @@ public class StmtReplacer<P> extends Traverser<Statement, P> {
 
   @Override
   protected Statement visitFuncProtoRet(FuncProtoRet obj, P param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Statement visitRangeType(RangeType obj, P param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Statement visitUnsignedType(UnsignedType obj, P param) {
     throw new RuntimeException("not yet implemented");
   }
 }

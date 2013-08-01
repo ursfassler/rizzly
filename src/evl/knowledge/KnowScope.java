@@ -31,9 +31,9 @@ import evl.type.base.Array;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
+import evl.type.base.Range;
 import evl.type.base.StringType;
 import evl.type.base.TypeAlias;
-import evl.type.base.Unsigned;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
 import evl.type.special.VoidType;
@@ -54,7 +54,7 @@ public class KnowScope extends KnowledgeEntry {
     global.add(ConstGlobal.class);
     global.add(FuncGlobal.class);
 
-    global.add(Unsigned.class);
+    global.add(Range.class);
     global.add(VoidType.class);
     global.add(RecordType.class);
     global.add(UnionType.class);

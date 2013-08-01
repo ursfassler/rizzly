@@ -91,7 +91,6 @@ import evl.type.base.FunctionTypeVoid;
 import evl.type.base.Range;
 import evl.type.base.StringType;
 import evl.type.base.TypeAlias;
-import evl.type.base.Unsigned;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
 import evl.type.special.ComponentType;
@@ -454,12 +453,6 @@ public class ToPir extends Traverser<PirObject, PirObject> {
       assert (arg instanceof PExpression);
       ret.getValue().add((PExpression) arg);
     }
-    return ret;
-  }
-
-  @Override
-  protected PirObject visitUnsigned(Unsigned obj, PirObject param) {
-    pir.type.UnsignedType ret = new pir.type.UnsignedType(obj.getBits());
     return ret;
   }
 

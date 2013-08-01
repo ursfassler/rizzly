@@ -69,7 +69,6 @@ import fun.type.genfunc.GenericTypeType;
 import fun.type.genfunc.GenericUnsigned;
 import fun.type.genfunc.Range;
 import fun.type.genfunc.TypeType;
-import fun.type.genfunc.Unsigned;
 import fun.variable.CompUse;
 import fun.variable.CompfuncParameter;
 import fun.variable.ConstGlobal;
@@ -89,11 +88,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitVoidType(VoidType obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitUnsigned(Unsigned obj, P param) {
     return visitDefault(obj, param);
   }
 

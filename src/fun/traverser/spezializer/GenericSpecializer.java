@@ -21,7 +21,6 @@ import fun.type.genfunc.GenericTypeType;
 import fun.type.genfunc.GenericUnsigned;
 import fun.type.genfunc.Range;
 import fun.type.genfunc.TypeType;
-import fun.type.genfunc.Unsigned;
 
 public class GenericSpecializer extends NullTraverser<Type, List<Expression>> {
   @Override
@@ -49,7 +48,10 @@ public class GenericSpecializer extends NullTraverser<Type, List<Expression>> {
     assert (param.size() == 1);
     Expression bits = param.get(0);
     assert (bits instanceof Number);
-    return new Unsigned(bits.getInfo(), ((Number) bits).getValue());
+    int val = ((Number) bits).getValue();
+    BigInteger max = BigInteger.valueOf(2).pow(val); // TODO correct?
+    max = max.add(BigInteger.valueOf(-1));
+    return new Range(obj.getInfo(), BigInteger.ZERO, max);
   }
 
   @Override
