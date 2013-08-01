@@ -72,8 +72,10 @@ import fun.type.composed.RecordType;
 import fun.type.composed.UnionType;
 import fun.type.genfunc.Array;
 import fun.type.genfunc.GenericArray;
+import fun.type.genfunc.GenericRange;
 import fun.type.genfunc.GenericTypeType;
 import fun.type.genfunc.GenericUnsigned;
+import fun.type.genfunc.Range;
 import fun.type.genfunc.TypeType;
 import fun.type.genfunc.Unsigned;
 import fun.variable.CompUse;
@@ -580,6 +582,16 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitFuncEntryExit(FuncEntryExit obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitRange(Range obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitGenericRange(GenericRange obj, P param) {
     return null;
   }
 

@@ -41,6 +41,7 @@ import pir.type.BooleanType;
 import pir.type.EnumElement;
 import pir.type.EnumType;
 import pir.type.NamedElement;
+import pir.type.RangeType;
 import pir.type.StringType;
 import pir.type.StructType;
 import pir.type.Type;
@@ -303,6 +304,11 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
     if (obj instanceof FuncWithBody) {
       visit(((FuncWithBody) obj).getBody(), param);
     }
+    return null;
+  }
+
+  @Override
+  protected R visitRangeType(RangeType obj, P param) {
     return null;
   }
 

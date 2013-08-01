@@ -88,6 +88,7 @@ import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.type.base.FunctionTypeRet;
 import evl.type.base.FunctionTypeVoid;
+import evl.type.base.Range;
 import evl.type.base.StringType;
 import evl.type.base.TypeAlias;
 import evl.type.base.Unsigned;
@@ -459,6 +460,12 @@ public class ToPir extends Traverser<PirObject, PirObject> {
   @Override
   protected PirObject visitUnsigned(Unsigned obj, PirObject param) {
     pir.type.UnsignedType ret = new pir.type.UnsignedType(obj.getBits());
+    return ret;
+  }
+
+  @Override
+  protected PirObject visitRange(Range obj, PirObject param) {
+    pir.type.RangeType ret = new pir.type.RangeType(obj.getLow(), obj.getHigh());
     return ret;
   }
 

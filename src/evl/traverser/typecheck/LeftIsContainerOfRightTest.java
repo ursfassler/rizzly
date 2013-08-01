@@ -14,6 +14,7 @@ import evl.type.base.EnumType;
 import evl.type.base.FunctionType;
 import evl.type.base.FunctionTypeRet;
 import evl.type.base.FunctionTypeVoid;
+import evl.type.base.Range;
 import evl.type.base.StringType;
 import evl.type.base.TypeAlias;
 import evl.type.base.Unsigned;
@@ -117,6 +118,17 @@ public class LeftIsContainerOfRightTest extends NullTraverser<Boolean, Type> {
   protected Boolean visitUnsigned(Unsigned left, Type right) {
     if (right instanceof Unsigned) {
       return left.getBits() >= ((Unsigned) right).getBits();
+    } else {
+      return false; // TODO correct?
+    }
+  }
+
+  @Override
+  protected Boolean visitRange(Range obj, Type right) {
+    if (right instanceof Range) {
+      int cmpLow = obj.getLow().compareTo(((Range) right).getLow());
+      int cmpHigh = obj.getHigh().compareTo(((Range) right).getHigh());
+      return (cmpLow >= 0) && (cmpHigh <= 0); // TODO ok?
     } else {
       return false; // TODO correct?
     }

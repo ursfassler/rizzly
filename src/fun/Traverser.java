@@ -78,8 +78,10 @@ import fun.type.composed.RecordType;
 import fun.type.composed.UnionType;
 import fun.type.genfunc.Array;
 import fun.type.genfunc.GenericArray;
+import fun.type.genfunc.GenericRange;
 import fun.type.genfunc.GenericTypeType;
 import fun.type.genfunc.GenericUnsigned;
+import fun.type.genfunc.Range;
 import fun.type.genfunc.TypeType;
 import fun.type.genfunc.Unsigned;
 import fun.variable.CompUse;
@@ -364,6 +366,10 @@ public abstract class Traverser<R, P> {
       return visitGenericArray((GenericArray) obj, param);
     else if (obj instanceof GenericTypeType)
       return visitGenericTypeType((GenericTypeType) obj, param);
+    else if (obj instanceof GenericRange)
+      return visitGenericRange((GenericRange) obj, param);
+    else if (obj instanceof Range)
+      return visitRange((Range) obj, param);
     else if (obj instanceof Unsigned)
       return visitUnsigned((Unsigned) obj, param);
     else if (obj instanceof Array)
@@ -422,6 +428,8 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitArray(Array obj, P param);
 
+  abstract protected R visitRange(Range obj, P param);
+
   abstract protected R visitUnsigned(Unsigned obj, P param);
 
   abstract protected R visitBooleanType(BooleanType obj, P param);
@@ -479,6 +487,8 @@ public abstract class Traverser<R, P> {
   abstract protected R visitGenericArray(GenericArray obj, P param);
 
   abstract protected R visitGenericUnsigned(GenericUnsigned obj, P param);
+
+  abstract protected R visitGenericRange(GenericRange obj, P param);
 
   abstract protected R visitAnyType(AnyType obj, P param);
 

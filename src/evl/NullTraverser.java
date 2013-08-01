@@ -57,6 +57,7 @@ import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.type.base.FunctionTypeRet;
 import evl.type.base.FunctionTypeVoid;
+import evl.type.base.Range;
 import evl.type.base.StringType;
 import evl.type.base.TypeAlias;
 import evl.type.base.Unsigned;
@@ -75,7 +76,7 @@ import evl.variable.StateVariable;
 
 abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
-  protected abstract R visitDefault(Evl obj, P param);
+  abstract protected R visitDefault(Evl obj, P param);
 
   @Override
   protected R visitArrayValue(ArrayValue obj, P param) {
@@ -429,6 +430,11 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitComponentType(ComponentType obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitRange(Range obj, P param) {
     return visitDefault(obj, param);
   }
 

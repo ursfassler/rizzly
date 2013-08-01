@@ -1,5 +1,6 @@
 package fun.traverser.spezializer;
 
+import java.math.BigInteger;
 import java.util.List;
 
 import common.ElementInfo;
@@ -15,8 +16,10 @@ import fun.type.NamedType;
 import fun.type.Type;
 import fun.type.genfunc.Array;
 import fun.type.genfunc.GenericArray;
+import fun.type.genfunc.GenericRange;
 import fun.type.genfunc.GenericTypeType;
 import fun.type.genfunc.GenericUnsigned;
+import fun.type.genfunc.Range;
 import fun.type.genfunc.TypeType;
 import fun.type.genfunc.Unsigned;
 
@@ -29,6 +32,16 @@ public class GenericSpecializer extends NullTraverser<Type, List<Expression>> {
   public static Type process(TypeGenerator type, List<Expression> genspec, KnowledgeBase kb) {
     GenericSpecializer specializer = new GenericSpecializer();
     return specializer.traverse(type.getItem(), genspec);
+  }
+
+  @Override
+  protected Type visitGenericRange(GenericRange obj, List<Expression> param) {
+    assert (param.size() == 2);
+    Expression low = param.get(0);
+    Expression high = param.get(1);
+    assert (low instanceof Number);
+    assert (high instanceof Number);
+    return new Range(obj.getInfo(), BigInteger.valueOf(((Number) low).getValue()), BigInteger.valueOf(((Number) high).getValue()));
   }
 
   @Override

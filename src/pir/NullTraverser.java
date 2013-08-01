@@ -38,6 +38,7 @@ import pir.type.BooleanType;
 import pir.type.EnumElement;
 import pir.type.EnumType;
 import pir.type.NamedElement;
+import pir.type.RangeType;
 import pir.type.StringType;
 import pir.type.StructType;
 import pir.type.TypeAlias;
@@ -266,6 +267,11 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitFuncProtoRet(FuncProtoRet obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitRangeType(RangeType obj, P param) {
     return doDefault(obj, param);
   }
 

@@ -64,6 +64,7 @@ import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.type.base.FunctionTypeRet;
 import evl.type.base.FunctionTypeVoid;
+import evl.type.base.Range;
 import evl.type.base.StringType;
 import evl.type.base.TypeAlias;
 import evl.type.base.Unsigned;
@@ -535,6 +536,11 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   protected R visitComponentType(ComponentType obj, P param) {
     visitItr(obj.getIface(Direction.in), param);
     visitItr(obj.getIface(Direction.out), param);
+    return null;
+  }
+
+  @Override
+  protected R visitRange(Range obj, P param) {
     return null;
   }
 

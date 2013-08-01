@@ -1,0 +1,28 @@
+
+interface
+  Tick
+    function tick( x: R{0,10} );
+  end
+  
+component
+  Range
+    input
+      in  : Tick;
+    
+    output
+      out : Tick;
+      
+    implementation elementary
+    
+    var
+      a : R{0,20};
+    
+    function in.tick( x: R{0,10} )
+      a := x * 2;
+      if a < 10 then
+        out.tick( a );
+      end
+    end
+
+  end
+

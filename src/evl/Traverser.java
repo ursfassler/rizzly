@@ -70,6 +70,7 @@ import evl.type.base.EnumType;
 import evl.type.base.FunctionType;
 import evl.type.base.FunctionTypeRet;
 import evl.type.base.FunctionTypeVoid;
+import evl.type.base.Range;
 import evl.type.base.StringType;
 import evl.type.base.TypeAlias;
 import evl.type.base.Unsigned;
@@ -345,6 +346,8 @@ public abstract class Traverser<R, P> {
       return visitBooleanType((BooleanType) obj, param);
     else if (obj instanceof Unsigned)
       return visitUnsigned((Unsigned) obj, param);
+    else if (obj instanceof Range)
+      return visitRange((Range) obj, param);
     else if (obj instanceof Array)
       return visitArray((Array) obj, param);
     else if (obj instanceof StringType)
@@ -402,6 +405,8 @@ public abstract class Traverser<R, P> {
   abstract protected R visitIntegerType(IntegerType obj, P param);
 
   abstract protected R visitUnsigned(Unsigned obj, P param);
+
+  abstract protected R visitRange(Range obj, P param);
 
   abstract protected R visitBooleanType(BooleanType obj, P param);
 

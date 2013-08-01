@@ -58,6 +58,7 @@ import fun.type.base.NaturalType;
 import fun.type.base.StringType;
 import fun.type.base.VoidType;
 import fun.type.genfunc.GenericArray;
+import fun.type.genfunc.GenericRange;
 import fun.type.genfunc.GenericTypeType;
 import fun.type.genfunc.GenericUnsigned;
 import fun.variable.ConstGlobal;
@@ -211,6 +212,7 @@ public class MainFun {
 
   private static List<TypeGenerator> genPrimitiveGenericTypes() {
     List<TypeGenerator> ret = new ArrayList<TypeGenerator>();
+    ret.add(makeGenericBaseType(new GenericRange()));
     ret.add(makeGenericBaseType(new GenericUnsigned()));
     ret.add(makeGenericBaseType(new GenericArray()));
     ret.add(makeGenericBaseType(new GenericTypeType()));

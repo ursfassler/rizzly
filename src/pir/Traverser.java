@@ -49,6 +49,7 @@ import pir.type.EnumElement;
 import pir.type.EnumType;
 import pir.type.NamedElemType;
 import pir.type.NamedElement;
+import pir.type.RangeType;
 import pir.type.StringType;
 import pir.type.StructType;
 import pir.type.Type;
@@ -206,6 +207,8 @@ public abstract class Traverser<R, P> {
   protected R visitType(Type obj, P param) {
     if (obj instanceof UnsignedType)
       return visitUnsignedType((UnsignedType) obj, param);
+    else if (obj instanceof RangeType)
+      return visitRangeType((RangeType) obj, param);
     else if (obj instanceof BooleanType)
       return visitBooleanType((BooleanType) obj, param);
     else if (obj instanceof NamedElemType)
@@ -318,6 +321,8 @@ public abstract class Traverser<R, P> {
   protected abstract R visitArray(Array obj, P param);
 
   protected abstract R visitUnsignedType(UnsignedType obj, P param);
+
+  protected abstract R visitRangeType(RangeType obj, P param);
 
   protected abstract R visitProgram(Program obj, P param);
 
