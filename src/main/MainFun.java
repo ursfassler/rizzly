@@ -43,8 +43,10 @@ import fun.symbol.SymbolTable;
 import fun.traverser.ClassNameExtender;
 import fun.traverser.GenfuncParamExtender;
 import fun.traverser.Linker;
+import fun.traverser.MakeBasicBlocks;
 import fun.traverser.Memory;
 import fun.traverser.NamespaceLinkReduction;
+import fun.traverser.SsaMaker;
 import fun.traverser.StateLinkReduction;
 import fun.traverser.TypeEvalReplacer;
 import fun.traverser.spezializer.ExprEvaluator;
@@ -119,7 +121,13 @@ public class MainFun {
     PrettyPrinter.print(classes, debugdir + "evaluated.rzy");
     removeUnused(debugdir, classes, nroot, fileList);
     PrettyPrinter.print(classes, debugdir + "stripped.rzy");
+    translateToSsa(classes, debugdir, new KnowledgeBase(classes, fileList, debugdir));
     return new Pair<String, Namespace>(nroot.getName(), classes);
+  }
+
+  private static void translateToSsa(Namespace classes, String rootdir, KnowledgeBase kb) {
+    MakeBasicBlocks.process(classes, kb);
+    SsaMaker.process(classes,kb);
   }
 
   private static void printDepGraph(String debugdir, Namespace classes, Named root, Collection<RizzlyFile> fileList) {

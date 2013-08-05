@@ -1,5 +1,13 @@
-import
-  iface.iface0;
+type
+  Point = Record
+    x : U{8};
+    y : U{8};
+  end
+
+interface
+  Iface0
+    function foo( x: U{8} ):Point;
+  end
 
 component
   While
@@ -21,10 +29,6 @@ component
         x := x-1;
       end
       return ret;
-    end
-
-    function in.bar( x: U{8} ):U{8}
-      return 0;
     end
   end
 

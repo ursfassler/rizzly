@@ -37,6 +37,7 @@ import evl.type.Type;
 import evl.type.base.Range;
 import evl.variable.FuncVariable;
 
+//FIXME does not work for while, condition variable is not re-set
 /**
  * Splits expression down to two operands per expression and maximal one function call.
  *

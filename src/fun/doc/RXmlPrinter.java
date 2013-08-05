@@ -192,11 +192,11 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   private void printEntryExit(String name, ReferenceLinked ref) {
     assert (ref.getOffset().isEmpty());
     FuncEntryExit func = (FuncEntryExit) ref.getLink();
-    if (!func.getBody().getStatements().isEmpty()) {
+    if (!func.getBody().isEmpty()) {
       xw.kw(name);
       xw.nl();
       xw.incIndent();
-      visitItr(func.getBody().getStatements(), null);
+      visit(func.getBody(), null);
       xw.decIndent();
       xw.kw("end");
       xw.nl();

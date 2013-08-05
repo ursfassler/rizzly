@@ -2,6 +2,12 @@ package fun;
 
 import common.Direction;
 
+import fun.cfg.BasicBlock;
+import fun.cfg.BasicBlockList;
+import fun.cfg.CaseGoto;
+import fun.cfg.CaseGotoOpt;
+import fun.cfg.Goto;
+import fun.cfg.IfGoto;
 import fun.composition.Connection;
 import fun.composition.ImplComposition;
 import fun.expression.ArithmeticOp;
@@ -586,6 +592,44 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitGenericRange(GenericRange obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitBasicBlock(BasicBlock obj, P param) {
+    visitItr(obj.getPhi(), param);
+    visitItr(obj.getCode(), param);
+    visit(obj.getEnd(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitGoto(Goto obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitCaseGotoOpt(CaseGotoOpt obj, P param) {
+    visitItr(obj.getValue(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitCaseGoto(CaseGoto obj, P param) {
+    visit(obj.getCondition(), param);
+    visitItr(obj.getOption(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitIfGoto(IfGoto obj, P param) {
+    visit(obj.getCondition(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitBasicBlockList(BasicBlockList obj, P param) {
+    visitItr(obj.getBasicBlocks(), param);
     return null;
   }
 
