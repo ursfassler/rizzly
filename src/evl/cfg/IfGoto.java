@@ -1,18 +1,18 @@
-package fun.cfg;
+package evl.cfg;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import common.ElementInfo;
 
-import fun.FunBase;
-import fun.expression.Expression;
+import evl.EvlBase;
+import evl.expression.Expression;
 
 /**
  *
  * @author urs
  */
-public class IfGoto extends FunBase implements BasicBlockEnd {
+public class IfGoto extends EvlBase implements BasicBlockEnd {
   private Expression condition;
   private BasicBlock thenBlock;
   private BasicBlock elseBlock;

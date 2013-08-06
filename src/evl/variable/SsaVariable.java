@@ -1,4 +1,4 @@
-package fun.variable;
+package evl.variable;
 
 public class SsaVariable extends Variable {
 

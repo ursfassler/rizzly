@@ -3,8 +3,8 @@ package fun.function.impl;
 import common.ElementInfo;
 
 import fun.function.FuncWithBody;
-import fun.function.FunctionBodyImplementation;
 import fun.function.FunctionHeader;
+import fun.statement.Block;
 
 /**
  * Function inside a component. It may be not pure and can therefore not be executed at compile time.
@@ -12,19 +12,19 @@ import fun.function.FunctionHeader;
  * @author urs
  */
 public class FuncPrivateVoid extends FunctionHeader implements FuncWithBody {
-  private FunctionBodyImplementation body;
+  private Block body;
 
   public FuncPrivateVoid(ElementInfo info) {
     super(info);
   }
 
   @Override
-  public FunctionBodyImplementation getBody() {
+  public Block getBody() {
     return body;
   }
 
   @Override
-  public void setBody(FunctionBodyImplementation body) {
+  public void setBody(Block body) {
     this.body = body;
   }
 

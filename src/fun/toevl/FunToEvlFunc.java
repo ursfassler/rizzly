@@ -5,6 +5,8 @@ import java.util.Map;
 import error.ErrorType;
 import error.RError;
 import evl.Evl;
+import evl.cfg.BasicBlockList;
+import evl.doc.PrettyPrinter;
 import evl.expression.reference.Reference;
 import evl.function.FunctionBase;
 import evl.function.FunctionFactory;
@@ -70,6 +72,8 @@ public class FunToEvlFunc extends NullTraverser<FunctionBase, Void> {
       ((evl.function.FuncWithReturn) func).setRet((Reference) fta.traverse(((FuncWithReturn) obj).getRet(), null));
     }
     if (obj instanceof FuncWithBody) {
+      MakeBasicBlocks blocks = new MakeBasicBlocks(fta);
+      BasicBlockList nbody = blocks.translate(((FuncWithBody) obj).getBody(), obj.getParam().getList());
       ((evl.function.FuncWithBody) func).setBody((evl.statement.Block) fta.traverse(((FuncWithBody) obj).getBody(), null));
     }
     return func;

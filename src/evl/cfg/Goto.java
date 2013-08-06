@@ -1,13 +1,13 @@
-package fun.cfg;
+package evl.cfg;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import common.ElementInfo;
 
-import fun.FunBase;
+import evl.EvlBase;
 
-public class Goto extends FunBase implements BasicBlockEnd{
+public class Goto extends EvlBase implements BasicBlockEnd{
   private BasicBlock target;
 
   public Goto(ElementInfo info, BasicBlock target) {

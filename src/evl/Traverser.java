@@ -1,5 +1,12 @@
 package evl;
 
+import evl.cfg.BasicBlock;
+import evl.cfg.BasicBlockList;
+import evl.cfg.CaseGoto;
+import evl.cfg.CaseGotoOpt;
+import evl.cfg.Goto;
+import evl.cfg.IfGoto;
+import evl.cfg.PhiStmt;
 import evl.composition.Connection;
 import evl.composition.Endpoint;
 import evl.composition.EndpointSelf;
@@ -86,6 +93,7 @@ import evl.variable.ConstGlobal;
 import evl.variable.ConstPrivate;
 import evl.variable.Constant;
 import evl.variable.FuncVariable;
+import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
 
@@ -147,6 +155,20 @@ public abstract class Traverser<R, P> {
       return visitInterface((Interface) obj, param);
     else if (obj instanceof Component)
       return visitComponent((Component) obj, param);
+    else if (obj instanceof BasicBlock)
+      return visitBasicBlock((BasicBlock) obj, param);
+    else if (obj instanceof BasicBlockList)
+      return visitBasicBlockList((BasicBlockList) obj, param);
+    else if (obj instanceof CaseGotoOpt)
+      return visitCaseGotoOpt((CaseGotoOpt) obj, param);
+    else if (obj instanceof Goto)
+      return visitGoto((Goto) obj, param);
+    else if (obj instanceof IfGoto)
+      return visitIfGoto((IfGoto) obj, param);
+    else if (obj instanceof CaseGoto)
+      return visitCaseGoto((CaseGoto) obj, param);
+    else if (obj instanceof PhiStmt)
+      return visitPhiStmt((PhiStmt) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
@@ -196,6 +218,8 @@ public abstract class Traverser<R, P> {
       return visitFuncVariable((FuncVariable) obj, param);
     else if (obj instanceof Constant)
       return visitConstant((Constant) obj, param);
+    else if (obj instanceof SsaVariable)
+      return visitSsaVariable((SsaVariable) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
@@ -363,6 +387,20 @@ public abstract class Traverser<R, P> {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
 
+  abstract protected R visitPhiStmt(PhiStmt obj, P param);
+
+  abstract protected R visitBasicBlockList(BasicBlockList obj, P param);
+
+  abstract protected R visitBasicBlock(BasicBlock obj, P param);
+
+  abstract protected R visitCaseGotoOpt(CaseGotoOpt obj, P param);
+
+  abstract protected R visitCaseGoto(CaseGoto obj, P param);
+
+  abstract protected R visitIfGoto(IfGoto obj, P param);
+
+  abstract protected R visitGoto(Goto obj, P param);
+
   abstract protected R visitEndpointSelf(EndpointSelf obj, P param);
 
   abstract protected R visitEndpointSub(EndpointSub obj, P param);
@@ -384,6 +422,8 @@ public abstract class Traverser<R, P> {
   abstract protected R visitFuncVariable(FuncVariable obj, P param);
 
   abstract protected R visitStateVariable(StateVariable obj, P param);
+
+  abstract protected R visitSsaVariable(SsaVariable obj, P param);
 
   abstract protected R visitTypeAlias(TypeAlias obj, P param);
 

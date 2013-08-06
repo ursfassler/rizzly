@@ -2,6 +2,13 @@ package evl;
 
 import common.Direction;
 
+import evl.cfg.BasicBlock;
+import evl.cfg.BasicBlockList;
+import evl.cfg.CaseGoto;
+import evl.cfg.CaseGotoOpt;
+import evl.cfg.Goto;
+import evl.cfg.IfGoto;
+import evl.cfg.PhiStmt;
 import evl.composition.Connection;
 import evl.composition.EndpointSelf;
 import evl.composition.EndpointSub;
@@ -78,6 +85,7 @@ import evl.type.special.VoidType;
 import evl.variable.ConstGlobal;
 import evl.variable.ConstPrivate;
 import evl.variable.FuncVariable;
+import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
 
 public class DefTraverser<R, P> extends Traverser<R, P> {
@@ -537,5 +545,55 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   protected R visitRange(Range obj, P param) {
     return null;
   }
+
+  @Override
+  protected R visitPhiStmt(PhiStmt obj, P param) {
+    visit(obj.getVardef(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitBasicBlock(BasicBlock obj, P param) {
+    visitItr(obj.getPhi(), param);
+    visitItr(obj.getCode(), param);
+    visit(obj.getEnd(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitGoto(Goto obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitCaseGotoOpt(CaseGotoOpt obj, P param) {
+    visitItr(obj.getValue(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitCaseGoto(CaseGoto obj, P param) {
+    visit(obj.getCondition(), param);
+    visitItr(obj.getOption(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitIfGoto(IfGoto obj, P param) {
+    visit(obj.getCondition(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitBasicBlockList(BasicBlockList obj, P param) {
+    visitItr(obj.getBasicBlocks(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitSsaVariable(SsaVariable obj, P param) {
+    return null;
+  }
+
 
 }

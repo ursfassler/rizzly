@@ -5,23 +5,27 @@
 
 package util.ssa;
 
-
 import java.io.PrintStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import evl.cfg.BasicBlockList;
+import evl.cfg.PhiStmt;
 import fun.DefGTraverser;
 import fun.cfg.BasicBlock;
-import fun.cfg.PhiStmt;
-import fun.expression.Expression;
-import fun.variable.SsaVariable;
+import fun.expression.reference.ReferenceLinked;
+import fun.expression.reference.ReferenceUnlinked;
+import fun.function.FuncWithBody;
+import fun.function.FunctionHeader;
+import fun.statement.Assignment;
+import fun.statement.VarDefStmt;
 import fun.variable.Variable;
 
 public class DefUseKillVisitor extends DefGTraverser<Void, BasicBlock> {
-  private HashMap<BasicBlock, HashSet<Variable>> use    = new HashMap<BasicBlock, HashSet<Variable>>();
-  private HashMap<BasicBlock, HashSet<Variable>> def    = new HashMap<BasicBlock, HashSet<Variable>>();
-  private HashMap<BasicBlock, HashSet<Variable>> kill   = new HashMap<BasicBlock, HashSet<Variable>>();
+  private HashMap<BasicBlock, HashSet<Variable>> use = new HashMap<BasicBlock, HashSet<Variable>>();
+  private HashMap<BasicBlock, HashSet<Variable>> def = new HashMap<BasicBlock, HashSet<Variable>>();
+  private HashMap<BasicBlock, HashSet<Variable>> kill = new HashMap<BasicBlock, HashSet<Variable>>();
   private HashMap<Variable, HashSet<BasicBlock>> blocks = new HashMap<Variable, HashSet<BasicBlock>>();
 
   public HashMap<BasicBlock, HashSet<Variable>> getUse() {
@@ -41,6 +45,26 @@ public class DefUseKillVisitor extends DefGTraverser<Void, BasicBlock> {
   }
 
   @Override
+  protected Void visitFunctionHeader(FunctionHeader obj, BasicBlock param) {
+    assert (param == null);
+
+    if (obj instanceof FuncWithBody) {
+      BasicBlockList bbl = (BasicBlockList) ((FuncWithBody) obj).getBody();
+      // TODO ok?
+      // we add the argument variables to the first basic block
+      param = bbl.getBasicBlocks().get(0);
+      use.put(param, new HashSet<Variable>());
+      def.put(param, new HashSet<Variable>());
+      kill.put(param, new HashSet<Variable>());
+      visitItr(obj.getParam(), param);
+
+      visit(bbl, null);
+    }
+
+    return null;
+  }
+
+  @Override
   protected Void visitBasicBlock(BasicBlock obj, BasicBlock param) {
     assert (param == null);
 
@@ -50,60 +74,79 @@ public class DefUseKillVisitor extends DefGTraverser<Void, BasicBlock> {
 
     super.visitBasicBlock(obj, obj);
 
-//    visitFollowingPhi(obj); //TODO ok?
+    visitFollowingPhi(obj); // TODO ok?
 
     return null;
   }
 
-  /* handle phi functions as they belong to the previous basic blocks, what they actually do*/
+  /* handle phi functions as they belong to the previous basic blocks, what they actually do */
   private void visitFollowingPhi(BasicBlock bb) {
-    for (BasicBlock v : bb.getOutlist()) {
+    for (BasicBlock v : bb.getEnd().getJumpDst()) {
       BbEdge edge = new BbEdge(bb, v);
-      Collection<PhiStmt> phis = edge.getDst().getPhis();
+      Collection<PhiStmt> phis = edge.getDst().getPhi();
       for (PhiStmt phi : phis) {
-        Expression expr = phi.getOption().get(bb.getId());
-        assert (expr != null);
-        visit(expr, bb);
-        visit(phi.getVarname(), bb);
+        throw new RuntimeException("not yet implemented");
+        // Expression expr = phi.getArg(bb);
+        // assert (expr != null);
+        // visit(expr, bb);
+        // visit(phi.getVarname(), bb);
       }
     }
   }
 
   @Override
   protected Void visitPhiStmt(PhiStmt obj, BasicBlock param) {
+    return super.visitPhiStmt(obj, param);
+  }
+
+  @Override
+  protected Void visitVariable(Variable obj, BasicBlock param) {
+    assert (param != null);
+    def.get(param).add(obj);
+    kill.get(param).add(obj);
+    if (!blocks.containsKey(obj)) {
+      blocks.put(obj, new HashSet<BasicBlock>());
+    }
+    blocks.get(obj).add(param);
+    return super.visitVariable(obj, param);
+  }
+
+  @Override
+  protected Void visitReferenceUnlinked(ReferenceUnlinked obj, BasicBlock param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Void visitReferenceLinked(ReferenceLinked obj, BasicBlock param) {
+    if ((obj.getLink() instanceof Variable) && (obj.getOffset().isEmpty())) {
+      visitVarRef((Variable) obj.getLink(), param);
+    }
+    return super.visitReferenceLinked(obj, param);
+  }
+
+  private void visitVarRef(Variable ref, BasicBlock bb) {
+    if (!def.get(bb).contains(ref)) {
+      use.get(bb).add(ref);
+      if (!blocks.containsKey(ref)) {
+        blocks.put(ref, new HashSet<BasicBlock>());
+      }
+    }
+  }
+
+  @Override
+  protected Void visitVarDef(VarDefStmt obj, BasicBlock param) {
     return null;
   }
 
   @Override
-  protected Void visitSsaVariable(SsaVariable obj, BasicBlock param) {
-    def.get(param).add(obj.getName());
-    kill.get(param).add(obj.getName());
-    if (!blocks.containsKey(obj.getName())) {
-      blocks.put(obj.getName(), new HashSet<BasicBlock>());
+  protected Void visitAssignment(Assignment obj, BasicBlock param) {
+    ReferenceLinked ref = (ReferenceLinked) obj.getLeft();
+    if ((ref.getLink() instanceof Variable) && (ref.getOffset().isEmpty())) {
+      visitVariable((Variable) ref.getLink(), param);
     }
-    blocks.get(obj.getName()).add(param);
-    return super.visitSsaVariable(obj, param);
-  }
-
-  @Override
-  protected Void visitVariableRefUnlinked(VariableRefUnlinked obj, BasicBlock param) {
-    visitVarRef(obj, param);
-    return super.visitVariableRefUnlinked(obj, param);
-  }
-
-  @Override
-  protected Void visitVariableRefLinked(VariableRefLinked obj, BasicBlock param) {
-    visitVarRef(obj, param);
-    return super.visitVariableRefLinked(obj, param);
-  }
-
-  private void visitVarRef(VariableRef ref, BasicBlock bb) {
-    if (!def.get(bb).contains(ref.getName())) {
-      use.get(bb).add(ref.getName());
-      if (!blocks.containsKey(ref.getName())) {
-        blocks.put(ref.getName(), new HashSet<BasicBlock>());
-      }
-    }
+    visitItr(obj.getLeft().getOffset(), param);
+    visit(obj.getRight(), param);
+    return null;
   }
 
   @SuppressWarnings("unused")

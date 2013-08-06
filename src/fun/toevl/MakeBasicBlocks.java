@@ -1,31 +1,23 @@
-package fun.traverser;
+package fun.toevl;
 
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.jgrapht.DirectedGraph;
-
-import util.ssa.BbEdge;
-
 import common.ElementInfo;
 
-import fun.DefGTraverser;
+import evl.cfg.BasicBlock;
+import evl.cfg.BasicBlockEnd;
+import evl.cfg.BasicBlockList;
+import evl.cfg.CaseGoto;
+import evl.cfg.CaseGotoOpt;
+import evl.cfg.Goto;
+import evl.cfg.IfGoto;
+import evl.cfg.PhiStmt;
+import evl.variable.Variable;
 import fun.Fun;
 import fun.NullTraverser;
-import fun.cfg.BasicBlock;
-import fun.cfg.BasicBlockEnd;
-import fun.cfg.BasicBlockList;
-import fun.cfg.CaseGoto;
-import fun.cfg.CaseGotoOpt;
-import fun.cfg.Goto;
-import fun.cfg.IfGoto;
-import fun.doc.PrettyPrinter;
-import fun.expression.Expression;
-import fun.function.FuncWithBody;
-import fun.function.FunctionHeader;
-import fun.knowledge.KnowledgeBase;
 import fun.statement.Assignment;
 import fun.statement.Block;
 import fun.statement.CallStmt;
@@ -38,48 +30,43 @@ import fun.statement.ReturnVoid;
 import fun.statement.Statement;
 import fun.statement.VarDefStmt;
 import fun.statement.While;
-
-public class MakeBasicBlocks extends DefGTraverser<Void, Void> {
-  private KnowledgeBase kb;
-
-  public MakeBasicBlocks(KnowledgeBase kb) {
-    super();
-    this.kb = kb;
-  }
-
-  static public void process(Fun obj, KnowledgeBase kb) {
-    MakeBasicBlocks mbb = new MakeBasicBlocks(kb);
-    mbb.traverse(obj, null);
-  }
-
-  @Override
-  protected Void visitFunctionHeader(FunctionHeader obj, Void param) {
-    if (obj instanceof FuncWithBody) {
-      Block body = (Block) ((FuncWithBody) obj).getBody();
-      MbbTranslator translator = new MbbTranslator();
-      translator.traverse(body, null);
-
-      BasicBlockList bbBody = new BasicBlockList(body.getInfo());
-      bbBody.getBasicBlocks().addAll(translator.getBbset());
-      ((FuncWithBody) obj).setBody(bbBody);
-
-      PrettyPrinter.print(obj, kb.getRootdir() + "bb" + obj.getInfo().getLine() + ".rzy");
-    }
-    return null;
-  }
-
-}
+import fun.variable.FuncVariable;
 
 /**
+ * Translates body of functions from FUN to EVL, including translation into Basic Block representation
  *
  * @author urs
  *
  */
-class MbbTranslator extends NullTraverser<BasicBlock, BasicBlock> {
-  private LinkedList<BasicBlock> bblist = new LinkedList<BasicBlock>();
+class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
+  final private FunToEvl fta;
+  final private LinkedList<BasicBlock> bblist = new LinkedList<BasicBlock>();
 
-  public LinkedList<BasicBlock> getBbset() {
-    return bblist;
+  public MakeBasicBlocks(FunToEvl fta) {
+    super();
+    this.fta = fta;
+  }
+
+  public BasicBlockList translate(Block body, List<FuncVariable> param) {
+    BasicBlock head = makeBb(body.getInfo());
+
+    for (FuncVariable var : param) {
+      PhiStmt phi = new PhiStmt(var.getInfo(), (Variable) fta.traverse(var, null));
+      head.getPhi().add(phi);
+    }
+
+    BasicBlock last = visit(body, null);
+    BasicBlock exit = makeBb(body.getInfo());
+    exit.setEnd((BasicBlockEnd) fta.traverse(new ReturnVoid(body.getInfo()), null));
+    addGoto(last, exit);
+    addGoto(head, bblist.get(1));
+
+    removeUnreachable(bblist);
+
+    BasicBlockList bbBody = new BasicBlockList(body.getInfo());
+    bbBody.getBasicBlocks().addAll(bblist);
+
+    return bbBody;
   }
 
   private BasicBlock makeBb(ElementInfo info) {
@@ -88,7 +75,7 @@ class MbbTranslator extends NullTraverser<BasicBlock, BasicBlock> {
     return bb;
   }
 
-  private IfGoto makeIf(Expression cond, BasicBlock bbThen, BasicBlock bbElse) {
+  private IfGoto makeIf(evl.expression.Expression cond, BasicBlock bbThen, BasicBlock bbElse) {
     IfGoto ifStmt = new IfGoto(cond.getInfo());
     ifStmt.setCondition(cond);
     ifStmt.setThenBlock(bbThen);
@@ -97,23 +84,10 @@ class MbbTranslator extends NullTraverser<BasicBlock, BasicBlock> {
   }
 
   private void addGoto(BasicBlock code, BasicBlock dst) {
-    List<Statement> lst = code.getCode();
+    List<evl.statement.Statement> lst = code.getCode();
     if (code.getEnd() == null) {
       code.setEnd(new Goto(dst.getInfo(), dst));
     }
-  }
-
-  @Override
-  public BasicBlock traverse(Fun obj, BasicBlock param) {
-    assert (param == null);
-    BasicBlock last = super.traverse(obj, null);
-    BasicBlock exit = makeBb(obj.getInfo());
-    exit.setEnd(new ReturnVoid(obj.getInfo()));
-    addGoto(last, exit);
-
-    removeUnreachable(bblist);
-
-    return null;
   }
 
   static private void removeUnreachable(LinkedList<BasicBlock> vertices) {
@@ -154,14 +128,14 @@ class MbbTranslator extends NullTraverser<BasicBlock, BasicBlock> {
   @Override
   protected BasicBlock visitReturnExpr(ReturnExpr obj, BasicBlock param) {
     assert (param.getEnd() == null);
-    param.setEnd(obj);
+    param.setEnd((BasicBlockEnd) fta.traverse(obj, null));
     return param;
   }
 
   @Override
   protected BasicBlock visitReturnVoid(ReturnVoid obj, BasicBlock param) {
     assert (param.getEnd() == null);
-    param.setEnd(obj);
+    param.setEnd((BasicBlockEnd) fta.traverse(obj, null));
     return param;
   }
 
@@ -174,7 +148,7 @@ class MbbTranslator extends NullTraverser<BasicBlock, BasicBlock> {
     addGoto(param, head);
     addGoto(sub, head);
 
-    IfGoto ifStmt = makeIf(obj.getCondition(), sub, exit);
+    IfGoto ifStmt = makeIf((evl.expression.Expression) fta.traverse(obj.getCondition(), null), sub, exit);
     head.setEnd(ifStmt);
 
     return exit;
@@ -225,19 +199,19 @@ class MbbTranslator extends NullTraverser<BasicBlock, BasicBlock> {
 
   @Override
   protected BasicBlock visitAssignment(Assignment obj, BasicBlock param) {
-    param.getCode().add(obj);
+    param.getCode().add((evl.statement.Statement) fta.traverse(obj, null));
     return param;
   }
 
   @Override
   protected BasicBlock visitVarDef(VarDefStmt obj, BasicBlock param) {
-    param.getCode().add(0, obj);
+    param.getCode().add((evl.statement.Statement) fta.traverse(obj, null));
     return param;
   }
 
   @Override
   protected BasicBlock visitCallStmt(CallStmt obj, BasicBlock param) {
-    param.getCode().add(obj);
+    param.getCode().add((evl.statement.Statement) fta.traverse(obj, null));
     return param;
   }
 

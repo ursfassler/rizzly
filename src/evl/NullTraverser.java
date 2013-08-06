@@ -1,5 +1,12 @@
 package evl;
 
+import evl.cfg.BasicBlock;
+import evl.cfg.BasicBlockList;
+import evl.cfg.CaseGoto;
+import evl.cfg.CaseGotoOpt;
+import evl.cfg.Goto;
+import evl.cfg.IfGoto;
+import evl.cfg.PhiStmt;
 import evl.composition.Connection;
 import evl.composition.EndpointSelf;
 import evl.composition.EndpointSub;
@@ -71,6 +78,7 @@ import evl.type.special.VoidType;
 import evl.variable.ConstGlobal;
 import evl.variable.ConstPrivate;
 import evl.variable.FuncVariable;
+import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
 
 abstract public class NullTraverser<R, P> extends Traverser<R, P> {
@@ -429,6 +437,46 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitRange(Range obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitPhiStmt(PhiStmt obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitBasicBlockList(BasicBlockList obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitBasicBlock(BasicBlock obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitCaseGotoOpt(CaseGotoOpt obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitCaseGoto(CaseGoto obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitIfGoto(IfGoto obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitGoto(Goto obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitSsaVariable(SsaVariable obj, P param) {
     return visitDefault(obj, param);
   }
 

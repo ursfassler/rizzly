@@ -1,11 +1,5 @@
 package fun;
 
-import fun.cfg.BasicBlock;
-import fun.cfg.BasicBlockList;
-import fun.cfg.CaseGoto;
-import fun.cfg.CaseGotoOpt;
-import fun.cfg.Goto;
-import fun.cfg.IfGoto;
 import fun.composition.Connection;
 import fun.composition.ImplComposition;
 import fun.expression.ArithmeticOp;
@@ -159,18 +153,6 @@ public abstract class Traverser<R, P> {
       return visitComponent((Component) obj, param);
     else if (obj instanceof NamedComponent)
       return visitNamedComponent((NamedComponent) obj, param);
-    else if (obj instanceof BasicBlock)
-      return visitBasicBlock((BasicBlock) obj, param);
-    else if (obj instanceof BasicBlockList)
-      return visitBasicBlockList((BasicBlockList) obj, param);
-    else if (obj instanceof CaseGotoOpt)
-      return visitCaseGotoOpt((CaseGotoOpt) obj, param);
-    else if (obj instanceof Goto)
-      return visitGoto((Goto) obj, param);
-    else if (obj instanceof IfGoto)
-      return visitIfGoto((IfGoto) obj, param);
-    else if (obj instanceof CaseGoto)
-      return visitCaseGoto((CaseGoto) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
@@ -403,10 +385,6 @@ public abstract class Traverser<R, P> {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
 
-  abstract protected R visitBasicBlockList(BasicBlockList obj, P param) ;
-
-  abstract protected R visitBasicBlock(BasicBlock obj, P param);
-
   abstract protected R visitFuncEntryExit(FuncEntryExit obj, P param);
 
   abstract protected R visitFuncPrivateRet(FuncPrivateRet obj, P param);
@@ -518,14 +496,6 @@ public abstract class Traverser<R, P> {
   abstract protected R visitEnumElement(EnumElement obj, P param);
 
   abstract protected R visitWhile(While obj, P param);
-
-  abstract protected R visitCaseGotoOpt(CaseGotoOpt obj, P param);
-
-  abstract protected R visitCaseGoto(CaseGoto obj, P param);
-
-  abstract protected R visitIfGoto(IfGoto obj, P param);
-
-  abstract protected R visitGoto(Goto obj, P param);
 
   abstract protected R visitCaseStmt(CaseStmt obj, P param);
 

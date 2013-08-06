@@ -6,19 +6,24 @@
 package util.ssa;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import util.Pair;
+import evl.cfg.PhiStmt;
+import evl.variable.SsaVariable;
 import fun.cfg.BasicBlock;
 import fun.function.FunctionHeader;
-import fun.variable.SsaVariable;
+import fun.variable.FuncVariable;
 import fun.variable.Variable;
 
 public class PhiInserter {
   private List<Variable> globals = new ArrayList<Variable>();
   private FunctionHeader func;
   private DominanceFrontier<BasicBlock, BbEdge> df;
+  private Set<Pair<BasicBlock, Variable>> hasPhi = new HashSet<Pair<BasicBlock, Variable>>();
 
   public PhiInserter(FunctionHeader func, DominanceFrontier<BasicBlock, BbEdge> df) {
     super();
@@ -45,9 +50,9 @@ public class PhiInserter {
       for (int i = 0; i < worklist.size(); i++) {
         BasicBlock b = worklist.get(i);
         for (BasicBlock d : df.getDf().get(b)) {
-          if (!d.hasPhiFor(x)) {
+          if (!hasPhiFor(d, x)) {
             number--;
-            d.insertPhi(new SsaVariable(x, number));
+            insertPhi(d, x, number);
             if (!worklist.contains(d)) {
               worklist.add(d);
             }
@@ -55,6 +60,17 @@ public class PhiInserter {
         }
       }
     }
+  }
+
+  private void insertPhi(BasicBlock bb, Variable var, int number) {
+    hasPhi.add(new Pair<BasicBlock, Variable>(bb, var));
+    SsaVariable ssaVar = new SsaVariable(var,number);
+    PhiStmt phi = new PhiStmt(var.getInfo(), ssaVar); // FIXME what with arguments of phi statement?
+    bb.getPhi().add(phi);
+  }
+
+  private boolean hasPhiFor(BasicBlock bb, Variable var) {
+    return hasPhi.contains(new Pair<BasicBlock, Variable>(bb, var));
   }
 
 }

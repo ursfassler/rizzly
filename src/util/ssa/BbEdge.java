@@ -1,6 +1,6 @@
 package util.ssa;
 
-import fun.cfg.BasicBlock;
+import evl.cfg.BasicBlock;
 
 public class BbEdge extends SimpleEdge<BasicBlock> {
 

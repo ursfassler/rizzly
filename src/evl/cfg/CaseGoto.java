@@ -1,4 +1,4 @@
-package fun.cfg;
+package evl.cfg;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -7,11 +7,10 @@ import java.util.Set;
 
 import common.ElementInfo;
 
-import fun.FunBase;
-import fun.expression.Expression;
-import fun.statement.Statement;
+import evl.EvlBase;
+import evl.expression.Expression;
 
-public class CaseGoto extends FunBase implements BasicBlockEnd {
+public class CaseGoto extends EvlBase implements BasicBlockEnd {
   private Expression condition;
   private List<CaseGotoOpt> option = new ArrayList<CaseGotoOpt>();
   private BasicBlock otherwise;

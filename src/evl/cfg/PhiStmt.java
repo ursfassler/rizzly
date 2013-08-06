@@ -1,4 +1,4 @@
-package fun.cfg;
+package evl.cfg;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,26 +7,24 @@ import java.util.Set;
 
 import common.ElementInfo;
 
-import fun.Fun;
-import fun.FunBase;
-import fun.variable.FuncVariable;
-import fun.variable.Variable;
+import evl.EvlBase;
+import evl.variable.Variable;
 
 /**
  *
  * @author urs
  */
-public class PhiStmt extends FunBase {
+public class PhiStmt extends EvlBase {
 
-  private FuncVariable vardef;
+  private Variable vardef;
   private Map<BasicBlock, Variable> arg = new HashMap<BasicBlock, Variable>();
 
-  public PhiStmt(ElementInfo info, FuncVariable vardef) {
+  public PhiStmt(ElementInfo info, Variable vardef) {
     super(info);
     this.vardef = vardef;
   }
 
-  public FuncVariable getVardef() {
+  public Variable getVardef() {
     return vardef;
   }
 
@@ -40,10 +38,6 @@ public class PhiStmt extends FunBase {
 
   public Set<BasicBlock> getInBB() {
     return new HashSet<BasicBlock>(arg.keySet());
-  }
-
-  public Fun getVarname() {
-    throw new RuntimeException("not yet implemented");
   }
 
 }

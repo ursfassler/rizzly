@@ -1,4 +1,4 @@
-package fun.cfg;
+package evl.cfg;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,12 +11,10 @@ import util.ssa.BbEdge;
 
 import common.ElementInfo;
 
-import fun.FunBase;
-import fun.statement.Statement;
-import fun.variable.SsaVariable;
-import fun.variable.Variable;
+import evl.EvlBase;
+import evl.statement.Statement;
 
-public class BasicBlock extends FunBase {
+public class BasicBlock extends EvlBase {
   final private int id;
   final private List<PhiStmt> phi = new ArrayList<PhiStmt>();
   final private List<Statement> code = new ArrayList<Statement>();
@@ -25,6 +23,10 @@ public class BasicBlock extends FunBase {
   public BasicBlock(ElementInfo info, int id) {
     super(info);
     this.id = id;
+  }
+
+  public int getId() {
+    return id;
   }
 
   public List<Statement> getCode() {
@@ -46,14 +48,6 @@ public class BasicBlock extends FunBase {
 
   public List<PhiStmt> getPhi() {
     return phi;
-  }
-
-  public boolean hasPhiFor(Variable x) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  public void insertPhi(SsaVariable ssaVariable) {
-    throw new RuntimeException("not yet implemented");
   }
 
   public static DirectedGraph<BasicBlock, BbEdge> makeFuncGraph(Collection<BasicBlock> bbs) {

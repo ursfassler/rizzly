@@ -1,13 +1,13 @@
-package fun.cfg;
+package evl.cfg;
 
 import java.util.List;
 
 import common.ElementInfo;
 
-import fun.FunBase;
-import fun.statement.CaseOptEntry;
+import evl.EvlBase;
+import evl.statement.CaseOptEntry;
 
-public class CaseGotoOpt extends FunBase {
+public class CaseGotoOpt extends EvlBase {
   private List<CaseOptEntry> value;
   private BasicBlock dst;
 

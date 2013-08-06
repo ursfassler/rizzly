@@ -15,12 +15,6 @@ import evl.doc.StreamWriter;
 import fun.Fun;
 import fun.FunBase;
 import fun.NullTraverser;
-import fun.cfg.BasicBlock;
-import fun.cfg.BasicBlockList;
-import fun.cfg.CaseGoto;
-import fun.cfg.CaseGotoOpt;
-import fun.cfg.Goto;
-import fun.cfg.IfGoto;
 import fun.composition.Connection;
 import fun.composition.ImplComposition;
 import fun.expression.ArithmeticOp;
@@ -933,83 +927,6 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.decIndent();
     param.wr("end");
     param.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitBasicBlock(BasicBlock obj, StreamWriter param) {
-    param.wr(obj.toString());
-    param.nl();
-    param.incIndent();
-    visitItr(obj.getPhi(), param);
-    param.wr("--");
-    param.nl();
-    visitItr(obj.getCode(), param);
-    param.wr("--");
-    param.nl();
-    visit(obj.getEnd(), param);
-    param.decIndent();
-    param.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitGoto(Goto obj, StreamWriter param) {
-    param.wr("goto ");
-    param.wr(obj.getTarget().toString());
-    param.wr(";");
-    param.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitIfGoto(IfGoto obj, StreamWriter param) {
-    param.wr("if ");
-    visit(obj.getCondition(), param);
-    param.nl();
-    param.incIndent();
-    param.wr("then goto ");
-    param.wr(obj.getThenBlock().toString());
-    param.nl();
-    param.wr("else goto ");
-    param.wr(obj.getElseBlock().toString());
-    param.nl();
-    param.decIndent();
-    return null;
-  }
-
-  @Override
-  protected Void visitCaseGoto(CaseGoto obj, StreamWriter param) {
-    param.wr("case ");
-    visit(obj.getCondition(), param);
-    param.wr(" of");
-    param.nl();
-
-    param.incIndent();
-    visitItr(obj.getOption(), param);
-
-    param.wr("else goto ");
-    param.wr(obj.getOtherwise().toString());
-    param.nl();
-
-    param.decIndent();
-    param.wr("end");
-    param.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitCaseGotoOpt(CaseGotoOpt obj, StreamWriter param) {
-    list(obj.getValue(), ",", param);
-    param.wr(": goto ");
-    param.wr(obj.getDst().toString());
-    param.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitBasicBlockList(BasicBlockList obj, StreamWriter param) {
-    visitItr(obj.getBasicBlocks(), param);
     return null;
   }
 

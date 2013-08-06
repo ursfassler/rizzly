@@ -1,14 +1,13 @@
-package fun.cfg;
+package evl.cfg;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import common.ElementInfo;
 
-import fun.FunBase;
-import fun.function.FunctionBodyImplementation;
+import evl.EvlBase;
 
-public class BasicBlockList extends FunBase implements FunctionBodyImplementation {
+public class BasicBlockList extends EvlBase {
   private List<BasicBlock> bbs = new ArrayList<BasicBlock>();
 
   public BasicBlockList(ElementInfo info) {
@@ -17,11 +16,6 @@ public class BasicBlockList extends FunBase implements FunctionBodyImplementatio
 
   public List<BasicBlock> getBasicBlocks() {
     return bbs;
-  }
-
-  @Override
-  public boolean isEmpty() {
-    return bbs.isEmpty();
   }
 
 }

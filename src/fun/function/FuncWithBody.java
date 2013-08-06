@@ -1,7 +1,10 @@
 package fun.function;
 
-public interface FuncWithBody {
-  public FunctionBodyImplementation getBody();
+import fun.statement.Block;
 
-  public void setBody(FunctionBodyImplementation body);
+
+public interface FuncWithBody {
+  public Block getBody();
+
+  public void setBody(Block body);
 }

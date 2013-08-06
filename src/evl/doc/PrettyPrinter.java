@@ -2,6 +2,9 @@ package evl.doc;
 
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 
@@ -12,6 +15,13 @@ import error.RError;
 import evl.Evl;
 import evl.EvlBase;
 import evl.NullTraverser;
+import evl.cfg.BasicBlock;
+import evl.cfg.BasicBlockList;
+import evl.cfg.CaseGoto;
+import evl.cfg.CaseGotoOpt;
+import evl.cfg.Goto;
+import evl.cfg.IfGoto;
+import evl.cfg.PhiStmt;
 import evl.composition.Connection;
 import evl.composition.EndpointSelf;
 import evl.composition.EndpointSub;
@@ -71,6 +81,7 @@ import evl.type.composed.UnionType;
 import evl.type.special.VoidType;
 import evl.variable.Constant;
 import evl.variable.FuncVariable;
+import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
 
@@ -657,6 +668,11 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
+  protected Void visitSsaVariable(SsaVariable obj, StreamWriter param) {
+    return null;
+  }
+
+  @Override
   protected Void visitStateVariable(StateVariable obj, StreamWriter param) {
     param.wr(";");
     param.nl();
@@ -821,4 +837,106 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     return null;
   }
 
+  @Override
+  protected Void visitBasicBlock(BasicBlock obj, StreamWriter param) {
+    param.wr(obj.toString());
+    param.nl();
+    param.incIndent();
+    visitItr(obj.getPhi(), param);
+    param.wr("--");
+    param.nl();
+    visitItr(obj.getCode(), param);
+    param.wr("--");
+    param.nl();
+    visit(obj.getEnd(), param);
+    param.decIndent();
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitGoto(Goto obj, StreamWriter param) {
+    param.wr("goto ");
+    param.wr(obj.getTarget().toString());
+    param.wr(";");
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitIfGoto(IfGoto obj, StreamWriter param) {
+    param.wr("if ");
+    visit(obj.getCondition(), param);
+    param.nl();
+    param.incIndent();
+    param.wr("then goto ");
+    param.wr(obj.getThenBlock().toString());
+    param.nl();
+    param.wr("else goto ");
+    param.wr(obj.getElseBlock().toString());
+    param.nl();
+    param.decIndent();
+    return null;
+  }
+
+  @Override
+  protected Void visitCaseGoto(CaseGoto obj, StreamWriter param) {
+    param.wr("case ");
+    visit(obj.getCondition(), param);
+    param.wr(" of");
+    param.nl();
+
+    param.incIndent();
+    visitItr(obj.getOption(), param);
+
+    param.wr("else goto ");
+    param.wr(obj.getOtherwise().toString());
+    param.nl();
+
+    param.decIndent();
+    param.wr("end");
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitCaseGotoOpt(CaseGotoOpt obj, StreamWriter param) {
+    list(obj.getValue(), ",", param);
+    param.wr(": goto ");
+    param.wr(obj.getDst().toString());
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitBasicBlockList(BasicBlockList obj, StreamWriter param) {
+    visitItr(obj.getBasicBlocks(), param);
+    return null;
+  }
+
+  @Override
+  protected Void visitPhiStmt(PhiStmt obj, StreamWriter param) {
+    visit(obj.getVardef(), param);
+    param.wr(" = phi(");
+    ArrayList<BasicBlock> args = new ArrayList<BasicBlock>(obj.getInBB());
+    Collections.sort(args, new Comparator<BasicBlock>() {
+      @Override
+      public int compare(BasicBlock arg0, BasicBlock arg1) {
+        return arg0.getId() - arg1.getId(); // TODO correct phi arg ordering?
+      }
+    });
+    for (int i = 0; i < args.size(); i++) {
+      if (i > 0) {
+        param.wr(",");
+      }
+      BasicBlock bb = args.get(i);
+      Variable var = obj.getArg(bb);
+      param.wr(bb.toString());
+      param.wr(":");
+      param.wr(var.getName());
+    }
+    param.wr(");");
+    param.nl();
+    return null;
+  }
 }

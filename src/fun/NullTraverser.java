@@ -1,11 +1,5 @@
 package fun;
 
-import fun.cfg.BasicBlock;
-import fun.cfg.BasicBlockList;
-import fun.cfg.CaseGoto;
-import fun.cfg.CaseGotoOpt;
-import fun.cfg.Goto;
-import fun.cfg.IfGoto;
 import fun.composition.Connection;
 import fun.composition.ImplComposition;
 import fun.expression.ArithmeticOp;
@@ -467,36 +461,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitGenericRange(GenericRange obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitBasicBlock(BasicBlock obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitGoto(Goto obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitIfGoto(IfGoto obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitCaseGoto(CaseGoto obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitCaseGotoOpt(CaseGotoOpt obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitBasicBlockList(BasicBlockList obj, P param) {
     return visitDefault(obj, param);
   }
 

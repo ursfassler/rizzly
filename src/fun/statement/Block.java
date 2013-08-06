@@ -5,9 +5,7 @@ import java.util.List;
 
 import common.ElementInfo;
 
-import fun.function.FunctionBodyImplementation;
-
-public class Block extends Statement implements FunctionBodyImplementation {
+public class Block extends Statement {
   final private List<Statement> statements = new ArrayList<Statement>();
 
   public Block(ElementInfo info) {
@@ -21,10 +19,5 @@ public class Block extends Statement implements FunctionBodyImplementation {
   @Override
   public String toString() {
     return "block" + Long.toHexString(this.hashCode());
-  }
-
-  @Override
-  public boolean isEmpty() {
-    return statements.isEmpty();
   }
 }
