@@ -12,21 +12,27 @@ import util.ssa.BbEdge;
 import common.ElementInfo;
 
 import evl.EvlBase;
+import evl.other.Named;
 import evl.statement.Statement;
 
-public class BasicBlock extends EvlBase {
-  final private int id;
+// Named since Phi statements references basic blocks
+public class BasicBlock extends EvlBase implements Named {
+  private String name;
   final private List<PhiStmt> phi = new ArrayList<PhiStmt>();
   final private List<Statement> code = new ArrayList<Statement>();
   private BasicBlockEnd end = null;
 
-  public BasicBlock(ElementInfo info, int id) {
+  public BasicBlock(ElementInfo info, String name) {
     super(info);
-    this.id = id;
+    this.name = name;
   }
 
-  public int getId() {
-    return id;
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
   public List<Statement> getCode() {
@@ -35,7 +41,7 @@ public class BasicBlock extends EvlBase {
 
   @Override
   public String toString() {
-    return "BB_" + id;
+    return name;
   }
 
   public BasicBlockEnd getEnd() {

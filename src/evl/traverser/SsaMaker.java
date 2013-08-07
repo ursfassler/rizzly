@@ -85,7 +85,7 @@ public class SsaMaker extends DefTraverser<Void, Void> {
       for (BasicBlock dst : bb.getEnd().getJumpDst()) {
         List<PhiStmt> phis = dst.getPhi();
         for (PhiStmt phistmt : phis) {
-          FuncVariable var = renamed.get(phistmt.getVardef());
+          FuncVariable var = renamed.get(phistmt.getVariable());
           assert (var != null);
           phistmt.addArg(bb, var); // just that a variable definition exists
         }
@@ -132,8 +132,8 @@ class VariableLinker extends DefTraverser<Void, Map<FuncVariable, SsaVariable>> 
 
   @Override
   protected Void visitPhiStmt(PhiStmt obj, Map<FuncVariable, SsaVariable> param) {
-    visit(obj.getVardef(), param);
-    handleVarWriter(obj.getVardef(), param);
+    visit(obj.getVariable(), param);
+    handleVarWriter(obj.getVariable(), param);
     return null;
   }
 

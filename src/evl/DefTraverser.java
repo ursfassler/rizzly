@@ -505,7 +505,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitPhiStmt(PhiStmt obj, P param) {
-    visit(obj.getVardef(), param);
+    visit(obj.getVariable(), param);
     return null;
   }
 

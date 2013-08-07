@@ -834,13 +834,13 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitPhiStmt(PhiStmt obj, StreamWriter param) {
-    visit(obj.getVardef(), param);
+    visit(obj.getVariable(), param);
     param.wr(" = phi(");
     ArrayList<BasicBlock> args = new ArrayList<BasicBlock>(obj.getInBB());
     Collections.sort(args, new Comparator<BasicBlock>() {
       @Override
       public int compare(BasicBlock arg0, BasicBlock arg1) {
-        return arg0.getId() - arg1.getId(); // TODO correct phi arg ordering?
+        return arg0.getName().compareTo(arg1.getName()); // TODO correct phi arg ordering?
       }
     });
     for (int i = 0; i < args.size(); i++) {

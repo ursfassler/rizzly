@@ -9,6 +9,7 @@ import common.NameFactory;
 
 import evl.Evl;
 import evl.NullTraverser;
+import evl.cfg.BasicBlock;
 import evl.composition.ImplComposition;
 import evl.expression.ArithmeticOp;
 import evl.expression.BoolValue;
@@ -29,15 +30,14 @@ import evl.other.Named;
 import evl.other.NamedList;
 import evl.other.Namespace;
 import evl.statement.Assignment;
-import evl.statement.Block;
 import evl.statement.Statement;
-import evl.statement.VarDefStmt;
+import evl.statement.VarDefInitStmt;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.type.Type;
 import evl.type.base.Range;
-import evl.variable.FuncVariable;
+import evl.variable.SsaVariable;
 
-//FIXME does not work for while, condition variable is not re-set
+//TODO check if everything is still ok
 /**
  * Splits expression down to two operands per expression and maximal one function call.
  *
@@ -131,23 +131,26 @@ class StmtTraverser extends ExprReplacer<List<Statement>> {
     return type;
   }
 
-  private FuncVariable extract(Expression obj, List<Statement> param) {
+  private SsaVariable extract(Expression obj, List<Statement> param) {
     ElementInfo info = obj.getInfo();
-    FuncVariable var = new FuncVariable(info, NameFactory.getNew(), getType(obj));
-    param.add(new VarDefStmt(info, var));
-    param.add(new Assignment(info, new Reference(info, var), obj));
+    SsaVariable var = new SsaVariable(info, NameFactory.getNew(), getType(obj));
+    param.add(new VarDefInitStmt(info, var, obj ));
     return var;
   }
 
   @Override
-  protected Expression visitBlock(Block obj, List<Statement> param) {
+  protected Expression visitBasicBlock(BasicBlock obj, List<Statement> param) {
+    // we do not check Phi statements since they can only reference variables
+
     List<Statement> sl = new ArrayList<Statement>();
-    for (Statement stmt : obj.getStatements()) {
+    for (Statement stmt : obj.getCode()) {
       visit(stmt, sl);
       sl.add(stmt);
     }
-    obj.getStatements().clear();
-    obj.getStatements().addAll(sl);
+    obj.getCode().clear();
+    obj.getCode().addAll(sl);
+
+    visit(obj.getEnd(),sl);
     return null;
   }
 
@@ -166,7 +169,7 @@ class StmtTraverser extends ExprReplacer<List<Statement>> {
       visit(itr, param);
       ret.getOffset().add(itr);
       if ((i < olist.size() - 1) && (itr instanceof RefCall)) {
-        FuncVariable var = extract(ret, param);
+        SsaVariable var = extract(ret, param);
         ret = new Reference(itr.getInfo(), var);
       }
     }
@@ -177,7 +180,7 @@ class StmtTraverser extends ExprReplacer<List<Statement>> {
   protected Expression visitRefIndex(RefIndex obj, List<Statement> param) {
     super.visitRefIndex(obj, param);
     if (cd.traverse(obj.getIndex(), null)) {
-      FuncVariable var = extract(obj.getIndex(), param);
+      SsaVariable var = extract(obj.getIndex(), param);
       obj.setIndex(new Reference(obj.getInfo(), var));
     }
     return null;
@@ -189,7 +192,7 @@ class StmtTraverser extends ExprReplacer<List<Statement>> {
     for (int i = 0; i < obj.getActualParameter().size(); i++) {
       Expression expr = obj.getActualParameter().get(i);
       if (cd.traverse(expr, null)) {
-        FuncVariable var = extract(expr, param);
+        SsaVariable var = extract(expr, param);
         obj.getActualParameter().set(i, new Reference(obj.getInfo(), var));
       }
     }
@@ -206,7 +209,7 @@ class StmtTraverser extends ExprReplacer<List<Statement>> {
     obj.setLeft(visit(obj.getLeft(), param));
     obj.setRight(visit(obj.getRight(), param));
 
-    FuncVariable var = extract(obj, param);
+    SsaVariable var = extract(obj, param);
 
     return new Reference(obj.getInfo(), var);
   }
@@ -215,7 +218,7 @@ class StmtTraverser extends ExprReplacer<List<Statement>> {
   protected Expression visitRelation(Relation obj, List<Statement> param) {
     obj.setLeft(visit(obj.getLeft(), param));
     obj.setRight(visit(obj.getRight(), param));
-    FuncVariable var = extract(obj, param);
+    SsaVariable var = extract(obj, param);
     return new Reference(obj.getInfo(), var);
   }
 

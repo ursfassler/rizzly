@@ -2,11 +2,10 @@ package evl.copy;
 
 import evl.Evl;
 import evl.NullTraverser;
-import evl.cfg.ReturnExpr;
-import evl.cfg.ReturnVoid;
 import evl.statement.Assignment;
 import evl.statement.CallStmt;
 import evl.statement.Statement;
+import evl.statement.VarDefInitStmt;
 import evl.statement.VarDefStmt;
 
 public class CopyStatement extends NullTraverser<Statement, Void> {
@@ -38,13 +37,8 @@ public class CopyStatement extends NullTraverser<Statement, Void> {
   }
 
   @Override
-  protected Statement visitReturnExpr(ReturnExpr obj, Void param) {
-    return new ReturnExpr(obj.getInfo(), cast.copy(obj.getExpr()));
-  }
-
-  @Override
-  protected Statement visitReturnVoid(ReturnVoid obj, Void param) {
-    return new ReturnVoid(obj.getInfo());
+  protected Statement visitVarDefInitStmt(VarDefInitStmt obj, Void param) {
+    return new VarDefInitStmt(obj.getInfo(), cast.copy(obj.getVariable()), cast.copy(obj.getInit()));
   }
 
 }

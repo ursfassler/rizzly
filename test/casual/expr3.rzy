@@ -1,0 +1,20 @@
+interface
+  Iface0{ T: Type }
+    function foo( x: T );
+  end
+
+component
+  Expr3
+    input
+      in    : Iface0{R{0,10}};
+
+    output
+      out   : Iface0{R{0,4}};
+
+    implementation elementary
+
+    function in.foo( x: R{0,10} )
+      out.foo( 1 + x * 10 mod 4 );
+    end
+  end
+

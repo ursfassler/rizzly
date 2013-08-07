@@ -3,13 +3,25 @@ package evl.copy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import common.Direction;
 
 import evl.Evl;
 import evl.NullTraverser;
+import evl.cfg.BasicBlock;
+import evl.cfg.BasicBlockList;
+import evl.cfg.CaseGoto;
+import evl.cfg.CaseGotoOpt;
 import evl.cfg.CaseOptEntry;
+import evl.cfg.CaseOptRange;
+import evl.cfg.CaseOptValue;
+import evl.cfg.Goto;
+import evl.cfg.IfGoto;
+import evl.cfg.PhiStmt;
+import evl.cfg.ReturnExpr;
+import evl.cfg.ReturnVoid;
 import evl.expression.Expression;
 import evl.expression.reference.RefItem;
 import evl.function.FunctionBase;
@@ -59,12 +71,19 @@ class CopyEvl extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visit(Evl obj, Void param) {
-    Evl nobj = super.visit(obj, param);
     if (obj instanceof Named) {
-      assert (nobj instanceof Named);
-      getCopied().put((Named) obj, (Named) nobj);
+      if (copied.containsKey(obj)) {
+        Named ret = copied.get(obj);
+        assert (ret != null);
+        return ret;
+      } else {
+        Evl nobj = super.visit(obj, param);
+        assert (nobj instanceof Named);
+        copied.put((Named) obj, (Named) nobj);
+        return nobj;
+      }
     }
-    return nobj;
+    return super.visit(obj, param);
   }
 
   @Override
@@ -139,6 +158,70 @@ class CopyEvl extends NullTraverser<Evl, Void> {
     ret.setEntryFunc(copy(obj.getEntryFunc()));
     ret.setExitFunc(copy(obj.getExitFunc()));
 
+    return ret;
+  }
+
+  @Override
+  protected Evl visitBasicBlockList(BasicBlockList obj, Void param) {
+    BasicBlockList bbl = new BasicBlockList(obj.getInfo());
+    bbl.getBasicBlocks().addAll(copy(obj.getBasicBlocks()));
+    return bbl;
+  }
+
+  @Override
+  protected Evl visitBasicBlock(BasicBlock obj, Void param) {
+    BasicBlock bb = new BasicBlock(obj.getInfo(), obj.getName());
+    copied.put(obj, bb);
+    bb.getPhi().addAll(copy(obj.getPhi()));
+    bb.getCode().addAll(copy(obj.getCode()));
+    bb.setEnd(copy(obj.getEnd()));
+    return bb;
+  }
+
+  @Override
+  protected Evl visitCaseGoto(CaseGoto obj, Void param) {
+    CaseGoto ret = new CaseGoto(obj.getInfo());
+    ret.setCondition(copy(obj.getCondition()));
+    ret.getOption().addAll(copy(obj.getOption()));
+    ret.setOtherwise(copy(obj.getOtherwise()));
+    return ret;
+  }
+
+  @Override
+  protected Evl visitCaseGotoOpt(CaseGotoOpt obj, Void param) {
+    return new CaseGotoOpt(obj.getInfo(), (List<CaseOptEntry>) copy(obj.getValue()), copy(obj.getDst()));
+  }
+
+  @Override
+  protected Evl visitIfGoto(IfGoto obj, Void param) {
+    IfGoto ret = new IfGoto(obj.getInfo());
+    ret.setCondition(copy(obj.getCondition()));
+    ret.setThenBlock(copy(obj.getThenBlock()));
+    ret.setElseBlock(copy(obj.getElseBlock()));
+    return ret;
+  }
+
+  @Override
+  protected Evl visitGoto(Goto obj, Void param) {
+    return new Goto(obj.getInfo(), copy(obj.getTarget()));
+  }
+
+  @Override
+  protected Evl visitReturnExpr(ReturnExpr obj, Void param) {
+    return new ReturnExpr(obj.getInfo(), copy(obj.getExpr()));
+  }
+
+  @Override
+  protected Evl visitReturnVoid(ReturnVoid obj, Void param) {
+    return new ReturnVoid(obj.getInfo());
+  }
+
+  @Override
+  protected Evl visitPhiStmt(PhiStmt obj, Void param) {
+    PhiStmt ret = new PhiStmt(obj.getInfo(), copy(obj.getVariable()));
+    for (BasicBlock in : obj.getInBB()) {
+      ret.addArg(copy(in), copy(obj.getArg(in)));
+    }
     return ret;
   }
 

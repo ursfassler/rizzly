@@ -5,6 +5,7 @@ import evl.NullTraverser;
 import evl.variable.ConstGlobal;
 import evl.variable.ConstPrivate;
 import evl.variable.FuncVariable;
+import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
 
@@ -39,6 +40,11 @@ public class CopyVariable extends NullTraverser<Variable, Void> {
   @Override
   protected Variable visitConstGlobal(ConstGlobal obj, Void param) {
     return new ConstGlobal(obj.getInfo(), obj.getName(), obj.getType(),cast.copy(obj.getDef()));
+  }
+
+  @Override
+  protected Variable visitSsaVariable(SsaVariable obj, Void param) {
+    return new SsaVariable(obj.getInfo(), obj.getName(), obj.getType());
   }
 
 }

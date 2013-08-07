@@ -1,7 +1,8 @@
-package evl.traverser;
+package evl.traverser.range;
 
 import java.math.BigInteger;
 import java.util.HashMap;
+import java.util.Map;
 
 import evl.Evl;
 import evl.NullTraverser;
@@ -17,7 +18,7 @@ import evl.type.base.Range;
 import evl.variable.Variable;
 
 //TODO implement everything left
-public class RangeUpdater extends NullTraverser<Void, HashMap<Variable, Range>> {
+public class RangeUpdater extends NullTraverser<Void, Map<Variable, Range>> {
   private KnowledgeBase kb;
   private KnowBaseItem kbi;
 
@@ -28,11 +29,11 @@ public class RangeUpdater extends NullTraverser<Void, HashMap<Variable, Range>> 
   }
 
   @Override
-  protected Void visitDefault(Evl obj, HashMap<Variable, Range> param) {
+  protected Void visitDefault(Evl obj, Map<Variable, Range> param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
-  public static void process(Expression condition, HashMap<Variable, Range> varRange, KnowledgeBase kb) {
+  public static void process(Expression condition, Map<Variable, Range> varRange, KnowledgeBase kb) {
     RangeUpdater updater = new RangeUpdater(kb);
     updater.traverse(condition, varRange);
   }
@@ -50,7 +51,7 @@ public class RangeUpdater extends NullTraverser<Void, HashMap<Variable, Range>> 
   }
 
   @Override
-  protected Void visitRelation(Relation obj, HashMap<Variable, Range> param) {
+  protected Void visitRelation(Relation obj, Map<Variable, Range> param) {
     {
       Variable lv = getDerefVar(obj.getLeft());
       if (lv != null) {
@@ -91,7 +92,7 @@ public class RangeUpdater extends NullTraverser<Void, HashMap<Variable, Range>> 
     return kbi.getRangeType(low,high);
   }
 
-  private Range getRange(Variable var, HashMap<Variable, Range> map) {
+  private Range getRange(Variable var, Map<Variable, Range> map) {
     if (map.containsKey(var)) {
       return map.get(var);
     } else {

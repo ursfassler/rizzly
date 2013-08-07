@@ -116,9 +116,11 @@ public class MainEvl {
     // only for debugging
     // typecheck(classes, debugdir);
 
+    //TODO or before type check?
+    ExprCutter.process(aclasses, knowledgeBase);
+    PrettyPrinter.print(aclasses, debugdir + "expr.rzy");
+
     if (opt.doDebugEvent()) {
-      ExprCutter.process(aclasses, knowledgeBase);
-      PrettyPrinter.print(aclasses, debugdir + "expr.rzy");
       addDebug(aclasses, (ImplElementary) root, debugdir);
     }
 
@@ -219,7 +221,8 @@ public class MainEvl {
     TypeChecker.processList(aclasses, kb); // check statements
     CompInterfaceTypeChecker.process(aclasses, kb); // check interfaces against implementation
 
-    VarInitCheck.process(aclasses);
+    //TODO VarInit should be checked when translated into SSA
+//    VarInitCheck.process(aclasses);
   }
 
   // TODO provide a call/connection graph in the error message

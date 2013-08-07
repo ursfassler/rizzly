@@ -3,6 +3,7 @@ package evl.traverser.typecheck.specific;
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.Map;
 
 import common.ElementInfo;
 
@@ -21,7 +22,7 @@ import evl.expression.UnaryExpression;
 import evl.expression.reference.Reference;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
-import evl.traverser.RangeUpdater;
+import evl.traverser.range.RangeUpdater;
 import evl.traverser.typecheck.BiggerType;
 import evl.type.Type;
 import evl.type.base.Array;
@@ -33,9 +34,9 @@ import evl.variable.Variable;
 public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
   private KnowledgeBase kb;
   private KnowBaseItem kbi;
-  private HashMap<Variable, Range> map;
+  private Map<Variable, Range> map;
 
-  public ExpressionTypeChecker(KnowledgeBase kb, HashMap<Variable, Range> map) {
+  public ExpressionTypeChecker(KnowledgeBase kb, Map<Variable, Range> map) {
     super();
     this.map = map;
     this.kb = kb;
@@ -54,7 +55,7 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
    * @param kb
    * @return
    */
-  static public Type process(Expression ast, HashMap<Variable, Range> map, KnowledgeBase kb) {
+  static public Type process(Expression ast, Map<Variable, Range> map, KnowledgeBase kb) {
     ExpressionTypeChecker adder = new ExpressionTypeChecker(kb, map);
     return adder.traverse(ast, null);
   }
@@ -177,7 +178,7 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
       if (rhs.getLow().compareTo(BigInteger.ZERO) < 0) {
         RError.err(ErrorType.Error, rhs.getInfo(), "mod only allowed for positive types");
       }
-      BigInteger high = lhs.getHigh().min(rhs.getHigh());
+      BigInteger high = lhs.getHigh().min(rhs.getHigh().subtract(BigInteger.ONE));
       return kbi.getRangeType(BigInteger.ZERO, high);
     }
 

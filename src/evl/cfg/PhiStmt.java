@@ -25,7 +25,7 @@ public class PhiStmt extends EvlBase {
     this.vardef = vardef;
   }
 
-  public SsaVariable getVardef() {
+  public SsaVariable getVariable() {
     return vardef;
   }
 

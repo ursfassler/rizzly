@@ -74,7 +74,7 @@ class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
   }
 
   private BasicBlock makeBb(ElementInfo info) {
-    BasicBlock bb = new BasicBlock(info, bblist.size());
+    BasicBlock bb = new BasicBlock(info, "BB_" + bblist.size());
     bblist.add(bb);
     return bb;
   }
