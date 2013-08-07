@@ -26,7 +26,6 @@ import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
-import evl.traverser.SsaMaker;
 import fun.doc.DepGraph;
 import fun.doc.DocWriter;
 import fun.doc.PrettyPrinter;
@@ -120,15 +119,7 @@ public class MainFun {
     PrettyPrinter.print(classes, debugdir + "evaluated.rzy");
     removeUnused(debugdir, classes, nroot, fileList);
     PrettyPrinter.print(classes, debugdir + "stripped.rzy");
-    // translateToSsa(classes, debugdir, new KnowledgeBase(classes, fileList, debugdir));
-    PrettyPrinter.print(classes, debugdir + "ssa.rzy");
     return new Pair<String, Namespace>(nroot.getName(), classes);
-  }
-
-  // TODO move to translation to evl
-  private static void translateToSsa(Namespace classes, String rootdir, KnowledgeBase kb) {
-    MakeBasicBlocks.process(classes, kb);
-    SsaMaker.process(classes, kb);
   }
 
   private static void printDepGraph(String debugdir, Namespace classes, Named root, Collection<RizzlyFile> fileList) {

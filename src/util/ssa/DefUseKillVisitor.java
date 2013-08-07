@@ -10,19 +10,18 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 
+import evl.DefTraverser;
+import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
 import evl.cfg.PhiStmt;
-import fun.DefGTraverser;
-import fun.cfg.BasicBlock;
-import fun.expression.reference.ReferenceLinked;
-import fun.expression.reference.ReferenceUnlinked;
-import fun.function.FuncWithBody;
-import fun.function.FunctionHeader;
-import fun.statement.Assignment;
-import fun.statement.VarDefStmt;
-import fun.variable.Variable;
+import evl.expression.reference.Reference;
+import evl.function.FuncWithBody;
+import evl.function.FunctionBase;
+import evl.statement.Assignment;
+import evl.statement.VarDefStmt;
+import evl.variable.Variable;
 
-public class DefUseKillVisitor extends DefGTraverser<Void, BasicBlock> {
+public class DefUseKillVisitor extends DefTraverser<Void, BasicBlock> {
   private HashMap<BasicBlock, HashSet<Variable>> use = new HashMap<BasicBlock, HashSet<Variable>>();
   private HashMap<BasicBlock, HashSet<Variable>> def = new HashMap<BasicBlock, HashSet<Variable>>();
   private HashMap<BasicBlock, HashSet<Variable>> kill = new HashMap<BasicBlock, HashSet<Variable>>();
@@ -45,12 +44,12 @@ public class DefUseKillVisitor extends DefGTraverser<Void, BasicBlock> {
   }
 
   @Override
-  protected Void visitFunctionHeader(FunctionHeader obj, BasicBlock param) {
+  protected Void visitFunctionBase(FunctionBase obj, BasicBlock param) {
     assert (param == null);
 
     if (obj instanceof FuncWithBody) {
       BasicBlockList bbl = (BasicBlockList) ((FuncWithBody) obj).getBody();
-      // TODO ok?
+      // TODO ok? no, move it to function creation
       // we add the argument variables to the first basic block
       param = bbl.getBasicBlocks().get(0);
       use.put(param, new HashSet<Variable>());
@@ -112,16 +111,11 @@ public class DefUseKillVisitor extends DefGTraverser<Void, BasicBlock> {
   }
 
   @Override
-  protected Void visitReferenceUnlinked(ReferenceUnlinked obj, BasicBlock param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Void visitReferenceLinked(ReferenceLinked obj, BasicBlock param) {
-    if ((obj.getLink() instanceof Variable) && (obj.getOffset().isEmpty())) {
+  protected Void visitReference(Reference obj, BasicBlock param) {
+    if (obj.getLink() instanceof Variable) {
       visitVarRef((Variable) obj.getLink(), param);
     }
-    return super.visitReferenceLinked(obj, param);
+    return super.visitReference(obj, param);
   }
 
   private void visitVarRef(Variable ref, BasicBlock bb) {
@@ -140,8 +134,8 @@ public class DefUseKillVisitor extends DefGTraverser<Void, BasicBlock> {
 
   @Override
   protected Void visitAssignment(Assignment obj, BasicBlock param) {
-    ReferenceLinked ref = (ReferenceLinked) obj.getLeft();
-    if ((ref.getLink() instanceof Variable) && (ref.getOffset().isEmpty())) {
+    Reference ref = obj.getLeft();
+    if (ref.getLink() instanceof Variable) {
       visitVariable((Variable) ref.getLink(), param);
     }
     visitItr(obj.getLeft().getOffset(), param);

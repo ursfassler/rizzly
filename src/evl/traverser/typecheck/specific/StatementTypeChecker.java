@@ -7,23 +7,19 @@ import error.ErrorType;
 import error.RError;
 import evl.Evl;
 import evl.NullTraverser;
+import evl.cfg.BasicBlock;
+import evl.cfg.BasicBlockList;
+import evl.cfg.CaseOptRange;
+import evl.cfg.CaseOptValue;
+import evl.cfg.ReturnExpr;
+import evl.cfg.ReturnVoid;
 import evl.expression.Expression;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
 import evl.statement.Assignment;
-import evl.statement.Block;
 import evl.statement.CallStmt;
-import evl.statement.CaseOpt;
-import evl.statement.CaseOptRange;
-import evl.statement.CaseOptValue;
-import evl.statement.CaseStmt;
-import evl.statement.IfOption;
-import evl.statement.IfStmt;
-import evl.statement.ReturnExpr;
-import evl.statement.ReturnVoid;
 import evl.statement.Statement;
 import evl.statement.VarDefStmt;
-import evl.statement.While;
 import evl.traverser.RangeUpdater;
 import evl.traverser.typecheck.LeftIsContainerOfRightTest;
 import evl.type.Type;
@@ -44,6 +40,11 @@ public class StatementTypeChecker extends NullTraverser<Void, HashMap<Variable, 
     this.kb = kb;
     kbi = kb.getEntry(KnowBaseItem.class);
     this.funcReturn = funcReturn;
+  }
+
+  public static void process(BasicBlockList obj, Type funcReturn, KnowledgeBase kb) {
+    StatementTypeChecker adder = new StatementTypeChecker(kb, funcReturn);
+    adder.traverse(obj, new HashMap<Variable, Range>());
   }
 
   public static void process(Statement obj, Type funcReturn, KnowledgeBase kb) {
@@ -189,6 +190,21 @@ public class StatementTypeChecker extends NullTraverser<Void, HashMap<Variable, 
   @Override
   protected Void visitBlock(Block obj, HashMap<Variable, Range> map) {
     visitList(obj.getStatements(), new HashMap<Variable, Range>(map));
+    return null;
+  }
+
+  @Override
+  protected Void visitBasicBlockList(BasicBlockList obj, HashMap<Variable, Range> map) {
+    visitList(obj.getBasicBlocks(), new HashMap<Variable, Range>(map));
+    return null;
+  }
+
+  @Override
+  protected Void visitBasicBlock(BasicBlock obj, HashMap<Variable, Range> map) {
+    map = new HashMap<Variable, Range>(map);
+    visitList(obj.getPhi(), map);
+    visitList(obj.getCode(), map);
+    visit(obj.getEnd(), map);
     return null;
   }
 

@@ -23,6 +23,8 @@ import common.FuncAttr;
 import error.ErrorType;
 import error.RError;
 import evl.Evl;
+import evl.cfg.BasicBlockList;
+import evl.cfg.ReturnExpr;
 import evl.composition.CompositionReduction;
 import evl.composition.Connection;
 import evl.composition.ImplComposition;
@@ -60,8 +62,6 @@ import evl.other.Named;
 import evl.other.NamedList;
 import evl.other.Namespace;
 import evl.other.RizzlyProgram;
-import evl.statement.Block;
-import evl.statement.ReturnExpr;
 import evl.traverser.CallgraphMaker;
 import evl.traverser.ClassGetter;
 import evl.traverser.CompInstantiator;
@@ -71,6 +71,7 @@ import evl.traverser.LinkReduction;
 import evl.traverser.NamespaceReduction;
 import evl.traverser.OutsideReaderInfo;
 import evl.traverser.OutsideWriterInfo;
+import evl.traverser.SsaMaker;
 import evl.traverser.debug.CompCascadeDepth;
 import evl.traverser.debug.DebugIfaceAdder;
 import evl.traverser.debug.MsgNamesGetter;
@@ -93,9 +94,11 @@ public class MainEvl {
   private static ElementInfo info = new ElementInfo();
 
   public static RizzlyProgram doEvl(ClaOption opt, String debugdir, Namespace aclasses, Component root) {
-    PrettyPrinter.print(aclasses, debugdir + "ast.rzy");
-
     KnowledgeBase kb = new KnowledgeBase(aclasses, debugdir);
+
+    PrettyPrinter.print(aclasses, debugdir + "ast.rzy");
+    SsaMaker.process(aclasses, kb);
+    PrettyPrinter.print(aclasses, debugdir + "ssa.rzy");
 
     typecheck(aclasses, root, debugdir);
     if (!opt.doLazyModelCheck()) {
@@ -105,7 +108,8 @@ public class MainEvl {
     KnowledgeBase knowledgeBase = kb;
 
     root = compositionReduction(aclasses, root);
-    root = hfsmReduction(root, opt, debugdir, aclasses, knowledgeBase);
+    // TODO reimplement
+    // root = hfsmReduction(root, opt, debugdir, aclasses, knowledgeBase);
 
     PrettyPrinter.print(aclasses, debugdir + "reduced.rzy");
 
@@ -478,7 +482,7 @@ public class MainEvl {
       FuncVariable sender = new FuncVariable(info, "nr", symNameSizeType);
       param.add(sender);
 
-      Block body = new Block(info);
+      BasicBlockList body = new BasicBlockList(info);
       {
         Reference index = new Reference(info, sender);
 
@@ -577,7 +581,7 @@ public class MainEvl {
 
   private static FuncPrivateVoid makeEntryExitFunc(String name) {
     FuncPrivateVoid func = new FuncPrivateVoid(info, name, new ListOfNamed<FuncVariable>());
-    func.setBody(new Block(info));
+    func.setBody(new BasicBlockList(info));
     return func;
   }
 

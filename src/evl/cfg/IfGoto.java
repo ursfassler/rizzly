@@ -5,14 +5,13 @@ import java.util.Set;
 
 import common.ElementInfo;
 
-import evl.EvlBase;
 import evl.expression.Expression;
 
 /**
  *
  * @author urs
  */
-public class IfGoto extends EvlBase implements BasicBlockEnd {
+public class IfGoto extends BasicBlockEnd {
   private Expression condition;
   private BasicBlock thenBlock;
   private BasicBlock elseBlock;

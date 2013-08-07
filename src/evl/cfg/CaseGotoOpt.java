@@ -5,7 +5,6 @@ import java.util.List;
 import common.ElementInfo;
 
 import evl.EvlBase;
-import evl.statement.CaseOptEntry;
 
 public class CaseGotoOpt extends EvlBase {
   private List<CaseOptEntry> value;

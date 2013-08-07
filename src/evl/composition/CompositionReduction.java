@@ -12,6 +12,8 @@ import common.ElementInfo;
 
 import evl.Evl;
 import evl.NullTraverser;
+import evl.cfg.BasicBlockList;
+import evl.cfg.ReturnExpr;
 import evl.copy.Copy;
 import evl.expression.Expression;
 import evl.expression.reference.RefCall;
@@ -34,9 +36,7 @@ import evl.other.Interface;
 import evl.other.ListOfNamed;
 import evl.other.Named;
 import evl.other.Namespace;
-import evl.statement.Block;
 import evl.statement.CallStmt;
-import evl.statement.ReturnExpr;
 import evl.statement.Statement;
 import evl.variable.FuncVariable;
 import fun.hfsm.State;
@@ -135,7 +135,7 @@ public class CompositionReduction extends NullTraverser<Named, Void> {
   private Reference makeEntryExitFunc(String name, ListOfNamed<FunctionBase> list) {
     ElementInfo info = new ElementInfo();
     FuncPrivateVoid func = new FuncPrivateVoid(info, name, new ListOfNamed<FuncVariable>());
-    func.setBody(new Block(info));
+    func.setBody(new BasicBlockList(info));
     list.add(func);
     return new Reference(info, func);
   }
@@ -151,7 +151,7 @@ public class CompositionReduction extends NullTraverser<Named, Void> {
         ((FuncWithReturn) impl).setRet(((FuncWithReturn) ptoto).getRet());
       }
 
-      Block body = new Block(new ElementInfo());
+      BasicBlockList body = new BasicBlockList(new ElementInfo());
       ((FuncWithBody) impl).setBody(body);
 
       for (Endpoint con : conset) {

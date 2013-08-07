@@ -74,7 +74,7 @@ public class FunToEvlFunc extends NullTraverser<FunctionBase, Void> {
     if (obj instanceof FuncWithBody) {
       MakeBasicBlocks blocks = new MakeBasicBlocks(fta);
       BasicBlockList nbody = blocks.translate(((FuncWithBody) obj).getBody(), obj.getParam().getList());
-      ((evl.function.FuncWithBody) func).setBody((evl.statement.Block) fta.traverse(((FuncWithBody) obj).getBody(), null));
+      ((evl.function.FuncWithBody) func).setBody(nbody);
     }
     return func;
   }

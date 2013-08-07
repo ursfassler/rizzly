@@ -8,6 +8,7 @@ import java.util.Set;
 import common.ElementInfo;
 
 import evl.EvlBase;
+import evl.variable.SsaVariable;
 import evl.variable.Variable;
 
 /**
@@ -16,15 +17,15 @@ import evl.variable.Variable;
  */
 public class PhiStmt extends EvlBase {
 
-  private Variable vardef;
+  private SsaVariable vardef;
   private Map<BasicBlock, Variable> arg = new HashMap<BasicBlock, Variable>();
 
-  public PhiStmt(ElementInfo info, Variable vardef) {
+  public PhiStmt(ElementInfo info, SsaVariable vardef) {
     super(info);
     this.vardef = vardef;
   }
 
-  public Variable getVardef() {
+  public SsaVariable getVardef() {
     return vardef;
   }
 

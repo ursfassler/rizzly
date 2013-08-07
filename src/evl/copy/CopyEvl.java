@@ -9,6 +9,7 @@ import common.Direction;
 
 import evl.Evl;
 import evl.NullTraverser;
+import evl.cfg.CaseOptEntry;
 import evl.expression.Expression;
 import evl.expression.reference.RefItem;
 import evl.function.FunctionBase;
@@ -18,9 +19,6 @@ import evl.other.IfaceUse;
 import evl.other.ImplElementary;
 import evl.other.Named;
 import evl.other.NamedList;
-import evl.statement.CaseOpt;
-import evl.statement.CaseOptEntry;
-import evl.statement.IfOption;
 import evl.statement.Statement;
 import evl.type.Type;
 import evl.variable.Variable;
@@ -114,16 +112,6 @@ class CopyEvl extends NullTraverser<Evl, Void> {
   @Override
   protected Evl visitStateItem(StateItem obj, Void param) {
     return cosi.traverse(obj, param);
-  }
-
-  @Override
-  protected Evl visitCaseOpt(CaseOpt obj, Void param) {
-    return new CaseOpt(obj.getInfo(), new ArrayList<CaseOptEntry>(copy(obj.getValue())), copy(obj.getCode()));
-  }
-
-  @Override
-  protected Evl visitIfOption(IfOption obj, Void param) {
-    return new IfOption(obj.getInfo(), copy(obj.getCondition()), copy(obj.getCode()));
   }
 
   @Override

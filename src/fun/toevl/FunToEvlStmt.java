@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import evl.Evl;
+import evl.cfg.BasicBlock;
 import evl.expression.Expression;
 import evl.expression.reference.Reference;
 import evl.statement.Statement;
@@ -22,7 +23,7 @@ import fun.statement.ReturnVoid;
 import fun.statement.VarDefStmt;
 import fun.statement.While;
 
-public class FunToEvlStmt extends NullTraverser<Statement, Void> {
+public class FunToEvlStmt extends NullTraverser<Evl, Void> {
   private Map<Fun, Evl> map;
   private FunToEvl fta;
 
@@ -33,8 +34,8 @@ public class FunToEvlStmt extends NullTraverser<Statement, Void> {
   }
 
   @Override
-  protected Statement visit(Fun obj, Void param) {
-    Statement cobj = (Statement) map.get(obj);
+  protected Evl visit(Fun obj, Void param) {
+    Evl cobj = (Evl) map.get(obj);
     if (cobj == null) {
       cobj = super.visit(obj, param);
       assert (cobj != null);
@@ -51,27 +52,18 @@ public class FunToEvlStmt extends NullTraverser<Statement, Void> {
   // ----------------------------------------------------------------------------
 
   @Override
-  protected Statement visitBlock(Block obj, Void param) {
-    evl.statement.Block block = new evl.statement.Block(obj.getInfo());
-    for (fun.statement.Statement stmt : obj.getStatements()) {
-      block.getStatements().add(visit(stmt, null));
-    }
-    return block;
-  }
-
-  @Override
   protected Statement visitAssignment(Assignment obj, Void param) {
     return new evl.statement.Assignment(obj.getInfo(), (evl.expression.reference.Reference) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
   }
 
   @Override
-  protected Statement visitReturnExpr(ReturnExpr obj, Void param) {
-    return new evl.statement.ReturnExpr(obj.getInfo(), (Expression) fta.traverse(obj.getExpr(), null));
+  protected Evl visitReturnExpr(ReturnExpr obj, Void param) {
+    return new evl.cfg.ReturnExpr(obj.getInfo(), (Expression) fta.traverse(obj.getExpr(), null));
   }
 
   @Override
-  protected Statement visitReturnVoid(ReturnVoid obj, Void param) {
-    return new evl.statement.ReturnVoid(obj.getInfo());
+  protected Evl visitReturnVoid(ReturnVoid obj, Void param) {
+    return new evl.cfg.ReturnVoid(obj.getInfo());
   }
 
   @Override

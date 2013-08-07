@@ -5,9 +5,7 @@ import java.util.Set;
 
 import common.ElementInfo;
 
-import evl.EvlBase;
-
-public class Goto extends EvlBase implements BasicBlockEnd{
+public class Goto extends BasicBlockEnd {
   private BasicBlock target;
 
   public Goto(ElementInfo info, BasicBlock target) {

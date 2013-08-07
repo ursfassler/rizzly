@@ -4,9 +4,13 @@ import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
 import evl.cfg.CaseGoto;
 import evl.cfg.CaseGotoOpt;
+import evl.cfg.CaseOptRange;
+import evl.cfg.CaseOptValue;
 import evl.cfg.Goto;
 import evl.cfg.IfGoto;
 import evl.cfg.PhiStmt;
+import evl.cfg.ReturnExpr;
+import evl.cfg.ReturnVoid;
 import evl.composition.Connection;
 import evl.composition.EndpointSelf;
 import evl.composition.EndpointSub;
@@ -46,18 +50,9 @@ import evl.other.NamedList;
 import evl.other.Namespace;
 import evl.other.RizzlyProgram;
 import evl.statement.Assignment;
-import evl.statement.Block;
 import evl.statement.CallStmt;
-import evl.statement.CaseOpt;
-import evl.statement.CaseOptRange;
-import evl.statement.CaseOptValue;
-import evl.statement.CaseStmt;
-import evl.statement.IfOption;
-import evl.statement.IfStmt;
-import evl.statement.ReturnExpr;
-import evl.statement.ReturnVoid;
+import evl.statement.VarDefInitStmt;
 import evl.statement.VarDefStmt;
-import evl.statement.While;
 import evl.type.base.Array;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumElement;
@@ -171,17 +166,7 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitWhile(While obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
   protected R visitVarDef(VarDefStmt obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitIf(IfStmt obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -202,11 +187,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitReturnVoid(ReturnVoid obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitBlock(Block obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -277,16 +257,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitIfaceUse(IfaceUse obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitCaseStmt(CaseStmt obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitCaseOpt(CaseOpt obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -411,11 +381,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitIfOption(IfOption obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
   protected R visitEndpointSelf(EndpointSelf obj, P param) {
     return visitDefault(obj, param);
   }
@@ -477,6 +442,11 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitSsaVariable(SsaVariable obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitVarDefInitStmt(VarDefInitStmt obj, P param) {
     return visitDefault(obj, param);
   }
 

@@ -2,8 +2,14 @@ package evl.cfg;
 
 import java.util.Set;
 
-import evl.Evl;
+import common.ElementInfo;
 
-public interface BasicBlockEnd extends Evl {
-  public Set<BasicBlock> getJumpDst();
+import evl.EvlBase;
+
+abstract public class BasicBlockEnd extends EvlBase {
+  public BasicBlockEnd(ElementInfo info) {
+    super(info);
+  }
+
+  public abstract Set<BasicBlock> getJumpDst();
 }

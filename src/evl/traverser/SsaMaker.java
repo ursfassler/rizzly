@@ -1,20 +1,43 @@
 package evl.traverser;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import org.jgrapht.DirectedGraph;
 
 import util.ssa.BbEdge;
 import util.ssa.DominanceFrontier;
 import util.ssa.Dominator;
 import util.ssa.PhiInserter;
-import evl.cfg.BasicBlockList;
-import fun.DefGTraverser;
-import fun.Fun;
-import fun.cfg.BasicBlock;
-import fun.function.FuncWithBody;
-import fun.function.FunctionHeader;
-import fun.knowledge.KnowledgeBase;
 
-public class SsaMaker extends DefGTraverser<Void, Void> {
+import common.ElementInfo;
+
+import error.ErrorType;
+import error.RError;
+import evl.DefTraverser;
+import evl.Evl;
+import evl.NullTraverser;
+import evl.cfg.BasicBlock;
+import evl.cfg.BasicBlockList;
+import evl.cfg.PhiStmt;
+import evl.expression.reference.Reference;
+import evl.function.FuncWithBody;
+import evl.function.FunctionBase;
+import evl.knowledge.KnowledgeBase;
+import evl.other.Namespace;
+import evl.statement.Assignment;
+import evl.statement.CallStmt;
+import evl.statement.Statement;
+import evl.statement.VarDefInitStmt;
+import evl.statement.VarDefStmt;
+import evl.variable.FuncVariable;
+import evl.variable.SsaVariable;
+import evl.variable.Variable;
+
+public class SsaMaker extends DefTraverser<Void, Void> {
   private KnowledgeBase kb;
 
   public SsaMaker(KnowledgeBase kb) {
@@ -22,13 +45,13 @@ public class SsaMaker extends DefGTraverser<Void, Void> {
     this.kb = kb;
   }
 
-  static public void process(Fun obj, KnowledgeBase kb) {
+  static public void process(Namespace aclasses, KnowledgeBase kb) {
     SsaMaker mbb = new SsaMaker(kb);
-    mbb.traverse(obj, null);
+    mbb.traverse(aclasses, null);
   }
 
   @Override
-  protected Void visitFunctionHeader(FunctionHeader obj, Void param) {
+  protected Void visitFunctionBase(FunctionBase obj, Void param) {
     if (obj instanceof FuncWithBody) {
       BasicBlockList body = (BasicBlockList) ((FuncWithBody) obj).getBody();
 
@@ -41,13 +64,248 @@ public class SsaMaker extends DefGTraverser<Void, Void> {
       PhiInserter phi = new PhiInserter(obj, df);
       phi.doWork();
 
-      // IntraBbVariableLinker intra = new IntraBbVariableLinker(app.getKb(), linkUnlinked, linkKilled);
-      // intra.visit(func, null);
-      //
-      // InterBbVariableLinker.link(intra, dom.getDom(), func, linkUnlinked, linkKilled);
+      Map<SsaVariable, FuncVariable> renamed = phi.getRenamed();
+
+      SsaVarCreator ssa = new SsaVarCreator(renamed);
+      ssa.traverse(body, null);
+
+      addPhiArg(body, renamed);
+
+      VariableLinker intra = new VariableLinker(kb, renamed);
+      intra.traverse(body, null);
+
+      InterBbVariableLinker.link(intra, dom.getDom(), body);
 
     }
     return null;
+  }
+
+  private void addPhiArg(BasicBlockList body, Map<SsaVariable, FuncVariable> renamed) {
+    for (BasicBlock bb : body.getBasicBlocks()) {
+      for (BasicBlock dst : bb.getEnd().getJumpDst()) {
+        List<PhiStmt> phis = dst.getPhi();
+        for (PhiStmt phistmt : phis) {
+          FuncVariable var = renamed.get(phistmt.getVardef());
+          assert (var != null);
+          phistmt.addArg(bb, var); // just that a variable definition exists
+        }
+      }
+    }
+  }
+
+}
+
+class VariableLinker extends DefTraverser<Void, Map<FuncVariable, SsaVariable>> {
+  private Map<BasicBlock, Map<FuncVariable, SsaVariable>> lastVarDef = new HashMap<BasicBlock, Map<FuncVariable, SsaVariable>>();
+  private KnowledgeBase kb;
+  private Map<SsaVariable, FuncVariable> renamed;
+
+  public VariableLinker(KnowledgeBase kb, Map<SsaVariable, FuncVariable> renamed) {
+    super();
+    this.kb = kb;
+    this.renamed = renamed;
+  }
+
+  public Map<BasicBlock, Map<FuncVariable, SsaVariable>> getLastVarDef() {
+    return lastVarDef;
+  }
+
+  private static Variable replaceVar(Variable expr, Map<FuncVariable, SsaVariable> param) {
+    if (param.containsKey(expr)) {
+      return param.get(expr);
+    } else {
+      return expr;
+    }
+  }
+
+  @Override
+  protected Void visitVarDef(VarDefStmt obj, Map<FuncVariable, SsaVariable> param) {
+    visit(obj.getVariable(), param);
+    return null;
+  }
+
+  private void handleVarWriter(SsaVariable newvar, Map<FuncVariable, SsaVariable> param) {
+    FuncVariable oldvar = renamed.get(newvar);
+    assert (oldvar != null);
+    param.put(oldvar, newvar);
+  }
+
+  @Override
+  protected Void visitPhiStmt(PhiStmt obj, Map<FuncVariable, SsaVariable> param) {
+    visit(obj.getVardef(), param);
+    handleVarWriter(obj.getVardef(), param);
+    return null;
+  }
+
+  @Override
+  protected Void visitVarDefInitStmt(VarDefInitStmt obj, Map<FuncVariable, SsaVariable> param) {
+    visit(obj.getInit(), param);
+    visit(obj.getVariable(), param);
+    handleVarWriter(obj.getVariable(), param);
+    return null;
+  }
+
+  @Override
+  protected Void visitVariable(Variable obj, Map<FuncVariable, SsaVariable> param) {
+    return null;
+  }
+
+  @Override
+  protected Void visitBasicBlock(BasicBlock obj, Map<FuncVariable, SsaVariable> param) {
+    assert (!lastVarDef.containsKey(obj));
+
+    assert (param == null);
+    param = new HashMap<FuncVariable, SsaVariable>();
+    super.visitBasicBlock(obj, param);
+    lastVarDef.put(obj, new HashMap<FuncVariable, SsaVariable>(param));
+    visitFollowingPhi(obj, param);
+    return null;
+  }
+
+  /* handle phi functions as they belong to the previous basic blocks, what they actually do */
+  private void visitFollowingPhi(BasicBlock bb, Map<FuncVariable, SsaVariable> param) {
+    for (BasicBlock dst : bb.getEnd().getJumpDst()) {
+      Collection<PhiStmt> phis = dst.getPhi();
+      for (PhiStmt phi : phis) {
+        Variable expr = phi.getArg(bb);
+        if (expr != null) { // FIXME why?
+          assert (expr != null);
+          expr = replaceVar(expr, param);
+          phi.addArg(bb, expr);
+        } else {
+          assert (false);
+        }
+      }
+    }
+  }
+
+  @Override
+  protected Void visitReference(Reference obj, Map<FuncVariable, SsaVariable> param) {
+    if (obj.getLink() instanceof Variable) {
+      obj.setLink(replaceVar((Variable) obj.getLink(), param));
+    }
+    return super.visitReference(obj, param);
+  }
+
+}
+
+class SsaVarCreator extends NullTraverser<Void, List<Statement>> {
+  private Map<SsaVariable, FuncVariable> renamed;
+  private int nr = 0;
+
+  public SsaVarCreator(Map<SsaVariable, FuncVariable> renamed) {
+    this.renamed = renamed;
+  }
+
+  @Override
+  protected Void visitDefault(Evl obj, List<Statement> param) {
+    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+  }
+
+  @Override
+  protected Void visitBasicBlockList(BasicBlockList obj, List<Statement> param) {
+    visitItr(obj.getBasicBlocks(), null);
+    return null;
+  }
+
+  @Override
+  protected Void visitBasicBlock(BasicBlock obj, List<Statement> param) {
+    assert (param == null);
+    List<Statement> list = new ArrayList<Statement>(obj.getCode());
+    obj.getCode().clear();
+    for (Statement itr : list) {
+      visit(itr, obj.getCode());
+    }
+    return null;
+  }
+
+  @Override
+  protected Void visitAssignment(Assignment obj, List<Statement> param) {
+    if (obj.getLeft().getOffset().isEmpty() && (obj.getLeft().getLink() instanceof FuncVariable)) {
+      FuncVariable var = (FuncVariable) obj.getLeft().getLink();
+      if (PhiInserter.isScalar(var.getType())) {
+        nr++;
+        SsaVariable sv = new SsaVariable(var, nr);
+        VarDefInitStmt init = new VarDefInitStmt(obj.getInfo(), sv, obj.getRight());
+        param.add(init);
+        renamed.put(sv, var);
+        return null;
+      }
+    }
+    param.add(obj);
+    return null;
+  }
+
+  @Override
+  protected Void visitVarDef(VarDefStmt obj, List<Statement> param) {
+    param.add(obj);
+    return null;
+  }
+
+  @Override
+  protected Void visitCallStmt(CallStmt obj, List<Statement> param) {
+    param.add(obj);
+    return null;
+  }
+}
+
+class InterBbVariableLinker extends DefTraverser<Void, BasicBlock> {
+  private VariableLinker link;
+  private HashMap<BasicBlock, BasicBlock> idom;
+
+  public static void link(VariableLinker link, HashMap<BasicBlock, BasicBlock> idom, BasicBlockList func) {
+    InterBbVariableLinker linker = new InterBbVariableLinker(link, idom);
+    linker.visit(func, null);
+  }
+
+  public InterBbVariableLinker(VariableLinker link, HashMap<BasicBlock, BasicBlock> idom) {
+    super();
+    this.link = link;
+    this.idom = idom;
+  }
+
+  private SsaVariable getVariable(BasicBlock first, FuncVariable name, ElementInfo info) {
+    for (BasicBlock dom = first; dom != null; dom = idom.get(dom)) {
+      Map<FuncVariable, SsaVariable> lastDef = link.getLastVarDef().get(dom);
+      if (lastDef.containsKey(name)) {
+        return lastDef.get(name);
+      }
+    }
+    RError.err(ErrorType.Error, info, "Variable definition not found: " + name);
+    return null;
+  }
+
+  @Override
+  protected Void visitBasicBlock(BasicBlock obj, BasicBlock param) {
+    assert (param == null);
+    return super.visitBasicBlock(obj, obj);
+  }
+
+  @Override
+  protected Void visitPhiStmt(PhiStmt obj, BasicBlock param) {
+    for (BasicBlock in : obj.getInBB()) {
+      Variable var = obj.getArg(in);
+      if (var instanceof FuncVariable) {
+        // the parameter <in> is correct since we execute the phi statement code in the previous basic block
+        var = getVariable(in, (FuncVariable) var, obj.getInfo());
+        obj.addArg(in, var);
+      }
+    }
+    return null;
+  }
+
+  @Override
+  protected Void visitReference(Reference obj, BasicBlock param) {
+    if (obj.getOffset().isEmpty() && (obj.getLink() instanceof FuncVariable) && (PhiInserter.isScalar(((FuncVariable) obj.getLink()).getType()))) {
+      BasicBlock dom = idom.get(param);
+      if (dom != null) {
+        // not for the first BB
+        obj.setLink(getVariable(dom, (FuncVariable) obj.getLink(), obj.getInfo()));
+      }
+      return null;
+    } else {
+      return super.visitReference(obj, param);
+    }
   }
 
 }

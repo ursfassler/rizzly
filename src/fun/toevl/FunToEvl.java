@@ -1,8 +1,6 @@
 package fun.toevl;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import common.Designator;
@@ -19,7 +17,6 @@ import evl.expression.reference.Reference;
 import evl.function.FunctionBase;
 import evl.other.CompUse;
 import evl.other.IfaceUse;
-import evl.statement.CaseOptEntry;
 import evl.type.Type;
 import fun.Fun;
 import fun.NullTraverser;
@@ -38,7 +35,6 @@ import fun.other.Named;
 import fun.other.NamedComponent;
 import fun.other.NamedInterface;
 import fun.other.Namespace;
-import fun.statement.CaseOpt;
 import fun.statement.Statement;
 import fun.type.NamedType;
 import fun.type.base.EnumElement;
@@ -139,15 +135,6 @@ public class FunToEvl extends NullTraverser<Evl, String> {
   @Override
   protected Evl visitFunctionHeader(FunctionHeader obj, String param) {
     return func.traverse(obj, null);
-  }
-
-  @Override
-  protected Evl visitCaseOpt(CaseOpt obj, String param) {
-    List<CaseOptEntry> value = new ArrayList<CaseOptEntry>();
-    for (fun.statement.CaseOptEntry itr : obj.getValue()) {
-      value.add((CaseOptEntry) traverse(itr, null));
-    }
-    return new evl.statement.CaseOpt(obj.getInfo(), value, (evl.statement.Block) traverse(obj.getCode(), param));
   }
 
   @Override

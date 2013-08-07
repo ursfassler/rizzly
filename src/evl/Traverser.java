@@ -1,12 +1,19 @@
 package evl;
 
 import evl.cfg.BasicBlock;
+import evl.cfg.BasicBlockEnd;
 import evl.cfg.BasicBlockList;
 import evl.cfg.CaseGoto;
 import evl.cfg.CaseGotoOpt;
+import evl.cfg.CaseOptEntry;
+import evl.cfg.CaseOptRange;
+import evl.cfg.CaseOptValue;
 import evl.cfg.Goto;
 import evl.cfg.IfGoto;
 import evl.cfg.PhiStmt;
+import evl.cfg.Return;
+import evl.cfg.ReturnExpr;
+import evl.cfg.ReturnVoid;
 import evl.composition.Connection;
 import evl.composition.Endpoint;
 import evl.composition.EndpointSelf;
@@ -53,21 +60,10 @@ import evl.other.NamedList;
 import evl.other.Namespace;
 import evl.other.RizzlyProgram;
 import evl.statement.Assignment;
-import evl.statement.Block;
 import evl.statement.CallStmt;
-import evl.statement.CaseOpt;
-import evl.statement.CaseOptEntry;
-import evl.statement.CaseOptRange;
-import evl.statement.CaseOptValue;
-import evl.statement.CaseStmt;
-import evl.statement.IfOption;
-import evl.statement.IfStmt;
-import evl.statement.Return;
-import evl.statement.ReturnExpr;
-import evl.statement.ReturnVoid;
 import evl.statement.Statement;
+import evl.statement.VarDefInitStmt;
 import evl.statement.VarDefStmt;
-import evl.statement.While;
 import evl.type.Type;
 import evl.type.base.Array;
 import evl.type.base.BaseType;
@@ -121,6 +117,8 @@ public abstract class Traverser<R, P> {
       return visitFunctionBase((FunctionBase) obj, param);
     else if (obj instanceof Expression)
       return visitExpression((Expression) obj, param);
+    else if (obj instanceof BasicBlockEnd)
+      return visitBasicBlockEnd((BasicBlockEnd) obj, param);
     else if (obj instanceof Statement)
       return visitStatement((Statement) obj, param);
     else if (obj instanceof Variable)
@@ -135,12 +133,8 @@ public abstract class Traverser<R, P> {
       return visitNamedElement((NamedElement) obj, param);
     else if (obj instanceof EnumElement)
       return visitEnumElement((EnumElement) obj, param);
-    else if (obj instanceof CaseOpt)
-      return visitCaseOpt((CaseOpt) obj, param);
     else if (obj instanceof CaseOptEntry)
       return visitCaseOptEntry((CaseOptEntry) obj, param);
-    else if (obj instanceof IfOption)
-      return visitIfOption((IfOption) obj, param);
     else if (obj instanceof Connection)
       return visitConnection((Connection) obj, param);
     else if (obj instanceof StateItem)
@@ -161,14 +155,21 @@ public abstract class Traverser<R, P> {
       return visitBasicBlockList((BasicBlockList) obj, param);
     else if (obj instanceof CaseGotoOpt)
       return visitCaseGotoOpt((CaseGotoOpt) obj, param);
-    else if (obj instanceof Goto)
+    else if (obj instanceof PhiStmt)
+      return visitPhiStmt((PhiStmt) obj, param);
+    else
+      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+  }
+
+  protected R visitBasicBlockEnd(BasicBlockEnd obj, P param) {
+    if (obj instanceof Goto)
       return visitGoto((Goto) obj, param);
     else if (obj instanceof IfGoto)
       return visitIfGoto((IfGoto) obj, param);
     else if (obj instanceof CaseGoto)
       return visitCaseGoto((CaseGoto) obj, param);
-    else if (obj instanceof PhiStmt)
-      return visitPhiStmt((PhiStmt) obj, param);
+    else if (obj instanceof Return)
+      return visitReturn((Return) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
@@ -259,22 +260,14 @@ public abstract class Traverser<R, P> {
   }
 
   protected R visitStatement(Statement obj, P param) {
-    if (obj instanceof Block)
-      return visitBlock((Block) obj, param);
-    else if (obj instanceof Assignment)
+    if (obj instanceof Assignment)
       return visitAssignment((Assignment) obj, param);
     else if (obj instanceof CallStmt)
       return visitCallStmt((CallStmt) obj, param);
-    else if (obj instanceof IfStmt)
-      return visitIf((IfStmt) obj, param);
-    else if (obj instanceof Return)
-      return visitReturn((Return) obj, param);
     else if (obj instanceof VarDefStmt)
       return visitVarDef((VarDefStmt) obj, param);
-    else if (obj instanceof While)
-      return visitWhile((While) obj, param);
-    else if (obj instanceof CaseStmt)
-      return visitCaseStmt((CaseStmt) obj, param);
+    else if (obj instanceof VarDefInitStmt)
+      return visitVarDefInitStmt((VarDefInitStmt) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
@@ -501,21 +494,13 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitEnumElement(EnumElement obj, P param);
 
-  abstract protected R visitWhile(While obj, P param);
-
-  abstract protected R visitCaseStmt(CaseStmt obj, P param);
-
   abstract protected R visitCaseOptRange(CaseOptRange obj, P param);
 
   abstract protected R visitCaseOptValue(CaseOptValue obj, P param);
 
-  abstract protected R visitCaseOpt(CaseOpt obj, P param);
-
-  abstract protected R visitIfOption(IfOption obj, P param);
-
   abstract protected R visitVarDef(VarDefStmt obj, P param);
 
-  abstract protected R visitIf(IfStmt obj, P param);
+  abstract protected R visitVarDefInitStmt(VarDefInitStmt obj, P param);
 
   abstract protected R visitCallStmt(CallStmt obj, P param);
 
@@ -524,8 +509,6 @@ public abstract class Traverser<R, P> {
   abstract protected R visitReturnExpr(ReturnExpr obj, P param);
 
   abstract protected R visitReturnVoid(ReturnVoid obj, P param);
-
-  abstract protected R visitBlock(Block obj, P param);
 
   abstract protected R visitUnaryExpression(UnaryExpression obj, P param);
 

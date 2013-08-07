@@ -7,10 +7,9 @@ import java.util.Set;
 
 import common.ElementInfo;
 
-import evl.EvlBase;
 import evl.expression.Expression;
 
-public class CaseGoto extends EvlBase implements BasicBlockEnd {
+public class CaseGoto extends BasicBlockEnd {
   private Expression condition;
   private List<CaseGotoOpt> option = new ArrayList<CaseGotoOpt>();
   private BasicBlock otherwise;
@@ -45,6 +44,7 @@ public class CaseGoto extends EvlBase implements BasicBlockEnd {
     for (CaseGotoOpt cgo : option) {
       ret.add(cgo.getDst());
     }
+    ret.add(otherwise);
     return ret;
   }
 

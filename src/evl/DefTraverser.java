@@ -6,9 +6,13 @@ import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
 import evl.cfg.CaseGoto;
 import evl.cfg.CaseGotoOpt;
+import evl.cfg.CaseOptRange;
+import evl.cfg.CaseOptValue;
 import evl.cfg.Goto;
 import evl.cfg.IfGoto;
 import evl.cfg.PhiStmt;
+import evl.cfg.ReturnExpr;
+import evl.cfg.ReturnVoid;
 import evl.composition.Connection;
 import evl.composition.EndpointSelf;
 import evl.composition.EndpointSub;
@@ -52,19 +56,9 @@ import evl.other.NamedList;
 import evl.other.Namespace;
 import evl.other.RizzlyProgram;
 import evl.statement.Assignment;
-import evl.statement.Block;
 import evl.statement.CallStmt;
-import evl.statement.CaseOpt;
-import evl.statement.CaseOptRange;
-import evl.statement.CaseOptValue;
-import evl.statement.CaseStmt;
-import evl.statement.IfOption;
-import evl.statement.IfStmt;
-import evl.statement.ReturnExpr;
-import evl.statement.ReturnVoid;
-import evl.statement.Statement;
+import evl.statement.VarDefInitStmt;
 import evl.statement.VarDefStmt;
-import evl.statement.While;
 import evl.type.base.Array;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumElement;
@@ -162,29 +156,15 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitWhile(While obj, P param) {
-    visit(obj.getCondition(), param);
-    visit(obj.getBody(), param);
-    return null;
-  }
-
-  @Override
   protected R visitVarDef(VarDefStmt obj, P param) {
     visit(obj.getVariable(), param);
     return null;
   }
 
   @Override
-  protected R visitIf(IfStmt obj, P param) {
-    visitItr(obj.getOption(), param);
-    visit(obj.getDefblock(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitIfOption(IfOption obj, P param) {
-    visit(obj.getCondition(), param);
-    visit(obj.getCode(), param);
+  protected R visitVarDefInitStmt(VarDefInitStmt obj, P param) {
+    visit(obj.getVariable(), param);
+    visit(obj.getInit(), param);
     return null;
   }
 
@@ -198,14 +178,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   protected R visitAssignment(Assignment obj, P param) {
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitBlock(Block obj, P param) {
-    for (Statement stmt : obj.getStatements()) {
-      visit(stmt, param);
-    }
     return null;
   }
 
@@ -337,21 +309,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitNamedElement(NamedElement obj, P param) {
-    return null;
-  }
-
-  @Override
-  protected R visitCaseStmt(CaseStmt obj, P param) {
-    visit(obj.getCondition(), param);
-    visitItr(obj.getOption(), param);
-    visit(obj.getOtherwise(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitCaseOpt(CaseOpt obj, P param) {
-    visitItr(obj.getValue(), param);
-    visit(obj.getCode(), param);
     return null;
   }
 
@@ -594,6 +551,5 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   protected R visitSsaVariable(SsaVariable obj, P param) {
     return null;
   }
-
 
 }

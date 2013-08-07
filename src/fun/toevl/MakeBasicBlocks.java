@@ -1,5 +1,6 @@
 package fun.toevl;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -12,10 +13,11 @@ import evl.cfg.BasicBlockEnd;
 import evl.cfg.BasicBlockList;
 import evl.cfg.CaseGoto;
 import evl.cfg.CaseGotoOpt;
+import evl.cfg.CaseOptEntry;
 import evl.cfg.Goto;
 import evl.cfg.IfGoto;
-import evl.cfg.PhiStmt;
-import evl.variable.Variable;
+import evl.expression.Expression;
+import evl.expression.reference.Reference;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.statement.Assignment;
@@ -51,8 +53,10 @@ class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
     BasicBlock head = makeBb(body.getInfo());
 
     for (FuncVariable var : param) {
-      PhiStmt phi = new PhiStmt(var.getInfo(), (Variable) fta.traverse(var, null));
-      head.getPhi().add(phi);
+      // this is later translated into an SSA variable
+      evl.variable.FuncVariable ev = (evl.variable.FuncVariable) fta.traverse(var, null);
+      evl.statement.Assignment vardef = new evl.statement.Assignment(var.getInfo(), new Reference(new ElementInfo(), ev), new Reference(new ElementInfo(), ev));
+      head.getCode().add(vardef);
     }
 
     BasicBlock last = visit(body, null);
@@ -117,7 +121,8 @@ class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
 
     for (Statement stmt : obj.getStatements()) {
       bb = visit(stmt, bb);
-      if (bb instanceof BasicBlockEnd) {
+      if (bb.getEnd() != null) {
+        // TODO add warning for unreachable code?
         return bb;
       }
     }
@@ -162,7 +167,7 @@ class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
       addGoto(bbthen, join);
 
       BasicBlock bbelse = makeBb(obj.getInfo());
-      IfGoto ifStmt = makeIf(opt.getCondition(), bbthen, bbelse);
+      IfGoto ifStmt = makeIf((Expression) fta.traverse(opt.getCondition(), null), bbthen, bbelse);
       assert (param.getEnd() == null);
       param.setEnd(ifStmt);
 
@@ -180,14 +185,18 @@ class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
     BasicBlock join = makeBb(obj.getInfo());
 
     CaseGoto co = new CaseGoto(obj.getInfo());
-    co.setCondition(obj.getCondition());
+    co.setCondition((Expression) fta.traverse(obj.getCondition(), null));
     assert (param.getEnd() == null);
     param.setEnd(co);
 
     for (CaseOpt itr : obj.getOption()) {
       BasicBlock caseBb = visit(itr.getCode(), null);
       addGoto(caseBb, join);
-      CaseGotoOpt cgo = new CaseGotoOpt(itr.getInfo(), itr.getValue(), caseBb);
+      List<CaseOptEntry> optlist = new ArrayList<CaseOptEntry>(obj.getOption().size());
+      for (fun.statement.CaseOptEntry opt : itr.getValue()) {
+        optlist.add((CaseOptEntry) fta.traverse(opt, null));
+      }
+      CaseGotoOpt cgo = new CaseGotoOpt(itr.getInfo(), optlist, caseBb);
       co.getOption().add(cgo);
     }
     BasicBlock otherBb = visit(obj.getOtherwise(), null);

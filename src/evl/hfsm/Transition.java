@@ -4,10 +4,10 @@ import java.util.Collection;
 
 import common.ElementInfo;
 
+import evl.cfg.BasicBlockList;
 import evl.expression.Expression;
 import evl.other.IfaceUse;
 import evl.other.ListOfNamed;
-import evl.statement.Block;
 import evl.variable.FuncVariable;
 
 public class Transition extends StateItem {
@@ -17,9 +17,9 @@ public class Transition extends StateItem {
   private String eventFunc;
   private Expression guard;
   final private ListOfNamed<FuncVariable> param;
-  private Block body;
+  private BasicBlockList body;
 
-  public Transition(ElementInfo info, State src, State dst, IfaceUse eventIface, String eventFunc, Expression guard, Collection<FuncVariable> param, Block body) {
+  public Transition(ElementInfo info, State src, State dst, IfaceUse eventIface, String eventFunc, Expression guard, Collection<FuncVariable> param, BasicBlockList body) {
     super(info);
     this.src = src;
     this.dst = dst;
@@ -74,11 +74,11 @@ public class Transition extends StateItem {
     return param;
   }
 
-  public Block getBody() {
+  public BasicBlockList getBody() {
     return body;
   }
 
-  public void setBody(Block body) {
+  public void setBody(BasicBlockList body) {
     this.body = body;
   }
 
