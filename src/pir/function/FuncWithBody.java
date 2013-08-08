@@ -1,10 +1,10 @@
 package pir.function;
 
-import pir.statement.Block;
+import pir.cfg.BasicBlockList;
 
 public interface FuncWithBody {
-  public Block getBody();
+  public BasicBlockList getBody();
 
-  public void setBody(Block body);
+  public void setBody(BasicBlockList body);
 
 }

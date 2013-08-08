@@ -2,16 +2,16 @@ package pir.function.impl;
 
 import java.util.List;
 
+import pir.cfg.BasicBlockList;
 import pir.function.FuncWithBody;
 import pir.function.FuncWithRet;
 import pir.function.Function;
 import pir.other.FuncVariable;
-import pir.statement.Block;
 import pir.type.Type;
 
 final public class FuncImplRet extends Function implements FuncWithRet, FuncWithBody {
   private Type retType = null;
-  private Block body = null;
+  private BasicBlockList body = null;
 
   public FuncImplRet(String name, List<FuncVariable> argument) {
     super(name, argument);
@@ -28,13 +28,13 @@ final public class FuncImplRet extends Function implements FuncWithRet, FuncWith
   }
 
   @Override
-  public Block getBody() {
+  public BasicBlockList getBody() {
     assert (body != null);
     return body;
   }
 
   @Override
-  public void setBody(Block body) {
+  public void setBody(BasicBlockList body) {
     assert (body != null);
     this.body = body;
   }

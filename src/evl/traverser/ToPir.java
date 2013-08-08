@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import pir.PirObject;
+import pir.cfg.BasicBlockEnd;
 import pir.expression.ArOp;
 import pir.expression.PExpression;
 import pir.expression.UnOp;
@@ -18,13 +19,20 @@ import pir.function.impl.FuncImplVoid;
 import pir.function.impl.FuncProtoRet;
 import pir.function.impl.FuncProtoVoid;
 import pir.other.Program;
-import pir.statement.IfStmtEntry;
+import pir.other.Variable;
 import pir.type.NamedElement;
 import evl.Evl;
 import evl.Traverser;
+import evl.cfg.BasicBlock;
+import evl.cfg.BasicBlockList;
+import evl.cfg.CaseGoto;
+import evl.cfg.CaseGotoOpt;
 import evl.cfg.CaseOptEntry;
 import evl.cfg.CaseOptRange;
 import evl.cfg.CaseOptValue;
+import evl.cfg.Goto;
+import evl.cfg.IfGoto;
+import evl.cfg.PhiStmt;
 import evl.cfg.ReturnExpr;
 import evl.cfg.ReturnVoid;
 import evl.composition.Connection;
@@ -72,15 +80,10 @@ import evl.other.NamedList;
 import evl.other.Namespace;
 import evl.other.RizzlyProgram;
 import evl.statement.Assignment;
-import evl.statement.Block;
 import evl.statement.CallStmt;
-import evl.statement.CaseOpt;
-import evl.statement.CaseStmt;
-import evl.statement.IfOption;
-import evl.statement.IfStmt;
 import evl.statement.Statement;
+import evl.statement.VarDefInitStmt;
 import evl.statement.VarDefStmt;
-import evl.statement.While;
 import evl.type.Type;
 import evl.type.base.Array;
 import evl.type.base.BooleanType;
@@ -102,6 +105,7 @@ import evl.variable.ConstGlobal;
 import evl.variable.ConstPrivate;
 import evl.variable.Constant;
 import evl.variable.FuncVariable;
+import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
 
 public class ToPir extends Traverser<PirObject, PirObject> {
@@ -246,7 +250,7 @@ public class ToPir extends Traverser<PirObject, PirObject> {
     }
 
     if (obj instanceof FuncWithBody) {
-      pir.statement.Block stmt = (pir.statement.Block) visit(((FuncWithBody) obj).getBody(), param);
+      pir.cfg.BasicBlockList stmt = (pir.cfg.BasicBlockList) visit(((FuncWithBody) obj).getBody(), param);
       ((pir.function.FuncWithBody) func).setBody(stmt);
     }
 
@@ -291,36 +295,10 @@ public class ToPir extends Traverser<PirObject, PirObject> {
   }
 
   @Override
-  protected PirObject visitWhile(While obj, PirObject param) {
-    PExpression cond = (PExpression) visit(obj.getCondition(), param);
-    pir.statement.Block block = (pir.statement.Block) visit(obj.getBody(), param);
-    return new pir.statement.WhileStmt(cond, block);
-  }
-
-  @Override
   protected PirObject visitVarDef(VarDefStmt obj, PirObject param) {
     pir.other.FuncVariable cvar = (pir.other.FuncVariable) visit(obj.getVariable(), param);
     pir.statement.VarDefStmt ret = new pir.statement.VarDefStmt(cvar);
     return ret;
-  }
-
-  @Override
-  protected PirObject visitIf(IfStmt obj, PirObject param) {
-    assert (!obj.getOption().isEmpty());
-    pir.statement.Block def = (pir.statement.Block) visit(obj.getDefblock(), param);
-    pir.statement.IfStmt act = new pir.statement.IfStmt(def);
-    for (IfOption itr : obj.getOption()) {
-      act.getOption().add((IfStmtEntry) visit(itr, param));
-    }
-    return act;
-  }
-
-  @Override
-  protected PirObject visitIfOption(IfOption obj, PirObject param) {
-    PExpression mcond = (PExpression) visit(obj.getCondition(), param);
-    pir.statement.Block mthen = (pir.statement.Block) visit(obj.getCode(), param);
-    IfStmtEntry entry = new IfStmtEntry(mcond, mthen);
-    return entry;
   }
 
   @Override
@@ -340,10 +318,10 @@ public class ToPir extends Traverser<PirObject, PirObject> {
   }
 
   @Override
-  protected pir.statement.Block visitBlock(Block obj, PirObject param) {
-    pir.statement.Block ret = new pir.statement.Block();
-    for (Statement stmt : obj.getStatements()) {
-      ret.getStatement().add((pir.statement.Statement) visit(stmt, param));
+  protected PirObject visitBasicBlockList(BasicBlockList obj, PirObject param) {
+    pir.cfg.BasicBlockList ret = new pir.cfg.BasicBlockList();
+    for (BasicBlock bb : obj.getBasicBlocks()) {
+      ret.getBasicBlocks().add((pir.cfg.BasicBlock) visit(bb, param));
     }
     return ret;
   }
@@ -479,12 +457,12 @@ public class ToPir extends Traverser<PirObject, PirObject> {
   protected PirObject visitReturnExpr(ReturnExpr obj, PirObject param) {
     PirObject expr = visit(obj.getExpr(), param);
     assert (expr instanceof PExpression);
-    return new pir.statement.ReturnValue((PExpression) expr);
+    return new pir.cfg.ReturnExpr((PExpression) expr);
   }
 
   @Override
   protected PirObject visitReturnVoid(ReturnVoid obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
+    return new pir.cfg.ReturnVoid();
   }
 
   @Override
@@ -720,6 +698,61 @@ public class ToPir extends Traverser<PirObject, PirObject> {
   @Override
   protected PirObject visitComponentType(ComponentType obj, PirObject param) {
     throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected PirObject visitPhiStmt(PhiStmt obj, PirObject param) {
+    pir.cfg.PhiStmt ret = new pir.cfg.PhiStmt((pir.other.SsaVariable) visit(obj.getVariable(), null));
+    for (BasicBlock in : obj.getInBB()) {
+      ret.addArg((pir.cfg.BasicBlock) visit(in, null), (Variable) visit(obj.getArg(in), null));
+    }
+    return ret;
+  }
+
+  @Override
+  protected PirObject visitBasicBlock(BasicBlock obj, PirObject param) {
+    pir.cfg.BasicBlock ret = new pir.cfg.BasicBlock(obj.getName());
+    map.put(obj, ret);
+
+    for (PhiStmt phi : obj.getPhi()) {
+      ret.getPhi().add((pir.cfg.PhiStmt) visit(phi, null));
+    }
+    for (Statement stmt : obj.getCode()) {
+      ret.getCode().add((pir.statement.Statement) visit(stmt, null));
+    }
+    ret.setEnd((BasicBlockEnd) visit(obj.getEnd(), null));
+
+    return ret;
+  }
+
+  @Override
+  protected PirObject visitCaseGotoOpt(CaseGotoOpt obj, PirObject param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected PirObject visitCaseGoto(CaseGoto obj, PirObject param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected PirObject visitIfGoto(IfGoto obj, PirObject param) {
+    return new pir.cfg.IfGoto( (PExpression) visit(obj.getCondition(),null),(pir.cfg.BasicBlock) visit(obj.getThenBlock(),null),(pir.cfg.BasicBlock) visit(obj.getElseBlock(),null) );
+  }
+
+  @Override
+  protected PirObject visitGoto(Goto obj, PirObject param) {
+    return new pir.cfg.Goto((pir.cfg.BasicBlock) visit(obj.getTarget(), null));
+  }
+
+  @Override
+  protected PirObject visitSsaVariable(SsaVariable obj, PirObject param) {
+    return new pir.other.SsaVariable(obj.getName(), (pir.type.Type) visit(obj.getType(), null));
+  }
+
+  @Override
+  protected PirObject visitVarDefInitStmt(VarDefInitStmt obj, PirObject param) {
+    return new pir.statement.VarDefInitStmt((pir.other.SsaVariable) visit(obj.getVariable(), null), (PExpression) visit(obj.getInit(), null));
   }
 
 }

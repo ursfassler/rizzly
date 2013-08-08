@@ -15,23 +15,15 @@ import pir.expression.Relation;
 import pir.expression.reference.RefHead;
 import pir.other.FuncVariable;
 import pir.statement.Assignment;
-import pir.statement.Block;
-import pir.statement.CaseEntry;
-import pir.statement.CaseOptEntry;
-import pir.statement.CaseOptRange;
-import pir.statement.CaseOptValue;
-import pir.statement.CaseStmt;
-import pir.statement.IfStmt;
-import pir.statement.IfStmtEntry;
 import pir.statement.Statement;
 import pir.statement.VarDefStmt;
 import pir.type.Type;
 
 /**
  * Replaces a case range with equivalent code
- * 
+ *
  * @author urs
- * 
+ *
  */
 public class CaserangeReduction extends StmtReplacer<Void> {
   static private int varNr = 0;
