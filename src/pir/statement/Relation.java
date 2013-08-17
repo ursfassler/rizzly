@@ -1,7 +1,7 @@
 package pir.statement;
 
 import pir.expression.PExpression;
-import pir.other.SsaVariable;
+import pir.other.Variable;
 import evl.expression.RelOp;
 
 public class Relation extends VariableGeneratorStmt {
@@ -9,7 +9,7 @@ public class Relation extends VariableGeneratorStmt {
   final private PExpression right; // FIXME only use constant or variable ref
   final private RelOp op;
 
-  public Relation(SsaVariable variable, PExpression left, PExpression right, RelOp op) {
+  public Relation(Variable variable, PExpression left, PExpression right, RelOp op) {
     super(variable);
     this.left = left;
     this.right = right;

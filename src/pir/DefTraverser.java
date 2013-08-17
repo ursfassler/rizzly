@@ -30,6 +30,7 @@ import pir.other.Variable;
 import pir.statement.ArithmeticOp;
 import pir.statement.Assignment;
 import pir.statement.CallStmt;
+import pir.statement.LoadStmt;
 import pir.statement.Relation;
 import pir.statement.StoreStmt;
 import pir.statement.VarDefStmt;
@@ -315,6 +316,12 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitVarRef(VarRef obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitLoadStmt(LoadStmt obj, P param) {
+    visit(obj.getVariable(),param);
     return null;
   }
 

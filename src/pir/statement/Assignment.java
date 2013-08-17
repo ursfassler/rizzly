@@ -1,13 +1,11 @@
 package pir.statement;
 
-import pir.other.SsaVariable;
 import pir.other.Variable;
 
-@Deprecated
 public class Assignment extends VariableGeneratorStmt {
   private Variable src;
 
-  public Assignment(SsaVariable dst, Variable src) {
+  public Assignment(Variable dst, Variable src) {
     super(dst);
     this.src = src;
   }

@@ -20,7 +20,6 @@ import pir.function.Function;
 import pir.other.Program;
 import pir.other.Variable;
 import pir.statement.ArOp;
-import pir.statement.StoreStmt;
 import pir.statement.VariableGeneratorStmt;
 import pir.type.NamedElement;
 import cir.statement.CaseStmt;
@@ -521,25 +520,17 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
     return converter.traverse(obj.getInit(), var);
   }
 
-  // TODO this handler should not be needed in the future
   @Override
   protected PirObject visitAssignment(Assignment obj, PirObject param) {
     assert ((obj.getLeft().getLink() instanceof evl.variable.Variable) && obj.getLeft().getOffset().isEmpty());
     pir.other.Variable var = (pir.other.Variable) visit(obj.getLeft().getLink(), null);
-    PExpression src = (PExpression) visit(obj.getRight(), null);
-    if (var instanceof pir.other.StateVariable) {
-      return new StoreStmt((pir.other.StateVariable) var, src);
-    }
-    if (var instanceof pir.other.SsaVariable) {
-      ToVariableGenerator converter = new ToVariableGenerator(this);
-      return converter.traverse(obj.getRight(), (pir.other.SsaVariable) var);
-    }
-    throw new RuntimeException("not yet implemented");
+    ToVariableGenerator converter = new ToVariableGenerator(this);
+    return converter.traverse(obj.getRight(), var);
   }
 
 }
 
-class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, pir.other.SsaVariable> {
+class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, Variable> {
   private ToPir converter;
 
   public ToVariableGenerator(ToPir converter) {
@@ -548,12 +539,12 @@ class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, pir.other
   }
 
   @Override
-  protected VariableGeneratorStmt visitDefault(Evl obj, pir.other.SsaVariable param) {
+  protected VariableGeneratorStmt visitDefault(Evl obj, Variable param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
   @Override
-  protected VariableGeneratorStmt visitReference(Reference obj, pir.other.SsaVariable param) {
+  protected VariableGeneratorStmt visitReference(Reference obj, Variable param) {
     if ((obj.getLink() instanceof evl.variable.Variable) && obj.getOffset().isEmpty()) {
       Variable var = (Variable) converter.traverse(obj.getLink(), null);
       return new pir.statement.Assignment(param, var);
@@ -562,14 +553,14 @@ class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, pir.other
   }
 
   @Override
-  protected VariableGeneratorStmt visitRelation(Relation obj, pir.other.SsaVariable param) {
+  protected VariableGeneratorStmt visitRelation(Relation obj, Variable param) {
     PExpression left = (PExpression) converter.visit(obj.getLeft(), null);
     PExpression right = (PExpression) converter.visit(obj.getRight(), null);
     return new pir.statement.Relation(param, left, right, obj.getOp());
   }
 
   @Override
-  protected VariableGeneratorStmt visitArithmeticOp(ArithmeticOp obj, pir.other.SsaVariable param) {
+  protected VariableGeneratorStmt visitArithmeticOp(ArithmeticOp obj, Variable param) {
     PExpression left = (PExpression) converter.visit(obj.getLeft(), null);
     PExpression right = (PExpression) converter.visit(obj.getRight(), null);
     return new pir.statement.ArithmeticOp(param, left, right, toCOp(obj.getOp()));

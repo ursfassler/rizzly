@@ -16,6 +16,7 @@ import pir.traverser.BitStretcher;
 import pir.traverser.CaserangeReduction;
 import pir.traverser.EnumElementConstPropagation;
 import pir.traverser.GlobalReadExtracter;
+import pir.traverser.GlobalWriteExtracter;
 import pir.traverser.LlvmWriter;
 import pir.traverser.PirPrinter;
 import pir.traverser.RangeReplacer;
@@ -118,6 +119,7 @@ public class Main {
 
     RangeReplacer.process(prog);
     GlobalReadExtracter.process(prog);
+    GlobalWriteExtracter.process(prog);
     
     LlvmWriter.print(prog, outdir + prg.getName() + ".ll");
 

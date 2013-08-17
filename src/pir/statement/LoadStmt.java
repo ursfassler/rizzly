@@ -1,12 +1,12 @@
 package pir.statement;
 
-import pir.other.SsaVariable;
 import pir.other.StateVariable;
+import pir.other.Variable;
 
 public class LoadStmt extends VariableGeneratorStmt {
   private StateVariable src;
 
-  public LoadStmt(SsaVariable variable, StateVariable src) {
+  public LoadStmt(Variable variable, StateVariable src) {
     super(variable);
     this.src = src;
   }
