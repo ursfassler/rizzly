@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import evl.Evl;
+import evl.cfg.BasicBlockList;
 import evl.expression.Expression;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
@@ -113,9 +114,15 @@ public class FunToEvlStateItem extends NullTraverser<StateItem, Void> {
     evl.expression.reference.Reference evt = (evl.expression.reference.Reference) fta.traverse(obj.getEvent(), null);
     assert (src.getOffset().isEmpty());
     assert (dst.getOffset().isEmpty());
-    assert( evt.getOffset().size() == 1 );
-    assert( evt.getOffset().get(0) instanceof RefName );
-    return new evl.hfsm.Transition(obj.getInfo(), (State)src.getLink(), (State)dst.getLink(), (IfaceUse) evt.getLink(), ((RefName)evt.getOffset().get(0)).getName(), (Expression) fta.traverse(obj.getGuard(), null), args, (evl.statement.Block) fta.traverse(obj.getBody(), null));
+    assert (evt.getOffset().size() == 1);
+    assert (evt.getOffset().get(0) instanceof RefName);
+
+    Expression guard = (Expression) fta.traverse(obj.getGuard(), null);
+
+    MakeBasicBlocks blocks = new MakeBasicBlocks(fta);
+    BasicBlockList nbody = blocks.translate(obj.getBody(), obj.getParam().getList());
+
+    return new evl.hfsm.Transition(obj.getInfo(), (State) src.getLink(), (State) dst.getLink(), (IfaceUse) evt.getLink(), ((RefName) evt.getOffset().get(0)).getName(), guard, args, nbody);
   }
 
 }

@@ -1,4 +1,4 @@
-package pir.expression;
+package pir.statement;
 
 import error.ErrorType;
 import error.RError;

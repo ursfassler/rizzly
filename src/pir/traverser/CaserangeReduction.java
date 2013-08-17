@@ -6,14 +6,14 @@ import java.util.List;
 
 import pir.NullTraverser;
 import pir.PirObject;
-import pir.expression.ArOp;
-import pir.expression.ArithmeticOp;
 import pir.expression.PExpression;
-import pir.expression.Reference;
 import pir.expression.RelOp;
 import pir.expression.Relation;
 import pir.expression.reference.RefHead;
+import pir.expression.reference.Reference;
 import pir.other.FuncVariable;
+import pir.statement.ArOp;
+import pir.statement.ArithmeticOp;
 import pir.statement.Assignment;
 import pir.statement.Statement;
 import pir.statement.VarDefStmt;

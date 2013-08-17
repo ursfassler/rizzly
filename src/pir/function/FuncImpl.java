@@ -1,17 +1,16 @@
-package pir.function.impl;
+package pir.function;
 
 import java.util.List;
 
 import pir.cfg.BasicBlockList;
-import pir.function.FuncWithBody;
-import pir.function.Function;
 import pir.other.FuncVariable;
+import pir.type.Type;
 
-final public class FuncImplVoid extends Function implements FuncWithBody {
+final public class FuncImpl extends Function implements FuncWithBody {
   private BasicBlockList body = null;
 
-  public FuncImplVoid(String name, List<FuncVariable> argument) {
-    super(name, argument);
+  public FuncImpl(String name, List<FuncVariable> argument, Type retType) {
+    super(name, argument, retType);
   }
 
   @Override

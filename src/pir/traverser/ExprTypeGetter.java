@@ -2,18 +2,18 @@ package pir.traverser;
 
 import pir.NullTraverser;
 import pir.PirObject;
-import pir.expression.ArithmeticOp;
 import pir.expression.BoolValue;
 import pir.expression.Number;
 import pir.expression.PExpression;
-import pir.expression.Reference;
-import pir.expression.Relation;
 import pir.expression.UnaryExpr;
 import pir.expression.reference.RefCall;
 import pir.expression.reference.RefHead;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
+import pir.expression.reference.VarRef;
 import pir.other.Variable;
+import pir.statement.ArithmeticOp;
+import pir.statement.Relation;
 import pir.type.BooleanType;
 import pir.type.EnumType;
 import pir.type.Type;
@@ -31,7 +31,7 @@ public class ExprTypeGetter extends NullTraverser<Type, Void> {
   }
 
   @Override
-  protected Type visitReference(Reference obj, Void param) {
+  protected Type visitVarRef(VarRef obj, Void param) {
     return visit(obj.getRef(), param);
   }
 

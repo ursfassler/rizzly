@@ -6,7 +6,6 @@ import error.ErrorType;
 import error.RError;
 import evl.Evl;
 import evl.cfg.BasicBlockList;
-import evl.doc.PrettyPrinter;
 import evl.expression.reference.Reference;
 import evl.function.FunctionBase;
 import evl.function.FunctionFactory;

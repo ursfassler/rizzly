@@ -12,8 +12,4 @@ public class UnsignedType extends Type implements IntType {
     return bits;
   }
 
-  public Integer getHigh() {
-    return 1 << bits;
-  }
-
 }

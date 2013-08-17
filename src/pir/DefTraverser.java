@@ -1,47 +1,47 @@
 package pir;
 
-import pir.expression.ArithmeticOp;
+import pir.cfg.BasicBlock;
+import pir.cfg.BasicBlockList;
+import pir.cfg.CaseGoto;
+import pir.cfg.Goto;
+import pir.cfg.IfGoto;
+import pir.cfg.PhiStmt;
+import pir.cfg.ReturnExpr;
+import pir.cfg.ReturnVoid;
 import pir.expression.ArrayValue;
 import pir.expression.BoolValue;
 import pir.expression.Number;
-import pir.expression.Reference;
-import pir.expression.Relation;
 import pir.expression.StringValue;
 import pir.expression.UnaryExpr;
+import pir.expression.reference.CallExpr;
 import pir.expression.reference.RefCall;
 import pir.expression.reference.RefHead;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
+import pir.expression.reference.VarRef;
+import pir.function.FuncImpl;
+import pir.function.FuncProto;
 import pir.function.FuncWithBody;
 import pir.function.Function;
-import pir.function.impl.FuncImplRet;
-import pir.function.impl.FuncImplVoid;
-import pir.function.impl.FuncProtoRet;
-import pir.function.impl.FuncProtoVoid;
 import pir.other.Constant;
 import pir.other.FuncVariable;
 import pir.other.Program;
+import pir.other.SsaVariable;
 import pir.other.StateVariable;
 import pir.other.Variable;
+import pir.statement.ArithmeticOp;
 import pir.statement.Assignment;
-import pir.statement.Block;
 import pir.statement.CallStmt;
-import pir.statement.CaseEntry;
-import pir.statement.CaseOptRange;
-import pir.statement.CaseOptValue;
-import pir.statement.CaseStmt;
-import pir.statement.IfStmt;
-import pir.statement.IfStmtEntry;
-import pir.statement.ReturnValue;
-import pir.statement.ReturnVoid;
+import pir.statement.Relation;
+import pir.statement.StoreStmt;
 import pir.statement.VarDefStmt;
-import pir.statement.WhileStmt;
 import pir.type.Array;
 import pir.type.BooleanType;
 import pir.type.EnumElement;
 import pir.type.EnumType;
 import pir.type.NamedElement;
 import pir.type.RangeType;
+import pir.type.SignedType;
 import pir.type.StringType;
 import pir.type.StructType;
 import pir.type.Type;
@@ -49,6 +49,8 @@ import pir.type.TypeAlias;
 import pir.type.UnionType;
 import pir.type.UnsignedType;
 import pir.type.VoidType;
+import evl.function.impl.FuncProtoRet;
+import evl.statement.VarDefInitStmt;
 
 public class DefTraverser<R, P> extends Traverser<R, P> {
 
@@ -73,20 +75,21 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitCallStmt(CallStmt obj, P param) {
-    visit(obj.getRef(), param);
+    visit(obj.getCall(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitStoreStmt(StoreStmt obj, P param) {
+    visit(obj.getSrc(), param);
+    visit(obj.getDst(), param);
     return null;
   }
 
   @Override
   protected R visitAssignment(Assignment obj, P param) {
-    visit(obj.getDst(), param);
     visit(obj.getSrc(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitBlock(Block obj, P param) {
-    visitList(obj.getStatement(), param);
+    visit(obj.getVariable(), param);
     return null;
   }
 
@@ -131,14 +134,8 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitReturnValue(ReturnValue obj, P param) {
-    visit(obj.getValue(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitReference(Reference obj, P param) {
-    visit(obj.getRef(), param);
+  protected R visitReturnExpr(ReturnExpr obj, P param) {
+    visit(obj.getExpr(), param);
     return null;
   }
 
@@ -191,13 +188,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitIfStmt(IfStmt obj, P param) {
-    visitList(obj.getOption(), param);
-    visit(obj.getDef(), param);
-    return null;
-  }
-
-  @Override
   protected R visitTypeAlias(TypeAlias obj, P param) {
     visit(obj.getRef(), param);
     return null;
@@ -236,49 +226,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitWhile(WhileStmt obj, P param) {
-    visit(obj.getCondition(), param);
-    visit(obj.getBlock(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitCaseEntry(CaseEntry obj, P param) {
-    visitList(obj.getValues(), param);
-    visit(obj.getCode(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitCaseStmt(CaseStmt obj, P param) {
-    visit(obj.getCondition(), param);
-    visitList(obj.getEntries(), param);
-    visit(obj.getOtherwise(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitIfStmtEntry(IfStmtEntry obj, P param) {
-    visit(obj.getCondition(), param);
-    visit(obj.getCode(), param);
-    return null;
-  }
-
-  @Override
   protected R visitBoolValue(BoolValue obj, P param) {
-    return null;
-  }
-
-  @Override
-  protected R visitCaseOptValue(CaseOptValue obj, P param) {
-    visit(obj.getValue(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitCaseOptRange(CaseOptRange obj, P param) {
-    visit(obj.getStart(), param);
-    visit(obj.getEnd(), param);
     return null;
   }
 
@@ -313,23 +261,77 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitFuncImplVoid(FuncImplVoid obj, P param) {
+  protected R visitBasicBlockList(BasicBlockList obj, P param) {
+    visitList(obj.getBasicBlocks(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitBasicBlock(BasicBlock obj, P param) {
+    visitList(obj.getPhi(), param);
+    visitList(obj.getCode(), param);
+    visit(obj.getEnd(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitVarDefInitStmt(VarDefInitStmt obj, P param) {
+    visit(obj.getVariable(), param);
+    visit(obj.getInit(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitSsaVariable(SsaVariable obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitGoto(Goto obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitPhiStmt(PhiStmt obj, P param) {
+    visit(obj.getVariable(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitIfGoto(IfGoto obj, P param) {
+    visit(obj.getCondition(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitSignedType(SignedType obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitFuncImpl(FuncImpl obj, P param) {
     throw new RuntimeException("not yet implemented");
   }
 
   @Override
-  protected R visitFuncImplRet(FuncImplRet obj, P param) {
+  protected R visitFuncProto(FuncProto obj, P param) {
     throw new RuntimeException("not yet implemented");
   }
 
   @Override
-  protected R visitFuncProtoVoid(FuncProtoVoid obj, P param) {
+  protected R visitCaseGoto(CaseGoto obj, P param) {
     throw new RuntimeException("not yet implemented");
   }
 
   @Override
-  protected R visitFuncProtoRet(FuncProtoRet obj, P param) {
-    throw new RuntimeException("not yet implemented");
+  protected R visitCallExpr(CallExpr obj, P param) {
+    visitList(obj.getParameter(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitVarRef(VarRef obj, P param) {
+    return null;
   }
 
 }

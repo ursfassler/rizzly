@@ -22,7 +22,7 @@ import evl.expression.UnaryExpression;
 import evl.expression.reference.Reference;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
-import evl.traverser.range.RangeUpdater;
+import evl.traverser.range.RangeGetter;
 import evl.traverser.typecheck.BiggerType;
 import evl.type.Type;
 import evl.type.base.Array;
@@ -51,7 +51,8 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
   /**
    *
    * @param ast
-   * @param map Constrainted type of variable
+   * @param map
+   *          Constrainted type of variable
    * @param kb
    * @return
    */
@@ -67,7 +68,7 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitReference(Reference obj, Void param) {
-    Variable rv = RangeUpdater.getDerefVar(obj);
+    Variable rv = RangeGetter.getDerefVar(obj);
     if ((rv != null) && map.containsKey(rv)) {
       return map.get(rv);
     } else {
@@ -156,7 +157,7 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
       BigInteger high = lhs.getHigh().subtract(rhs.getHigh());
       return kbi.getRangeType(low, high);
     }
-    case MUL: {
+    case MUL: { //FIXME correct when values are negative?
       BigInteger low = lhs.getLow().multiply(rhs.getLow());
       BigInteger high = lhs.getHigh().multiply(rhs.getHigh());
       return kbi.getRangeType(low, high);
@@ -181,9 +182,19 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
       BigInteger high = lhs.getHigh().min(rhs.getHigh().subtract(BigInteger.ONE));
       return kbi.getRangeType(BigInteger.ZERO, high);
     }
+    case DIV: {
+      if ((rhs.getLow().compareTo(BigInteger.ZERO) < 0) && (rhs.getHigh().compareTo(BigInteger.ZERO) > 0)) {
+        RError.err(ErrorType.Warning, rhs.getInfo(), "potential division by 0");
+      }
+      if ((lhs.getLow().compareTo(BigInteger.ZERO) < 0) || (lhs.getHigh().compareTo(BigInteger.ZERO) < 0) || (rhs.getLow().compareTo(BigInteger.ZERO) < 0) || (rhs.getHigh().compareTo(BigInteger.ZERO) < 0)) {
+        RError.err(ErrorType.Error, lhs.getInfo(), "sorry, I am too lazy to check for negative numbers");
+      }
+      BigInteger low = lhs.getLow().divide(rhs.getHigh());
+      BigInteger high = lhs.getHigh().divide(rhs.getLow());
+      return kbi.getRangeType(low, high);
+    }
 
     case SHR:
-    case DIV:
     case OR:
     case SHL:
     default: {

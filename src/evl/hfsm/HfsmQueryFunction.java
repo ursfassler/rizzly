@@ -2,17 +2,17 @@ package evl.hfsm;
 
 import common.ElementInfo;
 
+import evl.cfg.BasicBlockList;
 import evl.expression.reference.Reference;
 import evl.function.FuncWithBody;
 import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
 import evl.other.ListOfNamed;
-import evl.statement.Block;
 import evl.variable.FuncVariable;
 
 public class HfsmQueryFunction extends FunctionBase implements FuncWithReturn, FuncWithBody {
   private Reference ret = null;
-  private Block body = null;
+  private BasicBlockList body = null;
 
   public HfsmQueryFunction(ElementInfo info, String name, ListOfNamed<FuncVariable> param) {
     super(info, name, param);
@@ -31,13 +31,13 @@ public class HfsmQueryFunction extends FunctionBase implements FuncWithReturn, F
   }
 
   @Override
-  public Block getBody() {
+  public BasicBlockList getBody() {
     assert (body != null);
     return body;
   }
 
   @Override
-  public void setBody(Block body) {
+  public void setBody(BasicBlockList body) {
     assert (body != null);
     this.body = body;
   }

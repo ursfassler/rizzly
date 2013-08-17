@@ -1,37 +1,28 @@
 package pir.statement;
 
-import pir.expression.PExpression;
-import pir.expression.Reference;
+import pir.other.SsaVariable;
+import pir.other.Variable;
 
-public class Assignment extends Statement {
-  private Reference dst;
-  private PExpression src;
+@Deprecated
+public class Assignment extends VariableGeneratorStmt {
+  private Variable src;
 
-  public Assignment(Reference dst, PExpression src) {
-    super();
-    this.dst = dst;
+  public Assignment(SsaVariable dst, Variable src) {
+    super(dst);
     this.src = src;
   }
 
-  public Reference getDst() {
-    return dst;
-  }
-
-  public PExpression getSrc() {
+  public Variable getSrc() {
     return src;
   }
 
-  public void setDst(Reference dst) {
-    this.dst = dst;
-  }
-
-  public void setSrc(PExpression src) {
+  public void setSrc(Variable src) {
     this.src = src;
   }
 
   @Override
   public String toString() {
-    return ":=";
+    return getVariable() + " := " + getSrc();
   }
 
 }

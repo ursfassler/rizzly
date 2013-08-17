@@ -1,11 +1,15 @@
 package pir.traverser;
 
 import pir.Traverser;
-import pir.expression.ArithmeticOp;
+import pir.cfg.CaseGoto;
+import pir.cfg.CaseOptRange;
+import pir.cfg.CaseOptValue;
+import pir.cfg.IfGoto;
+import pir.cfg.ReturnExpr;
+import pir.cfg.ReturnVoid;
 import pir.expression.ArrayValue;
 import pir.expression.BoolValue;
 import pir.expression.Number;
-import pir.expression.Reference;
 import pir.expression.Relation;
 import pir.expression.StringValue;
 import pir.expression.UnaryExpr;
@@ -13,30 +17,22 @@ import pir.expression.reference.RefCall;
 import pir.expression.reference.RefHead;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
+import pir.expression.reference.Reference;
+import pir.function.FuncImpl;
+import pir.function.FuncProto;
 import pir.function.FuncWithBody;
 import pir.function.Function;
 import pir.function.impl.FuncImplRet;
-import pir.function.impl.FuncImplVoid;
 import pir.function.impl.FuncProtoRet;
-import pir.function.impl.FuncProtoVoid;
 import pir.other.Constant;
 import pir.other.FuncVariable;
 import pir.other.Program;
 import pir.other.StateVariable;
+import pir.statement.ArithmeticOp;
 import pir.statement.Assignment;
-import pir.statement.Block;
 import pir.statement.CallStmt;
-import pir.statement.CaseEntry;
-import pir.statement.CaseOptRange;
-import pir.statement.CaseOptValue;
-import pir.statement.CaseStmt;
-import pir.statement.IfStmt;
-import pir.statement.IfStmtEntry;
-import pir.statement.ReturnValue;
-import pir.statement.ReturnVoid;
 import pir.statement.Statement;
 import pir.statement.VarDefStmt;
-import pir.statement.WhileStmt;
 import pir.type.Array;
 import pir.type.BooleanType;
 import pir.type.EnumElement;
@@ -272,7 +268,7 @@ public class StmtReplacer<P> extends Traverser<Statement, P> {
   }
 
   @Override
-  protected Statement visitFuncImplVoid(FuncImplVoid obj, P param) {
+  protected Statement visitFuncImpl(FuncImpl obj, P param) {
     throw new RuntimeException("not yet implemented");
   }
 
@@ -282,7 +278,7 @@ public class StmtReplacer<P> extends Traverser<Statement, P> {
   }
 
   @Override
-  protected Statement visitFuncProtoVoid(FuncProtoVoid obj, P param) {
+  protected Statement visitFuncProto(FuncProto obj, P param) {
     throw new RuntimeException("not yet implemented");
   }
 
@@ -298,6 +294,21 @@ public class StmtReplacer<P> extends Traverser<Statement, P> {
 
   @Override
   protected Statement visitUnsignedType(UnsignedType obj, P param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Statement visitCaseGoto(CaseGoto obj, P param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Statement visitReturnExpr(ReturnExpr obj, P param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Statement visitIfGoto(IfGoto obj, P param) {
     throw new RuntimeException("not yet implemented");
   }
 }

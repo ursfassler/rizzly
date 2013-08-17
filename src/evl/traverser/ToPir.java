@@ -7,26 +7,29 @@ import java.util.Map;
 
 import pir.PirObject;
 import pir.cfg.BasicBlockEnd;
-import pir.expression.ArOp;
 import pir.expression.PExpression;
 import pir.expression.UnOp;
-import pir.expression.reference.RefHead;
+import pir.expression.reference.CallExpr;
 import pir.expression.reference.RefItem;
 import pir.expression.reference.Referencable;
-import pir.function.FuncWithRet;
-import pir.function.impl.FuncImplRet;
-import pir.function.impl.FuncImplVoid;
-import pir.function.impl.FuncProtoRet;
-import pir.function.impl.FuncProtoVoid;
+import pir.expression.reference.TypeRef;
+import pir.expression.reference.VarRef;
+import pir.function.FuncImpl;
+import pir.function.FuncProto;
+import pir.function.Function;
 import pir.other.Program;
 import pir.other.Variable;
+import pir.statement.ArOp;
+import pir.statement.StoreStmt;
+import pir.statement.VariableGeneratorStmt;
 import pir.type.NamedElement;
+import cir.statement.CaseStmt;
+import error.ErrorType;
+import error.RError;
 import evl.Evl;
-import evl.Traverser;
+import evl.NullTraverser;
 import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
-import evl.cfg.CaseGoto;
-import evl.cfg.CaseGotoOpt;
 import evl.cfg.CaseOptEntry;
 import evl.cfg.CaseOptRange;
 import evl.cfg.CaseOptValue;
@@ -35,10 +38,6 @@ import evl.cfg.IfGoto;
 import evl.cfg.PhiStmt;
 import evl.cfg.ReturnExpr;
 import evl.cfg.ReturnVoid;
-import evl.composition.Connection;
-import evl.composition.EndpointSelf;
-import evl.composition.EndpointSub;
-import evl.composition.ImplComposition;
 import evl.expression.ArithmeticOp;
 import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
@@ -57,27 +56,6 @@ import evl.expression.reference.Reference;
 import evl.function.FuncWithBody;
 import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
-import evl.function.impl.FuncGlobal;
-import evl.function.impl.FuncInputHandlerEvent;
-import evl.function.impl.FuncInputHandlerQuery;
-import evl.function.impl.FuncPrivateRet;
-import evl.function.impl.FuncPrivateVoid;
-import evl.function.impl.FuncSubHandlerEvent;
-import evl.function.impl.FuncSubHandlerQuery;
-import evl.hfsm.HfsmQueryFunction;
-import evl.hfsm.ImplHfsm;
-import evl.hfsm.QueryItem;
-import evl.hfsm.State;
-import evl.hfsm.StateComposite;
-import evl.hfsm.StateSimple;
-import evl.hfsm.Transition;
-import evl.other.CompUse;
-import evl.other.IfaceUse;
-import evl.other.ImplElementary;
-import evl.other.Interface;
-import evl.other.Named;
-import evl.other.NamedList;
-import evl.other.Namespace;
 import evl.other.RizzlyProgram;
 import evl.statement.Assignment;
 import evl.statement.CallStmt;
@@ -89,26 +67,19 @@ import evl.type.base.Array;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
-import evl.type.base.FunctionTypeRet;
-import evl.type.base.FunctionTypeVoid;
 import evl.type.base.Range;
 import evl.type.base.StringType;
 import evl.type.base.TypeAlias;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
-import evl.type.special.ComponentType;
-import evl.type.special.IntegerType;
-import evl.type.special.InterfaceType;
-import evl.type.special.NaturalType;
 import evl.type.special.VoidType;
-import evl.variable.ConstGlobal;
-import evl.variable.ConstPrivate;
 import evl.variable.Constant;
 import evl.variable.FuncVariable;
 import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
+import fun.statement.CaseOpt;
 
-public class ToPir extends Traverser<PirObject, PirObject> {
+public class ToPir extends NullTraverser<PirObject, PirObject> {
   private Map<Evl, PirObject> map = new HashMap<Evl, PirObject>();
 
   static public PirObject process(Evl ast) {
@@ -116,7 +87,12 @@ public class ToPir extends Traverser<PirObject, PirObject> {
     return toC.traverse(ast, null);
   }
 
-  private pir.type.Type getType(pir.expression.Reference obj) {
+  @Override
+  protected PirObject visitDefault(Evl obj, PirObject param) {
+    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+  }
+
+  private pir.type.Type getType(pir.expression.reference.Reference obj) {
     pir.expression.reference.RefItem item = obj.getRef();
     return getType(item);
   }
@@ -142,13 +118,36 @@ public class ToPir extends Traverser<PirObject, PirObject> {
   @Override
   protected PirObject visitReference(Reference obj, PirObject param) {
     PirObject ref = visit(obj.getLink(), null);
-    RefHead head = new RefHead((Referencable) ref);
+    if (ref instanceof Variable) {
+      assert (obj.getOffset().isEmpty());
+      return new VarRef((Variable) ref);
+    } else if (ref instanceof pir.type.Type) {
+      assert (obj.getOffset().isEmpty());
+      return new TypeRef((pir.type.Type) ref);
+    } else if (ref instanceof Function) {
+      assert ((obj.getOffset().size() == 1) && (obj.getOffset().get(0) instanceof RefCall));
+      RefCall call = (RefCall) obj.getOffset().get(0);
 
-    RefItem last = head;
-    for (evl.expression.reference.RefItem itr : obj.getOffset()) {
-      last = (RefItem) visit(itr, last);
+      ArrayList<PExpression> acpa = new ArrayList<PExpression>();
+      for (Expression pa : call.getActualParameter()) {
+        acpa.add((PExpression) visit(pa, null));
+      }
+
+      return new CallExpr((Function) ref, acpa);
+    } else {
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Unhandled class: " + ref.getClass().getCanonicalName());
     }
-    return new pir.expression.Reference(last);
+
+    return null;
+
+    // PirObject ref = visit(obj.getLink(), null);
+    // RefHead head = new RefHead((Referencable) ref);
+    //
+    // RefItem last = head;
+    // for (evl.expression.reference.RefItem itr : obj.getOffset()) {
+    // last = (RefItem) visit(itr, last);
+    // }
+    // return new pir.expression.reference.Reference(last);
   }
 
   @Override
@@ -180,11 +179,6 @@ public class ToPir extends Traverser<PirObject, PirObject> {
   }
 
   @Override
-  protected PirObject visitCompUse(CompUse obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
   protected Program visitRizzlyProgram(RizzlyProgram obj, PirObject param) {
     Program prog = new Program(obj.getName());
 
@@ -208,16 +202,6 @@ public class ToPir extends Traverser<PirObject, PirObject> {
   }
 
   @Override
-  protected PirObject visitImplElementary(ImplElementary obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitInterface(Interface obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
   protected PirObject visitFunctionBase(FunctionBase obj, PirObject param) {
     String name = obj.getName();
 
@@ -227,27 +211,21 @@ public class ToPir extends Traverser<PirObject, PirObject> {
     }
 
     pir.function.Function func;
-    if (obj instanceof FuncWithBody) {
-      if (obj instanceof FuncWithReturn) {
-        func = new FuncImplRet(name, arg);
-      } else {
-        func = new FuncImplVoid(name, arg);
-      }
+    pir.type.Type retType;
+    if (obj instanceof FuncWithReturn) {
+      retType = getType((pir.expression.reference.Reference) visit(((FuncWithReturn) obj).getRet(), param));
     } else {
-      if (obj instanceof FuncWithReturn) {
-        func = new FuncProtoRet(name, arg);
-      } else {
-        func = new FuncProtoVoid(name, arg);
-      }
+      retType = new pir.type.VoidType(VoidType.NAME); // FIXME get single void type instance
+    }
+
+    if (obj instanceof FuncWithBody) {
+      func = new FuncImpl(name, arg, retType);
+    } else {
+      func = new FuncProto(name, arg, retType);
     }
     func.getAttributes().addAll(obj.getAttributes());
 
     map.put(obj, func); // otherwise the compiler follows recursive calls
-
-    if (obj instanceof FuncWithReturn) {
-      pir.type.Type rettype = getType((pir.expression.Reference) visit(((FuncWithReturn) obj).getRet(), param));
-      ((FuncWithRet) func).setRetType(rettype);
-    }
 
     if (obj instanceof FuncWithBody) {
       pir.cfg.BasicBlockList stmt = (pir.cfg.BasicBlockList) visit(((FuncWithBody) obj).getBody(), param);
@@ -304,17 +282,8 @@ public class ToPir extends Traverser<PirObject, PirObject> {
   @Override
   protected pir.statement.CallStmt visitCallStmt(CallStmt obj, PirObject param) {
     PirObject call = visit(obj.getCall(), param);
-    assert (call instanceof pir.expression.Reference);
-    return new pir.statement.CallStmt((pir.expression.Reference) call);
-  }
-
-  @Override
-  protected pir.statement.Assignment visitAssignment(Assignment obj, PirObject param) {
-    PirObject dst = visit(obj.getLeft(), param);
-    PirObject src = visit(obj.getRight(), param);
-    assert (dst instanceof pir.expression.Reference);
-    assert (src instanceof PExpression);
-    return new pir.statement.Assignment((pir.expression.Reference) dst, (PExpression) src);
+    assert (call instanceof CallExpr);
+    return new pir.statement.CallStmt((CallExpr) call);
   }
 
   @Override
@@ -374,41 +343,6 @@ public class ToPir extends Traverser<PirObject, PirObject> {
   }
 
   @Override
-  protected PirObject visitArithmeticOp(ArithmeticOp obj, PirObject param) {
-    PirObject left = visit(obj.getLeft(), param);
-    PirObject right = visit(obj.getRight(), param);
-    assert (left instanceof PExpression);
-    assert (right instanceof PExpression);
-    return new pir.expression.ArithmeticOp((PExpression) left, (PExpression) right, toCOp(obj.getOp()));
-  }
-
-  private ArOp toCOp(ExpOp op) {
-    switch (op) {
-    case MUL:
-      return ArOp.MUL;
-    case PLUS:
-      return ArOp.PLUS;
-    case DIV:
-      return ArOp.DIV;
-    case MINUS:
-      return ArOp.MINUS;
-    case AND:
-      return ArOp.AND;
-    case OR:
-      return ArOp.OR;
-    case MOD:
-      return ArOp.MOD;
-    case SHL:
-      return ArOp.SHL;
-    case SHR:
-      return ArOp.SHR;
-    default: {
-      throw new RuntimeException("not yet implemented: " + op);
-    }
-    }
-  }
-
-  @Override
   protected PirObject visitBoolValue(BoolValue obj, PirObject param) {
     return new pir.expression.BoolValue(obj.isValue());
   }
@@ -442,7 +376,7 @@ public class ToPir extends Traverser<PirObject, PirObject> {
 
   @Override
   protected PirObject visitArray(Array obj, PirObject param) {
-    pir.type.Type type = getType((pir.expression.Reference) visit(obj.getType(), param));
+    pir.type.Type type = getType((pir.expression.reference.Reference) visit(obj.getType(), param));
     pir.type.Array ret = new pir.type.Array(obj.getName(), type, obj.getSize());
     return ret;
   }
@@ -479,7 +413,7 @@ public class ToPir extends Traverser<PirObject, PirObject> {
 
   @Override
   protected pir.type.Type visitTypeAlias(TypeAlias obj, PirObject param) {
-    pir.type.Type typ = getType((pir.expression.Reference) visit(obj.getRef(), param));
+    pir.type.Type typ = getType((pir.expression.reference.Reference) visit(obj.getRef(), param));
     return new pir.type.TypeAlias(obj.getName(), typ);
   }
 
@@ -500,21 +434,6 @@ public class ToPir extends Traverser<PirObject, PirObject> {
     pir.type.Type type = (pir.type.Type) visit(obj.getType(), null);
     PExpression def = (PExpression) visit(obj.getDef(), null);
     return new pir.other.Constant(obj.getName(), type, def);
-  }
-
-  @Override
-  protected PirObject visitNamespace(Namespace obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitNamedList(NamedList<Named> obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitIfaceUse(IfaceUse obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
   }
 
   @Override
@@ -556,151 +475,6 @@ public class ToPir extends Traverser<PirObject, PirObject> {
   }
 
   @Override
-  protected PirObject visitImplComposition(ImplComposition obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitConnection(Connection obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitConstPrivate(ConstPrivate obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitConstGlobal(ConstGlobal obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitFuncGlobal(FuncGlobal obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitImplHfsm(ImplHfsm obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitState(State obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitTransition(Transition obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitStateSimple(StateSimple obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitStateComposite(StateComposite obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitHfsmQueryFunction(HfsmQueryFunction obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitQueryItem(QueryItem obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitNamedElement(evl.type.composed.NamedElement obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitNaturalType(NaturalType obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitIntegerType(IntegerType obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitFuncProtoRet(evl.function.impl.FuncProtoRet obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitFuncInputHandlerEvent(FuncInputHandlerEvent obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitFuncInputHandlerQuery(FuncInputHandlerQuery obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitFuncPrivateVoid(FuncPrivateVoid obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitFuncPrivateRet(FuncPrivateRet obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitFuncProtoVoid(evl.function.impl.FuncProtoVoid obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitFuncSubHandlerQuery(FuncSubHandlerQuery obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitFuncSubHandlerEvent(FuncSubHandlerEvent obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitFunctionTypeVoid(FunctionTypeVoid obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitFunctionTypeRet(FunctionTypeRet obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitEndpointSelf(EndpointSelf obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitEndpointSub(EndpointSub obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitInterfaceType(InterfaceType obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitComponentType(ComponentType obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
   protected PirObject visitPhiStmt(PhiStmt obj, PirObject param) {
     pir.cfg.PhiStmt ret = new pir.cfg.PhiStmt((pir.other.SsaVariable) visit(obj.getVariable(), null));
     for (BasicBlock in : obj.getInBB()) {
@@ -726,18 +500,8 @@ public class ToPir extends Traverser<PirObject, PirObject> {
   }
 
   @Override
-  protected PirObject visitCaseGotoOpt(CaseGotoOpt obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitCaseGoto(CaseGoto obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
   protected PirObject visitIfGoto(IfGoto obj, PirObject param) {
-    return new pir.cfg.IfGoto( (PExpression) visit(obj.getCondition(),null),(pir.cfg.BasicBlock) visit(obj.getThenBlock(),null),(pir.cfg.BasicBlock) visit(obj.getElseBlock(),null) );
+    return new pir.cfg.IfGoto((PExpression) visit(obj.getCondition(), null), (pir.cfg.BasicBlock) visit(obj.getThenBlock(), null), (pir.cfg.BasicBlock) visit(obj.getElseBlock(), null));
   }
 
   @Override
@@ -752,7 +516,89 @@ public class ToPir extends Traverser<PirObject, PirObject> {
 
   @Override
   protected PirObject visitVarDefInitStmt(VarDefInitStmt obj, PirObject param) {
-    return new pir.statement.VarDefInitStmt((pir.other.SsaVariable) visit(obj.getVariable(), null), (PExpression) visit(obj.getInit(), null));
+    ToVariableGenerator converter = new ToVariableGenerator(this);
+    pir.other.SsaVariable var = (pir.other.SsaVariable) visit(obj.getVariable(), null);
+    return converter.traverse(obj.getInit(), var);
+  }
+
+  // TODO this handler should not be needed in the future
+  @Override
+  protected PirObject visitAssignment(Assignment obj, PirObject param) {
+    assert ((obj.getLeft().getLink() instanceof evl.variable.Variable) && obj.getLeft().getOffset().isEmpty());
+    pir.other.Variable var = (pir.other.Variable) visit(obj.getLeft().getLink(), null);
+    PExpression src = (PExpression) visit(obj.getRight(), null);
+    if (var instanceof pir.other.StateVariable) {
+      return new StoreStmt((pir.other.StateVariable) var, src);
+    }
+    if (var instanceof pir.other.SsaVariable) {
+      ToVariableGenerator converter = new ToVariableGenerator(this);
+      return converter.traverse(obj.getRight(), (pir.other.SsaVariable) var);
+    }
+    throw new RuntimeException("not yet implemented");
+  }
+
+}
+
+class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, pir.other.SsaVariable> {
+  private ToPir converter;
+
+  public ToVariableGenerator(ToPir converter) {
+    super();
+    this.converter = converter;
+  }
+
+  @Override
+  protected VariableGeneratorStmt visitDefault(Evl obj, pir.other.SsaVariable param) {
+    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+  }
+
+  @Override
+  protected VariableGeneratorStmt visitReference(Reference obj, pir.other.SsaVariable param) {
+    if ((obj.getLink() instanceof evl.variable.Variable) && obj.getOffset().isEmpty()) {
+      Variable var = (Variable) converter.traverse(obj.getLink(), null);
+      return new pir.statement.Assignment(param, var);
+    }
+    throw new RuntimeException("not yet implemented: " + obj);
+  }
+
+  @Override
+  protected VariableGeneratorStmt visitRelation(Relation obj, pir.other.SsaVariable param) {
+    PExpression left = (PExpression) converter.visit(obj.getLeft(), null);
+    PExpression right = (PExpression) converter.visit(obj.getRight(), null);
+    return new pir.statement.Relation(param, left, right, obj.getOp());
+  }
+
+  @Override
+  protected VariableGeneratorStmt visitArithmeticOp(ArithmeticOp obj, pir.other.SsaVariable param) {
+    PExpression left = (PExpression) converter.visit(obj.getLeft(), null);
+    PExpression right = (PExpression) converter.visit(obj.getRight(), null);
+    return new pir.statement.ArithmeticOp(param, left, right, toCOp(obj.getOp()));
+  }
+
+  private ArOp toCOp(ExpOp op) {
+    switch (op) {
+    case MUL:
+      return ArOp.MUL;
+    case PLUS:
+      return ArOp.PLUS;
+    case DIV:
+      return ArOp.DIV;
+    case MINUS:
+      return ArOp.MINUS;
+    case AND:
+      return ArOp.AND;
+    case OR:
+      return ArOp.OR;
+    case MOD:
+      return ArOp.MOD;
+    case SHL:
+      return ArOp.SHL;
+    case SHR:
+      return ArOp.SHR;
+    default: {
+      throw new RuntimeException("not yet implemented: " + op);
+    }
+    }
   }
 
 }

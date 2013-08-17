@@ -30,6 +30,6 @@ public class UnaryExpression extends Expression {
 
   @Override
   public String toString() {
-    return "(" + op + expr + ")";
+    return "(" + op + " " + expr + ")";
   }
 }

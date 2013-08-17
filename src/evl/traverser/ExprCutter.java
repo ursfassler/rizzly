@@ -10,6 +10,7 @@ import common.NameFactory;
 import evl.Evl;
 import evl.NullTraverser;
 import evl.cfg.BasicBlock;
+import evl.cfg.IfGoto;
 import evl.composition.ImplComposition;
 import evl.expression.ArithmeticOp;
 import evl.expression.BoolValue;
@@ -36,13 +37,15 @@ import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.type.Type;
 import evl.type.base.Range;
 import evl.variable.SsaVariable;
+import evl.variable.Variable;
 
+//TODO also split relation operands (only ref to var or constant)
 //TODO check if everything is still ok
 /**
  * Splits expression down to two operands per expression and maximal one function call.
- *
+ * 
  * @author urs
- *
+ * 
  */
 public class ExprCutter extends NullTraverser<Void, Void> {
   private StmtTraverser st;
@@ -134,7 +137,7 @@ class StmtTraverser extends ExprReplacer<List<Statement>> {
   private SsaVariable extract(Expression obj, List<Statement> param) {
     ElementInfo info = obj.getInfo();
     SsaVariable var = new SsaVariable(info, NameFactory.getNew(), getType(obj));
-    param.add(new VarDefInitStmt(info, var, obj ));
+    param.add(new VarDefInitStmt(info, var, obj));
     return var;
   }
 
@@ -147,10 +150,12 @@ class StmtTraverser extends ExprReplacer<List<Statement>> {
       visit(stmt, sl);
       sl.add(stmt);
     }
+    visit(obj.getEnd(), sl);
+    
     obj.getCode().clear();
     obj.getCode().addAll(sl);
 
-    visit(obj.getEnd(),sl);
+    
     return null;
   }
 
@@ -220,6 +225,25 @@ class StmtTraverser extends ExprReplacer<List<Statement>> {
     obj.setRight(visit(obj.getRight(), param));
     SsaVariable var = extract(obj, param);
     return new Reference(obj.getInfo(), var);
+  }
+
+  @Override
+  protected Expression visitIfGoto(IfGoto obj, List<Statement> param) {
+    boolean doChange;
+    if (obj.getCondition() instanceof Reference) {
+      Reference ref = (Reference) obj.getCondition();
+      doChange = !(ref.getLink() instanceof Variable);
+    } else {
+      doChange = true;
+    }
+    if (doChange) {
+      SsaVariable var = extract(obj.getCondition(), param);
+      obj.setCondition(new Reference(obj.getInfo(), var));
+    } else {
+      super.visitIfGoto(obj, param);
+    }
+    return null;
+
   }
 
 }

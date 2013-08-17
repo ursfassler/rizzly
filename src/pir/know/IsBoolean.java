@@ -2,15 +2,15 @@ package pir.know;
 
 import pir.NullTraverser;
 import pir.PirObject;
-import pir.expression.ArithmeticOp;
 import pir.expression.Number;
 import pir.expression.PExpression;
-import pir.expression.Reference;
 import pir.expression.Relation;
 import pir.expression.UnaryExpr;
 import pir.expression.reference.RefHead;
+import pir.expression.reference.Reference;
 import pir.function.Function;
 import pir.other.Variable;
+import pir.statement.ArithmeticOp;
 import pir.type.BooleanType;
 import pir.type.Type;
 

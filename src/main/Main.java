@@ -15,6 +15,7 @@ import pir.other.Program;
 import pir.traverser.BitStretcher;
 import pir.traverser.CaserangeReduction;
 import pir.traverser.EnumElementConstPropagation;
+import pir.traverser.LlvmWriter;
 import pir.traverser.PirPrinter;
 import pir.traverser.RangeReplacer;
 import pir.traverser.ToC;
@@ -114,10 +115,13 @@ public class Main {
     evl.doc.PrettyPrinter.print(prg, debugdir + "beforePir.rzy");
     Program prog = (Program) evl.traverser.ToPir.process(prg);
 
-    cir.other.Program cprog = makeC(debugdir, prog);
+    RangeReplacer.process(prog);
+    LlvmWriter.print(prog, outdir + prg.getName() + ".ll");
 
-    printC(outdir, prg.getName(), cprog);
-    printFpcHeader(outdir, prg.getName(), cprog);
+//    cir.other.Program cprog = makeC(debugdir, prog);
+//
+//    printC(outdir, prg.getName(), cprog);
+//    printFpcHeader(outdir, prg.getName(), cprog);
   }
 
   private static cir.other.Program makeC(String debugdir, Program prog) {

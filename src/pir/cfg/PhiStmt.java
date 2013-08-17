@@ -10,7 +10,7 @@ import pir.other.SsaVariable;
 import pir.other.Variable;
 
 /**
- *
+ * 
  * @author urs
  */
 public class PhiStmt extends PirObject {

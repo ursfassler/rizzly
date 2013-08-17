@@ -120,11 +120,15 @@ class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
     BasicBlock bb = makeBb(obj.getInfo());
 
     for (Statement stmt : obj.getStatements()) {
-      bb = visit(stmt, bb);
-      if (bb.getEnd() != null) {
+      BasicBlock nbb = visit(stmt, bb);
+      if (nbb.getEnd() != null) {
         // TODO add warning for unreachable code?
-        return bb;
+        return nbb;
       }
+      if (nbb != bb) {
+        addGoto(bb, nbb);
+      }
+      bb = nbb;
     }
 
     return bb;

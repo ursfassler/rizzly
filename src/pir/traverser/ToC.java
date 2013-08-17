@@ -8,13 +8,10 @@ import java.util.Map;
 
 import pir.PirObject;
 import pir.Traverser;
-import pir.expression.ArOp;
-import pir.expression.ArithmeticOp;
 import pir.expression.ArrayValue;
 import pir.expression.BoolValue;
 import pir.expression.Number;
 import pir.expression.PExpression;
-import pir.expression.Reference;
 import pir.expression.RelOp;
 import pir.expression.Relation;
 import pir.expression.StringValue;
@@ -24,18 +21,21 @@ import pir.expression.reference.RefCall;
 import pir.expression.reference.RefHead;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
+import pir.expression.reference.Reference;
+import pir.function.FuncImpl;
+import pir.function.FuncProto;
 import pir.function.FuncWithBody;
 import pir.function.FuncWithRet;
 import pir.function.Function;
 import pir.function.impl.FuncImplRet;
-import pir.function.impl.FuncImplVoid;
 import pir.function.impl.FuncProtoRet;
-import pir.function.impl.FuncProtoVoid;
 import pir.know.IsBoolean;
 import pir.other.Constant;
 import pir.other.FuncVariable;
 import pir.other.Program;
 import pir.other.StateVariable;
+import pir.statement.ArOp;
+import pir.statement.ArithmeticOp;
 import pir.statement.Assignment;
 import pir.statement.Block;
 import pir.statement.CallStmt;
@@ -494,7 +494,7 @@ public class ToC extends Traverser<CirBase, Void> {
   }
 
   @Override
-  protected CirBase visitFuncImplVoid(FuncImplVoid obj, Void param) {
+  protected CirBase visitFuncImpl(FuncImpl obj, Void param) {
     throw new RuntimeException("not yet implemented");
   }
 
@@ -504,7 +504,7 @@ public class ToC extends Traverser<CirBase, Void> {
   }
 
   @Override
-  protected CirBase visitFuncProtoVoid(FuncProtoVoid obj, Void param) {
+  protected CirBase visitFuncProto(FuncProto obj, Void param) {
     throw new RuntimeException("not yet implemented");
   }
 

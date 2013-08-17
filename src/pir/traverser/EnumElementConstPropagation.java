@@ -1,16 +1,16 @@
 package pir.traverser;
 
-import pir.expression.ArithmeticOp;
 import pir.expression.ArrayValue;
 import pir.expression.BoolValue;
 import pir.expression.Number;
 import pir.expression.PExpression;
-import pir.expression.Reference;
 import pir.expression.Relation;
 import pir.expression.StringValue;
 import pir.expression.UnaryExpr;
 import pir.expression.reference.RefHead;
+import pir.expression.reference.Reference;
 import pir.other.Program;
+import pir.statement.ArithmeticOp;
 import pir.type.EnumElement;
 
 public class EnumElementConstPropagation extends ExprReplacer<Void> {

@@ -27,4 +27,11 @@ public class Range extends BaseType {
     return high;
   }
 
+  static public Range narrow(Range a, Range b) {
+    BigInteger low = a.getLow().max(b.getLow());
+    BigInteger high = a.getHigh().min(b.getHigh());
+    assert (low.compareTo(high) >= 0);
+    return new Range(low, high);
+  }
+
 }

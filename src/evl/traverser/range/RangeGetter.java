@@ -6,9 +6,11 @@ import java.util.Map;
 
 import evl.Evl;
 import evl.NullTraverser;
+import evl.expression.BoolValue;
 import evl.expression.Expression;
 import evl.expression.RelOp;
 import evl.expression.Relation;
+import evl.expression.UnaryExpression;
 import evl.expression.reference.Reference;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
@@ -18,24 +20,26 @@ import evl.type.base.Range;
 import evl.variable.Variable;
 
 //TODO implement everything left
-public class RangeUpdater extends NullTraverser<Void, Map<Variable, Range>> {
+public class RangeGetter extends NullTraverser<Void, Void> {
   private KnowledgeBase kb;
   private KnowBaseItem kbi;
+  private Map<Variable, Range> ranges = new HashMap<Variable, Range>();
 
-  public RangeUpdater(KnowledgeBase kb) {
+  public RangeGetter(KnowledgeBase kb) {
     super();
     this.kb = kb;
     kbi = kb.getEntry(KnowBaseItem.class);
   }
 
-  @Override
-  protected Void visitDefault(Evl obj, Map<Variable, Range> param) {
-    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+  public static Map<Variable, Range> getRange(Expression condition, KnowledgeBase kb) {
+    RangeGetter updater = new RangeGetter(kb);
+    updater.traverse(condition, null);
+    return updater.ranges;
   }
 
-  public static void process(Expression condition, Map<Variable, Range> varRange, KnowledgeBase kb) {
-    RangeUpdater updater = new RangeUpdater(kb);
-    updater.traverse(condition, varRange);
+  @Override
+  protected Void visitDefault(Evl obj, Void param) {
+    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
   public static Variable getDerefVar(Expression left) {
@@ -51,7 +55,7 @@ public class RangeUpdater extends NullTraverser<Void, Map<Variable, Range>> {
   }
 
   @Override
-  protected Void visitRelation(Relation obj, Map<Variable, Range> param) {
+  protected Void visitRelation(Relation obj, Void param) {
     {
       Variable lv = getDerefVar(obj.getLeft());
       if (lv != null) {
@@ -59,9 +63,9 @@ public class RangeUpdater extends NullTraverser<Void, Map<Variable, Range>> {
           Type rt = ExpressionTypeChecker.process(obj.getRight(), kb);
           if (rt instanceof Range) {
             Range rr = (Range) rt;
-            Range range = getRange(lv, param);
+            Range range = getRange(lv);
             range = adjustLeft(range, obj.getOp(), rr);
-            param.put(lv, range);
+            ranges.put(lv, range);
             return null;
           }
         }
@@ -86,17 +90,38 @@ public class RangeUpdater extends NullTraverser<Void, Map<Variable, Range>> {
       high = lr.getHigh().max(min);
       break;
     }
+    case EQUAL: {
+      low = rr.getLow().max(lr.getLow());
+      high = rr.getHigh().min(lr.getHigh());
+      break;
+    }
     default:
       throw new RuntimeException("not yet implemented: " + op);
     }
-    return kbi.getRangeType(low,high);
+    return kbi.getRangeType(low, high);
   }
 
-  private Range getRange(Variable var, Map<Variable, Range> map) {
-    if (map.containsKey(var)) {
-      return map.get(var);
+  private Range getRange(Variable var) {
+    if (ranges.containsKey(var)) {
+      return ranges.get(var);
     } else {
       return (Range) var.getType();
     }
   }
+
+  @Override
+  protected Void visitReference(Reference obj, Void param) {
+    return null;
+  }
+
+  @Override
+  protected Void visitUnaryExpression(UnaryExpression obj, Void param) {
+    return null; // TODO should we support it?
+  }
+
+  @Override
+  protected Void visitBoolValue(BoolValue obj, Void param) {
+    return null;
+  }
+
 }

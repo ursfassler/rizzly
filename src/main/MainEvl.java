@@ -79,7 +79,6 @@ import evl.traverser.iocheck.IoCheck;
 import evl.traverser.iocheck.StateReaderInfo;
 import evl.traverser.iocheck.StateWriterInfo;
 import evl.traverser.typecheck.TypeChecker;
-import evl.traverser.typecheck.VarInitCheck;
 import evl.traverser.typecheck.specific.CompInterfaceTypeChecker;
 import evl.type.Type;
 import evl.type.base.Array;
@@ -105,19 +104,17 @@ public class MainEvl {
       modelCheck(debugdir, aclasses, root, kb);
     }
 
-    KnowledgeBase knowledgeBase = kb;
-
     root = compositionReduction(aclasses, root);
     // TODO reimplement
-    // root = hfsmReduction(root, opt, debugdir, aclasses, knowledgeBase);
+    // root = hfsmReduction(root, opt, debugdir, aclasses, kb);
 
     PrettyPrinter.print(aclasses, debugdir + "reduced.rzy");
 
     // only for debugging
     // typecheck(classes, debugdir);
 
-    //TODO or before type check?
-    ExprCutter.process(aclasses, knowledgeBase);
+    // TODO or before type check?
+    ExprCutter.process(aclasses, kb);
     PrettyPrinter.print(aclasses, debugdir + "expr.rzy");
 
     if (opt.doDebugEvent()) {
@@ -221,8 +218,8 @@ public class MainEvl {
     TypeChecker.processList(aclasses, kb); // check statements
     CompInterfaceTypeChecker.process(aclasses, kb); // check interfaces against implementation
 
-    //TODO VarInit should be checked when translated into SSA
-//    VarInitCheck.process(aclasses);
+    // TODO VarInit should be checked when translated into SSA
+    // VarInitCheck.process(aclasses);
   }
 
   // TODO provide a call/connection graph in the error message

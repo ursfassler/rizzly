@@ -12,6 +12,7 @@ import pir.type.Array;
 import pir.type.BooleanType;
 import pir.type.EnumType;
 import pir.type.RangeType;
+import pir.type.SignedType;
 import pir.type.StringType;
 import pir.type.StructType;
 import pir.type.Type;
@@ -27,18 +28,28 @@ import pir.type.VoidType;
  *
  */
 public class RangeReplacer extends TypeReplacer<Void> {
-  private final Map<Integer, UnsignedType> uint = new HashMap<Integer, UnsignedType>();
+  private final Map<Integer, SignedType> inttypes = new HashMap<Integer, SignedType>();
 
-  public RangeReplacer(Collection<UnsignedType> uint) {
-    for (UnsignedType type : uint) {
-      this.uint.put(type.getHigh(), type);
+  public RangeReplacer(List<SignedType> uint) {
+    for( SignedType type : uint ){
+      inttypes.put(type.getBits(), type);
     }
   }
 
+  private SignedType getInt( int bits ){
+    SignedType ret = inttypes.get(bits);
+    if( ret == null ){
+      ret = new SignedType(bits);
+      inttypes.put(bits, ret);
+    }
+    assert( ret != null );
+    return ret;
+  }
+  
   public static void process(Program obj) {
-    List<UnsignedType> uint = (new Getter<UnsignedType, Void>() {
+    List<SignedType> uint = (new Getter<SignedType, Void>() {
       @Override
-      protected Void visitUnsignedType(UnsignedType obj, Void param) {
+      protected Void visitSignedType(SignedType obj, Void param) {
         return add(obj);
       }
     }).get(obj, null);
@@ -68,35 +79,27 @@ public class RangeReplacer extends TypeReplacer<Void> {
   protected Type visitRangeType(RangeType obj, Void param) {
     // TODO implement also for signed
     // TODO add range offset movement (i.e. move R{10,20} to R{0,10})
-    assert (obj.getLow().compareTo(BigInteger.ZERO) >= 0);
-
-    int bits;
-
-    if (isLEQ(obj, 255)) {
-      bits = 8;
-    } else if (isLEQ(obj, 65535)) {
-      bits = 16;
-    } else if (isLEQ(obj, 4294967295l)) {
-      bits = 16;
-    } else {
-      throw new RuntimeException("not yet implemented");
+    BigInteger low = obj.getLow();
+    boolean hasNeg = low.compareTo(BigInteger.ZERO) < 0; //TODO ok?
+    if( hasNeg ){
+      low = low.add(BigInteger.ONE).abs();
     }
-
-    UnsignedType ret = uint.get(bits);
-    if (ret == null) {
-      ret = new UnsignedType(bits);
-      uint.put(bits, ret);
-    }
+    BigInteger max = low.max(obj.getHigh());
+    int bits = getBits( max );
+    bits++;
+    
+    SignedType ret = getInt(bits);
     return ret;
   }
 
-  private boolean isLEQ(RangeType left, long right) {
-    return left.getHigh().compareTo(BigInteger.valueOf(right)) <= 0; // TODO ok?
-  }
-
-  @Override
-  protected Type visitUnsignedType(UnsignedType obj, Void param) {
-    return obj;
+  private int getBits(BigInteger val) {
+    assert( val.compareTo(BigInteger.ZERO) >= 0 );
+    int bits = 0;
+    while( !val.equals(BigInteger.ZERO) ){
+      val = val.shiftRight(1);
+      bits++;
+    }
+    return bits;
   }
 
   @Override
@@ -143,6 +146,16 @@ public class RangeReplacer extends TypeReplacer<Void> {
   @Override
   protected Type visitStringType(StringType obj, Void param) {
     return obj;
+  }
+
+  @Override
+  protected Type visitSignedType(SignedType obj, Void param) {
+    return obj;
+  }
+
+  @Override
+  protected Type visitUnsignedType(UnsignedType obj, Void param) {
+    throw new RuntimeException("there should be no UnsignedType in PIR");
   }
 
 }

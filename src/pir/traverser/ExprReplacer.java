@@ -8,12 +8,12 @@ import pir.expression.reference.RefCall;
 import pir.expression.reference.RefHead;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
+import pir.function.FuncImpl;
+import pir.function.FuncProto;
 import pir.function.FuncWithBody;
 import pir.function.Function;
 import pir.function.impl.FuncImplRet;
-import pir.function.impl.FuncImplVoid;
 import pir.function.impl.FuncProtoRet;
-import pir.function.impl.FuncProtoVoid;
 import pir.other.Constant;
 import pir.other.FuncVariable;
 import pir.other.Program;
@@ -256,7 +256,7 @@ abstract public class ExprReplacer<T> extends Traverser<PExpression, T> {
   }
 
   @Override
-  protected PExpression visitFuncImplVoid(FuncImplVoid obj, T param) {
+  protected PExpression visitFuncImpl(FuncImpl obj, T param) {
     throw new RuntimeException("not yet implemented");
   }
 
@@ -266,7 +266,7 @@ abstract public class ExprReplacer<T> extends Traverser<PExpression, T> {
   }
 
   @Override
-  protected PExpression visitFuncProtoVoid(FuncProtoVoid obj, T param) {
+  protected PExpression visitFuncProto(FuncProto obj, T param) {
     throw new RuntimeException("not yet implemented");
   }
 

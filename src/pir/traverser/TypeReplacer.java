@@ -3,48 +3,48 @@ package pir.traverser;
 import java.util.HashSet;
 
 import pir.Traverser;
-import pir.expression.ArithmeticOp;
+import pir.cfg.BasicBlock;
+import pir.cfg.BasicBlockList;
+import pir.cfg.CaseGoto;
+import pir.cfg.Goto;
+import pir.cfg.IfGoto;
+import pir.cfg.PhiStmt;
+import pir.cfg.ReturnExpr;
+import pir.cfg.ReturnVoid;
 import pir.expression.ArrayValue;
 import pir.expression.BoolValue;
 import pir.expression.Number;
-import pir.expression.Reference;
-import pir.expression.Relation;
 import pir.expression.StringValue;
 import pir.expression.UnaryExpr;
+import pir.expression.reference.CallExpr;
 import pir.expression.reference.RefCall;
 import pir.expression.reference.RefHead;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
+import pir.expression.reference.Reference;
+import pir.expression.reference.VarRef;
+import pir.function.FuncImpl;
+import pir.function.FuncProto;
 import pir.function.FuncWithBody;
-import pir.function.FuncWithRet;
 import pir.function.Function;
-import pir.function.impl.FuncImplRet;
-import pir.function.impl.FuncImplVoid;
-import pir.function.impl.FuncProtoRet;
-import pir.function.impl.FuncProtoVoid;
 import pir.other.Constant;
 import pir.other.FuncVariable;
 import pir.other.Program;
+import pir.other.SsaVariable;
 import pir.other.StateVariable;
 import pir.other.Variable;
+import pir.statement.ArithmeticOp;
 import pir.statement.Assignment;
-import pir.statement.Block;
 import pir.statement.CallStmt;
-import pir.statement.CaseEntry;
-import pir.statement.CaseOptRange;
-import pir.statement.CaseOptValue;
-import pir.statement.CaseStmt;
-import pir.statement.IfStmt;
-import pir.statement.IfStmtEntry;
-import pir.statement.ReturnValue;
-import pir.statement.ReturnVoid;
+import pir.statement.Relation;
+import pir.statement.StoreStmt;
 import pir.statement.VarDefStmt;
-import pir.statement.WhileStmt;
 import pir.type.EnumElement;
 import pir.type.EnumType;
 import pir.type.NamedElement;
 import pir.type.StringType;
 import pir.type.Type;
+import evl.function.impl.FuncProtoRet;
 
 abstract public class TypeReplacer<T> extends Traverser<Type, T> {
 
@@ -56,9 +56,7 @@ abstract public class TypeReplacer<T> extends Traverser<Type, T> {
 
   @Override
   protected Type visitFunction(Function obj, T param) {
-    if (obj instanceof FuncWithRet) {
-      ((FuncWithRet) obj).setRetType(visit(((FuncWithRet) obj).getRetType(), param));
-    }
+    obj.setRetType(visit(obj.getRetType(), param));
     visitList(obj.getArgument(), param);
     if (obj instanceof FuncWithBody) {
       visit(((FuncWithBody) obj).getBody(), param);
@@ -67,7 +65,7 @@ abstract public class TypeReplacer<T> extends Traverser<Type, T> {
   }
 
   @Override
-  protected Type visitFuncImplVoid(FuncImplVoid obj, T param) {
+  protected Type visitFuncImpl(FuncImpl obj, T param) {
     throw new RuntimeException("not yet implemented");
   }
 
@@ -77,7 +75,7 @@ abstract public class TypeReplacer<T> extends Traverser<Type, T> {
   }
 
   @Override
-  protected Type visitFuncProtoVoid(FuncProtoVoid obj, T param) {
+  protected Type visitFuncProto(FuncProto obj, T param) {
     throw new RuntimeException("not yet implemented");
   }
 
@@ -93,7 +91,15 @@ abstract public class TypeReplacer<T> extends Traverser<Type, T> {
 
   @Override
   protected Type visitRefHead(RefHead obj, T param) {
-    throw new RuntimeException("not yet implemented");
+    if (obj.getRef() instanceof Type) {
+      throw new RuntimeException("not yet implemented");
+    }
+    return null;
+  }
+
+  @Override
+  protected Type visitReturnVoid(ReturnVoid obj, T param) {
+    return null;
   }
 
   @Override
@@ -112,12 +118,7 @@ abstract public class TypeReplacer<T> extends Traverser<Type, T> {
   }
 
   @Override
-  protected Type visitReturnVoid(ReturnVoid obj, T param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Type visitReturnValue(ReturnValue obj, T param) {
+  protected Type visitReturnExpr(ReturnExpr obj, T param) {
     return null;
   }
 
@@ -125,26 +126,6 @@ abstract public class TypeReplacer<T> extends Traverser<Type, T> {
   protected Type visitEnumElement(EnumElement obj, T param) {
     obj.setType((EnumType) visit(obj.getType(), param));
     return null;
-  }
-
-  @Override
-  protected Type visitIfStmtEntry(IfStmtEntry obj, T param) {
-    return visit(obj.getCode(), param);
-  }
-
-  @Override
-  protected Type visitCaseEntry(CaseEntry obj, T param) {
-    return visit(obj.getCode(), param);
-  }
-
-  @Override
-  protected Type visitCaseOptValue(CaseOptValue obj, T param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Type visitCaseOptRange(CaseOptRange obj, T param) {
-    throw new RuntimeException("not yet implemented");
   }
 
   @Override
@@ -185,12 +166,14 @@ abstract public class TypeReplacer<T> extends Traverser<Type, T> {
 
   @Override
   protected Type visitNumber(Number obj, T param) {
-    throw new RuntimeException("not yet implemented");
+    return null;
   }
 
   @Override
   protected Type visitArithmeticOp(ArithmeticOp obj, T param) {
-    throw new RuntimeException("not yet implemented");
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
   }
 
   @Override
@@ -200,12 +183,15 @@ abstract public class TypeReplacer<T> extends Traverser<Type, T> {
 
   @Override
   protected Type visitRelation(Relation obj, T param) {
-    throw new RuntimeException("not yet implemented");
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
   }
 
   @Override
   protected Type visitReference(Reference obj, T param) {
-    throw new RuntimeException("not yet implemented");
+    visit(obj.getRef(), param);
+    return null;
   }
 
   @Override
@@ -225,31 +211,6 @@ abstract public class TypeReplacer<T> extends Traverser<Type, T> {
   }
 
   @Override
-  protected Type visitCaseStmt(CaseStmt obj, T param) {
-    visitList(obj.getEntries(), param);
-    visit(obj.getOtherwise(), param);
-    return null;
-  }
-
-  @Override
-  protected Type visitWhile(WhileStmt obj, T param) {
-    return visit(obj.getBlock(), param);
-  }
-
-  @Override
-  protected Type visitIfStmt(IfStmt obj, T param) {
-    visitList(obj.getOption(), param);
-    visit(obj.getDef(), param);
-    return null;
-  }
-
-  @Override
-  protected Type visitBlock(Block obj, T param) {
-    visitList(obj.getStatement(), param);
-    return null;
-  }
-
-  @Override
   protected Type visitProgram(Program obj, T param) {
     visitList(obj.getConstant(), param);
     visitList(obj.getFunction(), param);
@@ -264,4 +225,63 @@ abstract public class TypeReplacer<T> extends Traverser<Type, T> {
     visitList(obj.getVariable(), param);
     return null;
   }
+
+  @Override
+  protected Type visitPhiStmt(PhiStmt obj, T param) {
+    visit(obj.getVariable(), param);
+    return null;
+  }
+
+  @Override
+  protected Type visitGoto(Goto obj, T param) {
+    return null;
+  }
+
+  @Override
+  protected Type visitSsaVariable(SsaVariable obj, T param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Type visitBasicBlock(BasicBlock obj, T param) {
+    visitList(obj.getPhi(), param);
+    visitList(obj.getCode(), param);
+    visit(obj.getEnd(), param);
+    return null;
+  }
+
+  @Override
+  protected Type visitBasicBlockList(BasicBlockList obj, T param) {
+    visitList(obj.getBasicBlocks(), param);
+    return null;
+  }
+
+  @Override
+  protected Type visitCaseGoto(CaseGoto obj, T param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Type visitIfGoto(IfGoto obj, T param) {
+    visit(obj.getCondition(), param);
+    return null;
+  }
+
+  @Override
+  protected Type visitStoreStmt(StoreStmt obj, T param) {
+    visit(obj.getSrc(), param);
+    visit(obj.getDst(), param);
+    return null;
+  }
+
+  @Override
+  protected Type visitCallExpr(CallExpr obj, T param) {
+    return null;
+  }
+
+  @Override
+  protected Type visitVarRef(VarRef obj, T param) {
+    return null;
+  }
+
 }

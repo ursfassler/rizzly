@@ -1,8 +1,10 @@
 package evl.traverser.typecheck.specific;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import util.ssa.PhiInserter;
 import error.ErrorType;
@@ -31,7 +33,7 @@ import evl.statement.Statement;
 import evl.statement.VarDefInitStmt;
 import evl.statement.VarDefStmt;
 import evl.traverser.range.CaseRangeUpdater;
-import evl.traverser.range.RangeUpdater;
+import evl.traverser.range.RangeGetter;
 import evl.traverser.typecheck.LeftIsContainerOfRightTest;
 import evl.type.Type;
 import evl.type.base.BooleanType;
@@ -41,32 +43,40 @@ import evl.variable.FuncVariable;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
 
+//TODO check return type at a different place
 //TODO before this step, replace case statements with a boolean condition with an if statement
 public class StatementTypeChecker extends NullTraverser<Void, Map<Variable, Range>> {
   private KnowledgeBase kb;
   private KnowBaseItem kbi;
   private Type funcReturn;
   private Map<BasicBlock, Map<Variable, Range>> map = new HashMap<BasicBlock, Map<Variable, Range>>();
+  private Map<Variable, Range> ranges;
 
-  public StatementTypeChecker(KnowledgeBase kb, Type funcReturn) {
+  public StatementTypeChecker(KnowledgeBase kb, Type funcReturn, Map<Variable, Range> ranges) {
     super();
     this.kb = kb;
     kbi = kb.getEntry(KnowBaseItem.class);
     this.funcReturn = funcReturn;
+    this.ranges = ranges;
+  }
+
+  public static void process(BasicBlockList obj, Type funcReturn, Map<Variable, Range> ranges, KnowledgeBase kb) {
+    StatementTypeChecker adder = new StatementTypeChecker(kb, funcReturn, ranges);
+    adder.traverse(obj, null);
   }
 
   public static void process(BasicBlockList obj, Type funcReturn, KnowledgeBase kb) {
-    StatementTypeChecker adder = new StatementTypeChecker(kb, funcReturn);
+    StatementTypeChecker adder = new StatementTypeChecker(kb, funcReturn, new HashMap<Variable, Range>());
     adder.traverse(obj, null);
   }
 
   public static void process(Statement obj, Type funcReturn, KnowledgeBase kb) {
-    StatementTypeChecker adder = new StatementTypeChecker(kb, funcReturn);
+    StatementTypeChecker adder = new StatementTypeChecker(kb, funcReturn, new HashMap<Variable, Range>());
     adder.traverse(obj, new HashMap<Variable, Range>());
   }
 
   public static void process(Variable obj, KnowledgeBase kb) {
-    StatementTypeChecker adder = new StatementTypeChecker(kb, null);
+    StatementTypeChecker adder = new StatementTypeChecker(kb, null, new HashMap<Variable, Range>());
     adder.traverse(obj, null);
   }
 
@@ -77,7 +87,14 @@ public class StatementTypeChecker extends NullTraverser<Void, Map<Variable, Rang
   }
 
   private void updateRange(Expression condition, Map<Variable, Range> param) {
-    RangeUpdater.process(condition, param, kb);
+    Map<Variable, Range> varRange = RangeGetter.getRange(condition, kb);
+    for (Variable var : varRange.keySet()) {
+      Range range = varRange.get(var);
+      if (param.containsKey(var)) {
+        range = Range.narrow(param.get(var), varRange.get(var));
+      }
+      param.put(var, range);
+    }
   }
 
   private Range getRange(Variable var, List<CaseOptEntry> values) {
@@ -233,12 +250,23 @@ public class StatementTypeChecker extends NullTraverser<Void, Map<Variable, Rang
   @Override
   protected Void visitBasicBlock(BasicBlock obj, Map<Variable, Range> param) {
     assert (param == null);
-    param = map.get(obj);
-    assert (param != null);
+    param = narrowAll(map.get(obj), ranges);
     visitList(obj.getPhi(), param);
     visitList(obj.getCode(), param);
     visit(obj.getEnd(), param);
     return null;
+  }
+
+  private Map<Variable, Range> narrowAll(Map<Variable, Range> a, Map<Variable, Range> b) {
+    Map<Variable, Range> ret = new HashMap<Variable, Range>();
+    ret.putAll(a);
+    ret.putAll(b);
+    Set<Variable> vars = new HashSet<Variable>(a.keySet());
+    vars.retainAll(b.keySet());
+    for (Variable var : vars) {
+      ret.put(var, Range.narrow(a.get(var), b.get(var)));
+    }
+    return ret;
   }
 
   @Override

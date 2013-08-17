@@ -1,19 +1,11 @@
 package pir.cfg;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-
-import org.jgrapht.DirectedGraph;
 
 import pir.PirObject;
 import pir.expression.reference.Referencable;
 import pir.statement.Statement;
-
-import util.ssa.BaseGraph;
-import util.ssa.BbEdge;
-
-import common.ElementInfo;
 
 // Named since Phi statements references basic blocks
 public class BasicBlock extends PirObject implements Referencable {
@@ -55,19 +47,4 @@ public class BasicBlock extends PirObject implements Referencable {
     return phi;
   }
 
-  public static DirectedGraph<BasicBlock, BbEdge> makeFuncGraph(Collection<BasicBlock> bbs) {
-    DirectedGraph<BasicBlock, BbEdge> g = new BaseGraph<BasicBlock, BbEdge>();
-
-    for (BasicBlock u : bbs) {
-      g.addVertex(u);
-      BasicBlockEnd bbe = u.getEnd();
-      for (BasicBlock v : bbe.getJumpDst()) {
-        g.addVertex(v);
-        BbEdge e = new BbEdge(u, v);
-        g.addEdge(u, v, e);
-      }
-    }
-
-    return g;
-  }
 }

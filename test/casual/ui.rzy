@@ -1,22 +1,22 @@
 
 interface
   Mode
-    function setTime( seconds: U{17} );
-    function showTime( seconds: U{17} );
+    function setTime( seconds: R{0,86399} );
+    function showTime( seconds: R{0,86399} );
   end
   
   TimeDisplay
-    function time( hour: U{5}; minute, second: U{6} );
+    function time( hour: R{0,23}; minute, second: R{0,59} );
   end  
   
   Time
-    function time( seconds: U{17} );
+    function time( seconds: R{0,86399} );
   end
   
   TimeConfig
-    function time( seconds: U{17} );
+    function time( seconds: R{0,86399} );
     function hasValidTime():Boolean;
-    function getTime():U{17};
+    function getTime():R{0,86399};
   end
   
   GenericEvent
@@ -44,10 +44,10 @@ component
   implementation hfsm( Top )
     state Top( ShowTime )
       var
-        shour:    U{5};
-        smin:     U{6};
+        shour:    R{0,23};
+        smin:     R{0,59};
       
-      function config.getTime():U{17}
+      function config.getTime():R{0,86399}
         return  0;
       end
       
@@ -56,25 +56,25 @@ component
       end
 
       transition 
-        Top to ShowTime by control.showTime( seconds: U{17} ) do
-          timeDisp.time( (seconds / (60*60)) and 31, (seconds / 60) mod 60, seconds mod 60 );
+        Top to ShowTime by control.showTime( seconds: R{0,86399} ) do
+          timeDisp.time( seconds / (60*60), (seconds / 60) mod 60, seconds mod 60 );
         end
 
-        Top to SetTime by control.setTime( seconds: U{17} ) do
-          shour   := (seconds / (60*60)) and 24;
+        Top to SetTime by control.setTime( seconds: R{0,86399} ) do
+          shour   := seconds / (60*60);
           smin    := (seconds / 60) mod 60;
           timeDisp.time( shour, smin, seconds mod 60 );
         end
 
-        SetTime to ShowTime by control.showTime( seconds: U{17} ) do
-          timeDisp.time( (seconds / (60*60)) and 31, (seconds / 60) mod 60, seconds mod 60 );
+        SetTime to ShowTime by control.showTime( seconds: R{0,86399} ) do
+          timeDisp.time( seconds / (60*60), (seconds / 60) mod 60, seconds mod 60 );
         end
 
 
       state ShowTime
         transition 
-          ShowTime to ShowTime by time.time( seconds: U{17} ) do
-            timeDisp.time( (seconds / (60*60)) and 31, (seconds / 60) mod 60, seconds mod 60 );
+          ShowTime to ShowTime by time.time( seconds: R{0,86399} ) do
+            timeDisp.time( seconds / (60*60), (seconds / 60) mod 60, seconds mod 60 );
           end
       end
 
@@ -86,11 +86,11 @@ component
         var
           write:    Boolean;
         
-        function config.getTime():U{17}
+        function config.getTime():R{0,86399}
           if write then
             return  ((shour*60)+smin)*60;
           else
-            return -1;
+            return 0;
           end
         end
         
@@ -122,7 +122,7 @@ component
             timer   := 80;
           end
           var
-            timer   : U{7};
+            timer   : R{0,80};
           transition 
             Visible to Visible by tick.evt() if timer > 0 do
               timer := timer - 1;
@@ -138,7 +138,7 @@ component
             visible.switch( True );
           end
           var
-            timer   : U{5};
+            timer   : R{0,20};
             
           transition 
             Hidden to Hidden by tick.evt() if timer > 0 do
