@@ -12,6 +12,7 @@ import java.util.Set;
 import org.jgrapht.traverse.TopologicalOrderIterator;
 
 import pir.other.Program;
+import pir.traverser.BooleanReplacer;
 import pir.traverser.CaserangeReduction;
 import pir.traverser.EnumElementConstPropagation;
 import pir.traverser.GlobalReadExtracter;
@@ -99,6 +100,7 @@ public class Main {
     Program prog = (Program) evl.traverser.ToPir.process(prg);
 
     RangeReplacer.process(prog);
+    BooleanReplacer.process(prog);
     GlobalReadExtracter.process(prog);
     GlobalWriteExtracter.process(prog);
     
