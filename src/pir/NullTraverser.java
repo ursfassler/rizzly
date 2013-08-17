@@ -14,8 +14,6 @@ import pir.expression.Number;
 import pir.expression.StringValue;
 import pir.expression.UnaryExpr;
 import pir.expression.reference.CallExpr;
-import pir.expression.reference.RefCall;
-import pir.expression.reference.RefHead;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
 import pir.expression.reference.VarRef;
@@ -52,16 +50,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitArrayValue(ArrayValue obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitRefHead(RefHead obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitRefCall(RefCall obj, P param) {
     return doDefault(obj, param);
   }
 

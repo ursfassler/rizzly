@@ -2,11 +2,10 @@ package pir.statement;
 
 import pir.expression.PExpression;
 import pir.other.StateVariable;
-import pir.other.Variable;
 
 public class StoreStmt extends Statement {
   private StateVariable dst;
-  private PExpression src;      //TODO change to Variable
+  private PExpression src;
 
   public StoreStmt(StateVariable dst, PExpression src) {
     this.dst = dst;
@@ -31,7 +30,7 @@ public class StoreStmt extends Statement {
 
   @Override
   public String toString() {
-    return dst + " := " + src;
+    return "store " + dst + " := " + src;
   }
 
 }

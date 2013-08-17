@@ -17,11 +17,8 @@ import pir.expression.Number;
 import pir.expression.StringValue;
 import pir.expression.UnaryExpr;
 import pir.expression.reference.CallExpr;
-import pir.expression.reference.RefCall;
-import pir.expression.reference.RefHead;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
-import pir.expression.reference.Reference;
 import pir.expression.reference.VarRef;
 import pir.function.FuncImpl;
 import pir.function.FuncProto;
@@ -39,12 +36,12 @@ import pir.statement.CallStmt;
 import pir.statement.Relation;
 import pir.statement.StoreStmt;
 import pir.statement.VarDefStmt;
+import pir.statement.VariableGeneratorStmt;
 import pir.type.EnumElement;
 import pir.type.EnumType;
 import pir.type.NamedElement;
 import pir.type.StringType;
 import pir.type.Type;
-import evl.function.impl.FuncProtoRet;
 
 abstract public class TypeReplacer<T> extends Traverser<Type, T> {
 
@@ -70,17 +67,7 @@ abstract public class TypeReplacer<T> extends Traverser<Type, T> {
   }
 
   @Override
-  protected Type visitFuncImplRet(FuncImplRet obj, T param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
   protected Type visitFuncProto(FuncProto obj, T param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Type visitFuncProtoRet(FuncProtoRet obj, T param) {
     throw new RuntimeException("not yet implemented");
   }
 
@@ -90,21 +77,8 @@ abstract public class TypeReplacer<T> extends Traverser<Type, T> {
   }
 
   @Override
-  protected Type visitRefHead(RefHead obj, T param) {
-    if (obj.getRef() instanceof Type) {
-      throw new RuntimeException("not yet implemented");
-    }
-    return null;
-  }
-
-  @Override
   protected Type visitReturnVoid(ReturnVoid obj, T param) {
     return null;
-  }
-
-  @Override
-  protected Type visitRefCall(RefCall obj, T param) {
-    throw new RuntimeException("not yet implemented");
   }
 
   @Override
@@ -170,6 +144,13 @@ abstract public class TypeReplacer<T> extends Traverser<Type, T> {
   }
 
   @Override
+  protected Type visitVariableGeneratorStmt(VariableGeneratorStmt obj, T param) {
+    visit(obj.getVariable(),param);
+    super.visitVariableGeneratorStmt(obj, param);
+    return null;
+  }
+
+  @Override
   protected Type visitArithmeticOp(ArithmeticOp obj, T param) {
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
@@ -185,12 +166,6 @@ abstract public class TypeReplacer<T> extends Traverser<Type, T> {
   protected Type visitRelation(Relation obj, T param) {
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
-    return null;
-  }
-
-  @Override
-  protected Type visitReference(Reference obj, T param) {
-    visit(obj.getRef(), param);
     return null;
   }
 

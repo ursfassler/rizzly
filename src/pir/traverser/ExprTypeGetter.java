@@ -6,8 +6,6 @@ import pir.expression.BoolValue;
 import pir.expression.Number;
 import pir.expression.PExpression;
 import pir.expression.UnaryExpr;
-import pir.expression.reference.RefCall;
-import pir.expression.reference.RefHead;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
 import pir.expression.reference.VarRef;
@@ -33,16 +31,6 @@ public class ExprTypeGetter extends NullTraverser<Type, Void> {
   @Override
   protected Type visitVarRef(VarRef obj, Void param) {
     return visit(obj.getRef(), param);
-  }
-
-  @Override
-  protected Type visitRefHead(RefHead obj, Void param) {
-    return visit((PirObject) obj.getRef(), param);
-  }
-
-  @Override
-  protected Type visitRefCall(RefCall obj, Void param) {
-    throw new RuntimeException("not yet implemented");
   }
 
   @Override

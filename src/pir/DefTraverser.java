@@ -14,8 +14,6 @@ import pir.expression.Number;
 import pir.expression.StringValue;
 import pir.expression.UnaryExpr;
 import pir.expression.reference.CallExpr;
-import pir.expression.reference.RefCall;
-import pir.expression.reference.RefHead;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
 import pir.expression.reference.VarRef;
@@ -140,27 +138,13 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitRefCall(RefCall obj, P param) {
-    visit(obj.getPrevious(), param);
-    visitList(obj.getParameter(), param);
-    return null;
-  }
-
-  @Override
   protected R visitRefName(RefName obj, P param) {
-    visit(obj.getPrevious(), param);
     return null;
   }
 
   @Override
   protected R visitRefIndex(RefIndex obj, P param) {
-    visit(obj.getPrevious(), param);
     visit(obj.getIndex(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitRefHead(RefHead obj, P param) {
     return null;
   }
 

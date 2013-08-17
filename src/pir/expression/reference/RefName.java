@@ -1,10 +1,9 @@
 package pir.expression.reference;
 
-final public class RefName extends RefMiddle {
+final public class RefName extends RefItem {
   final private String name;
 
-  public RefName(RefItem previous, String name) {
-    super(previous);
+  public RefName(String name) {
     this.name = name;
   }
 

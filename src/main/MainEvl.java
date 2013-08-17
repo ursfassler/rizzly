@@ -12,8 +12,8 @@ import java.util.Map;
 import java.util.Set;
 
 import joGraph.HtmlGraphWriter;
-import pir.expression.reference.RefHead;
 import util.SimpleGraph;
+import cir.expression.reference.RefHead;
 
 import common.Designator;
 import common.Direction;
@@ -225,7 +225,7 @@ public class MainEvl {
   // TODO provide a call/connection graph in the error message
   /**
    * Checks that Run To Completion semantic is not violated, i.e. that calls on component is a DAG
-   *
+   * 
    * @param kb
    */
   private static void checkForRtcViolation(Namespace aclasses, KnowledgeBase kb) {
@@ -286,9 +286,9 @@ public class MainEvl {
   // TODO do test in FUN part, issues warnings only once for parameterized components.
   /**
    * Checks if there is a input and output data flow. Gives a warning otherwise.
-   *
+   * 
    * A component with only input or output data flow can not do a lot (or not more than a global function can do).
-   *
+   * 
    * @param aclasses
    */
   private static void checkUsefullness(Namespace aclasses) {
@@ -335,7 +335,7 @@ public class MainEvl {
   /**
    * Throws an error if an interface in the top component contains a query. Because we have to be sure that queries are
    * implement correctly.
-   *
+   * 
    * @param root
    * @param rootdir
    */

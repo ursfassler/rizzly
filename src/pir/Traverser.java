@@ -19,11 +19,8 @@ import pir.expression.PExpression;
 import pir.expression.StringValue;
 import pir.expression.UnaryExpr;
 import pir.expression.reference.CallExpr;
-import pir.expression.reference.RefCall;
-import pir.expression.reference.RefHead;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefItem;
-import pir.expression.reference.RefMiddle;
 import pir.expression.reference.RefName;
 import pir.expression.reference.VarRef;
 import pir.function.FuncImpl;
@@ -38,6 +35,7 @@ import pir.other.Variable;
 import pir.statement.ArithmeticOp;
 import pir.statement.Assignment;
 import pir.statement.CallStmt;
+import pir.statement.LoadStmt;
 import pir.statement.Relation;
 import pir.statement.Statement;
 import pir.statement.StoreStmt;
@@ -126,19 +124,8 @@ abstract public class Traverser<R, P> {
   }
 
   protected R visitRefItem(RefItem obj, P param) {
-    if (obj instanceof RefMiddle)
-      return visitRefMiddle((RefMiddle) obj, param);
-    else if (obj instanceof RefHead)
-      return visitRefHead((RefHead) obj, param);
-    else
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
-  }
-
-  protected R visitRefMiddle(RefMiddle obj, P param) {
     if (obj instanceof RefName)
       return visitRefName((RefName) obj, param);
-    else if (obj instanceof RefCall)
-      return visitRefCall((RefCall) obj, param);
     else if (obj instanceof RefIndex)
       return visitRefIndex((RefIndex) obj, param);
     else
@@ -184,6 +171,8 @@ abstract public class Traverser<R, P> {
       return visitArithmeticOp((ArithmeticOp) obj, param);
     else if (obj instanceof Relation)
       return visitRelation((Relation) obj, param);
+    else if (obj instanceof LoadStmt)
+      return visitLoadStmt((LoadStmt) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
@@ -258,10 +247,6 @@ abstract public class Traverser<R, P> {
 
   protected abstract R visitCaseGoto(CaseGoto obj, P param);
 
-  protected abstract R visitRefHead(RefHead obj, P param);
-
-  protected abstract R visitRefCall(RefCall obj, P param);
-
   protected abstract R visitRefIndex(RefIndex obj, P param);
 
   protected abstract R visitRefName(RefName obj, P param);
@@ -299,6 +284,8 @@ abstract public class Traverser<R, P> {
   protected abstract R visitStringValue(StringValue obj, P param);
 
   protected abstract R visitRelation(Relation obj, P param);
+
+  protected abstract R visitLoadStmt(LoadStmt obj, P param);
 
   protected abstract R visitArithmeticOp(ArithmeticOp obj, P param);
 
