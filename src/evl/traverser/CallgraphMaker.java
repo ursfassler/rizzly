@@ -18,7 +18,7 @@ import evl.hfsm.Transition;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowChild;
 import evl.knowledge.KnowledgeBase;
-import evl.type.base.Array;
+import evl.type.base.ArrayType;
 import evl.variable.Variable;
 
 /**
@@ -124,7 +124,7 @@ class RefChecker extends NullTraverser<Evl, Evl> {
   @Override
   protected Evl visitRefIndex(RefIndex obj, Evl param) {
     Variable var = (Variable) param;
-    Array type = (Array) var.getType();
+    ArrayType type = (ArrayType) var.getType();
     return type.getType().getLink();
   }
 

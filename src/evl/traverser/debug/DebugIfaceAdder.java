@@ -9,6 +9,9 @@ import common.ElementInfo;
 
 import evl.Evl;
 import evl.NullTraverser;
+import evl.cfg.BasicBlock;
+import evl.cfg.BasicBlockList;
+import evl.cfg.ReturnVoid;
 import evl.composition.ImplComposition;
 import evl.expression.ArithmeticOp;
 import evl.expression.ExpOp;
@@ -29,18 +32,18 @@ import evl.other.Namespace;
 import evl.statement.Assignment;
 import evl.statement.CallStmt;
 import evl.statement.VarDefStmt;
-import evl.type.base.Array;
+import evl.type.base.ArrayType;
 import evl.type.base.Range;
 import evl.variable.FuncVariable;
 
 public class DebugIfaceAdder extends NullTraverser<Void, Void> {
   private Interface debugIface;
-  private Array arrayType;
+  private ArrayType arrayType;
   private Range sizeType;
   private ArrayList<String> names;
   static private ElementInfo info = new ElementInfo();
 
-  public DebugIfaceAdder(Array arrayType, Range sizeType, Interface debugIface, ArrayList<String> names) {
+  public DebugIfaceAdder(ArrayType arrayType, Range sizeType, Interface debugIface, ArrayList<String> names) {
     super();
     this.names = names;
     this.debugIface = debugIface;
@@ -48,12 +51,12 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     this.sizeType = sizeType;
   }
 
-  public static void process(Evl obj, Array arrayType, Range sizeType, Interface debugIface, ArrayList<String> names) {
+  public static void process(Evl obj, ArrayType arrayType, Range sizeType, Interface debugIface, ArrayList<String> names) {
     DebugIfaceAdder reduction = new DebugIfaceAdder(arrayType, sizeType, debugIface, names);
     reduction.traverse(obj, null);
   }
 
-  public FuncSubHandlerEvent makeRecvProto(Array arrayType, Range sizeType) {
+  public FuncSubHandlerEvent makeRecvProto(ArrayType arrayType, Range sizeType) {
     ListOfNamed<FuncVariable> param = new ListOfNamed<FuncVariable>();
     FuncVariable sender = new FuncVariable(info, "receiver", arrayType);
     param.add(sender);
@@ -61,11 +64,11 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     param.add(size);
 
     FuncSubHandlerEvent func = new FuncSubHandlerEvent(info, "msgRecv", param);
-    func.setBody(new Block(info));
+    func.setBody(new BasicBlockList(info));
     return func;
   }
 
-  public FuncSubHandlerEvent makeSendProto(Array arrayType, Range sizeType) {
+  public FuncSubHandlerEvent makeSendProto(ArrayType arrayType, Range sizeType) {
     ListOfNamed<FuncVariable> param = new ListOfNamed<FuncVariable>();
     FuncVariable sender = new FuncVariable(info, "sender", arrayType);
     param.add(sender);
@@ -73,12 +76,12 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     param.add(size);
 
     FuncSubHandlerEvent func = new FuncSubHandlerEvent(info, "msgSend", param);
-    func.setBody(new Block(info));
+    func.setBody(new BasicBlockList(info));
     return func;
   }
 
-  private FuncPrivateVoid makeDebugSend(String callname, Array arrayType, Range sizeType, IfaceUse debugIfaceUse) {
-    Block body = new Block(info);
+  private FuncPrivateVoid makeDebugSend(String callname, ArrayType arrayType, Range sizeType, IfaceUse debugIfaceUse) {
+    BasicBlock body = new BasicBlock(info, "bodyBB");
 
     FuncVariable func = new FuncVariable(info, "func", sizeType);
     FuncVariable iface = new FuncVariable(info, "iface", sizeType);
@@ -87,21 +90,21 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     { // path : Array{D,N};
       path = new FuncVariable(info, "path", arrayType);
       VarDefStmt def = new VarDefStmt(info, path);
-      body.getStatements().add(def);
+      body.getCode().add(def);
     }
 
     { // path[0] := func;
       Reference arridx = new Reference(info, path);
       arridx.getOffset().add(new RefIndex(info, new Number(info, 0)));
       Assignment ass = new Assignment(info, arridx, new Reference(info, func));
-      body.getStatements().add(ass);
+      body.getCode().add(ass);
     }
 
     { // path[1] := iface;
       Reference arridx = new Reference(info, path);
       arridx.getOffset().add(new RefIndex(info, new Number(info, 1)));
       Assignment ass = new Assignment(info, arridx, new Reference(info, iface));
-      body.getStatements().add(ass);
+      body.getCode().add(ass);
     }
 
     { // _debug.msgSend( path, 2 );
@@ -113,15 +116,18 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
       call.getOffset().add(new RefName(info, callname));
       call.getOffset().add(new RefCall(info, actParam));
 
-      body.getStatements().add(new CallStmt(info, call));
+      body.getCode().add(new CallStmt(info, call));
     }
+    body.setEnd(new ReturnVoid(info));
 
     ListOfNamed<FuncVariable> param = new ListOfNamed<FuncVariable>();
     param.add(func);
     param.add(iface);
 
+    BasicBlockList bblist = new BasicBlockList(info);
+    bblist.getBasicBlocks().add(body);
     FuncPrivateVoid rfunc = new FuncPrivateVoid(info, "_" + callname, param);
-    rfunc.setBody(body);
+    rfunc.setBody(bblist);
 
     return rfunc;
   }
@@ -138,8 +144,8 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     return null;
   }
 
-  private Block makeCode(String callname, FuncVariable varArray, FuncVariable varSize, IfaceUse debug, String compName) {
-    Block ret = new Block(info);
+  private BasicBlockList makeCode(String callname, FuncVariable varArray, FuncVariable varSize, IfaceUse debug, String compName) {
+    BasicBlock bb = new BasicBlock(info, "bodyBB");
 
     int x = names.indexOf(compName);
     assert (x >= 0);
@@ -148,13 +154,13 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
       Reference arridx = new Reference(info, varArray);
       arridx.getOffset().add(new RefIndex(info, new Reference(info, varSize)));
       Assignment ass = new Assignment(info, arridx, new Number(info, x));
-      ret.getStatements().add(ass);
+      bb.getCode().add(ass);
     }
 
     { // size := size + 1;
       Expression expr = new ArithmeticOp(info, new Reference(info, varSize), new Number(info, 1), ExpOp.PLUS);
       Assignment ass = new Assignment(info, new Reference(info, varSize), expr);
-      ret.getStatements().add(ass);
+      bb.getCode().add(ass);
     }
 
     { // Self._debug.sendMsg( sender, size );
@@ -166,10 +172,15 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
       call.getOffset().add(new RefName(info, callname));
       call.getOffset().add(new RefCall(info, actParam));
 
-      ret.getStatements().add(new CallStmt(info, call));
+      bb.getCode().add(new CallStmt(info, call));
     }
 
-    return ret;
+    bb.setEnd(new ReturnVoid(info));
+
+    BasicBlockList bblist = new BasicBlockList(info);
+    bblist.getBasicBlocks().add(bb);
+
+    return bblist;
   }
 
   @Override

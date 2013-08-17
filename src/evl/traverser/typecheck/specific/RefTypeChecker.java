@@ -17,7 +17,7 @@ import evl.knowledge.KnowledgeBase;
 import evl.traverser.typecheck.LeftIsContainerOfRightTest;
 import evl.traverser.typecheck.TypeGetter;
 import evl.type.Type;
-import evl.type.base.Array;
+import evl.type.base.ArrayType;
 import evl.type.base.EnumType;
 import evl.type.base.FunctionType;
 import evl.type.base.FunctionTypeRet;
@@ -95,11 +95,11 @@ public class RefTypeChecker extends NullTraverser<Type, Type> {
   @Override
   protected Type visitRefIndex(RefIndex obj, Type sub) {
     Type index = ExpressionTypeChecker.process(obj.getIndex(), kb);
-    if (sub instanceof Array) {
+    if (sub instanceof ArrayType) {
       if (!LeftIsContainerOfRightTest.process(kbi.getIntegerType(), index, kb)) {
         RError.err(ErrorType.Error, obj.getInfo(), "need integer type to index array, got: " + index.getName());
       }
-      Type ret = visit(((Array) sub).getType(), null);
+      Type ret = visit(((ArrayType) sub).getType(), null);
       return ret;
     } else {
       RError.err(ErrorType.Error, obj.getInfo(), "need array to index, got type: " + sub.getName());

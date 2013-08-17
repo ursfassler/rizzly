@@ -5,11 +5,11 @@ import common.ElementInfo;
 import evl.Evl;
 import evl.expression.reference.Reference;
 
-public class Array extends BaseType implements Evl {
+public class ArrayType extends BaseType implements Evl {
   private Reference type;
   private int size;
 
-  public Array(int size, Reference type) {
+  public ArrayType(int size, Reference type) {
     super(new ElementInfo(), makeName(size, type.getLink().getName()));
     this.type = type;
     this.size = size;

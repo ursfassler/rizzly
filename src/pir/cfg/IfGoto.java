@@ -3,29 +3,29 @@ package pir.cfg;
 import java.util.HashSet;
 import java.util.Set;
 
-import pir.expression.PExpression;
+import pir.other.SsaVariable;
 
 /**
- *
+ * 
  * @author urs
  */
 public class IfGoto extends BasicBlockEnd {
-  private PExpression condition;
+  private SsaVariable condition;
   private BasicBlock thenBlock;
   private BasicBlock elseBlock;
 
-  public IfGoto(PExpression condition, BasicBlock thenBlock, BasicBlock elseBlock) {
+  public IfGoto(SsaVariable condition, BasicBlock thenBlock, BasicBlock elseBlock) {
     super();
     this.condition = condition;
     this.thenBlock = thenBlock;
     this.elseBlock = elseBlock;
   }
 
-  public PExpression getCondition() {
+  public SsaVariable getCondition() {
     return condition;
   }
 
-  public void setCondition(PExpression condition) {
+  public void setCondition(SsaVariable condition) {
     this.condition = condition;
   }
 

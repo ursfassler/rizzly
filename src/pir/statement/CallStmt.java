@@ -1,21 +1,38 @@
 package pir.statement;
 
-import pir.expression.reference.CallExpr;
+import java.util.ArrayList;
 
-public class CallStmt extends Statement {
-  final private CallExpr ref;
+import pir.expression.PExpression;
+import pir.expression.reference.Reference;
+import pir.function.Function;
 
-  public CallStmt(CallExpr ref) {
+final public class CallStmt extends Statement implements Reference<Function> {
+  private Function ref;
+  private ArrayList<PExpression> parameter;
+
+  public CallStmt(Function ref, ArrayList<PExpression> parameter) {
     super();
     this.ref = ref;
+    this.parameter = parameter;
   }
 
-  public CallExpr getCall() {
+  @Override
+  public Function getRef() {
     return ref;
   }
 
   @Override
-  public String toString() {
-    return "call";
+  public void setRef(Function ref) {
+    this.ref = ref;
   }
+
+  public ArrayList<PExpression> getParameter() {
+    return parameter;
+  }
+
+  @Override
+  public String toString() {
+    return ref.toString() + parameter;
+  }
+
 }

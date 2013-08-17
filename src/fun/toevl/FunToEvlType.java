@@ -140,7 +140,7 @@ public class FunToEvlType extends NullTraverser<Type, String> {
 
   @Override
   protected Type visitArray(Array obj, String param) {
-    return new evl.type.base.Array(obj.getSize(), (Reference) fta.traverse(obj.getType(), null));
+    return new evl.type.base.ArrayType(obj.getSize(), (Reference) fta.traverse(obj.getType(), null));
   }
 
 }

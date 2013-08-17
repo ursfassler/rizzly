@@ -59,7 +59,7 @@ import evl.statement.Assignment;
 import evl.statement.CallStmt;
 import evl.statement.VarDefInitStmt;
 import evl.statement.VarDefStmt;
-import evl.type.base.Array;
+import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
@@ -220,7 +220,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitArray(Array obj, P param) {
+  protected R visitArrayType(ArrayType obj, P param) {
     visit(obj.getType(), param);
     return null;
   }

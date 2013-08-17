@@ -1,7 +1,5 @@
 package pir.traverser;
 
-import java.math.BigInteger;
-import java.util.HashSet;
 import java.util.List;
 
 import pir.other.Program;
@@ -53,6 +51,7 @@ public class BooleanReplacer extends TypeReplacer<Void> {
     changer.traverse(obj, null);
   }
 
+  //TODO move this functions to TypeReplacer
   @Override
   protected Type visitRangeType(RangeType obj, Void param) {
     return obj;

@@ -27,7 +27,7 @@ import evl.other.CompUse;
 import evl.other.IfaceUse;
 import evl.other.ImplElementary;
 import evl.other.Interface;
-import evl.type.base.Array;
+import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
@@ -59,7 +59,7 @@ public class KnowScope extends KnowledgeEntry {
     global.add(VoidType.class);
     global.add(RecordType.class);
     global.add(UnionType.class);
-    global.add(Array.class);
+    global.add(ArrayType.class);
     global.add(StringType.class);
     global.add(TypeAlias.class);
     global.add(EnumType.class);

@@ -3,7 +3,7 @@ package test;
 import org.junit.Test;
 
 public class CasualTest extends BaseTest {
-  private static final boolean DEBUG_EVENT = true;
+  private static final boolean DEBUG_EVENT = false;   //TODO set to true
 
   public CasualTest() {
     super();
@@ -101,8 +101,8 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
-  public void extconst_ExtConst() {
-    compile("extconst", "ExtConst", true, DEBUG_EVENT, false);
+  public void extConst() {
+    compile("extConst", "ExtConst", true, DEBUG_EVENT, false);
   }
 
   @Test

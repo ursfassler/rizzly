@@ -65,7 +65,7 @@ import evl.statement.Statement;
 import evl.statement.VarDefInitStmt;
 import evl.statement.VarDefStmt;
 import evl.type.Type;
-import evl.type.base.Array;
+import evl.type.base.ArrayType;
 import evl.type.base.BaseType;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumElement;
@@ -362,8 +362,8 @@ public abstract class Traverser<R, P> {
       return visitBooleanType((BooleanType) obj, param);
     else if (obj instanceof Range)
       return visitRange((Range) obj, param);
-    else if (obj instanceof Array)
-      return visitArray((Array) obj, param);
+    else if (obj instanceof ArrayType)
+      return visitArrayType((ArrayType) obj, param);
     else if (obj instanceof StringType)
       return visitStringType((StringType) obj, param);
     else if (obj instanceof VoidType)
@@ -424,7 +424,7 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitStringType(StringType obj, P param);
 
-  abstract protected R visitArray(Array obj, P param);
+  abstract protected R visitArrayType(ArrayType obj, P param);
 
   abstract protected R visitNaturalType(NaturalType obj, P param);
 

@@ -57,7 +57,7 @@ import evl.other.RizzlyProgram;
 import evl.statement.Assignment;
 import evl.statement.CallStmt;
 import evl.statement.VarDefStmt;
-import evl.type.base.Array;
+import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
@@ -512,7 +512,7 @@ public class RXmlPrinter extends NullTraverser<Void, XmlWriter> {
   }
 
   @Override
-  protected Void visitArray(Array obj, XmlWriter param) {
+  protected Void visitArrayType(ArrayType obj, XmlWriter param) {
     param.wr(obj.getName());
     return null;
   }

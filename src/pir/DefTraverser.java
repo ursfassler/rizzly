@@ -13,7 +13,6 @@ import pir.expression.BoolValue;
 import pir.expression.Number;
 import pir.expression.StringValue;
 import pir.expression.UnaryExpr;
-import pir.expression.reference.CallExpr;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
 import pir.expression.reference.VarRef;
@@ -29,7 +28,9 @@ import pir.other.StateVariable;
 import pir.other.Variable;
 import pir.statement.ArithmeticOp;
 import pir.statement.Assignment;
+import pir.statement.CallAssignment;
 import pir.statement.CallStmt;
+import pir.statement.ComplexWriter;
 import pir.statement.LoadStmt;
 import pir.statement.Relation;
 import pir.statement.StoreStmt;
@@ -300,19 +301,34 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitCallExpr(CallExpr obj, P param) {
+  protected R visitCallExpr(CallAssignment obj, P param) {
     visitList(obj.getParameter(), param);
     return null;
   }
 
   @Override
   protected R visitVarRef(VarRef obj, P param) {
+    visitList(obj.getOffset(), param);
     return null;
   }
 
   @Override
   protected R visitLoadStmt(LoadStmt obj, P param) {
     visit(obj.getVariable(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitComplexWriter(ComplexWriter obj, P param) {
+    visit(obj.getSrc(), param);
+    visit(obj.getDst(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitCallAssignment(CallAssignment obj, P param) {
+    visitList(obj.getParameter(), param);
+    visit(obj.getVariable(),param);
     return null;
   }
 

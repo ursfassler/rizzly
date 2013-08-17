@@ -101,6 +101,7 @@ public class RangeReplacer extends TypeReplacer<Void> {
     return bits;
   }
 
+  //TODO move this functions to TypeReplacer
   @Override
   protected Type visitVoidType(VoidType obj, Void param) {
     return obj;

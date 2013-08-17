@@ -1,15 +1,27 @@
+interface
+  Tick
+    function tick( x: R{0,200} );
+  end
+
 component
   ArrayTest
+    input
+      in  : Tick;
+      
+    output
+      out : Tick;
 
-    implementation elementary
+  implementation elementary
 
     var
-      a : Array{20,U{8}};
+      a : Array{20,R{0,200}};
 
-    function foo()
+    function in.tick( x: R{0,200} )
       a[0] := 10;
       a[2] := 4;
-      a[1] := a[0] + a[2];
+      a[1] := (a[0] + a[2]) mod 200;
+      out.tick( a[1] );
+      out.tick( a[10] );
     end
 
   end

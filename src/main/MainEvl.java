@@ -22,6 +22,7 @@ import common.FuncAttr;
 import error.ErrorType;
 import error.RError;
 import evl.Evl;
+import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
 import evl.cfg.ReturnExpr;
 import evl.composition.CompositionReduction;
@@ -80,7 +81,7 @@ import evl.traverser.iocheck.StateWriterInfo;
 import evl.traverser.typecheck.TypeChecker;
 import evl.traverser.typecheck.specific.CompInterfaceTypeChecker;
 import evl.type.Type;
-import evl.type.base.Array;
+import evl.type.base.ArrayType;
 import evl.type.base.Range;
 import evl.variable.ConstGlobal;
 import evl.variable.Constant;
@@ -404,7 +405,7 @@ public class MainEvl {
     Collections.sort(names);
 
     Range symNameSizeType = kbi.getRangeType(names.size());
-    Array arrayType = kbi.getArray(depth, symNameSizeType);
+    ArrayType arrayType = kbi.getArray(depth, symNameSizeType);
     Range sizeType = kbi.getRangeType(depth);
 
     Interface debugIface;
@@ -467,7 +468,7 @@ public class MainEvl {
       }
       ArrayValue val = new ArrayValue(info, values);
 
-      Array symType = kbi.getArray(names.size(), kbi.getStringType());
+      ArrayType symType = kbi.getArray(names.size(), kbi.getStringType());
 
       symtable = new ConstGlobal(info, "_debugsym", symType, val);
 
@@ -488,7 +489,9 @@ public class MainEvl {
         Reference array = new Reference(info, symtable);
         array.getOffset().add(new RefIndex(info, index));
 
-        body.getStatements().add(new ReturnExpr(info, array));
+        BasicBlock bb = new BasicBlock(info,"bodyBB");
+        bb.setEnd(new ReturnExpr(info, array));
+        body.getBasicBlocks().add(bb);
       }
 
       FuncGlobal func = new FuncGlobal(info, "getSym", new ListOfNamed<FuncVariable>(param));

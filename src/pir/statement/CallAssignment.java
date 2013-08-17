@@ -1,16 +1,18 @@
-package pir.expression.reference;
+package pir.statement;
 
 import java.util.ArrayList;
 
 import pir.expression.PExpression;
+import pir.expression.reference.Reference;
 import pir.function.Function;
+import pir.other.Variable;
 
-final public class CallExpr extends PExpression implements Reference<Function> {
+final public class CallAssignment extends VariableGeneratorStmt implements Reference<Function> {
   private Function ref;
   private ArrayList<PExpression> parameter;
 
-  public CallExpr(Function ref, ArrayList<PExpression> parameter) {
-    super();
+  public CallAssignment(Variable variable, Function ref, ArrayList<PExpression> parameter) {
+    super(variable);
     this.ref = ref;
     this.parameter = parameter;
   }

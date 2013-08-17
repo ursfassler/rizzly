@@ -7,7 +7,7 @@ import evl.NullTraverser;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.typecheck.specific.RefTypeChecker;
 import evl.type.Type;
-import evl.type.base.Array;
+import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
@@ -140,14 +140,14 @@ public class LeftIsContainerOfRightTest extends NullTraverser<Boolean, Type> {
   }
 
   @Override
-  protected Boolean visitArray(Array left, Type right) {
-    if (right instanceof Array) {
+  protected Boolean visitArrayType(ArrayType left, Type right) {
+    if (right instanceof ArrayType) {
       Type lefttype = RefTypeChecker.process(left.getType(), kb);
-      Type righttype = RefTypeChecker.process(((Array) right).getType(), kb);
+      Type righttype = RefTypeChecker.process(((ArrayType) right).getType(), kb);
       if (!visit(lefttype, righttype)) {
         return false;
       }
-      return left.getSize() <= ((Array) right).getSize();
+      return left.getSize() <= ((ArrayType) right).getSize();
     } else {
       return false;
     }

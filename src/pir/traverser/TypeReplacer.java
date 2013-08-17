@@ -16,7 +16,6 @@ import pir.expression.BoolValue;
 import pir.expression.Number;
 import pir.expression.StringValue;
 import pir.expression.UnaryExpr;
-import pir.expression.reference.CallExpr;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
 import pir.expression.reference.VarRef;
@@ -32,7 +31,9 @@ import pir.other.StateVariable;
 import pir.other.Variable;
 import pir.statement.ArithmeticOp;
 import pir.statement.Assignment;
+import pir.statement.CallAssignment;
 import pir.statement.CallStmt;
+import pir.statement.ComplexWriter;
 import pir.statement.LoadStmt;
 import pir.statement.Relation;
 import pir.statement.StoreStmt;
@@ -258,12 +259,24 @@ abstract public class TypeReplacer<T> extends Traverser<Type, T> {
   }
 
   @Override
-  protected Type visitCallExpr(CallExpr obj, T param) {
+  protected Type visitCallExpr(CallAssignment obj, T param) {
     return null;
   }
 
   @Override
   protected Type visitVarRef(VarRef obj, T param) {
+    return null;
+  }
+
+  @Override
+  protected Type visitComplexWriter(ComplexWriter obj, T param) {
+    visit( obj.getDst(), param );
+    return null;
+  }
+
+  @Override
+  protected Type visitCallAssignment(CallAssignment obj, T param) {
+    visit(obj.getVariable(),param);
     return null;
   }
 

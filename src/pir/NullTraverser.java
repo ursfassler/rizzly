@@ -13,7 +13,6 @@ import pir.expression.BoolValue;
 import pir.expression.Number;
 import pir.expression.StringValue;
 import pir.expression.UnaryExpr;
-import pir.expression.reference.CallExpr;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
 import pir.expression.reference.VarRef;
@@ -26,7 +25,9 @@ import pir.other.SsaVariable;
 import pir.other.StateVariable;
 import pir.statement.ArithmeticOp;
 import pir.statement.Assignment;
+import pir.statement.CallAssignment;
 import pir.statement.CallStmt;
+import pir.statement.ComplexWriter;
 import pir.statement.LoadStmt;
 import pir.statement.Relation;
 import pir.statement.StoreStmt;
@@ -255,7 +256,7 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitCallExpr(CallExpr obj, P param) {
+  protected R visitCallExpr(CallAssignment obj, P param) {
     return doDefault(obj, param);
   }
 
@@ -266,6 +267,16 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitLoadStmt(LoadStmt obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitComplexWriter(ComplexWriter obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitCallAssignment(CallAssignment obj, P param) {
     return doDefault(obj, param);
   }
 

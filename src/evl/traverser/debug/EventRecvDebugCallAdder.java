@@ -21,12 +21,11 @@ import evl.other.NamedList;
 import evl.statement.CallStmt;
 import evl.statement.Statement;
 
-
 /**
  * Inserts a message call whenever an event is received
- *
+ * 
  * @author urs
- *
+ * 
  */
 public class EventRecvDebugCallAdder extends DefTraverser<Void, Integer> {
   private ArrayList<String> names;
@@ -69,7 +68,8 @@ public class EventRecvDebugCallAdder extends DefTraverser<Void, Integer> {
     assert (param >= 0);
     int numFunc = names.indexOf(obj.getName());
     assert (numFunc >= 0);
-    obj.getBody().getStatements().add(0, makeCall(msgRecvFunc, numFunc, param));
+    obj.getBody().getBasicBlocks().get(0).getCode().add(0, makeCall(msgRecvFunc, numFunc, param)); // TODO make it
+                                                                                                   // cleaner
   }
 
   private Statement makeCall(FunctionBase func, int numFunc, int numIface) {

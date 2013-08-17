@@ -14,6 +14,7 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
 import pir.other.Program;
 import pir.traverser.BooleanReplacer;
 import pir.traverser.CaserangeReduction;
+import pir.traverser.ComplexReduction;
 import pir.traverser.EnumElementConstPropagation;
 import pir.traverser.GlobalReadExtracter;
 import pir.traverser.GlobalWriteExtracter;
@@ -101,6 +102,7 @@ public class Main {
 
     RangeReplacer.process(prog);
     BooleanReplacer.process(prog);
+    ComplexReduction.process(prog);
     GlobalReadExtracter.process(prog);
     GlobalWriteExtracter.process(prog);
     
@@ -110,32 +112,6 @@ public class Main {
 //
 //    printC(outdir, prg.getName(), cprog);
 //    printFpcHeader(outdir, prg.getName(), cprog);
-  }
-
-  private static cir.other.Program makeC(String debugdir, Program prog) {
-    // Changes needed to convert into C
-    CaserangeReduction.process(prog);
-    ToCEnum.process(prog);
-    BitStretcher.process(prog);
-    RangeReplacer.process(prog);
-
-    EnumElementConstPropagation.process(prog);
-
-    PirPrinter.print(prog, debugdir + "beforeToC.rzy");
-
-    cir.other.Program cprog = (cir.other.Program) ToC.process(prog);
-    BlockReduction.process(cprog);
-
-    makeCLibrary(cprog.getLibrary());
-
-    BoolToEnum.process(cprog);
-    CArrayCopy.process(cprog);
-    VarDeclToTop.process(cprog);
-
-    Renamer.process(cprog);
-
-    toposort(cprog.getType());
-    return cprog;
   }
 
   private static void makeCLibrary(List<CLibrary> list) {

@@ -5,18 +5,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import pir.expression.PExpression;
+import pir.other.SsaVariable;
 
 public class CaseGoto extends BasicBlockEnd {
-  private PExpression condition;
+  private SsaVariable condition;
   private List<CaseGotoOpt> option = new ArrayList<CaseGotoOpt>();
   private BasicBlock otherwise;
 
-  public PExpression getCondition() {
+  public SsaVariable getCondition() {
     return condition;
   }
 
-  public void setCondition(PExpression condition) {
+  public void setCondition(SsaVariable condition) {
     this.condition = condition;
   }
 

@@ -18,7 +18,6 @@ import pir.expression.Number;
 import pir.expression.PExpression;
 import pir.expression.StringValue;
 import pir.expression.UnaryExpr;
-import pir.expression.reference.CallExpr;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefItem;
 import pir.expression.reference.RefName;
@@ -34,7 +33,9 @@ import pir.other.StateVariable;
 import pir.other.Variable;
 import pir.statement.ArithmeticOp;
 import pir.statement.Assignment;
+import pir.statement.CallAssignment;
 import pir.statement.CallStmt;
+import pir.statement.ComplexWriter;
 import pir.statement.LoadStmt;
 import pir.statement.Relation;
 import pir.statement.Statement;
@@ -145,8 +146,6 @@ abstract public class Traverser<R, P> {
       return visitBoolValue((BoolValue) obj, param);
     else if (obj instanceof VarRef)
       return visitVarRef((VarRef) obj, param);
-    else if (obj instanceof CallExpr)
-      return visitCallExpr((CallExpr) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
@@ -160,6 +159,8 @@ abstract public class Traverser<R, P> {
       return visitVariableGeneratorStmt((VariableGeneratorStmt) obj, param);
     else if (obj instanceof StoreStmt)
       return visitStoreStmt((StoreStmt) obj, param);
+    else if (obj instanceof ComplexWriter)
+      return visitComplexWriter((ComplexWriter) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
@@ -173,6 +174,8 @@ abstract public class Traverser<R, P> {
       return visitRelation((Relation) obj, param);
     else if (obj instanceof LoadStmt)
       return visitLoadStmt((LoadStmt) obj, param);
+    else if (obj instanceof CallAssignment)
+      return visitCallAssignment((CallAssignment) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
@@ -271,7 +274,7 @@ abstract public class Traverser<R, P> {
 
   protected abstract R visitVoidType(VoidType obj, P param);
 
-  protected abstract R visitCallExpr(CallExpr obj, P param);
+  protected abstract R visitCallExpr(CallAssignment obj, P param);
 
   protected abstract R visitVarRef(VarRef obj, P param);
 
@@ -285,6 +288,8 @@ abstract public class Traverser<R, P> {
 
   protected abstract R visitRelation(Relation obj, P param);
 
+  protected abstract R visitCallAssignment(CallAssignment obj, P param);
+
   protected abstract R visitLoadStmt(LoadStmt obj, P param);
 
   protected abstract R visitArithmeticOp(ArithmeticOp obj, P param);
@@ -294,6 +299,8 @@ abstract public class Traverser<R, P> {
   protected abstract R visitFuncImpl(FuncImpl obj, P param);
 
   protected abstract R visitFuncProto(FuncProto obj, P param);
+
+  protected abstract R visitComplexWriter(ComplexWriter obj, P param);
 
   protected abstract R visitStoreStmt(StoreStmt obj, P param);
 

@@ -25,7 +25,7 @@ import evl.knowledge.KnowledgeBase;
 import evl.traverser.range.RangeGetter;
 import evl.traverser.typecheck.BiggerType;
 import evl.type.Type;
-import evl.type.base.Array;
+import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumType;
 import evl.type.base.Range;
@@ -220,7 +220,7 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
       cont = BiggerType.get(cont, ntype, obj.getInfo(), kb);
     }
 
-    return new Array(obj.getValue().size(), new Reference(new ElementInfo(), cont));
+    return new ArrayType(obj.getValue().size(), new Reference(new ElementInfo(), cont));
   }
 
   @Override

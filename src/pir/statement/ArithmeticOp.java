@@ -29,7 +29,7 @@ public class ArithmeticOp extends VariableGeneratorStmt {
 
   @Override
   public String toString() {
-    return op.toString();
+    return super.toString() + " := " + left.toString() + " " + op.toString() + " " + right.toString();
   }
 
 }

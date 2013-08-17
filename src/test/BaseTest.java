@@ -12,7 +12,7 @@ import common.Designator;
 
 abstract public class BaseTest {
   public final String outdir = getRootdir() + "output" + File.separator;
-  public final String cfile = outdir + "inst.c";
+  public final String llvmFile = outdir + "inst.ll";
   private boolean strict = true;
 
   protected abstract String getRootdir();
@@ -23,7 +23,7 @@ abstract public class BaseTest {
     opt.init(getRootdir(), new Designator(namespace, comp), debugEvent, lazyModelCheck);
     Main.compile(opt);
     if (compileCfile) {
-      compileC();
+      compileLlvm();
     }
   }
 
@@ -31,12 +31,10 @@ abstract public class BaseTest {
     this.strict = strict;
   }
 
-  public void compileC() {
+  public void compileLlvm() {
     // String cmd = "gcc -pedantic -ansi -Werror -Wall -Wextra -c " + cfile + " -o " + outdir + "libinst.a";
-    String cmd = "gcc -pedantic -ansi -c " + cfile + " -o " + outdir + "libinst.a";
-    if (strict) {
-      cmd += " -Werror";
-    }
+    String cmd = "llc " + llvmFile + " -o " + outdir + "inst.s";
+    //TODO use strict?
     try {
       Process p;
       p = Runtime.getRuntime().exec(cmd);

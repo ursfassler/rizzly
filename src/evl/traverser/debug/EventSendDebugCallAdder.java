@@ -8,6 +8,7 @@ import common.ElementInfo;
 import evl.DefTraverser;
 import evl.Evl;
 import evl.NullTraverser;
+import evl.cfg.BasicBlock;
 import evl.composition.ImplComposition;
 import evl.expression.Expression;
 import evl.expression.Number;
@@ -105,14 +106,14 @@ class StmtTraverser extends DefTraverser<Void, List<Statement>> {
   }
 
   @Override
-  protected Void visitBlock(Block obj, List<Statement> param) {
+  protected Void visitBasicBlock(BasicBlock obj, List<Statement> param) {
     List<Statement> sl = new ArrayList<Statement>();
-    for (Statement stmt : obj.getStatements()) {
+    for (Statement stmt : obj.getCode()) {
       visit(stmt, sl);
       sl.add(stmt);
     }
-    obj.getStatements().clear();
-    obj.getStatements().addAll(sl);
+    obj.getCode().clear();
+    obj.getCode().addAll(sl);
     return null;
   }
 
