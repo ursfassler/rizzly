@@ -2,7 +2,6 @@ package pir.traverser;
 
 import pir.DefTraverser;
 import pir.PirObject;
-import pir.expression.reference.RefHead;
 import util.SimpleGraph;
 
 //TODO used?

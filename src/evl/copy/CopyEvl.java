@@ -15,8 +15,6 @@ import evl.cfg.BasicBlockList;
 import evl.cfg.CaseGoto;
 import evl.cfg.CaseGotoOpt;
 import evl.cfg.CaseOptEntry;
-import evl.cfg.CaseOptRange;
-import evl.cfg.CaseOptValue;
 import evl.cfg.Goto;
 import evl.cfg.IfGoto;
 import evl.cfg.PhiStmt;

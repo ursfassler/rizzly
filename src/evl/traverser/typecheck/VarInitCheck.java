@@ -36,19 +36,18 @@ import evl.other.Named;
 import evl.other.NamedList;
 import evl.other.Namespace;
 import evl.statement.Assignment;
-import evl.statement.Block;
 import evl.statement.CallStmt;
-import evl.statement.CaseOpt;
-import evl.statement.CaseStmt;
-import evl.statement.IfOption;
-import evl.statement.IfStmt;
 import evl.statement.Statement;
 import evl.statement.VarDefStmt;
-import evl.statement.While;
 import evl.type.Type;
 import evl.variable.Constant;
 import evl.variable.FuncVariable;
 import evl.variable.Variable;
+import fun.statement.CaseOpt;
+import fun.statement.CaseStmt;
+import fun.statement.IfOption;
+import fun.statement.IfStmt;
+import fun.statement.While;
 
 public class VarInitCheck extends NullTraverser<Void, Void> {
 

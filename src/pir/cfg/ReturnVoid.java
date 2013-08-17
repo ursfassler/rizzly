@@ -1,6 +1,5 @@
 package pir.cfg;
 
-import common.ElementInfo;
 
 /**
  *

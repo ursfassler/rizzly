@@ -27,6 +27,7 @@ import pir.other.StateVariable;
 import pir.statement.ArithmeticOp;
 import pir.statement.Assignment;
 import pir.statement.CallStmt;
+import pir.statement.LoadStmt;
 import pir.statement.Relation;
 import pir.statement.StoreStmt;
 import pir.statement.VarDefStmt;
@@ -260,6 +261,11 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitVarRef(VarRef obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitLoadStmt(LoadStmt obj, P param) {
     return doDefault(obj, param);
   }
 

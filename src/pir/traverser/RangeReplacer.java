@@ -1,7 +1,6 @@
 package pir.traverser;
 
 import java.math.BigInteger;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;

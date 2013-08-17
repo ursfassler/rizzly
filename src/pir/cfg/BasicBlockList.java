@@ -5,8 +5,6 @@ import java.util.List;
 
 import pir.PirObject;
 
-import common.ElementInfo;
-
 
 public class BasicBlockList extends PirObject {
   private List<BasicBlock> bbs = new ArrayList<BasicBlock>();

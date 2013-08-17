@@ -60,7 +60,6 @@ import error.ErrorType;
 import error.RError;
 import evl.doc.StreamWriter;
 import evl.expression.RelOp;
-import evl.statement.VarDefInitStmt;
 
 public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
@@ -629,17 +628,6 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitSignedType(SignedType obj, StreamWriter param) {
     // param.wr("i" + obj.getBits());
-    return null;
-  }
-
-  @Override
-  protected Void visitVarDefInitStmt(VarDefInitStmt obj, StreamWriter param) {
-    param.wr("%" + obj.getVariable().getName());
-    param.wr(" = ");
-    wrTypeRef(obj.getVariable().getType(), param);
-    param.wr(" ");
-    visit(obj.getInit(), param);
-    param.nl();
     return null;
   }
 

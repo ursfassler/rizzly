@@ -1,8 +1,6 @@
 package pir.traverser;
 
 import pir.DefTraverser;
-import pir.expression.reference.RefCall;
-import pir.expression.reference.RefHead;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefItem;
 import pir.expression.reference.RefName;

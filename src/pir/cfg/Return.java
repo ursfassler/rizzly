@@ -3,8 +3,6 @@ package pir.cfg;
 import java.util.HashSet;
 import java.util.Set;
 
-import common.ElementInfo;
-
 /**
  *
  * @author urs

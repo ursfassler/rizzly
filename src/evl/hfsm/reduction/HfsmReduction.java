@@ -45,17 +45,16 @@ import evl.other.ListOfNamed;
 import evl.other.Named;
 import evl.other.Namespace;
 import evl.statement.Assignment;
-import evl.statement.Block;
 import evl.statement.CallStmt;
-import evl.statement.CaseOpt;
-import evl.statement.CaseStmt;
-import evl.statement.IfOption;
-import evl.statement.IfStmt;
 import evl.statement.Statement;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.variable.FuncVariable;
 import evl.variable.StateVariable;
+import fun.statement.CaseOpt;
+import fun.statement.CaseStmt;
+import fun.statement.IfOption;
+import fun.statement.IfStmt;
 
 //TODO in here is the problem, that _fentry functions from deeper states are not moved upwards
 

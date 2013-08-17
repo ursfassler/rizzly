@@ -13,7 +13,6 @@ import java.util.Set;
 
 import joGraph.HtmlGraphWriter;
 import util.SimpleGraph;
-import cir.expression.reference.RefHead;
 
 import common.Designator;
 import common.Direction;

@@ -22,7 +22,6 @@ import evl.other.ImplElementary;
 import evl.other.Named;
 import evl.other.NamedList;
 import evl.other.Namespace;
-import evl.statement.Block;
 import evl.statement.CallStmt;
 import evl.statement.Statement;
 import evl.type.Type;

@@ -33,6 +33,7 @@ import pir.other.Variable;
 import pir.statement.ArithmeticOp;
 import pir.statement.Assignment;
 import pir.statement.CallStmt;
+import pir.statement.LoadStmt;
 import pir.statement.Relation;
 import pir.statement.StoreStmt;
 import pir.statement.VarDefStmt;
@@ -246,6 +247,13 @@ abstract public class TypeReplacer<T> extends Traverser<Type, T> {
   protected Type visitStoreStmt(StoreStmt obj, T param) {
     visit(obj.getSrc(), param);
     visit(obj.getDst(), param);
+    return null;
+  }
+
+  @Override
+  protected Type visitLoadStmt(LoadStmt obj, T param) {
+    visit(obj.getSrc(), param);
+    visit(obj.getVariable(), param);
     return null;
   }
 

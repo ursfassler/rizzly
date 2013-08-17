@@ -5,14 +5,12 @@ import java.util.List;
 import java.util.Map;
 
 import evl.Evl;
-import evl.cfg.BasicBlock;
 import evl.expression.Expression;
 import evl.expression.reference.Reference;
 import evl.statement.Statement;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.statement.Assignment;
-import fun.statement.Block;
 import fun.statement.CallStmt;
 import fun.statement.CaseOpt;
 import fun.statement.CaseStmt;

@@ -12,7 +12,6 @@ import java.util.Set;
 import org.jgrapht.traverse.TopologicalOrderIterator;
 
 import pir.other.Program;
-import pir.traverser.BitStretcher;
 import pir.traverser.CaserangeReduction;
 import pir.traverser.EnumElementConstPropagation;
 import pir.traverser.GlobalReadExtracter;
@@ -20,29 +19,11 @@ import pir.traverser.GlobalWriteExtracter;
 import pir.traverser.LlvmWriter;
 import pir.traverser.PirPrinter;
 import pir.traverser.RangeReplacer;
-import pir.traverser.ToC;
 import pir.traverser.ToCEnum;
 import util.Pair;
 import util.SimpleGraph;
-import cir.function.LibFunction;
-import cir.library.CLibrary;
-import cir.other.FuncVariable;
-import cir.traverser.BlockReduction;
-import cir.traverser.BoolToEnum;
-import cir.traverser.CArrayCopy;
-import cir.traverser.CHeaderWriter;
-import cir.traverser.CWriter;
-import cir.traverser.FpcHeaderWriter;
-import cir.traverser.Renamer;
-import cir.traverser.VarDeclToTop;
-import cir.type.ArrayType;
-import cir.type.IntType;
-import cir.type.NamedElement;
-import cir.type.Pointer;
-import cir.type.Type;
-import cir.type.TypeAlias;
-import cir.type.VoidType;
 
+import com.sun.org.apache.xalan.internal.xsltc.compiler.util.IntType;
 import common.Designator;
 import common.FuncAttr;
 

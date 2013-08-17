@@ -7,9 +7,6 @@ import java.util.List;
 import pir.NullTraverser;
 import pir.PirObject;
 import pir.expression.PExpression;
-import pir.expression.RelOp;
-import pir.expression.Relation;
-import pir.expression.reference.RefHead;
 import pir.expression.reference.Reference;
 import pir.other.FuncVariable;
 import pir.statement.ArOp;
@@ -18,6 +15,9 @@ import pir.statement.Assignment;
 import pir.statement.Statement;
 import pir.statement.VarDefStmt;
 import pir.type.Type;
+import evl.expression.RelOp;
+import fun.statement.CaseStmt;
+import fun.statement.IfStmt;
 
 /**
  * Replaces a case range with equivalent code

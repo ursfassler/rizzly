@@ -8,15 +8,10 @@ import pir.NullTraverser;
 import pir.PirObject;
 import pir.expression.Number;
 import pir.expression.PExpression;
-import pir.expression.Relation;
 import pir.expression.UnOp;
 import pir.expression.UnaryExpr;
-import pir.expression.reference.RefCall;
-import pir.expression.reference.RefHead;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
-import pir.expression.reference.Reference;
-import pir.function.FuncWithRet;
 import pir.function.Function;
 import pir.other.FuncVariable;
 import pir.other.Variable;
@@ -50,8 +45,7 @@ public class KnowPirType extends NullTraverser<Type, Void> {
     for (FuncVariable var : obj.getArgument()) {
       arg.add(var.getType());
     }
-    assert (obj instanceof FuncWithRet);
-    return new FunctionType(arg, ((FuncWithRet) obj).getRetType());
+    return new FunctionType(arg, obj.getRetType());
   }
 
   @Override
@@ -73,24 +67,19 @@ public class KnowPirType extends NullTraverser<Type, Void> {
   protected Type visitUnaryExpr(UnaryExpr obj, Void param) {
     Type type = visit(obj.getExpr(), param);
     if (type instanceof BooleanType) {
-      assert(obj.getOp() == UnOp.NOT);
+      assert (obj.getOp() == UnOp.NOT);
       return type;
     } else if (type instanceof RangeType) {
-      assert( obj.getOp() == UnOp.MINUS );
+      assert (obj.getOp() == UnOp.MINUS);
       BigInteger low = ((RangeType) type).getLow();
       BigInteger high = ((RangeType) type).getHigh();
       low = BigInteger.ZERO.subtract(low);
       high = BigInteger.ZERO.subtract(high);
-      return new RangeType(high,low);
+      return new RangeType(high, low);
     } else {
       RError.err(ErrorType.Fatal, "Unsupported type: " + type.getClass().getCanonicalName() + " / " + type);
       return null;
     }
-  }
-
-  @Override
-  protected Type visitRelation(Relation obj, Void param) {
-    return new BooleanType();
   }
 
   @Override
@@ -102,24 +91,6 @@ public class KnowPirType extends NullTraverser<Type, Void> {
   protected Type visitNumber(Number obj, Void param) {
     BigInteger value = BigInteger.valueOf(obj.getValue());
     return new RangeType(value, value);
-  }
-
-  @Override
-  protected Type visitReference(Reference obj, Void param) {
-    return visit(obj.getRef(), param);
-  }
-
-  @Override
-  protected Type visitRefHead(RefHead obj, Void param) {
-    return visit((PirObject) obj.getRef(), param);
-  }
-
-  @Override
-  protected Type visitRefCall(RefCall obj, Void param) {
-    Type type = visit(obj.getPrevious(), param);
-    assert (type instanceof FunctionType);
-    FunctionType ft = (FunctionType) type;
-    return ft.getRet();
   }
 
   @Override

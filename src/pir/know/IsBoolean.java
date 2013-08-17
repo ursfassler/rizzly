@@ -4,13 +4,11 @@ import pir.NullTraverser;
 import pir.PirObject;
 import pir.expression.Number;
 import pir.expression.PExpression;
-import pir.expression.Relation;
 import pir.expression.UnaryExpr;
-import pir.expression.reference.RefHead;
-import pir.expression.reference.Reference;
 import pir.function.Function;
 import pir.other.Variable;
 import pir.statement.ArithmeticOp;
+import pir.statement.Relation;
 import pir.type.BooleanType;
 import pir.type.Type;
 
@@ -68,17 +66,6 @@ public class IsBoolean extends NullTraverser<Boolean, Void> {
   @Override
   protected Boolean visitNumber(Number obj, Void param) {
     return false;
-  }
-
-  @Override
-  protected Boolean visitReference(Reference obj, Void param) {
-    Type type = KnowPirType.get(obj);
-    return test(type);
-  }
-
-  @Override
-  protected Boolean visitRefHead(RefHead obj, Void param) {
-    return visit((PirObject) obj.getRef(), param);
   }
 
 }

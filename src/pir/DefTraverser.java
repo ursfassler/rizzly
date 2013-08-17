@@ -48,8 +48,6 @@ import pir.type.TypeAlias;
 import pir.type.UnionType;
 import pir.type.UnsignedType;
 import pir.type.VoidType;
-import evl.function.impl.FuncProtoRet;
-import evl.statement.VarDefInitStmt;
 
 public class DefTraverser<R, P> extends Traverser<R, P> {
 
@@ -260,13 +258,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitVarDefInitStmt(VarDefInitStmt obj, P param) {
-    visit(obj.getVariable(), param);
-    visit(obj.getInit(), param);
-    return null;
-  }
-
-  @Override
   protected R visitSsaVariable(SsaVariable obj, P param) {
     return null;
   }
@@ -321,7 +312,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitLoadStmt(LoadStmt obj, P param) {
-    visit(obj.getVariable(),param);
+    visit(obj.getVariable(), param);
     return null;
   }
 

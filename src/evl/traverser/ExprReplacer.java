@@ -28,6 +28,9 @@ import evl.statement.Assignment;
 import evl.type.base.Range;
 import evl.type.base.TypeAlias;
 import evl.variable.Constant;
+import fun.statement.CaseStmt;
+import fun.statement.IfOption;
+import fun.statement.While;
 
 abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
 

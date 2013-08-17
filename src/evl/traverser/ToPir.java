@@ -22,7 +22,6 @@ import pir.other.Variable;
 import pir.statement.ArOp;
 import pir.statement.VariableGeneratorStmt;
 import pir.type.NamedElement;
-import cir.statement.CaseStmt;
 import error.ErrorType;
 import error.RError;
 import evl.Evl;
@@ -77,6 +76,7 @@ import evl.variable.FuncVariable;
 import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
 import fun.statement.CaseOpt;
+import fun.statement.CaseStmt;
 
 public class ToPir extends NullTraverser<PirObject, PirObject> {
   private Map<Evl, PirObject> map = new HashMap<Evl, PirObject>();

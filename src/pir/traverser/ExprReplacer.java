@@ -4,33 +4,19 @@ import java.util.List;
 
 import pir.Traverser;
 import pir.expression.PExpression;
-import pir.expression.reference.RefCall;
-import pir.expression.reference.RefHead;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
 import pir.function.FuncImpl;
 import pir.function.FuncProto;
 import pir.function.FuncWithBody;
 import pir.function.Function;
-import pir.function.impl.FuncImplRet;
-import pir.function.impl.FuncProtoRet;
 import pir.other.Constant;
 import pir.other.FuncVariable;
 import pir.other.Program;
 import pir.other.StateVariable;
 import pir.statement.Assignment;
-import pir.statement.Block;
 import pir.statement.CallStmt;
-import pir.statement.CaseEntry;
-import pir.statement.CaseOptRange;
-import pir.statement.CaseOptValue;
-import pir.statement.CaseStmt;
-import pir.statement.IfStmt;
-import pir.statement.IfStmtEntry;
-import pir.statement.ReturnValue;
-import pir.statement.ReturnVoid;
 import pir.statement.VarDefStmt;
-import pir.statement.WhileStmt;
 import pir.type.Array;
 import pir.type.BooleanType;
 import pir.type.EnumElement;
@@ -43,6 +29,9 @@ import pir.type.TypeAlias;
 import pir.type.UnionType;
 import pir.type.UnsignedType;
 import pir.type.VoidType;
+import evl.function.impl.FuncProtoRet;
+import fun.statement.CaseStmt;
+import fun.statement.IfStmt;
 
 abstract public class ExprReplacer<T> extends Traverser<PExpression, T> {
 

@@ -55,14 +55,8 @@ import evl.other.NamedList;
 import evl.other.Namespace;
 import evl.other.RizzlyProgram;
 import evl.statement.Assignment;
-import evl.statement.Block;
 import evl.statement.CallStmt;
-import evl.statement.CaseOpt;
-import evl.statement.CaseStmt;
-import evl.statement.IfOption;
-import evl.statement.IfStmt;
 import evl.statement.VarDefStmt;
-import evl.statement.While;
 import evl.type.base.Array;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumElement;
@@ -78,6 +72,11 @@ import evl.variable.Constant;
 import evl.variable.FuncVariable;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
+import fun.statement.CaseOpt;
+import fun.statement.CaseStmt;
+import fun.statement.IfOption;
+import fun.statement.IfStmt;
+import fun.statement.While;
 
 public class RXmlPrinter extends NullTraverser<Void, XmlWriter> {
   private KnowPath kp;

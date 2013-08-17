@@ -22,7 +22,6 @@ import evl.hfsm.StateSimple;
 import evl.hfsm.Transition;
 import evl.other.ListOfNamed;
 import evl.other.Named;
-import evl.statement.Block;
 import evl.statement.CallStmt;
 import evl.statement.Statement;
 import evl.variable.FuncVariable;

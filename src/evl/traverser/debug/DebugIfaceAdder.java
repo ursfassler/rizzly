@@ -27,7 +27,6 @@ import evl.other.Interface;
 import evl.other.ListOfNamed;
 import evl.other.Namespace;
 import evl.statement.Assignment;
-import evl.statement.Block;
 import evl.statement.CallStmt;
 import evl.statement.VarDefStmt;
 import evl.type.base.Array;
