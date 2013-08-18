@@ -38,6 +38,7 @@ import pir.statement.StoreStmt;
 import pir.statement.VarDefStmt;
 import pir.statement.convert.SignExtendValue;
 import pir.statement.convert.TruncValue;
+import pir.statement.convert.ZeroExtendValue;
 import pir.type.Array;
 import pir.type.BooleanType;
 import pir.type.EnumElement;
@@ -351,6 +352,13 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitSignExtendValue(SignExtendValue obj, P param) {
+    visit(obj.getOriginal(), param);
+    visit(obj.getVariable(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitZeroExtendValue(ZeroExtendValue obj, P param) {
     visit(obj.getOriginal(), param);
     visit(obj.getVariable(), param);
     return null;

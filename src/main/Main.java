@@ -25,6 +25,7 @@ import pir.traverser.ReferenceReadReduction;
 import pir.traverser.Renamer;
 import pir.traverser.ToCEnum;
 import pir.traverser.ValueConverter;
+import pir.traverser.ValueExtender;
 import util.Pair;
 import util.SimpleGraph;
 
@@ -38,7 +39,7 @@ import evl.other.Component;
 import fun.other.Namespace;
 import fun.toevl.FunToEvl;
 
-//TODO add type conversation before and after arithmetic operation
+//TODO remove unused statements (in evl); this hopefully removes (unused) VarDefStmt
 
 //TODO add compiler self tests:
 //TODO -- check that no references to old stuff exists (check that parent of every object is in the namespace tree)
@@ -109,6 +110,7 @@ public class Main {
     ReferenceReadReduction.process(prog);
     GlobalReadExtracter.process(prog);
     GlobalWriteExtracter.process(prog);
+    ValueExtender.process(prog);
     
     Renamer.process(prog);
     

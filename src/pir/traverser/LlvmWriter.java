@@ -619,8 +619,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     // assert( type == obj.getDst().getType() ); //FIXME add it again
 
     param.wr("store ");
-    wrTypeRef(obj.getDst().getType(), param); // FIXME when using type from src, problem if src is a constant with on
-                                              // the fly generated type
+    wrTypeRef(type, param);
     param.wr(" ");
     wrVarRef(obj.getSrc(), param);
     param.wr(", ");
