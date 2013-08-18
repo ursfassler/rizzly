@@ -43,6 +43,10 @@ import pir.statement.Statement;
 import pir.statement.StoreStmt;
 import pir.statement.VarDefStmt;
 import pir.statement.VariableGeneratorStmt;
+import pir.statement.convert.ConvertValue;
+import pir.statement.convert.SignExtendValue;
+import pir.statement.convert.TruncValue;
+import pir.statement.convert.ZeroExtendValue;
 import pir.type.Array;
 import pir.type.BooleanType;
 import pir.type.EnumElement;
@@ -179,6 +183,19 @@ abstract public class Traverser<R, P> {
       return visitCallAssignment((CallAssignment) obj, param);
     else if (obj instanceof GetElementPtr)
       return visitGetElementPtr((GetElementPtr) obj, param);
+    else if (obj instanceof ConvertValue)
+      return visitConvertValue((ConvertValue) obj, param);
+    else
+      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+  }
+
+  protected R visitConvertValue(ConvertValue obj, P param) {
+    if (obj instanceof SignExtendValue)
+      return visitSignExtendValue((SignExtendValue) obj, param);
+    if (obj instanceof ZeroExtendValue)
+      return visitZeroExtendValue((ZeroExtendValue) obj, param);
+    else if (obj instanceof TruncValue)
+      return visitTruncValue((TruncValue) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
@@ -238,6 +255,12 @@ abstract public class Traverser<R, P> {
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
+
+  protected abstract R visitTruncValue(TruncValue obj, P param);
+
+  protected abstract R visitSignExtendValue(SignExtendValue obj, P param);
+
+  protected abstract R visitZeroExtendValue(ZeroExtendValue obj, P param);
 
   protected abstract R visitSignedType(SignedType obj, P param);
 

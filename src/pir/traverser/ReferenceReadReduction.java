@@ -48,6 +48,7 @@ public class ReferenceReadReduction extends DefTraverser<Void, List<Statement>> 
 
     offset.add(new Number(0));
 
+    //TODO share with ComplexWriterReduction
     for (RefItem itm : obj.getOffset()) {
       if (itm instanceof RefIndex) {
         assert (type instanceof Array);
@@ -93,7 +94,7 @@ public class ReferenceReadReduction extends DefTraverser<Void, List<Statement>> 
     visit(obj.getEnd(), list);
     obj.getCode().addAll(list);
 
-    // FIXME visit folloewing phis?
+    // FIXME visit following phis?
 
     return null;
   }

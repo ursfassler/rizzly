@@ -43,6 +43,10 @@ import pir.statement.Relation;
 import pir.statement.StoreStmt;
 import pir.statement.VarDefStmt;
 import pir.statement.VariableGeneratorStmt;
+import pir.statement.convert.ConvertValue;
+import pir.statement.convert.SignExtendValue;
+import pir.statement.convert.TruncValue;
+import pir.statement.convert.ZeroExtendValue;
 import pir.type.Array;
 import pir.type.BooleanType;
 import pir.type.EnumElement;
@@ -531,7 +535,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   private Type getType(PExpression left) {
-    return ExprTypeGetter.process(left); // FIXME change IR that this is no longer needed
+    return ExprTypeGetter.process(left, ExprTypeGetter.NUMBER_AS_INT); // FIXME change IR that this is no longer needed
   }
 
   private void printUnsignedRelop(RelOp op, StreamWriter param) {
@@ -757,6 +761,36 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   protected Void visitComplexWriter(ComplexWriter obj, StreamWriter param) {
     param.wr(obj.toString()); // TODO remove, should not exist anymore
     return null;
+  }
+
+  @Override
+  protected Void visitTruncValue(TruncValue obj, StreamWriter param) {
+    wrConvertValue(obj, "trunc", param);
+    return null;
+  }
+
+  @Override
+  protected Void visitSignExtendValue(SignExtendValue obj, StreamWriter param) {
+    wrConvertValue(obj, "sext", param);
+    return null;
+  }
+
+  @Override
+  protected Void visitZeroExtendValue(ZeroExtendValue obj, StreamWriter param) {
+    wrConvertValue(obj, "zext", param);
+    return null;
+  }
+
+  private void wrConvertValue(ConvertValue obj, String op, StreamWriter param) {
+    wrVarDef(obj, param);
+    param.wr(op);
+    param.wr(" ");
+    wrTypeRef(getType(obj.getOriginal()), param);
+    param.wr(" ");
+    visit(obj.getOriginal(), param);
+    param.wr(" to ");
+    wrTypeRef(obj.getVariable().getType(), param);
+    param.nl();
   }
 
 }

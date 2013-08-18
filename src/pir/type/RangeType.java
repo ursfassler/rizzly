@@ -21,4 +21,22 @@ public class RangeType extends Type {
     return high;
   }
 
+  public static RangeType makeContainer(RangeType lt, RangeType rt) {
+    BigInteger low = lt.getLow().min(rt.getLow());
+    BigInteger high = lt.getHigh().max(rt.getHigh());
+    return new RangeType(low, high);
+  }
+
+  /**
+   * 
+   * @param lt
+   * @param rt
+   * @return (lt.low < rt.low) or (lt.high > rt.high)
+   */
+  public static boolean isBigger(RangeType lt, RangeType rt) {
+    boolean lowIn = lt.getLow().compareTo(rt.getLow()) < 0;  //TODO ok?
+    boolean highIn = lt.getHigh().compareTo(rt.getHigh()) > 0;  //TODO ok?
+    return lowIn || highIn;
+  }
+
 }

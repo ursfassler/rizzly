@@ -4,8 +4,8 @@ import pir.expression.PExpression;
 import pir.other.Variable;
 
 public class ArithmeticOp extends VariableGeneratorStmt {
-  final private PExpression left; // FIXME only use constant or variable ref
-  final private PExpression right;// FIXME only use constant or variable ref
+  private PExpression left; // FIXME only use constant or variable ref
+  private PExpression right;// FIXME only use constant or variable ref
   final private ArOp op;
 
   public ArithmeticOp(Variable variable, PExpression left, PExpression right, ArOp op) {
@@ -21,6 +21,14 @@ public class ArithmeticOp extends VariableGeneratorStmt {
 
   public PExpression getRight() {
     return right;
+  }
+
+  public void setLeft(PExpression left) {
+    this.left = left;
+  }
+
+  public void setRight(PExpression right) {
+    this.right = right;
   }
 
   public ArOp getOp() {

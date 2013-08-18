@@ -33,6 +33,9 @@ import pir.statement.LoadStmt;
 import pir.statement.Relation;
 import pir.statement.StoreStmt;
 import pir.statement.VarDefStmt;
+import pir.statement.convert.SignExtendValue;
+import pir.statement.convert.TruncValue;
+import pir.statement.convert.ZeroExtendValue;
 import pir.type.Array;
 import pir.type.BooleanType;
 import pir.type.EnumElement;
@@ -283,6 +286,21 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitGetElementPtr(GetElementPtr obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitTruncValue(TruncValue obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitSignExtendValue(SignExtendValue obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitZeroExtendValue(ZeroExtendValue obj, P param) {
     return doDefault(obj, param);
   }
 

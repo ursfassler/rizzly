@@ -24,6 +24,7 @@ import pir.traverser.RangeReplacer;
 import pir.traverser.ReferenceReadReduction;
 import pir.traverser.Renamer;
 import pir.traverser.ToCEnum;
+import pir.traverser.ValueConverter;
 import util.Pair;
 import util.SimpleGraph;
 
@@ -101,6 +102,7 @@ public class Main {
     evl.doc.PrettyPrinter.print(prg, debugdir + "beforePir.rzy");
     Program prog = (Program) evl.traverser.ToPir.process(prg);
 
+    ValueConverter.process(prog);
     RangeReplacer.process(prog);
     BooleanReplacer.process(prog);
     ComplexWriterReduction.process(prog);

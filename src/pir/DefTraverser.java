@@ -36,6 +36,8 @@ import pir.statement.LoadStmt;
 import pir.statement.Relation;
 import pir.statement.StoreStmt;
 import pir.statement.VarDefStmt;
+import pir.statement.convert.SignExtendValue;
+import pir.statement.convert.TruncValue;
 import pir.type.Array;
 import pir.type.BooleanType;
 import pir.type.EnumElement;
@@ -329,14 +331,28 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitCallAssignment(CallAssignment obj, P param) {
     visitList(obj.getParameter(), param);
-    visit(obj.getVariable(),param);
+    visit(obj.getVariable(), param);
     return null;
   }
 
   @Override
   protected R visitGetElementPtr(GetElementPtr obj, P param) {
     visitList(obj.getOffset(), param);
-    visit(obj.getVariable(),param);
+    visit(obj.getVariable(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitTruncValue(TruncValue obj, P param) {
+    visit(obj.getOriginal(), param);
+    visit(obj.getVariable(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitSignExtendValue(SignExtendValue obj, P param) {
+    visit(obj.getOriginal(), param);
+    visit(obj.getVariable(), param);
     return null;
   }
 

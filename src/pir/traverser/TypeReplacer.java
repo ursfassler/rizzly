@@ -39,6 +39,8 @@ import pir.statement.Relation;
 import pir.statement.StoreStmt;
 import pir.statement.VarDefStmt;
 import pir.statement.VariableGeneratorStmt;
+import pir.statement.convert.SignExtendValue;
+import pir.statement.convert.TruncValue;
 import pir.type.EnumElement;
 import pir.type.EnumType;
 import pir.type.NamedElement;
@@ -149,6 +151,16 @@ abstract public class TypeReplacer<T> extends Traverser<Type, T> {
   protected Type visitVariableGeneratorStmt(VariableGeneratorStmt obj, T param) {
     visit(obj.getVariable(),param);
     super.visitVariableGeneratorStmt(obj, param);
+    return null;
+  }
+
+  @Override
+  protected Type visitTruncValue(TruncValue obj, T param) {
+    return null;
+  }
+
+  @Override
+  protected Type visitSignExtendValue(SignExtendValue obj, T param) {
     return null;
   }
 

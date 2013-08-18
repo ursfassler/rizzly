@@ -13,6 +13,10 @@ abstract public class VariableGeneratorStmt extends Statement {
     return variable;
   }
 
+  public void setVariable(Variable variable) {
+    this.variable = variable;
+  }
+
   @Override
   public String toString() {
     return variable.toString();
