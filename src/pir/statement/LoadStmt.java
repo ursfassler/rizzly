@@ -1,21 +1,20 @@
 package pir.statement;
 
-import pir.other.StateVariable;
 import pir.other.Variable;
 
 public class LoadStmt extends VariableGeneratorStmt {
-  private StateVariable src;
+  private Variable src;
 
-  public LoadStmt(Variable variable, StateVariable src) {
+  public LoadStmt(Variable variable, Variable src) {
     super(variable);
     this.src = src;
   }
 
-  public StateVariable getSrc() {
+  public Variable getSrc() {
     return src;
   }
 
-  public void setSrc(StateVariable src) {
+  public void setSrc(Variable src) {
     this.src = src;
   }
 

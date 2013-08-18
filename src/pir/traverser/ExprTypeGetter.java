@@ -14,6 +14,7 @@ import pir.statement.ArithmeticOp;
 import pir.statement.Relation;
 import pir.type.BooleanType;
 import pir.type.EnumType;
+import pir.type.SignedType;
 import pir.type.Type;
 import pir.type.UnsignedType;
 
@@ -85,7 +86,8 @@ public class ExprTypeGetter extends NullTraverser<Type, Void> {
   protected Type visitNumber(Number obj, Void param) {
     if (obj.getValue() >= 0) {
       int bits = getBits(obj.getValue());
-      return new UnsignedType(bits);
+      return new SignedType(bits+1);    //FIXME get type from somewhere else?
+//      return new UnsignedType(bits);
     } else {
       throw new RuntimeException("not yet implemented");
     }

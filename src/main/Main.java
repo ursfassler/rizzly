@@ -14,13 +14,15 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
 import pir.other.Program;
 import pir.traverser.BooleanReplacer;
 import pir.traverser.CaserangeReduction;
-import pir.traverser.ComplexReduction;
+import pir.traverser.ComplexWriterReduction;
 import pir.traverser.EnumElementConstPropagation;
 import pir.traverser.GlobalReadExtracter;
 import pir.traverser.GlobalWriteExtracter;
 import pir.traverser.LlvmWriter;
 import pir.traverser.PirPrinter;
 import pir.traverser.RangeReplacer;
+import pir.traverser.ReferenceReadReduction;
+import pir.traverser.Renamer;
 import pir.traverser.ToCEnum;
 import util.Pair;
 import util.SimpleGraph;
@@ -35,8 +37,7 @@ import evl.other.Component;
 import fun.other.Namespace;
 import fun.toevl.FunToEvl;
 
-//TODO after FUN, translate into SSA
-//TODO maybe the PIR is no longer needed (since EVL is quite nice)
+//TODO add type conversation before and after arithmetic operation
 
 //TODO add compiler self tests:
 //TODO -- check that no references to old stuff exists (check that parent of every object is in the namespace tree)
@@ -102,9 +103,12 @@ public class Main {
 
     RangeReplacer.process(prog);
     BooleanReplacer.process(prog);
-    ComplexReduction.process(prog);
+    ComplexWriterReduction.process(prog);
+    ReferenceReadReduction.process(prog);
     GlobalReadExtracter.process(prog);
     GlobalWriteExtracter.process(prog);
+    
+    Renamer.process(prog);
     
     LlvmWriter.print(prog, outdir + prg.getName() + ".ll");
 

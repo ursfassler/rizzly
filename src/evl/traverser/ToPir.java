@@ -284,8 +284,11 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   @Override
   protected pir.statement.CallStmt visitCallStmt(CallStmt obj, PirObject param) {
     PirObject call = visit(obj.getCall(), param);
-    assert (call instanceof CallAssignment);
-    return new pir.statement.CallStmt((CallAssignment) call);
+    return (pir.statement.CallStmt) call;
+//    assert (call instanceof CallAssignment);
+//    CallAssignment ass = (CallAssignment) call;
+//    return new pir.statement.CallStmt(ass.getRef(), ass.getParameter()); // FIXME is that ok? just forget the defined
+//                                                                         // variable?
   }
 
   @Override

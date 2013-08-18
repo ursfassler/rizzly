@@ -36,6 +36,7 @@ import pir.statement.Assignment;
 import pir.statement.CallAssignment;
 import pir.statement.CallStmt;
 import pir.statement.ComplexWriter;
+import pir.statement.GetElementPtr;
 import pir.statement.LoadStmt;
 import pir.statement.Relation;
 import pir.statement.Statement;
@@ -176,6 +177,8 @@ abstract public class Traverser<R, P> {
       return visitLoadStmt((LoadStmt) obj, param);
     else if (obj instanceof CallAssignment)
       return visitCallAssignment((CallAssignment) obj, param);
+    else if (obj instanceof GetElementPtr)
+      return visitGetElementPtr((GetElementPtr) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
@@ -289,6 +292,8 @@ abstract public class Traverser<R, P> {
   protected abstract R visitRelation(Relation obj, P param);
 
   protected abstract R visitCallAssignment(CallAssignment obj, P param);
+
+  protected abstract R visitGetElementPtr(GetElementPtr obj, P param);
 
   protected abstract R visitLoadStmt(LoadStmt obj, P param);
 

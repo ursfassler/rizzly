@@ -8,48 +8,54 @@ import pir.expression.PExpression;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefItem;
 import pir.other.Program;
+import pir.other.SsaVariable;
 import pir.statement.ComplexWriter;
-import pir.statement.Insertvalue;
+import pir.statement.GetElementPtr;
 import pir.statement.Statement;
+import pir.statement.StoreStmt;
 import pir.type.Array;
 import pir.type.Type;
 
+import common.NameFactory;
+
 /**
- * Replaces write accesses to structs and arrays with insertvalue instructions
+ * Replaces write accesses to structs and arrays with getelementptr and store instructions
  * 
  * @author urs
  * 
  */
-public class ComplexReduction extends StmtReplacer<Void> {
+public class ComplexWriterReduction extends StmtReplacer<Void> {
 
   public static void process(Program obj) {
-    ComplexReduction changer = new ComplexReduction();
+    ComplexWriterReduction changer = new ComplexWriterReduction();
     changer.traverse(obj, null);
   }
 
   @Override
   protected List<Statement> visitComplexWriter(ComplexWriter obj, Void param) {
-    List<Statement> ret = new ArrayList<Statement>();
-    List<Integer> offset = new ArrayList<Integer>();
+    List<PExpression> offset = new ArrayList<PExpression>();
 
     Type type = obj.getDst().getRef().getType();
 
+    offset.add(new Number(0));
+
     for (RefItem itm : obj.getDst().getOffset()) {
       if (itm instanceof RefIndex) {
-        assert( type instanceof Array );
+        assert (type instanceof Array);
         PExpression idx = ((RefIndex) itm).getIndex();
-        Number ofn = (Number) idx;    //FIXME only in a special case correct
-        offset.add( ofn.getValue() );
+        offset.add(idx);
+        type = ((Array)type).getType();
       } else {
         throw new RuntimeException("not yet implemented: " + itm.getClass().getCanonicalName());
       }
     }
-    
-    return add( new Insertvalue(dst, obj.g, src, index) )
 
-    assert (false);
+    SsaVariable dstAddr = new SsaVariable(NameFactory.getNew(), type); // FIXME use correct type
+    GetElementPtr gep = new GetElementPtr(dstAddr, obj.getDst().getRef(), offset);
+    StoreStmt store = new StoreStmt(dstAddr, obj.getSrc());
 
-    return ret;
+    return add(gep, store);
   }
+
 
 }

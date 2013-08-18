@@ -28,6 +28,7 @@ import pir.statement.Assignment;
 import pir.statement.CallAssignment;
 import pir.statement.CallStmt;
 import pir.statement.ComplexWriter;
+import pir.statement.GetElementPtr;
 import pir.statement.LoadStmt;
 import pir.statement.Relation;
 import pir.statement.StoreStmt;
@@ -277,6 +278,11 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitCallAssignment(CallAssignment obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitGetElementPtr(GetElementPtr obj, P param) {
     return doDefault(obj, param);
   }
 

@@ -19,9 +19,9 @@ component
     function in.tick( x: R{0,200} )
       a[0] := 10;
       a[2] := 4;
-      a[1] := (a[0] + a[2]) mod 200;
+      a[1] := (a[0] + a[2]) and 127;
       out.tick( a[1] );
-      out.tick( a[10] );
+      out.tick( a[x and 3] );
     end
 
   end

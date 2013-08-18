@@ -28,6 +28,7 @@ import pir.function.Function;
 import pir.other.Constant;
 import pir.other.FuncVariable;
 import pir.other.Program;
+import pir.other.SsaVariable;
 import pir.other.StateVariable;
 import pir.other.Variable;
 import pir.statement.ArOp;
@@ -36,6 +37,7 @@ import pir.statement.Assignment;
 import pir.statement.CallAssignment;
 import pir.statement.CallStmt;
 import pir.statement.ComplexWriter;
+import pir.statement.GetElementPtr;
 import pir.statement.LoadStmt;
 import pir.statement.Relation;
 import pir.statement.StoreStmt;
@@ -79,7 +81,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   private void wrId(PirObject obj, StreamWriter wr) {
-    wr.wr("[" + obj.hashCode() % 1000 + "]"); // TODO remove debug code
+    // wr.wr("[" + obj.hashCode() % 1000 + "]"); // TODO remove debug code
   }
 
   protected void visitOptList(String name, Collection<? extends PirObject> type, StreamWriter param) {
@@ -204,15 +206,13 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitArray(Array obj, StreamWriter param) {
-    param.wr(obj.getName());
+    param.wr("%" + obj.getName());
     wrId(obj, param);
-    param.wr(" = ");
-    param.wr("Array{");
+    param.wr(" = type [");
     param.wr(Integer.toString(obj.getSize()));
-    param.wr(",");
-    param.wr(obj.getType().getName());
-    wrId(obj.getType(), param);
-    param.wr("};");
+    param.wr(" x ");
+    wrTypeRef(obj.getType(), param);
+    param.wr("]");
     param.nl();
     return null;
   }
@@ -303,10 +303,9 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
   // ---- expression --------------------------------------------------------------------
 
-  
-  
   @Override
   protected Void visitCallExpr(CallAssignment obj, StreamWriter param) {
+    wrVarDef(obj, param);
     param.wr("call ");
     wrTypeRef(obj.getRef().getRetType(), param);
     param.wr(" ");
@@ -331,7 +330,6 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     param.wr(")");
     return null;
   }
-
 
   @Override
   protected Void visitNumber(Number obj, StreamWriter param) {
@@ -381,6 +379,42 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     }
   }
 
+  private void wrCall(Function func, List<PExpression> arg, StreamWriter param) {
+    param.wr("call ");
+    wrTypeRef(func.getRetType(), param);
+    param.wr(" ");
+    wrFuncRef(func, param);
+    param.wr("(");
+
+    {
+      boolean first = true;
+      for (PExpression itr : arg) {
+        if (first) {
+          first = false;
+        } else {
+          param.wr(", ");
+        }
+        Type type = getType(itr);
+        wrTypeRef(type, param);
+        param.wr(" ");
+        visit(itr, param);
+      }
+    }
+
+    param.wr(")");
+  }
+
+  private void wrVarRef(Variable variable, StreamWriter param) {
+    if (variable instanceof StateVariable) {
+      param.wr("@");
+    } else if (variable instanceof SsaVariable) {
+      param.wr("%");
+    } else {
+      throw new RuntimeException("not yet implemented: " + variable.getClass().getCanonicalName());
+    }
+    param.wr(variable.getName());
+  }
+
   @Deprecated
   private void wrVarRef(PExpression expr, StreamWriter param) {
     if (expr instanceof VarRef) {
@@ -422,37 +456,34 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitCallAssignment(CallAssignment obj, StreamWriter param) {
     wrVarDef(obj, param);
-    param.wr("call ");
-    wrTypeRef(obj.getRef().getRetType(), param);
-    param.wr(" ");
-    wrFuncRef(obj.getRef(), param);
-    param.wr("(");
-
-    {
-      boolean first = true;
-      for (PExpression itr : obj.getParameter()) {
-        if (first) {
-          first = false;
-        } else {
-          param.wr(", ");
-        }
-        Type type = getType(itr);
-        wrTypeRef(type, param);
-        param.wr(" ");
-        visit(itr, param);
-      }
-    }
-
-    param.wr(")");
+    wrCall(obj.getRef(), obj.getParameter(), param);
     param.nl();
     return null;
   }
-  
+
+  @Override
+  protected Void visitGetElementPtr(GetElementPtr obj, StreamWriter param) {
+    wrVarDef(obj, param);
+    param.wr("getelementptr ");
+    wrTypeRef(obj.getBase().getType(), param);
+    param.wr("*"); // FIXME ok?
+    param.wr(" ");
+    wrVarRef(obj.getBase(), param);
+    for (PExpression ofs : obj.getOffset()) {
+      param.wr(", ");
+      wrTypeRef(getType(ofs), param);
+      param.wr(" ");
+      visit(ofs, param);
+    }
+    param.nl();
+    return null;
+  }
+
   @Override
   protected Void visitArithmeticOp(ArithmeticOp obj, StreamWriter param) {
     wrVarDef(obj, param);
     wrArop(obj.getOp(), param);
-    param.wr(" nsw nuw ");
+    param.wr(" ");
 
     Type lt = getType(obj.getLeft());
     Type rt = getType(obj.getRight());
@@ -473,10 +504,13 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     String code;
     switch (op) {
     case MINUS:
-      code = "sub";
+      code = "sub nsw nuw"; // TODO make nsw nuw depended on signes
       break;
     case PLUS:
-      code = "add";
+      code = "add nsw nuw";// TODO make nsw nuw depended on signes
+      break;
+    case AND:
+      code = "and";
       break;
     default:
       RError.err(ErrorType.Fatal, "Operand not handled: " + op);
@@ -547,7 +581,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitCallStmt(CallStmt obj, StreamWriter param) {
-    visit(obj.getCall(), param);
+    wrCall(obj.getRef(), obj.getParameter(), param);
     param.nl();
     return null;
   }
@@ -570,7 +604,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     param.wr("load ");
     wrTypeRef(obj.getSrc().getType(), param);
     param.wr("* ");
-    param.wr("@" + obj.getSrc().getName());
+    wrVarRef(obj.getSrc(), param);
     param.nl();
     return null;
   }
@@ -581,13 +615,14 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     // assert( type == obj.getDst().getType() ); //FIXME add it again
 
     param.wr("store ");
-    wrTypeRef(type, param);
+    wrTypeRef(obj.getDst().getType(), param); // FIXME when using type from src, problem if src is a constant with on
+                                              // the fly generated type
     param.wr(" ");
     wrVarRef(obj.getSrc(), param);
     param.wr(", ");
     wrTypeRef(obj.getDst().getType(), param);
     param.wr("* ");
-    param.wr("@" + obj.getDst().getName());
+    wrVarRef(obj.getDst(), param);
     param.nl();
     return null;
   }
@@ -720,7 +755,8 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitComplexWriter(ComplexWriter obj, StreamWriter param) {
-    throw new RuntimeException("not yet implemented");
+    param.wr(obj.toString()); // TODO remove, should not exist anymore
+    return null;
   }
 
 }

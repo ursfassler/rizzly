@@ -2,12 +2,13 @@ package pir.statement;
 
 import pir.expression.PExpression;
 import pir.other.StateVariable;
+import pir.other.Variable;
 
 public class StoreStmt extends Statement {
-  private StateVariable dst;
+  private Variable dst;
   private PExpression src;
 
-  public StoreStmt(StateVariable dst, PExpression src) {
+  public StoreStmt(Variable dst, PExpression src) {
     this.dst = dst;
     this.src = src;
   }
@@ -20,11 +21,11 @@ public class StoreStmt extends Statement {
     this.src = src;
   }
 
-  public StateVariable getDst() {
+  public Variable getDst() {
     return dst;
   }
 
-  public void setDst(StateVariable dst) {
+  public void setDst(Variable dst) {
     this.dst = dst;
   }
 
