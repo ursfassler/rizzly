@@ -1,14 +1,13 @@
 package pir.statement;
 
 import pir.expression.PExpression;
-import pir.other.StateVariable;
-import pir.other.Variable;
+import pir.expression.reference.VarRef;
 
 public class StoreStmt extends Statement {
-  private Variable dst;
+  private VarRef dst;
   private PExpression src;
 
-  public StoreStmt(Variable dst, PExpression src) {
+  public StoreStmt(VarRef dst, PExpression src) {
     this.dst = dst;
     this.src = src;
   }
@@ -21,11 +20,11 @@ public class StoreStmt extends Statement {
     this.src = src;
   }
 
-  public Variable getDst() {
+  public VarRef getDst() {
     return dst;
   }
 
-  public void setDst(Variable dst) {
+  public void setDst(VarRef dst) {
     this.dst = dst;
   }
 

@@ -36,14 +36,15 @@ public class ValueExtender extends DefTraverser<List<Statement>, Void> {
     // TODO add support for zext
     Type type = ExprTypeGetter.process(obj.getSrc(), ExprTypeGetter.NUMBER_AS_INT);
     assert (type instanceof SignedType);
-    assert (obj.getDst().getType() instanceof SignedType);
+    Type dstType = ExprTypeGetter.process(obj.getDst(), ExprTypeGetter.NUMBER_AS_INT);
+    assert (dstType instanceof SignedType);
     int srcBits = ((SignedType) type).getBits();
-    int dstBits = ((SignedType) obj.getDst().getType()).getBits();
+    int dstBits = ((SignedType) dstType).getBits();
 
     if (dstBits > srcBits) {
       List<Statement> ret = new ArrayList<Statement>();
 
-      Variable var = new SsaVariable(NameFactory.getNew(), obj.getDst().getType());
+      Variable var = new SsaVariable(NameFactory.getNew(), dstType);
       SignExtendValue sext = new SignExtendValue(var, obj.getSrc());
 
       obj.setSrc(new VarRef(var));

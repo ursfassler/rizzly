@@ -1,24 +1,14 @@
 package pir.traverser;
 
-import java.util.HashSet;
 import java.util.Map;
-import java.util.Set;
 
 import pir.DefTraverser;
 import pir.PirObject;
-import pir.cfg.BasicBlockEnd;
 import pir.cfg.ReturnExpr;
 import pir.cfg.ReturnVoid;
 import pir.expression.reference.VarRef;
-import pir.statement.Assignment;
-import pir.statement.CallAssignment;
-import pir.statement.GetElementPtr;
 import pir.statement.Statement;
-import pir.statement.StoreStmt;
-import pir.statement.VarDefStmt;
 import util.SimpleGraph;
-import error.ErrorType;
-import error.RError;
 
 //TODO find better name
 public class DependencyGraphMaker extends DefTraverser<Boolean, PirObject> {

@@ -7,6 +7,7 @@ import pir.expression.Number;
 import pir.expression.PExpression;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefItem;
+import pir.expression.reference.VarRef;
 import pir.other.Program;
 import pir.other.SsaVariable;
 import pir.statement.ComplexWriter;
@@ -45,18 +46,17 @@ public class ComplexWriterReduction extends StmtReplacer<Void> {
         assert (type instanceof Array);
         PExpression idx = ((RefIndex) itm).getIndex();
         offset.add(idx);
-        type = ((Array)type).getType();
+        type = ((Array) type).getType();
       } else {
         throw new RuntimeException("not yet implemented: " + itm.getClass().getCanonicalName());
       }
     }
 
     SsaVariable dstAddr = new SsaVariable(NameFactory.getNew(), type); // FIXME use correct type
-    GetElementPtr gep = new GetElementPtr(dstAddr, obj.getDst().getRef(), offset);
-    StoreStmt store = new StoreStmt(dstAddr, obj.getSrc());
+    GetElementPtr gep = new GetElementPtr(dstAddr, new VarRef(obj.getDst().getRef()), offset);
+    StoreStmt store = new StoreStmt(new VarRef(dstAddr), obj.getSrc());
 
     return add(gep, store);
   }
-
 
 }

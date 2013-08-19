@@ -572,9 +572,10 @@ class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, Variable>
 
   @Override
   protected VariableGeneratorStmt visitReference(Reference obj, Variable param) {
+    //TODO make it simple
     if ((obj.getLink() instanceof evl.variable.Variable) && obj.getOffset().isEmpty()) {
       Variable var = (Variable) converter.traverse(obj.getLink(), null);
-      return new pir.statement.Assignment(param, var);
+      return new pir.statement.Assignment(param, new VarRef(var));
     } else if (obj.getLink() instanceof FunctionHeader) {
       assert (obj.getOffset().size() == 1);
       evl.expression.reference.RefCall ofs = (RefCall) obj.getOffset().get(0);

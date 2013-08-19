@@ -53,7 +53,7 @@ public class GlobalReadExtracter extends DefTraverser<Void, List<Statement>> {
     if (obj.getRef() instanceof StateVariable) {
       Type type = obj.getRef().getType();
       SsaVariable var = new SsaVariable(NameFactory.getNew(), type);
-      LoadStmt load = new LoadStmt(var, (StateVariable) obj.getRef());
+      LoadStmt load = new LoadStmt(var, new VarRef((StateVariable) obj.getRef()));
       obj.setRef(var);
       param.add(load);
     }

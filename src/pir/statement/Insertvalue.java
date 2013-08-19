@@ -2,33 +2,34 @@ package pir.statement;
 
 import java.util.List;
 
+import pir.expression.reference.VarRef;
 import pir.other.Variable;
 
 public class Insertvalue extends VariableGeneratorStmt {
-  private Variable old;
-  private Variable src;
+  private VarRef old;
+  private VarRef src;
   final private List<Integer> index;
 
-  public Insertvalue(Variable dst, Variable old, Variable src, List<Integer> index) {
+  public Insertvalue(Variable dst, VarRef old, VarRef src, List<Integer> index) {
     super(dst);
     this.old = old;
     this.src = src;
     this.index = index;
   }
 
-  public Variable getSrc() {
+  public VarRef getSrc() {
     return src;
   }
 
-  public void setSrc(Variable src) {
+  public void setSrc(VarRef src) {
     this.src = src;
   }
 
-  public Variable getOld() {
+  public VarRef getOld() {
     return old;
   }
 
-  public void setOld(Variable old) {
+  public void setOld(VarRef old) {
     this.old = old;
   }
 

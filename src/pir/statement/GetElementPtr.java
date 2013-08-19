@@ -4,23 +4,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pir.expression.PExpression;
+import pir.expression.reference.VarRef;
 import pir.other.Variable;
 
 public class GetElementPtr extends VariableGeneratorStmt {
-  private Variable base;
+  private VarRef base;
   final private List<PExpression> offset = new ArrayList<PExpression>();
 
-  public GetElementPtr(Variable variable, Variable base, List<PExpression> offset) {
+  public GetElementPtr(Variable variable, VarRef base, List<PExpression> offset) {
     super(variable);
     this.base = base;
     this.offset.addAll(offset);
   }
 
-  public Variable getBase() {
+  public VarRef getBase() {
     return base;
   }
 
-  public void setBase(Variable base) {
+  public void setBase(VarRef base) {
     this.base = base;
   }
 

@@ -38,17 +38,17 @@ public class ReferenceReadReduction extends DefTraverser<Void, List<Statement>> 
 
   @Override
   protected Void visitVarRef(VarRef obj, List<Statement> param) {
-    if( obj.getOffset().isEmpty() ){
+    if (obj.getOffset().isEmpty()) {
       return null;
     }
-    
+
     List<PExpression> offset = new ArrayList<PExpression>();
 
     Type type = obj.getRef().getType();
 
     offset.add(new Number(0));
 
-    //TODO share with ComplexWriterReduction
+    // TODO share with ComplexWriterReduction
     for (RefItem itm : obj.getOffset()) {
       if (itm instanceof RefIndex) {
         assert (type instanceof Array);
@@ -61,10 +61,10 @@ public class ReferenceReadReduction extends DefTraverser<Void, List<Statement>> 
     }
 
     SsaVariable dstAddr = new SsaVariable(NameFactory.getNew(), type); // FIXME use correct type
-    GetElementPtr gep = new GetElementPtr(dstAddr, obj.getRef(), offset);
+    GetElementPtr gep = new GetElementPtr(dstAddr, new VarRef(obj.getRef()), offset);
 
     SsaVariable value = new SsaVariable(NameFactory.getNew(), type);// FIXME use correct type
-    LoadStmt load = new LoadStmt(value, dstAddr);
+    LoadStmt load = new LoadStmt(value, new VarRef(dstAddr));
 
     obj.setRef(value);
     obj.getOffset().clear();

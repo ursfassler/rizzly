@@ -1,20 +1,21 @@
 package pir.statement;
 
+import pir.expression.reference.VarRef;
 import pir.other.Variable;
 
 public class LoadStmt extends VariableGeneratorStmt {
-  private Variable src;
+  private VarRef src;
 
-  public LoadStmt(Variable variable, Variable src) {
+  public LoadStmt(Variable variable, VarRef src) {
     super(variable);
     this.src = src;
   }
 
-  public Variable getSrc() {
+  public VarRef getSrc() {
     return src;
   }
 
-  public void setSrc(Variable src) {
+  public void setSrc(VarRef src) {
     this.src = src;
   }
 

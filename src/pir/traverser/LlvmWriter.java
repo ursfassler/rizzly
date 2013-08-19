@@ -413,6 +413,8 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
       param.wr("@");
     } else if (variable instanceof SsaVariable) {
       param.wr("%");
+    } else if (variable instanceof FuncVariable) { // FIXME remove?
+      param.wr("%");
     } else {
       throw new RuntimeException("not yet implemented: " + variable.getClass().getCanonicalName());
     }
@@ -423,7 +425,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   private void wrVarRef(PExpression expr, StreamWriter param) {
     if (expr instanceof VarRef) {
       Variable target = ((VarRef) expr).getRef();
-      param.wr("%" + target.getName());
+      wrVarRef(target, param);
     } else if (expr instanceof Number) {
       param.wr(expr.toString());
     } else {
@@ -469,7 +471,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   protected Void visitGetElementPtr(GetElementPtr obj, StreamWriter param) {
     wrVarDef(obj, param);
     param.wr("getelementptr ");
-    wrTypeRef(obj.getBase().getType(), param);
+    wrTypeRef(getType(obj.getBase()), param);
     param.wr("*"); // FIXME ok?
     param.wr(" ");
     wrVarRef(obj.getBase(), param);
@@ -594,9 +596,9 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   protected Void visitAssignment(Assignment obj, StreamWriter param) {
     param.wr("%" + obj.getVariable().getName());
     param.wr(" = add ");
-    wrTypeRef(obj.getSrc().getType(), param);
+    wrTypeRef(getType(obj.getSrc()), param);
     param.wr(" ");
-    param.wr("%" + obj.getSrc().getName());
+    wrVarRef(obj.getSrc(), param);
     param.wr(", 0");
     param.nl();
     return null;
@@ -606,7 +608,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   protected Void visitLoadStmt(LoadStmt obj, StreamWriter param) {
     wrVarDef(obj, param);
     param.wr("load ");
-    wrTypeRef(obj.getSrc().getType(), param);
+    wrTypeRef(getType(obj.getSrc()), param);
     param.wr("* ");
     wrVarRef(obj.getSrc(), param);
     param.nl();
@@ -623,7 +625,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     param.wr(" ");
     wrVarRef(obj.getSrc(), param);
     param.wr(", ");
-    wrTypeRef(obj.getDst().getType(), param);
+    wrTypeRef(getType(obj.getDst()), param);
     param.wr("* ");
     wrVarRef(obj.getDst(), param);
     param.nl();
