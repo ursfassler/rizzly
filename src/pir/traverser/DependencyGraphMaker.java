@@ -4,23 +4,26 @@ import java.util.Map;
 
 import pir.DefTraverser;
 import pir.PirObject;
-import pir.cfg.ReturnExpr;
-import pir.cfg.ReturnVoid;
 import pir.expression.reference.VarRef;
+import pir.other.FuncVariable;
+import pir.other.SsaVariable;
+import pir.other.StateVariable;
 import pir.statement.Statement;
 import util.SimpleGraph;
+import error.ErrorType;
+import error.RError;
 
 //TODO find better name
 public class DependencyGraphMaker extends DefTraverser<Boolean, PirObject> {
   private SimpleGraph<PirObject> g = new SimpleGraph<PirObject>();
-  private Map<PirObject, Statement> owner;
+  private Map<SsaVariable, Statement> owner;
 
-  public DependencyGraphMaker(Map<PirObject, Statement> owner) {
+  public DependencyGraphMaker(Map<SsaVariable, Statement> owner) {
     super();
     this.owner = owner;
   }
 
-  public static SimpleGraph<PirObject> make(PirObject obj, Map<PirObject, Statement> owner) {
+  public static SimpleGraph<PirObject> make(PirObject obj, Map<SsaVariable, Statement> owner) {
     DependencyGraphMaker maker = new DependencyGraphMaker(owner);
     maker.traverse(obj, null);
     return maker.g;
@@ -28,6 +31,7 @@ public class DependencyGraphMaker extends DefTraverser<Boolean, PirObject> {
 
   @Override
   protected Boolean visitStatement(Statement obj, PirObject param) {
+    assert (param == null);
     g.addVertex(obj);
     super.visitStatement(obj, obj);
     return null;
@@ -36,24 +40,18 @@ public class DependencyGraphMaker extends DefTraverser<Boolean, PirObject> {
   @Override
   protected Boolean visitVarRef(VarRef obj, PirObject param) {
     assert (param != null);
-    Statement srcStmt = owner.get(obj.getRef());
-    assert (srcStmt != null);
-    g.addEdge(param, srcStmt);
+    if (obj.getRef() instanceof SsaVariable) {
+      PirObject srcStmt = owner.get(obj.getRef());
+      assert (srcStmt != null);
+      g.addEdge(param, srcStmt);
+    } else if (obj.getRef() instanceof StateVariable) {
+      g.addEdge(param, obj.getRef());
+    } else if (obj.getRef() instanceof FuncVariable) {
+      g.addEdge(param, obj.getRef());
+    } else {
+      RError.err(ErrorType.Fatal, "not yet implemented: " + obj.getRef().getClass().getCanonicalName());
+    }
     return super.visitVarRef(obj, param);
-  }
-
-  @Override
-  protected Boolean visitReturnVoid(ReturnVoid obj, PirObject param) {
-    assert (param == null);
-    super.visitReturnVoid(obj, obj);
-    return true;
-  }
-
-  @Override
-  protected Boolean visitReturnExpr(ReturnExpr obj, PirObject param) {
-    assert (param == null);
-    super.visitReturnExpr(obj, obj);
-    return true;
   }
 
 }

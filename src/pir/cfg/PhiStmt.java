@@ -5,18 +5,18 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import pir.PirObject;
+import pir.expression.reference.VarRef;
 import pir.other.SsaVariable;
-import pir.other.Variable;
+import pir.statement.Statement;
 
 /**
  * 
  * @author urs
  */
-public class PhiStmt extends PirObject {
+public class PhiStmt extends Statement {
 
   private SsaVariable vardef;
-  private Map<BasicBlock, Variable> arg = new HashMap<BasicBlock, Variable>();
+  private Map<BasicBlock, VarRef> arg = new HashMap<BasicBlock, VarRef>();
 
   public PhiStmt(SsaVariable vardef) {
     this.vardef = vardef;
@@ -26,16 +26,25 @@ public class PhiStmt extends PirObject {
     return vardef;
   }
 
-  public void addArg(BasicBlock bb, Variable var) {
+  public void addArg(BasicBlock bb, VarRef var) {
     arg.put(bb, var);
   }
 
-  public Variable getArg(BasicBlock bb) {
+  public VarRef getArg(BasicBlock bb) {
     return arg.get(bb);
   }
 
   public Set<BasicBlock> getInBB() {
     return new HashSet<BasicBlock>(arg.keySet());
+  }
+
+  public Set<VarRef> getReferences() {
+    return new HashSet<VarRef>(arg.values());
+  }
+
+  @Override
+  public String toString() {
+    return getVariable() + " := phi " + arg;
   }
 
 }

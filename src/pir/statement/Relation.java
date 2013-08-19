@@ -30,7 +30,7 @@ public class Relation extends VariableGeneratorStmt {
 
   @Override
   public String toString() {
-    return op.toString();
+    return getVariable() + " := " + left + " " + op + " " + right;
   }
 
 }

@@ -1,0 +1,26 @@
+interface
+  Iface0
+    function foo( x: R{0,100} ):R{0,100};
+  end
+
+component
+  While2
+
+    input
+      in    : Iface0;
+
+    output
+      out   : Iface0;
+
+    implementation elementary
+
+    function in.foo( x: R{0,100} ):R{0,100}
+      ret : R{0,100} = 0;
+      while x > 0 do
+        ret := out.foo( x );
+        x := x-1;
+      end
+      return ret;
+    end
+  end
+

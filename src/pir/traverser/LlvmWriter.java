@@ -684,9 +684,9 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitIfGoto(IfGoto obj, StreamWriter param) {
     param.wr("br ");
-    wrTypeRef(obj.getCondition().getType(), param);
+    wrTypeRef(getType(obj.getCondition()), param);
     param.wr(" ");
-    param.wr("%" + obj.getCondition().getName());
+    wrVarRef(obj.getCondition(), param);
 
     param.wr(", label ");
     param.wr("%" + obj.getThenBlock().getName());
@@ -708,19 +708,18 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitPhiStmt(PhiStmt obj, StreamWriter param) {
     param.wr("%" + obj.getVariable().getName());
-    param.wr(" = ");
+    param.wr(" = phi ");
     param.wr("%" + obj.getVariable().getType().getName());
     param.wr(" ");
     boolean first = true;
     for (BasicBlock in : obj.getInBB()) {
-      Variable var = obj.getArg(in);
       if (first) {
         first = false;
       } else {
         param.wr(", ");
       }
       param.wr("[");
-      param.wr("%" + var.getName());
+      wrVarRef(obj.getArg(in), param);
       param.wr(", ");
       param.wr("%" + in.getName());
       param.wr("]");

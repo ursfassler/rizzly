@@ -285,10 +285,10 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   protected pir.statement.CallStmt visitCallStmt(CallStmt obj, PirObject param) {
     PirObject call = visit(obj.getCall(), param);
     return (pir.statement.CallStmt) call;
-//    assert (call instanceof CallAssignment);
-//    CallAssignment ass = (CallAssignment) call;
-//    return new pir.statement.CallStmt(ass.getRef(), ass.getParameter()); // FIXME is that ok? just forget the defined
-//                                                                         // variable?
+    // assert (call instanceof CallAssignment);
+    // CallAssignment ass = (CallAssignment) call;
+    // return new pir.statement.CallStmt(ass.getRef(), ass.getParameter()); // FIXME is that ok? just forget the defined
+    // // variable?
   }
 
   @Override
@@ -483,7 +483,8 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   protected PirObject visitPhiStmt(PhiStmt obj, PirObject param) {
     pir.cfg.PhiStmt ret = new pir.cfg.PhiStmt((pir.other.SsaVariable) visit(obj.getVariable(), null));
     for (BasicBlock in : obj.getInBB()) {
-      ret.addArg((pir.cfg.BasicBlock) visit(in, null), (Variable) visit(obj.getArg(in), null));
+      Variable var = (Variable) visit(obj.getArg(in), null);
+      ret.addArg((pir.cfg.BasicBlock) visit(in, null), new VarRef(var));
     }
     return ret;
   }
@@ -508,10 +509,10 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   protected PirObject visitIfGoto(IfGoto obj, PirObject param) {
     PirObject cond = visit(obj.getCondition(), null);
     assert (cond instanceof VarRef);
+    assert (((VarRef) cond).getOffset().isEmpty());
     Variable var = ((VarRef) cond).getRef();
-    assert (var instanceof pir.other.SsaVariable);
     assert (var.getType() instanceof pir.type.BooleanType);
-    return new pir.cfg.IfGoto((pir.other.SsaVariable) var, (pir.cfg.BasicBlock) visit(obj.getThenBlock(), null), (pir.cfg.BasicBlock) visit(obj.getElseBlock(), null));
+    return new pir.cfg.IfGoto(new VarRef(var), (pir.cfg.BasicBlock) visit(obj.getThenBlock(), null), (pir.cfg.BasicBlock) visit(obj.getElseBlock(), null));
   }
 
   @Override
@@ -572,7 +573,7 @@ class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, Variable>
 
   @Override
   protected VariableGeneratorStmt visitReference(Reference obj, Variable param) {
-    //TODO make it simple
+    // TODO make it simple
     if ((obj.getLink() instanceof evl.variable.Variable) && obj.getOffset().isEmpty()) {
       Variable var = (Variable) converter.traverse(obj.getLink(), null);
       return new pir.statement.Assignment(param, new VarRef(var));

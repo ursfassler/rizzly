@@ -191,8 +191,13 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
-  public void while_While() {
+  public void while_() {
     compile("while", "While", true, DEBUG_EVENT, true);
+  }
+
+  @Test
+  public void while2() {
+    compile("while2", "While2", true, DEBUG_EVENT, true);
   }
 
   @Test

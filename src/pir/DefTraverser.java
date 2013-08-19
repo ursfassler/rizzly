@@ -18,7 +18,6 @@ import pir.expression.reference.RefName;
 import pir.expression.reference.VarRef;
 import pir.function.FuncImpl;
 import pir.function.FuncProto;
-import pir.function.FuncWithBody;
 import pir.function.Function;
 import pir.other.Constant;
 import pir.other.FuncVariable;
@@ -84,6 +83,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitStoreStmt(StoreStmt obj, P param) {
     visit(obj.getSrc(), param);
+    visit(obj.getDst(), param);
     return null;
   }
 
@@ -101,6 +101,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitArithmeticOp(ArithmeticOp obj, P param) {
+    visit(obj.getVariable(), param);
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
     return null;
@@ -114,6 +115,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitRelation(Relation obj, P param) {
+    visit(obj.getVariable(), param);
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
     return null;
@@ -234,15 +236,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitFunction(Function obj, P param) {
-    visitList(obj.getArgument(), param);
-    if (obj instanceof FuncWithBody) {
-      visit(((FuncWithBody) obj).getBody(), param);
-    }
-    return null;
-  }
-
-  @Override
   protected R visitRangeType(RangeType obj, P param) {
     return null;
   }
@@ -274,6 +267,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitPhiStmt(PhiStmt obj, P param) {
     visit(obj.getVariable(), param);
+    visitList(obj.getReferences(), param);
     return null;
   }
 
@@ -290,12 +284,15 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitFuncImpl(FuncImpl obj, P param) {
-    throw new RuntimeException("not yet implemented");
+    visitList(obj.getArgument(), param);
+    visit(obj.getBody(), param);
+    return null;
   }
 
   @Override
   protected R visitFuncProto(FuncProto obj, P param) {
-    throw new RuntimeException("not yet implemented");
+    visitList(obj.getArgument(), param);
+    return null;
   }
 
   @Override
@@ -317,6 +314,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitLoadStmt(LoadStmt obj, P param) {
+    visit(obj.getSrc(), param);
     visit(obj.getVariable(), param);
     return null;
   }
@@ -337,6 +335,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitGetElementPtr(GetElementPtr obj, P param) {
+    visit(obj.getBase(), param);
     visitList(obj.getOffset(), param);
     visit(obj.getVariable(), param);
     return null;

@@ -6,23 +6,25 @@ import java.util.Set;
 
 import pir.DefTraverser;
 import pir.PirObject;
+import pir.other.SsaVariable;
 import pir.statement.Statement;
 
-public class OwnerMap extends DefTraverser<Void, Statement> {
+public class OwnerMap extends DefTraverser<Void, PirObject> {
   private MapMaker mapMaker = new MapMaker();
-  private HashMap<PirObject, Statement> owner = new HashMap<PirObject, Statement>();
+  private HashMap<SsaVariable, Statement> owner = new HashMap<SsaVariable, Statement>();
 
-  public static HashMap<PirObject, Statement> make(PirObject obj) {
+  public static HashMap<SsaVariable, Statement> make(PirObject obj) {
     OwnerMap maker = new OwnerMap();
     maker.traverse(obj, null);
     return maker.owner;
   }
 
   @Override
-  protected Void visitStatement(Statement obj, Statement param) {
-    Set<PirObject> set = new HashSet<PirObject>();
+  protected Void visitStatement(Statement obj, PirObject param) {
+    assert (param == null);
+    Set<SsaVariable> set = new HashSet<SsaVariable>();
     mapMaker.traverse(obj, set);
-    for (PirObject itr : set) {
+    for (SsaVariable itr : set) {
       assert (!owner.containsKey(itr));
       owner.put(itr, obj);
     }
@@ -31,12 +33,12 @@ public class OwnerMap extends DefTraverser<Void, Statement> {
 
 }
 
-class MapMaker extends DefTraverser<Void, Set<PirObject>> {
+class MapMaker extends DefTraverser<Void, Set<SsaVariable>> {
 
   @Override
-  protected Void visit(PirObject obj, Set<PirObject> param) {
+  protected Void visitSsaVariable(SsaVariable obj, Set<SsaVariable> param) {
     param.add(obj);
-    super.visit(obj, param);
+    super.visitSsaVariable(obj, param);
     return null;
   }
 

@@ -18,6 +18,7 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
 
 import pir.PirObject;
 import pir.other.Program;
+import pir.other.SsaVariable;
 import pir.passes.BooleanReplacer;
 import pir.statement.Statement;
 import pir.traverser.CaserangeReduction;
@@ -124,10 +125,10 @@ public class Main {
     GlobalWriteExtracter.process(prog);
     ValueExtender.process(prog);
 
-//    HashMap<PirObject, Statement> owner = OwnerMap.make(prog);
-//    SimpleGraph<PirObject> g = DependencyGraphMaker.make(prog, owner);
-//    printGraph(g,debugdir + "pirdepstmt.gv");
-//    UnusedStmtRemover.process(prog, g);
+    HashMap<SsaVariable, Statement> owner = OwnerMap.make(prog);
+    SimpleGraph<PirObject> g = DependencyGraphMaker.make(prog, owner);
+    printGraph(g,debugdir + "pirdepstmt.gv");
+    UnusedStmtRemover.process(prog, g);
 
     Renamer.process(prog);
 
