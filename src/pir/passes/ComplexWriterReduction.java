@@ -1,4 +1,4 @@
-package pir.traverser;
+package pir.passes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +13,7 @@ import pir.statement.ComplexWriter;
 import pir.statement.GetElementPtr;
 import pir.statement.Statement;
 import pir.statement.StoreStmt;
+import pir.traverser.StmtReplacer;
 import pir.type.Array;
 import pir.type.Type;
 

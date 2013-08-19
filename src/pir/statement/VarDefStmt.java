@@ -14,4 +14,11 @@ final public class VarDefStmt extends Statement {
     return variable;
   }
 
+  @Override
+  public String toString() {
+    return variable.toString();
+  }
+  
+  
+
 }

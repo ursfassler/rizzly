@@ -1,4 +1,4 @@
-package pir.traverser;
+package pir.passes;
 
 import java.math.BigInteger;
 import java.util.HashMap;
@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import pir.other.Program;
+import pir.traverser.Getter;
+import pir.traverser.TypeReplacer;
 import pir.type.Array;
 import pir.type.BooleanType;
 import pir.type.EnumType;

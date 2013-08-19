@@ -34,6 +34,7 @@ import pir.statement.Assignment;
 import pir.statement.CallAssignment;
 import pir.statement.CallStmt;
 import pir.statement.ComplexWriter;
+import pir.statement.GetElementPtr;
 import pir.statement.LoadStmt;
 import pir.statement.Relation;
 import pir.statement.StoreStmt;
@@ -41,6 +42,7 @@ import pir.statement.VarDefStmt;
 import pir.statement.VariableGeneratorStmt;
 import pir.statement.convert.SignExtendValue;
 import pir.statement.convert.TruncValue;
+import pir.statement.convert.ZeroExtendValue;
 import pir.type.EnumElement;
 import pir.type.EnumType;
 import pir.type.NamedElement;
@@ -161,6 +163,11 @@ abstract public class TypeReplacer<T> extends Traverser<Type, T> {
 
   @Override
   protected Type visitSignExtendValue(SignExtendValue obj, T param) {
+    return null;
+  }
+
+  @Override
+  protected Type visitZeroExtendValue(ZeroExtendValue obj, T param) {
     return null;
   }
 
@@ -290,6 +297,11 @@ abstract public class TypeReplacer<T> extends Traverser<Type, T> {
   protected Type visitCallAssignment(CallAssignment obj, T param) {
     visit(obj.getVariable(),param);
     return null;
+  }
+
+  @Override
+  protected Type visitGetElementPtr(GetElementPtr obj, T param) {
+    throw new RuntimeException("not yet implemented");
   }
 
 }

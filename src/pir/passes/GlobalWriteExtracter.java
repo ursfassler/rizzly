@@ -1,4 +1,4 @@
-package pir.traverser;
+package pir.passes;
 
 import java.util.List;
 
@@ -8,6 +8,7 @@ import pir.other.StateVariable;
 import pir.statement.Assignment;
 import pir.statement.Statement;
 import pir.statement.StoreStmt;
+import pir.traverser.StmtReplacer;
 
 /**
  * Replaces write accesses to global variables with store operation

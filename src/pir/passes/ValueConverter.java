@@ -1,4 +1,4 @@
-package pir.traverser;
+package pir.passes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +13,7 @@ import pir.statement.ArithmeticOp;
 import pir.statement.Statement;
 import pir.statement.convert.SignExtendValue;
 import pir.statement.convert.TruncValue;
+import pir.traverser.ExprTypeGetter;
 import pir.type.RangeType;
 import pir.type.Type;
 

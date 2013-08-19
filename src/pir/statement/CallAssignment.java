@@ -33,7 +33,7 @@ final public class CallAssignment extends VariableGeneratorStmt implements Refer
 
   @Override
   public String toString() {
-    return ref.toString() + parameter;
+    return getVariable() + " := call " + ref.toString() + parameter;
   }
 
 }

@@ -84,7 +84,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitStoreStmt(StoreStmt obj, P param) {
     visit(obj.getSrc(), param);
-    visit(obj.getDst(), param);
     return null;
   }
 

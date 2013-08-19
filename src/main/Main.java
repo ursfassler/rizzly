@@ -4,28 +4,38 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import joGraph.GraphWriter;
+import joGraph.HtmlGraphWriter;
+import joGraph.Writer;
+
 import org.jgrapht.traverse.TopologicalOrderIterator;
 
+import pir.PirObject;
 import pir.other.Program;
-import pir.traverser.BooleanReplacer;
+import pir.passes.BooleanReplacer;
+import pir.statement.Statement;
 import pir.traverser.CaserangeReduction;
-import pir.traverser.ComplexWriterReduction;
+import pir.passes.ComplexWriterReduction;
 import pir.traverser.EnumElementConstPropagation;
-import pir.traverser.GlobalReadExtracter;
-import pir.traverser.GlobalWriteExtracter;
+import pir.passes.GlobalReadExtracter;
+import pir.passes.GlobalWriteExtracter;
+import pir.passes.UnusedStmtRemover;
+import pir.traverser.DependencyGraphMaker;
 import pir.traverser.LlvmWriter;
+import pir.traverser.OwnerMap;
 import pir.traverser.PirPrinter;
-import pir.traverser.RangeReplacer;
-import pir.traverser.ReferenceReadReduction;
+import pir.passes.RangeReplacer;
+import pir.passes.ReferenceReadReduction;
 import pir.traverser.Renamer;
 import pir.traverser.ToCEnum;
-import pir.traverser.ValueConverter;
-import pir.traverser.ValueExtender;
+import pir.passes.ValueConverter;
+import pir.passes.ValueExtender;
 import util.Pair;
 import util.SimpleGraph;
 
@@ -39,7 +49,9 @@ import evl.other.Component;
 import fun.other.Namespace;
 import fun.toevl.FunToEvl;
 
-//TODO remove unused statements (in evl); this hopefully removes (unused) VarDefStmt
+//TODO always use varref when referencing a variable (maybe a simple version)
+//TODO remove unused statements (in evl); this hopefully removes (unused) VarDefStmt OR remove VarDefStmt if not defining an composed type
+//TODO add special first and last BB in BasicBlockList
 
 //TODO add compiler self tests:
 //TODO -- check that no references to old stuff exists (check that parent of every object is in the namespace tree)
@@ -111,15 +123,39 @@ public class Main {
     GlobalReadExtracter.process(prog);
     GlobalWriteExtracter.process(prog);
     ValueExtender.process(prog);
-    
+
+    HashMap<PirObject, Statement> owner = OwnerMap.make(prog);
+    SimpleGraph<PirObject> g = DependencyGraphMaker.make(prog, owner);
+    printGraph(g,debugdir + "pirdepstmt.gv");
+    UnusedStmtRemover.process(prog, g);
+
     Renamer.process(prog);
-    
+
     LlvmWriter.print(prog, outdir + prg.getName() + ".ll");
 
-//    cir.other.Program cprog = makeC(debugdir, prog);
-//
-//    printC(outdir, prg.getName(), cprog);
-//    printFpcHeader(outdir, prg.getName(), cprog);
+    // cir.other.Program cprog = makeC(debugdir, prog);
+    //
+    // printC(outdir, prg.getName(), cprog);
+    // printFpcHeader(outdir, prg.getName(), cprog);
+  }
+
+  private static void printGraph(SimpleGraph<PirObject> g, String filename) {
+    HtmlGraphWriter<PirObject> hgw;
+    try {
+      hgw = new HtmlGraphWriter<PirObject>(new Writer(new PrintStream(filename))) {
+        @Override
+        protected void wrVertex(PirObject v) {
+          wrVertexStart(v);
+          wrRow(v.toString());
+          wrVertexEnd();
+        }
+
+      };
+      hgw.print(g);
+    } catch (FileNotFoundException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
   }
 
   private static void makeCLibrary(List<CLibrary> list) {

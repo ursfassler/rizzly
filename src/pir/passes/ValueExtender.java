@@ -1,4 +1,4 @@
-package pir.traverser;
+package pir.passes;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -12,6 +12,7 @@ import pir.other.Variable;
 import pir.statement.Statement;
 import pir.statement.StoreStmt;
 import pir.statement.convert.SignExtendValue;
+import pir.traverser.ExprTypeGetter;
 import pir.type.SignedType;
 import pir.type.Type;
 
@@ -32,7 +33,7 @@ public class ValueExtender extends DefTraverser<List<Statement>, Void> {
 
   @Override
   protected List<Statement> visitStoreStmt(StoreStmt obj, Void param) {
-    //TODO add support for zext
+    // TODO add support for zext
     Type type = ExprTypeGetter.process(obj.getSrc(), ExprTypeGetter.NUMBER_AS_INT);
     assert (type instanceof SignedType);
     assert (obj.getDst().getType() instanceof SignedType);

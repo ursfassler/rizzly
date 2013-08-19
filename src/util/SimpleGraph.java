@@ -9,7 +9,6 @@ import java.util.Set;
 import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
 
-
 public class SimpleGraph<T> implements DirectedGraph<T, Pair<T, T>> {
   private Map<T, Set<T>> outlist;
 
@@ -25,8 +24,8 @@ public class SimpleGraph<T> implements DirectedGraph<T, Pair<T, T>> {
     return new Pair<T, T>(u, v);
   }
 
-  public Set<T> getOutVertices( T u ){
-    return new HashSet<T>( outlist.get(u) );
+  public Set<T> getOutVertices(T u) {
+    return new HashSet<T>(outlist.get(u));
   }
 
   @Override
@@ -44,6 +43,7 @@ public class SimpleGraph<T> implements DirectedGraph<T, Pair<T, T>> {
 
   @Override
   public boolean addVertex(T u) {
+    assert (u != null);
     if (!outlist.containsKey(u)) {
       outlist.put(u, new HashSet<T>());
     }

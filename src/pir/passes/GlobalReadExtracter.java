@@ -1,4 +1,4 @@
-package pir.traverser;
+package pir.passes;
 
 import java.util.ArrayList;
 import java.util.List;

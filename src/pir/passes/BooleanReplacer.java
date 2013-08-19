@@ -1,8 +1,10 @@
-package pir.traverser;
+package pir.passes;
 
 import java.util.List;
 
 import pir.other.Program;
+import pir.traverser.Getter;
+import pir.traverser.TypeReplacer;
 import pir.type.Array;
 import pir.type.BooleanType;
 import pir.type.EnumType;
