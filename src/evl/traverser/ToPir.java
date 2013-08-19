@@ -13,9 +13,11 @@ import pir.expression.reference.RefItem;
 import pir.expression.reference.Referencable;
 import pir.expression.reference.TypeRef;
 import pir.expression.reference.VarRef;
+import pir.expression.reference.VarRefSimple;
 import pir.function.FuncImpl;
 import pir.function.FuncProto;
 import pir.function.Function;
+import pir.other.PirValue;
 import pir.other.Program;
 import pir.other.Variable;
 import pir.statement.ArOp;
@@ -121,11 +123,15 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   protected PirObject visitReference(Reference obj, PirObject param) {
     PirObject ref = visit(obj.getLink(), null);
     if (ref instanceof Variable) {
-      ArrayList<RefItem> offset = new ArrayList<RefItem>();
-      for (evl.expression.reference.RefItem itm : obj.getOffset()) {
-        offset.add((RefItem) visit(itm, null));
+      if ((ref instanceof pir.other.SsaVariable) && (obj.getOffset().isEmpty())) {
+        return new VarRefSimple((pir.other.SsaVariable) ref);
+      } else {
+        ArrayList<RefItem> offset = new ArrayList<RefItem>();
+        for (evl.expression.reference.RefItem itm : obj.getOffset()) {
+          offset.add((RefItem) visit(itm, null));
+        }
+        return new VarRef((Variable) ref, offset);
       }
-      return new VarRef((Variable) ref, offset);
     } else if (ref instanceof pir.type.Type) {
       assert (obj.getOffset().isEmpty());
       return new TypeRef((pir.type.Type) ref);
@@ -395,8 +401,8 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   @Override
   protected PirObject visitReturnExpr(ReturnExpr obj, PirObject param) {
     PirObject expr = visit(obj.getExpr(), param);
-    assert (expr instanceof PExpression);
-    return new pir.cfg.ReturnExpr((PExpression) expr);
+    assert (expr instanceof PirValue);
+    return new pir.cfg.ReturnExpr((PirValue) expr);
   }
 
   @Override
@@ -508,11 +514,10 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   @Override
   protected PirObject visitIfGoto(IfGoto obj, PirObject param) {
     PirObject cond = visit(obj.getCondition(), null);
-    assert (cond instanceof VarRef);
-    assert (((VarRef) cond).getOffset().isEmpty());
-    Variable var = ((VarRef) cond).getRef();
+    assert (cond instanceof VarRefSimple);
+    pir.other.SsaVariable var = ((VarRefSimple) cond).getRef();
     assert (var.getType() instanceof pir.type.BooleanType);
-    return new pir.cfg.IfGoto(new VarRef(var), (pir.cfg.BasicBlock) visit(obj.getThenBlock(), null), (pir.cfg.BasicBlock) visit(obj.getElseBlock(), null));
+    return new pir.cfg.IfGoto(new VarRefSimple(var), (pir.cfg.BasicBlock) visit(obj.getThenBlock(), null), (pir.cfg.BasicBlock) visit(obj.getElseBlock(), null));
   }
 
   @Override

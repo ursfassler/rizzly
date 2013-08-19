@@ -25,6 +25,7 @@ import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
 import evl.hfsm.Transition;
 import evl.statement.Assignment;
+import evl.statement.VarDefInitStmt;
 import evl.type.base.Range;
 import evl.type.base.TypeAlias;
 import evl.variable.Constant;
@@ -188,6 +189,12 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   protected Expression visitTransition(Transition obj, T param) {
     obj.setGuard(visit(obj.getGuard(), param));
     return super.visitTransition(obj, param);
+  }
+
+  @Override
+  protected Expression visitVarDefInitStmt(VarDefInitStmt obj, T param) {
+    obj.setInit(visit(obj.getInit(), param));
+    return super.visitVarDefInitStmt(obj, param);
   }
 
 }

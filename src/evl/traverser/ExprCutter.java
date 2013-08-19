@@ -151,11 +151,10 @@ class StmtTraverser extends ExprReplacer<List<Statement>> {
       sl.add(stmt);
     }
     visit(obj.getEnd(), sl);
-    
+
     obj.getCode().clear();
     obj.getCode().addAll(sl);
 
-    
     return null;
   }
 
@@ -214,7 +213,7 @@ class StmtTraverser extends ExprReplacer<List<Statement>> {
     obj.setLeft(visit(obj.getLeft(), param));
     obj.setRight(visit(obj.getRight(), param));
 
-    SsaVariable var = extract(obj, param);
+    SsaVariable var = extract(obj, param);// TODO needed?
 
     return new Reference(obj.getInfo(), var);
   }

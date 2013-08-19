@@ -5,9 +5,11 @@ import java.util.Map;
 import pir.DefTraverser;
 import pir.PirObject;
 import pir.expression.reference.VarRef;
+import pir.expression.reference.VarRefSimple;
 import pir.other.FuncVariable;
 import pir.other.SsaVariable;
 import pir.other.StateVariable;
+import pir.other.Variable;
 import pir.statement.Statement;
 import util.SimpleGraph;
 import error.ErrorType;
@@ -40,18 +42,31 @@ public class DependencyGraphMaker extends DefTraverser<Boolean, PirObject> {
   @Override
   protected Boolean visitVarRef(VarRef obj, PirObject param) {
     assert (param != null);
-    if (obj.getRef() instanceof SsaVariable) {
-      PirObject srcStmt = owner.get(obj.getRef());
+    Variable refVar = obj.getRef();
+    link(param, refVar);
+    return super.visitVarRef(obj, param);
+  }
+
+  private void link(PirObject param, Variable refVar) {
+    if (refVar instanceof SsaVariable) {
+      PirObject srcStmt = owner.get(refVar);
       assert (srcStmt != null);
       g.addEdge(param, srcStmt);
-    } else if (obj.getRef() instanceof StateVariable) {
-      g.addEdge(param, obj.getRef());
-    } else if (obj.getRef() instanceof FuncVariable) {
-      g.addEdge(param, obj.getRef());
+    } else if (refVar instanceof StateVariable) {
+      g.addEdge(param, refVar);
+    } else if (refVar instanceof FuncVariable) {
+      g.addEdge(param, refVar);
     } else {
-      RError.err(ErrorType.Fatal, "not yet implemented: " + obj.getRef().getClass().getCanonicalName());
+      RError.err(ErrorType.Fatal, "not yet implemented: " + refVar.getClass().getCanonicalName());
     }
-    return super.visitVarRef(obj, param);
+  }
+
+  @Override
+  protected Boolean visitVarRefSimple(VarRefSimple obj, PirObject param) {
+    assert (param != null);
+    Variable refVar = obj.getRef();
+    link(param, refVar);
+    return super.visitVarRefSimple(obj, param);
   }
 
 }

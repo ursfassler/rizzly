@@ -3,15 +3,16 @@ package pir.traverser;
 import java.math.BigInteger;
 
 import pir.NullTraverser;
+import pir.Pir;
 import pir.PirObject;
 import pir.expression.BoolValue;
 import pir.expression.Number;
-import pir.expression.PExpression;
 import pir.expression.UnaryExpr;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefItem;
 import pir.expression.reference.RefName;
 import pir.expression.reference.VarRef;
+import pir.expression.reference.VarRefSimple;
 import pir.other.Variable;
 import pir.statement.ArithmeticOp;
 import pir.statement.Relation;
@@ -36,7 +37,7 @@ public class ExprTypeGetter extends NullTraverser<Type, Void> {
     this.numAsRange = numAsRange;
   }
 
-  static public Type process(PExpression ast, boolean numAsRange) {
+  static public Type process(Pir ast, boolean numAsRange) {
     ExprTypeGetter adder = new ExprTypeGetter(numAsRange);
     return adder.traverse(ast, null);
   }
@@ -53,6 +54,11 @@ public class ExprTypeGetter extends NullTraverser<Type, Void> {
       type = rtg.traverse(itm, type);
     }
     return type;
+  }
+
+  @Override
+  protected Type visitVarRefSimple(VarRefSimple obj, Void param) {
+    return visit(obj.getRef(), param);
   }
 
   @Override

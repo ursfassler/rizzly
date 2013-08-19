@@ -1,4 +1,4 @@
 package pir;
 
-abstract public class PirObject {
+abstract public class PirObject implements Pir {
 }

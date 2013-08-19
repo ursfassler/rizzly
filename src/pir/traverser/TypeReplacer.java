@@ -19,6 +19,7 @@ import pir.expression.UnaryExpr;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
 import pir.expression.reference.VarRef;
+import pir.expression.reference.VarRefSimple;
 import pir.function.FuncImpl;
 import pir.function.FuncProto;
 import pir.function.FuncWithBody;
@@ -49,7 +50,7 @@ import pir.type.NamedElement;
 import pir.type.StringType;
 import pir.type.Type;
 
-abstract public class TypeReplacer<T> extends Traverser<Type, T> {
+ public abstract class TypeReplacer<T> extends Traverser<Type, T> {
 
   @Override
   protected Type visitVariable(Variable obj, T param) {
@@ -284,6 +285,11 @@ abstract public class TypeReplacer<T> extends Traverser<Type, T> {
 
   @Override
   protected Type visitVarRef(VarRef obj, T param) {
+    return null;
+  }
+
+  @Override
+  protected Type visitVarRefSimple(VarRefSimple obj, T param) {
     return null;
   }
 

@@ -6,6 +6,7 @@ import java.util.Collection;
 import java.util.List;
 
 import pir.NullTraverser;
+import pir.Pir;
 import pir.PirObject;
 import pir.cfg.BasicBlock;
 import pir.cfg.BasicBlockList;
@@ -23,6 +24,7 @@ import pir.expression.UnaryExpr;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
 import pir.expression.reference.VarRef;
+import pir.expression.reference.VarRefSimple;
 import pir.function.FuncWithBody;
 import pir.function.Function;
 import pir.other.Constant;
@@ -52,6 +54,7 @@ import pir.type.BooleanType;
 import pir.type.EnumElement;
 import pir.type.EnumType;
 import pir.type.NamedElement;
+import pir.type.RangeType;
 import pir.type.SignedType;
 import pir.type.StringType;
 import pir.type.StructType;
@@ -352,7 +355,14 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
+  protected Void visitVarRefSimple(VarRefSimple obj, StreamWriter param) {
+    wrVarRef(obj.getRef(), param);
+    return null;
+  }
+
+  @Override
   protected Void visitVarRef(VarRef obj, StreamWriter param) {
+    //TODO not used?
     param.wr("%" + obj.getRef().getName());
     return null;
   }
@@ -425,6 +435,10 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   private void wrVarRef(PExpression expr, StreamWriter param) {
     if (expr instanceof VarRef) {
       Variable target = ((VarRef) expr).getRef();
+      // TODO offset?
+      wrVarRef(target, param);
+    } else if (expr instanceof VarRefSimple) {
+      SsaVariable target = ((VarRefSimple) expr).getRef();
       wrVarRef(target, param);
     } else if (expr instanceof Number) {
       param.wr(expr.toString());
@@ -536,7 +550,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     // return null;
   }
 
-  private Type getType(PExpression left) {
+  private Type getType(Pir left) {
     return ExprTypeGetter.process(left, ExprTypeGetter.NUMBER_AS_INT); // FIXME change IR that this is no longer needed
   }
 
@@ -650,9 +664,9 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitReturnExpr(ReturnExpr obj, StreamWriter param) {
     param.wr("ret ");
-    wrTypeRef(getType(obj.getExpr()), param);
+    wrTypeRef(getType(obj.getValue()), param);
     param.wr(" ");
-    visit(obj.getExpr(), param);
+    visit(obj.getValue(), param);
     param.nl();
     return null;
   }
@@ -759,6 +773,12 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitComplexWriter(ComplexWriter obj, StreamWriter param) {
+    param.wr(obj.toString()); // TODO remove, should not exist anymore
+    return null;
+  }
+
+  @Override
+  protected Void visitRangeType(RangeType obj, StreamWriter param) {
     param.wr(obj.toString()); // TODO remove, should not exist anymore
     return null;
   }

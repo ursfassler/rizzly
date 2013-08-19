@@ -22,6 +22,7 @@ import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefItem;
 import pir.expression.reference.RefName;
 import pir.expression.reference.VarRef;
+import pir.expression.reference.VarRefSimple;
 import pir.function.FuncImpl;
 import pir.function.FuncProto;
 import pir.function.Function;
@@ -64,7 +65,7 @@ import pir.type.UnsignedType;
 import pir.type.VoidType;
 
 abstract public class Traverser<R, P> {
-  public R traverse(PirObject obj, P param) {
+  public R traverse(Pir obj, P param) {
     return visit(obj, param);
   }
 
@@ -74,7 +75,7 @@ abstract public class Traverser<R, P> {
     }
   }
 
-  protected R visit(PirObject obj, P param) {
+  protected R visit(Pir obj, P param) {
     if (obj == null)
       throw new RuntimeException("object is null");
     else if (obj instanceof Program)
@@ -147,6 +148,8 @@ abstract public class Traverser<R, P> {
       return visitBoolValue((BoolValue) obj, param);
     else if (obj instanceof VarRef)
       return visitVarRef((VarRef) obj, param);
+    else if (obj instanceof VarRefSimple)
+      return visitVarRefSimple((VarRefSimple) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
@@ -301,6 +304,8 @@ abstract public class Traverser<R, P> {
   protected abstract R visitVoidType(VoidType obj, P param);
 
   protected abstract R visitCallExpr(CallAssignment obj, P param);
+
+  protected abstract R visitVarRefSimple(VarRefSimple obj, P param);
 
   protected abstract R visitVarRef(VarRef obj, P param);
 

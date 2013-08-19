@@ -16,6 +16,7 @@ import pir.expression.UnaryExpr;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
 import pir.expression.reference.VarRef;
+import pir.expression.reference.VarRefSimple;
 import pir.function.FuncImpl;
 import pir.function.FuncProto;
 import pir.other.Constant;
@@ -301,6 +302,11 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitZeroExtendValue(ZeroExtendValue obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitVarRefSimple(VarRefSimple obj, P param) {
     return doDefault(obj, param);
   }
 

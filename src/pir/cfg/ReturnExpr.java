@@ -1,30 +1,28 @@
 package pir.cfg;
 
-import pir.expression.PExpression;
-
+import pir.other.PirValue;
 
 /**
- *
+ * 
  * @author urs
  */
 public class ReturnExpr extends Return {
+  private PirValue value;
 
-  private PExpression expr;
-
-  public ReturnExpr(PExpression expr) {
-    this.expr = expr;
+  public ReturnExpr(PirValue value) {
+    this.value = value;
   }
 
-  public PExpression getExpr() {
-    return expr;
+  public PirValue getValue() {
+    return value;
   }
 
-  public void setExpr(PExpression expr) {
-    this.expr = expr;
+  public void setValue(PirValue value) {
+    this.value = value;
   }
 
   @Override
   public String toString() {
-    return super.toString() + " " + expr;
+    return super.toString() + " " + value;
   }
 }

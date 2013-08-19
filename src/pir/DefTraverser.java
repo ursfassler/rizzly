@@ -16,6 +16,7 @@ import pir.expression.UnaryExpr;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
 import pir.expression.reference.VarRef;
+import pir.expression.reference.VarRefSimple;
 import pir.function.FuncImpl;
 import pir.function.FuncProto;
 import pir.function.Function;
@@ -138,7 +139,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitReturnExpr(ReturnExpr obj, P param) {
-    visit(obj.getExpr(), param);
+    visit(obj.getValue(), param);
     return null;
   }
 
@@ -309,6 +310,11 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitVarRef(VarRef obj, P param) {
     visitList(obj.getOffset(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitVarRefSimple(VarRefSimple obj, P param) {
     return null;
   }
 

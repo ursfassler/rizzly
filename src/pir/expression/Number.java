@@ -1,6 +1,8 @@
 package pir.expression;
 
-public class Number extends PExpression {
+import pir.other.PirValue;
+
+public class Number extends PExpression implements PirValue {
   final private int value;
 
   public Number(int value) {

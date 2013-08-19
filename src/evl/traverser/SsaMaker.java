@@ -3,8 +3,10 @@ package evl.traverser;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.jgrapht.DirectedGraph;
 
@@ -74,7 +76,7 @@ public class SsaMaker extends DefTraverser<Void, Void> {
       VariableLinker intra = new VariableLinker(kb, renamed);
       intra.traverse(body, null);
 
-      InterBbVariableLinker.link(intra, dom.getDom(), body);
+      InterBbVariableLinker.link(intra, dom.getDom(), body, obj.getParam().getList());
 
     }
     return null;
@@ -252,16 +254,18 @@ class SsaVarCreator extends NullTraverser<Void, List<Statement>> {
 class InterBbVariableLinker extends DefTraverser<Void, BasicBlock> {
   private VariableLinker link;
   private HashMap<BasicBlock, BasicBlock> idom;
+  private Set<FuncVariable> argvar;
 
-  public static void link(VariableLinker link, HashMap<BasicBlock, BasicBlock> idom, BasicBlockList func) {
-    InterBbVariableLinker linker = new InterBbVariableLinker(link, idom);
+  public static void link(VariableLinker link, HashMap<BasicBlock, BasicBlock> idom, BasicBlockList func, Collection<FuncVariable> argvar) {
+    InterBbVariableLinker linker = new InterBbVariableLinker(link, idom, argvar);
     linker.visit(func, null);
   }
 
-  public InterBbVariableLinker(VariableLinker link, HashMap<BasicBlock, BasicBlock> idom) {
+  public InterBbVariableLinker(VariableLinker link, HashMap<BasicBlock, BasicBlock> idom, Collection<FuncVariable> argvar) {
     super();
     this.link = link;
     this.idom = idom;
+    this.argvar = new HashSet<FuncVariable>(argvar);
   }
 
   private SsaVariable getVariable(BasicBlock first, FuncVariable name, ElementInfo info) {
@@ -271,6 +275,12 @@ class InterBbVariableLinker extends DefTraverser<Void, BasicBlock> {
         return lastDef.get(name);
       }
     }
+
+    if (argvar.contains(name)) {
+      RError.err(ErrorType.Error, info, "Variable definition not found: " + name);
+      // TODO should be ok
+    }
+
     RError.err(ErrorType.Error, info, "Variable definition not found: " + name);
     return null;
   }

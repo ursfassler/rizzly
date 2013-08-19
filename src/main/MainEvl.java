@@ -114,7 +114,7 @@ public class MainEvl {
     // typecheck(classes, debugdir);
 
     // TODO or before type check?
-    ExprCutter.process(aclasses, kb);
+    ExprCutter.process(aclasses, kb);  //TODO this introduces a new variable which is never used
     PrettyPrinter.print(aclasses, debugdir + "expr.rzy");
 
     if (opt.doDebugEvent()) {

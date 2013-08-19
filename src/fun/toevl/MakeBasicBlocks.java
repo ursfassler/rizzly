@@ -52,13 +52,6 @@ class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
   public BasicBlockList translate(Block body, List<FuncVariable> param) {
     BasicBlock head = makeBb(body.getInfo());
 
-    for (FuncVariable var : param) {
-      // this is later translated into an SSA variable
-      evl.variable.FuncVariable ev = (evl.variable.FuncVariable) fta.traverse(var, null);
-      evl.statement.Assignment vardef = new evl.statement.Assignment(var.getInfo(), new Reference(new ElementInfo(), ev), new Reference(new ElementInfo(), ev));
-      head.getCode().add(vardef);
-    }
-
     BasicBlock last = visit(body, null);
     BasicBlock exit = makeBb(body.getInfo());
     exit.setEnd((BasicBlockEnd) fta.traverse(new ReturnVoid(body.getInfo()), null));
