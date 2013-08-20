@@ -81,9 +81,15 @@ import evl.variable.StateVariable;
 import evl.variable.Variable;
 
 public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
+  private boolean writeId;
 
-  public static void print(Evl ast, String filename) {
-    PrettyPrinter pp = new PrettyPrinter();
+  public PrettyPrinter(boolean writeId) {
+    super();
+    this.writeId = writeId;
+  }
+
+  public static void print(Evl ast, String filename, boolean writeId) {
+    PrettyPrinter pp = new PrettyPrinter(writeId);
     try {
       pp.traverse(ast, new StreamWriter(new PrintStream(filename)));
     } catch (FileNotFoundException e) {
@@ -119,7 +125,9 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   private void wrId(Evl obj, StreamWriter wr) {
-    wr.wr("[" + obj.hashCode() % 10000 + "]");
+    if (writeId) {
+      wr.wr("[" + obj.hashCode() % 10000 + "]");
+    }
   }
 
   @Override

@@ -30,7 +30,6 @@ import pir.passes.UnusedStmtRemover;
 import pir.traverser.DependencyGraphMaker;
 import pir.traverser.LlvmWriter;
 import pir.traverser.OwnerMap;
-import pir.traverser.PirPrinter;
 import pir.passes.RangeReplacer;
 import pir.passes.ReferenceReadReduction;
 import pir.traverser.Renamer;
@@ -50,7 +49,7 @@ import evl.other.Component;
 import fun.other.Namespace;
 import fun.toevl.FunToEvl;
 
-//TODO always use varref when referencing a variable (maybe a simple version)
+//TODO redo range expansion/shrinking. Maybe already in EVL since we have the type check there.
 //TODO remove unused statements (in evl); this hopefully removes (unused) VarDefStmt OR remove VarDefStmt if not defining an composed type
 //TODO add special first and last BB in BasicBlockList
 
@@ -113,9 +112,11 @@ public class Main {
 
     evl.other.RizzlyProgram prg = MainEvl.doEvl(opt, debugdir, aclasses, root);
 
-    evl.doc.PrettyPrinter.print(prg, debugdir + "beforePir.rzy");
+    evl.doc.PrettyPrinter.print(prg, debugdir + "beforePir.rzy",false);
     Program prog = (Program) evl.traverser.ToPir.process(prg);
 
+    LlvmWriter.print(prog, debugdir + "afterEvl.rzy");
+    
     ValueConverter.process(prog);
     RangeReplacer.process(prog);
     BooleanReplacer.process(prog);

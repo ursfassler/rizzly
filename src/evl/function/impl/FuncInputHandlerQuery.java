@@ -8,7 +8,7 @@ import evl.function.FuncWithBody;
 import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
 import evl.other.ListOfNamed;
-import evl.variable.FuncVariable;
+import evl.variable.Variable;
 
 /**
  *
@@ -19,7 +19,7 @@ public class FuncInputHandlerQuery extends FunctionBase implements FuncWithRetur
   private Reference ret = null;
   private BasicBlockList body = null;
 
-  public FuncInputHandlerQuery(ElementInfo info, String name, ListOfNamed<FuncVariable> param) {
+  public FuncInputHandlerQuery(ElementInfo info, String name, ListOfNamed<Variable> param) {
     super(info, name, param);
   }
 

@@ -4,7 +4,7 @@ import common.ElementInfo;
 
 import evl.function.FunctionBase;
 import evl.other.ListOfNamed;
-import evl.variable.FuncVariable;
+import evl.variable.Variable;
 
 /**
  *
@@ -12,7 +12,7 @@ import evl.variable.FuncVariable;
  */
 public class FuncProtoVoid extends FunctionBase {
 
-  public FuncProtoVoid(ElementInfo info, String name, ListOfNamed<FuncVariable> param) {
+  public FuncProtoVoid(ElementInfo info, String name, ListOfNamed<Variable> param) {
     super(info, name, param);
   }
 

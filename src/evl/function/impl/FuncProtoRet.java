@@ -6,7 +6,7 @@ import evl.expression.reference.Reference;
 import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
 import evl.other.ListOfNamed;
-import evl.variable.FuncVariable;
+import evl.variable.Variable;
 
 /**
  *
@@ -15,7 +15,7 @@ import evl.variable.FuncVariable;
 public class FuncProtoRet extends FunctionBase implements FuncWithReturn {
   private Reference ret = null;
 
-  public FuncProtoRet(ElementInfo info, String name, ListOfNamed<FuncVariable> param) {
+  public FuncProtoRet(ElementInfo info, String name, ListOfNamed<Variable> param) {
     super(info, name, param);
   }
 

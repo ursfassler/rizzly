@@ -45,7 +45,7 @@ public class TypeGetter extends NullTraverser<Type, Void> {
   @Override
   protected Type visitFunctionBase(FunctionBase obj, Void param) {
     List<Type> arg = new ArrayList<Type>(obj.getParam().size());
-    for (FuncVariable itr : obj.getParam()) {
+    for (Variable itr : obj.getParam()) {
       arg.add(itr.getType());
     }
     if (obj instanceof FuncWithReturn) {

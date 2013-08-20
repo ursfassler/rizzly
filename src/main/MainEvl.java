@@ -85,8 +85,9 @@ import evl.type.base.ArrayType;
 import evl.type.base.Range;
 import evl.variable.ConstGlobal;
 import evl.variable.Constant;
-import evl.variable.FuncVariable;
+import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
+import evl.variable.Variable;
 import fun.hfsm.State;
 
 public class MainEvl {
@@ -95,10 +96,12 @@ public class MainEvl {
   public static RizzlyProgram doEvl(ClaOption opt, String debugdir, Namespace aclasses, Component root) {
     KnowledgeBase kb = new KnowledgeBase(aclasses, debugdir);
 
-    PrettyPrinter.print(aclasses, debugdir + "ast.rzy");
+    PrettyPrinter.print(aclasses, debugdir + "ast.rzy",false);
     SsaMaker.process(aclasses, kb);
-    PrettyPrinter.print(aclasses, debugdir + "ssa.rzy");
+    PrettyPrinter.print(aclasses, debugdir + "ssa.rzy",false);
 
+    //TODO add new variables after if/case with narrowed range
+    
     typecheck(aclasses, root, debugdir);
     if (!opt.doLazyModelCheck()) {
       modelCheck(debugdir, aclasses, root, kb);
@@ -108,14 +111,14 @@ public class MainEvl {
     // TODO reimplement
     // root = hfsmReduction(root, opt, debugdir, aclasses, kb);
 
-    PrettyPrinter.print(aclasses, debugdir + "reduced.rzy");
+    PrettyPrinter.print(aclasses, debugdir + "reduced.rzy",false);
 
     // only for debugging
     // typecheck(classes, debugdir);
 
     // TODO or before type check?
-    ExprCutter.process(aclasses, kb);  //TODO this introduces a new variable which is never used
-    PrettyPrinter.print(aclasses, debugdir + "expr.rzy");
+    ExprCutter.process(aclasses, kb);
+    PrettyPrinter.print(aclasses, debugdir + "expr.rzy",false);
 
     if (opt.doDebugEvent()) {
       addDebug(aclasses, (ImplElementary) root, debugdir);
@@ -379,10 +382,10 @@ public class MainEvl {
   private static void addConDestructor(Namespace classes, String debugdir, KnowledgeBase kb) {
     Interface debugIface = new Interface(info, SystemIfaceAdder.IFACE_TYPE_NAME);
 
-    FuncProtoVoid sendFunc = new FuncProtoVoid(info, SystemIfaceAdder.CONSTRUCT, new ListOfNamed<FuncVariable>());
+    FuncProtoVoid sendFunc = new FuncProtoVoid(info, SystemIfaceAdder.CONSTRUCT, new ListOfNamed<Variable>());
     debugIface.getPrototype().add(sendFunc);
 
-    FuncProtoVoid recvFunc = new FuncProtoVoid(info, SystemIfaceAdder.DESTRUCT, new ListOfNamed<FuncVariable>());
+    FuncProtoVoid recvFunc = new FuncProtoVoid(info, SystemIfaceAdder.DESTRUCT, new ListOfNamed<Variable>());
     debugIface.getPrototype().add(recvFunc);
 
     classes.add(debugIface);
@@ -414,25 +417,25 @@ public class MainEvl {
       debugIface = new Interface(info, "_Debug");
 
       {
-        ArrayList<FuncVariable> param = new ArrayList<FuncVariable>();
-        FuncVariable sender = new FuncVariable(info, "sender", arrayType);
+        ArrayList<Variable> param = new ArrayList<Variable>();
+        SsaVariable sender = new SsaVariable(info, "sender", arrayType);
         param.add(sender);
-        FuncVariable size = new FuncVariable(info, "size", sizeType);
+        SsaVariable size = new SsaVariable(info, "size", sizeType);
         param.add(size);
 
-        FuncProtoVoid sendFunc = new FuncProtoVoid(info, "msgSend", new ListOfNamed<FuncVariable>(param));
+        FuncProtoVoid sendFunc = new FuncProtoVoid(info, "msgSend", new ListOfNamed<Variable>(param));
 
         debugIface.getPrototype().add(sendFunc);
       }
 
       {
-        ArrayList<FuncVariable> param = new ArrayList<FuncVariable>();
-        FuncVariable sender = new FuncVariable(info, "receiver", arrayType);
+        ArrayList<Variable> param = new ArrayList<Variable>();
+        SsaVariable sender = new SsaVariable(info, "receiver", arrayType);
         param.add(sender);
-        FuncVariable size = new FuncVariable(info, "size", sizeType);
+        SsaVariable size = new SsaVariable(info, "size", sizeType);
         param.add(size);
 
-        recvFunc = new FuncProtoVoid(info, "msgRecv", new ListOfNamed<FuncVariable>(param));
+        recvFunc = new FuncProtoVoid(info, "msgRecv", new ListOfNamed<Variable>(param));
 
         debugIface.getPrototype().add(recvFunc);
       }
@@ -447,12 +450,12 @@ public class MainEvl {
       debugQueryIface = new Interface(info, "_DebugQuery");
 
       {
-        ArrayList<FuncVariable> param = new ArrayList<FuncVariable>();
+        ArrayList<Variable> param = new ArrayList<Variable>();
 
-        FuncVariable sender = new FuncVariable(info, "nr", symNameSizeType);
+        SsaVariable sender = new SsaVariable(info, "nr", symNameSizeType);
         param.add(sender);
 
-        FuncProtoRet sendFunc = new FuncProtoRet(info, "getSym", new ListOfNamed<FuncVariable>(param));
+        FuncProtoRet sendFunc = new FuncProtoRet(info, "getSym", new ListOfNamed<Variable>(param));
         sendFunc.setRet(new Reference(info, kbi.getStringType()));
         debugQueryIface.getPrototype().add(sendFunc);
       }
@@ -478,8 +481,8 @@ public class MainEvl {
     root.getIface(Direction.in).add(new IfaceUse(info, "_debugQuery", debugQueryIface));
 
     {
-      ArrayList<FuncVariable> param = new ArrayList<FuncVariable>();
-      FuncVariable sender = new FuncVariable(info, "nr", symNameSizeType);
+      ArrayList<Variable> param = new ArrayList<Variable>();
+      SsaVariable sender = new SsaVariable(info, "nr", symNameSizeType);
       param.add(sender);
 
       BasicBlockList body = new BasicBlockList(info);
@@ -494,7 +497,7 @@ public class MainEvl {
         body.getBasicBlocks().add(bb);
       }
 
-      FuncGlobal func = new FuncGlobal(info, "getSym", new ListOfNamed<FuncVariable>(param));
+      FuncGlobal func = new FuncGlobal(info, "getSym", new ListOfNamed<Variable>(param));
       func.setRet(new Reference(info, kbi.getStringType()));
       func.setBody(body);
       func.setAttribute(FuncAttr.Public);
@@ -515,9 +518,9 @@ public class MainEvl {
     classes.add(env);
 
     {
-      PrettyPrinter.print(classes, rootdir + "env.rzy");
+      PrettyPrinter.print(classes, rootdir + "env.rzy",false);
       Map<? extends Named, ? extends Named> map = CompInstantiator.process(env, kb);
-      PrettyPrinter.print(classes, rootdir + "insta.rzy");
+      PrettyPrinter.print(classes, rootdir + "insta.rzy",false);
 
       KnowEvl kf = kb.getEntry(KnowEvl.class);
       Evl inst = kf.get(new Designator("inst"), info);
@@ -529,7 +532,7 @@ public class MainEvl {
 
     kb = new KnowledgeBase(classes, rootdir);
 
-    PrettyPrinter.print(classes, rootdir + "instance.rzy");
+    PrettyPrinter.print(classes, rootdir + "instance.rzy",true);
     {
       Namespace root = classes.forcePath(new Designator("!env", "inst"));
       Set<FunctionBase> pubfunc = makeInputPublic(root, top.getIface(Direction.in));
@@ -540,9 +543,9 @@ public class MainEvl {
 
     kb = null;
 
-    PrettyPrinter.print(classes, rootdir + "bflat.rzy");
+    PrettyPrinter.print(classes, rootdir + "bflat.rzy",true);
     ListOfNamed<Named> flat = NamespaceReduction.process(classes);
-    PrettyPrinter.print(classes, rootdir + "aflat.rzy");
+    PrettyPrinter.print(classes, rootdir + "aflat.rzy",true);
 
     RizzlyProgram prg = new RizzlyProgram(rootdir, "inst");
     prg.getFunction().addAll(flat.getItems(FunctionBase.class));
@@ -582,7 +585,7 @@ public class MainEvl {
   }
 
   private static FuncPrivateVoid makeEntryExitFunc(String name) {
-    FuncPrivateVoid func = new FuncPrivateVoid(info, name, new ListOfNamed<FuncVariable>());
+    FuncPrivateVoid func = new FuncPrivateVoid(info, name, new ListOfNamed<Variable>());
     func.setBody(new BasicBlockList(info));
     return func;
   }

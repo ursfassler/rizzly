@@ -3,10 +3,8 @@ package evl.traverser;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.jgrapht.DirectedGraph;
 
@@ -54,6 +52,16 @@ public class SsaMaker extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitFunctionBase(FunctionBase obj, Void param) {
+    Map<FuncVariable, SsaVariable> argmap = new HashMap<FuncVariable, SsaVariable>();
+    ArrayList<Variable> arglist = new ArrayList<Variable>(obj.getParam().getList());
+    obj.getParam().clear();
+    for (Variable par : arglist) {
+      assert (par instanceof FuncVariable);
+      SsaVariable svar = new SsaVariable(par.getInfo(), par.getName(), par.getType());
+      obj.getParam().add(svar);
+      argmap.put((FuncVariable) par, svar);
+    }
+
     if (obj instanceof FuncWithBody) {
       BasicBlockList body = (BasicBlockList) ((FuncWithBody) obj).getBody();
 
@@ -76,7 +84,7 @@ public class SsaMaker extends DefTraverser<Void, Void> {
       VariableLinker intra = new VariableLinker(kb, renamed);
       intra.traverse(body, null);
 
-      InterBbVariableLinker.link(intra, dom.getDom(), body, obj.getParam().getList());
+      InterBbVariableLinker.link(intra, dom.getDom(), body, argmap);
 
     }
     return null;
@@ -254,18 +262,18 @@ class SsaVarCreator extends NullTraverser<Void, List<Statement>> {
 class InterBbVariableLinker extends DefTraverser<Void, BasicBlock> {
   private VariableLinker link;
   private HashMap<BasicBlock, BasicBlock> idom;
-  private Set<FuncVariable> argvar;
+  private Map<FuncVariable, SsaVariable> argmap;
 
-  public static void link(VariableLinker link, HashMap<BasicBlock, BasicBlock> idom, BasicBlockList func, Collection<FuncVariable> argvar) {
-    InterBbVariableLinker linker = new InterBbVariableLinker(link, idom, argvar);
+  public static void link(VariableLinker link, HashMap<BasicBlock, BasicBlock> idom, BasicBlockList func, Map<FuncVariable, SsaVariable> argmap) {
+    InterBbVariableLinker linker = new InterBbVariableLinker(link, idom, argmap);
     linker.visit(func, null);
   }
 
-  public InterBbVariableLinker(VariableLinker link, HashMap<BasicBlock, BasicBlock> idom, Collection<FuncVariable> argvar) {
+  public InterBbVariableLinker(VariableLinker link, HashMap<BasicBlock, BasicBlock> idom, Map<FuncVariable, SsaVariable> argmap) {
     super();
     this.link = link;
     this.idom = idom;
-    this.argvar = new HashSet<FuncVariable>(argvar);
+    this.argmap = argmap;
   }
 
   private SsaVariable getVariable(BasicBlock first, FuncVariable name, ElementInfo info) {
@@ -276,9 +284,8 @@ class InterBbVariableLinker extends DefTraverser<Void, BasicBlock> {
       }
     }
 
-    if (argvar.contains(name)) {
-      RError.err(ErrorType.Error, info, "Variable definition not found: " + name);
-      // TODO should be ok
+    if (argmap.containsKey(name)) { // it is a function argument
+      return argmap.get(name);
     }
 
     RError.err(ErrorType.Error, info, "Variable definition not found: " + name);

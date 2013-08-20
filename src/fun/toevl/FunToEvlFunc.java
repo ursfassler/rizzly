@@ -47,8 +47,8 @@ public class FunToEvlFunc extends NullTraverser<FunctionBase, Void> {
 
   // ----------------------------------------------------------------------------
 
-  public ListOfNamed<evl.variable.FuncVariable> genpa(FunctionHeader obj) {
-    ListOfNamed<evl.variable.FuncVariable> fparam = new ListOfNamed<evl.variable.FuncVariable>();
+  public ListOfNamed<evl.variable.Variable> genpa(FunctionHeader obj) {
+    ListOfNamed<evl.variable.Variable> fparam = new ListOfNamed<evl.variable.Variable>();
     for (FuncVariable itr : obj.getParam()) {
       fparam.add((evl.variable.FuncVariable) fta.traverse(itr, null));
     }

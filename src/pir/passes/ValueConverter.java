@@ -25,6 +25,7 @@ import common.NameFactory;
  * @author urs
  * 
  */
+@Deprecated // do it already in EVL
 public class ValueConverter extends DefTraverser<List<Statement>, Void> {
 
   public static void process(Program obj) {

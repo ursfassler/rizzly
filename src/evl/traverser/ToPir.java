@@ -212,9 +212,10 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   protected PirObject visitFunctionBase(FunctionBase obj, PirObject param) {
     String name = obj.getName();
 
-    List<pir.other.FuncVariable> arg = new ArrayList<pir.other.FuncVariable>();
-    for (FuncVariable var : obj.getParam()) {
-      arg.add((pir.other.FuncVariable) visit(var, param));
+    List<pir.other.SsaVariable> arg = new ArrayList<pir.other.SsaVariable>();
+    for (evl.variable.Variable var : obj.getParam()) {
+      assert( var instanceof SsaVariable );
+      arg.add((pir.other.SsaVariable) visit(var, param));
     }
 
     pir.function.Function func;

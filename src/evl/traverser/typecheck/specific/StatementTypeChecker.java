@@ -40,6 +40,7 @@ import evl.type.base.BooleanType;
 import evl.type.base.Range;
 import evl.variable.Constant;
 import evl.variable.FuncVariable;
+import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
 
@@ -131,6 +132,11 @@ public class StatementTypeChecker extends NullTraverser<Void, Map<Variable, Rang
 
   @Override
   protected Void visitFuncVariable(FuncVariable obj, Map<Variable, Range> param) {
+    return null;
+  }
+
+  @Override
+  protected Void visitSsaVariable(SsaVariable obj, Map<Variable, Range> param) {
     return null;
   }
 

@@ -6,7 +6,7 @@ import evl.cfg.BasicBlockList;
 import evl.function.FuncWithBody;
 import evl.function.FunctionBase;
 import evl.other.ListOfNamed;
-import evl.variable.FuncVariable;
+import evl.variable.Variable;
 
 /**
  *
@@ -16,7 +16,7 @@ public class FuncSubHandlerEvent extends FunctionBase implements FuncWithBody {
 
   private BasicBlockList body = null;
 
-  public FuncSubHandlerEvent(ElementInfo info, String name, ListOfNamed<FuncVariable> param) {
+  public FuncSubHandlerEvent(ElementInfo info, String name, ListOfNamed<Variable> param) {
     super(info, name, param);
   }
 

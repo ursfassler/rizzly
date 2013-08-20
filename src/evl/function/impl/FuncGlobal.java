@@ -8,7 +8,7 @@ import evl.function.FuncWithBody;
 import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
 import evl.other.ListOfNamed;
-import evl.variable.FuncVariable;
+import evl.variable.Variable;
 
 /**
  *
@@ -18,7 +18,7 @@ public class FuncGlobal extends FunctionBase implements FuncWithReturn, FuncWith
   private Reference ret = null;
   private BasicBlockList body = null;
 
-  public FuncGlobal(ElementInfo info, String name, ListOfNamed<FuncVariable> param) {
+  public FuncGlobal(ElementInfo info, String name, ListOfNamed<Variable> param) {
     super(info, name, param);
   }
 

@@ -8,7 +8,7 @@ import evl.function.FuncWithBody;
 import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
 import evl.other.ListOfNamed;
-import evl.variable.FuncVariable;
+import evl.variable.Variable;
 
 /**
  *
@@ -18,7 +18,7 @@ public class FuncPrivateRet extends FunctionBase implements FuncWithReturn, Func
   private Reference ret = null;
   private BasicBlockList body = null;
 
-  public FuncPrivateRet(ElementInfo info, String name, ListOfNamed<FuncVariable> param) {
+  public FuncPrivateRet(ElementInfo info, String name, ListOfNamed<Variable> param) {
     super(info, name, param);
   }
 

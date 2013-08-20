@@ -6,7 +6,7 @@ import evl.cfg.BasicBlockList;
 import evl.function.FuncWithBody;
 import evl.function.FunctionBase;
 import evl.other.ListOfNamed;
-import evl.variable.FuncVariable;
+import evl.variable.Variable;
 
 /**
  *
@@ -15,7 +15,7 @@ import evl.variable.FuncVariable;
 public class FuncPrivateVoid extends FunctionBase implements FuncWithBody {
   private BasicBlockList body = null;
 
-  public FuncPrivateVoid(ElementInfo info, String name, ListOfNamed<FuncVariable> param) {
+  public FuncPrivateVoid(ElementInfo info, String name, ListOfNamed<Variable> param) {
     super(info, name, param);
   }
 

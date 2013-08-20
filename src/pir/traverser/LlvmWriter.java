@@ -166,6 +166,14 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
+  protected Void visitSsaVariable(SsaVariable obj, StreamWriter param) {
+    wrTypeRef(obj.getType(), param);
+    param.wr(" ");
+    param.wr("%" + obj.getName());
+    return null;
+  }
+
+  @Override
   protected Void visitConstant(Constant obj, StreamWriter param) {
     param.wr(obj.getName());
     param.wr(": ");
@@ -362,7 +370,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitVarRef(VarRef obj, StreamWriter param) {
-    //TODO not used?
+    // TODO not used?
     param.wr("%" + obj.getRef().getName());
     return null;
   }
