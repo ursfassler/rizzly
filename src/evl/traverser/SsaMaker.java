@@ -65,7 +65,7 @@ public class SsaMaker extends DefTraverser<Void, Void> {
     if (obj instanceof FuncWithBody) {
       BasicBlockList body = (BasicBlockList) ((FuncWithBody) obj).getBody();
 
-      DirectedGraph<BasicBlock, BbEdge> funcGraph = BasicBlock.makeFuncGraph(body.getBasicBlocks());
+      DirectedGraph<BasicBlock, BbEdge> funcGraph = body.makeFuncGraph();
       Dominator<BasicBlock, BbEdge> dom = new Dominator<BasicBlock, BbEdge>(funcGraph);
       dom.calc();
       DominanceFrontier<BasicBlock, BbEdge> df = new DominanceFrontier<BasicBlock, BbEdge>(funcGraph, dom.getDom());
@@ -91,7 +91,7 @@ public class SsaMaker extends DefTraverser<Void, Void> {
   }
 
   private void addPhiArg(BasicBlockList body, Map<SsaVariable, FuncVariable> renamed) {
-    for (BasicBlock bb : body.getBasicBlocks()) {
+    for (BasicBlock bb : body.getAllBbs()) {
       for (BasicBlock dst : bb.getEnd().getJumpDst()) {
         List<PhiStmt> phis = dst.getPhi();
         for (PhiStmt phistmt : phis) {
@@ -214,7 +214,7 @@ class SsaVarCreator extends NullTraverser<Void, List<Statement>> {
 
   @Override
   protected Void visitBasicBlockList(BasicBlockList obj, List<Statement> param) {
-    visitItr(obj.getBasicBlocks(), null);
+    visitItr(obj.getAllBbs(),null);
     return null;
   }
 

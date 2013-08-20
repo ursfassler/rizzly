@@ -300,7 +300,7 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
 
   @Override
   protected PirObject visitBasicBlockList(BasicBlockList obj, PirObject param) {
-    pir.cfg.BasicBlockList ret = new pir.cfg.BasicBlockList();
+    pir.cfg.BasicBlockList ret = new pir.cfg.BasicBlockList( (pir.cfg.BasicBlock)visit(obj.getEntry(),null), (pir.cfg.BasicBlock) visit(obj.getExit(),null) );
     for (BasicBlock bb : obj.getBasicBlocks()) {
       ret.getBasicBlocks().add((pir.cfg.BasicBlock) visit(bb, param));
     }

@@ -19,13 +19,11 @@ import pir.expression.reference.VarRef;
 import pir.expression.reference.VarRefSimple;
 import pir.function.FuncImpl;
 import pir.function.FuncProto;
-import pir.function.Function;
 import pir.other.Constant;
 import pir.other.FuncVariable;
 import pir.other.Program;
 import pir.other.SsaVariable;
 import pir.other.StateVariable;
-import pir.other.Variable;
 import pir.statement.ArithmeticOp;
 import pir.statement.Assignment;
 import pir.statement.CallAssignment;
@@ -48,7 +46,6 @@ import pir.type.RangeType;
 import pir.type.SignedType;
 import pir.type.StringType;
 import pir.type.StructType;
-import pir.type.Type;
 import pir.type.TypeAlias;
 import pir.type.UnionType;
 import pir.type.UnsignedType;
@@ -58,15 +55,9 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitProgram(Program obj, P param) {
-    for (Type type : obj.getType()) {
-      visit(type, param);
-    }
-    for (Variable var : obj.getVariable()) {
-      visit(var, param);
-    }
-    for (Function func : obj.getFunction()) {
-      visit(func, param);
-    }
+    visitList(obj.getType(), param);
+    visitList(obj.getVariable(), param);
+    visitList(obj.getFunction(), param);
     return null;
   }
 
@@ -243,7 +234,9 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitBasicBlockList(BasicBlockList obj, P param) {
+    visit(obj.getEntry(), param);
     visitList(obj.getBasicBlocks(), param);
+    visit(obj.getExit(), param);
     return null;
   }
 

@@ -10,6 +10,8 @@ import evl.expression.reference.Reference;
 import evl.function.FunctionBase;
 import evl.function.FunctionFactory;
 import evl.other.ListOfNamed;
+import evl.type.Type;
+import evl.type.special.VoidType;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.function.FuncWithBody;
@@ -67,12 +69,18 @@ public class FunToEvlFunc extends NullTraverser<FunctionBase, Void> {
     assert ((func instanceof evl.function.FuncWithBody) == (obj instanceof FuncWithBody));
 
     map.put(obj, func);
+    Type retType;
     if (obj instanceof FuncWithReturn) {
-      ((evl.function.FuncWithReturn) func).setRet((Reference) fta.traverse(((FuncWithReturn) obj).getRet(), null));
+      Reference typeRef = (Reference) fta.traverse(((FuncWithReturn) obj).getRet(), null);
+      assert (typeRef.getOffset().isEmpty());
+      retType = (Type) typeRef.getLink();
+      ((evl.function.FuncWithReturn) func).setRet(typeRef);
+    } else {
+      retType = new VoidType(); // FIXME get singleton
     }
     if (obj instanceof FuncWithBody) {
       MakeBasicBlocks blocks = new MakeBasicBlocks(fta);
-      BasicBlockList nbody = blocks.translate(((FuncWithBody) obj).getBody(), obj.getParam().getList());
+      BasicBlockList nbody = blocks.translate(((FuncWithBody) obj).getBody(), obj.getParam().getList(), retType);
       ((evl.function.FuncWithBody) func).setBody(nbody);
     }
     return func;

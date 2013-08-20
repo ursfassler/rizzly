@@ -161,7 +161,7 @@ class CopyEvl extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitBasicBlockList(BasicBlockList obj, Void param) {
-    BasicBlockList bbl = new BasicBlockList(obj.getInfo());
+    BasicBlockList bbl = new BasicBlockList(obj.getInfo(),copy(obj.getEntry()),copy(obj.getExit()));
     bbl.getBasicBlocks().addAll(copy(obj.getBasicBlocks()));
     return bbl;
   }

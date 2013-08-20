@@ -7,7 +7,10 @@ import java.util.List;
 import java.util.Set;
 
 import common.ElementInfo;
+import common.NameFactory;
 
+import error.ErrorType;
+import error.RError;
 import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockEnd;
 import evl.cfg.BasicBlockList;
@@ -18,6 +21,8 @@ import evl.cfg.Goto;
 import evl.cfg.IfGoto;
 import evl.expression.Expression;
 import evl.expression.reference.Reference;
+import evl.type.Type;
+import evl.type.special.VoidType;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.statement.Assignment;
@@ -36,31 +41,41 @@ import fun.variable.FuncVariable;
 
 /**
  * Translates body of functions from FUN to EVL, including translation into Basic Block representation
- *
+ * 
  * @author urs
- *
+ * 
  */
 class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
   final private FunToEvl fta;
   final private LinkedList<BasicBlock> bblist = new LinkedList<BasicBlock>();
+  private evl.variable.FuncVariable result;
+  private BasicBlock exit;
 
   public MakeBasicBlocks(FunToEvl fta) {
     super();
     this.fta = fta;
   }
 
-  public BasicBlockList translate(Block body, List<FuncVariable> param) {
-    BasicBlock head = makeBb(body.getInfo());
+  public BasicBlockList translate(Block body, List<FuncVariable> param, Type retType) {
+    BasicBlock head = new BasicBlock(body.getInfo(), "BB_entry");
+    exit = new BasicBlock(body.getInfo(), "BB_exit");
+
+    if (retType instanceof VoidType) {
+      result = null;
+      exit.setEnd(new evl.cfg.ReturnVoid(body.getInfo()));
+    } else {
+      result = new evl.variable.FuncVariable(body.getInfo(), NameFactory.getNew(), retType);
+      head.getCode().add(new evl.statement.VarDefStmt(body.getInfo(), result));
+      exit.setEnd(new evl.cfg.ReturnExpr(body.getInfo(), new Reference(body.getInfo(), result)));
+    }
 
     BasicBlock last = visit(body, null);
-    BasicBlock exit = makeBb(body.getInfo());
-    exit.setEnd((BasicBlockEnd) fta.traverse(new ReturnVoid(body.getInfo()), null));
     addGoto(last, exit);
-    addGoto(head, bblist.get(1));
+    addGoto(head, bblist.get(0));
 
-    removeUnreachable(bblist);
+    // removeUnreachable(bblist);
 
-    BasicBlockList bbBody = new BasicBlockList(body.getInfo());
+    BasicBlockList bbBody = new BasicBlockList(body.getInfo(),head,exit);
     bbBody.getBasicBlocks().addAll(bblist);
 
     return bbBody;
@@ -87,6 +102,8 @@ class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
     }
   }
 
+  @Deprecated
+  // TODO start from entry point
   static private void removeUnreachable(LinkedList<BasicBlock> vertices) {
     Set<BasicBlock> reachable = new HashSet<BasicBlock>();
     LinkedList<BasicBlock> test = new LinkedList<BasicBlock>();
@@ -130,7 +147,17 @@ class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
   @Override
   protected BasicBlock visitReturnExpr(ReturnExpr obj, BasicBlock param) {
     assert (param.getEnd() == null);
-    param.setEnd((BasicBlockEnd) fta.traverse(obj, null));
+
+    if (result == null) {
+      RError.err(ErrorType.Error, obj.getInfo(), "Function has no return value");
+      return param;
+    }
+
+    Expression retVal = (Expression) fta.traverse(obj.getExpr(), null);
+    evl.statement.Assignment ass = new evl.statement.Assignment(obj.getInfo(), new Reference(obj.getInfo(), result), retVal);
+    param.getCode().add(ass);
+
+    param.setEnd(new Goto(obj.getInfo(), exit));
     return param;
   }
 

@@ -543,7 +543,9 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitBasicBlockList(BasicBlockList obj, P param) {
+    visit(obj.getEntry(), param);
     visitItr(obj.getBasicBlocks(), param);
+    visit(obj.getExit(), param);
     return null;
   }
 

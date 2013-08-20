@@ -125,7 +125,7 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     param.add(iface);
 
     BasicBlockList bblist = new BasicBlockList(info);
-    bblist.getBasicBlocks().add(body);
+    bblist.getBasicBlocksOld().add(body);
     FuncPrivateVoid rfunc = new FuncPrivateVoid(info, "_" + callname, param);
     rfunc.setBody(bblist);
 
@@ -178,7 +178,7 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     bb.setEnd(new ReturnVoid(info));
 
     BasicBlockList bblist = new BasicBlockList(info);
-    bblist.getBasicBlocks().add(bb);
+    bblist.getBasicBlocksOld().add(bb);
 
     return bblist;
   }

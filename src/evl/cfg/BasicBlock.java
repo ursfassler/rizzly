@@ -55,20 +55,4 @@ public class BasicBlock extends EvlBase implements Named {
   public List<PhiStmt> getPhi() {
     return phi;
   }
-
-  public static DirectedGraph<BasicBlock, BbEdge> makeFuncGraph(Collection<BasicBlock> bbs) {
-    DirectedGraph<BasicBlock, BbEdge> g = new BaseGraph<BasicBlock, BbEdge>();
-
-    for (BasicBlock u : bbs) {
-      g.addVertex(u);
-      BasicBlockEnd bbe = u.getEnd();
-      for (BasicBlock v : bbe.getJumpDst()) {
-        g.addVertex(v);
-        BbEdge e = new BbEdge(u, v);
-        g.addEdge(u, v, e);
-      }
-    }
-
-    return g;
-  }
 }

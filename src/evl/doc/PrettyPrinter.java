@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 
 import common.Direction;
@@ -836,7 +837,16 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitBasicBlockList(BasicBlockList obj, StreamWriter param) {
-    visitItr(obj.getBasicBlocks(), param);
+    visit(obj.getEntry(),param);
+    visit(obj.getExit(),param);
+    LinkedList<BasicBlock> bbs = new LinkedList<BasicBlock>(obj.getBasicBlocks());
+    Collections.sort(bbs, new Comparator<BasicBlock>() {
+      @Override
+      public int compare(BasicBlock o1, BasicBlock o2) {
+        return o1.getName().compareTo(o2.getName());
+      }
+    });
+    visitItr(bbs, param);
     return null;
   }
 

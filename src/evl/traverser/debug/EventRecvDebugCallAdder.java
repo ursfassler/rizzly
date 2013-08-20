@@ -68,7 +68,7 @@ public class EventRecvDebugCallAdder extends DefTraverser<Void, Integer> {
     assert (param >= 0);
     int numFunc = names.indexOf(obj.getName());
     assert (numFunc >= 0);
-    obj.getBody().getBasicBlocks().get(0).getCode().add(0, makeCall(msgRecvFunc, numFunc, param)); // TODO make it
+    obj.getBody().getBasicBlocksOld().get(0).getCode().add(0, makeCall(msgRecvFunc, numFunc, param)); // TODO make it
                                                                                                    // cleaner
   }
 

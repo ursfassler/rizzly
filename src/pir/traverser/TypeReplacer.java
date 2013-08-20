@@ -249,6 +249,8 @@ import pir.type.Type;
 
   @Override
   protected Type visitBasicBlockList(BasicBlockList obj, T param) {
+    visit(obj.getEntry(),param);
+    visit(obj.getExit(),param);
     visitList(obj.getBasicBlocks(), param);
     return null;
   }

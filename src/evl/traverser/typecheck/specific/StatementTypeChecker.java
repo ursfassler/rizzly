@@ -246,10 +246,10 @@ public class StatementTypeChecker extends NullTraverser<Void, Map<Variable, Rang
 
   @Override
   protected Void visitBasicBlockList(BasicBlockList obj, Map<Variable, Range> param) {
-    for (BasicBlock bb : obj.getBasicBlocks()) {
+    for (BasicBlock bb : obj.getAllBbs()) {
       map.put(bb, new HashMap<Variable, Range>());
     }
-    visitList(obj.getBasicBlocks(), null);
+    visitItr(obj.getAllBbs(), null);
     return null;
   }
 

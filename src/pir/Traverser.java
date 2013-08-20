@@ -1,7 +1,5 @@
 package pir;
 
-import java.util.Collection;
-
 import pir.cfg.BasicBlock;
 import pir.cfg.BasicBlockEnd;
 import pir.cfg.BasicBlockList;
@@ -69,7 +67,7 @@ abstract public class Traverser<R, P> {
     return visit(obj, param);
   }
 
-  protected void visitList(Collection<? extends PirObject> list, P param) {
+  protected void visitList(Iterable<? extends PirObject> list, P param) {
     for (PirObject itr : list) {
       visit(itr, param);
     }

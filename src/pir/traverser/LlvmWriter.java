@@ -3,6 +3,9 @@ package pir.traverser;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 
 import pir.NullTraverser;
@@ -774,7 +777,16 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitBasicBlockList(BasicBlockList obj, StreamWriter param) {
     param.incIndent();
-    visitList(obj.getBasicBlocks(), param);
+    visit(obj.getEntry(),param);
+    visit(obj.getExit(),param);
+    
+    LinkedList<BasicBlock> bbs = new LinkedList<BasicBlock>(obj.getBasicBlocks());
+    Collections.sort(bbs, new Comparator<BasicBlock>(){
+      @Override
+      public int compare(BasicBlock o1, BasicBlock o2) {
+        return o1.getName().compareTo(o2.getName());
+      }});
+    visitList(bbs, param);
     param.decIndent();
     return null;
   }

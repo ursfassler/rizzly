@@ -51,7 +51,7 @@ public class DefUseKillVisitor extends DefTraverser<Void, BasicBlock> {
       BasicBlockList bbl = (BasicBlockList) ((FuncWithBody) obj).getBody();
       // TODO ok? no, move it to function creation
       // we add the argument variables to the first basic block
-      param = bbl.getBasicBlocks().get(0);
+      param = bbl.getEntry();
       use.put(param, new HashSet<Variable>());
       def.put(param, new HashSet<Variable>());
       kill.put(param, new HashSet<Variable>());

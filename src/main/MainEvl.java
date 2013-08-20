@@ -24,7 +24,9 @@ import error.RError;
 import evl.Evl;
 import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
+import evl.cfg.Goto;
 import evl.cfg.ReturnExpr;
+import evl.cfg.ReturnVoid;
 import evl.composition.CompositionReduction;
 import evl.composition.Connection;
 import evl.composition.ImplComposition;
@@ -96,12 +98,12 @@ public class MainEvl {
   public static RizzlyProgram doEvl(ClaOption opt, String debugdir, Namespace aclasses, Component root) {
     KnowledgeBase kb = new KnowledgeBase(aclasses, debugdir);
 
-    PrettyPrinter.print(aclasses, debugdir + "ast.rzy",false);
+    PrettyPrinter.print(aclasses, debugdir + "ast.rzy", false);
     SsaMaker.process(aclasses, kb);
-    PrettyPrinter.print(aclasses, debugdir + "ssa.rzy",false);
+    PrettyPrinter.print(aclasses, debugdir + "ssa.rzy", false);
 
-    //TODO add new variables after if/case with narrowed range
-    
+    // TODO add new variables after if/case with narrowed range
+
     typecheck(aclasses, root, debugdir);
     if (!opt.doLazyModelCheck()) {
       modelCheck(debugdir, aclasses, root, kb);
@@ -111,14 +113,14 @@ public class MainEvl {
     // TODO reimplement
     // root = hfsmReduction(root, opt, debugdir, aclasses, kb);
 
-    PrettyPrinter.print(aclasses, debugdir + "reduced.rzy",false);
+    PrettyPrinter.print(aclasses, debugdir + "reduced.rzy", false);
 
     // only for debugging
     // typecheck(classes, debugdir);
 
     // TODO or before type check?
     ExprCutter.process(aclasses, kb);
-    PrettyPrinter.print(aclasses, debugdir + "expr.rzy",false);
+    PrettyPrinter.print(aclasses, debugdir + "expr.rzy", false);
 
     if (opt.doDebugEvent()) {
       addDebug(aclasses, (ImplElementary) root, debugdir);
@@ -492,9 +494,9 @@ public class MainEvl {
         Reference array = new Reference(info, symtable);
         array.getOffset().add(new RefIndex(info, index));
 
-        BasicBlock bb = new BasicBlock(info,"bodyBB");
+        BasicBlock bb = new BasicBlock(info, "bodyBB");
         bb.setEnd(new ReturnExpr(info, array));
-        body.getBasicBlocks().add(bb);
+        body.getBasicBlocksOld().add(bb);
       }
 
       FuncGlobal func = new FuncGlobal(info, "getSym", new ListOfNamed<Variable>(param));
@@ -518,9 +520,9 @@ public class MainEvl {
     classes.add(env);
 
     {
-      PrettyPrinter.print(classes, rootdir + "env.rzy",false);
+      PrettyPrinter.print(classes, rootdir + "env.rzy", false);
       Map<? extends Named, ? extends Named> map = CompInstantiator.process(env, kb);
-      PrettyPrinter.print(classes, rootdir + "insta.rzy",false);
+      PrettyPrinter.print(classes, rootdir + "insta.rzy", false);
 
       KnowEvl kf = kb.getEntry(KnowEvl.class);
       Evl inst = kf.get(new Designator("inst"), info);
@@ -532,7 +534,7 @@ public class MainEvl {
 
     kb = new KnowledgeBase(classes, rootdir);
 
-    PrettyPrinter.print(classes, rootdir + "instance.rzy",true);
+    PrettyPrinter.print(classes, rootdir + "instance.rzy", true);
     {
       Namespace root = classes.forcePath(new Designator("!env", "inst"));
       Set<FunctionBase> pubfunc = makeInputPublic(root, top.getIface(Direction.in));
@@ -543,9 +545,9 @@ public class MainEvl {
 
     kb = null;
 
-    PrettyPrinter.print(classes, rootdir + "bflat.rzy",true);
+    PrettyPrinter.print(classes, rootdir + "bflat.rzy", true);
     ListOfNamed<Named> flat = NamespaceReduction.process(classes);
-    PrettyPrinter.print(classes, rootdir + "aflat.rzy",true);
+    PrettyPrinter.print(classes, rootdir + "aflat.rzy", true);
 
     RizzlyProgram prg = new RizzlyProgram(rootdir, "inst");
     prg.getFunction().addAll(flat.getItems(FunctionBase.class));
@@ -586,7 +588,11 @@ public class MainEvl {
 
   private static FuncPrivateVoid makeEntryExitFunc(String name) {
     FuncPrivateVoid func = new FuncPrivateVoid(info, name, new ListOfNamed<Variable>());
-    func.setBody(new BasicBlockList(info));
+    BasicBlock entryBb = new BasicBlock(info, "BB_entry");
+    BasicBlock exitBb = new BasicBlock(info, "BB_exit");
+    entryBb.setEnd(new Goto(info, exitBb));
+    exitBb.setEnd(new ReturnVoid(info));
+    func.setBody(new BasicBlockList(info, entryBb, exitBb));
     return func;
   }
 
