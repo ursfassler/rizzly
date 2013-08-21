@@ -64,6 +64,7 @@ import evl.other.Named;
 import evl.other.NamedList;
 import evl.other.Namespace;
 import evl.other.RizzlyProgram;
+import evl.passes.RangeNarrower;
 import evl.traverser.CallgraphMaker;
 import evl.traverser.ClassGetter;
 import evl.traverser.CompInstantiator;
@@ -102,8 +103,10 @@ public class MainEvl {
     SsaMaker.process(aclasses, kb);
     PrettyPrinter.print(aclasses, debugdir + "ssa.rzy", false);
 
-    // TODO add new variables after if/case with narrowed range
+    RangeNarrower.process( aclasses, kb );
 
+    PrettyPrinter.print(aclasses, debugdir + "ssaRanged.rzy", false);
+    
     typecheck(aclasses, root, debugdir);
     if (!opt.doLazyModelCheck()) {
       modelCheck(debugdir, aclasses, root, kb);

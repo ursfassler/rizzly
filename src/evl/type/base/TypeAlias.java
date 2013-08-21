@@ -2,22 +2,22 @@ package evl.type.base;
 
 import common.ElementInfo;
 
-import evl.expression.reference.Reference;
 import evl.type.Type;
+import evl.type.TypeRef;
 
 public class TypeAlias extends Type {
-  private Reference ref;
+  private TypeRef ref;
 
-  public TypeAlias(ElementInfo info, String name, Reference ref) {
+  public TypeAlias(ElementInfo info, String name, TypeRef ref) {
     super(info, name);
     this.ref = ref;
   }
 
-  public Reference getRef() {
+  public TypeRef getRef() {
     return ref;
   }
 
-  public void setRef(Reference ref) {
+  public void setRef(TypeRef ref) {
     this.ref = ref;
   }
 }

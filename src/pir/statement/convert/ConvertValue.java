@@ -1,22 +1,22 @@
 package pir.statement.convert;
 
-import pir.expression.PExpression;
-import pir.other.Variable;
+import pir.other.PirValue;
+import pir.other.SsaVariable;
 import pir.statement.VariableGeneratorStmt;
 
 abstract public class ConvertValue extends VariableGeneratorStmt {
-  private PExpression original;
+  private PirValue original;
 
-  public ConvertValue(Variable variable, PExpression original) {
+  public ConvertValue(SsaVariable variable, PirValue original) {
     super(variable);
     this.original = original;
   }
 
-  public PExpression getOriginal() {
+  public PirValue getOriginal() {
     return original;
   }
 
-  public void setOriginal(PExpression original) {
+  public void setOriginal(PirValue original) {
     this.original = original;
   }
 

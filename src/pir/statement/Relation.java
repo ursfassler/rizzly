@@ -1,26 +1,26 @@
 package pir.statement;
 
-import pir.expression.PExpression;
-import pir.other.Variable;
+import pir.other.PirValue;
+import pir.other.SsaVariable;
 import evl.expression.RelOp;
 
 public class Relation extends VariableGeneratorStmt {
-  final private PExpression left; // FIXME only use constant or variable ref
-  final private PExpression right; // FIXME only use constant or variable ref
+  final private PirValue left; // FIXME only use constant or variable ref
+  final private PirValue right; // FIXME only use constant or variable ref
   final private RelOp op;
 
-  public Relation(Variable variable, PExpression left, PExpression right, RelOp op) {
+  public Relation(SsaVariable variable, PirValue left, PirValue right, RelOp op) {
     super(variable);
     this.left = left;
     this.right = right;
     this.op = op;
   }
 
-  public PExpression getLeft() {
+  public PirValue getLeft() {
     return left;
   }
 
-  public PExpression getRight() {
+  public PirValue getRight() {
     return right;
   }
 

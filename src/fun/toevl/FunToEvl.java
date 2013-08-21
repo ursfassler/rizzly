@@ -18,6 +18,7 @@ import evl.function.FunctionBase;
 import evl.other.CompUse;
 import evl.other.IfaceUse;
 import evl.type.Type;
+import evl.type.TypeRef;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.composition.Connection;
@@ -63,6 +64,14 @@ public class FunToEvl extends NullTraverser<Evl, String> {
     FunToEvl funToAst = new FunToEvl(funType);
     return (evl.other.Namespace) funToAst.traverse(classes, null);
   }
+  
+  public static TypeRef toTypeRef(Reference ref) {
+    assert( ref.getOffset().isEmpty() );
+    assert( ref.getLink() instanceof Type );
+    TypeRef typeRef = new TypeRef(ref.getInfo(), (Type) ref.getLink());
+    return typeRef;
+  }
+
 
   @Override
   protected Evl visit(Fun obj, String param) {
@@ -145,8 +154,7 @@ public class FunToEvl extends NullTraverser<Evl, String> {
   @Override
   protected Evl visitNamedElement(NamedElement obj, String param) {
     Reference ref = (Reference) traverse(obj.getType(), null);
-    assert (ref.getOffset().isEmpty());
-    return new evl.type.composed.NamedElement(obj.getInfo(), obj.getName(), (Type) ref.getLink());
+    return new evl.type.composed.NamedElement(obj.getInfo(), obj.getName(), FunToEvl.toTypeRef(ref));
   }
 
   @Override

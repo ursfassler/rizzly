@@ -7,17 +7,17 @@ import java.util.Set;
 import pir.PirObject;
 import pir.expression.reference.Referencable;
 import pir.other.SsaVariable;
-import pir.type.Type;
+import pir.type.TypeRef;
 
 import common.FuncAttr;
 
 abstract public class Function extends PirObject implements Referencable {
   private String name;
   final private List<SsaVariable> argument;
-  private Type retType = null;
+  private TypeRef retType = null;
   final private Set<FuncAttr> attributes = new HashSet<FuncAttr>();
 
-  public Function(String name, List<SsaVariable> argument, Type retType) {
+  public Function(String name, List<SsaVariable> argument, TypeRef retType) {
     super();
     this.name = name;
     this.argument = argument;
@@ -40,11 +40,11 @@ abstract public class Function extends PirObject implements Referencable {
     this.name = name;
   }
 
-  public Type getRetType() {
+  public TypeRef getRetType() {
     return retType;
   }
 
-  public void setRetType(Type retType) {
+  public void setRetType(TypeRef retType) {
     this.retType = retType;
   }
 

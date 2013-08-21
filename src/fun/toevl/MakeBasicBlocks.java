@@ -21,7 +21,7 @@ import evl.cfg.Goto;
 import evl.cfg.IfGoto;
 import evl.expression.Expression;
 import evl.expression.reference.Reference;
-import evl.type.Type;
+import evl.type.TypeRef;
 import evl.type.special.VoidType;
 import fun.Fun;
 import fun.NullTraverser;
@@ -56,11 +56,11 @@ class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
     this.fta = fta;
   }
 
-  public BasicBlockList translate(Block body, List<FuncVariable> param, Type retType) {
+  public BasicBlockList translate(Block body, List<FuncVariable> param, TypeRef retType) {
     BasicBlock head = new BasicBlock(body.getInfo(), "BB_entry");
     exit = new BasicBlock(body.getInfo(), "BB_exit");
 
-    if (retType instanceof VoidType) {
+    if (retType.getRef() instanceof VoidType) {
       result = null;
       exit.setEnd(new evl.cfg.ReturnVoid(body.getInfo()));
     } else {

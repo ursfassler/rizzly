@@ -3,29 +3,28 @@ package pir.statement;
 import java.util.ArrayList;
 import java.util.List;
 
-import pir.expression.PExpression;
-import pir.expression.reference.VarRef;
-import pir.other.Variable;
+import pir.other.PirValue;
+import pir.other.SsaVariable;
 
 public class GetElementPtr extends VariableGeneratorStmt {
-  private VarRef base;
-  final private List<PExpression> offset = new ArrayList<PExpression>();
+  private PirValue base;
+  final private List<PirValue> offset = new ArrayList<PirValue>();
 
-  public GetElementPtr(Variable variable, VarRef base, List<PExpression> offset) {
+  public GetElementPtr(SsaVariable variable, PirValue base, List<PirValue> offset) {
     super(variable);
     this.base = base;
     this.offset.addAll(offset);
   }
 
-  public VarRef getBase() {
+  public PirValue getBase() {
     return base;
   }
 
-  public void setBase(VarRef base) {
+  public void setBase(PirValue base) {
     this.base = base;
   }
 
-  public List<PExpression> getOffset() {
+  public List<PirValue> getOffset() {
     return offset;
   }
 

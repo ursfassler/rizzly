@@ -5,6 +5,8 @@ import java.util.List;
 
 import common.ElementInfo;
 
+import error.ErrorType;
+import error.RError;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.expression.Expression;
@@ -40,7 +42,7 @@ public class GenericSpecializer extends NullTraverser<Type, List<Expression>> {
     Expression high = param.get(1);
     assert (low instanceof Number);
     assert (high instanceof Number);
-    return new Range(obj.getInfo(), BigInteger.valueOf(((Number) low).getValue()), BigInteger.valueOf(((Number) high).getValue()));
+    return new Range(obj.getInfo(), ((Number) low).getValue(), ((Number) high).getValue());
   }
 
   @Override
@@ -48,8 +50,11 @@ public class GenericSpecializer extends NullTraverser<Type, List<Expression>> {
     assert (param.size() == 1);
     Expression bits = param.get(0);
     assert (bits instanceof Number);
-    int val = ((Number) bits).getValue();
-    BigInteger max = BigInteger.valueOf(2).pow(val); // TODO correct?
+    BigInteger val = ((Number) bits).getValue();
+    if (val.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
+      RError.err(ErrorType.Error, obj.getInfo(), "Value to big");
+    }
+    BigInteger max = BigInteger.valueOf(2).pow(val.intValue()); // TODO correct?
     max = max.add(BigInteger.valueOf(-1));
     return new Range(obj.getInfo(), BigInteger.ZERO, max);
   }
@@ -61,7 +66,7 @@ public class GenericSpecializer extends NullTraverser<Type, List<Expression>> {
     Expression type = param.get(1);
     assert (type instanceof NamedType);
     assert (size instanceof Number);
-    int count = ((Number) size).getValue();
+    BigInteger count = ((Number) size).getValue();
     NamedType typ = (NamedType) type;
     return new Array(obj.getInfo(), count, new ReferenceLinked(new ElementInfo(), typ));
   }

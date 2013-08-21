@@ -4,12 +4,12 @@ import java.util.List;
 
 import pir.cfg.BasicBlockList;
 import pir.other.SsaVariable;
-import pir.type.Type;
+import pir.type.TypeRef;
 
 final public class FuncImpl extends Function implements FuncWithBody {
   private BasicBlockList body = null;
 
-  public FuncImpl(String name, List<SsaVariable> argument, Type retType) {
+  public FuncImpl(String name, List<SsaVariable> argument, TypeRef retType) {
     super(name, argument, retType);
   }
 

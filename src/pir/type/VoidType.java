@@ -1,8 +1,10 @@
 package pir.type;
 
 public class VoidType extends Type {
-  public VoidType(String name) {
-    super(name);
+  static final public String NAME = "void";
+
+  public VoidType() {
+    super(NAME);
   }
 
 }

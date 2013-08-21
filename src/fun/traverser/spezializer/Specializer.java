@@ -1,5 +1,6 @@
 package fun.traverser.spezializer;
 
+import java.math.BigInteger;
 import java.util.List;
 
 import common.Designator;
@@ -115,8 +116,8 @@ public class Specializer {
     for (Expression expr : generic) {
       name += Designator.NAME_SEP;
       if (expr instanceof Number) {
-        int ref = ((Number) expr).getValue();
-        name += Integer.toString(ref);
+        BigInteger ref = ((Number) expr).getValue();
+        name += ref.toString();
       } else if (expr instanceof Named) {
         name += ((Named) expr).getName();
       } else {

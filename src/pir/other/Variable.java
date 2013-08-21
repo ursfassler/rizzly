@@ -2,13 +2,13 @@ package pir.other;
 
 import pir.PirObject;
 import pir.expression.reference.Referencable;
-import pir.type.Type;
+import pir.type.TypeRef;
 
 abstract public class Variable extends PirObject implements Referencable {
   private String name;
-  private Type type;
+  private TypeRef type;
 
-  public Variable(String name, Type type) {
+  public Variable(String name, TypeRef type) {
     super();
     this.name = name;
     this.type = type;
@@ -18,20 +18,20 @@ abstract public class Variable extends PirObject implements Referencable {
     return name;
   }
 
-  public Type getType() {
+  public TypeRef getType() {
     return type;
   }
 
   @Override
   public String toString() {
-    return name + ":" + type.getName();
+    return name + ":" + type.getRef().getName();
   }
 
   public void setName(String name) {
     this.name = name;
   }
 
-  public void setType(Type type) {
+  public void setType(TypeRef type) {
     this.type = type;
   }
 

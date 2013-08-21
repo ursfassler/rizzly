@@ -1,5 +1,6 @@
 package parser;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -87,7 +88,7 @@ public class Scanner implements PeekReader<Token> {
     return new Token(value, id, info);
   }
 
-  private Token token(TokenType value, int num, Symbol sym) {
+  private Token token(TokenType value, BigInteger num, Symbol sym) {
     ElementInfo info = new ElementInfo(source, sym.line, sym.row);
     return new Token(value, num, info);
   }
@@ -213,14 +214,15 @@ public class Scanner implements PeekReader<Token> {
 
   // EBNF number: numeric { numeric }
   private Token readNumber(Symbol sym) {
-    int num = sym.sym - '0';
+    BigInteger num = BigInteger.valueOf(sym.sym - '0');
     while (isAlphaNummeric(reader.peek().sym)) {
       Symbol ne = reader.peek();
       if (!isNummeric(ne.sym)) {
         RError.err(ErrorType.Error, source, ne.line, ne.row, "number can't contain characters");
         return null;
       }
-      num = num * 10 + reader.next().sym - '0';
+      num = num.multiply(BigInteger.TEN);
+      num = num.add( BigInteger.valueOf(reader.next().sym - '0') );
     }
     Token res = token(TokenType.NUMBER, num, sym);
     return res;

@@ -1,11 +1,11 @@
 package pir.statement.convert;
 
-import pir.expression.PExpression;
-import pir.other.Variable;
+import pir.other.PirValue;
+import pir.other.SsaVariable;
 
 final public class TruncValue extends ConvertValue {
 
-  public TruncValue(Variable variable, PExpression original) {
+  public TruncValue(SsaVariable variable, PirValue original) {
     super(variable, original);
   }
 

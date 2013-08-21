@@ -45,8 +45,9 @@ import pir.statement.VariableGeneratorStmt;
 import pir.statement.convert.ConvertValue;
 import pir.statement.convert.SignExtendValue;
 import pir.statement.convert.TruncValue;
+import pir.statement.convert.TypeCast;
 import pir.statement.convert.ZeroExtendValue;
-import pir.type.Array;
+import pir.type.ArrayType;
 import pir.type.BooleanType;
 import pir.type.EnumElement;
 import pir.type.EnumType;
@@ -58,6 +59,7 @@ import pir.type.StringType;
 import pir.type.StructType;
 import pir.type.Type;
 import pir.type.TypeAlias;
+import pir.type.TypeRef;
 import pir.type.UnionType;
 import pir.type.UnsignedType;
 import pir.type.VoidType;
@@ -67,8 +69,8 @@ abstract public class Traverser<R, P> {
     return visit(obj, param);
   }
 
-  protected void visitList(Iterable<? extends PirObject> list, P param) {
-    for (PirObject itr : list) {
+  protected void visitList(Iterable<? extends Pir> list, P param) {
+    for (Pir itr : list) {
       visit(itr, param);
     }
   }
@@ -98,6 +100,8 @@ abstract public class Traverser<R, P> {
       return visitBasicBlockList((BasicBlockList) obj, param);
     else if (obj instanceof BasicBlock)
       return visitBasicBlock((BasicBlock) obj, param);
+    else if (obj instanceof TypeRef)
+      return visitTypeRef((TypeRef) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
@@ -197,6 +201,8 @@ abstract public class Traverser<R, P> {
       return visitZeroExtendValue((ZeroExtendValue) obj, param);
     else if (obj instanceof TruncValue)
       return visitTruncValue((TruncValue) obj, param);
+    else if (obj instanceof TypeCast)
+      return visitTypeCast((TypeCast) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
@@ -240,8 +246,8 @@ abstract public class Traverser<R, P> {
       return visitVoidType((VoidType) obj, param);
     else if (obj instanceof TypeAlias)
       return visitTypeAlias((TypeAlias) obj, param);
-    else if (obj instanceof Array)
-      return visitArray((Array) obj, param);
+    else if (obj instanceof ArrayType)
+      return visitArray((ArrayType) obj, param);
     else if (obj instanceof StringType)
       return visitStringType((StringType) obj, param);
     else
@@ -256,6 +262,10 @@ abstract public class Traverser<R, P> {
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
+
+  protected abstract R visitTypeRef(TypeRef obj, P param);
+
+  protected abstract R visitTypeCast(TypeCast obj, P param);
 
   protected abstract R visitTruncValue(TruncValue obj, P param);
 
@@ -351,7 +361,7 @@ abstract public class Traverser<R, P> {
 
   protected abstract R visitStringType(StringType obj, P param);
 
-  protected abstract R visitArray(Array obj, P param);
+  protected abstract R visitArray(ArrayType obj, P param);
 
   protected abstract R visitUnsignedType(UnsignedType obj, P param);
 

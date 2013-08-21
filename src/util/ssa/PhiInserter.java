@@ -56,7 +56,7 @@ public class PhiInserter {
       if (!(v instanceof FuncVariable)) {
         continue;
       }
-      if (!isScalar(v.getType())) {
+      if (!isScalar(v.getType().getRef())) {
         continue;
       }
       FuncVariable x = (FuncVariable) v;

@@ -26,7 +26,6 @@ public class GlobalWriteExtracter extends StmtReplacer<Void> {
   @Override
   protected List<Statement> visitAssignment(Assignment obj, Void param) {
     if (obj.getVariable() instanceof StateVariable) {
-      assert (obj.getSrc().getOffset().isEmpty());
       StoreStmt store = new StoreStmt(new VarRef((StateVariable) obj.getVariable()), obj.getSrc());
       return add(store);
     } else {

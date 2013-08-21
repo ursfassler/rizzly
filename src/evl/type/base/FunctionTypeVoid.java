@@ -4,11 +4,11 @@ import java.util.List;
 
 import common.ElementInfo;
 
-import evl.type.Type;
+import evl.type.TypeRef;
 
 
 final public class FunctionTypeVoid extends FunctionType {
-  public FunctionTypeVoid(ElementInfo info, String name, List<Type> arg) {
+  public FunctionTypeVoid(ElementInfo info, String name, List<TypeRef> arg) {
     super(info, name, arg);
   }
 

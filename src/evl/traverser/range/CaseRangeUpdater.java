@@ -30,7 +30,7 @@ public class CaseRangeUpdater extends NullTraverser<Void, Map<Variable, Range>> 
 
   private BigInteger evalToInt(Expression value) {
     assert (value instanceof Number);
-    return BigInteger.valueOf(((Number) value).getValue());
+    return ((Number) value).getValue();
   }
 
   private void setHigh(BigInteger num) {

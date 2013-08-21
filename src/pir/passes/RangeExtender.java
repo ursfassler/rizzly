@@ -24,10 +24,10 @@ import common.NameFactory;
  * @author urs
  * 
  */
-public class ValueExtender extends DefTraverser<List<Statement>, Void> {
+public class RangeExtender extends DefTraverser<List<Statement>, Void> {
 
   public static void process(Program obj) {
-    ValueExtender changer = new ValueExtender();
+    RangeExtender changer = new RangeExtender();
     changer.traverse(obj, null);
   }
 

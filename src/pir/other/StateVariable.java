@@ -1,15 +1,16 @@
 package pir.other;
 
-import pir.type.Type;
+import pir.type.TypeRef;
 
 /**
  * GLobal variable
+ * 
  * @author urs
- *
+ * 
  */
 final public class StateVariable extends Variable {
 
-  public StateVariable(String name, Type type) {
+  public StateVariable(String name, TypeRef type) {
     super(name, type);
   }
 

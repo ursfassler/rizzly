@@ -4,13 +4,13 @@ import common.ElementInfo;
 
 import evl.EvlBase;
 import evl.other.Named;
-import evl.type.Type;
+import evl.type.TypeRef;
 
 public class NamedElement extends EvlBase implements Named {
   private String name;
-  private Type type;
+  private TypeRef type;
 
-  public NamedElement(ElementInfo info, String name, Type type) {
+  public NamedElement(ElementInfo info, String name, TypeRef type) {
     super(info);
     this.name = name;
     this.type = type;
@@ -24,11 +24,11 @@ public class NamedElement extends EvlBase implements Named {
     this.name = name;
   }
 
-  public Type getType() {
+  public TypeRef getType() {
     return type;
   }
 
-  public void setType(Type type) {
+  public void setType(TypeRef type) {
     this.type = type;
   }
 

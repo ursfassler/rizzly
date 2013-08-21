@@ -17,7 +17,7 @@ import pir.other.FuncVariable;
 import pir.other.Variable;
 import pir.statement.ArithmeticOp;
 import pir.traverser.TypeContainer;
-import pir.type.Array;
+import pir.type.ArrayType;
 import pir.type.BooleanType;
 import pir.type.FunctionType;
 import pir.type.NamedElemType;
@@ -96,8 +96,8 @@ public class KnowPirType extends NullTraverser<Type, Void> {
   @Override
   protected Type visitRefIndex(RefIndex obj, Void param) {
     Type type = visit(obj.getPrevious(), param);
-    assert (type instanceof Array);
-    Array at = (Array) type;
+    assert (type instanceof ArrayType);
+    ArrayType at = (ArrayType) type;
     return at.getType();
   }
 

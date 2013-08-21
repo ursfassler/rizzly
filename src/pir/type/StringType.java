@@ -2,8 +2,10 @@ package pir.type;
 
 public class StringType extends Type {
 
-  public StringType(String name) {
-    super(name);
+  public static final String NAME = "string";
+
+  public StringType() {
+    super(NAME);
   }
 
 }

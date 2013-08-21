@@ -18,7 +18,7 @@ import evl.variable.Variable;
 public class PhiStmt extends EvlBase {
 
   private SsaVariable vardef;
-  private Map<BasicBlock, Variable> arg = new HashMap<BasicBlock, Variable>();
+  private Map<BasicBlock, Variable> arg = new HashMap<BasicBlock, Variable>();    //TODO use Reference?
 
   public PhiStmt(ElementInfo info, SsaVariable vardef) {
     super(info);

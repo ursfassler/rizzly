@@ -16,7 +16,7 @@ import pir.expression.reference.VarRefSimple;
 import pir.other.Variable;
 import pir.statement.ArithmeticOp;
 import pir.statement.Relation;
-import pir.type.Array;
+import pir.type.ArrayType;
 import pir.type.BooleanType;
 import pir.type.EnumType;
 import pir.type.NamedElement;
@@ -24,6 +24,7 @@ import pir.type.RangeType;
 import pir.type.SignedType;
 import pir.type.StructType;
 import pir.type.Type;
+import pir.type.TypeRef;
 
 public class ExprTypeGetter extends NullTraverser<Type, Void> {
   public final static boolean NUMBER_AS_RANGE = true;
@@ -54,6 +55,11 @@ public class ExprTypeGetter extends NullTraverser<Type, Void> {
       type = rtg.traverse(itm, type);
     }
     return type;
+  }
+
+  @Override
+  protected Type visitTypeRef(TypeRef obj, Void param) {
+    return obj.getRef();
   }
 
   @Override
@@ -100,24 +106,25 @@ public class ExprTypeGetter extends NullTraverser<Type, Void> {
     return bigger;
   }
 
-  static private int getBits(int value) {
-    int bit = 0;
-    while (value != 0) {
-      value >>= 1;
-      bit++;
-    }
-    return bit;
+  static private int getBits(BigInteger value) {
+    return value.bitCount();    //TODO does it return the correct bit number?
+//    int bit = 0;
+//    while (value != 0) {
+//      value >>= 1;
+//      bit++;
+//    }
+//    return bit;
   }
 
   @Override
   protected Type visitNumber(Number obj, Void param) {
     if (numAsRange) {
-      return new RangeType(BigInteger.valueOf(obj.getValue()), BigInteger.valueOf(obj.getValue()));
+      return new RangeType(obj.getValue(), obj.getValue());
     } else {
-      if (obj.getValue() >= 0) {
+      if ( obj.getValue().compareTo(BigInteger.ZERO) >= 0) {
         int bits = getBits(obj.getValue());
-        return new SignedType(bits + 1); // FIXME get type from somewhere else?
-        // return new UnsignedType(bits);
+        return new SignedType(bits);
+        // return new UnsignedType(bits);  //TODO reimplement this
       } else {
         throw new RuntimeException("not yet implemented");
       }
@@ -131,7 +138,7 @@ public class ExprTypeGetter extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitVariable(Variable obj, Void param) {
-    return obj.getType();
+    return visit( obj.getType(), param );
   }
 
 }
@@ -145,9 +152,9 @@ class RefTypeGetter extends NullTraverser<Type, Type> {
 
   @Override
   protected Type visitRefIndex(RefIndex obj, Type param) {
-    assert (param instanceof Array);
-    Array array = (Array) param;
-    return array.getType();
+    assert (param instanceof ArrayType);
+    ArrayType array = (ArrayType) param;
+    return array.getType().getRef();
   }
 
   @Override
@@ -156,7 +163,7 @@ class RefTypeGetter extends NullTraverser<Type, Type> {
     StructType struct = (StructType) param;
     NamedElement elem = struct.find(obj.getName());
     assert (elem != null);
-    return elem.getType();
+    return elem.getType().getRef();
   }
 
 }

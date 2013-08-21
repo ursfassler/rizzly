@@ -35,6 +35,7 @@ import evl.statement.Statement;
 import evl.statement.VarDefInitStmt;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.type.Type;
+import evl.type.TypeRef;
 import evl.type.base.Range;
 import evl.variable.SsaVariable;
 import evl.variable.Variable;
@@ -136,7 +137,7 @@ class StmtTraverser extends ExprReplacer<List<Statement>> {
 
   private SsaVariable extract(Expression obj, List<Statement> param) {
     ElementInfo info = obj.getInfo();
-    SsaVariable var = new SsaVariable(info, NameFactory.getNew(), getType(obj));
+    SsaVariable var = new SsaVariable(info, NameFactory.getNew(), new TypeRef(obj.getInfo(), getType(obj)));
     param.add(new VarDefInitStmt(info, var, obj));
     return var;
   }
@@ -243,6 +244,11 @@ class StmtTraverser extends ExprReplacer<List<Statement>> {
     }
     return null;
 
+  }
+
+  @Override
+  protected Expression visitVarDefInitStmt(VarDefInitStmt obj, List<Statement> param) {
+    return super.visitVarDefInitStmt(obj, param);
   }
 
 }

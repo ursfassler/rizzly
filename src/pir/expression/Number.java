@@ -1,22 +1,24 @@
 package pir.expression;
 
+import java.math.BigInteger;
+
 import pir.other.PirValue;
 
 public class Number extends PExpression implements PirValue {
-  final private int value;
+  final private BigInteger value;
 
-  public Number(int value) {
+  public Number(BigInteger value) {
     super();
     this.value = value;
   }
 
-  public int getValue() {
+  public BigInteger getValue() {
     return value;
   }
 
   @Override
   public String toString() {
-    return Integer.toString(value);
+    return value.toString();
   }
 
 }

@@ -1,12 +1,12 @@
 package pir.other;
 
 import pir.expression.PExpression;
-import pir.type.Type;
+import pir.type.TypeRef;
 
 final public class Constant extends Variable {
   private PExpression def;
 
-  public Constant(String name, Type type, PExpression def) {
+  public Constant(String name, TypeRef type, PExpression def) {
     super(name, type);
     this.def = def;
   }

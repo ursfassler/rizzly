@@ -6,6 +6,7 @@ import evl.Evl;
 import evl.other.Component;
 import evl.other.Interface;
 import evl.type.Type;
+import evl.type.TypeRef;
 import evl.variable.Variable;
 import fun.Fun;
 import fun.NullTraverser;
@@ -49,12 +50,12 @@ public class FunToEvlVariable extends NullTraverser<Evl, Void> {
 
   // ----------------------------------------------------------------------------
 
-  private Type copyType(Expression typeRef) {
+  private TypeRef copyType(Expression typeRef) {
     ReferenceLinked typeref = (ReferenceLinked) typeRef;
     assert (typeref.getOffset().isEmpty());
     NamedType nt = (NamedType) typeref.getLink();
     Type ecomp = (Type) fta.traverse(nt, null);
-    return ecomp;
+    return new TypeRef(typeref.getInfo(), ecomp);
   }
 
   @Override

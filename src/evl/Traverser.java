@@ -26,6 +26,7 @@ import evl.expression.Expression;
 import evl.expression.Number;
 import evl.expression.Relation;
 import evl.expression.StringValue;
+import evl.expression.TypeCast;
 import evl.expression.UnaryExpression;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
@@ -65,6 +66,7 @@ import evl.statement.Statement;
 import evl.statement.VarDefInitStmt;
 import evl.statement.VarDefStmt;
 import evl.type.Type;
+import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BaseType;
 import evl.type.base.BooleanType;
@@ -157,6 +159,8 @@ public abstract class Traverser<R, P> {
       return visitCaseGotoOpt((CaseGotoOpt) obj, param);
     else if (obj instanceof PhiStmt)
       return visitPhiStmt((PhiStmt) obj, param);
+    else if (obj instanceof TypeRef)
+      return visitTypeRef((TypeRef) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
@@ -298,6 +302,8 @@ public abstract class Traverser<R, P> {
       return visitUnaryExpression((UnaryExpression) obj, param);
     else if (obj instanceof Reference)
       return visitReference((Reference) obj, param);
+    else if (obj instanceof TypeCast)
+      return visitTypeCast((TypeCast) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
@@ -380,6 +386,8 @@ public abstract class Traverser<R, P> {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
 
+  abstract protected R visitTypeRef(TypeRef obj, P param);
+
   abstract protected R visitPhiStmt(PhiStmt obj, P param);
 
   abstract protected R visitBasicBlockList(BasicBlockList obj, P param);
@@ -397,6 +405,8 @@ public abstract class Traverser<R, P> {
   abstract protected R visitEndpointSelf(EndpointSelf obj, P param);
 
   abstract protected R visitEndpointSub(EndpointSub obj, P param);
+
+  abstract protected R visitTypeCast(TypeCast obj, P param);
 
   abstract protected R visitReference(Reference obj, P param);
 

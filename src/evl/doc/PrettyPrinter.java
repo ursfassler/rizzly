@@ -37,6 +37,7 @@ import evl.expression.BoolValue;
 import evl.expression.Number;
 import evl.expression.Relation;
 import evl.expression.StringValue;
+import evl.expression.TypeCast;
 import evl.expression.UnaryExpression;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
@@ -65,6 +66,7 @@ import evl.statement.Assignment;
 import evl.statement.CallStmt;
 import evl.statement.VarDefInitStmt;
 import evl.statement.VarDefStmt;
+import evl.type.TypeRef;
 import evl.type.base.BaseType;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
@@ -417,8 +419,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   protected Void visitNamedElement(NamedElement obj, StreamWriter param) {
     param.wr(obj.getName());
     param.wr(" : ");
-    param.wr(obj.getType().getName());
-    wrId(obj.getType(), param);
+    visit(obj.getType(), param);
     param.wr(";");
     param.nl();
     return null;
@@ -546,7 +547,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitNumber(Number obj, StreamWriter param) {
-    param.wr(Integer.toString(obj.getValue()));
+    param.wr(obj.getValue().toString());
     return null;
   }
 
@@ -583,8 +584,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.wr(obj.getName());
     wrId(obj, param);
     param.wr(": ");
-    param.wr(obj.getType().getName());
-    wrId(obj.getType(), param);
+    visit(obj.getType(), param);
     super.visitVariable(obj, param);
     return null;
   }
@@ -612,6 +612,13 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     visit(obj.getDef(), param);
     param.wr(";");
     param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitTypeRef(TypeRef obj, StreamWriter param) {
+    param.wr(obj.getRef().getName());
+    wrId(obj.getRef(), param);
     return null;
   }
 
@@ -837,8 +844,8 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitBasicBlockList(BasicBlockList obj, StreamWriter param) {
-    visit(obj.getEntry(),param);
-    visit(obj.getExit(),param);
+    visit(obj.getEntry(), param);
+    visit(obj.getExit(), param);
     LinkedList<BasicBlock> bbs = new LinkedList<BasicBlock>(obj.getBasicBlocks());
     Collections.sort(bbs, new Comparator<BasicBlock>() {
       @Override
@@ -876,4 +883,13 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.nl();
     return null;
   }
+
+  @Override
+  protected Void visitTypeCast(TypeCast obj, StreamWriter param) {
+    param.wr(obj.getRef().getName());
+    param.wr(" to ");
+    visit(obj.getCast(), param);
+    return null;
+  }
+
 }

@@ -1,18 +1,19 @@
 package pir.type;
 
-final public class TypeAlias extends Type {
-  private Type ref;
 
-  public TypeAlias(String name, Type ref) {
+final public class TypeAlias extends Type {
+  private TypeRef ref;
+
+  public TypeAlias(String name, TypeRef ref) {
     super(name);
     this.ref = ref;
   }
 
-  public Type getRef() {
+  public TypeRef getRef() {
     return ref;
   }
 
-  public void setRef(Type ref) {
+  public void setRef(TypeRef ref) {
     this.ref = ref;
   }
 

@@ -17,7 +17,7 @@ import pir.other.StateVariable;
 import pir.statement.Assignment;
 import pir.statement.CallStmt;
 import pir.statement.VarDefStmt;
-import pir.type.Array;
+import pir.type.ArrayType;
 import pir.type.BooleanType;
 import pir.type.EnumElement;
 import pir.type.EnumType;
@@ -91,7 +91,7 @@ abstract public class ExprReplacer<T> extends Traverser<PExpression, T> {
 
   @Override
   protected PExpression visitCaseEntry(CaseEntry obj, T param) {
-    visitList(obj.getValues(), param);
+    visitListOfNamed(obj.getValues(), param);
     visit(obj.getCode(), param);
     return null;
   }
@@ -161,7 +161,7 @@ abstract public class ExprReplacer<T> extends Traverser<PExpression, T> {
   @Override
   protected PExpression visitCaseStmt(CaseStmt obj, T param) {
     obj.setCondition(visit(obj.getCondition(), param));
-    visitList(obj.getEntries(), param);
+    visitListOfNamed(obj.getEntries(), param);
     visit(obj.getOtherwise(), param);
     return null;
   }
@@ -175,14 +175,14 @@ abstract public class ExprReplacer<T> extends Traverser<PExpression, T> {
 
   @Override
   protected PExpression visitIfStmt(IfStmt obj, T param) {
-    visitList(obj.getOption(), param);
+    visitListOfNamed(obj.getOption(), param);
     visit(obj.getDef(), param);
     return null;
   }
 
   @Override
   protected PExpression visitBlock(Block obj, T param) {
-    visitList(obj.getStatement(), param);
+    visitListOfNamed(obj.getStatement(), param);
     return null;
   }
 
@@ -207,7 +207,7 @@ abstract public class ExprReplacer<T> extends Traverser<PExpression, T> {
   }
 
   @Override
-  protected PExpression visitArray(Array obj, T param) {
+  protected PExpression visitArray(ArrayType obj, T param) {
     return null;
   }
 

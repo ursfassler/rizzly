@@ -1,5 +1,7 @@
 package parser;
 
+import java.math.BigInteger;
+
 import common.ElementInfo;
 
 /**
@@ -9,7 +11,7 @@ import common.ElementInfo;
 public class Token {
   private TokenType type;
   private String data;
-  private Integer num;
+  private BigInteger num;
   private ElementInfo info;
 
   public Token(TokenType type, ElementInfo info) {
@@ -18,7 +20,7 @@ public class Token {
     this.info = info;
   }
 
-  public Token(TokenType type, Integer num, ElementInfo info) {
+  public Token(TokenType type, BigInteger num, ElementInfo info) {
     super();
     this.type = type;
     this.num = num;
@@ -41,7 +43,7 @@ public class Token {
     return data;
   }
 
-  public Integer getNum() {
+  public BigInteger getNum() {
     assert (type == TokenType.NUMBER);
     return num;
   }

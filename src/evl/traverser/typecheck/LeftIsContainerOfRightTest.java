@@ -5,8 +5,8 @@ import java.util.List;
 import evl.Evl;
 import evl.NullTraverser;
 import evl.knowledge.KnowledgeBase;
-import evl.traverser.typecheck.specific.RefTypeChecker;
 import evl.type.Type;
+import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumElement;
@@ -48,10 +48,13 @@ public class LeftIsContainerOfRightTest extends NullTraverser<Boolean, Type> {
   }
 
   public static Type deAlias(Type type, KnowledgeBase kb) {
-    while (type instanceof TypeAlias) {
-      type = RefTypeChecker.process(((TypeAlias) type).getRef(), kb);
-    }
+    assert (!(type instanceof TypeAlias));
     return type;
+    // TODO reimplement
+    // while (type instanceof TypeAlias) {
+    // type = RefTypeChecker.process(((TypeAlias) type).getRef(), kb);
+    // }
+    // return type;
   }
 
   public Boolean isDerivativeOf(Class<? extends Type> baseClass, Type type) {
@@ -69,13 +72,13 @@ public class LeftIsContainerOfRightTest extends NullTraverser<Boolean, Type> {
     return Supertype.get(right, kb);
   }
 
-  private boolean process(List<Type> left, List<Type> right) {
+  private boolean process(List<TypeRef> left, List<TypeRef> right) {
     if (left.size() != right.size()) {
       return false;
     }
     for (int i = 0; i < left.size(); i++) {
-      Type lefttype = left.get(i);
-      Type righttype = right.get(i);
+      Type lefttype = left.get(i).getRef();
+      Type righttype = right.get(i).getRef();
       if (!visit(lefttype, righttype)) {
         return false;
       }
@@ -86,8 +89,8 @@ public class LeftIsContainerOfRightTest extends NullTraverser<Boolean, Type> {
   @Override
   protected Boolean visitFunctionTypeRet(FunctionTypeRet left, Type right) {
     if (right instanceof FunctionTypeRet) {
-      Type leftret = RefTypeChecker.process(left.getRet(), kb);
-      Type rightret = RefTypeChecker.process(((FunctionTypeRet) right).getRet(), kb);
+      Type leftret = left.getRet().getRef();
+      Type rightret = ((FunctionTypeRet) right).getRet().getRef();
       return visit(leftret, rightret) && process(((FunctionType) right).getArgD(), left.getArgD());
     } else {
       return false;
@@ -142,12 +145,12 @@ public class LeftIsContainerOfRightTest extends NullTraverser<Boolean, Type> {
   @Override
   protected Boolean visitArrayType(ArrayType left, Type right) {
     if (right instanceof ArrayType) {
-      Type lefttype = RefTypeChecker.process(left.getType(), kb);
-      Type righttype = RefTypeChecker.process(((ArrayType) right).getType(), kb);
+      Type lefttype = left.getType().getRef();
+      Type righttype = ((ArrayType) right).getType().getRef();
       if (!visit(lefttype, righttype)) {
         return false;
       }
-      return left.getSize() <= ((ArrayType) right).getSize();
+      return left.getSize().compareTo(((ArrayType) right).getSize()) <= 0;
     } else {
       return false;
     }

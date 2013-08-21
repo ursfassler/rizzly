@@ -1,30 +1,29 @@
 package pir.statement;
 
-import pir.expression.PExpression;
-import pir.expression.reference.VarRef;
+import pir.other.PirValue;
 
 public class StoreStmt extends Statement {
-  private VarRef dst;
-  private PExpression src;
+  private PirValue dst;
+  private PirValue src;
 
-  public StoreStmt(VarRef dst, PExpression src) {
+  public StoreStmt(PirValue dst, PirValue src) {
     this.dst = dst;
     this.src = src;
   }
 
-  public PExpression getSrc() {
+  public PirValue getSrc() {
     return src;
   }
 
-  public void setSrc(PExpression src) {
+  public void setSrc(PirValue src) {
     this.src = src;
   }
 
-  public VarRef getDst() {
+  public PirValue getDst() {
     return dst;
   }
 
-  public void setDst(VarRef dst) {
+  public void setDst(PirValue dst) {
     this.dst = dst;
   }
 

@@ -31,6 +31,7 @@ import evl.other.Named;
 import evl.other.NamedList;
 import evl.statement.Statement;
 import evl.type.Type;
+import evl.type.TypeRef;
 import evl.variable.Variable;
 
 class CopyEvl extends NullTraverser<Evl, Void> {
@@ -221,6 +222,11 @@ class CopyEvl extends NullTraverser<Evl, Void> {
       ret.addArg(copy(in), copy(obj.getArg(in)));
     }
     return ret;
+  }
+
+  @Override
+  protected Evl visitTypeRef(TypeRef obj, Void param) {
+    return new TypeRef(obj.getInfo(), obj.getRef());
   }
 
 }

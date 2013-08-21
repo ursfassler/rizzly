@@ -5,7 +5,7 @@ import java.util.List;
 import pir.other.Program;
 import pir.traverser.Getter;
 import pir.traverser.TypeReplacer;
-import pir.type.Array;
+import pir.type.ArrayType;
 import pir.type.BooleanType;
 import pir.type.EnumType;
 import pir.type.RangeType;
@@ -77,7 +77,7 @@ public class BooleanReplacer extends TypeReplacer<Void> {
   }
 
   @Override
-  protected Type visitArray(Array obj, Void param) {
+  protected Type visitArray(ArrayType obj, Void param) {
     Type typ = visit(obj.getType(), param);
     obj.setType(typ);
     return obj;

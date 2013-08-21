@@ -110,7 +110,7 @@ class RefChecker extends NullTraverser<Evl, Evl> {
     FunctionBase header = (FunctionBase) param;
     target.add(header);
     if (header instanceof FuncWithReturn) {
-      return ((FuncWithReturn) header).getRet().getLink();
+      return ((FuncWithReturn) header).getRet().getRef();
     } else {
       return kbi.getVoidType();
     }
@@ -124,8 +124,8 @@ class RefChecker extends NullTraverser<Evl, Evl> {
   @Override
   protected Evl visitRefIndex(RefIndex obj, Evl param) {
     Variable var = (Variable) param;
-    ArrayType type = (ArrayType) var.getType();
-    return type.getType().getLink();
+    ArrayType type = (ArrayType) var.getType().getRef();
+    return type.getType().getRef();
   }
 
 }

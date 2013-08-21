@@ -18,6 +18,7 @@ import evl.expression.Expression;
 import evl.expression.Number;
 import evl.expression.Relation;
 import evl.expression.StringValue;
+import evl.expression.TypeCast;
 import evl.expression.UnaryExpression;
 import evl.expression.reference.Reference;
 import evl.knowledge.KnowBaseItem;
@@ -25,18 +26,20 @@ import evl.knowledge.KnowledgeBase;
 import evl.traverser.range.RangeGetter;
 import evl.traverser.typecheck.BiggerType;
 import evl.type.Type;
+import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumType;
 import evl.type.base.Range;
+import evl.variable.SsaVariable;
 import evl.variable.Variable;
 
 public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
   private KnowledgeBase kb;
   private KnowBaseItem kbi;
-  private Map<Variable, Range> map;
+  private Map<SsaVariable, Range> map;
 
-  public ExpressionTypeChecker(KnowledgeBase kb, Map<Variable, Range> map) {
+  public ExpressionTypeChecker(KnowledgeBase kb, Map<SsaVariable, Range> map) {
     super();
     this.map = map;
     this.kb = kb;
@@ -44,7 +47,7 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
   }
 
   static public Type process(Expression ast, KnowledgeBase kb) {
-    ExpressionTypeChecker adder = new ExpressionTypeChecker(kb, new HashMap<Variable, Range>());
+    ExpressionTypeChecker adder = new ExpressionTypeChecker(kb, new HashMap<SsaVariable, Range>());
     return adder.traverse(ast, null);
   }
 
@@ -56,7 +59,7 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
    * @param kb
    * @return
    */
-  static public Type process(Expression ast, Map<Variable, Range> map, KnowledgeBase kb) {
+  static public Type process(Expression ast, Map<SsaVariable, Range> map, KnowledgeBase kb) {
     ExpressionTypeChecker adder = new ExpressionTypeChecker(kb, map);
     return adder.traverse(ast, null);
   }
@@ -74,6 +77,11 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
     } else {
       return RefTypeChecker.process(obj, kb);
     }
+  }
+
+  @Override
+  protected Type visitTypeCast(TypeCast obj, Void param) {
+    return visit(obj.getCast(),param);
   }
 
   @Override
@@ -206,7 +214,7 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitNumber(Number obj, Void param) {
-    BigInteger value = BigInteger.valueOf(obj.getValue());
+    BigInteger value = obj.getValue();
     return kbi.getRangeType(value, value);
   }
 
@@ -220,7 +228,7 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
       cont = BiggerType.get(cont, ntype, obj.getInfo(), kb);
     }
 
-    return new ArrayType(obj.getValue().size(), new Reference(new ElementInfo(), cont));
+    return new ArrayType( BigInteger.valueOf(obj.getValue().size()), new TypeRef(new ElementInfo(), cont));
   }
 
   @Override
@@ -231,6 +239,11 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
   @Override
   protected Type visitBoolValue(BoolValue obj, Void param) {
     return kbi.getBooleanType();
+  }
+
+  @Override
+  protected Type visitTypeRef(TypeRef obj, Void param) {
+    return obj.getRef();
   }
 
 }

@@ -5,16 +5,17 @@ import java.util.List;
 import common.ElementInfo;
 
 import evl.type.Type;
+import evl.type.TypeRef;
 
 abstract public class FunctionType extends Type {
-  private List<Type> arg;
+  private List<TypeRef> arg;
 
-  public FunctionType(ElementInfo info, String name, List<Type> arg) {
+  public FunctionType(ElementInfo info, String name, List<TypeRef> arg) {
     super(info, name);
     this.arg = arg;
   }
 
-  public List<Type> getArgD() {
+  public List<TypeRef> getArgD() {
     return arg;
   }
 

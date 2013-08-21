@@ -108,7 +108,7 @@ public class FunToEvlType extends NullTraverser<Type, String> {
 
   @Override
   protected Type visitTypeAlias(TypeAlias obj, String param) {
-    return new evl.type.base.TypeAlias(obj.getInfo(), param, (Reference) fta.traverse(obj.getRef(), null));
+    return new evl.type.base.TypeAlias(obj.getInfo(), param, FunToEvl.toTypeRef((Reference) fta.traverse(obj.getRef(), null)));
   }
 
   @Override
@@ -140,7 +140,8 @@ public class FunToEvlType extends NullTraverser<Type, String> {
 
   @Override
   protected Type visitArray(Array obj, String param) {
-    return new evl.type.base.ArrayType(obj.getSize(), (Reference) fta.traverse(obj.getType(), null));
+    Reference ref = (Reference) fta.traverse(obj.getType(), null);
+    return new evl.type.base.ArrayType(obj.getSize(), FunToEvl.toTypeRef(ref));
   }
 
 }

@@ -14,6 +14,8 @@ import evl.hfsm.HfsmQueryFunction;
 import evl.hfsm.State;
 import evl.hfsm.StateItem;
 import evl.other.IfaceUse;
+import evl.type.TypeRef;
+import evl.type.special.VoidType;
 import evl.variable.FuncVariable;
 import fun.Fun;
 import fun.NullTraverser;
@@ -120,7 +122,7 @@ public class FunToEvlStateItem extends NullTraverser<StateItem, Void> {
     Expression guard = (Expression) fta.traverse(obj.getGuard(), null);
 
     MakeBasicBlocks blocks = new MakeBasicBlocks(fta);
-    BasicBlockList nbody = blocks.translate(obj.getBody(), obj.getParam().getList());
+    BasicBlockList nbody = blocks.translate(obj.getBody(), obj.getParam().getList(), new TypeRef(obj.getInfo(), new VoidType()) );  //TODO use singleton void
 
     return new evl.hfsm.Transition(obj.getInfo(), (State) src.getLink(), (State) dst.getLink(), (IfaceUse) evt.getLink(), ((RefName) evt.getOffset().get(0)).getName(), guard, args, nbody);
   }

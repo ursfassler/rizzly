@@ -1,6 +1,6 @@
 package pir.other;
 
-import pir.type.Type;
+import pir.type.TypeRef;
 
 /**
  * Variable of scalar type and exactly one write point
@@ -9,7 +9,7 @@ import pir.type.Type;
  */
 final public class SsaVariable extends Variable {
 
-  public SsaVariable(String name, Type type) {
+  public SsaVariable(String name, TypeRef type) {
     super(name, type);
   }
 

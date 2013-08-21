@@ -148,8 +148,9 @@ class SubDep extends DefTraverser<Void, Named> {
 
   @Override
   protected Void visitVariable(Variable obj, Named param) {
-    g.addEdge(param, obj.getType());
-    visit( obj.getType(), obj.getType() );
+    visit( obj.getType(), param );
+//    g.addEdge(param, obj.getType());
+//    visit( obj.getType(), obj.getType() );
     return super.visitVariable(obj, param);
   }
 

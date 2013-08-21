@@ -1,21 +1,21 @@
 package pir.statement;
 
-import pir.expression.reference.VarRef;
-import pir.other.Variable;
+import pir.other.PirValue;
+import pir.other.SsaVariable;
 
 public class Assignment extends VariableGeneratorStmt {
-  private VarRef src;
+  private PirValue src;
 
-  public Assignment(Variable dst, VarRef src) {
+  public Assignment(SsaVariable dst, PirValue src) {
     super(dst);
     this.src = src;
   }
 
-  public VarRef getSrc() {
+  public PirValue getSrc() {
     return src;
   }
 
-  public void setSrc(VarRef src) {
+  public void setSrc(PirValue src) {
     this.src = src;
   }
 

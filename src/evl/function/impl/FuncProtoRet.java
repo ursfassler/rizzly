@@ -2,10 +2,10 @@ package evl.function.impl;
 
 import common.ElementInfo;
 
-import evl.expression.reference.Reference;
 import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
 import evl.other.ListOfNamed;
+import evl.type.TypeRef;
 import evl.variable.Variable;
 
 /**
@@ -13,20 +13,20 @@ import evl.variable.Variable;
  * @author urs
  */
 public class FuncProtoRet extends FunctionBase implements FuncWithReturn {
-  private Reference ret = null;
+  private TypeRef ret = null;
 
   public FuncProtoRet(ElementInfo info, String name, ListOfNamed<Variable> param) {
     super(info, name, param);
   }
 
   @Override
-  public Reference getRet() {
+  public TypeRef getRet() {
     assert (ret != null);
     return ret;
   }
 
   @Override
-  public void setRet(Reference ret) {
+  public void setRet(TypeRef ret) {
     assert (ret != null);
     this.ret = ret;
   }

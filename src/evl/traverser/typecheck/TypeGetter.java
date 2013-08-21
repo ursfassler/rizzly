@@ -12,13 +12,13 @@ import evl.function.FunctionBase;
 import evl.other.CompUse;
 import evl.other.IfaceUse;
 import evl.type.Type;
+import evl.type.TypeRef;
 import evl.type.base.FunctionType;
 import evl.type.base.FunctionTypeRet;
 import evl.type.base.FunctionTypeVoid;
 import evl.type.composed.NamedElement;
 import evl.type.special.ComponentType;
 import evl.type.special.InterfaceType;
-import evl.variable.FuncVariable;
 import evl.variable.Variable;
 
 public class TypeGetter extends NullTraverser<Type, Void> {
@@ -34,22 +34,22 @@ public class TypeGetter extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitVariable(Variable obj, Void sym) {
-    return obj.getType();
+    return visit(obj.getType(), null);
   }
 
   @Override
   protected Type visitNamedElement(NamedElement obj, Void sym) {
-    return obj.getType();
+    return visit(obj.getType(), null);
   }
 
   @Override
   protected Type visitFunctionBase(FunctionBase obj, Void param) {
-    List<Type> arg = new ArrayList<Type>(obj.getParam().size());
+    List<TypeRef> arg = new ArrayList<TypeRef>(obj.getParam().size());
     for (Variable itr : obj.getParam()) {
-      arg.add(itr.getType());
+      arg.add(itr.getType().copy());
     }
     if (obj instanceof FuncWithReturn) {
-      return new FunctionTypeRet(obj.getInfo(), obj.getName(), arg, ((FuncWithReturn) obj).getRet());
+      return new FunctionTypeRet(obj.getInfo(), obj.getName(), arg, new TypeRef(obj.getInfo(), ((FuncWithReturn) obj).getRet().getRef()));
     } else {
       return new FunctionTypeVoid(obj.getInfo(), obj.getName(), arg);
     }
@@ -82,6 +82,11 @@ public class TypeGetter extends NullTraverser<Type, Void> {
       ret.getIface(Direction.in).add(it);
     }
     return ret;
+  }
+
+  @Override
+  protected Type visitTypeRef(TypeRef obj, Void param) {
+    return obj.getRef();
   }
 
 }

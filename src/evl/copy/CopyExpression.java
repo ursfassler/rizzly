@@ -7,6 +7,7 @@ import evl.expression.BoolValue;
 import evl.expression.Expression;
 import evl.expression.Number;
 import evl.expression.Relation;
+import evl.expression.TypeCast;
 import evl.expression.UnaryExpression;
 import evl.expression.reference.Reference;
 
@@ -51,6 +52,11 @@ public class CopyExpression extends NullTraverser<Expression, Void> {
   @Override
   protected Expression visitUnaryExpression(UnaryExpression obj, Void param) {
     return new UnaryExpression(obj.getInfo(), cast.copy(obj.getExpr()), obj.getOp());
+  }
+
+  @Override
+  protected Expression visitTypeCast(TypeCast obj, Void param) {
+    return new TypeCast(obj.getInfo(), obj.getRef(), obj.getCast());
   }
 
 }

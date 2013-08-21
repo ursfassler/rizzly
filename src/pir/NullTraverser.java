@@ -36,8 +36,9 @@ import pir.statement.StoreStmt;
 import pir.statement.VarDefStmt;
 import pir.statement.convert.SignExtendValue;
 import pir.statement.convert.TruncValue;
+import pir.statement.convert.TypeCast;
 import pir.statement.convert.ZeroExtendValue;
-import pir.type.Array;
+import pir.type.ArrayType;
 import pir.type.BooleanType;
 import pir.type.EnumElement;
 import pir.type.EnumType;
@@ -47,6 +48,7 @@ import pir.type.SignedType;
 import pir.type.StringType;
 import pir.type.StructType;
 import pir.type.TypeAlias;
+import pir.type.TypeRef;
 import pir.type.UnionType;
 import pir.type.UnsignedType;
 import pir.type.VoidType;
@@ -171,7 +173,7 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitArray(Array obj, P param) {
+  protected R visitArray(ArrayType obj, P param) {
     return doDefault(obj, param);
   }
 
@@ -307,6 +309,16 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitVarRefSimple(VarRefSimple obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitTypeCast(TypeCast obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitTypeRef(TypeRef obj, P param) {
     return doDefault(obj, param);
   }
 

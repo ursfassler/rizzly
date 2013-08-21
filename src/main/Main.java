@@ -10,32 +10,28 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import joGraph.GraphWriter;
 import joGraph.HtmlGraphWriter;
 import joGraph.Writer;
 
 import org.jgrapht.traverse.TopologicalOrderIterator;
 
 import pir.PirObject;
+import pir.know.KnowledgeBase;
 import pir.other.Program;
 import pir.other.SsaVariable;
 import pir.passes.BooleanReplacer;
-import pir.statement.Statement;
-import pir.traverser.CaserangeReduction;
 import pir.passes.ComplexWriterReduction;
-import pir.traverser.EnumElementConstPropagation;
 import pir.passes.GlobalReadExtracter;
-import pir.passes.GlobalWriteExtracter;
+import pir.passes.RangeConverter;
+import pir.passes.RangeExtender;
+import pir.passes.RangeReplacer;
+import pir.passes.ReferenceReadReduction;
 import pir.passes.UnusedStmtRemover;
+import pir.statement.Statement;
 import pir.traverser.DependencyGraphMaker;
 import pir.traverser.LlvmWriter;
 import pir.traverser.OwnerMap;
-import pir.passes.RangeReplacer;
-import pir.passes.ReferenceReadReduction;
 import pir.traverser.Renamer;
-import pir.traverser.ToCEnum;
-import pir.passes.ValueConverter;
-import pir.passes.ValueExtender;
 import util.Pair;
 import util.SimpleGraph;
 
@@ -115,16 +111,17 @@ public class Main {
     evl.doc.PrettyPrinter.print(prg, debugdir + "beforePir.rzy",false);
     Program prog = (Program) evl.traverser.ToPir.process(prg);
 
-    LlvmWriter.print(prog, debugdir + "afterEvl.rzy");
+    LlvmWriter.print(prog, debugdir + "afterEvl.ll",true);
     
-    ValueConverter.process(prog);
+    RangeConverter.process(prog,new KnowledgeBase(prog, debugdir));
+    LlvmWriter.print(prog, debugdir + "typeext.ll",true);
     RangeReplacer.process(prog);
     BooleanReplacer.process(prog);
     ComplexWriterReduction.process(prog);
     ReferenceReadReduction.process(prog);
     GlobalReadExtracter.process(prog);
-    GlobalWriteExtracter.process(prog);
-    ValueExtender.process(prog);
+//    GlobalWriteExtracter.process(prog);   //TODO do it during translation to PIR?
+    RangeExtender.process(prog);
 
     HashMap<SsaVariable, Statement> owner = OwnerMap.make(prog);
     SimpleGraph<PirObject> g = DependencyGraphMaker.make(prog, owner);
@@ -133,7 +130,7 @@ public class Main {
 
     Renamer.process(prog);
 
-    LlvmWriter.print(prog, outdir + prg.getName() + ".ll");
+    LlvmWriter.print(prog, outdir + prg.getName() + ".ll",false);
 
     // cir.other.Program cprog = makeC(debugdir, prog);
     //
@@ -260,7 +257,7 @@ public class Main {
         return add(obj.getType());
       }
     };
-    List<Type> vs = getter.get(u, null);
+    List<Type> vs = getter.find(u, null);
     return vs;
   }
 

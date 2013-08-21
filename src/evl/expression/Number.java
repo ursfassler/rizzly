@@ -1,5 +1,7 @@
 package evl.expression;
 
+import java.math.BigInteger;
+
 import common.ElementInfo;
 
 /**
@@ -8,20 +10,20 @@ import common.ElementInfo;
  */
 final public class Number extends Expression {
 
-  final private int value;
+  final private BigInteger value;
 
-  public Number(ElementInfo info, int value) {
+  public Number(ElementInfo info, BigInteger value) {
     super(info);
     this.value = value;
   }
 
-  public int getValue() {
+  public BigInteger getValue() {
     return value;
   }
 
   @Override
   public String toString() {
-    return Integer.toString(value);
+    return value.toString();
   }
 
 }

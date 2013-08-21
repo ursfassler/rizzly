@@ -4,19 +4,18 @@ import java.util.List;
 
 import common.ElementInfo;
 
-import evl.expression.reference.Reference;
-import evl.type.Type;
+import evl.type.TypeRef;
 
 
 final public class FunctionTypeRet extends FunctionType {
-  final private Reference ret;
+  final private TypeRef ret;
 
-  public FunctionTypeRet(ElementInfo info, String name, List<Type> arg, Reference ret) {
+  public FunctionTypeRet(ElementInfo info, String name, List<TypeRef> arg, TypeRef ret) {
     super(info, name, arg);
     this.ret = ret;
   }
 
-  public Reference getRet() {
+  public TypeRef getRet() {
     return ret;
   }
 

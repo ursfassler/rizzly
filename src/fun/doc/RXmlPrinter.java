@@ -844,7 +844,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
 
   @Override
   protected Void visitNumber(Number obj, Designator param) {
-    xw.wr(Integer.toString(obj.getValue()));
+    xw.wr(obj.getValue().toString());
     return null;
   }
 

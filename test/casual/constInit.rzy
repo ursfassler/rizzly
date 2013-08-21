@@ -1,7 +1,7 @@
 
 
-function something( x: U{8} ):U{8}
-  return x + 2;
+function something( x: R{0,255} ):R{0,255}
+  return (x + 2) mod 256;
 end
 
 const

@@ -5,18 +5,18 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import pir.expression.reference.VarRefSimple;
+import pir.other.PirValue;
 
 public class CaseGoto extends BasicBlockEnd {
-  private VarRefSimple condition;
+  private PirValue condition;
   private List<CaseGotoOpt> option = new ArrayList<CaseGotoOpt>();
   private BasicBlock otherwise;
 
-  public VarRefSimple getCondition() {
+  public PirValue getCondition() {
     return condition;
   }
 
-  public void setCondition(VarRefSimple condition) {
+  public void setCondition(PirValue condition) {
     this.condition = condition;
   }
 

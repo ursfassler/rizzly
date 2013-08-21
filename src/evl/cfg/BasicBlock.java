@@ -1,13 +1,7 @@
 package evl.cfg;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-
-import org.jgrapht.DirectedGraph;
-
-import util.ssa.BaseGraph;
-import util.ssa.BbEdge;
 
 import common.ElementInfo;
 

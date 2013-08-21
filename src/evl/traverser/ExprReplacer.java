@@ -15,23 +15,18 @@ import evl.expression.Expression;
 import evl.expression.Number;
 import evl.expression.Relation;
 import evl.expression.StringValue;
+import evl.expression.TypeCast;
 import evl.expression.UnaryExpression;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefItem;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
-import evl.function.FuncWithReturn;
-import evl.function.FunctionBase;
 import evl.hfsm.Transition;
 import evl.statement.Assignment;
 import evl.statement.VarDefInitStmt;
 import evl.type.base.Range;
-import evl.type.base.TypeAlias;
 import evl.variable.Constant;
-import fun.statement.CaseStmt;
-import fun.statement.IfOption;
-import fun.statement.While;
 
 abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
 
@@ -44,6 +39,13 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
       }
       list.set(i, expr);
     }
+  }
+
+  @Override
+  protected Expression visitExpression(Expression obj, T param) {
+    Expression ret = super.visitExpression(obj, param);
+    assert (ret != null);
+    return ret;
   }
 
   @Override
@@ -76,6 +78,11 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
     obj.setLeft(visit(obj.getLeft(), param));
     obj.setRight(visit(obj.getRight(), param));
     return obj;
+  }
+
+  @Override
+  protected Expression visitTypeCast(TypeCast obj, T param) {
+    return obj; // XXX make something when changing TypeCast.ref from SsaVariable to Reference
   }
 
   @Override
@@ -132,13 +139,6 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitIfOption(IfOption obj, T param) {
-    obj.setCondition(visit(obj.getCondition(), param));
-    visit(obj.getCode(), param);
-    return null;
-  }
-
-  @Override
   protected Expression visitConstant(Constant obj, T param) {
     obj.setDef(visit(obj.getDef(), param));
     return null;
@@ -152,37 +152,8 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitCaseStmt(CaseStmt obj, T param) {
-    obj.setCondition(visit(obj.getCondition(), param));
-    visitItr(obj.getOption(), param);
-    visit(obj.getOtherwise(), param);
-    return null;
-  }
-
-  @Override
-  protected Expression visitWhile(While obj, T param) {
-    obj.setCondition(visit(obj.getCondition(), param));
-    visit(obj.getBody(), param);
-    return null;
-  }
-
-  @Override
   protected Expression visitRange(Range obj, T param) {
     return null;
-  }
-
-  @Override
-  protected Expression visitTypeAlias(TypeAlias obj, T param) {
-    obj.setRef((Reference) visit(obj.getRef(), param));
-    return super.visitTypeAlias(obj, param);
-  }
-
-  @Override
-  protected Expression visitFunctionBase(FunctionBase obj, T param) {
-    if (obj instanceof FuncWithReturn) {
-      ((FuncWithReturn) obj).setRet((Reference) visit(((FuncWithReturn) obj).getRet(), param));
-    }
-    return super.visitFunctionBase(obj, param);
   }
 
   @Override

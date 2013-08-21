@@ -17,6 +17,7 @@ import evl.knowledge.KnowledgeBase;
 import evl.traverser.typecheck.LeftIsContainerOfRightTest;
 import evl.traverser.typecheck.TypeGetter;
 import evl.type.Type;
+import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.EnumType;
 import evl.type.base.FunctionType;
@@ -43,6 +44,11 @@ public class RefTypeChecker extends NullTraverser<Type, Type> {
   }
 
   @Override
+  protected Type visitTypeRef(TypeRef obj, Type param) {
+    return obj.getRef();
+  }
+
+  @Override
   protected Type visitReference(Reference obj, Type param) {
     Type ret = TypeGetter.process(obj.getLink());
     for (RefItem ref : obj.getOffset()) {
@@ -55,13 +61,13 @@ public class RefTypeChecker extends NullTraverser<Type, Type> {
   @Override
   protected Type visitRefCall(RefCall obj, Type sub) {
     if (sub instanceof FunctionType) {
-      List<Type> arg = ((FunctionType) sub).getArgD();
+      List<TypeRef> arg = ((FunctionType) sub).getArgD();
       if (arg.size() != obj.getActualParameter().size()) {
         RError.err(ErrorType.Error, obj.getInfo(), "Need " + arg.size() + "arguments, got " + obj.getActualParameter().size());
         return null;
       }
       for (int i = 0; i < arg.size(); i++) {
-        Type partype = arg.get(i);
+        Type partype = arg.get(i).getRef();
         Type valtype = ExpressionTypeChecker.process(obj.getActualParameter().get(i), kb);
         if (!LeftIsContainerOfRightTest.process(partype, valtype, kb)) {
           RError.err(ErrorType.Error, obj.getActualParameter().get(i).getInfo(), "Data type to big or incompatible (argument " + (i + 1) + ", " + partype.getName() + " := " + valtype.getName() + ")");

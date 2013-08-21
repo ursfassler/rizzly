@@ -16,7 +16,7 @@ public class RefReplacer<P> extends DefTraverser<RefItem, P> {
 
   @Override
   protected RefItem visitRefCall(RefCall obj, P param) {
-    visitList(obj.getParameter(), param);
+    visitListOfNamed(obj.getParameter(), param);
     obj.setPrevious(visit(obj.getPrevious(),param));
     return obj;
   }

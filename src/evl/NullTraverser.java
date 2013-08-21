@@ -21,6 +21,7 @@ import evl.expression.BoolValue;
 import evl.expression.Number;
 import evl.expression.Relation;
 import evl.expression.StringValue;
+import evl.expression.TypeCast;
 import evl.expression.UnaryExpression;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
@@ -53,6 +54,7 @@ import evl.statement.Assignment;
 import evl.statement.CallStmt;
 import evl.statement.VarDefInitStmt;
 import evl.statement.VarDefStmt;
+import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumElement;
@@ -447,6 +449,16 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitVarDefInitStmt(VarDefInitStmt obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitTypeCast(TypeCast obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitTypeRef(TypeRef obj, P param) {
     return visitDefault(obj, param);
   }
 

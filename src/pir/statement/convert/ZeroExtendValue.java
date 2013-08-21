@@ -1,11 +1,11 @@
 package pir.statement.convert;
 
-import pir.expression.PExpression;
-import pir.other.Variable;
+import pir.other.PirValue;
+import pir.other.SsaVariable;
 
 final public class ZeroExtendValue extends ConvertValue {
 
-  public ZeroExtendValue(Variable variable, PExpression original) {
+  public ZeroExtendValue(SsaVariable variable, PirValue original) {
     super(variable, original);
   }
 

@@ -1,33 +1,33 @@
 package pir.statement;
 
-import pir.expression.PExpression;
-import pir.other.Variable;
+import pir.other.PirValue;
+import pir.other.SsaVariable;
 
 public class ArithmeticOp extends VariableGeneratorStmt {
-  private PExpression left; // FIXME only use constant or variable ref
-  private PExpression right;// FIXME only use constant or variable ref
+  private PirValue left; // FIXME only use constant or variable ref
+  private PirValue right;// FIXME only use constant or variable ref
   final private ArOp op;
 
-  public ArithmeticOp(Variable variable, PExpression left, PExpression right, ArOp op) {
+  public ArithmeticOp(SsaVariable variable, PirValue left, PirValue right, ArOp op) {
     super(variable);
     this.left = left;
     this.right = right;
     this.op = op;
   }
 
-  public PExpression getLeft() {
+  public PirValue getLeft() {
     return left;
   }
 
-  public PExpression getRight() {
+  public PirValue getRight() {
     return right;
   }
 
-  public void setLeft(PExpression left) {
+  public void setLeft(PirValue left) {
     this.left = left;
   }
 
-  public void setRight(PExpression right) {
+  public void setRight(PirValue right) {
     this.right = right;
   }
 

@@ -1,33 +1,35 @@
 package evl.type.base;
 
+import java.math.BigInteger;
+
 import common.ElementInfo;
 
 import evl.Evl;
-import evl.expression.reference.Reference;
+import evl.type.TypeRef;
 
 public class ArrayType extends BaseType implements Evl {
-  private Reference type;
-  private int size;
+  private TypeRef type;
+  private BigInteger size;
 
-  public ArrayType(int size, Reference type) {
-    super(new ElementInfo(), makeName(size, type.getLink().getName()));
+  public ArrayType(BigInteger size, TypeRef type) {
+    super(new ElementInfo(), makeName(size, type));
     this.type = type;
     this.size = size;
   }
 
-  public static String makeName(int size, String type) {
-    return "Array{" + size + "," + type + "}";
+  public static String makeName(BigInteger size, TypeRef type) {
+    return "Array{" + size + "," + type.getRef().getName() + "}";
   }
 
-  public Reference getType() {
+  public TypeRef getType() {
     return type;
   }
 
-  public void setType(Reference type) {
+  public void setType(TypeRef type) {
     this.type = type;
   }
 
-  public int getSize() {
+  public BigInteger getSize() {
     return size;
   }
 

@@ -17,13 +17,14 @@ import evl.knowledge.KnowledgeBase;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.type.Type;
 import evl.type.base.Range;
+import evl.variable.SsaVariable;
 import evl.variable.Variable;
 
 //TODO implement everything left
 public class RangeGetter extends NullTraverser<Void, Void> {
   private KnowledgeBase kb;
   private KnowBaseItem kbi;
-  private Map<Variable, Range> ranges = new HashMap<Variable, Range>();
+  private Map<SsaVariable, Range> ranges = new HashMap<SsaVariable, Range>();
 
   public RangeGetter(KnowledgeBase kb) {
     super();
@@ -31,7 +32,7 @@ public class RangeGetter extends NullTraverser<Void, Void> {
     kbi = kb.getEntry(KnowBaseItem.class);
   }
 
-  public static Map<Variable, Range> getRange(Expression condition, KnowledgeBase kb) {
+  public static Map<SsaVariable, Range> getRange(Expression condition, KnowledgeBase kb) {
     RangeGetter updater = new RangeGetter(kb);
     updater.traverse(condition, null);
     return updater.ranges;
@@ -42,12 +43,12 @@ public class RangeGetter extends NullTraverser<Void, Void> {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
-  public static Variable getDerefVar(Expression left) {
+  public static SsaVariable getDerefVar(Expression left) {
     if (left instanceof Reference) {
       Reference ref = (Reference) left;
       if (ref.getOffset().isEmpty()) {
-        if (ref.getLink() instanceof Variable) {
-          return (Variable) ref.getLink();
+        if (ref.getLink() instanceof SsaVariable) {
+          return (SsaVariable) ref.getLink();
         }
       }
     }
@@ -57,9 +58,9 @@ public class RangeGetter extends NullTraverser<Void, Void> {
   @Override
   protected Void visitRelation(Relation obj, Void param) {
     {
-      Variable lv = getDerefVar(obj.getLeft());
+      SsaVariable lv = getDerefVar(obj.getLeft());
       if (lv != null) {
-        if (lv.getType() instanceof Range) {
+        if (lv.getType().getRef() instanceof Range) {
           Type rt = ExpressionTypeChecker.process(obj.getRight(), kb);
           if (rt instanceof Range) {
             Range rr = (Range) rt;
@@ -105,7 +106,7 @@ public class RangeGetter extends NullTraverser<Void, Void> {
     if (ranges.containsKey(var)) {
       return ranges.get(var);
     } else {
-      return (Range) var.getType();
+      return (Range) var.getType().getRef();
     }
   }
 

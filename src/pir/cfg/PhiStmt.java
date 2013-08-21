@@ -5,7 +5,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import pir.expression.reference.VarRef;
+import pir.other.PirValue;
 import pir.other.SsaVariable;
 import pir.statement.Statement;
 
@@ -16,7 +16,7 @@ import pir.statement.Statement;
 public class PhiStmt extends Statement {
 
   private SsaVariable vardef;
-  private Map<BasicBlock, VarRef> arg = new HashMap<BasicBlock, VarRef>();
+  private Map<BasicBlock, PirValue> arg = new HashMap<BasicBlock, PirValue>();
 
   public PhiStmt(SsaVariable vardef) {
     this.vardef = vardef;
@@ -26,11 +26,11 @@ public class PhiStmt extends Statement {
     return vardef;
   }
 
-  public void addArg(BasicBlock bb, VarRef var) {
+  public void addArg(BasicBlock bb, PirValue var) {
     arg.put(bb, var);
   }
 
-  public VarRef getArg(BasicBlock bb) {
+  public PirValue getArg(BasicBlock bb) {
     return arg.get(bb);
   }
 
@@ -38,8 +38,8 @@ public class PhiStmt extends Statement {
     return new HashSet<BasicBlock>(arg.keySet());
   }
 
-  public Set<VarRef> getReferences() {
-    return new HashSet<VarRef>(arg.values());
+  public Set<PirValue> getReferences() {
+    return new HashSet<PirValue>(arg.values());
   }
 
   @Override

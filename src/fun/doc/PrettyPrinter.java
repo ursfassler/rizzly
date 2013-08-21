@@ -712,7 +712,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitNumber(Number obj, StreamWriter param) {
-    param.wr(Integer.toString(obj.getValue()));
+    param.wr(obj.getValue().toString());
     return null;
   }
 

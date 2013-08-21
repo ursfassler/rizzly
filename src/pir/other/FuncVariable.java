@@ -1,6 +1,6 @@
 package pir.other;
 
-import pir.type.Type;
+import pir.type.TypeRef;
 
 /**
  * Variable of composed type
@@ -8,7 +8,7 @@ import pir.type.Type;
  *
  */
 final public class FuncVariable extends Variable {
-  public FuncVariable(String name, Type type) {
+  public FuncVariable(String name, TypeRef type) {
     super(name, type);
   }
 }

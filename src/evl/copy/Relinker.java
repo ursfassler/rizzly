@@ -12,30 +12,36 @@ import evl.other.IfaceUse;
 import evl.other.Interface;
 import evl.other.Named;
 import evl.type.Type;
+import evl.type.TypeRef;
 import evl.type.base.FunctionTypeRet;
 import evl.type.base.FunctionTypeVoid;
-import evl.type.composed.NamedElement;
-import evl.variable.Variable;
-
 
 public class Relinker extends DefTraverser<Void, Void> {
-  private Map<? extends Named, ?extends Named> copied;
+  private Map<? extends Named, ? extends Named> copied;
 
-  static public void relink(Evl obj, Map<? extends Named, ?extends Named> map) {
+  static public void relink(Evl obj, Map<? extends Named, ? extends Named> map) {
     Relinker relinker = new Relinker(map);
     relinker.traverse(obj, null);
   }
 
-  static public void relink(Collection<? extends Evl> obj, Map<? extends Named, ?extends Named> map) {
+  static public void relink(Collection<? extends Evl> obj, Map<? extends Named, ? extends Named> map) {
     Relinker relinker = new Relinker(map);
     for (Evl itr : obj) {
       relinker.traverse(itr, null);
     }
   }
 
-  public Relinker(Map<? extends Named, ?extends Named> copied) {
+  public Relinker(Map<? extends Named, ? extends Named> copied) {
     super();
     this.copied = copied;
+  }
+
+  @Override
+  protected Void visitTypeRef(TypeRef obj, Void param) {
+    if (copied.containsKey(obj.getRef())) {
+      obj.setRef((Type) copied.get(obj.getRef()));
+    }
+    return null;
   }
 
   @Override
@@ -64,14 +70,6 @@ public class Relinker extends DefTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitVariable(Variable obj, Void param) {
-    if (copied.containsKey(obj.getType())) {
-      obj.setType((Type) copied.get(obj.getType()));
-    }
-    return super.visitVariable(obj, param);
-  }
-
-  @Override
   protected Void visitFunctionTypeVoid(FunctionTypeVoid obj, Void param) {
     throw new RuntimeException("not yet implemented");
   }
@@ -80,14 +78,5 @@ public class Relinker extends DefTraverser<Void, Void> {
   protected Void visitFunctionTypeRet(FunctionTypeRet obj, Void param) {
     throw new RuntimeException("not yet implemented");
   }
-
-  @Override
-  protected Void visitNamedElement(NamedElement obj, Void param) {
-    if (copied.containsKey(obj.getType())) {
-      obj.setType((Type) copied.get(obj.getType()));
-    }
-    return super.visitNamedElement(obj, param);
-  }
-
 
 }

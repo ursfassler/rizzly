@@ -34,4 +34,16 @@ public class Range extends BaseType {
     return new Range(low, high);
   }
 
+  public static boolean isEqual(Range left, Range right) {
+    boolean low = left.low.compareTo(right.low) == 0;
+    boolean high = left.high.compareTo(right.high) == 0;
+    return low && high;
+  }
+
+  public static boolean leftIsSmallerEqual(Range left, Range right) {
+    boolean low = left.low.compareTo(right.low) >= 0;
+    boolean high = left.high.compareTo(right.high) <= 0;
+    return low && high;
+  }
+
 }

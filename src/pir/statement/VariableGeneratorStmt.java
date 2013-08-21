@@ -1,19 +1,19 @@
 package pir.statement;
 
-import pir.other.Variable;
+import pir.other.SsaVariable;
 
 abstract public class VariableGeneratorStmt extends Statement {
-  private Variable variable;
+  private SsaVariable variable;
 
-  public VariableGeneratorStmt(Variable variable) {
+  public VariableGeneratorStmt(SsaVariable variable) {
     this.variable = variable;
   }
 
-  public Variable getVariable() {
+  public SsaVariable getVariable() {
     return variable;
   }
 
-  public void setVariable(Variable variable) {
+  public void setVariable(SsaVariable variable) {
     this.variable = variable;
   }
 

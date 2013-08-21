@@ -4,9 +4,9 @@ import pir.PirObject;
 
 public class NamedElement extends PirObject {
   private String name;
-  private Type type;
+  private TypeRef type;
 
-  public NamedElement(String name, Type type) {
+  public NamedElement(String name, TypeRef type) {
     super();
     this.name = name;
     this.type = type;
@@ -16,7 +16,7 @@ public class NamedElement extends PirObject {
     return name;
   }
 
-  public Type getType() {
+  public TypeRef getType() {
     return type;
   }
 
@@ -24,13 +24,13 @@ public class NamedElement extends PirObject {
     this.name = name;
   }
 
-  public void setType(Type type) {
+  public void setType(TypeRef type) {
     this.type = type;
   }
 
   @Override
   public String toString() {
-    return name + ":" + type.getName();
+    return name + ":" + type.toString();
   }
 
 }

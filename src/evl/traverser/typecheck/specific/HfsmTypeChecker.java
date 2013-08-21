@@ -19,8 +19,8 @@ import evl.other.Named;
 import evl.other.NamedList;
 import evl.traverser.range.RangeGetter;
 import evl.type.base.Range;
+import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
-import evl.variable.Variable;
 
 //TODO check for unused states
 //TODO check if a transition is never used
@@ -94,7 +94,7 @@ public class HfsmTypeChecker extends NullTraverser<Void, Void> {
   @Override
   protected Void visitTransition(Transition obj, Void param) {
     ExpressionTypeChecker.process(obj.getGuard(), kb);
-    Map<Variable, Range> varRange = RangeGetter.getRange(obj.getGuard(), kb);
+    Map<SsaVariable, Range> varRange = RangeGetter.getRange(obj.getGuard(), kb);
     StatementTypeChecker.process(obj.getBody(), kbi.getVoidType(), varRange, kb);
     return null;
   }

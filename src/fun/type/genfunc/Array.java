@@ -1,5 +1,7 @@
 package fun.type.genfunc;
 
+import java.math.BigInteger;
+
 import common.Designator;
 import common.ElementInfo;
 
@@ -11,10 +13,10 @@ import fun.variable.CompfuncParameter;
 
 public class Array extends BaseType implements Named {
   private Reference type;
-  private int size;
+  private BigInteger size;
   private String name;
 
-  public Array(ElementInfo info, int size, Reference type) {
+  public Array(ElementInfo info, BigInteger size, Reference type) {
     super(info);
     this.type = type;
     this.size = size;
@@ -29,11 +31,11 @@ public class Array extends BaseType implements Named {
     this.type = type;
   }
 
-  public void setSize(int size) {
+  public void setSize(BigInteger size) {
     this.size = size;
   }
 
-  public int getSize() {
+  public BigInteger getSize() {
     return size;
   }
 

@@ -527,7 +527,7 @@ public class RXmlPrinter extends NullTraverser<Void, XmlWriter> {
 
   @Override
   protected Void visitBlock(Block obj, XmlWriter param) {
-    visitList(obj.getStatements(), param);
+    visitListOfNamed(obj.getStatements(), param);
     return null;
   }
 

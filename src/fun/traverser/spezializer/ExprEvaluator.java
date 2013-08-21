@@ -1,6 +1,9 @@
 package fun.traverser.spezializer;
 
+import java.math.BigInteger;
 import java.util.List;
+
+import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
@@ -135,43 +138,52 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
     return null;
   }
 
+  private int getInt(ElementInfo info, BigInteger rval) {
+    if( rval.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0 ){
+      RError.err(ErrorType.Error, info, "value to big: " + rval.toString() );
+    } else if( rval.compareTo(BigInteger.valueOf(Integer.MIN_VALUE)) < 0 ){
+      RError.err(ErrorType.Error, info, "value to small: " + rval.toString() );
+    }
+    return rval.intValue();
+  }
+
   @Override
   protected Expression visitArithmeticOp(ArithmeticOp obj, Memory param) {
     Expression left = visit(obj.getLeft(), param);
     Expression right = visit(obj.getRight(), param);
 
     if ((left instanceof Number) && (right instanceof Number)) {
-      int lval = ((Number) left).getValue();
-      int rval = ((Number) right).getValue();
-      int res;
+      BigInteger lval = ((Number) left).getValue();
+      BigInteger rval = ((Number) right).getValue();
+      BigInteger res;
 
       switch (obj.getOp()) {
       case AND:
-        res = lval & rval;
+        res = lval.and(rval);
         break;
       case DIV:
-        res = lval / rval;
+        res = lval.divide(rval);
         break;
       case MINUS:
-        res = lval - rval;
+        res = lval.subtract(rval);
         break;
       case MOD:
-        res = lval % rval;
+        res = lval.mod(rval);
         break;
       case MUL:
-        res = lval * rval;
+        res = lval.multiply(rval);
         break;
       case OR:
-        res = lval | rval;
+        res = lval.or(rval);
         break;
       case PLUS:
-        res = lval + rval;
+        res = lval.add(rval);
         break;
       case SHL:
-        res = lval << rval;
+        res = lval.shiftLeft( getInt(obj.getInfo(), rval) );
         break;
       case SHR:
-        res = lval >> rval;
+        res = lval.shiftRight( getInt(obj.getInfo(), rval) );
         break;
       default:
         RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj.getOp());
@@ -189,28 +201,28 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
     Expression right = visit(obj.getRight(), param);
 
     if ((left instanceof Number) && (right instanceof Number)) {
-      int lval = ((Number) left).getValue();
-      int rval = ((Number) right).getValue();
+      BigInteger lval = ((Number) left).getValue();
+      BigInteger rval = ((Number) right).getValue();
       boolean res;
 
       switch (obj.getOp()) {
       case EQUAL:
-        res = lval == rval;
+        res = lval.compareTo(rval) == 0;
         break;
       case GREATER:
-        res = lval > rval;
+        res = lval.compareTo(rval) > 0;
         break;
       case GREATER_EQUEAL:
-        res = lval >= rval;
+        res = lval.compareTo(rval) >= 0;
         break;
       case LESS:
-        res = lval < rval;
+        res = lval.compareTo(rval) < 0;
         break;
       case LESS_EQUAL:
-        res = lval <= rval;
+        res = lval.compareTo(rval) <= 0;
         break;
       case NOT_EQUAL:
-        res = lval != rval;
+        res = lval.compareTo(rval) != 0;
         break;
       default:
         RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj.getOp());

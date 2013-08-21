@@ -39,6 +39,7 @@ import evl.other.Namespace;
 import evl.statement.CallStmt;
 import evl.statement.Statement;
 import evl.variable.FuncVariable;
+import evl.variable.Variable;
 import fun.hfsm.State;
 
 public class CompositionReduction extends NullTraverser<Named, Void> {
@@ -134,7 +135,7 @@ public class CompositionReduction extends NullTraverser<Named, Void> {
 
   private Reference makeEntryExitFunc(String name, ListOfNamed<FunctionBase> list) {
     ElementInfo info = new ElementInfo();
-    FuncPrivateVoid func = new FuncPrivateVoid(info, name, new ListOfNamed<FuncVariable>());
+    FuncPrivateVoid func = new FuncPrivateVoid(info, name, new ListOfNamed<Variable>());
     func.setBody(new BasicBlockList(info));
     list.add(func);
     return new Reference(info, func);

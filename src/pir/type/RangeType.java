@@ -7,10 +7,14 @@ public class RangeType extends Type {
   private final BigInteger high;
 
   public RangeType(BigInteger low, BigInteger high) {
-    super("R" + "{" + low.toString() + "," + high.toString() + "}");
+    super(makeName(low, high));
     assert (low.compareTo(high) <= 0); // TODO ok?
     this.low = low;
     this.high = high;
+  }
+
+  public static String makeName(BigInteger low, BigInteger high) {
+    return "R" + "{" + low.toString() + "," + high.toString() + "}";
   }
 
   public BigInteger getLow() {
@@ -34,8 +38,8 @@ public class RangeType extends Type {
    * @return (lt.low < rt.low) or (lt.high > rt.high)
    */
   public static boolean isBigger(RangeType lt, RangeType rt) {
-    boolean lowIn = lt.getLow().compareTo(rt.getLow()) < 0;  //TODO ok?
-    boolean highIn = lt.getHigh().compareTo(rt.getHigh()) > 0;  //TODO ok?
+    boolean lowIn = lt.getLow().compareTo(rt.getLow()) < 0; // TODO ok?
+    boolean highIn = lt.getHigh().compareTo(rt.getHigh()) > 0; // TODO ok?
     return lowIn || highIn;
   }
 

@@ -2,6 +2,8 @@ package fun.toevl;
 
 import java.util.Map;
 
+import common.ElementInfo;
+
 import error.ErrorType;
 import error.RError;
 import evl.Evl;
@@ -11,6 +13,7 @@ import evl.function.FunctionBase;
 import evl.function.FunctionFactory;
 import evl.other.ListOfNamed;
 import evl.type.Type;
+import evl.type.TypeRef;
 import evl.type.special.VoidType;
 import fun.Fun;
 import fun.NullTraverser;
@@ -69,14 +72,14 @@ public class FunToEvlFunc extends NullTraverser<FunctionBase, Void> {
     assert ((func instanceof evl.function.FuncWithBody) == (obj instanceof FuncWithBody));
 
     map.put(obj, func);
-    Type retType;
+    TypeRef retType;
     if (obj instanceof FuncWithReturn) {
-      Reference typeRef = (Reference) fta.traverse(((FuncWithReturn) obj).getRet(), null);
-      assert (typeRef.getOffset().isEmpty());
-      retType = (Type) typeRef.getLink();
-      ((evl.function.FuncWithReturn) func).setRet(typeRef);
+      Reference ref = (Reference) fta.traverse(((FuncWithReturn) obj).getRet(), null);
+      assert( ref.getOffset().isEmpty() );
+      retType = new TypeRef(ref.getInfo(), (Type) ref.getLink());
+      ((evl.function.FuncWithReturn) func).setRet(new TypeRef(retType.getInfo(), retType.getRef()));
     } else {
-      retType = new VoidType(); // FIXME get singleton
+      retType = new TypeRef(new ElementInfo(), new VoidType()); // FIXME get singleton
     }
     if (obj instanceof FuncWithBody) {
       MakeBasicBlocks blocks = new MakeBasicBlocks(fta);

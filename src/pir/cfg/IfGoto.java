@@ -3,29 +3,29 @@ package pir.cfg;
 import java.util.HashSet;
 import java.util.Set;
 
-import pir.expression.reference.VarRefSimple;
+import pir.other.PirValue;
 
 /**
  * 
  * @author urs
  */
 public class IfGoto extends BasicBlockEnd {
-  private VarRefSimple condition;
+  private PirValue condition;
   private BasicBlock thenBlock;
   private BasicBlock elseBlock;
 
-  public IfGoto(VarRefSimple condition, BasicBlock thenBlock, BasicBlock elseBlock) {
+  public IfGoto(PirValue condition, BasicBlock thenBlock, BasicBlock elseBlock) {
     super();
     this.condition = condition;
     this.thenBlock = thenBlock;
     this.elseBlock = elseBlock;
   }
 
-  public VarRefSimple getCondition() {
+  public PirValue getCondition() {
     return condition;
   }
 
-  public void setCondition(VarRefSimple condition) {
+  public void setCondition(PirValue condition) {
     this.condition = condition;
   }
 

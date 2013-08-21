@@ -39,7 +39,7 @@ public class FunctionTypeChecker extends NullTraverser<Void, Void> {
     if (obj instanceof FuncWithBody) {
       Type ret;
       if (obj instanceof FuncWithReturn) {
-        ret = RefTypeChecker.process(((FuncWithReturn) obj).getRet(), kb);
+        ret = ((FuncWithReturn) obj).getRet().getRef();
       } else {
         ret = kbi.getVoidType();
       }

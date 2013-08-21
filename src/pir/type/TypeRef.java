@@ -1,9 +1,9 @@
-package pir.expression.reference;
+package pir.type;
 
-import pir.expression.PExpression;
-import pir.type.Type;
+import pir.PirObject;
+import pir.expression.reference.Reference;
 
-final public class TypeRef extends PExpression implements Reference<Type> {
+final public class TypeRef extends PirObject implements Reference<Type> {
   private Type ref;
 
   public TypeRef(Type ref) {

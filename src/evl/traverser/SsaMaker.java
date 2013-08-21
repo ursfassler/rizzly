@@ -233,7 +233,7 @@ class SsaVarCreator extends NullTraverser<Void, List<Statement>> {
   protected Void visitAssignment(Assignment obj, List<Statement> param) {
     if (obj.getLeft().getOffset().isEmpty() && (obj.getLeft().getLink() instanceof FuncVariable)) {
       FuncVariable var = (FuncVariable) obj.getLeft().getLink();
-      if (PhiInserter.isScalar(var.getType())) {
+      if (PhiInserter.isScalar(var.getType().getRef())) {
         nr++;
         SsaVariable sv = new SsaVariable(var, nr);
         VarDefInitStmt init = new VarDefInitStmt(obj.getInfo(), sv, obj.getRight());
@@ -313,7 +313,7 @@ class InterBbVariableLinker extends DefTraverser<Void, BasicBlock> {
 
   @Override
   protected Void visitReference(Reference obj, BasicBlock param) {
-    if (obj.getOffset().isEmpty() && (obj.getLink() instanceof FuncVariable) && (PhiInserter.isScalar(((FuncVariable) obj.getLink()).getType()))) {
+    if (obj.getOffset().isEmpty() && (obj.getLink() instanceof FuncVariable) && (PhiInserter.isScalar(((FuncVariable) obj.getLink()).getType().getRef()))) {
       BasicBlock dom = idom.get(param);
       if (dom != null) {
         // not for the first BB

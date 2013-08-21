@@ -15,7 +15,7 @@ import pir.statement.GetElementPtr;
 import pir.statement.Statement;
 import pir.statement.StoreStmt;
 import pir.traverser.StmtReplacer;
-import pir.type.Array;
+import pir.type.ArrayType;
 import pir.type.Type;
 
 import common.NameFactory;
@@ -43,10 +43,10 @@ public class ComplexWriterReduction extends StmtReplacer<Void> {
 
     for (RefItem itm : obj.getDst().getOffset()) {
       if (itm instanceof RefIndex) {
-        assert (type instanceof Array);
+        assert (type instanceof ArrayType);
         PExpression idx = ((RefIndex) itm).getIndex();
         offset.add(idx);
-        type = ((Array) type).getType();
+        type = ((ArrayType) type).getType();
       } else {
         throw new RuntimeException("not yet implemented: " + itm.getClass().getCanonicalName());
       }

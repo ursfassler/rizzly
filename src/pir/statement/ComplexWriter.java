@@ -1,22 +1,22 @@
 package pir.statement;
 
-import pir.expression.PExpression;
 import pir.expression.reference.VarRef;
+import pir.other.PirValue;
 
 public class ComplexWriter extends Statement {
   private VarRef dst;
-  private PExpression src;
+  private PirValue src;
 
-  public ComplexWriter(VarRef dst, PExpression src) {
+  public ComplexWriter(VarRef dst, PirValue src) {
     this.dst = dst;
     this.src = src;
   }
 
-  public PExpression getSrc() {
+  public PirValue getSrc() {
     return src;
   }
 
-  public void setSrc(PExpression src) {
+  public void setSrc(PirValue src) {
     this.src = src;
   }
 
