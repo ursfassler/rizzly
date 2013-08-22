@@ -23,7 +23,6 @@ import pir.passes.BooleanReplacer;
 import pir.passes.ComplexWriterReduction;
 import pir.passes.GlobalReadExtracter;
 import pir.passes.RangeConverter;
-import pir.passes.RangeExtender;
 import pir.passes.RangeReplacer;
 import pir.passes.ReferenceReadReduction;
 import pir.passes.UnusedStmtRemover;
@@ -113,15 +112,16 @@ public class Main {
 
     LlvmWriter.print(prog, debugdir + "afterEvl.ll",true);
     
-    RangeConverter.process(prog,new KnowledgeBase(prog, debugdir));
-    LlvmWriter.print(prog, debugdir + "typeext.ll",true);
+    KnowledgeBase kb = new KnowledgeBase(prog, debugdir);
+    RangeConverter.process(prog,kb);
     RangeReplacer.process(prog);
-    BooleanReplacer.process(prog);
+    BooleanReplacer.process(prog,kb);
+    LlvmWriter.print(prog, debugdir + "typeext.ll",true);
     ComplexWriterReduction.process(prog);
     ReferenceReadReduction.process(prog);
     GlobalReadExtracter.process(prog);
 //    GlobalWriteExtracter.process(prog);   //TODO do it during translation to PIR?
-    RangeExtender.process(prog);
+//    RangeExtender.process(prog);
 
     HashMap<SsaVariable, Statement> owner = OwnerMap.make(prog);
     SimpleGraph<PirObject> g = DependencyGraphMaker.make(prog, owner);

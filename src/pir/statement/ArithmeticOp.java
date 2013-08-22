@@ -4,9 +4,10 @@ import pir.other.PirValue;
 import pir.other.SsaVariable;
 
 public class ArithmeticOp extends VariableGeneratorStmt {
-  private PirValue left; // FIXME only use constant or variable ref
-  private PirValue right;// FIXME only use constant or variable ref
-  final private ArOp op;
+  private PirValue left;
+  private PirValue right;
+  private ArOp op;
+  private StmtSignes signes = StmtSignes.unknown;
 
   public ArithmeticOp(SsaVariable variable, PirValue left, PirValue right, ArOp op) {
     super(variable);
@@ -35,9 +36,17 @@ public class ArithmeticOp extends VariableGeneratorStmt {
     return op;
   }
 
+  public StmtSignes getSignes() {
+    return signes;
+  }
+
+  public void setSignes(StmtSignes signes) {
+    this.signes = signes;
+  }
+
   @Override
   public String toString() {
-    return super.toString() + " := " + left.toString() + " " + op.toString() + " " + right.toString();
+    return super.toString() + " := " + signes + " " + left.toString() + " " + op.toString() + " " + right.toString();
   }
 
 }

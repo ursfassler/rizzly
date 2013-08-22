@@ -21,10 +21,10 @@ import pir.type.BooleanType;
 import pir.type.EnumType;
 import pir.type.NamedElement;
 import pir.type.RangeType;
-import pir.type.SignedType;
 import pir.type.StructType;
 import pir.type.Type;
 import pir.type.TypeRef;
+import pir.type.UnsignedType;
 
 public class ExprTypeGetter extends NullTraverser<Type, Void> {
   public final static boolean NUMBER_AS_RANGE = true;
@@ -119,11 +119,11 @@ public class ExprTypeGetter extends NullTraverser<Type, Void> {
   @Override
   protected Type visitNumber(Number obj, Void param) {
     if (numAsRange) {
-      return new RangeType(obj.getValue(), obj.getValue());
+      return new RangeType(obj.getValue(), obj.getValue());   //TODO add to types
     } else {
       if ( obj.getValue().compareTo(BigInteger.ZERO) >= 0) {
         int bits = getBits(obj.getValue());
-        return new SignedType(bits);
+        return new UnsignedType(bits);
         // return new UnsignedType(bits);  //TODO reimplement this
       } else {
         throw new RuntimeException("not yet implemented");

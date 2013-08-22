@@ -13,7 +13,6 @@ import pir.statement.Statement;
 import pir.statement.StoreStmt;
 import pir.statement.convert.SignExtendValue;
 import pir.traverser.ExprTypeGetter;
-import pir.type.SignedType;
 import pir.type.Type;
 
 import common.NameFactory;
@@ -35,11 +34,11 @@ public class RangeExtender extends DefTraverser<List<Statement>, Void> {
   protected List<Statement> visitStoreStmt(StoreStmt obj, Void param) {
     // TODO add support for zext
     Type type = ExprTypeGetter.process(obj.getSrc(), ExprTypeGetter.NUMBER_AS_INT);
-    assert (type instanceof SignedType);
+    assert (type instanceof OldSignedType);
     Type dstType = ExprTypeGetter.process(obj.getDst(), ExprTypeGetter.NUMBER_AS_INT);
-    assert (dstType instanceof SignedType);
-    int srcBits = ((SignedType) type).getBits();
-    int dstBits = ((SignedType) dstType).getBits();
+    assert (dstType instanceof OldSignedType);
+    int srcBits = ((OldSignedType) type).getBits();
+    int dstBits = ((OldSignedType) dstType).getBits();
 
     if (dstBits > srcBits) {
       List<Statement> ret = new ArrayList<Statement>();

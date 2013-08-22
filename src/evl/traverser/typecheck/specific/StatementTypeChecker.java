@@ -247,7 +247,9 @@ public class StatementTypeChecker extends NullTraverser<Void, Map<SsaVariable, R
     Set<SsaVariable> vars = new HashSet<SsaVariable>(a.keySet());
     vars.retainAll(b.keySet());
     for (SsaVariable var : vars) {
-      ret.put(var, Range.narrow(a.get(var), b.get(var)));
+      Range rt = Range.narrow(a.get(var), b.get(var));
+      rt = kbi.getRangeType(rt.getLow(), rt.getHigh());
+      ret.put(var, rt);
     }
     return ret;
   }

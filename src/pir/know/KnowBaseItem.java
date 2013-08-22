@@ -12,6 +12,7 @@ import pir.type.BooleanType;
 import pir.type.RangeType;
 import pir.type.StringType;
 import pir.type.Type;
+import pir.type.UnsignedType;
 import pir.type.VoidType;
 
 import common.ElementInfo;
@@ -113,6 +114,15 @@ public class KnowBaseItem extends KnowledgeEntry {
     BooleanType ret = (BooleanType) findItem(BooleanType.NAME);
     if (ret == null) {
       ret = new BooleanType();
+      addItem(ret);
+    }
+    return ret;
+  }
+
+  public UnsignedType getUnsignedType(int bits) {
+    UnsignedType ret = (UnsignedType) findItem(UnsignedType.makeName(bits));
+    if (ret == null) {
+      ret = new UnsignedType(bits);
       addItem(ret);
     }
     return ret;

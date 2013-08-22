@@ -46,6 +46,7 @@ import pir.statement.ComplexWriter;
 import pir.statement.GetElementPtr;
 import pir.statement.LoadStmt;
 import pir.statement.Relation;
+import pir.statement.StmtSignes;
 import pir.statement.StoreStmt;
 import pir.statement.VarDefStmt;
 import pir.statement.VariableGeneratorStmt;
@@ -58,9 +59,9 @@ import pir.type.ArrayType;
 import pir.type.BooleanType;
 import pir.type.EnumElement;
 import pir.type.EnumType;
+import pir.type.IntType;
 import pir.type.NamedElement;
 import pir.type.RangeType;
-import pir.type.SignedType;
 import pir.type.StringType;
 import pir.type.StructType;
 import pir.type.Type;
@@ -388,8 +389,8 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitTypeRef(TypeRef obj, StreamWriter param) {
-    if (obj.getRef() instanceof SignedType) {
-      param.wr("i" + ((SignedType) obj.getRef()).getBits());
+    if (obj.getRef() instanceof IntType) {
+      param.wr("i" + ((IntType) obj.getRef()).getBits());
     } else if (obj.getRef() instanceof VoidType) {
       param.wr("void");
     } else {
@@ -478,11 +479,46 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     param.wr(" = ");
   }
 
+  private String getRelop(RelOp op, StmtSignes signes) {
+    String sign;
+    switch (signes) {
+    case unknown:
+      sign = "";
+      break;
+    case signed:
+      sign = "s";
+      break;
+    case unsigned:
+      sign = "u";
+      break;
+    default:
+      RError.err(ErrorType.Fatal, "Unknown signes value: " + signes);
+      return null;
+    }
+    switch (op) {
+    case EQUAL:
+      return "eq";
+    case NOT_EQUAL:
+      return "ne";
+    case GREATER:
+      return sign + "gt";
+    case GREATER_EQUEAL:
+      return sign + "ge";
+    case LESS:
+      return sign + "lt";
+    case LESS_EQUAL:
+      return sign + "le";
+    default:
+      RError.err(ErrorType.Fatal, "Operand not handled: " + op);
+      return null;
+    }
+  }
+
   @Override
   protected Void visitRelation(Relation obj, StreamWriter param) {
     wrVarDef(obj, param);
     param.wr("icmp ");
-    printUnsignedRelop(obj.getOp(), param);// FIXME check if type is unsigned
+    param.wr(getRelop(obj.getOp(),obj.getSignes()));
     param.wr(" ");
 
     visit(obj.getVariable().getType(), param);
@@ -524,8 +560,9 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitArithmeticOp(ArithmeticOp obj, StreamWriter param) {
     wrVarDef(obj, param);
-    wrArop(obj.getOp(), param);
+    param.wr(getOpString(obj.getOp()));
     param.wr(" ");
+    param.wr("nuw nsw "); // TODO ok to set them always?
 
     visit(obj.getVariable().getType(), param);
 
@@ -538,23 +575,18 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     return null;
   }
 
-  private void wrArop(ArOp op, StreamWriter param) {
-    String code;
+  private String getOpString(ArOp op) {
     switch (op) {
     case MINUS:
-      code = "sub nsw nuw"; // TODO make nsw nuw depended on signes
-      break;
+      return "sub";
     case PLUS:
-      code = "add nsw nuw";// TODO make nsw nuw depended on signes
-      break;
+      return "add";
     case AND:
-      code = "and";
-      break;
+      return "and";
     default:
       RError.err(ErrorType.Fatal, "Operand not handled: " + op);
-      return;
+      return null;
     }
-    param.wr(code);
   }
 
   @Override
@@ -571,34 +603,6 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   @Deprecated
   private Type getType(Pir left) {
     return ExprTypeGetter.process(left, ExprTypeGetter.NUMBER_AS_INT); // FIXME change IR that this is no longer needed
-  }
-
-  private void printUnsignedRelop(RelOp op, StreamWriter param) {
-    String code;
-    switch (op) {
-    case EQUAL:
-      code = "eq";
-      break;
-    case NOT_EQUAL:
-      code = "ne";
-      break;
-    case GREATER:
-      code = "ugt";
-      break;
-    case GREATER_EQUEAL:
-      code = "uge";
-      break;
-    case LESS:
-      code = "ult";
-      break;
-    case LESS_EQUAL:
-      code = "ule";
-      break;
-    default:
-      RError.err(ErrorType.Fatal, "Operand not handled: " + op);
-      return;
-    }
-    param.wr(code);
   }
 
   @Override
@@ -739,7 +743,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitSignedType(SignedType obj, StreamWriter param) {
+  protected Void visitSignedType(OldSignedType obj, StreamWriter param) {
     // param.wr("i" + obj.getBits());
     return null;
   }

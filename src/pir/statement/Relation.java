@@ -5,9 +5,10 @@ import pir.other.SsaVariable;
 import evl.expression.RelOp;
 
 public class Relation extends VariableGeneratorStmt {
-  final private PirValue left; // FIXME only use constant or variable ref
-  final private PirValue right; // FIXME only use constant or variable ref
-  final private RelOp op;
+  private PirValue left;
+  private PirValue right;
+  private RelOp op;
+  private StmtSignes signes = StmtSignes.unknown;
 
   public Relation(SsaVariable variable, PirValue left, PirValue right, RelOp op) {
     super(variable);
@@ -28,9 +29,17 @@ public class Relation extends VariableGeneratorStmt {
     return op;
   }
 
+  public StmtSignes getSignes() {
+    return signes;
+  }
+
+  public void setSignes(StmtSignes signes) {
+    this.signes = signes;
+  }
+
   @Override
   public String toString() {
-    return getVariable() + " := " + left + " " + op + " " + right;
+    return getVariable() + " := " + signes + " " + left + " " + op + " " + right;
   }
 
 }

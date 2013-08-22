@@ -75,7 +75,7 @@ public class KnowPirType extends NullTraverser<Type, Void> {
       BigInteger high = ((RangeType) type).getHigh();
       low = BigInteger.ZERO.subtract(low);
       high = BigInteger.ZERO.subtract(high);
-      return new RangeType(high, low);
+      return new RangeType(high, low);    //TODO add to types
     } else {
       RError.err(ErrorType.Fatal, "Unsupported type: " + type.getClass().getCanonicalName() + " / " + type);
       return null;
@@ -90,7 +90,7 @@ public class KnowPirType extends NullTraverser<Type, Void> {
   @Override
   protected Type visitNumber(Number obj, Void param) {
     BigInteger value = BigInteger.valueOf(obj.getValue());
-    return new RangeType(value, value);
+    return new RangeType(value, value);  //TODO add to types
   }
 
   @Override
