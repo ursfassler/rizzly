@@ -47,11 +47,10 @@ public class VarPropagator extends StatementReplacer<Map<SsaVariable, SsaVariabl
   @Override
   protected List<Statement> visitAssignment(Assignment obj, Map<SsaVariable, SsaVariable> param) {
     if (obj.getSrc() instanceof VarRefSimple) {
-//      param.put(((VarRefSimple) obj.getSrc()).getRef(), obj.getVariable());
       param.put(obj.getVariable(),((VarRefSimple) obj.getSrc()).getRef());
       return new ArrayList<Statement>();
     } else {
-      return null; // TODO handle also this case
+      return null; // in ConstPropagator
     }
   }
 

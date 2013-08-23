@@ -19,6 +19,7 @@ import pir.PirObject;
 import pir.know.KnowledgeBase;
 import pir.other.Program;
 import pir.other.SsaVariable;
+import pir.passes.ConstPropagator;
 import pir.passes.LlvmIntTypeReplacer;
 import pir.passes.ComplexWriterReduction;
 import pir.passes.GlobalReadExtracter;
@@ -119,13 +120,13 @@ public class Main {
 
     { // reducing Range and boolean to nosign type
       RangeConverter.process(prog,kb);
-      LlvmWriter.print(prog, debugdir + "typeext.ll",true);
       RangeReplacer.process(prog);
       TypecastReplacer.process(prog);
       StmtSignSetter.process(prog);
       LlvmIntTypeReplacer.process(prog,kb);
     }
     
+    LlvmWriter.print(prog, debugdir + "typeext.ll",true);
 
     ComplexWriterReduction.process(prog);
     ReferenceReadReduction.process(prog);
@@ -134,12 +135,12 @@ public class Main {
 //    RangeExtender.process(prog);
 
     VarPropagator.process(prog);
-    
+    ConstPropagator.process(prog);
     
     HashMap<SsaVariable, Statement> owner = OwnerMap.make(prog);
     SimpleGraph<PirObject> g = DependencyGraphMaker.make(prog, owner);
     printGraph(g,debugdir + "pirdepstmt.gv");
-    UnusedStmtRemover.process(prog, g);
+    UnusedStmtRemover.process(prog, g);   //TODO implement it
 
     Renamer.process(prog);
 
