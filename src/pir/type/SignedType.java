@@ -1,15 +1,12 @@
 package pir.type;
 
-public class SignedType extends Type implements IntType {
-  private final int bits;
-
+public class SignedType extends IntType {
   public SignedType(int bits) {
-    super("S" + "{" + bits + "}");
-    this.bits = bits;
+    super(makeName(bits), bits);
   }
 
-  public int getBits() {
-    return bits;
+  public static String makeName(int bits) {
+    return "S" + "{" + bits + "}";
   }
 
 }

@@ -43,6 +43,7 @@ import pir.type.BooleanType;
 import pir.type.EnumElement;
 import pir.type.EnumType;
 import pir.type.NamedElement;
+import pir.type.NoSignType;
 import pir.type.RangeType;
 import pir.type.SignedType;
 import pir.type.StringType;
@@ -375,6 +376,11 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitTypeRef(TypeRef obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitNoSignType(NoSignType obj, P param) {
     return null;
   }
 

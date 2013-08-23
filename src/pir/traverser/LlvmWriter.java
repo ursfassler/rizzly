@@ -61,7 +61,9 @@ import pir.type.EnumElement;
 import pir.type.EnumType;
 import pir.type.IntType;
 import pir.type.NamedElement;
+import pir.type.NoSignType;
 import pir.type.RangeType;
+import pir.type.SignedType;
 import pir.type.StringType;
 import pir.type.StructType;
 import pir.type.Type;
@@ -226,9 +228,19 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     param.wr(obj.getName());
     wrId(obj, param);
     param.wr(" = ");
-    param.wr("U{");
+    param.wr("U");
     param.wr(Integer.toString(obj.getBits()));
-    param.wr("};");
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitSignedType(SignedType obj, StreamWriter param) {
+    param.wr(obj.getName());
+    wrId(obj, param);
+    param.wr(" = ");
+    param.wr("S");
+    param.wr(Integer.toString(obj.getBits()));
     param.nl();
     return null;
   }
@@ -389,7 +401,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitTypeRef(TypeRef obj, StreamWriter param) {
-    if (obj.getRef() instanceof IntType) {
+    if (obj.getRef() instanceof NoSignType) {
       param.wr("i" + ((IntType) obj.getRef()).getBits());
     } else if (obj.getRef() instanceof VoidType) {
       param.wr("void");
@@ -739,12 +751,6 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
     param.nl();
 
-    return null;
-  }
-
-  @Override
-  protected Void visitSignedType(OldSignedType obj, StreamWriter param) {
-    // param.wr("i" + obj.getBits());
     return null;
   }
 

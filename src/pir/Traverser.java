@@ -51,8 +51,10 @@ import pir.type.ArrayType;
 import pir.type.BooleanType;
 import pir.type.EnumElement;
 import pir.type.EnumType;
+import pir.type.IntType;
 import pir.type.NamedElemType;
 import pir.type.NamedElement;
+import pir.type.NoSignType;
 import pir.type.RangeType;
 import pir.type.SignedType;
 import pir.type.StringType;
@@ -230,12 +232,10 @@ abstract public class Traverser<R, P> {
   }
 
   protected R visitType(Type obj, P param) {
-    if (obj instanceof UnsignedType)
-      return visitUnsignedType((UnsignedType) obj, param);
-    else if (obj instanceof SignedType)
-      return visitSignedType((SignedType) obj, param);
-    else if (obj instanceof RangeType)
+    if (obj instanceof RangeType)
       return visitRangeType((RangeType) obj, param);
+    else if (obj instanceof IntType)
+      return visitIntType((IntType) obj, param);
     else if (obj instanceof BooleanType)
       return visitBooleanType((BooleanType) obj, param);
     else if (obj instanceof NamedElemType)
@@ -250,6 +250,17 @@ abstract public class Traverser<R, P> {
       return visitArray((ArrayType) obj, param);
     else if (obj instanceof StringType)
       return visitStringType((StringType) obj, param);
+    else
+      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+  }
+
+  protected R visitIntType(IntType obj, P param) {
+    if (obj instanceof UnsignedType)
+      return visitUnsignedType((UnsignedType) obj, param);
+    else if (obj instanceof SignedType)
+      return visitSignedType((SignedType) obj, param);
+    else if (obj instanceof NoSignType)
+      return visitNoSignType((NoSignType) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
@@ -272,6 +283,8 @@ abstract public class Traverser<R, P> {
   protected abstract R visitSignExtendValue(SignExtendValue obj, P param);
 
   protected abstract R visitZeroExtendValue(ZeroExtendValue obj, P param);
+
+  protected abstract R visitNoSignType(NoSignType obj, P param);
 
   protected abstract R visitSignedType(SignedType obj, P param);
 
