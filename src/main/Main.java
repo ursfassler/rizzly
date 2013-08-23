@@ -117,14 +117,19 @@ public class Main {
     RangeConverter.process(prog,kb);
     RangeReplacer.process(prog);
     BooleanReplacer.process(prog,kb);
+    //TODO replace typecast with trunc, sext, zext and assignment
+    //TODO replace unsigned and signed with noSigned
     LlvmWriter.print(prog, debugdir + "typeext.ll",true);
-    
+
     ComplexWriterReduction.process(prog);
     ReferenceReadReduction.process(prog);
     GlobalReadExtracter.process(prog);
 //    GlobalWriteExtracter.process(prog);   //TODO do it during translation to PIR?
 //    RangeExtender.process(prog);
 
+    //TODO add value propagation (i.e. remove assignments)
+    
+    
     HashMap<SsaVariable, Statement> owner = OwnerMap.make(prog);
     SimpleGraph<PirObject> g = DependencyGraphMaker.make(prog, owner);
     printGraph(g,debugdir + "pirdepstmt.gv");

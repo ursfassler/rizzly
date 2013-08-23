@@ -3,8 +3,6 @@ package pir.passes;
 import java.util.ArrayList;
 import java.util.List;
 
-import pir.DefTraverser;
-import pir.cfg.BasicBlock;
 import pir.cfg.PhiStmt;
 import pir.expression.Number;
 import pir.expression.reference.VarRefSimple;
@@ -19,6 +17,7 @@ import pir.statement.Relation;
 import pir.statement.Statement;
 import pir.statement.convert.TypeCast;
 import pir.traverser.ExprTypeGetter;
+import pir.traverser.StatementReplacer;
 import pir.type.RangeType;
 import pir.type.TypeRef;
 
@@ -30,7 +29,7 @@ import common.NameFactory;
  * @author urs
  * 
  */
-public class RangeConverter extends DefTraverser<List<Statement>, Void> {
+public class RangeConverter extends StatementReplacer<Void> {
   private KnowBaseItem kbi;
 
   public RangeConverter(KnowledgeBase kb) {
@@ -135,28 +134,6 @@ public class RangeConverter extends DefTraverser<List<Statement>, Void> {
     }
 
     return ret;
-  }
-
-  @Override
-  protected List<Statement> visitBasicBlock(BasicBlock obj, Void param) {
-    ArrayList<Statement> stmts = new ArrayList<Statement>(obj.getCode());
-    obj.getCode().clear();
-
-    for (Statement stmt : stmts) {
-      List<Statement> list = visit(stmt, null);
-      if (list == null) {
-        obj.getCode().add(stmt);
-      } else {
-        obj.getCode().addAll(list);
-      }
-    }
-
-    List<Statement> list = visit(obj.getEnd(), null);
-    if (list != null) {
-      obj.getCode().addAll(list);
-    }
-
-    return null;
   }
 
 }
