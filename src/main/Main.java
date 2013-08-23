@@ -113,10 +113,12 @@ public class Main {
     LlvmWriter.print(prog, debugdir + "afterEvl.ll",true);
     
     KnowledgeBase kb = new KnowledgeBase(prog, debugdir);
+    
     RangeConverter.process(prog,kb);
     RangeReplacer.process(prog);
     BooleanReplacer.process(prog,kb);
     LlvmWriter.print(prog, debugdir + "typeext.ll",true);
+    
     ComplexWriterReduction.process(prog);
     ReferenceReadReduction.process(prog);
     GlobalReadExtracter.process(prog);

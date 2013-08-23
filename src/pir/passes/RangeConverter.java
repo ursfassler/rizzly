@@ -10,15 +10,16 @@ import pir.expression.Number;
 import pir.expression.reference.VarRefSimple;
 import pir.know.KnowBaseItem;
 import pir.know.KnowledgeBase;
+import pir.other.PirValue;
 import pir.other.Program;
 import pir.other.SsaVariable;
 import pir.statement.ArithmeticOp;
 import pir.statement.Assignment;
+import pir.statement.Relation;
 import pir.statement.Statement;
 import pir.statement.convert.TypeCast;
 import pir.traverser.ExprTypeGetter;
 import pir.type.RangeType;
-import pir.type.Type;
 import pir.type.TypeRef;
 
 import common.NameFactory;
@@ -43,29 +44,49 @@ public class RangeConverter extends DefTraverser<List<Statement>, Void> {
   }
 
   @Override
-  protected List<Statement> visitArithmeticOp(ArithmeticOp obj, Void param) {
-    Type lt = ExprTypeGetter.process(obj.getLeft(), true);
-    Type rt = ExprTypeGetter.process(obj.getRight(), true);
-    Type dt = obj.getVariable().getType().getRef();
+  protected List<Statement> visitRelation(Relation obj, Void param) {
+    RangeType lt = (RangeType) ExprTypeGetter.process(obj.getLeft(), true);
+    RangeType rt = (RangeType) ExprTypeGetter.process(obj.getRight(), true);
 
-    assert (lt instanceof RangeType);
-    assert (rt instanceof RangeType);
-    assert (dt instanceof RangeType);
-
-    RangeType it = RangeType.makeContainer((RangeType) lt, (RangeType) rt);
-    RangeType bt = RangeType.makeContainer(it, (RangeType) dt);
+    RangeType bt = RangeType.makeContainer(lt, rt);
     bt = kbi.getRangeType(bt.getLow(), bt.getHigh()); // add bt to program
 
     List<Statement> ret = new ArrayList<Statement>();
 
-    if (RangeType.isBigger(bt, (RangeType) lt)) {
-      SsaVariable lev = new SsaVariable(NameFactory.getNew(), new TypeRef(bt));
-      TypeCast lex = new TypeCast(lev, obj.getLeft());
-      obj.setLeft(new VarRefSimple(lev));
+    obj.setLeft(replaceIfNeeded(obj.getLeft(), lt, bt, ret));
+    obj.setRight(replaceIfNeeded(obj.getRight(), rt, bt, ret));
+
+    ret.add(obj);
+
+    return ret;
+  }
+
+  private PirValue replaceIfNeeded(PirValue val, RangeType valType, RangeType commonType, List<Statement> ret) {
+    if (RangeType.isBigger(commonType, valType)) {
+      SsaVariable lev = new SsaVariable(NameFactory.getNew(), new TypeRef(commonType));
+      TypeCast lex = new TypeCast(lev, val);
+      val = new VarRefSimple(lev);
       ret.add(lex);
     }
+    return val;
+  }
 
-    if (RangeType.isBigger(bt, (RangeType) rt)) {
+  @Override
+  protected List<Statement> visitArithmeticOp(ArithmeticOp obj, Void param) {
+    RangeType lt = (RangeType) ExprTypeGetter.process(obj.getLeft(), true);
+    RangeType rt = (RangeType) ExprTypeGetter.process(obj.getRight(), true);
+    RangeType dt = (RangeType) obj.getVariable().getType().getRef();
+
+    RangeType it = RangeType.makeContainer(lt, rt);
+    RangeType bt = RangeType.makeContainer(it, dt);
+    bt = kbi.getRangeType(bt.getLow(), bt.getHigh()); // add bt to program
+
+    List<Statement> ret = new ArrayList<Statement>();
+
+    obj.setLeft(replaceIfNeeded(obj.getLeft(), lt, bt, ret));
+    obj.setRight(replaceIfNeeded(obj.getRight(), rt, bt, ret));
+
+    if (RangeType.isBigger(bt, rt)) {
       SsaVariable rev = new SsaVariable(NameFactory.getNew(), new TypeRef(bt));
       TypeCast rex = new TypeCast(rev, obj.getRight());
       obj.setRight(new VarRefSimple(rev));
@@ -74,13 +95,12 @@ public class RangeConverter extends DefTraverser<List<Statement>, Void> {
 
     ret.add(obj);
 
-    if (RangeType.isBigger(bt, (RangeType) dt)) {
+    if (RangeType.isBigger(bt, dt)) {
       SsaVariable irv = new SsaVariable(NameFactory.getNew(), new TypeRef(bt));
       TypeCast rex = new TypeCast(obj.getVariable(), new VarRefSimple(irv));
       obj.setVariable(irv);
       ret.add(rex);
     }
-
     return ret;
   }
 
@@ -95,27 +115,19 @@ public class RangeConverter extends DefTraverser<List<Statement>, Void> {
       return null;
     }
 
-    Type lt = ExprTypeGetter.process(obj.getSrc(), true);
-    Type dt = obj.getVariable().getType().getRef();
+    RangeType lt = (RangeType) ExprTypeGetter.process(obj.getSrc(), true);
+    RangeType dt = (RangeType) obj.getVariable().getType().getRef();
 
-    assert (lt instanceof RangeType);
-    assert (dt instanceof RangeType);
-
-    RangeType bt = RangeType.makeContainer((RangeType) lt, (RangeType) dt);
+    RangeType bt = RangeType.makeContainer(lt, dt);
     bt = kbi.getRangeType(bt.getLow(), bt.getHigh()); // add bt to program
 
     List<Statement> ret = new ArrayList<Statement>();
 
-    if (RangeType.isBigger(bt, (RangeType) lt)) {
-      SsaVariable lev = new SsaVariable(NameFactory.getNew(), new TypeRef(bt));
-      TypeCast lex = new TypeCast(lev, obj.getSrc());
-      obj.setSrc(new VarRefSimple(lev));
-      ret.add(lex);
-    }
+    obj.setSrc(replaceIfNeeded(obj.getSrc(), lt, bt, ret));
 
     ret.add(obj);
 
-    if (RangeType.isBigger(bt, (RangeType) dt)) {
+    if (RangeType.isBigger(bt, dt)) {
       SsaVariable irv = new SsaVariable(NameFactory.getNew(), new TypeRef(bt));
       TypeCast rex = new TypeCast(obj.getVariable(), new VarRefSimple(irv));
       obj.setVariable(irv);

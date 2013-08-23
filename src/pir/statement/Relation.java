@@ -29,6 +29,18 @@ public class Relation extends VariableGeneratorStmt {
     return op;
   }
 
+  public void setLeft(PirValue left) {
+    this.left = left;
+  }
+
+  public void setRight(PirValue right) {
+    this.right = right;
+  }
+
+  public void setOp(RelOp op) {
+    this.op = op;
+  }
+
   public StmtSignes getSignes() {
     return signes;
   }
