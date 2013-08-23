@@ -44,8 +44,8 @@ public class RangeConverter extends StatementReplacer<Void> {
 
   @Override
   protected List<Statement> visitRelation(Relation obj, Void param) {
-    RangeType lt = (RangeType) ExprTypeGetter.process(obj.getLeft(), true);
-    RangeType rt = (RangeType) ExprTypeGetter.process(obj.getRight(), true);
+    RangeType lt = (RangeType) ExprTypeGetter.process(obj.getLeft(), ExprTypeGetter.NUMBER_AS_RANGE);
+    RangeType rt = (RangeType) ExprTypeGetter.process(obj.getRight(), ExprTypeGetter.NUMBER_AS_RANGE);
 
     RangeType bt = RangeType.makeContainer(lt, rt);
     bt = kbi.getRangeType(bt.getLow(), bt.getHigh()); // add bt to program
@@ -72,8 +72,8 @@ public class RangeConverter extends StatementReplacer<Void> {
 
   @Override
   protected List<Statement> visitArithmeticOp(ArithmeticOp obj, Void param) {
-    RangeType lt = (RangeType) ExprTypeGetter.process(obj.getLeft(), true);
-    RangeType rt = (RangeType) ExprTypeGetter.process(obj.getRight(), true);
+    RangeType lt = (RangeType) ExprTypeGetter.process(obj.getLeft(), ExprTypeGetter.NUMBER_AS_RANGE);
+    RangeType rt = (RangeType) ExprTypeGetter.process(obj.getRight(), ExprTypeGetter.NUMBER_AS_RANGE);
     RangeType dt = (RangeType) obj.getVariable().getType().getRef();
 
     RangeType it = RangeType.makeContainer(lt, rt);
@@ -114,7 +114,7 @@ public class RangeConverter extends StatementReplacer<Void> {
       return null;
     }
 
-    RangeType lt = (RangeType) ExprTypeGetter.process(obj.getSrc(), true);
+    RangeType lt = (RangeType) ExprTypeGetter.process(obj.getSrc(), ExprTypeGetter.NUMBER_AS_RANGE);
     RangeType dt = (RangeType) obj.getVariable().getType().getRef();
 
     RangeType bt = RangeType.makeContainer(lt, dt);

@@ -17,10 +17,21 @@ import pir.statement.Statement;
  */
 public class StatementReplacer<T> extends DefTraverser<List<Statement>, T> {
 
+  /**
+   * Return a single statement
+   * @param stmt
+   * @return
+   */
+  protected List<Statement> ret(Statement stmt) {
+    ArrayList<Statement> stmts = new ArrayList<Statement>();
+    stmts.add(stmt);
+    return stmts;
+  }
+
   @Override
   protected List<Statement> visitBasicBlock(BasicBlock obj, T param) {
-    //TODO somehow include phi statements
-    
+    // TODO somehow include phi statements
+
     ArrayList<Statement> stmts = new ArrayList<Statement>(obj.getCode());
     obj.getCode().clear();
 

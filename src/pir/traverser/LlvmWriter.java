@@ -224,6 +224,18 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
+  protected Void visitNoSignType(NoSignType obj, StreamWriter param) {
+    param.wr("; ");
+    param.wr(obj.getName());
+    wrId(obj, param);
+    param.wr(" = ");
+    param.wr("i");
+    param.wr(Integer.toString(obj.getBits()));
+    param.nl();
+    return null;
+  }
+
+  @Override
   protected Void visitUnsignedType(UnsignedType obj, StreamWriter param) {
     param.wr(obj.getName());
     wrId(obj, param);
@@ -614,7 +626,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
   @Deprecated
   private Type getType(Pir left) {
-    return ExprTypeGetter.process(left, ExprTypeGetter.NUMBER_AS_INT); // FIXME change IR that this is no longer needed
+    return ExprTypeGetter.process(left, ExprTypeGetter.NUMBER_AS_NOSIGN); // FIXME change IR that this is no longer needed
   }
 
   @Override
@@ -708,7 +720,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     if (value instanceof VarRefSimple) {
       return ((VarRefSimple) value).getRef().getType();
     } else if (value instanceof Number) {
-      return new TypeRef(ExprTypeGetter.process(value, ExprTypeGetter.NUMBER_AS_INT));
+      return new TypeRef(ExprTypeGetter.process(value, ExprTypeGetter.NUMBER_AS_NOSIGN));
     } else {
       throw new RuntimeException("not yet implemented");
     }

@@ -19,7 +19,9 @@ import pir.statement.Relation;
 import pir.type.ArrayType;
 import pir.type.BooleanType;
 import pir.type.EnumType;
+import pir.type.IntType;
 import pir.type.NamedElement;
+import pir.type.NoSignType;
 import pir.type.RangeType;
 import pir.type.StructType;
 import pir.type.Type;
@@ -27,18 +29,21 @@ import pir.type.TypeRef;
 import pir.type.UnsignedType;
 
 public class ExprTypeGetter extends NullTraverser<Type, Void> {
-  public final static boolean NUMBER_AS_RANGE = true;
-  public final static boolean NUMBER_AS_INT = false;
+  public final static int NUMBER_AS_RANGE = 0;
+  public final static int NUMBER_AS_INT = 1;
+  public final static int NUMBER_AS_NOSIGN = 2;
 
   private RefTypeGetter rtg = new RefTypeGetter();
-  final private boolean numAsRange;
+  final private int numAsRange;
 
-  public ExprTypeGetter(boolean numAsRange) {
+  public ExprTypeGetter(int numAsRange) {
     super();
+    assert (numAsRange >= NUMBER_AS_RANGE);
+    assert (numAsRange <= NUMBER_AS_NOSIGN);
     this.numAsRange = numAsRange;
   }
 
-  static public Type process(Pir ast, boolean numAsRange) {
+  static public Type process(Pir ast, int numAsRange) {
     ExprTypeGetter adder = new ExprTypeGetter(numAsRange);
     return adder.traverse(ast, null);
   }
@@ -107,27 +112,38 @@ public class ExprTypeGetter extends NullTraverser<Type, Void> {
   }
 
   static private int getBits(BigInteger value) {
-    return value.bitCount();    //TODO does it return the correct bit number?
-//    int bit = 0;
-//    while (value != 0) {
-//      value >>= 1;
-//      bit++;
-//    }
-//    return bit;
+    return value.bitCount(); // TODO does it return the correct bit number?
+    // int bit = 0;
+    // while (value != 0) {
+    // value >>= 1;
+    // bit++;
+    // }
+    // return bit;
   }
 
   @Override
   protected Type visitNumber(Number obj, Void param) {
-    if (numAsRange) {
-      return new RangeType(obj.getValue(), obj.getValue());   //TODO add to types
-    } else {
-      if ( obj.getValue().compareTo(BigInteger.ZERO) >= 0) {
+    switch (numAsRange) {
+    case NUMBER_AS_RANGE:
+      return new RangeType(obj.getValue(), obj.getValue()); // TODO add to types
+    case NUMBER_AS_INT:
+    case NUMBER_AS_NOSIGN:
+      IntType ret;
+      if (obj.getValue().compareTo(BigInteger.ZERO) >= 0) {
         int bits = getBits(obj.getValue());
-        return new UnsignedType(bits);
-        // return new UnsignedType(bits);  //TODO reimplement this
+        ret = new UnsignedType(bits);
+        // return new UnsignedType(bits); //TODO reimplement this
       } else {
         throw new RuntimeException("not yet implemented");
       }
+
+      if (numAsRange == NUMBER_AS_NOSIGN) {
+        ret = new NoSignType(ret.getBits());
+      }
+
+      return ret;
+    default:
+      throw new RuntimeException("not yet implemented: " + numAsRange);
     }
   }
 
@@ -138,7 +154,7 @@ public class ExprTypeGetter extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitVariable(Variable obj, Void param) {
-    return visit( obj.getType(), param );
+    return visit(obj.getType(), param);
   }
 
 }

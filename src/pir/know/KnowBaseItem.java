@@ -9,6 +9,7 @@ import pir.expression.reference.Referencable;
 import pir.other.Program;
 import pir.type.ArrayType;
 import pir.type.BooleanType;
+import pir.type.NoSignType;
 import pir.type.RangeType;
 import pir.type.StringType;
 import pir.type.Type;
@@ -128,6 +129,15 @@ public class KnowBaseItem extends KnowledgeEntry {
     return ret;
   }
 
+  public NoSignType getNoSignType(int bits) {
+    assert( bits > 0 );
+    NoSignType ret = (NoSignType) findItem(NoSignType.makeName(bits));
+    if (ret == null) {
+      ret = new NoSignType(bits);
+      addItem(ret);
+    }
+    return ret;
+  }
 }
 
 class ItemAdder extends NullTraverser<Void, Referencable> {

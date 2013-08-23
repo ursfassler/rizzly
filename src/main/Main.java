@@ -19,12 +19,14 @@ import pir.PirObject;
 import pir.know.KnowledgeBase;
 import pir.other.Program;
 import pir.other.SsaVariable;
-import pir.passes.BooleanReplacer;
+import pir.passes.LlvmIntTypeReplacer;
 import pir.passes.ComplexWriterReduction;
 import pir.passes.GlobalReadExtracter;
 import pir.passes.RangeConverter;
 import pir.passes.RangeReplacer;
 import pir.passes.ReferenceReadReduction;
+import pir.passes.StmtSignSetter;
+import pir.passes.TypecastReplacer;
 import pir.passes.UnusedStmtRemover;
 import pir.statement.Statement;
 import pir.traverser.DependencyGraphMaker;
@@ -113,12 +115,15 @@ public class Main {
     LlvmWriter.print(prog, debugdir + "afterEvl.ll",true);
     
     KnowledgeBase kb = new KnowledgeBase(prog, debugdir);
+
+    { // reducing Range and boolean to nosign type
+      RangeConverter.process(prog,kb);
+      RangeReplacer.process(prog);
+      TypecastReplacer.process(prog);
+      StmtSignSetter.process(prog);
+      LlvmIntTypeReplacer.process(prog,kb);
+    }
     
-    RangeConverter.process(prog,kb);
-    RangeReplacer.process(prog);
-    BooleanReplacer.process(prog,kb);
-    //TODO replace typecast with trunc, sext, zext and assignment
-    //TODO replace unsigned and signed with noSigned
     LlvmWriter.print(prog, debugdir + "typeext.ll",true);
 
     ComplexWriterReduction.process(prog);
