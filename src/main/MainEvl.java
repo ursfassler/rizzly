@@ -116,14 +116,14 @@ public class MainEvl {
     // TODO reimplement
     // root = hfsmReduction(root, opt, debugdir, aclasses, kb);
 
-    PrettyPrinter.print(aclasses, debugdir + "reduced.rzy", false);
+    PrettyPrinter.print(aclasses, debugdir + "reduced.rzy", true);
 
     // only for debugging
     // typecheck(classes, debugdir);
 
     // TODO or before type check?
     ExprCutter.process(aclasses, kb);
-    PrettyPrinter.print(aclasses, debugdir + "expr.rzy", false);
+    PrettyPrinter.print(aclasses, debugdir + "expr.rzy", true);
 
     if (opt.doDebugEvent()) {
       addDebug(aclasses, (ImplElementary) root, debugdir);
@@ -523,9 +523,9 @@ public class MainEvl {
     classes.add(env);
 
     {
-      PrettyPrinter.print(classes, rootdir + "env.rzy", false);
+      PrettyPrinter.print(classes, rootdir + "env.rzy", true);
       Map<? extends Named, ? extends Named> map = CompInstantiator.process(env, kb);
-      PrettyPrinter.print(classes, rootdir + "insta.rzy", false);
+      PrettyPrinter.print(classes, rootdir + "insta.rzy", true);
 
       KnowEvl kf = kb.getEntry(KnowEvl.class);
       Evl inst = kf.get(new Designator("inst"), info);

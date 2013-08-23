@@ -584,8 +584,8 @@ class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, pir.other
 
   @Override
   protected VariableGeneratorStmt visitTypeCast(TypeCast obj, pir.other.SsaVariable param) {
-    pir.other.SsaVariable old = (pir.other.SsaVariable) converter.traverse(obj.getRef(), null);
-    return new pir.statement.convert.TypeCast(param, new VarRefSimple(old));
+    VarRefSimple old = (VarRefSimple) converter.traverse(obj.getRef(), null);
+    return new pir.statement.convert.TypeCast(param, old);
   }
 
   @Override

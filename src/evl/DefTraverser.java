@@ -562,6 +562,8 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitTypeCast(TypeCast obj, P param) {
+    visit(obj.getRef(),param);
+    visit(obj.getCast(),param);
     return null;
   }
 

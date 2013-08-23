@@ -24,7 +24,7 @@ import pir.type.TypeRef;
 import common.NameFactory;
 
 /**
- * Extends and truncates types of values used in an arithmetic operation
+ * Extends and truncates types of values used in an arithmetic operation, relation and assignments
  * 
  * @author urs
  * 

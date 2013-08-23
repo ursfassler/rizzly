@@ -886,7 +886,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitTypeCast(TypeCast obj, StreamWriter param) {
-    param.wr(obj.getRef().getName());
+    visit( obj.getRef(), param );
     param.wr(" to ");
     visit(obj.getCast(), param);
     return null;

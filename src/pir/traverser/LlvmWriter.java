@@ -400,7 +400,18 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitVarRefSimple(VarRefSimple obj, StreamWriter param) {
-    wrVarRef(obj.getRef(), param);
+    Variable variable = obj.getRef();
+    if (variable instanceof StateVariable) {
+      param.wr("@");
+    } else if (variable instanceof SsaVariable) {
+      param.wr("%");
+    } else if (variable instanceof FuncVariable) { // FIXME remove?
+      param.wr("%");
+    } else {
+      throw new RuntimeException("not yet implemented: " + variable.getClass().getCanonicalName());
+    }
+    param.wr(variable.getName());
+    wrId(variable,param);
     return null;
   }
 
@@ -469,37 +480,9 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     param.wr(")");
   }
 
-  private void wrVarRef(Variable variable, StreamWriter param) {
-    if (variable instanceof StateVariable) {
-      param.wr("@");
-    } else if (variable instanceof SsaVariable) {
-      param.wr("%");
-    } else if (variable instanceof FuncVariable) { // FIXME remove?
-      param.wr("%");
-    } else {
-      throw new RuntimeException("not yet implemented: " + variable.getClass().getCanonicalName());
-    }
-    param.wr(variable.getName());
-  }
-
-  @Deprecated
-  private void wrVarRef(PExpression expr, StreamWriter param) {
-    if (expr instanceof VarRef) {
-      Variable target = ((VarRef) expr).getRef();
-      // TODO offset?
-      wrVarRef(target, param);
-    } else if (expr instanceof VarRefSimple) {
-      SsaVariable target = ((VarRefSimple) expr).getRef();
-      wrVarRef(target, param);
-    } else if (expr instanceof Number) {
-      param.wr(expr.toString());
-    } else {
-      RError.err(ErrorType.Fatal, "Unhandled class: " + expr.getClass().getCanonicalName());
-    }
-  }
-
   private void wrVarDef(VariableGeneratorStmt obj, StreamWriter param) {
     param.wr("%" + obj.getVariable().getName());
+    wrId( obj.getVariable(), param );
     param.wr(" = ");
   }
 
@@ -661,8 +644,8 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitAssignment(Assignment obj, StreamWriter param) {
-    param.wr("%" + obj.getVariable().getName());
-    param.wr(" := ");
+    wrVarDef(obj, param);
+    param.wr("copy ");
     visit(obj.getVariable().getType(), param);
     param.wr(" ");
     visit(obj.getSrc(), param);
@@ -774,8 +757,8 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitPhiStmt(PhiStmt obj, StreamWriter param) {
-    param.wr("%" + obj.getVariable().getName());
-    param.wr(" = phi ");
+    wrVarDef( obj, param );
+    param.wr("phi ");
     visit(obj.getVariable().getType(), param);
     param.wr(" ");
     boolean first = true;

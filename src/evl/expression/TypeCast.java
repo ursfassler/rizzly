@@ -2,24 +2,24 @@ package evl.expression;
 
 import common.ElementInfo;
 
+import evl.expression.reference.Reference;
 import evl.type.TypeRef;
-import evl.variable.SsaVariable;
 
 public class TypeCast extends Expression {
-  private SsaVariable ref;
+  private Reference ref; // TODO replace with simple reference
   private TypeRef cast;
 
-  public TypeCast(ElementInfo info, SsaVariable ref, TypeRef cast) {
+  public TypeCast(ElementInfo info, Reference ref, TypeRef cast) {
     super(info);
     this.ref = ref;
     this.cast = cast;
   }
 
-  public SsaVariable getRef() {
+  public Reference getRef() {
     return ref;
   }
 
-  public void setRef(SsaVariable ref) {
+  public void setRef(Reference ref) {
     this.ref = ref;
   }
 

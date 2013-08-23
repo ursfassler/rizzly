@@ -169,8 +169,6 @@ abstract public class Traverser<R, P> {
       return visitStoreStmt((StoreStmt) obj, param);
     else if (obj instanceof ComplexWriter)
       return visitComplexWriter((ComplexWriter) obj, param);
-    else if (obj instanceof PhiStmt)
-      return visitPhiStmt((PhiStmt) obj, param);
     else if (obj instanceof BasicBlockEnd)
       return visitBasicBlockEnd((BasicBlockEnd) obj, param);
     else
@@ -192,6 +190,8 @@ abstract public class Traverser<R, P> {
       return visitGetElementPtr((GetElementPtr) obj, param);
     else if (obj instanceof ConvertValue)
       return visitConvertValue((ConvertValue) obj, param);
+    else if (obj instanceof PhiStmt)
+      return visitPhiStmt((PhiStmt) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }

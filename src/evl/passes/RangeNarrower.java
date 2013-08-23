@@ -95,7 +95,7 @@ class Narrower extends DefTraverser<Void, Void> {
         for (CaseGotoOpt opt : obj.getOption()) {
           Range r = CaseRangeUpdater.process(opt.getValue(), kb);
           // TODO check that r is smaller as defined range of var
-//          map.get(opt.getDst()).put(var, r);
+          // map.get(opt.getDst()).put(var, r);
         }
       }
     }
@@ -126,7 +126,7 @@ class Narrower extends DefTraverser<Void, Void> {
   private void replace(BasicBlock startBb, SsaVariable var, Range range) {
     assert (startBb.getPhi().isEmpty()); // if not true, we have to find a solution :(
     SsaVariable newVar = new SsaVariable(var.getInfo(), NameFactory.getNew(), new TypeRef(new ElementInfo(), range));
-    Expression initExpr = new TypeCast(var.getInfo(), var, new TypeRef(new ElementInfo(), range));
+    Expression initExpr = new TypeCast(var.getInfo(), new Reference(startBb.getInfo(), var), new TypeRef(new ElementInfo(), range));
     VarDefInitStmt ass = new VarDefInitStmt(var.getInfo(), newVar, initExpr);
     startBb.getCode().add(0, ass);
     VariableReplacer.replace(startBb, 1, var, newVar);

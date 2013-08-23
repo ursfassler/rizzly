@@ -7,23 +7,17 @@ import java.util.Set;
 
 import pir.other.PirValue;
 import pir.other.SsaVariable;
-import pir.statement.Statement;
+import pir.statement.VariableGeneratorStmt;
 
 /**
  * 
  * @author urs
  */
-public class PhiStmt extends Statement {
-
-  private SsaVariable vardef;
+public class PhiStmt extends VariableGeneratorStmt {
   private Map<BasicBlock, PirValue> arg = new HashMap<BasicBlock, PirValue>();
 
-  public PhiStmt(SsaVariable vardef) {
-    this.vardef = vardef;
-  }
-
-  public SsaVariable getVariable() {
-    return vardef;
+  public PhiStmt(SsaVariable variable) {
+    super(variable);
   }
 
   public void addArg(BasicBlock bb, PirValue var) {

@@ -285,6 +285,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitFuncImpl(FuncImpl obj, P param) {
     visitList(obj.getArgument(), param);
+    visit(obj.getRetType(),param);
     visit(obj.getBody(), param);
     return null;
   }
@@ -292,6 +293,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitFuncProto(FuncProto obj, P param) {
     visitList(obj.getArgument(), param);
+    visit(obj.getRetType(),param);
     return null;
   }
 

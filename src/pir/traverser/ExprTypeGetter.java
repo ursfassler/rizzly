@@ -138,7 +138,7 @@ public class ExprTypeGetter extends NullTraverser<Type, Void> {
       }
 
       if (numAsRange == NUMBER_AS_NOSIGN) {
-        ret = new NoSignType(ret.getBits());
+        ret = new NoSignType( Math.max(1,ret.getBits()));
       }
 
       return ret;

@@ -56,7 +56,7 @@ public class CopyExpression extends NullTraverser<Expression, Void> {
 
   @Override
   protected Expression visitTypeCast(TypeCast obj, Void param) {
-    return new TypeCast(obj.getInfo(), obj.getRef(), obj.getCast());
+    return new TypeCast(obj.getInfo(), cast.copy(obj.getRef()), cast.copy(obj.getCast()));
   }
 
 }
