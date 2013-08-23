@@ -28,6 +28,7 @@ import pir.passes.ReferenceReadReduction;
 import pir.passes.StmtSignSetter;
 import pir.passes.TypecastReplacer;
 import pir.passes.UnusedStmtRemover;
+import pir.passes.VarPropagator;
 import pir.statement.Statement;
 import pir.traverser.DependencyGraphMaker;
 import pir.traverser.LlvmWriter;
@@ -132,7 +133,7 @@ public class Main {
 //    GlobalWriteExtracter.process(prog);   //TODO do it during translation to PIR?
 //    RangeExtender.process(prog);
 
-    //TODO add value propagation (i.e. remove assignments)
+    VarPropagator.process(prog);
     
     
     HashMap<SsaVariable, Statement> owner = OwnerMap.make(prog);

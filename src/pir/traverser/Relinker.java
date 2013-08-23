@@ -6,6 +6,7 @@ import pir.DefTraverser;
 import pir.Pir;
 import pir.expression.reference.Referencable;
 import pir.expression.reference.Reference;
+import pir.statement.ArithmeticOp;
 
 public class Relinker extends DefTraverser<Void, Map<? extends Referencable, ? extends Referencable>> {
 
@@ -24,6 +25,11 @@ public class Relinker extends DefTraverser<Void, Map<? extends Referencable, ? e
       }
     }
     return super.visit(obj, param);
+  }
+
+  @Override
+  protected Void visitArithmeticOp(ArithmeticOp obj, Map<? extends Referencable, ? extends Referencable> param) {
+    return super.visitArithmeticOp(obj, param);
   }
 
 }

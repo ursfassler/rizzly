@@ -36,7 +36,7 @@ public class StatementReplacer<T> extends DefTraverser<List<Statement>, T> {
     obj.getCode().clear();
 
     for (Statement stmt : stmts) {
-      List<Statement> list = visit(stmt, null);
+      List<Statement> list = visit(stmt, param);
       if (list == null) {
         obj.getCode().add(stmt);
       } else {
@@ -44,7 +44,7 @@ public class StatementReplacer<T> extends DefTraverser<List<Statement>, T> {
       }
     }
 
-    List<Statement> list = visit(obj.getEnd(), null);
+    List<Statement> list = visit(obj.getEnd(), param);
     if (list != null) {
       obj.getCode().addAll(list);
     }

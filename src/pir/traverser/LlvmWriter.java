@@ -542,10 +542,15 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   protected Void visitRelation(Relation obj, StreamWriter param) {
     wrVarDef(obj, param);
     param.wr("icmp ");
-    param.wr(getRelop(obj.getOp(),obj.getSignes()));
+    param.wr(getRelop(obj.getOp(), obj.getSignes()));
     param.wr(" ");
 
-    visit(obj.getVariable().getType(), param);
+    TypeRef lt = getTypeRef(obj.getLeft());
+    TypeRef rt = getTypeRef(obj.getRight());
+
+//    assert (lt.getRef() == rt.getRef());
+    
+    visit( lt, param );
     param.wr(" ");
 
     visit(obj.getLeft(), param);
@@ -626,7 +631,8 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
   @Deprecated
   private Type getType(Pir left) {
-    return ExprTypeGetter.process(left, ExprTypeGetter.NUMBER_AS_NOSIGN); // FIXME change IR that this is no longer needed
+    return ExprTypeGetter.process(left, ExprTypeGetter.NUMBER_AS_NOSIGN); // FIXME change IR that this is no longer
+                                                                          // needed
   }
 
   @Override

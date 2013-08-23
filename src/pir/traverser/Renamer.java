@@ -1,6 +1,7 @@
 package pir.traverser;
 
 import pir.DefTraverser;
+import pir.Pir;
 import pir.PirObject;
 import pir.expression.reference.Referencable;
 
@@ -53,7 +54,7 @@ public class Renamer extends DefTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visit(PirObject obj, Void param) {
+  protected Void visit(Pir obj, Void param) {
     if (obj instanceof Referencable) {
       rename((Referencable) obj);
     }
