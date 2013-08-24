@@ -37,6 +37,6 @@ abstract public class Variable extends EvlBase implements Named {
 
   @Override
   public String toString() {
-    return name.toString() + ":" + type.toString();
+    return name.toString() + ":" + type.getRef().getName();
   }
 }

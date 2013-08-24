@@ -1,6 +1,7 @@
 package fun.toevl;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -73,9 +74,9 @@ class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
     addGoto(last, exit);
     addGoto(head, bblist.get(0));
 
-    // removeUnreachable(bblist);
+    removeUnreachable(head, exit, bblist, body.getInfo());
 
-    BasicBlockList bbBody = new BasicBlockList(body.getInfo(),head,exit);
+    BasicBlockList bbBody = new BasicBlockList(body.getInfo(), head, exit);
     bbBody.getBasicBlocks().addAll(bblist);
 
     return bbBody;
@@ -102,12 +103,10 @@ class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
     }
   }
 
-  @Deprecated
-  // TODO start from entry point
-  static private void removeUnreachable(LinkedList<BasicBlock> vertices) {
+  static private void removeUnreachable(BasicBlock head, BasicBlock exit, Collection<BasicBlock> vertices, ElementInfo info) {
     Set<BasicBlock> reachable = new HashSet<BasicBlock>();
     LinkedList<BasicBlock> test = new LinkedList<BasicBlock>();
-    test.add(vertices.getFirst());
+    test.add(head);
 
     while (!test.isEmpty()) {
       BasicBlock u = test.pop();
@@ -117,7 +116,14 @@ class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
       }
     }
 
+    Set<BasicBlock> unreachable = new HashSet<BasicBlock>(vertices);
+    unreachable.removeAll(reachable);
+
     vertices.retainAll(reachable);
+    if (!reachable.contains(exit)) {
+      RError.err(ErrorType.Error, info, "function does not return");
+    }
+
   }
 
   @Override

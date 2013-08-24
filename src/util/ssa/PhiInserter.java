@@ -16,7 +16,7 @@ import java.util.Set;
 import util.Pair;
 import evl.cfg.BasicBlock;
 import evl.cfg.PhiStmt;
-import evl.function.FunctionBase;
+import evl.function.FuncWithBody;
 import evl.type.Type;
 import evl.type.base.EnumType;
 import evl.type.base.Range;
@@ -26,25 +26,33 @@ import evl.variable.FuncVariable;
 import evl.variable.SsaVariable;
 import evl.variable.Variable;
 
+//FIXME go over textbook again, this algorithm is dirty and may not work correct
+@Deprecated
 public class PhiInserter {
   private List<Variable> globals = new ArrayList<Variable>();
-  private FunctionBase func;
+  private FuncWithBody func;
   private DominanceFrontier<BasicBlock, BbEdge> df;
   private Set<Pair<BasicBlock, Variable>> hasPhi = new HashSet<Pair<BasicBlock, Variable>>();
   private Map<SsaVariable, FuncVariable> renamed = new HashMap<SsaVariable, FuncVariable>();
+  private Map<BasicBlock, Set<Variable>> closedUse = new HashMap<BasicBlock, Set<Variable>>();
 
-  public PhiInserter(FunctionBase func, DominanceFrontier<BasicBlock, BbEdge> df) {
+  public PhiInserter(FuncWithBody func, DominanceFrontier<BasicBlock, BbEdge> df) {
     super();
     this.df = df;
     this.func = func;
   }
 
+  @Deprecated
   public void doWork() {
     DefUseKillVisitor visitor = new DefUseKillVisitor();
     visitor.traverse(func, null);
 
+    closedUse = new HashMap<BasicBlock, Set<Variable>>(visitor.getUse());
+    makeClosedUse(closedUse);
+
     // If a variable is used but never defined it has to be a global variable
     // it does not hold for definitions for variables
+    // FIXME why?
     for (Set<Variable> g : visitor.getUse().values()) {
       globals.addAll(g);
     }
@@ -65,11 +73,14 @@ public class PhiInserter {
       for (int i = 0; i < worklist.size(); i++) {
         BasicBlock b = worklist.get(i);
         for (BasicBlock d : df.getDf().get(b)) {
-          if (!hasPhiFor(d, x)) {
-            number--;
-            insertPhi(d, x, number);
-            if (!worklist.contains(d)) {
-              worklist.add(d);
+          //FIXME workaround for non-working phi inserter. Redo whole function.
+          if (closedUse.get(d).contains(x)) {
+            if (!hasPhiFor(d, x)) {
+              number--;
+              insertPhi(d, x, number);
+              if (!worklist.contains(d)) {
+                worklist.add(d);
+              }
             }
           }
         }
@@ -78,9 +89,25 @@ public class PhiInserter {
     }
   }
 
+  static private void makeClosedUse(Map<BasicBlock, Set<Variable>> use) {
+    for (BasicBlock bb : use.keySet()) {
+      Set<Variable> acuse = use.get(bb);
+      ArrayList<BasicBlock> worklist = new ArrayList<BasicBlock>();
+      worklist.add(bb);
+
+      for (int i = 0; i < worklist.size(); i++) {
+        BasicBlock ab = worklist.get(i);
+        acuse.addAll(use.get(ab));
+        Set<BasicBlock> next = new HashSet<BasicBlock>(ab.getEnd().getJumpDst());
+        next.removeAll(worklist);
+        worklist.addAll(next);
+      }
+    }
+  }
+
   @Deprecated
   public static boolean isScalar(Type type) {
-    //TODO make it nice
+    // TODO make it nice
     return (type instanceof Range) || (type instanceof IntegerType) || (type instanceof NaturalType) || (type instanceof EnumType);
   }
 

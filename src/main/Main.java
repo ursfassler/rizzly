@@ -195,7 +195,6 @@ public class Main {
       Map<Type, Integer> count = TyperefCounter.process(prog);
       Set<Type> removable = new HashSet<Type>();
       for (Type type : count.keySet()) {
-        System.out.println(type.getName() + ": " + count.get(type));
         if (count.get(type) == 0) {
           removable.add(type);
         }

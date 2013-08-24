@@ -82,6 +82,9 @@ component
         0..9:
           a := x;
         end
+        else
+          a := 255 - x;
+        end
       end
       
       return a;

@@ -71,7 +71,7 @@ public class SsaMaker extends DefTraverser<Void, Void> {
       DominanceFrontier<BasicBlock, BbEdge> df = new DominanceFrontier<BasicBlock, BbEdge>(funcGraph, dom.getDom());
       df.calc();
 
-      PhiInserter phi = new PhiInserter(obj, df);
+      PhiInserter phi = new PhiInserter((FuncWithBody) obj, df);
       phi.doWork();
 
       Map<SsaVariable, FuncVariable> renamed = phi.getRenamed();
