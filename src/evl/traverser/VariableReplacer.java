@@ -8,12 +8,17 @@ import evl.DefTraverser;
 import evl.Evl;
 import evl.NullTraverser;
 import evl.cfg.BasicBlock;
+import evl.cfg.CaseGoto;
 import evl.cfg.Goto;
+import evl.cfg.IfGoto;
 import evl.cfg.PhiStmt;
 import evl.cfg.ReturnExpr;
 import evl.cfg.ReturnVoid;
 import evl.expression.reference.Reference;
+import evl.statement.Assignment;
+import evl.statement.CallStmt;
 import evl.statement.VarDefInitStmt;
+import evl.statement.VarDefStmt;
 import evl.variable.SsaVariable;
 
 public class VariableReplacer extends NullTraverser<Boolean, Void> {
@@ -83,6 +88,24 @@ public class VariableReplacer extends NullTraverser<Boolean, Void> {
   }
 
   @Override
+  protected Boolean visitAssignment(Assignment obj, Void param) {
+    exprVarRepl.traverse(obj.getRight(), null);
+    visitItr(obj.getLeft().getOffset(), null);
+    return obj.getLeft().getLink() != exprVarRepl.getOld();
+  }
+
+  @Override
+  protected Boolean visitCallStmt(CallStmt obj, Void param) {
+    exprVarRepl.traverse(obj,null);
+    return true;
+  }
+
+  @Override
+  protected Boolean visitVarDef(VarDefStmt obj, Void param) {
+    return true;
+  }
+
+  @Override
   protected Boolean visitPhiStmt(PhiStmt obj, Void param) {
     //TODO use exprVarRepl?
     for( BasicBlock in : new ArrayList<BasicBlock>( obj.getInBB()) ){
@@ -94,8 +117,22 @@ public class VariableReplacer extends NullTraverser<Boolean, Void> {
   }
 
   @Override
+  protected Boolean visitCaseGoto(CaseGoto obj, Void param) {
+    exprVarRepl.traverse( obj.getCondition(), param );
+    visitItr( obj.getJumpDst(), param );
+    return null;
+  }
+
+  @Override
+  protected Boolean visitIfGoto(IfGoto obj, Void param) {
+    exprVarRepl.traverse( obj.getCondition(), param );
+    visitItr( obj.getJumpDst(), param );
+    return null;
+  }
+
+  @Override
   protected Boolean visitGoto(Goto obj, Void param) {
-    visit(obj.getTarget(), null);
+    visitItr(obj.getJumpDst(), null);
     return null;
   }
 

@@ -51,6 +51,36 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
     return adder.traverse(ast, null);
   }
 
+  private void checkPositive( String op, Range lhs, Range rhs) {
+    checkPositive(op, lhs);
+    checkPositive(op, rhs);
+  }
+
+  private void checkPositive(String op, Range range) {
+    if (range.getLow().compareTo(BigInteger.ZERO) < 0) {
+      RError.err(ErrorType.Error, range.getInfo(), op + " only allowed for positive types");
+    }
+  }
+
+  private BigInteger makeOnes(int bits) {
+    BigInteger ret = BigInteger.ZERO;
+    for( int i = 0; i < bits; i++ ){
+      ret = ret.shiftLeft(1);
+      ret = ret.or(BigInteger.ONE);
+    }
+    return ret;
+  }
+  
+  private int getAsInt( BigInteger value, ElementInfo info ){
+    if( value.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0){
+      RError.err(ErrorType.Error, info, "value to big, needs to be smaller than " + Integer.MAX_VALUE );
+    }
+    if( value.compareTo(BigInteger.valueOf(Integer.MIN_VALUE)) < 0){
+      RError.err(ErrorType.Error, info, "value to small, needs to be bigger than " + Integer.MIN_VALUE );
+    }
+    return value.intValue();
+  }
+
   /**
    *
    * @param ast
@@ -171,22 +201,12 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
       return kbi.getRangeType(low, high);
     }
     case AND: {
-      if (lhs.getLow().compareTo(BigInteger.ZERO) < 0) {
-        RError.err(ErrorType.Error, lhs.getInfo(), "and only allowed for positive types");
-      }
-      if (rhs.getLow().compareTo(BigInteger.ZERO) < 0) {
-        RError.err(ErrorType.Error, rhs.getInfo(), "and only allowed for positive types");
-      }
+      checkPositive("and", lhs, rhs);
       BigInteger high = lhs.getHigh().min(rhs.getHigh()); // TODO ok?
       return kbi.getRangeType(BigInteger.ZERO, high);
     }
     case MOD: {
-      if (lhs.getLow().compareTo(BigInteger.ZERO) < 0) {
-        RError.err(ErrorType.Error, lhs.getInfo(), "mod only allowed for positive types");
-      }
-      if (rhs.getLow().compareTo(BigInteger.ZERO) < 0) {
-        RError.err(ErrorType.Error, rhs.getInfo(), "mod only allowed for positive types");
-      }
+      checkPositive("mod", rhs);
       BigInteger high = lhs.getHigh().min(rhs.getHigh().subtract(BigInteger.ONE));
       return kbi.getRangeType(BigInteger.ZERO, high);
     }
@@ -201,10 +221,35 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
       BigInteger high = lhs.getHigh().divide(rhs.getLow());
       return kbi.getRangeType(low, high);
     }
-
-    case SHR:
-    case OR:
-    case SHL:
+    case OR: {
+      checkPositive("or", lhs, rhs);
+      
+      BigInteger bigger = lhs.getHigh().max(rhs.getHigh());
+      BigInteger smaller = lhs.getHigh().min(rhs.getHigh());
+      
+      int bits = smaller.bitCount();
+      BigInteger ones = makeOnes( bits );
+      BigInteger high = bigger.or(ones);
+      BigInteger low = lhs.getLow().max(rhs.getLow());
+      
+      return kbi.getRangeType(low, high);
+    }
+    case SHR: {
+      checkPositive("shr", lhs, rhs);
+      
+      BigInteger high = lhs.getHigh().shiftRight( getAsInt( rhs.getLow(), rhs.getInfo() ) );
+      BigInteger low = lhs.getLow().shiftRight( getAsInt(rhs.getHigh(), rhs.getInfo()) );
+      
+      return kbi.getRangeType(low, high);
+    }
+    case SHL:{
+      checkPositive("shl", lhs, rhs);
+      
+      BigInteger high = lhs.getHigh().shiftLeft( getAsInt( rhs.getHigh(), rhs.getInfo() ) );
+      BigInteger low = lhs.getLow().shiftLeft( getAsInt(rhs.getLow(), rhs.getInfo()) );
+      
+      return kbi.getRangeType(low, high);
+    }
     default: {
       RError.err(ErrorType.Fatal, obj.getInfo(), "Unhandled operation: " + obj.getOp());
       return null;

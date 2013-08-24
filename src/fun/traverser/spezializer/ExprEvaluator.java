@@ -259,7 +259,24 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
 
   @Override
   protected Expression visitUnaryExpression(UnaryExpression obj, Memory param) {
-    throw new RuntimeException("not yet implemented");
+    Expression expr = visit(obj.getExpr(), param);
+
+    if ((expr instanceof Number) ) {
+      BigInteger eval = ((Number) expr).getValue();
+      BigInteger res;
+
+      switch (obj.getOp()) {
+      case MINUS:
+        res = eval.negate();
+        break;
+      default:
+        RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj.getOp());
+        return obj;
+      }
+      return new Number(obj.getInfo(), res);
+    } else {
+      return obj;
+    }
   }
 
   @Override

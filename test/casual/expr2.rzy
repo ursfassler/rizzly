@@ -1,13 +1,7 @@
 
-type
-  Point = Record
-    x : U{8};
-    y : U{8};
-  end
-
 interface
   Tick
-    function tick( x: U{8} );
+    function tick( x: R{0,20} );
   end
 
 component
@@ -20,11 +14,11 @@ component
       
     implementation elementary
     
-    function in.tick( x: U{8} )
-      y1 : U{8} = +x;
-      y2 : U{8} = -x;
+    function in.tick( x: R{0,20} )
+      y1 : R{0,20} = +x;
+      y2 : R{-20,20} = -x;
 
-      y4 : U{8};
+      y4 : R{0,68};
       case x of
         0..1: y4 := x + 2; end
         2..3: y4 := x - 2; end
@@ -50,9 +44,9 @@ component
       end
         
       if y5 then
-        out.tick( y1 + y2 + y4 );
+        out.tick( (y1 + y2 + y4) mod 21 );
       else
-        out.tick( 42 );
+        out.tick( 42 / 2 -10 );
       end
     end
 
