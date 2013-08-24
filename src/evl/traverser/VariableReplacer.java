@@ -10,6 +10,8 @@ import evl.NullTraverser;
 import evl.cfg.BasicBlock;
 import evl.cfg.Goto;
 import evl.cfg.PhiStmt;
+import evl.cfg.ReturnExpr;
+import evl.cfg.ReturnVoid;
 import evl.expression.reference.Reference;
 import evl.statement.VarDefInitStmt;
 import evl.variable.SsaVariable;
@@ -97,6 +99,19 @@ public class VariableReplacer extends NullTraverser<Boolean, Void> {
     return null;
   }
 
+  @Override
+  protected Boolean visitReturnExpr(ReturnExpr obj, Void param) {
+    exprVarRepl.traverse(obj.getExpr(), null);
+    return null;
+  }
+
+  @Override
+  protected Boolean visitReturnVoid(ReturnVoid obj, Void param) {
+    return null;
+  }
+
+  
+  
 }
 
 class ExprVarRepl extends DefTraverser<Void, Void> {

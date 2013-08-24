@@ -2,13 +2,9 @@ package evl.passes;
 
 import java.util.Map;
 
-import util.ssa.PhiInserter;
-
 import common.ElementInfo;
 import common.NameFactory;
 
-import error.ErrorType;
-import error.RError;
 import evl.DefTraverser;
 import evl.Evl;
 import evl.cfg.BasicBlock;
@@ -24,13 +20,9 @@ import evl.statement.VarDefInitStmt;
 import evl.traverser.VariableReplacer;
 import evl.traverser.range.CaseRangeUpdater;
 import evl.traverser.range.RangeGetter;
-import evl.traverser.typecheck.LeftIsContainerOfRightTest;
-import evl.traverser.typecheck.specific.ExpressionTypeChecker;
-import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.base.Range;
 import evl.variable.SsaVariable;
-import evl.variable.Variable;
 
 /**
  * Replaces variables after if/goto with a variable of a more narrow range
@@ -81,29 +73,26 @@ class Narrower extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitCaseGoto(CaseGoto obj, Void param) {
-    Type cond = ExpressionTypeChecker.process(obj.getCondition(), kb);
     // TODO enumerator and boolean should also be allowed
-    if (!LeftIsContainerOfRightTest.process(kbi.getIntegerType(), cond, kb)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "Condition variable has to be an integer, got: " + cond.getName());
-    }
     // TODO check somewhere if case values are disjunct
 
-    if (obj.getCondition() instanceof Reference) {
-      Reference ref = (Reference) obj.getCondition();
-      if (ref.getOffset().isEmpty() && (ref.getLink() instanceof Variable) && (PhiInserter.isScalar(cond))) {
-        Variable var = (Variable) ref.getLink();
-        for (CaseGotoOpt opt : obj.getOption()) {
-          Range r = CaseRangeUpdater.process(opt.getValue(), kb);
-          // TODO check that r is smaller as defined range of var
-          // map.get(opt.getDst()).put(var, r);
-        }
+    assert (obj.getCondition() instanceof Reference);
+    Reference ref = (Reference) obj.getCondition();
+    assert (ref.getOffset().isEmpty());
+    assert (ref.getLink() instanceof SsaVariable);
+    SsaVariable var = (SsaVariable) ref.getLink();
+    Range varType = (Range) var.getType().getRef();
+
+    for (CaseGotoOpt opt : obj.getOption()) {
+      Range newType = CaseRangeUpdater.process(opt.getValue(), kb);
+      if (Range.leftIsSmallerEqual(newType, varType) && !Range.isEqual(newType, varType)) {
+        replace(opt.getDst(), var, newType);
       }
     }
 
     // TODO also update range for default case
 
     return null;
-    throw new RuntimeException("not yet implemented");
   }
 
   @Override

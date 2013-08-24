@@ -161,8 +161,8 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
       return kbi.getRangeType(low, high);
     }
     case MINUS: {
-      BigInteger low = lhs.getLow().subtract(rhs.getLow());
-      BigInteger high = lhs.getHigh().subtract(rhs.getHigh());
+      BigInteger low = lhs.getLow().subtract(rhs.getHigh());
+      BigInteger high = lhs.getHigh().subtract(rhs.getLow());
       return kbi.getRangeType(low, high);
     }
     case MUL: { //FIXME correct when values are negative?

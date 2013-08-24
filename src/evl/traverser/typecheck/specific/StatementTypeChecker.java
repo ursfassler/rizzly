@@ -142,21 +142,6 @@ public class StatementTypeChecker extends NullTraverser<Void, Map<SsaVariable, R
       RError.err(ErrorType.Error, obj.getInfo(), "Condition variable has to be an integer, got: " + cond.getName());
     }
     // TODO check somewhere if case values are disjunct
-
-    if (obj.getCondition() instanceof Reference) {
-      Reference ref = (Reference) obj.getCondition();
-      if (ref.getOffset().isEmpty() && (ref.getLink() instanceof Variable) && (PhiInserter.isScalar(cond))) {
-        Variable var = (Variable) ref.getLink();
-        for (CaseGotoOpt opt : obj.getOption()) {
-          Range r = getRange(var, opt.getValue());
-          // TODO check that r is smaller as defined range of var
-          map.get(opt.getDst()).put(var, r);
-        }
-      }
-    }
-
-    // TODO also update range for default case
-
     return null;
   }
 
