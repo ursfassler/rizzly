@@ -124,7 +124,9 @@ public class MainFun {
 
   private static void printDepGraph(String debugdir, Namespace classes, Named root, Collection<RizzlyFile> fileList) {
     SimpleGraph<Named> g = DepGraph.build(classes, new KnowledgeBase(classes, fileList, debugdir));
-    g.addEdge(new StateVariable(new ElementInfo(), "!inst", null), root);
+    StateVariable instVar = new StateVariable(new ElementInfo(), "!inst", null);
+    g.addVertex(instVar);
+    g.addEdge(instVar, root);
     try {
       @SuppressWarnings("resource")
       HtmlGraphWriter<Named> writer = new HtmlGraphWriter<Named>(new joGraph.Writer(new PrintStream(debugdir))) {

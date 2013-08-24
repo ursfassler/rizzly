@@ -94,6 +94,7 @@ class SubDep extends DefTraverser<Void, Named> {
 
   @Override
   protected Void visitTypeRef(TypeRef obj, Named param) {
+    g.addVertex(obj.getRef());
     g.addEdge(param, obj.getRef());
     visit( obj.getRef(), obj.getRef() );
     return super.visitTypeRef(obj, param);
@@ -105,6 +106,7 @@ class SubDep extends DefTraverser<Void, Named> {
     super.visitReference(obj, param);
 
     Named dst = obj.getLink();
+    g.addVertex(dst);
     Scope scope = KnowScope.get(dst);
     switch (scope) {  //TODO do we need that?
     case global:

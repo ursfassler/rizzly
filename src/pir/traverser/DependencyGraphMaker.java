@@ -55,6 +55,7 @@ public class DependencyGraphMaker extends DefTraverser<Boolean, PirObject> {
         g.addVertex(refVar);
       } else {
         assert (srcStmt != null);
+        g.addVertex(srcStmt);
         g.addEdge(param, srcStmt);
       }
     } else if (refVar instanceof StateVariable) {

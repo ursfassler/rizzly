@@ -142,6 +142,7 @@ class SubDep extends DefGTraverser<Void, Named> {
     Scope scope = KnowScope.get(dst);
     switch (scope) {
     case global:
+      g.addVertex(obj.getLink());
       g.addEdge(param, obj.getLink());
       break;
     case local:
