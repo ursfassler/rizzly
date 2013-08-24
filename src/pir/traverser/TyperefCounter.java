@@ -8,12 +8,6 @@ import pir.other.Program;
 import pir.type.Type;
 import pir.type.TypeRef;
 
-/**
- * Removes unused statements. This are statements with no dependencies and no input or output
- * 
- * @author urs
- * 
- */
 public class TyperefCounter extends DefTraverser<Void, Void> {
   final private Map<Type, Integer> count = new HashMap<Type, Integer>();
 

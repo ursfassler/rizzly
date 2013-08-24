@@ -18,6 +18,7 @@ import evl.cfg.BasicBlock;
 import evl.cfg.PhiStmt;
 import evl.function.FuncWithBody;
 import evl.type.Type;
+import evl.type.base.BooleanType;
 import evl.type.base.EnumType;
 import evl.type.base.Range;
 import evl.type.special.IntegerType;
@@ -108,7 +109,7 @@ public class PhiInserter {
   @Deprecated
   public static boolean isScalar(Type type) {
     // TODO make it nice
-    return (type instanceof Range) || (type instanceof IntegerType) || (type instanceof NaturalType) || (type instanceof EnumType);
+    return (type instanceof Range) || (type instanceof IntegerType) || (type instanceof NaturalType) || (type instanceof EnumType) || (type instanceof BooleanType);
   }
 
   private void insertPhi(BasicBlock bb, FuncVariable var, int number) {

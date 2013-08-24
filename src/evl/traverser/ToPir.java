@@ -7,6 +7,7 @@ import java.util.Map;
 
 import pir.PirObject;
 import pir.cfg.BasicBlockEnd;
+import pir.cfg.CaseOptEntry;
 import pir.expression.PExpression;
 import pir.expression.UnOp;
 import pir.expression.reference.RefItem;
@@ -31,6 +32,8 @@ import evl.Evl;
 import evl.NullTraverser;
 import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
+import evl.cfg.CaseGoto;
+import evl.cfg.CaseGotoOpt;
 import evl.cfg.CaseOptRange;
 import evl.cfg.CaseOptValue;
 import evl.cfg.Goto;
@@ -445,18 +448,15 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
 
   @Override
   protected PirObject visitCaseOptRange(CaseOptRange obj, PirObject param) {
-    // assert (obj.getStart() instanceof Number);
-    // assert (obj.getEnd() instanceof Number);
-    PExpression start = (PExpression) visit(obj.getStart(), param);
-    PExpression end = (PExpression) visit(obj.getEnd(), param);
-    return new pir.statement.CaseOptRange(start, end);
+    assert (obj.getStart() instanceof Number);
+    assert (obj.getEnd() instanceof Number);
+    return new pir.cfg.CaseOptRange(((Number)obj.getStart()).getValue(), ((Number)obj.getEnd()).getValue());
   }
 
   @Override
   protected PirObject visitCaseOptValue(CaseOptValue obj, PirObject param) {
-    // assert (obj.getValue() instanceof Number);
-    PExpression value = (PExpression) visit(obj.getValue(), param);
-    return new pir.statement.CaseOptValue(value);
+     assert (obj.getValue() instanceof Number);
+    return new pir.cfg.CaseOptValue(((Number)obj.getValue()).getValue());
   }
 
   @Override
@@ -483,6 +483,28 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
     ret.setEnd((BasicBlockEnd) visit(obj.getEnd(), null));
 
     return ret;
+  }
+
+  @Override
+  protected PirObject visitCaseGoto(CaseGoto obj, PirObject param) {
+    PirObject cond = visit(obj.getCondition(), null);
+    assert (cond instanceof VarRefSimple);
+    pir.other.SsaVariable var = ((VarRefSimple) cond).getRef();
+    pir.cfg.CaseGoto caseGoto = new pir.cfg.CaseGoto(new VarRefSimple(var), (pir.cfg.BasicBlock) visit(obj.getOtherwise(), null));
+    for (CaseGotoOpt opt : obj.getOption()) {
+      pir.cfg.CaseGotoOpt nopt = (pir.cfg.CaseGotoOpt) visit(opt, null);
+      caseGoto.getOption().add(nopt);
+    }
+    return caseGoto;
+  }
+
+  @Override
+  protected PirObject visitCaseGotoOpt(CaseGotoOpt obj, PirObject param) {
+    List<CaseOptEntry> list = new ArrayList<CaseOptEntry>();
+    for (evl.cfg.CaseOptEntry entry : obj.getValue()) {
+      list.add((CaseOptEntry) visit(entry, null));
+    }
+    return new pir.cfg.CaseGotoOpt(list, (pir.cfg.BasicBlock) visit(obj.getDst(), null));
   }
 
   @Override
@@ -626,6 +648,12 @@ class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, pir.other
       throw new RuntimeException("not yet implemented: " + op);
     }
     }
+  }
+
+  @Override
+  protected VariableGeneratorStmt visitUnaryExpression(UnaryExpression obj, pir.other.SsaVariable param) {
+    PirValue right = (PirValue) converter.visit(obj.getExpr(), null);
+    return new pir.statement.UnaryOp(param, right, obj.getOp());
   }
 
 }

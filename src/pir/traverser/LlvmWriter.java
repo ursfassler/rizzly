@@ -13,6 +13,10 @@ import pir.Pir;
 import pir.PirObject;
 import pir.cfg.BasicBlock;
 import pir.cfg.BasicBlockList;
+import pir.cfg.CaseGoto;
+import pir.cfg.CaseGotoOpt;
+import pir.cfg.CaseOptRange;
+import pir.cfg.CaseOptValue;
 import pir.cfg.Goto;
 import pir.cfg.IfGoto;
 import pir.cfg.PhiStmt;
@@ -21,9 +25,7 @@ import pir.cfg.ReturnVoid;
 import pir.expression.ArrayValue;
 import pir.expression.BoolValue;
 import pir.expression.Number;
-import pir.expression.PExpression;
 import pir.expression.StringValue;
-import pir.expression.UnaryExpr;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
 import pir.expression.reference.VarRef;
@@ -48,6 +50,7 @@ import pir.statement.LoadStmt;
 import pir.statement.Relation;
 import pir.statement.StmtSignes;
 import pir.statement.StoreStmt;
+import pir.statement.UnaryOp;
 import pir.statement.VarDefStmt;
 import pir.statement.VariableGeneratorStmt;
 import pir.statement.convert.ConvertValue;
@@ -411,7 +414,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
       throw new RuntimeException("not yet implemented: " + variable.getClass().getCanonicalName());
     }
     param.wr(variable.getName());
-    wrId(variable,param);
+    wrId(variable, param);
     return null;
   }
 
@@ -482,7 +485,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
   private void wrVarDef(VariableGeneratorStmt obj, StreamWriter param) {
     param.wr("%" + obj.getVariable().getName());
-    wrId( obj.getVariable(), param );
+    wrId(obj.getVariable(), param);
     param.wr(" = ");
   }
 
@@ -531,9 +534,9 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     TypeRef lt = getTypeRef(obj.getLeft());
     TypeRef rt = getTypeRef(obj.getRight());
 
-//    assert (lt.getRef() == rt.getRef());
-    
-    visit( lt, param );
+    // assert (lt.getRef() == rt.getRef());
+
+    visit(lt, param);
     param.wr(" ");
 
     visit(obj.getLeft(), param);
@@ -596,20 +599,9 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     case AND:
       return "and";
     default:
-      RError.err(ErrorType.Fatal, "Operand not handled: " + op);
-      return null;
+      RError.err(ErrorType.Warning, "Operand not handled: " + op);  //TODO change to fatal error
+      return op.toString();
     }
-  }
-
-  @Override
-  protected Void visitUnaryExpr(UnaryExpr obj, StreamWriter param) {
-    throw new RuntimeException("not yet implemented");
-    // param.wr("(");
-    // param.wr(obj.getOp().toString());
-    // param.wr(" ");
-    // visit(obj.getExpr(), param);
-    // param.wr(")");
-    // return null;
   }
 
   @Deprecated
@@ -738,6 +730,46 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
+  protected Void visitCaseGoto(CaseGoto obj, StreamWriter param) {
+    param.wr("br ");
+    visit(getTypeRef(obj.getCondition()), param);
+    param.wr(" ");
+    visit(obj.getCondition(), param);
+
+    // TODO implement it correct
+    param.wr(", ");
+    wrList(",", obj.getOption(), param);
+    param.wr(obj.getOtherwise().getName());
+    param.nl();
+
+    return null;
+  }
+
+  @Override
+  protected Void visitCaseOptValue(CaseOptValue obj, StreamWriter param) {
+    param.wr( obj.getValue().toString() );
+    return null;
+  }
+
+  @Override
+  protected Void visitCaseOptRange(CaseOptRange obj, StreamWriter param) {
+    param.wr( obj.getStart().toString() );
+    param.wr("..");
+    param.wr( obj.getEnd().toString() );
+    return null;
+  }
+
+  @Override
+  protected Void visitCaseGotoOpt(CaseGotoOpt obj, StreamWriter param) {
+    param.wr("[");
+    wrList(",", obj.getValue(), param);
+    param.wr(": goto ");
+    param.wr( obj.getDst().getName() );
+    param.wr("]");
+    return null;
+  }
+
+  @Override
   protected Void visitIfGoto(IfGoto obj, StreamWriter param) {
     param.wr("br ");
     visit(getTypeRef(obj.getCondition()), param);
@@ -757,7 +789,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitPhiStmt(PhiStmt obj, StreamWriter param) {
-    wrVarDef( obj, param );
+    wrVarDef(obj, param);
     param.wr("phi ");
     visit(obj.getVariable().getType(), param);
     param.wr(" ");
@@ -869,6 +901,18 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     param.wr(" to ");
     visit(obj.getVariable().getType(), param);
     param.nl();
+  }
+
+  @Override
+  protected Void visitUnaryOp(UnaryOp obj, StreamWriter param) {
+    // TODO implement it correct
+    param.wr("(");
+    param.wr(obj.getOp().toString());
+    param.wr(" ");
+    visit(obj.getExpr(), param);
+    param.wr(")");
+    return null;
+
   }
 
 }

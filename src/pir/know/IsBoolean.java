@@ -4,7 +4,6 @@ import pir.NullTraverser;
 import pir.PirObject;
 import pir.expression.Number;
 import pir.expression.PExpression;
-import pir.expression.UnaryExpr;
 import pir.function.Function;
 import pir.other.Variable;
 import pir.statement.ArithmeticOp;

@@ -9,7 +9,6 @@ import pir.PirObject;
 import pir.expression.Number;
 import pir.expression.PExpression;
 import pir.expression.UnOp;
-import pir.expression.UnaryExpr;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
 import pir.function.Function;

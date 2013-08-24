@@ -39,7 +39,11 @@ public class LlvmIntTypeReplacer {
   private static void intMapper(Set<Type> typeSet, Map<Type, NoSignType> map, KnowBaseItem kbi) {
     for (Type type : typeSet) {
       if ((type instanceof UnsignedType) || (type instanceof SignedType)) {
-        NoSignType nst = kbi.getNoSignType(((IntType) type).getBits());
+        int bits = ((IntType) type).getBits();
+        if( bits == 0 ){
+          bits = 1;
+        }
+        NoSignType nst = kbi.getNoSignType(bits);
         map.put(type, nst);
       }
     }

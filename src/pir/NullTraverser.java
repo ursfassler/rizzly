@@ -3,6 +3,9 @@ package pir;
 import pir.cfg.BasicBlock;
 import pir.cfg.BasicBlockList;
 import pir.cfg.CaseGoto;
+import pir.cfg.CaseGotoOpt;
+import pir.cfg.CaseOptRange;
+import pir.cfg.CaseOptValue;
 import pir.cfg.Goto;
 import pir.cfg.IfGoto;
 import pir.cfg.PhiStmt;
@@ -12,7 +15,6 @@ import pir.expression.ArrayValue;
 import pir.expression.BoolValue;
 import pir.expression.Number;
 import pir.expression.StringValue;
-import pir.expression.UnaryExpr;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
 import pir.expression.reference.VarRef;
@@ -33,6 +35,7 @@ import pir.statement.GetElementPtr;
 import pir.statement.LoadStmt;
 import pir.statement.Relation;
 import pir.statement.StoreStmt;
+import pir.statement.UnaryOp;
 import pir.statement.VarDefStmt;
 import pir.statement.convert.SignExtendValue;
 import pir.statement.convert.TruncValue;
@@ -130,11 +133,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitArithmeticOp(ArithmeticOp obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitUnaryExpr(UnaryExpr obj, P param) {
     return doDefault(obj, param);
   }
 
@@ -325,6 +323,26 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitNoSignType(NoSignType obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitUnaryOp(UnaryOp obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitCaseOptValue(CaseOptValue obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitCaseOptRange(CaseOptRange obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitCaseGotoOpt(CaseGotoOpt obj, P param) {
     return doDefault(obj, param);
   }
 

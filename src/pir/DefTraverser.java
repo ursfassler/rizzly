@@ -3,6 +3,9 @@ package pir;
 import pir.cfg.BasicBlock;
 import pir.cfg.BasicBlockList;
 import pir.cfg.CaseGoto;
+import pir.cfg.CaseGotoOpt;
+import pir.cfg.CaseOptRange;
+import pir.cfg.CaseOptValue;
 import pir.cfg.Goto;
 import pir.cfg.IfGoto;
 import pir.cfg.PhiStmt;
@@ -12,7 +15,6 @@ import pir.expression.ArrayValue;
 import pir.expression.BoolValue;
 import pir.expression.Number;
 import pir.expression.StringValue;
-import pir.expression.UnaryExpr;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
 import pir.expression.reference.VarRef;
@@ -33,6 +35,7 @@ import pir.statement.GetElementPtr;
 import pir.statement.LoadStmt;
 import pir.statement.Relation;
 import pir.statement.StoreStmt;
+import pir.statement.UnaryOp;
 import pir.statement.VarDefStmt;
 import pir.statement.convert.SignExtendValue;
 import pir.statement.convert.TruncValue;
@@ -99,12 +102,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
     visit(obj.getVariable(), param);
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitUnaryExpr(UnaryExpr obj, P param) {
-    visit(obj.getExpr(), param);
     return null;
   }
 
@@ -190,13 +187,13 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitStateVariable(StateVariable obj, P param) {
-    visit(obj.getType(),param);
+    visit(obj.getType(), param);
     return null;
   }
 
   @Override
   protected R visitFuncVariable(FuncVariable obj, P param) {
-    visit(obj.getType(),param);
+    visit(obj.getType(), param);
     return null;
   }
 
@@ -255,7 +252,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitSsaVariable(SsaVariable obj, P param) {
-    visit(obj.getType(),param);
+    visit(obj.getType(), param);
     return null;
   }
 
@@ -285,7 +282,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitFuncImpl(FuncImpl obj, P param) {
     visitList(obj.getArgument(), param);
-    visit(obj.getRetType(),param);
+    visit(obj.getRetType(), param);
     visit(obj.getBody(), param);
     return null;
   }
@@ -293,13 +290,15 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitFuncProto(FuncProto obj, P param) {
     visitList(obj.getArgument(), param);
-    visit(obj.getRetType(),param);
+    visit(obj.getRetType(), param);
     return null;
   }
 
   @Override
   protected R visitCaseGoto(CaseGoto obj, P param) {
-    throw new RuntimeException("not yet implemented");
+    visit(obj.getCondition(), param);
+    visitList(obj.getOption(), param);
+    return null;
   }
 
   @Override
@@ -383,6 +382,28 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitNoSignType(NoSignType obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitCaseOptValue(CaseOptValue obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitCaseOptRange(CaseOptRange obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitCaseGotoOpt(CaseGotoOpt obj, P param) {
+    visitList(obj.getValue(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitUnaryOp(UnaryOp obj, P param) {
+    visit(obj.getExpr(), param);
     return null;
   }
 

@@ -15,7 +15,6 @@ import joGraph.HtmlGraphWriter;
 import joGraph.Writer;
 
 import org.jgrapht.alg.TransitiveClosure;
-import org.jgrapht.graph.SimpleDirectedGraph;
 import org.jgrapht.traverse.TopologicalOrderIterator;
 
 import pir.PirObject;
@@ -27,10 +26,10 @@ import pir.cfg.ReturnVoid;
 import pir.know.KnowledgeBase;
 import pir.other.Program;
 import pir.other.SsaVariable;
-import pir.passes.ConstPropagator;
-import pir.passes.LlvmIntTypeReplacer;
 import pir.passes.ComplexWriterReduction;
+import pir.passes.ConstPropagator;
 import pir.passes.GlobalReadExtracter;
+import pir.passes.LlvmIntTypeReplacer;
 import pir.passes.RangeConverter;
 import pir.passes.RangeReplacer;
 import pir.passes.ReferenceReadReduction;

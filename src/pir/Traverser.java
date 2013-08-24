@@ -4,6 +4,10 @@ import pir.cfg.BasicBlock;
 import pir.cfg.BasicBlockEnd;
 import pir.cfg.BasicBlockList;
 import pir.cfg.CaseGoto;
+import pir.cfg.CaseGotoOpt;
+import pir.cfg.CaseOptEntry;
+import pir.cfg.CaseOptRange;
+import pir.cfg.CaseOptValue;
 import pir.cfg.Goto;
 import pir.cfg.IfGoto;
 import pir.cfg.PhiStmt;
@@ -15,7 +19,6 @@ import pir.expression.BoolValue;
 import pir.expression.Number;
 import pir.expression.PExpression;
 import pir.expression.StringValue;
-import pir.expression.UnaryExpr;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefItem;
 import pir.expression.reference.RefName;
@@ -40,6 +43,7 @@ import pir.statement.LoadStmt;
 import pir.statement.Relation;
 import pir.statement.Statement;
 import pir.statement.StoreStmt;
+import pir.statement.UnaryOp;
 import pir.statement.VarDefStmt;
 import pir.statement.VariableGeneratorStmt;
 import pir.statement.convert.ConvertValue;
@@ -104,6 +108,19 @@ abstract public class Traverser<R, P> {
       return visitBasicBlock((BasicBlock) obj, param);
     else if (obj instanceof TypeRef)
       return visitTypeRef((TypeRef) obj, param);
+    else if (obj instanceof CaseGotoOpt)
+      return visitCaseGotoOpt((CaseGotoOpt) obj, param);
+    else if (obj instanceof CaseOptEntry)
+      return visitCaseOptEntry((CaseOptEntry) obj, param);
+    else
+      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+  }
+
+  protected R visitCaseOptEntry(CaseOptEntry obj, P param) {
+    if (obj instanceof CaseOptRange)
+      return visitCaseOptRange((CaseOptRange) obj, param);
+    else if (obj instanceof CaseOptValue)
+      return visitCaseOptValue((CaseOptValue) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
@@ -140,9 +157,7 @@ abstract public class Traverser<R, P> {
   }
 
   protected R visitPExpression(PExpression obj, P param) {
-    if (obj instanceof UnaryExpr)
-      return visitUnaryExpr((UnaryExpr) obj, param);
-    else if (obj instanceof Number)
+    if (obj instanceof Number)
       return visitNumber((Number) obj, param);
     else if (obj instanceof StringValue)
       return visitStringValue((StringValue) obj, param);
@@ -192,6 +207,8 @@ abstract public class Traverser<R, P> {
       return visitConvertValue((ConvertValue) obj, param);
     else if (obj instanceof PhiStmt)
       return visitPhiStmt((PhiStmt) obj, param);
+    else if (obj instanceof UnaryOp)
+      return visitUnaryOp((UnaryOp) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
@@ -274,6 +291,12 @@ abstract public class Traverser<R, P> {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
 
+  protected abstract R visitCaseOptValue(CaseOptValue obj, P param);
+
+  protected abstract R visitCaseOptRange(CaseOptRange obj, P param);
+
+  protected abstract R visitCaseGotoOpt(CaseGotoOpt obj, P param);
+
   protected abstract R visitTypeRef(TypeRef obj, P param);
 
   protected abstract R visitTypeCast(TypeCast obj, P param);
@@ -287,6 +310,8 @@ abstract public class Traverser<R, P> {
   protected abstract R visitNoSignType(NoSignType obj, P param);
 
   protected abstract R visitSignedType(SignedType obj, P param);
+
+  protected abstract R visitUnaryOp(UnaryOp obj, P param);
 
   protected abstract R visitPhiStmt(PhiStmt obj, P param);
 
@@ -347,8 +372,6 @@ abstract public class Traverser<R, P> {
   protected abstract R visitLoadStmt(LoadStmt obj, P param);
 
   protected abstract R visitArithmeticOp(ArithmeticOp obj, P param);
-
-  protected abstract R visitUnaryExpr(UnaryExpr obj, P param);
 
   protected abstract R visitFuncImpl(FuncImpl obj, P param);
 

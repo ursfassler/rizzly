@@ -54,6 +54,7 @@ public class DesCallgraphMaker extends DefTraverser<Void, Designator> {
 
     Designator func = getIfFunc(obj);
     if (func != null) {
+      callgraph.addVertex(func);
       callgraph.addEdge(param, func);
     }
     return null;

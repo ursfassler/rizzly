@@ -9,7 +9,6 @@ import pir.cfg.CaseGoto;
 import pir.cfg.IfGoto;
 import pir.cfg.PhiStmt;
 import pir.cfg.ReturnExpr;
-import pir.expression.UnaryExpr;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.VarRef;
 import pir.other.PirValue;
@@ -37,8 +36,15 @@ abstract public class PirValueReplacer<R, P> extends DefTraverser<R, P> {
   }
 
   @Override
+  protected R visitCallAssignment(CallAssignment obj, P param) {
+    repList(obj.getParameter(), param);
+    return super.visitCallAssignment(obj, param);
+  }
+
+  @Override
   protected R visitCallStmt(CallStmt obj, P param) {
-    throw new RuntimeException("not yet implemented");
+    repList(obj.getParameter(), param);
+    return super.visitCallStmt(obj, param);
   }
 
   @Override
@@ -56,11 +62,6 @@ abstract public class PirValueReplacer<R, P> extends DefTraverser<R, P> {
     obj.setLeft(replace(obj.getLeft(), param));
     obj.setRight(replace(obj.getRight(), param));
     return super.visitArithmeticOp(obj, param);
-  }
-
-  @Override
-  protected R visitUnaryExpr(UnaryExpr obj, P param) {
-    throw new RuntimeException("not yet implemented");
   }
 
   @Override
@@ -97,7 +98,8 @@ abstract public class PirValueReplacer<R, P> extends DefTraverser<R, P> {
 
   @Override
   protected R visitCaseGoto(CaseGoto obj, P param) {
-    throw new RuntimeException("not yet implemented");
+    obj.setCondition(replace(obj.getCondition(), param));
+    return super.visitCaseGoto(obj, param);
   }
 
   @Override
@@ -118,12 +120,6 @@ abstract public class PirValueReplacer<R, P> extends DefTraverser<R, P> {
   @Override
   protected R visitComplexWriter(ComplexWriter obj, P param) {
     throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected R visitCallAssignment(CallAssignment obj, P param) {
-    repList(obj.getParameter(), param);
-    return super.visitCallAssignment(obj, param);
   }
 
   @Override

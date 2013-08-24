@@ -259,6 +259,8 @@ public class MainEvl {
     for (Connection con : connection) {
       Designator src = con.getEndpoint(Direction.in).getDes();
       Designator dst = con.getEndpoint(Direction.out).getDes();
+      ret.addVertex(src);
+      ret.addVertex(dst);
       ret.addEdge(src, dst);
     }
     return ret;
@@ -276,6 +278,8 @@ public class MainEvl {
           if (u.size() == n) {
             String vcomp = v.toList().get(0);
             String ucomp = u.toList().get(0);
+            compcall.addVertex(vcomp);
+            compcall.addVertex(ucomp);
             compcall.addEdge(vcomp, ucomp);
           }
         }

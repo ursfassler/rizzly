@@ -12,6 +12,12 @@ public class CaseGoto extends BasicBlockEnd {
   private List<CaseGotoOpt> option = new ArrayList<CaseGotoOpt>();
   private BasicBlock otherwise;
 
+  public CaseGoto(PirValue condition, BasicBlock otherwise) {
+    super();
+    this.condition = condition;
+    this.otherwise = otherwise;
+  }
+
   public PirValue getCondition() {
     return condition;
   }
