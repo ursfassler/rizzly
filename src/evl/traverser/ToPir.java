@@ -17,6 +17,8 @@ import pir.expression.reference.VarRefSimple;
 import pir.function.FuncImpl;
 import pir.function.FuncProto;
 import pir.function.Function;
+import pir.know.KnowBaseItem;
+import pir.know.KnowledgeBase;
 import pir.other.PirValue;
 import pir.other.Program;
 import pir.other.Variable;
@@ -25,6 +27,7 @@ import pir.statement.CallAssignment;
 import pir.statement.ComplexWriter;
 import pir.statement.VariableGeneratorStmt;
 import pir.type.NamedElement;
+import pir.type.RangeType;
 import pir.type.TypeRef;
 import error.ErrorType;
 import error.RError;
@@ -86,11 +89,17 @@ import evl.variable.StateVariable;
 
 public class ToPir extends NullTraverser<PirObject, PirObject> {
   private Map<Evl, PirObject> map = new HashMap<Evl, PirObject>();
-  private pir.type.VoidType pirVoidType = null;
+  KnowBaseItem kbi;
+  private String rootdir;
 
-  static public PirObject process(Evl ast) {
-    ToPir toC = new ToPir();
+  static public PirObject process(Evl ast, String rootdir) {
+    ToPir toC = new ToPir(rootdir);
     return toC.traverse(ast, null);
+  }
+
+  public ToPir(String rootdir) {
+    super();
+    this.rootdir = rootdir;
   }
 
   @Override
@@ -191,18 +200,7 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   protected Program visitRizzlyProgram(RizzlyProgram obj, PirObject param) {
     Program prog = new Program(obj.getName());
 
-    { // get/add void type
-      Type evoid = obj.getType().find(VoidType.NAME);
-      if (evoid != null) {
-        obj.getType().remove(evoid);
-        pir.type.VoidType pvoid = (pir.type.VoidType) visit(evoid, null);
-        this.pirVoidType  = pvoid;
-      } else {
-        this.pirVoidType = new pir.type.VoidType();
-      }
-      prog.getType().add(pirVoidType);
-    }
-
+    kbi = (new KnowledgeBase(prog, rootdir)).getEntry(KnowBaseItem.class);
     for (Type type : obj.getType()) {
       pir.type.Type ct = (pir.type.Type) visit(type, param);
       prog.getType().add(ct);
@@ -237,8 +235,7 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
     if (obj instanceof FuncWithReturn) {
       retType = (TypeRef) visit(((FuncWithReturn) obj).getRet(), null);
     } else {
-      assert( pirVoidType != null );
-      retType = new TypeRef(pirVoidType);
+      retType = new TypeRef(kbi.getVoidType());
     }
 
     if (obj instanceof FuncWithBody) {
@@ -375,7 +372,8 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
 
   @Override
   protected pir.expression.Number visitNumber(Number obj, PirObject param) {
-    return new pir.expression.Number(obj.getValue());
+    RangeType type = kbi.getRangeType(obj.getValue(), obj.getValue());
+    return new pir.expression.Number(obj.getValue(), new TypeRef(type));
   }
 
   @Override
@@ -396,7 +394,7 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
 
   @Override
   protected PirObject visitRange(Range obj, PirObject param) {
-    pir.type.RangeType ret = new pir.type.RangeType(obj.getLow(), obj.getHigh());
+    pir.type.RangeType ret = kbi.getRangeType(obj.getLow(), obj.getHigh());
     return ret;
   }
 
@@ -409,7 +407,7 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
 
   @Override
   protected pir.type.Type visitBooleanType(BooleanType obj, PirObject param) {
-    pir.type.BooleanType ret = new pir.type.BooleanType();
+    pir.type.BooleanType ret = kbi.getBooleanType();
     return ret;
   }
 
@@ -427,13 +425,13 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
 
   @Override
   protected PirObject visitVoidType(VoidType obj, PirObject param) {
-    pir.type.VoidType ret = new pir.type.VoidType(obj.getName());
+    pir.type.VoidType ret = kbi.getVoidType();
     return ret;
   }
 
   @Override
   protected PirObject visitStringType(StringType obj, PirObject param) {
-    pir.type.StringType ret = new pir.type.StringType(obj.getName());
+    pir.type.StringType ret = kbi.getStringType();
     return ret;
   }
 
@@ -464,13 +462,13 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   protected PirObject visitCaseOptRange(CaseOptRange obj, PirObject param) {
     assert (obj.getStart() instanceof Number);
     assert (obj.getEnd() instanceof Number);
-    return new pir.cfg.CaseOptRange(((Number)obj.getStart()).getValue(), ((Number)obj.getEnd()).getValue());
+    return new pir.cfg.CaseOptRange(((Number) obj.getStart()).getValue(), ((Number) obj.getEnd()).getValue());
   }
 
   @Override
   protected PirObject visitCaseOptValue(CaseOptValue obj, PirObject param) {
-     assert (obj.getValue() instanceof Number);
-    return new pir.cfg.CaseOptValue(((Number)obj.getValue()).getValue());
+    assert (obj.getValue() instanceof Number);
+    return new pir.cfg.CaseOptValue((pir.expression.Number) visit(obj.getValue(), null));
   }
 
   @Override
@@ -611,10 +609,10 @@ class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, pir.other
     throw new RuntimeException("not yet implemented: " + obj);
   }
 
-  // FIXME hack needed since assignment wants a variable as source
   @Override
   protected VariableGeneratorStmt visitNumber(Number obj, pir.other.SsaVariable param) {
-    pir.expression.Number num = new pir.expression.Number(obj.getValue());
+    pir.type.Type type = converter.kbi.getRangeType(obj.getValue(),obj.getValue());
+    pir.expression.Number num = new pir.expression.Number(obj.getValue(),new TypeRef(type));
     return new pir.statement.Assignment(param, num);
   }
 

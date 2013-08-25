@@ -6,7 +6,6 @@ import pir.other.Program;
 import pir.statement.ArithmeticOp;
 import pir.statement.Relation;
 import pir.statement.StmtSignes;
-import pir.traverser.ExprTypeGetter;
 import pir.type.IntType;
 import pir.type.SignedType;
 
@@ -24,8 +23,8 @@ public class StmtSignSetter extends DefTraverser<Void, Void> {
   }
 
   private boolean isSigned(PirValue left, PirValue right) {
-    IntType lt = (IntType) ExprTypeGetter.process(left, ExprTypeGetter.NUMBER_AS_INT);
-    IntType rt = (IntType) ExprTypeGetter.process(right, ExprTypeGetter.NUMBER_AS_INT);
+    IntType lt = (IntType) left.getType().getRef();
+    IntType rt = (IntType) right.getType().getRef();
     assert (lt == rt);
     return lt instanceof SignedType;
   }

@@ -5,8 +5,6 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import pir.traverser.ExprTypeGetter;
-
 import common.ElementInfo;
 
 import error.ErrorType;
@@ -53,7 +51,7 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
     return adder.traverse(ast, null);
   }
 
-  private void checkPositive( String op, Range lhs, Range rhs) {
+  private void checkPositive(String op, Range lhs, Range rhs) {
     checkPositive(op, lhs);
     checkPositive(op, rhs);
   }
@@ -66,25 +64,35 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
 
   private BigInteger makeOnes(int bits) {
     BigInteger ret = BigInteger.ZERO;
-    for( int i = 0; i < bits; i++ ){
+    for (int i = 0; i < bits; i++) {
       ret = ret.shiftLeft(1);
       ret = ret.or(BigInteger.ONE);
     }
     return ret;
   }
-  
-  private int getAsInt( BigInteger value, ElementInfo info ){
-    if( value.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0){
-      RError.err(ErrorType.Error, info, "value to big, needs to be smaller than " + Integer.MAX_VALUE );
+
+  private int getAsInt(BigInteger value, ElementInfo info) {
+    if (value.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
+      RError.err(ErrorType.Error, info, "value to big, needs to be smaller than " + Integer.MAX_VALUE);
     }
-    if( value.compareTo(BigInteger.valueOf(Integer.MIN_VALUE)) < 0){
-      RError.err(ErrorType.Error, info, "value to small, needs to be bigger than " + Integer.MIN_VALUE );
+    if (value.compareTo(BigInteger.valueOf(Integer.MIN_VALUE)) < 0) {
+      RError.err(ErrorType.Error, info, "value to small, needs to be bigger than " + Integer.MIN_VALUE);
     }
     return value.intValue();
   }
 
+  static public int bitCount(BigInteger value) {
+    assert (value.compareTo(BigInteger.ZERO) >= 0);
+    int bit = 0;
+    while (value.compareTo(BigInteger.ZERO) != 0) {
+      value = value.shiftRight(1);
+      bit++;
+    }
+    return bit;
+  }
+
   /**
-   *
+   * 
    * @param ast
    * @param map
    *          Constrainted type of variable
@@ -113,7 +121,7 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitTypeCast(TypeCast obj, Void param) {
-    return visit(obj.getCast(),param);
+    return visit(obj.getCast(), param);
   }
 
   @Override
@@ -197,7 +205,7 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
       BigInteger high = lhs.getHigh().subtract(rhs.getLow());
       return kbi.getRangeType(low, high);
     }
-    case MUL: { //FIXME correct when values are negative?
+    case MUL: { // FIXME correct when values are negative?
       BigInteger low = lhs.getLow().multiply(rhs.getLow());
       BigInteger high = lhs.getHigh().multiply(rhs.getHigh());
       return kbi.getRangeType(low, high);
@@ -225,31 +233,31 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
     }
     case OR: {
       checkPositive("or", lhs, rhs);
-      
+
       BigInteger bigger = lhs.getHigh().max(rhs.getHigh());
       BigInteger smaller = lhs.getHigh().min(rhs.getHigh());
-      
-      int bits = ExprTypeGetter.bitCount(smaller);
-      BigInteger ones = makeOnes( bits );
+
+      int bits = bitCount(smaller);
+      BigInteger ones = makeOnes(bits);
       BigInteger high = bigger.or(ones);
       BigInteger low = lhs.getLow().max(rhs.getLow());
-      
+
       return kbi.getRangeType(low, high);
     }
     case SHR: {
       checkPositive("shr", lhs, rhs);
-      
-      BigInteger high = lhs.getHigh().shiftRight( getAsInt( rhs.getLow(), rhs.getInfo() ) );
-      BigInteger low = lhs.getLow().shiftRight( getAsInt(rhs.getHigh(), rhs.getInfo()) );
-      
+
+      BigInteger high = lhs.getHigh().shiftRight(getAsInt(rhs.getLow(), rhs.getInfo()));
+      BigInteger low = lhs.getLow().shiftRight(getAsInt(rhs.getHigh(), rhs.getInfo()));
+
       return kbi.getRangeType(low, high);
     }
-    case SHL:{
+    case SHL: {
       checkPositive("shl", lhs, rhs);
-      
-      BigInteger high = lhs.getHigh().shiftLeft( getAsInt( rhs.getHigh(), rhs.getInfo() ) );
-      BigInteger low = lhs.getLow().shiftLeft( getAsInt(rhs.getLow(), rhs.getInfo()) );
-      
+
+      BigInteger high = lhs.getHigh().shiftLeft(getAsInt(rhs.getHigh(), rhs.getInfo()));
+      BigInteger low = lhs.getLow().shiftLeft(getAsInt(rhs.getLow(), rhs.getInfo()));
+
       return kbi.getRangeType(low, high);
     }
     default: {
@@ -275,7 +283,7 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
       cont = BiggerType.get(cont, ntype, obj.getInfo(), kb);
     }
 
-    return new ArrayType( BigInteger.valueOf(obj.getValue().size()), new TypeRef(new ElementInfo(), cont));
+    return new ArrayType(BigInteger.valueOf(obj.getValue().size()), new TypeRef(new ElementInfo(), cont));
   }
 
   @Override

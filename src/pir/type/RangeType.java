@@ -43,4 +43,9 @@ public class RangeType extends Type {
     return lowIn || highIn;
   }
 
+  public static boolean isEqual(RangeType lt, RangeType rt) {
+    boolean lowIn = lt.getLow().compareTo(rt.getLow()) == 0;
+    boolean highIn = lt.getHigh().compareTo(rt.getHigh()) == 0;
+    return lowIn && highIn;
+  }
 }

@@ -9,7 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 import pir.NullTraverser;
-import pir.Pir;
 import pir.PirObject;
 import pir.cfg.BasicBlock;
 import pir.cfg.BasicBlockList;
@@ -375,7 +374,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
         } else {
           param.wr(", ");
         }
-        visit(getTypeRef(itr), param);
+        visit(itr.getType(), param);
         param.wr(" ");
         visit(itr, param);
       }
@@ -474,7 +473,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
         } else {
           param.wr(", ");
         }
-        visit(getTypeRef(itr), param);
+        visit(itr.getType(), param);
         param.wr(" ");
         visit(itr, param);
       }
@@ -531,8 +530,8 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     param.wr(getRelop(obj.getOp(), obj.getSignes()));
     param.wr(" ");
 
-    TypeRef lt = getTypeRef(obj.getLeft());
-    TypeRef rt = getTypeRef(obj.getRight());
+    TypeRef lt = obj.getLeft().getType();
+    TypeRef rt = obj.getRight().getType();
 
     // assert (lt.getRef() == rt.getRef());
 
@@ -558,13 +557,13 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   protected Void visitGetElementPtr(GetElementPtr obj, StreamWriter param) {
     wrVarDef(obj, param);
     param.wr("getelementptr ");
-    visit(getTypeRef(obj.getBase()), param);
+    visit(obj.getBase().getType(), param);
     param.wr("*"); // FIXME ok?
     param.wr(" ");
     visit(obj.getBase(), param);
     for (PirValue ofs : obj.getOffset()) {
       param.wr(", ");
-      visit(getTypeRef(ofs), param);
+      visit(ofs.getType(), param);
       param.wr(" ");
       visit(ofs, param);
     }
@@ -602,12 +601,6 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
       RError.err(ErrorType.Warning, "Operand not handled: " + op); // TODO change to fatal error
       return op.toString();
     }
-  }
-
-  @Deprecated
-  private Type getType(Pir left) {
-    return ExprTypeGetter.process(left, ExprTypeGetter.NUMBER_AS_NOSIGN); // FIXME change IR that this is no longer
-                                                                          // needed
   }
 
   @Override
@@ -649,7 +642,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   protected Void visitLoadStmt(LoadStmt obj, StreamWriter param) {
     wrVarDef(obj, param);
     param.wr("load ");
-    visit(getTypeRef(obj.getSrc()), param);
+    visit(obj.getSrc().getType(), param);
     param.wr("* ");
     visit(obj.getSrc(), param);
     param.nl();
@@ -659,11 +652,11 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitStoreStmt(StoreStmt obj, StreamWriter param) {
     param.wr("store ");
-    visit(getTypeRef(obj.getSrc()), param);
+    visit(obj.getSrc().getType(), param);
     param.wr(" ");
     visit(obj.getSrc(), param);
     param.wr(", ");
-    visit(getTypeRef(obj.getDst()), param);
+    visit(obj.getDst().getType(), param);
     param.wr("* ");
     visit(obj.getDst(), param);
     param.nl();
@@ -688,7 +681,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitReturnExpr(ReturnExpr obj, StreamWriter param) {
     param.wr("ret ");
-    visit(getTypeRef(obj.getValue()), param);
+    visit(obj.getValue().getType(), param);
     param.wr(" ");
     visit(obj.getValue(), param);
     param.nl();
@@ -696,16 +689,6 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   // ------------------------------------------------------------------------
-
-  private TypeRef getTypeRef(PirValue value) {
-    if (value instanceof VarRefSimple) {
-      return ((VarRefSimple) value).getRef().getType();
-    } else if (value instanceof Number) {
-      return new TypeRef(ExprTypeGetter.process(value, ExprTypeGetter.NUMBER_AS_NOSIGN));
-    } else {
-      throw new RuntimeException("not yet implemented");
-    }
-  }
 
   @Override
   protected Void visitStringValue(StringValue obj, StreamWriter param) {
@@ -732,7 +715,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitCaseGoto(CaseGoto obj, StreamWriter param) {
     param.wr("switch ");
-    visit(getTypeRef(obj.getCondition()), param);
+    visit(obj.getCondition().getType(), param);
     param.wr(" ");
     visit(obj.getCondition(), param);
     param.wr(", label ");
@@ -756,10 +739,9 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitCaseOptValue(CaseOptValue obj, StreamWriter param) {
-    TypeRef nt = getTypeRef(new Number(obj.getValue())); // FIXME this is hacky
-    visit(nt, param);
+    visit(obj.getValue().getType(), param);
     param.wr(" ");
-    param.wr(obj.getValue().toString());
+    visit( obj.getValue(), param );
     return null;
   }
 
@@ -774,7 +756,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitIfGoto(IfGoto obj, StreamWriter param) {
     param.wr("br ");
-    visit(getTypeRef(obj.getCondition()), param);
+    visit(obj.getCondition().getType(), param);
     param.wr(" ");
     visit(obj.getCondition(), param);
 
@@ -897,7 +879,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     wrVarDef(obj, param);
     param.wr(op);
     param.wr(" ");
-    visit(getTypeRef(obj.getOriginal()), param);
+    visit(obj.getOriginal().getType(), param);
     param.wr(" ");
     visit(obj.getOriginal(), param);
     param.wr(" to ");

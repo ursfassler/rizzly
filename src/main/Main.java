@@ -126,7 +126,7 @@ public class Main {
     evl.other.RizzlyProgram prg = MainEvl.doEvl(opt, debugdir, aclasses, root);
 
     evl.doc.PrettyPrinter.print(prg, debugdir + "beforePir.rzy", true);
-    Program prog = (Program) evl.traverser.ToPir.process(prg);
+    Program prog = (Program) evl.traverser.ToPir.process(prg,debugdir);
 
     LlvmWriter.print(prog, debugdir + "afterEvl.ll", true);
 
@@ -134,13 +134,13 @@ public class Main {
 
     { // reducing Range and boolean to nosign type
       RangeConverter.process(prog, kb);
+      LlvmWriter.print(prog, debugdir + "typeext.ll", true);
       RangeReplacer.process(prog);
       TypecastReplacer.process(prog);
       StmtSignSetter.process(prog);
       LlvmIntTypeReplacer.process(prog, kb);
     }
 
-    LlvmWriter.print(prog, debugdir + "typeext.ll", true);
 
     CaseReduction.process(prog);
     
@@ -151,7 +151,7 @@ public class Main {
     // RangeExtender.process(prog);
 
     VarPropagator.process(prog);
-    ConstPropagator.process(prog);
+    ConstPropagator.process(prog,kb);
 
     { // remove unused statements
       HashMap<SsaVariable, Statement> owner = OwnerMap.make(prog);

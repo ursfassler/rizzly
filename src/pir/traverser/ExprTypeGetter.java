@@ -1,7 +1,5 @@
 package pir.traverser;
 
-import java.math.BigInteger;
-
 import pir.NullTraverser;
 import pir.Pir;
 import pir.PirObject;
@@ -18,32 +16,17 @@ import pir.statement.Relation;
 import pir.type.ArrayType;
 import pir.type.BooleanType;
 import pir.type.EnumType;
-import pir.type.IntType;
 import pir.type.NamedElement;
-import pir.type.NoSignType;
-import pir.type.RangeType;
 import pir.type.StructType;
 import pir.type.Type;
 import pir.type.TypeRef;
-import pir.type.UnsignedType;
 
 public class ExprTypeGetter extends NullTraverser<Type, Void> {
-  public final static int NUMBER_AS_RANGE = 0;
-  public final static int NUMBER_AS_INT = 1;
-  public final static int NUMBER_AS_NOSIGN = 2;
 
   private RefTypeGetter rtg = new RefTypeGetter();
-  final private int numAsRange;
 
-  public ExprTypeGetter(int numAsRange) {
-    super();
-    assert (numAsRange >= NUMBER_AS_RANGE);
-    assert (numAsRange <= NUMBER_AS_NOSIGN);
-    this.numAsRange = numAsRange;
-  }
-
-  static public Type process(Pir ast, int numAsRange) {
-    ExprTypeGetter adder = new ExprTypeGetter(numAsRange);
+  static public Type process(Pir ast) {
+    ExprTypeGetter adder = new ExprTypeGetter();
     return adder.traverse(ast, null);
   }
 
@@ -104,40 +87,9 @@ public class ExprTypeGetter extends NullTraverser<Type, Void> {
     return bigger;
   }
 
-  static public int bitCount(BigInteger value) {
-    assert( value.compareTo(BigInteger.ZERO) >= 0 );
-    int bit = 0;
-    while (value.compareTo(BigInteger.ZERO) != 0) {
-      value = value.shiftRight(1);
-      bit++;
-    }
-    return bit;
-  }
-
   @Override
   protected Type visitNumber(Number obj, Void param) {
-    switch (numAsRange) {
-    case NUMBER_AS_RANGE:
-      return new RangeType(obj.getValue(), obj.getValue()); // TODO add to types
-    case NUMBER_AS_INT:
-    case NUMBER_AS_NOSIGN:
-      IntType ret;
-      if (obj.getValue().compareTo(BigInteger.ZERO) >= 0) {
-        int bits = bitCount(obj.getValue());
-        ret = new UnsignedType(bits);
-        // return new UnsignedType(bits); //TODO reimplement this
-      } else {
-        throw new RuntimeException("not yet implemented");
-      }
-
-      if (numAsRange == NUMBER_AS_NOSIGN) {
-        ret = new NoSignType(Math.max(1, ret.getBits()));
-      }
-
-      return ret;
-    default:
-      throw new RuntimeException("not yet implemented: " + numAsRange);
-    }
+    return visit(obj.getType(), param);
   }
 
   @Override

@@ -3,6 +3,7 @@ package pir.expression.reference;
 import pir.expression.PExpression;
 import pir.other.PirValue;
 import pir.other.SsaVariable;
+import pir.type.TypeRef;
 
 final public class VarRefSimple extends PExpression implements Reference<SsaVariable>, PirValue {
   private SsaVariable ref;
@@ -25,6 +26,11 @@ final public class VarRefSimple extends PExpression implements Reference<SsaVari
   @Override
   public String toString() {
     return ref.toString();
+  }
+
+  @Override
+  public TypeRef getType() {
+    return ref.getType();
   }
 
 }

@@ -9,7 +9,6 @@ import pir.statement.convert.SignExtendValue;
 import pir.statement.convert.TruncValue;
 import pir.statement.convert.TypeCast;
 import pir.statement.convert.ZeroExtendValue;
-import pir.traverser.ExprTypeGetter;
 import pir.traverser.StatementReplacer;
 import pir.type.IntType;
 import pir.type.SignedType;
@@ -28,7 +27,7 @@ public class TypecastReplacer extends StatementReplacer<Void> {
   }
 
   private IntType getType(PirValue val) {
-    return (IntType) ExprTypeGetter.process(val, ExprTypeGetter.NUMBER_AS_INT);
+    return (IntType) val.getType().getRef();
   }
 
   @Override

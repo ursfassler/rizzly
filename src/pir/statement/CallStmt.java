@@ -6,6 +6,7 @@ import pir.expression.reference.Reference;
 import pir.function.Function;
 import pir.other.PirValue;
 
+//TODO remove, use CallAssignment
 final public class CallStmt extends Statement implements Reference<Function> {
   private Function ref;
   private ArrayList<PirValue> parameter;

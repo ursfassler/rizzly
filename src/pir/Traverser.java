@@ -349,8 +349,6 @@ abstract public class Traverser<R, P> {
 
   protected abstract R visitVoidType(VoidType obj, P param);
 
-  protected abstract R visitCallExpr(CallAssignment obj, P param);
-
   protected abstract R visitVarRefSimple(VarRefSimple obj, P param);
 
   protected abstract R visitVarRef(VarRef obj, P param);

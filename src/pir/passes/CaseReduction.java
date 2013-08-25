@@ -17,7 +17,10 @@ import pir.cfg.CaseGotoOpt;
 import pir.cfg.CaseOptEntry;
 import pir.cfg.CaseOptRange;
 import pir.cfg.CaseOptValue;
+import pir.expression.Number;
 import pir.other.Program;
+import pir.type.Type;
+import pir.type.TypeRef;
 
 /**
  * Ensures that CaseGotoOpt.value.size == 1 and the type of it is a single value
@@ -35,12 +38,13 @@ public class CaseReduction extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitCaseGoto(CaseGoto obj, Void param) {
+    Type condType = obj.getCondition().getType().getRef();
     Map<BigInteger, CaseGotoOpt> newEntries = new HashMap<BigInteger, CaseGotoOpt>();
     for (CaseGotoOpt entry : obj.getOption()) {
       Set<BigInteger> values = getValues(entry);
       for (BigInteger val : values) {
         List<CaseOptEntry> sv = new ArrayList<CaseOptEntry>(1);
-        sv.add(new CaseOptValue(val));
+        sv.add(new CaseOptValue(new Number(val, new TypeRef(condType))));
         CaseGotoOpt ncgo = new CaseGotoOpt(sv, entry.getDst());
         assert (!newEntries.containsKey(val));
         newEntries.put(val, ncgo);
@@ -88,7 +92,7 @@ class CaseValueAdder extends NullTraverser<Void, Set<BigInteger>> {
 
   @Override
   protected Void visitCaseOptValue(CaseOptValue obj, Set<BigInteger> param) {
-    add(param, obj.getValue());
+    add(param, obj.getValue().getValue());
     return null;
   }
 

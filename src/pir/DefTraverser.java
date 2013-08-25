@@ -94,6 +94,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitNumber(Number obj, P param) {
+    visit(obj.getType(),param);
     return null;
   }
 
@@ -298,12 +299,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   protected R visitCaseGoto(CaseGoto obj, P param) {
     visit(obj.getCondition(), param);
     visitList(obj.getOption(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitCallExpr(CallAssignment obj, P param) {
-    visitList(obj.getParameter(), param);
     return null;
   }
 

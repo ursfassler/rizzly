@@ -1,20 +1,19 @@
 package pir.cfg;
 
-import java.math.BigInteger;
-
+import pir.expression.Number;
 
 public class CaseOptValue extends CaseOptEntry {
-  private BigInteger value;
+  private Number value;
 
-  public CaseOptValue( BigInteger value) {
+  public CaseOptValue(Number value) {
     this.value = value;
   }
 
-  public BigInteger getValue() {
+  public Number getValue() {
     return value;
   }
 
-  public void setValue(BigInteger value) {
+  public void setValue(Number value) {
     this.value = value;
   }
 
