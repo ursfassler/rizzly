@@ -262,11 +262,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitCallExpr(CallAssignment obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
   protected R visitVarRef(VarRef obj, P param) {
     return doDefault(obj, param);
   }

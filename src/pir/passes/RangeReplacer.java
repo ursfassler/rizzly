@@ -12,6 +12,7 @@ import pir.type.RangeType;
 import pir.type.SignedType;
 import pir.type.Type;
 import pir.type.UnsignedType;
+import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 
 /**
  * Replaces range types with integer types
@@ -72,7 +73,7 @@ public class RangeReplacer extends NullTraverser<Void, Void> {
       low = low.add(BigInteger.ONE).abs();
     }
     BigInteger max = low.max(obj.getHigh());
-    int bits = getBits(max);
+    int bits = ExpressionTypeChecker.bitCount(max);
     if (hasNeg) {
       bits++;
     }
@@ -86,16 +87,6 @@ public class RangeReplacer extends NullTraverser<Void, Void> {
     map.put(obj, ret);
 
     return null;
-  }
-
-  private int getBits(BigInteger val) {
-    assert (val.compareTo(BigInteger.ZERO) >= 0);
-    int bits = 0;
-    while (!val.equals(BigInteger.ZERO)) {
-      val = val.shiftRight(1);
-      bits++;
-    }
-    return bits;
   }
 
   private UnsignedType getUint(int bits) {

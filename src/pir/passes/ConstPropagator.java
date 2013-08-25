@@ -8,8 +8,6 @@ import java.util.Map;
 
 import pir.expression.Number;
 import pir.expression.reference.VarRefSimple;
-import pir.know.KnowBaseItem;
-import pir.know.KnowledgeBase;
 import pir.other.PirValue;
 import pir.other.Program;
 import pir.other.SsaVariable;
@@ -28,11 +26,11 @@ import pir.type.TypeRef;
  */
 public class ConstPropagator extends StatementReplacer<Map<SsaVariable, BigInteger>> {
 
-  public static void process(Program obj, KnowledgeBase kb) {
+  public static void process(Program obj) {
     ConstPropagator changer = new ConstPropagator();
     Map<SsaVariable, BigInteger> map = new HashMap<SsaVariable, BigInteger>();
     changer.traverse(obj, map);
-    PvRelinker relinker = new PvRelinker(kb);
+    PvRelinker relinker = new PvRelinker();
     relinker.traverse(obj, map);
   }
 
@@ -49,12 +47,6 @@ public class ConstPropagator extends StatementReplacer<Map<SsaVariable, BigInteg
 }
 
 class PvRelinker extends PirValueReplacer<Void, Map<SsaVariable, BigInteger>> {
-  private KnowBaseItem kbi;
-
-  public PvRelinker(KnowledgeBase kb) {
-    super();
-    this.kbi = kb.getEntry(KnowBaseItem.class);
-  }
 
   @Override
   protected PirValue replace(PirValue val, Map<SsaVariable, BigInteger> param) {
@@ -62,7 +54,8 @@ class PvRelinker extends PirValueReplacer<Void, Map<SsaVariable, BigInteger>> {
       SsaVariable target = ((VarRefSimple) val).getRef();
       if (param.containsKey(target)) {
         BigInteger num = param.get(target);
-        Type type = kbi.getRangeType(num, num);
+        Type type = target.getType().getRef();
+        // TODO check if num is in range of type?
         return new Number(num, new TypeRef(type));
       }
     }

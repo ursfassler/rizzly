@@ -163,9 +163,9 @@ public class RangeConverter extends StatementReplacer<Void> {
 
   @Override
   protected List<Statement> visitAssignment(Assignment obj, Void param) {
-    if (obj.getSrc() instanceof Number) {
-      return null;
-    }
+//    if (obj.getSrc() instanceof Number) {
+//      return null;
+//    }
 
     RangeType lt = (RangeType) obj.getSrc().getType().getRef();
     RangeType dt = (RangeType) obj.getVariable().getType().getRef();

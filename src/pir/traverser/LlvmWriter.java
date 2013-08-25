@@ -358,33 +358,6 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   // ---- expression --------------------------------------------------------------------
 
   @Override
-  protected Void visitCallExpr(CallAssignment obj, StreamWriter param) {
-    wrVarDef(obj, param);
-    param.wr("call ");
-    visit(obj.getRef().getRetType(), param);
-    param.wr(" ");
-    wrFuncRef(obj.getRef(), param);
-    param.wr("(");
-
-    {
-      boolean first = true;
-      for (PirValue itr : obj.getParameter()) {
-        if (first) {
-          first = false;
-        } else {
-          param.wr(", ");
-        }
-        visit(itr.getType(), param);
-        param.wr(" ");
-        visit(itr, param);
-      }
-    }
-
-    param.wr(")");
-    return null;
-  }
-
-  @Override
   protected Void visitNumber(Number obj, StreamWriter param) {
     param.wr(obj.getValue().toString());
     return null;
@@ -741,7 +714,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   protected Void visitCaseOptValue(CaseOptValue obj, StreamWriter param) {
     visit(obj.getValue().getType(), param);
     param.wr(" ");
-    visit( obj.getValue(), param );
+    visit(obj.getValue(), param);
     return null;
   }
 

@@ -8,6 +8,7 @@ import pir.expression.reference.Referencable;
 import common.Designator;
 
 //TODO how to ensure that names are unique?
+//TODO use blacklist with llvm keywords
 
 /**
  * Replaces "{", "}" and "," in names.

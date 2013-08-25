@@ -103,11 +103,6 @@ abstract public class PirValueReplacer<R, P> extends DefTraverser<R, P> {
   }
 
   @Override
-  protected R visitCallExpr(CallAssignment obj, P param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
   protected R visitVarRef(VarRef obj, P param) {
     throw new RuntimeException("not yet implemented");
   }
