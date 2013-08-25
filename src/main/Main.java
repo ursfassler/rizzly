@@ -126,7 +126,7 @@ public class Main {
     evl.other.RizzlyProgram prg = MainEvl.doEvl(opt, debugdir, aclasses, root);
 
     evl.doc.PrettyPrinter.print(prg, debugdir + "beforePir.rzy", true);
-    Program prog = (Program) evl.traverser.ToPir.process(prg,debugdir);
+    Program prog = (Program) evl.traverser.ToPir.process(prg, debugdir);
 
     LlvmWriter.print(prog, debugdir + "afterEvl.ll", true);
 
@@ -135,15 +135,23 @@ public class Main {
     { // reducing Range and boolean to nosign type
       RangeConverter.process(prog, kb);
       RangeReplacer.process(prog);
+
+      LlvmWriter.print(prog, debugdir + "typeext.ll", true);
+
+//      { // replace boolean types
+//        KnowBaseItem kbi = kb.getEntry(KnowBaseItem.class);
+//        Map<BooleanType, UnsignedType> map = new HashMap<BooleanType, UnsignedType>();
+//        map.put(kbi.getBooleanType(), kbi.getUnsignedType(1));
+//        Relinker.process(prog, map);
+//      }
+
       TypecastReplacer.process(prog);
       StmtSignSetter.process(prog);
       LlvmIntTypeReplacer.process(prog, kb);
     }
 
-    LlvmWriter.print(prog, debugdir + "typeext.ll", true);
-
     CaseReduction.process(prog);
-    
+
     ComplexWriterReduction.process(prog);
     ReferenceReadReduction.process(prog);
     GlobalReadExtracter.process(prog);

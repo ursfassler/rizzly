@@ -545,6 +545,18 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
+  protected Void visitUnaryOp(UnaryOp obj, StreamWriter param) {
+    wrVarDef(obj, param);
+    param.wr(obj.getOp().toString());
+    param.wr(" ");
+    visit(obj.getVariable().getType(), param);
+    param.wr(" ");
+    visit(obj.getExpr(), param);
+    param.nl();
+    return null;
+  }
+
+  @Override
   protected Void visitArithmeticOp(ArithmeticOp obj, StreamWriter param) {
     wrVarDef(obj, param);
     param.wr(getOpString(obj.getOp()));
@@ -858,18 +870,6 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     param.wr(" to ");
     visit(obj.getVariable().getType(), param);
     param.nl();
-  }
-
-  @Override
-  protected Void visitUnaryOp(UnaryOp obj, StreamWriter param) {
-    // TODO implement it correct
-    param.wr("(");
-    param.wr(obj.getOp().toString());
-    param.wr(" ");
-    visit(obj.getExpr(), param);
-    param.wr(")");
-    return null;
-
   }
 
 }

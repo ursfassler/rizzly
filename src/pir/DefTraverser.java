@@ -398,6 +398,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitUnaryOp(UnaryOp obj, P param) {
+    visit(obj.getVariable(),param);
     visit(obj.getExpr(), param);
     return null;
   }

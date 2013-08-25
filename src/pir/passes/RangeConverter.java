@@ -19,6 +19,7 @@ import pir.statement.Relation;
 import pir.statement.Statement;
 import pir.statement.convert.TypeCast;
 import pir.traverser.StatementReplacer;
+import pir.type.BooleanType;
 import pir.type.RangeType;
 import pir.type.TypeRef;
 
@@ -163,10 +164,11 @@ public class RangeConverter extends StatementReplacer<Void> {
 
   @Override
   protected List<Statement> visitAssignment(Assignment obj, Void param) {
-//    if (obj.getSrc() instanceof Number) {
-//      return null;
-//    }
-
+    if( obj.getSrc().getType().getRef() instanceof BooleanType ){     //TODO implement it nicer
+      assert( obj.getVariable().getType().getRef() instanceof BooleanType );
+      return null;      
+    }
+    
     RangeType lt = (RangeType) obj.getSrc().getType().getRef();
     RangeType dt = (RangeType) obj.getVariable().getType().getRef();
 
