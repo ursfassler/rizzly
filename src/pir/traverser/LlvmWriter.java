@@ -275,9 +275,9 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitVoidType(VoidType obj, StreamWriter param) {
+    param.wr("; ");
     param.wr(obj.getName());
     wrId(obj, param);
-    param.wr(";");
     param.nl();
     return null;
   }
@@ -599,7 +599,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     case AND:
       return "and";
     default:
-      RError.err(ErrorType.Warning, "Operand not handled: " + op);  //TODO change to fatal error
+      RError.err(ErrorType.Warning, "Operand not handled: " + op); // TODO change to fatal error
       return op.toString();
     }
   }
@@ -731,41 +731,43 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitCaseGoto(CaseGoto obj, StreamWriter param) {
-    param.wr("br ");
+    param.wr("switch ");
     visit(getTypeRef(obj.getCondition()), param);
     param.wr(" ");
     visit(obj.getCondition(), param);
-
-    // TODO implement it correct
-    param.wr(", ");
-    wrList(",", obj.getOption(), param);
-    param.wr(obj.getOtherwise().getName());
+    param.wr(", label ");
+    param.wr("%" + obj.getOtherwise().getName());
+    param.wr(" [ ");
+    visitList(obj.getOption(), param);
+    param.wr("]");
     param.nl();
 
     return null;
   }
 
   @Override
+  protected Void visitCaseGotoOpt(CaseGotoOpt obj, StreamWriter param) {
+    wrList("|", obj.getValue(), param);
+    param.wr(", label ");
+    param.wr("%" + obj.getDst().getName());
+    param.wr(" ");
+    return null;
+  }
+
+  @Override
   protected Void visitCaseOptValue(CaseOptValue obj, StreamWriter param) {
-    param.wr( obj.getValue().toString() );
+    TypeRef nt = getTypeRef(new Number(obj.getValue())); // FIXME this is hacky
+    visit(nt, param);
+    param.wr(" ");
+    param.wr(obj.getValue().toString());
     return null;
   }
 
   @Override
   protected Void visitCaseOptRange(CaseOptRange obj, StreamWriter param) {
-    param.wr( obj.getStart().toString() );
+    param.wr(obj.getStart().toString());
     param.wr("..");
-    param.wr( obj.getEnd().toString() );
-    return null;
-  }
-
-  @Override
-  protected Void visitCaseGotoOpt(CaseGotoOpt obj, StreamWriter param) {
-    param.wr("[");
-    wrList(",", obj.getValue(), param);
-    param.wr(": goto ");
-    param.wr( obj.getDst().getName() );
-    param.wr("]");
+    param.wr(obj.getEnd().toString());
     return null;
   }
 

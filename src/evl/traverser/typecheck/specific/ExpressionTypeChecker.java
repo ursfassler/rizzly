@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import pir.traverser.ExprTypeGetter;
+
 import common.ElementInfo;
 
 import error.ErrorType;
@@ -227,7 +229,7 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
       BigInteger bigger = lhs.getHigh().max(rhs.getHigh());
       BigInteger smaller = lhs.getHigh().min(rhs.getHigh());
       
-      int bits = smaller.bitCount();
+      int bits = ExprTypeGetter.bitCount(smaller);
       BigInteger ones = makeOnes( bits );
       BigInteger high = bigger.or(ones);
       BigInteger low = lhs.getLow().max(rhs.getLow());

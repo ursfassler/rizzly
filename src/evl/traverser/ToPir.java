@@ -86,6 +86,7 @@ import evl.variable.StateVariable;
 
 public class ToPir extends NullTraverser<PirObject, PirObject> {
   private Map<Evl, PirObject> map = new HashMap<Evl, PirObject>();
+  private pir.type.VoidType pirVoidType = null;
 
   static public PirObject process(Evl ast) {
     ToPir toC = new ToPir();
@@ -190,6 +191,18 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   protected Program visitRizzlyProgram(RizzlyProgram obj, PirObject param) {
     Program prog = new Program(obj.getName());
 
+    { // get/add void type
+      Type evoid = obj.getType().find(VoidType.NAME);
+      if (evoid != null) {
+        obj.getType().remove(evoid);
+        pir.type.VoidType pvoid = (pir.type.VoidType) visit(evoid, null);
+        this.pirVoidType  = pvoid;
+      } else {
+        this.pirVoidType = new pir.type.VoidType();
+      }
+      prog.getType().add(pirVoidType);
+    }
+
     for (Type type : obj.getType()) {
       pir.type.Type ct = (pir.type.Type) visit(type, param);
       prog.getType().add(ct);
@@ -224,7 +237,8 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
     if (obj instanceof FuncWithReturn) {
       retType = (TypeRef) visit(((FuncWithReturn) obj).getRet(), null);
     } else {
-      retType = new TypeRef(new pir.type.VoidType()); // FIXME get single void type instance
+      assert( pirVoidType != null );
+      retType = new TypeRef(pirVoidType);
     }
 
     if (obj instanceof FuncWithBody) {

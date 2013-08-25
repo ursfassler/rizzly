@@ -104,14 +104,14 @@ public class ExprTypeGetter extends NullTraverser<Type, Void> {
     return bigger;
   }
 
-  static private int getBits(BigInteger value) {
-    return value.bitCount(); // TODO does it return the correct bit number?
-    // int bit = 0;
-    // while (value != 0) {
-    // value >>= 1;
-    // bit++;
-    // }
-    // return bit;
+  static public int bitCount(BigInteger value) {
+    assert( value.compareTo(BigInteger.ZERO) >= 0 );
+    int bit = 0;
+    while (value.compareTo(BigInteger.ZERO) != 0) {
+      value = value.shiftRight(1);
+      bit++;
+    }
+    return bit;
   }
 
   @Override
@@ -123,7 +123,7 @@ public class ExprTypeGetter extends NullTraverser<Type, Void> {
     case NUMBER_AS_NOSIGN:
       IntType ret;
       if (obj.getValue().compareTo(BigInteger.ZERO) >= 0) {
-        int bits = getBits(obj.getValue());
+        int bits = bitCount(obj.getValue());
         ret = new UnsignedType(bits);
         // return new UnsignedType(bits); //TODO reimplement this
       } else {
@@ -131,7 +131,7 @@ public class ExprTypeGetter extends NullTraverser<Type, Void> {
       }
 
       if (numAsRange == NUMBER_AS_NOSIGN) {
-        ret = new NoSignType( Math.max(1,ret.getBits()));
+        ret = new NoSignType(Math.max(1, ret.getBits()));
       }
 
       return ret;

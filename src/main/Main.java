@@ -26,6 +26,7 @@ import pir.cfg.ReturnVoid;
 import pir.know.KnowledgeBase;
 import pir.other.Program;
 import pir.other.SsaVariable;
+import pir.passes.CaseReduction;
 import pir.passes.ComplexWriterReduction;
 import pir.passes.ConstPropagator;
 import pir.passes.GlobalReadExtracter;
@@ -141,6 +142,8 @@ public class Main {
 
     LlvmWriter.print(prog, debugdir + "typeext.ll", true);
 
+    CaseReduction.process(prog);
+    
     ComplexWriterReduction.process(prog);
     ReferenceReadReduction.process(prog);
     GlobalReadExtracter.process(prog);
