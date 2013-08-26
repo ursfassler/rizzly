@@ -130,8 +130,8 @@ public class Main {
 
     LlvmWriter.print(prog, debugdir + "afterEvl.ll", true);
 
-    KnowledgeBase kb = new KnowledgeBase(prog, debugdir);
 
+    KnowledgeBase kb = new KnowledgeBase(prog, debugdir);
     { // reducing Range and boolean to nosign type
       RangeConverter.process(prog, kb);
       RangeReplacer.process(prog);

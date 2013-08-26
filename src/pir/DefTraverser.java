@@ -19,6 +19,7 @@ import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
 import pir.expression.reference.VarRef;
 import pir.expression.reference.VarRefSimple;
+import pir.expression.reference.VarRefStatevar;
 import pir.function.FuncImpl;
 import pir.function.FuncProto;
 import pir.other.Constant;
@@ -305,6 +306,11 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitVarRef(VarRef obj, P param) {
     visitList(obj.getOffset(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitVarRefStatevar(VarRefStatevar obj, P param) {
     return null;
   }
 

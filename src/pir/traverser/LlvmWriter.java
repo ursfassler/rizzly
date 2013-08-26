@@ -29,6 +29,7 @@ import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
 import pir.expression.reference.VarRef;
 import pir.expression.reference.VarRefSimple;
+import pir.expression.reference.VarRefStatevar;
 import pir.function.FuncWithBody;
 import pir.function.Function;
 import pir.other.Constant;
@@ -37,7 +38,6 @@ import pir.other.PirValue;
 import pir.other.Program;
 import pir.other.SsaVariable;
 import pir.other.StateVariable;
-import pir.other.Variable;
 import pir.statement.ArOp;
 import pir.statement.ArithmeticOp;
 import pir.statement.Assignment;
@@ -374,17 +374,18 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
+  protected Void visitVarRefStatevar(VarRefStatevar obj, StreamWriter param) {
+    StateVariable variable = obj.getRef();
+    param.wr("@");
+    param.wr(variable.getName());
+    wrId(variable, param);
+    return null;
+  }
+
+  @Override
   protected Void visitVarRefSimple(VarRefSimple obj, StreamWriter param) {
-    Variable variable = obj.getRef();
-    if (variable instanceof StateVariable) {
-      param.wr("@");
-    } else if (variable instanceof SsaVariable) {
-      param.wr("%");
-    } else if (variable instanceof FuncVariable) { // FIXME remove?
-      param.wr("%");
-    } else {
-      throw new RuntimeException("not yet implemented: " + variable.getClass().getCanonicalName());
-    }
+    SsaVariable variable = obj.getRef();
+    param.wr("%");
     param.wr(variable.getName());
     wrId(variable, param);
     return null;

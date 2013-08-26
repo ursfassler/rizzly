@@ -24,6 +24,7 @@ import pir.expression.reference.RefItem;
 import pir.expression.reference.RefName;
 import pir.expression.reference.VarRef;
 import pir.expression.reference.VarRefSimple;
+import pir.expression.reference.VarRefStatevar;
 import pir.function.FuncImpl;
 import pir.function.FuncProto;
 import pir.function.Function;
@@ -169,6 +170,8 @@ abstract public class Traverser<R, P> {
       return visitVarRef((VarRef) obj, param);
     else if (obj instanceof VarRefSimple)
       return visitVarRefSimple((VarRefSimple) obj, param);
+    else if (obj instanceof VarRefStatevar)
+      return visitVarRefStatevar((VarRefStatevar) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
@@ -348,6 +351,8 @@ abstract public class Traverser<R, P> {
   protected abstract R visitTypeAlias(TypeAlias obj, P param);
 
   protected abstract R visitVoidType(VoidType obj, P param);
+
+  protected abstract R visitVarRefStatevar(VarRefStatevar obj, P param);
 
   protected abstract R visitVarRefSimple(VarRefSimple obj, P param);
 

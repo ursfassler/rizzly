@@ -19,6 +19,7 @@ import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
 import pir.expression.reference.VarRef;
 import pir.expression.reference.VarRefSimple;
+import pir.expression.reference.VarRefStatevar;
 import pir.function.FuncImpl;
 import pir.function.FuncProto;
 import pir.other.Constant;
@@ -338,6 +339,11 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitCaseGotoOpt(CaseGotoOpt obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitVarRefStatevar(VarRefStatevar obj, P param) {
     return doDefault(obj, param);
   }
 

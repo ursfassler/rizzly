@@ -14,6 +14,7 @@ import pir.expression.reference.RefItem;
 import pir.expression.reference.Referencable;
 import pir.expression.reference.VarRef;
 import pir.expression.reference.VarRefSimple;
+import pir.expression.reference.VarRefStatevar;
 import pir.function.FuncImpl;
 import pir.function.FuncProto;
 import pir.function.Function;
@@ -25,6 +26,7 @@ import pir.other.Variable;
 import pir.statement.ArOp;
 import pir.statement.CallAssignment;
 import pir.statement.ComplexWriter;
+import pir.statement.StoreStmt;
 import pir.statement.VariableGeneratorStmt;
 import pir.type.NamedElement;
 import pir.type.RangeType;
@@ -555,8 +557,17 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
 
       ToVariableGenerator converter = new ToVariableGenerator(this);
 
-      VariableGeneratorStmt vargen = converter.traverse(obj.getRight(), (pir.other.SsaVariable) visit(obj.getLeft().getLink(), null));
-      return vargen;
+      Variable dstvar = (Variable) visit(obj.getLeft().getLink(), null);
+      if (dstvar instanceof pir.other.SsaVariable) {
+        VariableGeneratorStmt vargen = converter.traverse(obj.getRight(), (pir.other.SsaVariable) dstvar);
+        return vargen;
+      } else if (dstvar instanceof pir.other.StateVariable) {
+        PirValue src = (PirValue) visit(obj.getRight(), null);
+        StoreStmt store = new StoreStmt(new VarRefStatevar((pir.other.StateVariable) dstvar), src);
+        return store;
+      } else {
+        throw new RuntimeException("not yet implemented: " + dstvar.getClass().getCanonicalName());
+      }
     } else {
       VarRef dst = (VarRef) visit(obj.getLeft(), null);
       PirValue src = (PirValue) visit(obj.getRight(), null);
@@ -605,14 +616,18 @@ class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, pir.other
         parameter.add((PirValue) converter.traverse(expr, null));
       }
       return new CallAssignment(param, ref, parameter);
+    } else if ((obj.getLink() instanceof evl.variable.StateVariable) && obj.getOffset().isEmpty()) {
+      pir.other.StateVariable var = (pir.other.StateVariable) converter.traverse(obj.getLink(), null);
+      return new pir.statement.LoadStmt(param, new VarRefStatevar(var));
+    } else {
+      throw new RuntimeException("not yet implemented: " + obj);
     }
-    throw new RuntimeException("not yet implemented: " + obj);
   }
 
   @Override
   protected VariableGeneratorStmt visitNumber(Number obj, pir.other.SsaVariable param) {
-    pir.type.Type type = converter.kbi.getRangeType(obj.getValue(),obj.getValue());
-    pir.expression.Number num = new pir.expression.Number(obj.getValue(),new TypeRef(type));
+    pir.type.Type type = converter.kbi.getRangeType(obj.getValue(), obj.getValue());
+    pir.expression.Number num = new pir.expression.Number(obj.getValue(), new TypeRef(type));
     return new pir.statement.Assignment(param, num);
   }
 

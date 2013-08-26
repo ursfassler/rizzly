@@ -49,7 +49,9 @@ abstract public class PirValueReplacer<R, P> extends DefTraverser<R, P> {
 
   @Override
   protected R visitStoreStmt(StoreStmt obj, P param) {
-    throw new RuntimeException("not yet implemented");
+    obj.setSrc(replace(obj.getSrc(), param));
+    obj.setDst(replace(obj.getDst(), param));
+    return super.visitStoreStmt(obj, param);
   }
 
   @Override
@@ -109,7 +111,8 @@ abstract public class PirValueReplacer<R, P> extends DefTraverser<R, P> {
 
   @Override
   protected R visitLoadStmt(LoadStmt obj, P param) {
-    throw new RuntimeException("not yet implemented");
+    obj.setSrc(replace(obj.getSrc(),param));
+    return super.visitLoadStmt(obj, param);
   }
 
   @Override
