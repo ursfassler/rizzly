@@ -14,14 +14,14 @@ component
     implementation hfsm(A)
     
     var
-      a : U{8};
+      a : R{0,100};
     
     entry
       a := 0;
     end
     
     function foo:Boolean
-      a := a + 1;
+      a := 42;
       return a > 10;
     end
     

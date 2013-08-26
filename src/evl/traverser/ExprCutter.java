@@ -10,6 +10,7 @@ import common.NameFactory;
 import evl.Evl;
 import evl.NullTraverser;
 import evl.cfg.BasicBlock;
+import evl.cfg.CaseGoto;
 import evl.cfg.IfGoto;
 import evl.composition.ImplComposition;
 import evl.expression.ArithmeticOp;
@@ -228,22 +229,36 @@ class StmtTraverser extends ExprReplacer<List<Statement>> {
   }
 
   @Override
-  protected Expression visitIfGoto(IfGoto obj, List<Statement> param) {
+  protected Expression visitCaseGoto(CaseGoto obj, List<Statement> param) {
+    if (needExtract(obj.getCondition())) {
+      SsaVariable var = extract(obj.getCondition(), param);
+      obj.setCondition(new Reference(obj.getInfo(), var));
+    } else {
+      super.visitCaseGoto(obj, param);
+    }
+    return null;
+  }
+
+  private boolean needExtract(Expression condition) {
     boolean doChange;
-    if (obj.getCondition() instanceof Reference) {
-      Reference ref = (Reference) obj.getCondition();
+    if (condition instanceof Reference) {
+      Reference ref = (Reference) condition;
       doChange = !(ref.getLink() instanceof Variable);
     } else {
       doChange = true;
     }
-    if (doChange) {
+    return doChange;
+  }
+
+  @Override
+  protected Expression visitIfGoto(IfGoto obj, List<Statement> param) {
+    if (needExtract(obj.getCondition())) {
       SsaVariable var = extract(obj.getCondition(), param);
       obj.setCondition(new Reference(obj.getInfo(), var));
     } else {
       super.visitIfGoto(obj, param);
     }
     return null;
-
   }
 
   @Override

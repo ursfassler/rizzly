@@ -12,8 +12,10 @@ import common.ElementInfo;
 
 import evl.Evl;
 import evl.NullTraverser;
+import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
-import evl.cfg.ReturnExpr;
+import evl.cfg.Goto;
+import evl.cfg.ReturnVoid;
 import evl.copy.Copy;
 import evl.expression.Expression;
 import evl.expression.reference.RefCall;
@@ -38,7 +40,6 @@ import evl.other.Named;
 import evl.other.Namespace;
 import evl.statement.CallStmt;
 import evl.statement.Statement;
-import evl.variable.FuncVariable;
 import evl.variable.Variable;
 import fun.hfsm.State;
 
@@ -136,9 +137,18 @@ public class CompositionReduction extends NullTraverser<Named, Void> {
   private Reference makeEntryExitFunc(String name, ListOfNamed<FunctionBase> list) {
     ElementInfo info = new ElementInfo();
     FuncPrivateVoid func = new FuncPrivateVoid(info, name, new ListOfNamed<Variable>());
-    func.setBody(new BasicBlockList(info));
+    func.setBody(makeEmptyBody(info));
     list.add(func);
     return new Reference(info, func);
+  }
+
+  static private BasicBlockList makeEmptyBody(ElementInfo info) {
+    BasicBlock entryBb = new BasicBlock(info, "BB_entry");
+    BasicBlock exitBb = new BasicBlock(info, "BB_exit");
+    entryBb.setEnd(new Goto(info, exitBb));
+    exitBb.setEnd(new ReturnVoid(info));
+    BasicBlockList body = new BasicBlockList(info,entryBb,exitBb);
+    return body;
   }
 
   public List<FunctionBase> genFunctions(List<Endpoint> conset, ListOfNamed<? extends FunctionBase> functions, Class<? extends FunctionBase> kindVoid, Class<? extends FunctionBase> kindRet) {
@@ -151,16 +161,26 @@ public class CompositionReduction extends NullTraverser<Named, Void> {
       if (ptoto instanceof FuncWithReturn) {
         ((FuncWithReturn) impl).setRet(((FuncWithReturn) ptoto).getRet());
       }
-
-      BasicBlockList body = new BasicBlockList(new ElementInfo());
+      
+      ElementInfo info = new ElementInfo();
+      BasicBlock entryBb = new BasicBlock(info, "BB_entry");
+      BasicBlock callsBb = new BasicBlock(info, "BB_calls");
+      BasicBlock exitBb = new BasicBlock(info, "BB_exit");
+      entryBb.setEnd(new Goto(info, callsBb));
+      callsBb.setEnd(new Goto(info, exitBb));
+      exitBb.setEnd(new ReturnVoid(info));
+      
+      BasicBlockList body = new BasicBlockList(info,entryBb,exitBb);
+      body.getBasicBlocks().add(callsBb);
       ((FuncWithBody) impl).setBody(body);
 
       for (Endpoint con : conset) {
         Statement call = makeCall(con, impl);
-        body.getStatements().add(call);
-        if (call instanceof ReturnExpr) {
-          assert (conset.size() == 1); // FIXME typechecker should find this
-        }
+        callsBb.getCode().add(call);
+        //FIXME reimplement
+//        if (call instanceof ReturnExpr) {
+//          assert (conset.size() == 1); // FIXME typechecker should find this
+//        }
       }
 
       ret.add(impl);
@@ -173,7 +193,7 @@ public class CompositionReduction extends NullTraverser<Named, Void> {
     ref.getOffset().add(new RefName(ep.getInfo(), func.getName()));
 
     List<Expression> actparam = new ArrayList<Expression>();
-    for (FuncVariable var : func.getParam()) {
+    for (Variable var : func.getParam()) {
       actparam.add(new Reference(func.getInfo(), var));
     }
 
@@ -181,7 +201,8 @@ public class CompositionReduction extends NullTraverser<Named, Void> {
     ref.getOffset().add(call);
 
     if (func instanceof FuncWithReturn) {
-      return new ReturnExpr(func.getInfo(), ref);
+      throw new RuntimeException("not implemented");
+//      return new ReturnExpr(func.getInfo(), ref);
     } else {
       return new CallStmt(func.getInfo(), ref);
     }

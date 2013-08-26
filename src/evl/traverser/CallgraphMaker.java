@@ -75,6 +75,7 @@ public class CallgraphMaker extends DefTraverser<Void, Evl> {
       }
 
       for (FunctionBase head : target) {
+        callgraph.addVertex(head);
         callgraph.addEdge(param, head);
       }
     }

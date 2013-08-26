@@ -135,20 +135,12 @@ public class Main {
     { // reducing Range and boolean to nosign type
       RangeConverter.process(prog, kb);
       RangeReplacer.process(prog);
-
-      LlvmWriter.print(prog, debugdir + "typeext.ll", true);
-
-//      { // replace boolean types
-//        KnowBaseItem kbi = kb.getEntry(KnowBaseItem.class);
-//        Map<BooleanType, UnsignedType> map = new HashMap<BooleanType, UnsignedType>();
-//        map.put(kbi.getBooleanType(), kbi.getUnsignedType(1));
-//        Relinker.process(prog, map);
-//      }
-
       TypecastReplacer.process(prog);
       StmtSignSetter.process(prog);
       LlvmIntTypeReplacer.process(prog, kb);
     }
+
+    LlvmWriter.print(prog, debugdir + "typeext.ll", true);
 
     CaseReduction.process(prog);
 

@@ -5,6 +5,8 @@ import java.util.Map;
 import common.ElementInfo;
 import common.NameFactory;
 
+import error.ErrorType;
+import error.RError;
 import evl.DefTraverser;
 import evl.Evl;
 import evl.cfg.BasicBlock;
@@ -76,10 +78,15 @@ class Narrower extends DefTraverser<Void, Void> {
     // TODO enumerator and boolean should also be allowed
     // TODO check somewhere if case values are disjunct
 
-    assert (obj.getCondition() instanceof Reference);
+    if( !(obj.getCondition() instanceof Reference) ){
+      RError.err(ErrorType.Hint, obj.getCondition().getInfo(), "can only do range analysis on local variables" );
+      return null;
+    }
     Reference ref = (Reference) obj.getCondition();
-    assert (ref.getOffset().isEmpty());
-    assert (ref.getLink() instanceof SsaVariable);
+    if( !ref.getOffset().isEmpty() || !(ref.getLink() instanceof SsaVariable) ){
+      RError.err(ErrorType.Hint, obj.getCondition().getInfo(), "can only do range analysis on local variables" );
+      return null;
+    }
     SsaVariable var = (SsaVariable) ref.getLink();
     Range varType = (Range) var.getType().getRef();
 
