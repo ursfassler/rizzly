@@ -17,16 +17,18 @@ import evl.other.Namespace;
 
 /**
  * Returns a callgraph of the entire (sub-) tree
- *
+ * 
  * @author urs
- *
+ * 
  */
 public class DesCallgraphMaker extends DefTraverser<Void, Designator> {
   private SimpleGraph<Designator> callgraph = new SimpleGraph<Designator>();
 
   public static SimpleGraph<Designator> make(ImplElementary inst) {
     DesCallgraphMaker reduction = new DesCallgraphMaker();
-    reduction.traverse(inst, new Designator());
+    Designator root = new Designator(inst.getName());
+    reduction.callgraph.addVertex(root);
+    reduction.traverse(inst, root);
     return reduction.callgraph;
   }
 

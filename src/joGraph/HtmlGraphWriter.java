@@ -5,26 +5,23 @@
 
 package joGraph;
 
-
 import java.util.List;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.jgrapht.Graph;
 
-import util.Pair;
-import util.SimpleGraph;
-
-abstract public class HtmlGraphWriter<T> {
+abstract public class HtmlGraphWriter<T, E> {
   private Writer wr;
   private int rows = -1;
   private static final String[] style = { "solid", "dashed", "dotted", "invis", "bold", "tapered" };
 
-  public void print(SimpleGraph<T> g) {
+  public void print(Graph<T, E> g) {
     wrHeader();
     for (T v : g.vertexSet()) {
       wrVertex(v);
     }
-    for (Pair<T, T> e : g.edgeSet()) {
-      wrEdge(e.first, e.second, 0);
+    for (E e : g.edgeSet()) {
+      wrEdge(g.getEdgeSource(e), g.getEdgeTarget(e), 0);
     }
     wrFooter();
   }
@@ -105,8 +102,8 @@ abstract public class HtmlGraphWriter<T> {
   }
 
   protected void wrVertexEnd() {
-    assert( rows >= 0 );
-    if( rows == 0 ){
+    assert (rows >= 0);
+    if (rows == 0) {
       wrRow("");
     }
     rows = -1;

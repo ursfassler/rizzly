@@ -128,7 +128,7 @@ public class MainFun {
     g.addEdge(instVar, root);
     try {
       @SuppressWarnings("resource")
-      HtmlGraphWriter<Named> writer = new HtmlGraphWriter<Named>(new joGraph.Writer(new PrintStream(debugdir))) {
+      HtmlGraphWriter<Named,Pair<Named,Named>> writer = new HtmlGraphWriter<Named,Pair<Named,Named>>(new joGraph.Writer(new PrintStream(debugdir))) {
         @Override
         protected void wrVertex(Named v) {
           wrVertexStart(v);

@@ -28,7 +28,7 @@ import evl.variable.Variable;
  *
  */
 public class CallgraphMaker extends DefTraverser<Void, Evl> {
-  private SimpleGraph<Evl> callgraph = new SimpleGraph<Evl>();
+  private SimpleGraph<Evl> callgraph = new SimpleGraph<Evl>();;
   private KnowledgeBase kb;
 
   public CallgraphMaker(KnowledgeBase kb) {

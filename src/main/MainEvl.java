@@ -12,6 +12,11 @@ import java.util.Map;
 import java.util.Set;
 
 import joGraph.HtmlGraphWriter;
+
+import org.jgrapht.Graph;
+
+import util.GraphHelper;
+import util.Pair;
 import util.SimpleGraph;
 
 import common.Designator;
@@ -103,10 +108,10 @@ public class MainEvl {
     SsaMaker.process(aclasses, kb);
     PrettyPrinter.print(aclasses, debugdir + "ssa.rzy", false);
 
-    RangeNarrower.process( aclasses, kb );
+    RangeNarrower.process(aclasses, kb);
 
     PrettyPrinter.print(aclasses, debugdir + "ssaRanged.rzy", false);
-    
+
     typecheck(aclasses, root, debugdir);
     if (!opt.doLazyModelCheck()) {
       modelCheck(debugdir, aclasses, root, kb);
@@ -164,7 +169,7 @@ public class MainEvl {
     }
     // print(writes, reads, outputs, inputs);
 
-    doTransitiveClosure(cg);
+    GraphHelper.doTransitiveClosure(cg);
 
     writes = doTransStuff(cg, writes);
     reads = doTransStuff(cg, reads);
@@ -203,21 +208,6 @@ public class MainEvl {
       System.out.print("\t");
       System.out.print(header);
       System.out.println();
-    }
-  }
-
-  // TODO do it more elegant (i.e. use provided algorithm)
-  private static <T extends Object> void doTransitiveClosure(SimpleGraph<T> cg) {
-    for (T a : cg.vertexSet()) {
-      int outdeg = 0;
-      while (outdeg != cg.outDegreeOf(a)) {
-        outdeg = cg.outDegreeOf(a);
-        for (T b : cg.getOutVertices(a)) {
-          for (T c : cg.getOutVertices(b)) {
-            cg.addEdge(a, c);
-          }
-        }
-      }
     }
   }
 
@@ -267,7 +257,7 @@ public class MainEvl {
   }
 
   private static void checkRtcViolation(SimpleGraph<Designator> cg, int n, ElementInfo info) {
-    doTransitiveClosure(cg);
+    GraphHelper.doTransitiveClosure(cg);
     for (Designator v : cg.vertexSet()) {
       cg.removeEdge(v, v); // this is not what we are looking for but recursive calls
     }
@@ -285,7 +275,7 @@ public class MainEvl {
         }
       }
     }
-    doTransitiveClosure(compcall);
+    GraphHelper.doTransitiveClosure(compcall);
     ArrayList<String> vs = new ArrayList<String>(compcall.vertexSet());
     Collections.sort(vs);
     for (String v : vs) {
@@ -603,10 +593,10 @@ public class MainEvl {
     return func;
   }
 
-  private static <T extends Evl> void printGraph(String filename, SimpleGraph<T> cg) {
+  private static <T extends Evl> void printGraph(String filename, Graph<T, Pair<T, T>> cg) {
     try {
       @SuppressWarnings("resource")
-      HtmlGraphWriter<T> writer = new HtmlGraphWriter<T>(new joGraph.Writer(new PrintStream(filename))) {
+      HtmlGraphWriter<T, Pair<T, T>> writer = new HtmlGraphWriter<T, Pair<T, T>>(new joGraph.Writer(new PrintStream(filename))) {
         @Override
         protected void wrVertex(T v) {
           wrVertexStart(v);

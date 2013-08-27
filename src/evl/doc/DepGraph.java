@@ -40,12 +40,12 @@ public class DepGraph extends NullTraverser<Void, Void> {
     return depGraph.dep.getGraph();
   }
 
-  public static SimpleGraph<evl.other.Named> build(Set<? extends Named> roots) {
+  public static SimpleGraph<Named> build(Set<? extends Named> roots) {
     DepGraph depGraph = new DepGraph();
     for (Named itr : roots) {
       depGraph.traverse(itr, null);
     }
-    assert( depGraph.dep.getGraph().vertexSet().containsAll(roots) );
+    assert (depGraph.dep.getGraph().vertexSet().containsAll(roots));
     return depGraph.dep.getGraph();
   }
 
@@ -96,7 +96,7 @@ class SubDep extends DefTraverser<Void, Named> {
   protected Void visitTypeRef(TypeRef obj, Named param) {
     g.addVertex(obj.getRef());
     g.addEdge(param, obj.getRef());
-    visit( obj.getRef(), obj.getRef() );
+    visit(obj.getRef(), obj.getRef());
     return super.visitTypeRef(obj, param);
   }
 
@@ -108,10 +108,10 @@ class SubDep extends DefTraverser<Void, Named> {
     Named dst = obj.getLink();
     g.addVertex(dst);
     Scope scope = KnowScope.get(dst);
-    switch (scope) {  //TODO do we need that?
+    switch (scope) { // TODO do we need that?
     case global:
     case privat:
-           g.addEdge(param, obj.getLink());
+      g.addEdge(param, obj.getLink());
       break;
     case local:
       break;
@@ -128,21 +128,21 @@ class SubDep extends DefTraverser<Void, Named> {
   @Override
   protected Void visitIfaceUse(IfaceUse obj, Named param) {
     g.addEdge(param, obj.getLink());
-    visit( obj.getLink(), obj.getLink() );
+    visit(obj.getLink(), obj.getLink());
     return super.visitIfaceUse(obj, param);
   }
 
   @Override
   protected Void visitCompUse(CompUse obj, Named param) {
     g.addEdge(param, obj.getLink());
-    visit( obj.getLink(), obj.getLink() );
+    visit(obj.getLink(), obj.getLink());
     return super.visitCompUse(obj, param);
   }
 
   @Override
   protected Void visitNamedElement(NamedElement obj, Named param) {
-    g.addEdge(param, obj.getType());
-    visit( obj.getType(), obj.getType() );
+    g.addEdge(param, obj.getType().getRef());
+    visit(obj.getType().getRef(), obj.getType().getRef());
     return super.visitNamedElement(obj, param);
   }
 
@@ -158,9 +158,9 @@ class SubDep extends DefTraverser<Void, Named> {
 
   @Override
   protected Void visitVariable(Variable obj, Named param) {
-    visit( obj.getType(), param );
-//    g.addEdge(param, obj.getType());
-//    visit( obj.getType(), obj.getType() );
+    visit(obj.getType(), param);
+    // g.addEdge(param, obj.getType());
+    // visit( obj.getType(), obj.getType() );
     return super.visitVariable(obj, param);
   }
 

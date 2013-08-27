@@ -100,10 +100,10 @@ class SubDep extends DefGTraverser<Void, Named> {
   private SimpleGraph<Named> g;
   private Set<Named> traversed = new HashSet<Named>();
 
-  public SubDep(KnowledgeBase kb, SimpleGraph<Named> g) {
+  public SubDep(KnowledgeBase kb, SimpleGraph<Named> simpleGraph) {
     super();
     this.kb = kb;
-    this.g = g;
+    this.g = simpleGraph;
   }
 
   public SimpleGraph<Named> getGraph() {
@@ -117,7 +117,7 @@ class SubDep extends DefGTraverser<Void, Named> {
         return null;
       }
       traversed.add((Named) obj);
-      g.addVertex((Named) obj);   // otherwise an element with no dependency is not added
+      g.addVertex((Named) obj); // otherwise an element with no dependency is not added
     }
     return super.visit(obj, param);
   }

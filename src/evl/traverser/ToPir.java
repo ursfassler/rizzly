@@ -271,7 +271,8 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   protected pir.type.StructType visitRecordType(RecordType obj, PirObject param) {
     pir.type.StructType struct = new pir.type.StructType(obj.getName());
     for (evl.type.composed.NamedElement elem : obj.getElement()) {
-      NamedElement celem = new NamedElement(elem.getName(), (pir.type.Type) visit(elem.getType(), param));
+      TypeRef type = (TypeRef) visit(elem.getType(), param);
+      NamedElement celem = new NamedElement(elem.getName(), type);
       struct.getElements().add(celem);
     }
     return struct;

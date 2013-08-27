@@ -14,7 +14,8 @@ import java.util.Set;
 import joGraph.HtmlGraphWriter;
 import joGraph.Writer;
 
-import org.jgrapht.alg.TransitiveClosure;
+import org.jgrapht.Graph;
+import org.jgrapht.graph.SimpleDirectedGraph;
 import org.jgrapht.traverse.TopologicalOrderIterator;
 
 import pir.PirObject;
@@ -49,6 +50,7 @@ import pir.traverser.Renamer;
 import pir.traverser.StmtRemover;
 import pir.traverser.TyperefCounter;
 import pir.type.Type;
+import util.GraphHelper;
 import util.Pair;
 import util.SimpleGraph;
 
@@ -184,10 +186,10 @@ public class Main {
         }
       }
 
-      TransitiveClosure.INSTANCE.closeSimpleDirectedGraph(g);
+      GraphHelper.doTransitiveClosure(g);
       printGraph(g, debugdir + "pirdepstmt.gv");
 
-      removable.removeAll(g.getOutVertices(rootDummy));
+      removable.removeAll( g.getOutVertices(rootDummy));
 
       StmtRemover.process(prog, removable);
     }
@@ -214,10 +216,10 @@ public class Main {
     // printFpcHeader(outdir, prg.getName(), cprog);
   }
 
-  private static void printGraph(SimpleGraph<PirObject> g, String filename) {
-    HtmlGraphWriter<PirObject> hgw;
+  private static void printGraph(Graph<PirObject,Pair<PirObject,PirObject>> g, String filename) {
+    HtmlGraphWriter<PirObject,Pair<PirObject,PirObject>> hgw;
     try {
-      hgw = new HtmlGraphWriter<PirObject>(new Writer(new PrintStream(filename))) {
+      hgw = new HtmlGraphWriter<PirObject,Pair<PirObject,PirObject>>(new Writer(new PrintStream(filename))) {
         @Override
         protected void wrVertex(PirObject v) {
           wrVertexStart(v);
@@ -291,7 +293,7 @@ public class Main {
   }
 
   private static void toposort(List<Type> list) {
-    SimpleGraph<Type> g = new SimpleGraph<Type>();
+    SimpleDirectedGraph<Type, Pair<Type, Type>> g =  new SimpleGraph<Type>();
     for (Type u : list) {
       g.addVertex(u);
       List<Type> vs = getDirectUsedTypes(u);
