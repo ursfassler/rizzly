@@ -5,7 +5,7 @@ import common.ElementInfo;
 import evl.expression.Expression;
 import evl.variable.SsaVariable;
 
-public class VarDefInitStmt extends Statement {
+public class VarDefInitStmt extends Statement implements SsaGenerator {
   private SsaVariable variable;
   private Expression init;
 

@@ -24,7 +24,7 @@ import evl.variable.FuncVariable;
 import evl.variable.StateVariable;
 
 //FIXME this class is unsafe as it does not check if a called function reads/writes a state variable (and we use the cached version)
-//FIXME check if a statement (or so) reads/writes a cached global variable and read/write them back
+//FIXME check if a statement calls a function which reads/writes a cached global variable and read/write them back
 @Deprecated
 public class StateVariableExtractor extends DefTraverser<Void, Void> {
   private KnowStateVariableReadWrite ksvrw;
@@ -50,11 +50,6 @@ public class StateVariableExtractor extends DefTraverser<Void, Void> {
     }
     return null;
   }
-
-  // @Override
-  // protected Void visitDefault(Evl obj, Void param) {
-  // throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
-  // }
 
   private void doit(FuncWithBody func) {
     Set<StateVariable> reads = ksvrw.getReads(func);

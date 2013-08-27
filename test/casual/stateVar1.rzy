@@ -1,0 +1,39 @@
+
+interface
+  Tick
+    function tick( x: R{0,10} );
+  end
+  
+component
+  StateVar1
+    input
+      in  : Tick;
+    
+    output
+      out : Tick;
+    
+  implementation elementary
+    
+    var
+      a : R{0,10};
+      
+    entry
+      a := 0;
+    end
+    
+    function inc()
+      a := (a + 1) mod 11;
+    end
+    
+    function in.tick( x: R{0,10} )
+      if a < 10 then
+        a := a + 1;
+      else
+        a := 0;
+      end
+      inc();
+      out.tick( a );
+    end
+    
+  end
+

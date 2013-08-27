@@ -47,7 +47,7 @@ component
     end
     
     function in.tick( x: R{0,255} )
-      f := foo( out1.tack( x ), out2.tack( out3.tack(  x - 10 * 5 ) ), foo( 1, 2, 3) * 3 - x );
+      f := foo( out1.tack( x ), out2.tack( out3.tack(  (x - 10 * 5) mod 100 ) ), foo( 1, 2, 3) * 3 - x );
     end
 
     function in.tack( x: R{0,255} ):R{0,255}

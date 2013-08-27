@@ -8,6 +8,7 @@ import java.util.Set;
 import common.ElementInfo;
 
 import evl.EvlBase;
+import evl.statement.SsaGenerator;
 import evl.variable.SsaVariable;
 import evl.variable.Variable;
 
@@ -15,7 +16,7 @@ import evl.variable.Variable;
  *
  * @author urs
  */
-public class PhiStmt extends EvlBase {
+public class PhiStmt extends EvlBase implements SsaGenerator {
 
   private SsaVariable vardef;
   private Map<BasicBlock, Variable> arg = new HashMap<BasicBlock, Variable>();    //TODO use Reference?

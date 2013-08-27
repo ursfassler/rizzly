@@ -13,6 +13,7 @@ import evl.expression.Relation;
 import evl.expression.UnaryExpression;
 import evl.expression.reference.Reference;
 import evl.knowledge.KnowBaseItem;
+import evl.knowledge.KnowWriter;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.type.Type;
@@ -24,12 +25,14 @@ import evl.variable.Variable;
 public class RangeGetter extends NullTraverser<Void, Void> {
   private KnowledgeBase kb;
   private KnowBaseItem kbi;
+  private KnowWriter kw;
   private Map<SsaVariable, Range> ranges = new HashMap<SsaVariable, Range>();
 
   public RangeGetter(KnowledgeBase kb) {
     super();
     this.kb = kb;
     kbi = kb.getEntry(KnowBaseItem.class);
+    kw = kb.getEntry(KnowWriter.class);
   }
 
   //TODO follow ssa variables
@@ -58,6 +61,8 @@ public class RangeGetter extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitRelation(Relation obj, Void param) {
+    
+    
     {
       SsaVariable lv = getDerefVar(obj.getLeft());
       if (lv != null) {
@@ -113,6 +118,10 @@ public class RangeGetter extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitReference(Reference obj, Void param) {
+    assert( obj.getOffset().isEmpty() );
+    assert( obj.getLink() instanceof SsaVariable );
+    Expression writer = kw.get( (SsaVariable)obj.getLink() );
+    visit( writer, null );
     return null;
   }
 

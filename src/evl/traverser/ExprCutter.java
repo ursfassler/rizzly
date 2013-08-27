@@ -139,7 +139,8 @@ class StmtTraverser extends ExprReplacer<List<Statement>> {
 
   private FuncVariable extract(Expression obj, List<Statement> param) {
     ElementInfo info = obj.getInfo();
-    FuncVariable var = new FuncVariable(info, NameFactory.getNew(), new TypeRef(obj.getInfo(), getType(obj)));
+    Type type = getType(obj);
+    FuncVariable var = new FuncVariable(info, NameFactory.getNew(), new TypeRef(obj.getInfo(), type));
     param.add(new VarDefStmt(info, var));
     param.add(new Assignment(info, new Reference(info, var), obj));
     return var;

@@ -1,6 +1,7 @@
 package evl.passes;
 
 import java.util.Map;
+import java.util.Set;
 
 import common.ElementInfo;
 import common.NameFactory;
@@ -9,6 +10,7 @@ import error.ErrorType;
 import error.RError;
 import evl.DefTraverser;
 import evl.Evl;
+import evl.NullTraverser;
 import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
 import evl.cfg.CaseGoto;
@@ -17,11 +19,15 @@ import evl.cfg.IfGoto;
 import evl.expression.Expression;
 import evl.expression.TypeCast;
 import evl.expression.reference.Reference;
+import evl.knowledge.KnowSsaUsage;
 import evl.knowledge.KnowledgeBase;
+import evl.statement.SsaGenerator;
+import evl.statement.Statement;
 import evl.statement.VarDefInitStmt;
 import evl.traverser.VariableReplacer;
 import evl.traverser.range.CaseRangeUpdater;
 import evl.traverser.range.RangeGetter;
+import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.type.TypeRef;
 import evl.type.base.Range;
 import evl.variable.SsaVariable;
@@ -55,10 +61,14 @@ public class RangeNarrower extends DefTraverser<Void, Void> {
 
 class Narrower extends DefTraverser<Void, Void> {
   private KnowledgeBase kb;
+  private KnowSsaUsage ksu;
+  private StmtUpdater su;
 
   public Narrower(KnowledgeBase kb) {
     super();
     this.kb = kb;
+    ksu = kb.getEntry(KnowSsaUsage.class);
+    su = new StmtUpdater(kb);
   }
 
   private Map<SsaVariable, Range> getRanges(Expression condition) {
@@ -78,13 +88,13 @@ class Narrower extends DefTraverser<Void, Void> {
     // TODO enumerator and boolean should also be allowed
     // TODO check somewhere if case values are disjunct
 
-    if( !(obj.getCondition() instanceof Reference) ){
-      RError.err(ErrorType.Hint, obj.getCondition().getInfo(), "can only do range analysis on local variables" );
+    if (!(obj.getCondition() instanceof Reference)) {
+      RError.err(ErrorType.Hint, obj.getCondition().getInfo(), "can only do range analysis on local variables");
       return null;
     }
     Reference ref = (Reference) obj.getCondition();
-    if( !ref.getOffset().isEmpty() || !(ref.getLink() instanceof SsaVariable) ){
-      RError.err(ErrorType.Hint, obj.getCondition().getInfo(), "can only do range analysis on local variables" );
+    if (!ref.getOffset().isEmpty() || !(ref.getLink() instanceof SsaVariable)) {
+      RError.err(ErrorType.Hint, obj.getCondition().getInfo(), "can only do range analysis on local variables");
       return null;
     }
     SsaVariable var = (SsaVariable) ref.getLink();
@@ -126,6 +136,53 @@ class Narrower extends DefTraverser<Void, Void> {
     VarDefInitStmt ass = new VarDefInitStmt(var.getInfo(), newVar, initExpr);
     startBb.getCode().add(0, ass);
     VariableReplacer.replace(startBb, 1, var, newVar);
+
+    Set<Statement> use = ksu.get(newVar);
+    for (Statement stmt : use) {
+      update(stmt);
+    }
+  }
+
+  // FIXME a bit messy, clean it up
+  // follow variable usage until no more range can be narrowed
+  private void update(Statement stmt) {
+    if (su.traverse(stmt, null)) {
+      if (stmt instanceof SsaGenerator) {
+        SsaVariable var = ((SsaGenerator) stmt).getVariable();
+        Set<Statement> use = ksu.get(var);
+        for (Statement substmt : use) {
+          update(substmt);
+        }
+      }
+    }
+  }
+
+}
+
+class StmtUpdater extends NullTraverser<Boolean, Void> {
+
+  private KnowledgeBase kb;
+
+  public StmtUpdater(KnowledgeBase kb) {
+    super();
+    this.kb = kb;
+  }
+
+  @Override
+  protected Boolean visitDefault(Evl obj, Void param) {
+    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+  }
+
+  @Override
+  protected Boolean visitVarDefInitStmt(VarDefInitStmt obj, Void param) {
+    Range type = (Range) ExpressionTypeChecker.process(obj.getInit(), kb);
+    type = Range.narrow(type, (Range) obj.getVariable().getType().getRef());
+    if (obj.getVariable().getType().getRef() != type) {
+      obj.getVariable().getType().setRef(type);
+      return true;
+    } else {
+      return false;
+    }
   }
 
 }
