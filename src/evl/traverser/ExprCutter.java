@@ -34,11 +34,12 @@ import evl.other.Namespace;
 import evl.statement.Assignment;
 import evl.statement.Statement;
 import evl.statement.VarDefInitStmt;
+import evl.statement.VarDefStmt;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.base.Range;
-import evl.variable.SsaVariable;
+import evl.variable.FuncVariable;
 import evl.variable.Variable;
 
 //TODO also split relation operands (only ref to var or constant)
@@ -91,14 +92,6 @@ public class ExprCutter extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitImplElementary(ImplElementary obj, Void param) {
-    visitItr(obj.getInternalFunction(), param);
-    visitItr(obj.getInputFunc(), param);
-    visitItr(obj.getSubComCallback(), param);
-    return null;
-  }
-
-  @Override
   protected Void visitFunctionBase(FunctionBase obj, Void param) {
     if (obj instanceof FuncWithBody) {
       st.traverse(obj, null);
@@ -107,8 +100,16 @@ public class ExprCutter extends NullTraverser<Void, Void> {
   }
 
   @Override
+  protected Void visitImplElementary(ImplElementary obj, Void param) {
+    visitItr(obj.getInternalFunction(), param);
+    visitItr(obj.getInputFunc(), param);
+    visitItr(obj.getSubComCallback(), param);
+    return null;
+  }
+
+  @Override
   protected Void visitImplComposition(ImplComposition obj, Void param) {
-    throw new RuntimeException("not yet implemented");
+    return null;
   }
 
 }
@@ -136,10 +137,11 @@ class StmtTraverser extends ExprReplacer<List<Statement>> {
     return type;
   }
 
-  private SsaVariable extract(Expression obj, List<Statement> param) {
+  private FuncVariable extract(Expression obj, List<Statement> param) {
     ElementInfo info = obj.getInfo();
-    SsaVariable var = new SsaVariable(info, NameFactory.getNew(), new TypeRef(obj.getInfo(), getType(obj)));
-    param.add(new VarDefInitStmt(info, var, obj));
+    FuncVariable var = new FuncVariable(info, NameFactory.getNew(), new TypeRef(obj.getInfo(), getType(obj)));
+    param.add(new VarDefStmt(info, var));
+    param.add(new Assignment(info, new Reference(info, var), obj));
     return var;
   }
 
@@ -175,7 +177,7 @@ class StmtTraverser extends ExprReplacer<List<Statement>> {
       visit(itr, param);
       ret.getOffset().add(itr);
       if ((i < olist.size() - 1) && (itr instanceof RefCall)) {
-        SsaVariable var = extract(ret, param);
+        FuncVariable var = extract(ret, param);
         ret = new Reference(itr.getInfo(), var);
       }
     }
@@ -186,7 +188,7 @@ class StmtTraverser extends ExprReplacer<List<Statement>> {
   protected Expression visitRefIndex(RefIndex obj, List<Statement> param) {
     super.visitRefIndex(obj, param);
     if (cd.traverse(obj.getIndex(), null)) {
-      SsaVariable var = extract(obj.getIndex(), param);
+      FuncVariable var = extract(obj.getIndex(), param);
       obj.setIndex(new Reference(obj.getInfo(), var));
     }
     return null;
@@ -198,7 +200,7 @@ class StmtTraverser extends ExprReplacer<List<Statement>> {
     for (int i = 0; i < obj.getActualParameter().size(); i++) {
       Expression expr = obj.getActualParameter().get(i);
       if (cd.traverse(expr, null)) {
-        SsaVariable var = extract(expr, param);
+        FuncVariable var = extract(expr, param);
         obj.getActualParameter().set(i, new Reference(obj.getInfo(), var));
       }
     }
@@ -215,7 +217,7 @@ class StmtTraverser extends ExprReplacer<List<Statement>> {
     obj.setLeft(visit(obj.getLeft(), param));
     obj.setRight(visit(obj.getRight(), param));
 
-    SsaVariable var = extract(obj, param);// TODO needed?
+    FuncVariable var = extract(obj, param);// TODO needed?
 
     return new Reference(obj.getInfo(), var);
   }
@@ -224,14 +226,14 @@ class StmtTraverser extends ExprReplacer<List<Statement>> {
   protected Expression visitRelation(Relation obj, List<Statement> param) {
     obj.setLeft(visit(obj.getLeft(), param));
     obj.setRight(visit(obj.getRight(), param));
-    SsaVariable var = extract(obj, param);
+    FuncVariable var = extract(obj, param);
     return new Reference(obj.getInfo(), var);
   }
 
   @Override
   protected Expression visitCaseGoto(CaseGoto obj, List<Statement> param) {
     if (needExtract(obj.getCondition())) {
-      SsaVariable var = extract(obj.getCondition(), param);
+      FuncVariable var = extract(obj.getCondition(), param);
       obj.setCondition(new Reference(obj.getInfo(), var));
     } else {
       super.visitCaseGoto(obj, param);
@@ -253,7 +255,7 @@ class StmtTraverser extends ExprReplacer<List<Statement>> {
   @Override
   protected Expression visitIfGoto(IfGoto obj, List<Statement> param) {
     if (needExtract(obj.getCondition())) {
-      SsaVariable var = extract(obj.getCondition(), param);
+      FuncVariable var = extract(obj.getCondition(), param);
       obj.setCondition(new Reference(obj.getInfo(), var));
     } else {
       super.visitIfGoto(obj, param);

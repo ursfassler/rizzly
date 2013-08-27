@@ -32,6 +32,7 @@ public class RangeGetter extends NullTraverser<Void, Void> {
     kbi = kb.getEntry(KnowBaseItem.class);
   }
 
+  //TODO follow ssa variables
   public static Map<SsaVariable, Range> getRange(Expression condition, KnowledgeBase kb) {
     RangeGetter updater = new RangeGetter(kb);
     updater.traverse(condition, null);

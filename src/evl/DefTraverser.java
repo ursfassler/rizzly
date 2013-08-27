@@ -182,8 +182,8 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitAssignment(Assignment obj, P param) {
-    visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
+    visit(obj.getLeft(), param);
     return null;
   }
 

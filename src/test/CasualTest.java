@@ -16,6 +16,11 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  public void stateVar() {
+    compile("stateVar", "StateVar", true, DEBUG_EVENT, false);
+  }
+
+  @Test
   public void range() {
     compile("range", "Range", true, DEBUG_EVENT, false);
   }

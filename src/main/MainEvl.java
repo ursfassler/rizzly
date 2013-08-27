@@ -80,6 +80,7 @@ import evl.traverser.NamespaceReduction;
 import evl.traverser.OutsideReaderInfo;
 import evl.traverser.OutsideWriterInfo;
 import evl.traverser.SsaMaker;
+import evl.traverser.StateVariableExtractor;
 import evl.traverser.debug.CompCascadeDepth;
 import evl.traverser.debug.DebugIfaceAdder;
 import evl.traverser.debug.MsgNamesGetter;
@@ -104,6 +105,9 @@ public class MainEvl {
   public static RizzlyProgram doEvl(ClaOption opt, String debugdir, Namespace aclasses, Component root) {
     KnowledgeBase kb = new KnowledgeBase(aclasses, debugdir);
 
+    ExprCutter.process(aclasses, kb);
+    StateVariableExtractor.process(aclasses,kb);
+    
     PrettyPrinter.print(aclasses, debugdir + "ast.rzy", false);
     SsaMaker.process(aclasses, kb);
     PrettyPrinter.print(aclasses, debugdir + "ssa.rzy", false);
@@ -125,10 +129,6 @@ public class MainEvl {
 
     // only for debugging
     // typecheck(classes, debugdir);
-
-    // TODO or before type check?
-    ExprCutter.process(aclasses, kb);
-    PrettyPrinter.print(aclasses, debugdir + "expr.rzy", true);
 
     if (opt.doDebugEvent()) {
       addDebug(aclasses, (ImplElementary) root, debugdir);

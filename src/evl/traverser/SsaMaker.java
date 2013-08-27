@@ -27,7 +27,6 @@ import evl.expression.reference.Reference;
 import evl.function.FuncWithBody;
 import evl.function.FunctionBase;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
 import evl.statement.Assignment;
 import evl.statement.CallStmt;
 import evl.statement.Statement;
@@ -45,9 +44,9 @@ public class SsaMaker extends DefTraverser<Void, Void> {
     this.kb = kb;
   }
 
-  static public void process(Namespace aclasses, KnowledgeBase kb) {
+  static public void process(Evl evl, KnowledgeBase kb) {
     SsaMaker mbb = new SsaMaker(kb);
-    mbb.traverse(aclasses, null);
+    mbb.traverse(evl, null);
   }
 
   @Override
@@ -214,7 +213,7 @@ class SsaVarCreator extends NullTraverser<Void, List<Statement>> {
 
   @Override
   protected Void visitBasicBlockList(BasicBlockList obj, List<Statement> param) {
-    visitItr(obj.getAllBbs(),null);
+    visitItr(obj.getAllBbs(), null);
     return null;
   }
 
@@ -245,7 +244,7 @@ class SsaVarCreator extends NullTraverser<Void, List<Statement>> {
     param.add(obj);
     return null;
   }
-
+  
   @Override
   protected Void visitVarDef(VarDefStmt obj, List<Statement> param) {
     param.add(obj);
