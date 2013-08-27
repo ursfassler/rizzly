@@ -8,7 +8,7 @@ component
     implementation elementary
 
     var
-      blaBla : Array{Answer,U{8}};
+      blaBla : Array{Answer,R{0,255}};
 
 
   end

@@ -1,23 +1,23 @@
 type
   Rec = Record
-    s0    : U{0};
-    s8a   : U{1};
-    s8b   : U{2};
-    s8c   : U{4};
-    s8d   : U{7};
-    s8e   : U{8};
-    s16a  : U{9};
-    s16b  : U{15};
-    s32a  : U{17};
-    s32b  : U{24};
-    s64   : U{33};
+    s0    : R{0,0};
+    s8a   : R{0,1};
+    s8b   : R{0,3};
+    s8c   : R{0,15};
+    s8d   : R{0,127};
+    s8e   : R{0,255};
+    s16a  : R{0,511};
+    s16b  : R{0,32767};
+    s32a  : R{0,1131071};
+    s32b  : R{0,16777215};
+    s64   : R{0,8589934591};
   end
   
-  TheArray = Array{10,U{5}};
+  TheArray = Array{10,R{0,31}};
 
 interface  
   Tick
-    function tick( x: U{7} );
+    function tick( x: R{0,127} );
   end
 
 component
@@ -31,11 +31,11 @@ component
     implementation elementary
 
     var
-      count : U{3};
+      count : R{0,7};
       dummy : Rec;
       array : TheArray;
     
-    function tickIn.tick( x: U{7} )
+    function tickIn.tick( x: R{0,127} )
       if x = 0 then
         count := 0;
       else

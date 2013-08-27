@@ -3,8 +3,8 @@ component
 
     implementation elementary
 
-    function foo1( x: U{8} ):U{8}
-      a : U{8};
+    function foo1( x: R{0,255} ):R{0,255}
+      a : R{0,255};
       
       if x > 20 then
         a := 20;
@@ -17,8 +17,8 @@ component
       return a;
     end
 
-    function foo2( x: U{8} ):U{8}
-      a : U{8};
+    function foo2( x: R{0,255} ):R{0,255}
+      a : R{0,255};
       
       if x > 20 then
         a := 20;
@@ -31,8 +31,8 @@ component
       return a;
     end
 
-    function foo3( x: U{8} ):U{8}
-      a : U{8};
+    function foo3( x: R{0,255} ):R{0,255}
+      a : R{0,255};
       
       if x > 20 then
         a := 20;
@@ -45,8 +45,8 @@ component
       return a;
     end
 
-    function foo4( x: U{8} ):U{8}
-      a : U{8};
+    function foo4( x: R{0,255} ):R{0,255}
+      a : R{0,255};
       
       if x > 20 then
        return 20;
@@ -59,7 +59,7 @@ component
       return a;
     end
 
-    function foo5( x: U{8} ):U{8}
+    function foo5( x: R{0,255} ):R{0,255}
       if x > 20 then
         return 20;
       ef x > 10 then
@@ -69,8 +69,8 @@ component
       end
     end
 
-    function foo6( x: U{8} ):U{8}
-      a : U{8};
+    function foo6( x: R{0,255} ):R{0,255}
+      a : R{0,255};
       
       case x of
         20..29:

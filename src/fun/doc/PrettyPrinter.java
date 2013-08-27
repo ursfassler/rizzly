@@ -80,7 +80,6 @@ import fun.type.genfunc.Array;
 import fun.type.genfunc.GenericArray;
 import fun.type.genfunc.GenericRange;
 import fun.type.genfunc.GenericTypeType;
-import fun.type.genfunc.GenericUnsigned;
 import fun.type.genfunc.Range;
 import fun.type.genfunc.TypeType;
 import fun.variable.CompUse;
@@ -486,12 +485,6 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitBooleanType(BooleanType obj, StreamWriter param) {
-    param.wr(obj.getName());
-    return null;
-  }
-
-  @Override
-  protected Void visitGenericUnsigned(GenericUnsigned obj, StreamWriter param) {
     param.wr(obj.getName());
     return null;
   }

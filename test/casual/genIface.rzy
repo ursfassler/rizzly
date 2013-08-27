@@ -5,28 +5,28 @@ component
   GenIface
 
     input
-      in1    : Iface2{U{8}};
-      in2    : Iface2{U{16}};
+      in1    : Iface2{R{0,255}};
+      in2    : Iface2{R{0,65535}};
 
     output
-      out1   : Iface2{U{8}};
-      out2   : Iface2{U{16}};
+      out1   : Iface2{R{0,255}};
+      out2   : Iface2{R{0,65535}};
 
     implementation elementary
 
-    function in1.in( x: U{8} )
+    function in1.in( x: R{0,255} )
       out1.in( x );
     end
 
-    function in1.out():U{8}
+    function in1.out():R{0,255}
       return out1.out();
     end
 
-    function in2.in( x: U{16} )
+    function in2.in( x: R{0,65535} )
       out2.in( x );
     end
 
-    function in2.out():U{16}
+    function in2.out():R{0,65535}
       return out2.out();
     end
 

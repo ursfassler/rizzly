@@ -16,7 +16,7 @@ component
   implementation elementary
 
     var
-      count : U{8};
+      count : R{0,1};
 
     function tickIn.tick()
       count := (count+1) mod 2;

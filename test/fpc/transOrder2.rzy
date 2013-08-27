@@ -2,7 +2,7 @@
 
 interface
   ValueEvent
-    function tick( val: U{8} );
+    function tick( val: R{0,10} );
   end
 
 component
@@ -16,14 +16,14 @@ component
     
   implementation hfsm(A)
     transition 
-      A.AA to A by in.tick( val: U{8} ) do
+      A.AA to A by in.tick( val: R{0,10} ) do
         out.tick( 0 );
       end
       
     state A(AA)
       state AA
         transition 
-          A to A by in.tick( val: U{8} ) do
+          A to A by in.tick( val: R{0,10} ) do
             out.tick( 1 );
           end
       end

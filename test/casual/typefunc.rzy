@@ -18,8 +18,8 @@ component
   Typefunc
     implementation elementary
       var
-        a : U{getBits( 42 )};
-        b : U{8};
-        c : Rec{U{8}};
+        a : R{0,getBits( 42 )};
+        b : R{0,255};
+        c : Rec{R{0,255}};
   end
 

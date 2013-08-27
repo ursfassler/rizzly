@@ -1,6 +1,6 @@
 interface
   Iface
-    function foo():U{8};
+    function foo():R{-20,20};
   end
 
 component  
@@ -13,8 +13,8 @@ component
 
     implementation elementary
  
-    function in.foo():U{8}
-      x : U{8} = out.foo();
+    function in.foo():R{-20,20}
+      x : R{-20,20} = out.foo();
       return x;
     end
   end

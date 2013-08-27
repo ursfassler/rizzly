@@ -1,10 +1,10 @@
 interface
   Iface1
-    function foo( x: Array{10,U{8}} );
+    function foo( x: Array{10,R{0,100}} );
   end
 
   Iface2
-    function foo( x: Array{3,U{8}} );
+    function foo( x: Array{3,R{0,100}} );
   end
   
 component
@@ -18,11 +18,11 @@ component
     implementation elementary
     
     var
-      a : Array{10,U{8}};
+      a : Array{10,R{0,100}};
     
-    function in.foo( x: Array{10,U{8}} )
+    function in.foo( x: Array{10,R{0,100}} )
       a := x;
-      b : Array{3,U{8}};
+      b : Array{3,R{0,100}};
       b[0] := a[0];
       b[1] := a[2];
       b[2] := a[5];

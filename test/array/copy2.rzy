@@ -4,7 +4,7 @@ component
     implementation elementary
 
     function foo()
-      a, b : Array{10,U{8}};
+      a, b : Array{10,R{0,200}};
       b[0] := 1;
       a := b;
     end

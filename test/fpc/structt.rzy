@@ -1,12 +1,12 @@
 type
   Point = Record
-    x : U{8};
-    y : U{8};
+    x : R{0,1000};
+    y : R{0,1000};
   end
 
 interface
   Iface1
-    function foo( x, y: U{8} );
+    function foo( x, y: R{0,1000} );
   end
 
   Iface2
@@ -25,7 +25,7 @@ component
 
     implementation elementary
     
-    function in1.foo( x, y: U{8} )
+    function in1.foo( x, y: R{0,1000} )
       p : Point;
       p.x := x;
       p.y := y;

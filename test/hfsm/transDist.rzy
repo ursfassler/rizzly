@@ -2,7 +2,7 @@
 
 interface
   ValueEvent
-    function tick( val: U{8} );
+    function tick( val: R{0,255} );
   end
 
 component
@@ -18,31 +18,31 @@ component
   
     state Top(A)
       transition 
-        Top to A by in.tick( val: U{8} ) if val = 0 do
+        Top to A by in.tick( val: R{0,255} ) if val = 0 do
           out.tick( 0 );
         end
         
-        B to A by in.tick( val: U{8} ) if val = 1 do
+        B to A by in.tick( val: R{0,255} ) if val = 1 do
           out.tick( 1 );
         end
       
       state A
         transition 
-          A to Top by in.tick( val: U{8} ) if val = 2 do
+          A to Top by in.tick( val: R{0,255} ) if val = 2 do
             out.tick( 2 );
           end
           
-          Top to A by in.tick( val: U{8} ) if val = 3 do
+          Top to A by in.tick( val: R{0,255} ) if val = 3 do
             out.tick( 3 );
           end
       end
 
       transition 
-        A to A by in.tick( val: U{8} ) if val = 4 do
+        A to A by in.tick( val: R{0,255} ) if val = 4 do
           out.tick( 4 );
         end
         
-        Top to B by in.tick( val: U{8} ) do
+        Top to B by in.tick( val: R{0,255} ) do
           out.tick( 5 );
         end
       

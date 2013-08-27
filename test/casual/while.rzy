@@ -1,12 +1,12 @@
 type
   Point = Record
-    x : U{8};
-    y : U{8};
+    x : R{0,255};
+    y : R{0,255};
   end
 
 interface
   Iface0
-    function foo( x: U{8} ):Point;
+    function foo( x: R{0,255} ):Point;
   end
 
 component
@@ -20,7 +20,7 @@ component
 
     implementation elementary
 
-    function in.foo( x: U{8} ):Point
+    function in.foo( x: R{0,255} ):Point
       ret : Point;
       ret.x := 0;
       ret.y := 0;

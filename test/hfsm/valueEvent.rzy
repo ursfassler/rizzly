@@ -1,6 +1,6 @@
 
 interface
   ValueEvent
-    function evt( value: U{8} );
+    function evt( value: R{0,255} );
   end
 

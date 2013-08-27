@@ -16,7 +16,7 @@ component
     implementation elementary
     
     var
-      a : Array{10,U{8}};
+      a : Array{10,R{0,10}};
     
     function in.tick()
       return a[out.tick()];

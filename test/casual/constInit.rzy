@@ -5,7 +5,7 @@ function something( x: R{0,255} ):R{0,255}
 end
 
 const
-  Answer : U{8} = something( 42 );
+  Answer : R{0,255} = something( 42 );
 
 component
   ConstInit
@@ -13,38 +13,38 @@ component
     implementation elementary
 
     const
-      BlaBla : U{8} = something( 23 );
-      BluBlu : U{8} = Answer;
-      BleBle : U{Answer} = 1;
-      BloBlo : U{8} = (Answer + 10) / 3;
+      BlaBla : R{0,255} = something( 23 );
+      BluBlu : R{0,255} = Answer;
+      BleBle : R{0,Answer} = 1;
+      BloBlo : R{0,255} = (Answer + 10) / 3;
 
     var
-      a : U{Answer};
-      b : U{Answer+2};
+      a : R{0,Answer};
+      b : R{0,Answer+2};
       
     component
       comp1 : Dummy{1};
       comp2 : Dummy{Answer/2};
 
     function foo()
-      bar : U{8} = Answer;
+      bar : R{0,255} = Answer;
       bar := something( bar );
     end
 
   end
 
-  Dummy{S:U{8}}
+  Dummy{S:R{0,255}}
   
   implementation elementary
   
   const
-    Dodo : U{S} = 1;
-    Dudu : U{8} = S;
-    Dada : U{8} = something(S) - 1;
+    Dodo : R{0,S} = 1;
+    Dudu : R{0,255} = S;
+    Dada : R{-100,100} = something(S) / 2 - 100;
   
   var
-    a	 : U{S};
-    b : U{(S+10)/2};
+    a	 : R{0,S};
+    b : R{0,(S+10)/2};
   
   end
 

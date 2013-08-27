@@ -1,7 +1,7 @@
 
 type
-  Byte = U{8};
-  Word = U{16};
+  Byte = R{0,255};
+  Word = R{0,65535};
   Unsigned{T:Type{Natural}} = T;
   
 interface
@@ -19,7 +19,7 @@ component
     var
       a : Byte;
       b : Word;
-      c : Unsigned{U{32}};
+      c : Unsigned{R{0,4294967295}};
       
     function in.foo()
       a := 0;

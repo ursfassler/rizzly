@@ -31,9 +31,9 @@ component
       end
       
       var
-        c : U{8};
+        c : R{0,255};
 
-      function tuwas( x: U{8} ):U{8}
+      function tuwas( x: R{0,255} ):R{0,255}
         return x;
       end
       

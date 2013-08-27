@@ -1,7 +1,7 @@
 interface
   TimeConfig
-    function getTime():U{17};
-    function time( seconds: U{17} );
+    function getTime():R{0,99};
+    function time( seconds: R{0,99} );
   end
   
 component
@@ -15,9 +15,9 @@ component
     end
     
     var
-      atime   : U{17};
+      atime   : R{0,99};
       
-    function config.getTime():U{17}
+    function config.getTime():R{0,99}
       return atime;
     end
     
@@ -25,7 +25,7 @@ component
     end
     
     transition 
-      Disabled to Disabled by config.time( seconds: U{17} ) if 0 = seconds;
+      Disabled to Disabled by config.time( seconds: R{0,99} ) if 0 = seconds;
     
   end
 

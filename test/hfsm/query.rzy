@@ -2,7 +2,7 @@
 interface
   Iface
     function tick();
-    function read():U{8};
+    function read():R{0,255};
   end
   
 component
@@ -21,18 +21,18 @@ component
     end
       
     state B
-      function in.read():U{8}
+      function in.read():R{0,255}
         return 42;
       end
     end
 
     state C
-      function in.read():U{8}
+      function in.read():R{0,255}
         return 57;
       end
     end
     
-    function in.read():U{8}
+    function in.read():R{0,255}
       return 0;
     end
   

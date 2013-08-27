@@ -80,7 +80,6 @@ import fun.type.genfunc.Array;
 import fun.type.genfunc.GenericArray;
 import fun.type.genfunc.GenericRange;
 import fun.type.genfunc.GenericTypeType;
-import fun.type.genfunc.GenericUnsigned;
 import fun.type.genfunc.Range;
 import fun.type.genfunc.TypeType;
 import fun.variable.CompUse;
@@ -392,11 +391,6 @@ class CopyFun extends Traverser<Fun, Void> {
   @Override
   protected Fun visitGenericArray(GenericArray obj, Void param) {
     throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Fun visitGenericUnsigned(GenericUnsigned obj, Void param) {
-    return new GenericUnsigned();
   }
 
   @Override

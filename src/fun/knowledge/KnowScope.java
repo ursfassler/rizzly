@@ -41,7 +41,6 @@ import fun.type.composed.UnionType;
 import fun.type.genfunc.Array;
 import fun.type.genfunc.GenericArray;
 import fun.type.genfunc.GenericTypeType;
-import fun.type.genfunc.GenericUnsigned;
 import fun.type.genfunc.Range;
 import fun.type.genfunc.TypeType;
 import fun.variable.CompUse;
@@ -71,7 +70,6 @@ public class KnowScope extends KnowledgeEntry {
     global.add(NamedInterface.class);
     global.add(NamedType.class);
     global.add(IntegerType.class);
-    global.add(GenericUnsigned.class);
     global.add(GenericArray.class);
     global.add(Range.class);
     global.add(NaturalType.class);

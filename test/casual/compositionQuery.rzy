@@ -1,7 +1,7 @@
 interface
   Iface
-    function foo( x: U{8}; y: U{13} );
-    function bar( x: U{16} ):U{15};
+    function foo( x: R{0,255}; y: R{0,8191} );
+    function bar( x: R{0,65535} ):R{0,32767};
   end
 
 component
@@ -14,11 +14,11 @@ component
 
     implementation elementary
 
-    function in.foo( x: U{8}; y: U{13} )
+    function in.foo( x: R{0,255}; y: R{0,8191} )
       out.foo( x, y );
     end
 
-    function in.bar( x: U{16} ):U{15}
+    function in.bar( x: R{0,65535} ):R{0,32767}
       return out.bar( x );
     end
     

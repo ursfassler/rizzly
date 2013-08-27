@@ -7,7 +7,7 @@ interface
   end
   
   IfaceQuerry
-    function query():U{8};
+    function query():R{0,100};
   end
   
 component
@@ -28,7 +28,7 @@ component
       bar();
     end
     
-    function in.query():U{8}
+    function in.query():R{0,100}
       foo();
       return 0;
     end

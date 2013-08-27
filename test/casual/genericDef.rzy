@@ -5,7 +5,7 @@ import
 type
   TheRecord{T:Type{Integer}} = Record
     a : T;
-    b : U{8};
+    b : R{0,255};
   end
 
   The2Record{T,R:Type} = Record
@@ -27,7 +27,7 @@ component
 
     component
       sub1 : GenericSub{T};
-      sub2 : GenericSub{U{16}};
+      sub2 : GenericSub{R{0,65535}};
       sub3 : GenericSub{Boolean};
       sub4 : GenericSub{TheRecord{T}};
 

@@ -7,7 +7,7 @@ type
 
 interface
   Iface1
-    function foo( x: U{8} );
+    function foo( x: R{0,100} );
   end
 
   Iface2
@@ -24,7 +24,7 @@ component
 
     implementation elementary
     
-    function in.foo( x: U{8} )
+    function in.foo( x: R{0,100} )
       case x of
         0: out.foo( Color.Red ); end
         1: out.foo( Color.Green ); end

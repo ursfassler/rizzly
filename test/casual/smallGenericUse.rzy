@@ -1,7 +1,7 @@
 type
   TheRecord{T:Type{Natural}} = Record
     a : T;
-    b : U{8};
+    b : R{0,255};
   end
 
   The2Record{T:Type{Natural};R:Type} = Record
@@ -10,7 +10,7 @@ type
   end
 
   The3Record{R:Type} = Record
-    a : U{8};
+    a : R{0,255};
     b : R;
   end
 
@@ -33,8 +33,8 @@ component
     implementation elementary
 
     component
-      gen1 : SmallGeneric{U{8}};
-      gen2 : SmallGeneric{U{16}};
+      gen1 : SmallGeneric{R{0,255}};
+      gen2 : SmallGeneric{R{0,65535}};
     
   end
 

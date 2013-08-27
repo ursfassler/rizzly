@@ -1,6 +1,6 @@
 interface
   Tick
-    function tick( x: U{8} );
+    function tick( x: R{0,50} );
   end
 
 component
@@ -13,7 +13,7 @@ component
       
     implementation elementary
 
-    function tickIn.tick( x: U{8} )
+    function tickIn.tick( x: R{0,50} )
       if (x = 0) = False then
         tickOut.tick( 7 );
       else

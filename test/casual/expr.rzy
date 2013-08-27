@@ -1,14 +1,14 @@
 
 type
   Point = Record
-    x : U{8};
-    y : U{8};
+    x : R{0,255};
+    y : R{0,255};
   end
 
 interface
   Tick
-    function tick( x: U{8} );
-    function tack( x: U{8} ):U{8};
+    function tick( x: R{0,255} );
+    function tack( x: R{0,255} ):R{0,255};
   end
   
   Tack
@@ -31,9 +31,9 @@ component
     
     var
       a : Array{10,Point};
-      f : U{8};
+      f : R{0,255};
     
-    function foo( x, y, z: U{8} ):U{8}
+    function foo( x, y, z: R{0,255} ):R{0,255}
       if x+2 > z-3 then
         a[z*2-y].x := x;
       else
@@ -46,11 +46,11 @@ component
       return x + y * z - a[out1.tack(x)].y * a[out1.tack(y)].x;
     end
     
-    function in.tick( x: U{8} )
+    function in.tick( x: R{0,255} )
       f := foo( out1.tack( x ), out2.tack( out3.tack(  x - 10 * 5 ) ), foo( 1, 2, 3) * 3 - x );
     end
 
-    function in.tack( x: U{8} ):U{8}
+    function in.tack( x: R{0,255} ):R{0,255}
       return f;
     end
 

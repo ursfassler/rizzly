@@ -7,7 +7,7 @@ interface
   end
   
   IfaceQuerry
-    function query():U{8};
+    function query():R{0,100};
   end
   
 component
@@ -21,7 +21,7 @@ component
     implementation hfsm(A)
     
     state A
-      function in.query():U{8}
+      function in.query():R{0,100}
         out.event();
         return 0;
       end

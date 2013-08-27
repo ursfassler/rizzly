@@ -66,7 +66,6 @@ import fun.type.genfunc.Array;
 import fun.type.genfunc.GenericArray;
 import fun.type.genfunc.GenericRange;
 import fun.type.genfunc.GenericTypeType;
-import fun.type.genfunc.GenericUnsigned;
 import fun.type.genfunc.Range;
 import fun.type.genfunc.TypeType;
 import fun.variable.CompUse;
@@ -243,11 +242,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitNamespace(Namespace obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitGenericUnsigned(GenericUnsigned obj, P param) {
     return visitDefault(obj, param);
   }
 

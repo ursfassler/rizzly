@@ -6,7 +6,7 @@ component
 
     state A
       var
-        a : U{8};
+        a : R{0,255};
         
       function tuwas()
         a := a + 1;

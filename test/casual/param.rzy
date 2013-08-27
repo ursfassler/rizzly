@@ -1,10 +1,10 @@
 interface
   Tick
-    function tick( value: U{8} );
+    function tick( value: R{0,1000} );
   end
 
 component
-  Schmitt{Lower,Upper: U{8}}
+  Schmitt{Lower,Upper: R{0,1000}}
     input
       in  : Tick;
       
@@ -13,10 +13,10 @@ component
     state High end
     
     transition
-      Low to High by in.tick( value: U{8} ) do
-        a : U{8} = Upper;
+      Low to High by in.tick( value: R{0,1000} ) do
+        a : R{0,1000} = Upper;
       end
-      High to Low by in.tick( value: U{8} ) if value <= Lower;
+      High to Low by in.tick( value: R{0,1000} ) if value <= Lower;
   end
   
   Param

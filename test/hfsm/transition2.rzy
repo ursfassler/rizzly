@@ -18,7 +18,7 @@ component
     end
 
     transition 
-      A to A by evtIn.evt( value: U{8} ) do
+      A to A by evtIn.evt( value: R{0,255} ) do
         evtOut.evt( value );
       end
   end

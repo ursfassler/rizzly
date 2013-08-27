@@ -1,14 +1,14 @@
 
 type
   Point = Record
-    x : U{8};
-    y : U{8};
+    x : R{0,255};
+    y : R{0,255};
   end
 
 interface
   Iface0
-    function foo( x: U{8} ):Point;
-    function bar( x: U{8} ):U{8};
+    function foo( x: R{0,255} ):Point;
+    function bar( x: R{0,255} ):R{0,255};
   end
 
 

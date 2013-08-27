@@ -1,6 +1,6 @@
 
 const
-  Answer : U{8} = 42;
+  Answer : R{0,99} = 42;
 
 component
   Constdef
@@ -8,10 +8,10 @@ component
     implementation elementary
 
     const
-      BlaBla : U{8} = 23;
+      BlaBla : R{0,99} = 23;
 
     function foo()
-      bar : U{8} = Answer;
+      bar : R{0,99} = Answer;
     end
 
   end

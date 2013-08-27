@@ -14,7 +14,7 @@ component
 
     implementation elementary
 
-    function foo( x: U{8} )
+    function foo( x: R{0,10} )
       z : Weekday = x;
     end
 

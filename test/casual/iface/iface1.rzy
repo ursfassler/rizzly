@@ -1,7 +1,7 @@
 type
   Point = Record
-    x : U{8};
-    y : U{8};
+    x : R{0,255};
+    y : R{0,255};
   end
 
 

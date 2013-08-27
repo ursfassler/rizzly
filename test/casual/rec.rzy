@@ -1,7 +1,7 @@
 type
   Point = Record
-    x : U{8};
-    y : U{8};
+    x : R{0,100};
+    y : R{0,100};
   end
 
 component
@@ -9,7 +9,7 @@ component
 
     implementation elementary
 
-    function foo( x: U{8} ):Point
+    function foo( x: R{0,100} ):Point
       res : Point;
       res.x := x + 3;
       res.y := res.x + 3;

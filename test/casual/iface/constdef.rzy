@@ -1,4 +1,4 @@
 
 const
-  Answer : U{8} = 42;
+  Answer : R{0,255} = 42;
 

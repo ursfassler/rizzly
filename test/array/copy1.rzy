@@ -4,10 +4,10 @@ component
     implementation elementary
 
     var
-      a : Array{10,U{8}};
+      a : Array{10,R{0,200}};
 
     function foo()
-      b : Array{10,U{8}} = a;
+      b : Array{10,R{0,200}} = a;
     end
 
   end

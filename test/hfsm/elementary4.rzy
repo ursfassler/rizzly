@@ -14,11 +14,11 @@ component
 
   implementation elementary
 
-    function sqr( v: U{8} ):U{8}
+    function sqr( v: R{0,200} ):R{0,200}
       return v*v;
     end
 
-    function evtIn.evt( value: U{8} )
+    function evtIn.evt( value: R{0,200} )
       evtOut.evt( sqr( value ) );
     end
   end

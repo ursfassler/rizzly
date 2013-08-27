@@ -15,7 +15,7 @@ interface
   end
 
   Data
-    function data( value: U{8} );
+    function data( value: R{0,50} );
   end
 
 component

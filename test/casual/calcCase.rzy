@@ -1,6 +1,6 @@
 interface
   Tick
-    function tick( data: U{8} );
+    function tick( data: R{0,20} );
   end
 
 component
@@ -14,7 +14,7 @@ component
 
     implementation elementary
 
-    function in.tick( x: U{8} )
+    function in.tick( x: R{0,20} )
       case x+2 of
         0..10:
           out.tick( 2 );
