@@ -32,7 +32,6 @@ import evl.variable.FuncVariable;
 import evl.variable.StateVariable;
 
 //TODO do it for transitions
-
 /**
  * Replaces all state variables used in a function with a cached/local version of it. Writes/Reads them back whenever a
  * called function reads/writes a state variable.
@@ -41,6 +40,7 @@ import evl.variable.StateVariable;
  * 
  */
 public class StateVariableExtractor extends DefTraverser<Void, Void> {
+
   private KnowStateVariableReadWrite ksvrw;
   final private Map<StateVariable, FuncVariable> cache = new HashMap<StateVariable, FuncVariable>();
 
@@ -58,7 +58,7 @@ public class StateVariableExtractor extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visit(Evl obj, Void param) {
-    if (obj instanceof FuncWithBody) {
+    if( obj instanceof FuncWithBody ) {
       doit((FuncWithBody) obj);
     } else {
       super.visit(obj, null);
@@ -72,18 +72,18 @@ public class StateVariableExtractor extends DefTraverser<Void, Void> {
 
     Set<StateVariable> replace = new HashSet<StateVariable>();
 
-    for (StateVariable var : reads) {
-      if (PhiInserter.isScalar(var.getType().getRef())) {
+    for( StateVariable var : reads ) {
+      if( PhiInserter.isScalar(var.getType().getRef()) ) {
         replace.add(var);
       }
     }
-    for (StateVariable var : writes) {
-      if (PhiInserter.isScalar(var.getType().getRef())) {
+    for( StateVariable var : writes ) {
+      if( PhiInserter.isScalar(var.getType().getRef()) ) {
         replace.add(var);
       }
     }
 
-    for (StateVariable var : replace) {
+    for( StateVariable var : replace ) {
       replaceVar(var, func, reads.contains(var), writes.contains(var));
     }
   }
@@ -111,18 +111,17 @@ public class StateVariableExtractor extends DefTraverser<Void, Void> {
       Relinker.relink(func, map);
     }
 
-    if (read) {
+    if( read ) {
       Assignment load = new Assignment(info, new Reference(info, ssa), new Reference(info, var));
       func.getBody().getEntry().getCode().add(0, load);
     }
     VarDefStmt def = new VarDefStmt(info, ssa);
     func.getBody().getEntry().getCode().add(0, def);
-    if (write) {
+    if( write ) {
       Assignment store = new Assignment(info, new Reference(info, var), new Reference(info, ssa));
       func.getBody().getExit().getCode().add(store);
     }
   }
-
 }
 
 /**
@@ -133,6 +132,7 @@ public class StateVariableExtractor extends DefTraverser<Void, Void> {
  * 
  */
 class FuncProtector extends StatementReplacer<FunctionHeader> {
+
   private KnowStateVariableReadWrite ksvrw;
   final private Map<FunctionHeader, Set<StateVariable>> writes = new HashMap<FunctionHeader, Set<StateVariable>>();
   final private Map<FunctionHeader, Set<StateVariable>> reads = new HashMap<FunctionHeader, Set<StateVariable>>();
@@ -145,12 +145,12 @@ class FuncProtector extends StatementReplacer<FunctionHeader> {
     GraphHelper.doTransitiveClosure(g);
     this.ksvrw = kb.getEntry(KnowStateVariableReadWrite.class);
 
-    for (Evl caller : g.vertexSet()) {
-      if (caller instanceof FunctionHeader) {
+    for( Evl caller : g.vertexSet() ) {
+      if( caller instanceof FunctionHeader ) {
         Set<StateVariable> writes = new HashSet<StateVariable>(ksvrw.getWrites((FunctionHeader) caller));
         Set<StateVariable> reads = new HashSet<StateVariable>(ksvrw.getReads((FunctionHeader) caller));
-        for (Evl callee : g.getOutVertices(caller)) {
-          if (callee instanceof FunctionHeader) {
+        for( Evl callee : g.getOutVertices(caller) ) {
+          if( callee instanceof FunctionHeader ) {
             writes.addAll(ksvrw.getWrites((FunctionHeader) callee));
             reads.addAll(ksvrw.getReads((FunctionHeader) callee));
           }
@@ -163,8 +163,8 @@ class FuncProtector extends StatementReplacer<FunctionHeader> {
 
   @Override
   protected List<Statement> visit(Evl obj, FunctionHeader param) {
-    if (obj instanceof FunctionHeader) {
-      assert (param == null);
+    if( obj instanceof FunctionHeader ) {
+      assert ( param == null );
       param = (FunctionHeader) obj;
     }
     return super.visit(obj, param);
@@ -177,7 +177,7 @@ class FuncProtector extends StatementReplacer<FunctionHeader> {
   @Override
   protected List<Statement> visitStatement(Statement obj, FunctionHeader param) {
     FunctionHeader callee = getCallee(obj);
-    if (callee != null) {
+    if( callee != null ) {
       ElementInfo info = obj.getInfo();
 
       Set<StateVariable> used = new HashSet<StateVariable>();
@@ -196,14 +196,21 @@ class FuncProtector extends StatementReplacer<FunctionHeader> {
 
       List<Statement> ret = new ArrayList<Statement>();
 
-      for (StateVariable sv : writeBack) {
+      for( StateVariable sv : writeBack ) {
         Assignment ass = new Assignment(info, new Reference(info, sv), new Reference(info, cache.get(sv)));
         ret.add(ass);
       }
       ret.add(obj);
-      for (StateVariable sv : readBack) {
-        Assignment ass = new Assignment(info, new Reference(info, cache.get(sv)), new Reference(info, sv));
-        ret.add(ass);
+      for( StateVariable sv : readBack ) {
+        FuncVariable cached = cache.get(sv);
+        if( ( obj instanceof Assignment ) && ( ( (Assignment) obj ).getLeft().getLink() == cached ) ) {
+          // we do not reload a cached value if we overwrite the very same value as our call/assignment statement does
+          // not very nice when we handle that case here, maybe we have a better idea in the future
+          // see testcaase casual/StateVar2
+        } else {
+          Assignment ass = new Assignment(info, new Reference(info, cached), new Reference(info, sv));
+          ret.add(ass);
+        }
       }
 
       return ret;
@@ -216,15 +223,14 @@ class FuncProtector extends StatementReplacer<FunctionHeader> {
 
     Set<FunctionHeader> callees = new HashSet<FunctionHeader>();
     getter.traverse(stmt, callees);
-    switch (callees.size()) {
-    case 0:
-      return null;
-    case 1:
-      return callees.iterator().next();
-    default:
-      RError.err(ErrorType.Fatal, stmt.getInfo(), "In this phase is only one call per statement allowed");
-      return null;
+    switch( callees.size() ) {
+      case 0:
+        return null;
+      case 1:
+        return callees.iterator().next();
+      default:
+        RError.err(ErrorType.Fatal, stmt.getInfo(), "In this phase is only one call per statement allowed");
+        return null;
     }
   }
-
 }
