@@ -10,7 +10,6 @@ import evl.type.Type;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumType;
 import evl.type.base.Range;
-import evl.type.base.TypeAlias;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
 import evl.type.special.NaturalType;
@@ -62,11 +61,6 @@ public class Supertype extends NullTraverser<Type, Void> {
   protected Type visitVoidType(VoidType obj, Void param) {
     assert (kbi.getVoidType() == obj);
     return kbi.getVoidType();
-  }
-
-  @Override
-  protected Type visitTypeAlias(TypeAlias obj, Void param) {
-    throw new RuntimeException("not yet implemented");
   }
 
   @Override

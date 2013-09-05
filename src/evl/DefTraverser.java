@@ -71,7 +71,6 @@ import evl.type.base.FunctionTypeRet;
 import evl.type.base.FunctionTypeVoid;
 import evl.type.base.Range;
 import evl.type.base.StringType;
-import evl.type.base.TypeAlias;
 import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
@@ -260,12 +259,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitVoidType(VoidType obj, P param) {
-    return null;
-  }
-
-  @Override
-  protected R visitTypeAlias(TypeAlias obj, P param) {
-    visit(obj.getRef(), param);
     return null;
   }
 

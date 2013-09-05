@@ -38,7 +38,6 @@ import pir.other.PirValue;
 import pir.other.Program;
 import pir.other.SsaVariable;
 import pir.other.StateVariable;
-import pir.statement.ArOp;
 import pir.statement.ArithmeticOp;
 import pir.statement.Assignment;
 import pir.statement.CallAssignment;
@@ -69,7 +68,6 @@ import pir.type.SignedType;
 import pir.type.StringType;
 import pir.type.StructType;
 import pir.type.Type;
-import pir.type.TypeAlias;
 import pir.type.TypeRef;
 import pir.type.UnionType;
 import pir.type.UnsignedType;
@@ -344,17 +342,6 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     return null;
   }
 
-  @Override
-  protected Void visitTypeAlias(TypeAlias obj, StreamWriter param) {
-    param.wr(obj.getName());
-    wrId(obj, param);
-    param.wr(": ");
-    visit(obj.getRef(), param);
-    param.wr(";");
-    param.nl();
-    return null;
-  }
-
   // ---- expression --------------------------------------------------------------------
 
   @Override
@@ -560,9 +547,34 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitArithmeticOp(ArithmeticOp obj, StreamWriter param) {
     wrVarDef(obj, param);
-    param.wr(getOpString(obj.getOp()));
+    String op;
+    String flags;
+    switch (obj.getOp()) {
+    case MINUS:
+      op = "sub";
+      flags = "nuw nsw";
+      break;
+    case PLUS:
+      op = "add";
+      flags = "nuw nsw";
+      break;
+    case AND:
+      op = "and";
+      flags = "";
+      break;
+    case MOD:
+      //TODO does only work if left is unsigned (and right too, of course)
+      op = "urem";
+      flags = "";
+      break;
+    default:
+      RError.err(ErrorType.Warning, "Operand not handled: " + obj.getOp()); // TODO change to fatal error
+      return null;
+    }
+    param.wr(op);
     param.wr(" ");
-    param.wr("nuw nsw "); // TODO ok to set them always?
+    param.wr(flags);
+    param.wr(" ");
 
     visit(obj.getVariable().getType(), param);
 
@@ -573,20 +585,6 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     visit(obj.getRight(), param);
     param.nl();
     return null;
-  }
-
-  private String getOpString(ArOp op) {
-    switch (op) {
-    case MINUS:
-      return "sub";
-    case PLUS:
-      return "add";
-    case AND:
-      return "and";
-    default:
-      RError.err(ErrorType.Warning, "Operand not handled: " + op); // TODO change to fatal error
-      return op.toString();
-    }
   }
 
   @Override

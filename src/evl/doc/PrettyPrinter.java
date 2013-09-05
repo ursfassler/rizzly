@@ -71,7 +71,6 @@ import evl.type.base.BaseType;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.type.base.StringType;
-import evl.type.base.TypeAlias;
 import evl.type.composed.NamedElement;
 import evl.type.composed.NamedElementType;
 import evl.type.composed.RecordType;
@@ -361,12 +360,6 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   // ---- Type ----------------------------------------------------------------
-
-  @Override
-  protected Void visitTypeAlias(TypeAlias obj, StreamWriter param) {
-    visit(obj.getRef(), param);
-    return null;
-  }
 
   @Override
   protected Void visitStringType(StringType obj, StreamWriter param) {

@@ -1,0 +1,44 @@
+type
+  Uni = Union( what )
+    pos  : R{0,10};
+    neg  : R{-10,10};
+  end
+
+interface
+  Data
+    function tick();
+  end
+
+component
+  Union2
+    input
+      in  : Data;
+
+    implementation elementary
+
+    var
+      data : Uni;
+
+    function abs( x: R{-10,10} ):R{0,10}
+      if x < 0 then
+        return -x;
+      else
+        return x;
+      end
+    end
+  
+    function in.tick()
+      x : R{0,10};
+      case data.what of
+        Uni.pos:
+          x := data.pos;
+        end
+        Uni.neg:
+          x := abs( data.neg );
+        end
+      end
+    end
+    
+
+  end
+

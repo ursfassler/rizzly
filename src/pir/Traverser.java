@@ -65,7 +65,6 @@ import pir.type.SignedType;
 import pir.type.StringType;
 import pir.type.StructType;
 import pir.type.Type;
-import pir.type.TypeAlias;
 import pir.type.TypeRef;
 import pir.type.UnionType;
 import pir.type.UnsignedType;
@@ -264,8 +263,6 @@ abstract public class Traverser<R, P> {
       return visitEnumType((EnumType) obj, param);
     else if (obj instanceof VoidType)
       return visitVoidType((VoidType) obj, param);
-    else if (obj instanceof TypeAlias)
-      return visitTypeAlias((TypeAlias) obj, param);
     else if (obj instanceof ArrayType)
       return visitArray((ArrayType) obj, param);
     else if (obj instanceof StringType)
@@ -347,8 +344,6 @@ abstract public class Traverser<R, P> {
   protected abstract R visitFuncVariable(FuncVariable obj, P param);
 
   protected abstract R visitNamedElement(NamedElement obj, P param);
-
-  protected abstract R visitTypeAlias(TypeAlias obj, P param);
 
   protected abstract R visitVoidType(VoidType obj, P param);
 

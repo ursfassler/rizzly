@@ -41,6 +41,7 @@ import fun.other.Namespace;
 import fun.other.RizzlyFile;
 import fun.symbol.SymbolTable;
 import fun.traverser.ClassNameExtender;
+import fun.traverser.DeAlias;
 import fun.traverser.GenfuncParamExtender;
 import fun.traverser.Linker;
 import fun.traverser.Memory;
@@ -114,7 +115,8 @@ public class MainFun {
     DocWriter.print(fileList, new KnowledgeBase(classes, fileList, docdir));
 
     NamedComponent nroot = evaluate(root, classes, debugdir, fileList);
-
+    DeAlias.process( classes );
+    
     PrettyPrinter.print(classes, debugdir + "evaluated.rzy");
     removeUnused(debugdir, classes, nroot, fileList);
     PrettyPrinter.print(classes, debugdir + "stripped.rzy");

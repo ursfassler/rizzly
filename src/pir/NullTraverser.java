@@ -52,7 +52,6 @@ import pir.type.RangeType;
 import pir.type.SignedType;
 import pir.type.StringType;
 import pir.type.StructType;
-import pir.type.TypeAlias;
 import pir.type.TypeRef;
 import pir.type.UnionType;
 import pir.type.UnsignedType;
@@ -109,11 +108,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitNamedElement(NamedElement obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitTypeAlias(TypeAlias obj, P param) {
     return doDefault(obj, param);
   }
 

@@ -62,7 +62,6 @@ import error.RException;
 import evl.doc.StreamWriter;
 import evl.other.Component;
 import evl.type.base.ArrayType;
-import evl.type.base.TypeAlias;
 import evl.type.composed.NamedElement;
 import evl.type.special.VoidType;
 import evl.variable.FuncVariable;
@@ -72,15 +71,13 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-//TODO redo range expansion/shrinking. Maybe already in EVL since we have the type check there.
 //TODO remove unused statements (in evl); this hopefully removes (unused) VarDefStmt OR remove VarDefStmt if not defining an composed type
-//TODO add special first and last BB in BasicBlockList
 
 //TODO add compiler self tests:
 //TODO -- check that no references to old stuff exists (check that parent of every object is in the namespace tree)
 //TODO -- do name randomization and compile to see if references go outside
 
-//TODO add compiler switch to select backend (like --backend=ansic --backend=funHtmlDoc)
+//TODO add compiler switch to select backend (like --backend=llvm --backend=funHtmlDoc)
 
 public class Main {
 

@@ -26,11 +26,7 @@ component
     end
     
     function in.tick( x: R{0,10} )
-      if a < 10 then
-        a := a + 1;
-      else
-        a := 0;
-      end
+      a := (a + 1) mod 11;
       inc();
       out.tick( a );
     end

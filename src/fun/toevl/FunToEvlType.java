@@ -108,7 +108,8 @@ public class FunToEvlType extends NullTraverser<Type, String> {
 
   @Override
   protected Type visitTypeAlias(TypeAlias obj, String param) {
-    return new evl.type.base.TypeAlias(obj.getInfo(), param, FunToEvl.toTypeRef((Reference) fta.traverse(obj.getRef(), null)));
+    RError.err(ErrorType.Fatal, obj.getInfo(), "Alias tyoes should no longer occur");
+    return null;
   }
 
   @Override

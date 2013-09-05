@@ -216,6 +216,7 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
       return kbi.getRangeType(BigInteger.ZERO, high);
     }
     case MOD: {
+      checkPositive("mod", lhs);  //TODO implement mod correctly (and not with 'urem' instruction) and remove this check
       checkPositive("mod", rhs);
       BigInteger high = lhs.getHigh().min(rhs.getHigh().subtract(BigInteger.ONE));
       return kbi.getRangeType(BigInteger.ZERO, high);

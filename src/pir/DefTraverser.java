@@ -52,7 +52,6 @@ import pir.type.RangeType;
 import pir.type.SignedType;
 import pir.type.StringType;
 import pir.type.StructType;
-import pir.type.TypeAlias;
 import pir.type.TypeRef;
 import pir.type.UnionType;
 import pir.type.UnsignedType;
@@ -167,12 +166,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitEnumElement(EnumElement obj, P param) {
-    return null;
-  }
-
-  @Override
-  protected R visitTypeAlias(TypeAlias obj, P param) {
-    visit(obj.getRef(), param);
     return null;
   }
 
