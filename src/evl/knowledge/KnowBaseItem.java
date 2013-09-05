@@ -9,6 +9,7 @@ import error.RError;
 import evl.expression.reference.Reference;
 import evl.other.Named;
 import evl.type.Type;
+import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.Range;
@@ -87,10 +88,10 @@ public class KnowBaseItem extends KnowledgeEntry {
     return ret;
   }
 
-  public ArrayType getArray(int size, Type type) {
-    ArrayType ret = (ArrayType) findItem(ArrayType.makeName(size, type.getName()));
+  public ArrayType getArray(BigInteger size, TypeRef type) {
+    ArrayType ret = (ArrayType) findItem(ArrayType.makeName(size, type));
     if (ret == null) {
-      ret = new ArrayType(size, new Reference(new ElementInfo(), type));
+      ret = new ArrayType(size, type);
       addItem(ret);
     }
     return ret;

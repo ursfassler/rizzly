@@ -94,12 +94,13 @@ public class KnowBaseItem extends KnowledgeEntry {
   }
 
   public ArrayType getArray(BigInteger size, Type type) {
-    ArrayType ret = (ArrayType) findItem(ArrayType.makeName(size, type));
-    if (ret == null) {
-      ret = new ArrayType(size, new Reference(new ElementInfo(), type));
-      addItem(ret);
-    }
-    return ret;
+    throw new RuntimeException("reimplement it");
+//    ArrayType ret = (ArrayType) findItem(ArrayType.makeName(size, type));
+//    if (ret == null) {
+//      ret = new ArrayType(size, new Reference(new ElementInfo(), type));
+//      addItem(ret);
+//    }
+//    return ret;
   }
 
   public StringType getStringType() {

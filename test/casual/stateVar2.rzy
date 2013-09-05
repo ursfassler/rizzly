@@ -1,0 +1,39 @@
+
+interface
+  Tick
+    function tick( x: R{0,10} );
+  end
+  
+component
+  StateVar2
+    input
+      in  : Tick;
+    
+    output
+      out : Tick;
+    
+  implementation elementary
+    
+    var
+      a : R{0,10};
+      
+    entry
+      a := 0;
+    end
+    
+    function addret( x: R{0,10} ):R{0,10}
+      if a < 10 then
+        a := a + 1;
+      else
+        a := 0;
+      end
+      return x;
+    end
+    
+    function in.tick( x: R{0,10} )
+      a := addret( x );
+      out.tick( a );
+    end
+    
+  end
+

@@ -27,6 +27,7 @@ import evl.statement.CallStmt;
 import evl.statement.Statement;
 import evl.type.Type;
 import evl.variable.ConstGlobal;
+import java.math.BigInteger;
 
 
 /**
@@ -149,8 +150,8 @@ class StmtTraverser extends DefTraverser<Void, List<Statement>> {
   private Statement makeCall(FuncPrivateVoid func, int numFunc, int numIface) {
     // Self._sendMsg( numFunc, numIface );
     List<Expression> actParam = new ArrayList<Expression>();
-    actParam.add(new Number(info, numFunc));
-    actParam.add(new Number(info, numIface));
+    actParam.add(new Number(info, BigInteger.valueOf(numFunc)));
+    actParam.add(new Number(info, BigInteger.valueOf( numIface)));
 
     Reference call = new Reference(info, func);
     call.getOffset().add(new RefCall(info, actParam));

@@ -109,18 +109,6 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
-  private pir.type.Type getType(pir.expression.reference.Reference obj) {
-    pir.expression.reference.RefItem item = obj.getRef();
-    return getType(item);
-  }
-
-  private pir.type.Type getType(pir.expression.reference.RefItem item) {
-    assert (item instanceof pir.expression.reference.RefHead);
-    Referencable ref = ((pir.expression.reference.RefHead) item).getRef();
-    assert (ref instanceof pir.type.Type);
-    return (pir.type.Type) ref;
-  }
-
   @Override
   protected PirObject visit(Evl obj, PirObject param) {
     PirObject cobj = map.get(obj);
@@ -172,19 +160,6 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
     // last = (RefItem) visit(itr, last);
     // }
     // return new pir.expression.reference.Reference(last);
-  }
-
-  @Override
-  protected pir.expression.reference.RefCall visitRefCall(RefCall obj, PirObject param) {
-    assert (param != null);
-    assert (param instanceof RefItem);
-    pir.expression.reference.RefCall ret = new pir.expression.reference.RefCall((RefItem) param);
-    for (Expression itr : obj.getActualParameter()) {
-      PirObject arg = visit(itr, param);
-      assert (arg instanceof PExpression);
-      ret.getParameter().add((PExpression) arg);
-    }
-    return ret;
   }
 
   @Override
@@ -258,16 +233,6 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   }
 
   @Override
-  protected PirObject visitUnionType(UnionType obj, PirObject param) {
-    pir.type.UnionType struct = new pir.type.UnionType(obj.getName());
-    for (evl.type.composed.NamedElement elem : obj.getElement()) {
-      NamedElement celem = new NamedElement(elem.getName(), (pir.type.Type) visit(elem.getType(), param));
-      struct.getElements().add(celem);
-    }
-    return struct;
-  }
-
-  @Override
   protected pir.type.StructType visitRecordType(RecordType obj, PirObject param) {
     pir.type.StructType struct = new pir.type.StructType(obj.getName());
     for (evl.type.composed.NamedElement elem : obj.getElement()) {
@@ -321,13 +286,6 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
     return ret;
   }
 
-  @Override
-  protected PirObject visitUnaryExpression(UnaryExpression obj, PirObject param) {
-    PirObject expr = visit(obj.getExpr(), param);
-    assert (expr instanceof PExpression);
-    return new pir.expression.UnaryExpr(toUnOp(obj.getOp()), (PExpression) expr);
-  }
-
   private UnOp toUnOp(UnaryOp op) {
     switch (op) {
     case MINUS:
@@ -336,35 +294,6 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
       return pir.expression.UnOp.NOT;
     default:
       throw new RuntimeException("not yet implemented: " + op);
-    }
-  }
-
-  @Override
-  protected PirObject visitRelation(Relation obj, PirObject param) {
-    PirObject left = visit(obj.getLeft(), param);
-    PirObject right = visit(obj.getRight(), param);
-    assert (left instanceof PExpression);
-    assert (right instanceof PExpression);
-    return new pir.expression.Relation((PExpression) left, (PExpression) right, toRelOp(obj.getOp()));
-  }
-
-  private pir.expression.RelOp toRelOp(RelOp op) {
-    switch (op) {
-    case EQUAL:
-      return pir.expression.RelOp.EQUAL;
-    case NOT_EQUAL:
-      return pir.expression.RelOp.NOT_EQUAL;
-    case LESS:
-      return pir.expression.RelOp.LESS;
-    case LESS_EQUAL:
-      return pir.expression.RelOp.LESS_EQUAL;
-    case GREATER:
-      return pir.expression.RelOp.GREATER;
-    case GREATER_EQUEAL:
-      return pir.expression.RelOp.GREATER_EQUEAL;
-    default: {
-      throw new RuntimeException("not yet implemented: " + op);
-    }
     }
   }
 
@@ -436,12 +365,6 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   protected PirObject visitStringType(StringType obj, PirObject param) {
     pir.type.StringType ret = kbi.getStringType();
     return ret;
-  }
-
-  @Override
-  protected pir.type.Type visitTypeAlias(TypeAlias obj, PirObject param) {
-    pir.type.Type typ = getType((pir.expression.reference.Reference) visit(obj.getRef(), param));
-    return new pir.type.TypeAlias(obj.getName(), typ);
   }
 
   @Override

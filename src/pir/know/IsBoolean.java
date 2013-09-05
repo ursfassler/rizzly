@@ -40,17 +40,17 @@ public class IsBoolean extends NullTraverser<Boolean, Void> {
     return lhs;
   }
 
-  @Override
-  protected Boolean visitUnaryExpr(UnaryExpr obj, Void param) {
-    switch (obj.getOp()) {
-    case MINUS:
-      return false;
-    case NOT:
-      return true;
-    default:
-      throw new RuntimeException("not yet implemented: " + obj.getOp());
-    }
-  }
+//  @Override
+//  protected Boolean visitUnaryExpr(UnaryExpr obj, Void param) {
+//    switch (obj.getOp()) {
+//    case MINUS:
+//      return false;
+//    case NOT:
+//      return true;
+//    default:
+//      throw new RuntimeException("not yet implemented: " + obj.getOp());
+//    }
+//  }
 
   @Override
   protected Boolean visitRelation(Relation obj, Void param) {
@@ -59,7 +59,7 @@ public class IsBoolean extends NullTraverser<Boolean, Void> {
 
   @Override
   protected Boolean visitVariable(Variable obj, Void param) {
-    return test(obj.getType());
+    return test(obj.getType().getRef());
   }
 
   @Override

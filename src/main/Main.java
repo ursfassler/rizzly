@@ -61,8 +61,16 @@ import common.FuncAttr;
 import error.RException;
 import evl.doc.StreamWriter;
 import evl.other.Component;
+import evl.type.base.ArrayType;
+import evl.type.base.TypeAlias;
+import evl.type.composed.NamedElement;
+import evl.type.special.VoidType;
+import evl.variable.FuncVariable;
 import fun.other.Namespace;
 import fun.toevl.FunToEvl;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 
 //TODO redo range expansion/shrinking. Maybe already in EVL since we have the type check there.
 //TODO remove unused statements (in evl); this hopefully removes (unused) VarDefStmt OR remove VarDefStmt if not defining an composed type
@@ -209,11 +217,46 @@ public class Main {
     Renamer.process(prog);
 
     LlvmWriter.print(prog, outdir + prg.getName() + ".ll", false);
+    
+    compileLlvm( outdir + prg.getName() + ".ll", outdir + prg.getName() + ".s" );
 
     // cir.other.Program cprog = makeC(debugdir, prog);
     //
     // printC(outdir, prg.getName(), cprog);
     // printFpcHeader(outdir, prg.getName(), cprog);
+  }
+
+  private static void compileLlvm(String llvmFile, String asmFile) {
+    String cmd = "llc " + llvmFile + " -o " + asmFile;
+    //TODO use strict?
+    try {
+      Process p;
+      p = Runtime.getRuntime().exec(cmd);
+      p.waitFor();
+      if (p.exitValue() != 0) {
+        printMsg(p);
+        throw new RuntimeException("Comile error");
+      }
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private static void printMsg(Process p) throws IOException {
+    BufferedReader bri = new BufferedReader(new InputStreamReader(p.getInputStream()));
+    BufferedReader bre = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+    String line;
+    while ((line = bri.readLine()) != null) {
+      System.out.println(line);
+    }
+    bri.close();
+    while ((line = bre.readLine()) != null) {
+      System.out.println(line);
+    }
+    bre.close();
+    System.out.println("Compiled: " + p.exitValue());
   }
 
   private static void printGraph(Graph<PirObject,Pair<PirObject,PirObject>> g, String filename) {

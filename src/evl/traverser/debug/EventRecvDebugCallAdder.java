@@ -20,6 +20,7 @@ import evl.other.Named;
 import evl.other.NamedList;
 import evl.statement.CallStmt;
 import evl.statement.Statement;
+import java.math.BigInteger;
 
 /**
  * Inserts a message call whenever an event is received
@@ -68,15 +69,16 @@ public class EventRecvDebugCallAdder extends DefTraverser<Void, Integer> {
     assert (param >= 0);
     int numFunc = names.indexOf(obj.getName());
     assert (numFunc >= 0);
-    obj.getBody().getBasicBlocksOld().get(0).getCode().add(0, makeCall(msgRecvFunc, numFunc, param)); // TODO make it
+    throw new RuntimeException("reimplement");
+//    obj.getBody().getBasicBlocksOld().get(0).getCode().add(0, makeCall(msgRecvFunc, numFunc, param)); // TODO make it
                                                                                                    // cleaner
   }
 
   private Statement makeCall(FunctionBase func, int numFunc, int numIface) {
     // Self._sendMsg( numFunc, numIface );
     List<Expression> actParam = new ArrayList<Expression>();
-    actParam.add(new Number(info, numFunc));
-    actParam.add(new Number(info, numIface));
+    actParam.add(new Number(info, BigInteger.valueOf(numFunc)));
+    actParam.add(new Number(info, BigInteger.valueOf(numIface)));
 
     Reference call = new Reference(info, func);
     call.getOffset().add(new RefCall(info, actParam));
