@@ -407,7 +407,7 @@ class CopyFun extends Traverser<Fun, Void> {
 
   @Override
   protected Fun visitUnionType(UnionType obj, Void param) {
-    UnionType ret = new UnionType(obj.getInfo());
+    UnionType ret = new UnionType(obj.getInfo(),obj.getSelector());
     ret.getElement().addAll(copy(obj.getElement().getList()));
     return ret;
   }

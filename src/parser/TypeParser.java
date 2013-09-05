@@ -184,10 +184,15 @@ public class TypeParser extends BaseParser {
     return ret;
   }
 
-  // EBNF unionType: "Union" { recordElem } "end"
+  // EBNF unionType: "Union" "(" id ")" { recordElem } "end"
   private Type parseUnionType() {
     Token tok = expect(TokenType.UNION);
-    UnionType ret = new UnionType(tok.getInfo());
+    expect(TokenType.OPENPAREN);
+    String selector = expect(TokenType.IDENTIFIER).getData();
+    expect(TokenType.CLOSEPAREN);
+    
+    UnionType ret = new UnionType(tok.getInfo(),selector);
+    
     while (peek().getType() != TokenType.END) {
       ret.getElement().addAll(parseRecordElem());
     }
