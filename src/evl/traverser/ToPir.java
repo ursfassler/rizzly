@@ -566,6 +566,7 @@ class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, pir.other
 
   @Override
   protected VariableGeneratorStmt visitArithmeticOp(ArithmeticOp obj, pir.other.SsaVariable param) {
+    //TODO do not use VarRef for composite types but already use getElementPtr (maybe)
     PirValue left = (PirValue) converter.visit(obj.getLeft(), null);
     PirValue right = (PirValue) converter.visit(obj.getRight(), null);
     return new pir.statement.ArithmeticOp(param, left, right, toCOp(obj.getOp()));

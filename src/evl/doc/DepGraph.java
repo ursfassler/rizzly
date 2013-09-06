@@ -141,6 +141,7 @@ class SubDep extends DefTraverser<Void, Named> {
 
   @Override
   protected Void visitNamedElement(NamedElement obj, Named param) {
+    g.addVertex(obj.getType().getRef());
     g.addEdge(param, obj.getType().getRef());
     visit(obj.getType().getRef(), obj.getType().getRef());
     return super.visitNamedElement(obj, param);

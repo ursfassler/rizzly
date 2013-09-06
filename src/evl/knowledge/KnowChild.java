@@ -1,5 +1,6 @@
 package evl.knowledge;
 
+import evl.type.TypeRef;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -78,6 +79,11 @@ class KnowChildTraverser extends NullTraverser<Set<Named>, String> {
   @Override
   protected Set<Named> visitDefault(Evl obj, String param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+  }
+
+  @Override
+  protected Set<Named> visitTypeRef(TypeRef obj, String param) {
+    return visit(obj.getRef(), param);
   }
 
   @Override

@@ -4,16 +4,26 @@ type
     y : R{0,100};
   end
 
+interface
+  Tick
+    function tick;
+  end
+
 component
   Rec
+    input
+      in  : Tick;
+    
+  implementation elementary
 
-    implementation elementary
+    var
+      p : Point;
+      q : Point;
 
-    function foo( x: R{0,100} ):Point
-      res : Point;
-      res.x := x + 3;
-      res.y := res.x + 3;
-      return res;
+    function in.tick
+      p.x := (p.y + 1) mod 100;
+      p.y := 100 - p.y;
+      q   := p;
     end
 
   end
