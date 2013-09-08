@@ -28,19 +28,16 @@ import pir.know.KnowledgeBase;
 import pir.other.Program;
 import pir.other.SsaVariable;
 import pir.passes.CaseReduction;
-import pir.passes.ComplexWriterReduction;
 import pir.passes.ConstPropagator;
 import pir.passes.GlobalReadExtracter;
 import pir.passes.LlvmIntTypeReplacer;
 import pir.passes.RangeConverter;
 import pir.passes.RangeReplacer;
-import pir.passes.ReferenceReadReduction;
 import pir.passes.StmtSignSetter;
 import pir.passes.TypecastReplacer;
 import pir.passes.VarPropagator;
 import pir.statement.CallAssignment;
 import pir.statement.CallStmt;
-import pir.statement.ComplexWriter;
 import pir.statement.Statement;
 import pir.statement.StoreStmt;
 import pir.traverser.DependencyGraphMaker;
@@ -151,8 +148,6 @@ public class Main {
 
     CaseReduction.process(prog);
 
-    ComplexWriterReduction.process(prog);
-    ReferenceReadReduction.process(prog);
     GlobalReadExtracter.process(prog);
     // GlobalWriteExtracter.process(prog); //TODO do it during translation to PIR?
     // RangeExtender.process(prog);
@@ -170,7 +165,6 @@ public class Main {
       Set<Class<? extends Statement>> keep = new HashSet<Class<? extends Statement>>();
       keep.add(CallAssignment.class);
       keep.add(CallStmt.class);
-      keep.add(ComplexWriter.class); // should no longer exist in IR
       keep.add(StoreStmt.class);
 
       keep.add(CaseGoto.class);

@@ -27,7 +27,6 @@ import pir.other.Program;
 import pir.other.Variable;
 import pir.statement.ArOp;
 import pir.statement.CallAssignment;
-import pir.statement.ComplexWriter;
 import pir.statement.StoreStmt;
 import pir.statement.VariableGeneratorStmt;
 import pir.type.NamedElement;
@@ -540,10 +539,8 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
         throw new RuntimeException("not yet implemented: " + dstvar.getClass().getCanonicalName());
       }
     } else {
-      VarRef dst = (VarRef) visit(obj.getLeft(), null);
-      PirValue src = (PirValue) visit(obj.getRight(), null);
-      ComplexWriter cw = new ComplexWriter(dst, src);
-      return cw;
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Unexpected case: " + var.getType().getClass().getCanonicalName());
+      return null;
     }
   }
 

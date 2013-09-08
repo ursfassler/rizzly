@@ -38,7 +38,6 @@ import pir.statement.ArithmeticOp;
 import pir.statement.Assignment;
 import pir.statement.CallAssignment;
 import pir.statement.CallStmt;
-import pir.statement.ComplexWriter;
 import pir.statement.GetElementPtr;
 import pir.statement.LoadStmt;
 import pir.statement.Relation;
@@ -192,8 +191,6 @@ abstract public class Traverser<R, P> {
       return visitVariableGeneratorStmt((VariableGeneratorStmt) obj, param);
     } else if( obj instanceof StoreStmt ) {
       return visitStoreStmt((StoreStmt) obj, param);
-    } else if( obj instanceof ComplexWriter ) {
-      return visitComplexWriter((ComplexWriter) obj, param);
     } else if( obj instanceof BasicBlockEnd ) {
       return visitBasicBlockEnd((BasicBlockEnd) obj, param);
     } else {
@@ -393,8 +390,6 @@ abstract public class Traverser<R, P> {
   protected abstract R visitFuncImpl(FuncImpl obj, P param);
 
   protected abstract R visitFuncProto(FuncProto obj, P param);
-
-  protected abstract R visitComplexWriter(ComplexWriter obj, P param);
 
   protected abstract R visitStoreStmt(StoreStmt obj, P param);
 

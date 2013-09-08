@@ -42,7 +42,6 @@ import pir.statement.ArithmeticOp;
 import pir.statement.Assignment;
 import pir.statement.CallAssignment;
 import pir.statement.CallStmt;
-import pir.statement.ComplexWriter;
 import pir.statement.GetElementPtr;
 import pir.statement.LoadStmt;
 import pir.statement.Relation;
@@ -262,7 +261,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     param.wr(obj.getName());
     wrId(obj, param);
     param.wr(" = type ");
-    visit(obj.getType(),param);
+    visit(obj.getType(), param);
     param.wr(" *");
     param.nl();
     return null;
@@ -828,12 +827,6 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     });
     visitList(bbs, param);
     param.decIndent();
-    return null;
-  }
-
-  @Override
-  protected Void visitComplexWriter(ComplexWriter obj, StreamWriter param) {
-    param.wr(obj.toString()); // TODO remove, should not exist anymore
     return null;
   }
 

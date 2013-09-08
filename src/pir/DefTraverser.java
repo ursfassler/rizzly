@@ -31,7 +31,6 @@ import pir.statement.ArithmeticOp;
 import pir.statement.Assignment;
 import pir.statement.CallAssignment;
 import pir.statement.CallStmt;
-import pir.statement.ComplexWriter;
 import pir.statement.GetElementPtr;
 import pir.statement.LoadStmt;
 import pir.statement.Relation;
@@ -122,7 +121,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitNamedElement(NamedElement obj, P param) {
-    visit(obj.getType(),param);
+    visit(obj.getType(), param);
     return null;
   }
 
@@ -318,13 +317,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   protected R visitLoadStmt(LoadStmt obj, P param) {
     visit(obj.getSrc(), param);
     visit(obj.getVariable(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitComplexWriter(ComplexWriter obj, P param) {
-    visit(obj.getSrc(), param);
-    visit(obj.getDst(), param);
     return null;
   }
 
