@@ -4,6 +4,7 @@ import common.NameFactory;
 import evl.DefTraverser;
 import evl.copy.Copy;
 import evl.expression.Expression;
+import evl.expression.reference.RefIndex;
 import evl.expression.reference.Reference;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
@@ -17,10 +18,13 @@ import evl.traverser.StatementReplacer;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.type.Type;
 import evl.type.TypeRef;
+import evl.type.base.ArrayType;
+import evl.type.composed.RecordType;
 import evl.type.special.PointerType;
 import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 import util.ssa.PhiInserter;
@@ -109,14 +113,14 @@ class ExprReplacer extends DefTraverser<Void, List<Statement>> {
     return null;
   }
 
-  static GetElementPtr makeGep(Reference obj, KnowledgeBase kb) {
+  static GetElementPtr makeGep(Reference ref, KnowledgeBase kb) {
     KnowBaseItem kbi = kb.getEntry(KnowBaseItem.class);
 
-    Type type = ExpressionTypeChecker.process(obj, kb);
-
-    PointerType pt = kbi.getPointerType(new TypeRef(obj.getInfo(), type));
-    SsaVariable addr = new SsaVariable(obj.getInfo(), NameFactory.getNew(), new TypeRef(obj.getInfo(), pt));
-    GetElementPtr ptr = new GetElementPtr(obj.getInfo(), addr, Copy.copy(obj));
+    Type type = ExpressionTypeChecker.process(ref, kb);
+    
+    PointerType pt = kbi.getPointerType(new TypeRef(ref.getInfo(), type));
+    SsaVariable addr = new SsaVariable(ref.getInfo(), NameFactory.getNew(), new TypeRef(ref.getInfo(), pt));
+    GetElementPtr ptr = new GetElementPtr(ref.getInfo(), addr, Copy.copy(ref));
     return ptr;
   }
 

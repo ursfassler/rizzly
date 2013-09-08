@@ -87,6 +87,7 @@ import evl.variable.FuncVariable;
 import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
 import java.math.BigInteger;
+import pir.type.StructType;
 
 public class ToPir extends NullTraverser<PirObject, PirObject> {
 
@@ -481,9 +482,32 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
     VarRef ref = (VarRef) traverse(obj.getAddress(), null);
     ArrayList<PirValue> ofs = new ArrayList<PirValue>();
 
-    //TODO only for test:
+    if( ref.getRef() instanceof pir.other.StateVariable ){
+      // see llvm GEP FAQ: Why is the extra 0 index required?
+      ofs.add( new pir.expression.Number(BigInteger.ZERO, new TypeRef(kbi.getNoSignType(1))));
+    }
+    
+    pir.type.Type type = ref.getRef().getType().getRef();
     for( RefItem itr : ref.getOffset() ) {
-      ofs.add(new pir.expression.Number(BigInteger.ZERO, new TypeRef(kbi.getRangeType(BigInteger.ZERO, BigInteger.ZERO)))); //FIXME use correct number
+      if( itr instanceof pir.expression.reference.RefName ) {
+        // get index of struct member and use that
+        StructType st = (StructType) type;
+        String name = ((pir.expression.reference.RefName)itr).getName();
+        NamedElement elem = st.find(name);
+        assert( elem != null );
+        int idx = st.getElements().indexOf(elem);
+        assert( idx >= 0 );
+        ofs.add(new pir.expression.Number(BigInteger.valueOf(idx), new TypeRef(kbi.getNoSignType(32)))); //see llvm gep FAQ: Why do struct member indices always use i32?
+        type = elem.getType().getRef();
+      } else if( itr instanceof pir.expression.reference.RefIndex ) {
+        // get index calculation
+        pir.expression.reference.RefIndex idx = (pir.expression.reference.RefIndex)itr;
+        PirValue val = (PirValue) idx.getIndex();
+        ofs.add( val );
+        type = ((pir.type.ArrayType)type).getType().getRef();
+      } else {
+        RError.err(ErrorType.Fatal, obj.getInfo(), "Unhandled offset item: " + itr.getClass().getCanonicalName());
+      }
     }
 
     PirValue base;

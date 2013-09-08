@@ -640,7 +640,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     wrVarDef(obj, param);
     param.wr("load ");
     visit(obj.getSrc().getType(), param);
-    param.wr("* ");
+    param.wr(" ");
     visit(obj.getSrc(), param);
     param.nl();
     return null;
@@ -654,7 +654,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     visit(obj.getSrc(), param);
     param.wr(", ");
     visit(obj.getDst().getType(), param);
-    param.wr("* ");
+    param.wr(" ");
     visit(obj.getDst(), param);
     param.nl();
     return null;
