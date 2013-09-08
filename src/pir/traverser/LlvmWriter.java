@@ -63,6 +63,7 @@ import pir.type.EnumType;
 import pir.type.IntType;
 import pir.type.NamedElement;
 import pir.type.NoSignType;
+import pir.type.PointerType;
 import pir.type.RangeType;
 import pir.type.SignedType;
 import pir.type.StringType;
@@ -81,6 +82,7 @@ import evl.doc.StreamWriter;
 import evl.expression.RelOp;
 
 public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
+
   private final boolean wrId;
 
   public LlvmWriter(boolean wrId) {
@@ -92,7 +94,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     LlvmWriter printer = new LlvmWriter(wrId);
     try {
       printer.traverse(obj, new StreamWriter(new PrintStream(filename)));
-    } catch (FileNotFoundException e) {
+    } catch( FileNotFoundException e ) {
       e.printStackTrace();
     }
   }
@@ -103,13 +105,13 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   private void wrId(PirObject obj, StreamWriter wr) {
-    if (wrId) {
+    if( wrId ) {
       wr.wr("[" + obj.hashCode() % 1000 + "]"); // TODO remove debug code
     }
   }
 
   protected void visitOptList(String name, Collection<? extends PirObject> type, StreamWriter param) {
-    if (type.isEmpty()) {
+    if( type.isEmpty() ) {
       return;
     }
     param.wr(name);
@@ -122,8 +124,8 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
   private void visitSepList(String sep, List<? extends PirObject> list, StreamWriter param) {
     boolean first = true;
-    for (PirObject obj : list) {
-      if (first) {
+    for( PirObject obj : list ) {
+      if( first ) {
         first = false;
       } else {
         param.wr(sep);
@@ -133,7 +135,6 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   // ------------------------------------------------------------------------
-
   @Override
   protected Void visitProgram(Program obj, StreamWriter param) {
     visitList(obj.getType(), param);
@@ -145,12 +146,12 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitFunction(Function obj, StreamWriter param) {
-    if (obj instanceof FuncWithBody) {
+    if( obj instanceof FuncWithBody ) {
       param.wr("define ");
     } else {
       param.wr("declare ");
     }
-    if (obj.getAttributes().contains(FuncAttr.Public)) {
+    if( obj.getAttributes().contains(FuncAttr.Public) ) {
       param.wr("external ccc ");
     }
     visit(obj.getRetType(), param);
@@ -161,10 +162,10 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     visitSepList(",", obj.getArgument(), param);
     param.wr(")");
 
-    if (obj instanceof FuncWithBody) {
+    if( obj instanceof FuncWithBody ) {
       param.wr("{");
       param.nl();
-      visit(((FuncWithBody) obj).getBody(), param);
+      visit(( (FuncWithBody) obj ).getBody(), param);
       param.wr("}");
     }
     param.nl();
@@ -173,7 +174,6 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   // ---- variables --------------------------------------------------------------------
-
   @Override
   protected Void visitFuncVariable(FuncVariable obj, StreamWriter param) {
     visit(obj.getType(), param);
@@ -213,7 +213,6 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   // ---- types --------------------------------------------------------------------
-
   @Override
   protected Void visitBooleanType(BooleanType obj, StreamWriter param) {
     param.wr(obj.getName());
@@ -253,6 +252,18 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     param.wr(" = ");
     param.wr("S");
     param.wr(Integer.toString(obj.getBits()));
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitPointerType(PointerType obj, StreamWriter param) {
+    param.wr("%");
+    param.wr(obj.getName());
+    wrId(obj, param);
+    param.wr(" = type ");
+    visit(obj.getType(),param);
+    param.wr(" *");
     param.nl();
     return null;
   }
@@ -304,17 +315,32 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitStructType(StructType obj, StreamWriter param) {
+    param.wr("%");
     param.wr(obj.getName());
     wrId(obj, param);
-    param.wr(" = ");
-    param.wr("Record");
+    param.wr(" = type {");
     param.nl();
     param.incIndent();
-    visitList(obj.getElements(), param);
+    wrNamedElem(obj.getElements(), param);
     param.decIndent();
-    param.wr("end");
+    param.wr("}");
     param.nl();
     return null;
+  }
+
+  private void wrNamedElem(List<NamedElement> list, StreamWriter param) {
+    for( int i = 0; i < list.size(); i++ ) {
+      NamedElement elem = list.get(i);
+      visit(elem.getType(), param);
+      if( i == list.size() - 1 ) {
+        param.wr(" ");
+      } else {
+        param.wr(",");
+      }
+      param.wr(" ; ");
+      param.wr(elem.getName());
+      param.nl();
+    }
   }
 
   @Override
@@ -325,25 +351,14 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     param.wr("Union");
     param.nl();
     param.incIndent();
-    visitList(obj.getElements(), param);
+    wrNamedElem(obj.getElements(), param);
     param.decIndent();
     param.wr("end");
     param.nl();
     return null;
   }
 
-  @Override
-  protected Void visitNamedElement(NamedElement obj, StreamWriter param) {
-    param.wr(obj.getName());
-    param.wr(": ");
-    visit(obj.getType(), param);
-    param.wr(";");
-    param.nl();
-    return null;
-  }
-
   // ---- expression --------------------------------------------------------------------
-
   @Override
   protected Void visitNumber(Number obj, StreamWriter param) {
     param.wr(obj.getValue().toString());
@@ -352,7 +367,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitBoolValue(BoolValue obj, StreamWriter param) {
-    if (obj.isValue()) {
+    if( obj.isValue() ) {
       param.wr("True");
     } else {
       param.wr("False");
@@ -387,9 +402,9 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitTypeRef(TypeRef obj, StreamWriter param) {
-    if (obj.getRef() instanceof NoSignType) {
-      param.wr("i" + ((IntType) obj.getRef()).getBits());
-    } else if (obj.getRef() instanceof VoidType) {
+    if( obj.getRef() instanceof NoSignType ) {
+      param.wr("i" + ( (IntType) obj.getRef() ).getBits());
+    } else if( obj.getRef() instanceof VoidType ) {
       param.wr("void");
     } else {
       param.wr("%" + obj.getRef().getName());
@@ -400,8 +415,8 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
   private void wrList(String sep, Iterable<? extends PirObject> lst, StreamWriter param) {
     boolean first = true;
-    for (PirObject itr : lst) {
-      if (first) {
+    for( PirObject itr : lst ) {
+      if( first ) {
         first = false;
       } else {
         param.wr(sep);
@@ -428,8 +443,8 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
     {
       boolean first = true;
-      for (PirValue itr : arg) {
-        if (first) {
+      for( PirValue itr : arg ) {
+        if( first ) {
           first = false;
         } else {
           param.wr(", ");
@@ -451,36 +466,36 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
   private String getRelop(RelOp op, StmtSignes signes) {
     String sign;
-    switch (signes) {
-    case unknown:
-      sign = "";
-      break;
-    case signed:
-      sign = "s";
-      break;
-    case unsigned:
-      sign = "u";
-      break;
-    default:
-      RError.err(ErrorType.Fatal, "Unknown signes value: " + signes);
-      return null;
+    switch( signes ) {
+      case unknown:
+        sign = "";
+        break;
+      case signed:
+        sign = "s";
+        break;
+      case unsigned:
+        sign = "u";
+        break;
+      default:
+        RError.err(ErrorType.Fatal, "Unknown signes value: " + signes);
+        return null;
     }
-    switch (op) {
-    case EQUAL:
-      return "eq";
-    case NOT_EQUAL:
-      return "ne";
-    case GREATER:
-      return sign + "gt";
-    case GREATER_EQUEAL:
-      return sign + "ge";
-    case LESS:
-      return sign + "lt";
-    case LESS_EQUAL:
-      return sign + "le";
-    default:
-      RError.err(ErrorType.Fatal, "Operand not handled: " + op);
-      return null;
+    switch( op ) {
+      case EQUAL:
+        return "eq";
+      case NOT_EQUAL:
+        return "ne";
+      case GREATER:
+        return sign + "gt";
+      case GREATER_EQUEAL:
+        return sign + "ge";
+      case LESS:
+        return sign + "lt";
+      case LESS_EQUAL:
+        return sign + "le";
+      default:
+        RError.err(ErrorType.Fatal, "Operand not handled: " + op);
+        return null;
     }
   }
 
@@ -522,7 +537,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     param.wr("*"); // FIXME ok?
     param.wr(" ");
     visit(obj.getBase(), param);
-    for (PirValue ofs : obj.getOffset()) {
+    for( PirValue ofs : obj.getOffset() ) {
       param.wr(", ");
       visit(ofs.getType(), param);
       param.wr(" ");
@@ -549,27 +564,27 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     wrVarDef(obj, param);
     String op;
     String flags;
-    switch (obj.getOp()) {
-    case MINUS:
-      op = "sub";
-      flags = "nuw nsw";
-      break;
-    case PLUS:
-      op = "add";
-      flags = "nuw nsw";
-      break;
-    case AND:
-      op = "and";
-      flags = "";
-      break;
-    case MOD:
-      //TODO does only work if left is unsigned (and right too, of course)
-      op = "urem";
-      flags = "";
-      break;
-    default:
-      RError.err(ErrorType.Warning, "Operand not handled: " + obj.getOp()); // TODO change to fatal error
-      return null;
+    switch( obj.getOp() ) {
+      case MINUS:
+        op = "sub";
+        flags = "nuw nsw";
+        break;
+      case PLUS:
+        op = "add";
+        flags = "nuw nsw";
+        break;
+      case AND:
+        op = "and";
+        flags = "";
+        break;
+      case MOD:
+        //TODO does only work if left is unsigned (and right too, of course)
+        op = "urem";
+        flags = "";
+        break;
+      default:
+        RError.err(ErrorType.Warning, "Operand not handled: " + obj.getOp()); // TODO change to fatal error
+        return null;
     }
     param.wr(op);
     param.wr(" ");
@@ -603,7 +618,6 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   // ---- statement --------------------------------------------------------------------
-
   @Override
   protected Void visitCallStmt(CallStmt obj, StreamWriter param) {
     wrCall(obj.getRef(), obj.getParameter(), param);
@@ -673,7 +687,6 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   // ------------------------------------------------------------------------
-
   @Override
   protected Void visitStringValue(StringValue obj, StreamWriter param) {
     param.wr("'");
@@ -762,8 +775,8 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     visit(obj.getVariable().getType(), param);
     param.wr(" ");
     boolean first = true;
-    for (BasicBlock in : obj.getInBB()) {
-      if (first) {
+    for( BasicBlock in : obj.getInBB() ) {
+      if( first ) {
         first = false;
       } else {
         param.wr(", ");
@@ -807,6 +820,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
     LinkedList<BasicBlock> bbs = new LinkedList<BasicBlock>(obj.getBasicBlocks());
     Collections.sort(bbs, new Comparator<BasicBlock>() {
+
       @Override
       public int compare(BasicBlock o1, BasicBlock o2) {
         return o1.getName().compareTo(o2.getName());
@@ -870,5 +884,4 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     visit(obj.getVariable().getType(), param);
     param.nl();
   }
-
 }

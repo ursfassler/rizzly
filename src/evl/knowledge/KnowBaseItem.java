@@ -1,5 +1,6 @@
 package evl.knowledge;
 
+import evl.type.special.PointerType;
 import java.math.BigInteger;
 
 import common.ElementInfo;
@@ -96,6 +97,15 @@ public class KnowBaseItem extends KnowledgeEntry {
     }
     return ret;
   }
+  
+  public PointerType getPointerType(TypeRef type) {
+    PointerType ret = (PointerType) findItem(PointerType.makeName(type));
+    if (ret == null) {
+      ret = new PointerType(type);
+      addItem(ret);
+    }
+    return ret;
+  }
 
   public StringType getStringType() {
     StringType ret = (StringType) findItem(StringType.NAME);
@@ -132,4 +142,5 @@ public class KnowBaseItem extends KnowledgeEntry {
     }
     return ret;
   }
+
 }

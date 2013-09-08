@@ -5,6 +5,7 @@ import evl.DefTraverser;
 import evl.copy.Copy;
 import evl.expression.Expression;
 import evl.expression.reference.Reference;
+import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
 import evl.statement.Assignment;
@@ -109,8 +110,11 @@ class ExprReplacer extends DefTraverser<Void, List<Statement>> {
   }
 
   static GetElementPtr makeGep(Reference obj, KnowledgeBase kb) {
+    KnowBaseItem kbi = kb.getEntry(KnowBaseItem.class);
+
     Type type = ExpressionTypeChecker.process(obj, kb);
-    PointerType pt = new PointerType(new TypeRef(obj.getInfo(), type));
+
+    PointerType pt = kbi.getPointerType(new TypeRef(obj.getInfo(), type));
     SsaVariable addr = new SsaVariable(obj.getInfo(), NameFactory.getNew(), new TypeRef(obj.getInfo(), pt));
     GetElementPtr ptr = new GetElementPtr(obj.getInfo(), addr, Copy.copy(obj));
     return ptr;
@@ -122,8 +126,8 @@ class ExprReplacer extends DefTraverser<Void, List<Statement>> {
       assert ( param != null );
       GetElementPtr ptr = makeGep(obj, kb);
       Type type = ptr.getVariable().getType().getRef();
-      assert(type instanceof  PointerType);
-      type = ((PointerType)type).getType().getRef();
+      assert ( type instanceof PointerType );
+      type = ( (PointerType) type ).getType().getRef();
       SsaVariable var = new SsaVariable(obj.getInfo(), NameFactory.getNew(), new TypeRef(obj.getInfo(), type));
       LoadStmt load = new LoadStmt(obj.getInfo(), var, new Reference(obj.getInfo(), ptr.getVariable()));
       obj.setLink(var);

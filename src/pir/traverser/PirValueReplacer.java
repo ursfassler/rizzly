@@ -122,7 +122,9 @@ abstract public class PirValueReplacer<R, P> extends DefTraverser<R, P> {
 
   @Override
   protected R visitGetElementPtr(GetElementPtr obj, P param) {
-    throw new RuntimeException("not yet implemented");
+    obj.setBase(replace(obj.getBase(),param));
+    repList(obj.getOffset(),param);
+    return super.visitGetElementPtr(obj, param);
   }
 
   @Override

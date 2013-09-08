@@ -60,6 +60,7 @@ import pir.type.IntType;
 import pir.type.NamedElemType;
 import pir.type.NamedElement;
 import pir.type.NoSignType;
+import pir.type.PointerType;
 import pir.type.RangeType;
 import pir.type.SignedType;
 import pir.type.StringType;
@@ -71,224 +72,242 @@ import pir.type.UnsignedType;
 import pir.type.VoidType;
 
 abstract public class Traverser<R, P> {
+
   public R traverse(Pir obj, P param) {
     return visit(obj, param);
   }
 
   protected void visitList(Iterable<? extends Pir> list, P param) {
-    for (Pir itr : list) {
+    for( Pir itr : list ) {
       visit(itr, param);
     }
   }
 
   protected R visit(Pir obj, P param) {
-    if (obj == null)
+    if( obj == null ) {
       throw new RuntimeException("object is null");
-    else if (obj instanceof Program)
+    } else if( obj instanceof Program ) {
       return visitProgram((Program) obj, param);
-    else if (obj instanceof Statement)
+    } else if( obj instanceof Statement ) {
       return visitStatement((Statement) obj, param);
-    else if (obj instanceof PExpression)
+    } else if( obj instanceof PExpression ) {
       return visitPExpression((PExpression) obj, param);
-    else if (obj instanceof Type)
+    } else if( obj instanceof Type ) {
       return visitType((Type) obj, param);
-    else if (obj instanceof Function)
+    } else if( obj instanceof Function ) {
       return visitFunction((Function) obj, param);
-    else if (obj instanceof NamedElement)
+    } else if( obj instanceof NamedElement ) {
       return visitNamedElement((NamedElement) obj, param);
-    else if (obj instanceof RefItem)
+    } else if( obj instanceof RefItem ) {
       return visitRefItem((RefItem) obj, param);
-    else if (obj instanceof Variable)
+    } else if( obj instanceof Variable ) {
       return visitVariable((Variable) obj, param);
-    else if (obj instanceof EnumElement)
+    } else if( obj instanceof EnumElement ) {
       return visitEnumElement((EnumElement) obj, param);
-    else if (obj instanceof BasicBlockList)
+    } else if( obj instanceof BasicBlockList ) {
       return visitBasicBlockList((BasicBlockList) obj, param);
-    else if (obj instanceof BasicBlock)
+    } else if( obj instanceof BasicBlock ) {
       return visitBasicBlock((BasicBlock) obj, param);
-    else if (obj instanceof TypeRef)
+    } else if( obj instanceof TypeRef ) {
       return visitTypeRef((TypeRef) obj, param);
-    else if (obj instanceof CaseGotoOpt)
+    } else if( obj instanceof CaseGotoOpt ) {
       return visitCaseGotoOpt((CaseGotoOpt) obj, param);
-    else if (obj instanceof CaseOptEntry)
+    } else if( obj instanceof CaseOptEntry ) {
       return visitCaseOptEntry((CaseOptEntry) obj, param);
-    else
+    } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
   }
 
   protected R visitCaseOptEntry(CaseOptEntry obj, P param) {
-    if (obj instanceof CaseOptRange)
+    if( obj instanceof CaseOptRange ) {
       return visitCaseOptRange((CaseOptRange) obj, param);
-    else if (obj instanceof CaseOptValue)
+    } else if( obj instanceof CaseOptValue ) {
       return visitCaseOptValue((CaseOptValue) obj, param);
-    else
+    } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
   }
 
   protected R visitBasicBlockEnd(BasicBlockEnd obj, P param) {
-    if (obj instanceof Return)
+    if( obj instanceof Return ) {
       return visitReturn((Return) obj, param);
-    else if (obj instanceof IfGoto)
+    } else if( obj instanceof IfGoto ) {
       return visitIfGoto((IfGoto) obj, param);
-    else if (obj instanceof CaseGoto)
+    } else if( obj instanceof CaseGoto ) {
       return visitCaseGoto((CaseGoto) obj, param);
-    else if (obj instanceof Goto)
+    } else if( obj instanceof Goto ) {
       return visitGoto((Goto) obj, param);
-    else
+    } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
   }
 
   protected R visitFunction(Function obj, P param) {
-    if (obj instanceof FuncProto)
+    if( obj instanceof FuncProto ) {
       return visitFuncProto((FuncProto) obj, param);
-    else if (obj instanceof FuncImpl)
+    } else if( obj instanceof FuncImpl ) {
       return visitFuncImpl((FuncImpl) obj, param);
-    else
+    } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
   }
 
   protected R visitRefItem(RefItem obj, P param) {
-    if (obj instanceof RefName)
+    if( obj instanceof RefName ) {
       return visitRefName((RefName) obj, param);
-    else if (obj instanceof RefIndex)
+    } else if( obj instanceof RefIndex ) {
       return visitRefIndex((RefIndex) obj, param);
-    else
+    } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
   }
 
   protected R visitPExpression(PExpression obj, P param) {
-    if (obj instanceof Number)
+    if( obj instanceof Number ) {
       return visitNumber((Number) obj, param);
-    else if (obj instanceof StringValue)
+    } else if( obj instanceof StringValue ) {
       return visitStringValue((StringValue) obj, param);
-    else if (obj instanceof ArrayValue)
+    } else if( obj instanceof ArrayValue ) {
       return visitArrayValue((ArrayValue) obj, param);
-    else if (obj instanceof BoolValue)
+    } else if( obj instanceof BoolValue ) {
       return visitBoolValue((BoolValue) obj, param);
-    else if (obj instanceof VarRef)
+    } else if( obj instanceof VarRef ) {
       return visitVarRef((VarRef) obj, param);
-    else if (obj instanceof VarRefSimple)
+    } else if( obj instanceof VarRefSimple ) {
       return visitVarRefSimple((VarRefSimple) obj, param);
-    else if (obj instanceof VarRefStatevar)
+    } else if( obj instanceof VarRefStatevar ) {
       return visitVarRefStatevar((VarRefStatevar) obj, param);
-    else
+    } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
   }
 
   protected R visitStatement(Statement obj, P param) {
-    if (obj instanceof CallStmt)
+    if( obj instanceof CallStmt ) {
       return visitCallStmt((CallStmt) obj, param);
-    else if (obj instanceof VarDefStmt)
+    } else if( obj instanceof VarDefStmt ) {
       return visitVarDefStmt((VarDefStmt) obj, param);
-    else if (obj instanceof VariableGeneratorStmt)
+    } else if( obj instanceof VariableGeneratorStmt ) {
       return visitVariableGeneratorStmt((VariableGeneratorStmt) obj, param);
-    else if (obj instanceof StoreStmt)
+    } else if( obj instanceof StoreStmt ) {
       return visitStoreStmt((StoreStmt) obj, param);
-    else if (obj instanceof ComplexWriter)
+    } else if( obj instanceof ComplexWriter ) {
       return visitComplexWriter((ComplexWriter) obj, param);
-    else if (obj instanceof BasicBlockEnd)
+    } else if( obj instanceof BasicBlockEnd ) {
       return visitBasicBlockEnd((BasicBlockEnd) obj, param);
-    else
+    } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
   }
 
   protected R visitVariableGeneratorStmt(VariableGeneratorStmt obj, P param) {
-    if (obj instanceof Assignment)
+    if( obj instanceof Assignment ) {
       return visitAssignment((Assignment) obj, param);
-    else if (obj instanceof ArithmeticOp)
+    } else if( obj instanceof ArithmeticOp ) {
       return visitArithmeticOp((ArithmeticOp) obj, param);
-    else if (obj instanceof Relation)
+    } else if( obj instanceof Relation ) {
       return visitRelation((Relation) obj, param);
-    else if (obj instanceof LoadStmt)
+    } else if( obj instanceof LoadStmt ) {
       return visitLoadStmt((LoadStmt) obj, param);
-    else if (obj instanceof CallAssignment)
+    } else if( obj instanceof CallAssignment ) {
       return visitCallAssignment((CallAssignment) obj, param);
-    else if (obj instanceof GetElementPtr)
+    } else if( obj instanceof GetElementPtr ) {
       return visitGetElementPtr((GetElementPtr) obj, param);
-    else if (obj instanceof ConvertValue)
+    } else if( obj instanceof ConvertValue ) {
       return visitConvertValue((ConvertValue) obj, param);
-    else if (obj instanceof PhiStmt)
+    } else if( obj instanceof PhiStmt ) {
       return visitPhiStmt((PhiStmt) obj, param);
-    else if (obj instanceof UnaryOp)
+    } else if( obj instanceof UnaryOp ) {
       return visitUnaryOp((UnaryOp) obj, param);
-    else
+    } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
   }
 
   protected R visitConvertValue(ConvertValue obj, P param) {
-    if (obj instanceof SignExtendValue)
+    if( obj instanceof SignExtendValue ) {
       return visitSignExtendValue((SignExtendValue) obj, param);
-    if (obj instanceof ZeroExtendValue)
+    }
+    if( obj instanceof ZeroExtendValue ) {
       return visitZeroExtendValue((ZeroExtendValue) obj, param);
-    else if (obj instanceof TruncValue)
+    } else if( obj instanceof TruncValue ) {
       return visitTruncValue((TruncValue) obj, param);
-    else if (obj instanceof TypeCast)
+    } else if( obj instanceof TypeCast ) {
       return visitTypeCast((TypeCast) obj, param);
-    else
+    } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
   }
 
   protected R visitVariable(Variable obj, P param) {
-    if (obj instanceof FuncVariable)
+    if( obj instanceof FuncVariable ) {
       return visitFuncVariable((FuncVariable) obj, param);
-    else if (obj instanceof SsaVariable)
+    } else if( obj instanceof SsaVariable ) {
       return visitSsaVariable((SsaVariable) obj, param);
-    else if (obj instanceof StateVariable)
+    } else if( obj instanceof StateVariable ) {
       return visitStateVariable((StateVariable) obj, param);
-    else if (obj instanceof Constant)
+    } else if( obj instanceof Constant ) {
       return visitConstant((Constant) obj, param);
-    else
+    } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
   }
 
   protected R visitReturn(Return obj, P param) {
-    if (obj instanceof ReturnExpr)
+    if( obj instanceof ReturnExpr ) {
       return visitReturnExpr((ReturnExpr) obj, param);
-    else if (obj instanceof ReturnVoid)
+    } else if( obj instanceof ReturnVoid ) {
       return visitReturnVoid((ReturnVoid) obj, param);
-    else
+    } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
   }
 
   protected R visitType(Type obj, P param) {
-    if (obj instanceof RangeType)
+    if( obj instanceof RangeType ) {
       return visitRangeType((RangeType) obj, param);
-    else if (obj instanceof IntType)
+    } else if( obj instanceof IntType ) {
       return visitIntType((IntType) obj, param);
-    else if (obj instanceof BooleanType)
+    } else if( obj instanceof BooleanType ) {
       return visitBooleanType((BooleanType) obj, param);
-    else if (obj instanceof NamedElemType)
+    } else if( obj instanceof NamedElemType ) {
       return visitNamedElemType((NamedElemType) obj, param);
-    else if (obj instanceof EnumType)
+    } else if( obj instanceof EnumType ) {
       return visitEnumType((EnumType) obj, param);
-    else if (obj instanceof VoidType)
+    } else if( obj instanceof VoidType ) {
       return visitVoidType((VoidType) obj, param);
-    else if (obj instanceof ArrayType)
+    } else if( obj instanceof ArrayType ) {
       return visitArray((ArrayType) obj, param);
-    else if (obj instanceof StringType)
+    } else if( obj instanceof StringType ) {
       return visitStringType((StringType) obj, param);
-    else
+    } else if( obj instanceof PointerType ) {
+      return visitPointerType((PointerType) obj, param);
+    } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
   }
 
   protected R visitIntType(IntType obj, P param) {
-    if (obj instanceof UnsignedType)
+    if( obj instanceof UnsignedType ) {
       return visitUnsignedType((UnsignedType) obj, param);
-    else if (obj instanceof SignedType)
+    } else if( obj instanceof SignedType ) {
       return visitSignedType((SignedType) obj, param);
-    else if (obj instanceof NoSignType)
+    } else if( obj instanceof NoSignType ) {
       return visitNoSignType((NoSignType) obj, param);
-    else
+    } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
   }
 
   protected R visitNamedElemType(NamedElemType obj, P param) {
-    if (obj instanceof StructType)
+    if( obj instanceof StructType ) {
       return visitStructType((StructType) obj, param);
-    else if (obj instanceof UnionType)
+    } else if( obj instanceof UnionType ) {
       return visitUnionType((UnionType) obj, param);
-    else
+    } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
   }
 
   protected abstract R visitCaseOptValue(CaseOptValue obj, P param);
@@ -403,4 +422,5 @@ abstract public class Traverser<R, P> {
 
   protected abstract R visitProgram(Program obj, P param);
 
+  protected abstract R visitPointerType(PointerType obj, P param);
 }

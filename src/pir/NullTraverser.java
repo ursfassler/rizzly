@@ -48,6 +48,7 @@ import pir.type.EnumElement;
 import pir.type.EnumType;
 import pir.type.NamedElement;
 import pir.type.NoSignType;
+import pir.type.PointerType;
 import pir.type.RangeType;
 import pir.type.SignedType;
 import pir.type.StringType;
@@ -341,4 +342,8 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
     return doDefault(obj, param);
   }
 
+  @Override
+  protected R visitPointerType(PointerType obj, P param) {
+    return doDefault(obj, param);
+  }
 }
