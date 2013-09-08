@@ -18,34 +18,13 @@ component
       a : R{0,10};
     
     function in.tick( x: R{0,10} )
-      la : R{0,10} = a;   //TODO remove "la" (used temporarly since compiler is not yet too good)
-      if la < 10 then
-        la := la + 1;
-        out.tick( la );
+      if a < 10 then
+        a := a + 1;
+        out.tick( a );
       else
         out.tick( x );
       end
-      a := la;
     end
     
-    /*TODO what with
-     *
-     * if a + x < 10 then
-     *   a := a + x;
-     * end
-     *
-     * TODO or
-     *
-     *  if a+1 < 10 then
-     *    a := a + 1;
-     *  end
-     *
-     * TODO or even
-     *
-     *  if a[x] < 10 then
-     *    a[x] := a[x] + 1;
-     *  end
-     */
-
   end
 

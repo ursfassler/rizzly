@@ -6,7 +6,7 @@ type
 
 interface
   Tick
-    function tick;
+    function tick( x: R{0,100} );
   end
 
 component
@@ -14,16 +14,27 @@ component
     input
       in  : Tick;
     
+    output
+      out : Tick;
+    
   implementation elementary
 
     var
       p : Point;
       q : Point;
 
-    function in.tick
-      p.x := (p.y + 1) mod 100;
-      p.y := 100 - p.y;
+    entry
+      p.x := 0;
+      p.y := 0;
+      q.x := 0;
+      q.y := 0;
+    end
+
+    function in.tick(  x: R{0,100}  )
+      p.x := (p.y + x) mod 100;
+      p.y := 100 - p.x;
       q   := p;
+      out.tick( q.y );
     end
 
   end

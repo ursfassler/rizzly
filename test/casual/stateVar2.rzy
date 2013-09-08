@@ -22,11 +22,7 @@ component
     end
     
     function addret( x: R{0,10} ):R{0,10}
-      if a < 10 then
-        a := a + 1;
-      else
-        a := 0;
-      end
+      a := (a + 1) mod 11;
       return x;
     end
     

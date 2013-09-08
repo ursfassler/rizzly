@@ -1,5 +1,6 @@
 package evl.passes;
 
+import evl.statement.CallStmt;
 import java.util.Map;
 import java.util.Set;
 
@@ -28,6 +29,7 @@ import evl.traverser.VariableReplacer;
 import evl.traverser.range.CaseRangeUpdater;
 import evl.traverser.range.RangeGetter;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
+import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.base.Range;
 import evl.variable.SsaVariable;
@@ -39,6 +41,7 @@ import evl.variable.SsaVariable;
  * 
  */
 public class RangeNarrower extends DefTraverser<Void, Void> {
+
   private Narrower narrower;
 
   public RangeNarrower(KnowledgeBase kb) {
@@ -56,10 +59,10 @@ public class RangeNarrower extends DefTraverser<Void, Void> {
     narrower.traverse(obj, null);
     return null;
   }
-
 }
 
 class Narrower extends DefTraverser<Void, Void> {
+
   private KnowledgeBase kb;
   private KnowSsaUsage ksu;
   private StmtUpdater su;
@@ -88,21 +91,21 @@ class Narrower extends DefTraverser<Void, Void> {
     // TODO enumerator and boolean should also be allowed
     // TODO check somewhere if case values are disjunct
 
-    if (!(obj.getCondition() instanceof Reference)) {
+    if( !( obj.getCondition() instanceof Reference ) ) {
       RError.err(ErrorType.Hint, obj.getCondition().getInfo(), "can only do range analysis on local variables");
       return null;
     }
     Reference ref = (Reference) obj.getCondition();
-    if (!ref.getOffset().isEmpty() || !(ref.getLink() instanceof SsaVariable)) {
+    if( !ref.getOffset().isEmpty() || !( ref.getLink() instanceof SsaVariable ) ) {
       RError.err(ErrorType.Hint, obj.getCondition().getInfo(), "can only do range analysis on local variables");
       return null;
     }
     SsaVariable var = (SsaVariable) ref.getLink();
     Range varType = (Range) var.getType().getRef();
 
-    for (CaseGotoOpt opt : obj.getOption()) {
+    for( CaseGotoOpt opt : obj.getOption() ) {
       Range newType = CaseRangeUpdater.process(opt.getValue(), kb);
-      if (Range.leftIsSmallerEqual(newType, varType) && !Range.isEqual(newType, varType)) {
+      if( Range.leftIsSmallerEqual(newType, varType) && !Range.isEqual(newType, varType) ) {
         replace(opt.getDst(), var, newType);
       }
     }
@@ -116,10 +119,10 @@ class Narrower extends DefTraverser<Void, Void> {
   protected Void visitIfGoto(IfGoto obj, Void param) {
     Map<SsaVariable, Range> varRange = RangeGetter.getRange(obj.getCondition(), kb);
 
-    for (SsaVariable var : varRange.keySet()) {
+    for( SsaVariable var : varRange.keySet() ) {
       Range newType = varRange.get(var);
       Range varType = (Range) var.getType().getRef();
-      if (Range.leftIsSmallerEqual(newType, varType) && !Range.isEqual(newType, varType)) {
+      if( Range.leftIsSmallerEqual(newType, varType) && !Range.isEqual(newType, varType) ) {
         replace(obj.getThenBlock(), var, newType);
       }
     }
@@ -130,7 +133,7 @@ class Narrower extends DefTraverser<Void, Void> {
   }
 
   private void replace(BasicBlock startBb, SsaVariable var, Range range) {
-    assert (startBb.getPhi().isEmpty()); // if not true, we have to find a solution :(
+    assert ( startBb.getPhi().isEmpty() ); // if not true, we have to find a solution :(
     SsaVariable newVar = new SsaVariable(var.getInfo(), NameFactory.getNew(), new TypeRef(new ElementInfo(), range));
     Expression initExpr = new TypeCast(var.getInfo(), new Reference(startBb.getInfo(), var), new TypeRef(new ElementInfo(), range));
     VarDefInitStmt ass = new VarDefInitStmt(var.getInfo(), newVar, initExpr);
@@ -138,7 +141,7 @@ class Narrower extends DefTraverser<Void, Void> {
     VariableReplacer.replace(startBb, 1, var, newVar);
 
     Set<Statement> use = ksu.get(newVar);
-    for (Statement stmt : use) {
+    for( Statement stmt : use ) {
       update(stmt);
     }
   }
@@ -146,17 +149,16 @@ class Narrower extends DefTraverser<Void, Void> {
   // FIXME a bit messy, clean it up
   // follow variable usage until no more range can be narrowed
   private void update(Statement stmt) {
-    if (su.traverse(stmt, null)) {
-      if (stmt instanceof SsaGenerator) {
-        SsaVariable var = ((SsaGenerator) stmt).getVariable();
+    if( su.traverse(stmt, null) ) {
+      if( stmt instanceof SsaGenerator ) {
+        SsaVariable var = ( (SsaGenerator) stmt ).getVariable();
         Set<Statement> use = ksu.get(var);
-        for (Statement substmt : use) {
+        for( Statement substmt : use ) {
           update(substmt);
         }
       }
     }
   }
-
 }
 
 class StmtUpdater extends NullTraverser<Boolean, Void> {
@@ -177,7 +179,7 @@ class StmtUpdater extends NullTraverser<Boolean, Void> {
   protected Boolean visitVarDefInitStmt(VarDefInitStmt obj, Void param) {
     Range type = (Range) ExpressionTypeChecker.process(obj.getInit(), kb);
     type = Range.narrow(type, (Range) obj.getVariable().getType().getRef());
-    if (obj.getVariable().getType().getRef() != type) {
+    if( obj.getVariable().getType().getRef() != type ) {
       obj.getVariable().getType().setRef(type);
       return true;
     } else {
@@ -185,4 +187,9 @@ class StmtUpdater extends NullTraverser<Boolean, Void> {
     }
   }
 
+  @Override
+  protected Boolean visitCallStmt(CallStmt obj, Void param) {
+    // nothing to do since we do not produce a new value
+    return false;
+  }
 }

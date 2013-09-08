@@ -17,22 +17,27 @@ public class CasualTest extends BaseTest {
 
   @Test
   public void stateVar() {
-    compile("stateVar", "StateVar", true, DEBUG_EVENT, false);
+    compile("stateVar", TestSteps.EXECUTE, DEBUG_EVENT, false);
   }
 
   @Test
   public void stateVar1() {
-    compile("stateVar1", "StateVar1", true, DEBUG_EVENT, false);
+    compile("stateVar1", TestSteps.EXECUTE, DEBUG_EVENT, false);
   }
 
   @Test
   public void stateVar2() {
-    compile("stateVar2", "StateVar2", true, DEBUG_EVENT, false);
+    compile("stateVar2", TestSteps.EXECUTE, DEBUG_EVENT, false);
+  }
+
+  @Test
+  public void rec() {
+    compile("rec", TestSteps.EXECUTE, DEBUG_EVENT, false);
   }
 
   @Test
   public void range() {
-    compile("range", "Range", true, DEBUG_EVENT, false);
+    compile("range", TestSteps.EXECUTE, DEBUG_EVENT, false);
   }
 
   @Test
@@ -158,11 +163,6 @@ public class CasualTest extends BaseTest {
   @Test
   public void ifacemap() {
     compile("ifacemap", "Ifacemap", true, DEBUG_EVENT, false);
-  }
-
-  @Test
-  public void rec_Rec() {
-    compile("rec", "Rec", true, DEBUG_EVENT, false);
   }
 
   @Test

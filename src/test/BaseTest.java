@@ -17,11 +17,45 @@ abstract public class BaseTest {
 
   protected abstract String getRootdir();
 
+  public void compile(String filename, TestSteps steps, boolean debugEvent, boolean lazyModelCheck) {
+    cleanup();
+    ClaOption opt = new ClaOption();
+    String testcase = String.valueOf(filename.charAt(0)).toUpperCase() + filename.substring(1, filename.length());
+    String ns = filename;
+    opt.init(getRootdir(), new Designator(ns, testcase), debugEvent, lazyModelCheck);
+    Main.compile(opt);
+    
+    boolean compileBinary = false;
+    boolean execute = false;
+    boolean compileNative = false;
+    
+    switch( steps ){
+      case EXECUTE:
+        execute = true;
+      case COMPILE_TO_BIN:
+        compileBinary = true;
+      case COMPILE_TO_ASM:
+        compileNative = true;
+    }
+    
+    if (compileNative) {
+      compileLlvm();
+    }
+    if( compileBinary ){
+      compileTest(filename);
+    }
+    if( execute ){
+      executeTest(filename);
+    }
+  }
+
+  @Deprecated
   public void compile(String namespace, String comp, boolean compileCfile, boolean debugEvent, boolean lazyModelCheck) {
     cleanup();
     ClaOption opt = new ClaOption();
     opt.init(getRootdir(), new Designator(namespace, comp), debugEvent, lazyModelCheck);
     Main.compile(opt);
+    
     if (compileCfile) {
       compileLlvm();
     }
@@ -33,15 +67,29 @@ abstract public class BaseTest {
 
   public void compileLlvm() {
     // String cmd = "gcc -pedantic -ansi -Werror -Wall -Wextra -c " + cfile + " -o " + outdir + "libinst.a";
-    String cmd = "llc " + llvmFile + " -o " + outdir + "inst.s";
     //TODO use strict?
+    String cmd = "llc " + llvmFile + " -o " + outdir + "inst.s";
+    execute(cmd,"could not compile llvm file");
+  }
+
+  private void compileTest(String testcase) {
+    String cmd = "gcc " + getRootdir() + testcase + ".c" + " " + outdir + "inst.s" + " -o" + outdir + "inst";
+    execute(cmd,"could not compile test case");
+  }
+
+  private void executeTest(String testcase) {
+    String cmd = outdir + "inst";
+    execute(cmd,"test case failed");
+  }
+
+  private void execute(String cmd,String msg) throws RuntimeException {
     try {
       Process p;
       p = Runtime.getRuntime().exec(cmd);
       p.waitFor();
       if (p.exitValue() != 0) {
         printMsg(p);
-        throw new RuntimeException("Comile error");
+        throw new RuntimeException(msg);
       }
     } catch (InterruptedException e) {
       e.printStackTrace();

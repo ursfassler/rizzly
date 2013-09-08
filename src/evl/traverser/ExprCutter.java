@@ -4,6 +4,7 @@ import evl.cfg.BasicBlockList;
 import evl.cfg.Goto;
 import evl.cfg.ReturnExpr;
 import evl.cfg.ReturnVoid;
+import evl.statement.CallStmt;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -129,6 +130,8 @@ public class ExprCutter extends NullTraverser<Void, Void> {
 
 
 
+
+
 class StmtTraverser extends NullTraverser<Void, List<Statement>> {
 
   private KnowledgeBase kb;
@@ -183,6 +186,12 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
     obj.getCode().clear();
     obj.getCode().addAll(sl);
 
+    return null;
+  }
+
+  @Override
+  protected Void visitCallStmt(CallStmt obj, List<Statement> param) {
+    obj.setCall( (Reference)cutter.traverse(obj.getCall(), param) );
     return null;
   }
 
@@ -267,13 +276,19 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
   }
 
   @Override
+  protected Void visitVarDef(VarDefStmt obj, List<Statement> param) {
+    return null;
+  }
+
+  @Override
   protected Void visitVarDefInitStmt(VarDefInitStmt obj, List<Statement> param) {
     throw new UnsupportedOperationException("Not supported yet: " + obj.getClass().getCanonicalName());
   }
 
   @Override
   protected Void visitReturnExpr(ReturnExpr obj, List<Statement> param) {
-    throw new UnsupportedOperationException("Not supported yet: " + obj.getClass().getCanonicalName());
+    obj.setExpr(cutter.traverse(obj.getExpr(), param));
+    return null;
   }
 
   @Override
