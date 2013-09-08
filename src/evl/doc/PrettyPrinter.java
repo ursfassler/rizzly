@@ -1,5 +1,8 @@
 package evl.doc;
 
+import evl.statement.GetElementPtr;
+import evl.statement.LoadStmt;
+import evl.statement.StoreStmt;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -83,6 +86,7 @@ import evl.variable.StateVariable;
 import evl.variable.Variable;
 
 public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
+
   private boolean writeId;
 
   public PrettyPrinter(boolean writeId) {
@@ -94,7 +98,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     PrettyPrinter pp = new PrettyPrinter(writeId);
     try {
       pp.traverse(ast, new StreamWriter(new PrintStream(filename)));
-    } catch (FileNotFoundException e) {
+    } catch( FileNotFoundException e ) {
       e.printStackTrace();
     }
   }
@@ -105,8 +109,8 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   private void list(List<? extends Evl> list, String sep, StreamWriter param) {
-    for (int i = 0; i < list.size(); i++) {
-      if (i > 0) {
+    for( int i = 0; i < list.size(); i++ ) {
+      if( i > 0 ) {
         param.wr(sep);
       }
       visit(list.get(i), param);
@@ -114,20 +118,20 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   private void visitList(List<? extends Evl> list, StreamWriter param) {
-    for (int i = 0; i < list.size(); i++) {
+    for( int i = 0; i < list.size(); i++ ) {
       visit(list.get(i), param);
     }
   }
 
   private <T extends Named> void visitList(ListOfNamed<T> list, StreamWriter param) {
     Iterator<T> itr = list.iterator();
-    while (itr.hasNext()) {
+    while( itr.hasNext() ) {
       visit(itr.next(), param);
     }
   }
 
   private void wrId(Evl obj, StreamWriter wr) {
-    if (writeId) {
+    if( writeId ) {
       wr.wr("[" + obj.hashCode() % 10000 + "]");
     }
   }
@@ -149,7 +153,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   private void visitInterfaceDecl(String type, ListOfNamed<? extends Named> listOfNamed, StreamWriter param) {
-    if (!listOfNamed.isEmpty()) {
+    if( !listOfNamed.isEmpty() ) {
       param.wr(type);
       param.nl();
       param.incIndent();
@@ -176,7 +180,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   protected void visitOptList(String name, ListOfNamed<? extends Named> type, StreamWriter param) {
-    if (type.isEmpty()) {
+    if( type.isEmpty() ) {
       return;
     }
     param.wr(name);
@@ -187,7 +191,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   protected void visitOptList(String name, List<? extends EvlBase> type, StreamWriter param) {
-    if (type.isEmpty()) {
+    if( type.isEmpty() ) {
       return;
     }
     param.wr(name);
@@ -319,15 +323,15 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitConnection(Connection obj, StreamWriter param) {
     visit(obj.getEndpoint(Direction.in), param);
-    switch (obj.getType()) {
-    case sync:
-      param.wr(" -> ");
-      break;
-    case async:
-      param.wr(" >> ");
-      break;
-    default:
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Not yet implemented connection type: " + obj.getType());
+    switch( obj.getType() ) {
+      case sync:
+        param.wr(" -> ");
+        break;
+      case async:
+        param.wr(" >> ");
+        break;
+      default:
+        RError.err(ErrorType.Fatal, obj.getInfo(), "Not yet implemented connection type: " + obj.getType());
     }
     visit(obj.getEndpoint(Direction.out), param);
     param.wr(";");
@@ -343,14 +347,14 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.wr("(");
     list(obj.getParam().getList(), "; ", param);
     param.wr(")");
-    if (obj instanceof FuncWithReturn) {
+    if( obj instanceof FuncWithReturn ) {
       param.wr(":");
-      visit(((FuncWithReturn) obj).getRet(), param);
+      visit(( (FuncWithReturn) obj ).getRet(), param);
     }
     param.nl();
-    if (obj instanceof FuncWithBody) {
+    if( obj instanceof FuncWithBody ) {
       param.incIndent();
-      visit(((FuncWithBody) obj).getBody(), param);
+      visit(( (FuncWithBody) obj ).getBody(), param);
       param.decIndent();
       param.wr("end");
       param.nl();
@@ -360,7 +364,6 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   // ---- Type ----------------------------------------------------------------
-
   @Override
   protected Void visitStringType(StringType obj, StreamWriter param) {
     param.wr(obj.getName());
@@ -440,8 +443,38 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     return null;
   }
 
-  // ---- Statement -----------------------------------------------------------
+  @Override
+  protected Void visitGetElementPtr(GetElementPtr obj, StreamWriter param) {
+    visit(obj.getVariable(), param);
+    param.wr(" := getElementPtr ");
+    visit(obj.getAddress(), param);
+    param.wr(";");
+    param.nl();
+    return null;
+  }
 
+  @Override
+  protected Void visitLoadStmt(LoadStmt obj, StreamWriter param) {
+    visit(obj.getVariable(), param);
+    param.wr(" <= load ");
+    visit(obj.getAddress(), param);
+    param.wr(";");
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitStoreStmt(StoreStmt obj, StreamWriter param) {
+    param.wr("store ");
+    visit(obj.getAddress(), param);
+    param.wr(" <= ");
+    visit(obj.getExpr(), param);
+    param.wr(";");
+    param.nl();
+    return null;
+  }
+
+  // ---- Statement -----------------------------------------------------------
   @Override
   protected Void visitAssignment(Assignment obj, StreamWriter param) {
     visit(obj.getLeft(), param);
@@ -509,7 +542,6 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   // ---- Expression ----------------------------------------------------------
-
   @Override
   protected Void visitArithmeticOp(ArithmeticOp obj, StreamWriter param) {
     param.wr("(");
@@ -841,6 +873,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     visit(obj.getExit(), param);
     LinkedList<BasicBlock> bbs = new LinkedList<BasicBlock>(obj.getBasicBlocks());
     Collections.sort(bbs, new Comparator<BasicBlock>() {
+
       @Override
       public int compare(BasicBlock o1, BasicBlock o2) {
         return o1.getName().compareTo(o2.getName());
@@ -856,13 +889,14 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.wr(" = phi(");
     ArrayList<BasicBlock> args = new ArrayList<BasicBlock>(obj.getInBB());
     Collections.sort(args, new Comparator<BasicBlock>() {
+
       @Override
       public int compare(BasicBlock arg0, BasicBlock arg1) {
         return arg0.getName().compareTo(arg1.getName()); // TODO correct phi arg ordering?
       }
     });
-    for (int i = 0; i < args.size(); i++) {
-      if (i > 0) {
+    for( int i = 0; i < args.size(); i++ ) {
+      if( i > 0 ) {
         param.wr(",");
       }
       BasicBlock bb = args.get(i);
@@ -879,10 +913,9 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitTypeCast(TypeCast obj, StreamWriter param) {
-    visit( obj.getRef(), param );
+    visit(obj.getRef(), param);
     param.wr(" to ");
     visit(obj.getCast(), param);
     return null;
   }
-
 }

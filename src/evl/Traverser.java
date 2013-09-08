@@ -62,7 +62,10 @@ import evl.other.Namespace;
 import evl.other.RizzlyProgram;
 import evl.statement.Assignment;
 import evl.statement.CallStmt;
+import evl.statement.GetElementPtr;
+import evl.statement.LoadStmt;
 import evl.statement.Statement;
+import evl.statement.StoreStmt;
 import evl.statement.VarDefInitStmt;
 import evl.statement.VarDefStmt;
 import evl.type.Type;
@@ -85,6 +88,7 @@ import evl.type.special.ComponentType;
 import evl.type.special.IntegerType;
 import evl.type.special.InterfaceType;
 import evl.type.special.NaturalType;
+import evl.type.special.PointerType;
 import evl.type.special.VoidType;
 import evl.variable.ConstGlobal;
 import evl.variable.ConstPrivate;
@@ -280,6 +284,12 @@ public abstract class Traverser<R, P> {
       return visitVarDef((VarDefStmt) obj, param);
     } else if( obj instanceof VarDefInitStmt ) {
       return visitVarDefInitStmt((VarDefInitStmt) obj, param);
+    } else if( obj instanceof StoreStmt ) {
+      return visitStoreStmt((StoreStmt) obj, param);
+    } else if( obj instanceof LoadStmt ) {
+      return visitLoadStmt((LoadStmt) obj, param);
+    } else if( obj instanceof GetElementPtr ) {
+      return visitGetElementPtr((GetElementPtr) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -397,6 +407,8 @@ public abstract class Traverser<R, P> {
       return visitInterfaceType((InterfaceType) obj, param);
     } else if( obj instanceof ComponentType ) {
       return visitComponentType((ComponentType) obj, param);
+    } else if( obj instanceof PointerType ) {
+      return visitPointerType((PointerType) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -551,4 +563,12 @@ public abstract class Traverser<R, P> {
   abstract protected R visitFunctionTypeVoid(FunctionTypeVoid obj, P param);
 
   abstract protected R visitFunctionTypeRet(FunctionTypeRet obj, P param);
+
+  abstract protected R visitStoreStmt(StoreStmt obj, P param);
+
+  abstract protected R visitLoadStmt(LoadStmt obj, P param);
+
+  abstract protected R visitGetElementPtr(GetElementPtr getElementPtr, P param);
+
+  abstract protected R visitPointerType(PointerType pointerType, P param);
 }

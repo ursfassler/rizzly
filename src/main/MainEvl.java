@@ -69,6 +69,7 @@ import evl.other.Named;
 import evl.other.NamedList;
 import evl.other.Namespace;
 import evl.other.RizzlyProgram;
+import evl.passes.MemoryAccessCapsulater;
 import evl.passes.RangeNarrower;
 import evl.traverser.CallgraphMaker;
 import evl.traverser.ClassGetter;
@@ -127,6 +128,8 @@ public class MainEvl {
 
     PrettyPrinter.print(aclasses, debugdir + "reduced.rzy", true);
 
+    MemoryAccessCapsulater.process( aclasses, kb );
+    
     // only for debugging
     // typecheck(classes, debugdir);
 

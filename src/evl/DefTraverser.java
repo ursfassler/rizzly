@@ -1,5 +1,9 @@
 package evl;
 
+import evl.statement.GetElementPtr;
+import evl.statement.LoadStmt;
+import evl.statement.StoreStmt;
+import evl.type.special.PointerType;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -562,6 +566,33 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitTypeRef(TypeRef obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitStoreStmt(StoreStmt obj, P param) {
+    visit(obj.getExpr(),param);
+    visit(obj.getAddress(),param);
+    return null;
+  }
+
+  @Override
+  protected R visitLoadStmt(LoadStmt obj, P param) {
+    visit(obj.getAddress(),param);
+    visit(obj.getVariable(),param);
+    return null;
+  }
+
+  @Override
+  protected R visitGetElementPtr(GetElementPtr obj, P param) {
+    visit(obj.getAddress(),param);
+    visit(obj.getVariable(),param);
+    return null;
+  }
+
+  @Override
+  protected R visitPointerType(PointerType obj, P param) {
+    visit(obj.getType(),param);
     return null;
   }
 

@@ -52,6 +52,9 @@ import evl.other.Namespace;
 import evl.other.RizzlyProgram;
 import evl.statement.Assignment;
 import evl.statement.CallStmt;
+import evl.statement.GetElementPtr;
+import evl.statement.LoadStmt;
+import evl.statement.StoreStmt;
 import evl.statement.VarDefInitStmt;
 import evl.statement.VarDefStmt;
 import evl.type.TypeRef;
@@ -70,6 +73,7 @@ import evl.type.special.ComponentType;
 import evl.type.special.IntegerType;
 import evl.type.special.InterfaceType;
 import evl.type.special.NaturalType;
+import evl.type.special.PointerType;
 import evl.type.special.VoidType;
 import evl.variable.ConstGlobal;
 import evl.variable.ConstPrivate;
@@ -456,4 +460,23 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
     return visitDefault(obj, param);
   }
 
+  @Override
+  protected R visitLoadStmt(LoadStmt obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitStoreStmt(StoreStmt obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitGetElementPtr(GetElementPtr obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitPointerType(PointerType obj, P param) {
+    return visitDefault(obj, param);
+  }
 }
