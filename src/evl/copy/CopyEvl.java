@@ -1,5 +1,6 @@
 package evl.copy;
 
+import evl.other.RizzlyProgram;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -83,6 +84,16 @@ class CopyEvl extends NullTraverser<Evl, Void> {
       }
     }
     return super.visit(obj, param);
+  }
+
+  @Override
+  protected Evl visitRizzlyProgram(RizzlyProgram obj, Void param) {
+    RizzlyProgram ret = new RizzlyProgram(obj.getRootdir(), obj.getName());
+    ret.getConstant().addAll( copy(obj.getConstant().getList()) );
+    ret.getFunction().addAll( copy(obj.getFunction().getList()) );
+    ret.getType().addAll( copy(obj.getType().getList()) );
+    ret.getVariable().addAll( copy(obj.getVariable().getList()) );
+    return ret;
   }
 
   @Override

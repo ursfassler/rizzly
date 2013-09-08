@@ -278,22 +278,26 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitFuncVariable(FuncVariable obj, P param) {
+    visit(obj.getType(),param);
     return null;
   }
 
   @Override
   protected R visitStateVariable(StateVariable obj, P param) {
+    visit(obj.getType(),param);
     return null;
   }
 
   @Override
   protected R visitConstPrivate(ConstPrivate obj, P param) {
+    visit(obj.getType(),param);
     visit(obj.getDef(), param);
     return null;
   }
 
   @Override
   protected R visitConstGlobal(ConstGlobal obj, P param) {
+    visit(obj.getType(),param);
     visit(obj.getDef(), param);
     return null;
   }
@@ -554,6 +558,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitSsaVariable(SsaVariable obj, P param) {
+    visit(obj.getType(),param);
     return null;
   }
 

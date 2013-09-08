@@ -1,5 +1,6 @@
 package evl.passes;
 
+import evl.statement.Assignment;
 import evl.statement.CallStmt;
 import java.util.Map;
 import java.util.Set;
@@ -192,4 +193,12 @@ class StmtUpdater extends NullTraverser<Boolean, Void> {
     // nothing to do since we do not produce a new value
     return false;
   }
+
+  @Override
+  protected Boolean visitAssignment(Assignment obj, Void param) {
+    // nothing to do since we do not produce a new value
+    return false;
+  }
+  
+  
 }

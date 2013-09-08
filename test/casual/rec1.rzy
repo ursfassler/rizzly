@@ -1,0 +1,30 @@
+type
+  Point = Record
+    x : R{0,100};
+    y : R{0,100};
+  end
+
+interface
+  Tick
+    function tick( x: R{0,100} );
+  end
+
+component
+  Rec1
+    input
+      in  : Tick;
+    
+    output
+      out : Tick;
+    
+  implementation elementary
+
+    function in.tick(  x: R{0,100}  )
+      p : Point;
+      p.x := x;
+      p.y := 100 - p.x;
+      out.tick( p.y );
+    end
+
+  end
+

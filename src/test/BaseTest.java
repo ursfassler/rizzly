@@ -73,7 +73,8 @@ abstract public class BaseTest {
   }
 
   private void compileTest(String testcase) {
-    String cmd = "gcc " + getRootdir() + testcase + ".c" + " " + outdir + "inst.s" + " -o" + outdir + "inst";
+    String flags = "-Wall -Werror";
+    String cmd = "gcc " + flags + " " + getRootdir() + testcase + ".c" + " " + outdir + "inst.s" + " -o" + outdir + "inst";
     execute(cmd,"could not compile test case");
   }
 

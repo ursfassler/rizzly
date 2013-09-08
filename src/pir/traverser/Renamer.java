@@ -27,7 +27,7 @@ public class Renamer extends DefTraverser<Void, Void> {
     item.setName(name);
   }
 
-  private static String cleanName(String name) {
+  public static String cleanName(String name) {
     String ret = "";
     for (int i = 0; i < name.length(); i++) {
       char sym = name.charAt(i);

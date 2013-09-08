@@ -1,5 +1,6 @@
 #include  <stdio.h>
 #include  <stdint.h>
+#include  "output/inst.h"
 
 static uint8_t value;
 static uint8_t error = 0;

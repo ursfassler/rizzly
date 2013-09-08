@@ -36,6 +36,11 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  public void rec1() {
+    compile("rec1", TestSteps.EXECUTE, DEBUG_EVENT, false);
+  }
+
+  @Test
   public void range() {
     compile("range", TestSteps.EXECUTE, DEBUG_EVENT, false);
   }
