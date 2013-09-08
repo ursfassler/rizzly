@@ -7,6 +7,7 @@ import pir.other.PirValue;
 import pir.other.SsaVariable;
 
 public class GetElementPtr extends VariableGeneratorStmt {
+
   private PirValue base;
   final private List<PirValue> offset = new ArrayList<PirValue>();
 
@@ -32,5 +33,4 @@ public class GetElementPtr extends VariableGeneratorStmt {
   public String toString() {
     return super.toString() + " := getelementptr " + base + offset;
   }
-
 }
