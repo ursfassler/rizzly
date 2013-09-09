@@ -130,6 +130,7 @@ public class MainEvl {
     PrettyPrinter.print(aclasses, debugdir + "reduced.rzy", true);
 
     MemoryAccessCapsulater.process(aclasses, kb);
+    ExprCutter.process(aclasses, kb);
     PrettyPrinter.print(aclasses, debugdir + "memcaps.rzy", true);
 
     // only for debugging

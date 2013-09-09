@@ -45,6 +45,8 @@ public class CasualTest extends BaseTest {
     compile("range", TestSteps.EXECUTE, DEBUG_EVENT, false);
   }
 
+  /*
+  
   @Test
   public void meta() {
     compile("meta", "Meta", true, DEBUG_EVENT, false);
@@ -239,4 +241,5 @@ public class CasualTest extends BaseTest {
   public void param() {
     compile("param", "Param", true, DEBUG_EVENT, false);
   }
+   */
 }
