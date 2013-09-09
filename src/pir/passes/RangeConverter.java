@@ -17,13 +17,14 @@ import pir.statement.CallAssignment;
 import pir.statement.CallStmt;
 import pir.statement.Relation;
 import pir.statement.Statement;
+import pir.statement.StoreStmt;
 import pir.statement.convert.TypeCast;
 import pir.traverser.StatementReplacer;
-import pir.type.BooleanType;
 import pir.type.RangeType;
 import pir.type.TypeRef;
 
 import common.NameFactory;
+import pir.type.PointerType;
 import pir.type.Type;
 
 /**
@@ -210,6 +211,31 @@ public class RangeConverter extends StatementReplacer<Void> {
       obj.setVariable(irv);
       ret.add(rex);
     }
+
+    return ret;
+  }
+
+  @Override
+  protected List<Statement> visitStoreStmt(StoreStmt obj, Void param) {
+    Type st = obj.getSrc().getType().getRef();
+    Type dt = obj.getDst().getType().getRef();
+    assert ( dt instanceof PointerType );
+    dt = ( (PointerType) dt ).getType().getRef();
+    if( isNotRange(st, dt) ) {
+      return null;
+    }
+
+    RangeType lrt = (RangeType) st;
+    RangeType drt = (RangeType) dt;
+
+    RangeType bt = RangeType.makeContainer(lrt, drt);
+    bt = kbi.getRangeType(bt.getLow(), bt.getHigh()); // add bt to program
+
+    List<Statement> ret = new ArrayList<Statement>();
+
+    obj.setSrc(replaceIfNeeded(obj.getSrc(), lrt, bt, ret));
+
+    ret.add(obj);
 
     return ret;
   }
