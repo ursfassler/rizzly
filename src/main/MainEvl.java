@@ -71,6 +71,7 @@ import evl.other.Namespace;
 import evl.other.RizzlyProgram;
 import evl.passes.MemoryAccessCapsulater;
 import evl.passes.RangeNarrower;
+import evl.passes.StackMemoryIntroductor;
 import evl.traverser.CallgraphMaker;
 import evl.traverser.ClassGetter;
 import evl.traverser.CompInstantiator;
@@ -128,7 +129,10 @@ public class MainEvl {
 
     PrettyPrinter.print(aclasses, debugdir + "reduced.rzy", true);
 
+    StackMemoryIntroductor.process( aclasses, kb );
+    PrettyPrinter.print(aclasses, debugdir + "stackmem.rzy", true);
     MemoryAccessCapsulater.process( aclasses, kb );
+    PrettyPrinter.print(aclasses, debugdir + "memcaps.rzy", true);
     
     // only for debugging
     // typecheck(classes, debugdir);

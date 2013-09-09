@@ -2,6 +2,7 @@ package evl;
 
 import evl.statement.GetElementPtr;
 import evl.statement.LoadStmt;
+import evl.statement.StackMemoryAlloc;
 import evl.statement.StoreStmt;
 import evl.type.special.PointerType;
 import java.util.ArrayList;
@@ -598,6 +599,12 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitPointerType(PointerType obj, P param) {
     visit(obj.getType(),param);
+    return null;
+  }
+
+  @Override
+  protected R visitStackMemoryAlloc(StackMemoryAlloc obj, P param) {
+    visit(obj.getVariable(),param);
     return null;
   }
 

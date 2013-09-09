@@ -18,9 +18,12 @@ import evl.cfg.BasicBlock;
 import evl.cfg.PhiStmt;
 import evl.function.FuncWithBody;
 import evl.type.Type;
+import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumType;
 import evl.type.base.Range;
+import evl.type.composed.RecordType;
+import evl.type.composed.UnionType;
 import evl.type.special.IntegerType;
 import evl.type.special.NaturalType;
 import evl.variable.FuncVariable;
@@ -30,6 +33,7 @@ import evl.variable.Variable;
 //FIXME go over textbook again, this algorithm is dirty and may not work correct
 @Deprecated
 public class PhiInserter {
+
   private List<Variable> globals = new ArrayList<Variable>();
   private FuncWithBody func;
   private DominanceFrontier<BasicBlock, BbEdge> df;
@@ -110,6 +114,12 @@ public class PhiInserter {
   public static boolean isScalar(Type type) {
     // TODO make it nice
     return (type instanceof Range) || (type instanceof IntegerType) || (type instanceof NaturalType) || (type instanceof EnumType) || (type instanceof BooleanType);
+  }
+  
+  @Deprecated
+  public static boolean isAggregate(Type type) {
+    // TODO make it nice
+    return (type instanceof RecordType) || (type instanceof UnionType) || (type instanceof ArrayType);
   }
 
   private void insertPhi(BasicBlock bb, FuncVariable var, int number) {

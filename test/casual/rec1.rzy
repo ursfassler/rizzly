@@ -19,7 +19,7 @@ component
     
   implementation elementary
 
-    function in.tick(  x: R{0,100}  )
+    function in.tick( x: R{0,100} )
       p : Point;
       p.x := x;
       p.y := 100 - p.x;

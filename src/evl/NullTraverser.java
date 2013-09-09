@@ -54,6 +54,7 @@ import evl.statement.Assignment;
 import evl.statement.CallStmt;
 import evl.statement.GetElementPtr;
 import evl.statement.LoadStmt;
+import evl.statement.StackMemoryAlloc;
 import evl.statement.StoreStmt;
 import evl.statement.VarDefInitStmt;
 import evl.statement.VarDefStmt;
@@ -477,6 +478,11 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitPointerType(PointerType obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitStackMemoryAlloc(StackMemoryAlloc obj, P param) {
     return visitDefault(obj, param);
   }
 }

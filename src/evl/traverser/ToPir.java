@@ -2,6 +2,7 @@ package evl.traverser;
 
 import evl.statement.GetElementPtr;
 import evl.statement.LoadStmt;
+import evl.statement.StackMemoryAlloc;
 import evl.type.special.PointerType;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -88,6 +89,8 @@ import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
 import java.math.BigInteger;
 import pir.type.StructType;
+import util.ssa.PhiInserter;
+
 
 public class ToPir extends NullTraverser<PirObject, PirObject> {
 
@@ -263,9 +266,15 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
 
   @Override
   protected PirObject visitVarDef(VarDefStmt obj, PirObject param) {
-    pir.other.FuncVariable cvar = (pir.other.FuncVariable) visit(obj.getVariable(), param);
-    pir.statement.VarDefStmt ret = new pir.statement.VarDefStmt(cvar);
-    return ret;
+    RError.err(ErrorType.Fatal, obj.getInfo(), "VarDefStmt should no longer exists; replaced with StackMemoryAlloc");
+    return null;
+  }
+
+  @Override
+  protected PirObject visitStackMemoryAlloc(StackMemoryAlloc obj, PirObject param) {
+    pir.other.SsaVariable var = (pir.other.SsaVariable) visit(obj.getVariable(),null);
+    pir.statement.StackMemoryAlloc sma = new pir.statement.StackMemoryAlloc(var);
+    return sma;
   }
 
   @Override
@@ -482,12 +491,16 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
     VarRef ref = (VarRef) traverse(obj.getAddress(), null);
     ArrayList<PirValue> ofs = new ArrayList<PirValue>();
 
-    if( ref.getRef() instanceof pir.other.StateVariable ) {
+    pir.type.Type type = ref.getRef().getType().getRef();
+    
+    // hacky?
+    assert( type instanceof pir.type.PointerType );
+    type = ((pir.type.PointerType)type).getType().getRef();
+//    if( ref.getRef() instanceof pir.other.StateVariable ) {
       // see llvm GEP FAQ: Why is the extra 0 index required?
       ofs.add(new pir.expression.Number(BigInteger.ZERO, new TypeRef(kbi.getNoSignType(1))));
-    }
-
-    pir.type.Type type = ref.getRef().getType().getRef();
+//    }
+    
     for( RefItem itr : ref.getOffset() ) {
       if( itr instanceof pir.expression.reference.RefName ) {
         // get index of struct member and use that
@@ -582,7 +595,6 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
     return new TypeRef((pir.type.Type) visit(obj.getRef(), null));
   }
 }
-
 class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, pir.other.SsaVariable> {
 
   private ToPir converter;

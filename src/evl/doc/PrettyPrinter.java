@@ -2,6 +2,7 @@ package evl.doc;
 
 import evl.statement.GetElementPtr;
 import evl.statement.LoadStmt;
+import evl.statement.StackMemoryAlloc;
 import evl.statement.StoreStmt;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
@@ -481,6 +482,17 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.wr(" := ");
     visit(obj.getRight(), param);
     param.wr(";");
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitStackMemoryAlloc(StackMemoryAlloc obj, StreamWriter param) {
+    visit(obj.getVariable(),param);
+    param.wr(" := ");
+    param.wr("alloca( ");
+    param.wr( obj.getType().getName() );
+    param.wr(" );");
     param.nl();
     return null;
   }

@@ -45,10 +45,10 @@ import pir.statement.CallStmt;
 import pir.statement.GetElementPtr;
 import pir.statement.LoadStmt;
 import pir.statement.Relation;
+import pir.statement.StackMemoryAlloc;
 import pir.statement.StmtSignes;
 import pir.statement.StoreStmt;
 import pir.statement.UnaryOp;
-import pir.statement.VarDefStmt;
 import pir.statement.VariableGeneratorStmt;
 import pir.statement.convert.ConvertValue;
 import pir.statement.convert.SignExtendValue;
@@ -533,7 +533,6 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     wrVarDef(obj, param);
     param.wr("getelementptr ");
     visit(obj.getBase().getType(), param);
-    param.wr("*"); // FIXME ok?
     param.wr(" ");
     visit(obj.getBase(), param);
     for( PirValue ofs : obj.getOffset() ) {
@@ -661,9 +660,10 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitVarDefStmt(VarDefStmt obj, StreamWriter param) {
-    visit(obj.getVariable(), param);
-    param.wr(";");
+  protected Void visitStackMemoryAlloc(StackMemoryAlloc obj, StreamWriter param) {
+    wrVarDef(obj, param);
+    param.wr("alloca ");
+    visit( new TypeRef(obj.getType()), param);
     param.nl();
     return null;
   }

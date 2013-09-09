@@ -6,6 +6,7 @@ import evl.statement.Assignment;
 import evl.statement.CallStmt;
 import evl.statement.GetElementPtr;
 import evl.statement.LoadStmt;
+import evl.statement.StackMemoryAlloc;
 import evl.statement.Statement;
 import evl.statement.StoreStmt;
 import evl.statement.VarDefInitStmt;
@@ -57,6 +58,11 @@ public class CopyStatement extends NullTraverser<Statement, Void> {
   @Override
   protected Statement visitGetElementPtr(GetElementPtr obj, Void param) {
     return new GetElementPtr(obj.getInfo(), cast.copy(obj.getVariable()), cast.copy(obj.getAddress()));
+  }
+
+  @Override
+  protected Statement visitStackMemoryAlloc(StackMemoryAlloc obj, Void param) {
+    return new StackMemoryAlloc(obj.getInfo(), cast.copy(obj.getVariable()));
   }
 
 }

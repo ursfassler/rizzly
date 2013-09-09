@@ -64,6 +64,7 @@ import evl.statement.Assignment;
 import evl.statement.CallStmt;
 import evl.statement.GetElementPtr;
 import evl.statement.LoadStmt;
+import evl.statement.StackMemoryAlloc;
 import evl.statement.Statement;
 import evl.statement.StoreStmt;
 import evl.statement.VarDefInitStmt;
@@ -290,6 +291,8 @@ public abstract class Traverser<R, P> {
       return visitLoadStmt((LoadStmt) obj, param);
     } else if( obj instanceof GetElementPtr ) {
       return visitGetElementPtr((GetElementPtr) obj, param);
+    } else if( obj instanceof StackMemoryAlloc ) {
+      return visitStackMemoryAlloc((StackMemoryAlloc) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -568,7 +571,9 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitLoadStmt(LoadStmt obj, P param);
 
-  abstract protected R visitGetElementPtr(GetElementPtr getElementPtr, P param);
+  abstract protected R visitGetElementPtr(GetElementPtr obj, P param);
 
-  abstract protected R visitPointerType(PointerType pointerType, P param);
+  abstract protected R visitPointerType(PointerType obj, P param);
+
+  abstract protected R visitStackMemoryAlloc(StackMemoryAlloc obj, P param);
 }

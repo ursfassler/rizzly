@@ -34,9 +34,9 @@ import pir.statement.CallStmt;
 import pir.statement.GetElementPtr;
 import pir.statement.LoadStmt;
 import pir.statement.Relation;
+import pir.statement.StackMemoryAlloc;
 import pir.statement.StoreStmt;
 import pir.statement.UnaryOp;
-import pir.statement.VarDefStmt;
 import pir.statement.convert.SignExtendValue;
 import pir.statement.convert.TruncValue;
 import pir.statement.convert.TypeCast;
@@ -190,12 +190,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitFuncVariable(FuncVariable obj, P param) {
     visit(obj.getType(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitVarDefStmt(VarDefStmt obj, P param) {
-    visit(obj.getVariable(), param);
     return null;
   }
 
@@ -399,6 +393,12 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitPointerType(PointerType obj, P param) {
     visit(obj.getType(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitStackMemoryAlloc(StackMemoryAlloc obj, P param) {
+    visit(obj.getVariable(), param);
     return null;
   }
 }

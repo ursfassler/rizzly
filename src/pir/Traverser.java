@@ -41,10 +41,10 @@ import pir.statement.CallStmt;
 import pir.statement.GetElementPtr;
 import pir.statement.LoadStmt;
 import pir.statement.Relation;
+import pir.statement.StackMemoryAlloc;
 import pir.statement.Statement;
 import pir.statement.StoreStmt;
 import pir.statement.UnaryOp;
-import pir.statement.VarDefStmt;
 import pir.statement.VariableGeneratorStmt;
 import pir.statement.convert.ConvertValue;
 import pir.statement.convert.SignExtendValue;
@@ -185,8 +185,6 @@ abstract public class Traverser<R, P> {
   protected R visitStatement(Statement obj, P param) {
     if( obj instanceof CallStmt ) {
       return visitCallStmt((CallStmt) obj, param);
-    } else if( obj instanceof VarDefStmt ) {
-      return visitVarDefStmt((VarDefStmt) obj, param);
     } else if( obj instanceof VariableGeneratorStmt ) {
       return visitVariableGeneratorStmt((VariableGeneratorStmt) obj, param);
     } else if( obj instanceof StoreStmt ) {
@@ -217,6 +215,8 @@ abstract public class Traverser<R, P> {
       return visitPhiStmt((PhiStmt) obj, param);
     } else if( obj instanceof UnaryOp ) {
       return visitUnaryOp((UnaryOp) obj, param);
+    } else if( obj instanceof StackMemoryAlloc ) {
+      return visitStackMemoryAlloc((StackMemoryAlloc) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -393,8 +393,6 @@ abstract public class Traverser<R, P> {
 
   protected abstract R visitStoreStmt(StoreStmt obj, P param);
 
-  protected abstract R visitVarDefStmt(VarDefStmt obj, P param);
-
   protected abstract R visitCallStmt(CallStmt obj, P param);
 
   protected abstract R visitAssignment(Assignment obj, P param);
@@ -418,4 +416,6 @@ abstract public class Traverser<R, P> {
   protected abstract R visitProgram(Program obj, P param);
 
   protected abstract R visitPointerType(PointerType obj, P param);
+
+  protected abstract R visitStackMemoryAlloc(StackMemoryAlloc obj, P param);
 }
