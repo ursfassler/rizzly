@@ -1,6 +1,7 @@
 package main;
 
 import evl.other.RizzlyProgram;
+import evl.type.TypeRef;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
@@ -59,7 +60,9 @@ import common.FuncAttr;
 import error.ErrorType;
 import error.RError;
 import error.RException;
+import evl.DefTraverser;
 import evl.Evl;
+import evl.NullTraverser;
 import evl.copy.Copy;
 import evl.doc.StreamWriter;
 import evl.function.FuncWithBody;
@@ -70,6 +73,7 @@ import evl.function.impl.FuncProtoVoid;
 import evl.other.Component;
 import evl.other.Named;
 import evl.traverser.CHeaderWriter;
+import evl.traverser.ClassGetter;
 import evl.traverser.DepCollector;
 import evl.type.base.ArrayType;
 import evl.type.composed.NamedElement;
@@ -331,51 +335,42 @@ public class Main {
       }
   }
 
-  private static void toposort(List<Type> list) {
-    SimpleDirectedGraph<Type, Pair<Type, Type>> g = new SimpleGraph<Type>();
-    for( Type u : list ) {
+  private static void toposort(List<evl.type.Type> list) {
+    SimpleGraph<evl.type.Type> g = new SimpleGraph<evl.type.Type>();
+    for( evl.type.Type u : list ) {
       g.addVertex(u);
-      List<Type> vs = getDirectUsedTypes(u);
-      for( Type v : vs ) {
+      Set<evl.type.Type> vs = getDirectUsedTypes(u);
+      for( evl.type.Type v : vs ) {
         g.addEdge(u, v);
       }
     }
 
-    ArrayList<Type> old = new ArrayList<Type>(list);
+    ArrayList<evl.type.Type> old = new ArrayList<evl.type.Type>(list);
     int size = list.size();
     list.clear();
-    LinkedList<Type> nlist = new LinkedList<Type>();
-    TopologicalOrderIterator<Type, Pair<Type, Type>> itr = new TopologicalOrderIterator<Type, Pair<Type, Type>>(g);
+    LinkedList<evl.type.Type> nlist = new LinkedList<evl.type.Type>();
+    TopologicalOrderIterator<evl.type.Type, Pair<evl.type.Type, evl.type.Type>> itr = new TopologicalOrderIterator<evl.type.Type, Pair<evl.type.Type, evl.type.Type>>(g);
     while( itr.hasNext() ) {
       nlist.push(itr.next());
     }
     list.addAll(nlist);
 
-    ArrayList<Type> diff = new ArrayList<Type>(list);
+    ArrayList<evl.type.Type> diff = new ArrayList<evl.type.Type>(list);
     diff.removeAll(old);
     old.removeAll(list);
     assert ( size == list.size() );
   }
 
-  private static List<Type> getDirectUsedTypes(Type u) {
-    cir.traverser.Getter<Type, Void> getter = new cir.traverser.Getter<Type, Void>() {
-
+  private static Set<evl.type.Type> getDirectUsedTypes(evl.type.Type u) {
+    DefTraverser<Void,Set<evl.type.Type>> getter = new DefTraverser<Void, Set<evl.type.Type>>() {
       @Override
-      protected Void visitNamedElement(NamedElement obj, Void param) {
-        return add(obj.getType());
-      }
-
-      @Override
-      protected Void visitTypeAlias(TypeAlias obj, Void param) {
-        return add(obj.getRef());
-      }
-
-      @Override
-      protected Void visitArrayType(ArrayType obj, Void param) {
-        return add(obj.getType());
+      protected Void visitTypeRef(TypeRef obj, Set<evl.type.Type> param) {
+        param.add(obj.getRef());
+        return null;
       }
     };
-    List<Type> vs = getter.find(u, null);
+    Set<evl.type.Type> vs = new HashSet<evl.type.Type>();
+    getter.traverse(u,vs);
     return vs;
   }
 
@@ -420,6 +415,8 @@ public class Main {
     }
     
     ret = Copy.copy(ret);
+    
+    toposort(ret.getType().getList());
 
     return ret;
   }

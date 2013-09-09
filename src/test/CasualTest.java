@@ -45,6 +45,11 @@ public class CasualTest extends BaseTest {
     compile("range", TestSteps.EXECUTE, DEBUG_EVENT, false);
   }
 
+  @Test
+  public void while_() {
+    compile("while", TestSteps.EXECUTE, DEBUG_EVENT, true);
+  }
+
   /*
   
   @Test
@@ -210,11 +215,6 @@ public class CasualTest extends BaseTest {
   @Test
   public void varInit_VarInit() {
     compile("varInit", "VarInit", true, DEBUG_EVENT, false);
-  }
-
-  @Test
-  public void while_() {
-    compile("while", "While", true, DEBUG_EVENT, true);
   }
 
   @Test
