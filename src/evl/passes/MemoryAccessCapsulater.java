@@ -1,9 +1,12 @@
 package evl.passes;
 
+import common.Designator;
+import common.ElementInfo;
 import common.NameFactory;
 import evl.DefTraverser;
 import evl.copy.Copy;
 import evl.expression.Expression;
+import evl.expression.reference.RefPtrDeref;
 import evl.expression.reference.Reference;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
@@ -11,8 +14,10 @@ import evl.other.Namespace;
 import evl.statement.Assignment;
 import evl.statement.GetElementPtr;
 import evl.statement.LoadStmt;
+import evl.statement.StackMemoryAlloc;
 import evl.statement.Statement;
 import evl.statement.StoreStmt;
+import evl.statement.VarDefStmt;
 import evl.traverser.StatementReplacer;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.type.Type;
@@ -22,7 +27,9 @@ import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import util.ssa.PhiInserter;
 
 /**
@@ -32,6 +39,10 @@ import util.ssa.PhiInserter;
 public class MemoryAccessCapsulater {
 
   public static void process(Namespace aclasses, KnowledgeBase kb) {
+    StackMemTrav smt = new StackMemTrav(kb);
+    smt.traverse(aclasses, null);
+    DerefInserterAndRelinker diar = new DerefInserterAndRelinker();
+    diar.traverse(aclasses, smt.getMap());
     StmtReplacer loadInserter = new StmtReplacer(kb);
     loadInserter.traverse(aclasses, null);
   }
@@ -95,13 +106,13 @@ class ExprReplacer extends DefTraverser<Void, List<Statement>> {
   }
 
   static boolean isMemoryAccess(Reference ref) {
-    if( ref.getLink() instanceof Variable ) {
+    boolean ret = !ref.getOffset().isEmpty() && (ref.getOffset().get(0) instanceof RefPtrDeref);
+    if( ret ){
+      assert( ref.getLink() instanceof Variable );
       Variable var = (Variable) ref.getLink();
-      if( ( var instanceof StateVariable ) || !PhiInserter.isScalar(var.getType().getRef()) ) {
-        return true;
-      }
+      assert( ( var instanceof StateVariable ) || !PhiInserter.isScalar(var.getType().getRef()) );
     }
-    return false;
+    return ret;
   }
 
   @Override
@@ -112,11 +123,16 @@ class ExprReplacer extends DefTraverser<Void, List<Statement>> {
   static GetElementPtr makeGep(Reference ref, KnowledgeBase kb) {
     KnowBaseItem kbi = kb.getEntry(KnowBaseItem.class);
 
+    Type bt = ( (Variable) ref.getLink() ).getType().getRef();
+    assert ( bt instanceof PointerType );
+
     Type type = ExpressionTypeChecker.process(ref, kb);
-    
+
     PointerType pt = kbi.getPointerType(new TypeRef(ref.getInfo(), type));
     SsaVariable addr = new SsaVariable(ref.getInfo(), NameFactory.getNew(), new TypeRef(ref.getInfo(), pt));
-    GetElementPtr ptr = new GetElementPtr(ref.getInfo(), addr, Copy.copy(ref));
+
+    ref = Copy.copy(ref);
+    GetElementPtr ptr = new GetElementPtr(ref.getInfo(), addr, ref);
     return ptr;
   }
 
@@ -136,6 +152,59 @@ class ExprReplacer extends DefTraverser<Void, List<Statement>> {
       param.add(load);
     }
     super.visitReference(obj, param);
+    return null;
+  }
+}
+
+class StackMemTrav extends StatementReplacer<Void> {
+
+  final private Map<Variable, Variable> map = new HashMap<Variable, Variable>();
+  private KnowBaseItem kbi;
+
+  public StackMemTrav(KnowledgeBase kb) {
+    kbi = kb.getEntry(KnowBaseItem.class);
+  }
+
+  public Map<Variable, Variable> getMap() {
+    return map;
+  }
+
+  @Override
+  protected List<Statement> visitStateVariable(StateVariable obj, Void param) {
+    Type type = obj.getType().getRef();
+    assert ( !( type instanceof PointerType ) );
+    type = kbi.getPointerType(new TypeRef(new ElementInfo(), type));
+    obj.setType(new TypeRef(new ElementInfo(), type));
+
+    map.put(obj, obj);
+
+    return null;
+  }
+
+  @Override
+  protected List<Statement> visitVarDef(VarDefStmt obj, Void param) {
+    Type type = obj.getVariable().getType().getRef();
+
+    PointerType pt = kbi.getPointerType(new TypeRef(new ElementInfo(), type));
+    SsaVariable var = new SsaVariable(obj.getVariable().getInfo(), obj.getVariable().getName() + Designator.NAME_SEP + "p", new TypeRef(new ElementInfo(), pt));
+    StackMemoryAlloc sma = new StackMemoryAlloc(obj.getInfo(), var);
+
+    map.put(obj.getVariable(), var);
+
+    return ret(sma);
+  }
+}
+
+class DerefInserterAndRelinker extends DefTraverser<Void, Map<Variable, Variable>> {
+
+  @Override
+  protected Void visitReference(Reference obj, Map<Variable, Variable> param) {
+    super.visitReference(obj, param);
+    if( param.containsKey(obj.getLink()) ) {
+      assert ( obj.getLink() instanceof Variable );
+      obj.setLink(param.get(obj.getLink()));
+      obj.getOffset().add(0, new RefPtrDeref(new ElementInfo()));
+    }
     return null;
   }
 }

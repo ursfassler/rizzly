@@ -26,6 +26,7 @@ import evl.expression.UnaryExpression;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefName;
+import evl.expression.reference.RefPtrDeref;
 import evl.expression.reference.Reference;
 import evl.function.impl.FuncGlobal;
 import evl.function.impl.FuncInputHandlerEvent;
@@ -108,6 +109,11 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitRefCall(RefCall obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitRefPtrDeref(RefPtrDeref obj, P param) {
     return visitDefault(obj, param);
   }
 

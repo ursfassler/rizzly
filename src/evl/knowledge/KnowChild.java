@@ -84,7 +84,8 @@ class KnowChildTraverser extends NullTraverser<Set<Named>, String> {
 
   @Override
   protected Set<Named> visitPointerType(PointerType obj, String param) {
-    return visit(obj.getType(), param);  // this may be a bit hacky
+    RError.err(ErrorType.Fatal, obj.getInfo(), "PointerType can not have a named child");
+    return null;
   }
 
   @Override

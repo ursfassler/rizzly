@@ -1,5 +1,6 @@
 package evl.doc;
 
+import evl.expression.reference.RefPtrDeref;
 import evl.statement.GetElementPtr;
 import evl.statement.LoadStmt;
 import evl.statement.StackMemoryAlloc;
@@ -687,6 +688,12 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.wr("[");
     visit(obj.getIndex(), param);
     param.wr("]");
+    return null;
+  }
+
+  @Override
+  protected Void visitRefPtrDeref(RefPtrDeref obj, StreamWriter param) {
+    param.wr("^");
     return null;
   }
 

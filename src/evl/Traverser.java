@@ -32,6 +32,7 @@ import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefItem;
 import evl.expression.reference.RefName;
+import evl.expression.reference.RefPtrDeref;
 import evl.expression.reference.Reference;
 import evl.function.FunctionBase;
 import evl.function.impl.FuncGlobal;
@@ -339,6 +340,8 @@ public abstract class Traverser<R, P> {
       return visitRefName((RefName) obj, param);
     } else if( obj instanceof RefCall ) {
       return visitRefCall((RefCall) obj, param);
+    } else if( obj instanceof RefPtrDeref ) {
+      return visitRefPtrDeref((RefPtrDeref) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -482,6 +485,8 @@ public abstract class Traverser<R, P> {
   abstract protected R visitRefName(RefName obj, P param);
 
   abstract protected R visitRefIndex(RefIndex obj, P param);
+
+  abstract protected R visitRefPtrDeref(RefPtrDeref obj, P param);
 
   abstract protected R visitIfaceUse(IfaceUse obj, P param);
 

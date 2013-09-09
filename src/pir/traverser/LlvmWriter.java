@@ -203,9 +203,12 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitStateVariable(StateVariable obj, StreamWriter param) {
+    TypeRef type = obj.getType();
+    assert( type.getRef() instanceof PointerType );
+    type = ((PointerType)type.getRef()).getType();
     param.wr("@" + obj.getName());
     param.wr(" = global ");
-    visit(obj.getType(), param);
+    visit(type, param);
     param.wr(" undef");
     param.nl();
     return null;

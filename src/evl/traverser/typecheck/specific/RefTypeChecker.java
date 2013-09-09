@@ -1,5 +1,6 @@
 package evl.traverser.typecheck.specific;
 
+import evl.expression.reference.RefPtrDeref;
 import java.util.List;
 
 import error.ErrorType;
@@ -22,6 +23,7 @@ import evl.type.base.ArrayType;
 import evl.type.base.EnumType;
 import evl.type.base.FunctionType;
 import evl.type.base.FunctionTypeRet;
+import evl.type.special.PointerType;
 
 public class RefTypeChecker extends NullTraverser<Type, Type> {
   private KnowledgeBase kb;
@@ -113,4 +115,11 @@ public class RefTypeChecker extends NullTraverser<Type, Type> {
     }
   }
 
+  @Override
+  protected Type visitRefPtrDeref(RefPtrDeref obj, Type param) {
+    assert( param instanceof PointerType );
+    return ((PointerType)param).getType().getRef();
+  }
+
+  
 }

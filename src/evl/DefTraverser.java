@@ -1,5 +1,6 @@
 package evl;
 
+import evl.expression.reference.RefPtrDeref;
 import evl.statement.GetElementPtr;
 import evl.statement.LoadStmt;
 import evl.statement.StackMemoryAlloc;
@@ -93,7 +94,7 @@ import evl.variable.StateVariable;
 public class DefTraverser<R, P> extends Traverser<R, P> {
 
   protected R visitList(Collection<? extends Evl> list, P param) {
-    for (Evl itr : new ArrayList<Evl>(list)) {
+    for( Evl itr : new ArrayList<Evl>(list) ) {
       visit(itr, param);
     }
     return null;
@@ -230,6 +231,11 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
+  protected R visitRefPtrDeref(RefPtrDeref obj, P param) {
+    return null;
+  }
+
+  @Override
   protected R visitArrayType(ArrayType obj, P param) {
     visit(obj.getType(), param);
     return null;
@@ -279,26 +285,26 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitFuncVariable(FuncVariable obj, P param) {
-    visit(obj.getType(),param);
+    visit(obj.getType(), param);
     return null;
   }
 
   @Override
   protected R visitStateVariable(StateVariable obj, P param) {
-    visit(obj.getType(),param);
+    visit(obj.getType(), param);
     return null;
   }
 
   @Override
   protected R visitConstPrivate(ConstPrivate obj, P param) {
-    visit(obj.getType(),param);
+    visit(obj.getType(), param);
     visit(obj.getDef(), param);
     return null;
   }
 
   @Override
   protected R visitConstGlobal(ConstGlobal obj, P param) {
-    visit(obj.getType(),param);
+    visit(obj.getType(), param);
     visit(obj.getDef(), param);
     return null;
   }
@@ -414,11 +420,11 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitFunctionBase(FunctionBase obj, P param) {
     visitItr(obj.getParam(), param);
-    if (obj instanceof FuncWithReturn) {
-      visit(((FuncWithReturn) obj).getRet(), param);
+    if( obj instanceof FuncWithReturn ) {
+      visit(( (FuncWithReturn) obj ).getRet(), param);
     }
-    if (obj instanceof FuncWithBody) {
-      visit(((FuncWithBody) obj).getBody(), param);
+    if( obj instanceof FuncWithBody ) {
+      visit(( (FuncWithBody) obj ).getBody(), param);
     }
     return super.visitFunctionBase(obj, param);
   }
@@ -559,14 +565,14 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitSsaVariable(SsaVariable obj, P param) {
-    visit(obj.getType(),param);
+    visit(obj.getType(), param);
     return null;
   }
 
   @Override
   protected R visitTypeCast(TypeCast obj, P param) {
-    visit(obj.getRef(),param);
-    visit(obj.getCast(),param);
+    visit(obj.getRef(), param);
+    visit(obj.getCast(), param);
     return null;
   }
 
@@ -577,35 +583,34 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitStoreStmt(StoreStmt obj, P param) {
-    visit(obj.getExpr(),param);
-    visit(obj.getAddress(),param);
+    visit(obj.getExpr(), param);
+    visit(obj.getAddress(), param);
     return null;
   }
 
   @Override
   protected R visitLoadStmt(LoadStmt obj, P param) {
-    visit(obj.getAddress(),param);
-    visit(obj.getVariable(),param);
+    visit(obj.getAddress(), param);
+    visit(obj.getVariable(), param);
     return null;
   }
 
   @Override
   protected R visitGetElementPtr(GetElementPtr obj, P param) {
-    visit(obj.getAddress(),param);
-    visit(obj.getVariable(),param);
+    visit(obj.getAddress(), param);
+    visit(obj.getVariable(), param);
     return null;
   }
 
   @Override
   protected R visitPointerType(PointerType obj, P param) {
-    visit(obj.getType(),param);
+    visit(obj.getType(), param);
     return null;
   }
 
   @Override
   protected R visitStackMemoryAlloc(StackMemoryAlloc obj, P param) {
-    visit(obj.getVariable(),param);
+    visit(obj.getVariable(), param);
     return null;
   }
-
 }
