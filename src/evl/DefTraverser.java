@@ -323,6 +323,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitNamedElement(NamedElement obj, P param) {
+    visit(obj.getType(),param);
     return null;
   }
 

@@ -412,6 +412,8 @@ public class Main {
     for( Named itr : dep ) {
       if( itr instanceof evl.type.Type ) {
         ret.getType().add((evl.type.Type)itr);
+      } else if( itr instanceof NamedElement ){
+        // element of record type
       } else {
         RError.err(ErrorType.Fatal, itr.getInfo(), "Object should not be used in header file: " + itr.getClass().getCanonicalName());
       }

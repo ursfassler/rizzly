@@ -1,6 +1,7 @@
 package evl.copy;
 
 import evl.other.RizzlyProgram;
+import evl.type.composed.NamedElement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -238,6 +239,11 @@ class CopyEvl extends NullTraverser<Evl, Void> {
   @Override
   protected Evl visitTypeRef(TypeRef obj, Void param) {
     return new TypeRef(obj.getInfo(), obj.getRef());
+  }
+
+  @Override
+  protected Evl visitNamedElement(NamedElement obj, Void param) {
+    return new NamedElement(obj.getInfo(), obj.getName(), copy(obj.getType()));
   }
 
 }

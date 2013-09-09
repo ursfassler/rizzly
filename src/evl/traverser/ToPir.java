@@ -95,7 +95,7 @@ import pir.traverser.ExprTypeGetter;
 import pir.type.StructType;
 import util.ssa.PhiInserter;
 
-public class ToPir extends NullTraverser<PirObject, PirObject> {
+public class ToPir extends NullTraverser<PirObject, Void> {
 
   private Map<Evl, PirObject> map = new HashMap<Evl, PirObject>();
   KnowBaseItem kbi;
@@ -112,12 +112,12 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   }
 
   @Override
-  protected PirObject visitDefault(Evl obj, PirObject param) {
+  protected PirObject visitDefault(Evl obj, Void param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
   @Override
-  protected PirObject visit(Evl obj, PirObject param) {
+  protected PirObject visit(Evl obj, Void param) {
     PirObject cobj = map.get(obj);
     if( cobj == null ) {
       cobj = super.visit(obj, param);
@@ -128,7 +128,7 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   }
 
   @Override
-  protected PirObject visitReference(Reference obj, PirObject param) {
+  protected PirObject visitReference(Reference obj, Void param) {
     PirObject ref = visit(obj.getLink(), null);
     if( ref instanceof Variable ) {
       if( ( ref instanceof pir.other.SsaVariable ) && ( obj.getOffset().isEmpty() ) ) {
@@ -170,18 +170,18 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   }
 
   @Override
-  protected PirObject visitRefName(RefName obj, PirObject param) {
+  protected PirObject visitRefName(RefName obj, Void param) {
     return new pir.expression.reference.RefName(obj.getName());
   }
 
   @Override
-  protected PirObject visitRefIndex(RefIndex obj, PirObject param) {
+  protected PirObject visitRefIndex(RefIndex obj, Void param) {
     PExpression index = (PExpression) visit(obj.getIndex(), null);
     return new pir.expression.reference.RefIndex(index);
   }
 
   @Override
-  protected Program visitRizzlyProgram(RizzlyProgram obj, PirObject param) {
+  protected Program visitRizzlyProgram(RizzlyProgram obj, Void param) {
     Program prog = new Program(obj.getName());
 
     kbi = ( new KnowledgeBase(prog, rootdir) ).getEntry(KnowBaseItem.class);
@@ -205,7 +205,7 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   }
 
   @Override
-  protected PirObject visitFunctionBase(FunctionBase obj, PirObject param) {
+  protected PirObject visitFunctionBase(FunctionBase obj, Void param) {
     String name = obj.getName();
 
     List<pir.other.SsaVariable> arg = new ArrayList<pir.other.SsaVariable>();
@@ -240,7 +240,7 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   }
 
   @Override
-  protected pir.type.StructType visitRecordType(RecordType obj, PirObject param) {
+  protected pir.type.StructType visitRecordType(RecordType obj, Void param) {
     pir.type.StructType struct = new pir.type.StructType(obj.getName());
     for( evl.type.composed.NamedElement elem : obj.getElement() ) {
       TypeRef type = (TypeRef) visit(elem.getType(), param);
@@ -251,7 +251,7 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   }
 
   @Override
-  protected pir.type.EnumType visitEnumType(EnumType obj, PirObject param) {
+  protected pir.type.EnumType visitEnumType(EnumType obj, Void param) {
     pir.type.EnumType struct = new pir.type.EnumType(obj.getName());
     map.put(obj, struct);
     for( EnumElement elem : obj.getElement() ) {
@@ -262,26 +262,26 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   }
 
   @Override
-  protected pir.type.EnumElement visitEnumElement(EnumElement obj, PirObject param) {
+  protected pir.type.EnumElement visitEnumElement(EnumElement obj, Void param) {
     pir.type.EnumType type = (pir.type.EnumType) param;
     return new pir.type.EnumElement(obj.getName(), type);
   }
 
   @Override
-  protected PirObject visitVarDef(VarDefStmt obj, PirObject param) {
+  protected PirObject visitVarDef(VarDefStmt obj, Void param) {
     RError.err(ErrorType.Fatal, obj.getInfo(), "VarDefStmt should no longer exists; replaced with StackMemoryAlloc");
     return null;
   }
 
   @Override
-  protected PirObject visitStackMemoryAlloc(StackMemoryAlloc obj, PirObject param) {
+  protected PirObject visitStackMemoryAlloc(StackMemoryAlloc obj, Void param) {
     pir.other.SsaVariable var = (pir.other.SsaVariable) visit(obj.getVariable(), null);
     pir.statement.StackMemoryAlloc sma = new pir.statement.StackMemoryAlloc(var);
     return sma;
   }
 
   @Override
-  protected pir.statement.CallStmt visitCallStmt(CallStmt obj, PirObject param) {
+  protected pir.statement.CallStmt visitCallStmt(CallStmt obj, Void param) {
     PirObject call = visit(obj.getCall(), param);
     return (pir.statement.CallStmt) call;
     // assert (call instanceof CallAssignment);
@@ -291,7 +291,7 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   }
 
   @Override
-  protected PirObject visitBasicBlockList(BasicBlockList obj, PirObject param) {
+  protected PirObject visitBasicBlockList(BasicBlockList obj, Void param) {
     pir.cfg.BasicBlockList ret = new pir.cfg.BasicBlockList((pir.cfg.BasicBlock) visit(obj.getEntry(), null), (pir.cfg.BasicBlock) visit(obj.getExit(), null));
     for( BasicBlock bb : obj.getBasicBlocks() ) {
       ret.getBasicBlocks().add((pir.cfg.BasicBlock) visit(bb, param));
@@ -311,23 +311,23 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   }
 
   @Override
-  protected PirObject visitBoolValue(BoolValue obj, PirObject param) {
+  protected PirObject visitBoolValue(BoolValue obj, Void param) {
     return new pir.expression.BoolValue(obj.isValue());
   }
 
   @Override
-  protected pir.expression.Number visitNumber(Number obj, PirObject param) {
+  protected pir.expression.Number visitNumber(Number obj, Void param) {
     RangeType type = kbi.getRangeType(obj.getValue(), obj.getValue());
     return new pir.expression.Number(obj.getValue(), new TypeRef(type));
   }
 
   @Override
-  protected PirObject visitStringValue(StringValue obj, PirObject param) {
+  protected PirObject visitStringValue(StringValue obj, Void param) {
     return new pir.expression.StringValue(obj.getValue());
   }
 
   @Override
-  protected PirObject visitArrayValue(ArrayValue obj, PirObject param) {
+  protected PirObject visitArrayValue(ArrayValue obj, Void param) {
     pir.expression.ArrayValue ret = new pir.expression.ArrayValue();
     for( Expression itr : obj.getValue() ) {
       PirObject arg = visit(itr, param);
@@ -338,85 +338,85 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   }
 
   @Override
-  protected PirObject visitPointerType(PointerType obj, PirObject param) {
+  protected PirObject visitPointerType(PointerType obj, Void param) {
     return new pir.type.PointerType((TypeRef) traverse(obj.getType(), null));
   }
 
   @Override
-  protected PirObject visitRange(Range obj, PirObject param) {
+  protected PirObject visitRange(Range obj, Void param) {
     pir.type.RangeType ret = kbi.getRangeType(obj.getLow(), obj.getHigh());
     return ret;
   }
 
   @Override
-  protected PirObject visitArrayType(ArrayType obj, PirObject param) {
+  protected PirObject visitArrayType(ArrayType obj, Void param) {
     TypeRef elemType = (TypeRef) visit(obj.getType(), param);
     pir.type.ArrayType ret = new pir.type.ArrayType(obj.getSize(), elemType);
     return ret;
   }
 
   @Override
-  protected pir.type.Type visitBooleanType(BooleanType obj, PirObject param) {
+  protected pir.type.Type visitBooleanType(BooleanType obj, Void param) {
     pir.type.BooleanType ret = kbi.getBooleanType();
     return ret;
   }
 
   @Override
-  protected PirObject visitReturnExpr(ReturnExpr obj, PirObject param) {
+  protected PirObject visitReturnExpr(ReturnExpr obj, Void param) {
     PirObject expr = visit(obj.getExpr(), param);
     assert ( expr instanceof PirValue );
     return new pir.cfg.ReturnExpr((PirValue) expr);
   }
 
   @Override
-  protected PirObject visitReturnVoid(ReturnVoid obj, PirObject param) {
+  protected PirObject visitReturnVoid(ReturnVoid obj, Void param) {
     return new pir.cfg.ReturnVoid();
   }
 
   @Override
-  protected PirObject visitVoidType(VoidType obj, PirObject param) {
+  protected PirObject visitVoidType(VoidType obj, Void param) {
     pir.type.VoidType ret = kbi.getVoidType();
     return ret;
   }
 
   @Override
-  protected PirObject visitStringType(StringType obj, PirObject param) {
+  protected PirObject visitStringType(StringType obj, Void param) {
     pir.type.StringType ret = kbi.getStringType();
     return ret;
   }
 
   @Override
-  protected PirObject visitFuncVariable(FuncVariable obj, PirObject param) {
+  protected PirObject visitFuncVariable(FuncVariable obj, Void param) {
     return new pir.other.FuncVariable(obj.getName(), (TypeRef) visit(obj.getType(), null));
   }
 
   @Override
-  protected PirObject visitStateVariable(StateVariable obj, PirObject param) {
+  protected PirObject visitStateVariable(StateVariable obj, Void param) {
     return new pir.other.StateVariable(obj.getName(), (TypeRef) visit(obj.getType(), null));
   }
 
   @Override
-  protected PirObject visitConstant(Constant obj, PirObject param) {
+  protected PirObject visitConstant(Constant obj, Void param) {
     pir.type.Type type = (pir.type.Type) visit(obj.getType(), null);
     PExpression def = (PExpression) visit(obj.getDef(), null);
     return new pir.other.Constant(obj.getName(), new TypeRef(type), def);
   }
 
   @Override
-  protected PirObject visitCaseOptRange(CaseOptRange obj, PirObject param) {
+  protected PirObject visitCaseOptRange(CaseOptRange obj, Void param) {
     assert ( obj.getStart() instanceof Number );
     assert ( obj.getEnd() instanceof Number );
     return new pir.cfg.CaseOptRange(( (Number) obj.getStart() ).getValue(), ( (Number) obj.getEnd() ).getValue());
   }
 
   @Override
-  protected PirObject visitCaseOptValue(CaseOptValue obj, PirObject param) {
+  protected PirObject visitCaseOptValue(CaseOptValue obj, Void param) {
     assert ( obj.getValue() instanceof Number );
     return new pir.cfg.CaseOptValue((pir.expression.Number) visit(obj.getValue(), null));
   }
 
   @Override
-  protected PirObject visitPhiStmt(PhiStmt obj, PirObject param) {
+  protected PirObject visitPhiStmt(PhiStmt obj, Void param) {
     pir.cfg.PhiStmt ret = new pir.cfg.PhiStmt((pir.other.SsaVariable) visit(obj.getVariable(), null));
     for( BasicBlock in : obj.getInBB() ) {
       pir.other.SsaVariable var = (pir.other.SsaVariable) visit(obj.getArg(in), null);
@@ -426,7 +426,7 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   }
 
   @Override
-  protected PirObject visitBasicBlock(BasicBlock obj, PirObject param) {
+  protected PirObject visitBasicBlock(BasicBlock obj, Void param) {
     pir.cfg.BasicBlock ret = new pir.cfg.BasicBlock(obj.getName());
     map.put(obj, ret);
 
@@ -442,7 +442,7 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   }
 
   @Override
-  protected PirObject visitCaseGoto(CaseGoto obj, PirObject param) {
+  protected PirObject visitCaseGoto(CaseGoto obj, Void param) {
     PirObject cond = visit(obj.getCondition(), null);
     assert ( cond instanceof VarRefSimple );
     pir.other.SsaVariable var = ( (VarRefSimple) cond ).getRef();
@@ -455,7 +455,7 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   }
 
   @Override
-  protected PirObject visitCaseGotoOpt(CaseGotoOpt obj, PirObject param) {
+  protected PirObject visitCaseGotoOpt(CaseGotoOpt obj, Void param) {
     List<CaseOptEntry> list = new ArrayList<CaseOptEntry>();
     for( evl.cfg.CaseOptEntry entry : obj.getValue() ) {
       list.add((CaseOptEntry) visit(entry, null));
@@ -464,7 +464,7 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   }
 
   @Override
-  protected PirObject visitIfGoto(IfGoto obj, PirObject param) {
+  protected PirObject visitIfGoto(IfGoto obj, Void param) {
     PirObject cond = visit(obj.getCondition(), null);
     assert ( cond instanceof VarRefSimple );
     pir.other.SsaVariable var = ( (VarRefSimple) cond ).getRef();
@@ -473,24 +473,24 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   }
 
   @Override
-  protected PirObject visitGoto(Goto obj, PirObject param) {
+  protected PirObject visitGoto(Goto obj, Void param) {
     return new pir.cfg.Goto((pir.cfg.BasicBlock) visit(obj.getTarget(), null));
   }
 
   @Override
-  protected PirObject visitSsaVariable(SsaVariable obj, PirObject param) {
+  protected PirObject visitSsaVariable(SsaVariable obj, Void param) {
     return new pir.other.SsaVariable(obj.getName(), (TypeRef) visit(obj.getType(), null));
   }
 
   @Override
-  protected PirObject visitVarDefInitStmt(VarDefInitStmt obj, PirObject param) {
+  protected PirObject visitVarDefInitStmt(VarDefInitStmt obj, Void param) {
     pir.other.SsaVariable var = (pir.other.SsaVariable) visit(obj.getVariable(), null);
     ToVariableGenerator converter = new ToVariableGenerator(this);
     return converter.traverse(obj.getInit(), var);
   }
 
   @Override
-  protected PirObject visitGetElementPtr(GetElementPtr obj, PirObject param) {
+  protected PirObject visitGetElementPtr(GetElementPtr obj, Void param) {
 //    VarRef ref = (VarRef) traverse(obj.getAddress(), null);
     ArrayList<PirValue> ofs = new ArrayList<PirValue>();
 
@@ -557,7 +557,7 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   }
 
   @Override
-  protected PirObject visitLoadStmt(LoadStmt obj, PirObject param) {
+  protected PirObject visitLoadStmt(LoadStmt obj, Void param) {
     pir.other.SsaVariable var = (pir.other.SsaVariable) traverse(obj.getVariable(), null);
     VarRefSimple ref = (VarRefSimple) traverse(obj.getAddress(), null);
     assert ( ref.getType().getRef() instanceof pir.type.PointerType );
@@ -565,7 +565,7 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   }
 
   @Override
-  protected PirObject visitStoreStmt(evl.statement.StoreStmt obj, PirObject param) {
+  protected PirObject visitStoreStmt(evl.statement.StoreStmt obj, Void param) {
     pir.other.PirValue value = (pir.other.PirValue) traverse(obj.getExpr(), null);
     VarRefSimple ref = (VarRefSimple) traverse(obj.getAddress(), null);
     assert ( ref.getType().getRef() instanceof pir.type.PointerType );
@@ -573,7 +573,7 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   }
 
   @Override
-  protected PirObject visitAssignment(Assignment obj, PirObject param) {
+  protected PirObject visitAssignment(Assignment obj, Void param) {
     assert ( obj.getLeft().getLink() instanceof evl.variable.Variable );
     evl.variable.Variable var = (evl.variable.Variable) obj.getLeft().getLink();
 
@@ -605,7 +605,7 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   }
 
   @Override
-  protected PirObject visitTypeRef(evl.type.TypeRef obj, PirObject param) {
+  protected PirObject visitTypeRef(evl.type.TypeRef obj, Void param) {
     return new TypeRef((pir.type.Type) visit(obj.getRef(), null));
   }
 }

@@ -5,6 +5,7 @@ import common.ElementInfo;
 import evl.EvlBase;
 
 public class TypeRef extends EvlBase {
+
   private Type ref;
 
   public TypeRef(ElementInfo info, Type ref) {
@@ -19,9 +20,13 @@ public class TypeRef extends EvlBase {
   public void setRef(Type ref) {
     this.ref = ref;
   }
-  
-  public TypeRef copy(){
+
+  public TypeRef copy() {
     return new TypeRef(getInfo(), ref);
   }
 
+  @Override
+  public String toString() {
+    return "->" + ref;
+  }
 }

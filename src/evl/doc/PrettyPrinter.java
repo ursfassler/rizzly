@@ -5,6 +5,9 @@ import evl.statement.GetElementPtr;
 import evl.statement.LoadStmt;
 import evl.statement.StackMemoryAlloc;
 import evl.statement.StoreStmt;
+import evl.type.base.BooleanType;
+import evl.type.base.Range;
+import evl.type.special.PointerType;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
@@ -438,13 +441,40 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitBaseType(BaseType obj, StreamWriter param) {
+  protected Void visitBooleanType(BooleanType obj, StreamWriter param) {
     param.wr(obj.getName());
-    param.wr(" = !internal;");
+    wrId(obj, param);
+    param.wr(" = False..True");
     param.nl();
     return null;
   }
 
+  @Override
+  protected Void visitPointerType(PointerType obj, StreamWriter param) {
+    param.wr(obj.getName());
+    wrId(obj, param);
+    param.wr(" = ");
+    visit( obj.getType(), param );
+    param.wr("^");
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitRange(Range obj, StreamWriter param) {
+    param.wr(obj.getName());
+    wrId(obj, param);
+    param.wr(" = ");
+    param.wr( obj.getLow().toString() );
+    param.wr("..");
+    param.wr( obj.getHigh().toString() );
+    param.nl();
+    return null;
+  }
+  
+  
+
+  // ---- Statement -----------------------------------------------------------
   @Override
   protected Void visitGetElementPtr(GetElementPtr obj, StreamWriter param) {
     visit(obj.getVariable(), param);
@@ -476,7 +506,6 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     return null;
   }
 
-  // ---- Statement -----------------------------------------------------------
   @Override
   protected Void visitAssignment(Assignment obj, StreamWriter param) {
     visit(obj.getLeft(), param);

@@ -4,10 +4,13 @@ import common.Designator;
 import common.ElementInfo;
 import common.NameFactory;
 import evl.DefTraverser;
+import evl.cfg.BasicBlock;
+import evl.cfg.BasicBlockEnd;
 import evl.copy.Copy;
 import evl.expression.Expression;
 import evl.expression.reference.RefPtrDeref;
 import evl.expression.reference.Reference;
+import evl.function.FunctionHeader;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
@@ -71,18 +74,34 @@ class StmtReplacer extends StatementReplacer<List<Statement>> {
   }
 
   @Override
+  protected List<Statement> visitBasicBlockEnd(BasicBlockEnd obj, List<Statement> param) {
+    assert ( param == null );
+    param = new ArrayList<Statement>();
+    List<Statement> ret = super.visitBasicBlockEnd(obj, param);
+    assert ( ret == null );
+    return param;
+  }
+
+  @Override
   protected List<Statement> visitGetElementPtr(GetElementPtr obj, List<Statement> param) {
+    assert ( param != null );
     return null;
   }
 
   @Override
   protected List<Statement> visitExpression(Expression obj, List<Statement> param) {
-    exprReplacer.traverse(obj, param);
+    if( param == null ) {
+      assert( ((Reference) obj).getLink() instanceof FunctionHeader );
+      assert( ((Reference) obj).getOffset().isEmpty() );
+    } else {
+      exprReplacer.traverse(obj, param);
+    }
     return null;
   }
 
   @Override
   protected List<Statement> visitAssignment(Assignment obj, List<Statement> param) {
+    assert ( param != null );
     visit(obj.getRight(), param);
     visitItr(obj.getLeft().getOffset(), param);
 
@@ -106,11 +125,11 @@ class ExprReplacer extends DefTraverser<Void, List<Statement>> {
   }
 
   static boolean isMemoryAccess(Reference ref) {
-    boolean ret = !ref.getOffset().isEmpty() && (ref.getOffset().get(0) instanceof RefPtrDeref);
-    if( ret ){
-      assert( ref.getLink() instanceof Variable );
+    boolean ret = !ref.getOffset().isEmpty() && ( ref.getOffset().get(0) instanceof RefPtrDeref );
+    if( ret ) {
+      assert ( ref.getLink() instanceof Variable );
       Variable var = (Variable) ref.getLink();
-      assert( ( var instanceof StateVariable ) || !PhiInserter.isScalar(var.getType().getRef()) );
+      assert ( ( var instanceof StateVariable ) || !PhiInserter.isScalar(var.getType().getRef()) );
     }
     return ret;
   }
