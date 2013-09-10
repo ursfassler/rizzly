@@ -137,8 +137,11 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitProgram(Program obj, StreamWriter param) {
     visitList(obj.getType(), param);
+    param.nl();
     visitList(obj.getConstant(), param);
+    param.nl();
     visitList(obj.getVariable(), param);
+    param.nl();
     visitList(obj.getFunction(), param);
     return null;
   }

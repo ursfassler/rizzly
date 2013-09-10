@@ -1,8 +1,19 @@
 
+interface
+  Tick
+    function tick;
+  end
+
 component
   Linkorder
+    input
+      in  : Tick;
       
     implementation elementary
+    
+    function in.tick
+      foo();
+    end
     
     function foo()
       bar();

@@ -1,7 +1,7 @@
 
 interface
   Tick
-    function tick( x: R{0,65535} ):R{0,255};
+    function tick( x: R{0,50000} ):R{0,200};
   end
   
 component
@@ -14,19 +14,19 @@ component
     
     implementation elementary
     
-    function a.tick( x: R{0,65535} ):R{0,255}
-      return x and 255;
+    function a.tick( x: R{0,50000} ):R{0,200}
+      return x and 127;
     end
     
-    function b.tick( x: R{0,65535} ):R{0,255}
-      return x mod 250;
+    function b.tick( x: R{0,50000} ):R{0,200}
+      return x mod 201;
     end
 
-    function c.tick( x: R{0,65535} ):R{0,255}
+    function c.tick( x: R{0,50000} ):R{0,200}
       return x and 31;
     end
     
-    function d.tick( x: R{0,65535} ):R{0,255}
+    function d.tick( x: R{0,50000} ):R{0,200}
       return x mod 42;
     end
 

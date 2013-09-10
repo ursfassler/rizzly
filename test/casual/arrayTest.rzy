@@ -15,13 +15,17 @@ component
 
     var
       a : Array{20,R{0,200}};
+    
+    entry
+      i : R{0,20} = 0;
+      while i <= 20 do
+        a[i] := i*10;
+      end
+    end
 
     function in.tick( x: R{0,200} )
-      a[0] := 10;
-      a[2] := 4;
-      a[1] := (a[0] + a[2]) and 127;
-      out.tick( a[1] );
-      out.tick( a[x and 3] );
+      a[(x * 5) mod 21] := (a[x mod 11] + a[10 + (x mod 11)]) / 2;
+      out.tick( a[x mod 21] );
     end
 
   end

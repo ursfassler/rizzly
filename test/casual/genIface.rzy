@@ -1,32 +1,35 @@
-import
-  iface.iface2;
+interface
+  Iface2{T:Type{Natural}}
+    function in( x: T );
+    function out():T;
+  end
 
 component
   GenIface
 
     input
-      in1    : Iface2{R{0,255}};
-      in2    : Iface2{R{0,65535}};
+      in1    : Iface2{R{0,10}};
+      in2    : Iface2{R{0,2000}};
 
     output
-      out1   : Iface2{R{0,255}};
-      out2   : Iface2{R{0,65535}};
+      out1   : Iface2{R{0,10}};
+      out2   : Iface2{R{0,2000}};
 
     implementation elementary
 
-    function in1.in( x: R{0,255} )
+    function in1.in( x: R{0,10} )
       out1.in( x );
     end
 
-    function in1.out():R{0,255}
+    function in1.out():R{0,10}
       return out1.out();
     end
 
-    function in2.in( x: R{0,65535} )
+    function in2.in( x: R{0,2000} )
       out2.in( x );
     end
 
-    function in2.out():R{0,65535}
+    function in2.out():R{0,2000}
       return out2.out();
     end
 

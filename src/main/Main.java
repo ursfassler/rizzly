@@ -17,7 +17,6 @@ import joGraph.HtmlGraphWriter;
 import joGraph.Writer;
 
 import org.jgrapht.Graph;
-import org.jgrapht.graph.SimpleDirectedGraph;
 import org.jgrapht.traverse.TopologicalOrderIterator;
 
 import pir.PirObject;
@@ -62,7 +61,6 @@ import error.RError;
 import error.RException;
 import evl.DefTraverser;
 import evl.Evl;
-import evl.NullTraverser;
 import evl.copy.Copy;
 import evl.doc.StreamWriter;
 import evl.function.FuncWithBody;
@@ -73,20 +71,20 @@ import evl.function.impl.FuncProtoVoid;
 import evl.other.Component;
 import evl.other.Named;
 import evl.traverser.CHeaderWriter;
-import evl.traverser.ClassGetter;
 import evl.traverser.DepCollector;
-import evl.type.base.ArrayType;
 import evl.type.composed.NamedElement;
 import evl.type.special.VoidType;
 import evl.variable.FuncVariable;
 import evl.variable.Variable;
 import fun.other.Namespace;
 import fun.toevl.FunToEvl;
-import fun.type.base.TypeAlias;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
+//TODO type check case ranges (do not allow case options out of range)
+//TODO pass records by reference to functions (test case rec2)
+//TODO add switch to use only C compatible arguments (no i7 types, only i8, i16, i32, etc.) /test case while2)
 //TODO remove unused statements (in evl); this hopefully removes (unused) VarDefStmt OR remove VarDefStmt if not defining an composed type
 //TODO add compiler self tests:
 //TODO -- check that no references to old stuff exists (check that parent of every object is in the namespace tree)
@@ -149,7 +147,7 @@ public class Main {
     {
       evl.other.RizzlyProgram head = makeHeader(prg);
       evl.traverser.Renamer.process(head);
-      printCHeader(outdir,head);
+      printCHeader(outdir, head);
     }
 
     evl.doc.PrettyPrinter.print(prg, debugdir + "beforePir.rzy", true);
@@ -326,13 +324,13 @@ public class Main {
   }
 
   private static void printCHeader(String outdir, RizzlyProgram cprog) {
-      String cfilename = outdir + cprog.getName() + ".h";
-      CHeaderWriter cwriter = new CHeaderWriter();
-      try {
-        cwriter.traverse(cprog, new StreamWriter(new PrintStream(cfilename)));
-      } catch( FileNotFoundException e ) {
-        e.printStackTrace();
-      }
+    String cfilename = outdir + cprog.getName() + ".h";
+    CHeaderWriter cwriter = new CHeaderWriter();
+    try {
+      cwriter.traverse(cprog, new StreamWriter(new PrintStream(cfilename)));
+    } catch( FileNotFoundException e ) {
+      e.printStackTrace();
+    }
   }
 
   private static void toposort(List<evl.type.Type> list) {
@@ -361,7 +359,8 @@ public class Main {
   }
 
   private static Set<evl.type.Type> getDirectUsedTypes(evl.type.Type u) {
-    DefTraverser<Void,Set<evl.type.Type>> getter = new DefTraverser<Void, Set<evl.type.Type>>() {
+    DefTraverser<Void, Set<evl.type.Type>> getter = new DefTraverser<Void, Set<evl.type.Type>>() {
+
       @Override
       protected Void visitTypeRef(TypeRef obj, Set<evl.type.Type> param) {
         param.add(obj.getRef());
@@ -369,7 +368,7 @@ public class Main {
       }
     };
     Set<evl.type.Type> vs = new HashSet<evl.type.Type>();
-    getter.traverse(u,vs);
+    getter.traverse(u, vs);
     return vs;
   }
 
@@ -378,18 +377,18 @@ public class Main {
     Set<Evl> anchor = new HashSet<Evl>();
     for( FunctionBase func : prg.getFunction() ) {
       if( func.getAttributes().contains(FuncAttr.Public) ) {
-        boolean hasBody = func instanceof  FuncWithBody;
-        assert( func.getAttributes().contains(FuncAttr.Extern) || hasBody );
-        for( Variable arg : func.getParam() ){
+        boolean hasBody = func instanceof FuncWithBody;
+        assert ( func.getAttributes().contains(FuncAttr.Extern) || hasBody );
+        for( Variable arg : func.getParam() ) {
           anchor.add(arg.getType());
         }
-        if( func instanceof FuncWithReturn ){
-          anchor.add( ((FuncWithReturn)func).getRet() );
+        if( func instanceof FuncWithReturn ) {
+          anchor.add(( (FuncWithReturn) func ).getRet());
         }
-        if( hasBody ){
-          if( func instanceof FuncWithReturn ){
+        if( hasBody ) {
+          if( func instanceof FuncWithReturn ) {
             FuncProtoRet proto = new FuncProtoRet(func.getInfo(), func.getName(), func.getParam());
-            proto.setRet( ((FuncWithReturn)func).getRet() );
+            proto.setRet(( (FuncWithReturn) func ).getRet());
             ret.getFunction().add(proto);
           } else {
             FuncProtoVoid proto = new FuncProtoVoid(func.getInfo(), func.getName(), func.getParam());
@@ -405,16 +404,16 @@ public class Main {
 
     for( Named itr : dep ) {
       if( itr instanceof evl.type.Type ) {
-        ret.getType().add((evl.type.Type)itr);
-      } else if( itr instanceof NamedElement ){
+        ret.getType().add((evl.type.Type) itr);
+      } else if( itr instanceof NamedElement ) {
         // element of record type
       } else {
         RError.err(ErrorType.Fatal, itr.getInfo(), "Object should not be used in header file: " + itr.getClass().getCanonicalName());
       }
     }
-    
+
     ret = Copy.copy(ret);
-    
+
     toposort(ret.getType().getList());
 
     return ret;

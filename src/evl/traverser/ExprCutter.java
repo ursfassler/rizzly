@@ -49,9 +49,7 @@ import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.base.Range;
-import evl.variable.FuncVariable;
 import evl.variable.SsaVariable;
-import evl.variable.Variable;
 
 //TODO also split relation operands (only ref to var or constant)
 //TODO check if everything is still ok
@@ -228,8 +226,7 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
 
   @Override
   protected Void visitRefIndex(RefIndex obj, List<Statement> param) {
-    super.visitRefIndex(obj, param);
-    if( cd.traverse(obj.getIndex(), null) ) {
+    if( !KnowSimpleExpr.isSimple(obj.getIndex()) ) {
       SsaVariable var = cutter.extract(obj.getIndex(), param);
       obj.setIndex(new Reference(obj.getInfo(), var));
     }

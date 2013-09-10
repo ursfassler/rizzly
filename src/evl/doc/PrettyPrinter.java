@@ -5,6 +5,7 @@ import evl.statement.GetElementPtr;
 import evl.statement.LoadStmt;
 import evl.statement.StackMemoryAlloc;
 import evl.statement.StoreStmt;
+import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.Range;
 import evl.type.special.IntegerType;
@@ -500,6 +501,18 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     wrId(obj, param);
     param.wr(" = ");
     param.wr("∅");
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitArrayType(ArrayType obj, StreamWriter param) {
+    param.wr(obj.getName());
+    wrId(obj, param);
+    param.wr(" = ");
+    param.wr(obj.getSize().toString());
+    param.wr(" * ");
+    visit(obj.getType(),param);
     param.nl();
     return null;
   }
