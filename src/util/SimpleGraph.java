@@ -10,13 +10,22 @@ import org.jgrapht.DirectedGraph;
 import org.jgrapht.EdgeFactory;
 
 public class SimpleGraph<V> implements DirectedGraph<V, Pair<V, V>> {
-  private Map<V, Set<V>> outlist = new HashMap<V, Set<V>>();
+  final private Map<V, Set<V>> outlist = new HashMap<V, Set<V>>();
 
+  public SimpleGraph() {
+  }
+
+  public SimpleGraph(Collection<V> vertices) {
+    for( V v : vertices ){
+      outlist.put(v, new HashSet<V>());
+    }
+  }
+  
   public Set<V> getOutVertices(V u) {
     assert (containsVertex(u));
     return new HashSet<V>(outlist.get(u));
   }
-
+  
   @Override
   public Pair<V, V> addEdge(V u, V v) {
     assert (containsVertex(u));

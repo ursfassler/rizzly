@@ -1,0 +1,29 @@
+type
+  Point = Record
+    x : R{0,100};
+    y : R{0,100};
+  end
+
+interface
+  Tick
+    function getX( p: Point ):R{0,100};
+    function getY( p: Point ):R{0,100};
+  end
+
+component
+  Rec2
+    input
+      in  : Tick;
+    
+  implementation elementary
+
+    function in.getX( p: Point ):R{0,100}
+      return p.x;
+    end
+
+    function in.getY( p: Point ):R{0,100}
+      return p.y;
+    end
+
+  end
+

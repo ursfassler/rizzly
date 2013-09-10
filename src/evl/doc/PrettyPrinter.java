@@ -7,6 +7,8 @@ import evl.statement.StackMemoryAlloc;
 import evl.statement.StoreStmt;
 import evl.type.base.BooleanType;
 import evl.type.base.Range;
+import evl.type.special.IntegerType;
+import evl.type.special.NaturalType;
 import evl.type.special.PointerType;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
@@ -369,17 +371,6 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   // ---- Type ----------------------------------------------------------------
-  @Override
-  protected Void visitStringType(StringType obj, StreamWriter param) {
-    param.wr(obj.getName());
-    return null;
-  }
-
-  @Override
-  protected Void visitVoidType(VoidType obj, StreamWriter param) {
-    param.wr(obj.getName());
-    return null;
-  }
 
   @Override
   protected Void visitEnumType(EnumType obj, StreamWriter param) {
@@ -464,14 +455,54 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   protected Void visitRange(Range obj, StreamWriter param) {
     param.wr(obj.getName());
     wrId(obj, param);
-    param.wr(" = ");
+    param.wr(" = {");
     param.wr( obj.getLow().toString() );
     param.wr("..");
     param.wr( obj.getHigh().toString() );
+    param.wr("}");
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitIntegerType(IntegerType obj, StreamWriter param) {
+    param.wr(obj.getName());
+    wrId(obj, param);
+    param.wr(" = ");
+    param.wr("ℤ");
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitNaturalType(NaturalType obj, StreamWriter param) {
+    param.wr(obj.getName());
+    wrId(obj, param);
+    param.wr(" = ");
+    param.wr("ℕ");
     param.nl();
     return null;
   }
   
+  @Override
+  protected Void visitStringType(StringType obj, StreamWriter param) {
+    param.wr(obj.getName());
+    wrId(obj, param);
+    param.wr(" = ");
+    param.wr("*");
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitVoidType(VoidType obj, StreamWriter param) {
+    param.wr(obj.getName());
+    wrId(obj, param);
+    param.wr(" = ");
+    param.wr("∅");
+    param.nl();
+    return null;
+  }
   
 
   // ---- Statement -----------------------------------------------------------

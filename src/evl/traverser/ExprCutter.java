@@ -260,7 +260,6 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
       SsaVariable var = cutter.extract(obj.getCondition(), param);
       obj.setCondition(new Reference(obj.getInfo(), var));
     } else {
-      super.visitCaseGoto(obj, param);
     }
     return null;
   }

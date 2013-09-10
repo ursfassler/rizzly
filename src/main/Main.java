@@ -336,9 +336,8 @@ public class Main {
   }
 
   private static void toposort(List<evl.type.Type> list) {
-    SimpleGraph<evl.type.Type> g = new SimpleGraph<evl.type.Type>();
+    SimpleGraph<evl.type.Type> g = new SimpleGraph<evl.type.Type>(list);
     for( evl.type.Type u : list ) {
-      g.addVertex(u);
       Set<evl.type.Type> vs = getDirectUsedTypes(u);
       for( evl.type.Type v : vs ) {
         g.addEdge(u, v);
