@@ -47,6 +47,7 @@ import fun.variable.FuncVariable;
  * 
  */
 class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
+
   final private FunToEvl fta;
   final private LinkedList<BasicBlock> bblist = new LinkedList<BasicBlock>();
   private evl.variable.FuncVariable result;
@@ -61,7 +62,7 @@ class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
     BasicBlock head = new BasicBlock(body.getInfo(), "BB_entry");
     exit = new BasicBlock(body.getInfo(), "BB_exit");
 
-    if (retType.getRef() instanceof VoidType) {
+    if( retType.getRef() instanceof VoidType ) {
       result = null;
       exit.setEnd(new evl.cfg.ReturnVoid(body.getInfo()));
     } else {
@@ -70,10 +71,10 @@ class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
       exit.setEnd(new evl.cfg.ReturnExpr(body.getInfo(), new Reference(body.getInfo(), result)));
     }
 
-    BasicBlock last = visit(body, null);
+    BasicBlock last = visit(body, makeBb(body.getInfo()));
     addGoto(last, exit);
+    assert ( !bblist.isEmpty() );
     addGoto(head, bblist.get(0));
-
     removeUnreachable(head, exit, bblist, body.getInfo());
 
     BasicBlockList bbBody = new BasicBlockList(body.getInfo(), head, exit);
@@ -98,7 +99,7 @@ class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
 
   private void addGoto(BasicBlock code, BasicBlock dst) {
     List<evl.statement.Statement> lst = code.getCode();
-    if (code.getEnd() == null) {
+    if( code.getEnd() == null ) {
       code.setEnd(new Goto(dst.getInfo(), dst));
     }
   }
@@ -108,9 +109,9 @@ class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
     LinkedList<BasicBlock> test = new LinkedList<BasicBlock>();
     test.add(head);
 
-    while (!test.isEmpty()) {
+    while( !test.isEmpty() ) {
       BasicBlock u = test.pop();
-      if (!reachable.contains(u)) {
+      if( !reachable.contains(u) ) {
         reachable.add(u);
         test.addAll(u.getEnd().getJumpDst());
       }
@@ -120,7 +121,7 @@ class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
     unreachable.removeAll(reachable);
 
     vertices.retainAll(reachable);
-    if (!reachable.contains(exit)) {
+    if( !reachable.contains(exit) ) {
       RError.err(ErrorType.Error, info, "function does not return");
     }
 
@@ -133,28 +134,29 @@ class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
 
   @Override
   protected BasicBlock visitBlock(Block obj, BasicBlock param) {
-    BasicBlock bb = makeBb(obj.getInfo());
+    assert ( param != null );
 
-    for (Statement stmt : obj.getStatements()) {
-      BasicBlock nbb = visit(stmt, bb);
-      if (nbb.getEnd() != null) {
+    for( Statement stmt : obj.getStatements() ) {
+      BasicBlock nbb = visit(stmt, param);
+      if( nbb.getEnd() != null ) {
         // TODO add warning for unreachable code?
         return nbb;
       }
-      if (nbb != bb) {
-        addGoto(bb, nbb);
+      if( nbb != param ) {
+        addGoto(param, nbb);
       }
-      bb = nbb;
+      param = nbb;
     }
 
-    return bb;
+    return param;
   }
 
   @Override
   protected BasicBlock visitReturnExpr(ReturnExpr obj, BasicBlock param) {
-    assert (param.getEnd() == null);
+    assert ( param != null );
+    assert ( param.getEnd() == null );
 
-    if (result == null) {
+    if( result == null ) {
       RError.err(ErrorType.Error, obj.getInfo(), "Function has no return value");
       return param;
     }
@@ -169,15 +171,17 @@ class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
 
   @Override
   protected BasicBlock visitReturnVoid(ReturnVoid obj, BasicBlock param) {
-    assert (param.getEnd() == null);
+    assert ( param != null );
+    assert ( param.getEnd() == null );
     param.setEnd((BasicBlockEnd) fta.traverse(obj, null));
     return param;
   }
 
   @Override
   protected BasicBlock visitWhile(While obj, BasicBlock param) {
+    assert ( param != null );
     BasicBlock head = makeBb(obj.getInfo());
-    BasicBlock sub = visit(obj.getBody(), null);
+    BasicBlock sub = visit(obj.getBody(), makeBb(obj.getInfo()));
     BasicBlock exit = makeBb(obj.getCondition().getInfo());
 
     addGoto(param, head);
@@ -191,19 +195,20 @@ class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
 
   @Override
   protected BasicBlock visitIfStmt(IfStmt obj, BasicBlock param) {
+    assert ( param != null );
     BasicBlock join = makeBb(obj.getInfo());
-    for (IfOption opt : obj.getOption()) {
-      BasicBlock bbthen = visit(opt.getCode(), null);
+    for( IfOption opt : obj.getOption() ) {
+      BasicBlock bbthen = visit(opt.getCode(), makeBb(opt.getCode().getInfo()));
       addGoto(bbthen, join);
 
       BasicBlock bbelse = makeBb(obj.getInfo());
       IfGoto ifStmt = makeIf((Expression) fta.traverse(opt.getCondition(), null), bbthen, bbelse);
-      assert (param.getEnd() == null);
+      assert ( param.getEnd() == null );
       param.setEnd(ifStmt);
 
       param = bbelse;
     }
-    BasicBlock lastOpt = visit(obj.getDefblock(), null);
+    BasicBlock lastOpt = visit(obj.getDefblock(), makeBb(obj.getDefblock().getInfo()));
     addGoto(param, lastOpt);
     addGoto(lastOpt, join);
 
@@ -212,24 +217,25 @@ class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
 
   @Override
   protected BasicBlock visitCaseStmt(CaseStmt obj, BasicBlock param) {
+    assert ( param != null );
     BasicBlock join = makeBb(obj.getInfo());
 
     CaseGoto co = new CaseGoto(obj.getInfo());
     co.setCondition((Expression) fta.traverse(obj.getCondition(), null));
-    assert (param.getEnd() == null);
+    assert ( param.getEnd() == null );
     param.setEnd(co);
 
-    for (CaseOpt itr : obj.getOption()) {
-      BasicBlock caseBb = visit(itr.getCode(), null);
+    for( CaseOpt itr : obj.getOption() ) {
+      BasicBlock caseBb = visit(itr.getCode(), makeBb(itr.getCode().getInfo()));
       addGoto(caseBb, join);
       List<CaseOptEntry> optlist = new ArrayList<CaseOptEntry>(obj.getOption().size());
-      for (fun.statement.CaseOptEntry opt : itr.getValue()) {
+      for( fun.statement.CaseOptEntry opt : itr.getValue() ) {
         optlist.add((CaseOptEntry) fta.traverse(opt, null));
       }
       CaseGotoOpt cgo = new CaseGotoOpt(itr.getInfo(), optlist, caseBb);
       co.getOption().add(cgo);
     }
-    BasicBlock otherBb = visit(obj.getOtherwise(), null);
+    BasicBlock otherBb = visit(obj.getOtherwise(), makeBb(obj.getOtherwise().getInfo()));
     addGoto(otherBb, join);
     co.setOtherwise(otherBb);
 
@@ -253,5 +259,4 @@ class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
     param.getCode().add((evl.statement.Statement) fta.traverse(obj, null));
     return param;
   }
-
 }
