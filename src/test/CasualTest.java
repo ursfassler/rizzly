@@ -152,6 +152,12 @@ public class CasualTest extends BaseTest {
     compile("arrayTest2", TestSteps.EXECUTE, false, false);
   }
   
+  //TODO use integer type with enough bits to index array (see test case "arrayTest3")
+  @Test
+  public void arrayTest3() {
+    compile("arrayTest3", TestSteps.EXECUTE, false, false);
+  }
+  
   @Test
   public void arrayTest() {
     compile("arrayTest", TestSteps.EXECUTE, false, false);

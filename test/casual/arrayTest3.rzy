@@ -1,0 +1,29 @@
+interface
+  Tick
+    function tick( x: R{0,31} ):R{0,31};
+  end
+
+component
+  ArrayTest3
+    input
+      in  : Tick;
+      
+  implementation elementary
+
+    var
+      a : Array{32,R{0,31}};
+    
+    entry
+      i : R{0,32} = 0;
+      while i < 32 do
+        a[i] := i;
+        i    := i+1;
+      end
+    end
+
+    function in.tick( x: R{0,200} ):R{0,31}
+      return a[x mod 8];
+    end
+
+  end
+
