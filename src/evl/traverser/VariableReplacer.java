@@ -1,5 +1,9 @@
 package evl.traverser;
 
+import evl.expression.reference.RefCall;
+import evl.expression.reference.RefIndex;
+import evl.expression.reference.RefName;
+import evl.expression.reference.RefPtrDeref;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -14,6 +18,7 @@ import evl.cfg.IfGoto;
 import evl.cfg.PhiStmt;
 import evl.cfg.ReturnExpr;
 import evl.cfg.ReturnVoid;
+import evl.expression.reference.RefItem;
 import evl.expression.reference.Reference;
 import evl.statement.Assignment;
 import evl.statement.CallStmt;
@@ -22,6 +27,7 @@ import evl.statement.VarDefStmt;
 import evl.variable.SsaVariable;
 
 public class VariableReplacer extends NullTraverser<Boolean, Void> {
+
   final private Set<BasicBlock> checked = new HashSet<BasicBlock>();
   private ExprVarRepl exprVarRepl;
 
@@ -46,8 +52,8 @@ public class VariableReplacer extends NullTraverser<Boolean, Void> {
   }
 
   private void start(BasicBlock rootBb, int start) {
-    for (int i = start; i < rootBb.getCode().size(); i++) {
-      if (!visit(rootBb.getCode().get(i), null)) {
+    for( int i = start; i < rootBb.getCode().size(); i++ ) {
+      if( !visit(rootBb.getCode().get(i), null) ) {
         return;
       }
     }
@@ -61,7 +67,7 @@ public class VariableReplacer extends NullTraverser<Boolean, Void> {
 
   @Override
   protected Boolean visitBasicBlock(BasicBlock obj, Void param) {
-    if (checked.contains(obj)) {
+    if( checked.contains(obj) ) {
       return null;
     }
 
@@ -69,12 +75,12 @@ public class VariableReplacer extends NullTraverser<Boolean, Void> {
     list.addAll(obj.getPhi());
     list.addAll(obj.getCode());
 
-    for (Evl stmt : list) {
-      if (!visit(stmt, null)) {
+    for( Evl stmt : list ) {
+      if( !visit(stmt, null) ) {
         return null;
       }
     }
-    
+
     visit(obj.getEnd(), null);
 
     checked.add(obj);
@@ -90,13 +96,15 @@ public class VariableReplacer extends NullTraverser<Boolean, Void> {
   @Override
   protected Boolean visitAssignment(Assignment obj, Void param) {
     exprVarRepl.traverse(obj.getRight(), null);
-    visitItr(obj.getLeft().getOffset(), null);
+    for( RefItem itm : obj.getLeft().getOffset() ) {
+      exprVarRepl.traverse(itm, null);
+    }
     return obj.getLeft().getLink() != exprVarRepl.getOld();
   }
 
   @Override
   protected Boolean visitCallStmt(CallStmt obj, Void param) {
-    exprVarRepl.traverse(obj,null);
+    exprVarRepl.traverse(obj, null);
     return true;
   }
 
@@ -108,8 +116,8 @@ public class VariableReplacer extends NullTraverser<Boolean, Void> {
   @Override
   protected Boolean visitPhiStmt(PhiStmt obj, Void param) {
     //TODO use exprVarRepl?
-    for( BasicBlock in : new ArrayList<BasicBlock>( obj.getInBB()) ){
-      if( obj.getArg(in) == exprVarRepl.getOld() ){
+    for( BasicBlock in : new ArrayList<BasicBlock>(obj.getInBB()) ) {
+      if( obj.getArg(in) == exprVarRepl.getOld() ) {
         obj.addArg(in, exprVarRepl.getReplacement());
       }
     }
@@ -118,15 +126,15 @@ public class VariableReplacer extends NullTraverser<Boolean, Void> {
 
   @Override
   protected Boolean visitCaseGoto(CaseGoto obj, Void param) {
-    exprVarRepl.traverse( obj.getCondition(), param );
-    visitItr( obj.getJumpDst(), param );
+    exprVarRepl.traverse(obj.getCondition(), param);
+    visitItr(obj.getJumpDst(), param);
     return null;
   }
 
   @Override
   protected Boolean visitIfGoto(IfGoto obj, Void param) {
-    exprVarRepl.traverse( obj.getCondition(), param );
-    visitItr( obj.getJumpDst(), param );
+    exprVarRepl.traverse(obj.getCondition(), param);
+    visitItr(obj.getJumpDst(), param);
     return null;
   }
 
@@ -146,12 +154,10 @@ public class VariableReplacer extends NullTraverser<Boolean, Void> {
   protected Boolean visitReturnVoid(ReturnVoid obj, Void param) {
     return null;
   }
-
-  
-  
 }
 
 class ExprVarRepl extends DefTraverser<Void, Void> {
+
   final private SsaVariable old;
   final private SsaVariable replacement;
 
@@ -171,10 +177,9 @@ class ExprVarRepl extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitReference(Reference obj, Void param) {
-    if (obj.getLink() == old) {
+    if( obj.getLink() == old ) {
       obj.setLink(replacement);
     }
     return super.visitReference(obj, param);
   }
-
 }
