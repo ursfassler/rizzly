@@ -225,7 +225,7 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
       if ((rhs.getLow().compareTo(BigInteger.ZERO) < 0) && (rhs.getHigh().compareTo(BigInteger.ZERO) > 0)) {
         RError.err(ErrorType.Warning, rhs.getInfo(), "potential division by 0");
       }
-      if ((lhs.getLow().compareTo(BigInteger.ZERO) < 0) || (lhs.getHigh().compareTo(BigInteger.ZERO) < 0) || (rhs.getLow().compareTo(BigInteger.ZERO) < 0) || (rhs.getHigh().compareTo(BigInteger.ZERO) < 0)) {
+      if ((lhs.getLow().compareTo(BigInteger.ZERO) < 0) || (rhs.getLow().compareTo(BigInteger.ZERO) < 0)) {
         RError.err(ErrorType.Error, lhs.getInfo(), "sorry, I am too lazy to check for negative numbers");
       }
       BigInteger low = lhs.getLow().divide(rhs.getHigh());

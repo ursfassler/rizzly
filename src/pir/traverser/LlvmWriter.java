@@ -582,12 +582,21 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
         flags = "";
         break;
       case MOD:
-        //TODO does only work if left is unsigned (and right too, of course)
+        //FIXME does only work if left is unsigned (and right too, of course)
         op = "urem";
         flags = "";
         break;
+      case DIV:
+        //FIXME does only work if left and right is unsigned
+        op = "udiv";
+        flags = "";
+        break;
+      case MUL:
+        op = "mul";
+        flags = "nuw nsw";
+        break;
       default:
-        RError.err(ErrorType.Warning, "Operand not handled: " + obj.getOp()); // TODO change to fatal error
+        RError.err(ErrorType.Fatal, "Operand not handled: " + obj.getOp()); // TODO change to fatal error
         return null;
     }
     param.wr(op);
