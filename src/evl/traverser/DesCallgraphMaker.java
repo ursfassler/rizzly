@@ -22,13 +22,12 @@ import evl.other.Namespace;
  * 
  */
 public class DesCallgraphMaker extends DefTraverser<Void, Designator> {
+
   private SimpleGraph<Designator> callgraph = new SimpleGraph<Designator>();
 
   public static SimpleGraph<Designator> make(ImplElementary inst) {
     DesCallgraphMaker reduction = new DesCallgraphMaker();
-    Designator root = new Designator(inst.getName());
-    reduction.callgraph.addVertex(root);
-    reduction.traverse(inst, root);
+    reduction.traverse(inst, new Designator());
     return reduction.callgraph;
   }
 
@@ -44,8 +43,9 @@ public class DesCallgraphMaker extends DefTraverser<Void, Designator> {
 
   @Override
   protected Void visitFunctionBase(FunctionBase obj, Designator param) {
-    assert (param != null);
+    assert ( param != null );
     param = new Designator(param, obj.getName());
+    assert ( param.size() <= 3 );
     callgraph.addVertex(param);
     return super.visitFunctionBase(obj, param);
   }
@@ -55,7 +55,9 @@ public class DesCallgraphMaker extends DefTraverser<Void, Designator> {
     super.visitReference(obj, param);
 
     Designator func = getIfFunc(obj);
-    if (func != null) {
+    if( func != null ) {
+      assert ( func.size() <= 3 );
+      assert ( param.size() <= 3 );
       callgraph.addVertex(func);
       callgraph.addEdge(param, func);
     }
@@ -63,20 +65,19 @@ public class DesCallgraphMaker extends DefTraverser<Void, Designator> {
   }
 
   static private Designator getIfFunc(Reference obj) {
-    if (obj.getOffset().isEmpty()) {
+    if( obj.getOffset().isEmpty() ) {
       return null;
     }
     Designator ret = new Designator(obj.getLink().getName());
-    for (RefItem ref : obj.getOffset()) {
-      if (ref instanceof RefCall) {
+    for( RefItem ref : obj.getOffset() ) {
+      if( ref instanceof RefCall ) {
         break;
-      } else if (ref instanceof RefName) {
-        ret = new Designator(ret, ((RefName) ref).getName());
+      } else if( ref instanceof RefName ) {
+        ret = new Designator(ret, ( (RefName) ref ).getName());
       } else {
         return null; // no function call
       }
     }
     return ret;
   }
-
 }
