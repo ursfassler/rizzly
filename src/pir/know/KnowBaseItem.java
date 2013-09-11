@@ -151,6 +151,7 @@ class ItemAdder extends NullTraverser<Void, Referencable> {
   @Override
   protected Void visitProgram(Program obj, Referencable param) {
     if (param instanceof Type) {
+      assert( !obj.getType().contains((Type)param) );
       obj.getType().add((Type) param);
     } else {
       throw new RuntimeException("not yet implemented: " + param.getClass().getCanonicalName());

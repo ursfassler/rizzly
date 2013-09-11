@@ -228,6 +228,7 @@ public class Main {
 
     Renamer.process(prog);
 
+    toposortPir(prog.getType());
     LlvmWriter.print(prog, outdir + prg.getName() + ".ll", false);
 
     compileLlvm(outdir + prg.getName() + ".ll", outdir + prg.getName() + ".s");
@@ -418,4 +419,46 @@ public class Main {
 
     return ret;
   }
+  
+  //TODO make sorting independent of type, i.e. that it can be used for everything
+  private static void toposortPir(List<Type> list) {
+    SimpleGraph<Type> g = new SimpleGraph<Type>(list);
+    for( Type u : list ) {
+      Set<Type> vs = getDirectUsedTypesPir(u);
+      for( Type v : vs ) {
+        g.addEdge(u, v);
+      }
+    }
+
+    ArrayList<Type> old = new ArrayList<Type>(list);
+    int size = list.size();
+    list.clear();
+    LinkedList<Type> nlist = new LinkedList<Type>();
+    TopologicalOrderIterator<Type, Pair<Type, Type>> itr = new TopologicalOrderIterator<Type, Pair<Type, Type>>(g);
+    while( itr.hasNext() ) {
+      nlist.push(itr.next());
+    }
+    list.addAll(nlist);
+
+    ArrayList<Type> diff = new ArrayList<Type>(list);
+    diff.removeAll(old);
+    old.removeAll(list);
+    assert ( size == list.size() );
+  }
+
+  private static Set<Type> getDirectUsedTypesPir(Type u) {
+    pir.DefTraverser<Void, Set<Type>> getter = new pir.DefTraverser<Void, Set<Type>>() {
+
+      @Override
+      protected Void visitTypeRef(pir.type.TypeRef obj, Set<Type> param) {
+        param.add(obj.getRef());
+        return null;
+      }
+    };
+    Set<Type> vs = new HashSet<Type>();
+    getter.traverse(u, vs);
+    return vs;
+  }
+
+  
 }

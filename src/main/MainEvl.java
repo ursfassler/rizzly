@@ -637,22 +637,6 @@ public class MainEvl {
     removeUnused(classes, g.vertexSet());
   }
 
-  @SuppressWarnings("unused")
-  private static List<pir.type.Type> getDirectUsedTypes(pir.type.Type u) {
-    pir.traverser.Getter<pir.type.Type, Void> getter = new pir.traverser.Getter<pir.type.Type, Void>() {
-
-      @Override
-      protected Void visitRefHead(RefHead obj, Void param) {
-        if( obj.getRef() instanceof pir.type.Type ) {
-          add((pir.type.Type) obj.getRef());
-        }
-        return null;
-      }
-    };
-    List<pir.type.Type> vs = getter.get(u, null);
-    return vs;
-  }
-
   private static ListOfNamed<NamedList<FunctionBase>> addOutIfaceFunc(ListOfNamed<IfaceUse> ifaces, KnowledgeBase kb) {
     ListOfNamed<NamedList<FunctionBase>> ret = new ListOfNamed<NamedList<FunctionBase>>();
 

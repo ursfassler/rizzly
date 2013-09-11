@@ -17,6 +17,7 @@ int main(){
 
   for( i = 0; i <= 200; i++ ){
     exp = (i % 20) * 10;
+    value = 200;
     
     inst_in_tick( i );
     

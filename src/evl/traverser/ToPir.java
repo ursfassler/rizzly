@@ -187,7 +187,9 @@ public class ToPir extends NullTraverser<PirObject, Void> {
     kbi = ( new KnowledgeBase(prog, rootdir) ).getEntry(KnowBaseItem.class);
     for( Type type : obj.getType() ) {
       pir.type.Type ct = (pir.type.Type) visit(type, param);
-      prog.getType().add(ct);
+      if( !prog.getType().contains(ct) ) {    //TODO why?
+        prog.getType().add(ct);
+      }
     }
     for( StateVariable itr : obj.getVariable() ) {
       pir.other.StateVariable ct = (pir.other.StateVariable) visit(itr, param);
@@ -494,18 +496,18 @@ public class ToPir extends NullTraverser<PirObject, Void> {
 //    VarRef ref = (VarRef) traverse(obj.getAddress(), null);
     ArrayList<PirValue> ofs = new ArrayList<PirValue>();
 
-    Variable baseAddr = (Variable) traverse( obj.getAddress().getLink(), null );
-    
-    pir.type.Type type =  baseAddr.getType().getRef();
-    /*
+    Variable baseAddr = (Variable) traverse(obj.getAddress().getLink(), null);
 
+    pir.type.Type type = baseAddr.getType().getRef();
+    /*
+    
     // hacky?
     assert ( type instanceof pir.type.PointerType );
     type = ( (pir.type.PointerType) type ).getType().getRef();
-//    if( ref.getRef() instanceof pir.other.StateVariable ) {
+    //    if( ref.getRef() instanceof pir.other.StateVariable ) {
     // see llvm GEP FAQ: Why is the extra 0 index required?
     ofs.add(new pir.expression.Number(BigInteger.ZERO, new TypeRef(kbi.getNoSignType(1))));
-//    }
+    //    }
      */
 
     for( evl.expression.reference.RefItem itr : obj.getAddress().getOffset() ) {
@@ -523,14 +525,14 @@ public class ToPir extends NullTraverser<PirObject, Void> {
       } else if( itr instanceof RefIndex ) {
         // get index calculation
         RefIndex idx = (RefIndex) itr;
-        PirValue val = (PirValue) traverse(idx.getIndex(),null);
+        PirValue val = (PirValue) traverse(idx.getIndex(), null);
         ofs.add(val);
         type = ( (pir.type.ArrayType) type ).getType().getRef();
       } else if( itr instanceof RefPtrDeref ) {
         // dereferencing is like accesing an array element
         ofs.add(new pir.expression.Number(BigInteger.ZERO, new TypeRef(kbi.getNoSignType(32))));
         // see llvm GEP FAQ: Why is the extra 0 index required?
-        type = ((pir.type.PointerType)type).getType().getRef();
+        type = ( (pir.type.PointerType) type ).getType().getRef();
       } else {
         RError.err(ErrorType.Fatal, obj.getInfo(), "Unhandled offset item: " + itr.getClass().getCanonicalName());
       }
