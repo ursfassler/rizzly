@@ -142,10 +142,14 @@ public class CasualTest extends BaseTest {
     compile("genIface", TestSteps.COMPILE_TO_BIN, false, true);
   }
 
-  //TODO implement arrays
   @Test
   public void arrayTest1() {
     compile("arrayTest1", TestSteps.EXECUTE, false, false);
+  }
+  
+  @Test
+  public void arrayTest2() {
+    compile("arrayTest2", TestSteps.EXECUTE, false, false);
   }
   
   @Test

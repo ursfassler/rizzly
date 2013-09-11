@@ -162,6 +162,7 @@ class Narrower extends DefTraverser<Void, Void> {
   }
 }
 
+// functions return true if something changed
 class StmtUpdater extends NullTraverser<Boolean, Void> {
 
   private KnowledgeBase kb;
@@ -178,10 +179,14 @@ class StmtUpdater extends NullTraverser<Boolean, Void> {
 
   @Override
   protected Boolean visitVarDefInitStmt(VarDefInitStmt obj, Void param) {
-    Range type = (Range) ExpressionTypeChecker.process(obj.getInit(), kb);
-    type = Range.narrow(type, (Range) obj.getVariable().getType().getRef());
-    if( obj.getVariable().getType().getRef() != type ) {
-      obj.getVariable().getType().setRef(type);
+    Type type = ExpressionTypeChecker.process(obj.getInit(), kb);
+    if( !( type instanceof Range ) ) {
+      return false;   //TODO also check booleans and enums?
+    }
+    Range rtype = (Range) type;
+    rtype = Range.narrow(rtype, (Range) obj.getVariable().getType().getRef());
+    if( obj.getVariable().getType().getRef() != rtype ) {
+      obj.getVariable().getType().setRef(rtype);
       return true;
     } else {
       return false;
@@ -199,6 +204,4 @@ class StmtUpdater extends NullTraverser<Boolean, Void> {
     // nothing to do since we do not produce a new value
     return false;
   }
-  
-  
 }

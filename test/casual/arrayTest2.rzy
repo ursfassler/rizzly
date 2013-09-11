@@ -1,0 +1,26 @@
+interface
+  Iface
+    function set( i: R{0,19}; x: R{0,199} );
+    function get( i: R{0,19} ): R{0,199};
+  end
+
+component
+  ArrayTest2
+    input
+      in  : Iface;
+      
+  implementation elementary
+
+    var
+      a : Array{20,R{0,199}};
+    
+    function in.set( i: R{0,19}; x: R{0,199} )
+      a[i] := x;
+    end
+
+    function in.get( i: R{0,19} ): R{0,199}
+      return a[i];
+    end
+    
+  end
+
