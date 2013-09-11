@@ -7,6 +7,8 @@ void inst_out_foo(){
 }
 
 int main(){
+  inst__entry();
+
   inst_in_foo();
   return 0;
 }

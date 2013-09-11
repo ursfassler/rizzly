@@ -144,7 +144,12 @@ public class CasualTest extends BaseTest {
 
   //TODO implement arrays
   @Test
-  public void arrayTest_ArrayTest() {
+  public void arrayTest1() {
+    compile("arrayTest", TestSteps.EXECUTE, false, false);
+  }
+  
+  @Test
+  public void arrayTest() {
     compile("arrayTest", TestSteps.EXECUTE, false, false);
   }
 

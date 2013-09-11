@@ -49,7 +49,7 @@ public class ImplElementaryParser extends ImplBaseParser {
         break;
       }
       case EXIT: {
-        entryBody.getStatements().add(parseExitCode());
+        exitBody.getStatements().add(parseExitCode());
         break;
       }
       case COMPONENT: {

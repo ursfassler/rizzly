@@ -10,6 +10,8 @@ void inst_out_tick(R_0_100 x){
 }
 
 int main(){
+  inst__entry();
+
   R_0_100 i;
   R_0_100 exp;
   for( i = 0; i <= 100; i++ ){

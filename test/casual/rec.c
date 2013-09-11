@@ -13,6 +13,8 @@ void inst_out_tick( uint8_t x ){
 }
 
 int main(){
+  inst__entry();
+
   int i;
   for( i = 0; i < 100; i++ ){
     value = (200 - i) / 2;

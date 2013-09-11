@@ -4,7 +4,7 @@ interface
   end
 
 component
-  ArrayTest
+  ArrayTest1
     input
       in  : Tick;
       
@@ -24,7 +24,6 @@ component
     end
 
     function in.tick( x: R{0,200} )
-      a[(x * 5) mod 20] := (a[x mod 10] + a[10 + (x mod 10)]) / 2;
       out.tick( a[x mod 20] );
     end
 

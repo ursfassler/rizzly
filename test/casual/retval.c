@@ -9,6 +9,8 @@ R__20_20 inst_out_foo(){
 }
 
 int main(){
+  inst__entry();
+
   int i;
   for( i = -20; i <= 20; i++ ){
     value = i;

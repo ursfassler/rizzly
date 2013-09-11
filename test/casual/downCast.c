@@ -11,6 +11,8 @@ void check( R_0_200 e, R_0_200 r, const char *s ){
 }
 
 int main(){
+  inst__entry();
+
   R_0_50000 i;
   R_0_200 exp;
   R_0_200 ret;

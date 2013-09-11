@@ -540,7 +540,21 @@ public class MainEvl {
     PrettyPrinter.print(classes, rootdir + "instance.rzy", true);
     {
       Namespace root = classes.forcePath(new Designator("!env", "inst"));
-      Set<FunctionBase> pubfunc = makeInputPublic(root, top.getIface(Direction.in));
+      makeInputPublic(root, top.getIface(Direction.in));  //TODO why top and not newly instantiated stuff?
+
+      KnowEvl kf = kb.getEntry(KnowEvl.class);
+      FunctionBase entry = (FunctionBase) kf.get(new Designator("inst", State.ENTRY_FUNC_NAME), info);
+      FunctionBase exit = (FunctionBase) kf.get(new Designator("inst", State.EXIT_FUNC_NAME), info);
+      entry.getAttributes().add(FuncAttr.Public);
+      exit.getAttributes().add(FuncAttr.Public);
+
+      
+      Set<FunctionBase> pubfunc = new HashSet<FunctionBase>();
+      for( FunctionBase func : classes.getItems(FunctionBase.class, true) ) {
+        if( func.getAttributes().contains(FuncAttr.Public) ) {
+          pubfunc.add(func);
+        }
+      }
 
       // Use only stuff which is referenced from public input functions
       removeUnused(rootdir, classes, pubfunc);
@@ -564,7 +578,7 @@ public class MainEvl {
   private static ImplElementary makeEnv(String instname, Component top, KnowledgeBase kb) {
     String envname = "!Env";
     ImplElementary env = new ImplElementary(new ElementInfo(envname, -1, -1), "!Env");
-    {
+    {  //that we have them
       FunctionBase entryFunc = makeEntryExitFunc(State.ENTRY_FUNC_NAME);
       FunctionBase exitFunc = makeEntryExitFunc(State.EXIT_FUNC_NAME);
       env.getInternalFunction().add(entryFunc);
@@ -671,9 +685,7 @@ public class MainEvl {
     ns.removeAll(remove);
   }
 
-  private static Set<FunctionBase> makeInputPublic(Namespace root, ListOfNamed<IfaceUse> listOfNamed) {
-    Set<FunctionBase> ret = new HashSet<FunctionBase>();
-
+  private static void makeInputPublic(Namespace root, ListOfNamed<IfaceUse> listOfNamed) {
     for( IfaceUse iface : listOfNamed ) {
       Namespace ifspace = root.findSpace(iface.getName());
       assert ( ifspace != null );
@@ -681,9 +693,7 @@ public class MainEvl {
         assert ( item instanceof FunctionBase );
         FunctionBase func = (FunctionBase) item;
         func.setAttribute(FuncAttr.Public);
-        ret.add(func);
       }
     }
-    return ret;
   }
 }

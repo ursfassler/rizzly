@@ -4,6 +4,8 @@
 #include  "output/inst.h"
 
 int main(){
+  inst__entry();
+
   int i;
   for( i = 0; i < 100; i++ ){
     if( inst_in_get() != 42 ){

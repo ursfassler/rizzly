@@ -13,6 +13,8 @@ while_Point inst_out_foo(R_0_255 x){
 
 
 int main(){
+  inst__entry();
+
   while_Point point;
   
   point = inst_in_foo( 0 );

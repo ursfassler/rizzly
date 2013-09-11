@@ -14,6 +14,8 @@ void inst_out_foo(R_0_100 x){
 }
 
 int main(){
+  inst__entry();
+
   R_0_100 i;
   for( i = 0; i <= 100; i++ ){
     printf( "--> %i\n", i );

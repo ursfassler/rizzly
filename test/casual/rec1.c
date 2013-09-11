@@ -13,7 +13,9 @@ void inst_out_tick( uint8_t x ){
 }
 
 int main(){
-  int i;
+   inst__entry();
+
+ int i;
   for( i = 0; i < 100; i++ ){
     value = 100 - (i % 101);
     inst_in_tick( i % 101 );
