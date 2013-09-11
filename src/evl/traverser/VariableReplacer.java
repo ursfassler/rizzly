@@ -1,9 +1,5 @@
 package evl.traverser;
 
-import evl.expression.reference.RefCall;
-import evl.expression.reference.RefIndex;
-import evl.expression.reference.RefName;
-import evl.expression.reference.RefPtrDeref;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -70,6 +66,7 @@ public class VariableReplacer extends NullTraverser<Boolean, Void> {
     if( checked.contains(obj) ) {
       return null;
     }
+    checked.add(obj);
 
     ArrayList<Evl> list = new ArrayList<Evl>();
     list.addAll(obj.getPhi());
@@ -83,7 +80,6 @@ public class VariableReplacer extends NullTraverser<Boolean, Void> {
 
     visit(obj.getEnd(), null);
 
-    checked.add(obj);
     return null;
   }
 
