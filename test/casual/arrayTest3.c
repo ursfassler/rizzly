@@ -10,8 +10,8 @@ int main(){
   for( i = 0; i < 32; i++ ){
     R_0_31 v = inst_in_tick( i );
     
-    printf( "%i <> %i\n", i, v );
-    if( i != v ){
+    printf( "%i <> %i\n", i % 8, v );
+    if( i%8 != v ){
       return -1;
     }
   }

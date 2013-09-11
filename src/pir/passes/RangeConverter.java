@@ -3,6 +3,7 @@ package pir.passes;
 import java.util.ArrayList;
 import java.util.List;
 
+import pir.PirObject;
 import pir.cfg.PhiStmt;
 import pir.expression.Number;
 import pir.expression.reference.VarRefSimple;
@@ -15,15 +16,20 @@ import pir.statement.ArithmeticOp;
 import pir.statement.Assignment;
 import pir.statement.CallAssignment;
 import pir.statement.CallStmt;
+import pir.statement.GetElementPtr;
 import pir.statement.Relation;
 import pir.statement.Statement;
 import pir.statement.StoreStmt;
 import pir.statement.convert.TypeCast;
 import pir.traverser.StatementReplacer;
+import pir.type.ArrayType;
 import pir.type.RangeType;
+import pir.type.StructType;
 import pir.type.TypeRef;
 
 import common.NameFactory;
+import java.math.BigInteger;
+import pir.NullTraverser;
 import pir.type.PointerType;
 import pir.type.Type;
 
@@ -238,5 +244,63 @@ public class RangeConverter extends StatementReplacer<Void> {
     ret.add(obj);
 
     return ret;
+  }
+
+  @Override
+  protected List<Statement> visitGetElementPtr(GetElementPtr obj, Void param) {
+    List<Statement> ret = new ArrayList<Statement>();
+
+    ChildType extender = new ChildType(ret);
+    Type type = obj.getBase().getType().getRef();
+    for( int i = 0; i < obj.getOffset().size(); i++ ) {
+      PirValue val = obj.getOffset().get(i);
+      if( type instanceof ArrayType ) {
+        // extend array indices. We need a big enough data type as index, otherwise strange things may happen.
+        RangeType valType = (RangeType) val.getType().getRef();
+        RangeType arrType = (RangeType) ( (ArrayType) type ).getType().getRef();
+        val = replaceIfNeeded(val, valType, arrType, ret);
+        obj.getOffset().set(i, val);
+      }
+      type = extender.traverse(type, val);
+    }
+
+    ret.add(obj);
+    return ret;
+//    return super.visitGetElementPtr(obj, param);
+  }
+}
+
+class ChildType extends NullTraverser<Type, PirValue> {
+
+  private List<Statement> ret;
+
+  public ChildType(List<Statement> ret) {
+    this.ret = ret;
+  }
+
+  @Override
+  protected Type doDefault(PirObject obj, PirValue param) {
+    throw new UnsupportedOperationException("Not supported yet: " + obj.getClass().getCanonicalName());
+  }
+
+  @Override
+  protected Type visitArray(ArrayType obj, PirValue param) {
+    return obj.getType().getRef();
+  }
+
+  @Override
+  protected Type visitPointerType(PointerType obj, PirValue param) {
+    assert ( param instanceof Number );
+    assert ( ( (Number) param ).getValue() == BigInteger.ZERO );
+    return obj.getType().getRef();
+  }
+
+  @Override
+  protected Type visitStructType(StructType obj, PirValue param) {
+    assert ( param instanceof Number );
+    int idx = ( (Number) param ).getValue().intValue();
+    assert( idx >= 0 );
+    assert( idx < obj.getElements().size() );
+    return obj.getElements().get(idx).getType().getRef();
   }
 }
