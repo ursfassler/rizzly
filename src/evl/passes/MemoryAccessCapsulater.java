@@ -147,7 +147,7 @@ class ExprReplacer extends DefTraverser<Void, List<Statement>> {
 
     Type type = ExpressionTypeChecker.process(ref, kb);
 
-    PointerType pt = kbi.getPointerType(new TypeRef(ref.getInfo(), type));
+    PointerType pt = kbi.getPointerType(type);
     SsaVariable addr = new SsaVariable(ref.getInfo(), NameFactory.getNew(), new TypeRef(ref.getInfo(), pt));
 
     ref = Copy.copy(ref);
@@ -192,7 +192,7 @@ class StackMemTrav extends StatementReplacer<Void> {
   protected List<Statement> visitStateVariable(StateVariable obj, Void param) {
     Type type = obj.getType().getRef();
     assert ( !( type instanceof PointerType ) );
-    type = kbi.getPointerType(new TypeRef(new ElementInfo(), type));
+    type = kbi.getPointerType( type);
     obj.setType(new TypeRef(new ElementInfo(), type));
 
     map.put(obj, obj);
@@ -204,7 +204,7 @@ class StackMemTrav extends StatementReplacer<Void> {
   protected List<Statement> visitVarDef(VarDefStmt obj, Void param) {
     Type type = obj.getVariable().getType().getRef();
 
-    PointerType pt = kbi.getPointerType(new TypeRef(new ElementInfo(), type));
+    PointerType pt = kbi.getPointerType(type);
     SsaVariable var = new SsaVariable(obj.getVariable().getInfo(), obj.getVariable().getName() + Designator.NAME_SEP + "p", new TypeRef(new ElementInfo(), pt));
     StackMemoryAlloc sma = new StackMemoryAlloc(obj.getInfo(), var);
 

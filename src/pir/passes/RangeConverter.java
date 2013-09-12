@@ -177,8 +177,14 @@ public class RangeConverter extends StatementReplacer<Void> {
       PirValue actArg = parameter.get(i);
       SsaVariable defArg = argument.get(i);
 
-      RangeType lt = (RangeType) actArg.getType().getRef();
-      RangeType dt = (RangeType) defArg.getType().getRef();
+      Type st = actArg.getType().getRef();
+      Type pt = defArg.getType().getRef();
+      if( isNotRange(st, pt) ) {
+        continue;
+      }
+      
+      RangeType lt = (RangeType) st;
+      RangeType dt = (RangeType) pt;
 
       assert ( RangeType.isBigger(dt, lt) || RangeType.isEqual(dt, lt) );
 

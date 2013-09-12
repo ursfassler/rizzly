@@ -1,0 +1,27 @@
+interface
+  Iface
+    function foo();
+    function bar();
+  end
+
+component
+  DebugMsg
+    input
+      in  : Iface;
+    
+    output
+      out : Iface;
+
+  implementation elementary
+
+    function in.foo()
+      out.foo();
+      out.bar();
+    end
+
+    function in.bar()
+      out.bar();
+    end
+
+  end
+

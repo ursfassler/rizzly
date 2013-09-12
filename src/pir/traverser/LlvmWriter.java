@@ -28,6 +28,7 @@ import pir.expression.StringValue;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
 import pir.expression.reference.VarRef;
+import pir.expression.reference.VarRefConst;
 import pir.expression.reference.VarRefSimple;
 import pir.expression.reference.VarRefStatevar;
 import pir.function.FuncWithBody;
@@ -386,6 +387,15 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     param.wr("@");
     param.wr(variable.getName());
     wrId(variable, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitVarRefConst(VarRefConst obj, StreamWriter param) {
+    Constant constant = obj.getRef();
+    param.wr("@");
+    param.wr(constant.getName());
+    wrId(constant, param);
     return null;
   }
 

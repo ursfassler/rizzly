@@ -11,6 +11,8 @@ import util.ssa.BbEdge;
 import common.ElementInfo;
 
 import evl.EvlBase;
+import evl.statement.Statement;
+import java.util.Collection;
 
 public class BasicBlockList extends EvlBase {
   private BasicBlock entry;
@@ -21,6 +23,22 @@ public class BasicBlockList extends EvlBase {
     super(info);
     this.entry = entry;
     this.exit = exit;
+  }
+
+  public BasicBlockList(ElementInfo info) {
+    super(info);
+    entry = new BasicBlock(info, "entry");
+    exit = new BasicBlock(info, "exit");
+    entry.setEnd(new Goto(info, exit));
+    exit.setEnd(new ReturnVoid(info));
+  }
+
+  public void insertCodeAfterEntry( Collection<Statement> code, String bbName ){
+    BasicBlock bb = new BasicBlock(getInfo(), bbName);
+    bb.getCode().addAll(code);
+    bb.setEnd(entry.getEnd());
+    basicBlocks.add(bb);
+    entry.setEnd(new Goto(bb.getInfo(), bb));
   }
 
   public BasicBlock getEntry() {
@@ -49,7 +67,7 @@ public class BasicBlockList extends EvlBase {
     ret.add(exit);
     return ret;
   }
-
+  
   public DirectedGraph<BasicBlock, BbEdge> makeFuncGraph() {
     DirectedGraph<BasicBlock, BbEdge> g = new BaseGraph<BasicBlock, BbEdge>();
 

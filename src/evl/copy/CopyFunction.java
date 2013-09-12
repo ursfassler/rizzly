@@ -8,6 +8,7 @@ import evl.function.FunctionBase;
 import evl.function.FunctionFactory;
 import evl.other.ListOfNamed;
 import evl.variable.Variable;
+import java.util.Collection;
 
 public class CopyFunction extends NullTraverser<FunctionBase, Void> {
   private CopyEvl cast;
@@ -24,7 +25,8 @@ public class CopyFunction extends NullTraverser<FunctionBase, Void> {
 
   @Override
   protected FunctionBase visitFunctionBase(FunctionBase obj, Void param) {
-    FunctionBase ret = FunctionFactory.create(obj.getClass(), obj.getInfo(), obj.getName(), new ListOfNamed<Variable>(cast.copy(obj.getParam().getList())));
+    Collection<Variable> arg = cast.copy(obj.getParam().getList());
+    FunctionBase ret = FunctionFactory.create(obj.getClass(), obj.getInfo(), obj.getName(), new ListOfNamed<Variable>(arg));
     cast.getCopied().put(obj, ret);
     if (obj instanceof FuncWithReturn) {
       ((FuncWithReturn) ret).setRet(cast.copy(((FuncWithReturn) obj).getRet()));

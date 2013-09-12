@@ -29,6 +29,7 @@ import java.math.BigInteger;
  * 
  */
 public class EventRecvDebugCallAdder extends DefTraverser<Void, Integer> {
+
   private ArrayList<String> names;
   private FuncPrivateVoid msgRecvFunc;
   static private ElementInfo info = new ElementInfo();
@@ -45,7 +46,6 @@ public class EventRecvDebugCallAdder extends DefTraverser<Void, Integer> {
   }
 
   // recv event
-
   @Override
   protected Void visitNamedList(NamedList<Named> obj, Integer param) {
     int numIface = names.indexOf(obj.getName());
@@ -65,17 +65,17 @@ public class EventRecvDebugCallAdder extends DefTraverser<Void, Integer> {
   }
 
   public void makeDebugCall(FuncWithBody obj, Integer param) {
-    assert (param != null);
-    assert (param >= 0);
+    assert ( param != null );
+    assert ( param >= 0 );
     int numFunc = names.indexOf(obj.getName());
-    assert (numFunc >= 0);
-    throw new RuntimeException("reimplement");
-//    obj.getBody().getBasicBlocksOld().get(0).getCode().add(0, makeCall(msgRecvFunc, numFunc, param)); // TODO make it
-                                                                                                   // cleaner
+    assert ( numFunc >= 0 );
+    List<Statement> call = new ArrayList<Statement>();
+    call.add(makeCall(msgRecvFunc, numFunc, param));
+    obj.getBody().insertCodeAfterEntry(call, "debucCall");
   }
 
   private Statement makeCall(FunctionBase func, int numFunc, int numIface) {
-    // Self._sendMsg( numFunc, numIface );
+    // _sendMsg( numFunc, numIface );
     List<Expression> actParam = new ArrayList<Expression>();
     actParam.add(new Number(info, BigInteger.valueOf(numFunc)));
     actParam.add(new Number(info, BigInteger.valueOf(numIface)));
@@ -85,5 +85,4 @@ public class EventRecvDebugCallAdder extends DefTraverser<Void, Integer> {
 
     return new CallStmt(info, call);
   }
-
 }

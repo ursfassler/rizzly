@@ -1,5 +1,9 @@
 package evl.copy;
 
+import evl.function.FunctionBase;
+import evl.function.impl.FuncProtoRet;
+import evl.function.impl.FuncProtoVoid;
+import evl.other.RizzlyProgram;
 import java.util.Collection;
 import java.util.Map;
 

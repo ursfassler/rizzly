@@ -24,27 +24,27 @@ public class CopyVariable extends NullTraverser<Variable, Void> {
 
   @Override
   protected Variable visitFuncVariable(FuncVariable obj, Void param) {
-    return new FuncVariable(obj.getInfo(), obj.getName(), obj.getType());
+    return new FuncVariable(obj.getInfo(), obj.getName(), cast.copy(obj.getType()));
   }
 
   @Override
   protected Variable visitStateVariable(StateVariable obj, Void param) {
-    return new StateVariable(obj.getInfo(), obj.getName(), obj.getType());
+    return new StateVariable(obj.getInfo(), obj.getName(), cast.copy(obj.getType()));
   }
 
   @Override
   protected Variable visitConstPrivate(ConstPrivate obj, Void param) {
-    return new ConstPrivate(obj.getInfo(), obj.getName(), obj.getType(),cast.copy(obj.getDef()));
+    return new ConstPrivate(obj.getInfo(), obj.getName(), cast.copy(obj.getType()),cast.copy(obj.getDef()));
   }
 
   @Override
   protected Variable visitConstGlobal(ConstGlobal obj, Void param) {
-    return new ConstGlobal(obj.getInfo(), obj.getName(), obj.getType(),cast.copy(obj.getDef()));
+    return new ConstGlobal(obj.getInfo(), obj.getName(), cast.copy(obj.getType()),cast.copy(obj.getDef()));
   }
 
   @Override
   protected Variable visitSsaVariable(SsaVariable obj, Void param) {
-    return new SsaVariable(obj.getInfo(), obj.getName(), obj.getType());
+    return new SsaVariable(obj.getInfo(), obj.getName(), cast.copy(obj.getType()));
   }
 
 }

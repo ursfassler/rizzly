@@ -19,7 +19,6 @@ import pir.traverser.LlvmWriter;
 import util.Pair;
 import util.SimpleGraph;
 
-import com.sun.org.apache.xalan.internal.xsltc.compiler.util.IntType;
 import common.Designator;
 import common.FuncAttr;
 
@@ -40,8 +39,6 @@ import evl.other.Named;
 import evl.traverser.CHeaderWriter;
 import evl.traverser.DepCollector;
 import evl.type.composed.NamedElement;
-import evl.type.special.VoidType;
-import evl.variable.FuncVariable;
 import evl.variable.Variable;
 import fun.other.Namespace;
 import fun.toevl.FunToEvl;
@@ -108,13 +105,14 @@ public class Main {
       nl.add(fret.first);
       root = (Component) aclasses.getChildItem(nl);
     }
-
-    evl.other.RizzlyProgram prg = MainEvl.doEvl(opt, debugdir, aclasses, root);
+    
+    ArrayList<String> debugNames = new ArrayList<String>();
+    evl.other.RizzlyProgram prg = MainEvl.doEvl(opt, debugdir, aclasses, root,debugNames);
 
     {
-      evl.other.RizzlyProgram head = makeHeader(prg);
+      evl.other.RizzlyProgram head = makeHeader(prg, debugdir);
       evl.traverser.Renamer.process(head);
-      printCHeader(outdir, head);
+      printCHeader(outdir, head,debugNames);
     }
 
     evl.doc.PrettyPrinter.print(prg, debugdir + "beforePir.rzy", true);
@@ -158,9 +156,9 @@ public class Main {
     System.out.println("Compiled: " + p.exitValue());
   }
 
-  private static void printCHeader(String outdir, RizzlyProgram cprog) {
+  private static void printCHeader(String outdir, RizzlyProgram cprog,List<String> debugNames) {
     String cfilename = outdir + cprog.getName() + ".h";
-    CHeaderWriter cwriter = new CHeaderWriter();
+    CHeaderWriter cwriter = new CHeaderWriter(debugNames);
     try {
       cwriter.traverse(cprog, new StreamWriter(new PrintStream(cfilename)));
     } catch( FileNotFoundException e ) {
@@ -207,7 +205,7 @@ public class Main {
     return vs;
   }
 
-  private static RizzlyProgram makeHeader(RizzlyProgram prg) {
+  private static RizzlyProgram makeHeader(RizzlyProgram prg, String debugdir) {
     RizzlyProgram ret = new RizzlyProgram(prg.getRootdir(), prg.getName());
     Set<Evl> anchor = new HashSet<Evl>();
     for( FunctionBase func : prg.getFunction() ) {
@@ -247,10 +245,11 @@ public class Main {
       }
     }
 
-    ret = Copy.copy(ret);
+    RizzlyProgram cpy = Copy.copy(ret);
+    
+    toposort(cpy.getType().getList());
 
-    toposort(ret.getType().getList());
-
-    return ret;
+    return cpy;
   }
+
 }

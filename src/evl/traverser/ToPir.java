@@ -91,6 +91,7 @@ import evl.variable.FuncVariable;
 import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
 import java.math.BigInteger;
+import pir.expression.reference.VarRefConst;
 import pir.traverser.ExprTypeGetter;
 import pir.type.StructType;
 import util.ssa.PhiInserter;
@@ -399,9 +400,9 @@ public class ToPir extends NullTraverser<PirObject, Void> {
 
   @Override
   protected PirObject visitConstant(Constant obj, Void param) {
-    pir.type.Type type = (pir.type.Type) visit(obj.getType(), null);
+    pir.type.TypeRef type = (pir.type.TypeRef) visit(obj.getType(), null);
     PExpression def = (PExpression) visit(obj.getDef(), null);
-    return new pir.other.Constant(obj.getName(), new TypeRef(type), def);
+    return new pir.other.Constant(obj.getName(), type, def);
   }
 
   @Override
@@ -544,6 +545,8 @@ public class ToPir extends NullTraverser<PirObject, Void> {
       base = new VarRefStatevar((pir.other.StateVariable) baseAddr);
     } else if( baseAddr instanceof pir.other.SsaVariable ) {
       base = new VarRefSimple((pir.other.SsaVariable) baseAddr);
+    } else if( baseAddr instanceof pir.other.Constant ) {
+      base = new VarRefConst((pir.other.Constant) baseAddr);
     } else if( baseAddr instanceof pir.other.FuncVariable ) {
       RError.err(ErrorType.Fatal, obj.getInfo(), "not yet implemented " + baseAddr.getClass().getCanonicalName() + " -> implement alloca");
       //TODO implement stack memory allocation with alloca

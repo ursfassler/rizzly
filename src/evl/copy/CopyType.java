@@ -3,11 +3,15 @@ package evl.copy;
 import evl.Evl;
 import evl.NullTraverser;
 import evl.type.Type;
+import evl.type.base.ArrayType;
 import evl.type.base.Range;
+import evl.type.base.StringType;
 import evl.type.composed.RecordType;
+import evl.type.special.PointerType;
 import java.math.BigInteger;
 
 public class CopyType extends NullTraverser<Type, Void> {
+
   private CopyEvl cast;
 
   public CopyType(CopyEvl cast) {
@@ -29,7 +33,19 @@ public class CopyType extends NullTraverser<Type, Void> {
   protected Type visitRecordType(RecordType obj, Void param) {
     return new RecordType(obj.getInfo(), obj.getName(), cast.copy(obj.getElement().getList()));
   }
-  
-  
 
+  @Override
+  protected Type visitStringType(StringType obj, Void param) {
+    return new StringType();
+  }
+
+  @Override
+  protected Type visitArrayType(ArrayType obj, Void param) {
+    return new ArrayType(obj.getSize(), cast.copy(obj.getType()));
+  }
+
+  @Override
+  protected Type visitPointerType(PointerType obj, Void param) {
+    return new PointerType(cast.copy(obj.getType()));
+  }
 }

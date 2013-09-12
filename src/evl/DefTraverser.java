@@ -419,64 +419,76 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitFunctionBase(FunctionBase obj, P param) {
-    visitItr(obj.getParam(), param);
-    if( obj instanceof FuncWithReturn ) {
-      visit(( (FuncWithReturn) obj ).getRet(), param);
-    }
-    if( obj instanceof FuncWithBody ) {
-      visit(( (FuncWithBody) obj ).getBody(), param);
-    }
-    return super.visitFunctionBase(obj, param);
-  }
-
-  @Override
   protected R visitFuncInputHandlerEvent(FuncInputHandlerEvent obj, P param) {
+    visitItr(obj.getParam(), param);
+    visit( obj.getBody(), param);
     return null;
   }
 
   @Override
   protected R visitFuncInputHandlerQuery(FuncInputHandlerQuery obj, P param) {
+    visitItr(obj.getParam(), param);
+    visit( obj.getRet(), param);
+    visit( obj.getBody(), param);
     return null;
   }
 
   @Override
   protected R visitFuncPrivateVoid(FuncPrivateVoid obj, P param) {
+    visitItr(obj.getParam(), param);
+    visit( obj.getBody(), param);
     return null;
   }
 
   @Override
   protected R visitFuncPrivateRet(FuncPrivateRet obj, P param) {
+    visitItr(obj.getParam(), param);
+    visit( obj.getRet(), param);
+    visit( obj.getBody(), param);
     return null;
   }
 
   @Override
   protected R visitFuncProtoVoid(FuncProtoVoid obj, P param) {
+    visitItr(obj.getParam(), param);
     return null;
   }
 
   @Override
   protected R visitHfsmQueryFunction(HfsmQueryFunction obj, P param) {
+    visitItr(obj.getParam(), param);
+    visit( obj.getRet(), param);
+    visit( obj.getBody(), param);
     return null;
   }
 
   @Override
   protected R visitFuncProtoRet(FuncProtoRet obj, P param) {
+    visitItr(obj.getParam(), param);
+    visit( obj.getRet(), param);
     return null;
   }
 
   @Override
   protected R visitFuncGlobal(FuncGlobal obj, P param) {
+    visitItr(obj.getParam(), param);
+    visit( obj.getRet(), param);
+    visit( obj.getBody(), param);
     return null;
   }
 
   @Override
   protected R visitFuncSubHandlerQuery(FuncSubHandlerQuery obj, P param) {
+    visitItr(obj.getParam(), param);
+    visit( obj.getRet(), param);
+    visit( obj.getBody(), param);
     return null;
   }
 
   @Override
   protected R visitFuncSubHandlerEvent(FuncSubHandlerEvent obj, P param) {
+    visitItr(obj.getParam(), param);
+    visit( obj.getBody(), param);
     return null;
   }
 

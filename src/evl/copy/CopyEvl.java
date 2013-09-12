@@ -238,7 +238,7 @@ class CopyEvl extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitTypeRef(TypeRef obj, Void param) {
-    return new TypeRef(obj.getInfo(), obj.getRef());
+    return new TypeRef(obj.getInfo(), obj.getRef()); // we keep link to old type
   }
 
   @Override

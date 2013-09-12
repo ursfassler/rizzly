@@ -18,6 +18,7 @@ import pir.expression.StringValue;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
 import pir.expression.reference.VarRef;
+import pir.expression.reference.VarRefConst;
 import pir.expression.reference.VarRefSimple;
 import pir.expression.reference.VarRefStatevar;
 import pir.function.FuncImpl;
@@ -400,6 +401,11 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitStackMemoryAlloc(StackMemoryAlloc obj, P param) {
     visit(obj.getVariable(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitVarRefConst(VarRefConst varRefConst, P param) {
     return null;
   }
 }

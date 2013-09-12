@@ -8,6 +8,7 @@ import evl.Evl;
 import evl.type.TypeRef;
 
 public class ArrayType extends BaseType implements Evl {
+
   private TypeRef type;
   private BigInteger size;
 
@@ -32,5 +33,4 @@ public class ArrayType extends BaseType implements Evl {
   public BigInteger getSize() {
     return size;
   }
-
 }

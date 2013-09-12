@@ -18,6 +18,7 @@ import pir.expression.StringValue;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
 import pir.expression.reference.VarRef;
+import pir.expression.reference.VarRefConst;
 import pir.expression.reference.VarRefSimple;
 import pir.expression.reference.VarRefStatevar;
 import pir.function.FuncImpl;
@@ -338,6 +339,11 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitStackMemoryAlloc(StackMemoryAlloc obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitVarRefConst(VarRefConst obj, P param) {
     return doDefault(obj, param);
   }
 }

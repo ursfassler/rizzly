@@ -30,7 +30,6 @@ import evl.Evl;
 import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
 import evl.cfg.Goto;
-import evl.cfg.ReturnExpr;
 import evl.cfg.ReturnVoid;
 import evl.composition.CompositionReduction;
 import evl.composition.Connection;
@@ -42,13 +41,10 @@ import evl.doc.PrettyPrinter;
 import evl.expression.ArrayValue;
 import evl.expression.Expression;
 import evl.expression.StringValue;
-import evl.expression.reference.RefIndex;
 import evl.expression.reference.Reference;
 import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
-import evl.function.impl.FuncGlobal;
 import evl.function.impl.FuncPrivateVoid;
-import evl.function.impl.FuncProtoRet;
 import evl.function.impl.FuncProtoVoid;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.Transition;
@@ -91,20 +87,23 @@ import evl.traverser.iocheck.StateWriterInfo;
 import evl.traverser.typecheck.TypeChecker;
 import evl.traverser.typecheck.specific.CompInterfaceTypeChecker;
 import evl.type.Type;
+import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.Range;
+import evl.type.special.PointerType;
 import evl.variable.ConstGlobal;
 import evl.variable.Constant;
 import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
 import fun.hfsm.State;
+import java.math.BigInteger;
 
 public class MainEvl {
 
   private static ElementInfo info = new ElementInfo();
 
-  public static RizzlyProgram doEvl(ClaOption opt, String debugdir, Namespace aclasses, Component root) {
+  public static RizzlyProgram doEvl(ClaOption opt, String debugdir, Namespace aclasses, Component root, ArrayList<String> names) {
     KnowledgeBase kb = new KnowledgeBase(aclasses, debugdir);
 
     ExprCutter.process(aclasses, kb);
@@ -133,14 +132,15 @@ public class MainEvl {
     ExprCutter.process(aclasses, kb);
     PrettyPrinter.print(aclasses, debugdir + "memcaps.rzy", true);
 
+    if( opt.doDebugEvent() ) {
+       names.addAll(addDebug(aclasses, root, debugdir) );
+    }
+
     // only for debugging
     // typecheck(classes, debugdir);
 
-    if( opt.doDebugEvent() ) {
-      addDebug(aclasses, (ImplElementary) root, debugdir);
-    }
-
     RizzlyProgram prg = instantiate(root, debugdir, aclasses);
+    PrettyPrinter.print(prg, debugdir + "instprog.rzy", true);
     return prg;
   }
 
@@ -399,10 +399,10 @@ public class MainEvl {
     PrettyPrinter.print(classes, debugdir + "system.rzy");
   }
 
-  private static void addDebug(Namespace classes, ImplElementary root, String debugdir) {
+  private static ArrayList<String> addDebug(Namespace classes, Component root, String debugdir) {
     ArrayList<String> names = new ArrayList<String>(MsgNamesGetter.get(classes));
     if( names.isEmpty() ) {
-      return; // this means that there is no input nor output interface
+      return names; // this means that there is no input nor output interface
     }
 
     KnowledgeBase kb = new KnowledgeBase(classes, debugdir);
@@ -413,7 +413,8 @@ public class MainEvl {
     Collections.sort(names);
 
     Range symNameSizeType = kbi.getRangeType(names.size());
-    ArrayType arrayType = kbi.getArray(depth, symNameSizeType);
+    ArrayType arrayType = kbi.getArray(BigInteger.valueOf(depth), symNameSizeType);
+    PointerType pArray = kbi.getPointerType(arrayType);
     Range sizeType = kbi.getRangeType(depth);
 
     Interface debugIface;
@@ -423,9 +424,9 @@ public class MainEvl {
 
       {
         ArrayList<Variable> param = new ArrayList<Variable>();
-        SsaVariable sender = new SsaVariable(info, "sender", arrayType);
+        SsaVariable sender = new SsaVariable(info, "sender", new TypeRef(info, pArray));
         param.add(sender);
-        SsaVariable size = new SsaVariable(info, "size", sizeType);
+        SsaVariable size = new SsaVariable(info, "size", new TypeRef(info, sizeType));
         param.add(size);
 
         FuncProtoVoid sendFunc = new FuncProtoVoid(info, "msgSend", new ListOfNamed<Variable>(param));
@@ -435,9 +436,9 @@ public class MainEvl {
 
       {
         ArrayList<Variable> param = new ArrayList<Variable>();
-        SsaVariable sender = new SsaVariable(info, "receiver", arrayType);
+        SsaVariable sender = new SsaVariable(info, "receiver", new TypeRef(info, pArray));
         param.add(sender);
-        SsaVariable size = new SsaVariable(info, "size", sizeType);
+        SsaVariable size = new SsaVariable(info, "size", new TypeRef(info, sizeType));
         param.add(size);
 
         recvFunc = new FuncProtoVoid(info, "msgRecv", new ListOfNamed<Variable>(param));
@@ -448,73 +449,12 @@ public class MainEvl {
       classes.add(debugIface);
     }
 
-    DebugIfaceAdder.process(classes, arrayType, sizeType, debugIface, names);
+    PointerType pArrayElemType = kbi.getPointerType(symNameSizeType);
+    DebugIfaceAdder.process(classes, pArray, pArrayElemType, sizeType, symNameSizeType, debugIface, names);
 
-    Interface debugQueryIface;
-    {
-      debugQueryIface = new Interface(info, "_DebugQuery");
-
-      {
-        ArrayList<Variable> param = new ArrayList<Variable>();
-
-        SsaVariable sender = new SsaVariable(info, "nr", symNameSizeType);
-        param.add(sender);
-
-        FuncProtoRet sendFunc = new FuncProtoRet(info, "getSym", new ListOfNamed<Variable>(param));
-        sendFunc.setRet(new Reference(info, kbi.getStringType()));
-        debugQueryIface.getPrototype().add(sendFunc);
-      }
-
-      classes.add(debugQueryIface);
-    }
-
-    ConstGlobal symtable;
-    {
-      List<Expression> values = new ArrayList<Expression>();
-      for( String itr : names ) {
-        values.add(new StringValue(info, itr));
-      }
-      ArrayValue val = new ArrayValue(info, values);
-
-      ArrayType symType = kbi.getArray(names.size(), kbi.getStringType());
-
-      symtable = new ConstGlobal(info, "_debugsym", symType, val);
-
-      classes.add(symtable);
-    }
-
-    root.getIface(Direction.in).add(new IfaceUse(info, "_debugQuery", debugQueryIface));
-
-    {
-      ArrayList<Variable> param = new ArrayList<Variable>();
-      SsaVariable sender = new SsaVariable(info, "nr", symNameSizeType);
-      param.add(sender);
-
-      BasicBlockList body = new BasicBlockList(info);
-      {
-        Reference index = new Reference(info, sender);
-
-        Reference array = new Reference(info, symtable);
-        array.getOffset().add(new RefIndex(info, index));
-
-        BasicBlock bb = new BasicBlock(info, "bodyBB");
-        bb.setEnd(new ReturnExpr(info, array));
-        body.getBasicBlocksOld().add(bb);
-      }
-
-      FuncGlobal func = new FuncGlobal(info, "getSym", new ListOfNamed<Variable>(param));
-      func.setRet(new Reference(info, kbi.getStringType()));
-      func.setBody(body);
-      func.setAttribute(FuncAttr.Public);
-
-      Designator ns = new Designator("_debugQuery");
-      root.addFunction(ns.toList(), func);
-    }
-
-    // Linker.process(classes, new KnowledgeBase(classes, debugdir));
-    // evaluate(classes, debugdir);
-
-    PrettyPrinter.print(classes, debugdir + "debug.rzy");
+    PrettyPrinter.print(classes, debugdir + "debug.rzy", true);
+    
+    return names;
   }
 
   private static RizzlyProgram instantiate(Component top, String rootdir, Namespace classes) {
@@ -548,7 +488,7 @@ public class MainEvl {
       entry.getAttributes().add(FuncAttr.Public);
       exit.getAttributes().add(FuncAttr.Public);
 
-      
+
       Set<FunctionBase> pubfunc = new HashSet<FunctionBase>();
       for( FunctionBase func : classes.getItems(FunctionBase.class, true) ) {
         if( func.getAttributes().contains(FuncAttr.Public) ) {

@@ -1,5 +1,6 @@
 package evl.knowledge;
 
+import common.ElementInfo;
 import evl.type.special.PointerType;
 import java.math.BigInteger;
 
@@ -7,6 +8,7 @@ import java.math.BigInteger;
 import error.ErrorType;
 import error.RError;
 import evl.other.Named;
+import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
@@ -85,19 +87,21 @@ public class KnowBaseItem extends KnowledgeEntry {
     return ret;
   }
 
-  public ArrayType getArray(BigInteger size, TypeRef type) {
-    ArrayType ret = (ArrayType) findItem(ArrayType.makeName(size, type));
+  public ArrayType getArray(BigInteger size, Type type) {
+    TypeRef ref = new TypeRef(new ElementInfo(), type);
+    ArrayType ret = (ArrayType) findItem(ArrayType.makeName(size, ref));
     if( ret == null ) {
-      ret = new ArrayType(size, type);
+      ret = new ArrayType(size, ref);
       addItem(ret);
     }
     return ret;
   }
-
-  public PointerType getPointerType(TypeRef type) {
-    PointerType ret = (PointerType) findItem(PointerType.makeName(type));
+  
+  public PointerType getPointerType(Type type) {
+    TypeRef ref = new TypeRef(new ElementInfo(), type);
+    PointerType ret = (PointerType) findItem(PointerType.makeName(ref));
     if( ret == null ) {
-      ret = new PointerType(type);
+      ret = new PointerType(ref);
       addItem(ret);
     }
     return ret;

@@ -10,14 +10,17 @@ import evl.function.impl.FuncProtoVoid;
 import evl.other.RizzlyProgram;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.type.TypeRef;
+import evl.type.base.ArrayType;
 import evl.type.base.Range;
 import evl.type.base.StringType;
 import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
+import evl.type.special.PointerType;
 import evl.variable.Variable;
 import java.math.BigInteger;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -25,6 +28,12 @@ import java.util.Set;
  * @author urs
  */
 public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
+
+  private final List<String> debugNames;    // hacky hacky
+
+  public CHeaderWriter(List<String> debugNames) {
+    this.debugNames = debugNames;
+  }
 
   @Override
   protected Void visitDefault(Evl obj, StreamWriter param) {
@@ -34,22 +43,37 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitRizzlyProgram(RizzlyProgram obj, StreamWriter param) {
     String protname = obj.getName().toUpperCase() + "_" + "H";
-    
+
     param.wr("#ifndef " + protname);
     param.nl();
     param.wr("#define " + protname);
     param.nl();
     param.nl();
-    
+
     param.wr("#include <stdint.h>");
     param.nl();
     param.nl();
+    if( debugNames != null ) {
+      param.wr("const char* DEBUG_NAMES[] = { ");
+      boolean first = true;
+      for( String name : debugNames ) {
+        if( first ) {
+          first = false;
+        } else {
+          param.wr(", ");
+        }
+        param.wr("\"" + name + "\"");
+      }
+      param.wr(" };");
+      param.nl();
+      param.nl();
+    }
 
     visitItr(obj.getType(), param);
     visitItr(obj.getConstant(), param);
     assert ( obj.getVariable().isEmpty() );
     visitItr(obj.getFunction(), param);
-    
+
     param.nl();
     param.wr("#endif /* " + protname + " */");
     param.nl();
@@ -101,7 +125,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
     BigInteger max = getPos(obj.getHigh()).max(getPos(obj.getLow()));
     int bits = ExpressionTypeChecker.bitCount(max);
     assert ( bits >= 0 );
-    if( isNeg ){
+    if( isNeg ) {
       bits++;
     }
     bits = ( bits + 7 ) / 8;
@@ -112,13 +136,54 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
     bits = bits * 8;
 
     param.wr("typedef ");
-    param.wr( (isNeg?"":"u") + "int" + bits + "_t");
+    param.wr(( isNeg ? "" : "u" ) + "int" + bits + "_t");
     param.wr(" ");
     param.wr(obj.getName());
     param.wr(";");
     param.nl();
 
     return null;
+  }
+
+  @Override
+  protected Void visitArrayType(ArrayType obj, StreamWriter param) {
+    param.wr("typedef ");
+    visit(obj.getType(), param);
+    param.wr(" ");
+    param.wr(obj.getName());
+    param.wr("[");
+    param.wr(obj.getSize().toString());
+    param.wr("];");
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitStringType(StringType obj, StreamWriter param) {
+    param.wr("typedef ");
+    param.wr("char*");
+    param.wr(" ");
+    param.wr(obj.getName());
+    param.wr(";");
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitPointerType(PointerType obj, StreamWriter param) {
+    param.wr("typedef ");
+    visit(obj.getType(), param);
+    param.wr(" ");
+    param.wr("*");
+    param.wr(obj.getName());
+    param.wr(";");
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitUnionType(UnionType obj, StreamWriter param) {
+    throw new UnsupportedOperationException("Not supported yet");
   }
 
   @Override
@@ -172,15 +237,5 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.wr(" ");
     wrPrototype(obj, param);
     return null;
-  }
-
-  @Override
-  protected Void visitStringType(StringType obj, StreamWriter param) {
-    throw new UnsupportedOperationException("Not supported yet");
-  }
-
-  @Override
-  protected Void visitUnionType(UnionType obj, StreamWriter param) {
-    throw new UnsupportedOperationException("Not supported yet");
   }
 }
