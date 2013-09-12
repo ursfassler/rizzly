@@ -1,7 +1,5 @@
 package evl.knowledge;
 
-import evl.type.TypeRef;
-import evl.type.special.PointerType;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -24,12 +22,14 @@ import evl.other.Interface;
 import evl.other.ListOfNamed;
 import evl.other.Named;
 import evl.other.Namespace;
+import evl.type.TypeRef;
 import evl.type.base.EnumType;
 import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
 import evl.type.special.ComponentType;
 import evl.type.special.InterfaceType;
+import evl.type.special.PointerType;
 import evl.variable.Variable;
 
 public class KnowChild extends KnowledgeEntry {

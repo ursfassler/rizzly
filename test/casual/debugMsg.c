@@ -42,6 +42,6 @@ int main(){
   printf( "in-bar\n" );
   inst_in_bar();
   
- return 0;
+ return -1;   //TODO implement correct test (look at composition.c)
 }
 

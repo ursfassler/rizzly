@@ -1,10 +1,17 @@
 package evl.passes;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import util.ssa.PhiInserter;
+
 import common.Designator;
 import common.ElementInfo;
 import common.NameFactory;
+
 import evl.DefTraverser;
-import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockEnd;
 import evl.copy.Copy;
 import evl.expression.Expression;
@@ -29,11 +36,6 @@ import evl.type.special.PointerType;
 import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import util.ssa.PhiInserter;
 
 /**
  * Inserts a load statement for every read access on memory and a store statement for every write access.

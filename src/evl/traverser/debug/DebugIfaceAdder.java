@@ -1,5 +1,6 @@
 package evl.traverser.debug;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,7 +40,6 @@ import evl.type.base.Range;
 import evl.type.special.PointerType;
 import evl.variable.SsaVariable;
 import evl.variable.Variable;
-import java.math.BigInteger;
 
 public class DebugIfaceAdder extends NullTraverser<Void, Void> {
 

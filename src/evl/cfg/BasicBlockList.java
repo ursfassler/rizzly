@@ -1,5 +1,6 @@
 package evl.cfg;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -12,7 +13,6 @@ import common.ElementInfo;
 
 import evl.EvlBase;
 import evl.statement.Statement;
-import java.util.Collection;
 
 public class BasicBlockList extends EvlBase {
   private BasicBlock entry;

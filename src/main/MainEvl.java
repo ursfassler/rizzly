@@ -2,6 +2,7 @@ package main;
 
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -38,9 +39,6 @@ import evl.copy.Copy;
 import evl.copy.Relinker;
 import evl.doc.DepGraph;
 import evl.doc.PrettyPrinter;
-import evl.expression.ArrayValue;
-import evl.expression.Expression;
-import evl.expression.StringValue;
 import evl.expression.reference.Reference;
 import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
@@ -91,13 +89,11 @@ import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.Range;
 import evl.type.special.PointerType;
-import evl.variable.ConstGlobal;
 import evl.variable.Constant;
 import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
 import fun.hfsm.State;
-import java.math.BigInteger;
 
 public class MainEvl {
 
@@ -133,7 +129,7 @@ public class MainEvl {
     PrettyPrinter.print(aclasses, debugdir + "memcaps.rzy", true);
 
     if( opt.doDebugEvent() ) {
-       names.addAll(addDebug(aclasses, root, debugdir) );
+      names.addAll(addDebug(aclasses, root, debugdir));
     }
 
     // only for debugging
@@ -372,7 +368,7 @@ public class MainEvl {
 
     HfsmGraphviz.print(classes, debugdir + "hfsm.gv");
     HfsmToFsm.process(classes, kb);
-    PrettyPrinter.print(classes, debugdir + "fsm.rzy");
+    PrettyPrinter.print(classes, debugdir + "fsm.rzy", true);
 
     Map<ImplHfsm, ImplElementary> map = HfsmReduction.process(classes, new KnowledgeBase(classes, opt.getRootPath()));
     Relinker.relink(classes, map);
@@ -396,7 +392,7 @@ public class MainEvl {
     classes.add(debugIface);
 
     SystemIfaceAdder.process(classes, kb);
-    PrettyPrinter.print(classes, debugdir + "system.rzy");
+    PrettyPrinter.print(classes, debugdir + "system.rzy", true);
   }
 
   private static ArrayList<String> addDebug(Namespace classes, Component root, String debugdir) {
@@ -453,7 +449,7 @@ public class MainEvl {
     DebugIfaceAdder.process(classes, pArray, pArrayElemType, sizeType, symNameSizeType, debugIface, names);
 
     PrettyPrinter.print(classes, debugdir + "debug.rzy", true);
-    
+
     return names;
   }
 

@@ -8,7 +8,6 @@ import evl.type.base.Range;
 import evl.type.base.StringType;
 import evl.type.composed.RecordType;
 import evl.type.special.PointerType;
-import java.math.BigInteger;
 
 public class CopyType extends NullTraverser<Type, Void> {
 

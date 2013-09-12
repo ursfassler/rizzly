@@ -1,5 +1,7 @@
 package evl.copy;
 
+import java.util.Collection;
+
 import evl.Evl;
 import evl.NullTraverser;
 import evl.function.FuncWithBody;
@@ -8,7 +10,6 @@ import evl.function.FunctionBase;
 import evl.function.FunctionFactory;
 import evl.other.ListOfNamed;
 import evl.variable.Variable;
-import java.util.Collection;
 
 public class CopyFunction extends NullTraverser<FunctionBase, Void> {
   private CopyEvl cast;

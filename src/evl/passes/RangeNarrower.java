@@ -1,7 +1,5 @@
 package evl.passes;
 
-import evl.statement.Assignment;
-import evl.statement.CallStmt;
 import java.util.Map;
 import java.util.Set;
 
@@ -23,6 +21,8 @@ import evl.expression.TypeCast;
 import evl.expression.reference.Reference;
 import evl.knowledge.KnowSsaUsage;
 import evl.knowledge.KnowledgeBase;
+import evl.statement.Assignment;
+import evl.statement.CallStmt;
 import evl.statement.SsaGenerator;
 import evl.statement.Statement;
 import evl.statement.VarDefInitStmt;

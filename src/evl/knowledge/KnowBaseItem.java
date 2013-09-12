@@ -1,9 +1,8 @@
 package evl.knowledge;
 
-import common.ElementInfo;
-import evl.type.special.PointerType;
 import java.math.BigInteger;
 
+import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
@@ -16,6 +15,7 @@ import evl.type.base.Range;
 import evl.type.base.StringType;
 import evl.type.special.IntegerType;
 import evl.type.special.NaturalType;
+import evl.type.special.PointerType;
 import evl.type.special.VoidType;
 
 public class KnowBaseItem extends KnowledgeEntry {

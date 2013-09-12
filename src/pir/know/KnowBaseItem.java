@@ -15,12 +15,8 @@ import pir.type.StringType;
 import pir.type.Type;
 import pir.type.UnsignedType;
 import pir.type.VoidType;
-
-import common.ElementInfo;
-
 import error.ErrorType;
 import error.RError;
-import evl.expression.reference.Reference;
 
 public class KnowBaseItem extends KnowledgeEntry {
   private KnowChild kc;

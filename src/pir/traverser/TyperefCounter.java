@@ -1,7 +1,5 @@
 package pir.traverser;
 
-import error.ErrorType;
-import error.RError;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,6 +7,8 @@ import pir.DefTraverser;
 import pir.other.Program;
 import pir.type.Type;
 import pir.type.TypeRef;
+import error.ErrorType;
+import error.RError;
 
 public class TyperefCounter extends DefTraverser<Void, Void> {
 

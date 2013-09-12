@@ -1,16 +1,16 @@
 package main;
 
-import evl.other.RizzlyProgram;
-import evl.type.TypeRef;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-
 
 import org.jgrapht.traverse.TopologicalOrderIterator;
 
@@ -36,15 +36,14 @@ import evl.function.impl.FuncProtoRet;
 import evl.function.impl.FuncProtoVoid;
 import evl.other.Component;
 import evl.other.Named;
+import evl.other.RizzlyProgram;
 import evl.traverser.CHeaderWriter;
 import evl.traverser.DepCollector;
+import evl.type.TypeRef;
 import evl.type.composed.NamedElement;
 import evl.variable.Variable;
 import fun.other.Namespace;
 import fun.toevl.FunToEvl;
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
 
 //TODO type check case ranges (do not allow case options out of range)
 //TODO pass records by reference to functions (test case rec2)

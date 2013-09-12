@@ -77,6 +77,11 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  public void debugMsg() {
+    compile("debugMsg", TestSteps.EXECUTE, true, false);
+  }
+
+  @Test
   public void composition() {
     compile("composition", TestSteps.EXECUTE, true, false);
   }

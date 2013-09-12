@@ -1,8 +1,10 @@
 package pir.passes;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import pir.NullTraverser;
 import pir.PirObject;
 import pir.cfg.PhiStmt;
 import pir.expression.Number;
@@ -23,15 +25,13 @@ import pir.statement.StoreStmt;
 import pir.statement.convert.TypeCast;
 import pir.traverser.StatementReplacer;
 import pir.type.ArrayType;
+import pir.type.PointerType;
 import pir.type.RangeType;
 import pir.type.StructType;
+import pir.type.Type;
 import pir.type.TypeRef;
 
 import common.NameFactory;
-import java.math.BigInteger;
-import pir.NullTraverser;
-import pir.type.PointerType;
-import pir.type.Type;
 
 /**
  * Extends and truncates types of variables used in an arithmetic operation, relation and assignments

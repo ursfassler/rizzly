@@ -1,7 +1,5 @@
 package evl.copy;
 
-import evl.other.RizzlyProgram;
-import evl.type.composed.NamedElement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -31,9 +29,11 @@ import evl.other.IfaceUse;
 import evl.other.ImplElementary;
 import evl.other.Named;
 import evl.other.NamedList;
+import evl.other.RizzlyProgram;
 import evl.statement.Statement;
 import evl.type.Type;
 import evl.type.TypeRef;
+import evl.type.composed.NamedElement;
 import evl.variable.Variable;
 
 class CopyEvl extends NullTraverser<Evl, Void> {

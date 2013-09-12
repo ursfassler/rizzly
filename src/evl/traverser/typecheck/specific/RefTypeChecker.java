@@ -1,6 +1,5 @@
 package evl.traverser.typecheck.specific;
 
-import evl.expression.reference.RefPtrDeref;
 import java.util.List;
 
 import error.ErrorType;
@@ -11,6 +10,7 @@ import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefItem;
 import evl.expression.reference.RefName;
+import evl.expression.reference.RefPtrDeref;
 import evl.expression.reference.Reference;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowChild;

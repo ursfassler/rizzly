@@ -9,8 +9,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
-import org.jgrapht.graph.SimpleDirectedGraph;
-
 import util.Pair;
 import util.Point;
 import util.SimpleGraph;
@@ -55,7 +53,7 @@ public class Positioning {
 
   private static List<List<SubComponent>> doToposort(WorldComp comp) {
     HashMap<Component, Integer> map = new HashMap<Component, Integer>();
-    SimpleDirectedGraph<Integer, Pair<Integer, Integer>> g = new SimpleGraph<Integer>();
+    SimpleGraph<Integer> g = new SimpleGraph<Integer>();
     int nr = 0;
 
     for (Component u : comp.getComp()) {

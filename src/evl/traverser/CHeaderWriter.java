@@ -1,6 +1,12 @@
 package evl.traverser;
 
+import java.math.BigInteger;
+import java.util.Collection;
+import java.util.List;
+import java.util.Set;
+
 import common.FuncAttr;
+
 import evl.Evl;
 import evl.NullTraverser;
 import evl.doc.StreamWriter;
@@ -18,10 +24,6 @@ import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
 import evl.type.special.PointerType;
 import evl.variable.Variable;
-import java.math.BigInteger;
-import java.util.Collection;
-import java.util.List;
-import java.util.Set;
 
 /**
  *

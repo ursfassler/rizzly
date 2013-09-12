@@ -9,10 +9,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+
 import joGraph.HtmlGraphWriter;
 import joGraph.Writer;
+
 import org.jgrapht.Graph;
 import org.jgrapht.traverse.TopologicalOrderIterator;
+
 import pir.PirObject;
 import pir.cfg.CaseGoto;
 import pir.cfg.Goto;
@@ -24,7 +27,6 @@ import pir.other.Program;
 import pir.other.SsaVariable;
 import pir.passes.CaseReduction;
 import pir.passes.ConstPropagator;
-import pir.passes.GlobalReadExtracter;
 import pir.passes.LlvmIntTypeReplacer;
 import pir.passes.RangeConverter;
 import pir.passes.RangeReplacer;
@@ -68,10 +70,6 @@ public class MainPir {
     LlvmWriter.print(prog, debugdir + "typeext.ll", true);
 
     CaseReduction.process(prog);
-
-    GlobalReadExtracter.process(prog);
-    // GlobalWriteExtracter.process(prog); //TODO do it during translation to PIR?
-    // RangeExtender.process(prog);
 
     VarPropagator.process(prog);
     ConstPropagator.process(prog);

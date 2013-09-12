@@ -1,16 +1,16 @@
 package evl.traverser;
 
-import evl.other.CompUse;
-import evl.other.IfaceUse;
-import evl.type.TypeRef;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import evl.DefTraverser;
 import evl.Evl;
 import evl.expression.reference.Reference;
+import evl.other.CompUse;
+import evl.other.IfaceUse;
 import evl.other.Named;
-import java.util.Collection;
+import evl.type.TypeRef;
 
 public class DepCollector extends DefTraverser<Void, Void> {
 

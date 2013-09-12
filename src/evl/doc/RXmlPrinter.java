@@ -62,7 +62,6 @@ import evl.type.base.BooleanType;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.type.base.StringType;
-import evl.type.base.TypeAlias;
 import evl.type.composed.NamedElement;
 import evl.type.composed.NamedElementType;
 import evl.type.composed.RecordType;
@@ -77,6 +76,7 @@ import fun.statement.CaseStmt;
 import fun.statement.IfOption;
 import fun.statement.IfStmt;
 import fun.statement.While;
+import fun.type.base.TypeAlias;
 
 public class RXmlPrinter extends NullTraverser<Void, XmlWriter> {
   private KnowPath kp;

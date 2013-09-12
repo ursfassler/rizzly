@@ -1,5 +1,6 @@
 package evl.traverser.debug;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +21,6 @@ import evl.other.Named;
 import evl.other.NamedList;
 import evl.statement.CallStmt;
 import evl.statement.Statement;
-import java.math.BigInteger;
 
 /**
  * Inserts a message call whenever an event is received
