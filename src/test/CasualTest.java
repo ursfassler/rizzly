@@ -167,17 +167,22 @@ public class CasualTest extends BaseTest {
     compile("arrayTest", TestSteps.EXECUTE, false, false);
   }
 
+  @Test
+  public void constInit() {
+    compile("constInit", TestSteps.COMPILE_TO_LLVM, false, false);
+  }
+
+  @Test
+  public void alarmController() {
+    compile("alarmController", TestSteps.EXECUTE, false, false);
+  }
+
   
   
   
   
   
 /*  
-  @Test
-  public void constInit_ConstInit() {
-    compile("constInit", "ConstInit", true, false, false);
-  }
-
   @Test
   public void ui_Ui() {
     compile("ui", "Ui", true, false, false);
@@ -261,16 +266,6 @@ public class CasualTest extends BaseTest {
   @Test
   public void unionTest_UnionTest() {
     compile("unionTest", "UnionTest", true, false, false);
-  }
-
-  @Test
-  public void smallBitTest_SmallBitTest() {
-    compile("smallBitTest", "SmallBitTest", true, false, false);
-  }
-
-  @Test
-  public void alarmController() {
-    compile("alarmController", "AlarmController", true, false, false);
   }
 
   @Test

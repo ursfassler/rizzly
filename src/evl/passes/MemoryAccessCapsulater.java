@@ -17,7 +17,6 @@ import evl.copy.Copy;
 import evl.expression.Expression;
 import evl.expression.reference.RefPtrDeref;
 import evl.expression.reference.Reference;
-import evl.function.FunctionHeader;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
@@ -28,6 +27,7 @@ import evl.statement.StackMemoryAlloc;
 import evl.statement.Statement;
 import evl.statement.StoreStmt;
 import evl.statement.VarDefStmt;
+import evl.traverser.ClassGetter;
 import evl.traverser.StatementReplacer;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.type.Type;
@@ -44,10 +44,27 @@ import evl.variable.Variable;
 public class MemoryAccessCapsulater {
 
   public static void process(Namespace aclasses, KnowledgeBase kb) {
+    KnowBaseItem kbi = kb.getEntry(KnowBaseItem.class);
+    Map<Variable, Variable> map = new HashMap<Variable, Variable>();
+
+    List<StateVariable> svl = ClassGetter.get(StateVariable.class, aclasses);
+    for( StateVariable obj : svl ) {
+      Type type = obj.getType().getRef();
+      assert ( !( type instanceof PointerType ) );
+      type = kbi.getPointerType(type);
+      obj.setType(new TypeRef(new ElementInfo(), type));
+
+      map.put(obj, obj);
+    }
+
+
     StackMemTrav smt = new StackMemTrav(kb);
     smt.traverse(aclasses, null);
+    map.putAll(smt.getMap());
+
+
     DerefInserterAndRelinker diar = new DerefInserterAndRelinker();
-    diar.traverse(aclasses, smt.getMap());
+    diar.traverse(aclasses, map);
     StmtReplacer loadInserter = new StmtReplacer(kb);
     loadInserter.traverse(aclasses, null);
   }
@@ -92,12 +109,8 @@ class StmtReplacer extends StatementReplacer<List<Statement>> {
 
   @Override
   protected List<Statement> visitExpression(Expression obj, List<Statement> param) {
-    if( param == null ) {
-      assert( ((Reference) obj).getLink() instanceof FunctionHeader );
-      assert( ((Reference) obj).getOffset().isEmpty() );
-    } else {
-      exprReplacer.traverse(obj, param);
-    }
+    assert ( param != null );
+    exprReplacer.traverse(obj, param);
     return null;
   }
 
@@ -179,27 +192,15 @@ class ExprReplacer extends DefTraverser<Void, List<Statement>> {
 
 class StackMemTrav extends StatementReplacer<Void> {
 
-  final private Map<Variable, Variable> map = new HashMap<Variable, Variable>();
+  final private Map<Variable, SsaVariable> map = new HashMap<Variable, SsaVariable>();
   private KnowBaseItem kbi;
 
   public StackMemTrav(KnowledgeBase kb) {
     kbi = kb.getEntry(KnowBaseItem.class);
   }
 
-  public Map<Variable, Variable> getMap() {
+  public Map<Variable, SsaVariable> getMap() {
     return map;
-  }
-
-  @Override
-  protected List<Statement> visitStateVariable(StateVariable obj, Void param) {
-    Type type = obj.getType().getRef();
-    assert ( !( type instanceof PointerType ) );
-    type = kbi.getPointerType( type);
-    obj.setType(new TypeRef(new ElementInfo(), type));
-
-    map.put(obj, obj);
-
-    return null;
   }
 
   @Override

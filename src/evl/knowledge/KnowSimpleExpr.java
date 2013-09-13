@@ -21,6 +21,7 @@ import evl.type.base.Range;
 import evl.type.composed.RecordType;
 import evl.type.special.NaturalType;
 import evl.type.special.PointerType;
+import evl.variable.ConstGlobal;
 import evl.variable.FuncVariable;
 import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
@@ -109,6 +110,11 @@ class SimpleGetter extends NullTraverser<Boolean, Void> {
   @Override
   protected Boolean visitIfaceUse(IfaceUse obj, Void param) {
     return false;
+  }
+
+  @Override
+  protected Boolean visitConstGlobal(ConstGlobal obj, Void param) {
+    return visit(obj.getType(),param);  //TODO ok?
   }
 
   @Override

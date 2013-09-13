@@ -1,5 +1,8 @@
 package evl.traverser;
 
+import evl.composition.ImplComposition;
+import evl.hfsm.ImplHfsm;
+import evl.other.RizzlyProgram;
 import util.SimpleGraph;
 
 import common.Designator;
@@ -80,4 +83,29 @@ public class DesCallgraphMaker extends DefTraverser<Void, Designator> {
     }
     return ret;
   }
+
+  @Override
+  protected Void visitImplComposition(ImplComposition obj, Designator param) {
+    return super.visitImplComposition(obj, param);
+  }
+
+  @Override
+  protected Void visitImplElementary(ImplElementary obj, Designator param) {
+    visitItr( obj.getInputFunc(), param );
+    visitItr( obj.getInternalFunction(), param );
+    visitItr( obj.getSubComCallback(), param );
+    return null;
+  }
+
+  @Override
+  protected Void visitImplHfsm(ImplHfsm obj, Designator param) {
+    return super.visitImplHfsm(obj, param);
+  }
+
+  @Override
+  protected Void visitRizzlyProgram(RizzlyProgram obj, Designator param) {
+    return super.visitRizzlyProgram(obj, param);
+  }
+  
+  
 }

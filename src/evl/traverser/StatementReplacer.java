@@ -1,10 +1,14 @@
 package evl.traverser;
 
+import evl.variable.ConstGlobal;
 import java.util.ArrayList;
 import java.util.List;
 
 import evl.DefTraverser;
 import evl.cfg.BasicBlock;
+import evl.composition.ImplComposition;
+import evl.hfsm.ImplHfsm;
+import evl.other.ImplElementary;
 import evl.statement.Statement;
 
 /**
@@ -52,4 +56,29 @@ public class StatementReplacer<T> extends DefTraverser<List<Statement>, T> {
     return null;
   }
 
+  // traversal optimization
+
+  @Override
+  protected List<Statement> visitImplComposition(ImplComposition obj, T param) {
+    return null;
+  }
+
+  @Override
+  protected List<Statement> visitImplElementary(ImplElementary obj, T param) {
+    visitList(obj.getInternalFunction().getList(), param);
+    visitList(obj.getInputFunc().getList(), param);
+    visitList(obj.getSubComCallback().getList(), param);
+    return null;
+  }
+
+  @Override
+  protected List<Statement> visitImplHfsm(ImplHfsm obj, T param) {
+    visit(obj.getTopstate(), param);
+    return null;
+  }
+
+  @Override
+  protected List<Statement> visitConstGlobal(ConstGlobal obj, T param) {
+    return null;
+  }
 }
