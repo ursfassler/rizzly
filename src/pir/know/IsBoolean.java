@@ -6,8 +6,8 @@ import pir.expression.Number;
 import pir.expression.PExpression;
 import pir.function.Function;
 import pir.other.Variable;
-import pir.statement.ArithmeticOp;
-import pir.statement.Relation;
+import pir.statement.normal.ArithmeticOp;
+import pir.statement.normal.Relation;
 import pir.type.BooleanType;
 import pir.type.Type;
 

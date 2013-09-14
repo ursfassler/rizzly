@@ -1,32 +1,37 @@
 package pir.cfg;
 
+import pir.statement.bbend.BasicBlockEnd;
 import java.util.ArrayList;
 import java.util.List;
 
 import pir.PirObject;
 import pir.expression.reference.Referencable;
-import pir.statement.Statement;
+import pir.statement.normal.NormalStmt;
+import pir.statement.phi.PhiStmt;
 
 // Named since Phi statements references basic blocks
 public class BasicBlock extends PirObject implements Referencable {
+
   private String name;
   final private List<PhiStmt> phi = new ArrayList<PhiStmt>();
-  final private List<Statement> code = new ArrayList<Statement>();
+  final private List<NormalStmt> code = new ArrayList<NormalStmt>();
   private BasicBlockEnd end = null;
 
   public BasicBlock(String name) {
     this.name = name;
   }
 
+  @Override
   public String getName() {
     return name;
   }
 
+  @Override
   public void setName(String name) {
     this.name = name;
   }
 
-  public List<Statement> getCode() {
+  public List<NormalStmt> getCode() {
     return code;
   }
 
@@ -46,5 +51,4 @@ public class BasicBlock extends PirObject implements Referencable {
   public List<PhiStmt> getPhi() {
     return phi;
   }
-
 }

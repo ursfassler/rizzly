@@ -5,7 +5,7 @@ import java.util.List;
 
 import pir.DefTraverser;
 import pir.cfg.BasicBlock;
-import pir.statement.Statement;
+import pir.statement.normal.NormalStmt;
 
 /**
  * If the return value is null, the statement is kept. If it is != null, the statement is replaced with the content of
@@ -15,41 +15,40 @@ import pir.statement.Statement;
  * 
  * @param <T>
  */
-public class StatementReplacer<T> extends DefTraverser<List<Statement>, T> {
+public class StatementReplacer<T> extends DefTraverser<List<NormalStmt>, T> {
 
   /**
    * Return a single statement
    * @param stmt
    * @return
    */
-  protected List<Statement> ret(Statement stmt) {
-    ArrayList<Statement> stmts = new ArrayList<Statement>();
+  protected List<NormalStmt> ret(NormalStmt stmt) {
+    ArrayList<NormalStmt> stmts = new ArrayList<NormalStmt>();
     stmts.add(stmt);
     return stmts;
   }
 
   @Override
-  protected List<Statement> visitBasicBlock(BasicBlock obj, T param) {
+  protected List<NormalStmt> visitBasicBlock(BasicBlock obj, T param) {
     // TODO somehow include phi statements
 
-    ArrayList<Statement> stmts = new ArrayList<Statement>(obj.getCode());
+    ArrayList<NormalStmt> stmts = new ArrayList<NormalStmt>(obj.getCode());
     obj.getCode().clear();
 
-    for (Statement stmt : stmts) {
-      List<Statement> list = visit(stmt, param);
-      if (list == null) {
+    for( NormalStmt stmt : stmts ) {
+      List<NormalStmt> list = visit(stmt, param);
+      if( list == null ) {
         obj.getCode().add(stmt);
       } else {
         obj.getCode().addAll(list);
       }
     }
 
-    List<Statement> list = visit(obj.getEnd(), param);
-    if (list != null) {
+    List<NormalStmt> list = visit(obj.getEnd(), param);
+    if( list != null ) {
       obj.getCode().addAll(list);
     }
 
     return null;
   }
-
 }

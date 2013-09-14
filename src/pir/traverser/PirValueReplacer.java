@@ -1,3 +1,4 @@
+
 package pir.traverser;
 
 import java.util.ArrayList;
@@ -5,22 +6,22 @@ import java.util.Collection;
 
 import pir.DefTraverser;
 import pir.cfg.BasicBlock;
-import pir.cfg.CaseGoto;
-import pir.cfg.IfGoto;
-import pir.cfg.PhiStmt;
-import pir.cfg.ReturnExpr;
+import pir.statement.bbend.CaseGoto;
+import pir.statement.bbend.IfGoto;
+import pir.statement.bbend.ReturnExpr;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.VarRef;
 import pir.other.PirValue;
-import pir.statement.ArithmeticOp;
-import pir.statement.Assignment;
-import pir.statement.CallAssignment;
-import pir.statement.CallStmt;
-import pir.statement.GetElementPtr;
-import pir.statement.LoadStmt;
-import pir.statement.Relation;
-import pir.statement.StoreStmt;
-import pir.statement.convert.ConvertValue;
+import pir.statement.normal.Assignment;
+import pir.statement.normal.CallAssignment;
+import pir.statement.normal.CallStmt;
+import pir.statement.normal.GetElementPtr;
+import pir.statement.normal.LoadStmt;
+import pir.statement.normal.Relation;
+import pir.statement.normal.StoreStmt;
+import pir.statement.normal.ArithmeticOp;
+import pir.statement.normal.convert.ConvertValue;
+import pir.statement.phi.PhiStmt;
 
 abstract public class PirValueReplacer<R, P> extends DefTraverser<R, P> {
 

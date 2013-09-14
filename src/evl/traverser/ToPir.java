@@ -7,8 +7,8 @@ import java.util.List;
 import java.util.Map;
 
 import pir.PirObject;
-import pir.cfg.BasicBlockEnd;
-import pir.cfg.CaseOptEntry;
+import pir.statement.bbend.BasicBlockEnd;
+import pir.statement.bbend.CaseOptEntry;
 import pir.expression.PExpression;
 import pir.expression.UnOp;
 import pir.expression.reference.RefItem;
@@ -24,10 +24,10 @@ import pir.know.KnowledgeBase;
 import pir.other.PirValue;
 import pir.other.Program;
 import pir.other.Variable;
-import pir.statement.ArOp;
-import pir.statement.CallAssignment;
-import pir.statement.StoreStmt;
-import pir.statement.VariableGeneratorStmt;
+import pir.statement.normal.ArOp;
+import pir.statement.normal.CallAssignment;
+import pir.statement.normal.StoreStmt;
+import pir.statement.normal.VariableGeneratorStmt;
 import pir.type.NamedElement;
 import pir.type.RangeType;
 import pir.type.StructType;
@@ -71,8 +71,8 @@ import evl.statement.normal.CallStmt;
 import evl.statement.normal.GetElementPtr;
 import evl.statement.normal.LoadStmt;
 import evl.statement.normal.StackMemoryAlloc;
-import evl.statement.Statement;
 import evl.statement.normal.Assignment;
+import evl.statement.normal.NormalStmt;
 import evl.statement.normal.VarDefInitStmt;
 import evl.statement.normal.VarDefStmt;
 import evl.statement.phi.PhiStmt;
@@ -149,7 +149,7 @@ public class ToPir extends NullTraverser<PirObject, Void> {
         acpa.add((PirValue) visit(pa, null));
       }
 
-      return new pir.statement.CallStmt((Function) ref, acpa); // TODO correct? return value not used?
+      return new pir.statement.normal.CallStmt((Function) ref, acpa); // TODO correct? return value not used?
     } else {
       RError.err(ErrorType.Fatal, obj.getInfo(), "Unhandled class: " + ref.getClass().getCanonicalName());
     }
@@ -275,14 +275,14 @@ public class ToPir extends NullTraverser<PirObject, Void> {
   @Override
   protected PirObject visitStackMemoryAlloc(StackMemoryAlloc obj, Void param) {
     pir.other.SsaVariable var = (pir.other.SsaVariable) visit(obj.getVariable(), null);
-    pir.statement.StackMemoryAlloc sma = new pir.statement.StackMemoryAlloc(var);
+    pir.statement.normal.StackMemoryAlloc sma = new pir.statement.normal.StackMemoryAlloc(var);
     return sma;
   }
 
   @Override
-  protected pir.statement.CallStmt visitCallStmt(CallStmt obj, Void param) {
+  protected pir.statement.normal.CallStmt visitCallStmt(CallStmt obj, Void param) {
     PirObject call = visit(obj.getCall(), param);
-    return (pir.statement.CallStmt) call;
+    return (pir.statement.normal.CallStmt) call;
     // assert (call instanceof CallAssignment);
     // CallAssignment ass = (CallAssignment) call;
     // return new pir.statement.CallStmt(ass.getRef(), ass.getParameter()); // FIXME is that ok? just forget the defined
@@ -364,12 +364,12 @@ public class ToPir extends NullTraverser<PirObject, Void> {
   protected PirObject visitReturnExpr(ReturnExpr obj, Void param) {
     PirObject expr = visit(obj.getExpr(), param);
     assert ( expr instanceof PirValue );
-    return new pir.cfg.ReturnExpr((PirValue) expr);
+    return new pir.statement.bbend.ReturnExpr((PirValue) expr);
   }
 
   @Override
   protected PirObject visitReturnVoid(ReturnVoid obj, Void param) {
-    return new pir.cfg.ReturnVoid();
+    return new pir.statement.bbend.ReturnVoid();
   }
 
   @Override
@@ -405,18 +405,18 @@ public class ToPir extends NullTraverser<PirObject, Void> {
   protected PirObject visitCaseOptRange(CaseOptRange obj, Void param) {
     assert ( obj.getStart() instanceof Number );
     assert ( obj.getEnd() instanceof Number );
-    return new pir.cfg.CaseOptRange(( (Number) obj.getStart() ).getValue(), ( (Number) obj.getEnd() ).getValue());
+    return new pir.statement.bbend.CaseOptRange(( (Number) obj.getStart() ).getValue(), ( (Number) obj.getEnd() ).getValue());
   }
 
   @Override
   protected PirObject visitCaseOptValue(CaseOptValue obj, Void param) {
     assert ( obj.getValue() instanceof Number );
-    return new pir.cfg.CaseOptValue((pir.expression.Number) visit(obj.getValue(), null));
+    return new pir.statement.bbend.CaseOptValue((pir.expression.Number) visit(obj.getValue(), null));
   }
 
   @Override
   protected PirObject visitPhiStmt(PhiStmt obj, Void param) {
-    pir.cfg.PhiStmt ret = new pir.cfg.PhiStmt((pir.other.SsaVariable) visit(obj.getVariable(), null));
+    pir.statement.phi.PhiStmt ret = new pir.statement.phi.PhiStmt((pir.other.SsaVariable) visit(obj.getVariable(), null));
     for( BasicBlock in : obj.getInBB() ) {
       pir.other.PirValue var = (pir.other.PirValue) visit(obj.getArg(in), null);
       ret.addArg((pir.cfg.BasicBlock) visit(in, null), var);
@@ -430,10 +430,10 @@ public class ToPir extends NullTraverser<PirObject, Void> {
     map.put(obj, ret);
 
     for( PhiStmt phi : obj.getPhi() ) {
-      ret.getPhi().add((pir.cfg.PhiStmt) visit(phi, null));
+      ret.getPhi().add((pir.statement.phi.PhiStmt) visit(phi, null));
     }
-    for( Statement stmt : obj.getCode() ) {
-      ret.getCode().add((pir.statement.Statement) visit(stmt, null));
+    for( NormalStmt stmt : obj.getCode() ) {
+      ret.getCode().add((pir.statement.normal.NormalStmt) visit(stmt, null));
     }
     ret.setEnd((BasicBlockEnd) visit(obj.getEnd(), null));
 
@@ -445,9 +445,9 @@ public class ToPir extends NullTraverser<PirObject, Void> {
     PirObject cond = visit(obj.getCondition(), null);
     assert ( cond instanceof VarRefSimple );
     pir.other.SsaVariable var = ( (VarRefSimple) cond ).getRef();
-    pir.cfg.CaseGoto caseGoto = new pir.cfg.CaseGoto(new VarRefSimple(var), (pir.cfg.BasicBlock) visit(obj.getOtherwise(), null));
+    pir.statement.bbend.CaseGoto caseGoto = new pir.statement.bbend.CaseGoto(new VarRefSimple(var), (pir.cfg.BasicBlock) visit(obj.getOtherwise(), null));
     for( CaseGotoOpt opt : obj.getOption() ) {
-      pir.cfg.CaseGotoOpt nopt = (pir.cfg.CaseGotoOpt) visit(opt, null);
+      pir.statement.bbend.CaseGotoOpt nopt = (pir.statement.bbend.CaseGotoOpt) visit(opt, null);
       caseGoto.getOption().add(nopt);
     }
     return caseGoto;
@@ -459,7 +459,7 @@ public class ToPir extends NullTraverser<PirObject, Void> {
     for( evl.statement.bbend.CaseOptEntry entry : obj.getValue() ) {
       list.add((CaseOptEntry) visit(entry, null));
     }
-    return new pir.cfg.CaseGotoOpt(list, (pir.cfg.BasicBlock) visit(obj.getDst(), null));
+    return new pir.statement.bbend.CaseGotoOpt(list, (pir.cfg.BasicBlock) visit(obj.getDst(), null));
   }
 
   @Override
@@ -468,12 +468,12 @@ public class ToPir extends NullTraverser<PirObject, Void> {
     assert ( cond instanceof VarRefSimple );
     pir.other.SsaVariable var = ( (VarRefSimple) cond ).getRef();
     assert ( var.getType().getRef() instanceof pir.type.BooleanType );
-    return new pir.cfg.IfGoto(new VarRefSimple(var), (pir.cfg.BasicBlock) visit(obj.getThenBlock(), null), (pir.cfg.BasicBlock) visit(obj.getElseBlock(), null));
+    return new pir.statement.bbend.IfGoto(new VarRefSimple(var), (pir.cfg.BasicBlock) visit(obj.getThenBlock(), null), (pir.cfg.BasicBlock) visit(obj.getElseBlock(), null));
   }
 
   @Override
   protected PirObject visitGoto(Goto obj, Void param) {
-    return new pir.cfg.Goto((pir.cfg.BasicBlock) visit(obj.getTarget(), null));
+    return new pir.statement.bbend.Goto((pir.cfg.BasicBlock) visit(obj.getTarget(), null));
   }
 
   @Override
@@ -485,7 +485,7 @@ public class ToPir extends NullTraverser<PirObject, Void> {
   protected PirObject visitVarDefInitStmt(VarDefInitStmt obj, Void param) {
     pir.other.SsaVariable var = (pir.other.SsaVariable) visit(obj.getVariable(), null);
     ToVariableGenerator converter = new ToVariableGenerator(this);
-    return converter.traverse(obj.getInit(), var);
+    return (PirObject) converter.traverse(obj.getInit(), var);
   }
 
   @Override
@@ -554,7 +554,7 @@ public class ToPir extends NullTraverser<PirObject, Void> {
 
     pir.other.SsaVariable var = (pir.other.SsaVariable) traverse(obj.getVariable(), null);
 
-    return new pir.statement.GetElementPtr(var, base, ofs);
+    return new pir.statement.normal.GetElementPtr(var, base, ofs);
   }
 
   @Override
@@ -562,7 +562,7 @@ public class ToPir extends NullTraverser<PirObject, Void> {
     pir.other.SsaVariable var = (pir.other.SsaVariable) traverse(obj.getVariable(), null);
     VarRefSimple ref = (VarRefSimple) traverse(obj.getAddress(), null);
     assert ( ref.getType().getRef() instanceof pir.type.PointerType );
-    return new pir.statement.LoadStmt(var, ref);
+    return new pir.statement.normal.LoadStmt(var, ref);
   }
 
   @Override
@@ -570,7 +570,7 @@ public class ToPir extends NullTraverser<PirObject, Void> {
     pir.other.PirValue value = (pir.other.PirValue) traverse(obj.getExpr(), null);
     VarRefSimple ref = (VarRefSimple) traverse(obj.getAddress(), null);
     assert ( ref.getType().getRef() instanceof pir.type.PointerType );
-    return new pir.statement.StoreStmt(ref, value);
+    return new pir.statement.normal.StoreStmt(ref, value);
   }
 
   @Override
@@ -586,7 +586,7 @@ public class ToPir extends NullTraverser<PirObject, Void> {
       Variable dstvar = (Variable) visit(obj.getLeft().getLink(), null);
       if( dstvar instanceof pir.other.SsaVariable ) {
         VariableGeneratorStmt vargen = converter.traverse(obj.getRight(), (pir.other.SsaVariable) dstvar);
-        return vargen;
+        return (PirObject) vargen;
       } else if( dstvar instanceof pir.other.StateVariable ) {
         PirValue src = (PirValue) visit(obj.getRight(), null);
         StoreStmt store = new StoreStmt(new VarRefStatevar((pir.other.StateVariable) dstvar), src);
@@ -630,7 +630,7 @@ class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, pir.other
     // TODO make it simple
     if( ( obj.getLink() instanceof evl.variable.SsaVariable ) && obj.getOffset().isEmpty() ) {
       pir.other.SsaVariable var = (pir.other.SsaVariable) converter.traverse(obj.getLink(), null);
-      return new pir.statement.Assignment(param, new VarRefSimple(var));
+      return new pir.statement.normal.Assignment(param, new VarRefSimple(var));
     } else if( obj.getLink() instanceof FunctionHeader ) {
       assert ( obj.getOffset().size() == 1 );
       evl.expression.reference.RefCall ofs = (RefCall) obj.getOffset().get(0);
@@ -642,7 +642,7 @@ class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, pir.other
       return new CallAssignment(param, ref, parameter);
     } else if( ( obj.getLink() instanceof evl.variable.StateVariable ) && obj.getOffset().isEmpty() ) {
       pir.other.StateVariable var = (pir.other.StateVariable) converter.traverse(obj.getLink(), null);
-      return new pir.statement.LoadStmt(param, new VarRefStatevar(var));
+      return new pir.statement.normal.LoadStmt(param, new VarRefStatevar(var));
     } else {
       throw new RuntimeException("not yet implemented: " + obj);
     }
@@ -652,20 +652,20 @@ class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, pir.other
   protected VariableGeneratorStmt visitNumber(Number obj, pir.other.SsaVariable param) {
     pir.type.Type type = converter.kbi.getRangeType(obj.getValue(), obj.getValue());
     pir.expression.Number num = new pir.expression.Number(obj.getValue(), new TypeRef(type));
-    return new pir.statement.Assignment(param, num);
+    return new pir.statement.normal.Assignment(param, num);
   }
 
   @Override
   protected VariableGeneratorStmt visitTypeCast(TypeCast obj, pir.other.SsaVariable param) {
     VarRefSimple old = (VarRefSimple) converter.traverse(obj.getRef(), null);
-    return new pir.statement.convert.TypeCast(param, old);
+    return new pir.statement.normal.convert.TypeCast(param, old);
   }
 
   @Override
   protected VariableGeneratorStmt visitRelation(Relation obj, pir.other.SsaVariable param) {
     PirValue left = (PirValue) converter.visit(obj.getLeft(), null);
     PirValue right = (PirValue) converter.visit(obj.getRight(), null);
-    return new pir.statement.Relation(param, left, right, obj.getOp());
+    return new pir.statement.normal.Relation(param, left, right, obj.getOp());
   }
 
   @Override
@@ -673,7 +673,7 @@ class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, pir.other
     //TODO do not use VarRef for composite types but already use getElementPtr (maybe)
     PirValue left = (PirValue) converter.visit(obj.getLeft(), null);
     PirValue right = (PirValue) converter.visit(obj.getRight(), null);
-    return new pir.statement.ArithmeticOp(param, left, right, toCOp(obj.getOp()));
+    return new pir.statement.normal.ArithmeticOp(param, left, right, toCOp(obj.getOp()));
   }
 
   private ArOp toCOp(ExpOp op) {
@@ -705,6 +705,6 @@ class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, pir.other
   @Override
   protected VariableGeneratorStmt visitUnaryExpression(UnaryExpression obj, pir.other.SsaVariable param) {
     PirValue right = (PirValue) converter.visit(obj.getExpr(), null);
-    return new pir.statement.UnaryOp(param, right, obj.getOp());
+    return new pir.statement.normal.UnaryOp(param, right, obj.getOp());
   }
 }

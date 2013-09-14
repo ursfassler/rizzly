@@ -9,8 +9,8 @@ import java.util.Map;
 import pir.expression.reference.VarRefSimple;
 import pir.other.Program;
 import pir.other.SsaVariable;
-import pir.statement.Assignment;
-import pir.statement.Statement;
+import pir.statement.normal.Assignment;
+import pir.statement.normal.NormalStmt;
 import pir.traverser.Relinker;
 import pir.traverser.StatementReplacer;
 
@@ -31,27 +31,26 @@ public class VarPropagator extends StatementReplacer<Map<SsaVariable, SsaVariabl
   }
 
   private static void closure(Map<SsaVariable, SsaVariable> map) {
-    for (SsaVariable src : new HashSet<SsaVariable>(map.keySet())) {
+    for( SsaVariable src : new HashSet<SsaVariable>(map.keySet()) ) {
       SsaVariable last = follow(src, map);
       map.put(src, last);
     }
   }
 
   private static SsaVariable follow(SsaVariable src, Map<SsaVariable, SsaVariable> map) {
-    while (map.containsKey(src)) {
+    while( map.containsKey(src) ) {
       src = map.get(src);
     }
     return src;
   }
 
   @Override
-  protected List<Statement> visitAssignment(Assignment obj, Map<SsaVariable, SsaVariable> param) {
-    if (obj.getSrc() instanceof VarRefSimple) {
-      param.put(obj.getVariable(),((VarRefSimple) obj.getSrc()).getRef());
-      return new ArrayList<Statement>();
+  protected List<NormalStmt> visitAssignment(Assignment obj, Map<SsaVariable, SsaVariable> param) {
+    if( obj.getSrc() instanceof VarRefSimple ) {
+      param.put(obj.getVariable(), ( (VarRefSimple) obj.getSrc() ).getRef());
+      return new ArrayList<NormalStmt>();
     } else {
       return null; // in ConstPropagator
     }
   }
-
 }

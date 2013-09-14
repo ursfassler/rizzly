@@ -1,6 +1,5 @@
 package evl.statement.normal;
 
-import evl.statement.normal.NormalStmt;
 import common.ElementInfo;
 
 import evl.expression.Expression;
@@ -16,6 +15,7 @@ public class VarDefInitStmt extends NormalStmt implements SsaGenerator {
     this.init = init;
   }
 
+  @Override
   public SsaVariable getVariable() {
     return variable;
   }

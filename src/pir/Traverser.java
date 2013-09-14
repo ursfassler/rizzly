@@ -1,19 +1,18 @@
 package pir;
 
 import pir.cfg.BasicBlock;
-import pir.cfg.BasicBlockEnd;
+import pir.statement.bbend.BasicBlockEnd;
 import pir.cfg.BasicBlockList;
-import pir.cfg.CaseGoto;
-import pir.cfg.CaseGotoOpt;
-import pir.cfg.CaseOptEntry;
-import pir.cfg.CaseOptRange;
-import pir.cfg.CaseOptValue;
-import pir.cfg.Goto;
-import pir.cfg.IfGoto;
-import pir.cfg.PhiStmt;
-import pir.cfg.Return;
-import pir.cfg.ReturnExpr;
-import pir.cfg.ReturnVoid;
+import pir.statement.bbend.CaseGoto;
+import pir.statement.bbend.CaseGotoOpt;
+import pir.statement.bbend.CaseOptEntry;
+import pir.statement.bbend.CaseOptRange;
+import pir.statement.bbend.CaseOptValue;
+import pir.statement.bbend.Goto;
+import pir.statement.bbend.IfGoto;
+import pir.statement.bbend.Return;
+import pir.statement.bbend.ReturnExpr;
+import pir.statement.bbend.ReturnVoid;
 import pir.expression.ArrayValue;
 import pir.expression.BoolValue;
 import pir.expression.Number;
@@ -35,23 +34,24 @@ import pir.other.Program;
 import pir.other.SsaVariable;
 import pir.other.StateVariable;
 import pir.other.Variable;
-import pir.statement.ArithmeticOp;
-import pir.statement.Assignment;
-import pir.statement.CallAssignment;
-import pir.statement.CallStmt;
-import pir.statement.GetElementPtr;
-import pir.statement.LoadStmt;
-import pir.statement.Relation;
-import pir.statement.StackMemoryAlloc;
+import pir.statement.normal.Assignment;
+import pir.statement.normal.CallAssignment;
+import pir.statement.normal.CallStmt;
+import pir.statement.normal.GetElementPtr;
+import pir.statement.normal.LoadStmt;
+import pir.statement.normal.Relation;
+import pir.statement.normal.StackMemoryAlloc;
 import pir.statement.Statement;
-import pir.statement.StoreStmt;
-import pir.statement.UnaryOp;
-import pir.statement.VariableGeneratorStmt;
-import pir.statement.convert.ConvertValue;
-import pir.statement.convert.SignExtendValue;
-import pir.statement.convert.TruncValue;
-import pir.statement.convert.TypeCast;
-import pir.statement.convert.ZeroExtendValue;
+import pir.statement.normal.ArithmeticOp;
+import pir.statement.normal.NormalStmt;
+import pir.statement.normal.StoreStmt;
+import pir.statement.normal.UnaryOp;
+import pir.statement.normal.convert.ConvertValue;
+import pir.statement.normal.convert.SignExtendValue;
+import pir.statement.normal.convert.TruncValue;
+import pir.statement.normal.convert.TypeCast;
+import pir.statement.normal.convert.ZeroExtendValue;
+import pir.statement.phi.PhiStmt;
 import pir.type.ArrayType;
 import pir.type.BooleanType;
 import pir.type.EnumElement;
@@ -186,12 +186,10 @@ abstract public class Traverser<R, P> {
   }
 
   protected R visitStatement(Statement obj, P param) {
-    if( obj instanceof CallStmt ) {
-      return visitCallStmt((CallStmt) obj, param);
-    } else if( obj instanceof VariableGeneratorStmt ) {
-      return visitVariableGeneratorStmt((VariableGeneratorStmt) obj, param);
-    } else if( obj instanceof StoreStmt ) {
-      return visitStoreStmt((StoreStmt) obj, param);
+    if( obj instanceof NormalStmt ) {
+      return visitNormalStmt((NormalStmt) obj, param);
+    } else if( obj instanceof PhiStmt ) {
+      return visitPhiStmt((PhiStmt) obj, param);
     } else if( obj instanceof BasicBlockEnd ) {
       return visitBasicBlockEnd((BasicBlockEnd) obj, param);
     } else {
@@ -199,8 +197,12 @@ abstract public class Traverser<R, P> {
     }
   }
 
-  protected R visitVariableGeneratorStmt(VariableGeneratorStmt obj, P param) {
-    if( obj instanceof Assignment ) {
+  protected R visitNormalStmt(NormalStmt obj, P param) {
+    if( obj instanceof CallStmt ) {
+      return visitCallStmt((CallStmt) obj, param);
+    } else if( obj instanceof StoreStmt ) {
+      return visitStoreStmt((StoreStmt) obj, param);
+    } else if( obj instanceof Assignment ) {
       return visitAssignment((Assignment) obj, param);
     } else if( obj instanceof ArithmeticOp ) {
       return visitArithmeticOp((ArithmeticOp) obj, param);
@@ -214,8 +216,6 @@ abstract public class Traverser<R, P> {
       return visitGetElementPtr((GetElementPtr) obj, param);
     } else if( obj instanceof ConvertValue ) {
       return visitConvertValue((ConvertValue) obj, param);
-    } else if( obj instanceof PhiStmt ) {
-      return visitPhiStmt((PhiStmt) obj, param);
     } else if( obj instanceof UnaryOp ) {
       return visitUnaryOp((UnaryOp) obj, param);
     } else if( obj instanceof StackMemoryAlloc ) {

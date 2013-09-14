@@ -5,66 +5,67 @@ import java.util.List;
 
 import pir.DefTraverser;
 import pir.cfg.BasicBlock;
-import pir.cfg.BasicBlockEnd;
+import pir.statement.bbend.BasicBlockEnd;
 import pir.function.Function;
 import pir.other.Program;
-import pir.statement.Statement;
+import pir.statement.normal.NormalStmt;
 
-public class StmtReplacer<P> extends DefTraverser<List<Statement>, P> {
+//TODO check if ok when only handle NormalStmt
 
-  protected List<Statement> add(Statement stmt) {
-    ArrayList<Statement> ret = new ArrayList<Statement>();
+public class StmtReplacer<P> extends DefTraverser<List<NormalStmt>, P> {
+
+  protected List<NormalStmt> add(NormalStmt stmt) {
+    ArrayList<NormalStmt> ret = new ArrayList<NormalStmt>();
     ret.add(stmt);
     return ret;
   }
 
-  protected List<Statement> add(Statement stmt1, Statement stmt2) {
-    ArrayList<Statement> ret = new ArrayList<Statement>();
+  protected List<NormalStmt> add(NormalStmt stmt1, NormalStmt stmt2) {
+    ArrayList<NormalStmt> ret = new ArrayList<NormalStmt>();
     ret.add(stmt1);
     ret.add(stmt2);
     return ret;
   }
 
   @Override
-  protected List<Statement> visitProgram(Program obj, P param) {
-    for (Function func : obj.getFunction()) {
+  protected List<NormalStmt> visitProgram(Program obj, P param) {
+    for( Function func : obj.getFunction() ) {
       visit(func, param);
     }
     return null;
   }
 
   @Override
-  protected List<Statement> visitBasicBlock(BasicBlock obj, P param) {
-    ArrayList<Statement> stmts = new ArrayList<Statement>(obj.getCode());
+  protected List<NormalStmt> visitBasicBlock(BasicBlock obj, P param) {
+    ArrayList<NormalStmt> stmts = new ArrayList<NormalStmt>(obj.getCode());
     obj.getCode().clear();
 
-    for (Statement stmt : stmts) {
-      List<Statement> list = visit(stmt, param);
+    for( NormalStmt stmt : stmts ) {
+      List<NormalStmt> list = visit(stmt, param);
       obj.getCode().addAll(list);
     }
 
-    List<Statement> list = visit(obj.getEnd(), param);
+    List<NormalStmt> list = visit(obj.getEnd(), param);
     obj.getCode().addAll(list);
 
     return null;
   }
 
   @Override
-  protected List<Statement> visitBasicBlockEnd(BasicBlockEnd obj, P param) {
-    List<Statement> ret = super.visitBasicBlockEnd(obj, param);
-    if (ret == null) {
-      ret = new ArrayList<Statement>();
+  protected List<NormalStmt> visitBasicBlockEnd(BasicBlockEnd obj, P param) {
+    List<NormalStmt> ret = super.visitBasicBlockEnd(obj, param);
+    if( ret == null ) {
+      ret = new ArrayList<NormalStmt>();
     }
     return ret;
   }
 
   @Override
-  protected List<Statement> visitStatement(Statement obj, P param) {
-    List<Statement> ret = super.visitStatement(obj, param);
-    if (ret == null) {
+  protected List<NormalStmt> visitNormalStmt(NormalStmt obj, P param) {
+    List<NormalStmt> ret = super.visitNormalStmt(obj, param);
+    if( ret == null ) {
       ret = add(obj);
     }
     return ret;
   }
-
 }

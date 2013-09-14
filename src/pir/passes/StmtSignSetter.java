@@ -3,9 +3,9 @@ package pir.passes;
 import pir.DefTraverser;
 import pir.other.PirValue;
 import pir.other.Program;
-import pir.statement.ArithmeticOp;
-import pir.statement.Relation;
-import pir.statement.StmtSignes;
+import pir.statement.normal.ArithmeticOp;
+import pir.statement.normal.Relation;
+import pir.statement.normal.StmtSignes;
 import pir.type.IntType;
 import pir.type.SignedType;
 

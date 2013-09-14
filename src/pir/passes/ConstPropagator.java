@@ -11,8 +11,8 @@ import pir.expression.reference.VarRefSimple;
 import pir.other.PirValue;
 import pir.other.Program;
 import pir.other.SsaVariable;
-import pir.statement.Assignment;
-import pir.statement.Statement;
+import pir.statement.normal.Assignment;
+import pir.statement.normal.NormalStmt;
 import pir.traverser.PirValueReplacer;
 import pir.traverser.StatementReplacer;
 import pir.type.Type;
@@ -35,24 +35,23 @@ public class ConstPropagator extends StatementReplacer<Map<SsaVariable, BigInteg
   }
 
   @Override
-  protected List<Statement> visitAssignment(Assignment obj, Map<SsaVariable, BigInteger> param) {
-    if (obj.getSrc() instanceof Number) {
-      param.put(obj.getVariable(), ((Number) obj.getSrc()).getValue());
-      return new ArrayList<Statement>();
+  protected List<NormalStmt> visitAssignment(Assignment obj, Map<SsaVariable, BigInteger> param) {
+    if( obj.getSrc() instanceof Number ) {
+      param.put(obj.getVariable(), ( (Number) obj.getSrc() ).getValue());
+      return new ArrayList<NormalStmt>();
     } else {
       return null; // in VarPropagator
     }
   }
-
 }
 
 class PvRelinker extends PirValueReplacer<Void, Map<SsaVariable, BigInteger>> {
 
   @Override
   protected PirValue replace(PirValue val, Map<SsaVariable, BigInteger> param) {
-    if (val instanceof VarRefSimple) {
-      SsaVariable target = ((VarRefSimple) val).getRef();
-      if (param.containsKey(target)) {
+    if( val instanceof VarRefSimple ) {
+      SsaVariable target = ( (VarRefSimple) val ).getRef();
+      if( param.containsKey(target) ) {
         BigInteger num = param.get(target);
         Type type = target.getType().getRef();
         // TODO check if num is in range of type?
@@ -61,5 +60,4 @@ class PvRelinker extends PirValueReplacer<Void, Map<SsaVariable, BigInteger>> {
     }
     return val;
   }
-
 }
