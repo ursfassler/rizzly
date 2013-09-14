@@ -12,14 +12,8 @@ import evl.Evl;
 import evl.NullTraverser;
 import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
-import evl.cfg.CaseGoto;
-import evl.cfg.CaseGotoOpt;
-import evl.cfg.CaseOptEntry;
-import evl.cfg.Goto;
-import evl.cfg.IfGoto;
-import evl.cfg.PhiStmt;
-import evl.cfg.ReturnExpr;
-import evl.cfg.ReturnVoid;
+import evl.statement.bbend.CaseGotoOpt;
+import evl.statement.bbend.CaseOptEntry;
 import evl.expression.Expression;
 import evl.expression.reference.RefItem;
 import evl.function.FunctionBase;
@@ -190,50 +184,8 @@ class CopyEvl extends NullTraverser<Evl, Void> {
   }
 
   @Override
-  protected Evl visitCaseGoto(CaseGoto obj, Void param) {
-    CaseGoto ret = new CaseGoto(obj.getInfo());
-    ret.setCondition(copy(obj.getCondition()));
-    ret.getOption().addAll(copy(obj.getOption()));
-    ret.setOtherwise(copy(obj.getOtherwise()));
-    return ret;
-  }
-
-  @Override
   protected Evl visitCaseGotoOpt(CaseGotoOpt obj, Void param) {
     return new CaseGotoOpt(obj.getInfo(), (List<CaseOptEntry>) copy(obj.getValue()), copy(obj.getDst()));
-  }
-
-  @Override
-  protected Evl visitIfGoto(IfGoto obj, Void param) {
-    IfGoto ret = new IfGoto(obj.getInfo());
-    ret.setCondition(copy(obj.getCondition()));
-    ret.setThenBlock(copy(obj.getThenBlock()));
-    ret.setElseBlock(copy(obj.getElseBlock()));
-    return ret;
-  }
-
-  @Override
-  protected Evl visitGoto(Goto obj, Void param) {
-    return new Goto(obj.getInfo(), copy(obj.getTarget()));
-  }
-
-  @Override
-  protected Evl visitReturnExpr(ReturnExpr obj, Void param) {
-    return new ReturnExpr(obj.getInfo(), copy(obj.getExpr()));
-  }
-
-  @Override
-  protected Evl visitReturnVoid(ReturnVoid obj, Void param) {
-    return new ReturnVoid(obj.getInfo());
-  }
-
-  @Override
-  protected Evl visitPhiStmt(PhiStmt obj, Void param) {
-    PhiStmt ret = new PhiStmt(obj.getInfo(), copy(obj.getVariable()));
-    for (BasicBlock in : obj.getInBB()) {
-      ret.addArg(copy(in), copy(obj.getArg(in)));
-    }
-    return ret;
   }
 
   @Override

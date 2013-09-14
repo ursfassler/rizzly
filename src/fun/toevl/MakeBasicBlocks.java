@@ -13,15 +13,16 @@ import common.NameFactory;
 import error.ErrorType;
 import error.RError;
 import evl.cfg.BasicBlock;
-import evl.cfg.BasicBlockEnd;
 import evl.cfg.BasicBlockList;
-import evl.cfg.CaseGoto;
-import evl.cfg.CaseGotoOpt;
-import evl.cfg.CaseOptEntry;
-import evl.cfg.Goto;
-import evl.cfg.IfGoto;
+import evl.statement.bbend.CaseGoto;
+import evl.statement.bbend.CaseGotoOpt;
+import evl.statement.bbend.CaseOptEntry;
+import evl.statement.bbend.Goto;
+import evl.statement.bbend.IfGoto;
 import evl.expression.Expression;
 import evl.expression.reference.Reference;
+import evl.statement.bbend.BasicBlockEnd;
+import evl.statement.normal.NormalStmt;
 import evl.type.TypeRef;
 import evl.type.special.VoidType;
 import fun.Fun;
@@ -64,11 +65,11 @@ class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
 
     if( retType.getRef() instanceof VoidType ) {
       result = null;
-      exit.setEnd(new evl.cfg.ReturnVoid(body.getInfo()));
+      exit.setEnd(new evl.statement.bbend.ReturnVoid(body.getInfo()));
     } else {
       result = new evl.variable.FuncVariable(body.getInfo(), NameFactory.getNew(), retType);
-      head.getCode().add(new evl.statement.VarDefStmt(body.getInfo(), result));
-      exit.setEnd(new evl.cfg.ReturnExpr(body.getInfo(), new Reference(body.getInfo(), result)));
+      head.getCode().add(new evl.statement.normal.VarDefStmt(body.getInfo(), result));
+      exit.setEnd(new evl.statement.bbend.ReturnExpr(body.getInfo(), new Reference(body.getInfo(), result)));
     }
 
     BasicBlock last = visit(body, makeBb(body.getInfo()));
@@ -98,7 +99,7 @@ class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
   }
 
   private void addGoto(BasicBlock code, BasicBlock dst) {
-    List<evl.statement.Statement> lst = code.getCode();
+    List<NormalStmt> lst = code.getCode();
     if( code.getEnd() == null ) {
       code.setEnd(new Goto(dst.getInfo(), dst));
     }
@@ -162,7 +163,7 @@ class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
     }
 
     Expression retVal = (Expression) fta.traverse(obj.getExpr(), null);
-    evl.statement.Assignment ass = new evl.statement.Assignment(obj.getInfo(), new Reference(obj.getInfo(), result), retVal);
+    evl.statement.normal.Assignment ass = new evl.statement.normal.Assignment(obj.getInfo(), new Reference(obj.getInfo(), result), retVal);
     param.getCode().add(ass);
 
     param.setEnd(new Goto(obj.getInfo(), exit));
@@ -244,19 +245,19 @@ class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
 
   @Override
   protected BasicBlock visitAssignment(Assignment obj, BasicBlock param) {
-    param.getCode().add((evl.statement.Statement) fta.traverse(obj, null));
+    param.getCode().add((evl.statement.normal.NormalStmt) fta.traverse(obj, null));
     return param;
   }
 
   @Override
   protected BasicBlock visitVarDef(VarDefStmt obj, BasicBlock param) {
-    param.getCode().add((evl.statement.Statement) fta.traverse(obj, null));
+    param.getCode().add((evl.statement.normal.NormalStmt) fta.traverse(obj, null));
     return param;
   }
 
   @Override
   protected BasicBlock visitCallStmt(CallStmt obj, BasicBlock param) {
-    param.getCode().add((evl.statement.Statement) fta.traverse(obj, null));
+    param.getCode().add((evl.statement.normal.NormalStmt) fta.traverse(obj, null));
     return param;
   }
 }

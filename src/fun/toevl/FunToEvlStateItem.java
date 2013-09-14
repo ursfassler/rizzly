@@ -27,6 +27,7 @@ import fun.hfsm.Transition;
 import fun.variable.Variable;
 
 public class FunToEvlStateItem extends NullTraverser<StateItem, Void> {
+
   private Map<Fun, Evl> map;
   private FunToEvl fta;
 
@@ -39,9 +40,9 @@ public class FunToEvlStateItem extends NullTraverser<StateItem, Void> {
   @Override
   protected StateItem visit(Fun obj, Void param) {
     StateItem cobj = (StateItem) map.get(obj);
-    if (cobj == null) {
+    if( cobj == null ) {
       cobj = super.visit(obj, param);
-      assert (cobj != null);
+      assert ( cobj != null );
       map.put(obj, cobj);
     }
     return cobj;
@@ -53,19 +54,18 @@ public class FunToEvlStateItem extends NullTraverser<StateItem, Void> {
   }
 
   // ----------------------------------------------------------------------------
-
   @Override
   protected StateItem visitStateComposite(StateComposite obj, Void param) {
     evl.hfsm.StateComposite state = new evl.hfsm.StateComposite(obj.getInfo(), obj.getName());
     map.put(obj, state);
 
-    for (Variable var : obj.getVariable()) {
+    for( Variable var : obj.getVariable() ) {
       state.getVariable().add((evl.variable.Variable) fta.traverse(var, null));
     }
-    for (FunctionHeader use : obj.getBfunc()) {
+    for( FunctionHeader use : obj.getBfunc() ) {
       state.getFunction().add((FunctionBase) fta.traverse(use, null));
     }
-    for (fun.hfsm.StateItem use : obj.getItem()) {
+    for( fun.hfsm.StateItem use : obj.getItem() ) {
       state.getItem().add((evl.hfsm.StateItem) fta.traverse(use, null));
     }
 
@@ -73,7 +73,7 @@ public class FunToEvlStateItem extends NullTraverser<StateItem, Void> {
     state.setEntryFunc((Reference) fta.traverse(obj.getEntryFuncRef(), null));
     state.setExitFunc((Reference) fta.traverse(obj.getExitFuncRef(), null));
     Reference initref = (Reference) fta.traverse(obj.getInitial(), null);
-    assert (initref.getOffset().isEmpty());
+    assert ( initref.getOffset().isEmpty() );
     state.setInitial((State) initref.getLink());
 
     return state;
@@ -83,13 +83,13 @@ public class FunToEvlStateItem extends NullTraverser<StateItem, Void> {
   protected StateItem visitStateSimple(StateSimple obj, Void param) {
     evl.hfsm.StateSimple state = new evl.hfsm.StateSimple(obj.getInfo(), obj.getName());
     map.put(obj, state);
-    for (Variable var : obj.getVariable()) {
+    for( Variable var : obj.getVariable() ) {
       state.getVariable().add((evl.variable.Variable) fta.traverse(var, null));
     }
-    for (FunctionHeader use : obj.getBfunc()) {
+    for( FunctionHeader use : obj.getBfunc() ) {
       state.getFunction().add((FunctionBase) fta.traverse(use, null));
     }
-    for (fun.hfsm.StateItem use : obj.getItem()) {
+    for( fun.hfsm.StateItem use : obj.getItem() ) {
       state.getItem().add((evl.hfsm.StateItem) fta.traverse(use, null));
     }
 
@@ -107,24 +107,23 @@ public class FunToEvlStateItem extends NullTraverser<StateItem, Void> {
 
   @Override
   protected StateItem visitTransition(Transition obj, Void param) {
-    List<FuncVariable> args = new ArrayList<FuncVariable>(obj.getParam().size());
-    for (fun.variable.FuncVariable itr : obj.getParam()) {
-      args.add((FuncVariable) fta.traverse(itr, null));
+    List<evl.variable.Variable> args = new ArrayList<evl.variable.Variable>(obj.getParam().size());
+    for( fun.variable.FuncVariable itr : obj.getParam() ) {
+      args.add((evl.variable.Variable) fta.traverse(itr, null));
     }
     evl.expression.reference.Reference src = (evl.expression.reference.Reference) fta.traverse(obj.getSrc(), null);
     evl.expression.reference.Reference dst = (evl.expression.reference.Reference) fta.traverse(obj.getDst(), null);
     evl.expression.reference.Reference evt = (evl.expression.reference.Reference) fta.traverse(obj.getEvent(), null);
-    assert (src.getOffset().isEmpty());
-    assert (dst.getOffset().isEmpty());
-    assert (evt.getOffset().size() == 1);
-    assert (evt.getOffset().get(0) instanceof RefName);
+    assert ( src.getOffset().isEmpty() );
+    assert ( dst.getOffset().isEmpty() );
+    assert ( evt.getOffset().size() == 1 );
+    assert ( evt.getOffset().get(0) instanceof RefName );
 
     Expression guard = (Expression) fta.traverse(obj.getGuard(), null);
 
     MakeBasicBlocks blocks = new MakeBasicBlocks(fta);
-    BasicBlockList nbody = blocks.translate(obj.getBody(), obj.getParam().getList(), new TypeRef(obj.getInfo(), new VoidType()) );  //TODO use singleton void
+    BasicBlockList nbody = blocks.translate(obj.getBody(), obj.getParam().getList(), new TypeRef(obj.getInfo(), new VoidType()));  //TODO use singleton void
 
-    return new evl.hfsm.Transition(obj.getInfo(), (State) src.getLink(), (State) dst.getLink(), (IfaceUse) evt.getLink(), ((RefName) evt.getOffset().get(0)).getName(), guard, args, nbody);
+    return new evl.hfsm.Transition(obj.getInfo(), obj.getName(), (State) src.getLink(), (State) dst.getLink(), (IfaceUse) evt.getLink(), ( (RefName) evt.getOffset().get(0) ).getName(), guard, args, nbody);
   }
-
 }

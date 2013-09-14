@@ -12,21 +12,21 @@ import evl.Evl;
 import evl.NullTraverser;
 import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
-import evl.cfg.CaseGoto;
-import evl.cfg.CaseOptRange;
-import evl.cfg.CaseOptValue;
-import evl.cfg.Goto;
-import evl.cfg.IfGoto;
-import evl.cfg.PhiStmt;
-import evl.cfg.ReturnExpr;
-import evl.cfg.ReturnVoid;
+import evl.statement.bbend.CaseGoto;
+import evl.statement.bbend.CaseOptRange;
+import evl.statement.bbend.CaseOptValue;
+import evl.statement.bbend.Goto;
+import evl.statement.bbend.IfGoto;
+import evl.statement.bbend.ReturnExpr;
+import evl.statement.bbend.ReturnVoid;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
-import evl.statement.Assignment;
-import evl.statement.CallStmt;
+import evl.statement.normal.CallStmt;
 import evl.statement.Statement;
-import evl.statement.VarDefInitStmt;
-import evl.statement.VarDefStmt;
+import evl.statement.normal.Assignment;
+import evl.statement.normal.VarDefInitStmt;
+import evl.statement.normal.VarDefStmt;
+import evl.statement.phi.PhiStmt;
 import evl.traverser.typecheck.LeftIsContainerOfRightTest;
 import evl.type.Type;
 import evl.type.base.BooleanType;
@@ -174,7 +174,7 @@ public class StatementTypeChecker extends NullTraverser<Void, Map<SsaVariable, R
   protected Void visitPhiStmt(PhiStmt obj, Map<SsaVariable, Range> param) {
     Type lhs = obj.getVariable().getType().getRef();
     for (BasicBlock in : obj.getInBB()) {
-      Type rhs = obj.getArg(in).getType().getRef(); // TODO use map to get smaller range
+      Type rhs = ExpressionTypeChecker.process(obj.getArg(in), kb); // TODO use map to get smaller range
       if (!LeftIsContainerOfRightTest.process(lhs, rhs, kb)) {
         RError.err(ErrorType.Error, obj.getInfo(), "Data type to big or incompatible in assignment: " + lhs.getName() + " := " + rhs.getName());
       }

@@ -29,12 +29,13 @@ import evl.other.ImplElementary;
 import evl.other.Interface;
 import evl.other.ListOfNamed;
 import evl.other.Namespace;
-import evl.statement.Assignment;
-import evl.statement.CallStmt;
-import evl.statement.GetElementPtr;
-import evl.statement.StackMemoryAlloc;
+import evl.statement.normal.CallStmt;
+import evl.statement.normal.GetElementPtr;
+import evl.statement.normal.StackMemoryAlloc;
 import evl.statement.Statement;
-import evl.statement.StoreStmt;
+import evl.statement.normal.Assignment;
+import evl.statement.normal.NormalStmt;
+import evl.statement.normal.StoreStmt;
 import evl.type.TypeRef;
 import evl.type.base.Range;
 import evl.type.special.PointerType;
@@ -91,7 +92,7 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
   }
 
   private FuncPrivateVoid makeDebugSend(String callname, IfaceUse debugIfaceUse) {
-    ArrayList<Statement> code = new ArrayList<Statement>();
+    ArrayList<NormalStmt> code = new ArrayList<NormalStmt>();
 
     SsaVariable func = new SsaVariable(info, "func", new TypeRef(info, nameNumType));
     SsaVariable iface = new SsaVariable(info, "iface", new TypeRef(info, nameNumType));
@@ -163,8 +164,8 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     return null;
   }
 
-  private List<Statement> makeCode(String callname, SsaVariable pArray, SsaVariable argSize, IfaceUse debug, String compName) {
-    List<Statement> code = new ArrayList<Statement>();
+  private List<NormalStmt> makeCode(String callname, SsaVariable pArray, SsaVariable argSize, IfaceUse debug, String compName) {
+    List<NormalStmt> code = new ArrayList<NormalStmt>();
 
     int x = names.indexOf(compName);
     assert ( x >= 0 );
@@ -227,14 +228,14 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
 
         {
           FuncSubHandlerEvent recv = makeRecvProto(sizeType);
-          List<Statement> body = makeCode(recv.getName(), (SsaVariable) recv.getParam().getList().get(0), (SsaVariable) recv.getParam().getList().get(1), debIface, use.getName());
+          List<NormalStmt> body = makeCode(recv.getName(), (SsaVariable) recv.getParam().getList().get(0), (SsaVariable) recv.getParam().getList().get(1), debIface, use.getName());
           recv.getBody().insertCodeAfterEntry(body, "body");
           obj.addFunction(name.toList(), recv);
         }
 
         {
           FuncSubHandlerEvent send = makeSendProto(sizeType);
-          List<Statement> body = makeCode(send.getName(), (SsaVariable) send.getParam().getList().get(0), (SsaVariable) send.getParam().getList().get(1), debIface, use.getName());
+          List<NormalStmt> body = makeCode(send.getName(), (SsaVariable) send.getParam().getList().get(0), (SsaVariable) send.getParam().getList().get(1), debIface, use.getName());
           send.getBody().insertCodeAfterEntry(body, "body");
           obj.addFunction(name.toList(), send);
         }

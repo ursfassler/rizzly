@@ -1,0 +1,34 @@
+interface
+  Tick
+    function tick;
+  end
+  
+component
+  Transition1
+    input
+      in  : Tick;
+    
+    output
+      out : Tick;
+    
+  implementation hfsm(One)
+      
+    state One
+    end
+    
+    state Two
+    end
+    
+    state Three
+    end
+    
+    transition 
+      One   to Two   by in.tick();
+      Two   to Three by in.tick();
+      Three to One   by in.tick() do
+        out.tick();
+      end
+
+    
+  end
+

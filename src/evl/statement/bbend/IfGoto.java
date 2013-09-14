@@ -1,10 +1,11 @@
-package evl.cfg;
+package evl.statement.bbend;
 
 import java.util.HashSet;
 import java.util.Set;
 
 import common.ElementInfo;
 
+import evl.cfg.BasicBlock;
 import evl.expression.Expression;
 
 /**
@@ -50,6 +51,11 @@ public class IfGoto extends BasicBlockEnd {
     ret.add(thenBlock);
     ret.add(elseBlock);
     return ret;
+  }
+
+  @Override
+  public String toString() {
+    return condition + " ? goto " + thenBlock.getName() + " : goto " + elseBlock.getName();
   }
 
 }

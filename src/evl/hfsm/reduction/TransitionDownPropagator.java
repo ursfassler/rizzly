@@ -26,8 +26,9 @@ import evl.hfsm.StateSimple;
 import evl.hfsm.Transition;
 import evl.knowledge.KnowParent;
 import evl.knowledge.KnowledgeBase;
-import evl.statement.CallStmt;
+import evl.statement.normal.CallStmt;
 import evl.statement.Statement;
+import evl.statement.normal.NormalStmt;
 
 /**
  * adds transitions to the children until leaf states also adds calls to exit and entry function
@@ -36,6 +37,7 @@ import evl.statement.Statement;
  *
  */
 public class TransitionDownPropagator extends NullTraverser<Void, TransitionParam> {
+
   private KnowParent kp;
   private Map<Transition, State> tsrc;
   private Map<Transition, State> tdst;
@@ -70,14 +72,14 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
     filter(obj, param.before);
     filter(obj, param.after);
 
-    for (Transition trans : param.before) {
+    for( Transition trans : param.before ) {
       addTrans(obj, trans);
     }
-    for (Transition trans : transList) {
+    for( Transition trans : transList ) {
       trans.setSrc(obj);
       obj.getItem().add(trans);
     }
-    for (Transition trans : param.after) {
+    for( Transition trans : param.after ) {
       addTrans(obj, trans);
     }
     return null;
@@ -85,32 +87,32 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
 
   public void addTrans(StateSimple src, Transition trans) {
     State os = ttop.get(trans);
-    assert (os != null);
+    assert ( os != null );
     State dst = tdst.get(trans);
-    assert (dst != null);
+    assert ( dst != null );
     trans = Copy.copy(trans);
     trans.setSrc(src);
 
     {
-      List<Statement> list = new ArrayList<Statement>();
+      List<NormalStmt> list = new ArrayList<NormalStmt>();
       makeExitCalls(src, os, list);
-      trans.getBody().getStatements().addAll(0, list);
+      trans.getBody().insertCodeAfterEntry(list, "exitCalls");    //TODO check
     }
     {
-      List<Statement> list = new ArrayList<Statement>();
+      List<NormalStmt> list = new ArrayList<NormalStmt>();
       makeEntryCalls(dst, os, list);
-      trans.getBody().getStatements().addAll(list);
+      trans.getBody().insertCodeAfterEntry(list, "entryCalls");//TODO check
     }
 
     src.getItem().add(trans);
   }
 
-  private void makeEntryCalls(State start, State top, List<Statement> list) {
-    if (start == top) {
+  private void makeEntryCalls(State start, State top, List<NormalStmt> list) {
+    if( start == top ) {
       return;
     }
     StateComposite par = getParent(start);
-    assert (par != null);
+    assert ( par != null );
 
     makeEntryCalls(par, top, list);
     list.add(makeCall(start.getEntryFunc()));
@@ -118,36 +120,36 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
 
   private StateComposite getParent(State start) {
     Evl parent = kp.getParent(start);
-    if (parent instanceof StateComposite) {
+    if( parent instanceof StateComposite ) {
       return (StateComposite) parent;
     } else {
       return null;
     }
   }
 
-  private void makeExitCalls(State start, State top, List<Statement> list) {
-    if (start == top) {
+  private void makeExitCalls(State start, State top, List<NormalStmt> list) {
+    if( start == top ) {
       return;
     }
     StateComposite par = getParent(start);
-    assert (par != null);
+    assert ( par != null );
 
     list.add(makeCall(start.getExitFunc()));
     makeExitCalls(par, top, list);
   }
 
-  private Statement makeCall(Reference reference) {
-    assert (reference.getLink() instanceof FuncWithBody);
-    assert (reference.getOffset().isEmpty());
+  private NormalStmt makeCall(Reference reference) {
+    assert ( reference.getLink() instanceof FuncWithBody );
+    assert ( reference.getOffset().isEmpty() );
     Reference ref = new Reference(new ElementInfo(), reference.getLink(), new ArrayList<RefItem>());
     ref.getOffset().add(new RefCall(new ElementInfo(), new ArrayList<Expression>()));
     return new CallStmt(new ElementInfo(), ref);
   }
 
   private boolean isChildState(State test, State root) {
-    if (test == null) {
+    if( test == null ) {
       return false;
-    } else if (test == root) {
+    } else if( test == root ) {
       return true;
     } else {
       return isChildState(getParent(test), root);
@@ -167,15 +169,15 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
     ArrayList<Transition> transList = new ArrayList<Transition>();
     ArrayList<State> stateList = new ArrayList<State>();
 
-    for (StateItem itr : obj.getItem()) {
-      if (itr instanceof Transition) {
+    for( StateItem itr : obj.getItem() ) {
+      if( itr instanceof Transition ) {
         Transition trans = (Transition) itr;
         transList.add(trans);
-      } else if (itr instanceof State) {
+      } else if( itr instanceof State ) {
         spos.put((State) itr, transList.size());
         stateList.add((State) itr);
       } else {
-        assert (itr instanceof QueryItem);
+        assert ( itr instanceof QueryItem );
       }
     }
 
@@ -183,7 +185,7 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
 
     // build parameter for every substate
     Map<State, TransitionParam> spar = new HashMap<State, TransitionParam>();
-    for (State itr : stateList) {
+    for( State itr : stateList ) {
       int idx = spos.get(itr);
 
       TransitionParam cpar = new TransitionParam(param);
@@ -193,7 +195,7 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
       spar.put(itr, cpar);
     }
 
-    for (State itr : stateList) {
+    for( State itr : stateList ) {
       visit(itr, spar.get(itr));
     }
 
@@ -203,17 +205,17 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
   // removes transitions which does not come from this state or a parent of it
   private void filter(State state, List<Transition> list) {
     Set<Transition> remove = new HashSet<Transition>();
-    for (Transition trans : list) {
-      if (!isChildState(state, tsrc.get(trans))) {
+    for( Transition trans : list ) {
+      if( !isChildState(state, tsrc.get(trans)) ) {
         remove.add(trans);
       }
     }
     list.removeAll(remove);
   }
-
 }
 
 class TransitionParam {
+
   final public ArrayList<Transition> before;
   final public ArrayList<Transition> after;
 
@@ -234,10 +236,10 @@ class TransitionParam {
     this.before = new ArrayList<Transition>(parent.before);
     this.after = new ArrayList<Transition>(parent.after);
   }
-
 }
 
 class TransitionEndpointCollector extends NullTraverser<Void, State> {
+
   final private Map<Transition, State> tsrc = new HashMap<Transition, State>();
   final private Map<Transition, State> tdst = new HashMap<Transition, State>();
   final private Map<Transition, State> ttop = new HashMap<Transition, State>();
@@ -277,5 +279,4 @@ class TransitionEndpointCollector extends NullTraverser<Void, State> {
   public Map<Transition, State> getTtop() {
     return ttop;
   }
-
 }

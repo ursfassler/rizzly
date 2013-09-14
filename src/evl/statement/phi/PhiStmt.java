@@ -1,4 +1,4 @@
-package evl.cfg;
+package evl.statement.phi;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -7,39 +7,40 @@ import java.util.Set;
 
 import common.ElementInfo;
 
-import evl.EvlBase;
-import evl.statement.SsaGenerator;
+import evl.cfg.BasicBlock;
+import evl.expression.Expression;
+import evl.statement.normal.SsaGenerator;
+import evl.statement.Statement;
 import evl.variable.SsaVariable;
-import evl.variable.Variable;
 
 /**
  *
  * @author urs
  */
-public class PhiStmt extends EvlBase implements SsaGenerator {
+public class PhiStmt extends Statement implements SsaGenerator {
 
   private SsaVariable vardef;
-  private Map<BasicBlock, Variable> arg = new HashMap<BasicBlock, Variable>();    //TODO use Reference?
+  private Map<BasicBlock, Expression> arg = new HashMap<BasicBlock, Expression>();
 
   public PhiStmt(ElementInfo info, SsaVariable vardef) {
     super(info);
     this.vardef = vardef;
   }
 
+  @Override
   public SsaVariable getVariable() {
     return vardef;
   }
 
-  public void addArg(BasicBlock bb, Variable var) {
+  public void addArg(BasicBlock bb, Expression var) {
     arg.put(bb, var);
   }
 
-  public Variable getArg(BasicBlock bb) {
+  public Expression getArg(BasicBlock bb) {
     return arg.get(bb);
   }
 
   public Set<BasicBlock> getInBB() {
     return new HashSet<BasicBlock>(arg.keySet());
   }
-
 }

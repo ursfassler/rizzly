@@ -24,11 +24,10 @@ import evl.other.ImplElementary;
 import evl.other.Named;
 import evl.other.NamedList;
 import evl.other.Namespace;
-import evl.statement.CallStmt;
-import evl.statement.Statement;
+import evl.statement.normal.CallStmt;
+import evl.statement.normal.NormalStmt;
 import evl.type.Type;
 import evl.variable.ConstGlobal;
-
 
 /**
  * Inserts a message call whenever an event is sent
@@ -37,6 +36,7 @@ import evl.variable.ConstGlobal;
  *
  */
 public class EventSendDebugCallAdder extends NullTraverser<Void, Void> {
+
   private StmtTraverser st;
 
   public EventSendDebugCallAdder(FuncPrivateVoid debugSend, ArrayList<String> names) {
@@ -51,7 +51,7 @@ public class EventSendDebugCallAdder extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitDefault(Evl obj, Void param) {
-    if (!(obj instanceof Type)) {
+    if( !( obj instanceof Type ) ) {
       throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
     }
     return null;
@@ -92,10 +92,10 @@ public class EventSendDebugCallAdder extends NullTraverser<Void, Void> {
     st.traverse(obj, null);
     return null;
   }
-
 }
 
-class StmtTraverser extends DefTraverser<Void, List<Statement>> {
+class StmtTraverser extends DefTraverser<Void, List<NormalStmt>> {
+
   private FuncPrivateVoid debugSend;
   private ArrayList<String> names;
   static private ElementInfo info = new ElementInfo();
@@ -107,9 +107,9 @@ class StmtTraverser extends DefTraverser<Void, List<Statement>> {
   }
 
   @Override
-  protected Void visitBasicBlock(BasicBlock obj, List<Statement> param) {
-    List<Statement> sl = new ArrayList<Statement>();
-    for (Statement stmt : obj.getCode()) {
+  protected Void visitBasicBlock(BasicBlock obj, List<NormalStmt> param) {
+    List<NormalStmt> sl = new ArrayList<NormalStmt>();
+    for( NormalStmt stmt : obj.getCode() ) {
       visit(stmt, sl);
       sl.add(stmt);
     }
@@ -119,27 +119,27 @@ class StmtTraverser extends DefTraverser<Void, List<Statement>> {
   }
 
   @Override
-  protected Void visitReference(Reference obj, List<Statement> param) {
+  protected Void visitReference(Reference obj, List<NormalStmt> param) {
     super.visitReference(obj, param);
 
-    for (int i = 0; i < obj.getOffset().size(); i++) {
+    for( int i = 0; i < obj.getOffset().size(); i++ ) {
       RefItem ref = obj.getOffset().get(i);
-      if (ref instanceof RefCall) {
-        assert (i == obj.getOffset().size() - 1);
-        if (obj.getLink() instanceof IfaceUse) {
-          assert (i == 1);
+      if( ref instanceof RefCall ) {
+        assert ( i == obj.getOffset().size() - 1 );
+        if( obj.getLink() instanceof IfaceUse ) {
+          assert ( i == 1 );
           IfaceUse use = (IfaceUse) obj.getLink();
-          String funcName = ((RefName) obj.getOffset().get(0)).getName();
+          String funcName = ( (RefName) obj.getOffset().get(0) ).getName();
 
           int numIface = names.indexOf(use.getName());
-          if (numIface >= 0) {
+          if( numIface >= 0 ) {
             int numFunc = names.indexOf(funcName);
-            assert (numIface >= 0);
-            assert (numFunc >= 0);
+            assert ( numIface >= 0 );
+            assert ( numFunc >= 0 );
 
             param.add(makeCall(debugSend, numFunc, numIface));
           } else {
-            assert (use.getName().equals("_debug"));
+            assert ( use.getName().equals("_debug") );
           }
         }
       }
@@ -147,16 +147,15 @@ class StmtTraverser extends DefTraverser<Void, List<Statement>> {
     return null;
   }
 
-  private Statement makeCall(FuncPrivateVoid func, int numFunc, int numIface) {
+  private NormalStmt makeCall(FuncPrivateVoid func, int numFunc, int numIface) {
     // Self._sendMsg( numFunc, numIface );
     List<Expression> actParam = new ArrayList<Expression>();
     actParam.add(new Number(info, BigInteger.valueOf(numFunc)));
-    actParam.add(new Number(info, BigInteger.valueOf( numIface)));
+    actParam.add(new Number(info, BigInteger.valueOf(numIface)));
 
     Reference call = new Reference(info, func);
     call.getOffset().add(new RefCall(info, actParam));
 
     return new CallStmt(info, call);
   }
-
 }

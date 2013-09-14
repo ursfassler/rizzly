@@ -44,27 +44,27 @@ public class FunToEvlStmt extends NullTraverser<Evl, Void> {
 
   @Override
   protected Statement visitAssignment(Assignment obj, Void param) {
-    return new evl.statement.Assignment(obj.getInfo(), (evl.expression.reference.Reference) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
+    return new evl.statement.normal.Assignment(obj.getInfo(), (evl.expression.reference.Reference) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
   }
 
   @Override
   protected Evl visitReturnExpr(ReturnExpr obj, Void param) {
-    return new evl.cfg.ReturnExpr(obj.getInfo(), (Expression) fta.traverse(obj.getExpr(), null));
+    return new evl.statement.bbend.ReturnExpr(obj.getInfo(), (Expression) fta.traverse(obj.getExpr(), null));
   }
 
   @Override
   protected Evl visitReturnVoid(ReturnVoid obj, Void param) {
-    return new evl.cfg.ReturnVoid(obj.getInfo());
+    return new evl.statement.bbend.ReturnVoid(obj.getInfo());
   }
 
   @Override
   protected Statement visitVarDef(VarDefStmt obj, Void param) {
-    return new evl.statement.VarDefStmt(obj.getInfo(), (evl.variable.FuncVariable) fta.traverse(obj.getVariable(), null));
+    return new evl.statement.normal.VarDefStmt(obj.getInfo(), (evl.variable.FuncVariable) fta.traverse(obj.getVariable(), null));
   }
 
   @Override
   protected Statement visitCallStmt(CallStmt obj, Void param) {
-    return new evl.statement.CallStmt(obj.getInfo(), (Reference) fta.traverse(obj.getCall(), null));
+    return new evl.statement.normal.CallStmt(obj.getInfo(), (Reference) fta.traverse(obj.getCall(), null));
   }
 
 }

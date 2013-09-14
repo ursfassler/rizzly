@@ -38,15 +38,14 @@ import evl.Evl;
 import evl.NullTraverser;
 import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
-import evl.cfg.CaseGoto;
-import evl.cfg.CaseGotoOpt;
-import evl.cfg.CaseOptRange;
-import evl.cfg.CaseOptValue;
-import evl.cfg.Goto;
-import evl.cfg.IfGoto;
-import evl.cfg.PhiStmt;
-import evl.cfg.ReturnExpr;
-import evl.cfg.ReturnVoid;
+import evl.statement.bbend.CaseGoto;
+import evl.statement.bbend.CaseGotoOpt;
+import evl.statement.bbend.CaseOptRange;
+import evl.statement.bbend.CaseOptValue;
+import evl.statement.bbend.Goto;
+import evl.statement.bbend.IfGoto;
+import evl.statement.bbend.ReturnExpr;
+import evl.statement.bbend.ReturnVoid;
 import evl.expression.ArithmeticOp;
 import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
@@ -68,14 +67,15 @@ import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
 import evl.function.FunctionHeader;
 import evl.other.RizzlyProgram;
-import evl.statement.Assignment;
-import evl.statement.CallStmt;
-import evl.statement.GetElementPtr;
-import evl.statement.LoadStmt;
-import evl.statement.StackMemoryAlloc;
+import evl.statement.normal.CallStmt;
+import evl.statement.normal.GetElementPtr;
+import evl.statement.normal.LoadStmt;
+import evl.statement.normal.StackMemoryAlloc;
 import evl.statement.Statement;
-import evl.statement.VarDefInitStmt;
-import evl.statement.VarDefStmt;
+import evl.statement.normal.Assignment;
+import evl.statement.normal.VarDefInitStmt;
+import evl.statement.normal.VarDefStmt;
+import evl.statement.phi.PhiStmt;
 import evl.type.Type;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
@@ -418,8 +418,8 @@ public class ToPir extends NullTraverser<PirObject, Void> {
   protected PirObject visitPhiStmt(PhiStmt obj, Void param) {
     pir.cfg.PhiStmt ret = new pir.cfg.PhiStmt((pir.other.SsaVariable) visit(obj.getVariable(), null));
     for( BasicBlock in : obj.getInBB() ) {
-      pir.other.SsaVariable var = (pir.other.SsaVariable) visit(obj.getArg(in), null);
-      ret.addArg((pir.cfg.BasicBlock) visit(in, null), new VarRefSimple(var));
+      pir.other.PirValue var = (pir.other.PirValue) visit(obj.getArg(in), null);
+      ret.addArg((pir.cfg.BasicBlock) visit(in, null), var);
     }
     return ret;
   }
@@ -456,7 +456,7 @@ public class ToPir extends NullTraverser<PirObject, Void> {
   @Override
   protected PirObject visitCaseGotoOpt(CaseGotoOpt obj, Void param) {
     List<CaseOptEntry> list = new ArrayList<CaseOptEntry>();
-    for( evl.cfg.CaseOptEntry entry : obj.getValue() ) {
+    for( evl.statement.bbend.CaseOptEntry entry : obj.getValue() ) {
       list.add((CaseOptEntry) visit(entry, null));
     }
     return new pir.cfg.CaseGotoOpt(list, (pir.cfg.BasicBlock) visit(obj.getDst(), null));
@@ -566,7 +566,7 @@ public class ToPir extends NullTraverser<PirObject, Void> {
   }
 
   @Override
-  protected PirObject visitStoreStmt(evl.statement.StoreStmt obj, Void param) {
+  protected PirObject visitStoreStmt(evl.statement.normal.StoreStmt obj, Void param) {
     pir.other.PirValue value = (pir.other.PirValue) traverse(obj.getExpr(), null);
     VarRefSimple ref = (VarRefSimple) traverse(obj.getAddress(), null);
     assert ( ref.getType().getRef() instanceof pir.type.PointerType );

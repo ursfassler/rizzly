@@ -5,7 +5,7 @@ import java.util.Map;
 
 import evl.DefTraverser;
 import evl.expression.Expression;
-import evl.statement.VarDefInitStmt;
+import evl.statement.normal.VarDefInitStmt;
 import evl.variable.SsaVariable;
 
 public class KnowWriter extends KnowledgeEntry {

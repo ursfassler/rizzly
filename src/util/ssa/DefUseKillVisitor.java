@@ -13,12 +13,12 @@ import java.util.HashSet;
 import evl.DefTraverser;
 import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
-import evl.cfg.PhiStmt;
 import evl.expression.reference.Reference;
 import evl.function.FuncWithBody;
 import evl.function.FunctionBase;
-import evl.statement.Assignment;
-import evl.statement.VarDefStmt;
+import evl.statement.normal.Assignment;
+import evl.statement.normal.VarDefStmt;
+import evl.statement.phi.PhiStmt;
 import evl.variable.Variable;
 
 public class DefUseKillVisitor extends DefTraverser<Void, BasicBlock> {

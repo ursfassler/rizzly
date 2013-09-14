@@ -9,6 +9,7 @@ import common.ElementInfo;
 
 import evl.Evl;
 import evl.NullTraverser;
+import evl.cfg.BasicBlockList;
 import evl.expression.Expression;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.Reference;
@@ -22,9 +23,10 @@ import evl.hfsm.StateSimple;
 import evl.hfsm.Transition;
 import evl.other.ListOfNamed;
 import evl.other.Named;
-import evl.statement.CallStmt;
+import evl.statement.normal.CallStmt;
 import evl.statement.Statement;
-import evl.variable.FuncVariable;
+import evl.statement.normal.NormalStmt;
+import evl.variable.Variable;
 
 
 /**
@@ -81,19 +83,21 @@ public class EntryExitUpdater extends NullTraverser<Void, EePar> {
   }
 
   public FuncPrivateVoid makeFunc(String name, List<FunctionBase> list) {
-    FuncPrivateVoid func = new FuncPrivateVoid(new ElementInfo(), name, new ListOfNamed<FuncVariable>());
-    Block body = new Block(new ElementInfo());
+    FuncPrivateVoid func = new FuncPrivateVoid(new ElementInfo(), name, new ListOfNamed<Variable>());
+    List<NormalStmt> code = new ArrayList<NormalStmt>();
 
     for (FunctionBase cf : list) {
-      Statement stmt = makeCall(cf);
-      body.getStatements().add(stmt);
+      NormalStmt stmt = makeCall(cf);
+      code.add(stmt);
     }
 
+    BasicBlockList body = new BasicBlockList(new ElementInfo());
+    body.insertCodeAfterEntry(code, "body");
     func.setBody(body);
     return func;
   }
 
-  private Statement makeCall(FunctionBase func) {
+  private NormalStmt makeCall(FunctionBase func) {
     assert (func.getParam().isEmpty());
     Reference ref = new Reference(new ElementInfo(), func);
     ref.getOffset().add(new RefCall(new ElementInfo(), new ArrayList<Expression>()));

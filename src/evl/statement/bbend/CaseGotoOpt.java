@@ -1,10 +1,11 @@
-package evl.cfg;
+package evl.statement.bbend;
 
 import java.util.List;
 
 import common.ElementInfo;
 
 import evl.EvlBase;
+import evl.cfg.BasicBlock;
 
 public class CaseGotoOpt extends EvlBase {
   private List<CaseOptEntry> value;

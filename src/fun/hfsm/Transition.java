@@ -9,6 +9,8 @@ import fun.statement.Block;
 import fun.variable.FuncVariable;
 
 public class Transition extends StateItem {
+
+  private String name;
   private Reference src;
   private Reference dst;
   private Reference event;
@@ -16,8 +18,13 @@ public class Transition extends StateItem {
   final private ListOfNamed<FuncVariable> param = new ListOfNamed<FuncVariable>();
   private Block body;
 
-  public Transition(ElementInfo info) {
+  public Transition(ElementInfo info, String name) {
     super(info);
+    this.name = name;
+  }
+
+  public String getName() {
+    return name;
   }
 
   public Reference getSrc() {
@@ -68,5 +75,4 @@ public class Transition extends StateItem {
   public String toString() {
     return src + " -> " + dst + " by " + event + " if " + guard;
   }
-
 }

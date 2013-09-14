@@ -1,5 +1,8 @@
 package evl.passes;
 
+import evl.cfg.BasicBlock;
+import evl.statement.bbend.BasicBlockEnd;
+import evl.statement.phi.PhiStmt;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -12,7 +15,6 @@ import common.ElementInfo;
 import common.NameFactory;
 
 import evl.DefTraverser;
-import evl.cfg.BasicBlockEnd;
 import evl.copy.Copy;
 import evl.expression.Expression;
 import evl.expression.reference.RefPtrDeref;
@@ -20,13 +22,13 @@ import evl.expression.reference.Reference;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
-import evl.statement.Assignment;
-import evl.statement.GetElementPtr;
-import evl.statement.LoadStmt;
-import evl.statement.StackMemoryAlloc;
-import evl.statement.Statement;
-import evl.statement.StoreStmt;
-import evl.statement.VarDefStmt;
+import evl.statement.normal.GetElementPtr;
+import evl.statement.normal.LoadStmt;
+import evl.statement.normal.StackMemoryAlloc;
+import evl.statement.normal.Assignment;
+import evl.statement.normal.NormalStmt;
+import evl.statement.normal.StoreStmt;
+import evl.statement.normal.VarDefStmt;
 import evl.traverser.ClassGetter;
 import evl.traverser.StatementReplacer;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
@@ -70,7 +72,9 @@ public class MemoryAccessCapsulater {
   }
 }
 
-class StmtReplacer extends StatementReplacer<List<Statement>> {
+
+
+class StmtReplacer extends StatementReplacer<List<NormalStmt>> {
 
   private KnowledgeBase kb;
   ExprReplacer exprReplacer;
@@ -81,10 +85,10 @@ class StmtReplacer extends StatementReplacer<List<Statement>> {
   }
 
   @Override
-  protected List<Statement> visitStatement(Statement obj, List<Statement> param) {
+  protected List<NormalStmt> visitNormalStmt(NormalStmt obj, List<NormalStmt> param) {
     assert ( param == null );
-    param = new ArrayList<Statement>();
-    List<Statement> ret = super.visitStatement(obj, param);
+    param = new ArrayList<NormalStmt>();
+    List<NormalStmt> ret = super.visitNormalStmt(obj, param);
     assert ( ret == null );
     if( !( obj instanceof Assignment ) ) {  // hacky
       param.add(obj);
@@ -93,29 +97,40 @@ class StmtReplacer extends StatementReplacer<List<Statement>> {
   }
 
   @Override
-  protected List<Statement> visitBasicBlockEnd(BasicBlockEnd obj, List<Statement> param) {
+  protected List<NormalStmt> visitBasicBlockEnd(BasicBlockEnd obj, List<NormalStmt> param) {
     assert ( param == null );
-    param = new ArrayList<Statement>();
-    List<Statement> ret = super.visitBasicBlockEnd(obj, param);
+    param = new ArrayList<NormalStmt>();
+    List<NormalStmt> ret = super.visitBasicBlockEnd(obj, param);
+    assert ( ret == null );
+    return param;
+  }
+  
+  @Override
+  protected List<NormalStmt> visitPhi(PhiStmt phi, BasicBlock in, List<NormalStmt> param) {
+    assert ( param == null );
+    param = new ArrayList<NormalStmt>();
+    Expression expr = phi.getArg(in);
+    assert(expr != null);
+    List<NormalStmt> ret = visit(expr,param);
     assert ( ret == null );
     return param;
   }
 
   @Override
-  protected List<Statement> visitGetElementPtr(GetElementPtr obj, List<Statement> param) {
+  protected List<NormalStmt> visitGetElementPtr(GetElementPtr obj, List<NormalStmt> param) {
     assert ( param != null );
     return null;
   }
 
   @Override
-  protected List<Statement> visitExpression(Expression obj, List<Statement> param) {
+  protected List<NormalStmt> visitExpression(Expression obj, List<NormalStmt> param) {
     assert ( param != null );
     exprReplacer.traverse(obj, param);
     return null;
   }
 
   @Override
-  protected List<Statement> visitAssignment(Assignment obj, List<Statement> param) {
+  protected List<NormalStmt> visitAssignment(Assignment obj, List<NormalStmt> param) {
     assert ( param != null );
     visit(obj.getRight(), param);
     visitItr(obj.getLeft().getOffset(), param);
@@ -129,9 +144,10 @@ class StmtReplacer extends StatementReplacer<List<Statement>> {
     }
     return null;
   }
+
 }
 
-class ExprReplacer extends DefTraverser<Void, List<Statement>> {
+class ExprReplacer extends DefTraverser<Void, List<NormalStmt>> {
 
   private KnowledgeBase kb;
 
@@ -150,7 +166,7 @@ class ExprReplacer extends DefTraverser<Void, List<Statement>> {
   }
 
   @Override
-  protected Void visitGetElementPtr(GetElementPtr obj, List<Statement> param) {
+  protected Void visitGetElementPtr(GetElementPtr obj, List<NormalStmt> param) {
     return null;
   }
 
@@ -171,7 +187,7 @@ class ExprReplacer extends DefTraverser<Void, List<Statement>> {
   }
 
   @Override
-  protected Void visitReference(Reference obj, List<Statement> param) {
+  protected Void visitReference(Reference obj, List<NormalStmt> param) {
     if( isMemoryAccess(obj) ) {
       assert ( param != null );
       GetElementPtr ptr = makeGep(obj, kb);
@@ -190,6 +206,7 @@ class ExprReplacer extends DefTraverser<Void, List<Statement>> {
   }
 }
 
+
 class StackMemTrav extends StatementReplacer<Void> {
 
   final private Map<Variable, SsaVariable> map = new HashMap<Variable, SsaVariable>();
@@ -204,7 +221,7 @@ class StackMemTrav extends StatementReplacer<Void> {
   }
 
   @Override
-  protected List<Statement> visitVarDef(VarDefStmt obj, Void param) {
+  protected List<NormalStmt> visitVarDef(VarDefStmt obj, Void param) {
     Type type = obj.getVariable().getType().getRef();
 
     PointerType pt = kbi.getPointerType(type);
@@ -214,6 +231,11 @@ class StackMemTrav extends StatementReplacer<Void> {
     map.put(obj.getVariable(), var);
 
     return ret(sma);
+  }
+
+  @Override
+  protected List<NormalStmt> visitPhi(PhiStmt phi, BasicBlock in, Void param) {
+    return null;
   }
 }
 

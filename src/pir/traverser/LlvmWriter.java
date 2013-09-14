@@ -828,8 +828,14 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     param.wr(obj.getName() + ":");
     param.nl();
     param.incIndent();
+    param.wr("; phi");
+    param.nl();
     visitList(obj.getPhi(), param);
+    param.wr("; code");
+    param.nl();
     visitList(obj.getCode(), param);
+    param.wr("; end");
+    param.nl();
     visit(obj.getEnd(), param);
     param.decIndent();
     param.nl();

@@ -1,5 +1,6 @@
 package evl.traverser;
 
+import evl.expression.Expression;
 import evl.variable.ConstGlobal;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +10,8 @@ import evl.cfg.BasicBlock;
 import evl.composition.ImplComposition;
 import evl.hfsm.ImplHfsm;
 import evl.other.ImplElementary;
-import evl.statement.Statement;
+import evl.statement.normal.NormalStmt;
+import evl.statement.phi.PhiStmt;
 
 /**
  * If the return value is null, the statement is kept. If it is != null, the statement is replaced with the content of
@@ -19,52 +21,64 @@ import evl.statement.Statement;
  * 
  * @param <T>
  */
-public class StatementReplacer<T> extends DefTraverser<List<Statement>, T> {
+public abstract class StatementReplacer<T> extends DefTraverser<List<NormalStmt>, T> {
 
   /**
    * Return a single statement
    * @param stmt
    * @return
    */
-  protected List<Statement> ret(Statement stmt) {
-    ArrayList<Statement> stmts = new ArrayList<Statement>();
+  protected List<NormalStmt> ret(NormalStmt stmt) {
+    ArrayList<NormalStmt> stmts = new ArrayList<NormalStmt>();
     stmts.add(stmt);
     return stmts;
   }
 
+  abstract protected List<NormalStmt> visitPhi(PhiStmt phi, BasicBlock in, T param);
+  
   @Override
-  protected List<Statement> visitBasicBlock(BasicBlock obj, T param) {
-    // TODO somehow include phi statements
-
-    ArrayList<Statement> stmts = new ArrayList<Statement>(obj.getCode());
+  protected List<NormalStmt> visitBasicBlock(BasicBlock obj, T param) {
+    ArrayList<NormalStmt> stmts = new ArrayList<NormalStmt>(obj.getCode());
     obj.getCode().clear();
 
-    for (Statement stmt : stmts) {
-      List<Statement> list = visit(stmt, param);
-      if (list == null) {
+    for( NormalStmt stmt : stmts ) {
+      List<NormalStmt> list = visit(stmt, param);
+      if( list == null ) {
         obj.getCode().add(stmt);
       } else {
         obj.getCode().addAll(list);
       }
     }
 
-    List<Statement> list = visit(obj.getEnd(), param);
-    if (list != null) {
-      obj.getCode().addAll(list);
+    {
+      List<NormalStmt> list = visit(obj.getEnd(), param);
+      if( list != null ) {
+        obj.getCode().addAll(list);
+      }
     }
+
+    // go through phi statements of following bbs
+    for( BasicBlock dst : obj.getEnd().getJumpDst() ) {
+      for( PhiStmt phi : dst.getPhi() ) {
+        List<NormalStmt> list = visitPhi( phi, obj, param);
+        if( list != null ) {
+          obj.getCode().addAll(list);
+        }
+      }
+    }
+
 
     return null;
   }
 
   // traversal optimization
-
   @Override
-  protected List<Statement> visitImplComposition(ImplComposition obj, T param) {
+  protected List<NormalStmt> visitImplComposition(ImplComposition obj, T param) {
     return null;
   }
 
   @Override
-  protected List<Statement> visitImplElementary(ImplElementary obj, T param) {
+  protected List<NormalStmt> visitImplElementary(ImplElementary obj, T param) {
     visitList(obj.getInternalFunction().getList(), param);
     visitList(obj.getInputFunc().getList(), param);
     visitList(obj.getSubComCallback().getList(), param);
@@ -72,13 +86,14 @@ public class StatementReplacer<T> extends DefTraverser<List<Statement>, T> {
   }
 
   @Override
-  protected List<Statement> visitImplHfsm(ImplHfsm obj, T param) {
+  protected List<NormalStmt> visitImplHfsm(ImplHfsm obj, T param) {
     visit(obj.getTopstate(), param);
     return null;
   }
 
   @Override
-  protected List<Statement> visitConstGlobal(ConstGlobal obj, T param) {
+  protected List<NormalStmt> visitConstGlobal(ConstGlobal obj, T param) {
     return null;
   }
+
 }

@@ -1,5 +1,6 @@
-package evl.statement;
+package evl.statement.normal;
 
+import evl.statement.normal.NormalStmt;
 import common.ElementInfo;
 
 import evl.expression.Expression;
@@ -9,7 +10,7 @@ import evl.expression.reference.Reference;
  *
  * @author urs
  */
-public class StoreStmt extends Statement {
+public class StoreStmt extends NormalStmt {
 
   private Reference address;
   private Expression expr;

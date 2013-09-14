@@ -30,8 +30,8 @@ import error.RError;
 import evl.Evl;
 import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
-import evl.cfg.Goto;
-import evl.cfg.ReturnVoid;
+import evl.statement.bbend.Goto;
+import evl.statement.bbend.ReturnVoid;
 import evl.composition.CompositionReduction;
 import evl.composition.Connection;
 import evl.composition.ImplComposition;
@@ -119,8 +119,7 @@ public class MainEvl {
     }
 
     root = compositionReduction(aclasses, root);
-    // TODO reimplement
-    // root = hfsmReduction(root, opt, debugdir, aclasses, kb);
+//    root = hfsmReduction(root, opt, debugdir, aclasses, kb);
 
     PrettyPrinter.print(aclasses, debugdir + "reduced.rzy", true);
 

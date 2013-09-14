@@ -1,4 +1,4 @@
-package evl.cfg;
+package evl.statement.bbend;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -7,6 +7,7 @@ import java.util.Set;
 
 import common.ElementInfo;
 
+import evl.cfg.BasicBlock;
 import evl.expression.Expression;
 
 public class CaseGoto extends BasicBlockEnd {

@@ -1,4 +1,4 @@
-package evl.statement;
+package evl.statement.normal;
 
 import common.ElementInfo;
 
@@ -9,7 +9,7 @@ import evl.expression.reference.Reference;
  * 
  * @author urs
  */
-public class Assignment extends Statement {
+public class Assignment extends NormalStmt {
 
   private Reference left;
   private Expression right;

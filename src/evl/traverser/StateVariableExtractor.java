@@ -1,5 +1,7 @@
 package evl.traverser;
 
+import evl.cfg.BasicBlock;
+import evl.statement.phi.PhiStmt;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -25,9 +27,10 @@ import evl.function.FunctionHeader;
 import evl.knowledge.KnowStateVariableReadWrite;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
-import evl.statement.Assignment;
 import evl.statement.Statement;
-import evl.statement.VarDefStmt;
+import evl.statement.normal.Assignment;
+import evl.statement.normal.NormalStmt;
+import evl.statement.normal.VarDefStmt;
 import evl.variable.FuncVariable;
 import evl.variable.StateVariable;
 
@@ -124,6 +127,8 @@ public class StateVariableExtractor extends DefTraverser<Void, Void> {
   }
 }
 
+//FIXME what with expressions in phi?
+
 /**
  * Writes state variables back if a called function reads that variable. Reads state variables back in if a called
  * function writes that variable.
@@ -162,7 +167,7 @@ class FuncProtector extends StatementReplacer<FunctionHeader> {
   }
 
   @Override
-  protected List<Statement> visit(Evl obj, FunctionHeader param) {
+  protected List<NormalStmt> visit(Evl obj, FunctionHeader param) {
     if( obj instanceof FunctionHeader ) {
       assert ( param == null );
       param = (FunctionHeader) obj;
@@ -175,7 +180,7 @@ class FuncProtector extends StatementReplacer<FunctionHeader> {
   }
 
   @Override
-  protected List<Statement> visitStatement(Statement obj, FunctionHeader param) {
+  protected List<NormalStmt> visitNormalStmt(NormalStmt obj, FunctionHeader param) {
     FunctionHeader callee = getCallee(obj);
     if( callee != null ) {
       ElementInfo info = obj.getInfo();
@@ -194,7 +199,7 @@ class FuncProtector extends StatementReplacer<FunctionHeader> {
       // TODO only read back needed variables
       // TODO check if variable is ever read again
 
-      List<Statement> ret = new ArrayList<Statement>();
+      List<NormalStmt> ret = new ArrayList<NormalStmt>();
 
       for( StateVariable sv : writeBack ) {
         Assignment ass = new Assignment(info, new Reference(info, sv), new Reference(info, cache.get(sv)));
@@ -232,5 +237,10 @@ class FuncProtector extends StatementReplacer<FunctionHeader> {
         RError.err(ErrorType.Fatal, stmt.getInfo(), "In this phase is only one call per statement allowed");
         return null;
     }
+  }
+
+  @Override
+  protected List<NormalStmt> visitPhi(PhiStmt phi, BasicBlock in, FunctionHeader param) {
+    throw new UnsupportedOperationException("Not supported yet.");
   }
 }

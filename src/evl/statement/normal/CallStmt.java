@@ -1,10 +1,11 @@
-package evl.statement;
+package evl.statement.normal;
 
+import evl.statement.normal.NormalStmt;
 import common.ElementInfo;
 
 import evl.expression.reference.Reference;
 
-public class CallStmt extends Statement {
+public class CallStmt extends NormalStmt {
   private Reference call;
 
   public CallStmt(ElementInfo info, Reference call) {

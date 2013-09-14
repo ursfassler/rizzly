@@ -13,19 +13,21 @@ import evl.Evl;
 import evl.NullTraverser;
 import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
-import evl.cfg.CaseGoto;
-import evl.cfg.CaseGotoOpt;
-import evl.cfg.IfGoto;
+import evl.statement.bbend.CaseGoto;
+import evl.statement.bbend.CaseGotoOpt;
+import evl.statement.bbend.IfGoto;
 import evl.expression.Expression;
 import evl.expression.TypeCast;
 import evl.expression.reference.Reference;
+import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowSsaUsage;
 import evl.knowledge.KnowledgeBase;
-import evl.statement.Assignment;
-import evl.statement.CallStmt;
-import evl.statement.SsaGenerator;
+import evl.statement.normal.CallStmt;
+import evl.statement.normal.SsaGenerator;
 import evl.statement.Statement;
-import evl.statement.VarDefInitStmt;
+import evl.statement.normal.Assignment;
+import evl.statement.normal.VarDefInitStmt;
+import evl.statement.phi.PhiStmt;
 import evl.traverser.VariableReplacer;
 import evl.traverser.range.CaseRangeUpdater;
 import evl.traverser.range.RangeGetter;
@@ -34,6 +36,7 @@ import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.base.Range;
 import evl.variable.SsaVariable;
+import java.math.BigInteger;
 
 /**
  * Replaces variables after if/goto with a variable of a more narrow range
@@ -166,10 +169,12 @@ class Narrower extends DefTraverser<Void, Void> {
 class StmtUpdater extends NullTraverser<Boolean, Void> {
 
   private KnowledgeBase kb;
+  private KnowBaseItem kbi;
 
   public StmtUpdater(KnowledgeBase kb) {
     super();
     this.kb = kb;
+    kbi = kb.getEntry(KnowBaseItem.class);
   }
 
   @Override
@@ -185,6 +190,7 @@ class StmtUpdater extends NullTraverser<Boolean, Void> {
     }
     Range rtype = (Range) type;
     rtype = Range.narrow(rtype, (Range) obj.getVariable().getType().getRef());
+    rtype = kbi.getRangeType(rtype.getLow(), rtype.getHigh());  // get registred type
     if( obj.getVariable().getType().getRef() != rtype ) {
       obj.getVariable().getType().setRef(rtype);
       return true;
@@ -193,6 +199,36 @@ class StmtUpdater extends NullTraverser<Boolean, Void> {
     }
   }
 
+  @Override
+  protected Boolean visitPhiStmt(PhiStmt obj, Void param) {
+    Type type = obj.getVariable().getType().getRef();
+    if( !( type instanceof Range ) ) {
+      return false;   //TODO also check booleans and enums?
+    }
+    
+    BigInteger low = null;
+    BigInteger high = null;
+
+    for( BasicBlock in : obj.getInBB() ){
+      Range exprt = (Range) ExpressionTypeChecker.process(obj.getArg(in),kb);
+      if( (low == null) || (low.compareTo(exprt.getLow()) > 0) ){
+        low = exprt.getLow();
+      }
+      if( (high == null) || (high.compareTo(exprt.getHigh()) < 0) ){
+        high = exprt.getHigh();
+      }
+    }
+    
+    Range rtype = kbi.getRangeType(low, high);
+    
+    if( obj.getVariable().getType().getRef() != rtype ) {
+      obj.getVariable().getType().setRef(rtype);
+      return true;
+    } else {
+      return false;
+    }
+  }
+  
   @Override
   protected Boolean visitCallStmt(CallStmt obj, Void param) {
     // nothing to do since we do not produce a new value

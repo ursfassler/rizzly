@@ -14,8 +14,8 @@ import evl.Evl;
 import evl.NullTraverser;
 import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
-import evl.cfg.Goto;
-import evl.cfg.ReturnVoid;
+import evl.statement.bbend.Goto;
+import evl.statement.bbend.ReturnVoid;
 import evl.copy.Copy;
 import evl.expression.Expression;
 import evl.expression.reference.RefCall;
@@ -38,8 +38,9 @@ import evl.other.Interface;
 import evl.other.ListOfNamed;
 import evl.other.Named;
 import evl.other.Namespace;
-import evl.statement.CallStmt;
+import evl.statement.normal.CallStmt;
 import evl.statement.Statement;
+import evl.statement.normal.NormalStmt;
 import evl.variable.Variable;
 import fun.hfsm.State;
 
@@ -175,7 +176,7 @@ public class CompositionReduction extends NullTraverser<Named, Void> {
       ((FuncWithBody) impl).setBody(body);
 
       for (Endpoint con : conset) {
-        Statement call = makeCall(con, impl);
+        NormalStmt call = makeCall(con, impl);
         callsBb.getCode().add(call);
         //FIXME reimplement
 //        if (call instanceof ReturnExpr) {
@@ -188,7 +189,7 @@ public class CompositionReduction extends NullTraverser<Named, Void> {
     return ret;
   }
 
-  private Statement makeCall(Endpoint ep, FunctionBase func) {
+  private NormalStmt makeCall(Endpoint ep, FunctionBase func) {
     Reference ref = epToRef(ep);
     ref.getOffset().add(new RefName(ep.getInfo(), func.getName()));
 

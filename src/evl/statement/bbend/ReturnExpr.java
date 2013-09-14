@@ -1,4 +1,4 @@
-package evl.cfg;
+package evl.statement.bbend;
 
 import common.ElementInfo;
 

@@ -2,7 +2,7 @@ package evl.traverser.iocheck;
 
 import evl.DefTraverser;
 import evl.Evl;
-import evl.statement.Assignment;
+import evl.statement.normal.Assignment;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
 

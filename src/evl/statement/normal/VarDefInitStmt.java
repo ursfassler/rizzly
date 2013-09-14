@@ -1,11 +1,12 @@
-package evl.statement;
+package evl.statement.normal;
 
+import evl.statement.normal.NormalStmt;
 import common.ElementInfo;
 
 import evl.expression.Expression;
 import evl.variable.SsaVariable;
 
-public class VarDefInitStmt extends Statement implements SsaGenerator {
+public class VarDefInitStmt extends NormalStmt implements SsaGenerator {
   private SsaVariable variable;
   private Expression init;
 

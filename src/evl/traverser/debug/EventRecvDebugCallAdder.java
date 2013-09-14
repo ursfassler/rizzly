@@ -19,8 +19,9 @@ import evl.function.impl.FuncInputHandlerQuery;
 import evl.function.impl.FuncPrivateVoid;
 import evl.other.Named;
 import evl.other.NamedList;
-import evl.statement.CallStmt;
+import evl.statement.normal.CallStmt;
 import evl.statement.Statement;
+import evl.statement.normal.NormalStmt;
 
 /**
  * Inserts a message call whenever an event is received
@@ -69,12 +70,12 @@ public class EventRecvDebugCallAdder extends DefTraverser<Void, Integer> {
     assert ( param >= 0 );
     int numFunc = names.indexOf(obj.getName());
     assert ( numFunc >= 0 );
-    List<Statement> call = new ArrayList<Statement>();
+    List<NormalStmt> call = new ArrayList<NormalStmt>();
     call.add(makeCall(msgRecvFunc, numFunc, param));
     obj.getBody().insertCodeAfterEntry(call, "debucCall");
   }
 
-  private Statement makeCall(FunctionBase func, int numFunc, int numIface) {
+  private NormalStmt makeCall(FunctionBase func, int numFunc, int numIface) {
     // _sendMsg( numFunc, numIface );
     List<Expression> actParam = new ArrayList<Expression>();
     actParam.add(new Number(info, BigInteger.valueOf(numFunc)));

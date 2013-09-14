@@ -2,15 +2,22 @@ package evl.copy;
 
 import evl.Evl;
 import evl.NullTraverser;
-import evl.statement.Assignment;
-import evl.statement.CallStmt;
-import evl.statement.GetElementPtr;
-import evl.statement.LoadStmt;
-import evl.statement.StackMemoryAlloc;
+import evl.cfg.BasicBlock;
+import evl.statement.bbend.CaseGoto;
+import evl.statement.bbend.Goto;
+import evl.statement.bbend.IfGoto;
+import evl.statement.bbend.ReturnExpr;
+import evl.statement.bbend.ReturnVoid;
+import evl.statement.normal.CallStmt;
+import evl.statement.normal.GetElementPtr;
+import evl.statement.normal.LoadStmt;
+import evl.statement.normal.StackMemoryAlloc;
 import evl.statement.Statement;
-import evl.statement.StoreStmt;
-import evl.statement.VarDefInitStmt;
-import evl.statement.VarDefStmt;
+import evl.statement.normal.Assignment;
+import evl.statement.normal.StoreStmt;
+import evl.statement.normal.VarDefInitStmt;
+import evl.statement.normal.VarDefStmt;
+import evl.statement.phi.PhiStmt;
 
 public class CopyStatement extends NullTraverser<Statement, Void> {
   private CopyEvl cast;
@@ -63,6 +70,48 @@ public class CopyStatement extends NullTraverser<Statement, Void> {
   @Override
   protected Statement visitStackMemoryAlloc(StackMemoryAlloc obj, Void param) {
     return new StackMemoryAlloc(obj.getInfo(), cast.copy(obj.getVariable()));
+  }
+
+  @Override
+  protected Statement visitCaseGoto(CaseGoto obj, Void param) {
+    CaseGoto ret = new CaseGoto(obj.getInfo());
+    ret.setCondition(cast.copy(obj.getCondition()));
+    ret.getOption().addAll(cast.copy(obj.getOption()));
+    ret.setOtherwise(cast.copy(obj.getOtherwise()));
+    return ret;
+  }
+
+  @Override
+  protected Statement visitIfGoto(IfGoto obj, Void param) {
+    IfGoto ret = new IfGoto(obj.getInfo());
+    ret.setCondition(cast.copy(obj.getCondition()));
+    ret.setThenBlock(cast.copy(obj.getThenBlock()));
+    ret.setElseBlock(cast.copy(obj.getElseBlock()));
+    return ret;
+  }
+
+  @Override
+  protected Statement visitGoto(Goto obj, Void param) {
+    return new Goto(obj.getInfo(), cast.copy(obj.getTarget()));
+  }
+
+  @Override
+  protected Statement visitReturnExpr(ReturnExpr obj, Void param) {
+    return new ReturnExpr(obj.getInfo(), cast.copy(obj.getExpr()));
+  }
+
+  @Override
+  protected Statement visitReturnVoid(ReturnVoid obj, Void param) {
+    return new ReturnVoid(obj.getInfo());
+  }
+
+  @Override
+  protected Statement visitPhiStmt(PhiStmt obj, Void param) {
+    PhiStmt ret = new PhiStmt(obj.getInfo(), cast.copy(obj.getVariable()));
+    for (BasicBlock in : obj.getInBB()) {
+      ret.addArg(cast.copy(in), cast.copy(obj.getArg(in)));
+    }
+    return ret;
   }
 
 }

@@ -25,11 +25,13 @@ import evl.other.ImplElementary;
 import evl.other.Interface;
 import evl.other.ListOfNamed;
 import evl.other.Namespace;
-import evl.statement.CallStmt;
+import evl.statement.normal.CallStmt;
 import evl.statement.Statement;
-import evl.variable.FuncVariable;
+import evl.variable.Variable;
+import fun.statement.Block;
 
 public class SystemIfaceAdder extends NullTraverser<Void, Void> {
+
   public static final String IFACE_USE_NAME = "_system";
   public static final String IFACE_TYPE_NAME = "_System";
   public static final String DESTRUCT = "destruct";
@@ -80,7 +82,7 @@ public class SystemIfaceAdder extends NullTraverser<Void, Void> {
     FuncInputHandlerEvent ctor = makeFunc(CONSTRUCT);
     ArrayList<CompUse> compList = new ArrayList<CompUse>(obj.getComponent().getList());
     // FIXME this order may cause errors as it is not granted to be topological order
-    for (CompUse cuse : compList) {
+    for( CompUse cuse : compList ) {
       CallStmt call = makeCall(cuse, CONSTRUCT); // TODO correct link? Or should it be to the instance?
       ctor.getBody().getStatements().add(call);
     }
@@ -89,7 +91,7 @@ public class SystemIfaceAdder extends NullTraverser<Void, Void> {
     FuncInputHandlerEvent dtor = makeFunc(DESTRUCT);
     dtor.getBody().getStatements().add(makeCall(obj.getExitFunc()));
     Collections.reverse(compList);
-    for (CompUse cuse : compList) {
+    for( CompUse cuse : compList ) {
       CallStmt call = makeCall(cuse, DESTRUCT); // TODO correct link? Or should it be to the instance?
       dtor.getBody().getStatements().add(call);
     }
@@ -103,15 +105,15 @@ public class SystemIfaceAdder extends NullTraverser<Void, Void> {
   }
 
   private Statement makeCall(Reference ref) {
-    assert (ref.getOffset().isEmpty());
-    assert (ref.getLink() instanceof FunctionBase);
+    assert ( ref.getOffset().isEmpty() );
+    assert ( ref.getLink() instanceof FunctionBase );
     Reference call = new Reference(ref.getInfo(), ref.getLink());
     call.getOffset().add(new RefCall(info, new ArrayList<Expression>()));
     return new CallStmt(info, call);
   }
 
   private FuncInputHandlerEvent makeFunc(String funcname) {
-    FuncInputHandlerEvent rfunc = new FuncInputHandlerEvent(info, funcname, new ListOfNamed<FuncVariable>());
+    FuncInputHandlerEvent rfunc = new FuncInputHandlerEvent(info, funcname, new ListOfNamed<Variable>());
     rfunc.setBody(new Block(info));
     return rfunc;
   }
@@ -123,5 +125,4 @@ public class SystemIfaceAdder extends NullTraverser<Void, Void> {
     fref.getOffset().add(new RefCall(info, new ArrayList<Expression>()));
     return new CallStmt(info, fref);
   }
-
 }

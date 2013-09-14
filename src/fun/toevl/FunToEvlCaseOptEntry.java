@@ -3,7 +3,7 @@ package fun.toevl;
 import java.util.Map;
 
 import evl.Evl;
-import evl.cfg.CaseOptEntry;
+import evl.statement.bbend.CaseOptEntry;
 import evl.expression.Expression;
 import fun.Fun;
 import fun.NullTraverser;
@@ -38,12 +38,12 @@ public class FunToEvlCaseOptEntry extends NullTraverser<CaseOptEntry, Void> {
 
   @Override
   protected CaseOptEntry visitCaseOptRange(CaseOptRange obj, Void param) {
-    return new evl.cfg.CaseOptRange(obj.getInfo(), (Expression) fta.traverse(obj.getStart(), null), (Expression) fta.traverse(obj.getEnd(), null));
+    return new evl.statement.bbend.CaseOptRange(obj.getInfo(), (Expression) fta.traverse(obj.getStart(), null), (Expression) fta.traverse(obj.getEnd(), null));
   }
 
   @Override
   protected CaseOptEntry visitCaseOptValue(CaseOptValue obj, Void param) {
-    return new evl.cfg.CaseOptValue(obj.getInfo(), (Expression) fta.traverse(obj.getValue(), null));
+    return new evl.statement.bbend.CaseOptValue(obj.getInfo(), (Expression) fta.traverse(obj.getValue(), null));
   }
 
 }

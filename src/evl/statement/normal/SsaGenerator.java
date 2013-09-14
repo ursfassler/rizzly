@@ -1,4 +1,4 @@
-package evl.statement;
+package evl.statement.normal;
 
 import evl.variable.SsaVariable;
 

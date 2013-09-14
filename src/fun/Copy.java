@@ -333,7 +333,7 @@ class CopyFun extends Traverser<Fun, Void> {
 
   @Override
   protected Fun visitTransition(Transition obj, Void param) {
-    Transition ret = new Transition(obj.getInfo());
+    Transition ret = new Transition(obj.getInfo(),obj.getName());
     ret.setSrc(copy(obj.getSrc()));
     ret.setDst(copy(obj.getDst()));
     ret.setEvent(copy(obj.getEvent()));

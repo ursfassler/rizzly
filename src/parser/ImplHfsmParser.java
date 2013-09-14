@@ -132,7 +132,7 @@ public class ImplHfsmParser extends ImplBaseParser {
     ElementInfo info = expect(TokenType.TO).getInfo();
     Reference dst = parseNameRef();
 
-    Transition ret = new Transition(info);
+    Transition ret = new Transition(info,"tr" + info.getLine() + "_" + info.getRow());
     ret.setSrc(src);
     ret.setDst(dst);
 

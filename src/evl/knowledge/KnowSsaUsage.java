@@ -11,6 +11,7 @@ import evl.statement.Statement;
 import evl.variable.SsaVariable;
 
 public class KnowSsaUsage extends KnowledgeEntry {
+
   private KnowledgeBase kb;
   final private Map<SsaVariable, Set<Statement>> use = new HashMap<SsaVariable, Set<Statement>>();
 
@@ -20,10 +21,10 @@ public class KnowSsaUsage extends KnowledgeEntry {
   }
 
   public Set<Statement> get(SsaVariable var) {
-    if (!use.containsKey(var)) {
+    if( !use.containsKey(var) ) {
       update();
     }
-    assert (use.containsKey(var));
+    assert ( use.containsKey(var) );
     return use.get(var);
   }
 
@@ -32,10 +33,10 @@ public class KnowSsaUsage extends KnowledgeEntry {
     UseGetter getter = new UseGetter(use);
     getter.traverse(kb.getRoot(), null);
   }
-
 }
 
 class UseGetter extends DefTraverser<Void, Statement> {
+
   final private Map<SsaVariable, Set<Statement>> use;
 
   public UseGetter(Map<SsaVariable, Set<Statement>> use) {
@@ -45,14 +46,14 @@ class UseGetter extends DefTraverser<Void, Statement> {
 
   @Override
   protected Void visitStatement(Statement obj, Statement param) {
-    assert (param == null);
+    assert ( param == null );
     return super.visitStatement(obj, obj);
   }
 
   @Override
   protected Void visitSsaVariable(SsaVariable obj, Statement param) {
     Set<Statement> stmts = use.get(obj);
-    if (stmts == null) {
+    if( stmts == null ) {
       stmts = new HashSet<Statement>();
       use.put(obj, stmts);
     }
@@ -61,10 +62,11 @@ class UseGetter extends DefTraverser<Void, Statement> {
 
   @Override
   protected Void visitReference(Reference obj, Statement param) {
-    if (obj.getLink() instanceof SsaVariable) {
+    if( obj.getLink() instanceof SsaVariable ) {
+      assert ( param != null );
       SsaVariable var = (SsaVariable) obj.getLink();
       Set<Statement> stmts = use.get(var);
-      if (stmts == null) {
+      if( stmts == null ) {
         stmts = new HashSet<Statement>();
         use.put(var, stmts);
       }
@@ -73,5 +75,4 @@ class UseGetter extends DefTraverser<Void, Statement> {
     super.visitReference(obj, param);
     return null;
   }
-
 }

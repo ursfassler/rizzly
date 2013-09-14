@@ -140,7 +140,7 @@ class SimpleGetter extends NullTraverser<Boolean, Void> {
 
   @Override
   protected Boolean visitBoolValue(BoolValue obj, Void param) {
-    throw new UnsupportedOperationException("Not supported yet");
+    return true;
   }
 
   @Override

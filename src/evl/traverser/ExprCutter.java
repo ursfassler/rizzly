@@ -11,11 +11,11 @@ import evl.Evl;
 import evl.NullTraverser;
 import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
-import evl.cfg.CaseGoto;
-import evl.cfg.Goto;
-import evl.cfg.IfGoto;
-import evl.cfg.ReturnExpr;
-import evl.cfg.ReturnVoid;
+import evl.statement.bbend.CaseGoto;
+import evl.statement.bbend.Goto;
+import evl.statement.bbend.IfGoto;
+import evl.statement.bbend.ReturnExpr;
+import evl.statement.bbend.ReturnVoid;
 import evl.composition.ImplComposition;
 import evl.expression.ArithmeticOp;
 import evl.expression.BoolValue;
@@ -36,15 +36,15 @@ import evl.other.ImplElementary;
 import evl.other.Named;
 import evl.other.NamedList;
 import evl.other.Namespace;
-import evl.statement.Assignment;
-import evl.statement.CallStmt;
-import evl.statement.GetElementPtr;
-import evl.statement.LoadStmt;
-import evl.statement.StackMemoryAlloc;
-import evl.statement.Statement;
-import evl.statement.StoreStmt;
-import evl.statement.VarDefInitStmt;
-import evl.statement.VarDefStmt;
+import evl.statement.normal.CallStmt;
+import evl.statement.normal.GetElementPtr;
+import evl.statement.normal.LoadStmt;
+import evl.statement.normal.StackMemoryAlloc;
+import evl.statement.normal.Assignment;
+import evl.statement.normal.NormalStmt;
+import evl.statement.normal.StoreStmt;
+import evl.statement.normal.VarDefInitStmt;
+import evl.statement.normal.VarDefStmt;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.type.Type;
 import evl.type.TypeRef;
@@ -132,7 +132,7 @@ public class ExprCutter extends NullTraverser<Void, Void> {
 }
 
 
-class StmtTraverser extends NullTraverser<Void, List<Statement>> {
+class StmtTraverser extends NullTraverser<Void, List<NormalStmt>> {
 
   private KnowledgeBase kb;
   private Cutter cutter;
@@ -145,16 +145,16 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
   }
 
   @Override
-  protected Void visitDefault(Evl obj, List<Statement> param) {
+  protected Void visitDefault(Evl obj, List<NormalStmt> param) {
     throw new UnsupportedOperationException("Not supported yet: " + obj.getClass().getCanonicalName());
   }
 
   @Override
-  protected Void visitBasicBlock(BasicBlock obj, List<Statement> param) {
+  protected Void visitBasicBlock(BasicBlock obj, List<NormalStmt> param) {
     // we do not check Phi statements since they can only reference variables
 
-    List<Statement> sl = new ArrayList<Statement>();
-    for( Statement stmt : obj.getCode() ) {
+    List<NormalStmt> sl = new ArrayList<NormalStmt>();
+    for( NormalStmt stmt : obj.getCode() ) {
       visit(stmt, sl);
       sl.add(stmt);
     }
@@ -167,13 +167,13 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
   }
 
   @Override
-  protected Void visitCallStmt(CallStmt obj, List<Statement> param) {
+  protected Void visitCallStmt(CallStmt obj, List<NormalStmt> param) {
     obj.setCall((Reference) cutter.traverse(obj.getCall(), param));
     return null;
   }
 
   @Override
-  protected Void visitAssignment(Assignment obj, List<Statement> param) {
+  protected Void visitAssignment(Assignment obj, List<NormalStmt> param) {
     obj.setRight(cutter.traverse(obj.getRight(), param));
     visit(obj.getLeft(), param);
 
@@ -189,20 +189,20 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
   }
 
   @Override
-  protected Void visitGetElementPtr(GetElementPtr obj, List<Statement> param) {
+  protected Void visitGetElementPtr(GetElementPtr obj, List<NormalStmt> param) {
     obj.setAddress((Reference) cutter.traverse(obj.getAddress(), param));
 //    boolean ls = KnowSimpleExpr.isSimple(obj.getAddress());
     return null;
   }
 
   @Override
-  protected Void visitLoadStmt(LoadStmt obj, List<Statement> param) {
+  protected Void visitLoadStmt(LoadStmt obj, List<NormalStmt> param) {
     obj.setAddress((Reference) cutter.traverse(obj.getAddress(), param));
     return null;
   }
 
   @Override
-  protected Void visitStoreStmt(StoreStmt obj, List<Statement> param) {
+  protected Void visitStoreStmt(StoreStmt obj, List<NormalStmt> param) {
     obj.setAddress((Reference) cutter.traverse(obj.getAddress(), param));
     Expression expr = cutter.traverse(obj.getExpr(), param);
     if( !KnowSimpleExpr.isSimple(expr) ) {
@@ -214,18 +214,18 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
   }
 
   @Override
-  protected Void visitStackMemoryAlloc(StackMemoryAlloc obj, List<Statement> param) {
+  protected Void visitStackMemoryAlloc(StackMemoryAlloc obj, List<NormalStmt> param) {
     return null;
   }
 
   @Override
-  protected Void visitReference(Reference obj, List<Statement> param) {
+  protected Void visitReference(Reference obj, List<NormalStmt> param) {
     visitItr(obj.getOffset(), param);
     return null;
   }
 
   @Override
-  protected Void visitRefIndex(RefIndex obj, List<Statement> param) {
+  protected Void visitRefIndex(RefIndex obj, List<NormalStmt> param) {
     if( !KnowSimpleExpr.isSimple(obj.getIndex()) ) {
       SsaVariable var = cutter.extract(obj.getIndex(), param);
       obj.setIndex(new Reference(obj.getInfo(), var));
@@ -234,7 +234,7 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
   }
 
   @Override
-  protected Void visitRefCall(RefCall obj, List<Statement> param) {
+  protected Void visitRefCall(RefCall obj, List<NormalStmt> param) {
     super.visitRefCall(obj, param);
     for( int i = 0; i < obj.getActualParameter().size(); i++ ) {
       Expression expr = obj.getActualParameter().get(i);
@@ -247,12 +247,12 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
   }
 
   @Override
-  protected Void visitRefName(RefName obj, List<Statement> param) {
+  protected Void visitRefName(RefName obj, List<NormalStmt> param) {
     return null;
   }
 
   @Override
-  protected Void visitCaseGoto(CaseGoto obj, List<Statement> param) {
+  protected Void visitCaseGoto(CaseGoto obj, List<NormalStmt> param) {
     if( !KnowSimpleExpr.isSimple(obj.getCondition()) ) {
       SsaVariable var = cutter.extract(obj.getCondition(), param);
       obj.setCondition(new Reference(obj.getInfo(), var));
@@ -262,7 +262,7 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
   }
 
   @Override
-  protected Void visitIfGoto(IfGoto obj, List<Statement> param) {
+  protected Void visitIfGoto(IfGoto obj, List<NormalStmt> param) {
     if( !KnowSimpleExpr.isSimple(obj.getCondition()) ) {
       SsaVariable var = cutter.extract(obj.getCondition(), param);
       obj.setCondition(new Reference(obj.getInfo(), var));
@@ -272,34 +272,34 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
   }
 
   @Override
-  protected Void visitGoto(Goto obj, List<Statement> param) {
+  protected Void visitGoto(Goto obj, List<NormalStmt> param) {
     return null;
   }
 
   @Override
-  protected Void visitVarDef(VarDefStmt obj, List<Statement> param) {
+  protected Void visitVarDef(VarDefStmt obj, List<NormalStmt> param) {
     return null;
   }
 
   @Override
-  protected Void visitVarDefInitStmt(VarDefInitStmt obj, List<Statement> param) {
+  protected Void visitVarDefInitStmt(VarDefInitStmt obj, List<NormalStmt> param) {
     obj.setInit(cutter.traverse(obj.getInit(), param));
     return null;
   }
 
   @Override
-  protected Void visitReturnExpr(ReturnExpr obj, List<Statement> param) {
+  protected Void visitReturnExpr(ReturnExpr obj, List<NormalStmt> param) {
     obj.setExpr(cutter.traverse(obj.getExpr(), param));
     return null;
   }
 
   @Override
-  protected Void visitReturnVoid(ReturnVoid obj, List<Statement> param) {
+  protected Void visitReturnVoid(ReturnVoid obj, List<NormalStmt> param) {
     return null;
   }
 }
 
-class Cutter extends ExprReplacer<List<Statement>> {
+class Cutter extends ExprReplacer<List<NormalStmt>> {
 
   private KnowledgeBase kb;
   private CallDetector cd = new CallDetector();
@@ -323,7 +323,7 @@ class Cutter extends ExprReplacer<List<Statement>> {
     return type;
   }
 
-  SsaVariable extract(Expression obj, List<Statement> param) {
+  SsaVariable extract(Expression obj, List<NormalStmt> param) {
     ElementInfo info = obj.getInfo();
     Type type = getType(obj);
     SsaVariable var = new SsaVariable(info, NameFactory.getNew(), new TypeRef(obj.getInfo(), type));
@@ -333,7 +333,7 @@ class Cutter extends ExprReplacer<List<Statement>> {
 
 
   @Override
-  protected Expression visitReference(Reference obj, List<Statement> param) {
+  protected Expression visitReference(Reference obj, List<NormalStmt> param) {
     List<RefItem> olist = new ArrayList<RefItem>(obj.getOffset());
     obj.getOffset().clear();
     Reference ret = obj;
@@ -350,7 +350,7 @@ class Cutter extends ExprReplacer<List<Statement>> {
   }
 
   @Override
-  protected Expression visitRefIndex(RefIndex obj, List<Statement> param) {
+  protected Expression visitRefIndex(RefIndex obj, List<NormalStmt> param) {
     super.visitRefIndex(obj, param);
     if( cd.traverse(obj.getIndex(), null) ) {
       SsaVariable var = extract(obj.getIndex(), param);
@@ -360,7 +360,7 @@ class Cutter extends ExprReplacer<List<Statement>> {
   }
 
   @Override
-  protected Expression visitRefCall(RefCall obj, List<Statement> param) {
+  protected Expression visitRefCall(RefCall obj, List<NormalStmt> param) {
     super.visitRefCall(obj, param);
     for( int i = 0; i < obj.getActualParameter().size(); i++ ) {
       Expression expr = obj.getActualParameter().get(i);
@@ -373,12 +373,12 @@ class Cutter extends ExprReplacer<List<Statement>> {
   }
 
   @Override
-  protected Expression visitRefName(RefName obj, List<Statement> param) {
+  protected Expression visitRefName(RefName obj, List<NormalStmt> param) {
     return super.visitRefName(obj, param);
   }
 
   @Override
-  protected Expression visitArithmeticOp(ArithmeticOp obj, List<Statement> param) {
+  protected Expression visitArithmeticOp(ArithmeticOp obj, List<NormalStmt> param) {
     obj.setLeft(visit(obj.getLeft(), param));
     obj.setRight(visit(obj.getRight(), param));
 
@@ -388,7 +388,7 @@ class Cutter extends ExprReplacer<List<Statement>> {
   }
 
   @Override
-  protected Expression visitRelation(Relation obj, List<Statement> param) {
+  protected Expression visitRelation(Relation obj, List<NormalStmt> param) {
     obj.setLeft(visit(obj.getLeft(), param));
     obj.setRight(visit(obj.getRight(), param));
     SsaVariable var = extract(obj, param);

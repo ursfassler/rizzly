@@ -1,5 +1,7 @@
 package evl.cfg;
 
+import evl.statement.bbend.ReturnVoid;
+import evl.statement.bbend.Goto;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -12,7 +14,8 @@ import util.ssa.BbEdge;
 import common.ElementInfo;
 
 import evl.EvlBase;
-import evl.statement.Statement;
+import evl.statement.bbend.BasicBlockEnd;
+import evl.statement.normal.NormalStmt;
 
 public class BasicBlockList extends EvlBase {
   private BasicBlock entry;
@@ -33,7 +36,7 @@ public class BasicBlockList extends EvlBase {
     exit.setEnd(new ReturnVoid(info));
   }
 
-  public void insertCodeAfterEntry( Collection<Statement> code, String bbName ){
+  public void insertCodeAfterEntry( Collection<NormalStmt> code, String bbName ){
     BasicBlock bb = new BasicBlock(getInfo(), bbName);
     bb.getCode().addAll(code);
     bb.setEnd(entry.getEnd());

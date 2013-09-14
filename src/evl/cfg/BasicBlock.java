@@ -7,13 +7,15 @@ import common.ElementInfo;
 
 import evl.EvlBase;
 import evl.other.Named;
-import evl.statement.Statement;
+import evl.statement.bbend.BasicBlockEnd;
+import evl.statement.normal.NormalStmt;
+import evl.statement.phi.PhiStmt;
 
 // Named since Phi statements references basic blocks
 public class BasicBlock extends EvlBase implements Named {
   private String name;
   final private List<PhiStmt> phi = new ArrayList<PhiStmt>();
-  final private List<Statement> code = new ArrayList<Statement>();
+  final private List<NormalStmt> code = new ArrayList<NormalStmt>();
   private BasicBlockEnd end = null;
 
   public BasicBlock(ElementInfo info, String name) {
@@ -31,7 +33,7 @@ public class BasicBlock extends EvlBase implements Named {
     this.name = name;
   }
 
-  public List<Statement> getCode() {
+  public List<NormalStmt> getCode() {
     return code;
   }
 

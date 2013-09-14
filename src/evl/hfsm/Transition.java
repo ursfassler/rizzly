@@ -8,26 +8,32 @@ import evl.cfg.BasicBlockList;
 import evl.expression.Expression;
 import evl.other.IfaceUse;
 import evl.other.ListOfNamed;
-import evl.variable.FuncVariable;
+import evl.variable.Variable;
 
 public class Transition extends StateItem {
+  private String name;
   private State src;
   private State dst;
   private IfaceUse eventIface;
   private String eventFunc;
   private Expression guard;
-  final private ListOfNamed<FuncVariable> param;
+  final private ListOfNamed<Variable> param;
   private BasicBlockList body;
 
-  public Transition(ElementInfo info, State src, State dst, IfaceUse eventIface, String eventFunc, Expression guard, Collection<FuncVariable> param, BasicBlockList body) {
+  public Transition(ElementInfo info, String name, State src, State dst, IfaceUse eventIface, String eventFunc, Expression guard, Collection<Variable> param, BasicBlockList body) {
     super(info);
+    this.name = name;
     this.src = src;
     this.dst = dst;
     this.eventIface = eventIface;
     this.eventFunc = eventFunc;
     this.guard = guard;
-    this.param = new ListOfNamed<FuncVariable>(param);
+    this.param = new ListOfNamed<Variable>(param);
     this.body = body;
+  }
+
+  public String getName() {
+    return name;
   }
 
   public State getSrc() {
@@ -70,7 +76,7 @@ public class Transition extends StateItem {
     this.eventFunc = eventFunc;
   }
 
-  public ListOfNamed<FuncVariable> getParam() {
+  public ListOfNamed<Variable> getParam() {
     return param;
   }
 

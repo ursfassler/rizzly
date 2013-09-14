@@ -15,8 +15,8 @@ import java.util.Set;
 
 import util.Pair;
 import evl.cfg.BasicBlock;
-import evl.cfg.PhiStmt;
 import evl.function.FuncWithBody;
+import evl.statement.phi.PhiStmt;
 import evl.type.Type;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;

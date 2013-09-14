@@ -8,8 +8,8 @@ import java.util.Set;
 import evl.DefTraverser;
 import evl.expression.reference.Reference;
 import evl.function.FunctionHeader;
-import evl.statement.Assignment;
 import evl.statement.Statement;
+import evl.statement.normal.Assignment;
 import evl.variable.StateVariable;
 
 public class KnowStateVariableReadWrite extends KnowledgeEntry {

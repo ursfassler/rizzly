@@ -1,12 +1,13 @@
-package evl.cfg;
+package evl.statement.bbend;
 
 import java.util.Set;
 
 import common.ElementInfo;
 
-import evl.EvlBase;
+import evl.cfg.BasicBlock;
+import evl.statement.Statement;
 
-abstract public class BasicBlockEnd extends EvlBase {
+abstract public class BasicBlockEnd extends Statement {
   public BasicBlockEnd(ElementInfo info) {
     super(info);
   }

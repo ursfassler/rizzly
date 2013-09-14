@@ -6,6 +6,7 @@
 static R_0_100 next;
 
 void inst_out_foo(R_0_100 x){
+  x = x % 0x7f;  //TODO generate header file which does this or find nice way to handle such cases
   printf( "%i\n", x );
   if( x != next ){
     exit(-1);

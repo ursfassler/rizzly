@@ -1,5 +1,7 @@
-package evl.statement;
+package evl.statement.normal;
 
+import evl.statement.normal.SsaGenerator;
+import evl.statement.normal.NormalStmt;
 import common.ElementInfo;
 
 import evl.expression.reference.Reference;
@@ -9,11 +11,11 @@ import evl.variable.SsaVariable;
  *
  * @author urs
  */
-public class LoadStmt extends Statement implements SsaGenerator {
+public class GetElementPtr extends NormalStmt implements SsaGenerator {
   private SsaVariable variable;
   private Reference address;
-
-  public LoadStmt(ElementInfo info, SsaVariable variable, Reference address) {
+ 
+  public GetElementPtr(ElementInfo info, SsaVariable variable, Reference address) {
     super(info);
     this.variable = variable;
     this.address = address;
@@ -40,4 +42,6 @@ public class LoadStmt extends Statement implements SsaGenerator {
   public String toString() {
     return variable + " := load(" + address + ")";
   }
+  
+  
 }

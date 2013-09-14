@@ -2,9 +2,9 @@ package evl.copy;
 
 import evl.Evl;
 import evl.NullTraverser;
-import evl.cfg.CaseOptEntry;
-import evl.cfg.CaseOptRange;
-import evl.cfg.CaseOptValue;
+import evl.statement.bbend.CaseOptEntry;
+import evl.statement.bbend.CaseOptRange;
+import evl.statement.bbend.CaseOptValue;
 
 public class CopyCaseOptEntry extends NullTraverser<CaseOptEntry, Void> {
   private CopyEvl cast;

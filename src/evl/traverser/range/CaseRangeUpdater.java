@@ -6,9 +6,9 @@ import java.util.Map;
 
 import evl.Evl;
 import evl.NullTraverser;
-import evl.cfg.CaseOptEntry;
-import evl.cfg.CaseOptRange;
-import evl.cfg.CaseOptValue;
+import evl.statement.bbend.CaseOptEntry;
+import evl.statement.bbend.CaseOptRange;
+import evl.statement.bbend.CaseOptValue;
 import evl.expression.Expression;
 import evl.expression.Number;
 import evl.knowledge.KnowBaseItem;

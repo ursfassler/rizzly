@@ -25,7 +25,7 @@ public class CopyStateItem extends NullTraverser<StateItem, Void> {
 //    State dst = cast.copy(obj.getDstS());
     State src = obj.getSrc();  //TODO correct?
     State dst = obj.getDst();
-    return new Transition(obj.getInfo(), src, dst, obj.getEventIface(), obj.getEventFunc(), cast.copy(obj.getGuard()), cast.copy(obj.getParam().getList()), cast.copy(obj.getBody()));
+    return new Transition(obj.getInfo(), obj.getName(), src, dst, obj.getEventIface(), obj.getEventFunc(), cast.copy(obj.getGuard()), cast.copy(obj.getParam().getList()), cast.copy(obj.getBody()));
   }
 
 }

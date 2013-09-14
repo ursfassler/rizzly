@@ -7,15 +7,14 @@ import common.Direction;
 
 import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
-import evl.cfg.CaseGoto;
-import evl.cfg.CaseGotoOpt;
-import evl.cfg.CaseOptRange;
-import evl.cfg.CaseOptValue;
-import evl.cfg.Goto;
-import evl.cfg.IfGoto;
-import evl.cfg.PhiStmt;
-import evl.cfg.ReturnExpr;
-import evl.cfg.ReturnVoid;
+import evl.statement.bbend.CaseGoto;
+import evl.statement.bbend.CaseGotoOpt;
+import evl.statement.bbend.CaseOptRange;
+import evl.statement.bbend.CaseOptValue;
+import evl.statement.bbend.Goto;
+import evl.statement.bbend.IfGoto;
+import evl.statement.bbend.ReturnExpr;
+import evl.statement.bbend.ReturnVoid;
 import evl.composition.Connection;
 import evl.composition.EndpointSelf;
 import evl.composition.EndpointSub;
@@ -23,6 +22,7 @@ import evl.composition.ImplComposition;
 import evl.expression.ArithmeticOp;
 import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
+import evl.expression.Expression;
 import evl.expression.Number;
 import evl.expression.Relation;
 import evl.expression.StringValue;
@@ -56,14 +56,15 @@ import evl.other.Named;
 import evl.other.NamedList;
 import evl.other.Namespace;
 import evl.other.RizzlyProgram;
-import evl.statement.Assignment;
-import evl.statement.CallStmt;
-import evl.statement.GetElementPtr;
-import evl.statement.LoadStmt;
-import evl.statement.StackMemoryAlloc;
-import evl.statement.StoreStmt;
-import evl.statement.VarDefInitStmt;
-import evl.statement.VarDefStmt;
+import evl.statement.normal.Assignment;
+import evl.statement.normal.CallStmt;
+import evl.statement.normal.GetElementPtr;
+import evl.statement.normal.LoadStmt;
+import evl.statement.normal.StackMemoryAlloc;
+import evl.statement.normal.StoreStmt;
+import evl.statement.normal.VarDefInitStmt;
+import evl.statement.normal.VarDefStmt;
+import evl.statement.phi.PhiStmt;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
@@ -320,7 +321,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitNamedElement(NamedElement obj, P param) {
-    visit(obj.getType(),param);
+    visit(obj.getType(), param);
     return null;
   }
 
@@ -418,30 +419,30 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitFuncInputHandlerEvent(FuncInputHandlerEvent obj, P param) {
     visitItr(obj.getParam(), param);
-    visit( obj.getBody(), param);
+    visit(obj.getBody(), param);
     return null;
   }
 
   @Override
   protected R visitFuncInputHandlerQuery(FuncInputHandlerQuery obj, P param) {
     visitItr(obj.getParam(), param);
-    visit( obj.getRet(), param);
-    visit( obj.getBody(), param);
+    visit(obj.getRet(), param);
+    visit(obj.getBody(), param);
     return null;
   }
 
   @Override
   protected R visitFuncPrivateVoid(FuncPrivateVoid obj, P param) {
     visitItr(obj.getParam(), param);
-    visit( obj.getBody(), param);
+    visit(obj.getBody(), param);
     return null;
   }
 
   @Override
   protected R visitFuncPrivateRet(FuncPrivateRet obj, P param) {
     visitItr(obj.getParam(), param);
-    visit( obj.getRet(), param);
-    visit( obj.getBody(), param);
+    visit(obj.getRet(), param);
+    visit(obj.getBody(), param);
     return null;
   }
 
@@ -454,38 +455,38 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitHfsmQueryFunction(HfsmQueryFunction obj, P param) {
     visitItr(obj.getParam(), param);
-    visit( obj.getRet(), param);
-    visit( obj.getBody(), param);
+    visit(obj.getRet(), param);
+    visit(obj.getBody(), param);
     return null;
   }
 
   @Override
   protected R visitFuncProtoRet(FuncProtoRet obj, P param) {
     visitItr(obj.getParam(), param);
-    visit( obj.getRet(), param);
+    visit(obj.getRet(), param);
     return null;
   }
 
   @Override
   protected R visitFuncGlobal(FuncGlobal obj, P param) {
     visitItr(obj.getParam(), param);
-    visit( obj.getRet(), param);
-    visit( obj.getBody(), param);
+    visit(obj.getRet(), param);
+    visit(obj.getBody(), param);
     return null;
   }
 
   @Override
   protected R visitFuncSubHandlerQuery(FuncSubHandlerQuery obj, P param) {
     visitItr(obj.getParam(), param);
-    visit( obj.getRet(), param);
-    visit( obj.getBody(), param);
+    visit(obj.getRet(), param);
+    visit(obj.getBody(), param);
     return null;
   }
 
   @Override
   protected R visitFuncSubHandlerEvent(FuncSubHandlerEvent obj, P param) {
     visitItr(obj.getParam(), param);
-    visit( obj.getBody(), param);
+    visit(obj.getBody(), param);
     return null;
   }
 
@@ -530,6 +531,11 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitPhiStmt(PhiStmt obj, P param) {
     visit(obj.getVariable(), param);
+    for( BasicBlock in : obj.getInBB() ) {
+      Expression expr = obj.getArg(in);
+      assert(expr != null);
+      visit(expr, param);
+    }
     return null;
   }
 

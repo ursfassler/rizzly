@@ -1,5 +1,6 @@
 package evl.traverser;
 
+import common.ElementInfo;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
@@ -8,19 +9,20 @@ import evl.DefTraverser;
 import evl.Evl;
 import evl.NullTraverser;
 import evl.cfg.BasicBlock;
-import evl.cfg.CaseGoto;
-import evl.cfg.Goto;
-import evl.cfg.IfGoto;
-import evl.cfg.PhiStmt;
-import evl.cfg.ReturnExpr;
-import evl.cfg.ReturnVoid;
+import evl.statement.bbend.CaseGoto;
+import evl.statement.bbend.Goto;
+import evl.statement.bbend.IfGoto;
+import evl.statement.bbend.ReturnExpr;
+import evl.statement.bbend.ReturnVoid;
 import evl.expression.reference.RefItem;
 import evl.expression.reference.Reference;
-import evl.statement.Assignment;
-import evl.statement.CallStmt;
-import evl.statement.VarDefInitStmt;
-import evl.statement.VarDefStmt;
+import evl.statement.normal.Assignment;
+import evl.statement.normal.CallStmt;
+import evl.statement.normal.VarDefInitStmt;
+import evl.statement.normal.VarDefStmt;
+import evl.statement.phi.PhiStmt;
 import evl.variable.SsaVariable;
+import evl.variable.Variable;
 
 public class VariableReplacer extends NullTraverser<Boolean, Void> {
 
@@ -113,8 +115,9 @@ public class VariableReplacer extends NullTraverser<Boolean, Void> {
   protected Boolean visitPhiStmt(PhiStmt obj, Void param) {
     //TODO use exprVarRepl?
     for( BasicBlock in : new ArrayList<BasicBlock>(obj.getInBB()) ) {
-      if( obj.getArg(in) == exprVarRepl.getOld() ) {
-        obj.addArg(in, exprVarRepl.getReplacement());
+      Variable var = (Variable) ((Reference) obj.getArg(in)).getLink();
+      if( var == exprVarRepl.getOld() ) {
+        obj.addArg(in, new Reference(new ElementInfo(), exprVarRepl.getReplacement()));
       }
     }
     return obj.getVariable() != exprVarRepl.getOld();

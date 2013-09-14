@@ -1,19 +1,17 @@
 package evl;
 
 import evl.cfg.BasicBlock;
-import evl.cfg.BasicBlockEnd;
 import evl.cfg.BasicBlockList;
-import evl.cfg.CaseGoto;
-import evl.cfg.CaseGotoOpt;
-import evl.cfg.CaseOptEntry;
-import evl.cfg.CaseOptRange;
-import evl.cfg.CaseOptValue;
-import evl.cfg.Goto;
-import evl.cfg.IfGoto;
-import evl.cfg.PhiStmt;
-import evl.cfg.Return;
-import evl.cfg.ReturnExpr;
-import evl.cfg.ReturnVoid;
+import evl.statement.bbend.CaseGoto;
+import evl.statement.bbend.CaseGotoOpt;
+import evl.statement.bbend.CaseOptEntry;
+import evl.statement.bbend.CaseOptRange;
+import evl.statement.bbend.CaseOptValue;
+import evl.statement.bbend.Goto;
+import evl.statement.bbend.IfGoto;
+import evl.statement.bbend.Return;
+import evl.statement.bbend.ReturnExpr;
+import evl.statement.bbend.ReturnVoid;
 import evl.composition.Connection;
 import evl.composition.Endpoint;
 import evl.composition.EndpointSelf;
@@ -61,15 +59,18 @@ import evl.other.Named;
 import evl.other.NamedList;
 import evl.other.Namespace;
 import evl.other.RizzlyProgram;
-import evl.statement.Assignment;
-import evl.statement.CallStmt;
-import evl.statement.GetElementPtr;
-import evl.statement.LoadStmt;
-import evl.statement.StackMemoryAlloc;
+import evl.statement.normal.CallStmt;
+import evl.statement.normal.GetElementPtr;
+import evl.statement.normal.LoadStmt;
+import evl.statement.normal.StackMemoryAlloc;
 import evl.statement.Statement;
-import evl.statement.StoreStmt;
-import evl.statement.VarDefInitStmt;
-import evl.statement.VarDefStmt;
+import evl.statement.bbend.BasicBlockEnd;
+import evl.statement.normal.Assignment;
+import evl.statement.normal.NormalStmt;
+import evl.statement.normal.StoreStmt;
+import evl.statement.normal.VarDefInitStmt;
+import evl.statement.normal.VarDefStmt;
+import evl.statement.phi.PhiStmt;
 import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
@@ -124,8 +125,6 @@ public abstract class Traverser<R, P> {
       return visitFunctionBase((FunctionBase) obj, param);
     } else if( obj instanceof Expression ) {
       return visitExpression((Expression) obj, param);
-    } else if( obj instanceof BasicBlockEnd ) {
-      return visitBasicBlockEnd((BasicBlockEnd) obj, param);
     } else if( obj instanceof Statement ) {
       return visitStatement((Statement) obj, param);
     } else if( obj instanceof Variable ) {
@@ -162,8 +161,6 @@ public abstract class Traverser<R, P> {
       return visitBasicBlockList((BasicBlockList) obj, param);
     } else if( obj instanceof CaseGotoOpt ) {
       return visitCaseGotoOpt((CaseGotoOpt) obj, param);
-    } else if( obj instanceof PhiStmt ) {
-      return visitPhiStmt((PhiStmt) obj, param);
     } else if( obj instanceof TypeRef ) {
       return visitTypeRef((TypeRef) obj, param);
     } else {
@@ -278,7 +275,19 @@ public abstract class Traverser<R, P> {
   }
 
   protected R visitStatement(Statement obj, P param) {
-    if( obj instanceof Assignment ) {
+    if( obj instanceof NormalStmt ) {
+      return visitNormalStmt((NormalStmt) obj, param);
+    } else if( obj instanceof BasicBlockEnd ) {
+      return visitBasicBlockEnd((BasicBlockEnd) obj, param);
+    } else if( obj instanceof PhiStmt ) {
+      return visitPhiStmt((PhiStmt) obj, param);
+    } else {
+      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
+  }
+
+  protected R visitNormalStmt(NormalStmt obj, P param) {
+    if ( obj instanceof Assignment ) {
       return visitAssignment((Assignment) obj, param);
     } else if( obj instanceof CallStmt ) {
       return visitCallStmt((CallStmt) obj, param);

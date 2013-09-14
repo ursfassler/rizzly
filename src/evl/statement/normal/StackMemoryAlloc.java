@@ -1,5 +1,6 @@
-package evl.statement;
+package evl.statement.normal;
 
+import evl.statement.normal.NormalStmt;
 import common.ElementInfo;
 
 import evl.type.Type;
@@ -10,7 +11,7 @@ import evl.variable.SsaVariable;
  *
  * @author urs
  */
-public class StackMemoryAlloc extends Statement implements SsaGenerator {
+public class StackMemoryAlloc extends NormalStmt implements SsaGenerator {
 
   private SsaVariable variable;
 

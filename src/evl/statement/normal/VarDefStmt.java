@@ -1,10 +1,11 @@
-package evl.statement;
+package evl.statement.normal;
 
+import evl.statement.normal.NormalStmt;
 import common.ElementInfo;
 
 import evl.variable.FuncVariable;
 
-public class VarDefStmt extends Statement {
+public class VarDefStmt extends NormalStmt {
   private FuncVariable variable;
 
   public VarDefStmt(ElementInfo info, FuncVariable variable) {
