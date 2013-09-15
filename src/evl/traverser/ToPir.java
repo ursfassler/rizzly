@@ -250,19 +250,15 @@ public class ToPir extends NullTraverser<PirObject, Void> {
   }
 
   @Override
-  protected pir.type.EnumType visitEnumType(EnumType obj, Void param) {
-    pir.type.EnumType struct = new pir.type.EnumType(obj.getName());
-    map.put(obj, struct);
-    for( EnumElement elem : obj.getElement() ) {
-      pir.type.EnumElement celem = (pir.type.EnumElement) visit(elem, null);
-      struct.getElements().add(celem);
-    }
-    return struct;
+  protected PirObject visitEnumType(EnumType obj, Void param) {
+    RError.err(ErrorType.Fatal, obj.getInfo(), "EnumType should no longer exists; replaced with Range");
+    return null;
   }
 
   @Override
-  protected pir.type.EnumElement visitEnumElement(EnumElement obj, Void param) {
-    return new pir.type.EnumElement(obj.getName());
+  protected PirObject visitEnumElement(EnumElement obj, Void param) {
+    RError.err(ErrorType.Fatal, obj.getInfo(), "EnumElement should no longer exists");
+    return null;
   }
 
   @Override

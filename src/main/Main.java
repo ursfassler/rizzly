@@ -39,6 +39,7 @@ import evl.other.Named;
 import evl.other.RizzlyProgram;
 import evl.traverser.CHeaderWriter;
 import evl.traverser.DepCollector;
+import evl.traverser.EnumReduction;
 import evl.type.TypeRef;
 import evl.type.base.EnumElement;
 import evl.type.composed.NamedElement;
@@ -114,6 +115,8 @@ public class Main {
       evl.traverser.Renamer.process(head);
       printCHeader(outdir, head,debugNames);
     }
+    
+    EnumReduction.process( prg, debugdir );
 
     evl.doc.PrettyPrinter.print(prg, debugdir + "beforePir.rzy", true);
     Program prog = (Program) evl.traverser.ToPir.process(prg, debugdir);

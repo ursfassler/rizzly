@@ -44,8 +44,6 @@ import pir.statement.normal.convert.ZeroExtendValue;
 import pir.statement.phi.PhiStmt;
 import pir.type.ArrayType;
 import pir.type.BooleanType;
-import pir.type.EnumElement;
-import pir.type.EnumType;
 import pir.type.NamedElement;
 import pir.type.NoSignType;
 import pir.type.PointerType;
@@ -157,17 +155,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitUnionType(UnionType obj, P param) {
     visitList(obj.getElements(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitEnumType(EnumType obj, P param) {
-    visitList(obj.getElements(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitEnumElement(EnumElement obj, P param) {
     return null;
   }
 

@@ -1,5 +1,7 @@
 package pir.traverser;
 
+import error.ErrorType;
+import error.RError;
 import pir.NullTraverser;
 import pir.Pir;
 import pir.PirObject;
@@ -15,7 +17,6 @@ import pir.statement.normal.ArithmeticOp;
 import pir.statement.normal.Relation;
 import pir.type.ArrayType;
 import pir.type.BooleanType;
-import pir.type.EnumType;
 import pir.type.NamedElement;
 import pir.type.StructType;
 import pir.type.Type;
@@ -38,7 +39,7 @@ public class ExprTypeGetter extends NullTraverser<Type, Void> {
   @Override
   protected Type visitVarRef(VarRef obj, Void param) {
     Type type = visit(obj.getRef(), param);
-    for (RefItem itm : obj.getOffset()) {
+    for( RefItem itm : obj.getOffset() ) {
       type = rtg.traverse(itm, type);
     }
     return type;
@@ -75,13 +76,12 @@ public class ExprTypeGetter extends NullTraverser<Type, Void> {
     Type rhs = visit(obj.getRight(), sym);
     Type bigger;
     // TODO implement correct test, may depend on operator
-    if ((lhs instanceof EnumType) || (rhs instanceof EnumType)) {
-      bigger = null;
-    } else if (TypeContainer.leftIsContainer(lhs, rhs)) {
+    if( TypeContainer.leftIsContainer(lhs, rhs) ) {
       bigger = lhs;
-    } else if (TypeContainer.leftIsContainer(rhs, lhs)) {
+    } else if( TypeContainer.leftIsContainer(rhs, lhs) ) {
       bigger = rhs;
     } else {
+      RError.err(ErrorType.Fatal, "Not yet implemented: " + obj);
       bigger = null;
     }
     return bigger;
@@ -101,7 +101,6 @@ public class ExprTypeGetter extends NullTraverser<Type, Void> {
   protected Type visitVariable(Variable obj, Void param) {
     return visit(obj.getType(), param);
   }
-
 }
 
 class RefTypeGetter extends NullTraverser<Type, Type> {
@@ -113,18 +112,17 @@ class RefTypeGetter extends NullTraverser<Type, Type> {
 
   @Override
   protected Type visitRefIndex(RefIndex obj, Type param) {
-    assert (param instanceof ArrayType);
+    assert ( param instanceof ArrayType );
     ArrayType array = (ArrayType) param;
     return array.getType().getRef();
   }
 
   @Override
   protected Type visitRefName(RefName obj, Type param) {
-    assert (param instanceof StructType);
+    assert ( param instanceof StructType );
     StructType struct = (StructType) param;
     NamedElement elem = struct.find(obj.getName());
-    assert (elem != null);
+    assert ( elem != null );
     return elem.getType().getRef();
   }
-
 }

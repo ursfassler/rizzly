@@ -55,8 +55,6 @@ import pir.statement.normal.convert.TypeCast;
 import pir.statement.normal.convert.ZeroExtendValue;
 import pir.type.ArrayType;
 import pir.type.BooleanType;
-import pir.type.EnumElement;
-import pir.type.EnumType;
 import pir.type.IntType;
 import pir.type.NamedElement;
 import pir.type.NoSignType;
@@ -208,8 +206,8 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitStateVariable(StateVariable obj, StreamWriter param) {
     TypeRef type = obj.getType();
-    assert( type.getRef() instanceof PointerType );
-    type = ((PointerType)type.getRef()).getType();
+    assert ( type.getRef() instanceof PointerType );
+    type = ( (PointerType) type.getRef() ).getType();
     param.wr("@" + obj.getName());
     param.wr(" = global ");
     visit(type, param);
@@ -292,29 +290,6 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     param.wr("; ");
     param.wr(obj.getName());
     wrId(obj, param);
-    param.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitEnumType(EnumType obj, StreamWriter param) {
-    param.wr(obj.getName());
-    wrId(obj, param);
-    param.wr(" = ");
-    param.wr("Enum");
-    param.nl();
-    param.incIndent();
-    visitList(obj.getElements(), param);
-    param.decIndent();
-    param.wr("end");
-    param.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitEnumElement(EnumElement obj, StreamWriter param) {
-    param.wr(obj.getName());
-    param.wr(";");
     param.nl();
     return null;
   }
@@ -688,7 +663,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   protected Void visitStackMemoryAlloc(StackMemoryAlloc obj, StreamWriter param) {
     wrVarDef(obj, param);
     param.wr("alloca ");
-    visit( new TypeRef(obj.getType()), param);
+    visit(new TypeRef(obj.getType()), param);
     param.nl();
     return null;
   }

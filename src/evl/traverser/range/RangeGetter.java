@@ -23,6 +23,7 @@ import evl.variable.Variable;
 
 //TODO implement everything left
 public class RangeGetter extends NullTraverser<Void, Void> {
+
   private KnowledgeBase kb;
   private KnowBaseItem kbi;
   private KnowWriter kw;
@@ -48,10 +49,10 @@ public class RangeGetter extends NullTraverser<Void, Void> {
   }
 
   public static SsaVariable getDerefVar(Expression left) {
-    if (left instanceof Reference) {
+    if( left instanceof Reference ) {
       Reference ref = (Reference) left;
-      if (ref.getOffset().isEmpty()) {
-        if (ref.getLink() instanceof SsaVariable) {
+      if( ref.getOffset().isEmpty() ) {
+        if( ref.getLink() instanceof SsaVariable ) {
           return (SsaVariable) ref.getLink();
         }
       }
@@ -61,20 +62,24 @@ public class RangeGetter extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitRelation(Relation obj, Void param) {
-    
-    
+
+
     {
       SsaVariable lv = getDerefVar(obj.getLeft());
-      if (lv != null) {
-        if (lv.getType().getRef() instanceof Range) {
+      if( lv != null ) {
+        if( lv.getType().getRef() instanceof Range ) {
           Type rt = ExpressionTypeChecker.process(obj.getRight(), kb);
-          if (rt instanceof Range) {
+          if( rt instanceof Range ) {
             Range rr = (Range) rt;
             Range range = getRange(lv);
             range = adjustLeft(range, obj.getOp(), rr);
             ranges.put(lv, range);
             return null;
           }
+        } else {
+          // not range type, we do not care
+          //TODO should we care about different types?
+          return null;
         }
       }
     }
@@ -84,32 +89,32 @@ public class RangeGetter extends NullTraverser<Void, Void> {
   private Range adjustLeft(Range lr, RelOp op, Range rr) {
     BigInteger low;
     BigInteger high;
-    switch (op) {
-    case LESS: {
-      BigInteger max = rr.getHigh().subtract(BigInteger.ONE);
-      low = lr.getLow().min(max);
-      high = lr.getHigh().min(max);
-      break;
-    }
-    case GREATER: {
-      BigInteger min = rr.getLow().add(BigInteger.ONE);
-      low = lr.getLow().max(min);
-      high = lr.getHigh().max(min);
-      break;
-    }
-    case EQUAL: {
-      low = rr.getLow().max(lr.getLow());
-      high = rr.getHigh().min(lr.getHigh());
-      break;
-    }
-    default:
-      throw new RuntimeException("not yet implemented: " + op);
+    switch( op ) {
+      case LESS: {
+        BigInteger max = rr.getHigh().subtract(BigInteger.ONE);
+        low = lr.getLow().min(max);
+        high = lr.getHigh().min(max);
+        break;
+      }
+      case GREATER: {
+        BigInteger min = rr.getLow().add(BigInteger.ONE);
+        low = lr.getLow().max(min);
+        high = lr.getHigh().max(min);
+        break;
+      }
+      case EQUAL: {
+        low = rr.getLow().max(lr.getLow());
+        high = rr.getHigh().min(lr.getHigh());
+        break;
+      }
+      default:
+        throw new RuntimeException("not yet implemented: " + op);
     }
     return kbi.getRangeType(low, high);
   }
 
   private Range getRange(Variable var) {
-    if (ranges.containsKey(var)) {
+    if( ranges.containsKey(var) ) {
       return ranges.get(var);
     } else {
       return (Range) var.getType().getRef();
@@ -118,10 +123,10 @@ public class RangeGetter extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitReference(Reference obj, Void param) {
-    assert( obj.getOffset().isEmpty() );
-    assert( obj.getLink() instanceof SsaVariable );
-    Expression writer = kw.get( (SsaVariable)obj.getLink() );
-    visit( writer, null );
+    assert ( obj.getOffset().isEmpty() );
+    assert ( obj.getLink() instanceof SsaVariable );
+    Expression writer = kw.get((SsaVariable) obj.getLink());
+    visit(writer, null);
     return null;
   }
 
@@ -134,5 +139,4 @@ public class RangeGetter extends NullTraverser<Void, Void> {
   protected Void visitBoolValue(BoolValue obj, Void param) {
     return null;
   }
-
 }

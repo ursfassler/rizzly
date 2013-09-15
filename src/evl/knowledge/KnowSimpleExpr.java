@@ -17,6 +17,7 @@ import evl.expression.reference.Reference;
 import evl.function.FunctionBase;
 import evl.other.IfaceUse;
 import evl.type.TypeRef;
+import evl.type.base.EnumType;
 import evl.type.base.Range;
 import evl.type.composed.RecordType;
 import evl.type.special.NaturalType;
@@ -102,6 +103,11 @@ class SimpleGetter extends NullTraverser<Boolean, Void> {
     return true;
   }
 
+  @Override
+  protected Boolean visitEnumType(EnumType obj, Void param) {
+    return true;
+  }
+  
   @Override
   protected Boolean visitRecordType(RecordType obj, Void param) {
     return false;

@@ -54,8 +54,6 @@ import pir.statement.normal.convert.ZeroExtendValue;
 import pir.statement.phi.PhiStmt;
 import pir.type.ArrayType;
 import pir.type.BooleanType;
-import pir.type.EnumElement;
-import pir.type.EnumType;
 import pir.type.IntType;
 import pir.type.NamedElemType;
 import pir.type.NamedElement;
@@ -102,8 +100,6 @@ abstract public class Traverser<R, P> {
       return visitRefItem((RefItem) obj, param);
     } else if( obj instanceof Variable ) {
       return visitVariable((Variable) obj, param);
-    } else if( obj instanceof EnumElement ) {
-      return visitEnumElement((EnumElement) obj, param);
     } else if( obj instanceof BasicBlockList ) {
       return visitBasicBlockList((BasicBlockList) obj, param);
     } else if( obj instanceof BasicBlock ) {
@@ -273,8 +269,6 @@ abstract public class Traverser<R, P> {
       return visitBooleanType((BooleanType) obj, param);
     } else if( obj instanceof NamedElemType ) {
       return visitNamedElemType((NamedElemType) obj, param);
-    } else if( obj instanceof EnumType ) {
-      return visitEnumType((EnumType) obj, param);
     } else if( obj instanceof VoidType ) {
       return visitVoidType((VoidType) obj, param);
     } else if( obj instanceof ArrayType ) {
@@ -352,8 +346,6 @@ abstract public class Traverser<R, P> {
 
   protected abstract R visitReturnExpr(ReturnExpr obj, P param);
 
-  protected abstract R visitEnumElement(EnumElement obj, P param);
-
   protected abstract R visitIfGoto(IfGoto obj, P param);
 
   protected abstract R visitConstant(Constant obj, P param);
@@ -399,8 +391,6 @@ abstract public class Traverser<R, P> {
   protected abstract R visitCallStmt(CallStmt obj, P param);
 
   protected abstract R visitAssignment(Assignment obj, P param);
-
-  protected abstract R visitEnumType(EnumType obj, P param);
 
   protected abstract R visitStructType(StructType obj, P param);
 

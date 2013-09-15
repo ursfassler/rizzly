@@ -44,8 +44,6 @@ import pir.statement.normal.convert.ZeroExtendValue;
 import pir.statement.phi.PhiStmt;
 import pir.type.ArrayType;
 import pir.type.BooleanType;
-import pir.type.EnumElement;
-import pir.type.EnumType;
 import pir.type.NamedElement;
 import pir.type.NoSignType;
 import pir.type.PointerType;
@@ -84,11 +82,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitReturnExpr(ReturnExpr obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitEnumElement(EnumElement obj, P param) {
     return doDefault(obj, param);
   }
 
@@ -139,11 +132,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitAssignment(Assignment obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitEnumType(EnumType obj, P param) {
     return doDefault(obj, param);
   }
 

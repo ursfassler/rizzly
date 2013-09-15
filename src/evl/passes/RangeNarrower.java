@@ -96,7 +96,7 @@ class Narrower extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitCaseGoto(CaseGoto obj, Void param) {
-    // TODO enumerator and boolean should also be allowed
+    // TODO boolean should also be allowed
     // TODO check somewhere else if case values are disjunct
 
     if( !( obj.getCondition() instanceof Reference ) ) {
