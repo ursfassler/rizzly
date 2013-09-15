@@ -27,6 +27,7 @@ import fun.type.composed.UnionType;
 import fun.type.genfunc.Array;
 import fun.type.genfunc.Range;
 import fun.type.genfunc.TypeType;
+import java.util.List;
 
 public class FunToEvlType extends NullTraverser<Type, String> {
   private Map<Fun, Evl> map;
@@ -114,10 +115,11 @@ public class FunToEvlType extends NullTraverser<Type, String> {
 
   @Override
   protected Type visitEnumType(EnumType obj, String param) {
-    evl.type.base.EnumType ret = new evl.type.base.EnumType(obj.getInfo(), param);
+    List<evl.type.base.EnumElement> elements = new ArrayList<evl.type.base.EnumElement>();
     for (EnumElement elem : obj.getElement()) {
-      ret.getElement().add((evl.type.base.EnumElement) fta.traverse(elem, null));
+      elements.add((evl.type.base.EnumElement) fta.traverse(elem, null));
     }
+    evl.type.base.EnumType ret = new evl.type.base.EnumType(obj.getInfo(), param,elements);
     return ret;
   }
 

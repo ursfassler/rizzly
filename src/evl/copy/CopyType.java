@@ -4,6 +4,7 @@ import evl.Evl;
 import evl.NullTraverser;
 import evl.type.Type;
 import evl.type.base.ArrayType;
+import evl.type.base.EnumType;
 import evl.type.base.Range;
 import evl.type.base.StringType;
 import evl.type.composed.RecordType;
@@ -47,4 +48,11 @@ public class CopyType extends NullTraverser<Type, Void> {
   protected Type visitPointerType(PointerType obj, Void param) {
     return new PointerType(cast.copy(obj.getType()));
   }
+
+  @Override
+  protected Type visitEnumType(EnumType obj, Void param) {
+    return new EnumType( obj.getInfo(), obj.getName(), cast.copy(obj.getElement()));
+  }
+  
+  
 }

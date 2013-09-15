@@ -13,10 +13,12 @@ final public class EnumElement extends FunBase implements Named {
     this.name = name;
   }
 
+  @Override
   public String getName() {
     return name;
   }
 
+  @Override
   public void setName(String name) {
     this.name = name;
   }

@@ -1,5 +1,7 @@
 package evl.traverser;
 
+import evl.type.base.EnumElement;
+import evl.type.base.EnumType;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
@@ -103,6 +105,29 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.wr(" ");
     param.wr(obj.getName());
     param.wr(";");
+    param.nl();
+    return null;
+  }
+
+  //FIXME we can not guarantee that the order is still true after PIR
+  @Override
+  protected Void visitEnumType(EnumType obj, StreamWriter param) {
+    param.wr("typedef enum {");
+    param.nl();
+    param.incIndent();
+    visitItr(obj.getElement(), param);
+    param.decIndent();
+    param.wr("} ");
+    param.wr(obj.getName());
+    param.wr(";");
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitEnumElement(EnumElement obj, StreamWriter param) {
+    param.wr(obj.getName());
+    param.wr(",");
     param.nl();
     return null;
   }

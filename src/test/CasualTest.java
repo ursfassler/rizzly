@@ -177,6 +177,16 @@ public class CasualTest extends BaseTest {
     compile("alarmController", TestSteps.EXECUTE, false, false);
   }
 
+  @Test
+  public void enumCase() {
+    compile("enumCase", TestSteps.EXECUTE, false, false);
+  }
+
+  @Test
+  public void enumTest() {
+    compile("enumTest", TestSteps.COMPILE_TO_FUN, false, false);
+  }
+
   
   
   
@@ -236,16 +246,6 @@ public class CasualTest extends BaseTest {
   @Test
   public void extConst() {
     compile("extConst", "ExtConst", true, false, false);
-  }
-
-  @Test
-  public void enumCase_Case() {
-    compile("enumCase", "EnumCase", true, false, false);
-  }
-
-  @Test
-  public void enumTest_EnumTest() {
-    compile("enumTest", "EnumTest", true, false, false);
   }
 
   @Test

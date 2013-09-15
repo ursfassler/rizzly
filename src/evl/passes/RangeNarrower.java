@@ -29,11 +29,13 @@ import evl.statement.normal.Assignment;
 import evl.statement.normal.VarDefInitStmt;
 import evl.statement.phi.PhiStmt;
 import evl.traverser.VariableReplacer;
+import evl.traverser.range.CaseEnumUpdater;
 import evl.traverser.range.CaseRangeUpdater;
 import evl.traverser.range.RangeGetter;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.type.Type;
 import evl.type.TypeRef;
+import evl.type.base.EnumType;
 import evl.type.base.Range;
 import evl.variable.SsaVariable;
 import java.math.BigInteger;
@@ -65,6 +67,8 @@ public class RangeNarrower extends DefTraverser<Void, Void> {
   }
 }
 
+// functions return true if something changed
+// functions return true if something changed
 class Narrower extends DefTraverser<Void, Void> {
 
   private KnowledgeBase kb;
@@ -93,7 +97,7 @@ class Narrower extends DefTraverser<Void, Void> {
   @Override
   protected Void visitCaseGoto(CaseGoto obj, Void param) {
     // TODO enumerator and boolean should also be allowed
-    // TODO check somewhere if case values are disjunct
+    // TODO check somewhere else if case values are disjunct
 
     if( !( obj.getCondition() instanceof Reference ) ) {
       RError.err(ErrorType.Hint, obj.getCondition().getInfo(), "can only do range analysis on local variables");
@@ -105,8 +109,33 @@ class Narrower extends DefTraverser<Void, Void> {
       return null;
     }
     SsaVariable var = (SsaVariable) ref.getLink();
-    Range varType = (Range) var.getType().getRef();
 
+    if( var.getType().getRef() instanceof Range ) {
+      gotoRange(obj, var);
+    } else if( var.getType().getRef() instanceof EnumType ) {
+      gotoEnum(obj, var);
+    } else {
+      throw new RuntimeException("not yet implemented: " + var.getType().getRef().getClass().getCanonicalName());
+    }
+
+    return null;
+  }
+
+  private void gotoEnum(CaseGoto obj, SsaVariable var) {
+    EnumType varType = (EnumType) var.getType().getRef();
+
+    for( CaseGotoOpt opt : obj.getOption() ) {
+      EnumType newType = CaseEnumUpdater.process(opt.getValue(), kb);
+      if( newType.isRealSubtype(varType) ){
+        replace(opt.getDst(), var, newType);
+      }
+    }
+
+    // TODO also update range for default case
+  }
+
+  private void gotoRange(CaseGoto obj, SsaVariable var) {
+    Range varType = (Range) var.getType().getRef();
     for( CaseGotoOpt opt : obj.getOption() ) {
       Range newType = CaseRangeUpdater.process(opt.getValue(), kb);
       if( Range.leftIsSmallerEqual(newType, varType) && !Range.isEqual(newType, varType) ) {
@@ -115,8 +144,6 @@ class Narrower extends DefTraverser<Void, Void> {
     }
 
     // TODO also update range for default case
-
-    return null;
   }
 
   @Override
@@ -136,10 +163,10 @@ class Narrower extends DefTraverser<Void, Void> {
     return null;
   }
 
-  private void replace(BasicBlock startBb, SsaVariable var, Range range) {
+  private void replace(BasicBlock startBb, SsaVariable var, Type newType) {
     assert ( startBb.getPhi().isEmpty() ); // if not true, we have to find a solution :(
-    SsaVariable newVar = new SsaVariable(var.getInfo(), NameFactory.getNew(), new TypeRef(new ElementInfo(), range));
-    Expression initExpr = new TypeCast(var.getInfo(), new Reference(startBb.getInfo(), var), new TypeRef(new ElementInfo(), range));
+    SsaVariable newVar = new SsaVariable(var.getInfo(), NameFactory.getNew(), new TypeRef(new ElementInfo(), newType));
+    Expression initExpr = new TypeCast(var.getInfo(), new Reference(startBb.getInfo(), var), new TypeRef(new ElementInfo(), newType));
     VarDefInitStmt ass = new VarDefInitStmt(var.getInfo(), newVar, initExpr);
     startBb.getCode().add(0, ass);
     VariableReplacer.replace(startBb, 1, var, newVar);
@@ -205,22 +232,22 @@ class StmtUpdater extends NullTraverser<Boolean, Void> {
     if( !( type instanceof Range ) ) {
       return false;   //TODO also check booleans and enums?
     }
-    
+
     BigInteger low = null;
     BigInteger high = null;
 
-    for( BasicBlock in : obj.getInBB() ){
-      Range exprt = (Range) ExpressionTypeChecker.process(obj.getArg(in),kb);
-      if( (low == null) || (low.compareTo(exprt.getLow()) > 0) ){
+    for( BasicBlock in : obj.getInBB() ) {
+      Range exprt = (Range) ExpressionTypeChecker.process(obj.getArg(in), kb);
+      if( ( low == null ) || ( low.compareTo(exprt.getLow()) > 0 ) ) {
         low = exprt.getLow();
       }
-      if( (high == null) || (high.compareTo(exprt.getHigh()) < 0) ){
+      if( ( high == null ) || ( high.compareTo(exprt.getHigh()) < 0 ) ) {
         high = exprt.getHigh();
       }
     }
-    
+
     Range rtype = kbi.getRangeType(low, high);
-    
+
     if( obj.getVariable().getType().getRef() != rtype ) {
       obj.getVariable().getType().setRef(rtype);
       return true;
@@ -228,7 +255,7 @@ class StmtUpdater extends NullTraverser<Boolean, Void> {
       return false;
     }
   }
-  
+
   @Override
   protected Boolean visitCallStmt(CallStmt obj, Void param) {
     // nothing to do since we do not produce a new value

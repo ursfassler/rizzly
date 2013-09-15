@@ -40,6 +40,7 @@ import evl.other.RizzlyProgram;
 import evl.traverser.CHeaderWriter;
 import evl.traverser.DepCollector;
 import evl.type.TypeRef;
+import evl.type.base.EnumElement;
 import evl.type.composed.NamedElement;
 import evl.variable.Variable;
 import fun.other.Namespace;
@@ -239,6 +240,8 @@ public class Main {
         ret.getType().add((evl.type.Type) itr);
       } else if( itr instanceof NamedElement ) {
         // element of record type
+      } else if( itr instanceof EnumElement ) {
+        // element of enumerator type
       } else {
         RError.err(ErrorType.Fatal, itr.getInfo(), "Object should not be used in header file: " + itr.getClass().getCanonicalName());
       }

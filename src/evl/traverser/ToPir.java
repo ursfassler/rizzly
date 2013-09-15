@@ -254,7 +254,7 @@ public class ToPir extends NullTraverser<PirObject, Void> {
     pir.type.EnumType struct = new pir.type.EnumType(obj.getName());
     map.put(obj, struct);
     for( EnumElement elem : obj.getElement() ) {
-      pir.type.EnumElement celem = (pir.type.EnumElement) visit(elem, struct);
+      pir.type.EnumElement celem = (pir.type.EnumElement) visit(elem, null);
       struct.getElements().add(celem);
     }
     return struct;
@@ -262,8 +262,7 @@ public class ToPir extends NullTraverser<PirObject, Void> {
 
   @Override
   protected pir.type.EnumElement visitEnumElement(EnumElement obj, Void param) {
-    pir.type.EnumType type = (pir.type.EnumType) param;
-    return new pir.type.EnumElement(obj.getName(), type);
+    return new pir.type.EnumElement(obj.getName());
   }
 
   @Override

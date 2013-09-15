@@ -1,5 +1,8 @@
 package evl.knowledge;
 
+import common.Designator;
+import evl.type.base.EnumElement;
+import evl.type.base.EnumType;
 import java.math.BigInteger;
 
 import common.ElementInfo;
@@ -7,6 +10,7 @@ import common.ElementInfo;
 import error.ErrorType;
 import error.RError;
 import evl.other.Named;
+import evl.other.Namespace;
 import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
@@ -17,6 +21,7 @@ import evl.type.special.IntegerType;
 import evl.type.special.NaturalType;
 import evl.type.special.PointerType;
 import evl.type.special.VoidType;
+import java.util.List;
 
 public class KnowBaseItem extends KnowledgeEntry {
 
@@ -96,7 +101,7 @@ public class KnowBaseItem extends KnowledgeEntry {
     }
     return ret;
   }
-  
+
   public PointerType getPointerType(Type type) {
     TypeRef ref = new TypeRef(new ElementInfo(), type);
     PointerType ret = (PointerType) findItem(PointerType.makeName(ref));
@@ -141,5 +146,23 @@ public class KnowBaseItem extends KnowledgeEntry {
       addItem(ret);
     }
     return ret;
+  }
+
+  public EnumType getEnumType(EnumType supertype, List<EnumElement> elements) {
+    KnowPath kp = kb.getEntry(KnowPath.class);
+    Designator path = kp.get(supertype);
+    Namespace parent = kb.getRoot().forceChildPath(path.toList());
+    assert ( parent.find(supertype.getName()) != null );
+
+    String subName = supertype.makeSubtypeName(elements);
+
+    EnumType type = (EnumType) parent.find(subName);
+
+    if( type == null ) {
+      type = new EnumType(new ElementInfo(), subName,elements);
+      parent.add(type);
+    }
+
+    return type;
   }
 }
