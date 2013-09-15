@@ -56,7 +56,8 @@ abstract public class PirValueReplacer<R, P> extends DefTraverser<R, P> {
 
   @Override
   protected R visitAssignment(Assignment obj, P param) {
-    throw new RuntimeException("not yet implemented");
+    obj.setSrc(replace(obj.getSrc(),param));
+    return super.visitAssignment(obj, param);
   }
 
   @Override

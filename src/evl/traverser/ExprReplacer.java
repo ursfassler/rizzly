@@ -1,10 +1,13 @@
 package evl.traverser;
 
+import evl.statement.normal.StoreStmt;
+import evl.statement.phi.PhiStmt;
 import java.util.List;
 
 import error.ErrorType;
 import error.RError;
 import evl.DefTraverser;
+import evl.cfg.BasicBlock;
 import evl.statement.bbend.CaseOptRange;
 import evl.statement.bbend.CaseOptValue;
 import evl.statement.bbend.ReturnExpr;
@@ -166,6 +169,25 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   protected Expression visitVarDefInitStmt(VarDefInitStmt obj, T param) {
     obj.setInit(visit(obj.getInit(), param));
     return super.visitVarDefInitStmt(obj, param);
+  }
+
+  @Override
+  protected Expression visitPhiStmt(PhiStmt obj, T param) {
+    visit(obj.getVariable(), param);
+    for( BasicBlock in : obj.getInBB() ) {
+      Expression expr = obj.getArg(in);
+      assert(expr != null);
+      expr = visit(expr, param);
+      obj.addArg(in, expr);
+    }
+    return null;
+  }
+
+  @Override
+  protected Expression visitStoreStmt(StoreStmt obj, T param) {
+    obj.setExpr(visit(obj.getExpr(), param) );
+    visit(obj.getAddress(), param);
+    return null;
   }
 
 }

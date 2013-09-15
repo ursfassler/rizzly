@@ -391,6 +391,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitEnumElement(EnumElement obj, StreamWriter param) {
     param.wr(obj.getName().toString());
+    wrId(obj, param);
     param.wr(";");
     param.nl();
     return null;

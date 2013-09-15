@@ -1,6 +1,5 @@
 package evl.statement.normal;
 
-import evl.statement.normal.NormalStmt;
 import common.ElementInfo;
 
 import evl.type.Type;

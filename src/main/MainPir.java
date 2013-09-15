@@ -25,6 +25,7 @@ import pir.statement.bbend.ReturnVoid;
 import pir.know.KnowledgeBase;
 import pir.other.Program;
 import pir.other.SsaVariable;
+import pir.passes.BoolConstReplacer;
 import pir.passes.CaseReduction;
 import pir.passes.ConstPropagator;
 import pir.passes.LlvmIntTypeReplacer;
@@ -65,6 +66,7 @@ public class MainPir {
       TypecastReplacer.process(prog);
       StmtSignSetter.process(prog);
       LlvmIntTypeReplacer.process(prog, kb);
+      BoolConstReplacer.process(prog, kb);
     }
 
     LlvmWriter.print(prog, debugdir + "typeext.ll", true);

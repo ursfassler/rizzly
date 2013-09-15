@@ -1,6 +1,8 @@
 package evl.traverser;
 
 import common.ElementInfo;
+import error.ErrorType;
+import error.RError;
 import evl.DefTraverser;
 import evl.copy.Relinker;
 import evl.expression.Expression;
@@ -55,14 +57,17 @@ class ElemReplacer extends ExprReplacer<Void> {
 
   @Override
   protected Expression visitReference(Reference obj, Void param) {
+    if( obj.getLink() instanceof EnumElement ) {
+      RError.err(ErrorType.Fatal, obj.getInfo(), "should not happen: " + obj);
+    }
     if( obj.getLink() instanceof EnumType ) {
-      assert( obj.getOffset().size() == 1 );
+      assert ( obj.getOffset().size() == 1 );
       EnumType type = (EnumType) obj.getLink();
       RefName name = (RefName) obj.getOffset().get(0);
       EnumElement elem = type.find(name.getName());
-      assert( elem != null );
+      assert ( elem != null );
       int value = type.getElement().indexOf(elem);
-      assert( value >= 0 );
+      assert ( value >= 0 );
       return new evl.expression.Number(elem.getInfo(), BigInteger.valueOf(value));
     }
     return super.visitReference(obj, param);

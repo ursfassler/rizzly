@@ -83,7 +83,7 @@ class StmtReplacer extends StatementReplacer<List<NormalStmt>> {
     this.kb = kb;
     exprReplacer = new ExprReplacer(kb);
   }
-
+  
   @Override
   protected List<NormalStmt> visitNormalStmt(NormalStmt obj, List<NormalStmt> param) {
     assert ( param == null );

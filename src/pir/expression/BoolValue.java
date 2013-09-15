@@ -1,11 +1,16 @@
 package pir.expression;
 
-public class BoolValue extends PExpression {
-  final private boolean value;
+import pir.other.PirValue;
+import pir.type.TypeRef;
 
-  public BoolValue(boolean value) {
+public class BoolValue extends PExpression implements PirValue {
+  final private boolean value;
+  final private TypeRef type;
+
+  public BoolValue(boolean value,TypeRef type) {
     super();
     this.value = value;
+    this.type = type;
   }
 
   public boolean isValue() {
@@ -15,6 +20,11 @@ public class BoolValue extends PExpression {
   @Override
   public String toString() {
     return Boolean.toString(value);
+  }
+
+  @Override
+  public TypeRef getType() {
+    return type;
   }
 
 }

@@ -1,6 +1,5 @@
 package evl.statement.normal;
 
-import evl.statement.normal.NormalStmt;
 import common.ElementInfo;
 
 import evl.expression.reference.Reference;
@@ -11,6 +10,7 @@ import evl.variable.SsaVariable;
  * @author urs
  */
 public class LoadStmt extends NormalStmt implements SsaGenerator {
+
   private SsaVariable variable;
   private Reference address;
 

@@ -1,5 +1,6 @@
 package evl.traverser;
 
+import common.ElementInfo;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -306,7 +307,8 @@ public class ToPir extends NullTraverser<PirObject, Void> {
 
   @Override
   protected PirObject visitBoolValue(BoolValue obj, Void param) {
-    return new pir.expression.BoolValue(obj.isValue());
+    pir.type.BooleanType type = kbi.getBooleanType();
+    return new pir.expression.BoolValue(obj.isValue(),new TypeRef(type));
   }
 
   @Override
@@ -459,11 +461,9 @@ public class ToPir extends NullTraverser<PirObject, Void> {
 
   @Override
   protected PirObject visitIfGoto(IfGoto obj, Void param) {
-    PirObject cond = visit(obj.getCondition(), null);
-    assert ( cond instanceof VarRefSimple );
-    pir.other.SsaVariable var = ( (VarRefSimple) cond ).getRef();
-    assert ( var.getType().getRef() instanceof pir.type.BooleanType );
-    return new pir.statement.bbend.IfGoto(new VarRefSimple(var), (pir.cfg.BasicBlock) visit(obj.getThenBlock(), null), (pir.cfg.BasicBlock) visit(obj.getElseBlock(), null));
+    PirValue cond = (PirValue) visit(obj.getCondition(), null);
+    assert ( cond.getType().getRef() instanceof pir.type.BooleanType );
+    return new pir.statement.bbend.IfGoto(cond, (pir.cfg.BasicBlock) visit(obj.getThenBlock(), null), (pir.cfg.BasicBlock) visit(obj.getElseBlock(), null));
   }
 
   @Override

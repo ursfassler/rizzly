@@ -1,6 +1,5 @@
 package evl.traverser;
 
-import evl.expression.Expression;
 import evl.variable.ConstGlobal;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,6 +8,8 @@ import evl.DefTraverser;
 import evl.cfg.BasicBlock;
 import evl.composition.ImplComposition;
 import evl.hfsm.ImplHfsm;
+import evl.hfsm.StateComposite;
+import evl.hfsm.StateSimple;
 import evl.other.ImplElementary;
 import evl.statement.normal.NormalStmt;
 import evl.statement.phi.PhiStmt;
@@ -93,6 +94,20 @@ public abstract class StatementReplacer<T> extends DefTraverser<List<NormalStmt>
 
   @Override
   protected List<NormalStmt> visitConstGlobal(ConstGlobal obj, T param) {
+    return null;
+  }
+
+  @Override
+  protected List<NormalStmt> visitStateSimple(StateSimple obj, T param) {
+    visitItr(obj.getFunction(), param);
+    visitItr(obj.getItem(), param);
+    return null;
+  }
+
+  @Override
+  protected List<NormalStmt> visitStateComposite(StateComposite obj, T param) {
+    visitItr(obj.getFunction(), param);
+    visitItr(obj.getItem(), param);
     return null;
   }
 
