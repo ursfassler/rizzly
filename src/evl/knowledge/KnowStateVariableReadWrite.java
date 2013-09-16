@@ -6,51 +6,52 @@ import java.util.Map;
 import java.util.Set;
 
 import evl.DefTraverser;
+import evl.cfg.BasicBlockList;
 import evl.expression.reference.Reference;
-import evl.function.FunctionHeader;
 import evl.statement.Statement;
 import evl.statement.normal.Assignment;
 import evl.variable.StateVariable;
 
 public class KnowStateVariableReadWrite extends KnowledgeEntry {
-  final private Map<FunctionHeader, Set<StateVariable>> reads = new HashMap<FunctionHeader, Set<StateVariable>>();
-  final private Map<FunctionHeader, Set<StateVariable>> writes = new HashMap<FunctionHeader, Set<StateVariable>>();
+
+  final private Map<BasicBlockList, Set<StateVariable>> reads = new HashMap<BasicBlockList, Set<StateVariable>>();
+  final private Map<BasicBlockList, Set<StateVariable>> writes = new HashMap<BasicBlockList, Set<StateVariable>>();
 
   @Override
   public void init(KnowledgeBase base) {
   }
 
-  public Set<StateVariable> getReads(FunctionHeader func) {
+  public Set<StateVariable> getReads(BasicBlockList func) {
     Set<StateVariable> ret = reads.get(func);
-    if (ret == null) {
+    if( ret == null ) {
       update(func);
       ret = reads.get(func);
     }
-    assert (ret != null);
+    assert ( ret != null );
     return ret;
   }
 
-  public Set<StateVariable> getWrites(FunctionHeader func) {
+  public Set<StateVariable> getWrites(BasicBlockList func) {
     Set<StateVariable> ret = writes.get(func);
-    if (ret == null) {
+    if( ret == null ) {
       update(func);
       ret = writes.get(func);
     }
-    assert (ret != null);
+    assert ( ret != null );
     return ret;
   }
 
-  private void update(FunctionHeader func) {
+  private void update(BasicBlockList func) {
     StateVariableTraverser traverser = new StateVariableTraverser();
     traverser.traverse(func, null);
     reads.put(func, traverser.getReads());
     writes.put(func, traverser.getWrites());
   }
-
 }
 
 // param says if we are writing to the reference
 class StateVariableTraverser extends DefTraverser<Void, Boolean> {
+
   final private Set<StateVariable> reads = new HashSet<StateVariable>();
   final private Set<StateVariable> writes = new HashSet<StateVariable>();
 
@@ -64,7 +65,7 @@ class StateVariableTraverser extends DefTraverser<Void, Boolean> {
 
   @Override
   protected Void visitStatement(Statement obj, Boolean param) {
-    assert (param == null);
+    assert ( param == null );
     super.visitStatement(obj, false);
     return null;
   }
@@ -78,9 +79,9 @@ class StateVariableTraverser extends DefTraverser<Void, Boolean> {
 
   @Override
   protected Void visitReference(Reference obj, Boolean param) {
-    if (obj.getLink() instanceof StateVariable) {
+    if( obj.getLink() instanceof StateVariable ) {
       StateVariable var = (StateVariable) obj.getLink();
-      if (param) {
+      if( param ) {
         writes.add(var);
       } else {
         reads.add(var);
@@ -89,5 +90,4 @@ class StateVariableTraverser extends DefTraverser<Void, Boolean> {
     visitItr(obj.getOffset(), false);
     return null;
   }
-
 }

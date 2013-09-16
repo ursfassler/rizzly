@@ -21,6 +21,7 @@ import error.ErrorType;
 import error.RError;
 import evl.DefTraverser;
 import evl.Evl;
+import evl.cfg.BasicBlockList;
 import evl.copy.Relinker;
 import evl.expression.reference.Reference;
 import evl.function.FuncWithBody;
@@ -36,9 +37,7 @@ import evl.variable.FuncVariable;
 import evl.variable.StateVariable;
 
 //TODO do it for transitions
-
 //FIXME what with expressions in phi?
-
 /**
  * Replaces all state variables used in a function with a cached/local version of it. Writes/Reads them back whenever a
  * called function reads/writes a state variable.
@@ -66,7 +65,7 @@ public class StateVariableExtractor extends DefTraverser<Void, Void> {
   @Override
   protected Void visit(Evl obj, Void param) {
     if( obj instanceof FuncWithBody ) {
-      doit((FuncWithBody) obj);
+      doit(( (FuncWithBody) obj ).getBody());
     } else {
       super.visit(obj, null);
     }
@@ -75,12 +74,11 @@ public class StateVariableExtractor extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitTransition(Transition obj, Void param) {
-    throw new RuntimeException("not yet implemented");
+    doit( obj.getBody() );
+    return null;
   }
-  
-  
 
-  private void doit(FuncWithBody func) {
+  private void doit(BasicBlockList func) {
     Set<StateVariable> reads = ksvrw.getReads(func);
     Set<StateVariable> writes = ksvrw.getWrites(func);
 
@@ -112,7 +110,7 @@ public class StateVariableExtractor extends DefTraverser<Void, Void> {
    * @param write
    *          add code to write variable out
    */
-  private void replaceVar(StateVariable var, FuncWithBody func, boolean read, boolean write) {
+  private void replaceVar(StateVariable var, BasicBlockList func, boolean read, boolean write) {
     ElementInfo info = var.getInfo();
 
     FuncVariable ssa = new FuncVariable(info, var.getName() + Designator.NAME_SEP + "ssa", var.getType().copy());
@@ -127,16 +125,17 @@ public class StateVariableExtractor extends DefTraverser<Void, Void> {
 
     if( read ) {
       Assignment load = new Assignment(info, new Reference(info, ssa), new Reference(info, var));
-      func.getBody().getEntry().getCode().add(0, load);
+      func.getEntry().getCode().add(0, load);
     }
     VarDefStmt def = new VarDefStmt(info, ssa);
-    func.getBody().getEntry().getCode().add(0, def);
+    func.getEntry().getCode().add(0, def);
     if( write ) {
       Assignment store = new Assignment(info, new Reference(info, var), new Reference(info, ssa));
-      func.getBody().getExit().getCode().add(store);
+      func.getExit().getCode().add(store);
     }
   }
 }
+
 /**
  * Writes state variables back if a called function reads that variable. Reads state variables back in if a called
  * function writes that variable.
@@ -144,7 +143,7 @@ public class StateVariableExtractor extends DefTraverser<Void, Void> {
  * @author urs
  * 
  */
-class FuncProtector extends StatementReplacer<FunctionHeader> {
+class FuncProtector extends StatementReplacer<BasicBlockList> {
 
   private KnowStateVariableReadWrite ksvrw;
   final private Map<FunctionHeader, Set<StateVariable>> writes = new HashMap<FunctionHeader, Set<StateVariable>>();
@@ -159,13 +158,13 @@ class FuncProtector extends StatementReplacer<FunctionHeader> {
     this.ksvrw = kb.getEntry(KnowStateVariableReadWrite.class);
 
     for( Evl caller : g.vertexSet() ) {
-      if( caller instanceof FunctionHeader ) {
-        Set<StateVariable> writes = new HashSet<StateVariable>(ksvrw.getWrites((FunctionHeader) caller));
-        Set<StateVariable> reads = new HashSet<StateVariable>(ksvrw.getReads((FunctionHeader) caller));
+      if( caller instanceof FuncWithBody ) {
+        Set<StateVariable> writes = new HashSet<StateVariable>(ksvrw.getWrites(( (FuncWithBody) caller ).getBody()));
+        Set<StateVariable> reads = new HashSet<StateVariable>(ksvrw.getReads(( (FuncWithBody) caller ).getBody()));
         for( Evl callee : g.getOutVertices(caller) ) {
-          if( callee instanceof FunctionHeader ) {
-            writes.addAll(ksvrw.getWrites((FunctionHeader) callee));
-            reads.addAll(ksvrw.getReads((FunctionHeader) callee));
+          if( callee instanceof FuncWithBody ) {
+            writes.addAll(ksvrw.getWrites(( (FuncWithBody) callee ).getBody()));
+            reads.addAll(ksvrw.getReads(( (FuncWithBody) callee ).getBody()));
           }
         }
         this.writes.put((FunctionHeader) caller, writes);
@@ -175,20 +174,13 @@ class FuncProtector extends StatementReplacer<FunctionHeader> {
   }
 
   @Override
-  protected List<NormalStmt> visit(Evl obj, FunctionHeader param) {
-    if( obj instanceof FunctionHeader ) {
-      assert ( param == null );
-      param = (FunctionHeader) obj;
-    }
-    return super.visit(obj, param);
-  }
-
-  public void process(FunctionHeader func) {
-    traverse(func, func);
+  protected List<NormalStmt> visitBasicBlockList(BasicBlockList obj, BasicBlockList param) {
+    assert ( param == null );
+    return super.visitBasicBlockList(obj, obj);
   }
 
   @Override
-  protected List<NormalStmt> visitNormalStmt(NormalStmt obj, FunctionHeader param) {
+  protected List<NormalStmt> visitNormalStmt(NormalStmt obj, BasicBlockList param) {
     FunctionHeader callee = getCallee(obj);
     if( callee != null ) {
       ElementInfo info = obj.getInfo();
@@ -248,7 +240,7 @@ class FuncProtector extends StatementReplacer<FunctionHeader> {
   }
 
   @Override
-  protected List<NormalStmt> visitPhi(PhiStmt phi, BasicBlock in, FunctionHeader param) {
+  protected List<NormalStmt> visitPhi(PhiStmt phi, BasicBlock in, BasicBlockList param) {
     throw new UnsupportedOperationException("Not supported yet.");
   }
 }
