@@ -197,6 +197,10 @@ public class CasualTest extends BaseTest {
     compile("transition1", TestSteps.EXECUTE, false, false);
   }
   
+  @Test
+  public void alarmClock() {
+    compile("alarmClock", TestSteps.EXECUTE, false, false);
+  }
   
   
   

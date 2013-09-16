@@ -2,7 +2,6 @@
  * Part of upcompiler. Copyright (c) 2012, Urs Fässler, Licensed under the GNU Genera Public License, v3
  * @author: urs@bitzgi.ch
  */
-
 package util.ssa;
 
 import java.io.PrintStream;
@@ -14,58 +13,58 @@ import evl.DefTraverser;
 import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
 import evl.expression.reference.Reference;
-import evl.function.FuncWithBody;
-import evl.function.FunctionBase;
 import evl.statement.normal.Assignment;
 import evl.statement.normal.VarDefStmt;
 import evl.statement.phi.PhiStmt;
 import evl.variable.Variable;
+import java.util.List;
 
-public class DefUseKillVisitor extends DefTraverser<Void, BasicBlock> {
-  private HashMap<BasicBlock, HashSet<Variable>> use = new HashMap<BasicBlock, HashSet<Variable>>();
-  private HashMap<BasicBlock, HashSet<Variable>> def = new HashMap<BasicBlock, HashSet<Variable>>();
-  private HashMap<BasicBlock, HashSet<Variable>> kill = new HashMap<BasicBlock, HashSet<Variable>>();
-  private HashMap<Variable, HashSet<BasicBlock>> blocks = new HashMap<Variable, HashSet<BasicBlock>>();
+public class DefUseKillGetter {
+
+  private DefUseKillVisitor dukvv = new DefUseKillVisitor();
 
   public HashMap<BasicBlock, HashSet<Variable>> getUse() {
-    return use;
+    return dukvv.use;
   }
 
   public HashMap<BasicBlock, HashSet<Variable>> getDef() {
-    return def;
+    return dukvv.def;
   }
 
   public HashMap<BasicBlock, HashSet<Variable>> getKill() {
-    return kill;
+    return dukvv.kill;
   }
 
   public HashMap<Variable, HashSet<BasicBlock>> getBlocks() {
-    return blocks;
+    return dukvv.blocks;
   }
 
-  @Override
-  protected Void visitFunctionBase(FunctionBase obj, BasicBlock param) {
-    assert (param == null);
+  public void traverse(BasicBlockList bbl, List<Variable> param) {
+    // TODO ok? no, move it to function creation
+    // we add the argument variables to the first basic block
+    BasicBlock start = bbl.getEntry();
+    dukvv.use.put(start, new HashSet<Variable>());
+    dukvv.def.put(start, new HashSet<Variable>());
+    dukvv.kill.put(start, new HashSet<Variable>());
 
-    if (obj instanceof FuncWithBody) {
-      BasicBlockList bbl = (BasicBlockList) ((FuncWithBody) obj).getBody();
-      // TODO ok? no, move it to function creation
-      // we add the argument variables to the first basic block
-      param = bbl.getEntry();
-      use.put(param, new HashSet<Variable>());
-      def.put(param, new HashSet<Variable>());
-      kill.put(param, new HashSet<Variable>());
-      visitItr(obj.getParam(), param);
-
-      visit(bbl, null);
+    for( Variable var : param ) {
+      dukvv.traverse(var, start);
     }
 
-    return null;
+    dukvv.traverse(bbl, null);
   }
+}
+
+class DefUseKillVisitor extends DefTraverser<Void, BasicBlock> {
+
+  HashMap<BasicBlock, HashSet<Variable>> use = new HashMap<BasicBlock, HashSet<Variable>>();
+  HashMap<BasicBlock, HashSet<Variable>> def = new HashMap<BasicBlock, HashSet<Variable>>();
+  HashMap<BasicBlock, HashSet<Variable>> kill = new HashMap<BasicBlock, HashSet<Variable>>();
+  HashMap<Variable, HashSet<BasicBlock>> blocks = new HashMap<Variable, HashSet<BasicBlock>>();
 
   @Override
   protected Void visitBasicBlock(BasicBlock obj, BasicBlock param) {
-    assert (param == null);
+    assert ( param == null );
 
     use.put(obj, new HashSet<Variable>());
     def.put(obj, new HashSet<Variable>());
@@ -80,10 +79,10 @@ public class DefUseKillVisitor extends DefTraverser<Void, BasicBlock> {
 
   /* handle phi functions as they belong to the previous basic blocks, what they actually do */
   private void visitFollowingPhi(BasicBlock bb) {
-    for (BasicBlock v : bb.getEnd().getJumpDst()) {
+    for( BasicBlock v : bb.getEnd().getJumpDst() ) {
       BbEdge edge = new BbEdge(bb, v);
       Collection<PhiStmt> phis = edge.getDst().getPhi();
-      for (PhiStmt phi : phis) {
+      for( PhiStmt phi : phis ) {
         throw new RuntimeException("not yet implemented");
         // Expression expr = phi.getArg(bb);
         // assert (expr != null);
@@ -100,10 +99,10 @@ public class DefUseKillVisitor extends DefTraverser<Void, BasicBlock> {
 
   @Override
   protected Void visitVariable(Variable obj, BasicBlock param) {
-    assert (param != null);
+    assert ( param != null );
     def.get(param).add(obj);
     kill.get(param).add(obj);
-    if (!blocks.containsKey(obj)) {
+    if( !blocks.containsKey(obj) ) {
       blocks.put(obj, new HashSet<BasicBlock>());
     }
     blocks.get(obj).add(param);
@@ -112,16 +111,16 @@ public class DefUseKillVisitor extends DefTraverser<Void, BasicBlock> {
 
   @Override
   protected Void visitReference(Reference obj, BasicBlock param) {
-    if (obj.getLink() instanceof Variable) {
+    if( obj.getLink() instanceof Variable ) {
       visitVarRef((Variable) obj.getLink(), param);
     }
     return super.visitReference(obj, param);
   }
 
   private void visitVarRef(Variable ref, BasicBlock bb) {
-    if (!def.get(bb).contains(ref)) {
+    if( !def.get(bb).contains(ref) ) {
       use.get(bb).add(ref);
-      if (!blocks.containsKey(ref)) {
+      if( !blocks.containsKey(ref) ) {
         blocks.put(ref, new HashSet<BasicBlock>());
       }
     }
@@ -135,7 +134,7 @@ public class DefUseKillVisitor extends DefTraverser<Void, BasicBlock> {
   @Override
   protected Void visitAssignment(Assignment obj, BasicBlock param) {
     Reference ref = obj.getLeft();
-    if (ref.getLink() instanceof Variable) {
+    if( ref.getLink() instanceof Variable ) {
       visitVariable((Variable) ref.getLink(), param);
     }
     visitItr(obj.getLeft().getOffset(), param);
@@ -155,11 +154,10 @@ public class DefUseKillVisitor extends DefTraverser<Void, BasicBlock> {
   }
 
   private void printVarList(Collection<Variable> vars, PrintStream st) {
-    for (Variable var : vars) {
+    for( Variable var : vars ) {
       st.print(var);
       st.print(", ");
     }
     st.println();
   }
-
 }

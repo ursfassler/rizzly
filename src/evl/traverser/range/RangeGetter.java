@@ -19,15 +19,17 @@ import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.type.Type;
 import evl.type.base.Range;
 import evl.variable.SsaVariable;
+import evl.variable.StateVariable;
 import evl.variable.Variable;
 
 //TODO implement everything left
 public class RangeGetter extends NullTraverser<Void, Void> {
 
-  private KnowledgeBase kb;
-  private KnowBaseItem kbi;
-  private KnowWriter kw;
-  private Map<SsaVariable, Range> ranges = new HashMap<SsaVariable, Range>();
+  final private KnowledgeBase kb;
+  final private KnowBaseItem kbi;
+  final private KnowWriter kw;
+  final private Map<SsaVariable, Range> ranges = new HashMap<SsaVariable, Range>();
+  final private Map<StateVariable, Range> sranges = new HashMap<StateVariable, Range>();
 
   public RangeGetter(KnowledgeBase kb) {
     super();
@@ -43,17 +45,35 @@ public class RangeGetter extends NullTraverser<Void, Void> {
     return updater.ranges;
   }
 
+  public Map<SsaVariable, Range> getRanges() {
+    return ranges;
+  }
+
+  public Map<StateVariable, Range> getSranges() {
+    return sranges;
+  }
+
+  private Range getRange(Variable var) {
+    if( ranges.containsKey(var) ) {
+      return ranges.get(var);
+    } else if( sranges.containsKey(var) ) {
+      return sranges.get(var);
+    } else {
+      return (Range) var.getType().getRef();
+    }
+  }
+
   @Override
   protected Void visitDefault(Evl obj, Void param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
-  public static SsaVariable getDerefVar(Expression left) {
+  public static Variable getDerefVar(Expression left) {
     if( left instanceof Reference ) {
       Reference ref = (Reference) left;
       if( ref.getOffset().isEmpty() ) {
-        if( ref.getLink() instanceof SsaVariable ) {
-          return (SsaVariable) ref.getLink();
+        if( ref.getLink() instanceof Variable ) {
+          return (Variable) ref.getLink();
         }
       }
     }
@@ -62,10 +82,8 @@ public class RangeGetter extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitRelation(Relation obj, Void param) {
-
-
     {
-      SsaVariable lv = getDerefVar(obj.getLeft());
+      Variable lv = getDerefVar(obj.getLeft());
       if( lv != null ) {
         if( lv.getType().getRef() instanceof Range ) {
           Type rt = ExpressionTypeChecker.process(obj.getRight(), kb);
@@ -73,7 +91,15 @@ public class RangeGetter extends NullTraverser<Void, Void> {
             Range rr = (Range) rt;
             Range range = getRange(lv);
             range = adjustLeft(range, obj.getOp(), rr);
-            ranges.put(lv, range);
+            if( lv instanceof SsaVariable ) {
+              ranges.put((SsaVariable) lv, range);
+            } else if( lv instanceof StateVariable ) {
+              //TODO check that state variable was not written during test (by a called function)
+              //TODO should not be possible since the only call comes from transition guard which is not allowed to change state
+              sranges.put((StateVariable) lv, range);
+            } else {
+              throw new RuntimeException("not yet implemented: " + obj);
+            }
             return null;
           }
         } else {
@@ -111,14 +137,6 @@ public class RangeGetter extends NullTraverser<Void, Void> {
         throw new RuntimeException("not yet implemented: " + op);
     }
     return kbi.getRangeType(low, high);
-  }
-
-  private Range getRange(Variable var) {
-    if( ranges.containsKey(var) ) {
-      return ranges.get(var);
-    } else {
-      return (Range) var.getType().getRef();
-    }
   }
 
   @Override

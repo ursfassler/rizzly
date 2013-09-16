@@ -1,6 +1,7 @@
 package evl.traverser;
 
 import evl.cfg.BasicBlock;
+import evl.hfsm.Transition;
 import evl.statement.phi.PhiStmt;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -35,6 +36,9 @@ import evl.variable.FuncVariable;
 import evl.variable.StateVariable;
 
 //TODO do it for transitions
+
+//FIXME what with expressions in phi?
+
 /**
  * Replaces all state variables used in a function with a cached/local version of it. Writes/Reads them back whenever a
  * called function reads/writes a state variable.
@@ -68,6 +72,13 @@ public class StateVariableExtractor extends DefTraverser<Void, Void> {
     }
     return null;
   }
+
+  @Override
+  protected Void visitTransition(Transition obj, Void param) {
+    throw new RuntimeException("not yet implemented");
+  }
+  
+  
 
   private void doit(FuncWithBody func) {
     Set<StateVariable> reads = ksvrw.getReads(func);
@@ -126,9 +137,6 @@ public class StateVariableExtractor extends DefTraverser<Void, Void> {
     }
   }
 }
-
-//FIXME what with expressions in phi?
-
 /**
  * Writes state variables back if a called function reads that variable. Reads state variables back in if a called
  * function writes that variable.

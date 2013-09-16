@@ -1,5 +1,7 @@
 package evl.traverser;
 
+import evl.hfsm.Transition;
+import evl.other.ListOfNamed;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -52,46 +54,59 @@ public class SsaMaker extends DefTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitFunctionBase(FunctionBase obj, Void param) {
-    Map<FuncVariable, SsaVariable> argmap = new HashMap<FuncVariable, SsaVariable>();
-    ArrayList<Variable> arglist = new ArrayList<Variable>(obj.getParam().getList());
-    obj.getParam().clear();
-    for( Variable par : arglist ) {
-      assert ( par instanceof FuncVariable );
-      SsaVariable svar = new SsaVariable(par.getInfo(), par.getName(), par.getType());
-      obj.getParam().add(svar);
-      argmap.put((FuncVariable) par, svar);
-    }
+  protected Void visitTransition(Transition obj, Void param) {
+    Map<FuncVariable, SsaVariable> argmap = replaceParam(obj.getParam());
+    translateBody(obj.getBody(), obj.getParam().getList(), argmap);
+    return null;
+  }
 
+  @Override
+  protected Void visitFunctionBase(FunctionBase obj, Void param) {
+    Map<FuncVariable, SsaVariable> argmap = replaceParam(obj.getParam());
     if( obj instanceof FuncWithBody ) {
       BasicBlockList body = (BasicBlockList) ( (FuncWithBody) obj ).getBody();
-
-      DirectedGraph<BasicBlock, BbEdge> funcGraph = body.makeFuncGraph();
-      Dominator<BasicBlock, BbEdge> dom = new Dominator<BasicBlock, BbEdge>(funcGraph);
-      dom.calc();
-      DominanceFrontier<BasicBlock, BbEdge> df = new DominanceFrontier<BasicBlock, BbEdge>(funcGraph, dom.getDom());
-      df.calc();
-
-      PhiInserter phi = new PhiInserter((FuncWithBody) obj, df);
-      phi.doWork();
-
-      Map<SsaVariable, Variable> renamed = new HashMap<SsaVariable, Variable>(phi.getRenamed());
-
-      SsaVarCreator ssa = new SsaVarCreator(renamed);
-      ssa.traverse(body, null);
-
-      addPhiArg(body, renamed);
-
-      VariableLinker intra = new VariableLinker(kb, renamed);
-      intra.traverse(body, null);
-
-      InterBbVariableLinker.link(intra, dom.getDom(), body, argmap);
-
+      translateBody(body, obj.getParam().getList(), argmap);
     }
     return null;
   }
 
-  private void addPhiArg(BasicBlockList body, Map<SsaVariable, Variable> renamed) {
+  private void translateBody(BasicBlockList body, List<Variable> arglist, Map<FuncVariable, SsaVariable> argmap) {
+    DirectedGraph<BasicBlock, BbEdge> funcGraph = body.makeFuncGraph();
+    Dominator<BasicBlock, BbEdge> dom = new Dominator<BasicBlock, BbEdge>(funcGraph);
+    dom.calc();
+    DominanceFrontier<BasicBlock, BbEdge> df = new DominanceFrontier<BasicBlock, BbEdge>(funcGraph, dom.getDom());
+    df.calc();
+
+    PhiInserter phi = new PhiInserter(body, arglist, df);
+    phi.doWork();
+
+    Map<SsaVariable, Variable> renamed = new HashMap<SsaVariable, Variable>(phi.getRenamed());
+
+    SsaVarCreator ssa = new SsaVarCreator(renamed);
+    ssa.traverse(body, null);
+
+    addPhiArg(body, renamed);
+
+    VariableLinker intra = new VariableLinker(kb, renamed);
+    intra.traverse(body, null);
+
+    InterBbVariableLinker.link(intra, dom.getDom(), body, argmap);
+  }
+
+  private static Map<FuncVariable, SsaVariable> replaceParam(ListOfNamed<Variable> fpar) {
+    Map<FuncVariable, SsaVariable> argmap = new HashMap<FuncVariable, SsaVariable>();
+    ArrayList<Variable> arglist = new ArrayList<Variable>(fpar.getList());
+    fpar.clear();
+    for( Variable par : arglist ) {
+      assert ( par instanceof FuncVariable );
+      SsaVariable svar = new SsaVariable(par.getInfo(), par.getName(), par.getType());
+      fpar.add(svar);
+      argmap.put((FuncVariable) par, svar);
+    }
+    return argmap;
+  }
+
+  private static void addPhiArg(BasicBlockList body, Map<SsaVariable, Variable> renamed) {
     for( BasicBlock bb : body.getAllBbs() ) {
       for( BasicBlock dst : bb.getEnd().getJumpDst() ) {
         List<PhiStmt> phis = dst.getPhi();
@@ -178,7 +193,7 @@ class VariableLinker extends DefTraverser<Void, Map<Variable, SsaVariable>> {
     for( BasicBlock dst : bb.getEnd().getJumpDst() ) {
       Collection<PhiStmt> phis = dst.getPhi();
       for( PhiStmt phi : phis ) {
-        Variable expr = (Variable) ((Reference) phi.getArg(bb)).getLink();
+        Variable expr = (Variable) ( (Reference) phi.getArg(bb) ).getLink();
         if( expr != null ) { // FIXME why?
           assert ( expr != null );
           expr = replaceVar(expr, param);
@@ -310,10 +325,10 @@ class InterBbVariableLinker extends DefTraverser<Void, BasicBlock> {
   @Override
   protected Void visitPhiStmt(PhiStmt obj, BasicBlock param) {
     for( BasicBlock in : obj.getInBB() ) {
-      Variable var =  (Variable) ((Reference) obj.getArg(in)).getLink();
+      Variable var = (Variable) ( (Reference) obj.getArg(in) ).getLink();
       if( var instanceof FuncVariable ) {
         // the parameter <in> is correct since we execute the phi statement code in the previous basic block
-        var = getVariable(in, (FuncVariable)var, obj.getInfo());
+        var = getVariable(in, (FuncVariable) var, obj.getInfo());
         obj.addArg(in, new Reference(null, var));
       }
     }

@@ -1,0 +1,38 @@
+interface
+  Tick
+    function tick();
+  end
+  
+component
+  AlarmClock
+    input
+      tick    : Tick;
+    
+    output
+      alarm   : Tick;
+    
+  implementation hfsm(Counting)
+    var
+      time    : R{0,100};
+      
+    entry
+      time    := 100;
+    end
+    
+    state Counting
+    end
+    
+    state Off
+    end
+    
+    transition 
+      Counting to Counting by tick.time if time > 0 do
+        time := time - 1;
+      end
+      
+      Counting to Off by tick.time if time = 0 do
+        alarm.tick();
+      end
+    
+  end
+
