@@ -83,7 +83,7 @@ public class RangeGetter extends NullTraverser<Void, Void> {
         }
       }
     }
-    throw new RuntimeException("not yet implemented");
+    throw new RuntimeException("not yet implemented: " + obj);
   }
 
   private Range adjustLeft(Range lr, RelOp op, Range rr) {

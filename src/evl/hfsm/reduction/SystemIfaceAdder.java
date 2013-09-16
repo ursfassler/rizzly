@@ -1,5 +1,6 @@
 package evl.hfsm.reduction;
 
+import evl.cfg.BasicBlockList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -26,9 +27,8 @@ import evl.other.Interface;
 import evl.other.ListOfNamed;
 import evl.other.Namespace;
 import evl.statement.normal.CallStmt;
-import evl.statement.Statement;
+import evl.statement.normal.NormalStmt;
 import evl.variable.Variable;
-import fun.statement.Block;
 
 public class SystemIfaceAdder extends NullTraverser<Void, Void> {
 
@@ -63,12 +63,12 @@ public class SystemIfaceAdder extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitImplHfsm(ImplHfsm obj, Void param) {
-    return null; // added during reduction to elementary
+    throw new RuntimeException("Forgot hfsm reduction phase, dude");
   }
 
   @Override
   protected Void visitImplComposition(ImplComposition obj, Void param) {
-    throw new RuntimeException("Fool! you forgot the composition reduction phase, dude.");
+    throw new RuntimeException("Forgot composition reduction phase, dude");
   }
 
   @Override
@@ -79,21 +79,33 @@ public class SystemIfaceAdder extends NullTraverser<Void, Void> {
       obj.getIface(Direction.in).add(debIface);
     }
 
-    FuncInputHandlerEvent ctor = makeFunc(CONSTRUCT);
     ArrayList<CompUse> compList = new ArrayList<CompUse>(obj.getComponent().getList());
     // FIXME this order may cause errors as it is not granted to be topological order
-    for( CompUse cuse : compList ) {
-      CallStmt call = makeCall(cuse, CONSTRUCT); // TODO correct link? Or should it be to the instance?
-      ctor.getBody().getStatements().add(call);
-    }
-    ctor.getBody().getStatements().add(makeCall(obj.getEntryFunc()));
 
+    FuncInputHandlerEvent ctor = makeFunc(CONSTRUCT);
     FuncInputHandlerEvent dtor = makeFunc(DESTRUCT);
-    dtor.getBody().getStatements().add(makeCall(obj.getExitFunc()));
-    Collections.reverse(compList);
-    for( CompUse cuse : compList ) {
-      CallStmt call = makeCall(cuse, DESTRUCT); // TODO correct link? Or should it be to the instance?
-      dtor.getBody().getStatements().add(call);
+
+    {
+      ArrayList<NormalStmt> code = new ArrayList<NormalStmt>();
+      for( CompUse cuse : compList ) {
+        CallStmt call = makeCall(cuse, CONSTRUCT); // TODO correct link? Or should it be to the instance?
+        code.add(call);
+      }
+      code.add(makeCall(obj.getEntryFunc()));
+
+      ctor.getBody().insertCodeAfterEntry(code, "body");
+    }
+
+    {
+      ArrayList<NormalStmt> code = new ArrayList<NormalStmt>();
+      code.add(makeCall(obj.getExitFunc()));
+      Collections.reverse(compList);
+      for( CompUse cuse : compList ) {
+        CallStmt call = makeCall(cuse, DESTRUCT); // TODO correct link? Or should it be to the instance?
+        code.add(call);
+      }
+
+      dtor.getBody().insertCodeAfterEntry(code, "body");
     }
 
     List<String> ns = new ArrayList<String>();
@@ -104,7 +116,7 @@ public class SystemIfaceAdder extends NullTraverser<Void, Void> {
     return null;
   }
 
-  private Statement makeCall(Reference ref) {
+  private CallStmt makeCall(Reference ref) {
     assert ( ref.getOffset().isEmpty() );
     assert ( ref.getLink() instanceof FunctionBase );
     Reference call = new Reference(ref.getInfo(), ref.getLink());
@@ -114,7 +126,8 @@ public class SystemIfaceAdder extends NullTraverser<Void, Void> {
 
   private FuncInputHandlerEvent makeFunc(String funcname) {
     FuncInputHandlerEvent rfunc = new FuncInputHandlerEvent(info, funcname, new ListOfNamed<Variable>());
-    rfunc.setBody(new Block(info));
+    BasicBlockList body = new BasicBlockList(info);
+    rfunc.setBody(body);
     return rfunc;
   }
 

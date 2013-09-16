@@ -3,7 +3,7 @@
 #include  <string.h>
 #include  "output/inst.h"
 
-#define NUM_STEP 15
+#define NUM_STEP 23
 
 typedef enum {
   DBG_RECV,
@@ -18,6 +18,11 @@ typedef struct {
 } Step;
 
 static const Step events[NUM_STEP] = {
+  { DBG_RECV, 2, {"_system",  "construct",  NULL  } },
+  { DBG_RECV, 3, {"a",        "_system",    "construct" } },
+  { DBG_RECV, 3, {"b",        "_system",    "construct" } },
+  { DBG_RECV, 3, {"c" ,       "_system",    "construct" } },
+
   { DBG_RECV, 2, {"in",   "foo",  NULL  } },
   { DBG_RECV, 3, {"a",    "in",   "foo" } },
   { DBG_SEND, 3, {"a",    "out",  "foo" } },
@@ -32,7 +37,12 @@ static const Step events[NUM_STEP] = {
   { DBG_RECV, 3, {"b",    "in",   "foo" } },
   { DBG_SEND, 3, {"b",    "out",  "foo" } },
   { DBG_SEND, 2, {"out",  "foo",  NULL  } },
-  { RECV,     0, {NULL,   NULL,   NULL  } }
+  { RECV,     0, {NULL,   NULL,   NULL  } },
+
+  { DBG_RECV, 2, {"_system",  "destruct",   NULL  } },
+  { DBG_RECV, 3, {"c",        "_system",    "destruct" } },
+  { DBG_RECV, 3, {"b",        "_system",    "destruct" } },
+  { DBG_RECV, 3, {"a" ,       "_system",    "destruct" } }
 };
 
 static int step = 0;
@@ -60,6 +70,11 @@ static void printError( const Step *as ){
 }
 
 static void checkStep( What what, uint8_t *list, int size ){
+  if( step >= NUM_STEP ){
+    printf( "Too many steps" );
+    goto error;
+  }
+  
   switch( what ){
     case DBG_RECV: printf( "recv" ); break;
     case DBG_SEND: printf( "send" ); break;
@@ -92,11 +107,11 @@ static void checkStep( What what, uint8_t *list, int size ){
   printf( "\n" );
 }
 
-void inst__debug_msgSend(Pointer_Array_4_R_0_5 sender, R_0_3 size){
+void inst__debug_msgSend(Pointer_Array_4_R_0_8 sender, R_0_3 size){
   checkStep( DBG_SEND, *sender, size );
 }
 
-void inst__debug_msgRecv(Pointer_Array_4_R_0_5 receiver, R_0_3 size){
+void inst__debug_msgRecv(Pointer_Array_4_R_0_8 receiver, R_0_3 size){
   checkStep( DBG_RECV, *receiver, size );
 }
 
@@ -105,10 +120,13 @@ void inst_out_foo(){
 }
 
 int main(){
-  inst__entry();
+  inst__system_construct();
 
   printf( "send message :in.foo\n" );
   inst_in_foo();
+  
+  inst__system_destruct();
+
   return error;
 }
 

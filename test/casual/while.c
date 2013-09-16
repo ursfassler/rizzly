@@ -13,7 +13,7 @@ while_Point inst_out_foo(R_0_255 x){
 
 
 int main(){
-  inst__entry();
+  inst__system_construct();
 
   while_Point point;
   

@@ -95,6 +95,8 @@ import evl.variable.StateVariable;
 import evl.variable.Variable;
 import fun.hfsm.State;
 
+//TODO ensure that composition and hfsm use construct and destruct correctly
+
 public class MainEvl {
 
   private static ElementInfo info = new ElementInfo();
@@ -121,6 +123,8 @@ public class MainEvl {
     root = compositionReduction(aclasses, root);
     root = hfsmReduction(root, opt, debugdir, aclasses, kb);
 
+    addConDestructor(aclasses, debugdir, kb);
+    
     PrettyPrinter.print(aclasses, debugdir + "reduced.rzy", true);
 
     MemoryAccessCapsulater.process(aclasses, kb);
@@ -363,8 +367,6 @@ public class MainEvl {
   }
 
   private static Component hfsmReduction(Component root, ClaOption opt, String debugdir, Namespace classes, KnowledgeBase kb) {
-//    addConDestructor(classes, debugdir, kb);
-
     HfsmGraphviz.print(classes, debugdir + "hfsm.gv");
     HfsmToFsm.process(classes, kb);
     PrettyPrinter.print(classes, debugdir + "fsm.rzy", true);
@@ -476,13 +478,6 @@ public class MainEvl {
     {
       Namespace root = classes.forcePath(new Designator("!env", "inst"));
       makeInputPublic(root, top.getIface(Direction.in));  //TODO why top and not newly instantiated stuff?
-
-      KnowEvl kf = kb.getEntry(KnowEvl.class);
-      FunctionBase entry = (FunctionBase) kf.get(new Designator("inst", State.ENTRY_FUNC_NAME), info);
-      FunctionBase exit = (FunctionBase) kf.get(new Designator("inst", State.EXIT_FUNC_NAME), info);
-      entry.getAttributes().add(FuncAttr.Public);
-      exit.getAttributes().add(FuncAttr.Public);
-
 
       Set<FunctionBase> pubfunc = new HashSet<FunctionBase>();
       for( FunctionBase func : classes.getItems(FunctionBase.class, true) ) {

@@ -13,7 +13,7 @@ void inst_out_tick( uint8_t x ){
 }
 
 int main(){
-  inst__entry();
+  inst__system_construct();
 
   int i;
   for( i = 0; i < 100; i++ ){

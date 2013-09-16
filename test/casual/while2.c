@@ -15,7 +15,7 @@ void inst_out_foo(R_0_100 x){
 }
 
 int main(){
-  inst__entry();
+  inst__system_construct();
 
   R_0_100 i;
   for( i = 0; i <= 100; i++ ){

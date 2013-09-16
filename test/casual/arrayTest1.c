@@ -10,7 +10,7 @@ void inst_out_tick(R_0_200 x){
 }
 
 int main(){
-  inst__entry();
+  inst__system_construct();
 
   R_0_200 i;
   R_0_200 exp;

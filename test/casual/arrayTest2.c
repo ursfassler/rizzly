@@ -4,7 +4,7 @@
 #include  "output/inst.h"
 
 int main(){
-  inst__entry();
+  inst__system_construct();
 
   int i;
   R_0_199 a[20];

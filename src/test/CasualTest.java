@@ -187,6 +187,10 @@ public class CasualTest extends BaseTest {
     compile("enumTest", TestSteps.COMPILE_TO_FUN, false, false);
   }
 
+  @Test
+  public void elemComp() {
+    compile("elemComp", TestSteps.EXECUTE, false, false);
+  }
   
   
   

@@ -39,7 +39,6 @@ import evl.other.ListOfNamed;
 import evl.other.Named;
 import evl.other.Namespace;
 import evl.statement.normal.CallStmt;
-import evl.statement.Statement;
 import evl.statement.normal.NormalStmt;
 import evl.variable.Variable;
 import fun.hfsm.State;

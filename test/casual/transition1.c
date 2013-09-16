@@ -8,7 +8,7 @@ void inst_out_tick(){
 }
 
 int main(){
-  inst__entry();
+  inst__system_construct();
   
   inst_in_tick();
   inst_in_tick();

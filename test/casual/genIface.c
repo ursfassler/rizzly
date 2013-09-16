@@ -15,7 +15,7 @@ R_0_2000 inst_out2_out(){
 }
 
 int main( int argc, char **argv ){
-  inst__entry();
+  inst__system_construct();
 
   R_0_2000 n2000;
   R_0_10   n10;

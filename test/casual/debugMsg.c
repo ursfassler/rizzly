@@ -34,7 +34,7 @@ void inst_out_bar(){
 }
 
 int main(){
-  inst__entry();
+  inst__system_construct();
 
   printf( "in-foo\n" );
   inst_in_foo();

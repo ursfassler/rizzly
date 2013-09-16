@@ -1,0 +1,65 @@
+
+interface
+  GetVal
+    function get:R{0,100};
+  end
+
+component
+  Sub{Init,Deinit:R{0,100}}
+    input
+      val : GetVal;
+      
+  implementation elementary
+    var
+      value : R{0,100};
+    
+    entry
+      value := Init;
+    end
+    
+    exit
+      value := Deinit;
+    end
+    
+    function val.get:R{0,100}
+      return value;
+    end
+  end
+
+  ElemComp
+    input
+      val1 : GetVal;
+      val2 : GetVal;
+      val3 : GetVal;
+      val4 : GetVal;
+      val5 : GetVal;
+      
+  implementation elementary
+    component
+      sub1 : Sub{10,20};
+      sub2 : Sub{20,30};
+      sub3 : Sub{30,40};
+      sub4 : Sub{40,50};
+      sub5 : Sub{50,60};
+    
+    function val1.get:R{0,100}
+      return sub1.val.get();
+    end
+    
+    function val2.get:R{0,100}
+      return sub2.val.get();
+    end
+    
+    function val3.get:R{0,100}
+      return sub3.val.get();
+    end
+    
+    function val4.get:R{0,100}
+      return sub4.val.get();
+    end
+    
+    function val5.get:R{0,100}
+      return sub5.val.get();
+    end
+  end
+

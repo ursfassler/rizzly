@@ -15,7 +15,7 @@ static int test( enumCase_Weekday day, int value ){
 }
 
 int main(){
-  inst__entry();
+  inst__system_construct();
   
   if( test( Monday, 2 ) < 0 ) return -1;
   if( test( Tuesday, 0 ) < 0 ) return -1;

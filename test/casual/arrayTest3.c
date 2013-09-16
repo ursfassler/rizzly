@@ -4,7 +4,7 @@
 #include  "output/inst.h"
 
 int main(){
-  inst__entry();
+  inst__system_construct();
   
   R_0_31 i;
   for( i = 0; i < 32; i++ ){
