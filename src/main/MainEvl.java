@@ -119,7 +119,7 @@ public class MainEvl {
     }
 
     root = compositionReduction(aclasses, root);
-//    root = hfsmReduction(root, opt, debugdir, aclasses, kb);
+    root = hfsmReduction(root, opt, debugdir, aclasses, kb);
 
     PrettyPrinter.print(aclasses, debugdir + "reduced.rzy", true);
 
@@ -363,7 +363,7 @@ public class MainEvl {
   }
 
   private static Component hfsmReduction(Component root, ClaOption opt, String debugdir, Namespace classes, KnowledgeBase kb) {
-    addConDestructor(classes, debugdir, kb);
+//    addConDestructor(classes, debugdir, kb);
 
     HfsmGraphviz.print(classes, debugdir + "hfsm.gv");
     HfsmToFsm.process(classes, kb);
