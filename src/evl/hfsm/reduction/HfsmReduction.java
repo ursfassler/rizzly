@@ -23,11 +23,9 @@ import evl.statement.bbend.CaseOptEntry;
 import evl.statement.bbend.CaseOptValue;
 import evl.statement.bbend.Goto;
 import evl.statement.bbend.IfGoto;
-import evl.statement.bbend.ReturnExpr;
 import evl.copy.Copy;
 import evl.expression.Expression;
 import evl.expression.reference.RefCall;
-import evl.expression.reference.RefItem;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
 import evl.function.FuncWithBody;
@@ -235,22 +233,23 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
   }
 
   private List<HfsmQueryFunction> addQueryCode(ImplHfsm obj, Collection<StateSimple> leafes, HashMap<StateSimple, EnumElement> enumMap, StateVariable stateVariable, String ifaceName, FuncInputHandlerQuery func) {
-    List<HfsmQueryFunction> queryList = new ArrayList<HfsmQueryFunction>();
+    throw new RuntimeException("not yet implemented");
+    /*    List<HfsmQueryFunction> queryList = new ArrayList<HfsmQueryFunction>();
     List<CaseOpt> option = new ArrayList<CaseOpt>();
     for( State state : leafes ) {
-      HfsmQueryFunction query = getQuery(state, ifaceName, func.getName());
-      CaseOpt opt = makeCaseOption(state, enumMap);
-      opt.getCode().getStatements().add(new ReturnExpr(new ElementInfo(), makeCall(query))); // TODO parameters?
-      option.add(opt);
-
-      query.setName(state.getName() + Designator.NAME_SEP + ifaceName + Designator.NAME_SEP + query.getName());
-      queryList.add(query);
+    HfsmQueryFunction query = getQuery(state, ifaceName, func.getName());
+    CaseOpt opt = makeCaseOption(state, enumMap);
+    opt.getCode().getStatements().add(new ReturnExpr(new ElementInfo(), makeCall(query))); // TODO parameters?
+    option.add(opt);
+    
+    query.setName(state.getName() + Designator.NAME_SEP + ifaceName + Designator.NAME_SEP + query.getName());
+    queryList.add(query);
     }
-
+    
     CaseStmt caseStmt = new CaseStmt(new ElementInfo(), new Reference(new ElementInfo(), stateVariable, new ArrayList<RefItem>()), option, new Block(new ElementInfo()));
     func.getBody().getStatements().add(caseStmt);
-
-    return queryList;
+    
+    return queryList;*/
   }
 
   private HfsmQueryFunction getQuery(State state, String ifaceName, String funcName) {
