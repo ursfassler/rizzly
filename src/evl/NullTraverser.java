@@ -20,7 +20,7 @@ import evl.expression.BoolValue;
 import evl.expression.Number;
 import evl.expression.Relation;
 import evl.expression.StringValue;
-import evl.expression.TypeCast;
+import evl.statement.normal.TypeCast;
 import evl.expression.UnaryExpression;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;

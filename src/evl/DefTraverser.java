@@ -26,7 +26,7 @@ import evl.expression.Expression;
 import evl.expression.Number;
 import evl.expression.Relation;
 import evl.expression.StringValue;
-import evl.expression.TypeCast;
+import evl.statement.normal.TypeCast;
 import evl.expression.UnaryExpression;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
@@ -587,8 +587,9 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitTypeCast(TypeCast obj, P param) {
-    visit(obj.getRef(), param);
+    visit(obj.getValue(), param);
     visit(obj.getCast(), param);
+    visit(obj.getVariable(), param);
     return null;
   }
 

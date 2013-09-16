@@ -24,6 +24,7 @@ import evl.knowledge.KnowledgeBase;
 import evl.statement.normal.CallStmt;
 import evl.statement.Statement;
 import evl.statement.normal.Assignment;
+import evl.statement.normal.TypeCast;
 import evl.statement.normal.VarDefInitStmt;
 import evl.statement.normal.VarDefStmt;
 import evl.statement.phi.PhiStmt;
@@ -247,6 +248,13 @@ public class StatementTypeChecker extends NullTraverser<Void, Map<SsaVariable, R
 
   @Override
   protected Void visitReturnVoid(ReturnVoid obj, Map<SsaVariable, Range> param) {
+    return null;
+  }
+
+  @Override
+  protected Void visitTypeCast(TypeCast obj, Map<SsaVariable, Range> param) {
+    // we trust the cast
+    //TODO can we trust the cast?
     return null;
   }
 

@@ -1,5 +1,6 @@
 package evl.traverser;
 
+import evl.statement.normal.TypeCast;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -132,6 +133,7 @@ public class ExprCutter extends NullTraverser<Void, Void> {
 }
 
 
+
 class StmtTraverser extends NullTraverser<Void, List<NormalStmt>> {
 
   private KnowledgeBase kb;
@@ -215,6 +217,15 @@ class StmtTraverser extends NullTraverser<Void, List<NormalStmt>> {
 
   @Override
   protected Void visitStackMemoryAlloc(StackMemoryAlloc obj, List<NormalStmt> param) {
+    return null;
+  }
+
+  @Override
+  protected Void visitTypeCast(TypeCast obj, List<NormalStmt> param) {
+    if( !KnowSimpleExpr.isSimple(obj.getValue()) ) {
+      SsaVariable var = cutter.extract(obj.getValue(), param);
+      obj.setValue(new Reference(obj.getInfo(), var));
+    }
     return null;
   }
 

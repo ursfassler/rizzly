@@ -18,7 +18,7 @@ import evl.expression.Expression;
 import evl.expression.Number;
 import evl.expression.Relation;
 import evl.expression.StringValue;
-import evl.expression.TypeCast;
+import evl.statement.normal.TypeCast;
 import evl.expression.UnaryExpression;
 import evl.expression.reference.Reference;
 import evl.knowledge.KnowBaseItem;
@@ -117,11 +117,6 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
     } else {
       return RefTypeChecker.process(obj, kb);
     }
-  }
-
-  @Override
-  protected Type visitTypeCast(TypeCast obj, Void param) {
-    return visit(obj.getCast(), param);
   }
 
   @Override

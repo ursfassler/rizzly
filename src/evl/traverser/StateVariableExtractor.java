@@ -23,6 +23,7 @@ import evl.DefTraverser;
 import evl.Evl;
 import evl.cfg.BasicBlockList;
 import evl.copy.Relinker;
+import evl.statement.normal.TypeCast;
 import evl.expression.reference.Reference;
 import evl.function.FuncWithBody;
 import evl.function.FunctionHeader;
@@ -33,7 +34,11 @@ import evl.statement.Statement;
 import evl.statement.normal.Assignment;
 import evl.statement.normal.NormalStmt;
 import evl.statement.normal.VarDefStmt;
+import evl.traverser.range.RangeGetter;
+import evl.type.TypeRef;
+import evl.type.base.Range;
 import evl.variable.FuncVariable;
+import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
 
 //TODO do it for transitions
@@ -47,12 +52,14 @@ import evl.variable.StateVariable;
  */
 public class StateVariableExtractor extends DefTraverser<Void, Void> {
 
-  private KnowStateVariableReadWrite ksvrw;
+  final private KnowledgeBase kb;
+  final private KnowStateVariableReadWrite ksvrw;
   final private Map<StateVariable, FuncVariable> cache = new HashMap<StateVariable, FuncVariable>();
 
   public StateVariableExtractor(KnowledgeBase kb) {
     super();
     ksvrw = kb.getEntry(KnowStateVariableReadWrite.class);
+    this.kb = kb;
   }
 
   public static void process(Namespace classes, KnowledgeBase kb) {
@@ -74,11 +81,26 @@ public class StateVariableExtractor extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitTransition(Transition obj, Void param) {
-    doit( obj.getBody() );
+    Map<StateVariable, Assignment> loads = doit(obj.getBody());
+    // narrow ranges depending on the transition guard
+/*    if( !loads.isEmpty() ) {
+      RangeGetter getter = new RangeGetter(kb);
+      getter.traverse(obj.getGuard(), null);
+      Map<StateVariable, Range> varSRange = getter.getSranges();
+      for( StateVariable load : loads.keySet() ) {
+        if( varSRange.containsKey(load) ) {
+          Range nt = varSRange.get(load);
+          if( nt != load.getType().getRef() ) {
+            Assignment ass = loads.get(load);
+            ass.setRight(new TypeCast(new ElementInfo(), new Reference(new ElementInfo(), load), new TypeRef(new ElementInfo(), nt)));
+          }
+        }
+      }
+    }*/
     return null;
   }
 
-  private void doit(BasicBlockList func) {
+  private Map<StateVariable, Assignment> doit(BasicBlockList func) {
     Set<StateVariable> reads = ksvrw.getReads(func);
     Set<StateVariable> writes = ksvrw.getWrites(func);
 
@@ -95,9 +117,14 @@ public class StateVariableExtractor extends DefTraverser<Void, Void> {
       }
     }
 
+    Map<StateVariable, Assignment> ret = new HashMap<StateVariable, Assignment>();
     for( StateVariable var : replace ) {
-      replaceVar(var, func, reads.contains(var), writes.contains(var));
+      Assignment load = replaceVar(var, func, reads.contains(var), writes.contains(var));
+      if( load != null ) {
+        ret.put(var, load);
+      }
     }
+    return ret;
   }
 
   /**
@@ -110,7 +137,7 @@ public class StateVariableExtractor extends DefTraverser<Void, Void> {
    * @param write
    *          add code to write variable out
    */
-  private void replaceVar(StateVariable var, BasicBlockList func, boolean read, boolean write) {
+  private Assignment replaceVar(StateVariable var, BasicBlockList func, boolean read, boolean write) {
     ElementInfo info = var.getInfo();
 
     FuncVariable ssa = new FuncVariable(info, var.getName() + Designator.NAME_SEP + "ssa", var.getType().copy());
@@ -123,9 +150,12 @@ public class StateVariableExtractor extends DefTraverser<Void, Void> {
       Relinker.relink(func, map);
     }
 
+    Assignment load;
     if( read ) {
-      Assignment load = new Assignment(info, new Reference(info, ssa), new Reference(info, var));
+      load = new Assignment(info, new Reference(info, ssa), new Reference(info, var));
       func.getEntry().getCode().add(0, load);
+    } else {
+      load = null;
     }
     VarDefStmt def = new VarDefStmt(info, ssa);
     func.getEntry().getCode().add(0, def);
@@ -133,6 +163,7 @@ public class StateVariableExtractor extends DefTraverser<Void, Void> {
       Assignment store = new Assignment(info, new Reference(info, var), new Reference(info, ssa));
       func.getExit().getCode().add(store);
     }
+    return load;
   }
 }
 

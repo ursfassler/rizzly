@@ -1,6 +1,5 @@
 package evl.traverser;
 
-import common.ElementInfo;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -55,7 +54,7 @@ import evl.expression.Expression;
 import evl.expression.Number;
 import evl.expression.Relation;
 import evl.expression.StringValue;
-import evl.expression.TypeCast;
+import evl.statement.normal.TypeCast;
 import evl.expression.UnaryExpression;
 import evl.expression.UnaryOp;
 import evl.expression.reference.RefCall;
@@ -92,6 +91,7 @@ import evl.variable.Constant;
 import evl.variable.FuncVariable;
 import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
+
 
 public class ToPir extends NullTraverser<PirObject, Void> {
 
@@ -308,7 +308,7 @@ public class ToPir extends NullTraverser<PirObject, Void> {
   @Override
   protected PirObject visitBoolValue(BoolValue obj, Void param) {
     pir.type.BooleanType type = kbi.getBooleanType();
-    return new pir.expression.BoolValue(obj.isValue(),new TypeRef(type));
+    return new pir.expression.BoolValue(obj.isValue(), new TypeRef(type));
   }
 
   @Override
@@ -477,6 +477,13 @@ public class ToPir extends NullTraverser<PirObject, Void> {
   }
 
   @Override
+  protected PirObject visitTypeCast(TypeCast obj, Void param) {
+    pir.other.SsaVariable var = (pir.other.SsaVariable) visit(obj.getVariable(), null);
+    PirValue old = (PirValue) visit(obj.getValue(),null);  // and we hope that we cast to the right value
+    return new pir.statement.normal.convert.TypeCast(var, old);
+  }
+
+  @Override
   protected PirObject visitVarDefInitStmt(VarDefInitStmt obj, Void param) {
     pir.other.SsaVariable var = (pir.other.SsaVariable) visit(obj.getVariable(), null);
     ToVariableGenerator converter = new ToVariableGenerator(this);
@@ -604,8 +611,8 @@ public class ToPir extends NullTraverser<PirObject, Void> {
   protected PirObject visitTypeRef(evl.type.TypeRef obj, Void param) {
     return new TypeRef((pir.type.Type) visit(obj.getRef(), null));
   }
+ 
 }
-
 class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, pir.other.SsaVariable> {
 
   private ToPir converter;
@@ -652,7 +659,7 @@ class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, pir.other
 
   @Override
   protected VariableGeneratorStmt visitTypeCast(TypeCast obj, pir.other.SsaVariable param) {
-    VarRefSimple old = (VarRefSimple) converter.traverse(obj.getRef(), null);
+    VarRefSimple old = (VarRefSimple) converter.traverse(obj.getValue(), null);
     return new pir.statement.normal.convert.TypeCast(param, old);
   }
 

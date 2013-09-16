@@ -65,6 +65,7 @@ import evl.other.Namespace;
 import evl.other.RizzlyProgram;
 import evl.passes.MemoryAccessCapsulater;
 import evl.passes.RangeNarrower;
+import evl.passes.TransitionGuardNarrower;
 import evl.traverser.CallgraphMaker;
 import evl.traverser.ClassGetter;
 import evl.traverser.CompInstantiator;
@@ -111,6 +112,7 @@ public class MainEvl {
     SsaMaker.process(aclasses, kb);
     PrettyPrinter.print(aclasses, debugdir + "ssa.rzy", false);
 
+    TransitionGuardNarrower.process(aclasses,kb);
     RangeNarrower.process(aclasses, kb);
 
     PrettyPrinter.print(aclasses, debugdir + "ssaRanged.rzy", false);
@@ -610,4 +612,5 @@ public class MainEvl {
       }
     }
   }
+
 }

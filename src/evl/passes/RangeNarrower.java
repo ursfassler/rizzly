@@ -17,7 +17,7 @@ import evl.statement.bbend.CaseGoto;
 import evl.statement.bbend.CaseGotoOpt;
 import evl.statement.bbend.IfGoto;
 import evl.expression.Expression;
-import evl.expression.TypeCast;
+import evl.statement.normal.TypeCast;
 import evl.expression.reference.Reference;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowSsaUsage;
@@ -68,6 +68,8 @@ public class RangeNarrower extends DefTraverser<Void, Void> {
 }
 
 // functions return true if something changed
+// functions return true if something changed
+
 // functions return true if something changed
 class Narrower extends DefTraverser<Void, Void> {
 
@@ -166,9 +168,8 @@ class Narrower extends DefTraverser<Void, Void> {
   private void replace(BasicBlock startBb, SsaVariable var, Type newType) {
     assert ( startBb.getPhi().isEmpty() ); // if not true, we have to find a solution :(
     SsaVariable newVar = new SsaVariable(var.getInfo(), NameFactory.getNew(), new TypeRef(new ElementInfo(), newType));
-    Expression initExpr = new TypeCast(var.getInfo(), new Reference(startBb.getInfo(), var), new TypeRef(new ElementInfo(), newType));
-    VarDefInitStmt ass = new VarDefInitStmt(var.getInfo(), newVar, initExpr);
-    startBb.getCode().add(0, ass);
+    TypeCast initExpr = new TypeCast(var.getInfo(), newVar, new TypeRef(new ElementInfo(), newType), new Reference(startBb.getInfo(), var));
+    startBb.getCode().add(0, initExpr);
     VariableReplacer.replace(startBb, 1, var, newVar);
 
     Set<Statement> use = ksu.get(newVar);
@@ -190,6 +191,18 @@ class Narrower extends DefTraverser<Void, Void> {
       }
     }
   }
+
+  // introduced by TransitionGuardNarrower
+  @Override
+  protected Void visitTypeCast(TypeCast obj, Void param) {
+    Set<Statement> use = ksu.get(obj.getVariable());
+    for( Statement stmt : use ) {
+      update(stmt);
+    }
+    return super.visitTypeCast(obj, param);
+  }
+  
+  
 }
 
 // functions return true if something changed

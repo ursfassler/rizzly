@@ -24,7 +24,7 @@ import evl.expression.Expression;
 import evl.expression.Number;
 import evl.expression.Relation;
 import evl.expression.StringValue;
-import evl.expression.TypeCast;
+import evl.statement.normal.TypeCast;
 import evl.expression.UnaryExpression;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
@@ -303,6 +303,8 @@ public abstract class Traverser<R, P> {
       return visitGetElementPtr((GetElementPtr) obj, param);
     } else if( obj instanceof StackMemoryAlloc ) {
       return visitStackMemoryAlloc((StackMemoryAlloc) obj, param);
+    } else if( obj instanceof TypeCast ) {
+      return visitTypeCast((TypeCast) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -335,8 +337,6 @@ public abstract class Traverser<R, P> {
       return visitUnaryExpression((UnaryExpression) obj, param);
     } else if( obj instanceof Reference ) {
       return visitReference((Reference) obj, param);
-    } else if( obj instanceof TypeCast ) {
-      return visitTypeCast((TypeCast) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }

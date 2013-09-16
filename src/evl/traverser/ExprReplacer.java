@@ -18,7 +18,7 @@ import evl.expression.Expression;
 import evl.expression.Number;
 import evl.expression.Relation;
 import evl.expression.StringValue;
-import evl.expression.TypeCast;
+import evl.statement.normal.TypeCast;
 import evl.expression.UnaryExpression;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
@@ -84,11 +84,6 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitTypeCast(TypeCast obj, T param) {
-    return obj; // XXX make something when changing TypeCast.ref from SsaVariable to Reference
-  }
-
-  @Override
   protected Expression visitNumber(Number obj, T param) {
     return obj;
   }
@@ -120,6 +115,12 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   @Override
   protected Expression visitBoolValue(BoolValue obj, T param) {
     return obj;
+  }
+
+  @Override
+  protected Expression visitTypeCast(TypeCast obj, T param) {
+    obj.setValue(visit(obj.getValue(),param));
+    return null;
   }
 
   @Override

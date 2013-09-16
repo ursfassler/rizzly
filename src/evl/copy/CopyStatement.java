@@ -15,11 +15,13 @@ import evl.statement.normal.StackMemoryAlloc;
 import evl.statement.Statement;
 import evl.statement.normal.Assignment;
 import evl.statement.normal.StoreStmt;
+import evl.statement.normal.TypeCast;
 import evl.statement.normal.VarDefInitStmt;
 import evl.statement.normal.VarDefStmt;
 import evl.statement.phi.PhiStmt;
 
 public class CopyStatement extends NullTraverser<Statement, Void> {
+
   private CopyEvl cast;
 
   public CopyStatement(CopyEvl cast) {
@@ -108,10 +110,14 @@ public class CopyStatement extends NullTraverser<Statement, Void> {
   @Override
   protected Statement visitPhiStmt(PhiStmt obj, Void param) {
     PhiStmt ret = new PhiStmt(obj.getInfo(), cast.copy(obj.getVariable()));
-    for (BasicBlock in : obj.getInBB()) {
+    for( BasicBlock in : obj.getInBB() ) {
       ret.addArg(cast.copy(in), cast.copy(obj.getArg(in)));
     }
     return ret;
   }
 
+  @Override
+  protected Statement visitTypeCast(TypeCast obj, Void param) {
+    return new TypeCast(obj.getInfo(), cast.copy(obj.getVariable()), cast.copy(obj.getCast()), cast.copy(obj.getValue()));
+  }
 }
