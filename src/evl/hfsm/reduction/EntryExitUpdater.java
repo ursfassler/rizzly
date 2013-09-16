@@ -24,7 +24,6 @@ import evl.hfsm.Transition;
 import evl.other.ListOfNamed;
 import evl.other.Named;
 import evl.statement.normal.CallStmt;
-import evl.statement.Statement;
 import evl.statement.normal.NormalStmt;
 import evl.variable.Variable;
 

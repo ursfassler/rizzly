@@ -362,17 +362,19 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
   }
 
   /**
-   * Makes one BasicBlock with everithing a transition needs:
-   * - call of all exit functions
-   * - call of the transition body
-   * - call of all entry functions
+   * Checks if transition is built like we expect and makes a transition bb out of it.
    */
   private BasicBlock makeTransition(Transition trans, BasicBlock nextBb) {
     BasicBlock transCode = new BasicBlock(info, "bb" + Designator.NAME_SEP + trans.getName());
 
-    //TODO make exit calls;
-    //TODO call transition function
-    //TODO make entry calls
+    assert( trans.getBody().getEntry().getCode().isEmpty() );
+    assert( trans.getBody().getExit().getCode().isEmpty() );
+    assert( trans.getBody().getExit().getPhi().isEmpty() );
+    assert( trans.getBody().getBasicBlocks().size() == 1 );
+    
+    BasicBlock body = trans.getBody().getBasicBlocks().iterator().next();
+    
+    transCode.getCode().addAll( body.getCode() );
 
     transCode.setEnd(new Goto(info, nextBb));
 

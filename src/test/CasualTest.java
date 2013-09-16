@@ -192,6 +192,10 @@ public class CasualTest extends BaseTest {
     compile("elemComp", TestSteps.EXECUTE, false, false);
   }
   
+  @Test
+  public void transition1() {
+    compile("transition1", TestSteps.EXECUTE, false, false);
+  }
   
   
   

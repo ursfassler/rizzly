@@ -1,6 +1,8 @@
 package evl.hfsm.reduction;
 
+import common.Designator;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -11,12 +13,14 @@ import common.ElementInfo;
 
 import evl.Evl;
 import evl.NullTraverser;
+import evl.cfg.BasicBlockList;
 import evl.copy.Copy;
 import evl.expression.Expression;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefItem;
 import evl.expression.reference.Reference;
 import evl.function.FuncWithBody;
+import evl.function.impl.FuncPrivateVoid;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.QueryItem;
 import evl.hfsm.State;
@@ -26,9 +30,10 @@ import evl.hfsm.StateSimple;
 import evl.hfsm.Transition;
 import evl.knowledge.KnowParent;
 import evl.knowledge.KnowledgeBase;
+import evl.other.ListOfNamed;
 import evl.statement.normal.CallStmt;
-import evl.statement.Statement;
 import evl.statement.normal.NormalStmt;
+import evl.variable.Variable;
 
 /**
  * adds transitions to the children until leaf states also adds calls to exit and entry function
@@ -38,16 +43,19 @@ import evl.statement.normal.NormalStmt;
  */
 public class TransitionDownPropagator extends NullTraverser<Void, TransitionParam> {
 
-  private KnowParent kp;
-  private Map<Transition, State> tsrc;
-  private Map<Transition, State> tdst;
-  private Map<Transition, State> ttop;
+  private static final ElementInfo info = new ElementInfo();
+  private final KnowParent kp;
+  private final Map<Transition, State> tsrc;
+  private final Map<Transition, State> tdst;
+  private final Map<Transition, State> ttop;
+  private final Map<Transition, FuncPrivateVoid> tfunc;
 
-  public TransitionDownPropagator(KnowledgeBase kb, Map<Transition, State> tsrc, Map<Transition, State> tdst, Map<Transition, State> ttop) {
+  public TransitionDownPropagator(KnowledgeBase kb, Map<Transition, State> tsrc, Map<Transition, State> tdst, Map<Transition, State> ttop, Map<Transition, FuncPrivateVoid> tfunc) {
     super();
     this.tsrc = tsrc;
     this.tdst = tdst;
     this.ttop = ttop;
+    this.tfunc = tfunc;
     kp = kb.getEntry(KnowParent.class);
   }
 
@@ -55,8 +63,28 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
     TransitionEndpointCollector tec = new TransitionEndpointCollector();
     tec.traverse(hfsm.getTopstate(), null);
 
-    TransitionDownPropagator redirecter = new TransitionDownPropagator(kb, tec.getTsrc(), tec.getTdst(), tec.getTtop());
+    assert ( tec.getTdst().size() == tec.getTsrc().size() );
+    assert ( tec.getTdst().size() == tec.getTtop().size() );
+    Map<Transition, FuncPrivateVoid> tfunc = new HashMap<Transition, FuncPrivateVoid>();
+    for( Transition trans : tec.getTdst().keySet() ) {
+      FuncPrivateVoid func = makeTransBodyFunc(trans);
+      hfsm.getTopstate().getFunction().add(func);
+      tfunc.put(trans, func);
+    }
+
+    TransitionDownPropagator redirecter = new TransitionDownPropagator(kb, tec.getTsrc(), tec.getTdst(), tec.getTtop(), tfunc);
     redirecter.traverse(hfsm.getTopstate(), new TransitionParam());
+  }
+
+  /**
+   * Extracts a function out of the transition body
+   */
+  private static FuncPrivateVoid makeTransBodyFunc(Transition trans) {
+    Collection<Variable> params = Copy.copy(trans.getParam().getList());
+    FuncPrivateVoid func = new FuncPrivateVoid(info, trans.getName() + Designator.NAME_SEP + "transFunc", new ListOfNamed<Variable>(params));
+    func.setBody(trans.getBody());
+    trans.setBody(new BasicBlockList(info));
+    return func;
   }
 
   @Override
@@ -85,24 +113,39 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
     return null;
   }
 
-  public void addTrans(StateSimple src, Transition trans) {
-    State os = ttop.get(trans);
+  private void addTrans(StateSimple src, Transition otrans) {
+    State os = ttop.get(otrans);
     assert ( os != null );
-    State dst = tdst.get(trans);
+    State dst = tdst.get(otrans);
     assert ( dst != null );
-    trans = Copy.copy(trans);
+    Transition trans = Copy.copy(otrans);
     trans.setSrc(src);
 
+    assert ( trans.getBody().getEntry().getCode().isEmpty() );  // because we emptied it before
+    assert ( trans.getBody().getExit().getCode().isEmpty() );  // because we emptied it before
+    assert ( trans.getBody().getBasicBlocks().isEmpty() );  // because we emptied it before
+
+    List<NormalStmt> body = new ArrayList<NormalStmt>();
+
+    makeExitCalls(src, os, body);
     {
-      List<NormalStmt> list = new ArrayList<NormalStmt>();
-      makeExitCalls(src, os, list);
-      trans.getBody().insertCodeAfterEntry(list, "exitCalls");    //TODO check
+      FuncPrivateVoid func = tfunc.get(otrans);
+      assert ( func != null );
+      Reference ref = new Reference(info, func);
+
+      ArrayList<Expression> param = new ArrayList<Expression>();
+      for( Variable acpar : trans.getParam() ) {
+        Reference parref = new Reference(info, acpar);
+        param.add(parref);
+      }
+
+      ref.getOffset().add(new RefCall(info, param));
+      CallStmt call = new CallStmt(info, ref);
+      body.add(call);
     }
-    {
-      List<NormalStmt> list = new ArrayList<NormalStmt>();
-      makeEntryCalls(dst, os, list);
-      trans.getBody().insertCodeAfterEntry(list, "entryCalls");//TODO check
-    }
+    makeEntryCalls(dst, os, body);
+
+    trans.getBody().insertCodeAfterEntry(body, "body");
 
     src.getItem().add(trans);
   }
@@ -141,9 +184,9 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
   private NormalStmt makeCall(Reference reference) {
     assert ( reference.getLink() instanceof FuncWithBody );
     assert ( reference.getOffset().isEmpty() );
-    Reference ref = new Reference(new ElementInfo(), reference.getLink(), new ArrayList<RefItem>());
-    ref.getOffset().add(new RefCall(new ElementInfo(), new ArrayList<Expression>()));
-    return new CallStmt(new ElementInfo(), ref);
+    Reference ref = new Reference(info, reference.getLink(), new ArrayList<RefItem>());
+    ref.getOffset().add(new RefCall(info, new ArrayList<Expression>()));
+    return new CallStmt(info, ref);
   }
 
   private boolean isChildState(State test, State root) {
