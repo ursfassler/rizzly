@@ -8,6 +8,7 @@ import java.io.PrintStream;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 
 import evl.DefTraverser;
 import evl.cfg.BasicBlock;
@@ -17,7 +18,6 @@ import evl.statement.normal.Assignment;
 import evl.statement.normal.VarDefStmt;
 import evl.statement.phi.PhiStmt;
 import evl.variable.Variable;
-import java.util.List;
 
 public class DefUseKillGetter {
 

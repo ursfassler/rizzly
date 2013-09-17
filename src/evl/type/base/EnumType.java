@@ -1,13 +1,14 @@
 package evl.type.base;
 
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
 import common.Designator;
 import common.ElementInfo;
 
 import evl.type.Type;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 
 public class EnumType extends Type {

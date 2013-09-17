@@ -1,7 +1,8 @@
 package evl.copy;
 
-import evl.Evl;
 import java.util.Collection;
+
+import evl.Evl;
 
 public final class Copy {
 

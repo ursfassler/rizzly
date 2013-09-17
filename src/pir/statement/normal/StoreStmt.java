@@ -1,7 +1,6 @@
 package pir.statement.normal;
 
 import pir.other.PirValue;
-import pir.statement.Statement;
 
 public class StoreStmt extends NormalStmt {
   private PirValue dst;

@@ -9,8 +9,8 @@ import common.ElementInfo;
 
 import evl.cfg.BasicBlock;
 import evl.expression.Expression;
-import evl.statement.normal.SsaGenerator;
 import evl.statement.Statement;
+import evl.statement.normal.SsaGenerator;
 import evl.variable.SsaVariable;
 
 /**

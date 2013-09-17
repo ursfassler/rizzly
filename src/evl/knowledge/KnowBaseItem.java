@@ -1,10 +1,9 @@
 package evl.knowledge;
 
-import common.Designator;
-import evl.type.base.EnumElement;
-import evl.type.base.EnumType;
 import java.math.BigInteger;
+import java.util.List;
 
+import common.Designator;
 import common.ElementInfo;
 
 import error.ErrorType;
@@ -15,13 +14,14 @@ import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
+import evl.type.base.EnumElement;
+import evl.type.base.EnumType;
 import evl.type.base.Range;
 import evl.type.base.StringType;
 import evl.type.special.IntegerType;
 import evl.type.special.NaturalType;
 import evl.type.special.PointerType;
 import evl.type.special.VoidType;
-import java.util.List;
 
 public class KnowBaseItem extends KnowledgeEntry {
 

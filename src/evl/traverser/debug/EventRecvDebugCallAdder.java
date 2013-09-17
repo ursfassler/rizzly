@@ -20,7 +20,6 @@ import evl.function.impl.FuncPrivateVoid;
 import evl.other.Named;
 import evl.other.NamedList;
 import evl.statement.normal.CallStmt;
-import evl.statement.Statement;
 import evl.statement.normal.NormalStmt;
 
 /**

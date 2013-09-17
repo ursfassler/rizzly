@@ -6,13 +6,13 @@ import java.util.Map;
 
 import evl.Evl;
 import evl.NullTraverser;
-import evl.statement.bbend.CaseOptEntry;
-import evl.statement.bbend.CaseOptRange;
-import evl.statement.bbend.CaseOptValue;
 import evl.expression.Expression;
 import evl.expression.Number;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
+import evl.statement.bbend.CaseOptEntry;
+import evl.statement.bbend.CaseOptRange;
+import evl.statement.bbend.CaseOptValue;
 import evl.type.base.Range;
 import evl.variable.Variable;
 

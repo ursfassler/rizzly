@@ -1,21 +1,23 @@
 package evl.passes;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import common.ElementInfo;
 import common.NameFactory;
+
 import evl.DefTraverser;
 import evl.copy.Relinker;
-import evl.statement.normal.TypeCast;
 import evl.expression.reference.Reference;
 import evl.hfsm.Transition;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
+import evl.statement.normal.TypeCast;
 import evl.traverser.range.RangeGetter;
 import evl.type.TypeRef;
 import evl.type.base.Range;
 import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
-import java.util.HashMap;
-import java.util.Map;
 
 /**
  * Checks if the transition guard narrows a state variable. If so, a new

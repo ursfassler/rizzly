@@ -1,28 +1,25 @@
 package evl.traverser.range;
 
-import error.ErrorType;
-import error.RError;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import evl.Evl;
 import evl.NullTraverser;
-import evl.statement.bbend.CaseOptEntry;
-import evl.statement.bbend.CaseOptRange;
-import evl.statement.bbend.CaseOptValue;
 import evl.expression.Expression;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
+import evl.statement.bbend.CaseOptEntry;
+import evl.statement.bbend.CaseOptRange;
+import evl.statement.bbend.CaseOptValue;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.type.base.Range;
 import evl.variable.Variable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Set;
 
 /**
  *

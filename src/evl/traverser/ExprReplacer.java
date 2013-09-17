@@ -1,16 +1,11 @@
 package evl.traverser;
 
-import evl.statement.normal.StoreStmt;
-import evl.statement.phi.PhiStmt;
 import java.util.List;
 
 import error.ErrorType;
 import error.RError;
 import evl.DefTraverser;
 import evl.cfg.BasicBlock;
-import evl.statement.bbend.CaseOptRange;
-import evl.statement.bbend.CaseOptValue;
-import evl.statement.bbend.ReturnExpr;
 import evl.expression.ArithmeticOp;
 import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
@@ -18,7 +13,6 @@ import evl.expression.Expression;
 import evl.expression.Number;
 import evl.expression.Relation;
 import evl.expression.StringValue;
-import evl.statement.normal.TypeCast;
 import evl.expression.UnaryExpression;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
@@ -26,8 +20,14 @@ import evl.expression.reference.RefItem;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
 import evl.hfsm.Transition;
+import evl.statement.bbend.CaseOptRange;
+import evl.statement.bbend.CaseOptValue;
+import evl.statement.bbend.ReturnExpr;
 import evl.statement.normal.Assignment;
+import evl.statement.normal.StoreStmt;
+import evl.statement.normal.TypeCast;
 import evl.statement.normal.VarDefInitStmt;
+import evl.statement.phi.PhiStmt;
 import evl.type.base.Range;
 import evl.variable.Constant;
 

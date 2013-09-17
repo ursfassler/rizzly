@@ -1,6 +1,12 @@
 package evl.traverser;
 
+import java.math.BigInteger;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 import common.ElementInfo;
+
 import error.ErrorType;
 import error.RError;
 import evl.DefTraverser;
@@ -15,10 +21,6 @@ import evl.other.RizzlyProgram;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.type.base.Range;
-import java.math.BigInteger;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 /**
  *

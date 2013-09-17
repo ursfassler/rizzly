@@ -3,8 +3,8 @@ package evl.hfsm.reduction;
 import java.util.ArrayList;
 
 import common.Designator;
-
 import common.ElementInfo;
+
 import evl.Evl;
 import evl.NullTraverser;
 import evl.hfsm.State;

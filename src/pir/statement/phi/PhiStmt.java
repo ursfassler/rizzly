@@ -1,6 +1,5 @@
 package pir.statement.phi;
 
-import pir.statement.Statement;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
@@ -9,6 +8,7 @@ import java.util.Set;
 import pir.cfg.BasicBlock;
 import pir.other.PirValue;
 import pir.other.SsaVariable;
+import pir.statement.Statement;
 import pir.statement.normal.VariableGeneratorStmt;
 
 /**

@@ -1,8 +1,8 @@
 package evl.hfsm.reduction;
 
-import evl.variable.SsaVariable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -17,12 +17,6 @@ import evl.Evl;
 import evl.NullTraverser;
 import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
-import evl.statement.bbend.CaseGoto;
-import evl.statement.bbend.CaseGotoOpt;
-import evl.statement.bbend.CaseOptEntry;
-import evl.statement.bbend.CaseOptValue;
-import evl.statement.bbend.Goto;
-import evl.statement.bbend.IfGoto;
 import evl.copy.Copy;
 import evl.expression.Expression;
 import evl.expression.reference.RefCall;
@@ -49,16 +43,22 @@ import evl.other.Interface;
 import evl.other.ListOfNamed;
 import evl.other.Named;
 import evl.other.Namespace;
-import evl.statement.normal.CallStmt;
+import evl.statement.bbend.CaseGoto;
+import evl.statement.bbend.CaseGotoOpt;
+import evl.statement.bbend.CaseOptEntry;
+import evl.statement.bbend.CaseOptValue;
+import evl.statement.bbend.Goto;
+import evl.statement.bbend.IfGoto;
 import evl.statement.normal.Assignment;
+import evl.statement.normal.CallStmt;
 import evl.statement.normal.NormalStmt;
 import evl.statement.phi.PhiStmt;
 import evl.type.TypeRef;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
+import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
-import java.util.Collections;
 
 public class HfsmReduction extends NullTraverser<Named, Namespace> {
 

@@ -1,8 +1,5 @@
 package evl.traverser;
 
-import evl.cfg.BasicBlock;
-import evl.hfsm.Transition;
-import evl.statement.phi.PhiStmt;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -21,12 +18,13 @@ import error.ErrorType;
 import error.RError;
 import evl.DefTraverser;
 import evl.Evl;
+import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
 import evl.copy.Relinker;
-import evl.statement.normal.TypeCast;
 import evl.expression.reference.Reference;
 import evl.function.FuncWithBody;
 import evl.function.FunctionHeader;
+import evl.hfsm.Transition;
 import evl.knowledge.KnowStateVariableReadWrite;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
@@ -34,11 +32,8 @@ import evl.statement.Statement;
 import evl.statement.normal.Assignment;
 import evl.statement.normal.NormalStmt;
 import evl.statement.normal.VarDefStmt;
-import evl.traverser.range.RangeGetter;
-import evl.type.TypeRef;
-import evl.type.base.Range;
+import evl.statement.phi.PhiStmt;
 import evl.variable.FuncVariable;
-import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
 
 //TODO do it for transitions

@@ -6,12 +6,13 @@ import java.util.Collection;
 
 import pir.DefTraverser;
 import pir.cfg.BasicBlock;
-import pir.statement.bbend.CaseGoto;
-import pir.statement.bbend.IfGoto;
-import pir.statement.bbend.ReturnExpr;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.VarRef;
 import pir.other.PirValue;
+import pir.statement.bbend.CaseGoto;
+import pir.statement.bbend.IfGoto;
+import pir.statement.bbend.ReturnExpr;
+import pir.statement.normal.ArithmeticOp;
 import pir.statement.normal.Assignment;
 import pir.statement.normal.CallAssignment;
 import pir.statement.normal.CallStmt;
@@ -19,7 +20,6 @@ import pir.statement.normal.GetElementPtr;
 import pir.statement.normal.LoadStmt;
 import pir.statement.normal.Relation;
 import pir.statement.normal.StoreStmt;
-import pir.statement.normal.ArithmeticOp;
 import pir.statement.normal.convert.ConvertValue;
 import pir.statement.phi.PhiStmt;
 

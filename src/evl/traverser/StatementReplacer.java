@@ -1,6 +1,5 @@
 package evl.traverser;
 
-import evl.variable.ConstGlobal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,6 +12,7 @@ import evl.hfsm.StateSimple;
 import evl.other.ImplElementary;
 import evl.statement.normal.NormalStmt;
 import evl.statement.phi.PhiStmt;
+import evl.variable.ConstGlobal;
 
 /**
  * If the return value is null, the statement is kept. If it is != null, the statement is replaced with the content of

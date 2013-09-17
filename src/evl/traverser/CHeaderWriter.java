@@ -1,7 +1,5 @@
 package evl.traverser;
 
-import evl.type.base.EnumElement;
-import evl.type.base.EnumType;
 import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
@@ -19,6 +17,8 @@ import evl.other.RizzlyProgram;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
+import evl.type.base.EnumElement;
+import evl.type.base.EnumType;
 import evl.type.base.Range;
 import evl.type.base.StringType;
 import evl.type.composed.NamedElement;

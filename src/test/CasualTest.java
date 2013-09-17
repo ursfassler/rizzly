@@ -3,6 +3,7 @@ package test;
 import org.junit.Test;
 
 public class CasualTest extends BaseTest {
+
   public CasualTest() {
     super();
     setStrict(false);
@@ -42,20 +43,19 @@ public class CasualTest extends BaseTest {
   /*
   @Test
   public void rec2() {
-    compile("rec2", TestSteps.EXECUTE, false, false);
+  compile("rec2", TestSteps.EXECUTE, false, false);
   }
-
+  
   @Test
   public void rec3() {
-    compile("rec3", TestSteps.EXECUTE, false, false);
+  compile("rec3", TestSteps.EXECUTE, false, false);
   }
-
+  
   @Test
   public void while_() {
-    compile("while", TestSteps.EXECUTE, false, true);
+  compile("while", TestSteps.EXECUTE, false, true);
   }
    */
-
   @Test
   public void range() {
     compile("range", TestSteps.EXECUTE, false, false);
@@ -63,7 +63,7 @@ public class CasualTest extends BaseTest {
 
   @Test
   public void smallGenericUse() {
-    compile("smallGenericUse",TestSteps.COMPILE_TO_ASM, false, false);
+    compile("smallGenericUse", TestSteps.COMPILE_TO_ASM, false, false);
   }
 
   @Test
@@ -151,17 +151,17 @@ public class CasualTest extends BaseTest {
   public void arrayTest1() {
     compile("arrayTest1", TestSteps.EXECUTE, false, false);
   }
-  
+
   @Test
   public void arrayTest2() {
     compile("arrayTest2", TestSteps.EXECUTE, false, false);
   }
-  
+
   @Test
   public void arrayTest3() {
     compile("arrayTest3", TestSteps.EXECUTE, false, false);
   }
-  
+
   @Test
   public void arrayTest() {
     compile("arrayTest", TestSteps.EXECUTE, false, false);
@@ -191,103 +191,98 @@ public class CasualTest extends BaseTest {
   public void elemComp() {
     compile("elemComp", TestSteps.EXECUTE, false, false);
   }
-  
+
   @Test
   public void transition1() {
     compile("transition1", TestSteps.EXECUTE, false, false);
   }
-  
+
   @Test
   public void alarmClock() {
     compile("alarmClock", TestSteps.EXECUTE, false, false);
   }
-  
-  
-  
-/*  
-  @Test
-  public void ui_Ui() {
-    compile("union1", "Union1", true, false, false);
-  }
 
   @Test
-  public void ui_Ui() {
-    compile("ui", "Ui", true, false, false);
-  }
-
-  @Test
-  public void linking() {
-    compile("linking", "Linking", true, false, false);
-  }
-
-  @Test
-  public void bitred() {
-    compile("bitred", "Bitred", true, false, false);
-  }
-
-  @Test
-  public void bool_Bool() {
-    compile("bool", "Bool", true, false, false);
-  }
-
-  @Test
-  public void bool2_Bool2() {
-    compile("bool2", "Bool2", true, false, false);
-  }
-
-  // @Test
-  // public void compFib() {
-  // compile("compFib", "CompFib", true, false, false);
-  // }
-
-  @Test
-  public void compositionQuery_CompositionQuery() {
-    compile("compositionQuery", "CompositionQuery", true, false, true);
+  public void union1() {
+    compile("union1", TestSteps.COMPILE_TO_ASM, false, false);//TODO make testcase
   }
 
   @Test
   public void constdef() {
-    compile("constdef", "Constdef", true, false, false);
-  }
-
-  @Test
-  public void expr_Expr() {
-    compile("expr", "Expr", true, false, true);
-  }
-
-  @Test
-  public void expr2_Expr2() {
-    compile("expr2", "Expr2", true, false, false);
+    compile("constdef", TestSteps.COMPILE_TO_PIR, false, false);
   }
 
   @Test
   public void extConst() {
-    compile("extConst", "ExtConst", true, false, false);
+    compile("extConst", TestSteps.COMPILE_TO_PIR, false, false);
   }
 
   @Test
   public void genericUse2() {
-    compile("genericUse2", "GenericUse2", true, false, false);
+    compile("genericUse2", TestSteps.COMPILE_TO_PIR, false, false);
   }
 
   @Test
   public void genericUse_GenericUse() {
-    compile("genericUse", "GenericUse", true, false, false);
+    compile("genericUse", TestSteps.COMPILE_TO_PIR, false, false);
   }
-
-   @Test
-   public void gfunc_GFunc() {
-   compile("gfunc", "GFunc", true, false, false);
-   }
 
   @Test
   public void unionTest_UnionTest() {
-    compile("unionTest", "UnionTest", true, false, false);
+    compile("unionTest", TestSteps.COMPILE_TO_ASM, false, false);  //TODO make testcase
   }
-
+  /*  @Test
+  public void ui_Ui() {
+  compile("ui", "Ui", true, false, false);
+  }
+  
+  @Test
+  public void linking() {
+  compile("linking", "Linking", true, false, false);
+  }
+  
+  @Test
+  public void bitred() {
+  compile("bitred", "Bitred", true, false, false);
+  }
+  
+  @Test
+  public void bool_Bool() {
+  compile("bool", "Bool", true, false, false);
+  }
+  
+  @Test
+  public void bool2_Bool2() {
+  compile("bool2", "Bool2", true, false, false);
+  }
+  
+  @Test
+  public void compositionQuery_CompositionQuery() {
+  compile("compositionQuery", "CompositionQuery", true, false, true);
+  }
+  
+  @Test
+  public void expr_Expr() {
+  compile("expr", "Expr", true, false, true);
+  }
+  
+  @Test
+  public void expr2_Expr2() {
+  compile("expr2", "Expr2", true, false, false);
+  }
+  
+  @Test
+  public void gfunc_GFunc() {
+  compile("gfunc", "GFunc", true, false, false);
+  }
+  
   @Test
   public void param() {
-    compile("param", "Param", true, false, false);
+  compile("param", "Param", true, false, false);
   }
    */
+  // @Test
+  // public void compFib() {
+  // compile("compFib", "CompFib", true, false, false);
+  // }
 }

@@ -1,7 +1,5 @@
 package evl.cfg;
 
-import evl.statement.bbend.ReturnVoid;
-import evl.statement.bbend.Goto;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
@@ -15,6 +13,8 @@ import common.ElementInfo;
 
 import evl.EvlBase;
 import evl.statement.bbend.BasicBlockEnd;
+import evl.statement.bbend.Goto;
+import evl.statement.bbend.ReturnVoid;
 import evl.statement.normal.NormalStmt;
 
 public class BasicBlockList extends EvlBase {

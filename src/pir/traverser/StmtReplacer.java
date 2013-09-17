@@ -5,9 +5,9 @@ import java.util.List;
 
 import pir.DefTraverser;
 import pir.cfg.BasicBlock;
-import pir.statement.bbend.BasicBlockEnd;
 import pir.function.Function;
 import pir.other.Program;
+import pir.statement.bbend.BasicBlockEnd;
 import pir.statement.normal.NormalStmt;
 
 //TODO check if ok when only handle NormalStmt

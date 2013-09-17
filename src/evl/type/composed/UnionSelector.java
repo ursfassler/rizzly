@@ -1,6 +1,7 @@
 package evl.type.composed;
 
 import common.ElementInfo;
+
 import evl.EvlBase;
 import evl.other.Named;
 

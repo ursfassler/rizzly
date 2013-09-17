@@ -1,6 +1,5 @@
 package fun;
 
-import fun.type.composed.UnionSelector;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -76,6 +75,7 @@ import fun.type.base.TypeAlias;
 import fun.type.base.VoidType;
 import fun.type.composed.NamedElement;
 import fun.type.composed.RecordType;
+import fun.type.composed.UnionSelector;
 import fun.type.composed.UnionType;
 import fun.type.genfunc.Array;
 import fun.type.genfunc.GenericArray;

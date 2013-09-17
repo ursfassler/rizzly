@@ -1,21 +1,22 @@
 package evl.traverser;
 
-import common.ElementInfo;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Set;
+
+import common.ElementInfo;
 
 import evl.DefTraverser;
 import evl.Evl;
 import evl.NullTraverser;
 import evl.cfg.BasicBlock;
+import evl.expression.reference.RefItem;
+import evl.expression.reference.Reference;
 import evl.statement.bbend.CaseGoto;
 import evl.statement.bbend.Goto;
 import evl.statement.bbend.IfGoto;
 import evl.statement.bbend.ReturnExpr;
 import evl.statement.bbend.ReturnVoid;
-import evl.expression.reference.RefItem;
-import evl.expression.reference.Reference;
 import evl.statement.normal.Assignment;
 import evl.statement.normal.CallStmt;
 import evl.statement.normal.VarDefInitStmt;

@@ -1,8 +1,5 @@
 package evl.passes;
 
-import evl.cfg.BasicBlock;
-import evl.statement.bbend.BasicBlockEnd;
-import evl.statement.phi.PhiStmt;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +12,7 @@ import common.ElementInfo;
 import common.NameFactory;
 
 import evl.DefTraverser;
+import evl.cfg.BasicBlock;
 import evl.copy.Copy;
 import evl.expression.Expression;
 import evl.expression.reference.RefPtrDeref;
@@ -22,13 +20,15 @@ import evl.expression.reference.Reference;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
+import evl.statement.bbend.BasicBlockEnd;
+import evl.statement.normal.Assignment;
 import evl.statement.normal.GetElementPtr;
 import evl.statement.normal.LoadStmt;
-import evl.statement.normal.StackMemoryAlloc;
-import evl.statement.normal.Assignment;
 import evl.statement.normal.NormalStmt;
+import evl.statement.normal.StackMemoryAlloc;
 import evl.statement.normal.StoreStmt;
 import evl.statement.normal.VarDefStmt;
+import evl.statement.phi.PhiStmt;
 import evl.traverser.ClassGetter;
 import evl.traverser.StatementReplacer;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;

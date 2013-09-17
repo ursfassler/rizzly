@@ -1,6 +1,5 @@
 package evl.hfsm.reduction;
 
-import evl.cfg.BasicBlockList;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -10,6 +9,7 @@ import common.ElementInfo;
 
 import evl.Evl;
 import evl.NullTraverser;
+import evl.cfg.BasicBlockList;
 import evl.composition.ImplComposition;
 import evl.expression.Expression;
 import evl.expression.reference.RefCall;

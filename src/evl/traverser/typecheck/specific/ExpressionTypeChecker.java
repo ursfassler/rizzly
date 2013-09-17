@@ -18,7 +18,6 @@ import evl.expression.Expression;
 import evl.expression.Number;
 import evl.expression.Relation;
 import evl.expression.StringValue;
-import evl.statement.normal.TypeCast;
 import evl.expression.UnaryExpression;
 import evl.expression.reference.Reference;
 import evl.knowledge.KnowBaseItem;

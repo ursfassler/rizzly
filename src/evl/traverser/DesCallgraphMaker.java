@@ -1,22 +1,22 @@
 package evl.traverser;
 
-import evl.composition.ImplComposition;
-import evl.hfsm.ImplHfsm;
-import evl.other.RizzlyProgram;
 import util.SimpleGraph;
 
 import common.Designator;
 
 import evl.DefTraverser;
+import evl.composition.ImplComposition;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefItem;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
 import evl.function.FunctionBase;
+import evl.hfsm.ImplHfsm;
 import evl.other.ImplElementary;
 import evl.other.Named;
 import evl.other.NamedList;
 import evl.other.Namespace;
+import evl.other.RizzlyProgram;
 
 /**
  * Returns a callgraph of the entire (sub-) tree

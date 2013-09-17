@@ -1,8 +1,8 @@
 package fun.toevl;
 
-import evl.type.composed.UnionSelector;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 import java.util.Map;
 
 import error.ErrorType;
@@ -11,6 +11,7 @@ import evl.Evl;
 import evl.expression.reference.Reference;
 import evl.type.Type;
 import evl.type.composed.NamedElement;
+import evl.type.composed.UnionSelector;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.type.NamedType;
@@ -28,7 +29,6 @@ import fun.type.composed.UnionType;
 import fun.type.genfunc.Array;
 import fun.type.genfunc.Range;
 import fun.type.genfunc.TypeType;
-import java.util.List;
 
 public class FunToEvlType extends NullTraverser<Type, String> {
   private Map<Fun, Evl> map;

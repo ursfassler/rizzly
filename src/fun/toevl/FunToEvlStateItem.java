@@ -16,7 +16,6 @@ import evl.hfsm.StateItem;
 import evl.other.IfaceUse;
 import evl.type.TypeRef;
 import evl.type.special.VoidType;
-import evl.variable.FuncVariable;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.function.FunctionHeader;

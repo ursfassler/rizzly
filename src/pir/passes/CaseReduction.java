@@ -12,13 +12,13 @@ import java.util.Set;
 import pir.DefTraverser;
 import pir.NullTraverser;
 import pir.PirObject;
+import pir.expression.Number;
+import pir.other.Program;
 import pir.statement.bbend.CaseGoto;
 import pir.statement.bbend.CaseGotoOpt;
 import pir.statement.bbend.CaseOptEntry;
 import pir.statement.bbend.CaseOptRange;
 import pir.statement.bbend.CaseOptValue;
-import pir.expression.Number;
-import pir.other.Program;
 import pir.type.Type;
 import pir.type.TypeRef;
 

@@ -1,7 +1,5 @@
 package pir.traverser;
 
-import error.ErrorType;
-import error.RError;
 import pir.NullTraverser;
 import pir.Pir;
 import pir.PirObject;
@@ -21,6 +19,8 @@ import pir.type.NamedElement;
 import pir.type.StructType;
 import pir.type.Type;
 import pir.type.TypeRef;
+import error.ErrorType;
+import error.RError;
 
 public class ExprTypeGetter extends NullTraverser<Type, Void> {
 

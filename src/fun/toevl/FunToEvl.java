@@ -1,6 +1,5 @@
 package fun.toevl;
 
-import fun.type.composed.UnionSelector;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -41,6 +40,7 @@ import fun.statement.Statement;
 import fun.type.NamedType;
 import fun.type.base.EnumElement;
 import fun.type.composed.NamedElement;
+import fun.type.composed.UnionSelector;
 import fun.variable.Constant;
 import fun.variable.Variable;
 

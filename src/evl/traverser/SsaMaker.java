@@ -1,7 +1,5 @@
 package evl.traverser;
 
-import evl.hfsm.Transition;
-import evl.other.ListOfNamed;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -27,10 +25,12 @@ import evl.cfg.BasicBlockList;
 import evl.expression.reference.Reference;
 import evl.function.FuncWithBody;
 import evl.function.FunctionBase;
+import evl.hfsm.Transition;
 import evl.knowledge.KnowledgeBase;
-import evl.statement.normal.CallStmt;
+import evl.other.ListOfNamed;
 import evl.statement.Statement;
 import evl.statement.normal.Assignment;
+import evl.statement.normal.CallStmt;
 import evl.statement.normal.NormalStmt;
 import evl.statement.normal.VarDefInitStmt;
 import evl.statement.normal.VarDefStmt;

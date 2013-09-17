@@ -13,13 +13,16 @@ import pir.know.KnowledgeBase;
 import pir.other.PirValue;
 import pir.other.Program;
 import pir.other.SsaVariable;
+import pir.statement.normal.ArithmeticOp;
 import pir.statement.normal.Assignment;
 import pir.statement.normal.CallAssignment;
 import pir.statement.normal.CallStmt;
 import pir.statement.normal.GetElementPtr;
+import pir.statement.normal.NormalStmt;
 import pir.statement.normal.Relation;
 import pir.statement.normal.StoreStmt;
 import pir.statement.normal.convert.TypeCast;
+import pir.statement.phi.PhiStmt;
 import pir.traverser.StatementReplacer;
 import pir.type.ArrayType;
 import pir.type.PointerType;
@@ -27,12 +30,9 @@ import pir.type.RangeType;
 import pir.type.StructType;
 import pir.type.Type;
 import pir.type.TypeRef;
+import pir.type.UnionType;
 
 import common.NameFactory;
-import pir.statement.normal.ArithmeticOp;
-import pir.statement.normal.NormalStmt;
-import pir.statement.phi.PhiStmt;
-import pir.type.UnionType;
 
 /**
  * Extends and truncates types of variables used in an arithmetic operation, relation and assignments

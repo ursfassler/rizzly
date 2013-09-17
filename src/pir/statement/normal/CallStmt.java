@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import pir.expression.reference.Reference;
 import pir.function.Function;
 import pir.other.PirValue;
-import pir.statement.Statement;
 
 //TODO remove, use CallAssignment
 final public class CallStmt extends NormalStmt implements Reference<Function> {

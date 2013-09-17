@@ -1,5 +1,6 @@
 package evl.passes;
 
+import java.math.BigInteger;
 import java.util.Map;
 import java.util.Set;
 
@@ -13,19 +14,19 @@ import evl.Evl;
 import evl.NullTraverser;
 import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
-import evl.statement.bbend.CaseGoto;
-import evl.statement.bbend.CaseGotoOpt;
-import evl.statement.bbend.IfGoto;
 import evl.expression.Expression;
-import evl.statement.normal.TypeCast;
 import evl.expression.reference.Reference;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowSsaUsage;
 import evl.knowledge.KnowledgeBase;
+import evl.statement.Statement;
+import evl.statement.bbend.CaseGoto;
+import evl.statement.bbend.CaseGotoOpt;
+import evl.statement.bbend.IfGoto;
+import evl.statement.normal.Assignment;
 import evl.statement.normal.CallStmt;
 import evl.statement.normal.SsaGenerator;
-import evl.statement.Statement;
-import evl.statement.normal.Assignment;
+import evl.statement.normal.TypeCast;
 import evl.statement.normal.VarDefInitStmt;
 import evl.statement.phi.PhiStmt;
 import evl.traverser.VariableReplacer;
@@ -38,7 +39,6 @@ import evl.type.TypeRef;
 import evl.type.base.EnumType;
 import evl.type.base.Range;
 import evl.variable.SsaVariable;
-import java.math.BigInteger;
 
 /**
  * Replaces variables after if/goto with a variable of a more narrow range

@@ -1,6 +1,5 @@
 package evl.copy;
 
-import evl.type.base.EnumElement;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -13,8 +12,6 @@ import evl.Evl;
 import evl.NullTraverser;
 import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
-import evl.statement.bbend.CaseGotoOpt;
-import evl.statement.bbend.CaseOptEntry;
 import evl.expression.Expression;
 import evl.expression.reference.RefItem;
 import evl.function.FunctionBase;
@@ -26,8 +23,11 @@ import evl.other.Named;
 import evl.other.NamedList;
 import evl.other.RizzlyProgram;
 import evl.statement.Statement;
+import evl.statement.bbend.CaseGotoOpt;
+import evl.statement.bbend.CaseOptEntry;
 import evl.type.Type;
 import evl.type.TypeRef;
+import evl.type.base.EnumElement;
 import evl.type.composed.NamedElement;
 import evl.variable.Variable;
 

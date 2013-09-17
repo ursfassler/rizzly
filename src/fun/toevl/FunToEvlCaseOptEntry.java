@@ -3,8 +3,8 @@ package fun.toevl;
 import java.util.Map;
 
 import evl.Evl;
-import evl.statement.bbend.CaseOptEntry;
 import evl.expression.Expression;
+import evl.statement.bbend.CaseOptEntry;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.statement.CaseOptRange;

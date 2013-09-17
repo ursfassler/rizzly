@@ -1,6 +1,7 @@
 package fun.type.composed;
 
 import common.ElementInfo;
+
 import fun.FunBase;
 import fun.other.Named;
 
