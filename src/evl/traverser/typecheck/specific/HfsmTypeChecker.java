@@ -94,14 +94,7 @@ public class HfsmTypeChecker extends NullTraverser<Void, Void> {
   @Override
   protected Void visitTransition(Transition obj, Void param) {
     ExpressionTypeChecker.process(obj.getGuard(), kb);
-    RangeGetter getter = new RangeGetter(kb);
-    getter.traverse(obj.getGuard(), null);
-    Map<SsaVariable, Range> varRange = getter.getRanges();
-    Map<StateVariable, Range> varSRange = getter.getSranges();
-    
-    //TODO introduce new SsaVariable for all state variables in varSRange
-    //TODO do it in StateVariableExtractor
-    
+    Map<SsaVariable, Range> varRange = RangeGetter.getRange(obj.getGuard(), kb);
     StatementTypeChecker.process(obj.getBody(), kbi.getVoidType(), varRange, kb);
     return null;
   }

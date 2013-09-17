@@ -60,9 +60,6 @@ import evl.variable.StateVariable;
 import evl.variable.Variable;
 import java.util.Collections;
 
-//TODO previous of this step: for every transition, create a function with the body content
-//TODO in this step: call the transition function when the transition is taken
-//TODO in here is the problem, that _fentry functions from deeper states are not moved upwards
 public class HfsmReduction extends NullTraverser<Named, Namespace> {
 
   private ElementInfo info = new ElementInfo();

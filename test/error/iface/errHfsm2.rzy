@@ -1,0 +1,23 @@
+interface
+  Iface
+    function funcA();
+    function funcB();
+  end
+
+component
+  ErrHfsm2
+    input
+      in    : Iface;
+
+    implementation hfsm( One )
+    
+    state One
+    end
+    
+    transition 
+      One to One by in.funcA;
+      One to One by in.funcB;
+      One to One by in.funcC;
+    
+  end
+

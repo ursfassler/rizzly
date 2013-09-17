@@ -70,6 +70,7 @@ import evl.type.base.Range;
 import evl.type.base.StringType;
 import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
+import evl.type.composed.UnionSelector;
 import evl.type.composed.UnionType;
 import evl.type.special.ComponentType;
 import evl.type.special.IntegerType;
@@ -489,6 +490,11 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitStackMemoryAlloc(StackMemoryAlloc obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitUnionSelector(UnionSelector obj, P param) {
     return visitDefault(obj, param);
   }
 }

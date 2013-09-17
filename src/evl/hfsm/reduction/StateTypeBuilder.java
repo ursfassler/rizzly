@@ -15,6 +15,7 @@ import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
+import evl.type.composed.UnionSelector;
 import evl.type.composed.UnionType;
 import evl.variable.Variable;
 
@@ -52,7 +53,7 @@ public class StateTypeBuilder extends NullTraverser<RecordType, Designator> {
 
   public UnionType makeUnion(State obj, Designator param) {
     param = new Designator(param, "Sub");
-    UnionType union = new UnionType(obj.getInfo(), param.toString(Designator.NAME_SEP), new ArrayList<NamedElement>());
+    UnionType union = new UnionType(obj.getInfo(), param.toString(Designator.NAME_SEP), new UnionSelector(obj.getInfo(), "state"), new ArrayList<NamedElement>());
     typeSpace.add(union);
     return union;
   }

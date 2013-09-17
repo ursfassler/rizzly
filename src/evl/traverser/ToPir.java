@@ -1,5 +1,6 @@
 package evl.traverser;
 
+import evl.type.composed.UnionType;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -91,7 +92,7 @@ import evl.variable.Constant;
 import evl.variable.FuncVariable;
 import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
-
+import pir.type.UnionSelector;
 
 public class ToPir extends NullTraverser<PirObject, Void> {
 
@@ -248,6 +249,23 @@ public class ToPir extends NullTraverser<PirObject, Void> {
       struct.getElements().add(celem);
     }
     return struct;
+  }
+
+  @Override
+  protected PirObject visitUnionSelector(evl.type.composed.UnionSelector obj, Void param) {
+    return new UnionSelector(obj.getName());
+  }
+
+  @Override
+  protected PirObject visitUnionType(UnionType obj, Void param) {
+    UnionSelector selector = (UnionSelector) visit(obj.getSelector(), null);
+    pir.type.UnionType union = new pir.type.UnionType(obj.getName(), selector);
+    for( evl.type.composed.NamedElement elem : obj.getElement() ) {
+      TypeRef type = (TypeRef) visit(elem.getType(), param);
+      NamedElement celem = new NamedElement(elem.getName(), type);
+      union.getElements().add(celem);
+    }
+    return union;
   }
 
   @Override
@@ -479,7 +497,7 @@ public class ToPir extends NullTraverser<PirObject, Void> {
   @Override
   protected PirObject visitTypeCast(TypeCast obj, Void param) {
     pir.other.SsaVariable var = (pir.other.SsaVariable) visit(obj.getVariable(), null);
-    PirValue old = (PirValue) visit(obj.getValue(),null);  // and we hope that we cast to the right value
+    PirValue old = (PirValue) visit(obj.getValue(), null);  // and we hope that we cast to the right value
     return new pir.statement.normal.convert.TypeCast(var, old);
   }
 
@@ -510,7 +528,8 @@ public class ToPir extends NullTraverser<PirObject, Void> {
      */
 
     for( evl.expression.reference.RefItem itr : obj.getAddress().getOffset() ) {
-      if( itr instanceof RefName ) {
+      if( type instanceof StructType ) {
+        assert( itr instanceof RefName );
         // get index of struct member and use that
         StructType st = (StructType) type;
         String name = ( (RefName) itr ).getName();
@@ -521,19 +540,33 @@ public class ToPir extends NullTraverser<PirObject, Void> {
         ofs.add(new pir.expression.Number(BigInteger.valueOf(idx), new TypeRef(kbi.getNoSignType(32))));
         //see llvm gep FAQ: Why do struct member indices always use i32?
         type = elem.getType().getRef();
-      } else if( itr instanceof RefIndex ) {
+      } else if( type instanceof pir.type.UnionType ) {
+        assert( itr instanceof RefName );
+        // get index of struct member and use that
+        pir.type.UnionType st = (pir.type.UnionType) type;
+        String name = ( (RefName) itr ).getName();
+        NamedElement elem = st.find(name);
+        assert ( elem != null );
+        int idx = st.getElements().indexOf(elem);
+        assert ( idx >= 0 );
+        ofs.add(new pir.expression.Number(BigInteger.valueOf(idx), new TypeRef(kbi.getNoSignType(32))));
+        //see llvm gep FAQ: Why do struct member indices always use i32?
+        type = elem.getType().getRef();
+      } else if( type instanceof pir.type.ArrayType ) {
+        assert( itr instanceof RefIndex );
         // get index calculation
         RefIndex idx = (RefIndex) itr;
         PirValue val = (PirValue) traverse(idx.getIndex(), null);
         ofs.add(val);
         type = ( (pir.type.ArrayType) type ).getType().getRef();
-      } else if( itr instanceof RefPtrDeref ) {
+      } else if( type instanceof pir.type.PointerType ) {
+        assert( itr instanceof RefPtrDeref );
         // dereferencing is like accesing an array element
         ofs.add(new pir.expression.Number(BigInteger.ZERO, new TypeRef(kbi.getNoSignType(32))));
         // see llvm GEP FAQ: Why is the extra 0 index required?
         type = ( (pir.type.PointerType) type ).getType().getRef();
       } else {
-        RError.err(ErrorType.Fatal, obj.getInfo(), "Unhandled offset item: " + itr.getClass().getCanonicalName());
+        RError.err(ErrorType.Fatal, obj.getInfo(), "type: " + type.getClass().getCanonicalName());
       }
     }
 
@@ -611,8 +644,8 @@ public class ToPir extends NullTraverser<PirObject, Void> {
   protected PirObject visitTypeRef(evl.type.TypeRef obj, Void param) {
     return new TypeRef((pir.type.Type) visit(obj.getRef(), null));
   }
- 
 }
+
 class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, pir.other.SsaVariable> {
 
   private ToPir converter;

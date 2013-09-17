@@ -69,6 +69,7 @@ import fun.type.base.TypeAlias;
 import fun.type.base.VoidType;
 import fun.type.composed.NamedElement;
 import fun.type.composed.RecordType;
+import fun.type.composed.UnionSelector;
 import fun.type.composed.UnionType;
 import fun.type.genfunc.Array;
 import fun.type.genfunc.GenericArray;
@@ -234,6 +235,7 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitUnionType(UnionType obj, P param) {
+    visit(obj.getSelector(),param);
     visitList(obj.getElement(), param);
     return null;
   }
@@ -580,6 +582,11 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitGenericRange(GenericRange obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitUnionSelector(UnionSelector obj, P param) {
     return null;
   }
 

@@ -79,6 +79,8 @@ import pir.statement.normal.ArithmeticOp;
 import pir.statement.normal.convert.ConvertValue;
 import pir.statement.phi.PhiStmt;
 
+//TODO mark private objects with "internal"
+
 public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
   private final boolean wrId;
@@ -309,6 +311,22 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     return null;
   }
 
+  @Override
+  protected Void visitUnionType(UnionType obj, StreamWriter param) {
+    param.wr("%");
+    param.wr(obj.getName());
+    wrId(obj, param);
+    param.wr(" = type {");
+    param.nl();
+    param.incIndent();
+    wrNamedElem(obj.getElements(), param);
+    param.decIndent();
+    param.wr("}");
+    param.wr( "  ; sorry for wasting your memory" );  //TODO implement unions as they are supposed to be
+    param.nl();
+    return null;
+  }
+
   private void wrNamedElem(List<NamedElement> list, StreamWriter param) {
     for( int i = 0; i < list.size(); i++ ) {
       NamedElement elem = list.get(i);
@@ -322,21 +340,6 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
       param.wr(elem.getName());
       param.nl();
     }
-  }
-
-  @Override
-  protected Void visitUnionType(UnionType obj, StreamWriter param) {
-    param.wr(obj.getName());
-    wrId(obj, param);
-    param.wr(" = ");
-    param.wr("Union");
-    param.nl();
-    param.incIndent();
-    wrNamedElem(obj.getElements(), param);
-    param.decIndent();
-    param.wr("end");
-    param.nl();
-    return null;
   }
 
   // ---- expression --------------------------------------------------------------------

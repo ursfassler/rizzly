@@ -1,5 +1,6 @@
 package fun.toevl;
 
+import evl.type.composed.UnionSelector;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Map;
@@ -138,7 +139,8 @@ public class FunToEvlType extends NullTraverser<Type, String> {
     for (fun.type.composed.NamedElement elem : obj.getElement()) {
       element.add((NamedElement) fta.traverse(elem, null));
     }
-    return new evl.type.composed.UnionType(obj.getInfo(), param, element);
+    UnionSelector selector = (UnionSelector) fta.traverse(obj.getSelector(), null);
+    return new evl.type.composed.UnionType(obj.getInfo(), param, selector, element);
   }
 
   @Override

@@ -207,6 +207,11 @@ public class CasualTest extends BaseTest {
 /*  
   @Test
   public void ui_Ui() {
+    compile("union1", "Union1", true, false, false);
+  }
+
+  @Test
+  public void ui_Ui() {
     compile("ui", "Ui", true, false, false);
   }
 

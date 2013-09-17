@@ -47,6 +47,7 @@ import evl.variable.Variable;
 import fun.other.Namespace;
 import fun.toevl.FunToEvl;
 
+//TODO implement unions as they are supposed to be (no more waste of memory)
 //TODO type check case ranges (do not allow case options out of range)
 //TODO pass records by reference to functions (test case rec2)
 //TODO add switch to use only C compatible arguments (no i7 types, only i8, i16, i32, etc.) /test case while2)

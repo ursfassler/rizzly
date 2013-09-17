@@ -13,10 +13,10 @@ component
     
   implementation hfsm(Counting)
     var
-      time    : R{0,100};
+      time    : R{0,5};
       
     entry
-      time    := 100;
+      time    := 5;
     end
     
     state Counting
@@ -26,11 +26,11 @@ component
     end
     
     transition 
-      Counting to Counting by tick.time if time > 0 do
+      Counting to Counting by tick.tick if time > 0 do
         time := time - 1;
       end
       
-      Counting to Off by tick.time if time = 0 do
+      Counting to Off by tick.tick if time = 0 do
         alarm.tick();
       end
     

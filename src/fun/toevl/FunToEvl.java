@@ -1,5 +1,6 @@
 package fun.toevl;
 
+import fun.type.composed.UnionSelector;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -155,6 +156,11 @@ public class FunToEvl extends NullTraverser<Evl, String> {
   protected Evl visitNamedElement(NamedElement obj, String param) {
     Reference ref = (Reference) traverse(obj.getType(), null);
     return new evl.type.composed.NamedElement(obj.getInfo(), obj.getName(), FunToEvl.toTypeRef(ref));
+  }
+
+  @Override
+  protected Evl visitUnionSelector(UnionSelector obj, String param) {
+    return new evl.type.composed.UnionSelector(obj.getInfo(), obj.getName());
   }
 
   @Override

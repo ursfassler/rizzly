@@ -3,18 +3,18 @@ package fun.type.composed;
 import common.ElementInfo;
 
 public class UnionType extends NamedElementType {
-  private String selector;
+  private UnionSelector selector;
   
-  public UnionType(ElementInfo info, String selector) {
+  public UnionType(ElementInfo info, UnionSelector selector) {
     super(info);
     this.selector = selector;
   }
 
-  public String getSelector() {
+  public UnionSelector getSelector() {
     return selector;
   }
 
-  public void setSelector(String selector) {
+  public void setSelector(UnionSelector selector) {
     this.selector = selector;
   }
 

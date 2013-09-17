@@ -1,5 +1,6 @@
 package fun;
 
+import fun.type.composed.UnionSelector;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -591,6 +592,11 @@ class CopyFun extends Traverser<Fun, Void> {
   @Override
   protected Fun visitGenericRange(GenericRange obj, Void param) {
     throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Fun visitUnionSelector(UnionSelector obj, Void param) {
+    throw new UnsupportedOperationException("Not supported yet.");
   }
 
 }

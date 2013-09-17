@@ -59,4 +59,9 @@ public class ErrIfaceTest extends ErrorTest {
     testForError("err10", "Err10", "Component a has no output interface out2");
   }
 
+  @Test
+  public void errHfsm2() {
+    testForError("errHfsm2", "ErrHfsm2", "interface Iface{} has no function funcC");
+  }
+
 }

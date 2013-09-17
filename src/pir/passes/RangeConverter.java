@@ -32,6 +32,7 @@ import common.NameFactory;
 import pir.statement.normal.ArithmeticOp;
 import pir.statement.normal.NormalStmt;
 import pir.statement.phi.PhiStmt;
+import pir.type.UnionType;
 
 /**
  * Extends and truncates types of variables used in an arithmetic operation, relation and assignments
@@ -309,4 +310,15 @@ class ChildType extends NullTraverser<Type, PirValue> {
     assert ( idx < obj.getElements().size() );
     return obj.getElements().get(idx).getType().getRef();
   }
+
+  @Override
+  protected Type visitUnionType(UnionType obj, PirValue param) {
+    assert ( param instanceof Number );
+    int idx = ( (Number) param ).getValue().intValue();
+    assert ( idx >= 0 );
+    assert ( idx < obj.getElements().size() );
+    return obj.getElements().get(idx).getType().getRef();
+  }
+  
+  
 }

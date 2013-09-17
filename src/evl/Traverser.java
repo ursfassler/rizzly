@@ -86,6 +86,7 @@ import evl.type.base.StringType;
 import evl.type.composed.NamedElement;
 import evl.type.composed.NamedElementType;
 import evl.type.composed.RecordType;
+import evl.type.composed.UnionSelector;
 import evl.type.composed.UnionType;
 import evl.type.special.ComponentType;
 import evl.type.special.IntegerType;
@@ -163,6 +164,8 @@ public abstract class Traverser<R, P> {
       return visitCaseGotoOpt((CaseGotoOpt) obj, param);
     } else if( obj instanceof TypeRef ) {
       return visitTypeRef((TypeRef) obj, param);
+    } else if( obj instanceof UnionSelector ) {
+      return visitUnionSelector((UnionSelector) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -287,7 +290,7 @@ public abstract class Traverser<R, P> {
   }
 
   protected R visitNormalStmt(NormalStmt obj, P param) {
-    if ( obj instanceof Assignment ) {
+    if( obj instanceof Assignment ) {
       return visitAssignment((Assignment) obj, param);
     } else if( obj instanceof CallStmt ) {
       return visitCallStmt((CallStmt) obj, param);
@@ -590,4 +593,6 @@ public abstract class Traverser<R, P> {
   abstract protected R visitPointerType(PointerType obj, P param);
 
   abstract protected R visitStackMemoryAlloc(StackMemoryAlloc obj, P param);
+
+  abstract protected R visitUnionSelector(UnionSelector obj, P param);
 }

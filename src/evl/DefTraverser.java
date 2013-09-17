@@ -1,5 +1,6 @@
 package evl;
 
+import evl.type.composed.UnionSelector;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -628,6 +629,11 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitStackMemoryAlloc(StackMemoryAlloc obj, P param) {
     visit(obj.getVariable(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitUnionSelector(UnionSelector obj, P param) {
     return null;
   }
 }
