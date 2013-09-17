@@ -47,6 +47,9 @@ import evl.variable.Variable;
 import fun.other.Namespace;
 import fun.toevl.FunToEvl;
 
+//TODO check for llvm bug: when using an index value with a too small type to index an array, it can happen that the wrong element is returned (because an upper bit is set) => either an error should be thrown (index too small) or it chould behave correct
+//TODO check for llvm bug: testcase while2: decrementing does not work as expected
+//TODO llvm: how can we interfcae non i*8 bits types with C?
 //TODO implement unions as they are supposed to be (no more waste of memory)
 //TODO type check case ranges (do not allow case options out of range)
 //TODO pass records by reference to functions (test case rec2)

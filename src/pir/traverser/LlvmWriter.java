@@ -182,6 +182,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     visit(obj.getType(), param);
     param.wr(" ");
     param.wr("%" + obj.getName());
+    wrId(obj, param);
     return null;
   }
 
@@ -190,6 +191,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     visit(obj.getType(), param);
     param.wr(" ");
     param.wr("%" + obj.getName());
+    wrId(obj, param);
     return null;
   }
 
@@ -211,6 +213,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     assert ( type.getRef() instanceof PointerType );
     type = ( (PointerType) type.getRef() ).getType();
     param.wr("@" + obj.getName());
+    wrId(obj, param);
     param.wr(" = global ");
     visit(type, param);
     param.wr(" undef");

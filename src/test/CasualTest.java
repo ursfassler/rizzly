@@ -88,7 +88,7 @@ public class CasualTest extends BaseTest {
 
   @Test
   public void while2() {
-    compile("while2", TestSteps.EXECUTE, false, false);
+    compile("while2", TestSteps.EXECUTE, false, false);   //TODO this may be an llvm bug (or a missunderstanding)
   }
 
   @Test
@@ -231,6 +231,7 @@ public class CasualTest extends BaseTest {
   public void unionTest_UnionTest() {
     compile("unionTest", TestSteps.COMPILE_TO_ASM, false, false);  //TODO make testcase
   }
+  
   /*  @Test
   public void ui_Ui() {
   compile("ui", "Ui", true, false, false);

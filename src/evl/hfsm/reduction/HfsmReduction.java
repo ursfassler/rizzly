@@ -18,6 +18,7 @@ import evl.NullTraverser;
 import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
 import evl.copy.Copy;
+import evl.copy.Relinker;
 import evl.expression.Expression;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefName;
@@ -152,6 +153,18 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
 
     map.put(obj, elem);
     return elem;
+  }
+
+  /**
+   * relinking parameter references to new parameter
+   */ 
+  public static void relinkActualParameterRef(Transition trans, List<Variable> newParam, Evl body) {
+    assert ( newParam.size() == trans.getParam().size() );
+    Map<Variable, Variable> map = new HashMap<Variable, Variable>();
+    for( int i = 0; i < newParam.size(); i++ ) {
+      map.put(trans.getParam().getList().get(i), newParam.get(i));
+    }
+    Relinker.relink(body, map);
   }
 
   private FuncPrivateVoid makeEntryFunc(State initial, EnumType etype, HashMap<StateSimple, EnumElement> enumMap, StateVariable stateVariable) {
@@ -292,7 +305,7 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
       } else {
         Map<Transition, BasicBlock> guardMap = new HashMap<Transition, BasicBlock>();
         Map<Transition, BasicBlock> codeMap = new HashMap<Transition, BasicBlock>();
-        makeGuardedTrans(transList, src, bbl, guardMap, codeMap);
+        makeGuardedTrans(transList, src, bbl, guardMap, codeMap, param);
 
         stateBb.setEnd(new Goto(info, guardMap.get(transList.get(0))));
 
@@ -317,14 +330,14 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
    * For every transition, it adds a basic block with the guard in it and for the "then" part another basic block with code if the transition is taken.
    * The "else" part points to the next basic block or exit if there is no more transition.
    */
-  private void makeGuardedTrans(List<Transition> transList, State src, BasicBlockList bbl, Map<Transition, BasicBlock> guardMap, Map<Transition, BasicBlock> codeMap) {
+  private void makeGuardedTrans(List<Transition> transList, State src, BasicBlockList bbl, Map<Transition, BasicBlock> guardMap, Map<Transition, BasicBlock> codeMap, List<Variable> param) {
     BasicBlock blockElse = bbl.getExit();
 
     ArrayList<Transition> rl = new ArrayList<Transition>(transList);
     Collections.reverse(rl);
     for( Transition trans : rl ) {
 
-      BasicBlock blockThen = makeTransition(trans, bbl.getExit());
+      BasicBlock blockThen = makeTransition(trans, bbl.getExit(), param);
       bbl.getBasicBlocks().add(blockThen);
 
       IfGoto entry = new IfGoto(trans.getInfo());
@@ -361,17 +374,18 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
   /**
    * Checks if transition is built like we expect and makes a transition bb out of it.
    */
-  private BasicBlock makeTransition(Transition trans, BasicBlock nextBb) {
+  private BasicBlock makeTransition(Transition trans, BasicBlock nextBb, List<Variable> param) {
     BasicBlock transCode = new BasicBlock(info, "bb" + Designator.NAME_SEP + trans.getName());
 
-    assert( trans.getBody().getEntry().getCode().isEmpty() );
-    assert( trans.getBody().getExit().getCode().isEmpty() );
-    assert( trans.getBody().getExit().getPhi().isEmpty() );
-    assert( trans.getBody().getBasicBlocks().size() == 1 );
-    
+    assert ( trans.getBody().getEntry().getCode().isEmpty() );
+    assert ( trans.getBody().getExit().getCode().isEmpty() );
+    assert ( trans.getBody().getExit().getPhi().isEmpty() );
+    assert ( trans.getBody().getBasicBlocks().size() == 1 );
+
     BasicBlock body = trans.getBody().getBasicBlocks().iterator().next();
-    
-    transCode.getCode().addAll( body.getCode() );
+    relinkActualParameterRef(trans, param, body);
+
+    transCode.getCode().addAll(body.getCode());
 
     transCode.setEnd(new Goto(info, nextBb));
 
