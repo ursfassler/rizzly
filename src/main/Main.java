@@ -47,6 +47,7 @@ import evl.variable.Variable;
 import fun.other.Namespace;
 import fun.toevl.FunToEvl;
 
+//TODO make input language moe easy (types should not be expressions => functions can not return types; only templates)
 //TODO check for llvm bug: when using an index value with a too small type to index an array, it can happen that the wrong element is returned (because an upper bit is set) => either an error should be thrown (index too small) or it chould behave correct
 //TODO check for llvm bug: testcase while2: decrementing does not work as expected
 //TODO llvm: how can we interfcae non i*8 bits types with C?

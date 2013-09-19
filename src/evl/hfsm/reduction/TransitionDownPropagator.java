@@ -108,7 +108,8 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
     }
     for( Transition trans : transList ) {
       trans.setSrc(obj);
-      obj.getItem().add(trans);
+//      obj.getItem().add(trans);
+      addTrans(obj, trans);
     }
     for( Transition trans : param.after ) {
       addTrans(obj, trans);
@@ -122,6 +123,7 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
     State dst = tdst.get(otrans);
     assert ( dst != null );
     Transition trans = Copy.copy(otrans);
+    trans.setName( trans.getName() + Designator.NAME_SEP + src.getName() );  // make name unique
     trans.setSrc(src);
 
     assert ( trans.getBody().getEntry().getCode().isEmpty() );  // because we emptied it before

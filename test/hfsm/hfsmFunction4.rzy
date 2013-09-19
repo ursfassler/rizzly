@@ -9,7 +9,7 @@ component
         a : R{0,255};
         
       function tuwas()
-        a := a + 1;
+        a := (a + 1) mod 256;
       end
       
     end

@@ -2,7 +2,7 @@
 
 interface
   ValueEvent
-    function tick( val: R{0,255} );
+    function tick( val: R{0,5} );
   end
 
 component
@@ -16,31 +16,31 @@ component
     
   implementation hfsm(A)
     transition 
-      A to A by in.tick( val: R{0,255} ) if val = 0 do
+      A to A by in.tick( val: R{0,5} ) if val = 0 do
         out.tick( 0 );
       end
       
-      A to A by in.tick( val: R{0,255} ) if val = 1 do
+      A to A by in.tick( val: R{0,5} ) if val = 1 do
         out.tick( 1 );
       end
     
     state A
       transition 
-        A to A by in.tick( val: R{0,255} ) if val = 2 do
+        A to A by in.tick( val: R{0,5} ) if val = 2 do
           out.tick( 2 );
         end
         
-        A to A by in.tick( val: R{0,255} ) if val = 3 do
+        A to A by in.tick( val: R{0,5} ) if val = 3 do
           out.tick( 3 );
         end
     end
 
     transition 
-      A to A by in.tick( val: R{0,255} ) if val = 4 do
+      A to A by in.tick( val: R{0,5} ) if val = 4 do
         out.tick( 4 );
       end
       
-      A to A by in.tick( val: R{0,255} ) do
+      A to A by in.tick( val: R{0,5} ) do
         out.tick( 5 );
       end
       

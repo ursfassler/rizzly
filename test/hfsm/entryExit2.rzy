@@ -1,0 +1,76 @@
+//test ok
+
+import
+  tick;
+  valueEvent;
+
+component
+  EntryExit2
+
+  input
+    tick    : Tick;
+  
+  output
+    evt     : ValueEvent;
+
+  implementation hfsm(A)
+    state A(AA)
+      entry
+        evt.evt( 10 );
+      end
+      exit
+        evt.evt( 20 );
+      end
+
+      state AA(AAA)
+        entry
+          evt.evt( 11 );
+        end
+        exit
+          evt.evt( 21 );
+        end
+
+        state AAA
+          entry
+            evt.evt( 12 );
+          end
+          exit
+            evt.evt( 22 );
+          end
+        end
+      end
+    end
+
+    state B(BB)
+      entry
+        evt.evt( 30 );
+      end
+      exit
+        evt.evt( 40 );
+      end
+
+      state BB(BBB)
+        entry
+          evt.evt( 31 );
+        end
+        exit
+          evt.evt( 41 );
+        end
+
+        state BBB
+          entry
+            evt.evt( 32 );
+          end
+          exit
+            evt.evt( 42 );
+          end
+        end
+      end
+    end
+
+    transition 
+      A to B by tick.tick();
+      B to A by tick.tick();
+
+  end
+

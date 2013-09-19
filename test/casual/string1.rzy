@@ -1,0 +1,38 @@
+
+interface
+  Tick
+    function tick();
+  end
+
+  Msg
+    function text( x: String );
+  end
+  
+component
+  String1
+    input
+      in  : Tick;
+    
+    output
+      out : Msg;
+    
+  implementation elementary
+    
+    var
+      k : R{0,2};
+      
+    entry
+      k := 0;
+    end
+    
+    function in.tick()
+      case k of
+        0: out.tick( 'Hello' ); end
+        1: out.tick( ' ' ); end
+        2: out.tick( 'World' ); end
+      end
+      k := (k + 1) mod 3;
+    end
+    
+  end
+

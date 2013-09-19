@@ -15,11 +15,11 @@ component
   implementation elementary
 
     function sqr( v: R{0,200} ):R{0,200}
-      return v*v;
+      return v*v mod 201;
     end
 
-    function evtIn.evt( value: R{0,200} )
-      evtOut.evt( sqr( value ) );
+    function evtIn.evt( value: R{0,255} )
+      evtOut.evt( sqr( value mod 201 ) );
     end
   end
   

@@ -30,13 +30,6 @@ component
         evt.evt( 19 );
       end
       
-      var
-        c : R{0,255};
-
-      function tuwas( x: R{0,255} ):R{0,255}
-        return x;
-      end
-      
       state AA(AAA)
         entry
           evt.evt( 20 );
@@ -96,5 +89,10 @@ component
         end
       end
     end
+    
+    transition 
+      BBB to AAA by tick.tick() do
+        evt.evt( 3 );
+      end
   end
 

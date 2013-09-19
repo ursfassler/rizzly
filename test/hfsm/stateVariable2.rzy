@@ -10,20 +10,20 @@ component
   implementation hfsm(A)
 
     state A
-      entry
-        a := a + 3;
-      end
-      
       var
         a : R{0,255};
         
+      entry
+        a := 0;
+      end
+      
       function tuwas()
-        a := a + 2;
+        a := (a + 2) and 255;
       end
       
       transition 
         A to A by tick.tick() do
-          a := a + 1;
+          a := (a + 1) mod 256;
         end
     end
   end

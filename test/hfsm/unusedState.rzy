@@ -13,8 +13,6 @@ component
 
     state A(AA)
       state AA
-        var
-          aa : R{0,255};
       end
 
       state AB
@@ -22,22 +20,14 @@ component
     end
 
     state B(BA)
-      var
-        b : R{0,255};
-
       state BA
       end
 
       state BB
-        var
-          bb : R{0,255};
       end
     end
 
     state C(CA)
-      var
-        c : R{0,255};
-
       state CA
       end
 

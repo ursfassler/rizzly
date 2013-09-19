@@ -11,6 +11,11 @@ public class HfsmTest extends BaseTest {
   }
 
   @Test
+  public void hfsm() {
+    compile("hfsm", TestSteps.EXECUTE, false, false);
+  }
+
+  @Test
   public void elementary1() {
     compile("elementary1", "Elementary1", true, false, false);
   }
@@ -28,11 +33,6 @@ public class HfsmTest extends BaseTest {
   @Test
   public void elementary4() {
     compile("elementary4", "Elementary4", true, false, false);
-  }
-
-  @Test
-  public void hfsm() {
-    compile("hfsm", "Hfsm", true, false, false);
   }
 
   @Test
