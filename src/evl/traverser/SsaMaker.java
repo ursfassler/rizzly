@@ -22,6 +22,7 @@ import evl.Evl;
 import evl.NullTraverser;
 import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
+import evl.copy.Relinker;
 import evl.expression.reference.Reference;
 import evl.function.FuncWithBody;
 import evl.function.FunctionBase;
@@ -57,6 +58,7 @@ public class SsaMaker extends DefTraverser<Void, Void> {
   protected Void visitTransition(Transition obj, Void param) {
     Map<FuncVariable, SsaVariable> argmap = replaceParam(obj.getParam());
     translateBody(obj.getBody(), obj.getParam().getList(), argmap);
+    Relinker.relink(obj.getGuard(), argmap);
     return null;
   }
 

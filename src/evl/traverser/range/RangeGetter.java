@@ -141,6 +141,9 @@ public class RangeGetter extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitReference(Reference obj, Void param) {
+    if( !(obj.getLink() instanceof SsaVariable) ){
+      return null;
+    }
     assert ( obj.getOffset().isEmpty() );
     assert ( obj.getLink() instanceof SsaVariable );
     Expression writer = kw.get((SsaVariable) obj.getLink());

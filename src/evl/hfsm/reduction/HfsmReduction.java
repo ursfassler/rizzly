@@ -330,21 +330,23 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
    * For every transition, it adds a basic block with the guard in it and for the "then" part another basic block with code if the transition is taken.
    * The "else" part points to the next basic block or exit if there is no more transition.
    */
-  private void makeGuardedTrans(List<Transition> transList, State src, BasicBlockList bbl, Map<Transition, BasicBlock> guardMap, Map<Transition, BasicBlock> codeMap, List<Variable> param) {
+  private void makeGuardedTrans(List<Transition> transList, State src, BasicBlockList bbl, Map<Transition, BasicBlock> guardMap, Map<Transition, BasicBlock> codeMap, List<Variable> newparam) {
     BasicBlock blockElse = bbl.getExit();
 
     ArrayList<Transition> rl = new ArrayList<Transition>(transList);
     Collections.reverse(rl);
     for( Transition trans : rl ) {
 
-      BasicBlock blockThen = makeTransition(trans, bbl.getExit(), param);
+      BasicBlock blockThen = makeTransition(trans, bbl.getExit(), newparam);
       bbl.getBasicBlocks().add(blockThen);
 
+      relinkActualParameterRef( trans, newparam, trans.getGuard() );  // relink references to arguments to the new ones
+      
       IfGoto entry = new IfGoto(trans.getInfo());
       entry.setCondition(trans.getGuard());
       entry.setThenBlock(blockThen);
       entry.setElseBlock(blockElse);
-
+      
       BasicBlock guardBb = new BasicBlock(info, "bb" + Designator.NAME_SEP + src.getName() + Designator.NAME_SEP + trans.getName());
       bbl.getBasicBlocks().add(guardBb);
       guardBb.setEnd(entry);

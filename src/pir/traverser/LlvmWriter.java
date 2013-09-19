@@ -586,6 +586,14 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
         op = "mul";
         flags = "nuw nsw";
         break;
+      case SHL:
+        op = "shl";
+        flags = "nuw nsw";
+        break;
+      case SHR:
+        op = "shr";
+        flags = "nuw nsw";
+        break;
       default:
         RError.err(ErrorType.Fatal, "Operand not handled: " + obj.getOp()); // TODO change to fatal error
         return null;

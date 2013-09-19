@@ -15,8 +15,12 @@ component
     out     : ValueEvent;
     
   implementation hfsm(A)
+    function testBit( value: R{0,63}; bit: R{0,5} ):Boolean
+      return (value and (1 shl bit)) <> 0;
+    end
+  
     transition 
-      A to A by in.tick( val: R{0,5} ) if val = 0 do
+      A to A by in.tick( val: R{0,5} ) if testBit( val, 0 ) do
         out.tick( 0 );
       end
       

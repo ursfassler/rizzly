@@ -110,7 +110,7 @@ public class MainEvl {
 
     PrettyPrinter.print(aclasses, debugdir + "ast.rzy", false);
     SsaMaker.process(aclasses, kb);
-    PrettyPrinter.print(aclasses, debugdir + "ssa.rzy", false);
+    PrettyPrinter.print(aclasses, debugdir + "ssa.rzy", true);
 
     TransitionGuardNarrower.process(aclasses,kb);
     RangeNarrower.process(aclasses, kb);
