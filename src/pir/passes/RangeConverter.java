@@ -130,19 +130,19 @@ public class RangeConverter extends StatementReplacer<Void> {
 
   @Override
   protected List<NormalStmt> visitCallAssignment(CallAssignment obj, Void param) {
-    {
-      Type st = obj.getRef().getRetType().getRef();
-      Type dt = obj.getVariable().getType().getRef();
-      if( isNotRange(st, dt) ) {
-        return null;
-      }
-    }
     List<SsaVariable> argument = obj.getRef().getArgument();
     ArrayList<PirValue> parameter = obj.getParameter();
 
     List<NormalStmt> ret = checkArg(argument, parameter);
     ret.add(obj);
 
+    {
+      Type st = obj.getRef().getRetType().getRef();
+      Type dt = obj.getVariable().getType().getRef();
+      if( isNotRange(st, dt) ) {
+        return ret;
+      }
+    }
     RangeType lt = (RangeType) obj.getRef().getRetType().getRef();
     RangeType dt = (RangeType) obj.getVariable().getType().getRef();
 
