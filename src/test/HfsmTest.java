@@ -2,7 +2,6 @@ package test;
 
 import org.junit.Test;
 
-
 public class HfsmTest extends BaseTest {
 
   @Override
@@ -13,6 +12,11 @@ public class HfsmTest extends BaseTest {
   @Test
   public void hfsm() {
     compile("hfsm", TestSteps.EXECUTE, false, false);
+  }
+
+  @Test
+  public void transOrder() {
+    compile("transOrder", TestSteps.EXECUTE, false, false);
   }
 
   @Test
@@ -38,11 +42,6 @@ public class HfsmTest extends BaseTest {
   @Test
   public void transDist() {
     compile("transDist", "TransDist", true, false, false);
-  }
-
-  @Test
-  public void transOrder() {
-    compile("transOrder", "TransOrder", true, false, false);
   }
 
   @Test
