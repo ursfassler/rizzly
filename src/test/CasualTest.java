@@ -231,77 +231,80 @@ public class CasualTest extends BaseTest {
   public void unionTest_UnionTest() {
     compile("unionTest", TestSteps.COMPILE_TO_ASM, false, false);  //TODO make testcase
   }
-  
+
   @Test
   public void elementary1() {
-    compile("elementary1", "Elementary1", true, false, false);
+    compile("elementary1", TestSteps.COMPILE_TO_ASM, false, false);
   }
 
   @Test
   public void elementary2() {
-    compile("elementary2", "Elementary2", true, false, false);
+    compile("elementary2", TestSteps.COMPILE_TO_BIN, false, false);
   }
 
   @Test
   public void elementary3() {
-    compile("elementary3", "Elementary3", true, false, false);
+    compile("elementary3", TestSteps.COMPILE_TO_BIN, false, false);
   }
 
   @Test
   public void elementary4() {
-    compile("elementary4", "Elementary4", true, false, false);
+    compile("elementary4", TestSteps.COMPILE_TO_BIN, false, false);
   }
 
-  /*  @Test
-  public void ui_Ui() {
-  compile("ui", "Ui", true, false, false);
+  @Test
+  public void ui() {
+    compile("ui", TestSteps.COMPILE_TO_ASM, false, false); //TODO make real testcase
   }
+
+  @Test
+  public void bitred() {
+    compile("bitred", TestSteps.COMPILE_TO_ASM, false, false);
+  }
+
+  
   
   @Test
   public void linking() {
-  compile("linking", "Linking", true, false, false);
+    compile("linking", "Linking", true, false, false);
   }
-  
-  @Test
-  public void bitred() {
-  compile("bitred", "Bitred", true, false, false);
-  }
-  
+
   @Test
   public void bool_Bool() {
-  compile("bool", "Bool", true, false, false);
+    compile("bool", "Bool", true, false, false);
   }
-  
+
   @Test
   public void bool2_Bool2() {
-  compile("bool2", "Bool2", true, false, false);
+    compile("bool2", "Bool2", true, false, false);
   }
   
+  // check:
+
   @Test
   public void compositionQuery_CompositionQuery() {
-  compile("compositionQuery", "CompositionQuery", true, false, true);
+    compile("compositionQuery", "CompositionQuery", true, false, true);
   }
-  
+
   @Test
   public void expr_Expr() {
-  compile("expr", "Expr", true, false, true);
+    compile("expr", "Expr", true, false, true);
   }
-  
+
   @Test
   public void expr2_Expr2() {
-  compile("expr2", "Expr2", true, false, false);
+    compile("expr2", "Expr2", true, false, false);
   }
-  
+
   @Test
   public void gfunc_GFunc() {
-  compile("gfunc", "GFunc", true, false, false);
+    compile("gfunc", "GFunc", true, false, false);
   }
-  
+
   @Test
   public void param() {
-  compile("param", "Param", true, false, false);
+    compile("param", "Param", true, false, false);
   }
-   */
   // @Test
   // public void compFib() {
   // compile("compFib", "CompFib", true, false, false);

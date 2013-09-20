@@ -690,6 +690,13 @@ class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, pir.other
   }
 
   @Override
+  protected VariableGeneratorStmt visitBoolValue(BoolValue obj, pir.other.SsaVariable param) {
+    pir.type.BooleanType type = converter.kbi.getBooleanType();
+    pir.expression.BoolValue num = new pir.expression.BoolValue(obj.isValue(), new TypeRef(type));
+    return new pir.statement.normal.Assignment(param, num);
+  }
+
+  @Override
   protected VariableGeneratorStmt visitNumber(Number obj, pir.other.SsaVariable param) {
     pir.type.Type type = converter.kbi.getRangeType(obj.getValue(), obj.getValue());
     pir.expression.Number num = new pir.expression.Number(obj.getValue(), new TypeRef(type));

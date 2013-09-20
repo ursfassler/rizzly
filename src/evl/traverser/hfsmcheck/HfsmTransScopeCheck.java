@@ -1,6 +1,11 @@
 package evl.traverser.hfsmcheck;
 
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
 import common.ElementInfo;
+
 import error.ErrorType;
 import error.RError;
 import evl.Evl;
@@ -11,9 +16,6 @@ import evl.hfsm.Transition;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
 import evl.traverser.ClassGetter;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
 
 /**
  * Checks if the states (src,dst) of a transition are reachable from the transition (inner scope)

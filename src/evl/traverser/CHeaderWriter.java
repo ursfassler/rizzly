@@ -17,6 +17,7 @@ import evl.other.RizzlyProgram;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
+import evl.type.base.BooleanType;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.type.base.Range;
@@ -144,6 +145,17 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
     } else {
       return value;
     }
+  }
+
+  @Override
+  protected Void visitBooleanType(BooleanType obj, StreamWriter param) {
+    param.wr("typedef ");
+    param.wr("uint8_t");
+    param.wr(" ");
+    param.wr(obj.getName());
+    param.wr(";");
+    param.nl();
+    return null;
   }
 
   @Override

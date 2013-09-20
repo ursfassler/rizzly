@@ -81,7 +81,6 @@ import evl.doc.StreamWriter;
 import evl.expression.RelOp;
 
 //TODO mark private objects with "internal"
-
 public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
 
   private final boolean wrId;
@@ -326,7 +325,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     wrNamedElem(obj.getElements(), param);
     param.decIndent();
     param.wr("}");
-    param.wr( "  ; sorry for wasting your memory" );  //TODO implement unions as they are supposed to be
+    param.wr("  ; sorry for wasting your memory");  //TODO implement unions as they are supposed to be
     param.nl();
     return null;
   }
@@ -546,13 +545,26 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitUnaryOp(UnaryOp obj, StreamWriter param) {
     wrVarDef(obj, param);
-    param.wr(obj.getOp().toString());
-    param.wr(" ");
-    visit(obj.getVariable().getType(), param);
-    param.wr(" ");
-    visit(obj.getExpr(), param);
-    param.nl();
-    return null;
+    switch( obj.getOp() ) {
+      case MINUS:
+        param.wr("sub ");
+        visit(obj.getVariable().getType(), param);
+        param.wr(" 0, ");
+        visit(obj.getExpr(), param);
+        param.nl();
+        return null;
+      case NOT:
+        param.wr("xor ");
+        visit(obj.getVariable().getType(), param);
+        param.wr(" ");
+        visit(obj.getExpr(), param);
+        param.wr(", -1");
+        param.nl();
+        return null;
+      default:
+        RError.err(ErrorType.Fatal, "Operand not handled: " + obj.getOp());
+        return null;
+    }
   }
 
   @Override

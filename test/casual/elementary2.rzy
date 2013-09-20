@@ -1,7 +1,9 @@
 //test ok
 
-import
-  tick;
+interface
+  Tick
+    function tick();
+  end
 
 component
   Elementary2

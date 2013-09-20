@@ -1,7 +1,9 @@
 //test ok
 
-import
-  valueEvent;
+interface
+  ValueEvent
+    function evt( value: R{0,255} );
+  end
 
 component
   Elementary4
