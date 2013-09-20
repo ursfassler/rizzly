@@ -35,6 +35,7 @@ import pir.statement.bbend.Goto;
 import pir.statement.bbend.IfGoto;
 import pir.statement.bbend.ReturnExpr;
 import pir.statement.bbend.ReturnVoid;
+import pir.statement.bbend.Unreachable;
 import pir.statement.normal.CallAssignment;
 import pir.statement.normal.CallStmt;
 import pir.statement.normal.StoreStmt;
@@ -93,6 +94,7 @@ public class MainPir {
       keep.add(IfGoto.class);
       keep.add(ReturnExpr.class);
       keep.add(ReturnVoid.class);
+      keep.add(Unreachable.class);
 
       Set<Statement> removable = new HashSet<Statement>();
 

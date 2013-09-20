@@ -20,6 +20,26 @@ public class HfsmTest extends BaseTest {
   }
 
   @Test
+  public void query() {
+    compile("query",  TestSteps.EXECUTE, false, false);
+  }
+
+  @Test
+  public void query2() {
+    compile("query2",  TestSteps.COMPILE_TO_ASM, false, false);
+  }
+
+  @Test
+  public void query3() {
+    compile("query3",  TestSteps.EXECUTE, false, false);
+  }
+
+  @Test
+  public void query4() {
+    compile("query4",  TestSteps.EXECUTE, false, false);
+  }
+
+  @Test
   public void transDist() {
     compile("transDist", "TransDist", true, false, false);
   }
@@ -57,16 +77,6 @@ public class HfsmTest extends BaseTest {
   @Test
   public void stateVariable2() {
     compile("stateVariable2", "StateVariable2", true, false, false);
-  }
-
-  @Test
-  public void query_Query() {
-    compile("query", "Query", true, false, false);
-  }
-
-  @Test
-  public void query2_Query2() {
-    compile("query2", "Query2", true, false, false);
   }
 
   @Test

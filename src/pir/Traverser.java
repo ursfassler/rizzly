@@ -35,6 +35,7 @@ import pir.statement.bbend.IfGoto;
 import pir.statement.bbend.Return;
 import pir.statement.bbend.ReturnExpr;
 import pir.statement.bbend.ReturnVoid;
+import pir.statement.bbend.Unreachable;
 import pir.statement.normal.ArithmeticOp;
 import pir.statement.normal.Assignment;
 import pir.statement.normal.CallAssignment;
@@ -134,6 +135,8 @@ abstract public class Traverser<R, P> {
       return visitCaseGoto((CaseGoto) obj, param);
     } else if( obj instanceof Goto ) {
       return visitGoto((Goto) obj, param);
+    } else if( obj instanceof Unreachable ) {
+      return visitUnreachable((Unreachable) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -413,4 +416,6 @@ abstract public class Traverser<R, P> {
   protected abstract R visitStackMemoryAlloc(StackMemoryAlloc obj, P param);
 
   protected abstract R visitVarRefConst(VarRefConst obj, P param);
+
+  protected abstract R visitUnreachable(Unreachable obj, P param);
 }

@@ -51,6 +51,7 @@ import evl.statement.bbend.CaseOptValue;
 import evl.statement.bbend.Goto;
 import evl.statement.bbend.IfGoto;
 import evl.statement.bbend.ReturnExpr;
+import evl.statement.bbend.Unreachable;
 import evl.statement.normal.Assignment;
 import evl.statement.normal.CallStmt;
 import evl.statement.normal.NormalStmt;
@@ -188,7 +189,7 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
 
   static private BasicBlock makeErrorBb() {
     BasicBlock bberror = new BasicBlock(info, "error");
-    bberror.setEnd(new Goto(info, bberror));    // should never be reached in target, throw exception or so?
+    bberror.setEnd(new Unreachable(info));
     return bberror;
   }
 
@@ -318,7 +319,6 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
     SsaVariable newStateVal = new SsaVariable(info, "newStateVal", stateVariable.getType().copy());
     PhiStmt phi = new PhiStmt(info, newStateVal);
     bbl.getExit().getPhi().add(phi);
-    phi.addArg(bbl.getEntry(), new Reference(info, stateVariable));  // set phi arg if state was not in list (should not happen?)
 
     Assignment writeState = new Assignment(info, new Reference(info, stateVariable), new Reference(info, newStateVal));
     bbl.getExit().getCode().add(0, writeState);

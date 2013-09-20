@@ -38,6 +38,7 @@ import pir.statement.bbend.Goto;
 import pir.statement.bbend.IfGoto;
 import pir.statement.bbend.ReturnExpr;
 import pir.statement.bbend.ReturnVoid;
+import pir.statement.bbend.Unreachable;
 import pir.statement.normal.ArithmeticOp;
 import pir.statement.normal.Assignment;
 import pir.statement.normal.CallAssignment;
@@ -678,6 +679,13 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     wrVarDef(obj, param);
     param.wr("alloca ");
     visit(new TypeRef(obj.getType()), param);
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitUnreachable(Unreachable obj, StreamWriter param) {
+    param.wr("unreachable");
     param.nl();
     return null;
   }

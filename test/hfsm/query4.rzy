@@ -2,11 +2,11 @@
 interface
   Iface
     function tick();
-    function read():R{0,100};
+    function read( x: R{0,10} ):R{0,100};
   end
   
 component
-  Query2
+  Query4
     input
       in : Iface;
     
@@ -18,17 +18,22 @@ component
       C to A by in.tick();
   
     state A
+      function in.read( x: R{0,10} ):R{0,100}
+        return x * 1;
+      end
     end
       
     state B
+      function in.read( x: R{0,10} ):R{0,100}
+        return x * 2;
+      end
     end
 
     state C
+      function in.read( x: R{0,10} ):R{0,100}
+        return x * 3;
+      end
     end
     
-    function in.read():R{0,100}
-      return 0;
-    end
-  
   end
 

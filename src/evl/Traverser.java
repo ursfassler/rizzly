@@ -60,6 +60,7 @@ import evl.statement.bbend.IfGoto;
 import evl.statement.bbend.Return;
 import evl.statement.bbend.ReturnExpr;
 import evl.statement.bbend.ReturnVoid;
+import evl.statement.bbend.Unreachable;
 import evl.statement.normal.Assignment;
 import evl.statement.normal.CallStmt;
 import evl.statement.normal.GetElementPtr;
@@ -180,6 +181,8 @@ public abstract class Traverser<R, P> {
       return visitCaseGoto((CaseGoto) obj, param);
     } else if( obj instanceof Return ) {
       return visitReturn((Return) obj, param);
+    } else if( obj instanceof Unreachable ) {
+      return visitUnreachable((Unreachable) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -595,4 +598,6 @@ public abstract class Traverser<R, P> {
   abstract protected R visitStackMemoryAlloc(StackMemoryAlloc obj, P param);
 
   abstract protected R visitUnionSelector(UnionSelector obj, P param);
+
+  abstract protected R visitUnreachable(Unreachable obj, P param);
 }

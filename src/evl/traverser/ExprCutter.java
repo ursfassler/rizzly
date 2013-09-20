@@ -36,6 +36,7 @@ import evl.statement.bbend.Goto;
 import evl.statement.bbend.IfGoto;
 import evl.statement.bbend.ReturnExpr;
 import evl.statement.bbend.ReturnVoid;
+import evl.statement.bbend.Unreachable;
 import evl.statement.normal.Assignment;
 import evl.statement.normal.CallStmt;
 import evl.statement.normal.GetElementPtr;
@@ -131,8 +132,6 @@ public class ExprCutter extends NullTraverser<Void, Void> {
     return null;
   }
 }
-
-
 
 class StmtTraverser extends NullTraverser<Void, List<NormalStmt>> {
 
@@ -308,6 +307,11 @@ class StmtTraverser extends NullTraverser<Void, List<NormalStmt>> {
   protected Void visitReturnVoid(ReturnVoid obj, List<NormalStmt> param) {
     return null;
   }
+
+  @Override
+  protected Void visitUnreachable(Unreachable obj, List<NormalStmt> param) {
+    return null;
+  }
 }
 
 class Cutter extends ExprReplacer<List<NormalStmt>> {
@@ -341,7 +345,6 @@ class Cutter extends ExprReplacer<List<NormalStmt>> {
     param.add(new VarDefInitStmt(info, var, obj));
     return var;
   }
-
 
   @Override
   protected Expression visitReference(Reference obj, List<NormalStmt> param) {

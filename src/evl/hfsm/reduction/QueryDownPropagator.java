@@ -1,19 +1,21 @@
 package evl.hfsm.reduction;
 
-import common.Designator;
-import common.ElementInfo;
-import evl.expression.Expression;
-import evl.statement.normal.NormalStmt;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import util.Pair;
+
+import common.Designator;
+import common.ElementInfo;
+
 import evl.Evl;
 import evl.NullTraverser;
 import evl.cfg.BasicBlockList;
 import evl.copy.Copy;
+import evl.expression.Expression;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.Reference;
 import evl.function.impl.FuncPrivateRet;
@@ -29,10 +31,10 @@ import evl.knowledge.KnowledgeBase;
 import evl.other.ListOfNamed;
 import evl.statement.bbend.ReturnExpr;
 import evl.statement.bbend.ReturnVoid;
+import evl.statement.normal.NormalStmt;
 import evl.statement.normal.VarDefInitStmt;
 import evl.variable.SsaVariable;
 import evl.variable.Variable;
-import java.util.Collection;
 
 public class QueryDownPropagator extends NullTraverser<Void, QueryParam> {
 

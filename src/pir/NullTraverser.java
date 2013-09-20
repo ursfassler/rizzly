@@ -27,6 +27,7 @@ import pir.statement.bbend.Goto;
 import pir.statement.bbend.IfGoto;
 import pir.statement.bbend.ReturnExpr;
 import pir.statement.bbend.ReturnVoid;
+import pir.statement.bbend.Unreachable;
 import pir.statement.normal.ArithmeticOp;
 import pir.statement.normal.Assignment;
 import pir.statement.normal.CallAssignment;
@@ -332,6 +333,11 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitVarRefConst(VarRefConst obj, P param) {
+    return doDefault(obj, param);
+  }
+  
+  @Override
+  protected R visitUnreachable(Unreachable obj, P param) {
     return doDefault(obj, param);
   }
 }

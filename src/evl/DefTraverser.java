@@ -55,6 +55,7 @@ import evl.statement.bbend.Goto;
 import evl.statement.bbend.IfGoto;
 import evl.statement.bbend.ReturnExpr;
 import evl.statement.bbend.ReturnVoid;
+import evl.statement.bbend.Unreachable;
 import evl.statement.normal.Assignment;
 import evl.statement.normal.CallStmt;
 import evl.statement.normal.GetElementPtr;
@@ -634,6 +635,11 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitUnionSelector(UnionSelector obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitUnreachable(Unreachable obj, P param) {
     return null;
   }
 }

@@ -67,6 +67,7 @@ import evl.statement.bbend.Goto;
 import evl.statement.bbend.IfGoto;
 import evl.statement.bbend.ReturnExpr;
 import evl.statement.bbend.ReturnVoid;
+import evl.statement.bbend.Unreachable;
 import evl.statement.normal.Assignment;
 import evl.statement.normal.CallStmt;
 import evl.statement.normal.GetElementPtr;
@@ -93,6 +94,7 @@ import evl.variable.Constant;
 import evl.variable.FuncVariable;
 import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
+
 
 public class ToPir extends NullTraverser<PirObject, Void> {
 
@@ -388,6 +390,11 @@ public class ToPir extends NullTraverser<PirObject, Void> {
   }
 
   @Override
+  protected PirObject visitUnreachable(Unreachable obj, Void param) {
+    return new pir.statement.bbend.Unreachable();
+  }
+
+  @Override
   protected PirObject visitVoidType(VoidType obj, Void param) {
     pir.type.VoidType ret = kbi.getVoidType();
     return ret;
@@ -645,7 +652,6 @@ public class ToPir extends NullTraverser<PirObject, Void> {
     return new TypeRef((pir.type.Type) visit(obj.getRef(), null));
   }
 }
-
 class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, pir.other.SsaVariable> {
 
   private ToPir converter;

@@ -6,7 +6,7 @@ interface
   end
   
 component
-  Query2
+  Query3
     input
       in : Iface;
     
@@ -17,18 +17,21 @@ component
       B to C by in.tick();
       C to A by in.tick();
   
+    function in.read():R{0,100}
+      return 57;
+    end
+  
     state A
     end
       
     state B
+      function in.read():R{0,100}     // this query is never used
+        return 42;
+      end
     end
 
     state C
     end
     
-    function in.read():R{0,100}
-      return 0;
-    end
-  
   end
 

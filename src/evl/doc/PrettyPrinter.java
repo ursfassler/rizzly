@@ -62,6 +62,7 @@ import evl.statement.bbend.Goto;
 import evl.statement.bbend.IfGoto;
 import evl.statement.bbend.ReturnExpr;
 import evl.statement.bbend.ReturnVoid;
+import evl.statement.bbend.Unreachable;
 import evl.statement.normal.Assignment;
 import evl.statement.normal.CallStmt;
 import evl.statement.normal.GetElementPtr;
@@ -592,6 +593,13 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   protected Void visitCallStmt(CallStmt obj, StreamWriter param) {
     visit(obj.getCall(), param);
     param.wr(";");
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitUnreachable(Unreachable obj, StreamWriter param) {
+    param.wr("unreachable");
     param.nl();
     return null;
   }

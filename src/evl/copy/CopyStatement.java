@@ -9,6 +9,7 @@ import evl.statement.bbend.Goto;
 import evl.statement.bbend.IfGoto;
 import evl.statement.bbend.ReturnExpr;
 import evl.statement.bbend.ReturnVoid;
+import evl.statement.bbend.Unreachable;
 import evl.statement.normal.Assignment;
 import evl.statement.normal.CallStmt;
 import evl.statement.normal.GetElementPtr;
@@ -119,5 +120,10 @@ public class CopyStatement extends NullTraverser<Statement, Void> {
   @Override
   protected Statement visitTypeCast(TypeCast obj, Void param) {
     return new TypeCast(obj.getInfo(), cast.copy(obj.getVariable()), cast.copy(obj.getCast()), cast.copy(obj.getValue()));
+  }
+
+  @Override
+  protected Statement visitUnreachable(Unreachable obj, Void param) {
+    return new Unreachable(obj.getInfo());
   }
 }
