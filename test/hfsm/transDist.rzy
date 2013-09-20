@@ -28,7 +28,7 @@ component
       
       state A
         transition 
-          A to Top by in.tick( val: R{0,255} ) if val = 2 do
+          A to Top by in.tick( val: R{0,255} ) if val = 2 do  // should not work since Top is in outer scope of A
             out.tick( 2 );
           end
           

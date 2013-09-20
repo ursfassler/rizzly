@@ -40,11 +40,6 @@ public class HfsmTest extends BaseTest {
   }
 
   @Test
-  public void transDist() {
-    compile("transDist", "TransDist", true, false, false);
-  }
-
-  @Test
   public void entryExit1() {
     compile("entryExit1", "EntryExit1", true, false, false);
   }

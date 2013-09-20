@@ -80,6 +80,7 @@ import evl.traverser.StateVariableExtractor;
 import evl.traverser.debug.CompCascadeDepth;
 import evl.traverser.debug.DebugIfaceAdder;
 import evl.traverser.debug.MsgNamesGetter;
+import evl.traverser.hfsmcheck.HfsmTransScopeCheck;
 import evl.traverser.iocheck.IoCheck;
 import evl.traverser.iocheck.StateReaderInfo;
 import evl.traverser.iocheck.StateWriterInfo;
@@ -150,6 +151,7 @@ public class MainEvl {
     checkUsefullness(aclasses);
     checkForRtcViolation(aclasses, kb);
     ioCheck(aclasses, kb);
+    hfsmCheck(aclasses,kb);
   }
 
   /**
@@ -611,6 +613,10 @@ public class MainEvl {
         func.setAttribute(FuncAttr.Public);
       }
     }
+  }
+
+  private static void hfsmCheck(Namespace aclasses, KnowledgeBase kb) {
+    HfsmTransScopeCheck.process(aclasses,kb);
   }
 
 }
