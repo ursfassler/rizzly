@@ -1,5 +1,9 @@
 package evl.hfsm.reduction;
 
+import common.Designator;
+import common.ElementInfo;
+import evl.expression.Expression;
+import evl.statement.normal.NormalStmt;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -8,7 +12,11 @@ import java.util.Map;
 import util.Pair;
 import evl.Evl;
 import evl.NullTraverser;
+import evl.cfg.BasicBlockList;
 import evl.copy.Copy;
+import evl.expression.reference.RefCall;
+import evl.expression.reference.Reference;
+import evl.function.impl.FuncPrivateRet;
 import evl.hfsm.HfsmQueryFunction;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.QueryItem;
@@ -18,12 +26,33 @@ import evl.hfsm.StateItem;
 import evl.hfsm.StateSimple;
 import evl.hfsm.Transition;
 import evl.knowledge.KnowledgeBase;
+import evl.other.ListOfNamed;
+import evl.statement.bbend.ReturnExpr;
+import evl.statement.bbend.ReturnVoid;
+import evl.statement.normal.VarDefInitStmt;
+import evl.variable.SsaVariable;
+import evl.variable.Variable;
+import java.util.Collection;
 
-//TODO do not duplicate query in simple state when query is defined in parent state (call query of parent state)
 public class QueryDownPropagator extends NullTraverser<Void, QueryParam> {
 
+  private static final ElementInfo info = new ElementInfo();
+  private final Map<HfsmQueryFunction, FuncPrivateRet> map;
+
+  public QueryDownPropagator(Map<HfsmQueryFunction, FuncPrivateRet> map) {
+    this.map = map;
+  }
+
   public static void process(ImplHfsm hfsm, KnowledgeBase kb) {
-    QueryDownPropagator redirecter = new QueryDownPropagator();
+    Map<HfsmQueryFunction, FuncPrivateRet> qfunc = new HashMap<HfsmQueryFunction, FuncPrivateRet>();
+    QueryFuncMaker qfmaker = new QueryFuncMaker(qfunc);
+    qfmaker.traverse(hfsm.getTopstate(), new Designator());
+
+    for( FuncPrivateRet func : qfunc.values() ) {
+      hfsm.getTopstate().getFunction().add(func);
+    }
+
+    QueryDownPropagator redirecter = new QueryDownPropagator(qfunc);
     redirecter.traverse(hfsm.getTopstate(), new QueryParam());
   }
 
@@ -39,29 +68,52 @@ public class QueryDownPropagator extends NullTraverser<Void, QueryParam> {
 
     Map<Pair<String, String>, HfsmQueryFunction> queries = new HashMap<Pair<String, String>, HfsmQueryFunction>();
 
-    for (QueryItem query : param.before) {
+    for( QueryItem query : param.before ) {
       addQuery(queries, query);
     }
-    for (QueryItem query : queryList) {
+    for( QueryItem query : queryList ) {
       addQuery(queries, query);
     }
-    for (QueryItem query : param.after) {
+    for( QueryItem query : param.after ) {
       addQuery(queries, query);
     }
 
-    for (Pair<String, String> key : queries.keySet()) {
+    for( Pair<String, String> key : queries.keySet() ) {
       HfsmQueryFunction func = queries.get(key);
-      HfsmQueryFunction cfunc = Copy.copy(func);
+      assert ( func.getBody().getBasicBlocks().isEmpty() );
+      assert ( func.getBody().getEntry().getCode().isEmpty() );
+      assert ( func.getBody().getExit().getCode().isEmpty() );
+      assert ( func.getBody().getExit().getEnd() instanceof ReturnVoid );
+
+      HfsmQueryFunction cfunc = new HfsmQueryFunction(info, func.getName(), new ListOfNamed<Variable>(Copy.copy(func.getParam().getList())));
+      cfunc.setRet(func.getRet().copy());
+
+      cfunc.setBody(new BasicBlockList(info));
+
+      ArrayList<Expression> acpar = new ArrayList<Expression>();
+      for( Variable par : cfunc.getParam() ) {
+        acpar.add(new Reference(info, par));
+      }
+      SsaVariable retvar = new SsaVariable(info, Designator.NAME_SEP + "ret", func.getRet().copy());
+      Reference call = new Reference(info, map.get(func));
+      call.getOffset().add(new RefCall(info, acpar));
+      VarDefInitStmt callstmt = new VarDefInitStmt(info, retvar, call);
+      ArrayList<NormalStmt> code = new ArrayList<NormalStmt>();
+      code.add(callstmt);
+      cfunc.getBody().getExit().setEnd(new ReturnExpr(info, new Reference(info, retvar)));
+
+      cfunc.getBody().insertCodeAfterEntry(code, "body");
+
       obj.getItem().add(new QueryItem(key.first, cfunc));
     }
 
     return null;
   }
 
-  private void addQuery(Map<Pair<String, String>, HfsmQueryFunction> set, QueryItem query) {
+  static private void addQuery(Map<Pair<String, String>, HfsmQueryFunction> set, QueryItem query) {
     Pair<String, String> key = new Pair<String, String>(query.getNamespace(), query.getFunc().getName());
 
-    if (!set.containsKey(key)) {
+    if( !set.containsKey(key) ) {
       set.put(key, query.getFunc());
     }
   }
@@ -72,14 +124,14 @@ public class QueryDownPropagator extends NullTraverser<Void, QueryParam> {
     ArrayList<QueryItem> queryList = new ArrayList<QueryItem>();
     ArrayList<State> stateList = new ArrayList<State>();
 
-    for (StateItem itr : obj.getItem()) {
-      if (itr instanceof QueryItem) {
+    for( StateItem itr : obj.getItem() ) {
+      if( itr instanceof QueryItem ) {
         queryList.add((QueryItem) itr);
-      } else if (itr instanceof State) {
+      } else if( itr instanceof State ) {
         spos.put((State) itr, queryList.size());
         stateList.add((State) itr);
       } else {
-        assert (itr instanceof Transition);
+        assert ( itr instanceof Transition );
       }
     }
 
@@ -87,7 +139,7 @@ public class QueryDownPropagator extends NullTraverser<Void, QueryParam> {
 
     // build parameter for every substate
     Map<State, QueryParam> spar = new HashMap<State, QueryParam>();
-    for (State itr : stateList) {
+    for( State itr : stateList ) {
       int idx = spos.get(itr);
 
       QueryParam cpar = new QueryParam(param);
@@ -97,16 +149,16 @@ public class QueryDownPropagator extends NullTraverser<Void, QueryParam> {
       spar.put(itr, cpar);
     }
 
-    for (State itr : stateList) {
+    for( State itr : stateList ) {
       visit(itr, spar.get(itr));
     }
 
     return null;
   }
-
 }
 
 class QueryParam {
+
   final public ArrayList<QueryItem> before;
   final public ArrayList<QueryItem> after;
 
@@ -127,5 +179,55 @@ class QueryParam {
     this.before = new ArrayList<QueryItem>(parent.before);
     this.after = new ArrayList<QueryItem>(parent.after);
   }
+}
 
+class QueryFuncMaker extends NullTraverser<Void, Designator> {
+
+  private final Map<HfsmQueryFunction, FuncPrivateRet> qfunc;
+
+  public QueryFuncMaker(Map<HfsmQueryFunction, FuncPrivateRet> qfunc) {
+    this.qfunc = qfunc;
+  }
+
+  @Override
+  protected Void visitDefault(Evl obj, Designator param) {
+    throw new UnsupportedOperationException("Not supported yet: " + obj.getClass().getCanonicalName());
+  }
+
+  @Override
+  protected Void visitHfsmQueryFunction(HfsmQueryFunction obj, Designator param) {
+    param = new Designator(param, obj.getName());
+
+    Collection<Variable> params = Copy.copy(obj.getParam().getList());
+    ElementInfo info = new ElementInfo();
+    FuncPrivateRet func = new FuncPrivateRet(info, param.toString(Designator.NAME_SEP), new ListOfNamed<Variable>(params));
+    func.setRet(obj.getRet().copy());
+    func.setBody(obj.getBody());
+    obj.setBody(new BasicBlockList(info));
+
+    HfsmReduction.relinkActualParameterRef(obj.getParam(), func.getParam().getList(), func.getBody());
+
+    qfunc.put(obj, func);
+
+    return null;
+  }
+
+  @Override
+  protected Void visitState(State obj, Designator param) {
+    param = new Designator(param, obj.getName());
+    visitItr(obj.getItem(), param);
+    return null;
+  }
+
+  @Override
+  protected Void visitQueryItem(QueryItem obj, Designator param) {
+    param = new Designator(param, obj.getNamespace());
+    visit(obj.getFunc(), param);
+    return null;
+  }
+
+  @Override
+  protected Void visitTransition(Transition obj, Designator param) {
+    return null;
+  }
 }

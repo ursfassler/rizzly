@@ -26,7 +26,7 @@ component
     state C
     end
     
-    function in.read():R{0,255}
+    function in.read():R{0,100}
       return 0;
     end
   

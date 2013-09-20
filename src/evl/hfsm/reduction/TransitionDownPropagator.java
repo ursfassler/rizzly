@@ -85,7 +85,7 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
     func.setBody(trans.getBody());
     trans.setBody(new BasicBlockList(info));
     
-    HfsmReduction.relinkActualParameterRef(trans, func.getParam().getList(), func.getBody());
+    HfsmReduction.relinkActualParameterRef(trans.getParam(), func.getParam().getList(), func.getBody());
     
     return func;
   }

@@ -232,6 +232,26 @@ public class CasualTest extends BaseTest {
     compile("unionTest", TestSteps.COMPILE_TO_ASM, false, false);  //TODO make testcase
   }
   
+  @Test
+  public void elementary1() {
+    compile("elementary1", "Elementary1", true, false, false);
+  }
+
+  @Test
+  public void elementary2() {
+    compile("elementary2", "Elementary2", true, false, false);
+  }
+
+  @Test
+  public void elementary3() {
+    compile("elementary3", "Elementary3", true, false, false);
+  }
+
+  @Test
+  public void elementary4() {
+    compile("elementary4", "Elementary4", true, false, false);
+  }
+
   /*  @Test
   public void ui_Ui() {
   compile("ui", "Ui", true, false, false);

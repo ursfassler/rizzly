@@ -20,26 +20,6 @@ public class HfsmTest extends BaseTest {
   }
 
   @Test
-  public void elementary1() {
-    compile("elementary1", "Elementary1", true, false, false);
-  }
-
-  @Test
-  public void elementary2() {
-    compile("elementary2", "Elementary2", true, false, false);
-  }
-
-  @Test
-  public void elementary3() {
-    compile("elementary3", "Elementary3", true, false, false);
-  }
-
-  @Test
-  public void elementary4() {
-    compile("elementary4", "Elementary4", true, false, false);
-  }
-
-  @Test
   public void transDist() {
     compile("transDist", "TransDist", true, false, false);
   }

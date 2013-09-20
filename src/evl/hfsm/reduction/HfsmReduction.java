@@ -50,9 +50,11 @@ import evl.statement.bbend.CaseOptEntry;
 import evl.statement.bbend.CaseOptValue;
 import evl.statement.bbend.Goto;
 import evl.statement.bbend.IfGoto;
+import evl.statement.bbend.ReturnExpr;
 import evl.statement.normal.Assignment;
 import evl.statement.normal.CallStmt;
 import evl.statement.normal.NormalStmt;
+import evl.statement.normal.VarDefInitStmt;
 import evl.statement.phi.PhiStmt;
 import evl.type.TypeRef;
 import evl.type.base.EnumElement;
@@ -63,7 +65,7 @@ import evl.variable.Variable;
 
 public class HfsmReduction extends NullTraverser<Named, Namespace> {
 
-  private ElementInfo info = new ElementInfo();
+  static final private ElementInfo info = new ElementInfo();
   private KnowBaseItem kbi;
   private Map<ImplHfsm, ImplElementary> map = new HashMap<ImplHfsm, ImplElementary>();
 
@@ -132,9 +134,7 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
 
         BasicBlockList bbl;
         if( func instanceof FuncWithReturn ) {
-          List<HfsmQueryFunction> queryList = addQueryCode(obj, enumMap.keySet(), enumMap, stateVariable, use.getName(), (FuncInputHandlerQuery) func);
-          elem.getInternalFunction().addAll(queryList);
-          throw new RuntimeException("not yet implemented");
+          bbl = addQueryCode(enumMap.keySet(), enumMap, states, stateVariable, use.getName(), (FuncInputHandlerQuery) func, func.getParam().getList());
         } else {
           bbl = addTransitionCode(enumMap.keySet(), enumMap, states, stateVariable, use.getName(), func.getName(), dict, func.getParam().getList());
         }
@@ -157,23 +157,23 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
 
   /**
    * relinking parameter references to new parameter
-   */ 
-  public static void relinkActualParameterRef(Transition trans, List<Variable> newParam, Evl body) {
-    assert ( newParam.size() == trans.getParam().size() );
+   */
+  public static void relinkActualParameterRef(ListOfNamed<Variable> oldParam, List<Variable> newParam, Evl body) {
+    assert ( newParam.size() == oldParam.size() );
     Map<Variable, Variable> map = new HashMap<Variable, Variable>();
     for( int i = 0; i < newParam.size(); i++ ) {
-      map.put(trans.getParam().getList().get(i), newParam.get(i));
+      map.put(oldParam.getList().get(i), newParam.get(i));
     }
     Relinker.relink(body, map);
   }
 
-  private FuncPrivateVoid makeEntryFunc(State initial, EnumType etype, HashMap<StateSimple, EnumElement> enumMap, StateVariable stateVariable) {
+  static private FuncPrivateVoid makeEntryFunc(State initial, EnumType etype, HashMap<StateSimple, EnumElement> enumMap, StateVariable stateVariable) {
     List<NormalStmt> code = new ArrayList<NormalStmt>();
 
     // set initial state
-    Reference dst = new Reference(new ElementInfo(), stateVariable);
+    Reference dst = new Reference(info, stateVariable);
     Reference src = makeEnumElemRef(etype, enumMap.get(initial).getName());
-    Assignment newState = new Assignment(new ElementInfo(), dst, src);
+    Assignment newState = new Assignment(info, dst, src);
     code.add(newState);
 
     code.add(makeCall(initial.getEntryFunc()));
@@ -186,8 +186,14 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
     return rfunc;
   }
 
+  static private BasicBlock makeErrorBb() {
+    BasicBlock bberror = new BasicBlock(info, "error");
+    bberror.setEnd(new Goto(info, bberror));    // should never be reached in target, throw exception or so?
+    return bberror;
+  }
+
   //TODO ok?
-  private FuncPrivateVoid makeExitFunc(EnumType etype, HashMap<StateSimple, EnumElement> enumMap, StateVariable stateVariable) {
+  static private FuncPrivateVoid makeExitFunc(EnumType etype, HashMap<StateSimple, EnumElement> enumMap, StateVariable stateVariable) {
     BasicBlockList body = new BasicBlockList(info);
 
     List<CaseGotoOpt> option = new ArrayList<CaseGotoOpt>();
@@ -202,8 +208,8 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
       opt.getDst().setEnd(new Goto(info, body.getExit()));
     }
 
-    CaseGoto caseStmt = new CaseGoto(new ElementInfo());
-    caseStmt.setCondition(new Reference(new ElementInfo(), stateVariable));
+    CaseGoto caseStmt = new CaseGoto(info);
+    caseStmt.setCondition(new Reference(info, stateVariable));
     caseStmt.getOption().addAll(option);
     BasicBlock otherwise = new BasicBlock(info, "bb_unknown_state");
     body.getBasicBlocks().add(otherwise);
@@ -217,7 +223,7 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
     return rfunc;
   }
 
-  private CallStmt makeCall(Reference funcRef) {
+  static private CallStmt makeCall(Reference funcRef) {
     assert ( funcRef.getLink() instanceof FunctionBase );
     assert ( funcRef.getOffset().isEmpty() );
 
@@ -225,14 +231,14 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
     return new CallStmt(info, makeCall(func));
   }
 
-  private Reference makeCall(FunctionBase func) {
+  static private Reference makeCall(FunctionBase func) {
     assert ( func.getParam().isEmpty() );
     Reference call = new Reference(info, func);
     call.getOffset().add(new RefCall(info, new ArrayList<Expression>()));
     return call;
   }
 
-  private HashMap<StateSimple, EnumElement> makeEnumElem(StateComposite topstate) {
+  static private HashMap<StateSimple, EnumElement> makeEnumElem(StateComposite topstate) {
     HashMap<StateSimple, EnumElement> ret = new HashMap<StateSimple, EnumElement>();
     for( State state : topstate.getItemList(State.class) ) {
       assert ( state instanceof StateSimple );
@@ -242,27 +248,52 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
     return ret;
   }
 
-  private List<HfsmQueryFunction> addQueryCode(ImplHfsm obj, Collection<StateSimple> leafes, HashMap<StateSimple, EnumElement> enumMap, StateVariable stateVariable, String ifaceName, FuncInputHandlerQuery func) {
-    throw new RuntimeException("not yet implemented");
-    /*    List<HfsmQueryFunction> queryList = new ArrayList<HfsmQueryFunction>();
-    List<CaseOpt> option = new ArrayList<CaseOpt>();
+  static private BasicBlockList addQueryCode(Collection<StateSimple> leafes, HashMap<StateSimple, EnumElement> enumMap, EnumType enumType, StateVariable stateVariable, String ifaceName, FuncInputHandlerQuery func, List<Variable> param) {
+    BasicBlockList bbl = new BasicBlockList(info);
+
+    BasicBlock bberror = makeErrorBb();
+    bbl.getBasicBlocks().add(bberror);
+
+    CaseGoto caseStmt = new CaseGoto(info);
+    caseStmt.setCondition(new Reference(info, stateVariable));
+    caseStmt.setOtherwise(bberror);
+
+    bbl.getEntry().setEnd(caseStmt);
+
+    SsaVariable retval = new SsaVariable(info, Designator.NAME_SEP + "retval", func.getRet().copy());
+    PhiStmt phi = new PhiStmt(info, retval);
+    bbl.getExit().getPhi().add(phi);
+    bbl.getExit().setEnd(new ReturnExpr(info, new Reference(info, retval)));
+
     for( State state : leafes ) {
-    HfsmQueryFunction query = getQuery(state, ifaceName, func.getName());
-    CaseOpt opt = makeCaseOption(state, enumMap);
-    opt.getCode().getStatements().add(new ReturnExpr(new ElementInfo(), makeCall(query))); // TODO parameters?
-    option.add(opt);
-    
-    query.setName(state.getName() + Designator.NAME_SEP + ifaceName + Designator.NAME_SEP + query.getName());
-    queryList.add(query);
+      BasicBlock stateBb = new BasicBlock(info, "bb" + Designator.NAME_SEP + state.getName());
+      bbl.getBasicBlocks().add(stateBb);
+      stateBb.setEnd(new Goto(info, bbl.getExit()));
+
+      HfsmQueryFunction query = getQuery(state, ifaceName, func.getName());
+
+      assert ( query.getBody().getEntry().getCode().isEmpty() );
+      assert ( query.getBody().getExit().getCode().isEmpty() );
+      assert ( query.getBody().getBasicBlocks().size() == 1 );
+      BasicBlock bbb = query.getBody().getBasicBlocks().iterator().next();
+      assert ( bbb.getCode().size() == 1 );
+      VarDefInitStmt call = (VarDefInitStmt) bbb.getCode().get(0);  // because we defined it that way (in QueryDownPropagator)
+
+      call.getVariable().setName("retval" + Designator.NAME_SEP + state.getName());
+      stateBb.getCode().add(call);
+
+      relinkActualParameterRef(query.getParam(), param, call.getInit());
+
+      phi.addArg(stateBb, new Reference(info, call.getVariable()));
+
+      CaseGotoOpt opt = makeCaseOption(makeEnumElemRef(enumType, enumMap.get(state).getName()), stateBb);
+      caseStmt.getOption().add(opt);
     }
-    
-    CaseStmt caseStmt = new CaseStmt(new ElementInfo(), new Reference(new ElementInfo(), stateVariable, new ArrayList<RefItem>()), option, new Block(new ElementInfo()));
-    func.getBody().getStatements().add(caseStmt);
-    
-    return queryList;*/
+
+    return bbl;
   }
 
-  private HfsmQueryFunction getQuery(State state, String ifaceName, String funcName) {
+  static private HfsmQueryFunction getQuery(State state, String ifaceName, String funcName) {
     for( QueryItem itr : state.getItemList(QueryItem.class) ) {
       if( itr.getNamespace().equals(ifaceName) && itr.getFunc().getName().equals(funcName) ) {
         return itr.getFunc();
@@ -272,12 +303,15 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
     return null;
   }
 
-  private BasicBlockList addTransitionCode(Collection<StateSimple> leafes, HashMap<StateSimple, EnumElement> enumMap, EnumType enumType, StateVariable stateVariable, String ifaceName, String funcName, TransitionDict getter, List<Variable> param) {
+  static private BasicBlockList addTransitionCode(Collection<StateSimple> leafes, HashMap<StateSimple, EnumElement> enumMap, EnumType enumType, StateVariable stateVariable, String ifaceName, String funcName, TransitionDict getter, List<Variable> param) {
     BasicBlockList bbl = new BasicBlockList(info);
+
+    BasicBlock bberror = makeErrorBb();
+    bbl.getBasicBlocks().add(bberror);
 
     CaseGoto caseStmt = new CaseGoto(info);
     caseStmt.setCondition(new Reference(info, stateVariable));
-    caseStmt.setOtherwise(bbl.getExit());
+    caseStmt.setOtherwise(bberror);
 
     bbl.getEntry().setEnd(caseStmt);
 
@@ -330,7 +364,7 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
    * For every transition, it adds a basic block with the guard in it and for the "then" part another basic block with code if the transition is taken.
    * The "else" part points to the next basic block or exit if there is no more transition.
    */
-  private void makeGuardedTrans(List<Transition> transList, State src, BasicBlockList bbl, Map<Transition, BasicBlock> guardMap, Map<Transition, BasicBlock> codeMap, List<Variable> newparam) {
+  static private void makeGuardedTrans(List<Transition> transList, State src, BasicBlockList bbl, Map<Transition, BasicBlock> guardMap, Map<Transition, BasicBlock> codeMap, List<Variable> newparam) {
     BasicBlock blockElse = bbl.getExit();
 
     ArrayList<Transition> rl = new ArrayList<Transition>(transList);
@@ -340,13 +374,13 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
       BasicBlock blockThen = makeTransition(trans, bbl.getExit(), newparam);
       bbl.getBasicBlocks().add(blockThen);
 
-      relinkActualParameterRef( trans, newparam, trans.getGuard() );  // relink references to arguments to the new ones
-      
+      relinkActualParameterRef(trans.getParam(), newparam, trans.getGuard());  // relink references to arguments to the new ones
+
       IfGoto entry = new IfGoto(trans.getInfo());
       entry.setCondition(trans.getGuard());
       entry.setThenBlock(blockThen);
       entry.setElseBlock(blockElse);
-      
+
       BasicBlock guardBb = new BasicBlock(info, "bb" + Designator.NAME_SEP + src.getName() + Designator.NAME_SEP + trans.getName());
       bbl.getBasicBlocks().add(guardBb);
       guardBb.setEnd(entry);
@@ -361,22 +395,22 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
   private static Reference makeEnumElemRef(EnumType type, String value) {
     EnumElement elem = type.find(value);
     assert ( elem != null );
-    Reference eval = new Reference(new ElementInfo(), type);
-    eval.getOffset().add(new RefName(new ElementInfo(), value));
+    Reference eval = new Reference(info, type);
+    eval.getOffset().add(new RefName(info, value));
     return eval;
   }
 
-  private static CaseGotoOpt makeCaseOption(Reference eref, BasicBlock code) {
+  private static CaseGotoOpt makeCaseOption(Reference caseval, BasicBlock code) {
     List<CaseOptEntry> value = new ArrayList<CaseOptEntry>();
-    value.add(new CaseOptValue(new ElementInfo(), eref));
-    CaseGotoOpt opt = new CaseGotoOpt(new ElementInfo(), value, code);
+    value.add(new CaseOptValue(info, caseval));
+    CaseGotoOpt opt = new CaseGotoOpt(info, value, code);
     return opt;
   }
 
   /**
    * Checks if transition is built like we expect and makes a transition bb out of it.
    */
-  private BasicBlock makeTransition(Transition trans, BasicBlock nextBb, List<Variable> param) {
+  static private BasicBlock makeTransition(Transition trans, BasicBlock nextBb, List<Variable> param) {
     BasicBlock transCode = new BasicBlock(info, "bb" + Designator.NAME_SEP + trans.getName());
 
     assert ( trans.getBody().getEntry().getCode().isEmpty() );
@@ -385,7 +419,7 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
     assert ( trans.getBody().getBasicBlocks().size() == 1 );
 
     BasicBlock body = trans.getBody().getBasicBlocks().iterator().next();
-    relinkActualParameterRef(trans, param, body);
+    relinkActualParameterRef(trans.getParam(), param, body);
 
     transCode.getCode().addAll(body.getCode());
 
