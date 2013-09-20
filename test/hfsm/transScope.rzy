@@ -8,42 +8,50 @@ component
   TransScope
     input
       in : Iface;
+      
+    output
+      outA  : Iface;
+      outB  : Iface;
     
   implementation hfsm( A )
+    var
+      a : R{0,0};     // this variable is never read since A.a and B.b overwrites it
+      
+    entry
+      a := 0;
+    end
   
     transition
-      A to B by in.tick() if a = 0;
-      B to A by in.tick() if b = 0;
+      A to B by in.tick() if a = 0;   // guard is evaluated in the scope of the source state
+      B to A by in.tick() if a = 0;
   
     state A
+      var
+        a : R{0,4};
+        
       entry
-        a := 5;
+        a := 4;
+        outA.tick();
       end
       
-      var
-        a : R{0,255};
-        
       transition
-        A to A by in.tick() do
-          if a > 0 then
-            a := a - 1;
-          end
+        A to A by in.tick() if a > 0 do
+          a := a - 1;
         end
     end
       
     state B
       entry
-        b := 3;
+        a := 2;
+        outB.tick();
       end
       
       var
-        b : R{0,255};
+        a : R{0,2};
         
       transition
-        B to B by in.tick() do
-          if b > 0 then
-            b := b - 1;
-          end
+        B to B by in.tick() if a > 0 do
+          a := a - 1;
         end
     end
 

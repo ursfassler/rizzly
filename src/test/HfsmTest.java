@@ -40,42 +40,17 @@ public class HfsmTest extends BaseTest {
   }
 
   @Test
-  public void entryExit1() {
-    compile("entryExit1", "EntryExit1", true, false, false);
-  }
-
-  @Test
-  public void hfsmFunction3() {
-    compile("hfsmFunction3", "HfsmFunction3", true, false, false);
-  }
-
-  @Test
-  public void hfsmFunction4() {
-    compile("hfsmFunction4", "HfsmFunction4", true, false, false);
-  }
-
-  @Test
-  public void hfsmFunction5() {
-    compile("hfsmFunction5", "HfsmFunction5", true, false, false);
-  }
-
-  @Test
-  public void transition2() {
-    compile("transition2", "Transition2", true, false, false);
-  }
-
-  @Test
   public void unusedState() {
-    compile("unusedState", "UnusedState", true, false, false);
+    compile("unusedState",TestSteps.COMPILE_TO_PIR, false, false);  //TODO check for warnings
   }
 
   @Test
   public void stateVariable2() {
-    compile("stateVariable2", "StateVariable2", true, false, false);
+    compile("stateVariable2", TestSteps.COMPILE_TO_ASM, false, false);
   }
 
   @Test
-  public void transScope_TransScope() {
-    compile("transScope", "TransScope", true, false, false);
+  public void transScope() {
+    compile("transScope", TestSteps.EXECUTE, false, false);
   }
 }
