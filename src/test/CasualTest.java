@@ -262,8 +262,14 @@ public class CasualTest extends BaseTest {
     compile("bitred", TestSteps.COMPILE_TO_ASM, false, false);
   }
 
+  @Test
+  public void compositionQuery() {
+    compile("compositionQuery", TestSteps.EXECUTE, false, true);
+  }
   
   
+  
+
   @Test
   public void linking() {
     compile("linking", "Linking", true, false, false);
@@ -278,14 +284,8 @@ public class CasualTest extends BaseTest {
   public void bool2_Bool2() {
     compile("bool2", "Bool2", true, false, false);
   }
-  
+
   // check:
-
-  @Test
-  public void compositionQuery_CompositionQuery() {
-    compile("compositionQuery", "CompositionQuery", true, false, true);
-  }
-
   @Test
   public void expr_Expr() {
     compile("expr", "Expr", true, false, true);
