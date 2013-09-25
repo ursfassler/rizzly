@@ -122,6 +122,12 @@ public class RangeGetter extends NullTraverser<Void, Void> {
         high = lr.getHigh().min(max);
         break;
       }
+      case LESS_EQUAL:{
+        BigInteger max = rr.getHigh();
+        low = lr.getLow().min(max);
+        high = lr.getHigh().min(max);
+        break;
+      }
       case GREATER: {
         BigInteger min = rr.getLow().add(BigInteger.ONE);
         low = lr.getLow().max(min);

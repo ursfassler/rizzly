@@ -209,8 +209,7 @@ class MakeBasicBlocks extends NullTraverser<BasicBlock, BasicBlock> {
 
       param = bbelse;
     }
-    BasicBlock lastOpt = visit(obj.getDefblock(), makeBb(obj.getDefblock().getInfo()));
-    addGoto(param, lastOpt);
+    BasicBlock lastOpt = visit(obj.getDefblock(), param);
     addGoto(lastOpt, join);
 
     return join;

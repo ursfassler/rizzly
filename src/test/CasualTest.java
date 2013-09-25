@@ -267,6 +267,10 @@ public class CasualTest extends BaseTest {
     compile("compositionQuery", TestSteps.EXECUTE, false, true);
   }
   
+  @Test
+  public void param() {
+    compile("param",TestSteps.COMPILE_TO_LLVM, false, false);
+  }
   
   
 
@@ -285,6 +289,11 @@ public class CasualTest extends BaseTest {
     compile("bool2", "Bool2", true, false, false);
   }
 
+  @Test
+  public void locvar() {
+    compile("locvar", "Locvar", true, false, true);
+  }
+  
   // check:
   @Test
   public void expr_Expr() {
@@ -296,15 +305,6 @@ public class CasualTest extends BaseTest {
     compile("expr2", "Expr2", true, false, false);
   }
 
-  @Test
-  public void gfunc_GFunc() {
-    compile("gfunc", "GFunc", true, false, false);
-  }
-
-  @Test
-  public void param() {
-    compile("param", "Param", true, false, false);
-  }
   // @Test
   // public void compFib() {
   // compile("compFib", "CompFib", true, false, false);

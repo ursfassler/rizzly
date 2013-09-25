@@ -44,7 +44,7 @@ component
       end
         
       if y5 then
-        out.tick( (y1 + y2 + y4) mod 21 );
+        out.tick( (y1 + y2 + y4 + 20) mod 21 );
       else
         out.tick( 42 / 2 -10 );
       end
