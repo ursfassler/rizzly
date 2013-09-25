@@ -22,14 +22,27 @@ import evl.composition.Connection;
 import evl.composition.EndpointSelf;
 import evl.composition.EndpointSub;
 import evl.composition.ImplComposition;
-import evl.expression.ArithmeticOp;
 import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
 import evl.expression.Expression;
 import evl.expression.Number;
-import evl.expression.Relation;
 import evl.expression.StringValue;
-import evl.expression.UnaryExpression;
+import evl.expression.binop.And;
+import evl.expression.binop.BinaryExp;
+import evl.expression.binop.Div;
+import evl.expression.binop.Equal;
+import evl.expression.binop.Greater;
+import evl.expression.binop.Greaterequal;
+import evl.expression.binop.Less;
+import evl.expression.binop.Lessequal;
+import evl.expression.binop.Minus;
+import evl.expression.binop.Mod;
+import evl.expression.binop.Mul;
+import evl.expression.binop.Notequal;
+import evl.expression.binop.Or;
+import evl.expression.binop.Plus;
+import evl.expression.binop.Shl;
+import evl.expression.binop.Shr;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefName;
@@ -636,23 +649,13 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   // ---- Expression ----------------------------------------------------------
   @Override
-  protected Void visitArithmeticOp(ArithmeticOp obj, StreamWriter param) {
+  protected Void visitBinaryExp(BinaryExp obj, StreamWriter param) {
     param.wr("(");
     visit(obj.getLeft(), param);
     param.wr(" ");
-    param.wr(obj.getOp().toString());
+    param.wr(obj.getOpName());
     param.wr(" ");
     visit(obj.getRight(), param);
-    param.wr(")");
-    return null;
-  }
-
-  @Override
-  protected Void visitUnaryExpression(UnaryExpression obj, StreamWriter param) {
-    param.wr("(");
-    param.wr(obj.getOp().toString());
-    param.wr(" ");
-    visit(obj.getExpr(), param);
     param.wr(")");
     return null;
   }
@@ -685,15 +688,103 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     return null;
   }
 
-  @Override
-  protected Void visitRelation(Relation obj, StreamWriter param) {
+  private void visitBinop(String op, BinaryExp obj, StreamWriter param) {
     param.wr("(");
     visit(obj.getLeft(), param);
     param.wr(" ");
-    param.wr(obj.getOp().toString());
+    param.wr(op);
     param.wr(" ");
     visit(obj.getRight(), param);
     param.wr(")");
+  }
+
+  @Override
+  protected Void visitAnd(And obj, StreamWriter param) {
+    visitBinop("and", obj, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitDiv(Div obj, StreamWriter param) {
+    visitBinop("/", obj, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitEqual(Equal obj, StreamWriter param) {
+    visitBinop("=", obj, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitGreater(Greater obj, StreamWriter param) {
+    visitBinop(">", obj, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitGreaterequal(Greaterequal obj, StreamWriter param) {
+    visitBinop(">=", obj, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitLess(Less obj, StreamWriter param) {
+    visitBinop("<", obj, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitLessequall(Lessequal obj, StreamWriter param) {
+    visitBinop("<=", obj, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitMinus(Minus obj, StreamWriter param) {
+    visitBinop("-", obj, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitMod(Mod obj, StreamWriter param) {
+    visitBinop("mod", obj, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitMul(Mul obj, StreamWriter param) {
+    visitBinop("*", obj, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitNotequal(Notequal obj, StreamWriter param) {
+    visitBinop("<>", obj, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitOr(Or obj, StreamWriter param) {
+    visitBinop("or", obj, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitPlus(Plus obj, StreamWriter param) {
+    visitBinop("+", obj, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitShl(Shl obj, StreamWriter param) {
+    visitBinop("shl", obj, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitShr(Shr obj, StreamWriter param) {
+    visitBinop("shr", obj, param);
     return null;
   }
 

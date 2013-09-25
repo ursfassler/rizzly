@@ -2,7 +2,6 @@ package fun.expression;
 
 import common.ElementInfo;
 
-import evl.expression.RelOp;
 
 /**
  *

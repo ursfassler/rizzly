@@ -11,15 +11,30 @@ import error.ErrorType;
 import error.RError;
 import evl.Evl;
 import evl.NullTraverser;
-import evl.expression.ArithmeticOp;
 import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
 import evl.expression.Expression;
 import evl.expression.Number;
-import evl.expression.Relation;
 import evl.expression.StringValue;
-import evl.expression.UnaryExpression;
+import evl.expression.binop.And;
+import evl.expression.binop.BinaryExp;
+import evl.expression.binop.Div;
+import evl.expression.binop.Equal;
+import evl.expression.binop.Greater;
+import evl.expression.binop.Greaterequal;
+import evl.expression.binop.Less;
+import evl.expression.binop.Lessequal;
+import evl.expression.binop.Minus;
+import evl.expression.binop.Mod;
+import evl.expression.binop.Mul;
+import evl.expression.binop.Notequal;
+import evl.expression.binop.Or;
+import evl.expression.binop.Plus;
+import evl.expression.binop.Shl;
+import evl.expression.binop.Shr;
 import evl.expression.reference.Reference;
+import evl.expression.unop.Not;
+import evl.expression.unop.Uminus;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.range.RangeGetter;
@@ -34,6 +49,7 @@ import evl.variable.SsaVariable;
 import evl.variable.Variable;
 
 public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
+
   private KnowledgeBase kb;
   private KnowBaseItem kbi;
   private Map<SsaVariable, Range> map;
@@ -56,14 +72,23 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
   }
 
   private void checkPositive(String op, Range range) {
-    if (range.getLow().compareTo(BigInteger.ZERO) < 0) {
+    if( range.getLow().compareTo(BigInteger.ZERO) < 0 ) {
       RError.err(ErrorType.Error, range.getInfo(), op + " only allowed for positive types");
     }
   }
 
+  private Range getRange(Expression expr, Void param) {
+    Type lhs = visit(expr, param);
+    if( !( lhs instanceof Range ) ) {
+      RError.err(ErrorType.Fatal, expr.getInfo(), "Expected range type");
+    }
+    Range lt = (Range) lhs;
+    return lt;
+  }
+
   private BigInteger makeOnes(int bits) {
     BigInteger ret = BigInteger.ZERO;
-    for (int i = 0; i < bits; i++) {
+    for( int i = 0; i < bits; i++ ) {
       ret = ret.shiftLeft(1);
       ret = ret.or(BigInteger.ONE);
     }
@@ -71,19 +96,19 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
   }
 
   private int getAsInt(BigInteger value, ElementInfo info) {
-    if (value.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
+    if( value.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0 ) {
       RError.err(ErrorType.Error, info, "value to big, needs to be smaller than " + Integer.MAX_VALUE);
     }
-    if (value.compareTo(BigInteger.valueOf(Integer.MIN_VALUE)) < 0) {
+    if( value.compareTo(BigInteger.valueOf(Integer.MIN_VALUE)) < 0 ) {
       RError.err(ErrorType.Error, info, "value to small, needs to be bigger than " + Integer.MIN_VALUE);
     }
     return value.intValue();
   }
 
   static public int bitCount(BigInteger value) {
-    assert (value.compareTo(BigInteger.ZERO) >= 0);
+    assert ( value.compareTo(BigInteger.ZERO) >= 0 );
     int bit = 0;
-    while (value.compareTo(BigInteger.ZERO) != 0) {
+    while( value.compareTo(BigInteger.ZERO) != 0 ) {
       value = value.shiftRight(1);
       bit++;
     }
@@ -111,7 +136,7 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
   @Override
   protected Type visitReference(Reference obj, Void param) {
     Variable rv = RangeGetter.getDerefVar(obj);
-    if ((rv != null) && map.containsKey(rv)) {
+    if( ( rv != null ) && map.containsKey(rv) ) {
       return map.get(rv);
     } else {
       return RefTypeChecker.process(obj, kb);
@@ -119,147 +144,190 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
   }
 
   @Override
-  protected Type visitUnaryExpression(UnaryExpression obj, Void param) {
+  protected Type visitNot(Not obj, Void param) {
     Type type = visit(obj.getExpr(), param);
-    if (type instanceof EnumType) {
+    if( type instanceof EnumType ) {
       RError.err(ErrorType.Error, obj.getInfo(), "operation not possible on enumerator");
       return null;
     }
 
-    switch (obj.getOp()) {
-    case MINUS:
-      if (!(type instanceof Range)) {
-        RError.err(ErrorType.Error, obj.getInfo(), "Need ordinal type for minus, got: " + type.getName());
-        return null;
-      }
-      BigInteger low = ((Range) type).getLow();
-      BigInteger high = ((Range) type).getHigh();
-      low = BigInteger.ZERO.subtract(low);
-      high = BigInteger.ZERO.subtract(high);
-      return kbi.getRangeType(high, low);
-    case NOT:
-      if (!(type instanceof BooleanType)) {
-        RError.err(ErrorType.Error, obj.getInfo(), "Need boolean type for not, got: " + type.getName());
-        return null;
-      }
-      return type;
-    default:
-      RError.err(ErrorType.Fatal, "Unhandled relation operator: " + obj.getOp());
+    if( !( type instanceof BooleanType ) ) {
+      RError.err(ErrorType.Error, obj.getInfo(), "Need boolean type for not, got: " + type.getName());
       return null;
+    }
+    return type;
+  }
+
+  @Override
+  protected Type visitUminus(Uminus obj, Void param) {
+    Type type = visit(obj.getExpr(), param);
+    if( type instanceof EnumType ) {
+      RError.err(ErrorType.Error, obj.getInfo(), "operation not possible on enumerator");
+      return null;
+    }
+
+    if( !( type instanceof Range ) ) {
+      RError.err(ErrorType.Error, obj.getInfo(), "Need ordinal type for minus, got: " + type.getName());
+      return null;
+    }
+    BigInteger low = ( (Range) type ).getLow();
+    BigInteger high = ( (Range) type ).getHigh();
+    low = BigInteger.ZERO.subtract(low);
+    high = BigInteger.ZERO.subtract(high);
+    return kbi.getRangeType(high, low);
+  }
+
+  private void testForSame(Type lhs, Type rhs, BinaryExp obj) {
+    if( lhs.getClass() != rhs.getClass() ) { // TODO make it better
+      RError.err(ErrorType.Error, obj.getInfo(), "Incompatible types: " + lhs.getName() + " <-> " + rhs.getName());
     }
   }
 
   @Override
-  protected Type visitRelation(Relation obj, Void sym) {
-    Type lhs = visit(obj.getLeft(), sym);
-    Type rhs = visit(obj.getRight(), sym);
-
-    // if (!(LeftIsContainerOfRightTest.process(lhs, rhs, kb) || LeftIsContainerOfRightTest.process(rhs, lhs, kb))) {
-    if (lhs.getClass() != rhs.getClass()) { // TODO make it better
-      RError.err(ErrorType.Error, obj.getInfo(), "Incompatible types: " + lhs.getName() + " <-> " + rhs.getName());
-    }
-
-    switch (obj.getOp()) {
-    case EQUAL:
-    case NOT_EQUAL: {
-      break;
-    }
-    case GREATER:
-    case GREATER_EQUEAL:
-    case LESS:
-    case LESS_EQUAL: {
-      if (!(lhs instanceof Range)) {
-        RError.err(ErrorType.Error, lhs.getInfo(), "Expected ordinal type");
-      }
-      if (!(rhs instanceof Range)) {
-        RError.err(ErrorType.Error, rhs.getInfo(), "Expected ordinal type");
-      }
-      break;
-    }
-    default: {
-      RError.err(ErrorType.Fatal, "Unhandled relation operator: " + obj.getOp());
-    }
-    }
+  protected Type visitEqual(Equal obj, Void param) {
+    Type lhs = visit(obj.getLeft(), param);
+    Type rhs = visit(obj.getRight(), param);
+    testForSame(lhs, rhs, obj);
     return kbi.getBooleanType();
   }
 
   @Override
-  protected Type visitArithmeticOp(ArithmeticOp obj, Void sym) {
-    Range lhs = (Range) visit(obj.getLeft(), sym);
-    Range rhs = (Range) visit(obj.getRight(), sym);
+  protected Type visitNotequal(Notequal obj, Void param) {
+    Type lhs = visit(obj.getLeft(), param);
+    Type rhs = visit(obj.getRight(), param);
+    testForSame(lhs, rhs, obj);
+    return kbi.getBooleanType();
+  }
 
-    switch (obj.getOp()) {
-    case PLUS: {
-      BigInteger low = lhs.getLow().add(rhs.getLow());
-      BigInteger high = lhs.getHigh().add(rhs.getHigh());
-      return kbi.getRangeType(low, high);
-    }
-    case MINUS: {
-      BigInteger low = lhs.getLow().subtract(rhs.getHigh());
-      BigInteger high = lhs.getHigh().subtract(rhs.getLow());
-      return kbi.getRangeType(low, high);
-    }
-    case MUL: { // FIXME correct when values are negative?
-      BigInteger low = lhs.getLow().multiply(rhs.getLow());
-      BigInteger high = lhs.getHigh().multiply(rhs.getHigh());
-      return kbi.getRangeType(low, high);
-    }
-    case AND: {
-      checkPositive("and", lhs, rhs);
-      BigInteger high = lhs.getHigh().min(rhs.getHigh()); // TODO ok?
-      return kbi.getRangeType(BigInteger.ZERO, high);
-    }
-    case MOD: {
-      checkPositive("mod", lhs);  //TODO implement mod correctly (and not with 'urem' instruction) and remove this check
-      checkPositive("mod", rhs);
-      BigInteger high = lhs.getHigh().min(rhs.getHigh().subtract(BigInteger.ONE));
-      return kbi.getRangeType(BigInteger.ZERO, high);
-    }
-    case DIV: {
-      if ((rhs.getLow().compareTo(BigInteger.ZERO) < 0) && (rhs.getHigh().compareTo(BigInteger.ZERO) > 0)) {
-        RError.err(ErrorType.Warning, rhs.getInfo(), "potential division by 0");
-      }
-      if ((lhs.getLow().compareTo(BigInteger.ZERO) < 0) || (rhs.getLow().compareTo(BigInteger.ZERO) < 0)) {
-        RError.err(ErrorType.Error, lhs.getInfo(), "sorry, I am too lazy to check for negative numbers");
-      }
-      BigInteger low = lhs.getLow().divide(rhs.getHigh());
-      BigInteger high = lhs.getHigh().divide(rhs.getLow());
-      return kbi.getRangeType(low, high);
-    }
-    case OR: {
-      checkPositive("or", lhs, rhs);
+  @Override
+  protected Type visitGreater(Greater obj, Void param) {
+    getRange(obj.getLeft(), param);
+    getRange(obj.getRight(), param);
+    return kbi.getBooleanType();
+  }
 
-      BigInteger bigger = lhs.getHigh().max(rhs.getHigh());
-      BigInteger smaller = lhs.getHigh().min(rhs.getHigh());
+  @Override
+  protected Type visitGreaterequal(Greaterequal obj, Void param) {
+    getRange(obj.getLeft(), param);
+    getRange(obj.getRight(), param);
+    return kbi.getBooleanType();
+  }
 
-      int bits = bitCount(smaller);
-      BigInteger ones = makeOnes(bits);
-      BigInteger high = bigger.or(ones);
-      BigInteger low = lhs.getLow().max(rhs.getLow());
+  @Override
+  protected Type visitLess(Less obj, Void param) {
+    getRange(obj.getLeft(), param);
+    getRange(obj.getRight(), param);
+    return kbi.getBooleanType();
+  }
 
-      return kbi.getRangeType(low, high);
+  @Override
+  protected Type visitLessequall(Lessequal obj, Void param) {
+    getRange(obj.getLeft(), param);
+    getRange(obj.getRight(), param);
+    return kbi.getBooleanType();
+  }
+
+  @Override
+  protected Type visitAnd(And obj, Void param) {
+    Range lhs = getRange(obj.getLeft(), param);
+    Range rhs = getRange(obj.getRight(), param);
+    checkPositive("and", lhs, rhs);
+    BigInteger high = lhs.getHigh().min(rhs.getHigh()); // TODO ok?
+    return kbi.getRangeType(BigInteger.ZERO, high);
+  }
+
+  @Override
+  protected Type visitDiv(Div obj, Void param) {
+    Range lhs = getRange(obj.getLeft(), param);
+    Range rhs = getRange(obj.getRight(), param);
+    if( ( rhs.getLow().compareTo(BigInteger.ZERO) < 0 ) && ( rhs.getHigh().compareTo(BigInteger.ZERO) > 0 ) ) {
+      RError.err(ErrorType.Warning, rhs.getInfo(), "potential division by 0");
     }
-    case SHR: {
-      checkPositive("shr", lhs, rhs);
-
-      BigInteger high = lhs.getHigh().shiftRight(getAsInt(rhs.getLow(), rhs.getInfo()));
-      BigInteger low = lhs.getLow().shiftRight(getAsInt(rhs.getHigh(), rhs.getInfo()));
-
-      return kbi.getRangeType(low, high);
+    if( ( lhs.getLow().compareTo(BigInteger.ZERO) < 0 ) || ( rhs.getLow().compareTo(BigInteger.ZERO) < 0 ) ) {
+      RError.err(ErrorType.Error, lhs.getInfo(), "sorry, I am too lazy to check for negative numbers");
     }
-    case SHL: {
-      checkPositive("shl", lhs, rhs);
+    BigInteger low = lhs.getLow().divide(rhs.getHigh());
+    BigInteger high = lhs.getHigh().divide(rhs.getLow());
+    return kbi.getRangeType(low, high);
+  }
 
-      BigInteger high = lhs.getHigh().shiftLeft(getAsInt(rhs.getHigh(), rhs.getInfo()));
-      BigInteger low = lhs.getLow().shiftLeft(getAsInt(rhs.getLow(), rhs.getInfo()));
+  @Override
+  protected Type visitMinus(Minus obj, Void param) {
+    Range lhs = getRange(obj.getLeft(), param);
+    Range rhs = getRange(obj.getRight(), param);
+    BigInteger low = lhs.getLow().subtract(rhs.getHigh());
+    BigInteger high = lhs.getHigh().subtract(rhs.getLow());
+    return kbi.getRangeType(low, high);
+  }
 
-      return kbi.getRangeType(low, high);
-    }
-    default: {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Unhandled operation: " + obj.getOp());
-      return null;
-    }
-    }
+  @Override
+  protected Type visitMod(Mod obj, Void param) {
+    Range lhs = getRange(obj.getLeft(), param);
+    Range rhs = getRange(obj.getRight(), param);
+    checkPositive("mod", lhs);  //TODO implement mod correctly (and not with 'urem' instruction) and remove this check
+    checkPositive("mod", rhs);
+    BigInteger high = lhs.getHigh().min(rhs.getHigh().subtract(BigInteger.ONE));
+    return kbi.getRangeType(BigInteger.ZERO, high);
+  }
+
+  @Override
+  protected Type visitMul(Mul obj, Void param) {
+    Range lhs = getRange(obj.getLeft(), param);
+    Range rhs = getRange(obj.getRight(), param);
+    // FIXME correct when values are negative?
+    BigInteger low = lhs.getLow().multiply(rhs.getLow());
+    BigInteger high = lhs.getHigh().multiply(rhs.getHigh());
+    return kbi.getRangeType(low, high);
+  }
+
+  @Override
+  protected Type visitOr(Or obj, Void param) {
+    Range lhs = getRange(obj.getLeft(), param);
+    Range rhs = getRange(obj.getRight(), param);
+    checkPositive("or", lhs, rhs);
+
+    BigInteger bigger = lhs.getHigh().max(rhs.getHigh());
+    BigInteger smaller = lhs.getHigh().min(rhs.getHigh());
+
+    int bits = bitCount(smaller);
+    BigInteger ones = makeOnes(bits);
+    BigInteger high = bigger.or(ones);
+    BigInteger low = lhs.getLow().max(rhs.getLow());
+
+    return kbi.getRangeType(low, high);
+  }
+
+  @Override
+  protected Type visitPlus(Plus obj, Void param) {
+    Range lhs = getRange(obj.getLeft(), param);
+    Range rhs = getRange(obj.getRight(), param);
+    BigInteger low = lhs.getLow().add(rhs.getLow());
+    BigInteger high = lhs.getHigh().add(rhs.getHigh());
+    return kbi.getRangeType(low, high);
+  }
+
+  @Override
+  protected Type visitShl(Shl obj, Void param) {
+    Range lhs = getRange(obj.getLeft(), param);
+    Range rhs = getRange(obj.getRight(), param);
+    checkPositive("shl", lhs, rhs);
+
+    BigInteger high = lhs.getHigh().shiftLeft(getAsInt(rhs.getHigh(), rhs.getInfo()));
+    BigInteger low = lhs.getLow().shiftLeft(getAsInt(rhs.getLow(), rhs.getInfo()));
+
+    return kbi.getRangeType(low, high);
+  }
+
+  @Override
+  protected Type visitShr(Shr obj, Void param) {
+    Range lhs = getRange(obj.getLeft(), param);
+    Range rhs = getRange(obj.getRight(), param);
+    checkPositive("shr", lhs, rhs);
+
+    BigInteger high = lhs.getHigh().shiftRight(getAsInt(rhs.getLow(), rhs.getInfo()));
+    BigInteger low = lhs.getLow().shiftRight(getAsInt(rhs.getHigh(), rhs.getInfo()));
+
+    return kbi.getRangeType(low, high);
   }
 
   @Override
@@ -271,9 +339,9 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
   @Override
   protected Type visitArrayValue(ArrayValue obj, Void param) {
     Iterator<Expression> itr = obj.getValue().iterator();
-    assert (itr.hasNext());
+    assert ( itr.hasNext() );
     Type cont = visit(itr.next(), param);
-    while (itr.hasNext()) {
+    while( itr.hasNext() ) {
       Type ntype = visit(itr.next(), param);
       cont = BiggerType.get(cont, ntype, obj.getInfo(), kb);
     }
@@ -295,5 +363,4 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
   protected Type visitTypeRef(TypeRef obj, Void param) {
     return obj.getRef();
   }
-
 }

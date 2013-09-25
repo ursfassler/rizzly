@@ -39,23 +39,36 @@ import pir.statement.bbend.IfGoto;
 import pir.statement.bbend.ReturnExpr;
 import pir.statement.bbend.ReturnVoid;
 import pir.statement.bbend.Unreachable;
-import pir.statement.normal.ArithmeticOp;
 import pir.statement.normal.Assignment;
 import pir.statement.normal.CallAssignment;
 import pir.statement.normal.CallStmt;
 import pir.statement.normal.GetElementPtr;
 import pir.statement.normal.LoadStmt;
-import pir.statement.normal.Relation;
 import pir.statement.normal.StackMemoryAlloc;
 import pir.statement.normal.StmtSignes;
 import pir.statement.normal.StoreStmt;
-import pir.statement.normal.UnaryOp;
 import pir.statement.normal.VariableGeneratorStmt;
+import pir.statement.normal.binop.And;
+import pir.statement.normal.binop.Div;
+import pir.statement.normal.binop.Equal;
+import pir.statement.normal.binop.Greater;
+import pir.statement.normal.binop.Greaterequal;
+import pir.statement.normal.binop.Less;
+import pir.statement.normal.binop.Lessequal;
+import pir.statement.normal.binop.Minus;
+import pir.statement.normal.binop.Mod;
+import pir.statement.normal.binop.Mul;
+import pir.statement.normal.binop.Notequal;
+import pir.statement.normal.binop.Plus;
+import pir.statement.normal.binop.Shl;
+import pir.statement.normal.binop.Shr;
 import pir.statement.normal.convert.ConvertValue;
 import pir.statement.normal.convert.SignExtendValue;
 import pir.statement.normal.convert.TruncValue;
 import pir.statement.normal.convert.TypeCast;
 import pir.statement.normal.convert.ZeroExtendValue;
+import pir.statement.normal.unop.Not;
+import pir.statement.normal.unop.Uminus;
 import pir.statement.phi.PhiStmt;
 import pir.type.ArrayType;
 import pir.type.BooleanType;
@@ -78,7 +91,6 @@ import common.FuncAttr;
 import error.ErrorType;
 import error.RError;
 import evl.doc.StreamWriter;
-import evl.expression.RelOp;
 
 //TODO mark private objects with "internal"
 public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
@@ -460,47 +472,10 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     param.wr(" = ");
   }
 
-  private String getRelop(RelOp op, StmtSignes signes) {
-    String sign;
-    switch( signes ) {
-      case unknown:
-        sign = "";
-        break;
-      case signed:
-        sign = "s";
-        break;
-      case unsigned:
-        sign = "u";
-        break;
-      default:
-        RError.err(ErrorType.Fatal, "Unknown signes value: " + signes);
-        return null;
-    }
-    switch( op ) {
-      case EQUAL:
-        return "eq";
-      case NOT_EQUAL:
-        return "ne";
-      case GREATER:
-        return sign + "gt";
-      case GREATER_EQUEAL:
-        return sign + "ge";
-      case LESS:
-        return sign + "lt";
-      case LESS_EQUAL:
-        return sign + "le";
-      default:
-        RError.err(ErrorType.Fatal, "Operand not handled: " + op);
-        return null;
-    }
-  }
-
   @Override
-  protected Void visitRelation(Relation obj, StreamWriter param) {
+  protected Void visitEqual(Equal obj, StreamWriter param) {
     wrVarDef(obj, param);
-    param.wr("icmp ");
-    param.wr(getRelop(obj.getOp(), obj.getSignes()));
-    param.wr(" ");
+    param.wr("icmp eq ");
 
     TypeRef lt = obj.getLeft().getType();
     TypeRef rt = obj.getRight().getType();
@@ -515,6 +490,121 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     visit(obj.getRight(), param);
     param.nl();
     return null;
+  }
+
+  @Override
+  protected Void visitNotequal(Notequal obj, StreamWriter param) {
+    wrVarDef(obj, param);
+    param.wr("icmp ne ");
+
+    TypeRef lt = obj.getLeft().getType();
+    TypeRef rt = obj.getRight().getType();
+
+    // assert (lt.getRef() == rt.getRef());
+
+    visit(lt, param);
+    param.wr(" ");
+
+    visit(obj.getLeft(), param);
+    param.wr(", ");
+    visit(obj.getRight(), param);
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitGreater(Greater obj, StreamWriter param) {
+    wrVarDef(obj, param);
+    param.wr("icmp "+ getSign(obj.getSignes()) + "gt ");
+
+    TypeRef lt = obj.getLeft().getType();
+    TypeRef rt = obj.getRight().getType();
+
+    // assert (lt.getRef() == rt.getRef());
+
+    visit(lt, param);
+    param.wr(" ");
+
+    visit(obj.getLeft(), param);
+    param.wr(", ");
+    visit(obj.getRight(), param);
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitGreaterequal(Greaterequal obj, StreamWriter param) {
+    wrVarDef(obj, param);
+    param.wr("icmp "+ getSign(obj.getSignes()) + "ge ");
+
+    TypeRef lt = obj.getLeft().getType();
+    TypeRef rt = obj.getRight().getType();
+
+    // assert (lt.getRef() == rt.getRef());
+
+    visit(lt, param);
+    param.wr(" ");
+
+    visit(obj.getLeft(), param);
+    param.wr(", ");
+    visit(obj.getRight(), param);
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitLess(Less obj, StreamWriter param) {
+    wrVarDef(obj, param);
+    param.wr("icmp "+ getSign(obj.getSignes()) + "lt ");
+
+    TypeRef lt = obj.getLeft().getType();
+    TypeRef rt = obj.getRight().getType();
+
+    // assert (lt.getRef() == rt.getRef());
+
+    visit(lt, param);
+    param.wr(" ");
+
+    visit(obj.getLeft(), param);
+    param.wr(", ");
+    visit(obj.getRight(), param);
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitLessequal(Lessequal obj, StreamWriter param) {
+    wrVarDef(obj, param);
+    param.wr("icmp "+ getSign(obj.getSignes()) + "le ");
+
+    TypeRef lt = obj.getLeft().getType();
+    TypeRef rt = obj.getRight().getType();
+
+    // assert (lt.getRef() == rt.getRef());
+
+    visit(lt, param);
+    param.wr(" ");
+
+    visit(obj.getLeft(), param);
+    param.wr(", ");
+    visit(obj.getRight(), param);
+    param.nl();
+    return null;
+  }
+
+  private String getSign(StmtSignes signes) {
+    String sign;
+    switch( signes ) {
+      case unknown:
+        return "";
+      case signed:
+        return "s";
+      case unsigned:
+        return "u";
+      default:
+        RError.err(ErrorType.Fatal, "Unknown signes value: " + signes);
+        return null;
+    }
   }
 
   @Override
@@ -543,83 +633,127 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitUnaryOp(UnaryOp obj, StreamWriter param) {
+  protected Void visitNot(Not obj, StreamWriter param) {
     wrVarDef(obj, param);
-    switch( obj.getOp() ) {
-      case MINUS:
-        param.wr("sub ");
-        visit(obj.getVariable().getType(), param);
-        param.wr(" 0, ");
-        visit(obj.getExpr(), param);
-        param.nl();
-        return null;
-      case NOT:
-        param.wr("xor ");
-        visit(obj.getVariable().getType(), param);
-        param.wr(" ");
-        visit(obj.getExpr(), param);
-        param.wr(", -1");
-        param.nl();
-        return null;
-      default:
-        RError.err(ErrorType.Fatal, "Operand not handled: " + obj.getOp());
-        return null;
-    }
+    param.wr("xor ");
+    visit(obj.getVariable().getType(), param);
+    param.wr(" ");
+    visit(obj.getExpr(), param);
+    param.wr(", -1");
+    param.nl();
+    return null;
   }
 
   @Override
-  protected Void visitArithmeticOp(ArithmeticOp obj, StreamWriter param) {
+  protected Void visitUminus(Uminus obj, StreamWriter param) {
     wrVarDef(obj, param);
-    String op;
-    String flags;
-    switch( obj.getOp() ) {
-      case MINUS:
-        op = "sub";
-        flags = "nuw nsw";
-        break;
-      case PLUS:
-        op = "add";
-        flags = "nuw nsw";
-        break;
-      case AND:
-        op = "and";
-        flags = "";
-        break;
-      case MOD:
-        //FIXME does only work if left is unsigned (and right too, of course)
-        op = "urem";
-        flags = "";
-        break;
-      case DIV:
-        //FIXME does only work if left and right is unsigned
-        op = "udiv";
-        flags = "";
-        break;
-      case MUL:
-        op = "mul";
-        flags = "nuw nsw";
-        break;
-      case SHL:
-        op = "shl";
-        flags = "nuw nsw";
-        break;
-      case SHR:
-        op = "shr";
-        flags = "nuw nsw";
-        break;
-      default:
-        RError.err(ErrorType.Fatal, "Operand not handled: " + obj.getOp()); // TODO change to fatal error
-        return null;
-    }
-    param.wr(op);
-    param.wr(" ");
-    param.wr(flags);
-    param.wr(" ");
-
+    param.wr("sub ");
     visit(obj.getVariable().getType(), param);
+    param.wr(" 0, ");
+    visit(obj.getExpr(), param);
+    param.nl();
+    return null;
+  }
 
+  @Override
+  protected Void visitAnd(And obj, StreamWriter param) {
+    wrVarDef(obj, param);
+    param.wr("and ");
+    visit(obj.getVariable().getType(), param);
     param.wr(" ");
+    visit(obj.getLeft(), param);
+    param.wr(", ");
+    visit(obj.getRight(), param);
+    param.nl();
+    return null;
+  }
 
+  @Override
+  protected Void visitDiv(Div obj, StreamWriter param) {
+    //FIXME does only work if left and right is unsigned
+    wrVarDef(obj, param);
+    param.wr("udiv ");
+    visit(obj.getVariable().getType(), param);
+    param.wr(" ");
+    visit(obj.getLeft(), param);
+    param.wr(", ");
+    visit(obj.getRight(), param);
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitMinus(Minus obj, StreamWriter param) {
+    wrVarDef(obj, param);
+    param.wr("sub nuw nsw ");
+    visit(obj.getVariable().getType(), param);
+    param.wr(" ");
+    visit(obj.getLeft(), param);
+    param.wr(", ");
+    visit(obj.getRight(), param);
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitMod(Mod obj, StreamWriter param) {
+    //FIXME does only work if left is unsigned (and right too, of course)
+    wrVarDef(obj, param);
+    param.wr("urem ");
+    visit(obj.getVariable().getType(), param);
+    param.wr(" ");
+    visit(obj.getLeft(), param);
+    param.wr(", ");
+    visit(obj.getRight(), param);
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitMul(Mul obj, StreamWriter param) {
+    wrVarDef(obj, param);
+    param.wr("mul nuw nsw ");
+    visit(obj.getVariable().getType(), param);
+    param.wr(" ");
+    visit(obj.getLeft(), param);
+    param.wr(", ");
+    visit(obj.getRight(), param);
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitPlus(Plus obj, StreamWriter param) {
+    wrVarDef(obj, param);
+    param.wr("add nuw nsw ");
+    visit(obj.getVariable().getType(), param);
+    param.wr(" ");
+    visit(obj.getLeft(), param);
+    param.wr(", ");
+    visit(obj.getRight(), param);
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitShl(Shl obj, StreamWriter param) {
+    wrVarDef(obj, param);
+    param.wr("shl nuw nsw ");
+    visit(obj.getVariable().getType(), param);
+    param.wr(" ");
+    visit(obj.getLeft(), param);
+    param.wr(", ");
+    visit(obj.getRight(), param);
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitShr(Shr obj, StreamWriter param) {
+    wrVarDef(obj, param);
+    param.wr("shr nuw nsw ");
+    visit(obj.getVariable().getType(), param);
+    param.wr(" ");
     visit(obj.getLeft(), param);
     param.wr(", ");
     visit(obj.getRight(), param);

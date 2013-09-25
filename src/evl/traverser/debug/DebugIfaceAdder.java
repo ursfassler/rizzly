@@ -12,10 +12,9 @@ import evl.Evl;
 import evl.NullTraverser;
 import evl.cfg.BasicBlockList;
 import evl.composition.ImplComposition;
-import evl.expression.ArithmeticOp;
-import evl.expression.ExpOp;
 import evl.expression.Expression;
 import evl.expression.Number;
+import evl.expression.binop.Plus;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefName;
@@ -184,7 +183,7 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     SsaVariable sizeP1 = new SsaVariable(info, "sizeP1", new TypeRef(info, sizeType));
 
     { // sizeP1 := size + 1;
-      Expression expr = new ArithmeticOp(info, new Reference(info, argSize), new Number(info, BigInteger.ONE), ExpOp.PLUS);
+      Expression expr = new Plus(info, new Reference(info, argSize), new Number(info, BigInteger.ONE));
       Assignment ass = new Assignment(info, new Reference(info, sizeP1), expr);
       code.add(ass);
     }

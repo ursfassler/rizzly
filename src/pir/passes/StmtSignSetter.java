@@ -3,9 +3,8 @@ package pir.passes;
 import pir.DefTraverser;
 import pir.other.PirValue;
 import pir.other.Program;
-import pir.statement.normal.ArithmeticOp;
-import pir.statement.normal.Relation;
 import pir.statement.normal.StmtSignes;
+import pir.statement.normal.binop.BinaryOp;
 import pir.type.IntType;
 import pir.type.SignedType;
 
@@ -25,28 +24,17 @@ public class StmtSignSetter extends DefTraverser<Void, Void> {
   private boolean isSigned(PirValue left, PirValue right) {
     IntType lt = (IntType) left.getType().getRef();
     IntType rt = (IntType) right.getType().getRef();
-    assert (lt == rt);
+    assert ( lt == rt );
     return lt instanceof SignedType;
   }
 
   @Override
-  protected Void visitArithmeticOp(ArithmeticOp obj, Void param) {
-    if (isSigned(obj.getLeft(), obj.getRight())) {
+  protected Void visitBinaryOp(BinaryOp obj, Void param) {
+    if( isSigned(obj.getLeft(), obj.getRight()) ) {
       obj.setSignes(StmtSignes.signed);
     } else {
       obj.setSignes(StmtSignes.unsigned);
     }
-    return super.visitArithmeticOp(obj, param);
+    return super.visitBinaryOp(obj, param);
   }
-
-  @Override
-  protected Void visitRelation(Relation obj, Void param) {
-    if (isSigned(obj.getLeft(), obj.getRight())) {
-      obj.setSignes(StmtSignes.signed);
-    } else {
-      obj.setSignes(StmtSignes.unsigned);
-    }
-    return super.visitRelation(obj, param);
-  }
-
 }

@@ -2,18 +2,17 @@ package evl.knowledge;
 
 import evl.Evl;
 import evl.NullTraverser;
-import evl.expression.ArithmeticOp;
 import evl.expression.BoolValue;
 import evl.expression.Expression;
 import evl.expression.Number;
-import evl.expression.Relation;
 import evl.expression.StringValue;
-import evl.expression.UnaryExpression;
+import evl.expression.binop.BinaryExp;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefName;
 import evl.expression.reference.RefPtrDeref;
 import evl.expression.reference.Reference;
+import evl.expression.unop.UnaryExp;
 import evl.function.FunctionBase;
 import evl.other.CompUse;
 import evl.other.IfaceUse;
@@ -152,7 +151,7 @@ class SimpleGetter extends NullTraverser<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitArithmeticOp(ArithmeticOp obj, Void param) {
+  protected Boolean visitBinaryExp(BinaryExp obj, Void param) {
     return false;
   }
 
@@ -167,17 +166,12 @@ class SimpleGetter extends NullTraverser<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitRelation(Relation obj, Void param) {
-    return false;
-  }
-
-  @Override
   protected Boolean visitStringValue(StringValue obj, Void param) {
     throw new UnsupportedOperationException("Not supported yet");
   }
 
   @Override
-  protected Boolean visitUnaryExpression(UnaryExpression obj, Void param) {
+  protected Boolean visitUnaryExp(UnaryExp obj, Void param) {
     return false;
   }
 

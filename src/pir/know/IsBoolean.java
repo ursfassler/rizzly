@@ -6,8 +6,8 @@ import pir.expression.Number;
 import pir.expression.PExpression;
 import pir.function.Function;
 import pir.other.Variable;
-import pir.statement.normal.ArithmeticOp;
-import pir.statement.normal.Relation;
+import pir.statement.normal.binop.Arithmetic;
+import pir.statement.normal.binop.Relation;
 import pir.type.BooleanType;
 import pir.type.Type;
 
@@ -33,7 +33,7 @@ public class IsBoolean extends NullTraverser<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitArithmeticOp(ArithmeticOp obj, Void param) {
+  protected Boolean visitArithmetic(Arithmetic obj, Void param) {
     boolean lhs = visit(obj.getLeft(), param);
     boolean rhs = visit(obj.getRight(), param);
     assert (lhs == rhs);

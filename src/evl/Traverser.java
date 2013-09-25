@@ -7,20 +7,38 @@ import evl.composition.Endpoint;
 import evl.composition.EndpointSelf;
 import evl.composition.EndpointSub;
 import evl.composition.ImplComposition;
-import evl.expression.ArithmeticOp;
 import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
 import evl.expression.Expression;
 import evl.expression.Number;
-import evl.expression.Relation;
 import evl.expression.StringValue;
-import evl.expression.UnaryExpression;
+import evl.expression.binop.And;
+import evl.expression.binop.ArithmeticOp;
+import evl.expression.binop.BinaryExp;
+import evl.expression.binop.Div;
+import evl.expression.binop.Equal;
+import evl.expression.binop.Greater;
+import evl.expression.binop.Greaterequal;
+import evl.expression.binop.Less;
+import evl.expression.binop.Lessequal;
+import evl.expression.binop.Minus;
+import evl.expression.binop.Mod;
+import evl.expression.binop.Mul;
+import evl.expression.binop.Notequal;
+import evl.expression.binop.Or;
+import evl.expression.binop.Plus;
+import evl.expression.binop.Relation;
+import evl.expression.binop.Shl;
+import evl.expression.binop.Shr;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefItem;
 import evl.expression.reference.RefName;
 import evl.expression.reference.RefPtrDeref;
 import evl.expression.reference.Reference;
+import evl.expression.unop.Not;
+import evl.expression.unop.Uminus;
+import evl.expression.unop.UnaryExp;
 import evl.function.FunctionBase;
 import evl.function.impl.FuncGlobal;
 import evl.function.impl.FuncInputHandlerEvent;
@@ -335,14 +353,74 @@ public abstract class Traverser<R, P> {
       return visitArrayValue((ArrayValue) obj, param);
     } else if( obj instanceof BoolValue ) {
       return visitBoolValue((BoolValue) obj, param);
-    } else if( obj instanceof ArithmeticOp ) {
+    } else if( obj instanceof BinaryExp ) {
+      return visitBinaryExp((BinaryExp) obj, param);
+    } else if( obj instanceof UnaryExp ) {
+      return visitUnaryExp((UnaryExp) obj, param);
+    } else if( obj instanceof Reference ) {
+      return visitReference((Reference) obj, param);
+    } else {
+      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
+  }
+
+  protected R visitUnaryExp(UnaryExp obj, P param) {
+    if( obj instanceof Uminus ) {
+      return visitUminus((Uminus) obj, param);
+    } else if( obj instanceof Not ) {
+      return visitNot((Not) obj, param);
+    } else {
+      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
+  }
+
+  protected R visitBinaryExp(BinaryExp obj, P param) {
+    if( obj instanceof ArithmeticOp ) {
       return visitArithmeticOp((ArithmeticOp) obj, param);
     } else if( obj instanceof Relation ) {
       return visitRelation((Relation) obj, param);
-    } else if( obj instanceof UnaryExpression ) {
-      return visitUnaryExpression((UnaryExpression) obj, param);
-    } else if( obj instanceof Reference ) {
-      return visitReference((Reference) obj, param);
+    } else {
+      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
+  }
+
+  protected R visitArithmeticOp(ArithmeticOp obj, P param) {
+    if( obj instanceof Plus ) {
+      return visitPlus((Plus) obj, param);
+    } else if( obj instanceof Minus ) {
+      return visitMinus((Minus) obj, param);
+    } else if( obj instanceof Mul ) {
+      return visitMul((Mul) obj, param);
+    } else if( obj instanceof Div ) {
+      return visitDiv((Div) obj, param);
+    } else if( obj instanceof Mod ) {
+      return visitMod((Mod) obj, param);
+    } else if( obj instanceof And ) {
+      return visitAnd((And) obj, param);
+    } else if( obj instanceof Or ) {
+      return visitOr((Or) obj, param);
+    } else if( obj instanceof Shl ) {
+      return visitShl((Shl) obj, param);
+    } else if( obj instanceof Shr ) {
+      return visitShr((Shr) obj, param);
+    } else {
+      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
+  }
+
+  protected R visitRelation(Relation obj, P param) {
+    if( obj instanceof Equal ) {
+      return visitEqual((Equal) obj, param);
+    } else if( obj instanceof Notequal ) {
+      return visitNotequal((Notequal) obj, param);
+    } else if( obj instanceof Greater ) {
+      return visitGreater((Greater) obj, param);
+    } else if( obj instanceof Greaterequal ) {
+      return visitGreaterequal((Greaterequal) obj, param);
+    } else if( obj instanceof Less ) {
+      return visitLess((Less) obj, param);
+    } else if( obj instanceof Lessequal ) {
+      return visitLessequall((Lessequal) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -569,12 +647,6 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitReturnVoid(ReturnVoid obj, P param);
 
-  abstract protected R visitUnaryExpression(UnaryExpression obj, P param);
-
-  abstract protected R visitRelation(Relation obj, P param);
-
-  abstract protected R visitArithmeticOp(ArithmeticOp obj, P param);
-
   abstract protected R visitBoolValue(BoolValue obj, P param);
 
   abstract protected R visitArrayValue(ArrayValue obj, P param);
@@ -600,4 +672,38 @@ public abstract class Traverser<R, P> {
   abstract protected R visitUnionSelector(UnionSelector obj, P param);
 
   abstract protected R visitUnreachable(Unreachable obj, P param);
+
+  abstract protected R visitUminus(Uminus obj, P param);
+
+  abstract protected R visitNot(Not obj, P param);
+
+  abstract protected R visitPlus(Plus obj, P param);
+
+  abstract protected R visitMinus(Minus obj, P param);
+
+  abstract protected R visitMul(Mul obj, P param);
+
+  abstract protected R visitDiv(Div obj, P param);
+
+  abstract protected R visitMod(Mod obj, P param);
+
+  abstract protected R visitOr(Or obj, P param);
+
+  abstract protected R visitAnd(And obj, P param);
+
+  abstract protected R visitShr(Shr obj, P param);
+
+  abstract protected R visitShl(Shl obj, P param);
+
+  abstract protected R visitEqual(Equal obj, P param);
+
+  abstract protected R visitNotequal(Notequal obj, P param);
+
+  abstract protected R visitLess(Less obj, P param);
+
+  abstract protected R visitLessequall(Lessequal obj, P param);
+
+  abstract protected R visitGreater(Greater obj, P param);
+
+  abstract protected R visitGreaterequal(Greaterequal obj, P param);
 }

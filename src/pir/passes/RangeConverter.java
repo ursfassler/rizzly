@@ -13,14 +13,14 @@ import pir.know.KnowledgeBase;
 import pir.other.PirValue;
 import pir.other.Program;
 import pir.other.SsaVariable;
-import pir.statement.normal.ArithmeticOp;
 import pir.statement.normal.Assignment;
 import pir.statement.normal.CallAssignment;
 import pir.statement.normal.CallStmt;
 import pir.statement.normal.GetElementPtr;
 import pir.statement.normal.NormalStmt;
-import pir.statement.normal.Relation;
 import pir.statement.normal.StoreStmt;
+import pir.statement.normal.binop.Arithmetic;
+import pir.statement.normal.binop.Relation;
 import pir.statement.normal.convert.TypeCast;
 import pir.statement.phi.PhiStmt;
 import pir.traverser.StatementReplacer;
@@ -55,10 +55,35 @@ public class RangeConverter extends StatementReplacer<Void> {
   }
 
   @Override
+  protected List<NormalStmt> visitArithmetic(Arithmetic obj, Void param) {
+    RangeType lt = (RangeType) obj.getLeft().getType().getRef();
+    RangeType rt = (RangeType) obj.getRight().getType().getRef();
+    RangeType dt = (RangeType) obj.getVariable().getType().getRef();
+
+    RangeType it = RangeType.makeContainer(lt, rt);
+    RangeType bt = RangeType.makeContainer(it, dt);
+    bt = kbi.getRangeType(bt.getLow(), bt.getHigh()); // add bt to program
+
+    List<NormalStmt> ret = new ArrayList<NormalStmt>();
+
+    obj.setLeft(replaceIfNeeded(obj.getLeft(), lt, bt, ret));
+    obj.setRight(replaceIfNeeded(obj.getRight(), rt, bt, ret));
+
+    ret.add(obj);
+
+    if( RangeType.isBigger(bt, dt) ) {
+      SsaVariable irv = new SsaVariable(NameFactory.getNew(), new TypeRef(bt));
+      TypeCast rex = new TypeCast(obj.getVariable(), new VarRefSimple(irv));
+      obj.setVariable(irv);
+      ret.add(rex);
+    }
+    return ret;
+  }
+
+  @Override
   protected List<NormalStmt> visitRelation(Relation obj, Void param) {
     RangeType lt = (RangeType) obj.getLeft().getType().getRef();
     RangeType rt = (RangeType) obj.getRight().getType().getRef();
-
     RangeType bt = RangeType.makeContainer(lt, rt);
     bt = kbi.getRangeType(bt.getLow(), bt.getHigh()); // add bt to program
 
@@ -95,32 +120,6 @@ public class RangeConverter extends StatementReplacer<Void> {
       }
     }
     return val;
-  }
-
-  @Override
-  protected List<NormalStmt> visitArithmeticOp(ArithmeticOp obj, Void param) {
-    RangeType lt = (RangeType) obj.getLeft().getType().getRef();
-    RangeType rt = (RangeType) obj.getRight().getType().getRef();
-    RangeType dt = (RangeType) obj.getVariable().getType().getRef();
-
-    RangeType it = RangeType.makeContainer(lt, rt);
-    RangeType bt = RangeType.makeContainer(it, dt);
-    bt = kbi.getRangeType(bt.getLow(), bt.getHigh()); // add bt to program
-
-    List<NormalStmt> ret = new ArrayList<NormalStmt>();
-
-    obj.setLeft(replaceIfNeeded(obj.getLeft(), lt, bt, ret));
-    obj.setRight(replaceIfNeeded(obj.getRight(), rt, bt, ret));
-
-    ret.add(obj);
-
-    if( RangeType.isBigger(bt, dt) ) {
-      SsaVariable irv = new SsaVariable(NameFactory.getNew(), new TypeRef(bt));
-      TypeCast rex = new TypeCast(obj.getVariable(), new VarRefSimple(irv));
-      obj.setVariable(irv);
-      ret.add(rex);
-    }
-    return ret;
   }
 
   @Override
@@ -319,6 +318,4 @@ class ChildType extends NullTraverser<Type, PirValue> {
     assert ( idx < obj.getElements().size() );
     return obj.getElements().get(idx).getType().getRef();
   }
-  
-  
 }

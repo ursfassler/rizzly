@@ -11,19 +11,33 @@ import evl.composition.Connection;
 import evl.composition.EndpointSelf;
 import evl.composition.EndpointSub;
 import evl.composition.ImplComposition;
-import evl.expression.ArithmeticOp;
 import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
 import evl.expression.Expression;
 import evl.expression.Number;
-import evl.expression.Relation;
 import evl.expression.StringValue;
-import evl.expression.UnaryExpression;
+import evl.expression.binop.And;
+import evl.expression.binop.Div;
+import evl.expression.binop.Equal;
+import evl.expression.binop.Greater;
+import evl.expression.binop.Greaterequal;
+import evl.expression.binop.Less;
+import evl.expression.binop.Lessequal;
+import evl.expression.binop.Minus;
+import evl.expression.binop.Mod;
+import evl.expression.binop.Mul;
+import evl.expression.binop.Notequal;
+import evl.expression.binop.Or;
+import evl.expression.binop.Plus;
+import evl.expression.binop.Shl;
+import evl.expression.binop.Shr;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefName;
 import evl.expression.reference.RefPtrDeref;
 import evl.expression.reference.Reference;
+import evl.expression.unop.Not;
+import evl.expression.unop.Uminus;
 import evl.function.impl.FuncGlobal;
 import evl.function.impl.FuncInputHandlerEvent;
 import evl.function.impl.FuncInputHandlerQuery;
@@ -143,26 +157,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitNumber(Number obj, P param) {
-    return null;
-  }
-
-  @Override
-  protected R visitUnaryExpression(UnaryExpression obj, P param) {
-    visit(obj.getExpr(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitRelation(Relation obj, P param) {
-    visit(obj.getLeft(), param);
-    visit(obj.getRight(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitArithmeticOp(ArithmeticOp obj, P param) {
-    visit(obj.getLeft(), param);
-    visit(obj.getRight(), param);
     return null;
   }
 
@@ -535,7 +529,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
     visit(obj.getVariable(), param);
     for( BasicBlock in : obj.getInBB() ) {
       Expression expr = obj.getArg(in);
-      assert(expr != null);
+      assert ( expr != null );
       visit(expr, param);
     }
     return null;
@@ -640,6 +634,123 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitUnreachable(Unreachable obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitAnd(And obj, P param) {
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitDiv(Div obj, P param) {
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitEqual(Equal obj, P param) {
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitGreater(Greater obj, P param) {
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitGreaterequal(Greaterequal obj, P param) {
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitLess(Less obj, P param) {
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitLessequall(Lessequal obj, P param) {
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitMinus(Minus obj, P param) {
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitMod(Mod obj, P param) {
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitMul(Mul obj, P param) {
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitNot(Not obj, P param) {
+    visit(obj.getExpr(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitNotequal(Notequal obj, P param) {
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitOr(Or obj, P param) {
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitPlus(Plus obj, P param) {
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitShl(Shl obj, P param) {
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitShr(Shr obj, P param) {
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitUminus(Uminus obj, P param) {
+    visit(obj.getExpr(), param);
     return null;
   }
 }

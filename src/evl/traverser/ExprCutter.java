@@ -12,11 +12,10 @@ import evl.NullTraverser;
 import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
 import evl.composition.ImplComposition;
-import evl.expression.ArithmeticOp;
 import evl.expression.BoolValue;
 import evl.expression.Expression;
 import evl.expression.Number;
-import evl.expression.Relation;
+import evl.expression.binop.BinaryExp;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefItem;
@@ -314,6 +313,7 @@ class StmtTraverser extends NullTraverser<Void, List<NormalStmt>> {
   }
 }
 
+
 class Cutter extends ExprReplacer<List<NormalStmt>> {
 
   private KnowledgeBase kb;
@@ -392,7 +392,7 @@ class Cutter extends ExprReplacer<List<NormalStmt>> {
   }
 
   @Override
-  protected Expression visitArithmeticOp(ArithmeticOp obj, List<NormalStmt> param) {
+  protected Expression visitBinaryExp(BinaryExp obj, List<NormalStmt> param) {
     obj.setLeft(visit(obj.getLeft(), param));
     obj.setRight(visit(obj.getRight(), param));
 
@@ -401,13 +401,6 @@ class Cutter extends ExprReplacer<List<NormalStmt>> {
     return new Reference(obj.getInfo(), var);
   }
 
-  @Override
-  protected Expression visitRelation(Relation obj, List<NormalStmt> param) {
-    obj.setLeft(visit(obj.getLeft(), param));
-    obj.setRight(visit(obj.getRight(), param));
-    SsaVariable var = extract(obj, param);
-    return new Reference(obj.getInfo(), var);
-  }
 }
 
 class CallDetector extends NullTraverser<Boolean, Void> {

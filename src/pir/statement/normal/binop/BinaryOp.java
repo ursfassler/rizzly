@@ -1,21 +1,25 @@
-package pir.statement.normal;
+package pir.statement.normal.binop;
 
 import pir.other.PirValue;
 import pir.other.SsaVariable;
+import pir.statement.normal.NormalStmt;
+import pir.statement.normal.StmtSignes;
+import pir.statement.normal.VariableGeneratorStmt;
 
-public class ArithmeticOp extends NormalStmt implements VariableGeneratorStmt {
+abstract public class BinaryOp extends NormalStmt implements VariableGeneratorStmt {
+
   private SsaVariable variable;
   private PirValue left;
   private PirValue right;
-  private ArOp op;
   private StmtSignes signes = StmtSignes.unknown;
 
-  public ArithmeticOp(SsaVariable variable, PirValue left, PirValue right, ArOp op) {
+  public BinaryOp(SsaVariable variable, PirValue left, PirValue right) {
     this.variable = variable;
     this.left = left;
     this.right = right;
-    this.op = op;
   }
+
+  abstract public String getOpName();
 
   @Override
   public SsaVariable getVariable() {
@@ -43,10 +47,6 @@ public class ArithmeticOp extends NormalStmt implements VariableGeneratorStmt {
     this.right = right;
   }
 
-  public ArOp getOp() {
-    return op;
-  }
-
   public StmtSignes getSignes() {
     return signes;
   }
@@ -57,7 +57,6 @@ public class ArithmeticOp extends NormalStmt implements VariableGeneratorStmt {
 
   @Override
   public String toString() {
-    return super.toString() + " := " + signes + " " + left.toString() + " " + op.toString() + " " + right.toString();
+    return super.toString() + " := " + signes + " " + left.toString() + " " + getOpName() + " " + right.toString();
   }
-
 }

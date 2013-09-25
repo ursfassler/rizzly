@@ -1,19 +1,23 @@
-package pir.statement.normal;
+package pir.statement.normal.unop;
 
 import pir.other.PirValue;
 import pir.other.SsaVariable;
+import pir.statement.normal.NormalStmt;
+import pir.statement.normal.StmtSignes;
+import pir.statement.normal.VariableGeneratorStmt;
 
-public class UnaryOp extends NormalStmt implements VariableGeneratorStmt {
+abstract public class UnaryOp extends NormalStmt implements VariableGeneratorStmt {
+
   private SsaVariable variable;
   private PirValue expr;
-  private evl.expression.UnaryOp op;
   private StmtSignes signes = StmtSignes.unknown;
 
-  public UnaryOp(SsaVariable variable, PirValue expr, evl.expression.UnaryOp op) {
+  public UnaryOp(SsaVariable variable, PirValue expr) {
     this.variable = variable;
     this.expr = expr;
-    this.op = op;
   }
+
+  abstract public String getOpName();
 
   @Override
   public SsaVariable getVariable() {
@@ -33,14 +37,6 @@ public class UnaryOp extends NormalStmt implements VariableGeneratorStmt {
     this.expr = expr;
   }
 
-  public evl.expression.UnaryOp getOp() {
-    return op;
-  }
-
-  public void setOp(evl.expression.UnaryOp op) {
-    this.op = op;
-  }
-
   public StmtSignes getSignes() {
     return signes;
   }
@@ -51,7 +47,6 @@ public class UnaryOp extends NormalStmt implements VariableGeneratorStmt {
 
   @Override
   public String toString() {
-    return variable + " := " + signes + " " + op.toString() + " " + expr.toString();
+    return variable + " := " + signes + " " + getOpName() + " " + expr.toString();
   }
-
 }

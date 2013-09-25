@@ -6,19 +6,18 @@ import error.ErrorType;
 import error.RError;
 import evl.DefTraverser;
 import evl.cfg.BasicBlock;
-import evl.expression.ArithmeticOp;
 import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
 import evl.expression.Expression;
 import evl.expression.Number;
-import evl.expression.Relation;
 import evl.expression.StringValue;
-import evl.expression.UnaryExpression;
+import evl.expression.binop.BinaryExp;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefItem;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
+import evl.expression.unop.UnaryExp;
 import evl.hfsm.Transition;
 import evl.statement.bbend.CaseOptRange;
 import evl.statement.bbend.CaseOptValue;
@@ -77,7 +76,7 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitArithmeticOp(ArithmeticOp obj, T param) {
+  protected Expression visitBinaryExp(BinaryExp obj, T param) {
     obj.setLeft(visit(obj.getLeft(), param));
     obj.setRight(visit(obj.getRight(), param));
     return obj;
@@ -89,14 +88,7 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitRelation(Relation obj, T param) {
-    obj.setLeft(visit(obj.getLeft(), param));
-    obj.setRight(visit(obj.getRight(), param));
-    return obj;
-  }
-
-  @Override
-  protected Expression visitUnaryExpression(UnaryExpression obj, T param) {
+  protected Expression visitUnaryExp(UnaryExp obj, T param) {
     obj.setExpr(visit(obj.getExpr(), param));
     return obj;
   }

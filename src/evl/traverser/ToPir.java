@@ -8,7 +8,6 @@ import java.util.Map;
 
 import pir.PirObject;
 import pir.expression.PExpression;
-import pir.expression.UnOp;
 import pir.expression.reference.RefItem;
 import pir.expression.reference.VarRef;
 import pir.expression.reference.VarRefConst;
@@ -24,7 +23,6 @@ import pir.other.Program;
 import pir.other.Variable;
 import pir.statement.bbend.BasicBlockEnd;
 import pir.statement.bbend.CaseOptEntry;
-import pir.statement.normal.ArOp;
 import pir.statement.normal.CallAssignment;
 import pir.statement.normal.StoreStmt;
 import pir.statement.normal.VariableGeneratorStmt;
@@ -39,16 +37,26 @@ import evl.Evl;
 import evl.NullTraverser;
 import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
-import evl.expression.ArithmeticOp;
 import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
-import evl.expression.ExpOp;
 import evl.expression.Expression;
 import evl.expression.Number;
-import evl.expression.Relation;
 import evl.expression.StringValue;
-import evl.expression.UnaryExpression;
-import evl.expression.UnaryOp;
+import evl.expression.binop.And;
+import evl.expression.binop.Div;
+import evl.expression.binop.Equal;
+import evl.expression.binop.Greater;
+import evl.expression.binop.Greaterequal;
+import evl.expression.binop.Less;
+import evl.expression.binop.Lessequal;
+import evl.expression.binop.Minus;
+import evl.expression.binop.Mod;
+import evl.expression.binop.Mul;
+import evl.expression.binop.Notequal;
+import evl.expression.binop.Or;
+import evl.expression.binop.Plus;
+import evl.expression.binop.Shl;
+import evl.expression.binop.Shr;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefName;
@@ -94,7 +102,6 @@ import evl.variable.Constant;
 import evl.variable.FuncVariable;
 import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
-
 
 public class ToPir extends NullTraverser<PirObject, Void> {
 
@@ -314,17 +321,6 @@ public class ToPir extends NullTraverser<PirObject, Void> {
     return ret;
   }
 
-  private UnOp toUnOp(UnaryOp op) {
-    switch( op ) {
-      case MINUS:
-        return pir.expression.UnOp.MINUS;
-      case NOT:
-        return pir.expression.UnOp.NOT;
-      default:
-        throw new RuntimeException("not yet implemented: " + op);
-    }
-  }
-
   @Override
   protected PirObject visitBoolValue(BoolValue obj, Void param) {
     pir.type.BooleanType type = kbi.getBooleanType();
@@ -536,7 +532,7 @@ public class ToPir extends NullTraverser<PirObject, Void> {
 
     for( evl.expression.reference.RefItem itr : obj.getAddress().getOffset() ) {
       if( type instanceof StructType ) {
-        assert( itr instanceof RefName );
+        assert ( itr instanceof RefName );
         // get index of struct member and use that
         StructType st = (StructType) type;
         String name = ( (RefName) itr ).getName();
@@ -548,7 +544,7 @@ public class ToPir extends NullTraverser<PirObject, Void> {
         //see llvm gep FAQ: Why do struct member indices always use i32?
         type = elem.getType().getRef();
       } else if( type instanceof pir.type.UnionType ) {
-        assert( itr instanceof RefName );
+        assert ( itr instanceof RefName );
         // get index of struct member and use that
         pir.type.UnionType st = (pir.type.UnionType) type;
         String name = ( (RefName) itr ).getName();
@@ -560,14 +556,14 @@ public class ToPir extends NullTraverser<PirObject, Void> {
         //see llvm gep FAQ: Why do struct member indices always use i32?
         type = elem.getType().getRef();
       } else if( type instanceof pir.type.ArrayType ) {
-        assert( itr instanceof RefIndex );
+        assert ( itr instanceof RefIndex );
         // get index calculation
         RefIndex idx = (RefIndex) itr;
         PirValue val = (PirValue) traverse(idx.getIndex(), null);
         ofs.add(val);
         type = ( (pir.type.ArrayType) type ).getType().getRef();
       } else if( type instanceof pir.type.PointerType ) {
-        assert( itr instanceof RefPtrDeref );
+        assert ( itr instanceof RefPtrDeref );
         // dereferencing is like accesing an array element
         ofs.add(new pir.expression.Number(BigInteger.ZERO, new TypeRef(kbi.getNoSignType(32))));
         // see llvm GEP FAQ: Why is the extra 0 index required?
@@ -652,6 +648,7 @@ public class ToPir extends NullTraverser<PirObject, Void> {
     return new TypeRef((pir.type.Type) visit(obj.getRef(), null));
   }
 }
+
 class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, pir.other.SsaVariable> {
 
   private ToPir converter;
@@ -710,49 +707,122 @@ class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, pir.other
   }
 
   @Override
-  protected VariableGeneratorStmt visitRelation(Relation obj, pir.other.SsaVariable param) {
-    PirValue left = (PirValue) converter.visit(obj.getLeft(), null);
-    PirValue right = (PirValue) converter.visit(obj.getRight(), null);
-    return new pir.statement.normal.Relation(param, left, right, obj.getOp());
-  }
-
-  @Override
-  protected VariableGeneratorStmt visitArithmeticOp(ArithmeticOp obj, pir.other.SsaVariable param) {
+  protected VariableGeneratorStmt visitAnd(And obj, pir.other.SsaVariable param) {
     //TODO do not use VarRef for composite types but already use getElementPtr (maybe)
     PirValue left = (PirValue) converter.visit(obj.getLeft(), null);
     PirValue right = (PirValue) converter.visit(obj.getRight(), null);
-    return new pir.statement.normal.ArithmeticOp(param, left, right, toCOp(obj.getOp()));
-  }
-
-  private ArOp toCOp(ExpOp op) {
-    switch( op ) {
-      case MUL:
-        return ArOp.MUL;
-      case PLUS:
-        return ArOp.PLUS;
-      case DIV:
-        return ArOp.DIV;
-      case MINUS:
-        return ArOp.MINUS;
-      case AND:
-        return ArOp.AND;
-      case OR:
-        return ArOp.OR;
-      case MOD:
-        return ArOp.MOD;
-      case SHL:
-        return ArOp.SHL;
-      case SHR:
-        return ArOp.SHR;
-      default: {
-        throw new RuntimeException("not yet implemented: " + op);
-      }
-    }
+    return new pir.statement.normal.binop.And(param, left, right);
   }
 
   @Override
-  protected VariableGeneratorStmt visitUnaryExpression(UnaryExpression obj, pir.other.SsaVariable param) {
-    PirValue right = (PirValue) converter.visit(obj.getExpr(), null);
-    return new pir.statement.normal.UnaryOp(param, right, obj.getOp());
+  protected VariableGeneratorStmt visitDiv(Div obj, pir.other.SsaVariable param) {
+    //TODO do not use VarRef for composite types but already use getElementPtr (maybe)
+    PirValue left = (PirValue) converter.visit(obj.getLeft(), null);
+    PirValue right = (PirValue) converter.visit(obj.getRight(), null);
+    return new pir.statement.normal.binop.Div(param, left, right);
+  }
+
+  @Override
+  protected VariableGeneratorStmt visitMinus(Minus obj, pir.other.SsaVariable param) {
+    //TODO do not use VarRef for composite types but already use getElementPtr (maybe)
+    PirValue left = (PirValue) converter.visit(obj.getLeft(), null);
+    PirValue right = (PirValue) converter.visit(obj.getRight(), null);
+    return new pir.statement.normal.binop.Minus(param, left, right);
+  }
+
+  @Override
+  protected VariableGeneratorStmt visitMod(Mod obj, pir.other.SsaVariable param) {
+    //TODO do not use VarRef for composite types but already use getElementPtr (maybe)
+    PirValue left = (PirValue) converter.visit(obj.getLeft(), null);
+    PirValue right = (PirValue) converter.visit(obj.getRight(), null);
+    return new pir.statement.normal.binop.Mod(param, left, right);
+  }
+
+  @Override
+  protected VariableGeneratorStmt visitMul(Mul obj, pir.other.SsaVariable param) {
+    //TODO do not use VarRef for composite types but already use getElementPtr (maybe)
+    PirValue left = (PirValue) converter.visit(obj.getLeft(), null);
+    PirValue right = (PirValue) converter.visit(obj.getRight(), null);
+    return new pir.statement.normal.binop.Mul(param, left, right);
+  }
+
+  @Override
+  protected VariableGeneratorStmt visitOr(Or obj, pir.other.SsaVariable param) {
+    //TODO do not use VarRef for composite types but already use getElementPtr (maybe)
+    PirValue left = (PirValue) converter.visit(obj.getLeft(), null);
+    PirValue right = (PirValue) converter.visit(obj.getRight(), null);
+    return new pir.statement.normal.binop.Or(param, left, right);
+  }
+
+  @Override
+  protected VariableGeneratorStmt visitPlus(Plus obj, pir.other.SsaVariable param) {
+    //TODO do not use VarRef for composite types but already use getElementPtr (maybe)
+    PirValue left = (PirValue) converter.visit(obj.getLeft(), null);
+    PirValue right = (PirValue) converter.visit(obj.getRight(), null);
+    return new pir.statement.normal.binop.Plus(param, left, right);
+  }
+
+  @Override
+  protected VariableGeneratorStmt visitShl(Shl obj, pir.other.SsaVariable param) {
+    //TODO do not use VarRef for composite types but already use getElementPtr (maybe)
+    PirValue left = (PirValue) converter.visit(obj.getLeft(), null);
+    PirValue right = (PirValue) converter.visit(obj.getRight(), null);
+    return new pir.statement.normal.binop.Shl(param, left, right);
+  }
+
+  @Override
+  protected VariableGeneratorStmt visitShr(Shr obj, pir.other.SsaVariable param) {
+    //TODO do not use VarRef for composite types but already use getElementPtr (maybe)
+    PirValue left = (PirValue) converter.visit(obj.getLeft(), null);
+    PirValue right = (PirValue) converter.visit(obj.getRight(), null);
+    return new pir.statement.normal.binop.Shr(param, left, right);
+  }
+
+  @Override
+  protected VariableGeneratorStmt visitEqual(Equal obj, pir.other.SsaVariable param) {
+    //TODO do not use VarRef for composite types but already use getElementPtr (maybe)
+    PirValue left = (PirValue) converter.visit(obj.getLeft(), null);
+    PirValue right = (PirValue) converter.visit(obj.getRight(), null);
+    return new pir.statement.normal.binop.Equal(param, left, right);
+  }
+
+  @Override
+  protected VariableGeneratorStmt visitGreater(Greater obj, pir.other.SsaVariable param) {
+    //TODO do not use VarRef for composite types but already use getElementPtr (maybe)
+    PirValue left = (PirValue) converter.visit(obj.getLeft(), null);
+    PirValue right = (PirValue) converter.visit(obj.getRight(), null);
+    return new pir.statement.normal.binop.Greater(param, left, right);
+  }
+
+  @Override
+  protected VariableGeneratorStmt visitNotequal(Notequal obj, pir.other.SsaVariable param) {
+    //TODO do not use VarRef for composite types but already use getElementPtr (maybe)
+    PirValue left = (PirValue) converter.visit(obj.getLeft(), null);
+    PirValue right = (PirValue) converter.visit(obj.getRight(), null);
+    return new pir.statement.normal.binop.Notequal(param, left, right);
+  }
+
+  @Override
+  protected VariableGeneratorStmt visitGreaterequal(Greaterequal obj, pir.other.SsaVariable param) {
+    //TODO do not use VarRef for composite types but already use getElementPtr (maybe)
+    PirValue left = (PirValue) converter.visit(obj.getLeft(), null);
+    PirValue right = (PirValue) converter.visit(obj.getRight(), null);
+    return new pir.statement.normal.binop.Greaterequal(param, left, right);
+  }
+
+  @Override
+  protected VariableGeneratorStmt visitLess(Less obj, pir.other.SsaVariable param) {
+    //TODO do not use VarRef for composite types but already use getElementPtr (maybe)
+    PirValue left = (PirValue) converter.visit(obj.getLeft(), null);
+    PirValue right = (PirValue) converter.visit(obj.getRight(), null);
+    return new pir.statement.normal.binop.Less(param, left, right);
+  }
+
+  @Override
+  protected VariableGeneratorStmt visitLessequall(Lessequal obj, pir.other.SsaVariable param) {
+    //TODO do not use VarRef for composite types but already use getElementPtr (maybe)
+    PirValue left = (PirValue) converter.visit(obj.getLeft(), null);
+    PirValue right = (PirValue) converter.visit(obj.getRight(), null);
+    return new pir.statement.normal.binop.Lessequal(param, left, right);
   }
 }

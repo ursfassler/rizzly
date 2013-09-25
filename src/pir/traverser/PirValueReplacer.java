@@ -1,4 +1,3 @@
-
 package pir.traverser;
 
 import java.util.ArrayList;
@@ -12,14 +11,13 @@ import pir.other.PirValue;
 import pir.statement.bbend.CaseGoto;
 import pir.statement.bbend.IfGoto;
 import pir.statement.bbend.ReturnExpr;
-import pir.statement.normal.ArithmeticOp;
 import pir.statement.normal.Assignment;
 import pir.statement.normal.CallAssignment;
 import pir.statement.normal.CallStmt;
 import pir.statement.normal.GetElementPtr;
 import pir.statement.normal.LoadStmt;
-import pir.statement.normal.Relation;
 import pir.statement.normal.StoreStmt;
+import pir.statement.normal.binop.BinaryOp;
 import pir.statement.normal.convert.ConvertValue;
 import pir.statement.phi.PhiStmt;
 
@@ -30,7 +28,7 @@ abstract public class PirValueReplacer<R, P> extends DefTraverser<R, P> {
   protected void repList(Collection<PirValue> list, P param) {
     ArrayList<PirValue> clist = new ArrayList<PirValue>(list);
     list.clear();
-    for (PirValue val : clist) {
+    for( PirValue val : clist ) {
       list.add(replace(val, param));
     }
   }
@@ -56,22 +54,15 @@ abstract public class PirValueReplacer<R, P> extends DefTraverser<R, P> {
 
   @Override
   protected R visitAssignment(Assignment obj, P param) {
-    obj.setSrc(replace(obj.getSrc(),param));
+    obj.setSrc(replace(obj.getSrc(), param));
     return super.visitAssignment(obj, param);
   }
 
   @Override
-  protected R visitArithmeticOp(ArithmeticOp obj, P param) {
+  protected R visitBinaryOp(BinaryOp obj, P param) {
     obj.setLeft(replace(obj.getLeft(), param));
     obj.setRight(replace(obj.getRight(), param));
-    return super.visitArithmeticOp(obj, param);
-  }
-
-  @Override
-  protected R visitRelation(Relation obj, P param) {
-    obj.setLeft(replace(obj.getLeft(), param));
-    obj.setRight(replace(obj.getRight(), param));
-    return super.visitRelation(obj, param);
+    return super.visitBinaryOp(obj, param);
   }
 
   @Override
@@ -87,7 +78,7 @@ abstract public class PirValueReplacer<R, P> extends DefTraverser<R, P> {
 
   @Override
   protected R visitPhiStmt(PhiStmt obj, P param) {
-    for (BasicBlock in : new ArrayList<BasicBlock>(obj.getInBB())) {
+    for( BasicBlock in : new ArrayList<BasicBlock>(obj.getInBB()) ) {
       obj.addArg(in, replace(obj.getArg(in), param));
     }
     return super.visitPhiStmt(obj, param);
@@ -112,14 +103,14 @@ abstract public class PirValueReplacer<R, P> extends DefTraverser<R, P> {
 
   @Override
   protected R visitLoadStmt(LoadStmt obj, P param) {
-    obj.setSrc(replace(obj.getSrc(),param));
+    obj.setSrc(replace(obj.getSrc(), param));
     return super.visitLoadStmt(obj, param);
   }
 
   @Override
   protected R visitGetElementPtr(GetElementPtr obj, P param) {
-    obj.setBase(replace(obj.getBase(),param));
-    repList(obj.getOffset(),param);
+    obj.setBase(replace(obj.getBase(), param));
+    repList(obj.getOffset(), param);
     return super.visitGetElementPtr(obj, param);
   }
 
@@ -128,5 +119,4 @@ abstract public class PirValueReplacer<R, P> extends DefTraverser<R, P> {
     obj.setOriginal(replace(obj.getOriginal(), param));
     return super.visitConvertValue(obj, param);
   }
-
 }

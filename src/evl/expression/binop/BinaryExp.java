@@ -1,30 +1,28 @@
-package evl.expression;
+package evl.expression.binop;
 
 import common.ElementInfo;
 
+import evl.expression.Expression;
+
 /**
- * 
+ *
  * @author urs
  */
-public class ArithmeticOp extends Expression {
+abstract public class BinaryExp extends Expression {
 
   private Expression left;
   private Expression right;
-  private ExpOp op;
 
-  public ArithmeticOp(ElementInfo info, Expression left, Expression right, ExpOp op) {
+  public BinaryExp(ElementInfo info, Expression left, Expression right) {
     super(info);
     this.left = left;
     this.right = right;
-    this.op = op;
   }
 
+  abstract public String getOpName();
+  
   public Expression getLeft() {
     return left;
-  }
-
-  public ExpOp getOp() {
-    return op;
   }
 
   public Expression getRight() {
@@ -41,7 +39,6 @@ public class ArithmeticOp extends Expression {
 
   @Override
   public String toString() {
-    return "(" + left + " " + op + " " + right + ")";
+    return "(" + left + " " + getOpName() + " " + right + ")";
   }
-
 }

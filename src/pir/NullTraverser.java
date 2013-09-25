@@ -28,20 +28,34 @@ import pir.statement.bbend.IfGoto;
 import pir.statement.bbend.ReturnExpr;
 import pir.statement.bbend.ReturnVoid;
 import pir.statement.bbend.Unreachable;
-import pir.statement.normal.ArithmeticOp;
 import pir.statement.normal.Assignment;
 import pir.statement.normal.CallAssignment;
 import pir.statement.normal.CallStmt;
 import pir.statement.normal.GetElementPtr;
 import pir.statement.normal.LoadStmt;
-import pir.statement.normal.Relation;
 import pir.statement.normal.StackMemoryAlloc;
 import pir.statement.normal.StoreStmt;
-import pir.statement.normal.UnaryOp;
+import pir.statement.normal.binop.And;
+import pir.statement.normal.binop.Div;
+import pir.statement.normal.binop.Equal;
+import pir.statement.normal.binop.Greater;
+import pir.statement.normal.binop.Greaterequal;
+import pir.statement.normal.binop.Less;
+import pir.statement.normal.binop.Lessequal;
+import pir.statement.normal.binop.Minus;
+import pir.statement.normal.binop.Mod;
+import pir.statement.normal.binop.Mul;
+import pir.statement.normal.binop.Notequal;
+import pir.statement.normal.binop.Or;
+import pir.statement.normal.binop.Plus;
+import pir.statement.normal.binop.Shl;
+import pir.statement.normal.binop.Shr;
 import pir.statement.normal.convert.SignExtendValue;
 import pir.statement.normal.convert.TruncValue;
 import pir.statement.normal.convert.TypeCast;
 import pir.statement.normal.convert.ZeroExtendValue;
+import pir.statement.normal.unop.Not;
+import pir.statement.normal.unop.Uminus;
 import pir.statement.phi.PhiStmt;
 import pir.type.ArrayType;
 import pir.type.BooleanType;
@@ -122,11 +136,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitArithmeticOp(ArithmeticOp obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
   protected R visitCallStmt(CallStmt obj, P param) {
     return doDefault(obj, param);
   }
@@ -163,11 +172,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitProgram(Program obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitRelation(Relation obj, P param) {
     return doDefault(obj, param);
   }
 
@@ -297,11 +301,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitUnaryOp(UnaryOp obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
   protected R visitCaseOptValue(CaseOptValue obj, P param) {
     return doDefault(obj, param);
   }
@@ -335,9 +334,94 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   protected R visitVarRefConst(VarRefConst obj, P param) {
     return doDefault(obj, param);
   }
-  
+
   @Override
   protected R visitUnreachable(Unreachable obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitAnd(And obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitDiv(Div obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitEqual(Equal obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitGreater(Greater obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitGreaterequal(Greaterequal obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitLess(Less obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitLessequal(Lessequal obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitMinus(Minus obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitMod(Mod obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitMul(Mul obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitNotequal(Notequal obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitOr(Or obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitPlus(Plus obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitShl(Shl obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitShr(Shr obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitNot(Not obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitUminus(Uminus obj, P param) {
     return doDefault(obj, param);
   }
 }

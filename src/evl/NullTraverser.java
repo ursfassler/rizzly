@@ -6,18 +6,32 @@ import evl.composition.Connection;
 import evl.composition.EndpointSelf;
 import evl.composition.EndpointSub;
 import evl.composition.ImplComposition;
-import evl.expression.ArithmeticOp;
 import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
 import evl.expression.Number;
-import evl.expression.Relation;
 import evl.expression.StringValue;
-import evl.expression.UnaryExpression;
+import evl.expression.binop.And;
+import evl.expression.binop.Div;
+import evl.expression.binop.Equal;
+import evl.expression.binop.Greater;
+import evl.expression.binop.Greaterequal;
+import evl.expression.binop.Less;
+import evl.expression.binop.Lessequal;
+import evl.expression.binop.Minus;
+import evl.expression.binop.Mod;
+import evl.expression.binop.Mul;
+import evl.expression.binop.Notequal;
+import evl.expression.binop.Or;
+import evl.expression.binop.Plus;
+import evl.expression.binop.Shl;
+import evl.expression.binop.Shr;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefName;
 import evl.expression.reference.RefPtrDeref;
 import evl.expression.reference.Reference;
+import evl.expression.unop.Not;
+import evl.expression.unop.Uminus;
 import evl.function.impl.FuncGlobal;
 import evl.function.impl.FuncInputHandlerEvent;
 import evl.function.impl.FuncInputHandlerQuery;
@@ -201,21 +215,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitReturnVoid(ReturnVoid obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitUnaryExpression(UnaryExpression obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitRelation(Relation obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitArithmeticOp(ArithmeticOp obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -501,6 +500,91 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitUnreachable(Unreachable obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitAnd(And obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitDiv(Div obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitEqual(Equal obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitGreater(Greater obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitGreaterequal(Greaterequal obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitLess(Less obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitLessequall(Lessequal obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitMinus(Minus obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitMod(Mod obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitMul(Mul obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitNot(Not obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitNotequal(Notequal obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitOr(Or obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitPlus(Plus obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitShl(Shl obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitShr(Shr obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitUminus(Uminus obj, P param) {
     return visitDefault(obj, param);
   }
 }

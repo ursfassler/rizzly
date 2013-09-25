@@ -28,20 +28,34 @@ import pir.statement.bbend.IfGoto;
 import pir.statement.bbend.ReturnExpr;
 import pir.statement.bbend.ReturnVoid;
 import pir.statement.bbend.Unreachable;
-import pir.statement.normal.ArithmeticOp;
 import pir.statement.normal.Assignment;
 import pir.statement.normal.CallAssignment;
 import pir.statement.normal.CallStmt;
 import pir.statement.normal.GetElementPtr;
 import pir.statement.normal.LoadStmt;
-import pir.statement.normal.Relation;
 import pir.statement.normal.StackMemoryAlloc;
 import pir.statement.normal.StoreStmt;
-import pir.statement.normal.UnaryOp;
+import pir.statement.normal.binop.And;
+import pir.statement.normal.binop.Div;
+import pir.statement.normal.binop.Equal;
+import pir.statement.normal.binop.Greater;
+import pir.statement.normal.binop.Greaterequal;
+import pir.statement.normal.binop.Less;
+import pir.statement.normal.binop.Lessequal;
+import pir.statement.normal.binop.Minus;
+import pir.statement.normal.binop.Mod;
+import pir.statement.normal.binop.Mul;
+import pir.statement.normal.binop.Notequal;
+import pir.statement.normal.binop.Or;
+import pir.statement.normal.binop.Plus;
+import pir.statement.normal.binop.Shl;
+import pir.statement.normal.binop.Shr;
 import pir.statement.normal.convert.SignExtendValue;
 import pir.statement.normal.convert.TruncValue;
 import pir.statement.normal.convert.TypeCast;
 import pir.statement.normal.convert.ZeroExtendValue;
+import pir.statement.normal.unop.Not;
+import pir.statement.normal.unop.Uminus;
 import pir.statement.phi.PhiStmt;
 import pir.type.ArrayType;
 import pir.type.BooleanType;
@@ -95,22 +109,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitNumber(Number obj, P param) {
     visit(obj.getType(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitArithmeticOp(ArithmeticOp obj, P param) {
-    visit(obj.getVariable(), param);
-    visit(obj.getLeft(), param);
-    visit(obj.getRight(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitRelation(Relation obj, P param) {
-    visit(obj.getVariable(), param);
-    visit(obj.getLeft(), param);
-    visit(obj.getRight(), param);
     return null;
   }
 
@@ -374,13 +372,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitUnaryOp(UnaryOp obj, P param) {
-    visit(obj.getVariable(), param);
-    visit(obj.getExpr(), param);
-    return null;
-  }
-
-  @Override
   protected R visitPointerType(PointerType obj, P param) {
     visit(obj.getType(), param);
     return null;
@@ -399,6 +390,140 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitUnreachable(Unreachable obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitPlus(Plus obj, P param) {
+    visit(obj.getVariable(), param);
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitMinus(Minus obj, P param) {
+    visit(obj.getVariable(), param);
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitMul(Mul obj, P param) {
+    visit(obj.getVariable(), param);
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitDiv(Div obj, P param) {
+    visit(obj.getVariable(), param);
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitMod(Mod obj, P param) {
+    visit(obj.getVariable(), param);
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitAnd(And obj, P param) {
+    visit(obj.getVariable(), param);
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitOr(Or obj, P param) {
+    visit(obj.getVariable(), param);
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitShl(Shl obj, P param) {
+    visit(obj.getVariable(), param);
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitShr(Shr obj, P param) {
+    visit(obj.getVariable(), param);
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitEqual(Equal obj, P param) {
+    visit(obj.getVariable(), param);
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitNotequal(Notequal obj, P param) {
+    visit(obj.getVariable(), param);
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitLess(Less obj, P param) {
+    visit(obj.getVariable(), param);
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitLessequal(Lessequal obj, P param) {
+    visit(obj.getVariable(), param);
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitGreater(Greater obj, P param) {
+    visit(obj.getVariable(), param);
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitGreaterequal(Greaterequal obj, P param) {
+    visit(obj.getVariable(), param);
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitNot(Not obj, P param) {
+    visit(obj.getVariable(), param);
+    visit(obj.getExpr(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitUminus(Uminus obj, P param) {
+    visit(obj.getVariable(), param);
+    visit(obj.getExpr(), param);
     return null;
   }
 }

@@ -11,8 +11,8 @@ import pir.expression.reference.RefName;
 import pir.expression.reference.VarRef;
 import pir.expression.reference.VarRefSimple;
 import pir.other.Variable;
-import pir.statement.normal.ArithmeticOp;
-import pir.statement.normal.Relation;
+import pir.statement.normal.binop.Arithmetic;
+import pir.statement.normal.binop.Relation;
 import pir.type.ArrayType;
 import pir.type.BooleanType;
 import pir.type.NamedElement;
@@ -21,6 +21,7 @@ import pir.type.Type;
 import pir.type.TypeRef;
 import error.ErrorType;
 import error.RError;
+
 
 public class ExprTypeGetter extends NullTraverser<Type, Void> {
 
@@ -71,7 +72,7 @@ public class ExprTypeGetter extends NullTraverser<Type, Void> {
   }
 
   @Override
-  protected Type visitArithmeticOp(ArithmeticOp obj, Void sym) {
+  protected Type visitArithmetic(Arithmetic obj, Void sym) {
     Type lhs = visit(obj.getLeft(), sym);
     Type rhs = visit(obj.getRight(), sym);
     Type bigger;
@@ -102,7 +103,6 @@ public class ExprTypeGetter extends NullTraverser<Type, Void> {
     return visit(obj.getType(), param);
   }
 }
-
 class RefTypeGetter extends NullTraverser<Type, Type> {
 
   @Override

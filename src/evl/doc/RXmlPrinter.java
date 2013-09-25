@@ -18,17 +18,16 @@ import evl.composition.Connection;
 import evl.composition.EndpointSelf;
 import evl.composition.EndpointSub;
 import evl.composition.ImplComposition;
-import evl.expression.ArithmeticOp;
 import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
 import evl.expression.Number;
-import evl.expression.Relation;
 import evl.expression.StringValue;
-import evl.expression.UnaryExpression;
+import evl.expression.binop.BinaryExp;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
+import evl.expression.unop.UnaryExp;
 import evl.function.FuncWithBody;
 import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
@@ -561,11 +560,11 @@ public class RXmlPrinter extends NullTraverser<Void, XmlWriter> {
 
   // ---- Expression ----------------------------------------------------------
   @Override
-  protected Void visitArithmeticOp(ArithmeticOp obj, XmlWriter param) {
+  protected Void visitBinaryExp(BinaryExp obj, XmlWriter param) {
     param.wr("(");
     visit(obj.getLeft(), param);
     param.wr(" ");
-    param.kw(obj.getOp().toString());
+    param.kw(obj.getOpName());
     param.wr(" ");
     visit(obj.getRight(), param);
     param.wr(")");
@@ -573,9 +572,9 @@ public class RXmlPrinter extends NullTraverser<Void, XmlWriter> {
   }
 
   @Override
-  protected Void visitUnaryExpression(UnaryExpression obj, XmlWriter param) {
+  protected Void visitUnaryExp(UnaryExp obj, XmlWriter param) {
     param.wr("(");
-    param.kw(obj.getOp().toString());
+    param.kw(obj.getOpName());
     param.wr(" ");
     visit(obj.getExpr(), param);
     param.wr(")");
@@ -607,18 +606,6 @@ public class RXmlPrinter extends NullTraverser<Void, XmlWriter> {
     param.wr("[");
     list(obj.getValue(), ", ", param);
     param.wr("]");
-    return null;
-  }
-
-  @Override
-  protected Void visitRelation(Relation obj, XmlWriter param) {
-    param.wr("(");
-    visit(obj.getLeft(), param);
-    param.wr(" ");
-    param.wr(obj.getOp().toString());
-    param.wr(" ");
-    visit(obj.getRight(), param);
-    param.wr(")");
     return null;
   }
 

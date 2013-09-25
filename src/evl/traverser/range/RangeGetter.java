@@ -4,13 +4,20 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
+import common.ElementInfo;
+
+import error.ErrorType;
+import error.RError;
 import evl.Evl;
 import evl.NullTraverser;
 import evl.expression.BoolValue;
 import evl.expression.Expression;
-import evl.expression.RelOp;
-import evl.expression.Relation;
-import evl.expression.UnaryExpression;
+import evl.expression.binop.Equal;
+import evl.expression.binop.Greater;
+import evl.expression.binop.Greaterequal;
+import evl.expression.binop.Less;
+import evl.expression.binop.Lessequal;
+import evl.expression.binop.Notequal;
 import evl.expression.reference.Reference;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowWriter;
@@ -80,74 +87,108 @@ public class RangeGetter extends NullTraverser<Void, Void> {
     return null;
   }
 
-  @Override
-  protected Void visitRelation(Relation obj, Void param) {
-    {
-      Variable lv = getDerefVar(obj.getLeft());
-      if( lv != null ) {
-        if( lv.getType().getRef() instanceof Range ) {
-          Type rt = ExpressionTypeChecker.process(obj.getRight(), kb);
-          if( rt instanceof Range ) {
-            Range rr = (Range) rt;
-            Range range = getRange(lv);
-            range = adjustLeft(range, obj.getOp(), rr);
-            if( lv instanceof SsaVariable ) {
-              ranges.put((SsaVariable) lv, range);
-            } else if( lv instanceof StateVariable ) {
-              //TODO check that state variable was not written during test (by a called function)
-              //TODO should not be possible since the only call comes from transition guard which is not allowed to change state
-              sranges.put((StateVariable) lv, range);
-            } else {
-              throw new RuntimeException("not yet implemented: " + obj);
-            }
-            return null;
-          }
-        } else {
-          // not range type, we do not care
-          //TODO should we care about different types?
-          return null;
-        }
+  private Variable getVar(Expression expr) {
+    Variable lv = getDerefVar(expr);
+    if( lv != null ) {
+      if( lv.getType().getRef() instanceof Range ) {
+        return lv;
       }
     }
-    throw new RuntimeException("not yet implemented: " + obj);
+    return null;
   }
 
-  private Range adjustLeft(Range lr, RelOp op, Range rr) {
-    BigInteger low;
-    BigInteger high;
-    switch( op ) {
-      case LESS: {
-        BigInteger max = rr.getHigh().subtract(BigInteger.ONE);
-        low = lr.getLow().min(max);
-        high = lr.getHigh().min(max);
-        break;
-      }
-      case LESS_EQUAL:{
-        BigInteger max = rr.getHigh();
-        low = lr.getLow().min(max);
-        high = lr.getHigh().min(max);
-        break;
-      }
-      case GREATER: {
-        BigInteger min = rr.getLow().add(BigInteger.ONE);
-        low = lr.getLow().max(min);
-        high = lr.getHigh().max(min);
-        break;
-      }
-      case EQUAL: {
-        low = rr.getLow().max(lr.getLow());
-        high = rr.getHigh().min(lr.getHigh());
-        break;
-      }
-      default:
-        throw new RuntimeException("not yet implemented: " + op);
+  private Range getRangeType(Expression right) {
+    Type rt = ExpressionTypeChecker.process(right, kb);
+    if( rt instanceof Range ) {
+      return (Range) rt;
     }
-    return kbi.getRangeType(low, high);
+    return null;
+  }
+
+  private void putRange(Variable lv, Range range, ElementInfo info) throws RuntimeException {
+    if( lv instanceof SsaVariable ) {
+      ranges.put((SsaVariable) lv, range);
+    } else if( lv instanceof StateVariable ) {
+      //TODO check that state variable was not written during test (by a called function)
+      //TODO should not be possible since the only call comes from transition guard which is not allowed to change state
+      sranges.put((StateVariable) lv, range);
+    } else {
+      RError.err(ErrorType.Fatal, info, "not yet implemented: " + lv.getClass().getCanonicalName());
+    }
+  }
+
+  @Override
+  protected Void visitEqual(Equal obj, Void param) {
+    Variable lv = getVar(obj.getLeft());
+    Range rr = getRangeType(obj.getRight());
+    if( ( lv != null ) && ( rr != null ) ) {
+      Range range = getRange(lv);
+      BigInteger low = rr.getLow().max(range.getLow());
+      BigInteger high = rr.getHigh().min(range.getHigh());
+      range = kbi.getRangeType(low, high);
+      putRange(lv, range, obj.getInfo());
+    }
+    return null;
+  }
+
+  @Override
+  protected Void visitNotequal(Notequal obj, Void param) {
+    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+  }
+
+  @Override
+  protected Void visitGreater(Greater obj, Void param) {
+    Variable lv = getVar(obj.getLeft());
+    Range rr = getRangeType(obj.getRight());
+    if( ( lv != null ) && ( rr != null ) ) {
+      Range range = getRange(lv);
+      BigInteger min = rr.getLow().add(BigInteger.ONE);
+      BigInteger low = range.getLow().max(min);
+      BigInteger high = range.getHigh().max(min);
+      range = kbi.getRangeType(low, high);
+      putRange(lv, range, obj.getInfo());
+    }
+    return null;
+  }
+
+  @Override
+  protected Void visitGreaterequal(Greaterequal obj, Void param) {
+    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+  }
+
+  @Override
+  protected Void visitLess(Less obj, Void param) {
+    Variable lv = getVar(obj.getLeft());
+    Range rr = getRangeType(obj.getRight());
+    if( ( lv != null ) && ( rr != null ) ) {
+      Range range = getRange(lv);
+      BigInteger max = rr.getHigh().subtract(BigInteger.ONE);
+      BigInteger low = range.getLow().min(max);
+      BigInteger high = range.getHigh().min(max);
+      range = kbi.getRangeType(low, high);
+      putRange(lv, range, obj.getInfo());
+    }
+    return null;
+  }
+
+  @Override
+  protected Void visitLessequall(Lessequal obj, Void param) {
+    Variable lv = getVar(obj.getLeft());
+    Range rr = getRangeType(obj.getRight());
+    if( ( lv != null ) && ( rr != null ) ) {
+      Range range = getRange(lv);
+      BigInteger max = rr.getHigh();
+      BigInteger low = range.getLow().min(max);
+      BigInteger high = range.getHigh().min(max);
+      range = kbi.getRangeType(low, high);
+      putRange(lv, range, obj.getInfo());
+    }
+    return null;
   }
 
   @Override
   protected Void visitReference(Reference obj, Void param) {
-    if( !(obj.getLink() instanceof SsaVariable) ){
+    if( !( obj.getLink() instanceof SsaVariable ) ) {
       return null;
     }
     assert ( obj.getOffset().isEmpty() );
@@ -155,11 +196,6 @@ public class RangeGetter extends NullTraverser<Void, Void> {
     Expression writer = kw.get((SsaVariable) obj.getLink());
     visit(writer, null);
     return null;
-  }
-
-  @Override
-  protected Void visitUnaryExpression(UnaryExpression obj, Void param) {
-    return null; // TODO should we support it?
   }
 
   @Override
