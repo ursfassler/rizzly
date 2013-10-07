@@ -62,7 +62,7 @@ class UseGetter extends DefTraverser<Void, Statement> {
 
   @Override
   protected Void visitReference(Reference obj, Statement param) {
-    if( obj.getLink() instanceof SsaVariable ) {
+    if( (obj.getLink() instanceof SsaVariable) && (param != null) ) {  // could be from a transition
       assert ( param != null );
       SsaVariable var = (SsaVariable) obj.getLink();
       Set<Statement> stmts = use.get(var);

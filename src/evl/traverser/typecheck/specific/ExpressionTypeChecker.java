@@ -37,7 +37,6 @@ import evl.expression.unop.Not;
 import evl.expression.unop.Uminus;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
-import evl.traverser.range.RangeGetter;
 import evl.traverser.typecheck.BiggerType;
 import evl.type.Type;
 import evl.type.TypeRef;
@@ -133,9 +132,22 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
+  private static Variable getDerefVar(Expression left) {
+    // throw new RuntimeException("not used");
+    if (left instanceof Reference) {
+      Reference ref = (Reference) left;
+      if (ref.getOffset().isEmpty()) {
+        if (ref.getLink() instanceof Variable) {
+          return (Variable) ref.getLink();
+        }
+      }
+    }
+    return null;
+  }
+  
   @Override
   protected Type visitReference(Reference obj, Void param) {
-    Variable rv = RangeGetter.getDerefVar(obj);
+    Variable rv = getDerefVar(obj);
     if( ( rv != null ) && map.containsKey(rv) ) {
       return map.get(rv);
     } else {

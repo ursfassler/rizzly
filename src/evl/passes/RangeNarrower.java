@@ -14,7 +14,6 @@ import evl.Evl;
 import evl.NullTraverser;
 import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
-import evl.expression.Expression;
 import evl.expression.reference.Reference;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowSsaUsage;
@@ -39,6 +38,7 @@ import evl.type.TypeRef;
 import evl.type.base.EnumType;
 import evl.type.base.Range;
 import evl.variable.SsaVariable;
+import evl.variable.Variable;
 
 /**
  * Replaces variables after if/goto with a variable of a more narrow range
@@ -69,6 +69,7 @@ public class RangeNarrower extends DefTraverser<Void, Void> {
 
 // functions return true if something changed
 // functions return true if something changed
+// functions return true if something changed
 
 // functions return true if something changed
 class Narrower extends DefTraverser<Void, Void> {
@@ -84,37 +85,25 @@ class Narrower extends DefTraverser<Void, Void> {
     su = new StmtUpdater(kb);
   }
 
-  private Map<SsaVariable, Range> getRanges(Expression condition) {
-    Map<SsaVariable, Range> varRange = RangeGetter.getRange(condition, kb);
-    return varRange;
-    // for (Variable var : varRange.keySet()) {
-    // Range range = varRange.get(var);
-    // if (param.containsKey(var)) {
-    // range = Range.narrow(param.get(var), varRange.get(var));
-    // }
-    // param.put(var, range);
-    // }
-  }
-
   @Override
   protected Void visitCaseGoto(CaseGoto obj, Void param) {
     // TODO boolean should also be allowed
     // TODO check somewhere else if case values are disjunct
 
-    if( !( obj.getCondition() instanceof Reference ) ) {
+    if (!(obj.getCondition() instanceof Reference)) {
       RError.err(ErrorType.Hint, obj.getCondition().getInfo(), "can only do range analysis on local variables");
       return null;
     }
     Reference ref = (Reference) obj.getCondition();
-    if( !ref.getOffset().isEmpty() || !( ref.getLink() instanceof SsaVariable ) ) {
+    if (!ref.getOffset().isEmpty() || !(ref.getLink() instanceof SsaVariable)) {
       RError.err(ErrorType.Hint, obj.getCondition().getInfo(), "can only do range analysis on local variables");
       return null;
     }
     SsaVariable var = (SsaVariable) ref.getLink();
 
-    if( var.getType().getRef() instanceof Range ) {
+    if (var.getType().getRef() instanceof Range) {
       gotoRange(obj, var);
-    } else if( var.getType().getRef() instanceof EnumType ) {
+    } else if (var.getType().getRef() instanceof EnumType) {
       gotoEnum(obj, var);
     } else {
       throw new RuntimeException("not yet implemented: " + var.getType().getRef().getClass().getCanonicalName());
@@ -126,9 +115,9 @@ class Narrower extends DefTraverser<Void, Void> {
   private void gotoEnum(CaseGoto obj, SsaVariable var) {
     EnumType varType = (EnumType) var.getType().getRef();
 
-    for( CaseGotoOpt opt : obj.getOption() ) {
+    for (CaseGotoOpt opt : obj.getOption()) {
       EnumType newType = CaseEnumUpdater.process(opt.getValue(), kb);
-      if( newType.isRealSubtype(varType) ){
+      if (newType.isRealSubtype(varType)) {
         replace(opt.getDst(), var, newType);
       }
     }
@@ -138,9 +127,9 @@ class Narrower extends DefTraverser<Void, Void> {
 
   private void gotoRange(CaseGoto obj, SsaVariable var) {
     Range varType = (Range) var.getType().getRef();
-    for( CaseGotoOpt opt : obj.getOption() ) {
+    for (CaseGotoOpt opt : obj.getOption()) {
       Range newType = CaseRangeUpdater.process(opt.getValue(), kb);
-      if( Range.leftIsSmallerEqual(newType, varType) && !Range.isEqual(newType, varType) ) {
+      if (Range.leftIsSmallerEqual(newType, varType) && !Range.isEqual(newType, varType)) {
         replace(opt.getDst(), var, newType);
       }
     }
@@ -150,30 +139,32 @@ class Narrower extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitIfGoto(IfGoto obj, Void param) {
-    Map<SsaVariable, Range> varRange = RangeGetter.getRange(obj.getCondition(), kb);
-
-    for( SsaVariable var : varRange.keySet() ) {
-      Range newType = varRange.get(var);
-      Range varType = (Range) var.getType().getRef();
-      if( Range.leftIsSmallerEqual(newType, varType) && !Range.isEqual(newType, varType) ) {
+    {
+      Map<SsaVariable, Range> ranges = RangeGetter.getSmallerRangeFor(true,obj.getCondition(), SsaVariable.class, kb);
+      for (SsaVariable var : ranges.keySet()) {
+        Range newType = ranges.get(var);
         replace(obj.getThenBlock(), var, newType);
       }
     }
-
-    // TODO also for ELSE
-
+    {
+      Map<SsaVariable, Range> ranges = RangeGetter.getSmallerRangeFor(false,obj.getCondition(), SsaVariable.class, kb);
+      for (SsaVariable var : ranges.keySet()) {
+        Range newType = ranges.get(var);
+        replace(obj.getElseBlock(), var, newType);
+      }
+    }
     return null;
   }
 
   private void replace(BasicBlock startBb, SsaVariable var, Type newType) {
-    assert ( startBb.getPhi().isEmpty() ); // if not true, we have to find a solution :(
+    assert (startBb.getPhi().isEmpty()); // if not true, we have to find a solution :(
     SsaVariable newVar = new SsaVariable(var.getInfo(), NameFactory.getNew(), new TypeRef(new ElementInfo(), newType));
     TypeCast initExpr = new TypeCast(var.getInfo(), newVar, new TypeRef(new ElementInfo(), newType), new Reference(startBb.getInfo(), var));
     startBb.getCode().add(0, initExpr);
     VariableReplacer.replace(startBb, 1, var, newVar);
 
     Set<Statement> use = ksu.get(newVar);
-    for( Statement stmt : use ) {
+    for (Statement stmt : use) {
       update(stmt);
     }
   }
@@ -181,11 +172,11 @@ class Narrower extends DefTraverser<Void, Void> {
   // FIXME a bit messy, clean it up
   // follow variable usage until no more range can be narrowed
   private void update(Statement stmt) {
-    if( su.traverse(stmt, null) ) {
-      if( stmt instanceof SsaGenerator ) {
-        SsaVariable var = ( (SsaGenerator) stmt ).getVariable();
+    if (su.traverse(stmt, null)) {
+      if (stmt instanceof SsaGenerator) {
+        SsaVariable var = ((SsaGenerator) stmt).getVariable();
         Set<Statement> use = ksu.get(var);
-        for( Statement substmt : use ) {
+        for (Statement substmt : use) {
           update(substmt);
         }
       }
@@ -196,13 +187,12 @@ class Narrower extends DefTraverser<Void, Void> {
   @Override
   protected Void visitTypeCast(TypeCast obj, Void param) {
     Set<Statement> use = ksu.get(obj.getVariable());
-    for( Statement stmt : use ) {
+    for (Statement stmt : use) {
       update(stmt);
     }
     return super.visitTypeCast(obj, param);
   }
-  
-  
+
 }
 
 // functions return true if something changed
@@ -225,13 +215,13 @@ class StmtUpdater extends NullTraverser<Boolean, Void> {
   @Override
   protected Boolean visitVarDefInitStmt(VarDefInitStmt obj, Void param) {
     Type type = ExpressionTypeChecker.process(obj.getInit(), kb);
-    if( !( type instanceof Range ) ) {
-      return false;   //TODO also check booleans and enums?
+    if (!(type instanceof Range)) {
+      return false; // TODO also check booleans and enums?
     }
     Range rtype = (Range) type;
     rtype = Range.narrow(rtype, (Range) obj.getVariable().getType().getRef());
-    rtype = kbi.getRangeType(rtype.getLow(), rtype.getHigh());  // get registred type
-    if( obj.getVariable().getType().getRef() != rtype ) {
+    rtype = kbi.getRangeType(rtype.getLow(), rtype.getHigh()); // get registred type
+    if (obj.getVariable().getType().getRef() != rtype) {
       obj.getVariable().getType().setRef(rtype);
       return true;
     } else {
@@ -242,26 +232,26 @@ class StmtUpdater extends NullTraverser<Boolean, Void> {
   @Override
   protected Boolean visitPhiStmt(PhiStmt obj, Void param) {
     Type type = obj.getVariable().getType().getRef();
-    if( !( type instanceof Range ) ) {
-      return false;   //TODO also check booleans and enums?
+    if (!(type instanceof Range)) {
+      return false; // TODO also check booleans and enums?
     }
 
     BigInteger low = null;
     BigInteger high = null;
 
-    for( BasicBlock in : obj.getInBB() ) {
+    for (BasicBlock in : obj.getInBB()) {
       Range exprt = (Range) ExpressionTypeChecker.process(obj.getArg(in), kb);
-      if( ( low == null ) || ( low.compareTo(exprt.getLow()) > 0 ) ) {
+      if ((low == null) || (low.compareTo(exprt.getLow()) > 0)) {
         low = exprt.getLow();
       }
-      if( ( high == null ) || ( high.compareTo(exprt.getHigh()) < 0 ) ) {
+      if ((high == null) || (high.compareTo(exprt.getHigh()) < 0)) {
         high = exprt.getHigh();
       }
     }
 
     Range rtype = kbi.getRangeType(low, high);
 
-    if( obj.getVariable().getType().getRef() != rtype ) {
+    if (obj.getVariable().getType().getRef() != rtype) {
       obj.getVariable().getType().setRef(rtype);
       return true;
     } else {

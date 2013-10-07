@@ -18,6 +18,7 @@ import evl.type.TypeRef;
 import evl.type.base.Range;
 import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
+import evl.variable.Variable;
 
 /**
  * Checks if the transition guard narrows a state variable. If so, a new
@@ -41,10 +42,8 @@ public class TransitionGuardNarrower extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitTransition(Transition obj, Void param) {
-    RangeGetter getter = new RangeGetter(kb);
-    getter.traverse(obj.getGuard(), null);
-    Map<StateVariable, Range> varSRange = getter.getSranges();
-
+    Map<StateVariable, Range> varSRange = RangeGetter.getSmallerRangeFor(true,obj.getGuard(), StateVariable.class, kb);
+    
     for( StateVariable sv : varSRange.keySet() ) {
       Range rt = varSRange.get(sv);
       SsaVariable ssa = new SsaVariable(info, NameFactory.getNew(), new TypeRef(info, rt));

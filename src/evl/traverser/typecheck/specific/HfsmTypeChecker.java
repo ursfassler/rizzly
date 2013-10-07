@@ -1,6 +1,6 @@
 package evl.traverser.typecheck.specific;
 
-import java.util.Map;
+import java.util.HashMap;
 
 import evl.Evl;
 import evl.NullTraverser;
@@ -17,7 +17,6 @@ import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Named;
 import evl.other.NamedList;
-import evl.traverser.range.RangeGetter;
 import evl.type.base.Range;
 import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
@@ -94,8 +93,10 @@ public class HfsmTypeChecker extends NullTraverser<Void, Void> {
   @Override
   protected Void visitTransition(Transition obj, Void param) {
     ExpressionTypeChecker.process(obj.getGuard(), kb);
-    Map<SsaVariable, Range> varRange = RangeGetter.getRange(obj.getGuard(), kb);
-    StatementTypeChecker.process(obj.getBody(), kbi.getVoidType(), varRange, kb);
+    //TODO not used since we narrowed ranges before? => remove Map<SsaVariable, Range>
+//    Map<Variable, Range> varRange = RangeGetter.getSmallerRangeForTrue(obj.getGuard(), kb);
+//    StatementTypeChecker.process(obj.getBody(), kbi.getVoidType(), varRange, kb);
+    StatementTypeChecker.process(obj.getBody(), kbi.getVoidType(), new HashMap<SsaVariable, Range>(), kb);
     return null;
   }
 
