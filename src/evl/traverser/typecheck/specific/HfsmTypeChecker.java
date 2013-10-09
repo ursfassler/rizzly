@@ -17,7 +17,7 @@ import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Named;
 import evl.other.NamedList;
-import evl.type.base.Range;
+import evl.type.base.NumSet;
 import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
 
@@ -93,10 +93,10 @@ public class HfsmTypeChecker extends NullTraverser<Void, Void> {
   @Override
   protected Void visitTransition(Transition obj, Void param) {
     ExpressionTypeChecker.process(obj.getGuard(), kb);
-    //TODO not used since we narrowed ranges before? => remove Map<SsaVariable, Range>
-//    Map<Variable, Range> varRange = RangeGetter.getSmallerRangeForTrue(obj.getGuard(), kb);
-//    StatementTypeChecker.process(obj.getBody(), kbi.getVoidType(), varRange, kb);
-    StatementTypeChecker.process(obj.getBody(), kbi.getVoidType(), new HashMap<SsaVariable, Range>(), kb);
+    // TODO not used since we narrowed ranges before? => remove Map<SsaVariable, NumSet>
+    // Map<Variable, NumSet> varRange = RangeGetter.getSmallerRangeForTrue(obj.getGuard(), kb);
+    // StatementTypeChecker.process(obj.getBody(), kbi.getVoidType(), varRange, kb);
+    StatementTypeChecker.process(obj.getBody(), kbi.getVoidType(), new HashMap<SsaVariable, NumSet>(), kb);
     return null;
   }
 

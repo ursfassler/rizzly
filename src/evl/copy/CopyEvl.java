@@ -85,10 +85,10 @@ class CopyEvl extends NullTraverser<Evl, Void> {
   @Override
   protected Evl visitRizzlyProgram(RizzlyProgram obj, Void param) {
     RizzlyProgram ret = new RizzlyProgram(obj.getRootdir(), obj.getName());
-    ret.getConstant().addAll( copy(obj.getConstant().getList()) );
-    ret.getFunction().addAll( copy(obj.getFunction().getList()) );
-    ret.getType().addAll( copy(obj.getType().getList()) );
-    ret.getVariable().addAll( copy(obj.getVariable().getList()) );
+    ret.getConstant().addAll(copy(obj.getConstant().getList()));
+    ret.getFunction().addAll(copy(obj.getFunction().getList()));
+    ret.getType().addAll(copy(obj.getType().getList()));
+    ret.getVariable().addAll(copy(obj.getVariable().getList()));
     return ret;
   }
 
@@ -169,7 +169,7 @@ class CopyEvl extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitBasicBlockList(BasicBlockList obj, Void param) {
-    BasicBlockList bbl = new BasicBlockList(obj.getInfo(),copy(obj.getEntry()),copy(obj.getExit()));
+    BasicBlockList bbl = new BasicBlockList(obj.getInfo(), copy(obj.getEntry()), copy(obj.getExit()));
     bbl.getBasicBlocks().addAll(copy(obj.getBasicBlocks()));
     return bbl;
   }

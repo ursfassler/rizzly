@@ -9,7 +9,7 @@ import evl.knowledge.KnowledgeBase;
 import evl.type.Type;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumType;
-import evl.type.base.Range;
+import evl.type.base.NumSet;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
 import evl.type.special.NaturalType;
@@ -34,8 +34,8 @@ public class Supertype extends NullTraverser<Type, Void> {
   }
 
   @Override
-  protected Type visitRange(Range obj, Void param) {
-    if (obj.getLow().compareTo(BigInteger.ZERO) >= 0) {
+  protected Type visitNumSet(NumSet obj, Void param) {
+    if (obj.getNumbers().getLow().compareTo(BigInteger.ZERO) >= 0) {
       return kbi.getNaturalType();
     } else {
       return kbi.getIntegerType();

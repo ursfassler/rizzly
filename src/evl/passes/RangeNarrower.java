@@ -4,6 +4,8 @@ import java.math.BigInteger;
 import java.util.Map;
 import java.util.Set;
 
+import util.NumberSet;
+
 import common.ElementInfo;
 import common.NameFactory;
 
@@ -22,6 +24,7 @@ import evl.statement.Statement;
 import evl.statement.bbend.CaseGoto;
 import evl.statement.bbend.CaseGotoOpt;
 import evl.statement.bbend.IfGoto;
+import evl.statement.bbend.ReturnExpr;
 import evl.statement.normal.Assignment;
 import evl.statement.normal.CallStmt;
 import evl.statement.normal.SsaGenerator;
@@ -36,9 +39,8 @@ import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.base.EnumType;
-import evl.type.base.Range;
+import evl.type.base.NumSet;
 import evl.variable.SsaVariable;
-import evl.variable.Variable;
 
 /**
  * Replaces variables after if/goto with a variable of a more narrow range
@@ -66,10 +68,6 @@ public class RangeNarrower extends DefTraverser<Void, Void> {
     return null;
   }
 }
-
-// functions return true if something changed
-// functions return true if something changed
-// functions return true if something changed
 
 // functions return true if something changed
 class Narrower extends DefTraverser<Void, Void> {
@@ -101,7 +99,7 @@ class Narrower extends DefTraverser<Void, Void> {
     }
     SsaVariable var = (SsaVariable) ref.getLink();
 
-    if (var.getType().getRef() instanceof Range) {
+    if (var.getType().getRef() instanceof NumSet) {
       gotoRange(obj, var);
     } else if (var.getType().getRef() instanceof EnumType) {
       gotoEnum(obj, var);
@@ -126,10 +124,12 @@ class Narrower extends DefTraverser<Void, Void> {
   }
 
   private void gotoRange(CaseGoto obj, SsaVariable var) {
-    Range varType = (Range) var.getType().getRef();
+    NumSet varType = (NumSet) var.getType().getRef();
     for (CaseGotoOpt opt : obj.getOption()) {
-      Range newType = CaseRangeUpdater.process(opt.getValue(), kb);
-      if (Range.leftIsSmallerEqual(newType, varType) && !Range.isEqual(newType, varType)) {
+      NumSet newType = CaseRangeUpdater.process(opt.getValue(), kb);
+      int cmp = newType.getNumbers().getNumberCount().compareTo(varType.getNumbers().getNumberCount());
+      assert (cmp <= 0);
+      if (cmp < 0) {
         replace(opt.getDst(), var, newType);
       }
     }
@@ -140,16 +140,16 @@ class Narrower extends DefTraverser<Void, Void> {
   @Override
   protected Void visitIfGoto(IfGoto obj, Void param) {
     {
-      Map<SsaVariable, Range> ranges = RangeGetter.getSmallerRangeFor(true,obj.getCondition(), SsaVariable.class, kb);
+      Map<SsaVariable, NumSet> ranges = RangeGetter.getSmallerRangeFor(true, obj.getCondition(), SsaVariable.class, kb);
       for (SsaVariable var : ranges.keySet()) {
-        Range newType = ranges.get(var);
+        NumSet newType = ranges.get(var);
         replace(obj.getThenBlock(), var, newType);
       }
     }
     {
-      Map<SsaVariable, Range> ranges = RangeGetter.getSmallerRangeFor(false,obj.getCondition(), SsaVariable.class, kb);
+      Map<SsaVariable, NumSet> ranges = RangeGetter.getSmallerRangeFor(false, obj.getCondition(), SsaVariable.class, kb);
       for (SsaVariable var : ranges.keySet()) {
-        Range newType = ranges.get(var);
+        NumSet newType = ranges.get(var);
         replace(obj.getElseBlock(), var, newType);
       }
     }
@@ -193,6 +193,12 @@ class Narrower extends DefTraverser<Void, Void> {
     return super.visitTypeCast(obj, param);
   }
 
+  @Override
+  protected Void visitVarDefInitStmt(VarDefInitStmt obj, Void param) {
+    update(obj);
+    return null;
+  }
+
 }
 
 // functions return true if something changed
@@ -212,15 +218,16 @@ class StmtUpdater extends NullTraverser<Boolean, Void> {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
-  @Override
-  protected Boolean visitVarDefInitStmt(VarDefInitStmt obj, Void param) {
-    Type type = ExpressionTypeChecker.process(obj.getInit(), kb);
-    if (!(type instanceof Range)) {
+  private Boolean handleSsaGen(SsaGenerator obj, Type type) {
+    if (!(type instanceof NumSet)) {
       return false; // TODO also check booleans and enums?
     }
-    Range rtype = (Range) type;
-    rtype = Range.narrow(rtype, (Range) obj.getVariable().getType().getRef());
-    rtype = kbi.getRangeType(rtype.getLow(), rtype.getHigh()); // get registred type
+    NumSet rtype = (NumSet) type;
+    NumberSet rset = NumberSet.intersection(rtype.getNumbers(), ((NumSet) obj.getVariable().getType().getRef()).getNumbers());
+    if (rset.isEmpty()) {
+      return false; // TODO we could add a not reachable instruction?
+    }
+    rtype = kbi.getRangeType(rset.getLow(), rset.getHigh()); // get registered type
     if (obj.getVariable().getType().getRef() != rtype) {
       obj.getVariable().getType().setRef(rtype);
       return true;
@@ -230,9 +237,20 @@ class StmtUpdater extends NullTraverser<Boolean, Void> {
   }
 
   @Override
+  protected Boolean visitVarDefInitStmt(VarDefInitStmt obj, Void param) {
+    Type type = ExpressionTypeChecker.process(obj.getInit(), kb);
+    return handleSsaGen(obj, type);
+  }
+
+  @Override
+  protected Boolean visitTypeCast(TypeCast obj, Void param) {
+    return handleSsaGen(obj, obj.getCast().getRef());
+  }
+
+  @Override
   protected Boolean visitPhiStmt(PhiStmt obj, Void param) {
     Type type = obj.getVariable().getType().getRef();
-    if (!(type instanceof Range)) {
+    if (!(type instanceof NumSet)) {
       return false; // TODO also check booleans and enums?
     }
 
@@ -240,16 +258,16 @@ class StmtUpdater extends NullTraverser<Boolean, Void> {
     BigInteger high = null;
 
     for (BasicBlock in : obj.getInBB()) {
-      Range exprt = (Range) ExpressionTypeChecker.process(obj.getArg(in), kb);
-      if ((low == null) || (low.compareTo(exprt.getLow()) > 0)) {
-        low = exprt.getLow();
+      NumSet exprt = (NumSet) ExpressionTypeChecker.process(obj.getArg(in), kb);
+      if ((low == null) || (low.compareTo(exprt.getNumbers().getLow()) > 0)) {
+        low = exprt.getNumbers().getLow();
       }
-      if ((high == null) || (high.compareTo(exprt.getHigh()) < 0)) {
-        high = exprt.getHigh();
+      if ((high == null) || (high.compareTo(exprt.getNumbers().getHigh()) < 0)) {
+        high = exprt.getNumbers().getHigh();
       }
     }
 
-    Range rtype = kbi.getRangeType(low, high);
+    NumSet rtype = kbi.getRangeType(low, high);
 
     if (obj.getVariable().getType().getRef() != rtype) {
       obj.getVariable().getType().setRef(rtype);
@@ -270,4 +288,11 @@ class StmtUpdater extends NullTraverser<Boolean, Void> {
     // nothing to do since we do not produce a new value
     return false;
   }
+
+  @Override
+  protected Boolean visitReturnExpr(ReturnExpr obj, Void param) {
+    // nothing to do since we do not produce a new value
+    return false;
+  }
+
 }

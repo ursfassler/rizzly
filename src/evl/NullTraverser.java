@@ -9,6 +9,7 @@ import evl.composition.ImplComposition;
 import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
 import evl.expression.Number;
+import evl.expression.RangeValue;
 import evl.expression.StringValue;
 import evl.expression.binop.And;
 import evl.expression.binop.Div;
@@ -81,7 +82,7 @@ import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.type.base.FunctionTypeRet;
 import evl.type.base.FunctionTypeVoid;
-import evl.type.base.Range;
+import evl.type.base.NumSet;
 import evl.type.base.StringType;
 import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
@@ -409,11 +410,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitRange(Range obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
   protected R visitPhiStmt(PhiStmt obj, P param) {
     return visitDefault(obj, param);
   }
@@ -534,7 +530,7 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitLessequall(Lessequal obj, P param) {
+  protected R visitLessequal(Lessequal obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -587,4 +583,15 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   protected R visitUminus(Uminus obj, P param) {
     return visitDefault(obj, param);
   }
+
+  @Override
+  protected R visitNumSet(NumSet obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitRangeValue(RangeValue obj, P param) {
+    return visitDefault(obj, param);
+  }
+
 }

@@ -49,7 +49,7 @@ import evl.statement.normal.VarDefStmt;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.type.Type;
 import evl.type.TypeRef;
-import evl.type.base.Range;
+import evl.type.base.NumSet;
 import evl.variable.SsaVariable;
 
 //TODO also split relation operands (only ref to var or constant)
@@ -331,7 +331,7 @@ class Cutter extends ExprReplacer<List<NormalStmt>> {
     Designator path = ka.find(type);
 
     if( path == null ) {
-      assert ( type instanceof Range ); // should not be Unsigned (more like type != VoidType)
+      assert (type instanceof NumSet ); // should not be Unsigned (more like type != VoidType)
       kb.getRoot().add(type);
     }
 

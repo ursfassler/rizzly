@@ -19,6 +19,7 @@ import evl.statement.bbend.ReturnExpr;
 import evl.statement.bbend.ReturnVoid;
 import evl.statement.normal.Assignment;
 import evl.statement.normal.CallStmt;
+import evl.statement.normal.TypeCast;
 import evl.statement.normal.VarDefInitStmt;
 import evl.statement.normal.VarDefStmt;
 import evl.statement.phi.PhiStmt;
@@ -56,6 +57,7 @@ public class VariableReplacer extends NullTraverser<Boolean, Void> {
         return;
       }
     }
+    checkNextPhi(rootBb);
     visit(rootBb.getEnd(), null);
   }
 
@@ -71,19 +73,33 @@ public class VariableReplacer extends NullTraverser<Boolean, Void> {
     }
     checked.add(obj);
 
-    ArrayList<Evl> list = new ArrayList<Evl>();
-    list.addAll(obj.getPhi());
-    list.addAll(obj.getCode());
-
-    for( Evl stmt : list ) {
+    for( PhiStmt phi : obj.getPhi() ){
+      if( phi.getVariable() == exprVarRepl.getOld() ){
+        return null;
+      }
+    }
+    
+    for( Evl stmt : obj.getCode() ) {
       if( !visit(stmt, null) ) {
         return null;
       }
     }
 
+    checkNextPhi(obj);
     visit(obj.getEnd(), null);
-
+    
     return null;
+  }
+
+  private void checkNextPhi(BasicBlock from) {
+    for( BasicBlock next : from.getEnd().getJumpDst() ){
+      for( PhiStmt phi : next.getPhi() ){
+        exprVarRepl.traverse(phi.getArg(from), null);
+        if( phi.getVariable() == exprVarRepl.getOld() ){
+          break;// inner loop
+        }
+      }
+    }
   }
 
   @Override
@@ -102,6 +118,12 @@ public class VariableReplacer extends NullTraverser<Boolean, Void> {
   }
 
   @Override
+  protected Boolean visitTypeCast(TypeCast obj, Void param) {
+    exprVarRepl.traverse(obj.getValue(), null);
+    return obj.getVariable() != exprVarRepl.getOld();
+  }
+
+  @Override
   protected Boolean visitCallStmt(CallStmt obj, Void param) {
     exprVarRepl.traverse(obj, null);
     return true;
@@ -114,6 +136,7 @@ public class VariableReplacer extends NullTraverser<Boolean, Void> {
 
   @Override
   protected Boolean visitPhiStmt(PhiStmt obj, Void param) {
+    assert(false);
     //TODO use exprVarRepl?
     for( BasicBlock in : new ArrayList<BasicBlock>(obj.getInBB()) ) {
       Variable var = (Variable) ((Reference) obj.getArg(in)).getLink();

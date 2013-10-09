@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import util.Range;
 import evl.Evl;
 import evl.NullTraverser;
 import evl.expression.Expression;
@@ -18,7 +19,6 @@ import evl.statement.bbend.CaseOptRange;
 import evl.statement.bbend.CaseOptValue;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
-import evl.type.base.Range;
 import evl.variable.Variable;
 
 /**

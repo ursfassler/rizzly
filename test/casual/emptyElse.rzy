@@ -1,0 +1,22 @@
+
+interface
+  Tick
+    function tack( x: R{0,20} ):R{0,10};
+  end
+  
+component
+  EmptyElse
+    input
+      in  : Tick;
+    
+    implementation elementary
+    
+    function in.tack( x: R{0,20} ):R{0,10}
+      if x > 10 then
+        x := x - 10;
+      end
+      return x;
+    end
+
+  end
+

@@ -9,6 +9,9 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
+import util.NumberSet;
+import util.Range;
+
 import common.Direction;
 
 import error.ErrorType;
@@ -26,6 +29,7 @@ import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
 import evl.expression.Expression;
 import evl.expression.Number;
+import evl.expression.RangeValue;
 import evl.expression.StringValue;
 import evl.expression.binop.And;
 import evl.expression.binop.BinaryExp;
@@ -91,7 +95,7 @@ import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
-import evl.type.base.Range;
+import evl.type.base.NumSet;
 import evl.type.base.StringType;
 import evl.type.composed.NamedElement;
 import evl.type.composed.NamedElementType;
@@ -120,7 +124,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     PrettyPrinter pp = new PrettyPrinter(writeId);
     try {
       pp.traverse(ast, new StreamWriter(new PrintStream(filename)));
-    } catch( FileNotFoundException e ) {
+    } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
   }
@@ -131,8 +135,8 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   private void list(List<? extends Evl> list, String sep, StreamWriter param) {
-    for( int i = 0; i < list.size(); i++ ) {
-      if( i > 0 ) {
+    for (int i = 0; i < list.size(); i++) {
+      if (i > 0) {
         param.wr(sep);
       }
       visit(list.get(i), param);
@@ -140,22 +144,35 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   private void visitList(List<? extends Evl> list, StreamWriter param) {
-    for( int i = 0; i < list.size(); i++ ) {
+    for (int i = 0; i < list.size(); i++) {
       visit(list.get(i), param);
     }
   }
 
   private <T extends Named> void visitList(ListOfNamed<T> list, StreamWriter param) {
     Iterator<T> itr = list.iterator();
-    while( itr.hasNext() ) {
+    while (itr.hasNext()) {
       visit(itr.next(), param);
     }
   }
 
   private void wrId(Evl obj, StreamWriter wr) {
-    if( writeId ) {
+    if (writeId) {
       wr.wr("[" + obj.hashCode() % 10000 + "]");
     }
+  }
+
+  private void printNumberSet(NumberSet ranges, StreamWriter param) {
+    param.wr("{");
+    Iterator<Range> itr = ranges.getRanges().iterator();
+    if (itr.hasNext()) {
+      param.wr(itr.next().toString());
+      while (itr.hasNext()) {
+        param.wr(",");
+        param.wr(itr.next().toString());
+      }
+    }
+    param.wr("}");
   }
 
   @Override
@@ -175,7 +192,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   private void visitInterfaceDecl(String type, ListOfNamed<? extends Named> listOfNamed, StreamWriter param) {
-    if( !listOfNamed.isEmpty() ) {
+    if (!listOfNamed.isEmpty()) {
       param.wr(type);
       param.nl();
       param.incIndent();
@@ -202,7 +219,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   protected void visitOptList(String name, ListOfNamed<? extends Named> type, StreamWriter param) {
-    if( type.isEmpty() ) {
+    if (type.isEmpty()) {
       return;
     }
     param.wr(name);
@@ -213,7 +230,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   protected void visitOptList(String name, List<? extends EvlBase> type, StreamWriter param) {
-    if( type.isEmpty() ) {
+    if (type.isEmpty()) {
       return;
     }
     param.wr(name);
@@ -345,15 +362,15 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitConnection(Connection obj, StreamWriter param) {
     visit(obj.getEndpoint(Direction.in), param);
-    switch( obj.getType() ) {
-      case sync:
-        param.wr(" -> ");
-        break;
-      case async:
-        param.wr(" >> ");
-        break;
-      default:
-        RError.err(ErrorType.Fatal, obj.getInfo(), "Not yet implemented connection type: " + obj.getType());
+    switch (obj.getType()) {
+    case sync:
+      param.wr(" -> ");
+      break;
+    case async:
+      param.wr(" >> ");
+      break;
+    default:
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Not yet implemented connection type: " + obj.getType());
     }
     visit(obj.getEndpoint(Direction.out), param);
     param.wr(";");
@@ -369,14 +386,14 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.wr("(");
     list(obj.getParam().getList(), "; ", param);
     param.wr(")");
-    if( obj instanceof FuncWithReturn ) {
+    if (obj instanceof FuncWithReturn) {
       param.wr(":");
-      visit(( (FuncWithReturn) obj ).getRet(), param);
+      visit(((FuncWithReturn) obj).getRet(), param);
     }
     param.nl();
-    if( obj instanceof FuncWithBody ) {
+    if (obj instanceof FuncWithBody) {
       param.incIndent();
-      visit(( (FuncWithBody) obj ).getBody(), param);
+      visit(((FuncWithBody) obj).getBody(), param);
       param.decIndent();
       param.wr("end");
       param.nl();
@@ -467,14 +484,19 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitRange(Range obj, StreamWriter param) {
-    param.wr(obj.getName());
-    wrId(obj, param);
-    param.wr(" = {");
+  protected Void visitRangeValue(RangeValue obj, StreamWriter param) {
     param.wr(obj.getLow().toString());
     param.wr("..");
     param.wr(obj.getHigh().toString());
-    param.wr("}");
+    return null;
+  }
+
+  @Override
+  protected Void visitNumSet(NumSet obj, StreamWriter param) {
+    param.wr(obj.getName());
+    wrId(obj, param);
+    param.wr(" = ");
+    printNumberSet(obj.getNumbers(), param);
     param.nl();
     return null;
   }
@@ -735,7 +757,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitLessequall(Lessequal obj, StreamWriter param) {
+  protected Void visitLessequal(Lessequal obj, StreamWriter param) {
     visitBinop("<=", obj, param);
     return null;
   }
@@ -1085,8 +1107,8 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
         return arg0.getName().compareTo(arg1.getName()); // TODO correct phi arg ordering?
       }
     });
-    for( int i = 0; i < args.size(); i++ ) {
-      if( i > 0 ) {
+    for (int i = 0; i < args.size(); i++) {
+      if (i > 0) {
         param.wr(",");
       }
       BasicBlock bb = args.get(i);

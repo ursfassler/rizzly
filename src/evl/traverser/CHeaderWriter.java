@@ -20,7 +20,7 @@ import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
-import evl.type.base.Range;
+import evl.type.base.NumSet;
 import evl.type.base.StringType;
 import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
@@ -159,9 +159,9 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitRange(Range obj, StreamWriter param) {
-    boolean isNeg = obj.getLow().compareTo(BigInteger.ZERO) < 0;
-    BigInteger max = getPos(obj.getHigh()).max(getPos(obj.getLow()));
+  protected Void visitNumSet(NumSet obj, StreamWriter param) {
+    boolean isNeg = obj.getNumbers().getLow().compareTo(BigInteger.ZERO) < 0;
+    BigInteger max = getPos(obj.getNumbers().getHigh()).max(getPos(obj.getNumbers().getLow()));
     int bits = ExpressionTypeChecker.bitCount(max);
     assert ( bits >= 0 );
     if( isNeg ) {

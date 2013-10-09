@@ -20,7 +20,7 @@ import evl.type.Type;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumType;
-import evl.type.base.Range;
+import evl.type.base.NumSet;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
 import evl.type.special.IntegerType;
@@ -59,32 +59,32 @@ public class PhiInserter {
     // If a variable is used but never defined it has to be a global variable
     // it does not hold for definitions for variables
     // FIXME why?
-    for( Set<Variable> g : getter.getUse().values() ) {
+    for (Set<Variable> g : getter.getUse().values()) {
       globals.addAll(g);
     }
 
     // Collections.sort(globals, new VarComp()); // needed to make output deterministic
     int number = 0;
 
-    for( Variable v : globals ) {
-      if( !( v instanceof FuncVariable ) ) {
+    for (Variable v : globals) {
+      if (!(v instanceof FuncVariable)) {
         continue;
       }
-      if( !isScalar(v.getType().getRef()) ) {
+      if (!isScalar(v.getType().getRef())) {
         continue;
       }
       FuncVariable x = (FuncVariable) v;
       Set<BasicBlock> blocks = getter.getBlocks().get(x);
       LinkedList<BasicBlock> worklist = new LinkedList<BasicBlock>(blocks);
-      for( int i = 0; i < worklist.size(); i++ ) {
+      for (int i = 0; i < worklist.size(); i++) {
         BasicBlock b = worklist.get(i);
-        for( BasicBlock d : df.getDf().get(b) ) {
-          //FIXME workaround for non-working phi inserter. Redo whole function.
-          if( closedUse.get(d).contains(x) ) {
-            if( !hasPhiFor(d, x) ) {
+        for (BasicBlock d : df.getDf().get(b)) {
+          // FIXME workaround for non-working phi inserter. Redo whole function.
+          if (closedUse.get(d).contains(x)) {
+            if (!hasPhiFor(d, x)) {
               number--;
               insertPhi(d, x, number);
-              if( !worklist.contains(d) ) {
+              if (!worklist.contains(d)) {
                 worklist.add(d);
               }
             }
@@ -96,12 +96,12 @@ public class PhiInserter {
   }
 
   static private void makeClosedUse(Map<BasicBlock, Set<Variable>> use) {
-    for( BasicBlock bb : use.keySet() ) {
+    for (BasicBlock bb : use.keySet()) {
       Set<Variable> acuse = use.get(bb);
       ArrayList<BasicBlock> worklist = new ArrayList<BasicBlock>();
       worklist.add(bb);
 
-      for( int i = 0; i < worklist.size(); i++ ) {
+      for (int i = 0; i < worklist.size(); i++) {
         BasicBlock ab = worklist.get(i);
         acuse.addAll(use.get(ab));
         Set<BasicBlock> next = new HashSet<BasicBlock>(ab.getEnd().getJumpDst());
@@ -114,13 +114,13 @@ public class PhiInserter {
   @Deprecated
   public static boolean isScalar(Type type) {
     // TODO make it nice
-    return ( type instanceof Range ) || ( type instanceof IntegerType ) || ( type instanceof NaturalType ) || ( type instanceof EnumType ) || ( type instanceof BooleanType );
+    return (type instanceof NumSet) || (type instanceof IntegerType) || (type instanceof NaturalType) || (type instanceof EnumType) || (type instanceof BooleanType);
   }
 
   @Deprecated
   public static boolean isAggregate(Type type) {
     // TODO make it nice
-    return ( type instanceof RecordType ) || ( type instanceof UnionType ) || ( type instanceof ArrayType );
+    return (type instanceof RecordType) || (type instanceof UnionType) || (type instanceof ArrayType);
   }
 
   private void insertPhi(BasicBlock bb, FuncVariable var, int number) {

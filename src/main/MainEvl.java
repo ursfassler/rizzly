@@ -73,6 +73,7 @@ import evl.traverser.DesCallgraphMaker;
 import evl.traverser.ExprCutter;
 import evl.traverser.LinkReduction;
 import evl.traverser.NamespaceReduction;
+import evl.traverser.NormalizeBool;
 import evl.traverser.OutsideReaderInfo;
 import evl.traverser.OutsideWriterInfo;
 import evl.traverser.SsaMaker;
@@ -89,7 +90,7 @@ import evl.traverser.typecheck.specific.CompInterfaceTypeChecker;
 import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
-import evl.type.base.Range;
+import evl.type.base.NumSet;
 import evl.type.special.PointerType;
 import evl.variable.Constant;
 import evl.variable.SsaVariable;
@@ -113,13 +114,16 @@ public class MainEvl {
     SsaMaker.process(aclasses, kb);
     PrettyPrinter.print(aclasses, debugdir + "ssa.rzy", true);
 
-    TransitionGuardNarrower.process(aclasses,kb);
+    NormalizeBool.process( aclasses, kb );
+    PrettyPrinter.print(aclasses, debugdir + "normalized.rzy", true);
+    
+    TransitionGuardNarrower.process(aclasses, kb);
     RangeNarrower.process(aclasses, kb);
 
     PrettyPrinter.print(aclasses, debugdir + "ssaRanged.rzy", false);
 
     typecheck(aclasses, root, debugdir);
-    if( !opt.doLazyModelCheck() ) {
+    if (!opt.doLazyModelCheck()) {
       modelCheck(debugdir, aclasses, root, kb);
     }
 
@@ -127,14 +131,14 @@ public class MainEvl {
     root = hfsmReduction(root, opt, debugdir, aclasses, kb);
 
     addConDestructor(aclasses, debugdir, kb);
-    
+
     PrettyPrinter.print(aclasses, debugdir + "reduced.rzy", true);
 
     MemoryAccessCapsulater.process(aclasses, kb);
     ExprCutter.process(aclasses, kb);
     PrettyPrinter.print(aclasses, debugdir + "memcaps.rzy", true);
 
-    if( opt.doDebugEvent() ) {
+    if (opt.doDebugEvent()) {
       names.addAll(addDebug(aclasses, root, debugdir));
     }
 
@@ -151,7 +155,7 @@ public class MainEvl {
     checkUsefullness(aclasses);
     checkForRtcViolation(aclasses, kb);
     ioCheck(aclasses, kb);
-    hfsmCheck(aclasses,kb);
+    hfsmCheck(aclasses, kb);
   }
 
   /**
@@ -165,10 +169,10 @@ public class MainEvl {
     Map<Evl, Boolean> reads = new HashMap<Evl, Boolean>();
     Map<Evl, Boolean> outputs = new HashMap<Evl, Boolean>();
     Map<Evl, Boolean> inputs = new HashMap<Evl, Boolean>();
-    for( Evl header : cg.vertexSet() ) {
+    for (Evl header : cg.vertexSet()) {
       writes.put(header, StateWriterInfo.get(header));
       reads.put(header, StateReaderInfo.get(header));
-      if( header instanceof FunctionBase ) {
+      if (header instanceof FunctionBase) {
         inputs.put(header, OutsideReaderInfo.get((FunctionBase) header));
         outputs.put(header, OutsideWriterInfo.get((FunctionBase) header));
       } else {
@@ -195,9 +199,9 @@ public class MainEvl {
 
   private static <T extends Evl> Map<T, Boolean> doTransStuff(SimpleGraph<T> cg, Map<? extends Evl, Boolean> does) {
     Map<T, Boolean> ret = new HashMap<T, Boolean>();
-    for( T u : cg.vertexSet() ) {
+    for (T u : cg.vertexSet()) {
       boolean doThings = does.get(u);
-      for( Evl v : cg.getOutVertices(u) ) {
+      for (Evl v : cg.getOutVertices(u)) {
         doThings |= does.get(v);
       }
       ret.put(u, doThings);
@@ -207,7 +211,7 @@ public class MainEvl {
 
   @SuppressWarnings("unused")
   private static void print(Map<Evl, Boolean> writes, Map<Evl, Boolean> reads, Map<Evl, Boolean> outputs, Map<Evl, Boolean> inputs) {
-    for( Evl header : writes.keySet() ) {
+    for (Evl header : writes.keySet()) {
       String rwio = "";
       rwio += reads.get(header) ? "r" : " ";
       rwio += writes.get(header) ? "w" : " ";
@@ -238,14 +242,14 @@ public class MainEvl {
   private static void checkForRtcViolation(Namespace aclasses, KnowledgeBase kb) {
     {
       List<ImplElementary> elemset = ClassGetter.get(ImplElementary.class, aclasses);
-      for( ImplElementary elem : elemset ) {
+      for (ImplElementary elem : elemset) {
         SimpleGraph<Designator> cg = DesCallgraphMaker.make(elem);
         checkRtcViolation(cg, 3, elem.getInfo());
       }
     }
     {
       List<ImplComposition> elemset = ClassGetter.get(ImplComposition.class, aclasses);
-      for( ImplComposition elem : elemset ) {
+      for (ImplComposition elem : elemset) {
         SimpleGraph<Designator> cg = makeCallgraph(elem.getConnection());
         checkRtcViolation(cg, 2, elem.getInfo());
       }
@@ -255,7 +259,7 @@ public class MainEvl {
 
   private static SimpleGraph<Designator> makeCallgraph(List<Connection> connection) {
     SimpleGraph<Designator> ret = new SimpleGraph<Designator>();
-    for( Connection con : connection ) {
+    for (Connection con : connection) {
       Designator src = con.getEndpoint(Direction.in).getDes();
       Designator dst = con.getEndpoint(Direction.out).getDes();
       ret.addVertex(src);
@@ -267,14 +271,14 @@ public class MainEvl {
 
   private static void checkRtcViolation(SimpleGraph<Designator> cg, int n, ElementInfo info) {
     GraphHelper.doTransitiveClosure(cg);
-    for( Designator v : cg.vertexSet() ) {
+    for (Designator v : cg.vertexSet()) {
       cg.removeEdge(v, v); // this is not what we are looking for but recursive calls
     }
     SimpleGraph<String> compcall = new SimpleGraph<String>();
-    for( Designator v : cg.vertexSet() ) {
-      if( v.size() == n ) {
-        for( Designator u : cg.getOutVertices(v) ) {
-          if( u.size() == n ) {
+    for (Designator v : cg.vertexSet()) {
+      if (v.size() == n) {
+        for (Designator u : cg.getOutVertices(v)) {
+          if (u.size() == n) {
             String vcomp = v.toList().get(0);
             String ucomp = u.toList().get(0);
             compcall.addVertex(vcomp);
@@ -287,8 +291,8 @@ public class MainEvl {
     GraphHelper.doTransitiveClosure(compcall);
     ArrayList<String> vs = new ArrayList<String>(compcall.vertexSet());
     Collections.sort(vs);
-    for( String v : vs ) {
-      if( compcall.containsEdge(v, v) ) {
+    for (String v : vs) {
+      if (compcall.containsEdge(v, v)) {
         RError.err(ErrorType.Error, info, "Violation of run to completion detected for component: " + v);
       }
     }
@@ -303,32 +307,32 @@ public class MainEvl {
    * @param aclasses
    */
   private static void checkUsefullness(Namespace aclasses) {
-    for( Component comp : ClassGetter.get(Component.class, aclasses) ) {
+    for (Component comp : ClassGetter.get(Component.class, aclasses)) {
       boolean in = false;
       boolean out = false;
       List<FunctionBase> outFunc = ClassGetter.getAll(FunctionBase.class, getInterfaces(comp.getIface(Direction.out).getList()));
       List<FunctionBase> inFunc = ClassGetter.getAll(FunctionBase.class, getInterfaces(comp.getIface(Direction.in).getList()));
-      for( FunctionBase itr : inFunc ) {
-        if( itr instanceof FuncWithReturn ) {
+      for (FunctionBase itr : inFunc) {
+        if (itr instanceof FuncWithReturn) {
           out = true;
         } else {
           in = true;
         }
       }
-      for( FunctionBase itr : outFunc ) {
-        if( itr instanceof FuncWithReturn ) {
+      for (FunctionBase itr : outFunc) {
+        if (itr instanceof FuncWithReturn) {
           in = true;
         } else {
           out = true;
         }
       }
-      if( !in && !out ) {
+      if (!in && !out) {
         RError.err(ErrorType.Warning, comp.getInfo(), "Component " + comp.getName() + " has no input and no output data flow");
       }
-      if( in && !out ) {
+      if (in && !out) {
         RError.err(ErrorType.Warning, comp.getInfo(), "Component " + comp.getName() + " has no output data flow");
       }
-      if( !in && out ) {
+      if (!in && out) {
         RError.err(ErrorType.Warning, comp.getInfo(), "Component " + comp.getName() + " has no input data flow");
       }
     }
@@ -336,7 +340,7 @@ public class MainEvl {
 
   private static Set<Interface> getInterfaces(Collection<IfaceUse> list) {
     Set<Interface> ret = new HashSet<Interface>();
-    for( IfaceUse var : list ) {
+    for (IfaceUse var : list) {
       ret.add(var.getLink());
     }
     return ret;
@@ -351,10 +355,10 @@ public class MainEvl {
    * @param rootdir
    */
   private static void checkRoot(Component root, String rootdir) {
-    for( IfaceUse itr : root.getIface(Direction.out) ) {
+    for (IfaceUse itr : root.getIface(Direction.out)) {
       Interface iface = itr.getLink();
-      for( FunctionBase func : iface.getPrototype() ) {
-        if( func instanceof FuncWithReturn ) {
+      for (FunctionBase func : iface.getPrototype()) {
+        if (func instanceof FuncWithReturn) {
           RError.err(ErrorType.Error, itr.getInfo(), "Top component is not allowed to have queries in output (" + itr.getName() + "." + func.getName() + ")");
         }
       }
@@ -364,7 +368,7 @@ public class MainEvl {
   private static Component compositionReduction(Namespace aclasses, Component root) {
     Map<ImplComposition, ImplElementary> map = CompositionReduction.process(aclasses);
     Relinker.relink(aclasses, map);
-    if( map.containsKey(root) ) {
+    if (map.containsKey(root)) {
       root = map.get(root);
     }
     return root;
@@ -379,7 +383,7 @@ public class MainEvl {
     Relinker.relink(classes, map);
     // Linker.process(classes, knowledgeBase);
 
-    if( map.containsKey(root) ) {
+    if (map.containsKey(root)) {
       root = map.get(root);
     }
     return root;
@@ -402,7 +406,7 @@ public class MainEvl {
 
   private static ArrayList<String> addDebug(Namespace classes, Component root, String debugdir) {
     ArrayList<String> names = new ArrayList<String>(MsgNamesGetter.get(classes));
-    if( names.isEmpty() ) {
+    if (names.isEmpty()) {
       return names; // this means that there is no input nor output interface
     }
 
@@ -413,10 +417,10 @@ public class MainEvl {
     depth += 2;
     Collections.sort(names);
 
-    Range symNameSizeType = kbi.getRangeType(names.size());
+    NumSet symNameSizeType = kbi.getRangeType(names.size());
     ArrayType arrayType = kbi.getArray(BigInteger.valueOf(depth), symNameSizeType);
     PointerType pArray = kbi.getPointerType(arrayType);
-    Range sizeType = kbi.getRangeType(depth);
+    NumSet sizeType = kbi.getRangeType(depth);
 
     Interface debugIface;
     FuncProtoVoid recvFunc;
@@ -481,11 +485,11 @@ public class MainEvl {
     PrettyPrinter.print(classes, rootdir + "instance.rzy", true);
     {
       Namespace root = classes.forcePath(new Designator("!env", "inst"));
-      makeInputPublic(root, top.getIface(Direction.in));  //TODO why top and not newly instantiated stuff?
+      makeInputPublic(root, top.getIface(Direction.in)); // TODO why top and not newly instantiated stuff?
 
       Set<FunctionBase> pubfunc = new HashSet<FunctionBase>();
-      for( FunctionBase func : classes.getItems(FunctionBase.class, true) ) {
-        if( func.getAttributes().contains(FuncAttr.Public) ) {
+      for (FunctionBase func : classes.getItems(FunctionBase.class, true)) {
+        if (func.getAttributes().contains(FuncAttr.Public)) {
           pubfunc.add(func);
         }
       }
@@ -512,7 +516,7 @@ public class MainEvl {
   private static ImplElementary makeEnv(String instname, Component top, KnowledgeBase kb) {
     String envname = "!Env";
     ImplElementary env = new ImplElementary(new ElementInfo(envname, -1, -1), "!Env");
-    {  //that we have them
+    { // that we have them
       FunctionBase entryFunc = makeEntryExitFunc(State.ENTRY_FUNC_NAME);
       FunctionBase exitFunc = makeEntryExitFunc(State.EXIT_FUNC_NAME);
       env.getInternalFunction().add(entryFunc);
@@ -525,11 +529,11 @@ public class MainEvl {
 
     ListOfNamed<NamedList<FunctionBase>> outprot = addOutIfaceFunc(top.getIface(Direction.out), kb);
 
-    for( NamedList<FunctionBase> list : outprot ) {
+    for (NamedList<FunctionBase> list : outprot) {
       ArrayList<String> ns = new ArrayList<String>();
       ns.add(instname);
       ns.add(list.getName());
-      for( FunctionBase func : list ) {
+      for (FunctionBase func : list) {
         env.addFunction(ns, func);
       }
     }
@@ -560,7 +564,7 @@ public class MainEvl {
         }
       };
       writer.print(cg);
-    } catch( FileNotFoundException e ) {
+    } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
   }
@@ -574,11 +578,11 @@ public class MainEvl {
   private static ListOfNamed<NamedList<FunctionBase>> addOutIfaceFunc(ListOfNamed<IfaceUse> ifaces, KnowledgeBase kb) {
     ListOfNamed<NamedList<FunctionBase>> ret = new ListOfNamed<NamedList<FunctionBase>>();
 
-    for( IfaceUse ifaceRef : ifaces ) {
+    for (IfaceUse ifaceRef : ifaces) {
       NamedList<FunctionBase> list = new NamedList<FunctionBase>(info, ifaceRef.getName());
       Interface iface = ifaceRef.getLink();
-      assert ( iface != null );
-      for( FunctionBase func : iface.getPrototype() ) {
+      assert (iface != null);
+      for (FunctionBase func : iface.getPrototype()) {
         FunctionBase prot = Copy.copy(func);
         prot.setAttribute(FuncAttr.Extern);
         prot.setAttribute(FuncAttr.Public);
@@ -591,11 +595,11 @@ public class MainEvl {
 
   private static void removeUnused(Namespace ns, Set<Named> keep) {
     Set<Named> remove = new HashSet<Named>();
-    for( Named itr : ns ) {
-      if( itr instanceof Namespace ) {
+    for (Named itr : ns) {
+      if (itr instanceof Namespace) {
         removeUnused((Namespace) itr, keep);
       } else {
-        if( !keep.contains(itr) ) {
+        if (!keep.contains(itr)) {
           remove.add(itr);
         }
       }
@@ -604,11 +608,11 @@ public class MainEvl {
   }
 
   private static void makeInputPublic(Namespace root, ListOfNamed<IfaceUse> listOfNamed) {
-    for( IfaceUse iface : listOfNamed ) {
+    for (IfaceUse iface : listOfNamed) {
       Namespace ifspace = root.findSpace(iface.getName());
-      assert ( ifspace != null );
-      for( Named item : ifspace ) {
-        assert ( item instanceof FunctionBase );
+      assert (ifspace != null);
+      for (Named item : ifspace) {
+        assert (item instanceof FunctionBase);
         FunctionBase func = (FunctionBase) item;
         func.setAttribute(FuncAttr.Public);
       }
@@ -616,7 +620,7 @@ public class MainEvl {
   }
 
   private static void hfsmCheck(Namespace aclasses, KnowledgeBase kb) {
-    HfsmTransScopeCheck.process(aclasses,kb);
+    HfsmTransScopeCheck.process(aclasses, kb);
   }
 
 }

@@ -15,15 +15,14 @@ import evl.other.Namespace;
 import evl.statement.normal.TypeCast;
 import evl.traverser.range.RangeGetter;
 import evl.type.TypeRef;
-import evl.type.base.Range;
+import evl.type.base.NumSet;
 import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
-import evl.variable.Variable;
 
 /**
- * Checks if the transition guard narrows a state variable. If so, a new
- * (cached) version is created with the narrow range and references to the state
- * variable are rpelaced.
+ * Checks if the transition guard narrows a state variable. If so, a new (cached) version is created with the narrow
+ * range and references to the state variable are rpelaced.
+ * 
  * @author urs
  */
 public class TransitionGuardNarrower extends DefTraverser<Void, Void> {
@@ -42,15 +41,16 @@ public class TransitionGuardNarrower extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitTransition(Transition obj, Void param) {
-    Map<StateVariable, Range> varSRange = RangeGetter.getSmallerRangeFor(true,obj.getGuard(), StateVariable.class, kb);
-    
-    for( StateVariable sv : varSRange.keySet() ) {
-      Range rt = varSRange.get(sv);
+    Map<StateVariable, NumSet> varSRange = RangeGetter.getSmallerRangeFor(true, obj.getGuard(), StateVariable.class, kb);
+
+    for (StateVariable sv : varSRange.keySet()) {
+      NumSet rt = varSRange.get(sv);
       SsaVariable ssa = new SsaVariable(info, NameFactory.getNew(), new TypeRef(info, rt));
       TypeCast init = new TypeCast(info, ssa, new TypeRef(info, rt), new Reference(info, sv));
       Map<StateVariable, SsaVariable> map = new HashMap<StateVariable, SsaVariable>();
       map.put(sv, ssa);
-      Relinker.relink(obj.getBody().getEntry(), map);  //FIXME how can we ensure that we only replace the one used reference?
+      Relinker.relink(obj.getBody().getEntry(), map); // FIXME how can we ensure that we only replace the one used
+                                                      // reference?
       obj.getBody().getEntry().getCode().add(0, init);
     }
     return super.visitTransition(obj, param);

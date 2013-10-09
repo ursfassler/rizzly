@@ -20,10 +20,10 @@ import evl.other.Namespace;
 import evl.other.RizzlyProgram;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
-import evl.type.base.Range;
+import evl.type.base.NumSet;
 
 /**
- *
+ * 
  * @author urs
  */
 public class EnumReduction extends DefTraverser<Void, Void> {
@@ -34,13 +34,12 @@ public class EnumReduction extends DefTraverser<Void, Void> {
     KnowledgeBase kb = new KnowledgeBase(root, debugdir);
     KnowBaseItem kbi = kb.getEntry(KnowBaseItem.class);
 
-
-    Map<EnumType, Range> typeMap = new HashMap<EnumType, Range>();
+    Map<EnumType, NumSet> typeMap = new HashMap<EnumType, NumSet>();
 
     List<EnumType> enumTypes = prg.getType().getItems(EnumType.class);
-    for( EnumType et : enumTypes ) {
-      Range rt = kbi.getRangeType(et.getElement().size());
-      if( !( prg.getType().getList().contains(rt) ) ) {
+    for (EnumType et : enumTypes) {
+      NumSet rt = kbi.getRangeType(et.getElement().size());
+      if (!(prg.getType().getList().contains(rt))) {
         prg.getType().add(rt);
       }
       typeMap.put(et, rt);
@@ -59,17 +58,17 @@ class ElemReplacer extends ExprReplacer<Void> {
 
   @Override
   protected Expression visitReference(Reference obj, Void param) {
-    if( obj.getLink() instanceof EnumElement ) {
+    if (obj.getLink() instanceof EnumElement) {
       RError.err(ErrorType.Fatal, obj.getInfo(), "should not happen: " + obj);
     }
-    if( obj.getLink() instanceof EnumType ) {
-      assert ( obj.getOffset().size() == 1 );
+    if (obj.getLink() instanceof EnumType) {
+      assert (obj.getOffset().size() == 1);
       EnumType type = (EnumType) obj.getLink();
       RefName name = (RefName) obj.getOffset().get(0);
       EnumElement elem = type.find(name.getName());
-      assert ( elem != null );
+      assert (elem != null);
       int value = type.getElement().indexOf(elem);
-      assert ( value >= 0 );
+      assert (value >= 0);
       return new evl.expression.Number(elem.getInfo(), BigInteger.valueOf(value));
     }
     return super.visitReference(obj, param);

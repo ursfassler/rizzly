@@ -22,7 +22,7 @@ public class VarDefInitStmt extends NormalStmt implements SsaGenerator {
 
   @Override
   public String toString() {
-    return variable.toString();
+    return variable.toString() + " := " + init.toString();
   }
 
   public Expression getInit() {

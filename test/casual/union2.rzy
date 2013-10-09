@@ -1,8 +1,5 @@
 type
-  Uni = Union( what )
-    pos  : R{0,10};
-    neg  : R{-10,10};
-  end
+  Uni = Union( R{0,10}, R{-10,10} );
 
 interface
   Data
@@ -29,12 +26,12 @@ component
   
     function in.tick()
       x : R{0,10};
-      case data.what of
-        Uni.pos:
-          x := data.pos;
+      case data of
+        R{0,10}:
+          x := data;  // ... as R{0,10}
         end
-        Uni.neg:
-          x := abs( data.neg );
+        R{-10,10}:
+          x := abs( data );
         end
       end
     end

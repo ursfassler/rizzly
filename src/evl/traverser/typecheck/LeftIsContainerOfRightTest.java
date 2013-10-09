@@ -2,6 +2,7 @@ package evl.traverser.typecheck;
 
 import java.util.List;
 
+import util.NumberSet;
 import evl.Evl;
 import evl.NullTraverser;
 import evl.knowledge.KnowledgeBase;
@@ -14,7 +15,7 @@ import evl.type.base.EnumType;
 import evl.type.base.FunctionType;
 import evl.type.base.FunctionTypeRet;
 import evl.type.base.FunctionTypeVoid;
-import evl.type.base.Range;
+import evl.type.base.NumSet;
 import evl.type.base.StringType;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
@@ -42,13 +43,13 @@ public class LeftIsContainerOfRightTest extends NullTraverser<Boolean, Type> {
 
   @Override
   protected Boolean visit(Evl left, Type right) {
-    return super.visit( (Type) left, right);
+    return super.visit((Type) left, right);
   }
 
   public Boolean isDerivativeOf(Class<? extends Type> baseClass, Type type) {
-    while( !( baseClass.isInstance(type) ) ) {
+    while (!(baseClass.isInstance(type))) {
       Type parent = getSupertype(type);
-      if( parent == type ) {
+      if (parent == type) {
         return false;
       }
       type = parent;
@@ -61,13 +62,13 @@ public class LeftIsContainerOfRightTest extends NullTraverser<Boolean, Type> {
   }
 
   private boolean process(List<TypeRef> left, List<TypeRef> right) {
-    if( left.size() != right.size() ) {
+    if (left.size() != right.size()) {
       return false;
     }
-    for( int i = 0; i < left.size(); i++ ) {
+    for (int i = 0; i < left.size(); i++) {
       Type lefttype = left.get(i).getRef();
       Type righttype = right.get(i).getRef();
-      if( !visit(lefttype, righttype) ) {
+      if (!visit(lefttype, righttype)) {
         return false;
       }
     }
@@ -76,10 +77,10 @@ public class LeftIsContainerOfRightTest extends NullTraverser<Boolean, Type> {
 
   @Override
   protected Boolean visitFunctionTypeRet(FunctionTypeRet left, Type right) {
-    if( right instanceof FunctionTypeRet ) {
+    if (right instanceof FunctionTypeRet) {
       Type leftret = left.getRet().getRef();
-      Type rightret = ( (FunctionTypeRet) right ).getRet().getRef();
-      return visit(leftret, rightret) && process(( (FunctionType) right ).getArgD(), left.getArgD());
+      Type rightret = ((FunctionTypeRet) right).getRet().getRef();
+      return visit(leftret, rightret) && process(((FunctionType) right).getArgD(), left.getArgD());
     } else {
       return false;
     }
@@ -87,8 +88,8 @@ public class LeftIsContainerOfRightTest extends NullTraverser<Boolean, Type> {
 
   @Override
   protected Boolean visitFunctionTypeVoid(FunctionTypeVoid left, Type right) {
-    if( right instanceof FunctionTypeVoid ) {
-      return process(( (FunctionTypeVoid) right ).getArgD(), left.getArgD());
+    if (right instanceof FunctionTypeVoid) {
+      return process(((FunctionTypeVoid) right).getArgD(), left.getArgD());
     } else {
       return false;
     }
@@ -105,11 +106,12 @@ public class LeftIsContainerOfRightTest extends NullTraverser<Boolean, Type> {
   }
 
   @Override
-  protected Boolean visitRange(Range obj, Type right) {
-    if( right instanceof Range ) {
-      int cmpLow = obj.getLow().compareTo(( (Range) right ).getLow());
-      int cmpHigh = obj.getHigh().compareTo(( (Range) right ).getHigh());
-      return ( cmpLow <= 0 ) && ( cmpHigh >= 0 ); // TODO ok?
+  protected Boolean visitNumSet(NumSet obj, Type right) {
+    if (right instanceof NumSet) {
+      NumberSet insec = NumberSet.intersection(obj.getNumbers(), ((NumSet) right).getNumbers());
+      int cmp = insec.getNumberCount().compareTo((((NumSet) right)).getNumbers().getNumberCount());
+      assert (cmp <= 0);
+      return cmp == 0;
     } else {
       return false; // TODO correct?
     }
@@ -132,13 +134,13 @@ public class LeftIsContainerOfRightTest extends NullTraverser<Boolean, Type> {
 
   @Override
   protected Boolean visitArrayType(ArrayType left, Type right) {
-    if( right instanceof ArrayType ) {
+    if (right instanceof ArrayType) {
       Type lefttype = left.getType().getRef();
-      Type righttype = ( (ArrayType) right ).getType().getRef();
-      if( !visit(lefttype, righttype) ) {
+      Type righttype = ((ArrayType) right).getType().getRef();
+      if (!visit(lefttype, righttype)) {
         return false;
       }
-      return left.getSize().compareTo(( (ArrayType) right ).getSize()) <= 0;
+      return left.getSize().compareTo(((ArrayType) right).getSize()) <= 0;
     } else {
       return false;
     }

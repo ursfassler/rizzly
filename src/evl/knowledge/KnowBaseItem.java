@@ -1,7 +1,10 @@
 package evl.knowledge;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.List;
+
+import util.Range;
 
 import common.Designator;
 import common.ElementInfo;
@@ -16,7 +19,7 @@ import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
-import evl.type.base.Range;
+import evl.type.base.NumSet;
 import evl.type.base.StringType;
 import evl.type.special.IntegerType;
 import evl.type.special.NaturalType;
@@ -37,7 +40,7 @@ public class KnowBaseItem extends KnowledgeEntry {
   }
 
   private void addItem(Named item) {
-    assert ( findItem(item.getName()) == null );
+    assert (findItem(item.getName()) == null);
     kb.getRoot().add(item);
 
   }
@@ -45,11 +48,11 @@ public class KnowBaseItem extends KnowledgeEntry {
   // --------------------------------------------------------------------------
   public <T extends Named> T get(Class<T> kind, String name) {
     Named item = findItem(name);
-    if( item == null ) {
+    if (item == null) {
       RError.err(ErrorType.Fatal, "Base item not found: " + name);
       return null;
     }
-    if( !kind.isAssignableFrom(item.getClass()) ) {
+    if (!kind.isAssignableFrom(item.getClass())) {
       RError.err(ErrorType.Fatal, "Base item is of wrong type. Expected: " + kind.getCanonicalName() + "; got: " + item.getClass().getCanonicalName());
       return null;
     }
@@ -58,7 +61,7 @@ public class KnowBaseItem extends KnowledgeEntry {
 
   public VoidType getVoidType() {
     VoidType ret = (VoidType) findItem(VoidType.NAME);
-    if( ret == null ) {
+    if (ret == null) {
       ret = new VoidType();
       addItem(ret);
     }
@@ -67,11 +70,11 @@ public class KnowBaseItem extends KnowledgeEntry {
 
   /**
    * Returns R{0,count-1}
-   *
+   * 
    * @param count
    * @return
    */
-  public Range getRangeType(int count) {
+  public NumSet getRangeType(int count) {
     BigInteger low = BigInteger.ZERO;
     BigInteger high = BigInteger.valueOf(count - 1);
     return getRangeType(low, high);
@@ -79,14 +82,23 @@ public class KnowBaseItem extends KnowledgeEntry {
 
   /**
    * Returns R{low,high}
-   *
+   * 
    * @param count
    * @return
    */
-  public Range getRangeType(BigInteger low, BigInteger high) {
-    Range ret = (Range) findItem(Range.makeName(low, high));
-    if( ret == null ) {
-      ret = new Range(low, high);
+  public NumSet getRangeType(BigInteger low, BigInteger high) {
+    NumSet ret = (NumSet) findItem(NumSet.makeName(low, high));
+    if (ret == null) {
+      ret = new NumSet(low, high);
+      addItem(ret);
+    }
+    return ret;
+  }
+
+  public NumSet getNumsetType(ArrayList<Range> ranges) {
+    NumSet ret = (NumSet) findItem(NumSet.makeName(ranges));
+    if (ret == null) {
+      ret = new NumSet(ranges);
       addItem(ret);
     }
     return ret;
@@ -95,7 +107,7 @@ public class KnowBaseItem extends KnowledgeEntry {
   public ArrayType getArray(BigInteger size, Type type) {
     TypeRef ref = new TypeRef(new ElementInfo(), type);
     ArrayType ret = (ArrayType) findItem(ArrayType.makeName(size, ref));
-    if( ret == null ) {
+    if (ret == null) {
       ret = new ArrayType(size, ref);
       addItem(ret);
     }
@@ -105,7 +117,7 @@ public class KnowBaseItem extends KnowledgeEntry {
   public PointerType getPointerType(Type type) {
     TypeRef ref = new TypeRef(new ElementInfo(), type);
     PointerType ret = (PointerType) findItem(PointerType.makeName(ref));
-    if( ret == null ) {
+    if (ret == null) {
       ret = new PointerType(ref);
       addItem(ret);
     }
@@ -114,7 +126,7 @@ public class KnowBaseItem extends KnowledgeEntry {
 
   public StringType getStringType() {
     StringType ret = (StringType) findItem(StringType.NAME);
-    if( ret == null ) {
+    if (ret == null) {
       ret = new StringType();
       addItem(ret);
     }
@@ -123,7 +135,7 @@ public class KnowBaseItem extends KnowledgeEntry {
 
   public BooleanType getBooleanType() {
     BooleanType ret = (BooleanType) findItem(BooleanType.NAME);
-    if( ret == null ) {
+    if (ret == null) {
       ret = new BooleanType();
       addItem(ret);
     }
@@ -132,7 +144,7 @@ public class KnowBaseItem extends KnowledgeEntry {
 
   public IntegerType getIntegerType() {
     IntegerType ret = (IntegerType) findItem(IntegerType.NAME);
-    if( ret == null ) {
+    if (ret == null) {
       ret = new IntegerType();
       addItem(ret);
     }
@@ -141,7 +153,7 @@ public class KnowBaseItem extends KnowledgeEntry {
 
   public NaturalType getNaturalType() {
     NaturalType ret = (NaturalType) findItem(NaturalType.NAME);
-    if( ret == null ) {
+    if (ret == null) {
       ret = new NaturalType();
       addItem(ret);
     }
@@ -152,17 +164,18 @@ public class KnowBaseItem extends KnowledgeEntry {
     KnowPath kp = kb.getEntry(KnowPath.class);
     Designator path = kp.get(supertype);
     Namespace parent = kb.getRoot().forceChildPath(path.toList());
-    assert ( parent.find(supertype.getName()) != null );
+    assert (parent.find(supertype.getName()) != null);
 
     String subName = supertype.makeSubtypeName(elements);
 
     EnumType type = (EnumType) parent.find(subName);
 
-    if( type == null ) {
-      type = new EnumType(new ElementInfo(), subName,elements);
+    if (type == null) {
+      type = new EnumType(new ElementInfo(), subName, elements);
       parent.add(type);
     }
 
     return type;
   }
+
 }

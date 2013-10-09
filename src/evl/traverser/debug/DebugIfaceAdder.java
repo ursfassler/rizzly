@@ -35,7 +35,7 @@ import evl.statement.normal.NormalStmt;
 import evl.statement.normal.StackMemoryAlloc;
 import evl.statement.normal.StoreStmt;
 import evl.type.TypeRef;
-import evl.type.base.Range;
+import evl.type.base.NumSet;
 import evl.type.special.PointerType;
 import evl.variable.SsaVariable;
 import evl.variable.Variable;
@@ -45,12 +45,12 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
   final private Interface debugIface;
   final private PointerType pArrayType;
   final private PointerType pArrayElemType;
-  final private Range sizeType;
-  final private Range nameNumType;
+  final private NumSet sizeType;
+  final private NumSet nameNumType;
   final private ArrayList<String> names;
   final static private ElementInfo info = new ElementInfo();
 
-  public DebugIfaceAdder(PointerType pArrayType, PointerType pArrayElemType, Range sizeType, Range nameNumType, Interface debugIface, ArrayList<String> names) {
+  public DebugIfaceAdder(PointerType pArrayType, PointerType pArrayElemType, NumSet sizeType, NumSet nameNumType, Interface debugIface, ArrayList<String> names) {
     super();
     this.names = names;
     this.debugIface = debugIface;
@@ -60,12 +60,12 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     this.pArrayElemType = pArrayElemType;
   }
 
-  public static void process(Evl obj, PointerType pArrayType, PointerType pArrayElemType, Range sizeType, Range nameNumType, Interface debugIface, ArrayList<String> names) {
+  public static void process(Evl obj, PointerType pArrayType, PointerType pArrayElemType, NumSet sizeType, NumSet nameNumType, Interface debugIface, ArrayList<String> names) {
     DebugIfaceAdder reduction = new DebugIfaceAdder(pArrayType, pArrayElemType, sizeType, nameNumType, debugIface, names);
     reduction.traverse(obj, null);
   }
 
-  private FuncSubHandlerEvent makeRecvProto(Range sizeType) {
+  private FuncSubHandlerEvent makeRecvProto(NumSet sizeType) {
     ListOfNamed<Variable> param = new ListOfNamed<Variable>();
     SsaVariable sender = new SsaVariable(info, "receiver", new TypeRef(info, pArrayType));
     param.add(sender);
@@ -77,7 +77,7 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     return func;
   }
 
-  private FuncSubHandlerEvent makeSendProto(Range sizeType) {
+  private FuncSubHandlerEvent makeSendProto(NumSet sizeType) {
     ListOfNamed<Variable> param = new ListOfNamed<Variable>();
     SsaVariable sender = new SsaVariable(info, "sender", new TypeRef(info, pArrayType));
     param.add(sender);
@@ -151,9 +151,9 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitDefault(Evl obj, Void param) {
-    //what now?
+    // what now?
     return null;
-//    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+    // throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
   @Override
@@ -166,7 +166,7 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     List<NormalStmt> code = new ArrayList<NormalStmt>();
 
     int x = names.indexOf(compName);
-    assert ( x >= 0 );
+    assert (x >= 0);
 
     { // sender[size] := x;
       SsaVariable pSendSize = new SsaVariable(info, "pSendSize", new TypeRef(info, pArrayElemType));
@@ -221,7 +221,7 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
 
     {// add callback
 
-      for( CompUse use : obj.getComponent() ) {
+      for (CompUse use : obj.getComponent()) {
         Designator name = new Designator(use.getName(), "_debug");
 
         {

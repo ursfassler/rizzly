@@ -19,7 +19,7 @@ import evl.other.IfaceUse;
 import evl.type.TypeRef;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
-import evl.type.base.Range;
+import evl.type.base.NumSet;
 import evl.type.composed.RecordType;
 import evl.type.special.NaturalType;
 import evl.type.special.PointerType;
@@ -100,7 +100,7 @@ class SimpleGetter extends NullTraverser<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitRange(Range obj, Void param) {
+  protected Boolean visitNumSet(NumSet obj, Void param) {
     return true;
   }
 

@@ -272,7 +272,15 @@ public class CasualTest extends BaseTest {
     compile("param",TestSteps.COMPILE_TO_LLVM, false, false);
   }
   
-  
+  @Test
+  public void emptyElse() {
+    compile("emptyElse", TestSteps.COMPILE_TO_LLVM, false, true);
+  }
+
+  @Test
+  public void saturate() {
+    compile("saturate", TestSteps.COMPILE_TO_LLVM, false, true);
+  }
 
   @Test
   public void linking() {

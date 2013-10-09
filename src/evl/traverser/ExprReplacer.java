@@ -11,13 +11,29 @@ import evl.expression.BoolValue;
 import evl.expression.Expression;
 import evl.expression.Number;
 import evl.expression.StringValue;
+import evl.expression.binop.And;
 import evl.expression.binop.BinaryExp;
+import evl.expression.binop.Div;
+import evl.expression.binop.Equal;
+import evl.expression.binop.Greater;
+import evl.expression.binop.Greaterequal;
+import evl.expression.binop.Less;
+import evl.expression.binop.Lessequal;
+import evl.expression.binop.Minus;
+import evl.expression.binop.Mod;
+import evl.expression.binop.Mul;
+import evl.expression.binop.Notequal;
+import evl.expression.binop.Or;
+import evl.expression.binop.Plus;
+import evl.expression.binop.Shl;
+import evl.expression.binop.Shr;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefItem;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
-import evl.expression.unop.UnaryExp;
+import evl.expression.unop.Not;
+import evl.expression.unop.Uminus;
 import evl.hfsm.Transition;
 import evl.statement.bbend.CaseOptRange;
 import evl.statement.bbend.CaseOptValue;
@@ -27,7 +43,6 @@ import evl.statement.normal.StoreStmt;
 import evl.statement.normal.TypeCast;
 import evl.statement.normal.VarDefInitStmt;
 import evl.statement.phi.PhiStmt;
-import evl.type.base.Range;
 import evl.variable.Constant;
 
 abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
@@ -75,21 +90,101 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
     return super.visitRefName(obj, param);
   }
 
-  @Override
-  protected Expression visitBinaryExp(BinaryExp obj, T param) {
+  private Expression defaultBinaryOp(BinaryExp obj, T param) {
     obj.setLeft(visit(obj.getLeft(), param));
     obj.setRight(visit(obj.getRight(), param));
     return obj;
   }
 
   @Override
-  protected Expression visitNumber(Number obj, T param) {
+  protected Expression visitAnd(And obj, T param) {
+    return defaultBinaryOp(obj,param);
+  }
+
+  @Override
+  protected Expression visitDiv(Div obj, T param) {
+    return defaultBinaryOp(obj,param);
+  }
+
+  @Override
+  protected Expression visitEqual(Equal obj, T param) {
+    return defaultBinaryOp(obj,param);
+  }
+
+  @Override
+  protected Expression visitGreater(Greater obj, T param) {
+    return defaultBinaryOp(obj,param);
+  }
+
+  @Override
+  protected Expression visitGreaterequal(Greaterequal obj, T param) {
+    return defaultBinaryOp(obj,param);
+  }
+
+  @Override
+  protected Expression visitLess(Less obj, T param) {
+    return defaultBinaryOp(obj,param);
+  }
+
+  @Override
+  protected Expression visitLessequal(Lessequal obj, T param) {
+    return defaultBinaryOp(obj,param);
+  }
+
+  @Override
+  protected Expression visitMinus(Minus obj, T param) {
+    return defaultBinaryOp(obj,param);
+  }
+
+  @Override
+  protected Expression visitMod(Mod obj, T param) {
+    return defaultBinaryOp(obj,param);
+  }
+
+  @Override
+  protected Expression visitMul(Mul obj, T param) {
+    return defaultBinaryOp(obj,param);
+  }
+
+  @Override
+  protected Expression visitNotequal(Notequal obj, T param) {
+    return defaultBinaryOp(obj,param);
+  }
+
+  @Override
+  protected Expression visitOr(Or obj, T param) {
+    return defaultBinaryOp(obj,param);
+  }
+
+  @Override
+  protected Expression visitPlus(Plus obj, T param) {
+    return defaultBinaryOp(obj,param);
+  }
+
+  @Override
+  protected Expression visitShl(Shl obj, T param) {
+    return defaultBinaryOp(obj,param);
+  }
+
+  @Override
+  protected Expression visitShr(Shr obj, T param) {
+    return defaultBinaryOp(obj,param);
+  }
+
+  @Override
+  protected Expression visitNot(Not obj, T param) {
+    obj.setExpr(visit(obj.getExpr(), param));
     return obj;
   }
 
   @Override
-  protected Expression visitUnaryExp(UnaryExp obj, T param) {
+  protected Expression visitUminus(Uminus obj, T param) {
     obj.setExpr(visit(obj.getExpr(), param));
+    return obj;
+  }
+
+  @Override
+  protected Expression visitNumber(Number obj, T param) {
     return obj;
   }
 
@@ -148,11 +243,6 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitRange(Range obj, T param) {
-    return null;
-  }
-
-  @Override
   protected Expression visitTransition(Transition obj, T param) {
     obj.setGuard(visit(obj.getGuard(), param));
     return super.visitTransition(obj, param);
@@ -161,7 +251,7 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   @Override
   protected Expression visitVarDefInitStmt(VarDefInitStmt obj, T param) {
     obj.setInit(visit(obj.getInit(), param));
-    return super.visitVarDefInitStmt(obj, param);
+    return null;
   }
 
   @Override

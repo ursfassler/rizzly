@@ -45,6 +45,9 @@ public class Renamer extends DefTraverser<Void, Void> {
       case '-':
         ret += Designator.NAME_SEP;
         break;
+      case '.':
+        ret += Designator.NAME_SEP;
+        break;
       default:
         assert ((sym >= 'a' && sym <= 'z') || (sym >= 'A' && sym <= 'Z') || (sym >= '0' && sym <= '9') || (sym == '_'));
         ret += sym;

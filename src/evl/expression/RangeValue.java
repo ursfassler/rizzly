@@ -32,4 +32,24 @@ public class RangeValue extends Expression {
     return low + ".." + high;
   }
 
+  public static boolean doOverlap(RangeValue left, RangeValue right) {
+    //TODO verify
+    boolean low = left.high.compareTo(right.low) < 0;
+    boolean high = left.low.compareTo(right.high) > 0;
+    return !(low || high);
+  }
+
+  public static boolean isEqual(RangeValue left, RangeValue right) {
+    boolean low = left.low.compareTo(right.low) == 0;
+    boolean high = left.high.compareTo(right.high) == 0;
+    return low && high;
+  }
+
+  public static boolean leftIsSmallerEqual(RangeValue left, RangeValue right) {
+    boolean low = left.low.compareTo(right.low) >= 0;
+    boolean high = left.high.compareTo(right.high) <= 0;
+    return low && high;
+  }
+
+  
 }

@@ -3,6 +3,8 @@ package evl.knowledge;
 import java.util.HashSet;
 import java.util.Set;
 
+import util.Range;
+
 import common.Scope;
 
 import error.ErrorType;
@@ -31,7 +33,6 @@ import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
-import evl.type.base.Range;
 import evl.type.base.StringType;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;

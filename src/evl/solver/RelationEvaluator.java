@@ -15,9 +15,10 @@ import evl.expression.binop.Equal;
 import evl.expression.binop.Greater;
 import evl.expression.binop.Less;
 import evl.expression.binop.Lessequal;
+import evl.expression.binop.Notequal;
 import evl.expression.binop.Relation;
 import evl.expression.reference.Reference;
-import evl.type.base.Range;
+import evl.type.base.NumSet;
 import evl.variable.Variable;
 
 public class RelationEvaluator extends NullTraverser<Expression, Variable> {
@@ -33,10 +34,60 @@ public class RelationEvaluator extends NullTraverser<Expression, Variable> {
   }
 
   static private RangeValue getRangeFromType(Variable param) {
-    Range rt = (Range) param.getType().getRef();
-    return new RangeValue(rt.getInfo(), rt.getLow(), rt.getHigh());
+    NumSet rt = (NumSet) param.getType().getRef();
+    return new RangeValue(rt.getInfo(), rt.getNumbers().getLow(), rt.getNumbers().getHigh());
   }
 
+  private Expression greater(ElementInfo info, RangeValue left, RangeValue right) {
+    if (left.getLow().compareTo(right.getHigh()) > 0) {
+      return new BoolValue(info, true); // TODO check
+    }
+    if (left.getHigh().compareTo(right.getLow()) <= 0) {
+      return new BoolValue(info, false);// TODO check
+    }
+    return new AnyValue(info); // TODO check
+  }
+
+  private Expression makeRetLess(RangeValue leftRange,RangeValue rightRange, ElementInfo info) {
+    BigInteger low = leftRange.getLow();
+    BigInteger high = rightRange.getHigh().subtract(BigInteger.ONE);
+    high = high.min(leftRange.getHigh());
+
+    if (low.compareTo(high) > 0) {
+      return new BoolValue(info, false); // TODO check
+    }
+
+    leftRange = new RangeValue(info, low, high);
+    return leftRange;
+  }
+
+  private Expression makeRetLessEqual(RangeValue leftRange,RangeValue rightRange, ElementInfo info) {
+    BigInteger low = leftRange.getLow();
+    BigInteger high = rightRange.getHigh();
+    high = high.min(leftRange.getHigh());
+
+    if (low.compareTo(high) > 0) {
+      return new BoolValue(info, false); // TODO check
+    }
+
+    leftRange = new RangeValue(info, low, high);
+    return leftRange;
+  }
+
+  private Expression makeRetGreater(RangeValue leftRange,RangeValue rightRange, ElementInfo info) {
+    if (leftRange.getLow().compareTo(rightRange.getHigh()) <= 0) {
+      BigInteger low = rightRange.getHigh().add(BigInteger.ONE);
+      if (leftRange.getHigh().compareTo(low) < 0) {
+        return new BoolValue(info, false); // TODO check
+      }
+      return new RangeValue(info, low, leftRange.getHigh());
+    }
+    return leftRange;
+  }
+
+  
+  
+  
   @Override
   protected Expression visitGreater(Greater obj, Variable param) {
     Expression left = visit(obj.getLeft(), param);
@@ -57,6 +108,7 @@ public class RelationEvaluator extends NullTraverser<Expression, Variable> {
       assert (((Reference) right).getOffset().isEmpty());
       // TODO check ranges
       RangeValue varr = getRangeFromType(param);
+      assert(false);
       return new Lessequal(obj.getInfo(), right, left);
     }
 
@@ -68,27 +120,10 @@ public class RelationEvaluator extends NullTraverser<Expression, Variable> {
       RangeValue rr = (RangeValue) right;
       // TODO check ranges
       RangeValue varr = getRangeFromType(param);
-      if (varr.getLow().compareTo(rr.getHigh()) <= 0) {
-        BigInteger low = rr.getHigh().add(BigInteger.ONE);
-        if (varr.getHigh().compareTo(low) < 0) {
-          return new BoolValue(obj.getInfo(), false); // TODO check
-        }
-        varr = new RangeValue(obj.getInfo(), low, varr.getHigh());
-      }
-      return varr;
+      return makeRetGreater(varr,rr,obj.getInfo());
     }
 
     throw new RuntimeException("reached unreachable code");
-  }
-
-  private Expression greater(ElementInfo info, RangeValue left, RangeValue right) {
-    if (left.getLow().compareTo(right.getHigh()) > 0) {
-      return new BoolValue(info, true); // TODO check
-    }
-    if (left.getHigh().compareTo(right.getLow()) <= 0) {
-      return new BoolValue(info, false);// TODO check
-    }
-    return new AnyValue(info); // TODO check
   }
 
   @Override
@@ -104,18 +139,26 @@ public class RelationEvaluator extends NullTraverser<Expression, Variable> {
       RangeValue rr = (RangeValue) right;
       // TODO check ranges
       RangeValue varr = getRangeFromType(param);
+      return makeRetLess(varr,rr,obj.getInfo());
+    }
 
-      BigInteger low = varr.getLow();
-      BigInteger high = rr.getHigh().subtract(BigInteger.ONE);
-      high = high.min(varr.getHigh());
+    throw new RuntimeException("not yet implemented");
+  }
 
-      if (low.compareTo(high) > 0) {
-        return new BoolValue(obj.getInfo(), false); // TODO check
-      }
+  @Override
+  protected Expression visitLessequal(Lessequal obj, Variable param) {
+    Expression left = visit(obj.getLeft(), param);
+    Expression right = visit(obj.getRight(), param);
 
-      varr = new RangeValue(obj.getInfo(), low, high);
-
-      return varr;
+    if (!(left instanceof RangeValue) && (right instanceof RangeValue)) {
+      // TODO add solver
+      assert (left instanceof Reference);
+      assert (((Reference) left).getLink() == param);
+      assert (((Reference) left).getOffset().isEmpty());
+      RangeValue rr = (RangeValue) right;
+      // TODO check ranges
+      RangeValue varr = getRangeFromType(param);
+      return makeRetLessEqual(varr,rr,obj.getInfo());
     }
 
     throw new RuntimeException("not yet implemented");
@@ -126,6 +169,12 @@ public class RelationEvaluator extends NullTraverser<Expression, Variable> {
     Expression left = visit(obj.getLeft(), param);
     Expression right = visit(obj.getRight(), param);
 
+    if ((left instanceof RangeValue) && !(right instanceof RangeValue)) {
+      Expression t = left;
+      left = right;
+      right = t;
+    }
+    
     if (!(left instanceof RangeValue) && (right instanceof RangeValue)) {
       // TODO add solver
       assert (left instanceof Reference);
@@ -139,6 +188,50 @@ public class RelationEvaluator extends NullTraverser<Expression, Variable> {
       BigInteger high = rr.getHigh().min(varr.getHigh());
 
       varr = new RangeValue(obj.getInfo(), low, high);
+      return varr;
+    }
+
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Expression visitNotequal(Notequal obj, Variable param) {
+    Expression left = visit(obj.getLeft(), param);
+    Expression right = visit(obj.getRight(), param);
+
+    if ((left instanceof RangeValue) && !(right instanceof RangeValue)) {
+      Expression t = left;
+      left = right;
+      right = t;
+    }
+    
+    if (!(left instanceof RangeValue) && (right instanceof RangeValue)) {
+      // TODO add solver
+      assert (left instanceof Reference);
+      assert (((Reference) left).getLink() == param);
+      assert (((Reference) left).getOffset().isEmpty());
+      RangeValue rr = (RangeValue) right;
+
+      RangeValue varr = getRangeFromType(param);
+      
+      if( rr.getLow().equals(rr.getHigh()) ){
+        BigInteger val = rr.getLow();
+        BigInteger low = varr.getLow();
+        BigInteger high = varr.getHigh();
+        if( varr.getLow().equals(val) ){
+          low = val.add(BigInteger.ONE);
+        }
+        if( varr.getHigh().equals(val) ){
+          high = val.subtract(BigInteger.ONE);
+        }
+        if( low.compareTo(high) > 0 ){
+          return new BoolValue(obj.getInfo(), false);
+        } else {
+          return new RangeValue(obj.getInfo(), low, high);
+        }
+      }
+      
+      // we can say nothing
       return varr;
     }
 

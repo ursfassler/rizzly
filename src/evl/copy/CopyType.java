@@ -6,7 +6,7 @@ import evl.type.Type;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumType;
-import evl.type.base.Range;
+import evl.type.base.NumSet;
 import evl.type.base.StringType;
 import evl.type.composed.RecordType;
 import evl.type.special.PointerType;
@@ -26,8 +26,8 @@ public class CopyType extends NullTraverser<Type, Void> {
   }
 
   @Override
-  protected Type visitRange(Range obj, Void param) {
-    return new Range(obj.getLow(), obj.getHigh());
+  protected Type visitNumSet(NumSet obj, Void param) {
+    return new NumSet(obj.getNumbers());
   }
 
   @Override

@@ -87,7 +87,7 @@ public class CopyExpression extends NullTraverser<Expression, Void> {
   }
 
   @Override
-  protected Expression visitLessequall(Lessequal obj, Void param) {
+  protected Expression visitLessequal(Lessequal obj, Void param) {
     return new Lessequal(obj.getInfo(), cast.copy(obj.getLeft()), cast.copy(obj.getRight()));
   }
 
