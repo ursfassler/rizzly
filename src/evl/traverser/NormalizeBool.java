@@ -6,6 +6,10 @@ import evl.expression.BoolValue;
 import evl.expression.Expression;
 import evl.expression.binop.And;
 import evl.expression.binop.Equal;
+import evl.expression.binop.Greater;
+import evl.expression.binop.Greaterequal;
+import evl.expression.binop.Less;
+import evl.expression.binop.Lessequal;
 import evl.expression.binop.Notequal;
 import evl.expression.binop.Or;
 import evl.expression.unop.Not;
@@ -14,9 +18,14 @@ import evl.other.Namespace;
 
 public class NormalizeBool extends ExprReplacer<Void> {
 
-  public static void process(Namespace aclasses, KnowledgeBase kb) {
+  public static void process(Namespace evl, KnowledgeBase kb) {
     NormalizeBool normalizeBool = new NormalizeBool();
-    normalizeBool.traverse(aclasses, null);
+    normalizeBool.traverse(evl, null);
+  }
+
+  public static Expression process(Expression evl, KnowledgeBase kb) {
+    NormalizeBool normalizeBool = new NormalizeBool();
+    return normalizeBool.traverse(evl, null);
   }
 
   @Override
@@ -110,6 +119,31 @@ class Inverter extends NullTraverser<Expression, Void> {
   @Override
   protected Expression visitEqual(Equal obj, Void param) {
     return new Notequal(obj.getInfo(), obj.getLeft(), obj.getRight());
+  }
+
+  @Override
+  protected Expression visitGreater(Greater obj, Void param) {
+    return new Lessequal(obj.getInfo(), obj.getLeft(), obj.getRight());
+  }
+
+  @Override
+  protected Expression visitGreaterequal(Greaterequal obj, Void param) {
+    return new Less(obj.getInfo(), obj.getLeft(), obj.getRight());
+  }
+
+  @Override
+  protected Expression visitLess(Less obj, Void param) {
+    return new Greaterequal(obj.getInfo(), obj.getLeft(), obj.getRight());
+  }
+
+  @Override
+  protected Expression visitLessequal(Lessequal obj, Void param) {
+    return new Greater(obj.getInfo(), obj.getLeft(), obj.getRight());
+  }
+
+  @Override
+  protected Expression visitNot(Not obj, Void param) {
+    return obj.getExpr();
   }
 
 }

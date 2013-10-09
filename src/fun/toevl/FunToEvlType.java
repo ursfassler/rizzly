@@ -105,7 +105,7 @@ public class FunToEvlType extends NullTraverser<Type, String> {
 
   @Override
   protected Type visitRange(Range obj, String param) {
-    return new evl.type.base.NumSet(obj.getLow(), obj.getHigh());
+    return new evl.type.base.NumSet(new util.Range(obj.getLow(), obj.getHigh()));
   }
 
   @Override

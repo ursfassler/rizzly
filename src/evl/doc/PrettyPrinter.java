@@ -485,9 +485,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitRangeValue(RangeValue obj, StreamWriter param) {
-    param.wr(obj.getLow().toString());
-    param.wr("..");
-    param.wr(obj.getHigh().toString());
+    param.wr(obj.toString());
     return null;
   }
 

@@ -1,7 +1,6 @@
 package evl.knowledge;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.List;
 
 import util.Range;
@@ -59,6 +58,15 @@ public class KnowBaseItem extends KnowledgeEntry {
     return (T) item;
   }
 
+  public <T extends Type> T getRegistredType(T type) {
+    T ret = (T) findItem(type.getName());
+    if (ret == null) {
+      ret = type;
+      addItem(ret);
+    }
+    return ret;
+  }
+
   public VoidType getVoidType() {
     VoidType ret = (VoidType) findItem(VoidType.NAME);
     if (ret == null) {
@@ -86,16 +94,18 @@ public class KnowBaseItem extends KnowledgeEntry {
    * @param count
    * @return
    */
+  @Deprecated
   public NumSet getRangeType(BigInteger low, BigInteger high) {
-    NumSet ret = (NumSet) findItem(NumSet.makeName(low, high));
+    Range range = new Range(low, high);
+    NumSet ret = (NumSet) findItem(NumSet.makeName(range));
     if (ret == null) {
-      ret = new NumSet(low, high);
+      ret = new NumSet(range);
       addItem(ret);
     }
     return ret;
   }
 
-  public NumSet getNumsetType(ArrayList<Range> ranges) {
+  public NumSet getNumsetType(List<Range> ranges) {
     NumSet ret = (NumSet) findItem(NumSet.makeName(ranges));
     if (ret == null) {
       ret = new NumSet(ranges);

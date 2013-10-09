@@ -1,55 +1,24 @@
 package evl.expression;
 
-import java.math.BigInteger;
+import util.NumberSet;
 
 import common.ElementInfo;
 
 public class RangeValue extends Expression {
-  final private BigInteger low;
-  final private BigInteger high;
+  final private NumberSet values;
 
-  public RangeValue(ElementInfo info, BigInteger low, BigInteger high) {
+  public RangeValue(ElementInfo info, NumberSet values) {
     super(info);
-    assert (low.compareTo(high) <= 0);
-    this.low = low;
-    this.high = high;
+    this.values = values;
   }
 
-  public static String makeName(BigInteger low, BigInteger high) {
-    return "R{" + low.toString() + "," + high.toString() + "}";
-  }
-
-  public BigInteger getLow() {
-    return low;
-  }
-
-  public BigInteger getHigh() {
-    return high;
+  public NumberSet getValues() {
+    return values;
   }
 
   @Override
   public String toString() {
-    return low + ".." + high;
+    return values.toString();
   }
 
-  public static boolean doOverlap(RangeValue left, RangeValue right) {
-    //TODO verify
-    boolean low = left.high.compareTo(right.low) < 0;
-    boolean high = left.low.compareTo(right.high) > 0;
-    return !(low || high);
-  }
-
-  public static boolean isEqual(RangeValue left, RangeValue right) {
-    boolean low = left.low.compareTo(right.low) == 0;
-    boolean high = left.high.compareTo(right.high) == 0;
-    return low && high;
-  }
-
-  public static boolean leftIsSmallerEqual(RangeValue left, RangeValue right) {
-    boolean low = left.low.compareTo(right.low) >= 0;
-    boolean high = left.high.compareTo(right.high) <= 0;
-    return low && high;
-  }
-
-  
 }

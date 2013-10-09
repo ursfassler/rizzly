@@ -23,7 +23,10 @@ import evl.expression.unop.Not;
 import evl.knowledge.KnowWriter;
 import evl.knowledge.KnowledgeBase;
 import evl.solver.RelationEvaluator;
+import evl.solver.Solver;
+import evl.traverser.ExprBuilder;
 import evl.traverser.ExprStaticBoolEval;
+import evl.traverser.NormalizeBool;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.type.Type;
 import evl.type.base.BooleanType;
@@ -106,25 +109,29 @@ public class RangeGetter extends NullTraverser<Map<Variable, NumSet>, Boolean> {
     vg.traverse(obj, variables);
     for (Variable var : variables) {
       if ((var.getType().getRef() instanceof NumSet)) {
-        Expression expr = RelationEvaluator.eval(obj, var);
-        if (expr instanceof RangeValue) {
-          RangeValue rv = (RangeValue) expr;
-
-          NumberSet newType = new NumberSet(rv.getLow(), rv.getHigh());
-          NumberSet varType = ((NumSet) var.getType().getRef()).getNumbers();
-
-          if (!evalTo) {
-            newType = NumberSet.invert(newType, varType.getLow(), varType.getHigh());
-          }
-
-          newType = NumberSet.intersection(varType, newType);
-
-          int cmp = newType.getNumberCount().compareTo(varType.getNumberCount());
-          assert (cmp <= 0); // because of intersection
-          if (cmp < 0) {
-            ret.put(var, new NumSet(newType.getRanges()));
-          }
+        Expression et = ExprBuilder.makeTree(obj, var, kb);
+        if (!evalTo) {
+          et = new Not(et.getInfo(), et);
         }
+        et = NormalizeBool.process(et, kb);
+
+        assert (et instanceof Relation);
+        et = Solver.solve(var, (Relation) et);
+        assert (et instanceof Relation);
+        assert (((Relation) et).getLeft() instanceof Reference);
+        assert (((Reference) ((Relation) et).getLeft()).getLink() == var);
+        assert (((Relation) et).getRight() instanceof RangeValue);
+
+        NumberSet retset = RelationEvaluator.eval((Relation) et, var);
+
+        NumberSet varType = ((NumSet) var.getType().getRef()).getNumbers();
+
+        int cmp = retset.getNumberCount().compareTo(varType.getNumberCount());
+        assert (cmp <= 0); // because of intersection
+        if (cmp < 0) {
+          ret.put(var, new NumSet(retset.getRanges()));
+        }
+
       }
     }
     return ret;

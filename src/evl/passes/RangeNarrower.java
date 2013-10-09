@@ -1,8 +1,9 @@
 package evl.passes;
 
-import java.math.BigInteger;
+import java.util.Collections;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import util.NumberSet;
 
@@ -72,14 +73,16 @@ public class RangeNarrower extends DefTraverser<Void, Void> {
 // functions return true if something changed
 class Narrower extends DefTraverser<Void, Void> {
 
-  private KnowledgeBase kb;
-  private KnowSsaUsage ksu;
-  private StmtUpdater su;
+  final private KnowledgeBase kb;
+  final private KnowBaseItem kbi;
+  final private KnowSsaUsage ksu;
+  final private StmtUpdater su;
 
   public Narrower(KnowledgeBase kb) {
     super();
     this.kb = kb;
     ksu = kb.getEntry(KnowSsaUsage.class);
+    kbi = kb.getEntry(KnowBaseItem.class);
     su = new StmtUpdater(kb);
   }
 
@@ -141,14 +144,18 @@ class Narrower extends DefTraverser<Void, Void> {
   protected Void visitIfGoto(IfGoto obj, Void param) {
     {
       Map<SsaVariable, NumSet> ranges = RangeGetter.getSmallerRangeFor(true, obj.getCondition(), SsaVariable.class, kb);
-      for (SsaVariable var : ranges.keySet()) {
+      LinkedList<SsaVariable> keys = new LinkedList<SsaVariable>(ranges.keySet());
+      Collections.sort(keys);
+      for (SsaVariable var : keys) {
         NumSet newType = ranges.get(var);
         replace(obj.getThenBlock(), var, newType);
       }
     }
     {
       Map<SsaVariable, NumSet> ranges = RangeGetter.getSmallerRangeFor(false, obj.getCondition(), SsaVariable.class, kb);
-      for (SsaVariable var : ranges.keySet()) {
+      LinkedList<SsaVariable> keys = new LinkedList<SsaVariable>(ranges.keySet());
+      Collections.sort(keys);
+      for (SsaVariable var : keys) {
         NumSet newType = ranges.get(var);
         replace(obj.getElseBlock(), var, newType);
       }
@@ -157,13 +164,14 @@ class Narrower extends DefTraverser<Void, Void> {
   }
 
   private void replace(BasicBlock startBb, SsaVariable var, Type newType) {
+    newType = kbi.getRegistredType(newType);
     assert (startBb.getPhi().isEmpty()); // if not true, we have to find a solution :(
     SsaVariable newVar = new SsaVariable(var.getInfo(), NameFactory.getNew(), new TypeRef(new ElementInfo(), newType));
     TypeCast initExpr = new TypeCast(var.getInfo(), newVar, new TypeRef(new ElementInfo(), newType), new Reference(startBb.getInfo(), var));
     startBb.getCode().add(0, initExpr);
     VariableReplacer.replace(startBb, 1, var, newVar);
 
-    Set<Statement> use = ksu.get(newVar);
+    List<Statement> use = ksu.get(newVar);
     for (Statement stmt : use) {
       update(stmt);
     }
@@ -175,7 +183,7 @@ class Narrower extends DefTraverser<Void, Void> {
     if (su.traverse(stmt, null)) {
       if (stmt instanceof SsaGenerator) {
         SsaVariable var = ((SsaGenerator) stmt).getVariable();
-        Set<Statement> use = ksu.get(var);
+        List<Statement> use = ksu.get(var);
         for (Statement substmt : use) {
           update(substmt);
         }
@@ -186,7 +194,7 @@ class Narrower extends DefTraverser<Void, Void> {
   // introduced by TransitionGuardNarrower
   @Override
   protected Void visitTypeCast(TypeCast obj, Void param) {
-    Set<Statement> use = ksu.get(obj.getVariable());
+    List<Statement> use = ksu.get(obj.getVariable());
     for (Statement stmt : use) {
       update(stmt);
     }
@@ -227,7 +235,7 @@ class StmtUpdater extends NullTraverser<Boolean, Void> {
     if (rset.isEmpty()) {
       return false; // TODO we could add a not reachable instruction?
     }
-    rtype = kbi.getRangeType(rset.getLow(), rset.getHigh()); // get registered type
+    rtype = kbi.getNumsetType(rset.getRanges()); // get registered type
     if (obj.getVariable().getType().getRef() != rtype) {
       obj.getVariable().getType().setRef(rtype);
       return true;
@@ -244,7 +252,8 @@ class StmtUpdater extends NullTraverser<Boolean, Void> {
 
   @Override
   protected Boolean visitTypeCast(TypeCast obj, Void param) {
-    return handleSsaGen(obj, obj.getCast().getRef());
+    Type type = ExpressionTypeChecker.process(obj.getValue(), kb);
+    return handleSsaGen(obj, type);
   }
 
   @Override
@@ -254,20 +263,14 @@ class StmtUpdater extends NullTraverser<Boolean, Void> {
       return false; // TODO also check booleans and enums?
     }
 
-    BigInteger low = null;
-    BigInteger high = null;
+    NumberSet retset = new NumberSet();
 
     for (BasicBlock in : obj.getInBB()) {
       NumSet exprt = (NumSet) ExpressionTypeChecker.process(obj.getArg(in), kb);
-      if ((low == null) || (low.compareTo(exprt.getNumbers().getLow()) > 0)) {
-        low = exprt.getNumbers().getLow();
-      }
-      if ((high == null) || (high.compareTo(exprt.getNumbers().getHigh()) < 0)) {
-        high = exprt.getNumbers().getHigh();
-      }
+      retset = NumberSet.union(retset, exprt.getNumbers());
     }
 
-    NumSet rtype = kbi.getRangeType(low, high);
+    NumSet rtype = kbi.getNumsetType(retset.getRanges());
 
     if (obj.getVariable().getType().getRef() != rtype) {
       obj.getVariable().getType().setRef(rtype);

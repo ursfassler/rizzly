@@ -15,8 +15,12 @@ public class NumberSet {
     verify();
   }
 
-  public NumberSet(BigInteger low, BigInteger high) {
-    ranges.add(new Range(low, high));
+  public NumberSet(Range range) {
+    ranges.add(range);
+    verify();
+  }
+
+  public NumberSet() {
     verify();
   }
 
@@ -50,10 +54,10 @@ public class NumberSet {
   }
 
   public boolean contains(BigInteger num) {
-    //TODO check
+    // TODO check
     // and implement binary search
-    for( Range r : ranges ){
-      if( (r.getLow().compareTo(num) <= 0) && (r.getHigh().compareTo(num) >= 0) ){
+    for (Range r : ranges) {
+      if ((r.getLow().compareTo(num) <= 0) && (r.getHigh().compareTo(num) >= 0)) {
         return true;
       }
     }
@@ -174,7 +178,10 @@ public class NumberSet {
     List<Range> set = new ArrayList<Range>();
     for (Range lr : left.ranges) {
       for (Range rr : right.ranges) {
-        set.add(op.op(lr, rr));
+        Range ret = op.op(lr, rr);
+        if (ret != null) {
+          set.add(ret);
+        }
       }
     }
     set = coalesce(set);
@@ -213,6 +220,19 @@ public class NumberSet {
     assert (list.size() % 2 == 0);
 
     return makeNumSet(list);
+  }
+
+  public static NumberSet invert(NumberSet subset, NumberSet world) {
+    assert (NumberSet.intersection(subset, world).equals(subset));
+
+    if (world.isEmpty()) {
+      return new NumberSet(new ArrayList<Range>());
+    }
+
+    NumberSet ret = invert(subset, world.getLow(), world.getHigh());
+    ret = intersection(ret, world);
+
+    return ret;
   }
 
   public static NumberSet makeNumSet(List<BigInteger> list) {

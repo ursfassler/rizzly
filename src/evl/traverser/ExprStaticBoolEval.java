@@ -3,6 +3,8 @@ package evl.traverser;
 import java.util.HashMap;
 import java.util.Map;
 
+import util.NumberSet;
+import util.Range;
 import util.Unsure;
 import evl.Evl;
 import evl.NullTraverser;
@@ -95,10 +97,10 @@ public class ExprStaticBoolEval extends NullTraverser<Unsure, Map<Expression, Un
       assert (!isBool(obj.getRight()));
       RangeValue left = reval.traverse(obj.getLeft(), null);
       RangeValue right = reval.traverse(obj.getRight(), null);
-      if (RangeValue.isEqual(left, right)) {
+      if (left.getValues().equals(right.getValues())) {
         return Unsure.True;
-      } else if (RangeValue.doOverlap(left, right)) {
-        return Unsure.DontKnow;
+      } else if (!NumberSet.intersection(left.getValues(), right.getValues()).isEmpty()) {
+        return Unsure.DontKnow; // they overlap
       } else {
         return Unsure.False;
       }
@@ -116,10 +118,10 @@ public class ExprStaticBoolEval extends NullTraverser<Unsure, Map<Expression, Un
       assert (!isBool(obj.getRight()));
       RangeValue left = reval.traverse(obj.getLeft(), null);
       RangeValue right = reval.traverse(obj.getRight(), null);
-      if (RangeValue.isEqual(left, right)) {
+      if (left.getValues().equals(right.getValues())) {
         return Unsure.False;
-      } else if (RangeValue.doOverlap(left, right)) {
-        return Unsure.DontKnow;
+      } else if (!NumberSet.intersection(left.getValues(), right.getValues()).isEmpty()) {
+        return Unsure.DontKnow; // they overlap
       } else {
         return Unsure.True;
       }
@@ -132,20 +134,20 @@ public class ExprStaticBoolEval extends NullTraverser<Unsure, Map<Expression, Un
   }
 
   private Unsure evalGreater(RangeValue left, RangeValue right) {
-    if (left.getHigh().compareTo(right.getLow()) <= 0) {
+    if (left.getValues().getHigh().compareTo(right.getValues().getLow()) <= 0) {
       return Unsure.False; // TODO check borders
     }
-    if (left.getLow().compareTo(right.getHigh()) > 0) {
+    if (left.getValues().getLow().compareTo(right.getValues().getHigh()) > 0) {
       return Unsure.True; // TODO check borders
     }
     return Unsure.DontKnow;
   }
 
   private Unsure evalGreaterEqual(RangeValue left, RangeValue right) {
-    if (left.getHigh().compareTo(right.getLow()) < 0) {
+    if (left.getValues().getHigh().compareTo(right.getValues().getLow()) < 0) {
       return Unsure.False; // TODO check borders
     }
-    if (left.getLow().compareTo(right.getHigh()) >= 0) {
+    if (left.getValues().getLow().compareTo(right.getValues().getHigh()) >= 0) {
       return Unsure.True; // TODO check borders
     }
     return Unsure.DontKnow;
@@ -206,12 +208,12 @@ class ExprStaticRangeEval extends NullTraverser<RangeValue, Void> {
     Type type = getType(obj);
     assert (type instanceof NumSet);
     NumSet ns = (NumSet) type;
-    return new RangeValue(obj.getInfo(), ns.getNumbers().getLow(), ns.getNumbers().getHigh());
+    return new RangeValue(obj.getInfo(), ns.getNumbers());
   }
 
   @Override
   protected RangeValue visitNumber(Number obj, Void param) {
-    return new RangeValue(obj.getInfo(), obj.getValue(), obj.getValue());
+    return new RangeValue(obj.getInfo(), new NumberSet( new Range(obj.getValue(), obj.getValue())));
   }
 
 }

@@ -10,6 +10,7 @@ import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
 import evl.expression.Expression;
 import evl.expression.Number;
+import evl.expression.RangeValue;
 import evl.expression.StringValue;
 import evl.expression.binop.And;
 import evl.expression.binop.BinaryExp;
@@ -185,6 +186,11 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
 
   @Override
   protected Expression visitNumber(Number obj, T param) {
+    return obj;
+  }
+
+  @Override
+  protected Expression visitRangeValue(RangeValue obj, T param) {
     return obj;
   }
 

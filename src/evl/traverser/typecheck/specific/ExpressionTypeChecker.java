@@ -1,8 +1,10 @@
 package evl.traverser.typecheck.specific;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 
 import util.NumberSet;
@@ -195,7 +197,7 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
         BigInteger high = left.getHigh().subtract(right.getLow());
         return new Range(low, high);
       }
-    }, new NumberSet(BigInteger.ZERO, BigInteger.ZERO), ((NumSet) type).getNumbers());
+    }, new NumberSet(new Range(BigInteger.ZERO, BigInteger.ZERO)), ((NumSet) type).getNumbers());
 
     return kbi.getNumsetType(ret.getRanges());
   }
@@ -429,12 +431,14 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
   @Override
   protected Type visitNumber(Number obj, Void param) {
     BigInteger value = obj.getValue();
-    return kbi.getRangeType(value, value);
+    List<Range> rlist = new ArrayList<Range>();
+    rlist.add(new Range(value, value));
+    return kbi.getNumsetType(rlist);
   }
 
   @Override
   protected Type visitRangeValue(RangeValue obj, Void param) {
-    return kbi.getRangeType(obj.getLow(), obj.getHigh());
+    return kbi.getNumsetType(obj.getValues().getRanges());
   }
 
   @Override

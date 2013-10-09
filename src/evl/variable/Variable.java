@@ -6,7 +6,7 @@ import evl.EvlBase;
 import evl.other.Named;
 import evl.type.TypeRef;
 
-abstract public class Variable extends EvlBase implements Named {
+abstract public class Variable extends EvlBase implements Named, Comparable<Variable> {
   private String name;
   private TypeRef type;
 
@@ -39,4 +39,11 @@ abstract public class Variable extends EvlBase implements Named {
   public String toString() {
     return name.toString() + ":" + type.getRef().getName();
   }
+
+  @Override
+  public int compareTo(Variable o) {
+    return getName().compareTo(o.getName());
+  }
+  
+  
 }

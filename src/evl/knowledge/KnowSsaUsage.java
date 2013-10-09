@@ -1,9 +1,9 @@
 package evl.knowledge;
 
+import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import evl.DefTraverser;
 import evl.expression.reference.Reference;
@@ -13,18 +13,18 @@ import evl.variable.SsaVariable;
 public class KnowSsaUsage extends KnowledgeEntry {
 
   private KnowledgeBase kb;
-  final private Map<SsaVariable, Set<Statement>> use = new HashMap<SsaVariable, Set<Statement>>();
+  final private Map<SsaVariable, List<Statement>> use = new HashMap<SsaVariable, List<Statement>>();
 
   @Override
   public void init(KnowledgeBase base) {
     kb = base;
   }
 
-  public Set<Statement> get(SsaVariable var) {
-    if( !use.containsKey(var) ) {
+  public List<Statement> get(SsaVariable var) {
+    if (!use.containsKey(var)) {
       update();
     }
-    assert ( use.containsKey(var) );
+    assert (use.containsKey(var));
     return use.get(var);
   }
 
@@ -37,24 +37,24 @@ public class KnowSsaUsage extends KnowledgeEntry {
 
 class UseGetter extends DefTraverser<Void, Statement> {
 
-  final private Map<SsaVariable, Set<Statement>> use;
+  final private Map<SsaVariable, List<Statement>> use;
 
-  public UseGetter(Map<SsaVariable, Set<Statement>> use) {
+  public UseGetter(Map<SsaVariable, List<Statement>> use) {
     super();
     this.use = use;
   }
 
   @Override
   protected Void visitStatement(Statement obj, Statement param) {
-    assert ( param == null );
+    assert (param == null);
     return super.visitStatement(obj, obj);
   }
 
   @Override
   protected Void visitSsaVariable(SsaVariable obj, Statement param) {
-    Set<Statement> stmts = use.get(obj);
-    if( stmts == null ) {
-      stmts = new HashSet<Statement>();
+    List<Statement> stmts = use.get(obj);
+    if (stmts == null) {
+      stmts = new ArrayList<Statement>();
       use.put(obj, stmts);
     }
     return null;
@@ -62,15 +62,17 @@ class UseGetter extends DefTraverser<Void, Statement> {
 
   @Override
   protected Void visitReference(Reference obj, Statement param) {
-    if( (obj.getLink() instanceof SsaVariable) && (param != null) ) {  // could be from a transition
-      assert ( param != null );
+    if ((obj.getLink() instanceof SsaVariable) && (param != null)) { // could be from a transition
+      assert (param != null);
       SsaVariable var = (SsaVariable) obj.getLink();
-      Set<Statement> stmts = use.get(var);
-      if( stmts == null ) {
-        stmts = new HashSet<Statement>();
+      List<Statement> stmts = use.get(var);
+      if (stmts == null) {
+        stmts = new ArrayList<Statement>();
         use.put(var, stmts);
       }
-      stmts.add(param);
+      if (!stmts.contains(param)) {
+        stmts.add(param);
+      }
     }
     super.visitReference(obj, param);
     return null;

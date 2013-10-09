@@ -283,6 +283,16 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  public void range2() {
+    compile("range2", TestSteps.COMPILE_TO_LLVM, false, true);
+  }
+
+  @Test
+  public void range3() {
+    compile("range3", TestSteps.COMPILE_TO_LLVM, false, true);
+  }
+
+  @Test
   public void linking() {
     compile("linking", "Linking", true, false, false);
   }

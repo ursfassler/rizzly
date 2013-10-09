@@ -1,6 +1,5 @@
 package evl.type.base;
 
-import java.math.BigInteger;
 import java.util.Collection;
 
 import util.NumberSet;
@@ -21,15 +20,15 @@ public class NumSet extends BaseType {
     this.ranges = new NumberSet(ranges);
   }
 
-  public NumSet(BigInteger low, BigInteger high) {
-    super(new ElementInfo(), makeName(low, high));
-    this.ranges = new NumberSet(low, high);
+  public NumSet(Range range) {
+    super(new ElementInfo(), makeName(range));
+    this.ranges = new NumberSet(range);
   }
 
   public static String makeName(Collection<Range> ranges) {
     if (ranges.size() == 1) {
       Range r = ranges.iterator().next();
-      return makeName(r.getLow(), r.getHigh());
+      return makeName(r);
     }
     String ret = "NumSet{";
     boolean first = true;
@@ -45,8 +44,8 @@ public class NumSet extends BaseType {
     return ret;
   }
 
-  public static String makeName(BigInteger low, BigInteger high) {
-    return "R{" + low + "," + high + "}";
+  public static String makeName(Range range) {
+    return "R{" + range.getLow() + "," + range.getHigh() + "}";
   }
 
   public NumberSet getNumbers() {
