@@ -52,6 +52,11 @@ public class ExprStaticBoolEval extends NullTraverser<Unsure, Map<Expression, Un
     return type instanceof BooleanType;
   }
 
+  private boolean isRange(Expression expr) {
+    Type type = ExpressionTypeChecker.process(expr, kb); // TODO replace with a type getter function (not so bloated)
+    return type instanceof NumSet;
+  }
+
   @Override
   protected Unsure visitDefault(Evl obj, Map<Expression, Unsure> param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
@@ -93,8 +98,8 @@ public class ExprStaticBoolEval extends NullTraverser<Unsure, Map<Expression, Un
       Unsure left = visit(obj.getLeft(), param);
       Unsure right = visit(obj.getRight(), param);
       return Unsure.equal(left, right);
-    } else {
-      assert (!isBool(obj.getRight()));
+    } else if( isRange(obj.getLeft()) ) {
+      assert (isRange(obj.getRight()));
       RangeValue left = reval.traverse(obj.getLeft(), null);
       RangeValue right = reval.traverse(obj.getRight(), null);
       if (left.getValues().equals(right.getValues())) {
@@ -104,6 +109,8 @@ public class ExprStaticBoolEval extends NullTraverser<Unsure, Map<Expression, Un
       } else {
         return Unsure.False;
       }
+    } else {
+      return Unsure.DontKnow; //TODO make it smarter
     }
   }
 
@@ -114,8 +121,8 @@ public class ExprStaticBoolEval extends NullTraverser<Unsure, Map<Expression, Un
       Unsure left = visit(obj.getLeft(), param);
       Unsure right = visit(obj.getRight(), param);
       return Unsure.notequal(left, right);
-    } else {
-      assert (!isBool(obj.getRight()));
+    } else if( isRange(obj.getLeft()) ) {
+      assert (isRange(obj.getRight()));
       RangeValue left = reval.traverse(obj.getLeft(), null);
       RangeValue right = reval.traverse(obj.getRight(), null);
       if (left.getValues().equals(right.getValues())) {
@@ -125,6 +132,8 @@ public class ExprStaticBoolEval extends NullTraverser<Unsure, Map<Expression, Un
       } else {
         return Unsure.True;
       }
+    } else {
+      return Unsure.DontKnow; //TODO make it smarter
     }
   }
 

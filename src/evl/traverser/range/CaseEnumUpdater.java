@@ -1,6 +1,5 @@
 package evl.traverser.range;
 
-import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -45,9 +44,7 @@ public class CaseEnumUpdater extends NullTraverser<Void, Map<Variable, Range>> {
   private EnumType getType() {
     assert ( types.size() == 1 );
     EnumType type = types.iterator().next();
-    ArrayList<EnumElement> sorted = new ArrayList<EnumElement>(type.getElement());
-    sorted.retainAll(elements);
-    return kbi.getEnumType(type, sorted);
+    return kbi.getEnumType(type, elements);
   }
 
   @Override

@@ -2,7 +2,6 @@ package pir.passes;
 
 import java.util.List;
 
-import pir.cfg.BasicBlock;
 import pir.other.PirValue;
 import pir.other.Program;
 import pir.statement.normal.NormalStmt;
@@ -10,7 +9,6 @@ import pir.statement.normal.convert.SignExtendValue;
 import pir.statement.normal.convert.TruncValue;
 import pir.statement.normal.convert.TypeCast;
 import pir.statement.normal.convert.ZeroExtendValue;
-import pir.statement.phi.PhiStmt;
 import pir.traverser.StatementReplacer;
 import pir.type.IntType;
 import pir.type.SignedType;

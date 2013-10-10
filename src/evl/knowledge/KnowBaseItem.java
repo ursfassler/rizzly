@@ -1,6 +1,8 @@
 package evl.knowledge;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import util.Range;
@@ -56,15 +58,6 @@ public class KnowBaseItem extends KnowledgeEntry {
       return null;
     }
     return (T) item;
-  }
-
-  public <T extends Type> T getRegistredType(T type) {
-    T ret = (T) findItem(type.getName());
-    if (ret == null) {
-      ret = type;
-      addItem(ret);
-    }
-    return ret;
   }
 
   public VoidType getVoidType() {
@@ -170,18 +163,21 @@ public class KnowBaseItem extends KnowledgeEntry {
     return ret;
   }
 
-  public EnumType getEnumType(EnumType supertype, List<EnumElement> elements) {
+  public EnumType getEnumType(EnumType supertype, Collection<EnumElement> elements) {
+    ArrayList<EnumElement> subelem = new ArrayList<EnumElement>(supertype.getElement());
+    subelem.retainAll(elements);
+    
     KnowPath kp = kb.getEntry(KnowPath.class);
     Designator path = kp.get(supertype);
     Namespace parent = kb.getRoot().forceChildPath(path.toList());
     assert (parent.find(supertype.getName()) != null);
 
-    String subName = supertype.makeSubtypeName(elements);
+    String subName = supertype.makeSubtypeName(subelem);
 
     EnumType type = (EnumType) parent.find(subName);
 
     if (type == null) {
-      type = new EnumType(new ElementInfo(), subName, elements);
+      type = new EnumType(new ElementInfo(), subName, subelem);
       parent.add(type);
     }
 

@@ -75,6 +75,8 @@ public class MainPir {
     VarPropagator.process(prog);
     ConstPropagator.process(prog);
 
+    LlvmWriter.print(prog, debugdir + "propa.ll", true);
+    
     { // remove unused statements
       HashMap<SsaVariable, Statement> owner = OwnerMap.make(prog);
       SimpleGraph<PirObject> g = DependencyGraphMaker.make(prog, owner);

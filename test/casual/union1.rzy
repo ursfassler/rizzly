@@ -1,5 +1,8 @@
 type
-  Uni = Union( R{0,255}, R{0,65535} );
+  Uni = Union( what )
+    byte  : R{0,255};
+    word  : R{0,65535};
+  end
 
 interface
   Data
@@ -20,21 +23,21 @@ component
       data : Uni;
 
     function in.setByte( value: R{0,255} )
-      data := value;
+      data.byte := value;
     end
     
     function in.getByte:R{0,255}
-      // if data is R{0,255} then ...
-      return data as R{0,255};
+      return data.byte;
     end
     
     function in.setWord( value: R{0,65535} )
-      data := value;
+      data.word := value;
     end
     
     function in.getWord:R{0,65535}
-      return data as R{0,65535};
+      return data.word;
     end
 
   end
+
 

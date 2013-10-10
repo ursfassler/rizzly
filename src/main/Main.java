@@ -121,8 +121,9 @@ public class Main {
       printCHeader(outdir, head,debugNames);
     }
     
+    evl.doc.PrettyPrinter.print(prg, debugdir + "benum.rzy", true);
     EnumReduction.process( prg, debugdir );
-
+    
     evl.doc.PrettyPrinter.print(prg, debugdir + "beforePir.rzy", true);
     Program prog = (Program) evl.traverser.ToPir.process(prg, debugdir);
     MainPir.doPir(prog, debugdir);

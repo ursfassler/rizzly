@@ -480,7 +480,8 @@ public class ToPir extends NullTraverser<PirObject, Void> {
         low = null;
         high = null;
       }
-      list.add(new Range(low, high));
+      Range range = new Range(low, high);
+      list.add(range);
     }
     return new pir.statement.bbend.CaseGotoOpt(new NumberSet(list), (pir.cfg.BasicBlock) visit(obj.getDst(), null));
   }
