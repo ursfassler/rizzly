@@ -243,7 +243,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitCaseGotoOpt(CaseGotoOpt obj, P param) {
-    visit(obj.getDst(),param);
     return null;
   }
 

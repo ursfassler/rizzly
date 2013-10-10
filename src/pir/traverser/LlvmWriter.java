@@ -913,23 +913,28 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     visit(obj.getCondition(), param);
     param.wr(", label ");
     param.wr("%" + obj.getOtherwise().getName());
-    param.wr(" [ ");
-    visitList(obj.getOption(), param);
+    param.wr(" [");
+    param.nl();
+    param.incIndent();
+    for (CaseGotoOpt opt : obj.getOption()) {
+      wrOpt(opt, obj.getCondition().getType(), param);
+    }
+    param.decIndent();
     param.wr("]");
     param.nl();
 
     return null;
   }
 
-  @Override
-  protected Void visitCaseGotoOpt(CaseGotoOpt obj, StreamWriter param) {
+  protected void wrOpt(CaseGotoOpt obj, TypeRef type, StreamWriter param) {
     for (BigInteger val : obj.getValue()) {
+      visit(type, param);
+      param.wr(" ");
       param.wr(val.toString());
       param.wr(", label ");
       param.wr("%" + obj.getDst().getName());
-      param.wr(" ");
+      param.nl();
     }
-    return null;
   }
 
   @Override

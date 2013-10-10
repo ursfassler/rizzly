@@ -19,6 +19,7 @@ import evl.cfg.BasicBlock;
 import evl.cfg.BasicBlockList;
 import evl.expression.reference.Reference;
 import evl.knowledge.KnowBaseItem;
+import evl.knowledge.KnowParent;
 import evl.knowledge.KnowSsaUsage;
 import evl.knowledge.KnowledgeBase;
 import evl.statement.Statement;
@@ -76,6 +77,7 @@ class Narrower extends DefTraverser<Void, Void> {
   final private KnowledgeBase kb;
   final private KnowBaseItem kbi;
   final private KnowSsaUsage ksu;
+  final private KnowParent kp;
   final private StmtUpdater su;
 
   public Narrower(KnowledgeBase kb) {
@@ -83,6 +85,7 @@ class Narrower extends DefTraverser<Void, Void> {
     this.kb = kb;
     ksu = kb.getEntry(KnowSsaUsage.class);
     kbi = kb.getEntry(KnowBaseItem.class);
+    kp = kb.getEntry(KnowParent.class);
     su = new StmtUpdater(kb);
   }
 
@@ -148,6 +151,7 @@ class Narrower extends DefTraverser<Void, Void> {
       Collections.sort(keys);
       for (SsaVariable var : keys) {
         NumSet newType = ranges.get(var);
+        newType = kbi.getNumsetType(newType.getNumbers().getRanges());
         replace(obj.getThenBlock(), var, newType);
       }
     }
@@ -157,6 +161,7 @@ class Narrower extends DefTraverser<Void, Void> {
       Collections.sort(keys);
       for (SsaVariable var : keys) {
         NumSet newType = ranges.get(var);
+        newType = kbi.getNumsetType(newType.getNumbers().getRanges());
         replace(obj.getElseBlock(), var, newType);
       }
     }
@@ -164,7 +169,7 @@ class Narrower extends DefTraverser<Void, Void> {
   }
 
   private void replace(BasicBlock startBb, SsaVariable var, Type newType) {
-    newType = kbi.getRegistredType(newType);
+    assert(kp.getParent(newType) != null );
     assert (startBb.getPhi().isEmpty()); // if not true, we have to find a solution :(
     SsaVariable newVar = new SsaVariable(var.getInfo(), NameFactory.getNew(), new TypeRef(new ElementInfo(), newType));
     TypeCast initExpr = new TypeCast(var.getInfo(), newVar, new TypeRef(new ElementInfo(), newType), new Reference(startBb.getInfo(), var));

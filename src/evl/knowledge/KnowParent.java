@@ -7,6 +7,7 @@ import error.ErrorType;
 import error.RError;
 import evl.DefTraverser;
 import evl.Evl;
+import evl.type.base.EnumElement;
 
 /**
  * Knows the parent of most objects
@@ -52,8 +53,10 @@ class KnowParentTraverser extends DefTraverser<Void, Evl> {
   protected Void visit(Evl obj, Evl param) {
     assert (obj != param);
     if (cache.containsKey(obj)) {
-      Evl oldparent = cache.get(obj);
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Same object (" + obj + ") found 2 times: " + oldparent + " and " + param);
+      if (!(obj instanceof EnumElement)) {  //FIXME remove this hack (new enum type system?)
+        Evl oldparent = cache.get(obj);
+        RError.err(ErrorType.Fatal, obj.getInfo(), "Same object (" + obj + ") found 2 times: " + oldparent + " and " + param);
+      }
     }
     cache.put(obj, param);
     return super.visit(obj, obj);

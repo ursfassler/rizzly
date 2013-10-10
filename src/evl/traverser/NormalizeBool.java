@@ -147,6 +147,11 @@ class Inverter extends NullTraverser<Expression, Void> {
   }
 
   @Override
+  protected Expression visitNotequal(Notequal obj, Void param) {
+    return new Equal(obj.getInfo(), obj.getLeft(), obj.getRight());
+  }
+
+  @Override
   protected Expression visitGreater(Greater obj, Void param) {
     return new Lessequal(obj.getInfo(), obj.getLeft(), obj.getRight());
   }
