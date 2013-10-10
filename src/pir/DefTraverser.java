@@ -35,18 +35,22 @@ import pir.statement.normal.GetElementPtr;
 import pir.statement.normal.LoadStmt;
 import pir.statement.normal.StackMemoryAlloc;
 import pir.statement.normal.StoreStmt;
-import pir.statement.normal.binop.And;
+import pir.statement.normal.binop.BitAnd;
 import pir.statement.normal.binop.Div;
 import pir.statement.normal.binop.Equal;
 import pir.statement.normal.binop.Greater;
 import pir.statement.normal.binop.Greaterequal;
 import pir.statement.normal.binop.Less;
 import pir.statement.normal.binop.Lessequal;
+import pir.statement.normal.binop.LogicAnd;
+import pir.statement.normal.binop.LogicOr;
+import pir.statement.normal.binop.LogicXand;
+import pir.statement.normal.binop.LogicXor;
 import pir.statement.normal.binop.Minus;
 import pir.statement.normal.binop.Mod;
 import pir.statement.normal.binop.Mul;
 import pir.statement.normal.binop.Notequal;
-import pir.statement.normal.binop.Or;
+import pir.statement.normal.binop.BitOr;
 import pir.statement.normal.binop.Plus;
 import pir.statement.normal.binop.Shl;
 import pir.statement.normal.binop.Shr;
@@ -434,7 +438,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitAnd(And obj, P param) {
+  protected R visitAnd(BitAnd obj, P param) {
     visit(obj.getVariable(), param);
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
@@ -442,7 +446,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitOr(Or obj, P param) {
+  protected R visitOr(BitOr obj, P param) {
     visit(obj.getVariable(), param);
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
@@ -524,6 +528,38 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   protected R visitUminus(Uminus obj, P param) {
     visit(obj.getVariable(), param);
     visit(obj.getExpr(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitLogicAnd(LogicAnd obj, P param) {
+    visit(obj.getVariable(), param);
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitLogicOr(LogicOr obj, P param) {
+    visit(obj.getVariable(), param);
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitLogicXand(LogicXand obj, P param) {
+    visit(obj.getVariable(), param);
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitLogicXor(LogicXor obj, P param) {
+    visit(obj.getVariable(), param);
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
     return null;
   }
 }

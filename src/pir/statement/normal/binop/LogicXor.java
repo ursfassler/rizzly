@@ -7,14 +7,14 @@ import pir.other.SsaVariable;
  *
  * @author urs
  */
-public class Or extends Arithmetic {
+public class LogicXor extends Logical {
 
-  public Or(SsaVariable variable, PirValue left, PirValue right) {
+  public LogicXor(SsaVariable variable, PirValue left, PirValue right) {
     super(variable, left, right);
   }
 
   @Override
   public String getOpName() {
-    return "or";
+    return "=";
   }
 }

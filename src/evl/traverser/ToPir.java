@@ -358,7 +358,7 @@ public class ToPir extends NullTraverser<PirObject, Void> {
   protected PirObject visitNumSet(NumSet obj, Void param) {
     // TODO also implement numset in pir
     if (obj.getNumbers().isEmpty()) {
-      return kbi.getRangeType(BigInteger.ZERO,BigInteger.ZERO);  //FIXME should it be reachable?
+      return kbi.getRangeType(BigInteger.ZERO, BigInteger.ZERO); // FIXME should it be reachable?
     } else {
       pir.type.RangeType ret = kbi.getRangeType(obj.getNumbers().getLow(), obj.getNumbers().getHigh());
       return ret;
@@ -713,7 +713,14 @@ class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, pir.other
     // TODO do not use VarRef for composite types but already use getElementPtr (maybe)
     PirValue left = (PirValue) converter.visit(obj.getLeft(), null);
     PirValue right = (PirValue) converter.visit(obj.getRight(), null);
-    return new pir.statement.normal.binop.And(param, left, right);
+    if (left.getType().getRef() instanceof pir.type.BooleanType) {
+      assert (right.getType().getRef() instanceof pir.type.BooleanType);
+      return new pir.statement.normal.binop.LogicAnd(param, left, right);
+    } else {
+      assert (left.getType().getRef() instanceof pir.type.RangeType);
+      assert (right.getType().getRef() instanceof pir.type.RangeType);
+      return new pir.statement.normal.binop.BitAnd(param, left, right);
+    }
   }
 
   @Override
@@ -753,7 +760,14 @@ class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, pir.other
     // TODO do not use VarRef for composite types but already use getElementPtr (maybe)
     PirValue left = (PirValue) converter.visit(obj.getLeft(), null);
     PirValue right = (PirValue) converter.visit(obj.getRight(), null);
-    return new pir.statement.normal.binop.Or(param, left, right);
+    if (left.getType().getRef() instanceof pir.type.BooleanType) {
+      assert (right.getType().getRef() instanceof pir.type.BooleanType);
+      return new pir.statement.normal.binop.LogicOr(param, left, right);
+    } else {
+      assert (left.getType().getRef() instanceof pir.type.RangeType);
+      assert (right.getType().getRef() instanceof pir.type.RangeType);
+      return new pir.statement.normal.binop.BitOr(param, left, right);
+    }
   }
 
   @Override
@@ -785,7 +799,14 @@ class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, pir.other
     // TODO do not use VarRef for composite types but already use getElementPtr (maybe)
     PirValue left = (PirValue) converter.visit(obj.getLeft(), null);
     PirValue right = (PirValue) converter.visit(obj.getRight(), null);
-    return new pir.statement.normal.binop.Equal(param, left, right);
+    if (left.getType().getRef() instanceof pir.type.BooleanType) {
+      assert (right.getType().getRef() instanceof pir.type.BooleanType);
+      return new pir.statement.normal.binop.LogicXand(param, left, right);
+    } else {
+      assert (left.getType().getRef() instanceof pir.type.RangeType);
+      assert (right.getType().getRef() instanceof pir.type.RangeType);
+      return new pir.statement.normal.binop.Equal(param, left, right);
+    }
   }
 
   @Override
@@ -801,7 +822,14 @@ class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, pir.other
     // TODO do not use VarRef for composite types but already use getElementPtr (maybe)
     PirValue left = (PirValue) converter.visit(obj.getLeft(), null);
     PirValue right = (PirValue) converter.visit(obj.getRight(), null);
-    return new pir.statement.normal.binop.Notequal(param, left, right);
+    if (left.getType().getRef() instanceof pir.type.BooleanType) {
+      assert (right.getType().getRef() instanceof pir.type.BooleanType);
+      return new pir.statement.normal.binop.LogicXor(param, left, right);
+    } else {
+      assert (left.getType().getRef() instanceof pir.type.RangeType);
+      assert (right.getType().getRef() instanceof pir.type.RangeType);
+      return new pir.statement.normal.binop.Notequal(param, left, right);
+    }
   }
 
   @Override

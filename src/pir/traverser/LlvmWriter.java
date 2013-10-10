@@ -48,13 +48,18 @@ import pir.statement.normal.StackMemoryAlloc;
 import pir.statement.normal.StmtSignes;
 import pir.statement.normal.StoreStmt;
 import pir.statement.normal.VariableGeneratorStmt;
-import pir.statement.normal.binop.And;
+import pir.statement.normal.binop.BinaryOp;
+import pir.statement.normal.binop.BitAnd;
 import pir.statement.normal.binop.Div;
 import pir.statement.normal.binop.Equal;
 import pir.statement.normal.binop.Greater;
 import pir.statement.normal.binop.Greaterequal;
 import pir.statement.normal.binop.Less;
 import pir.statement.normal.binop.Lessequal;
+import pir.statement.normal.binop.LogicAnd;
+import pir.statement.normal.binop.LogicOr;
+import pir.statement.normal.binop.LogicXand;
+import pir.statement.normal.binop.LogicXor;
 import pir.statement.normal.binop.Minus;
 import pir.statement.normal.binop.Mod;
 import pir.statement.normal.binop.Mul;
@@ -655,8 +660,7 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     return null;
   }
 
-  @Override
-  protected Void visitAnd(And obj, StreamWriter param) {
+  private void emitAnd(BinaryOp obj, StreamWriter param) {
     wrVarDef(obj, param);
     param.wr("and ");
     visit(obj.getVariable().getType(), param);
@@ -665,6 +669,17 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     param.wr(", ");
     visit(obj.getRight(), param);
     param.nl();
+  }
+
+  @Override
+  protected Void visitAnd(BitAnd obj, StreamWriter param) {
+    emitAnd(obj, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitLogicAnd(LogicAnd obj, StreamWriter param) {
+    emitAnd(obj, param);
     return null;
   }
 
@@ -759,6 +774,21 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     visit(obj.getRight(), param);
     param.nl();
     return null;
+  }
+
+  @Override
+  protected Void visitLogicOr(LogicOr obj, StreamWriter param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Void visitLogicXand(LogicXand obj, StreamWriter param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Void visitLogicXor(LogicXor obj, StreamWriter param) {
+    throw new RuntimeException("not yet implemented");
   }
 
   @Override

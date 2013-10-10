@@ -11,7 +11,6 @@ abstract public class BinaryOp extends NormalStmt implements VariableGeneratorSt
   private SsaVariable variable;
   private PirValue left;
   private PirValue right;
-  private StmtSignes signes = StmtSignes.unknown;
 
   public BinaryOp(SsaVariable variable, PirValue left, PirValue right) {
     this.variable = variable;
@@ -47,16 +46,4 @@ abstract public class BinaryOp extends NormalStmt implements VariableGeneratorSt
     this.right = right;
   }
 
-  public StmtSignes getSignes() {
-    return signes;
-  }
-
-  public void setSignes(StmtSignes signes) {
-    this.signes = signes;
-  }
-
-  @Override
-  public String toString() {
-    return super.toString() + " := " + signes + " " + left.toString() + " " + getOpName() + " " + right.toString();
-  }
 }
