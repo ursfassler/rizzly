@@ -21,8 +21,6 @@ import pir.other.SsaVariable;
 import pir.other.StateVariable;
 import pir.statement.bbend.CaseGoto;
 import pir.statement.bbend.CaseGotoOpt;
-import pir.statement.bbend.CaseOptRange;
-import pir.statement.bbend.CaseOptValue;
 import pir.statement.bbend.Goto;
 import pir.statement.bbend.IfGoto;
 import pir.statement.bbend.ReturnExpr;
@@ -36,6 +34,7 @@ import pir.statement.normal.LoadStmt;
 import pir.statement.normal.StackMemoryAlloc;
 import pir.statement.normal.StoreStmt;
 import pir.statement.normal.binop.BitAnd;
+import pir.statement.normal.binop.BitOr;
 import pir.statement.normal.binop.Div;
 import pir.statement.normal.binop.Equal;
 import pir.statement.normal.binop.Greater;
@@ -50,7 +49,6 @@ import pir.statement.normal.binop.Minus;
 import pir.statement.normal.binop.Mod;
 import pir.statement.normal.binop.Mul;
 import pir.statement.normal.binop.Notequal;
-import pir.statement.normal.binop.BitOr;
 import pir.statement.normal.binop.Plus;
 import pir.statement.normal.binop.Shl;
 import pir.statement.normal.binop.Shr;
@@ -301,16 +299,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitNoSignType(NoSignType obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitCaseOptValue(CaseOptValue obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitCaseOptRange(CaseOptRange obj, P param) {
     return doDefault(obj, param);
   }
 

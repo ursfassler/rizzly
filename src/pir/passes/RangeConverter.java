@@ -6,6 +6,7 @@ import java.util.List;
 
 import pir.NullTraverser;
 import pir.PirObject;
+import pir.cfg.BasicBlock;
 import pir.expression.Number;
 import pir.expression.reference.VarRefSimple;
 import pir.know.KnowBaseItem;
@@ -71,7 +72,7 @@ public class RangeConverter extends StatementReplacer<Void> {
 
     ret.add(obj);
 
-    if( RangeType.isBigger(bt, dt) ) {
+    if (RangeType.isBigger(bt, dt)) {
       SsaVariable irv = new SsaVariable(NameFactory.getNew(), new TypeRef(bt));
       TypeCast rex = new TypeCast(obj.getVariable(), new VarRefSimple(irv));
       obj.setVariable(irv);
@@ -98,20 +99,20 @@ public class RangeConverter extends StatementReplacer<Void> {
   }
 
   private boolean isNotRange(Type t1, Type t2) {
-    if( !( t1 instanceof RangeType ) ) {
-      //TODO implement it nicer
-      assert ( t1 == t2 );
+    if (!(t1 instanceof RangeType)) {
+      // TODO implement it nicer
+      assert (t1 == t2);
       return true;
     } else {
-      assert ( t2 instanceof RangeType );
+      assert (t2 instanceof RangeType);
     }
     return false;
   }
 
   private PirValue replaceIfNeeded(PirValue val, RangeType valType, RangeType commonType, List<NormalStmt> ret) {
-    if( RangeType.isBigger(commonType, valType) ) {
-      if( val instanceof Number ) { // a number is of any type
-        ( (Number) val ).setType(new TypeRef(commonType));
+    if (RangeType.isBigger(commonType, valType)) {
+      if (val instanceof Number) { // a number is of any type
+        ((Number) val).setType(new TypeRef(commonType));
       } else {
         SsaVariable lev = new SsaVariable(NameFactory.getNew(), new TypeRef(commonType));
         TypeCast lex = new TypeCast(lev, val);
@@ -124,7 +125,17 @@ public class RangeConverter extends StatementReplacer<Void> {
 
   @Override
   protected List<NormalStmt> visitPhiStmt(PhiStmt obj, Void param) {
-    return super.visitPhiStmt(obj, param); // TODO implement it
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected void visitPhiOption(PhiStmt phi, BasicBlock in, List<NormalStmt> stmts, Void param) {
+    PirValue val = phi.getArg(in);
+    Type vt = val.getType().getRef();
+    if (vt instanceof RangeType) {
+      PirValue nv = replaceIfNeeded(val, (RangeType) vt, (RangeType) phi.getVariable().getType().getRef(), stmts);
+      phi.addArg(in, nv);
+    }
   }
 
   @Override
@@ -138,16 +149,16 @@ public class RangeConverter extends StatementReplacer<Void> {
     {
       Type st = obj.getRef().getRetType().getRef();
       Type dt = obj.getVariable().getType().getRef();
-      if( isNotRange(st, dt) ) {
+      if (isNotRange(st, dt)) {
         return ret;
       }
     }
     RangeType lt = (RangeType) obj.getRef().getRetType().getRef();
     RangeType dt = (RangeType) obj.getVariable().getType().getRef();
 
-    assert ( RangeType.isBigger(dt, lt) || RangeType.isEqual(dt, lt) );
+    assert (RangeType.isBigger(dt, lt) || RangeType.isEqual(dt, lt));
 
-    if( RangeType.isBigger(dt, dt) ) {
+    if (RangeType.isBigger(dt, dt)) {
       SsaVariable irv = new SsaVariable(NameFactory.getNew(), new TypeRef(dt));
       TypeCast rex = new TypeCast(obj.getVariable(), new VarRefSimple(irv));
       obj.setVariable(irv);
@@ -169,24 +180,24 @@ public class RangeConverter extends StatementReplacer<Void> {
   }
 
   private List<NormalStmt> checkArg(List<SsaVariable> argument, ArrayList<PirValue> parameter) {
-    assert ( argument.size() == parameter.size() );
+    assert (argument.size() == parameter.size());
 
     List<NormalStmt> ret = new ArrayList<NormalStmt>();
 
-    for( int i = 0; i < argument.size(); i++ ) {
+    for (int i = 0; i < argument.size(); i++) {
       PirValue actArg = parameter.get(i);
       SsaVariable defArg = argument.get(i);
 
       Type st = actArg.getType().getRef();
       Type pt = defArg.getType().getRef();
-      if( isNotRange(st, pt) ) {
+      if (isNotRange(st, pt)) {
         continue;
       }
 
       RangeType lt = (RangeType) st;
       RangeType dt = (RangeType) pt;
 
-      assert ( RangeType.isBigger(dt, lt) || RangeType.isEqual(dt, lt) );
+      assert (RangeType.isBigger(dt, lt) || RangeType.isEqual(dt, lt));
 
       actArg = replaceIfNeeded(actArg, lt, dt, ret);
       parameter.set(i, actArg);
@@ -200,7 +211,7 @@ public class RangeConverter extends StatementReplacer<Void> {
     {
       Type st = obj.getSrc().getType().getRef();
       Type dt = obj.getVariable().getType().getRef();
-      if( isNotRange(st, dt) ) {
+      if (isNotRange(st, dt)) {
         return null;
       }
     }
@@ -217,7 +228,7 @@ public class RangeConverter extends StatementReplacer<Void> {
 
     ret.add(obj);
 
-    if( RangeType.isBigger(bt, dt) ) {
+    if (RangeType.isBigger(bt, dt)) {
       SsaVariable irv = new SsaVariable(NameFactory.getNew(), new TypeRef(bt));
       TypeCast rex = new TypeCast(obj.getVariable(), new VarRefSimple(irv));
       obj.setVariable(irv);
@@ -231,9 +242,9 @@ public class RangeConverter extends StatementReplacer<Void> {
   protected List<NormalStmt> visitStoreStmt(StoreStmt obj, Void param) {
     Type st = obj.getSrc().getType().getRef();
     Type dt = obj.getDst().getType().getRef();
-    assert ( dt instanceof PointerType );
-    dt = ( (PointerType) dt ).getType().getRef();
-    if( isNotRange(st, dt) ) {
+    assert (dt instanceof PointerType);
+    dt = ((PointerType) dt).getType().getRef();
+    if (isNotRange(st, dt)) {
       return null;
     }
 
@@ -258,12 +269,12 @@ public class RangeConverter extends StatementReplacer<Void> {
 
     ChildType extender = new ChildType(ret);
     Type type = obj.getBase().getType().getRef();
-    for( int i = 0; i < obj.getOffset().size(); i++ ) {
+    for (int i = 0; i < obj.getOffset().size(); i++) {
       PirValue val = obj.getOffset().get(i);
-      if( type instanceof ArrayType ) {
+      if (type instanceof ArrayType) {
         // extend array indices. We need a big enough data type as index, otherwise strange things may happen.
         RangeType valType = (RangeType) val.getType().getRef();
-        RangeType arrType = (RangeType) ( (ArrayType) type ).getType().getRef();
+        RangeType arrType = (RangeType) ((ArrayType) type).getType().getRef();
         val = replaceIfNeeded(val, valType, arrType, ret);
         obj.getOffset().set(i, val);
       }
@@ -272,7 +283,7 @@ public class RangeConverter extends StatementReplacer<Void> {
 
     ret.add(obj);
     return ret;
-//    return super.visitGetElementPtr(obj, param);
+    // return super.visitGetElementPtr(obj, param);
   }
 }
 
@@ -296,26 +307,26 @@ class ChildType extends NullTraverser<Type, PirValue> {
 
   @Override
   protected Type visitPointerType(PointerType obj, PirValue param) {
-    assert ( param instanceof Number );
-    assert ( ( (Number) param ).getValue() == BigInteger.ZERO );
+    assert (param instanceof Number);
+    assert (((Number) param).getValue() == BigInteger.ZERO);
     return obj.getType().getRef();
   }
 
   @Override
   protected Type visitStructType(StructType obj, PirValue param) {
-    assert ( param instanceof Number );
-    int idx = ( (Number) param ).getValue().intValue();
-    assert ( idx >= 0 );
-    assert ( idx < obj.getElements().size() );
+    assert (param instanceof Number);
+    int idx = ((Number) param).getValue().intValue();
+    assert (idx >= 0);
+    assert (idx < obj.getElements().size());
     return obj.getElements().get(idx).getType().getRef();
   }
 
   @Override
   protected Type visitUnionType(UnionType obj, PirValue param) {
-    assert ( param instanceof Number );
-    int idx = ( (Number) param ).getValue().intValue();
-    assert ( idx >= 0 );
-    assert ( idx < obj.getElements().size() );
+    assert (param instanceof Number);
+    int idx = ((Number) param).getValue().intValue();
+    assert (idx >= 0);
+    assert (idx < obj.getElements().size());
     return obj.getElements().get(idx).getType().getRef();
   }
 }

@@ -27,9 +27,6 @@ import pir.statement.Statement;
 import pir.statement.bbend.BasicBlockEnd;
 import pir.statement.bbend.CaseGoto;
 import pir.statement.bbend.CaseGotoOpt;
-import pir.statement.bbend.CaseOptEntry;
-import pir.statement.bbend.CaseOptRange;
-import pir.statement.bbend.CaseOptValue;
 import pir.statement.bbend.Goto;
 import pir.statement.bbend.IfGoto;
 import pir.statement.bbend.Return;
@@ -132,18 +129,6 @@ abstract public class Traverser<R, P> {
       return visitTypeRef((TypeRef) obj, param);
     } else if (obj instanceof CaseGotoOpt) {
       return visitCaseGotoOpt((CaseGotoOpt) obj, param);
-    } else if (obj instanceof CaseOptEntry) {
-      return visitCaseOptEntry((CaseOptEntry) obj, param);
-    } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
-    }
-  }
-
-  protected R visitCaseOptEntry(CaseOptEntry obj, P param) {
-    if (obj instanceof CaseOptRange) {
-      return visitCaseOptRange((CaseOptRange) obj, param);
-    } else if (obj instanceof CaseOptValue) {
-      return visitCaseOptValue((CaseOptValue) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -406,10 +391,6 @@ abstract public class Traverser<R, P> {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
   }
-
-  protected abstract R visitCaseOptValue(CaseOptValue obj, P param);
-
-  protected abstract R visitCaseOptRange(CaseOptRange obj, P param);
 
   protected abstract R visitCaseGotoOpt(CaseGotoOpt obj, P param);
 

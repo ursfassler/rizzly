@@ -22,7 +22,6 @@ import pir.other.PirValue;
 import pir.other.Program;
 import pir.other.Variable;
 import pir.statement.bbend.BasicBlockEnd;
-import pir.statement.bbend.CaseOptEntry;
 import pir.statement.normal.CallAssignment;
 import pir.statement.normal.StoreStmt;
 import pir.statement.normal.VariableGeneratorStmt;
@@ -31,6 +30,8 @@ import pir.type.RangeType;
 import pir.type.StructType;
 import pir.type.TypeRef;
 import pir.type.UnionSelector;
+import util.NumberSet;
+import util.Range;
 import error.ErrorType;
 import error.RError;
 import evl.Evl;
@@ -425,19 +426,6 @@ public class ToPir extends NullTraverser<PirObject, Void> {
   }
 
   @Override
-  protected PirObject visitCaseOptRange(CaseOptRange obj, Void param) {
-    assert (obj.getStart() instanceof Number);
-    assert (obj.getEnd() instanceof Number);
-    return new pir.statement.bbend.CaseOptRange(((Number) obj.getStart()).getValue(), ((Number) obj.getEnd()).getValue());
-  }
-
-  @Override
-  protected PirObject visitCaseOptValue(CaseOptValue obj, Void param) {
-    assert (obj.getValue() instanceof Number);
-    return new pir.statement.bbend.CaseOptValue((pir.expression.Number) visit(obj.getValue(), null));
-  }
-
-  @Override
   protected PirObject visitPhiStmt(PhiStmt obj, Void param) {
     pir.statement.phi.PhiStmt ret = new pir.statement.phi.PhiStmt((pir.other.SsaVariable) visit(obj.getVariable(), null));
     for (BasicBlock in : obj.getInBB()) {
@@ -478,11 +466,23 @@ public class ToPir extends NullTraverser<PirObject, Void> {
 
   @Override
   protected PirObject visitCaseGotoOpt(CaseGotoOpt obj, Void param) {
-    List<CaseOptEntry> list = new ArrayList<CaseOptEntry>();
+    List<Range> list = new ArrayList<Range>();
     for (evl.statement.bbend.CaseOptEntry entry : obj.getValue()) {
-      list.add((CaseOptEntry) visit(entry, null));
+      BigInteger low, high;
+      if (entry instanceof CaseOptRange) {
+        low = ((Number) ((CaseOptRange) entry).getStart()).getValue();
+        high = ((Number) ((CaseOptRange) entry).getEnd()).getValue();
+      } else if (entry instanceof CaseOptValue) {
+        low = ((Number) ((CaseOptValue) entry).getValue()).getValue();
+        high = low;
+      } else {
+        RError.err(ErrorType.Fatal, obj.getInfo(), "not yet implemented " + entry.getClass().getCanonicalName());
+        low = null;
+        high = null;
+      }
+      list.add(new Range(low, high));
     }
-    return new pir.statement.bbend.CaseGotoOpt(list, (pir.cfg.BasicBlock) visit(obj.getDst(), null));
+    return new pir.statement.bbend.CaseGotoOpt(new NumberSet(list), (pir.cfg.BasicBlock) visit(obj.getDst(), null));
   }
 
   @Override

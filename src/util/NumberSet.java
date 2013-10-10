@@ -5,9 +5,10 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
 import java.util.List;
 
-public class NumberSet {
+public class NumberSet implements Iterable<BigInteger> {
   final private ArrayList<Range> ranges = new ArrayList<Range>();
 
   public NumberSet(Collection<Range> ranges) {
@@ -272,6 +273,53 @@ public class NumberSet {
     } else if (!ranges.equals(other.ranges))
       return false;
     return true;
+  }
+
+  @Override
+  public Iterator<BigInteger> iterator() {
+    return new ValItr(ranges);
+  }
+}
+
+class ValItr implements Iterator<BigInteger> {
+  private final ArrayList<Range> ranges;
+  private int idx;
+  private BigInteger next;
+
+  public ValItr(ArrayList<Range> ranges) {
+    this.ranges = ranges;
+    idx = 0;
+    if (!ranges.isEmpty()) {
+      next = ranges.get(0).getLow();
+    } else {
+      next = null;
+    }
+  }
+
+  @Override
+  public boolean hasNext() {
+    return next != null;
+  }
+
+  @Override
+  public BigInteger next() {
+    BigInteger ret = next;
+    next = next.add(BigInteger.ONE);
+    Range r = ranges.get(idx);
+    if (next.compareTo(r.getHigh()) > 0) {
+      idx++;
+      if (idx < ranges.size()) {
+        next = ranges.get(idx).getLow();
+      } else {
+        next = null;
+      }
+    }
+    return ret;
+  }
+
+  @Override
+  public void remove() {
+    throw new RuntimeException("not yet implemented");
   }
 
 }

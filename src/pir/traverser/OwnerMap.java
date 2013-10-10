@@ -1,5 +1,6 @@
 package pir.traverser;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
@@ -16,6 +17,14 @@ public class OwnerMap extends DefTraverser<Void, PirObject> {
   public static HashMap<SsaVariable, Statement> make(PirObject obj) {
     OwnerMap maker = new OwnerMap();
     maker.traverse(obj, null);
+    return maker.owner;
+  }
+
+  public static HashMap<SsaVariable, Statement> make(Collection<? extends PirObject> obj) {
+    OwnerMap maker = new OwnerMap();
+    for (PirObject itr : obj) {
+      maker.traverse(itr, null);
+    }
     return maker.owner;
   }
 

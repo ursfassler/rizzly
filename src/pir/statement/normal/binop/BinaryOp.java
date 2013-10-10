@@ -3,7 +3,6 @@ package pir.statement.normal.binop;
 import pir.other.PirValue;
 import pir.other.SsaVariable;
 import pir.statement.normal.NormalStmt;
-import pir.statement.normal.StmtSignes;
 import pir.statement.normal.VariableGeneratorStmt;
 
 abstract public class BinaryOp extends NormalStmt implements VariableGeneratorStmt {

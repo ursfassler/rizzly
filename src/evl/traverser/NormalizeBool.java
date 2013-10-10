@@ -60,6 +60,36 @@ public class NormalizeBool extends ExprReplacer<Void> {
   }
 
   @Override
+  protected Expression visitNotequal(Notequal obj, Void param) {
+    obj = (Notequal) super.visitNotequal(obj, param);
+    boolean lib = obj.getLeft() instanceof BoolValue;
+    boolean rib = obj.getRight() instanceof BoolValue;
+    if (lib && rib) {
+      boolean lv = ((BoolValue) obj.getLeft()).isValue();
+      boolean rv = ((BoolValue) obj.getRight()).isValue();
+      return new BoolValue(obj.getInfo(), lv != rv);
+    }
+    if (lib) {
+      boolean lv = ((BoolValue) obj.getLeft()).isValue();
+      if (lv) {
+        return Inverter.INSTANCE.traverse(obj.getRight(), null);
+      } else {
+        return obj.getRight();
+      }
+    }
+    if (rib) {
+      boolean rv = ((BoolValue) obj.getRight()).isValue();
+      if (rv) {
+        return Inverter.INSTANCE.traverse(obj.getLeft(), null);
+      } else {
+        return obj.getLeft();
+      }
+    }
+    return obj;
+  }
+
+  
+  @Override
   protected Expression visitNot(Not obj, Void param) {
     return Inverter.INSTANCE.traverse(obj.getExpr(), param);
   }
@@ -94,11 +124,6 @@ public class NormalizeBool extends ExprReplacer<Void> {
       }
     }
     return obj;
-  }
-
-  @Override
-  protected Expression visitNotequal(Notequal obj, Void param) {
-    throw new RuntimeException("not yet implemented");
   }
 
   @Override

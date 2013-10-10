@@ -1,15 +1,14 @@
 package pir.statement.bbend;
 
-import java.util.List;
-
 import pir.PirObject;
 import pir.cfg.BasicBlock;
+import util.NumberSet;
 
 public class CaseGotoOpt extends PirObject {
-  private List<CaseOptEntry> value;
+  private NumberSet value;
   private BasicBlock dst;
 
-  public CaseGotoOpt(List<CaseOptEntry> value, BasicBlock dst) {
+  public CaseGotoOpt(NumberSet value, BasicBlock dst) {
     this.value = value;
     this.dst = dst;
   }
@@ -22,8 +21,12 @@ public class CaseGotoOpt extends PirObject {
     this.dst = dst;
   }
 
-  public List<CaseOptEntry> getValue() {
+  public NumberSet getValue() {
     return value;
+  }
+
+  public void setValue(NumberSet value) {
+    this.value = value;
   }
 
   @Override

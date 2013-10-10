@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import pir.cfg.BasicBlock;
 import pir.expression.Number;
 import pir.expression.reference.VarRefSimple;
 import pir.other.PirValue;
@@ -13,6 +14,7 @@ import pir.other.Program;
 import pir.other.SsaVariable;
 import pir.statement.normal.Assignment;
 import pir.statement.normal.NormalStmt;
+import pir.statement.phi.PhiStmt;
 import pir.traverser.PirValueReplacer;
 import pir.traverser.StatementReplacer;
 import pir.type.Type;

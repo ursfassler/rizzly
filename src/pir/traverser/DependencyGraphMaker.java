@@ -1,5 +1,6 @@
 package pir.traverser;
 
+import java.util.Collection;
 import java.util.Map;
 
 import pir.DefTraverser;
@@ -28,6 +29,14 @@ public class DependencyGraphMaker extends DefTraverser<Boolean, PirObject> {
   public static SimpleGraph<PirObject> make(PirObject obj, Map<SsaVariable, Statement> owner) {
     DependencyGraphMaker maker = new DependencyGraphMaker(owner);
     maker.traverse(obj, null);
+    return maker.g;
+  }
+
+  public static SimpleGraph<PirObject> make(Collection<? extends PirObject> obj, Map<SsaVariable, Statement> owner) {
+    DependencyGraphMaker maker = new DependencyGraphMaker(owner);
+    for (PirObject itr : obj) {
+      maker.traverse(itr, null);
+    }
     return maker.g;
   }
 

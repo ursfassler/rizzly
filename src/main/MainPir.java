@@ -21,7 +21,6 @@ import pir.know.KnowledgeBase;
 import pir.other.Program;
 import pir.other.SsaVariable;
 import pir.passes.BoolConstReplacer;
-import pir.passes.CaseReduction;
 import pir.passes.ConstPropagator;
 import pir.passes.LlvmIntTypeReplacer;
 import pir.passes.RangeConverter;
@@ -51,7 +50,7 @@ import util.Pair;
 import util.SimpleGraph;
 
 /**
- *
+ * 
  * @author urs
  */
 public class MainPir {
@@ -59,10 +58,11 @@ public class MainPir {
   public static void doPir(Program prog, String debugdir) {
     LlvmWriter.print(prog, debugdir + "afterEvl.ll", true);
 
-
     KnowledgeBase kb = new KnowledgeBase(prog, debugdir);
     { // reducing Range and boolean to nosign type
       RangeConverter.process(prog, kb);
+      LlvmWriter.print(prog, debugdir + "conv.ll", true);
+      
       RangeReplacer.process(prog);
       TypecastReplacer.process(prog);
       StmtSignSetter.process(prog);
@@ -71,8 +71,6 @@ public class MainPir {
     }
 
     LlvmWriter.print(prog, debugdir + "typeext.ll", true);
-
-    CaseReduction.process(prog);
 
     VarPropagator.process(prog);
     ConstPropagator.process(prog);
@@ -99,11 +97,11 @@ public class MainPir {
       Set<Statement> removable = new HashSet<Statement>();
 
       g.addVertex(rootDummy);
-      for( PirObject obj : g.vertexSet() ) {
-        if( keep.contains(obj.getClass()) ) {
+      for (PirObject obj : g.vertexSet()) {
+        if (keep.contains(obj.getClass())) {
           g.addEdge(rootDummy, obj);
         }
-        if( obj instanceof Statement ) {
+        if (obj instanceof Statement) {
           removable.add((Statement) obj);
         }
       }
@@ -120,8 +118,8 @@ public class MainPir {
       // FIXME use dependency graph and transitive closure to remove all unused
       Map<Type, Integer> count = TyperefCounter.process(prog);
       Set<Type> removable = new HashSet<Type>();
-      for( Type type : count.keySet() ) {
-        if( count.get(type) == 0 ) {
+      for (Type type : count.keySet()) {
+        if (count.get(type) == 0) {
           removable.add(type);
         }
       }
@@ -133,12 +131,12 @@ public class MainPir {
     toposortPir(prog.getType());
   }
 
-  //TODO make sorting independent of type, i.e. that it can be used for everything
+  // TODO make sorting independent of type, i.e. that it can be used for everything
   private static void toposortPir(List<Type> list) {
     SimpleGraph<Type> g = new SimpleGraph<Type>(list);
-    for( Type u : list ) {
+    for (Type u : list) {
       Set<Type> vs = getDirectUsedTypesPir(u);
-      for( Type v : vs ) {
+      for (Type v : vs) {
         g.addEdge(u, v);
       }
     }
@@ -148,7 +146,7 @@ public class MainPir {
     list.clear();
     LinkedList<Type> nlist = new LinkedList<Type>();
     TopologicalOrderIterator<Type, Pair<Type, Type>> itr = new TopologicalOrderIterator<Type, Pair<Type, Type>>(g);
-    while( itr.hasNext() ) {
+    while (itr.hasNext()) {
       nlist.push(itr.next());
     }
     list.addAll(nlist);
@@ -156,7 +154,7 @@ public class MainPir {
     ArrayList<Type> diff = new ArrayList<Type>(list);
     diff.removeAll(old);
     old.removeAll(list);
-    assert ( size == list.size() );
+    assert (size == list.size());
   }
 
   private static Set<Type> getDirectUsedTypesPir(Type u) {
@@ -186,7 +184,7 @@ public class MainPir {
         }
       };
       hgw.print(g);
-    } catch( FileNotFoundException e ) {
+    } catch (FileNotFoundException e) {
       // TODO Auto-generated catch block
       e.printStackTrace();
     }
