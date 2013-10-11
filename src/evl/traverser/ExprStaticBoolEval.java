@@ -77,7 +77,7 @@ public class ExprStaticBoolEval extends NullTraverser<Unsure, Map<Expression, Un
       assert (obj.getOffset().isEmpty());
       Expression def = kw.get((SsaVariable) obj.getLink());
       return visit(def, param);
-    } else if( obj.getLink() instanceof FunctionHeader ){
+    } else if (obj.getLink() instanceof FunctionHeader) {
       return Unsure.DontKnow;
     } else {
       throw new RuntimeException("not yet implemented: " + obj.getLink().getClass().getCanonicalName());

@@ -174,7 +174,8 @@ class Narrower extends DefTraverser<Void, Void> {
 
     List<Reference> refs = ClassGetter.getAll(Reference.class, startBb.getPhi());
     for (Reference ref : refs) {
-      assert (ref.getLink() != var); // if not true, we have to find a solution :( => insert a new basic block with typecast
+      assert (ref.getLink() != var); // if not true, we have to find a solution :( => insert a new basic block with
+                                     // typecast
     }
 
     SsaVariable newVar = new SsaVariable(var.getInfo(), NameFactory.getNew(), new TypeRef(new ElementInfo(), newType));
