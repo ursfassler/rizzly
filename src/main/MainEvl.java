@@ -63,7 +63,6 @@ import evl.other.Namespace;
 import evl.other.RizzlyProgram;
 import evl.passes.MemoryAccessCapsulater;
 import evl.passes.RangeNarrower;
-import evl.passes.TransitionGuardNarrower;
 import evl.statement.bbend.Goto;
 import evl.statement.bbend.ReturnVoid;
 import evl.traverser.CallgraphMaker;
@@ -106,6 +105,10 @@ public class MainEvl {
 
   public static RizzlyProgram doEvl(ClaOption opt, String debugdir, Namespace aclasses, Component root, ArrayList<String> names) {
     KnowledgeBase kb = new KnowledgeBase(aclasses, debugdir);
+    
+    if (!opt.doLazyModelCheck()) {
+      modelCheck(debugdir, aclasses, root, kb);
+    }
 
     ExprCutter.process(aclasses, kb);
     StateVariableExtractor.process(aclasses, kb);
@@ -114,21 +117,17 @@ public class MainEvl {
     SsaMaker.process(aclasses, kb);
     PrettyPrinter.print(aclasses, debugdir + "ssa.rzy", true);
 
+    root = compositionReduction(aclasses, root);
+    root = hfsmReduction(root, opt, debugdir, aclasses, kb);
+
     NormalizeBool.process( aclasses, kb );
     PrettyPrinter.print(aclasses, debugdir + "normalized.rzy", true);
     
-    TransitionGuardNarrower.process(aclasses, kb);
     RangeNarrower.process(aclasses, kb);
 
     PrettyPrinter.print(aclasses, debugdir + "ssaRanged.rzy", false);
 
     typecheck(aclasses, root, debugdir);
-    if (!opt.doLazyModelCheck()) {
-      modelCheck(debugdir, aclasses, root, kb);
-    }
-
-    root = compositionReduction(aclasses, root);
-    root = hfsmReduction(root, opt, debugdir, aclasses, kb);
 
     addConDestructor(aclasses, debugdir, kb);
 
@@ -156,6 +155,7 @@ public class MainEvl {
     checkForRtcViolation(aclasses, kb);
     ioCheck(aclasses, kb);
     hfsmCheck(aclasses, kb);
+    CompInterfaceTypeChecker.process(aclasses, kb); // check interfaces against implementation
   }
 
   /**
@@ -227,10 +227,6 @@ public class MainEvl {
   private static void typecheck(Namespace aclasses, Component root, String rootdir) {
     KnowledgeBase kb = new KnowledgeBase(aclasses, rootdir);
     TypeChecker.processList(aclasses, kb); // check statements
-    CompInterfaceTypeChecker.process(aclasses, kb); // check interfaces against implementation
-
-    // TODO VarInit should be checked when translated into SSA
-    // VarInitCheck.process(aclasses);
   }
 
   // TODO provide a call/connection graph in the error message

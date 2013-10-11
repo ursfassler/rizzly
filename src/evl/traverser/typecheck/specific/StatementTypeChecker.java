@@ -23,6 +23,7 @@ import evl.statement.bbend.Goto;
 import evl.statement.bbend.IfGoto;
 import evl.statement.bbend.ReturnExpr;
 import evl.statement.bbend.ReturnVoid;
+import evl.statement.bbend.Unreachable;
 import evl.statement.normal.Assignment;
 import evl.statement.normal.CallStmt;
 import evl.statement.normal.TypeCast;
@@ -169,6 +170,11 @@ public class StatementTypeChecker extends NullTraverser<Void, Map<SsaVariable, N
   @Override
   protected Void visitCallStmt(CallStmt obj, Map<SsaVariable, NumSet> param) {
     ExpressionTypeChecker.process(obj.getCall(), kb);
+    return null;
+  }
+
+  @Override
+  protected Void visitUnreachable(Unreachable obj, Map<SsaVariable, NumSet> param) {
     return null;
   }
 
