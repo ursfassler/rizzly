@@ -28,7 +28,6 @@ import evl.hfsm.Transition;
 import evl.knowledge.KnowStateVariableReadWrite;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
-import evl.statement.Statement;
 import evl.statement.normal.Assignment;
 import evl.statement.normal.NormalStmt;
 import evl.statement.normal.VarDefStmt;
@@ -249,7 +248,7 @@ class FuncProtector extends StatementReplacer<BasicBlockList> {
     return null;
   }
 
-  private FunctionHeader getCallee(Statement stmt) {
+  private FunctionHeader getCallee(Evl stmt) {
     CalleeGetter<Void> getter = new CalleeGetter<Void>();
 
     Set<FunctionHeader> callees = new HashSet<FunctionHeader>();
@@ -267,6 +266,8 @@ class FuncProtector extends StatementReplacer<BasicBlockList> {
 
   @Override
   protected List<NormalStmt> visitPhi(PhiStmt phi, BasicBlock in, BasicBlockList param) {
-    throw new UnsupportedOperationException("Not supported yet.");
+    FunctionHeader callee = getCallee(phi.getArg(in));
+    assert( callee == null );
+    return null;
   }
 }

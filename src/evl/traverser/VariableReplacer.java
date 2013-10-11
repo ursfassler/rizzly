@@ -10,6 +10,7 @@ import evl.DefTraverser;
 import evl.Evl;
 import evl.NullTraverser;
 import evl.cfg.BasicBlock;
+import evl.expression.Expression;
 import evl.expression.reference.RefItem;
 import evl.expression.reference.Reference;
 import evl.statement.bbend.CaseGoto;
@@ -49,6 +50,11 @@ public class VariableReplacer extends NullTraverser<Boolean, Void> {
   public static void replace(BasicBlock rootBb, int start, SsaVariable old, SsaVariable replacement) {
     VariableReplacer replacer = new VariableReplacer(old, replacement);
     replacer.start(rootBb, start);
+  }
+  
+  public static void replace( Expression expr, SsaVariable old, SsaVariable replacement ){
+    ExprVarRepl exprVarRepl = new ExprVarRepl(old, replacement);
+    exprVarRepl.traverse(expr, null);
   }
 
   private void start(BasicBlock rootBb, int start) {

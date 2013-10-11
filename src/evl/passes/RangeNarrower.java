@@ -33,6 +33,7 @@ import evl.statement.normal.SsaGenerator;
 import evl.statement.normal.TypeCast;
 import evl.statement.normal.VarDefInitStmt;
 import evl.statement.phi.PhiStmt;
+import evl.traverser.ClassGetter;
 import evl.traverser.VariableReplacer;
 import evl.traverser.range.CaseEnumUpdater;
 import evl.traverser.range.CaseRangeUpdater;
@@ -146,7 +147,7 @@ class Narrower extends DefTraverser<Void, Void> {
   @Override
   protected Void visitIfGoto(IfGoto obj, Void param) {
     {
-      Map<SsaVariable, NumSet> ranges = RangeGetter.getSmallerRangeFor(true, obj.getCondition(), SsaVariable.class, kb);
+      Map<SsaVariable, NumSet> ranges = RangeGetter.getSmallerRangeFor(true, obj.getCondition(), kb);
       LinkedList<SsaVariable> keys = new LinkedList<SsaVariable>(ranges.keySet());
       Collections.sort(keys);
       for (SsaVariable var : keys) {
@@ -156,7 +157,7 @@ class Narrower extends DefTraverser<Void, Void> {
       }
     }
     {
-      Map<SsaVariable, NumSet> ranges = RangeGetter.getSmallerRangeFor(false, obj.getCondition(), SsaVariable.class, kb);
+      Map<SsaVariable, NumSet> ranges = RangeGetter.getSmallerRangeFor(false, obj.getCondition(), kb);
       LinkedList<SsaVariable> keys = new LinkedList<SsaVariable>(ranges.keySet());
       Collections.sort(keys);
       for (SsaVariable var : keys) {
@@ -169,8 +170,13 @@ class Narrower extends DefTraverser<Void, Void> {
   }
 
   private void replace(BasicBlock startBb, SsaVariable var, Type newType) {
-    assert(kp.getParent(newType) != null );
-    assert (startBb.getPhi().isEmpty()); // if not true, we have to find a solution :(
+    assert (kp.getParent(newType) != null);
+
+    List<Reference> refs = ClassGetter.getAll(Reference.class, startBb.getPhi());
+    for (Reference ref : refs) {
+      assert (ref.getLink() != var); // if not true, we have to find a solution :( => insert a new basic block with typecast
+    }
+
     SsaVariable newVar = new SsaVariable(var.getInfo(), NameFactory.getNew(), new TypeRef(new ElementInfo(), newType));
     TypeCast initExpr = new TypeCast(var.getInfo(), newVar, new TypeRef(new ElementInfo(), newType), new Reference(startBb.getInfo(), var));
     startBb.getCode().add(0, initExpr);

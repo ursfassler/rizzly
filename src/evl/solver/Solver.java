@@ -13,11 +13,11 @@ import evl.expression.binop.Lessequal;
 import evl.expression.binop.Notequal;
 import evl.expression.binop.Relation;
 import evl.expression.reference.Reference;
-import evl.variable.Variable;
+import evl.variable.SsaVariable;
 
 public class Solver {
 
-  public static Expression solve(Variable var, Relation eq) {
+  public static Expression solve(SsaVariable var, Relation eq) {
     StupidSolver solver = new StupidSolver();
     Expression expr = solver.traverse(eq, null);
     return expr;

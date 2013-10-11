@@ -293,6 +293,11 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  public void iffunc() {
+    compile("iffunc", TestSteps.EXECUTE, false, true);
+  }
+
+  @Test
   public void linking() {
     compile("linking", "Linking", true, false, false);
   }

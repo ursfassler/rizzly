@@ -20,6 +20,7 @@ import evl.expression.binop.Less;
 import evl.expression.binop.Lessequal;
 import evl.expression.binop.Notequal;
 import evl.expression.reference.Reference;
+import evl.function.FunctionHeader;
 import evl.knowledge.KnowWriter;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
@@ -72,10 +73,15 @@ public class ExprStaticBoolEval extends NullTraverser<Unsure, Map<Expression, Un
 
   @Override
   protected Unsure visitReference(Reference obj, Map<Expression, Unsure> param) {
-    assert (obj.getLink() instanceof SsaVariable);
-    assert (obj.getOffset().isEmpty());
-    Expression def = kw.get((SsaVariable) obj.getLink());
-    return visit(def, param);
+    if (obj.getLink() instanceof SsaVariable) {
+      assert (obj.getOffset().isEmpty());
+      Expression def = kw.get((SsaVariable) obj.getLink());
+      return visit(def, param);
+    } else if( obj.getLink() instanceof FunctionHeader ){
+      return Unsure.DontKnow;
+    } else {
+      throw new RuntimeException("not yet implemented: " + obj.getLink().getClass().getCanonicalName());
+    }
   }
 
   @Override
@@ -98,7 +104,7 @@ public class ExprStaticBoolEval extends NullTraverser<Unsure, Map<Expression, Un
       Unsure left = visit(obj.getLeft(), param);
       Unsure right = visit(obj.getRight(), param);
       return Unsure.equal(left, right);
-    } else if( isRange(obj.getLeft()) ) {
+    } else if (isRange(obj.getLeft())) {
       assert (isRange(obj.getRight()));
       RangeValue left = reval.traverse(obj.getLeft(), null);
       RangeValue right = reval.traverse(obj.getRight(), null);
@@ -110,7 +116,7 @@ public class ExprStaticBoolEval extends NullTraverser<Unsure, Map<Expression, Un
         return Unsure.False;
       }
     } else {
-      return Unsure.DontKnow; //TODO make it smarter
+      return Unsure.DontKnow; // TODO make it smarter
     }
   }
 
@@ -121,7 +127,7 @@ public class ExprStaticBoolEval extends NullTraverser<Unsure, Map<Expression, Un
       Unsure left = visit(obj.getLeft(), param);
       Unsure right = visit(obj.getRight(), param);
       return Unsure.notequal(left, right);
-    } else if( isRange(obj.getLeft()) ) {
+    } else if (isRange(obj.getLeft())) {
       assert (isRange(obj.getRight()));
       RangeValue left = reval.traverse(obj.getLeft(), null);
       RangeValue right = reval.traverse(obj.getRight(), null);
@@ -133,7 +139,7 @@ public class ExprStaticBoolEval extends NullTraverser<Unsure, Map<Expression, Un
         return Unsure.True;
       }
     } else {
-      return Unsure.DontKnow; //TODO make it smarter
+      return Unsure.DontKnow; // TODO make it smarter
     }
   }
 
@@ -222,7 +228,7 @@ class ExprStaticRangeEval extends NullTraverser<RangeValue, Void> {
 
   @Override
   protected RangeValue visitNumber(Number obj, Void param) {
-    return new RangeValue(obj.getInfo(), new NumberSet( new Range(obj.getValue(), obj.getValue())));
+    return new RangeValue(obj.getInfo(), new NumberSet(new Range(obj.getValue(), obj.getValue())));
   }
 
 }

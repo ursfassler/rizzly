@@ -119,6 +119,7 @@ public class MainEvl {
 
     root = compositionReduction(aclasses, root);
     root = hfsmReduction(root, opt, debugdir, aclasses, kb);
+    ExprCutter.process(aclasses, kb);
 
     NormalizeBool.process( aclasses, kb );
     PrettyPrinter.print(aclasses, debugdir + "normalized.rzy", true);

@@ -1,0 +1,25 @@
+interface
+  Tick
+    function tick( x: R{0,10} ):R{0,10};
+  end
+  
+component
+  Iffunc
+    input
+      in  : Tick;
+    
+  implementation elementary
+    function eval( x: R{0,10} ):Boolean
+      return x > 5;
+    end
+  
+    function in.tick( x: R{0,10} ):R{0,10}
+      if eval( x ) then
+        return 0;
+      else
+        return 10;
+      end
+    end
+      
+  end
+
