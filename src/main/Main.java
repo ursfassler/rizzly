@@ -222,7 +222,7 @@ public class Main {
         boolean hasBody = func instanceof FuncWithBody;
         assert ( func.getAttributes().contains(FuncAttr.Extern) || hasBody );
         for( Variable arg : func.getParam() ) {
-          anchor.add(arg.getType());
+          anchor.add(arg.getType().getRef());
         }
         if( func instanceof FuncWithReturn ) {
           anchor.add(( (FuncWithReturn) func ).getRet());

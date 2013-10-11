@@ -101,7 +101,7 @@ public class SsaMaker extends DefTraverser<Void, Void> {
     fpar.clear();
     for( Variable par : arglist ) {
       assert ( par instanceof FuncVariable );
-      SsaVariable svar = new SsaVariable(par.getInfo(), par.getName(), par.getType());
+      SsaVariable svar = new SsaVariable(par.getInfo(), par.getName(), par.getType().copy());
       fpar.add(svar);
       argmap.put((FuncVariable) par, svar);
     }

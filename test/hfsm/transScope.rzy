@@ -15,7 +15,7 @@ component
     
   implementation hfsm( A )
     var
-      a : R{0,0};     // this variable is never read since A.a and B.b overwrites it
+      a : R{0,0};     // this variable is never read since A.a and B.b shadows it
       
     entry
       a := 0;

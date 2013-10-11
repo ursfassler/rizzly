@@ -80,7 +80,7 @@ public class StateTypeBuilder extends NullTraverser<RecordType, Designator> {
     RecordType record = super.visitState(obj, new Designator(param, obj.getName()));
 
     for (Variable var : obj.getVariable()) {
-      NamedElement item = new NamedElement(var.getInfo(), var.getName(), var.getType());
+      NamedElement item = new NamedElement(var.getInfo(), var.getName(), var.getType().copy());
       record.getElement().add(item);
     }
 

@@ -98,8 +98,8 @@ import evl.type.base.EnumType;
 import evl.type.base.NumSet;
 import evl.type.base.StringType;
 import evl.type.composed.NamedElement;
-import evl.type.composed.NamedElementType;
 import evl.type.composed.RecordType;
+import evl.type.composed.UnionSelector;
 import evl.type.composed.UnionType;
 import evl.type.special.IntegerType;
 import evl.type.special.NaturalType;
@@ -428,32 +428,18 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitUnionType(UnionType obj, StreamWriter param) {
-    writeNamedElementType(obj, "Union", param);
-    return null;
-  }
-
-  @Override
-  protected Void visitRecordType(RecordType obj, StreamWriter param) {
-    writeNamedElementType(obj, "Record", param);
-    return null;
-  }
-
-  @Override
-  protected Void visitNamedElement(NamedElement obj, StreamWriter param) {
+  protected Void visitUnionSelector(UnionSelector obj, StreamWriter param) {
     param.wr(obj.getName());
-    param.wr(" : ");
-    visit(obj.getType(), param);
-    param.wr(";");
-    param.nl();
     return null;
   }
 
-  private void writeNamedElementType(NamedElementType obj, String typename, StreamWriter param) {
+  @Override
+  protected Void visitUnionType(UnionType obj, StreamWriter param) {
     param.wr(obj.getName());
     wrId(obj, param);
-    param.wr(" = ");
-    param.wr(typename);
+    param.wr(" = Union(");
+    visit(obj.getSelector(), param);
+    param.wr(")");
     param.nl();
     param.incIndent();
     visitList(obj.getElement(), param);
@@ -461,6 +447,33 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.wr("end");
     param.nl();
     param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitRecordType(RecordType obj, StreamWriter param) {
+    param.wr(obj.getName());
+    wrId(obj, param);
+    param.wr(" = Record");
+    param.nl();
+    param.incIndent();
+    visitList(obj.getElement(), param);
+    param.decIndent();
+    param.wr("end");
+    param.nl();
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitNamedElement(NamedElement obj, StreamWriter param) {
+    param.wr(obj.getName());
+    wrId(obj, param);
+    param.wr(" : ");
+    visit(obj.getType(), param);
+    param.wr(";");
+    param.nl();
+    return null;
   }
 
   @Override
