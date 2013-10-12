@@ -4,7 +4,7 @@ import java.util.ArrayList;
 
 import fun.DefGTraverser;
 import fun.expression.Expression;
-import fun.expression.reference.RefCompcall;
+import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.ReferenceLinked;
 import fun.expression.reference.ReferenceUnlinked;
 import fun.generator.Generator;
@@ -42,8 +42,8 @@ public class GenfuncParamExtender extends DefGTraverser<Void, Void> {
   protected Void visitReferenceLinked(ReferenceLinked obj, Void param) {
     super.visitReferenceLinked(obj, param);
     if (obj.getLink() instanceof Generator) {
-      if (obj.getOffset().isEmpty() || !(obj.getOffset().get(0) instanceof RefCompcall)) {
-        obj.getOffset().add(0, new RefCompcall(obj.getInfo(), new ArrayList<Expression>()));
+      if (obj.getOffset().isEmpty() || !(obj.getOffset().get(0) instanceof RefTemplCall)) {
+        obj.getOffset().add(0, new RefTemplCall(obj.getInfo(), new ArrayList<Expression>()));
       }
     }
     return null;

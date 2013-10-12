@@ -4,7 +4,7 @@ import common.ElementInfo;
 
 import fun.other.ListOfNamed;
 import fun.type.Type;
-import fun.variable.CompfuncParameter;
+import fun.variable.TemplateParameter;
 
 abstract public class BaseType extends Type {
   public BaseType(ElementInfo info) {
@@ -13,6 +13,6 @@ abstract public class BaseType extends Type {
 
   abstract public String getName();
 
-  abstract public ListOfNamed<CompfuncParameter> getParamList();
+  abstract public ListOfNamed<TemplateParameter> getParamList();
 
 }

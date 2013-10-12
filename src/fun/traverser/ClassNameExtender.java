@@ -19,7 +19,7 @@ import fun.FunBase;
 import fun.NullTraverser;
 import fun.composition.ImplComposition;
 import fun.expression.reference.RefCall;
-import fun.expression.reference.RefCompcall;
+import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefName;
 import fun.expression.reference.ReferenceLinked;
@@ -47,7 +47,7 @@ import fun.symbol.SymbolTable;
 import fun.type.NamedType;
 import fun.type.Type;
 import fun.variable.CompUse;
-import fun.variable.CompfuncParameter;
+import fun.variable.TemplateParameter;
 import fun.variable.Constant;
 import fun.variable.FuncVariable;
 import fun.variable.IfaceUse;
@@ -322,7 +322,7 @@ public class ClassNameExtender extends DefGTraverser<Void, SymbolTable<Designato
   }
 
   @Override
-  protected Void visitRefCompcall(RefCompcall obj, SymbolTable<Designator, String> param) {
+  protected Void visitRefCompcall(RefTemplCall obj, SymbolTable<Designator, String> param) {
     visitItr(obj.getActualParameter(), param);
     return null;
   }
@@ -367,7 +367,7 @@ public class ClassNameExtender extends DefGTraverser<Void, SymbolTable<Designato
 
   private <T extends FunBase> SymbolTable<Designator, String> generator(Generator<T> obj, SymbolTable<Designator, String> param) {
     param = new SymbolTable<Designator, String>(param);
-    for (CompfuncParameter gen : obj.getParam()) {
+    for (TemplateParameter gen : obj.getParam()) {
       param.add(gen.getName(), new Designator(gen.getName()));
     }
     param.add("Self", new Designator("Self"));

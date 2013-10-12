@@ -2,7 +2,7 @@ package fun.function.impl;
 
 import common.ElementInfo;
 
-import fun.expression.Expression;
+import fun.expression.reference.Reference;
 import fun.function.FuncWithBody;
 import fun.function.FuncWithReturn;
 import fun.function.FunctionHeader;
@@ -14,7 +14,7 @@ import fun.statement.Block;
  * @author urs
  */
 public class FuncPrivateRet extends FunctionHeader implements FuncWithBody, FuncWithReturn {
-  private Expression ret;
+  private Reference ret;
   private Block body;
 
   public FuncPrivateRet(ElementInfo info) {
@@ -22,12 +22,12 @@ public class FuncPrivateRet extends FunctionHeader implements FuncWithBody, Func
   }
 
   @Override
-  public Expression getRet() {
+  public Reference getRet() {
     return ret;
   }
 
   @Override
-  public void setRet(Expression ret) {
+  public void setRet(Reference ret) {
     this.ret = ret;
   }
 

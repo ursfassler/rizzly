@@ -5,7 +5,7 @@ import java.util.Collection;
 import common.ElementInfo;
 
 import fun.other.Interface;
-import fun.variable.CompfuncParameter;
+import fun.variable.TemplateParameter;
 
 /**
  *
@@ -13,7 +13,7 @@ import fun.variable.CompfuncParameter;
  */
 public class InterfaceGenerator extends Generator<Interface> {
 
-  public InterfaceGenerator(ElementInfo info, String name, Collection<CompfuncParameter> param, Interface item) {
+  public InterfaceGenerator(ElementInfo info, String name, Collection<TemplateParameter> param, Interface item) {
     super(info, name, param, item);
   }
 }

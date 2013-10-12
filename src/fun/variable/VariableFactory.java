@@ -5,13 +5,13 @@ import java.lang.reflect.InvocationTargetException;
 
 import common.ElementInfo;
 
-import fun.expression.Expression;
+import fun.expression.reference.Reference;
 
 public class VariableFactory {
-  static public <T extends Variable> T create(Class<T> kind, ElementInfo info, String name, Expression type) {
+  static public <T extends Variable> T create(Class<T> kind, ElementInfo info, String name, Reference type) {
     T ret = null;
     try {
-      Constructor<T> c = kind.getDeclaredConstructor(ElementInfo.class, String.class, Expression.class);
+      Constructor<T> c = kind.getDeclaredConstructor(ElementInfo.class, String.class, Reference.class);
       ret = c.newInstance(info, name, type);
     } catch (InstantiationException e) {
       e.printStackTrace();

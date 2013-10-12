@@ -1,4 +1,4 @@
-package fun.type.genfunc;
+package fun.type.template;
 
 import java.math.BigInteger;
 
@@ -9,7 +9,7 @@ import fun.expression.reference.Reference;
 import fun.other.ListOfNamed;
 import fun.other.Named;
 import fun.type.base.BaseType;
-import fun.variable.CompfuncParameter;
+import fun.variable.TemplateParameter;
 
 public class Array extends BaseType implements Named {
   private Reference type;
@@ -20,7 +20,7 @@ public class Array extends BaseType implements Named {
     super(info);
     this.type = type;
     this.size = size;
-    name = GenericArray.NAME + Designator.NAME_SEP + size + Designator.NAME_SEP + type.toString();
+    name = ArrayTemplate.NAME + Designator.NAME_SEP + size + Designator.NAME_SEP + type.toString();
   }
 
   public Reference getType() {
@@ -49,7 +49,7 @@ public class Array extends BaseType implements Named {
   }
 
   @Override
-  public ListOfNamed<CompfuncParameter> getParamList() {
-    return new ListOfNamed<CompfuncParameter>();
+  public ListOfNamed<TemplateParameter> getParamList() {
+    return new ListOfNamed<TemplateParameter>();
   }
 }

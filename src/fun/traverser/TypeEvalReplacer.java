@@ -3,7 +3,7 @@ package fun.traverser;
 import fun.DefGTraverser;
 import fun.Fun;
 import fun.expression.Expression;
-import fun.expression.reference.RefCompcall;
+import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.ReferenceLinked;
 import fun.function.FuncWithReturn;
 import fun.function.FunctionHeader;
@@ -18,9 +18,9 @@ import fun.type.NamedType;
 import fun.type.base.EnumType;
 import fun.type.base.TypeAlias;
 import fun.type.composed.NamedElement;
-import fun.type.genfunc.Array;
+import fun.type.template.Array;
 import fun.variable.CompUse;
-import fun.variable.CompfuncParameter;
+import fun.variable.TemplateParameter;
 import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
 import fun.variable.FuncVariable;
@@ -112,7 +112,7 @@ public class TypeEvalReplacer extends DefGTraverser<Void, Memory> {
   }
 
   @Override
-  protected Void visitCompfuncParameter(CompfuncParameter obj, Memory param) {
+  protected Void visitCompfuncParameter(TemplateParameter obj, Memory param) {
     super.visitCompfuncParameter(obj, param);
     obj.setType(eval(obj.getType(), param));
     return null;
@@ -146,9 +146,9 @@ public class TypeEvalReplacer extends DefGTraverser<Void, Memory> {
     // this is only necessary because Enumeration types are references from within the code since the type ref is needed
     // to specifiy an element; i.e. Weekday.Monday
     // TODO remove this hack
-    if ((obj.getLink() instanceof TypeGenerator) && (((TypeGenerator) obj.getLink()).getItem() instanceof EnumType) && !obj.getOffset().isEmpty() && (obj.getOffset().get(0) instanceof RefCompcall)) {
+    if ((obj.getLink() instanceof TypeGenerator) && (((TypeGenerator) obj.getLink()).getItem() instanceof EnumType) && !obj.getOffset().isEmpty() && (obj.getOffset().get(0) instanceof RefTemplCall)) {
       assert (obj.getLink() instanceof TypeGenerator);
-      RefCompcall call = (RefCompcall) obj.getOffset().pop();
+      RefTemplCall call = (RefTemplCall) obj.getOffset().pop();
       assert (call.getActualParameter().isEmpty());
       NamedType type = Specializer.processType((TypeGenerator) obj.getLink(), call.getActualParameter(), kb);
       assert (type.getType() instanceof EnumType);

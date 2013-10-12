@@ -4,9 +4,9 @@ import common.ElementInfo;
 
 import fun.expression.reference.Reference;
 
-final public class StateVariable extends Variable {
+final public class TemplateParameter extends Variable {
 
-  public StateVariable(ElementInfo info, String name, Reference type) {
+  public TemplateParameter(ElementInfo info, String name, Reference type) {
     super(info, name, type);
   }
 

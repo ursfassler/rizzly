@@ -25,7 +25,7 @@ import fun.expression.Relation;
 import fun.expression.StringValue;
 import fun.expression.UnaryExpression;
 import fun.expression.reference.RefCall;
-import fun.expression.reference.RefCompcall;
+import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefName;
 import fun.expression.reference.ReferenceLinked;
@@ -85,13 +85,13 @@ import fun.type.composed.NamedElement;
 import fun.type.composed.NamedElementType;
 import fun.type.composed.RecordType;
 import fun.type.composed.UnionType;
-import fun.type.genfunc.Array;
-import fun.type.genfunc.GenericArray;
-import fun.type.genfunc.GenericTypeType;
-import fun.type.genfunc.Range;
-import fun.type.genfunc.TypeType;
+import fun.type.template.Array;
+import fun.type.template.ArrayTemplate;
+import fun.type.template.TypeTypeTemplate;
+import fun.type.template.Range;
+import fun.type.template.TypeType;
 import fun.variable.CompUse;
-import fun.variable.CompfuncParameter;
+import fun.variable.TemplateParameter;
 import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
 import fun.variable.FuncVariable;
@@ -606,7 +606,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitGenericArray(GenericArray obj, Designator param) {
+  protected Void visitGenericArray(ArrayTemplate obj, Designator param) {
     xw.kw(obj.getName());
     xw.wr(";");
     return null;
@@ -635,7 +635,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
 
   @Override
   protected Void visitTypeType(TypeType obj, Designator param) {
-    xw.wr(GenericTypeType.NAME);
+    xw.wr(TypeTypeTemplate.NAME);
     xw.wr("(");
     visit(obj.getType(), null);
     xw.wr(")");
@@ -643,7 +643,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitGenericTypeType(GenericTypeType obj, Designator param) {
+  protected Void visitGenericTypeType(TypeTypeTemplate obj, Designator param) {
     xw.kw(obj.getName());
     xw.wr(";");
     return null;
@@ -909,7 +909,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitRefCompcall(RefCompcall obj, Designator param) {
+  protected Void visitRefCompcall(RefTemplCall obj, Designator param) {
     visitOptList("{", "}", obj.getActualParameter()); // FIXME it is a bit hacky, but maybe needed to make output
                                                       // nicer
     return null;
@@ -956,7 +956,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitCompfuncParameter(CompfuncParameter obj, Designator param) {
+  protected Void visitCompfuncParameter(TemplateParameter obj, Designator param) {
     xw.wa(obj);
     xw.wr(": ");
     visit(obj.getType(), null);

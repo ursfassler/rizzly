@@ -5,7 +5,7 @@ import java.util.Collection;
 import common.ElementInfo;
 
 import fun.other.Component;
-import fun.variable.CompfuncParameter;
+import fun.variable.TemplateParameter;
 
 /**
  *
@@ -13,7 +13,7 @@ import fun.variable.CompfuncParameter;
  */
 public class ComponentGenerator extends Generator<Component> {
 
-  public ComponentGenerator(ElementInfo info, String name, Collection<CompfuncParameter> param, Component item) {
+  public ComponentGenerator(ElementInfo info, String name, Collection<TemplateParameter> param, Component item) {
     super(info, name, param, item);
   }
 }

@@ -15,8 +15,8 @@ import fun.hfsm.Transition;
 import fun.statement.CallStmt;
 import fun.type.base.TypeAlias;
 import fun.type.composed.NamedElement;
-import fun.type.genfunc.Array;
-import fun.type.genfunc.TypeType;
+import fun.type.template.Array;
+import fun.type.template.TypeType;
 import fun.variable.Variable;
 
 public abstract class RefReplacer<T> extends ExprReplacer<T> {
@@ -98,7 +98,7 @@ public abstract class RefReplacer<T> extends ExprReplacer<T> {
   @Override
   protected Expression visitFunctionHeader(FunctionHeader obj, T param) {
     if (obj instanceof FuncWithReturn) {
-      ((FuncWithReturn) obj).setRet(visit(((FuncWithReturn) obj).getRet(), param));
+      ((FuncWithReturn) obj).setRet((Reference)visit(((FuncWithReturn) obj).getRet(), param));
     }
     return super.visitFunctionHeader(obj, param);
   }

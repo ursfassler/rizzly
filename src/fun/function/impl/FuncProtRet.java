@@ -2,7 +2,7 @@ package fun.function.impl;
 
 import common.ElementInfo;
 
-import fun.expression.Expression;
+import fun.expression.reference.Reference;
 import fun.function.FuncWithReturn;
 import fun.function.FunctionHeader;
 
@@ -11,19 +11,19 @@ import fun.function.FunctionHeader;
  * @author urs
  */
 public class FuncProtRet extends FunctionHeader implements FuncWithReturn {
-  private Expression ret;
+  private Reference ret;
 
   public FuncProtRet(ElementInfo info) {
     super(info);
   }
 
   @Override
-  public Expression getRet() {
+  public Reference getRet() {
     return ret;
   }
 
   @Override
-  public void setRet(Expression ret) {
+  public void setRet(Reference ret) {
     this.ret = ret;
   }
 

@@ -18,7 +18,7 @@ import fun.expression.Relation;
 import fun.expression.StringValue;
 import fun.expression.UnaryExpression;
 import fun.expression.reference.RefCall;
-import fun.expression.reference.RefCompcall;
+import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefItem;
 import fun.expression.reference.RefName;
@@ -30,7 +30,7 @@ import fun.generator.TypeGenerator;
 import fun.knowledge.KnowledgeBase;
 import fun.traverser.Memory;
 import fun.type.NamedType;
-import fun.variable.CompfuncParameter;
+import fun.variable.TemplateParameter;
 import fun.variable.ConstGlobal;
 import fun.variable.FuncVariable;
 
@@ -62,7 +62,7 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
   }
 
   @Override
-  protected Expression visitCompfuncParameter(CompfuncParameter obj, Memory param) {
+  protected Expression visitCompfuncParameter(TemplateParameter obj, Memory param) {
     assert (param.contains(obj));
     return param.getInt(obj);
   }
@@ -122,7 +122,7 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
   }
 
   @Override
-  protected Expression visitRefCompcall(RefCompcall obj, Memory param) {
+  protected Expression visitRefCompcall(RefTemplCall obj, Memory param) {
     visitExpList(obj.getActualParameter(), param);
     return null;
   }
@@ -308,8 +308,8 @@ class RefExecutor extends NullTraverser<Expression, RefItem> {
 
   @Override
   protected Expression visitTypeGenerator(TypeGenerator obj, RefItem param) {
-    assert (param instanceof RefCompcall);
-    return Specializer.processType(obj, ((RefCompcall) param).getActualParameter(), kb);
+    assert (param instanceof RefTemplCall);
+    return Specializer.processType(obj, ((RefTemplCall) param).getActualParameter(), kb);
   }
 
 }

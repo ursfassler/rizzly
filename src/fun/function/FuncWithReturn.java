@@ -1,8 +1,8 @@
 package fun.function;
 
-import fun.expression.Expression;
+import fun.expression.reference.Reference;
 
 public interface FuncWithReturn {
-  public Expression getRet();
-  public void setRet(Expression ret);
+  public Reference getRet();
+  public void setRet(Reference ret);
 }

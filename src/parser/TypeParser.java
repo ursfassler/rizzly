@@ -24,7 +24,7 @@ import fun.type.composed.NamedElement;
 import fun.type.composed.RecordType;
 import fun.type.composed.UnionSelector;
 import fun.type.composed.UnionType;
-import fun.variable.CompfuncParameter;
+import fun.variable.TemplateParameter;
 import fun.variable.IfaceUse;
 
 public class TypeParser extends BaseParser {
@@ -66,11 +66,11 @@ public class TypeParser extends BaseParser {
   // EBNF ifacedecl: id genericParam interface
   private InterfaceGenerator parseIfacedecl() {
     Token name = expect(TokenType.IDENTIFIER);
-    List<CompfuncParameter> genpam;
+    List<TemplateParameter> genpam;
     if( peek().getType() == TokenType.OPENCURLY ) {
       genpam = parseGenericParam();
     } else {
-      genpam = new ArrayList<CompfuncParameter>();
+      genpam = new ArrayList<TemplateParameter>();
     }
 
     Interface type = parseInterface(name.getInfo());
@@ -82,11 +82,11 @@ public class TypeParser extends BaseParser {
   // EBNF compdecl: id genericParam  component
   private ComponentGenerator parseCompdecl() {
     Token name = expect(TokenType.IDENTIFIER);
-    List<CompfuncParameter> genpam;
+    List<TemplateParameter> genpam;
     if( peek().getType() == TokenType.OPENCURLY ) {
       genpam = parseGenericParam();
     } else {
-      genpam = new ArrayList<CompfuncParameter>();
+      genpam = new ArrayList<TemplateParameter>();
     }
 
     Component type = parseComponent(name.getInfo());
@@ -134,11 +134,11 @@ public class TypeParser extends BaseParser {
   // EBNF typedecl: id genericParam "=" typedef
   private TypeGenerator parseTypedecl() {
     Token name = expect(TokenType.IDENTIFIER);
-    List<CompfuncParameter> genpam;
+    List<TemplateParameter> genpam;
     if( peek().getType() == TokenType.OPENCURLY ) {
       genpam = parseGenericParam();
     } else {
-      genpam = new ArrayList<CompfuncParameter>(); // FIXME or directly generate a type here?
+      genpam = new ArrayList<TemplateParameter>(); // FIXME or directly generate a type here?
     }
     expect(TokenType.EQUAL);
 

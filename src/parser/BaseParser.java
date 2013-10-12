@@ -22,7 +22,7 @@ import fun.function.impl.FuncProtVoid;
 import fun.statement.Assignment;
 import fun.statement.Statement;
 import fun.statement.VarDefStmt;
-import fun.variable.CompfuncParameter;
+import fun.variable.TemplateParameter;
 import fun.variable.Constant;
 import fun.variable.FuncVariable;
 import fun.variable.Variable;
@@ -172,11 +172,11 @@ public class BaseParser extends Parser {
   }
 
   // EBNF genericParam: [ "{" vardef { ";" vardef } "}" ]
-  protected List<CompfuncParameter> parseGenericParam() {
-    ArrayList<CompfuncParameter> ret = new ArrayList<CompfuncParameter>();
+  protected List<TemplateParameter> parseGenericParam() {
+    ArrayList<TemplateParameter> ret = new ArrayList<TemplateParameter>();
     if (consumeIfEqual(TokenType.OPENCURLY)) {
       do {
-        List<CompfuncParameter> param = parseVarDef(CompfuncParameter.class);
+        List<TemplateParameter> param = parseVarDef(TemplateParameter.class);
         ret.addAll(param);
       } while (consumeIfEqual(TokenType.SEMI));
       expect(TokenType.CLOSECURLY);

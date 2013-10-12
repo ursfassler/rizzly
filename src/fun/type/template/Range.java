@@ -1,4 +1,4 @@
-package fun.type.genfunc;
+package fun.type.template;
 
 import java.math.BigInteger;
 
@@ -7,7 +7,7 @@ import common.ElementInfo;
 import fun.other.ListOfNamed;
 import fun.other.Named;
 import fun.type.base.BaseType;
-import fun.variable.CompfuncParameter;
+import fun.variable.TemplateParameter;
 
 final public class Range extends BaseType implements Named {
   final private BigInteger low;
@@ -40,7 +40,7 @@ final public class Range extends BaseType implements Named {
   }
 
   @Override
-  public ListOfNamed<CompfuncParameter> getParamList() {
-    return new ListOfNamed<CompfuncParameter>();
+  public ListOfNamed<TemplateParameter> getParamList() {
+    return new ListOfNamed<TemplateParameter>();
   }
 }

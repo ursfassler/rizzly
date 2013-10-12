@@ -25,7 +25,7 @@ import fun.expression.Relation;
 import fun.expression.StringValue;
 import fun.expression.UnaryExpression;
 import fun.expression.reference.RefCall;
-import fun.expression.reference.RefCompcall;
+import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefName;
 import fun.expression.reference.ReferenceLinked;
@@ -76,14 +76,14 @@ import fun.type.composed.NamedElement;
 import fun.type.composed.NamedElementType;
 import fun.type.composed.RecordType;
 import fun.type.composed.UnionType;
-import fun.type.genfunc.Array;
-import fun.type.genfunc.GenericArray;
-import fun.type.genfunc.GenericRange;
-import fun.type.genfunc.GenericTypeType;
-import fun.type.genfunc.Range;
-import fun.type.genfunc.TypeType;
+import fun.type.template.Array;
+import fun.type.template.ArrayTemplate;
+import fun.type.template.RangeTemplate;
+import fun.type.template.TypeTypeTemplate;
+import fun.type.template.Range;
+import fun.type.template.TypeType;
 import fun.variable.CompUse;
-import fun.variable.CompfuncParameter;
+import fun.variable.TemplateParameter;
 import fun.variable.Constant;
 import fun.variable.FuncVariable;
 import fun.variable.IfaceUse;
@@ -466,7 +466,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitGenericRange(GenericRange obj, StreamWriter param) {
+  protected Void visitGenericRange(RangeTemplate obj, StreamWriter param) {
     param.wr(obj.getName());
     return null;
   }
@@ -490,7 +490,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitGenericArray(GenericArray obj, StreamWriter param) {
+  protected Void visitGenericArray(ArrayTemplate obj, StreamWriter param) {
     param.wr(obj.getName());
     return null;
   }
@@ -515,7 +515,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitTypeType(TypeType obj, StreamWriter param) {
-    param.wr(GenericTypeType.NAME);
+    param.wr(TypeTypeTemplate.NAME);
     param.wr("(");
     visit(obj.getType(), param);
     param.wr(")");
@@ -523,7 +523,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitGenericTypeType(GenericTypeType obj, StreamWriter param) {
+  protected Void visitGenericTypeType(TypeTypeTemplate obj, StreamWriter param) {
     param.wr(obj.getName());
     return null;
   }
@@ -748,7 +748,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitCompfuncParameter(CompfuncParameter obj, StreamWriter param) {
+  protected Void visitCompfuncParameter(TemplateParameter obj, StreamWriter param) {
     return null;
   }
 
@@ -806,7 +806,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitRefCompcall(RefCompcall obj, StreamWriter param) {
+  protected Void visitRefCompcall(RefTemplCall obj, StreamWriter param) {
     param.wr("{");
     list(obj.getActualParameter(), ",", param);
     param.wr("}");

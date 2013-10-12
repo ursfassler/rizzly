@@ -10,7 +10,7 @@ import fun.expression.Relation;
 import fun.expression.StringValue;
 import fun.expression.UnaryExpression;
 import fun.expression.reference.RefCall;
-import fun.expression.reference.RefCompcall;
+import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefName;
 import fun.expression.reference.ReferenceLinked;
@@ -63,14 +63,14 @@ import fun.type.composed.NamedElement;
 import fun.type.composed.RecordType;
 import fun.type.composed.UnionSelector;
 import fun.type.composed.UnionType;
-import fun.type.genfunc.Array;
-import fun.type.genfunc.GenericArray;
-import fun.type.genfunc.GenericRange;
-import fun.type.genfunc.GenericTypeType;
-import fun.type.genfunc.Range;
-import fun.type.genfunc.TypeType;
+import fun.type.template.Array;
+import fun.type.template.ArrayTemplate;
+import fun.type.template.RangeTemplate;
+import fun.type.template.TypeTypeTemplate;
+import fun.type.template.Range;
+import fun.type.template.TypeType;
 import fun.variable.CompUse;
-import fun.variable.CompfuncParameter;
+import fun.variable.TemplateParameter;
 import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
 import fun.variable.FuncVariable;
@@ -222,7 +222,7 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitRefCompcall(RefCompcall obj, P param) {
+  protected R visitRefCompcall(RefTemplCall obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -257,7 +257,7 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitCompfuncParameter(CompfuncParameter obj, P param) {
+  protected R visitCompfuncParameter(TemplateParameter obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -272,7 +272,7 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitGenericTypeType(GenericTypeType obj, P param) {
+  protected R visitGenericTypeType(TypeTypeTemplate obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -282,7 +282,7 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitGenericArray(GenericArray obj, P param) {
+  protected R visitGenericArray(ArrayTemplate obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -455,7 +455,7 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitGenericRange(GenericRange obj, P param) {
+  protected R visitGenericRange(RangeTemplate obj, P param) {
     return visitDefault(obj, param);
   }
 

@@ -17,7 +17,7 @@ import fun.expression.StringValue;
 import fun.expression.UnaryExpression;
 import fun.expression.UnaryOp;
 import fun.expression.reference.RefCall;
-import fun.expression.reference.RefCompcall;
+import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefName;
 import fun.expression.reference.Reference;
@@ -267,7 +267,7 @@ public class ExpressionParser extends Parser {
   }
 
   // EBNF refGeneric: "{" [ exprList ] "}"
-  private RefCompcall parseRefGeneric() {
+  private RefTemplCall parseRefGeneric() {
     Token tok = expect(TokenType.OPENCURLY);
     List<Expression> expr;
     if (peek().getType() == TokenType.CLOSECURLY) {
@@ -276,7 +276,7 @@ public class ExpressionParser extends Parser {
       expr = parseExprList();
     }
     expect(TokenType.CLOSECURLY);
-    return new RefCompcall(tok.getInfo(), expr);
+    return new RefTemplCall(tok.getInfo(), expr);
   }
 
   // EBNF addOp: "+" | "-" | "or"

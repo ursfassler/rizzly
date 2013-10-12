@@ -15,7 +15,7 @@ import fun.traverser.ExprReplacer;
 import fun.traverser.Memory;
 import fun.traverser.ReLinker;
 import fun.traverser.TypeEvalReplacer;
-import fun.variable.CompfuncParameter;
+import fun.variable.TemplateParameter;
 
 /**
  * Generates a type from a unspecified TypeGenerator and its arguments
@@ -40,9 +40,9 @@ public class TypeSpecializer {
     }
 
     Memory mem = new Memory();
-    Map<CompfuncParameter, Expression> map = new HashMap<CompfuncParameter, Expression>();
+    Map<TemplateParameter, Expression> map = new HashMap<TemplateParameter, Expression>();
     for (int i = 0; i < genspec.size(); i++) {
-      CompfuncParameter var = cobj.getParam().getList().get(i);
+      TemplateParameter var = cobj.getParam().getList().get(i);
       Expression val = genspec.get(i);
       // TODO can we ensure that val is evaluated?
       map.put(var, val);
@@ -70,20 +70,23 @@ public class TypeSpecializer {
  * @author urs
  *
  */
-class TypeSpecTrav extends ExprReplacer<Map<CompfuncParameter, Expression>> {
+class TypeSpecTrav extends ExprReplacer<Map<TemplateParameter, Expression>> {
   @Override
-  protected Expression visitReferenceUnlinked(ReferenceUnlinked obj, Map<CompfuncParameter, Expression> param) {
+  protected Expression visitReferenceUnlinked(ReferenceUnlinked obj, Map<TemplateParameter, Expression> param) {
     throw new RuntimeException("not yet implemented");
   }
 
   @Override
-  protected Expression visitReferenceLinked(ReferenceLinked obj, Map<CompfuncParameter, Expression> param) {
+  protected Expression visitReferenceLinked(ReferenceLinked obj, Map<TemplateParameter, Expression> param) {
     super.visitReferenceLinked(obj, param);
 
     if (param.containsKey(obj.getLink())) {
-      return param.get(obj.getLink());
+      throw new RuntimeException("not yet implemented");
+//      Expression repl = param.get(obj.getLink());
+//      ReferenceLinked ret = new ReferenceLinked(obj.getInfo(), );
+//      return ;
     } else {
-      assert (!(obj.getLink() instanceof CompfuncParameter));
+      assert (!(obj.getLink() instanceof TemplateParameter));
       return obj;
     }
   }

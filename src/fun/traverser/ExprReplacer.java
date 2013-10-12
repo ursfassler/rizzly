@@ -14,7 +14,7 @@ import fun.expression.Relation;
 import fun.expression.StringValue;
 import fun.expression.UnaryExpression;
 import fun.expression.reference.RefCall;
-import fun.expression.reference.RefCompcall;
+import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefItem;
 import fun.expression.reference.RefName;
@@ -35,7 +35,7 @@ import fun.type.NamedType;
 import fun.type.base.IntegerType;
 import fun.type.base.NaturalType;
 import fun.type.composed.NamedElement;
-import fun.type.genfunc.Range;
+import fun.type.template.Range;
 import fun.variable.Constant;
 import fun.variable.Variable;
 
@@ -78,7 +78,7 @@ public class ExprReplacer<T> extends DefGTraverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitRefCompcall(RefCompcall obj, T param) {
+  protected Expression visitRefCompcall(RefTemplCall obj, T param) {
     visitExprList(obj.getActualParameter(), param);
     return null;
   }
@@ -212,20 +212,20 @@ public class ExprReplacer<T> extends DefGTraverser<Expression, T> {
 
   @Override
   protected Expression visitNamedElement(NamedElement obj, T param) {
-    obj.setType(visit(obj.getType(), param));
+    obj.setType((Reference)visit(obj.getType(), param));
     return super.visitNamedElement(obj, param);
   }
 
   @Override
   protected Expression visitVariable(Variable obj, T param) {
-    obj.setType(visit(obj.getType(), param));
+    obj.setType((Reference)visit(obj.getType(), param));
     return super.visitVariable(obj, param);
   }
 
   @Override
   protected Expression visitFunctionHeader(FunctionHeader obj, T param) {
     if (obj instanceof FuncWithReturn) {
-      ((FuncWithReturn) obj).setRet(visit(((FuncWithReturn) obj).getRet(), param));
+      ((FuncWithReturn) obj).setRet((Reference)visit(((FuncWithReturn) obj).getRet(), param));
     }
     return super.visitFunctionHeader(obj, param);
   }

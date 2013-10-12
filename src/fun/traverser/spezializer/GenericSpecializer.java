@@ -14,12 +14,12 @@ import fun.generator.TypeGenerator;
 import fun.knowledge.KnowledgeBase;
 import fun.type.NamedType;
 import fun.type.Type;
-import fun.type.genfunc.Array;
-import fun.type.genfunc.GenericArray;
-import fun.type.genfunc.GenericRange;
-import fun.type.genfunc.GenericTypeType;
-import fun.type.genfunc.Range;
-import fun.type.genfunc.TypeType;
+import fun.type.template.Array;
+import fun.type.template.ArrayTemplate;
+import fun.type.template.RangeTemplate;
+import fun.type.template.TypeTypeTemplate;
+import fun.type.template.Range;
+import fun.type.template.TypeType;
 
 public class GenericSpecializer extends NullTraverser<Type, List<Expression>> {
   @Override
@@ -33,7 +33,7 @@ public class GenericSpecializer extends NullTraverser<Type, List<Expression>> {
   }
 
   @Override
-  protected Type visitGenericRange(GenericRange obj, List<Expression> param) {
+  protected Type visitGenericRange(RangeTemplate obj, List<Expression> param) {
     assert (param.size() == 2);
     Expression low = param.get(0);
     Expression high = param.get(1);
@@ -43,7 +43,7 @@ public class GenericSpecializer extends NullTraverser<Type, List<Expression>> {
   }
 
   @Override
-  protected Type visitGenericArray(GenericArray obj, List<Expression> param) {
+  protected Type visitGenericArray(ArrayTemplate obj, List<Expression> param) {
     assert (param.size() == 2);
     Expression size = param.get(0);
     Expression type = param.get(1);
@@ -55,7 +55,7 @@ public class GenericSpecializer extends NullTraverser<Type, List<Expression>> {
   }
 
   @Override
-  protected Type visitGenericTypeType(GenericTypeType obj, List<Expression> param) {
+  protected Type visitGenericTypeType(TypeTypeTemplate obj, List<Expression> param) {
     assert (param.size() == 1);
     Expression type = param.get(0);
     assert (type instanceof NamedType);

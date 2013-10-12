@@ -11,7 +11,7 @@ import fun.expression.Relation;
 import fun.expression.StringValue;
 import fun.expression.UnaryExpression;
 import fun.expression.reference.RefCall;
-import fun.expression.reference.RefCompcall;
+import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefItem;
 import fun.expression.reference.RefName;
@@ -77,14 +77,14 @@ import fun.type.composed.NamedElementType;
 import fun.type.composed.RecordType;
 import fun.type.composed.UnionSelector;
 import fun.type.composed.UnionType;
-import fun.type.genfunc.Array;
-import fun.type.genfunc.GenericArray;
-import fun.type.genfunc.GenericRange;
-import fun.type.genfunc.GenericTypeType;
-import fun.type.genfunc.Range;
-import fun.type.genfunc.TypeType;
+import fun.type.template.Array;
+import fun.type.template.ArrayTemplate;
+import fun.type.template.RangeTemplate;
+import fun.type.template.TypeTypeTemplate;
+import fun.type.template.Range;
+import fun.type.template.TypeType;
 import fun.variable.CompUse;
-import fun.variable.CompfuncParameter;
+import fun.variable.TemplateParameter;
 import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
 import fun.variable.Constant;
@@ -217,8 +217,8 @@ public abstract class Traverser<R, P> {
       return visitFuncVariable((FuncVariable) obj, param);
     } else if( obj instanceof Constant ) {
       return visitConstant((Constant) obj, param);
-    } else if( obj instanceof CompfuncParameter ) {
-      return visitCompfuncParameter((CompfuncParameter) obj, param);
+    } else if( obj instanceof TemplateParameter ) {
+      return visitCompfuncParameter((TemplateParameter) obj, param);
     } else if( obj instanceof CompUse ) {
       return visitCompUse((CompUse) obj, param);
     } else if( obj instanceof IfaceUse ) {
@@ -325,8 +325,8 @@ public abstract class Traverser<R, P> {
       return visitRefName((RefName) obj, param);
     } else if( obj instanceof RefCall ) {
       return visitRefCall((RefCall) obj, param);
-    } else if( obj instanceof RefCompcall ) {
-      return visitRefCompcall((RefCompcall) obj, param);
+    } else if( obj instanceof RefTemplCall ) {
+      return visitRefCompcall((RefTemplCall) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -378,12 +378,12 @@ public abstract class Traverser<R, P> {
   protected R visitBaseType(BaseType obj, P param) {
     if( obj instanceof BooleanType ) {
       return visitBooleanType((BooleanType) obj, param);
-    } else if( obj instanceof GenericArray ) {
-      return visitGenericArray((GenericArray) obj, param);
-    } else if( obj instanceof GenericTypeType ) {
-      return visitGenericTypeType((GenericTypeType) obj, param);
-    } else if( obj instanceof GenericRange ) {
-      return visitGenericRange((GenericRange) obj, param);
+    } else if( obj instanceof ArrayTemplate ) {
+      return visitGenericArray((ArrayTemplate) obj, param);
+    } else if( obj instanceof TypeTypeTemplate ) {
+      return visitGenericTypeType((TypeTypeTemplate) obj, param);
+    } else if( obj instanceof RangeTemplate ) {
+      return visitGenericRange((RangeTemplate) obj, param);
     } else if( obj instanceof Range ) {
       return visitRange((Range) obj, param);
     } else if( obj instanceof Array ) {
@@ -447,7 +447,7 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitBooleanType(BooleanType obj, P param);
 
-  abstract protected R visitCompfuncParameter(CompfuncParameter obj, P param);
+  abstract protected R visitCompfuncParameter(TemplateParameter obj, P param);
 
   abstract protected R visitRefCall(RefCall obj, P param);
 
@@ -455,7 +455,7 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitRefIndex(RefIndex obj, P param);
 
-  abstract protected R visitRefCompcall(RefCompcall obj, P param);
+  abstract protected R visitRefCompcall(RefTemplCall obj, P param);
 
   abstract protected R visitIfaceUse(IfaceUse obj, P param);
 
@@ -495,11 +495,11 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitTypeType(TypeType obj, P param);
 
-  abstract protected R visitGenericTypeType(GenericTypeType obj, P param);
+  abstract protected R visitGenericTypeType(TypeTypeTemplate obj, P param);
 
-  abstract protected R visitGenericArray(GenericArray obj, P param);
+  abstract protected R visitGenericArray(ArrayTemplate obj, P param);
 
-  abstract protected R visitGenericRange(GenericRange obj, P param);
+  abstract protected R visitGenericRange(RangeTemplate obj, P param);
 
   abstract protected R visitAnyType(AnyType obj, P param);
 

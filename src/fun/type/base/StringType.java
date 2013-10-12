@@ -4,7 +4,7 @@ import common.ElementInfo;
 
 import evl.Evl;
 import fun.other.ListOfNamed;
-import fun.variable.CompfuncParameter;
+import fun.variable.TemplateParameter;
 
 public class StringType extends BaseType implements Evl {
   public StringType() {
@@ -17,8 +17,8 @@ public class StringType extends BaseType implements Evl {
   }
 
   @Override
-  public ListOfNamed<CompfuncParameter> getParamList() {
-    return new ListOfNamed<CompfuncParameter>();
+  public ListOfNamed<TemplateParameter> getParamList() {
+    return new ListOfNamed<TemplateParameter>();
   }
 
 }

@@ -3,7 +3,7 @@ package fun.type.base;
 import common.ElementInfo;
 
 import fun.other.ListOfNamed;
-import fun.variable.CompfuncParameter;
+import fun.variable.TemplateParameter;
 
 final public class BooleanType extends BaseType {
   public BooleanType() {
@@ -16,8 +16,8 @@ final public class BooleanType extends BaseType {
   }
 
   @Override
-  public ListOfNamed<CompfuncParameter> getParamList() {
-    return new ListOfNamed<CompfuncParameter>();
+  public ListOfNamed<TemplateParameter> getParamList() {
+    return new ListOfNamed<TemplateParameter>();
   }
 
   @Override

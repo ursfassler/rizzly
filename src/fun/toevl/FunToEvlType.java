@@ -26,9 +26,9 @@ import fun.type.base.TypeAlias;
 import fun.type.base.VoidType;
 import fun.type.composed.RecordType;
 import fun.type.composed.UnionType;
-import fun.type.genfunc.Array;
-import fun.type.genfunc.Range;
-import fun.type.genfunc.TypeType;
+import fun.type.template.Array;
+import fun.type.template.Range;
+import fun.type.template.TypeType;
 
 public class FunToEvlType extends NullTraverser<Type, String> {
   private Map<Fun, Evl> map;

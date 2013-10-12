@@ -5,7 +5,7 @@ import java.util.Collection;
 import common.ElementInfo;
 
 import fun.type.Type;
-import fun.variable.CompfuncParameter;
+import fun.variable.TemplateParameter;
 
 /**
  *
@@ -13,7 +13,7 @@ import fun.variable.CompfuncParameter;
  */
 public class TypeGenerator extends Generator<Type> {
 
-  public TypeGenerator(ElementInfo info, String name, Collection<CompfuncParameter> param, Type item) {
+  public TypeGenerator(ElementInfo info, String name, Collection<TemplateParameter> param, Type item) {
     super(info, name, param, item);
   }
 }

@@ -18,7 +18,7 @@ import fun.expression.Relation;
 import fun.expression.StringValue;
 import fun.expression.UnaryExpression;
 import fun.expression.reference.RefCall;
-import fun.expression.reference.RefCompcall;
+import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefName;
 import fun.expression.reference.ReferenceLinked;
@@ -77,14 +77,14 @@ import fun.type.composed.NamedElement;
 import fun.type.composed.RecordType;
 import fun.type.composed.UnionSelector;
 import fun.type.composed.UnionType;
-import fun.type.genfunc.Array;
-import fun.type.genfunc.GenericArray;
-import fun.type.genfunc.GenericRange;
-import fun.type.genfunc.GenericTypeType;
-import fun.type.genfunc.Range;
-import fun.type.genfunc.TypeType;
+import fun.type.template.Array;
+import fun.type.template.ArrayTemplate;
+import fun.type.template.RangeTemplate;
+import fun.type.template.TypeTypeTemplate;
+import fun.type.template.Range;
+import fun.type.template.TypeType;
 import fun.variable.CompUse;
-import fun.variable.CompfuncParameter;
+import fun.variable.TemplateParameter;
 import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
 import fun.variable.FuncVariable;
@@ -162,8 +162,8 @@ class CopyFun extends Traverser<Fun, Void> {
   }
 
   @Override
-  protected Fun visitRefCompcall(RefCompcall obj, Void param) {
-    return new RefCompcall(obj.getInfo(), copy(obj.getActualParameter()));
+  protected Fun visitRefCompcall(RefTemplCall obj, Void param) {
+    return new RefTemplCall(obj.getInfo(), copy(obj.getActualParameter()));
   }
 
   @Override
@@ -268,8 +268,8 @@ class CopyFun extends Traverser<Fun, Void> {
   }
 
   @Override
-  protected Fun visitCompfuncParameter(CompfuncParameter obj, Void param) {
-    return new CompfuncParameter(obj.getInfo(), obj.getName(), copy(obj.getType()));
+  protected Fun visitCompfuncParameter(TemplateParameter obj, Void param) {
+    return new TemplateParameter(obj.getInfo(), obj.getName(), copy(obj.getType()));
   }
 
   @Override
@@ -385,12 +385,12 @@ class CopyFun extends Traverser<Fun, Void> {
   }
 
   @Override
-  protected Fun visitGenericTypeType(GenericTypeType obj, Void param) {
+  protected Fun visitGenericTypeType(TypeTypeTemplate obj, Void param) {
     throw new RuntimeException("not yet implemented");
   }
 
   @Override
-  protected Fun visitGenericArray(GenericArray obj, Void param) {
+  protected Fun visitGenericArray(ArrayTemplate obj, Void param) {
     throw new RuntimeException("not yet implemented");
   }
 
@@ -590,7 +590,7 @@ class CopyFun extends Traverser<Fun, Void> {
   }
 
   @Override
-  protected Fun visitGenericRange(GenericRange obj, Void param) {
+  protected Fun visitGenericRange(RangeTemplate obj, Void param) {
     throw new RuntimeException("not yet implemented");
   }
 

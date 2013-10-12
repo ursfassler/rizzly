@@ -3,24 +3,24 @@ package fun.variable;
 import common.ElementInfo;
 
 import fun.FunBase;
-import fun.expression.Expression;
+import fun.expression.reference.Reference;
 import fun.other.Named;
 
 abstract public class Variable extends FunBase implements Named {
   private String name;
-  private Expression type;
+  private Reference type;
 
-  public Variable(ElementInfo info, String name, Expression type) {
+  public Variable(ElementInfo info, String name, Reference type) {
     super(info);
     this.name = name;
     this.type = type;
   }
 
-  public Expression getType() {
+  public Reference getType() {
     return type;
   }
 
-  public void setType(Expression type) {
+  public void setType(Reference type) {
     this.type = type;
   }
 

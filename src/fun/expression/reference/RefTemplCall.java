@@ -6,10 +6,10 @@ import common.ElementInfo;
 
 import fun.expression.Expression;
 
-final public class RefCompcall extends RefItem {
+final public class RefTemplCall extends RefItem {
   final private List<Expression> actualParameter;
 
-  public RefCompcall(ElementInfo info, List<Expression> expr) {
+  public RefTemplCall(ElementInfo info, List<Expression> expr) {
     super(info);
     this.actualParameter = expr;
   }

@@ -38,13 +38,13 @@ import fun.type.base.TypeAlias;
 import fun.type.base.VoidType;
 import fun.type.composed.RecordType;
 import fun.type.composed.UnionType;
-import fun.type.genfunc.Array;
-import fun.type.genfunc.GenericArray;
-import fun.type.genfunc.GenericTypeType;
-import fun.type.genfunc.Range;
-import fun.type.genfunc.TypeType;
+import fun.type.template.Array;
+import fun.type.template.ArrayTemplate;
+import fun.type.template.TypeTypeTemplate;
+import fun.type.template.Range;
+import fun.type.template.TypeType;
 import fun.variable.CompUse;
-import fun.variable.CompfuncParameter;
+import fun.variable.TemplateParameter;
 import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
 import fun.variable.FuncVariable;
@@ -70,10 +70,10 @@ public class KnowScope extends KnowledgeEntry {
     global.add(NamedInterface.class);
     global.add(NamedType.class);
     global.add(IntegerType.class);
-    global.add(GenericArray.class);
+    global.add(ArrayTemplate.class);
     global.add(Range.class);
     global.add(NaturalType.class);
-    global.add(GenericTypeType.class);
+    global.add(TypeTypeTemplate.class);
     global.add(AnyType.class);
     global.add(VoidType.class);
     global.add(RecordType.class);
@@ -91,7 +91,7 @@ public class KnowScope extends KnowledgeEntry {
     global.add(Interface.class);
 
     local.add(FuncVariable.class);
-    local.add(CompfuncParameter.class);
+    local.add(TemplateParameter.class);
     local.add(FuncEntryExit.class); // TODO: sure?
 
     priv.add(IfaceUse.class);

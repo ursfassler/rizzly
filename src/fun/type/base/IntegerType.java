@@ -3,7 +3,7 @@ package fun.type.base;
 import common.ElementInfo;
 
 import fun.other.ListOfNamed;
-import fun.variable.CompfuncParameter;
+import fun.variable.TemplateParameter;
 
 public class IntegerType extends BaseType {
   public static final String NAME = "Integer";
@@ -18,8 +18,8 @@ public class IntegerType extends BaseType {
   }
 
   @Override
-  public ListOfNamed<CompfuncParameter> getParamList() {
-    return new ListOfNamed<CompfuncParameter>();
+  public ListOfNamed<TemplateParameter> getParamList() {
+    return new ListOfNamed<TemplateParameter>();
   }
 
 }

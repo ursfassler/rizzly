@@ -1,4 +1,4 @@
-package fun.type.genfunc;
+package fun.type.template;
 
 import common.ElementInfo;
 

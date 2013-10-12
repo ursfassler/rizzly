@@ -8,7 +8,7 @@ import fun.FunBase;
 import fun.expression.Expression;
 import fun.other.ListOfNamed;
 import fun.other.Named;
-import fun.variable.CompfuncParameter;
+import fun.variable.TemplateParameter;
 
 /**
  *
@@ -16,13 +16,13 @@ import fun.variable.CompfuncParameter;
  */
 abstract public class Generator<T extends FunBase> extends Expression implements Named {
   private String name;
-  final private ListOfNamed<CompfuncParameter> param;
+  final private ListOfNamed<TemplateParameter> param;
   final private T item;
 
-  public Generator(ElementInfo info, String name, Collection<CompfuncParameter> param, T item) {
+  public Generator(ElementInfo info, String name, Collection<TemplateParameter> param, T item) {
     super(info);
     this.name = name;
-    this.param = new ListOfNamed<CompfuncParameter>(param);
+    this.param = new ListOfNamed<TemplateParameter>(param);
     this.item = item;
   }
 
@@ -30,7 +30,7 @@ abstract public class Generator<T extends FunBase> extends Expression implements
     return item;
   }
 
-  public ListOfNamed<CompfuncParameter> getParam() {
+  public ListOfNamed<TemplateParameter> getParam() {
     return param;
   }
 

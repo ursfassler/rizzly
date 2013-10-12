@@ -2,10 +2,10 @@ package fun.variable;
 
 import common.ElementInfo;
 
-import fun.expression.Expression;
+import fun.expression.reference.Reference;
 
 final public class ConstGlobal extends Constant {
-  public ConstGlobal(ElementInfo info, String name, Expression type) {
+  public ConstGlobal(ElementInfo info, String name, Reference type) {
     super(info, name, type);
   }
 

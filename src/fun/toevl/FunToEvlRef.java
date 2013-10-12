@@ -12,7 +12,7 @@ import evl.expression.reference.RefItem;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.expression.reference.RefCall;
-import fun.expression.reference.RefCompcall;
+import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefName;
 
@@ -45,7 +45,7 @@ public class FunToEvlRef extends NullTraverser<RefItem, Void> {
   // ----------------------------------------------------------------------------
 
   @Override
-  protected RefItem visitRefCompcall(RefCompcall obj, Void param) {
+  protected RefItem visitRefCompcall(RefTemplCall obj, Void param) {
     RError.err(ErrorType.Fatal, obj.getInfo(), "Unresolved compcall");
     throw new RuntimeException("not yet implemented");
   }
