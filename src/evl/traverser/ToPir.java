@@ -63,6 +63,7 @@ import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefName;
 import evl.expression.reference.RefPtrDeref;
 import evl.expression.reference.Reference;
+import evl.expression.unop.Not;
 import evl.function.FuncWithBody;
 import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
@@ -707,6 +708,11 @@ class ToVariableGenerator extends NullTraverser<VariableGeneratorStmt, pir.other
   protected VariableGeneratorStmt visitTypeCast(TypeCast obj, pir.other.SsaVariable param) {
     VarRefSimple old = (VarRefSimple) converter.traverse(obj.getValue(), null);
     return new pir.statement.normal.convert.TypeCast(param, old);
+  }
+
+  @Override
+  protected VariableGeneratorStmt visitNot(Not obj, pir.other.SsaVariable param) {
+    return new pir.statement.normal.unop.Not(param, (PirValue) converter.visit(obj.getExpr(), null));
   }
 
   @Override

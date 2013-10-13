@@ -121,7 +121,7 @@ public class MainEvl {
     root = hfsmReduction(root, opt, debugdir, aclasses, kb);
     ExprCutter.process(aclasses, kb);
 
-    NormalizeBool.process( aclasses, kb );
+    NormalizeBool.process( aclasses, kb );  //TODO needed here?
     PrettyPrinter.print(aclasses, debugdir + "normalized.rzy", true);
     
     RangeNarrower.process(aclasses, kb);

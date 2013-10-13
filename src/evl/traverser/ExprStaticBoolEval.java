@@ -231,4 +231,9 @@ class ExprStaticRangeEval extends NullTraverser<RangeValue, Void> {
     return new RangeValue(obj.getInfo(), new NumberSet(new Range(obj.getValue(), obj.getValue())));
   }
 
+  @Override
+  protected RangeValue visitRangeValue(RangeValue obj, Void param) {
+    return obj;
+  }
+
 }

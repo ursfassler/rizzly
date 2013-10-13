@@ -10,6 +10,7 @@ import util.Unsure;
 import evl.DefTraverser;
 import evl.Evl;
 import evl.NullTraverser;
+import evl.copy.Copy;
 import evl.expression.BoolValue;
 import evl.expression.Expression;
 import evl.expression.RangeValue;
@@ -26,6 +27,7 @@ import evl.knowledge.KnowledgeBase;
 import evl.solver.RelationEvaluator;
 import evl.solver.Solver;
 import evl.traverser.ExprBuilder;
+import evl.traverser.ExprReplacer;
 import evl.traverser.ExprStaticBoolEval;
 import evl.traverser.NormalizeBool;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
@@ -48,6 +50,8 @@ public class RangeGetter extends NullTraverser<Map<SsaVariable, NumSet>, Boolean
   }
 
   public static Map<SsaVariable, NumSet> getSmallerRangeFor(boolean evalTo, Expression boolExpr, KnowledgeBase kb) {
+    boolExpr = ExprBuilder.makeTree(boolExpr, kb);
+    boolExpr = NormalizeBool.process(boolExpr, kb);
     Map<Expression, Unsure> eval = ExprStaticBoolEval.eval(boolExpr, kb);
     RangeGetter updater = new RangeGetter(eval, kb);
     Map<SsaVariable, NumSet> varrange = updater.traverse(boolExpr, evalTo);
@@ -73,7 +77,7 @@ public class RangeGetter extends NullTraverser<Map<SsaVariable, NumSet>, Boolean
       assert (obj.getLink() instanceof SsaVariable);
       Expression writer = kw.get((SsaVariable) obj.getLink());
       return visit(writer, param);
-    } else if( obj.getLink() instanceof FunctionHeader ){
+    } else if (obj.getLink() instanceof FunctionHeader) {
       return new HashMap<SsaVariable, NumSet>();
     } else {
       throw new RuntimeException("not yet implemented: " + obj.getLink().getClass().getCanonicalName());
@@ -100,7 +104,8 @@ public class RangeGetter extends NullTraverser<Map<SsaVariable, NumSet>, Boolean
     vg.traverse(obj, variables);
     for (SsaVariable var : variables) {
       if ((var.getType().getRef() instanceof NumSet)) {
-        Expression et = ExprBuilder.makeTree(obj, var, kb);
+        Expression et = Copy.copy(obj);
+        VarRefByRangeReplacer.INSTANCE.traverse(et, var);
         if (!evalTo) {
           et = new Not(et.getInfo(), et);
         }
@@ -229,4 +234,24 @@ class VarGetter extends DefTraverser<Void, Set<SsaVariable>> {
     }
     return super.visitReference(obj, param);
   }
+}
+
+class VarRefByRangeReplacer extends ExprReplacer<SsaVariable> {
+  static final public VarRefByRangeReplacer INSTANCE = new VarRefByRangeReplacer();
+
+  @Override
+  protected Expression visitReference(Reference obj, SsaVariable param) {
+    if (obj.getLink() instanceof SsaVariable) {
+      assert (obj.getOffset().isEmpty());
+      SsaVariable var = (SsaVariable) obj.getLink();
+      if (var == param) {
+        return obj;
+      }
+      NumSet ns = (NumSet) var.getType().getRef();
+      return new RangeValue(obj.getInfo(), ns.getNumbers());
+    } else {
+      throw new RuntimeException("not yet implemented");
+    }
+  }
+
 }

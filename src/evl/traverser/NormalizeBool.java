@@ -12,6 +12,7 @@ import evl.expression.binop.Less;
 import evl.expression.binop.Lessequal;
 import evl.expression.binop.Notequal;
 import evl.expression.binop.Or;
+import evl.expression.reference.Reference;
 import evl.expression.unop.Not;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
@@ -44,7 +45,6 @@ public class NormalizeBool extends ExprReplacer<Void> {
         return obj.getRight();
       } else {
         return Inverter.INSTANCE.traverse(obj.getRight(), null);
-//        return visit(new Not(obj.getInfo(), obj.getRight()), param);
       }
     }
     if (rib) {
@@ -53,7 +53,6 @@ public class NormalizeBool extends ExprReplacer<Void> {
         return obj.getLeft();
       } else {
         return Inverter.INSTANCE.traverse(obj.getLeft(), null);
-//        return visit(new Not(obj.getInfo(), obj.getLeft()), param);
       }
     }
     return obj;
@@ -139,6 +138,11 @@ class Inverter extends NullTraverser<Expression, Void> {
   @Override
   protected Expression visitDefault(Evl obj, Void param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+  }
+
+  @Override
+  protected Expression visitReference(Reference obj, Void param) {
+    return new Not(obj.getInfo(), obj);   //TODO follow link?
   }
 
   @Override

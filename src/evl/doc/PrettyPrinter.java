@@ -52,6 +52,8 @@ import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefName;
 import evl.expression.reference.RefPtrDeref;
 import evl.expression.reference.Reference;
+import evl.expression.unop.Not;
+import evl.expression.unop.Uminus;
 import evl.function.FuncWithBody;
 import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
@@ -718,6 +720,20 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.wr("[");
     list(obj.getValue(), ", ", param);
     param.wr("]");
+    return null;
+  }
+
+  @Override
+  protected Void visitNot(Not obj, StreamWriter param) {
+    param.wr( "not " );
+    visit(obj.getExpr(),param);
+    return null;
+  }
+
+  @Override
+  protected Void visitUminus(Uminus obj, StreamWriter param) {
+    param.wr( "- " );
+    visit(obj.getExpr(),param);
     return null;
   }
 

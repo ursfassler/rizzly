@@ -5,6 +5,7 @@ import evl.NullTraverser;
 import evl.expression.BoolValue;
 import evl.expression.Expression;
 import evl.expression.Number;
+import evl.expression.RangeValue;
 import evl.expression.binop.And;
 import evl.expression.binop.Div;
 import evl.expression.binop.Equal;
@@ -21,6 +22,8 @@ import evl.expression.binop.Plus;
 import evl.expression.binop.Shl;
 import evl.expression.binop.Shr;
 import evl.expression.reference.Reference;
+import evl.expression.unop.Not;
+import evl.expression.unop.Uminus;
 
 public class CopyExpression extends NullTraverser<Expression, Void> {
 
@@ -44,6 +47,11 @@ public class CopyExpression extends NullTraverser<Expression, Void> {
   @Override
   protected Expression visitBoolValue(BoolValue obj, Void param) {
     return new BoolValue(obj.getInfo(), obj.isValue());
+  }
+
+  @Override
+  protected Expression visitRangeValue(RangeValue obj, Void param) {
+    return new RangeValue( obj.getInfo(), obj.getValues() );
   }
 
   @Override
@@ -125,4 +133,15 @@ public class CopyExpression extends NullTraverser<Expression, Void> {
   protected Expression visitShr(Shr obj, Void param) {
     return new Shr(obj.getInfo(), cast.copy(obj.getLeft()), cast.copy(obj.getRight()));
   }
+
+  @Override
+  protected Expression visitNot(Not obj, Void param) {
+    return new Not(obj.getInfo(), cast.copy(obj.getExpr()));
+  }
+
+  @Override
+  protected Expression visitUminus(Uminus obj, Void param) {
+    return new Uminus(obj.getInfo(), cast.copy(obj.getExpr()));
+  }
+
 }

@@ -13,53 +13,47 @@ import evl.knowledge.KnowledgeBase;
 import evl.type.base.BooleanType;
 import evl.type.base.NumSet;
 import evl.variable.SsaVariable;
-import evl.variable.Variable;
 
 /**
  * 
  * @author urs
  */
-public class ExprBuilder extends ExprReplacer<Variable> {
-  private final KnowledgeBase kb;
+public class ExprBuilder extends ExprReplacer<Void> {
   private final KnowWriter kw;
 
   public ExprBuilder(KnowledgeBase kb) {
     super();
-    this.kb = kb;
     kw = kb.getEntry(KnowWriter.class);
   }
 
-  public static Expression makeTree(Expression expr, Variable var, KnowledgeBase kb) {
+  public static Expression makeTree(Expression expr, KnowledgeBase kb) {
     ExprBuilder builder = new ExprBuilder(kb);
-    return builder.traverse(expr, var);
+    return builder.traverse(expr, null);
   }
 
   @Override
-  public Expression traverse(Evl obj, Variable param) {
+  public Expression traverse(Evl obj, Void param) {
     obj = Copy.copy(obj);
     return super.traverse(obj, param);
   }
 
   @Override
-  protected Expression visitNumber(Number obj, Variable param) {
+  protected Expression visitNumber(Number obj, Void param) {
     return new RangeValue(obj.getInfo(), new NumberSet(new Range(obj.getValue(), obj.getValue())));
   }
 
   @Override
-  protected Expression visitReference(Reference obj, Variable param) {
+  protected Expression visitReference(Reference obj, Void param) {
     if (obj.getLink() instanceof SsaVariable) {
       assert (obj.getOffset().isEmpty());
       SsaVariable var = (SsaVariable) obj.getLink();
-      if (var == param) {
-        return obj;
-      }
       if (var.getType().getRef() instanceof BooleanType) {
         Expression writer = kw.get(var);
         writer = Copy.copy(writer);
+        writer = visit(writer, param);
         return writer;
       } else if (var.getType().getRef() instanceof NumSet) {
-        NumSet ns = (NumSet) var.getType().getRef();
-        return new RangeValue(var.getInfo(), ns.getNumbers());
+        return obj;
       } else {
         throw new RuntimeException("not yet implemented");
       }
