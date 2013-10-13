@@ -8,10 +8,13 @@ import pir.NullTraverser;
 import pir.PirObject;
 import pir.other.Program;
 import pir.traverser.Relinker;
+import pir.type.IntType;
 import pir.type.RangeType;
 import pir.type.SignedType;
 import pir.type.Type;
 import pir.type.UnsignedType;
+import error.ErrorType;
+import error.RError;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 
 /**
@@ -24,6 +27,7 @@ public class RangeReplacer extends NullTraverser<Void, Void> {
   private final Map<Integer, SignedType> signed = new HashMap<Integer, SignedType>();
   private final Map<Integer, UnsignedType> unsigned = new HashMap<Integer, UnsignedType>();
   private final Map<RangeType, Type> map = new HashMap<RangeType, Type>();
+  private final int allowedBitSizes[] = { 8, 16, 32, 64 };    //TODO make a parameter (is probably target specific)
 
   public static void process(Program obj) {
     RangeReplacer changer = new RangeReplacer();
@@ -78,7 +82,18 @@ public class RangeReplacer extends NullTraverser<Void, Void> {
       bits++;
     }
 
-    Type ret;
+    if( bits > allowedBitSizes[allowedBitSizes.length-1] ){
+      RError.err(ErrorType.Fatal, "Found type with too many bits: " + obj.toString() );
+    }
+    
+    for( int i = 0; i < allowedBitSizes.length; i++ ){
+      if( bits <= allowedBitSizes[i] ){
+        bits = allowedBitSizes[i];
+        break;
+      }
+    }
+    
+    IntType ret;
     if (hasNeg) {
       ret = getSint(bits);
     } else {
