@@ -2,9 +2,10 @@ package fun.type;
 
 import common.ElementInfo;
 
+import fun.other.ActualTemplateArgument;
 import fun.other.Named;
 
-public class NamedType extends Type implements Named {
+public class NamedType extends Type implements Named, ActualTemplateArgument {
   private String name;
   private Type type;
 

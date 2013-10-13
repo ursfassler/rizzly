@@ -48,7 +48,7 @@ import fun.traverser.Memory;
 import fun.traverser.NamespaceLinkReduction;
 import fun.traverser.StateLinkReduction;
 import fun.traverser.TypeEvalReplacer;
-import fun.traverser.spezializer.ExprEvaluator;
+import fun.traverser.spezializer.EvalTo;
 import fun.traverser.spezializer.Specializer;
 import fun.type.NamedType;
 import fun.type.base.AnyType;
@@ -115,8 +115,8 @@ public class MainFun {
     DocWriter.print(fileList, new KnowledgeBase(classes, fileList, docdir));
 
     NamedComponent nroot = evaluate(root, classes, debugdir, fileList);
-    DeAlias.process( classes );
-    
+    DeAlias.process(classes);
+
     PrettyPrinter.print(classes, debugdir + "evaluated.rzy");
     removeUnused(debugdir, classes, nroot, fileList);
     PrettyPrinter.print(classes, debugdir + "stripped.rzy");
@@ -130,7 +130,7 @@ public class MainFun {
     g.addEdge(instVar, root);
     try {
       @SuppressWarnings("resource")
-      HtmlGraphWriter<Named,Pair<Named,Named>> writer = new HtmlGraphWriter<Named,Pair<Named,Named>>(new joGraph.Writer(new PrintStream(debugdir))) {
+      HtmlGraphWriter<Named, Pair<Named, Named>> writer = new HtmlGraphWriter<Named, Pair<Named, Named>>(new joGraph.Writer(new PrintStream(debugdir))) {
         @Override
         protected void wrVertex(Named v) {
           wrVertexStart(v);
@@ -182,8 +182,8 @@ public class MainFun {
       {
         List<ConstGlobal> gconst = classes.getItems(ConstGlobal.class, true);
         for (ConstGlobal itr : gconst) {
-          NamedType type = (NamedType) ExprEvaluator.evaluate(itr.getType(), new Memory(), kb);
-          itr.setType(new ReferenceLinked(itr.getInfo(), type));
+          NamedType type = EvalTo.type((ReferenceLinked) itr.getType(), kb);
+          itr.setType(new ReferenceLinked(itr.getType().getInfo(), type));
         }
       }
 
@@ -196,7 +196,7 @@ public class MainFun {
         }
       }
 
-      NamedComponent nroot = Specializer.processComp((ComponentGenerator) root, new ArrayList<Expression>(), kb);
+      NamedComponent nroot = Specializer.processComp((ComponentGenerator) root, new ArrayList<Expression>(), root.getInfo(), kb);
 
       return nroot;
     }

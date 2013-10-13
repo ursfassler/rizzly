@@ -223,7 +223,7 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
-  public void genericUse_GenericUse() {
+  public void genericUse() {
     compile("genericUse", TestSteps.COMPILE_TO_PIR, false, false);
   }
 

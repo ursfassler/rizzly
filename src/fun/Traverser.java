@@ -11,10 +11,10 @@ import fun.expression.Relation;
 import fun.expression.StringValue;
 import fun.expression.UnaryExpression;
 import fun.expression.reference.RefCall;
-import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefItem;
 import fun.expression.reference.RefName;
+import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.Reference;
 import fun.expression.reference.ReferenceLinked;
 import fun.expression.reference.ReferenceUnlinked;
@@ -79,18 +79,18 @@ import fun.type.composed.UnionSelector;
 import fun.type.composed.UnionType;
 import fun.type.template.Array;
 import fun.type.template.ArrayTemplate;
-import fun.type.template.RangeTemplate;
-import fun.type.template.TypeTypeTemplate;
 import fun.type.template.Range;
+import fun.type.template.RangeTemplate;
 import fun.type.template.TypeType;
+import fun.type.template.TypeTypeTemplate;
 import fun.variable.CompUse;
-import fun.variable.TemplateParameter;
 import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
 import fun.variable.Constant;
 import fun.variable.FuncVariable;
 import fun.variable.IfaceUse;
 import fun.variable.StateVariable;
+import fun.variable.TemplateParameter;
 import fun.variable.Variable;
 
 public abstract class Traverser<R, P> {
@@ -155,6 +155,8 @@ public abstract class Traverser<R, P> {
       return visitNamedComponent((NamedComponent) obj, param);
     } else if( obj instanceof UnionSelector ) {
       return visitUnionSelector((UnionSelector) obj, param);
+    } else if( obj instanceof Generator ) {
+      return visitGenerator((Generator) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -288,8 +290,6 @@ public abstract class Traverser<R, P> {
       return visitUnaryExpression((UnaryExpression) obj, param);
     } else if( obj instanceof Reference ) {
       return visitReference((Reference) obj, param);
-    } else if( obj instanceof Generator ) {
-      return visitGenerator((Generator) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }

@@ -18,21 +18,16 @@ import fun.expression.Relation;
 import fun.expression.StringValue;
 import fun.expression.UnaryExpression;
 import fun.expression.reference.RefCall;
-import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefItem;
 import fun.expression.reference.RefName;
+import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.ReferenceLinked;
-import fun.expression.reference.ReferenceUnlinked;
-import fun.function.impl.FuncGlobal;
-import fun.generator.Generator;
-import fun.generator.TypeGenerator;
 import fun.knowledge.KnowledgeBase;
 import fun.traverser.Memory;
-import fun.type.NamedType;
-import fun.variable.TemplateParameter;
 import fun.variable.ConstGlobal;
 import fun.variable.FuncVariable;
+import fun.variable.TemplateParameter;
 
 public class ExprEvaluator extends NullTraverser<Expression, Memory> {
   private RefExecutor rex;
@@ -83,17 +78,6 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
   }
 
   @Override
-  protected Expression visitGenerator(@SuppressWarnings("rawtypes") Generator obj, Memory param) {
-    return obj;
-  }
-
-  @Override
-  protected Expression visitNamedType(NamedType obj, Memory param) {
-    // return obj.getType();
-    return obj; // TODO ????
-  }
-
-  @Override
   protected Expression visitConstGlobal(ConstGlobal obj, Memory param) {
     return visit(obj.getDef(), new Memory()); // new memory because global constant need no context
   }
@@ -111,11 +95,6 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
   }
 
   @Override
-  protected Expression visitReferenceUnlinked(ReferenceUnlinked obj, Memory param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
   protected Expression visitRefCall(RefCall obj, Memory param) {
     visitExpList(obj.getActualParameter(), param);
     return null;
@@ -129,7 +108,7 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
 
   @Override
   protected Expression visitRefName(RefName obj, Memory param) {
-    return null;
+    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
   @Override
@@ -139,10 +118,10 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
   }
 
   private int getInt(ElementInfo info, BigInteger rval) {
-    if( rval.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0 ){
-      RError.err(ErrorType.Error, info, "value to big: " + rval.toString() );
-    } else if( rval.compareTo(BigInteger.valueOf(Integer.MIN_VALUE)) < 0 ){
-      RError.err(ErrorType.Error, info, "value to small: " + rval.toString() );
+    if (rval.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
+      RError.err(ErrorType.Error, info, "value to big: " + rval.toString());
+    } else if (rval.compareTo(BigInteger.valueOf(Integer.MIN_VALUE)) < 0) {
+      RError.err(ErrorType.Error, info, "value to small: " + rval.toString());
     }
     return rval.intValue();
   }
@@ -180,10 +159,10 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
         res = lval.add(rval);
         break;
       case SHL:
-        res = lval.shiftLeft( getInt(obj.getInfo(), rval) );
+        res = lval.shiftLeft(getInt(obj.getInfo(), rval));
         break;
       case SHR:
-        res = lval.shiftRight( getInt(obj.getInfo(), rval) );
+        res = lval.shiftRight(getInt(obj.getInfo(), rval));
         break;
       default:
         RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj.getOp());
@@ -261,7 +240,7 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
   protected Expression visitUnaryExpression(UnaryExpression obj, Memory param) {
     Expression expr = visit(obj.getExpr(), param);
 
-    if ((expr instanceof Number) ) {
+    if ((expr instanceof Number)) {
       BigInteger eval = ((Number) expr).getValue();
       BigInteger res;
 
@@ -277,39 +256,6 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
     } else {
       return obj;
     }
-  }
-
-  @Override
-  protected Expression visitBoolValue(BoolValue obj, Memory param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-}
-
-class RefExecutor extends NullTraverser<Expression, RefItem> {
-
-  private KnowledgeBase kb;
-
-  public RefExecutor(KnowledgeBase kb) {
-    super();
-    this.kb = kb;
-  }
-
-  @Override
-  protected Expression visitDefault(Fun obj, RefItem param) {
-    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
-  }
-
-  @Override
-  protected Expression visitFuncGlobal(FuncGlobal obj, RefItem param) {
-    assert (param instanceof RefCall);
-    return StmtExecutor.process(obj, ((RefCall) param).getActualParameter(), new Memory(), kb);
-  }
-
-  @Override
-  protected Expression visitTypeGenerator(TypeGenerator obj, RefItem param) {
-    assert (param instanceof RefTemplCall);
-    return Specializer.processType(obj, ((RefTemplCall) param).getActualParameter(), kb);
   }
 
 }

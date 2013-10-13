@@ -24,8 +24,8 @@ import fun.type.composed.NamedElement;
 import fun.type.composed.RecordType;
 import fun.type.composed.UnionSelector;
 import fun.type.composed.UnionType;
-import fun.variable.TemplateParameter;
 import fun.variable.IfaceUse;
+import fun.variable.TemplateParameter;
 
 public class TypeParser extends BaseParser {
 

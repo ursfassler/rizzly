@@ -1,5 +1,5 @@
 component
-  GenericSub{T:Type}
+  GenericSub{T:Type{Any}}
     implementation elementary
 
     var

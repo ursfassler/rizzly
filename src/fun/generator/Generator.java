@@ -5,7 +5,6 @@ import java.util.Collection;
 import common.ElementInfo;
 
 import fun.FunBase;
-import fun.expression.Expression;
 import fun.other.ListOfNamed;
 import fun.other.Named;
 import fun.variable.TemplateParameter;
@@ -14,7 +13,7 @@ import fun.variable.TemplateParameter;
  *
  * @author urs
  */
-abstract public class Generator<T extends FunBase> extends Expression implements Named {
+abstract public class Generator<T extends FunBase> extends FunBase implements Named {
   private String name;
   final private ListOfNamed<TemplateParameter> param;
   final private T item;

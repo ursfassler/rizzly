@@ -40,16 +40,16 @@ import fun.type.composed.RecordType;
 import fun.type.composed.UnionType;
 import fun.type.template.Array;
 import fun.type.template.ArrayTemplate;
-import fun.type.template.TypeTypeTemplate;
 import fun.type.template.Range;
 import fun.type.template.TypeType;
+import fun.type.template.TypeTypeTemplate;
 import fun.variable.CompUse;
-import fun.variable.TemplateParameter;
 import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
 import fun.variable.FuncVariable;
 import fun.variable.IfaceUse;
 import fun.variable.StateVariable;
+import fun.variable.TemplateParameter;
 
 public class KnowScope extends KnowledgeEntry {
   @SuppressWarnings("rawtypes")

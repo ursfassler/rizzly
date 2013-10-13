@@ -12,9 +12,9 @@ import evl.expression.reference.RefItem;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.expression.reference.RefCall;
-import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefName;
+import fun.expression.reference.RefTemplCall;
 
 public class FunToEvlRef extends NullTraverser<RefItem, Void> {
   private Map<Fun, Evl> map;

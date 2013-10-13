@@ -25,12 +25,15 @@ final public class ArrayTemplate extends BaseType {
 
   public ListOfNamed<TemplateParameter> getParamList() {
     ListOfNamed<TemplateParameter> ret = new ListOfNamed<TemplateParameter>();
+    
     ret.add(new TemplateParameter(new ElementInfo(), PARAM[0], new ReferenceUnlinked(new ElementInfo(), new Designator(IntegerType.NAME))));
+    
     ReferenceUnlinked type = new ReferenceUnlinked(new ElementInfo(), new Designator(TypeTypeTemplate.NAME));
     List<Expression> typeparam = new ArrayList<Expression>();
     typeparam.add(new ReferenceUnlinked(new ElementInfo(), new Designator(AnyType.NAME)));
     type.getOffset().add(new RefTemplCall(new ElementInfo(),typeparam));
     ret.add(new TemplateParameter(new ElementInfo(), PARAM[1], type));
+    
     return ret;
   }
 

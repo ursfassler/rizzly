@@ -22,9 +22,9 @@ import fun.function.impl.FuncProtVoid;
 import fun.statement.Assignment;
 import fun.statement.Statement;
 import fun.statement.VarDefStmt;
-import fun.variable.TemplateParameter;
 import fun.variable.Constant;
 import fun.variable.FuncVariable;
+import fun.variable.TemplateParameter;
 import fun.variable.Variable;
 import fun.variable.VariableFactory;
 

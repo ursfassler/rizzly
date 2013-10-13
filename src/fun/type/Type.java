@@ -2,9 +2,9 @@ package fun.type;
 
 import common.ElementInfo;
 
-import fun.expression.Expression;
+import fun.FunBase;
 
-abstract public class Type extends Expression {
+abstract public class Type extends FunBase {
   public Type(ElementInfo info) {
     super(info);
   }

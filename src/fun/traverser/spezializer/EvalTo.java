@@ -4,6 +4,7 @@ import java.util.List;
 
 import fun.expression.Expression;
 import fun.expression.reference.RefTemplCall;
+import fun.expression.reference.Reference;
 import fun.expression.reference.ReferenceLinked;
 import fun.generator.ComponentGenerator;
 import fun.generator.InterfaceGenerator;
@@ -14,7 +15,7 @@ import fun.other.NamedInterface;
 import fun.type.NamedType;
 
 public class EvalTo {
-  public static NamedInterface iface(Expression expr, KnowledgeBase kb) {
+  public static NamedInterface iface(Reference expr, KnowledgeBase kb) {
     assert (expr instanceof ReferenceLinked);
 
     ReferenceLinked obj = (ReferenceLinked) expr;
@@ -26,10 +27,10 @@ public class EvalTo {
     InterfaceGenerator generator = (InterfaceGenerator) obj.getLink();
     List<Expression> actparam = ((RefTemplCall) obj.getOffset().get(0)).getActualParameter();
 
-    return Specializer.processIface(generator, actparam, kb);
+    return Specializer.processIface(generator, actparam, expr.getInfo(), kb);
   }
 
-  public static NamedComponent comp(Expression expr, KnowledgeBase kb) {
+  public static NamedComponent comp(Reference expr, KnowledgeBase kb) {
     assert (expr instanceof ReferenceLinked);
 
     ReferenceLinked obj = (ReferenceLinked) expr;
@@ -41,10 +42,11 @@ public class EvalTo {
     ComponentGenerator generator = (ComponentGenerator) obj.getLink();
     List<Expression> actparam = ((RefTemplCall) obj.getOffset().get(0)).getActualParameter();
 
-    return Specializer.processComp(generator, actparam, kb);
+    return Specializer.processComp(generator, actparam, expr.getInfo(), kb);
   }
 
-  public static NamedType type(Expression expr, KnowledgeBase kb) {
+  public static NamedType type(Reference expr, KnowledgeBase kb) {
+    
     assert (expr instanceof ReferenceLinked);
 
     ReferenceLinked obj = (ReferenceLinked) expr;
@@ -59,6 +61,6 @@ public class EvalTo {
     TypeGenerator generator = (TypeGenerator) obj.getLink();
     List<Expression> actparam = ((RefTemplCall) obj.getOffset().get(0)).getActualParameter();
 
-    return Specializer.processType(generator, actparam, kb);
+    return Specializer.processType(generator, actparam, expr.getInfo(), kb);
   }
 }

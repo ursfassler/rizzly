@@ -18,9 +18,9 @@ import fun.expression.Relation;
 import fun.expression.StringValue;
 import fun.expression.UnaryExpression;
 import fun.expression.reference.RefCall;
-import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefName;
+import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.ReferenceLinked;
 import fun.expression.reference.ReferenceUnlinked;
 import fun.function.FuncWithBody;
@@ -79,17 +79,17 @@ import fun.type.composed.UnionSelector;
 import fun.type.composed.UnionType;
 import fun.type.template.Array;
 import fun.type.template.ArrayTemplate;
-import fun.type.template.RangeTemplate;
-import fun.type.template.TypeTypeTemplate;
 import fun.type.template.Range;
+import fun.type.template.RangeTemplate;
 import fun.type.template.TypeType;
+import fun.type.template.TypeTypeTemplate;
 import fun.variable.CompUse;
-import fun.variable.TemplateParameter;
 import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
 import fun.variable.FuncVariable;
 import fun.variable.IfaceUse;
 import fun.variable.StateVariable;
+import fun.variable.TemplateParameter;
 
 public class Copy {
   public static <T extends Fun> T copy(T obj) {

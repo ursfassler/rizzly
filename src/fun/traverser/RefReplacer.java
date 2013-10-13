@@ -44,13 +44,13 @@ public abstract class RefReplacer<T> extends ExprReplacer<T> {
   protected Expression visitArray(Array obj, T param) {
     assert (false);
     obj.setType((Reference) visit(obj.getType(), param));
-    return obj;
+    return null;
   }
 
   @Override
   protected Expression visitTypeType(TypeType obj, T param) {
     obj.setType((Reference) visit(obj.getType(), param));
-    return obj;
+    return null;
   }
 
   @Override
@@ -98,7 +98,7 @@ public abstract class RefReplacer<T> extends ExprReplacer<T> {
   @Override
   protected Expression visitFunctionHeader(FunctionHeader obj, T param) {
     if (obj instanceof FuncWithReturn) {
-      ((FuncWithReturn) obj).setRet((Reference)visit(((FuncWithReturn) obj).getRet(), param));
+      ((FuncWithReturn) obj).setRet((Reference) visit(((FuncWithReturn) obj).getRet(), param));
     }
     return super.visitFunctionHeader(obj, param);
   }

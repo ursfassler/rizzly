@@ -2,8 +2,8 @@ package fun.traverser;
 
 import fun.DefGTraverser;
 import fun.Fun;
-import fun.expression.Expression;
 import fun.expression.reference.RefTemplCall;
+import fun.expression.reference.Reference;
 import fun.expression.reference.ReferenceLinked;
 import fun.function.FuncWithReturn;
 import fun.function.FunctionHeader;
@@ -12,7 +12,6 @@ import fun.knowledge.KnowledgeBase;
 import fun.other.NamedComponent;
 import fun.other.NamedInterface;
 import fun.traverser.spezializer.EvalTo;
-import fun.traverser.spezializer.ExprEvaluator;
 import fun.traverser.spezializer.Specializer;
 import fun.type.NamedType;
 import fun.type.base.EnumType;
@@ -20,20 +19,20 @@ import fun.type.base.TypeAlias;
 import fun.type.composed.NamedElement;
 import fun.type.template.Array;
 import fun.variable.CompUse;
-import fun.variable.TemplateParameter;
 import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
 import fun.variable.FuncVariable;
 import fun.variable.IfaceUse;
 import fun.variable.StateVariable;
+import fun.variable.TemplateParameter;
 
 /**
  * Replaces all types with the evaluated expression:
- *
+ * 
  * a : U{3+5} => a : U_8
- *
+ * 
  * @author urs
- *
+ * 
  */
 public class TypeEvalReplacer extends DefGTraverser<Void, Memory> {
 
@@ -50,10 +49,9 @@ public class TypeEvalReplacer extends DefGTraverser<Void, Memory> {
     return super.traverse(obj, param);
   }
 
-  private ReferenceLinked eval(Expression expr, Memory mem) {
-    NamedType type = (NamedType) ExprEvaluator.evaluate(expr, mem, kb);
-    ReferenceLinked ref = new ReferenceLinked(expr.getInfo(), type);
-    return ref;
+  private ReferenceLinked eval(Reference expr, Memory mem) {
+    NamedType type = EvalTo.type((ReferenceLinked) expr, kb);
+    return new ReferenceLinked(expr.getInfo(), type);
   }
 
   // TODO are these handlers needed or can it be done by visitReferenceLinked?
@@ -150,7 +148,7 @@ public class TypeEvalReplacer extends DefGTraverser<Void, Memory> {
       assert (obj.getLink() instanceof TypeGenerator);
       RefTemplCall call = (RefTemplCall) obj.getOffset().pop();
       assert (call.getActualParameter().isEmpty());
-      NamedType type = Specializer.processType((TypeGenerator) obj.getLink(), call.getActualParameter(), kb);
+      NamedType type = Specializer.processType((TypeGenerator) obj.getLink(), call.getActualParameter(), obj.getInfo(), kb);
       assert (type.getType() instanceof EnumType);
       obj.setLink(type);
     }

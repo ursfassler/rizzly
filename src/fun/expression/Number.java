@@ -4,11 +4,13 @@ import java.math.BigInteger;
 
 import common.ElementInfo;
 
+import fun.other.ActualTemplateArgument;
+
 /**
  * 
  * @author urs
  */
-final public class Number extends Expression {
+final public class Number extends Expression implements ActualTemplateArgument {
 
   final private BigInteger value;
 

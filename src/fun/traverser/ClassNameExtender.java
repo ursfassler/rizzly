@@ -19,9 +19,9 @@ import fun.FunBase;
 import fun.NullTraverser;
 import fun.composition.ImplComposition;
 import fun.expression.reference.RefCall;
-import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefName;
+import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.ReferenceLinked;
 import fun.expression.reference.ReferenceUnlinked;
 import fun.function.FunctionHeader;
@@ -47,11 +47,11 @@ import fun.symbol.SymbolTable;
 import fun.type.NamedType;
 import fun.type.Type;
 import fun.variable.CompUse;
-import fun.variable.TemplateParameter;
 import fun.variable.Constant;
 import fun.variable.FuncVariable;
 import fun.variable.IfaceUse;
 import fun.variable.StateVariable;
+import fun.variable.TemplateParameter;
 
 //TODO what if interface and component have the same name? (in different namespaces)
 //TODO what if component is specified with namespace prefix?

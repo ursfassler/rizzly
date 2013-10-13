@@ -9,7 +9,7 @@ function getBits( nr: Natural ):Natural
 end
 
 type
-  Rec{T:Type} = Record
+  Rec{T:Type{Any}} = Record
     a : T;
     b : T;
   end

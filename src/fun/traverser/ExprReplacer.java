@@ -14,10 +14,10 @@ import fun.expression.Relation;
 import fun.expression.StringValue;
 import fun.expression.UnaryExpression;
 import fun.expression.reference.RefCall;
-import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefItem;
 import fun.expression.reference.RefName;
+import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.Reference;
 import fun.expression.reference.ReferenceLinked;
 import fun.expression.reference.ReferenceUnlinked;
@@ -31,11 +31,7 @@ import fun.statement.CaseStmt;
 import fun.statement.IfOption;
 import fun.statement.ReturnExpr;
 import fun.statement.While;
-import fun.type.NamedType;
-import fun.type.base.IntegerType;
-import fun.type.base.NaturalType;
 import fun.type.composed.NamedElement;
-import fun.type.template.Range;
 import fun.variable.Constant;
 import fun.variable.Variable;
 
@@ -185,26 +181,6 @@ public class ExprReplacer<T> extends DefGTraverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitIntegerType(IntegerType obj, T param) {
-    return obj;
-  }
-
-  @Override
-  protected Expression visitNaturalType(NaturalType obj, T param) {
-    return obj;
-  }
-
-  @Override
-  protected Expression visitRange(Range obj, T param) {
-    return obj;
-  }
-
-  @Override
-  protected Expression visitNamedType(NamedType obj, T param) {
-    return obj;
-  }
-
-  @Override
   protected Expression visitTransition(Transition obj, T param) {
     obj.setGuard(visit(obj.getGuard(), param));
     return super.visitTransition(obj, param);
@@ -212,20 +188,20 @@ public class ExprReplacer<T> extends DefGTraverser<Expression, T> {
 
   @Override
   protected Expression visitNamedElement(NamedElement obj, T param) {
-    obj.setType((Reference)visit(obj.getType(), param));
+    obj.setType((Reference) visit(obj.getType(), param));
     return super.visitNamedElement(obj, param);
   }
 
   @Override
   protected Expression visitVariable(Variable obj, T param) {
-    obj.setType((Reference)visit(obj.getType(), param));
+    obj.setType((Reference) visit(obj.getType(), param));
     return super.visitVariable(obj, param);
   }
 
   @Override
   protected Expression visitFunctionHeader(FunctionHeader obj, T param) {
     if (obj instanceof FuncWithReturn) {
-      ((FuncWithReturn) obj).setRet((Reference)visit(((FuncWithReturn) obj).getRet(), param));
+      ((FuncWithReturn) obj).setRet((Reference) visit(((FuncWithReturn) obj).getRet(), param));
     }
     return super.visitFunctionHeader(obj, param);
   }
