@@ -106,12 +106,15 @@ class SubDep extends DefTraverser<Void, Named> {
     super.visitReference(obj, param);
 
     Named dst = obj.getLink();
+    if( g.containsVertex(dst) ){
+      return null;
+    }
     g.addVertex(dst);
     Scope scope = KnowScope.get(dst);
     switch (scope) { // TODO do we need that?
     case global:
     case privat:
-      g.addEdge(param, obj.getLink());
+      g.addEdge(param, dst);
       break;
     case local:
       break;
@@ -120,7 +123,7 @@ class SubDep extends DefTraverser<Void, Named> {
       break;
     }
 
-    visit(obj.getLink(), obj.getLink());
+    visit(dst, dst);
 
     return null;
   }

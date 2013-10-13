@@ -9,12 +9,9 @@ import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
-import fun.Fun;
 import fun.FunBase;
-import fun.NullTraverser;
 import fun.expression.Expression;
 import fun.expression.Number;
-import fun.expression.reference.Reference;
 import fun.expression.reference.ReferenceLinked;
 import fun.generator.ComponentGenerator;
 import fun.generator.Generator;
@@ -165,20 +162,6 @@ public class Specializer {
     }
     name += "}";
     return name;
-  }
-
-}
-
-class SpecDispatcher extends NullTraverser<Fun, List<Expression>> {
-
-  public static Fun execute(Reference type, KnowledgeBase kb) {
-    SpecDispatcher dispatcher = new SpecDispatcher();
-    return dispatcher.traverse(type, null);
-  }
-
-  @Override
-  protected Fun visitDefault(Fun obj, List<Expression> param) {
-    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
 }
