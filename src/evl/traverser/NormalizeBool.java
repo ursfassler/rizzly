@@ -127,7 +127,34 @@ public class NormalizeBool extends ExprReplacer<Void> {
 
   @Override
   protected Expression visitOr(Or obj, Void param) {
-    throw new RuntimeException("not yet implemented");
+    obj = (Or) super.visitOr(obj, param);
+    boolean lib = obj.getLeft() instanceof BoolValue;
+    boolean rib = obj.getRight() instanceof BoolValue;
+    if (lib && rib) {
+      //TODO check
+      boolean lv = ((BoolValue) obj.getLeft()).isValue();
+      boolean rv = ((BoolValue) obj.getRight()).isValue();
+      return new BoolValue(obj.getInfo(), lv || rv);
+    }
+    if (lib) {
+      //TODO check
+      boolean lv = ((BoolValue) obj.getLeft()).isValue();
+      if (lv) {
+        return new BoolValue(obj.getInfo(), true);
+      } else {
+        return obj.getRight();
+      }
+    }
+    if (rib) {
+      //TODO check
+      boolean rv = ((BoolValue) obj.getRight()).isValue();
+      if (rv) {
+        return new BoolValue(obj.getInfo(), true);
+      } else {
+        return obj.getLeft();
+      }
+    }
+    return obj;
   }
 
 }

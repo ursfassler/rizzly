@@ -43,7 +43,7 @@ component
         end
         a[out2.tack(x)-z].y := t;
       end
-      return x + y * z - a[out1.tack(x)].y * a[out1.tack(y)].x;
+      return (x + y * z + a[out1.tack(x)].y * a[out1.tack(y)].x) mod 256;
     end
     
     function in.tick( x: R{0,255} )

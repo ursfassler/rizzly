@@ -12,13 +12,13 @@ void printMsg( uint8_t *list, int size ){
   }
 }
 
-void inst__debug_msgSend(Pointer_Array_3_R_0_3 sender, R_0_2 size){
+void inst__debug_msgSend(Pointer_Array_3_R_0_6 sender, R_0_2 size){
   printf( "send: " );
   printMsg( *sender, size );
   printf( "\n" );
 }
 
-void inst__debug_msgRecv(Pointer_Array_3_R_0_3 receiver, R_0_2 size){
+void inst__debug_msgRecv(Pointer_Array_3_R_0_6 receiver, R_0_2 size){
   printf( "recv: " );
   printMsg( *receiver, size );
   printf( "\n" );

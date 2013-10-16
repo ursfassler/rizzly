@@ -8,9 +8,11 @@ import evl.expression.Expression;
 import evl.expression.Number;
 import evl.expression.RangeValue;
 import evl.expression.reference.Reference;
+import evl.knowledge.KnowChild;
 import evl.knowledge.KnowWriter;
 import evl.knowledge.KnowledgeBase;
 import evl.type.base.BooleanType;
+import evl.type.base.EnumType;
 import evl.type.base.NumSet;
 import evl.variable.SsaVariable;
 
@@ -20,10 +22,14 @@ import evl.variable.SsaVariable;
  */
 public class ExprBuilder extends ExprReplacer<Void> {
   private final KnowWriter kw;
+  private final KnowChild kc;
+  private final KnowledgeBase kb;
 
   public ExprBuilder(KnowledgeBase kb) {
     super();
     kw = kb.getEntry(KnowWriter.class);
+    kc = kb.getEntry(KnowChild.class);
+    this.kb = kb;
   }
 
   public static Expression makeTree(Expression expr, KnowledgeBase kb) {
@@ -54,12 +60,13 @@ public class ExprBuilder extends ExprReplacer<Void> {
         return writer;
       } else if (var.getType().getRef() instanceof NumSet) {
         return obj;
+      } else if (var.getType().getRef() instanceof EnumType) {
+        return obj;
       } else {
-        throw new RuntimeException("not yet implemented");
+        throw new RuntimeException("not yet implemented: " + var);
       }
     } else {
-      throw new RuntimeException("not yet implemented");
-      // return super.visitReference(obj, param);
+      return obj;
     }
   }
 

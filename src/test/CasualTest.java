@@ -134,7 +134,7 @@ public class CasualTest extends BaseTest {
 
   @Test
   public void ifacemap() {
-    compile("ifacemap", TestSteps.EXECUTE, true, false);
+    compile("ifacemap", TestSteps.COMPILE_TO_ASM, true, false);
   }
 
   @Test
@@ -174,7 +174,7 @@ public class CasualTest extends BaseTest {
 
   @Test
   public void alarmController() {
-    compile("alarmController", TestSteps.EXECUTE, false, false);
+    compile("alarmController", TestSteps.COMPILE_TO_ASM, false, false);
   }
 
   @Test
