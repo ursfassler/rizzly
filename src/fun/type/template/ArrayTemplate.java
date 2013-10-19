@@ -9,37 +9,31 @@ import common.ElementInfo;
 import fun.expression.Expression;
 import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.ReferenceUnlinked;
-import fun.other.ListOfNamed;
+import fun.generator.TypeGenerator;
 import fun.type.base.AnyType;
-import fun.type.base.BaseType;
 import fun.type.base.IntegerType;
 import fun.variable.TemplateParameter;
 
-final public class ArrayTemplate extends BaseType {
+final public class ArrayTemplate extends TypeGenerator {
   public static final String NAME = "Array";
   public static final String[] PARAM = { "S", "T" };
 
   public ArrayTemplate() {
-    super(new ElementInfo());
+    super(new ElementInfo(), NAME, makeParam());
   }
 
-  public ListOfNamed<TemplateParameter> getParamList() {
-    ListOfNamed<TemplateParameter> ret = new ListOfNamed<TemplateParameter>();
-    
+  static private List<TemplateParameter> makeParam() {
+    ArrayList<TemplateParameter> ret = new ArrayList<TemplateParameter>();
+
     ret.add(new TemplateParameter(new ElementInfo(), PARAM[0], new ReferenceUnlinked(new ElementInfo(), new Designator(IntegerType.NAME))));
-    
+
     ReferenceUnlinked type = new ReferenceUnlinked(new ElementInfo(), new Designator(TypeTypeTemplate.NAME));
     List<Expression> typeparam = new ArrayList<Expression>();
     typeparam.add(new ReferenceUnlinked(new ElementInfo(), new Designator(AnyType.NAME)));
-    type.getOffset().add(new RefTemplCall(new ElementInfo(),typeparam));
+    type.getOffset().add(new RefTemplCall(new ElementInfo(), typeparam));
     ret.add(new TemplateParameter(new ElementInfo(), PARAM[1], type));
-    
-    return ret;
-  }
 
-  @Override
-  public String getName() {
-    return NAME;
+    return ret;
   }
 
 }

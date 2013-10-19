@@ -2,7 +2,6 @@ package fun.toevl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.Map;
 
 import error.ErrorType;
@@ -14,7 +13,6 @@ import evl.type.composed.NamedElement;
 import evl.type.composed.UnionSelector;
 import fun.Fun;
 import fun.NullTraverser;
-import fun.type.NamedType;
 import fun.type.base.AnyType;
 import fun.type.base.BooleanType;
 import fun.type.base.EnumElement;
@@ -58,11 +56,6 @@ public class FunToEvlType extends NullTraverser<Type, String> {
   }
 
   // --------------------------------------------------------------------------
-
-  @Override
-  protected Type visitNamedType(NamedType obj, String param) {
-    return visit(obj.getType(), param);
-  }
 
   @Override
   protected Type visitBooleanType(BooleanType obj, String param) {
@@ -116,11 +109,11 @@ public class FunToEvlType extends NullTraverser<Type, String> {
 
   @Override
   protected Type visitEnumType(EnumType obj, String param) {
-    List<evl.type.base.EnumElement> elements = new ArrayList<evl.type.base.EnumElement>();
+    evl.type.base.EnumType ret = new evl.type.base.EnumType(obj.getInfo(), param);
+    map.put(obj, ret);
     for (EnumElement elem : obj.getElement()) {
-      elements.add((evl.type.base.EnumElement) fta.traverse(elem, null));
+      ret.getElement().add((evl.type.base.EnumElement) fta.traverse(elem, null));
     }
-    evl.type.base.EnumType ret = new evl.type.base.EnumType(obj.getInfo(), param,elements);
     return ret;
   }
 

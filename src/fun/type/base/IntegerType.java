@@ -9,12 +9,7 @@ public class IntegerType extends BaseType {
   public static final String NAME = "Integer";
 
   public IntegerType() {
-    super(new ElementInfo());
-  }
-
-  @Override
-  public String getName() {
-    return NAME;
+    super(new ElementInfo(), NAME);
   }
 
   @Override

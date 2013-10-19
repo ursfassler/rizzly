@@ -2,19 +2,15 @@ package fun.traverser;
 
 import fun.DefGTraverser;
 import fun.Fun;
-import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.Reference;
 import fun.expression.reference.ReferenceLinked;
 import fun.function.FuncWithReturn;
 import fun.function.FunctionHeader;
-import fun.generator.TypeGenerator;
 import fun.knowledge.KnowledgeBase;
-import fun.other.NamedComponent;
-import fun.other.NamedInterface;
+import fun.other.Component;
+import fun.other.Interface;
 import fun.traverser.spezializer.EvalTo;
-import fun.traverser.spezializer.Specializer;
-import fun.type.NamedType;
-import fun.type.base.EnumType;
+import fun.type.Type;
 import fun.type.base.TypeAlias;
 import fun.type.composed.NamedElement;
 import fun.type.template.Array;
@@ -50,7 +46,7 @@ public class TypeEvalReplacer extends DefGTraverser<Void, Memory> {
   }
 
   private ReferenceLinked eval(Reference expr, Memory mem) {
-    NamedType type = EvalTo.type((ReferenceLinked) expr, kb);
+    Type type = EvalTo.type((ReferenceLinked) expr, kb);
     return new ReferenceLinked(expr.getInfo(), type);
   }
 
@@ -66,7 +62,7 @@ public class TypeEvalReplacer extends DefGTraverser<Void, Memory> {
   @Override
   protected Void visitIfaceUse(IfaceUse obj, Memory param) {
     super.visitIfaceUse(obj, param);
-    NamedInterface type = EvalTo.iface(obj.getType(), kb);
+    Interface type = EvalTo.iface(obj.getType(), kb);
     ReferenceLinked ref = new ReferenceLinked(obj.getType().getInfo(), type);
     obj.setType(ref);
     return null;
@@ -75,7 +71,7 @@ public class TypeEvalReplacer extends DefGTraverser<Void, Memory> {
   @Override
   protected Void visitCompUse(CompUse obj, Memory param) {
     super.visitCompUse(obj, param);
-    NamedComponent type = EvalTo.comp(obj.getType(), kb);
+    Component type = EvalTo.comp(obj.getType(), kb);
     ReferenceLinked ref = new ReferenceLinked(obj.getType().getInfo(), type);
     obj.setType(ref);
     return null;
@@ -134,24 +130,6 @@ public class TypeEvalReplacer extends DefGTraverser<Void, Memory> {
   protected Void visitTypeAlias(TypeAlias obj, Memory param) {
     super.visitTypeAlias(obj, param);
     obj.setRef(eval(obj.getRef(), param));
-    return null;
-  }
-
-  @Override
-  protected Void visitReferenceLinked(ReferenceLinked obj, Memory param) {
-    super.visitReferenceLinked(obj, param);
-
-    // this is only necessary because Enumeration types are references from within the code since the type ref is needed
-    // to specifiy an element; i.e. Weekday.Monday
-    // TODO remove this hack
-    if ((obj.getLink() instanceof TypeGenerator) && (((TypeGenerator) obj.getLink()).getItem() instanceof EnumType) && !obj.getOffset().isEmpty() && (obj.getOffset().get(0) instanceof RefTemplCall)) {
-      assert (obj.getLink() instanceof TypeGenerator);
-      RefTemplCall call = (RefTemplCall) obj.getOffset().pop();
-      assert (call.getActualParameter().isEmpty());
-      NamedType type = Specializer.processType((TypeGenerator) obj.getLink(), call.getActualParameter(), obj.getInfo(), kb);
-      assert (type.getType() instanceof EnumType);
-      obj.setLink(type);
-    }
     return null;
   }
 

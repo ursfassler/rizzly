@@ -22,16 +22,16 @@ public class ImplElementaryParser extends ImplBaseParser {
     super(scanner);
   }
 
-  public static Component parse(Scanner scanner) {
+  public static Component parse(Scanner scanner, Token name) {
     ImplElementaryParser parser = new ImplElementaryParser(scanner);
-    return parser.parseImplementationElementary();
+    return parser.parseImplementationElementary(name);
   }
 
   // EBNF implementationElementary: "elementary" { entryCode | exitCode | compDeclBlock | varDeclBlock | constDeclBlock
   // | privateFunction | entry | exit }
-  private ImplElementary parseImplementationElementary() {
+  private ImplElementary parseImplementationElementary(Token name) {
     ElementInfo info = expect(TokenType.ELEMENTARY).getInfo();
-    ImplElementary comp = new ImplElementary(info);
+    ImplElementary comp = new ImplElementary(name.getInfo(),name.getData());
 
     Block entryBody = new Block(info);
     Block exitBody = new Block(info);

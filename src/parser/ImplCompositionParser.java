@@ -22,17 +22,17 @@ public class ImplCompositionParser extends ImplBaseParser {
     super(scanner);
   }
 
-  public static Component parse(Scanner scanner) {
+  public static Component parse(Scanner scanner, Token name) {
     ImplCompositionParser parser = new ImplCompositionParser(scanner);
-    return parser.parseImplementationComposition();
+    return parser.parseImplementationComposition(name);
   }
 
   // EBNF implementationComposition: "composition" { compDeclBlock | connectionDeclBlock }
-  private ImplComposition parseImplementationComposition() {
+  private ImplComposition parseImplementationComposition(Token name) {
     ElementInfo info = expect(TokenType.COMPOSITION).getInfo();
     ArrayList<Metadata> meta = getMetadata();
     info.getMetadata().addAll(meta);
-    ImplComposition comp = new ImplComposition(info);
+    ImplComposition comp = new ImplComposition(name.getInfo(),name.getData());
 
     while (true) {
       switch (peek().getType()) {

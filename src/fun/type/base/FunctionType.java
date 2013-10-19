@@ -11,8 +11,8 @@ public class FunctionType extends Type {
   private List<Reference> arg;
   final private Reference ret;
 
-  public FunctionType(ElementInfo info, List<Reference> arg, Reference ret) {
-    super(info);
+  public FunctionType(ElementInfo info, String name, List<Reference> arg, Reference ret) {
+    super(info,name);
     this.ret = ret;
     this.arg = arg;
   }

@@ -1,31 +1,17 @@
 package fun.type.base;
 
+import java.math.BigInteger;
+
 import common.ElementInfo;
 
-import fun.FunBase;
-import fun.other.Named;
+import fun.expression.Number;
+import fun.expression.reference.ReferenceLinked;
+import fun.variable.Constant;
 
-final public class EnumElement extends FunBase implements Named {
-  private String name;
-
-  public EnumElement(ElementInfo info, String name) {
-    super(info);
-    this.name = name;
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  @Override
-  public String toString() {
-    return name;
+final public class EnumElement extends Constant {
+  public EnumElement(ElementInfo info, String name, EnumType type, BigInteger value) {
+    super(info, name, new ReferenceLinked(info, type));
+    setDef(new Number(info, value));
   }
 
 }

@@ -9,12 +9,7 @@ public class AnyType extends BaseType {
   public static final String NAME = "Any";
 
   public AnyType() {
-    super(new ElementInfo());
-  }
-
-  @Override
-  public String getName() {
-    return NAME;
+    super(new ElementInfo(), NAME);
   }
 
   @Override

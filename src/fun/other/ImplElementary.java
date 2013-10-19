@@ -20,8 +20,8 @@ public class ImplElementary extends Component {
   private Reference entryFunc = null;
   private Reference exitFunc = null;
 
-  public ImplElementary(ElementInfo info) {
-    super(info);
+  public ImplElementary(ElementInfo info,String name) {
+    super(info, name);
   }
 
   public void addFunction(List<String> namespace, FunctionHeader func) {

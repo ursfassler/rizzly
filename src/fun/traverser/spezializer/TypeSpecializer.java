@@ -5,18 +5,16 @@ import java.util.List;
 import java.util.Map;
 
 import fun.Copy;
-import fun.FunBase;
+import fun.Fun;
 import fun.expression.Expression;
 import fun.expression.reference.ReferenceLinked;
 import fun.expression.reference.ReferenceUnlinked;
-import fun.generator.Generator;
 import fun.knowledge.KnowledgeBase;
 import fun.other.ActualTemplateArgument;
 import fun.traverser.ExprReplacer;
 import fun.traverser.Memory;
-import fun.traverser.ReLinker;
 import fun.traverser.TypeEvalReplacer;
-import fun.type.NamedType;
+import fun.type.Type;
 import fun.variable.TemplateParameter;
 
 /**
@@ -27,24 +25,13 @@ import fun.variable.TemplateParameter;
  */
 public class TypeSpecializer {
 
-  public static <T extends FunBase> T evaluate(Generator<T> funObj, List<ActualTemplateArgument> genspec, KnowledgeBase kb) {
-    Generator<T> cobj = Copy.copy(funObj);
-    /*
-     * if this function has a reference to itself, the reference points to the new copied object. This is not what we
-     * want since it is unspecialized
-     * 
-     * As a workaround, we relink links to this function back to the original object
-     */
-    {
-      Map<Generator<T>, Generator<T>> map = new HashMap<Generator<T>, Generator<T>>();
-      map.put(cobj, funObj);
-      ReLinker.process(cobj, map);
-    }
+  public static <T extends Fun> T evaluate(List<TemplateParameter> param, List<ActualTemplateArgument> genspec, T template, KnowledgeBase kb) {
+    template = Copy.copy(template);
 
     Memory mem = new Memory();
     Map<TemplateParameter, ActualTemplateArgument> map = new HashMap<TemplateParameter, ActualTemplateArgument>();
     for (int i = 0; i < genspec.size(); i++) {
-      TemplateParameter var = cobj.getParam().getList().get(i);
+      TemplateParameter var = param.get(i);
       ActualTemplateArgument val = genspec.get(i);
       // TODO can we ensure that val is evaluated?
       map.put(var, val);
@@ -55,15 +42,13 @@ public class TypeSpecializer {
       }
     }
 
-    T spec = cobj.getItem();
-
     TypeSpecTrav evaluator = new TypeSpecTrav();
-    evaluator.traverse(spec, map);
+    evaluator.traverse(template, map);
 
     TypeEvalReplacer typeEvalReplacer = new TypeEvalReplacer(kb);
-    typeEvalReplacer.traverse(spec, mem);
+    typeEvalReplacer.traverse(template, mem);
 
-    return spec;
+    return template;
   }
 
 }
@@ -86,8 +71,8 @@ class TypeSpecTrav extends ExprReplacer<Map<TemplateParameter, ActualTemplateArg
 
     if (param.containsKey(obj.getLink())) {
       ActualTemplateArgument repl = param.get(obj.getLink());
-      if (repl instanceof NamedType) {
-        return new ReferenceLinked(obj.getInfo(), (NamedType) repl);
+      if (repl instanceof Type) {
+        return new ReferenceLinked(obj.getInfo(), (Type) repl);
       } else {
         return (Expression) repl;
       }

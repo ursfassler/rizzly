@@ -46,13 +46,13 @@ public class CompositionGraphMaker {
     for (CompUse use : impl.getComponent()) {
       ComponentGenerator comptype = getComp(use.getType());
       Designator subpath = kp.get(comptype);
-      SubComponent sub = new SubComponent(use.getName(), subpath, comptype.getName(),use.getInfo().getMetadata(METADATA_KEY));
+      SubComponent sub = new SubComponent(use.getName(), subpath, comptype.getName(), use.getInfo().getMetadata(METADATA_KEY));
 
-      for (IfaceUse iface : comptype.getItem().getIface(Direction.in)) {
+      for (IfaceUse iface : comptype.getTemplate().getIface(Direction.in)) {
         Interface niface = makeIface(new Designator("Self", use.getName()), sub, iface, ifacemap, kb);
         sub.getInput().add(niface);
       }
-      for (IfaceUse iface : comptype.getItem().getIface(Direction.out)) {
+      for (IfaceUse iface : comptype.getTemplate().getIface(Direction.out)) {
         Interface niface = makeIface(new Designator("Self", use.getName()), sub, iface, ifacemap, kb);
         sub.getOutput().add(niface);
       }
@@ -64,7 +64,7 @@ public class CompositionGraphMaker {
     for (fun.composition.Connection con : impl.getConnection()) {
       Interface src = getIface(con.getEndpoint(Direction.in), ifacemap, kb);
       Interface dst = getIface(con.getEndpoint(Direction.out), ifacemap, kb);
-      fun.doc.compgraph.Connection ncon = new fun.doc.compgraph.Connection(src, dst,con.getInfo().getMetadata(METADATA_KEY));
+      fun.doc.compgraph.Connection ncon = new fun.doc.compgraph.Connection(src, dst, con.getInfo().getMetadata(METADATA_KEY));
       src.getConnection().add(ncon);
       dst.getConnection().add(ncon);
       comp.getConn().add(ncon);

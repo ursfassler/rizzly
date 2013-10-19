@@ -12,23 +12,16 @@ import fun.variable.TemplateParameter;
 final public class Range extends BaseType implements Named {
   final private BigInteger low;
   final private BigInteger high;
-  private String name;
 
   public Range(ElementInfo info, BigInteger low, BigInteger high) {
-    super(info);
+    super(info, makeName(low, high));
     assert (low.compareTo(high) <= 0); // TODO ok?
     this.low = low;
     this.high = high;
-    name = "U{" + low.toString() + "," + high.toString() + "}";
   }
 
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
+  public static String makeName(BigInteger low, BigInteger high) {
+    return RangeTemplate.NAME + "{" + low.toString() + "," + high.toString() + "}";
   }
 
   public BigInteger getLow() {

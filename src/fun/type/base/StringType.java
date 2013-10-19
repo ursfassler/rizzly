@@ -7,13 +7,10 @@ import fun.other.ListOfNamed;
 import fun.variable.TemplateParameter;
 
 public class StringType extends BaseType implements Evl {
-  public StringType() {
-    super(new ElementInfo());
-  }
+  public static final String NAME = "String";
 
-  @Override
-  public String getName() {
-    return "String";
+  public StringType() {
+    super(new ElementInfo(), NAME);
   }
 
   @Override

@@ -9,7 +9,6 @@ import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
-import fun.FunBase;
 import fun.expression.Expression;
 import fun.expression.Number;
 import fun.expression.reference.ReferenceLinked;
@@ -23,22 +22,19 @@ import fun.other.ActualTemplateArgument;
 import fun.other.Component;
 import fun.other.Interface;
 import fun.other.Named;
-import fun.other.NamedComponent;
-import fun.other.NamedInterface;
 import fun.other.Namespace;
 import fun.traverser.Memory;
-import fun.type.NamedType;
 import fun.type.Type;
 import fun.type.base.AnyType;
-import fun.type.base.BaseType;
 import fun.type.base.IntegerType;
 import fun.type.template.Range;
 import fun.type.template.TypeType;
+import fun.type.template.UserTypeGenerator;
 import fun.variable.TemplateParameter;
 
 public class Specializer {
 
-  public static NamedType processType(TypeGenerator item, List<Expression> genspec, ElementInfo info, KnowledgeBase kb) {
+  public static Type processType(TypeGenerator item, List<Expression> genspec, ElementInfo info, KnowledgeBase kb) {
     List<ActualTemplateArgument> param = evalParam(item, genspec, info, kb);
 
     String name = makeName(item.getName(), param);
@@ -47,24 +43,22 @@ public class Specializer {
     KnowFunPath kp = kb.getEntry(KnowFunPath.class);
     Designator path = kp.get(item);
     Namespace parent = (Namespace) kb.getRoot().getChildItem(path.toList());
-    NamedType inst = (NamedType) parent.find(name);
+    Type inst = (Type) parent.find(name);
     if (inst == null) {
-      Type rawret;
-      if (item.getItem() instanceof BaseType) {
-        rawret = GenericSpecializer.process((TypeGenerator) item, param, kb);
+      if (item instanceof UserTypeGenerator) {
+        inst = TypeSpecializer.evaluate(item.getParam().getList(), param, ((UserTypeGenerator) item).getTemplate(), kb);
+        inst.setName(name);
       } else {
-        rawret = TypeSpecializer.evaluate(item, param, kb);
+        inst = GenericSpecializer.process(item, param, kb);
       }
-      inst = new NamedType(new ElementInfo(), name, (Type) rawret);
+      assert (inst.getName().equals(name));
       parent.add(inst);
     }
-
-    assert (inst.getName().equals(name));
 
     return inst;
   }
 
-  public static NamedInterface processIface(InterfaceGenerator item, List<Expression> genspec, ElementInfo info, KnowledgeBase kb) {
+  public static Interface processIface(InterfaceGenerator item, List<Expression> genspec, ElementInfo info, KnowledgeBase kb) {
     List<ActualTemplateArgument> param = evalParam(item, genspec, info, kb);
 
     String name = makeName(item.getName(), param);
@@ -73,20 +67,18 @@ public class Specializer {
     KnowFunPath kp = kb.getEntry(KnowFunPath.class);
     Designator path = kp.get(item);
     Namespace parent = (Namespace) kb.getRoot().getChildItem(path.toList());
-    NamedInterface inst = (NamedInterface) parent.find(name);
+    Interface inst = (Interface) parent.find(name);
     if (inst == null) {
-      Interface rawret;
-      rawret = TypeSpecializer.evaluate(item, param, kb);
-      inst = new NamedInterface(new ElementInfo(), name, rawret);
+      inst = TypeSpecializer.evaluate(item.getParam().getList(), param, item.getTemplate(), kb);
+      inst.setName(name);
+      assert (inst.getName().equals(name));
       parent.add(inst);
     }
-
-    assert (inst.getName().equals(name));
 
     return inst;
   }
 
-  public static NamedComponent processComp(ComponentGenerator item, List<Expression> genspec, ElementInfo info, KnowledgeBase kb) {
+  public static Component processComp(ComponentGenerator item, List<Expression> genspec, ElementInfo info, KnowledgeBase kb) {
     List<ActualTemplateArgument> param = evalParam(item, genspec, info, kb);
 
     String name = makeName(item.getName(), param);
@@ -95,20 +87,18 @@ public class Specializer {
     KnowFunPath kp = kb.getEntry(KnowFunPath.class);
     Designator path = kp.get(item);
     Namespace parent = (Namespace) kb.getRoot().getChildItem(path.toList());
-    NamedComponent inst = (NamedComponent) parent.find(name);
+    Component inst = (Component) parent.find(name);
     if (inst == null) {
-      Component rawret;
-      rawret = TypeSpecializer.evaluate(item, param, kb);
-      inst = new NamedComponent(new ElementInfo(), name, rawret);
+      inst = TypeSpecializer.evaluate(item.getParam().getList(), param, item.getTemplate(), kb);
+      inst.setName(name);
+      assert (inst.getName().equals(name));
       parent.add(inst);
     }
-
-    assert (inst.getName().equals(name));
 
     return inst;
   }
 
-  private static List<ActualTemplateArgument> evalParam(Generator<? extends FunBase> item, List<Expression> genspec, ElementInfo info, KnowledgeBase kb) {
+  private static List<ActualTemplateArgument> evalParam(Generator item, List<Expression> genspec, ElementInfo info, KnowledgeBase kb) {
     if (genspec.size() != item.getParam().size()) {
       RError.err(ErrorType.Error, info, "Wrong number of parameter, expected " + genspec.size() + " got " + item.getParam().size());
     }
@@ -119,9 +109,8 @@ public class Specializer {
     for (int i = 0; i < genspec.size(); i++) {
       TemplateParameter pitm = item.getParam().getList().get(i);
       ReferenceLinked tref = (ReferenceLinked) pitm.getType();
-      NamedType ntype = EvalTo.type(tref, kb);
+      Type type = EvalTo.type(tref, kb);
       ActualTemplateArgument evald;
-      Type type = ntype.getType();
       if (type instanceof Range) {
         Number num = (Number) ExprEvaluator.evaluate(genspec.get(i), new Memory(), kb);
         evald = num;
@@ -138,7 +127,7 @@ public class Specializer {
         evald = EvalTo.type(rl, kb);
         // TODO check type
       } else {
-        throw new RuntimeException("not yet implemented: " + ntype.getName());
+        throw new RuntimeException("not yet implemented: " + type.getName());
       }
       // TODO check type
       ret.add(evald);
@@ -149,8 +138,13 @@ public class Specializer {
 
   static private String makeName(String name, List<ActualTemplateArgument> generic) {
     name += "{";
+    boolean first = true;
     for (ActualTemplateArgument expr : generic) {
-      name += Designator.NAME_SEP;
+      if (first) {
+        first = false;
+      } else {
+        name += ",";
+      }
       if (expr instanceof Number) {
         BigInteger ref = ((Number) expr).getValue();
         name += ref.toString();

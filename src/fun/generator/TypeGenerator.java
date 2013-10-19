@@ -1,19 +1,18 @@
 package fun.generator;
 
-import java.util.Collection;
+import java.util.List;
 
 import common.ElementInfo;
 
-import fun.type.Type;
 import fun.variable.TemplateParameter;
 
 /**
- *
+ * 
  * @author urs
  */
-public class TypeGenerator extends Generator<Type> {
+abstract public class TypeGenerator extends Generator {
 
-  public TypeGenerator(ElementInfo info, String name, Collection<TemplateParameter> param, Type item) {
-    super(info, name, param, item);
+  public TypeGenerator(ElementInfo info, String name, List<TemplateParameter> param) {
+    super(info, name, param);
   }
 }

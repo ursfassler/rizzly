@@ -14,7 +14,6 @@ import fun.expression.reference.ReferenceLinked;
 import fun.expression.reference.ReferenceUnlinked;
 import fun.function.FunctionHeader;
 import fun.generator.InterfaceGenerator;
-import fun.generator.TypeGenerator;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.State;
 import fun.hfsm.StateComposite;
@@ -24,10 +23,7 @@ import fun.other.ImplElementary;
 import fun.other.Interface;
 import fun.other.ListOfNamed;
 import fun.other.Named;
-import fun.other.NamedComponent;
-import fun.other.NamedInterface;
 import fun.other.Namespace;
-import fun.type.NamedType;
 import fun.type.base.EnumType;
 import fun.type.composed.RecordType;
 import fun.type.composed.UnionType;
@@ -168,13 +164,6 @@ class KnowFunChildTraverser extends NullTraverser<Set<Named>, String> {
   }
 
   @Override
-  protected Set<Named> visitTypeGenerator(TypeGenerator obj, String param) {
-    Set<Named> rset = visit(obj.getItem(), param);
-    addIfFound(obj.getParam().find(param), rset);
-    return rset;
-  }
-
-  @Override
   protected Set<Named> visitRecordType(RecordType obj, String param) {
     return retopt(obj.getElement().find(param));
   }
@@ -191,7 +180,7 @@ class KnowFunChildTraverser extends NullTraverser<Set<Named>, String> {
 
   @Override
   protected Set<Named> visitInterfaceGenerator(InterfaceGenerator obj, String param) {
-    Set<Named> rset = visit(obj.getItem(), param);
+    Set<Named> rset = visit(obj.getTemplate(), param);
     addIfFound(obj.getParam().find(param), rset);
     return rset;
   }
@@ -213,21 +202,6 @@ class KnowFunChildTraverser extends NullTraverser<Set<Named>, String> {
     addIfFound(obj.getIface(Direction.in).find(param), rset);
     addIfFound(obj.getIface(Direction.out).find(param), rset);
     return rset;
-  }
-
-  @Override
-  protected Set<Named> visitNamedType(NamedType obj, String param) {
-    return visit(obj.getType(), param);
-  }
-
-  @Override
-  protected Set<Named> visitNamedInterface(NamedInterface obj, String param) {
-    return visit(obj.getIface(), param);
-  }
-
-  @Override
-  protected Set<Named> visitNamedComponent(NamedComponent obj, String param) {
-    return visit(obj.getComp(), param);
   }
 
 }

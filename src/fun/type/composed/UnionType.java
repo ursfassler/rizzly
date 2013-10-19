@@ -4,9 +4,9 @@ import common.ElementInfo;
 
 public class UnionType extends NamedElementType {
   private UnionSelector selector;
-  
-  public UnionType(ElementInfo info, UnionSelector selector) {
-    super(info);
+
+  public UnionType(ElementInfo info, String name, UnionSelector selector) {
+    super(info, name);
     this.selector = selector;
   }
 

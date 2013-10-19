@@ -11,10 +11,9 @@ import evl.variable.Variable;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.expression.Expression;
+import fun.expression.Number;
 import fun.expression.reference.ReferenceLinked;
-import fun.other.NamedComponent;
-import fun.other.NamedInterface;
-import fun.type.NamedType;
+import fun.type.base.EnumElement;
 import fun.variable.CompUse;
 import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
@@ -53,7 +52,7 @@ public class FunToEvlVariable extends NullTraverser<Evl, Void> {
   private TypeRef copyType(Expression typeRef) {
     ReferenceLinked typeref = (ReferenceLinked) typeRef;
     assert (typeref.getOffset().isEmpty());
-    NamedType nt = (NamedType) typeref.getLink();
+    fun.type.Type nt = (fun.type.Type) typeref.getLink();
     Type ecomp = (Type) fta.traverse(nt, null);
     return new TypeRef(typeref.getInfo(), ecomp);
   }
@@ -79,10 +78,16 @@ public class FunToEvlVariable extends NullTraverser<Evl, Void> {
   }
 
   @Override
+  protected Evl visitEnumElement(EnumElement obj, Void param) {
+    Number num = (Number) obj.getDef();
+    return new evl.type.base.EnumElement(obj.getInfo(), obj.getName(), copyType(obj.getType()), num.getValue());
+  }
+
+  @Override
   protected Evl visitCompUse(CompUse obj, Void param) {
     ReferenceLinked typeref = (ReferenceLinked) obj.getType();
     assert (typeref.getOffset().isEmpty());
-    NamedComponent nt = (NamedComponent) typeref.getLink();
+    fun.other.Component nt = (fun.other.Component) typeref.getLink();
     Component ecomp = (Component) fta.traverse(nt, null);
     return new evl.other.CompUse(obj.getInfo(), obj.getName(), ecomp);
   }
@@ -91,7 +96,7 @@ public class FunToEvlVariable extends NullTraverser<Evl, Void> {
   protected Evl visitIfaceUse(IfaceUse obj, Void param) {
     ReferenceLinked typeref = (ReferenceLinked) obj.getType();
     assert (typeref.getOffset().isEmpty());
-    NamedInterface nt = (NamedInterface) typeref.getLink();
+    fun.other.Interface nt = (fun.other.Interface) typeref.getLink();
     Interface ecomp = (Interface) fta.traverse(nt, null);
     return new evl.other.IfaceUse(obj.getInfo(), obj.getName(), ecomp);
   }

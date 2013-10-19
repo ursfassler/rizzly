@@ -10,16 +10,19 @@ import fun.generator.ComponentGenerator;
 import fun.generator.InterfaceGenerator;
 import fun.generator.TypeGenerator;
 import fun.knowledge.KnowledgeBase;
-import fun.other.NamedComponent;
-import fun.other.NamedInterface;
-import fun.type.NamedType;
+import fun.other.Component;
+import fun.other.Interface;
+import fun.type.Type;
 
 public class EvalTo {
-  public static NamedInterface iface(Reference expr, KnowledgeBase kb) {
+  public static Interface iface(Reference expr, KnowledgeBase kb) {
     assert (expr instanceof ReferenceLinked);
 
     ReferenceLinked obj = (ReferenceLinked) expr;
 
+    if( obj.getLink() instanceof Interface ){
+      return (Interface) obj.getLink();
+    }
     assert (obj.getLink() instanceof InterfaceGenerator);
     assert (obj.getOffset().size() == 1);
     assert (obj.getOffset().get(0) instanceof RefTemplCall);
@@ -30,11 +33,14 @@ public class EvalTo {
     return Specializer.processIface(generator, actparam, expr.getInfo(), kb);
   }
 
-  public static NamedComponent comp(Reference expr, KnowledgeBase kb) {
+  public static Component comp(Reference expr, KnowledgeBase kb) {
     assert (expr instanceof ReferenceLinked);
 
     ReferenceLinked obj = (ReferenceLinked) expr;
 
+    if( obj.getLink() instanceof Component ){
+      return (Component) obj.getLink();
+    }
     assert (obj.getLink() instanceof ComponentGenerator);
     assert (obj.getOffset().size() == 1);
     assert (obj.getOffset().get(0) instanceof RefTemplCall);
@@ -45,14 +51,14 @@ public class EvalTo {
     return Specializer.processComp(generator, actparam, expr.getInfo(), kb);
   }
 
-  public static NamedType type(Reference expr, KnowledgeBase kb) {
+  public static Type type(Reference expr, KnowledgeBase kb) {
     
     assert (expr instanceof ReferenceLinked);
 
     ReferenceLinked obj = (ReferenceLinked) expr;
 
-    if( obj.getLink() instanceof NamedType ){
-      return (NamedType) obj.getLink();
+    if( obj.getLink() instanceof Type ){
+      return (Type) obj.getLink();
     }
     assert (obj.getLink() instanceof TypeGenerator);
     assert (obj.getOffset().size() == 1);

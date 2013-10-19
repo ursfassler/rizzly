@@ -28,7 +28,6 @@ import fun.function.impl.FuncProtRet;
 import fun.function.impl.FuncProtVoid;
 import fun.generator.ComponentGenerator;
 import fun.generator.InterfaceGenerator;
-import fun.generator.TypeGenerator;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.QueryItem;
 import fun.hfsm.StateComposite;
@@ -38,8 +37,6 @@ import fun.other.ImplElementary;
 import fun.other.Interface;
 import fun.other.ListOfNamed;
 import fun.other.Named;
-import fun.other.NamedComponent;
-import fun.other.NamedInterface;
 import fun.other.Namespace;
 import fun.other.RizzlyFile;
 import fun.statement.Assignment;
@@ -56,7 +53,6 @@ import fun.statement.ReturnVoid;
 import fun.statement.Statement;
 import fun.statement.VarDefStmt;
 import fun.statement.While;
-import fun.type.NamedType;
 import fun.type.base.AnyType;
 import fun.type.base.BooleanType;
 import fun.type.base.EnumElement;
@@ -77,6 +73,7 @@ import fun.type.template.Range;
 import fun.type.template.RangeTemplate;
 import fun.type.template.TypeType;
 import fun.type.template.TypeTypeTemplate;
+import fun.type.template.UserTypeGenerator;
 import fun.variable.CompUse;
 import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
@@ -95,6 +92,9 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitRizzlyFile(RizzlyFile obj, P param) {
     visitList(obj.getCompfunc(), param);
+    visitList(obj.getType(), param);
+    visitList(obj.getIface(), param);
+    visitList(obj.getComp(), param);
     visitList(obj.getConstant(), param);
     visitList(obj.getFunction(), param);
     return null;
@@ -165,23 +165,16 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitTypeGenerator(TypeGenerator obj, P param) {
-    visitItr(obj.getParam(), param);
-    visit(obj.getItem(), param);
-    return null;
-  }
-
-  @Override
   protected R visitInterfaceGenerator(InterfaceGenerator obj, P param) {
     visitItr(obj.getParam(), param);
-    visit(obj.getItem(), param);
+    visit(obj.getTemplate(), param);
     return null;
   }
 
   @Override
   protected R visitComponentGenerator(ComponentGenerator obj, P param) {
     visitItr(obj.getParam(), param);
-    visit(obj.getItem(), param);
+    visit(obj.getTemplate(), param);
     return null;
   }
 
@@ -235,7 +228,7 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitUnionType(UnionType obj, P param) {
-    visit(obj.getSelector(),param);
+    visit(obj.getSelector(), param);
     visitList(obj.getElement(), param);
     return null;
   }
@@ -381,7 +374,8 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitGenericArray(ArrayTemplate obj, P param) {
+  protected R visitArrayTemplate(ArrayTemplate obj, P param) {
+    visitItr(obj.getParam(),param);
     return null;
   }
 
@@ -396,7 +390,8 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitGenericTypeType(TypeTypeTemplate obj, P param) {
+  protected R visitTypeTypeTemplate(TypeTypeTemplate obj, P param) {
+    visitItr(obj.getParam(),param);
     return null;
   }
 
@@ -511,24 +506,6 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitNamedType(NamedType obj, P param) {
-    visit(obj.getType(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitNamedInterface(NamedInterface obj, P param) {
-    visit(obj.getIface(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitNamedComponent(NamedComponent obj, P param) {
-    visit(obj.getComp(), param);
-    return null;
-  }
-
-  @Override
   protected R visitFunctionHeader(FunctionHeader obj, P param) {
     visitItr(obj.getParam(), param);
     if (obj instanceof FuncWithReturn) {
@@ -581,12 +558,20 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitGenericRange(RangeTemplate obj, P param) {
+  protected R visitRangeTemplate(RangeTemplate obj, P param) {
+    visitItr(obj.getParam(),param);
     return null;
   }
 
   @Override
   protected R visitUnionSelector(UnionSelector obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitUserTypeGenerator(UserTypeGenerator obj, P param) {
+    visitItr(obj.getParam(), param);
+    visit(obj.getTemplate(), param);
     return null;
   }
 

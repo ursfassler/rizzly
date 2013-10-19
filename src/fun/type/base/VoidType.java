@@ -9,12 +9,7 @@ public class VoidType extends BaseType {
   public static final String NAME = "Void";
 
   public VoidType() {
-    super(new ElementInfo());
-  }
-
-  @Override
-  public String getName() {
-    return NAME;
+    super(new ElementInfo(), NAME);
   }
 
   @Override

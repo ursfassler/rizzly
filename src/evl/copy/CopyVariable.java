@@ -1,7 +1,10 @@
 package evl.copy;
 
+import java.math.BigInteger;
+
 import evl.Evl;
 import evl.NullTraverser;
+import evl.type.base.EnumElement;
 import evl.variable.ConstGlobal;
 import evl.variable.ConstPrivate;
 import evl.variable.FuncVariable;
@@ -34,17 +37,23 @@ public class CopyVariable extends NullTraverser<Variable, Void> {
 
   @Override
   protected Variable visitConstPrivate(ConstPrivate obj, Void param) {
-    return new ConstPrivate(obj.getInfo(), obj.getName(), cast.copy(obj.getType()),cast.copy(obj.getDef()));
+    return new ConstPrivate(obj.getInfo(), obj.getName(), cast.copy(obj.getType()), cast.copy(obj.getDef()));
   }
 
   @Override
   protected Variable visitConstGlobal(ConstGlobal obj, Void param) {
-    return new ConstGlobal(obj.getInfo(), obj.getName(), cast.copy(obj.getType()),cast.copy(obj.getDef()));
+    return new ConstGlobal(obj.getInfo(), obj.getName(), cast.copy(obj.getType()), cast.copy(obj.getDef()));
   }
 
   @Override
   protected Variable visitSsaVariable(SsaVariable obj, Void param) {
     return new SsaVariable(obj.getInfo(), obj.getName(), cast.copy(obj.getType()));
+  }
+
+  @Override
+  protected Variable visitEnumElement(EnumElement obj, Void param) {
+    BigInteger value = ((evl.expression.Number) obj.getDef()).getValue();
+    return new EnumElement(obj.getInfo(), obj.getName(), cast.copy(obj.getType()), value);
   }
 
 }

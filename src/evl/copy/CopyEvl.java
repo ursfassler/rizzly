@@ -27,7 +27,6 @@ import evl.statement.bbend.CaseGotoOpt;
 import evl.statement.bbend.CaseOptEntry;
 import evl.type.Type;
 import evl.type.TypeRef;
-import evl.type.base.EnumElement;
 import evl.type.composed.NamedElement;
 import evl.variable.Variable;
 
@@ -197,11 +196,6 @@ class CopyEvl extends NullTraverser<Evl, Void> {
   @Override
   protected Evl visitNamedElement(NamedElement obj, Void param) {
     return new NamedElement(obj.getInfo(), obj.getName(), copy(obj.getType()));
-  }
-
-  @Override
-  protected Evl visitEnumElement(EnumElement obj, Void param) {
-    return new EnumElement(obj.getInfo(), obj.getName());
   }
 
 }

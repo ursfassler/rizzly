@@ -35,7 +35,6 @@ import fun.function.impl.FuncProtRet;
 import fun.function.impl.FuncProtVoid;
 import fun.generator.ComponentGenerator;
 import fun.generator.InterfaceGenerator;
-import fun.generator.TypeGenerator;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.QueryItem;
 import fun.hfsm.StateComposite;
@@ -44,8 +43,6 @@ import fun.hfsm.Transition;
 import fun.other.ImplElementary;
 import fun.other.Interface;
 import fun.other.Named;
-import fun.other.NamedComponent;
-import fun.other.NamedInterface;
 import fun.other.Namespace;
 import fun.other.RizzlyFile;
 import fun.statement.Assignment;
@@ -62,7 +59,6 @@ import fun.statement.ReturnVoid;
 import fun.statement.VarDefStmt;
 import fun.statement.While;
 import fun.traverser.ReLinker;
-import fun.type.NamedType;
 import fun.type.base.AnyType;
 import fun.type.base.BooleanType;
 import fun.type.base.EnumElement;
@@ -83,6 +79,7 @@ import fun.type.template.Range;
 import fun.type.template.RangeTemplate;
 import fun.type.template.TypeType;
 import fun.type.template.TypeTypeTemplate;
+import fun.type.template.UserTypeGenerator;
 import fun.variable.CompUse;
 import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
@@ -172,11 +169,6 @@ class CopyFun extends Traverser<Fun, Void> {
   }
 
   @Override
-  protected Fun visitNamedType(NamedType obj, Void param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
   protected Fun visitStateSimple(StateSimple obj, Void param) {
     StateSimple ret = new StateSimple(obj.getInfo(), obj.getName());
 
@@ -239,7 +231,7 @@ class CopyFun extends Traverser<Fun, Void> {
 
   @Override
   protected Fun visitTypeAlias(TypeAlias obj, Void param) {
-    return new TypeAlias(obj.getInfo(), copy(obj.getRef()));
+    return new TypeAlias(obj.getInfo(), obj.getName(), copy(obj.getRef()));
   }
 
   @Override
@@ -284,7 +276,7 @@ class CopyFun extends Traverser<Fun, Void> {
 
   @Override
   protected Fun visitImplHfsm(ImplHfsm obj, Void param) {
-    ImplHfsm ret = new ImplHfsm(obj.getInfo(), copy(obj.getTopstate()));
+    ImplHfsm ret = new ImplHfsm(obj.getInfo(), obj.getName(), copy(obj.getTopstate()));
 
     ret.getIface(Direction.in).addAll(copy(obj.getIface(Direction.in).getList()));
     ret.getIface(Direction.out).addAll(copy(obj.getIface(Direction.out).getList()));
@@ -294,7 +286,7 @@ class CopyFun extends Traverser<Fun, Void> {
 
   @Override
   protected Fun visitImplComposition(ImplComposition obj, Void param) {
-    ImplComposition ret = new ImplComposition(obj.getInfo());
+    ImplComposition ret = new ImplComposition(obj.getInfo(), obj.getName());
 
     ret.getIface(Direction.in).addAll(copy(obj.getIface(Direction.in).getList()));
     ret.getIface(Direction.out).addAll(copy(obj.getIface(Direction.out).getList()));
@@ -306,7 +298,7 @@ class CopyFun extends Traverser<Fun, Void> {
 
   @Override
   protected Fun visitImplElementary(ImplElementary obj, Void param) {
-    ImplElementary ret = new ImplElementary(obj.getInfo());
+    ImplElementary ret = new ImplElementary(obj.getInfo(), obj.getName());
 
     ret.getIface(Direction.in).addAll(copy(obj.getIface(Direction.in).getList()));
     ret.getIface(Direction.out).addAll(copy(obj.getIface(Direction.out).getList()));
@@ -322,7 +314,7 @@ class CopyFun extends Traverser<Fun, Void> {
 
   @Override
   protected Fun visitInterface(Interface obj, Void param) {
-    Interface ret = new Interface(obj.getInfo());
+    Interface ret = new Interface(obj.getInfo(), obj.getName());
     ret.getPrototype().addAll(copy(obj.getPrototype().getList()));
     return ret;
   }
@@ -334,7 +326,7 @@ class CopyFun extends Traverser<Fun, Void> {
 
   @Override
   protected Fun visitTransition(Transition obj, Void param) {
-    Transition ret = new Transition(obj.getInfo(),obj.getName());
+    Transition ret = new Transition(obj.getInfo(), obj.getName());
     ret.setSrc(copy(obj.getSrc()));
     ret.setDst(copy(obj.getDst()));
     ret.setEvent(copy(obj.getEvent()));
@@ -350,18 +342,18 @@ class CopyFun extends Traverser<Fun, Void> {
   }
 
   @Override
-  protected Fun visitTypeGenerator(TypeGenerator obj, Void param) {
-    return new TypeGenerator(obj.getInfo(), obj.getName(), copy(obj.getParam().getList()), copy(obj.getItem()));
+  protected Fun visitUserTypeGenerator(UserTypeGenerator obj, Void param) {
+    throw new RuntimeException("not yet implemented");
   }
 
   @Override
   protected Fun visitInterfaceGenerator(InterfaceGenerator obj, Void param) {
-    return new InterfaceGenerator(obj.getInfo(), obj.getName(), copy(obj.getParam().getList()), copy(obj.getItem()));
+    return new InterfaceGenerator(obj.getInfo(), obj.getName(), copy(obj.getParam().getList()), copy(obj.getTemplate()));
   }
 
   @Override
   protected Fun visitComponentGenerator(ComponentGenerator obj, Void param) {
-    return new ComponentGenerator(obj.getInfo(), obj.getName(), copy(obj.getParam().getList()), copy(obj.getItem()));
+    return new ComponentGenerator(obj.getInfo(), obj.getName(), copy(obj.getParam().getList()), copy(obj.getTemplate()));
   }
 
   @Override
@@ -385,12 +377,12 @@ class CopyFun extends Traverser<Fun, Void> {
   }
 
   @Override
-  protected Fun visitGenericTypeType(TypeTypeTemplate obj, Void param) {
+  protected Fun visitTypeTypeTemplate(TypeTypeTemplate obj, Void param) {
     throw new RuntimeException("not yet implemented");
   }
 
   @Override
-  protected Fun visitGenericArray(ArrayTemplate obj, Void param) {
+  protected Fun visitArrayTemplate(ArrayTemplate obj, Void param) {
     throw new RuntimeException("not yet implemented");
   }
 
@@ -401,28 +393,23 @@ class CopyFun extends Traverser<Fun, Void> {
 
   @Override
   protected Fun visitRecordType(RecordType obj, Void param) {
-    RecordType ret = new RecordType(obj.getInfo());
+    RecordType ret = new RecordType(obj.getInfo(), obj.getName());
     ret.getElement().addAll(copy(obj.getElement().getList()));
     return ret;
   }
 
   @Override
   protected Fun visitUnionType(UnionType obj, Void param) {
-    UnionType ret = new UnionType(obj.getInfo(),obj.getSelector());
+    UnionType ret = new UnionType(obj.getInfo(), obj.getName(), obj.getSelector());
     ret.getElement().addAll(copy(obj.getElement().getList()));
     return ret;
   }
 
   @Override
   protected Fun visitEnumType(EnumType obj, Void param) {
-    EnumType type = new EnumType(obj.getInfo());
+    EnumType type = new EnumType(obj.getInfo(), obj.getName());
     type.getElement().addAll(copy(obj.getElement()));
     return type;
-  }
-
-  @Override
-  protected Fun visitEnumElement(EnumElement obj, Void param) {
-    return new EnumElement(obj.getInfo(), obj.getName());
   }
 
   @Override
@@ -575,28 +562,23 @@ class CopyFun extends Traverser<Fun, Void> {
   }
 
   @Override
-  protected Fun visitNamedInterface(NamedInterface obj, Void param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Fun visitNamedComponent(NamedComponent obj, Void param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
   protected Fun visitRange(Range obj, Void param) {
     throw new RuntimeException("not yet implemented");
   }
 
   @Override
-  protected Fun visitGenericRange(RangeTemplate obj, Void param) {
+  protected Fun visitRangeTemplate(RangeTemplate obj, Void param) {
     throw new RuntimeException("not yet implemented");
   }
 
   @Override
   protected Fun visitUnionSelector(UnionSelector obj, Void param) {
     throw new UnsupportedOperationException("Not supported yet.");
+  }
+
+  @Override
+  protected Fun visitEnumElement(EnumElement obj, Void param) {
+    throw new RuntimeException("not yet implemented");
   }
 
 }

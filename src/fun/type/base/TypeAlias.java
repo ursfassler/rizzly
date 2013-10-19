@@ -8,8 +8,8 @@ import fun.type.Type;
 public class TypeAlias extends Type {
   private Reference ref;
 
-  public TypeAlias(ElementInfo info, Reference ref) {
-    super(info);
+  public TypeAlias(ElementInfo info, String name, Reference ref) {
+    super(info,name);
     this.ref = ref;
   }
 

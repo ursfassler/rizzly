@@ -6,13 +6,10 @@ import fun.other.ListOfNamed;
 import fun.variable.TemplateParameter;
 
 final public class BooleanType extends BaseType {
-  public BooleanType() {
-    super(new ElementInfo());
-  }
+  public static final String NAME = "Boolean";
 
-  @Override
-  public String getName() {
-    return "Boolean";
+  public BooleanType() {
+    super(new ElementInfo(),NAME);
   }
 
   @Override

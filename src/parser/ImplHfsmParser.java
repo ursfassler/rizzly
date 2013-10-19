@@ -33,13 +33,13 @@ public class ImplHfsmParser extends ImplBaseParser {
     super(scanner);
   }
 
-  public static Component parse(Scanner scanner) {
+  public static Component parse(Scanner scanner, Token name) {
     ImplHfsmParser parser = new ImplHfsmParser(scanner);
-    return parser.parseImplementationHfsm();
+    return parser.parseImplementationHfsm(name);
   }
 
   // EBNF implementationComposition: "hfsm" "(" id ")" stateBody
-  private Component parseImplementationHfsm() {
+  private Component parseImplementationHfsm(Token name) {
     ElementInfo info = expect(TokenType.HFSM).getInfo();
 
     expect(TokenType.OPENPAREN);
@@ -48,7 +48,7 @@ public class ImplHfsmParser extends ImplBaseParser {
 
     StateComposite topstate = new StateComposite(info, State.TOPSTATE_NAME, initial);
     parseStateBody(topstate);
-    return new ImplHfsm(info, topstate);
+    return new ImplHfsm(name.getInfo(), name.getData(), topstate);
   }
 
   // EBNF stateBody: { entryCode | exitCode | varDeclBlock | funcDecl | transitionDecl | state }
@@ -132,7 +132,7 @@ public class ImplHfsmParser extends ImplBaseParser {
     ElementInfo info = expect(TokenType.TO).getInfo();
     Reference dst = parseNameRef();
 
-    Transition ret = new Transition(info,"tr" + info.getLine() + "_" + info.getRow());
+    Transition ret = new Transition(info, "tr" + info.getLine() + "_" + info.getRow());
     ret.setSrc(src);
     ret.setDst(dst);
 

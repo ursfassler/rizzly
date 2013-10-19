@@ -9,8 +9,12 @@ public class TypeType extends Type {
   private Reference type;
 
   public TypeType(ElementInfo info, Reference type) {
-    super(info);
+    super(info, makeName(type));
     this.type = type;
+  }
+
+  public static String makeName(Reference type) {
+    return TypeTypeTemplate.NAME + "{" + type.toString() + "}";
   }
 
   public Reference getType() {

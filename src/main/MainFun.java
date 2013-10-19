@@ -29,14 +29,11 @@ import error.RError;
 import fun.doc.DepGraph;
 import fun.doc.DocWriter;
 import fun.doc.PrettyPrinter;
-import fun.expression.Expression;
 import fun.expression.reference.ReferenceLinked;
-import fun.function.impl.FuncGlobal;
-import fun.generator.ComponentGenerator;
 import fun.generator.TypeGenerator;
 import fun.knowledge.KnowledgeBase;
+import fun.other.Component;
 import fun.other.Named;
-import fun.other.NamedComponent;
 import fun.other.Namespace;
 import fun.other.RizzlyFile;
 import fun.symbol.SymbolTable;
@@ -49,8 +46,7 @@ import fun.traverser.NamespaceLinkReduction;
 import fun.traverser.StateLinkReduction;
 import fun.traverser.TypeEvalReplacer;
 import fun.traverser.spezializer.EvalTo;
-import fun.traverser.spezializer.Specializer;
-import fun.type.NamedType;
+import fun.type.Type;
 import fun.type.base.AnyType;
 import fun.type.base.BaseType;
 import fun.type.base.BooleanType;
@@ -77,11 +73,11 @@ public class MainFun {
       System.out.println();
     }
 
-    List<NamedType> primtyp = genPrimitiveTypes();
+    List<Type> primtyp = genPrimitiveTypes();
     List<TypeGenerator> gentyp = genPrimitiveGenericTypes();
 
     SymbolTable<Designator, String> sym = new SymbolTable<Designator, String>();
-    for (NamedType typ : primtyp) {
+    for (Type typ : primtyp) {
       sym.add(typ.getName(), new Designator(typ.getName()));
     }
     for (TypeGenerator typ : gentyp) {
@@ -95,6 +91,9 @@ public class MainFun {
 
     for (RizzlyFile f : fileList) {
       Namespace parent = classes.forceChildPath(f.getName().toList());
+      parent.addAll(f.getType());
+      parent.addAll(f.getIface());
+      parent.addAll(f.getComp());
       parent.addAll(f.getConstant());
       parent.addAll(f.getFunction());
       parent.addAll(f.getCompfunc());
@@ -114,7 +113,7 @@ public class MainFun {
     printDepGraph(debugdir + "rdep.gv", classes, root, fileList);
     DocWriter.print(fileList, new KnowledgeBase(classes, fileList, docdir));
 
-    NamedComponent nroot = evaluate(root, classes, debugdir, fileList);
+    Component nroot = evaluate(root, classes, debugdir, fileList);
     DeAlias.process(classes);
 
     PrettyPrinter.print(classes, debugdir + "evaluated.rzy");
@@ -163,7 +162,7 @@ public class MainFun {
     ns.removeAll(remove);
   }
 
-  private static NamedComponent evaluate(Named root, Namespace classes, String debugdir, Collection<RizzlyFile> fileList) {
+  private static Component evaluate(Named root, Namespace classes, String debugdir, Collection<RizzlyFile> fileList) {
     KnowledgeBase kb = new KnowledgeBase(classes, fileList, debugdir);
     SimpleGraph<Named> g = DepGraph.build(classes, kb);
 
@@ -182,28 +181,37 @@ public class MainFun {
       {
         List<ConstGlobal> gconst = classes.getItems(ConstGlobal.class, true);
         for (ConstGlobal itr : gconst) {
-          NamedType type = EvalTo.type((ReferenceLinked) itr.getType(), kb);
+          Type type = EvalTo.type((ReferenceLinked) itr.getType(), kb);
           itr.setType(new ReferenceLinked(itr.getType().getInfo(), type));
         }
       }
 
       {
-        Memory mem = new Memory();
         TypeEvalReplacer replacer = new TypeEvalReplacer(kb);
-        List<FuncGlobal> gfunc = classes.getItems(FuncGlobal.class, true);
-        for (FuncGlobal itr : gfunc) {
-          replacer.traverse(itr, mem);
+        
+        
+        for( RizzlyFile f : fileList ){
+          List<Named> itms = new ArrayList<Named>();
+          itms.addAll( f.getType().getList() );
+          itms.addAll( f.getConstant().getList() );
+          itms.addAll( f.getFunction().getList() );
+          itms.addAll( f.getIface().getList() );
+          itms.addAll( f.getComp().getList() );
+          for( Named itr : itms ){
+            replacer.traverse(itr, new Memory());
+          }
         }
       }
 
-      NamedComponent nroot = Specializer.processComp((ComponentGenerator) root, new ArrayList<Expression>(), root.getInfo(), kb);
-
+      //FIXME is this function needed anymore?
+//      NamedComponent nroot = Specializer.processComp((ComponentGenerator) root, new ArrayList<Expression>(), root.getInfo(), kb);
+      Component nroot = (Component) root;
       return nroot;
     }
   }
 
-  private static List<NamedType> genPrimitiveTypes() {
-    List<NamedType> ret = new ArrayList<NamedType>();
+  private static List<Type> genPrimitiveTypes() {
+    List<Type> ret = new ArrayList<Type>();
     ret.add(makeNamedBaseType(new BooleanType()));
     ret.add(makeNamedBaseType(new VoidType()));
     ret.add(makeNamedBaseType(new IntegerType()));
@@ -221,14 +229,14 @@ public class MainFun {
     return ret;
   }
 
-  private static NamedType makeNamedBaseType(BaseType inst) {
-    assert (inst.getParamList().isEmpty());
-    return new NamedType(new ElementInfo(), inst.getName(), inst);
+  @Deprecated
+  private static Type makeNamedBaseType(BaseType inst) {
+    return inst;
   }
 
-  private static TypeGenerator makeGenericBaseType(BaseType inst) {
-    assert (!inst.getParamList().isEmpty());
-    return new TypeGenerator(info, inst.getName(), inst.getParamList().getList(), inst);
+  @Deprecated
+  private static TypeGenerator makeGenericBaseType(TypeGenerator inst) {
+    return inst;
   }
 
   private static Collection<RizzlyFile> loadFiles(Designator rootname, String rootdir) {

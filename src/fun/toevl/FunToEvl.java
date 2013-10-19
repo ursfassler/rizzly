@@ -33,18 +33,14 @@ import fun.other.ImplElementary;
 import fun.other.Interface;
 import fun.other.ListOfNamed;
 import fun.other.Named;
-import fun.other.NamedComponent;
-import fun.other.NamedInterface;
 import fun.other.Namespace;
 import fun.statement.Statement;
-import fun.type.NamedType;
-import fun.type.base.EnumElement;
 import fun.type.composed.NamedElement;
 import fun.type.composed.UnionSelector;
 import fun.variable.Constant;
 import fun.variable.Variable;
 
-public class FunToEvl extends NullTraverser<Evl, String> {
+public class FunToEvl extends NullTraverser<Evl, Void> {
   private Map<Fun, Evl> map = new HashMap<Fun, Evl>();
   private FunToEvlType type = new FunToEvlType(this, map);
   private FunToEvlExpr expr = new FunToEvlExpr(this, map);
@@ -75,7 +71,7 @@ public class FunToEvl extends NullTraverser<Evl, String> {
 
 
   @Override
-  protected Evl visit(Fun obj, String param) {
+  protected Evl visit(Fun obj, Void param) {
     Evl cobj = map.get(obj);
     if (cobj == null) {
       cobj = super.visit(obj, param);
@@ -86,12 +82,12 @@ public class FunToEvl extends NullTraverser<Evl, String> {
   }
 
   @Override
-  protected Evl visitDefault(Fun obj, String param) {
+  protected Evl visitDefault(Fun obj, Void param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
   @Override
-  protected Evl visitNamespace(Namespace obj, String param) {
+  protected Evl visitNamespace(Namespace obj, Void param) {
     evl.other.Namespace ret = new evl.other.Namespace(obj.getInfo(), obj.getName());
     map.put(obj, ret);
     for (Named src : obj) {
@@ -102,69 +98,64 @@ public class FunToEvl extends NullTraverser<Evl, String> {
   }
 
   @Override
-  protected Evl visitNamedType(NamedType obj, String param) {
+  protected Evl visitType(fun.type.Type obj, Void param) {
     return type.traverse(obj, obj.getName());
   }
 
   @Override
-  protected Evl visitTypeGenerator(TypeGenerator obj, String param) {
+  protected Evl visitTypeGenerator(TypeGenerator obj, Void param) {
     RError.err(ErrorType.Fatal, obj.getInfo(), "unresolved functional type: " + obj);
     return null;
   }
 
   @Override
-  protected Evl visitExpression(Expression obj, String param) {
+  protected Evl visitExpression(Expression obj, Void param) {
     return expr.traverse(obj, param);
   }
 
   @Override
-  protected Evl visitRefItem(RefItem obj, String param) {
+  protected Evl visitRefItem(RefItem obj, Void param) {
     return ref.traverse(obj, null);
   }
 
   @Override
-  protected Evl visitStatement(Statement obj, String param) {
+  protected Evl visitStatement(Statement obj, Void param) {
     return stmt.traverse(obj, null);
   }
 
   @Override
-  protected Evl visitVariable(Variable obj, String param) {
+  protected Evl visitVariable(Variable obj, Void param) {
     return var.traverse(obj, null);
   }
 
   @Override
-  protected Evl visitStateItem(StateItem obj, String param) {
+  protected Evl visitStateItem(StateItem obj, Void param) {
     return state.traverse(obj, null);
   }
 
   @Override
-  protected Evl visitCaseOptEntry(fun.statement.CaseOptEntry obj, String param) {
+  protected Evl visitCaseOptEntry(fun.statement.CaseOptEntry obj, Void param) {
     return caoe.traverse(obj, null);
   }
 
   @Override
-  protected Evl visitFunctionHeader(FunctionHeader obj, String param) {
+  protected Evl visitFunctionHeader(FunctionHeader obj, Void param) {
     return func.traverse(obj, null);
   }
 
   @Override
-  protected Evl visitEnumElement(EnumElement obj, String param) {
-    return new evl.type.base.EnumElement(obj.getInfo(), obj.getName());
-  }
-
-  @Override
-  protected Evl visitNamedElement(NamedElement obj, String param) {
+  protected Evl visitNamedElement(NamedElement obj, Void param) {
     Reference ref = (Reference) traverse(obj.getType(), null);
     return new evl.type.composed.NamedElement(obj.getInfo(), obj.getName(), FunToEvl.toTypeRef(ref));
   }
 
   @Override
-  protected Evl visitUnionSelector(UnionSelector obj, String param) {
+  protected Evl visitUnionSelector(UnionSelector obj, Void param) {
     return new evl.type.composed.UnionSelector(obj.getInfo(), obj.getName());
   }
 
   @Override
-  protected Evl visitConnection(Connection obj, String param) {
+  protected Evl visitConnection(Connection obj, Void param) {
     Reference srcref = (Reference) traverse(obj.getEndpoint(Direction.in), null);
     Reference dstref = (Reference) traverse(obj.getEndpoint(Direction.out), null);
     return new evl.composition.Connection(obj.getInfo(), refToEnp(srcref), refToEnp(dstref), obj.getType());
@@ -187,13 +178,8 @@ public class FunToEvl extends NullTraverser<Evl, String> {
   }
 
   @Override
-  protected Evl visitNamedComponent(NamedComponent obj, String param) {
-    return visit(obj.getComp(), obj.getName());
-  }
-
-  @Override
-  protected Evl visitImplElementary(ImplElementary obj, String param) {
-    evl.other.ImplElementary comp = new evl.other.ImplElementary(obj.getInfo(), param);
+  protected Evl visitImplElementary(ImplElementary obj, Void param) {
+    evl.other.ImplElementary comp = new evl.other.ImplElementary(obj.getInfo(), obj.getName());
     map.put(obj, comp);
     for (fun.variable.IfaceUse use : obj.getIface(Direction.out)) {
       comp.getIface(Direction.out).add((evl.other.IfaceUse) visit(use, null));
@@ -228,8 +214,8 @@ public class FunToEvl extends NullTraverser<Evl, String> {
   }
 
   @Override
-  protected Evl visitImplHfsm(ImplHfsm obj, String param) {
-    evl.hfsm.ImplHfsm comp = new evl.hfsm.ImplHfsm(obj.getInfo(), param);
+  protected Evl visitImplHfsm(ImplHfsm obj, Void param) {
+    evl.hfsm.ImplHfsm comp = new evl.hfsm.ImplHfsm(obj.getInfo(), obj.getName());
     map.put(obj, comp);
     for (fun.variable.IfaceUse use : obj.getIface(Direction.out)) {
       comp.getIface(Direction.out).add((evl.other.IfaceUse) visit(use, null));
@@ -242,8 +228,8 @@ public class FunToEvl extends NullTraverser<Evl, String> {
   }
 
   @Override
-  protected Evl visitImplComposition(ImplComposition obj, String param) {
-    evl.composition.ImplComposition comp = new evl.composition.ImplComposition(obj.getInfo(), param);
+  protected Evl visitImplComposition(ImplComposition obj, Void param) {
+    evl.composition.ImplComposition comp = new evl.composition.ImplComposition(obj.getInfo(), obj.getName());
     map.put(obj, comp);
     for (fun.variable.IfaceUse use : obj.getIface(Direction.out)) {
       comp.getIface(Direction.out).add((evl.other.IfaceUse) visit(use, null));
@@ -261,14 +247,8 @@ public class FunToEvl extends NullTraverser<Evl, String> {
   }
 
   @Override
-  protected Evl visitNamedInterface(NamedInterface obj, String param) {
-    return visit(obj.getIface(), obj.getName());
-  }
-
-  @Override
-  protected Evl visitInterface(Interface obj, String param) {
-    assert (param != null);
-    evl.other.Interface ret = new evl.other.Interface(obj.getInfo(), param);
+  protected Evl visitInterface(Interface obj, Void param) {
+    evl.other.Interface ret = new evl.other.Interface(obj.getInfo(), obj.getName());
     for (FunctionHeader func : obj.getPrototype()) {
       ret.getPrototype().add((evl.function.FunctionBase) visit(func, null));
     }

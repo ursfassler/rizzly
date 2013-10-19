@@ -16,6 +16,7 @@ import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.traverser.typecheck.specific.FunctionTypeChecker;
 import evl.traverser.typecheck.specific.HfsmTypeChecker;
 import evl.traverser.typecheck.specific.StatementTypeChecker;
+import evl.type.base.EnumType;
 import evl.variable.Variable;
 
 public class TypeChecker extends DefTraverser<Void, Void> {
@@ -75,6 +76,11 @@ public class TypeChecker extends DefTraverser<Void, Void> {
   protected Void visitExpression(Expression obj, Void sym) {
     ExpressionTypeChecker.process(obj, kb);
     return null;
+  }
+
+  @Override
+  protected Void visitEnumType(EnumType obj, Void param) {
+    return null;  // we do not type check them (assignment of number does not work)
   }
 
 }

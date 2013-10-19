@@ -15,7 +15,6 @@ import error.ErrorType;
 import error.RError;
 import fun.DefGTraverser;
 import fun.Fun;
-import fun.FunBase;
 import fun.NullTraverser;
 import fun.composition.ImplComposition;
 import fun.expression.reference.RefCall;
@@ -44,8 +43,12 @@ import fun.other.Named;
 import fun.other.RizzlyFile;
 import fun.symbol.NameTable;
 import fun.symbol.SymbolTable;
-import fun.type.NamedType;
 import fun.type.Type;
+import fun.type.base.EnumType;
+import fun.type.base.TypeAlias;
+import fun.type.composed.RecordType;
+import fun.type.composed.UnionType;
+import fun.type.template.UserTypeGenerator;
 import fun.variable.CompUse;
 import fun.variable.Constant;
 import fun.variable.FuncVariable;
@@ -58,9 +61,9 @@ import fun.variable.TemplateParameter;
 
 /**
  * Extends references to types and other class stuff to the full name path
- *
+ * 
  * @author urs
- *
+ * 
  */
 public class ClassNameExtender extends DefGTraverser<Void, SymbolTable<Designator, String>> {
   private Map<Designator, RizzlyFile> rfile;
@@ -99,6 +102,9 @@ public class ClassNameExtender extends DefGTraverser<Void, SymbolTable<Designato
     param = new SymbolTable<Designator, String>(param);
 
     AdderWithPrefix.add(obj.getCompfunc(), obj.getName(), param);
+    AdderWithPrefix.add(obj.getType(), obj.getName(), param);
+    AdderWithPrefix.add(obj.getIface(), obj.getName(), param);
+    AdderWithPrefix.add(obj.getComp(), obj.getName(), param);
     AdderWithPrefix.add(obj.getConstant(), obj.getName(), param);
     AdderWithPrefix.add(obj.getFunction(), obj.getName(), param);
 
@@ -150,6 +156,7 @@ public class ClassNameExtender extends DefGTraverser<Void, SymbolTable<Designato
 
   @Override
   protected Void visitInterface(Interface obj, SymbolTable<Designator, String> param) {
+    param = new SymbolTable<Designator, String>(param);
     addNames(obj.getPrototype(), param);
     super.visitInterface(obj, param);
     return null;
@@ -157,6 +164,7 @@ public class ClassNameExtender extends DefGTraverser<Void, SymbolTable<Designato
 
   @Override
   protected Void visitComponent(Component obj, SymbolTable<Designator, String> param) {
+    param = new SymbolTable<Designator, String>(param);
     AdderWithPrefix.add(obj.getIface(Direction.in), new Designator("Self"), param);
 
     AdderWithPrefix.add(obj.getIface(Direction.out), new Designator("Self"), param);
@@ -351,11 +359,6 @@ public class ClassNameExtender extends DefGTraverser<Void, SymbolTable<Designato
   }
 
   @Override
-  protected Void visitTypeGenerator(TypeGenerator obj, SymbolTable<Designator, String> param) {
-    return super.visitTypeGenerator(obj, generator(obj, param));
-  }
-
-  @Override
   protected Void visitInterfaceGenerator(InterfaceGenerator obj, SymbolTable<Designator, String> param) {
     return super.visitInterfaceGenerator(obj, generator(obj, param));
   }
@@ -365,12 +368,17 @@ public class ClassNameExtender extends DefGTraverser<Void, SymbolTable<Designato
     return super.visitComponentGenerator(obj, generator(obj, param));
   }
 
-  private <T extends FunBase> SymbolTable<Designator, String> generator(Generator<T> obj, SymbolTable<Designator, String> param) {
+  @Override
+  protected Void visitUserTypeGenerator(UserTypeGenerator obj, SymbolTable<Designator, String> param) {
+    return super.visitUserTypeGenerator(obj, generator(obj, param));
+  }
+
+  private SymbolTable<Designator, String> generator(Generator obj, SymbolTable<Designator, String> param) {
     param = new SymbolTable<Designator, String>(param);
     for (TemplateParameter gen : obj.getParam()) {
       param.add(gen.getName(), new Designator(gen.getName()));
     }
-    param.add("Self", new Designator("Self"));
+    param.add("Self", new Designator(obj.getName()));
     return param;
   }
 
@@ -435,11 +443,6 @@ class NameTableCreator extends NullTraverser<Void, Designator> {
     return null; // not referencable
   }
 
-  @Override
-  protected Void visitNamedType(NamedType obj, Designator param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
 }
 
 class AdderWithPrefix extends NullTraverser<Void, Designator> {
@@ -501,6 +504,43 @@ class AdderWithPrefix extends NullTraverser<Void, Designator> {
   }
 
   @Override
+  protected Void visitEnumType(EnumType obj, Designator param) {
+    add(obj, param);
+    visitItr(obj.getElement(), new Designator(param, obj.getName()));
+    return null;
+  }
+
+  @Override
+  protected Void visitRecordType(RecordType obj, Designator param) {
+    add(obj, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitUnionType(UnionType obj, Designator param) {
+    add(obj, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitTypeAlias(TypeAlias obj, Designator param) {
+    add(obj, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitInterface(Interface obj, Designator param) {
+    add(obj, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitComponent(Component obj, Designator param) {
+    add(obj, param);
+    return null;
+  }
+
+  @Override
   protected Void visitTypeGenerator(TypeGenerator obj, Designator param) {
     add(obj, param); // FIXME ok?
     return null;
@@ -514,12 +554,6 @@ class AdderWithPrefix extends NullTraverser<Void, Designator> {
 
   @Override
   protected Void visitComponentGenerator(ComponentGenerator obj, Designator param) {
-    add(obj, param); // FIXME ok?
-    return null;
-  }
-
-  @Override
-  protected Void visitNamedType(NamedType obj, Designator param) {
     add(obj, param); // FIXME ok?
     return null;
   }

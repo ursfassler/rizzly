@@ -94,9 +94,11 @@ class SubDep extends DefTraverser<Void, Named> {
 
   @Override
   protected Void visitTypeRef(TypeRef obj, Named param) {
-    g.addVertex(obj.getRef());
-    g.addEdge(param, obj.getRef());
-    visit(obj.getRef(), obj.getRef());
+    if (!g.containsVertex(obj.getRef())) {
+      g.addVertex(obj.getRef());
+      g.addEdge(param, obj.getRef());
+      visit(obj.getRef(), obj.getRef());
+    }
     return super.visitTypeRef(obj, param);
   }
 
@@ -106,7 +108,7 @@ class SubDep extends DefTraverser<Void, Named> {
     super.visitReference(obj, param);
 
     Named dst = obj.getLink();
-    if( g.containsVertex(dst) ){
+    if (g.containsVertex(dst)) {
       return null;
     }
     g.addVertex(dst);

@@ -19,11 +19,11 @@ import fun.generator.Generator;
 import fun.knowledge.KnowFun;
 import fun.knowledge.KnowScope;
 import fun.knowledge.KnowledgeBase;
+import fun.other.Component;
+import fun.other.Interface;
 import fun.other.Named;
-import fun.other.NamedComponent;
-import fun.other.NamedInterface;
 import fun.other.Namespace;
-import fun.type.NamedType;
+import fun.type.Type;
 import fun.variable.Constant;
 
 public class DepGraph extends NullTraverser<Void, Void> {
@@ -58,19 +58,7 @@ public class DepGraph extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitNamedType(NamedType obj, Void param) {
-    dep.traverse(obj, obj);
-    return null;
-  }
-
-  @Override
-  protected Void visitNamedInterface(NamedInterface obj, Void param) {
-    dep.traverse(obj, obj);
-    return null;
-  }
-
-  @Override
-  protected Void visitNamedComponent(NamedComponent obj, Void param) {
+  protected Void visitType(Type obj, Void param) {
     dep.traverse(obj, obj);
     return null;
   }
@@ -89,6 +77,18 @@ public class DepGraph extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitGenerator(Generator obj, Void param) {
+    dep.traverse(obj, obj);
+    return null;
+  }
+
+  @Override
+  protected Void visitInterface(Interface obj, Void param) {
+    dep.traverse(obj, obj);
+    return null;
+  }
+
+  @Override
+  protected Void visitComponent(Component obj, Void param) {
     dep.traverse(obj, obj);
     return null;
   }

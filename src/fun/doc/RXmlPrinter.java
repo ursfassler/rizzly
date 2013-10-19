@@ -71,7 +71,6 @@ import fun.statement.ReturnExpr;
 import fun.statement.ReturnVoid;
 import fun.statement.VarDefStmt;
 import fun.statement.While;
-import fun.type.NamedType;
 import fun.type.base.AnyType;
 import fun.type.base.BooleanType;
 import fun.type.base.EnumElement;
@@ -88,8 +87,10 @@ import fun.type.composed.UnionType;
 import fun.type.template.Array;
 import fun.type.template.ArrayTemplate;
 import fun.type.template.Range;
+import fun.type.template.RangeTemplate;
 import fun.type.template.TypeType;
 import fun.type.template.TypeTypeTemplate;
+import fun.type.template.UserTypeGenerator;
 import fun.variable.CompUse;
 import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
@@ -353,13 +354,24 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
     return null;
   }
 
+
   @Override
-  protected Void visitTypeGenerator(TypeGenerator obj, Designator param) {
+  protected Void visitRangeTemplate(RangeTemplate obj, Designator param) {
+    xw.sectionSeparator();
+    xw.wa(obj);
+    visitOptList("{", "}", obj.getParam().getList());
+    xw.wr(" = internal;");
+    xw.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitUserTypeGenerator(UserTypeGenerator obj, Designator param) {
     xw.sectionSeparator();
     xw.wa(obj);
     visitOptList("{", "}", obj.getParam().getList());
     xw.wr(" = ");
-    visit(obj.getItem(), param);
+    visit(obj.getTemplate(), param);
     xw.nl();
     return null;
   }
@@ -369,8 +381,9 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
     xw.sectionSeparator();
     xw.wa(obj);
     visitOptList("{", "}", obj.getParam().getList());
+    xw.wr(" = ");
+    visit(obj.getTemplate(), param);
     xw.nl();
-    visit(obj.getItem(), param);
     return null;
   }
 
@@ -378,8 +391,9 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   protected Void visitInterfaceGenerator(InterfaceGenerator obj, Designator param) {
     xw.wa(obj);
     visitOptList("{", "}", obj.getParam().getList());
+    xw.wr(" = ");
+    visit(obj.getTemplate(), param);
     xw.nl();
-    visit(obj.getItem(), param);
     return null;
   }
 
@@ -507,16 +521,9 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   // ---- Type ----------------------------------------------------------------
 
   @Override
-  protected Void visitNamedType(NamedType obj, Designator param) {
+  protected Void visitTypeAlias(TypeAlias obj, Designator param) {
     xw.wa(obj);
     xw.wr(" = ");
-    visit(obj.getType(), null);
-    xw.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitTypeAlias(TypeAlias obj, Designator param) {
     visit(obj.getRef(), null);
     xw.wr(";");
     return null;
@@ -524,6 +531,8 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
 
   @Override
   protected Void visitStringType(StringType obj, Designator param) {
+    xw.wa(obj);
+    xw.wr(" = ");
     xw.kw(obj.getName());
     xw.wr(";");
     return null;
@@ -531,6 +540,8 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
 
   @Override
   protected Void visitVoidType(VoidType obj, Designator param) {
+    xw.wa(obj);
+    xw.wr(" = ");
     xw.kw(obj.getName());
     xw.wr(";");
     return null;
@@ -538,6 +549,8 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
 
   @Override
   protected Void visitEnumType(EnumType obj, Designator param) {
+    xw.wa(obj);
+    xw.wr(" = ");
     xw.kw("Enum");
     xw.nl();
     xw.incIndent();
@@ -578,6 +591,8 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   private void writeNamedElementType(NamedElementType obj, String typename, Designator param) {
+    xw.wa(obj);
+    xw.wr(" = ");
     xw.kw(typename);
     xw.nl();
     xw.incIndent();
@@ -606,7 +621,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitGenericArray(ArrayTemplate obj, Designator param) {
+  protected Void visitArrayTemplate(ArrayTemplate obj, Designator param) {
     xw.kw(obj.getName());
     xw.wr(";");
     return null;
@@ -643,7 +658,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitGenericTypeType(TypeTypeTemplate obj, Designator param) {
+  protected Void visitTypeTypeTemplate(TypeTypeTemplate obj, Designator param) {
     xw.kw(obj.getName());
     xw.wr(";");
     return null;
@@ -870,7 +885,6 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
 
   @Override
   protected Void visitReferenceUnlinked(ReferenceUnlinked obj, Designator param) {
-    assert (false);
     xw.wr("'");
     xw.wr(obj.getName().toString("."));
     xw.wr("'");

@@ -135,7 +135,7 @@ public class ComponentFilePrinter {
     KnowFunPath kp = kb.getEntry(KnowFunPath.class);
     List<ComponentGenerator> compgens = file.getCompfunc().getItems(ComponentGenerator.class);
     for (ComponentGenerator compgen : compgens) {
-      Component comp = compgen.getItem();
+      Component comp = compgen.getTemplate();
       if (comp instanceof ImplComposition) {
         Element title = doc.createElement("h2");
         title.appendChild(doc.createTextNode("Picture"));

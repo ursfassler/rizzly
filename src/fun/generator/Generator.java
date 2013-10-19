@@ -1,6 +1,6 @@
 package fun.generator;
 
-import java.util.Collection;
+import java.util.List;
 
 import common.ElementInfo;
 
@@ -10,23 +10,17 @@ import fun.other.Named;
 import fun.variable.TemplateParameter;
 
 /**
- *
+ * 
  * @author urs
  */
-abstract public class Generator<T extends FunBase> extends FunBase implements Named {
+abstract public class Generator extends FunBase implements Named {
   private String name;
   final private ListOfNamed<TemplateParameter> param;
-  final private T item;
 
-  public Generator(ElementInfo info, String name, Collection<TemplateParameter> param, T item) {
+  public Generator(ElementInfo info, String name, List<TemplateParameter> param) {
     super(info);
     this.name = name;
     this.param = new ListOfNamed<TemplateParameter>(param);
-    this.item = item;
-  }
-
-  public T getItem() {
-    return item;
   }
 
   public ListOfNamed<TemplateParameter> getParam() {

@@ -1,31 +1,15 @@
 package evl.type.base;
 
+import java.math.BigInteger;
+
 import common.ElementInfo;
 
-import evl.EvlBase;
-import evl.other.Named;
+import evl.expression.Number;
+import evl.type.TypeRef;
+import evl.variable.Constant;
 
-final public class EnumElement extends EvlBase implements Named {
-
-  private String name;
-
-  public EnumElement(ElementInfo info, String name) {
-    super(info);
-    this.name = name;
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  @Override
-  public String toString() {
-    return name;
+final public class EnumElement extends Constant {
+  public EnumElement(ElementInfo info, String name, TypeRef type, BigInteger value) {
+    super(info, name, type, new Number(info, value));
   }
 }

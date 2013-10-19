@@ -12,7 +12,6 @@ import fun.expression.reference.ReferenceLinked;
 import fun.generator.TypeGenerator;
 import fun.knowledge.KnowledgeBase;
 import fun.other.ActualTemplateArgument;
-import fun.type.NamedType;
 import fun.type.Type;
 import fun.type.template.Array;
 import fun.type.template.ArrayTemplate;
@@ -29,11 +28,11 @@ public class GenericSpecializer extends NullTraverser<Type, List<ActualTemplateA
 
   public static Type process(TypeGenerator type, List<ActualTemplateArgument> genspec, KnowledgeBase kb) {
     GenericSpecializer specializer = new GenericSpecializer();
-    return specializer.traverse(type.getItem(), genspec);
+    return specializer.traverse(type, genspec);
   }
 
   @Override
-  protected Type visitGenericRange(RangeTemplate obj, List<ActualTemplateArgument> param) {
+  protected Type visitRangeTemplate(RangeTemplate obj, List<ActualTemplateArgument> param) {
     assert (param.size() == 2);
     ActualTemplateArgument low = param.get(0);
     ActualTemplateArgument high = param.get(1);
@@ -43,23 +42,23 @@ public class GenericSpecializer extends NullTraverser<Type, List<ActualTemplateA
   }
 
   @Override
-  protected Type visitGenericArray(ArrayTemplate obj, List<ActualTemplateArgument> param) {
+  protected Type visitArrayTemplate(ArrayTemplate obj, List<ActualTemplateArgument> param) {
     assert (param.size() == 2);
     ActualTemplateArgument size = param.get(0);
     ActualTemplateArgument type = param.get(1);
-    assert (type instanceof NamedType);
+    assert (type instanceof Type);
     assert (size instanceof Number);
     BigInteger count = ((Number) size).getValue();
-    NamedType typ = (NamedType) type;
+    Type typ = (Type) type;
     return new Array(obj.getInfo(), count, new ReferenceLinked(new ElementInfo(), typ));
   }
 
   @Override
-  protected Type visitGenericTypeType(TypeTypeTemplate obj, List<ActualTemplateArgument> param) {
+  protected Type visitTypeTypeTemplate(TypeTypeTemplate obj, List<ActualTemplateArgument> param) {
     assert (param.size() == 1);
     ActualTemplateArgument type = param.get(0);
-    assert (type instanceof NamedType);
-    NamedType typ = (NamedType) type;
+    assert (type instanceof Type);
+    Type typ = (Type) type;
     return new TypeType(obj.getInfo(), new ReferenceLinked(new ElementInfo(), typ));
   }
 

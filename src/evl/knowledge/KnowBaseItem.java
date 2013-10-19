@@ -177,7 +177,8 @@ public class KnowBaseItem extends KnowledgeEntry {
     EnumType type = (EnumType) parent.find(subName);
 
     if (type == null) {
-      type = new EnumType(new ElementInfo(), subName, subelem);
+      type = new EnumType(new ElementInfo(), subName);
+      type.getElement().addAll(subelem);
       parent.add(type);
     }
 

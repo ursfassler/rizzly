@@ -6,8 +6,9 @@ import common.Designator;
 import common.ElementInfo;
 
 import fun.FunBase;
-import fun.function.FunctionHeader;
+import fun.function.impl.FuncGlobal;
 import fun.generator.Generator;
+import fun.type.Type;
 import fun.variable.Constant;
 
 /**
@@ -17,10 +18,12 @@ import fun.variable.Constant;
 final public class RizzlyFile extends FunBase {
   private Designator name;
   final private List<Designator> imports;
-  @SuppressWarnings("rawtypes")
   final private ListOfNamed<Generator> compfunc = new ListOfNamed<Generator>();
+  final private ListOfNamed<Type> type = new ListOfNamed<Type>();
+  final private ListOfNamed<Interface> iface = new ListOfNamed<Interface>();
+  final private ListOfNamed<Component> comp = new ListOfNamed<Component>();
   final private ListOfNamed<Constant> constant = new ListOfNamed<Constant>();
-  final private ListOfNamed<FunctionHeader> function = new ListOfNamed<FunctionHeader>();
+  final private ListOfNamed<FuncGlobal> function = new ListOfNamed<FuncGlobal>();
 
   public RizzlyFile(ElementInfo info, List<Designator> imports) {
     super(info);
@@ -48,13 +51,24 @@ final public class RizzlyFile extends FunBase {
     return constant;
   }
 
-  public ListOfNamed<FunctionHeader> getFunction() {
+  public ListOfNamed<FuncGlobal> getFunction() {
     return function;
   }
 
-  @SuppressWarnings("rawtypes")
   public ListOfNamed<Generator> getCompfunc() {
     return compfunc;
+  }
+
+  public ListOfNamed<Type> getType() {
+    return type;
+  }
+
+  public ListOfNamed<Interface> getIface() {
+    return iface;
+  }
+
+  public ListOfNamed<Component> getComp() {
+    return comp;
   }
 
 }

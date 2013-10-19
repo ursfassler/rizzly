@@ -2,7 +2,6 @@ package fun.type.template;
 
 import java.math.BigInteger;
 
-import common.Designator;
 import common.ElementInfo;
 
 import fun.expression.reference.Reference;
@@ -14,13 +13,15 @@ import fun.variable.TemplateParameter;
 public class Array extends BaseType implements Named {
   private Reference type;
   private BigInteger size;
-  private String name;
 
   public Array(ElementInfo info, BigInteger size, Reference type) {
-    super(info);
+    super(info, makeName(size, type));
     this.type = type;
     this.size = size;
-    name = ArrayTemplate.NAME + Designator.NAME_SEP + size + Designator.NAME_SEP + type.toString();
+  }
+
+  private static String makeName(BigInteger size, Reference type) {
+    return ArrayTemplate.NAME + "{" + size + "," + type.toString() + "}";
   }
 
   public Reference getType() {
@@ -37,15 +38,6 @@ public class Array extends BaseType implements Named {
 
   public BigInteger getSize() {
     return size;
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
   }
 
   @Override

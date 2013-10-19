@@ -9,12 +9,7 @@ public class NaturalType extends BaseType {
   public static final String NAME = "Natural";
 
   public NaturalType() {
-    super(new ElementInfo());
-  }
-
-  @Override
-  public String getName() {
-    return NAME;
+    super(new ElementInfo(), NAME);
   }
 
   @Override

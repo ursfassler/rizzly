@@ -9,11 +9,14 @@ import common.Metadata;
 
 import error.ErrorType;
 import error.RError;
+import fun.generator.ComponentGenerator;
+import fun.generator.InterfaceGenerator;
 import fun.other.RizzlyFile;
+import fun.type.template.UserTypeGenerator;
 import fun.variable.ConstGlobal;
 
 /**
- *
+ * 
  * @author urs
  */
 public class FileParser extends BaseParser {
@@ -31,7 +34,7 @@ public class FileParser extends BaseParser {
 
   // ---- Parser Functions ----
 
-  // EBNF file: import { ifacedefsec | compdefsec |  typesec | constDeclBlock | globalFunction }
+  // EBNF file: import { ifacedefsec | compdefsec | typesec | constDeclBlock | globalFunction }
   private RizzlyFile parseFile() {
     ElementInfo info = peek().getInfo();
     ArrayList<Metadata> meta = getMetadata();
@@ -43,15 +46,33 @@ public class FileParser extends BaseParser {
     while (peek().getType() != TokenType.EOF) {
       switch (peek().getType()) {
       case INTERFACE: {
-        ret.getCompfunc().addAll(type().parseInterfaceSection());
+        for (InterfaceGenerator gen : type().parseInterfaceSection()) {
+          if (gen.getParam().isEmpty()) {
+            ret.getIface().add(gen.getTemplate());
+          } else {
+            ret.getCompfunc().add(gen); // type producing functions
+          }
+        }
         break;
       }
       case COMPONENT: {
-        ret.getCompfunc().addAll(type().parseComponentSection());
+        for (ComponentGenerator gen : type().parseComponentSection()) {
+          if (gen.getParam().isEmpty()) {
+            ret.getComp().add(gen.getTemplate());
+          } else {
+            ret.getCompfunc().add(gen); // type producing functions
+          }
+        }
         break;
       }
       case TYPE_SEC: {
-        ret.getCompfunc().addAll(type().parseTypeSection()); // type producing functions
+        for (UserTypeGenerator gen : type().parseTypeSection()) {
+          if (gen.getParam().isEmpty()) {
+            ret.getType().add(gen.getTemplate());
+          } else {
+            ret.getCompfunc().add(gen); // type producing functions
+          }
+        }
         break;
       }
       case CONST: {

@@ -2,8 +2,6 @@ package fun.traverser;
 
 import java.util.Iterator;
 
-import common.ElementInfo;
-
 import error.ErrorType;
 import error.RError;
 import fun.Fun;
@@ -25,13 +23,9 @@ import fun.knowledge.KnowledgeBase;
 import fun.other.Component;
 import fun.other.ImplElementary;
 import fun.other.Named;
-import fun.other.NamedComponent;
 import fun.statement.Block;
 import fun.statement.VarDefStmt;
 import fun.symbol.SymbolTable;
-import fun.type.NamedType;
-import fun.type.Type;
-import fun.type.base.EnumType;
 
 public class Linker extends RefReplacer<SymbolTable<Named, String>> {
   private KnowledgeBase kb;
@@ -84,7 +78,9 @@ public class Linker extends RefReplacer<SymbolTable<Named, String>> {
 
   @Override
   protected Expression visitComponent(Component obj, SymbolTable<Named, String> param) {
-    addSelf(param, obj);
+    param = new SymbolTable<Named, String>(param);
+    add(param, obj); // add self?
+    param.add("Self", obj);
     super.visitComponent(obj, param);
     return null;
   }
@@ -184,14 +180,6 @@ public class Linker extends RefReplacer<SymbolTable<Named, String>> {
     return null;
   }
 
-  @Override
-  protected Expression visitEnumType(EnumType obj, SymbolTable<Named, String> param) {
-    // TODO remove this function
-    addSelf(param, obj);
-    super.visitEnumType(obj, param);
-    return null;
-  }
-
   private void add(SymbolTable<Named, String> sym, Iterable<? extends Named> list) {
     for (Named itr : list) {
       add(sym, itr);
@@ -202,13 +190,4 @@ public class Linker extends RefReplacer<SymbolTable<Named, String>> {
     sym.add(item.getName(), item);
   }
 
-  public void addSelf(SymbolTable<Named, String> param, Type obj) {
-    NamedType self = new NamedType(new ElementInfo(), "Self", obj);
-    add(param, self);
-  }
-
-  public void addSelf(SymbolTable<Named, String> param, Component obj) {
-    NamedComponent self = new NamedComponent(new ElementInfo(), "Self", obj);
-    add(param, self);
-  }
 }
