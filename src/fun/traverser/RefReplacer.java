@@ -13,6 +13,7 @@ import fun.hfsm.State;
 import fun.hfsm.StateComposite;
 import fun.hfsm.Transition;
 import fun.statement.CallStmt;
+import fun.type.base.EnumType;
 import fun.type.base.TypeAlias;
 import fun.type.composed.NamedElement;
 import fun.type.template.Array;
@@ -101,6 +102,16 @@ public abstract class RefReplacer<T> extends ExprReplacer<T> {
       ((FuncWithReturn) obj).setRet((Reference) visit(((FuncWithReturn) obj).getRet(), param));
     }
     return super.visitFunctionHeader(obj, param);
+  }
+
+  @Override
+  protected Expression visitEnumType(EnumType obj, T param) {
+    for (int i = 0; i < obj.getElement().size(); i++) {
+      Reference element = obj.getElement().get(i);
+      element = (Reference) visit(element, param);
+      obj.getElement().set(i, element);
+    }
+    return super.visitEnumType(obj, param);
   }
 
 }

@@ -23,7 +23,7 @@ component
     
     function in.tick( x: R{0,10} )
       if a < 10 then
-        a := a + 1;
+        a := R{0,10}( a + 1 );
       else
         a := 0;
       end

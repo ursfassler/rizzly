@@ -96,12 +96,13 @@ import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BaseType;
 import evl.type.base.BooleanType;
+import evl.type.base.EnumDefRef;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.type.base.FunctionType;
 import evl.type.base.FunctionTypeRet;
 import evl.type.base.FunctionTypeVoid;
-import evl.type.base.NumSet;
+import evl.type.base.RangeType;
 import evl.type.base.StringType;
 import evl.type.composed.NamedElement;
 import evl.type.composed.NamedElementType;
@@ -184,6 +185,8 @@ public abstract class Traverser<R, P> {
       return visitTypeRef((TypeRef) obj, param);
     } else if (obj instanceof UnionSelector) {
       return visitUnionSelector((UnionSelector) obj, param);
+    } else if (obj instanceof EnumDefRef) {
+      return visitEnumDefRef((EnumDefRef) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -493,8 +496,8 @@ public abstract class Traverser<R, P> {
   protected R visitBaseType(BaseType obj, P param) {
     if (obj instanceof BooleanType) {
       return visitBooleanType((BooleanType) obj, param);
-    } else if (obj instanceof NumSet) {
-      return visitNumSet((NumSet) obj, param);
+    } else if (obj instanceof RangeType) {
+      return visitNumSet((RangeType) obj, param);
     } else if (obj instanceof ArrayType) {
       return visitArrayType((ArrayType) obj, param);
     } else if (obj instanceof StringType) {
@@ -572,7 +575,7 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitIntegerType(IntegerType obj, P param);
 
-  abstract protected R visitNumSet(NumSet obj, P param);
+  abstract protected R visitNumSet(RangeType obj, P param);
 
   abstract protected R visitBooleanType(BooleanType obj, P param);
 
@@ -583,6 +586,8 @@ public abstract class Traverser<R, P> {
   abstract protected R visitRefIndex(RefIndex obj, P param);
 
   abstract protected R visitRefPtrDeref(RefPtrDeref obj, P param);
+
+  abstract protected R visitEnumDefRef(EnumDefRef obj, P param);
 
   abstract protected R visitIfaceUse(IfaceUse obj, P param);
 

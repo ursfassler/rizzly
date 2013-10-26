@@ -33,6 +33,7 @@ import evl.statement.Statement;
 import evl.statement.normal.Assignment;
 import evl.statement.normal.CallStmt;
 import evl.statement.normal.NormalStmt;
+import evl.statement.normal.TypeCast;
 import evl.statement.normal.VarDefInitStmt;
 import evl.statement.normal.VarDefStmt;
 import evl.statement.phi.PhiStmt;
@@ -93,6 +94,8 @@ public class SsaMaker extends DefTraverser<Void, Void> {
     intra.traverse(body, null);
 
     InterBbVariableLinker.link(intra, dom.getDom(), body, argmap);
+    
+    Relinker.relink(body, argmap);
   }
 
   private static Map<FuncVariable, SsaVariable> replaceParam(ListOfNamed<Variable> fpar) {
@@ -266,6 +269,14 @@ class SsaVarCreator extends NullTraverser<Void, List<NormalStmt>> {
 
   @Override
   protected Void visitVarDefInitStmt(VarDefInitStmt obj, List<NormalStmt> param) {
+    renamed.put(obj.getVariable(), obj.getVariable());
+    param.add(obj);
+    return null;
+  }
+
+  @Override
+  protected Void visitTypeCast(TypeCast obj, List<NormalStmt> param) {
+    //TODO ok?
     renamed.put(obj.getVariable(), obj.getVariable());
     param.add(obj);
     return null;

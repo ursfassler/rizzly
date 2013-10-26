@@ -24,10 +24,6 @@ import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.ReferenceLinked;
 import fun.expression.reference.ReferenceUnlinked;
 import fun.function.FunctionHeader;
-import fun.generator.ComponentGenerator;
-import fun.generator.Generator;
-import fun.generator.InterfaceGenerator;
-import fun.generator.TypeGenerator;
 import fun.hfsm.FullStateName;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.QueryItem;
@@ -36,6 +32,7 @@ import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
 import fun.other.Component;
+import fun.other.Generator;
 import fun.other.ImplElementary;
 import fun.other.Interface;
 import fun.other.ListOfNamed;
@@ -48,7 +45,6 @@ import fun.type.base.EnumType;
 import fun.type.base.TypeAlias;
 import fun.type.composed.RecordType;
 import fun.type.composed.UnionType;
-import fun.type.template.UserTypeGenerator;
 import fun.variable.CompUse;
 import fun.variable.Constant;
 import fun.variable.FuncVariable;
@@ -359,18 +355,8 @@ public class ClassNameExtender extends DefGTraverser<Void, SymbolTable<Designato
   }
 
   @Override
-  protected Void visitInterfaceGenerator(InterfaceGenerator obj, SymbolTable<Designator, String> param) {
-    return super.visitInterfaceGenerator(obj, generator(obj, param));
-  }
-
-  @Override
-  protected Void visitComponentGenerator(ComponentGenerator obj, SymbolTable<Designator, String> param) {
-    return super.visitComponentGenerator(obj, generator(obj, param));
-  }
-
-  @Override
-  protected Void visitUserTypeGenerator(UserTypeGenerator obj, SymbolTable<Designator, String> param) {
-    return super.visitUserTypeGenerator(obj, generator(obj, param));
+  protected Void visitGenerator(Generator obj, SymbolTable<Designator, String> param) {
+    return super.visitGenerator(obj, generator(obj, param));
   }
 
   private SymbolTable<Designator, String> generator(Generator obj, SymbolTable<Designator, String> param) {
@@ -506,7 +492,7 @@ class AdderWithPrefix extends NullTraverser<Void, Designator> {
   @Override
   protected Void visitEnumType(EnumType obj, Designator param) {
     add(obj, param);
-    visitItr(obj.getElement(), new Designator(param, obj.getName()));
+    visitItr(obj.getElement(), param);
     return null;
   }
 
@@ -541,19 +527,7 @@ class AdderWithPrefix extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitTypeGenerator(TypeGenerator obj, Designator param) {
-    add(obj, param); // FIXME ok?
-    return null;
-  }
-
-  @Override
-  protected Void visitInterfaceGenerator(InterfaceGenerator obj, Designator param) {
-    add(obj, param); // FIXME ok?
-    return null;
-  }
-
-  @Override
-  protected Void visitComponentGenerator(ComponentGenerator obj, Designator param) {
+  protected Void visitGenerator(Generator obj, Designator param) {
     add(obj, param); // FIXME ok?
     return null;
   }

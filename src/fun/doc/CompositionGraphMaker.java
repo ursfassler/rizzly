@@ -17,10 +17,9 @@ import fun.expression.Expression;
 import fun.expression.reference.RefName;
 import fun.expression.reference.Reference;
 import fun.expression.reference.ReferenceLinked;
-import fun.generator.ComponentGenerator;
-import fun.generator.InterfaceGenerator;
 import fun.knowledge.KnowFunPath;
 import fun.knowledge.KnowledgeBase;
+import fun.other.Generator;
 import fun.variable.CompUse;
 import fun.variable.IfaceUse;
 
@@ -44,15 +43,15 @@ public class CompositionGraphMaker {
     }
 
     for (CompUse use : impl.getComponent()) {
-      ComponentGenerator comptype = getComp(use.getType());
+      fun.other.Component comptype = getComp(use.getType());
       Designator subpath = kp.get(comptype);
       SubComponent sub = new SubComponent(use.getName(), subpath, comptype.getName(), use.getInfo().getMetadata(METADATA_KEY));
 
-      for (IfaceUse iface : comptype.getTemplate().getIface(Direction.in)) {
+      for (IfaceUse iface : comptype.getIface(Direction.in)) {
         Interface niface = makeIface(new Designator("Self", use.getName()), sub, iface, ifacemap, kb);
         sub.getInput().add(niface);
       }
-      for (IfaceUse iface : comptype.getTemplate().getIface(Direction.out)) {
+      for (IfaceUse iface : comptype.getIface(Direction.out)) {
         Interface niface = makeIface(new Designator("Self", use.getName()), sub, iface, ifacemap, kb);
         sub.getOutput().add(niface);
       }
@@ -91,7 +90,7 @@ public class CompositionGraphMaker {
 
   private static Interface makeIface(Designator name, Component sub, IfaceUse iface, Map<Designator, Interface> ifacemap, KnowledgeBase kb) {
     KnowFunPath kp = kb.getEntry(KnowFunPath.class);
-    InterfaceGenerator ifacetype = getIface(iface.getType());
+    fun.other.Interface ifacetype = getIface(iface.getType());
     Designator path = kp.get(ifacetype);
     Interface niface = new Interface(sub, iface.getName(), path, ifacetype.getName());
 
@@ -101,16 +100,16 @@ public class CompositionGraphMaker {
     return niface;
   }
 
-  private static fun.generator.InterfaceGenerator getIface(Expression expr) {
+  private static fun.other.Interface getIface(Expression expr) {
     ReferenceLinked reference = (ReferenceLinked) expr;
     ReferenceLinked rl = reference;
-    return (InterfaceGenerator) rl.getLink();
+    return (fun.other.Interface) ((Generator) rl.getLink()).getTemplate();
   }
 
-  private static fun.generator.ComponentGenerator getComp(Expression expr) {
+  private static fun.other.Component getComp(Expression expr) {
     ReferenceLinked reference = (ReferenceLinked) expr;
     ReferenceLinked rl = reference;
-    return (ComponentGenerator) rl.getLink();
+    return (fun.other.Component) ((Generator) rl.getLink()).getTemplate();
   }
 
 }

@@ -23,13 +23,13 @@ component
 
     function in.tick( x: Weekday ):R{0,3}
       case x of
-        Weekday.Monday,Weekday.Wednesday:
+        Monday,Wednesday:
           return 2;
         end
-        Weekday.Tuesday:
+        Tuesday:
           return 0;
         end
-        Weekday.Thursday..Weekday.Saturday:
+        Thursday..Saturday:
           return 1;
         end
         else

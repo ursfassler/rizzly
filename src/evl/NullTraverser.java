@@ -78,11 +78,12 @@ import evl.statement.phi.PhiStmt;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
+import evl.type.base.EnumDefRef;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.type.base.FunctionTypeRet;
 import evl.type.base.FunctionTypeVoid;
-import evl.type.base.NumSet;
+import evl.type.base.RangeType;
 import evl.type.base.StringType;
 import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
@@ -585,12 +586,17 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitNumSet(NumSet obj, P param) {
+  protected R visitNumSet(RangeType obj, P param) {
     return visitDefault(obj, param);
   }
 
   @Override
   protected R visitRangeValue(RangeValue obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitEnumDefRef(EnumDefRef obj, P param) {
     return visitDefault(obj, param);
   }
 

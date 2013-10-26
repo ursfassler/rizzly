@@ -1,7 +1,5 @@
 package fun.toevl;
 
-import java.util.Map;
-
 import evl.Evl;
 import evl.other.Component;
 import evl.other.Interface;
@@ -11,7 +9,6 @@ import evl.variable.Variable;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.expression.Expression;
-import fun.expression.Number;
 import fun.expression.reference.ReferenceLinked;
 import fun.type.base.EnumElement;
 import fun.variable.CompUse;
@@ -22,24 +19,11 @@ import fun.variable.IfaceUse;
 import fun.variable.StateVariable;
 
 public class FunToEvlVariable extends NullTraverser<Evl, Void> {
-  private Map<Fun, Evl> map;
   private FunToEvl fta;
 
-  public FunToEvlVariable(FunToEvl fta, Map<Fun, Evl> map) {
+  public FunToEvlVariable(FunToEvl fta) {
     super();
-    this.map = map;
     this.fta = fta;
-  }
-
-  @Override
-  protected Evl visit(Fun obj, Void param) {
-    Evl cobj = (Evl) map.get(obj);
-    if (cobj == null) {
-      cobj = super.visit(obj, param);
-      assert (cobj != null);
-      map.put(obj, cobj);
-    }
-    return cobj;
   }
 
   @Override
@@ -79,8 +63,14 @@ public class FunToEvlVariable extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitEnumElement(EnumElement obj, Void param) {
-    Number num = (Number) obj.getDef();
-    return new evl.type.base.EnumElement(obj.getInfo(), obj.getName(), copyType(obj.getType()), num.getValue());
+    TypeRef type = copyType(obj.getType());
+    // since enums produce a stupid circular dependency, the enum value may exist now
+    evl.type.base.EnumElement val = (evl.type.base.EnumElement) fta.map.get(obj);
+    if( val == null ){
+      val = new evl.type.base.EnumElement(obj.getInfo(), obj.getName(), type, (evl.expression.Expression) fta.traverse(obj.getDef(), null));
+      fta.map.put(obj, val);
+    }
+    return val;
   }
 
   @Override

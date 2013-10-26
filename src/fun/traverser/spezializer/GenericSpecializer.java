@@ -9,12 +9,13 @@ import fun.Fun;
 import fun.NullTraverser;
 import fun.expression.Number;
 import fun.expression.reference.ReferenceLinked;
-import fun.generator.TypeGenerator;
 import fun.knowledge.KnowledgeBase;
 import fun.other.ActualTemplateArgument;
+import fun.other.Named;
 import fun.type.Type;
 import fun.type.template.Array;
 import fun.type.template.ArrayTemplate;
+import fun.type.template.BuiltinTemplate;
 import fun.type.template.Range;
 import fun.type.template.RangeTemplate;
 import fun.type.template.TypeType;
@@ -26,7 +27,7 @@ public class GenericSpecializer extends NullTraverser<Type, List<ActualTemplateA
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
-  public static Type process(TypeGenerator type, List<ActualTemplateArgument> genspec, KnowledgeBase kb) {
+  public static Named process(BuiltinTemplate type, List<ActualTemplateArgument> genspec, KnowledgeBase kb) {
     GenericSpecializer specializer = new GenericSpecializer();
     return specializer.traverse(type, genspec);
   }

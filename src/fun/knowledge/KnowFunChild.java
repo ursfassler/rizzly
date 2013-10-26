@@ -13,12 +13,12 @@ import fun.composition.ImplComposition;
 import fun.expression.reference.ReferenceLinked;
 import fun.expression.reference.ReferenceUnlinked;
 import fun.function.FunctionHeader;
-import fun.generator.InterfaceGenerator;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.State;
 import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
 import fun.other.Component;
+import fun.other.Generator;
 import fun.other.ImplElementary;
 import fun.other.Interface;
 import fun.other.ListOfNamed;
@@ -94,7 +94,7 @@ class KnowFunChildTraverser extends NullTraverser<Set<Named>, String> {
 
   @Override
   protected Set<Named> visitEnumType(EnumType obj, String param) {
-    return retopt(obj.find(param));
+    return new HashSet<Named>();
   }
 
   @Override
@@ -179,7 +179,7 @@ class KnowFunChildTraverser extends NullTraverser<Set<Named>, String> {
   }
 
   @Override
-  protected Set<Named> visitInterfaceGenerator(InterfaceGenerator obj, String param) {
+  protected Set<Named> visitGenerator(Generator obj, String param) {
     Set<Named> rset = visit(obj.getTemplate(), param);
     addIfFound(obj.getParam().find(param), rset);
     return rset;

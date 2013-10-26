@@ -24,10 +24,10 @@ import common.Designator;
 import fun.composition.ImplComposition;
 import fun.doc.compgraph.Positioning;
 import fun.doc.compgraph.WorldComp;
-import fun.generator.ComponentGenerator;
 import fun.knowledge.KnowFunPath;
 import fun.knowledge.KnowledgeBase;
 import fun.other.Component;
+import fun.other.Generator;
 import fun.other.RizzlyFile;
 
 public class ComponentFilePrinter {
@@ -133,19 +133,21 @@ public class ComponentFilePrinter {
 
   public void makePicture(RizzlyFile file) {
     KnowFunPath kp = kb.getEntry(KnowFunPath.class);
-    List<ComponentGenerator> compgens = file.getCompfunc().getItems(ComponentGenerator.class);
-    for (ComponentGenerator compgen : compgens) {
-      Component comp = compgen.getTemplate();
-      if (comp instanceof ImplComposition) {
-        Element title = doc.createElement("h2");
-        title.appendChild(doc.createTextNode("Picture"));
-        body.appendChild(title);
+    List<Generator> compgens = file.getCompfunc().getItems(Generator.class);
+    for (Generator compgen : compgens) {
+      if (compgen.getTemplate() instanceof Component) {
+        Component comp = (Component) compgen.getTemplate();
+        if (comp instanceof ImplComposition) {
+          Element title = doc.createElement("h2");
+          title.appendChild(doc.createTextNode("Picture"));
+          body.appendChild(title);
 
-        Designator path = kp.get(compgen);
-        WorldComp g = CompositionGraphMaker.make( path, compgen.getName(), (ImplComposition) comp, kb);
-        Positioning.doPositioning(g);
-        CompositionGraphPrinter pr = new CompositionGraphPrinter(doc);
-        body.appendChild(pr.makeSvg(g));
+          Designator path = kp.get(compgen);
+          WorldComp g = CompositionGraphMaker.make(path, compgen.getName(), (ImplComposition) comp, kb);
+          Positioning.doPositioning(g);
+          CompositionGraphPrinter pr = new CompositionGraphPrinter(doc);
+          body.appendChild(pr.makeSvg(g));
+        }
       }
     }
   }

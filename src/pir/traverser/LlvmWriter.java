@@ -181,6 +181,13 @@ public class LlvmWriter extends NullTraverser<Void, StreamWriter> {
     visitSepList(",", obj.getArgument(), param);
     param.wr(")");
 
+    if (obj.getAttributes().contains(FuncAttr.LlvmNoreturn)) {
+      param.wr(" noreturn");
+    }
+    if (obj.getAttributes().contains(FuncAttr.LlvmNounwind)) {
+      param.wr(" nounwind");
+    }
+
     if (obj instanceof FuncWithBody) {
       param.wr("{");
       param.nl();

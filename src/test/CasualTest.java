@@ -274,7 +274,7 @@ public class CasualTest extends BaseTest {
   
   @Test
   public void emptyElse() {
-    compile("emptyElse", TestSteps.COMPILE_TO_LLVM, false, true);
+    compile("emptyElse", TestSteps.COMPILE_TO_LLVM, false, false);
   }
 
   @Test
@@ -295,6 +295,11 @@ public class CasualTest extends BaseTest {
   @Test
   public void iffunc() {
     compile("iffunc", TestSteps.EXECUTE, false, true);
+  }
+
+  @Test
+  public void convert1() {
+    compile("convert1", TestSteps.EXECUTE, false, true);
   }
 
   @Test

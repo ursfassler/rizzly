@@ -19,6 +19,7 @@ import fun.function.impl.FuncPrivateRet;
 import fun.function.impl.FuncPrivateVoid;
 import fun.function.impl.FuncProtRet;
 import fun.function.impl.FuncProtVoid;
+import fun.other.Generator;
 import fun.statement.Assignment;
 import fun.statement.Statement;
 import fun.statement.VarDefStmt;
@@ -114,12 +115,15 @@ public class BaseParser extends Parser {
     return res;
   }
 
-  // EBNF globalFunction: "function" id vardeflist block "end"
-  protected FuncGlobal parseGlobalFunction() {
+  // EBNF globalFunction: "function" id genericParam vardeflist ":" ref block "end"
+  protected Generator parseGlobalFunction() {
     Token tok = expect(TokenType.FUNCTION);
 
     FuncGlobal func = new FuncGlobal(tok.getInfo());
     func.setName(expect(TokenType.IDENTIFIER).getData());
+
+    List<TemplateParameter> gen = parseGenericParam();
+
     func.getParam().addAll(parseVardefList());
 
     expect(TokenType.COLON);
@@ -129,7 +133,7 @@ public class BaseParser extends Parser {
     func.setBody(stmt().parseBlock());
     expect(TokenType.END);
 
-    return func;
+    return new Generator(tok.getInfo(), func, gen);
   }
 
   // EBNF privateFunction: "function" designator vardeflist [ ":" typeref ] block "end"

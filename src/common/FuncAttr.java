@@ -1,5 +1,5 @@
 package common;
 
 public enum FuncAttr {
-  Public, Extern;
+  Public, Extern, LlvmNoreturn, LlvmNounwind;
 }

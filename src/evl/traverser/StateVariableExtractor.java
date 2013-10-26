@@ -65,8 +65,8 @@ public class StateVariableExtractor extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visit(Evl obj, Void param) {
-    if( obj instanceof FuncWithBody ) {
-      doit(( (FuncWithBody) obj ).getBody());
+    if (obj instanceof FuncWithBody) {
+      doit(((FuncWithBody) obj).getBody());
     } else {
       super.visit(obj, null);
     }
@@ -77,20 +77,13 @@ public class StateVariableExtractor extends DefTraverser<Void, Void> {
   protected Void visitTransition(Transition obj, Void param) {
     Map<StateVariable, Assignment> loads = doit(obj.getBody());
     // narrow ranges depending on the transition guard
-/*    if( !loads.isEmpty() ) {
-      RangeGetter getter = new RangeGetter(kb);
-      getter.traverse(obj.getGuard(), null);
-      Map<StateVariable, Range> varSRange = getter.getSranges();
-      for( StateVariable load : loads.keySet() ) {
-        if( varSRange.containsKey(load) ) {
-          Range nt = varSRange.get(load);
-          if( nt != load.getType().getRef() ) {
-            Assignment ass = loads.get(load);
-            ass.setRight(new TypeCast(new ElementInfo(), new Reference(new ElementInfo(), load), new TypeRef(new ElementInfo(), nt)));
-          }
-        }
-      }
-    }*/
+    /*
+     * if( !loads.isEmpty() ) { RangeGetter getter = new RangeGetter(kb); getter.traverse(obj.getGuard(), null);
+     * Map<StateVariable, Range> varSRange = getter.getSranges(); for( StateVariable load : loads.keySet() ) { if(
+     * varSRange.containsKey(load) ) { Range nt = varSRange.get(load); if( nt != load.getType().getRef() ) { Assignment
+     * ass = loads.get(load); ass.setRight(new TypeCast(new ElementInfo(), new Reference(new ElementInfo(), load), new
+     * TypeRef(new ElementInfo(), nt))); } } } }
+     */
     return null;
   }
 
@@ -100,21 +93,21 @@ public class StateVariableExtractor extends DefTraverser<Void, Void> {
 
     Set<StateVariable> replace = new HashSet<StateVariable>();
 
-    for( StateVariable var : reads ) {
-      if( PhiInserter.isScalar(var.getType().getRef()) ) {
+    for (StateVariable var : reads) {
+      if (PhiInserter.isScalar(var.getType().getRef())) {
         replace.add(var);
       }
     }
-    for( StateVariable var : writes ) {
-      if( PhiInserter.isScalar(var.getType().getRef()) ) {
+    for (StateVariable var : writes) {
+      if (PhiInserter.isScalar(var.getType().getRef())) {
         replace.add(var);
       }
     }
 
     Map<StateVariable, Assignment> ret = new HashMap<StateVariable, Assignment>();
-    for( StateVariable var : replace ) {
+    for (StateVariable var : replace) {
       Assignment load = replaceVar(var, func, reads.contains(var), writes.contains(var));
-      if( load != null ) {
+      if (load != null) {
         ret.put(var, load);
       }
     }
@@ -145,7 +138,7 @@ public class StateVariableExtractor extends DefTraverser<Void, Void> {
     }
 
     Assignment load;
-    if( read ) {
+    if (read) {
       load = new Assignment(info, new Reference(info, ssa), new Reference(info, var));
       func.getEntry().getCode().add(0, load);
     } else {
@@ -153,7 +146,7 @@ public class StateVariableExtractor extends DefTraverser<Void, Void> {
     }
     VarDefStmt def = new VarDefStmt(info, ssa);
     func.getEntry().getCode().add(0, def);
-    if( write ) {
+    if (write) {
       Assignment store = new Assignment(info, new Reference(info, var), new Reference(info, ssa));
       func.getExit().getCode().add(store);
     }
@@ -182,32 +175,38 @@ class FuncProtector extends StatementReplacer<BasicBlockList> {
     GraphHelper.doTransitiveClosure(g);
     this.ksvrw = kb.getEntry(KnowStateVariableReadWrite.class);
 
-    for( Evl caller : g.vertexSet() ) {
-      if( caller instanceof FuncWithBody ) {
-        Set<StateVariable> writes = new HashSet<StateVariable>(ksvrw.getWrites(( (FuncWithBody) caller ).getBody()));
-        Set<StateVariable> reads = new HashSet<StateVariable>(ksvrw.getReads(( (FuncWithBody) caller ).getBody()));
-        for( Evl callee : g.getOutVertices(caller) ) {
-          if( callee instanceof FuncWithBody ) {
-            writes.addAll(ksvrw.getWrites(( (FuncWithBody) callee ).getBody()));
-            reads.addAll(ksvrw.getReads(( (FuncWithBody) callee ).getBody()));
+    for (Evl caller : g.vertexSet()) {
+      Set<StateVariable> writes;
+      Set<StateVariable> reads;
+      if (caller instanceof FuncWithBody) {
+        writes = new HashSet<StateVariable>(ksvrw.getWrites(((FuncWithBody) caller).getBody()));
+        reads = new HashSet<StateVariable>(ksvrw.getReads(((FuncWithBody) caller).getBody()));
+        for (Evl callee : g.getOutVertices(caller)) {
+          if (callee instanceof FuncWithBody) {
+            writes.addAll(ksvrw.getWrites(((FuncWithBody) callee).getBody()));
+            reads.addAll(ksvrw.getReads(((FuncWithBody) callee).getBody()));
           }
         }
-        this.writes.put((FunctionHeader) caller, writes);
-        this.reads.put((FunctionHeader) caller, reads);
+      } else {
+        // is this really ok? can a not yet implemented function ever change state? probably not
+        writes = new HashSet<StateVariable>();
+        reads = new HashSet<StateVariable>();
       }
+      this.writes.put((FunctionHeader) caller, writes);
+      this.reads.put((FunctionHeader) caller, reads);
     }
   }
 
   @Override
   protected List<NormalStmt> visitBasicBlockList(BasicBlockList obj, BasicBlockList param) {
-    assert ( param == null );
+    assert (param == null);
     return super.visitBasicBlockList(obj, obj);
   }
 
   @Override
   protected List<NormalStmt> visitNormalStmt(NormalStmt obj, BasicBlockList param) {
     FunctionHeader callee = getCallee(obj);
-    if( callee != null ) {
+    if (callee != null) {
       ElementInfo info = obj.getInfo();
 
       Set<StateVariable> used = new HashSet<StateVariable>();
@@ -226,14 +225,14 @@ class FuncProtector extends StatementReplacer<BasicBlockList> {
 
       List<NormalStmt> ret = new ArrayList<NormalStmt>();
 
-      for( StateVariable sv : writeBack ) {
+      for (StateVariable sv : writeBack) {
         Assignment ass = new Assignment(info, new Reference(info, sv), new Reference(info, cache.get(sv)));
         ret.add(ass);
       }
       ret.add(obj);
-      for( StateVariable sv : readBack ) {
+      for (StateVariable sv : readBack) {
         FuncVariable cached = cache.get(sv);
-        if( ( obj instanceof Assignment ) && ( ( (Assignment) obj ).getLeft().getLink() == cached ) ) {
+        if ((obj instanceof Assignment) && (((Assignment) obj).getLeft().getLink() == cached)) {
           // we do not reload a cached value if we overwrite the very same value as our call/assignment statement does
           // not very nice when we handle that case here, maybe we have a better idea in the future
           // see testcaase casual/StateVar2
@@ -253,21 +252,21 @@ class FuncProtector extends StatementReplacer<BasicBlockList> {
 
     Set<FunctionHeader> callees = new HashSet<FunctionHeader>();
     getter.traverse(stmt, callees);
-    switch( callees.size() ) {
-      case 0:
-        return null;
-      case 1:
-        return callees.iterator().next();
-      default:
-        RError.err(ErrorType.Fatal, stmt.getInfo(), "In this phase is only one call per statement allowed");
-        return null;
+    switch (callees.size()) {
+    case 0:
+      return null;
+    case 1:
+      return callees.iterator().next();
+    default:
+      RError.err(ErrorType.Fatal, stmt.getInfo(), "In this phase is only one call per statement allowed");
+      return null;
     }
   }
 
   @Override
   protected List<NormalStmt> visitPhi(PhiStmt phi, BasicBlock in, BasicBlockList param) {
     FunctionHeader callee = getCallee(phi.getArg(in));
-    assert( callee == null );
+    assert (callee == null);
     return null;
   }
 }

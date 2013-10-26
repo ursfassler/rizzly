@@ -14,9 +14,6 @@ import java.util.Queue;
 import java.util.Set;
 
 import joGraph.HtmlGraphWriter;
-
-import org.jgrapht.alg.CycleDetector;
-
 import parser.FileParser;
 import util.Pair;
 import util.SimpleGraph;
@@ -24,15 +21,14 @@ import util.SimpleGraph;
 import common.Designator;
 import common.ElementInfo;
 
-import error.ErrorType;
-import error.RError;
 import fun.doc.DepGraph;
 import fun.doc.DocWriter;
 import fun.doc.PrettyPrinter;
+import fun.expression.Expression;
 import fun.expression.reference.ReferenceLinked;
-import fun.generator.TypeGenerator;
 import fun.knowledge.KnowledgeBase;
 import fun.other.Component;
+import fun.other.Generator;
 import fun.other.Named;
 import fun.other.Namespace;
 import fun.other.RizzlyFile;
@@ -46,6 +42,7 @@ import fun.traverser.NamespaceLinkReduction;
 import fun.traverser.StateLinkReduction;
 import fun.traverser.TypeEvalReplacer;
 import fun.traverser.spezializer.EvalTo;
+import fun.traverser.spezializer.Specializer;
 import fun.type.Type;
 import fun.type.base.AnyType;
 import fun.type.base.BaseType;
@@ -74,13 +71,13 @@ public class MainFun {
     }
 
     List<Type> primtyp = genPrimitiveTypes();
-    List<TypeGenerator> gentyp = genPrimitiveGenericTypes();
+    List<Generator> gentyp = genPrimitiveGenericTypes();
 
     SymbolTable<Designator, String> sym = new SymbolTable<Designator, String>();
     for (Type typ : primtyp) {
       sym.add(typ.getName(), new Designator(typ.getName()));
     }
-    for (TypeGenerator typ : gentyp) {
+    for (Generator typ : gentyp) {
       sym.add(typ.getName(), new Designator(typ.getName()));
     }
     ClassNameExtender.process(fileList, sym);
@@ -103,6 +100,9 @@ public class MainFun {
 
     KnowledgeBase knowledgeBase = new KnowledgeBase(classes, fileList, debugdir);
     Linker.process(classes, knowledgeBase);
+    
+    PrettyPrinter.print(classes, debugdir + "linked.rzy");
+
     NamespaceLinkReduction.process(classes);
     StateLinkReduction.process(classes, knowledgeBase);
     GenfuncParamExtender.process(classes);
@@ -166,7 +166,7 @@ public class MainFun {
     KnowledgeBase kb = new KnowledgeBase(classes, fileList, debugdir);
     SimpleGraph<Named> g = DepGraph.build(classes, kb);
 
-    { // Cycle detection
+/*    { // Cycle detection
       CycleDetector<Named, Pair<Named, Named>> cd = new CycleDetector<Named, Pair<Named, Named>>(g);
       Set<Named> cycle = cd.findCycles();
       if (!cycle.isEmpty()) {
@@ -175,38 +175,35 @@ public class MainFun {
         }
         RError.err(ErrorType.Warning, "Maybe a dependency cycle found in types");
       }
-    }
+    }*/
 
     {
       {
         List<ConstGlobal> gconst = classes.getItems(ConstGlobal.class, true);
         for (ConstGlobal itr : gconst) {
-          Type type = EvalTo.type((ReferenceLinked) itr.getType(), kb);
+          Type type = (Type) EvalTo.any((ReferenceLinked) itr.getType(), kb);
           itr.setType(new ReferenceLinked(itr.getType().getInfo(), type));
         }
       }
 
       {
         TypeEvalReplacer replacer = new TypeEvalReplacer(kb);
-        
-        
-        for( RizzlyFile f : fileList ){
+
+        for (RizzlyFile f : fileList) {
           List<Named> itms = new ArrayList<Named>();
-          itms.addAll( f.getType().getList() );
-          itms.addAll( f.getConstant().getList() );
-          itms.addAll( f.getFunction().getList() );
-          itms.addAll( f.getIface().getList() );
-          itms.addAll( f.getComp().getList() );
-          for( Named itr : itms ){
+          itms.addAll(f.getType().getList());
+          itms.addAll(f.getConstant().getList());
+          itms.addAll(f.getFunction().getList());
+          itms.addAll(f.getIface().getList());
+          itms.addAll(f.getComp().getList());
+          for (Named itr : itms) {
             replacer.traverse(itr, new Memory());
           }
         }
       }
 
-      //FIXME is this function needed anymore?
-//      NamedComponent nroot = Specializer.processComp((ComponentGenerator) root, new ArrayList<Expression>(), root.getInfo(), kb);
-      Component nroot = (Component) root;
-      return nroot;
+      Named nroot = Specializer.process((Generator) root, new ArrayList<Expression>(), root.getInfo(), kb);
+      return (Component) nroot;
     }
   }
 
@@ -221,21 +218,16 @@ public class MainFun {
     return ret;
   }
 
-  private static List<TypeGenerator> genPrimitiveGenericTypes() {
-    List<TypeGenerator> ret = new ArrayList<TypeGenerator>();
-    ret.add(makeGenericBaseType(new RangeTemplate()));
-    ret.add(makeGenericBaseType(new ArrayTemplate()));
-    ret.add(makeGenericBaseType(new TypeTypeTemplate()));
+  private static List<Generator> genPrimitiveGenericTypes() {
+    List<Generator> ret = new ArrayList<Generator>();
+    ret.add(new Generator(info, new RangeTemplate(), RangeTemplate.makeParams()));
+    ret.add(new Generator(info, new ArrayTemplate(), ArrayTemplate.makeParam()));
+    ret.add(new Generator(info, new TypeTypeTemplate(), TypeTypeTemplate.makeParam()));
     return ret;
   }
 
   @Deprecated
   private static Type makeNamedBaseType(BaseType inst) {
-    return inst;
-  }
-
-  @Deprecated
-  private static TypeGenerator makeGenericBaseType(TypeGenerator inst) {
     return inst;
   }
 

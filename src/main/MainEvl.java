@@ -62,7 +62,6 @@ import evl.other.NamedList;
 import evl.other.Namespace;
 import evl.other.RizzlyProgram;
 import evl.passes.MemoryAccessCapsulater;
-import evl.passes.RangeNarrower;
 import evl.statement.bbend.Goto;
 import evl.statement.bbend.ReturnVoid;
 import evl.traverser.CallgraphMaker;
@@ -70,9 +69,10 @@ import evl.traverser.ClassGetter;
 import evl.traverser.CompInstantiator;
 import evl.traverser.DesCallgraphMaker;
 import evl.traverser.ExprCutter;
+import evl.traverser.IntroduceConvert;
 import evl.traverser.LinkReduction;
 import evl.traverser.NamespaceReduction;
-import evl.traverser.NormalizeBool;
+import evl.traverser.OpenReplace;
 import evl.traverser.OutsideReaderInfo;
 import evl.traverser.OutsideWriterInfo;
 import evl.traverser.SsaMaker;
@@ -89,7 +89,7 @@ import evl.traverser.typecheck.specific.CompInterfaceTypeChecker;
 import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
-import evl.type.base.NumSet;
+import evl.type.base.RangeType;
 import evl.type.special.PointerType;
 import evl.variable.Constant;
 import evl.variable.SsaVariable;
@@ -110,29 +110,31 @@ public class MainEvl {
       modelCheck(debugdir, aclasses, root, kb);
     }
 
+    IntroduceConvert.process(aclasses, kb);
+    
+    OpenReplace.process(aclasses, kb);
+
+    PrettyPrinter.print(aclasses, debugdir + "convert.rzy", true);
+    
     ExprCutter.process(aclasses, kb);
     StateVariableExtractor.process(aclasses, kb);
 
-    PrettyPrinter.print(aclasses, debugdir + "ast.rzy", false);
+    PrettyPrinter.print(aclasses, debugdir + "ast.rzy", true);
     SsaMaker.process(aclasses, kb);
     PrettyPrinter.print(aclasses, debugdir + "ssa.rzy", true);
 
     root = compositionReduction(aclasses, root);
     root = hfsmReduction(root, opt, debugdir, aclasses, kb);
+    
+    PrettyPrinter.print(aclasses, debugdir + "reduced.rzy", true);
+
     ExprCutter.process(aclasses, kb);
 
-    NormalizeBool.process( aclasses, kb );  //TODO needed here?
     PrettyPrinter.print(aclasses, debugdir + "normalized.rzy", true);
-    
-    RangeNarrower.process(aclasses, kb);
-
-    PrettyPrinter.print(aclasses, debugdir + "ssaRanged.rzy", false);
 
     typecheck(aclasses, root, debugdir);
-
+    
     addConDestructor(aclasses, debugdir, kb);
-
-    PrettyPrinter.print(aclasses, debugdir + "reduced.rzy", true);
 
     MemoryAccessCapsulater.process(aclasses, kb);
     ExprCutter.process(aclasses, kb);
@@ -414,10 +416,10 @@ public class MainEvl {
     depth += 2;
     Collections.sort(names);
 
-    NumSet symNameSizeType = kbi.getRangeType(names.size());
+    RangeType symNameSizeType = kbi.getRangeType(names.size());
     ArrayType arrayType = kbi.getArray(BigInteger.valueOf(depth), symNameSizeType);
     PointerType pArray = kbi.getPointerType(arrayType);
-    NumSet sizeType = kbi.getRangeType(depth);
+    RangeType sizeType = kbi.getRangeType(depth);
 
     Interface debugIface;
     FuncProtoVoid recvFunc;

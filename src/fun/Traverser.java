@@ -25,10 +25,6 @@ import fun.function.impl.FuncPrivateRet;
 import fun.function.impl.FuncPrivateVoid;
 import fun.function.impl.FuncProtRet;
 import fun.function.impl.FuncProtVoid;
-import fun.generator.ComponentGenerator;
-import fun.generator.Generator;
-import fun.generator.InterfaceGenerator;
-import fun.generator.TypeGenerator;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.QueryItem;
 import fun.hfsm.State;
@@ -37,6 +33,7 @@ import fun.hfsm.StateItem;
 import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
 import fun.other.Component;
+import fun.other.Generator;
 import fun.other.ImplElementary;
 import fun.other.Interface;
 import fun.other.Namespace;
@@ -80,7 +77,6 @@ import fun.type.template.Range;
 import fun.type.template.RangeTemplate;
 import fun.type.template.TypeType;
 import fun.type.template.TypeTypeTemplate;
-import fun.type.template.UserTypeGenerator;
 import fun.variable.CompUse;
 import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
@@ -288,32 +284,6 @@ public abstract class Traverser<R, P> {
     }
   }
 
-  protected R visitGenerator(Generator obj, P param) {
-    if (obj instanceof TypeGenerator) {
-      return visitTypeGenerator((TypeGenerator) obj, param);
-    } else if (obj instanceof InterfaceGenerator) {
-      return visitInterfaceGenerator((InterfaceGenerator) obj, param);
-    } else if (obj instanceof ComponentGenerator) {
-      return visitComponentGenerator((ComponentGenerator) obj, param);
-    } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
-    }
-  }
-
-  protected R visitTypeGenerator(TypeGenerator obj, P param) {
-    if (obj instanceof ArrayTemplate) {
-      return visitArrayTemplate((ArrayTemplate) obj, param);
-    } else if (obj instanceof TypeTypeTemplate) {
-      return visitTypeTypeTemplate((TypeTypeTemplate) obj, param);
-    } else if (obj instanceof RangeTemplate) {
-      return visitRangeTemplate((RangeTemplate) obj, param);
-    } else if (obj instanceof UserTypeGenerator) {
-      return visitUserTypeGenerator((UserTypeGenerator) obj, param);
-    } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
-    }
-  }
-
   protected R visitReference(Reference obj, P param) {
     if (obj instanceof ReferenceUnlinked) {
       return visitReferenceUnlinked((ReferenceUnlinked) obj, param);
@@ -351,6 +321,12 @@ public abstract class Traverser<R, P> {
       return visitEnumType((EnumType) obj, param);
     } else if (obj instanceof TypeAlias) {
       return visitTypeAlias((TypeAlias) obj, param);
+    } else if (obj instanceof ArrayTemplate) {
+      return visitArrayTemplate((ArrayTemplate) obj, param);
+    } else if (obj instanceof TypeTypeTemplate) {
+      return visitTypeTypeTemplate((TypeTypeTemplate) obj, param);
+    } else if (obj instanceof RangeTemplate) {
+      return visitRangeTemplate((RangeTemplate) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -470,9 +446,7 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitConnection(Connection obj, P param);
 
-  abstract protected R visitInterfaceGenerator(InterfaceGenerator obj, P param);
-
-  abstract protected R visitComponentGenerator(ComponentGenerator obj, P param);
+  abstract protected R visitGenerator(Generator obj, P param);
 
   abstract protected R visitFuncPrivate(FuncPrivateVoid obj, P param);
 
@@ -489,8 +463,6 @@ public abstract class Traverser<R, P> {
   abstract protected R visitArrayTemplate(ArrayTemplate obj, P param);
 
   abstract protected R visitRangeTemplate(RangeTemplate obj, P param);
-
-  abstract protected R visitUserTypeGenerator(UserTypeGenerator obj, P param);
 
   abstract protected R visitAnyType(AnyType obj, P param);
 

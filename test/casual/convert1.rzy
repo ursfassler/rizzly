@@ -5,16 +5,13 @@ interface
   end
   
 component
-  EmptyElse
+  Convert1
     input
       in  : Tick;
     
     implementation elementary
     
     function in.tack( x: R{0,20} ):R{0,10}
-      if x > 10 then
-        x := R{0,10}( x - 10 );
-      end
       return R{0,10}( x );
     end
 

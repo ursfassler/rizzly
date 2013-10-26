@@ -7,7 +7,7 @@ import fun.expression.Expression;
 import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.ReferenceLinked;
 import fun.expression.reference.ReferenceUnlinked;
-import fun.generator.Generator;
+import fun.other.Generator;
 import fun.other.Namespace;
 import fun.variable.Variable;
 

@@ -9,20 +9,19 @@ import common.ElementInfo;
 import fun.expression.Expression;
 import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.ReferenceUnlinked;
-import fun.generator.TypeGenerator;
 import fun.type.base.AnyType;
 import fun.type.base.IntegerType;
 import fun.variable.TemplateParameter;
 
-final public class ArrayTemplate extends TypeGenerator {
+final public class ArrayTemplate extends BuiltinTemplate {
   public static final String NAME = "Array";
   public static final String[] PARAM = { "S", "T" };
 
   public ArrayTemplate() {
-    super(new ElementInfo(), NAME, makeParam());
+    super(new ElementInfo(), NAME);
   }
 
-  static private List<TemplateParameter> makeParam() {
+  static public List<TemplateParameter> makeParam() {
     ArrayList<TemplateParameter> ret = new ArrayList<TemplateParameter>();
 
     ret.add(new TemplateParameter(new ElementInfo(), PARAM[0], new ReferenceUnlinked(new ElementInfo(), new Designator(IntegerType.NAME))));

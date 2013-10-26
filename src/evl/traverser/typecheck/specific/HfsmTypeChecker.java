@@ -1,7 +1,5 @@
 package evl.traverser.typecheck.specific;
 
-import java.util.HashMap;
-
 import evl.Evl;
 import evl.NullTraverser;
 import evl.function.FuncWithBody;
@@ -17,8 +15,6 @@ import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Named;
 import evl.other.NamedList;
-import evl.type.base.NumSet;
-import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
 
 //TODO check for unused states
@@ -96,7 +92,7 @@ public class HfsmTypeChecker extends NullTraverser<Void, Void> {
     // TODO not used since we narrowed ranges before? => remove Map<SsaVariable, NumSet>
     // Map<Variable, NumSet> varRange = RangeGetter.getSmallerRangeForTrue(obj.getGuard(), kb);
     // StatementTypeChecker.process(obj.getBody(), kbi.getVoidType(), varRange, kb);
-    StatementTypeChecker.process(obj.getBody(), kbi.getVoidType(), new HashMap<SsaVariable, NumSet>(), kb);
+    StatementTypeChecker.process(obj.getBody(), kbi.getVoidType(), kb);
     return null;
   }
 

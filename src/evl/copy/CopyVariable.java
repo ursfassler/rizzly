@@ -1,7 +1,5 @@
 package evl.copy;
 
-import java.math.BigInteger;
-
 import evl.Evl;
 import evl.NullTraverser;
 import evl.type.base.EnumElement;
@@ -52,8 +50,7 @@ public class CopyVariable extends NullTraverser<Variable, Void> {
 
   @Override
   protected Variable visitEnumElement(EnumElement obj, Void param) {
-    BigInteger value = ((evl.expression.Number) obj.getDef()).getValue();
-    return new EnumElement(obj.getInfo(), obj.getName(), cast.copy(obj.getType()), value);
+    return new EnumElement(obj.getInfo(), obj.getName(), cast.copy(obj.getType()), cast.copy(obj.getDef()));
   }
 
 }

@@ -26,9 +26,9 @@ import fun.composition.ImplComposition;
 import fun.expression.Expression;
 import fun.expression.reference.RefItem;
 import fun.function.FunctionHeader;
-import fun.generator.TypeGenerator;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.StateItem;
+import fun.other.Generator;
 import fun.other.ImplElementary;
 import fun.other.Interface;
 import fun.other.ListOfNamed;
@@ -41,15 +41,15 @@ import fun.variable.Constant;
 import fun.variable.Variable;
 
 public class FunToEvl extends NullTraverser<Evl, Void> {
-  private Map<Fun, Evl> map = new HashMap<Fun, Evl>();
-  private FunToEvlType type = new FunToEvlType(this, map);
-  private FunToEvlExpr expr = new FunToEvlExpr(this, map);
-  private FunToEvlRef ref = new FunToEvlRef(this, map);
+  Map<Fun, Evl> map = new HashMap<Fun, Evl>();
+  private FunToEvlType type = new FunToEvlType(this);
+  private FunToEvlExpr expr = new FunToEvlExpr(this);
+  private FunToEvlRef ref = new FunToEvlRef(this);
   private FunToEvlFunc func;
-  private FunToEvlStmt stmt = new FunToEvlStmt(this, map);
-  private FunToEvlVariable var = new FunToEvlVariable(this, map);
-  private FunToEvlStateItem state = new FunToEvlStateItem(this, map);
-  private FunToEvlCaseOptEntry caoe = new FunToEvlCaseOptEntry(this, map);
+  private FunToEvlStmt stmt = new FunToEvlStmt(this);
+  private FunToEvlVariable var = new FunToEvlVariable(this);
+  private FunToEvlStateItem state = new FunToEvlStateItem(this);
+  private FunToEvlCaseOptEntry caoe = new FunToEvlCaseOptEntry(this);
 
   public FunToEvl(Map<FunctionHeader, Class<? extends FunctionBase>> funType) {
     super();
@@ -103,7 +103,7 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
   }
 
   @Override
-  protected Evl visitTypeGenerator(TypeGenerator obj, Void param) {
+  protected Evl visitGenerator(Generator obj, Void param) {
     RError.err(ErrorType.Fatal, obj.getInfo(), "unresolved functional type: " + obj);
     return null;
   }

@@ -1,7 +1,5 @@
 package fun.toevl;
 
-import java.util.Map;
-
 import evl.Evl;
 import evl.expression.Expression;
 import evl.expression.reference.Reference;
@@ -15,24 +13,11 @@ import fun.statement.ReturnVoid;
 import fun.statement.VarDefStmt;
 
 public class FunToEvlStmt extends NullTraverser<Evl, Void> {
-  private Map<Fun, Evl> map;
   private FunToEvl fta;
 
-  public FunToEvlStmt(FunToEvl fta, Map<Fun, Evl> map) {
+  public FunToEvlStmt(FunToEvl fta) {
     super();
-    this.map = map;
     this.fta = fta;
-  }
-
-  @Override
-  protected Evl visit(Fun obj, Void param) {
-    Evl cobj = (Evl) map.get(obj);
-    if (cobj == null) {
-      cobj = super.visit(obj, param);
-      assert (cobj != null);
-      map.put(obj, cobj);
-    }
-    return cobj;
   }
 
   @Override

@@ -39,9 +39,6 @@ import fun.function.impl.FuncPrivateRet;
 import fun.function.impl.FuncPrivateVoid;
 import fun.function.impl.FuncProtRet;
 import fun.function.impl.FuncProtVoid;
-import fun.generator.ComponentGenerator;
-import fun.generator.InterfaceGenerator;
-import fun.generator.TypeGenerator;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.QueryItem;
 import fun.hfsm.State;
@@ -52,6 +49,7 @@ import fun.hfsm.Transition;
 import fun.knowledge.KnowFunFile;
 import fun.knowledge.KnowledgeBase;
 import fun.other.Component;
+import fun.other.Generator;
 import fun.other.ImplElementary;
 import fun.other.Interface;
 import fun.other.ListOfNamed;
@@ -90,7 +88,6 @@ import fun.type.template.Range;
 import fun.type.template.RangeTemplate;
 import fun.type.template.TypeType;
 import fun.type.template.TypeTypeTemplate;
-import fun.type.template.UserTypeGenerator;
 import fun.variable.CompUse;
 import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
@@ -242,14 +239,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
     xw.sectionSeparator();
     visitList(obj.getFunction(), null);
 
-    List<TypeGenerator> types = obj.getCompfunc().getItems(TypeGenerator.class);
-    List<InterfaceGenerator> ifaces = obj.getCompfunc().getItems(InterfaceGenerator.class);
-    List<ComponentGenerator> compos = obj.getCompfunc().getItems(ComponentGenerator.class);
-    assert (types.size() + ifaces.size() + compos.size() == obj.getCompfunc().size());
-
-    visitNamedSection("type", types);
-    visitNamedSection("interface", ifaces);
-    visitNamedSection("component", compos);
+    visitNamedSection("compfunc", obj.getCompfunc().getList());
 
     return null;
   }
@@ -354,41 +344,17 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
     return null;
   }
 
-
   @Override
   protected Void visitRangeTemplate(RangeTemplate obj, Designator param) {
-    xw.sectionSeparator();
     xw.wa(obj);
-    visitOptList("{", "}", obj.getParam().getList());
-    xw.wr(" = internal;");
+    xw.wr(";");
     xw.nl();
     return null;
   }
 
   @Override
-  protected Void visitUserTypeGenerator(UserTypeGenerator obj, Designator param) {
+  protected Void visitGenerator(Generator obj, Designator param) {
     xw.sectionSeparator();
-    xw.wa(obj);
-    visitOptList("{", "}", obj.getParam().getList());
-    xw.wr(" = ");
-    visit(obj.getTemplate(), param);
-    xw.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitComponentGenerator(ComponentGenerator obj, Designator param) {
-    xw.sectionSeparator();
-    xw.wa(obj);
-    visitOptList("{", "}", obj.getParam().getList());
-    xw.wr(" = ");
-    visit(obj.getTemplate(), param);
-    xw.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitInterfaceGenerator(InterfaceGenerator obj, Designator param) {
     xw.wa(obj);
     visitOptList("{", "}", obj.getParam().getList());
     xw.wr(" = ");
@@ -1020,7 +986,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
 
   @Override
   protected Void visitFuncGlobal(FuncGlobal obj, Designator param) {
-    xw.sectionSeparator();
+//    xw.sectionSeparator();
     assert (param == null);
     printFunc(obj, new Designator());
     return null;

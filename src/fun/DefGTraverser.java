@@ -26,13 +26,12 @@ import fun.function.impl.FuncPrivateRet;
 import fun.function.impl.FuncPrivateVoid;
 import fun.function.impl.FuncProtRet;
 import fun.function.impl.FuncProtVoid;
-import fun.generator.ComponentGenerator;
-import fun.generator.InterfaceGenerator;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.QueryItem;
 import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
+import fun.other.Generator;
 import fun.other.ImplElementary;
 import fun.other.Interface;
 import fun.other.ListOfNamed;
@@ -73,7 +72,6 @@ import fun.type.template.Range;
 import fun.type.template.RangeTemplate;
 import fun.type.template.TypeType;
 import fun.type.template.TypeTypeTemplate;
-import fun.type.template.UserTypeGenerator;
 import fun.variable.CompUse;
 import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
@@ -165,14 +163,7 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitInterfaceGenerator(InterfaceGenerator obj, P param) {
-    visitItr(obj.getParam(), param);
-    visit(obj.getTemplate(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitComponentGenerator(ComponentGenerator obj, P param) {
+  protected R visitGenerator(Generator obj, P param) {
     visitItr(obj.getParam(), param);
     visit(obj.getTemplate(), param);
     return null;
@@ -281,6 +272,8 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitEnumElement(EnumElement obj, P param) {
+    visit(obj.getType(),param);
+    visit(obj.getDef(),param);
     return null;
   }
 
@@ -375,7 +368,6 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitArrayTemplate(ArrayTemplate obj, P param) {
-    visitItr(obj.getParam(),param);
     return null;
   }
 
@@ -391,7 +383,6 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitTypeTypeTemplate(TypeTypeTemplate obj, P param) {
-    visitItr(obj.getParam(),param);
     return null;
   }
 
@@ -559,19 +550,11 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitRangeTemplate(RangeTemplate obj, P param) {
-    visitItr(obj.getParam(),param);
     return null;
   }
 
   @Override
   protected R visitUnionSelector(UnionSelector obj, P param) {
-    return null;
-  }
-
-  @Override
-  protected R visitUserTypeGenerator(UserTypeGenerator obj, P param) {
-    visitItr(obj.getParam(), param);
-    visit(obj.getTemplate(), param);
     return null;
   }
 

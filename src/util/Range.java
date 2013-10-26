@@ -39,6 +39,10 @@ final public class Range {
     return low && high;
   }
 
+  public static boolean isIn(BigInteger num, Range range) {
+    throw new RuntimeException("not yet implemented");
+  }
+
   @Override
   public String toString() {
     return low + ".." + high;

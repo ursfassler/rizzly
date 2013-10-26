@@ -28,13 +28,12 @@ import fun.expression.reference.RefCall;
 import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefName;
 import fun.expression.reference.RefTemplCall;
+import fun.expression.reference.Reference;
 import fun.expression.reference.ReferenceLinked;
 import fun.expression.reference.ReferenceUnlinked;
 import fun.function.FuncWithBody;
 import fun.function.FuncWithReturn;
 import fun.function.FunctionHeader;
-import fun.generator.ComponentGenerator;
-import fun.generator.InterfaceGenerator;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.QueryItem;
 import fun.hfsm.State;
@@ -42,6 +41,7 @@ import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
 import fun.other.Component;
+import fun.other.Generator;
 import fun.other.ImplElementary;
 import fun.other.Interface;
 import fun.other.ListOfNamed;
@@ -80,7 +80,6 @@ import fun.type.template.Range;
 import fun.type.template.RangeTemplate;
 import fun.type.template.TypeType;
 import fun.type.template.TypeTypeTemplate;
-import fun.type.template.UserTypeGenerator;
 import fun.variable.CompUse;
 import fun.variable.Constant;
 import fun.variable.FuncVariable;
@@ -197,24 +196,13 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitInterfaceGenerator(InterfaceGenerator obj, StreamWriter param) {
+  protected Void visitGenerator(Generator obj, StreamWriter param) {
     param.wr(obj.getName());
     wrId(obj, param);
     param.wr("{");
     list(obj.getParam().getList(), "; ", param);
     param.wr("} = ");
-    visit(obj.getTemplate(),param);
-    return null;
-  }
-
-  @Override
-  protected Void visitComponentGenerator(ComponentGenerator obj, StreamWriter param) {
-    param.wr(obj.getName());
-    wrId(obj, param);
-    param.wr("{");
-    list(obj.getParam().getList(), "; ", param);
-    param.wr("} = ");
-    visit(obj.getTemplate(),param);
+    visit(obj.getTemplate(), param);
     return null;
   }
 
@@ -407,7 +395,11 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.wr(" = Enum");
     param.nl();
     param.incIndent();
-    visitList(obj.getElement(), param);
+    for (Reference ref : obj.getElement()) {
+      visit(ref,param);
+      param.wr(";");
+      param.nl();
+    }
     param.decIndent();
     param.wr("end");
     param.nl();
@@ -458,9 +450,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   protected Void visitRangeTemplate(RangeTemplate obj, StreamWriter param) {
     param.wr(obj.getName());
     wrId(obj, param);
-    param.wr("{");
-    list(obj.getParam().getList(), "; ", param);
-    param.wr("} = internal;");
+    param.wr(";");
     param.nl();
     return null;
   }
@@ -496,9 +486,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   protected Void visitArrayTemplate(ArrayTemplate obj, StreamWriter param) {
     param.wr(obj.getName());
     wrId(obj, param);
-    param.wr("{");
-    list(obj.getParam().getList(), "; ", param);
-    param.wr("} = internal;");
+    param.wr(";");
     param.nl();
     return null;
   }
@@ -543,21 +531,8 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   protected Void visitTypeTypeTemplate(TypeTypeTemplate obj, StreamWriter param) {
     param.wr(obj.getName());
     wrId(obj, param);
-    param.wr("{");
-    list(obj.getParam().getList(), "; ", param);
-    param.wr("} = internal;");
+    param.wr(";");
     param.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitUserTypeGenerator(UserTypeGenerator obj, StreamWriter param) {
-    param.wr(obj.getName());
-    wrId(obj, param);
-    param.wr("{");
-    list(obj.getParam().getList(), "; ", param);
-    param.wr("} = ");
-    visit(obj.getTemplate(),param);
     return null;
   }
 

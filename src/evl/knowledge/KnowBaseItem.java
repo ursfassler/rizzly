@@ -1,26 +1,19 @@
 package evl.knowledge;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 
 import util.Range;
 
-import common.Designator;
 import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
 import evl.other.Named;
-import evl.other.Namespace;
 import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
-import evl.type.base.EnumElement;
-import evl.type.base.EnumType;
-import evl.type.base.NumSet;
+import evl.type.base.RangeType;
 import evl.type.base.StringType;
 import evl.type.special.IntegerType;
 import evl.type.special.NaturalType;
@@ -36,11 +29,11 @@ public class KnowBaseItem extends KnowledgeEntry {
     this.kb = kb;
   }
 
-  private Named findItem(String name) {
+  public Named findItem(String name) {
     return kb.getRoot().find(name);
   }
 
-  private void addItem(Named item) {
+  public void addItem(Named item) {
     assert (findItem(item.getName()) == null);
     kb.getRoot().add(item);
 
@@ -75,7 +68,7 @@ public class KnowBaseItem extends KnowledgeEntry {
    * @param count
    * @return
    */
-  public NumSet getRangeType(int count) {
+  public RangeType getRangeType(int count) {
     BigInteger low = BigInteger.ZERO;
     BigInteger high = BigInteger.valueOf(count - 1);
     return getRangeType(low, high);
@@ -88,20 +81,20 @@ public class KnowBaseItem extends KnowledgeEntry {
    * @return
    */
   @Deprecated
-  public NumSet getRangeType(BigInteger low, BigInteger high) {
+  public RangeType getRangeType(BigInteger low, BigInteger high) {
     Range range = new Range(low, high);
-    NumSet ret = (NumSet) findItem(NumSet.makeName(range));
+    RangeType ret = (RangeType) findItem(RangeType.makeName(range));
     if (ret == null) {
-      ret = new NumSet(range);
+      ret = new RangeType(range);
       addItem(ret);
     }
     return ret;
   }
 
-  public NumSet getNumsetType(List<Range> ranges) {
-    NumSet ret = (NumSet) findItem(NumSet.makeName(ranges));
+  public RangeType getNumsetType(Range range) {
+    RangeType ret = (RangeType) findItem(RangeType.makeName(range));
     if (ret == null) {
-      ret = new NumSet(ranges);
+      ret = new RangeType(range);
       addItem(ret);
     }
     return ret;
@@ -161,28 +154,6 @@ public class KnowBaseItem extends KnowledgeEntry {
       addItem(ret);
     }
     return ret;
-  }
-
-  public EnumType getEnumType(EnumType supertype, Collection<EnumElement> elements) {
-    ArrayList<EnumElement> subelem = new ArrayList<EnumElement>(supertype.getElement());
-    subelem.retainAll(elements);
-    
-    KnowPath kp = kb.getEntry(KnowPath.class);
-    Designator path = kp.get(supertype);
-    Namespace parent = kb.getRoot().forceChildPath(path.toList());
-    assert (parent.find(supertype.getName()) != null);
-
-    String subName = supertype.makeSubtypeName(subelem);
-
-    EnumType type = (EnumType) parent.find(subName);
-
-    if (type == null) {
-      type = new EnumType(new ElementInfo(), subName);
-      type.getElement().addAll(subelem);
-      parent.add(type);
-    }
-
-    return type;
   }
 
 }

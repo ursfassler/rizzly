@@ -1,6 +1,5 @@
 package evl.traverser;
 
-import util.NumberSet;
 import util.Range;
 import evl.Evl;
 import evl.copy.Copy;
@@ -13,7 +12,7 @@ import evl.knowledge.KnowWriter;
 import evl.knowledge.KnowledgeBase;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumType;
-import evl.type.base.NumSet;
+import evl.type.base.RangeType;
 import evl.variable.SsaVariable;
 
 /**
@@ -45,7 +44,7 @@ public class ExprBuilder extends ExprReplacer<Void> {
 
   @Override
   protected Expression visitNumber(Number obj, Void param) {
-    return new RangeValue(obj.getInfo(), new NumberSet(new Range(obj.getValue(), obj.getValue())));
+    return new RangeValue(obj.getInfo(), new Range(obj.getValue(), obj.getValue()));
   }
 
   @Override
@@ -58,7 +57,7 @@ public class ExprBuilder extends ExprReplacer<Void> {
         writer = Copy.copy(writer);
         writer = visit(writer, param);
         return writer;
-      } else if (var.getType().getRef() instanceof NumSet) {
+      } else if (var.getType().getRef() instanceof RangeType) {
         return obj;
       } else if (var.getType().getRef() instanceof EnumType) {
         return obj;

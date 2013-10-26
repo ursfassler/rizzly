@@ -20,7 +20,7 @@ import evl.type.Type;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumType;
-import evl.type.base.NumSet;
+import evl.type.base.RangeType;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
 import evl.type.special.IntegerType;
@@ -114,7 +114,7 @@ public class PhiInserter {
   @Deprecated
   public static boolean isScalar(Type type) {
     // TODO make it nice
-    return (type instanceof NumSet) || (type instanceof IntegerType) || (type instanceof NaturalType) || (type instanceof EnumType) || (type instanceof BooleanType);
+    return (type instanceof RangeType) || (type instanceof IntegerType) || (type instanceof NaturalType) || (type instanceof EnumType) || (type instanceof BooleanType);
   }
 
   @Deprecated

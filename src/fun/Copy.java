@@ -21,6 +21,7 @@ import fun.expression.reference.RefCall;
 import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefName;
 import fun.expression.reference.RefTemplCall;
+import fun.expression.reference.Reference;
 import fun.expression.reference.ReferenceLinked;
 import fun.expression.reference.ReferenceUnlinked;
 import fun.function.FuncWithBody;
@@ -33,13 +34,12 @@ import fun.function.impl.FuncPrivateRet;
 import fun.function.impl.FuncPrivateVoid;
 import fun.function.impl.FuncProtRet;
 import fun.function.impl.FuncProtVoid;
-import fun.generator.ComponentGenerator;
-import fun.generator.InterfaceGenerator;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.QueryItem;
 import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
+import fun.other.Generator;
 import fun.other.ImplElementary;
 import fun.other.Interface;
 import fun.other.Named;
@@ -79,7 +79,6 @@ import fun.type.template.Range;
 import fun.type.template.RangeTemplate;
 import fun.type.template.TypeType;
 import fun.type.template.TypeTypeTemplate;
-import fun.type.template.UserTypeGenerator;
 import fun.variable.CompUse;
 import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
@@ -121,10 +120,13 @@ class CopyFun extends Traverser<Fun, Void> {
 
   @Override
   protected Fun visit(Fun obj, Void param) {
-    Fun nobj = super.visit(obj, param);
-    if (obj instanceof Named) {
-      assert (nobj instanceof Named);
-      getCopied().put((Named) obj, (Named) nobj);
+    Fun nobj = copied.get(obj);
+    if (nobj == null) {
+      nobj = super.visit(obj, param);
+      if (obj instanceof Named) {
+        assert (nobj instanceof Named);
+        getCopied().put((Named) obj, (Named) nobj);
+      }
     }
     return nobj;
   }
@@ -342,18 +344,8 @@ class CopyFun extends Traverser<Fun, Void> {
   }
 
   @Override
-  protected Fun visitUserTypeGenerator(UserTypeGenerator obj, Void param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Fun visitInterfaceGenerator(InterfaceGenerator obj, Void param) {
-    return new InterfaceGenerator(obj.getInfo(), obj.getName(), copy(obj.getParam().getList()), copy(obj.getTemplate()));
-  }
-
-  @Override
-  protected Fun visitComponentGenerator(ComponentGenerator obj, Void param) {
-    return new ComponentGenerator(obj.getInfo(), obj.getName(), copy(obj.getParam().getList()), copy(obj.getTemplate()));
+  protected Fun visitGenerator(Generator obj, Void param) {
+    return new Generator(obj.getInfo(), copy(obj.getTemplate()), copy(obj.getParam().getList()));
   }
 
   @Override
@@ -408,8 +400,21 @@ class CopyFun extends Traverser<Fun, Void> {
   @Override
   protected Fun visitEnumType(EnumType obj, Void param) {
     EnumType type = new EnumType(obj.getInfo(), obj.getName());
+    copied.put(obj, type);
     type.getElement().addAll(copy(obj.getElement()));
     return type;
+  }
+
+  @Override
+  protected Fun visitEnumElement(EnumElement obj, Void param) {
+    Reference type = copy(obj.getType());
+    if (copied.containsKey(obj)) {
+      return copied.get(obj);
+    } else {
+      EnumElement elem = new EnumElement(obj.getInfo(), obj.getName(), type);
+      elem.setDef(copy(obj.getDef()));
+      return elem;
+    }
   }
 
   @Override
@@ -574,11 +579,6 @@ class CopyFun extends Traverser<Fun, Void> {
   @Override
   protected Fun visitUnionSelector(UnionSelector obj, Void param) {
     throw new UnsupportedOperationException("Not supported yet.");
-  }
-
-  @Override
-  protected Fun visitEnumElement(EnumElement obj, Void param) {
-    throw new RuntimeException("not yet implemented");
   }
 
 }

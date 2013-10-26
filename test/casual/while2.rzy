@@ -17,7 +17,7 @@ component
     function in.foo( x: R{0,100} )
       while x > 0 do
         out.foo( x );
-        x := x-1;
+        x := R{0,100}( x-1 );
       end
     end
   end

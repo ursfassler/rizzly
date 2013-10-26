@@ -7,8 +7,8 @@ import fun.expression.reference.RefCall;
 import fun.expression.reference.RefItem;
 import fun.expression.reference.RefTemplCall;
 import fun.function.impl.FuncGlobal;
-import fun.generator.TypeGenerator;
 import fun.knowledge.KnowledgeBase;
+import fun.other.Generator;
 import fun.traverser.Memory;
 
 public class RefExecutor extends NullTraverser<Fun, RefItem> {
@@ -32,7 +32,7 @@ public class RefExecutor extends NullTraverser<Fun, RefItem> {
   }
 
   @Override
-  protected Fun visitTypeGenerator(TypeGenerator obj, RefItem param) {
+  protected Fun visitGenerator(Generator obj, RefItem param) {
     assert (param instanceof RefTemplCall);
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }

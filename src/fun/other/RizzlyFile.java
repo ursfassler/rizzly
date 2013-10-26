@@ -7,7 +7,6 @@ import common.ElementInfo;
 
 import fun.FunBase;
 import fun.function.impl.FuncGlobal;
-import fun.generator.Generator;
 import fun.type.Type;
 import fun.variable.Constant;
 

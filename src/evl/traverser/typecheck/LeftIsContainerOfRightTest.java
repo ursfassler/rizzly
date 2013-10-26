@@ -2,7 +2,7 @@ package evl.traverser.typecheck;
 
 import java.util.List;
 
-import util.NumberSet;
+import util.Range;
 import evl.Evl;
 import evl.NullTraverser;
 import evl.knowledge.KnowledgeBase;
@@ -15,7 +15,7 @@ import evl.type.base.EnumType;
 import evl.type.base.FunctionType;
 import evl.type.base.FunctionTypeRet;
 import evl.type.base.FunctionTypeVoid;
-import evl.type.base.NumSet;
+import evl.type.base.RangeType;
 import evl.type.base.StringType;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
@@ -106,12 +106,12 @@ public class LeftIsContainerOfRightTest extends NullTraverser<Boolean, Type> {
   }
 
   @Override
-  protected Boolean visitNumSet(NumSet obj, Type right) {
-    if (right instanceof NumSet) {
-      NumberSet insec = NumberSet.intersection(obj.getNumbers(), ((NumSet) right).getNumbers());
-      int cmp = insec.getNumberCount().compareTo((((NumSet) right)).getNumbers().getNumberCount());
-      assert (cmp <= 0);
-      return cmp == 0;
+  protected Boolean visitNumSet(RangeType obj, Type right) {
+    if (right instanceof RangeType) {
+      Range lr = obj.getNumbers();
+      Range rr = ((RangeType) right).getNumbers();
+
+      return Range.leftIsSmallerEqual(rr, lr); // TODO test
     } else {
       return false; // TODO correct?
     }

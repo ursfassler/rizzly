@@ -35,6 +35,7 @@ import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.special.PointerType;
+import evl.variable.Constant;
 import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
@@ -142,6 +143,13 @@ class StmtReplacer extends StatementReplacer<List<NormalStmt>> {
       param.add(ptr);
       param.add(store);
     }
+    return null;
+  }
+
+  @Override
+  protected List<NormalStmt> visitConstant(Constant obj, List<NormalStmt> param) {
+    // do not handle stuff that is not possible to handle
+    assert( param == null );
     return null;
   }
 

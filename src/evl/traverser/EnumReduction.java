@@ -1,6 +1,5 @@
 package evl.traverser;
 
-import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -10,9 +9,9 @@ import common.ElementInfo;
 import error.ErrorType;
 import error.RError;
 import evl.DefTraverser;
+import evl.copy.Copy;
 import evl.copy.Relinker;
 import evl.expression.Expression;
-import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
@@ -20,7 +19,7 @@ import evl.other.Namespace;
 import evl.other.RizzlyProgram;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
-import evl.type.base.NumSet;
+import evl.type.base.RangeType;
 
 /**
  * 
@@ -34,11 +33,11 @@ public class EnumReduction extends DefTraverser<Void, Void> {
     KnowledgeBase kb = new KnowledgeBase(root, debugdir);
     KnowBaseItem kbi = kb.getEntry(KnowBaseItem.class);
 
-    Map<EnumType, NumSet> typeMap = new HashMap<EnumType, NumSet>();
+    Map<EnumType, RangeType> typeMap = new HashMap<EnumType, RangeType>();
 
     List<EnumType> enumTypes = prg.getType().getItems(EnumType.class);
     for (EnumType et : enumTypes) {
-      NumSet rt = kbi.getRangeType(et.getElement().size());
+      RangeType rt = kbi.getRangeType(et.getElement().size());
       if (!(prg.getType().getList().contains(rt))) {
         prg.getType().add(rt);
       }
@@ -51,25 +50,21 @@ public class EnumReduction extends DefTraverser<Void, Void> {
     Relinker.relink(prg, typeMap);
 
     prg.getType().removeAll(enumTypes);
+    prg.getConstant().removeAll( prg.getConstant().getItems(EnumElement.class) );  //FIXME hacky, dependency cleaner should find it
   }
 }
 
+// TODO make a constant propagation out of it
 class ElemReplacer extends ExprReplacer<Void> {
 
   @Override
   protected Expression visitReference(Reference obj, Void param) {
-    if (obj.getLink() instanceof EnumElement) {
+    if (obj.getLink() instanceof EnumType) {
       RError.err(ErrorType.Fatal, obj.getInfo(), "should not happen: " + obj);
     }
-    if (obj.getLink() instanceof EnumType) {
-      assert (obj.getOffset().size() == 1);
-      EnumType type = (EnumType) obj.getLink();
-      RefName name = (RefName) obj.getOffset().get(0);
-      EnumElement elem = type.find(name.getName());
-      assert (elem != null);
-      int value = type.getElement().indexOf(elem);
-      assert (value >= 0);
-      return new evl.expression.Number(elem.getInfo(), BigInteger.valueOf(value));
+    if (obj.getLink() instanceof EnumElement) {
+      EnumElement elem = (EnumElement) obj.getLink();
+      return Copy.copy(elem.getDef());
     }
     return super.visitReference(obj, param);
   }

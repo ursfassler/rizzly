@@ -9,7 +9,7 @@ import evl.cfg.BasicBlock;
 import evl.expression.Expression;
 
 /**
- *
+ * 
  * @author urs
  */
 public class IfGoto extends BasicBlockEnd {
@@ -19,6 +19,13 @@ public class IfGoto extends BasicBlockEnd {
 
   public IfGoto(ElementInfo info) {
     super(info);
+  }
+
+  public IfGoto(ElementInfo info, Expression condition, BasicBlock thenBlock, BasicBlock elseBlock) {
+    super(info);
+    this.condition = condition;
+    this.thenBlock = thenBlock;
+    this.elseBlock = elseBlock;
   }
 
   public Expression getCondition() {

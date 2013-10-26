@@ -2,11 +2,9 @@ package fun.toevl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 import error.ErrorType;
 import error.RError;
-import evl.Evl;
 import evl.expression.Expression;
 import evl.expression.reference.RefItem;
 import fun.Fun;
@@ -17,24 +15,11 @@ import fun.expression.reference.RefName;
 import fun.expression.reference.RefTemplCall;
 
 public class FunToEvlRef extends NullTraverser<RefItem, Void> {
-  private Map<Fun, Evl> map;
   private FunToEvl fta;
 
-  public FunToEvlRef(FunToEvl fta, Map<Fun, Evl> map) {
+  public FunToEvlRef(FunToEvl fta) {
     super();
-    this.map = map;
     this.fta = fta;
-  }
-
-  @Override
-  protected RefItem visit(Fun obj, Void param) {
-    RefItem cobj = (RefItem) map.get(obj);
-    if (cobj == null) {
-      cobj = super.visit(obj, param);
-      assert (cobj != null);
-      map.put(obj, cobj);
-    }
-    return cobj;
   }
 
   @Override

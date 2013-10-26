@@ -19,6 +19,7 @@ import evl.other.IfaceUse;
 import evl.other.Named;
 import evl.other.Namespace;
 import evl.type.TypeRef;
+import evl.type.base.EnumDefRef;
 import evl.type.base.EnumElement;
 import evl.type.base.FunctionTypeRet;
 import evl.type.base.FunctionTypeVoid;
@@ -100,6 +101,16 @@ class SubDep extends DefTraverser<Void, Named> {
       visit(obj.getRef(), obj.getRef());
     }
     return super.visitTypeRef(obj, param);
+  }
+
+  @Override
+  protected Void visitEnumDefRef(EnumDefRef obj, Named param) {
+    if (!g.containsVertex(obj.getElem())) {
+      g.addVertex(obj.getElem());
+      g.addEdge(param, obj.getElem());
+      visit(obj.getElem(), obj.getElem());
+    }
+    return super.visitEnumDefRef(obj, param);
   }
 
   @Override

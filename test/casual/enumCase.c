@@ -17,13 +17,13 @@ static int test( enumCase_Weekday day, int value ){
 int main(){
   inst__system_construct();
   
-  if( test( Monday, 2 ) < 0 ) return -1;
-  if( test( Tuesday, 0 ) < 0 ) return -1;
-  if( test( Wednesday, 2 ) < 0 ) return -1;
-  if( test( Thursday, 1 ) < 0 ) return -1;
-  if( test( Friday, 1 ) < 0 ) return -1;
-  if( test( Saturday, 1 ) < 0 ) return -1;
-  if( test( Sunday, 3 ) < 0 ) return -1;
+  if( test( enumCase_Monday, 2 ) < 0 ) return -1;
+  if( test( enumCase_Tuesday, 0 ) < 0 ) return -1;
+  if( test( enumCase_Wednesday, 2 ) < 0 ) return -1;
+  if( test( enumCase_Thursday, 1 ) < 0 ) return -1;
+  if( test( enumCase_Friday, 1 ) < 0 ) return -1;
+  if( test( enumCase_Saturday, 1 ) < 0 ) return -1;
+  if( test( enumCase_Sunday, 3 ) < 0 ) return -1;
 
   return 0;
 }

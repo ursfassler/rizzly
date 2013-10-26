@@ -16,8 +16,8 @@ component
     entry
       i : R{0,32} = 0;
       while i < 32 do
-        a[i] := i;
-        i    := i+1;
+        a[i] := R{0,31}( i );
+        i    := R{0,32}( i+1 );
       end
     end
 

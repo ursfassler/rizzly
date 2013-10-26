@@ -13,7 +13,7 @@ import fun.variable.FuncVariable;
  */
 abstract public class FunctionHeader extends FunBase implements Named {
   private String name;
-  private ListOfNamed<FuncVariable> param = new ListOfNamed<FuncVariable>();
+  final private ListOfNamed<FuncVariable> param = new ListOfNamed<FuncVariable>();
 
   public FunctionHeader(ElementInfo info) {
     super(info);
@@ -24,7 +24,6 @@ abstract public class FunctionHeader extends FunBase implements Named {
     return name;
   }
 
-  @Override
   public void setName(String name) {
     this.name = name;
   }

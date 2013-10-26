@@ -1,29 +1,32 @@
 package parser;
 
+import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import common.Direction;
 
 import error.ErrorType;
 import error.RError;
 import fun.Copy;
+import fun.expression.Number;
+import fun.expression.reference.RefName;
 import fun.expression.reference.Reference;
+import fun.expression.reference.ReferenceUnlinked;
 import fun.function.FunctionHeader;
-import fun.generator.ComponentGenerator;
-import fun.generator.InterfaceGenerator;
 import fun.other.Component;
+import fun.other.Generator;
 import fun.other.Interface;
+import fun.other.ListOfNamed;
 import fun.type.Type;
+import fun.type.base.EnumElement;
 import fun.type.base.EnumType;
 import fun.type.base.TypeAlias;
 import fun.type.composed.NamedElement;
 import fun.type.composed.RecordType;
 import fun.type.composed.UnionSelector;
 import fun.type.composed.UnionType;
-import fun.type.template.UserTypeGenerator;
+import fun.variable.Constant;
 import fun.variable.IfaceUse;
 import fun.variable.TemplateParameter;
 
@@ -34,9 +37,9 @@ public class TypeParser extends BaseParser {
   }
 
   // EBNF ifacedefsec: "interface" ifacedecl { ifacedecl }
-  protected List<InterfaceGenerator> parseInterfaceSection() {
+  protected List<Generator> parseInterfaceSection() {
     expect(TokenType.INTERFACE);
-    List<InterfaceGenerator> ret = new ArrayList<InterfaceGenerator>();
+    List<Generator> ret = new ArrayList<Generator>();
     do {
       ret.add(parseIfacedecl());
     } while (peek().getType() == TokenType.IDENTIFIER);
@@ -44,9 +47,9 @@ public class TypeParser extends BaseParser {
   }
 
   // EBNF compdefsec: "component" compdecl { compdecl }
-  protected List<ComponentGenerator> parseComponentSection() {
+  protected List<Generator> parseComponentSection() {
     expect(TokenType.COMPONENT);
-    List<ComponentGenerator> ret = new ArrayList<ComponentGenerator>();
+    List<Generator> ret = new ArrayList<Generator>();
     do {
       ret.add(parseCompdecl());
     } while (peek().getType() == TokenType.IDENTIFIER);
@@ -54,17 +57,17 @@ public class TypeParser extends BaseParser {
   }
 
   // EBNF typesec: "type" typedecl { typedecl }
-  protected List<UserTypeGenerator> parseTypeSection() {
+  protected List<Generator> parseTypeSection(ListOfNamed<Constant> constants) {
     expect(TokenType.TYPE_SEC);
-    List<UserTypeGenerator> ret = new ArrayList<UserTypeGenerator>();
+    List<Generator> ret = new ArrayList<Generator>();
     do {
-      ret.add(parseTypedecl());
+      ret.add(parseTypedecl(constants));
     } while (peek().getType() == TokenType.IDENTIFIER);
     return ret;
   }
 
   // EBNF ifacedecl: id genericParam interface
-  private InterfaceGenerator parseIfacedecl() {
+  private Generator parseIfacedecl() {
     Token name = expect(TokenType.IDENTIFIER);
     List<TemplateParameter> genpam;
     if (peek().getType() == TokenType.OPENCURLY) {
@@ -75,12 +78,12 @@ public class TypeParser extends BaseParser {
 
     Interface type = parseInterface(name);
 
-    InterfaceGenerator func = new InterfaceGenerator(name.getInfo(), name.getData(), genpam, type);
+    Generator func = new Generator(name.getInfo(), type, genpam);
     return func;
   }
 
   // EBNF compdecl: id genericParam component
-  private ComponentGenerator parseCompdecl() {
+  private Generator parseCompdecl() {
     Token name = expect(TokenType.IDENTIFIER);
     List<TemplateParameter> genpam;
     if (peek().getType() == TokenType.OPENCURLY) {
@@ -91,7 +94,7 @@ public class TypeParser extends BaseParser {
 
     Component type = parseComponent(name);
 
-    ComponentGenerator func = new ComponentGenerator(name.getInfo(), name.getData(), genpam, type);
+    Generator func = new Generator(name.getInfo(), type, genpam);
     return func;
   }
 
@@ -132,7 +135,7 @@ public class TypeParser extends BaseParser {
   }
 
   // EBNF typedecl: id genericParam "=" typedef
-  private UserTypeGenerator parseTypedecl() {
+  private Generator parseTypedecl(ListOfNamed<Constant> constants) {
     Token name = expect(TokenType.IDENTIFIER);
     List<TemplateParameter> genpam;
     if (peek().getType() == TokenType.OPENCURLY) {
@@ -142,21 +145,21 @@ public class TypeParser extends BaseParser {
     }
     expect(TokenType.EQUAL);
 
-    Type type = parseTypeDef(name.getData());
+    Type type = parseTypeDef(name.getData(), constants);
 
-    UserTypeGenerator func = new UserTypeGenerator(name.getInfo(), name.getData(), genpam, type);
+    Generator func = new Generator(name.getInfo(), type, genpam);
     return func;
   }
 
   // EBNF typedef: recordtype | uniontype | enumtype | arraytype | derivatetype
-  private Type parseTypeDef(String name) {
+  private Type parseTypeDef(String name, ListOfNamed<Constant> constants) {
     switch (peek().getType()) {
     case RECORD:
       return parseRecordType(name);
     case UNION:
       return parseUnionType(name);
     case ENUM:
-      return parseEnumType(name);
+      return parseEnumType(name, constants);
     case IDENTIFIER:
       return parseDerivateType(name);
     default:
@@ -201,23 +204,30 @@ public class TypeParser extends BaseParser {
   }
 
   // EBNF enumType: "Enum" { enumElem } "end"
-  private Type parseEnumType(String name) {
+  private Type parseEnumType(String name, ListOfNamed<Constant> constants) {
     Token tok = expect(TokenType.ENUM);
-    Set<String> names = new HashSet<String>();
 
     EnumType type = new EnumType(tok.getInfo(), name);
 
     while (peek().getType() != TokenType.END) {
-      Token elem = parseEnumElem();
-      if (names.contains(elem.getData())) {
-        RError.err(ErrorType.Fatal, elem.getInfo(), "Name \"" + elem.getData() + "\" already defined");
-      } else {
-        names.add(elem.getData());
-      }
-      type.createElement(elem.getData(), elem.getInfo());
-    }
+      Token elemTok = parseEnumElem();
 
-    // FIXME what to do with elements?
+      Constant old = constants.find(elemTok.getData());
+      if (old != null) {
+        RError.err(ErrorType.Hint, old.getInfo(), "first definition was here");
+        RError.err(ErrorType.Error, elemTok.getInfo(), "Name \"" + elemTok.getData() + "\" already defined");
+      } else {
+        ReferenceUnlinked typeRef = new ReferenceUnlinked(elemTok.getInfo());
+        typeRef.getOffset().add(new RefName(elemTok.getInfo(), name));
+        EnumElement elem = new EnumElement(elemTok.getInfo(), elemTok.getData(), typeRef);
+        elem.setDef(new Number(elemTok.getInfo(), BigInteger.valueOf(type.getElement().size())));
+        constants.add(elem);
+
+        ReferenceUnlinked elemRef = new ReferenceUnlinked(elemTok.getInfo());
+        elemRef.getOffset().add(new RefName(elemTok.getInfo(), elem.getName()));
+        type.getElement().add(elemRef);
+      }
+    }
 
     expect(TokenType.END);
     return type;

@@ -26,7 +26,6 @@ import pir.statement.normal.CallAssignment;
 import pir.statement.normal.StoreStmt;
 import pir.statement.normal.VariableGeneratorStmt;
 import pir.type.NamedElement;
-import pir.type.RangeType;
 import pir.type.StructType;
 import pir.type.TypeRef;
 import pir.type.UnionSelector;
@@ -93,7 +92,7 @@ import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
-import evl.type.base.NumSet;
+import evl.type.base.RangeType;
 import evl.type.base.StringType;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
@@ -331,7 +330,7 @@ public class ToPir extends NullTraverser<PirObject, Void> {
 
   @Override
   protected pir.expression.Number visitNumber(Number obj, Void param) {
-    RangeType type = kbi.getRangeType(obj.getValue(), obj.getValue());
+    pir.type.RangeType type = kbi.getRangeType(obj.getValue(), obj.getValue());
     return new pir.expression.Number(obj.getValue(), new TypeRef(type));
   }
 
@@ -357,14 +356,9 @@ public class ToPir extends NullTraverser<PirObject, Void> {
   }
 
   @Override
-  protected PirObject visitNumSet(NumSet obj, Void param) {
-    // TODO also implement numset in pir
-    if (obj.getNumbers().isEmpty()) {
-      return kbi.getRangeType(BigInteger.ZERO, BigInteger.ZERO); // FIXME should it be reachable?
-    } else {
-      pir.type.RangeType ret = kbi.getRangeType(obj.getNumbers().getLow(), obj.getNumbers().getHigh());
-      return ret;
-    }
+  protected PirObject visitNumSet(RangeType obj, Void param) {
+    pir.type.RangeType ret = kbi.getRangeType(obj.getNumbers().getLow(), obj.getNumbers().getHigh());
+    return ret;
   }
 
   @Override
@@ -644,7 +638,7 @@ public class ToPir extends NullTraverser<PirObject, Void> {
 
   // TODO make it better
   private boolean isScalar(Type type) {
-    return (type instanceof IntegerType) || (type instanceof BooleanType) || (type instanceof NumSet);
+    return (type instanceof IntegerType) || (type instanceof BooleanType) || (type instanceof RangeType);
   }
 
   @Override

@@ -16,7 +16,7 @@ component
       if t > 255 then
         t := 255;
       end
-      return t;
+      return R{0,255}( t );
     end
 
   end

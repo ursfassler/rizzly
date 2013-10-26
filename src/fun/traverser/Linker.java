@@ -11,9 +11,6 @@ import fun.expression.reference.Reference;
 import fun.expression.reference.ReferenceLinked;
 import fun.expression.reference.ReferenceUnlinked;
 import fun.function.FunctionHeader;
-import fun.generator.ComponentGenerator;
-import fun.generator.InterfaceGenerator;
-import fun.generator.TypeGenerator;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.State;
 import fun.hfsm.StateComposite;
@@ -21,6 +18,7 @@ import fun.hfsm.Transition;
 import fun.knowledge.KnowFunChild;
 import fun.knowledge.KnowledgeBase;
 import fun.other.Component;
+import fun.other.Generator;
 import fun.other.ImplElementary;
 import fun.other.Named;
 import fun.statement.Block;
@@ -135,26 +133,10 @@ public class Linker extends RefReplacer<SymbolTable<Named, String>> {
   }
 
   @Override
-  protected Expression visitTypeGenerator(TypeGenerator obj, SymbolTable<Named, String> param) {
+  protected Expression visitGenerator(Generator obj, SymbolTable<Named, String> param) {
     param = new SymbolTable<Named, String>(param);
     add(param, obj.getParam());
-    super.visitTypeGenerator(obj, param);
-    return null;
-  }
-
-  @Override
-  protected Expression visitInterfaceGenerator(InterfaceGenerator obj, SymbolTable<Named, String> param) {
-    param = new SymbolTable<Named, String>(param);
-    add(param, obj.getParam());
-    super.visitInterfaceGenerator(obj, param);
-    return null;
-  }
-
-  @Override
-  protected Expression visitComponentGenerator(ComponentGenerator obj, SymbolTable<Named, String> param) {
-    param = new SymbolTable<Named, String>(param);
-    add(param, obj.getParam());
-    super.visitComponentGenerator(obj, param);
+    super.visitGenerator(obj, param);
     return null;
   }
 

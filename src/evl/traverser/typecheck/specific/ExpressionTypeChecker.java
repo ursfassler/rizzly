@@ -1,14 +1,8 @@
 package evl.traverser.typecheck.specific;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
 
-import util.NumberSet;
-import util.NumberSetOperator;
 import util.Range;
 
 import common.ElementInfo;
@@ -50,46 +44,43 @@ import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumType;
-import evl.type.base.NumSet;
-import evl.variable.SsaVariable;
+import evl.type.base.RangeType;
 import evl.variable.Variable;
 
 public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
 
   private KnowledgeBase kb;
   private KnowBaseItem kbi;
-  private Map<SsaVariable, NumSet> map;
 
-  public ExpressionTypeChecker(KnowledgeBase kb, Map<SsaVariable, NumSet> map) {
+  public ExpressionTypeChecker(KnowledgeBase kb) {
     super();
-    this.map = map;
     this.kb = kb;
     kbi = kb.getEntry(KnowBaseItem.class);
   }
 
   static public Type process(Expression ast, KnowledgeBase kb) {
-    ExpressionTypeChecker adder = new ExpressionTypeChecker(kb, new HashMap<SsaVariable, NumSet>());
+    ExpressionTypeChecker adder = new ExpressionTypeChecker(kb);
     return adder.traverse(ast, null);
   }
 
-  private void checkPositive(String op, NumSet lhs, NumSet rhs) {
-    checkPositive(op, lhs);
-    checkPositive(op, rhs);
+  private void checkPositive(ElementInfo info, String op, Range lhs, Range rhs) {
+    checkPositive(info, op, lhs);
+    checkPositive(info, op, rhs);
   }
 
-  private void checkPositive(String op, NumSet range) {
-    if (range.getNumbers().getLow().compareTo(BigInteger.ZERO) < 0) {
-      RError.err(ErrorType.Error, range.getInfo(), op + " only allowed for positive types");
+  private void checkPositive(ElementInfo info, String op, Range range) {
+    if (range.getLow().compareTo(BigInteger.ZERO) < 0) {
+      RError.err(ErrorType.Error, info, op + " only allowed for positive types");
     }
   }
 
-  private NumSet getRange(Expression expr, Void param) {
+  private Range getRange(Expression expr, Void param) {
     Type lhs = visit(expr, param);
-    if (!(lhs instanceof NumSet)) {
+    if (!(lhs instanceof RangeType)) {
       RError.err(ErrorType.Fatal, expr.getInfo(), "Expected range type");
     }
-    NumSet lt = (NumSet) lhs;
-    return lt;
+    RangeType lt = (RangeType) lhs;
+    return lt.getNumbers();
   }
 
   private BigInteger makeOnes(int bits) {
@@ -121,19 +112,6 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
     return bit;
   }
 
-  /**
-   * 
-   * @param ast
-   * @param map
-   *          Constrainted type of variable
-   * @param kb
-   * @return
-   */
-  static public Type process(Expression ast, Map<SsaVariable, NumSet> map, KnowledgeBase kb) {
-    ExpressionTypeChecker adder = new ExpressionTypeChecker(kb, map);
-    return adder.traverse(ast, null);
-  }
-
   @Override
   protected Type visitDefault(Evl obj, Void param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
@@ -154,12 +132,7 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitReference(Reference obj, Void param) {
-    Variable rv = getDerefVar(obj);
-    if ((rv != null) && map.containsKey(rv)) {
-      return map.get(rv);
-    } else {
-      return RefTypeChecker.process(obj, kb);
-    }
+    return RefTypeChecker.process(obj, kb);
   }
 
   @Override
@@ -185,21 +158,17 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
       return null;
     }
 
-    if (!(type instanceof NumSet)) {
+    if (!(type instanceof RangeType)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Need ordinal type for minus, got: " + type.getName());
       return null;
     }
 
-    NumberSet ret = NumberSet.execOp(new NumberSetOperator() {
-      @Override
-      public Range op(Range left, Range right) {
-        BigInteger low = left.getLow().subtract(right.getHigh());
-        BigInteger high = left.getHigh().subtract(right.getLow());
-        return new Range(low, high);
-      }
-    }, new NumberSet(new Range(BigInteger.ZERO, BigInteger.ZERO)), ((NumSet) type).getNumbers());
+    Range right = ((RangeType) type).getNumbers();
 
-    return kbi.getNumsetType(ret.getRanges());
+    BigInteger low = BigInteger.ZERO.subtract(right.getHigh());
+    BigInteger high = BigInteger.ZERO.subtract(right.getLow());
+
+    return kbi.getNumsetType(new Range(low, high));
   }
 
   private void testForSame(Type lhs, Type rhs, BinaryExp obj) {
@@ -257,15 +226,15 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
     Type lhst = visit(obj.getLeft(), param);
     Type rhst = visit(obj.getRight(), param);
 
-    if (lhst instanceof NumSet) {
-      if (!(rhst instanceof NumSet)) {
+    if (lhst instanceof RangeType) {
+      if (!(rhst instanceof RangeType)) {
         RError.err(ErrorType.Fatal, rhst.getInfo(), "Expected range type");
       }
-      NumSet lhs = getRange(obj.getLeft(), param);
-      NumSet rhs = getRange(obj.getRight(), param);
-      checkPositive("and", lhs, rhs);
-      BigInteger high = lhs.getNumbers().getHigh().min(rhs.getNumbers().getHigh()); // TODO ok?
-      return kbi.getRangeType(BigInteger.ZERO, high);
+      Range lhs = getRange(obj.getLeft(), param);
+      Range rhs = getRange(obj.getRight(), param);
+      checkPositive(obj.getInfo(), "and", lhs, rhs);
+      BigInteger high = lhs.getHigh().min(rhs.getHigh()); // TODO ok?
+      return kbi.getNumsetType(new Range(BigInteger.ZERO, high));
     } else if (lhst instanceof BooleanType) {
       return kbi.getBooleanType();
     } else {
@@ -276,169 +245,116 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitDiv(Div obj, Void param) {
-    NumSet lhs = getRange(obj.getLeft(), param);
-    NumSet rhs = getRange(obj.getRight(), param);
-    if (rhs.getNumbers().contains(BigInteger.ZERO)) {
-      RError.err(ErrorType.Error, rhs.getInfo(), "division by 0");
-    }
-    if ((lhs.getNumbers().getLow().compareTo(BigInteger.ZERO) < 0) || (rhs.getNumbers().getLow().compareTo(BigInteger.ZERO) < 0)) {
-      RError.err(ErrorType.Error, lhs.getInfo(), "sorry, I am too lazy to check for negative numbers");
+    Range lhs = getRange(obj.getLeft(), param);
+    Range rhs = getRange(obj.getRight(), param);
+    if ((lhs.getLow().compareTo(BigInteger.ZERO) < 0) || (rhs.getLow().compareTo(BigInteger.ZERO) < 0)) {
+      RError.err(ErrorType.Error, obj.getInfo(), "sorry, I am too lazy to check for negative numbers");
     }
 
-    NumberSet ret = NumberSet.execOp(new NumberSetOperator() {
-      @Override
-      public Range op(Range lhs, Range rhs) {
-        BigInteger low = lhs.getLow().divide(rhs.getHigh());
-        BigInteger high = lhs.getHigh().divide(rhs.getLow());
-        return new Range(low, high);
-      }
-    }, lhs.getNumbers(), rhs.getNumbers());
+    BigInteger low = lhs.getLow().divide(rhs.getHigh());
+    BigInteger high = lhs.getHigh().divide(rhs.getLow());
 
-    return kbi.getNumsetType(ret.getRanges());
+    return kbi.getNumsetType(new Range(low, high));
   }
 
   @Override
   protected Type visitMinus(Minus obj, Void param) {
-    NumSet lhs = getRange(obj.getLeft(), param);
-    NumSet rhs = getRange(obj.getRight(), param);
+    Range lhs = getRange(obj.getLeft(), param);
+    Range rhs = getRange(obj.getRight(), param);
 
-    NumberSet ret = NumberSet.execOp(new NumberSetOperator() {
-      @Override
-      public Range op(Range left, Range right) {
-        BigInteger low = left.getLow().subtract(right.getHigh());
-        BigInteger high = left.getHigh().subtract(right.getLow());
-        return new Range(low, high);
-      }
-    }, lhs.getNumbers(), rhs.getNumbers());
+    BigInteger low = lhs.getLow().subtract(rhs.getHigh());
+    BigInteger high = lhs.getHigh().subtract(rhs.getLow());
 
-    return kbi.getNumsetType(ret.getRanges());
+    return kbi.getNumsetType(new Range(low, high));
   }
 
   @Override
   protected Type visitMod(Mod obj, Void param) {
-    NumSet lhs = getRange(obj.getLeft(), param);
-    NumSet rhs = getRange(obj.getRight(), param);
-    checkPositive("mod", lhs); // TODO implement mod correctly (and not with 'urem' instruction) and remove this check
-    checkPositive("mod", rhs);
+    Range lhs = getRange(obj.getLeft(), param);
+    Range rhs = getRange(obj.getRight(), param);
+    checkPositive(obj.getInfo(), "mod", lhs); // TODO implement mod correctly (and not with 'urem' instruction) and
+                                              // remove this check
+    checkPositive(obj.getInfo(), "mod", rhs);
 
-    NumberSet ret = NumberSet.execOp(new NumberSetOperator() {
-      @Override
-      public Range op(Range left, Range right) {
-        BigInteger low = BigInteger.ZERO;
-        BigInteger high = left.getHigh().min(right.getHigh().subtract(BigInteger.ONE));
-        return new Range(low, high);
-      }
-    }, lhs.getNumbers(), rhs.getNumbers());
+    BigInteger low = BigInteger.ZERO;
+    BigInteger high = lhs.getHigh().min(rhs.getHigh().subtract(BigInteger.ONE));
 
-    return kbi.getNumsetType(ret.getRanges());
+    return kbi.getNumsetType(new Range(low, high));
   }
 
   @Override
   protected Type visitMul(Mul obj, Void param) {
-    NumSet lhs = getRange(obj.getLeft(), param);
-    NumSet rhs = getRange(obj.getRight(), param);
+    Range lhs = getRange(obj.getLeft(), param);
+    Range rhs = getRange(obj.getRight(), param);
     // FIXME correct when values are negative?
 
-    NumberSet ret = NumberSet.execOp(new NumberSetOperator() {
-      @Override
-      public Range op(Range left, Range right) {
-        BigInteger low = left.getLow().multiply(right.getLow());
-        BigInteger high = left.getHigh().multiply(right.getHigh());
-        return new Range(low, high);
-      }
-    }, lhs.getNumbers(), rhs.getNumbers());
+    BigInteger low = lhs.getLow().multiply(rhs.getLow());
+    BigInteger high = lhs.getHigh().multiply(rhs.getHigh());
 
-    return kbi.getNumsetType(ret.getRanges());
+    return kbi.getNumsetType(new Range(low, high));
   }
 
   @Override
   protected Type visitOr(Or obj, Void param) {
-    NumSet lhs = getRange(obj.getLeft(), param);
-    NumSet rhs = getRange(obj.getRight(), param);
-    checkPositive("or", lhs, rhs);
+    Range lhs = getRange(obj.getLeft(), param);
+    Range rhs = getRange(obj.getRight(), param);
+    checkPositive(obj.getInfo(), "or", lhs, rhs);
 
-    NumberSet ret = NumberSet.execOp(new NumberSetOperator() {
-      @Override
-      public Range op(Range lhs, Range rhs) {
-        BigInteger bigger = lhs.getHigh().max(rhs.getHigh());
-        BigInteger smaller = lhs.getHigh().min(rhs.getHigh());
+    BigInteger bigger = lhs.getHigh().max(rhs.getHigh());
+    BigInteger smaller = lhs.getHigh().min(rhs.getHigh());
 
-        int bits = bitCount(smaller);
-        BigInteger ones = makeOnes(bits);
-        BigInteger high = bigger.or(ones);
-        BigInteger low = lhs.getLow().max(rhs.getLow());
+    int bits = bitCount(smaller);
+    BigInteger ones = makeOnes(bits);
+    BigInteger high = bigger.or(ones);
+    BigInteger low = lhs.getLow().max(rhs.getLow());
 
-        return new Range(low, high);
-      }
-    }, lhs.getNumbers(), rhs.getNumbers());
-
-    return kbi.getNumsetType(ret.getRanges());
+    return kbi.getNumsetType(new Range(low, high));
   }
 
   @Override
   protected Type visitPlus(Plus obj, Void param) {
-    NumSet lhs = getRange(obj.getLeft(), param);
-    NumSet rhs = getRange(obj.getRight(), param);
+    Range lhs = getRange(obj.getLeft(), param);
+    Range rhs = getRange(obj.getRight(), param);
 
-    NumberSet ret = NumberSet.execOp(new NumberSetOperator() {
-      @Override
-      public Range op(Range left, Range right) {
-        BigInteger low = left.getLow().add(right.getLow());
-        BigInteger high = left.getHigh().add(right.getHigh());
-        return new Range(low, high);
-      }
-    }, lhs.getNumbers(), rhs.getNumbers());
+    BigInteger low = lhs.getLow().add(rhs.getLow());
+    BigInteger high = lhs.getHigh().add(rhs.getHigh());
 
-    return kbi.getNumsetType(ret.getRanges());
+    return kbi.getNumsetType(new Range(low, high));
   }
 
   @Override
   protected Type visitShl(Shl obj, Void param) {
-    NumSet lhs = getRange(obj.getLeft(), param);
-    NumSet rhs = getRange(obj.getRight(), param);
-    checkPositive("shl", lhs, rhs);
+    Range lhs = getRange(obj.getLeft(), param);
+    Range rhs = getRange(obj.getRight(), param);
+    checkPositive(obj.getInfo(), "shl", lhs, rhs);
 
-    NumberSet ret = NumberSet.execOp(new NumberSetOperator() {
-      @Override
-      public Range op(Range lhs, Range rhs) {
-        BigInteger high = lhs.getHigh().shiftLeft(getAsInt(rhs.getHigh(), "shl"));
-        BigInteger low = lhs.getLow().shiftLeft(getAsInt(rhs.getLow(), "shl"));
-        return new Range(low, high);
-      }
-    }, lhs.getNumbers(), rhs.getNumbers());
+    BigInteger high = lhs.getHigh().shiftLeft(getAsInt(rhs.getHigh(), "shl"));
+    BigInteger low = lhs.getLow().shiftLeft(getAsInt(rhs.getLow(), "shl"));
 
-    return kbi.getNumsetType(ret.getRanges());
+    return kbi.getNumsetType(new Range(low, high));
   }
 
   @Override
   protected Type visitShr(Shr obj, Void param) {
-    NumSet lhs = getRange(obj.getLeft(), param);
-    NumSet rhs = getRange(obj.getRight(), param);
-    checkPositive("shr", lhs, rhs);
+    Range lhs = getRange(obj.getLeft(), param);
+    Range rhs = getRange(obj.getRight(), param);
+    checkPositive(obj.getInfo(), "shr", lhs, rhs);
 
-    NumberSet ret = NumberSet.execOp(new NumberSetOperator() {
-      @Override
-      public Range op(Range lhs, Range rhs) {
-        BigInteger high = lhs.getHigh().shiftRight(getAsInt(rhs.getLow(), "shr"));
-        BigInteger low = lhs.getLow().shiftRight(getAsInt(rhs.getHigh(), "shr"));
-        return new Range(low, high);
-      }
-    }, lhs.getNumbers(), rhs.getNumbers());
+    BigInteger high = lhs.getHigh().shiftRight(getAsInt(rhs.getLow(), "shr"));
+    BigInteger low = lhs.getLow().shiftRight(getAsInt(rhs.getHigh(), "shr"));
 
-    return kbi.getNumsetType(ret.getRanges());
+    return kbi.getNumsetType(new Range(low, high));
   }
 
   @Override
   protected Type visitNumber(Number obj, Void param) {
     BigInteger value = obj.getValue();
-    List<Range> rlist = new ArrayList<Range>();
-    rlist.add(new Range(value, value));
-    return kbi.getNumsetType(rlist);
+    return kbi.getNumsetType(new Range(value, value));
   }
 
   @Override
   protected Type visitRangeValue(RangeValue obj, Void param) {
-    return kbi.getNumsetType(obj.getValues().getRanges());
+    return kbi.getNumsetType(obj.getValues());
   }
 
   @Override

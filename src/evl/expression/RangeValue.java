@@ -1,18 +1,18 @@
 package evl.expression;
 
-import util.NumberSet;
+import util.Range;
 
 import common.ElementInfo;
 
 public class RangeValue extends Expression {
-  final private NumberSet values;
+  final private Range values;
 
-  public RangeValue(ElementInfo info, NumberSet values) {
+  public RangeValue(ElementInfo info, Range values) {
     super(info);
     this.values = values;
   }
 
-  public NumberSet getValues() {
+  public Range getValues() {
     return values;
   }
 

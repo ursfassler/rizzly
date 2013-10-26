@@ -9,10 +9,7 @@ import common.Metadata;
 
 import error.ErrorType;
 import error.RError;
-import fun.generator.ComponentGenerator;
-import fun.generator.InterfaceGenerator;
 import fun.other.RizzlyFile;
-import fun.type.template.UserTypeGenerator;
 import fun.variable.ConstGlobal;
 
 /**
@@ -46,33 +43,15 @@ public class FileParser extends BaseParser {
     while (peek().getType() != TokenType.EOF) {
       switch (peek().getType()) {
       case INTERFACE: {
-        for (InterfaceGenerator gen : type().parseInterfaceSection()) {
-          if (gen.getParam().isEmpty()) {
-            ret.getIface().add(gen.getTemplate());
-          } else {
-            ret.getCompfunc().add(gen); // type producing functions
-          }
-        }
+        ret.getCompfunc().addAll(type().parseInterfaceSection());
         break;
       }
       case COMPONENT: {
-        for (ComponentGenerator gen : type().parseComponentSection()) {
-          if (gen.getParam().isEmpty()) {
-            ret.getComp().add(gen.getTemplate());
-          } else {
-            ret.getCompfunc().add(gen); // type producing functions
-          }
-        }
+        ret.getCompfunc().addAll(type().parseComponentSection());
         break;
       }
       case TYPE_SEC: {
-        for (UserTypeGenerator gen : type().parseTypeSection()) {
-          if (gen.getParam().isEmpty()) {
-            ret.getType().add(gen.getTemplate());
-          } else {
-            ret.getCompfunc().add(gen); // type producing functions
-          }
-        }
+        ret.getCompfunc().addAll(type().parseTypeSection(ret.getConstant()));
         break;
       }
       case CONST: {
@@ -80,7 +59,7 @@ public class FileParser extends BaseParser {
         break;
       }
       case FUNCTION: {
-        ret.getFunction().add(parseGlobalFunction());
+        ret.getCompfunc().add(type().parseGlobalFunction());
         break;
       }
       default: {

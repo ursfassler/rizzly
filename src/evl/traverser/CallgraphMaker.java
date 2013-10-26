@@ -18,6 +18,7 @@ import evl.hfsm.Transition;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowChild;
 import evl.knowledge.KnowledgeBase;
+import evl.type.Type;
 import evl.type.base.ArrayType;
 import evl.variable.Variable;
 
@@ -28,7 +29,7 @@ import evl.variable.Variable;
  *
  */
 public class CallgraphMaker extends DefTraverser<Void, Evl> {
-  private SimpleGraph<Evl> callgraph = new SimpleGraph<Evl>();;
+  private SimpleGraph<Evl> callgraph = new SimpleGraph<Evl>();
   private KnowledgeBase kb;
 
   public CallgraphMaker(KnowledgeBase kb) {
@@ -108,6 +109,10 @@ class RefChecker extends NullTraverser<Evl, Evl> {
 
   @Override
   protected Evl visitRefCall(RefCall obj, Evl param) {
+    if( param instanceof Type ){
+      // convert function
+      return param;
+    }
     FunctionBase header = (FunctionBase) param;
     target.add(header);
     if (header instanceof FuncWithReturn) {

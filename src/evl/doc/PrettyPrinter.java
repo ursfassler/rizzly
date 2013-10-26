@@ -9,9 +9,6 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 
-import util.NumberSet;
-import util.Range;
-
 import common.Direction;
 
 import error.ErrorType;
@@ -95,9 +92,10 @@ import evl.statement.phi.PhiStmt;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
+import evl.type.base.EnumDefRef;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
-import evl.type.base.NumSet;
+import evl.type.base.RangeType;
 import evl.type.base.StringType;
 import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
@@ -162,19 +160,6 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     if (writeId) {
       wr.wr("[" + obj.hashCode() % 10000 + "]");
     }
-  }
-
-  private void printNumberSet(NumberSet ranges, StreamWriter param) {
-    param.wr("{");
-    Iterator<Range> itr = ranges.getRanges().iterator();
-    if (itr.hasNext()) {
-      param.wr(itr.next().toString());
-      while (itr.hasNext()) {
-        param.wr(",");
-        param.wr(itr.next().toString());
-      }
-    }
-    param.wr("}");
   }
 
   @Override
@@ -412,10 +397,19 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.wr(" = Enum");
     param.nl();
     param.incIndent();
-    visitList(obj.getElement(), param);
+    visitItr(obj.getElement(), param);
     param.decIndent();
     param.wr("end");
     param.nl();
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitEnumDefRef(EnumDefRef obj, StreamWriter param) {
+    param.wr(obj.getElem().getName());
+    wrId(obj.getElem(), param);
+    param.wr(";");
     param.nl();
     return null;
   }
@@ -505,11 +499,14 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitNumSet(NumSet obj, StreamWriter param) {
+  protected Void visitNumSet(RangeType obj, StreamWriter param) {
     param.wr(obj.getName());
     wrId(obj, param);
     param.wr(" = ");
-    printNumberSet(obj.getNumbers(), param);
+    param.wr(obj.getNumbers().getLow().toString());
+    param.wr("..");
+    param.wr(obj.getNumbers().getHigh().toString());
+    param.wr(";");
     param.nl();
     return null;
   }
@@ -725,15 +722,15 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitNot(Not obj, StreamWriter param) {
-    param.wr( "not " );
-    visit(obj.getExpr(),param);
+    param.wr("not ");
+    visit(obj.getExpr(), param);
     return null;
   }
 
   @Override
   protected Void visitUminus(Uminus obj, StreamWriter param) {
-    param.wr( "- " );
-    visit(obj.getExpr(),param);
+    param.wr("- ");
+    visit(obj.getExpr(), param);
     return null;
   }
 

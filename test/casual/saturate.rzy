@@ -15,7 +15,7 @@ component
       if x > 10 then
         x := 10;
       end
-      return x;
+      return R{0,10}(x);
     end
 
   end

@@ -2,20 +2,19 @@ package fun.toevl;
 
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Map;
 
 import error.ErrorType;
 import error.RError;
-import evl.Evl;
 import evl.expression.reference.Reference;
 import evl.type.Type;
+import evl.type.base.EnumDefRef;
+import evl.type.base.EnumElement;
 import evl.type.composed.NamedElement;
 import evl.type.composed.UnionSelector;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.type.base.AnyType;
 import fun.type.base.BooleanType;
-import fun.type.base.EnumElement;
 import fun.type.base.EnumType;
 import fun.type.base.IntegerType;
 import fun.type.base.NaturalType;
@@ -29,25 +28,11 @@ import fun.type.template.Range;
 import fun.type.template.TypeType;
 
 public class FunToEvlType extends NullTraverser<Type, String> {
-  private Map<Fun, Evl> map;
   private FunToEvl fta;
 
-  public FunToEvlType(FunToEvl fta, Map<Fun, Evl> map) {
+  public FunToEvlType(FunToEvl fta) {
     super();
-    this.map = map;
     this.fta = fta;
-  }
-
-  @Override
-  protected Type visit(Fun obj, String param) {
-    assert (param != null);
-    evl.type.Type cobj = (Type) map.get(obj);
-    if (cobj == null) {
-      cobj = super.visit(obj, param);
-      assert (cobj != null);
-      map.put(obj, cobj);
-    }
-    return cobj;
   }
 
   @Override
@@ -69,14 +54,12 @@ public class FunToEvlType extends NullTraverser<Type, String> {
 
   @Override
   protected Type visitIntegerType(IntegerType obj, String param) {
-    RError.err(ErrorType.Fatal, obj.getInfo(), "unresolved integer type: " + obj);
-    return null;
+    return new evl.type.special.IntegerType();
   }
 
   @Override
   protected Type visitNaturalType(NaturalType obj, String param) {
-    RError.err(ErrorType.Fatal, obj.getInfo(), "unresolved natural type: " + obj);
-    return null;
+    return new evl.type.special.NaturalType();
   }
 
   @Override
@@ -98,7 +81,7 @@ public class FunToEvlType extends NullTraverser<Type, String> {
 
   @Override
   protected Type visitRange(Range obj, String param) {
-    return new evl.type.base.NumSet(new util.Range(obj.getLow(), obj.getHigh()));
+    return new evl.type.base.RangeType(new util.Range(obj.getLow(), obj.getHigh()));
   }
 
   @Override
@@ -110,9 +93,12 @@ public class FunToEvlType extends NullTraverser<Type, String> {
   @Override
   protected Type visitEnumType(EnumType obj, String param) {
     evl.type.base.EnumType ret = new evl.type.base.EnumType(obj.getInfo(), param);
-    map.put(obj, ret);
-    for (EnumElement elem : obj.getElement()) {
-      ret.getElement().add((evl.type.base.EnumElement) fta.traverse(elem, null));
+    fta.map.put(obj, ret);
+    for (fun.expression.reference.Reference elem : obj.getElement()) {
+      Reference ref = (Reference) fta.traverse(elem, null);
+      assert (ref.getLink() instanceof EnumElement);
+      assert (ref.getOffset().isEmpty());
+      ret.getElement().add(new EnumDefRef(ref.getInfo(), (EnumElement) ref.getLink()));
     }
     return ret;
   }
