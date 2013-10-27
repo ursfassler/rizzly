@@ -34,7 +34,7 @@ public class RefExecutor extends NullTraverser<Fun, RefItem> {
   @Override
   protected Fun visitGenerator(Generator obj, RefItem param) {
     assert (param instanceof RefTemplCall);
-    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+    return Specializer.process(obj, ((RefTemplCall)param).getActualParameter(), param.getInfo(), kb);
   }
 
 }

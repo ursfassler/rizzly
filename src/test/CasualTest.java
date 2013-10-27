@@ -303,6 +303,11 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  public void funcStruct() {
+    compile("funcStruct", TestSteps.COMPILE_TO_ASM, false, true);
+  }
+
+  @Test
   public void linking() {
     compile("linking", "Linking", true, false, false);
   }

@@ -66,19 +66,20 @@ public class Specializer {
       ReferenceLinked tref = (ReferenceLinked) pitm.getType();
       Type type = (Type) EvalTo.any(tref, kb);
       ActualTemplateArgument evald;
+      Expression acarg = genspec.get(i);
       if (type instanceof Range) {
-        Number num = (Number) ExprEvaluator.evaluate(genspec.get(i), new Memory(), kb);
+        Number num = (Number) ExprEvaluator.evaluate(acarg, new Memory(), kb);
         evald = num;
         // TODO check type
       } else if (type instanceof IntegerType) {
-        Number num = (Number) ExprEvaluator.evaluate(genspec.get(i), new Memory(), kb);
+        Number num = (Number) ExprEvaluator.evaluate(acarg, new Memory(), kb);
         evald = num;
       } else if (type instanceof AnyType) {
-        ReferenceLinked rl = (ReferenceLinked) genspec.get(i);
+        ReferenceLinked rl = (ReferenceLinked) acarg;
         evald = (Type) EvalTo.any(rl, kb);
         // TODO check type
       } else if (type instanceof TypeType) {
-        ReferenceLinked rl = (ReferenceLinked) genspec.get(i);
+        ReferenceLinked rl = (ReferenceLinked) acarg;
         evald = (Type) EvalTo.any(rl, kb);
         // TODO check type
       } else {

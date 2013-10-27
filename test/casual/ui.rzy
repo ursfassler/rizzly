@@ -125,7 +125,7 @@ component
             timer   : R{0,80};
           transition 
             Visible to Visible by tick.evt() if timer > 0 do
-              timer := timer - 1;
+              timer := R{0,80}( timer - 1 );
             end
         end
 
@@ -142,7 +142,7 @@ component
             
           transition 
             Hidden to Hidden by tick.evt() if timer > 0 do
-              timer := timer - 1;
+              timer := R{0,20}( timer - 1 );
             end
         end
         

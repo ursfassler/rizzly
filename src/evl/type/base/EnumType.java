@@ -18,11 +18,6 @@ public class EnumType extends Type {
     return element;
   }
 
-  @Deprecated
-  public EnumElement createElement(String name, ElementInfo info) {
-    throw new RuntimeException("no longer implemented");
-  }
-
   public EnumElement find(String name) {
     for (EnumDefRef itr : element) {
       if (itr.getElem().getName().equals(name)) {

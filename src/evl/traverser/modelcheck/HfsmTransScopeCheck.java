@@ -1,4 +1,4 @@
-package evl.traverser.hfsmcheck;
+package evl.traverser.modelcheck;
 
 import java.util.HashSet;
 import java.util.List;

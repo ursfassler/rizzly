@@ -76,14 +76,14 @@ import evl.traverser.OpenReplace;
 import evl.traverser.OutsideReaderInfo;
 import evl.traverser.OutsideWriterInfo;
 import evl.traverser.SsaMaker;
-import evl.traverser.StateVariableExtractor;
 import evl.traverser.debug.CompCascadeDepth;
 import evl.traverser.debug.DebugIfaceAdder;
 import evl.traverser.debug.MsgNamesGetter;
-import evl.traverser.hfsmcheck.HfsmTransScopeCheck;
 import evl.traverser.iocheck.IoCheck;
 import evl.traverser.iocheck.StateReaderInfo;
 import evl.traverser.iocheck.StateWriterInfo;
+import evl.traverser.modelcheck.HfsmTransScopeCheck;
+import evl.traverser.modelcheck.ModelChecker;
 import evl.traverser.typecheck.TypeChecker;
 import evl.traverser.typecheck.specific.CompInterfaceTypeChecker;
 import evl.type.Type;
@@ -111,22 +111,18 @@ public class MainEvl {
     }
 
     IntroduceConvert.process(aclasses, kb);
-    
     OpenReplace.process(aclasses, kb);
 
     PrettyPrinter.print(aclasses, debugdir + "convert.rzy", true);
     
-    ExprCutter.process(aclasses, kb);
-    StateVariableExtractor.process(aclasses, kb);
-
-    PrettyPrinter.print(aclasses, debugdir + "ast.rzy", true);
-    SsaMaker.process(aclasses, kb);
-    PrettyPrinter.print(aclasses, debugdir + "ssa.rzy", true);
-
     root = compositionReduction(aclasses, root);
     root = hfsmReduction(root, opt, debugdir, aclasses, kb);
     
     PrettyPrinter.print(aclasses, debugdir + "reduced.rzy", true);
+
+    PrettyPrinter.print(aclasses, debugdir + "ast.rzy", true);
+    SsaMaker.process(aclasses, kb);
+    PrettyPrinter.print(aclasses, debugdir + "ssa.rzy", true);
 
     ExprCutter.process(aclasses, kb);
 
@@ -157,8 +153,9 @@ public class MainEvl {
     checkUsefullness(aclasses);
     checkForRtcViolation(aclasses, kb);
     ioCheck(aclasses, kb);
-    hfsmCheck(aclasses, kb);
+    HfsmTransScopeCheck.process(aclasses, kb);
     CompInterfaceTypeChecker.process(aclasses, kb); // check interfaces against implementation
+    ModelChecker.process(aclasses, kb);
   }
 
   /**
@@ -616,10 +613,6 @@ public class MainEvl {
         func.setAttribute(FuncAttr.Public);
       }
     }
-  }
-
-  private static void hfsmCheck(Namespace aclasses, KnowledgeBase kb) {
-    HfsmTransScopeCheck.process(aclasses, kb);
   }
 
 }

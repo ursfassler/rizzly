@@ -1,0 +1,31 @@
+
+type
+  Point = Record
+    x : R{0,255};
+  end
+
+interface
+  Tick
+    function tick():R{0,255};
+  end
+  
+  Tack
+    function tack():Point;
+  end
+
+component
+  FuncStruct
+    input
+      in  : Tick;
+    
+    output
+      out : Tack;
+      
+    implementation elementary
+    
+    function in.tick():R{0,255}
+      return out.tack().x;
+    end
+    
+  end
+

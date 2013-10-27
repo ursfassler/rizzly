@@ -27,7 +27,7 @@ component
     
     transition 
       Counting to Counting by tick.tick if time > 0 do
-        time := time - 1;
+        time := R{0,5}( time - 1 );
       end
       
       Counting to Off by tick.tick if time = 0 do

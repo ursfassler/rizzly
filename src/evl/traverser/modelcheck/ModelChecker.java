@@ -1,4 +1,4 @@
-package evl.traverser.typecheck;
+package evl.traverser.modelcheck;
 
 import java.util.ArrayList;
 
@@ -12,27 +12,23 @@ import evl.knowledge.KnowledgeBase;
 import evl.other.ImplElementary;
 import evl.other.ListOfNamed;
 import evl.other.Named;
-import evl.traverser.typecheck.specific.ExpressionTypeChecker;
-import evl.traverser.typecheck.specific.FunctionTypeChecker;
-import evl.traverser.typecheck.specific.StatementTypeChecker;
-import evl.type.base.EnumType;
 import evl.variable.Variable;
 
-public class TypeChecker extends DefTraverser<Void, Void> {
+public class ModelChecker extends DefTraverser<Void, Void> {
   private KnowledgeBase kb;
 
-  public TypeChecker(KnowledgeBase kb) {
+  public ModelChecker(KnowledgeBase kb) {
     super();
     this.kb = kb;
   }
 
-  static public void process(Evl obj, KnowledgeBase kb, Void sym) {
-    TypeChecker adder = new TypeChecker(kb);
-    adder.traverse(obj, sym);
+  static public void process(Evl obj, KnowledgeBase kb) {
+    ModelChecker adder = new ModelChecker(kb);
+    adder.traverse(obj, null);
   }
 
   public static void processList(ListOfNamed<? extends Named> variable, KnowledgeBase kb) {
-    TypeChecker adder = new TypeChecker(kb);
+    ModelChecker adder = new ModelChecker(kb);
     for (Named itr : new ArrayList<Named>(variable.getList())) {
       adder.traverse(itr, null);
     }
@@ -40,45 +36,33 @@ public class TypeChecker extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitImplElementary(ImplElementary obj, Void sym) {
-    visitItr(obj.getVariable(), sym);
-    visitItr(obj.getConstant(), sym);
-    visitItr(obj.getInternalFunction(), sym);
-    visitItr(obj.getInputFunc(), sym);
-    visitItr(obj.getSubComCallback(), sym);
     return null;
   }
 
   @Override
   protected Void visitImplComposition(ImplComposition obj, Void sym) {
-    throw new RuntimeException("should not reach this point");
+    return null; // why not type checked (here)? > in CompInterfaceTypeChecker
   }
 
   @Override
   protected Void visitImplHfsm(ImplHfsm obj, Void param) {
-    throw new RuntimeException("should not reach this point");
+    HfsmModelChecker.process(obj, kb);
+    return null;
   }
 
   @Override
   protected Void visitFunctionBase(FunctionBase obj, Void sym) {
-    FunctionTypeChecker.process(obj, kb);
     return null;
   }
 
   @Override
   protected Void visitVariable(Variable obj, Void sym) {
-    StatementTypeChecker.process(obj, kb);
     return null;
   }
 
   @Override
   protected Void visitExpression(Expression obj, Void sym) {
-    ExpressionTypeChecker.process(obj, kb);
     return null;
-  }
-
-  @Override
-  protected Void visitEnumType(EnumType obj, Void param) {
-    return null; // we do not type check them (assignment of number does not work)
   }
 
 }
