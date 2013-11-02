@@ -7,12 +7,16 @@ import evl.expression.Expression;
 import evl.expression.Number;
 import evl.expression.RangeValue;
 import evl.expression.binop.And;
+import evl.expression.binop.BitAnd;
+import evl.expression.binop.BitOr;
 import evl.expression.binop.Div;
 import evl.expression.binop.Equal;
 import evl.expression.binop.Greater;
 import evl.expression.binop.Greaterequal;
 import evl.expression.binop.Less;
 import evl.expression.binop.Lessequal;
+import evl.expression.binop.LogicAnd;
+import evl.expression.binop.LogicOr;
 import evl.expression.binop.Minus;
 import evl.expression.binop.Mod;
 import evl.expression.binop.Mul;
@@ -142,6 +146,26 @@ public class CopyExpression extends NullTraverser<Expression, Void> {
   @Override
   protected Expression visitUminus(Uminus obj, Void param) {
     return new Uminus(obj.getInfo(), cast.copy(obj.getExpr()));
+  }
+
+  @Override
+  protected Expression visitBitAnd(BitAnd obj, Void param) {
+    return new BitAnd(obj.getInfo(), cast.copy(obj.getLeft()), cast.copy(obj.getRight()));
+  }
+
+  @Override
+  protected Expression visitBitOr(BitOr obj, Void param) {
+    return new BitOr(obj.getInfo(), cast.copy(obj.getLeft()), cast.copy(obj.getRight()));
+  }
+
+  @Override
+  protected Expression visitLogicOr(LogicOr obj, Void param) {
+    return new LogicOr(obj.getInfo(), cast.copy(obj.getLeft()), cast.copy(obj.getRight()));
+  }
+
+  @Override
+  protected Expression visitLogicAnd(LogicAnd obj, Void param) {
+    return new LogicAnd(obj.getInfo(), cast.copy(obj.getLeft()), cast.copy(obj.getRight()));
   }
 
 }

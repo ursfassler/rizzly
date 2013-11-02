@@ -13,7 +13,6 @@ import common.ElementInfo;
 
 import evl.Evl;
 import evl.NullTraverser;
-import evl.cfg.BasicBlockList;
 import evl.copy.Copy;
 import evl.expression.Expression;
 import evl.expression.reference.RefCall;
@@ -31,8 +30,10 @@ import evl.hfsm.Transition;
 import evl.knowledge.KnowParent;
 import evl.knowledge.KnowledgeBase;
 import evl.other.ListOfNamed;
-import evl.statement.normal.CallStmt;
-import evl.statement.normal.NormalStmt;
+import evl.statement.Block;
+import evl.statement.CallStmt;
+import evl.statement.Statement;
+import evl.variable.FuncVariable;
 import evl.variable.Variable;
 
 /**
@@ -80,10 +81,10 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
    * Extracts a function out of the transition body
    */
   private static FuncPrivateVoid makeTransBodyFunc(Transition trans) {
-    Collection<Variable> params = Copy.copy(trans.getParam().getList());
-    FuncPrivateVoid func = new FuncPrivateVoid(info, trans.getName() + Designator.NAME_SEP + "transFunc", new ListOfNamed<Variable>(params));
+    Collection<FuncVariable> params = Copy.copy(trans.getParam().getList());
+    FuncPrivateVoid func = new FuncPrivateVoid(info, trans.getName() + Designator.NAME_SEP + "transFunc", new ListOfNamed<FuncVariable>(params));
     func.setBody(trans.getBody());
-    trans.setBody(new BasicBlockList(info));
+    trans.setBody(new Block(info));
     
     HfsmReduction.relinkActualParameterRef(trans.getParam(), func.getParam().getList(), func.getBody());
     
@@ -126,13 +127,7 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
     trans.setName( trans.getName() + Designator.NAME_SEP + src.getName() );  // make name unique
     trans.setSrc(src);
 
-    assert ( trans.getBody().getEntry().getCode().isEmpty() );  // because we emptied it before
-    assert ( trans.getBody().getExit().getCode().isEmpty() );  // because we emptied it before
-    assert ( trans.getBody().getBasicBlocks().isEmpty() );  // because we emptied it before
-
-    List<NormalStmt> body = new ArrayList<NormalStmt>();
-
-    makeExitCalls(src, os, body);
+    makeExitCalls(src, os, trans.getBody().getStatements());
     {
       FuncPrivateVoid func = tfunc.get(otrans);
       assert ( func != null );
@@ -146,16 +141,14 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
 
       ref.getOffset().add(new RefCall(info, param));
       CallStmt call = new CallStmt(info, ref);
-      body.add(call);
+      trans.getBody().getStatements().add(call);
     }
-    makeEntryCalls(dst, os, body);
-
-    trans.getBody().insertCodeAfterEntry(body, "body");
+    makeEntryCalls(dst, os, trans.getBody().getStatements());
 
     src.getItem().add(trans);
   }
 
-  private void makeEntryCalls(State start, State top, List<NormalStmt> list) {
+  private void makeEntryCalls(State start, State top, List<Statement> list) {
     if( start == top ) {
       return;
     }
@@ -175,7 +168,7 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
     }
   }
 
-  private void makeExitCalls(State start, State top, List<NormalStmt> list) {
+  private void makeExitCalls(State start, State top, List<Statement> list) {
     if( start == top ) {
       return;
     }
@@ -186,7 +179,7 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
     makeExitCalls(par, top, list);
   }
 
-  private NormalStmt makeCall(Reference reference) {
+  private CallStmt makeCall(Reference reference) {
     assert ( reference.getLink() instanceof FuncWithBody );
     assert ( reference.getOffset().isEmpty() );
     Reference ref = new Reference(info, reference.getLink(), new ArrayList<RefItem>());

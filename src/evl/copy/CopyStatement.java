@@ -1,28 +1,22 @@
 package evl.copy;
 
+import java.util.ArrayList;
+
 import evl.Evl;
 import evl.NullTraverser;
-import evl.cfg.BasicBlock;
+import evl.statement.Assignment;
+import evl.statement.Block;
+import evl.statement.CallStmt;
+import evl.statement.CaseOpt;
+import evl.statement.CaseStmt;
+import evl.statement.IfStmt;
+import evl.statement.ReturnExpr;
+import evl.statement.ReturnVoid;
 import evl.statement.Statement;
-import evl.statement.bbend.CaseGoto;
-import evl.statement.bbend.Goto;
-import evl.statement.bbend.IfGoto;
-import evl.statement.bbend.ReturnExpr;
-import evl.statement.bbend.ReturnVoid;
-import evl.statement.bbend.Unreachable;
-import evl.statement.normal.Assignment;
-import evl.statement.normal.CallStmt;
-import evl.statement.normal.GetElementPtr;
-import evl.statement.normal.LoadStmt;
-import evl.statement.normal.StackMemoryAlloc;
-import evl.statement.normal.StoreStmt;
-import evl.statement.normal.TypeCast;
-import evl.statement.normal.VarDefInitStmt;
-import evl.statement.normal.VarDefStmt;
-import evl.statement.phi.PhiStmt;
+import evl.statement.VarDefStmt;
+import evl.statement.While;
 
 public class CopyStatement extends NullTraverser<Statement, Void> {
-
   private CopyEvl cast;
 
   public CopyStatement(CopyEvl cast) {
@@ -33,6 +27,13 @@ public class CopyStatement extends NullTraverser<Statement, Void> {
   @Override
   protected Statement visitDefault(Evl obj, Void param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+  }
+
+  @Override
+  protected Statement visitBlock(Block obj, Void param) {
+    Block ret = new Block(obj.getInfo());
+    ret.getStatements().addAll(cast.copy(obj.getStatements()));
+    return ret;
   }
 
   @Override
@@ -51,54 +52,6 @@ public class CopyStatement extends NullTraverser<Statement, Void> {
   }
 
   @Override
-  protected Statement visitVarDefInitStmt(VarDefInitStmt obj, Void param) {
-    return new VarDefInitStmt(obj.getInfo(), cast.copy(obj.getVariable()), cast.copy(obj.getInit()));
-  }
-
-  @Override
-  protected Statement visitLoadStmt(LoadStmt obj, Void param) {
-    return new LoadStmt(obj.getInfo(), cast.copy(obj.getVariable()), cast.copy(obj.getAddress()));
-  }
-
-  @Override
-  protected Statement visitStoreStmt(StoreStmt obj, Void param) {
-    return new StoreStmt(obj.getInfo(), cast.copy(obj.getAddress()), cast.copy(obj.getExpr()));
-  }
-
-  @Override
-  protected Statement visitGetElementPtr(GetElementPtr obj, Void param) {
-    return new GetElementPtr(obj.getInfo(), cast.copy(obj.getVariable()), cast.copy(obj.getAddress()));
-  }
-
-  @Override
-  protected Statement visitStackMemoryAlloc(StackMemoryAlloc obj, Void param) {
-    return new StackMemoryAlloc(obj.getInfo(), cast.copy(obj.getVariable()));
-  }
-
-  @Override
-  protected Statement visitCaseGoto(CaseGoto obj, Void param) {
-    CaseGoto ret = new CaseGoto(obj.getInfo());
-    ret.setCondition(cast.copy(obj.getCondition()));
-    ret.getOption().addAll(cast.copy(obj.getOption()));
-    ret.setOtherwise(cast.copy(obj.getOtherwise()));
-    return ret;
-  }
-
-  @Override
-  protected Statement visitIfGoto(IfGoto obj, Void param) {
-    IfGoto ret = new IfGoto(obj.getInfo());
-    ret.setCondition(cast.copy(obj.getCondition()));
-    ret.setThenBlock(cast.copy(obj.getThenBlock()));
-    ret.setElseBlock(cast.copy(obj.getElseBlock()));
-    return ret;
-  }
-
-  @Override
-  protected Statement visitGoto(Goto obj, Void param) {
-    return new Goto(obj.getInfo(), cast.copy(obj.getTarget()));
-  }
-
-  @Override
   protected Statement visitReturnExpr(ReturnExpr obj, Void param) {
     return new ReturnExpr(obj.getInfo(), cast.copy(obj.getExpr()));
   }
@@ -109,21 +62,18 @@ public class CopyStatement extends NullTraverser<Statement, Void> {
   }
 
   @Override
-  protected Statement visitPhiStmt(PhiStmt obj, Void param) {
-    PhiStmt ret = new PhiStmt(obj.getInfo(), cast.copy(obj.getVariable()));
-    for( BasicBlock in : obj.getInBB() ) {
-      ret.addArg(cast.copy(in), cast.copy(obj.getArg(in)));
-    }
-    return ret;
+  protected Statement visitCaseStmt(CaseStmt obj, Void param) {
+    return new CaseStmt(obj.getInfo(), cast.copy(obj.getCondition()), new ArrayList<CaseOpt>(cast.copy(obj.getOption())), cast.copy(obj.getOtherwise()));
   }
 
   @Override
-  protected Statement visitTypeCast(TypeCast obj, Void param) {
-    return new TypeCast(obj.getInfo(), cast.copy(obj.getVariable()), cast.copy(obj.getCast()), cast.copy(obj.getValue()));
+  protected Statement visitIfStmt(IfStmt obj, Void param) {
+    return new IfStmt(obj.getInfo(), cast.copy(obj.getOption()), cast.copy(obj.getDefblock()));
   }
 
   @Override
-  protected Statement visitUnreachable(Unreachable obj, Void param) {
-    return new Unreachable(obj.getInfo());
+  protected Statement visitWhile(While obj, Void param) {
+    return new While(obj.getInfo(), cast.copy(obj.getCondition()), cast.copy(obj.getBody()));
   }
+
 }

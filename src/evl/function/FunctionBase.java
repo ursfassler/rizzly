@@ -8,7 +8,7 @@ import common.FuncAttr;
 
 import evl.EvlBase;
 import evl.other.ListOfNamed;
-import evl.variable.Variable;
+import evl.variable.FuncVariable;
 
 
 /**
@@ -17,10 +17,10 @@ import evl.variable.Variable;
  */
 abstract public class FunctionBase extends EvlBase implements FunctionHeader {
   private String name;
-  private ListOfNamed<Variable> param = new ListOfNamed<Variable>();
+  private ListOfNamed<FuncVariable> param = new ListOfNamed<FuncVariable>();
   private Set<FuncAttr> attributes = new HashSet<FuncAttr>();
 
-  public FunctionBase(ElementInfo info, String name, ListOfNamed<Variable> param) {
+  public FunctionBase(ElementInfo info, String name, ListOfNamed<FuncVariable> param) {
     super(info);
     assert (name != null);
     this.name = name;
@@ -36,7 +36,7 @@ abstract public class FunctionBase extends EvlBase implements FunctionHeader {
   }
 
   @Override
-  public ListOfNamed<Variable> getParam() {
+  public ListOfNamed<FuncVariable> getParam() {
     return param;
   }
 

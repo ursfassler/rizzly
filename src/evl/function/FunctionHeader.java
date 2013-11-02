@@ -2,9 +2,9 @@ package evl.function;
 
 import evl.other.ListOfNamed;
 import evl.other.Named;
-import evl.variable.Variable;
+import evl.variable.FuncVariable;
 
 public interface FunctionHeader extends Named {
-  public ListOfNamed<Variable> getParam();
+  public ListOfNamed<FuncVariable> getParam();
 
 }

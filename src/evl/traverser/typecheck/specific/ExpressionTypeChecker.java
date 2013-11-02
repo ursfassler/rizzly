@@ -17,14 +17,18 @@ import evl.expression.Expression;
 import evl.expression.Number;
 import evl.expression.RangeValue;
 import evl.expression.StringValue;
-import evl.expression.binop.And;
+import evl.expression.TypeCast;
 import evl.expression.binop.BinaryExp;
+import evl.expression.binop.BitAnd;
+import evl.expression.binop.BitOr;
 import evl.expression.binop.Div;
 import evl.expression.binop.Equal;
 import evl.expression.binop.Greater;
 import evl.expression.binop.Greaterequal;
 import evl.expression.binop.Less;
 import evl.expression.binop.Lessequal;
+import evl.expression.binop.LogicAnd;
+import evl.expression.binop.LogicOr;
 import evl.expression.binop.Minus;
 import evl.expression.binop.Mod;
 import evl.expression.binop.Mul;
@@ -47,6 +51,8 @@ import evl.type.base.EnumType;
 import evl.type.base.RangeType;
 import evl.variable.Variable;
 
+//TODO use KnowType to get types of children
+//TODO do not give type back
 public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
 
   private KnowledgeBase kb;
@@ -92,7 +98,7 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
     return ret;
   }
 
-  private int getAsInt(BigInteger value, String text) {
+  public static int getAsInt(BigInteger value, String text) {
     if (value.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
       RError.err(ErrorType.Error, "value to big, needs to be smaller than " + Integer.MAX_VALUE + " in " + text);
     }
@@ -222,7 +228,7 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
   }
 
   @Override
-  protected Type visitAnd(And obj, Void param) {
+  protected Type visitBitAnd(BitAnd obj, Void param) {
     Type lhst = visit(obj.getLeft(), param);
     Type rhst = visit(obj.getRight(), param);
 
@@ -241,6 +247,30 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
       RError.err(ErrorType.Error, lhst.getInfo(), "Expected range or boolean type");
       return null;
     }
+  }
+
+  @Override
+  protected Type visitLogicAnd(LogicAnd obj, Void param) {
+    Type lhst = visit(obj.getLeft(), param);
+    Type rhst = visit(obj.getRight(), param);
+
+    if (!(lhst instanceof BooleanType)) {
+      RError.err(ErrorType.Error, lhst.getInfo(), "Expected boolean type at the left side");
+    }
+    if (!(rhst instanceof BooleanType)) {
+      RError.err(ErrorType.Error, rhst.getInfo(), "Expected boolean type at the right side");
+    }
+    return kbi.getBooleanType();
+  }
+
+  @Override
+  protected Type visitBitOr(BitOr obj, Void param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Type visitLogicOr(LogicOr obj, Void param) {
+    throw new RuntimeException("not yet implemented");
   }
 
   @Override
@@ -347,6 +377,12 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
   }
 
   @Override
+  protected Type visitTypeCast(TypeCast obj, Void param) {
+    visit(obj.getValue(), param);
+    return obj.getCast().getRef();
+  }
+
+  @Override
   protected Type visitNumber(Number obj, Void param) {
     BigInteger value = obj.getValue();
     return kbi.getNumsetType(new Range(value, value));
@@ -384,4 +420,5 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
   protected Type visitTypeRef(TypeRef obj, Void param) {
     return obj.getRef();
   }
+
 }

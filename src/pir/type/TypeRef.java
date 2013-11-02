@@ -1,9 +1,8 @@
 package pir.type;
 
 import pir.PirObject;
-import pir.expression.reference.Reference;
 
-final public class TypeRef extends PirObject implements Reference<Type> {
+final public class TypeRef extends PirObject {
   private Type ref;
 
   public TypeRef(Type ref) {
@@ -11,12 +10,10 @@ final public class TypeRef extends PirObject implements Reference<Type> {
     this.ref = ref;
   }
 
-  @Override
   public Type getRef() {
     return ref;
   }
 
-  @Override
   public void setRef(Type ref) {
     this.ref = ref;
   }

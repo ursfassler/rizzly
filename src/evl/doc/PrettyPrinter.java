@@ -2,11 +2,7 @@ package evl.doc;
 
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import common.Direction;
@@ -16,18 +12,16 @@ import error.RError;
 import evl.Evl;
 import evl.EvlBase;
 import evl.NullTraverser;
-import evl.cfg.BasicBlock;
-import evl.cfg.BasicBlockList;
 import evl.composition.Connection;
 import evl.composition.EndpointSelf;
 import evl.composition.EndpointSub;
 import evl.composition.ImplComposition;
 import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
-import evl.expression.Expression;
 import evl.expression.Number;
 import evl.expression.RangeValue;
 import evl.expression.StringValue;
+import evl.expression.TypeCast;
 import evl.expression.binop.And;
 import evl.expression.binop.BinaryExp;
 import evl.expression.binop.Div;
@@ -70,25 +64,19 @@ import evl.other.Named;
 import evl.other.NamedList;
 import evl.other.Namespace;
 import evl.other.RizzlyProgram;
-import evl.statement.bbend.CaseGoto;
-import evl.statement.bbend.CaseGotoOpt;
-import evl.statement.bbend.CaseOptRange;
-import evl.statement.bbend.CaseOptValue;
-import evl.statement.bbend.Goto;
-import evl.statement.bbend.IfGoto;
-import evl.statement.bbend.ReturnExpr;
-import evl.statement.bbend.ReturnVoid;
-import evl.statement.bbend.Unreachable;
-import evl.statement.normal.Assignment;
-import evl.statement.normal.CallStmt;
-import evl.statement.normal.GetElementPtr;
-import evl.statement.normal.LoadStmt;
-import evl.statement.normal.StackMemoryAlloc;
-import evl.statement.normal.StoreStmt;
-import evl.statement.normal.TypeCast;
-import evl.statement.normal.VarDefInitStmt;
-import evl.statement.normal.VarDefStmt;
-import evl.statement.phi.PhiStmt;
+import evl.statement.Assignment;
+import evl.statement.Block;
+import evl.statement.CallStmt;
+import evl.statement.CaseOpt;
+import evl.statement.CaseOptRange;
+import evl.statement.CaseOptValue;
+import evl.statement.CaseStmt;
+import evl.statement.IfOption;
+import evl.statement.IfStmt;
+import evl.statement.ReturnExpr;
+import evl.statement.ReturnVoid;
+import evl.statement.VarDefStmt;
+import evl.statement.While;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
@@ -107,7 +95,6 @@ import evl.type.special.PointerType;
 import evl.type.special.VoidType;
 import evl.variable.Constant;
 import evl.variable.FuncVariable;
-import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
 
@@ -564,34 +551,10 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   // ---- Statement -----------------------------------------------------------
-  @Override
-  protected Void visitGetElementPtr(GetElementPtr obj, StreamWriter param) {
-    visit(obj.getVariable(), param);
-    param.wr(" := getElementPtr ");
-    visit(obj.getAddress(), param);
-    param.wr(";");
-    param.nl();
-    return null;
-  }
 
   @Override
-  protected Void visitLoadStmt(LoadStmt obj, StreamWriter param) {
-    visit(obj.getVariable(), param);
-    param.wr(" <= load ");
-    visit(obj.getAddress(), param);
-    param.wr(";");
-    param.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitStoreStmt(StoreStmt obj, StreamWriter param) {
-    param.wr("store ");
-    visit(obj.getAddress(), param);
-    param.wr(" <= ");
-    visit(obj.getExpr(), param);
-    param.wr(";");
-    param.nl();
+  protected Void visitBlock(Block obj, StreamWriter param) {
+    visitList(obj.getStatements(), param);
     return null;
   }
 
@@ -606,29 +569,8 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitStackMemoryAlloc(StackMemoryAlloc obj, StreamWriter param) {
-    visit(obj.getVariable(), param);
-    param.wr(" := ");
-    param.wr("alloca( ");
-    param.wr(obj.getType().getName());
-    param.wr(" );");
-    param.nl();
-    return null;
-  }
-
-  @Override
   protected Void visitVarDef(VarDefStmt obj, StreamWriter param) {
     visit(obj.getVariable(), param);
-    param.wr(";");
-    param.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitVarDefInitStmt(VarDefInitStmt obj, StreamWriter param) {
-    visit(obj.getVariable(), param);
-    param.wr(" = ");
-    visit(obj.getInit(), param);
     param.wr(";");
     param.nl();
     return null;
@@ -638,13 +580,6 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   protected Void visitCallStmt(CallStmt obj, StreamWriter param) {
     visit(obj.getCall(), param);
     param.wr(";");
-    param.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitUnreachable(Unreachable obj, StreamWriter param) {
-    param.wr("unreachable");
     param.nl();
     return null;
   }
@@ -661,6 +596,87 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitReturnVoid(ReturnVoid obj, StreamWriter param) {
     param.wr("return;");
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitWhile(While obj, StreamWriter param) {
+    param.wr("while ");
+    visit(obj.getCondition(), param);
+    param.wr(" do");
+    param.nl();
+    param.incIndent();
+    visit(obj.getBody(), param);
+    param.decIndent();
+    param.wr("end");
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitIfStmt(IfStmt obj, StreamWriter param) {
+    assert (!obj.getOption().isEmpty());
+
+    boolean first = true;
+    for (IfOption itr : obj.getOption()) {
+      if (first) {
+        param.wr("if ");
+        first = false;
+      } else {
+        param.wr("ef ");
+      }
+      visit(itr.getCondition(), param);
+      param.wr(" then");
+      param.nl();
+      param.incIndent();
+      visit(itr.getCode(), param);
+      param.decIndent();
+    }
+
+    param.wr("else");
+    param.nl();
+    param.incIndent();
+    visit(obj.getDefblock(), param);
+    param.decIndent();
+    param.wr("end");
+    param.nl();
+
+    return null;
+  }
+
+  @Override
+  protected Void visitCaseStmt(CaseStmt obj, StreamWriter param) {
+    param.wr("case ");
+    visit(obj.getCondition(), param);
+    param.wr(" of");
+    param.nl();
+    param.incIndent();
+    visitItr(obj.getOption(), param);
+    if (!obj.getOtherwise().getStatements().isEmpty()) {
+      param.wr("else");
+      param.nl();
+      param.incIndent();
+      visit(obj.getOtherwise(), param);
+      param.decIndent();
+      param.wr("end");
+      param.nl();
+    }
+    param.decIndent();
+    param.wr("end");
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitCaseOpt(CaseOpt obj, StreamWriter param) {
+    list(obj.getValue(), ",", param);
+    param.wr(":");
+    param.nl();
+    param.incIndent();
+    visit(obj.getCode(), param);
+    param.decIndent();
+    param.wr("end");
     param.nl();
     return null;
   }
@@ -850,11 +866,6 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitSsaVariable(SsaVariable obj, StreamWriter param) {
-    return null;
-  }
-
-  @Override
   protected Void visitStateVariable(StateVariable obj, StreamWriter param) {
     param.wr(";");
     param.nl();
@@ -1033,128 +1044,12 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitBasicBlock(BasicBlock obj, StreamWriter param) {
-    param.wr(obj.toString());
-    param.nl();
-    param.incIndent();
-    visitItr(obj.getPhi(), param);
-    param.wr("--");
-    param.nl();
-    visitItr(obj.getCode(), param);
-    param.wr("--");
-    param.nl();
-    visit(obj.getEnd(), param);
-    param.decIndent();
-    param.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitGoto(Goto obj, StreamWriter param) {
-    param.wr("goto ");
-    param.wr(obj.getTarget().toString());
-    param.wr(";");
-    param.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitIfGoto(IfGoto obj, StreamWriter param) {
-    param.wr("if ");
-    visit(obj.getCondition(), param);
-    param.nl();
-    param.incIndent();
-    param.wr("then goto ");
-    param.wr(obj.getThenBlock().toString());
-    param.nl();
-    param.wr("else goto ");
-    param.wr(obj.getElseBlock().toString());
-    param.nl();
-    param.decIndent();
-    return null;
-  }
-
-  @Override
-  protected Void visitCaseGoto(CaseGoto obj, StreamWriter param) {
-    param.wr("case ");
-    visit(obj.getCondition(), param);
-    param.wr(" of");
-    param.nl();
-
-    param.incIndent();
-    visitItr(obj.getOption(), param);
-
-    param.wr("else goto ");
-    param.wr(obj.getOtherwise().toString());
-    param.nl();
-
-    param.decIndent();
-    param.wr("end");
-    param.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitCaseGotoOpt(CaseGotoOpt obj, StreamWriter param) {
-    list(obj.getValue(), ",", param);
-    param.wr(": goto ");
-    param.wr(obj.getDst().toString());
-    param.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitBasicBlockList(BasicBlockList obj, StreamWriter param) {
-    visit(obj.getEntry(), param);
-    visit(obj.getExit(), param);
-    LinkedList<BasicBlock> bbs = new LinkedList<BasicBlock>(obj.getBasicBlocks());
-    Collections.sort(bbs, new Comparator<BasicBlock>() {
-
-      @Override
-      public int compare(BasicBlock o1, BasicBlock o2) {
-        return o1.getName().compareTo(o2.getName());
-      }
-    });
-    visitItr(bbs, param);
-    return null;
-  }
-
-  @Override
-  protected Void visitPhiStmt(PhiStmt obj, StreamWriter param) {
-    visit(obj.getVariable(), param);
-    param.wr(" = phi(");
-    ArrayList<BasicBlock> args = new ArrayList<BasicBlock>(obj.getInBB());
-    Collections.sort(args, new Comparator<BasicBlock>() {
-
-      @Override
-      public int compare(BasicBlock arg0, BasicBlock arg1) {
-        return arg0.getName().compareTo(arg1.getName()); // TODO correct phi arg ordering?
-      }
-    });
-    for (int i = 0; i < args.size(); i++) {
-      if (i > 0) {
-        param.wr(",");
-      }
-      BasicBlock bb = args.get(i);
-      Expression var = obj.getArg(bb);
-      param.wr(bb.toString());
-      param.wr(":");
-      visit(var, param);
-    }
-    param.wr(");");
-    param.nl();
-    return null;
-  }
-
-  @Override
   protected Void visitTypeCast(TypeCast obj, StreamWriter param) {
-    visit(obj.getVariable(), param);
-    param.wr(" = cast{");
     visit(obj.getCast(), param);
-    param.wr("}(");
+    param.wr("(");
     visit(obj.getValue(), param);
-    param.wr(");");
-    param.nl();
+    param.wr(")");
     return null;
   }
+
 }

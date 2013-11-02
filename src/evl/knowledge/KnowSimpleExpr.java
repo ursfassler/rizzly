@@ -25,11 +25,10 @@ import evl.type.special.NaturalType;
 import evl.type.special.PointerType;
 import evl.variable.ConstGlobal;
 import evl.variable.FuncVariable;
-import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
 
 /**
- *
+ * 
  * @author urs
  */
 public class KnowSimpleExpr {
@@ -50,8 +49,8 @@ class SimpleGetter extends NullTraverser<Boolean, Void> {
 
   @Override
   protected Boolean visitItr(Iterable<? extends Evl> list, Void param) {
-    for( Evl ast : list ) {
-      if( !visit(ast, param) ){
+    for (Evl ast : list) {
+      if (!visit(ast, param)) {
         return false;
       }
     }
@@ -60,7 +59,7 @@ class SimpleGetter extends NullTraverser<Boolean, Void> {
 
   @Override
   protected Boolean visitReference(Reference obj, Void param) {
-    boolean ret = visit(obj.getLink(),param) & visitItr(obj.getOffset(),param);
+    boolean ret = visit(obj.getLink(), param) & visitItr(obj.getOffset(), param);
     return ret;
   }
 
@@ -113,7 +112,7 @@ class SimpleGetter extends NullTraverser<Boolean, Void> {
   protected Boolean visitEnumElement(EnumElement obj, Void param) {
     return true;
   }
-  
+
   @Override
   protected Boolean visitRecordType(RecordType obj, Void param) {
     return false;
@@ -131,18 +130,13 @@ class SimpleGetter extends NullTraverser<Boolean, Void> {
 
   @Override
   protected Boolean visitConstGlobal(ConstGlobal obj, Void param) {
-    return visit(obj.getType(),param);  //TODO ok?
+    return visit(obj.getType(), param); // TODO ok?
   }
 
   @Override
   protected Boolean visitFuncVariable(FuncVariable obj, Void param) {
     return true;
-//    return visit(obj.getType(),param);
-  }
-
-  @Override
-  protected Boolean visitSsaVariable(SsaVariable obj, Void param) {
-    return true;
+    // return visit(obj.getType(),param);
   }
 
   @Override
@@ -179,6 +173,5 @@ class SimpleGetter extends NullTraverser<Boolean, Void> {
   protected Boolean visitFunctionBase(FunctionBase obj, Void param) {
     return false;
   }
-  
-  
+
 }

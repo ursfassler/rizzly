@@ -1,7 +1,5 @@
 package evl;
 
-import evl.cfg.BasicBlock;
-import evl.cfg.BasicBlockList;
 import evl.composition.Connection;
 import evl.composition.EndpointSelf;
 import evl.composition.EndpointSub;
@@ -11,13 +9,18 @@ import evl.expression.BoolValue;
 import evl.expression.Number;
 import evl.expression.RangeValue;
 import evl.expression.StringValue;
+import evl.expression.TypeCast;
 import evl.expression.binop.And;
+import evl.expression.binop.BitAnd;
+import evl.expression.binop.BitOr;
 import evl.expression.binop.Div;
 import evl.expression.binop.Equal;
 import evl.expression.binop.Greater;
 import evl.expression.binop.Greaterequal;
 import evl.expression.binop.Less;
 import evl.expression.binop.Lessequal;
+import evl.expression.binop.LogicAnd;
+import evl.expression.binop.LogicOr;
 import evl.expression.binop.Minus;
 import evl.expression.binop.Mod;
 import evl.expression.binop.Mul;
@@ -56,25 +59,19 @@ import evl.other.Named;
 import evl.other.NamedList;
 import evl.other.Namespace;
 import evl.other.RizzlyProgram;
-import evl.statement.bbend.CaseGoto;
-import evl.statement.bbend.CaseGotoOpt;
-import evl.statement.bbend.CaseOptRange;
-import evl.statement.bbend.CaseOptValue;
-import evl.statement.bbend.Goto;
-import evl.statement.bbend.IfGoto;
-import evl.statement.bbend.ReturnExpr;
-import evl.statement.bbend.ReturnVoid;
-import evl.statement.bbend.Unreachable;
-import evl.statement.normal.Assignment;
-import evl.statement.normal.CallStmt;
-import evl.statement.normal.GetElementPtr;
-import evl.statement.normal.LoadStmt;
-import evl.statement.normal.StackMemoryAlloc;
-import evl.statement.normal.StoreStmt;
-import evl.statement.normal.TypeCast;
-import evl.statement.normal.VarDefInitStmt;
-import evl.statement.normal.VarDefStmt;
-import evl.statement.phi.PhiStmt;
+import evl.statement.Assignment;
+import evl.statement.Block;
+import evl.statement.CallStmt;
+import evl.statement.CaseOpt;
+import evl.statement.CaseOptRange;
+import evl.statement.CaseOptValue;
+import evl.statement.CaseStmt;
+import evl.statement.IfOption;
+import evl.statement.IfStmt;
+import evl.statement.ReturnExpr;
+import evl.statement.ReturnVoid;
+import evl.statement.VarDefStmt;
+import evl.statement.While;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
@@ -98,12 +95,31 @@ import evl.type.special.VoidType;
 import evl.variable.ConstGlobal;
 import evl.variable.ConstPrivate;
 import evl.variable.FuncVariable;
-import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
 
 abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   abstract protected R visitDefault(Evl obj, P param);
+
+  @Override
+  protected R visitBitAnd(BitAnd obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitBitOr(BitOr obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitLogicOr(LogicOr obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitLogicAnd(LogicAnd obj, P param) {
+    return visitDefault(obj, param);
+  }
 
   @Override
   protected R visitArrayValue(ArrayValue obj, P param) {
@@ -196,31 +212,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitVarDef(VarDefStmt obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitCallStmt(CallStmt obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitAssignment(Assignment obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitReturnExpr(ReturnExpr obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitReturnVoid(ReturnVoid obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
   protected R visitNumber(Number obj, P param) {
     return visitDefault(obj, param);
   }
@@ -267,16 +258,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitIfaceUse(IfaceUse obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitCaseOptRange(CaseOptRange obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitCaseOptValue(CaseOptValue obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -411,72 +392,7 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitPhiStmt(PhiStmt obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitBasicBlockList(BasicBlockList obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitBasicBlock(BasicBlock obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitCaseGotoOpt(CaseGotoOpt obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitCaseGoto(CaseGoto obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitIfGoto(IfGoto obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitGoto(Goto obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitSsaVariable(SsaVariable obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitVarDefInitStmt(VarDefInitStmt obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitTypeCast(TypeCast obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
   protected R visitTypeRef(TypeRef obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitLoadStmt(LoadStmt obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitStoreStmt(StoreStmt obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitGetElementPtr(GetElementPtr obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -486,17 +402,7 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitStackMemoryAlloc(StackMemoryAlloc obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
   protected R visitUnionSelector(UnionSelector obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitUnreachable(Unreachable obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -597,6 +503,76 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitEnumDefRef(EnumDefRef obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitWhile(While obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitCaseStmt(CaseStmt obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitCaseOptRange(CaseOptRange obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitCaseOptValue(CaseOptValue obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitCaseOpt(CaseOpt obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitIfOption(IfOption obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitVarDef(VarDefStmt obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitIfStmt(IfStmt obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitCallStmt(CallStmt obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitAssignment(Assignment obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitReturnExpr(ReturnExpr obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitReturnVoid(ReturnVoid obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitBlock(Block obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitTypeCast(TypeCast obj, P param) {
     return visitDefault(obj, param);
   }
 

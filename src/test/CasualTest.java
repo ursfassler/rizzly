@@ -39,22 +39,13 @@ public class CasualTest extends BaseTest {
     compile("rec1", TestSteps.EXECUTE, false, false);
   }
 
-  //TODO pass composite types by reference to functions, bring this tests to work
+  // TODO pass composite types by reference to functions, bring this tests to work
   /*
-  @Test
-  public void rec2() {
-  compile("rec2", TestSteps.EXECUTE, false, false);
-  }
-  
-  @Test
-  public void rec3() {
-  compile("rec3", TestSteps.EXECUTE, false, false);
-  }
-  
-  @Test
-  public void while_() {
-  compile("while", TestSteps.EXECUTE, false, true);
-  }
+   * @Test public void rec2() { compile("rec2", TestSteps.EXECUTE, false, false); }
+   * 
+   * @Test public void rec3() { compile("rec3", TestSteps.EXECUTE, false, false); }
+   * 
+   * @Test public void while_() { compile("while", TestSteps.EXECUTE, false, true); }
    */
   @Test
   public void range() {
@@ -88,7 +79,7 @@ public class CasualTest extends BaseTest {
 
   @Test
   public void while2() {
-    compile("while2", TestSteps.EXECUTE, false, false);   //TODO this may be an llvm bug (or a missunderstanding)
+    compile("while2", TestSteps.EXECUTE, false, false);
   }
 
   @Test
@@ -101,7 +92,7 @@ public class CasualTest extends BaseTest {
     compile("calcCase", TestSteps.EXECUTE, false, false);
   }
 
-  //TODO add type check/conversation to C interface
+  // TODO add type check/conversation to C interface
   @Test
   public void elemInit() {
     compile("elemInit", TestSteps.EXECUTE, false, false);
@@ -204,7 +195,7 @@ public class CasualTest extends BaseTest {
 
   @Test
   public void union1() {
-    compile("union1", TestSteps.COMPILE_TO_ASM, false, false);//TODO make testcase
+    compile("union1", TestSteps.COMPILE_TO_ASM, false, false);// TODO make testcase
   }
 
   @Test
@@ -229,7 +220,7 @@ public class CasualTest extends BaseTest {
 
   @Test
   public void unionTest_UnionTest() {
-    compile("unionTest", TestSteps.COMPILE_TO_ASM, false, false);  //TODO make testcase
+    compile("unionTest", TestSteps.COMPILE_TO_ASM, false, false); // TODO make testcase
   }
 
   @Test
@@ -254,7 +245,7 @@ public class CasualTest extends BaseTest {
 
   @Test
   public void ui() {
-    compile("ui", TestSteps.COMPILE_TO_ASM, false, false); //TODO make real testcase
+    compile("ui", TestSteps.COMPILE_TO_ASM, false, false); // TODO make real testcase
   }
 
   @Test
@@ -266,12 +257,12 @@ public class CasualTest extends BaseTest {
   public void compositionQuery() {
     compile("compositionQuery", TestSteps.EXECUTE, false, true);
   }
-  
+
   @Test
   public void param() {
-    compile("param",TestSteps.COMPILE_TO_LLVM, false, false);
+    compile("param", TestSteps.COMPILE_TO_LLVM, false, false);
   }
-  
+
   @Test
   public void emptyElse() {
     compile("emptyElse", TestSteps.COMPILE_TO_LLVM, false, false);
@@ -326,7 +317,7 @@ public class CasualTest extends BaseTest {
   public void locvar() {
     compile("locvar", "Locvar", true, false, true);
   }
-  
+
   // check:
   @Test
   public void expr_Expr() {

@@ -3,18 +3,16 @@ package evl.traverser;
 import java.util.ArrayList;
 import java.util.List;
 
-import common.Designator;
 import common.ElementInfo;
 import common.NameFactory;
 
 import evl.Evl;
 import evl.NullTraverser;
-import evl.cfg.BasicBlock;
-import evl.cfg.BasicBlockList;
 import evl.composition.ImplComposition;
 import evl.expression.BoolValue;
 import evl.expression.Expression;
 import evl.expression.Number;
+import evl.expression.TypeCast;
 import evl.expression.binop.BinaryExp;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
@@ -25,32 +23,29 @@ import evl.function.FuncWithBody;
 import evl.function.FunctionBase;
 import evl.knowledge.KnowPath;
 import evl.knowledge.KnowSimpleExpr;
+import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
 import evl.other.ImplElementary;
 import evl.other.Named;
 import evl.other.NamedList;
 import evl.other.Namespace;
-import evl.statement.bbend.CaseGoto;
-import evl.statement.bbend.Goto;
-import evl.statement.bbend.IfGoto;
-import evl.statement.bbend.ReturnExpr;
-import evl.statement.bbend.ReturnVoid;
-import evl.statement.bbend.Unreachable;
-import evl.statement.normal.Assignment;
-import evl.statement.normal.CallStmt;
-import evl.statement.normal.GetElementPtr;
-import evl.statement.normal.LoadStmt;
-import evl.statement.normal.NormalStmt;
-import evl.statement.normal.StackMemoryAlloc;
-import evl.statement.normal.StoreStmt;
-import evl.statement.normal.TypeCast;
-import evl.statement.normal.VarDefInitStmt;
-import evl.statement.normal.VarDefStmt;
-import evl.traverser.typecheck.specific.ExpressionTypeChecker;
+import evl.statement.Assignment;
+import evl.statement.Block;
+import evl.statement.CallStmt;
+import evl.statement.CaseOpt;
+import evl.statement.CaseOptRange;
+import evl.statement.CaseOptValue;
+import evl.statement.CaseStmt;
+import evl.statement.IfOption;
+import evl.statement.IfStmt;
+import evl.statement.ReturnExpr;
+import evl.statement.ReturnVoid;
+import evl.statement.Statement;
+import evl.statement.VarDefStmt;
+import evl.statement.While;
 import evl.type.Type;
 import evl.type.TypeRef;
-import evl.type.base.RangeType;
-import evl.variable.SsaVariable;
+import evl.variable.FuncVariable;
 
 //TODO also split relation operands (only ref to var or constant)
 //TODO check if everything is still ok
@@ -84,7 +79,7 @@ public class ExprCutter extends NullTraverser<Void, Void> {
   protected Void visitItr(Iterable<? extends Evl> list, Void param) {
     // against comodification error
     ArrayList<Evl> old = new ArrayList<Evl>();
-    for( Evl itr : list ) {
+    for (Evl itr : list) {
       old.add(itr);
     }
     return super.visitItr(old, param);
@@ -104,17 +99,15 @@ public class ExprCutter extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitFunctionBase(FunctionBase obj, Void param) {
-    if( obj instanceof FuncWithBody ) {
-      visit(( (FuncWithBody) obj ).getBody(), null);
+    if (obj instanceof FuncWithBody) {
+      visit(((FuncWithBody) obj).getBody(), null);
     }
     return null;
   }
 
   @Override
-  protected Void visitBasicBlockList(BasicBlockList obj, Void param) {
-    for( BasicBlock bb : obj.getAllBbs() ) {
-      st.traverse(bb, null);
-    }
+  protected Void visitBlock(Block obj, Void param) {
+    st.traverse(obj, null);
     return null;
   }
 
@@ -132,7 +125,7 @@ public class ExprCutter extends NullTraverser<Void, Void> {
   }
 }
 
-class StmtTraverser extends NullTraverser<Void, List<NormalStmt>> {
+class StmtTraverser extends NullTraverser<Void, List<Statement>> {
 
   private KnowledgeBase kb;
   private Cutter cutter;
@@ -145,43 +138,39 @@ class StmtTraverser extends NullTraverser<Void, List<NormalStmt>> {
   }
 
   @Override
-  protected Void visitDefault(Evl obj, List<NormalStmt> param) {
+  protected Void visitDefault(Evl obj, List<Statement> param) {
     throw new UnsupportedOperationException("Not supported yet: " + obj.getClass().getCanonicalName());
   }
 
   @Override
-  protected Void visitBasicBlock(BasicBlock obj, List<NormalStmt> param) {
-    // we do not check Phi statements since they can only reference variables
-
-    List<NormalStmt> sl = new ArrayList<NormalStmt>();
-    for( NormalStmt stmt : obj.getCode() ) {
-      visit(stmt, sl);
-      sl.add(stmt);
+  protected Void visitBlock(Block obj, List<Statement> param) {
+    List<Statement> list = new ArrayList<Statement>();
+    for (Statement stmt : obj.getStatements()) {
+      visit(stmt, list);
+      assert (!list.contains(stmt));
+      list.add(stmt);
     }
-    visit(obj.getEnd(), sl);
-
-    obj.getCode().clear();
-    obj.getCode().addAll(sl);
-
+    obj.getStatements().clear();
+    obj.getStatements().addAll(list);
     return null;
   }
 
   @Override
-  protected Void visitCallStmt(CallStmt obj, List<NormalStmt> param) {
+  protected Void visitCallStmt(CallStmt obj, List<Statement> param) {
     obj.setCall((Reference) cutter.traverse(obj.getCall(), param));
     return null;
   }
 
   @Override
-  protected Void visitAssignment(Assignment obj, List<NormalStmt> param) {
+  protected Void visitAssignment(Assignment obj, List<Statement> param) {
     obj.setRight(cutter.traverse(obj.getRight(), param));
     visit(obj.getLeft(), param);
 
     boolean rs = KnowSimpleExpr.isSimple(obj.getRight());
     boolean ls = KnowSimpleExpr.isSimple(obj.getLeft());
 
-    if( !rs & !ls ) {
-      SsaVariable var = cutter.extract(obj.getRight(), param);
+    if (!rs & !ls) {
+      FuncVariable var = cutter.extract(obj.getRight(), param);
       obj.setRight(new Reference(new ElementInfo(), var));
     }
 
@@ -189,66 +178,36 @@ class StmtTraverser extends NullTraverser<Void, List<NormalStmt>> {
   }
 
   @Override
-  protected Void visitGetElementPtr(GetElementPtr obj, List<NormalStmt> param) {
-    obj.setAddress((Reference) cutter.traverse(obj.getAddress(), param));
-//    boolean ls = KnowSimpleExpr.isSimple(obj.getAddress());
-    return null;
-  }
-
-  @Override
-  protected Void visitLoadStmt(LoadStmt obj, List<NormalStmt> param) {
-    obj.setAddress((Reference) cutter.traverse(obj.getAddress(), param));
-    return null;
-  }
-
-  @Override
-  protected Void visitStoreStmt(StoreStmt obj, List<NormalStmt> param) {
-    obj.setAddress((Reference) cutter.traverse(obj.getAddress(), param));
-    Expression expr = cutter.traverse(obj.getExpr(), param);
-    if( !KnowSimpleExpr.isSimple(expr) ) {
-      SsaVariable var = cutter.extract(expr, param);
-      expr = new Reference(new ElementInfo(), var);
-    }
-    obj.setExpr(expr);
-    return null;
-  }
-
-  @Override
-  protected Void visitStackMemoryAlloc(StackMemoryAlloc obj, List<NormalStmt> param) {
-    return null;
-  }
-
-  @Override
-  protected Void visitTypeCast(TypeCast obj, List<NormalStmt> param) {
-    if( !KnowSimpleExpr.isSimple(obj.getValue()) ) {
-      SsaVariable var = cutter.extract(obj.getValue(), param);
+  protected Void visitTypeCast(TypeCast obj, List<Statement> param) {
+    if (!KnowSimpleExpr.isSimple(obj.getValue())) {
+      FuncVariable var = cutter.extract(obj.getValue(), param);
       obj.setValue(new Reference(obj.getInfo(), var));
     }
     return null;
   }
 
   @Override
-  protected Void visitReference(Reference obj, List<NormalStmt> param) {
+  protected Void visitReference(Reference obj, List<Statement> param) {
     visitItr(obj.getOffset(), param);
     return null;
   }
 
   @Override
-  protected Void visitRefIndex(RefIndex obj, List<NormalStmt> param) {
-    if( !KnowSimpleExpr.isSimple(obj.getIndex()) ) {
-      SsaVariable var = cutter.extract(obj.getIndex(), param);
+  protected Void visitRefIndex(RefIndex obj, List<Statement> param) {
+    if (!KnowSimpleExpr.isSimple(obj.getIndex())) {
+      FuncVariable var = cutter.extract(obj.getIndex(), param);
       obj.setIndex(new Reference(obj.getInfo(), var));
     }
     return null;
   }
 
   @Override
-  protected Void visitRefCall(RefCall obj, List<NormalStmt> param) {
+  protected Void visitRefCall(RefCall obj, List<Statement> param) {
     super.visitRefCall(obj, param);
-    for( int i = 0; i < obj.getActualParameter().size(); i++ ) {
+    for (int i = 0; i < obj.getActualParameter().size(); i++) {
       Expression expr = obj.getActualParameter().get(i);
-      if( cd.traverse(expr, null) ) {
-        SsaVariable var = cutter.extract(expr, param);
+      if (cd.traverse(expr, null)) {
+        FuncVariable var = cutter.extract(expr, param);
         obj.getActualParameter().set(i, new Reference(obj.getInfo(), var));
       }
     }
@@ -256,107 +215,124 @@ class StmtTraverser extends NullTraverser<Void, List<NormalStmt>> {
   }
 
   @Override
-  protected Void visitRefName(RefName obj, List<NormalStmt> param) {
+  protected Void visitRefName(RefName obj, List<Statement> param) {
     return null;
   }
 
   @Override
-  protected Void visitCaseGoto(CaseGoto obj, List<NormalStmt> param) {
-    if( !KnowSimpleExpr.isSimple(obj.getCondition()) ) {
-      SsaVariable var = cutter.extract(obj.getCondition(), param);
+  protected Void visitWhile(While obj, List<Statement> param) {
+    assert (false);
+    // FIXME the following code is wrong. If we extract code from the condition, it has to go into all incoming edges of
+    // the condition
+    // => also in the body of the loop
+    if (!KnowSimpleExpr.isSimple(obj.getCondition())) {
+      FuncVariable var = cutter.extract(obj.getCondition(), param);
       obj.setCondition(new Reference(obj.getInfo(), var));
-    } else {
+    }
+    visit(obj.getBody(), null);
+    return null;
+  }
+
+  @Override
+  protected Void visitIfStmt(IfStmt obj, List<Statement> param) {
+    for (IfOption opt : obj.getOption()) {
+      if (!KnowSimpleExpr.isSimple(opt.getCondition())) {
+        FuncVariable var = cutter.extract(opt.getCondition(), param);
+        opt.setCondition(new Reference(obj.getInfo(), var));
+      }
+    }
+    for (IfOption opt : obj.getOption()) {
+      visit(opt.getCode(), null);
     }
     return null;
   }
 
   @Override
-  protected Void visitIfGoto(IfGoto obj, List<NormalStmt> param) {
-    if( !KnowSimpleExpr.isSimple(obj.getCondition()) ) {
-      SsaVariable var = cutter.extract(obj.getCondition(), param);
+  protected Void visitCaseStmt(CaseStmt obj, List<Statement> param) {
+    if (!KnowSimpleExpr.isSimple(obj.getCondition())) {
+      FuncVariable var = cutter.extract(obj.getCondition(), param);
       obj.setCondition(new Reference(obj.getInfo(), var));
-    } else {
     }
+    for (CaseOpt opt : obj.getOption()) {
+      visitItr(opt.getValue(), param);
+      visit(opt.getCode(), null);
+    }
+    visit(obj.getOtherwise(), null);
     return null;
   }
 
   @Override
-  protected Void visitGoto(Goto obj, List<NormalStmt> param) {
+  protected Void visitCaseOptValue(CaseOptValue obj, List<Statement> param) {
+    assert (KnowSimpleExpr.isSimple(obj.getValue()));
     return null;
   }
 
   @Override
-  protected Void visitVarDef(VarDefStmt obj, List<NormalStmt> param) {
+  protected Void visitCaseOptRange(CaseOptRange obj, List<Statement> param) {
+    assert (KnowSimpleExpr.isSimple(obj.getStart()));
+    assert (KnowSimpleExpr.isSimple(obj.getEnd()));
     return null;
   }
 
   @Override
-  protected Void visitVarDefInitStmt(VarDefInitStmt obj, List<NormalStmt> param) {
-    obj.setInit(cutter.traverse(obj.getInit(), param));
+  protected Void visitVarDef(VarDefStmt obj, List<Statement> param) {
     return null;
   }
 
   @Override
-  protected Void visitReturnExpr(ReturnExpr obj, List<NormalStmt> param) {
+  protected Void visitReturnExpr(ReturnExpr obj, List<Statement> param) {
     obj.setExpr(cutter.traverse(obj.getExpr(), param));
     return null;
   }
 
   @Override
-  protected Void visitReturnVoid(ReturnVoid obj, List<NormalStmt> param) {
+  protected Void visitReturnVoid(ReturnVoid obj, List<Statement> param) {
     return null;
   }
 
-  @Override
-  protected Void visitUnreachable(Unreachable obj, List<NormalStmt> param) {
-    return null;
-  }
 }
 
-
-class Cutter extends ExprReplacer<List<NormalStmt>> {
+class Cutter extends ExprReplacer<List<Statement>> {
 
   private KnowledgeBase kb;
+  private KnowType kt;
   private CallDetector cd = new CallDetector();
 
   public Cutter(KnowledgeBase kb) {
     super();
     this.kb = kb;
+    kt = kb.getEntry(KnowType.class);
   }
 
   private Type getType(Expression obj) {
-    Type type = ExpressionTypeChecker.process(obj, kb);
+    Type type = kt.get(obj);
 
     KnowPath ka = kb.getEntry(KnowPath.class);
-    Designator path = ka.find(type);
-
-    if( path == null ) {
-      assert (type instanceof RangeType ); // should not be Unsigned (more like type != VoidType)
-      kb.getRoot().add(type);
-    }
+    assert (ka.find(type) != null);
 
     return type;
   }
 
-  SsaVariable extract(Expression obj, List<NormalStmt> param) {
+  FuncVariable extract(Expression obj, List<Statement> param) {
     ElementInfo info = obj.getInfo();
     Type type = getType(obj);
-    SsaVariable var = new SsaVariable(info, NameFactory.getNew(), new TypeRef(obj.getInfo(), type));
-    param.add(new VarDefInitStmt(info, var, obj));
+    FuncVariable var = new FuncVariable(info, NameFactory.getNew(), new TypeRef(obj.getInfo(), type));
+    param.add(new VarDefStmt(info, var));
+    param.add(new Assignment(info, new Reference(info, var), obj));
     return var;
   }
 
   @Override
-  protected Expression visitReference(Reference obj, List<NormalStmt> param) {
+  protected Expression visitReference(Reference obj, List<Statement> param) {
     List<RefItem> olist = new ArrayList<RefItem>(obj.getOffset());
     obj.getOffset().clear();
     Reference ret = obj;
-    for( int i = 0; i < olist.size(); i++ ) {
+    for (int i = 0; i < olist.size(); i++) {
       RefItem itr = olist.get(i);
       visit(itr, param);
       ret.getOffset().add(itr);
-      if( ( i < olist.size() - 1 ) && ( itr instanceof RefCall ) ) {
-        SsaVariable var = extract(ret, param);
+      if ((i < olist.size() - 1) && (itr instanceof RefCall)) {
+        FuncVariable var = extract(ret, param);
         ret = new Reference(itr.getInfo(), var);
       }
     }
@@ -364,22 +340,22 @@ class Cutter extends ExprReplacer<List<NormalStmt>> {
   }
 
   @Override
-  protected Expression visitRefIndex(RefIndex obj, List<NormalStmt> param) {
+  protected Expression visitRefIndex(RefIndex obj, List<Statement> param) {
     super.visitRefIndex(obj, param);
-    if( cd.traverse(obj.getIndex(), null) ) {
-      SsaVariable var = extract(obj.getIndex(), param);
+    if (cd.traverse(obj.getIndex(), null)) {
+      FuncVariable var = extract(obj.getIndex(), param);
       obj.setIndex(new Reference(obj.getInfo(), var));
     }
     return null;
   }
 
   @Override
-  protected Expression visitRefCall(RefCall obj, List<NormalStmt> param) {
+  protected Expression visitRefCall(RefCall obj, List<Statement> param) {
     super.visitRefCall(obj, param);
-    for( int i = 0; i < obj.getActualParameter().size(); i++ ) {
+    for (int i = 0; i < obj.getActualParameter().size(); i++) {
       Expression expr = obj.getActualParameter().get(i);
-      if( cd.traverse(expr, null) ) {
-        SsaVariable var = extract(expr, param);
+      if (cd.traverse(expr, null)) {
+        FuncVariable var = extract(expr, param);
         obj.getActualParameter().set(i, new Reference(obj.getInfo(), var));
       }
     }
@@ -387,16 +363,16 @@ class Cutter extends ExprReplacer<List<NormalStmt>> {
   }
 
   @Override
-  protected Expression visitRefName(RefName obj, List<NormalStmt> param) {
+  protected Expression visitRefName(RefName obj, List<Statement> param) {
     return super.visitRefName(obj, param);
   }
 
   @Override
-  protected Expression visitBinaryExp(BinaryExp obj, List<NormalStmt> param) {
+  protected Expression visitBinaryExp(BinaryExp obj, List<Statement> param) {
     obj.setLeft(visit(obj.getLeft(), param));
     obj.setRight(visit(obj.getRight(), param));
 
-    SsaVariable var = extract(obj, param);// TODO needed?
+    FuncVariable var = extract(obj, param);// TODO needed?
 
     return new Reference(obj.getInfo(), var);
   }
@@ -412,8 +388,8 @@ class CallDetector extends NullTraverser<Boolean, Void> {
 
   @Override
   protected Boolean visitReference(Reference obj, Void param) {
-    for( RefItem itr : obj.getOffset() ) {
-      if( visit(itr, null) ) {
+    for (RefItem itr : obj.getOffset()) {
+      if (visit(itr, null)) {
         return true;
       }
     }

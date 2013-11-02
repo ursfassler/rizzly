@@ -1,0 +1,385 @@
+package evl.knowledge;
+
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.List;
+
+import util.Range;
+
+import common.Designator;
+
+import error.ErrorType;
+import error.RError;
+import evl.Evl;
+import evl.NullTraverser;
+import evl.expression.Number;
+import evl.expression.binop.And;
+import evl.expression.binop.Div;
+import evl.expression.binop.LogicAnd;
+import evl.expression.binop.LogicOr;
+import evl.expression.binop.Minus;
+import evl.expression.binop.Mod;
+import evl.expression.binop.Mul;
+import evl.expression.binop.Or;
+import evl.expression.binop.Plus;
+import evl.expression.binop.Relation;
+import evl.expression.binop.Shl;
+import evl.expression.binop.Shr;
+import evl.expression.reference.RefCall;
+import evl.expression.reference.RefIndex;
+import evl.expression.reference.RefItem;
+import evl.expression.reference.RefName;
+import evl.expression.reference.RefPtrDeref;
+import evl.expression.reference.Reference;
+import evl.expression.unop.Not;
+import evl.function.FuncWithReturn;
+import evl.function.FunctionBase;
+import evl.traverser.typecheck.specific.ExpressionTypeChecker;
+import evl.type.Type;
+import evl.type.TypeRef;
+import evl.type.base.ArrayType;
+import evl.type.base.BooleanType;
+import evl.type.base.EnumType;
+import evl.type.base.FunctionType;
+import evl.type.base.FunctionTypeRet;
+import evl.type.base.FunctionTypeVoid;
+import evl.type.base.RangeType;
+import evl.type.composed.NamedElement;
+import evl.type.special.PointerType;
+import evl.variable.Variable;
+
+public class KnowType extends KnowledgeEntry {
+  private KnowTypeTraverser ktt;
+
+  @Override
+  public void init(KnowledgeBase base) {
+    ktt = new KnowTypeTraverser(base);
+  }
+
+  public Type get(Evl evl) {
+    return ktt.traverse(evl, null);
+  }
+
+}
+
+class KnowTypeTraverser extends NullTraverser<Type, Void> {
+  final private KnowBaseItem kbi;
+  final private RefTypeGetter rtg;
+
+  public KnowTypeTraverser(KnowledgeBase kb) {
+    super();
+    kbi = kb.getEntry(KnowBaseItem.class);
+    rtg = new RefTypeGetter(this, kb);
+  }
+
+  @Override
+  protected Type visitDefault(Evl obj, Void param) {
+    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+  }
+
+  @Override
+  protected Type visitFunctionBase(FunctionBase obj, Void param) {
+    List<TypeRef> arg = new ArrayList<TypeRef>();
+    for (Variable var : obj.getParam()) {
+      arg.add(var.getType().copy());
+    }
+    String name = "T" + Designator.NAME_SEP + obj.getName();
+    FunctionType ft;
+
+    if (obj instanceof FuncWithReturn) {
+      TypeRef ret = ((FuncWithReturn) obj).getRet().copy();
+      ft = new FunctionTypeRet(obj.getInfo(), name, arg, ret);
+    } else {
+      ft = new FunctionTypeVoid(obj.getInfo(), name, arg);
+    }
+
+    return ft;
+  }
+
+  @Override
+  protected Type visitNumber(Number obj, Void param) {
+    return kbi.getNumsetType(new Range(obj.getValue(), obj.getValue()));
+  }
+
+  @Override
+  protected Type visitNamedElement(NamedElement obj, Void param) {
+    return visit(obj.getType(),param);
+  }
+
+  @Override
+  protected Type visitReference(Reference obj, Void param) {
+    Type base = visit(obj.getLink(), param);
+    for (RefItem itm : obj.getOffset()) {
+      base = rtg.traverse(itm, base);
+    }
+    return base;
+  }
+
+  @Override
+  protected Type visitVariable(Variable obj, Void param) {
+    return visit(obj.getType(), param);
+  }
+
+  @Override
+  protected Type visitTypeRef(TypeRef obj, Void param) {
+    return visit(obj.getRef(), param);
+  }
+
+  @Override
+  protected Type visitType(Type obj, Void param) {
+    return obj;
+  }
+
+  @Override
+  protected Type visitRelation(Relation obj, Void param) {
+    return kbi.getBooleanType();
+  }
+
+  @Override
+  protected Type visitShl(Shl obj, Void param) {
+    Type lhs = visit(obj.getLeft(), param);
+    Type rhs = visit(obj.getRight(), param);
+
+    assert (lhs instanceof RangeType);
+    assert (rhs instanceof RangeType);
+
+    Range lr = ((RangeType) lhs).getNumbers();
+    Range rr = ((RangeType) rhs).getNumbers();
+
+    BigInteger high = lr.getHigh().shiftLeft(ExpressionTypeChecker.getAsInt(rr.getHigh(), "shl"));
+    BigInteger low = lr.getLow().shiftLeft(ExpressionTypeChecker.getAsInt(rr.getLow(), "shl"));
+
+    return kbi.getNumsetType(new Range(low, high));
+  }
+
+  @Override
+  protected Type visitShr(Shr obj, Void param) {
+    Type lhs = visit(obj.getLeft(), param);
+    Type rhs = visit(obj.getRight(), param);
+
+    assert (lhs instanceof RangeType);
+    assert (rhs instanceof RangeType);
+
+    Range lr = ((RangeType) lhs).getNumbers();
+    Range rr = ((RangeType) rhs).getNumbers();
+
+    BigInteger high = lr.getHigh().shiftRight(ExpressionTypeChecker.getAsInt(rr.getHigh(), "shl"));
+    BigInteger low = lr.getLow().shiftRight(ExpressionTypeChecker.getAsInt(rr.getLow(), "shl"));
+
+    return kbi.getNumsetType(new Range(low, high));
+  }
+
+  @Override
+  protected Type visitPlus(Plus obj, Void param) {
+    Type lhs = visit(obj.getLeft(), param);
+    Type rhs = visit(obj.getRight(), param);
+
+    assert (lhs instanceof RangeType);
+    assert (rhs instanceof RangeType);
+
+    Range lr = ((RangeType) lhs).getNumbers();
+    Range rr = ((RangeType) rhs).getNumbers();
+
+    BigInteger low = lr.getLow().add(rr.getLow());
+    BigInteger high = lr.getHigh().add(rr.getHigh());
+
+    return kbi.getNumsetType(new Range(low, high));
+  }
+
+  @Override
+  protected Type visitMinus(Minus obj, Void param) {
+    Type lhs = visit(obj.getLeft(), param);
+    Type rhs = visit(obj.getRight(), param);
+
+    assert (lhs instanceof RangeType);
+    assert (rhs instanceof RangeType);
+
+    Range lr = ((RangeType) lhs).getNumbers();
+    Range rr = ((RangeType) rhs).getNumbers();
+
+    BigInteger low = lr.getLow().subtract(rr.getHigh());
+    BigInteger high = lr.getHigh().subtract(rr.getLow());
+
+    return kbi.getNumsetType(new Range(low, high));
+
+  }
+
+  @Override
+  protected Type visitLogicOr(LogicOr obj, Void param) {
+    return kbi.getBooleanType();
+  }
+
+  @Override
+  protected Type visitLogicAnd(LogicAnd obj, Void param) {
+    return kbi.getBooleanType();
+  }
+
+  @Override
+  protected Type visitOr(Or obj, Void param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Type visitAnd(And obj, Void param) {
+    Type lhst = visit(obj.getLeft(), param);
+    Type rhst = visit(obj.getRight(), param);
+
+    if (lhst instanceof RangeType) {
+      assert (rhst instanceof RangeType);
+      Range lhs = ((RangeType) lhst).getNumbers();
+      Range rhs = ((RangeType) rhst).getNumbers();
+      BigInteger high = lhs.getHigh().min(rhs.getHigh()); // TODO ok?
+      return kbi.getNumsetType(new Range(BigInteger.ZERO, high));
+    } else if (lhst instanceof BooleanType) {
+      assert (rhst instanceof BooleanType);
+      return lhst;
+    } else {
+      RError.err(ErrorType.Error, lhst.getInfo(), "Expected range or boolean type");
+      return null;
+    }
+  }
+
+  @Override
+  protected Type visitMod(Mod obj, Void param) {
+    Type lhs = visit(obj.getLeft(), param);
+    Type rhs = visit(obj.getRight(), param);
+
+    assert (lhs instanceof RangeType);
+    assert (rhs instanceof RangeType);
+
+    Range lr = ((RangeType) lhs).getNumbers();
+    Range rr = ((RangeType) rhs).getNumbers();
+
+    assert (lr.getLow().compareTo(BigInteger.ZERO) >= 0); // TODO implement mod correctly for negative numbers
+    assert (rr.getLow().compareTo(BigInteger.ZERO) > 0);
+
+    BigInteger low = BigInteger.ZERO;
+    BigInteger high = lr.getHigh().min(rr.getHigh().subtract(BigInteger.ONE));
+
+    return kbi.getNumsetType(new Range(low, high));
+  }
+
+  @Override
+  protected Type visitMul(Mul obj, Void param) {
+    Type lhs = visit(obj.getLeft(), param);
+    Type rhs = visit(obj.getRight(), param);
+
+    assert (lhs instanceof RangeType);
+    assert (rhs instanceof RangeType);
+
+    Range lr = ((RangeType) lhs).getNumbers();
+    Range rr = ((RangeType) rhs).getNumbers();
+
+    // FIXME correct when values are negative?
+
+    BigInteger low = lr.getLow().multiply(rr.getLow());
+    BigInteger high = lr.getHigh().multiply(rr.getHigh());
+
+    return kbi.getNumsetType(new Range(low, high));
+  }
+
+  @Override
+  protected Type visitDiv(Div obj, Void param) {
+    Type lhs = visit(obj.getLeft(), param);
+    Type rhs = visit(obj.getRight(), param);
+
+    assert (lhs instanceof RangeType);
+    assert (rhs instanceof RangeType);
+
+    Range lr = ((RangeType) lhs).getNumbers();
+    Range rr = ((RangeType) rhs).getNumbers();
+    
+    if ((lr.getLow().compareTo(BigInteger.ZERO) < 0) || (rr.getLow().compareTo(BigInteger.ZERO) < 0)) {
+      RError.err(ErrorType.Fatal, obj.getInfo(), "sorry, I am too lazy to check for negative numbers");
+    }
+
+    BigInteger low = lr.getLow().divide(rr.getHigh());
+    BigInteger high = lr.getHigh().divide(rr.getLow());
+
+    return kbi.getNumsetType(new Range(low, high));
+  }
+
+  @Override
+  protected Type visitNot(Not obj, Void param) {
+    return kbi.getBooleanType();  //FIXME what with invert?
+  }
+
+}
+
+class RefTypeGetter extends NullTraverser<Type, Type> {
+  private KnowledgeBase kb;
+  private KnowBaseItem kbi;
+  private KnowTypeTraverser kt;
+
+  public RefTypeGetter(KnowTypeTraverser kt, KnowledgeBase kb) {
+    super();
+    this.kt = kt;
+    this.kb = kb;
+    kbi = kb.getEntry(KnowBaseItem.class);
+  }
+
+  @Override
+  protected Type visitDefault(Evl obj, Type param) {
+    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+  }
+
+  @Override
+  protected Type visitTypeRef(TypeRef obj, Type param) {
+    return obj.getRef();
+  }
+
+  @Override
+  protected Type visitReference(Reference obj, Type param) {
+    Type ret = kt.traverse(obj.getLink(), null);
+    for (RefItem ref : obj.getOffset()) {
+      ret = visit(ref, ret);
+      assert (ret != null);
+    }
+    return ret;
+  }
+
+  @Override
+  protected Type visitRefCall(RefCall obj, Type sub) {
+    if (sub instanceof FunctionType) {
+      if (sub instanceof FunctionTypeRet) {
+        return visit(((FunctionTypeRet) sub).getRet(), null);
+      } else {
+        return kbi.getVoidType();
+      }
+    } else {
+      RError.err(ErrorType.Error, obj.getInfo(), "Not a function: " + obj.toString());
+      return null;
+    }
+  }
+
+  @Override
+  protected Type visitRefName(RefName obj, Type sub) {
+    if (sub instanceof EnumType) {
+      return sub;
+    } else {
+      KnowChild kc = kb.getEntry(KnowChild.class);
+      Evl etype = kc.find(sub, obj.getName());
+      if (etype == null) {
+        RError.err(ErrorType.Error, obj.getInfo(), "Child not found: " + obj.getName());
+      }
+      return kt.traverse(etype, null);
+    }
+  }
+
+  @Override
+  protected Type visitRefIndex(RefIndex obj, Type sub) {
+    if (sub instanceof ArrayType) {
+      return visit(((ArrayType) sub).getType(), null);
+    } else {
+      RError.err(ErrorType.Error, obj.getInfo(), "need array to index, got type: " + sub.getName());
+      return null;
+    }
+  }
+
+  @Override
+  protected Type visitRefPtrDeref(RefPtrDeref obj, Type param) {
+    assert (param instanceof PointerType);
+    return ((PointerType) param).getType().getRef();
+  }
+
+}

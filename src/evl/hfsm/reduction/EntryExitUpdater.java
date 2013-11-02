@@ -9,7 +9,6 @@ import common.ElementInfo;
 
 import evl.Evl;
 import evl.NullTraverser;
-import evl.cfg.BasicBlockList;
 import evl.expression.Expression;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.Reference;
@@ -23,17 +22,17 @@ import evl.hfsm.StateSimple;
 import evl.hfsm.Transition;
 import evl.other.ListOfNamed;
 import evl.other.Named;
-import evl.statement.normal.CallStmt;
-import evl.statement.normal.NormalStmt;
-import evl.variable.Variable;
-
+import evl.statement.Block;
+import evl.statement.CallStmt;
+import evl.statement.Statement;
+import evl.variable.FuncVariable;
 
 /**
  * For every state, a new entry and exit function is added. This new function contains calls to the parent entry or exit
  * function. After this pass, it is safe to move the leaf states up.
- *
+ * 
  * @author urs
- *
+ * 
  */
 public class EntryExitUpdater extends NullTraverser<Void, EePar> {
   private final static String hfsmEntryFuncName = Designator.NAME_SEP + "hfsmEntry";
@@ -82,21 +81,19 @@ public class EntryExitUpdater extends NullTraverser<Void, EePar> {
   }
 
   public FuncPrivateVoid makeFunc(String name, List<FunctionBase> list) {
-    FuncPrivateVoid func = new FuncPrivateVoid(new ElementInfo(), name, new ListOfNamed<Variable>());
-    List<NormalStmt> code = new ArrayList<NormalStmt>();
+    FuncPrivateVoid func = new FuncPrivateVoid(new ElementInfo(), name, new ListOfNamed<FuncVariable>());
+    Block code = new Block(new ElementInfo());
 
     for (FunctionBase cf : list) {
-      NormalStmt stmt = makeCall(cf);
-      code.add(stmt);
+      Statement stmt = makeCall(cf);
+      code.getStatements().add(stmt);
     }
 
-    BasicBlockList body = new BasicBlockList(new ElementInfo());
-    body.insertCodeAfterEntry(code, "body");
-    func.setBody(body);
+    func.setBody(code);
     return func;
   }
 
-  private NormalStmt makeCall(FunctionBase func) {
+  private CallStmt makeCall(FunctionBase func) {
     assert (func.getParam().isEmpty());
     Reference ref = new Reference(new ElementInfo(), func);
     ref.getOffset().add(new RefCall(new ElementInfo(), new ArrayList<Expression>()));

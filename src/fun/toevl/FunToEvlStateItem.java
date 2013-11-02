@@ -3,7 +3,6 @@ package fun.toevl;
 import java.util.ArrayList;
 import java.util.List;
 
-import evl.cfg.BasicBlockList;
 import evl.expression.Expression;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
@@ -12,8 +11,7 @@ import evl.hfsm.HfsmQueryFunction;
 import evl.hfsm.State;
 import evl.hfsm.StateItem;
 import evl.other.IfaceUse;
-import evl.type.TypeRef;
-import evl.type.special.VoidType;
+import evl.statement.Block;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.function.FunctionHeader;
@@ -90,9 +88,9 @@ public class FunToEvlStateItem extends NullTraverser<StateItem, Void> {
 
   @Override
   protected StateItem visitTransition(Transition obj, Void param) {
-    List<evl.variable.Variable> args = new ArrayList<evl.variable.Variable>(obj.getParam().size());
+    List<evl.variable.FuncVariable> args = new ArrayList<evl.variable.FuncVariable>(obj.getParam().size());
     for (fun.variable.FuncVariable itr : obj.getParam()) {
-      args.add((evl.variable.Variable) fta.traverse(itr, null));
+      args.add((evl.variable.FuncVariable) fta.traverse(itr, null));
     }
     evl.expression.reference.Reference src = (evl.expression.reference.Reference) fta.traverse(obj.getSrc(), null);
     evl.expression.reference.Reference dst = (evl.expression.reference.Reference) fta.traverse(obj.getDst(), null);
@@ -104,11 +102,7 @@ public class FunToEvlStateItem extends NullTraverser<StateItem, Void> {
 
     Expression guard = (Expression) fta.traverse(obj.getGuard(), null);
 
-    MakeBasicBlocks blocks = new MakeBasicBlocks(fta);
-    BasicBlockList nbody = blocks.translate(obj.getBody(), obj.getParam().getList(), new TypeRef(obj.getInfo(), new VoidType())); // TODO
-                                                                                                                                  // use
-                                                                                                                                  // singleton
-                                                                                                                                  // void
+    Block nbody = (Block) fta.traverse(obj.getBody(), null);
 
     return new evl.hfsm.Transition(obj.getInfo(), obj.getName(), (State) src.getLink(), (State) dst.getLink(), (IfaceUse) evt.getLink(), ((RefName) evt.getOffset().get(0)).getName(), guard, args, nbody);
   }

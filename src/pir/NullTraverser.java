@@ -1,68 +1,56 @@
 package pir;
 
-import pir.cfg.BasicBlock;
-import pir.cfg.BasicBlockList;
 import pir.expression.ArrayValue;
 import pir.expression.BoolValue;
 import pir.expression.Number;
 import pir.expression.StringValue;
+import pir.expression.TypeCast;
+import pir.expression.binop.BitAnd;
+import pir.expression.binop.BitOr;
+import pir.expression.binop.Div;
+import pir.expression.binop.Equal;
+import pir.expression.binop.Greater;
+import pir.expression.binop.Greaterequal;
+import pir.expression.binop.Less;
+import pir.expression.binop.Lessequal;
+import pir.expression.binop.LogicAnd;
+import pir.expression.binop.LogicOr;
+import pir.expression.binop.LogicXand;
+import pir.expression.binop.LogicXor;
+import pir.expression.binop.Minus;
+import pir.expression.binop.Mod;
+import pir.expression.binop.Mul;
+import pir.expression.binop.Notequal;
+import pir.expression.binop.Plus;
+import pir.expression.binop.Shl;
+import pir.expression.binop.Shr;
+import pir.expression.reference.RefCall;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
-import pir.expression.reference.VarRef;
-import pir.expression.reference.VarRefConst;
-import pir.expression.reference.VarRefSimple;
-import pir.expression.reference.VarRefStatevar;
-import pir.function.FuncImpl;
-import pir.function.FuncProto;
+import pir.expression.reference.Reference;
+import pir.expression.unop.Not;
+import pir.expression.unop.Uminus;
+import pir.function.impl.FuncImplRet;
+import pir.function.impl.FuncImplVoid;
+import pir.function.impl.FuncProtoRet;
+import pir.function.impl.FuncProtoVoid;
 import pir.other.Constant;
 import pir.other.FuncVariable;
 import pir.other.Program;
-import pir.other.SsaVariable;
 import pir.other.StateVariable;
-import pir.statement.bbend.CaseGoto;
-import pir.statement.bbend.CaseGotoOpt;
-import pir.statement.bbend.Goto;
-import pir.statement.bbend.IfGoto;
-import pir.statement.bbend.ReturnExpr;
-import pir.statement.bbend.ReturnVoid;
-import pir.statement.bbend.Unreachable;
-import pir.statement.normal.Assignment;
-import pir.statement.normal.CallAssignment;
-import pir.statement.normal.CallStmt;
-import pir.statement.normal.GetElementPtr;
-import pir.statement.normal.LoadStmt;
-import pir.statement.normal.StackMemoryAlloc;
-import pir.statement.normal.StoreStmt;
-import pir.statement.normal.binop.BitAnd;
-import pir.statement.normal.binop.BitOr;
-import pir.statement.normal.binop.Div;
-import pir.statement.normal.binop.Equal;
-import pir.statement.normal.binop.Greater;
-import pir.statement.normal.binop.Greaterequal;
-import pir.statement.normal.binop.Less;
-import pir.statement.normal.binop.Lessequal;
-import pir.statement.normal.binop.LogicAnd;
-import pir.statement.normal.binop.LogicOr;
-import pir.statement.normal.binop.LogicXand;
-import pir.statement.normal.binop.LogicXor;
-import pir.statement.normal.binop.Minus;
-import pir.statement.normal.binop.Mod;
-import pir.statement.normal.binop.Mul;
-import pir.statement.normal.binop.Notequal;
-import pir.statement.normal.binop.Plus;
-import pir.statement.normal.binop.Shl;
-import pir.statement.normal.binop.Shr;
-import pir.statement.normal.convert.SignExtendValue;
-import pir.statement.normal.convert.TruncValue;
-import pir.statement.normal.convert.TypeCast;
-import pir.statement.normal.convert.ZeroExtendValue;
-import pir.statement.normal.unop.Not;
-import pir.statement.normal.unop.Uminus;
-import pir.statement.phi.PhiStmt;
+import pir.statement.Assignment;
+import pir.statement.Block;
+import pir.statement.CallStmt;
+import pir.statement.CaseEntry;
+import pir.statement.CaseStmt;
+import pir.statement.IfStmt;
+import pir.statement.ReturnExpr;
+import pir.statement.ReturnVoid;
+import pir.statement.VarDefStmt;
+import pir.statement.WhileStmt;
 import pir.type.ArrayType;
 import pir.type.BooleanType;
 import pir.type.NamedElement;
-import pir.type.NoSignType;
 import pir.type.PointerType;
 import pir.type.RangeType;
 import pir.type.SignedType;
@@ -76,6 +64,51 @@ import pir.type.VoidType;
 abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   abstract protected R doDefault(PirObject obj, P param);
+
+  @Override
+  protected R visitCaseEntry(CaseEntry obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitBitAnd(BitAnd obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitRefCall(RefCall obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitReference(Reference obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitCaseStmt(CaseStmt obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitWhileStmt(WhileStmt obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitVarDefStmt(VarDefStmt obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitIfStmt(IfStmt obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitBlock(Block obj, P param) {
+    return doDefault(obj, param);
+  }
 
   @Override
   protected R visitArrayValue(ArrayValue obj, P param) {
@@ -163,7 +196,7 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitArray(ArrayType obj, P param) {
+  protected R visitArrayType(ArrayType obj, P param) {
     return doDefault(obj, param);
   }
 
@@ -188,102 +221,12 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitFuncImpl(FuncImpl obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitFuncProto(FuncProto obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
   protected R visitRangeType(RangeType obj, P param) {
     return doDefault(obj, param);
   }
 
   @Override
-  protected R visitCaseGoto(CaseGoto obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitIfGoto(IfGoto obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
   protected R visitSignedType(SignedType obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitPhiStmt(PhiStmt obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitGoto(Goto obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitSsaVariable(SsaVariable obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitBasicBlock(BasicBlock obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitBasicBlockList(BasicBlockList obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitStoreStmt(StoreStmt obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitVarRef(VarRef obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitLoadStmt(LoadStmt obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitCallAssignment(CallAssignment obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitGetElementPtr(GetElementPtr obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitTruncValue(TruncValue obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitSignExtendValue(SignExtendValue obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitZeroExtendValue(ZeroExtendValue obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitVarRefSimple(VarRefSimple obj, P param) {
     return doDefault(obj, param);
   }
 
@@ -298,42 +241,7 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitNoSignType(NoSignType obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitCaseGotoOpt(CaseGotoOpt obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitVarRefStatevar(VarRefStatevar obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
   protected R visitPointerType(PointerType obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitStackMemoryAlloc(StackMemoryAlloc obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitVarRefConst(VarRefConst obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitUnreachable(Unreachable obj, P param) {
-    return doDefault(obj, param);
-  }
-
-  @Override
-  protected R visitAnd(BitAnd obj, P param) {
     return doDefault(obj, param);
   }
 
@@ -388,7 +296,7 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitOr(BitOr obj, P param) {
+  protected R visitBitOr(BitOr obj, P param) {
     return doDefault(obj, param);
   }
 
@@ -434,6 +342,26 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitLogicXor(LogicXor obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitFuncImplRet(FuncImplRet obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitFuncProtoRet(FuncProtoRet obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitFuncImplVoid(FuncImplVoid obj, P param) {
+    return doDefault(obj, param);
+  }
+
+  @Override
+  protected R visitFuncProtoVoid(FuncProtoVoid obj, P param) {
     return doDefault(obj, param);
   }
 }

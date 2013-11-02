@@ -3,6 +3,10 @@
 #include  <stdlib.h>
 #include  "output/inst.h"
 
+void _trap(){
+  exit( EXIT_FAILURE );
+}
+
 static R_0_100 next;
 
 void inst_out_foo(R_0_100 x){

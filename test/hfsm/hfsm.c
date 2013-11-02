@@ -1,7 +1,12 @@
 #include  <stdio.h>
 #include  <stdint.h>
 #include  <string.h>
+#include  <stdlib.h>
 #include  "output/inst.h"
+
+void _trap(){
+  exit( EXIT_FAILURE );
+}
 
 #define NUM_STEP 27
 

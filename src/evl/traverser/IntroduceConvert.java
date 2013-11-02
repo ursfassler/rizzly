@@ -10,12 +10,11 @@ import error.ErrorType;
 import error.RError;
 import evl.DefTraverser;
 import evl.Evl;
-import evl.cfg.BasicBlock;
-import evl.cfg.BasicBlockList;
 import evl.expression.Expression;
 import evl.expression.Number;
-import evl.expression.binop.And;
+import evl.expression.TypeCast;
 import evl.expression.binop.Lessequal;
+import evl.expression.binop.LogicAnd;
 import evl.expression.binop.Relation;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.Reference;
@@ -26,17 +25,15 @@ import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowLlvmLibrary;
 import evl.knowledge.KnowledgeBase;
 import evl.other.ListOfNamed;
-import evl.statement.bbend.IfGoto;
-import evl.statement.bbend.ReturnExpr;
-import evl.statement.bbend.Unreachable;
-import evl.statement.normal.CallStmt;
-import evl.statement.normal.TypeCast;
+import evl.statement.Block;
+import evl.statement.CallStmt;
+import evl.statement.IfOption;
+import evl.statement.IfStmt;
+import evl.statement.ReturnExpr;
 import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.base.RangeType;
 import evl.variable.FuncVariable;
-import evl.variable.SsaVariable;
-import evl.variable.Variable;
 
 /**
  * Replaces calls to types with corresponding convert function calls
@@ -98,43 +95,47 @@ public class IntroduceConvert extends DefTraverser<Void, Void> {
   }
 
   private FuncGlobal makeConvertRange(String name, RangeType resType) {
-    BasicBlockList bbl = new BasicBlockList(info);
-
-    BasicBlock branch = bbl.getEntry();
-    BasicBlock ok = bbl.getExit();
-    BasicBlock error = new BasicBlock(info, "BB_error");
-    bbl.getBasicBlocks().add(error);
-
+    Block body = new Block(info);
     FuncVariable value = new FuncVariable(info, "value", new TypeRef(info, kbi.getIntegerType()));
+
+    Block ok = new Block(info);
+    Block error = new Block(info);
+    List<IfOption> option = new ArrayList<IfOption>();
 
     { // test
       Relation aboveLower = new Lessequal(info, new Number(info, resType.getNumbers().getLow()), new Reference(info, value));
       Relation belowHigher = new Lessequal(info, new Reference(info, value), new Number(info, resType.getNumbers().getHigh()));
-      Expression cond = new And(info, aboveLower, belowHigher);
-      branch.setEnd(new IfGoto(info, cond, ok, error));
+      Expression cond = new LogicAnd(info, aboveLower, belowHigher);
+      IfOption opt = new IfOption(info, cond, ok);
+      option.add(opt);
     }
 
     { // ok, cast
-      SsaVariable retvar = new SsaVariable(info, "ret", new TypeRef(info, resType));
-      TypeCast cast = new TypeCast(info, retvar, new TypeRef(info, resType), new Reference(info, value));
-      ok.getCode().add(cast);
-      ok.setEnd(new ReturnExpr(info, new Reference(info, retvar)));
+      TypeCast cast = new TypeCast(info, new TypeRef(info, resType), new Reference(info, value));
+      ReturnExpr ret = new ReturnExpr(info, cast);
+      ok.getStatements().add(ret);
     }
 
     { // error, do something
+      // TODO how to trap or exception throwing?
       // TODO insert call to debug output with error message
       // TODO throw exception
       Reference call = new Reference(info, kll.getTrap());
       call.getOffset().add(new RefCall(info, new ArrayList<Expression>()));
-      error.getCode().add(new CallStmt(info, call));
-      error.setEnd(new Unreachable(info));
+      ReturnExpr trap = new ReturnExpr(info, new Number(info, resType.getNumbers().getLow()));
+
+      error.getStatements().add(new CallStmt(info, call));
+      error.getStatements().add(trap);
     }
 
-    List<Variable> param = new ArrayList<Variable>();
+    IfStmt ifstmt = new IfStmt(info, option, error);
+    body.getStatements().add(ifstmt);
+
+    List<FuncVariable> param = new ArrayList<FuncVariable>();
     param.add(value);
-    FuncGlobal ret = new FuncGlobal(info, name, new ListOfNamed<Variable>(param));
+    FuncGlobal ret = new FuncGlobal(info, name, new ListOfNamed<FuncVariable>(param));
     ret.setRet(new TypeRef(info, resType));
-    ret.setBody(bbl);
+    ret.setBody(body);
 
     return ret;
   }

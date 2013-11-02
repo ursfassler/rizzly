@@ -9,7 +9,6 @@ import common.ElementInfo;
 
 import evl.Evl;
 import evl.NullTraverser;
-import evl.cfg.BasicBlockList;
 import evl.composition.ImplComposition;
 import evl.expression.Expression;
 import evl.expression.reference.RefCall;
@@ -26,9 +25,10 @@ import evl.other.ImplElementary;
 import evl.other.Interface;
 import evl.other.ListOfNamed;
 import evl.other.Namespace;
-import evl.statement.normal.CallStmt;
-import evl.statement.normal.NormalStmt;
-import evl.variable.Variable;
+import evl.statement.Block;
+import evl.statement.CallStmt;
+import evl.statement.Statement;
+import evl.variable.FuncVariable;
 
 public class SystemIfaceAdder extends NullTraverser<Void, Void> {
 
@@ -86,26 +86,26 @@ public class SystemIfaceAdder extends NullTraverser<Void, Void> {
     FuncInputHandlerEvent dtor = makeFunc(DESTRUCT);
 
     {
-      ArrayList<NormalStmt> code = new ArrayList<NormalStmt>();
-      for( CompUse cuse : compList ) {
+      ArrayList<Statement> code = new ArrayList<Statement>();
+      for (CompUse cuse : compList) {
         CallStmt call = makeCall(cuse, CONSTRUCT); // TODO correct link? Or should it be to the instance?
         code.add(call);
       }
       code.add(makeCall(obj.getEntryFunc()));
 
-      ctor.getBody().insertCodeAfterEntry(code, "body");
+      ctor.getBody().getStatements().addAll(code);
     }
 
     {
-      ArrayList<NormalStmt> code = new ArrayList<NormalStmt>();
+      ArrayList<Statement> code = new ArrayList<Statement>();
       code.add(makeCall(obj.getExitFunc()));
       Collections.reverse(compList);
-      for( CompUse cuse : compList ) {
+      for (CompUse cuse : compList) {
         CallStmt call = makeCall(cuse, DESTRUCT); // TODO correct link? Or should it be to the instance?
         code.add(call);
       }
 
-      dtor.getBody().insertCodeAfterEntry(code, "body");
+      dtor.getBody().getStatements().addAll(code);
     }
 
     List<String> ns = new ArrayList<String>();
@@ -117,16 +117,16 @@ public class SystemIfaceAdder extends NullTraverser<Void, Void> {
   }
 
   private CallStmt makeCall(Reference ref) {
-    assert ( ref.getOffset().isEmpty() );
-    assert ( ref.getLink() instanceof FunctionBase );
+    assert (ref.getOffset().isEmpty());
+    assert (ref.getLink() instanceof FunctionBase);
     Reference call = new Reference(ref.getInfo(), ref.getLink());
     call.getOffset().add(new RefCall(info, new ArrayList<Expression>()));
     return new CallStmt(info, call);
   }
 
   private FuncInputHandlerEvent makeFunc(String funcname) {
-    FuncInputHandlerEvent rfunc = new FuncInputHandlerEvent(info, funcname, new ListOfNamed<Variable>());
-    BasicBlockList body = new BasicBlockList(info);
+    FuncInputHandlerEvent rfunc = new FuncInputHandlerEvent(info, funcname, new ListOfNamed<FuncVariable>());
+    Block body = new Block(info);
     rfunc.setBody(body);
     return rfunc;
   }

@@ -5,10 +5,10 @@ import common.ElementInfo;
 import evl.expression.Expression;
 
 /**
- *
+ * 
  * @author urs
  */
-public class Or extends ArithmeticOp {
+public class Or extends BinaryExp {
 
   public Or(ElementInfo info, Expression left, Expression right) {
     super(info, left, right);

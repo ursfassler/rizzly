@@ -1,9 +1,9 @@
 package evl.function;
 
-import evl.cfg.BasicBlockList;
+import evl.statement.Block;
 
 public interface FuncWithBody extends FunctionHeader{
-  public BasicBlockList getBody();
+  public Block getBody();
 
-  public void setBody(BasicBlockList body);
+  public void setBody(Block body);
 }

@@ -4,6 +4,10 @@
 #include  <stdlib.h>
 #include  "output/inst.h"
 
+void _trap(){
+  exit( EXIT_FAILURE );
+}
+
 #define NUM_STEP 18
 
 static const char values[NUM_STEP] = {

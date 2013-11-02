@@ -37,14 +37,6 @@ public class Relinker extends DefTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitTypeRef(TypeRef obj, Void param) {
-    if (copied.containsKey(obj.getRef())) {
-      obj.setRef((Type) copied.get(obj.getRef()));
-    }
-    return null;
-  }
-
-  @Override
   protected Void visitReference(Reference obj, Void param) {
     super.visitReference(obj, param);
     if (copied.containsKey(obj.getLink())) {
@@ -65,6 +57,14 @@ public class Relinker extends DefTraverser<Void, Void> {
   protected Void visitIfaceUse(IfaceUse obj, Void param) {
     if (copied.containsKey(obj.getLink())) {
       obj.setLink((Interface) copied.get(obj.getLink()));
+    }
+    return null;
+  }
+
+  @Override
+  protected Void visitTypeRef(TypeRef obj, Void param) {
+    if (copied.containsKey(obj.getRef())) {
+      obj.setRef((Type) copied.get(obj.getRef()));
     }
     return null;
   }

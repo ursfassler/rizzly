@@ -6,11 +6,11 @@ import java.lang.reflect.InvocationTargetException;
 import common.ElementInfo;
 
 import evl.other.ListOfNamed;
-import evl.variable.Variable;
+import evl.variable.FuncVariable;
 
 
 public class FunctionFactory {
-  static public <T extends FunctionBase> T create(Class<T> type, ElementInfo info, String name, ListOfNamed<Variable> param) {
+  static public <T extends FunctionBase> T create(Class<T> type, ElementInfo info, String name, ListOfNamed<FuncVariable> param) {
     T ret = null;
     try {
       Constructor<T> c = type.getDeclaredConstructor(ElementInfo.class, String.class, ListOfNamed.class);

@@ -40,7 +40,6 @@ import evl.type.special.VoidType;
 import evl.variable.ConstGlobal;
 import evl.variable.ConstPrivate;
 import evl.variable.FuncVariable;
-import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
 
 public class KnowScope extends KnowledgeEntry {
@@ -87,7 +86,6 @@ public class KnowScope extends KnowledgeEntry {
     priv.add(HfsmQueryFunction.class); // TODO: sure?
 
     local.add(FuncVariable.class);
-    local.add(SsaVariable.class);
 
     {
       @SuppressWarnings("rawtypes")

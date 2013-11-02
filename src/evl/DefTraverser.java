@@ -5,25 +5,27 @@ import java.util.Collection;
 
 import common.Direction;
 
-import evl.cfg.BasicBlock;
-import evl.cfg.BasicBlockList;
 import evl.composition.Connection;
 import evl.composition.EndpointSelf;
 import evl.composition.EndpointSub;
 import evl.composition.ImplComposition;
 import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
-import evl.expression.Expression;
 import evl.expression.Number;
 import evl.expression.RangeValue;
 import evl.expression.StringValue;
+import evl.expression.TypeCast;
 import evl.expression.binop.And;
+import evl.expression.binop.BitAnd;
+import evl.expression.binop.BitOr;
 import evl.expression.binop.Div;
 import evl.expression.binop.Equal;
 import evl.expression.binop.Greater;
 import evl.expression.binop.Greaterequal;
 import evl.expression.binop.Less;
 import evl.expression.binop.Lessequal;
+import evl.expression.binop.LogicAnd;
+import evl.expression.binop.LogicOr;
 import evl.expression.binop.Minus;
 import evl.expression.binop.Mod;
 import evl.expression.binop.Mul;
@@ -62,25 +64,20 @@ import evl.other.Named;
 import evl.other.NamedList;
 import evl.other.Namespace;
 import evl.other.RizzlyProgram;
-import evl.statement.bbend.CaseGoto;
-import evl.statement.bbend.CaseGotoOpt;
-import evl.statement.bbend.CaseOptRange;
-import evl.statement.bbend.CaseOptValue;
-import evl.statement.bbend.Goto;
-import evl.statement.bbend.IfGoto;
-import evl.statement.bbend.ReturnExpr;
-import evl.statement.bbend.ReturnVoid;
-import evl.statement.bbend.Unreachable;
-import evl.statement.normal.Assignment;
-import evl.statement.normal.CallStmt;
-import evl.statement.normal.GetElementPtr;
-import evl.statement.normal.LoadStmt;
-import evl.statement.normal.StackMemoryAlloc;
-import evl.statement.normal.StoreStmt;
-import evl.statement.normal.TypeCast;
-import evl.statement.normal.VarDefInitStmt;
-import evl.statement.normal.VarDefStmt;
-import evl.statement.phi.PhiStmt;
+import evl.statement.Assignment;
+import evl.statement.Block;
+import evl.statement.CallStmt;
+import evl.statement.CaseOpt;
+import evl.statement.CaseOptRange;
+import evl.statement.CaseOptValue;
+import evl.statement.CaseStmt;
+import evl.statement.IfOption;
+import evl.statement.IfStmt;
+import evl.statement.ReturnExpr;
+import evl.statement.ReturnVoid;
+import evl.statement.Statement;
+import evl.statement.VarDefStmt;
+import evl.statement.While;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
@@ -104,13 +101,12 @@ import evl.type.special.VoidType;
 import evl.variable.ConstGlobal;
 import evl.variable.ConstPrivate;
 import evl.variable.FuncVariable;
-import evl.variable.SsaVariable;
 import evl.variable.StateVariable;
 
 public class DefTraverser<R, P> extends Traverser<R, P> {
 
   protected R visitList(Collection<? extends Evl> list, P param) {
-    for( Evl itr : new ArrayList<Evl>(list) ) {
+    for (Evl itr : new ArrayList<Evl>(list)) {
       visit(itr, param);
     }
     return null;
@@ -165,13 +161,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitVarDef(VarDefStmt obj, P param) {
     visit(obj.getVariable(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitVarDefInitStmt(VarDefInitStmt obj, P param) {
-    visit(obj.getVariable(), param);
-    visit(obj.getInit(), param);
     return null;
   }
 
@@ -250,8 +239,8 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitEnumElement(EnumElement obj, P param) {
-    visit(obj.getType(),param);
-    visit(obj.getDef(),param);
+    visit(obj.getType(), param);
+    visit(obj.getDef(), param);
     return null;
   }
 
@@ -524,93 +513,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitPhiStmt(PhiStmt obj, P param) {
-    visit(obj.getVariable(), param);
-    for( BasicBlock in : obj.getInBB() ) {
-      Expression expr = obj.getArg(in);
-      assert ( expr != null );
-      visit(expr, param);
-    }
-    return null;
-  }
-
-  @Override
-  protected R visitBasicBlock(BasicBlock obj, P param) {
-    visitItr(obj.getPhi(), param);
-    visitItr(obj.getCode(), param);
-    visit(obj.getEnd(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitGoto(Goto obj, P param) {
-    return null;
-  }
-
-  @Override
-  protected R visitCaseGotoOpt(CaseGotoOpt obj, P param) {
-    visitItr(obj.getValue(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitCaseGoto(CaseGoto obj, P param) {
-    visit(obj.getCondition(), param);
-    visitItr(obj.getOption(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitIfGoto(IfGoto obj, P param) {
-    visit(obj.getCondition(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitBasicBlockList(BasicBlockList obj, P param) {
-    visit(obj.getEntry(), param);
-    visitItr(obj.getBasicBlocks(), param);
-    visit(obj.getExit(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitSsaVariable(SsaVariable obj, P param) {
-    visit(obj.getType(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitTypeCast(TypeCast obj, P param) {
-    visit(obj.getValue(), param);
-    visit(obj.getCast(), param);
-    visit(obj.getVariable(), param);
-    return null;
-  }
-
-  @Override
   protected R visitTypeRef(TypeRef obj, P param) {
-    return null;
-  }
-
-  @Override
-  protected R visitStoreStmt(StoreStmt obj, P param) {
-    visit(obj.getExpr(), param);
-    visit(obj.getAddress(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitLoadStmt(LoadStmt obj, P param) {
-    visit(obj.getAddress(), param);
-    visit(obj.getVariable(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitGetElementPtr(GetElementPtr obj, P param) {
-    visit(obj.getAddress(), param);
-    visit(obj.getVariable(), param);
     return null;
   }
 
@@ -621,18 +524,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitStackMemoryAlloc(StackMemoryAlloc obj, P param) {
-    visit(obj.getVariable(), param);
-    return null;
-  }
-
-  @Override
   protected R visitUnionSelector(UnionSelector obj, P param) {
-    return null;
-  }
-
-  @Override
-  protected R visitUnreachable(Unreachable obj, P param) {
     return null;
   }
 
@@ -767,4 +659,84 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   protected R visitEnumDefRef(EnumDefRef obj, P param) {
     return null;
   }
+
+  @Override
+  protected R visitWhile(While obj, P param) {
+    visit(obj.getCondition(), param);
+    visit(obj.getBody(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitIfStmt(IfStmt obj, P param) {
+    visitItr(obj.getOption(), param);
+    visit(obj.getDefblock(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitIfOption(IfOption obj, P param) {
+    visit(obj.getCondition(), param);
+    visit(obj.getCode(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitBlock(Block obj, P param) {
+    for (Statement stmt : obj.getStatements()) {
+      visit(stmt, param);
+    }
+    return null;
+  }
+
+  @Override
+  protected R visitCaseStmt(CaseStmt obj, P param) {
+    visit(obj.getCondition(), param);
+    visitItr(obj.getOption(), param);
+    visit(obj.getOtherwise(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitCaseOpt(CaseOpt obj, P param) {
+    visitItr(obj.getValue(), param);
+    visit(obj.getCode(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitTypeCast(TypeCast obj, P param) {
+    visit(obj.getCast(), param);
+    visit(obj.getValue(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitBitAnd(BitAnd obj, P param) {
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitBitOr(BitOr obj, P param) {
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitLogicOr(LogicOr obj, P param) {
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitLogicAnd(LogicAnd obj, P param) {
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
 }

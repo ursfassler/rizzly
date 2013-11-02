@@ -6,29 +6,26 @@ import java.util.Set;
 
 import pir.PirObject;
 import pir.expression.reference.Referencable;
-import pir.other.SsaVariable;
-import pir.type.TypeRef;
+import pir.other.FuncVariable;
 
 import common.FuncAttr;
 
 abstract public class Function extends PirObject implements Referencable {
   private String name;
-  final private List<SsaVariable> argument;
-  private TypeRef retType = null;
+  final private List<FuncVariable> argument;
   final private Set<FuncAttr> attributes = new HashSet<FuncAttr>();
 
-  public Function(String name, List<SsaVariable> argument, TypeRef retType) {
+  public Function(String name, List<FuncVariable> argument) {
     super();
     this.name = name;
     this.argument = argument;
-    this.retType = retType;
   }
 
   public String getName() {
     return name;
   }
 
-  public List<SsaVariable> getArgument() {
+  public List<FuncVariable> getArgument() {
     return argument;
   }
 
@@ -40,20 +37,12 @@ abstract public class Function extends PirObject implements Referencable {
     this.name = name;
   }
 
-  public TypeRef getRetType() {
-    return retType;
-  }
-
-  public void setRetType(TypeRef retType) {
-    this.retType = retType;
-  }
-
   @Override
   public String toString() {
     String ret = name;
     ret += "(";
     boolean first = true;
-    for (SsaVariable var : argument) {
+    for (FuncVariable var : argument) {
       if (first) {
         first = false;
       } else {

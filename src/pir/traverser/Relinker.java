@@ -6,6 +6,8 @@ import pir.DefTraverser;
 import pir.Pir;
 import pir.expression.reference.Referencable;
 import pir.expression.reference.Reference;
+import pir.type.Type;
+import pir.type.TypeRef;
 
 public class Relinker extends DefTraverser<Void, Map<? extends Referencable, ? extends Referencable>> {
 
@@ -14,16 +16,27 @@ public class Relinker extends DefTraverser<Void, Map<? extends Referencable, ? e
     relinker.traverse(obj, map);
   }
 
-  @Override
-  protected Void visit(Pir obj, Map<? extends Referencable, ? extends Referencable> param) {
-    if (obj instanceof Reference) {
-      Reference ref = (Reference) obj;
-      Referencable ntarget = param.get(ref.getRef());
-      if (ntarget != null) {
-        ref.setRef(ntarget);
-      }
+  private Referencable replace(Referencable ref, Map<? extends Referencable, ? extends Referencable> param) {
+    Referencable ntarget = param.get(ref);
+    if (ntarget != null) {
+      return ntarget;
+    } else {
+      return ref;
     }
-    return super.visit(obj, param);
+  }
+
+  @Override
+  protected Void visitTypeRef(TypeRef obj, Map<? extends Referencable, ? extends Referencable> param) {
+    super.visitTypeRef(obj, param);
+    obj.setRef((Type) replace(obj.getRef(),param));
+    return null;
+  }
+
+  @Override
+  protected Void visitReference(Reference obj, Map<? extends Referencable, ? extends Referencable> param) {
+    super.visitReference(obj, param);
+    obj.setRef(replace(obj.getRef(),param));
+    return null;
   }
 
 }

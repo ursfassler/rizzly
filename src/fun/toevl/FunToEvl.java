@@ -1,6 +1,8 @@
 package fun.toevl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import common.Designator;
@@ -17,6 +19,8 @@ import evl.expression.reference.Reference;
 import evl.function.FunctionBase;
 import evl.other.CompUse;
 import evl.other.IfaceUse;
+import evl.statement.Block;
+import evl.statement.CaseOptEntry;
 import evl.type.Type;
 import evl.type.TypeRef;
 import fun.Fun;
@@ -34,6 +38,7 @@ import fun.other.Interface;
 import fun.other.ListOfNamed;
 import fun.other.Named;
 import fun.other.Namespace;
+import fun.statement.CaseOpt;
 import fun.statement.Statement;
 import fun.type.composed.NamedElement;
 import fun.type.composed.UnionSelector;
@@ -61,14 +66,13 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
     FunToEvl funToAst = new FunToEvl(funType);
     return (evl.other.Namespace) funToAst.traverse(classes, null);
   }
-  
+
   public static TypeRef toTypeRef(Reference ref) {
-    assert( ref.getOffset().isEmpty() );
-    assert( ref.getLink() instanceof Type );
+    assert (ref.getOffset().isEmpty());
+    assert (ref.getLink() instanceof Type);
     TypeRef typeRef = new TypeRef(ref.getInfo(), (Type) ref.getLink());
     return typeRef;
   }
-
 
   @Override
   protected Evl visit(Fun obj, Void param) {
@@ -254,4 +258,14 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
     }
     return ret;
   }
+
+  @Override
+  protected Evl visitCaseOpt(CaseOpt obj, Void param) {
+    List<CaseOptEntry> value = new ArrayList<CaseOptEntry>();
+    for (fun.statement.CaseOptEntry entry : obj.getValue()) {
+      value.add((CaseOptEntry) visit(entry, null));
+    }
+    return new evl.statement.CaseOpt(obj.getInfo(), value, (Block) visit(obj.getCode(), null));
+  }
+
 }

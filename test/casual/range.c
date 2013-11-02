@@ -1,6 +1,11 @@
 #include  <stdio.h>
 #include  <stdint.h>
+#include  <stdlib.h>
 #include  "output/inst.h"
+
+void _trap(){
+  exit( EXIT_FAILURE );
+}
 
 static uint8_t value;
 static uint8_t error = 0;

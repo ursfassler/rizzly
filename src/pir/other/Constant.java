@@ -1,21 +1,21 @@
 package pir.other;
 
-import pir.expression.PExpression;
+import pir.expression.Expression;
 import pir.type.TypeRef;
 
 final public class Constant extends Variable {
-  private PExpression def;
+  private Expression def;
 
-  public Constant(String name, TypeRef type, PExpression def) {
+  public Constant(String name, TypeRef type, Expression def) {
     super(name, type);
     this.def = def;
   }
 
-  public PExpression getDef() {
+  public Expression getDef() {
     return def;
   }
 
-  public void setDef(PExpression def) {
+  public void setDef(Expression def) {
     this.def = def;
   }
 

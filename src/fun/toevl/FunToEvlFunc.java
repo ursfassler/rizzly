@@ -7,11 +7,11 @@ import common.ElementInfo;
 import error.ErrorType;
 import error.RError;
 import evl.Evl;
-import evl.cfg.BasicBlockList;
 import evl.expression.reference.Reference;
 import evl.function.FunctionBase;
 import evl.function.FunctionFactory;
 import evl.other.ListOfNamed;
+import evl.statement.Block;
 import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.special.VoidType;
@@ -52,8 +52,8 @@ public class FunToEvlFunc extends NullTraverser<FunctionBase, Void> {
 
   // ----------------------------------------------------------------------------
 
-  public ListOfNamed<evl.variable.Variable> genpa(FunctionHeader obj) {
-    ListOfNamed<evl.variable.Variable> fparam = new ListOfNamed<evl.variable.Variable>();
+  public ListOfNamed<evl.variable.FuncVariable> genpa(FunctionHeader obj) {
+    ListOfNamed<evl.variable.FuncVariable> fparam = new ListOfNamed<evl.variable.FuncVariable>();
     for (FuncVariable itr : obj.getParam()) {
       fparam.add((evl.variable.FuncVariable) fta.traverse(itr, null));
     }
@@ -82,9 +82,8 @@ public class FunToEvlFunc extends NullTraverser<FunctionBase, Void> {
       retType = new TypeRef(new ElementInfo(), new VoidType()); // FIXME get singleton
     }
     if (obj instanceof FuncWithBody) {
-      MakeBasicBlocks blocks = new MakeBasicBlocks(fta);
-      BasicBlockList nbody = blocks.translate(((FuncWithBody) obj).getBody(), obj.getParam().getList(), retType);
-      ((evl.function.FuncWithBody) func).setBody(nbody);
+      Block body = (Block) fta.visit(((FuncWithBody) obj).getBody(), null);
+      ((evl.function.FuncWithBody) func).setBody(body);
     }
     return func;
   }

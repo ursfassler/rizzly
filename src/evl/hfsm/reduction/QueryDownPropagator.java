@@ -13,7 +13,6 @@ import common.ElementInfo;
 
 import evl.Evl;
 import evl.NullTraverser;
-import evl.cfg.BasicBlockList;
 import evl.copy.Copy;
 import evl.expression.Expression;
 import evl.expression.reference.RefCall;
@@ -29,11 +28,9 @@ import evl.hfsm.StateSimple;
 import evl.hfsm.Transition;
 import evl.knowledge.KnowledgeBase;
 import evl.other.ListOfNamed;
-import evl.statement.bbend.ReturnExpr;
-import evl.statement.bbend.ReturnVoid;
-import evl.statement.normal.NormalStmt;
-import evl.statement.normal.VarDefInitStmt;
-import evl.variable.SsaVariable;
+import evl.statement.Block;
+import evl.statement.ReturnExpr;
+import evl.variable.FuncVariable;
 import evl.variable.Variable;
 
 public class QueryDownPropagator extends NullTraverser<Void, QueryParam> {
@@ -50,7 +47,7 @@ public class QueryDownPropagator extends NullTraverser<Void, QueryParam> {
     QueryFuncMaker qfmaker = new QueryFuncMaker(qfunc);
     qfmaker.traverse(hfsm.getTopstate(), new Designator());
 
-    for( FuncPrivateRet func : qfunc.values() ) {
+    for (FuncPrivateRet func : qfunc.values()) {
       hfsm.getTopstate().getFunction().add(func);
     }
 
@@ -70,41 +67,31 @@ public class QueryDownPropagator extends NullTraverser<Void, QueryParam> {
 
     Map<Pair<String, String>, HfsmQueryFunction> queries = new HashMap<Pair<String, String>, HfsmQueryFunction>();
 
-    for( QueryItem query : param.before ) {
+    for (QueryItem query : param.before) {
       addQuery(queries, query);
     }
-    for( QueryItem query : queryList ) {
+    for (QueryItem query : queryList) {
       addQuery(queries, query);
     }
-    for( QueryItem query : param.after ) {
+    for (QueryItem query : param.after) {
       addQuery(queries, query);
     }
 
-    for( Pair<String, String> key : queries.keySet() ) {
+    for (Pair<String, String> key : queries.keySet()) {
       HfsmQueryFunction func = queries.get(key);
-      assert ( func.getBody().getBasicBlocks().isEmpty() );
-      assert ( func.getBody().getEntry().getCode().isEmpty() );
-      assert ( func.getBody().getExit().getCode().isEmpty() );
-      assert ( func.getBody().getExit().getEnd() instanceof ReturnVoid );
 
-      HfsmQueryFunction cfunc = new HfsmQueryFunction(info, func.getName(), new ListOfNamed<Variable>(Copy.copy(func.getParam().getList())));
+      HfsmQueryFunction cfunc = new HfsmQueryFunction(info, func.getName(), new ListOfNamed<FuncVariable>(Copy.copy(func.getParam().getList())));
       cfunc.setRet(func.getRet().copy());
 
-      cfunc.setBody(new BasicBlockList(info));
+      cfunc.setBody(new Block(info));
 
       ArrayList<Expression> acpar = new ArrayList<Expression>();
-      for( Variable par : cfunc.getParam() ) {
+      for (Variable par : cfunc.getParam()) {
         acpar.add(new Reference(info, par));
       }
-      SsaVariable retvar = new SsaVariable(info, Designator.NAME_SEP + "ret", func.getRet().copy());
       Reference call = new Reference(info, map.get(func));
       call.getOffset().add(new RefCall(info, acpar));
-      VarDefInitStmt callstmt = new VarDefInitStmt(info, retvar, call);
-      ArrayList<NormalStmt> code = new ArrayList<NormalStmt>();
-      code.add(callstmt);
-      cfunc.getBody().getExit().setEnd(new ReturnExpr(info, new Reference(info, retvar)));
-
-      cfunc.getBody().insertCodeAfterEntry(code, "body");
+      cfunc.getBody().getStatements().add(new ReturnExpr(info, call));
 
       obj.getItem().add(new QueryItem(key.first, cfunc));
     }
@@ -115,7 +102,7 @@ public class QueryDownPropagator extends NullTraverser<Void, QueryParam> {
   static private void addQuery(Map<Pair<String, String>, HfsmQueryFunction> set, QueryItem query) {
     Pair<String, String> key = new Pair<String, String>(query.getNamespace(), query.getFunc().getName());
 
-    if( !set.containsKey(key) ) {
+    if (!set.containsKey(key)) {
       set.put(key, query.getFunc());
     }
   }
@@ -126,14 +113,14 @@ public class QueryDownPropagator extends NullTraverser<Void, QueryParam> {
     ArrayList<QueryItem> queryList = new ArrayList<QueryItem>();
     ArrayList<State> stateList = new ArrayList<State>();
 
-    for( StateItem itr : obj.getItem() ) {
-      if( itr instanceof QueryItem ) {
+    for (StateItem itr : obj.getItem()) {
+      if (itr instanceof QueryItem) {
         queryList.add((QueryItem) itr);
-      } else if( itr instanceof State ) {
+      } else if (itr instanceof State) {
         spos.put((State) itr, queryList.size());
         stateList.add((State) itr);
       } else {
-        assert ( itr instanceof Transition );
+        assert (itr instanceof Transition);
       }
     }
 
@@ -141,7 +128,7 @@ public class QueryDownPropagator extends NullTraverser<Void, QueryParam> {
 
     // build parameter for every substate
     Map<State, QueryParam> spar = new HashMap<State, QueryParam>();
-    for( State itr : stateList ) {
+    for (State itr : stateList) {
       int idx = spos.get(itr);
 
       QueryParam cpar = new QueryParam(param);
@@ -151,7 +138,7 @@ public class QueryDownPropagator extends NullTraverser<Void, QueryParam> {
       spar.put(itr, cpar);
     }
 
-    for( State itr : stateList ) {
+    for (State itr : stateList) {
       visit(itr, spar.get(itr));
     }
 
@@ -200,12 +187,12 @@ class QueryFuncMaker extends NullTraverser<Void, Designator> {
   protected Void visitHfsmQueryFunction(HfsmQueryFunction obj, Designator param) {
     param = new Designator(param, obj.getName());
 
-    Collection<Variable> params = Copy.copy(obj.getParam().getList());
+    Collection<FuncVariable> params = Copy.copy(obj.getParam().getList());
     ElementInfo info = new ElementInfo();
-    FuncPrivateRet func = new FuncPrivateRet(info, param.toString(Designator.NAME_SEP), new ListOfNamed<Variable>(params));
+    FuncPrivateRet func = new FuncPrivateRet(info, param.toString(Designator.NAME_SEP), new ListOfNamed<FuncVariable>(params));
     func.setRet(obj.getRet().copy());
     func.setBody(obj.getBody());
-    obj.setBody(new BasicBlockList(info));
+    obj.setBody(new Block(info));
 
     HfsmReduction.relinkActualParameterRef(obj.getParam(), func.getParam().getList(), func.getBody());
 

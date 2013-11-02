@@ -12,7 +12,7 @@ import common.Designator;
 
 abstract public class BaseTest {
   public final String outdir = getRootdir() + "output" + File.separator;
-  public final String llvmFile = outdir + "inst.ll";
+  public final String cFile = outdir + "inst.c";
   private boolean strict = true;
 
   protected abstract String getRootdir();
@@ -66,15 +66,16 @@ abstract public class BaseTest {
   }
 
   public void compileLlvm() {
-    // String cmd = "gcc -pedantic -ansi -Werror -Wall -Wextra -c " + cfile + " -o " + outdir + "libinst.a";
-    //TODO use strict?
-    String cmd = "llc " + llvmFile + " -o " + outdir + "inst.s";
-    execute(cmd,"could not compile llvm file");
+//    String cmd = "gcc -pedantic -ansi -Werror -Wall -Wextra -c " + cFile + " -o " + outdir + "libinst.a";  //TODO use strict again
+    String cmd = "gcc -pedantic -ansi -Wall -Wextra -c " + cFile + " -o " + outdir + "libinst.a";
+    //TODO use strict? yes
+    //TODO use additional code checker
+    execute(cmd,"could not compile c file");
   }
 
   private void compileTest(String testcase) {
     String flags = "-Wall -Werror";
-    String cmd = "gcc " + flags + " " + getRootdir() + testcase + ".c" + " " + outdir + "inst.s" + " -o" + outdir + "inst";
+    String cmd = "gcc " + flags + " " + getRootdir() + testcase + ".c" + " " + outdir + "libinst.a" + " -o" + outdir + "inst";
     execute(cmd,"could not compile test case");
   }
 

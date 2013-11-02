@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -15,9 +16,11 @@ import java.util.Set;
 import joGraph.HtmlGraphWriter;
 
 import org.jgrapht.Graph;
+import org.jgrapht.traverse.TopologicalOrderIterator;
 
 import util.GraphHelper;
 import util.Pair;
+import util.Range;
 import util.SimpleGraph;
 
 import common.Designator;
@@ -27,9 +30,8 @@ import common.FuncAttr;
 
 import error.ErrorType;
 import error.RError;
+import evl.DefTraverser;
 import evl.Evl;
-import evl.cfg.BasicBlock;
-import evl.cfg.BasicBlockList;
 import evl.composition.CompositionReduction;
 import evl.composition.Connection;
 import evl.composition.ImplComposition;
@@ -37,10 +39,13 @@ import evl.copy.Copy;
 import evl.copy.Relinker;
 import evl.doc.DepGraph;
 import evl.doc.PrettyPrinter;
+import evl.doc.StreamWriter;
 import evl.expression.reference.Reference;
+import evl.function.FuncWithBody;
 import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
 import evl.function.impl.FuncPrivateVoid;
+import evl.function.impl.FuncProtoRet;
 import evl.function.impl.FuncProtoVoid;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.Transition;
@@ -61,21 +66,23 @@ import evl.other.Named;
 import evl.other.NamedList;
 import evl.other.Namespace;
 import evl.other.RizzlyProgram;
-import evl.passes.MemoryAccessCapsulater;
-import evl.statement.bbend.Goto;
-import evl.statement.bbend.ReturnVoid;
+import evl.statement.Block;
+import evl.statement.ReturnVoid;
+import evl.traverser.BitLogicCategorizer;
+import evl.traverser.CHeaderWriter;
 import evl.traverser.CallgraphMaker;
 import evl.traverser.ClassGetter;
 import evl.traverser.CompInstantiator;
+import evl.traverser.ConstantPropagation;
+import evl.traverser.DepCollector;
 import evl.traverser.DesCallgraphMaker;
-import evl.traverser.ExprCutter;
+import evl.traverser.IfCutter;
 import evl.traverser.IntroduceConvert;
 import evl.traverser.LinkReduction;
 import evl.traverser.NamespaceReduction;
 import evl.traverser.OpenReplace;
 import evl.traverser.OutsideReaderInfo;
 import evl.traverser.OutsideWriterInfo;
-import evl.traverser.SsaMaker;
 import evl.traverser.debug.CompCascadeDepth;
 import evl.traverser.debug.DebugIfaceAdder;
 import evl.traverser.debug.MsgNamesGetter;
@@ -89,10 +96,12 @@ import evl.traverser.typecheck.specific.CompInterfaceTypeChecker;
 import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
+import evl.type.base.EnumElement;
+import evl.type.base.EnumType;
 import evl.type.base.RangeType;
-import evl.type.special.PointerType;
+import evl.type.composed.NamedElement;
 import evl.variable.Constant;
-import evl.variable.SsaVariable;
+import evl.variable.FuncVariable;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
 import fun.hfsm.State;
@@ -103,9 +112,9 @@ public class MainEvl {
 
   private static ElementInfo info = new ElementInfo();
 
-  public static RizzlyProgram doEvl(ClaOption opt, String debugdir, Namespace aclasses, Component root, ArrayList<String> names) {
+  public static RizzlyProgram doEvl(ClaOption opt, String outdir, String debugdir, Namespace aclasses, Component root, ArrayList<String> names) {
     KnowledgeBase kb = new KnowledgeBase(aclasses, debugdir);
-    
+
     if (!opt.doLazyModelCheck()) {
       modelCheck(debugdir, aclasses, root, kb);
     }
@@ -114,26 +123,22 @@ public class MainEvl {
     OpenReplace.process(aclasses, kb);
 
     PrettyPrinter.print(aclasses, debugdir + "convert.rzy", true);
-    
+
     root = compositionReduction(aclasses, root);
     root = hfsmReduction(root, opt, debugdir, aclasses, kb);
-    
+
     PrettyPrinter.print(aclasses, debugdir + "reduced.rzy", true);
 
-    PrettyPrinter.print(aclasses, debugdir + "ast.rzy", true);
-    SsaMaker.process(aclasses, kb);
-    PrettyPrinter.print(aclasses, debugdir + "ssa.rzy", true);
-
-    ExprCutter.process(aclasses, kb);
+//    ExprCutter.process(aclasses, kb); //TODO reimplement
+    BitLogicCategorizer.process(aclasses,kb);
 
     PrettyPrinter.print(aclasses, debugdir + "normalized.rzy", true);
 
     typecheck(aclasses, root, debugdir);
-    
+
     addConDestructor(aclasses, debugdir, kb);
 
-    MemoryAccessCapsulater.process(aclasses, kb);
-    ExprCutter.process(aclasses, kb);
+//  ExprCutter.process(aclasses, kb); //TODO reimplement
     PrettyPrinter.print(aclasses, debugdir + "memcaps.rzy", true);
 
     if (opt.doDebugEvent()) {
@@ -144,8 +149,42 @@ public class MainEvl {
     // typecheck(classes, debugdir);
 
     RizzlyProgram prg = instantiate(root, debugdir, aclasses);
+    
+    {
+      evl.other.RizzlyProgram head = makeHeader(prg, debugdir);
+      evl.traverser.Renamer.process(head);
+      printCHeader(outdir, head,names);
+    }
+    
+    ConstantPropagation.process(prg);
+    replaceEnums(prg);
+    removeUnused(prg);
+    IfCutter.process(prg);
+
     PrettyPrinter.print(prg, debugdir + "instprog.rzy", true);
     return prg;
+  }
+
+  private static void replaceEnums(RizzlyProgram prg) {
+    Map<EnumType, RangeType> map = new HashMap<EnumType, RangeType>();
+
+    for (EnumType et : prg.getType().getItems(EnumType.class)) {
+      RangeType rt = getRangeType(et, prg.getType());
+      map.put(et, rt);
+    }
+
+    Relinker.relink(prg, map);
+  }
+
+  private static RangeType getRangeType(EnumType et, ListOfNamed<Type> type) {
+    Range range = new Range(BigInteger.ZERO, BigInteger.valueOf(et.getElement().size() - 1));
+    String name = RangeType.makeName(range);
+    RangeType ret = (RangeType) type.find(name);
+    if (ret == null) {
+      ret = new RangeType(range);
+      type.add(ret);
+    }
+    return ret;
   }
 
   private static void modelCheck(String debugdir, Namespace aclasses, Component root, KnowledgeBase kb) {
@@ -388,10 +427,10 @@ public class MainEvl {
   private static void addConDestructor(Namespace classes, String debugdir, KnowledgeBase kb) {
     Interface debugIface = new Interface(info, SystemIfaceAdder.IFACE_TYPE_NAME);
 
-    FuncProtoVoid sendFunc = new FuncProtoVoid(info, SystemIfaceAdder.CONSTRUCT, new ListOfNamed<Variable>());
+    FuncProtoVoid sendFunc = new FuncProtoVoid(info, SystemIfaceAdder.CONSTRUCT, new ListOfNamed<FuncVariable>());
     debugIface.getPrototype().add(sendFunc);
 
-    FuncProtoVoid recvFunc = new FuncProtoVoid(info, SystemIfaceAdder.DESTRUCT, new ListOfNamed<Variable>());
+    FuncProtoVoid recvFunc = new FuncProtoVoid(info, SystemIfaceAdder.DESTRUCT, new ListOfNamed<FuncVariable>());
     debugIface.getPrototype().add(recvFunc);
 
     classes.add(debugIface);
@@ -415,7 +454,6 @@ public class MainEvl {
 
     RangeType symNameSizeType = kbi.getRangeType(names.size());
     ArrayType arrayType = kbi.getArray(BigInteger.valueOf(depth), symNameSizeType);
-    PointerType pArray = kbi.getPointerType(arrayType);
     RangeType sizeType = kbi.getRangeType(depth);
 
     Interface debugIface;
@@ -424,25 +462,25 @@ public class MainEvl {
       debugIface = new Interface(info, "_Debug");
 
       {
-        ArrayList<Variable> param = new ArrayList<Variable>();
-        SsaVariable sender = new SsaVariable(info, "sender", new TypeRef(info, pArray));
+        ArrayList<FuncVariable> param = new ArrayList<FuncVariable>();
+        FuncVariable sender = new FuncVariable(info, "sender", new TypeRef(info, arrayType));
         param.add(sender);
-        SsaVariable size = new SsaVariable(info, "size", new TypeRef(info, sizeType));
+        FuncVariable size = new FuncVariable(info, "size", new TypeRef(info, sizeType));
         param.add(size);
 
-        FuncProtoVoid sendFunc = new FuncProtoVoid(info, "msgSend", new ListOfNamed<Variable>(param));
+        FuncProtoVoid sendFunc = new FuncProtoVoid(info, "msgSend", new ListOfNamed<FuncVariable>(param));
 
         debugIface.getPrototype().add(sendFunc);
       }
 
       {
-        ArrayList<Variable> param = new ArrayList<Variable>();
-        SsaVariable sender = new SsaVariable(info, "receiver", new TypeRef(info, pArray));
+        ArrayList<FuncVariable> param = new ArrayList<FuncVariable>();
+        FuncVariable sender = new FuncVariable(info, "receiver", new TypeRef(info, arrayType));
         param.add(sender);
-        SsaVariable size = new SsaVariable(info, "size", new TypeRef(info, sizeType));
+        FuncVariable size = new FuncVariable(info, "size", new TypeRef(info, sizeType));
         param.add(size);
 
-        recvFunc = new FuncProtoVoid(info, "msgRecv", new ListOfNamed<Variable>(param));
+        recvFunc = new FuncProtoVoid(info, "msgRecv", new ListOfNamed<FuncVariable>(param));
 
         debugIface.getPrototype().add(recvFunc);
       }
@@ -450,8 +488,7 @@ public class MainEvl {
       classes.add(debugIface);
     }
 
-    PointerType pArrayElemType = kbi.getPointerType(symNameSizeType);
-    DebugIfaceAdder.process(classes, pArray, pArrayElemType, sizeType, symNameSizeType, debugIface, names);
+    DebugIfaceAdder.process(classes, arrayType, sizeType, symNameSizeType, debugIface, names);
 
     PrettyPrinter.print(classes, debugdir + "debug.rzy", true);
 
@@ -509,6 +546,25 @@ public class MainEvl {
     return prg;
   }
 
+  private static void removeUnused(RizzlyProgram prg) {
+    Set<FunctionBase> roots = new HashSet<FunctionBase>();
+
+    for (FunctionBase func : prg.getFunction()) {
+      if (func.getAttributes().contains(FuncAttr.Public)) {
+        roots.add(func);
+      }
+    }
+
+    SimpleGraph<Named> g = DepGraph.build(roots);
+
+    Set<Named> keep = g.vertexSet();
+
+    prg.getConstant().retainAll(keep);
+    prg.getVariable().retainAll(keep);
+    prg.getFunction().retainAll(keep);
+    prg.getType().retainAll(keep);
+  }
+
   private static ImplElementary makeEnv(String instname, Component top, KnowledgeBase kb) {
     String envname = "!Env";
     ImplElementary env = new ImplElementary(new ElementInfo(envname, -1, -1), "!Env");
@@ -538,12 +594,10 @@ public class MainEvl {
   }
 
   private static FuncPrivateVoid makeEntryExitFunc(String name) {
-    FuncPrivateVoid func = new FuncPrivateVoid(info, name, new ListOfNamed<Variable>());
-    BasicBlock entryBb = new BasicBlock(info, "BB_entry");
-    BasicBlock exitBb = new BasicBlock(info, "BB_exit");
-    entryBb.setEnd(new Goto(info, exitBb));
-    exitBb.setEnd(new ReturnVoid(info));
-    func.setBody(new BasicBlockList(info, entryBb, exitBb));
+    FuncPrivateVoid func = new FuncPrivateVoid(info, name, new ListOfNamed<FuncVariable>());
+    Block body = new Block(info);
+    body.getStatements().add(new ReturnVoid(info));
+    func.setBody(body);
     return func;
   }
 
@@ -612,6 +666,104 @@ public class MainEvl {
         FunctionBase func = (FunctionBase) item;
         func.setAttribute(FuncAttr.Public);
       }
+    }
+  }
+
+  private static RizzlyProgram makeHeader(RizzlyProgram prg, String debugdir) {
+    RizzlyProgram ret = new RizzlyProgram(prg.getRootdir(), prg.getName());
+    Set<Evl> anchor = new HashSet<Evl>();
+    for( FunctionBase func : prg.getFunction() ) {
+      if( func.getAttributes().contains(FuncAttr.Public) ) {
+        boolean hasBody = func instanceof FuncWithBody;
+        assert ( func.getAttributes().contains(FuncAttr.Extern) || hasBody );
+        for( Variable arg : func.getParam() ) {
+          anchor.add(arg.getType().getRef());
+        }
+        if( func instanceof FuncWithReturn ) {
+          anchor.add(( (FuncWithReturn) func ).getRet());
+        }
+        if( hasBody ) {
+          if( func instanceof FuncWithReturn ) {
+            FuncProtoRet proto = new FuncProtoRet(func.getInfo(), func.getName(), func.getParam());
+            proto.setRet(( (FuncWithReturn) func ).getRet());
+            ret.getFunction().add(proto);
+          } else {
+            FuncProtoVoid proto = new FuncProtoVoid(func.getInfo(), func.getName(), func.getParam());
+            ret.getFunction().add(proto);
+          }
+        } else {
+          ret.getFunction().add(func);
+        }
+      }
+    }
+
+    Set<Named> dep = DepCollector.process(anchor);
+
+    for( Named itr : dep ) {
+      if( itr instanceof evl.type.Type ) {
+        ret.getType().add((evl.type.Type) itr);
+      } else if( itr instanceof NamedElement ) {
+        // element of record type
+      } else if( itr instanceof EnumElement ) {
+        // element of enumerator type
+      } else {
+        RError.err(ErrorType.Fatal, itr.getInfo(), "Object should not be used in header file: " + itr.getClass().getCanonicalName());
+      }
+    }
+
+    RizzlyProgram cpy = Copy.copy(ret);
+    
+    toposort(cpy.getType().getList());
+
+    return cpy;
+  }
+
+  private static void toposort(List<evl.type.Type> list) {
+    SimpleGraph<evl.type.Type> g = new SimpleGraph<evl.type.Type>(list);
+    for( evl.type.Type u : list ) {
+      Set<evl.type.Type> vs = getDirectUsedTypes(u);
+      for( evl.type.Type v : vs ) {
+        g.addEdge(u, v);
+      }
+    }
+
+    ArrayList<evl.type.Type> old = new ArrayList<evl.type.Type>(list);
+    int size = list.size();
+    list.clear();
+    LinkedList<evl.type.Type> nlist = new LinkedList<evl.type.Type>();
+    TopologicalOrderIterator<evl.type.Type, Pair<evl.type.Type, evl.type.Type>> itr = new TopologicalOrderIterator<evl.type.Type, Pair<evl.type.Type, evl.type.Type>>(g);
+    while( itr.hasNext() ) {
+      nlist.push(itr.next());
+    }
+    list.addAll(nlist);
+
+    ArrayList<evl.type.Type> diff = new ArrayList<evl.type.Type>(list);
+    diff.removeAll(old);
+    old.removeAll(list);
+    assert ( size == list.size() );
+  }
+  
+  private static Set<evl.type.Type> getDirectUsedTypes(evl.type.Type u) {
+    DefTraverser<Void, Set<evl.type.Type>> getter = new DefTraverser<Void, Set<evl.type.Type>>() {
+
+      @Override
+      protected Void visitTypeRef(TypeRef obj, Set<evl.type.Type> param) {
+        param.add(obj.getRef());
+        return null;
+      }
+    };
+    Set<evl.type.Type> vs = new HashSet<evl.type.Type>();
+    getter.traverse(u, vs);
+    return vs;
+  }
+
+  private static void printCHeader(String outdir, RizzlyProgram cprog,List<String> debugNames) {
+    String cfilename = outdir + cprog.getName() + ".h";
+    CHeaderWriter cwriter = new CHeaderWriter(debugNames);
+    try {
+      cwriter.traverse(cprog, new StreamWriter(new PrintStream(cfilename)));
+    } catch( FileNotFoundException e ) {
+      e.printStackTrace();
     }
   }
 

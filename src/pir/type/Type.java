@@ -14,7 +14,6 @@ abstract public class Type extends PirObject implements Referencable {
     return name;
   }
 
-  @Override
   public void setName(String name) {
     this.name = name;
   }

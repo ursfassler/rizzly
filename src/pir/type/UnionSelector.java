@@ -20,7 +20,6 @@ public class UnionSelector extends PirObject implements Referencable {
     return name;
   }
 
-  @Override
   public void setName(String name) {
     this.name = name;
   }

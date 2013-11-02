@@ -22,6 +22,7 @@ import evl.type.Type;
 import evl.type.base.RangeType;
 import evl.type.special.IntegerType;
 import evl.type.special.NaturalType;
+import evl.variable.FuncVariable;
 import evl.variable.Variable;
 
 /**
@@ -72,7 +73,7 @@ public class OpenReplace extends DefTraverser<Void, Void> {
       FunctionHeader func = (FunctionHeader) obj.getLink();
       RefCall call = (RefCall) obj.getOffset().get(0);
 
-      List<Variable> arg = func.getParam().getList();
+      List<FuncVariable> arg = func.getParam().getList();
       List<Expression> acarg = call.getActualParameter();
 
       assert (arg.size() == acarg.size());

@@ -20,6 +20,14 @@ public class Reference extends Expression {
     this.offset = new LinkedList<RefItem>(offset);
   }
 
+  public Reference(ElementInfo info, Named link, RefItem itm) {
+    super(info);
+    assert(link != null);
+    this.link = link;
+    this.offset = new LinkedList<RefItem>();
+    this.offset.add(itm);
+  }
+
   public Reference(ElementInfo info, Named link) {
     super(info);
     assert(link != null);

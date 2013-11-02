@@ -3,6 +3,10 @@
 #include  <stdlib.h>
 #include  "output/inst.h"
 
+void _trap(){
+  exit( EXIT_FAILURE );
+}
+
 static int i;
 
 void inst_alarm_tick(){

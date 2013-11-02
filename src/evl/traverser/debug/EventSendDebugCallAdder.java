@@ -9,7 +9,6 @@ import common.ElementInfo;
 import evl.DefTraverser;
 import evl.Evl;
 import evl.NullTraverser;
-import evl.cfg.BasicBlock;
 import evl.composition.ImplComposition;
 import evl.expression.Expression;
 import evl.expression.Number;
@@ -24,8 +23,9 @@ import evl.other.ImplElementary;
 import evl.other.Named;
 import evl.other.NamedList;
 import evl.other.Namespace;
-import evl.statement.normal.CallStmt;
-import evl.statement.normal.NormalStmt;
+import evl.statement.Block;
+import evl.statement.CallStmt;
+import evl.statement.Statement;
 import evl.type.Type;
 import evl.variable.ConstGlobal;
 
@@ -94,7 +94,7 @@ public class EventSendDebugCallAdder extends NullTraverser<Void, Void> {
   }
 }
 
-class StmtTraverser extends DefTraverser<Void, List<NormalStmt>> {
+class StmtTraverser extends DefTraverser<Void, List<Statement>> {
 
   private FuncPrivateVoid debugSend;
   private ArrayList<String> names;
@@ -107,19 +107,19 @@ class StmtTraverser extends DefTraverser<Void, List<NormalStmt>> {
   }
 
   @Override
-  protected Void visitBasicBlock(BasicBlock obj, List<NormalStmt> param) {
-    List<NormalStmt> sl = new ArrayList<NormalStmt>();
-    for( NormalStmt stmt : obj.getCode() ) {
+  protected Void visitBlock(Block obj, List<Statement> param) {
+    List<Statement> sl = new ArrayList<Statement>();
+    for( Statement stmt : obj.getStatements() ) {
       visit(stmt, sl);
       sl.add(stmt);
     }
-    obj.getCode().clear();
-    obj.getCode().addAll(sl);
+    obj.getStatements().clear();
+    obj.getStatements().addAll(sl);
     return null;
   }
 
   @Override
-  protected Void visitReference(Reference obj, List<NormalStmt> param) {
+  protected Void visitReference(Reference obj, List<Statement> param) {
     super.visitReference(obj, param);
 
     for( int i = 0; i < obj.getOffset().size(); i++ ) {
@@ -147,7 +147,7 @@ class StmtTraverser extends DefTraverser<Void, List<NormalStmt>> {
     return null;
   }
 
-  private NormalStmt makeCall(FuncPrivateVoid func, int numFunc, int numIface) {
+  private CallStmt makeCall(FuncPrivateVoid func, int numFunc, int numIface) {
     // Self._sendMsg( numFunc, numIface );
     List<Expression> actParam = new ArrayList<Expression>();
     actParam.add(new Number(info, BigInteger.valueOf(numFunc)));

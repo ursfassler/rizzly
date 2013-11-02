@@ -1,6 +1,6 @@
 package pir.expression;
 
-public class StringValue extends PExpression {
+public class StringValue extends Expression {
   final private String value;
 
   public StringValue(String value) {

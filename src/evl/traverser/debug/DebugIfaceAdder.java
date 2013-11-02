@@ -10,7 +10,6 @@ import common.ElementInfo;
 
 import evl.Evl;
 import evl.NullTraverser;
-import evl.cfg.BasicBlockList;
 import evl.composition.ImplComposition;
 import evl.expression.Expression;
 import evl.expression.Number;
@@ -18,7 +17,6 @@ import evl.expression.binop.Plus;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefName;
-import evl.expression.reference.RefPtrDeref;
 import evl.expression.reference.Reference;
 import evl.function.impl.FuncPrivateVoid;
 import evl.function.impl.FuncSubHandlerEvent;
@@ -28,101 +26,88 @@ import evl.other.ImplElementary;
 import evl.other.Interface;
 import evl.other.ListOfNamed;
 import evl.other.Namespace;
-import evl.statement.normal.Assignment;
-import evl.statement.normal.CallStmt;
-import evl.statement.normal.GetElementPtr;
-import evl.statement.normal.NormalStmt;
-import evl.statement.normal.StackMemoryAlloc;
-import evl.statement.normal.StoreStmt;
+import evl.statement.Assignment;
+import evl.statement.Block;
+import evl.statement.CallStmt;
+import evl.statement.Statement;
+import evl.statement.VarDefStmt;
 import evl.type.TypeRef;
+import evl.type.base.ArrayType;
 import evl.type.base.RangeType;
-import evl.type.special.PointerType;
-import evl.variable.SsaVariable;
-import evl.variable.Variable;
+import evl.variable.FuncVariable;
 
 public class DebugIfaceAdder extends NullTraverser<Void, Void> {
 
   final private Interface debugIface;
-  final private PointerType pArrayType;
-  final private PointerType pArrayElemType;
+  final private ArrayType arrayType;
   final private RangeType sizeType;
   final private RangeType nameNumType;
   final private ArrayList<String> names;
   final static private ElementInfo info = new ElementInfo();
 
-  public DebugIfaceAdder(PointerType pArrayType, PointerType pArrayElemType, RangeType sizeType, RangeType nameNumType, Interface debugIface, ArrayList<String> names) {
+  public DebugIfaceAdder(ArrayType arrayType, RangeType sizeType, RangeType nameNumType, Interface debugIface, ArrayList<String> names) {
     super();
     this.names = names;
     this.debugIface = debugIface;
-    this.pArrayType = pArrayType;
+    this.arrayType = arrayType;
     this.sizeType = sizeType;
     this.nameNumType = nameNumType;
-    this.pArrayElemType = pArrayElemType;
   }
 
-  public static void process(Evl obj, PointerType pArrayType, PointerType pArrayElemType, RangeType sizeType, RangeType nameNumType, Interface debugIface, ArrayList<String> names) {
-    DebugIfaceAdder reduction = new DebugIfaceAdder(pArrayType, pArrayElemType, sizeType, nameNumType, debugIface, names);
+  public static void process(Evl obj, ArrayType arrayType, RangeType sizeType, RangeType nameNumType, Interface debugIface, ArrayList<String> names) {
+    DebugIfaceAdder reduction = new DebugIfaceAdder(arrayType, sizeType, nameNumType, debugIface, names);
     reduction.traverse(obj, null);
   }
 
   private FuncSubHandlerEvent makeRecvProto(RangeType sizeType) {
-    ListOfNamed<Variable> param = new ListOfNamed<Variable>();
-    SsaVariable sender = new SsaVariable(info, "receiver", new TypeRef(info, pArrayType));
+    ListOfNamed<FuncVariable> param = new ListOfNamed<FuncVariable>();
+    FuncVariable sender = new FuncVariable(info, "receiver", new TypeRef(info, arrayType));
     param.add(sender);
-    SsaVariable size = new SsaVariable(info, "size", new TypeRef(info, sizeType));
+    FuncVariable size = new FuncVariable(info, "size", new TypeRef(info, sizeType));
     param.add(size);
 
     FuncSubHandlerEvent func = new FuncSubHandlerEvent(info, "msgRecv", param);
-    func.setBody(new BasicBlockList(info));
+    func.setBody(new Block(info));
     return func;
   }
 
   private FuncSubHandlerEvent makeSendProto(RangeType sizeType) {
-    ListOfNamed<Variable> param = new ListOfNamed<Variable>();
-    SsaVariable sender = new SsaVariable(info, "sender", new TypeRef(info, pArrayType));
+    ListOfNamed<FuncVariable> param = new ListOfNamed<FuncVariable>();
+    FuncVariable sender = new FuncVariable(info, "sender", new TypeRef(info, arrayType));
     param.add(sender);
-    SsaVariable size = new SsaVariable(info, "size", new TypeRef(info, sizeType));
+    FuncVariable size = new FuncVariable(info, "size", new TypeRef(info, sizeType));
     param.add(size);
 
     FuncSubHandlerEvent func = new FuncSubHandlerEvent(info, "msgSend", param);
-    func.setBody(new BasicBlockList(info));
+    func.setBody(new Block(info));
     return func;
   }
 
   private FuncPrivateVoid makeDebugSend(String callname, IfaceUse debugIfaceUse) {
-    ArrayList<NormalStmt> code = new ArrayList<NormalStmt>();
+    Block body = new Block(info);
 
-    SsaVariable func = new SsaVariable(info, "func", new TypeRef(info, nameNumType));
-    SsaVariable iface = new SsaVariable(info, "iface", new TypeRef(info, nameNumType));
+    FuncVariable func = new FuncVariable(info, "func", new TypeRef(info, nameNumType));
+    FuncVariable iface = new FuncVariable(info, "iface", new TypeRef(info, nameNumType));
 
-    SsaVariable path = new SsaVariable(info, "path", new TypeRef(info, pArrayType));
+    FuncVariable path = new FuncVariable(info, "path", new TypeRef(info, arrayType));
     { // path : Array{D,N};
-      StackMemoryAlloc def = new StackMemoryAlloc(info, path);
-      code.add(def);
+      VarDefStmt def = new VarDefStmt(info, path);
+      body.getStatements().add(def);
     }
 
     { // path[0] := func;
-      SsaVariable pidx0 = new SsaVariable(info, "pidx0", new TypeRef(info, pArrayElemType));
-      Reference arridx = new Reference(info, path);
-      arridx.getOffset().add(new RefPtrDeref(info));
-      arridx.getOffset().add(new RefIndex(info, new Number(info, BigInteger.ZERO)));
-      GetElementPtr gep = new GetElementPtr(info, pidx0, arridx);
-      StoreStmt store = new StoreStmt(info, new Reference(info, pidx0), new Reference(info, func));
 
-      code.add(gep);
-      code.add(store);
+      Reference left = new Reference(info, path, new RefIndex(info, new Number(info, BigInteger.ZERO)));
+      Reference right = new Reference(info, func);
+      Assignment ass = new Assignment(info, left, right);
+      body.getStatements().add(ass);
     }
 
     { // path[1] := iface;
-      SsaVariable pidx1 = new SsaVariable(info, "pidx1", new TypeRef(info, pArrayElemType));
-      Reference arridx = new Reference(info, path);
-      arridx.getOffset().add(new RefPtrDeref(info));
-      arridx.getOffset().add(new RefIndex(info, new Number(info, BigInteger.ONE)));
-      GetElementPtr gep = new GetElementPtr(info, pidx1, arridx);
-      StoreStmt store = new StoreStmt(info, new Reference(info, pidx1), new Reference(info, iface));
-
-      code.add(gep);
-      code.add(store);
+      Reference left = new Reference(info, path, new RefIndex(info, new Number(info, BigInteger.ONE)));
+      Reference right = new Reference(info, iface);
+      Assignment ass = new Assignment(info, left, right);
+      body.getStatements().add(ass);
     }
 
     { // _debug.msgSend( path, 2 );
@@ -134,17 +119,14 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
       call.getOffset().add(new RefName(info, callname));
       call.getOffset().add(new RefCall(info, actParam));
 
-      code.add(new CallStmt(info, call));
+      body.getStatements().add(new CallStmt(info, call));
     }
 
-    BasicBlockList bblist = new BasicBlockList(info);
-    bblist.insertCodeAfterEntry(code, "body");
-
-    ListOfNamed<Variable> param = new ListOfNamed<Variable>();
+    ListOfNamed<FuncVariable> param = new ListOfNamed<FuncVariable>();
     param.add(func);
     param.add(iface);
     FuncPrivateVoid rfunc = new FuncPrivateVoid(info, "_" + callname, param);
-    rfunc.setBody(bblist);
+    rfunc.setBody(body);
 
     return rfunc;
   }
@@ -162,27 +144,25 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     return null;
   }
 
-  private List<NormalStmt> makeCode(String callname, SsaVariable pArray, SsaVariable argSize, IfaceUse debug, String compName) {
-    List<NormalStmt> code = new ArrayList<NormalStmt>();
+  private List<Statement> makeCode(String callname, FuncVariable pArray, FuncVariable argSize, IfaceUse debug, String compName) {
+    List<Statement> code = new ArrayList<Statement>();
 
     int x = names.indexOf(compName);
     assert (x >= 0);
 
     { // sender[size] := x;
-      SsaVariable pSendSize = new SsaVariable(info, "pSendSize", new TypeRef(info, pArrayElemType));
-      Reference ref = new Reference(info, pArray);
-      ref.getOffset().add(new RefPtrDeref(info));
-      ref.getOffset().add(new RefIndex(info, new Reference(info, argSize)));
-      GetElementPtr gep = new GetElementPtr(info, pSendSize, ref);
-      StoreStmt store = new StoreStmt(info, new Reference(info, pSendSize), new Number(info, BigInteger.valueOf(x)));
-
-      code.add(gep);
-      code.add(store);
+      Reference left = new Reference(info, pArray, new RefIndex(info, new Reference(info, argSize)));
+      Number right = new Number(info, BigInteger.valueOf(x));
+      Assignment ass = new Assignment(info, left, right);
+      code.add(ass);
     }
 
-    SsaVariable sizeP1 = new SsaVariable(info, "sizeP1", new TypeRef(info, sizeType));
+    FuncVariable sizeP1 = new FuncVariable(info, "sizeP1", new TypeRef(info, sizeType));
 
     { // sizeP1 := size + 1;
+      VarDefStmt def = new VarDefStmt(info, sizeP1);
+      code.add(def);
+
       Expression expr = new Plus(info, new Reference(info, argSize), new Number(info, BigInteger.ONE));
       Assignment ass = new Assignment(info, new Reference(info, sizeP1), expr);
       code.add(ass);
@@ -226,15 +206,15 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
 
         {
           FuncSubHandlerEvent recv = makeRecvProto(sizeType);
-          List<NormalStmt> body = makeCode(recv.getName(), (SsaVariable) recv.getParam().getList().get(0), (SsaVariable) recv.getParam().getList().get(1), debIface, use.getName());
-          recv.getBody().insertCodeAfterEntry(body, "body");
+          List<Statement> body = makeCode(recv.getName(), recv.getParam().getList().get(0), recv.getParam().getList().get(1), debIface, use.getName());
+          recv.getBody().getStatements().addAll(body);
           obj.addFunction(name.toList(), recv);
         }
 
         {
           FuncSubHandlerEvent send = makeSendProto(sizeType);
-          List<NormalStmt> body = makeCode(send.getName(), (SsaVariable) send.getParam().getList().get(0), (SsaVariable) send.getParam().getList().get(1), debIface, use.getName());
-          send.getBody().insertCodeAfterEntry(body, "body");
+          List<Statement> body = makeCode(send.getName(), send.getParam().getList().get(0), send.getParam().getList().get(1), debIface, use.getName());
+          send.getBody().getStatements().addAll(body);
           obj.addFunction(name.toList(), send);
         }
       }

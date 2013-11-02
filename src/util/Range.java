@@ -1,8 +1,9 @@
 package util;
 
 import java.math.BigInteger;
+import java.util.Iterator;
 
-final public class Range {
+final public class Range implements Iterable<BigInteger> {
   final private BigInteger low;
   final private BigInteger high;
 
@@ -43,6 +44,10 @@ final public class Range {
     throw new RuntimeException("not yet implemented");
   }
 
+  public Iterator<BigInteger> iterator() {
+    return new RangeIterator( low, high );
+  }
+
   @Override
   public String toString() {
     return low + ".." + high;
@@ -77,6 +82,35 @@ final public class Range {
     } else if (!low.equals(other.low))
       return false;
     return true;
+  }
+
+}
+
+class RangeIterator implements Iterator<BigInteger> {
+  private BigInteger act;
+  private BigInteger last;
+
+  public RangeIterator(BigInteger low, BigInteger high) {
+    super();
+    this.act = low;
+    this.last = high;
+  }
+
+  @Override
+  public boolean hasNext() {
+    return act.compareTo(last) <= 0;
+  }
+
+  @Override
+  public BigInteger next() {
+    assert (hasNext());
+    BigInteger ret = act;
+    act = act.add(BigInteger.ONE);
+    return ret;
+  }
+
+  @Override
+  public void remove() {
   }
 
 }

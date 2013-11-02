@@ -2,24 +2,24 @@ package evl.function.impl;
 
 import common.ElementInfo;
 
-import evl.cfg.BasicBlockList;
 import evl.function.FuncWithBody;
 import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
 import evl.other.ListOfNamed;
+import evl.statement.Block;
 import evl.type.TypeRef;
-import evl.variable.Variable;
+import evl.variable.FuncVariable;
 
 /**
- * 
+ *
  * @author urs
  */
 public class FuncInputHandlerQuery extends FunctionBase implements FuncWithReturn, FuncWithBody {
 
   private TypeRef ret = null;
-  private BasicBlockList body = null;
+  private Block body = null;
 
-  public FuncInputHandlerQuery(ElementInfo info, String name, ListOfNamed<Variable> param) {
+  public FuncInputHandlerQuery(ElementInfo info, String name, ListOfNamed<FuncVariable> param) {
     super(info, name, param);
   }
 
@@ -36,13 +36,13 @@ public class FuncInputHandlerQuery extends FunctionBase implements FuncWithRetur
   }
 
   @Override
-  public BasicBlockList getBody() {
+  public Block getBody() {
     assert (body != null);
     return body;
   }
 
   @Override
-  public void setBody(BasicBlockList body) {
+  public void setBody(Block body) {
     assert (body != null);
     this.body = body;
   }

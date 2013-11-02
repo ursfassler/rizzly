@@ -5,21 +5,25 @@ import java.util.List;
 import error.ErrorType;
 import error.RError;
 import evl.DefTraverser;
-import evl.cfg.BasicBlock;
 import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
 import evl.expression.Expression;
 import evl.expression.Number;
 import evl.expression.RangeValue;
 import evl.expression.StringValue;
+import evl.expression.TypeCast;
 import evl.expression.binop.And;
 import evl.expression.binop.BinaryExp;
+import evl.expression.binop.BitAnd;
+import evl.expression.binop.BitOr;
 import evl.expression.binop.Div;
 import evl.expression.binop.Equal;
 import evl.expression.binop.Greater;
 import evl.expression.binop.Greaterequal;
 import evl.expression.binop.Less;
 import evl.expression.binop.Lessequal;
+import evl.expression.binop.LogicAnd;
+import evl.expression.binop.LogicOr;
 import evl.expression.binop.Minus;
 import evl.expression.binop.Mod;
 import evl.expression.binop.Mul;
@@ -36,14 +40,11 @@ import evl.expression.reference.Reference;
 import evl.expression.unop.Not;
 import evl.expression.unop.Uminus;
 import evl.hfsm.Transition;
-import evl.statement.bbend.CaseOptRange;
-import evl.statement.bbend.CaseOptValue;
-import evl.statement.bbend.ReturnExpr;
-import evl.statement.normal.Assignment;
-import evl.statement.normal.StoreStmt;
-import evl.statement.normal.TypeCast;
-import evl.statement.normal.VarDefInitStmt;
-import evl.statement.phi.PhiStmt;
+import evl.statement.Assignment;
+import evl.statement.CaseOptRange;
+import evl.statement.CaseOptValue;
+import evl.statement.IfOption;
+import evl.statement.ReturnExpr;
 import evl.variable.Constant;
 
 abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
@@ -173,6 +174,26 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   }
 
   @Override
+  protected Expression visitBitAnd(BitAnd obj, T param) {
+    return defaultBinaryOp(obj,param);
+  }
+
+  @Override
+  protected Expression visitBitOr(BitOr obj, T param) {
+    return defaultBinaryOp(obj,param);
+  }
+
+  @Override
+  protected Expression visitLogicOr(LogicOr obj, T param) {
+    return defaultBinaryOp(obj,param);
+  }
+
+  @Override
+  protected Expression visitLogicAnd(LogicAnd obj, T param) {
+    return defaultBinaryOp(obj,param);
+  }
+
+  @Override
   protected Expression visitNot(Not obj, T param) {
     obj.setExpr(visit(obj.getExpr(), param));
     return obj;
@@ -213,7 +234,7 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   @Override
   protected Expression visitTypeCast(TypeCast obj, T param) {
     obj.setValue(visit(obj.getValue(),param));
-    return null;
+    return obj;
   }
 
   @Override
@@ -255,27 +276,9 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitVarDefInitStmt(VarDefInitStmt obj, T param) {
-    obj.setInit(visit(obj.getInit(), param));
-    return null;
-  }
-
-  @Override
-  protected Expression visitPhiStmt(PhiStmt obj, T param) {
-    visit(obj.getVariable(), param);
-    for( BasicBlock in : obj.getInBB() ) {
-      Expression expr = obj.getArg(in);
-      assert(expr != null);
-      expr = visit(expr, param);
-      obj.addArg(in, expr);
-    }
-    return null;
-  }
-
-  @Override
-  protected Expression visitStoreStmt(StoreStmt obj, T param) {
-    obj.setExpr(visit(obj.getExpr(), param) );
-    visit(obj.getAddress(), param);
+  protected Expression visitIfOption(IfOption obj, T param) {
+    obj.setCondition(visit(obj.getCondition(),param));
+    visit(obj.getCode(),param);
     return null;
   }
 

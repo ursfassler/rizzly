@@ -3,10 +3,10 @@ package pir.expression;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ArrayValue extends PExpression {
-  final private List<PExpression> value = new ArrayList<PExpression>();
+public class ArrayValue extends Expression {
+  final private List<Expression> value = new ArrayList<Expression>();
 
-  public List<PExpression> getValue() {
+  public List<Expression> getValue() {
     return value;
   }
 

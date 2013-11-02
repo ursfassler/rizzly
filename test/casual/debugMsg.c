@@ -1,6 +1,11 @@
 #include  <stdio.h>
 #include  <stdint.h>
+#include  <stdlib.h>
 #include  "output/inst.h"
+
+void _trap(){
+  exit( EXIT_FAILURE );
+}
 
 void printMsg( uint8_t *list, int size ){
   int i;
@@ -12,15 +17,15 @@ void printMsg( uint8_t *list, int size ){
   }
 }
 
-void inst__debug_msgSend(Pointer_Array_3_R_0_6 sender, R_0_2 size){
+void inst__debug_msgSend(Array_3_R_0_6 sender, R_0_2 size){
   printf( "send: " );
-  printMsg( *sender, size );
+  printMsg( sender, size );
   printf( "\n" );
 }
 
-void inst__debug_msgRecv(Pointer_Array_3_R_0_6 receiver, R_0_2 size){
+void inst__debug_msgRecv(Array_3_R_0_6 receiver, R_0_2 size){
   printf( "recv: " );
-  printMsg( *receiver, size );
+  printMsg( receiver, size );
   printf( "\n" );
 }
 

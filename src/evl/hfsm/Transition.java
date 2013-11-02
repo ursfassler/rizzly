@@ -4,11 +4,11 @@ import java.util.Collection;
 
 import common.ElementInfo;
 
-import evl.cfg.BasicBlockList;
 import evl.expression.Expression;
 import evl.other.IfaceUse;
 import evl.other.ListOfNamed;
-import evl.variable.Variable;
+import evl.statement.Block;
+import evl.variable.FuncVariable;
 
 public class Transition extends StateItem {
   private String name;
@@ -17,10 +17,10 @@ public class Transition extends StateItem {
   private IfaceUse eventIface;
   private String eventFunc;
   private Expression guard;
-  final private ListOfNamed<Variable> param;
-  private BasicBlockList body;
+  final private ListOfNamed<FuncVariable> param;
+  private Block body;
 
-  public Transition(ElementInfo info, String name, State src, State dst, IfaceUse eventIface, String eventFunc, Expression guard, Collection<Variable> param, BasicBlockList body) {
+  public Transition(ElementInfo info, String name, State src, State dst, IfaceUse eventIface, String eventFunc, Expression guard, Collection<FuncVariable> param, Block body) {
     super(info);
     this.name = name;
     this.src = src;
@@ -28,7 +28,7 @@ public class Transition extends StateItem {
     this.eventIface = eventIface;
     this.eventFunc = eventFunc;
     this.guard = guard;
-    this.param = new ListOfNamed<Variable>(param);
+    this.param = new ListOfNamed<FuncVariable>(param);
     this.body = body;
   }
 
@@ -80,15 +80,15 @@ public class Transition extends StateItem {
     this.eventFunc = eventFunc;
   }
 
-  public ListOfNamed<Variable> getParam() {
+  public ListOfNamed<FuncVariable> getParam() {
     return param;
   }
 
-  public BasicBlockList getBody() {
+  public Block getBody() {
     return body;
   }
 
-  public void setBody(BasicBlockList body) {
+  public void setBody(Block body) {
     this.body = body;
   }
 

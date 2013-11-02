@@ -107,12 +107,12 @@ static void checkStep( What what, uint8_t *list, int size ){
   printf( "\n" );
 }
 
-void inst__debug_msgSend(Pointer_Array_4_R_0_8 sender, R_0_3 size){
-  checkStep( DBG_SEND, *sender, size );
+void inst__debug_msgSend(Array_4_R_0_8 sender, R_0_3 size){
+  checkStep( DBG_SEND, sender, size );
 }
 
-void inst__debug_msgRecv(Pointer_Array_4_R_0_8 receiver, R_0_3 size){
-  checkStep( DBG_RECV, *receiver, size );
+void inst__debug_msgRecv(Array_4_R_0_8 receiver, R_0_3 size){
+  checkStep( DBG_RECV, receiver, size );
 }
 
 void inst_out_foo(){

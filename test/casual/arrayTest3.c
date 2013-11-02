@@ -3,6 +3,10 @@
 #include  <stdlib.h>
 #include  "output/inst.h"
 
+void _trap(){
+  exit( EXIT_FAILURE );
+}
+
 int main(){
   inst__system_construct();
   

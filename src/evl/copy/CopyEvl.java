@@ -10,8 +10,6 @@ import common.Direction;
 
 import evl.Evl;
 import evl.NullTraverser;
-import evl.cfg.BasicBlock;
-import evl.cfg.BasicBlockList;
 import evl.expression.Expression;
 import evl.expression.reference.RefItem;
 import evl.function.FunctionBase;
@@ -22,9 +20,12 @@ import evl.other.ImplElementary;
 import evl.other.Named;
 import evl.other.NamedList;
 import evl.other.RizzlyProgram;
+import evl.statement.CaseOpt;
+import evl.statement.CaseOptEntry;
+import evl.statement.CaseOptRange;
+import evl.statement.CaseOptValue;
+import evl.statement.IfOption;
 import evl.statement.Statement;
-import evl.statement.bbend.CaseGotoOpt;
-import evl.statement.bbend.CaseOptEntry;
 import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.base.EnumDefRef;
@@ -131,11 +132,6 @@ class CopyEvl extends NullTraverser<Evl, Void> {
   }
 
   @Override
-  protected Evl visitCaseOptEntry(CaseOptEntry obj, Void param) {
-    return caoe.traverse(obj, param);
-  }
-
-  @Override
   protected Evl visitStateItem(StateItem obj, Void param) {
     return cosi.traverse(obj, param);
   }
@@ -169,28 +165,6 @@ class CopyEvl extends NullTraverser<Evl, Void> {
   }
 
   @Override
-  protected Evl visitBasicBlockList(BasicBlockList obj, Void param) {
-    BasicBlockList bbl = new BasicBlockList(obj.getInfo(), copy(obj.getEntry()), copy(obj.getExit()));
-    bbl.getBasicBlocks().addAll(copy(obj.getBasicBlocks()));
-    return bbl;
-  }
-
-  @Override
-  protected Evl visitBasicBlock(BasicBlock obj, Void param) {
-    BasicBlock bb = new BasicBlock(obj.getInfo(), obj.getName());
-    copied.put(obj, bb);
-    bb.getPhi().addAll(copy(obj.getPhi()));
-    bb.getCode().addAll(copy(obj.getCode()));
-    bb.setEnd(copy(obj.getEnd()));
-    return bb;
-  }
-
-  @Override
-  protected Evl visitCaseGotoOpt(CaseGotoOpt obj, Void param) {
-    return new CaseGotoOpt(obj.getInfo(), (List<CaseOptEntry>) copy(obj.getValue()), copy(obj.getDst()));
-  }
-
-  @Override
   protected Evl visitTypeRef(TypeRef obj, Void param) {
     return new TypeRef(obj.getInfo(), obj.getRef()); // we keep link to old type
   }
@@ -208,6 +182,30 @@ class CopyEvl extends NullTraverser<Evl, Void> {
     } else {
       return new EnumDefRef(obj.getInfo(), elem);
     }
+  }
+
+  @Override
+  protected Evl visitIfOption(IfOption obj, Void param) {
+    return new IfOption(obj.getInfo(), copy(obj.getCondition()), copy(obj.getCode()));
+  }
+
+  @Override
+  protected Evl visitCaseOpt(CaseOpt obj, Void param) {
+    List<CaseOptEntry> entries = new ArrayList<CaseOptEntry>();
+    for (CaseOptEntry itr : obj.getValue()) {
+      entries.add(copy(itr));
+    }
+    return new CaseOpt(obj.getInfo(), entries, copy(obj.getCode()));
+  }
+
+  @Override
+  protected Evl visitCaseOptValue(CaseOptValue obj, Void param) {
+    return new CaseOptValue(obj.getInfo(),copy(obj.getValue()));
+  }
+
+  @Override
+  protected Evl visitCaseOptRange(CaseOptRange obj, Void param) {
+    return new CaseOptRange(obj.getInfo(),copy(obj.getStart()),copy(obj.getEnd()));
   }
 
 }

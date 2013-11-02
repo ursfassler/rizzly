@@ -1,68 +1,56 @@
 package pir;
 
-import pir.cfg.BasicBlock;
-import pir.cfg.BasicBlockList;
 import pir.expression.ArrayValue;
 import pir.expression.BoolValue;
 import pir.expression.Number;
 import pir.expression.StringValue;
+import pir.expression.TypeCast;
+import pir.expression.binop.BitAnd;
+import pir.expression.binop.BitOr;
+import pir.expression.binop.Div;
+import pir.expression.binop.Equal;
+import pir.expression.binop.Greater;
+import pir.expression.binop.Greaterequal;
+import pir.expression.binop.Less;
+import pir.expression.binop.Lessequal;
+import pir.expression.binop.LogicAnd;
+import pir.expression.binop.LogicOr;
+import pir.expression.binop.LogicXand;
+import pir.expression.binop.LogicXor;
+import pir.expression.binop.Minus;
+import pir.expression.binop.Mod;
+import pir.expression.binop.Mul;
+import pir.expression.binop.Notequal;
+import pir.expression.binop.Plus;
+import pir.expression.binop.Shl;
+import pir.expression.binop.Shr;
+import pir.expression.reference.RefCall;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefName;
-import pir.expression.reference.VarRef;
-import pir.expression.reference.VarRefConst;
-import pir.expression.reference.VarRefSimple;
-import pir.expression.reference.VarRefStatevar;
-import pir.function.FuncImpl;
-import pir.function.FuncProto;
+import pir.expression.reference.Reference;
+import pir.expression.unop.Not;
+import pir.expression.unop.Uminus;
+import pir.function.impl.FuncImplRet;
+import pir.function.impl.FuncImplVoid;
+import pir.function.impl.FuncProtoRet;
+import pir.function.impl.FuncProtoVoid;
 import pir.other.Constant;
 import pir.other.FuncVariable;
 import pir.other.Program;
-import pir.other.SsaVariable;
 import pir.other.StateVariable;
-import pir.statement.bbend.CaseGoto;
-import pir.statement.bbend.CaseGotoOpt;
-import pir.statement.bbend.Goto;
-import pir.statement.bbend.IfGoto;
-import pir.statement.bbend.ReturnExpr;
-import pir.statement.bbend.ReturnVoid;
-import pir.statement.bbend.Unreachable;
-import pir.statement.normal.Assignment;
-import pir.statement.normal.CallAssignment;
-import pir.statement.normal.CallStmt;
-import pir.statement.normal.GetElementPtr;
-import pir.statement.normal.LoadStmt;
-import pir.statement.normal.StackMemoryAlloc;
-import pir.statement.normal.StoreStmt;
-import pir.statement.normal.binop.BitAnd;
-import pir.statement.normal.binop.BitOr;
-import pir.statement.normal.binop.Div;
-import pir.statement.normal.binop.Equal;
-import pir.statement.normal.binop.Greater;
-import pir.statement.normal.binop.Greaterequal;
-import pir.statement.normal.binop.Less;
-import pir.statement.normal.binop.Lessequal;
-import pir.statement.normal.binop.LogicAnd;
-import pir.statement.normal.binop.LogicOr;
-import pir.statement.normal.binop.LogicXand;
-import pir.statement.normal.binop.LogicXor;
-import pir.statement.normal.binop.Minus;
-import pir.statement.normal.binop.Mod;
-import pir.statement.normal.binop.Mul;
-import pir.statement.normal.binop.Notequal;
-import pir.statement.normal.binop.Plus;
-import pir.statement.normal.binop.Shl;
-import pir.statement.normal.binop.Shr;
-import pir.statement.normal.convert.SignExtendValue;
-import pir.statement.normal.convert.TruncValue;
-import pir.statement.normal.convert.TypeCast;
-import pir.statement.normal.convert.ZeroExtendValue;
-import pir.statement.normal.unop.Not;
-import pir.statement.normal.unop.Uminus;
-import pir.statement.phi.PhiStmt;
+import pir.statement.Assignment;
+import pir.statement.Block;
+import pir.statement.CallStmt;
+import pir.statement.CaseEntry;
+import pir.statement.CaseStmt;
+import pir.statement.IfStmt;
+import pir.statement.ReturnExpr;
+import pir.statement.ReturnVoid;
+import pir.statement.VarDefStmt;
+import pir.statement.WhileStmt;
 import pir.type.ArrayType;
 import pir.type.BooleanType;
 import pir.type.NamedElement;
-import pir.type.NoSignType;
 import pir.type.PointerType;
 import pir.type.RangeType;
 import pir.type.SignedType;
@@ -89,22 +77,9 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitCallStmt(CallStmt obj, P param) {
-    visitList(obj.getParameter(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitStoreStmt(StoreStmt obj, P param) {
-    visit(obj.getSrc(), param);
-    visit(obj.getDst(), param);
-    return null;
-  }
-
-  @Override
   protected R visitAssignment(Assignment obj, P param) {
     visit(obj.getSrc(), param);
-    visit(obj.getVariable(), param);
+    visit(obj.getDst(), param);
     return null;
   }
 
@@ -183,7 +158,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitArray(ArrayType obj, P param) {
+  protected R visitArrayType(ArrayType obj, P param) {
     visit(obj.getType(), param);
     return null;
   }
@@ -215,57 +190,12 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitBasicBlockList(BasicBlockList obj, P param) {
-    visit(obj.getEntry(), param);
-    visitList(obj.getBasicBlocks(), param);
-    visit(obj.getExit(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitBasicBlock(BasicBlock obj, P param) {
-    visitList(obj.getPhi(), param);
-    visitList(obj.getCode(), param);
-    visit(obj.getEnd(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitSsaVariable(SsaVariable obj, P param) {
-    visit(obj.getType(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitGoto(Goto obj, P param) {
-    return null;
-  }
-
-  @Override
-  protected R visitCaseGotoOpt(CaseGotoOpt obj, P param) {
-    return null;
-  }
-
-  @Override
-  protected R visitPhiStmt(PhiStmt obj, P param) {
-    visit(obj.getVariable(), param);
-    visitList(obj.getReferences(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitIfGoto(IfGoto obj, P param) {
-    visit(obj.getCondition(), param);
-    return null;
-  }
-
-  @Override
   protected R visitSignedType(SignedType obj, P param) {
     return null;
   }
 
   @Override
-  protected R visitFuncImpl(FuncImpl obj, P param) {
+  protected R visitFuncImplRet(FuncImplRet obj, P param) {
     visitList(obj.getArgument(), param);
     visit(obj.getRetType(), param);
     visit(obj.getBody(), param);
@@ -273,92 +203,34 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitFuncProto(FuncProto obj, P param) {
+  protected R visitFuncImplVoid(FuncImplVoid obj, P param) {
+    visitList(obj.getArgument(), param);
+    visit(obj.getBody(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitFuncProtoRet(FuncProtoRet obj, P param) {
     visitList(obj.getArgument(), param);
     visit(obj.getRetType(), param);
     return null;
   }
 
   @Override
-  protected R visitCaseGoto(CaseGoto obj, P param) {
-    visit(obj.getCondition(), param);
-    visitList(obj.getOption(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitVarRef(VarRef obj, P param) {
-    visitList(obj.getOffset(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitVarRefStatevar(VarRefStatevar obj, P param) {
-    return null;
-  }
-
-  @Override
-  protected R visitVarRefSimple(VarRefSimple obj, P param) {
-    return null;
-  }
-
-  @Override
-  protected R visitLoadStmt(LoadStmt obj, P param) {
-    visit(obj.getSrc(), param);
-    visit(obj.getVariable(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitCallAssignment(CallAssignment obj, P param) {
-    visitList(obj.getParameter(), param);
-    visit(obj.getVariable(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitGetElementPtr(GetElementPtr obj, P param) {
-    visit(obj.getBase(), param);
-    visitList(obj.getOffset(), param);
-    visit(obj.getVariable(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitTruncValue(TruncValue obj, P param) {
-    visit(obj.getOriginal(), param);
-    visit(obj.getVariable(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitSignExtendValue(SignExtendValue obj, P param) {
-    visit(obj.getOriginal(), param);
-    visit(obj.getVariable(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitZeroExtendValue(ZeroExtendValue obj, P param) {
-    visit(obj.getOriginal(), param);
-    visit(obj.getVariable(), param);
+  protected R visitFuncProtoVoid(FuncProtoVoid obj, P param) {
+    visitList(obj.getArgument(), param);
     return null;
   }
 
   @Override
   protected R visitTypeCast(TypeCast obj, P param) {
-    visit(obj.getOriginal(), param);
-    visit(obj.getVariable(), param);
+    visit(obj.getCast(), param);
+    visit(obj.getValue(), param);
     return null;
   }
 
   @Override
   protected R visitTypeRef(TypeRef obj, P param) {
-    return null;
-  }
-
-  @Override
-  protected R visitNoSignType(NoSignType obj, P param) {
     return null;
   }
 
@@ -369,24 +241,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitStackMemoryAlloc(StackMemoryAlloc obj, P param) {
-    visit(obj.getVariable(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitVarRefConst(VarRefConst varRefConst, P param) {
-    return null;
-  }
-
-  @Override
-  protected R visitUnreachable(Unreachable obj, P param) {
-    return null;
-  }
-
-  @Override
   protected R visitPlus(Plus obj, P param) {
-    visit(obj.getVariable(), param);
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
     return null;
@@ -394,7 +249,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitMinus(Minus obj, P param) {
-    visit(obj.getVariable(), param);
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
     return null;
@@ -402,7 +256,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitMul(Mul obj, P param) {
-    visit(obj.getVariable(), param);
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
     return null;
@@ -410,7 +263,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitDiv(Div obj, P param) {
-    visit(obj.getVariable(), param);
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
     return null;
@@ -418,23 +270,20 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitMod(Mod obj, P param) {
-    visit(obj.getVariable(), param);
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
     return null;
   }
 
   @Override
-  protected R visitAnd(BitAnd obj, P param) {
-    visit(obj.getVariable(), param);
+  protected R visitBitAnd(BitAnd obj, P param) {
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
     return null;
   }
 
   @Override
-  protected R visitOr(BitOr obj, P param) {
-    visit(obj.getVariable(), param);
+  protected R visitBitOr(BitOr obj, P param) {
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
     return null;
@@ -442,7 +291,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitShl(Shl obj, P param) {
-    visit(obj.getVariable(), param);
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
     return null;
@@ -450,7 +298,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitShr(Shr obj, P param) {
-    visit(obj.getVariable(), param);
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
     return null;
@@ -458,7 +305,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitEqual(Equal obj, P param) {
-    visit(obj.getVariable(), param);
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
     return null;
@@ -466,7 +312,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitNotequal(Notequal obj, P param) {
-    visit(obj.getVariable(), param);
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
     return null;
@@ -474,7 +319,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitLess(Less obj, P param) {
-    visit(obj.getVariable(), param);
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
     return null;
@@ -482,7 +326,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitLessequal(Lessequal obj, P param) {
-    visit(obj.getVariable(), param);
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
     return null;
@@ -490,7 +333,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitGreater(Greater obj, P param) {
-    visit(obj.getVariable(), param);
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
     return null;
@@ -498,7 +340,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitGreaterequal(Greaterequal obj, P param) {
-    visit(obj.getVariable(), param);
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
     return null;
@@ -506,21 +347,18 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitNot(Not obj, P param) {
-    visit(obj.getVariable(), param);
     visit(obj.getExpr(), param);
     return null;
   }
 
   @Override
   protected R visitUminus(Uminus obj, P param) {
-    visit(obj.getVariable(), param);
     visit(obj.getExpr(), param);
     return null;
   }
 
   @Override
   protected R visitLogicAnd(LogicAnd obj, P param) {
-    visit(obj.getVariable(), param);
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
     return null;
@@ -528,7 +366,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitLogicOr(LogicOr obj, P param) {
-    visit(obj.getVariable(), param);
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
     return null;
@@ -536,7 +373,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitLogicXand(LogicXand obj, P param) {
-    visit(obj.getVariable(), param);
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
     return null;
@@ -544,9 +380,68 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitLogicXor(LogicXor obj, P param) {
-    visit(obj.getVariable(), param);
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
     return null;
   }
+
+  @Override
+  protected R visitCallStmt(CallStmt obj, P param) {
+    visit(obj.getRef(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitBlock(Block obj, P param) {
+    visitList(obj.getStatement(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitIfStmt(IfStmt obj, P param) {
+    visit(obj.getCondition(), param);
+    visit(obj.getThenBlock(), param);
+    visit(obj.getElseBlock(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitReference(Reference obj, P param) {
+    visitList(obj.getOffset(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitRefCall(RefCall obj, P param) {
+    visitList(obj.getParameter(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitWhileStmt(WhileStmt obj, P param) {
+    visit(obj.getCondition(), param);
+    visit(obj.getBlock(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitCaseStmt(CaseStmt obj, P param) {
+    visit(obj.getCondition(), param);
+    visitList(obj.getEntries(), param);
+    visit(obj.getOtherwise(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitVarDefStmt(VarDefStmt obj, P param) {
+    visit(obj.getVariable(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitCaseEntry(CaseEntry obj, P param) {
+    visit(obj.getCode(), param);
+    return null;
+  }
+
 }

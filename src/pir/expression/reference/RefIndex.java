@@ -1,19 +1,19 @@
 package pir.expression.reference;
 
-import pir.expression.PExpression;
+import pir.expression.Expression;
 
 final public class RefIndex extends RefItem {
-  private PExpression index;
+  private Expression index;
 
-  public RefIndex(PExpression index) {
+  public RefIndex(Expression index) {
     this.index = index;
   }
 
-  public PExpression getIndex() {
+  public Expression getIndex() {
     return index;
   }
 
-  public void setIndex(PExpression index) {
+  public void setIndex(Expression index) {
     this.index = index;
   }
 

@@ -1,84 +1,69 @@
 package pir;
 
-import pir.cfg.BasicBlock;
-import pir.cfg.BasicBlockList;
 import pir.expression.ArrayValue;
 import pir.expression.BoolValue;
+import pir.expression.Expression;
 import pir.expression.Number;
-import pir.expression.PExpression;
 import pir.expression.StringValue;
+import pir.expression.TypeCast;
+import pir.expression.binop.ArithmeticExp;
+import pir.expression.binop.BinaryExp;
+import pir.expression.binop.BitAnd;
+import pir.expression.binop.BitOr;
+import pir.expression.binop.Div;
+import pir.expression.binop.Equal;
+import pir.expression.binop.Greater;
+import pir.expression.binop.Greaterequal;
+import pir.expression.binop.Less;
+import pir.expression.binop.Lessequal;
+import pir.expression.binop.LogicAnd;
+import pir.expression.binop.LogicOr;
+import pir.expression.binop.LogicXand;
+import pir.expression.binop.LogicXor;
+import pir.expression.binop.Logical;
+import pir.expression.binop.Minus;
+import pir.expression.binop.Mod;
+import pir.expression.binop.Mul;
+import pir.expression.binop.Notequal;
+import pir.expression.binop.Plus;
+import pir.expression.binop.Relation;
+import pir.expression.binop.Shl;
+import pir.expression.binop.Shr;
+import pir.expression.reference.RefCall;
 import pir.expression.reference.RefIndex;
 import pir.expression.reference.RefItem;
 import pir.expression.reference.RefName;
-import pir.expression.reference.VarRef;
-import pir.expression.reference.VarRefConst;
-import pir.expression.reference.VarRefSimple;
-import pir.expression.reference.VarRefStatevar;
-import pir.function.FuncImpl;
-import pir.function.FuncProto;
+import pir.expression.reference.Reference;
+import pir.expression.unop.Not;
+import pir.expression.unop.Uminus;
+import pir.expression.unop.UnaryExp;
 import pir.function.Function;
+import pir.function.impl.FuncImplRet;
+import pir.function.impl.FuncImplVoid;
+import pir.function.impl.FuncProtoRet;
+import pir.function.impl.FuncProtoVoid;
 import pir.other.Constant;
 import pir.other.FuncVariable;
 import pir.other.Program;
-import pir.other.SsaVariable;
 import pir.other.StateVariable;
 import pir.other.Variable;
+import pir.statement.Assignment;
+import pir.statement.Block;
+import pir.statement.CallStmt;
+import pir.statement.CaseEntry;
+import pir.statement.CaseStmt;
+import pir.statement.IfStmt;
+import pir.statement.Return;
+import pir.statement.ReturnExpr;
+import pir.statement.ReturnVoid;
 import pir.statement.Statement;
-import pir.statement.bbend.BasicBlockEnd;
-import pir.statement.bbend.CaseGoto;
-import pir.statement.bbend.CaseGotoOpt;
-import pir.statement.bbend.Goto;
-import pir.statement.bbend.IfGoto;
-import pir.statement.bbend.Return;
-import pir.statement.bbend.ReturnExpr;
-import pir.statement.bbend.ReturnVoid;
-import pir.statement.bbend.Unreachable;
-import pir.statement.normal.Assignment;
-import pir.statement.normal.CallAssignment;
-import pir.statement.normal.CallStmt;
-import pir.statement.normal.GetElementPtr;
-import pir.statement.normal.LoadStmt;
-import pir.statement.normal.NormalStmt;
-import pir.statement.normal.StackMemoryAlloc;
-import pir.statement.normal.StoreStmt;
-import pir.statement.normal.binop.Arithmetic;
-import pir.statement.normal.binop.BinaryOp;
-import pir.statement.normal.binop.BitAnd;
-import pir.statement.normal.binop.BitOr;
-import pir.statement.normal.binop.Div;
-import pir.statement.normal.binop.Equal;
-import pir.statement.normal.binop.Greater;
-import pir.statement.normal.binop.Greaterequal;
-import pir.statement.normal.binop.Less;
-import pir.statement.normal.binop.Lessequal;
-import pir.statement.normal.binop.LogicAnd;
-import pir.statement.normal.binop.LogicOr;
-import pir.statement.normal.binop.LogicXand;
-import pir.statement.normal.binop.LogicXor;
-import pir.statement.normal.binop.Logical;
-import pir.statement.normal.binop.Minus;
-import pir.statement.normal.binop.Mod;
-import pir.statement.normal.binop.Mul;
-import pir.statement.normal.binop.Notequal;
-import pir.statement.normal.binop.Plus;
-import pir.statement.normal.binop.Relation;
-import pir.statement.normal.binop.Shl;
-import pir.statement.normal.binop.Shr;
-import pir.statement.normal.convert.ConvertValue;
-import pir.statement.normal.convert.SignExtendValue;
-import pir.statement.normal.convert.TruncValue;
-import pir.statement.normal.convert.TypeCast;
-import pir.statement.normal.convert.ZeroExtendValue;
-import pir.statement.normal.unop.Not;
-import pir.statement.normal.unop.Uminus;
-import pir.statement.normal.unop.UnaryOp;
-import pir.statement.phi.PhiStmt;
+import pir.statement.VarDefStmt;
+import pir.statement.WhileStmt;
 import pir.type.ArrayType;
 import pir.type.BooleanType;
 import pir.type.IntType;
 import pir.type.NamedElemType;
 import pir.type.NamedElement;
-import pir.type.NoSignType;
 import pir.type.PointerType;
 import pir.type.RangeType;
 import pir.type.SignedType;
@@ -109,8 +94,8 @@ abstract public class Traverser<R, P> {
       return visitProgram((Program) obj, param);
     } else if (obj instanceof Statement) {
       return visitStatement((Statement) obj, param);
-    } else if (obj instanceof PExpression) {
-      return visitPExpression((PExpression) obj, param);
+    } else if (obj instanceof Expression) {
+      return visitPExpression((Expression) obj, param);
     } else if (obj instanceof Type) {
       return visitType((Type) obj, param);
     } else if (obj instanceof Function) {
@@ -121,40 +106,45 @@ abstract public class Traverser<R, P> {
       return visitRefItem((RefItem) obj, param);
     } else if (obj instanceof Variable) {
       return visitVariable((Variable) obj, param);
-    } else if (obj instanceof BasicBlockList) {
-      return visitBasicBlockList((BasicBlockList) obj, param);
-    } else if (obj instanceof BasicBlock) {
-      return visitBasicBlock((BasicBlock) obj, param);
     } else if (obj instanceof TypeRef) {
       return visitTypeRef((TypeRef) obj, param);
-    } else if (obj instanceof CaseGotoOpt) {
-      return visitCaseGotoOpt((CaseGotoOpt) obj, param);
+    } else if (obj instanceof CaseEntry) {
+      return visitCaseEntry((CaseEntry) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
   }
 
-  protected R visitBasicBlockEnd(BasicBlockEnd obj, P param) {
-    if (obj instanceof Return) {
+  protected R visitStatement(Statement obj, P param) {
+    if (obj instanceof Block)
+      return visitBlock((Block) obj, param);
+    else if (obj instanceof Assignment)
+      return visitAssignment((Assignment) obj, param);
+    else if (obj instanceof CallStmt)
+      return visitCallStmt((CallStmt) obj, param);
+    else if (obj instanceof IfStmt)
+      return visitIfStmt((IfStmt) obj, param);
+    else if (obj instanceof Return)
       return visitReturn((Return) obj, param);
-    } else if (obj instanceof IfGoto) {
-      return visitIfGoto((IfGoto) obj, param);
-    } else if (obj instanceof CaseGoto) {
-      return visitCaseGoto((CaseGoto) obj, param);
-    } else if (obj instanceof Goto) {
-      return visitGoto((Goto) obj, param);
-    } else if (obj instanceof Unreachable) {
-      return visitUnreachable((Unreachable) obj, param);
-    } else {
+    else if (obj instanceof VarDefStmt)
+      return visitVarDefStmt((VarDefStmt) obj, param);
+    else if (obj instanceof WhileStmt)
+      return visitWhileStmt((WhileStmt) obj, param);
+    else if (obj instanceof CaseStmt)
+      return visitCaseStmt((CaseStmt) obj, param);
+    else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
-    }
   }
 
   protected R visitFunction(Function obj, P param) {
-    if (obj instanceof FuncProto) {
-      return visitFuncProto((FuncProto) obj, param);
-    } else if (obj instanceof FuncImpl) {
-      return visitFuncImpl((FuncImpl) obj, param);
+    if (obj instanceof FuncProtoVoid) {
+      return visitFuncProtoVoid((FuncProtoVoid) obj, param);
+    } else if (obj instanceof FuncProtoRet) {
+      return visitFuncProtoRet((FuncProtoRet) obj, param);
+    } else if (obj instanceof FuncImplVoid) {
+      return visitFuncImplVoid((FuncImplVoid) obj, param);
+    } else if (obj instanceof FuncImplRet) {
+      return visitFuncImplRet((FuncImplRet) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -165,12 +155,14 @@ abstract public class Traverser<R, P> {
       return visitRefName((RefName) obj, param);
     } else if (obj instanceof RefIndex) {
       return visitRefIndex((RefIndex) obj, param);
+    } else if (obj instanceof RefCall) {
+      return visitRefCall((RefCall) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
   }
 
-  protected R visitPExpression(PExpression obj, P param) {
+  protected R visitPExpression(Expression obj, P param) {
     if (obj instanceof Number) {
       return visitNumber((Number) obj, param);
     } else if (obj instanceof StringValue) {
@@ -179,58 +171,20 @@ abstract public class Traverser<R, P> {
       return visitArrayValue((ArrayValue) obj, param);
     } else if (obj instanceof BoolValue) {
       return visitBoolValue((BoolValue) obj, param);
-    } else if (obj instanceof VarRef) {
-      return visitVarRef((VarRef) obj, param);
-    } else if (obj instanceof VarRefSimple) {
-      return visitVarRefSimple((VarRefSimple) obj, param);
-    } else if (obj instanceof VarRefStatevar) {
-      return visitVarRefStatevar((VarRefStatevar) obj, param);
-    } else if (obj instanceof VarRefConst) {
-      return visitVarRefConst((VarRefConst) obj, param);
+    } else if (obj instanceof BinaryExp) {
+      return visitBinaryExp((BinaryExp) obj, param);
+    } else if (obj instanceof UnaryExp) {
+      return visitUnaryExp((UnaryExp) obj, param);
+    } else if (obj instanceof Reference) {
+      return visitReference((Reference) obj, param);
+    } else if (obj instanceof TypeCast) {
+      return visitTypeCast((TypeCast) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
   }
 
-  protected R visitStatement(Statement obj, P param) {
-    if (obj instanceof NormalStmt) {
-      return visitNormalStmt((NormalStmt) obj, param);
-    } else if (obj instanceof PhiStmt) {
-      return visitPhiStmt((PhiStmt) obj, param);
-    } else if (obj instanceof BasicBlockEnd) {
-      return visitBasicBlockEnd((BasicBlockEnd) obj, param);
-    } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
-    }
-  }
-
-  protected R visitNormalStmt(NormalStmt obj, P param) {
-    if (obj instanceof CallStmt) {
-      return visitCallStmt((CallStmt) obj, param);
-    } else if (obj instanceof StoreStmt) {
-      return visitStoreStmt((StoreStmt) obj, param);
-    } else if (obj instanceof Assignment) {
-      return visitAssignment((Assignment) obj, param);
-    } else if (obj instanceof BinaryOp) {
-      return visitBinaryOp((BinaryOp) obj, param);
-    } else if (obj instanceof LoadStmt) {
-      return visitLoadStmt((LoadStmt) obj, param);
-    } else if (obj instanceof CallAssignment) {
-      return visitCallAssignment((CallAssignment) obj, param);
-    } else if (obj instanceof GetElementPtr) {
-      return visitGetElementPtr((GetElementPtr) obj, param);
-    } else if (obj instanceof ConvertValue) {
-      return visitConvertValue((ConvertValue) obj, param);
-    } else if (obj instanceof UnaryOp) {
-      return visitUnaryOp((UnaryOp) obj, param);
-    } else if (obj instanceof StackMemoryAlloc) {
-      return visitStackMemoryAlloc((StackMemoryAlloc) obj, param);
-    } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
-    }
-  }
-
-  protected R visitUnaryOp(UnaryOp obj, P param) {
+  protected R visitUnaryExp(UnaryExp obj, P param) {
     if (obj instanceof Not) {
       return visitNot((Not) obj, param);
     } else if (obj instanceof Uminus) {
@@ -240,11 +194,11 @@ abstract public class Traverser<R, P> {
     }
   }
 
-  protected R visitBinaryOp(BinaryOp obj, P param) {
+  protected R visitBinaryExp(BinaryExp obj, P param) {
     if (obj instanceof Relation) {
       return visitRelation((Relation) obj, param);
-    } else if (obj instanceof Arithmetic) {
-      return visitArithmetic((Arithmetic) obj, param);
+    } else if (obj instanceof ArithmeticExp) {
+      return visitArithmetic((ArithmeticExp) obj, param);
     } else if (obj instanceof Logical) {
       return visitLogical((Logical) obj, param);
     } else {
@@ -266,7 +220,7 @@ abstract public class Traverser<R, P> {
     }
   }
 
-  protected R visitArithmetic(Arithmetic obj, P param) {
+  protected R visitArithmetic(ArithmeticExp obj, P param) {
     if (obj instanceof Plus) {
       return visitPlus((Plus) obj, param);
     } else if (obj instanceof Minus) {
@@ -278,9 +232,9 @@ abstract public class Traverser<R, P> {
     } else if (obj instanceof Mod) {
       return visitMod((Mod) obj, param);
     } else if (obj instanceof BitAnd) {
-      return visitAnd((BitAnd) obj, param);
+      return visitBitAnd((BitAnd) obj, param);
     } else if (obj instanceof BitOr) {
-      return visitOr((BitOr) obj, param);
+      return visitBitOr((BitOr) obj, param);
     } else if (obj instanceof Shl) {
       return visitShl((Shl) obj, param);
     } else if (obj instanceof Shr) {
@@ -309,26 +263,9 @@ abstract public class Traverser<R, P> {
 
   }
 
-  protected R visitConvertValue(ConvertValue obj, P param) {
-    if (obj instanceof SignExtendValue) {
-      return visitSignExtendValue((SignExtendValue) obj, param);
-    }
-    if (obj instanceof ZeroExtendValue) {
-      return visitZeroExtendValue((ZeroExtendValue) obj, param);
-    } else if (obj instanceof TruncValue) {
-      return visitTruncValue((TruncValue) obj, param);
-    } else if (obj instanceof TypeCast) {
-      return visitTypeCast((TypeCast) obj, param);
-    } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
-    }
-  }
-
   protected R visitVariable(Variable obj, P param) {
     if (obj instanceof FuncVariable) {
       return visitFuncVariable((FuncVariable) obj, param);
-    } else if (obj instanceof SsaVariable) {
-      return visitSsaVariable((SsaVariable) obj, param);
     } else if (obj instanceof StateVariable) {
       return visitStateVariable((StateVariable) obj, param);
     } else if (obj instanceof Constant) {
@@ -360,7 +297,7 @@ abstract public class Traverser<R, P> {
     } else if (obj instanceof VoidType) {
       return visitVoidType((VoidType) obj, param);
     } else if (obj instanceof ArrayType) {
-      return visitArray((ArrayType) obj, param);
+      return visitArrayType((ArrayType) obj, param);
     } else if (obj instanceof StringType) {
       return visitStringType((StringType) obj, param);
     } else if (obj instanceof PointerType) {
@@ -375,8 +312,6 @@ abstract public class Traverser<R, P> {
       return visitUnsignedType((UnsignedType) obj, param);
     } else if (obj instanceof SignedType) {
       return visitSignedType((SignedType) obj, param);
-    } else if (obj instanceof NoSignType) {
-      return visitNoSignType((NoSignType) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -392,33 +327,27 @@ abstract public class Traverser<R, P> {
     }
   }
 
-  protected abstract R visitCaseGotoOpt(CaseGotoOpt obj, P param);
+  protected abstract R visitReference(Reference obj, P param);
+
+  protected abstract R visitCaseStmt(CaseStmt obj, P param);
+
+  protected abstract R visitWhileStmt(WhileStmt obj, P param);
+
+  protected abstract R visitVarDefStmt(VarDefStmt obj, P param);
+
+  protected abstract R visitIfStmt(IfStmt obj, P param);
+
+  protected abstract R visitBlock(Block obj, P param);
+
+  protected abstract R visitCaseEntry(CaseEntry obj, P param);
 
   protected abstract R visitTypeRef(TypeRef obj, P param);
 
   protected abstract R visitTypeCast(TypeCast obj, P param);
 
-  protected abstract R visitTruncValue(TruncValue obj, P param);
-
-  protected abstract R visitSignExtendValue(SignExtendValue obj, P param);
-
-  protected abstract R visitZeroExtendValue(ZeroExtendValue obj, P param);
-
-  protected abstract R visitNoSignType(NoSignType obj, P param);
-
   protected abstract R visitSignedType(SignedType obj, P param);
 
-  protected abstract R visitPhiStmt(PhiStmt obj, P param);
-
-  protected abstract R visitGoto(Goto obj, P param);
-
-  protected abstract R visitSsaVariable(SsaVariable obj, P param);
-
-  protected abstract R visitBasicBlock(BasicBlock obj, P param);
-
-  protected abstract R visitBasicBlockList(BasicBlockList obj, P param);
-
-  protected abstract R visitCaseGoto(CaseGoto obj, P param);
+  protected abstract R visitRefCall(RefCall obj, P param);
 
   protected abstract R visitRefIndex(RefIndex obj, P param);
 
@@ -427,8 +356,6 @@ abstract public class Traverser<R, P> {
   protected abstract R visitReturnVoid(ReturnVoid obj, P param);
 
   protected abstract R visitReturnExpr(ReturnExpr obj, P param);
-
-  protected abstract R visitIfGoto(IfGoto obj, P param);
 
   protected abstract R visitConstant(Constant obj, P param);
 
@@ -440,12 +367,6 @@ abstract public class Traverser<R, P> {
 
   protected abstract R visitVoidType(VoidType obj, P param);
 
-  protected abstract R visitVarRefStatevar(VarRefStatevar obj, P param);
-
-  protected abstract R visitVarRefSimple(VarRefSimple obj, P param);
-
-  protected abstract R visitVarRef(VarRef obj, P param);
-
   protected abstract R visitBoolValue(BoolValue obj, P param);
 
   protected abstract R visitNumber(Number obj, P param);
@@ -454,17 +375,13 @@ abstract public class Traverser<R, P> {
 
   protected abstract R visitStringValue(StringValue obj, P param);
 
-  protected abstract R visitCallAssignment(CallAssignment obj, P param);
+  protected abstract R visitFuncImplRet(FuncImplRet obj, P param);
 
-  protected abstract R visitGetElementPtr(GetElementPtr obj, P param);
+  protected abstract R visitFuncProtoRet(FuncProtoRet obj, P param);
 
-  protected abstract R visitLoadStmt(LoadStmt obj, P param);
+  protected abstract R visitFuncImplVoid(FuncImplVoid obj, P param);
 
-  protected abstract R visitFuncImpl(FuncImpl obj, P param);
-
-  protected abstract R visitFuncProto(FuncProto obj, P param);
-
-  protected abstract R visitStoreStmt(StoreStmt obj, P param);
+  protected abstract R visitFuncProtoVoid(FuncProtoVoid obj, P param);
 
   protected abstract R visitCallStmt(CallStmt obj, P param);
 
@@ -478,7 +395,7 @@ abstract public class Traverser<R, P> {
 
   protected abstract R visitStringType(StringType obj, P param);
 
-  protected abstract R visitArray(ArrayType obj, P param);
+  protected abstract R visitArrayType(ArrayType obj, P param);
 
   protected abstract R visitUnsignedType(UnsignedType obj, P param);
 
@@ -487,12 +404,6 @@ abstract public class Traverser<R, P> {
   protected abstract R visitProgram(Program obj, P param);
 
   protected abstract R visitPointerType(PointerType obj, P param);
-
-  protected abstract R visitStackMemoryAlloc(StackMemoryAlloc obj, P param);
-
-  protected abstract R visitVarRefConst(VarRefConst obj, P param);
-
-  protected abstract R visitUnreachable(Unreachable obj, P param);
 
   protected abstract R visitPlus(Plus obj, P param);
 
@@ -504,9 +415,9 @@ abstract public class Traverser<R, P> {
 
   protected abstract R visitMod(Mod obj, P param);
 
-  protected abstract R visitAnd(BitAnd obj, P param);
+  protected abstract R visitBitAnd(BitAnd obj, P param);
 
-  protected abstract R visitOr(BitOr obj, P param);
+  protected abstract R visitBitOr(BitOr obj, P param);
 
   protected abstract R visitShl(Shl obj, P param);
 
