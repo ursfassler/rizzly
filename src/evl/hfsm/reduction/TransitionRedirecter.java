@@ -2,15 +2,15 @@ package evl.hfsm.reduction;
 
 import evl.Evl;
 import evl.NullTraverser;
-import evl.hfsm.QueryItem;
+import evl.hfsm.HfsmQueryFunction;
 import evl.hfsm.State;
 import evl.hfsm.Transition;
 
 /**
  * Sets the destination of a transition to the initial substate if the destination is a composite state
- *
+ * 
  * @author urs
- *
+ * 
  */
 public class TransitionRedirecter extends NullTraverser<Void, Void> {
   final private InitStateGetter initStateGetter = new InitStateGetter();
@@ -26,7 +26,7 @@ public class TransitionRedirecter extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitQueryItem(QueryItem obj, Void param) {
+  protected Void visitHfsmQueryFunction(HfsmQueryFunction obj, Void param) {
     return null;
   }
 

@@ -5,27 +5,21 @@ type
     y : R{0,255};
   end
 
-interface
-  Tick
-    function tick( x: R{0,255} );
-    function tack( x: R{0,255} ):R{0,255};
-  end
-  
-  Tack
-    function tack():Point;
-    function tock();
-  end
-
 component
   Expr
     input
-      in  : Tick;
+      inTick( x: R{0,255} );
+      inTack( x: R{0,255} ):R{0,255};
     
     output
-      out1 : Tick;
-      out2 : Tick;
-      out3 : Tick;
-      out4 : Tack;
+      out1tick( x: R{0,255} );
+      out1tack( x: R{0,255} ):R{0,255};
+      out2tick( x: R{0,255} );
+      out2tack( x: R{0,255} ):R{0,255};
+      out3tick( x: R{0,255} );
+      out3tack( x: R{0,255} ):R{0,255};
+      out4tack():Point;
+      out4tock();
       
     implementation elementary
     
@@ -37,20 +31,20 @@ component
       if x > z then
         a[(z*2+y) mod 100].x := x;
       else
-        t : R{0,510} = y + out4.tack().x;
+        t : R{0,510} = y + out4tack().x;
         if t > 255 then
           t := 255;
         end
-        a[out2.tack(x)-z].y := R{0,255}( t );
+        a[out2tack(x)-z].y := R{0,255}( t );
       end
-      return (x + y * z + a[out1.tack(x)].y * a[out1.tack(y)].x) mod 256;
+      return (x + y * z + a[out1tack(x)].y * a[out1tack(y)].x) mod 256;
     end
     
-    function in.tick( x: R{0,255} )
-      f := foo( out1.tack( x ), out2.tack( out3.tack(  (x + 10 * 5) mod 100 ) ), (foo( 1, 2, 3) * 3 + 2) and 127 );
+    function inTick( x: R{0,255} )
+      f := foo( out1tack( x ), out2tack( out3tack(  (x + 10 * 5) mod 100 ) ), (foo( 1, 2, 3) * 3 + 2) and 127 );
     end
 
-    function in.tack( x: R{0,255} ):R{0,255}
+    function inTack( x: R{0,255} ):R{0,255}
       return f;
     end
 

@@ -5,8 +5,6 @@ import java.lang.reflect.InvocationTargetException;
 
 import common.ElementInfo;
 
-
-
 public class FunctionFactory {
   static public <T extends FunctionHeader> T create(Class<T> type, ElementInfo info) {
     T ret = null;

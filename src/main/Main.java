@@ -48,6 +48,7 @@ import fun.toevl.FunToEvl;
 //TODO -- check that no references to old stuff exists (check that parent of every object is in the namespace tree)
 //TODO -- do name randomization and compile to see if references go outside
 //TODO add compiler switch to select backend (like --backend=ansiC --backend=funHtmlDoc)
+//TODO check metadata parser
 public class Main {
 
   /**

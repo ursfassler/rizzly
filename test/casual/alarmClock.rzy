@@ -1,15 +1,11 @@
-interface
-  Tick
-    function tick();
-  end
-  
+
 component
   AlarmClock
     input
-      tick    : Tick;
+      tick();
     
     output
-      alarm   : Tick;
+      alarm();
     
   implementation hfsm(Counting)
     var
@@ -26,12 +22,12 @@ component
     end
     
     transition 
-      Counting to Counting by tick.tick if time > 0 do
+      Counting to Counting by tick() if time > 0 do
         time := R{0,5}( time - 1 );
       end
       
-      Counting to Off by tick.tick if time = 0 do
-        alarm.tick();
+      Counting to Off by tick() if time = 0 do
+        alarm();
       end
     
   end

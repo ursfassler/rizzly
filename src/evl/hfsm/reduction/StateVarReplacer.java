@@ -19,7 +19,6 @@ import evl.hfsm.Transition;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
 
-
 public class StateVarReplacer extends DefTraverser<Void, Void> {
   final private Map<StateVariable, Designator> vpath;
   final private Variable dataVar;

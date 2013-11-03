@@ -1,18 +1,13 @@
 //test ok
 
-interface
-  ValueEvent
-    function evt( value: R{0,255} );
-  end
-
 component
   Elementary4
 
   input
-    evtIn   : ValueEvent;
+    evtIn( value: R{0,255} );
     
   output
-    evtOut  : ValueEvent;
+    evtOut( value: R{0,255} );
 
   implementation elementary
 
@@ -20,8 +15,8 @@ component
       return v*v mod 201;
     end
 
-    function evtIn.evt( value: R{0,255} )
-      evtOut.evt( sqr( value mod 201 ) );
+    function evtIn( value: R{0,255} )
+      evtOut( sqr( value mod 201 ) );
     end
   end
   

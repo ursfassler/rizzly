@@ -2,7 +2,6 @@ package fun.function;
 
 import fun.statement.Block;
 
-
 public interface FuncWithBody {
   public Block getBody();
 

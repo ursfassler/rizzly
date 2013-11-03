@@ -103,7 +103,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitNamedElement(NamedElement obj, Void param) {
-    return visit(obj.getType(),param);
+    return visit(obj.getType(), param);
   }
 
   @Override
@@ -288,7 +288,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
 
     Range lr = ((RangeType) lhs).getNumbers();
     Range rr = ((RangeType) rhs).getNumbers();
-    
+
     if ((lr.getLow().compareTo(BigInteger.ZERO) < 0) || (rr.getLow().compareTo(BigInteger.ZERO) < 0)) {
       RError.err(ErrorType.Fatal, obj.getInfo(), "sorry, I am too lazy to check for negative numbers");
     }
@@ -301,7 +301,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitNot(Not obj, Void param) {
-    return kbi.getBooleanType();  //FIXME what with invert?
+    return kbi.getBooleanType(); // FIXME what with invert?
   }
 
 }

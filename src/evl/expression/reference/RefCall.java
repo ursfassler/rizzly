@@ -8,7 +8,6 @@ import common.ElementInfo;
 
 import evl.expression.Expression;
 
-
 final public class RefCall extends RefItem {
   private List<Expression> actualParameter;
 

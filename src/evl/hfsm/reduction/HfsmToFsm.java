@@ -63,7 +63,7 @@ public class HfsmToFsm extends NullTraverser<Void, Namespace> {
       svpg.process(obj);
       StateTypeBuilder stb = new StateTypeBuilder(param);
       Type stateType = stb.traverse(obj.getTopstate(), new Designator(obj.getName()));
-      StateVariable var = new StateVariable(new ElementInfo(), "data", new TypeRef(new ElementInfo(), stateType) );
+      StateVariable var = new StateVariable(new ElementInfo(), "data", new TypeRef(new ElementInfo(), stateType));
       obj.getTopstate().getVariable().add(var);
       StateVarReplacer.process(obj, var, svpg.getVpath());
     }

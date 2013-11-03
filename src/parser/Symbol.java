@@ -1,8 +1,7 @@
-
 package parser;
 
 /**
- *
+ * 
  * @author urs
  */
 public class Symbol {

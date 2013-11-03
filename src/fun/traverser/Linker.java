@@ -109,7 +109,7 @@ public class Linker extends RefReplacer<SymbolTable<Named, String>> {
   @Override
   protected Expression visitState(State obj, SymbolTable<Named, String> param) {
     param = new SymbolTable<Named, String>(param);
-    add(param, obj.getBfunc());
+    add(param, obj.getItemList());
     add(param, obj.getVariable());
     super.visitState(obj, param);
     return null;
@@ -119,7 +119,7 @@ public class Linker extends RefReplacer<SymbolTable<Named, String>> {
   protected Expression visitStateComposite(StateComposite obj, SymbolTable<Named, String> param) {
     {
       SymbolTable<Named, String> chn = new SymbolTable<Named, String>(param);
-      add(chn, obj.getItemList(State.class));
+      add(chn, obj.getItemList().getItems(State.class));
       obj.setInitial((Reference) visit(obj.getInitial(), chn));
     }
     return super.visitStateComposite(obj, param);

@@ -16,9 +16,7 @@ import evl.hfsm.StateComposite;
 import evl.hfsm.StateSimple;
 import evl.other.CompUse;
 import evl.other.Component;
-import evl.other.IfaceUse;
 import evl.other.ImplElementary;
-import evl.other.Interface;
 import evl.other.ListOfNamed;
 import evl.other.Named;
 import evl.other.Namespace;
@@ -28,7 +26,6 @@ import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
 import evl.type.special.ComponentType;
-import evl.type.special.InterfaceType;
 import evl.type.special.PointerType;
 import evl.variable.Variable;
 
@@ -164,11 +161,6 @@ class KnowChildTraverser extends NullTraverser<Set<Named>, String> {
   }
 
   @Override
-  protected Set<Named> visitIfaceUse(IfaceUse obj, String param) {
-    return visit(obj.getLink(), param);
-  }
-
-  @Override
   protected Set<Named> visitRecordType(RecordType obj, String param) {
     return retopt(obj.getElement().find(param));
   }
@@ -186,16 +178,6 @@ class KnowChildTraverser extends NullTraverser<Set<Named>, String> {
   @Override
   protected Set<Named> visitNamespace(Namespace obj, String param) {
     return retopt(obj.find(param));
-  }
-
-  @Override
-  protected Set<Named> visitInterface(Interface obj, String param) {
-    return retopt(obj.getPrototype().find(param));
-  }
-
-  @Override
-  protected Set<Named> visitInterfaceType(InterfaceType obj, String param) {
-    return retopt(obj.getPrototype().find(param));
   }
 
   private void addIfFound(Named item, Set<Named> rset) {

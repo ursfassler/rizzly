@@ -3,57 +3,59 @@ program debug;
 uses
   inst;
 
-procedure inst_out_foo(); cdecl; public;
+procedure inst_outfoo(); cdecl; public;
 begin
   writeln( 'foo' );
 end;
 
-procedure inst_out_bar(); cdecl; public;
+procedure inst_outbar(); cdecl; public;
 begin
   writeln( 'bar' );
 end;
 
-procedure inst_out_poh(); cdecl; public;
+procedure inst_outpoh(); cdecl; public;
 begin
   writeln( 'poh' );
 end;
 
-procedure inst__debug_msgRecv(receiver: Array_4_U_4; size: uint8_t); cdecl; public;
+procedure inst__msgRecv(receiver: Array_4_U_4; size: uint8_t); cdecl; public;
 var
   i : Integer;
 begin
   write( 'debug: ' );
   for i := size-1 downto 0 do begin
-    write( inst__debugQuery_getSym(receiver[i]) );
+    write( inst__getSym(receiver[i]) );
     write( ' ' );
   end;
   writeln();
 end;
 
-procedure inst__debug_msgSend(sender: Array_4_U_4; size: uint8_t); cdecl; public;
+procedure inst__msgSend(sender: Array_4_U_4; size: uint8_t); cdecl; public;
 var
   i : Integer;
 begin
   write( 'debug: ' );
   for i := size-1 downto 0 do begin
-    write( inst__debugQuery_getSym(sender[i]) );
+    write( inst__getSym(sender[i]) );
     write( ' ' );
   end;
   writeln();
 end;
 
 begin
+  inst__construct();
   writeln( 'start debug' );
 
   writeln( 'send foo' );
-  inst_in_foo();
+  inst_infoo();
 
   writeln( 'send bar' );
-  inst_in_bar();
+  inst_inbar();
 
   writeln( 'send poh' );
-  inst_in_poh();
+  inst_inpoh();
 
   writeln( 'end debug' );
+  inst__destruct();
 end.
 

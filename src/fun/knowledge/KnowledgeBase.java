@@ -22,7 +22,7 @@ public class KnowledgeBase {
   public KnowledgeBase(Namespace root, Collection<RizzlyFile> files, String rootdir) {
     super();
     this.root = root;
-    this.files = new HashSet<RizzlyFile>( files );
+    this.files = new HashSet<RizzlyFile>(files);
     this.rootdir = rootdir;
   }
 

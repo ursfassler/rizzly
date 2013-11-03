@@ -20,7 +20,6 @@ import fun.knowledge.KnowScope;
 import fun.knowledge.KnowledgeBase;
 import fun.other.Component;
 import fun.other.Generator;
-import fun.other.Interface;
 import fun.other.Named;
 import fun.other.Namespace;
 import fun.type.Type;
@@ -77,12 +76,6 @@ public class DepGraph extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitGenerator(Generator obj, Void param) {
-    dep.traverse(obj, obj);
-    return null;
-  }
-
-  @Override
-  protected Void visitInterface(Interface obj, Void param) {
     dep.traverse(obj, obj);
     return null;
   }

@@ -1,36 +1,34 @@
-interface
-  Iface2{T:Type{Natural}}
-    function in( x: T );
-    function out():T;
-  end
-
 component
   GenIface
 
     input
-      in1    : Iface2{R{0,10}};
-      in2    : Iface2{R{0,2000}};
+      in1in( x: R{0,10} );
+      in1out():R{0,10};
+      in2in( x: R{0,2000} );
+      in2out():R{0,2000};
 
     output
-      out1   : Iface2{R{0,10}};
-      out2   : Iface2{R{0,2000}};
+      out1in( x: R{0,10} );
+      out1out():R{0,10};
+      out2in( x: R{0,2000} );
+      out2out():R{0,2000};
 
     implementation elementary
 
-    function in1.in( x: R{0,10} )
-      out1.in( x );
+    function in1in( x: R{0,10} )
+      out1in( x );
     end
 
-    function in1.out():R{0,10}
-      return out1.out();
+    function in1out():R{0,10}
+      return out1out();
     end
 
-    function in2.in( x: R{0,2000} )
-      out2.in( x );
+    function in2in( x: R{0,2000} )
+      out2in( x );
     end
 
-    function in2.out():R{0,2000}
-      return out2.out();
+    function in2out():R{0,2000}
+      return out2out();
     end
 
   end

@@ -7,10 +7,11 @@ import common.Direction;
 
 import evl.Evl;
 import evl.NullTraverser;
+import evl.function.FuncIfaceIn;
+import evl.function.FuncIfaceOut;
 import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
 import evl.other.CompUse;
-import evl.other.IfaceUse;
 import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.base.FunctionType;
@@ -18,7 +19,6 @@ import evl.type.base.FunctionTypeRet;
 import evl.type.base.FunctionTypeVoid;
 import evl.type.composed.NamedElement;
 import evl.type.special.ComponentType;
-import evl.type.special.InterfaceType;
 import evl.variable.Variable;
 
 public class TypeGetter extends NullTraverser<Type, Void> {
@@ -61,24 +61,14 @@ public class TypeGetter extends NullTraverser<Type, Void> {
   }
 
   @Override
-  protected Type visitIfaceUse(IfaceUse obj, Void param) {
-    InterfaceType ret = new InterfaceType(obj.getInfo(), obj.getName());
-    for (FunctionBase func : obj.getLink().getPrototype()) {
-      FunctionType ft = (FunctionType) visit(func, null);
-      ret.getPrototype().add(ft);
-    }
-    return ret;
-  }
-
-  @Override
   protected Type visitCompUse(CompUse obj, Void param) {
     ComponentType ret = new ComponentType(obj.getInfo(), obj.getName());
-    for (IfaceUse iface : obj.getLink().getIface(Direction.out)) {
-      InterfaceType it = (InterfaceType) visit(iface, null);
+    for (FuncIfaceOut iface : obj.getLink().getOutput()) {
+      FunctionType it = (FunctionType) visit(iface, null);
       ret.getIface(Direction.out).add(it);
     }
-    for (IfaceUse iface : obj.getLink().getIface(Direction.in)) {
-      InterfaceType it = (InterfaceType) visit(iface, null);
+    for (FuncIfaceIn iface : obj.getLink().getInput()) {
+      FunctionType it = (FunctionType) visit(iface, null);
       ret.getIface(Direction.in).add(it);
     }
     return ret;

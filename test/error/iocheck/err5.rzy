@@ -1,34 +1,24 @@
 // Error: query is not allowed to output
 
-
-interface
-  IfaceEvent
-    function event();
-  end
-  
-  IfaceQuerry
-    function query():R{0,100};
-  end
-  
 component
   Err5
     input
-      in  : IfaceQuerry;
+      query():R{0,100};
     
     output
-      out : IfaceEvent;
+      event();
       
     implementation elementary
     
     function bar()
-      out.event();
+      event();
     end
     
     function foo()
       bar();
     end
     
-    function in.query():R{0,100}
+    function query():R{0,100}
       foo();
       return 0;
     end

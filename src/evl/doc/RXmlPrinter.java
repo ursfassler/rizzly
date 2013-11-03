@@ -32,7 +32,6 @@ import evl.function.FuncWithBody;
 import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
 import evl.hfsm.ImplHfsm;
-import evl.hfsm.QueryItem;
 import evl.hfsm.StateComposite;
 import evl.hfsm.StateSimple;
 import evl.hfsm.Transition;
@@ -41,9 +40,7 @@ import evl.knowledge.KnowScope;
 import evl.knowledge.KnowledgeBase;
 import evl.other.CompUse;
 import evl.other.Component;
-import evl.other.IfaceUse;
 import evl.other.ImplElementary;
-import evl.other.Interface;
 import evl.other.ListOfNamed;
 import evl.other.Named;
 import evl.other.NamedList;
@@ -90,8 +87,8 @@ public class RXmlPrinter extends NullTraverser<Void, XmlWriter> {
   }
 
   private void list(List<? extends Evl> list, String sep, XmlWriter param) {
-    for( int i = 0; i < list.size(); i++ ) {
-      if( i > 0 ) {
+    for (int i = 0; i < list.size(); i++) {
+      if (i > 0) {
         param.wr(sep);
       }
       visit(list.get(i), param);
@@ -99,14 +96,14 @@ public class RXmlPrinter extends NullTraverser<Void, XmlWriter> {
   }
 
   private void visitList(List<? extends Evl> list, XmlWriter param) {
-    for( int i = 0; i < list.size(); i++ ) {
+    for (int i = 0; i < list.size(); i++) {
       visit(list.get(i), param);
     }
   }
 
   private <T extends Named> void visitList(ListOfNamed<T> list, XmlWriter param) {
     Iterator<T> itr = list.iterator();
-    while( itr.hasNext() ) {
+    while (itr.hasNext()) {
       visit(itr.next(), param);
     }
   }
@@ -128,7 +125,7 @@ public class RXmlPrinter extends NullTraverser<Void, XmlWriter> {
   }
 
   private void visitInterfaceDecl(String type, ListOfNamed<? extends Named> listOfNamed, XmlWriter param) {
-    if( !listOfNamed.isEmpty() ) {
+    if (!listOfNamed.isEmpty()) {
       param.kw(type);
       param.nl();
       param.incIndent();
@@ -138,22 +135,8 @@ public class RXmlPrinter extends NullTraverser<Void, XmlWriter> {
     }
   }
 
-  @Override
-  protected Void visitInterface(Interface obj, XmlWriter param) {
-    param.kw("Interface");
-    param.nl();
-
-    param.incIndent();
-    visitList(obj.getPrototype(), param);
-    param.decIndent();
-    param.kw("end");
-    param.nl();
-    param.nl();
-    return null;
-  }
-
   protected void visitOptList(String name, ListOfNamed<? extends Named> type, XmlWriter param) {
-    if( type.isEmpty() ) {
+    if (type.isEmpty()) {
       return;
     }
     param.kw(name);
@@ -164,7 +147,7 @@ public class RXmlPrinter extends NullTraverser<Void, XmlWriter> {
   }
 
   protected void visitOptList(String name, List<? extends EvlBase> type, XmlWriter param) {
-    if( type.isEmpty() ) {
+    if (type.isEmpty()) {
       return;
     }
     param.kw(name);
@@ -176,7 +159,7 @@ public class RXmlPrinter extends NullTraverser<Void, XmlWriter> {
 
   @Override
   protected Void visitNamespace(Namespace obj, XmlWriter param) {
-    assert ( false );
+    assert (false);
     return null;
   }
 
@@ -197,13 +180,6 @@ public class RXmlPrinter extends NullTraverser<Void, XmlWriter> {
 
   @Override
   protected Void visitCompUse(CompUse obj, XmlWriter param) {
-    param.wr(";");
-    param.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitIfaceUse(IfaceUse obj, XmlWriter param) {
     param.wr(";");
     param.nl();
     return null;
@@ -252,7 +228,6 @@ public class RXmlPrinter extends NullTraverser<Void, XmlWriter> {
     param.nl();
     param.nl();
 
-    visitList(obj.getInputFunc(), param);
     visitList(obj.getSubComCallback(), param);
     visitList(obj.getInternalFunction(), param);
     return null;
@@ -287,15 +262,15 @@ public class RXmlPrinter extends NullTraverser<Void, XmlWriter> {
   @Override
   protected Void visitConnection(Connection obj, XmlWriter param) {
     visit(obj.getEndpoint(Direction.in), param);
-    switch( obj.getType() ) {
-      case sync:
-        param.wr(" -> ");
-        break;
-      case async:
-        param.wr(" >> ");
-        break;
-      default:
-        RError.err(ErrorType.Fatal, obj.getInfo(), "Not yet implemented connection type: " + obj.getType());
+    switch (obj.getType()) {
+    case sync:
+      param.wr(" -> ");
+      break;
+    case async:
+      param.wr(" >> ");
+      break;
+    default:
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Not yet implemented connection type: " + obj.getType());
     }
     visit(obj.getEndpoint(Direction.in), param);
     param.wr(";");
@@ -308,14 +283,14 @@ public class RXmlPrinter extends NullTraverser<Void, XmlWriter> {
     param.kw("function(");
     list(obj.getParam().getList(), "; ", param);
     param.wr(")");
-    if( obj instanceof FuncWithReturn ) {
+    if (obj instanceof FuncWithReturn) {
       param.wr(":");
-      visit(( (FuncWithReturn) obj ).getRet(), param);
+      visit(((FuncWithReturn) obj).getRet(), param);
     }
     param.nl();
-    if( obj instanceof FuncWithBody ) {
+    if (obj instanceof FuncWithBody) {
       param.incIndent();
-      visit(( (FuncWithBody) obj ).getBody(), param);
+      visit(((FuncWithBody) obj).getBody(), param);
       param.decIndent();
       param.kw("end");
       param.nl();
@@ -384,9 +359,7 @@ public class RXmlPrinter extends NullTraverser<Void, XmlWriter> {
     param.wr(" ");
     param.kw("by");
     param.wr(" ");
-    param.wr(obj.getEventIface().getName());
-    param.wr(".");
-    param.wr(obj.getEventFunc());
+    visit(obj.getEventFunc(), param);
     param.wr("(");
     list(obj.getParam().getList(), "; ", param);
     param.wr(")");
@@ -406,20 +379,6 @@ public class RXmlPrinter extends NullTraverser<Void, XmlWriter> {
 
     param.decIndent();
 
-    return null;
-  }
-
-  @Override
-  protected Void visitQueryItem(QueryItem obj, XmlWriter param) {
-    param.kw("namespace '");
-    param.wr(obj.getNamespace());
-    param.wr("'");
-    param.nl();
-    param.incIndent();
-    visit(obj.getFunc(), param);
-    param.decIndent();
-    param.kw("end");
-    param.nl();
     return null;
   }
 
@@ -644,7 +603,7 @@ public class RXmlPrinter extends NullTraverser<Void, XmlWriter> {
   protected Void visitReference(Reference obj, XmlWriter param) {
     String title = obj.getLink().toString();
     Scope scope = KnowScope.get(obj.getLink());
-    if( scope == Scope.global ) {
+    if (scope == Scope.global) {
       Designator path = kp.get(obj.getLink());
       param.wl(obj.getLink().getName(), path);
     } else {

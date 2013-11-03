@@ -7,12 +7,11 @@ import common.Designator;
 
 import evl.Evl;
 import evl.NullTraverser;
+import evl.hfsm.HfsmQueryFunction;
 import evl.hfsm.ImplHfsm;
-import evl.hfsm.QueryItem;
 import evl.hfsm.State;
 import evl.hfsm.Transition;
 import evl.variable.StateVariable;
-
 
 public class StateVarPathGetter extends NullTraverser<Void, Designator> {
   final private Map<StateVariable, Designator> vpath = new HashMap<StateVariable, Designator>();
@@ -53,7 +52,7 @@ public class StateVarPathGetter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitQueryItem(QueryItem obj, Designator param) {
+  protected Void visitHfsmQueryFunction(HfsmQueryFunction obj, Designator param) {
     return null;
   }
 

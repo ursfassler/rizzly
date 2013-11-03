@@ -24,27 +24,27 @@ abstract public class BaseTest {
     String ns = filename;
     opt.init(getRootdir(), new Designator(ns, testcase), debugEvent, lazyModelCheck);
     Main.compile(opt);
-    
+
     boolean compileBinary = false;
     boolean execute = false;
     boolean compileNative = false;
-    
-    switch( steps ){
-      case EXECUTE:
-        execute = true;
-      case COMPILE_TO_BIN:
-        compileBinary = true;
-      case COMPILE_TO_ASM:
-        compileNative = true;
+
+    switch (steps) {
+    case EXECUTE:
+      execute = true;
+    case COMPILE_TO_BIN:
+      compileBinary = true;
+    case COMPILE_TO_ASM:
+      compileNative = true;
     }
-    
+
     if (compileNative) {
       compileLlvm();
     }
-    if( compileBinary ){
+    if (compileBinary) {
       compileTest(filename);
     }
-    if( execute ){
+    if (execute) {
       executeTest(filename);
     }
   }
@@ -55,7 +55,7 @@ abstract public class BaseTest {
     ClaOption opt = new ClaOption();
     opt.init(getRootdir(), new Designator(namespace, comp), debugEvent, lazyModelCheck);
     Main.compile(opt);
-    
+
     if (compileCfile) {
       compileLlvm();
     }
@@ -66,25 +66,26 @@ abstract public class BaseTest {
   }
 
   public void compileLlvm() {
-//    String cmd = "gcc -pedantic -ansi -Werror -Wall -Wextra -c " + cFile + " -o " + outdir + "libinst.a";  //TODO use strict again
+    // String cmd = "gcc -pedantic -ansi -Werror -Wall -Wextra -c " + cFile + " -o " + outdir + "libinst.a"; //TODO use
+    // strict again
     String cmd = "gcc -pedantic -ansi -Wall -Wextra -c " + cFile + " -o " + outdir + "libinst.a";
-    //TODO use strict? yes
-    //TODO use additional code checker
-    execute(cmd,"could not compile c file");
+    // TODO use strict? yes
+    // TODO use additional code checker
+    execute(cmd, "could not compile c file");
   }
 
   private void compileTest(String testcase) {
     String flags = "-Wall -Werror";
     String cmd = "gcc " + flags + " " + getRootdir() + testcase + ".c" + " " + outdir + "libinst.a" + " -o" + outdir + "inst";
-    execute(cmd,"could not compile test case");
+    execute(cmd, "could not compile test case");
   }
 
   private void executeTest(String testcase) {
     String cmd = outdir + "inst";
-    execute(cmd,"test case failed");
+    execute(cmd, "test case failed");
   }
 
-  private void execute(String cmd,String msg) throws RuntimeException {
+  private void execute(String cmd, String msg) throws RuntimeException {
     try {
       Process p;
       p = Runtime.getRuntime().exec(cmd);

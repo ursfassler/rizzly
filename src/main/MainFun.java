@@ -22,7 +22,6 @@ import common.Designator;
 import common.ElementInfo;
 
 import fun.doc.DepGraph;
-import fun.doc.DocWriter;
 import fun.doc.PrettyPrinter;
 import fun.expression.Expression;
 import fun.expression.reference.ReferenceLinked;
@@ -89,7 +88,6 @@ public class MainFun {
     for (RizzlyFile f : fileList) {
       Namespace parent = classes.forceChildPath(f.getName().toList());
       parent.addAll(f.getType());
-      parent.addAll(f.getIface());
       parent.addAll(f.getComp());
       parent.addAll(f.getConstant());
       parent.addAll(f.getFunction());
@@ -100,7 +98,7 @@ public class MainFun {
 
     KnowledgeBase knowledgeBase = new KnowledgeBase(classes, fileList, debugdir);
     Linker.process(classes, knowledgeBase);
-    
+
     PrettyPrinter.print(classes, debugdir + "linked.rzy");
 
     NamespaceLinkReduction.process(classes);
@@ -111,7 +109,7 @@ public class MainFun {
 
     Named root = classes.getChildItem(opt.getRootComp().toList());
     printDepGraph(debugdir + "rdep.gv", classes, root, fileList);
-    DocWriter.print(fileList, new KnowledgeBase(classes, fileList, docdir));
+    // DocWriter.print(fileList, new KnowledgeBase(classes, fileList, docdir)); //TODO reimplement
 
     Component nroot = evaluate(root, classes, debugdir, fileList);
     DeAlias.process(classes);
@@ -166,16 +164,12 @@ public class MainFun {
     KnowledgeBase kb = new KnowledgeBase(classes, fileList, debugdir);
     SimpleGraph<Named> g = DepGraph.build(classes, kb);
 
-/*    { // Cycle detection
-      CycleDetector<Named, Pair<Named, Named>> cd = new CycleDetector<Named, Pair<Named, Named>>(g);
-      Set<Named> cycle = cd.findCycles();
-      if (!cycle.isEmpty()) {
-        for (Named v : cycle) {
-          RError.err(ErrorType.Hint, v.getInfo(), "Dependency cycle found, invovling type: " + v.getName());
-        }
-        RError.err(ErrorType.Warning, "Maybe a dependency cycle found in types");
-      }
-    }*/
+    /*
+     * { // Cycle detection CycleDetector<Named, Pair<Named, Named>> cd = new CycleDetector<Named, Pair<Named,
+     * Named>>(g); Set<Named> cycle = cd.findCycles(); if (!cycle.isEmpty()) { for (Named v : cycle) {
+     * RError.err(ErrorType.Hint, v.getInfo(), "Dependency cycle found, invovling type: " + v.getName()); }
+     * RError.err(ErrorType.Warning, "Maybe a dependency cycle found in types"); } }
+     */
 
     {
       {
@@ -194,7 +188,6 @@ public class MainFun {
           itms.addAll(f.getType().getList());
           itms.addAll(f.getConstant().getList());
           itms.addAll(f.getFunction().getList());
-          itms.addAll(f.getIface().getList());
           itms.addAll(f.getComp().getList());
           for (Named itr : itms) {
             replacer.traverse(itr, new Memory());

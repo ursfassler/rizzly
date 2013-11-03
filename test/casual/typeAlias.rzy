@@ -5,15 +5,10 @@ type
   Unsigned{T:Type{Natural}} = T;
   Byte2 = Byte;
   
-interface
-  Iface
-    function foo();
-  end
-  
 component
   TypeAlias
     input
-      in  : Iface;
+      in();
   
     implementation elementary
 
@@ -24,7 +19,7 @@ component
       d : Unsigned{R{0,255}};
       e : Byte2;
       
-    function in.foo()
+    function in()
       a := 0;
       b := 0;
       c := 0;

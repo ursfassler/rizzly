@@ -8,7 +8,6 @@ import evl.DefTraverser;
 import evl.Evl;
 import evl.expression.reference.Reference;
 import evl.other.CompUse;
-import evl.other.IfaceUse;
 import evl.other.Named;
 import evl.type.TypeRef;
 import evl.type.base.EnumDefRef;
@@ -25,7 +24,7 @@ public class DepCollector extends DefTraverser<Void, Void> {
 
   public static Set<Named> process(Collection<? extends Evl> pubfunc) {
     DepCollector collector = new DepCollector();
-    for( Evl func : pubfunc ) {
+    for (Evl func : pubfunc) {
       collector.traverse(func, null);
     }
     return collector.visited;
@@ -33,8 +32,8 @@ public class DepCollector extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visit(Evl obj, Void param) {
-    if( !visited.contains(obj) ) {
-      if( obj instanceof Named ) {
+    if (!visited.contains(obj)) {
+      if (obj instanceof Named) {
         visited.add((Named) obj);
       }
       super.visit(obj, param);
@@ -57,13 +56,6 @@ public class DepCollector extends DefTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitIfaceUse(IfaceUse obj, Void param) {
-    super.visitIfaceUse(obj, param);
-    visit(obj.getLink(), param);
-    return null;
-  }
-
-  @Override
   protected Void visitTypeRef(TypeRef obj, Void param) {
     super.visitTypeRef(obj, param);
     visit(obj.getRef(), param);
@@ -76,6 +68,5 @@ public class DepCollector extends DefTraverser<Void, Void> {
     visit(obj.getElem(), param);
     return null;
   }
-  
-  
+
 }

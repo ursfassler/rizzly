@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import common.Designator;
-import common.Direction;
 import common.ElementInfo;
 
 import evl.Evl;
@@ -16,14 +15,12 @@ import evl.expression.Number;
 import evl.expression.binop.Plus;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
-import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
+import evl.function.impl.FuncIfaceOutVoid;
 import evl.function.impl.FuncPrivateVoid;
 import evl.function.impl.FuncSubHandlerEvent;
 import evl.other.CompUse;
-import evl.other.IfaceUse;
 import evl.other.ImplElementary;
-import evl.other.Interface;
 import evl.other.ListOfNamed;
 import evl.other.Namespace;
 import evl.statement.Assignment;
@@ -37,25 +34,22 @@ import evl.type.base.RangeType;
 import evl.variable.FuncVariable;
 
 public class DebugIfaceAdder extends NullTraverser<Void, Void> {
-
-  final private Interface debugIface;
   final private ArrayType arrayType;
   final private RangeType sizeType;
   final private RangeType nameNumType;
   final private ArrayList<String> names;
   final static private ElementInfo info = new ElementInfo();
 
-  public DebugIfaceAdder(ArrayType arrayType, RangeType sizeType, RangeType nameNumType, Interface debugIface, ArrayList<String> names) {
+  public DebugIfaceAdder(ArrayType arrayType, RangeType sizeType, RangeType nameNumType, ArrayList<String> names) {
     super();
     this.names = names;
-    this.debugIface = debugIface;
     this.arrayType = arrayType;
     this.sizeType = sizeType;
     this.nameNumType = nameNumType;
   }
 
-  public static void process(Evl obj, ArrayType arrayType, RangeType sizeType, RangeType nameNumType, Interface debugIface, ArrayList<String> names) {
-    DebugIfaceAdder reduction = new DebugIfaceAdder(arrayType, sizeType, nameNumType, debugIface, names);
+  public static void process(Evl obj, ArrayType arrayType, RangeType sizeType, RangeType nameNumType, ArrayList<String> names) {
+    DebugIfaceAdder reduction = new DebugIfaceAdder(arrayType, sizeType, nameNumType, names);
     reduction.traverse(obj, null);
   }
 
@@ -66,7 +60,7 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     FuncVariable size = new FuncVariable(info, "size", new TypeRef(info, sizeType));
     param.add(size);
 
-    FuncSubHandlerEvent func = new FuncSubHandlerEvent(info, "msgRecv", param);
+    FuncSubHandlerEvent func = new FuncSubHandlerEvent(info, Designator.NAME_SEP + "msgRecv", param);
     func.setBody(new Block(info));
     return func;
   }
@@ -78,16 +72,15 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     FuncVariable size = new FuncVariable(info, "size", new TypeRef(info, sizeType));
     param.add(size);
 
-    FuncSubHandlerEvent func = new FuncSubHandlerEvent(info, "msgSend", param);
+    FuncSubHandlerEvent func = new FuncSubHandlerEvent(info, Designator.NAME_SEP + "msgSend", param);
     func.setBody(new Block(info));
     return func;
   }
 
-  private FuncPrivateVoid makeDebugSend(String callname, IfaceUse debugIfaceUse) {
+  private FuncPrivateVoid makeDebugSend(String callname, FuncIfaceOutVoid sendProto) {
     Block body = new Block(info);
 
     FuncVariable func = new FuncVariable(info, "func", new TypeRef(info, nameNumType));
-    FuncVariable iface = new FuncVariable(info, "iface", new TypeRef(info, nameNumType));
 
     FuncVariable path = new FuncVariable(info, "path", new TypeRef(info, arrayType));
     { // path : Array{D,N};
@@ -103,20 +96,12 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
       body.getStatements().add(ass);
     }
 
-    { // path[1] := iface;
-      Reference left = new Reference(info, path, new RefIndex(info, new Number(info, BigInteger.ONE)));
-      Reference right = new Reference(info, iface);
-      Assignment ass = new Assignment(info, left, right);
-      body.getStatements().add(ass);
-    }
-
-    { // _debug.msgSend( path, 2 );
+    { // _debug.msgSend( path, 1 );
       List<Expression> actParam = new ArrayList<Expression>();
       actParam.add(new Reference(info, path));
-      actParam.add(new Number(info, BigInteger.valueOf(2)));
+      actParam.add(new Number(info, BigInteger.valueOf(1)));
 
-      Reference call = new Reference(info, debugIfaceUse);
-      call.getOffset().add(new RefName(info, callname));
+      Reference call = new Reference(info, sendProto);
       call.getOffset().add(new RefCall(info, actParam));
 
       body.getStatements().add(new CallStmt(info, call));
@@ -124,7 +109,6 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
 
     ListOfNamed<FuncVariable> param = new ListOfNamed<FuncVariable>();
     param.add(func);
-    param.add(iface);
     FuncPrivateVoid rfunc = new FuncPrivateVoid(info, "_" + callname, param);
     rfunc.setBody(body);
 
@@ -144,7 +128,7 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     return null;
   }
 
-  private List<Statement> makeCode(String callname, FuncVariable pArray, FuncVariable argSize, IfaceUse debug, String compName) {
+  private List<Statement> makeCode(String callname, FuncVariable pArray, FuncVariable argSize, FuncIfaceOutVoid proto, String compName) {
     List<Statement> code = new ArrayList<Statement>();
 
     int x = names.indexOf(compName);
@@ -173,8 +157,7 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
       actParam.add(new Reference(info, pArray));
       actParam.add(new Reference(info, sizeP1));
 
-      Reference call = new Reference(info, debug);
-      call.getOffset().add(new RefName(info, callname));
+      Reference call = new Reference(info, proto);
       call.getOffset().add(new RefCall(info, actParam));
 
       code.add(new CallStmt(info, call));
@@ -185,14 +168,14 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitImplElementary(ImplElementary obj, Void param) {
-    IfaceUse debIface;
-    { // add iface
-      debIface = new IfaceUse(info, "_debug", debugIface);
-      obj.getIface(Direction.out).add(debIface);
-    }
 
-    FuncPrivateVoid debugSend = makeDebugSend("msgSend", debIface);
-    FuncPrivateVoid debugRecv = makeDebugSend("msgRecv", debIface);
+    FuncIfaceOutVoid sendProto = makeMsg(Designator.NAME_SEP + "msgSend", "sender");
+    obj.getOutput().add(sendProto);
+    FuncIfaceOutVoid recvProto = makeMsg(Designator.NAME_SEP + "msgRecv", "receiver");
+    obj.getOutput().add(recvProto);
+
+    FuncPrivateVoid debugSend = makeDebugSend("iMsgSend", sendProto);
+    FuncPrivateVoid debugRecv = makeDebugSend("iMsgRecv", recvProto);
     obj.getInternalFunction().add(debugSend);
     obj.getInternalFunction().add(debugRecv);
 
@@ -202,18 +185,18 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     {// add callback
 
       for (CompUse use : obj.getComponent()) {
-        Designator name = new Designator(use.getName(), "_debug");
+        Designator name = new Designator(use.getName());
 
         {
           FuncSubHandlerEvent recv = makeRecvProto(sizeType);
-          List<Statement> body = makeCode(recv.getName(), recv.getParam().getList().get(0), recv.getParam().getList().get(1), debIface, use.getName());
+          List<Statement> body = makeCode(recv.getName(), recv.getParam().getList().get(0), recv.getParam().getList().get(1), recvProto, use.getName());
           recv.getBody().getStatements().addAll(body);
           obj.addFunction(name.toList(), recv);
         }
 
         {
           FuncSubHandlerEvent send = makeSendProto(sizeType);
-          List<Statement> body = makeCode(send.getName(), send.getParam().getList().get(0), send.getParam().getList().get(1), debIface, use.getName());
+          List<Statement> body = makeCode(send.getName(), send.getParam().getList().get(0), send.getParam().getList().get(1), sendProto, use.getName());
           send.getBody().getStatements().addAll(body);
           obj.addFunction(name.toList(), send);
         }
@@ -221,6 +204,17 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     }
 
     return null;
+  }
+
+  private FuncIfaceOutVoid makeMsg(String funcName, String paramName) {
+    ArrayList<FuncVariable> param = new ArrayList<FuncVariable>();
+    FuncVariable sender = new FuncVariable(info, paramName, new TypeRef(info, arrayType));
+    param.add(sender);
+    FuncVariable size = new FuncVariable(info, "size", new TypeRef(info, sizeType));
+    param.add(size);
+
+    FuncIfaceOutVoid sendFunc = new FuncIfaceOutVoid(info, funcName, new ListOfNamed<FuncVariable>(param));
+    return sendFunc;
   }
 
   @Override

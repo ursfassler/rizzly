@@ -4,14 +4,17 @@
 #include  "output/inst.h"
 
 int main(){
-  inst__system_construct();
+  inst__construct();
 
   int i;
   for( i = 0; i < 100; i++ ){
-    if( inst_in_get() != 42 ){
+    if( inst_in() != 42 ){
       return -1;
     }
   }
+  
+  inst__destruct();
+
   return 0;
 }
 

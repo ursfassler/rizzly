@@ -22,13 +22,11 @@ import fun.function.impl.FuncPrivateVoid;
 import fun.function.impl.FuncProtRet;
 import fun.function.impl.FuncProtVoid;
 import fun.hfsm.ImplHfsm;
-import fun.hfsm.QueryItem;
 import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
 import fun.other.Generator;
 import fun.other.ImplElementary;
-import fun.other.Interface;
 import fun.other.Namespace;
 import fun.other.RizzlyFile;
 import fun.statement.Assignment;
@@ -68,7 +66,6 @@ import fun.variable.CompUse;
 import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
 import fun.variable.FuncVariable;
-import fun.variable.IfaceUse;
 import fun.variable.StateVariable;
 import fun.variable.TemplateParameter;
 
@@ -118,11 +115,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitImplElementary(ImplElementary obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitInterface(Interface obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -292,11 +284,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitIfaceUse(IfaceUse obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
   protected R visitTypeType(TypeType obj, P param) {
     return visitDefault(obj, param);
   }
@@ -371,11 +358,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitTransition(Transition obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitQueryItem(QueryItem obj, P param) {
     return visitDefault(obj, param);
   }
 

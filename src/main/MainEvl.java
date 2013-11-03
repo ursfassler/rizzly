@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -41,9 +40,15 @@ import evl.doc.DepGraph;
 import evl.doc.PrettyPrinter;
 import evl.doc.StreamWriter;
 import evl.expression.reference.Reference;
+import evl.function.FuncIfaceIn;
+import evl.function.FuncIfaceOut;
 import evl.function.FuncWithBody;
 import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
+import evl.function.FunctionFactory;
+import evl.function.FunctionHeader;
+import evl.function.impl.FuncIfaceInVoid;
+import evl.function.impl.FuncIfaceOutVoid;
 import evl.function.impl.FuncPrivateVoid;
 import evl.function.impl.FuncProtoRet;
 import evl.function.impl.FuncProtoVoid;
@@ -58,12 +63,9 @@ import evl.knowledge.KnowEvl;
 import evl.knowledge.KnowledgeBase;
 import evl.other.CompUse;
 import evl.other.Component;
-import evl.other.IfaceUse;
 import evl.other.ImplElementary;
-import evl.other.Interface;
 import evl.other.ListOfNamed;
 import evl.other.Named;
-import evl.other.NamedList;
 import evl.other.Namespace;
 import evl.other.RizzlyProgram;
 import evl.statement.Block;
@@ -129,8 +131,8 @@ public class MainEvl {
 
     PrettyPrinter.print(aclasses, debugdir + "reduced.rzy", true);
 
-//    ExprCutter.process(aclasses, kb); //TODO reimplement
-    BitLogicCategorizer.process(aclasses,kb);
+    // ExprCutter.process(aclasses, kb); //TODO reimplement
+    BitLogicCategorizer.process(aclasses, kb);
 
     PrettyPrinter.print(aclasses, debugdir + "normalized.rzy", true);
 
@@ -138,7 +140,7 @@ public class MainEvl {
 
     addConDestructor(aclasses, debugdir, kb);
 
-//  ExprCutter.process(aclasses, kb); //TODO reimplement
+    // ExprCutter.process(aclasses, kb); //TODO reimplement
     PrettyPrinter.print(aclasses, debugdir + "memcaps.rzy", true);
 
     if (opt.doDebugEvent()) {
@@ -149,13 +151,13 @@ public class MainEvl {
     // typecheck(classes, debugdir);
 
     RizzlyProgram prg = instantiate(root, debugdir, aclasses);
-    
+
     {
       evl.other.RizzlyProgram head = makeHeader(prg, debugdir);
       evl.traverser.Renamer.process(head);
-      printCHeader(outdir, head,names);
+      printCHeader(outdir, head, names);
     }
-    
+
     ConstantPropagation.process(prg);
     replaceEnums(prg);
     removeUnused(prg);
@@ -345,16 +347,16 @@ public class MainEvl {
     for (Component comp : ClassGetter.get(Component.class, aclasses)) {
       boolean in = false;
       boolean out = false;
-      List<FunctionBase> outFunc = ClassGetter.getAll(FunctionBase.class, getInterfaces(comp.getIface(Direction.out).getList()));
-      List<FunctionBase> inFunc = ClassGetter.getAll(FunctionBase.class, getInterfaces(comp.getIface(Direction.in).getList()));
-      for (FunctionBase itr : inFunc) {
+      List<FuncIfaceOut> outFunc = comp.getOutput().getList();
+      List<FuncIfaceIn> inFunc = comp.getInput().getList();
+      for (FunctionHeader itr : inFunc) {
         if (itr instanceof FuncWithReturn) {
           out = true;
         } else {
           in = true;
         }
       }
-      for (FunctionBase itr : outFunc) {
+      for (FunctionHeader itr : outFunc) {
         if (itr instanceof FuncWithReturn) {
           in = true;
         } else {
@@ -373,14 +375,6 @@ public class MainEvl {
     }
   }
 
-  private static Set<Interface> getInterfaces(Collection<IfaceUse> list) {
-    Set<Interface> ret = new HashSet<Interface>();
-    for (IfaceUse var : list) {
-      ret.add(var.getLink());
-    }
-    return ret;
-  }
-
   // TODO add a compiler flag to change the error into a warning. Like --lazyDeveloper or so
   /**
    * Throws an error if an interface in the top component contains a query. Because we have to be sure that queries are
@@ -390,12 +384,9 @@ public class MainEvl {
    * @param rootdir
    */
   private static void checkRoot(Component root, String rootdir) {
-    for (IfaceUse itr : root.getIface(Direction.out)) {
-      Interface iface = itr.getLink();
-      for (FunctionBase func : iface.getPrototype()) {
-        if (func instanceof FuncWithReturn) {
-          RError.err(ErrorType.Error, itr.getInfo(), "Top component is not allowed to have queries in output (" + itr.getName() + "." + func.getName() + ")");
-        }
+    for (FunctionHeader func : root.getOutput()) {
+      if (func instanceof FuncWithReturn) {
+        RError.err(ErrorType.Error, func.getInfo(), "Top component is not allowed to have queries in output (" + func.getName() + "." + func.getName() + ")");
       }
     }
   }
@@ -425,17 +416,10 @@ public class MainEvl {
   }
 
   private static void addConDestructor(Namespace classes, String debugdir, KnowledgeBase kb) {
-    Interface debugIface = new Interface(info, SystemIfaceAdder.IFACE_TYPE_NAME);
+    FuncIfaceInVoid sendFunc = new FuncIfaceInVoid(info, SystemIfaceAdder.CONSTRUCT, new ListOfNamed<FuncVariable>());
+    FuncIfaceInVoid recvFunc = new FuncIfaceInVoid(info, SystemIfaceAdder.DESTRUCT, new ListOfNamed<FuncVariable>());
 
-    FuncProtoVoid sendFunc = new FuncProtoVoid(info, SystemIfaceAdder.CONSTRUCT, new ListOfNamed<FuncVariable>());
-    debugIface.getPrototype().add(sendFunc);
-
-    FuncProtoVoid recvFunc = new FuncProtoVoid(info, SystemIfaceAdder.DESTRUCT, new ListOfNamed<FuncVariable>());
-    debugIface.getPrototype().add(recvFunc);
-
-    classes.add(debugIface);
-
-    SystemIfaceAdder.process(classes, kb);
+    SystemIfaceAdder.process(sendFunc, recvFunc, classes, kb);
     PrettyPrinter.print(classes, debugdir + "system.rzy", true);
   }
 
@@ -456,39 +440,7 @@ public class MainEvl {
     ArrayType arrayType = kbi.getArray(BigInteger.valueOf(depth), symNameSizeType);
     RangeType sizeType = kbi.getRangeType(depth);
 
-    Interface debugIface;
-    FuncProtoVoid recvFunc;
-    {
-      debugIface = new Interface(info, "_Debug");
-
-      {
-        ArrayList<FuncVariable> param = new ArrayList<FuncVariable>();
-        FuncVariable sender = new FuncVariable(info, "sender", new TypeRef(info, arrayType));
-        param.add(sender);
-        FuncVariable size = new FuncVariable(info, "size", new TypeRef(info, sizeType));
-        param.add(size);
-
-        FuncProtoVoid sendFunc = new FuncProtoVoid(info, "msgSend", new ListOfNamed<FuncVariable>(param));
-
-        debugIface.getPrototype().add(sendFunc);
-      }
-
-      {
-        ArrayList<FuncVariable> param = new ArrayList<FuncVariable>();
-        FuncVariable sender = new FuncVariable(info, "receiver", new TypeRef(info, arrayType));
-        param.add(sender);
-        FuncVariable size = new FuncVariable(info, "size", new TypeRef(info, sizeType));
-        param.add(size);
-
-        recvFunc = new FuncProtoVoid(info, "msgRecv", new ListOfNamed<FuncVariable>(param));
-
-        debugIface.getPrototype().add(recvFunc);
-      }
-
-      classes.add(debugIface);
-    }
-
-    DebugIfaceAdder.process(classes, arrayType, sizeType, symNameSizeType, debugIface, names);
+    DebugIfaceAdder.process(classes, arrayType, sizeType, symNameSizeType, names);
 
     PrettyPrinter.print(classes, debugdir + "debug.rzy", true);
 
@@ -496,11 +448,11 @@ public class MainEvl {
   }
 
   private static RizzlyProgram instantiate(Component top, String rootdir, Namespace classes) {
-    KnowledgeBase kb = new KnowledgeBase(classes, rootdir);
-    ImplElementary env = makeEnv("inst", top, kb);
-    classes.add(env);
-
     {
+      KnowledgeBase kb = new KnowledgeBase(classes, rootdir);
+      ImplElementary env = makeEnv("inst", top, kb);
+      classes.add(env);
+
       PrettyPrinter.print(classes, rootdir + "env.rzy", true);
       Map<? extends Named, ? extends Named> map = CompInstantiator.process(env, kb);
       PrettyPrinter.print(classes, rootdir + "insta.rzy", true);
@@ -513,12 +465,14 @@ public class MainEvl {
       LinkReduction.process(inst);
     }
 
-    kb = new KnowledgeBase(classes, rootdir);
-
     PrettyPrinter.print(classes, rootdir + "instance.rzy", true);
     {
       Namespace root = classes.forcePath(new Designator("!env", "inst"));
-      makeInputPublic(root, top.getIface(Direction.in)); // TODO why top and not newly instantiated stuff?
+      for (FuncIfaceIn funcProto : top.getInput()) {
+        FunctionHeader impl = (FunctionHeader) root.findItem(funcProto.getName());
+        assert (impl != null);
+        impl.setAttribute(FuncAttr.Public);
+      }
 
       Set<FunctionBase> pubfunc = new HashSet<FunctionBase>();
       for (FunctionBase func : classes.getItems(FunctionBase.class, true)) {
@@ -530,8 +484,6 @@ public class MainEvl {
       // Use only stuff which is referenced from public input functions
       removeUnused(rootdir, classes, pubfunc);
     }
-
-    kb = null;
 
     PrettyPrinter.print(classes, rootdir + "bflat.rzy", true);
     ListOfNamed<Named> flat = NamespaceReduction.process(classes);
@@ -579,15 +531,11 @@ public class MainEvl {
 
     env.getComponent().add(new CompUse(info, instname, top));
 
-    ListOfNamed<NamedList<FunctionBase>> outprot = addOutIfaceFunc(top.getIface(Direction.out), kb);
-
-    for (NamedList<FunctionBase> list : outprot) {
-      ArrayList<String> ns = new ArrayList<String>();
-      ns.add(instname);
-      ns.add(list.getName());
-      for (FunctionBase func : list) {
-        env.addFunction(ns, func);
-      }
+    ListOfNamed<FunctionHeader> outprot = addOutIfaceFunc(top.getOutput(), kb);
+    ArrayList<String> ns = new ArrayList<String>();
+    ns.add(instname);
+    for (FunctionHeader func : outprot) {
+      env.addFunction(ns, func);
     }
 
     return env;
@@ -625,20 +573,21 @@ public class MainEvl {
     removeUnused(classes, g.vertexSet());
   }
 
-  private static ListOfNamed<NamedList<FunctionBase>> addOutIfaceFunc(ListOfNamed<IfaceUse> ifaces, KnowledgeBase kb) {
-    ListOfNamed<NamedList<FunctionBase>> ret = new ListOfNamed<NamedList<FunctionBase>>();
+  private static ListOfNamed<FunctionHeader> addOutIfaceFunc(ListOfNamed<FuncIfaceOut> listOfNamed, KnowledgeBase kb) {
+    ListOfNamed<FunctionHeader> ret = new ListOfNamed<FunctionHeader>();
 
-    for (IfaceUse ifaceRef : ifaces) {
-      NamedList<FunctionBase> list = new NamedList<FunctionBase>(info, ifaceRef.getName());
-      Interface iface = ifaceRef.getLink();
-      assert (iface != null);
-      for (FunctionBase func : iface.getPrototype()) {
-        FunctionBase prot = Copy.copy(func);
-        prot.setAttribute(FuncAttr.Extern);
-        prot.setAttribute(FuncAttr.Public);
-        list.add(prot);
+    for (FunctionHeader func : listOfNamed) {
+      FunctionHeader prot = Copy.copy(func);
+      Class<? extends FunctionBase> type = func instanceof FuncIfaceOutVoid ? FuncProtoVoid.class : FuncProtoRet.class;
+      FunctionHeader cprot = FunctionFactory.create(type, prot.getInfo(), prot.getName(), prot.getParam());
+      cprot.setAttribute(FuncAttr.Extern);
+      cprot.setAttribute(FuncAttr.Public);
+
+      if (cprot instanceof FuncWithReturn) {
+        ((FuncWithReturn) cprot).setRet(((FuncWithReturn) prot).getRet());
       }
-      ret.add(list);
+
+      ret.add(cprot);
     }
     return ret;
   }
@@ -657,35 +606,23 @@ public class MainEvl {
     ns.removeAll(remove);
   }
 
-  private static void makeInputPublic(Namespace root, ListOfNamed<IfaceUse> listOfNamed) {
-    for (IfaceUse iface : listOfNamed) {
-      Namespace ifspace = root.findSpace(iface.getName());
-      assert (ifspace != null);
-      for (Named item : ifspace) {
-        assert (item instanceof FunctionBase);
-        FunctionBase func = (FunctionBase) item;
-        func.setAttribute(FuncAttr.Public);
-      }
-    }
-  }
-
   private static RizzlyProgram makeHeader(RizzlyProgram prg, String debugdir) {
     RizzlyProgram ret = new RizzlyProgram(prg.getRootdir(), prg.getName());
     Set<Evl> anchor = new HashSet<Evl>();
-    for( FunctionBase func : prg.getFunction() ) {
-      if( func.getAttributes().contains(FuncAttr.Public) ) {
+    for (FunctionBase func : prg.getFunction()) {
+      if (func.getAttributes().contains(FuncAttr.Public)) {
         boolean hasBody = func instanceof FuncWithBody;
-        assert ( func.getAttributes().contains(FuncAttr.Extern) || hasBody );
-        for( Variable arg : func.getParam() ) {
+        assert (func.getAttributes().contains(FuncAttr.Extern) || hasBody);
+        for (Variable arg : func.getParam()) {
           anchor.add(arg.getType().getRef());
         }
-        if( func instanceof FuncWithReturn ) {
-          anchor.add(( (FuncWithReturn) func ).getRet());
+        if (func instanceof FuncWithReturn) {
+          anchor.add(((FuncWithReturn) func).getRet());
         }
-        if( hasBody ) {
-          if( func instanceof FuncWithReturn ) {
+        if (hasBody) {
+          if (func instanceof FuncWithReturn) {
             FuncProtoRet proto = new FuncProtoRet(func.getInfo(), func.getName(), func.getParam());
-            proto.setRet(( (FuncWithReturn) func ).getRet());
+            proto.setRet(((FuncWithReturn) func).getRet());
             ret.getFunction().add(proto);
           } else {
             FuncProtoVoid proto = new FuncProtoVoid(func.getInfo(), func.getName(), func.getParam());
@@ -699,12 +636,12 @@ public class MainEvl {
 
     Set<Named> dep = DepCollector.process(anchor);
 
-    for( Named itr : dep ) {
-      if( itr instanceof evl.type.Type ) {
+    for (Named itr : dep) {
+      if (itr instanceof evl.type.Type) {
         ret.getType().add((evl.type.Type) itr);
-      } else if( itr instanceof NamedElement ) {
+      } else if (itr instanceof NamedElement) {
         // element of record type
-      } else if( itr instanceof EnumElement ) {
+      } else if (itr instanceof EnumElement) {
         // element of enumerator type
       } else {
         RError.err(ErrorType.Fatal, itr.getInfo(), "Object should not be used in header file: " + itr.getClass().getCanonicalName());
@@ -712,7 +649,7 @@ public class MainEvl {
     }
 
     RizzlyProgram cpy = Copy.copy(ret);
-    
+
     toposort(cpy.getType().getList());
 
     return cpy;
@@ -720,9 +657,9 @@ public class MainEvl {
 
   private static void toposort(List<evl.type.Type> list) {
     SimpleGraph<evl.type.Type> g = new SimpleGraph<evl.type.Type>(list);
-    for( evl.type.Type u : list ) {
+    for (evl.type.Type u : list) {
       Set<evl.type.Type> vs = getDirectUsedTypes(u);
-      for( evl.type.Type v : vs ) {
+      for (evl.type.Type v : vs) {
         g.addEdge(u, v);
       }
     }
@@ -732,7 +669,7 @@ public class MainEvl {
     list.clear();
     LinkedList<evl.type.Type> nlist = new LinkedList<evl.type.Type>();
     TopologicalOrderIterator<evl.type.Type, Pair<evl.type.Type, evl.type.Type>> itr = new TopologicalOrderIterator<evl.type.Type, Pair<evl.type.Type, evl.type.Type>>(g);
-    while( itr.hasNext() ) {
+    while (itr.hasNext()) {
       nlist.push(itr.next());
     }
     list.addAll(nlist);
@@ -740,9 +677,9 @@ public class MainEvl {
     ArrayList<evl.type.Type> diff = new ArrayList<evl.type.Type>(list);
     diff.removeAll(old);
     old.removeAll(list);
-    assert ( size == list.size() );
+    assert (size == list.size());
   }
-  
+
   private static Set<evl.type.Type> getDirectUsedTypes(evl.type.Type u) {
     DefTraverser<Void, Set<evl.type.Type>> getter = new DefTraverser<Void, Set<evl.type.Type>>() {
 
@@ -757,12 +694,12 @@ public class MainEvl {
     return vs;
   }
 
-  private static void printCHeader(String outdir, RizzlyProgram cprog,List<String> debugNames) {
+  private static void printCHeader(String outdir, RizzlyProgram cprog, List<String> debugNames) {
     String cfilename = outdir + cprog.getName() + ".h";
     CHeaderWriter cwriter = new CHeaderWriter(debugNames);
     try {
       cwriter.traverse(cprog, new StreamWriter(new PrintStream(cfilename)));
-    } catch( FileNotFoundException e ) {
+    } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
   }

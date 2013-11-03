@@ -1,5 +1,4 @@
 import
-  genericIface;
   genericSub;
 
 type
@@ -21,7 +20,8 @@ type
 component
   GenericDef{T:Type{Integer}}
     input
-      in: GenericIface{T};
+      set( item: T );
+      get():T;
 
     implementation elementary
 
@@ -37,11 +37,11 @@ component
       dat3: The2Record{T,T};
       dat4: The3{T,TheRecord{T}};
 
-    function in.set( item: T )
+    function set( item: T )
       data := item;
     end
 
-    function in.get():T
+    function get():T
       return data;
     end
   end

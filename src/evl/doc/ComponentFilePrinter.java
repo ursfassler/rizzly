@@ -26,7 +26,6 @@ import evl.doc.compgraph.WorldComp;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Named;
 
-
 public class ComponentFilePrinter {
   private Document doc;
   private Element body;

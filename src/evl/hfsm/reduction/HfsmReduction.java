@@ -8,7 +8,6 @@ import java.util.List;
 import java.util.Map;
 
 import common.Designator;
-import common.Direction;
 import common.ElementInfo;
 
 import error.ErrorType;
@@ -21,6 +20,7 @@ import evl.expression.Expression;
 import evl.expression.Number;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.Reference;
+import evl.function.FuncIfaceIn;
 import evl.function.FuncWithBody;
 import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
@@ -30,7 +30,6 @@ import evl.function.impl.FuncPrivateVoid;
 import evl.function.impl.FuncProtoVoid;
 import evl.hfsm.HfsmQueryFunction;
 import evl.hfsm.ImplHfsm;
-import evl.hfsm.QueryItem;
 import evl.hfsm.State;
 import evl.hfsm.StateComposite;
 import evl.hfsm.StateSimple;
@@ -38,9 +37,7 @@ import evl.hfsm.Transition;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowLlvmLibrary;
 import evl.knowledge.KnowledgeBase;
-import evl.other.IfaceUse;
 import evl.other.ImplElementary;
-import evl.other.Interface;
 import evl.other.ListOfNamed;
 import evl.other.Named;
 import evl.other.Namespace;
@@ -102,8 +99,8 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
   @Override
   protected Named visitImplHfsm(ImplHfsm obj, Namespace param) {
     ImplElementary elem = new ImplElementary(obj.getInfo(), obj.getName());
-    elem.getIface(Direction.in).addAll(obj.getIface(Direction.in));
-    elem.getIface(Direction.out).addAll(obj.getIface(Direction.out));
+    elem.getInput().addAll(obj.getInput());
+    elem.getOutput().addAll(obj.getOutput());
     elem.getVariable().addAll(obj.getTopstate().getVariable());
     elem.getInternalFunction().addAll(obj.getTopstate().getFunction());
 
@@ -118,33 +115,27 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
     dict.traverse(obj.getTopstate(), null);
 
     // create event handler
-    for (IfaceUse use : elem.getIface(Direction.in)) {
-      Interface iface = use.getLink();
-      List<String> ns = new ArrayList<String>();
-      ns.add(use.getName());
-      for (FunctionBase header : iface.getPrototype()) {
-        FunctionBase ptoto = Copy.copy(header);
-        FunctionBase func;
-        if (ptoto instanceof FuncWithReturn) {
-          func = new FuncInputHandlerQuery(obj.getInfo(), header.getName(), ptoto.getParam());
-          ((FuncWithReturn) func).setRet(((FuncWithReturn) ptoto).getRet());
-        } else {
-          func = new FuncInputHandlerEvent(obj.getInfo(), header.getName(), ptoto.getParam());
-        }
-        elem.addFunction(ns, func);
-
-        // TODO replace stateVariable with a cached SSA version of it
-
-        Statement code;
-        if (func instanceof FuncWithReturn) {
-          code = addQueryCode(enumMap.keySet(), enumMap, states, stateVariable, use.getName(), (FuncInputHandlerQuery) func, func.getParam().getList());
-        } else {
-          code = addTransitionCode(enumMap.keySet(), enumMap, states, stateVariable, use.getName(), func.getName(), dict, func.getParam().getList());
-        }
-        Block bbl = new Block(info);
-        bbl.getStatements().add(code);
-        ((FuncWithBody) func).setBody(bbl);
+    for (FuncIfaceIn header : elem.getInput()) {
+      FuncIfaceIn ptoto = Copy.copy(header);
+      FunctionBase func;
+      if (ptoto instanceof FuncWithReturn) {
+        func = new FuncInputHandlerQuery(obj.getInfo(), header.getName(), ptoto.getParam());
+        ((FuncWithReturn) func).setRet(((FuncWithReturn) ptoto).getRet());
+      } else {
+        func = new FuncInputHandlerEvent(obj.getInfo(), header.getName(), ptoto.getParam());
       }
+      List<String> ns = new ArrayList<String>();
+      elem.addFunction(ns, func);
+
+      Statement code;
+      if (func instanceof FuncWithReturn) {
+        code = addQueryCode(enumMap.keySet(), enumMap, states, stateVariable, (FuncInputHandlerQuery) func, func.getParam().getList());
+      } else {
+        code = addTransitionCode(enumMap.keySet(), enumMap, states, stateVariable, func.getName(), dict, func.getParam().getList());
+      }
+      Block bbl = new Block(info);
+      bbl.getStatements().add(code);
+      ((FuncWithBody) func).setBody(bbl);
     }
 
     {
@@ -249,13 +240,13 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
     return ret;
   }
 
-  private CaseStmt addQueryCode(Collection<StateSimple> leafes, HashMap<StateSimple, EnumElement> enumMap, EnumType enumType, StateVariable stateVariable, String ifaceName, FuncInputHandlerQuery func, List<FuncVariable> param) {
+  private CaseStmt addQueryCode(Collection<StateSimple> leafes, HashMap<StateSimple, EnumElement> enumMap, EnumType enumType, StateVariable stateVariable, FuncInputHandlerQuery func, List<FuncVariable> param) {
     List<CaseOpt> copt = new ArrayList<CaseOpt>();
 
     for (State state : leafes) {
 
-      HfsmQueryFunction query = getQuery(state, ifaceName, func.getName());
-      
+      HfsmQueryFunction query = getQuery(state, func.getName());
+
       // from QueryDownPropagator
       assert (query.getBody().getStatements().size() == 1);
       ReturnExpr retcall = (ReturnExpr) query.getBody().getStatements().get(0);
@@ -274,17 +265,17 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
     return caseStmt;
   }
 
-  static private HfsmQueryFunction getQuery(State state, String ifaceName, String funcName) {
-    for (QueryItem itr : state.getItemList(QueryItem.class)) {
-      if (itr.getNamespace().equals(ifaceName) && itr.getFunc().getName().equals(funcName)) {
-        return itr.getFunc();
+  static private HfsmQueryFunction getQuery(State state, String funcName) {
+    for (HfsmQueryFunction itr : state.getItemList(HfsmQueryFunction.class)) {
+      if (itr.getName().equals(funcName)) {
+        return itr;
       }
     }
-    RError.err(ErrorType.Fatal, state.getInfo(), "Query not found: " + ifaceName + "." + funcName);
+    RError.err(ErrorType.Fatal, state.getInfo(), "Query not found: " + funcName);
     return null;
   }
 
-  private CaseStmt addTransitionCode(Collection<StateSimple> leafes, HashMap<StateSimple, EnumElement> enumMap, EnumType enumType, StateVariable stateVariable, String ifaceName, String funcName, TransitionDict getter, List<FuncVariable> param) {
+  private CaseStmt addTransitionCode(Collection<StateSimple> leafes, HashMap<StateSimple, EnumElement> enumMap, EnumType enumType, StateVariable stateVariable, String funcName, TransitionDict getter, List<FuncVariable> param) {
 
     List<CaseOpt> options = new ArrayList<CaseOpt>();
 
@@ -293,7 +284,7 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
       Reference label = makeEnumElemRef(enumType, enumMap.get(src).getName());
       CaseOpt opt = makeCaseOption(label, body);
 
-      List<Transition> transList = getter.get(src, ifaceName, funcName);
+      List<Transition> transList = getter.get(src, funcName);
       if (!transList.isEmpty()) {
         body.getStatements().add(makeGuardedTrans(transList, param, stateVariable, enumMap));
       }

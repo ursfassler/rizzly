@@ -1,13 +1,8 @@
-interface
-  Iface
-    function funcA();
-    function funcB();
-  end
-
 component
   Sub
     output
-      out: Iface;
+      funcA();
+      funcB();
       
     implementation elementary
   end
@@ -19,10 +14,10 @@ component
       a : Sub;
       b : Sub;
 
-    function a.out.funcA()
+    function a.funcA()
     end
 
-    function a.out.funcB()
+    function a.funcB()
     end
 
   end

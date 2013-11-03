@@ -27,9 +27,9 @@ import fun.variable.Variable;
 /**
  * If a visit() returns null, this means normal execution. If !null is returned, this means the function called "return"
  * and execution is aborted.
- *
+ * 
  * @author urs
- *
+ * 
  */
 public class StmtExecutor extends NullTraverser<Expression, Memory> {
   private KnowledgeBase kb;

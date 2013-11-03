@@ -10,7 +10,7 @@ import error.RError;
 import fun.Fun;
 
 /**
- *
+ * 
  * @author urs
  */
 public class SymbolTable<T, N> {

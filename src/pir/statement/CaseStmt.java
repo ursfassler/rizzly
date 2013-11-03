@@ -5,7 +5,6 @@ import java.util.List;
 
 import pir.expression.Expression;
 
-
 public class CaseStmt extends Statement {
   private Expression condition;
   final private List<CaseEntry> entries;

@@ -117,9 +117,8 @@ public class RefTypeChecker extends NullTraverser<Type, Type> {
 
   @Override
   protected Type visitRefPtrDeref(RefPtrDeref obj, Type param) {
-    assert( param instanceof PointerType );
-    return ((PointerType)param).getType().getRef();
+    assert (param instanceof PointerType);
+    return ((PointerType) param).getType().getRef();
   }
 
-  
 }

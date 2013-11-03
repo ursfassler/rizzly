@@ -273,8 +273,8 @@ public class ExprReplacer<T> extends Traverser<Expression, T> {
 
   @Override
   protected Expression visitTypeCast(TypeCast obj, T param) {
-    visit(obj.getCast(),param);
-    obj.setValue(visit(obj.getValue(),param));
+    visit(obj.getCast(), param);
+    obj.setValue(visit(obj.getValue(), param));
     return obj;
   }
 
@@ -283,7 +283,6 @@ public class ExprReplacer<T> extends Traverser<Expression, T> {
     return null;
   }
 
-  
   @Override
   protected Expression visitLibFunction(LibFunction obj, T param) {
     throw new RuntimeException("not yet implemented");
@@ -306,7 +305,7 @@ public class ExprReplacer<T> extends Traverser<Expression, T> {
 
   @Override
   protected Expression visitPointerType(PointerType obj, T param) {
-    visit(obj.getType(),param);
+    visit(obj.getType(), param);
     return null;
   }
 

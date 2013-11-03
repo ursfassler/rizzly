@@ -30,5 +30,4 @@ public class KnowEvl extends KnowledgeEntry {
     return named;
   }
 
-
 }

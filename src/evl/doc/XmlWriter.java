@@ -6,8 +6,6 @@ import org.w3c.dom.Text;
 
 import common.Designator;
 
-
-
 public class XmlWriter implements Writer {
   private Document doc;
   private Element root;

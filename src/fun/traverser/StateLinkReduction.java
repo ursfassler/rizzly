@@ -18,9 +18,9 @@ import fun.variable.StateVariable;
 
 /**
  * Changes references to deepest state, e.g. _top.A.B -> B
- *
+ * 
  * @author urs
- *
+ * 
  */
 public class StateLinkReduction extends DefGTraverser<Void, Void> {
   private final KnowFunChild kc;

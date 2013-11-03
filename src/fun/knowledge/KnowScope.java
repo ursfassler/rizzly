@@ -21,7 +21,6 @@ import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
 import fun.other.Generator;
 import fun.other.ImplElementary;
-import fun.other.Interface;
 import fun.type.base.AnyType;
 import fun.type.base.BooleanType;
 import fun.type.base.EnumElement;
@@ -43,7 +42,6 @@ import fun.variable.CompUse;
 import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
 import fun.variable.FuncVariable;
-import fun.variable.IfaceUse;
 import fun.variable.StateVariable;
 import fun.variable.TemplateParameter;
 
@@ -80,13 +78,11 @@ public class KnowScope extends KnowledgeEntry {
     global.add(ImplElementary.class);
     global.add(ImplComposition.class);
     global.add(ImplHfsm.class);
-    global.add(Interface.class);
 
     local.add(FuncVariable.class);
     local.add(TemplateParameter.class);
     local.add(FuncEntryExit.class); // TODO: sure?
 
-    priv.add(IfaceUse.class);
     priv.add(CompUse.class);
     priv.add(StateVariable.class);
     priv.add(ConstPrivate.class);

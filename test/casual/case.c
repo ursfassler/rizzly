@@ -5,12 +5,12 @@
 
 static R_0_100 value;
 
-void inst_out_tick(R_0_100 x){
+void inst_out(R_0_100 x){
   value = x;
 }
 
 int main(){
-  inst__system_construct();
+  inst__construct();
 
   R_0_100 i;
   R_0_100 exp;
@@ -28,12 +28,13 @@ int main(){
     } else {
       exp = 8;
     }
-    inst_in_tick( i );
+    inst_in( i );
     printf( "%i: %i <> %i\n", i, exp, value );
     if( exp != value ){
       return -1;
     }
   }
+  inst__destruct();
   return 0;
 }
 

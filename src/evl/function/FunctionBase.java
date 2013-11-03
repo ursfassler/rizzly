@@ -10,9 +10,8 @@ import evl.EvlBase;
 import evl.other.ListOfNamed;
 import evl.variable.FuncVariable;
 
-
 /**
- *
+ * 
  * @author urs
  */
 abstract public class FunctionBase extends EvlBase implements FunctionHeader {

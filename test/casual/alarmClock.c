@@ -9,7 +9,7 @@ void _trap(){
 
 static int i;
 
-void inst_alarm_tick(){
+void inst_alarm(){
   printf( "alarm by %i\n", i );
   if( i != 5 ){
     printf( "error, expected by 5\n" );
@@ -18,12 +18,14 @@ void inst_alarm_tick(){
 }
 
 int main(){
-  inst__system_construct();
+  inst__construct();
 
   for( i = 0; i < 15; i++ ){
     printf( "tick %i\n", i );
-    inst_tick_tick();
+    inst_tick();
   }
+  
+  inst__destruct();
   return 0;
 }
 

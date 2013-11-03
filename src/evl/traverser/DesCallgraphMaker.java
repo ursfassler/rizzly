@@ -46,9 +46,9 @@ public class DesCallgraphMaker extends DefTraverser<Void, Designator> {
 
   @Override
   protected Void visitFunctionBase(FunctionBase obj, Designator param) {
-    assert ( param != null );
+    assert (param != null);
     param = new Designator(param, obj.getName());
-    assert ( param.size() <= 3 );
+    assert (param.size() <= 3);
     callgraph.addVertex(param);
     return super.visitFunctionBase(obj, param);
   }
@@ -58,9 +58,9 @@ public class DesCallgraphMaker extends DefTraverser<Void, Designator> {
     super.visitReference(obj, param);
 
     Designator func = getIfFunc(obj);
-    if( func != null ) {
-      assert ( func.size() <= 3 );
-      assert ( param.size() <= 3 );
+    if (func != null) {
+      assert (func.size() <= 3);
+      assert (param.size() <= 3);
       callgraph.addVertex(func);
       callgraph.addEdge(param, func);
     }
@@ -68,15 +68,15 @@ public class DesCallgraphMaker extends DefTraverser<Void, Designator> {
   }
 
   static private Designator getIfFunc(Reference obj) {
-    if( obj.getOffset().isEmpty() ) {
+    if (obj.getOffset().isEmpty()) {
       return null;
     }
     Designator ret = new Designator(obj.getLink().getName());
-    for( RefItem ref : obj.getOffset() ) {
-      if( ref instanceof RefCall ) {
+    for (RefItem ref : obj.getOffset()) {
+      if (ref instanceof RefCall) {
         break;
-      } else if( ref instanceof RefName ) {
-        ret = new Designator(ret, ( (RefName) ref ).getName());
+      } else if (ref instanceof RefName) {
+        ret = new Designator(ret, ((RefName) ref).getName());
       } else {
         return null; // no function call
       }
@@ -91,9 +91,8 @@ public class DesCallgraphMaker extends DefTraverser<Void, Designator> {
 
   @Override
   protected Void visitImplElementary(ImplElementary obj, Designator param) {
-    visitItr( obj.getInputFunc(), param );
-    visitItr( obj.getInternalFunction(), param );
-    visitItr( obj.getSubComCallback(), param );
+    visitItr(obj.getInternalFunction(), param);
+    visitItr(obj.getSubComCallback(), param);
     return null;
   }
 
@@ -106,6 +105,5 @@ public class DesCallgraphMaker extends DefTraverser<Void, Designator> {
   protected Void visitRizzlyProgram(RizzlyProgram obj, Designator param) {
     return super.visitRizzlyProgram(obj, param);
   }
-  
-  
+
 }

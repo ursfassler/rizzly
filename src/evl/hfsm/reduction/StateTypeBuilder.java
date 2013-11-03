@@ -21,9 +21,9 @@ import evl.variable.Variable;
 
 /**
  * Creates a type with data of states for whole state machine
- *
+ * 
  * @author urs
- *
+ * 
  */
 public class StateTypeBuilder extends NullTraverser<RecordType, Designator> {
   public static final String SUB_ENTRY_NAME = "sub";
@@ -65,11 +65,11 @@ public class StateTypeBuilder extends NullTraverser<RecordType, Designator> {
 
     for (State sub : obj.getItemList(State.class)) {
       Type stype = visit(sub, param);
-      NamedElement item = new NamedElement(sub.getInfo(), sub.getName(), new TypeRef(new ElementInfo(), stype) );
+      NamedElement item = new NamedElement(sub.getInfo(), sub.getName(), new TypeRef(new ElementInfo(), stype));
       union.getElement().add(item);
     }
 
-    NamedElement sub = new NamedElement(obj.getInfo(), SUB_ENTRY_NAME,  new TypeRef(new ElementInfo(),union));
+    NamedElement sub = new NamedElement(obj.getInfo(), SUB_ENTRY_NAME, new TypeRef(new ElementInfo(), union));
     record.getElement().add(sub);
 
     return record;

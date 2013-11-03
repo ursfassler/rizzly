@@ -1,30 +1,25 @@
-interface
-  Iface
-    function bar():R{0,100};
-  end
-
 component
   DummyComp
     input
-      in  : Iface;
+      in():R{0,100};
     
     output
-      out : Iface;
+      out():R{0,100};
 
     implementation elementary
 
-    function in.bar():R{0,100}
-      return out.bar();
+    function in():R{0,100}
+      return out();
     end
     
   end
 
   CompositionQuery
     input
-      in  : Iface;
+      in():R{0,100};
     
     output
-      out : Iface;
+      out():R{0,100};
 
     implementation composition
     

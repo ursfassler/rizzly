@@ -4,31 +4,30 @@ import java.util.Collection;
 
 import common.ElementInfo;
 
+import evl.EvlBase;
 import evl.expression.Expression;
-import evl.other.IfaceUse;
+import evl.expression.reference.Reference;
 import evl.other.ListOfNamed;
 import evl.statement.Block;
 import evl.variable.FuncVariable;
 
-public class Transition extends StateItem {
+public class Transition extends EvlBase implements StateItem {
   private String name;
-  private State src;
-  private State dst;
-  private IfaceUse eventIface;
-  private String eventFunc;
-  private Expression guard;
+  private State src; // TODO use reference
+  private State dst; // TODO use reference
+  private Reference eventFunc;
   final private ListOfNamed<FuncVariable> param;
+  private Expression guard;
   private Block body;
 
-  public Transition(ElementInfo info, String name, State src, State dst, IfaceUse eventIface, String eventFunc, Expression guard, Collection<FuncVariable> param, Block body) {
+  public Transition(ElementInfo info, String name, State src, State dst, Reference eventFunc, Expression guard, Collection<FuncVariable> param, Block body) {
     super(info);
     this.name = name;
     this.src = src;
     this.dst = dst;
-    this.eventIface = eventIface;
     this.eventFunc = eventFunc;
-    this.guard = guard;
     this.param = new ListOfNamed<FuncVariable>(param);
+    this.guard = guard;
     this.body = body;
   }
 
@@ -64,19 +63,11 @@ public class Transition extends StateItem {
     this.guard = guard;
   }
 
-  public IfaceUse getEventIface() {
-    return eventIface;
-  }
-
-  public void setEventIface(IfaceUse eventIface) {
-    this.eventIface = eventIface;
-  }
-
-  public String getEventFunc() {
+  public Reference getEventFunc() {
     return eventFunc;
   }
 
-  public void setEventFunc(String eventFunc) {
+  public void setEventFunc(Reference eventFunc) {
     this.eventFunc = eventFunc;
   }
 
@@ -94,7 +85,7 @@ public class Transition extends StateItem {
 
   @Override
   public String toString() {
-    return src + " -> " + dst + " by " + eventIface.getName() + "." + eventFunc + " if " + guard;
+    return src + " -> " + dst + " by " + eventFunc + param + " if " + guard;
   }
 
 }

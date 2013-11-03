@@ -42,10 +42,6 @@ public class FileParser extends BaseParser {
 
     while (peek().getType() != TokenType.EOF) {
       switch (peek().getType()) {
-      case INTERFACE: {
-        ret.getCompfunc().addAll(type().parseInterfaceSection());
-        break;
-      }
       case COMPONENT: {
         ret.getCompfunc().addAll(type().parseComponentSection());
         break;

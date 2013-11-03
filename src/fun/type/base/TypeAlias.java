@@ -9,7 +9,7 @@ public class TypeAlias extends Type {
   private Reference ref;
 
   public TypeAlias(ElementInfo info, String name, Reference ref) {
-    super(info,name);
+    super(info, name);
     this.ref = ref;
   }
 

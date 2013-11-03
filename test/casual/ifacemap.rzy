@@ -1,30 +1,25 @@
-interface
-  Iface
-    function foo();
-  end
-
 component
   DummyComp
     input
-      in  : Iface;
+      in();
     
     output
-      out : Iface;
+      out();
 
     implementation elementary
 
-    function in.foo()
-      out.foo();
+    function in()
+      out();
     end
 
   end
 
   Ifacemap
     input
-      in  : Iface;
+      in();
     
     output
-      out : Iface;
+      out();
 
     implementation elementary
     
@@ -33,22 +28,22 @@ component
       b : DummyComp;
       c : DummyComp;
       
-    function in.foo()
-      a.in.foo();
-      b.in.foo();
+    function in()
+      a.in();
+      b.in();
     end
     
-    function a.out.foo()
-      b.in.foo();
-      c.in.foo();
+    function a.out()
+      b.in();
+      c.in();
     end
 
-    function c.out.foo()
-      out.foo();
+    function c.out()
+      out();
     end
 
-    function b.out.foo()
-      out.foo();
+    function b.out()
+      out();
     end
     
   end

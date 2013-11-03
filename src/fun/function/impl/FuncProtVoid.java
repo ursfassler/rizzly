@@ -5,7 +5,7 @@ import common.ElementInfo;
 import fun.function.FunctionHeader;
 
 /**
- *
+ * 
  * @author urs
  */
 public class FuncProtVoid extends FunctionHeader {

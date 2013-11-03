@@ -126,7 +126,7 @@ public class HfsmGraphviz extends DefTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitTransition(Transition obj, StreamWriter param) {
-    wrEdge(obj.getSrc(), obj.getDst(), obj.getEventIface().getName() + "." + obj.getEventFunc(), 0, param);
+    wrEdge(obj.getSrc(), obj.getDst(), obj.getEventFunc().getLink().getName(), 0, param);
     return null;
   }
 

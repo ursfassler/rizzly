@@ -6,7 +6,7 @@ import fun.expression.Expression;
 import fun.expression.reference.Reference;
 
 /**
- *
+ * 
  * @author urs
  */
 public class Assignment extends Statement {

@@ -4,15 +4,10 @@ type
     neg  : R{-10,10};
   end
 
-interface
-  Data
-    function tick();
-  end
-
 component
   Union2
     input
-      in  : Data;
+      in();
 
     implementation elementary
 
@@ -27,7 +22,7 @@ component
       end
     end
   
-    function in.tick()
+    function in()
       x : R{0,10};
       case data.what of
         Uni.pos:

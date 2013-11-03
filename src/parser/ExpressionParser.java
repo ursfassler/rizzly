@@ -192,12 +192,10 @@ public class ExpressionParser extends Parser {
     case IDENTIFIER: {
       return parseRef();
     }
-/*    case STAR: {
-      ElementInfo info = next().getInfo();
-      Reference ref = new ReferenceUnlinked(info);
-      ref.getOffset().add(new RefName(info, AnyType.NAME));
-      return ref;
-    }*/
+    /*
+     * case STAR: { ElementInfo info = next().getInfo(); Reference ref = new ReferenceUnlinked(info);
+     * ref.getOffset().add(new RefName(info, AnyType.NAME)); return ref; }
+     */
     case NUMBER: {
       Token tok = expect(TokenType.NUMBER);
       return new Number(tok.getInfo(), tok.getNum());

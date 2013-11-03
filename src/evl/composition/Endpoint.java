@@ -4,7 +4,7 @@ import common.Designator;
 import common.ElementInfo;
 
 import evl.EvlBase;
-import evl.other.IfaceUse;
+import evl.function.FuncIface;
 
 abstract public class Endpoint extends EvlBase {
 
@@ -12,7 +12,7 @@ abstract public class Endpoint extends EvlBase {
     super(info);
   }
 
-  abstract public IfaceUse getIfaceUse();
+  abstract public FuncIface getIfaceUse();
 
   abstract public Designator getDes();
 }

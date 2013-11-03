@@ -12,23 +12,18 @@ const
     7 
   ];
 
-interface
-  Iface
-    function foo( x: R{0,100} );
-  end
-
 component
   ArrayValue
     input
-      in  : Iface;
+      in( x: R{0,100} );
     
     output
-      out : Iface;
+      out( x: R{0,100} );
 
     implementation elementary
     
-    function in.foo( x: R{0,100} )
-      out.foo( data[x] );
+    function in( x: R{0,100} )
+      out( data[x] );
     end
 
   end

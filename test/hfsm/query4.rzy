@@ -1,36 +1,30 @@
-
-interface
-  Iface
-    function tick();
-    function read( x: R{0,10} ):R{0,100};
-  end
-  
 component
   Query4
     input
-      in : Iface;
+      tick();
+      read( x: R{0,10} ):R{0,100};
     
   implementation hfsm( A )
   
     transition
-      A to B by in.tick();
-      B to C by in.tick();
-      C to A by in.tick();
+      A to B by tick();
+      B to C by tick();
+      C to A by tick();
   
     state A
-      function in.read( x: R{0,10} ):R{0,100}
+      function read( x: R{0,10} ):R{0,100}
         return x * 1;
       end
     end
       
     state B
-      function in.read( x: R{0,10} ):R{0,100}
+      function read( x: R{0,10} ):R{0,100}
         return x * 2;
       end
     end
 
     state C
-      function in.read( x: R{0,10} ):R{0,100}
+      function read( x: R{0,10} ):R{0,100}
         return x * 3;
       end
     end

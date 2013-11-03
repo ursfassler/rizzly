@@ -11,21 +11,21 @@ void _trap(){
 static int rv = -1;
 static int error = 0;
 
-void inst_out_tick(R_0_63 value){
+void inst_out(R_0_63 value){
   value = value & 0x3f;
   
   rv = value;
 }
 
 int main(){
-  inst__system_construct();
+  inst__construct();
   
   printf( "tick,received,expected,error\n" );
   
   int i;
   for( i = 0; i < 64; i++ ){
     rv = -1;
-    inst_in_tick( i );
+    inst_in( i );
     
     int exp = -1;
     if( i & 0x01 ){
@@ -49,7 +49,7 @@ int main(){
     }
   }
  
-  inst__system_destruct();
+  inst__destruct();
 
   return error;
 }

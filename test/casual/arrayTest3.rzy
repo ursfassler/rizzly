@@ -1,12 +1,7 @@
-interface
-  Tick
-    function tick( x: R{0,31} ):R{0,31};
-  end
-
 component
   ArrayTest3
     input
-      in  : Tick;
+      in( x: R{0,31} ):R{0,31};
       
   implementation elementary
 
@@ -21,7 +16,7 @@ component
       end
     end
 
-    function in.tick( x: R{0,200} ):R{0,31}
+    function in( x: R{0,200} ):R{0,31}
       return a[x mod 8];
     end
 

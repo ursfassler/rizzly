@@ -24,9 +24,9 @@ import evl.variable.Variable;
 
 /**
  * Returns a callgraph of the entire (sub-) tree
- *
+ * 
  * @author urs
- *
+ * 
  */
 public class CallgraphMaker extends DefTraverser<Void, Evl> {
   private SimpleGraph<Evl> callgraph = new SimpleGraph<Evl>();
@@ -109,7 +109,7 @@ class RefChecker extends NullTraverser<Evl, Evl> {
 
   @Override
   protected Evl visitRefCall(RefCall obj, Evl param) {
-    if( param instanceof Type ){
+    if (param instanceof Type) {
       // convert function
       return param;
     }

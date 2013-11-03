@@ -9,7 +9,7 @@ void _trap(){
 
 static int i;
 
-void inst_out_tick(){
+void inst_out(){
   printf("out\n");
   if( (i % 3) != 2 ){
     printf("error\n");
@@ -18,13 +18,15 @@ void inst_out_tick(){
 }
 
 int main(){
-  inst__system_construct();
+  inst__construct();
 
   for( i = 0; i < 20; i++ ){  
     printf( "in\n" );
-    inst_in_tick();
+    inst_in();
   }
   
+  inst__destruct();
+
   return 0;
 }
 

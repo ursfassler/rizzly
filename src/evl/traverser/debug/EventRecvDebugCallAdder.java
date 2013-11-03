@@ -17,8 +17,6 @@ import evl.function.FunctionBase;
 import evl.function.impl.FuncInputHandlerEvent;
 import evl.function.impl.FuncInputHandlerQuery;
 import evl.function.impl.FuncPrivateVoid;
-import evl.other.Named;
-import evl.other.NamedList;
 import evl.statement.CallStmt;
 
 /**
@@ -27,7 +25,7 @@ import evl.statement.CallStmt;
  * @author urs
  * 
  */
-public class EventRecvDebugCallAdder extends DefTraverser<Void, Integer> {
+public class EventRecvDebugCallAdder extends DefTraverser<Void, Void> {
 
   private ArrayList<String> names;
   private FuncPrivateVoid msgRecvFunc;
@@ -44,38 +42,28 @@ public class EventRecvDebugCallAdder extends DefTraverser<Void, Integer> {
     reduction.traverse(obj, null);
   }
 
-  // recv event
   @Override
-  protected Void visitNamedList(NamedList<Named> obj, Integer param) {
-    int numIface = names.indexOf(obj.getName());
-    return super.visitNamedList(obj, numIface);
-  }
-
-  @Override
-  protected Void visitFuncInputHandlerQuery(FuncInputHandlerQuery obj, Integer param) {
-    makeDebugCall(obj, param);
+  protected Void visitFuncInputHandlerQuery(FuncInputHandlerQuery obj, Void param) {
+    makeDebugCall(obj);
     return null;
   }
 
   @Override
-  protected Void visitFuncInputHandlerEvent(FuncInputHandlerEvent obj, Integer param) {
-    makeDebugCall(obj, param);
+  protected Void visitFuncInputHandlerEvent(FuncInputHandlerEvent obj, Void param) {
+    makeDebugCall(obj);
     return null;
   }
 
-  public void makeDebugCall(FuncWithBody obj, Integer param) {
-    assert (param != null);
-    assert (param >= 0);
+  public void makeDebugCall(FuncWithBody obj) {
     int numFunc = names.indexOf(obj.getName());
     assert (numFunc >= 0);
-    obj.getBody().getStatements().add(0, makeCall(msgRecvFunc, numFunc, param));
+    obj.getBody().getStatements().add(0, makeCall(msgRecvFunc, numFunc));
   }
 
-  private CallStmt makeCall(FunctionBase func, int numFunc, int numIface) {
-    // _sendMsg( numFunc, numIface );
+  private CallStmt makeCall(FunctionBase func, int numFunc) {
+    // _sendMsg( numFunc );
     List<Expression> actParam = new ArrayList<Expression>();
     actParam.add(new Number(info, BigInteger.valueOf(numFunc)));
-    actParam.add(new Number(info, BigInteger.valueOf(numIface)));
 
     Reference call = new Reference(info, func);
     call.getOffset().add(new RefCall(info, actParam));

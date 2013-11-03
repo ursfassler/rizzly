@@ -21,7 +21,7 @@ public class TypeCollector extends DefTraverser<Void, Collection<Type>> {
 
   @Override
   protected Void visitTypeRef(TypeRef obj, Collection<Type> param) {
-    visit(obj.getRef(),param);
+    visit(obj.getRef(), param);
     return null;
   }
 

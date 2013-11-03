@@ -6,7 +6,7 @@ import evl.EvlBase;
 import evl.other.Named;
 
 /**
- *
+ * 
  * @author urs
  */
 public class UnionSelector extends EvlBase implements Named {

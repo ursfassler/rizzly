@@ -8,7 +8,7 @@ import error.ErrorType;
 import error.RError;
 
 /**
- *
+ * 
  * @author urs
  */
 public class Scanner implements PeekReader<Token> {

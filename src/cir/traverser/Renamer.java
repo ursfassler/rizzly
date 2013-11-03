@@ -11,8 +11,9 @@ import common.Designator;
 
 /**
  * Replaces "{" and "}" from names.
+ * 
  * @author urs
- *
+ * 
  */
 public class Renamer extends DefTraverser<Void, Void> {
   public static void process(CirBase cprog) {

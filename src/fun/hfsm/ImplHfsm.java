@@ -8,7 +8,7 @@ public class ImplHfsm extends Component {
   private StateComposite topstate;
 
   public ImplHfsm(ElementInfo info, String name, StateComposite topState) {
-    super(info,name);
+    super(info, name);
     topstate = topState;
   }
 

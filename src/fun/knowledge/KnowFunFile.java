@@ -12,9 +12,9 @@ import fun.other.RizzlyFile;
 
 /**
  * Knows in which file an object is.
- *
+ * 
  * @author urs
- *
+ * 
  */
 public class KnowFunFile extends KnowledgeEntry {
   private KnowledgeBase base;

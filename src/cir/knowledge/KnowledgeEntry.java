@@ -5,7 +5,6 @@
 
 package cir.knowledge;
 
-
 public abstract class KnowledgeEntry {
 
   abstract public void init(KnowledgeBase base);

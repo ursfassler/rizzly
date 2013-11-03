@@ -7,20 +7,22 @@ interface
 component
   DebugMsg
     input
-      in  : Iface;
+      inFoo();
+      inBar();
     
     output
-      out : Iface;
+      outFoo();
+      outBar();
 
   implementation elementary
 
-    function in.foo()
-      out.foo();
-      out.bar();
+    function inFoo()
+      outFoo();
+      outBar();
     end
 
-    function in.bar()
-      out.bar();
+    function inBar()
+      outBar();
     end
 
   end

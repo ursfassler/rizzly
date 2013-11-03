@@ -1,17 +1,11 @@
-
-interface
-  Tick
-    function tack( x: R{0,255} ):R{0,255};
-  end
-  
 component
   Range2
     input
-      in  : Tick;
+      in( x: R{0,255} ):R{0,255};
     
     implementation elementary
     
-    function in.tack( x: R{0,255} ):R{0,255}
+    function in( x: R{0,255} ):R{0,255}
       t : R{0,510} = x * 2;
       if t > 255 then
         t := 255;

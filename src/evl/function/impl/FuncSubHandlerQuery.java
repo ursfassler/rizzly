@@ -11,7 +11,7 @@ import evl.type.TypeRef;
 import evl.variable.FuncVariable;
 
 /**
- *
+ * 
  * @author urs
  */
 public class FuncSubHandlerQuery extends FunctionBase implements FuncWithReturn, FuncWithBody {

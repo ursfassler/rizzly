@@ -9,43 +9,38 @@ type
     dat2 : R{0,65535};
   end
 
-interface
-  Data
-    function set1( a, b: R{0,255} );
-    function set2( c: R{0,65535} );
-    function get1a():R{0,255};
-    function get1b():R{0,255};
-    function get2():R{0,65535};
-  end
-
 component
   UnionTest 
     input
-      in  : Data;
+      set1( a, b: R{0,255} );
+      set2( c: R{0,65535} );
+      get1a():R{0,255};
+      get1b():R{0,255};
+      get2():R{0,65535};
 
     implementation elementary
 
     var
       data : Uni;
   
-    function in.set1( a, b: R{0,255} )
+    function set1( a, b: R{0,255} )
       data.dat1.a := a;
       data.dat1.b := b;
     end
     
-    function in.set2( c: R{0,65535} )
+    function set2( c: R{0,65535} )
       data.dat2 := c;
     end
     
-    function in.get1a():R{0,255}
+    function get1a():R{0,255}
       return data.dat1.a;
     end
     
-    function in.get1b():R{0,255}
+    function get1b():R{0,255}
       return data.dat1.b;
     end
     
-    function in.get2():R{0,65535}
+    function get2():R{0,65535}
       return data.dat2;
     end
     

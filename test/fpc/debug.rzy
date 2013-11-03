@@ -1,43 +1,43 @@
-
-interface
-  Iface
-    function foo();
-    function bar();
-    function poh();
-  end
-
 component
   DummyComp
     input
-      in    : Iface;
+      infoo();
+      inbar();
+      inpoh();
     
     output
-      out   : Iface;
+      outfoo();
+      outbar();
+      outpoh();
 
     implementation elementary
 
-    function in.foo()
-      out.foo();
-      out.bar();
+    function infoo()
+      outfoo();
+      outbar();
     end
 
-    function in.bar()
-      out.bar();
-      out.poh();
+    function inbar()
+      outbar();
+      outpoh();
     end
 
-    function in.poh()
-      out.bar();
+    function inpoh()
+      outbar();
     end
 
   end
 
   Debug
     input
-      in    : Iface;
+      infoo();
+      inbar();
+      inpoh();
     
     output
-      out   : Iface;
+      outfoo();
+      outbar();
+      outpoh();
 
     implementation composition
     
@@ -46,11 +46,19 @@ component
       b : DummyComp;
     
     connection
-      in -> a.in;
-      in -> b.in;
+      infoo -> a.infoo;
+      inbar -> a.inbar;
+      inpoh -> a.inpoh;
+      infoo -> b.infoo;
+      inbar -> b.inbar;
+      inpoh -> b.inpoh;
     
-      a.out -> b.in;
-      b.out -> out;
+      a.outfoo -> b.infoo;
+      a.outbar -> b.inbar;
+      a.outpoh -> b.inpoh;
+      b.outfoo -> outfoo;
+      b.outbar -> outbar;
+      b.outpoh -> outpoh;
     
   end
 

@@ -21,10 +21,10 @@ public class TypeSizeGetter extends NullTraverser<Integer, Void> {
   }
 
   private int roundUp(int tsize) {
-    if( tsize % ByteAlignment != 0 ){
+    if (tsize % ByteAlignment != 0) {
       int nsize = tsize + (ByteAlignment - (tsize % ByteAlignment));
-      assert( nsize > tsize );
-      assert( nsize % ByteAlignment == 0 );
+      assert (nsize > tsize);
+      assert (nsize % ByteAlignment == 0);
       return nsize;
     }
     return tsize;

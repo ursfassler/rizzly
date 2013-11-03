@@ -1,27 +1,22 @@
 
-interface
-  Tick
-    function tick( x: R{0,20} );
-  end
-
 component
   Expr2
     input
-      in  : Tick;
+      in( x: R{0,20} );
     
     output
-      out : Tick;
+      out( x: R{0,20} );
       
     implementation elementary
     
-    function in.tick( x: R{0,20} )
+    function in( x: R{0,20} )
       y1 : R{0,20} = +x;
       y2 : R{-20,20} = -x;
 
       y4 : R{0,68};
       case x of
         0..1: y4 := x + 2; end
-        2..3: y4 := x - 2; end
+        2..3: y4 := R{0,68}( x - 2 ); end
         4..5: y4 := x * 2; end
         6..7: y4 := x / 2; end
         8..9: y4 := x mod 2; end
@@ -44,9 +39,9 @@ component
       end
         
       if y5 then
-        out.tick( (y1 + y2 + y4 + 20) mod 21 );
+        out( (y1 + y2 + y4 + 20) mod 21 );
       else
-        out.tick( 42 / 2 -10 );
+        out( 42 / 2 -10 );
       end
     end
 

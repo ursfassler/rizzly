@@ -10,7 +10,7 @@ import fun.statement.Block;
 
 /**
  * Globally defined function. It is a pure function and can be executed at compile time.
- *
+ * 
  * @author urs
  */
 public class FuncGlobal extends FunctionHeader implements FuncWithBody, FuncWithReturn {

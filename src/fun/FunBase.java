@@ -15,6 +15,4 @@ public abstract class FunBase implements Fun {
     return info;
   }
 
-
-
 }

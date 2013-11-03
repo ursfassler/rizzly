@@ -2,7 +2,6 @@ package fun.toevl;
 
 import evl.Evl;
 import evl.other.Component;
-import evl.other.Interface;
 import evl.type.Type;
 import evl.type.TypeRef;
 import evl.variable.Variable;
@@ -15,7 +14,6 @@ import fun.variable.CompUse;
 import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
 import fun.variable.FuncVariable;
-import fun.variable.IfaceUse;
 import fun.variable.StateVariable;
 
 public class FunToEvlVariable extends NullTraverser<Evl, Void> {
@@ -66,7 +64,7 @@ public class FunToEvlVariable extends NullTraverser<Evl, Void> {
     TypeRef type = copyType(obj.getType());
     // since enums produce a stupid circular dependency, the enum value may exist now
     evl.type.base.EnumElement val = (evl.type.base.EnumElement) fta.map.get(obj);
-    if( val == null ){
+    if (val == null) {
       val = new evl.type.base.EnumElement(obj.getInfo(), obj.getName(), type, (evl.expression.Expression) fta.traverse(obj.getDef(), null));
       fta.map.put(obj, val);
     }
@@ -80,15 +78,6 @@ public class FunToEvlVariable extends NullTraverser<Evl, Void> {
     fun.other.Component nt = (fun.other.Component) typeref.getLink();
     Component ecomp = (Component) fta.traverse(nt, null);
     return new evl.other.CompUse(obj.getInfo(), obj.getName(), ecomp);
-  }
-
-  @Override
-  protected Evl visitIfaceUse(IfaceUse obj, Void param) {
-    ReferenceLinked typeref = (ReferenceLinked) obj.getType();
-    assert (typeref.getOffset().isEmpty());
-    fun.other.Interface nt = (fun.other.Interface) typeref.getLink();
-    Interface ecomp = (Interface) fta.traverse(nt, null);
-    return new evl.other.IfaceUse(obj.getInfo(), obj.getName(), ecomp);
   }
 
 }

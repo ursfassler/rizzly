@@ -10,8 +10,6 @@ import error.RError;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.composition.ImplComposition;
-import fun.expression.reference.ReferenceLinked;
-import fun.expression.reference.ReferenceUnlinked;
 import fun.function.FunctionHeader;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.State;
@@ -20,14 +18,11 @@ import fun.hfsm.StateSimple;
 import fun.other.Component;
 import fun.other.Generator;
 import fun.other.ImplElementary;
-import fun.other.Interface;
 import fun.other.ListOfNamed;
 import fun.other.Named;
 import fun.other.Namespace;
 import fun.type.base.EnumType;
-import fun.type.composed.RecordType;
 import fun.type.composed.UnionType;
-import fun.variable.Variable;
 
 public class KnowFunChild extends KnowledgeEntry {
   private KnowFunChildTraverser kct;
@@ -128,7 +123,7 @@ class KnowFunChildTraverser extends NullTraverser<Set<Named>, String> {
   protected Set<Named> visitState(State obj, String param) {
     Set<Named> rset = super.visitState(obj, param);
     addIfFound(obj.getVariable().find(param), rset);
-    addIfFound(obj.getBfunc().find(param), rset);
+    addIfFound(obj.getItemList().find(param), rset);
     return rset;
   }
 
@@ -139,33 +134,7 @@ class KnowFunChildTraverser extends NullTraverser<Set<Named>, String> {
 
   @Override
   protected Set<Named> visitStateComposite(StateComposite obj, String param) {
-    Set<Named> rset = new HashSet<Named>();
-    ListOfNamed<State> children = new ListOfNamed<State>(obj.getItemList(State.class));
-    addIfFound(children.find(param), rset);
-    return rset;
-  }
-
-  @Override
-  protected Set<Named> visitVariable(Variable obj, String param) {
-    KnowFun kt = kb.getEntry(KnowFun.class);
-    Fun typ;
-    if (obj.getType() instanceof ReferenceLinked) {
-      ReferenceLinked ref = (ReferenceLinked) obj.getType();
-      typ = ref.getLink();
-    } else if (obj.getType() instanceof ReferenceUnlinked) {
-      ReferenceUnlinked ref = (ReferenceUnlinked) obj.getType();
-      typ = kt.get(ref.getName(), obj.getInfo());
-    } else {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Class not handled: " + obj.getType().getClass().getCanonicalName());
-      return null;
-    }
-    assert (typ != null);
-    return visit(typ, param);
-  }
-
-  @Override
-  protected Set<Named> visitRecordType(RecordType obj, String param) {
-    return retopt(obj.getElement().find(param));
+    return new HashSet<Named>();
   }
 
   @Override
@@ -183,11 +152,6 @@ class KnowFunChildTraverser extends NullTraverser<Set<Named>, String> {
     Set<Named> rset = visit(obj.getTemplate(), param);
     addIfFound(obj.getParam().find(param), rset);
     return rset;
-  }
-
-  @Override
-  protected Set<Named> visitInterface(Interface obj, String param) {
-    return retopt(obj.getPrototype().find(param));
   }
 
   private void addIfFound(Named item, Set<Named> rset) {

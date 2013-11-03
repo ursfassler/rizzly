@@ -3,7 +3,6 @@ package pir.statement;
 import pir.expression.Expression;
 import pir.expression.reference.Reference;
 
-
 public class Assignment extends Statement {
   private Reference dst;
   private Expression src;

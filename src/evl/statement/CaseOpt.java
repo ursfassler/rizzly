@@ -6,7 +6,6 @@ import common.ElementInfo;
 
 import evl.EvlBase;
 
-
 public class CaseOpt extends EvlBase {
   private List<CaseOptEntry> value;
   private Block code;

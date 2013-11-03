@@ -11,7 +11,7 @@ abstract public class UnaryExp extends Expression {
     super(info);
     this.expr = expr;
   }
-  
+
   abstract public String getOpName();
 
   public Expression getExpr() {

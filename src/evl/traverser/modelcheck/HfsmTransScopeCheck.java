@@ -19,6 +19,7 @@ import evl.traverser.ClassGetter;
 
 /**
  * Checks if the states (src,dst) of a transition are reachable from the transition (inner scope)
+ * 
  * @author urs
  */
 public class HfsmTransScopeCheck extends NullTraverser<Set<State>, Void> {
@@ -26,7 +27,7 @@ public class HfsmTransScopeCheck extends NullTraverser<Set<State>, Void> {
   public static void process(Namespace aclasses, KnowledgeBase kb) {
     HfsmTransScopeCheck check = new HfsmTransScopeCheck();
     List<ImplHfsm> hfsms = ClassGetter.get(ImplHfsm.class, aclasses);
-    for( ImplHfsm hfsm : hfsms ) {
+    for (ImplHfsm hfsm : hfsms) {
       check.traverse(hfsm, null);
     }
   }
@@ -39,7 +40,7 @@ public class HfsmTransScopeCheck extends NullTraverser<Set<State>, Void> {
   @Override
   protected Set<State> visitImplHfsm(ImplHfsm obj, Void param) {
     List<State> states = obj.getTopstate().getItemList(State.class);
-    for( State subState : states ) {
+    for (State subState : states) {
       visit(subState, null);
     }
     return null;
@@ -50,11 +51,11 @@ public class HfsmTransScopeCheck extends NullTraverser<Set<State>, Void> {
     Set<State> ret = new HashSet<State>();
     ret.add(obj);
 
-    for( State subState : obj.getItemList(State.class) ) {
+    for (State subState : obj.getItemList(State.class)) {
       ret.addAll(visit(subState, null));
     }
 
-    for( Transition trans : obj.getItemList(Transition.class) ) {
+    for (Transition trans : obj.getItemList(Transition.class)) {
       checkTransition(trans, ret);
     }
 
@@ -67,7 +68,7 @@ public class HfsmTransScopeCheck extends NullTraverser<Set<State>, Void> {
   }
 
   private void check(State state, Set<State> allowed, ElementInfo info, String end) {
-    if( !allowed.contains(state) ) {
+    if (!allowed.contains(state)) {
       RError.err(ErrorType.Error, info, "Connection to state which is in outer scope for " + end + " (" + state.getName() + ")");
     }
   }

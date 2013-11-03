@@ -21,7 +21,7 @@ static const int values[NUM_STEP] = {
 static int step = 0;
 static int error = 0;
 
-void inst_evt_evt(R_0_255 value){
+void inst_evt(R_0_255 value){
   if( step >= NUM_STEP ){
     printf( "Too many steps" );
     goto error;
@@ -48,15 +48,15 @@ void inst_evt_evt(R_0_255 value){
 
 int main(){
   printf( "construct\n" );
-  inst__system_construct();
+  inst__construct();
   printf( "tick\n" );
-  inst_tick_tick();
+  inst_tick();
   printf( "tick\n" );
-  inst_tick_tick();
+  inst_tick();
   printf( "tick\n" );
-  inst_tick_tick();
+  inst_tick();
   printf( "destruct\n" );
-  inst__system_destruct();
+  inst__destruct();
 
   return error;
 }

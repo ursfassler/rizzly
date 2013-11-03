@@ -9,9 +9,9 @@ import evl.variable.Variable;
 /**
  * Returns for every function if it writes state. It does not check called functions nor it uses information from the
  * function type or header.
- *
+ * 
  * @author urs
- *
+ * 
  */
 public class StateWriterInfo extends DefTraverser<Void, Void> {
   private boolean writeState = false;

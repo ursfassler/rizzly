@@ -13,8 +13,8 @@ public class ImplComposition extends Component {
   final private ListOfNamed<CompUse> component = new ListOfNamed<CompUse>();
   final private List<Connection> connection = new ArrayList<Connection>();
 
-  public ImplComposition(ElementInfo info,String name) {
-    super(info,name);
+  public ImplComposition(ElementInfo info, String name) {
+    super(info, name);
   }
 
   public ListOfNamed<CompUse> getComponent() {

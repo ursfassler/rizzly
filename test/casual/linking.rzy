@@ -1,20 +1,15 @@
-interface
-  Foo
-    function bar();
-  end
-
 component
   Linking
     input
-      in  : Foo;
+      in();
 
     output
-      linking   : Foo;    // it has the same name as namespace ("linking"), may cause problem; should not
+      linking();    // it has the same name as namespace ("linking"), may cause problem; should not
     
   implementation elementary
   
-    function in.bar
-      linking.bar;
+    function in()
+      linking();
     end
   
   end

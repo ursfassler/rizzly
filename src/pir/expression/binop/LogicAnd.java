@@ -2,9 +2,9 @@ package pir.expression.binop;
 
 import pir.expression.Expression;
 
-final public class LogicAnd extends Logical{
+final public class LogicAnd extends Logical {
 
-  public LogicAnd( Expression left, Expression right) {
+  public LogicAnd(Expression left, Expression right) {
     super(left, right);
   }
 

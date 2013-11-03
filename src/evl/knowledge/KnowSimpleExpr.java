@@ -15,7 +15,6 @@ import evl.expression.reference.Reference;
 import evl.expression.unop.UnaryExp;
 import evl.function.FunctionBase;
 import evl.other.CompUse;
-import evl.other.IfaceUse;
 import evl.type.TypeRef;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
@@ -115,11 +114,6 @@ class SimpleGetter extends NullTraverser<Boolean, Void> {
 
   @Override
   protected Boolean visitRecordType(RecordType obj, Void param) {
-    return false;
-  }
-
-  @Override
-  protected Boolean visitIfaceUse(IfaceUse obj, Void param) {
     return false;
   }
 

@@ -3,7 +3,7 @@ package evl.expression.reference;
 import common.ElementInfo;
 
 /**
- *
+ * 
  * @author urs
  */
 public class RefPtrDeref extends RefItem {

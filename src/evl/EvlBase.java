@@ -15,6 +15,4 @@ public abstract class EvlBase implements Evl {
     return info;
   }
 
-  
-  
 }

@@ -5,18 +5,18 @@ import java.util.List;
 
 import evl.Evl;
 import evl.NullTraverser;
+import evl.hfsm.HfsmQueryFunction;
 import evl.hfsm.ImplHfsm;
-import evl.hfsm.QueryItem;
 import evl.hfsm.State;
 import evl.hfsm.StateComposite;
 import evl.hfsm.StateSimple;
 import evl.hfsm.Transition;
 
-
 /**
  * Moves all transitions of all states to the top-state.
+ * 
  * @author urs
- *
+ * 
  */
 public class TransitionUplifter extends NullTraverser<Void, List<Transition>> {
 
@@ -44,7 +44,7 @@ public class TransitionUplifter extends NullTraverser<Void, List<Transition>> {
   }
 
   @Override
-  protected Void visitQueryItem(QueryItem obj, List<Transition> param) {
+  protected Void visitHfsmQueryFunction(HfsmQueryFunction obj, List<Transition> param) {
     return null;
   }
 

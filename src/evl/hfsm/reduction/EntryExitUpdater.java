@@ -14,8 +14,8 @@ import evl.expression.reference.RefCall;
 import evl.expression.reference.Reference;
 import evl.function.FunctionBase;
 import evl.function.impl.FuncPrivateVoid;
+import evl.hfsm.HfsmQueryFunction;
 import evl.hfsm.ImplHfsm;
-import evl.hfsm.QueryItem;
 import evl.hfsm.State;
 import evl.hfsm.StateComposite;
 import evl.hfsm.StateSimple;
@@ -54,7 +54,7 @@ public class EntryExitUpdater extends NullTraverser<Void, EePar> {
   }
 
   @Override
-  protected Void visitQueryItem(QueryItem obj, EePar param) {
+  protected Void visitHfsmQueryFunction(HfsmQueryFunction obj, EePar param) {
     return null;
   }
 

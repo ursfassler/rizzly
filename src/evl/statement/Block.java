@@ -5,8 +5,6 @@ import java.util.List;
 
 import common.ElementInfo;
 
-
-
 public class Block extends Statement {
   final private List<Statement> statements = new ArrayList<Statement>();
 

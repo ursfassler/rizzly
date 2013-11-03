@@ -11,8 +11,7 @@ public abstract class Component implements Vertex {
   public static final int Y_SUBC_IFACE_OFFSET = 35;
   public static final int Y_WORLD_IFACE_OFFSET = 55;
   public static final int SUBCOMP_WIDTH = 100;
-  
-  
+
   final protected Designator path;
   final protected String classname;
   final protected ArrayList<Interface> input = new ArrayList<Interface>();

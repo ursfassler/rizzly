@@ -62,6 +62,15 @@ public class BaseParser extends Parser {
     return varlist;
   }
 
+  // EBNF funcDefList: funcDef { funcDef }
+  protected List<FunctionHeader> parseFunctionDefList() {
+    List<FunctionHeader> res = new ArrayList<FunctionHeader>();
+    do {
+      res.add(parseFunctionDef());
+    } while (peek().getType() == TokenType.IDENTIFIER);
+    return res;
+  }
+
   // EBNF fileUseList: vardef ";" { vardef ";" }
   protected <T extends Variable> List<T> parseFileUseList(Class<T> kind) {
     List<T> res = new ArrayList<T>();
@@ -79,11 +88,15 @@ public class BaseParser extends Parser {
     return res;
   }
 
-  // EBNF functionPrototype: "function" id vardeflist [ ":" typeref ] ";"
+  // EBNF functionPrototype: "function" funcDef
   protected FunctionHeader parseFunctionPrototype() {
-    Token tok = expect(TokenType.FUNCTION);
+    expect(TokenType.FUNCTION);
+    return parseFunctionDef();
+  }
 
-    String name = expect(TokenType.IDENTIFIER).getData();
+  // EBNF funcDef: id vardeflist [ ":" typeref ] ";"
+  protected FunctionHeader parseFunctionDef() {
+    Token tok = expect(TokenType.IDENTIFIER);
 
     List<FuncVariable> varlist = parseVardefList();
 
@@ -99,7 +112,7 @@ public class BaseParser extends Parser {
 
     expect(TokenType.SEMI);
 
-    func.setName(name);
+    func.setName(tok.getData());
     func.getParam().addAll(varlist);
 
     return func;
@@ -136,6 +149,7 @@ public class BaseParser extends Parser {
     return new Generator(tok.getInfo(), func, gen);
   }
 
+  // TODO do we need the designatior ir is id enough?
   // EBNF privateFunction: "function" designator vardeflist [ ":" typeref ] block "end"
   protected Pair<List<String>, FunctionHeader> parsePrivateFunction() {
     Token tok = expect(TokenType.FUNCTION);
@@ -213,18 +227,17 @@ public class BaseParser extends Parser {
     return stmtlist;
   }
 
-  // EBNF vardeflist: [ "(" [ vardef { ";" vardef } ] ")" ]
+  // EBNF vardeflist: "(" [ vardef { ";" vardef } ] ")"
   protected List<FuncVariable> parseVardefList() {
     List<FuncVariable> res = new ArrayList<FuncVariable>();
-    if (consumeIfEqual(TokenType.OPENPAREN)) {
-      if (peek().getType() == TokenType.IDENTIFIER) {
-        do {
-          List<FuncVariable> list = stmt().parseVarDef(FuncVariable.class);
-          res.addAll(list);
-        } while (consumeIfEqual(TokenType.SEMI));
-      }
-      expect(TokenType.CLOSEPAREN);
+    expect(TokenType.OPENPAREN);
+    if (peek().getType() == TokenType.IDENTIFIER) {
+      do {
+        List<FuncVariable> list = stmt().parseVarDef(FuncVariable.class);
+        res.addAll(list);
+      } while (consumeIfEqual(TokenType.SEMI));
     }
+    expect(TokenType.CLOSEPAREN);
     return res;
   }
 

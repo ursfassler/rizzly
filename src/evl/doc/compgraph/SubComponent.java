@@ -11,7 +11,7 @@ final public class SubComponent extends Component {
   final private Point pos = new Point();
 
   public SubComponent(String instname, Designator path, String classname) {
-    super(path,classname);
+    super(path, classname);
     this.instname = instname;
   }
 

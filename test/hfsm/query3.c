@@ -9,20 +9,20 @@ void _trap(){
 }
 
 int main(){
-  inst__system_construct();
+  inst__construct();
   
   int i;
   for( i = 0; i < 100; i++ ){
-    R_0_100 val = inst_in_read();
+    R_0_100 val = inst_read();
     if( val != 57 ){
       printf( "%i:%i\n", i, val );
       return -1;
     }
 
-    inst_in_tick();
+    inst_tick();
   }
   
-  inst__system_destruct();
+  inst__destruct();
 
   return 0;
 }

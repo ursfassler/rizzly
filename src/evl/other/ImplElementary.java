@@ -7,7 +7,7 @@ import common.ElementInfo;
 import error.ErrorType;
 import error.RError;
 import evl.expression.reference.Reference;
-import evl.function.FunctionBase;
+import evl.function.FunctionHeader;
 import evl.variable.Constant;
 import evl.variable.Variable;
 
@@ -15,9 +15,8 @@ public class ImplElementary extends Component {
   final private ListOfNamed<Variable> variable = new ListOfNamed<Variable>();
   final private ListOfNamed<Constant> constant = new ListOfNamed<Constant>();
   final private ListOfNamed<CompUse> component = new ListOfNamed<CompUse>();
-  final private ListOfNamed<FunctionBase> function = new ListOfNamed<FunctionBase>();
-  final private ListOfNamed<NamedList<FunctionBase>> inFunc = new ListOfNamed<NamedList<FunctionBase>>();
-  final private ListOfNamed<NamedList<NamedList<FunctionBase>>> subComCallback = new ListOfNamed<NamedList<NamedList<FunctionBase>>>();
+  final private ListOfNamed<FunctionHeader> function = new ListOfNamed<FunctionHeader>();
+  final private ListOfNamed<NamedList<FunctionHeader>> subComCallback = new ListOfNamed<NamedList<FunctionHeader>>();
   private Reference entryFunc = null;
   private Reference exitFunc = null;
 
@@ -25,37 +24,23 @@ public class ImplElementary extends Component {
     super(info, name);
   }
 
-  public void addFunction(List<String> namespace, FunctionBase prot) {
+  public void addFunction(List<String> namespace, FunctionHeader prot) {
     switch (namespace.size()) {
     case 0: {
       function.add(prot);
       break;
     }
     case 1: {
-      NamedList<FunctionBase> list = inFunc.find(namespace.get(0));
+      NamedList<FunctionHeader> list = subComCallback.find(namespace.get(0));
       if (list == null) {
-        list = new NamedList<FunctionBase>(getInfo(), namespace.get(0));
-        inFunc.add(list);
+        list = new NamedList<FunctionHeader>(getInfo(), namespace.get(0));
+        subComCallback.add(list);
       }
       list.add(prot);
       break;
     }
-    case 2: {
-      NamedList<NamedList<FunctionBase>> compList = subComCallback.find(namespace.get(0));
-      if (compList == null) {
-        compList = new NamedList<NamedList<FunctionBase>>(getInfo(), namespace.get(0));
-        subComCallback.add(compList);
-      }
-      NamedList<FunctionBase> funcList = compList.find(namespace.get(1));
-      if (funcList == null) {
-        funcList = new NamedList<FunctionBase>(getInfo(), namespace.get(1));
-        compList.add(funcList);
-      }
-      funcList.add(prot);
-      break;
-    }
     default: {
-      RError.err(ErrorType.Error, prot.getInfo(), "Namespace can have max deepth of 2, got: " + namespace);
+      RError.err(ErrorType.Error, prot.getInfo(), "Namespace can have max deepth of 1, got: " + namespace);
     }
     }
   }
@@ -68,7 +53,7 @@ public class ImplElementary extends Component {
     return constant;
   }
 
-  public ListOfNamed<FunctionBase> getInternalFunction() {
+  public ListOfNamed<FunctionHeader> getInternalFunction() {
     return function;
   }
 
@@ -76,11 +61,7 @@ public class ImplElementary extends Component {
     return component;
   }
 
-  public ListOfNamed<NamedList<FunctionBase>> getInputFunc() {
-    return inFunc;
-  }
-
-  public ListOfNamed<NamedList<NamedList<FunctionBase>>> getSubComCallback() {
+  public ListOfNamed<NamedList<FunctionHeader>> getSubComCallback() {
     return subComCallback;
   }
 

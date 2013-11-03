@@ -35,22 +35,22 @@ public class WorldComp extends Component {
     return size;
   }
 
-  public ArrayList<Connection> getInEdges(){
+  public ArrayList<Connection> getInEdges() {
     ArrayList<Connection> ret = new ArrayList<Connection>();
-    for( Interface iface : output ){
+    for (Interface iface : output) {
       ret.addAll(iface.getConnection());
     }
     return ret;
   }
-  
-  public ArrayList<Connection> getOutEdges(){
+
+  public ArrayList<Connection> getOutEdges() {
     ArrayList<Connection> ret = new ArrayList<Connection>();
-    for( Interface iface : input ){
+    for (Interface iface : input) {
       ret.addAll(iface.getConnection());
     }
     return ret;
   }
-  
+
   @Override
   public Point getPos() {
     Point pos = new Point();
@@ -68,21 +68,21 @@ public class WorldComp extends Component {
   public Point getPort(Connection con) {
     int x;
     int y;
-    if( getInEdges().contains(con) ){
+    if (getInEdges().contains(con)) {
       x = size.x / 2 - Interface.WIDTH;
       int index = output.indexOf(con.getDst());
       assert (index >= 0);
-      y = index*Y_IFACE_DIST+Y_WORLD_IFACE_OFFSET;
+      y = index * Y_IFACE_DIST + Y_WORLD_IFACE_OFFSET;
       y += con.getDst().getYOffset(con);
     } else {
-      assert( getOutEdges().contains(con) );
+      assert (getOutEdges().contains(con));
       x = -size.x / 2 + Interface.WIDTH;
       int index = input.indexOf(con.getSrc());
       assert (index >= 0);
-      y = index*Y_IFACE_DIST+Y_WORLD_IFACE_OFFSET;
+      y = index * Y_IFACE_DIST + Y_WORLD_IFACE_OFFSET;
       y += con.getSrc().getYOffset(con);
     }
-    return new Point( size.x/2+x, y);
+    return new Point(size.x / 2 + x, y);
   }
 
 }

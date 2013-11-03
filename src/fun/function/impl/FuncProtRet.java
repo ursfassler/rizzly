@@ -7,7 +7,7 @@ import fun.function.FuncWithReturn;
 import fun.function.FunctionHeader;
 
 /**
- *
+ * 
  * @author urs
  */
 public class FuncProtRet extends FunctionHeader implements FuncWithReturn {

@@ -5,8 +5,6 @@ import java.util.List;
 
 import common.Designator;
 
-
-
 public class Interface {
   final static public int WIDTH = 46;
   final static public int HEIGHT = 20;

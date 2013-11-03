@@ -4,18 +4,13 @@ type
     y : R{0,100};
   end
 
-interface
-  Tick
-    function tick( x: R{0,100} );
-  end
-
 component
   Rec
     input
-      in  : Tick;
+      in( x: R{0,100} );
     
     output
-      out : Tick;
+      out( x: R{0,100} );
     
   implementation elementary
 
@@ -30,11 +25,11 @@ component
       q.y := 0;
     end
 
-    function in.tick(  x: R{0,100}  )
+    function in(  x: R{0,100}  )
       p.x := (p.y + x) mod 100;
       p.y := 100 - p.x;
       q   := p;
-      out.tick( q.y );
+      out( q.y );
     end
 
   end

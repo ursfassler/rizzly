@@ -1,17 +1,13 @@
-interface
-  Iface
-    function funcA();
-    function funcB();
-  end
 
 component
   Err1
     input
-      in    : Iface;
+      funcA();
+      funcB();
 
     implementation elementary
 
-    function in.funcA()
+    function funcA()
     end
 
   end

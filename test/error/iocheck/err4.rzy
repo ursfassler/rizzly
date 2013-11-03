@@ -1,15 +1,9 @@
 // Error: query is not allowed to write state
 
-
-interface
-  IfaceQuerry
-    function query():R{0,100};
-  end
-  
 component
   Err4
     input
-      in  : IfaceQuerry;
+      query():R{0,100};
     
     implementation hfsm(A)
     
@@ -21,7 +15,7 @@ component
     end
     
     state A
-      function in.query():R{0,100}
+      function query():R{0,100}
         a := 42;
         return 0;
       end

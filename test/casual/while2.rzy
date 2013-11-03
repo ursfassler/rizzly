@@ -1,22 +1,17 @@
-interface
-  Iface0
-    function foo( x: R{0,100} );
-  end
-
 component
   While2
 
     input
-      in    : Iface0;
+      in( x: R{0,100} );
 
     output
-      out   : Iface0;
+      out( x: R{0,100} );
 
     implementation elementary
 
-    function in.foo( x: R{0,100} )
+    function in( x: R{0,100} )
       while x > 0 do
-        out.foo( x );
+        out( x );
         x := R{0,100}( x-1 );
       end
     end

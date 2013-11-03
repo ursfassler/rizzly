@@ -9,19 +9,14 @@ type
     Sunday;
   end
 
-interface
-  Tick
-    function tick( data: Weekday ):R{0,3};
-  end
-
 component
   EnumCase
     input
-      in    : Tick;
+      in( data: Weekday ):R{0,3};
 
     implementation elementary
 
-    function in.tick( x: Weekday ):R{0,3}
+    function in( x: Weekday ):R{0,3}
       case x of
         Monday,Wednesday:
           return 2;

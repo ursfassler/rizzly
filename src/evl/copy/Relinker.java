@@ -8,8 +8,6 @@ import evl.Evl;
 import evl.expression.reference.Reference;
 import evl.other.CompUse;
 import evl.other.Component;
-import evl.other.IfaceUse;
-import evl.other.Interface;
 import evl.other.Named;
 import evl.type.Type;
 import evl.type.TypeRef;
@@ -49,14 +47,6 @@ public class Relinker extends DefTraverser<Void, Void> {
   protected Void visitCompUse(CompUse obj, Void param) {
     if (copied.containsKey(obj.getLink())) {
       obj.setLink((Component) copied.get(obj.getLink()));
-    }
-    return null;
-  }
-
-  @Override
-  protected Void visitIfaceUse(IfaceUse obj, Void param) {
-    if (copied.containsKey(obj.getLink())) {
-      obj.setLink((Interface) copied.get(obj.getLink()));
     }
     return null;
   }

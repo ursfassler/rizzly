@@ -1,63 +1,59 @@
 //test ok
 
-import
-  tick;
-  valueEvent;
-
 component
   Hfsm
 
   input
-    tick    : Tick;
+    tick();
   
   output
-    evt     : ValueEvent;
+    evt( value: R{0,255} );
 
   implementation hfsm(A)
     transition 
-      AA to B.BB by tick.tick() do
-        evt.evt( 1 );
+      AA to B.BB by tick() do
+        evt( 1 );
       end
-      AA.BB to B by tick.tick() do
-        evt.evt( 2 );
+      AA.BB to B by tick() do
+        evt( 2 );
       end
     
     state A(AA)
       entry
-        evt.evt( 10 );
+        evt( 10 );
       end
       exit
-        evt.evt( 19 );
+        evt( 19 );
       end
       
       state AA(AAA)
         entry
-          evt.evt( 20 );
+          evt( 20 );
         end
         exit
-          evt.evt( 29 );
+          evt( 29 );
         end
         
         state AAA
           entry
-            evt.evt( 30 );
+            evt( 30 );
           end
           exit
-            evt.evt( 39 );
+            evt( 39 );
           end
         end
         
         transition 
-          AA to BB by tick.tick() do
-            evt.evt( 3 );
+          AA to BB by tick() do
+            evt( 3 );
           end
     
         state BB
           entry
-            evt.evt( 40 );
+            evt( 40 );
           end
           exit
-            evt.evt( 49 );
+            evt( 49 );
           end
         end
       end
@@ -65,34 +61,34 @@ component
 
     state B(BB)
       entry
-        evt.evt( 50 );
+        evt( 50 );
       end
       exit
-        evt.evt( 59 );
+        evt( 59 );
       end
 
       state BB(BBB)
         entry
-          evt.evt( 60 );
+          evt( 60 );
         end
         exit
-          evt.evt( 69 );
+          evt( 69 );
         end
         
         state BBB
           entry
-            evt.evt( 70 );
+            evt( 70 );
           end
           exit
-            evt.evt( 79 );
+            evt( 79 );
           end
         end
       end
     end
     
     transition 
-      BBB to AAA by tick.tick() do
-        evt.evt( 3 );
+      BBB to AAA by tick() do
+        evt( 3 );
       end
   end
 

@@ -138,7 +138,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitNumber(Number obj, StreamWriter param) {
-    param.wr( obj.getValue().toString() );
+    param.wr(obj.getValue().toString());
     return null;
   }
 

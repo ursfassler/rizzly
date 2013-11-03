@@ -1,19 +1,14 @@
-interface
-  Iface
-    function foo( x: R{0,10} );
-  end
-  
 component
   Bitred
     input
-      in      : Iface;
+      in( x: R{0,10} );
     
   implementation hfsm(A)
     state A
     end
     
     transition 
-      A to A by in.foo( x: R{0,10} ) if x > 0;
+      A to A by in( x: R{0,10} ) if x > 0;
     
   end
 

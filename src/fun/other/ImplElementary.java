@@ -20,7 +20,7 @@ public class ImplElementary extends Component {
   private Reference entryFunc = null;
   private Reference exitFunc = null;
 
-  public ImplElementary(ElementInfo info,String name) {
+  public ImplElementary(ElementInfo info, String name) {
     super(info, name);
   }
 

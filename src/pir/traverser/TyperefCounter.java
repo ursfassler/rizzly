@@ -21,7 +21,7 @@ public class TyperefCounter extends DefTraverser<Void, Void> {
   }
 
   private void inc(Type type) {
-    if( !this.count.containsKey(type) ) {
+    if (!this.count.containsKey(type)) {
       RError.err(ErrorType.Fatal, "Reference to missing type: " + type.getName());
     }
     int count = this.count.get(type);
@@ -31,8 +31,8 @@ public class TyperefCounter extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitProgram(Program obj, Void param) {
-    for( Type type : obj.getType() ) {
-      assert ( !count.containsKey(type) );
+    for (Type type : obj.getType()) {
+      assert (!count.containsKey(type));
       count.put(type, 0);
     }
     return super.visitProgram(obj, param);

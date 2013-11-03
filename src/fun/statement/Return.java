@@ -3,7 +3,7 @@ package fun.statement;
 import common.ElementInfo;
 
 /**
- *
+ * 
  * @author urs
  */
 abstract public class Return extends Statement {

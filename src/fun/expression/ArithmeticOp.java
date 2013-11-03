@@ -2,9 +2,8 @@ package fun.expression;
 
 import common.ElementInfo;
 
-
 /**
- *
+ * 
  * @author urs
  */
 public class ArithmeticOp extends Expression {

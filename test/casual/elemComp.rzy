@@ -1,13 +1,8 @@
 
-interface
-  GetVal
-    function get:R{0,100};
-  end
-
 component
   Sub{Init,Deinit:R{0,100}}
     input
-      val : GetVal;
+      get():R{0,100};
       
   implementation elementary
     var
@@ -21,18 +16,18 @@ component
       value := Deinit;
     end
     
-    function val.get:R{0,100}
+    function get():R{0,100}
       return value;
     end
   end
 
   ElemComp
     input
-      val1 : GetVal;
-      val2 : GetVal;
-      val3 : GetVal;
-      val4 : GetVal;
-      val5 : GetVal;
+      val1():R{0,100};
+      val2():R{0,100};
+      val3():R{0,100};
+      val4():R{0,100};
+      val5():R{0,100};
       
   implementation elementary
     component
@@ -42,24 +37,24 @@ component
       sub4 : Sub{40,50};
       sub5 : Sub{50,60};
     
-    function val1.get:R{0,100}
-      return sub1.val.get();
+    function val1():R{0,100}
+      return sub1.get();
     end
     
-    function val2.get:R{0,100}
-      return sub2.val.get();
+    function val2():R{0,100}
+      return sub2.get();
     end
     
-    function val3.get:R{0,100}
-      return sub3.val.get();
+    function val3():R{0,100}
+      return sub3.get();
     end
     
-    function val4.get:R{0,100}
-      return sub4.val.get();
+    function val4():R{0,100}
+      return sub4.get();
     end
     
-    function val5.get:R{0,100}
-      return sub5.val.get();
+    function val5():R{0,100}
+      return sub5.get();
     end
   end
 

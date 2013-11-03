@@ -53,7 +53,7 @@ class KnowParentTraverser extends DefTraverser<Void, Evl> {
   protected Void visit(Evl obj, Evl param) {
     assert (obj != param);
     if (cache.containsKey(obj)) {
-      if (!(obj instanceof EnumElement)) {  //FIXME remove this hack (new enum type system?)
+      if (!(obj instanceof EnumElement)) { // FIXME remove this hack (new enum type system?)
         Evl oldparent = cache.get(obj);
         RError.err(ErrorType.Fatal, obj.getInfo(), "Same object (" + obj + ") found 2 times: " + oldparent + " and " + param);
       }

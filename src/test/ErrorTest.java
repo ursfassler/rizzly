@@ -19,7 +19,7 @@ public abstract class ErrorTest {
       opt.init(getRootdir(), new Designator(file, comp), false, false);
       Main.compile(opt);
     } catch (RException err) {
-      Assert.assertEquals(err.getMsg(), error);
+      Assert.assertEquals(error, err.getMsg());
       return;
     }
     throw new RuntimeException("Error not thrown: " + error);

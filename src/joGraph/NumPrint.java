@@ -6,9 +6,9 @@
 package joGraph;
 
 public class NumPrint {
-  public static String toString( long num ){
+  public static String toString(long num) {
     String res = "";
-    if( num < 0 ){
+    if (num < 0) {
       res += "-";
       num = -num;
     }

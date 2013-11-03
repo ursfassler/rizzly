@@ -5,7 +5,6 @@ import java.util.List;
 import pir.PirObject;
 import util.Range;
 
-
 public class CaseEntry extends PirObject {
   final private List<Range> values;
   private Block code;

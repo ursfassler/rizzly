@@ -13,18 +13,18 @@ import fun.variable.Variable;
 
 /**
  * Inserts missing empty braces when referencing a generic function:
- *
+ * 
  * type TheType = ...
- *
+ * 
  * var a : TheType;
- *
- *
+ * 
+ * 
  * =>
- *
+ * 
  * var a : TheType{};
- *
+ * 
  * @author urs
- *
+ * 
  */
 public class GenfuncParamExtender extends DefGTraverser<Void, Void> {
 

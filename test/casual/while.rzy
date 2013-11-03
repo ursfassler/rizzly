@@ -4,28 +4,23 @@ type
     y : R{0,255};
   end
 
-interface
-  Iface0
-    function foo( x: R{0,255} ):Point;
-  end
-
 component
   While
 
     input
-      in    : Iface0;
+      in( x: R{0,255} ):Point;
 
     output
-      out   : Iface0;
+      out( x: R{0,255} ):Point;
 
     implementation elementary
 
-    function in.foo( x: R{0,255} ):Point
+    function in( x: R{0,255} ):Point
       ret : Point;
       ret.x := 0;
       ret.y := 0;
       while x > 0 do
-        ret := out.foo( x );
+        ret := out( x );
         x := x-1;
       end
       return ret;

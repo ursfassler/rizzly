@@ -1,17 +1,12 @@
 
-interface
-  Tick
-    function tack( x: R{0,20} ):R{0,10};
-  end
-  
 component
   Saturate
     input
-      in  : Tick;
+      tack( x: R{0,20} ):R{0,10};
     
     implementation elementary
     
-    function in.tack( x: R{0,20} ):R{0,10}
+    function tack( x: R{0,20} ):R{0,10}
       if x > 10 then
         x := 10;
       end

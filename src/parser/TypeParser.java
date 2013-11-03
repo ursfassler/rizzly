@@ -16,7 +16,6 @@ import fun.expression.reference.ReferenceUnlinked;
 import fun.function.FunctionHeader;
 import fun.other.Component;
 import fun.other.Generator;
-import fun.other.Interface;
 import fun.other.ListOfNamed;
 import fun.type.Type;
 import fun.type.base.EnumElement;
@@ -27,23 +26,12 @@ import fun.type.composed.RecordType;
 import fun.type.composed.UnionSelector;
 import fun.type.composed.UnionType;
 import fun.variable.Constant;
-import fun.variable.IfaceUse;
 import fun.variable.TemplateParameter;
 
 public class TypeParser extends BaseParser {
 
   public TypeParser(Scanner scanner) {
     super(scanner);
-  }
-
-  // EBNF ifacedefsec: "interface" ifacedecl { ifacedecl }
-  protected List<Generator> parseInterfaceSection() {
-    expect(TokenType.INTERFACE);
-    List<Generator> ret = new ArrayList<Generator>();
-    do {
-      ret.add(parseIfacedecl());
-    } while (peek().getType() == TokenType.IDENTIFIER);
-    return ret;
   }
 
   // EBNF compdefsec: "component" compdecl { compdecl }
@@ -66,22 +54,6 @@ public class TypeParser extends BaseParser {
     return ret;
   }
 
-  // EBNF ifacedecl: id genericParam interface
-  private Generator parseIfacedecl() {
-    Token name = expect(TokenType.IDENTIFIER);
-    List<TemplateParameter> genpam;
-    if (peek().getType() == TokenType.OPENCURLY) {
-      genpam = parseGenericParam();
-    } else {
-      genpam = new ArrayList<TemplateParameter>();
-    }
-
-    Interface type = parseInterface(name);
-
-    Generator func = new Generator(name.getInfo(), type, genpam);
-    return func;
-  }
-
   // EBNF compdecl: id genericParam component
   private Generator parseCompdecl() {
     Token name = expect(TokenType.IDENTIFIER);
@@ -98,36 +70,23 @@ public class TypeParser extends BaseParser {
     return func;
   }
 
-  // EBNF component: [ "input" fileUseList ] [ "output" fileUseList ] componentImplementation "end"
+  // EBNF component: [ "input" funcDefList ] [ "output" funcDefList ] componentImplementation "end"
   private Component parseComponent(Token name) {
-    List<IfaceUse> in = new ArrayList<IfaceUse>();
-    List<IfaceUse> out = new ArrayList<IfaceUse>();
+    List<FunctionHeader> in = new ArrayList<FunctionHeader>();
+    List<FunctionHeader> out = new ArrayList<FunctionHeader>();
 
     if (consumeIfEqual(TokenType.INPUT)) {
-      in = parseFileUseList(IfaceUse.class);
+      in = parseFunctionDefList();
     }
 
     if (consumeIfEqual(TokenType.OUTPUT)) {
-      out = parseFileUseList(IfaceUse.class);
+      out = parseFunctionDefList();
     }
 
     Component iface = parseComponentImplementation(name);
 
     iface.getIface(Direction.in).addAll(in);
     iface.getIface(Direction.out).addAll(out);
-
-    expect(TokenType.END);
-
-    return iface;
-  }
-
-  // EBNF interface: functionPrototype { functionPrototype } "end"
-  private Interface parseInterface(Token name) {
-    Interface iface = new Interface(name.getInfo(), name.getData());
-    do {
-      FunctionHeader proto = parseFunctionPrototype();
-      iface.getPrototype().add(proto);
-    } while (peek().getType() == TokenType.FUNCTION);
 
     expect(TokenType.END);
 

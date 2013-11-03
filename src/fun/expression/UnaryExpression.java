@@ -2,7 +2,6 @@ package fun.expression;
 
 import common.ElementInfo;
 
-
 public class UnaryExpression extends Expression {
   private Expression expr;
   private UnaryOp op;

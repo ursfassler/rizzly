@@ -75,7 +75,7 @@ public class FunToEvlFunc extends NullTraverser<FunctionBase, Void> {
     TypeRef retType;
     if (obj instanceof FuncWithReturn) {
       Reference ref = (Reference) fta.traverse(((FuncWithReturn) obj).getRet(), null);
-      assert( ref.getOffset().isEmpty() );
+      assert (ref.getOffset().isEmpty());
       retType = new TypeRef(ref.getInfo(), (Type) ref.getLink());
       ((evl.function.FuncWithReturn) func).setRet(new TypeRef(retType.getInfo(), retType.getRef()));
     } else {

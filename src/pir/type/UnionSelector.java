@@ -4,7 +4,7 @@ import pir.PirObject;
 import pir.expression.reference.Referencable;
 
 /**
- *
+ * 
  * @author urs
  */
 public class UnionSelector extends PirObject implements Referencable {

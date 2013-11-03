@@ -114,7 +114,6 @@ public class FpcTest extends BaseTest {
     test("debug", "Debug", "start debug\n" + fooTrace + barTrace + pohTrace + "end debug\n", true);
   }
 
-
   @Test
   public void jump() {
     String trace = "";

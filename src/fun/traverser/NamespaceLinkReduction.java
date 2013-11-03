@@ -13,11 +13,11 @@ import fun.other.Namespace;
 
 /**
  * Follows offset when link is to namespace until it finds a different object.
- *
+ * 
  * Example: makes foo.bar() to bar()
- *
+ * 
  * @author urs
- *
+ * 
  */
 public class NamespaceLinkReduction extends DefGTraverser<Void, Void> {
 
@@ -37,7 +37,7 @@ public class NamespaceLinkReduction extends DefGTraverser<Void, Void> {
       }
       RefName name = (RefName) next;
       item = ((Namespace) item).find(name.getName());
-      assert (item != null);  // type checker should find it?
+      assert (item != null); // type checker should find it?
     }
     obj.setLink(item);
     return super.visitReferenceLinked(obj, param);

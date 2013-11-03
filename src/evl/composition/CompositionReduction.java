@@ -17,10 +17,13 @@ import evl.expression.Expression;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
+import evl.function.FuncIface;
+import evl.function.FuncIfaceOut;
 import evl.function.FuncWithBody;
 import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
 import evl.function.FunctionFactory;
+import evl.function.FunctionHeader;
 import evl.function.impl.FuncInputHandlerEvent;
 import evl.function.impl.FuncInputHandlerQuery;
 import evl.function.impl.FuncPrivateVoid;
@@ -28,9 +31,7 @@ import evl.function.impl.FuncSubHandlerEvent;
 import evl.function.impl.FuncSubHandlerQuery;
 import evl.other.CompUse;
 import evl.other.Component;
-import evl.other.IfaceUse;
 import evl.other.ImplElementary;
-import evl.other.Interface;
 import evl.other.ListOfNamed;
 import evl.other.Named;
 import evl.other.Namespace;
@@ -41,6 +42,7 @@ import evl.variable.FuncVariable;
 import evl.variable.Variable;
 import fun.hfsm.State;
 
+//TODO cleanup
 public class CompositionReduction extends NullTraverser<Named, Void> {
 
   private static final ElementInfo info = new ElementInfo();
@@ -73,20 +75,20 @@ public class CompositionReduction extends NullTraverser<Named, Void> {
   protected ImplElementary visitImplComposition(ImplComposition obj, Void param) {
     ImplElementary elem = new ImplElementary(obj.getInfo(), obj.getName());
     elem.getComponent().addAll(obj.getComponent());
-    elem.getIface(Direction.in).addAll(obj.getIface(Direction.in));
-    elem.getIface(Direction.out).addAll(obj.getIface(Direction.out));
+    elem.getInput().addAll(obj.getInput());
+    elem.getOutput().addAll(obj.getOutput());
 
     elem.setEntryFunc(makeEntryExitFunc(State.ENTRY_FUNC_NAME, elem.getInternalFunction()));
     elem.setExitFunc(makeEntryExitFunc(State.EXIT_FUNC_NAME, elem.getInternalFunction()));
 
-    Map<IfaceUse, List<Endpoint>> input = new HashMap<IfaceUse, List<Endpoint>>();
+    Map<FuncIface, List<Endpoint>> input = new HashMap<FuncIface, List<Endpoint>>();
     Map<Pair<CompUse, String>, List<Endpoint>> callback = new HashMap<Pair<CompUse, String>, List<Endpoint>>();
     for (Connection con : obj.getConnection()) {
       assert (con.getType() == MessageType.sync);
       Endpoint src = con.getEndpoint(Direction.in);
 
       if (src instanceof EndpointSelf) {
-        IfaceUse srcIface = ((EndpointSelf) src).getIface();
+        FuncIface srcIface = ((EndpointSelf) src).getIface();
         List<Endpoint> set = input.get(srcIface);
         if (set == null) {
           set = new ArrayList<Endpoint>();
@@ -106,27 +108,20 @@ public class CompositionReduction extends NullTraverser<Named, Void> {
       }
     }
 
-    for (IfaceUse src : input.keySet()) {
+    for (FuncIface src : input.keySet()) {
       List<Endpoint> conset = input.get(src);
       ArrayList<String> ns = new ArrayList<String>();
-      ns.add(src.getName());
-      Interface iface = src.getLink();
-      List<FunctionBase> functions = genFunctions(conset, iface.getPrototype(), FuncInputHandlerEvent.class, FuncInputHandlerQuery.class);
-      for (FunctionBase func : functions) {
-        elem.addFunction(ns, func);
-      }
+      FunctionBase func = genFunctions(conset, src, FuncInputHandlerEvent.class, FuncInputHandlerQuery.class);
+      elem.addFunction(ns, func);
     }
 
     for (Pair<CompUse, String> src : callback.keySet()) {
       List<Endpoint> conset = callback.get(src);
       ArrayList<String> ns = new ArrayList<String>();
       ns.add(src.first.getName());
-      ns.add(src.second);
-      Interface iface = getIface(src);
-      List<FunctionBase> functions = genFunctions(conset, iface.getPrototype(), FuncSubHandlerEvent.class, FuncSubHandlerQuery.class);
-      for (FunctionBase func : functions) {
-        elem.addFunction(ns, func);
-      }
+      FuncIfaceOut iface = getIface(src);
+      FunctionBase func = genFunctions(conset, iface, FuncSubHandlerEvent.class, FuncSubHandlerQuery.class);
+      elem.addFunction(ns, func);
     }
 
     map.put(obj, elem);
@@ -134,47 +129,42 @@ public class CompositionReduction extends NullTraverser<Named, Void> {
     return elem;
   }
 
-  private Reference makeEntryExitFunc(String name, ListOfNamed<FunctionBase> list) {
+  private Reference makeEntryExitFunc(String name, ListOfNamed<FunctionHeader> listOfNamed) {
     FuncPrivateVoid func = new FuncPrivateVoid(info, name, new ListOfNamed<FuncVariable>());
     func.setBody(new Block(info));
-    list.add(func);
+    listOfNamed.add(func);
     return new Reference(info, func);
   }
 
-  public List<FunctionBase> genFunctions(List<Endpoint> conset, ListOfNamed<? extends FunctionBase> functions, Class<? extends FunctionBase> kindVoid, Class<? extends FunctionBase> kindRet) {
-    List<FunctionBase> ret = new ArrayList<FunctionBase>();
-    for (FunctionBase fh : functions) {
-      FunctionBase ptoto = Copy.copy(fh);
+  public FunctionBase genFunctions(List<Endpoint> conset, FuncIface iface, Class<? extends FunctionBase> kindVoid, Class<? extends FunctionBase> kindRet) {
+    FunctionBase ptoto = Copy.copy((FunctionBase) iface);
 
-      Class<? extends FunctionBase> kind = fh instanceof FuncWithReturn ? kindRet : kindVoid;
-      FunctionBase impl = FunctionFactory.create(kind, info, ptoto.getName(), ptoto.getParam());
-      if (ptoto instanceof FuncWithReturn) {
-        ((FuncWithReturn) impl).setRet(((FuncWithReturn) ptoto).getRet());
-      }
-      ret.add(impl);
-
-      Block body = new Block(info);
-      ((FuncWithBody) impl).setBody(body);
-
-      if (ptoto instanceof FuncWithReturn) {
-        assert (conset.size() == 1); // typechecker should find this
-        Endpoint con = conset.get(0);
-        ReturnExpr call = makeQueryCall(con, (FuncWithReturn) impl);
-        body.getStatements().add(call);
-      } else {
-        for (Endpoint con : conset) {
-          CallStmt call = makeEventCall(con, impl);
-          body.getStatements().add(call);
-        }
-      }
-
+    Class<? extends FunctionBase> kind = iface instanceof FuncWithReturn ? kindRet : kindVoid;
+    FunctionBase impl = FunctionFactory.create(kind, info, ptoto.getName(), ptoto.getParam());
+    if (ptoto instanceof FuncWithReturn) {
+      ((FuncWithReturn) impl).setRet(((FuncWithReturn) ptoto).getRet());
     }
-    return ret;
+
+    Block body = new Block(info);
+    ((FuncWithBody) impl).setBody(body);
+
+    if (ptoto instanceof FuncWithReturn) {
+      assert (conset.size() == 1); // typechecker should find this
+      Endpoint con = conset.get(0);
+      ReturnExpr call = makeQueryCall(con, (FuncWithReturn) impl);
+      body.getStatements().add(call);
+    } else {
+      for (Endpoint con : conset) {
+        CallStmt call = makeEventCall(con, impl);
+        body.getStatements().add(call);
+      }
+    }
+
+    return impl;
   }
 
   static private ReturnExpr makeQueryCall(Endpoint ep, FuncWithReturn func) {
     Reference ref = epToRef(ep);
-    ref.getOffset().add(new RefName(ep.getInfo(), func.getName()));
 
     List<Expression> actparam = new ArrayList<Expression>();
     for (Variable var : func.getParam()) {
@@ -191,7 +181,6 @@ public class CompositionReduction extends NullTraverser<Named, Void> {
     assert (!(func instanceof FuncWithReturn));
 
     Reference ref = epToRef(ep);
-    ref.getOffset().add(new RefName(ep.getInfo(), func.getName()));
 
     List<Expression> actparam = new ArrayList<Expression>();
     for (Variable var : func.getParam()) {
@@ -215,10 +204,10 @@ public class CompositionReduction extends NullTraverser<Named, Void> {
     }
   }
 
-  private Interface getIface(Pair<CompUse, String> src) {
+  private FuncIfaceOut getIface(Pair<CompUse, String> src) {
     Component comp = src.first.getLink();
-    IfaceUse iface = comp.getIface(Direction.out).find(src.second);
+    FuncIfaceOut iface = comp.getOutput().find(src.second);
     assert (iface != null);
-    return iface.getLink();
+    return iface;
   }
 }

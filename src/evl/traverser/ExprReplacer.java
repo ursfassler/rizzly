@@ -100,97 +100,97 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
 
   @Override
   protected Expression visitAnd(And obj, T param) {
-    return defaultBinaryOp(obj,param);
+    return defaultBinaryOp(obj, param);
   }
 
   @Override
   protected Expression visitDiv(Div obj, T param) {
-    return defaultBinaryOp(obj,param);
+    return defaultBinaryOp(obj, param);
   }
 
   @Override
   protected Expression visitEqual(Equal obj, T param) {
-    return defaultBinaryOp(obj,param);
+    return defaultBinaryOp(obj, param);
   }
 
   @Override
   protected Expression visitGreater(Greater obj, T param) {
-    return defaultBinaryOp(obj,param);
+    return defaultBinaryOp(obj, param);
   }
 
   @Override
   protected Expression visitGreaterequal(Greaterequal obj, T param) {
-    return defaultBinaryOp(obj,param);
+    return defaultBinaryOp(obj, param);
   }
 
   @Override
   protected Expression visitLess(Less obj, T param) {
-    return defaultBinaryOp(obj,param);
+    return defaultBinaryOp(obj, param);
   }
 
   @Override
   protected Expression visitLessequal(Lessequal obj, T param) {
-    return defaultBinaryOp(obj,param);
+    return defaultBinaryOp(obj, param);
   }
 
   @Override
   protected Expression visitMinus(Minus obj, T param) {
-    return defaultBinaryOp(obj,param);
+    return defaultBinaryOp(obj, param);
   }
 
   @Override
   protected Expression visitMod(Mod obj, T param) {
-    return defaultBinaryOp(obj,param);
+    return defaultBinaryOp(obj, param);
   }
 
   @Override
   protected Expression visitMul(Mul obj, T param) {
-    return defaultBinaryOp(obj,param);
+    return defaultBinaryOp(obj, param);
   }
 
   @Override
   protected Expression visitNotequal(Notequal obj, T param) {
-    return defaultBinaryOp(obj,param);
+    return defaultBinaryOp(obj, param);
   }
 
   @Override
   protected Expression visitOr(Or obj, T param) {
-    return defaultBinaryOp(obj,param);
+    return defaultBinaryOp(obj, param);
   }
 
   @Override
   protected Expression visitPlus(Plus obj, T param) {
-    return defaultBinaryOp(obj,param);
+    return defaultBinaryOp(obj, param);
   }
 
   @Override
   protected Expression visitShl(Shl obj, T param) {
-    return defaultBinaryOp(obj,param);
+    return defaultBinaryOp(obj, param);
   }
 
   @Override
   protected Expression visitShr(Shr obj, T param) {
-    return defaultBinaryOp(obj,param);
+    return defaultBinaryOp(obj, param);
   }
 
   @Override
   protected Expression visitBitAnd(BitAnd obj, T param) {
-    return defaultBinaryOp(obj,param);
+    return defaultBinaryOp(obj, param);
   }
 
   @Override
   protected Expression visitBitOr(BitOr obj, T param) {
-    return defaultBinaryOp(obj,param);
+    return defaultBinaryOp(obj, param);
   }
 
   @Override
   protected Expression visitLogicOr(LogicOr obj, T param) {
-    return defaultBinaryOp(obj,param);
+    return defaultBinaryOp(obj, param);
   }
 
   @Override
   protected Expression visitLogicAnd(LogicAnd obj, T param) {
-    return defaultBinaryOp(obj,param);
+    return defaultBinaryOp(obj, param);
   }
 
   @Override
@@ -233,7 +233,7 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
 
   @Override
   protected Expression visitTypeCast(TypeCast obj, T param) {
-    obj.setValue(visit(obj.getValue(),param));
+    obj.setValue(visit(obj.getValue(), param));
     return obj;
   }
 
@@ -277,8 +277,8 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
 
   @Override
   protected Expression visitIfOption(IfOption obj, T param) {
-    obj.setCondition(visit(obj.getCondition(),param));
-    visit(obj.getCode(),param);
+    obj.setCondition(visit(obj.getCondition(), param));
+    visit(obj.getCode(), param);
     return null;
   }
 

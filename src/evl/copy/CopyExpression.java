@@ -55,7 +55,7 @@ public class CopyExpression extends NullTraverser<Expression, Void> {
 
   @Override
   protected Expression visitRangeValue(RangeValue obj, Void param) {
-    return new RangeValue( obj.getInfo(), obj.getValues() );
+    return new RangeValue(obj.getInfo(), obj.getValues());
   }
 
   @Override

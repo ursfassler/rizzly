@@ -1,12 +1,7 @@
-interface
-  Iface
-    function get():R{0,50};
-  end
-
 component
   ElemInit 
     input
-      in  : Iface;
+      in():R{0,50};
 
   implementation elementary
     
@@ -21,7 +16,7 @@ component
       x := 23;
     end
     
-    function in.get():R{0,50}
+    function in():R{0,50}
       return x;
     end
 

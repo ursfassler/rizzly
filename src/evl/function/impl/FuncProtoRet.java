@@ -9,7 +9,7 @@ import evl.type.TypeRef;
 import evl.variable.FuncVariable;
 
 /**
- *
+ * 
  * @author urs
  */
 public class FuncProtoRet extends FunctionBase implements FuncWithReturn {

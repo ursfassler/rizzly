@@ -5,7 +5,7 @@
 static uint8_t value;
 static uint8_t error = 0;
 
-void inst_out_tick( uint8_t x ){
+void inst_out( uint8_t x ){
   printf( "%i (%i)\n", x, value );
   if( value != x ){
     error = 1;
@@ -13,13 +13,15 @@ void inst_out_tick( uint8_t x ){
 }
 
 int main(){
-   inst__system_construct();
+  inst__construct();
 
- int i;
+  int i;
   for( i = 0; i < 100; i++ ){
     value = 100 - (i % 101);
-    inst_in_tick( i % 101 );
+    inst_in( i % 101 );
   }
+  
+  inst__destruct();
   return -error;
 }
 

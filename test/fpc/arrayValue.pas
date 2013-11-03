@@ -3,23 +3,25 @@ program arrayValue;
 uses
   inst;
 
-procedure inst_out_foo(x: uint8_t); cdecl; public;
+procedure inst_out(x: uint8_t); cdecl; public;
 begin
   writeln( x );
 end;
 
 begin
+  inst__construct();
   writeln( 'start arrayValue' );
-  inst_in_foo(0);
-  inst_in_foo(1);
-  inst_in_foo(2);
-  inst_in_foo(3);
-  inst_in_foo(4);
-  inst_in_foo(5);
-  inst_in_foo(6);
-  inst_in_foo(7);
-  inst_in_foo(8);
-  inst_in_foo(9);
+  inst_in(0);
+  inst_in(1);
+  inst_in(2);
+  inst_in(3);
+  inst_in(4);
+  inst_in(5);
+  inst_in(6);
+  inst_in(7);
+  inst_in(8);
+  inst_in(9);
   writeln( 'end arrayValue' );
+  inst__destruct();
 end.
 

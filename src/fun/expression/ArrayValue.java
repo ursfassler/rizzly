@@ -4,8 +4,6 @@ import java.util.List;
 
 import common.ElementInfo;
 
-
-
 public class ArrayValue extends Expression {
   final private List<Expression> value;
 

@@ -1,13 +1,8 @@
-interface
-  Iface
-    function funcA();
-    function funcB();
-  end
-
 component
   ErrHfsm2
     input
-      in    : Iface;
+      funcA();
+      funcB();
 
     implementation hfsm( One )
     
@@ -15,9 +10,9 @@ component
     end
     
     transition 
-      One to One by in.funcA;
-      One to One by in.funcB;
-      One to One by in.funcC;
+      One to One by funcA();
+      One to One by funcB();
+      One to One by funcC();
     
   end
 

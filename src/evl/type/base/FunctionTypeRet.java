@@ -6,7 +6,6 @@ import common.ElementInfo;
 
 import evl.type.TypeRef;
 
-
 final public class FunctionTypeRet extends FunctionType {
   final private TypeRef ret;
 

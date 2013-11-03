@@ -6,6 +6,7 @@ import common.Designator;
 
 import fun.Fun;
 import fun.NullTraverser;
+import fun.function.FunctionHeader;
 
 public class FullStateName extends NullTraverser<Void, Designator> {
   final private HashMap<State, Designator> names = new HashMap<State, Designator>();
@@ -31,18 +32,18 @@ public class FullStateName extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitQueryItem(QueryItem obj, Designator param) {
-    return null;
-  }
-
-  @Override
   protected Void visitStateSimple(StateSimple obj, Designator param) {
     return null;
   }
 
   @Override
+  protected Void visitFunctionHeader(FunctionHeader obj, Designator param) {
+    return null;
+  }
+
+  @Override
   protected Void visitStateComposite(StateComposite obj, Designator param) {
-    visitItr(obj.getItem(), param);
+    visitItr(obj.getItemList(), param);
     return null;
   }
 

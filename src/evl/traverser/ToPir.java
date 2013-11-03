@@ -48,9 +48,6 @@ import evl.expression.unop.Not;
 import evl.function.FuncWithBody;
 import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
-import evl.other.CompUse;
-import evl.other.ImplElementary;
-import evl.other.Interface;
 import evl.other.RizzlyProgram;
 import evl.statement.Assignment;
 import evl.statement.Block;
@@ -153,11 +150,6 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
   }
 
   @Override
-  protected PirObject visitCompUse(CompUse obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
   protected Program visitRizzlyProgram(RizzlyProgram obj, PirObject param) {
     Program prog = new Program(obj.getName());
 
@@ -178,16 +170,6 @@ public class ToPir extends NullTraverser<PirObject, PirObject> {
       prog.getFunction().add(ct);
     }
     return prog;
-  }
-
-  @Override
-  protected PirObject visitImplElementary(ImplElementary obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected PirObject visitInterface(Interface obj, PirObject param) {
-    throw new RuntimeException("not yet implemented");
   }
 
   @Override

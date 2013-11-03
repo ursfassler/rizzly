@@ -1,23 +1,18 @@
 //test ok
 
-interface
-  Tick
-    function tick();
-  end
-
 component
   Elementary2
 
   input
-    tickIn  : Tick;
+    tickIn();
   
   output
-    tickOut : Tick;
+    tickOut();
 
   implementation elementary
 
-    function tickIn.tick()
-      tickOut.tick();
+    function tickIn()
+      tickOut();
     end
 
   end

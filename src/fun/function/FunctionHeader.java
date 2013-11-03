@@ -8,7 +8,7 @@ import fun.other.Named;
 import fun.variable.FuncVariable;
 
 /**
- *
+ * 
  * @author urs
  */
 abstract public class FunctionHeader extends FunBase implements Named {

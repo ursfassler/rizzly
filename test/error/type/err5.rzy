@@ -1,25 +1,20 @@
 // fail, use procedure to index array
 
-interface
-  Tick
-    function tick();
-  end
-  
 component
   Err5
     input
-      in  : Tick;
+      in();
     
     output
-      out : Tick;
+      out();
       
     implementation elementary
     
     var
       a : Array{10,R{0,10}};
     
-    function in.tick()
-      return a[out.tick()];
+    function in()
+      return a[out()];
     end
     
   end

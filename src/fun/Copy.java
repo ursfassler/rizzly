@@ -35,13 +35,11 @@ import fun.function.impl.FuncPrivateVoid;
 import fun.function.impl.FuncProtRet;
 import fun.function.impl.FuncProtVoid;
 import fun.hfsm.ImplHfsm;
-import fun.hfsm.QueryItem;
 import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
 import fun.other.Generator;
 import fun.other.ImplElementary;
-import fun.other.Interface;
 import fun.other.Named;
 import fun.other.Namespace;
 import fun.other.RizzlyFile;
@@ -83,7 +81,6 @@ import fun.variable.CompUse;
 import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
 import fun.variable.FuncVariable;
-import fun.variable.IfaceUse;
 import fun.variable.StateVariable;
 import fun.variable.TemplateParameter;
 
@@ -175,8 +172,7 @@ class CopyFun extends Traverser<Fun, Void> {
     StateSimple ret = new StateSimple(obj.getInfo(), obj.getName());
 
     ret.getVariable().addAll(copy(obj.getVariable().getList()));
-    ret.getBfunc().addAll(copy(obj.getBfunc().getList()));
-    ret.getItem().addAll(copy(obj.getItem()));
+    ret.getItemList().addAll(copy(obj.getItemList().getList()));
     ret.setEntryFuncRef(copy(obj.getEntryFuncRef()));
     ret.setExitFuncRef(copy(obj.getExitFuncRef()));
 
@@ -188,8 +184,7 @@ class CopyFun extends Traverser<Fun, Void> {
     StateComposite ret = new StateComposite(obj.getInfo(), obj.getName(), "");
 
     ret.getVariable().addAll(copy(obj.getVariable().getList()));
-    ret.getBfunc().addAll(copy(obj.getBfunc().getList()));
-    ret.getItem().addAll(copy(obj.getItem()));
+    ret.getItemList().addAll(copy(obj.getItemList().getList()));
     ret.setEntryFuncRef(copy(obj.getEntryFuncRef()));
     ret.setExitFuncRef(copy(obj.getExitFuncRef()));
     ret.setInitial(copy(obj.getInitial()));
@@ -267,11 +262,6 @@ class CopyFun extends Traverser<Fun, Void> {
   }
 
   @Override
-  protected Fun visitIfaceUse(IfaceUse obj, Void param) {
-    return new IfaceUse(obj.getInfo(), obj.getName(), copy(obj.getType()));
-  }
-
-  @Override
   protected Fun visitCompUse(CompUse obj, Void param) {
     return new CompUse(obj.getInfo(), obj.getName(), copy(obj.getType()));
   }
@@ -312,18 +302,6 @@ class CopyFun extends Traverser<Fun, Void> {
     ret.setExitFunc(copy(obj.getExitFunc()));
 
     return ret;
-  }
-
-  @Override
-  protected Fun visitInterface(Interface obj, Void param) {
-    Interface ret = new Interface(obj.getInfo(), obj.getName());
-    ret.getPrototype().addAll(copy(obj.getPrototype().getList()));
-    return ret;
-  }
-
-  @Override
-  protected Fun visitQueryItem(QueryItem obj, Void param) {
-    return new QueryItem(obj.getNamespace(), copy(obj.getFunc()));
   }
 
   @Override

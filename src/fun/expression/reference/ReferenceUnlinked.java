@@ -3,7 +3,6 @@ package fun.expression.reference;
 import common.Designator;
 import common.ElementInfo;
 
-
 final public class ReferenceUnlinked extends Reference {
   private Designator name;
 

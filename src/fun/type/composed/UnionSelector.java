@@ -6,7 +6,7 @@ import fun.FunBase;
 import fun.other.Named;
 
 /**
- *
+ * 
  * @author urs
  */
 public class UnionSelector extends FunBase implements Named {

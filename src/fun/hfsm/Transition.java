@@ -2,13 +2,15 @@ package fun.hfsm;
 
 import common.ElementInfo;
 
+import fun.FunBase;
 import fun.expression.Expression;
 import fun.expression.reference.Reference;
 import fun.other.ListOfNamed;
+import fun.other.Named;
 import fun.statement.Block;
 import fun.variable.FuncVariable;
 
-public class Transition extends StateItem {
+public class Transition extends FunBase implements Named {
 
   private String name;
   private Reference src;
@@ -25,6 +27,11 @@ public class Transition extends StateItem {
 
   public String getName() {
     return name;
+  }
+
+  @Override
+  public void setName(String name) {
+    this.name = name;
   }
 
   public Reference getSrc() {
@@ -75,4 +82,5 @@ public class Transition extends StateItem {
   public String toString() {
     return src + " -> " + dst + " by " + event + " if " + guard;
   }
+
 }

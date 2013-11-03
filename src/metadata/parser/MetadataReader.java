@@ -9,7 +9,7 @@ import common.ElementInfo;
 import common.Metadata;
 
 /**
- *
+ * 
  * @author urs
  */
 public class MetadataReader implements PeekReader<Character> {

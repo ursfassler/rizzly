@@ -1,28 +1,23 @@
 //test ok
 
-interface
-  Tick
-    function tick();
-  end
-
 component
   Elementary3
 
   input
-    tickIn  : Tick;
+    tickIn();
   
   output
-    tickOut : Tick;
+    tickOut();
 
   implementation elementary
 
     var
       count : R{0,1};
 
-    function tickIn.tick()
+    function tickIn()
       count := (count+1) mod 2;
       if count = 0 then
-        tickOut.tick();
+        tickOut();
       end
     end
   end

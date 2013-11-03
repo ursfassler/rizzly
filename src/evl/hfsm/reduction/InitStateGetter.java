@@ -8,11 +8,11 @@ import evl.hfsm.StateComposite;
 import evl.hfsm.StateSimple;
 
 /**
- *
+ * 
  * Gets the initial leaf state form a state
- *
+ * 
  * @author urs
- *
+ * 
  */
 public class InitStateGetter extends NullTraverser<StateSimple, Void> {
   @Override
@@ -20,7 +20,7 @@ public class InitStateGetter extends NullTraverser<StateSimple, Void> {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
-  static public StateSimple get( State obj ){
+  static public StateSimple get(State obj) {
     InitStateGetter getter = new InitStateGetter();
     return getter.traverse(obj, null);
   }
@@ -37,10 +37,9 @@ public class InitStateGetter extends NullTraverser<StateSimple, Void> {
 
   @Override
   protected StateSimple visitReference(Reference obj, Void param) {
-    assert(false);
+    assert (false);
     assert (obj.getOffset().isEmpty());
     return visit(obj.getLink(), param);
   }
 
 }
-

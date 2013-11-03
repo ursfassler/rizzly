@@ -1,26 +1,40 @@
 package evl.other;
 
-import java.util.EnumMap;
-
 import common.Direction;
 import common.ElementInfo;
 
 import evl.EvlBase;
+import evl.function.FuncIface;
+import evl.function.FuncIfaceIn;
+import evl.function.FuncIfaceOut;
 
 abstract public class Component extends EvlBase implements Named {
   private String name;
-  final private EnumMap<Direction, ListOfNamed<IfaceUse>> iface;
+  final private ListOfNamed<FuncIfaceIn> input = new ListOfNamed<FuncIfaceIn>();
+  final private ListOfNamed<FuncIfaceOut> output = new ListOfNamed<FuncIfaceOut>();
 
   public Component(ElementInfo info, String name) {
     super(info);
     this.name = name;
-    iface = new EnumMap<Direction, ListOfNamed<IfaceUse>>(Direction.class);
-    iface.put(Direction.in, new ListOfNamed<IfaceUse>());
-    iface.put(Direction.out, new ListOfNamed<IfaceUse>());
   }
 
-  public ListOfNamed<IfaceUse> getIface(Direction dir) {
-    return iface.get(dir);
+  public ListOfNamed<FuncIfaceIn> getInput() {
+    return input;
+  }
+
+  public ListOfNamed<FuncIfaceOut> getOutput() {
+    return output;
+  }
+
+  public ListOfNamed<? extends FuncIface> getIface(Direction dir) {
+    switch (dir) {
+    case in:
+      return input;
+    case out:
+      return output;
+    default:
+      throw new RuntimeException("Not implemented: " + dir);
+    }
   }
 
   @Override

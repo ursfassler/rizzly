@@ -5,7 +5,7 @@ import common.ElementInfo;
 import fun.expression.Expression;
 
 /**
- *
+ * 
  * @author urs
  */
 public class While extends Statement {

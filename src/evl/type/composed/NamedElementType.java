@@ -7,7 +7,6 @@ import common.ElementInfo;
 import evl.other.ListOfNamed;
 import evl.type.Type;
 
-
 abstract public class NamedElementType extends Type {
   final private ListOfNamed<NamedElement> element;
 

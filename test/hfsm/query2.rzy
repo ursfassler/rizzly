@@ -1,21 +1,15 @@
-
-interface
-  Iface
-    function tick();
-    function read():R{0,100};
-  end
-  
 component
   Query2
     input
-      in : Iface;
+      tick();
+      read():R{0,100};
     
   implementation hfsm( A )
   
     transition
-      A to B by in.tick();
-      B to C by in.tick();
-      C to A by in.tick();
+      A to B by tick();
+      B to C by tick();
+      C to A by tick();
   
     state A
     end
@@ -26,7 +20,7 @@ component
     state C
     end
     
-    function in.read():R{0,100}
+    function read():R{0,100}
       return 0;
     end
   

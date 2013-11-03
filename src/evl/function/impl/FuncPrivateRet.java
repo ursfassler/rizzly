@@ -11,7 +11,7 @@ import evl.type.TypeRef;
 import evl.variable.FuncVariable;
 
 /**
- *
+ * 
  * @author urs
  */
 public class FuncPrivateRet extends FunctionBase implements FuncWithReturn, FuncWithBody {

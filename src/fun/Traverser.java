@@ -26,16 +26,13 @@ import fun.function.impl.FuncPrivateVoid;
 import fun.function.impl.FuncProtRet;
 import fun.function.impl.FuncProtVoid;
 import fun.hfsm.ImplHfsm;
-import fun.hfsm.QueryItem;
 import fun.hfsm.State;
 import fun.hfsm.StateComposite;
-import fun.hfsm.StateItem;
 import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
 import fun.other.Component;
 import fun.other.Generator;
 import fun.other.ImplElementary;
-import fun.other.Interface;
 import fun.other.Namespace;
 import fun.other.RizzlyFile;
 import fun.statement.Assignment;
@@ -82,7 +79,6 @@ import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
 import fun.variable.Constant;
 import fun.variable.FuncVariable;
-import fun.variable.IfaceUse;
 import fun.variable.StateVariable;
 import fun.variable.TemplateParameter;
 import fun.variable.Variable;
@@ -129,16 +125,10 @@ public abstract class Traverser<R, P> {
       return visitIfOption((IfOption) obj, param);
     } else if (obj instanceof Connection) {
       return visitConnection((Connection) obj, param);
-    } else if (obj instanceof StateItem) {
-      return visitStateItem((StateItem) obj, param);
     } else if (obj instanceof State) {
       return visitState((State) obj, param);
     } else if (obj instanceof Transition) {
       return visitTransition((Transition) obj, param);
-    } else if (obj instanceof QueryItem) {
-      return visitQueryItem((QueryItem) obj, param);
-    } else if (obj instanceof Interface) {
-      return visitInterface((Interface) obj, param);
     } else if (obj instanceof Component) {
       return visitComponent((Component) obj, param);
     } else if (obj instanceof UnionSelector) {
@@ -163,18 +153,6 @@ public abstract class Traverser<R, P> {
       return visitFuncPrivateRet((FuncPrivateRet) obj, param);
     } else if (obj instanceof FuncEntryExit) {
       return visitFuncEntryExit((FuncEntryExit) obj, param);
-    } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
-    }
-  }
-
-  protected R visitStateItem(StateItem obj, P param) {
-    if (obj instanceof State) {
-      return visitState((State) obj, param);
-    } else if (obj instanceof Transition) {
-      return visitTransition((Transition) obj, param);
-    } else if (obj instanceof QueryItem) {
-      return visitQueryItem((QueryItem) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -211,8 +189,6 @@ public abstract class Traverser<R, P> {
       return visitCompfuncParameter((TemplateParameter) obj, param);
     } else if (obj instanceof CompUse) {
       return visitCompUse((CompUse) obj, param);
-    } else if (obj instanceof IfaceUse) {
-      return visitIfaceUse((IfaceUse) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -428,8 +404,6 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitRefCompcall(RefTemplCall obj, P param);
 
-  abstract protected R visitIfaceUse(IfaceUse obj, P param);
-
   abstract protected R visitCompUse(CompUse obj, P param);
 
   abstract protected R visitImplHfsm(ImplHfsm obj, P param);
@@ -437,10 +411,6 @@ public abstract class Traverser<R, P> {
   abstract protected R visitImplComposition(ImplComposition obj, P param);
 
   abstract protected R visitImplElementary(ImplElementary obj, P param);
-
-  abstract protected R visitInterface(Interface obj, P param);
-
-  abstract protected R visitQueryItem(QueryItem obj, P param);
 
   abstract protected R visitTransition(Transition obj, P param);
 

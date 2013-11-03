@@ -42,6 +42,10 @@ import evl.expression.reference.Reference;
 import evl.expression.unop.Not;
 import evl.expression.unop.Uminus;
 import evl.function.impl.FuncGlobal;
+import evl.function.impl.FuncIfaceInRet;
+import evl.function.impl.FuncIfaceInVoid;
+import evl.function.impl.FuncIfaceOutRet;
+import evl.function.impl.FuncIfaceOutVoid;
 import evl.function.impl.FuncInputHandlerEvent;
 import evl.function.impl.FuncInputHandlerQuery;
 import evl.function.impl.FuncPrivateRet;
@@ -52,14 +56,11 @@ import evl.function.impl.FuncSubHandlerEvent;
 import evl.function.impl.FuncSubHandlerQuery;
 import evl.hfsm.HfsmQueryFunction;
 import evl.hfsm.ImplHfsm;
-import evl.hfsm.QueryItem;
 import evl.hfsm.StateComposite;
 import evl.hfsm.StateSimple;
 import evl.hfsm.Transition;
 import evl.other.CompUse;
-import evl.other.IfaceUse;
 import evl.other.ImplElementary;
-import evl.other.Interface;
 import evl.other.Named;
 import evl.other.NamedList;
 import evl.other.Namespace;
@@ -94,7 +95,6 @@ import evl.type.composed.UnionSelector;
 import evl.type.composed.UnionType;
 import evl.type.special.ComponentType;
 import evl.type.special.IntegerType;
-import evl.type.special.InterfaceType;
 import evl.type.special.NaturalType;
 import evl.type.special.PointerType;
 import evl.type.special.VoidType;
@@ -114,14 +114,13 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitImplElementary(ImplElementary obj, P param) {
-    visitList(obj.getIface(Direction.in).getList(), param);
-    visitList(obj.getIface(Direction.out).getList(), param);
+    visitList(obj.getInput().getList(), param);
+    visitList(obj.getOutput().getList(), param);
 
     visitList(obj.getConstant().getList(), param);
     visitList(obj.getVariable().getList(), param);
     visitList(obj.getComponent().getList(), param);
     visitList(obj.getInternalFunction().getList(), param);
-    visitList(obj.getInputFunc().getList(), param);
     visitList(obj.getSubComCallback().getList(), param);
     visit(obj.getEntryFunc(), param);
     visit(obj.getExitFunc(), param);
@@ -130,8 +129,8 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitImplComposition(ImplComposition obj, P param) {
-    visitList(obj.getIface(Direction.in).getList(), param);
-    visitList(obj.getIface(Direction.out).getList(), param);
+    visitList(obj.getInput().getList(), param);
+    visitList(obj.getOutput().getList(), param);
 
     visitList(obj.getComponent().getList(), param);
     visitList(obj.getConnection(), param);
@@ -140,16 +139,10 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitImplHfsm(ImplHfsm obj, P param) {
-    visitList(obj.getIface(Direction.in).getList(), param);
-    visitList(obj.getIface(Direction.out).getList(), param);
+    visitList(obj.getInput().getList(), param);
+    visitList(obj.getOutput().getList(), param);
 
     visit(obj.getTopstate(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitInterface(Interface obj, P param) {
-    visitList(obj.getPrototype().getList(), param);
     return null;
   }
 
@@ -257,11 +250,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitVoidType(VoidType obj, P param) {
-    return null;
-  }
-
-  @Override
-  protected R visitIfaceUse(IfaceUse obj, P param) {
     return null;
   }
 
@@ -384,12 +372,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitQueryItem(QueryItem obj, P param) {
-    visit(obj.getFunc(), param);
-    return null;
-  }
-
-  @Override
   protected R visitReference(Reference obj, P param) {
     visitItr(obj.getOffset(), param);
     return null;
@@ -496,12 +478,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitEndpointSub(EndpointSub obj, P param) {
-    return null;
-  }
-
-  @Override
-  protected R visitInterfaceType(InterfaceType obj, P param) {
-    visitItr(obj.getPrototype(), param);
     return null;
   }
 
@@ -736,6 +712,32 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   protected R visitLogicAnd(LogicAnd obj, P param) {
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitFuncIfaceOutVoid(FuncIfaceOutVoid obj, P param) {
+    visitItr(obj.getParam(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitFuncIfaceOutRet(FuncIfaceOutRet obj, P param) {
+    visitItr(obj.getParam(), param);
+    visit(obj.getRet(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitFuncIfaceInVoid(FuncIfaceInVoid obj, P param) {
+    visitItr(obj.getParam(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitFuncIfaceInRet(FuncIfaceInRet obj, P param) {
+    visitItr(obj.getParam(), param);
+    visit(obj.getRet(), param);
     return null;
   }
 

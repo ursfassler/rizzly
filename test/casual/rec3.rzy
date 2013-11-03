@@ -4,19 +4,14 @@ type
     y : R{0,100};
   end
 
-interface
-  Tick
-    function getElem( p: Point; elem: R{0,1} ):R{0,100};
-  end
-
 component
   Rec2
     input
-      in  : Tick;
+      getElem( p: Point; elem: R{0,1} ):R{0,100};
     
   implementation elementary
 
-    function in.getElem( p: Point; elem: R{0,1} ):R{0,100}
+    function getElem( p: Point; elem: R{0,1} ):R{0,100}
       case elem of
         0: return p.x; end
         1: return p.y; end

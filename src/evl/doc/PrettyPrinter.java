@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.List;
 
 import common.Direction;
+import common.FuncAttr;
 
 import error.ErrorType;
 import error.RError;
@@ -45,20 +46,19 @@ import evl.expression.reference.RefPtrDeref;
 import evl.expression.reference.Reference;
 import evl.expression.unop.Not;
 import evl.expression.unop.Uminus;
+import evl.function.FuncIface;
 import evl.function.FuncWithBody;
 import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
+import evl.hfsm.HfsmQueryFunction;
 import evl.hfsm.ImplHfsm;
-import evl.hfsm.QueryItem;
 import evl.hfsm.State;
 import evl.hfsm.StateComposite;
 import evl.hfsm.StateSimple;
 import evl.hfsm.Transition;
 import evl.other.CompUse;
 import evl.other.Component;
-import evl.other.IfaceUse;
 import evl.other.ImplElementary;
-import evl.other.Interface;
 import evl.other.ListOfNamed;
 import evl.other.Named;
 import evl.other.NamedList;
@@ -165,7 +165,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     return null;
   }
 
-  private void visitInterfaceDecl(String type, ListOfNamed<? extends Named> listOfNamed, StreamWriter param) {
+  private void visitInterfaceDecl(String type, ListOfNamed<? extends FuncIface> listOfNamed, StreamWriter param) {
     if (!listOfNamed.isEmpty()) {
       param.wr(type);
       param.nl();
@@ -174,22 +174,6 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
       param.decIndent();
       param.nl();
     }
-  }
-
-  @Override
-  protected Void visitInterface(Interface obj, StreamWriter param) {
-    param.wr(obj.getName());
-    param.wr(" = Interface");
-    wrId(obj, param);
-    param.nl();
-
-    param.incIndent();
-    visitList(obj.getPrototype(), param);
-    param.decIndent();
-    param.wr("end");
-    param.nl();
-    param.nl();
-    return null;
   }
 
   protected void visitOptList(String name, ListOfNamed<? extends Named> type, StreamWriter param) {
@@ -258,18 +242,6 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     return null;
   }
 
-  @Override
-  protected Void visitIfaceUse(IfaceUse obj, StreamWriter param) {
-    param.wr(obj.getName());
-    wrId(obj, param);
-    param.wr(": ");
-    param.wr(obj.getLink().getName());
-    wrId(obj.getLink(), param);
-    param.wr(";");
-    param.nl();
-    return null;
-  }
-
   private void compHeader(Component obj, StreamWriter param) {
     param.wr(obj.getName());
     wrId(obj, param);
@@ -278,8 +250,8 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
     param.incIndent();
     param.nl();
-    visitInterfaceDecl("input", obj.getIface(Direction.in), param);
-    visitInterfaceDecl("output", obj.getIface(Direction.out), param);
+    visitInterfaceDecl("input", obj.getInput(), param);
+    visitInterfaceDecl("output", obj.getOutput(), param);
     param.decIndent();
   }
 
@@ -315,7 +287,6 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.nl();
     param.nl();
 
-    visitList(obj.getInputFunc(), param);
     visitList(obj.getSubComCallback(), param);
     visitList(obj.getInternalFunction(), param);
     return null;
@@ -363,6 +334,10 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     if (obj instanceof FuncWithReturn) {
       param.wr(":");
       visit(((FuncWithReturn) obj).getRet(), param);
+    }
+    for (FuncAttr attr : obj.getAttributes()) {
+      param.wr(" ");
+      param.wr(attr.toString());
     }
     param.nl();
     if (obj instanceof FuncWithBody) {
@@ -993,9 +968,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.wr(" to ");
     param.wr(obj.getDst().getName());
     param.wr(" by ");
-    param.wr(obj.getEventIface().getName());
-    param.wr(".");
-    param.wr(obj.getEventFunc());
+    visit(obj.getEventFunc(), param);
     param.wr("(");
     list(obj.getParam().getList(), "; ", param);
     param.wr(")");
@@ -1016,15 +989,29 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitQueryItem(QueryItem obj, StreamWriter param) {
-    param.wr("namespace '");
-    param.wr(obj.getNamespace());
-    param.wr("'");
+  protected Void visitHfsmQueryFunction(HfsmQueryFunction obj, StreamWriter param) {
+    param.wr("query ");
+    param.wr(obj.getName());
+    wrId(obj, param);
+    param.wr("(");
+    list(obj.getParam().getList(), "; ", param);
+    param.wr(")");
+    if (obj instanceof FuncWithReturn) {
+      param.wr(":");
+      visit(((FuncWithReturn) obj).getRet(), param);
+    }
+    for (FuncAttr attr : obj.getAttributes()) {
+      param.wr(" ");
+      param.wr(attr.toString());
+    }
     param.nl();
-    param.incIndent();
-    visit(obj.getFunc(), param);
-    param.decIndent();
-    param.wr("end");
+    if (obj instanceof FuncWithBody) {
+      param.incIndent();
+      visit(((FuncWithBody) obj).getBody(), param);
+      param.decIndent();
+      param.wr("end");
+      param.nl();
+    }
     param.nl();
     return null;
   }

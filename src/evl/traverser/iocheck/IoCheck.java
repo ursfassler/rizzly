@@ -8,6 +8,10 @@ import error.RError;
 import evl.Evl;
 import evl.NullTraverser;
 import evl.function.impl.FuncGlobal;
+import evl.function.impl.FuncIfaceInRet;
+import evl.function.impl.FuncIfaceInVoid;
+import evl.function.impl.FuncIfaceOutRet;
+import evl.function.impl.FuncIfaceOutVoid;
 import evl.function.impl.FuncInputHandlerEvent;
 import evl.function.impl.FuncInputHandlerQuery;
 import evl.function.impl.FuncPrivateRet;
@@ -114,7 +118,7 @@ public class IoCheck extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitFuncInputHandlerQuery(FuncInputHandlerQuery obj, Void param) {
-    checkQuery(obj,"Query input");
+    checkQuery(obj, "Query input");
     return null;
   }
 
@@ -130,13 +134,13 @@ public class IoCheck extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitFuncSubHandlerQuery(FuncSubHandlerQuery obj, Void param) {
-    checkQuery(obj,"Query input");
+    checkQuery(obj, "Query input");
     return null;
   }
 
   @Override
   protected Void visitHfsmQueryFunction(HfsmQueryFunction obj, Void param) {
-    checkQuery(obj,"Query");
+    checkQuery(obj, "Query");
     return null;
   }
 
@@ -147,7 +151,43 @@ public class IoCheck extends NullTraverser<Void, Void> {
     assert (outputs.containsKey(obj.getBody()));
     assert (inputs.containsKey(obj.getBody()));
 
-    checkQuery(obj.getGuard(),"Transition guard");
+    checkQuery(obj.getGuard(), "Transition guard");
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncIfaceOutVoid(FuncIfaceOutVoid obj, Void param) {
+    assert (writes.get(obj) == false);
+    assert (reads.get(obj) == false);
+    assert (outputs.get(obj) == true);
+    assert (inputs.get(obj) == false);
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncIfaceOutRet(FuncIfaceOutRet obj, Void param) {
+    assert (writes.get(obj) == false);
+    assert (reads.get(obj) == true);
+    assert (outputs.get(obj) == false);
+    assert (inputs.get(obj) == false);
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncIfaceInVoid(FuncIfaceInVoid obj, Void param) {
+    assert (writes.get(obj) == false);
+    assert (reads.get(obj) == false);
+    assert (outputs.get(obj) == false);
+    assert (inputs.get(obj) == false);
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncIfaceInRet(FuncIfaceInRet obj, Void param) {
+    assert (writes.get(obj) == false);
+    assert (reads.get(obj) == false);
+    assert (outputs.get(obj) == false);
+    assert (inputs.get(obj) == false);
     return null;
   }
 

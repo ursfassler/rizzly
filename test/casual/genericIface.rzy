@@ -1,7 +1,0 @@
-
-interface
-  GenericIface{T:Type{Any}}
-    function set( item: T );
-    function get():T;
-  end
-

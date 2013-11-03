@@ -1,11 +1,10 @@
 package evl.composition;
 
 import common.Designator;
-import common.Direction;
 import common.ElementInfo;
 
+import evl.function.FuncIface;
 import evl.other.CompUse;
-import evl.other.IfaceUse;
 
 public class EndpointSub extends Endpoint {
   private CompUse comp;
@@ -34,10 +33,10 @@ public class EndpointSub extends Endpoint {
   }
 
   @Override
-  public IfaceUse getIfaceUse() {
-    IfaceUse ret = comp.getLink().getIface(Direction.in).find(iface);
+  public FuncIface getIfaceUse() {
+    FuncIface ret = comp.getLink().getInput().find(iface);
     if (ret == null) {
-      ret = comp.getLink().getIface(Direction.out).find(iface);
+      ret = comp.getLink().getOutput().find(iface);
     }
     assert (ret != null);
     return ret;
@@ -45,7 +44,7 @@ public class EndpointSub extends Endpoint {
 
   @Override
   public Designator getDes() {
-    return new Designator( comp.getName(), iface );
+    return new Designator(comp.getName(), iface);
   }
 
 }

@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import util.Pair;
-
 import common.Designator;
 import common.ElementInfo;
 
@@ -20,7 +18,6 @@ import evl.expression.reference.Reference;
 import evl.function.impl.FuncPrivateRet;
 import evl.hfsm.HfsmQueryFunction;
 import evl.hfsm.ImplHfsm;
-import evl.hfsm.QueryItem;
 import evl.hfsm.State;
 import evl.hfsm.StateComposite;
 import evl.hfsm.StateItem;
@@ -34,9 +31,8 @@ import evl.variable.FuncVariable;
 import evl.variable.Variable;
 
 public class QueryDownPropagator extends NullTraverser<Void, QueryParam> {
-
   private static final ElementInfo info = new ElementInfo();
-  private final Map<HfsmQueryFunction, FuncPrivateRet> map;
+  private final Map<HfsmQueryFunction, FuncPrivateRet> map; // TODO do we need that?
 
   public QueryDownPropagator(Map<HfsmQueryFunction, FuncPrivateRet> map) {
     this.map = map;
@@ -62,24 +58,22 @@ public class QueryDownPropagator extends NullTraverser<Void, QueryParam> {
 
   @Override
   protected Void visitStateSimple(StateSimple obj, QueryParam param) {
-    List<QueryItem> queryList = obj.getItemList(QueryItem.class);
+    List<HfsmQueryFunction> queryList = obj.getItemList(HfsmQueryFunction.class);
     obj.getItem().removeAll(queryList);
 
-    Map<Pair<String, String>, HfsmQueryFunction> queries = new HashMap<Pair<String, String>, HfsmQueryFunction>();
+    ListOfNamed<HfsmQueryFunction> queries = new ListOfNamed<HfsmQueryFunction>();
 
-    for (QueryItem query : param.before) {
+    for (HfsmQueryFunction query : param.before) {
       addQuery(queries, query);
     }
-    for (QueryItem query : queryList) {
+    for (HfsmQueryFunction query : queryList) {
       addQuery(queries, query);
     }
-    for (QueryItem query : param.after) {
+    for (HfsmQueryFunction query : param.after) {
       addQuery(queries, query);
     }
 
-    for (Pair<String, String> key : queries.keySet()) {
-      HfsmQueryFunction func = queries.get(key);
-
+    for (HfsmQueryFunction func : queries) {
       HfsmQueryFunction cfunc = new HfsmQueryFunction(info, func.getName(), new ListOfNamed<FuncVariable>(Copy.copy(func.getParam().getList())));
       cfunc.setRet(func.getRet().copy());
 
@@ -93,29 +87,27 @@ public class QueryDownPropagator extends NullTraverser<Void, QueryParam> {
       call.getOffset().add(new RefCall(info, acpar));
       cfunc.getBody().getStatements().add(new ReturnExpr(info, call));
 
-      obj.getItem().add(new QueryItem(key.first, cfunc));
+      obj.getItem().add(cfunc); // TODO ok or copy?
     }
 
     return null;
   }
 
-  static private void addQuery(Map<Pair<String, String>, HfsmQueryFunction> set, QueryItem query) {
-    Pair<String, String> key = new Pair<String, String>(query.getNamespace(), query.getFunc().getName());
-
-    if (!set.containsKey(key)) {
-      set.put(key, query.getFunc());
+  static private void addQuery(ListOfNamed<HfsmQueryFunction> queries, HfsmQueryFunction query) {
+    if (queries.find(query.getName()) == null) {
+      queries.add(query);
     }
   }
 
   @Override
   protected Void visitStateComposite(StateComposite obj, QueryParam param) {
     Map<State, Integer> spos = new HashMap<State, Integer>();
-    ArrayList<QueryItem> queryList = new ArrayList<QueryItem>();
+    ArrayList<HfsmQueryFunction> queryList = new ArrayList<HfsmQueryFunction>();
     ArrayList<State> stateList = new ArrayList<State>();
 
     for (StateItem itr : obj.getItem()) {
-      if (itr instanceof QueryItem) {
-        queryList.add((QueryItem) itr);
+      if (itr instanceof HfsmQueryFunction) {
+        queryList.add((HfsmQueryFunction) itr);
       } else if (itr instanceof State) {
         spos.put((State) itr, queryList.size());
         stateList.add((State) itr);
@@ -148,25 +140,25 @@ public class QueryDownPropagator extends NullTraverser<Void, QueryParam> {
 
 class QueryParam {
 
-  final public ArrayList<QueryItem> before;
-  final public ArrayList<QueryItem> after;
+  final public ArrayList<HfsmQueryFunction> before;
+  final public ArrayList<HfsmQueryFunction> after;
 
-  public QueryParam(List<QueryItem> before, List<QueryItem> after) {
+  public QueryParam(List<HfsmQueryFunction> before, List<HfsmQueryFunction> after) {
     super();
-    this.before = new ArrayList<QueryItem>(before);
-    this.after = new ArrayList<QueryItem>(after);
+    this.before = new ArrayList<HfsmQueryFunction>(before);
+    this.after = new ArrayList<HfsmQueryFunction>(after);
   }
 
   public QueryParam() {
     super();
-    this.before = new ArrayList<QueryItem>();
-    this.after = new ArrayList<QueryItem>();
+    this.before = new ArrayList<HfsmQueryFunction>();
+    this.after = new ArrayList<HfsmQueryFunction>();
   }
 
   public QueryParam(QueryParam parent) {
     super();
-    this.before = new ArrayList<QueryItem>(parent.before);
-    this.after = new ArrayList<QueryItem>(parent.after);
+    this.before = new ArrayList<HfsmQueryFunction>(parent.before);
+    this.after = new ArrayList<HfsmQueryFunction>(parent.after);
   }
 }
 
@@ -205,13 +197,6 @@ class QueryFuncMaker extends NullTraverser<Void, Designator> {
   protected Void visitState(State obj, Designator param) {
     param = new Designator(param, obj.getName());
     visitItr(obj.getItem(), param);
-    return null;
-  }
-
-  @Override
-  protected Void visitQueryItem(QueryItem obj, Designator param) {
-    param = new Designator(param, obj.getNamespace());
-    visit(obj.getFunc(), param);
     return null;
   }
 

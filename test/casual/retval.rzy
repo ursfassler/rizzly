@@ -1,20 +1,15 @@
-interface
-  Iface
-    function foo():R{-20,20};
-  end
-
 component  
   Retval
     input
-      in    : Iface;
+      in():R{-20,20};
 
     output
-      out   : Iface;
+      out():R{-20,20};
 
     implementation elementary
  
-    function in.foo():R{-20,20}
-      x : R{-20,20} = out.foo();
+    function in():R{-20,20}
+      x : R{-20,20} = out();
       return x;
     end
   end

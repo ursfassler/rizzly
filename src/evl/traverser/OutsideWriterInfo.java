@@ -4,6 +4,10 @@ import evl.Evl;
 import evl.NullTraverser;
 import evl.function.FunctionBase;
 import evl.function.impl.FuncGlobal;
+import evl.function.impl.FuncIfaceInRet;
+import evl.function.impl.FuncIfaceInVoid;
+import evl.function.impl.FuncIfaceOutRet;
+import evl.function.impl.FuncIfaceOutVoid;
 import evl.function.impl.FuncInputHandlerEvent;
 import evl.function.impl.FuncInputHandlerQuery;
 import evl.function.impl.FuncPrivateRet;
@@ -16,9 +20,9 @@ import evl.hfsm.HfsmQueryFunction;
 
 /**
  * Returns for every function if, it writes to outside. It gets the information only from the function type.
- *
+ * 
  * @author urs
- *
+ * 
  */
 public class OutsideWriterInfo extends NullTraverser<Boolean, Void> {
 
@@ -79,6 +83,26 @@ public class OutsideWriterInfo extends NullTraverser<Boolean, Void> {
 
   @Override
   protected Boolean visitFuncInputHandlerQuery(FuncInputHandlerQuery obj, Void param) {
+    return false;
+  }
+
+  @Override
+  protected Boolean visitFuncIfaceOutVoid(FuncIfaceOutVoid obj, Void param) {
+    return true;
+  }
+
+  @Override
+  protected Boolean visitFuncIfaceOutRet(FuncIfaceOutRet obj, Void param) {
+    return false;
+  }
+
+  @Override
+  protected Boolean visitFuncIfaceInVoid(FuncIfaceInVoid obj, Void param) {
+    return false; // FIXME sure?
+  }
+
+  @Override
+  protected Boolean visitFuncIfaceInRet(FuncIfaceInRet obj, Void param) {
     return false;
   }
 

@@ -1,13 +1,8 @@
-interface
-  TimeConfig
-    function getTime():R{0,99};
-    function time( seconds: R{0,99} );
-  end
-  
 component
   AlarmController
     input
-      config      : TimeConfig;
+      getTime():R{0,99};
+      time( seconds: R{0,99} );
     
   implementation hfsm(Disabled)
     entry
@@ -17,7 +12,7 @@ component
     var
       atime   : R{0,99};
       
-    function config.getTime():R{0,99}
+    function getTime():R{0,99}
       return atime;
     end
     
@@ -25,7 +20,7 @@ component
     end
     
     transition 
-      Disabled to Disabled by config.time( seconds: R{0,99} ) if 0 = seconds;
+      Disabled to Disabled by time( seconds: R{0,99} ) if 0 = seconds;
     
   end
 

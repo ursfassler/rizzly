@@ -3,14 +3,16 @@
 #include  <stdlib.h>
 #include  "output/inst.h"
 
-void inst_evtOut_evt(R_0_255 x){
+void inst_evtOut(R_0_255 x){
 }
 
 int main(){
-  inst__system_construct();
+  inst__construct();
 
-  inst_evtIn_evt( 42 );
+  inst_evtIn( 42 );
 
+  inst__destruct();
+  
   return 0;
 }
 

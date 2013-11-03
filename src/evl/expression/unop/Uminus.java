@@ -5,7 +5,7 @@ import common.ElementInfo;
 import evl.expression.Expression;
 
 /**
- *
+ * 
  * @author urs
  */
 final public class Uminus extends UnaryExp {
@@ -18,5 +18,5 @@ final public class Uminus extends UnaryExp {
   public String getOpName() {
     return "-";
   }
-  
+
 }

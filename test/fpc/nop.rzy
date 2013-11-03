@@ -1,15 +1,10 @@
-interface
-  Iface
-    function foo();
-  end
-
 component
   Nop
     input
-      in  : Iface;
+      in();
     
     output
-      out : Iface;
+      out();
 
     implementation composition
     

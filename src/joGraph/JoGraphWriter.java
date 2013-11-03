@@ -5,7 +5,6 @@ import java.util.Set;
 
 import evl.Evl;
 
-
 public class JoGraphWriter<T extends Evl> extends GraphWriter {
 
   public static <T extends Evl> void print(Map<T, Set<T>> graph, Writer writer) {

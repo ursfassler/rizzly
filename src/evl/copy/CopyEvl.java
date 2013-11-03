@@ -6,8 +6,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import common.Direction;
-
 import evl.Evl;
 import evl.NullTraverser;
 import evl.expression.Expression;
@@ -15,7 +13,6 @@ import evl.expression.reference.RefItem;
 import evl.function.FunctionBase;
 import evl.hfsm.StateItem;
 import evl.other.CompUse;
-import evl.other.IfaceUse;
 import evl.other.ImplElementary;
 import evl.other.Named;
 import evl.other.NamedList;
@@ -42,7 +39,6 @@ class CopyEvl extends NullTraverser<Evl, Void> {
   private CopyType type = new CopyType(this);
   private CopyStatement stmt = new CopyStatement(this);
   private CopyRef ref = new CopyRef(this);
-  private CopyCaseOptEntry caoe = new CopyCaseOptEntry(this);
   private CopyStateItem cosi = new CopyStateItem(this);
 
   public Map<Named, Named> getCopied() {
@@ -142,21 +138,15 @@ class CopyEvl extends NullTraverser<Evl, Void> {
   }
 
   @Override
-  protected Evl visitIfaceUse(IfaceUse obj, Void param) {
-    return new IfaceUse(obj.getInfo(), obj.getName(), obj.getLink()); // we keep link to old Interface
-  }
-
-  @Override
   protected Evl visitImplElementary(ImplElementary obj, Void param) {
     ImplElementary ret = new ImplElementary(obj.getInfo(), obj.getName());
 
-    ret.getIface(Direction.in).addAll(copy(obj.getIface(Direction.in).getList()));
-    ret.getIface(Direction.out).addAll(copy(obj.getIface(Direction.out).getList()));
+    ret.getInput().addAll(copy(obj.getInput().getList()));
+    ret.getOutput().addAll(copy(obj.getOutput().getList()));
     ret.getVariable().addAll(copy(obj.getVariable().getList()));
     ret.getConstant().addAll(copy(obj.getConstant().getList()));
     ret.getComponent().addAll(copy(obj.getComponent().getList()));
     ret.getInternalFunction().addAll(copy(obj.getInternalFunction().getList()));
-    ret.getInputFunc().addAll(copy(obj.getInputFunc().getList()));
     ret.getSubComCallback().addAll(copy(obj.getSubComCallback().getList()));
     ret.setEntryFunc(copy(obj.getEntryFunc()));
     ret.setExitFunc(copy(obj.getExitFunc()));
@@ -200,12 +190,12 @@ class CopyEvl extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitCaseOptValue(CaseOptValue obj, Void param) {
-    return new CaseOptValue(obj.getInfo(),copy(obj.getValue()));
+    return new CaseOptValue(obj.getInfo(), copy(obj.getValue()));
   }
 
   @Override
   protected Evl visitCaseOptRange(CaseOptRange obj, Void param) {
-    return new CaseOptRange(obj.getInfo(),copy(obj.getStart()),copy(obj.getEnd()));
+    return new CaseOptRange(obj.getInfo(), copy(obj.getStart()), copy(obj.getEnd()));
   }
 
 }

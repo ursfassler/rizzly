@@ -1,20 +1,10 @@
-
-interface
-  Tick
-    function tick();
-  end
-
-  Msg
-    function text( x: String );
-  end
-  
 component
   String1
     input
-      in  : Tick;
+      tick();
     
     output
-      out : Msg;
+      text( x: String );
     
   implementation elementary
     
@@ -25,11 +15,11 @@ component
       k := 0;
     end
     
-    function in.tick()
+    function tick()
       case k of
-        0: out.tick( 'Hello' ); end
-        1: out.tick( ' ' ); end
-        2: out.tick( 'World' ); end
+        0: text( 'Hello' ); end
+        1: text( ' ' ); end
+        2: text( 'World' ); end
       end
       k := (k + 1) mod 3;
     end

@@ -9,7 +9,7 @@ void _trap(){
 
 static R_0_100 next;
 
-void inst_out_foo(R_0_100 x){
+void inst_out(R_0_100 x){
   x = x % 0x7f;  //TODO generate header file which does this or find nice way to handle such cases
   printf( "%i\n", x );
   if( x != next ){
@@ -19,17 +19,19 @@ void inst_out_foo(R_0_100 x){
 }
 
 int main(){
-  inst__system_construct();
+  inst__construct();
 
   R_0_100 i;
   for( i = 0; i <= 100; i++ ){
     printf( "--> %i\n", i );
     next = i;
-    inst_in_foo( i );
+    inst_in( i );
     if( next != 0 ){
       return -1;
     }
   }
+  
+  inst__destruct();
   return 0;
 }
 

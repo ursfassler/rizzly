@@ -1,29 +1,24 @@
-interface
-  Tick
-    function tick( data: R{0,20} );
-  end
-
 component
   CalcCase
 
     input
-      in    : Tick;
+      in( data: R{0,20} );
 
     output
-      out   : Tick;
+      out( data: R{0,20} );
 
     implementation elementary
 
-    function in.tick( x: R{0,20} )
+    function in( x: R{0,20} )
       case x+2 of
         2..10:
-          out.tick( 2 );
+          out( 2 );
         end
         11:
-          out.tick( 3 );
+          out( 3 );
         end
         12..22:
-          out.tick( 4 );
+          out( 4 );
         end
       end
     end

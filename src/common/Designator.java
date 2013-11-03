@@ -43,10 +43,10 @@ public final class Designator implements Iterable<String> {
 
   public Designator(String prefix, Designator suffix) {
     this.name = new ArrayList<String>(suffix.name);
-    this.name.add(0,prefix);
+    this.name.add(0, prefix);
   }
 
-  public int size(){
+  public int size() {
     return name.size();
   }
 

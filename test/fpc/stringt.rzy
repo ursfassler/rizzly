@@ -2,25 +2,20 @@
 const
   Name : String = 'Hallo';
 
-interface
-  Iface
-    function foo( value: String );
-  end
-
 component
   Stringt
     input
-      in    : Iface;
+      in( value: String );
     
     output
-      out1   : Iface;
-      out2   : Iface;
+      out1( value: String );
+      out2( value: String );
 
     implementation elementary
 
-    function in.foo( value: String )
-      out1.foo( value );
-      out2.foo( Name );
+    function in( value: String )
+      out1( value );
+      out2( Name );
     end
     
   end

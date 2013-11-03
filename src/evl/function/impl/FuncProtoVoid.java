@@ -7,7 +7,7 @@ import evl.other.ListOfNamed;
 import evl.variable.FuncVariable;
 
 /**
- *
+ * 
  * @author urs
  */
 public class FuncProtoVoid extends FunctionBase {

@@ -1,13 +1,7 @@
 package evl.hfsm;
 
-import common.ElementInfo;
+import evl.Evl;
+import evl.other.Named;
 
-import evl.EvlBase;
-
-abstract public class StateItem extends EvlBase {
-
-  public StateItem(ElementInfo info) {
-    super(info);
-  }
-
+public interface StateItem extends Named, Evl {
 }

@@ -39,7 +39,7 @@ public class CArrayCopy extends StmtReplacer<Void> {
       rcall.getParameter().add(obj.getDst());
       rcall.getParameter().add(obj.getSrc());
       rcall.getParameter().add(new Number(size));
-      CallStmt call = new CallStmt(new Reference(memcpy,rcall));
+      CallStmt call = new CallStmt(new Reference(memcpy, rcall));
       return call;
     }
 

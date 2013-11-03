@@ -1,11 +1,8 @@
-import
-  tick;
-
 component
   StateVariable2
 
   input
-    tick    : Tick;
+    tick();
 
   implementation hfsm(A)
 
@@ -22,7 +19,7 @@ component
       end
       
       transition 
-        A to A by tick.tick() do
+        A to A by tick() do
           a := (a + 1) mod 256;
         end
     end

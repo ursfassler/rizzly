@@ -10,7 +10,7 @@ import evl.statement.Block;
 import evl.type.TypeRef;
 import evl.variable.FuncVariable;
 
-public class HfsmQueryFunction extends FunctionBase implements FuncWithReturn, FuncWithBody {
+public class HfsmQueryFunction extends FunctionBase implements StateItem, FuncWithReturn, FuncWithBody {
   private TypeRef ret = null;
   private Block body = null;
 

@@ -26,7 +26,7 @@ public class Renamer extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visit(Evl obj, Void param) {
-    if( obj instanceof Named ) {
+    if (obj instanceof Named) {
       rename((Named) obj);
     }
     return super.visit(obj, param);

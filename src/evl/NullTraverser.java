@@ -37,6 +37,10 @@ import evl.expression.reference.Reference;
 import evl.expression.unop.Not;
 import evl.expression.unop.Uminus;
 import evl.function.impl.FuncGlobal;
+import evl.function.impl.FuncIfaceInRet;
+import evl.function.impl.FuncIfaceInVoid;
+import evl.function.impl.FuncIfaceOutRet;
+import evl.function.impl.FuncIfaceOutVoid;
 import evl.function.impl.FuncInputHandlerEvent;
 import evl.function.impl.FuncInputHandlerQuery;
 import evl.function.impl.FuncPrivateRet;
@@ -47,14 +51,11 @@ import evl.function.impl.FuncSubHandlerEvent;
 import evl.function.impl.FuncSubHandlerQuery;
 import evl.hfsm.HfsmQueryFunction;
 import evl.hfsm.ImplHfsm;
-import evl.hfsm.QueryItem;
 import evl.hfsm.StateComposite;
 import evl.hfsm.StateSimple;
 import evl.hfsm.Transition;
 import evl.other.CompUse;
-import evl.other.IfaceUse;
 import evl.other.ImplElementary;
-import evl.other.Interface;
 import evl.other.Named;
 import evl.other.NamedList;
 import evl.other.Namespace;
@@ -88,7 +89,6 @@ import evl.type.composed.UnionSelector;
 import evl.type.composed.UnionType;
 import evl.type.special.ComponentType;
 import evl.type.special.IntegerType;
-import evl.type.special.InterfaceType;
 import evl.type.special.NaturalType;
 import evl.type.special.PointerType;
 import evl.type.special.VoidType;
@@ -100,6 +100,26 @@ import evl.variable.StateVariable;
 abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   abstract protected R visitDefault(Evl obj, P param);
+
+  @Override
+  protected R visitFuncIfaceOutVoid(FuncIfaceOutVoid obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitFuncIfaceOutRet(FuncIfaceOutRet obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitFuncIfaceInVoid(FuncIfaceInVoid obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitFuncIfaceInRet(FuncIfaceInRet obj, P param) {
+    return visitDefault(obj, param);
+  }
 
   @Override
   protected R visitBitAnd(BitAnd obj, P param) {
@@ -173,11 +193,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitImplElementary(ImplElementary obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitInterface(Interface obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -257,11 +272,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitIfaceUse(IfaceUse obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
   protected R visitFuncVariable(FuncVariable obj, P param) {
     return visitDefault(obj, param);
   }
@@ -303,11 +313,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitHfsmQueryFunction(HfsmQueryFunction obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitQueryItem(QueryItem obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -378,11 +383,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitEndpointSub(EndpointSub obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitInterfaceType(InterfaceType obj, P param) {
     return visitDefault(obj, param);
   }
 

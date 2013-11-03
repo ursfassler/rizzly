@@ -9,19 +9,14 @@ function narrow{low,high:Integer}( x: R{-1000,10000} ):R{low,high}
 end
 
 
-interface
-  Tick
-    function tack( x: R{0,20} ):R{0,10};
-  end
-  
 component
   TemplFunc
     input
-      in  : Tick;
+      in( x: R{0,20} ):R{0,10};
     
     implementation elementary
     
-    function in.tack( x: R{0,20} ):R{0,10}
+    function in( x: R{0,20} ):R{0,10}
       return narrow{0,10}( x );
     end
 

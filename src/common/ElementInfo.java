@@ -37,10 +37,10 @@ public class ElementInfo {
     return metadata;
   }
 
-  public ArrayList<Metadata> getMetadata( String filterKey ) {
+  public ArrayList<Metadata> getMetadata(String filterKey) {
     ArrayList<Metadata> ret = new ArrayList<Metadata>();
-    for( Metadata itr : metadata ){
-      if( itr.getKey().equals(filterKey) ){
+    for (Metadata itr : metadata) {
+      if (itr.getKey().equals(filterKey)) {
         ret.add(itr);
       }
     }

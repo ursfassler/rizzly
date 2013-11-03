@@ -27,13 +27,11 @@ import fun.function.impl.FuncPrivateVoid;
 import fun.function.impl.FuncProtRet;
 import fun.function.impl.FuncProtVoid;
 import fun.hfsm.ImplHfsm;
-import fun.hfsm.QueryItem;
 import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
 import fun.other.Generator;
 import fun.other.ImplElementary;
-import fun.other.Interface;
 import fun.other.ListOfNamed;
 import fun.other.Named;
 import fun.other.Namespace;
@@ -76,7 +74,6 @@ import fun.variable.CompUse;
 import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
 import fun.variable.FuncVariable;
-import fun.variable.IfaceUse;
 import fun.variable.StateVariable;
 import fun.variable.TemplateParameter;
 
@@ -91,7 +88,6 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
   protected R visitRizzlyFile(RizzlyFile obj, P param) {
     visitList(obj.getCompfunc(), param);
     visitList(obj.getType(), param);
-    visitList(obj.getIface(), param);
     visitList(obj.getComp(), param);
     visitList(obj.getConstant(), param);
     visitList(obj.getFunction(), param);
@@ -128,12 +124,6 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
     visitList(obj.getIface(Direction.out), param);
 
     visit(obj.getTopstate(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitInterface(Interface obj, P param) {
-    visitList(obj.getPrototype(), param);
     return null;
   }
 
@@ -272,8 +262,8 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitEnumElement(EnumElement obj, P param) {
-    visit(obj.getType(),param);
-    visit(obj.getDef(),param);
+    visit(obj.getType(), param);
+    visit(obj.getDef(), param);
     return null;
   }
 
@@ -301,12 +291,6 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitTypeAlias(TypeAlias obj, P param) {
     visit(obj.getRef(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitIfaceUse(IfaceUse obj, P param) {
-    visit(obj.getType(), param);
     return null;
   }
 
@@ -463,16 +447,14 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
     visit(obj.getEntryFuncRef(), param);
     visit(obj.getExitFuncRef(), param);
     visitItr(obj.getVariable(), param);
-    visitItr(obj.getBfunc(), param);
-    visitItr(obj.getItem(), param);
+    visitItr(obj.getItemList(), param);
     return null;
   }
 
   @Override
   protected R visitStateComposite(StateComposite obj, P param) {
     visitItr(obj.getVariable(), param);
-    visitItr(obj.getBfunc(), param);
-    visitItr(obj.getItem(), param);
+    visitItr(obj.getItemList(), param);
     visit(obj.getInitial(), param);
     visit(obj.getEntryFuncRef(), param);
     visit(obj.getExitFuncRef(), param);
@@ -487,12 +469,6 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
     visitItr(obj.getParam(), param);
     visit(obj.getGuard(), param);
     visit(obj.getBody(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitQueryItem(QueryItem obj, P param) {
-    visit(obj.getFunc(), param);
     return null;
   }
 

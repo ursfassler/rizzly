@@ -10,7 +10,7 @@ import fun.statement.Block;
 
 /**
  * Function inside a component. It may be not pure and can therefore not be executed at compile time.
- *
+ * 
  * @author urs
  */
 public class FuncPrivateRet extends FunctionHeader implements FuncWithBody, FuncWithReturn {

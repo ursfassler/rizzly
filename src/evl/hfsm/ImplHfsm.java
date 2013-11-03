@@ -12,12 +12,12 @@ public class ImplHfsm extends Component {
   }
 
   public StateComposite getTopstate() {
-    assert(topstate != null);
+    assert (topstate != null);
     return topstate;
   }
 
   public void setTopstate(StateComposite topstate) {
-    assert(topstate != null);
+    assert (topstate != null);
     this.topstate = topstate;
   }
 

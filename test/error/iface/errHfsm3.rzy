@@ -1,0 +1,21 @@
+component
+  ErrHfsm3
+    input
+      funcA();
+      funcB();
+
+    implementation hfsm( One )
+    
+    state One
+    end
+    
+    function funcC()
+    end
+    
+    transition 
+      One to One by funcA();
+      One to One by funcB();
+      One to One by funcC();
+    
+  end
+

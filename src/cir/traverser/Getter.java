@@ -6,7 +6,6 @@ import java.util.List;
 import cir.CirBase;
 import cir.DefTraverser;
 
-
 public class Getter<R, T> extends DefTraverser<Void, T> {
   private List<R> list = new ArrayList<R>();
 

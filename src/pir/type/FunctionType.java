@@ -2,13 +2,12 @@ package pir.type;
 
 import java.util.List;
 
-
 public class FunctionType extends Type {
   final private List<TypeRef> arg;
   final private TypeRef ret;
 
   public FunctionType(List<TypeRef> arg, TypeRef ret) {
-    super(makeName(arg,ret));
+    super(makeName(arg, ret));
     this.arg = arg;
     this.ret = ret;
   }

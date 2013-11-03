@@ -4,36 +4,27 @@ type
     y : R{0,1000};
   end
 
-interface
-  Iface1
-    function foo( x, y: R{0,1000} );
-  end
-
-  Iface2
-    function foo( x: Point );
-  end
-  
 component
   Structt
     input
-      in1  : Iface1;
-      in2  : Iface2;
+      in1( x, y: R{0,1000} );
+      in2( x: Point );
     
     output
-      out1 : Iface2;
-      out2 : Iface1;
+      out1( x: Point );
+      out2( x, y: R{0,1000} );
 
     implementation elementary
     
-    function in1.foo( x, y: R{0,1000} )
+    function in1( x, y: R{0,1000} )
       p : Point;
       p.x := x;
       p.y := y;
-      out1.foo( p );
+      out1( p );
     end
     
-    function in2.foo( p: Point )
-      out2.foo( p.x, p.y );
+    function in2( p: Point )
+      out2( p.x, p.y );
     end
 
   end

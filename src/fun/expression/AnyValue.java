@@ -14,6 +14,4 @@ public class AnyValue extends Expression {
     return NAME;
   }
 
-
-
 }

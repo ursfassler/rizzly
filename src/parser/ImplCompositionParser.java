@@ -32,7 +32,7 @@ public class ImplCompositionParser extends ImplBaseParser {
     ElementInfo info = expect(TokenType.COMPOSITION).getInfo();
     ArrayList<Metadata> meta = getMetadata();
     info.getMetadata().addAll(meta);
-    ImplComposition comp = new ImplComposition(name.getInfo(),name.getData());
+    ImplComposition comp = new ImplComposition(name.getInfo(), name.getData());
 
     while (true) {
       switch (peek().getType()) {

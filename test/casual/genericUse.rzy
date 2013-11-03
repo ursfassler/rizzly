@@ -8,8 +8,8 @@ component
       gen : GenericDef{R{0,255}};
 
     function foo()
-      gen.in.set( 42 );
-      a : R{0,255} = gen.in.get();
+      gen.set( 42 );
+      a : R{0,255} = gen.get();
     end
   end
 

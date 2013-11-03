@@ -22,15 +22,15 @@ public class IfCutter extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitIfStmt(IfStmt obj, Void param) {
-    if( obj.getOption().size() > 1 ){
+    if (obj.getOption().size() > 1) {
       int optcount = obj.getOption().size();
       IfOption first = obj.getOption().get(0);
       List<IfOption> opt = new ArrayList<IfOption>(obj.getOption());
       obj.getOption().clear();
       obj.getOption().add(first);
       opt.remove(0);
-      assert( obj.getOption().size() + opt.size() == optcount );
-      
+      assert (obj.getOption().size() + opt.size() == optcount);
+
       IfStmt nif = new IfStmt(opt.get(0).getInfo(), opt, obj.getDefblock());
       Block newElse = new Block(obj.getInfo());
       newElse.getStatements().add(nif);

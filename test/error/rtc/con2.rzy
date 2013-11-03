@@ -1,28 +1,25 @@
 // error: loop in connection graph for sub
 
-interface
-  Tick
-    function tick;
-  end
-
 component
   Dummy
     input
-      in  : Tick;
+      in();
+      
     output
-      out : Tick;
+      out();
       
   implementation elementary
-    function in.tick
-      out.tick();
+    function in()
+      out();
     end
   end
 
   Con2
     input
-      in  : Tick;
+      in();
+      
     output
-      out : Tick;
+      out();
       
   implementation composition
     component

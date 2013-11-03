@@ -5,21 +5,20 @@ import java.util.List;
 
 import common.ElementInfo;
 
+import evl.EvlBase;
 import evl.expression.reference.Reference;
-import evl.function.FunctionBase;
+import evl.function.FunctionHeader;
 import evl.other.ListOfNamed;
-import evl.other.Named;
 import evl.variable.Variable;
 
-
-abstract public class State extends StateItem implements Named {
+abstract public class State extends EvlBase implements StateItem {
   public final static String TOPSTATE_NAME = "_top";
 
   private String name;
   private Reference entryFunc;
   private Reference exitFunc;
+  final private ListOfNamed<FunctionHeader> function = new ListOfNamed<FunctionHeader>();
   final private ListOfNamed<Variable> variable = new ListOfNamed<Variable>();
-  final private ListOfNamed<FunctionBase> function = new ListOfNamed<FunctionBase>();
   final protected List<StateItem> item = new ArrayList<StateItem>();
 
   public State(ElementInfo info, String name) {
@@ -39,7 +38,7 @@ abstract public class State extends StateItem implements Named {
     return variable;
   }
 
-  public ListOfNamed<FunctionBase> getFunction() {
+  public ListOfNamed<FunctionHeader> getFunction() {
     return function;
   }
 

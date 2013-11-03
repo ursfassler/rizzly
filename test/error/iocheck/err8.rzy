@@ -1,15 +1,9 @@
 // Error: transition guard is not allowed to write state
 
-
-interface
-  IfaceEvent
-    function event();
-  end
-  
 component
   Err8
     input
-      in  : IfaceEvent;
+      event();
     
     implementation hfsm(A)
     
@@ -20,7 +14,7 @@ component
       a := 0;
     end
     
-    function foo:Boolean
+    function foo():Boolean
       a := 42;
       return a > 10;
     end
@@ -28,7 +22,7 @@ component
     state A end
     state B end
     
-    transition A to B by in.event() if foo();
+    transition A to B by event() if foo();
     
   end
 

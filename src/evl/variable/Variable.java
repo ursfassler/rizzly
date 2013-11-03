@@ -44,6 +44,5 @@ abstract public class Variable extends EvlBase implements Named, Comparable<Vari
   public int compareTo(Variable o) {
     return getName().compareTo(o.getName());
   }
-  
-  
+
 }

@@ -6,7 +6,6 @@ import common.ElementInfo;
 
 import evl.type.TypeRef;
 
-
 final public class FunctionTypeVoid extends FunctionType {
   public FunctionTypeVoid(ElementInfo info, String name, List<TypeRef> arg) {
     super(info, name, arg);

@@ -10,17 +10,16 @@ import evl.NullTraverser;
 import evl.function.FunctionBase;
 import evl.function.impl.FuncPrivateRet;
 import evl.function.impl.FuncPrivateVoid;
+import evl.hfsm.HfsmQueryFunction;
 import evl.hfsm.ImplHfsm;
-import evl.hfsm.QueryItem;
 import evl.hfsm.State;
 import evl.hfsm.Transition;
 
-
 /**
  * Moves all functions of all states to the top-state.
- *
+ * 
  * @author urs
- *
+ * 
  */
 public class StateFuncUplifter extends NullTraverser<Void, Designator> {
   final private List<FunctionBase> func = new ArrayList<FunctionBase>();
@@ -52,7 +51,7 @@ public class StateFuncUplifter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitQueryItem(QueryItem obj, Designator param) {
+  protected Void visitHfsmQueryFunction(HfsmQueryFunction obj, Designator param) {
     return null;
   }
 

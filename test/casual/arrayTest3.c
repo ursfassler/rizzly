@@ -8,17 +8,20 @@ void _trap(){
 }
 
 int main(){
-  inst__system_construct();
+  inst__construct();
   
   R_0_31 i;
   for( i = 0; i < 32; i++ ){
-    R_0_31 v = inst_in_tick( i );
+    R_0_31 v = inst_in( i );
     
     printf( "%i <> %i\n", i % 8, v );
     if( i%8 != v ){
       return -1;
     }
   }
+  
+  inst__destruct();
+  
   return 0;
 }
 

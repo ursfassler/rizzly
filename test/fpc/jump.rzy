@@ -1,18 +1,13 @@
 //test ok
 
-interface
-  Tick
-    function tick();
-  end
-
 component
   Jump
 
   input
-    in      : Tick;
+    in();
   
   output
-    out     : Tick;
+    out();
     
   implementation hfsm(A)
     state A(X)
@@ -31,10 +26,10 @@ component
     end
     
     transition 
-      A to B by in.tick();
-      B to C by in.tick();
-      C to A by in.tick() do
-        out.tick();
+      A to B by in();
+      B to C by in();
+      C to A by in() do
+        out();
       end
         
   end

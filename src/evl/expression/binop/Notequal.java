@@ -5,7 +5,7 @@ import common.ElementInfo;
 import evl.expression.Expression;
 
 /**
- *
+ * 
  * @author urs
  */
 public class Notequal extends Relation {

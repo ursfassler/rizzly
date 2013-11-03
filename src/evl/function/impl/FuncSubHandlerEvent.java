@@ -9,7 +9,7 @@ import evl.statement.Block;
 import evl.variable.FuncVariable;
 
 /**
- *
+ * 
  * @author urs
  */
 public class FuncSubHandlerEvent extends FunctionBase implements FuncWithBody {

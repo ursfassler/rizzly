@@ -8,7 +8,7 @@ abstract public class UnaryExp extends Expression {
   public UnaryExp(Expression expr) {
     this.expr = expr;
   }
-  
+
   abstract public String getOpName();
 
   public Expression getExpr() {

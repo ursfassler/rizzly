@@ -124,7 +124,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitNamedElement(NamedElement obj, P param) {
-    visit(obj.getType(),param);
+    visit(obj.getType(), param);
     return null;
   }
 
@@ -164,7 +164,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitPointerType(PointerType obj, P param) {
-    visit(obj.getType(),param);
+    visit(obj.getType(), param);
     return null;
   }
 
@@ -229,7 +229,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitArrayType(ArrayType obj, P param) {
-    visit(obj.getType(),param);
+    visit(obj.getType(), param);
     return null;
   }
 

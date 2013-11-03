@@ -1,7 +1,7 @@
 package pir.type;
 
 /**
- *
+ * 
  * @author urs
  */
 public class PointerType extends Type {

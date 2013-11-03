@@ -45,7 +45,7 @@ final public class Range implements Iterable<BigInteger> {
   }
 
   public Iterator<BigInteger> iterator() {
-    return new RangeIterator( low, high );
+    return new RangeIterator(low, high);
   }
 
   @Override

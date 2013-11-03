@@ -6,7 +6,6 @@ import common.ElementInfo;
 
 import evl.expression.Expression;
 
-
 public class CaseStmt extends Statement {
   private Expression condition;
   private List<CaseOpt> option;

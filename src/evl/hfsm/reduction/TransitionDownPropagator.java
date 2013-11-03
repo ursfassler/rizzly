@@ -20,8 +20,8 @@ import evl.expression.reference.RefItem;
 import evl.expression.reference.Reference;
 import evl.function.FuncWithBody;
 import evl.function.impl.FuncPrivateVoid;
+import evl.hfsm.HfsmQueryFunction;
 import evl.hfsm.ImplHfsm;
-import evl.hfsm.QueryItem;
 import evl.hfsm.State;
 import evl.hfsm.StateComposite;
 import evl.hfsm.StateItem;
@@ -38,9 +38,9 @@ import evl.variable.Variable;
 
 /**
  * adds transitions to the children until leaf states also adds calls to exit and entry function
- *
+ * 
  * @author urs
- *
+ * 
  */
 public class TransitionDownPropagator extends NullTraverser<Void, TransitionParam> {
 
@@ -64,10 +64,10 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
     TransitionEndpointCollector tec = new TransitionEndpointCollector();
     tec.traverse(hfsm.getTopstate(), null);
 
-    assert ( tec.getTdst().size() == tec.getTsrc().size() );
-    assert ( tec.getTdst().size() == tec.getTtop().size() );
+    assert (tec.getTdst().size() == tec.getTsrc().size());
+    assert (tec.getTdst().size() == tec.getTtop().size());
     Map<Transition, FuncPrivateVoid> tfunc = new HashMap<Transition, FuncPrivateVoid>();
-    for( Transition trans : tec.getTdst().keySet() ) {
+    for (Transition trans : tec.getTdst().keySet()) {
       FuncPrivateVoid func = makeTransBodyFunc(trans);
       hfsm.getTopstate().getFunction().add(func);
       tfunc.put(trans, func);
@@ -85,9 +85,9 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
     FuncPrivateVoid func = new FuncPrivateVoid(info, trans.getName() + Designator.NAME_SEP + "transFunc", new ListOfNamed<FuncVariable>(params));
     func.setBody(trans.getBody());
     trans.setBody(new Block(info));
-    
+
     HfsmReduction.relinkActualParameterRef(trans.getParam(), func.getParam().getList(), func.getBody());
-    
+
     return func;
   }
 
@@ -104,15 +104,15 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
     filter(obj, param.before);
     filter(obj, param.after);
 
-    for( Transition trans : param.before ) {
+    for (Transition trans : param.before) {
       addTrans(obj, trans);
     }
-    for( Transition trans : transList ) {
+    for (Transition trans : transList) {
       trans.setSrc(obj);
-//      obj.getItem().add(trans);
+      // obj.getItem().add(trans);
       addTrans(obj, trans);
     }
-    for( Transition trans : param.after ) {
+    for (Transition trans : param.after) {
       addTrans(obj, trans);
     }
     return null;
@@ -120,21 +120,21 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
 
   private void addTrans(StateSimple src, Transition otrans) {
     State os = ttop.get(otrans);
-    assert ( os != null );
+    assert (os != null);
     State dst = tdst.get(otrans);
-    assert ( dst != null );
+    assert (dst != null);
     Transition trans = Copy.copy(otrans);
-    trans.setName( trans.getName() + Designator.NAME_SEP + src.getName() );  // make name unique
+    trans.setName(trans.getName() + Designator.NAME_SEP + src.getName()); // make name unique
     trans.setSrc(src);
 
     makeExitCalls(src, os, trans.getBody().getStatements());
     {
       FuncPrivateVoid func = tfunc.get(otrans);
-      assert ( func != null );
+      assert (func != null);
       Reference ref = new Reference(info, func);
 
       ArrayList<Expression> param = new ArrayList<Expression>();
-      for( Variable acpar : trans.getParam() ) {
+      for (Variable acpar : trans.getParam()) {
         Reference parref = new Reference(info, acpar);
         param.add(parref);
       }
@@ -149,11 +149,11 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
   }
 
   private void makeEntryCalls(State start, State top, List<Statement> list) {
-    if( start == top ) {
+    if (start == top) {
       return;
     }
     StateComposite par = getParent(start);
-    assert ( par != null );
+    assert (par != null);
 
     makeEntryCalls(par, top, list);
     list.add(makeCall(start.getEntryFunc()));
@@ -161,7 +161,7 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
 
   private StateComposite getParent(State start) {
     Evl parent = kp.getParent(start);
-    if( parent instanceof StateComposite ) {
+    if (parent instanceof StateComposite) {
       return (StateComposite) parent;
     } else {
       return null;
@@ -169,28 +169,28 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
   }
 
   private void makeExitCalls(State start, State top, List<Statement> list) {
-    if( start == top ) {
+    if (start == top) {
       return;
     }
     StateComposite par = getParent(start);
-    assert ( par != null );
+    assert (par != null);
 
     list.add(makeCall(start.getExitFunc()));
     makeExitCalls(par, top, list);
   }
 
   private CallStmt makeCall(Reference reference) {
-    assert ( reference.getLink() instanceof FuncWithBody );
-    assert ( reference.getOffset().isEmpty() );
+    assert (reference.getLink() instanceof FuncWithBody);
+    assert (reference.getOffset().isEmpty());
     Reference ref = new Reference(info, reference.getLink(), new ArrayList<RefItem>());
     ref.getOffset().add(new RefCall(info, new ArrayList<Expression>()));
     return new CallStmt(info, ref);
   }
 
   private boolean isChildState(State test, State root) {
-    if( test == null ) {
+    if (test == null) {
       return false;
-    } else if( test == root ) {
+    } else if (test == root) {
       return true;
     } else {
       return isChildState(getParent(test), root);
@@ -202,7 +202,7 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
     /*
      * for all states in obj.getItem() we want to know, which transitions are before and which ones are after the
      * specific state.
-     *
+     * 
      * the map spos contains the position of the state in the transition array
      */
 
@@ -210,15 +210,15 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
     ArrayList<Transition> transList = new ArrayList<Transition>();
     ArrayList<State> stateList = new ArrayList<State>();
 
-    for( StateItem itr : obj.getItem() ) {
-      if( itr instanceof Transition ) {
+    for (StateItem itr : obj.getItem()) {
+      if (itr instanceof Transition) {
         Transition trans = (Transition) itr;
         transList.add(trans);
-      } else if( itr instanceof State ) {
+      } else if (itr instanceof State) {
         spos.put((State) itr, transList.size());
         stateList.add((State) itr);
       } else {
-        assert ( itr instanceof QueryItem );
+        assert (itr instanceof HfsmQueryFunction);
       }
     }
 
@@ -226,7 +226,7 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
 
     // build parameter for every substate
     Map<State, TransitionParam> spar = new HashMap<State, TransitionParam>();
-    for( State itr : stateList ) {
+    for (State itr : stateList) {
       int idx = spos.get(itr);
 
       TransitionParam cpar = new TransitionParam(param);
@@ -236,7 +236,7 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
       spar.put(itr, cpar);
     }
 
-    for( State itr : stateList ) {
+    for (State itr : stateList) {
       visit(itr, spar.get(itr));
     }
 
@@ -246,8 +246,8 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
   // removes transitions which does not come from this state or a parent of it
   private void filter(State state, List<Transition> list) {
     Set<Transition> remove = new HashSet<Transition>();
-    for( Transition trans : list ) {
-      if( !isChildState(state, tsrc.get(trans)) ) {
+    for (Transition trans : list) {
+      if (!isChildState(state, tsrc.get(trans))) {
         remove.add(trans);
       }
     }
@@ -291,7 +291,7 @@ class TransitionEndpointCollector extends NullTraverser<Void, State> {
   }
 
   @Override
-  protected Void visitQueryItem(QueryItem obj, State param) {
+  protected Void visitHfsmQueryFunction(HfsmQueryFunction obj, State param) {
     return null;
   }
 

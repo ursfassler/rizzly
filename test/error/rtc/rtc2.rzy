@@ -1,44 +1,41 @@
 // error: loop in connection graph for sub
 
-interface
-  Tick
-    function tick;
-  end
-
 component
   Dummy
     input
-      in  : Tick;
+      in();
+      
     output
-      out : Tick;
+      out();
       
   implementation elementary
-    function in.tick
-      out.tick();
+    function in()
+      out();
     end
   end
 
   Rtc2
     input
-      in  : Tick;
+      in();
+      
     output
-      out : Tick;
+      out();
       
   implementation elementary
     component
       sub1 : Dummy;
       sub2 : Dummy;
       
-    function in.tick
-      out.tick();   //surpress errors or warnings about unused stuff
+    function in()
+      out();   //surpress errors or warnings about unused stuff
     end
     
-    function sub1.out.tick
-      sub2.in.tick();
+    function sub1.out()
+      sub2.in();
     end
 
-    function sub2.out.tick
-      sub1.in.tick();
+    function sub2.out()
+      sub1.in();
     end
     
   end

@@ -6,7 +6,7 @@ import java.util.List;
 import common.ElementInfo;
 
 /**
- *
+ * 
  * @author urs
  */
 public class IfStmt extends Statement {

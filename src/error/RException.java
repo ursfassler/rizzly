@@ -10,7 +10,7 @@ public class RException extends RuntimeException {
   final private String msg;
 
   public RException(ErrorType type, String filename, int line, int col, String msg) {
-    super( mktxt(type, filename, line, col, msg) );
+    super(mktxt(type, filename, line, col, msg));
     this.type = type;
     this.filename = filename;
     this.line = line;

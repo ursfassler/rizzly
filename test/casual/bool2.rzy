@@ -1,23 +1,18 @@
-interface
-  Tick
-    function tick( x: R{0,50} );
-  end
-
 component
   Bool2
     input
-      tickIn  : Tick;
+      tickIn( x: R{0,50} );
     
     output
-      tickOut : Tick;
+      tickOut( x: R{0,50} );
       
     implementation elementary
 
-    function tickIn.tick( x: R{0,50} )
+    function tickIn( x: R{0,50} )
       if (x = 0) = False then
-        tickOut.tick( 7 );
+        tickOut( 7 );
       else
-        tickOut.tick( 8 );
+        tickOut( 8 );
       end
     end
 

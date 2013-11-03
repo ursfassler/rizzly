@@ -4,37 +4,32 @@ type
     word  : R{0,65535};
   end
 
-interface
-  Data
-    function setByte( value: R{0,255} );
-    function getByte:R{0,255};
-    function setWord( value: R{0,65535} );
-    function getWord:R{0,65535};
-  end
-
 component
   Union1
     input
-      in  : Data;
+      setByte( value: R{0,255} );
+      getByte():R{0,255};
+      setWord( value: R{0,65535} );
+      getWord():R{0,65535};
 
     implementation elementary
 
     var
       data : Uni;
 
-    function in.setByte( value: R{0,255} )
+    function setByte( value: R{0,255} )
       data.byte := value;
     end
     
-    function in.getByte:R{0,255}
+    function getByte():R{0,255}
       return data.byte;
     end
     
-    function in.setWord( value: R{0,65535} )
+    function setWord( value: R{0,65535} )
       data.word := value;
     end
     
-    function in.getWord:R{0,65535}
+    function getWord():R{0,65535}
       return data.word;
     end
 

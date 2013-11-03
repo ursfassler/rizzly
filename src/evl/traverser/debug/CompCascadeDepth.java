@@ -46,8 +46,8 @@ public class CompCascadeDepth extends NullTraverser<Integer, Void> {
 
   @Override
   protected Integer visitReference(Reference obj, Void param) {
-    assert( obj.getOffset().isEmpty() );
-    return visit( obj.getLink(), param );
+    assert (obj.getOffset().isEmpty());
+    return visit(obj.getLink(), param);
   }
 
 }

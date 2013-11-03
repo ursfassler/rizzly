@@ -1,17 +1,11 @@
-
-interface
-  Tick
-    function tick( x: R{0,10} ):R{0,3};
-  end
-  
 component
   Range3
     input
-      in  : Tick;
+      in( x: R{0,10} ):R{0,3};
     
     implementation elementary
     
-    function in.tick( x: R{0,10} ):R{0,3}
+    function in( x: R{0,10} ):R{0,3}
       if (x > 3) and (x <= 7) then
         return R{0,3}( x - 4 );
       ef x > 9 then

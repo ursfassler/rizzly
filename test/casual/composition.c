@@ -14,35 +14,35 @@ typedef enum {
 typedef struct {
   What  what;
   int   size;
-  char* path[3];
+  char* path[2];
 } Step;
 
 static const Step events[NUM_STEP] = {
-  { DBG_RECV, 2, {"_system",  "construct",  NULL  } },
-  { DBG_RECV, 3, {"a",        "_system",    "construct" } },
-  { DBG_RECV, 3, {"b",        "_system",    "construct" } },
-  { DBG_RECV, 3, {"c" ,       "_system",    "construct" } },
+  { DBG_RECV, 1, {"_construct",  NULL  } },
+  { DBG_RECV, 2, {"a", "_construct" } },
+  { DBG_RECV, 2, {"b", "_construct" } },
+  { DBG_RECV, 2, {"c", "_construct" } },
 
-  { DBG_RECV, 2, {"in",   "foo",  NULL  } },
-  { DBG_RECV, 3, {"a",    "in",   "foo" } },
-  { DBG_SEND, 3, {"a",    "out",  "foo" } },
-  { DBG_RECV, 3, {"b" ,   "in",   "foo" } },
-  { DBG_SEND, 3, {"b",    "out",  "foo" } },
-  { DBG_SEND, 2, {"out",  "foo",  NULL  } },
-  { RECV,     0, {NULL,   NULL,   NULL  } },
-  { DBG_RECV, 3, {"c",    "in",   "foo" } },
-  { DBG_SEND, 3, {"c",    "out",  "foo" } },
-  { DBG_SEND, 2, {"out",  "foo",  NULL  } },
-  { RECV,     0, {NULL,   NULL,   NULL  } },
-  { DBG_RECV, 3, {"b",    "in",   "foo" } },
-  { DBG_SEND, 3, {"b",    "out",  "foo" } },
-  { DBG_SEND, 2, {"out",  "foo",  NULL  } },
-  { RECV,     0, {NULL,   NULL,   NULL  } },
+  { DBG_RECV, 1, {"in", NULL  } },
+  { DBG_RECV, 2, {"a", "in" } },
+  { DBG_SEND, 2, {"a", "out" } },
+  { DBG_RECV, 2, {"b", "in" } },
+  { DBG_SEND, 2, {"b", "out" } },
+  { DBG_SEND, 1, {"out", NULL } },
+  { RECV,     0, {NULL, NULL } },
+  { DBG_RECV, 2, {"c", "in" } },
+  { DBG_SEND, 2, {"c", "out" } },
+  { DBG_SEND, 1, {"out", NULL } },
+  { RECV,     0, {NULL, NULL } },
+  { DBG_RECV, 2, {"b", "in" } },
+  { DBG_SEND, 2, {"b", "out" } },
+  { DBG_SEND, 1, {"out", NULL } },
+  { RECV,     0, {NULL, NULL } },
 
-  { DBG_RECV, 2, {"_system",  "destruct",   NULL  } },
-  { DBG_RECV, 3, {"c",        "_system",    "destruct" } },
-  { DBG_RECV, 3, {"b",        "_system",    "destruct" } },
-  { DBG_RECV, 3, {"a" ,       "_system",    "destruct" } }
+  { DBG_RECV, 1, {"_destruct",   NULL  } },
+  { DBG_RECV, 2, {"c",        "_destruct" } },
+  { DBG_RECV, 2, {"b",        "_destruct" } },
+  { DBG_RECV, 2, {"a" ,       "_destruct" } }
 };
 
 static int step = 0;
@@ -107,25 +107,25 @@ static void checkStep( What what, uint8_t *list, int size ){
   printf( "\n" );
 }
 
-void inst__debug_msgSend(Array_4_R_0_8 sender, R_0_3 size){
+void inst__msgSend(Array_4_R_0_6 sender, R_0_3 size){
   checkStep( DBG_SEND, sender, size );
 }
 
-void inst__debug_msgRecv(Array_4_R_0_8 receiver, R_0_3 size){
+void inst__msgRecv(Array_4_R_0_6 receiver, R_0_3 size){
   checkStep( DBG_RECV, receiver, size );
 }
 
-void inst_out_foo(){
+void inst_out(){
   checkStep( RECV, NULL, 0 );
 }
 
 int main(){
-  inst__system_construct();
+  inst__construct();
 
-  printf( "send message :in.foo\n" );
-  inst_in_foo();
+  printf( "send message :in\n" );
+  inst_in();
   
-  inst__system_destruct();
+  inst__destruct();
 
   return error;
 }

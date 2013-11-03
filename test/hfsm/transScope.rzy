@@ -1,17 +1,11 @@
-
-interface
-  Iface
-    function tick();
-  end
-  
 component
   TransScope
     input
-      in : Iface;
+      in();
       
     output
-      outA  : Iface;
-      outB  : Iface;
+      outA();
+      outB();
     
   implementation hfsm( A )
     var
@@ -22,8 +16,8 @@ component
     end
   
     transition
-      A to B by in.tick() if a = 0;   // guard is evaluated in the scope of the source state
-      B to A by in.tick() if a = 0;
+      A to B by in() if a = 0;   // guard is evaluated in the scope of the source state
+      B to A by in() if a = 0;
   
     state A
       var
@@ -31,11 +25,11 @@ component
         
       entry
         a := 4;
-        outA.tick();
+        outA();
       end
       
       transition
-        A to A by in.tick() if a > 0 do
+        A to A by in() if a > 0 do
           a := R{0,4}( a - 1 );
         end
     end
@@ -43,14 +37,14 @@ component
     state B
       entry
         a := 2;
-        outB.tick();
+        outB();
       end
       
       var
         a : R{0,2};
         
       transition
-        B to B by in.tick() if a > 0 do
+        B to B by in() if a > 0 do
           a := R{0,2}( a - 1 );
         end
     end

@@ -1,15 +1,9 @@
 // Error: query is not allowed to write state
 
-
-interface
-  IfaceQuerry
-    function query():R{0,100};
-  end
-  
 component
   Err6
     input
-      in  : IfaceQuerry;
+      query():R{0,100};
     
     implementation elementary
     
@@ -28,7 +22,7 @@ component
       bar();
     end
     
-    function in.query():R{0,100}
+    function query():R{0,100}
       foo();
       return a;
     end

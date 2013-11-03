@@ -12,7 +12,7 @@ import error.ErrorType;
 import error.RError;
 
 /**
- *
+ * 
  * @author urs
  */
 public class Scanner implements PeekReader<Token> {
@@ -23,7 +23,6 @@ public class Scanner implements PeekReader<Token> {
   private ArrayList<Metadata> metadata = new ArrayList<Metadata>();
 
   {
-    keywords.put("interface", TokenType.INTERFACE);
     keywords.put("component", TokenType.COMPONENT);
     keywords.put("connection", TokenType.CONNECTION);
     keywords.put("implementation", TokenType.IMPLEMENTATION);
@@ -222,7 +221,7 @@ public class Scanner implements PeekReader<Token> {
         return null;
       }
       num = num.multiply(BigInteger.TEN);
-      num = num.add( BigInteger.valueOf(reader.next().sym - '0') );
+      num = num.add(BigInteger.valueOf(reader.next().sym - '0'));
     }
     Token res = token(TokenType.NUMBER, num, sym);
     return res;

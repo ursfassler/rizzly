@@ -6,7 +6,6 @@ import java.util.List;
 import util.Range;
 import cir.CirBase;
 
-
 public class CaseEntry extends CirBase {
   final private List<Range> values;
   private Statement code;

@@ -3,7 +3,7 @@ package metadata.parser;
 import common.ElementInfo;
 
 /**
- *
+ * 
  * @author urs
  */
 public class Token {
@@ -40,7 +40,8 @@ public class Token {
   @Override
   public String toString() {
     switch (type) {
-    case IDENTIFIER: case STRING:
+    case IDENTIFIER:
+    case STRING:
       return type + "(" + data + ")";
     default:
       return type.toString();

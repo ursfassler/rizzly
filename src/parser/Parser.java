@@ -9,7 +9,7 @@ import error.ErrorType;
 import error.RError;
 
 /**
- *
+ * 
  * @author urs
  */
 public abstract class Parser {

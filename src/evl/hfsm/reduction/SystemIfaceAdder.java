@@ -4,25 +4,25 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import common.Direction;
+import common.Designator;
 import common.ElementInfo;
 
 import evl.Evl;
 import evl.NullTraverser;
 import evl.composition.ImplComposition;
+import evl.copy.Copy;
 import evl.expression.Expression;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
 import evl.function.FunctionBase;
+import evl.function.impl.FuncIfaceInVoid;
 import evl.function.impl.FuncInputHandlerEvent;
 import evl.hfsm.ImplHfsm;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
 import evl.other.CompUse;
-import evl.other.IfaceUse;
 import evl.other.ImplElementary;
-import evl.other.Interface;
 import evl.other.ListOfNamed;
 import evl.other.Namespace;
 import evl.statement.Block;
@@ -32,20 +32,26 @@ import evl.variable.FuncVariable;
 
 public class SystemIfaceAdder extends NullTraverser<Void, Void> {
 
+  @Deprecated
   public static final String IFACE_USE_NAME = "_system";
+  @Deprecated
   public static final String IFACE_TYPE_NAME = "_System";
-  public static final String DESTRUCT = "destruct";
-  public static final String CONSTRUCT = "construct";
+  public static final String DESTRUCT = Designator.NAME_SEP + "destruct";
+  public static final String CONSTRUCT = Designator.NAME_SEP + "construct";
+  final private FuncIfaceInVoid sendFunc;
+  final private FuncIfaceInVoid recvFunc;
   static private ElementInfo info = new ElementInfo();
   private KnowBaseItem kbi;
 
-  public SystemIfaceAdder(KnowledgeBase kb) {
+  public SystemIfaceAdder(FuncIfaceInVoid sendFunc, FuncIfaceInVoid recvFunc, KnowledgeBase kb) {
     super();
+    this.sendFunc = sendFunc;
+    this.recvFunc = recvFunc;
     kbi = kb.getEntry(KnowBaseItem.class);
   }
 
-  public static void process(Evl obj, KnowledgeBase kb) {
-    SystemIfaceAdder reduction = new SystemIfaceAdder(kb);
+  public static void process(FuncIfaceInVoid sendFunc, FuncIfaceInVoid recvFunc, Evl obj, KnowledgeBase kb) {
+    SystemIfaceAdder reduction = new SystemIfaceAdder(sendFunc, recvFunc, kb);
     reduction.traverse(obj, null);
   }
 
@@ -74,9 +80,10 @@ public class SystemIfaceAdder extends NullTraverser<Void, Void> {
   @Override
   protected Void visitImplElementary(ImplElementary obj, Void param) {
     { // add iface
-      Interface iface = kbi.get(Interface.class, IFACE_TYPE_NAME);
-      IfaceUse debIface = new IfaceUse(info, IFACE_USE_NAME, iface);
-      obj.getIface(Direction.in).add(debIface);
+      FuncIfaceInVoid recv = Copy.copy(recvFunc);
+      FuncIfaceInVoid send = Copy.copy(sendFunc);
+      obj.getInput().add(recv);
+      obj.getInput().add(send);
     }
 
     ArrayList<CompUse> compList = new ArrayList<CompUse>(obj.getComponent().getList());
@@ -109,7 +116,7 @@ public class SystemIfaceAdder extends NullTraverser<Void, Void> {
     }
 
     List<String> ns = new ArrayList<String>();
-    ns.add(IFACE_USE_NAME);
+    // ns.add(IFACE_USE_NAME);
     obj.addFunction(ns, ctor);
     obj.addFunction(ns, dtor);
 
@@ -133,7 +140,7 @@ public class SystemIfaceAdder extends NullTraverser<Void, Void> {
 
   private CallStmt makeCall(CompUse self, String funcname) {
     Reference fref = new Reference(info, self);
-    fref.getOffset().add(new RefName(info, IFACE_USE_NAME));
+    // fref.getOffset().add(new RefName(info, IFACE_USE_NAME));
     fref.getOffset().add(new RefName(info, funcname));
     fref.getOffset().add(new RefCall(info, new ArrayList<Expression>()));
     return new CallStmt(info, fref);

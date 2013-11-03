@@ -9,7 +9,6 @@ import evl.other.CompUse;
 import evl.other.Component;
 import evl.other.ListOfNamed;
 
-
 public class ImplComposition extends Component {
   final private ListOfNamed<CompUse> component = new ListOfNamed<CompUse>();
   final private List<Connection> connection = new ArrayList<Connection>();

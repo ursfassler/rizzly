@@ -5,7 +5,7 @@ import common.ElementInfo;
 import evl.expression.Expression;
 
 /**
- *
+ * 
  * @author urs
  */
 abstract public class BinaryExp extends Expression {
@@ -20,7 +20,7 @@ abstract public class BinaryExp extends Expression {
   }
 
   abstract public String getOpName();
-  
+
   public Expression getLeft() {
     return left;
   }

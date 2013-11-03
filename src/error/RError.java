@@ -7,7 +7,7 @@ import common.ElementInfo;
 //TODO don't directly throw errors, let user ask if an fatal error occurred in order to finish a check
 
 /**
- *
+ * 
  * @author urs
  */
 public class RError {

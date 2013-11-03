@@ -36,6 +36,7 @@ public class XmlWriter implements Writer {
 
   /**
    * Write a comment
+   * 
    * @param text
    */
   public void wc(String text) {
@@ -49,6 +50,7 @@ public class XmlWriter implements Writer {
 
   /**
    * Write a keyword
+   * 
    * @param s
    */
   public void kw(String s) {
@@ -85,7 +87,7 @@ public class XmlWriter implements Writer {
       root.appendChild(doc.createElement("br"));
       newlines++;
     } else {
-//      assert (newlines == 0); // only for debugging
+      // assert (newlines == 0); // only for debugging
     }
   }
 

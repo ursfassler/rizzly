@@ -3,14 +3,16 @@
 #include  <stdlib.h>
 #include  "output/inst.h"
 
-void inst_tickOut_tick(){
+void inst_tickOut(){
 }
 
 int main(){
-  inst__system_construct();
+  inst__construct();
 
-  inst_tickIn_tick();
+  inst_tickIn();
 
+  inst__destruct();
+  
   return 0;
 }
 

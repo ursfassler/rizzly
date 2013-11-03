@@ -12,7 +12,7 @@ public class FunctionType extends Type {
   final private Reference ret;
 
   public FunctionType(ElementInfo info, String name, List<Reference> arg, Reference ret) {
-    super(info,name);
+    super(info, name);
     this.ret = ret;
     this.arg = arg;
   }

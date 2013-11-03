@@ -2,7 +2,6 @@ package pir.type;
 
 import java.math.BigInteger;
 
-
 public class ArrayType extends Type {
   private TypeRef type;
   private BigInteger size;

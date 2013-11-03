@@ -15,7 +15,6 @@ import evl.expression.reference.Reference;
 import evl.function.FunctionBase;
 import evl.knowledge.KnowScope;
 import evl.other.CompUse;
-import evl.other.IfaceUse;
 import evl.other.Named;
 import evl.other.Namespace;
 import evl.type.TypeRef;
@@ -139,13 +138,6 @@ class SubDep extends DefTraverser<Void, Named> {
     visit(dst, dst);
 
     return null;
-  }
-
-  @Override
-  protected Void visitIfaceUse(IfaceUse obj, Named param) {
-    g.addEdge(param, obj.getLink());
-    visit(obj.getLink(), obj.getLink());
-    return super.visitIfaceUse(obj, param);
   }
 
   @Override

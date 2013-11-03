@@ -5,30 +5,21 @@ type
     Blue;
   end
 
-interface
-  Iface1
-    function foo( x: R{0,100} );
-  end
-
-  Iface2
-    function foo( x: Color );
-  end
-  
 component
   Enumt
     input
-      in  : Iface1;
+      in( x: R{0,100} );
     
     output
-      out : Iface2;
+      out( x: Color );
 
     implementation elementary
     
-    function in.foo( x: R{0,100} )
+    function in( x: R{0,100} )
       case x of
-        0: out.foo( Color.Red ); end
-        1: out.foo( Color.Green ); end
-        2: out.foo( Color.Blue ); end
+        0: out( Color.Red ); end
+        1: out( Color.Green ); end
+        2: out( Color.Blue ); end
       end
     end
     

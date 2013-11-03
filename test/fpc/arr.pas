@@ -3,7 +3,7 @@ program arr;
 uses
   inst;
 
-procedure inst_out_foo(x: Array_3_U_8); cdecl; public;
+procedure inst_out(x: Array_3_U_8); cdecl; public;
 begin
   if (x[0] = 100) and (x[1] = 200) and (x[2] = 50) 
     then writeln( 'ok' )
@@ -14,11 +14,13 @@ var
   x: Array_10_U_8;
 
 begin
+  inst__construct();
   x[0] := 100;
   x[2] := 200;
   x[5] := 50;
   writeln( 'start arr' );
-  inst_in_foo(x);
+  inst_in(x);
   writeln( 'end arr' );
+  inst__destruct();
 end.
 

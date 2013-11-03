@@ -1,15 +1,10 @@
-interface
-  Tick
-    function tick;
-  end
-  
 component
   Transition1
     input
-      in  : Tick;
+      in();
     
     output
-      out : Tick;
+      out();
     
   implementation hfsm(One)
       
@@ -23,10 +18,10 @@ component
     end
     
     transition 
-      One   to Two   by in.tick();
-      Two   to Three by in.tick();
-      Three to One   by in.tick() do
-        out.tick();
+      One   to Two   by in();
+      Two   to Three by in();
+      Three to One   by in() do
+        out();
       end
 
     

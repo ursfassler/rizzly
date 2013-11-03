@@ -4,26 +4,21 @@ type
     y : R{0,100};
   end
 
-interface
-  Tick
-    function tick( x: R{0,100} );
-  end
-
 component
   Rec1
     input
-      in  : Tick;
+      in( x: R{0,100} );
     
     output
-      out : Tick;
+      out( x: R{0,100} );
     
   implementation elementary
 
-    function in.tick( x: R{0,100} )
+    function in( x: R{0,100} )
       p : Point;
       p.x := x;
       p.y := 100 - p.x;
-      out.tick( p.y );
+      out( p.y );
     end
 
   end

@@ -8,21 +8,20 @@ import common.ElementInfo;
 import evl.expression.Expression;
 import evl.other.Named;
 
-
 public class Reference extends Expression {
   final private LinkedList<RefItem> offset;
   private Named link;
 
   public Reference(ElementInfo info, Named link, Collection<RefItem> offset) {
     super(info);
-    assert(link != null);
+    assert (link != null);
     this.link = link;
     this.offset = new LinkedList<RefItem>(offset);
   }
 
   public Reference(ElementInfo info, Named link, RefItem itm) {
     super(info);
-    assert(link != null);
+    assert (link != null);
     this.link = link;
     this.offset = new LinkedList<RefItem>();
     this.offset.add(itm);
@@ -30,7 +29,7 @@ public class Reference extends Expression {
 
   public Reference(ElementInfo info, Named link) {
     super(info);
-    assert(link != null);
+    assert (link != null);
     this.link = link;
     this.offset = new LinkedList<RefItem>();
   }
@@ -44,7 +43,7 @@ public class Reference extends Expression {
   }
 
   public void setLink(Named link) {
-    assert(link != null);
+    assert (link != null);
     this.link = link;
   }
 

@@ -76,7 +76,7 @@ public class CompositionGraphPrinter {
 
     path += " " + src.x + "," + src.y;
 
-    for( Vertex v : con.getVias() ){
+    for (Vertex v : con.getVias()) {
       path += " " + v.getPos().x + "," + v.getPos().y;
     }
 

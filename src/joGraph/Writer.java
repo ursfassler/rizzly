@@ -9,8 +9,8 @@ import java.io.PrintStream;
 
 public class Writer {
   private PrintStream stream;
-  private int         indent      = 0;
-  private boolean     didIndented = false;
+  private int indent = 0;
+  private boolean didIndented = false;
 
   public Writer(PrintStream stream) {
     this.stream = stream;
@@ -20,7 +20,7 @@ public class Writer {
     wr(msg);
     nl();
   }
-  
+
   public void wr(Object msg) {
     if (!didIndented) {
       doIndent();

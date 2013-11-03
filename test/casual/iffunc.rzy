@@ -1,19 +1,14 @@
-interface
-  Tick
-    function tick( x: R{0,10} ):R{0,10};
-  end
-  
 component
   Iffunc
     input
-      in  : Tick;
+      in( x: R{0,10} ):R{0,10};
     
   implementation elementary
     function eval( x: R{0,10} ):Boolean
       return x > 5;
     end
   
-    function in.tick( x: R{0,10} ):R{0,10}
+    function in( x: R{0,10} ):R{0,10}
       if eval( x ) then
         return 0;
       else

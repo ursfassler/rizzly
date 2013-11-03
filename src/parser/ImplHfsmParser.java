@@ -17,9 +17,7 @@ import fun.expression.reference.ReferenceLinked;
 import fun.expression.reference.ReferenceUnlinked;
 import fun.function.FunctionHeader;
 import fun.function.impl.FuncEntryExit;
-import fun.function.impl.FuncPrivateRet;
 import fun.hfsm.ImplHfsm;
-import fun.hfsm.QueryItem;
 import fun.hfsm.State;
 import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
@@ -57,8 +55,8 @@ public class ImplHfsmParser extends ImplBaseParser {
     Block exitBody = new Block(state.getInfo());
     FuncEntryExit entryFunc = makeEntryExitFunc(State.ENTRY_FUNC_NAME, entryBody);
     FuncEntryExit exitFunc = makeEntryExitFunc(State.EXIT_FUNC_NAME, exitBody);
-    state.getBfunc().add(entryFunc);
-    state.getBfunc().add(exitFunc);
+    state.getItemList().add(entryFunc);
+    state.getItemList().add(exitFunc);
     state.setEntryFuncRef(new ReferenceLinked(state.getInfo(), entryFunc));
     state.setExitFuncRef(new ReferenceLinked(state.getInfo(), exitFunc));
 
@@ -75,19 +73,15 @@ public class ImplHfsmParser extends ImplBaseParser {
         break;
       case FUNCTION:
         Pair<List<String>, FunctionHeader> func = parsePrivateFunction();
-        if (func.first.isEmpty()) {
-          state.getBfunc().add(func.second);
-        } else {
-          assert (func.first.size() == 1);
-          state.getItem().add(new QueryItem(func.first.get(0), (FuncPrivateRet) func.second));
-        }
+        assert (func.first.isEmpty());
+        state.getItemList().add(func.second);
         break;
       case TRANSITION:
-        state.getItem().addAll(parseTransitionDecl());
+        state.getItemList().addAll(parseTransitionDecl());
         break;
       case STATE:
         if (state instanceof StateComposite) {
-          state.getItem().add(parseState());
+          state.getItemList().add(parseState());
         } else {
           RError.err(ErrorType.Error, peek().getInfo(), "Simple state can not have children (no initial state defined)");
         }
@@ -173,9 +167,11 @@ public class ImplHfsmParser extends ImplBaseParser {
     return ret;
   }
 
-  // EBNF transitionEvent: nameRef vardeflist
+  // EBNF transitionEvent: id vardeflist
   private void parseTransitionEvent(Transition ret) {
-    Reference name = parseNameRef();
+    Reference name = new ReferenceUnlinked(peek().getInfo());
+    Token tok = expect(TokenType.IDENTIFIER);
+    name.getOffset().add(new RefName(tok.getInfo(), tok.getData()));
     ret.setEvent(name);
     ret.getParam().addAll(parseVardefList());
   }

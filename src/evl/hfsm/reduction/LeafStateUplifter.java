@@ -12,14 +12,13 @@ import evl.hfsm.State;
 import evl.hfsm.StateComposite;
 import evl.hfsm.StateSimple;
 
-
 /**
  * Moves all leaf-states up. In the end, the top state only has former leaf states a children.
- *
+ * 
  * (The leaf states are the only states the state machoine can be in.)
- *
+ * 
  * @author urs
- *
+ * 
  */
 public class LeafStateUplifter extends NullTraverser<Void, Designator> {
   final private List<StateSimple> states = new ArrayList<StateSimple>();

@@ -11,7 +11,7 @@ import fun.type.Type;
 import fun.variable.Constant;
 
 /**
- *
+ * 
  * @author urs
  */
 final public class RizzlyFile extends FunBase {
@@ -19,7 +19,6 @@ final public class RizzlyFile extends FunBase {
   final private List<Designator> imports;
   final private ListOfNamed<Generator> compfunc = new ListOfNamed<Generator>();
   final private ListOfNamed<Type> type = new ListOfNamed<Type>();
-  final private ListOfNamed<Interface> iface = new ListOfNamed<Interface>();
   final private ListOfNamed<Component> comp = new ListOfNamed<Component>();
   final private ListOfNamed<Constant> constant = new ListOfNamed<Constant>();
   final private ListOfNamed<FuncGlobal> function = new ListOfNamed<FuncGlobal>();
@@ -60,10 +59,6 @@ final public class RizzlyFile extends FunBase {
 
   public ListOfNamed<Type> getType() {
     return type;
-  }
-
-  public ListOfNamed<Interface> getIface() {
-    return iface;
   }
 
   public ListOfNamed<Component> getComp() {

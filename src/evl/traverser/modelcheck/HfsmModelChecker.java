@@ -4,7 +4,6 @@ import evl.Evl;
 import evl.NullTraverser;
 import evl.hfsm.HfsmQueryFunction;
 import evl.hfsm.ImplHfsm;
-import evl.hfsm.QueryItem;
 import evl.hfsm.State;
 import evl.hfsm.Transition;
 import evl.knowledge.KnowBaseItem;
@@ -57,12 +56,6 @@ public class HfsmModelChecker extends NullTraverser<Void, Void> {
   @Override
   protected Void visitTransition(Transition obj, Void param) {
     // TODO check that guard does not write state
-    return null;
-  }
-
-  @Override
-  protected Void visitQueryItem(QueryItem obj, Void param) {
-    visit(obj.getFunc(), param);
     return null;
   }
 

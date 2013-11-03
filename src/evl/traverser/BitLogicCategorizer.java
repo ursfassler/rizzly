@@ -3,7 +3,9 @@ package evl.traverser;
 import evl.expression.Expression;
 import evl.expression.binop.And;
 import evl.expression.binop.BitAnd;
+import evl.expression.binop.BitOr;
 import evl.expression.binop.LogicAnd;
+import evl.expression.binop.LogicOr;
 import evl.expression.binop.Or;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
@@ -12,9 +14,10 @@ import evl.type.Type;
 import evl.type.base.BooleanType;
 
 /**
- * Replaces "and" with "bitand" or "logicand", replaces "or" with "bitor" or "logicor" 
+ * Replaces "and" with "bitand" or "logicand", replaces "or" with "bitor" or "logicor"
+ * 
  * @author urs
- *
+ * 
  */
 public class BitLogicCategorizer extends ExprReplacer<KnowType> {
   private final static BitLogicCategorizer INSTANCE = new BitLogicCategorizer();
@@ -39,7 +42,15 @@ public class BitLogicCategorizer extends ExprReplacer<KnowType> {
 
   @Override
   protected Expression visitOr(Or obj, KnowType param) {
-    throw new RuntimeException("not yet implemented");
+    super.visitOr(obj, param);
+    Type lt = param.get(obj.getLeft());
+    Type rt = param.get(obj.getRight());
+    assert ((lt instanceof BooleanType) == (rt instanceof BooleanType));
+    if (lt instanceof BooleanType) {
+      return new LogicOr(obj.getInfo(), obj.getLeft(), obj.getRight());
+    } else {
+      return new BitOr(obj.getInfo(), obj.getLeft(), obj.getRight());
+    }
   }
 
 }

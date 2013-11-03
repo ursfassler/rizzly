@@ -1,28 +1,23 @@
 
-interface
-  Tick
-    function tick( x: R{0,10} );
-  end
-  
 component
   Range
     input
-      in  : Tick;
+      in( x: R{0,10} );
     
     output
-      out : Tick;
+      out( x: R{0,10} );
       
-    implementation elementary
+  implementation elementary
     
     var
       a : R{0,10};
     
-    function in.tick( x: R{0,10} )
+    function in( x: R{0,10} )
       if a < 10 then
         a := R{0,10}( a + 1 );
-        out.tick( a );
+        out( a );
       else
-        out.tick( x );
+        out( x );
       end
     end
     

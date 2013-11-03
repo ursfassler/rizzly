@@ -1,16 +1,10 @@
-
-interface
-  Tick
-    function tick( x: R{0,10} );
-  end
-  
 component
   StateVar
     input
-      in  : Tick;
+      in( x: R{0,10} );
     
     output
-      out : Tick;
+      out( x: R{0,10} );
     
   implementation elementary
     
@@ -21,13 +15,13 @@ component
       a := 0;
     end
     
-    function in.tick( x: R{0,10} )
+    function in( x: R{0,10} )
       if a < 10 then
         a := R{0,10}( a + 1 );
       else
         a := 0;
       end
-      out.tick( a );
+      out( a );
     end
     
   end

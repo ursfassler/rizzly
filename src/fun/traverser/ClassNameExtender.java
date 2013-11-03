@@ -26,7 +26,6 @@ import fun.expression.reference.ReferenceUnlinked;
 import fun.function.FunctionHeader;
 import fun.hfsm.FullStateName;
 import fun.hfsm.ImplHfsm;
-import fun.hfsm.QueryItem;
 import fun.hfsm.State;
 import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
@@ -34,7 +33,6 @@ import fun.hfsm.Transition;
 import fun.other.Component;
 import fun.other.Generator;
 import fun.other.ImplElementary;
-import fun.other.Interface;
 import fun.other.ListOfNamed;
 import fun.other.Named;
 import fun.other.RizzlyFile;
@@ -48,7 +46,6 @@ import fun.type.composed.UnionType;
 import fun.variable.CompUse;
 import fun.variable.Constant;
 import fun.variable.FuncVariable;
-import fun.variable.IfaceUse;
 import fun.variable.StateVariable;
 import fun.variable.TemplateParameter;
 
@@ -99,7 +96,6 @@ public class ClassNameExtender extends DefGTraverser<Void, SymbolTable<Designato
 
     AdderWithPrefix.add(obj.getCompfunc(), obj.getName(), param);
     AdderWithPrefix.add(obj.getType(), obj.getName(), param);
-    AdderWithPrefix.add(obj.getIface(), obj.getName(), param);
     AdderWithPrefix.add(obj.getComp(), obj.getName(), param);
     AdderWithPrefix.add(obj.getConstant(), obj.getName(), param);
     AdderWithPrefix.add(obj.getFunction(), obj.getName(), param);
@@ -151,17 +147,9 @@ public class ClassNameExtender extends DefGTraverser<Void, SymbolTable<Designato
   }
 
   @Override
-  protected Void visitInterface(Interface obj, SymbolTable<Designator, String> param) {
-    param = new SymbolTable<Designator, String>(param);
-    addNames(obj.getPrototype(), param);
-    super.visitInterface(obj, param);
-    return null;
-  }
-
-  @Override
   protected Void visitComponent(Component obj, SymbolTable<Designator, String> param) {
     param = new SymbolTable<Designator, String>(param);
-    AdderWithPrefix.add(obj.getIface(Direction.in), new Designator("Self"), param);
+    // AdderWithPrefix.add(obj.getIface(Direction.in), new Designator("Self"), param);
 
     AdderWithPrefix.add(obj.getIface(Direction.out), new Designator("Self"), param);
     // we need that, otherwise the namespace linker may link to the wrong namespace
@@ -174,7 +162,6 @@ public class ClassNameExtender extends DefGTraverser<Void, SymbolTable<Designato
   protected Void visitImplElementary(ImplElementary obj, SymbolTable<Designator, String> param) {
     AdderWithPrefix.add(obj.getConstant(), new Designator("Self"), param);
     AdderWithPrefix.add(obj.getVariable(), new Designator("Self"), param);
-
     AdderWithPrefix.add(obj.getComponent(), new Designator("Self"), param);
 
     ListOfNamed<FunctionHeader> cofu = new ListOfNamed<FunctionHeader>(obj.getFunction().getItems(FunctionHeader.class));
@@ -187,6 +174,7 @@ public class ClassNameExtender extends DefGTraverser<Void, SymbolTable<Designato
   @Override
   protected Void visitImplComposition(ImplComposition obj, SymbolTable<Designator, String> param) {
     AdderWithPrefix.add(obj.getComponent(), new Designator("Self"), param);
+    AdderWithPrefix.add(obj.getIface(Direction.in), new Designator("Self"), param);
     super.visitImplComposition(obj, param);
     return null;
   }
@@ -197,6 +185,7 @@ public class ClassNameExtender extends DefGTraverser<Void, SymbolTable<Designato
     assert (stateTable == null);
     stateTable = new HashMap<Designator, SymbolTable<Designator, String>>();
     fullName = FullStateName.get(obj.getTopstate());
+    AdderWithPrefix.add(obj.getIface(Direction.in), new Designator("Self"), param);
     super.visitImplHfsm(obj, param);
     stateTable = null;
     fullName = null;
@@ -209,18 +198,15 @@ public class ClassNameExtender extends DefGTraverser<Void, SymbolTable<Designato
     param = new SymbolTable<Designator, String>(param);
 
     param.add(obj.getName(), fullName.get(obj));
-    AdderWithPrefix.add(obj.getBfunc(), key, param);
+    AdderWithPrefix.add(obj.getItemList(), key, param);
     AdderWithPrefix.add(obj.getVariable(), key, param);
 
     stateTable.put(key, param);
 
     visit(obj.getEntryFuncRef(), param);
     visit(obj.getExitFuncRef(), param);
-    visitList(obj.getBfunc(), param);
     visitList(obj.getVariable(), param);
-
-    // param.add(obj.getName(), new Designator(obj.getName()));
-    visitItr(obj.getItem(), param);
+    visitList(obj.getItemList(), param);
 
     return null;
   }
@@ -228,7 +214,7 @@ public class ClassNameExtender extends DefGTraverser<Void, SymbolTable<Designato
   @Override
   protected Void visitStateComposite(StateComposite obj, SymbolTable<Designator, String> param) {
     Designator key = fullName.get(obj);
-    ListOfNamed<State> children = new ListOfNamed<State>(obj.getItemList(State.class));
+    ListOfNamed<State> children = new ListOfNamed<State>(obj.getItemList().getItems(State.class));
     {
       SymbolTable<Designator, String> initsym = new SymbolTable<Designator, String>();
       AdderWithPrefix.add(children, key, initsym);
@@ -237,17 +223,17 @@ public class ClassNameExtender extends DefGTraverser<Void, SymbolTable<Designato
 
     param = new SymbolTable<Designator, String>(param);
     param.add(obj.getName(), fullName.get(obj));
-    AdderWithPrefix.add(obj.getBfunc(), key, param);
+    AdderWithPrefix.add(obj.getItemList().getItems(FunctionHeader.class), key, param);
     AdderWithPrefix.add(obj.getVariable(), key, param);
 
     stateTable.put(key, param);
 
     visit(obj.getEntryFuncRef(), param);
     visit(obj.getExitFuncRef(), param);
-    visitList(obj.getBfunc(), param);
+    visitItr(obj.getItemList().getItems(State.class), param);
     visitList(obj.getVariable(), param);
     visitItr(children, param);
-    visitItr(obj.getItemList(QueryItem.class), param);
+    visitItr(obj.getItemList().getItems(FunctionHeader.class), param);
 
     param = new SymbolTable<Designator, String>(param);
     // param.add(obj.getName(), new Designator(obj.getName()));
@@ -257,7 +243,7 @@ public class ClassNameExtender extends DefGTraverser<Void, SymbolTable<Designato
       param.add(name, table.expand(name));
     }
 
-    visitItr(obj.getItemList(Transition.class), param);
+    visitItr(obj.getItemList().getItems(Transition.class), param);
 
     return null;
   }
@@ -290,12 +276,6 @@ public class ClassNameExtender extends DefGTraverser<Void, SymbolTable<Designato
       }
       param.add(name.getName(), new Designator(name.getName()));
     }
-  }
-
-  @Override
-  protected Void visitQueryItem(QueryItem obj, SymbolTable<Designator, String> param) {
-    super.visitQueryItem(obj, param);
-    return null;
   }
 
   @Override
@@ -401,6 +381,11 @@ class NameTableCreator extends NullTraverser<Void, Designator> {
   }
 
   @Override
+  protected Void visitFunctionHeader(FunctionHeader obj, Designator param) {
+    return null;
+  }
+
+  @Override
   protected Void visitTransition(Transition obj, Designator param) {
     return null;
   }
@@ -420,13 +405,8 @@ class NameTableCreator extends NullTraverser<Void, Designator> {
 
   @Override
   protected Void visitStateComposite(StateComposite obj, Designator param) {
-    visitItr(obj.getItem(), param);
+    visitItr(obj.getItemList(), param);
     return null;
-  }
-
-  @Override
-  protected Void visitQueryItem(QueryItem obj, Designator param) {
-    return null; // not referencable
   }
 
 }
@@ -439,7 +419,7 @@ class AdderWithPrefix extends NullTraverser<Void, Designator> {
     this.sym = sym;
   }
 
-  static public void add(ListOfNamed<? extends Named> list, Designator prefix, SymbolTable<Designator, String> sym) {
+  static public void add(Iterable<? extends Named> list, Designator prefix, SymbolTable<Designator, String> sym) {
     AdderWithPrefix fixer = new AdderWithPrefix(sym);
     fixer.visitItr(list, prefix);
   }
@@ -478,12 +458,6 @@ class AdderWithPrefix extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitIfaceUse(IfaceUse obj, Designator param) {
-    add(obj, param);
-    return null;
-  }
-
-  @Override
   protected Void visitState(State obj, Designator param) {
     add(obj, param);
     return null;
@@ -515,12 +489,6 @@ class AdderWithPrefix extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitInterface(Interface obj, Designator param) {
-    add(obj, param);
-    return null;
-  }
-
-  @Override
   protected Void visitComponent(Component obj, Designator param) {
     add(obj, param);
     return null;
@@ -529,6 +497,11 @@ class AdderWithPrefix extends NullTraverser<Void, Designator> {
   @Override
   protected Void visitGenerator(Generator obj, Designator param) {
     add(obj, param); // FIXME ok?
+    return null;
+  }
+
+  @Override
+  protected Void visitTransition(Transition obj, Designator param) {
     return null;
   }
 

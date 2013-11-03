@@ -21,27 +21,27 @@ public class HfsmTest extends BaseTest {
 
   @Test
   public void query() {
-    compile("query",  TestSteps.EXECUTE, false, false);
+    compile("query", TestSteps.EXECUTE, false, false);
   }
 
   @Test
   public void query2() {
-    compile("query2",  TestSteps.COMPILE_TO_ASM, false, false);
+    compile("query2", TestSteps.COMPILE_TO_ASM, false, false);
   }
 
   @Test
   public void query3() {
-    compile("query3",  TestSteps.EXECUTE, false, false);
+    compile("query3", TestSteps.EXECUTE, false, false);
   }
 
   @Test
   public void query4() {
-    compile("query4",  TestSteps.EXECUTE, false, false);
+    compile("query4", TestSteps.EXECUTE, false, false);
   }
 
   @Test
   public void unusedState() {
-    compile("unusedState",TestSteps.COMPILE_TO_PIR, false, false);  //TODO check for warnings
+    compile("unusedState", TestSteps.COMPILE_TO_PIR, false, false); // TODO check for warnings
   }
 
   @Test

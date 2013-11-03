@@ -1,16 +1,11 @@
 //testcase
 
-interface
-  Tick
-    function tick;
-  end
-
 component
   Forward
     input
-      in  : Tick;                     //
+      in();                           //
     output                            // 
-      out : Tick;
+      out();
       
   implementation composition          //dummy meta1
     connection
@@ -19,9 +14,9 @@ component
 
   Meta
     input
-      in1  : Tick;
+      in1();
     output
-      out1 : Tick;
+      out1();
       
   implementation composition          //geometry width="420"
   // bla bla 1

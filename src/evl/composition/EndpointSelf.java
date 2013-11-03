@@ -3,27 +3,27 @@ package evl.composition;
 import common.Designator;
 import common.ElementInfo;
 
-import evl.other.IfaceUse;
+import evl.function.FuncIface;
 
 final public class EndpointSelf extends Endpoint {
 
-  private IfaceUse iface;
+  private FuncIface iface;
 
-  public EndpointSelf(ElementInfo info, IfaceUse iface) {
+  public EndpointSelf(ElementInfo info, FuncIface iface) {
     super(info);
     this.iface = iface;
   }
 
-  public IfaceUse getIface() {
+  public FuncIface getIface() {
     return iface;
   }
 
-  public void setIface(IfaceUse iface) {
+  public void setIface(FuncIface iface) {
     this.iface = iface;
   }
 
   @Override
-  public IfaceUse getIfaceUse() {
+  public FuncIface getIfaceUse() {
     return iface;
   }
 

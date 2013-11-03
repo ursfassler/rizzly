@@ -1,18 +1,11 @@
-//test ok
-
-interface
-  ValueEvent
-    function tick( val: R{0,63} );
-  end
-
 component
   TransOrder
 
   input
-    in      : ValueEvent;
+    in( val: R{0,63} );
   
   output
-    out     : ValueEvent;
+    out( val: R{0,63} );
     
   implementation hfsm(A)
     function testBit( value: R{0,63}; bit: R{0,5} ):Boolean
@@ -20,32 +13,32 @@ component
     end
   
     transition 
-      A to A by in.tick( val: R{0,63} ) if testBit( val, 0 ) do
-        out.tick( 0 );
+      A to A by in( val: R{0,63} ) if testBit( val, 0 ) do
+        out( 0 );
       end
       
-      A to A by in.tick( val: R{0,63} ) if testBit( val, 1 ) do
-        out.tick( 1 );
+      A to A by in( val: R{0,63} ) if testBit( val, 1 ) do
+        out( 1 );
       end
     
     state A
       transition 
-        A to A by in.tick( val: R{0,63} ) if testBit( val, 2 ) do
-          out.tick( 2 );
+        A to A by in( val: R{0,63} ) if testBit( val, 2 ) do
+          out( 2 );
         end
         
-        A to A by in.tick( val: R{0,63} ) if testBit( val, 3 ) do
-          out.tick( 3 );
+        A to A by in( val: R{0,63} ) if testBit( val, 3 ) do
+          out( 3 );
         end
     end
 
     transition 
-      A to A by in.tick( val: R{0,63} ) if testBit( val, 4 ) do
-        out.tick( 4 );
+      A to A by in( val: R{0,63} ) if testBit( val, 4 ) do
+        out( 4 );
       end
       
-      A to A by in.tick( val: R{0,63} ) if testBit( val, 5 ) do
-        out.tick( 5 );
+      A to A by in( val: R{0,63} ) if testBit( val, 5 ) do
+        out( 5 );
       end
       
   end
