@@ -15,6 +15,11 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  public void mul() {
+    compile("mul", TestSteps.EXECUTE, false, false);
+  }
+
+  @Test
   public void stateVar() {
     compile("stateVar", TestSteps.EXECUTE, false, false);
   }

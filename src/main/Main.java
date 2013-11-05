@@ -49,6 +49,9 @@ import fun.toevl.FunToEvl;
 //TODO -- do name randomization and compile to see if references go outside
 //TODO add compiler switch to select backend (like --backend=ansiC --backend=funHtmlDoc)
 //TODO check metadata parser
+//TODO check for zero bevore division
+//TODO check range by user input
+//TODO check if event handling is in progress when starting event handling
 public class Main {
 
   /**
@@ -128,7 +131,7 @@ public class Main {
 
     // XXX no enums at this stage?
     // EnumElementConstPropagation.process(prog);
-
+    
     PirPrinter.print(prog, debugdir + "beforeToC.rzy");
 
     cir.other.Program cprog = (cir.other.Program) ToC.process(prog);

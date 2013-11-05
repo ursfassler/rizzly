@@ -89,7 +89,7 @@ public class ExpressionTypeChecker extends NullTraverser<Type, Void> {
     return lt.getNumbers();
   }
 
-  private BigInteger makeOnes(int bits) {
+  public static BigInteger makeOnes(int bits) {
     BigInteger ret = BigInteger.ZERO;
     for (int i = 0; i < bits; i++) {
       ret = ret.shiftLeft(1);

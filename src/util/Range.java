@@ -21,6 +21,13 @@ final public class Range implements Iterable<BigInteger> {
     return high;
   }
 
+  static public Range grow(Range a, Range b) {
+    BigInteger low = a.getLow().min(b.getLow());
+    BigInteger high = a.getHigh().max(b.getHigh());
+    assert (low.compareTo(high) <= 0);
+    return new Range(low, high);
+  }
+
   static public Range narrow(Range a, Range b) {
     BigInteger low = a.getLow().max(b.getLow());
     BigInteger high = a.getHigh().min(b.getHigh());

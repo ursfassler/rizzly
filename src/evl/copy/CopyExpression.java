@@ -6,6 +6,7 @@ import evl.expression.BoolValue;
 import evl.expression.Expression;
 import evl.expression.Number;
 import evl.expression.RangeValue;
+import evl.expression.TypeCast;
 import evl.expression.binop.And;
 import evl.expression.binop.BitAnd;
 import evl.expression.binop.BitOr;
@@ -41,6 +42,11 @@ public class CopyExpression extends NullTraverser<Expression, Void> {
   @Override
   protected Expression visitDefault(Evl obj, Void param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+  }
+
+  @Override
+  protected Expression visitTypeCast(TypeCast obj, Void param) {
+    return new TypeCast(obj.getInfo(), cast.copy(obj.getCast()), cast.copy(obj.getValue()));
   }
 
   @Override

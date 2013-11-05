@@ -5,15 +5,18 @@ import java.util.ArrayList;
 import java.util.List;
 
 import util.Range;
-
 import common.Designator;
-
+import common.ElementInfo;
 import error.ErrorType;
 import error.RError;
 import evl.Evl;
 import evl.NullTraverser;
+import evl.expression.BoolValue;
 import evl.expression.Number;
+import evl.expression.TypeCast;
 import evl.expression.binop.And;
+import evl.expression.binop.BitAnd;
+import evl.expression.binop.BitOr;
 import evl.expression.binop.Div;
 import evl.expression.binop.LogicAnd;
 import evl.expression.binop.LogicOr;
@@ -72,9 +75,25 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     rtg = new RefTypeGetter(this, kb);
   }
 
+  private void checkPositive(ElementInfo info, String op, Range lhs, Range rhs) {
+    checkPositive(info, op, lhs);
+    checkPositive(info, op, rhs);
+  }
+
+  private void checkPositive(ElementInfo info, String op, Range range) {
+    if (range.getLow().compareTo(BigInteger.ZERO) < 0) {
+      RError.err(ErrorType.Error, info, op + " only allowed for positive types");
+    }
+  }
+
   @Override
   protected Type visitDefault(Evl obj, Void param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+  }
+
+  @Override
+  protected Type visitTypeCast(TypeCast obj, Void param) {
+    return visit(obj.getCast(), param);
   }
 
   @Override
@@ -94,6 +113,11 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     }
 
     return ft;
+  }
+
+  @Override
+  protected Type visitBoolValue(BoolValue obj, Void param) {
+    return kbi.getBooleanType();
   }
 
   @Override
@@ -210,13 +234,69 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
   }
 
   @Override
+  protected Type visitBitOr(BitOr obj, Void param) {
+    Type lhst = visit(obj.getLeft(), param);
+    Type rhst = visit(obj.getRight(), param);
+    assert (lhst instanceof RangeType);
+    assert (rhst instanceof RangeType);
+    Range lhs = ((RangeType) lhst).getNumbers();
+    Range rhs = ((RangeType) rhst).getNumbers();
+    return bitOr(obj.getInfo(), lhs, rhs);
+  }
+
+  @Override
+  protected Type visitOr(Or obj, Void param) {
+    Type lhst = visit(obj.getLeft(), param);
+    Type rhst = visit(obj.getRight(), param);
+
+    if (lhst instanceof RangeType) {
+      Range lhs = ((RangeType) lhst).getNumbers();
+      Range rhs = ((RangeType) rhst).getNumbers();
+      return bitOr(obj.getInfo(), lhs, rhs);
+    } else if (lhst instanceof BooleanType) {
+      assert (rhst instanceof BooleanType);
+      return lhst;
+    } else {
+      RError.err(ErrorType.Error, lhst.getInfo(), "Expected range or boolean type");
+      return null;
+    }
+  }
+
+  private Type bitOr(ElementInfo info, Range lhs, Range rhs) {
+    checkPositive(info, "or", lhs, rhs);
+
+    BigInteger bigger = lhs.getHigh().max(rhs.getHigh());
+    BigInteger smaller = lhs.getHigh().min(rhs.getHigh());
+
+    int bits = ExpressionTypeChecker.bitCount(smaller);
+    BigInteger ones = ExpressionTypeChecker.makeOnes(bits);
+    BigInteger high = bigger.or(ones);
+    BigInteger low = lhs.getLow().max(rhs.getLow());
+
+    return kbi.getNumsetType(new Range(low, high));
+  }
+
+  @Override
   protected Type visitLogicAnd(LogicAnd obj, Void param) {
     return kbi.getBooleanType();
   }
 
   @Override
-  protected Type visitOr(Or obj, Void param) {
-    throw new RuntimeException("not yet implemented");
+  protected Type visitBitAnd(BitAnd obj, Void param) {
+    Type lhst = visit(obj.getLeft(), param);
+    Type rhst = visit(obj.getRight(), param);
+
+    assert (lhst instanceof RangeType);
+    assert (rhst instanceof RangeType);
+    Range lhs = ((RangeType) lhst).getNumbers();
+    Range rhs = ((RangeType) rhst).getNumbers();
+    return bitAnd(obj.getInfo(), lhs, rhs);
+  }
+
+  private Type bitAnd(ElementInfo info, Range lhs, Range rhs) {
+    checkPositive(info, "and", lhs, rhs);
+    BigInteger high = lhs.getHigh().min(rhs.getHigh()); // TODO ok?
+    return kbi.getNumsetType(new Range(BigInteger.ZERO, high));
   }
 
   @Override
@@ -228,8 +308,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
       assert (rhst instanceof RangeType);
       Range lhs = ((RangeType) lhst).getNumbers();
       Range rhs = ((RangeType) rhst).getNumbers();
-      BigInteger high = lhs.getHigh().min(rhs.getHigh()); // TODO ok?
-      return kbi.getNumsetType(new Range(BigInteger.ZERO, high));
+      return bitAnd( obj.getInfo(), lhs, rhs );
     } else if (lhst instanceof BooleanType) {
       assert (rhst instanceof BooleanType);
       return lhst;
@@ -251,7 +330,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     Range rr = ((RangeType) rhs).getNumbers();
 
     assert (lr.getLow().compareTo(BigInteger.ZERO) >= 0); // TODO implement mod correctly for negative numbers
-    assert (rr.getLow().compareTo(BigInteger.ZERO) > 0);
+    assert (rr.getLow().compareTo(BigInteger.ZERO) > 0); // type checker has to find this
 
     BigInteger low = BigInteger.ZERO;
     BigInteger high = lr.getHigh().min(rr.getHigh().subtract(BigInteger.ONE));
@@ -293,8 +372,21 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
       RError.err(ErrorType.Fatal, obj.getInfo(), "sorry, I am too lazy to check for negative numbers");
     }
 
-    BigInteger low = lr.getLow().divide(rr.getHigh());
-    BigInteger high = lr.getHigh().divide(rr.getLow());
+    BigInteger rhigh = rr.getHigh();
+    BigInteger rlow = rr.getLow();
+
+    assert ((rlow.compareTo(BigInteger.ZERO) != 0) || (rhigh.compareTo(BigInteger.ZERO) != 0));
+
+    // division by zero is cought during runtime
+    if (rhigh.compareTo(BigInteger.ZERO) == 0) {
+      rhigh = rhigh.subtract(BigInteger.ONE);
+    }
+    if (rlow.compareTo(BigInteger.ZERO) == 0) {
+      rlow = rlow.add(BigInteger.ONE);
+    }
+
+    BigInteger low = lr.getLow().divide(rhigh);
+    BigInteger high = lr.getHigh().divide(rlow);
 
     return kbi.getNumsetType(new Range(low, high));
   }

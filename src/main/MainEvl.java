@@ -85,6 +85,7 @@ import evl.traverser.NamespaceReduction;
 import evl.traverser.OpenReplace;
 import evl.traverser.OutsideReaderInfo;
 import evl.traverser.OutsideWriterInfo;
+import evl.traverser.RangeConverter;
 import evl.traverser.debug.CompCascadeDepth;
 import evl.traverser.debug.DebugIfaceAdder;
 import evl.traverser.debug.MsgNamesGetter;
@@ -150,6 +151,7 @@ public class MainEvl {
     // only for debugging
     // typecheck(classes, debugdir);
 
+    RangeConverter.process(aclasses,kb);
     RizzlyProgram prg = instantiate(root, debugdir, aclasses);
 
     {
