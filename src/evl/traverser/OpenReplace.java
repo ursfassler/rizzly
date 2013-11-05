@@ -16,8 +16,8 @@ import evl.expression.reference.RefCall;
 import evl.expression.reference.Reference;
 import evl.function.FunctionHeader;
 import evl.knowledge.KnowBaseItem;
+import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
-import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.type.Type;
 import evl.type.base.RangeType;
 import evl.type.special.IntegerType;
@@ -30,13 +30,13 @@ import evl.variable.Variable;
  * 
  */
 public class OpenReplace extends DefTraverser<Void, Void> {
-  private final KnowledgeBase kb;
+  private final KnowType kt;
   private final Set<Type> openTypes;
   private final Map<Variable, RangeType> map = new HashMap<Variable, RangeType>();
 
   public OpenReplace(Collection<Type> openTypes, KnowledgeBase kb) {
     super();
-    this.kb = kb;
+    this.kt = kb.getEntry(KnowType.class);
     this.openTypes = new HashSet<Type>(openTypes);
   }
 
@@ -83,7 +83,7 @@ public class OpenReplace extends DefTraverser<Void, Void> {
         Expression iaca = acarg.get(i);
 
         if (openTypes.contains(iarg.getType().getRef())) {
-          Type provtype = ExpressionTypeChecker.process(iaca, kb); // TODO replace with type getter
+          Type provtype = kt.get(iaca);
           updateVar(iarg, provtype);
         }
       }

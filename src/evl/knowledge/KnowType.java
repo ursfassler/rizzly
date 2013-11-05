@@ -2,11 +2,17 @@ package evl.knowledge;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import util.Range;
+
 import common.Designator;
+import common.Direction;
 import common.ElementInfo;
+
 import error.ErrorType;
 import error.RError;
 import evl.Evl;
@@ -35,8 +41,11 @@ import evl.expression.reference.RefName;
 import evl.expression.reference.RefPtrDeref;
 import evl.expression.reference.Reference;
 import evl.expression.unop.Not;
+import evl.function.FuncIface;
 import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
+import evl.other.CompUse;
+import evl.other.Component;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.type.Type;
 import evl.type.TypeRef;
@@ -48,6 +57,7 @@ import evl.type.base.FunctionTypeRet;
 import evl.type.base.FunctionTypeVoid;
 import evl.type.base.RangeType;
 import evl.type.composed.NamedElement;
+import evl.type.special.ComponentType;
 import evl.type.special.PointerType;
 import evl.variable.Variable;
 
@@ -66,6 +76,7 @@ public class KnowType extends KnowledgeEntry {
 }
 
 class KnowTypeTraverser extends NullTraverser<Type, Void> {
+  private final Map<Evl, Type> cache = new HashMap<Evl, Type>();
   final private KnowBaseItem kbi;
   final private RefTypeGetter rtg;
 
@@ -92,6 +103,17 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
   }
 
   @Override
+  protected Type visit(Evl obj, Void param) {
+    Type type = cache.get(obj);
+    if (type == null) {
+      type = super.visit(obj, param);
+      assert (type != null);
+      cache.put(obj, type);
+    }
+    return type;
+  }
+
+  @Override
   protected Type visitTypeCast(TypeCast obj, Void param) {
     return visit(obj.getCast(), param);
   }
@@ -113,6 +135,19 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     }
 
     return ft;
+  }
+
+  @Override
+  protected Type visitComponent(Component obj, Void param) {
+    Collection<NamedElement> elements = new ArrayList<NamedElement>();
+    for (FuncIface itr : obj.getIface(Direction.in)) {
+      elements.add(new NamedElement(itr.getInfo(), itr.getName(), new TypeRef(itr.getInfo(), visit(itr, param))));
+    }
+    for (FuncIface itr : obj.getIface(Direction.out)) {
+      elements.add(new NamedElement(itr.getInfo(), itr.getName(), new TypeRef(itr.getInfo(), visit(itr, param))));
+    }
+    ComponentType ct = new ComponentType(obj.getInfo(), Designator.NAME_SEP + "T" + Designator.NAME_SEP + obj.getName(), elements);
+    return ct;
   }
 
   @Override
@@ -308,7 +343,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
       assert (rhst instanceof RangeType);
       Range lhs = ((RangeType) lhst).getNumbers();
       Range rhs = ((RangeType) rhst).getNumbers();
-      return bitAnd( obj.getInfo(), lhs, rhs );
+      return bitAnd(obj.getInfo(), lhs, rhs);
     } else if (lhst instanceof BooleanType) {
       assert (rhst instanceof BooleanType);
       return lhst;
@@ -394,6 +429,11 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
   @Override
   protected Type visitNot(Not obj, Void param) {
     return kbi.getBooleanType(); // FIXME what with invert?
+  }
+
+  @Override
+  protected Type visitCompUse(CompUse obj, Void param) {
+    return visit(obj.getLink(), param);
   }
 
 }

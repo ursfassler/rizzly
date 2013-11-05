@@ -105,14 +105,6 @@ class KnowChildTraverser extends NullTraverser<Set<Named>, String> {
   }
 
   @Override
-  protected Set<Named> visitComponentType(ComponentType obj, String param) {
-    Set<Named> rset = new HashSet<Named>();
-    addIfFound(obj.getIface(Direction.in).find(param), rset);
-    addIfFound(obj.getIface(Direction.out).find(param), rset);
-    return rset;
-  }
-
-  @Override
   protected Set<Named> visitImplComposition(ImplComposition obj, String param) {
     Set<Named> rset = new HashSet<Named>();
     addIfFound(obj.getComponent().find(param), rset);
@@ -167,6 +159,11 @@ class KnowChildTraverser extends NullTraverser<Set<Named>, String> {
 
   @Override
   protected Set<Named> visitUnionType(UnionType obj, String param) {
+    return retopt(obj.getElement().find(param));
+  }
+
+  @Override
+  protected Set<Named> visitComponentType(ComponentType obj, String param) {
     return retopt(obj.getElement().find(param));
   }
 

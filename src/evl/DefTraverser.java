@@ -183,6 +183,12 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
+  protected R visitComponentType(ComponentType obj, P param) {
+    visitList(obj.getElement().getList(), param);
+    return null;
+  }
+
+  @Override
   protected R visitRizzlyProgram(RizzlyProgram obj, P param) {
     visitList(obj.getType().getList(), param);
     visitList(obj.getConstant().getList(), param);
@@ -478,13 +484,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitEndpointSub(EndpointSub obj, P param) {
-    return null;
-  }
-
-  @Override
-  protected R visitComponentType(ComponentType obj, P param) {
-    visitItr(obj.getIface(Direction.in), param);
-    visitItr(obj.getIface(Direction.out), param);
     return null;
   }
 

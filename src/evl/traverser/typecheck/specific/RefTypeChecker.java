@@ -14,9 +14,9 @@ import evl.expression.reference.RefPtrDeref;
 import evl.expression.reference.Reference;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowChild;
+import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.typecheck.LeftIsContainerOfRightTest;
-import evl.traverser.typecheck.TypeGetter;
 import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
@@ -25,19 +25,22 @@ import evl.type.base.FunctionType;
 import evl.type.base.FunctionTypeRet;
 import evl.type.special.PointerType;
 
+//TODO check if this class does not too much (i.e. check and return type)
 public class RefTypeChecker extends NullTraverser<Type, Type> {
   private KnowledgeBase kb;
   private KnowBaseItem kbi;
+  private KnowType kt;
 
   public RefTypeChecker(KnowledgeBase kb) {
     super();
     this.kb = kb;
     kbi = kb.getEntry(KnowBaseItem.class);
+    kt = kb.getEntry(KnowType.class);
   }
 
-  static public Type process(Reference ast, KnowledgeBase kb) {
+  static public void process(Reference ast, KnowledgeBase kb) {
     RefTypeChecker adder = new RefTypeChecker(kb);
-    return adder.traverse(ast, null);
+    adder.traverse(ast, null);
   }
 
   @Override
@@ -46,13 +49,8 @@ public class RefTypeChecker extends NullTraverser<Type, Type> {
   }
 
   @Override
-  protected Type visitTypeRef(TypeRef obj, Type param) {
-    return obj.getRef();
-  }
-
-  @Override
   protected Type visitReference(Reference obj, Type param) {
-    Type ret = TypeGetter.process(obj.getLink());
+    Type ret = kt.get(obj.getLink());
     for (RefItem ref : obj.getOffset()) {
       ret = visit(ref, ret);
       assert (ret != null);
@@ -70,13 +68,13 @@ public class RefTypeChecker extends NullTraverser<Type, Type> {
       }
       for (int i = 0; i < arg.size(); i++) {
         Type partype = arg.get(i).getRef();
-        Type valtype = ExpressionTypeChecker.process(obj.getActualParameter().get(i), kb);
+        Type valtype = kt.get(obj.getActualParameter().get(i));
         if (!LeftIsContainerOfRightTest.process(partype, valtype, kb)) {
           RError.err(ErrorType.Error, obj.getActualParameter().get(i).getInfo(), "Data type to big or incompatible (argument " + (i + 1) + ", " + partype.getName() + " := " + valtype.getName() + ")");
         }
       }
       if (sub instanceof FunctionTypeRet) {
-        return visit(((FunctionTypeRet) sub).getRet(), null);
+        return ((FunctionTypeRet) sub).getRet().getRef();
       } else {
         return kbi.getVoidType();
       }
@@ -96,19 +94,18 @@ public class RefTypeChecker extends NullTraverser<Type, Type> {
       if (etype == null) {
         RError.err(ErrorType.Error, obj.getInfo(), "Child not found: " + obj.getName());
       }
-      return TypeGetter.process(etype);
+      return kt.get(etype);
     }
   }
 
   @Override
   protected Type visitRefIndex(RefIndex obj, Type sub) {
-    Type index = ExpressionTypeChecker.process(obj.getIndex(), kb);
+    Type index = kt.get(obj.getIndex());
     if (sub instanceof ArrayType) {
       if (!LeftIsContainerOfRightTest.process(kbi.getIntegerType(), index, kb)) {
         RError.err(ErrorType.Error, obj.getInfo(), "need integer type to index array, got: " + index.getName());
       }
-      Type ret = visit(((ArrayType) sub).getType(), null);
-      return ret;
+      return ((ArrayType) sub).getType().getRef();
     } else {
       RError.err(ErrorType.Error, obj.getInfo(), "need array to index, got type: " + sub.getName());
       return null;

@@ -59,14 +59,14 @@ public class RangeConverter extends ExprReplacer<Void> {
   @Override
   protected Expression visitArithmeticOp(ArithmeticOp obj, Void param) {
     obj = (ArithmeticOp) super.visitArithmeticOp(obj, param);
-    
+
     Type lb = kt.get(obj.getLeft());
     Type rb = kt.get(obj.getRight());
-    
-    if( isNotRange(lb,rb) ){
+
+    if (isNotRange(lb, rb)) {
       return obj;
     }
-    
+
     RangeType lt = (RangeType) lb;
     RangeType rt = (RangeType) rb;
     RangeType dt = (RangeType) kt.get(obj);
@@ -91,14 +91,14 @@ public class RangeConverter extends ExprReplacer<Void> {
   @Override
   protected Expression visitRelation(Relation obj, Void param) {
     obj = (Relation) super.visitRelation(obj, param);
-    
+
     Type lb = kt.get(obj.getLeft());
     Type rb = kt.get(obj.getRight());
-    
-    if( isNotRange(lb,rb) ){
+
+    if (isNotRange(lb, rb)) {
       return obj;
     }
-    
+
     RangeType lt = (RangeType) lb;
     RangeType rt = (RangeType) rb;
 

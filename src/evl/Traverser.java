@@ -470,6 +470,8 @@ public abstract class Traverser<R, P> {
       return visitRecordType((RecordType) obj, param);
     } else if (obj instanceof UnionType) {
       return visitUnionType((UnionType) obj, param);
+    } else if (obj instanceof ComponentType) {
+      return visitComponentType((ComponentType) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -490,8 +492,6 @@ public abstract class Traverser<R, P> {
       return visitNaturalType((NaturalType) obj, param);
     } else if (obj instanceof IntegerType) {
       return visitIntegerType((IntegerType) obj, param);
-    } else if (obj instanceof ComponentType) {
-      return visitComponentType((ComponentType) obj, param);
     } else if (obj instanceof PointerType) {
       return visitPointerType((PointerType) obj, param);
     } else {

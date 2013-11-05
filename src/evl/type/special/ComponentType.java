@@ -1,27 +1,16 @@
 package evl.type.special;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collection;
 
-import common.Direction;
 import common.ElementInfo;
 
-import evl.other.ListOfNamed;
-import evl.type.base.BaseType;
-import evl.type.base.FunctionType;
+import evl.type.composed.NamedElement;
+import evl.type.composed.NamedElementType;
 
-public class ComponentType extends BaseType {
-  final private Map<Direction, ListOfNamed<FunctionType>> iface;
+public class ComponentType extends NamedElementType {
 
-  public ComponentType(ElementInfo info, String name) {
-    super(info, name);
-    iface = new HashMap<Direction, ListOfNamed<FunctionType>>();
-    iface.put(Direction.in, new ListOfNamed<FunctionType>());
-    iface.put(Direction.out, new ListOfNamed<FunctionType>());
-  }
-
-  public ListOfNamed<FunctionType> getIface(Direction dir) {
-    return iface.get(dir);
+  public ComponentType(ElementInfo info, String name, Collection<NamedElement> element) {
+    super(info, name, element);
   }
 
 }

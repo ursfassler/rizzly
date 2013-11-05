@@ -151,7 +151,7 @@ public class MainEvl {
     // only for debugging
     // typecheck(classes, debugdir);
 
-    RangeConverter.process(aclasses,kb);
+    RangeConverter.process(aclasses, kb);
     RizzlyProgram prg = instantiate(root, debugdir, aclasses);
 
     {

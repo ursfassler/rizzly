@@ -131,7 +131,7 @@ public class Main {
 
     // XXX no enums at this stage?
     // EnumElementConstPropagation.process(prog);
-    
+
     PirPrinter.print(prog, debugdir + "beforeToC.rzy");
 
     cir.other.Program cprog = (cir.other.Program) ToC.process(prog);

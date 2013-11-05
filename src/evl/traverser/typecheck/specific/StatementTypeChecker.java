@@ -6,7 +6,9 @@ import error.ErrorType;
 import error.RError;
 import evl.Evl;
 import evl.NullTraverser;
+import evl.expression.Expression;
 import evl.knowledge.KnowBaseItem;
+import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
 import evl.statement.Assignment;
 import evl.statement.Block;
@@ -35,6 +37,7 @@ import evl.variable.Variable;
 
 public class StatementTypeChecker extends NullTraverser<Void, Void> {
   private KnowledgeBase kb;
+  private KnowType kt;
   private KnowBaseItem kbi;
   private Type funcReturn;
 
@@ -42,6 +45,7 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
     super();
     this.kb = kb;
     kbi = kb.getEntry(KnowBaseItem.class);
+    kt = kb.getEntry(KnowType.class);
     this.funcReturn = funcReturn;
   }
 
@@ -59,6 +63,11 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
     for (Evl itr : list) {
       visit(itr, sym);
     }
+  }
+
+  private Type checkGetExpr(Expression expr) {
+    ExpressionTypeChecker.process(expr, kb);
+    return kt.get(expr);
   }
 
   @Override
@@ -80,7 +89,7 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitEnumElement(EnumElement obj, Void param) {
-    Type defType = ExpressionTypeChecker.process(obj.getDef(), kb);
+    Type defType = checkGetExpr(obj.getDef());
     if (!LeftIsContainerOfRightTest.process(kbi.getIntegerType(), defType, kb)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Data type to big or incompatible in assignment: " + defType.getName());
     }
@@ -89,7 +98,7 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
 
   private void checkConstant(Constant obj) {
     Type ret = obj.getType().getRef();
-    Type defType = ExpressionTypeChecker.process(obj.getDef(), kb);
+    Type defType = checkGetExpr(obj.getDef());
     if (!LeftIsContainerOfRightTest.process(ret, defType, kb)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Data type to big or incompatible in assignment: " + ret.getName() + " := " + defType.getName());
     }
@@ -114,7 +123,7 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitWhile(While obj, Void param) {
-    Type cond = ExpressionTypeChecker.process(obj.getCondition(), kb);
+    Type cond = checkGetExpr(obj.getCondition());
     if (!(cond instanceof BooleanType)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Need boolean type, got: " + cond.getName());
     }
@@ -125,23 +134,19 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
   @Override
   protected Void visitIfStmt(IfStmt obj, Void param) {
     for (IfOption opt : obj.getOption()) {
-      Type cond = ExpressionTypeChecker.process(opt.getCondition(), kb);
+      Type cond = checkGetExpr(opt.getCondition());
       if (!(cond instanceof BooleanType)) {
         RError.err(ErrorType.Error, opt.getInfo(), "Need boolean type, got: " + cond.getName());
       }
-
-      // TODO use knowledge from previous condition to constrain RangeType of variable
-
       visit(opt.getCode(), param);
     }
-    // TODO use knowledge from previous condition to constrain RangeType of variable
     visit(obj.getDefblock(), param);
     return null;
   }
 
   @Override
   protected Void visitCaseStmt(CaseStmt obj, Void map) {
-    Type cond = ExpressionTypeChecker.process(obj.getCondition(), kb);
+    Type cond = checkGetExpr(obj.getCondition());
     // TODO enumerator and boolean should also be allowed
     if (!LeftIsContainerOfRightTest.process(kbi.getIntegerType(), cond, kb)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Condition variable has to be an integer, got: " + cond.getName());
@@ -161,8 +166,8 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitCaseOptRange(CaseOptRange obj, Void map) {
-    Type start = ExpressionTypeChecker.process(obj.getStart(), kb);
-    Type end = ExpressionTypeChecker.process(obj.getEnd(), kb);
+    Type start = checkGetExpr(obj.getStart());
+    Type end = checkGetExpr(obj.getEnd());
     if (!LeftIsContainerOfRightTest.process(kbi.getIntegerType(), start, kb)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Case value has to be an integer (start), got: " + start.getName());
     }
@@ -174,7 +179,7 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitCaseOptValue(CaseOptValue obj, Void map) {
-    Type value = ExpressionTypeChecker.process(obj.getValue(), kb);
+    Type value = checkGetExpr(obj.getValue());
     if (!LeftIsContainerOfRightTest.process(kbi.getIntegerType(), value, kb)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Case value has to be an integer, got: " + value.getName());
     }
@@ -188,9 +193,9 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitAssignment(Assignment obj, Void map) {
-    Type lhs = RefTypeChecker.process(obj.getLeft(), kb);
-    Type rhs = ExpressionTypeChecker.process(obj.getRight(), kb);
+  protected Void visitAssignment(Assignment obj, Void param) {
+    Type lhs = checkGetExpr(obj.getLeft());
+    Type rhs = checkGetExpr(obj.getRight());
     if (!LeftIsContainerOfRightTest.process(lhs, rhs, kb)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Data type to big or incompatible in assignment: " + lhs.getName() + " := " + rhs.getName());
     }
@@ -205,7 +210,7 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitReturnExpr(ReturnExpr obj, Void map) {
-    Type ret = ExpressionTypeChecker.process(obj.getExpr(), kb);
+    Type ret = checkGetExpr(obj.getExpr());
     if (!LeftIsContainerOfRightTest.process(funcReturn, ret, kb)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Data type to big or incompatible to return: " + funcReturn.getName() + " := " + ret.getName());
     }

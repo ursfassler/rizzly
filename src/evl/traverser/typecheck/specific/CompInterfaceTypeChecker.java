@@ -25,6 +25,7 @@ import evl.function.FunctionBase;
 import evl.function.FunctionHeader;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.Transition;
+import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
 import evl.other.CompUse;
 import evl.other.Component;
@@ -35,17 +36,18 @@ import evl.other.NamedList;
 import evl.other.Namespace;
 import evl.traverser.ClassGetter;
 import evl.traverser.typecheck.LeftIsContainerOfRightTest;
-import evl.traverser.typecheck.TypeGetter;
 import evl.type.Type;
 import evl.variable.Constant;
 
 public class CompInterfaceTypeChecker extends NullTraverser<Void, Void> {
 
   private KnowledgeBase kb;
+  private KnowType kt;
 
   public CompInterfaceTypeChecker(KnowledgeBase kb) {
     super();
     this.kb = kb;
+    this.kt = kb.getEntry(KnowType.class);
   }
 
   public static void process(Namespace impl, KnowledgeBase kb) {
@@ -133,8 +135,8 @@ public class CompInterfaceTypeChecker extends NullTraverser<Void, Void> {
         RError.err(ErrorType.Error, info, "Missing callback for component/function " + compname + "." + itr.first.getName());
       }
 
-      Type prottype = TypeGetter.process(itr.first);
-      Type impltype = TypeGetter.process(itr.second);
+      Type prottype = kt.get(itr.first);
+      Type impltype = kt.get(itr.second);
       if (!LeftIsContainerOfRightTest.process(prottype, impltype, kb)) {
         RError.err(ErrorType.Error, itr.second.getInfo(), "Function does not implement prototype: " + itr.first);
       }
@@ -147,8 +149,8 @@ public class CompInterfaceTypeChecker extends NullTraverser<Void, Void> {
       if (impl == null) {
         RError.err(ErrorType.Error, proto.getInfo(), "Missing function implementation " + proto.getName());
       } else {
-        Type prottype = TypeGetter.process(proto);
-        Type impltype = TypeGetter.process(impl);
+        Type prottype = kt.get(proto);
+        Type impltype = kt.get(impl);
         if (!LeftIsContainerOfRightTest.process(prottype, impltype, kb)) {
           RError.err(ErrorType.Error, impl.getInfo(), "Function does not implement prototype: " + proto);
         }
@@ -178,8 +180,8 @@ public class CompInterfaceTypeChecker extends NullTraverser<Void, Void> {
         RError.err(ErrorType.Error, info, "missing function implementation " + name + "." + itr.first.getName());
       }
 
-      Type prottype = TypeGetter.process(itr.first);
-      Type impltype = TypeGetter.process(itr.second);
+      Type prottype = kt.get(itr.first);
+      Type impltype = kt.get(itr.second);
       if (!LeftIsContainerOfRightTest.process(prottype, impltype, kb)) {
         RError.err(ErrorType.Error, itr.second.getInfo(), "Function does not implement prototype: " + itr.first);
       }
