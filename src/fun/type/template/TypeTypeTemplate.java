@@ -16,6 +16,7 @@ public class TypeTypeTemplate extends BuiltinTemplate {
 
   public TypeTypeTemplate() {
     super(new ElementInfo(), NAME);
+    getTemplateParam().addAll(makeParam());
   }
 
   public static List<TemplateParameter> makeParam() {

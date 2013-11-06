@@ -19,7 +19,6 @@ import fun.function.impl.FuncPrivateRet;
 import fun.function.impl.FuncPrivateVoid;
 import fun.function.impl.FuncProtRet;
 import fun.function.impl.FuncProtVoid;
-import fun.other.Generator;
 import fun.statement.Assignment;
 import fun.statement.Statement;
 import fun.statement.VarDefStmt;
@@ -129,13 +128,13 @@ public class BaseParser extends Parser {
   }
 
   // EBNF globalFunction: "function" id genericParam vardeflist ":" ref block "end"
-  protected Generator parseGlobalFunction() {
+  protected FuncGlobal parseGlobalFunction() {
     Token tok = expect(TokenType.FUNCTION);
 
     FuncGlobal func = new FuncGlobal(tok.getInfo());
     func.setName(expect(TokenType.IDENTIFIER).getData());
 
-    List<TemplateParameter> gen = parseGenericParam();
+    func.getTemplateParam().addAll(parseGenericParam());
 
     func.getParam().addAll(parseVardefList());
 
@@ -146,7 +145,7 @@ public class BaseParser extends Parser {
     func.setBody(stmt().parseBlock());
     expect(TokenType.END);
 
-    return new Generator(tok.getInfo(), func, gen);
+    return func;
   }
 
   // TODO do we need the designatior ir is id enough?

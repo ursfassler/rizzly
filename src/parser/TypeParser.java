@@ -15,7 +15,6 @@ import fun.expression.reference.Reference;
 import fun.expression.reference.ReferenceUnlinked;
 import fun.function.FunctionHeader;
 import fun.other.Component;
-import fun.other.Generator;
 import fun.other.ListOfNamed;
 import fun.type.Type;
 import fun.type.base.EnumElement;
@@ -35,9 +34,9 @@ public class TypeParser extends BaseParser {
   }
 
   // EBNF compdefsec: "component" compdecl { compdecl }
-  protected List<Generator> parseComponentSection() {
+  protected List<Component> parseComponentSection() {
     expect(TokenType.COMPONENT);
-    List<Generator> ret = new ArrayList<Generator>();
+    List<Component> ret = new ArrayList<Component>();
     do {
       ret.add(parseCompdecl());
     } while (peek().getType() == TokenType.IDENTIFIER);
@@ -45,9 +44,9 @@ public class TypeParser extends BaseParser {
   }
 
   // EBNF typesec: "type" typedecl { typedecl }
-  protected List<Generator> parseTypeSection(ListOfNamed<Constant> constants) {
+  protected List<Type> parseTypeSection(ListOfNamed<Constant> constants) {
     expect(TokenType.TYPE_SEC);
-    List<Generator> ret = new ArrayList<Generator>();
+    List<Type> ret = new ArrayList<Type>();
     do {
       ret.add(parseTypedecl(constants));
     } while (peek().getType() == TokenType.IDENTIFIER);
@@ -55,7 +54,7 @@ public class TypeParser extends BaseParser {
   }
 
   // EBNF compdecl: id genericParam component
-  private Generator parseCompdecl() {
+  private Component parseCompdecl() {
     Token name = expect(TokenType.IDENTIFIER);
     List<TemplateParameter> genpam;
     if (peek().getType() == TokenType.OPENCURLY) {
@@ -65,9 +64,9 @@ public class TypeParser extends BaseParser {
     }
 
     Component type = parseComponent(name);
+    type.getTemplateParam().addAll(genpam);
 
-    Generator func = new Generator(name.getInfo(), type, genpam);
-    return func;
+    return type;
   }
 
   // EBNF component: [ "input" funcDefList ] [ "output" funcDefList ] componentImplementation "end"
@@ -94,7 +93,7 @@ public class TypeParser extends BaseParser {
   }
 
   // EBNF typedecl: id genericParam "=" typedef
-  private Generator parseTypedecl(ListOfNamed<Constant> constants) {
+  private Type parseTypedecl(ListOfNamed<Constant> constants) {
     Token name = expect(TokenType.IDENTIFIER);
     List<TemplateParameter> genpam;
     if (peek().getType() == TokenType.OPENCURLY) {
@@ -105,9 +104,9 @@ public class TypeParser extends BaseParser {
     expect(TokenType.EQUAL);
 
     Type type = parseTypeDef(name.getData(), constants);
+    type.getTemplateParam().addAll(genpam);
 
-    Generator func = new Generator(name.getInfo(), type, genpam);
-    return func;
+    return type;
   }
 
   // EBNF typedef: recordtype | uniontype | enumtype | arraytype | derivatetype

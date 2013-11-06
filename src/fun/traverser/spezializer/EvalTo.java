@@ -17,13 +17,16 @@ public class EvalTo {
     ReferenceLinked obj = (ReferenceLinked) expr;
 
     if (!(obj.getLink() instanceof Generator)) {
-      return (Named) obj.getLink();
+      return obj.getLink();
     }
-    assert (obj.getLink() instanceof Generator);
+    Generator generator = (Generator) obj.getLink();
+    if (obj.getOffset().isEmpty() || !(obj.getOffset().get(0) instanceof RefTemplCall)) {
+      assert (generator.getTemplateParam().isEmpty());
+      return generator;
+    }
     assert (obj.getOffset().size() == 1);
     assert (obj.getOffset().get(0) instanceof RefTemplCall);
 
-    Generator generator = (Generator) obj.getLink();
     List<Expression> actparam = ((RefTemplCall) obj.getOffset().get(0)).getActualParameter();
 
     return Specializer.process(generator, actparam, expr.getInfo(), kb);

@@ -2,23 +2,29 @@ package fun.traverser.spezializer;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import common.Designator;
 import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
+import fun.Copy;
 import fun.expression.Expression;
 import fun.expression.Number;
 import fun.expression.reference.ReferenceLinked;
+import fun.expression.reference.ReferenceUnlinked;
 import fun.knowledge.KnowFunPath;
 import fun.knowledge.KnowledgeBase;
 import fun.other.ActualTemplateArgument;
 import fun.other.Generator;
 import fun.other.Named;
 import fun.other.Namespace;
+import fun.traverser.ExprReplacer;
 import fun.traverser.Memory;
+import fun.traverser.TypeEvalReplacer;
 import fun.type.Type;
 import fun.type.base.AnyType;
 import fun.type.base.IntegerType;
@@ -40,10 +46,10 @@ public class Specializer {
     Namespace parent = (Namespace) kb.getRoot().getChildItem(path.toList());
     Named inst = parent.find(name);
     if (inst == null) {
-      if (item.getTemplate() instanceof BuiltinTemplate) {
-        inst = GenericSpecializer.process((BuiltinTemplate) item.getTemplate(), param, kb);
+      if (item instanceof BuiltinTemplate) {
+        inst = GenericSpecializer.process((BuiltinTemplate) item, param, kb);
       } else {
-        inst = TypeSpecializer.evaluate(item.getParam().getList(), param, item.getTemplate(), kb);
+        inst = evaluate(param, item, kb);
         inst.setName(name);
       }
       assert (inst.getName().equals(name));
@@ -54,15 +60,15 @@ public class Specializer {
   }
 
   private static List<ActualTemplateArgument> evalParam(Generator item, List<Expression> genspec, ElementInfo info, KnowledgeBase kb) {
-    if (genspec.size() != item.getParam().size()) {
-      RError.err(ErrorType.Error, info, "Wrong number of parameter, expected " + genspec.size() + " got " + item.getParam().size());
+    if (genspec.size() != item.getTemplateParam().size()) {
+      RError.err(ErrorType.Error, info, "Wrong number of parameter, expected " + genspec.size() + " got " + item.getTemplateParam().size());
     }
-    assert (genspec.size() == item.getParam().size());
+    assert (genspec.size() == item.getTemplateParam().size());
 
     List<ActualTemplateArgument> ret = new ArrayList<ActualTemplateArgument>(genspec.size());
 
     for (int i = 0; i < genspec.size(); i++) {
-      TemplateParameter pitm = item.getParam().getList().get(i);
+      TemplateParameter pitm = item.getTemplateParam().getList().get(i);
       ReferenceLinked tref = (ReferenceLinked) pitm.getType();
       Type type = (Type) EvalTo.any(tref, kb);
       ActualTemplateArgument evald;
@@ -80,7 +86,7 @@ public class Specializer {
         // TODO check type
       } else if (type instanceof TypeType) {
         ReferenceLinked rl = (ReferenceLinked) acarg;
-        evald = (Type) EvalTo.any(rl, kb);
+        evald = (ActualTemplateArgument) EvalTo.any(rl, kb);
         // TODO check type
       } else {
         throw new RuntimeException("not yet implemented: " + type.getName());
@@ -112,6 +118,63 @@ public class Specializer {
     }
     name += "}";
     return name;
+  }
+
+  private static Generator evaluate(List<ActualTemplateArgument> genspec, Generator template, KnowledgeBase kb) {
+    List<TemplateParameter> param = template.getTemplateParam().getList();
+    template = Copy.copy(template);
+
+    Memory mem = new Memory();
+    Map<TemplateParameter, ActualTemplateArgument> map = new HashMap<TemplateParameter, ActualTemplateArgument>();
+    for (int i = 0; i < genspec.size(); i++) {
+      TemplateParameter var = param.get(i);
+      ActualTemplateArgument val = genspec.get(i);
+      // TODO can we ensure that val is evaluated?
+      map.put(var, val);
+
+      if (val instanceof Expression) { // TODO ok?
+        mem.createVar(var);
+        mem.setInt(var, (Expression) val);
+      }
+    }
+
+    TypeSpecTrav evaluator = new TypeSpecTrav();
+    evaluator.traverse(template, map);
+
+    TypeEvalReplacer typeEvalReplacer = new TypeEvalReplacer(kb);
+    typeEvalReplacer.traverse(template, mem);
+
+    return template;
+  }
+}
+
+/**
+ * Replaces a reference to a CompfuncParameter with the value of it
+ * 
+ * @author urs
+ * 
+ */
+class TypeSpecTrav extends ExprReplacer<Map<TemplateParameter, ActualTemplateArgument>> {
+  @Override
+  protected Expression visitReferenceUnlinked(ReferenceUnlinked obj, Map<TemplateParameter, ActualTemplateArgument> param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Expression visitReferenceLinked(ReferenceLinked obj, Map<TemplateParameter, ActualTemplateArgument> param) {
+    super.visitReferenceLinked(obj, param);
+
+    if (param.containsKey(obj.getLink())) {
+      ActualTemplateArgument repl = param.get(obj.getLink());
+      if (repl instanceof Type) {
+        return new ReferenceLinked(obj.getInfo(), (Type) repl);
+      } else {
+        return (Expression) repl;
+      }
+    } else {
+      assert (!(obj.getLink() instanceof TemplateParameter));
+      return obj;
+    }
   }
 
 }

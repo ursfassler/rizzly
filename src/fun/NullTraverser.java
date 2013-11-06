@@ -25,7 +25,6 @@ import fun.hfsm.ImplHfsm;
 import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
-import fun.other.Generator;
 import fun.other.ImplElementary;
 import fun.other.Namespace;
 import fun.other.RizzlyFile;
@@ -244,7 +243,7 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitCompfuncParameter(TemplateParameter obj, P param) {
+  protected R visitTemplateParameter(TemplateParameter obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -393,11 +392,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitFuncEntryExit(FuncEntryExit obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitGenerator(Generator obj, P param) {
     return visitDefault(obj, param);
   }
 

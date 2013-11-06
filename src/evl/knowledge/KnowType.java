@@ -41,6 +41,7 @@ import evl.expression.reference.RefName;
 import evl.expression.reference.RefPtrDeref;
 import evl.expression.reference.Reference;
 import evl.expression.unop.Not;
+import evl.expression.unop.Uminus;
 import evl.function.FuncIface;
 import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
@@ -429,6 +430,16 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
   @Override
   protected Type visitNot(Not obj, Void param) {
     return kbi.getBooleanType(); // FIXME what with invert?
+  }
+
+  @Override
+  protected Type visitUminus(Uminus obj, Void param) {
+    Type lhs = visit(obj.getExpr(), param);
+    assert (lhs instanceof RangeType);
+    Range lr = ((RangeType) lhs).getNumbers();
+    BigInteger low = BigInteger.ZERO.subtract(lr.getHigh());
+    BigInteger high = BigInteger.ZERO.subtract(lr.getLow());
+    return kbi.getNumsetType(new Range(low, high));
   }
 
   @Override

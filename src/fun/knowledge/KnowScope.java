@@ -19,7 +19,6 @@ import fun.hfsm.ImplHfsm;
 import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
-import fun.other.Generator;
 import fun.other.ImplElementary;
 import fun.type.base.AnyType;
 import fun.type.base.BooleanType;
@@ -57,7 +56,6 @@ public class KnowScope extends KnowledgeEntry {
     global.add(ConstGlobal.class);
     global.add(FuncGlobal.class);
 
-    global.add(Generator.class);
     global.add(IntegerType.class);
     global.add(ArrayTemplate.class);
     global.add(Range.class);

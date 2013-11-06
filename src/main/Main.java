@@ -1,40 +1,15 @@
 package main;
 
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Set;
-
-import org.jgrapht.traverse.TopologicalOrderIterator;
 
 import util.Pair;
-import util.SimpleGraph;
-import cir.function.LibFunction;
-import cir.library.CLibrary;
-import cir.other.FuncVariable;
-import cir.traverser.BlockReduction;
-import cir.traverser.BoolToEnum;
-import cir.traverser.CArrayCopy;
+import cir.other.Program;
 import cir.traverser.CWriter;
-import cir.traverser.FpcHeaderWriter;
-import cir.traverser.RangeReplacer;
-import cir.traverser.Renamer;
-import cir.traverser.VarDeclToTop;
-import cir.type.PointerType;
-import cir.type.Type;
-import cir.type.TypeRef;
-import cir.type.UIntType;
-import cir.type.VoidType;
 
 import common.Designator;
-import common.FuncAttr;
 
 import error.RException;
-import evl.doc.StreamWriter;
 import evl.other.Component;
 import fun.other.Namespace;
 import fun.toevl.FunToEvl;
@@ -49,7 +24,8 @@ import fun.toevl.FunToEvl;
 //TODO check for zero before division
 //TODO check range by user input
 //TODO check if event handling is in progress when starting event handling
-//TODO can we remove PIR? 
+//TODO check stuff in joGraph (and remove)
+
 public class Main {
 
   /**
@@ -93,7 +69,7 @@ public class Main {
 
     Pair<String, Namespace> fret = MainFun.doFun(opt, rootfile, debugdir, docdir);
     evl.other.Namespace aclasses = FunToEvl.process(fret.second, debugdir);
-    evl.doc.PrettyPrinter.print(aclasses, debugdir + "afterFun.rzy", true);
+    evl.traverser.PrettyPrinter.print(aclasses, debugdir + "afterFun.rzy", true);
     evl.other.Component root;
     {
       ArrayList<String> nl = opt.getRootComp().toList();
@@ -105,130 +81,13 @@ public class Main {
     ArrayList<String> debugNames = new ArrayList<String>();
     evl.other.RizzlyProgram prg = MainEvl.doEvl(opt, outdir, debugdir, aclasses, root, debugNames);
 
-    evl.doc.PrettyPrinter.print(prg, debugdir + "beforeCir.rzy", true);
+    evl.traverser.PrettyPrinter.print(prg, debugdir + "beforeCir.rzy", true);
 
-    cir.other.Program cprog = makeC(debugdir, (cir.other.Program) evl.traverser.ToC.process(prg));
+    Program cprog = (cir.other.Program) evl.traverser.ToC.process(prg);
 
-    printC(outdir, prg.getName(), cprog);
+    cprog = MainCir.doCir(cprog, debugdir);
 
-    // TODO reimplement
-    // printFpcHeader(outdir, prg.getName(), cprog);
-  }
-
-  private static cir.other.Program makeC(String debugdir, cir.other.Program cprog) {
-    RangeReplacer.process(cprog);
-    CWriter.print(cprog, debugdir + "norange.rzy", true);
-
-    BlockReduction.process(cprog);
-
-    makeCLibrary(cprog.getLibrary());
-
-    BoolToEnum.process(cprog);
-    CArrayCopy.process(cprog);
-    VarDeclToTop.process(cprog);
-
-    Renamer.process(cprog);
-
-    toposort(cprog.getType());
-    return cprog;
-  }
-
-  private static void makeCLibrary(List<CLibrary> list) {
-    list.add(makeClibString());
-  }
-
-  private static CLibrary makeClibString() {
-    Set<FuncAttr> attr = new HashSet<FuncAttr>();
-    attr.add(FuncAttr.Public);
-
-    CLibrary ret = new CLibrary("string");
-
-    { // memcpy
-      UIntType uint4 = new UIntType(4); // FIXME get singleton
-
-      List<FuncVariable> arg = new ArrayList<FuncVariable>();
-      PointerType voidp = new PointerType("voidp_t", new TypeRef(new VoidType())); // FIXME get void singleton
-      arg.add(new FuncVariable("dstp", new cir.type.TypeRef(voidp)));
-      arg.add(new FuncVariable("srcp", new cir.type.TypeRef(voidp)));
-      arg.add(new FuncVariable("size", new cir.type.TypeRef(uint4)));
-      LibFunction memcpy = new LibFunction("memcpy", new cir.type.TypeRef(voidp), arg, new HashSet<FuncAttr>(attr));
-      ret.getFunction().add(memcpy);
-    }
-
-    return ret;
-  }
-
-  private static void printFpcHeader(String outdir, String name, cir.other.Program cprog) {
-    String cfilename = outdir + name + ".pas";
-    FpcHeaderWriter cwriter = new FpcHeaderWriter();
-    try {
-      cwriter.traverse(cprog, new StreamWriter(new PrintStream(cfilename)));
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    }
-  }
-
-  private static void printC(String outdir, String name, cir.other.Program cprog) {
-    // output c prog
-    {
-      String cfilename = outdir + name + ".c";
-      CWriter cwriter = new CWriter();
-      try {
-        cwriter.traverse(cprog, new StreamWriter(new PrintStream(cfilename)));
-      } catch (FileNotFoundException e) {
-        e.printStackTrace();
-      }
-    }
-
-    // output c header file
-    {
-      // FIXME we already wrote a (better) header at EVL level
-      /*
-       * String cfilename = outdir + name + ".h"; cir.traverser.CHeaderWriter cwriter = new
-       * cir.traverser.CHeaderWriter(); try { cwriter.traverse(cprog, new StreamWriter(new PrintStream(cfilename))); }
-       * catch (FileNotFoundException e) { e.printStackTrace(); }
-       */
-    }
-  }
-
-  private static void toposort(List<cir.type.Type> list) {
-    SimpleGraph<cir.type.Type> g = new SimpleGraph<cir.type.Type>();
-    for (cir.type.Type u : list) {
-      g.addVertex(u);
-      Set<cir.type.Type> vs = getDirectUsedTypes(u);
-      for (Type v : vs) {
-        g.addVertex(v);
-        g.addEdge(u, v);
-      }
-    }
-
-    ArrayList<cir.type.Type> old = new ArrayList<cir.type.Type>(list);
-    int size = list.size();
-    list.clear();
-    LinkedList<cir.type.Type> nlist = new LinkedList<cir.type.Type>();
-    TopologicalOrderIterator<cir.type.Type, Pair<cir.type.Type, cir.type.Type>> itr = new TopologicalOrderIterator<cir.type.Type, Pair<cir.type.Type, cir.type.Type>>(g);
-    while (itr.hasNext()) {
-      nlist.push(itr.next());
-    }
-    list.addAll(nlist);
-
-    ArrayList<cir.type.Type> diff = new ArrayList<cir.type.Type>(list);
-    diff.removeAll(old);
-    old.removeAll(list);
-    assert (size == list.size());
-  }
-
-  private static Set<cir.type.Type> getDirectUsedTypes(cir.type.Type u) {
-    cir.DefTraverser<Void, Set<cir.type.Type>> getter = new cir.DefTraverser<Void, Set<cir.type.Type>>() {
-      @Override
-      protected Void visitTypeRef(cir.type.TypeRef obj, Set<cir.type.Type> param) {
-        param.add(obj.getRef());
-        return null;
-      }
-    };
-    Set<cir.type.Type> vs = new HashSet<cir.type.Type>();
-    getter.traverse(u, vs);
-    return vs;
+    CWriter.print(cprog, outdir + prg.getName() + ".c", false);
   }
 
 }

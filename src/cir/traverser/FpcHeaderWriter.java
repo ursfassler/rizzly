@@ -3,6 +3,7 @@ package cir.traverser;
 import java.util.ArrayList;
 import java.util.List;
 
+import util.StreamWriter;
 import cir.CirBase;
 import cir.NullTraverser;
 import cir.expression.BoolValue;
@@ -28,8 +29,6 @@ import cir.type.UnionType;
 import cir.type.VoidType;
 
 import common.FuncAttr;
-
-import evl.doc.StreamWriter;
 
 //FIXME do not name boolean elements true and false; they are defined by the language
 

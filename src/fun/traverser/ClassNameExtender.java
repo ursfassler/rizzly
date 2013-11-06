@@ -13,7 +13,7 @@ import common.Direction;
 
 import error.ErrorType;
 import error.RError;
-import fun.DefGTraverser;
+import fun.DefTraverser;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.composition.ImplComposition;
@@ -31,7 +31,6 @@ import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
 import fun.other.Component;
-import fun.other.Generator;
 import fun.other.ImplElementary;
 import fun.other.ListOfNamed;
 import fun.other.Named;
@@ -58,7 +57,7 @@ import fun.variable.TemplateParameter;
  * @author urs
  * 
  */
-public class ClassNameExtender extends DefGTraverser<Void, SymbolTable<Designator, String>> {
+public class ClassNameExtender extends DefTraverser<Void, SymbolTable<Designator, String>> {
   private Map<Designator, RizzlyFile> rfile;
   private HashMap<State, Designator> fullName = null;
   private HashMap<Designator, SymbolTable<Designator, String>> stateTable = null;
@@ -94,7 +93,6 @@ public class ClassNameExtender extends DefGTraverser<Void, SymbolTable<Designato
     addImports(imported, param);
     param = new SymbolTable<Designator, String>(param);
 
-    AdderWithPrefix.add(obj.getCompfunc(), obj.getName(), param);
     AdderWithPrefix.add(obj.getType(), obj.getName(), param);
     AdderWithPrefix.add(obj.getComp(), obj.getName(), param);
     AdderWithPrefix.add(obj.getConstant(), obj.getName(), param);
@@ -335,17 +333,9 @@ public class ClassNameExtender extends DefGTraverser<Void, SymbolTable<Designato
   }
 
   @Override
-  protected Void visitGenerator(Generator obj, SymbolTable<Designator, String> param) {
-    return super.visitGenerator(obj, generator(obj, param));
-  }
-
-  private SymbolTable<Designator, String> generator(Generator obj, SymbolTable<Designator, String> param) {
-    param = new SymbolTable<Designator, String>(param);
-    for (TemplateParameter gen : obj.getParam()) {
-      param.add(gen.getName(), new Designator(gen.getName()));
-    }
-    param.add("Self", new Designator(obj.getName()));
-    return param;
+  protected Void visitTemplateParameter(TemplateParameter obj, SymbolTable<Designator, String> param) {
+    param.add(obj.getName(), new Designator(obj.getName()));
+    return super.visitTemplateParameter(obj, param);
   }
 
   @Override
@@ -466,7 +456,7 @@ class AdderWithPrefix extends NullTraverser<Void, Designator> {
   @Override
   protected Void visitEnumType(EnumType obj, Designator param) {
     add(obj, param);
-    visitItr(obj.getElement(), param);
+    // visitItr(obj.getElement(), param);
     return null;
   }
 
@@ -491,12 +481,6 @@ class AdderWithPrefix extends NullTraverser<Void, Designator> {
   @Override
   protected Void visitComponent(Component obj, Designator param) {
     add(obj, param);
-    return null;
-  }
-
-  @Override
-  protected Void visitGenerator(Generator obj, Designator param) {
-    add(obj, param); // FIXME ok?
     return null;
   }
 

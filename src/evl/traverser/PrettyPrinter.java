@@ -1,9 +1,11 @@
-package evl.doc;
+package evl.traverser;
 
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.List;
+
+import util.StreamWriter;
 
 import common.Direction;
 import common.FuncAttr;

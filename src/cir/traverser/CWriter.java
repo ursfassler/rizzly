@@ -5,6 +5,7 @@ import java.io.PrintStream;
 import java.math.BigInteger;
 
 import util.Range;
+import util.StreamWriter;
 import cir.Cir;
 import cir.CirBase;
 import cir.NullTraverser;
@@ -57,7 +58,6 @@ import common.FuncAttr;
 
 import error.ErrorType;
 import error.RError;
-import evl.doc.StreamWriter;
 
 public class CWriter extends NullTraverser<Void, StreamWriter> {
   private boolean printReferenceId = false;

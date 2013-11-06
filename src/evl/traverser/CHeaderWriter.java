@@ -5,11 +5,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
+import util.StreamWriter;
+
 import common.FuncAttr;
 
 import evl.Evl;
 import evl.NullTraverser;
-import evl.doc.StreamWriter;
 import evl.expression.Number;
 import evl.function.FunctionBase;
 import evl.function.impl.FuncProtoRet;

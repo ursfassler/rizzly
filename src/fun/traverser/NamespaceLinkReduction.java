@@ -2,7 +2,7 @@ package fun.traverser;
 
 import error.ErrorType;
 import error.RError;
-import fun.DefGTraverser;
+import fun.DefTraverser;
 import fun.Fun;
 import fun.expression.reference.RefItem;
 import fun.expression.reference.RefName;
@@ -19,7 +19,7 @@ import fun.other.Namespace;
  * @author urs
  * 
  */
-public class NamespaceLinkReduction extends DefGTraverser<Void, Void> {
+public class NamespaceLinkReduction extends DefTraverser<Void, Void> {
 
   public static void process(Fun inst) {
     NamespaceLinkReduction reduction = new NamespaceLinkReduction();

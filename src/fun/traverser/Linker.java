@@ -18,13 +18,15 @@ import fun.hfsm.Transition;
 import fun.knowledge.KnowFunChild;
 import fun.knowledge.KnowledgeBase;
 import fun.other.Component;
-import fun.other.Generator;
 import fun.other.ImplElementary;
 import fun.other.Named;
 import fun.statement.Block;
 import fun.statement.VarDefStmt;
 import fun.symbol.SymbolTable;
+import fun.type.Type;
+import fun.variable.TemplateParameter;
 
+//TODO merge with ClassNameExtender?
 public class Linker extends RefReplacer<SymbolTable<Named, String>> {
   private KnowledgeBase kb;
 
@@ -133,19 +135,22 @@ public class Linker extends RefReplacer<SymbolTable<Named, String>> {
   }
 
   @Override
-  protected Expression visitGenerator(Generator obj, SymbolTable<Named, String> param) {
-    param = new SymbolTable<Named, String>(param);
-    add(param, obj.getParam());
-    super.visitGenerator(obj, param);
-    return null;
-  }
-
-  @Override
   protected Reference visitFunctionHeader(FunctionHeader obj, SymbolTable<Named, String> param) {
     param = new SymbolTable<Named, String>(param);
     add(param, obj.getParam());
     super.visitFunctionHeader(obj, param);
     return null;
+  }
+
+  @Override
+  protected Expression visitTemplateParameter(TemplateParameter obj, SymbolTable<Named, String> param) {
+    add(param, obj);
+    return super.visitTemplateParameter(obj, param);
+  }
+
+  @Override
+  protected Expression visitType(Type obj, SymbolTable<Named, String> param) {
+    return super.visitType(obj, new SymbolTable<Named, String>(param));
   }
 
   @Override

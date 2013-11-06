@@ -17,9 +17,6 @@ import fun.expression.reference.RefName;
 import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.ReferenceLinked;
 import fun.expression.reference.ReferenceUnlinked;
-import fun.function.FuncWithBody;
-import fun.function.FuncWithReturn;
-import fun.function.FunctionHeader;
 import fun.function.impl.FuncEntryExit;
 import fun.function.impl.FuncGlobal;
 import fun.function.impl.FuncPrivateRet;
@@ -30,7 +27,6 @@ import fun.hfsm.ImplHfsm;
 import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
-import fun.other.Generator;
 import fun.other.ImplElementary;
 import fun.other.ListOfNamed;
 import fun.other.Named;
@@ -77,7 +73,7 @@ import fun.variable.FuncVariable;
 import fun.variable.StateVariable;
 import fun.variable.TemplateParameter;
 
-public class DefGTraverser<R, P> extends Traverser<R, P> {
+public class DefTraverser<R, P> extends Traverser<R, P> {
 
   protected <T extends Named> R visitList(ListOfNamed<T> list, P param) {
     visitItr(list.getList(), param);
@@ -86,7 +82,6 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitRizzlyFile(RizzlyFile obj, P param) {
-    visitList(obj.getCompfunc(), param);
     visitList(obj.getType(), param);
     visitList(obj.getComp(), param);
     visitList(obj.getConstant(), param);
@@ -96,6 +91,8 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitImplElementary(ImplElementary obj, P param) {
+    visitList(obj.getTemplateParam(), param);
+
     visitList(obj.getIface(Direction.in), param);
     visitList(obj.getIface(Direction.out), param);
 
@@ -110,6 +107,8 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitImplComposition(ImplComposition obj, P param) {
+    visitList(obj.getTemplateParam(), param);
+
     visitList(obj.getIface(Direction.in), param);
     visitList(obj.getIface(Direction.out), param);
 
@@ -120,6 +119,8 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitImplHfsm(ImplHfsm obj, P param) {
+    visitList(obj.getTemplateParam(), param);
+
     visitList(obj.getIface(Direction.in), param);
     visitList(obj.getIface(Direction.out), param);
 
@@ -149,13 +150,6 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
   protected R visitArithmeticOp(ArithmeticOp obj, P param) {
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitGenerator(Generator obj, P param) {
-    visitItr(obj.getParam(), param);
-    visit(obj.getTemplate(), param);
     return null;
   }
 
@@ -209,6 +203,7 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitUnionType(UnionType obj, P param) {
+    visitList(obj.getTemplateParam(), param);
     visit(obj.getSelector(), param);
     visitList(obj.getElement(), param);
     return null;
@@ -216,6 +211,7 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitRecordType(RecordType obj, P param) {
+    visitList(obj.getTemplateParam(), param);
     visitList(obj.getElement(), param);
     return null;
   }
@@ -251,11 +247,13 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitBooleanType(BooleanType obj, P param) {
+    visitList(obj.getTemplateParam(), param);
     return null;
   }
 
   @Override
   protected R visitEnumType(EnumType obj, P param) {
+    visitList(obj.getTemplateParam(), param);
     visitItr(obj.getElement(), param);
     return null;
   }
@@ -280,16 +278,19 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitVoidType(VoidType obj, P param) {
+    visitList(obj.getTemplateParam(), param);
     return null;
   }
 
   @Override
   protected R visitFunctionType(FunctionType obj, P param) {
+    visitList(obj.getTemplateParam(), param);
     throw new RuntimeException("not yet implemented");
   }
 
   @Override
   protected R visitTypeAlias(TypeAlias obj, P param) {
+    visitList(obj.getTemplateParam(), param);
     visit(obj.getRef(), param);
     return null;
   }
@@ -327,7 +328,7 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitCompfuncParameter(TemplateParameter obj, P param) {
+  protected R visitTemplateParameter(TemplateParameter obj, P param) {
     visit(obj.getType(), param);
     return null;
   }
@@ -352,21 +353,25 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitArrayTemplate(ArrayTemplate obj, P param) {
+    visitList(obj.getTemplateParam(), param);
     return null;
   }
 
   @Override
   protected R visitIntegerType(IntegerType obj, P param) {
+    visitList(obj.getTemplateParam(), param);
     return null;
   }
 
   @Override
   protected R visitNaturalType(NaturalType obj, P param) {
+    visitList(obj.getTemplateParam(), param);
     return null;
   }
 
   @Override
   protected R visitTypeTypeTemplate(TypeTypeTemplate obj, P param) {
+    visitList(obj.getTemplateParam(), param);
     return null;
   }
 
@@ -378,11 +383,13 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitTypeType(TypeType obj, P param) {
+    visitList(obj.getTemplateParam(), param);
     return null;
   }
 
   @Override
   protected R visitAnyType(AnyType obj, P param) {
+    visitList(obj.getTemplateParam(), param);
     return null;
   }
 
@@ -433,6 +440,7 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitStringType(StringType obj, P param) {
+    visitList(obj.getTemplateParam(), param);
     return null;
   }
 
@@ -473,49 +481,53 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitFunctionHeader(FunctionHeader obj, P param) {
-    visitItr(obj.getParam(), param);
-    if (obj instanceof FuncWithReturn) {
-      visit(((FuncWithReturn) obj).getRet(), param);
-    }
-    if (obj instanceof FuncWithBody) {
-      visit(((FuncWithBody) obj).getBody(), param);
-    }
-    return super.visitFunctionHeader(obj, param);
-  }
-
-  @Override
   protected R visitFuncPrivateRet(FuncPrivateRet obj, P param) {
+    visitItr(obj.getParam(), param);
+    visit(obj.getRet(), param);
+    visit(obj.getBody(), param);
     return null;
   }
 
   @Override
   protected R visitFuncPrivateVoid(FuncPrivateVoid obj, P param) {
+    visitItr(obj.getParam(), param);
+    visit(obj.getBody(), param);
     return null;
   }
 
   @Override
   protected R visitFuncProtRet(FuncProtRet obj, P param) {
+    visitItr(obj.getParam(), param);
+    visit(obj.getRet(), param);
     return null;
   }
 
   @Override
   protected R visitFuncProtVoid(FuncProtVoid obj, P param) {
+    visitItr(obj.getParam(), param);
     return null;
   }
 
   @Override
   protected R visitFuncGlobal(FuncGlobal obj, P param) {
+    visitList(obj.getTemplateParam(), param);
+    visitItr(obj.getParam(), param);
+    visit(obj.getRet(), param);
+    visit(obj.getBody(), param);
     return null;
   }
 
   @Override
   protected R visitFuncPrivate(FuncPrivateVoid obj, P param) {
+    visitItr(obj.getParam(), param);
+    visit(obj.getBody(), param);
     return null;
   }
 
   @Override
   protected R visitFuncEntryExit(FuncEntryExit obj, P param) {
+    visitItr(obj.getParam(), param);
+    visit(obj.getBody(), param);
     return null;
   }
 
@@ -526,6 +538,7 @@ public class DefGTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitRangeTemplate(RangeTemplate obj, P param) {
+    visitList(obj.getTemplateParam(), param);
     return null;
   }
 

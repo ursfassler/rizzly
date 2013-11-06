@@ -214,6 +214,7 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
       Range rhs = getRange(obj.getRight());
       checkPositive(obj.getInfo(), "and", lhs, rhs);
     } else if (lhst instanceof BooleanType) {
+      // TODO we should not get here
       if (!(rhst instanceof BooleanType)) {
         RError.err(ErrorType.Fatal, rhst.getInfo(), "Expected boolean type");
       }
@@ -241,7 +242,19 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
   @Override
   protected Void visitBitOr(BitOr obj, Void param) {
     super.visitBitOr(obj, param);
-    throw new RuntimeException("not yet implemented");
+    Type lhst = kt.get(obj.getLeft());
+    Type rhst = kt.get(obj.getRight());
+
+    if (!(lhst instanceof RangeType)) {
+      RError.err(ErrorType.Fatal, lhst.getInfo(), "Expected range type");
+    }
+    if (!(rhst instanceof RangeType)) {
+      RError.err(ErrorType.Fatal, rhst.getInfo(), "Expected range type");
+    }
+    Range lhs = getRange(obj.getLeft());
+    Range rhs = getRange(obj.getRight());
+    checkPositive(obj.getInfo(), "and", lhs, rhs);
+    return null;
   }
 
   @Override

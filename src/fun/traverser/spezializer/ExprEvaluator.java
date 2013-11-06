@@ -23,18 +23,20 @@ import fun.expression.reference.RefItem;
 import fun.expression.reference.RefName;
 import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.ReferenceLinked;
+import fun.function.impl.FuncGlobal;
 import fun.knowledge.KnowledgeBase;
+import fun.other.Generator;
 import fun.traverser.Memory;
 import fun.variable.ConstGlobal;
 import fun.variable.FuncVariable;
 import fun.variable.TemplateParameter;
 
 public class ExprEvaluator extends NullTraverser<Expression, Memory> {
-  private RefExecutor rex;
+  private final KnowledgeBase kb;
 
   public ExprEvaluator(KnowledgeBase kb) {
     super();
-    rex = new RefExecutor(kb);
+    this.kb = kb;
   }
 
   public static Expression evaluate(Expression obj, Memory mem, KnowledgeBase kb) {
@@ -50,6 +52,18 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
     }
   }
 
+  private Fun executeRef(Fun obj, RefItem param) {
+    if (param instanceof RefTemplCall) {
+      assert (obj instanceof Generator);
+      return Specializer.process((Generator) obj, ((RefTemplCall) param).getActualParameter(), param.getInfo(), kb);
+    } else if (param instanceof RefCall) {
+      assert (obj instanceof FuncGlobal);
+      return StmtExecutor.process((FuncGlobal) obj, ((RefCall) param).getActualParameter(), new Memory(), kb);
+    } else {
+      throw new RuntimeException("Dont know what to do with: " + param.getClass().getCanonicalName());
+    }
+  }
+
   @Override
   protected Expression visitFuncVariable(FuncVariable obj, Memory param) {
     assert (param.contains(obj));
@@ -57,7 +71,7 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
   }
 
   @Override
-  protected Expression visitCompfuncParameter(TemplateParameter obj, Memory param) {
+  protected Expression visitTemplateParameter(TemplateParameter obj, Memory param) {
     assert (param.contains(obj));
     return param.getInt(obj);
   }
@@ -88,7 +102,7 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
     Fun item = obj.getLink();
 
     for (RefItem itr : obj.getOffset()) {
-      item = rex.traverse(item, itr);
+      item = executeRef(item, itr);
     }
 
     return visit(item, param);

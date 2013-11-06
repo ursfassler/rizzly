@@ -19,6 +19,7 @@ final public class ArrayTemplate extends BuiltinTemplate {
 
   public ArrayTemplate() {
     super(new ElementInfo(), NAME);
+    getTemplateParam().addAll(makeParam());
   }
 
   static public List<TemplateParameter> makeParam() {

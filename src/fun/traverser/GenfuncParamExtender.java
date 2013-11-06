@@ -1,13 +1,8 @@
 package fun.traverser;
 
-import java.util.ArrayList;
-
-import fun.DefGTraverser;
-import fun.expression.Expression;
-import fun.expression.reference.RefTemplCall;
+import fun.DefTraverser;
 import fun.expression.reference.ReferenceLinked;
 import fun.expression.reference.ReferenceUnlinked;
-import fun.other.Generator;
 import fun.other.Namespace;
 import fun.variable.Variable;
 
@@ -26,7 +21,9 @@ import fun.variable.Variable;
  * @author urs
  * 
  */
-public class GenfuncParamExtender extends DefGTraverser<Void, Void> {
+
+// TODO remove this class
+public class GenfuncParamExtender extends DefTraverser<Void, Void> {
 
   public static void process(Namespace classes) {
     GenfuncParamExtender genfuncParamExtender = new GenfuncParamExtender();
@@ -41,11 +38,10 @@ public class GenfuncParamExtender extends DefGTraverser<Void, Void> {
   @Override
   protected Void visitReferenceLinked(ReferenceLinked obj, Void param) {
     super.visitReferenceLinked(obj, param);
-    if (obj.getLink() instanceof Generator) {
-      if (obj.getOffset().isEmpty() || !(obj.getOffset().get(0) instanceof RefTemplCall)) {
-        obj.getOffset().add(0, new RefTemplCall(obj.getInfo(), new ArrayList<Expression>()));
-      }
-    }
+    /*
+     * if (obj.getLink() instanceof Generator) { if (obj.getOffset().isEmpty() || !(obj.getOffset().get(0) instanceof
+     * RefTemplCall)) { obj.getOffset().add(0, new RefTemplCall(obj.getInfo(), new ArrayList<Expression>())); } }
+     */
     return null;
   }
 

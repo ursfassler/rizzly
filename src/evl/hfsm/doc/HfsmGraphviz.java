@@ -4,10 +4,10 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.List;
 
+import util.StreamWriter;
 import evl.DefTraverser;
 import evl.Evl;
 import evl.composition.ImplComposition;
-import evl.doc.StreamWriter;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.State;
 import evl.hfsm.StateComposite;

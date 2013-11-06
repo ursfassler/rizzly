@@ -6,12 +6,13 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import util.StreamWriter;
+
 import common.Designator;
 import common.Direction;
 
 import error.ErrorType;
 import error.RError;
-import evl.doc.StreamWriter;
 import fun.Fun;
 import fun.FunBase;
 import fun.NullTraverser;
@@ -110,6 +111,16 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getSimpleName());
   }
 
+  private void wrTemplHead(Generator obj, StreamWriter param) {
+    param.wr(obj.getName());
+    wrId(obj, param);
+    if (!obj.getTemplateParam().isEmpty()) {
+      param.wr("{");
+      list(obj.getTemplateParam().getList(), "; ", param);
+      param.wr("}");
+    }
+  }
+
   private void list(List<? extends Fun> list, String sep, StreamWriter param) {
     for (int i = 0; i < list.size(); i++) {
       if (i > 0) {
@@ -169,21 +180,9 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.nl();
     visitImports(obj.getImports(), param);
     param.nl();
-    visitList(obj.getCompfunc(), param);
     visitList(obj.getType(), param);
     visitList(obj.getConstant(), param);
     visitList(obj.getFunction(), param);
-    return null;
-  }
-
-  @Override
-  protected Void visitGenerator(Generator obj, StreamWriter param) {
-    param.wr(obj.getName());
-    wrId(obj, param);
-    param.wr("{");
-    list(obj.getParam().getList(), "; ", param);
-    param.wr("} = ");
-    visit(obj.getTemplate(), param);
     return null;
   }
 
@@ -233,7 +232,8 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   private void compHeader(Component obj, StreamWriter param) {
-    param.wr("Component");
+    wrTemplHead(obj, param);
+    param.wr(" = Component");
     param.nl();
 
     param.incIndent();
@@ -411,6 +411,8 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   private void writeNamedElementType(NamedElementType obj, String typename, StreamWriter param) {
+    wrTemplHead(obj, param);
+    param.wr(" = ");
     param.wr(typename);
     param.nl();
     param.incIndent();
@@ -422,8 +424,8 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitRangeTemplate(RangeTemplate obj, StreamWriter param) {
-    param.wr(obj.getName());
-    wrId(obj, param);
+    wrTemplHead(obj, param);
+    param.wr(" = ");
     param.wr(";");
     param.nl();
     return null;
@@ -730,7 +732,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitCompfuncParameter(TemplateParameter obj, StreamWriter param) {
+  protected Void visitTemplateParameter(TemplateParameter obj, StreamWriter param) {
     return null;
   }
 

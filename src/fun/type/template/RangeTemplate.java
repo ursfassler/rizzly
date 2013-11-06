@@ -16,9 +16,10 @@ final public class RangeTemplate extends BuiltinTemplate {
 
   public RangeTemplate() {
     super(new ElementInfo(), NAME);
+    getTemplateParam().addAll(makeParam());
   }
 
-  static public List<TemplateParameter> makeParams() {
+  static public List<TemplateParameter> makeParam() {
     ArrayList<TemplateParameter> ret = new ArrayList<TemplateParameter>();
     ret.add(new TemplateParameter(new ElementInfo(), PARAM[0], new ReferenceUnlinked(new ElementInfo(), new Designator(IntegerType.NAME))));
     ret.add(new TemplateParameter(new ElementInfo(), PARAM[1], new ReferenceUnlinked(new ElementInfo(), new Designator(IntegerType.NAME))));

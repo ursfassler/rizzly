@@ -1,4 +1,4 @@
-package evl.doc;
+package util;
 
 public interface Writer {
   public void wr(String s);

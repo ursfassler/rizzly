@@ -16,7 +16,6 @@ import fun.hfsm.State;
 import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
 import fun.other.Component;
-import fun.other.Generator;
 import fun.other.ImplElementary;
 import fun.other.ListOfNamed;
 import fun.other.Named;
@@ -145,13 +144,6 @@ class KnowFunChildTraverser extends NullTraverser<Set<Named>, String> {
   @Override
   protected Set<Named> visitNamespace(Namespace obj, String param) {
     return retopt(obj.find(param));
-  }
-
-  @Override
-  protected Set<Named> visitGenerator(Generator obj, String param) {
-    Set<Named> rset = visit(obj.getTemplate(), param);
-    addIfFound(obj.getParam().find(param), rset);
-    return rset;
   }
 
   private void addIfFound(Named item, Set<Named> rset) {

@@ -7,7 +7,7 @@ import common.Designator;
 
 import error.ErrorType;
 import error.RError;
-import fun.DefGTraverser;
+import fun.DefTraverser;
 import fun.Fun;
 import fun.function.FunctionHeader;
 import fun.other.Named;
@@ -51,7 +51,7 @@ public class KnowFunPath extends KnowledgeEntry {
 
 }
 
-class KnowPathTraverser extends DefGTraverser<Void, Designator> {
+class KnowPathTraverser extends DefTraverser<Void, Designator> {
   private Map<Named, Designator> cache;
 
   public KnowPathTraverser(Map<Named, Designator> cache) {

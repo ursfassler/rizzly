@@ -23,7 +23,7 @@ component
         10..11: y4 := x shr 2; end
         12..13: y4 := x and 13; end
         14..15: y4 := x or 14; end
-        16..17: y4 := x shl 2; end
+        16..17: y4 := R{0,68}( x shl 2 ); end
         else y4 := x; end
       end
       

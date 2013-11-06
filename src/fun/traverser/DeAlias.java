@@ -1,6 +1,6 @@
 package fun.traverser;
 
-import fun.DefGTraverser;
+import fun.DefTraverser;
 import fun.expression.reference.Reference;
 import fun.expression.reference.ReferenceLinked;
 import fun.other.Namespace;
@@ -13,7 +13,7 @@ import fun.type.base.TypeAlias;
  * 
  * @author urs
  */
-public class DeAlias extends DefGTraverser<Void, Void> {
+public class DeAlias extends DefTraverser<Void, Void> {
 
   public static void process(Namespace classes) {
     DeAlias deAlias = new DeAlias();

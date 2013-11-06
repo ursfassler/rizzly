@@ -38,7 +38,6 @@ import fun.hfsm.ImplHfsm;
 import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
-import fun.other.Generator;
 import fun.other.ImplElementary;
 import fun.other.Named;
 import fun.other.Namespace;
@@ -232,6 +231,11 @@ class CopyFun extends Traverser<Fun, Void> {
   }
 
   @Override
+  protected Fun visitBooleanType(BooleanType obj, Void param) {
+    return new BooleanType();
+  }
+
+  @Override
   protected Fun visitFunctionType(FunctionType obj, Void param) {
     throw new RuntimeException("not yet implemented");
   }
@@ -252,12 +256,7 @@ class CopyFun extends Traverser<Fun, Void> {
   }
 
   @Override
-  protected Fun visitBooleanType(BooleanType obj, Void param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Fun visitCompfuncParameter(TemplateParameter obj, Void param) {
+  protected Fun visitTemplateParameter(TemplateParameter obj, Void param) {
     return new TemplateParameter(obj.getInfo(), obj.getName(), copy(obj.getType()));
   }
 
@@ -322,22 +321,17 @@ class CopyFun extends Traverser<Fun, Void> {
   }
 
   @Override
-  protected Fun visitGenerator(Generator obj, Void param) {
-    return new Generator(obj.getInfo(), copy(obj.getTemplate()), copy(obj.getParam().getList()));
-  }
-
-  @Override
   protected Fun visitNamedElement(NamedElement obj, Void param) {
     return new NamedElement(obj.getInfo(), obj.getName(), copy(obj.getType()));
   }
 
   @Override
-  protected Fun visitNaturalType(NaturalType obj, Void param) {
-    throw new RuntimeException("not yet implemented");
+  protected Fun visitIntegerType(IntegerType obj, Void param) {
+    return new IntegerType();
   }
 
   @Override
-  protected Fun visitIntegerType(IntegerType obj, Void param) {
+  protected Fun visitNaturalType(NaturalType obj, Void param) {
     throw new RuntimeException("not yet implemented");
   }
 

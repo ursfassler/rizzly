@@ -93,7 +93,7 @@ public class XmlWriter implements Writer {
 
   public void sectionSeparator() {
     if (!wroteSecSep.peek()) {
-      assert (newlines == 1);
+      // assert (newlines == 1); //TODO reimplement
       root.appendChild(doc.createElement("br"));
       newlines++;
       wroteSecSep.set(0, true);

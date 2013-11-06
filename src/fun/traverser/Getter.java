@@ -3,10 +3,10 @@ package fun.traverser;
 import java.util.ArrayList;
 import java.util.List;
 
-import fun.DefGTraverser;
+import fun.DefTraverser;
 import fun.Fun;
 
-public class Getter<R, T> extends DefGTraverser<Void, T> {
+public class Getter<R, T> extends DefTraverser<Void, T> {
   private List<R> list = new ArrayList<R>();
 
   public List<R> get(Fun ast, T param) {

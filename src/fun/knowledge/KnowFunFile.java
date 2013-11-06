@@ -5,7 +5,7 @@ import java.util.Map;
 
 import error.ErrorType;
 import error.RError;
-import fun.DefGTraverser;
+import fun.DefTraverser;
 import fun.Fun;
 import fun.other.Named;
 import fun.other.RizzlyFile;
@@ -56,7 +56,7 @@ public class KnowFunFile extends KnowledgeEntry {
 
 }
 
-class KnowFileTraverser extends DefGTraverser<Void, RizzlyFile> {
+class KnowFileTraverser extends DefTraverser<Void, RizzlyFile> {
   private Map<Named, RizzlyFile> cache;
 
   public KnowFileTraverser(Map<Named, RizzlyFile> cache) {

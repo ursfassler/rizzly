@@ -21,7 +21,7 @@ import evl.function.impl.FuncPrivateVoid;
 import evl.function.impl.FuncSubHandlerEvent;
 import evl.function.impl.FuncSubHandlerQuery;
 import evl.hfsm.HfsmQueryFunction;
-import fun.DefGTraverser;
+import fun.DefTraverser;
 import fun.function.FuncWithReturn;
 import fun.function.FunctionHeader;
 import fun.function.impl.FuncGlobal;
@@ -32,7 +32,7 @@ import fun.other.ListOfNamed;
 import fun.other.Named;
 import fun.other.Namespace;
 
-public class FuncTypeCollector extends DefGTraverser<Void, Set<String>> {
+public class FuncTypeCollector extends DefTraverser<Void, Set<String>> {
   private Map<FunctionHeader, Class<? extends FunctionBase>> funcType = new HashMap<FunctionHeader, Class<? extends FunctionBase>>();
 
   public static Map<FunctionHeader, Class<? extends FunctionBase>> process(Namespace classes) {

@@ -4,7 +4,7 @@ import java.util.List;
 
 import error.ErrorType;
 import error.RError;
-import fun.DefGTraverser;
+import fun.DefTraverser;
 import fun.expression.ArithmeticOp;
 import fun.expression.ArrayValue;
 import fun.expression.BoolValue;
@@ -35,7 +35,7 @@ import fun.type.composed.NamedElement;
 import fun.variable.Constant;
 import fun.variable.Variable;
 
-public class ExprReplacer<T> extends DefGTraverser<Expression, T> {
+public class ExprReplacer<T> extends DefTraverser<Expression, T> {
 
   protected void visitExprList(List<Expression> list, T param) {
     for (int i = 0; i < list.size(); i++) {

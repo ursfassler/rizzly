@@ -43,11 +43,11 @@ public class FileParser extends BaseParser {
     while (peek().getType() != TokenType.EOF) {
       switch (peek().getType()) {
       case COMPONENT: {
-        ret.getCompfunc().addAll(type().parseComponentSection());
+        ret.getComp().addAll(type().parseComponentSection());
         break;
       }
       case TYPE_SEC: {
-        ret.getCompfunc().addAll(type().parseTypeSection(ret.getConstant()));
+        ret.getType().addAll(type().parseTypeSection(ret.getConstant()));
         break;
       }
       case CONST: {
@@ -55,7 +55,7 @@ public class FileParser extends BaseParser {
         break;
       }
       case FUNCTION: {
-        ret.getCompfunc().add(type().parseGlobalFunction());
+        ret.getFunction().add(type().parseGlobalFunction());
         break;
       }
       default: {

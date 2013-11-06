@@ -49,6 +49,7 @@ import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
 import evl.expression.unop.Not;
+import evl.expression.unop.Uminus;
 import evl.function.FuncWithBody;
 import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
@@ -388,6 +389,11 @@ public class ToC extends NullTraverser<CirBase, Void> {
     return new cir.expression.UnaryOp(Op.BITNOT, (cir.expression.Expression) visit(obj.getExpr(), null)); // FIXME
                                                                                                           // bitnot is
                                                                                                           // correct?
+  }
+
+  @Override
+  protected CirBase visitUminus(Uminus obj, Void param) {
+    return new cir.expression.UnaryOp(Op.MINUS, (cir.expression.Expression) visit(obj.getExpr(), null));
   }
 
   private CirBase transBinOp(BinaryExp obj, Op op) {

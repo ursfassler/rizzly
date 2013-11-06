@@ -37,7 +37,6 @@ import fun.hfsm.ImplHfsm;
 import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
-import fun.other.Generator;
 import fun.other.ImplElementary;
 import fun.other.ListOfNamed;
 import fun.other.Named;
@@ -107,12 +106,6 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
   @Override
   protected Evl visitType(fun.type.Type obj, Void param) {
     return type.traverse(obj, obj.getName());
-  }
-
-  @Override
-  protected Evl visitGenerator(Generator obj, Void param) {
-    RError.err(ErrorType.Fatal, obj.getInfo(), "unresolved functional type: " + obj);
-    return null;
   }
 
   @Override

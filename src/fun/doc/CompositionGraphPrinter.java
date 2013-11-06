@@ -137,8 +137,7 @@ public class CompositionGraphPrinter {
     bg.setAttribute("class", InterfaceClassName);
     top.appendChild(bg);
 
-    addText(top, -1, iface.getInstname());
-    addText(top, 8, iface.getClassname(), iface.getFullName());
+    addText(top, 3, iface.getInstname());
 
     return top;
   }

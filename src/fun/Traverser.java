@@ -31,7 +31,6 @@ import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
 import fun.other.Component;
-import fun.other.Generator;
 import fun.other.ImplElementary;
 import fun.other.Namespace;
 import fun.other.RizzlyFile;
@@ -133,8 +132,6 @@ public abstract class Traverser<R, P> {
       return visitComponent((Component) obj, param);
     } else if (obj instanceof UnionSelector) {
       return visitUnionSelector((UnionSelector) obj, param);
-    } else if (obj instanceof Generator) {
-      return visitGenerator((Generator) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -186,7 +183,7 @@ public abstract class Traverser<R, P> {
     } else if (obj instanceof Constant) {
       return visitConstant((Constant) obj, param);
     } else if (obj instanceof TemplateParameter) {
-      return visitCompfuncParameter((TemplateParameter) obj, param);
+      return visitTemplateParameter((TemplateParameter) obj, param);
     } else if (obj instanceof CompUse) {
       return visitCompUse((CompUse) obj, param);
     } else {
@@ -394,7 +391,7 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitBooleanType(BooleanType obj, P param);
 
-  abstract protected R visitCompfuncParameter(TemplateParameter obj, P param);
+  abstract protected R visitTemplateParameter(TemplateParameter obj, P param);
 
   abstract protected R visitRefCall(RefCall obj, P param);
 
@@ -415,8 +412,6 @@ public abstract class Traverser<R, P> {
   abstract protected R visitTransition(Transition obj, P param);
 
   abstract protected R visitConnection(Connection obj, P param);
-
-  abstract protected R visitGenerator(Generator obj, P param);
 
   abstract protected R visitFuncPrivate(FuncPrivateVoid obj, P param);
 

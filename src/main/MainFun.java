@@ -22,6 +22,7 @@ import common.Designator;
 import common.ElementInfo;
 
 import fun.doc.DepGraph;
+import fun.doc.DocWriter;
 import fun.doc.PrettyPrinter;
 import fun.expression.Expression;
 import fun.expression.reference.ReferenceLinked;
@@ -69,21 +70,18 @@ public class MainFun {
       System.out.println();
     }
 
-    List<Type> primtyp = genPrimitiveTypes();
-    List<Generator> gentyp = genPrimitiveGenericTypes();
+    List<Type> types = new ArrayList<Type>();
+    types.addAll(genPrimitiveTypes());
+    types.addAll(genPrimitiveGenericTypes());
 
     SymbolTable<Designator, String> sym = new SymbolTable<Designator, String>();
-    for (Type typ : primtyp) {
-      sym.add(typ.getName(), new Designator(typ.getName()));
-    }
-    for (Generator typ : gentyp) {
+    for (Type typ : types) {
       sym.add(typ.getName(), new Designator(typ.getName()));
     }
     ClassNameExtender.process(fileList, sym);
 
     Namespace classes = new Namespace(info, "!");
-    classes.addAll(primtyp);
-    classes.addAll(gentyp);
+    classes.addAll(types);
 
     for (RizzlyFile f : fileList) {
       Namespace parent = classes.forceChildPath(f.getName().toList());
@@ -91,7 +89,6 @@ public class MainFun {
       parent.addAll(f.getComp());
       parent.addAll(f.getConstant());
       parent.addAll(f.getFunction());
-      parent.addAll(f.getCompfunc());
     }
 
     PrettyPrinter.print(classes, debugdir + "pretty.rzy");
@@ -109,7 +106,7 @@ public class MainFun {
 
     Named root = classes.getChildItem(opt.getRootComp().toList());
     printDepGraph(debugdir + "rdep.gv", classes, root, fileList);
-    // DocWriter.print(fileList, new KnowledgeBase(classes, fileList, docdir)); //TODO reimplement
+    DocWriter.print(fileList, new KnowledgeBase(classes, fileList, docdir)); // TODO reimplement
 
     Component nroot = evaluate(root, classes, debugdir, fileList);
     DeAlias.process(classes);
@@ -184,13 +181,14 @@ public class MainFun {
         TypeEvalReplacer replacer = new TypeEvalReplacer(kb);
 
         for (RizzlyFile f : fileList) {
-          List<Named> itms = new ArrayList<Named>();
+          List<Generator> itms = new ArrayList<Generator>();
           itms.addAll(f.getType().getList());
-          itms.addAll(f.getConstant().getList());
           itms.addAll(f.getFunction().getList());
           itms.addAll(f.getComp().getList());
-          for (Named itr : itms) {
-            replacer.traverse(itr, new Memory());
+          for (Generator itr : itms) {
+            if (itr.getTemplateParam().isEmpty()) {
+              replacer.traverse(itr, new Memory());
+            }
           }
         }
       }
@@ -211,11 +209,11 @@ public class MainFun {
     return ret;
   }
 
-  private static List<Generator> genPrimitiveGenericTypes() {
-    List<Generator> ret = new ArrayList<Generator>();
-    ret.add(new Generator(info, new RangeTemplate(), RangeTemplate.makeParams()));
-    ret.add(new Generator(info, new ArrayTemplate(), ArrayTemplate.makeParam()));
-    ret.add(new Generator(info, new TypeTypeTemplate(), TypeTypeTemplate.makeParam()));
+  private static List<Type> genPrimitiveGenericTypes() {
+    List<Type> ret = new ArrayList<Type>();
+    ret.add(new RangeTemplate());
+    ret.add(new ArrayTemplate());
+    ret.add(new TypeTypeTemplate());
     return ret;
   }
 

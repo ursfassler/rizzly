@@ -7,8 +7,10 @@ import common.ElementInfo;
 
 import fun.FunBase;
 import fun.function.FunctionHeader;
+import fun.variable.TemplateParameter;
 
-abstract public class Component extends FunBase implements Named {
+abstract public class Component extends FunBase implements Generator, Named {
+  final private ListOfNamed<TemplateParameter> param = new ListOfNamed<TemplateParameter>();
   final private EnumMap<Direction, ListOfNamed<FunctionHeader>> iface;
   private String name;
 
@@ -32,4 +34,8 @@ abstract public class Component extends FunBase implements Named {
     this.name = name;
   }
 
+  @Override
+  public ListOfNamed<TemplateParameter> getTemplateParam() {
+    return param;
+  }
 }

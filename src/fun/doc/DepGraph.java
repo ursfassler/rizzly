@@ -9,7 +9,7 @@ import common.Scope;
 
 import error.ErrorType;
 import error.RError;
-import fun.DefGTraverser;
+import fun.DefTraverser;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.expression.reference.ReferenceLinked;
@@ -19,7 +19,6 @@ import fun.knowledge.KnowFun;
 import fun.knowledge.KnowScope;
 import fun.knowledge.KnowledgeBase;
 import fun.other.Component;
-import fun.other.Generator;
 import fun.other.Named;
 import fun.other.Namespace;
 import fun.type.Type;
@@ -75,12 +74,6 @@ public class DepGraph extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitGenerator(Generator obj, Void param) {
-    dep.traverse(obj, obj);
-    return null;
-  }
-
-  @Override
   protected Void visitComponent(Component obj, Void param) {
     dep.traverse(obj, obj);
     return null;
@@ -88,7 +81,7 @@ public class DepGraph extends NullTraverser<Void, Void> {
 
 }
 
-class SubDep extends DefGTraverser<Void, Named> {
+class SubDep extends DefTraverser<Void, Named> {
   private KnowledgeBase kb;
   private SimpleGraph<Named> g;
   private Set<Named> traversed = new HashSet<Named>();

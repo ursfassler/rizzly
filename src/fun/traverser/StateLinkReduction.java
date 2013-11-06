@@ -3,7 +3,7 @@ package fun.traverser;
 import java.util.HashSet;
 import java.util.Set;
 
-import fun.DefGTraverser;
+import fun.DefTraverser;
 import fun.Fun;
 import fun.expression.reference.RefItem;
 import fun.expression.reference.RefName;
@@ -22,7 +22,7 @@ import fun.variable.StateVariable;
  * @author urs
  * 
  */
-public class StateLinkReduction extends DefGTraverser<Void, Void> {
+public class StateLinkReduction extends DefTraverser<Void, Void> {
   private final KnowFunChild kc;
   static final private Set<Class<? extends Named>> stop = new HashSet<Class<? extends Named>>();
 
