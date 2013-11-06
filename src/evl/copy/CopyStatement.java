@@ -14,7 +14,7 @@ import evl.statement.ReturnExpr;
 import evl.statement.ReturnVoid;
 import evl.statement.Statement;
 import evl.statement.VarDefStmt;
-import evl.statement.While;
+import evl.statement.WhileStmt;
 
 public class CopyStatement extends NullTraverser<Statement, Void> {
   private CopyEvl cast;
@@ -72,8 +72,8 @@ public class CopyStatement extends NullTraverser<Statement, Void> {
   }
 
   @Override
-  protected Statement visitWhile(While obj, Void param) {
-    return new While(obj.getInfo(), cast.copy(obj.getCondition()), cast.copy(obj.getBody()));
+  protected Statement visitWhileStmt(WhileStmt obj, Void param) {
+    return new WhileStmt(obj.getInfo(), cast.copy(obj.getCondition()), cast.copy(obj.getBody()));
   }
 
 }

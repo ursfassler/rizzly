@@ -11,10 +11,6 @@ import java.util.Set;
 
 import org.jgrapht.traverse.TopologicalOrderIterator;
 
-import pir.other.Program;
-import pir.traverser.PirPrinter;
-import pir.traverser.RangeReplacer;
-import pir.traverser.ToC;
 import util.Pair;
 import util.SimpleGraph;
 import cir.function.LibFunction;
@@ -25,6 +21,7 @@ import cir.traverser.BoolToEnum;
 import cir.traverser.CArrayCopy;
 import cir.traverser.CWriter;
 import cir.traverser.FpcHeaderWriter;
+import cir.traverser.RangeReplacer;
 import cir.traverser.Renamer;
 import cir.traverser.VarDeclToTop;
 import cir.type.PointerType;
@@ -49,9 +46,10 @@ import fun.toevl.FunToEvl;
 //TODO -- do name randomization and compile to see if references go outside
 //TODO add compiler switch to select backend (like --backend=ansiC --backend=funHtmlDoc)
 //TODO check metadata parser
-//TODO check for zero bevore division
+//TODO check for zero before division
 //TODO check range by user input
 //TODO check if event handling is in progress when starting event handling
+//TODO can we remove PIR? 
 public class Main {
 
   /**
@@ -107,10 +105,9 @@ public class Main {
     ArrayList<String> debugNames = new ArrayList<String>();
     evl.other.RizzlyProgram prg = MainEvl.doEvl(opt, outdir, debugdir, aclasses, root, debugNames);
 
-    evl.doc.PrettyPrinter.print(prg, debugdir + "beforePir.rzy", true);
-    Program prog = (Program) evl.traverser.ToPir.process(prg);
+    evl.doc.PrettyPrinter.print(prg, debugdir + "beforeCir.rzy", true);
 
-    cir.other.Program cprog = makeC(debugdir, prog);
+    cir.other.Program cprog = makeC(debugdir, (cir.other.Program) evl.traverser.ToC.process(prg));
 
     printC(outdir, prg.getName(), cprog);
 
@@ -118,23 +115,10 @@ public class Main {
     // printFpcHeader(outdir, prg.getName(), cprog);
   }
 
-  private static cir.other.Program makeC(String debugdir, Program prog) {
-    // Changes needed to convert into C
+  private static cir.other.Program makeC(String debugdir, cir.other.Program cprog) {
+    RangeReplacer.process(cprog);
+    CWriter.print(cprog, debugdir + "norange.rzy", true);
 
-    // XXX probably not really needed
-    // CaserangeReduction.process(prog);
-
-    // XXX no enums at this stage?
-    // ToCEnum.process(prog);
-
-    RangeReplacer.process(prog);
-
-    // XXX no enums at this stage?
-    // EnumElementConstPropagation.process(prog);
-
-    PirPrinter.print(prog, debugdir + "beforeToC.rzy");
-
-    cir.other.Program cprog = (cir.other.Program) ToC.process(prog);
     BlockReduction.process(cprog);
 
     makeCLibrary(cprog.getLibrary());

@@ -6,6 +6,7 @@ import evl.Evl;
 import evl.type.TypeRef;
 import evl.type.base.BaseType;
 
+//TODO remove this class
 public class PointerType extends BaseType implements Evl {
 
   private TypeRef type;

@@ -8,12 +8,12 @@ import evl.expression.Expression;
  * 
  * @author urs
  */
-public class While extends Statement {
+public class WhileStmt extends Statement {
 
   private Expression condition;
   private Block body;
 
-  public While(ElementInfo info, Expression condition, Block body) {
+  public WhileStmt(ElementInfo info, Expression condition, Block body) {
     super(info);
     this.condition = condition;
     this.body = body;

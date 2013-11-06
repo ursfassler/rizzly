@@ -1,17 +1,17 @@
-package pir.traverser;
+package cir.traverser;
 
 import java.util.Map;
 
-import pir.DefTraverser;
-import pir.Pir;
-import pir.expression.reference.Referencable;
-import pir.expression.reference.Reference;
-import pir.type.Type;
-import pir.type.TypeRef;
+import cir.Cir;
+import cir.DefTraverser;
+import cir.expression.reference.Referencable;
+import cir.expression.reference.Reference;
+import cir.type.Type;
+import cir.type.TypeRef;
 
 public class Relinker extends DefTraverser<Void, Map<? extends Referencable, ? extends Referencable>> {
 
-  public static void process(Pir obj, Map<? extends Referencable, ? extends Referencable> map) {
+  public static void process(Cir obj, Map<? extends Referencable, ? extends Referencable> map) {
     Relinker relinker = new Relinker();
     relinker.traverse(obj, map);
   }

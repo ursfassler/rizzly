@@ -1,5 +1,7 @@
 package evl.traverser;
 
+import common.Designator;
+
 import evl.DefTraverser;
 import evl.Evl;
 import evl.other.Named;
@@ -20,8 +22,38 @@ public class Renamer extends DefTraverser<Void, Void> {
   }
 
   private void rename(Named item) {
-    String name = pir.traverser.Renamer.cleanName(item.getName());
+    String name = cleanName(item.getName());
     item.setName(name);
+  }
+
+  public static String cleanName(String name) {
+    String ret = "";
+    for (int i = 0; i < name.length(); i++) {
+      char sym = name.charAt(i);
+      switch (sym) {
+      case '{':
+        if (name.charAt(i + 1) != '}') {
+          ret += Designator.NAME_SEP;
+        }
+        break;
+      case '}':
+        break;
+      case ',':
+        ret += Designator.NAME_SEP;
+        break;
+      case '-':
+        ret += Designator.NAME_SEP;
+        break;
+      case '.':
+        ret += Designator.NAME_SEP;
+        break;
+      default:
+        assert ((sym >= 'a' && sym <= 'z') || (sym >= 'A' && sym <= 'Z') || (sym >= '0' && sym <= '9') || (sym == '_'));
+        ret += sym;
+        break;
+      }
+    }
+    return ret;
   }
 
   @Override
@@ -31,4 +63,5 @@ public class Renamer extends DefTraverser<Void, Void> {
     }
     return super.visit(obj, param);
   }
+
 }

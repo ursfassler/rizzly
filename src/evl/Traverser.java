@@ -87,7 +87,7 @@ import evl.statement.ReturnExpr;
 import evl.statement.ReturnVoid;
 import evl.statement.Statement;
 import evl.statement.VarDefStmt;
-import evl.statement.While;
+import evl.statement.WhileStmt;
 import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
@@ -205,8 +205,8 @@ public abstract class Traverser<R, P> {
       return visitReturn((Return) obj, param);
     else if (obj instanceof VarDefStmt)
       return visitVarDef((VarDefStmt) obj, param);
-    else if (obj instanceof While)
-      return visitWhile((While) obj, param);
+    else if (obj instanceof WhileStmt)
+      return visitWhileStmt((WhileStmt) obj, param);
     else if (obj instanceof CaseStmt)
       return visitCaseStmt((CaseStmt) obj, param);
     else
@@ -499,7 +499,7 @@ public abstract class Traverser<R, P> {
     }
   }
 
-  abstract protected R visitWhile(While obj, P param);
+  abstract protected R visitWhileStmt(WhileStmt obj, P param);
 
   abstract protected R visitCaseStmt(CaseStmt obj, P param);
 

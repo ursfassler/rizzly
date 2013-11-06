@@ -34,6 +34,7 @@ import cir.type.EnumElement;
 import cir.type.EnumType;
 import cir.type.NamedElement;
 import cir.type.PointerType;
+import cir.type.RangeType;
 import cir.type.SIntType;
 import cir.type.StringType;
 import cir.type.StructType;
@@ -46,6 +47,11 @@ import cir.type.VoidType;
 public abstract class NullTraverser<R, P> extends Traverser<R, P> {
 
   protected abstract R visitDefault(CirBase obj, P param);
+
+  @Override
+  protected R visitRangeType(RangeType obj, P param) {
+    return visitDefault(obj, param);
+  }
 
   @Override
   protected R visitPointerType(PointerType obj, P param) {

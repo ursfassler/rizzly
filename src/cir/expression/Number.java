@@ -1,20 +1,22 @@
 package cir.expression;
 
-public class Number extends Expression {
-  final private int value;
+import java.math.BigInteger;
 
-  public Number(int value) {
+public class Number extends Expression {
+  final private BigInteger value;
+
+  public Number(BigInteger value) {
     super();
     this.value = value;
   }
 
-  public int getValue() {
+  public BigInteger getValue() {
     return value;
   }
 
   @Override
   public String toString() {
-    return Integer.toString(value);
+    return value.toString();
   }
 
 }

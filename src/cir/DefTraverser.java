@@ -35,6 +35,7 @@ import cir.type.EnumElement;
 import cir.type.EnumType;
 import cir.type.NamedElement;
 import cir.type.PointerType;
+import cir.type.RangeType;
 import cir.type.SIntType;
 import cir.type.StringType;
 import cir.type.StructType;
@@ -83,6 +84,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitFunctionImpl(FunctionImpl obj, P param) {
     visitList(obj.getArgument(), param);
+    visit(obj.getRetType(), param);
     visit(obj.getBody(), param);
     return null;
   }
@@ -90,12 +92,14 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitFunctionPrototype(FunctionPrototype obj, P param) {
     visitList(obj.getArgument(), param);
+    visit(obj.getRetType(), param);
     return null;
   }
 
   @Override
   protected R visitLibFunction(LibFunction obj, P param) {
     visitList(obj.getArgument(), param);
+    visit(obj.getRetType(), param);
     return null;
   }
 
@@ -208,22 +212,30 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitConstant(Constant obj, P param) {
     visit(obj.getDef(), param);
+    visit(obj.getType(), param);
     return null;
   }
 
   @Override
   protected R visitFuncVariable(FuncVariable obj, P param) {
+    visit(obj.getType(), param);
     return null;
   }
 
   @Override
   protected R visitStateVariable(StateVariable obj, P param) {
+    visit(obj.getType(), param);
     return null;
   }
 
   @Override
   protected R visitVarDefStmt(VarDefStmt obj, P param) {
     visit(obj.getVariable(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitRangeType(RangeType obj, P param) {
     return null;
   }
 

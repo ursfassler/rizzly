@@ -45,6 +45,7 @@ import cir.type.IntType;
 import cir.type.NamedElemType;
 import cir.type.NamedElement;
 import cir.type.PointerType;
+import cir.type.RangeType;
 import cir.type.SIntType;
 import cir.type.StringType;
 import cir.type.StructType;
@@ -184,6 +185,8 @@ public abstract class Traverser<R, P> {
   protected R visitType(Type obj, P param) {
     if (obj instanceof IntType)
       return visitIntType((IntType) obj, param);
+    else if (obj instanceof RangeType)
+      return visitRangeType((RangeType) obj, param);
     else if (obj instanceof NamedElemType)
       return visitNamedElemType((NamedElemType) obj, param);
     else if (obj instanceof EnumType)
@@ -221,6 +224,8 @@ public abstract class Traverser<R, P> {
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
+
+  protected abstract R visitRangeType(RangeType obj, P param);
 
   protected abstract R visitSIntType(SIntType obj, P param);
 

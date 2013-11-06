@@ -78,7 +78,7 @@ import evl.statement.ReturnExpr;
 import evl.statement.ReturnVoid;
 import evl.statement.Statement;
 import evl.statement.VarDefStmt;
-import evl.statement.While;
+import evl.statement.WhileStmt;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
@@ -636,7 +636,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitWhile(While obj, P param) {
+  protected R visitWhileStmt(WhileStmt obj, P param) {
     visit(obj.getCondition(), param);
     visit(obj.getBody(), param);
     return null;

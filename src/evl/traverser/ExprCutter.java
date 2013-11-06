@@ -42,7 +42,7 @@ import evl.statement.ReturnExpr;
 import evl.statement.ReturnVoid;
 import evl.statement.Statement;
 import evl.statement.VarDefStmt;
-import evl.statement.While;
+import evl.statement.WhileStmt;
 import evl.type.Type;
 import evl.type.TypeRef;
 import evl.variable.FuncVariable;
@@ -219,7 +219,7 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
   }
 
   @Override
-  protected Void visitWhile(While obj, List<Statement> param) {
+  protected Void visitWhileStmt(WhileStmt obj, List<Statement> param) {
     assert (false);
     // FIXME the following code is wrong. If we extract code from the condition, it has to go into all incoming edges of
     // the condition

@@ -76,7 +76,7 @@ import evl.statement.IfStmt;
 import evl.statement.ReturnExpr;
 import evl.statement.ReturnVoid;
 import evl.statement.VarDefStmt;
-import evl.statement.While;
+import evl.statement.WhileStmt;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
@@ -576,7 +576,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitWhile(While obj, StreamWriter param) {
+  protected Void visitWhileStmt(WhileStmt obj, StreamWriter param) {
     param.wr("while ");
     visit(obj.getCondition(), param);
     param.wr(" do");

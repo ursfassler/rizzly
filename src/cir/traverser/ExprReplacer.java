@@ -40,6 +40,7 @@ import cir.type.EnumType;
 import cir.type.IntType;
 import cir.type.NamedElement;
 import cir.type.PointerType;
+import cir.type.RangeType;
 import cir.type.SIntType;
 import cir.type.StringType;
 import cir.type.StructType;
@@ -307,6 +308,11 @@ public class ExprReplacer<T> extends Traverser<Expression, T> {
   protected Expression visitPointerType(PointerType obj, T param) {
     visit(obj.getType(), param);
     return null;
+  }
+
+  @Override
+  protected Expression visitRangeType(RangeType obj, T param) {
+    throw new RuntimeException("not yet implemented");
   }
 
 }

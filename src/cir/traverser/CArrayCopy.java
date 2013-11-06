@@ -1,5 +1,7 @@
 package cir.traverser;
 
+import java.math.BigInteger;
+
 import cir.expression.Number;
 import cir.expression.reference.RefCall;
 import cir.expression.reference.Reference;
@@ -38,7 +40,7 @@ public class CArrayCopy extends StmtReplacer<Void> {
       RefCall rcall = new RefCall();
       rcall.getParameter().add(obj.getDst());
       rcall.getParameter().add(obj.getSrc());
-      rcall.getParameter().add(new Number(size));
+      rcall.getParameter().add(new Number(BigInteger.valueOf(size)));
       CallStmt call = new CallStmt(new Reference(memcpy, rcall));
       return call;
     }

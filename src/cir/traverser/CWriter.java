@@ -1,12 +1,16 @@
 package cir.traverser;
 
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.math.BigInteger;
 
 import util.Range;
+import cir.Cir;
 import cir.CirBase;
 import cir.NullTraverser;
 import cir.expression.ArrayValue;
 import cir.expression.BinaryOp;
+import cir.expression.BoolValue;
 import cir.expression.Number;
 import cir.expression.StringValue;
 import cir.expression.TypeCast;
@@ -56,6 +60,17 @@ import error.RError;
 import evl.doc.StreamWriter;
 
 public class CWriter extends NullTraverser<Void, StreamWriter> {
+  private boolean printReferenceId = false;
+
+  static public void print(Cir obj, String filename, boolean printReferenceId) {
+    CWriter printer = new CWriter();
+    printer.printReferenceId = printReferenceId;
+    try {
+      printer.traverse(obj, new StreamWriter(new PrintStream(filename)));
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+  }
 
   @Override
   protected Void visitDefault(CirBase obj, StreamWriter param) {
@@ -91,7 +106,7 @@ public class CWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitNumber(Number obj, StreamWriter param) {
-    param.wr(Integer.toString(obj.getValue()));
+    param.wr(obj.getValue().toString());
     return null;
   }
 
@@ -566,6 +581,16 @@ public class CWriter extends NullTraverser<Void, StreamWriter> {
     param.wr(")");
     visit(obj.getValue(), param);
     param.wr(")");
+    return null;
+  }
+
+  @Override
+  protected Void visitBoolValue(BoolValue obj, StreamWriter param) {
+    if (obj.getValue()) {
+      param.wr("true");
+    } else {
+      param.wr("false");
+    }
     return null;
   }
 

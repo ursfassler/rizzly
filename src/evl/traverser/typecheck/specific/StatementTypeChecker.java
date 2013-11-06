@@ -23,7 +23,7 @@ import evl.statement.ReturnExpr;
 import evl.statement.ReturnVoid;
 import evl.statement.Statement;
 import evl.statement.VarDefStmt;
-import evl.statement.While;
+import evl.statement.WhileStmt;
 import evl.traverser.typecheck.LeftIsContainerOfRightTest;
 import evl.type.Type;
 import evl.type.base.BooleanType;
@@ -122,7 +122,7 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitWhile(While obj, Void param) {
+  protected Void visitWhileStmt(WhileStmt obj, Void param) {
     Type cond = checkGetExpr(obj.getCondition());
     if (!(cond instanceof BooleanType)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Need boolean type, got: " + cond.getName());

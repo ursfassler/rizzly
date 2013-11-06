@@ -72,7 +72,7 @@ import evl.statement.IfStmt;
 import evl.statement.ReturnExpr;
 import evl.statement.ReturnVoid;
 import evl.statement.VarDefStmt;
-import evl.statement.While;
+import evl.statement.WhileStmt;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
@@ -507,7 +507,7 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitWhile(While obj, P param) {
+  protected R visitWhileStmt(WhileStmt obj, P param) {
     return visitDefault(obj, param);
   }
 

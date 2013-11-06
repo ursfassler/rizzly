@@ -1,17 +1,17 @@
-package pir.traverser;
+package cir.traverser;
 
 import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
-import pir.NullTraverser;
-import pir.PirObject;
-import pir.other.Program;
-import pir.type.IntType;
-import pir.type.RangeType;
-import pir.type.SignedType;
-import pir.type.Type;
-import pir.type.UnsignedType;
+import cir.CirBase;
+import cir.NullTraverser;
+import cir.other.Program;
+import cir.type.IntType;
+import cir.type.RangeType;
+import cir.type.SIntType;
+import cir.type.Type;
+import cir.type.UIntType;
 import error.ErrorType;
 import error.RError;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
@@ -23,10 +23,10 @@ import evl.traverser.typecheck.specific.ExpressionTypeChecker;
  * 
  */
 public class RangeReplacer extends NullTraverser<Void, Void> {
-  private final Map<Integer, SignedType> signed = new HashMap<Integer, SignedType>();
-  private final Map<Integer, UnsignedType> unsigned = new HashMap<Integer, UnsignedType>();
+  private final Map<Integer, SIntType> signed = new HashMap<Integer, SIntType>();
+  private final Map<Integer, UIntType> unsigned = new HashMap<Integer, UIntType>();
   private final Map<RangeType, Type> map = new HashMap<RangeType, Type>();
-  private final int allowedBitSizes[] = { 8, 16, 32, 64 }; // TODO make a parameter (is probably target specific)
+  private final int allowedByteSizes[] = { 1, 2, 4, 8 }; // TODO make a parameter (is probably target specific)
 
   public static void process(Program obj) {
     RangeReplacer changer = new RangeReplacer();
@@ -41,11 +41,11 @@ public class RangeReplacer extends NullTraverser<Void, Void> {
     obj.getType().removeAll(changer.map.keySet()); // TODO remove all unused, but at a different location
   }
 
-  public Map<Integer, SignedType> getSigned() {
+  public Map<Integer, SIntType> getSigned() {
     return signed;
   }
 
-  public Map<Integer, UnsignedType> getUnsigned() {
+  public Map<Integer, UIntType> getUnsigned() {
     return unsigned;
   }
 
@@ -54,17 +54,17 @@ public class RangeReplacer extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void doDefault(PirObject obj, Void param) {
+  protected Void visitDefault(CirBase obj, Void param) {
     return null;
   }
 
   @Override
-  protected Void visitUnsignedType(UnsignedType obj, Void param) {
+  protected Void visitUIntType(UIntType obj, Void param) {
     throw new RuntimeException("should not exist");
   }
 
   @Override
-  protected Void visitSignedType(SignedType obj, Void param) {
+  protected Void visitSIntType(SIntType obj, Void param) {
     throw new RuntimeException("should not exist");
   }
 
@@ -83,43 +83,45 @@ public class RangeReplacer extends NullTraverser<Void, Void> {
       bits++;
     }
 
-    if (bits > allowedBitSizes[allowedBitSizes.length - 1]) {
+    int bytes = (bits + 7) / 8;
+
+    if (bytes > allowedByteSizes[allowedByteSizes.length - 1]) {
       RError.err(ErrorType.Fatal, "Found type with too many bits: " + obj.toString());
     }
 
-    for (int i = 0; i < allowedBitSizes.length; i++) {
-      if (bits <= allowedBitSizes[i]) {
-        bits = allowedBitSizes[i];
+    for (int i = 0; i < allowedByteSizes.length; i++) {
+      if (bytes <= allowedByteSizes[i]) {
+        bytes = allowedByteSizes[i];
         break;
       }
     }
 
     IntType ret;
     if (hasNeg) {
-      ret = getSint(bits);
+      ret = getSint(bytes);
     } else {
-      ret = getUint(bits);
+      ret = getUint(bytes);
     }
     map.put(obj, ret);
 
     return null;
   }
 
-  private UnsignedType getUint(int bits) {
-    UnsignedType ret = unsigned.get(bits);
+  private UIntType getUint(int bytes) {
+    UIntType ret = unsigned.get(bytes);
     if (ret == null) {
-      ret = new UnsignedType(bits);
-      unsigned.put(bits, ret);
+      ret = new UIntType(bytes);
+      unsigned.put(bytes, ret);
     }
     assert (ret != null);
     return ret;
   }
 
-  private SignedType getSint(int bits) {
-    SignedType ret = signed.get(bits);
+  private SIntType getSint(int bytes) {
+    SIntType ret = signed.get(bytes);
     if (ret == null) {
-      ret = new SignedType(bits);
-      signed.put(bits, ret);
+      ret = new SIntType(bytes);
+      signed.put(bytes, ret);
     }
     assert (ret != null);
     return ret;

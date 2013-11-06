@@ -60,7 +60,7 @@ public class FunToEvlStmt extends NullTraverser<Statement, Void> {
 
   @Override
   protected Statement visitWhile(While obj, Void param) {
-    return new evl.statement.While(obj.getInfo(), (Expression) fta.traverse(obj.getCondition(), null), (evl.statement.Block) fta.visit(obj.getBody(), null));
+    return new evl.statement.WhileStmt(obj.getInfo(), (Expression) fta.traverse(obj.getCondition(), null), (evl.statement.Block) fta.visit(obj.getBody(), null));
   }
 
   @Override

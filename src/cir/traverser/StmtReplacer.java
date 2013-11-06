@@ -39,6 +39,7 @@ import cir.type.EnumType;
 import cir.type.IntType;
 import cir.type.NamedElement;
 import cir.type.PointerType;
+import cir.type.RangeType;
 import cir.type.SIntType;
 import cir.type.StringType;
 import cir.type.StructType;
@@ -283,6 +284,11 @@ public class StmtReplacer<P> extends Traverser<Statement, P> {
 
   @Override
   protected Statement visitPointerType(PointerType obj, P param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Statement visitRangeType(RangeType obj, P param) {
     throw new RuntimeException("not yet implemented");
   }
 }
