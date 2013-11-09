@@ -7,8 +7,6 @@ import java.util.Set;
 
 import common.Direction;
 
-import error.ErrorType;
-import error.RError;
 import evl.function.FunctionBase;
 import evl.function.impl.FuncIfaceInRet;
 import evl.function.impl.FuncIfaceInVoid;
@@ -18,8 +16,6 @@ import evl.function.impl.FuncInputHandlerEvent;
 import evl.function.impl.FuncInputHandlerQuery;
 import evl.function.impl.FuncPrivateRet;
 import evl.function.impl.FuncPrivateVoid;
-import evl.function.impl.FuncSubHandlerEvent;
-import evl.function.impl.FuncSubHandlerQuery;
 import evl.hfsm.HfsmQueryFunction;
 import fun.DefTraverser;
 import fun.function.FuncWithReturn;
@@ -28,8 +24,6 @@ import fun.function.impl.FuncGlobal;
 import fun.hfsm.State;
 import fun.other.Component;
 import fun.other.ImplElementary;
-import fun.other.ListOfNamed;
-import fun.other.Named;
 import fun.other.Namespace;
 
 public class FuncTypeCollector extends DefTraverser<Void, Set<String>> {
@@ -88,34 +82,16 @@ public class FuncTypeCollector extends DefTraverser<Void, Set<String>> {
   protected Void visitImplElementary(ImplElementary obj, Set<String> param) {
     // visitItr(obj.getIface(Direction.in), param);
     // visitItr(obj.getIface(Direction.out), param);
-    trfunc(0, obj.getFunction(), param);
-    return null;
-  }
-
-  private void trfunc(int names, ListOfNamed<Named> func, Set<String> param) {
-    for (Named item : func) {
-      if (item instanceof Namespace) {
-        trfunc(names + 1, (Namespace) item, param);
+    for (FunctionHeader item : obj.getFunction()) {
+      Class<? extends evl.function.FunctionBase> kind;
+      if (param.contains(item.getName())) {
+        kind = item instanceof FuncWithReturn ? FuncInputHandlerQuery.class : FuncInputHandlerEvent.class;
       } else {
-        Class<? extends evl.function.FunctionBase> kind;
-        switch (names) {
-        case 0:
-          if (param.contains(item.getName())) {
-            kind = item instanceof FuncWithReturn ? FuncInputHandlerQuery.class : FuncInputHandlerEvent.class;
-          } else {
-            kind = item instanceof FuncWithReturn ? FuncPrivateRet.class : FuncPrivateVoid.class;
-          }
-          break;
-        case 1:
-          kind = item instanceof FuncWithReturn ? FuncSubHandlerQuery.class : FuncSubHandlerEvent.class;
-          break;
-        default:
-          RError.err(ErrorType.Error, item.getInfo(), "Too deep namespace: " + names + "; " + item.getName());
-          return;
-        }
-        fun.function.FunctionHeader cfun = (fun.function.FunctionHeader) item;
-        add(cfun, kind);
+        kind = item instanceof FuncWithReturn ? FuncPrivateRet.class : FuncPrivateVoid.class;
       }
+      fun.function.FunctionHeader cfun = (fun.function.FunctionHeader) item;
+      add(cfun, kind);
     }
+    return null;
   }
 }

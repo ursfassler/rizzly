@@ -13,7 +13,6 @@ import fun.composition.Connection;
 import fun.composition.ImplComposition;
 import fun.expression.reference.RefName;
 import fun.expression.reference.Reference;
-import fun.expression.reference.ReferenceUnlinked;
 import fun.other.Component;
 
 public class ImplCompositionParser extends ImplBaseParser {
@@ -82,9 +81,8 @@ public class ImplCompositionParser extends ImplBaseParser {
 
   // EBNF endpoint: id [ "." id ]
   private Reference parseEndpoint() {
-    Reference ref = new ReferenceUnlinked(peek().getInfo());
     Token tok = expect(TokenType.IDENTIFIER);
-    ref.getOffset().add(new RefName(tok.getInfo(), tok.getData()));
+    Reference ref = new Reference(tok.getInfo(), tok.getData());
     if (consumeIfEqual(TokenType.PERIOD)) {
       tok = expect(TokenType.IDENTIFIER);
       ref.getOffset().add(new RefName(tok.getInfo(), tok.getData()));

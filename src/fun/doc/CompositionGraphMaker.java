@@ -16,7 +16,6 @@ import fun.doc.compgraph.WorldComp;
 import fun.expression.Expression;
 import fun.expression.reference.RefName;
 import fun.expression.reference.Reference;
-import fun.expression.reference.ReferenceLinked;
 import fun.function.FunctionHeader;
 import fun.knowledge.KnowFunPath;
 import fun.knowledge.KnowledgeBase;
@@ -72,12 +71,11 @@ public class CompositionGraphMaker {
   }
 
   private static Interface getIface(Reference ep, Map<Designator, Interface> ifacemap, KnowledgeBase kb) {
-    ReferenceLinked rl = (ReferenceLinked) ep;
-    assert (rl.getOffset().size() <= 1);
+    assert (ep.getOffset().size() <= 1);
 
-    Designator name = new Designator("Self", rl.getLink().getName());
-    if (!rl.getOffset().isEmpty()) {
-      name = new Designator(name, ((RefName) rl.getOffset().get(0)).getName());
+    Designator name = new Designator("Self", ep.getLink().getName());
+    if (!ep.getOffset().isEmpty()) {
+      name = new Designator(name, ((RefName) ep.getOffset().get(0)).getName());
     }
 
     Interface iface = ifacemap.get(name);
@@ -96,9 +94,8 @@ public class CompositionGraphMaker {
   }
 
   private static fun.other.Component getComp(Expression expr) {
-    ReferenceLinked reference = (ReferenceLinked) expr;
-    ReferenceLinked rl = reference;
-    return (fun.other.Component) rl.getLink();
+    Reference reference = (Reference) expr;
+    return (fun.other.Component) reference.getLink();
   }
 
 }

@@ -1,5 +1,6 @@
 package fun.symbol;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -8,17 +9,18 @@ import common.ElementInfo;
 import error.ErrorType;
 import error.RError;
 import fun.Fun;
+import fun.other.Named;
 
 /**
  * 
  * @author urs
  */
-public class SymbolTable<T, N> {
+public class SymbolTable {
 
-  private SymbolTable<T, N> parent;
-  private HashMap<N, T> entries = new HashMap<N, T>();
+  private SymbolTable parent;
+  private HashMap<String, Named> entries = new HashMap<String, Named>();
 
-  public SymbolTable(SymbolTable<T, N> parent) {
+  public SymbolTable(SymbolTable parent) {
     this.parent = parent;
   }
 
@@ -26,8 +28,8 @@ public class SymbolTable<T, N> {
     this.parent = null;
   }
 
-  public T get(N name, ElementInfo info) {
-    T res = find(name, true);
+  public Named get(String name, ElementInfo info) {
+    Named res = find(name, true);
     if (res == null) {
       RError.err(ErrorType.Error, info, "Entry not found: " + name);
       return null;
@@ -35,7 +37,7 @@ public class SymbolTable<T, N> {
     return res;
   }
 
-  public T find(N name, boolean recursive) {
+  public Named find(String name, boolean recursive) {
     if (entries.containsKey(name)) {
       return entries.get(name);
     } else if (recursive && (parent != null)) {
@@ -45,31 +47,37 @@ public class SymbolTable<T, N> {
     }
   }
 
-  public T find(N name) {
+  public Named find(String name) {
     return find(name, true);
   }
 
-  public void add(N name, T sym) {
-    T old = find(name, false);
+  public void addAll(Collection<? extends Named> syms) {
+    for (Named itr : syms) {
+      add(itr);
+    }
+  }
+
+  public void add(Named sym) {
+    Named old = find(sym.getName(), false);
     if (old != null) {
       if (old instanceof Fun) {
         RError.err(ErrorType.Hint, ((Fun) old).getInfo(), "First definition was here");
-        RError.err(ErrorType.Error, ((Fun) sym).getInfo(), "Entry already defined: " + name);
+        RError.err(ErrorType.Error, ((Fun) sym).getInfo(), "Entry already defined: " + sym.getName());
       } else {
-        RError.err(ErrorType.Error, "Entry already defined: " + name);
+        RError.err(ErrorType.Error, "Entry already defined: " + sym.getName());
       }
     }
-    entries.put(name, sym);
+    entries.put(sym.getName(), sym);
   }
 
-  public SymbolTable<T, N> getParent() {
+  public SymbolTable getParent() {
     return parent;
   }
 
-  public Map<N, T> getMap() {
-    Map<N, T> ret;
+  public Map<String, Named> getMap() {
+    Map<String, Named> ret;
     if (parent == null) {
-      ret = new HashMap<N, T>();
+      ret = new HashMap<String, Named>();
     } else {
       ret = parent.getMap();
     }

@@ -7,7 +7,7 @@ import fun.DefTraverser;
 import fun.Fun;
 import fun.expression.reference.RefItem;
 import fun.expression.reference.RefName;
-import fun.expression.reference.ReferenceLinked;
+import fun.expression.reference.Reference;
 import fun.function.impl.FuncPrivateRet;
 import fun.function.impl.FuncPrivateVoid;
 import fun.hfsm.State;
@@ -43,7 +43,7 @@ public class StateLinkReduction extends DefTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitReferenceLinked(ReferenceLinked obj, Void param) {
+  protected Void visitReference(Reference obj, Void param) {
     Named item = obj.getLink();
     if (item instanceof State) {
       while (!obj.getOffset().isEmpty()) {
@@ -60,6 +60,6 @@ public class StateLinkReduction extends DefTraverser<Void, Void> {
       obj.setLink(item);
       obj.getOffset().clear();
     }
-    return super.visitReferenceLinked(obj, param);
+    return super.visitReference(obj, param);
   }
 }

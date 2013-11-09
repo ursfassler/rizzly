@@ -146,8 +146,8 @@ class CopyEvl extends NullTraverser<Evl, Void> {
     ret.getVariable().addAll(copy(obj.getVariable().getList()));
     ret.getConstant().addAll(copy(obj.getConstant().getList()));
     ret.getComponent().addAll(copy(obj.getComponent().getList()));
-    ret.getInternalFunction().addAll(copy(obj.getInternalFunction().getList()));
-    ret.getSubComCallback().addAll(copy(obj.getSubComCallback().getList()));
+    ret.getFunction().addAll(copy(obj.getFunction().getList()));
+    ret.getSubCallback().addAll(copy(obj.getSubCallback().getList()));
     ret.setEntryFunc(copy(obj.getEntryFunc()));
     ret.setExitFunc(copy(obj.getExitFunc()));
 

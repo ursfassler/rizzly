@@ -22,7 +22,7 @@ import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefItem;
 import fun.expression.reference.RefName;
 import fun.expression.reference.RefTemplCall;
-import fun.expression.reference.ReferenceLinked;
+import fun.expression.reference.Reference;
 import fun.function.impl.FuncGlobal;
 import fun.knowledge.KnowledgeBase;
 import fun.other.Generator;
@@ -97,7 +97,7 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
   }
 
   @Override
-  protected Expression visitReferenceLinked(ReferenceLinked obj, Memory param) {
+  protected Expression visitReference(Reference obj, Memory param) {
 
     Fun item = obj.getLink();
 

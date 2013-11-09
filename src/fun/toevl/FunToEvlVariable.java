@@ -8,7 +8,7 @@ import evl.variable.Variable;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.expression.Expression;
-import fun.expression.reference.ReferenceLinked;
+import fun.expression.reference.Reference;
 import fun.type.base.EnumElement;
 import fun.variable.CompUse;
 import fun.variable.ConstGlobal;
@@ -32,7 +32,7 @@ public class FunToEvlVariable extends NullTraverser<Evl, Void> {
   // ----------------------------------------------------------------------------
 
   private TypeRef copyType(Expression typeRef) {
-    ReferenceLinked typeref = (ReferenceLinked) typeRef;
+    Reference typeref = (Reference) typeRef;
     assert (typeref.getOffset().isEmpty());
     fun.type.Type nt = (fun.type.Type) typeref.getLink();
     Type ecomp = (Type) fta.traverse(nt, null);
@@ -73,7 +73,7 @@ public class FunToEvlVariable extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitCompUse(CompUse obj, Void param) {
-    ReferenceLinked typeref = (ReferenceLinked) obj.getType();
+    Reference typeref = (Reference) obj.getType();
     assert (typeref.getOffset().isEmpty());
     fun.other.Component nt = (fun.other.Component) typeref.getLink();
     Component ecomp = (Component) fta.traverse(nt, null);

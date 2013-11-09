@@ -16,8 +16,6 @@ import fun.expression.reference.RefItem;
 import fun.expression.reference.RefName;
 import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.Reference;
-import fun.expression.reference.ReferenceLinked;
-import fun.expression.reference.ReferenceUnlinked;
 import fun.function.FunctionHeader;
 import fun.function.impl.FuncEntryExit;
 import fun.function.impl.FuncGlobal;
@@ -257,16 +255,6 @@ public abstract class Traverser<R, P> {
     }
   }
 
-  protected R visitReference(Reference obj, P param) {
-    if (obj instanceof ReferenceUnlinked) {
-      return visitReferenceUnlinked((ReferenceUnlinked) obj, param);
-    } else if (obj instanceof ReferenceLinked) {
-      return visitReferenceLinked((ReferenceLinked) obj, param);
-    } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
-    }
-  }
-
   protected R visitRefItem(RefItem obj, P param) {
     if (obj instanceof RefIndex) {
       return visitRefIndex((RefIndex) obj, param);
@@ -479,9 +467,7 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitNumber(Number obj, P param);
 
-  abstract protected R visitReferenceUnlinked(ReferenceUnlinked obj, P param);
-
-  abstract protected R visitReferenceLinked(ReferenceLinked obj, P param);
+  abstract protected R visitReference(Reference obj, P param);
 
   abstract protected R visitUnionSelector(UnionSelector obj, P param);
 }

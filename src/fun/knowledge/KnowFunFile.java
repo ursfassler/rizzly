@@ -75,7 +75,7 @@ class KnowFileTraverser extends DefTraverser<Void, RizzlyFile> {
     if (obj instanceof Named) {
       if (cache.containsKey(obj)) {
         RizzlyFile oldparent = cache.get(obj);
-        RError.err(ErrorType.Fatal, obj.getInfo(), "Same object (" + obj + ") found 2 times: " + oldparent.getName() + " and " + param.getName());
+        RError.err(ErrorType.Fatal, obj.getInfo(), "Same object (" + obj + ") found 2 times: " + oldparent.getFullName() + " and " + param.getFullName());
       }
       cache.put((Named) obj, param);
     }

@@ -48,7 +48,7 @@ public class ComponentFilePrinter {
   }
 
   public void print(RizzlyFile comp) {
-    Designator path = comp.getName();
+    Designator path = comp.getFullName();
     try {
       String filename = kb.getRootdir() + path.toString(".") + ".html";
       TransformerFactory transformerFactory = TransformerFactory.newInstance();
@@ -71,7 +71,7 @@ public class ComponentFilePrinter {
   }
 
   public void createDoc(RizzlyFile comp) {
-    Designator path = comp.getName();
+    Designator path = comp.getFullName();
 
     try {
       DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();

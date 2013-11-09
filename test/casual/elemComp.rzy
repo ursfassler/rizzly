@@ -29,7 +29,7 @@ component
       val4():R{0,100};
       val5():R{0,100};
       
-  implementation elementary
+  implementation composition
     component
       sub1 : Sub{10,20};
       sub2 : Sub{20,30};
@@ -37,24 +37,12 @@ component
       sub4 : Sub{40,50};
       sub5 : Sub{50,60};
     
-    function val1():R{0,100}
-      return sub1.get();
-    end
-    
-    function val2():R{0,100}
-      return sub2.get();
-    end
-    
-    function val3():R{0,100}
-      return sub3.get();
-    end
-    
-    function val4():R{0,100}
-      return sub4.get();
-    end
-    
-    function val5():R{0,100}
-      return sub5.get();
-    end
+    connection
+      val1 -> sub1.get;
+      val2 -> sub2.get;
+      val3 -> sub3.get;
+      val4 -> sub4.get;
+      val5 -> sub5.get;
+
   end
 

@@ -12,10 +12,8 @@ import error.RError;
 import fun.DefTraverser;
 import fun.Fun;
 import fun.NullTraverser;
-import fun.expression.reference.ReferenceLinked;
-import fun.expression.reference.ReferenceUnlinked;
+import fun.expression.reference.Reference;
 import fun.function.FunctionHeader;
-import fun.knowledge.KnowFun;
 import fun.knowledge.KnowScope;
 import fun.knowledge.KnowledgeBase;
 import fun.other.Component;
@@ -109,21 +107,9 @@ class SubDep extends DefTraverser<Void, Named> {
   }
 
   @Override
-  protected Void visitReferenceUnlinked(ReferenceUnlinked obj, Named param) {
+  protected Void visitReference(Reference obj, Named param) {
     assert (param != null);
-    super.visitReferenceUnlinked(obj, param);
-    KnowFun ka = kb.getEntry(KnowFun.class);
-    Fun item = ka.find(obj.getName());
-    if (item != null) {
-      g.addEdge(param, (Named) item);
-    }
-    return null;
-  }
-
-  @Override
-  protected Void visitReferenceLinked(ReferenceLinked obj, Named param) {
-    assert (param != null);
-    super.visitReferenceLinked(obj, param);
+    super.visitReference(obj, param);
     Fun dst = obj.getLink();
     Scope scope = KnowScope.get(dst);
     switch (scope) {

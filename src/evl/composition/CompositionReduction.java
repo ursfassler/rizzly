@@ -78,8 +78,8 @@ public class CompositionReduction extends NullTraverser<Named, Void> {
     elem.getInput().addAll(obj.getInput());
     elem.getOutput().addAll(obj.getOutput());
 
-    elem.setEntryFunc(makeEntryExitFunc(State.ENTRY_FUNC_NAME, elem.getInternalFunction()));
-    elem.setExitFunc(makeEntryExitFunc(State.EXIT_FUNC_NAME, elem.getInternalFunction()));
+    elem.setEntryFunc(makeEntryExitFunc(State.ENTRY_FUNC_NAME, elem.getFunction()));
+    elem.setExitFunc(makeEntryExitFunc(State.EXIT_FUNC_NAME, elem.getFunction()));
 
     Map<FuncIface, List<Endpoint>> input = new HashMap<FuncIface, List<Endpoint>>();
     Map<Pair<CompUse, String>, List<Endpoint>> callback = new HashMap<Pair<CompUse, String>, List<Endpoint>>();
@@ -110,18 +110,15 @@ public class CompositionReduction extends NullTraverser<Named, Void> {
 
     for (FuncIface src : input.keySet()) {
       List<Endpoint> conset = input.get(src);
-      ArrayList<String> ns = new ArrayList<String>();
       FunctionBase func = genFunctions(conset, src, FuncInputHandlerEvent.class, FuncInputHandlerQuery.class);
-      elem.addFunction(ns, func);
+      elem.getFunction().add(func);
     }
 
     for (Pair<CompUse, String> src : callback.keySet()) {
       List<Endpoint> conset = callback.get(src);
-      ArrayList<String> ns = new ArrayList<String>();
-      ns.add(src.first.getName());
       FuncIfaceOut iface = getIface(src);
       FunctionBase func = genFunctions(conset, iface, FuncSubHandlerEvent.class, FuncSubHandlerQuery.class);
-      elem.addFunction(ns, func);
+      elem.addSubCallback(src.first.getName(), func);
     }
 
     map.put(obj, elem);

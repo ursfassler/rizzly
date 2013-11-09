@@ -14,7 +14,7 @@ import fun.variable.Constant;
  * 
  * @author urs
  */
-final public class RizzlyFile extends FunBase {
+final public class RizzlyFile extends FunBase implements Named {
   private Designator name;
   final private List<Designator> imports;
   final private ListOfNamed<Type> type = new ListOfNamed<Type>();
@@ -32,11 +32,11 @@ final public class RizzlyFile extends FunBase {
     return name.toString();
   }
 
-  public Designator getName() {
+  public Designator getFullName() {
     return name;
   }
 
-  public void setName(Designator name) {
+  public void setFullName(Designator name) {
     this.name = name;
   }
 
@@ -58,6 +58,17 @@ final public class RizzlyFile extends FunBase {
 
   public ListOfNamed<Component> getComp() {
     return comp;
+  }
+
+  @Override
+  public String getName() {
+    assert (name.size() > 0);
+    return name.toList().get(name.size() - 1);
+  }
+
+  @Override
+  public void setName(String name) {
+    throw new RuntimeException("not yet implemented");
   }
 
 }

@@ -8,17 +8,19 @@ component
   end
 
   Err7
-    implementation elementary
+    output
+      funcA();
+      funcB();
+      
+  implementation composition
     
     component
       a : Sub;
       b : Sub;
 
-    function a.funcA()
-    end
-
-    function a.funcB()
-    end
-
+    connection
+      a.funcA -> funcA;
+      a.funcB -> funcB;
+      
   end
 

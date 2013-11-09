@@ -42,8 +42,8 @@ public class TypeChecker extends DefTraverser<Void, Void> {
   protected Void visitImplElementary(ImplElementary obj, Void sym) {
     visitItr(obj.getVariable(), sym);
     visitItr(obj.getConstant(), sym);
-    visitItr(obj.getInternalFunction(), sym);
-    visitItr(obj.getSubComCallback(), sym);
+    visitItr(obj.getFunction(), sym);
+    visitItr(obj.getSubCallback(), sym);
     return null;
   }
 

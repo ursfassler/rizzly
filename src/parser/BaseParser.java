@@ -3,15 +3,11 @@ package parser;
 import java.util.ArrayList;
 import java.util.List;
 
-import util.Pair;
-
 import common.Metadata;
 
 import fun.Copy;
 import fun.expression.Expression;
-import fun.expression.reference.RefName;
 import fun.expression.reference.Reference;
-import fun.expression.reference.ReferenceUnlinked;
 import fun.function.FuncWithBody;
 import fun.function.FunctionHeader;
 import fun.function.impl.FuncGlobal;
@@ -148,14 +144,12 @@ public class BaseParser extends Parser {
     return func;
   }
 
-  // TODO do we need the designatior ir is id enough?
-  // EBNF privateFunction: "function" designator vardeflist [ ":" typeref ] block "end"
-  protected Pair<List<String>, FunctionHeader> parsePrivateFunction() {
+  // TODO can we merge it with another function parser?
+  // EBNF privateFunction: "function" id vardeflist [ ":" typeref ] block "end"
+  protected FunctionHeader parsePrivateFunction() {
     Token tok = expect(TokenType.FUNCTION);
 
-    List<String> name = parseDesignator();
-    String funcName = name.get(name.size() - 1);
-    name.remove(name.size() - 1);
+    Token name = expect(TokenType.IDENTIFIER);
 
     List<FuncVariable> varlist = parseVardefList();
 
@@ -169,13 +163,13 @@ public class BaseParser extends Parser {
       func = new FuncPrivateVoid(tok.getInfo());
     }
 
-    func.setName(funcName);
+    func.setName(name.getData());
     func.getParam().addAll(varlist);
 
     ((FuncWithBody) func).setBody(stmt().parseBlock());
     expect(TokenType.END);
 
-    return new Pair<List<String>, FunctionHeader>(name, func);
+    return func;
   }
 
   // EBNF vardef: id { "," id } ":" typeref
@@ -216,8 +210,7 @@ public class BaseParser extends Parser {
       for (int i = 0; i < vardef.size(); i++) {
         Expression expr = def.get(i);
         FuncVariable var = vardef.get(i);
-        Reference ref = new ReferenceUnlinked(expr.getInfo());
-        ref.getOffset().add(new RefName(expr.getInfo(), var.getName()));
+        Reference ref = new Reference(expr.getInfo(), var.getName());
         Assignment stmt = new Assignment(expr.getInfo(), ref, expr);
         stmtlist.add(stmt);
       }

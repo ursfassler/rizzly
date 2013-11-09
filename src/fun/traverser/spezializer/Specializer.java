@@ -14,8 +14,8 @@ import error.RError;
 import fun.Copy;
 import fun.expression.Expression;
 import fun.expression.Number;
-import fun.expression.reference.ReferenceLinked;
-import fun.expression.reference.ReferenceUnlinked;
+import fun.expression.reference.DummyLinkTarget;
+import fun.expression.reference.Reference;
 import fun.knowledge.KnowFunPath;
 import fun.knowledge.KnowledgeBase;
 import fun.other.ActualTemplateArgument;
@@ -69,7 +69,7 @@ public class Specializer {
 
     for (int i = 0; i < genspec.size(); i++) {
       TemplateParameter pitm = item.getTemplateParam().getList().get(i);
-      ReferenceLinked tref = (ReferenceLinked) pitm.getType();
+      Reference tref = pitm.getType();
       Type type = (Type) EvalTo.any(tref, kb);
       ActualTemplateArgument evald;
       Expression acarg = genspec.get(i);
@@ -81,12 +81,10 @@ public class Specializer {
         Number num = (Number) ExprEvaluator.evaluate(acarg, new Memory(), kb);
         evald = num;
       } else if (type instanceof AnyType) {
-        ReferenceLinked rl = (ReferenceLinked) acarg;
-        evald = (Type) EvalTo.any(rl, kb);
+        evald = (Type) EvalTo.any((Reference) acarg, kb);
         // TODO check type
       } else if (type instanceof TypeType) {
-        ReferenceLinked rl = (ReferenceLinked) acarg;
-        evald = (ActualTemplateArgument) EvalTo.any(rl, kb);
+        evald = (ActualTemplateArgument) EvalTo.any((Reference) acarg, kb);
         // TODO check type
       } else {
         throw new RuntimeException("not yet implemented: " + type.getName());
@@ -155,19 +153,16 @@ public class Specializer {
  * 
  */
 class TypeSpecTrav extends ExprReplacer<Map<TemplateParameter, ActualTemplateArgument>> {
-  @Override
-  protected Expression visitReferenceUnlinked(ReferenceUnlinked obj, Map<TemplateParameter, ActualTemplateArgument> param) {
-    throw new RuntimeException("not yet implemented");
-  }
 
   @Override
-  protected Expression visitReferenceLinked(ReferenceLinked obj, Map<TemplateParameter, ActualTemplateArgument> param) {
-    super.visitReferenceLinked(obj, param);
+  protected Expression visitReference(Reference obj, Map<TemplateParameter, ActualTemplateArgument> param) {
+    assert (!(obj.getLink() instanceof DummyLinkTarget));
+    super.visitReference(obj, param);
 
     if (param.containsKey(obj.getLink())) {
       ActualTemplateArgument repl = param.get(obj.getLink());
       if (repl instanceof Type) {
-        return new ReferenceLinked(obj.getInfo(), (Type) repl);
+        return new Reference(obj.getInfo(), (Type) repl);
       } else {
         return (Expression) repl;
       }

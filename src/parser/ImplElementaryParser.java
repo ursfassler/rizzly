@@ -1,13 +1,8 @@
 package parser;
 
-import java.util.List;
-
-import util.Pair;
-
 import common.ElementInfo;
 
-import fun.expression.reference.ReferenceLinked;
-import fun.function.FunctionHeader;
+import fun.expression.reference.Reference;
 import fun.function.impl.FuncEntryExit;
 import fun.hfsm.State;
 import fun.other.Component;
@@ -39,8 +34,8 @@ public class ImplElementaryParser extends ImplBaseParser {
     FuncEntryExit exitFunc = makeEntryExitFunc(State.EXIT_FUNC_NAME, exitBody);
     comp.getFunction().add(entryFunc);
     comp.getFunction().add(exitFunc);
-    comp.setEntryFunc(new ReferenceLinked(info, entryFunc));
-    comp.setExitFunc(new ReferenceLinked(info, exitFunc));
+    comp.setEntryFunc(new Reference(info, entryFunc));
+    comp.setExitFunc(new Reference(info, exitFunc));
 
     while (true)
       switch (peek().getType()) {
@@ -52,10 +47,6 @@ public class ImplElementaryParser extends ImplBaseParser {
         exitBody.getStatements().add(parseExitCode());
         break;
       }
-      case COMPONENT: {
-        comp.getComponent().addAll(parseCompDeclBlock());
-        break;
-      }
       case VAR: {
         comp.getVariable().addAll(parseVarDefBlock(StateVariable.class));
         break;
@@ -65,8 +56,7 @@ public class ImplElementaryParser extends ImplBaseParser {
         break;
       }
       case FUNCTION: {
-        Pair<List<String>, FunctionHeader> func = parsePrivateFunction();
-        comp.addFunction(func.first, func.second);
+        comp.getFunction().add(parsePrivateFunction());
         break;
       }
       default: {

@@ -13,8 +13,7 @@ import fun.expression.reference.RefCall;
 import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefName;
 import fun.expression.reference.RefTemplCall;
-import fun.expression.reference.ReferenceLinked;
-import fun.expression.reference.ReferenceUnlinked;
+import fun.expression.reference.Reference;
 import fun.function.impl.FuncEntryExit;
 import fun.function.impl.FuncGlobal;
 import fun.function.impl.FuncPrivateRet;
@@ -332,11 +331,7 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
     return visitDefault(obj, param);
   }
 
-  protected R visitReferenceUnlinked(ReferenceUnlinked obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  protected R visitReferenceLinked(ReferenceLinked obj, P param) {
+  protected R visitReference(Reference obj, P param) {
     return visitDefault(obj, param);
   }
 

@@ -25,13 +25,12 @@ import fun.expression.Number;
 import fun.expression.Relation;
 import fun.expression.StringValue;
 import fun.expression.UnaryExpression;
+import fun.expression.reference.DummyLinkTarget;
 import fun.expression.reference.RefCall;
 import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefName;
 import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.Reference;
-import fun.expression.reference.ReferenceLinked;
-import fun.expression.reference.ReferenceUnlinked;
 import fun.function.FuncWithBody;
 import fun.function.FuncWithReturn;
 import fun.function.FunctionHeader;
@@ -176,13 +175,14 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitRizzlyFile(RizzlyFile obj, StreamWriter param) {
     param.wr("// file: ");
-    param.wr(obj.getName().toString());
+    param.wr(obj.getFullName().toString());
     param.nl();
     visitImports(obj.getImports(), param);
     param.nl();
     visitList(obj.getType(), param);
     visitList(obj.getConstant(), param);
     visitList(obj.getFunction(), param);
+    visitList(obj.getComp(), param);
     return null;
   }
 
@@ -262,9 +262,8 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.nl();
 
     visitOptList("const", obj.getConstant(), param);
-    visitOptList("component", obj.getComponent(), param);
     visitOptList("var", obj.getVariable(), param);
-    visitOptList(obj.getFunction().getName(), obj.getFunction(), param);
+    visitList(obj.getFunction(), param);
 
     param.wr("entry: ");
     visit(obj.getEntryFunc(), param);
@@ -758,16 +757,10 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitReferenceUnlinked(ReferenceUnlinked obj, StreamWriter param) {
-    param.wr("'");
-    param.wr(obj.getName().toString("."));
-    param.wr("'");
-    visitItr(obj.getOffset(), param);
-    return null;
-  }
-
-  @Override
-  protected Void visitReferenceLinked(ReferenceLinked obj, StreamWriter param) {
+  protected Void visitReference(Reference obj, StreamWriter param) {
+    if (obj.getLink() instanceof DummyLinkTarget) {
+      param.wr("?");
+    }
     param.wr(obj.getLink().getName());
     wrId(obj.getLink(), param);
     visitItr(obj.getOffset(), param);

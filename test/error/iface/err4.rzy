@@ -4,23 +4,24 @@ component
       funcA();
       funcB();
       
-    implementation elementary
+  implementation elementary
   end
 
   Err4
-    implementation elementary
+    output
+      funcA();
+      funcB();
+      funcC();
+      
+  implementation composition
     
     component
       a : Sub;
 
-    function a.funcA()
-    end
-
-    function a.funcB()
-    end
-    
-    function a.funcC()
-    end
+    connection
+      a.funcA -> funcA;
+      a.funcB -> funcB;
+      a.funcC -> funcC;
     
   end
 

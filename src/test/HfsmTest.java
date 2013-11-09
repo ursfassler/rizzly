@@ -53,4 +53,9 @@ public class HfsmTest extends BaseTest {
   public void transScope() {
     compile("transScope", TestSteps.EXECUTE, false, false);
   }
+
+  @Test
+  public void stateNames1() {
+    compile("stateNames1", TestSteps.COMPILE_TO_EVL, false, false);
+  }
 }

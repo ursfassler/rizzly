@@ -129,11 +129,6 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
-  public void ifacemap() {
-    compile("ifacemap", TestSteps.COMPILE_TO_ASM, true, false);
-  }
-
-  @Test
   public void linkorder2() {
     compile("linkorder2", TestSteps.COMPILE_TO_ASM, false, false);
   }

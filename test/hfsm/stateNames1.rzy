@@ -1,0 +1,26 @@
+//test ok
+
+component
+  StateNames1
+
+  input
+    tick();
+  
+  output
+    evt( value: R{0,255} );
+
+  implementation hfsm(A)
+    state A(A)
+      state A(A)
+        state A;
+        state B;
+        state C;
+      end
+      state B(A)
+        state A;
+        state B;
+        state C;
+      end
+    end
+  end
+

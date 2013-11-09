@@ -10,9 +10,7 @@ import error.ErrorType;
 import error.RError;
 import fun.Copy;
 import fun.expression.Number;
-import fun.expression.reference.RefName;
 import fun.expression.reference.Reference;
-import fun.expression.reference.ReferenceUnlinked;
 import fun.function.FunctionHeader;
 import fun.other.Component;
 import fun.other.ListOfNamed;
@@ -175,14 +173,12 @@ public class TypeParser extends BaseParser {
         RError.err(ErrorType.Hint, old.getInfo(), "first definition was here");
         RError.err(ErrorType.Error, elemTok.getInfo(), "Name \"" + elemTok.getData() + "\" already defined");
       } else {
-        ReferenceUnlinked typeRef = new ReferenceUnlinked(elemTok.getInfo());
-        typeRef.getOffset().add(new RefName(elemTok.getInfo(), name));
+        Reference typeRef = new Reference(elemTok.getInfo(), name);
         EnumElement elem = new EnumElement(elemTok.getInfo(), elemTok.getData(), typeRef);
         elem.setDef(new Number(elemTok.getInfo(), BigInteger.valueOf(type.getElement().size())));
         constants.add(elem);
 
-        ReferenceUnlinked elemRef = new ReferenceUnlinked(elemTok.getInfo());
-        elemRef.getOffset().add(new RefName(elemTok.getInfo(), elem.getName()));
+        Reference elemRef = new Reference(elemTok.getInfo(), elem.getName());
         type.getElement().add(elemRef);
       }
     }

@@ -5,5 +5,5 @@ import fun.Fun;
 public interface Named extends Fun {
   public String getName();
 
-  public void setName(String name);
+  public void setName(String name);   // TODO can we remove this?
 }

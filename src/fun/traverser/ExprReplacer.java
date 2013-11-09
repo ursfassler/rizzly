@@ -19,8 +19,6 @@ import fun.expression.reference.RefItem;
 import fun.expression.reference.RefName;
 import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.Reference;
-import fun.expression.reference.ReferenceLinked;
-import fun.expression.reference.ReferenceUnlinked;
 import fun.function.FuncWithReturn;
 import fun.function.FunctionHeader;
 import fun.hfsm.Transition;
@@ -49,7 +47,7 @@ public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitReferenceLinked(ReferenceLinked obj, T param) {
+  protected Expression visitReference(Reference obj, T param) {
     for (RefItem item : obj.getOffset()) {
       visit(item, param);
     }
@@ -113,11 +111,6 @@ public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   protected Expression visitArrayValue(ArrayValue obj, T param) {
     visitExprList(obj.getValue(), param);
     return obj;
-  }
-
-  @Override
-  protected Expression visitReferenceUnlinked(ReferenceUnlinked obj, T param) {
-    throw new RuntimeException("not yet implemented");
   }
 
   @Override

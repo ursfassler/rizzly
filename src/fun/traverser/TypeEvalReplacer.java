@@ -3,7 +3,7 @@ package fun.traverser;
 import fun.DefTraverser;
 import fun.Fun;
 import fun.expression.reference.RefTemplCall;
-import fun.expression.reference.ReferenceLinked;
+import fun.expression.reference.Reference;
 import fun.knowledge.KnowledgeBase;
 import fun.other.Generator;
 import fun.other.Named;
@@ -33,18 +33,18 @@ public class TypeEvalReplacer extends DefTraverser<Void, Memory> {
   }
 
   @Override
-  protected Void visitReferenceLinked(ReferenceLinked obj, Memory param) {
+  protected Void visitReference(Reference obj, Memory param) {
     if (obj.getLink() instanceof Generator) {
       Generator gen = (Generator) obj.getLink();
       if (!gen.getTemplateParam().isEmpty()) {
         assert (!obj.getOffset().isEmpty());
         assert (obj.getOffset().get(0) instanceof RefTemplCall);
-        ReferenceLinked nr = new ReferenceLinked(obj.getInfo(), obj.getLink());
+        Reference nr = new Reference(obj.getInfo(), obj.getLink());
         nr.getOffset().add(obj.getOffset().pop());
         Named func = EvalTo.any(nr, kb);
         obj.setLink(func);
       }
     }
-    return super.visitReferenceLinked(obj, param);
+    return super.visitReference(obj, param);
   }
 }

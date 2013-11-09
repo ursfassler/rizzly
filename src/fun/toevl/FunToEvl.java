@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import common.Designator;
 import common.Direction;
 
 import error.ErrorType;
@@ -38,7 +37,6 @@ import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
 import fun.other.ImplElementary;
-import fun.other.ListOfNamed;
 import fun.other.Named;
 import fun.other.Namespace;
 import fun.statement.CaseOpt;
@@ -189,24 +187,12 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
     for (Variable var : obj.getVariable()) {
       comp.getVariable().add((evl.variable.Variable) visit(var, null));
     }
-    for (fun.variable.CompUse use : obj.getComponent()) {
-      comp.getComponent().add((evl.other.CompUse) visit(use, null));
-    }
     comp.setEntryFunc((Reference) visit(obj.getEntryFunc(), null));
     comp.setExitFunc((Reference) visit(obj.getExitFunc(), null));
-    trfunc(new Designator(), obj.getFunction(), comp);
-    return comp;
-  }
-
-  private void trfunc(Designator ns, ListOfNamed<Named> func, evl.other.ImplElementary comp) {
-    for (Named item : func) {
-      if (item instanceof Namespace) {
-        trfunc(new Designator(ns, item.getName()), (Namespace) item, comp);
-      } else {
-        fun.function.FunctionHeader cfun = (fun.function.FunctionHeader) item;
-        comp.addFunction(ns.toList(), (FunctionBase) visit(cfun, null));
-      }
+    for (FunctionHeader item : obj.getFunction()) {
+      comp.getFunction().add((FunctionBase) visit(item, null));
     }
+    return comp;
   }
 
   @Override

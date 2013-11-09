@@ -2,7 +2,6 @@ package fun.traverser;
 
 import fun.DefTraverser;
 import fun.expression.reference.Reference;
-import fun.expression.reference.ReferenceLinked;
 import fun.other.Namespace;
 import fun.type.Type;
 import fun.type.base.TypeAlias;
@@ -21,14 +20,13 @@ public class DeAlias extends DefTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitReferenceLinked(ReferenceLinked obj, Void param) {
+  protected Void visitReference(Reference obj, Void param) {
     while ((obj.getLink() instanceof Type) && (((Type) obj.getLink()) instanceof TypeAlias)) {
       assert (obj.getOffset().isEmpty());
       Reference ref = ((TypeAlias) ((Type) obj.getLink())).getRef();
-      assert (ref instanceof ReferenceLinked);
       assert (ref.getOffset().isEmpty());
-      obj.setLink(((ReferenceLinked) ref).getLink());
+      obj.setLink(ref.getLink());
     }
-    return super.visitReferenceLinked(obj, param);
+    return super.visitReference(obj, param);
   }
 }

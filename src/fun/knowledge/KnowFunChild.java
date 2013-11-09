@@ -10,14 +10,12 @@ import error.RError;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.composition.ImplComposition;
-import fun.function.FunctionHeader;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.State;
 import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
 import fun.other.Component;
 import fun.other.ImplElementary;
-import fun.other.ListOfNamed;
 import fun.other.Named;
 import fun.other.Namespace;
 import fun.type.base.EnumType;
@@ -94,11 +92,9 @@ class KnowFunChildTraverser extends NullTraverser<Set<Named>, String> {
   @Override
   protected Set<Named> visitImplElementary(ImplElementary obj, String param) {
     Set<Named> rset = new HashSet<Named>();
-    addIfFound(obj.getComponent().find(param), rset);
     addIfFound(obj.getConstant().find(param), rset);
     addIfFound(obj.getVariable().find(param), rset);
-    ListOfNamed<FunctionHeader> internalFunc = new ListOfNamed<FunctionHeader>(obj.getFunction().getItems(FunctionHeader.class, false));
-    addIfFound(internalFunc.find(param), rset);
+    addIfFound(obj.getFunction().find(param), rset);
     return rset;
   }
 

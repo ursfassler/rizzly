@@ -49,7 +49,7 @@ public class CompInstantiator extends NullTraverser<ImplElementary, Designator> 
 
     ns.addAll(inst.getConstant());
     ns.addAll(inst.getVariable());
-    ns.addAll(inst.getInternalFunction());
+    ns.addAll(inst.getFunction());
 
     // XXX instantiated component should not have any function in Input nor Output
 
@@ -69,7 +69,7 @@ public class CompInstantiator extends NullTraverser<ImplElementary, Designator> 
       ifacemap.put(compUse, compSpace);
     }
 
-    for (NamedList<FunctionHeader> compItem : inst.getSubComCallback()) {
+    for (NamedList<FunctionHeader> compItem : inst.getSubCallback()) {
       Namespace compspace = ns.findSpace(compItem.getName());
       if (compspace == null) {
         RError.err(ErrorType.Fatal, "Namespace should exist since subcomponent was created");

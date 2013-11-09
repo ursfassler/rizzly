@@ -4,10 +4,10 @@ import error.ErrorType;
 import error.RError;
 import fun.DefTraverser;
 import fun.Fun;
+import fun.expression.reference.DummyLinkTarget;
 import fun.expression.reference.RefItem;
 import fun.expression.reference.RefName;
-import fun.expression.reference.ReferenceLinked;
-import fun.expression.reference.ReferenceUnlinked;
+import fun.expression.reference.Reference;
 import fun.other.Named;
 import fun.other.Namespace;
 
@@ -27,8 +27,9 @@ public class NamespaceLinkReduction extends DefTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitReferenceLinked(ReferenceLinked obj, Void param) {
+  protected Void visitReference(Reference obj, Void param) {
     Named item = obj.getLink();
+    assert (!(item instanceof DummyLinkTarget));
     while (item instanceof Namespace) {
       RefItem next = obj.getOffset().pop();
       if (!(next instanceof RefName)) {
@@ -40,12 +41,7 @@ public class NamespaceLinkReduction extends DefTraverser<Void, Void> {
       assert (item != null); // type checker should find it?
     }
     obj.setLink(item);
-    return super.visitReferenceLinked(obj, param);
-  }
-
-  @Override
-  protected Void visitReferenceUnlinked(ReferenceUnlinked obj, Void param) {
-    throw new RuntimeException("not yet implemented");
+    return super.visitReference(obj, param);
   }
 
 }

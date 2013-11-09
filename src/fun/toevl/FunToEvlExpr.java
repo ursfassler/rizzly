@@ -21,7 +21,6 @@ import evl.expression.binop.Or;
 import evl.expression.binop.Plus;
 import evl.expression.binop.Shl;
 import evl.expression.binop.Shr;
-import evl.expression.reference.Reference;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.expression.ArithmeticOp;
@@ -32,7 +31,7 @@ import fun.expression.Relation;
 import fun.expression.StringValue;
 import fun.expression.UnaryExpression;
 import fun.expression.reference.RefItem;
-import fun.expression.reference.ReferenceLinked;
+import fun.expression.reference.Reference;
 
 public class FunToEvlExpr extends NullTraverser<Evl, Void> {
   private FunToEvl fta;
@@ -49,12 +48,12 @@ public class FunToEvlExpr extends NullTraverser<Evl, Void> {
 
   // ----------------------------------------------------------------------------
   @Override
-  protected Expression visitReferenceLinked(ReferenceLinked obj, Void param) {
+  protected Expression visitReference(Reference obj, Void param) {
     ArrayList<evl.expression.reference.RefItem> ofs = new ArrayList<evl.expression.reference.RefItem>();
     for (RefItem item : obj.getOffset()) {
       ofs.add((evl.expression.reference.RefItem) fta.traverse(item, null));
     }
-    Reference ret = new evl.expression.reference.Reference(obj.getInfo(), (evl.other.Named) fta.traverse(obj.getLink(), null), ofs);
+    evl.expression.reference.Reference ret = new evl.expression.reference.Reference(obj.getInfo(), (evl.other.Named) fta.traverse(obj.getLink(), null), ofs);
     return ret;
   }
 

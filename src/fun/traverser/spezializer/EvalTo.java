@@ -5,17 +5,12 @@ import java.util.List;
 import fun.expression.Expression;
 import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.Reference;
-import fun.expression.reference.ReferenceLinked;
 import fun.knowledge.KnowledgeBase;
 import fun.other.Generator;
 import fun.other.Named;
 
 public class EvalTo {
-  public static Named any(Reference expr, KnowledgeBase kb) {
-    assert (expr instanceof ReferenceLinked);
-
-    ReferenceLinked obj = (ReferenceLinked) expr;
-
+  public static Named any(Reference obj, KnowledgeBase kb) {
     if (!(obj.getLink() instanceof Generator)) {
       return obj.getLink();
     }
@@ -29,7 +24,7 @@ public class EvalTo {
 
     List<Expression> actparam = ((RefTemplCall) obj.getOffset().get(0)).getActualParameter();
 
-    return Specializer.process(generator, actparam, expr.getInfo(), kb);
+    return Specializer.process(generator, actparam, obj.getInfo(), kb);
   }
 
 }

@@ -91,8 +91,8 @@ public class DesCallgraphMaker extends DefTraverser<Void, Designator> {
 
   @Override
   protected Void visitImplElementary(ImplElementary obj, Designator param) {
-    visitItr(obj.getInternalFunction(), param);
-    visitItr(obj.getSubComCallback(), param);
+    visitItr(obj.getFunction(), param);
+    visitItr(obj.getSubCallback(), param);
     return null;
   }
 

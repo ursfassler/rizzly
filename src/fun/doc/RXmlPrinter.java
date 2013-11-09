@@ -28,8 +28,7 @@ import fun.expression.reference.RefCall;
 import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefName;
 import fun.expression.reference.RefTemplCall;
-import fun.expression.reference.ReferenceLinked;
-import fun.expression.reference.ReferenceUnlinked;
+import fun.expression.reference.Reference;
 import fun.function.FuncWithBody;
 import fun.function.FuncWithReturn;
 import fun.function.FunctionHeader;
@@ -182,7 +181,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
     }
   }
 
-  private void printEntryExit(String name, ReferenceLinked ref) {
+  private void printEntryExit(String name, Reference ref) {
     assert (ref.getOffset().isEmpty());
     FuncEntryExit func = (FuncEntryExit) ref.getLink();
     if (!func.getBody().getStatements().isEmpty()) {
@@ -288,11 +287,10 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
     xw.incIndent();
 
     visitNamedSection("const", obj.getConstant().getList());
-    visitNamedSection("component", obj.getComponent().getList());
     visitNamedSection("var", obj.getVariable().getList());
 
-    printEntryExit("entry", (ReferenceLinked) obj.getEntryFunc());
-    printEntryExit("entry", (ReferenceLinked) obj.getExitFunc());
+    printEntryExit("entry", obj.getEntryFunc());
+    printEntryExit("entry", obj.getExitFunc());
 
     visitList(obj.getFunction(), new Designator());
     xw.decIndent();
@@ -352,8 +350,8 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   private void printStateBody(State obj) {
     xw.incIndent();
 
-    printEntryExit("entry", (ReferenceLinked) obj.getEntryFuncRef());
-    printEntryExit("exit", (ReferenceLinked) obj.getExitFuncRef());
+    printEntryExit("entry", obj.getEntryFuncRef());
+    printEntryExit("exit", obj.getExitFuncRef());
     visitNamedSection("var", obj.getVariable().getList());
     visitList(obj.getItemList(), new Designator());
 
@@ -811,22 +809,13 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitReferenceUnlinked(ReferenceUnlinked obj, Designator param) {
-    xw.wr("'");
-    xw.wr(obj.getName().toString("."));
-    xw.wr("'");
-    visitItr(obj.getOffset(), null);
-    return null;
-  }
-
-  @Override
-  protected Void visitReferenceLinked(ReferenceLinked obj, Designator param) {
+  protected Void visitReference(Reference obj, Designator param) {
     RizzlyFile file = kff.find(obj.getLink()); // FIXME find better way to handle built in functions and so
     Designator path;
     if (file == null) {
       path = new Designator();
     } else {
-      path = file.getName();
+      path = file.getFullName();
     }
     String title = obj.getLink().toString();
     xw.wl(obj.getLink(), title, path);

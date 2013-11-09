@@ -9,6 +9,7 @@ import error.ErrorType;
 import error.RError;
 import fun.Fun;
 import fun.composition.ImplComposition;
+import fun.expression.reference.DummyLinkTarget;
 import fun.function.impl.FuncEntryExit;
 import fun.function.impl.FuncGlobal;
 import fun.function.impl.FuncPrivateRet;
@@ -76,6 +77,7 @@ public class KnowScope extends KnowledgeEntry {
     global.add(ImplElementary.class);
     global.add(ImplComposition.class);
     global.add(ImplHfsm.class);
+    global.add(DummyLinkTarget.class);
 
     local.add(FuncVariable.class);
     local.add(TemplateParameter.class);

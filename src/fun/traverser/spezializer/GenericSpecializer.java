@@ -8,7 +8,7 @@ import common.ElementInfo;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.expression.Number;
-import fun.expression.reference.ReferenceLinked;
+import fun.expression.reference.Reference;
 import fun.knowledge.KnowledgeBase;
 import fun.other.ActualTemplateArgument;
 import fun.other.Named;
@@ -51,7 +51,7 @@ public class GenericSpecializer extends NullTraverser<Type, List<ActualTemplateA
     assert (size instanceof Number);
     BigInteger count = ((Number) size).getValue();
     Type typ = (Type) type;
-    return new Array(obj.getInfo(), count, new ReferenceLinked(new ElementInfo(), typ));
+    return new Array(obj.getInfo(), count, new Reference(new ElementInfo(), typ));
   }
 
   @Override
@@ -60,7 +60,7 @@ public class GenericSpecializer extends NullTraverser<Type, List<ActualTemplateA
     ActualTemplateArgument type = param.get(0);
     assert (type instanceof Type);
     Type typ = (Type) type;
-    return new TypeType(obj.getInfo(), new ReferenceLinked(new ElementInfo(), typ));
+    return new TypeType(obj.getInfo(), new Reference(new ElementInfo(), typ));
   }
 
 }

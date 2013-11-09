@@ -9,7 +9,7 @@ import fun.NullTraverser;
 import fun.expression.AnyValue;
 import fun.expression.BoolValue;
 import fun.expression.Expression;
-import fun.expression.reference.ReferenceLinked;
+import fun.expression.reference.Reference;
 import fun.function.impl.FuncGlobal;
 import fun.knowledge.KnowledgeBase;
 import fun.statement.Assignment;
@@ -66,7 +66,7 @@ public class StmtExecutor extends NullTraverser<Expression, Memory> {
     return ((BoolValue) expr).isValue();
   }
 
-  private void setVariable(ReferenceLinked left, Expression val, Memory param) {
+  private void setVariable(Reference left, Expression val, Memory param) {
     assert (left.getOffset().isEmpty());
     assert (left.getLink() instanceof Variable);
     param.setInt((Variable) left.getLink(), val);
@@ -108,7 +108,7 @@ public class StmtExecutor extends NullTraverser<Expression, Memory> {
   @Override
   protected Expression visitAssignment(Assignment obj, Memory param) {
     Expression rhs = exeval(obj.getRight(), param);
-    setVariable((ReferenceLinked) obj.getLeft(), rhs, param);
+    setVariable(obj.getLeft(), rhs, param);
     return null;
   }
 

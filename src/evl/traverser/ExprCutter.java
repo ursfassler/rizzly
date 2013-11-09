@@ -113,8 +113,8 @@ public class ExprCutter extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitImplElementary(ImplElementary obj, Void param) {
-    visitItr(obj.getInternalFunction(), param);
-    visitItr(obj.getSubComCallback(), param);
+    visitItr(obj.getFunction(), param);
+    visitItr(obj.getSubCallback(), param);
     return null;
   }
 

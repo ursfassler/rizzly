@@ -525,8 +525,8 @@ public class MainEvl {
     { // that we have them
       FunctionBase entryFunc = makeEntryExitFunc(State.ENTRY_FUNC_NAME);
       FunctionBase exitFunc = makeEntryExitFunc(State.EXIT_FUNC_NAME);
-      env.getInternalFunction().add(entryFunc);
-      env.getInternalFunction().add(exitFunc);
+      env.getFunction().add(entryFunc);
+      env.getFunction().add(exitFunc);
       env.setEntryFunc(new Reference(info, entryFunc));
       env.setExitFunc(new Reference(info, exitFunc));
     }
@@ -534,10 +534,8 @@ public class MainEvl {
     env.getComponent().add(new CompUse(info, instname, top));
 
     ListOfNamed<FunctionHeader> outprot = addOutIfaceFunc(top.getOutput(), kb);
-    ArrayList<String> ns = new ArrayList<String>();
-    ns.add(instname);
     for (FunctionHeader func : outprot) {
-      env.addFunction(ns, func);
+      env.addSubCallback(instname, func);
     }
 
     return env;

@@ -25,7 +25,7 @@ import fun.doc.DepGraph;
 import fun.doc.DocWriter;
 import fun.doc.PrettyPrinter;
 import fun.expression.Expression;
-import fun.expression.reference.ReferenceLinked;
+import fun.expression.reference.Reference;
 import fun.knowledge.KnowledgeBase;
 import fun.other.Component;
 import fun.other.Generator;
@@ -33,9 +33,7 @@ import fun.other.Named;
 import fun.other.Namespace;
 import fun.other.RizzlyFile;
 import fun.symbol.SymbolTable;
-import fun.traverser.ClassNameExtender;
 import fun.traverser.DeAlias;
-import fun.traverser.GenfuncParamExtender;
 import fun.traverser.Linker;
 import fun.traverser.Memory;
 import fun.traverser.NamespaceLinkReduction;
@@ -66,7 +64,7 @@ public class MainFun {
     System.out.println("loaded files:");
     for (RizzlyFile f : fileList) {
       System.out.print("  ");
-      System.out.print(f.getName());
+      System.out.print(f.getFullName());
       System.out.println();
     }
 
@@ -74,17 +72,19 @@ public class MainFun {
     types.addAll(genPrimitiveTypes());
     types.addAll(genPrimitiveGenericTypes());
 
-    SymbolTable<Designator, String> sym = new SymbolTable<Designator, String>();
+    SymbolTable sym = new SymbolTable();
     for (Type typ : types) {
-      sym.add(typ.getName(), new Designator(typ.getName()));
+      sym.add(typ);
     }
-    ClassNameExtender.process(fileList, sym);
+    Linker.process(types, fileList, sym);
+    Linker.process(fileList, sym);
+    PrettyPrinter.print(fileList, debugdir + "linked.rzy");
 
     Namespace classes = new Namespace(info, "!");
     classes.addAll(types);
 
     for (RizzlyFile f : fileList) {
-      Namespace parent = classes.forceChildPath(f.getName().toList());
+      Namespace parent = classes.forceChildPath(f.getFullName().toList());
       parent.addAll(f.getType());
       parent.addAll(f.getComp());
       parent.addAll(f.getConstant());
@@ -94,18 +94,13 @@ public class MainFun {
     PrettyPrinter.print(classes, debugdir + "pretty.rzy");
 
     KnowledgeBase knowledgeBase = new KnowledgeBase(classes, fileList, debugdir);
-    Linker.process(classes, knowledgeBase);
-
-    PrettyPrinter.print(classes, debugdir + "linked.rzy");
 
     NamespaceLinkReduction.process(classes);
     StateLinkReduction.process(classes, knowledgeBase);
-    GenfuncParamExtender.process(classes);
 
     PrettyPrinter.print(classes, debugdir + "linkreduced.rzy");
 
     Named root = classes.getChildItem(opt.getRootComp().toList());
-    printDepGraph(debugdir + "rdep.gv", classes, root, fileList);
     DocWriter.print(fileList, new KnowledgeBase(classes, fileList, docdir)); // TODO reimplement
 
     Component nroot = evaluate(root, classes, debugdir, fileList);
@@ -114,6 +109,7 @@ public class MainFun {
     PrettyPrinter.print(classes, debugdir + "evaluated.rzy");
     removeUnused(debugdir, classes, nroot, fileList);
     PrettyPrinter.print(classes, debugdir + "stripped.rzy");
+    printDepGraph(debugdir + "rdep.gv", classes, nroot, fileList);
     return new Pair<String, Namespace>(nroot.getName(), classes);
   }
 
@@ -172,8 +168,8 @@ public class MainFun {
       {
         List<ConstGlobal> gconst = classes.getItems(ConstGlobal.class, true);
         for (ConstGlobal itr : gconst) {
-          Type type = (Type) EvalTo.any((ReferenceLinked) itr.getType(), kb);
-          itr.setType(new ReferenceLinked(itr.getType().getInfo(), type));
+          Type type = (Type) EvalTo.any(itr.getType(), kb);
+          itr.setType(new Reference(itr.getType().getInfo(), type));
         }
       }
 
@@ -235,7 +231,7 @@ public class MainFun {
       }
       String filename = rootdir + lname.toString(File.separator) + ClaOption.extension;
       RizzlyFile lfile = FileParser.parse(filename);
-      lfile.setName(lname);
+      lfile.setFullName(lname);
 
       loaded.put(lname, lfile);
       for (Designator name : lfile.getImports()) {

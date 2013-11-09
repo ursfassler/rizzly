@@ -15,8 +15,15 @@ component
   end
   
   Param
-  implementation elementary
+    input
+      in( value: R{0,1000} );
+      
+  implementation composition
     component
       schmitt : Schmitt{90,110};
+      
+    connection
+      in -> schmitt.in;
+    
   end
     

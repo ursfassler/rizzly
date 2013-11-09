@@ -1,11 +1,7 @@
 package evl.other;
 
-import java.util.List;
-
 import common.ElementInfo;
 
-import error.ErrorType;
-import error.RError;
 import evl.expression.reference.Reference;
 import evl.function.FunctionHeader;
 import evl.variable.Constant;
@@ -24,25 +20,13 @@ public class ImplElementary extends Component {
     super(info, name);
   }
 
-  public void addFunction(List<String> namespace, FunctionHeader prot) {
-    switch (namespace.size()) {
-    case 0: {
-      function.add(prot);
-      break;
+  public void addSubCallback(String namespace, FunctionHeader prot) {
+    NamedList<FunctionHeader> list = subComCallback.find(namespace);
+    if (list == null) {
+      list = new NamedList<FunctionHeader>(getInfo(), namespace);
+      subComCallback.add(list);
     }
-    case 1: {
-      NamedList<FunctionHeader> list = subComCallback.find(namespace.get(0));
-      if (list == null) {
-        list = new NamedList<FunctionHeader>(getInfo(), namespace.get(0));
-        subComCallback.add(list);
-      }
-      list.add(prot);
-      break;
-    }
-    default: {
-      RError.err(ErrorType.Error, prot.getInfo(), "Namespace can have max deepth of 1, got: " + namespace);
-    }
-    }
+    list.add(prot);
   }
 
   public ListOfNamed<Variable> getVariable() {
@@ -53,7 +37,7 @@ public class ImplElementary extends Component {
     return constant;
   }
 
-  public ListOfNamed<FunctionHeader> getInternalFunction() {
+  public ListOfNamed<FunctionHeader> getFunction() {
     return function;
   }
 
@@ -61,7 +45,7 @@ public class ImplElementary extends Component {
     return component;
   }
 
-  public ListOfNamed<NamedList<FunctionHeader>> getSubComCallback() {
+  public ListOfNamed<NamedList<FunctionHeader>> getSubCallback() {
     return subComCallback;
   }
 

@@ -176,8 +176,8 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
 
     FuncPrivateVoid debugSend = makeDebugSend("iMsgSend", sendProto);
     FuncPrivateVoid debugRecv = makeDebugSend("iMsgRecv", recvProto);
-    obj.getInternalFunction().add(debugSend);
-    obj.getInternalFunction().add(debugRecv);
+    obj.getFunction().add(debugSend);
+    obj.getFunction().add(debugRecv);
 
     EventSendDebugCallAdder.process(obj, names, debugSend);
     EventRecvDebugCallAdder.process(obj, names, debugRecv);
@@ -185,20 +185,19 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     {// add callback
 
       for (CompUse use : obj.getComponent()) {
-        Designator name = new Designator(use.getName());
 
         {
           FuncSubHandlerEvent recv = makeRecvProto(sizeType);
           List<Statement> body = makeCode(recv.getName(), recv.getParam().getList().get(0), recv.getParam().getList().get(1), recvProto, use.getName());
           recv.getBody().getStatements().addAll(body);
-          obj.addFunction(name.toList(), recv);
+          obj.addSubCallback(use.getName(), recv);
         }
 
         {
           FuncSubHandlerEvent send = makeSendProto(sizeType);
           List<Statement> body = makeCode(send.getName(), send.getParam().getList().get(0), send.getParam().getList().get(1), sendProto, use.getName());
           send.getBody().getStatements().addAll(body);
-          obj.addFunction(name.toList(), send);
+          obj.addSubCallback(use.getName(), send);
         }
       }
     }

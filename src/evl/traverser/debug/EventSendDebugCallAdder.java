@@ -75,8 +75,8 @@ public class EventSendDebugCallAdder extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitImplElementary(ImplElementary obj, Void param) {
-    visitItr(obj.getInternalFunction(), null);
-    visitItr(obj.getSubComCallback(), null);
+    visitItr(obj.getFunction(), null);
+    visitItr(obj.getSubCallback(), null);
     return null;
   }
 

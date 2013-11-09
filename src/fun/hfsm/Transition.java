@@ -16,8 +16,8 @@ public class Transition extends FunBase implements Named {
   private Reference src;
   private Reference dst;
   private Reference event;
-  private Expression guard;
   final private ListOfNamed<FuncVariable> param = new ListOfNamed<FuncVariable>();
+  private Expression guard;
   private Block body;
 
   public Transition(ElementInfo info, String name) {

@@ -7,7 +7,6 @@ import common.ElementInfo;
 
 import error.ErrorType;
 import fun.expression.Expression;
-import fun.expression.reference.RefName;
 import fun.expression.reference.Reference;
 import fun.statement.Assignment;
 import fun.statement.Block;
@@ -63,9 +62,8 @@ public class StatementParser extends BaseParser {
     List<Token> names = new ArrayList<Token>(lhs.size());
 
     for (Reference ae : lhs) {
-      assert (ae.getOffset().size() == 1);
-      assert (ae.getOffset().get(0) instanceof RefName);
-      names.add(new Token(TokenType.IDENTIFIER, ((RefName) ae.getOffset().get(0)).getName(), ae.getInfo()));
+      assert (ae.getOffset().isEmpty());
+      names.add(new Token(TokenType.IDENTIFIER, ae.getLink().getName(), ae.getInfo()));
     }
 
     List<FuncVariable> varlist = parseVarDefType(FuncVariable.class, names);

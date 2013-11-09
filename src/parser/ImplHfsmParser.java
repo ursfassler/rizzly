@@ -3,8 +3,6 @@ package parser;
 import java.util.ArrayList;
 import java.util.List;
 
-import util.Pair;
-
 import common.ElementInfo;
 
 import error.ErrorType;
@@ -13,8 +11,6 @@ import fun.expression.BoolValue;
 import fun.expression.Expression;
 import fun.expression.reference.RefName;
 import fun.expression.reference.Reference;
-import fun.expression.reference.ReferenceLinked;
-import fun.expression.reference.ReferenceUnlinked;
 import fun.function.FunctionHeader;
 import fun.function.impl.FuncEntryExit;
 import fun.hfsm.ImplHfsm;
@@ -53,12 +49,7 @@ public class ImplHfsmParser extends ImplBaseParser {
   private <T extends State> void parseStateBody(T state) {
     Block entryBody = new Block(state.getInfo());
     Block exitBody = new Block(state.getInfo());
-    FuncEntryExit entryFunc = makeEntryExitFunc(State.ENTRY_FUNC_NAME, entryBody);
-    FuncEntryExit exitFunc = makeEntryExitFunc(State.EXIT_FUNC_NAME, exitBody);
-    state.getItemList().add(entryFunc);
-    state.getItemList().add(exitFunc);
-    state.setEntryFuncRef(new ReferenceLinked(state.getInfo(), entryFunc));
-    state.setExitFuncRef(new ReferenceLinked(state.getInfo(), exitFunc));
+    initEntryExit(state, entryBody, exitBody);
 
     while (true) {
       switch (peek().getType()) {
@@ -72,9 +63,8 @@ public class ImplHfsmParser extends ImplBaseParser {
         state.getVariable().addAll(parseVarDefBlock(StateVariable.class));
         break;
       case FUNCTION:
-        Pair<List<String>, FunctionHeader> func = parsePrivateFunction();
-        assert (func.first.isEmpty());
-        state.getItemList().add(func.second);
+        FunctionHeader func = parsePrivateFunction();
+        state.getItemList().add(func);
         break;
       case TRANSITION:
         state.getItemList().addAll(parseTransitionDecl());
@@ -92,22 +82,38 @@ public class ImplHfsmParser extends ImplBaseParser {
     }
   }
 
-  // EBNF stateDecl: "state" id [ "(" id ")" ] stateBody "end"
+  private void initEntryExit(State state, Block entryBody, Block exitBody) {
+    FuncEntryExit entryFunc = makeEntryExitFunc(State.ENTRY_FUNC_NAME, entryBody);
+    FuncEntryExit exitFunc = makeEntryExitFunc(State.EXIT_FUNC_NAME, exitBody);
+    state.getItemList().add(entryFunc);
+    state.getItemList().add(exitFunc);
+    state.setEntryFuncRef(new Reference(state.getInfo(), entryFunc));
+    state.setExitFuncRef(new Reference(state.getInfo(), exitFunc));
+  }
+
+  // EBNF stateDecl: "state" id ( ";" | ( [ "(" id ")" ] stateBody "end" ) )
   private State parseState() {
     ElementInfo info = expect(TokenType.STATE).getInfo();
     String name = expect(TokenType.IDENTIFIER).getData();
-    State state;
-    if (consumeIfEqual(TokenType.OPENPAREN)) {
-      String initial = expect(TokenType.IDENTIFIER).getData();
-      expect(TokenType.CLOSEPAREN);
-      state = new StateComposite(info, name, initial);
-    } else {
-      state = new StateSimple(info, name);
-    }
 
-    parseStateBody(state);
-    expect(TokenType.END);
-    return state;
+    if (consumeIfEqual(TokenType.SEMI)) {
+      State state = new StateSimple(info, name);
+      initEntryExit(state, new Block(state.getInfo()), new Block(state.getInfo()));
+      return state;
+    } else {
+      State state;
+      if (consumeIfEqual(TokenType.OPENPAREN)) {
+        String initial = expect(TokenType.IDENTIFIER).getData();
+        expect(TokenType.CLOSEPAREN);
+        state = new StateComposite(info, name, initial);
+      } else {
+        state = new StateSimple(info, name);
+      }
+
+      parseStateBody(state);
+      expect(TokenType.END);
+      return state;
+    }
   }
 
   // EBNF transitionDecl: "transition" transition { transition }
@@ -157,21 +163,21 @@ public class ImplHfsmParser extends ImplBaseParser {
 
   // EBNF nameRef: Designator
   private Reference parseNameRef() {
-    Reference ret = new ReferenceUnlinked(peek().getInfo());
+    Token tokh = expect(TokenType.IDENTIFIER);
+    Reference ret = new Reference(tokh.getInfo(), tokh.getData());
 
-    do {
+    while (consumeIfEqual(TokenType.PERIOD)) {
       Token tok = expect(TokenType.IDENTIFIER);
       ret.getOffset().add(new RefName(tok.getInfo(), tok.getData()));
-    } while (consumeIfEqual(TokenType.PERIOD));
+    }
 
     return ret;
   }
 
   // EBNF transitionEvent: id vardeflist
   private void parseTransitionEvent(Transition ret) {
-    Reference name = new ReferenceUnlinked(peek().getInfo());
     Token tok = expect(TokenType.IDENTIFIER);
-    name.getOffset().add(new RefName(tok.getInfo(), tok.getData()));
+    Reference name = new Reference(tok.getInfo(), tok.getData());
     ret.setEvent(name);
     ret.getParam().addAll(parseVardefList());
   }

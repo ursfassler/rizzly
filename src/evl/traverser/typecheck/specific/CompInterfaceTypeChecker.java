@@ -91,8 +91,8 @@ public class CompInterfaceTypeChecker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitImplElementary(ImplElementary obj, Void param) {
-    checkCallback(obj.getComponent(), obj.getSubComCallback());
-    checkInput(obj.getInput(), obj.getInternalFunction());
+    checkCallback(obj.getComponent(), obj.getSubCallback());
+    checkInput(obj.getInput(), obj.getFunction());
     return null;
   }
 

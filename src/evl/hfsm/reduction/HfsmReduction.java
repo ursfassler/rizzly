@@ -102,7 +102,7 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
     elem.getInput().addAll(obj.getInput());
     elem.getOutput().addAll(obj.getOutput());
     elem.getVariable().addAll(obj.getTopstate().getVariable());
-    elem.getInternalFunction().addAll(obj.getTopstate().getFunction());
+    elem.getFunction().addAll(obj.getTopstate().getFunction());
 
     EnumType states = new EnumType(obj.getTopstate().getInfo(), obj.getName() + Designator.NAME_SEP + "State");
     HashMap<StateSimple, EnumElement> enumMap = makeEnumElem(obj.getTopstate(), states, param);
@@ -124,8 +124,7 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
       } else {
         func = new FuncInputHandlerEvent(obj.getInfo(), header.getName(), ptoto.getParam());
       }
-      List<String> ns = new ArrayList<String>();
-      elem.addFunction(ns, func);
+      elem.getFunction().add(func);
 
       Statement code;
       if (func instanceof FuncWithReturn) {
@@ -140,10 +139,10 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
 
     {
       FuncPrivateVoid fEntry = makeEntryFunc(obj.getTopstate().getInitial(), states, enumMap, stateVariable);
-      elem.getInternalFunction().add(fEntry);
+      elem.getFunction().add(fEntry);
       elem.setEntryFunc(new Reference(info, fEntry));
       FuncPrivateVoid fExit = makeExitFunc(states, enumMap, stateVariable);
-      elem.getInternalFunction().add(fExit);
+      elem.getFunction().add(fExit);
       elem.setExitFunc(new Reference(info, fExit));
     }
 

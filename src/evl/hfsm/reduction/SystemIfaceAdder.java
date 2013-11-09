@@ -2,7 +2,6 @@ package evl.hfsm.reduction;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.List;
 
 import common.Designator;
 import common.ElementInfo;
@@ -115,10 +114,8 @@ public class SystemIfaceAdder extends NullTraverser<Void, Void> {
       dtor.getBody().getStatements().addAll(code);
     }
 
-    List<String> ns = new ArrayList<String>();
-    // ns.add(IFACE_USE_NAME);
-    obj.addFunction(ns, ctor);
-    obj.addFunction(ns, dtor);
+    obj.getFunction().add(ctor);
+    obj.getFunction().add(dtor);
 
     return null;
   }

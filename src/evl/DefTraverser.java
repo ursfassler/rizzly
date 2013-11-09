@@ -120,8 +120,8 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
     visitList(obj.getConstant().getList(), param);
     visitList(obj.getVariable().getList(), param);
     visitList(obj.getComponent().getList(), param);
-    visitList(obj.getInternalFunction().getList(), param);
-    visitList(obj.getSubComCallback().getList(), param);
+    visitList(obj.getFunction().getList(), param);
+    visitList(obj.getSubCallback().getList(), param);
     visit(obj.getEntryFunc(), param);
     visit(obj.getExitFunc(), param);
     return null;

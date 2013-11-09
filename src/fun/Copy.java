@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import common.Designator;
 import common.Direction;
 
 import fun.composition.Connection;
@@ -22,8 +21,6 @@ import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefName;
 import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.Reference;
-import fun.expression.reference.ReferenceLinked;
-import fun.expression.reference.ReferenceUnlinked;
 import fun.function.FuncWithBody;
 import fun.function.FuncWithReturn;
 import fun.function.FunctionFactory;
@@ -128,15 +125,8 @@ class CopyFun extends Traverser<Fun, Void> {
   }
 
   @Override
-  protected Fun visitReferenceUnlinked(ReferenceUnlinked obj, Void param) {
-    ReferenceUnlinked ret = new ReferenceUnlinked(obj.getInfo(), new Designator(obj.getName()));
-    ret.getOffset().addAll(copy(obj.getOffset()));
-    return ret;
-  }
-
-  @Override
-  protected Fun visitReferenceLinked(ReferenceLinked obj, Void param) {
-    ReferenceLinked ret = new ReferenceLinked(obj.getInfo(), obj.getLink());
+  protected Fun visitReference(Reference obj, Void param) {
+    Reference ret = new Reference(obj.getInfo(), obj.getLink());
     ret.getOffset().addAll(copy(obj.getOffset()));
     return ret;
   }
@@ -295,8 +285,7 @@ class CopyFun extends Traverser<Fun, Void> {
     ret.getIface(Direction.out).addAll(copy(obj.getIface(Direction.out).getList()));
     ret.getVariable().addAll(copy(obj.getVariable().getList()));
     ret.getConstant().addAll(copy(obj.getConstant().getList()));
-    ret.getComponent().addAll(copy(obj.getComponent().getList()));
-    ret.getFunction().addAll(copy(obj.getFunction()));
+    ret.getFunction().addAll(copy(obj.getFunction().getList()));
     ret.setEntryFunc(copy(obj.getEntryFunc()));
     ret.setExitFunc(copy(obj.getExitFunc()));
 

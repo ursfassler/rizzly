@@ -3,13 +3,16 @@ import
 
 component
   GenericUse
-    implementation elementary
+    input
+      set( x: R{0,255} );
+      get():R{0,255};
+    
+  implementation composition
     component
       gen : GenericDef{R{0,255}};
-
-    function foo()
-      gen.set( 42 );
-      a : R{0,255} = gen.get();
-    end
+      
+    connection
+      set -> gen.set;
+      get -> gen.get;
   end
 

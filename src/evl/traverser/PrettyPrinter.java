@@ -289,8 +289,8 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.nl();
     param.nl();
 
-    visitList(obj.getSubComCallback(), param);
-    visitList(obj.getInternalFunction(), param);
+    visitList(obj.getSubCallback(), param);
+    visitList(obj.getFunction(), param);
     return null;
   }
 

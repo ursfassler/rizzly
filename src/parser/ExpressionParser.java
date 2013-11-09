@@ -21,7 +21,6 @@ import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefName;
 import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.Reference;
-import fun.expression.reference.ReferenceUnlinked;
 
 public class ExpressionParser extends Parser {
 
@@ -55,8 +54,7 @@ public class ExpressionParser extends Parser {
   // EBNF ref: id { refName | refIndex | refCall | refGeneric }
   protected Reference parseRef() {
     Token head = expect(TokenType.IDENTIFIER);
-    Reference res = new ReferenceUnlinked(head.getInfo());
-    res.getOffset().add(new RefName(head.getInfo(), head.getData()));
+    Reference res = new Reference(head.getInfo(), head.getData());
 
     while (true) {
       switch (peek().getType()) {

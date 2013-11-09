@@ -30,7 +30,7 @@ component
   end
 
   SmallGenericUse
-    implementation elementary
+    implementation composition
 
     component
       gen1 : SmallGeneric{R{0,255}};
