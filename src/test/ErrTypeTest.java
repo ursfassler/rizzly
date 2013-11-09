@@ -10,22 +10,22 @@ public class ErrTypeTest extends ErrorTest {
 
   @Test
   public void err1() {
-    testForError("err1", "Err1", "Data type to big or incompatible in assignment: R{0,10} := Weekday{}");
+    testForError("err1", "Err1", "Data type to big or incompatible in assignment: R{0,10} := Weekday");
   }
 
   @Test
   public void err2() {
-    testForError("err2", "Err2", "Data type to big or incompatible in assignment: Weekday{} := R{0,10}");
+    testForError("err2", "Err2", "Data type to big or incompatible in assignment: Weekday := R{0,10}");
   }
 
   @Test
   public void err3() {
-    testForError("err3", "Err3", "Arithmetic operation not possible on enumerator");
+    testForError("err3", "Err3", "Expected range type");
   }
 
   @Test
   public void err4() {
-    testForError("err4", "Err4", "Data type to big or incompatible (argument 1, R{0,10} := Weekday{})");
+    testForError("err4", "Err4", "Data type to big or incompatible (argument 1, R{0,10} := Weekday)");
   }
 
   @Test

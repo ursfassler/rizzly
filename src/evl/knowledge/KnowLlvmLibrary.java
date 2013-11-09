@@ -9,6 +9,8 @@ import evl.other.ListOfNamed;
 import evl.other.Named;
 import evl.variable.FuncVariable;
 
+//TODO rename
+//TODO rename trap to runtime exception and provide arguments
 public class KnowLlvmLibrary extends KnowledgeEntry {
   private static final ElementInfo info = new ElementInfo();
   private KnowledgeBase kb;

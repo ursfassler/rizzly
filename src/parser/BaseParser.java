@@ -83,12 +83,6 @@ public class BaseParser extends Parser {
     return res;
   }
 
-  // EBNF functionPrototype: "function" funcDef
-  protected FunctionHeader parseFunctionPrototype() {
-    expect(TokenType.FUNCTION);
-    return parseFunctionDef();
-  }
-
   // EBNF funcDef: id vardeflist [ ":" typeref ] ";"
   protected FunctionHeader parseFunctionDef() {
     Token tok = expect(TokenType.IDENTIFIER);

@@ -139,7 +139,7 @@ public class MainEvl {
 
     typecheck(aclasses, root, debugdir);
 
-    addConDestructor(aclasses, debugdir, kb);
+    addConDestructor(aclasses, debugdir);
 
     // ExprCutter.process(aclasses, kb); //TODO reimplement
     PrettyPrinter.print(aclasses, debugdir + "memcaps.rzy", true);
@@ -417,11 +417,11 @@ public class MainEvl {
     return root;
   }
 
-  private static void addConDestructor(Namespace classes, String debugdir, KnowledgeBase kb) {
+  private static void addConDestructor(Namespace classes, String debugdir) {
     FuncIfaceInVoid sendFunc = new FuncIfaceInVoid(info, SystemIfaceAdder.CONSTRUCT, new ListOfNamed<FuncVariable>());
     FuncIfaceInVoid recvFunc = new FuncIfaceInVoid(info, SystemIfaceAdder.DESTRUCT, new ListOfNamed<FuncVariable>());
 
-    SystemIfaceAdder.process(sendFunc, recvFunc, classes, kb);
+    SystemIfaceAdder.process(sendFunc, recvFunc, classes);
     PrettyPrinter.print(classes, debugdir + "system.rzy", true);
   }
 

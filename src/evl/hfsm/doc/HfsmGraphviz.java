@@ -2,7 +2,6 @@ package evl.hfsm.doc;
 
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
-import java.util.List;
 
 import util.StreamWriter;
 import evl.DefTraverser;
@@ -24,25 +23,6 @@ public class HfsmGraphviz extends DefTraverser<Void, StreamWriter> {
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
-  }
-
-  private void list(List<? extends Evl> list, String sep, StreamWriter param) {
-    for (int i = 0; i < list.size(); i++) {
-      if (i > 0) {
-        param.wr(sep);
-      }
-      visit(list.get(i), param);
-    }
-  }
-
-  private void visitList(List<? extends Evl> list, StreamWriter param) {
-    for (int i = 0; i < list.size(); i++) {
-      visit(list.get(i), param);
-    }
-  }
-
-  private void wrId(Evl obj, StreamWriter wr) {
-    // wr.wr("[" + obj.hashCode() % 10000 + "]");
   }
 
   private String getId(State obj) {

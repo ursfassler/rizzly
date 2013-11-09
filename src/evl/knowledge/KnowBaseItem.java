@@ -40,6 +40,7 @@ public class KnowBaseItem extends KnowledgeEntry {
   }
 
   // --------------------------------------------------------------------------
+  @SuppressWarnings("unchecked")
   public <T extends Named> T get(Class<T> kind, String name) {
     Named item = findItem(name);
     if (item == null) {

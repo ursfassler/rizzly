@@ -18,8 +18,8 @@ import evl.other.Component;
 import evl.other.ImplElementary;
 import evl.other.ListOfNamed;
 import evl.other.Named;
-import evl.other.NamedList;
 import evl.other.Namespace;
+import evl.other.SubCallbacks;
 
 public class CompInstantiator extends NullTraverser<ImplElementary, Designator> {
   private KnowledgeBase kb;
@@ -54,12 +54,12 @@ public class CompInstantiator extends NullTraverser<ImplElementary, Designator> 
     // XXX instantiated component should not have any function in Input nor Output
 
     // FIXME This code is probably full of errors
-    ListOfNamed<NamedList<FunctionHeader>> ifaceUsed = new ListOfNamed<NamedList<FunctionHeader>>();
+    ListOfNamed<SubCallbacks> ifaceUsed = new ListOfNamed<SubCallbacks>();
     for (CompUse compUse : inst.getComponent()) {
       Component comp = compUse.getLink();
       comp = visit(comp, new Designator(param, compUse.getName()));
 
-      NamedList<FunctionHeader> clist = new NamedList<FunctionHeader>(new ElementInfo(), compUse.getName());
+      SubCallbacks clist = new SubCallbacks(new ElementInfo(), compUse.getName());
       ifaceUsed.add(clist);
       clist.addAll(comp.getOutput().getList());
 
@@ -69,13 +69,13 @@ public class CompInstantiator extends NullTraverser<ImplElementary, Designator> 
       ifacemap.put(compUse, compSpace);
     }
 
-    for (NamedList<FunctionHeader> compItem : inst.getSubCallback()) {
+    for (SubCallbacks compItem : inst.getSubCallback()) {
       Namespace compspace = ns.findSpace(compItem.getName());
       if (compspace == null) {
         RError.err(ErrorType.Fatal, "Namespace should exist since subcomponent was created");
         return null;
       }
-      NamedList<FunctionHeader> clist = ifaceUsed.find(compItem.getName());
+      SubCallbacks clist = ifaceUsed.find(compItem.getName());
       assert (clist != null);
 
       for (FunctionHeader iface : compItem) {
@@ -83,7 +83,7 @@ public class CompInstantiator extends NullTraverser<ImplElementary, Designator> 
       }
     }
 
-    for (NamedList<FunctionHeader> comp : ifaceUsed) {
+    for (SubCallbacks comp : ifaceUsed) {
       Namespace compSpace = ns.findSpace(comp.getName());
       assert (compSpace != null);
       for (FunctionHeader func : comp) {

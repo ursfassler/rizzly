@@ -14,7 +14,6 @@ import evl.other.Component;
 import fun.other.Namespace;
 import fun.toevl.FunToEvl;
 
-//TODO type check case ranges (do not allow case options out of range)
 //TODO pass records by reference to functions (test case rec2)
 //TODO add compiler self tests:
 //TODO -- check that no references to old stuff exists (check that parent of every object is in the namespace tree)

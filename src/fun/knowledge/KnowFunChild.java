@@ -10,6 +10,7 @@ import error.RError;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.composition.ImplComposition;
+import fun.expression.reference.Reference;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.State;
 import fun.hfsm.StateComposite;
@@ -18,6 +19,7 @@ import fun.other.Component;
 import fun.other.ImplElementary;
 import fun.other.Named;
 import fun.other.Namespace;
+import fun.type.base.EnumElement;
 import fun.type.base.EnumType;
 import fun.type.composed.UnionType;
 
@@ -26,7 +28,7 @@ public class KnowFunChild extends KnowledgeEntry {
 
   @Override
   public void init(KnowledgeBase base) {
-    kct = new KnowFunChildTraverser(base);
+    kct = new KnowFunChildTraverser();
   }
 
   public Fun get(Fun root, Iterable<String> path) {
@@ -64,12 +66,6 @@ public class KnowFunChild extends KnowledgeEntry {
 }
 
 class KnowFunChildTraverser extends NullTraverser<Set<Named>, String> {
-  private KnowledgeBase kb;
-
-  public KnowFunChildTraverser(KnowledgeBase kb) {
-    super();
-    this.kb = kb;
-  }
 
   public Set<Named> retopt(Named res) {
     Set<Named> rset = new HashSet<Named>();
@@ -86,7 +82,17 @@ class KnowFunChildTraverser extends NullTraverser<Set<Named>, String> {
 
   @Override
   protected Set<Named> visitEnumType(EnumType obj, String param) {
-    return new HashSet<Named>();
+    HashSet<Named> ret = new HashSet<Named>();
+
+    for (Reference ref : obj.getElement()) {
+      assert (ref.getOffset().isEmpty());
+      assert (ref.getLink() instanceof EnumElement);
+      if (ref.getLink().getName().equals(param)) {
+        ret.add(ref.getLink());
+      }
+    }
+
+    return ret;
   }
 
   @Override

@@ -1,4 +1,4 @@
-package fun.symbol;
+package fun.other;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -9,7 +9,6 @@ import common.ElementInfo;
 import error.ErrorType;
 import error.RError;
 import fun.Fun;
-import fun.other.Named;
 
 /**
  * 

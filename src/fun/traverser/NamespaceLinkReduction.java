@@ -33,8 +33,7 @@ public class NamespaceLinkReduction extends DefTraverser<Void, Void> {
     while (item instanceof Namespace) {
       RefItem next = obj.getOffset().pop();
       if (!(next instanceof RefName)) {
-        // TODO check it with typechecker
-        RError.err(ErrorType.Fatal, obj.getInfo(), "Expected named offset, got: " + next.getClass().getCanonicalName() + " (and why did the typechecker not find it?)");
+        RError.err(ErrorType.Error, obj.getInfo(), "Expected named offset, got: " + next.getClass().getCanonicalName());
       }
       RefName name = (RefName) next;
       item = ((Namespace) item).find(name.getName());

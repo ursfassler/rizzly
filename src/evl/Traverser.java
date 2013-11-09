@@ -68,10 +68,9 @@ import evl.hfsm.Transition;
 import evl.other.CompUse;
 import evl.other.Component;
 import evl.other.ImplElementary;
-import evl.other.Named;
-import evl.other.NamedList;
 import evl.other.Namespace;
 import evl.other.RizzlyProgram;
+import evl.other.SubCallbacks;
 import evl.statement.Assignment;
 import evl.statement.Block;
 import evl.statement.CallStmt;
@@ -144,8 +143,8 @@ public abstract class Traverser<R, P> {
       return visitExpression((Expression) obj, param);
     } else if (obj instanceof Variable) {
       return visitVariable((Variable) obj, param);
-    } else if (obj instanceof NamedList) {
-      return visitNamedList((NamedList<Named>) obj, param);
+    } else if (obj instanceof SubCallbacks) {
+      return visitSubCallbacks((SubCallbacks) obj, param);
     } else if (obj instanceof RefItem) {
       return visitRefItem((RefItem) obj, param);
     } else if (obj instanceof Namespace) {
@@ -539,7 +538,7 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitNamespace(Namespace obj, P param);
 
-  abstract protected R visitNamedList(NamedList<Named> obj, P param);
+  abstract protected R visitSubCallbacks(SubCallbacks obj, P param);
 
   abstract protected R visitConstPrivate(ConstPrivate obj, P param);
 

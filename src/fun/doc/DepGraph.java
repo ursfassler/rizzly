@@ -15,7 +15,6 @@ import fun.NullTraverser;
 import fun.expression.reference.Reference;
 import fun.function.FunctionHeader;
 import fun.knowledge.KnowScope;
-import fun.knowledge.KnowledgeBase;
 import fun.other.Component;
 import fun.other.Named;
 import fun.other.Namespace;
@@ -25,19 +24,19 @@ import fun.variable.Constant;
 public class DepGraph extends NullTraverser<Void, Void> {
   private SubDep dep;
 
-  public DepGraph(KnowledgeBase kb) {
+  public DepGraph() {
     super();
-    dep = new SubDep(kb, new SimpleGraph<Named>());
+    dep = new SubDep(new SimpleGraph<Named>());
   }
 
-  static public SimpleGraph<Named> build(Namespace ns, KnowledgeBase kb) {
-    DepGraph depGraph = new DepGraph(kb);
+  static public SimpleGraph<Named> build(Namespace ns) {
+    DepGraph depGraph = new DepGraph();
     depGraph.traverse(ns, null);
     return depGraph.dep.getGraph();
   }
 
-  static public SimpleGraph<Named> build(Named root, KnowledgeBase kb) {
-    DepGraph depGraph = new DepGraph(kb);
+  static public SimpleGraph<Named> build(Named root) {
+    DepGraph depGraph = new DepGraph();
     depGraph.traverse(root, null);
     return depGraph.dep.getGraph();
   }
@@ -80,13 +79,11 @@ public class DepGraph extends NullTraverser<Void, Void> {
 }
 
 class SubDep extends DefTraverser<Void, Named> {
-  private KnowledgeBase kb;
   private SimpleGraph<Named> g;
   private Set<Named> traversed = new HashSet<Named>();
 
-  public SubDep(KnowledgeBase kb, SimpleGraph<Named> simpleGraph) {
+  public SubDep(SimpleGraph<Named> simpleGraph) {
     super();
-    this.kb = kb;
     this.g = simpleGraph;
   }
 

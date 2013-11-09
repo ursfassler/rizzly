@@ -63,9 +63,9 @@ import evl.other.Component;
 import evl.other.ImplElementary;
 import evl.other.ListOfNamed;
 import evl.other.Named;
-import evl.other.NamedList;
 import evl.other.Namespace;
 import evl.other.RizzlyProgram;
+import evl.other.SubCallbacks;
 import evl.statement.Assignment;
 import evl.statement.Block;
 import evl.statement.CallStmt;
@@ -218,7 +218,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitNamedList(NamedList<Named> obj, StreamWriter param) {
+  protected Void visitSubCallbacks(SubCallbacks obj, StreamWriter param) {
     param.wr("namespace ");
     param.wr(obj.getName());
     wrId(obj, param);

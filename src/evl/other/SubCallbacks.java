@@ -3,12 +3,13 @@ package evl.other;
 import common.ElementInfo;
 
 import evl.Evl;
+import evl.function.FunctionHeader;
 
-public class NamedList<T extends Named> extends ListOfNamed<T> implements Named, Evl {
+public class SubCallbacks extends ListOfNamed<FunctionHeader> implements Named, Evl {
   private ElementInfo info;
   private String name;
 
-  public NamedList(ElementInfo info, String name) {
+  public SubCallbacks(ElementInfo info, String name) {
     this.info = info;
     this.name = name;
   }

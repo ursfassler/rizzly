@@ -32,6 +32,7 @@ public class KnowledgeBase {
     entries.clear();
   }
 
+  @SuppressWarnings("unchecked")
   public <T extends KnowledgeEntry> T getEntry(Class<T> id) {
     if (!entries.containsKey(id)) {
       KnowledgeEntry entry;

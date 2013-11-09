@@ -12,7 +12,7 @@ public class ImplElementary extends Component {
   final private ListOfNamed<Constant> constant = new ListOfNamed<Constant>();
   final private ListOfNamed<CompUse> component = new ListOfNamed<CompUse>();
   final private ListOfNamed<FunctionHeader> function = new ListOfNamed<FunctionHeader>();
-  final private ListOfNamed<NamedList<FunctionHeader>> subComCallback = new ListOfNamed<NamedList<FunctionHeader>>();
+  final private ListOfNamed<SubCallbacks> subComCallback = new ListOfNamed<SubCallbacks>();
   private Reference entryFunc = null;
   private Reference exitFunc = null;
 
@@ -21,9 +21,9 @@ public class ImplElementary extends Component {
   }
 
   public void addSubCallback(String namespace, FunctionHeader prot) {
-    NamedList<FunctionHeader> list = subComCallback.find(namespace);
+    SubCallbacks list = subComCallback.find(namespace);
     if (list == null) {
-      list = new NamedList<FunctionHeader>(getInfo(), namespace);
+      list = new SubCallbacks(getInfo(), namespace);
       subComCallback.add(list);
     }
     list.add(prot);
@@ -45,7 +45,7 @@ public class ImplElementary extends Component {
     return component;
   }
 
-  public ListOfNamed<NamedList<FunctionHeader>> getSubCallback() {
+  public ListOfNamed<SubCallbacks> getSubCallback() {
     return subComCallback;
   }
 

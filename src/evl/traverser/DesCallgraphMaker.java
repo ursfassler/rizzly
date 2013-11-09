@@ -13,10 +13,9 @@ import evl.expression.reference.Reference;
 import evl.function.FunctionBase;
 import evl.hfsm.ImplHfsm;
 import evl.other.ImplElementary;
-import evl.other.Named;
-import evl.other.NamedList;
 import evl.other.Namespace;
 import evl.other.RizzlyProgram;
+import evl.other.SubCallbacks;
 
 /**
  * Returns a callgraph of the entire (sub-) tree
@@ -35,8 +34,8 @@ public class DesCallgraphMaker extends DefTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitNamedList(NamedList<Named> obj, Designator param) {
-    return super.visitNamedList(obj, new Designator(param, obj.getName()));
+  protected Void visitSubCallbacks(SubCallbacks obj, Designator param) {
+    return super.visitSubCallbacks(obj, new Designator(param, obj.getName()));
   }
 
   @Override

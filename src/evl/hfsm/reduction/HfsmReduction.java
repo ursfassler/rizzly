@@ -34,7 +34,6 @@ import evl.hfsm.State;
 import evl.hfsm.StateComposite;
 import evl.hfsm.StateSimple;
 import evl.hfsm.Transition;
-import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowLlvmLibrary;
 import evl.knowledge.KnowledgeBase;
 import evl.other.ImplElementary;
@@ -63,12 +62,10 @@ import evl.variable.Variable;
 public class HfsmReduction extends NullTraverser<Named, Namespace> {
 
   static final private ElementInfo info = new ElementInfo();
-  private KnowBaseItem kbi;
   private KnowLlvmLibrary kll;
   private Map<ImplHfsm, ImplElementary> map = new HashMap<ImplHfsm, ImplElementary>();
 
   public HfsmReduction(KnowledgeBase kb) {
-    this.kbi = kb.getEntry(KnowBaseItem.class);
     this.kll = kb.getEntry(KnowLlvmLibrary.class);
   }
 

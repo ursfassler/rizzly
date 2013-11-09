@@ -66,6 +66,7 @@ abstract public class State extends EvlBase implements StateItem {
     return item;
   }
 
+  @SuppressWarnings("unchecked")
   public <T extends StateItem> List<T> getItemList(Class<T> kind) {
     List<T> ret = new ArrayList<T>();
     for (StateItem itr : item) {

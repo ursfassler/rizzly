@@ -8,8 +8,7 @@ import evl.hfsm.State;
 import evl.hfsm.Transition;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Named;
-import evl.other.NamedList;
+import evl.other.SubCallbacks;
 
 //TODO check for unused states
 //TODO check if a transition is never used
@@ -36,7 +35,7 @@ public class HfsmModelChecker extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitNamedList(NamedList<Named> obj, Void param) {
+  protected Void visitSubCallbacks(SubCallbacks obj, Void param) {
     visitItr(obj, param);
     return null;
   }

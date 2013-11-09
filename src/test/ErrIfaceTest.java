@@ -15,12 +15,12 @@ public class ErrIfaceTest extends ErrorTest {
 
   @Test
   public void err3() {
-    testForError("err3", "Err3", "Missing callback for component/function a.funcB");
+    testForError("err3", "Err3", "Interface a.funcB not connected");
   }
 
   @Test
   public void err4() {
-    testForError("err4", "Err4", "Component a has no output function funcC");
+    testForError("err4", "Err4", "Interface not found: a.funcC");
   }
 
   @Test
@@ -35,7 +35,7 @@ public class ErrIfaceTest extends ErrorTest {
 
   @Test
   public void errHfsm2() {
-    testForError("errHfsm2", "ErrHfsm2", "interface Iface{} has no function funcC");
+    testForError("errHfsm2", "ErrHfsm2", "Name not found: funcC");
   }
 
   @Test

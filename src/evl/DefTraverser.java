@@ -61,10 +61,9 @@ import evl.hfsm.StateSimple;
 import evl.hfsm.Transition;
 import evl.other.CompUse;
 import evl.other.ImplElementary;
-import evl.other.Named;
-import evl.other.NamedList;
 import evl.other.Namespace;
 import evl.other.RizzlyProgram;
+import evl.other.SubCallbacks;
 import evl.statement.Assignment;
 import evl.statement.Block;
 import evl.statement.CallStmt;
@@ -291,7 +290,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitNamedList(NamedList<Named> obj, P param) {
+  protected R visitSubCallbacks(SubCallbacks obj, P param) {
     visitItr(obj.getList(), param);
     return null;
   }

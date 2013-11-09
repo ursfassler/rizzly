@@ -1,6 +1,7 @@
 package fun.doc;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import common.Designator;
@@ -21,6 +22,7 @@ import fun.knowledge.KnowFunPath;
 import fun.knowledge.KnowledgeBase;
 import fun.variable.CompUse;
 
+//TODO do we need the "Self" prefix?
 public class CompositionGraphMaker {
   public static final String METADATA_KEY = "geometry";
 
@@ -80,7 +82,9 @@ public class CompositionGraphMaker {
 
     Interface iface = ifacemap.get(name);
     if (iface == null) {
-      RError.err(ErrorType.Error, ep.getInfo(), "Interface not found: " + name);
+      LinkedList<String> dname = new LinkedList<String>(name.toList());
+      dname.pop();
+      RError.err(ErrorType.Error, ep.getInfo(), "Interface not found: " + new Designator(dname));
     }
     return iface;
   }

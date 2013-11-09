@@ -26,9 +26,8 @@ import evl.knowledge.KnowSimpleExpr;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
 import evl.other.ImplElementary;
-import evl.other.Named;
-import evl.other.NamedList;
 import evl.other.Namespace;
+import evl.other.SubCallbacks;
 import evl.statement.Assignment;
 import evl.statement.Block;
 import evl.statement.CallStmt;
@@ -92,7 +91,7 @@ public class ExprCutter extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitNamedList(NamedList<Named> obj, Void param) {
+  protected Void visitSubCallbacks(SubCallbacks obj, Void param) {
     visitItr(obj, param);
     return null;
   }

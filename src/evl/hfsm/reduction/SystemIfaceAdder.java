@@ -18,8 +18,6 @@ import evl.function.FunctionBase;
 import evl.function.impl.FuncIfaceInVoid;
 import evl.function.impl.FuncInputHandlerEvent;
 import evl.hfsm.ImplHfsm;
-import evl.knowledge.KnowBaseItem;
-import evl.knowledge.KnowledgeBase;
 import evl.other.CompUse;
 import evl.other.ImplElementary;
 import evl.other.ListOfNamed;
@@ -40,17 +38,15 @@ public class SystemIfaceAdder extends NullTraverser<Void, Void> {
   final private FuncIfaceInVoid sendFunc;
   final private FuncIfaceInVoid recvFunc;
   static private ElementInfo info = new ElementInfo();
-  private KnowBaseItem kbi;
 
-  public SystemIfaceAdder(FuncIfaceInVoid sendFunc, FuncIfaceInVoid recvFunc, KnowledgeBase kb) {
+  public SystemIfaceAdder(FuncIfaceInVoid sendFunc, FuncIfaceInVoid recvFunc) {
     super();
     this.sendFunc = sendFunc;
     this.recvFunc = recvFunc;
-    kbi = kb.getEntry(KnowBaseItem.class);
   }
 
-  public static void process(FuncIfaceInVoid sendFunc, FuncIfaceInVoid recvFunc, Evl obj, KnowledgeBase kb) {
-    SystemIfaceAdder reduction = new SystemIfaceAdder(sendFunc, recvFunc, kb);
+  public static void process(FuncIfaceInVoid sendFunc, FuncIfaceInVoid recvFunc, Evl obj) {
+    SystemIfaceAdder reduction = new SystemIfaceAdder(sendFunc, recvFunc);
     reduction.traverse(obj, null);
   }
 

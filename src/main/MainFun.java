@@ -32,8 +32,9 @@ import fun.other.Generator;
 import fun.other.Named;
 import fun.other.Namespace;
 import fun.other.RizzlyFile;
-import fun.symbol.SymbolTable;
+import fun.other.SymbolTable;
 import fun.traverser.DeAlias;
+import fun.traverser.EnumLinkReduction;
 import fun.traverser.Linker;
 import fun.traverser.Memory;
 import fun.traverser.NamespaceLinkReduction;
@@ -43,7 +44,6 @@ import fun.traverser.spezializer.EvalTo;
 import fun.traverser.spezializer.Specializer;
 import fun.type.Type;
 import fun.type.base.AnyType;
-import fun.type.base.BaseType;
 import fun.type.base.BooleanType;
 import fun.type.base.IntegerType;
 import fun.type.base.NaturalType;
@@ -97,6 +97,7 @@ public class MainFun {
 
     NamespaceLinkReduction.process(classes);
     StateLinkReduction.process(classes, knowledgeBase);
+    EnumLinkReduction.process(classes, knowledgeBase);
 
     PrettyPrinter.print(classes, debugdir + "linkreduced.rzy");
 
@@ -107,14 +108,14 @@ public class MainFun {
     DeAlias.process(classes);
 
     PrettyPrinter.print(classes, debugdir + "evaluated.rzy");
-    removeUnused(debugdir, classes, nroot, fileList);
+    removeUnused(classes, nroot);
     PrettyPrinter.print(classes, debugdir + "stripped.rzy");
-    printDepGraph(debugdir + "rdep.gv", classes, nroot, fileList);
+    printDepGraph(debugdir + "rdep.gv", classes, nroot);
     return new Pair<String, Namespace>(nroot.getName(), classes);
   }
 
-  private static void printDepGraph(String debugdir, Namespace classes, Named root, Collection<RizzlyFile> fileList) {
-    SimpleGraph<Named> g = DepGraph.build(classes, new KnowledgeBase(classes, fileList, debugdir));
+  private static void printDepGraph(String debugdir, Namespace classes, Named root) {
+    SimpleGraph<Named> g = DepGraph.build(classes);
     StateVariable instVar = new StateVariable(new ElementInfo(), "!inst", null);
     g.addVertex(instVar);
     g.addEdge(instVar, root);
@@ -134,8 +135,8 @@ public class MainFun {
     }
   }
 
-  private static void removeUnused(String debugdir, Namespace classes, Named root, Collection<RizzlyFile> fileList) {
-    SimpleGraph<Named> g = DepGraph.build(root, new KnowledgeBase(classes, fileList, debugdir));
+  private static void removeUnused(Namespace classes, Named root) {
+    SimpleGraph<Named> g = DepGraph.build(root);
     removeUnused(classes, g.vertexSet());
   }
 
@@ -155,14 +156,18 @@ public class MainFun {
 
   private static Component evaluate(Named root, Namespace classes, String debugdir, Collection<RizzlyFile> fileList) {
     KnowledgeBase kb = new KnowledgeBase(classes, fileList, debugdir);
-    SimpleGraph<Named> g = DepGraph.build(classes, kb);
 
-    /*
-     * { // Cycle detection CycleDetector<Named, Pair<Named, Named>> cd = new CycleDetector<Named, Pair<Named,
-     * Named>>(g); Set<Named> cycle = cd.findCycles(); if (!cycle.isEmpty()) { for (Named v : cycle) {
-     * RError.err(ErrorType.Hint, v.getInfo(), "Dependency cycle found, invovling type: " + v.getName()); }
-     * RError.err(ErrorType.Warning, "Maybe a dependency cycle found in types"); } }
-     */
+    // { // Cycle detection
+    // SimpleGraph<Named> g = DepGraph.build(classes);
+    // CycleDetector<Named, Pair<Named, Named>> cd = new CycleDetector<Named, Pair<Named, Named>>(g);
+    // Set<Named> cycle = cd.findCycles();
+    // if (!cycle.isEmpty()) {
+    // for (Named v : cycle) {
+    // RError.err(ErrorType.Hint, v.getInfo(), "Dependency cycle found, invovling type: " + v.getName());
+    // }
+    // RError.err(ErrorType.Error, "Dependency cycle found in types");
+    // }
+    // }
 
     {
       {
@@ -196,12 +201,12 @@ public class MainFun {
 
   private static List<Type> genPrimitiveTypes() {
     List<Type> ret = new ArrayList<Type>();
-    ret.add(makeNamedBaseType(new BooleanType()));
-    ret.add(makeNamedBaseType(new VoidType()));
-    ret.add(makeNamedBaseType(new IntegerType()));
-    ret.add(makeNamedBaseType(new NaturalType()));
-    ret.add(makeNamedBaseType(new AnyType()));
-    ret.add(makeNamedBaseType(new StringType()));
+    ret.add((Type) new BooleanType());
+    ret.add((Type) new VoidType());
+    ret.add((Type) new IntegerType());
+    ret.add((Type) new NaturalType());
+    ret.add((Type) new AnyType());
+    ret.add((Type) new StringType());
     return ret;
   }
 
@@ -211,11 +216,6 @@ public class MainFun {
     ret.add(new ArrayTemplate());
     ret.add(new TypeTypeTemplate());
     return ret;
-  }
-
-  @Deprecated
-  private static Type makeNamedBaseType(BaseType inst) {
-    return inst;
   }
 
   private static Collection<RizzlyFile> loadFiles(Designator rootname, String rootdir) {

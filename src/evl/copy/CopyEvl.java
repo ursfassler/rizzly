@@ -15,8 +15,8 @@ import evl.hfsm.StateItem;
 import evl.other.CompUse;
 import evl.other.ImplElementary;
 import evl.other.Named;
-import evl.other.NamedList;
 import evl.other.RizzlyProgram;
+import evl.other.SubCallbacks;
 import evl.statement.CaseOpt;
 import evl.statement.CaseOptEntry;
 import evl.statement.CaseOptRange;
@@ -91,8 +91,8 @@ class CopyEvl extends NullTraverser<Evl, Void> {
   }
 
   @Override
-  protected Evl visitNamedList(NamedList<Named> obj, Void param) {
-    NamedList<Named> ret = new NamedList<Named>(obj.getInfo(), obj.getName());
+  protected Evl visitSubCallbacks(SubCallbacks obj, Void param) {
+    SubCallbacks ret = new SubCallbacks(obj.getInfo(), obj.getName());
     ret.addAll(copy(obj.getList()));
     return ret;
   }
