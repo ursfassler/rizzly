@@ -3,7 +3,13 @@ program transOrder2;
 uses
   inst;
 
-procedure inst_out(val: uint8_t); cdecl; public;
+procedure _trap(); cdecl; public;
+begin
+  writeln( 'Runtime error' );
+  halt( -1 );
+end;
+
+procedure inst_out(val: R_0_10); cdecl; public;
 begin
   writeln( val );
 end;

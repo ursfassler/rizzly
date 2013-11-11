@@ -29,7 +29,7 @@ public class FpcTest extends BaseTest {
 
   @Test
   public void enumt() {
-    test("enumt", "Enumt", "start enumt\nenumt_Color_Red\nenumt_Color_Green\nenumt_Color_Blue\nend enumt\n", false);
+    test("enumt", "Enumt", "start enumt\nenumt_Red\nenumt_Green\nenumt_Blue\nend enumt\n", false);
   }
 
   @Test
@@ -45,70 +45,70 @@ public class FpcTest extends BaseTest {
   @Test
   public void debug() {
     String fooTrace = "send foo\n";
-    fooTrace += "debug: in foo \n";
-    fooTrace += "debug: a in foo \n";
-    fooTrace += "debug: a out foo \n";
-    fooTrace += "debug: b in foo \n";
-    fooTrace += "debug: b out foo \n";
-    fooTrace += "debug: out foo \n";
+    fooTrace += "debug: infoo \n";
+    fooTrace += "debug: a infoo \n";
+    fooTrace += "debug: a outfoo \n";
+    fooTrace += "debug: b infoo \n";
+    fooTrace += "debug: b outfoo \n";
+    fooTrace += "debug: outfoo \n";
     fooTrace += "foo\n";
-    fooTrace += "debug: b out bar \n";
-    fooTrace += "debug: out bar \n";
+    fooTrace += "debug: b outbar \n";
+    fooTrace += "debug: outbar \n";
     fooTrace += "bar\n";
-    fooTrace += "debug: a out bar \n";
-    fooTrace += "debug: b in bar \n";
-    fooTrace += "debug: b out bar \n";
-    fooTrace += "debug: out bar \n";
+    fooTrace += "debug: a outbar \n";
+    fooTrace += "debug: b inbar \n";
+    fooTrace += "debug: b outbar \n";
+    fooTrace += "debug: outbar \n";
     fooTrace += "bar\n";
-    fooTrace += "debug: b out poh \n";
-    fooTrace += "debug: out poh \n";
+    fooTrace += "debug: b outpoh \n";
+    fooTrace += "debug: outpoh \n";
     fooTrace += "poh\n";
-    fooTrace += "debug: b in foo \n";
-    fooTrace += "debug: b out foo \n";
-    fooTrace += "debug: out foo \n";
+    fooTrace += "debug: b infoo \n";
+    fooTrace += "debug: b outfoo \n";
+    fooTrace += "debug: outfoo \n";
     fooTrace += "foo\n";
-    fooTrace += "debug: b out bar \n";
-    fooTrace += "debug: out bar \n";
+    fooTrace += "debug: b outbar \n";
+    fooTrace += "debug: outbar \n";
     fooTrace += "bar\n";
 
     String barTrace = "send bar\n";
-    barTrace += "debug: in bar \n";
-    barTrace += "debug: a in bar \n";
-    barTrace += "debug: a out bar \n";
-    barTrace += "debug: b in bar \n";
-    barTrace += "debug: b out bar \n";
-    barTrace += "debug: out bar \n";
+    barTrace += "debug: inbar \n";
+    barTrace += "debug: a inbar \n";
+    barTrace += "debug: a outbar \n";
+    barTrace += "debug: b inbar \n";
+    barTrace += "debug: b outbar \n";
+    barTrace += "debug: outbar \n";
     barTrace += "bar\n";
-    barTrace += "debug: b out poh \n";
-    barTrace += "debug: out poh \n";
+    barTrace += "debug: b outpoh \n";
+    barTrace += "debug: outpoh \n";
     barTrace += "poh\n";
-    barTrace += "debug: a out poh \n";
-    barTrace += "debug: b in poh \n";
-    barTrace += "debug: b out bar \n";
-    barTrace += "debug: out bar \n";
+    barTrace += "debug: a outpoh \n";
+    barTrace += "debug: b inpoh \n";
+    barTrace += "debug: b outbar \n";
+    barTrace += "debug: outbar \n";
     barTrace += "bar\n";
-    barTrace += "debug: b in bar \n";
-    barTrace += "debug: b out bar \n";
-    barTrace += "debug: out bar \n";
+    barTrace += "debug: b inbar \n";
+    barTrace += "debug: b outbar \n";
+    barTrace += "debug: outbar \n";
     barTrace += "bar\n";
-    barTrace += "debug: b out poh \n";
-    barTrace += "debug: out poh \n";
+    barTrace += "debug: b outpoh \n";
+    barTrace += "debug: outpoh \n";
     barTrace += "poh\n";
 
     String pohTrace = "send poh\n";
-    pohTrace += "debug: in poh \n";
-    pohTrace += "debug: a in poh \n";
-    pohTrace += "debug: a out bar \n";
-    pohTrace += "debug: b in bar \n";
-    pohTrace += "debug: b out bar \n";
-    pohTrace += "debug: out bar \n";
+    pohTrace += "debug: inpoh \n";
+    pohTrace += "debug: a inpoh \n";
+    pohTrace += "debug: a outbar \n";
+    pohTrace += "debug: b inbar \n";
+    pohTrace += "debug: b outbar \n";
+    pohTrace += "debug: outbar \n";
     pohTrace += "bar\n";
-    pohTrace += "debug: b out poh \n";
-    pohTrace += "debug: out poh \n";
+    pohTrace += "debug: b outpoh \n";
+    pohTrace += "debug: outpoh \n";
     pohTrace += "poh\n";
-    pohTrace += "debug: b in poh \n";
-    pohTrace += "debug: b out bar \n";
-    pohTrace += "debug: out bar \n";
+    pohTrace += "debug: b inpoh \n";
+    pohTrace += "debug: b outbar \n";
+    pohTrace += "debug: outbar \n";
     pohTrace += "bar\n";
 
     test("debug", "Debug", "start debug\n" + fooTrace + barTrace + pohTrace + "end debug\n", true);

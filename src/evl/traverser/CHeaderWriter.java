@@ -60,7 +60,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.wr("#include <stdint.h>");
     param.nl();
     param.nl();
-    if (debugNames != null) {
+    if (!debugNames.isEmpty()) {
       param.wr("const char* DEBUG_NAMES[] = { ");
       boolean first = true;
       for (String name : debugNames) {

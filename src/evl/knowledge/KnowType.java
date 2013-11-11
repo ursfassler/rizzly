@@ -4,6 +4,7 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -17,8 +18,11 @@ import error.ErrorType;
 import error.RError;
 import evl.Evl;
 import evl.NullTraverser;
+import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
+import evl.expression.Expression;
 import evl.expression.Number;
+import evl.expression.StringValue;
 import evl.expression.TypeCast;
 import evl.expression.binop.And;
 import evl.expression.binop.BitAnd;
@@ -447,6 +451,24 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     return visit(obj.getLink(), param);
   }
 
+  protected Type visitArrayValue(ArrayValue obj, Void param) {
+    Iterator<Expression> itr = obj.getValue().iterator();
+    assert (itr.hasNext());
+    Range cont = ((RangeType) visit(itr.next(), param)).getNumbers();
+    while (itr.hasNext()) {
+      Range ntype = ((RangeType) visit(itr.next(), param)).getNumbers();
+      cont = Range.grow(cont, ntype);
+    }
+
+    RangeType et = kbi.getNumsetType(cont);
+
+    return new ArrayType(BigInteger.valueOf(obj.getValue().size()), new TypeRef(new ElementInfo(), et));
+  }
+
+  @Override
+  protected Type visitStringValue(StringValue obj, Void param) {
+    return kbi.getStringType();
+  }
 }
 
 class RefTypeGetter extends NullTraverser<Type, Type> {

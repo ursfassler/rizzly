@@ -17,11 +17,12 @@ component
       
     state A(AA)
       state AA
-        transition 
-          A to A by in( val: R{0,10} ) do
-            out( 1 );
-          end
       end
     end
+    
+    transition 
+      A to A by in( val: R{0,10} ) do
+        out( 1 );
+      end
   end
 

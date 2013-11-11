@@ -77,6 +77,7 @@ import evl.traverser.ConstantPropagation;
 import evl.traverser.DepCollector;
 import evl.traverser.DepGraph;
 import evl.traverser.DesCallgraphMaker;
+import evl.traverser.FpcHeaderWriter;
 import evl.traverser.IfCutter;
 import evl.traverser.IntroduceConvert;
 import evl.traverser.LinkReduction;
@@ -156,8 +157,10 @@ public class MainEvl {
 
     {
       evl.other.RizzlyProgram head = makeHeader(prg, debugdir);
-      evl.traverser.Renamer.process(head);
+      Set<String> blacklist = makeBlacklist();
+      evl.traverser.Renamer.process(head, blacklist);
       printCHeader(outdir, head, names);
+      printFpcHeader(outdir, head, names);
     }
 
     ConstantPropagation.process(prg);
@@ -167,6 +170,19 @@ public class MainEvl {
 
     PrettyPrinter.print(prg, debugdir + "instprog.rzy", true);
     return prg;
+  }
+
+  private static Set<String> makeBlacklist() {
+    Set<String> blacklist = new HashSet<String>();
+    blacklist.add("if");
+    blacklist.add("goto");
+    blacklist.add("while");
+    blacklist.add("do");
+    blacklist.add("byte");
+    blacklist.add("word");
+    blacklist.add("integer");
+    blacklist.add("string");
+    return blacklist;
   }
 
   private static void replaceEnums(RizzlyProgram prg) {
@@ -622,10 +638,12 @@ public class MainEvl {
         if (hasBody) {
           if (func instanceof FuncWithReturn) {
             FuncProtoRet proto = new FuncProtoRet(func.getInfo(), func.getName(), func.getParam());
+            proto.getAttributes().addAll(func.getAttributes());
             proto.setRet(((FuncWithReturn) func).getRet());
             ret.getFunction().add(proto);
           } else {
             FuncProtoVoid proto = new FuncProtoVoid(func.getInfo(), func.getName(), func.getParam());
+            proto.getAttributes().addAll(func.getAttributes());
             ret.getFunction().add(proto);
           }
         } else {
@@ -697,6 +715,16 @@ public class MainEvl {
   private static void printCHeader(String outdir, RizzlyProgram cprog, List<String> debugNames) {
     String cfilename = outdir + cprog.getName() + ".h";
     CHeaderWriter cwriter = new CHeaderWriter(debugNames);
+    try {
+      cwriter.traverse(cprog, new StreamWriter(new PrintStream(cfilename)));
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private static void printFpcHeader(String outdir, RizzlyProgram cprog, List<String> debugNames) {
+    String cfilename = outdir + cprog.getName() + ".pas";
+    FpcHeaderWriter cwriter = new FpcHeaderWriter(debugNames);
     try {
       cwriter.traverse(cprog, new StreamWriter(new PrintStream(cfilename)));
     } catch (FileNotFoundException e) {

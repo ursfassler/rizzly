@@ -1,7 +1,5 @@
 package main;
 
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -12,7 +10,6 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
 
 import util.Pair;
 import util.SimpleGraph;
-import util.StreamWriter;
 import cir.function.LibFunction;
 import cir.library.CLibrary;
 import cir.other.FuncVariable;
@@ -21,7 +18,6 @@ import cir.traverser.BlockReduction;
 import cir.traverser.BoolToEnum;
 import cir.traverser.CArrayCopy;
 import cir.traverser.CWriter;
-import cir.traverser.FpcHeaderWriter;
 import cir.traverser.RangeReplacer;
 import cir.traverser.Renamer;
 import cir.traverser.VarDeclToTop;
@@ -116,16 +112,6 @@ public class MainCir {
     Set<cir.type.Type> vs = new HashSet<cir.type.Type>();
     getter.traverse(u, vs);
     return vs;
-  }
-
-  private static void printFpcHeader(String outdir, String name, cir.other.Program cprog) {
-    String cfilename = outdir + name + ".pas";
-    FpcHeaderWriter cwriter = new FpcHeaderWriter();
-    try {
-      cwriter.traverse(cprog, new StreamWriter(new PrintStream(cfilename)));
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    }
   }
 
 }

@@ -18,25 +18,25 @@ begin
   writeln( 'poh' );
 end;
 
-procedure inst__msgRecv(receiver: Array_4_U_4; size: uint8_t); cdecl; public;
+procedure inst__msgRecv(receiver: Array_4_R_0_9; size: R_0_3); cdecl; public;
 var
   i : Integer;
 begin
   write( 'debug: ' );
   for i := size-1 downto 0 do begin
-    write( inst__getSym(receiver[i]) );
+    write( DEBUG_NAMES[receiver[i]] );
     write( ' ' );
   end;
   writeln();
 end;
 
-procedure inst__msgSend(sender: Array_4_U_4; size: uint8_t); cdecl; public;
+procedure inst__msgSend(sender: Array_4_R_0_9; size: R_0_3); cdecl; public;
 var
   i : Integer;
 begin
   write( 'debug: ' );
   for i := size-1 downto 0 do begin
-    write( inst__getSym(sender[i]) );
+    write( DEBUG_NAMES[sender[i]] );
     write( ' ' );
   end;
   writeln();

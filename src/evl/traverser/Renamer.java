@@ -1,5 +1,7 @@
 package evl.traverser;
 
+import java.util.Set;
+
 import common.Designator;
 
 import evl.DefTraverser;
@@ -7,7 +9,8 @@ import evl.Evl;
 import evl.other.Named;
 
 //TODO how to ensure that names are unique?
-//TODO use blacklist with C keywords
+//TODO use blacklist with keywords
+//TODO use better names for public stuff
 /**
  * @see pir.traverser.Renamer
  * 
@@ -16,8 +19,15 @@ import evl.other.Named;
  */
 public class Renamer extends DefTraverser<Void, Void> {
 
-  public static void process(Evl cprog) {
-    Renamer cVarDeclToTop = new Renamer();
+  final private Set<String> blacklist;
+
+  public Renamer(Set<String> blacklist) {
+    super();
+    this.blacklist = blacklist;
+  }
+
+  public static void process(Evl cprog, Set<String> blacklist) {
+    Renamer cVarDeclToTop = new Renamer(blacklist);
     cVarDeclToTop.traverse(cprog, null);
   }
 
@@ -26,7 +36,7 @@ public class Renamer extends DefTraverser<Void, Void> {
     item.setName(name);
   }
 
-  public static String cleanName(String name) {
+  private String cleanName(String name) {
     String ret = "";
     for (int i = 0; i < name.length(); i++) {
       char sym = name.charAt(i);
@@ -53,6 +63,11 @@ public class Renamer extends DefTraverser<Void, Void> {
         break;
       }
     }
+
+    while (blacklist.contains(ret.toLowerCase())) {
+      ret += Designator.NAME_SEP;
+    }
+
     return ret;
   }
 

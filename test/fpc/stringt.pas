@@ -3,13 +3,13 @@ program stringt;
 uses
   inst;
 
-procedure inst_out1(value: string_t); cdecl; public;
+procedure inst_out1(value: String_); cdecl; public;
 begin
   write( '1:' );
   writeln( value );
 end;
 
-procedure inst_out2(value: string_t); cdecl; public;
+procedure inst_out2(value: String_); cdecl; public;
 begin
   write( '2:' );
   writeln( value );

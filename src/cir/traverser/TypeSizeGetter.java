@@ -8,6 +8,7 @@ import cir.type.IntType;
 import cir.type.StructType;
 import cir.type.Type;
 import cir.type.TypeAlias;
+import cir.type.TypeRef;
 import cir.type.UnionType;
 import cir.type.VoidType;
 
@@ -28,6 +29,11 @@ public class TypeSizeGetter extends NullTraverser<Integer, Void> {
       return nsize;
     }
     return tsize;
+  }
+
+  @Override
+  protected Integer visitTypeRef(TypeRef obj, Void param) {
+    return visit(obj.getRef(), param);
   }
 
   @Override

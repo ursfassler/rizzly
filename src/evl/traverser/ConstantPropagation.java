@@ -4,8 +4,10 @@ import evl.expression.Expression;
 import evl.expression.reference.Reference;
 import evl.other.RizzlyProgram;
 import evl.type.Type;
+import evl.type.base.ArrayType;
 import evl.type.base.EnumType;
 import evl.type.base.RangeType;
+import evl.type.base.StringType;
 import evl.variable.Constant;
 
 /**
@@ -24,6 +26,10 @@ public class ConstantPropagation extends ExprReplacer<Void> {
       return true;
     } else if (type instanceof EnumType) {
       return true;
+    } else if (type instanceof ArrayType) {
+      return false;
+    } else if (type instanceof StringType) {  // TODO decide by size?
+      return false;
     }
     throw new RuntimeException("not yet implemented:" + type.getClass().getCanonicalName());
   }

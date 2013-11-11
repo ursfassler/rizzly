@@ -3,7 +3,7 @@ program arrayValue;
 uses
   inst;
 
-procedure inst_out(x: uint8_t); cdecl; public;
+procedure inst_out(x: R_0_100); cdecl; public;
 begin
   writeln( x );
 end;

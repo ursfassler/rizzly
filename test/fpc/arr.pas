@@ -3,7 +3,7 @@ program arr;
 uses
   inst;
 
-procedure inst_out(x: Array_3_U_8); cdecl; public;
+procedure inst_out(x: Array_3_R_0_100); cdecl; public;
 begin
   if (x[0] = 100) and (x[1] = 200) and (x[2] = 50) 
     then writeln( 'ok' )
@@ -11,7 +11,7 @@ begin
 end;
 
 var
-  x: Array_10_U_8;
+  x: Array_10_R_0_100;
 
 begin
   inst__construct();

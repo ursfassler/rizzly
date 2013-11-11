@@ -3,6 +3,12 @@ program jump;
 uses
   inst;
 
+procedure _trap(); cdecl; public;
+begin
+  writeln( 'Runtime error' );
+  halt(-1);
+end;
+
 procedure inst_out(); cdecl; public;
 begin
   writeln( 'out' );

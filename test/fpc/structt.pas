@@ -3,14 +3,14 @@ program structt;
 uses
   inst;
 
-procedure inst_out1(p: structt_Point); cdecl; public;
+procedure inst_out1(x: structt_Point); cdecl; public;
 begin
-  if (p.x = 1) and (p.y = 2)
+  if (x.x = 1) and (x.y = 2)
     then writeln( 'ok' )
     else writeln( 'error' );
 end;
 
-procedure inst_out2(x: uint8_t; y: uint8_t); cdecl; public;
+procedure inst_out2(x: R_0_1000; y: R_0_1000); cdecl; public;
 begin
   if (x = 100) and (y = 200)
     then writeln( 'ok' )
