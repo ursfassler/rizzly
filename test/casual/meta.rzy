@@ -12,6 +12,7 @@ component
       in -> out;
   end
 
+
   Meta
     input
       in1();
@@ -35,4 +36,5 @@ component
       b.out -> out1;                  //geometry path="350"
 
   end
+
 

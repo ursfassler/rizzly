@@ -1,16 +1,11 @@
-package fun.doc;
+package util;
 
 import java.util.LinkedList;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import common.Designator;
-
-import fun.Fun;
-import fun.other.Named;
-
-public class XmlWriter implements Writer {
+public class HtmlWriter implements Writer {
   private Document doc;
   private Element root;
   private int newlines = 1;
@@ -21,7 +16,7 @@ public class XmlWriter implements Writer {
   public final static String CL_COMMENT = "comment";
   public final static String extension = ".html";
 
-  public XmlWriter(Element root) {
+  public HtmlWriter(Element root) {
     super();
     this.doc = root.getOwnerDocument();
     this.root = root;
@@ -34,11 +29,6 @@ public class XmlWriter implements Writer {
     wroteSecSep.set(0, false);
   }
 
-  /**
-   * Write a comment
-   * 
-   * @param text
-   */
   public void wc(String text) {
     newlines = 0;
     Element kw = doc.createElement("span");
@@ -48,11 +38,6 @@ public class XmlWriter implements Writer {
     wroteSecSep.set(0, false);
   }
 
-  /**
-   * Write a keyword
-   * 
-   * @param s
-   */
   public void kw(String s) {
     newlines = 0;
     Element kw = doc.createElement("span");
@@ -62,22 +47,33 @@ public class XmlWriter implements Writer {
     wroteSecSep.set(0, false);
   }
 
-  public void wl(Named dst, String title, Designator file) {
+  public void wl(String text, String hint, String file, String id) {
     newlines = 0;
     Element kw = doc.createElement("a");
     kw.setAttribute("class", CL_LINK);
-    kw.setAttribute("title", title);
-    kw.setAttribute("href", file + extension + "#" + getId(dst));
-    kw.appendChild(doc.createTextNode(dst.getName()));
+    kw.setAttribute("title", hint);
+    kw.setAttribute("href", file + extension + "#" + id);
+    kw.appendChild(doc.createTextNode(text));
     root.appendChild(kw);
     wroteSecSep.set(0, false);
   }
 
-  public void wa(Named obj) {
+  public void wl(String text, String hint, String file) {
     newlines = 0;
     Element kw = doc.createElement("a");
-    kw.setAttribute("name", getId(obj));
-    kw.appendChild(doc.createTextNode(obj.getName()));
+    kw.setAttribute("class", CL_LINK);
+    kw.setAttribute("title", hint);
+    kw.setAttribute("href", file + extension);
+    kw.appendChild(doc.createTextNode(text));
+    root.appendChild(kw);
+    wroteSecSep.set(0, false);
+  }
+
+  public void wa(String text, String id) {
+    newlines = 0;
+    Element kw = doc.createElement("a");
+    kw.setAttribute("name", id);
+    kw.appendChild(doc.createTextNode(text));
     root.appendChild(kw);
     wroteSecSep.set(0, false);
   }
@@ -112,10 +108,6 @@ public class XmlWriter implements Writer {
     root = (Element) root.getParentNode();
     assert (root.getNodeName().equals("div"));
     wroteSecSep.poll();
-  }
-
-  private String getId(Fun obj) {
-    return "_" + Integer.toHexString(obj.hashCode());
   }
 
 }

@@ -34,7 +34,19 @@ abstract public class FunctionHeader extends FunBase implements Named {
 
   @Override
   public String toString() {
-    return name + " " + param;
+    String ret = name;
+    ret += "(";
+    boolean first = true;
+    for (FuncVariable tp : param) {
+      if (first) {
+        first = false;
+      } else {
+        ret += "; ";
+      }
+      ret += tp.toString();
+    }
+    ret += ")";
+    return ret;
   }
 
 }

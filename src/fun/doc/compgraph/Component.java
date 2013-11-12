@@ -37,8 +37,8 @@ public abstract class Component implements Vertex {
     return classname;
   }
 
-  public Designator getFullName() {
-    return new Designator(path, classname);
+  public Designator getPath() {
+    return path;
   }
 
   public ArrayList<Interface> getInput() {

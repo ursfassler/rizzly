@@ -18,6 +18,8 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import util.HtmlWriter;
+
 import common.Designator;
 
 import fun.composition.ImplComposition;
@@ -50,7 +52,8 @@ public class ComponentFilePrinter {
   public void print(RizzlyFile comp) {
     Designator path = comp.getFullName();
     try {
-      String filename = kb.getRootdir() + path.toString(".") + ".html";
+      String filename = kb.getRootdir() + path + ".html";
+
       TransformerFactory transformerFactory = TransformerFactory.newInstance();
       Transformer transformer;
       transformer = transformerFactory.newTransformer();
@@ -126,7 +129,7 @@ public class ComponentFilePrinter {
     Element pre = doc.createElement("div");
     pre.setAttribute("class", "code");
     body.appendChild(pre);
-    RXmlPrinter.print(comp, pre, kb);
+    HtmlPrinter.print(comp, pre, kb);
   }
 
   public void makePicture(RizzlyFile file) {
@@ -160,12 +163,12 @@ public class ComponentFilePrinter {
       wr.println("  padding-left: 1em;");
       wr.println("}");
       wr.println();
-      wr.println("." + XmlWriter.CL_KEYWORD + " {");
+      wr.println("." + HtmlWriter.CL_KEYWORD + " {");
       wr.println("  font-weight:bold;");
       wr.println("  color:darkred;");
       wr.println("}");
       wr.println();
-      wr.println("." + XmlWriter.CL_COMMENT + " {");
+      wr.println("." + HtmlWriter.CL_COMMENT + " {");
       wr.println("  color:green;");
       wr.println("}");
       wr.println();

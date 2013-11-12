@@ -17,13 +17,15 @@ import joGraph.HtmlGraphWriter;
 import parser.FileParser;
 import util.Pair;
 import util.SimpleGraph;
+import util.StreamWriter;
 
 import common.Designator;
 import common.ElementInfo;
 
+import fun.Fun;
 import fun.doc.DepGraph;
 import fun.doc.DocWriter;
-import fun.doc.PrettyPrinter;
+import fun.doc.FunPrinter;
 import fun.expression.Expression;
 import fun.expression.reference.Reference;
 import fun.knowledge.KnowledgeBase;
@@ -78,7 +80,7 @@ public class MainFun {
     }
     Linker.process(types, fileList, sym);
     Linker.process(fileList, sym);
-    PrettyPrinter.print(fileList, debugdir + "linked.rzy");
+    print(fileList, debugdir + "linked.rzy");
 
     Namespace classes = new Namespace(info, "!");
     classes.addAll(types);
@@ -91,15 +93,15 @@ public class MainFun {
       parent.addAll(f.getFunction());
     }
 
-    PrettyPrinter.print(classes, debugdir + "pretty.rzy");
+    KnowledgeBase kb = new KnowledgeBase(classes, fileList, debugdir);
 
-    KnowledgeBase knowledgeBase = new KnowledgeBase(classes, fileList, debugdir);
+    print(classes, debugdir + "pretty.rzy");
 
     NamespaceLinkReduction.process(classes);
-    StateLinkReduction.process(classes, knowledgeBase);
-    EnumLinkReduction.process(classes, knowledgeBase);
+    StateLinkReduction.process(classes, kb);
+    EnumLinkReduction.process(classes, kb);
 
-    PrettyPrinter.print(classes, debugdir + "linkreduced.rzy");
+    print(classes, debugdir + "linkreduced.rzy");
 
     Named root = classes.getChildItem(opt.getRootComp().toList());
     DocWriter.print(fileList, new KnowledgeBase(classes, fileList, docdir)); // TODO reimplement
@@ -107,9 +109,9 @@ public class MainFun {
     Component nroot = evaluate(root, classes, debugdir, fileList);
     DeAlias.process(classes);
 
-    PrettyPrinter.print(classes, debugdir + "evaluated.rzy");
+    print(classes, debugdir + "evaluated.rzy");
     removeUnused(classes, nroot);
-    PrettyPrinter.print(classes, debugdir + "stripped.rzy");
+    print(classes, debugdir + "stripped.rzy");
     printDepGraph(debugdir + "rdep.gv", classes, nroot);
     return new Pair<String, Namespace>(nroot.getName(), classes);
   }
@@ -239,6 +241,28 @@ public class MainFun {
       }
     }
     return loaded.values();
+  }
+
+  static private void print(Collection<? extends Fun> list, String filename) {
+    try {
+      StreamWriter writer = new StreamWriter(new PrintStream(filename));
+      FunPrinter pp = new FunPrinter(writer);
+      for (Fun itr : list) {
+        pp.traverse(itr, null);
+      }
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+  }
+
+  static private void print(Fun ast, String filename) {
+    try {
+      StreamWriter writer = new StreamWriter(new PrintStream(filename));
+      FunPrinter pp = new FunPrinter(writer);
+      pp.traverse(ast, null);
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
   }
 
 }

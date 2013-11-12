@@ -27,12 +27,27 @@ abstract public class Type extends FunBase implements Named, ActualTemplateArgum
   }
 
   @Override
-  public String toString() {
-    return name;
-  }
-
-  @Override
   public ListOfNamed<TemplateParameter> getTemplateParam() {
     return param;
   }
+
+  @Override
+  public String toString() {
+    String ret = name;
+    if (!param.isEmpty()) {
+      ret += "{";
+      boolean first = true;
+      for (TemplateParameter tp : param) {
+        if (first) {
+          first = false;
+        } else {
+          ret += "; ";
+        }
+        ret += tp.toString();
+      }
+      ret += "}";
+    }
+    return ret;
+  }
+
 }

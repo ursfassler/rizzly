@@ -25,7 +25,7 @@ public class StreamWriter implements Writer {
     spaceAdded = false;
   }
 
-  public void emptyLine() {
+  public void sectionSeparator() {
     nl();
     nl(); // FIXME make it correct
   }
@@ -42,6 +42,31 @@ public class StreamWriter implements Writer {
 
   public void decIndent() {
     indent--;
+  }
+
+  @Override
+  public void kw(String name) {
+    wr(name);
+  }
+
+  @Override
+  public void wc(String text) {
+    wr(text);
+  }
+
+  @Override
+  public void wl(String text, String hint, String file, String id) {
+    wr(text);
+  }
+
+  @Override
+  public void wl(String text, String hint, String file) {
+    wr(text);
+  }
+
+  @Override
+  public void wa(String name, String id) {
+    wr(name);
   }
 
 }

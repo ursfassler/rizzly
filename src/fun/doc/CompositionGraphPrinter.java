@@ -22,6 +22,7 @@ import fun.doc.compgraph.WorldComp;
 //DOM
 
 public class CompositionGraphPrinter {
+  private static final int SCALE = 2;
   private static final String WorldCompClassName = "World";
   private static final String SubCompClassName = "Component";
   private static final String InterfaceClassName = "Interface";
@@ -44,7 +45,8 @@ public class CompositionGraphPrinter {
     // root.setAttribute("version", "1.1");
     // root.setAttribute("baseProfile", "tiny");
 
-    root.setAttribute("width", "100%");
+    root.setAttribute("width", Integer.toString((comp.getSize().x + 2) * SCALE));
+    root.setAttribute("height", Integer.toString((comp.getSize().y + 2) * SCALE));
     // root.setAttribute("width", Integer.toString(comp.getSize().x + 2));
     // root.setAttribute("height", Integer.toString(comp.getSize().y + 2));
     root.setAttribute("viewBox", "-1 -1 " + (comp.getSize().x + 1) + " " + (comp.getSize().y + 1));
@@ -107,7 +109,7 @@ public class CompositionGraphPrinter {
     } else {
       bg.setAttribute("class", SubCompClassName);
       addText(top, 9, ((SubComponent) comp).getInstname());
-      addText(top, 18, comp.getClassname(), comp.getFullName());
+      addText(top, 18, comp.getClassname(), comp.getPath());
     }
 
     makeIfaces(comp.getInput(), Interface.WIDTH / 2 - (comp.getSize().x / 2), ifaceOffset, top);
@@ -155,7 +157,7 @@ public class CompositionGraphPrinter {
   private void addText(Element bg, int top, String text, Designator designator) {
     Element a = createElement("a");
     Attr attr = doc.createAttributeNS(xlinkNs, "href");
-    attr.setNodeValue(designator.toString(".") + linkExtension);
+    attr.setNodeValue(designator.toString(".") + linkExtension + "#" + text);
     attr.setPrefix("xlink");
     a.setAttributeNode(attr);
     addText(a, top, text);

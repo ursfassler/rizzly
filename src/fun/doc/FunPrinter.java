@@ -5,7 +5,7 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
-import org.w3c.dom.Element;
+import util.Writer;
 
 import common.Designator;
 import common.Direction;
@@ -43,8 +43,6 @@ import fun.hfsm.State;
 import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
-import fun.knowledge.KnowFunFile;
-import fun.knowledge.KnowledgeBase;
 import fun.other.Component;
 import fun.other.Generator;
 import fun.other.ImplElementary;
@@ -91,26 +89,33 @@ import fun.variable.FuncVariable;
 import fun.variable.StateVariable;
 import fun.variable.TemplateParameter;
 
-public class RXmlPrinter extends NullTraverser<Void, Designator> {
-  private XmlWriter xw;
-  private KnowFunFile kff;
+/**
+ * Prints formated FUN objects to a specific writer.
+ * 
+ * @author urs
+ * 
+ */
+public class FunPrinter extends NullTraverser<Void, Void> {
+  private Writer xw;
 
-  public RXmlPrinter(XmlWriter xw, KnowledgeBase kb) {
+  public FunPrinter(Writer xw) {
     this.xw = xw;
-    kff = kb.getEntry(KnowFunFile.class);
-  }
-
-  public static void print(Fun ast, Element parent, KnowledgeBase kb) {
-    RXmlPrinter pp = new RXmlPrinter(new XmlWriter(parent), kb);
-    pp.traverse(ast, null);
   }
 
   @Override
-  protected Void visitDefault(Fun obj, Designator param) {
+  protected Void visitDefault(Fun obj, Void param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getSimpleName());
   }
 
-  private void list(List<? extends Fun> list, String sep, Designator param) {
+  protected String getId(Named obj) {
+    return "_" + Integer.toHexString(obj.hashCode());
+  }
+
+  protected Designator getObjPath(Reference obj) {
+    return new Designator();
+  }
+
+  private void list(List<? extends Fun> list, String sep, Void param) {
     for (int i = 0; i < list.size(); i++) {
       if (i > 0) {
         xw.wr(sep);
@@ -119,13 +124,13 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
     }
   }
 
-  private void visitList(List<? extends Fun> list, Designator param) {
+  private void visitList(List<? extends Fun> list, Void param) {
     for (int i = 0; i < list.size(); i++) {
       visit(list.get(i), param);
     }
   }
 
-  private <T extends Named> void visitList(ListOfNamed<T> list, Designator param) {
+  private <T extends Named> void visitList(ListOfNamed<T> list, Void param) {
     Iterator<T> itr = list.iterator();
     while (itr.hasNext()) {
       visit(itr.next(), param);
@@ -154,7 +159,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
       xw.kw(name);
       xw.nl();
       xw.incIndent();
-      visitItr(data, new Designator());
+      visitItr(data, null);
       xw.decIndent();
     }
   }
@@ -167,13 +172,13 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
     }
   }
 
-  private void visitImports(List<Designator> imports, Designator param) {
+  private void visitImports(List<Designator> imports, Void param) {
     if (!imports.isEmpty()) {
       xw.kw("import");
       xw.nl();
       xw.incIndent();
       for (Designator ref : imports) {
-        xw.wr(ref.toString("."));
+        xw.wl(ref.toString(), ref.toString(), ref.toString());
         xw.wr(";");
         xw.nl();
       }
@@ -195,18 +200,14 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
     }
   }
 
-  private void printFunc(FunctionHeader func, Designator ns) {
-    xw.kw("function ");
-    ArrayList<String> nslist = ns.toList();
-    ns = new Designator();
-    for (String itm : nslist) {
-      ns = new Designator(ns, itm);
-      // xw.wl(itm, true, itm);
-      xw.wr(itm); // TODO write link
-      xw.wr(".");
+  private void printFunc(FunctionHeader func, boolean nofunc) {
+    if (!nofunc) {
+      xw.kw("function ");
     }
-    xw.wa(func);
-    visitOptList("(", "; ", ")", func.getParam().getList());
+    xw.wa(func.getName(), getId(func));
+    xw.wr("(");
+    visitOptList("", "; ", "", func.getParam().getList());
+    xw.wr(")");
     if (func instanceof FuncWithReturn) {
       xw.wr(":");
       visit(((FuncWithReturn) func).getRet(), null);
@@ -219,7 +220,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
       xw.kw("end");
       xw.nl();
     } else {
-      xw.kw(";");
+      xw.wr(";");
       xw.nl();
     }
   }
@@ -227,12 +228,12 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   // TODO write that before generators like component
   private void wrGen(Generator obj) {
     xw.sectionSeparator();
-    xw.wa(obj);
+    xw.wa(obj.getName(), getId(obj));
     visitOptList("{", "; ", "}", obj.getTemplateParam().getList());
   }
 
   @Override
-  protected Void visitRizzlyFile(RizzlyFile obj, Designator param) {
+  protected Void visitRizzlyFile(RizzlyFile obj, Void param) {
     assert (param == null);
     writeMeta(obj);
     visitImports(obj.getImports(), null);
@@ -249,16 +250,14 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitNamespace(Namespace obj, Designator param) {
-    assert (param != null);
-    param = new Designator(param, obj.getName());
+  protected Void visitNamespace(Namespace obj, Void param) {
     visitItr(obj, param);
     return null;
   }
 
   @Override
-  protected Void visitCompUse(CompUse obj, Designator param) {
-    xw.wa(obj);
+  protected Void visitCompUse(CompUse obj, Void param) {
+    xw.wa(obj.getName(), getId(obj));
     xw.wr(": ");
     visit(obj.getType(), null);
     xw.wr(";");
@@ -268,7 +267,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitComponent(Component obj, Designator param) {
+  protected Void visitComponent(Component obj, Void param) {
     wrGen(obj);
     xw.incIndent();
     visitNamedSection("input", obj.getIface(Direction.in).getList());
@@ -281,7 +280,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitImplElementary(ImplElementary obj, Designator param) {
+  protected Void visitImplElementary(ImplElementary obj, Void param) {
     xw.kw("implementation elementary");
     xw.nl();
     xw.incIndent();
@@ -292,7 +291,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
     printEntryExit("entry", obj.getEntryFunc());
     printEntryExit("entry", obj.getExitFunc());
 
-    visitList(obj.getFunction(), new Designator());
+    visitList(obj.getFunction(), param);
     xw.decIndent();
     xw.kw("end");
     xw.nl();
@@ -300,7 +299,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitImplComposition(ImplComposition obj, Designator param) {
+  protected Void visitImplComposition(ImplComposition obj, Void param) {
     xw.kw("implementation composition");
     xw.nl();
     writeMeta(obj);
@@ -318,7 +317,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitConnection(Connection obj, Designator param) {
+  protected Void visitConnection(Connection obj, Void param) {
     visit(obj.getEndpoint(Direction.in), null);
     switch (obj.getType()) {
     case sync:
@@ -338,8 +337,8 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitRangeTemplate(RangeTemplate obj, Designator param) {
-    xw.wa(obj);
+  protected Void visitRangeTemplate(RangeTemplate obj, Void param) {
+    xw.wa(obj.getName(), getId(obj));
     xw.wr(";");
     xw.nl();
     return null;
@@ -353,7 +352,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
     printEntryExit("entry", obj.getEntryFuncRef());
     printEntryExit("exit", obj.getExitFuncRef());
     visitNamedSection("var", obj.getVariable().getList());
-    visitList(obj.getItemList(), new Designator());
+    visitList(obj.getItemList(), null);
 
     xw.decIndent();
     xw.kw("end");
@@ -362,7 +361,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitImplHfsm(ImplHfsm obj, Designator param) {
+  protected Void visitImplHfsm(ImplHfsm obj, Void param) {
     xw.kw("implementation hfsm");
     xw.wr("(");
     visit(obj.getTopstate().getInitial(), null);
@@ -375,10 +374,10 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitStateComposite(StateComposite obj, Designator param) {
+  protected Void visitStateComposite(StateComposite obj, Void param) {
     xw.kw("state");
     xw.wr(" ");
-    xw.wa(obj);
+    xw.wa(obj.getName(), getId(obj));
     xw.wr("(");
     visit(obj.getInitial(), null);
     xw.wr(")");
@@ -389,10 +388,10 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitStateSimple(StateSimple obj, Designator param) {
+  protected Void visitStateSimple(StateSimple obj, Void param) {
     xw.kw("state");
     xw.wr(" ");
-    xw.wa(obj);
+    xw.wa(obj.getName(), getId(obj));
     xw.nl();
 
     printStateBody(obj);
@@ -400,7 +399,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitTransition(Transition obj, Designator param) {
+  protected Void visitTransition(Transition obj, Void param) {
     xw.kw("transition");
     xw.nl();
     xw.incIndent();
@@ -445,8 +444,8 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   // ---- Type ----------------------------------------------------------------
 
   @Override
-  protected Void visitTypeAlias(TypeAlias obj, Designator param) {
-    xw.wa(obj);
+  protected Void visitTypeAlias(TypeAlias obj, Void param) {
+    xw.wa(obj.getName(), getId(obj));
     xw.wr(" = ");
     visit(obj.getRef(), null);
     xw.wr(";");
@@ -454,8 +453,8 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitStringType(StringType obj, Designator param) {
-    xw.wa(obj);
+  protected Void visitStringType(StringType obj, Void param) {
+    xw.wa(obj.getName(), getId(obj));
     xw.wr(" = ");
     xw.kw(obj.getName());
     xw.wr(";");
@@ -463,8 +462,8 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitVoidType(VoidType obj, Designator param) {
-    xw.wa(obj);
+  protected Void visitVoidType(VoidType obj, Void param) {
+    xw.wa(obj.getName(), getId(obj));
     xw.wr(" = ");
     xw.kw(obj.getName());
     xw.wr(";");
@@ -472,8 +471,8 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitEnumType(EnumType obj, Designator param) {
-    xw.wa(obj);
+  protected Void visitEnumType(EnumType obj, Void param) {
+    xw.wa(obj.getName(), getId(obj));
     xw.wr(" = ");
     xw.kw("Enum");
     xw.nl();
@@ -485,28 +484,28 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitEnumElement(EnumElement obj, Designator param) {
-    xw.wa(obj);
+  protected Void visitEnumElement(EnumElement obj, Void param) {
+    xw.wa(obj.getName(), getId(obj));
     xw.wr(";");
     xw.nl();
     return null;
   }
 
   @Override
-  protected Void visitUnionType(UnionType obj, Designator param) {
+  protected Void visitUnionType(UnionType obj, Void param) {
     writeNamedElementType(obj, "Union", null);
     return null;
   }
 
   @Override
-  protected Void visitRecordType(RecordType obj, Designator param) {
+  protected Void visitRecordType(RecordType obj, Void param) {
     writeNamedElementType(obj, "Record", null);
     return null;
   }
 
   @Override
-  protected Void visitNamedElement(NamedElement obj, Designator param) {
-    xw.wa(obj);
+  protected Void visitNamedElement(NamedElement obj, Void param) {
+    xw.wa(obj.getName(), getId(obj));
     xw.wr(" : ");
     visit(obj.getType(), null);
     xw.wr(";");
@@ -514,7 +513,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
     return null;
   }
 
-  private void writeNamedElementType(NamedElementType obj, String typename, Designator param) {
+  private void writeNamedElementType(NamedElementType obj, String typename, Void param) {
     wrGen(obj);
     xw.wr(" = ");
     xw.kw(typename);
@@ -527,54 +526,54 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitRange(Range obj, Designator param) {
+  protected Void visitRange(Range obj, Void param) {
     xw.wr(obj.getName());
     return null;
   }
 
   @Override
-  protected Void visitArray(Array obj, Designator param) {
+  protected Void visitArray(Array obj, Void param) {
     xw.wr(obj.getName());
     return null;
   }
 
   @Override
-  protected Void visitBooleanType(BooleanType obj, Designator param) {
+  protected Void visitBooleanType(BooleanType obj, Void param) {
     xw.kw(obj.getName());
     xw.wr(";");
     return null;
   }
 
   @Override
-  protected Void visitArrayTemplate(ArrayTemplate obj, Designator param) {
+  protected Void visitArrayTemplate(ArrayTemplate obj, Void param) {
     xw.kw(obj.getName());
     xw.wr(";");
     return null;
   }
 
   @Override
-  protected Void visitIntegerType(IntegerType obj, Designator param) {
+  protected Void visitIntegerType(IntegerType obj, Void param) {
     xw.kw(obj.getName());
     xw.wr(";");
     return null;
   }
 
   @Override
-  protected Void visitNaturalType(NaturalType obj, Designator param) {
+  protected Void visitNaturalType(NaturalType obj, Void param) {
     xw.kw(obj.getName());
     xw.wr(";");
     return null;
   }
 
   @Override
-  protected Void visitAnyType(AnyType obj, Designator param) {
+  protected Void visitAnyType(AnyType obj, Void param) {
     xw.kw(obj.getName());
     xw.wr(";");
     return null;
   }
 
   @Override
-  protected Void visitTypeType(TypeType obj, Designator param) {
+  protected Void visitTypeType(TypeType obj, Void param) {
     xw.wr(TypeTypeTemplate.NAME);
     xw.wr("(");
     visit(obj.getType(), null);
@@ -583,7 +582,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitTypeTypeTemplate(TypeTypeTemplate obj, Designator param) {
+  protected Void visitTypeTypeTemplate(TypeTypeTemplate obj, Void param) {
     xw.kw(obj.getName());
     xw.wr(";");
     return null;
@@ -592,13 +591,13 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   // ---- Statement -----------------------------------------------------------
 
   @Override
-  protected Void visitBlock(Block obj, Designator param) {
+  protected Void visitBlock(Block obj, Void param) {
     visitList(obj.getStatements(), param);
     return null;
   }
 
   @Override
-  protected Void visitAssignment(Assignment obj, Designator param) {
+  protected Void visitAssignment(Assignment obj, Void param) {
     visit(obj.getLeft(), null);
     xw.wr(" := ");
     visit(obj.getRight(), null);
@@ -608,7 +607,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitVarDef(VarDefStmt obj, Designator param) {
+  protected Void visitVarDef(VarDefStmt obj, Void param) {
     visit(obj.getVariable(), param);
     xw.wr(";");
     xw.nl();
@@ -616,7 +615,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitCallStmt(CallStmt obj, Designator param) {
+  protected Void visitCallStmt(CallStmt obj, Void param) {
     visit(obj.getCall(), null);
     xw.wr(";");
     xw.nl();
@@ -624,7 +623,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitReturnExpr(ReturnExpr obj, Designator param) {
+  protected Void visitReturnExpr(ReturnExpr obj, Void param) {
     xw.kw("return");
     xw.wr(" ");
     visit(obj.getExpr(), null);
@@ -634,7 +633,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitReturnVoid(ReturnVoid obj, Designator param) {
+  protected Void visitReturnVoid(ReturnVoid obj, Void param) {
     xw.kw("return");
     xw.wr(";");
     xw.nl();
@@ -642,7 +641,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitWhile(While obj, Designator param) {
+  protected Void visitWhile(While obj, Void param) {
     xw.kw("while");
     xw.wr(" ");
     visit(obj.getCondition(), null);
@@ -657,7 +656,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitIfStmt(IfStmt obj, Designator param) {
+  protected Void visitIfStmt(IfStmt obj, Void param) {
     assert (!obj.getOption().isEmpty());
 
     boolean first = true;
@@ -693,7 +692,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitCaseStmt(CaseStmt obj, Designator param) {
+  protected Void visitCaseStmt(CaseStmt obj, Void param) {
     xw.kw("case");
     xw.wr(" ");
     visit(obj.getCondition(), null);
@@ -718,7 +717,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitCaseOpt(CaseOpt obj, Designator param) {
+  protected Void visitCaseOpt(CaseOpt obj, Void param) {
     list(obj.getValue(), ",", null);
     xw.wr(":");
     xw.nl();
@@ -731,7 +730,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitCaseOptRange(CaseOptRange obj, Designator param) {
+  protected Void visitCaseOptRange(CaseOptRange obj, Void param) {
     visit(obj.getStart(), null);
     xw.wr("..");
     visit(obj.getEnd(), null);
@@ -739,7 +738,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitCaseOptValue(CaseOptValue obj, Designator param) {
+  protected Void visitCaseOptValue(CaseOptValue obj, Void param) {
     visit(obj.getValue(), null);
     return null;
   }
@@ -747,7 +746,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   // ---- Expression ----------------------------------------------------------
 
   @Override
-  protected Void visitArithmeticOp(ArithmeticOp obj, Designator param) {
+  protected Void visitArithmeticOp(ArithmeticOp obj, Void param) {
     xw.wr("(");
     visit(obj.getLeft(), null);
     xw.wr(" ");
@@ -759,7 +758,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitUnaryExpression(UnaryExpression obj, Designator param) {
+  protected Void visitUnaryExpression(UnaryExpression obj, Void param) {
     xw.wr("(");
     xw.kw(obj.getOp().toString());
     xw.wr(" ");
@@ -769,19 +768,19 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitBoolValue(BoolValue obj, Designator param) {
+  protected Void visitBoolValue(BoolValue obj, Void param) {
     xw.kw(obj.isValue() ? "True" : "False");
     return null;
   }
 
   @Override
-  protected Void visitNumber(Number obj, Designator param) {
+  protected Void visitNumber(Number obj, Void param) {
     xw.wr(obj.getValue().toString());
     return null;
   }
 
   @Override
-  protected Void visitStringValue(StringValue obj, Designator param) {
+  protected Void visitStringValue(StringValue obj, Void param) {
     xw.wr("'");
     xw.wr(obj.getValue());
     xw.wr("'");
@@ -789,7 +788,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitArrayValue(ArrayValue obj, Designator param) {
+  protected Void visitArrayValue(ArrayValue obj, Void param) {
     xw.wr("[");
     list(obj.getValue(), ", ", null);
     xw.wr("]");
@@ -797,7 +796,7 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitRelation(Relation obj, Designator param) {
+  protected Void visitRelation(Relation obj, Void param) {
     xw.wr("(");
     visit(obj.getLeft(), null);
     xw.wr(" ");
@@ -809,29 +808,23 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitReference(Reference obj, Designator param) {
-    RizzlyFile file = kff.find(obj.getLink()); // FIXME find better way to handle built in functions and so
-    Designator path;
-    if (file == null) {
-      path = new Designator();
-    } else {
-      path = file.getFullName();
-    }
-    String title = obj.getLink().toString();
-    xw.wl(obj.getLink(), title, path);
+  protected Void visitReference(Reference obj, Void param) {
+    Designator path = getObjPath(obj);
+    String hint = obj.getLink().toString();
+    xw.wl(obj.getLink().getName(), hint, path.toString(), getId(obj.getLink()));
     visitItr(obj.getOffset(), null);
     return null;
   }
 
   @Override
-  protected Void visitRefName(RefName obj, Designator param) {
+  protected Void visitRefName(RefName obj, Void param) {
     xw.wr(".");
     xw.wr(obj.getName());
     return null;
   }
 
   @Override
-  protected Void visitRefCall(RefCall obj, Designator param) {
+  protected Void visitRefCall(RefCall obj, Void param) {
     xw.wr("(");
     list(obj.getActualParameter(), ", ", null);
     xw.wr(")");
@@ -839,14 +832,14 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitRefCompcall(RefTemplCall obj, Designator param) {
+  protected Void visitRefCompcall(RefTemplCall obj, Void param) {
     visitOptList("{", ", ", "}", obj.getActualParameter()); // FIXME it is a bit hacky, but maybe needed to make output
     // nicer
     return null;
   }
 
   @Override
-  protected Void visitRefIndex(RefIndex obj, Designator param) {
+  protected Void visitRefIndex(RefIndex obj, Void param) {
     xw.wr("[");
     visit(obj.getIndex(), null);
     xw.wr("]");
@@ -854,8 +847,8 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitConstPrivate(ConstPrivate obj, Designator param) {
-    xw.wa(obj);
+  protected Void visitConstPrivate(ConstPrivate obj, Void param) {
+    xw.wa(obj.getName(), getId(obj));
     xw.wr(": ");
     visit(obj.getType(), null);
     xw.wr(" = ");
@@ -866,8 +859,8 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitConstGlobal(ConstGlobal obj, Designator param) {
-    xw.wa(obj);
+  protected Void visitConstGlobal(ConstGlobal obj, Void param) {
+    xw.wa(obj.getName(), getId(obj));
     xw.wr(": ");
     visit(obj.getType(), null);
     xw.wr(" = ");
@@ -878,24 +871,24 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitFuncVariable(FuncVariable obj, Designator param) {
-    xw.wa(obj);
+  protected Void visitFuncVariable(FuncVariable obj, Void param) {
+    xw.wa(obj.getName(), getId(obj));
     xw.wr(": ");
     visit(obj.getType(), param);
     return null;
   }
 
   @Override
-  protected Void visitTemplateParameter(TemplateParameter obj, Designator param) {
-    xw.wa(obj);
+  protected Void visitTemplateParameter(TemplateParameter obj, Void param) {
+    xw.wa(obj.getName(), getId(obj));
     xw.wr(": ");
     visit(obj.getType(), null);
     return null;
   }
 
   @Override
-  protected Void visitStateVariable(StateVariable obj, Designator param) {
-    xw.wa(obj);
+  protected Void visitStateVariable(StateVariable obj, Void param) {
+    xw.wa(obj.getName(), getId(obj));
     xw.wr(": ");
     visit(obj.getType(), null);
     xw.wr(";");
@@ -904,46 +897,45 @@ public class RXmlPrinter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitFuncPrivate(FuncPrivateVoid obj, Designator param) {
+  protected Void visitFuncPrivate(FuncPrivateVoid obj, Void param) {
     throw new RuntimeException("not yet implemented");
   }
 
   @Override
-  protected Void visitFuncPrivateRet(FuncPrivateRet obj, Designator param) {
+  protected Void visitFuncPrivateRet(FuncPrivateRet obj, Void param) {
     xw.sectionSeparator();
-    printFunc(obj, param);
+    printFunc(obj, false);
     return null;
   }
 
   @Override
-  protected Void visitFuncPrivateVoid(FuncPrivateVoid obj, Designator param) {
+  protected Void visitFuncPrivateVoid(FuncPrivateVoid obj, Void param) {
     xw.sectionSeparator();
-    printFunc(obj, param);
+    printFunc(obj, false);
     return null;
   }
 
   @Override
-  protected Void visitFuncProtRet(FuncProtRet obj, Designator param) {
-    printFunc(obj, param);
+  protected Void visitFuncProtRet(FuncProtRet obj, Void param) {
+    printFunc(obj, false);
     return null;
   }
 
   @Override
-  protected Void visitFuncProtVoid(FuncProtVoid obj, Designator param) {
-    printFunc(obj, param);
+  protected Void visitFuncProtVoid(FuncProtVoid obj, Void param) {
+    printFunc(obj, false);
     return null;
   }
 
   @Override
-  protected Void visitFuncGlobal(FuncGlobal obj, Designator param) {
+  protected Void visitFuncGlobal(FuncGlobal obj, Void param) {
     // xw.sectionSeparator();
-    assert (param == null);
-    printFunc(obj, new Designator());
+    printFunc(obj, false);
     return null;
   }
 
   @Override
-  protected Void visitFuncEntryExit(FuncEntryExit obj, Designator param) {
+  protected Void visitFuncEntryExit(FuncEntryExit obj, Void param) {
     return null; // it is written otherwise
   }
 
