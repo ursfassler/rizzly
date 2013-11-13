@@ -64,8 +64,7 @@ public class FunToEvlType extends NullTraverser<Type, String> {
 
   @Override
   protected Type visitAnyType(AnyType obj, String param) {
-    RError.err(ErrorType.Fatal, obj.getInfo(), "unresolved any type: " + obj);
-    return null;
+    return new evl.type.special.AnyType();
   }
 
   @Override

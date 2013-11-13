@@ -105,6 +105,7 @@ import evl.type.composed.NamedElementType;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionSelector;
 import evl.type.composed.UnionType;
+import evl.type.special.AnyType;
 import evl.type.special.ComponentType;
 import evl.type.special.IntegerType;
 import evl.type.special.NaturalType;
@@ -493,10 +494,14 @@ public abstract class Traverser<R, P> {
       return visitIntegerType((IntegerType) obj, param);
     } else if (obj instanceof PointerType) {
       return visitPointerType((PointerType) obj, param);
+    } else if (obj instanceof AnyType) {
+      return visitAnyType((AnyType) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
   }
+
+  abstract protected R visitAnyType(AnyType obj, P param);
 
   abstract protected R visitWhileStmt(WhileStmt obj, P param);
 

@@ -18,6 +18,7 @@ import fun.function.impl.FuncProtVoid;
 import fun.statement.Assignment;
 import fun.statement.Statement;
 import fun.statement.VarDefStmt;
+import fun.type.base.AnyType;
 import fun.variable.Constant;
 import fun.variable.FuncVariable;
 import fun.variable.TemplateParameter;
@@ -234,9 +235,7 @@ public class BaseParser extends Parser {
     if (consumeIfEqual(TokenType.COLON)) {
       type = expr().parseRef();
     } else {
-      expect(TokenType.COLON); // untyped constants not yet implemented
-      // type = new RefUnlinked(id.getInfo(), UnknownType.NAME);
-      type = null;
+      type = new Reference(id.getInfo(), AnyType.NAME);
     }
     expect(TokenType.EQUAL);
     Expression value = expr().parse();

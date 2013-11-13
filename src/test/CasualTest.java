@@ -204,6 +204,11 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  public void constdef2() {
+    compile("constdef2", TestSteps.COMPILE_TO_PIR, false, false);
+  }
+
+  @Test
   public void extConst() {
     compile("extConst", TestSteps.COMPILE_TO_PIR, false, false);
   }

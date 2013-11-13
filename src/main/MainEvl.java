@@ -73,6 +73,7 @@ import evl.traverser.CHeaderWriter;
 import evl.traverser.CallgraphMaker;
 import evl.traverser.ClassGetter;
 import evl.traverser.CompInstantiator;
+import evl.traverser.ConstTyper;
 import evl.traverser.ConstantPropagation;
 import evl.traverser.DepCollector;
 import evl.traverser.DepGraph;
@@ -125,6 +126,7 @@ public class MainEvl {
 
     IntroduceConvert.process(aclasses, kb);
     OpenReplace.process(aclasses, kb);
+    ConstTyper.process(aclasses, kb);
 
     PrettyPrinter.print(aclasses, debugdir + "convert.rzy", true);
 

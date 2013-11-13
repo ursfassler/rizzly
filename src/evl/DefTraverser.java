@@ -92,6 +92,7 @@ import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionSelector;
 import evl.type.composed.UnionType;
+import evl.type.special.AnyType;
 import evl.type.special.ComponentType;
 import evl.type.special.IntegerType;
 import evl.type.special.NaturalType;
@@ -736,6 +737,11 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   protected R visitFuncIfaceInRet(FuncIfaceInRet obj, P param) {
     visitItr(obj.getParam(), param);
     visit(obj.getRet(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitAnyType(AnyType obj, P param) {
     return null;
   }
 

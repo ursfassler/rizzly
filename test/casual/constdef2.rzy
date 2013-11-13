@@ -1,0 +1,18 @@
+
+const
+  Answer = 42;
+
+component
+  Constdef2
+
+    implementation elementary
+
+    const
+      BlaBla = 23;
+
+    function foo()
+      bar : R{0,99} = Answer;
+    end
+
+  end
+
