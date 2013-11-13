@@ -1,0 +1,32 @@
+component
+  Sub
+    input
+      in();
+    output
+      out();
+      
+  implementation composition
+    connection
+      in -> out;
+      
+  end
+
+  Err2
+    input
+      in();
+    output
+      out();
+
+  implementation composition
+    
+    component
+      a : Sub;
+      
+    connection
+      in -> a.in;     // prevent error throwing
+      a.out -> out;   // prevent error throwing
+      
+      a.in -> out;    // ERROR connect sub-input to output
+
+  end
+

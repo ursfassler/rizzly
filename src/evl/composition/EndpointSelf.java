@@ -32,4 +32,9 @@ final public class EndpointSelf extends Endpoint {
     return new Designator(iface.getName());
   }
 
+  @Override
+  public String toString() {
+    return iface.getName();
+  }
+
 }

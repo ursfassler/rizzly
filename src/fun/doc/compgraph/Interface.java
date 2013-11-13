@@ -35,9 +35,12 @@ public class Interface {
 
   public int getYOffset(Connection con) {
     int idx = connection.indexOf(con);
-    assert (idx >= 0);
-    int h = HEIGHT * (idx + 1) / (connection.size() + 1);
-    return h - HEIGHT / 2;
+    if (idx >= 0) {
+      int h = HEIGHT * (idx + 1) / (connection.size() + 1);
+      return h - HEIGHT / 2;
+    } else {
+      return -1;
+    }
   }
 
 }

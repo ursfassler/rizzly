@@ -14,6 +14,11 @@ public class ErrIfaceTest extends ErrorTest {
   }
 
   @Test
+  public void err2() {
+    testForError("err2", "Err2", "can not connect from input");
+  }
+
+  @Test
   public void err3() {
     testForError("err3", "Err3", "Interface a.funcB not connected");
   }

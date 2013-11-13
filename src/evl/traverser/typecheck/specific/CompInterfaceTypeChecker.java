@@ -3,12 +3,15 @@ package evl.traverser.typecheck.specific;
 import java.util.List;
 
 import common.Direction;
+import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
 import evl.Evl;
 import evl.NullTraverser;
 import evl.composition.Connection;
+import evl.composition.Endpoint;
+import evl.composition.EndpointSelf;
 import evl.composition.ImplComposition;
 import evl.function.FuncIface;
 import evl.function.FuncIfaceIn;
@@ -154,9 +157,41 @@ public class CompInterfaceTypeChecker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitConnection(Connection obj, Void param) {
-    FuncIface srcType = obj.getEndpoint(Direction.in).getIfaceUse();
-    FuncIface dstType = obj.getEndpoint(Direction.out).getIfaceUse();
+    Endpoint srcEp = obj.getEndpoint(Direction.in);
+    Endpoint dstEp = obj.getEndpoint(Direction.out);
+    FuncIface srcType = srcEp.getIfaceUse();
+    FuncIface dstType = dstEp.getIfaceUse();
     // TODO check if functions are compatible
+
+    boolean srcSelf = srcEp instanceof EndpointSelf;
+    boolean dstSelf = dstEp instanceof EndpointSelf;
+    Direction srcDir = srcType instanceof FuncIfaceIn ? Direction.in : Direction.out;
+    Direction dstDir = dstType instanceof FuncIfaceIn ? Direction.in : Direction.out;
+
+    if (srcSelf && dstSelf) {
+      checkDir(srcDir, Direction.in, Direction.in, srcEp.getInfo());
+      checkDir(dstDir, Direction.out, Direction.out, dstEp.getInfo());
+    } else if (!srcSelf && dstSelf) {
+      checkDir(srcDir, Direction.out, Direction.in, srcEp.getInfo());
+      checkDir(dstDir, Direction.out, Direction.out, dstEp.getInfo());
+    } else if (srcSelf && !dstSelf) {
+      checkDir(srcDir, Direction.in, Direction.in, srcEp.getInfo());
+      checkDir(dstDir, Direction.in, Direction.out, dstEp.getInfo());
+    } else {
+      assert (!srcSelf && !dstSelf);
+      checkDir(srcDir, Direction.out, Direction.in, srcEp.getInfo());
+      checkDir(dstDir, Direction.in, Direction.out, dstEp.getInfo());
+    }
+
     return null;
   }
+
+  private void checkDir(Direction is, Direction should, Direction ep, ElementInfo info) {
+    if (is != should) {
+      String eps = ep == Direction.in ? "from" : "to";
+      String iss = is == Direction.in ? "input" : "output";
+      RError.err(ErrorType.Error, info, "can not connect " + eps + " " + iss);
+    }
+  }
+
 }

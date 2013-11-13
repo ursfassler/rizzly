@@ -47,4 +47,9 @@ public class EndpointSub extends Endpoint {
     return new Designator(comp.getName(), iface);
   }
 
+  @Override
+  public String toString() {
+    return comp.getName() + "." + iface;
+  }
+
 }

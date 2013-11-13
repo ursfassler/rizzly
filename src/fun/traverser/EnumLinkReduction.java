@@ -41,7 +41,7 @@ public class EnumLinkReduction extends DefTraverser<Void, Void> {
           RError.err(ErrorType.Error, obj.getInfo(), "Expected named offset, got: " + next.getClass().getCanonicalName());
         }
         Fun elem = kc.find(item, ((RefName) next).getName());
-        if( elem == null ){
+        if (elem == null) {
           RError.err(ErrorType.Error, obj.getInfo(), "Element not found: " + ((RefName) next).getName());
         }
         if (elem instanceof EnumElement) {

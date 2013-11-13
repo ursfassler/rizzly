@@ -9,6 +9,7 @@ import common.Designator;
 import common.Metadata;
 
 final public class SubComponent extends Component {
+  private static final Point ErrorPoint = new Point(0, 0);
   final private String instname;
   final private Point pos = new Point();
 
@@ -58,27 +59,43 @@ final public class SubComponent extends Component {
 
   @Override
   public Point getSrcPort(Connection con) {
-    assert (getOutEdges().contains(con));
+    if (!getOutEdges().contains(con)) {
+      return ErrorPoint;
+    }
     int x;
     int index;
     x = SUBCOMP_WIDTH / 2;
     index = output.indexOf(con.getSrc());
-    assert (index >= 0);
+    if (index < 0) {
+      return ErrorPoint;
+    }
     int y = pos.y + index * Y_IFACE_DIST + Y_SUBC_IFACE_OFFSET;
-    y += con.getSrc().getYOffset(con);
+    int yOffset = con.getSrc().getYOffset(con);
+    if (yOffset < 0) {
+      return ErrorPoint;
+    }
+    y += yOffset;
     return new Point(pos.x + x, y);
   }
 
   @Override
   public Point getDstPort(Connection con) {
-    assert (getInEdges().contains(con));
+    if (!getInEdges().contains(con)) {
+      return ErrorPoint;
+    }
     int x;
     int index;
     x = -SUBCOMP_WIDTH / 2;
     index = input.indexOf(con.getDst());
-    assert (index >= 0);
+    if (index < 0) {
+      return ErrorPoint;
+    }
     int y = pos.y + index * Y_IFACE_DIST + Y_SUBC_IFACE_OFFSET;
-    y += con.getDst().getYOffset(con);
+    int yOffset = con.getDst().getYOffset(con);
+    if (yOffset < 0) {
+      return ErrorPoint;
+    }
+    y += yOffset;
     return new Point(pos.x + x, y);
   }
 }
