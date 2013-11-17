@@ -167,9 +167,9 @@ public class IoCheck extends NullTraverser<Void, Void> {
   @Override
   protected Void visitFuncIfaceOutRet(FuncIfaceOutRet obj, Void param) {
     assert (writes.get(obj) == false);
-    assert (reads.get(obj) == true);
+    assert (reads.get(obj) == false);
     assert (outputs.get(obj) == false);
-    assert (inputs.get(obj) == false);
+    assert (inputs.get(obj) == true);
     return null;
   }
 

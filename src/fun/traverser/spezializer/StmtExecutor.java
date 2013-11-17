@@ -9,7 +9,6 @@ import fun.NullTraverser;
 import fun.expression.AnyValue;
 import fun.expression.BoolValue;
 import fun.expression.Expression;
-import fun.expression.reference.Reference;
 import fun.function.impl.FuncGlobal;
 import fun.knowledge.KnowledgeBase;
 import fun.statement.Assignment;
@@ -48,7 +47,7 @@ public class StmtExecutor extends NullTraverser<Expression, Memory> {
       Variable var = func.getParam().getList().get(i);
       Expression val = actparam.get(i);
       memory.createVar(var);
-      memory.setInt(var, val);
+      memory.set(var, val);
     }
 
     StmtExecutor executor = new StmtExecutor(kb);
@@ -64,12 +63,6 @@ public class StmtExecutor extends NullTraverser<Expression, Memory> {
   private boolean toBool(Expression expr) {
     assert (expr instanceof BoolValue);
     return ((BoolValue) expr).isValue();
-  }
-
-  private void setVariable(Reference left, Expression val, Memory param) {
-    assert (left.getOffset().isEmpty());
-    assert (left.getLink() instanceof Variable);
-    param.setInt((Variable) left.getLink(), val);
   }
 
   @Override
@@ -107,8 +100,19 @@ public class StmtExecutor extends NullTraverser<Expression, Memory> {
 
   @Override
   protected Expression visitAssignment(Assignment obj, Memory param) {
+    Variable var = (Variable) obj.getLeft().getLink();
     Expression rhs = exeval(obj.getRight(), param);
-    setVariable(obj.getLeft(), rhs, param);
+
+    /*
+     * Expression value = param.get(var); Expression base = value; for (RefItem itr : obj.getLeft().getOffset()) { base
+     * = ElementGetter.INSTANCE.visit(itr,base); } Expression elem = base;
+     * 
+     * value = ElemReplacer.replace(value, elem, rhs);
+     * 
+     * param.set(var, value);
+     */
+    param.set(var, rhs);
+
     return null;
   }
 

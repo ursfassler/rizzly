@@ -72,7 +72,7 @@ public class CallgraphMaker extends DefTraverser<Void, Evl> {
 
       Evl item = obj.getLink();
       for (RefItem itr : obj.getOffset()) {
-        item = RefChecker.process(itr, item, target, kb);
+        item = RefGetter.process(itr, item, target, kb);
       }
 
       for (FunctionBase head : target) {
@@ -85,17 +85,17 @@ public class CallgraphMaker extends DefTraverser<Void, Evl> {
 
 }
 
-class RefChecker extends NullTraverser<Evl, Evl> {
+class RefGetter extends NullTraverser<Evl, Evl> {
   private Set<FunctionBase> target;
   private KnowChild kfc;
   private KnowBaseItem kbi;
 
   static public Evl process(RefItem refitm, Evl last, Set<FunctionBase> target, KnowledgeBase kb) {
-    RefChecker refChecker = new RefChecker(kb, target);
+    RefGetter refChecker = new RefGetter(kb, target);
     return refChecker.traverse(refitm, last);
   }
 
-  public RefChecker(KnowledgeBase kb, Set<FunctionBase> target) {
+  public RefGetter(KnowledgeBase kb, Set<FunctionBase> target) {
     super();
     this.target = target;
     this.kfc = kb.getEntry(KnowChild.class);
@@ -124,7 +124,7 @@ class RefChecker extends NullTraverser<Evl, Evl> {
 
   @Override
   protected Evl visitRefName(RefName obj, Evl param) {
-    return kfc.get(param, obj.getName());
+    return kfc.get(param, obj.getName(), obj.getInfo());
   }
 
   @Override

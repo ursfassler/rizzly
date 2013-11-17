@@ -35,6 +35,8 @@ import fun.other.Named;
 import fun.other.Namespace;
 import fun.other.RizzlyFile;
 import fun.other.SymbolTable;
+import fun.traverser.CompLinkReduction;
+import fun.traverser.ConstEval;
 import fun.traverser.DeAlias;
 import fun.traverser.EnumLinkReduction;
 import fun.traverser.Linker;
@@ -100,6 +102,7 @@ public class MainFun {
     NamespaceLinkReduction.process(classes);
     StateLinkReduction.process(classes, kb);
     EnumLinkReduction.process(classes, kb);
+    CompLinkReduction.process(classes);
 
     print(classes, debugdir + "linkreduced.rzy");
 
@@ -197,6 +200,9 @@ public class MainFun {
       }
 
       Named nroot = Specializer.process((Generator) root, new ArrayList<Expression>(), root.getInfo(), kb);
+
+      ConstEval.process(classes, kb);
+
       return (Component) nroot;
     }
   }

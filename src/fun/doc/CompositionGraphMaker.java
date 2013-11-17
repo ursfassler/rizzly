@@ -14,7 +14,6 @@ import fun.doc.compgraph.Component;
 import fun.doc.compgraph.Interface;
 import fun.doc.compgraph.SubComponent;
 import fun.doc.compgraph.WorldComp;
-import fun.expression.Expression;
 import fun.expression.reference.RefName;
 import fun.expression.reference.Reference;
 import fun.function.FunctionHeader;
@@ -43,7 +42,7 @@ public class CompositionGraphMaker {
     }
 
     for (CompUse use : impl.getComponent()) {
-      fun.other.Component comptype = getComp(use.getType());
+      fun.other.Component comptype = (fun.other.Component) use.getType().getLink();
       Designator subpath = kp.get(comptype);
       SubComponent sub = new SubComponent(use.getName(), subpath, comptype.getName(), use.getInfo().getMetadata(METADATA_KEY));
 
@@ -95,11 +94,6 @@ public class CompositionGraphMaker {
     assert (!ifacemap.containsKey(name));
     ifacemap.put(name, niface);
     return niface;
-  }
-
-  private static fun.other.Component getComp(Expression expr) {
-    Reference reference = (Reference) expr;
-    return (fun.other.Component) reference.getLink();
   }
 
 }

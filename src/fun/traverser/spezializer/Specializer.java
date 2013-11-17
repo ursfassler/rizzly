@@ -28,6 +28,7 @@ import fun.traverser.TypeEvalReplacer;
 import fun.type.Type;
 import fun.type.base.AnyType;
 import fun.type.base.IntegerType;
+import fun.type.base.NaturalType;
 import fun.type.template.BuiltinTemplate;
 import fun.type.template.Range;
 import fun.type.template.TypeType;
@@ -79,6 +80,12 @@ public class Specializer {
         // TODO check type
       } else if (type instanceof IntegerType) {
         Number num = (Number) ExprEvaluator.evaluate(acarg, new Memory(), kb);
+        evald = num;
+      } else if (type instanceof NaturalType) {
+        Number num = (Number) ExprEvaluator.evaluate(acarg, new Memory(), kb);
+        if (num.getValue().compareTo(BigInteger.ZERO) < 0) {
+          RError.err(ErrorType.Error, acarg.getInfo(), "Value for Natural type has to be >= 0");
+        }
         evald = num;
       } else if (type instanceof AnyType) {
         evald = (Type) EvalTo.any((Reference) acarg, kb);
@@ -132,7 +139,7 @@ public class Specializer {
 
       if (val instanceof Expression) { // TODO ok?
         mem.createVar(var);
-        mem.setInt(var, (Expression) val);
+        mem.set(var, (Expression) val);
       }
     }
 

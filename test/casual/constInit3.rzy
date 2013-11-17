@@ -1,0 +1,33 @@
+
+
+function fibArray{ till: Natural }():Array{till,Natural}
+  res : Array{till,Natural};
+  
+  res[0] := 0;
+
+  if till >= 1 then
+    res[1] := 1;
+  end
+
+  i: Natural = 2;
+  while i < till do
+    res[i] := res[i-1] + res[i-2];
+  end
+  
+  return res;
+end
+
+component
+  ConstInit3
+    input
+      get( idx: R{0,10} ):R{0,1000*1000};
+      
+  implementation elementary
+    const
+      Fib = fibArray{10}();
+      
+    function get( idx: R{0,10} ):R{0,1000*1000}
+      return Fib[idx];
+    end
+  end      
+

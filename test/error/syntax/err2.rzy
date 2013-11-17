@@ -1,0 +1,12 @@
+
+component
+  Foo{Bar:Natural}
+  implementation elementary
+  end
+
+  Err2
+  implementation composition
+    component
+      foo: Foo;  // no template parameter
+  end
+

@@ -1,0 +1,18 @@
+
+
+component
+  Err1
+    input
+      in();
+      
+    output
+      out();
+    
+  implementation elementary
+    
+    function in()
+      out.foo();      // .foo does not exist
+    end
+    
+  end
+

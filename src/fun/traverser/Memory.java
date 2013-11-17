@@ -10,44 +10,48 @@ import fun.expression.reference.Reference;
 import fun.variable.Variable;
 
 public class Memory {
-  private Map<Variable, Expression> varInt = new HashMap<Variable, Expression>();
+  private Map<Variable, Expression> values = new HashMap<Variable, Expression>();
 
   public Memory() {
   }
 
   public Memory(Memory param) {
-    varInt.putAll(param.varInt);
+    values.putAll(param.values);
   }
 
   public void createVar(Variable var) {
     assert (var != null);
-    if (varInt.containsKey(var)) {
+    if (values.containsKey(var)) {
       RError.err(ErrorType.Fatal, var.getInfo(), "Variable exists: " + var);
     }
-    varInt.put(var, null);
+
+    // assert( var.getType().getOffset().isEmpty() );
+    // Type type = (Type) var.getType().getLink();
+    // values.put(var, ValueCreator.INSTANCE.traverse(type, null));
+    values.put(var, null);
   }
 
-  public void setInt(Variable var, Expression value) {
+  public void set(Variable var, Expression value) {
     assert (var != null);
-    assert (varInt.containsKey(var));
+    assert (values.containsKey(var));
     assert (!(value instanceof Reference));
-    varInt.put(var, value);
+    values.put(var, value);
   }
 
-  public Expression getInt(Variable var) {
+  public Expression get(Variable var) {
     assert (var != null);
-    assert (varInt.containsKey(var));
-    Expression expr = varInt.get(var);
+    assert (values.containsKey(var));
+    Expression expr = values.get(var);
     assert (expr != null);
     return expr;
   }
 
   public boolean contains(Variable name) {
-    return varInt.containsKey(name);
+    return values.containsKey(name);
   }
 
   public Variable find(String name) {
-    for (Variable var : varInt.keySet()) {
+    for (Variable var : values.keySet()) {
       if (var.getName().equals(name)) {
         return var;
       }

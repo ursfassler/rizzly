@@ -30,6 +30,7 @@ import fun.traverser.Memory;
 import fun.variable.ConstGlobal;
 import fun.variable.FuncVariable;
 import fun.variable.TemplateParameter;
+import fun.variable.Variable;
 
 public class ExprEvaluator extends NullTraverser<Expression, Memory> {
   private final KnowledgeBase kb;
@@ -52,13 +53,21 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
     }
   }
 
-  private Fun executeRef(Fun obj, RefItem param) {
+  private Fun executeRef(Fun obj, RefItem param, Memory memory) {
     if (param instanceof RefTemplCall) {
       assert (obj instanceof Generator);
       return Specializer.process((Generator) obj, ((RefTemplCall) param).getActualParameter(), param.getInfo(), kb);
     } else if (param instanceof RefCall) {
       assert (obj instanceof FuncGlobal);
       return StmtExecutor.process((FuncGlobal) obj, ((RefCall) param).getActualParameter(), new Memory(), kb);
+    } else if (param instanceof RefIndex) {
+      Variable var = (Variable) obj;
+      Expression value = memory.get(var);
+
+      Expression idx = visit(((RefIndex) param).getIndex(), memory);
+      Expression elem = ElementGetter.INSTANCE.traverse(idx, value);
+
+      return elem;
     } else {
       throw new RuntimeException("Dont know what to do with: " + param.getClass().getCanonicalName());
     }
@@ -67,13 +76,13 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
   @Override
   protected Expression visitFuncVariable(FuncVariable obj, Memory param) {
     assert (param.contains(obj));
-    return param.getInt(obj);
+    return param.get(obj);
   }
 
   @Override
   protected Expression visitTemplateParameter(TemplateParameter obj, Memory param) {
     assert (param.contains(obj));
-    return param.getInt(obj);
+    return param.get(obj);
   }
 
   @Override
@@ -102,7 +111,7 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
     Fun item = obj.getLink();
 
     for (RefItem itr : obj.getOffset()) {
-      item = executeRef(item, itr);
+      item = executeRef(item, itr, param);
     }
 
     return visit(item, param);

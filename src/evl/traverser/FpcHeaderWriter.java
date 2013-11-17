@@ -24,6 +24,7 @@ import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
+import evl.type.base.BooleanType;
 import evl.type.base.EnumDefRef;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
@@ -194,6 +195,11 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
       param.nl();
 
     }
+  }
+
+  @Override
+  protected Void visitBooleanType(BooleanType obj, StreamWriter param) {
+    return null;
   }
 
   private static BigInteger getPos(BigInteger value) {

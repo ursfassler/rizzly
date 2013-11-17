@@ -3,6 +3,7 @@ package fun.traverser;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 
 import common.Designator;
@@ -23,6 +24,8 @@ import fun.function.impl.FuncProtRet;
 import fun.function.impl.FuncProtVoid;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.State;
+import fun.hfsm.StateComposite;
+import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
 import fun.other.ImplElementary;
 import fun.other.Named;
@@ -38,6 +41,7 @@ import fun.type.template.RangeTemplate;
 
 public class Linker extends DefTraverser<Void, SymbolTable> {
   final private HashMap<Designator, RizzlyFile> files = new HashMap<Designator, RizzlyFile>();
+  final private HashMap<State, SymbolTable> stateNames = new HashMap<State, SymbolTable>();
 
   public Linker(Collection<RizzlyFile> fileList) {
     for (RizzlyFile file : fileList) {
@@ -180,7 +184,40 @@ public class Linker extends DefTraverser<Void, SymbolTable> {
 
     param.addAll(obj.getVariable().getList());
     param.addAll(obj.getItemList().getList());
+
+    assert (!stateNames.containsKey(obj));
+    stateNames.put(obj, param);
+
     return super.visitState(obj, param);
+  }
+
+  @Override
+  protected Void visitStateSimple(StateSimple obj, SymbolTable param) {
+    visitItr(obj.getVariable(), param);
+    visit(obj.getEntryFuncRef(), param);
+    visit(obj.getExitFuncRef(), param);
+
+    List<Transition> trans = obj.getItemList().getItems(Transition.class);
+    List<Named> rest = new LinkedList<Named>(obj.getItemList().getList());
+    rest.removeAll(trans);
+    visitItr(rest, param);
+    visitItr(trans, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitStateComposite(StateComposite obj, SymbolTable param) {
+    visitItr(obj.getVariable(), param);
+    visit(obj.getInitial(), param);
+    visit(obj.getEntryFuncRef(), param);
+    visit(obj.getExitFuncRef(), param);
+
+    List<Transition> trans = obj.getItemList().getItems(Transition.class);
+    List<Named> rest = new LinkedList<Named>(obj.getItemList().getList());
+    rest.removeAll(trans);
+    visitItr(rest, param);
+    visitItr(trans, param);
+    return null;
   }
 
   @Override
@@ -193,7 +230,13 @@ public class Linker extends DefTraverser<Void, SymbolTable> {
     param = new SymbolTable(param);
     param.addAll(obj.getParam().getList());
 
-    visit(obj.getGuard(), param);    // FIXME do this in the source state space
+    // get context from src state and add event arguments
+    SymbolTable srcNames = stateNames.get(obj.getSrc().getLink());
+    assert (srcNames != null);
+    srcNames = new SymbolTable(srcNames);
+    srcNames.addAll(obj.getParam().getList());
+    visit(obj.getGuard(), srcNames);
+
     visit(obj.getBody(), param);
     return null;
   }

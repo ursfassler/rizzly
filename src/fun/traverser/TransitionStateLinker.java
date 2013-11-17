@@ -16,8 +16,8 @@ import fun.hfsm.Transition;
 /**
  * Links all src/dst states of all transitions in a hfsm implementation.
  * 
- * This is needed since the visibility of states is different. A transition can only come from / go to a state that is
- * on the same or a deeper level than the transition is defined.
+ * This is needed since the visibility of states is different than other rules. A transition can only come from / go to
+ * a state that is on the same or a deeper level than the transition is defined.
  * 
  * @author urs
  * 

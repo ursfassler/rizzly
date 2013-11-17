@@ -8,10 +8,12 @@ import evl.knowledge.KnowledgeBase;
 import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.special.AnyType;
+import evl.type.special.IntegerType;
+import evl.type.special.NaturalType;
 import evl.variable.Constant;
 
 /**
- * Sets types for all constants
+ * Sets and constrains types for all constants
  * 
  */
 public class ConstTyper extends DefTraverser<Void, Void> {
@@ -24,19 +26,17 @@ public class ConstTyper extends DefTraverser<Void, Void> {
 
   public static void process(Evl evl, KnowledgeBase kb) {
     KnowBaseItem kbi = kb.getEntry(KnowBaseItem.class);
-
-    if (kbi.findItem(AnyType.NAME) == null) {
-      // no open type used
-      return;
-    }
-
     ConstTyper replace = new ConstTyper(kb);
     replace.traverse(evl, null);
   }
 
+  private static boolean isOpenType(Type type) {
+    return ((type instanceof AnyType) || (type instanceof NaturalType) || (type instanceof IntegerType));
+  }
+
   @Override
   protected Void visitConstant(Constant obj, Void param) {
-    if (obj.getType().getRef() instanceof AnyType) {
+    if (isOpenType(obj.getType().getRef())) {
       Type ct = kt.get(obj.getDef());
       obj.setType(new TypeRef(obj.getInfo(), ct));
     }

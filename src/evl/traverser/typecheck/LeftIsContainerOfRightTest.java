@@ -20,6 +20,7 @@ import evl.type.base.StringType;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
 import evl.type.special.IntegerType;
+import evl.type.special.NaturalType;
 import evl.type.special.VoidType;
 
 public class LeftIsContainerOfRightTest extends NullTraverser<Boolean, Type> {
@@ -93,6 +94,11 @@ public class LeftIsContainerOfRightTest extends NullTraverser<Boolean, Type> {
     } else {
       return false;
     }
+  }
+
+  @Override
+  protected Boolean visitNaturalType(NaturalType obj, Type param) {
+    return isDerivativeOf(obj.getClass(), param);
   }
 
   @Override

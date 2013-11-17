@@ -76,7 +76,7 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
   private Range getRange(Expression expr) {
     Type lhs = kt.get(expr);
     if (!(lhs instanceof RangeType)) {
-      RError.err(ErrorType.Fatal, expr.getInfo(), "Expected range type");
+      RError.err(ErrorType.Fatal, expr.getInfo(), "Expected range type, got " + lhs.getName());
       return null;
     } else {
       return ((RangeType) lhs).getNumbers();
@@ -92,12 +92,12 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
     return ret;
   }
 
-  public static int getAsInt(BigInteger value, String text) {
+  public static int getAsInt(BigInteger value, String errtext) {
     if (value.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
-      RError.err(ErrorType.Error, "value to big, needs to be smaller than " + Integer.MAX_VALUE + " in " + text);
+      RError.err(ErrorType.Error, "value to big, needs to be smaller than " + Integer.MAX_VALUE + " in " + errtext);
     }
     if (value.compareTo(BigInteger.valueOf(Integer.MIN_VALUE)) < 0) {
-      RError.err(ErrorType.Error, "value to small, needs to be bigger than " + Integer.MIN_VALUE + " in " + text);
+      RError.err(ErrorType.Error, "value to small, needs to be bigger than " + Integer.MIN_VALUE + " in " + errtext);
     }
     return value.intValue();
   }

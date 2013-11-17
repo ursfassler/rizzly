@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import common.Direction;
+import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
@@ -37,19 +38,19 @@ public class KnowChild extends KnowledgeEntry {
     kct = new KnowChildTraverser();
   }
 
-  public Evl get(Evl sub, String name) {
-    return getOrFind(sub, name, true);
+  public Evl get(Evl sub, String name, ElementInfo info) {
+    return getOrFind(sub, name, true, info);
   }
 
   public Evl find(Evl sub, String name) {
-    return getOrFind(sub, name, false);
+    return getOrFind(sub, name, false, null);
   }
 
-  private Evl getOrFind(Evl sub, String name, boolean raiseError) {
+  private Evl getOrFind(Evl sub, String name, boolean raiseError, ElementInfo info) {
     Set<Named> rset = kct.traverse(sub, name);
     if (rset.isEmpty()) {
       if (raiseError) {
-        RError.err(ErrorType.Fatal, sub.getInfo(), "Name not found: " + name);
+        RError.err(ErrorType.Fatal, info, "Name not found: " + name);
       }
       return null;
     }
@@ -57,7 +58,7 @@ public class KnowChild extends KnowledgeEntry {
       return rset.iterator().next();
     }
     if (raiseError) {
-      RError.err(ErrorType.Fatal, sub.getInfo(), "Name not unique: " + name);
+      RError.err(ErrorType.Fatal, info, "Name not unique: " + name);
     }
     return null;
   }
@@ -76,12 +77,13 @@ class KnowChildTraverser extends NullTraverser<Set<Named>, String> {
 
   @Override
   protected Set<Named> visitDefault(Evl obj, String param) {
-    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+    // RError.err(ErrorType.Warning, obj.getInfo(), "Element can not have a named child");
+    return new HashSet<Named>();
   }
 
   @Override
   protected Set<Named> visitPointerType(PointerType obj, String param) {
-    RError.err(ErrorType.Fatal, obj.getInfo(), "PointerType can not have a named child");
+    // RError.err(ErrorType.Fatal, obj.getInfo(), "PointerType can not have a named child");
     return null;
   }
 

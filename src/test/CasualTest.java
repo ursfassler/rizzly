@@ -164,6 +164,16 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  public void constInit2() {
+    compile("constInit2", TestSteps.COMPILE_TO_LLVM, false, false);
+  }
+
+  @Test
+  public void constInit3() {
+    compile("constInit3", TestSteps.EXECUTE, false, false);
+  }
+
+  @Test
   public void alarmController() {
     compile("alarmController", TestSteps.COMPILE_TO_ASM, false, false);
   }
