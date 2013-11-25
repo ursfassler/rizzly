@@ -161,7 +161,13 @@ public class CompInterfaceTypeChecker extends NullTraverser<Void, Void> {
     Endpoint dstEp = obj.getEndpoint(Direction.out);
     FuncIface srcType = srcEp.getIfaceUse();
     FuncIface dstType = dstEp.getIfaceUse();
-    // TODO check if functions are compatible
+
+    Type st = kt.get(srcType);
+    Type dt = kt.get(dstType);
+
+    if (!LeftIsContainerOfRightTest.process(dt, st, kb)) {
+      RError.err(ErrorType.Error, obj.getInfo(), "Invalid connection: " + st + " -> " + dt);
+    }
 
     boolean srcSelf = srcEp instanceof EndpointSelf;
     boolean dstSelf = dstEp instanceof EndpointSelf;

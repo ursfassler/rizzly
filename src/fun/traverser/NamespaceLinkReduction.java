@@ -8,8 +8,10 @@ import fun.expression.reference.DummyLinkTarget;
 import fun.expression.reference.RefItem;
 import fun.expression.reference.RefName;
 import fun.expression.reference.Reference;
+import fun.knowledge.KnowFunChild;
 import fun.other.Named;
 import fun.other.Namespace;
+import fun.other.RizzlyFile;
 
 /**
  * Follows offset when link is to namespace until it finds a different object.
@@ -37,6 +39,16 @@ public class NamespaceLinkReduction extends DefTraverser<Void, Void> {
       }
       RefName name = (RefName) next;
       item = ((Namespace) item).find(name.getName());
+      assert (item != null); // type checker should find it?
+    }
+    if (item instanceof RizzlyFile) {
+      RefItem next = obj.getOffset().pop();
+      if (!(next instanceof RefName)) {
+        RError.err(ErrorType.Error, obj.getInfo(), "Expected named offset, got: " + next.getClass().getCanonicalName());
+      }
+      RefName name = (RefName) next;
+      KnowFunChild kfc = new KnowFunChild();
+      item = kfc.get(item, name.getName());
       assert (item != null); // type checker should find it?
     }
     obj.setLink(item);

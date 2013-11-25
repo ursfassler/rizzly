@@ -310,4 +310,18 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
 
     return new evl.hfsm.Transition(obj.getInfo(), obj.getName(), (State) src.getLink(), (State) dst.getLink(), evt, guard, args, nbody);
   }
+
+  static public fun.type.Type getRefType(fun.expression.reference.Reference ref) {
+    if (ref.getLink() instanceof fun.type.Type) {
+      if (!ref.getOffset().isEmpty()) {
+        RError.err(ErrorType.Error, ref.getOffset().get(0).getInfo(), "Type reference should not have offset anymore");
+      }
+      fun.type.Type nt = (fun.type.Type) ref.getLink();
+      return nt;
+    } else {
+      RError.err(ErrorType.Hint, ref.getLink().getInfo(), "Definition was here");
+      RError.err(ErrorType.Error, ref.getInfo(), "Need type");
+      return null;
+    }
+  }
 }

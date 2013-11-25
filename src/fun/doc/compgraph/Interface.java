@@ -4,8 +4,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Interface {
-  final static public int WIDTH = 46;
-  final static public int HEIGHT = 10;
+  final static public double WIDTH = 46;
+  final static public double HEIGHT = 10;
   final private Component owner;
   final private String instname;
   final private List<Connection> connection = new ArrayList<Connection>();
@@ -33,13 +33,13 @@ public class Interface {
     return owner.toString() + "." + instname;
   }
 
-  public int getYOffset(Connection con) {
+  public double getYOffset(Connection con) {
     int idx = connection.indexOf(con);
     if (idx >= 0) {
-      int h = HEIGHT * (idx + 1) / (connection.size() + 1);
+      double h = HEIGHT * (idx + 1) / (connection.size() + 1);
       return h - HEIGHT / 2;
     } else {
-      return -1;
+      return Double.NaN;
     }
   }
 

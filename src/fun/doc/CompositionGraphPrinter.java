@@ -8,7 +8,7 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import util.Point;
+import util.PointF;
 
 import common.Designator;
 
@@ -45,8 +45,8 @@ public class CompositionGraphPrinter {
     // root.setAttribute("version", "1.1");
     // root.setAttribute("baseProfile", "tiny");
 
-    root.setAttribute("width", Integer.toString((comp.getSize().x + 2) * SCALE));
-    root.setAttribute("height", Integer.toString((comp.getSize().y + 2) * SCALE));
+    root.setAttribute("width", Double.toString((comp.getSize().x + 2) * SCALE));
+    root.setAttribute("height", Double.toString((comp.getSize().y + 2) * SCALE));
     // root.setAttribute("width", Integer.toString(comp.getSize().x + 2));
     // root.setAttribute("height", Integer.toString(comp.getSize().y + 2));
     root.setAttribute("viewBox", "-1 -1 " + (comp.getSize().x + 1) + " " + (comp.getSize().y + 1));
@@ -70,8 +70,8 @@ public class CompositionGraphPrinter {
   }
 
   private Element makeConnection(Connection con) {
-    Point src = con.getSrc().getOwner().getSrcPort(con);
-    Point dst = con.getDst().getOwner().getDstPort(con);
+    PointF src = con.getSrc().getOwner().getSrcPort(con);
+    PointF dst = con.getDst().getOwner().getDstPort(con);
 
     Element line = createElement("path");
     String path = "M";
@@ -95,9 +95,9 @@ public class CompositionGraphPrinter {
     movePos(top, comp.getPos());
 
     Element bg = createElement("rect");
-    bg.setAttribute("width", Integer.toString(comp.getSize().x - 20));
-    bg.setAttribute("height", Integer.toString(comp.getSize().y));
-    bg.setAttribute("x", Integer.toString(-comp.getSize().x / 2 + 10));
+    bg.setAttribute("width", Double.toString(comp.getSize().x - 20));
+    bg.setAttribute("height", Double.toString(comp.getSize().y));
+    bg.setAttribute("x", Double.toString(-comp.getSize().x / 2 + 10));
     bg.setAttribute("y", "0");
     bg.setAttribute("rx", "10");
     bg.setAttribute("ry", "10");
@@ -118,11 +118,11 @@ public class CompositionGraphPrinter {
     return top;
   }
 
-  private void makeIfaces(ArrayList<Interface> ifaces, int x, int ifaceOffset, Element top) {
+  private void makeIfaces(ArrayList<Interface> ifaces, double x, int ifaceOffset, Element top) {
     int nr = 0;
     for (Interface iface : ifaces) {
       Element sif = makeIface(iface);
-      movePos(sif, new Point(x, ifaceOffset + nr * 25));
+      movePos(sif, new PointF(x, ifaceOffset + nr * Component.Y_IFACE_DIST));
       top.appendChild(sif);
       nr++;
     }
@@ -132,10 +132,10 @@ public class CompositionGraphPrinter {
     Element top = createElement("g");
 
     Element bg = createElement("rect");
-    bg.setAttribute("width", Integer.toString(Interface.WIDTH));
-    bg.setAttribute("height", Integer.toString(Interface.HEIGHT));
-    bg.setAttribute("x", Integer.toString(-Interface.WIDTH / 2));
-    bg.setAttribute("y", Integer.toString(-Interface.HEIGHT / 2));
+    bg.setAttribute("width", Double.toString(Interface.WIDTH));
+    bg.setAttribute("height", Double.toString(Interface.HEIGHT));
+    bg.setAttribute("x", Double.toString(-Interface.WIDTH / 2));
+    bg.setAttribute("y", Double.toString(-Interface.HEIGHT / 2));
     bg.setAttribute("class", InterfaceClassName);
     top.appendChild(bg);
 
@@ -164,7 +164,7 @@ public class CompositionGraphPrinter {
     bg.appendChild(a);
   }
 
-  static private void movePos(Element top, Point pos) {
+  static private void movePos(Element top, PointF pos) {
     top.setAttribute("transform", "translate(" + pos.x + "," + pos.y + ")");
   }
 

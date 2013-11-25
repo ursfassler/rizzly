@@ -7,7 +7,6 @@ import common.ElementInfo;
 import error.ErrorType;
 import error.RError;
 import evl.Evl;
-import evl.expression.reference.Reference;
 import evl.function.FunctionBase;
 import evl.function.FunctionFactory;
 import evl.other.ListOfNamed;
@@ -74,9 +73,9 @@ public class FunToEvlFunc extends NullTraverser<FunctionBase, Void> {
     map.put(obj, func);
     TypeRef retType;
     if (obj instanceof FuncWithReturn) {
-      Reference ref = (Reference) fta.traverse(((FuncWithReturn) obj).getRet(), null);
-      assert (ref.getOffset().isEmpty());
-      retType = new TypeRef(ref.getInfo(), (Type) ref.getLink());
+      fun.type.Type ot = FunToEvl.getRefType(((FuncWithReturn) obj).getRet());
+      Type nt = (Type) fta.traverse(ot, null);
+      retType = new TypeRef(((FuncWithReturn) obj).getRet().getInfo(), (Type) nt);
       ((evl.function.FuncWithReturn) func).setRet(new TypeRef(retType.getInfo(), retType.getRef()));
     } else {
       retType = new TypeRef(new ElementInfo(), new VoidType()); // FIXME get singleton

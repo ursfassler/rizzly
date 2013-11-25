@@ -37,9 +37,9 @@ public class Main {
       return;
     }
 
-    compile(opt);
+    // compile(opt);
     try {
-      // compile(opt);
+      compile(opt);
     } catch (RException err) {
       System.err.println(err.getMessage());
       System.exit(-1);

@@ -3,8 +3,10 @@ package fun.traverser;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 import common.Designator;
 import common.Direction;
@@ -63,7 +65,7 @@ public class Linker extends DefTraverser<Void, SymbolTable> {
     }
   }
 
-  private Collection<? extends Named> getPublics(RizzlyFile rzy) {
+  static public Collection<? extends Named> getPublics(RizzlyFile rzy) {
     Collection<Named> ret = new ArrayList<Named>();
     ret.addAll(rzy.getComp().getList());
     ret.addAll(rzy.getConstant().getList());
@@ -78,14 +80,15 @@ public class Linker extends DefTraverser<Void, SymbolTable> {
     SymbolTable rzys = new SymbolTable(pubs);
     SymbolTable locs = new SymbolTable(rzys);
 
+    List<Named> objs = new ArrayList<Named>();
     for (Designator des : obj.getImports()) {
       RizzlyFile rzy = files.get(des);
       assert (rzy != null);
-      List<Named> objs = new ArrayList<Named>();
       objs.addAll(getPublics(rzy));
-      pubs.addAll(objs);
       rzys.add(rzy);
     }
+
+    pubs.addAll(removeDuplicates(objs));
 
     locs.addAll(obj.getComp().getList());
     locs.addAll(obj.getConstant().getList());
@@ -93,6 +96,22 @@ public class Linker extends DefTraverser<Void, SymbolTable> {
     locs.addAll(obj.getType().getList());
     super.visitRizzlyFile(obj, locs);
     return null;
+  }
+
+  private Collection<Named> removeDuplicates(List<Named> objs) {
+    Set<String> ambigous = new HashSet<String>();
+    HashMap<String, Named> map = new HashMap<String, Named>();
+    for (Named itr : objs) {
+      if (!ambigous.contains(itr.getName())) {
+        if (map.containsKey(itr.getName())) {
+          map.remove(itr.getName());
+          ambigous.add(itr.getName());
+        } else {
+          map.put(itr.getName(), itr);
+        }
+      }
+    }
+    return map.values();
   }
 
   @Override

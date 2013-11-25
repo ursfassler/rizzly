@@ -63,7 +63,7 @@ public class RefTypeChecker extends NullTraverser<Type, Type> {
     if (sub instanceof FunctionType) {
       List<TypeRef> arg = ((FunctionType) sub).getArgD();
       if (arg.size() != obj.getActualParameter().size()) {
-        RError.err(ErrorType.Error, obj.getInfo(), "Need " + arg.size() + "arguments, got " + obj.getActualParameter().size());
+        RError.err(ErrorType.Error, obj.getInfo(), "Need " + arg.size() + " arguments, got " + obj.getActualParameter().size());
         return null;
       }
       for (int i = 0; i < arg.size(); i++) {

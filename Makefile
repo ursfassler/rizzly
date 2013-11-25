@@ -5,9 +5,9 @@ classpath=.:javalib/jgrapht-jdk1.6.jar:javalib/commons-lang-2.6.jar:javalib/comm
 
 tmpdir=/tmp/rizzly/
 
-all: rizzly.jar rizzly
+all: jar rizzly
 
-rizzly.jar: src/** javalib/*
+jar:
 	mkdir -p ${tmpdir}
 	javac -d ${tmpdir} -s ${tmpdir} -classpath ${classpath} -encoding UTF8 -sourcepath src/ src/main/Main.java
 	jar cfm rizzly.jar src/Manifest.txt -C ${tmpdir} .

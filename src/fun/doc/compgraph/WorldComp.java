@@ -5,13 +5,13 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import util.Point;
+import util.PointF;
 
 import common.Designator;
 import common.Metadata;
 
 public class WorldComp extends Component {
-  final private Point size = new Point(140, 35);
+  final private PointF size = new PointF(140, 35);
 
   final private List<SubComponent> comp = new ArrayList<SubComponent>();
   final private Set<Connection> conn = new HashSet<Connection>();
@@ -32,7 +32,7 @@ public class WorldComp extends Component {
     return path;
   }
 
-  public Point getSize() {
+  public PointF getSize() {
     return size;
   }
 
@@ -53,8 +53,8 @@ public class WorldComp extends Component {
   }
 
   @Override
-  public Point getPos() {
-    Point pos = new Point();
+  public PointF getPos() {
+    PointF pos = new PointF();
     pos.x = size.x / 2;
     pos.y = 0;
     return pos;
@@ -66,28 +66,28 @@ public class WorldComp extends Component {
   }
 
   @Override
-  public Point getSrcPort(Connection con) {
+  public PointF getSrcPort(Connection con) {
     assert (getOutEdges().contains(con));
-    int x;
-    int y;
+    double x;
+    double y;
     x = -size.x / 2 + Interface.WIDTH;
     int index = input.indexOf(con.getSrc());
     assert (index >= 0);
     y = index * Y_IFACE_DIST + Y_WORLD_IFACE_OFFSET;
     y += con.getSrc().getYOffset(con);
-    return new Point(size.x / 2 + x, y);
+    return new PointF(size.x / 2 + x, y);
   }
 
   @Override
-  public Point getDstPort(Connection con) {
+  public PointF getDstPort(Connection con) {
     assert (getInEdges().contains(con));
-    int x;
-    int y;
+    double x;
+    double y;
     x = size.x / 2 - Interface.WIDTH;
     int index = output.indexOf(con.getDst());
     assert (index >= 0);
     y = index * Y_IFACE_DIST + Y_WORLD_IFACE_OFFSET;
     y += con.getDst().getYOffset(con);
-    return new Point(size.x / 2 + x, y);
+    return new PointF(size.x / 2 + x, y);
   }
 }

@@ -1,17 +1,17 @@
 package fun.doc.compgraph;
 
-import util.Point;
+import util.PointF;
 
 public class Via implements Vertex {
-  private Point pos;
+  private PointF pos;
 
-  public Via(Point pos) {
+  public Via(PointF pos) {
     super();
     this.pos = pos;
   }
 
   @Override
-  public Point getPos() {
+  public PointF getPos() {
     return pos;
   }
 

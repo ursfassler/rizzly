@@ -1,7 +1,7 @@
 package fun.doc.compgraph;
 
-import util.Point;
+import util.PointF;
 
 public interface Vertex {
-  public Point getPos();
+  public PointF getPos();
 }

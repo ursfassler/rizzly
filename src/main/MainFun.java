@@ -65,12 +65,12 @@ public class MainFun {
   public static Pair<String, Namespace> doFun(ClaOption opt, Designator rootfile, String debugdir, String docdir) {
     Collection<RizzlyFile> fileList = loadFiles(rootfile, opt.getRootPath());
 
-    System.out.println("loaded files:");
-    for (RizzlyFile f : fileList) {
-      System.out.print("  ");
-      System.out.print(f.getFullName());
-      System.out.println();
-    }
+    // System.out.println("loaded files:");
+    // for (RizzlyFile f : fileList) {
+    // System.out.print("  ");
+    // System.out.print(f.getFullName());
+    // System.out.println();
+    // }
 
     List<Type> types = new ArrayList<Type>();
     types.addAll(genPrimitiveTypes());

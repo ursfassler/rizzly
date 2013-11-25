@@ -3,16 +3,16 @@ package fun.doc.compgraph;
 import java.util.ArrayList;
 import java.util.List;
 
-import util.Point;
+import util.PointF;
 
 import common.Designator;
 import common.Metadata;
 
 public abstract class Component implements Vertex {
-  public static final int Y_IFACE_DIST = 25;
-  public static final int Y_SUBC_IFACE_OFFSET = 35;
-  public static final int Y_WORLD_IFACE_OFFSET = 55;
-  public static final int SUBCOMP_WIDTH = 100;
+  public static final double Y_IFACE_DIST = 15;
+  public static final double Y_SUBC_IFACE_OFFSET = 35;
+  public static final double Y_WORLD_IFACE_OFFSET = 55;
+  public static final double SUBCOMP_WIDTH = 100;
 
   final protected Designator path;
   final protected String classname;
@@ -31,7 +31,7 @@ public abstract class Component implements Vertex {
     return metadata;
   }
 
-  public abstract Point getSize();
+  public abstract PointF getSize();
 
   public String getClassname() {
     return classname;
@@ -53,8 +53,8 @@ public abstract class Component implements Vertex {
 
   public abstract ArrayList<Connection> getOutEdges();
 
-  public abstract Point getSrcPort(Connection con);
+  public abstract PointF getSrcPort(Connection con);
 
-  public abstract Point getDstPort(Connection con);
+  public abstract PointF getDstPort(Connection con);
 
 }

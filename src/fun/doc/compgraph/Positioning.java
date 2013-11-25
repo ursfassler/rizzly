@@ -12,13 +12,13 @@ import java.util.StringTokenizer;
 
 import metadata.parser.SimpleMetaParser;
 import util.Pair;
-import util.Point;
+import util.PointF;
 import util.SimpleGraph;
 
 public class Positioning {
-  private static final int X_COMP_DIST = 140;
-  private static final int Y_COMP_OFFSET = 20;
-  private static final int Y_COMP_SPACE = 15;
+  private static final double X_COMP_DIST = 140;
+  private static final double Y_COMP_OFFSET = 20;
+  private static final double Y_COMP_SPACE = 15;
 
   public static void doPositioning(WorldComp g) {
     Set<Connection> done = new HashSet<Connection>();
@@ -33,15 +33,15 @@ public class Positioning {
 
     List<List<SubComponent>> topolist = doToposort(g);
 
-    int height = Math.max(g.getInput().size(), g.getOutput().size()) * Component.Y_IFACE_DIST + Component.Y_WORLD_IFACE_OFFSET;
-    int xdist = X_COMP_DIST;
+    double height = Math.max(g.getInput().size(), g.getOutput().size()) * Component.Y_IFACE_DIST + Component.Y_WORLD_IFACE_OFFSET;
+    double xdist = X_COMP_DIST;
 
     for (int i = 0; i < topolist.size(); i++) {
       List<SubComponent> complist = topolist.get(i);
 
-      int y = Y_COMP_OFFSET;
+      double y = Y_COMP_OFFSET;
       for (SubComponent comp : complist) {
-        Point pos = comp.getPos();
+        PointF pos = comp.getPos();
         pos.y = y;
         pos.x = xdist * (i + 1);
         y = y + comp.getSize().y + Y_COMP_SPACE;
@@ -67,35 +67,35 @@ public class Positioning {
     }
     Map<String, String> data = SimpleMetaParser.parse(con.getMetadata());
 
-    Point src = new Point(con.getSrc().getOwner().getSrcPort(con));
-    Point dst = new Point(con.getDst().getOwner().getDstPort(con));
+    PointF src = new PointF(con.getSrc().getOwner().getSrcPort(con));
+    PointF dst = new PointF(con.getDst().getOwner().getDstPort(con));
 
-    int[] path = getPath(data);
+    double[] path = getPath(data);
     assert (path.length % 2 == 1);
     boolean setX = true;
-    Point lastPos = src;
-    for (int itr : path) {
-      Point nextPos;
+    PointF lastPos = src;
+    for (double itr : path) {
+      PointF nextPos;
       if (setX) {
-        nextPos = new Point(itr, lastPos.y);
+        nextPos = new PointF(itr, lastPos.y);
       } else {
-        nextPos = new Point(lastPos.x, itr);
+        nextPos = new PointF(lastPos.x, itr);
       }
       con.getVias().add(new Via(nextPos));
       lastPos = nextPos;
       setX = !setX;
     }
-    con.getVias().add(new Via(new Point(lastPos.x, dst.y)));
+    con.getVias().add(new Via(new PointF(lastPos.x, dst.y)));
   }
 
-  private static int[] getPath(Map<String, String> data) {
+  private static double[] getPath(Map<String, String> data) {
     assert (data.containsKey("path"));
     String paths = data.get("path");
     StringTokenizer st = new StringTokenizer(paths, " ");
-    int path[] = new int[st.countTokens()];
+    double path[] = new double[st.countTokens()];
     int i = 0;
     while (st.hasMoreTokens()) {
-      path[i] = Integer.parseInt(st.nextToken());
+      path[i] = Double.parseDouble(st.nextToken());
       i++;
     }
     return path;
@@ -107,8 +107,8 @@ public class Positioning {
     }
     Map<String, String> data = SimpleMetaParser.parse(sub.getMetadata());
 
-    sub.getPos().x = getInt(data, "x");
-    sub.getPos().y = getInt(data, "y");
+    sub.getPos().x = getDouble(data, "x");
+    sub.getPos().y = getDouble(data, "y");
   }
 
   private static void appendMeta(WorldComp g) {
@@ -117,13 +117,13 @@ public class Positioning {
     }
     Map<String, String> data = SimpleMetaParser.parse(g.getMetadata());
 
-    g.getSize().x = getInt(data, "width");
-    g.getSize().y = getInt(data, "height");
+    g.getSize().x = getDouble(data, "width");
+    g.getSize().y = getDouble(data, "height");
   }
 
-  private static int getInt(Map<String, String> data, String key) {
+  private static double getDouble(Map<String, String> data, String key) {
     assert (data.containsKey(key));
-    return Integer.parseInt(data.get(key));
+    return Double.parseDouble(data.get(key));
   }
 
   private static List<List<SubComponent>> doToposort(WorldComp comp) {

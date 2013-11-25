@@ -19,34 +19,34 @@ import fun.other.Component;
 import fun.other.ImplElementary;
 import fun.other.Named;
 import fun.other.Namespace;
+import fun.other.RizzlyFile;
 import fun.type.base.EnumElement;
 import fun.type.base.EnumType;
 import fun.type.composed.UnionType;
 
 public class KnowFunChild extends KnowledgeEntry {
-  private KnowFunChildTraverser kct;
+  private static final KnowFunChildTraverser kct = new KnowFunChildTraverser();
 
   @Override
   public void init(KnowledgeBase base) {
-    kct = new KnowFunChildTraverser();
   }
 
-  public Fun get(Fun root, Iterable<String> path) {
+  public Named get(Named root, Iterable<String> path) {
     for (String child : path) {
       root = get(root, child);
     }
     return root;
   }
 
-  public Fun get(Fun sub, String name) {
+  public Named get(Fun sub, String name) {
     return getOrFind(sub, name, true);
   }
 
-  public Fun find(Fun sub, String name) {
+  public Named find(Fun sub, String name) {
     return getOrFind(sub, name, false);
   }
 
-  private Fun getOrFind(Fun sub, String name, boolean raiseError) {
+  private Named getOrFind(Fun sub, String name, boolean raiseError) {
     Set<Named> rset = kct.traverse(sub, name);
     if (rset.isEmpty()) {
       if (raiseError) {
@@ -159,6 +159,16 @@ class KnowFunChildTraverser extends NullTraverser<Set<Named>, String> {
     Set<Named> rset = super.visitComponent(obj, param);
     addIfFound(obj.getIface(Direction.in).find(param), rset);
     addIfFound(obj.getIface(Direction.out).find(param), rset);
+    return rset;
+  }
+
+  @Override
+  protected Set<Named> visitRizzlyFile(RizzlyFile obj, String param) {
+    Set<Named> rset = new HashSet<Named>();
+    addIfFound(obj.getComp().find(param), rset);
+    addIfFound(obj.getConstant().find(param), rset);
+    addIfFound(obj.getFunction().find(param), rset);
+    addIfFound(obj.getType().find(param), rset);
     return rset;
   }
 

@@ -21,6 +21,7 @@ import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
 import fun.other.ImplElementary;
+import fun.other.RizzlyFile;
 import fun.type.base.AnyType;
 import fun.type.base.BooleanType;
 import fun.type.base.EnumElement;
@@ -78,6 +79,7 @@ public class KnowScope extends KnowledgeEntry {
     global.add(ImplComposition.class);
     global.add(ImplHfsm.class);
     global.add(DummyLinkTarget.class);
+    global.add(RizzlyFile.class);
 
     local.add(FuncVariable.class);
     local.add(TemplateParameter.class);

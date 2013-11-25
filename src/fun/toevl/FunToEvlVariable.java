@@ -33,8 +33,7 @@ public class FunToEvlVariable extends NullTraverser<Evl, Void> {
 
   private TypeRef copyType(Expression typeRef) {
     Reference typeref = (Reference) typeRef;
-    assert (typeref.getOffset().isEmpty());
-    fun.type.Type nt = (fun.type.Type) typeref.getLink();
+    fun.type.Type nt = FunToEvl.getRefType(typeref);
     Type ecomp = (Type) fta.traverse(nt, null);
     return new TypeRef(typeref.getInfo(), ecomp);
   }

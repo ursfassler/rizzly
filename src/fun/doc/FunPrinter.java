@@ -477,7 +477,11 @@ public class FunPrinter extends NullTraverser<Void, Void> {
     xw.kw("Enum");
     xw.nl();
     xw.incIndent();
-    visitList(obj.getElement(), null);
+    for (Reference ref : obj.getElement()) {
+      xw.wa(ref.getLink().getName(), getId(ref.getLink()));
+      xw.wr(";");
+      xw.nl();
+    }
     xw.decIndent();
     xw.kw("end");
     return null;
@@ -485,9 +489,6 @@ public class FunPrinter extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitEnumElement(EnumElement obj, Void param) {
-    xw.wa(obj.getName(), getId(obj));
-    xw.wr(";");
-    xw.nl();
     return null;
   }
 
@@ -917,13 +918,13 @@ public class FunPrinter extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitFuncProtRet(FuncProtRet obj, Void param) {
-    printFunc(obj, false);
+    printFunc(obj, true);
     return null;
   }
 
   @Override
   protected Void visitFuncProtVoid(FuncProtVoid obj, Void param) {
-    printFunc(obj, false);
+    printFunc(obj, true);
     return null;
   }
 
