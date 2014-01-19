@@ -8,7 +8,6 @@ import java.util.Map;
 
 import common.Designator;
 import common.ElementInfo;
-
 import error.ErrorType;
 import error.RError;
 import fun.Copy;
@@ -29,6 +28,7 @@ import fun.type.Type;
 import fun.type.base.AnyType;
 import fun.type.base.IntegerType;
 import fun.type.base.NaturalType;
+import fun.type.base.TypeAlias;
 import fun.type.template.BuiltinTemplate;
 import fun.type.template.Range;
 import fun.type.template.TypeType;
@@ -71,7 +71,19 @@ public class Specializer {
     for (int i = 0; i < genspec.size(); i++) {
       TemplateParameter pitm = item.getTemplateParam().getList().get(i);
       Reference tref = pitm.getType();
-      Type type = (Type) EvalTo.any(tref, kb);
+      Type type;
+      if (tref.getLink() instanceof TemplateParameter) {
+        // we use a previous defined parameter, it has to be a "Type{*}" argument
+        pitm = (TemplateParameter) tref.getLink();
+        tref = pitm.getType();
+        Named any = EvalTo.any(tref, kb);
+        assert( any instanceof TypeType );
+        any = EvalTo.any(((TypeType) any).getType(),kb);
+        type = (Type) any;
+      } else {
+        Named any = EvalTo.any(tref, kb);
+        type = (Type) any;
+      }
       ActualTemplateArgument evald;
       Expression acarg = genspec.get(i);
       if (type instanceof Range) {
@@ -92,6 +104,9 @@ public class Specializer {
         // TODO check type
       } else if (type instanceof TypeType) {
         evald = (ActualTemplateArgument) EvalTo.any((Reference) acarg, kb);
+        // TODO check type
+      } else if (type instanceof TypeAlias) {
+        evald = (ActualTemplateArgument) ExprEvaluator.evaluate(acarg, new Memory(), kb);
         // TODO check type
       } else {
         throw new RuntimeException("not yet implemented: " + type.getName());

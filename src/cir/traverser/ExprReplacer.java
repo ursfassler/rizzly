@@ -2,7 +2,8 @@ package cir.traverser;
 
 import java.util.List;
 
-import cir.Traverser;
+import cir.CirBase;
+import cir.NullTraverser;
 import cir.expression.ArrayValue;
 import cir.expression.BinaryOp;
 import cir.expression.BoolValue;
@@ -17,8 +18,6 @@ import cir.expression.reference.RefName;
 import cir.expression.reference.Reference;
 import cir.function.FunctionImpl;
 import cir.function.FunctionPrototype;
-import cir.function.LibFunction;
-import cir.library.CLibrary;
 import cir.other.Constant;
 import cir.other.FuncVariable;
 import cir.other.Program;
@@ -35,22 +34,22 @@ import cir.statement.VarDefStmt;
 import cir.statement.WhileStmt;
 import cir.type.ArrayType;
 import cir.type.BooleanType;
-import cir.type.EnumElement;
 import cir.type.EnumType;
 import cir.type.IntType;
-import cir.type.NamedElement;
 import cir.type.PointerType;
-import cir.type.RangeType;
-import cir.type.SIntType;
 import cir.type.StringType;
 import cir.type.StructType;
 import cir.type.TypeAlias;
 import cir.type.TypeRef;
-import cir.type.UIntType;
 import cir.type.UnionType;
 import cir.type.VoidType;
 
-public class ExprReplacer<T> extends Traverser<Expression, T> {
+public class ExprReplacer<T> extends NullTraverser<Expression, T> {
+
+  @Override
+  protected Expression visitDefault(CirBase obj, T param) {
+    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+  }
 
   protected void visitExprList(List<Expression> parameter, T param) {
     for (int i = 0; i < parameter.size(); i++) {
@@ -87,11 +86,6 @@ public class ExprReplacer<T> extends Traverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitEnumElement(EnumElement obj, T param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
   protected Expression visitCaseEntry(CaseEntry obj, T param) {
     visit(obj.getCode(), param);
     return null;
@@ -111,11 +105,6 @@ public class ExprReplacer<T> extends Traverser<Expression, T> {
   @Override
   protected Expression visitFuncVariable(FuncVariable obj, T param) {
     return null;
-  }
-
-  @Override
-  protected Expression visitNamedElement(NamedElement obj, T param) {
-    throw new RuntimeException("not yet implemented");
   }
 
   @Override
@@ -285,34 +274,8 @@ public class ExprReplacer<T> extends Traverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitLibFunction(LibFunction obj, T param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Expression visitCLibrary(CLibrary obj, T param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Expression visitSIntType(SIntType obj, T param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Expression visitUIntType(UIntType obj, T param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
   protected Expression visitPointerType(PointerType obj, T param) {
     visit(obj.getType(), param);
     return null;
   }
-
-  @Override
-  protected Expression visitRangeType(RangeType obj, T param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
 }

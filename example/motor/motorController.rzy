@@ -1,0 +1,37 @@
+component
+  MotorController
+    input
+      start();
+      stop();
+      overtemp();
+      normtemp();
+    
+    output
+      on();
+      off();
+
+  implementation hfsm( Top )
+    state Top( Stopped )
+      state Stopped( Off )
+        entry
+          off();
+        end
+        state Off;
+        state Overtemp;
+      end
+      
+      state On
+        entry
+          on();
+        end
+      end
+    end
+    
+    transition
+      Top to Overtemp by overtemp();
+      Overtemp to Off by normtemp();
+      On to Off by stop();
+      Off to On by start();
+    
+  end
+

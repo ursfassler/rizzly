@@ -18,8 +18,6 @@ import cir.expression.reference.Reference;
 import cir.function.Function;
 import cir.function.FunctionImpl;
 import cir.function.FunctionPrototype;
-import cir.function.LibFunction;
-import cir.library.CLibrary;
 import cir.other.Constant;
 import cir.other.FuncVariable;
 import cir.other.Program;
@@ -92,8 +90,6 @@ public abstract class Traverser<R, P> {
       return visitCaseEntry((CaseEntry) obj, param);
     else if (obj instanceof TypeRef)
       return visitTypeRef((TypeRef) obj, param);
-    else if (obj instanceof CLibrary)
-      return visitCLibrary((CLibrary) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
@@ -103,8 +99,6 @@ public abstract class Traverser<R, P> {
       return visitFunctionImpl((FunctionImpl) obj, param);
     else if (obj instanceof FunctionPrototype)
       return visitFunctionPrototype((FunctionPrototype) obj, param);
-    else if (obj instanceof LibFunction)
-      return visitLibFunction((LibFunction) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
@@ -279,8 +273,6 @@ public abstract class Traverser<R, P> {
 
   protected abstract R visitFunctionPrototype(FunctionPrototype obj, P param);
 
-  protected abstract R visitLibFunction(LibFunction obj, P param);
-
   protected abstract R visitVarDefStmt(VarDefStmt obj, P param);
 
   protected abstract R visitCallStmt(CallStmt obj, P param);
@@ -308,8 +300,6 @@ public abstract class Traverser<R, P> {
   protected abstract R visitStringType(StringType obj, P param);
 
   protected abstract R visitArrayType(ArrayType obj, P param);
-
-  protected abstract R visitCLibrary(CLibrary obj, P param);
 
   protected abstract R visitProgram(Program obj, P param);
 

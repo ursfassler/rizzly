@@ -250,7 +250,7 @@ public class ToC extends NullTraverser<CirBase, Void> {
   }
 
   @Override
-  protected CirBase visitNumSet(RangeType obj, Void param) {
+  protected CirBase visitRangeType(RangeType obj, Void param) {
     return new cir.type.RangeType(obj.getNumbers().getLow(), obj.getNumbers().getHigh());
   }
 

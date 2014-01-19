@@ -10,9 +10,6 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
 
 import util.Pair;
 import util.SimpleGraph;
-import cir.function.LibFunction;
-import cir.library.CLibrary;
-import cir.other.FuncVariable;
 import cir.other.Program;
 import cir.traverser.BlockReduction;
 import cir.traverser.BoolToEnum;
@@ -21,13 +18,7 @@ import cir.traverser.CWriter;
 import cir.traverser.RangeReplacer;
 import cir.traverser.Renamer;
 import cir.traverser.VarDeclToTop;
-import cir.type.PointerType;
 import cir.type.Type;
-import cir.type.TypeRef;
-import cir.type.UIntType;
-import cir.type.VoidType;
-
-import common.FuncAttr;
 
 public class MainCir {
 
@@ -37,8 +28,6 @@ public class MainCir {
 
     BlockReduction.process(cprog);
 
-    makeCLibrary(cprog.getLibrary());
-
     BoolToEnum.process(cprog);
     CArrayCopy.process(cprog);
     VarDeclToTop.process(cprog);
@@ -47,31 +36,6 @@ public class MainCir {
 
     toposort(cprog.getType());
     return cprog;
-  }
-
-  private static void makeCLibrary(List<CLibrary> list) {
-    list.add(makeClibString());
-  }
-
-  private static CLibrary makeClibString() {
-    Set<FuncAttr> attr = new HashSet<FuncAttr>();
-    attr.add(FuncAttr.Public);
-
-    CLibrary ret = new CLibrary("string");
-
-    { // memcpy
-      UIntType uint4 = new UIntType(4); // FIXME get singleton
-
-      List<FuncVariable> arg = new ArrayList<FuncVariable>();
-      PointerType voidp = new PointerType("voidp_t", new TypeRef(new VoidType())); // FIXME get void singleton
-      arg.add(new FuncVariable("dstp", new cir.type.TypeRef(voidp)));
-      arg.add(new FuncVariable("srcp", new cir.type.TypeRef(voidp)));
-      arg.add(new FuncVariable("size", new cir.type.TypeRef(uint4)));
-      LibFunction memcpy = new LibFunction("memcpy", new cir.type.TypeRef(voidp), arg, new HashSet<FuncAttr>(attr));
-      ret.getFunction().add(memcpy);
-    }
-
-    return ret;
   }
 
   private static void toposort(List<cir.type.Type> list) {

@@ -81,7 +81,7 @@ public class LeftIsContainerOfRightTest extends NullTraverser<Boolean, Type> {
     if (right instanceof FunctionTypeRet) {
       Type leftret = left.getRet().getRef();
       Type rightret = ((FunctionTypeRet) right).getRet().getRef();
-      return visit(leftret, rightret) && process(((FunctionType) right).getArgD(), left.getArgD());
+      return visit(leftret, rightret) && process(left.getArgD(),((FunctionType) right).getArgD());
     } else {
       return false;
     }
@@ -90,7 +90,7 @@ public class LeftIsContainerOfRightTest extends NullTraverser<Boolean, Type> {
   @Override
   protected Boolean visitFunctionTypeVoid(FunctionTypeVoid left, Type right) {
     if (right instanceof FunctionTypeVoid) {
-      return process(((FunctionTypeVoid) right).getArgD(), left.getArgD());
+      return process(left.getArgD(),((FunctionTypeVoid) right).getArgD());
     } else {
       return false;
     }
@@ -112,7 +112,7 @@ public class LeftIsContainerOfRightTest extends NullTraverser<Boolean, Type> {
   }
 
   @Override
-  protected Boolean visitNumSet(RangeType obj, Type right) {
+  protected Boolean visitRangeType(RangeType obj, Type right) {
     if (right instanceof RangeType) {
       Range lr = obj.getNumbers();
       Range rr = ((RangeType) right).getNumbers();

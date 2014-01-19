@@ -621,7 +621,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitNumSet(RangeType obj, P param) {
+  protected R visitRangeType(RangeType obj, P param) {
     return null;
   }
 

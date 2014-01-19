@@ -1,12 +1,9 @@
 package cir.traverser;
 
-import cir.Traverser;
-import cir.expression.ArrayValue;
+import cir.CirBase;
+import cir.NullTraverser;
 import cir.expression.BinaryOp;
-import cir.expression.BoolValue;
 import cir.expression.Number;
-import cir.expression.StringValue;
-import cir.expression.TypeCast;
 import cir.expression.UnaryOp;
 import cir.expression.reference.RefCall;
 import cir.expression.reference.RefIndex;
@@ -15,8 +12,6 @@ import cir.expression.reference.Reference;
 import cir.function.Function;
 import cir.function.FunctionImpl;
 import cir.function.FunctionPrototype;
-import cir.function.LibFunction;
-import cir.library.CLibrary;
 import cir.other.Constant;
 import cir.other.FuncVariable;
 import cir.other.Program;
@@ -33,23 +28,21 @@ import cir.statement.Statement;
 import cir.statement.VarDefStmt;
 import cir.statement.WhileStmt;
 import cir.type.ArrayType;
-import cir.type.BooleanType;
 import cir.type.EnumElement;
 import cir.type.EnumType;
 import cir.type.IntType;
 import cir.type.NamedElement;
-import cir.type.PointerType;
-import cir.type.RangeType;
-import cir.type.SIntType;
-import cir.type.StringType;
 import cir.type.StructType;
 import cir.type.TypeAlias;
-import cir.type.TypeRef;
-import cir.type.UIntType;
 import cir.type.UnionType;
 import cir.type.VoidType;
 
-public class StmtReplacer<P> extends Traverser<Statement, P> {
+public class StmtReplacer<P> extends NullTraverser<Statement, P> {
+  @Override
+  protected Statement visitDefault(CirBase obj, P param) {
+    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+  }
+
   @Override
   protected Statement visitProgram(Program obj, P param) {
     for (Function func : obj.getFunction()) {
@@ -227,68 +220,4 @@ public class StmtReplacer<P> extends Traverser<Statement, P> {
     return obj;
   }
 
-  @Override
-  protected Statement visitLibFunction(LibFunction obj, P param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Statement visitCLibrary(CLibrary obj, P param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Statement visitStringValue(StringValue obj, P param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Statement visitStringType(StringType obj, P param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Statement visitArrayValue(ArrayValue obj, P param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Statement visitBooleanType(BooleanType obj, P param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Statement visitBoolValue(BoolValue obj, P param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Statement visitSIntType(SIntType obj, P param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Statement visitUIntType(UIntType obj, P param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Statement visitTypeRef(TypeRef obj, P param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Statement visitTypeCast(TypeCast obj, P param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Statement visitPointerType(PointerType obj, P param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Statement visitRangeType(RangeType obj, P param) {
-    throw new RuntimeException("not yet implemented");
-  }
 }

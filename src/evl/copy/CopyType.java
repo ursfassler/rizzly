@@ -26,7 +26,7 @@ public class CopyType extends NullTraverser<Type, Void> {
   }
 
   @Override
-  protected Type visitNumSet(RangeType obj, Void param) {
+  protected Type visitRangeType(RangeType obj, Void param) {
     return new RangeType(obj.getNumbers());
   }
 

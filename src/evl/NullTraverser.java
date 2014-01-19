@@ -497,7 +497,7 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitNumSet(RangeType obj, P param) {
+  protected R visitRangeType(RangeType obj, P param) {
     return visitDefault(obj, param);
   }
 

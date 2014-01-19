@@ -23,8 +23,6 @@ import cir.expression.reference.Reference;
 import cir.function.Function;
 import cir.function.FunctionImpl;
 import cir.function.FunctionPrototype;
-import cir.function.LibFunction;
-import cir.library.CLibrary;
 import cir.other.Constant;
 import cir.other.FuncVariable;
 import cir.other.Program;
@@ -80,9 +78,6 @@ public class CWriter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitProgram(Program obj, StreamWriter param) {
     param.wr("#include <stdint.h>");
-    param.nl();
-
-    visitList(obj.getLibrary(), param);
     param.nl();
 
     visitList(obj.getType(), param);
@@ -189,20 +184,6 @@ public class CWriter extends NullTraverser<Void, StreamWriter> {
       }
     }
     param.wr(")");
-  }
-
-  @Override
-  protected Void visitLibFunction(LibFunction obj, StreamWriter param) {
-    return null;
-  }
-
-  @Override
-  protected Void visitCLibrary(CLibrary obj, StreamWriter param) {
-    param.wr("#include <");
-    param.wr(obj.getName());
-    param.wr(".h>");
-    param.nl();
-    return null;
   }
 
   @Override

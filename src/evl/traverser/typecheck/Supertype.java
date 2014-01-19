@@ -34,7 +34,7 @@ public class Supertype extends NullTraverser<Type, Void> {
   }
 
   @Override
-  protected Type visitNumSet(RangeType obj, Void param) {
+  protected Type visitRangeType(RangeType obj, Void param) {
     if (obj.getNumbers().getLow().compareTo(BigInteger.ZERO) >= 0) {
       return kbi.getNaturalType();
     } else {

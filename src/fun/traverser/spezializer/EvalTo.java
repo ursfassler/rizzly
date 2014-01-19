@@ -8,6 +8,7 @@ import fun.expression.reference.Reference;
 import fun.knowledge.KnowledgeBase;
 import fun.other.Generator;
 import fun.other.Named;
+import fun.variable.TemplateParameter;
 
 public class EvalTo {
   public static Named any(Reference obj, KnowledgeBase kb) {

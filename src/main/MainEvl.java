@@ -73,6 +73,7 @@ import evl.traverser.CHeaderWriter;
 import evl.traverser.CallgraphMaker;
 import evl.traverser.ClassGetter;
 import evl.traverser.CompInstantiator;
+import evl.traverser.CompareReplacer;
 import evl.traverser.ConstTyper;
 import evl.traverser.ConstantPropagation;
 import evl.traverser.DepCollector;
@@ -155,6 +156,8 @@ public class MainEvl {
     // typecheck(classes, debugdir);
 
     RangeConverter.process(aclasses, kb);
+    CompareReplacer.process(aclasses, kb);
+
     RizzlyProgram prg = instantiate(root, debugdir, aclasses);
 
     {
@@ -166,6 +169,7 @@ public class MainEvl {
     }
 
     ConstantPropagation.process(prg);
+
     replaceEnums(prg);
     removeUnused(prg);
     IfCutter.process(prg);

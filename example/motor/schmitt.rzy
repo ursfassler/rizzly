@@ -1,0 +1,25 @@
+component
+  Schmitt{T:Type{Integer}; Lower, Upper: T}
+    input
+      changed( value: T );
+      
+    output
+      high();
+      low();
+      
+  implementation hfsm( Low )
+    state Low end
+    state High end
+    
+    transition
+      Low to High by changed( value: T ) if value >= Upper do
+        high();
+      end
+      
+      High to Low by changed( value: T ) if value <= Lower do
+        low();
+      end
+  end
+  
+  
+

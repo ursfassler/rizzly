@@ -1,19 +1,13 @@
 package cir.traverser;
 
-import java.math.BigInteger;
-
-import cir.expression.Number;
-import cir.expression.reference.RefCall;
-import cir.expression.reference.Reference;
-import cir.function.LibFunction;
 import cir.knowledge.KnowType;
 import cir.other.Program;
 import cir.statement.Assignment;
-import cir.statement.CallStmt;
 import cir.statement.Statement;
 import cir.type.ArrayType;
 import cir.type.Type;
 
+//TODO reimplement
 public class CArrayCopy extends StmtReplacer<Void> {
   private Program prog;
 
@@ -34,15 +28,17 @@ public class CArrayCopy extends StmtReplacer<Void> {
     if (type instanceof ArrayType) { // FIXME what with type alias?
       // FIXME make library function prototypes at a proper place
 
-      int size = TypeSizeGetter.get(type);
-
-      LibFunction memcpy = prog.getLibFunc("string", "memcpy");
-      RefCall rcall = new RefCall();
-      rcall.getParameter().add(obj.getDst());
-      rcall.getParameter().add(obj.getSrc());
-      rcall.getParameter().add(new Number(BigInteger.valueOf(size)));
-      CallStmt call = new CallStmt(new Reference(memcpy, rcall));
-      return call;
+      assert (false);
+      return null;
+      // int size = TypeSizeGetter.get(type);
+      //
+      // LibFunction memcpy = prog.getLibFunc("string", "memcpy");
+      // RefCall rcall = new RefCall();
+      // rcall.getParameter().add(obj.getDst());
+      // rcall.getParameter().add(obj.getSrc());
+      // rcall.getParameter().add(new Number(BigInteger.valueOf(size)));
+      // CallStmt call = new CallStmt(new Reference(memcpy, rcall));
+      // return call;
     }
 
     return obj;

@@ -13,8 +13,6 @@ import cir.expression.reference.RefName;
 import cir.expression.reference.Reference;
 import cir.function.FunctionImpl;
 import cir.function.FunctionPrototype;
-import cir.function.LibFunction;
-import cir.library.CLibrary;
 import cir.other.Constant;
 import cir.other.FuncVariable;
 import cir.other.Program;
@@ -49,15 +47,8 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitProgram(Program obj, P param) {
-    visitList(obj.getLibrary(), param);
     visitList(obj.getType(), param);
     visitList(obj.getVariable(), param);
-    visitList(obj.getFunction(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitCLibrary(CLibrary obj, P param) {
     visitList(obj.getFunction(), param);
     return null;
   }
@@ -91,13 +82,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitFunctionPrototype(FunctionPrototype obj, P param) {
-    visitList(obj.getArgument(), param);
-    visit(obj.getRetType(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitLibFunction(LibFunction obj, P param) {
     visitList(obj.getArgument(), param);
     visit(obj.getRetType(), param);
     return null;

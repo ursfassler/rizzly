@@ -10,6 +10,7 @@ import cir.expression.reference.Reference;
 import cir.other.Variable;
 import cir.type.ArrayType;
 import cir.type.EnumElement;
+import cir.type.NamedElemType;
 import cir.type.NamedElement;
 import cir.type.Type;
 import cir.type.TypeRef;
@@ -28,6 +29,10 @@ public class KnowType extends KnowledgeEntry {
       t = traverser.traverse(itm, t);
     }
     return t;
+  }
+
+  public static boolean isComposition(Type type) {
+    return (type instanceof NamedElemType) || (type instanceof ArrayType);
   }
 
 }

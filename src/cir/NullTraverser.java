@@ -12,8 +12,6 @@ import cir.expression.reference.RefIndex;
 import cir.expression.reference.RefName;
 import cir.function.FunctionImpl;
 import cir.function.FunctionPrototype;
-import cir.function.LibFunction;
-import cir.library.CLibrary;
 import cir.other.Constant;
 import cir.other.FuncVariable;
 import cir.other.Program;
@@ -179,11 +177,6 @@ public abstract class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitLibFunction(LibFunction obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
   protected R visitVarDefStmt(VarDefStmt obj, P param) {
     return visitDefault(obj, param);
   }
@@ -250,11 +243,6 @@ public abstract class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitProgram(Program obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitCLibrary(CLibrary obj, P param) {
     return visitDefault(obj, param);
   }
 

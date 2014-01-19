@@ -227,7 +227,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitNumSet(RangeType obj, StreamWriter param) {
+  protected Void visitRangeType(RangeType obj, StreamWriter param) {
     boolean isNeg = obj.getNumbers().getLow().compareTo(BigInteger.ZERO) < 0;
     BigInteger max = getPos(obj.getNumbers().getHigh()).max(getPos(obj.getNumbers().getLow()));
     int bits = ExpressionTypeChecker.bitCount(max);

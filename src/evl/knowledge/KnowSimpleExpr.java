@@ -98,7 +98,7 @@ class SimpleGetter extends NullTraverser<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitNumSet(RangeType obj, Void param) {
+  protected Boolean visitRangeType(RangeType obj, Void param) {
     return true;
   }
 

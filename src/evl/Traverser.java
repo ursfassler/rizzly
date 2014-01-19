@@ -481,7 +481,7 @@ public abstract class Traverser<R, P> {
     if (obj instanceof BooleanType) {
       return visitBooleanType((BooleanType) obj, param);
     } else if (obj instanceof RangeType) {
-      return visitNumSet((RangeType) obj, param);
+      return visitRangeType((RangeType) obj, param);
     } else if (obj instanceof ArrayType) {
       return visitArrayType((ArrayType) obj, param);
     } else if (obj instanceof StringType) {
@@ -565,7 +565,7 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitIntegerType(IntegerType obj, P param);
 
-  abstract protected R visitNumSet(RangeType obj, P param);
+  abstract protected R visitRangeType(RangeType obj, P param);
 
   abstract protected R visitBooleanType(BooleanType obj, P param);
 
