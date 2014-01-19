@@ -1,0 +1,22 @@
+component
+  Boolext
+    input
+      tick( value: Boolean );
+    
+    output
+      on();
+      off();
+      
+    implementation elementary
+
+    function tick( value: Boolean )
+      if value then
+        on();
+      else
+        off();
+      end
+    end
+
+  end
+
+

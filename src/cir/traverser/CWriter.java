@@ -79,6 +79,9 @@ public class CWriter extends NullTraverser<Void, StreamWriter> {
   protected Void visitProgram(Program obj, StreamWriter param) {
     param.wr("#include <stdint.h>");
     param.nl();
+    param.wr("#include <stdbool.h>");
+    param.nl();
+    param.nl();
 
     visitList(obj.getType(), param);
     param.nl();
@@ -315,12 +318,13 @@ public class CWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitBooleanType(BooleanType obj, StreamWriter param) {
-    RError.err(ErrorType.Warning, "there should be no more boolean type in C");
+    param.wr("/* "); // built in type
     param.wr("typedef ");
-    param.wr("char");
+    param.wr("bool");
     param.wr(" ");
     param.wr(obj.getName());
     param.wr(";");
+    param.wr(" */");
     param.nl();
     return null;
   }

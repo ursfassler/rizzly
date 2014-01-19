@@ -319,6 +319,11 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  public void boolext() {
+    compile("boolext", TestSteps.COMPILE_TO_ASM, false, false);
+  }
+
+  @Test
   public void bool_Bool() {
     compile("bool", "Bool", true, false, false);
   }

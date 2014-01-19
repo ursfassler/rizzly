@@ -59,7 +59,10 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
     param.wr("#include <stdint.h>");
     param.nl();
+    param.wr("#include <stdbool.h>");
     param.nl();
+    param.nl();
+
     if (!debugNames.isEmpty()) {
       param.wr("const char* DEBUG_NAMES[] = { ");
       boolean first = true;
@@ -160,7 +163,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitBooleanType(BooleanType obj, StreamWriter param) {
     param.wr("typedef ");
-    param.wr("uint8_t");
+    param.wr("bool");
     param.wr(" ");
     param.wr(obj.getName());
     param.wr(";");

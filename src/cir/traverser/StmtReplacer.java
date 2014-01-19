@@ -3,6 +3,7 @@ package cir.traverser;
 import cir.CirBase;
 import cir.NullTraverser;
 import cir.expression.BinaryOp;
+import cir.expression.BoolValue;
 import cir.expression.Number;
 import cir.expression.UnaryOp;
 import cir.expression.reference.RefCall;
@@ -90,6 +91,11 @@ public class StmtReplacer<P> extends NullTraverser<Statement, P> {
 
   @Override
   protected Statement visitNumber(Number obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected Statement visitBoolValue(BoolValue obj, P param) {
     return null;
   }
 

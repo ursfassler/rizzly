@@ -12,7 +12,6 @@ import util.Pair;
 import util.SimpleGraph;
 import cir.other.Program;
 import cir.traverser.BlockReduction;
-import cir.traverser.BoolToEnum;
 import cir.traverser.CArrayCopy;
 import cir.traverser.CWriter;
 import cir.traverser.RangeReplacer;
@@ -28,7 +27,6 @@ public class MainCir {
 
     BlockReduction.process(cprog);
 
-    BoolToEnum.process(cprog);
     CArrayCopy.process(cprog);
     VarDeclToTop.process(cprog);
 
