@@ -102,7 +102,7 @@ public class CompInterfaceTypeChecker extends NullTraverser<Void, Void> {
       } else {
         Type prottype = kt.get(proto);
         Type impltype = kt.get(impl);
-        if (!LeftIsContainerOfRightTest.process(prottype, impltype, kb)) {
+        if (!LeftIsContainerOfRightTest.process(impltype,prottype, kb)) {
           RError.err(ErrorType.Error, impl.getInfo(), "Function does not implement prototype: " + proto);
         }
       }
