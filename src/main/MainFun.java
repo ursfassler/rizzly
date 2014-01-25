@@ -201,8 +201,6 @@ public class MainFun {
 
       Named nroot = Specializer.process((Generator) root, new ArrayList<Expression>(), root.getInfo(), kb);
 
-      ConstEval.process(classes, kb);
-
       return (Component) nroot;
     }
   }
