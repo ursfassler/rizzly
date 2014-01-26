@@ -12,7 +12,6 @@ import util.Pair;
 import util.SimpleGraph;
 import cir.other.Program;
 import cir.traverser.BlockReduction;
-import cir.traverser.CArrayCopy;
 import cir.traverser.CWriter;
 import cir.traverser.RangeReplacer;
 import cir.traverser.Renamer;
@@ -27,7 +26,6 @@ public class MainCir {
 
     BlockReduction.process(cprog);
 
-    CArrayCopy.process(cprog);
     VarDeclToTop.process(cprog);
 
     Renamer.process(cprog);

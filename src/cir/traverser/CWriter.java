@@ -54,10 +54,8 @@ import cir.type.VoidType;
 
 import common.FuncAttr;
 
-import error.ErrorType;
-import error.RError;
-
 public class CWriter extends NullTraverser<Void, StreamWriter> {
+  public static final String ARRAY_DATA_NAME = "data";
   private boolean printReferenceId = false;
 
   static public void print(Cir obj, String filename, boolean printReferenceId) {
@@ -156,6 +154,8 @@ public class CWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitRefIndex(RefIndex obj, StreamWriter param) {
+    param.wr(".");
+    param.wr(ARRAY_DATA_NAME);
     param.wr("[");
     visit(obj.getIndex(), param);
     param.wr("]");
@@ -292,13 +292,20 @@ public class CWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitArrayType(ArrayType obj, StreamWriter param) {
-    param.wr("typedef ");
+    param.wr("typedef struct {");
+    param.nl();
+    param.incIndent();
     visit(obj.getType(), param);
     param.wr(" ");
-    param.wr(obj.getName());
+    param.wr(ARRAY_DATA_NAME);
     param.wr("[");
     param.wr(Integer.toString(obj.getSize()));
     param.wr("]");
+    param.wr(";");
+    param.decIndent();
+    param.nl();
+    param.wr("} ");
+    param.wr(obj.getName());
     param.wr(";");
     param.nl();
     return null;

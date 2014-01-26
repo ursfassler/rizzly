@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import util.StreamWriter;
+import cir.traverser.CWriter;
 
 import common.FuncAttr;
 
@@ -199,13 +200,21 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitArrayType(ArrayType obj, StreamWriter param) {
-    param.wr("typedef ");
+    param.wr("typedef struct {");
+    param.nl();
+    param.incIndent();
     visit(obj.getType(), param);
     param.wr(" ");
-    param.wr(obj.getName());
+    param.wr(CWriter.ARRAY_DATA_NAME);
     param.wr("[");
     param.wr(obj.getSize().toString());
-    param.wr("];");
+    param.wr("]");
+    param.wr(";");
+    param.decIndent();
+    param.nl();
+    param.wr("} ");
+    param.wr(obj.getName());
+    param.wr(";");
     param.nl();
     return null;
   }

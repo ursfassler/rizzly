@@ -19,13 +19,13 @@ void printMsg( uint8_t *list, int size ){
 
 void inst__msgSend(Array_3_R_0_5 sender, R_0_2 size){
   printf( "send: " );
-  printMsg( sender, size );
+  printMsg( sender.data, size );
   printf( "\n" );
 }
 
 void inst__msgRecv(Array_3_R_0_5 receiver, R_0_2 size){
   printf( "recv: " );
-  printMsg( receiver, size );
+  printMsg( receiver.data, size );
   printf( "\n" );
 }
 
