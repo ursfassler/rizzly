@@ -1,0 +1,26 @@
+
+function reverse{S:Natural;T:Type}( x: Array{S,T} ): Array{S,T}
+  t : T;
+  i : R{0,S/2+1} = 0;
+  while i < S/2 do
+    t         := x[i];
+    x[i]      := x[S-1-i];
+    x[S-1-i]  := x[i];
+    i         := i + 1;
+  end
+  return x;
+end
+
+component
+  Reverse
+    input
+      data( x: Array{10,R{0,100}} ): Array{10,R{0,100}};
+      
+  implementation elementary
+
+    function data( x: Array{10,R{0,100}} ): Array{10,R{0,100}}
+      return reverse{10,R{0,100}}( x );
+    end
+
+  end
+

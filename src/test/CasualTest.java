@@ -139,26 +139,6 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
-  public void arrayTest1() {
-    compile("arrayTest1", TestSteps.EXECUTE, false, false);
-  }
-
-  @Test
-  public void arrayTest2() {
-    compile("arrayTest2", TestSteps.EXECUTE, false, false);
-  }
-
-  @Test
-  public void arrayTest3() {
-    compile("arrayTest3", TestSteps.EXECUTE, false, false);
-  }
-
-  @Test
-  public void arrayTest() {
-    compile("arrayTest", TestSteps.EXECUTE, false, false);
-  }
-
-  @Test
   public void constInit() {
     compile("constInit", TestSteps.COMPILE_TO_LLVM, false, false);
   }
