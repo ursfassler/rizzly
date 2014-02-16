@@ -35,7 +35,7 @@ public class ErrIfaceTest extends ErrorTest {
 
   @Test
   public void err7() {
-    testForError("err7", "Err7", "No callback functions found for component b");
+    testForError("err7", "Err7", "Interface b.funcA not connected");
   }
 
   @Test

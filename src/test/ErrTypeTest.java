@@ -20,7 +20,7 @@ public class ErrTypeTest extends ErrorTest {
 
   @Test
   public void err3() {
-    testForError("err3", "Err3", "Expected range type");
+    testForError("err3", "Err3", "Expected range type, got Weekday");
   }
 
   @Test

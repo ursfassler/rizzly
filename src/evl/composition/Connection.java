@@ -36,4 +36,9 @@ public class Connection extends EvlBase {
     this.type = type;
   }
 
+  @Override
+  public String toString() {
+    return endpoint.get(Direction.in) + " " + type + " " + endpoint.get(Direction.out);
+  }
+
 }

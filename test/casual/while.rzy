@@ -19,9 +19,10 @@ component
       ret : Point;
       ret.x := 0;
       ret.y := 0;
-      while x > 0 do
+      i : R{0,256} = 0;
+      while i < x do
         ret := out( x );
-        x := x-1;
+        i := R{1,256}( i+1 );
       end
       return ret;
     end

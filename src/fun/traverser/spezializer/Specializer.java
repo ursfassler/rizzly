@@ -8,6 +8,7 @@ import java.util.Map;
 
 import common.Designator;
 import common.ElementInfo;
+
 import error.ErrorType;
 import error.RError;
 import fun.Copy;
@@ -77,8 +78,8 @@ public class Specializer {
         pitm = (TemplateParameter) tref.getLink();
         tref = pitm.getType();
         Named any = EvalTo.any(tref, kb);
-        assert( any instanceof TypeType );
-        any = EvalTo.any(((TypeType) any).getType(),kb);
+        assert (any instanceof TypeType);
+        any = EvalTo.any(((TypeType) any).getType(), kb);
         type = (Type) any;
       } else {
         Named any = EvalTo.any(tref, kb);

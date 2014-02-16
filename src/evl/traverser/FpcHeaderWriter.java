@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import util.StreamWriter;
+import cir.traverser.CWriter;
 
 import common.ElementInfo;
 import common.FuncAttr;
@@ -306,11 +307,18 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitArrayType(ArrayType obj, StreamWriter param) {
     param.wr(obj.getName());
-    param.wr(" = Array[0..");
+    param.wr(" = Record");
+    param.nl();
+    param.incIndent();
+    param.wr(CWriter.ARRAY_DATA_NAME);
+    param.wr(": Array[0..");
     param.wr(obj.getSize().subtract(BigInteger.ONE).toString());
     param.wr("] of ");
     visit(obj.getType(), param);
     param.wr(";");
+    param.nl();
+    param.decIndent();
+    param.wr("end;");
     param.nl();
     return null;
   }

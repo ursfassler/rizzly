@@ -108,11 +108,11 @@ static void checkStep( What what, uint8_t *list, int size ){
 }
 
 void inst__msgSend(Array_4_R_0_6 sender, R_0_3 size){
-  checkStep( DBG_SEND, sender, size );
+  checkStep( DBG_SEND, sender.data, size );
 }
 
 void inst__msgRecv(Array_4_R_0_6 receiver, R_0_3 size){
-  checkStep( DBG_RECV, receiver, size );
+  checkStep( DBG_RECV, receiver.data, size );
 }
 
 void inst_out(){

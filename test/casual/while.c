@@ -1,8 +1,13 @@
 #include  <stdio.h>
 #include  <stdint.h>
+#include  <stdlib.h>
 #include  "output/inst.h"
 
-while_Point inst_out_foo(R_0_255 x){
+void _trap(){
+  exit( EXIT_FAILURE );
+}
+
+while_Point inst_out(R_0_255 x){
   while_Point ret;
   ret.x = x;
   ret.y = 255 - x;
@@ -11,23 +16,24 @@ while_Point inst_out_foo(R_0_255 x){
 
 #define check( x1, y1, x2, y2 )    printf( "%i %i <> %i %i\n", x1, y1, x2, y2 ); if( (x1 != x2) | (y1 != y2) ) return -1
 
-
 int main(){
-  inst__system_construct();
+  inst__construct();
 
   while_Point point;
   
-  point = inst_in_foo( 0 );
+  point = inst_in( 0 );
   check( point.x, point.y, 0, 0 );
   
-  point = inst_in_foo( 1 );
+  point = inst_in( 1 );
   check( point.x, point.y, 1, 254 );
   
-  point = inst_in_foo( 2 );
+  point = inst_in( 2 );
   check( point.x, point.y, 2, 253 );
   
-  point = inst_in_foo( 3 );
+  point = inst_in( 3 );
   check( point.x, point.y, 3, 252 );
+  
+  inst__destruct();
   
   return 0;
 }

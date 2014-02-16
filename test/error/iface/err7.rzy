@@ -1,8 +1,9 @@
+// output of sub-component b is not connected
+
 component
   Sub
     output
       funcA();
-      funcB();
       
     implementation elementary
   end
@@ -10,7 +11,6 @@ component
   Err7
     output
       funcA();
-      funcB();
       
   implementation composition
     
@@ -20,7 +20,6 @@ component
 
     connection
       a.funcA -> funcA;
-      a.funcB -> funcB;
       
   end
 

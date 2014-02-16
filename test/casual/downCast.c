@@ -1,6 +1,7 @@
 #include  <stdio.h>
 #include  <stdint.h>
 #include  <stdlib.h>
+#include  <stdlib.h>
 #include  "output/inst.h"
 
 void check( R_0_200 e, R_0_200 r, const char *s ){

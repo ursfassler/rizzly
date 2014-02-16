@@ -12,6 +12,7 @@ import evl.NullTraverser;
 import evl.composition.Connection;
 import evl.composition.Endpoint;
 import evl.composition.EndpointSelf;
+import evl.composition.EndpointSub;
 import evl.composition.ImplComposition;
 import evl.function.FuncIface;
 import evl.function.FuncIfaceIn;
@@ -102,7 +103,7 @@ public class CompInterfaceTypeChecker extends NullTraverser<Void, Void> {
       } else {
         Type prottype = kt.get(proto);
         Type impltype = kt.get(impl);
-        if (!LeftIsContainerOfRightTest.process(impltype,prottype, kb)) {
+        if (!LeftIsContainerOfRightTest.process(impltype, prottype, kb)) {
           RError.err(ErrorType.Error, impl.getInfo(), "Function does not implement prototype: " + proto);
         }
       }
@@ -138,18 +139,32 @@ public class CompInterfaceTypeChecker extends NullTraverser<Void, Void> {
   private Component checkIface(ImplComposition obj, CompUse use, Direction dir) {
     Component type = use.getLink();
     for (FuncIface ifaceuse : type.getIface(dir)) {
-      if (!ifaceIsConnected(ifaceuse, dir.other(), obj.getConnection())) {
+      if (!ifaceIsConnected(use, ifaceuse, dir.other(), obj.getConnection())) {
         RError.err(ErrorType.Error, use.getInfo(), "Interface " + use.getName() + "." + ifaceuse.getName() + " not connected");
       }
     }
     return type;
   }
 
+  private boolean ifaceIsConnected(CompUse use, FuncIface ifaceuse, Direction dir, List<Connection> connection) {
+    for (Connection itr : connection) {
+      if (itr.getEndpoint(dir) instanceof EndpointSub) {
+        EndpointSub ep = (EndpointSub) itr.getEndpoint(dir);
+        if ((ep.getComp() == use) && (ep.getIfaceUse() == ifaceuse)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
   private boolean ifaceIsConnected(FuncIface ifaceuse, Direction dir, List<Connection> connection) {
     for (Connection itr : connection) {
-      FuncIface src = itr.getEndpoint(dir).getIfaceUse();
-      if (src == ifaceuse) {
-        return true;
+      if (itr.getEndpoint(dir) instanceof EndpointSelf) {
+        Endpoint ep = itr.getEndpoint(dir);
+        if (ep.getIfaceUse() == ifaceuse) {
+          return true;
+        }
       }
     }
     return false;

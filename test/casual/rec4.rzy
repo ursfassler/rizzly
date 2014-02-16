@@ -1,0 +1,19 @@
+type
+  Point = Record
+    x : R{0,100};
+    y : R{0,100};
+  end
+
+component
+  Rec4
+    input
+      equal( a, b: Point ):Boolean;
+    
+  implementation elementary
+
+    function equal( a, b: Point ):Boolean
+      return a = b;
+    end
+
+  end
+

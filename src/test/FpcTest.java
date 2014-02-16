@@ -44,6 +44,10 @@ public class FpcTest extends BaseTest {
 
   @Test
   public void debug() {
+    String conTrace = "debug: _construct \n";
+    conTrace += "debug: a _construct \n";
+    conTrace += "debug: b _construct \n";
+
     String fooTrace = "send foo\n";
     fooTrace += "debug: infoo \n";
     fooTrace += "debug: a infoo \n";
@@ -111,7 +115,11 @@ public class FpcTest extends BaseTest {
     pohTrace += "debug: outbar \n";
     pohTrace += "bar\n";
 
-    test("debug", "Debug", "start debug\n" + fooTrace + barTrace + pohTrace + "end debug\n", true);
+    String desTrace = "debug: _destruct \n";
+    desTrace += "debug: b _destruct \n";
+    desTrace += "debug: a _destruct \n";
+
+    test("debug", "Debug", "start debug\n" + conTrace + fooTrace + barTrace + pohTrace + desTrace + "end debug\n", true);
   }
 
   @Test

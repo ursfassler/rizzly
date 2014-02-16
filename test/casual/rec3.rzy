@@ -5,7 +5,7 @@ type
   end
 
 component
-  Rec2
+  Rec3
     input
       getElem( p: Point; elem: R{0,1} ):R{0,100};
     

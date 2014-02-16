@@ -36,7 +36,6 @@ import fun.other.Namespace;
 import fun.other.RizzlyFile;
 import fun.other.SymbolTable;
 import fun.traverser.CompLinkReduction;
-import fun.traverser.ConstEval;
 import fun.traverser.DeAlias;
 import fun.traverser.EnumLinkReduction;
 import fun.traverser.Linker;

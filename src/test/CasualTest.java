@@ -45,13 +45,26 @@ public class CasualTest extends BaseTest {
   }
 
   // TODO pass composite types by reference to functions, bring this tests to work
-  /*
-   * @Test public void rec2() { compile("rec2", TestSteps.EXECUTE, false, false); }
-   * 
-   * @Test public void rec3() { compile("rec3", TestSteps.EXECUTE, false, false); }
-   * 
-   * @Test public void while_() { compile("while", TestSteps.EXECUTE, false, true); }
-   */
+  @Test
+  public void rec2() {
+    compile("rec2", TestSteps.EXECUTE, false, false);
+  }
+
+  @Test
+  public void rec3() {
+    compile("rec3", TestSteps.EXECUTE, false, false);
+  }
+
+  @Test
+  public void rec4() {
+    compile("rec4", TestSteps.EXECUTE, false, false);
+  }
+
+  @Test
+  public void while_() {
+    compile("while", TestSteps.EXECUTE, false, true);
+  }
+
   @Test
   public void range() {
     compile("range", TestSteps.EXECUTE, false, false);

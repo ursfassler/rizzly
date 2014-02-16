@@ -24,7 +24,7 @@ var
 begin
   write( 'debug: ' );
   for i := size-1 downto 0 do begin
-    write( DEBUG_NAMES[receiver[i]] );
+    write( DEBUG_NAMES[receiver.data[i]] );
     write( ' ' );
   end;
   writeln();
@@ -36,15 +36,16 @@ var
 begin
   write( 'debug: ' );
   for i := size-1 downto 0 do begin
-    write( DEBUG_NAMES[sender[i]] );
+    write( DEBUG_NAMES[sender.data[i]] );
     write( ' ' );
   end;
   writeln();
 end;
 
 begin
-  inst__construct();
   writeln( 'start debug' );
+  
+  inst__construct();
 
   writeln( 'send foo' );
   inst_infoo();
@@ -55,7 +56,8 @@ begin
   writeln( 'send poh' );
   inst_inpoh();
 
-  writeln( 'end debug' );
   inst__destruct();
+  
+  writeln( 'end debug' );
 end.
 
