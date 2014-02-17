@@ -44,7 +44,6 @@ import evl.expression.binop.Shr;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefName;
-import evl.expression.reference.RefPtrDeref;
 import evl.expression.reference.Reference;
 import evl.expression.unop.Not;
 import evl.expression.unop.Uminus;
@@ -94,7 +93,6 @@ import evl.type.composed.UnionType;
 import evl.type.special.AnyType;
 import evl.type.special.IntegerType;
 import evl.type.special.NaturalType;
-import evl.type.special.PointerType;
 import evl.type.special.VoidType;
 import evl.variable.Constant;
 import evl.variable.FuncVariable;
@@ -442,17 +440,6 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.wr(obj.getName());
     wrId(obj, param);
     param.wr(" = False..True");
-    param.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitPointerType(PointerType obj, StreamWriter param) {
-    param.wr(obj.getName());
-    wrId(obj, param);
-    param.wr(" = ");
-    visit(obj.getType(), param);
-    param.wr("^");
     param.nl();
     return null;
   }
@@ -904,12 +891,6 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.wr("[");
     visit(obj.getIndex(), param);
     param.wr("]");
-    return null;
-  }
-
-  @Override
-  protected Void visitRefPtrDeref(RefPtrDeref obj, StreamWriter param) {
-    param.wr("^");
     return null;
   }
 

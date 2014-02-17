@@ -28,7 +28,6 @@ import evl.type.base.StringType;
 import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
-import evl.type.special.PointerType;
 import evl.variable.Variable;
 
 /**
@@ -224,18 +223,6 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.wr("typedef ");
     param.wr("char*");
     param.wr(" ");
-    param.wr(obj.getName());
-    param.wr(";");
-    param.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitPointerType(PointerType obj, StreamWriter param) {
-    param.wr("typedef ");
-    visit(obj.getType(), param);
-    param.wr(" ");
-    param.wr("*");
     param.wr(obj.getName());
     param.wr(";");
     param.nl();

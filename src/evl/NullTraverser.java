@@ -32,7 +32,6 @@ import evl.expression.binop.Shr;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefName;
-import evl.expression.reference.RefPtrDeref;
 import evl.expression.reference.Reference;
 import evl.expression.unop.Not;
 import evl.expression.unop.Uminus;
@@ -90,7 +89,6 @@ import evl.type.special.AnyType;
 import evl.type.special.ComponentType;
 import evl.type.special.IntegerType;
 import evl.type.special.NaturalType;
-import evl.type.special.PointerType;
 import evl.type.special.VoidType;
 import evl.variable.ConstGlobal;
 import evl.variable.ConstPrivate;
@@ -168,11 +166,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitRefCall(RefCall obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitRefPtrDeref(RefPtrDeref obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -398,11 +391,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitTypeRef(TypeRef obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitPointerType(PointerType obj, P param) {
     return visitDefault(obj, param);
   }
 

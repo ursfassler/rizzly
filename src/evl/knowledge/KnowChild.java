@@ -27,7 +27,6 @@ import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
 import evl.type.special.ComponentType;
-import evl.type.special.PointerType;
 import evl.variable.Variable;
 
 public class KnowChild extends KnowledgeEntry {
@@ -79,12 +78,6 @@ class KnowChildTraverser extends NullTraverser<Set<Named>, String> {
   protected Set<Named> visitDefault(Evl obj, String param) {
     // RError.err(ErrorType.Warning, obj.getInfo(), "Element can not have a named child");
     return new HashSet<Named>();
-  }
-
-  @Override
-  protected Set<Named> visitPointerType(PointerType obj, String param) {
-    // RError.err(ErrorType.Fatal, obj.getInfo(), "PointerType can not have a named child");
-    return null;
   }
 
   @Override

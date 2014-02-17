@@ -10,7 +10,6 @@ import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefItem;
 import evl.expression.reference.RefName;
-import evl.expression.reference.RefPtrDeref;
 import evl.expression.reference.Reference;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowChild;
@@ -23,7 +22,6 @@ import evl.type.base.ArrayType;
 import evl.type.base.EnumType;
 import evl.type.base.FunctionType;
 import evl.type.base.FunctionTypeRet;
-import evl.type.special.PointerType;
 
 //TODO check if this class does not too much (i.e. check and return type)
 public class RefTypeChecker extends NullTraverser<Type, Type> {
@@ -110,12 +108,6 @@ public class RefTypeChecker extends NullTraverser<Type, Type> {
       RError.err(ErrorType.Error, obj.getInfo(), "need array to index, got type: " + sub.getName());
       return null;
     }
-  }
-
-  @Override
-  protected Type visitRefPtrDeref(RefPtrDeref obj, Type param) {
-    assert (param instanceof PointerType);
-    return ((PointerType) param).getType().getRef();
   }
 
 }

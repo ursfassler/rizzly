@@ -6,7 +6,6 @@ import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefItem;
 import evl.expression.reference.RefName;
-import evl.expression.reference.RefPtrDeref;
 
 public class CopyRef extends NullTraverser<RefItem, Void> {
   private CopyEvl cast;
@@ -34,11 +33,6 @@ public class CopyRef extends NullTraverser<RefItem, Void> {
   @Override
   protected RefItem visitRefIndex(RefIndex obj, Void param) {
     return new RefIndex(obj.getInfo(), cast.copy(obj.getIndex()));
-  }
-
-  @Override
-  protected RefItem visitRefPtrDeref(RefPtrDeref obj, Void param) {
-    return new RefPtrDeref(obj.getInfo());
   }
 
 }

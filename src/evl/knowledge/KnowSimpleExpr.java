@@ -10,7 +10,6 @@ import evl.expression.binop.BinaryExp;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefName;
-import evl.expression.reference.RefPtrDeref;
 import evl.expression.reference.Reference;
 import evl.expression.unop.UnaryExp;
 import evl.function.FunctionBase;
@@ -21,7 +20,6 @@ import evl.type.base.EnumType;
 import evl.type.base.RangeType;
 import evl.type.composed.RecordType;
 import evl.type.special.NaturalType;
-import evl.type.special.PointerType;
 import evl.variable.ConstGlobal;
 import evl.variable.FuncVariable;
 import evl.variable.StateVariable;
@@ -78,22 +76,12 @@ class SimpleGetter extends NullTraverser<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitRefPtrDeref(RefPtrDeref obj, Void param) {
-    return false;
-  }
-
-  @Override
   protected Boolean visitTypeRef(TypeRef obj, Void param) {
     return visit(obj.getRef(), param);
   }
 
   @Override
   protected Boolean visitNaturalType(NaturalType obj, Void param) {
-    throw new UnsupportedOperationException("Not supported yet");
-  }
-
-  @Override
-  protected Boolean visitPointerType(PointerType obj, Void param) {
     throw new UnsupportedOperationException("Not supported yet");
   }
 

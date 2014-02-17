@@ -39,7 +39,6 @@ import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefItem;
 import evl.expression.reference.RefName;
-import evl.expression.reference.RefPtrDeref;
 import evl.expression.reference.Reference;
 import evl.expression.unop.Not;
 import evl.expression.unop.Uminus;
@@ -109,7 +108,6 @@ import evl.type.special.AnyType;
 import evl.type.special.ComponentType;
 import evl.type.special.IntegerType;
 import evl.type.special.NaturalType;
-import evl.type.special.PointerType;
 import evl.type.special.VoidType;
 import evl.variable.ConstGlobal;
 import evl.variable.ConstPrivate;
@@ -421,8 +419,6 @@ public abstract class Traverser<R, P> {
       return visitRefName((RefName) obj, param);
     } else if (obj instanceof RefCall) {
       return visitRefCall((RefCall) obj, param);
-    } else if (obj instanceof RefPtrDeref) {
-      return visitRefPtrDeref((RefPtrDeref) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -492,8 +488,6 @@ public abstract class Traverser<R, P> {
       return visitNaturalType((NaturalType) obj, param);
     } else if (obj instanceof IntegerType) {
       return visitIntegerType((IntegerType) obj, param);
-    } else if (obj instanceof PointerType) {
-      return visitPointerType((PointerType) obj, param);
     } else if (obj instanceof AnyType) {
       return visitAnyType((AnyType) obj, param);
     } else {
@@ -575,8 +569,6 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitRefIndex(RefIndex obj, P param);
 
-  abstract protected R visitRefPtrDeref(RefPtrDeref obj, P param);
-
   abstract protected R visitEnumDefRef(EnumDefRef obj, P param);
 
   abstract protected R visitCompUse(CompUse obj, P param);
@@ -646,8 +638,6 @@ public abstract class Traverser<R, P> {
   abstract protected R visitFunctionTypeVoid(FunctionTypeVoid obj, P param);
 
   abstract protected R visitFunctionTypeRet(FunctionTypeRet obj, P param);
-
-  abstract protected R visitPointerType(PointerType obj, P param);
 
   abstract protected R visitUnionSelector(UnionSelector obj, P param);
 

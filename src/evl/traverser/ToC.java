@@ -78,7 +78,6 @@ import evl.type.base.StringType;
 import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
-import evl.type.special.PointerType;
 import evl.type.special.VoidType;
 import evl.variable.ConstGlobal;
 import evl.variable.Constant;
@@ -242,11 +241,6 @@ public class ToC extends NullTraverser<CirBase, Void> {
   protected CirBase visitFuncVariable(FuncVariable obj, Void param) {
     cir.other.FuncVariable var = new cir.other.FuncVariable(obj.getName(), (cir.type.TypeRef) visit(obj.getType(), param));
     return var;
-  }
-
-  @Override
-  protected CirBase visitPointerType(PointerType obj, Void param) {
-    return new cir.type.PointerType(obj.getName(), (cir.type.TypeRef) visit(obj.getType(), null));
   }
 
   @Override

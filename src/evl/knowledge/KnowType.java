@@ -42,7 +42,6 @@ import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefItem;
 import evl.expression.reference.RefName;
-import evl.expression.reference.RefPtrDeref;
 import evl.expression.reference.Reference;
 import evl.expression.unop.Not;
 import evl.expression.unop.Uminus;
@@ -63,7 +62,6 @@ import evl.type.base.FunctionTypeVoid;
 import evl.type.base.RangeType;
 import evl.type.composed.NamedElement;
 import evl.type.special.ComponentType;
-import evl.type.special.PointerType;
 import evl.variable.Variable;
 
 public class KnowType extends KnowledgeEntry {
@@ -539,12 +537,6 @@ class RefTypeGetter extends NullTraverser<Type, Type> {
       RError.err(ErrorType.Error, obj.getInfo(), "need array to index, got type: " + sub.getName());
       return null;
     }
-  }
-
-  @Override
-  protected Type visitRefPtrDeref(RefPtrDeref obj, Type param) {
-    assert (param instanceof PointerType);
-    return ((PointerType) param).getType().getRef();
   }
 
 }

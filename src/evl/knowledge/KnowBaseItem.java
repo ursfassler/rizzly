@@ -17,7 +17,6 @@ import evl.type.base.RangeType;
 import evl.type.base.StringType;
 import evl.type.special.IntegerType;
 import evl.type.special.NaturalType;
-import evl.type.special.PointerType;
 import evl.type.special.VoidType;
 
 public class KnowBaseItem extends KnowledgeEntry {
@@ -106,16 +105,6 @@ public class KnowBaseItem extends KnowledgeEntry {
     ArrayType ret = (ArrayType) findItem(ArrayType.makeName(size, ref));
     if (ret == null) {
       ret = new ArrayType(size, ref);
-      addItem(ret);
-    }
-    return ret;
-  }
-
-  public PointerType getPointerType(Type type) {
-    TypeRef ref = new TypeRef(new ElementInfo(), type);
-    PointerType ret = (PointerType) findItem(PointerType.makeName(ref));
-    if (ret == null) {
-      ret = new PointerType(ref);
       addItem(ret);
     }
     return ret;
