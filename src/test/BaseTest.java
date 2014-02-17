@@ -68,14 +68,14 @@ abstract public class BaseTest {
   public void compileLlvm() {
     // String cmd = "gcc -pedantic -ansi -Werror -Wall -Wextra -c " + cFile + " -o " + outdir + "libinst.a";
     // TODO use strict again
-    String cmd = "gcc -pedantic -ansi -Wall -Wextra -c " + cFile + " -o " + outdir + "libinst.a";
+    String cmd = "gcc -std=c11 -pedantic -Wall -Wextra -c " + cFile + " -o " + outdir + "libinst.a";
     // TODO use strict? yes
     // TODO use additional code checker
     execute(cmd, "could not compile c file");
   }
 
   private void compileTest(String testcase) {
-    String flags = "-Wall -Werror";
+    String flags = "-std=c11 -Wall -pedantic -Wall -Wextra";
     String cmd = "gcc " + flags + " " + getRootdir() + testcase + ".c" + " " + outdir + "libinst.a" + " -o" + outdir + "inst";
     execute(cmd, "could not compile test case");
   }
