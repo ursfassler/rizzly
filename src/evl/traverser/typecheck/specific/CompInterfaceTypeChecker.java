@@ -77,6 +77,10 @@ public class CompInterfaceTypeChecker extends NullTraverser<Void, Void> {
 
     for (Transition tr : transList) {
       // TODO check if tr.getEventFunc() has compatible parameters
+
+      if (!(tr.getEventFunc().getLink() instanceof FuncIfaceIn)) {
+        RError.err(ErrorType.Error, tr.getInfo(), tr.getEventFunc().getLink().getName() + " is not an input event");
+      }
     }
 
     return null; // TODO check if all queries are defined

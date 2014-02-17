@@ -45,7 +45,7 @@ public class ErrIfaceTest extends ErrorTest {
 
   @Test
   public void errHfsm3() {
-    testForError("errHfsm3", "ErrHfsm3", "???");
+    testForError("errHfsm3", "ErrHfsm3", "funcC is not an input event");
   }
 
 }

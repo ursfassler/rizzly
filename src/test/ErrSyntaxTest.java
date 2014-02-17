@@ -10,7 +10,7 @@ public class ErrSyntaxTest extends ErrorTest {
 
   @Test
   public void err1() {
-    testForError("err1", "Err1", "???");
+    testForError("err1", "Err1", "Name not found: foo");
   }
 
   @Test

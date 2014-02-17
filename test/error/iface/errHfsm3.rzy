@@ -1,3 +1,5 @@
+// funcC is not an event
+
 component
   ErrHfsm3
     input
