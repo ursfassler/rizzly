@@ -38,6 +38,8 @@ import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
+import evl.expression.unop.BitNot;
+import evl.expression.unop.LogicNot;
 import evl.expression.unop.Not;
 import evl.expression.unop.Uminus;
 import evl.function.impl.FuncGlobal;
@@ -562,6 +564,18 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitNot(Not obj, P param) {
+    visit(obj.getExpr(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitLogicNot(LogicNot obj, P param) {
+    visit(obj.getExpr(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitBitNot(BitNot obj, P param) {
     visit(obj.getExpr(), param);
     return null;
   }

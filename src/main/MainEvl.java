@@ -69,6 +69,7 @@ import evl.other.RizzlyProgram;
 import evl.statement.Block;
 import evl.statement.ReturnVoid;
 import evl.traverser.BitLogicCategorizer;
+import evl.traverser.BitnotFixer;
 import evl.traverser.CHeaderWriter;
 import evl.traverser.CallgraphMaker;
 import evl.traverser.ClassGetter;
@@ -157,6 +158,8 @@ public class MainEvl {
 
     RangeConverter.process(aclasses, kb);
     CompareReplacer.process(aclasses, kb);
+
+    BitnotFixer.process(aclasses, kb);
 
     RizzlyProgram prg = instantiate(root, debugdir, aclasses);
 

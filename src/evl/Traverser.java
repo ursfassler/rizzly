@@ -40,6 +40,8 @@ import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefItem;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
+import evl.expression.unop.BitNot;
+import evl.expression.unop.LogicNot;
 import evl.expression.unop.Not;
 import evl.expression.unop.Uminus;
 import evl.expression.unop.UnaryExp;
@@ -339,6 +341,10 @@ public abstract class Traverser<R, P> {
       return visitUminus((Uminus) obj, param);
     } else if (obj instanceof Not) {
       return visitNot((Not) obj, param);
+    } else if (obj instanceof BitNot) {
+      return visitBitNot((BitNot) obj, param);
+    } else if (obj instanceof LogicNot) {
+      return visitLogicNot((LogicNot) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -644,6 +650,10 @@ public abstract class Traverser<R, P> {
   abstract protected R visitUminus(Uminus obj, P param);
 
   abstract protected R visitNot(Not obj, P param);
+
+  abstract protected R visitLogicNot(LogicNot obj, P param);
+
+  abstract protected R visitBitNot(BitNot obj, P param);
 
   abstract protected R visitPlus(Plus obj, P param);
 

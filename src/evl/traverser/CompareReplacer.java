@@ -16,7 +16,7 @@ import evl.expression.binop.LogicAnd;
 import evl.expression.binop.Notequal;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
-import evl.expression.unop.Not;
+import evl.expression.unop.LogicNot;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
 import evl.type.Type;
@@ -51,7 +51,7 @@ public class CompareReplacer extends ExprReplacer<Void> {
   @Override
   protected Expression visitNotequal(Notequal obj, Void param) {
     obj = (Notequal) super.visitNotequal(obj, param);
-    return new Not(obj.getInfo(), MakeCompareFunction.makeCmpExpr(obj.getLeft(), obj.getRight(), kb));
+    return new LogicNot(obj.getInfo(), MakeCompareFunction.makeCmpExpr(obj.getLeft(), obj.getRight(), kb));
   }
 
 }

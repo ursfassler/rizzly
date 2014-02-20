@@ -27,6 +27,8 @@ import evl.expression.binop.Plus;
 import evl.expression.binop.Shl;
 import evl.expression.binop.Shr;
 import evl.expression.reference.Reference;
+import evl.expression.unop.BitNot;
+import evl.expression.unop.LogicNot;
 import evl.expression.unop.Not;
 import evl.expression.unop.Uminus;
 
@@ -147,6 +149,16 @@ public class CopyExpression extends NullTraverser<Expression, Void> {
   @Override
   protected Expression visitNot(Not obj, Void param) {
     return new Not(obj.getInfo(), cast.copy(obj.getExpr()));
+  }
+
+  @Override
+  protected Expression visitLogicNot(LogicNot obj, Void param) {
+    return new LogicNot(obj.getInfo(), cast.copy(obj.getExpr()));
+  }
+
+  @Override
+  protected Expression visitBitNot(BitNot obj, Void param) {
+    return new BitNot(obj.getInfo(), cast.copy(obj.getExpr()));
   }
 
   @Override

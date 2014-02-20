@@ -33,6 +33,8 @@ import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
+import evl.expression.unop.BitNot;
+import evl.expression.unop.LogicNot;
 import evl.expression.unop.Not;
 import evl.expression.unop.Uminus;
 import evl.function.impl.FuncGlobal;
@@ -566,6 +568,16 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitTypeCast(TypeCast obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitLogicNot(LogicNot obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitBitNot(BitNot obj, P param) {
     return visitDefault(obj, param);
   }
 

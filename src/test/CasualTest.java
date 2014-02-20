@@ -15,6 +15,16 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  public void logicNot() {
+    compile("logicNot", TestSteps.EXECUTE, false, false);
+  }
+
+  @Test
+  public void bitNot() {
+    compile("bitNot", TestSteps.EXECUTE, false, false);
+  }
+
+  @Test
   public void mul() {
     compile("mul", TestSteps.EXECUTE, false, false);
   }

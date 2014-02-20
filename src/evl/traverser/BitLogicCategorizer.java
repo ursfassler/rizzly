@@ -1,5 +1,10 @@
 package evl.traverser;
 
+import java.math.BigInteger;
+
+import util.Range;
+import error.ErrorType;
+import error.RError;
 import evl.expression.Expression;
 import evl.expression.binop.And;
 import evl.expression.binop.BitAnd;
@@ -7,14 +12,19 @@ import evl.expression.binop.BitOr;
 import evl.expression.binop.LogicAnd;
 import evl.expression.binop.LogicOr;
 import evl.expression.binop.Or;
+import evl.expression.unop.BitNot;
+import evl.expression.unop.LogicNot;
+import evl.expression.unop.Not;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
 import evl.type.Type;
 import evl.type.base.BooleanType;
+import evl.type.base.RangeType;
 
 /**
- * Replaces "and" with "bitand" or "logicand", replaces "or" with "bitor" or "logicor"
+ * Replaces "and" with "bitand" or "logicand", replaces "or" with "bitor" or "logicor", replaces "not" with "bitnot" or
+ * "logicnot"
  * 
  * @author urs
  * 
@@ -50,6 +60,27 @@ public class BitLogicCategorizer extends ExprReplacer<KnowType> {
       return new LogicOr(obj.getInfo(), obj.getLeft(), obj.getRight());
     } else {
       return new BitOr(obj.getInfo(), obj.getLeft(), obj.getRight());
+    }
+  }
+
+  @Override
+  protected Expression visitNot(Not obj, KnowType param) {
+    super.visitNot(obj, param);
+    Type type = param.get(obj.getExpr());
+    if (type instanceof BooleanType) {
+      return new LogicNot(obj.getInfo(), obj.getExpr());
+    } else if (type instanceof RangeType) {
+      Range range = ((RangeType) type).getNumbers();
+      int bits = range.getHigh().bitCount();
+      BigInteger exp = BigInteger.valueOf(2).pow(bits).subtract(BigInteger.ONE);
+      if (!range.getLow().equals(BigInteger.ZERO) || !exp.equals(range.getHigh())) {
+        RError.err(ErrorType.Error, obj.getInfo(), "not only allowed for R{0,2^n-1}");
+        return null;
+      }
+      return new BitNot(obj.getInfo(), obj.getExpr());
+    } else {
+      RError.err(ErrorType.Error, obj.getInfo(), "not only implemented for boolean and range types");
+      return null;
     }
   }
 

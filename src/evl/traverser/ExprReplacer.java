@@ -37,6 +37,8 @@ import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefItem;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
+import evl.expression.unop.BitNot;
+import evl.expression.unop.LogicNot;
 import evl.expression.unop.Not;
 import evl.expression.unop.Uminus;
 import evl.hfsm.Transition;
@@ -195,6 +197,18 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
 
   @Override
   protected Expression visitNot(Not obj, T param) {
+    obj.setExpr(visit(obj.getExpr(), param));
+    return obj;
+  }
+
+  @Override
+  protected Expression visitLogicNot(LogicNot obj, T param) {
+    obj.setExpr(visit(obj.getExpr(), param));
+    return obj;
+  }
+
+  @Override
+  protected Expression visitBitNot(BitNot obj, T param) {
     obj.setExpr(visit(obj.getExpr(), param));
     return obj;
   }

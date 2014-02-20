@@ -43,7 +43,8 @@ import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefItem;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
-import evl.expression.unop.Not;
+import evl.expression.unop.BitNot;
+import evl.expression.unop.LogicNot;
 import evl.expression.unop.Uminus;
 import evl.function.FuncIface;
 import evl.function.FuncWithReturn;
@@ -430,8 +431,22 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
   }
 
   @Override
-  protected Type visitNot(Not obj, Void param) {
-    return kbi.getBooleanType(); // FIXME what with invert?
+  protected Type visitLogicNot(LogicNot obj, Void param) {
+    return kbi.getBooleanType();
+  }
+
+  @Override
+  protected Type visitBitNot(BitNot obj, Void param) {
+    Type type = visit(obj.getExpr(), param);
+    assert (type instanceof RangeType);
+
+    Range range = ((RangeType) type).getNumbers();
+    assert (range.getLow().equals(BigInteger.ZERO));
+    int bits = range.getHigh().bitCount();
+    BigInteger exp = BigInteger.valueOf(2).pow(bits).subtract(BigInteger.ONE);
+    assert (exp.equals(range.getHigh()));
+
+    return type;
   }
 
   @Override
