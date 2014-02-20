@@ -15,7 +15,7 @@ public class ErrSyntaxTest extends ErrorTest {
 
   @Test
   public void err2() {
-    testForError("err2", "Err2", "???");
+    testForError("err2", "Err2", "Missing arguments");
   }
 
 }

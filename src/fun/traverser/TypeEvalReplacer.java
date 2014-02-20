@@ -1,5 +1,7 @@
 package fun.traverser;
 
+import error.ErrorType;
+import error.RError;
 import fun.DefTraverser;
 import fun.Fun;
 import fun.expression.reference.RefTemplCall;
@@ -36,9 +38,11 @@ public class TypeEvalReplacer extends DefTraverser<Void, Memory> {
   protected Void visitReference(Reference obj, Memory param) {
     if (obj.getLink() instanceof Generator) {
       Generator gen = (Generator) obj.getLink();
+
       if (!gen.getTemplateParam().isEmpty()) {
-        assert (!obj.getOffset().isEmpty());
-        assert (obj.getOffset().get(0) instanceof RefTemplCall);
+        if ((obj.getOffset().isEmpty()) || !(obj.getOffset().get(0) instanceof RefTemplCall)) {
+          RError.err(ErrorType.Error, obj.getInfo(), "Missing arguments");
+        }
         Reference nr = new Reference(obj.getInfo(), obj.getLink());
         nr.getOffset().add(obj.getOffset().pop());
         Named func = EvalTo.any(nr, kb);

@@ -252,11 +252,6 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
-  public void ui() {
-    compile("ui", TestSteps.COMPILE_TO_ASM, false, false); // TODO make real testcase
-  }
-
-  @Test
   public void bitred() {
     compile("bitred", TestSteps.COMPILE_TO_ASM, false, false);
   }
