@@ -12,6 +12,8 @@ import common.ElementInfo;
 import error.ErrorType;
 import error.RError;
 import fun.Copy;
+import fun.Fun;
+import fun.NullTraverser;
 import fun.expression.Expression;
 import fun.expression.Number;
 import fun.expression.reference.DummyLinkTarget;
@@ -71,7 +73,6 @@ public class Specializer {
     return inst;
   }
 
-  // TODO clean this method up
   private static List<ActualTemplateArgument> evalParam(Generator item, List<Expression> genspec, ElementInfo info, KnowledgeBase kb) {
     if (genspec.size() != item.getTemplateParam().size()) {
       RError.err(ErrorType.Error, info, "Wrong number of parameter, expected " + item.getTemplateParam().size() + " got " + genspec.size());
@@ -81,56 +82,35 @@ public class Specializer {
     List<ActualTemplateArgument> ret = new ArrayList<ActualTemplateArgument>(genspec.size());
 
     for (int i = 0; i < genspec.size(); i++) {
-      TemplateParameter pitm = item.getTemplateParam().getList().get(i);
-      Reference tref = pitm.getType();
-      Type type;
-      if (tref.getLink() instanceof TemplateParameter) {
-        // we use a previous defined parameter, it has to be a "Type{*}" argument
-        pitm = (TemplateParameter) tref.getLink();
-        tref = pitm.getType();
-        Named any = eval(tref, kb);
-        assert (any instanceof TypeType);
-        any = eval(((TypeType) any).getType(), kb);
-        type = (Type) any;
-      } else {
-        Named any = eval(tref, kb);
-        type = (Type) any;
-      }
-      ActualTemplateArgument evald;
+      Reference tref = item.getTemplateParam().getList().get(i).getType();
       Expression acarg = genspec.get(i);
-      if (type instanceof Range) {
-        Number num = (Number) ExprEvaluator.evaluate(acarg, new Memory(), kb);
-        evald = num;
-        // TODO check type
-      } else if (type instanceof IntegerType) {
-        Number num = (Number) ExprEvaluator.evaluate(acarg, new Memory(), kb);
-        evald = num;
-      } else if (type instanceof NaturalType) {
-        Number num = (Number) ExprEvaluator.evaluate(acarg, new Memory(), kb);
-        if (num.getValue().compareTo(BigInteger.ZERO) < 0) {
-          RError.err(ErrorType.Error, acarg.getInfo(), "Value for Natural type has to be >= 0");
-        }
-        evald = num;
-      } else if (type instanceof AnyType) {
-        evald = (Type) eval((Reference) acarg, kb);
-        // TODO check type
-      } else if (type instanceof TypeType) {
-        evald = (ActualTemplateArgument) eval((Reference) acarg, kb);
-        // TODO check type
-      } else if (type instanceof TypeAlias) {
-        evald = (ActualTemplateArgument) ExprEvaluator.evaluate(acarg, new Memory(), kb);
-        // TODO check type
-      } else {
-        throw new RuntimeException("not yet implemented: " + type.getName());
-      }
-      // TODO check type
+      Type type = evalType(tref, kb);
+      ActualTemplateArgument evald = ArgEvaluator.process(type, acarg, kb);
       ret.add(evald);
     }
 
     return ret;
   }
 
-  private static Named eval(Reference obj, KnowledgeBase kb) {
+  private static Type evalType(Reference tref, KnowledgeBase kb) {
+    Type type;
+    if (tref.getLink() instanceof TemplateParameter) {
+      // we use a previous defined parameter, it has to be a "Type{*}" argument
+      TemplateParameter pitm;
+      pitm = (TemplateParameter) tref.getLink();
+      tref = pitm.getType();
+      Named any = eval(tref, kb);
+      assert (any instanceof TypeType);
+      any = eval(((TypeType) any).getType(), kb);
+      type = (Type) any;
+    } else {
+      Named any = eval(tref, kb);
+      type = (Type) any;
+    }
+    return type;
+  }
+
+  static Named eval(Reference obj, KnowledgeBase kb) {
     if (obj.getLink() instanceof Constant) {
       assert (false);
     }
@@ -219,6 +199,68 @@ class TypeSpecTrav extends ExprReplacer<Map<TemplateParameter, ActualTemplateArg
       assert (!(obj.getLink() instanceof TemplateParameter));
       return obj;
     }
+  }
+
+}
+
+class ArgEvaluator extends NullTraverser<ActualTemplateArgument, Expression> {
+  final private KnowledgeBase kb;
+
+  public ArgEvaluator(KnowledgeBase kb) {
+    super();
+    this.kb = kb;
+  }
+
+  public static ActualTemplateArgument process(Type type, Expression acarg, KnowledgeBase kb) {
+    ArgEvaluator argEvaluator = new ArgEvaluator(kb);
+    return argEvaluator.traverse(type, acarg);
+  }
+
+  @Override
+  protected ActualTemplateArgument visitDefault(Fun obj, Expression param) {
+    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+  }
+
+  @Override
+  protected ActualTemplateArgument visitIntegerType(IntegerType obj, Expression param) {
+    Number num = (Number) ExprEvaluator.evaluate(param, new Memory(), kb);
+    return num;
+  }
+
+  @Override
+  protected ActualTemplateArgument visitNaturalType(NaturalType obj, Expression param) {
+    Number num = (Number) ExprEvaluator.evaluate(param, new Memory(), kb);
+    if (num.getValue().compareTo(BigInteger.ZERO) < 0) {
+      RError.err(ErrorType.Error, param.getInfo(), "Value for Natural type has to be >= 0");
+    }
+    return num;
+  }
+
+  @Override
+  protected ActualTemplateArgument visitRange(Range obj, Expression param) {
+    Number num = (Number) ExprEvaluator.evaluate(param, new Memory(), kb);
+    // TODO check type
+    return num;
+  }
+
+  @Override
+  protected ActualTemplateArgument visitAnyType(AnyType obj, Expression param) {
+    Type evald = (Type) Specializer.eval((Reference) param, kb);
+    return evald;
+  }
+
+  @Override
+  protected ActualTemplateArgument visitTypeAlias(TypeAlias obj, Expression param) {
+    ActualTemplateArgument evald = (ActualTemplateArgument) ExprEvaluator.evaluate(param, new Memory(), kb);
+    // TODO check type
+    return evald;
+  }
+
+  @Override
+  protected ActualTemplateArgument visitTypeType(TypeType obj, Expression param) {
+    ActualTemplateArgument evald = (ActualTemplateArgument) Specializer.eval((Reference) param, kb);
+    // TODO check type
+    return evald;
   }
 
 }
