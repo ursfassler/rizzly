@@ -122,13 +122,15 @@ public class MainEvl {
   public static RizzlyProgram doEvl(ClaOption opt, String outdir, String debugdir, Namespace aclasses, Component root, ArrayList<String> names) {
     KnowledgeBase kb = new KnowledgeBase(aclasses, debugdir);
 
+    ConstTyper.process(aclasses, kb);
+    PrettyPrinter.print(aclasses, debugdir + "consttype.rzy", true);
+
     if (!opt.doLazyModelCheck()) {
       modelCheck(debugdir, aclasses, root, kb);
     }
 
     IntroduceConvert.process(aclasses, kb);
     OpenReplace.process(aclasses, kb);
-    ConstTyper.process(aclasses, kb);
 
     PrettyPrinter.print(aclasses, debugdir + "convert.rzy", true);
 

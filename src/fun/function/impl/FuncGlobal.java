@@ -9,6 +9,7 @@ import fun.function.FunctionHeader;
 import fun.other.Generator;
 import fun.other.ListOfNamed;
 import fun.statement.Block;
+import fun.variable.FuncVariable;
 import fun.variable.TemplateParameter;
 
 /**
@@ -48,6 +49,41 @@ public class FuncGlobal extends FunctionHeader implements Generator, FuncWithBod
   @Override
   public ListOfNamed<TemplateParameter> getTemplateParam() {
     return param;
+  }
+
+  @Override
+  public String toString() {
+    String ret = getName();
+
+    {
+      ret += "{";
+      boolean first = true;
+      for (TemplateParameter tp : getTemplateParam()) {
+        if (first) {
+          first = false;
+        } else {
+          ret += "; ";
+        }
+        ret += tp.toString();
+      }
+      ret += "}";
+    }
+
+    {
+      ret += "(";
+      boolean first = true;
+      for (FuncVariable tp : getParam()) {
+        if (first) {
+          first = false;
+        } else {
+          ret += "; ";
+        }
+        ret += tp.toString();
+      }
+      ret += ")";
+    }
+
+    return ret;
   }
 
 }

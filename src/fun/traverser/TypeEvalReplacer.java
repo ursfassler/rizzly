@@ -1,15 +1,19 @@
 package fun.traverser;
 
-import error.ErrorType;
-import error.RError;
+import java.util.ArrayList;
+import java.util.List;
+
 import fun.DefTraverser;
-import fun.Fun;
+import fun.expression.Expression;
 import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.Reference;
 import fun.knowledge.KnowledgeBase;
 import fun.other.Generator;
 import fun.other.Named;
-import fun.traverser.spezializer.EvalTo;
+import fun.traverser.spezializer.Specializer;
+import fun.variable.ConstGlobal;
+
+//TODO: merge with Specializer?
 
 /**
  * Replaces all types with the evaluated expression:
@@ -19,9 +23,9 @@ import fun.traverser.spezializer.EvalTo;
  * @author urs
  * 
  */
-public class TypeEvalReplacer extends DefTraverser<Void, Memory> {
+public class TypeEvalReplacer extends DefTraverser<Void, Void> {
 
-  private KnowledgeBase kb;
+  final private KnowledgeBase kb;
 
   public TypeEvalReplacer(KnowledgeBase kb) {
     super();
@@ -29,26 +33,22 @@ public class TypeEvalReplacer extends DefTraverser<Void, Memory> {
   }
 
   @Override
-  public Void traverse(Fun obj, Memory param) {
-    assert (param != null);
-    return super.traverse(obj, param);
-  }
-
-  @Override
-  protected Void visitReference(Reference obj, Memory param) {
+  protected Void visitReference(Reference obj, Void param) {
+    super.visitReference(obj, param);
     if (obj.getLink() instanceof Generator) {
-      Generator gen = (Generator) obj.getLink();
-
-      if (!gen.getTemplateParam().isEmpty()) {
-        if ((obj.getOffset().isEmpty()) || !(obj.getOffset().get(0) instanceof RefTemplCall)) {
-          RError.err(ErrorType.Error, obj.getInfo(), "Missing arguments");
+      List<Expression> arg = new ArrayList<>();
+      if (!obj.getOffset().isEmpty()) {
+        if (obj.getOffset().get(0) instanceof RefTemplCall) {
+          arg = ((RefTemplCall) obj.getOffset().pop()).getActualParameter();
         }
-        Reference nr = new Reference(obj.getInfo(), obj.getLink());
-        nr.getOffset().add(obj.getOffset().pop());
-        Named func = EvalTo.any(nr, kb);
-        obj.setLink(func);
       }
+
+      Named inst = Specializer.process((Generator) obj.getLink(), arg, obj.getInfo(), kb);
+      obj.setLink(inst);
+    } else if ((obj.getLink() instanceof ConstGlobal)) {
+      // FIXME this is a temporary workaround, the copy should be done in the instantiater (Specializer?)
+      visit(obj.getLink(), null);   // somebody has to instantiate the constant
     }
-    return super.visitReference(obj, param);
+    return null;
   }
 }

@@ -1,0 +1,15 @@
+type
+  R1 = Record
+  end
+
+  R2{T:Any} = Record
+    b : T;
+  end
+
+component
+  Generic
+  implementation elementary
+    var
+      x: R2{R1};
+  end
+

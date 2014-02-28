@@ -15,6 +15,7 @@ import fun.function.FunctionHeader;
 import fun.other.Component;
 import fun.other.ListOfNamed;
 import fun.type.Type;
+import fun.type.TypeGenerator;
 import fun.type.base.EnumElement;
 import fun.type.base.EnumType;
 import fun.type.base.TypeAlias;
@@ -97,12 +98,19 @@ public class TypeParser extends BaseParser {
     if (peek().getType() == TokenType.OPENCURLY) {
       genpam = parseGenericParam();
     } else {
-      genpam = new ArrayList<TemplateParameter>(); // FIXME or directly generate a type here?
+      genpam = null;
     }
     expect(TokenType.EQUAL);
 
     Type type = parseTypeDef(name.getData(), constants);
-    type.getTemplateParam().addAll(genpam);
+    if (genpam != null) {
+      if (type instanceof TypeGenerator) {
+        ((TypeGenerator) type).getTemplateParam().addAll(genpam);
+      } else {
+        RError.err(ErrorType.Error, name.getInfo(), "Expected type template");
+      }
+
+    }
 
     return type;
   }

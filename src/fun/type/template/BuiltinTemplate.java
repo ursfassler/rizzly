@@ -2,9 +2,9 @@ package fun.type.template;
 
 import common.ElementInfo;
 
-import fun.type.Type;
+import fun.type.TypeGenerator;
 
-public class BuiltinTemplate extends Type {
+public class BuiltinTemplate extends TypeGenerator {
 
   public BuiltinTemplate(ElementInfo info, String name) {
     super(info, name);

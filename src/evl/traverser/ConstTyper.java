@@ -18,10 +18,12 @@ import evl.variable.Constant;
  */
 public class ConstTyper extends DefTraverser<Void, Void> {
   private final KnowType kt;
+  private final KnowBaseItem kbi;
 
   public ConstTyper(KnowledgeBase kb) {
     super();
     this.kt = kb.getEntry(KnowType.class);
+    this.kbi = kb.getEntry(KnowBaseItem.class);
   }
 
   public static void process(Evl evl, KnowledgeBase kb) {
@@ -38,7 +40,16 @@ public class ConstTyper extends DefTraverser<Void, Void> {
   protected Void visitConstant(Constant obj, Void param) {
     if (isOpenType(obj.getType().getRef())) {
       Type ct = kt.get(obj.getDef());
-      obj.setType(new TypeRef(obj.getInfo(), ct));
+
+      // that is a bit hacky
+      Type rt = (Type) kbi.findItem(ct.getName());
+      if (rt == null) {
+        kbi.addItem(ct);
+        rt = ct;
+      }
+      // ct = kbi.get(ct.getClass(), ct.getName());
+
+      obj.setType(new TypeRef(obj.getInfo(), rt));
     }
     super.visitConstant(obj, param);
     return null;

@@ -49,7 +49,6 @@ import fun.type.base.AnyType;
 import fun.type.base.BooleanType;
 import fun.type.base.EnumElement;
 import fun.type.base.EnumType;
-import fun.type.base.FunctionType;
 import fun.type.base.IntegerType;
 import fun.type.base.NaturalType;
 import fun.type.base.StringType;
@@ -245,13 +244,11 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitBooleanType(BooleanType obj, P param) {
-    visitList(obj.getTemplateParam(), param);
     return null;
   }
 
   @Override
   protected R visitEnumType(EnumType obj, P param) {
-    visitList(obj.getTemplateParam(), param);
     visitItr(obj.getElement(), param);
     return null;
   }
@@ -276,14 +273,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitVoidType(VoidType obj, P param) {
-    visitList(obj.getTemplateParam(), param);
     return null;
-  }
-
-  @Override
-  protected R visitFunctionType(FunctionType obj, P param) {
-    visitList(obj.getTemplateParam(), param);
-    throw new RuntimeException("not yet implemented");
   }
 
   @Override
@@ -351,13 +341,11 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitIntegerType(IntegerType obj, P param) {
-    visitList(obj.getTemplateParam(), param);
     return null;
   }
 
   @Override
   protected R visitNaturalType(NaturalType obj, P param) {
-    visitList(obj.getTemplateParam(), param);
     return null;
   }
 
@@ -381,7 +369,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitAnyType(AnyType obj, P param) {
-    visitList(obj.getTemplateParam(), param);
     return null;
   }
 
@@ -432,7 +419,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitStringType(StringType obj, P param) {
-    visitList(obj.getTemplateParam(), param);
     return null;
   }
 

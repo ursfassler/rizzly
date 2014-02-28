@@ -27,7 +27,6 @@ import fun.doc.DepGraph;
 import fun.doc.DocWriter;
 import fun.doc.FunPrinter;
 import fun.expression.Expression;
-import fun.expression.reference.Reference;
 import fun.knowledge.KnowledgeBase;
 import fun.other.Component;
 import fun.other.Generator;
@@ -39,11 +38,8 @@ import fun.traverser.CompLinkReduction;
 import fun.traverser.DeAlias;
 import fun.traverser.EnumLinkReduction;
 import fun.traverser.Linker;
-import fun.traverser.Memory;
 import fun.traverser.NamespaceLinkReduction;
 import fun.traverser.StateLinkReduction;
-import fun.traverser.TypeEvalReplacer;
-import fun.traverser.spezializer.EvalTo;
 import fun.traverser.spezializer.Specializer;
 import fun.type.Type;
 import fun.type.base.AnyType;
@@ -55,7 +51,6 @@ import fun.type.base.VoidType;
 import fun.type.template.ArrayTemplate;
 import fun.type.template.RangeTemplate;
 import fun.type.template.TypeTypeTemplate;
-import fun.variable.ConstGlobal;
 import fun.variable.StateVariable;
 
 public class MainFun {
@@ -139,6 +134,14 @@ public class MainFun {
     }
   }
 
+  private static Component evaluate(Named root, Namespace oldClasses, String debugdir, Collection<RizzlyFile> fileList) {
+    KnowledgeBase kb = new KnowledgeBase(oldClasses, fileList, debugdir);
+
+    Named nroot = Specializer.process((Generator) root, new ArrayList<Expression>(), root.getInfo(), kb);
+
+    return (Component) nroot;
+  }
+
   private static void removeUnused(Namespace classes, Named root) {
     SimpleGraph<Named> g = DepGraph.build(root);
     removeUnused(classes, g.vertexSet());
@@ -156,52 +159,6 @@ public class MainFun {
       }
     }
     ns.removeAll(remove);
-  }
-
-  private static Component evaluate(Named root, Namespace classes, String debugdir, Collection<RizzlyFile> fileList) {
-    KnowledgeBase kb = new KnowledgeBase(classes, fileList, debugdir);
-
-    // { // Cycle detection
-    // SimpleGraph<Named> g = DepGraph.build(classes);
-    // CycleDetector<Named, Pair<Named, Named>> cd = new CycleDetector<Named, Pair<Named, Named>>(g);
-    // Set<Named> cycle = cd.findCycles();
-    // if (!cycle.isEmpty()) {
-    // for (Named v : cycle) {
-    // RError.err(ErrorType.Hint, v.getInfo(), "Dependency cycle found, invovling type: " + v.getName());
-    // }
-    // RError.err(ErrorType.Error, "Dependency cycle found in types");
-    // }
-    // }
-
-    {
-      {
-        List<ConstGlobal> gconst = classes.getItems(ConstGlobal.class, true);
-        for (ConstGlobal itr : gconst) {
-          Type type = (Type) EvalTo.any(itr.getType(), kb);
-          itr.setType(new Reference(itr.getType().getInfo(), type));
-        }
-      }
-
-      {
-        TypeEvalReplacer replacer = new TypeEvalReplacer(kb);
-
-        for (RizzlyFile f : fileList) {
-          List<Generator> itms = new ArrayList<Generator>();
-          itms.addAll(f.getType().getList());
-          itms.addAll(f.getFunction().getList());
-          itms.addAll(f.getComp().getList());
-          for (Generator itr : itms) {
-            if (itr.getTemplateParam().isEmpty()) {
-              replacer.traverse(itr, new Memory());
-            }
-          }
-        }
-      }
-
-      Named nroot = Specializer.process((Generator) root, new ArrayList<Expression>(), root.getInfo(), kb);
-
-      return (Component) nroot;
-    }
   }
 
   private static List<Type> genPrimitiveTypes() {

@@ -81,6 +81,7 @@ import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
 import evl.type.special.VoidType;
 import evl.variable.ConstGlobal;
+import evl.variable.ConstPrivate;
 import evl.variable.Constant;
 import evl.variable.FuncVariable;
 import evl.variable.StateVariable;
@@ -230,6 +231,11 @@ public class ToC extends NullTraverser<CirBase, Void> {
 
   @Override
   protected CirBase visitConstGlobal(ConstGlobal obj, Void param) {
+    return new cir.other.Constant(obj.getName(), (cir.type.TypeRef) visit(obj.getType(), param), (cir.expression.Expression) visit(obj.getDef(), param));
+  }
+
+  @Override
+  protected CirBase visitConstPrivate(ConstPrivate obj, Void param) {
     return new cir.other.Constant(obj.getName(), (cir.type.TypeRef) visit(obj.getType(), param), (cir.expression.Expression) visit(obj.getDef(), param));
   }
 

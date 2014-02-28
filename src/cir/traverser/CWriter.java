@@ -550,12 +550,14 @@ public class CWriter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitArrayValue(ArrayValue obj, StreamWriter param) {
     param.wr("{");
+    param.wr(" ." + ARRAY_DATA_NAME + " = {");
     for (int i = 0; i < obj.getValue().size(); i++) {
       if (i > 0) {
         param.wr(",");
       }
       visit(obj.getValue().get(i), param);
     }
+    param.wr("} ");
     param.wr("}");
     return null;
   }

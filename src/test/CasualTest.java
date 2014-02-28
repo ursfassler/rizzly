@@ -81,6 +81,11 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  public void generic() {
+    compile("generic", TestSteps.COMPILE_TO_ASM, false, false);
+  }
+
+  @Test
   public void smallGenericUse() {
     compile("smallGenericUse", TestSteps.COMPILE_TO_ASM, false, false);
   }
@@ -177,6 +182,11 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  public void constInit4() {
+    compile("constInit4", TestSteps.EXECUTE, false, false);
+  }
+
+  @Test
   public void alarmController() {
     compile("alarmController", TestSteps.COMPILE_TO_ASM, false, false);
   }
@@ -209,6 +219,11 @@ public class CasualTest extends BaseTest {
   @Test
   public void union1() {
     compile("union1", TestSteps.COMPILE_TO_ASM, false, false);// TODO make testcase
+  }
+
+  @Test
+  public void typedConst() {
+    compile("typedConst", TestSteps.COMPILE_TO_PIR, false, false);
   }
 
   @Test

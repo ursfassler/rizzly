@@ -130,8 +130,9 @@ class RefGetter extends NullTraverser<Evl, Evl> {
   @Override
   protected Evl visitRefIndex(RefIndex obj, Evl param) {
     Variable var = (Variable) param;
-    ArrayType type = (ArrayType) var.getType().getRef();
-    return type.getType().getRef();
+    Type type = var.getType().getRef();
+    ArrayType arrayType = (ArrayType) type;
+    return arrayType.getType().getRef();
   }
 
 }

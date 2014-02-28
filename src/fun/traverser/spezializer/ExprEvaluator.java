@@ -25,7 +25,6 @@ import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.Reference;
 import fun.function.impl.FuncGlobal;
 import fun.knowledge.KnowledgeBase;
-import fun.other.Generator;
 import fun.traverser.Memory;
 import fun.variable.ConstGlobal;
 import fun.variable.FuncVariable;
@@ -55,8 +54,8 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
 
   private Fun executeRef(Fun obj, RefItem param, Memory memory) {
     if (param instanceof RefTemplCall) {
-      assert (obj instanceof Generator);
-      return Specializer.process((Generator) obj, ((RefTemplCall) param).getActualParameter(), param.getInfo(), kb);
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Can not evaluate template");
+      return null;
     } else if (param instanceof RefCall) {
       assert (obj instanceof FuncGlobal);
       return StmtExecutor.process((FuncGlobal) obj, ((RefCall) param).getActualParameter(), new Memory(), kb);

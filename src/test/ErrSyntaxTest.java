@@ -15,7 +15,11 @@ public class ErrSyntaxTest extends ErrorTest {
 
   @Test
   public void err2() {
-    testForError("err2", "Err2", "Missing arguments");
+    testForError("err2", "Err2", "Wrong number of parameter, expected 1 got 0");
   }
 
+  @Test
+  public void err3() {
+    testForError("err3", "Err3", "Expected name, got keyword R");
+  }
 }

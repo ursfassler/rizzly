@@ -44,7 +44,6 @@ import fun.type.base.AnyType;
 import fun.type.base.BooleanType;
 import fun.type.base.EnumElement;
 import fun.type.base.EnumType;
-import fun.type.base.FunctionType;
 import fun.type.base.IntegerType;
 import fun.type.base.NaturalType;
 import fun.type.base.StringType;
@@ -208,11 +207,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitRefCompcall(RefTemplCall obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitFunctionType(FunctionType obj, P param) {
     return visitDefault(obj, param);
   }
 

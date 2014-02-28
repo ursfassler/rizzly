@@ -2,6 +2,8 @@ package fun.traverser.spezializer;
 
 import java.util.List;
 
+import error.ErrorType;
+import error.RError;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import fun.Fun;
 import fun.NullTraverser;
@@ -34,6 +36,9 @@ public class ElementGetter extends NullTraverser<Expression, Expression> {
   @Override
   protected Expression visitNumber(Number obj, Expression param) {
     int idx = ExpressionTypeChecker.getAsInt(obj.getValue(), obj.toString());
+    if (!(param instanceof ArrayValue)) {
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Expected array value");
+    }
     ArrayValue arrv = (ArrayValue) param;
     return arrv.getValue().get(idx);
   }

@@ -1,9 +1,9 @@
 package fun.traverser;
 
 import fun.DefTraverser;
+import fun.Fun;
 import fun.expression.Expression;
 import fun.knowledge.KnowledgeBase;
-import fun.other.Namespace;
 import fun.traverser.spezializer.ExprEvaluator;
 import fun.variable.Constant;
 
@@ -15,7 +15,7 @@ public class ConstEval extends DefTraverser<Void, Void> {
     this.kb = kb;
   }
 
-  public static void process(Namespace classes, KnowledgeBase kb) {
+  public static void process(Fun classes, KnowledgeBase kb) {
     ConstEval eval = new ConstEval(kb);
     eval.traverse(classes, null);
   }

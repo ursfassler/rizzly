@@ -12,9 +12,9 @@ type
     b : R;
   end
   
-  The3{T:Type{Integer};R:Type{Any}} = Record
+  The3{T:Type{Integer};S:Type{Any}} = Record
     a : T;
-    b : The2Record{T,R};
+    b : The2Record{T,S};
   end
 
 component

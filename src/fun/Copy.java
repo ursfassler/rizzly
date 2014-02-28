@@ -57,7 +57,6 @@ import fun.type.base.AnyType;
 import fun.type.base.BooleanType;
 import fun.type.base.EnumElement;
 import fun.type.base.EnumType;
-import fun.type.base.FunctionType;
 import fun.type.base.IntegerType;
 import fun.type.base.NaturalType;
 import fun.type.base.StringType;
@@ -226,11 +225,6 @@ class CopyFun extends Traverser<Fun, Void> {
   }
 
   @Override
-  protected Fun visitFunctionType(FunctionType obj, Void param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
   protected Fun visitVoidType(VoidType obj, Void param) {
     throw new RuntimeException("not yet implemented");
   }
@@ -247,7 +241,7 @@ class CopyFun extends Traverser<Fun, Void> {
 
   @Override
   protected Fun visitTemplateParameter(TemplateParameter obj, Void param) {
-    return new TemplateParameter(obj.getInfo(), obj.getName(), copy(obj.getType()));
+    throw new RuntimeException("not yet implemented");
   }
 
   @Override
@@ -316,11 +310,6 @@ class CopyFun extends Traverser<Fun, Void> {
 
   @Override
   protected Fun visitIntegerType(IntegerType obj, Void param) {
-    return new IntegerType();
-  }
-
-  @Override
-  protected Fun visitNaturalType(NaturalType obj, Void param) {
     throw new RuntimeException("not yet implemented");
   }
 
@@ -336,6 +325,11 @@ class CopyFun extends Traverser<Fun, Void> {
 
   @Override
   protected Fun visitArrayTemplate(ArrayTemplate obj, Void param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Fun visitNaturalType(NaturalType obj, Void param) {
     throw new RuntimeException("not yet implemented");
   }
 

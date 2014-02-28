@@ -12,6 +12,7 @@ function fibArray{ till: Natural }():Array{till,Natural}
   i: Natural = 2;
   while i < till do
     res[i] := res[i-1] + res[i-2];
+    i := i + 1;
   end
   
   return res;

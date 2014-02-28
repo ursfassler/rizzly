@@ -1,14 +1,22 @@
 package fun.traverser.spezializer;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 
 import common.ElementInfo;
 
+import error.ErrorType;
+import error.RError;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.expression.AnyValue;
+import fun.expression.ArrayValue;
 import fun.expression.BoolValue;
 import fun.expression.Expression;
+import fun.expression.reference.RefIndex;
+import fun.expression.reference.RefItem;
+import fun.expression.reference.Reference;
 import fun.function.impl.FuncGlobal;
 import fun.knowledge.KnowledgeBase;
 import fun.statement.Assignment;
@@ -21,6 +29,10 @@ import fun.statement.Statement;
 import fun.statement.VarDefStmt;
 import fun.statement.While;
 import fun.traverser.Memory;
+import fun.type.Type;
+import fun.type.base.NaturalType;
+import fun.type.template.Array;
+import fun.type.template.Range;
 import fun.variable.Variable;
 
 /**
@@ -94,7 +106,32 @@ public class StmtExecutor extends NullTraverser<Expression, Memory> {
 
   @Override
   protected Expression visitVarDef(VarDefStmt obj, Memory param) {
+    Expression value;
+
+    Reference tr = obj.getVariable().getType();
+    assert (tr.getOffset().isEmpty());
+    Type type = (Type) tr.getLink();
+    if (type instanceof Range) {
+      value = null;
+    } else if (type instanceof NaturalType) {
+      value = null;
+    } else if (type instanceof Array) {
+      Array at = (Array) type;
+      List<Expression> vals = new ArrayList<Expression>(at.getSize().intValue());
+      for (int i = 0; i < at.getSize().intValue(); i++) {
+        vals.add(null);
+      }
+      value = new ArrayValue(new ElementInfo(), vals);
+    } else {
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Unhandled type: " + type.getName());
+      value = null;
+    }
+
     param.createVar(obj.getVariable());
+    if (value != null) {
+      param.set(obj.getVariable(), value);
+    }
+
     return null;
   }
 
@@ -103,15 +140,24 @@ public class StmtExecutor extends NullTraverser<Expression, Memory> {
     Variable var = (Variable) obj.getLeft().getLink();
     Expression rhs = exeval(obj.getRight(), param);
 
-    /*
-     * Expression value = param.get(var); Expression base = value; for (RefItem itr : obj.getLeft().getOffset()) { base
-     * = ElementGetter.INSTANCE.visit(itr,base); } Expression elem = base;
-     * 
-     * value = ElemReplacer.replace(value, elem, rhs);
-     * 
-     * param.set(var, value);
-     */
-    param.set(var, rhs);
+    if (obj.getLeft().getOffset().isEmpty()) {
+      param.set(var, rhs);
+      return null;
+    }
+
+    Expression value = param.get(var);
+
+    LinkedList<RefItem> offset = new LinkedList<>();
+    for (RefItem itm : obj.getLeft().getOffset()) {
+      if (itm instanceof RefIndex) {
+        itm = new RefIndex(new ElementInfo(), exeval(((RefIndex) itm).getIndex(), param));
+      }
+      offset.add(itm);
+    }
+    RefItem last = offset.pollLast();
+    Expression elem = ElementGetter.get(value, offset);
+
+    ElementSetter.set(elem, last, rhs);
 
     return null;
   }
@@ -147,5 +193,4 @@ public class StmtExecutor extends NullTraverser<Expression, Memory> {
     }
     return visit(obj.getDefblock(), param);
   }
-
 }

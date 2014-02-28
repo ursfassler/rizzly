@@ -1,7 +1,10 @@
 package evl.copy;
 
+import java.util.ArrayList;
+
 import evl.Evl;
 import evl.NullTraverser;
+import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
 import evl.expression.Expression;
 import evl.expression.Number;
@@ -69,6 +72,11 @@ public class CopyExpression extends NullTraverser<Expression, Void> {
   @Override
   protected Expression visitNumber(Number obj, Void param) {
     return new Number(obj.getInfo(), obj.getValue());
+  }
+
+  @Override
+  protected Expression visitArrayValue(ArrayValue obj, Void param) {
+    return new ArrayValue(obj.getInfo(), new ArrayList<Expression>(cast.copy(obj.getValue())));
   }
 
   @Override

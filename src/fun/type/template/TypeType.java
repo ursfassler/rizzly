@@ -3,9 +3,9 @@ package fun.type.template;
 import common.ElementInfo;
 
 import fun.expression.reference.Reference;
-import fun.type.Type;
+import fun.type.TypeGenerator;
 
-public class TypeType extends Type {
+public class TypeType extends TypeGenerator {
   private Reference type;
 
   public TypeType(ElementInfo info, Reference type) {

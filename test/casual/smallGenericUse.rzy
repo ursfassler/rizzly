@@ -4,14 +4,14 @@ type
     b : R{0,255};
   end
 
-  The2Record{T:Type{Natural};R:Type{Any}} = Record
+  The2Record{T:Type{Natural};S:Type{Any}} = Record
     a : T;
-    b : R;
+    b : S;
   end
 
-  The3Record{R:Type{Any}} = Record
+  The3Record{T:Type{Any}} = Record
     a : R{0,255};
-    b : R;
+    b : T;
   end
 
 component

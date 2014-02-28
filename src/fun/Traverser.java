@@ -54,7 +54,6 @@ import fun.type.base.BaseType;
 import fun.type.base.BooleanType;
 import fun.type.base.EnumElement;
 import fun.type.base.EnumType;
-import fun.type.base.FunctionType;
 import fun.type.base.IntegerType;
 import fun.type.base.NaturalType;
 import fun.type.base.StringType;
@@ -272,8 +271,6 @@ public abstract class Traverser<R, P> {
   protected R visitType(Type obj, P param) {
     if (obj instanceof BaseType) {
       return visitBaseType((BaseType) obj, param);
-    } else if (obj instanceof FunctionType) {
-      return visitFunctionType((FunctionType) obj, param);
     } else if (obj instanceof TypeType) {
       return visitTypeType((TypeType) obj, param);
     } else if (obj instanceof NamedElementType) {
@@ -366,8 +363,6 @@ public abstract class Traverser<R, P> {
   abstract protected R visitStateVariable(StateVariable obj, P param);
 
   abstract protected R visitTypeAlias(TypeAlias obj, P param);
-
-  abstract protected R visitFunctionType(FunctionType obj, P param);
 
   abstract protected R visitVoidType(VoidType obj, P param);
 

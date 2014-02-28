@@ -3,9 +3,9 @@ package fun.type.base;
 import common.ElementInfo;
 
 import fun.expression.reference.Reference;
-import fun.type.Type;
+import fun.type.TypeGenerator;
 
-public class TypeAlias extends Type {
+public class TypeAlias extends TypeGenerator {
   private Reference ref;
 
   public TypeAlias(ElementInfo info, String name, Reference ref) {
