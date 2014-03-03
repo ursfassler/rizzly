@@ -147,8 +147,13 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
-  public void typeAlias() {
-    compile("typeAlias", TestSteps.COMPILE_TO_ASM, false, false);
+  public void typeAlias1() {
+    compile("typeAlias1", TestSteps.COMPILE_TO_ASM, false, false);
+  }
+
+  @Test
+  public void typeAlias2() {
+    compile("typeAlias2", TestSteps.COMPILE_TO_ASM, false, false);
   }
 
   @Test

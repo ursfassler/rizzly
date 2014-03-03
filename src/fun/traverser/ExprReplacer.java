@@ -29,6 +29,7 @@ import fun.statement.CaseStmt;
 import fun.statement.IfOption;
 import fun.statement.ReturnExpr;
 import fun.statement.While;
+import fun.type.base.TypeAlias;
 import fun.type.composed.NamedElement;
 import fun.variable.Constant;
 import fun.variable.Variable;
@@ -183,6 +184,12 @@ public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   protected Expression visitNamedElement(NamedElement obj, T param) {
     obj.setType((Reference) visit(obj.getType(), param));
     return super.visitNamedElement(obj, param);
+  }
+
+  @Override
+  protected Expression visitTypeAlias(TypeAlias obj, T param) {
+    obj.setRef((Reference) visit(obj.getRef(), param));
+    return super.visitTypeAlias(obj, param);
   }
 
   @Override

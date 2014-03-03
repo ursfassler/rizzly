@@ -6,7 +6,7 @@ type
   Byte2 = Byte;
   
 component
-  TypeAlias
+  TypeAlias2
     input
       in();
   

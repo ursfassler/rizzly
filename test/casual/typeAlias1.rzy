@@ -1,0 +1,20 @@
+
+type
+  Unsigned{T:Type{Natural}} = T;
+  
+component
+  TypeAlias1
+    input
+      in();
+  
+    implementation elementary
+
+    var
+      a : Unsigned{R{0,255}};
+      
+    function in()
+      a := 0;
+    end
+    
+  end
+
