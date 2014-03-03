@@ -7,9 +7,9 @@ type
     b : R{0,255};
   end
 
-  The2Record{T,R:Type{Any}} = Record
+  The2Record{T,S:Type{Any}} = Record
     a : T;
-    b : R;
+    b : S;
   end
   
   The3{T:Type{Integer};S:Type{Any}} = Record

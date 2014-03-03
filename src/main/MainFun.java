@@ -34,6 +34,7 @@ import fun.other.Named;
 import fun.other.Namespace;
 import fun.other.RizzlyFile;
 import fun.other.SymbolTable;
+import fun.traverser.CheckNames;
 import fun.traverser.CompLinkReduction;
 import fun.traverser.DeAlias;
 import fun.traverser.EnumLinkReduction;
@@ -69,6 +70,8 @@ public class MainFun {
     List<Type> types = new ArrayList<Type>();
     types.addAll(genPrimitiveTypes());
     types.addAll(genPrimitiveGenericTypes());
+
+    CheckNames.check(fileList, types);
 
     SymbolTable sym = new SymbolTable();
     for (Type typ : types) {
