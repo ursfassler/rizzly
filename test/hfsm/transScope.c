@@ -35,7 +35,7 @@ int main(){
   
   int i;
   for( i = 1; i < NUM_STEP-1; i++ ){
-    test( inst_in, i );
+    test( inst_inp, i );
   }
 
   test( inst__destruct, NUM_STEP-1 );

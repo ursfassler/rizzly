@@ -3,20 +3,20 @@
 component
   Dummy
     input
-      in();
+      inp();
       
     output
       out();
       
   implementation elementary
-    function in()
+    function inp()
       out();
     end
   end
 
   Con2
     input
-      in();
+      inp();
       
     output
       out();
@@ -27,9 +27,9 @@ component
       sub2 : Dummy;
       
     connection
-      in -> out;
-      sub1.out -> sub2.in;
-      sub2.out -> sub1.in;
+      inp -> out;
+      sub1.out -> sub2.inp;
+      sub2.out -> sub1.inp;
       
   end
 

@@ -25,7 +25,7 @@ int main(){
   int i;
   for( i = 0; i < 64; i++ ){
     rv = -1;
-    inst_in( i );
+    inst_inp( i );
     
     int exp = -1;
     if( i & 0x01 ){

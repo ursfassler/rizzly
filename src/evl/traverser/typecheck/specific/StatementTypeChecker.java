@@ -147,7 +147,7 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
   @Override
   protected Void visitCaseStmt(CaseStmt obj, Void map) {
     Type cond = checkGetExpr(obj.getCondition());
-    // TODO enumerator and boolean should also be allowed
+    // TODO enumerator, union and boolean should also be allowed
     if (!LeftIsContainerOfRightTest.process(kbi.getIntegerType(), cond, kb)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Condition variable has to be an integer, got: " + cond.getName());
     }

@@ -23,7 +23,7 @@ int main(){
   int i;
   for( i = 0; i < 100; i++ ){
     value = (i + 1) % 11;
-    inst_in( 0 );
+    inst_ind(0);
   }
   
   inst__destruct();

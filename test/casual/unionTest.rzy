@@ -4,7 +4,7 @@ type
     b : R{0,255};
   end
   
-  Uni = Union( what )
+  Uni = Union
     dat1 : Rec;
     dat2 : R{0,65535};
   end

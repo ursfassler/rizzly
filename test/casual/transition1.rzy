@@ -1,7 +1,7 @@
 component
   Transition1
     input
-      in();
+      ind();
     
     output
       out();
@@ -18,9 +18,9 @@ component
     end
     
     transition 
-      One   to Two   by in();
-      Two   to Three by in();
-      Three to One   by in() do
+      One   to Two   by ind();
+      Two   to Three by ind();
+      Three to One   by ind() do
         out();
       end
 

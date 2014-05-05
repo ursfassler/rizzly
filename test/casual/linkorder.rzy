@@ -1,11 +1,11 @@
 component
   Linkorder
     input
-      in();
+      ind();
       
     implementation elementary
     
-    function in()
+    function ind()
       foo();
     end
     

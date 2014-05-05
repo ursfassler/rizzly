@@ -5,7 +5,7 @@ const
 component
   Stringt
     input
-      in( value: String );
+      inp( value: String );
     
     output
       out1( value: String );
@@ -13,7 +13,7 @@ component
 
     implementation elementary
 
-    function in( value: String )
+    function inp( value: String )
       out1( value );
       out2( Name );
     end

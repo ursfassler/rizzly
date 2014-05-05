@@ -18,7 +18,7 @@ int main(){
   int i;
   for( i = 0; i < 22; i++ ){
     value = i*2 % 11;
-    inst_in( value );
+    inst_ind( value );
   }
   
   inst__destruct();

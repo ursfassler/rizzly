@@ -1,14 +1,14 @@
 component
   DummyComp
     input
-      in();
+      ind();
     
     output
       out();
 
     implementation elementary
 
-    function in()
+    function ind()
       out();
     end
 
@@ -16,7 +16,7 @@ component
 
   Composition
     input
-      in();
+      ind();
     
     output
       out();
@@ -29,10 +29,10 @@ component
       c : DummyComp;
     
     connection
-      in -> a.in;
-      in -> b.in;
-      a.out -> b.in;
-      a.out -> c.in;
+      ind -> a.ind;
+      ind -> b.ind;
+      a.out -> b.ind;
+      a.out -> c.ind;
       c.out -> out;
       b.out -> out;
   end

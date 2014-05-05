@@ -3,7 +3,7 @@
 component
   Err5
     input
-      in();
+      inp();
     
     output
       out();
@@ -13,7 +13,7 @@ component
     var
       a : Array{10,R{0,10}};
     
-    function in()
+    function inp()
       return a[out()];
     end
     

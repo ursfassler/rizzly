@@ -1,7 +1,7 @@
 component
   Arr
     input
-      in( x: Array{10,R{0,100}} );
+      inp( x: Array{10,R{0,100}} );
     
     output
       out( x: Array{3,R{0,100}} );
@@ -11,7 +11,7 @@ component
     var
       a : Array{10,R{0,100}};
     
-    function in( x: Array{10,R{0,100}} )
+    function inp( x: Array{10,R{0,100}} )
       a := x;
       b : Array{3,R{0,100}};
       b[0] := a[0];

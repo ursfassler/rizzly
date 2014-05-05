@@ -3,7 +3,7 @@
 component
   Err7
     input
-      in();
+      inp();
     
     output
       out();
@@ -18,7 +18,7 @@ component
     state A end
     state B end
     
-    transition A to B by in() if foo();
+    transition A to B by inp() if foo();
     
   end
 

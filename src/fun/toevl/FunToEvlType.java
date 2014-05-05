@@ -10,7 +10,6 @@ import evl.type.Type;
 import evl.type.base.EnumDefRef;
 import evl.type.base.EnumElement;
 import evl.type.composed.NamedElement;
-import evl.type.composed.UnionSelector;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.type.base.AnyType;
@@ -117,8 +116,7 @@ public class FunToEvlType extends NullTraverser<Type, String> {
     for (fun.type.composed.NamedElement elem : obj.getElement()) {
       element.add((NamedElement) fta.traverse(elem, null));
     }
-    UnionSelector selector = (UnionSelector) fta.traverse(obj.getSelector(), null);
-    return new evl.type.composed.UnionType(obj.getInfo(), param, selector, element);
+    return new evl.type.composed.UnionType(obj.getInfo(), param, element);
   }
 
   @Override

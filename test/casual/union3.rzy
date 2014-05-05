@@ -5,9 +5,9 @@ type
   end
 
 component
-  Union2
+  Union3
     input
-      ind();
+      evt();
 
     implementation elementary
 
@@ -22,15 +22,12 @@ component
       end
     end
   
-    function ind()
+    function evt()
       x : R{0,10};
-      case data of
-        Uni.pos:
-          x := data.pos;
-        end
-        Uni.neg:
-          x := abs( data.neg );
-        end
+      if data is Uni.pos then
+        x := data.pos;
+      ef data is Uni.neg then
+        x := abs( data.neg );
       end
     end
     

@@ -1,14 +1,14 @@
 component
   Linking
     input
-      in();
+      ind();
 
     output
       linking();    // it has the same name as namespace ("linking"), may cause problem; should not
     
   implementation elementary
   
-    function in()
+    function ind()
       linking();
     end
   

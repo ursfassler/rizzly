@@ -8,14 +8,14 @@ type
 component
   Enumt
     input
-      in( x: R{0,100} );
+      inp( x: R{0,100} );
     
     output
       out( x: Color );
 
     implementation elementary
     
-    function in( x: R{0,100} )
+    function inp( x: R{0,100} )
       case x of
         0: out( Color.Red ); end
         1: out( Color.Green ); end

@@ -2,7 +2,7 @@
 component
   Range
     input
-      in( x: R{0,10} );
+      ind( x: R{0,10} );
     
     output
       out( x: R{0,10} );
@@ -12,7 +12,7 @@ component
     var
       a : R{0,10};
     
-    function in( x: R{0,10} )
+    function ind( x: R{0,10} )
       if a < 10 then
         a := R{0,10}( a + 1 );
         out( a );

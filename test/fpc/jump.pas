@@ -21,22 +21,22 @@ begin
   inst__construct();
 
   writeln( 'in 1' );
-  inst_in();
+  inst_inp();
 
   writeln( 'in 2' );
-  inst_in();
+  inst_inp();
 
   writeln( 'in 3' );
-  inst_in();
+  inst_inp();
 
   writeln( 'in 4' );
-  inst_in();
+  inst_inp();
 
   writeln( 'in 5' );
-  inst_in();
+  inst_inp();
 
   writeln( 'in 6' );
-  inst_in();
+  inst_inp();
 
   writeln( 'destruct' );
   inst__destruct();

@@ -90,7 +90,6 @@ import evl.type.base.RangeType;
 import evl.type.base.StringType;
 import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
-import evl.type.composed.UnionSelector;
 import evl.type.composed.UnionType;
 import evl.type.special.AnyType;
 import evl.type.special.IntegerType;
@@ -389,18 +388,10 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitUnionSelector(UnionSelector obj, StreamWriter param) {
-    param.wr(obj.getName());
-    return null;
-  }
-
-  @Override
   protected Void visitUnionType(UnionType obj, StreamWriter param) {
     param.wr(obj.getName());
     wrId(obj, param);
-    param.wr(" = Union(");
-    visit(obj.getSelector(), param);
-    param.wr(")");
+    param.wr(" = Union");
     param.nl();
     param.incIndent();
     visitList(obj.getElement(), param);

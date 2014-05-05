@@ -21,16 +21,16 @@ int main(){
 
   while_Point point;
   
-  point = inst_in( 0 );
+  point = inst_ind( 0 );
   check( point.x, point.y, 0, 0 );
   
-  point = inst_in( 1 );
+  point = inst_ind( 1 );
   check( point.x, point.y, 1, 254 );
   
-  point = inst_in( 2 );
+  point = inst_ind( 2 );
   check( point.x, point.y, 2, 253 );
   
-  point = inst_in( 3 );
+  point = inst_ind( 3 );
   check( point.x, point.y, 3, 252 );
   
   inst__destruct();

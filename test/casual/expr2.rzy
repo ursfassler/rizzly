@@ -2,14 +2,14 @@
 component
   Expr2
     input
-      in( x: R{0,20} );
+      ind( x: R{0,20} );
     
     output
       out( x: R{0,20} );
       
     implementation elementary
     
-    function in( x: R{0,20} )
+    function ind( x: R{0,20} )
       y1 : R{0,20} = +x;
       y2 : R{-20,20} = -x;
 

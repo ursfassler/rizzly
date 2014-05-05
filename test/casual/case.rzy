@@ -2,14 +2,14 @@ component
   Case
 
     input
-      in( data: R{0,100} );
+      ind( data: R{0,100} );
 
     output
       out( data: R{0,100} );
 
     implementation elementary
 
-    function in( x: R{0,100} )
+    function ind( x: R{0,100} )
       case x of
         0:
           out( 2 );

@@ -1,29 +1,29 @@
 component
   Schmitt{Lower,Upper: R{0,1000}}
     input
-      in( value: R{0,1000} );
+      ind( value: R{0,1000} );
       
   implementation hfsm( Low )
     state Low end
     state High end
     
     transition
-      Low to High by in( value: R{0,1000} ) do
+      Low to High by ind( value: R{0,1000} ) do
         a : R{0,1000} = Upper;
       end
-      High to Low by in( value: R{0,1000} ) if value <= Lower;
+      High to Low by ind( value: R{0,1000} ) if value <= Lower;
   end
   
   Param
     input
-      in( value: R{0,1000} );
+      ind( value: R{0,1000} );
       
   implementation composition
     component
       schmitt : Schmitt{90,110};
       
     connection
-      in -> schmitt.in;
+      ind -> schmitt.ind;
     
   end
     

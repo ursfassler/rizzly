@@ -64,7 +64,6 @@ import fun.type.base.TypeAlias;
 import fun.type.base.VoidType;
 import fun.type.composed.NamedElement;
 import fun.type.composed.RecordType;
-import fun.type.composed.UnionSelector;
 import fun.type.composed.UnionType;
 import fun.type.template.Array;
 import fun.type.template.ArrayTemplate;
@@ -347,7 +346,7 @@ class CopyFun extends Traverser<Fun, Void> {
 
   @Override
   protected Fun visitUnionType(UnionType obj, Void param) {
-    UnionType ret = new UnionType(obj.getInfo(), obj.getName(), obj.getSelector());
+    UnionType ret = new UnionType(obj.getInfo(), obj.getName());
     ret.getElement().addAll(copy(obj.getElement().getList()));
     return ret;
   }
@@ -529,11 +528,6 @@ class CopyFun extends Traverser<Fun, Void> {
   @Override
   protected Fun visitRangeTemplate(RangeTemplate obj, Void param) {
     throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Fun visitUnionSelector(UnionSelector obj, Void param) {
-    throw new UnsupportedOperationException("Not supported yet.");
   }
 
 }

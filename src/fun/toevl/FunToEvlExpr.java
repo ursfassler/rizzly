@@ -11,6 +11,7 @@ import evl.expression.binop.Div;
 import evl.expression.binop.Equal;
 import evl.expression.binop.Greater;
 import evl.expression.binop.Greaterequal;
+import evl.expression.binop.Is;
 import evl.expression.binop.Less;
 import evl.expression.binop.Lessequal;
 import evl.expression.binop.Minus;
@@ -123,6 +124,8 @@ public class FunToEvlExpr extends NullTraverser<Evl, Void> {
       return new Less(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
     case LESS_EQUAL:
       return new Lessequal(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
+    case IS:
+      return new Is(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
     default:
       RError.err(ErrorType.Fatal, obj.getInfo(), "Unhandled case: " + obj.getOp());
     }

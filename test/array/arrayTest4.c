@@ -23,7 +23,7 @@ int main(){
     in.data[i] = (i * 17) % 32;
   }
     
-  inst_in( in );
+  inst_inp( in );
   
   for( i = 0; i <= 10; i++ ){
     in.data[i] = 0;

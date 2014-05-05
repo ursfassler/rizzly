@@ -5,14 +5,14 @@ type
 component
   TypeAlias1
     input
-      in();
+      ind();
   
     implementation elementary
 
     var
       a : Unsigned{R{0,255}};
       
-    function in()
+    function ind()
       a := 0;
     end
     

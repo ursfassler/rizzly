@@ -3,13 +3,13 @@
 component
   Forward
     input
-      in();                           //
+      ind();                          //
     output                            // 
       out();
       
   implementation composition          //dummy meta1
     connection
-      in -> out;
+      ind -> out;
   end
 
 
@@ -28,11 +28,11 @@ component
       b : Forward;                    //geometry x="280" y="65"
       
     connection
-      in1 -> a.in;                    //geometry path="75"
+      in1 -> a.ind;                   //geometry path="75"
       a.out -> out1;                  
-      in1 -> b.in;
+      in1 -> b.ind;
       //geometry path="65"
-      a.out -> b.in;                  //geometry path="210"
+      a.out -> b.ind;                 //geometry path="210"
       b.out -> out1;                  //geometry path="350"
 
   end

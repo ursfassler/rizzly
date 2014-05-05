@@ -21,6 +21,7 @@ import evl.expression.binop.Div;
 import evl.expression.binop.Equal;
 import evl.expression.binop.Greater;
 import evl.expression.binop.Greaterequal;
+import evl.expression.binop.Is;
 import evl.expression.binop.Less;
 import evl.expression.binop.Lessequal;
 import evl.expression.binop.LogicAnd;
@@ -104,7 +105,6 @@ import evl.type.base.StringType;
 import evl.type.composed.NamedElement;
 import evl.type.composed.NamedElementType;
 import evl.type.composed.RecordType;
-import evl.type.composed.UnionSelector;
 import evl.type.composed.UnionType;
 import evl.type.special.AnyType;
 import evl.type.special.ComponentType;
@@ -164,8 +164,6 @@ public abstract class Traverser<R, P> {
       return visitComponent((Component) obj, param);
     } else if (obj instanceof TypeRef) {
       return visitTypeRef((TypeRef) obj, param);
-    } else if (obj instanceof UnionSelector) {
-      return visitUnionSelector((UnionSelector) obj, param);
     } else if (obj instanceof EnumDefRef) {
       return visitEnumDefRef((EnumDefRef) obj, param);
     } else if (obj instanceof Expression) {
@@ -413,6 +411,8 @@ public abstract class Traverser<R, P> {
       return visitLess((Less) obj, param);
     } else if (obj instanceof Lessequal) {
       return visitLessequal((Lessequal) obj, param);
+    } else if (obj instanceof Is) {
+      return visitIs((Is) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -645,8 +645,6 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitFunctionTypeRet(FunctionTypeRet obj, P param);
 
-  abstract protected R visitUnionSelector(UnionSelector obj, P param);
-
   abstract protected R visitUminus(Uminus obj, P param);
 
   abstract protected R visitNot(Not obj, P param);
@@ -692,4 +690,6 @@ public abstract class Traverser<R, P> {
   abstract protected R visitGreater(Greater obj, P param);
 
   abstract protected R visitGreaterequal(Greaterequal obj, P param);
+  
+  abstract protected R visitIs(Is obj, P param);
 }

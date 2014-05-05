@@ -62,7 +62,6 @@ import fun.type.base.VoidType;
 import fun.type.composed.NamedElement;
 import fun.type.composed.NamedElementType;
 import fun.type.composed.RecordType;
-import fun.type.composed.UnionSelector;
 import fun.type.composed.UnionType;
 import fun.type.template.Array;
 import fun.type.template.ArrayTemplate;
@@ -127,8 +126,6 @@ public abstract class Traverser<R, P> {
       return visitTransition((Transition) obj, param);
     } else if (obj instanceof Component) {
       return visitComponent((Component) obj, param);
-    } else if (obj instanceof UnionSelector) {
-      return visitUnionSelector((UnionSelector) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -464,5 +461,4 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitReference(Reference obj, P param);
 
-  abstract protected R visitUnionSelector(UnionSelector obj, P param);
 }

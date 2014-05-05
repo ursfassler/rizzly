@@ -2,14 +2,14 @@ component
   While2
 
     input
-      in( x: R{0,100} );
+      ind( x: R{0,100} );
 
     output
       out( x: R{0,100} );
 
     implementation elementary
 
-    function in( x: R{0,100} )
+    function ind( x: R{0,100} )
       while x > 0 do
         out( x );
         x := R{0,100}( x-1 );

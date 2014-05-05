@@ -22,7 +22,7 @@ int main(){
 
   for( i = 0; i < 20; i++ ){  
     printf( "in\n" );
-    inst_in();
+    inst_ind();
   }
   
   inst__destruct();

@@ -13,7 +13,7 @@ int main(){
   inst__construct();
 
   for( i = 0; i <= 100; i++ ){
-    R_0_100 recv = inst_in();
+    R_0_100 recv = inst_ind();
     printf( "%3i <> %3i\n", i, recv );
     if( i != recv ){
       return -1;

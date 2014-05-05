@@ -1,14 +1,14 @@
 component
   ArrayTest4
     input
-      in( x: Array{10,R{0,31}} );
+      inp( x: Array{10,R{0,31}} );
       
     output
       out( x: Array{10,R{0,31}} );
       
   implementation elementary
 
-    function in( x: Array{10,R{0,31}} )
+    function inp( x: Array{10,R{0,31}} )
       out( x );
     end
 

@@ -1,14 +1,14 @@
 component  
   Retval
     input
-      in():R{-20,20};
+      ind():R{-20,20};
 
     output
       out():R{-20,20};
 
     implementation elementary
  
-    function in():R{-20,20}
+    function ind():R{-20,20}
       x : R{-20,20} = out();
       return x;
     end

@@ -28,7 +28,7 @@ int main(){
     } else {
       exp = 8;
     }
-    inst_in( i );
+    inst_ind( i );
     printf( "%i: %i <> %i\n", i, exp, value );
     if( exp != value ){
       return -1;

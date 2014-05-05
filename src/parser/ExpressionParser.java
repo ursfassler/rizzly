@@ -103,7 +103,7 @@ public class ExpressionParser extends Parser {
     }
   }
 
-  // EBNF relOp: "=" | "<>" | "<" | "<=" | ">" | ">="
+  // EBNF relOp: "=" | "<>" | "<" | "<=" | ">" | ">=" | "is"
   private RelOp parseRelOp() {
     Token tok = next();
     switch (tok.getType()) {
@@ -119,6 +119,8 @@ public class ExpressionParser extends Parser {
       return RelOp.GREATER;
     case GEQ:
       return RelOp.GREATER_EQUEAL;
+    case IS:
+      return RelOp.IS;
     default:
       RError.err(ErrorType.Error, tok.getInfo(), "unexpected token: " + tok);
       return null;
@@ -300,6 +302,7 @@ public class ExpressionParser extends Parser {
     case LEQ:
     case GREATER:
     case GEQ:
+    case IS:
       return true;
     default:
       return false;

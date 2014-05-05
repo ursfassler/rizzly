@@ -8,14 +8,14 @@ component
   While
 
     input
-      in( x: R{0,255} ):Point;
+      ind( x: R{0,255} ):Point;
 
     output
       out( x: R{0,255} ):Point;
 
     implementation elementary
 
-    function in( x: R{0,255} ):Point
+    function ind( x: R{0,255} ):Point
       ret : Point;
       ret.x := 0;
       ret.y := 0;

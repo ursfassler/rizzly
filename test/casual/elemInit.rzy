@@ -1,7 +1,7 @@
 component
   ElemInit 
     input
-      in():R{0,50};
+      ind():R{0,50};
 
   implementation elementary
     
@@ -16,7 +16,7 @@ component
       x := 23;
     end
     
-    function in():R{0,50}
+    function ind():R{0,50}
       return x;
     end
 

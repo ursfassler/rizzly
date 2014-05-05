@@ -4,7 +4,7 @@ component
   Jump
 
   input
-    in();
+    inp();
   
   output
     out();
@@ -26,9 +26,9 @@ component
     end
     
     transition 
-      A to B by in();
-      B to C by in();
-      C to A by in() do
+      A to B by inp();
+      B to C by inp();
+      C to A by inp() do
         out();
       end
         

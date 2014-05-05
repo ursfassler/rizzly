@@ -51,7 +51,6 @@ import fun.type.base.TypeAlias;
 import fun.type.base.VoidType;
 import fun.type.composed.NamedElement;
 import fun.type.composed.RecordType;
-import fun.type.composed.UnionSelector;
 import fun.type.composed.UnionType;
 import fun.type.template.Array;
 import fun.type.template.ArrayTemplate;
@@ -391,11 +390,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitRangeTemplate(RangeTemplate obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitUnionSelector(UnionSelector obj, P param) {
     return visitDefault(obj, param);
   }
 

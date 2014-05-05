@@ -18,7 +18,7 @@ int main(){
   int i;
   for( i = 0; i < 100; i++ ){
     value = 100 - (i % 101);
-    inst_in( i % 101 );
+    inst_ind( i % 101 );
   }
   
   inst__destruct();

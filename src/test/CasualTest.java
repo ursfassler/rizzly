@@ -227,6 +227,21 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  public void union2() {
+    compile("union2", TestSteps.COMPILE_TO_ASM, false, false);// TODO make testcase
+  }
+
+  @Test
+  public void union3() {
+    compile("union3", TestSteps.COMPILE_TO_ASM, false, false);// TODO make testcase
+  }
+
+  @Test
+  public void unionTest() {
+    compile("unionTest", TestSteps.COMPILE_TO_ASM, false, false); // TODO make testcase
+  }
+
+  @Test
   public void typedConst() {
     compile("typedConst", TestSteps.COMPILE_TO_PIR, false, false);
   }
@@ -254,11 +269,6 @@ public class CasualTest extends BaseTest {
   @Test
   public void genericUse() {
     compile("genericUse", TestSteps.COMPILE_TO_PIR, false, false);
-  }
-
-  @Test
-  public void unionTest_UnionTest() {
-    compile("unionTest", TestSteps.COMPILE_TO_ASM, false, false); // TODO make testcase
   }
 
   @Test

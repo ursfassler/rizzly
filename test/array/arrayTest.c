@@ -27,7 +27,7 @@ int main(){
     exp = a[i % 20];
     
     value = 0;
-    inst_in( i );
+    inst_inp( i );
     
     printf( "%i: %i <> %i\n", i, exp, value );
     if( exp != value ){

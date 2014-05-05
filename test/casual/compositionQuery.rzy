@@ -1,14 +1,14 @@
 component
   DummyComp
     input
-      in():R{0,100};
+      ind():R{0,100};
     
     output
       out():R{0,100};
 
     implementation elementary
 
-    function in():R{0,100}
+    function ind():R{0,100}
       return out();
     end
     
@@ -16,7 +16,7 @@ component
 
   CompositionQuery
     input
-      in():R{0,100};
+      ind():R{0,100};
     
     output
       out():R{0,100};
@@ -28,8 +28,8 @@ component
       b : DummyComp;
     
     connection
-      in -> a.in;
-      a.out -> b.in;
+      ind -> a.ind;
+      a.out -> b.ind;
       b.out -> out;
   end
 

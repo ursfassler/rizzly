@@ -1,19 +1,19 @@
 component
   Sub
     input
-      in();
+      inp();
     output
       out();
       
   implementation composition
     connection
-      in -> out;
+      inp -> out;
       
   end
 
   Err2
     input
-      in();
+      inp();
     output
       out();
 
@@ -23,10 +23,10 @@ component
       a : Sub;
       
     connection
-      in -> a.in;     // prevent error throwing
+      inp -> a.inp;   // prevent error throwing
       a.out -> out;   // prevent error throwing
       
-      a.in -> out;    // ERROR connect sub-input to output
+      a.inp -> out;   // ERROR connect sub-input to output
 
   end
 

@@ -1,14 +1,14 @@
 component
   Iffunc
     input
-      in( x: R{0,10} ):R{0,10};
+      ind( x: R{0,10} ):R{0,10};
     
   implementation elementary
     function eval( x: R{0,10} ):Boolean
       return x > 5;
     end
   
-    function in( x: R{0,10} ):R{0,10}
+    function ind( x: R{0,10} ):R{0,10}
       if eval( x ) then
         return 0;
       else

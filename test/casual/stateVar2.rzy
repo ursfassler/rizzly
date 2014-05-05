@@ -1,7 +1,7 @@
 component
   StateVar2
     input
-      in( x: R{0,10} );
+      ind( x: R{0,10} );
     
     output
       out( x: R{0,10} );
@@ -20,7 +20,7 @@ component
       return x;
     end
     
-    function in( x: R{0,10} )
+    function ind( x: R{0,10} )
       a := addret( x );
       out( a );
     end

@@ -23,7 +23,7 @@ int main(){
     exp = (i % 20) * 10;
     value = 200;
     
-    inst_in( i );
+    inst_inp( i );
     
     printf( "%i: %i <> %i\n", i, exp, value );
     if( exp != value ){

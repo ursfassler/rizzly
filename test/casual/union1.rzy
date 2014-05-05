@@ -1,5 +1,5 @@
 type
-  Uni = Union( what )
+  Uni = Union
     byte  : R{0,255};
     word  : R{0,65535};
   end

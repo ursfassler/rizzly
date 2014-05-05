@@ -19,7 +19,7 @@ begin
   x.data[2] := 200;
   x.data[5] := 50;
   writeln( 'start arr' );
-  inst_in(x);
+  inst_inp(x);
   writeln( 'end arr' );
   inst__destruct();
 end.

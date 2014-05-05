@@ -3,14 +3,14 @@
 component
   Err1
     input
-      in();
+      inp();
       
     output
       out();
     
   implementation elementary
     
-    function in()
+    function inp()
       out.foo();      // .foo does not exist
     end
     

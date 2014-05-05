@@ -25,7 +25,7 @@ int main(){
   for( i = 0; i <= 100; i++ ){
     printf( "--> %i\n", i );
     next = i;
-    inst_in( i );
+    inst_ind( i );
     if( next != 0 ){
       return -1;
     }

@@ -56,7 +56,6 @@ import fun.type.base.TypeAlias;
 import fun.type.base.VoidType;
 import fun.type.composed.NamedElement;
 import fun.type.composed.RecordType;
-import fun.type.composed.UnionSelector;
 import fun.type.composed.UnionType;
 import fun.type.template.Array;
 import fun.type.template.ArrayTemplate;
@@ -201,7 +200,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitUnionType(UnionType obj, P param) {
     visitList(obj.getTemplateParam(), param);
-    visit(obj.getSelector(), param);
     visitList(obj.getElement(), param);
     return null;
   }
@@ -517,11 +515,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitRangeTemplate(RangeTemplate obj, P param) {
     visitList(obj.getTemplateParam(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitUnionSelector(UnionSelector obj, P param) {
     return null;
   }
 

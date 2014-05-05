@@ -23,18 +23,18 @@ static const Step events[NUM_STEP] = {
   { DBG_RECV, 2, {"b", "_construct" } },
   { DBG_RECV, 2, {"c", "_construct" } },
 
-  { DBG_RECV, 1, {"in", NULL  } },
-  { DBG_RECV, 2, {"a", "in" } },
+  { DBG_RECV, 1, {"ind", NULL  } },
+  { DBG_RECV, 2, {"a", "ind" } },
   { DBG_SEND, 2, {"a", "out" } },
-  { DBG_RECV, 2, {"b", "in" } },
+  { DBG_RECV, 2, {"b", "ind" } },
   { DBG_SEND, 2, {"b", "out" } },
   { DBG_SEND, 1, {"out", NULL } },
   { RECV,     0, {NULL, NULL } },
-  { DBG_RECV, 2, {"c", "in" } },
+  { DBG_RECV, 2, {"c", "ind" } },
   { DBG_SEND, 2, {"c", "out" } },
   { DBG_SEND, 1, {"out", NULL } },
   { RECV,     0, {NULL, NULL } },
-  { DBG_RECV, 2, {"b", "in" } },
+  { DBG_RECV, 2, {"b", "ind" } },
   { DBG_SEND, 2, {"b", "out" } },
   { DBG_SEND, 1, {"out", NULL } },
   { RECV,     0, {NULL, NULL } },
@@ -123,7 +123,7 @@ int main(){
   inst__construct();
 
   printf( "send message :in\n" );
-  inst_in();
+  inst_ind();
   
   inst__destruct();
 

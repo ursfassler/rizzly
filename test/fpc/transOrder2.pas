@@ -21,7 +21,7 @@ begin
   inst__construct();
 
   writeln( 'tick' );
-  inst_in( 0 );
+  inst_inp( 0 );
 
   writeln( 'destruct' );
   inst__destruct();

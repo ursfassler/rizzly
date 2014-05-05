@@ -4,14 +4,14 @@ component
   TransOrder2
 
   input
-    in( val: R{0,10} );
+    inp( val: R{0,10} );
   
   output
     out( val: R{0,10} );
     
   implementation hfsm(A)
     transition 
-      A.AA to A by in( val: R{0,10} ) do
+      A.AA to A by inp( val: R{0,10} ) do
         out( 0 );
       end
       
@@ -21,7 +21,7 @@ component
     end
     
     transition 
-      A to A by in( val: R{0,10} ) do
+      A to A by inp( val: R{0,10} ) do
         out( 1 );
       end
   end

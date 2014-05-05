@@ -1,7 +1,7 @@
 component
   StateVar1
     input
-      in( x: R{0,10} );
+      ind( x: R{0,10} );
     
     output
       out( x: R{0,10} );
@@ -19,7 +19,7 @@ component
       a := (a + 1) mod 11;
     end
     
-    function in( x: R{0,10} )
+    function ind( x: R{0,10} )
       a := (a + 1) mod 11;
       inc();
       out( a );

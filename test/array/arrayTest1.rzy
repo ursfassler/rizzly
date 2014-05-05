@@ -1,7 +1,7 @@
 component
   ArrayTest1
     input
-      in( x: R{0,200} );
+      inp( x: R{0,200} );
       
     output
       out( x: R{0,200} );
@@ -19,7 +19,7 @@ component
       end
     end
 
-    function in( x: R{0,200} )
+    function inp( x: R{0,200} )
       out( a[x mod 20] );
     end
 

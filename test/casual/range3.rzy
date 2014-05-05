@@ -1,11 +1,11 @@
 component
   Range3
     input
-      in( x: R{0,10} ):R{0,3};
+      ind( x: R{0,10} ):R{0,3};
     
     implementation elementary
     
-    function in( x: R{0,10} ):R{0,3}
+    function ind( x: R{0,10} ):R{0,3}
       if (x > 3) and (x <= 7) then
         return R{0,3}( x - 4 );
       ef x > 9 then

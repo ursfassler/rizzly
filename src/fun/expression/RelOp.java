@@ -9,7 +9,7 @@ import error.RError;
  */
 public enum RelOp {
 
-  EQUAL, NOT_EQUAL, LESS, LESS_EQUAL, GREATER, GREATER_EQUEAL;
+  EQUAL, NOT_EQUAL, LESS, LESS_EQUAL, GREATER, GREATER_EQUEAL, IS;
 
   public String toString() {
     switch (this) {
@@ -25,6 +25,8 @@ public enum RelOp {
       return ">";
     case GREATER_EQUEAL:
       return ">=";
+    case IS:
+      return "is";
     default:
       RError.err(ErrorType.Fatal, "not supported yet");
       return null;

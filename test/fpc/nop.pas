@@ -11,7 +11,7 @@ end;
 begin
   inst__construct();
   writeln( 'start nop' );
-  inst_in();
+  inst_inp();
   writeln( 'end nop' );
   inst__destruct();
 end.

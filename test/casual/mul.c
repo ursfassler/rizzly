@@ -11,7 +11,7 @@ int main(){
   for( a = 1; a <= 65536; a = a << 1 ){
     int64_t exp = a;
     exp = exp * exp;
-    z = inst_in( a, a );
+    z = inst_ind( a, a );
     printf( "%i: %li <> %li\n", a, exp, z );
     if( exp != z ){
       return -1;

@@ -4,7 +4,7 @@
 #include  "output/inst.h"
 
 static int test( enumCase_Weekday day, int value ){
-  int got = inst_in(day);
+  int got = inst_ind(day);
   got = got & 0x3;
   if( value != got ){
     printf( "error by %i: expected %i got %i\n", day, value, got );

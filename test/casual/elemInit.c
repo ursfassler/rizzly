@@ -8,7 +8,7 @@ int main(){
 
   int i;
   for( i = 0; i < 100; i++ ){
-    if( inst_in() != 42 ){
+    if( inst_ind() != 42 ){
       return -1;
     }
   }

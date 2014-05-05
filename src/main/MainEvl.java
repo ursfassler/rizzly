@@ -22,12 +22,10 @@ import util.Pair;
 import util.Range;
 import util.SimpleGraph;
 import util.StreamWriter;
-
 import common.Designator;
 import common.Direction;
 import common.ElementInfo;
 import common.FuncAttr;
-
 import error.ErrorType;
 import error.RError;
 import evl.DefTraverser;
@@ -90,6 +88,7 @@ import evl.traverser.OutsideReaderInfo;
 import evl.traverser.OutsideWriterInfo;
 import evl.traverser.PrettyPrinter;
 import evl.traverser.RangeConverter;
+import evl.traverser.ReduceUnion;
 import evl.traverser.debug.CompCascadeDepth;
 import evl.traverser.debug.DebugIfaceAdder;
 import evl.traverser.debug.MsgNamesGetter;
@@ -136,6 +135,8 @@ public class MainEvl {
 
     root = compositionReduction(aclasses, root);
     root = hfsmReduction(root, opt, debugdir, aclasses, kb);
+
+    ReduceUnion.process(aclasses, kb);
 
     PrettyPrinter.print(aclasses, debugdir + "reduced.rzy", true);
 

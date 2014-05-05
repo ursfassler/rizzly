@@ -7,14 +7,14 @@ type
 component
   FuncStruct
     input
-      in():R{0,255};
+      ind():R{0,255};
     
     output
       out():Point;
       
     implementation elementary
     
-    function in():R{0,255}
+    function ind():R{0,255}
       return out().x;
     end
     

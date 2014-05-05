@@ -21,7 +21,6 @@ import fun.type.base.EnumType;
 import fun.type.base.TypeAlias;
 import fun.type.composed.NamedElement;
 import fun.type.composed.RecordType;
-import fun.type.composed.UnionSelector;
 import fun.type.composed.UnionType;
 import fun.variable.Constant;
 import fun.variable.TemplateParameter;
@@ -151,14 +150,11 @@ public class TypeParser extends BaseParser {
     return ret;
   }
 
-  // EBNF unionType: "Union" "(" id ")" { recordElem } "end"
+  // EBNF unionType: "Union" { recordElem } "end"
   private Type parseUnionType(String name) {
     Token tok = expect(TokenType.UNION);
-    expect(TokenType.OPENPAREN);
-    Token selector = expect(TokenType.IDENTIFIER);
-    expect(TokenType.CLOSEPAREN);
 
-    UnionType ret = new UnionType(tok.getInfo(), name, new UnionSelector(selector.getInfo(), selector.getData()));
+    UnionType ret = new UnionType(tok.getInfo(), name);
 
     while (peek().getType() != TokenType.END) {
       ret.getElement().addAll(parseRecordElem());

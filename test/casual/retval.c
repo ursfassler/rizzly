@@ -14,7 +14,7 @@ int main(){
   int i;
   for( i = -20; i <= 20; i++ ){
     value = i;
-    R__20_20 ret = inst_in();
+    R__20_20 ret = inst_ind();
     printf( "%i <> %i\n", i, ret );
     if( i != ret ){
       return -1;

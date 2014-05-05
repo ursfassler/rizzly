@@ -42,7 +42,6 @@ import fun.other.Namespace;
 import fun.statement.CaseOpt;
 import fun.statement.Statement;
 import fun.type.composed.NamedElement;
-import fun.type.composed.UnionSelector;
 import fun.variable.Constant;
 import fun.variable.Variable;
 
@@ -140,11 +139,6 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
   protected Evl visitNamedElement(NamedElement obj, Void param) {
     Reference ref = (Reference) traverse(obj.getType(), null);
     return new evl.type.composed.NamedElement(obj.getInfo(), obj.getName(), FunToEvl.toTypeRef(ref));
-  }
-
-  @Override
-  protected Evl visitUnionSelector(UnionSelector obj, Void param) {
-    return new evl.type.composed.UnionSelector(obj.getInfo(), obj.getName());
   }
 
   @Override

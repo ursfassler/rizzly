@@ -2,14 +2,14 @@ component
   CalcCase
 
     input
-      in( data: R{0,20} );
+      ind( data: R{0,20} );
 
     output
       out( data: R{0,20} );
 
     implementation elementary
 
-    function in( x: R{0,20} )
+    function ind( x: R{0,20} )
       case x+2 of
         2..10:
           out( 2 );

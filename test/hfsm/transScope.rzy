@@ -1,7 +1,7 @@
 component
   TransScope
     input
-      in();
+      inp();
       
     output
       outA();
@@ -16,8 +16,8 @@ component
     end
   
     transition
-      A to B by in() if a = 0;   // guard is evaluated in the scope of the source state
-      B to A by in() if a = 0;
+      A to B by inp() if a = 0;   // guard is evaluated in the scope of the source state
+      B to A by inp() if a = 0;
   
     state A
       var
@@ -29,7 +29,7 @@ component
       end
       
       transition
-        A to A by in() if a > 0 do
+        A to A by inp() if a > 0 do
           a := R{0,4}( a - 1 );
         end
     end
@@ -44,7 +44,7 @@ component
         a : R{0,2};
         
       transition
-        B to B by in() if a > 0 do
+        B to B by inp() if a > 0 do
           a := R{0,2}( a - 1 );
         end
     end

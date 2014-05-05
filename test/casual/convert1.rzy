@@ -2,11 +2,11 @@
 component
   Convert1
     input
-      in( x: R{0,20} ):R{0,10};
+      ind( x: R{0,20} ):R{0,10};
     
     implementation elementary
     
-    function in( x: R{0,20} ):R{0,10}
+    function ind( x: R{0,20} ):R{0,10}
       return R{0,10}( x );
     end
 

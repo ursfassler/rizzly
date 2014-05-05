@@ -17,6 +17,7 @@ import evl.expression.binop.Div;
 import evl.expression.binop.Equal;
 import evl.expression.binop.Greater;
 import evl.expression.binop.Greaterequal;
+import evl.expression.binop.Is;
 import evl.expression.binop.Less;
 import evl.expression.binop.Lessequal;
 import evl.expression.binop.LogicAnd;
@@ -85,7 +86,6 @@ import evl.type.base.RangeType;
 import evl.type.base.StringType;
 import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
-import evl.type.composed.UnionSelector;
 import evl.type.composed.UnionType;
 import evl.type.special.AnyType;
 import evl.type.special.ComponentType;
@@ -397,11 +397,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitUnionSelector(UnionSelector obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
   protected R visitAnd(And obj, P param) {
     return visitDefault(obj, param);
   }
@@ -581,4 +576,8 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
     return visitDefault(obj, param);
   }
 
+  @Override
+  protected R visitIs(Is obj, P param) {
+    return visitDefault(obj, param);
+  }
 }

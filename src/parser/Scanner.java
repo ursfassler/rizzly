@@ -57,6 +57,10 @@ public class Scanner implements PeekReader<Token> {
     keywords.put("ef", TokenType.EF);
     keywords.put("else", TokenType.ELSE);
 
+    keywords.put("is", TokenType.IS);
+    keywords.put("as", TokenType.AS);
+    keywords.put("in", TokenType.IN);
+
     keywords.put("False", TokenType.FALSE);
     keywords.put("True", TokenType.TRUE);
 

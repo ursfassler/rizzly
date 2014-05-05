@@ -7,7 +7,7 @@ type
 component
   Rec
     input
-      in( x: R{0,100} );
+      ind( x: R{0,100} );
     
     output
       out( x: R{0,100} );
@@ -25,7 +25,7 @@ component
       q.y := 0;
     end
 
-    function in(  x: R{0,100}  )
+    function ind(  x: R{0,100}  )
       p.x := (p.y + x) mod 100;
       p.y := 100 - p.x;
       q   := p;

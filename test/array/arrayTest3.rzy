@@ -1,7 +1,7 @@
 component
   ArrayTest3
     input
-      in( x: R{0,31} ):R{0,31};
+      inp( x: R{0,31} ):R{0,31};
       
   implementation elementary
 
@@ -16,7 +16,7 @@ component
       end
     end
 
-    function in( x: R{0,200} ):R{0,31}
+    function inp( x: R{0,200} ):R{0,31}
       return a[x mod 8];
     end
 

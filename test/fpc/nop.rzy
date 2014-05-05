@@ -1,7 +1,7 @@
 component
   Nop
     input
-      in();
+      inp();
     
     output
       out();
@@ -9,7 +9,7 @@ component
     implementation composition
     
     connection
-      in -> out;
+      inp -> out;
 
   end
 

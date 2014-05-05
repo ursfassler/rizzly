@@ -18,8 +18,8 @@ end;
 begin
   inst__construct();
   writeln( 'start stringt' );
-  inst_in( 'Hello' );
-  inst_in( 'World' );
+  inst_inp( 'Hello' );
+  inst_inp( 'World' );
   writeln( 'end stringt' );
   inst__destruct();
 end.

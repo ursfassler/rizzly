@@ -27,7 +27,7 @@ int main(){
     } else {
       value = i % 3;
     }
-    inst_in( i % 3 );
+    inst_ind( i % 3 );
   }
   inst__destruct();
   return -error;

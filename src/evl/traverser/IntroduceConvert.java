@@ -62,9 +62,7 @@ public class IntroduceConvert extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitReference(Reference obj, Void param) {
-    if (obj.getLink() instanceof Type) {
-      assert (!obj.getOffset().isEmpty());
-      assert (obj.getOffset().get(0) instanceof RefCall);
+    if ((obj.getLink() instanceof Type) && !obj.getOffset().isEmpty() && (obj.getOffset().get(0) instanceof RefCall)) {
       Type resType = (Type) obj.getLink();
       FunctionHeader convertFunc = getConvertFunc(resType);
       obj.setLink(convertFunc);
