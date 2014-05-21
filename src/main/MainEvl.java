@@ -22,10 +22,12 @@ import util.Pair;
 import util.Range;
 import util.SimpleGraph;
 import util.StreamWriter;
+
 import common.Designator;
 import common.Direction;
 import common.ElementInfo;
 import common.FuncAttr;
+
 import error.ErrorType;
 import error.RError;
 import evl.DefTraverser;

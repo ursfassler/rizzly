@@ -690,6 +690,6 @@ public abstract class Traverser<R, P> {
   abstract protected R visitGreater(Greater obj, P param);
 
   abstract protected R visitGreaterequal(Greaterequal obj, P param);
-  
+
   abstract protected R visitIs(Is obj, P param);
 }

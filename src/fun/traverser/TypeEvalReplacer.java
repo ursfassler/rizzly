@@ -36,7 +36,7 @@ public class TypeEvalReplacer extends DefTraverser<Void, Void> {
   protected Void visitReference(Reference obj, Void param) {
     super.visitReference(obj, param);
     if (obj.getLink() instanceof Generator) {
-      List<Expression> arg = new ArrayList<>();
+      List<Expression> arg = new ArrayList<Expression>();
       if (!obj.getOffset().isEmpty()) {
         if (obj.getOffset().get(0) instanceof RefTemplCall) {
           arg = ((RefTemplCall) obj.getOffset().pop()).getActualParameter();

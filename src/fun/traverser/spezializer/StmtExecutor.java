@@ -147,7 +147,7 @@ public class StmtExecutor extends NullTraverser<Expression, Memory> {
 
     Expression value = param.get(var);
 
-    LinkedList<RefItem> offset = new LinkedList<>();
+    LinkedList<RefItem> offset = new LinkedList<RefItem>();
     for (RefItem itm : obj.getLeft().getOffset()) {
       if (itm instanceof RefIndex) {
         itm = new RefIndex(new ElementInfo(), exeval(((RefIndex) itm).getIndex(), param));
