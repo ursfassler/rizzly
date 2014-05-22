@@ -5,12 +5,13 @@ import java.util.Set;
 
 import common.Direction;
 import common.ElementInfo;
-
 import error.ErrorType;
 import error.RError;
 import evl.Evl;
 import evl.NullTraverser;
 import evl.composition.ImplComposition;
+import evl.function.FunctionBase;
+import evl.function.impl.FuncIfaceOutVoid;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.State;
 import evl.hfsm.StateComposite;
@@ -26,6 +27,7 @@ import evl.type.base.EnumType;
 import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
+import evl.type.composed.UnsafeUnionType;
 import evl.type.special.ComponentType;
 import evl.variable.Variable;
 
@@ -76,8 +78,9 @@ class KnowChildTraverser extends NullTraverser<Set<Named>, String> {
 
   @Override
   protected Set<Named> visitDefault(Evl obj, String param) {
+    throw new RuntimeException("Not yet implemented: " + obj.getClass().getCanonicalName());
     // RError.err(ErrorType.Warning, obj.getInfo(), "Element can not have a named child");
-    return new HashSet<Named>();
+    // return new HashSet<Named>();
   }
 
   @Override
@@ -154,6 +157,15 @@ class KnowChildTraverser extends NullTraverser<Set<Named>, String> {
 
   @Override
   protected Set<Named> visitUnionType(UnionType obj, String param) {
+    Set<Named> rset = retopt(obj.getElement().find(param));
+    if (obj.getTag().getName() == param) {
+      rset.add(obj.getTag());
+    }
+    return rset;
+  }
+
+  @Override
+  protected Set<Named> visitUnsafeUnionType(UnsafeUnionType obj, String param) {
     return retopt(obj.getElement().find(param));
   }
 
@@ -184,6 +196,11 @@ class KnowChildTraverser extends NullTraverser<Set<Named>, String> {
     addIfFound(obj.getIface(Direction.in).find(param), rset);
     addIfFound(obj.getIface(Direction.out).find(param), rset);
     return rset;
+  }
+
+  @Override
+  protected Set<Named> visitFunctionBase(FunctionBase obj, String param) {
+    return new HashSet<Named>();
   }
 
 }

@@ -106,6 +106,7 @@ import evl.type.composed.NamedElement;
 import evl.type.composed.NamedElementType;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
+import evl.type.composed.UnsafeUnionType;
 import evl.type.special.AnyType;
 import evl.type.special.ComponentType;
 import evl.type.special.IntegerType;
@@ -472,6 +473,8 @@ public abstract class Traverser<R, P> {
       return visitRecordType((RecordType) obj, param);
     } else if (obj instanceof UnionType) {
       return visitUnionType((UnionType) obj, param);
+    } else if (obj instanceof UnsafeUnionType) {
+      return visitUnsafeUnionType((UnsafeUnionType) obj, param);
     } else if (obj instanceof ComponentType) {
       return visitComponentType((ComponentType) obj, param);
     } else {
@@ -624,6 +627,8 @@ public abstract class Traverser<R, P> {
   abstract protected R visitRecordType(RecordType obj, P param);
 
   abstract protected R visitUnionType(UnionType obj, P param);
+
+  abstract protected R visitUnsafeUnionType(UnsafeUnionType obj, P param);
 
   abstract protected R visitEnumType(EnumType obj, P param);
 

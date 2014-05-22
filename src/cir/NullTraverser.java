@@ -40,6 +40,7 @@ import cir.type.TypeAlias;
 import cir.type.TypeRef;
 import cir.type.UIntType;
 import cir.type.UnionType;
+import cir.type.UnsafeUnionType;
 import cir.type.VoidType;
 
 public abstract class NullTraverser<R, P> extends Traverser<R, P> {
@@ -223,6 +224,11 @@ public abstract class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitUnionType(UnionType obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitUnsafeUnionType(UnsafeUnionType obj, P param) {
     return visitDefault(obj, param);
   }
 

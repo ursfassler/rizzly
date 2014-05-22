@@ -31,8 +31,7 @@ import evl.type.composed.UnionType;
 // TODO replace also reference to element x of U to x' in E
 // DONE replace "is" with "=="
 public class ReduceUnion extends ExprReplacer<Void> {
-  private final static String PREFIX = Designator.NAME_SEP + "enum";
-  private final static String SELECTOR = Designator.NAME_SEP + "s";
+  private final static String ENUM_PREFIX = Designator.NAME_SEP + "enum";
   private final static ElementInfo info = new ElementInfo();
 
   private Map<UnionType, EnumType> union2enum = new HashMap<UnionType, EnumType>();
@@ -53,7 +52,7 @@ public class ReduceUnion extends ExprReplacer<Void> {
   protected Expression visitUnionType(UnionType obj, Void param) {
     assert (!union2enum.containsKey(obj));
 
-    EnumType et = new EnumType(info, PREFIX + Designator.NAME_SEP + obj.getName());
+    EnumType et = new EnumType(info, ENUM_PREFIX + Designator.NAME_SEP + obj.getName());
 
     int k = 0;
     for (NamedElement elem : obj.getElement()) {
@@ -62,8 +61,7 @@ public class ReduceUnion extends ExprReplacer<Void> {
       k++;
     }
 
-    NamedElement selector = new NamedElement(info, SELECTOR, new TypeRef(info, et));
-    obj.getElement().add(selector);
+    obj.getTag().setType(new TypeRef(info, et));
 
     union2enum.put(obj, et);
     return null;
@@ -78,8 +76,6 @@ public class ReduceUnion extends ExprReplacer<Void> {
     assert (left.getOffset().isEmpty());
     assert (right.getOffset().size() == 1);
 
-    left.getOffset().add(new RefName(info, SELECTOR));
-
     UnionType ut = (UnionType) right.getLink();
     assert (union2enum.containsKey(ut));
     assert (right.getOffset().size() == 1);
@@ -87,10 +83,12 @@ public class ReduceUnion extends ExprReplacer<Void> {
     EnumType et = union2enum.get(ut);
     Evl ev = kc.get(et, ((RefName) right.getOffset().get(0)).getName(), ut.getInfo());
     assert (ev instanceof EnumElement);
+
+    left.getOffset().add(new RefName(info, ut.getTag().getName()));
+
     right.getOffset().clear();
     right.setLink((EnumElement) ev);
 
     return new Equal(info, left, right);
   }
-
 }

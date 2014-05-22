@@ -50,6 +50,7 @@ import cir.type.TypeAlias;
 import cir.type.TypeRef;
 import cir.type.UIntType;
 import cir.type.UnionType;
+import cir.type.UnsafeUnionType;
 import cir.type.VoidType;
 
 import common.FuncAttr;
@@ -359,11 +360,35 @@ public class CWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitUnionType(UnionType obj, StreamWriter param) {
+  protected Void visitUnsafeUnionType(UnsafeUnionType obj, StreamWriter param) {
     param.wr("typedef union {");
     param.nl();
     param.incIndent();
     visitList(obj.getElements(), param);
+    param.decIndent();
+    param.wr("} ");
+    param.wr(obj.getName());
+    param.wr(";");
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitUnionType(UnionType obj, StreamWriter param) {
+    param.wr("typedef struct {");
+    param.nl();
+    param.incIndent();
+
+    visit(obj.getTag(), param);
+
+    param.wr("union {");
+    param.nl();
+    param.incIndent();
+    visitList(obj.getElements(), param);
+    param.decIndent();
+    param.wr("};");
+    param.nl();
+
     param.decIndent();
     param.wr("} ");
     param.wr(obj.getName());

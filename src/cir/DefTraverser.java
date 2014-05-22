@@ -41,6 +41,7 @@ import cir.type.TypeAlias;
 import cir.type.TypeRef;
 import cir.type.UIntType;
 import cir.type.UnionType;
+import cir.type.UnsafeUnionType;
 import cir.type.VoidType;
 
 public class DefTraverser<R, P> extends Traverser<R, P> {
@@ -164,6 +165,13 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitUnionType(UnionType obj, P param) {
+    visit(obj.getTag(), param);
+    visitList(obj.getElements(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitUnsafeUnionType(UnsafeUnionType obj, P param) {
     visitList(obj.getElements(), param);
     return null;
   }

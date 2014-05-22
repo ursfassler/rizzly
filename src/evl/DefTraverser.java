@@ -93,6 +93,7 @@ import evl.type.base.StringType;
 import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
+import evl.type.composed.UnsafeUnionType;
 import evl.type.special.AnyType;
 import evl.type.special.ComponentType;
 import evl.type.special.IntegerType;
@@ -172,6 +173,13 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitUnionType(UnionType obj, P param) {
+    visit(obj.getTag(), param);
+    visitList(obj.getElement().getList(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitUnsafeUnionType(UnsafeUnionType obj, P param) {
     visitList(obj.getElement().getList(), param);
     return null;
   }

@@ -79,6 +79,7 @@ import evl.type.base.StringType;
 import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
+import evl.type.composed.UnsafeUnionType;
 import evl.type.special.VoidType;
 import evl.variable.ConstGlobal;
 import evl.variable.ConstPrivate;
@@ -343,7 +344,17 @@ public class ToC extends NullTraverser<CirBase, Void> {
 
   @Override
   protected CirBase visitUnionType(UnionType obj, Void param) {
-    cir.type.UnionType type = new cir.type.UnionType(obj.getName());
+    cir.type.UnionType type = new cir.type.UnionType(obj.getName(),(cir.type.NamedElement) visit(obj.getTag(),param));
+    for (NamedElement elem : obj.getElement()) {
+      cir.type.NamedElement celem = (cir.type.NamedElement) visit(elem, param);
+      type.getElements().add(celem);
+    }
+    return type;
+  }
+
+  @Override
+  protected CirBase visitUnsafeUnionType(UnsafeUnionType obj, Void param) {
+    cir.type.UnsafeUnionType type = new cir.type.UnsafeUnionType(obj.getName());
     for (NamedElement elem : obj.getElement()) {
       cir.type.NamedElement celem = (cir.type.NamedElement) visit(elem, param);
       type.getElements().add(celem);

@@ -15,7 +15,7 @@ import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
-import evl.type.composed.UnionType;
+import evl.type.composed.UnsafeUnionType;
 import evl.variable.Variable;
 
 /**
@@ -25,7 +25,7 @@ import evl.variable.Variable;
  * 
  */
 public class StateTypeBuilder extends NullTraverser<RecordType, Designator> {
-  public static final String SUB_ENTRY_NAME = "sub";
+  public static final String SUB_ENTRY_NAME = Designator.NAME_SEP + "sub";
   final private Namespace typeSpace;
 
   public StateTypeBuilder(Namespace typeSpace) {
@@ -50,9 +50,9 @@ public class StateTypeBuilder extends NullTraverser<RecordType, Designator> {
     return record;
   }
 
-  public UnionType makeUnion(State obj, Designator param) {
+  public UnsafeUnionType makeUnion(State obj, Designator param) {
     param = new Designator(param, "Sub");
-    UnionType union = new UnionType(obj.getInfo(), param.toString(Designator.NAME_SEP), new ArrayList<NamedElement>());
+    UnsafeUnionType union = new UnsafeUnionType(obj.getInfo(), param.toString(Designator.NAME_SEP), new ArrayList<NamedElement>());
     typeSpace.add(union);
     return union;
   }
@@ -60,7 +60,7 @@ public class StateTypeBuilder extends NullTraverser<RecordType, Designator> {
   @Override
   protected RecordType visitStateComposite(StateComposite obj, Designator param) {
     RecordType record = makeRecord(obj, param);
-    UnionType union = makeUnion(obj, param);
+    UnsafeUnionType union = makeUnion(obj, param);
 
     for (State sub : obj.getItemList(State.class)) {
       Type stype = visit(sub, param);

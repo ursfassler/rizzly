@@ -1,0 +1,43 @@
+type
+  Rec = Record
+    pos  : R{0,10};
+    neg  : R{-10,10};
+    ofs  : R{10,20};
+    dum  : R{0,0};
+  end
+
+  Uni = Union
+    rec  : Rec;
+  end
+
+component
+  Union4
+    input
+      get0():R{-100,100};
+      get1():R{-100,100};
+      get2():R{-100,100};
+
+  implementation elementary
+
+    var
+      uni : Uni;
+      
+    entry
+      uni.rec.dum := 0;
+    end
+      
+    function get0():R{-100,100}
+      return uni.rec.pos;
+    end
+    
+    function get1():R{-100,100}
+      return uni.rec.pos;
+    end
+
+    function get2():R{-100,100}
+      return uni.rec.pos;
+    end
+
+  end
+
+

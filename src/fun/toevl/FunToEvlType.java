@@ -3,10 +3,14 @@ package fun.toevl;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import common.Designator;
+import common.ElementInfo;
+
 import error.ErrorType;
 import error.RError;
 import evl.expression.reference.Reference;
 import evl.type.Type;
+import evl.type.TypeRef;
 import evl.type.base.EnumDefRef;
 import evl.type.base.EnumElement;
 import evl.type.composed.NamedElement;
@@ -116,7 +120,11 @@ public class FunToEvlType extends NullTraverser<Type, String> {
     for (fun.type.composed.NamedElement elem : obj.getElement()) {
       element.add((NamedElement) fta.traverse(elem, null));
     }
-    return new evl.type.composed.UnionType(obj.getInfo(), param, element);
+
+    NamedElement tag = new NamedElement(new ElementInfo(), Designator.NAME_SEP + "tag", new TypeRef(new ElementInfo(), new evl.type.special.VoidType()));
+    // FIXME get singleton
+
+    return new evl.type.composed.UnionType(obj.getInfo(), param, element, tag);
   }
 
   @Override

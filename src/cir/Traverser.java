@@ -52,6 +52,7 @@ import cir.type.TypeAlias;
 import cir.type.TypeRef;
 import cir.type.UIntType;
 import cir.type.UnionType;
+import cir.type.UnsafeUnionType;
 import cir.type.VoidType;
 
 public abstract class Traverser<R, P> {
@@ -215,6 +216,8 @@ public abstract class Traverser<R, P> {
       return visitStructType((StructType) obj, param);
     else if (obj instanceof UnionType)
       return visitUnionType((UnionType) obj, param);
+    else if (obj instanceof UnsafeUnionType)
+      return visitUnsafeUnionType((UnsafeUnionType) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
@@ -292,6 +295,8 @@ public abstract class Traverser<R, P> {
   protected abstract R visitStructType(StructType obj, P param);
 
   protected abstract R visitUnionType(UnionType obj, P param);
+
+  protected abstract R visitUnsafeUnionType(UnsafeUnionType obj, P param);
 
   protected abstract R visitPointerType(PointerType obj, P param);
 

@@ -237,6 +237,11 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  public void union4() {
+    compile("union4", TestSteps.COMPILE_TO_ASM, false, false);// TODO make testcase
+  }
+
+  @Test
   public void unionTest() {
     compile("unionTest", TestSteps.COMPILE_TO_ASM, false, false); // TODO make testcase
   }
