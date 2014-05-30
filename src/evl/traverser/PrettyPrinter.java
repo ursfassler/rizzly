@@ -399,7 +399,9 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   protected Void visitUnionType(UnionType obj, StreamWriter param) {
     param.wr(obj.getName());
     wrId(obj, param);
-    param.wr(" = Union");
+    param.wr(" = Union(");
+    visit(obj.getTag(),param);
+    param.wr(")");
     param.nl();
     param.incIndent();
     visitList(obj.getElement(), param);

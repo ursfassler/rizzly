@@ -15,8 +15,11 @@ import evl.expression.binop.Is;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
 import evl.knowledge.KnowChild;
+import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
+import evl.statement.CaseStmt;
+import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.base.EnumDefRef;
 import evl.type.base.EnumElement;
@@ -36,6 +39,7 @@ public class ReduceUnion extends ExprReplacer<Void> {
 
   private Map<UnionType, EnumType> union2enum = new HashMap<UnionType, EnumType>();
   final private KnowChild kc;
+  final private KnowType kt;
 
   public static void process(Namespace aclasses, KnowledgeBase kb) {
     ReduceUnion inst = new ReduceUnion(kb);
@@ -46,6 +50,7 @@ public class ReduceUnion extends ExprReplacer<Void> {
   public ReduceUnion(KnowledgeBase kb) {
     super();
     this.kc = kb.getEntry(KnowChild.class);
+    this.kt = kb.getEntry(KnowType.class);
   }
 
   @Override
@@ -68,28 +73,45 @@ public class ReduceUnion extends ExprReplacer<Void> {
   }
 
   @Override
+  protected Expression visitCaseStmt(CaseStmt obj, Void param) {
+    Type et = kt.get(obj.getCondition());
+    if (et instanceof UnionType) {
+      assert (obj.getCondition() instanceof Reference);
+      Reference cond = (Reference) obj.getCondition();
+      cond.getOffset().add(new RefName(info, ((UnionType) et).getTag().getName()));
+    }
+    return super.visitCaseStmt(obj, param);
+  }
+
+  @Override
+  protected Expression visitReference(Reference obj, Void param) {
+    obj = (Reference) super.visitReference(obj, param);
+    if (obj.getLink() instanceof UnionType) {
+      UnionType ut = (UnionType) obj.getLink();
+      assert (union2enum.containsKey(ut));
+      assert (obj.getOffset().size() == 1);
+      assert (obj.getOffset().get(0) instanceof RefName);
+      EnumType et = union2enum.get(ut);
+      Evl ev = kc.get(et, ((RefName) obj.getOffset().get(0)).getName(), ut.getInfo());
+      assert (ev instanceof EnumElement);
+      return new Reference(obj.getInfo(), (EnumElement) ev);
+    }
+    return obj;
+  }
+
+  @Override
   protected Expression visitIs(Is obj, Void param) {
     super.visitIs(obj, param);
     Reference left = (Reference) visit(obj.getLeft(), null);
-    Reference right = (Reference) visit(obj.getRight(), null);
 
     assert (left.getOffset().isEmpty());
-    assert (right.getOffset().size() == 1);
 
-    UnionType ut = (UnionType) right.getLink();
-    assert (union2enum.containsKey(ut));
-    assert (right.getOffset().size() == 1);
-    assert (right.getOffset().get(0) instanceof RefName);
-    EnumType et = union2enum.get(ut);
-    Evl ev = kc.get(et, ((RefName) right.getOffset().get(0)).getName(), ut.getInfo());
-    assert (ev instanceof EnumElement);
+    Type ut = kt.get(left);
+    assert (ut instanceof UnionType);
 
-    left.getOffset().add(new RefName(info, ut.getTag().getName()));
+    left = new Reference(left.getInfo(), left.getLink(), new RefName(info, ((UnionType) ut).getTag().getName()));
 
-    right.getOffset().clear();
-    right.setLink((EnumElement) ev);
-
-    return new Equal(info, left, right);
+    return new Equal(obj.getInfo(), left, obj.getRight());
   }
 
 }

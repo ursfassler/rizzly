@@ -26,6 +26,7 @@ import evl.expression.binop.Div;
 import evl.expression.binop.Equal;
 import evl.expression.binop.Greater;
 import evl.expression.binop.Greaterequal;
+import evl.expression.binop.Is;
 import evl.expression.binop.Less;
 import evl.expression.binop.Lessequal;
 import evl.expression.binop.LogicAnd;
@@ -118,6 +119,11 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
 
   @Override
   protected Expression visitEqual(Equal obj, T param) {
+    return defaultBinaryOp(obj, param);
+  }
+
+  @Override
+  protected Expression visitIs(Is obj, T param) {
     return defaultBinaryOp(obj, param);
   }
 
