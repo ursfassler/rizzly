@@ -20,4 +20,9 @@ public class EnumDefRef extends EvlBase {
     this.elem = elem;
   }
 
+  @Override
+  public String toString() {
+    return elem.toString();
+  }
+
 }

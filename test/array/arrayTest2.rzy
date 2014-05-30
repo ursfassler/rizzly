@@ -7,7 +7,7 @@ component
   implementation elementary
 
     var
-      a : Array{20,R{0,199}};
+      a : Array{20,R{0,199}} = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
     
     function set( i: R{0,19}; x: R{0,199} )
       a[i] := x;

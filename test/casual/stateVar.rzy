@@ -9,12 +9,8 @@ component
   implementation elementary
     
     var
-      a : R{0,10};
+      a : R{0,10} = 0;
       
-    entry
-      a := 0;
-    end
-    
     function ind( x: R{0,10} )
       if a < 10 then
         a := R{0,10}( a + 1 );

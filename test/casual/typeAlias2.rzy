@@ -13,11 +13,11 @@ component
     implementation elementary
 
     var
-      a : Byte;
-      b : Word;
-      c : Unsigned{R{0,4294967295}};
-      d : Unsigned{R{0,255}};
-      e : Byte2;
+      a : Byte = 1;
+      b : Word = 2;
+      c : Unsigned{R{0,4294967295}} = 3;
+      d : Unsigned{R{0,255}} = 4;
+      e : Byte2 = 5;
       
     function ind()
       a := 0;

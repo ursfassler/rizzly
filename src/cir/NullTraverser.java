@@ -3,10 +3,15 @@ package cir;
 import cir.expression.ArrayValue;
 import cir.expression.BinaryOp;
 import cir.expression.BoolValue;
+import cir.expression.ElementValue;
+import cir.expression.NoValue;
 import cir.expression.Number;
 import cir.expression.StringValue;
+import cir.expression.StructValue;
 import cir.expression.TypeCast;
 import cir.expression.UnaryOp;
+import cir.expression.UnionValue;
+import cir.expression.UnsafeUnionValue;
 import cir.expression.reference.RefCall;
 import cir.expression.reference.RefIndex;
 import cir.expression.reference.RefName;
@@ -48,12 +53,37 @@ public abstract class NullTraverser<R, P> extends Traverser<R, P> {
   protected abstract R visitDefault(CirBase obj, P param);
 
   @Override
+  protected R visitUnsafeUnionValue(UnsafeUnionValue obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitStructValue(StructValue obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitElementValue(ElementValue obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitUnionValue(UnionValue obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
   protected R visitRangeType(RangeType obj, P param) {
     return visitDefault(obj, param);
   }
 
   @Override
   protected R visitPointerType(PointerType obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitNoValue(NoValue obj, P param) {
     return visitDefault(obj, param);
   }
 

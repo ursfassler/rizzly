@@ -2,10 +2,13 @@ package fun;
 
 import fun.composition.Connection;
 import fun.composition.ImplComposition;
+import fun.expression.AnyValue;
 import fun.expression.ArithmeticOp;
 import fun.expression.ArrayValue;
 import fun.expression.BoolValue;
+import fun.expression.ExprList;
 import fun.expression.Expression;
+import fun.expression.NamedElementValue;
 import fun.expression.Number;
 import fun.expression.Relation;
 import fun.expression.StringValue;
@@ -236,6 +239,8 @@ public abstract class Traverser<R, P> {
       return visitStringValue((StringValue) obj, param);
     } else if (obj instanceof ArrayValue) {
       return visitArrayValue((ArrayValue) obj, param);
+    } else if (obj instanceof ExprList) {
+      return visitExprList((ExprList) obj, param);
     } else if (obj instanceof BoolValue) {
       return visitBoolValue((BoolValue) obj, param);
     } else if (obj instanceof ArithmeticOp) {
@@ -246,6 +251,10 @@ public abstract class Traverser<R, P> {
       return visitUnaryExpression((UnaryExpression) obj, param);
     } else if (obj instanceof Reference) {
       return visitReference((Reference) obj, param);
+    } else if (obj instanceof AnyValue) {
+      return visitAnyValue((AnyValue) obj, param);
+    } else if (obj instanceof NamedElementValue) {
+      return visitNamedElementValue((NamedElementValue) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -455,9 +464,15 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitArrayValue(ArrayValue obj, P param);
 
+  abstract protected R visitExprList(ExprList obj, P param);
+
   abstract protected R visitStringValue(StringValue obj, P param);
 
   abstract protected R visitNumber(Number obj, P param);
+
+  abstract protected R visitAnyValue(AnyValue obj, P param);
+
+  abstract protected R visitNamedElementValue(NamedElementValue obj, P param);
 
   abstract protected R visitReference(Reference obj, P param);
 

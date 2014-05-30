@@ -30,10 +30,12 @@ import evl.hfsm.Transition;
 import evl.knowledge.KnowParent;
 import evl.knowledge.KnowledgeBase;
 import evl.other.ListOfNamed;
+import evl.statement.Assignment;
 import evl.statement.Block;
 import evl.statement.CallStmt;
 import evl.statement.Statement;
 import evl.variable.FuncVariable;
+import evl.variable.StateVariable;
 import evl.variable.Variable;
 
 /**
@@ -143,9 +145,25 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
       CallStmt call = new CallStmt(info, ref);
       trans.getBody().getStatements().add(call);
     }
+    makeVarInit(dst, os, trans.getBody().getStatements());
     makeEntryCalls(dst, os, trans.getBody().getStatements());
 
     src.getItem().add(trans);
+  }
+
+  private void makeVarInit(State start, State top, List<Statement> list) {
+    if (start == top) {
+      return;
+    }
+    StateComposite par = getParent(start);
+    assert (par != null);
+
+    makeVarInit(par, top, list);
+
+    for (StateVariable var : start.getVariable()) {
+      Assignment init = new Assignment(var.getDef().getInfo(), new Reference(info, var), Copy.copy(var.getDef()));
+      list.add(init);
+    }
   }
 
   private void makeEntryCalls(State start, State top, List<Statement> list) {

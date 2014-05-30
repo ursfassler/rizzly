@@ -7,7 +7,7 @@ component
     implementation elementary
 
     var
-      data: T;
+      data: T = 0;
 
     function set( item: T )
       data := item;

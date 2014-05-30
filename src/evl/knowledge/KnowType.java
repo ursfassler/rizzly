@@ -22,8 +22,11 @@ import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
 import evl.expression.Expression;
 import evl.expression.Number;
+import evl.expression.RecordValue;
 import evl.expression.StringValue;
 import evl.expression.TypeCast;
+import evl.expression.UnionValue;
+import evl.expression.UnsafeUnionValue;
 import evl.expression.binop.And;
 import evl.expression.binop.BitAnd;
 import evl.expression.binop.BitOr;
@@ -167,6 +170,21 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
   @Override
   protected Type visitNamedElement(NamedElement obj, Void param) {
     return visit(obj.getType(), param);
+  }
+
+  @Override
+  protected Type visitUnsafeUnionValue(UnsafeUnionValue obj, Void param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Type visitRecordValue(RecordValue obj, Void param) {
+    return visit(obj.getType(), param);
+  }
+
+  @Override
+  protected Type visitUnionValue(UnionValue obj, Void param) {
+    throw new RuntimeException("not yet implemented");
   }
 
   @Override

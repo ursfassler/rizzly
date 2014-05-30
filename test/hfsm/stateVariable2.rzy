@@ -8,12 +8,8 @@ component
 
     state A
       var
-        a : R{0,255};
+        a : R{0,255} = 0;
         
-      entry
-        a := 0;
-      end
-      
       function tuwas()
         a := (a + 2) and 255;
       end

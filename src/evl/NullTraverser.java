@@ -4,12 +4,18 @@ import evl.composition.Connection;
 import evl.composition.EndpointSelf;
 import evl.composition.EndpointSub;
 import evl.composition.ImplComposition;
+import evl.expression.AnyValue;
 import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
+import evl.expression.ExprList;
+import evl.expression.NamedElementValue;
 import evl.expression.Number;
 import evl.expression.RangeValue;
+import evl.expression.RecordValue;
 import evl.expression.StringValue;
 import evl.expression.TypeCast;
+import evl.expression.UnionValue;
+import evl.expression.UnsafeUnionValue;
 import evl.expression.binop.And;
 import evl.expression.binop.BitAnd;
 import evl.expression.binop.BitOr;
@@ -103,7 +109,37 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   abstract protected R visitDefault(Evl obj, P param);
 
   @Override
+  protected R visitUnsafeUnionValue(UnsafeUnionValue obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitRecordValue(RecordValue obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitExprList(ExprList obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitUnionValue(UnionValue obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitNamedElementValue(NamedElementValue obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
   protected R visitAnyType(AnyType obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitAnyValue(AnyValue obj, P param) {
     return visitDefault(obj, param);
   }
 

@@ -4,12 +4,18 @@ import java.util.ArrayList;
 
 import evl.Evl;
 import evl.NullTraverser;
+import evl.expression.AnyValue;
 import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
+import evl.expression.ExprList;
 import evl.expression.Expression;
+import evl.expression.NamedElementValue;
 import evl.expression.Number;
 import evl.expression.RangeValue;
+import evl.expression.RecordValue;
 import evl.expression.TypeCast;
+import evl.expression.UnionValue;
+import evl.expression.UnsafeUnionValue;
 import evl.expression.binop.And;
 import evl.expression.binop.BitAnd;
 import evl.expression.binop.BitOr;
@@ -65,6 +71,11 @@ public class CopyExpression extends NullTraverser<Expression, Void> {
   }
 
   @Override
+  protected Expression visitAnyValue(AnyValue obj, Void param) {
+    return new AnyValue(obj.getInfo());
+  }
+
+  @Override
   protected Expression visitRangeValue(RangeValue obj, Void param) {
     return new RangeValue(obj.getInfo(), obj.getValues());
   }
@@ -77,6 +88,31 @@ public class CopyExpression extends NullTraverser<Expression, Void> {
   @Override
   protected Expression visitArrayValue(ArrayValue obj, Void param) {
     return new ArrayValue(obj.getInfo(), new ArrayList<Expression>(cast.copy(obj.getValue())));
+  }
+
+  @Override
+  protected Expression visitExprList(ExprList obj, Void param) {
+    return new ExprList(obj.getInfo(), new ArrayList<Expression>(cast.copy(obj.getValue())));
+  }
+
+  @Override
+  protected Expression visitRecordValue(RecordValue obj, Void param) {
+    return new RecordValue(obj.getInfo(), new ArrayList<NamedElementValue>(cast.copy(obj.getValue())), cast.copy(obj.getType()));
+  }
+
+  @Override
+  protected Expression visitNamedElementValue(NamedElementValue obj, Void param) {
+    return new NamedElementValue(obj.getInfo(), obj.getName(), cast.copy(obj.getValue()));
+  }
+
+  @Override
+  protected Expression visitUnsafeUnionValue(UnsafeUnionValue obj, Void param) {
+    return new UnsafeUnionValue(obj.getInfo(), cast.copy(obj.getContentValue()), cast.copy(obj.getType()));
+  }
+
+  @Override
+  protected Expression visitUnionValue(UnionValue obj, Void param) {
+    return new UnionValue(obj.getInfo(), cast.copy(obj.getTagValue()), cast.copy(obj.getContentValue()), cast.copy(obj.getType()));
   }
 
   @Override

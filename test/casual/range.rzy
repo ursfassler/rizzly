@@ -10,7 +10,7 @@ component
   implementation elementary
     
     var
-      a : R{0,10};
+      a : R{0,10} = 0;
     
     function ind( x: R{0,10} )
       if a < 10 then

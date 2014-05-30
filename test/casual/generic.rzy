@@ -10,6 +10,6 @@ component
   Generic
   implementation elementary
     var
-      x: R2{R1};
+      x: R2{R1} = b := _;
   end
 

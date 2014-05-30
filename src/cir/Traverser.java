@@ -5,11 +5,16 @@ import java.util.Collection;
 import cir.expression.ArrayValue;
 import cir.expression.BinaryOp;
 import cir.expression.BoolValue;
+import cir.expression.ElementValue;
 import cir.expression.Expression;
+import cir.expression.NoValue;
 import cir.expression.Number;
 import cir.expression.StringValue;
+import cir.expression.StructValue;
 import cir.expression.TypeCast;
 import cir.expression.UnaryOp;
+import cir.expression.UnionValue;
+import cir.expression.UnsafeUnionValue;
 import cir.expression.reference.RefCall;
 import cir.expression.reference.RefIndex;
 import cir.expression.reference.RefItem;
@@ -128,10 +133,20 @@ public abstract class Traverser<R, P> {
       return visitStringValue((StringValue) obj, param);
     else if (obj instanceof ArrayValue)
       return visitArrayValue((ArrayValue) obj, param);
+    else if (obj instanceof StructValue)
+      return visitStructValue((StructValue) obj, param);
     else if (obj instanceof BoolValue)
       return visitBoolValue((BoolValue) obj, param);
     else if (obj instanceof TypeCast)
       return visitTypeCast((TypeCast) obj, param);
+    else if (obj instanceof NoValue)
+      return visitNoValue((NoValue) obj, param);
+    else if (obj instanceof UnionValue)
+      return visitUnionValue((UnionValue) obj, param);
+    else if (obj instanceof UnsafeUnionValue)
+      return visitUnsafeUnionValue((UnsafeUnionValue) obj, param);
+    else if (obj instanceof ElementValue)
+      return visitElementValue((ElementValue) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
@@ -265,6 +280,16 @@ public abstract class Traverser<R, P> {
   protected abstract R visitStringValue(StringValue obj, P param);
 
   protected abstract R visitNumber(Number obj, P param);
+
+  protected abstract R visitUnionValue(UnionValue obj, P param);
+
+  protected abstract R visitUnsafeUnionValue(UnsafeUnionValue obj, P param);
+
+  protected abstract R visitStructValue(StructValue obj, P param);
+
+  protected abstract R visitElementValue(ElementValue obj, P param);
+
+  protected abstract R visitNoValue(NoValue obj, P param);
 
   protected abstract R visitBinaryOp(BinaryOp obj, P param);
 

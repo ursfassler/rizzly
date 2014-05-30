@@ -6,7 +6,7 @@ component
   implementation elementary
     
     var
-      x : R{0,50};
+      x : R{0,50} = 1;
       
     entry
       x := 42;

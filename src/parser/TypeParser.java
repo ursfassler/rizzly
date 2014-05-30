@@ -178,8 +178,7 @@ public class TypeParser extends BaseParser {
         RError.err(ErrorType.Error, elemTok.getInfo(), "Name \"" + elemTok.getData() + "\" already defined");
       } else {
         Reference typeRef = new Reference(elemTok.getInfo(), name);
-        EnumElement elem = new EnumElement(elemTok.getInfo(), elemTok.getData(), typeRef);
-        elem.setDef(new Number(elemTok.getInfo(), BigInteger.valueOf(type.getElement().size())));
+        EnumElement elem = new EnumElement(elemTok.getInfo(), elemTok.getData(), typeRef, new Number(elemTok.getInfo(), BigInteger.valueOf(type.getElement().size())));
         constants.add(elem);
 
         Reference elemRef = new Reference(elemTok.getInfo(), elem.getName());

@@ -29,7 +29,7 @@ public class CopyVariable extends NullTraverser<Variable, Void> {
 
   @Override
   protected Variable visitStateVariable(StateVariable obj, Void param) {
-    return new StateVariable(obj.getInfo(), obj.getName(), cast.copy(obj.getType()));
+    return new StateVariable(obj.getInfo(), obj.getName(), cast.copy(obj.getType()), cast.copy(obj.getDef()));
   }
 
   @Override

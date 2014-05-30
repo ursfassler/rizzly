@@ -239,7 +239,7 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
     map.put(obj, state);
 
     for (Variable var : obj.getVariable()) {
-      state.getVariable().add((evl.variable.Variable) traverse(var, null));
+      state.getVariable().add((evl.variable.StateVariable) traverse(var, null));
     }
     for (Named use : obj.getItemList()) {
       Evl evl = traverse(use, null);
@@ -266,7 +266,7 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
     evl.hfsm.StateSimple state = new evl.hfsm.StateSimple(obj.getInfo(), obj.getName());
     map.put(obj, state);
     for (Variable var : obj.getVariable()) {
-      state.getVariable().add((evl.variable.Variable) traverse(var, null));
+      state.getVariable().add((evl.variable.StateVariable) traverse(var, null));
     }
     for (Named use : obj.getItemList()) {
       Evl evl = traverse(use, null);

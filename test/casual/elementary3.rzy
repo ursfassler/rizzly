@@ -12,7 +12,7 @@ component
   implementation elementary
 
     var
-      count : R{0,1};
+      count : R{0,1} = 0;
 
     function tickIn()
       count := (count+1) mod 2;

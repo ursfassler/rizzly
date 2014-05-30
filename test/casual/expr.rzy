@@ -24,8 +24,8 @@ component
     implementation elementary
     
     var
-      a : Array{10,Point};
-      f : R{0,255};
+      a : Array{10,Point} = [ ( x := 10, y := 20 ) ];
+      f : R{0,255} = 20;
     
     function foo( x, y, z: R{0,255} ):R{0,255}
       if x > z then

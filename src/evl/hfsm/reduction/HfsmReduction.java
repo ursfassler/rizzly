@@ -105,7 +105,8 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
     HashMap<StateSimple, EnumElement> enumMap = makeEnumElem(obj.getTopstate(), states, param);
 
     param.add(states);
-    StateVariable stateVariable = new StateVariable(obj.getInfo(), "state", new TypeRef(info, states));
+    Reference initState = makeEnumElemRef(states, enumMap.get(obj.getTopstate().getInitial()).getName());
+    StateVariable stateVariable = new StateVariable(obj.getInfo(), "state", new TypeRef(info, states), initState);
     elem.getVariable().add(stateVariable);
 
     TransitionDict dict = new TransitionDict();
@@ -135,7 +136,7 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
     }
 
     {
-      FuncPrivateVoid fEntry = makeEntryFunc(obj.getTopstate().getInitial(), states, enumMap, stateVariable);
+      FuncPrivateVoid fEntry = makeEntryFunc(obj.getTopstate().getInitial());
       elem.getFunction().add(fEntry);
       elem.setEntryFunc(new Reference(info, fEntry));
       FuncPrivateVoid fExit = makeExitFunc(states, enumMap, stateVariable);
@@ -159,14 +160,8 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
     Relinker.relink(body, map);
   }
 
-  static private FuncPrivateVoid makeEntryFunc(State initial, EnumType etype, HashMap<StateSimple, EnumElement> enumMap, StateVariable stateVariable) {
+  static private FuncPrivateVoid makeEntryFunc(State initial) {
     Block body = new Block(info);
-
-    // set initial state
-    Reference dst = new Reference(info, stateVariable);
-    Reference src = makeEnumElemRef(etype, enumMap.get(initial).getName());
-    Assignment newState = new Assignment(info, dst, src);
-    body.getStatements().add(newState);
 
     body.getStatements().add(makeCall(initial.getEntryFunc()));
 
@@ -295,13 +290,6 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
     return caseStmt;
   }
 
-  /**
-   * For every transition, it adds a basic block with the guard in it and for the "then" part another basic block with
-   * code if the transition is taken. The "else" part points to the next basic block or exit if there is no more
-   * transition.
-   * 
-   * @return
-   */
   static private IfStmt makeGuardedTrans(List<Transition> transList, List<FuncVariable> newparam, StateVariable stateVariable, HashMap<StateSimple, EnumElement> enumMap) {
     Block def = new Block(info);
 

@@ -9,7 +9,7 @@ component
   implementation elementary
 
     var
-      a : Array{20,R{0,200}};
+      a : Array{20,R{0,200}} = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
     
     entry
       i : R{0,20} = 0;

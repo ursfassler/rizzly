@@ -3,13 +3,17 @@ package parser;
 import java.util.ArrayList;
 import java.util.List;
 
+import common.ElementInfo;
+
 import error.ErrorType;
 import error.RError;
 import fun.expression.ArithmeticOp;
 import fun.expression.ArrayValue;
 import fun.expression.BoolValue;
 import fun.expression.ExpOp;
+import fun.expression.ExprList;
 import fun.expression.Expression;
+import fun.expression.NamedElementValue;
 import fun.expression.Number;
 import fun.expression.RelOp;
 import fun.expression.Relation;
@@ -37,14 +41,29 @@ public class ExpressionParser extends Parser {
     return ret;
   }
 
-  // EBNF expr: shiftExpr [ relOp shiftExpr ]
-  protected Expression parse() {
+  // EBNF relExpr: shiftExpr [ relOp shiftExpr ]
+  protected Expression parseRelExpr() {
     Expression expr = parseShiftExpr();
     if (isRelOp()) {
       Token tok = peek();
       RelOp op = parseRelOp();
       Expression right = parseShiftExpr();
       return new Relation(tok.getInfo(), expr, right, op);
+    } else {
+      return expr;
+    }
+  }
+
+  // EBNF expr: relExpr | ( id ":=" relExpr )
+  protected Expression parse() {
+    Expression expr = parseRelExpr();
+    if (consumeIfEqual(TokenType.BECOMES)) {
+      if (!(expr instanceof Reference) || !((Reference) expr).getOffset().isEmpty()) {
+        RError.err(ErrorType.Error, expr.getInfo(), "expected identifier for assignment");
+        return null;
+      }
+      Expression value = parseRelExpr();
+      return new NamedElementValue(expr.getInfo(), ((Reference) expr).getLink().getName(), value);
     } else {
       return expr;
     }
@@ -185,7 +204,7 @@ public class ExpressionParser extends Parser {
     return null;
   }
 
-  // EBNF factor: ref | number | string | arrayValue | "False" | "True" | "not" factor | "(" expr ")"
+  // EBNF factor: ref | number | string | arrayValue | "False" | "True" | "not" factor | "(" exprList ")"
   private Expression parseFactor() {
     TokenType type = peek().getType();
     switch (type) {
@@ -217,10 +236,14 @@ public class ExpressionParser extends Parser {
       return parseArrayValue();
     }
     case OPENPAREN: {
-      expect(TokenType.OPENPAREN);
-      Expression ret = parse();
+      ElementInfo info = expect(TokenType.OPENPAREN).getInfo();
+      List<Expression> list = parseExprList();
       expect(TokenType.CLOSEPAREN);
-      return ret;
+      if (list.size() == 1) {
+        return list.get(0);
+      } else {
+        return new ExprList(info, list);
+      }
     }
     default:
       RError.err(ErrorType.Fatal, peek().getInfo(), "Unexpected token: " + type);

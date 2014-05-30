@@ -2,9 +2,12 @@ package fun;
 
 import fun.composition.Connection;
 import fun.composition.ImplComposition;
+import fun.expression.AnyValue;
 import fun.expression.ArithmeticOp;
 import fun.expression.ArrayValue;
 import fun.expression.BoolValue;
+import fun.expression.ExprList;
+import fun.expression.NamedElementValue;
 import fun.expression.Number;
 import fun.expression.Relation;
 import fun.expression.StringValue;
@@ -70,7 +73,22 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   protected abstract R visitDefault(Fun obj, P param);
 
   @Override
+  protected R visitExprList(ExprList obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitNamedElementValue(NamedElementValue obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
   protected R visitArrayValue(ArrayValue obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitAnyValue(AnyValue obj, P param) {
     return visitDefault(obj, param);
   }
 

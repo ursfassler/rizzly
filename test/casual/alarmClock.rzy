@@ -9,12 +9,8 @@ component
     
   implementation hfsm(Counting)
     var
-      time    : R{0,5};
+      time    : R{0,5} = 5;
       
-    entry
-      time    := 5;
-    end
-    
     state Counting
     end
     

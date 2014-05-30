@@ -9,12 +9,8 @@ component
   implementation elementary
     
     var
-      a : R{0,10};
+      a : R{0,10} = 0;
       
-    entry
-      a := 0;
-    end
-    
     function inc()
       a := (a + 1) mod 11;
     end

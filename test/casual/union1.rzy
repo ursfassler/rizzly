@@ -15,7 +15,7 @@ component
     implementation elementary
 
     var
-      data : Uni;
+      data : Uni = ( byte := 42 );
 
     function setByte( value: R{0,255} )
       data.byte := value;

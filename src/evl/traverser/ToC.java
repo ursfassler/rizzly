@@ -10,6 +10,8 @@ import java.util.Map;
 import util.Range;
 import cir.CirBase;
 import cir.expression.BinaryOp;
+import cir.expression.ElementValue;
+import cir.expression.NoValue;
 import cir.expression.Op;
 import cir.expression.reference.RefItem;
 import cir.function.FunctionImpl;
@@ -20,12 +22,17 @@ import common.FuncAttr;
 
 import evl.Evl;
 import evl.NullTraverser;
+import evl.expression.AnyValue;
 import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
 import evl.expression.Expression;
+import evl.expression.NamedElementValue;
 import evl.expression.Number;
+import evl.expression.RecordValue;
 import evl.expression.StringValue;
 import evl.expression.TypeCast;
+import evl.expression.UnionValue;
+import evl.expression.UnsafeUnionValue;
 import evl.expression.binop.BinaryExp;
 import evl.expression.binop.BitAnd;
 import evl.expression.binop.BitOr;
@@ -242,7 +249,7 @@ public class ToC extends NullTraverser<CirBase, Void> {
 
   @Override
   protected CirBase visitStateVariable(StateVariable obj, Void param) {
-    return new cir.other.StateVariable(obj.getName(), (cir.type.TypeRef) visit(obj.getType(), param));
+    return new cir.other.StateVariable(obj.getName(), (cir.type.TypeRef) visit(obj.getType(), param), (cir.expression.Expression) visit(obj.getDef(), param));
   }
 
   @Override
@@ -344,7 +351,7 @@ public class ToC extends NullTraverser<CirBase, Void> {
 
   @Override
   protected CirBase visitUnionType(UnionType obj, Void param) {
-    cir.type.UnionType type = new cir.type.UnionType(obj.getName(),(cir.type.NamedElement) visit(obj.getTag(),param));
+    cir.type.UnionType type = new cir.type.UnionType(obj.getName(), (cir.type.NamedElement) visit(obj.getTag(), param));
     for (NamedElement elem : obj.getElement()) {
       cir.type.NamedElement celem = (cir.type.NamedElement) visit(elem, param);
       type.getElements().add(celem);
@@ -388,6 +395,31 @@ public class ToC extends NullTraverser<CirBase, Void> {
   }
 
   @Override
+  protected CirBase visitRecordValue(RecordValue obj, Void param) {
+    cir.expression.StructValue ret = new cir.expression.StructValue();
+    for (NamedElementValue expr : obj.getValue()) {
+      ElementValue actarg = (cir.expression.ElementValue) visit(expr, param);
+      ret.getValue().add(actarg);
+    }
+    return ret;
+  }
+
+  @Override
+  protected CirBase visitNamedElementValue(NamedElementValue obj, Void param) {
+    return new cir.expression.ElementValue(obj.getName(), (cir.expression.Expression) visit(obj.getValue(), null));
+  }
+
+  @Override
+  protected CirBase visitUnsafeUnionValue(UnsafeUnionValue obj, Void param) {
+    return new cir.expression.UnsafeUnionValue((cir.expression.ElementValue) visit(obj.getContentValue(), param));
+  }
+
+  @Override
+  protected CirBase visitUnionValue(UnionValue obj, Void param) {
+    return new cir.expression.UnionValue((cir.expression.ElementValue) visit(obj.getTagValue(), null), (cir.expression.ElementValue) visit(obj.getContentValue(), param));
+  }
+
+  @Override
   protected CirBase visitStringType(StringType obj, Void param) {
     return new cir.type.StringType();
   }
@@ -400,6 +432,11 @@ public class ToC extends NullTraverser<CirBase, Void> {
   @Override
   protected CirBase visitBoolValue(BoolValue obj, Void param) {
     return new cir.expression.BoolValue(obj.isValue());
+  }
+
+  @Override
+  protected CirBase visitAnyValue(AnyValue obj, Void param) {
+    return new NoValue();
   }
 
   @Override

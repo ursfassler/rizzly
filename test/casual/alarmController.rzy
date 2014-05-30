@@ -5,12 +5,8 @@ component
       time( seconds: R{0,99} );
     
   implementation hfsm(Disabled)
-    entry
-      atime   := 0;
-    end
-    
     var
-      atime   : R{0,99};
+      atime   : R{0,99} = 0;
       
     function getTime():R{0,99}
       return atime;

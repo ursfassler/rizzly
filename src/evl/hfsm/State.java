@@ -9,7 +9,7 @@ import evl.EvlBase;
 import evl.expression.reference.Reference;
 import evl.function.FunctionHeader;
 import evl.other.ListOfNamed;
-import evl.variable.Variable;
+import evl.variable.StateVariable;
 
 abstract public class State extends EvlBase implements StateItem {
   public final static String TOPSTATE_NAME = "_top";
@@ -18,7 +18,7 @@ abstract public class State extends EvlBase implements StateItem {
   private Reference entryFunc;
   private Reference exitFunc;
   final private ListOfNamed<FunctionHeader> function = new ListOfNamed<FunctionHeader>();
-  final private ListOfNamed<Variable> variable = new ListOfNamed<Variable>();
+  final private ListOfNamed<StateVariable> variable = new ListOfNamed<StateVariable>();
   final protected List<StateItem> item = new ArrayList<StateItem>();
 
   public State(ElementInfo info, String name) {
@@ -34,7 +34,7 @@ abstract public class State extends EvlBase implements StateItem {
     this.name = name;
   }
 
-  public ListOfNamed<Variable> getVariable() {
+  public ListOfNamed<StateVariable> getVariable() {
     return variable;
   }
 

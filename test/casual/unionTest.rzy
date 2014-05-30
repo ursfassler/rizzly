@@ -21,7 +21,7 @@ component
     implementation elementary
 
     var
-      data : Uni;
+      data : Uni = dat2 := 0;
   
     function set1( a, b: R{0,255} )
       data.dat1.a := a;

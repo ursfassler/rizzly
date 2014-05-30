@@ -8,11 +8,7 @@ component
     implementation elementary
     
     var
-      a : R{0,100};
-    
-    entry
-      a := 0;
-    end
+      a : R{0,100} = 0;
     
     function bar()
       a := 42;

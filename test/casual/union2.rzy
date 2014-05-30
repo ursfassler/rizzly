@@ -12,7 +12,7 @@ component
     implementation elementary
 
     var
-      data : Uni;
+      data : Uni = pos := 1;
 
     function abs( x: R{-10,10} ):R{0,10}
       if x < 0 then

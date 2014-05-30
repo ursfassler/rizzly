@@ -24,9 +24,12 @@ import evl.expression.binop.Shl;
 import evl.expression.binop.Shr;
 import fun.Fun;
 import fun.NullTraverser;
+import fun.expression.AnyValue;
 import fun.expression.ArithmeticOp;
 import fun.expression.ArrayValue;
 import fun.expression.BoolValue;
+import fun.expression.ExprList;
+import fun.expression.NamedElementValue;
 import fun.expression.Number;
 import fun.expression.Relation;
 import fun.expression.StringValue;
@@ -78,8 +81,27 @@ public class FunToEvlExpr extends NullTraverser<Evl, Void> {
   }
 
   @Override
+  protected Evl visitExprList(ExprList obj, Void param) {
+    ArrayList<evl.expression.Expression> value = new ArrayList<evl.expression.Expression>();
+    for (fun.expression.Expression item : obj.getValue()) {
+      value.add((evl.expression.Expression) fta.traverse(item, null));
+    }
+    return new evl.expression.ExprList(obj.getInfo(), value);
+  }
+
+  @Override
+  protected Evl visitNamedElementValue(NamedElementValue obj, Void param) {
+    return new evl.expression.NamedElementValue(obj.getInfo(), obj.getName(), (Expression) fta.traverse(obj.getValue(), null));
+  }
+
+  @Override
   protected Expression visitBoolValue(BoolValue obj, Void param) {
     return new evl.expression.BoolValue(obj.getInfo(), obj.isValue());
+  }
+
+  @Override
+  protected Evl visitAnyValue(AnyValue obj, Void param) {
+    return new evl.expression.AnyValue(obj.getInfo());
   }
 
   @Override

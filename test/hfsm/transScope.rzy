@@ -9,22 +9,17 @@ component
     
   implementation hfsm( A )
     var
-      a : R{0,0};     // this variable is never read since A.a and B.b shadows it
+      a : R{0,0} = 0;     // this variable is never read since A.a and B.b shadows it
       
-    entry
-      a := 0;
-    end
-  
     transition
       A to B by inp() if a = 0;   // guard is evaluated in the scope of the source state
       B to A by inp() if a = 0;
   
     state A
       var
-        a : R{0,4};
+        a : R{0,4} = 4;
         
       entry
-        a := 4;
         outA();
       end
       
@@ -36,12 +31,11 @@ component
       
     state B
       entry
-        a := 2;
         outB();
       end
       
       var
-        a : R{0,2};
+        a : R{0,2} = 2;
         
       transition
         B to B by inp() if a > 0 do

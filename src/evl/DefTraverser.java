@@ -9,12 +9,18 @@ import evl.composition.Connection;
 import evl.composition.EndpointSelf;
 import evl.composition.EndpointSub;
 import evl.composition.ImplComposition;
+import evl.expression.AnyValue;
 import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
+import evl.expression.ExprList;
+import evl.expression.NamedElementValue;
 import evl.expression.Number;
 import evl.expression.RangeValue;
+import evl.expression.RecordValue;
 import evl.expression.StringValue;
 import evl.expression.TypeCast;
+import evl.expression.UnionValue;
+import evl.expression.UnsafeUnionValue;
 import evl.expression.binop.And;
 import evl.expression.binop.BitAnd;
 import evl.expression.binop.BitOr;
@@ -276,6 +282,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitStateVariable(StateVariable obj, P param) {
     visit(obj.getType(), param);
+    visit(obj.getDef(), param);
     return null;
   }
 
@@ -348,6 +355,12 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitArrayValue(ArrayValue obj, P param) {
+    visitItr(obj.getValue(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitExprList(ExprList obj, P param) {
     visitItr(obj.getValue(), param);
     return null;
   }
@@ -753,6 +766,39 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitAnyType(AnyType obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitAnyValue(AnyValue obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitNamedElementValue(NamedElementValue obj, P param) {
+    visit(obj.getValue(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitUnionValue(UnionValue obj, P param) {
+    visit(obj.getTagValue(), param);
+    visit(obj.getContentValue(), param);
+    visit(obj.getType(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitUnsafeUnionValue(UnsafeUnionValue obj, P param) {
+    visit(obj.getContentValue(), param);
+    visit(obj.getType(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitRecordValue(RecordValue obj, P param) {
+    visitList(obj.getValue(), param);
+    visit(obj.getType(), param);
     return null;
   }
 

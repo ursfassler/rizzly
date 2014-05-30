@@ -25,8 +25,8 @@ component
       BloBlo : R{0,255} = (Answer + 10) / 3;
 
     var
-      a : R{0,Answer};
-      b : R{0,Answer+2};
+      a : R{0,Answer}   = 0;
+      b : R{0,Answer+2} = 0;
   end      
 
   Dummy{S:R{0,255}}
@@ -39,8 +39,8 @@ component
       Dada : R{-100,100} = something(S) / 2 - 100;
     
     var
-      a	 : R{0,S};
-      b : R{0,(S+10)/2};
+      a	: R{0,S}        = 0;
+      b : R{0,(S+10)/2} = 0;
     
     function foo()
       bar : R{0,255} = Answer;

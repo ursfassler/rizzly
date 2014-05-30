@@ -5,13 +5,13 @@ import java.util.Set;
 
 import common.Direction;
 import common.ElementInfo;
+
 import error.ErrorType;
 import error.RError;
 import evl.Evl;
 import evl.NullTraverser;
 import evl.composition.ImplComposition;
 import evl.function.FunctionBase;
-import evl.function.impl.FuncIfaceOutVoid;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.State;
 import evl.hfsm.StateComposite;

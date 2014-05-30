@@ -5,13 +5,19 @@ import java.util.List;
 import error.ErrorType;
 import error.RError;
 import evl.DefTraverser;
+import evl.expression.AnyValue;
 import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
+import evl.expression.ExprList;
 import evl.expression.Expression;
+import evl.expression.NamedElementValue;
 import evl.expression.Number;
 import evl.expression.RangeValue;
+import evl.expression.RecordValue;
 import evl.expression.StringValue;
 import evl.expression.TypeCast;
+import evl.expression.UnionValue;
+import evl.expression.UnsafeUnionValue;
 import evl.expression.binop.And;
 import evl.expression.binop.BinaryExp;
 import evl.expression.binop.BitAnd;
@@ -47,7 +53,7 @@ import evl.statement.CaseOptRange;
 import evl.statement.CaseOptValue;
 import evl.statement.IfOption;
 import evl.statement.ReturnExpr;
-import evl.variable.Constant;
+import evl.variable.DefVariable;
 
 abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
 
@@ -241,6 +247,42 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   }
 
   @Override
+  protected Expression visitExprList(ExprList obj, T param) {
+    visitExprList(obj.getValue(), param);
+    return obj;
+  }
+
+  @Override
+  protected Expression visitNamedElementValue(NamedElementValue obj, T param) {
+    obj.setValue(visit(obj.getValue(), param));
+    return obj;
+  }
+
+  @Override
+  protected Expression visitUnsafeUnionValue(UnsafeUnionValue obj, T param) {
+    obj.setContentValue((NamedElementValue) visit(obj.getContentValue(), param));
+    return obj;
+  }
+
+  @Override
+  protected Expression visitUnionValue(UnionValue obj, T param) {
+    obj.setTagValue((NamedElementValue) visit(obj.getTagValue(), param));
+    obj.setContentValue((NamedElementValue) visit(obj.getContentValue(), param));
+    return obj;
+  }
+
+  @Override
+  protected Expression visitRecordValue(RecordValue obj, T param) {
+    visitList(obj.getValue(), param);
+    return obj;
+  }
+
+  @Override
+  protected Expression visitAnyValue(AnyValue obj, T param) {
+    return obj;
+  }
+
+  @Override
   protected Expression visitBoolValue(BoolValue obj, T param) {
     return obj;
   }
@@ -271,7 +313,7 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitConstant(Constant obj, T param) {
+  protected Expression visitDefVariable(DefVariable obj, T param) {
     obj.setDef(visit(obj.getDef(), param));
     return null;
   }

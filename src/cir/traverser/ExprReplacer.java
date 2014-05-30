@@ -7,11 +7,15 @@ import cir.NullTraverser;
 import cir.expression.ArrayValue;
 import cir.expression.BinaryOp;
 import cir.expression.BoolValue;
+import cir.expression.ElementValue;
 import cir.expression.Expression;
 import cir.expression.Number;
 import cir.expression.StringValue;
+import cir.expression.StructValue;
 import cir.expression.TypeCast;
 import cir.expression.UnaryOp;
+import cir.expression.UnionValue;
+import cir.expression.UnsafeUnionValue;
 import cir.expression.reference.RefCall;
 import cir.expression.reference.RefIndex;
 import cir.expression.reference.RefName;
@@ -233,6 +237,26 @@ public class ExprReplacer<T> extends NullTraverser<Expression, T> {
   }
 
   @Override
+  protected Expression visitElementValue(ElementValue obj, T param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Expression visitStructValue(StructValue obj, T param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Expression visitUnsafeUnionValue(UnsafeUnionValue obj, T param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Expression visitUnionValue(UnionValue obj, T param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
   protected Expression visitStringValue(StringValue obj, T param) {
     return obj;
   }
@@ -278,4 +302,5 @@ public class ExprReplacer<T> extends NullTraverser<Expression, T> {
     visit(obj.getType(), param);
     return null;
   }
+
 }

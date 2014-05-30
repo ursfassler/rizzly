@@ -20,7 +20,7 @@ component
   implementation elementary
 
     var
-      uni : Uni;
+      uni : Uni = rec := ( pos := 2, neg := -3, ofs := 13, dum := 0 );
       
     entry
       uni.rec.dum := 0;

@@ -12,10 +12,15 @@ import cir.NullTraverser;
 import cir.expression.ArrayValue;
 import cir.expression.BinaryOp;
 import cir.expression.BoolValue;
+import cir.expression.ElementValue;
+import cir.expression.NoValue;
 import cir.expression.Number;
 import cir.expression.StringValue;
+import cir.expression.StructValue;
 import cir.expression.TypeCast;
 import cir.expression.UnaryOp;
+import cir.expression.UnionValue;
+import cir.expression.UnsafeUnionValue;
 import cir.expression.reference.RefCall;
 import cir.expression.reference.RefIndex;
 import cir.expression.reference.RefName;
@@ -104,6 +109,12 @@ public class CWriter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitNumber(Number obj, StreamWriter param) {
     param.wr(obj.getValue().toString());
+    return null;
+  }
+
+  @Override
+  protected Void visitNoValue(NoValue obj, StreamWriter param) {
+    param.wr("_");
     return null;
   }
 
@@ -228,6 +239,8 @@ public class CWriter extends NullTraverser<Void, StreamWriter> {
     visit(obj.getType(), param);
     param.wr(" ");
     param.wr(obj.getName());
+    param.wr(" = ");
+    visit(obj.getDef(), param);
     param.wr(";");
     param.nl();
     return null;
@@ -583,6 +596,42 @@ public class CWriter extends NullTraverser<Void, StreamWriter> {
       visit(obj.getValue().get(i), param);
     }
     param.wr("} ");
+    param.wr("}");
+    return null;
+  }
+
+  @Override
+  protected Void visitElementValue(ElementValue obj, StreamWriter param) {
+    param.wr(".");
+    param.wr(obj.getName());
+    param.wr("=");
+    visit(obj.getValue(), param);
+    param.wr(",");
+    return null;
+  }
+
+  @Override
+  protected Void visitUnsafeUnionValue(UnsafeUnionValue obj, StreamWriter param) {
+    param.wr("{");
+    visit(obj.getContentValue(), param);
+    param.wr("}");
+    return null;
+  }
+
+  @Override
+  protected Void visitUnionValue(UnionValue obj, StreamWriter param) {
+    param.wr("{");
+    visit(obj.getTagValue(), param);
+    // param.wr(",");
+    visit(obj.getContentValue(), param);
+    param.wr("}");
+    return null;
+  }
+
+  @Override
+  protected Void visitStructValue(StructValue obj, StreamWriter param) {
+    param.wr("{");
+    visitList(obj.getValue(), param);
     param.wr("}");
     return null;
   }

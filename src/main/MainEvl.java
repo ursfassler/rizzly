@@ -82,6 +82,7 @@ import evl.traverser.DepGraph;
 import evl.traverser.DesCallgraphMaker;
 import evl.traverser.FpcHeaderWriter;
 import evl.traverser.IfCutter;
+import evl.traverser.InitVarTyper;
 import evl.traverser.IntroduceConvert;
 import evl.traverser.LinkReduction;
 import evl.traverser.NamespaceReduction;
@@ -139,6 +140,7 @@ public class MainEvl {
     root = hfsmReduction(root, opt, debugdir, aclasses, kb);
 
     ReduceUnion.process(aclasses, kb);
+    InitVarTyper.process(aclasses, kb);
 
     PrettyPrinter.print(aclasses, debugdir + "reduced.rzy", true);
 

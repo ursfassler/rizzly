@@ -8,6 +8,7 @@ import evl.type.base.ArrayType;
 import evl.type.base.EnumType;
 import evl.type.base.RangeType;
 import evl.type.base.StringType;
+import evl.type.composed.RecordType;
 import evl.variable.Constant;
 
 /**
@@ -30,6 +31,8 @@ public class ConstantPropagation extends ExprReplacer<Void> {
       return false;
     } else if (type instanceof StringType) {  // TODO decide by size?
       return false;
+    } else if (type instanceof RecordType) {
+      return true;    // Because of C
     }
     throw new RuntimeException("not yet implemented:" + type.getClass().getCanonicalName());
   }

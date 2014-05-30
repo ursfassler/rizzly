@@ -20,12 +20,12 @@ abstract public class ImplBaseParser extends BaseParser {
     return parseFileUseList(CompUse.class);
   }
 
-  // EBNF varDefBlock: "var" vardef ";" { vardef ";" }
+  // EBNF varDefBlock: "var" vardefMustinit ";" { vardefMustinit ";" }
   protected <T extends Variable> List<T> parseVarDefBlock(Class<T> kind) {
-    List<T> res = new ArrayList<T>();
     expect(TokenType.VAR);
+    List<T> res = new ArrayList<T>();
     do {
-      res.addAll(parseVarDef(kind));
+      res.addAll(parseVarDef(kind, InitType.MustInit));
       expect(TokenType.SEMI);
     } while (peek().getType() == TokenType.IDENTIFIER);
     return res;

@@ -8,11 +8,7 @@ component
     implementation hfsm(A)
     
     var
-      a : R{0,100};
-    
-    entry
-      a := 0;
-    end
+      a : R{0,100} = 0;
     
     state A
       function query():R{0,100}

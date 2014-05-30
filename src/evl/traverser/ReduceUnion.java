@@ -91,4 +91,5 @@ public class ReduceUnion extends ExprReplacer<Void> {
 
     return new Equal(info, left, right);
   }
+
 }

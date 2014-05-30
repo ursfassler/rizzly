@@ -7,12 +7,16 @@ import common.ElementInfo;
 
 import evl.Evl;
 import evl.NullTraverser;
+import evl.expression.reference.Reference;
 import evl.hfsm.ImplHfsm;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
 import evl.type.Type;
 import evl.type.TypeRef;
+import evl.variable.Constant;
 import evl.variable.StateVariable;
+
+//TODO set correct values when switching states
 
 public class HfsmToFsm extends NullTraverser<Void, Namespace> {
   KnowledgeBase kb;
@@ -56,14 +60,18 @@ public class HfsmToFsm extends NullTraverser<Void, Namespace> {
     TransitionRedirecter.process(obj.getTopstate());
     TransitionDownPropagator.process(obj, kb);
 
-    obj.getTopstate().setInitial(InitStateGetter.get(obj.getTopstate()));
-
     {
       StateVarPathGetter svpg = new StateVarPathGetter();
       svpg.process(obj);
       StateTypeBuilder stb = new StateTypeBuilder(param);
       Type stateType = stb.traverse(obj.getTopstate(), new Designator(obj.getName()));
-      StateVariable var = new StateVariable(new ElementInfo(), "data", new TypeRef(new ElementInfo(), stateType));
+
+      obj.getTopstate().setInitial(InitStateGetter.get(obj.getTopstate()));
+
+      Constant def = stb.getInitVar().get(stateType);
+
+      // TODO set correct values when switching states
+      StateVariable var = new StateVariable(new ElementInfo(), "data", new TypeRef(new ElementInfo(), stateType), new Reference(new ElementInfo(), def));
       obj.getTopstate().getVariable().add(var);
       StateVarReplacer.process(obj, var, svpg.getVpath());
     }

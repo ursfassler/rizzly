@@ -20,6 +20,8 @@ import fun.composition.ImplComposition;
 import fun.expression.ArithmeticOp;
 import fun.expression.ArrayValue;
 import fun.expression.BoolValue;
+import fun.expression.ExprList;
+import fun.expression.NamedElementValue;
 import fun.expression.Number;
 import fun.expression.Relation;
 import fun.expression.StringValue;
@@ -797,6 +799,24 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   }
 
   @Override
+  protected Void visitNamedElementValue(NamedElementValue obj, Void param) {
+    xw.wr("(");
+    xw.wr(obj.getName());
+    xw.wr(" := ");
+    visit(obj.getValue(), null);
+    xw.wr(")");
+    return null;
+  }
+
+  @Override
+  protected Void visitExprList(ExprList obj, Void param) {
+    xw.wr("(");
+    list(obj.getValue(), ", ", null);
+    xw.wr(")");
+    return null;
+  }
+
+  @Override
   protected Void visitRelation(Relation obj, Void param) {
     xw.wr("(");
     visit(obj.getLeft(), null);
@@ -892,6 +912,8 @@ public class FunPrinter extends NullTraverser<Void, Void> {
     xw.wa(obj.getName(), getId(obj));
     xw.wr(": ");
     visit(obj.getType(), null);
+    xw.wr(" = ");
+    visit(obj.getDef(), null);
     xw.wr(";");
     xw.nl();
     return null;

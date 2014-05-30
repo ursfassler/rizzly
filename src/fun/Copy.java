@@ -9,9 +9,12 @@ import common.Direction;
 
 import fun.composition.Connection;
 import fun.composition.ImplComposition;
+import fun.expression.AnyValue;
 import fun.expression.ArithmeticOp;
 import fun.expression.ArrayValue;
 import fun.expression.BoolValue;
+import fun.expression.ExprList;
+import fun.expression.NamedElementValue;
 import fun.expression.Number;
 import fun.expression.Relation;
 import fun.expression.StringValue;
@@ -193,8 +196,7 @@ class CopyFun extends Traverser<Fun, Void> {
 
   @Override
   protected Fun visitConstPrivate(ConstPrivate obj, Void param) {
-    ConstPrivate var = new ConstPrivate(obj.getInfo(), obj.getName(), copy(obj.getType()));
-    var.setDef(copy(obj.getDef()));
+    ConstPrivate var = new ConstPrivate(obj.getInfo(), obj.getName(), copy(obj.getType()), copy(obj.getDef()));
     return var;
   }
 
@@ -210,7 +212,7 @@ class CopyFun extends Traverser<Fun, Void> {
 
   @Override
   protected Fun visitStateVariable(StateVariable obj, Void param) {
-    return new StateVariable(obj.getInfo(), obj.getName(), copy(obj.getType()));
+    return new StateVariable(obj.getInfo(), obj.getName(), copy(obj.getType()), copy(obj.getDef()));
   }
 
   @Override
@@ -365,7 +367,7 @@ class CopyFun extends Traverser<Fun, Void> {
     if (copied.containsKey(obj)) {
       return copied.get(obj);
     } else {
-      EnumElement elem = new EnumElement(obj.getInfo(), obj.getName(), type);
+      EnumElement elem = new EnumElement(obj.getInfo(), obj.getName(), type, copy(obj.getDef()));
       elem.setDef(copy(obj.getDef()));
       return elem;
     }
@@ -467,6 +469,11 @@ class CopyFun extends Traverser<Fun, Void> {
   }
 
   @Override
+  protected Fun visitExprList(ExprList obj, Void param) {
+    return new ExprList(obj.getInfo(), copy(obj.getValue()));
+  }
+
+  @Override
   protected Fun visitStringValue(StringValue obj, Void param) {
     return new StringValue(obj.getInfo(), obj.getValue());
   }
@@ -527,6 +534,16 @@ class CopyFun extends Traverser<Fun, Void> {
 
   @Override
   protected Fun visitRangeTemplate(RangeTemplate obj, Void param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Fun visitAnyValue(AnyValue obj, Void param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Fun visitNamedElementValue(NamedElementValue obj, Void param) {
     throw new RuntimeException("not yet implemented");
   }
 

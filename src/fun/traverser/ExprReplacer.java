@@ -8,7 +8,9 @@ import fun.DefTraverser;
 import fun.expression.ArithmeticOp;
 import fun.expression.ArrayValue;
 import fun.expression.BoolValue;
+import fun.expression.ExprList;
 import fun.expression.Expression;
+import fun.expression.NamedElementValue;
 import fun.expression.Number;
 import fun.expression.Relation;
 import fun.expression.StringValue;
@@ -115,6 +117,12 @@ public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   }
 
   @Override
+  protected Expression visitExprList(ExprList obj, T param) {
+    visitExprList(obj.getValue(), param);
+    return obj;
+  }
+
+  @Override
   protected Expression visitBoolValue(BoolValue obj, T param) {
     return obj;
   }
@@ -204,6 +212,12 @@ public class ExprReplacer<T> extends DefTraverser<Expression, T> {
       ((FuncWithReturn) obj).setRet((Reference) visit(((FuncWithReturn) obj).getRet(), param));
     }
     return super.visitFunctionHeader(obj, param);
+  }
+
+  @Override
+  protected Expression visitNamedElementValue(NamedElementValue obj, T param) {
+    obj.setValue(visit(obj.getValue(), param));
+    return super.visitNamedElementValue(obj, param);
   }
 
 }

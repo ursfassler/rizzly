@@ -7,7 +7,7 @@ component
   implementation elementary
 
     var
-      data: Array{10,R{0,31}};
+      data: Array{10,R{0,31}} = [0,0,0,0,0,0,0,0,0,0];
 
     function set( x: Array{10,R{0,31}} )
       data := x;

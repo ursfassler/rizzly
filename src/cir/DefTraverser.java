@@ -3,10 +3,15 @@ package cir;
 import cir.expression.ArrayValue;
 import cir.expression.BinaryOp;
 import cir.expression.BoolValue;
+import cir.expression.ElementValue;
+import cir.expression.NoValue;
 import cir.expression.Number;
 import cir.expression.StringValue;
+import cir.expression.StructValue;
 import cir.expression.TypeCast;
 import cir.expression.UnaryOp;
+import cir.expression.UnionValue;
+import cir.expression.UnsafeUnionValue;
 import cir.expression.reference.RefCall;
 import cir.expression.reference.RefIndex;
 import cir.expression.reference.RefName;
@@ -275,6 +280,12 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
+  protected R visitStructValue(StructValue obj, P param) {
+    visitList(obj.getValue(), param);
+    return null;
+  }
+
+  @Override
   protected R visitBooleanType(BooleanType obj, P param) {
     return null;
   }
@@ -303,6 +314,30 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitUIntType(UIntType obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitNoValue(NoValue obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitUnsafeUnionValue(UnsafeUnionValue obj, P param) {
+    visit(obj.getContentValue(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitUnionValue(UnionValue obj, P param) {
+    visit(obj.getTagValue(), param);
+    visit(obj.getContentValue(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitElementValue(ElementValue obj, P param) {
+    visit(obj.getValue(), param);
     return null;
   }
 

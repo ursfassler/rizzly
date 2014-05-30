@@ -9,12 +9,8 @@ component
   implementation elementary
     
     var
-      a : R{0,10};
+      a : R{0,10} = 0;
       
-    entry
-      a := 0;
-    end
-    
     function addret( x: R{0,10} ):R{0,10}
       a := (a + 1) mod 11;
       return x;

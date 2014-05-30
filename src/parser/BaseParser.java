@@ -5,7 +5,10 @@ import java.util.List;
 
 import common.Metadata;
 
+import error.ErrorType;
+import error.RError;
 import fun.Copy;
+import fun.expression.AnyValue;
 import fun.expression.Expression;
 import fun.expression.reference.Reference;
 import fun.function.FuncWithBody;
@@ -15,9 +18,6 @@ import fun.function.impl.FuncPrivateRet;
 import fun.function.impl.FuncPrivateVoid;
 import fun.function.impl.FuncProtRet;
 import fun.function.impl.FuncProtVoid;
-import fun.statement.Assignment;
-import fun.statement.Statement;
-import fun.statement.VarDefStmt;
 import fun.type.base.AnyType;
 import fun.variable.Constant;
 import fun.variable.FuncVariable;
@@ -26,6 +26,10 @@ import fun.variable.Variable;
 import fun.variable.VariableFactory;
 
 public class BaseParser extends Parser {
+
+  enum InitType {
+    NoInit, CanInit, MustInit
+  }
 
   public BaseParser(Scanner scanner) {
     super(scanner);
@@ -43,21 +47,6 @@ public class BaseParser extends Parser {
     return new ExpressionParser(getScanner());
   }
 
-  protected <T extends Variable> List<T> parseVarDefType(Class<T> kind, List<Token> names) {
-    expect(TokenType.COLON);
-    Reference type = expr().parseRef();
-
-    List<T> varlist = new ArrayList<T>();
-    for (Token id : names) {
-      Reference ntype = Copy.copy(type);
-
-      T var = VariableFactory.create(kind, id.getInfo(), id.getData(), ntype);
-      var.setName(id.getData());
-      varlist.add((T) var);
-    }
-    return varlist;
-  }
-
   // EBNF funcDefList: funcDef { funcDef }
   protected List<FunctionHeader> parseFunctionDefList() {
     List<FunctionHeader> res = new ArrayList<FunctionHeader>();
@@ -71,7 +60,7 @@ public class BaseParser extends Parser {
   protected <T extends Variable> List<T> parseFileUseList(Class<T> kind) {
     List<T> res = new ArrayList<T>();
     do {
-      List<T> vardefs = stmt().parseVarDef(kind);
+      List<T> vardefs = stmt().parseVarDef(kind, InitType.NoInit);
       expect(TokenType.SEMI);
 
       ArrayList<Metadata> meta = getMetadata();
@@ -167,14 +156,47 @@ public class BaseParser extends Parser {
     return func;
   }
 
-  // EBNF vardef: id { "," id } ":" typeref
-  protected <T extends Variable> List<T> parseVarDef(Class<T> kind) {
+  // EBNF vardefNoinit: id { "," id } ":" typeref
+  // EBNF vardefCaninit: id { "," id } ":" typeref [ "=" exprList ]
+  // EBNF vardefMustinit: id { "," id } ":" typeref "=" exprList
+  protected <T extends Variable> List<T> parseVarDef(Class<T> kind, InitType init) {
     List<Token> names = new ArrayList<Token>();
     do {
       Token id = expect(TokenType.IDENTIFIER);
       names.add(id);
     } while (consumeIfEqual(TokenType.COMMA));
-    return parseVarDefType(kind, names);
+
+    expect(TokenType.COLON);
+    Reference type = expr().parseRef();
+
+    List<Expression> def = new ArrayList<Expression>();
+    if ((init == InitType.MustInit) || ((init == InitType.CanInit) && (peek().getType() == TokenType.EQUAL))) {
+      expect(TokenType.EQUAL);
+      def = expr().parseExprList();
+    } else {
+      for (Token name : names) {
+        def.add(new AnyValue(name.getInfo()));
+      }
+    }
+
+    if (names.size() != def.size()) {
+      RError.err(ErrorType.Error, names.get(0).getInfo(), "expected " + names.size() + " init values, got " + def.size());
+      return null;
+    }
+
+    List<T> ret = new ArrayList<T>();
+    for (int i = 0; i < names.size(); i++) {
+      Reference ntype = Copy.copy(type);
+      T var;
+      if (init == InitType.NoInit) {
+        var = VariableFactory.create(kind, names.get(i).getInfo(), names.get(i).getData(), ntype);
+      } else {
+        var = VariableFactory.create(kind, names.get(i).getInfo(), names.get(i).getData(), ntype, def.get(i));
+      }
+      ret.add((T) var);
+    }
+
+    return ret;
   }
 
   // EBNF genericParam: [ "{" vardef { ";" vardef } "}" ]
@@ -182,36 +204,12 @@ public class BaseParser extends Parser {
     ArrayList<TemplateParameter> ret = new ArrayList<TemplateParameter>();
     if (consumeIfEqual(TokenType.OPENCURLY)) {
       do {
-        List<TemplateParameter> param = parseVarDef(TemplateParameter.class);
+        List<TemplateParameter> param = parseVarDef(TemplateParameter.class, InitType.NoInit);
         ret.addAll(param);
       } while (consumeIfEqual(TokenType.SEMI));
       expect(TokenType.CLOSECURLY);
     }
     return ret;
-  }
-
-  // EBNF vardefinit: vardef [ "=" exprList ]
-  protected List<Statement> parseVarDefInit(List<FuncVariable> vardef) {
-    List<Statement> stmtlist = new ArrayList<Statement>();
-
-    for (FuncVariable var : vardef) {
-      VarDefStmt stmt = new VarDefStmt(var.getInfo(), var);
-      stmtlist.add(stmt);
-    }
-
-    if (consumeIfEqual(TokenType.EQUAL)) {
-      List<Expression> def = expr().parseExprList();
-      assert (def.size() == vardef.size());
-      for (int i = 0; i < vardef.size(); i++) {
-        Expression expr = def.get(i);
-        FuncVariable var = vardef.get(i);
-        Reference ref = new Reference(expr.getInfo(), var.getName());
-        Assignment stmt = new Assignment(expr.getInfo(), ref, expr);
-        stmtlist.add(stmt);
-      }
-    }
-
-    return stmtlist;
   }
 
   // EBNF vardeflist: "(" [ vardef { ";" vardef } ] ")"
@@ -220,7 +218,7 @@ public class BaseParser extends Parser {
     expect(TokenType.OPENPAREN);
     if (peek().getType() == TokenType.IDENTIFIER) {
       do {
-        List<FuncVariable> list = stmt().parseVarDef(FuncVariable.class);
+        List<FuncVariable> list = stmt().parseVarDef(FuncVariable.class, InitType.NoInit);
         res.addAll(list);
       } while (consumeIfEqual(TokenType.SEMI));
     }
@@ -241,8 +239,7 @@ public class BaseParser extends Parser {
     Expression value = expr().parse();
     expect(TokenType.SEMI);
 
-    T ret = VariableFactory.create(kind, id.getInfo(), id.getData(), type);
-    ret.setDef(value);
+    T ret = VariableFactory.create(kind, id.getInfo(), id.getData(), type, value);
     return ret;
   }
 

@@ -26,6 +26,7 @@ import fun.Fun;
 import fun.doc.DepGraph;
 import fun.doc.DocWriter;
 import fun.doc.FunPrinter;
+import fun.expression.AnyValue;
 import fun.expression.Expression;
 import fun.knowledge.KnowledgeBase;
 import fun.other.Component;
@@ -118,7 +119,7 @@ public class MainFun {
 
   private static void printDepGraph(String debugdir, Namespace classes, Named root) {
     SimpleGraph<Named> g = DepGraph.build(classes);
-    StateVariable instVar = new StateVariable(new ElementInfo(), "!inst", null);
+    StateVariable instVar = new StateVariable(new ElementInfo(), "!inst", null, new AnyValue(new ElementInfo()));
     g.addVertex(instVar);
     g.addEdge(instVar, root);
     try {

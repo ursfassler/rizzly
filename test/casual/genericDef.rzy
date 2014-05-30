@@ -45,10 +45,10 @@ component
     
   implementation elementary
     var
-      data: T;
-      dat2: The2Record{T,Boolean};
-      dat3: The2Record{T,T};
-      dat4: The3{T,TheRecord{T}};
+      data: T = 0;
+      dat2: The2Record{T,Boolean} = ( a := 2, b := True );
+      dat3: The2Record{T,T} = ( a := 1, b := 2 );
+      dat4: The3{T,TheRecord{T}} = ( a := 0, ( a := 2, b := 200 ) );
 
     function set( item: T )
       data := item;

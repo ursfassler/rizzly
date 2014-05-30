@@ -33,4 +33,8 @@ public class ErrTypeTest extends ErrorTest {
     testForError("err5", "Err5", "need integer type to index array, got: Void");
   }
 
+  @Test
+  public void err6() {
+    testForError("err6", "Err6", "");
+  }
 }

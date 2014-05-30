@@ -6,7 +6,7 @@ component
       
   implementation elementary
     var
-      value : R{0,100};
+      value : R{0,100} = 0;
     
     entry
       value := Init;

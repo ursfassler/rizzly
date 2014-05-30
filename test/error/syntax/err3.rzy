@@ -9,6 +9,6 @@ component
   Err3
     implementation elementary
       var
-        dat: Rec{Boolean};
+        dat: Rec{Boolean} = a := False;
   end
 

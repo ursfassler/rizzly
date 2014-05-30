@@ -6,6 +6,8 @@ import java.util.List;
 import common.ElementInfo;
 
 import error.ErrorType;
+import error.RError;
+import fun.Copy;
 import fun.expression.Expression;
 import fun.expression.reference.Reference;
 import fun.statement.Assignment;
@@ -22,6 +24,7 @@ import fun.statement.Return;
 import fun.statement.ReturnExpr;
 import fun.statement.ReturnVoid;
 import fun.statement.Statement;
+import fun.statement.VarDefStmt;
 import fun.statement.While;
 import fun.variable.FuncVariable;
 
@@ -57,7 +60,7 @@ public class StatementParser extends BaseParser {
     }
   }
 
-  // EBNF vardefstmt: vardefinit ";"
+  // EBNF vardefstmt: vardefinitopt ";"
   private List<Statement> parseVarDefStmt(List<Reference> lhs) {
     List<Token> names = new ArrayList<Token>(lhs.size());
 
@@ -66,11 +69,33 @@ public class StatementParser extends BaseParser {
       names.add(new Token(TokenType.IDENTIFIER, ae.getLink().getName(), ae.getInfo()));
     }
 
-    List<FuncVariable> varlist = parseVarDefType(FuncVariable.class, names);
-    List<Statement> code = parseVarDefInit(varlist);
+    expect(TokenType.COLON);
+    Reference type = expr().parseRef();
+
+    List<Expression> def;
+    if (consumeIfEqual(TokenType.EQUAL)) {
+      def = expr().parseExprList();
+      if (names.size() != def.size()) {
+        RError.err(ErrorType.Error, names.get(0).getInfo(), "expected " + names.size() + " init values, got " + def.size());
+        return null;
+      }
+    } else {
+      def = null;
+    }
+
+    List<Statement> ret = new ArrayList<Statement>();
+    for (int i = 0; i < names.size(); i++) {
+      Reference ntype = Copy.copy(type);
+      FuncVariable var = new FuncVariable(names.get(i).getInfo(), names.get(i).getData(), ntype);
+      ret.add(new VarDefStmt(var.getInfo(), var));
+      if (def != null) {
+        ret.add(new Assignment(var.getInfo(), new Reference(var.getInfo(), var), def.get(i)));
+      }
+    }
+
     expect(TokenType.SEMI);
 
-    return code;
+    return ret;
   }
 
   // EBNF casestmt: "case" expression "do" caseopt { caseopt } [ "else" block "end" ] "end"

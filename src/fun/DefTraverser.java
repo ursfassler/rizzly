@@ -4,9 +4,12 @@ import common.Direction;
 
 import fun.composition.Connection;
 import fun.composition.ImplComposition;
+import fun.expression.AnyValue;
 import fun.expression.ArithmeticOp;
 import fun.expression.ArrayValue;
 import fun.expression.BoolValue;
+import fun.expression.ExprList;
+import fun.expression.NamedElementValue;
 import fun.expression.Number;
 import fun.expression.Relation;
 import fun.expression.StringValue;
@@ -296,6 +299,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitStateVariable(StateVariable obj, P param) {
     visit(obj.getType(), param);
+    visit(obj.getDef(), param);
     return null;
   }
 
@@ -427,6 +431,12 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
+  protected R visitExprList(ExprList obj, P param) {
+    visitItr(obj.getValue(), param);
+    return null;
+  }
+
+  @Override
   protected R visitStateSimple(StateSimple obj, P param) {
     visit(obj.getEntryFuncRef(), param);
     visit(obj.getExitFuncRef(), param);
@@ -515,6 +525,17 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitRangeTemplate(RangeTemplate obj, P param) {
     visitList(obj.getTemplateParam(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitAnyValue(AnyValue obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitNamedElementValue(NamedElementValue obj, P param) {
+    visit(obj.getValue(), param);
     return null;
   }
 

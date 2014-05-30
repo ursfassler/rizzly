@@ -15,15 +15,8 @@ component
   implementation elementary
 
     var
-      p : Point;
-      q : Point;
-
-    entry
-      p.x := 0;
-      p.y := 0;
-      q.x := 0;
-      q.y := 0;
-    end
+      p : Point = ( x := 0, y := 0 );
+      q : Point = ( x := 0, y := 0 );
 
     function ind(  x: R{0,100}  )
       p.x := (p.y + x) mod 100;

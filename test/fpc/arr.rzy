@@ -9,7 +9,7 @@ component
     implementation elementary
     
     var
-      a : Array{10,R{0,100}};
+      a : Array{10,R{0,100}} = [ 90, 80, 70, 60, 50, 40, 30, 20, 10 ];
     
     function inp( x: Array{10,R{0,100}} )
       a := x;

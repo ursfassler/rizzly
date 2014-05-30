@@ -45,7 +45,7 @@ public class FunToEvlVariable extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitStateVariable(StateVariable obj, Void param) {
-    return new evl.variable.StateVariable(obj.getInfo(), obj.getName(), copyType(obj.getType()));
+    return new evl.variable.StateVariable(obj.getInfo(), obj.getName(), copyType(obj.getType()), (evl.expression.Expression) fta.traverse(obj.getDef(), null));
   }
 
   @Override
