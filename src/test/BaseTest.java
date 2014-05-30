@@ -4,6 +4,8 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.ArrayList;
+import java.util.StringTokenizer;
 
 import main.ClaOption;
 import main.Main;
@@ -47,6 +49,19 @@ abstract public class BaseTest {
     if (execute) {
       executeTest(filename);
     }
+  }
+
+  public void compileExample(String dir, String testcase) {
+    cleanup();
+    ClaOption opt = new ClaOption();
+    StringTokenizer st = new StringTokenizer(testcase, ".");
+    ArrayList<String> tc = new ArrayList<String>();
+    while (st.hasMoreElements()) {
+      tc.add(st.nextToken());
+    }
+    opt.init(getRootdir() + dir, new Designator(tc), false, false);
+    Main.compile(opt);
+    compileLlvm();
   }
 
   @Deprecated
