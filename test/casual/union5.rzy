@@ -1,0 +1,27 @@
+type
+  Uni = Union
+    pos  : R{0,10};
+    neg  : R{-10,10};
+  end
+
+component
+  Union3
+    input
+      evt():R{0,1};
+
+    implementation elementary
+
+    function evt():R{0,1}
+      x: Uni;
+      x := Uni.pos;
+      if data is Uni.pos then
+        return 0;
+      ef data is Uni.neg then
+        return 1;
+      end
+    end
+    
+
+  end
+
+

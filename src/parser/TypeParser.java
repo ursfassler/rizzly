@@ -147,6 +147,7 @@ public class TypeParser extends BaseParser {
       ret.getElement().addAll(parseRecordElem());
     }
     expect(TokenType.END);
+    RError.err(ErrorType.Warning, tok.getInfo(), "Type checking of records is not yet fully implemented");
     return ret;
   }
 
@@ -160,6 +161,7 @@ public class TypeParser extends BaseParser {
       ret.getElement().addAll(parseRecordElem());
     }
     expect(TokenType.END);
+    RError.err(ErrorType.Warning, tok.getInfo(), "Unions are probably broken and do not work as intended");
     return ret;
   }
 

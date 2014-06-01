@@ -14,6 +14,8 @@ import evl.other.Component;
 import fun.other.Namespace;
 import fun.toevl.FunToEvl;
 
+//TODO set tag when writing to union
+//TODO allow writing of tag of union
 //TODO check that union/record is fully initialized before passing to other function
 //TODO pass records by reference to functions (test case rec2)
 //TODO add compiler self tests:

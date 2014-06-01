@@ -1,0 +1,92 @@
+type
+  Msg1 = Record
+    dummy: R{0,0};
+  end
+  
+  Msg2 = Record
+    x: R{0,10};
+    y: R{0,10};
+  end
+
+  Msg3 = Record
+    x: R{-1000,1000};
+  end
+  
+  Msg4 = Record
+    x: Boolean;
+  end
+  
+  Msg = Union
+    msg1: Msg1;
+    msg2: Msg2;
+    msg3: Msg3;
+    msg4: Msg4;
+  end
+
+const
+  Size = 10;
+
+component
+  Queue1
+    input
+      dispatch();
+      count():R{0,Size};
+      
+      inMsg1();
+      inMsg2( x: R{0,10}; y: R{0,10} );
+      inMsg3( x: R{-1000,1000} );
+      inMsg4( x: Boolean );
+      
+    output
+      outMsg1();
+      outMsg2( x: R{0,10}; y: R{0,10} );
+      outMsg3( x: R{-1000,1000} );
+      outMsg4( x: Boolean );
+
+  implementation elementary
+
+    var
+      queue : Array{Size,Msg} = [ _ := (msg3 := ( 0 )) ];
+      head  : R{0,Size-1} = 0;
+      size  : R{0,Size} = 0;
+      
+    function dispatch()
+      if size > 0 then
+        case queue[head] of
+          Msg.msg1: outMsg1(); end
+          Msg.msg2: outMsg2( queue[head].msg2.x, queue[head].msg2.y ); end
+          Msg.msg3: outMsg3( queue[head].msg3.x ); end
+          Msg.msg4: outMsg4( queue[head].msg4.x ); end
+        end
+        head := (head + 1) mod Size;
+        size := R{0,Size}(size - 1);
+      end
+    end
+    
+    function count():R{0,Size}
+      return size;
+    end
+      
+    function inMsg1()
+      queue[head+size].msg1.dummy := 0;
+      size := R{0,Size}(size + 1);
+    end
+    
+    function inMsg2( x: R{0,10}; y: R{0,10} )
+      queue[head+size].msg2.x := x;
+      queue[head+size].msg2.y := y;
+      size := R{0,Size}(size + 1);
+    end
+    
+    function inMsg3( x: R{-1000,1000} )
+      queue[head+size].msg3.x := x;
+      size := R{0,Size}(size + 1);
+    end
+    
+    function inMsg4( x: Boolean )
+      queue[head+size].msg4.x := x;
+      size := R{0,Size}(size + 1);
+    end
+
+  end
+
