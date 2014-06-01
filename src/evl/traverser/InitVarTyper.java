@@ -3,10 +3,12 @@ package evl.traverser;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import error.ErrorType;
 import error.RError;
+import evl.copy.Copy;
 import evl.expression.ArrayValue;
 import evl.expression.ExprList;
 import evl.expression.Expression;
@@ -21,6 +23,7 @@ import evl.other.Named;
 import evl.other.Namespace;
 import evl.type.Type;
 import evl.type.TypeRef;
+import evl.type.base.ArrayType;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.type.composed.NamedElement;
@@ -29,6 +32,7 @@ import evl.type.composed.UnionType;
 import evl.type.composed.UnsafeUnionType;
 import evl.variable.DefVariable;
 
+//TODO clean up
 // Type Inference (for union assignments)
 public class InitVarTyper extends ExprReplacer<Type> {
   private final KnowChild kc;
@@ -53,7 +57,36 @@ public class InitVarTyper extends ExprReplacer<Type> {
 
   @Override
   protected Expression visitArrayValue(ArrayValue obj, Type param) {
-    return super.visitArrayValue(obj, param);
+    if (param instanceof ArrayType) {
+      ArrayType at = (ArrayType) param;
+      int size = at.getSize().intValue();
+      List<Expression> init = new ArrayList<Expression>(size);
+      for (int i = 0; i < size; i++) {
+        init.add(null);
+      }
+      int idx = 0;
+      for (Expression expr : obj.getValue()) {
+        if (expr instanceof NamedElementValue) {
+          if (!((NamedElementValue) expr).getName().equals("_")) {
+            RError.err(ErrorType.Error, expr.getInfo(), "Unknown name: " + ((NamedElementValue) expr).getName());
+          } else {
+            expr = visit(((NamedElementValue) expr).getValue(), at.getType().getRef());
+            for (int i = 0; i < size; i++) {
+              if (init.get(i) == null) {
+                init.set(i, Copy.copy(expr));
+              }
+            }
+          }
+        } else {
+          init.set(idx, visit(expr, at.getType().getRef()));
+          idx++;
+        }
+      }
+
+      return new ArrayValue(obj.getInfo(), init);
+    } else {
+      throw new RuntimeException("not yet implemented: " + param.getClass().getCanonicalName());
+    }
   }
 
   @Override
