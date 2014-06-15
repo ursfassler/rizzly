@@ -1,0 +1,33 @@
+component
+
+  Dummy
+    input
+      ind();
+    
+    output
+      out();
+
+  implementation elementary
+    function ind()
+      out();
+    end
+      
+  end
+
+  Simple2
+    input
+      ind();
+    
+    output
+      out();
+
+  implementation composition
+    component
+      dummy : Dummy;
+      
+    connection
+      ind >> dummy.ind;
+      dummy.out >> out;
+      
+  end
+

@@ -50,6 +50,7 @@ public class CompInstantiator extends NullTraverser<ImplElementary, Designator> 
     ns.addAll(inst.getConstant());
     ns.addAll(inst.getVariable());
     ns.addAll(inst.getFunction());
+    ns.add(inst.getQueue());
 
     // XXX instantiated component should not have any function in Input nor Output
 

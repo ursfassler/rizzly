@@ -66,6 +66,7 @@ import evl.other.ListOfNamed;
 import evl.other.Named;
 import evl.other.Namespace;
 import evl.other.RizzlyProgram;
+import evl.queue.QueueReduction;
 import evl.statement.Block;
 import evl.statement.ReturnVoid;
 import evl.traverser.BitLogicCategorizer;
@@ -136,7 +137,7 @@ public class MainEvl {
 
     PrettyPrinter.print(aclasses, debugdir + "convert.rzy", true);
 
-    root = compositionReduction(aclasses, root);
+    root = compositionReduction(aclasses, root, kb);
     root = hfsmReduction(root, opt, debugdir, aclasses, kb);
 
     ReduceUnion.process(aclasses, kb);
@@ -425,8 +426,8 @@ public class MainEvl {
     }
   }
 
-  private static Component compositionReduction(Namespace aclasses, Component root) {
-    Map<ImplComposition, ImplElementary> map = CompositionReduction.process(aclasses);
+  private static Component compositionReduction(Namespace aclasses, Component root, KnowledgeBase kb) {
+    Map<ImplComposition, ImplElementary> map = CompositionReduction.process(aclasses, kb);
     Relinker.relink(aclasses, map);
     if (map.containsKey(root)) {
       root = map.get(root);
@@ -495,8 +496,10 @@ public class MainEvl {
       Evl inst = kf.get(new Designator("inst"), info);
 
       Relinker.relink(inst, map);
+      PrettyPrinter.print(inst, rootdir + "relinked.rzy", true);
 
       LinkReduction.process(inst);
+
     }
 
     PrettyPrinter.print(classes, rootdir + "instance.rzy", true);
@@ -517,6 +520,8 @@ public class MainEvl {
 
       // Use only stuff which is referenced from public input functions
       removeUnused(rootdir, classes, pubfunc);
+      PrettyPrinter.print(root, rootdir + "qt.rzy", true);
+      QueueReduction.process(root, new KnowledgeBase(classes, rootdir));
     }
 
     PrettyPrinter.print(classes, rootdir + "bflat.rzy", true);

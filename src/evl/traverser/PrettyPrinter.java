@@ -71,6 +71,7 @@ import evl.other.ImplElementary;
 import evl.other.ListOfNamed;
 import evl.other.Named;
 import evl.other.Namespace;
+import evl.other.Queue;
 import evl.other.RizzlyProgram;
 import evl.other.SubCallbacks;
 import evl.statement.Assignment;
@@ -86,6 +87,7 @@ import evl.statement.ReturnExpr;
 import evl.statement.ReturnVoid;
 import evl.statement.VarDefStmt;
 import evl.statement.WhileStmt;
+import evl.statement.intern.MsgPush;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
@@ -287,6 +289,10 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     visitOptList("component", obj.getComponent(), param);
     visitOptList("var", obj.getVariable(), param);
 
+    param.wr("queue ");
+    visit(obj.getQueue(), param);
+    param.nl();
+
     param.wr("entry: ");
     visit(obj.getEntryFunc(), param);
     param.wr(";");
@@ -306,6 +312,10 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   protected Void visitImplComposition(ImplComposition obj, StreamWriter param) {
     param.wr("implementation composition");
     param.nl();
+    param.nl();
+
+    param.wr("queue ");
+    visit(obj.getQueue(), param);
     param.nl();
 
     visitOptList("component", obj.getComponent(), param);
@@ -400,7 +410,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.wr(obj.getName());
     wrId(obj, param);
     param.wr(" = Union(");
-    visit(obj.getTag(),param);
+    visit(obj.getTag(), param);
     param.wr(")");
     param.nl();
     param.incIndent();
@@ -986,6 +996,10 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.nl();
     param.nl();
 
+    param.wr("queue ");
+    visit(obj.getQueue(), param);
+    param.nl();
+
     visit(obj.getTopstate(), param);
 
     return null;
@@ -1116,6 +1130,27 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.wr("(");
     visit(obj.getValue(), param);
     param.wr(")");
+    return null;
+  }
+
+  @Override
+  protected Void visitMsgPush(MsgPush obj, StreamWriter param) {
+    param.wr("!push(");
+    visit(obj.getQueue(), param);
+    param.wr(",");
+    visit(obj.getFunc(), param);
+    param.wr(",[");
+    list(obj.getData(), ",", param);
+    param.wr("]);");
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitQueue(Queue obj, StreamWriter param) {
+    param.wr(obj.getName());
+    wrId(obj, param);
+    param.nl();
     return null;
   }
 

@@ -15,6 +15,7 @@ import evl.hfsm.StateItem;
 import evl.other.CompUse;
 import evl.other.ImplElementary;
 import evl.other.Named;
+import evl.other.Queue;
 import evl.other.RizzlyProgram;
 import evl.other.SubCallbacks;
 import evl.statement.CaseOpt;
@@ -91,6 +92,11 @@ class CopyEvl extends NullTraverser<Evl, Void> {
   }
 
   @Override
+  protected Evl visitQueue(Queue obj, Void param) {
+    return new Queue(obj.getName());
+  }
+
+  @Override
   protected Evl visitSubCallbacks(SubCallbacks obj, Void param) {
     SubCallbacks ret = new SubCallbacks(obj.getInfo(), obj.getName());
     ret.addAll(copy(obj.getList()));
@@ -143,6 +149,7 @@ class CopyEvl extends NullTraverser<Evl, Void> {
 
     ret.getInput().addAll(copy(obj.getInput().getList()));
     ret.getOutput().addAll(copy(obj.getOutput().getList()));
+    ret.setQueue(copy(obj.getQueue()));
     ret.getVariable().addAll(copy(obj.getVariable().getList()));
     ret.getConstant().addAll(copy(obj.getConstant().getList()));
     ret.getComponent().addAll(copy(obj.getComponent().getList()));

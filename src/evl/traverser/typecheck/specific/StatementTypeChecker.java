@@ -24,6 +24,7 @@ import evl.statement.ReturnVoid;
 import evl.statement.Statement;
 import evl.statement.VarDefStmt;
 import evl.statement.WhileStmt;
+import evl.statement.intern.MsgPush;
 import evl.traverser.typecheck.LeftIsContainerOfRightTest;
 import evl.type.Type;
 import evl.type.base.BooleanType;
@@ -219,6 +220,14 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitReturnVoid(ReturnVoid obj, Void map) {
+    return null;
+  }
+
+  @Override
+  protected Void visitMsgPush(MsgPush obj, Void param) {
+    Type func = checkGetExpr(obj.getFunc());
+    // TODO implement check
+    RError.err(ErrorType.Warning, obj.getInfo(), "Type check for push function not yet implemented");
     return null;
   }
 

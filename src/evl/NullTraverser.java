@@ -65,6 +65,7 @@ import evl.hfsm.Transition;
 import evl.other.CompUse;
 import evl.other.ImplElementary;
 import evl.other.Namespace;
+import evl.other.Queue;
 import evl.other.RizzlyProgram;
 import evl.other.SubCallbacks;
 import evl.statement.Assignment;
@@ -80,6 +81,7 @@ import evl.statement.ReturnExpr;
 import evl.statement.ReturnVoid;
 import evl.statement.VarDefStmt;
 import evl.statement.WhileStmt;
+import evl.statement.intern.MsgPush;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
@@ -107,6 +109,16 @@ import evl.variable.StateVariable;
 abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   abstract protected R visitDefault(Evl obj, P param);
+
+  @Override
+  protected R visitQueue(Queue obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitMsgPush(MsgPush obj, P param) {
+    return visitDefault(obj, param);
+  }
 
   @Override
   protected R visitUnsafeUnionValue(UnsafeUnionValue obj, P param) {

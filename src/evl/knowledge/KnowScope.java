@@ -27,6 +27,7 @@ import evl.hfsm.StateSimple;
 import evl.hfsm.Transition;
 import evl.other.CompUse;
 import evl.other.ImplElementary;
+import evl.other.Queue;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumElement;
@@ -65,6 +66,7 @@ public class KnowScope extends KnowledgeEntry {
     global.add(ImplComposition.class);
     global.add(ImplHfsm.class);
 
+    priv.add(Queue.class);
     priv.add(CompUse.class);
     priv.add(StateVariable.class);
     priv.add(ConstPrivate.class);

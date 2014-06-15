@@ -1,0 +1,15 @@
+component
+  Simple3
+    input
+      ind( x: R{0,100} );
+    
+    output
+      out( x: R{0,100} );
+
+  implementation composition
+    
+    connection
+      ind >> out;
+      
+  end
+

@@ -15,6 +15,7 @@ import evl.statement.ReturnVoid;
 import evl.statement.Statement;
 import evl.statement.VarDefStmt;
 import evl.statement.WhileStmt;
+import evl.statement.intern.MsgPush;
 
 public class CopyStatement extends NullTraverser<Statement, Void> {
   private CopyEvl cast;
@@ -74,6 +75,11 @@ public class CopyStatement extends NullTraverser<Statement, Void> {
   @Override
   protected Statement visitWhileStmt(WhileStmt obj, Void param) {
     return new WhileStmt(obj.getInfo(), cast.copy(obj.getCondition()), cast.copy(obj.getBody()));
+  }
+
+  @Override
+  protected Statement visitMsgPush(MsgPush obj, Void param) {
+    return new MsgPush(obj.getInfo(), cast.copy(obj.getQueue()), cast.copy(obj.getFunc()), cast.copy(obj.getData()));
   }
 
 }

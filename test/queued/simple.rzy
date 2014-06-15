@@ -1,0 +1,15 @@
+component
+  Simple
+    input
+      ind();
+    
+    output
+      out();
+
+  implementation composition
+    
+    connection
+      ind >> out;
+      
+  end
+

@@ -71,11 +71,6 @@ public class ImplCompositionParser extends ImplBaseParser {
     ArrayList<Metadata> meta = getMetadata();
     info.getMetadata().addAll(meta);
 
-    if (type != MessageType.sync) {
-      RError.err(ErrorType.Fatal, info, "Only synchron messages supported at the moment");
-      return null;
-    }
-
     return new Connection(info, src, dst, type);
   }
 

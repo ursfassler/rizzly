@@ -70,6 +70,7 @@ import evl.hfsm.Transition;
 import evl.other.CompUse;
 import evl.other.ImplElementary;
 import evl.other.Namespace;
+import evl.other.Queue;
 import evl.other.RizzlyProgram;
 import evl.other.SubCallbacks;
 import evl.statement.Assignment;
@@ -86,6 +87,7 @@ import evl.statement.ReturnVoid;
 import evl.statement.Statement;
 import evl.statement.VarDefStmt;
 import evl.statement.WhileStmt;
+import evl.statement.intern.MsgPush;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
@@ -123,6 +125,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   protected R visitImplElementary(ImplElementary obj, P param) {
     visitList(obj.getInput().getList(), param);
     visitList(obj.getOutput().getList(), param);
+    visit(obj.getQueue(), param);
 
     visitList(obj.getConstant().getList(), param);
     visitList(obj.getVariable().getList(), param);
@@ -138,6 +141,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   protected R visitImplComposition(ImplComposition obj, P param) {
     visitList(obj.getInput().getList(), param);
     visitList(obj.getOutput().getList(), param);
+    visit(obj.getQueue(), param);
 
     visitList(obj.getComponent().getList(), param);
     visitList(obj.getConnection(), param);
@@ -148,6 +152,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   protected R visitImplHfsm(ImplHfsm obj, P param) {
     visitList(obj.getInput().getList(), param);
     visitList(obj.getOutput().getList(), param);
+    visit(obj.getQueue(), param);
 
     visit(obj.getTopstate(), param);
     return null;
@@ -799,6 +804,19 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   protected R visitRecordValue(RecordValue obj, P param) {
     visitList(obj.getValue(), param);
     visit(obj.getType(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitMsgPush(MsgPush obj, P param) {
+    visit(obj.getQueue(), param);
+    visit(obj.getFunc(), param);
+    visitList(obj.getData(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitQueue(Queue obj, P param) {
     return null;
   }
 

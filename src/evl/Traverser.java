@@ -77,6 +77,7 @@ import evl.other.CompUse;
 import evl.other.Component;
 import evl.other.ImplElementary;
 import evl.other.Namespace;
+import evl.other.Queue;
 import evl.other.RizzlyProgram;
 import evl.other.SubCallbacks;
 import evl.statement.Assignment;
@@ -95,6 +96,7 @@ import evl.statement.ReturnVoid;
 import evl.statement.Statement;
 import evl.statement.VarDefStmt;
 import evl.statement.WhileStmt;
+import evl.statement.intern.MsgPush;
 import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
@@ -184,6 +186,8 @@ public abstract class Traverser<R, P> {
       return visitCaseOpt((CaseOpt) obj, param);
     } else if (obj instanceof CaseOptEntry) {
       return visitCaseOptEntry((CaseOptEntry) obj, param);
+    } else if (obj instanceof Queue) {
+      return visitQueue((Queue) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -215,6 +219,8 @@ public abstract class Traverser<R, P> {
       return visitWhileStmt((WhileStmt) obj, param);
     else if (obj instanceof CaseStmt)
       return visitCaseStmt((CaseStmt) obj, param);
+    else if (obj instanceof MsgPush)
+      return visitMsgPush((MsgPush) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
@@ -530,6 +536,10 @@ public abstract class Traverser<R, P> {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
   }
+
+  abstract protected R visitQueue(Queue obj, P param);
+
+  abstract protected R visitMsgPush(MsgPush obj, P param);
 
   abstract protected R visitAnyType(AnyType obj, P param);
 

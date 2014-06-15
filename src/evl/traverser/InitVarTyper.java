@@ -83,6 +83,16 @@ public class InitVarTyper extends ExprReplacer<Type> {
         }
       }
 
+      ArrayList<Integer> missing = new ArrayList<Integer>();
+      for (int i = 0; i < size; i++) {
+        if (init.get(i) == null) {
+          missing.add(i);
+        }
+      }
+      if (!missing.isEmpty()) {
+        RError.err(ErrorType.Error, obj.getInfo(), "Elements not initialized: " + missing);
+      }
+
       return new ArrayValue(obj.getInfo(), init);
     } else {
       throw new RuntimeException("not yet implemented: " + param.getClass().getCanonicalName());

@@ -9,6 +9,7 @@ import evl.function.impl.FuncProtoRet;
 import evl.other.ListOfNamed;
 import evl.other.Named;
 import evl.other.Namespace;
+import evl.other.Queue;
 import evl.other.SubCallbacks;
 import evl.type.Type;
 import evl.variable.Constant;
@@ -81,6 +82,12 @@ public class NamespaceReduction extends NullTraverser<Void, Designator> {
 
   @Override
   protected Void visitType(Type obj, Designator param) {
+    addToList(param, obj);
+    return null;
+  }
+
+  @Override
+  protected Void visitQueue(Queue obj, Designator param) {
     addToList(param, obj);
     return null;
   }

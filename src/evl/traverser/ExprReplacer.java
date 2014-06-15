@@ -54,6 +54,7 @@ import evl.statement.CaseOptRange;
 import evl.statement.CaseOptValue;
 import evl.statement.IfOption;
 import evl.statement.ReturnExpr;
+import evl.statement.intern.MsgPush;
 import evl.variable.DefVariable;
 
 abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
@@ -341,6 +342,14 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   protected Expression visitIfOption(IfOption obj, T param) {
     obj.setCondition(visit(obj.getCondition(), param));
     visit(obj.getCode(), param);
+    return null;
+  }
+
+  @Override
+  protected Expression visitMsgPush(MsgPush obj, T param) {
+    obj.setQueue((Reference) visit(obj.getQueue(), param));
+    obj.setFunc((Reference) visit(obj.getFunc(), param));
+    visitItr(obj.getData(), param);
     return null;
   }
 
