@@ -11,7 +11,6 @@ import error.RError;
 import evl.expression.reference.Reference;
 import evl.type.Type;
 import evl.type.TypeRef;
-import evl.type.base.EnumDefRef;
 import evl.type.base.EnumElement;
 import evl.type.composed.NamedElement;
 import fun.Fun;
@@ -95,12 +94,8 @@ public class FunToEvlType extends NullTraverser<Type, String> {
   @Override
   protected Type visitEnumType(EnumType obj, String param) {
     evl.type.base.EnumType ret = new evl.type.base.EnumType(obj.getInfo(), param);
-    fta.map.put(obj, ret);
-    for (fun.expression.reference.Reference elem : obj.getElement()) {
-      Reference ref = (Reference) fta.traverse(elem, null);
-      assert (ref.getLink() instanceof EnumElement);
-      assert (ref.getOffset().isEmpty());
-      ret.getElement().add(new EnumDefRef(ref.getInfo(), (EnumElement) ref.getLink()));
+    for (fun.type.base.EnumElement elem : obj.getElement()) {
+      ret.getElement().add((EnumElement) fta.visit(elem, null));
     }
     return ret;
   }

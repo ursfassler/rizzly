@@ -9,7 +9,6 @@ import fun.Fun;
 import fun.NullTraverser;
 import fun.expression.Expression;
 import fun.expression.reference.Reference;
-import fun.type.base.EnumElement;
 import fun.variable.CompUse;
 import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
@@ -56,18 +55,6 @@ public class FunToEvlVariable extends NullTraverser<Evl, Void> {
   @Override
   protected Evl visitConstGlobal(ConstGlobal obj, Void param) {
     return new evl.variable.ConstGlobal(obj.getInfo(), obj.getName(), copyType(obj.getType()), (evl.expression.Expression) fta.traverse(obj.getDef(), null));
-  }
-
-  @Override
-  protected Evl visitEnumElement(EnumElement obj, Void param) {
-    TypeRef type = copyType(obj.getType());
-    // since enums produce a stupid circular dependency, the enum value may exist now
-    evl.type.base.EnumElement val = (evl.type.base.EnumElement) fta.map.get(obj);
-    if (val == null) {
-      val = new evl.type.base.EnumElement(obj.getInfo(), obj.getName(), type, (evl.expression.Expression) fta.traverse(obj.getDef(), null));
-      fta.map.put(obj, val);
-    }
-    return val;
   }
 
   @Override

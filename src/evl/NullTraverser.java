@@ -85,7 +85,6 @@ import evl.statement.intern.MsgPush;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
-import evl.type.base.EnumDefRef;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.type.base.FunctionTypeRet;
@@ -542,11 +541,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitRangeValue(RangeValue obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitEnumDefRef(EnumDefRef obj, P param) {
     return visitDefault(obj, param);
   }
 

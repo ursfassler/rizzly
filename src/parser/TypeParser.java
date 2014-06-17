@@ -1,6 +1,5 @@
 package parser;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,11 +8,9 @@ import common.Direction;
 import error.ErrorType;
 import error.RError;
 import fun.Copy;
-import fun.expression.Number;
 import fun.expression.reference.Reference;
 import fun.function.FunctionHeader;
 import fun.other.Component;
-import fun.other.ListOfNamed;
 import fun.type.Type;
 import fun.type.TypeGenerator;
 import fun.type.base.EnumElement;
@@ -22,7 +19,6 @@ import fun.type.base.TypeAlias;
 import fun.type.composed.NamedElement;
 import fun.type.composed.RecordType;
 import fun.type.composed.UnionType;
-import fun.variable.Constant;
 import fun.variable.TemplateParameter;
 
 public class TypeParser extends BaseParser {
@@ -42,11 +38,11 @@ public class TypeParser extends BaseParser {
   }
 
   // EBNF typesec: "type" typedecl { typedecl }
-  protected List<Type> parseTypeSection(ListOfNamed<Constant> constants) {
+  protected List<Type> parseTypeSection() {
     expect(TokenType.TYPE_SEC);
     List<Type> ret = new ArrayList<Type>();
     do {
-      ret.add(parseTypedecl(constants));
+      ret.add(parseTypedecl());
     } while (peek().getType() == TokenType.IDENTIFIER);
     return ret;
   }
@@ -91,7 +87,7 @@ public class TypeParser extends BaseParser {
   }
 
   // EBNF typedecl: id genericParam "=" typedef
-  private Type parseTypedecl(ListOfNamed<Constant> constants) {
+  private Type parseTypedecl() {
     Token name = expect(TokenType.IDENTIFIER);
     List<TemplateParameter> genpam;
     if (peek().getType() == TokenType.OPENCURLY) {
@@ -101,7 +97,7 @@ public class TypeParser extends BaseParser {
     }
     expect(TokenType.EQUAL);
 
-    Type type = parseTypeDef(name.getData(), constants);
+    Type type = parseTypeDef(name.getData());
     if (genpam != null) {
       if (type instanceof TypeGenerator) {
         ((TypeGenerator) type).getTemplateParam().addAll(genpam);
@@ -115,14 +111,14 @@ public class TypeParser extends BaseParser {
   }
 
   // EBNF typedef: recordtype | uniontype | enumtype | arraytype | derivatetype
-  private Type parseTypeDef(String name, ListOfNamed<Constant> constants) {
+  private Type parseTypeDef(String name) {
     switch (peek().getType()) {
     case RECORD:
       return parseRecordType(name);
     case UNION:
       return parseUnionType(name);
     case ENUM:
-      return parseEnumType(name, constants);
+      return parseEnumType(name);
     case IDENTIFIER:
       return parseDerivateType(name);
     default:
@@ -166,26 +162,14 @@ public class TypeParser extends BaseParser {
   }
 
   // EBNF enumType: "Enum" { enumElem } "end"
-  private Type parseEnumType(String name, ListOfNamed<Constant> constants) {
+  private Type parseEnumType(String name) {
     Token tok = expect(TokenType.ENUM);
 
     EnumType type = new EnumType(tok.getInfo(), name);
 
     while (peek().getType() != TokenType.END) {
       Token elemTok = parseEnumElem();
-
-      Constant old = constants.find(elemTok.getData());
-      if (old != null) {
-        RError.err(ErrorType.Hint, old.getInfo(), "first definition was here");
-        RError.err(ErrorType.Error, elemTok.getInfo(), "Name \"" + elemTok.getData() + "\" already defined");
-      } else {
-        Reference typeRef = new Reference(elemTok.getInfo(), name);
-        EnumElement elem = new EnumElement(elemTok.getInfo(), elemTok.getData(), typeRef, new Number(elemTok.getInfo(), BigInteger.valueOf(type.getElement().size())));
-        constants.add(elem);
-
-        Reference elemRef = new Reference(elemTok.getInfo(), elem.getName());
-        type.getElement().add(elemRef);
-      }
+      type.getElement().add(new EnumElement(elemTok.getInfo(), elemTok.getData()));
     }
 
     expect(TokenType.END);

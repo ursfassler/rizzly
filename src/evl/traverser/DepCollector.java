@@ -10,7 +10,6 @@ import evl.expression.reference.Reference;
 import evl.other.CompUse;
 import evl.other.Named;
 import evl.type.TypeRef;
-import evl.type.base.EnumDefRef;
 
 public class DepCollector extends DefTraverser<Void, Void> {
 
@@ -59,13 +58,6 @@ public class DepCollector extends DefTraverser<Void, Void> {
   protected Void visitTypeRef(TypeRef obj, Void param) {
     super.visitTypeRef(obj, param);
     visit(obj.getRef(), param);
-    return null;
-  }
-
-  @Override
-  protected Void visitEnumDefRef(EnumDefRef obj, Void param) {
-    super.visitEnumDefRef(obj, param);
-    visit(obj.getElem(), param);
     return null;
   }
 

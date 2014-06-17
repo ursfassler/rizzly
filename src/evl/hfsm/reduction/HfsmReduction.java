@@ -1,6 +1,5 @@
 package evl.hfsm.reduction;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -17,7 +16,6 @@ import evl.NullTraverser;
 import evl.copy.Copy;
 import evl.copy.Relinker;
 import evl.expression.Expression;
-import evl.expression.Number;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.Reference;
 import evl.function.FuncIfaceIn;
@@ -52,7 +50,6 @@ import evl.statement.IfStmt;
 import evl.statement.ReturnExpr;
 import evl.statement.Statement;
 import evl.type.TypeRef;
-import evl.type.base.EnumDefRef;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.variable.FuncVariable;
@@ -102,7 +99,7 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
     elem.getFunction().addAll(obj.getTopstate().getFunction());
 
     EnumType states = new EnumType(obj.getTopstate().getInfo(), obj.getName() + Designator.NAME_SEP + "State");
-    HashMap<StateSimple, EnumElement> enumMap = makeEnumElem(obj.getTopstate(), states, param);
+    HashMap<StateSimple, EnumElement> enumMap = makeEnumElem(obj.getTopstate(), states);
 
     param.add(states);
     Reference initState = makeEnumElemRef(states, enumMap.get(obj.getTopstate().getInitial()).getName());
@@ -216,15 +213,13 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
     return call;
   }
 
-  static private HashMap<StateSimple, EnumElement> makeEnumElem(StateComposite topstate, EnumType stateEnum, Namespace param) {
+  static private HashMap<StateSimple, EnumElement> makeEnumElem(StateComposite topstate, EnumType stateEnum) {
     HashMap<StateSimple, EnumElement> ret = new HashMap<StateSimple, EnumElement>();
     for (State state : topstate.getItemList(State.class)) {
       assert (state instanceof StateSimple);
 
-      EnumElement element = new EnumElement(info, state.getName(), new TypeRef(info, stateEnum), new Number(info, BigInteger.valueOf(stateEnum.getElement().size())));
-      param.add(element);
-
-      stateEnum.getElement().add(new EnumDefRef(info, element));
+      EnumElement element = new EnumElement(info, state.getName());
+      stateEnum.getElement().add(element);
 
       ret.put((StateSimple) state, element);
     }

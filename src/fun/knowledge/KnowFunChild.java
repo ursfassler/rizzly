@@ -10,7 +10,6 @@ import error.RError;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.composition.ImplComposition;
-import fun.expression.reference.Reference;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.State;
 import fun.hfsm.StateComposite;
@@ -20,7 +19,6 @@ import fun.other.ImplElementary;
 import fun.other.Named;
 import fun.other.Namespace;
 import fun.other.RizzlyFile;
-import fun.type.base.EnumElement;
 import fun.type.base.EnumType;
 import fun.type.composed.UnionType;
 
@@ -82,17 +80,9 @@ class KnowFunChildTraverser extends NullTraverser<Set<Named>, String> {
 
   @Override
   protected Set<Named> visitEnumType(EnumType obj, String param) {
-    HashSet<Named> ret = new HashSet<Named>();
-
-    for (Reference ref : obj.getElement()) {
-      assert (ref.getOffset().isEmpty());
-      assert (ref.getLink() instanceof EnumElement);
-      if (ref.getLink().getName().equals(param)) {
-        ret.add(ref.getLink());
-      }
-    }
-
-    return ret;
+    Set<Named> rset = new HashSet<Named>();
+    addIfFound(obj.getElement().find(param), rset);
+    return rset;
   }
 
   @Override

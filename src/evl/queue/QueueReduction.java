@@ -54,7 +54,6 @@ import evl.statement.intern.MsgPush;
 import evl.traverser.ClassGetter;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
-import evl.type.base.EnumDefRef;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.type.composed.NamedElement;
@@ -136,12 +135,10 @@ public class QueueReduction {
         NamedElement elem = new NamedElement(info, name, new TypeRef(info, funrec.get(func)));
         elements.put(func, elem);
 
-        EnumElement enumElem = new EnumElement(info, prefix + name, new TypeRef(info, msgType), new Number(info, BigInteger.valueOf(msgType.getElement().size())));
-        msgType.getElement().add(new EnumDefRef(info, enumElem));
+        EnumElement enumElem = new EnumElement(info, prefix + name);
+        msgType.getElement().add(enumElem);
 
-        classes.add(enumElem);
         funem.put(func, enumElem);
-
       }
 
       NamedElement tag = new NamedElement(info, MsgTagName, new TypeRef(info, msgType));

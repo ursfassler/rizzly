@@ -26,7 +26,6 @@ import evl.statement.IfOption;
 import evl.statement.Statement;
 import evl.type.Type;
 import evl.type.TypeRef;
-import evl.type.base.EnumDefRef;
 import evl.type.base.EnumElement;
 import evl.type.composed.NamedElement;
 import evl.variable.Variable;
@@ -172,13 +171,8 @@ class CopyEvl extends NullTraverser<Evl, Void> {
   }
 
   @Override
-  protected Evl visitEnumDefRef(EnumDefRef obj, Void param) {
-    EnumElement elem = copy(obj.getElem());
-    if (copied.containsKey(obj)) {
-      return copied.get(obj);
-    } else {
-      return new EnumDefRef(obj.getInfo(), elem);
-    }
+  protected Evl visitEnumElement(EnumElement obj, Void param) {
+    return new EnumElement(obj.getInfo(), obj.getName());
   }
 
   @Override

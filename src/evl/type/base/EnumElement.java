@@ -2,13 +2,23 @@ package evl.type.base;
 
 import common.ElementInfo;
 
-import evl.expression.Expression;
-import evl.type.TypeRef;
-import evl.variable.Constant;
+import evl.EvlBase;
+import evl.other.Named;
 
-final public class EnumElement extends Constant {
+final public class EnumElement extends EvlBase implements Named {
+  private String name;
 
-  public EnumElement(ElementInfo info, String name, TypeRef type, Expression def) {
-    super(info, name, type, def);
+  public EnumElement(ElementInfo info, String name) {
+    super(info);
+    this.name = name;
   }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
 }

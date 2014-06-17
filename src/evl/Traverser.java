@@ -102,7 +102,6 @@ import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BaseType;
 import evl.type.base.BooleanType;
-import evl.type.base.EnumDefRef;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.type.base.FunctionType;
@@ -174,8 +173,6 @@ public abstract class Traverser<R, P> {
       return visitComponent((Component) obj, param);
     } else if (obj instanceof TypeRef) {
       return visitTypeRef((TypeRef) obj, param);
-    } else if (obj instanceof EnumDefRef) {
-      return visitEnumDefRef((EnumDefRef) obj, param);
     } else if (obj instanceof Expression) {
       return visitExpression((Expression) obj, param);
     } else if (obj instanceof Statement) {
@@ -188,6 +185,8 @@ public abstract class Traverser<R, P> {
       return visitCaseOptEntry((CaseOptEntry) obj, param);
     } else if (obj instanceof Queue) {
       return visitQueue((Queue) obj, param);
+    } else if (obj instanceof EnumElement) {
+      return visitEnumElement((EnumElement) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -291,8 +290,6 @@ public abstract class Traverser<R, P> {
       return visitConstPrivate((ConstPrivate) obj, param);
     } else if (obj instanceof ConstGlobal) {
       return visitConstGlobal((ConstGlobal) obj, param);
-    } else if (obj instanceof EnumElement) {
-      return visitEnumElement((EnumElement) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -614,8 +611,6 @@ public abstract class Traverser<R, P> {
   abstract protected R visitRefName(RefName obj, P param);
 
   abstract protected R visitRefIndex(RefIndex obj, P param);
-
-  abstract protected R visitEnumDefRef(EnumDefRef obj, P param);
 
   abstract protected R visitCompUse(CompUse obj, P param);
 

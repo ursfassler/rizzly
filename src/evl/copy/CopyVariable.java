@@ -2,7 +2,6 @@ package evl.copy;
 
 import evl.Evl;
 import evl.NullTraverser;
-import evl.type.base.EnumElement;
 import evl.variable.ConstGlobal;
 import evl.variable.ConstPrivate;
 import evl.variable.FuncVariable;
@@ -40,11 +39,6 @@ public class CopyVariable extends NullTraverser<Variable, Void> {
   @Override
   protected Variable visitConstGlobal(ConstGlobal obj, Void param) {
     return new ConstGlobal(obj.getInfo(), obj.getName(), cast.copy(obj.getType()), cast.copy(obj.getDef()));
-  }
-
-  @Override
-  protected Variable visitEnumElement(EnumElement obj, Void param) {
-    return new EnumElement(obj.getInfo(), obj.getName(), cast.copy(obj.getType()), cast.copy(obj.getDef()));
   }
 
 }

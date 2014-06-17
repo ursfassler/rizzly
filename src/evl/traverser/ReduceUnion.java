@@ -1,6 +1,5 @@
 package evl.traverser;
 
-import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -9,7 +8,6 @@ import common.ElementInfo;
 
 import evl.Evl;
 import evl.expression.Expression;
-import evl.expression.Number;
 import evl.expression.binop.Equal;
 import evl.expression.binop.Is;
 import evl.expression.reference.RefName;
@@ -21,7 +19,6 @@ import evl.other.Namespace;
 import evl.statement.CaseStmt;
 import evl.type.Type;
 import evl.type.TypeRef;
-import evl.type.base.EnumDefRef;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.type.composed.NamedElement;
@@ -59,11 +56,9 @@ public class ReduceUnion extends ExprReplacer<Void> {
 
     EnumType et = new EnumType(info, ENUM_PREFIX + Designator.NAME_SEP + obj.getName());
 
-    int k = 0;
     for (NamedElement elem : obj.getElement()) {
-      EnumElement ee = new EnumElement(info, elem.getName(), new TypeRef(info, et), new Number(info, BigInteger.valueOf(k)));
-      et.getElement().add(new EnumDefRef(new ElementInfo(), ee));
-      k++;
+      EnumElement ee = new EnumElement(info, elem.getName());
+      et.getElement().add(ee);
     }
 
     obj.getTag().setType(new TypeRef(info, et));

@@ -2,14 +2,23 @@ package fun.type.base;
 
 import common.ElementInfo;
 
-import fun.expression.Expression;
-import fun.expression.reference.Reference;
-import fun.variable.Constant;
+import fun.FunBase;
+import fun.other.Named;
 
-final public class EnumElement extends Constant {
+final public class EnumElement extends FunBase implements Named {
+  private String name;
 
-  public EnumElement(ElementInfo info, String name, Reference type, Expression def) {
-    super(info, name, type, def);
+  public EnumElement(ElementInfo info, String name) {
+    super(info);
+    this.name = name;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
 }

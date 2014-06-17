@@ -59,6 +59,7 @@ import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
+import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.type.base.FunctionType;
 import evl.type.base.FunctionTypeRet;
@@ -86,10 +87,12 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
   private final Map<Evl, Type> cache = new HashMap<Evl, Type>();
   final private KnowBaseItem kbi;
   final private RefTypeGetter rtg;
+  final private KnowParent kp;
 
   public KnowTypeTraverser(KnowledgeBase kb) {
     super();
     kbi = kb.getEntry(KnowBaseItem.class);
+    kp = kb.getEntry(KnowParent.class);
     rtg = new RefTypeGetter(this, kb);
   }
 
@@ -185,6 +188,13 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
   @Override
   protected Type visitUnionValue(UnionValue obj, Void param) {
     throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Type visitEnumElement(EnumElement obj, Void param) {
+    Evl parent = kp.getParent(obj);
+    assert (parent instanceof EnumType);
+    return (EnumType) parent;
   }
 
   @Override

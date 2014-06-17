@@ -30,4 +30,9 @@ public class RecordValue extends Expression {
     this.type = type;
   }
 
+  @Override
+  public String toString() {
+    return value + ": " + type;
+  }
+
 }

@@ -1,7 +1,10 @@
 package evl.knowledge;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+
+import common.Designator;
 
 import error.ErrorType;
 import error.RError;
@@ -49,13 +52,24 @@ class KnowParentTraverser extends DefTraverser<Void, Evl> {
     this.cache = cache;
   }
 
+  private Designator getPath(Evl obj) {
+    LinkedList<String> name = new LinkedList<String>();
+    while (obj != null) {
+      name.push(obj.toString());
+      obj = cache.get(obj);
+    }
+    return new Designator(name);
+  }
+
   @Override
   protected Void visit(Evl obj, Evl param) {
     assert (obj != param);
     if (cache.containsKey(obj)) {
       if (!(obj instanceof EnumElement)) { // FIXME remove this hack (new enum type system?)
         Evl oldparent = cache.get(obj);
-        RError.err(ErrorType.Fatal, obj.getInfo(), "Same object (" + obj + ") found 2 times: " + oldparent + " and " + param);
+        RError.err(ErrorType.Hint, "First time was here:  " + getPath(oldparent));
+        RError.err(ErrorType.Hint, "Second time was here: " + getPath(param));
+        RError.err(ErrorType.Fatal, obj.getInfo(), "Same object (" + obj + ") found 2 times");
       }
     }
     cache.put(obj, param);

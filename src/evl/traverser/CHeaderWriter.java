@@ -21,7 +21,7 @@ import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
-import evl.type.base.EnumDefRef;
+import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.type.base.RangeType;
 import evl.type.base.StringType;
@@ -131,10 +131,8 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitEnumDefRef(EnumDefRef obj, StreamWriter param) {
-    param.wr(obj.getElem().getName());
-    param.wr(" = ");
-    visit(obj.getElem().getDef(), param);
+  protected Void visitEnumElement(EnumElement obj, StreamWriter param) {
+    param.wr(obj.getName());
     param.wr(",");
     param.nl();
     return null;

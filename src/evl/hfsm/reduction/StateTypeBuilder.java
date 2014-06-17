@@ -9,9 +9,10 @@ import common.ElementInfo;
 
 import evl.Evl;
 import evl.NullTraverser;
-import evl.expression.ExprList;
-import evl.expression.Expression;
+import evl.copy.Copy;
 import evl.expression.NamedElementValue;
+import evl.expression.RecordValue;
+import evl.expression.UnsafeUnionValue;
 import evl.expression.reference.Reference;
 import evl.hfsm.State;
 import evl.hfsm.StateComposite;
@@ -36,7 +37,7 @@ public class StateTypeBuilder extends NullTraverser<RecordType, Designator> {
   public static final String SUB_ENTRY_NAME = Designator.NAME_SEP + "sub";
   public static final String CONST_PREFIX = Designator.NAME_SEP + "INIT" + Designator.NAME_SEP;
   final private Namespace typeSpace;
-  final private Map<RecordType, ExprList> initValues = new HashMap<RecordType, ExprList>();
+  final private Map<RecordType, RecordValue> initValues = new HashMap<RecordType, RecordValue>();
   final private Map<RecordType, Constant> initVar = new HashMap<RecordType, Constant>();
 
   public StateTypeBuilder(Namespace typeSpace) {
@@ -63,7 +64,7 @@ public class StateTypeBuilder extends NullTraverser<RecordType, Designator> {
     RecordType record = new RecordType(obj.getInfo(), param.toString(Designator.NAME_SEP), new ArrayList<NamedElement>());
     typeSpace.add(record);
 
-    initValues.put(record, new ExprList(obj.getInfo(), new ArrayList<Expression>()));
+    initValues.put(record, new RecordValue(obj.getInfo(), new ArrayList<NamedElementValue>(), new TypeRef(obj.getInfo(), record)));
 
     return record;
   }
@@ -86,16 +87,15 @@ public class StateTypeBuilder extends NullTraverser<RecordType, Designator> {
       union.getElement().add(item);
     }
 
-    ExprList uninit = new ExprList(obj.getInfo(), new ArrayList<Expression>());
     NamedElement initStateElem = union.getElement().find(obj.getInitial().getName());
     Constant initvalue = initVar.get(initStateElem.getType().getRef());
     assert (initvalue != null);
-    uninit.getValue().add(new NamedElementValue(obj.getInfo(), obj.getInitial().getName(), new Reference(obj.getInfo(), initvalue)));
+    UnsafeUnionValue uninit = new UnsafeUnionValue(obj.getInfo(), new NamedElementValue(obj.getInfo(), obj.getInitial().getName(), new Reference(obj.getInfo(), Copy.copy(initvalue))), new TypeRef(obj.getInfo(), union));
 
     NamedElement sub = new NamedElement(obj.getInfo(), SUB_ENTRY_NAME, new TypeRef(new ElementInfo(), union));
     record.getElement().add(sub);
 
-    ExprList value = initValues.get(record);
+    RecordValue value = initValues.get(record);
     assert (value != null);
 
     value.getValue().add(new NamedElementValue(obj.getInfo(), SUB_ENTRY_NAME, uninit));
@@ -107,13 +107,13 @@ public class StateTypeBuilder extends NullTraverser<RecordType, Designator> {
   protected RecordType visitState(State obj, Designator param) {
     RecordType record = super.visitState(obj, new Designator(param, obj.getName()));
 
-    ExprList value = initValues.get(record);
+    RecordValue value = initValues.get(record);
     assert (value != null);
 
     for (StateVariable var : obj.getVariable()) {
       NamedElement item = new NamedElement(var.getInfo(), var.getName(), var.getType().copy());
       record.getElement().add(item);
-      value.getValue().add(new NamedElementValue(var.getInfo(), var.getName(), var.getDef()));
+      value.getValue().add(new NamedElementValue(var.getInfo(), var.getName(), Copy.copy(var.getDef())));
     }
 
     Constant init = new ConstPrivate(obj.getInfo(), CONST_PREFIX + record.getName(), new TypeRef(obj.getInfo(), record), value);

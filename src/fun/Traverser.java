@@ -129,6 +129,8 @@ public abstract class Traverser<R, P> {
       return visitTransition((Transition) obj, param);
     } else if (obj instanceof Component) {
       return visitComponent((Component) obj, param);
+    } else if (obj instanceof EnumElement) {
+      return visitEnumElement((EnumElement) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -193,8 +195,6 @@ public abstract class Traverser<R, P> {
       return visitConstPrivate((ConstPrivate) obj, param);
     } else if (obj instanceof ConstGlobal) {
       return visitConstGlobal((ConstGlobal) obj, param);
-    } else if (obj instanceof EnumElement) {
-      return visitEnumElement((EnumElement) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }

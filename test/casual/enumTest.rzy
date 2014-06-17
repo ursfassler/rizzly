@@ -11,9 +11,9 @@ component
     implementation elementary
 
     function foo()
-      color : Color = Red;
-      if color = Green then
-        color := Blue;
+      color : Color = Color.Red;
+      if color = Color.Green then
+        color := Color.Blue;
       end
     end
 

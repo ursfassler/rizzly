@@ -357,20 +357,13 @@ class CopyFun extends Traverser<Fun, Void> {
   protected Fun visitEnumType(EnumType obj, Void param) {
     EnumType type = new EnumType(obj.getInfo(), obj.getName());
     copied.put(obj, type);
-    type.getElement().addAll(copy(obj.getElement()));
+    type.getElement().addAll(copy(obj.getElement().getList()));
     return type;
   }
 
   @Override
   protected Fun visitEnumElement(EnumElement obj, Void param) {
-    Reference type = copy(obj.getType());
-    if (copied.containsKey(obj)) {
-      return copied.get(obj);
-    } else {
-      EnumElement elem = new EnumElement(obj.getInfo(), obj.getName(), type, copy(obj.getDef()));
-      elem.setDef(copy(obj.getDef()));
-      return elem;
-    }
+    return new EnumElement(obj.getInfo(), obj.getName());
   }
 
   @Override

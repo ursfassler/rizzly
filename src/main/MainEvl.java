@@ -19,7 +19,6 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
 
 import util.GraphHelper;
 import util.Pair;
-import util.Range;
 import util.SimpleGraph;
 import util.StreamWriter;
 
@@ -81,6 +80,7 @@ import evl.traverser.ConstantPropagation;
 import evl.traverser.DepCollector;
 import evl.traverser.DepGraph;
 import evl.traverser.DesCallgraphMaker;
+import evl.traverser.EnumReduction;
 import evl.traverser.FpcHeaderWriter;
 import evl.traverser.IfCutter;
 import evl.traverser.InitVarTyper;
@@ -107,14 +107,12 @@ import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.EnumElement;
-import evl.type.base.EnumType;
 import evl.type.base.RangeType;
 import evl.type.composed.NamedElement;
 import evl.variable.Constant;
 import evl.variable.FuncVariable;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
-import fun.hfsm.State;
 
 //TODO ensure that composition and hfsm use construct and destruct correctly
 
@@ -181,7 +179,10 @@ public class MainEvl {
 
     ConstantPropagation.process(prg);
 
-    replaceEnums(prg);
+    // TODO can we do that before instantiation? It is needed since queue reduction creates enums
+    EnumReduction.process(prg);
+    ConstantPropagation.process(prg);
+
     removeUnused(prg);
     IfCutter.process(prg);
 
@@ -200,28 +201,6 @@ public class MainEvl {
     blacklist.add("integer");
     blacklist.add("string");
     return blacklist;
-  }
-
-  private static void replaceEnums(RizzlyProgram prg) {
-    Map<EnumType, RangeType> map = new HashMap<EnumType, RangeType>();
-
-    for (EnumType et : prg.getType().getItems(EnumType.class)) {
-      RangeType rt = getRangeType(et, prg.getType());
-      map.put(et, rt);
-    }
-
-    Relinker.relink(prg, map);
-  }
-
-  private static RangeType getRangeType(EnumType et, ListOfNamed<Type> type) {
-    Range range = new Range(BigInteger.ZERO, BigInteger.valueOf(et.getElement().size() - 1));
-    String name = RangeType.makeName(range);
-    RangeType ret = (RangeType) type.find(name);
-    if (ret == null) {
-      ret = new RangeType(range);
-      type.add(ret);
-    }
-    return ret;
   }
 
   private static void modelCheck(String debugdir, Namespace aclasses, Component root, KnowledgeBase kb) {
@@ -520,7 +499,6 @@ public class MainEvl {
 
       // Use only stuff which is referenced from public input functions
       removeUnused(rootdir, classes, pubfunc);
-      PrettyPrinter.print(root, rootdir + "qt.rzy", true);
       QueueReduction.process(root, new KnowledgeBase(classes, rootdir));
     }
 
@@ -560,8 +538,8 @@ public class MainEvl {
     String envname = "!Env";
     ImplElementary env = new ImplElementary(new ElementInfo(envname, -1, -1), "!Env");
     { // that we have them
-      FunctionBase entryFunc = makeEntryExitFunc(State.ENTRY_FUNC_NAME);
-      FunctionBase exitFunc = makeEntryExitFunc(State.EXIT_FUNC_NAME);
+      FunctionBase entryFunc = makeEntryExitFunc(fun.hfsm.State.ENTRY_FUNC_NAME);
+      FunctionBase exitFunc = makeEntryExitFunc(fun.hfsm.State.EXIT_FUNC_NAME);
       env.getFunction().add(entryFunc);
       env.getFunction().add(exitFunc);
       env.setEntryFunc(new Reference(info, entryFunc));

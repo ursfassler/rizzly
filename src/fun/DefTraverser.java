@@ -256,8 +256,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitEnumElement(EnumElement obj, P param) {
-    visit(obj.getType(), param);
-    visit(obj.getDef(), param);
     return null;
   }
 

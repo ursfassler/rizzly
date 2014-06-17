@@ -26,7 +26,6 @@ import evl.type.Type;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
-import evl.type.base.EnumDefRef;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.type.base.RangeType;
@@ -281,8 +280,8 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitEnumElement(EnumElement obj, StreamWriter param) {
     param.wr(obj.getName());
-    param.wr(" = ");
-    visit(obj.getDef(), param);
+    param.wr(",");
+    param.nl();
     return null;
   }
 
@@ -343,15 +342,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.nl();
     param.incIndent();
 
-    for (int i = 0; i < obj.getElement().size(); i++) {
-      EnumDefRef eref = obj.getElement().get(i);
-      EnumElement elem = eref.getElem();
-      visit(elem, param);
-      if (i + 1 < obj.getElement().size()) {
-        param.wr(",");
-      }
-      param.nl();
-    }
+    visitItr(obj.getElement(), param);
 
     param.decIndent();
     param.wr(");");

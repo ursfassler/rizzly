@@ -18,13 +18,13 @@ component
 
     function ind( x: Weekday ):R{0,3}
       case x of
-        Monday,Wednesday:
+        Weekday.Monday,Weekday.Wednesday:
           return 2;
         end
-        Tuesday:
+        Weekday.Tuesday:
           return 0;
         end
-        Thursday..Saturday:
+        Weekday.Thursday..Weekday.Saturday:
           return 1;
         end
         else

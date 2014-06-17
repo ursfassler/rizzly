@@ -91,7 +91,6 @@ import evl.statement.intern.MsgPush;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
-import evl.type.base.EnumDefRef;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.type.base.FunctionTypeRet;
@@ -252,8 +251,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitEnumElement(EnumElement obj, P param) {
-    visit(obj.getType(), param);
-    visit(obj.getDef(), param);
     return null;
   }
 
@@ -656,11 +653,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitRangeValue(RangeValue obj, P param) {
-    return null;
-  }
-
-  @Override
-  protected R visitEnumDefRef(EnumDefRef obj, P param) {
     return null;
   }
 

@@ -47,7 +47,7 @@ public class FileParser extends BaseParser {
         break;
       }
       case TYPE_SEC: {
-        ret.getType().addAll(type().parseTypeSection(ret.getConstant()));
+        ret.getType().addAll(type().parseTypeSection());
         break;
       }
       case CONST: {

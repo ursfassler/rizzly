@@ -6,6 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import common.ElementInfo;
+
 import error.ErrorType;
 import error.RError;
 import evl.copy.Copy;
@@ -27,6 +29,7 @@ import evl.type.base.ArrayType;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.type.composed.NamedElement;
+import evl.type.composed.NamedElementType;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
 import evl.type.composed.UnsafeUnionType;
@@ -101,50 +104,78 @@ public class InitVarTyper extends ExprReplacer<Type> {
 
   @Override
   protected Expression visitExprList(ExprList obj, Type param) {
+    // FIXME recursion does not work
     if (param instanceof RecordType) {
-      Map<String, Expression> map = new HashMap<String, Expression>();
-      for (Expression itr : obj.getValue()) {
-        if (itr instanceof NamedElementValue) {
-          String name = ((NamedElementValue) itr).getName();
-          Expression value = ((NamedElementValue) itr).getValue();
-
-          if (map.containsKey(name)) {
-            RError.err(ErrorType.Warning, map.get(name).getInfo(), "First defined here");
-            RError.err(ErrorType.Error, itr.getInfo(), "Duplicated entry");
-          } else {
-            map.put(name, value);
-          }
-        } else {
-          RError.err(ErrorType.Error, itr.getInfo(), "Expected named element value, got: " + itr.getClass().getCanonicalName());
-        }
-      }
-
-      Collection<NamedElementValue> iv = new ArrayList<NamedElementValue>();
-      for (Named itr : ((RecordType) param).getElement()) {
-        Expression value = map.remove(itr.getName());
-        if (value == null) {
-          RError.err(ErrorType.Error, obj.getInfo(), "Missing initializer: " + itr.getName());
-        } else {
-          NamedElement elem = (NamedElement) kc.get(param, itr.getName(), value.getInfo());
-          value = visit(value, elem.getType().getRef());
-          iv.add(new NamedElementValue(value.getInfo(), itr.getName(), value));
-        }
-      }
-
-      if (!map.isEmpty()) {
-        for (String key : map.keySet()) {
-          RError.err(ErrorType.Warning, map.get(key).getInfo(), "Unknown item: " + key);
-        }
-        RError.err(ErrorType.Error, obj.getInfo(), "Too many items");
-      }
-
+      Collection<NamedElementValue> iv = toElemList(obj, param);
       return new RecordValue(obj.getInfo(), iv, new TypeRef(obj.getInfo(), param));
+    } else if (param instanceof UnsafeUnionType) {
+      Map<String, Expression> map = toMap(obj);
+      if (map.size() != 1) {
+        RError.err(ErrorType.Error, obj.getInfo(), "Union need exactly 1 value");
+      }
+
+      String name = map.keySet().iterator().next();
+      Expression value = map.get(name);
+      NamedElement elem = ((UnsafeUnionType) param).getElement().find(name);
+
+      value = visit(value, elem.getType().getRef());
+
+      return new UnsafeUnionValue(obj.getInfo(), new NamedElementValue(obj.getInfo(), name, value), elem.getType().copy());
     } else if (obj.getValue().size() == 1) {
       // TODO do that at a different place
       return visit(obj.getValue().get(0), param);
     } else {
       throw new RuntimeException("not yet implemented: " + param.getClass().getCanonicalName());
     }
+  }
+
+  private Collection<NamedElementValue> toElemList(ExprList obj, Type param) {
+    Map<String, Expression> map = toMap(obj);
+
+    Collection<NamedElementValue> iv = toNamedElem(obj.getInfo(), (NamedElementType) param, map);
+
+    if (!map.isEmpty()) {
+      for (String key : map.keySet()) {
+        RError.err(ErrorType.Warning, map.get(key).getInfo(), "Unknown item: " + key);
+      }
+      RError.err(ErrorType.Error, obj.getInfo(), "Too many items");
+    }
+    return iv;
+  }
+
+  private Collection<NamedElementValue> toNamedElem(ElementInfo info, NamedElementType param, Map<String, Expression> map) {
+    Collection<NamedElementValue> iv = new ArrayList<NamedElementValue>();
+    for (Named itr : param.getElement()) {
+      Expression value = map.remove(itr.getName());
+      if (value == null) {
+        RError.err(ErrorType.Error, info, "Missing initializer: " + itr.getName());
+      } else {
+        NamedElement elem = (NamedElement) kc.get(param, itr.getName(), value.getInfo());
+        value = visit(value, elem.getType().getRef());
+        iv.add(new NamedElementValue(value.getInfo(), itr.getName(), value));
+      }
+    }
+    return iv;
+  }
+
+  private Map<String, Expression> toMap(ExprList obj) {
+    Map<String, Expression> map = new HashMap<String, Expression>();
+    for (Expression itr : obj.getValue()) {
+      if (itr instanceof NamedElementValue) {
+        String name = ((NamedElementValue) itr).getName();
+        Expression value = ((NamedElementValue) itr).getValue();
+
+        if (map.containsKey(name)) {
+          RError.err(ErrorType.Warning, map.get(name).getInfo(), "First defined here");
+          RError.err(ErrorType.Error, itr.getInfo(), "Duplicated entry");
+        } else {
+          map.put(name, value);
+        }
+      } else {
+        RError.err(ErrorType.Error, itr.getInfo(), "Expected named element value, got: " + itr.getClass().getCanonicalName());
+      }
+    }
+    return map;
   }
 
   @Override
@@ -178,4 +209,14 @@ public class InitVarTyper extends ExprReplacer<Type> {
       throw new RuntimeException("not yet implemented: " + type.getClass().getCanonicalName());
     }
   }
+
+  @Override
+  protected Expression visitRecordValue(RecordValue obj, Type param) {
+    if (param instanceof RecordType) {
+      return obj; // we assume it is right
+    } else {
+      throw new RuntimeException("not yet implemented: " + param.getClass().getCanonicalName());
+    }
+  }
+
 }

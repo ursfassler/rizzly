@@ -91,7 +91,6 @@ import evl.statement.intern.MsgPush;
 import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
-import evl.type.base.EnumDefRef;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.type.base.RangeType;
@@ -383,15 +382,6 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.decIndent();
     param.wr("end");
     param.nl();
-    param.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitEnumDefRef(EnumDefRef obj, StreamWriter param) {
-    param.wr(obj.getElem().getName());
-    wrId(obj.getElem(), param);
-    param.wr(";");
     param.nl();
     return null;
   }

@@ -90,10 +90,6 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitEnumElement(EnumElement obj, Void param) {
-    Type defType = checkGetExpr(obj.getDef());
-    if (!LeftIsContainerOfRightTest.process(kbi.getIntegerType(), defType, kb)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "Data type to big or incompatible in assignment: " + defType.getName());
-    }
     return null;
   }
 
