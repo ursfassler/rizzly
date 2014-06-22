@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Set;
 
 import common.Designator;
-import common.Direction;
 
 import error.ErrorType;
 import error.RError;
@@ -20,6 +19,8 @@ import fun.expression.reference.DummyLinkTarget;
 import fun.expression.reference.Reference;
 import fun.function.impl.FuncEntryExit;
 import fun.function.impl.FuncGlobal;
+import fun.function.impl.FuncImplResponse;
+import fun.function.impl.FuncImplSlot;
 import fun.function.impl.FuncPrivateRet;
 import fun.function.impl.FuncPrivateVoid;
 import fun.function.impl.FuncProtRet;
@@ -134,12 +135,16 @@ public class Linker extends DefTraverser<Void, SymbolTable> {
   protected Void visitImplComposition(ImplComposition obj, SymbolTable param) {
     param = new SymbolTable(param);
     param.addAll(obj.getTemplateParam().getList());
-    param.addAll(obj.getIface(Direction.in).getList());
-    param.addAll(obj.getIface(Direction.out).getList());
+    param.addAll(obj.getQuery().getList());
+    param.addAll(obj.getSignal().getList());
+    param.addAll(obj.getResponse().getList());
+    param.addAll(obj.getSlot().getList());
 
     visitList(obj.getTemplateParam(), param);
-    visitList(obj.getIface(Direction.in), param);
-    visitList(obj.getIface(Direction.out), param);
+    visitList(obj.getQuery(), param);
+    visitList(obj.getSignal(), param);
+    visitList(obj.getResponse(), param);
+    visitList(obj.getSlot(), param);
 
     // TODO separate component header and implementation?
     param = new SymbolTable(param);
@@ -155,12 +160,16 @@ public class Linker extends DefTraverser<Void, SymbolTable> {
   protected Void visitImplElementary(ImplElementary obj, SymbolTable param) {
     param = new SymbolTable(param);
     param.addAll(obj.getTemplateParam().getList());
-    param.addAll(obj.getIface(Direction.in).getList());
-    param.addAll(obj.getIface(Direction.out).getList());
+    param.addAll(obj.getQuery().getList());
+    param.addAll(obj.getSignal().getList());
+    param.addAll(obj.getResponse().getList());
+    param.addAll(obj.getSlot().getList());
 
     visitList(obj.getTemplateParam(), param);
-    visitList(obj.getIface(Direction.in), param);
-    visitList(obj.getIface(Direction.out), param);
+    visitList(obj.getQuery(), param);
+    visitList(obj.getSignal(), param);
+    visitList(obj.getResponse(), param);
+    visitList(obj.getSlot(), param);
 
     // TODO separate component header and implementation?
     param = new SymbolTable(param);
@@ -181,12 +190,16 @@ public class Linker extends DefTraverser<Void, SymbolTable> {
   protected Void visitImplHfsm(ImplHfsm obj, SymbolTable param) {
     param = new SymbolTable(param);
     param.addAll(obj.getTemplateParam().getList());
-    param.addAll(obj.getIface(Direction.in).getList());
-    param.addAll(obj.getIface(Direction.out).getList());
+    param.addAll(obj.getQuery().getList());
+    param.addAll(obj.getSignal().getList());
+    param.addAll(obj.getResponse().getList());
+    param.addAll(obj.getSlot().getList());
 
     visitList(obj.getTemplateParam(), param);
-    visitList(obj.getIface(Direction.in), param);
-    visitList(obj.getIface(Direction.out), param);
+    visitList(obj.getQuery(), param);
+    visitList(obj.getSignal(), param);
+    visitList(obj.getResponse(), param);
+    visitList(obj.getSlot(), param);
     // TODO separate component header and implementation?
 
     TransitionStateLinker.process(obj);
@@ -273,6 +286,22 @@ public class Linker extends DefTraverser<Void, SymbolTable> {
     param = new SymbolTable(param);
     param.addAll(obj.getParam().getList());
     super.visitFuncPrivateVoid(obj, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncImplResponse(FuncImplResponse obj, SymbolTable param) {
+    param = new SymbolTable(param);
+    param.addAll(obj.getParam().getList());
+    super.visitFuncImplResponse(obj, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncImplSlot(FuncImplSlot obj, SymbolTable param) {
+    param = new SymbolTable(param);
+    param.addAll(obj.getParam().getList());
+    super.visitFuncImplSlot(obj, param);
     return null;
   }
 

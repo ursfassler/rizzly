@@ -59,7 +59,6 @@ import evl.function.FuncIface;
 import evl.function.FuncWithBody;
 import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
-import evl.hfsm.HfsmQueryFunction;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.State;
 import evl.hfsm.StateComposite;
@@ -261,8 +260,10 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
     param.incIndent();
     param.nl();
-    visitInterfaceDecl("input", obj.getInput(), param);
-    visitInterfaceDecl("output", obj.getOutput(), param);
+    visitList(obj.getResponse(), param);
+    visitList(obj.getSlot(), param);
+    visitList(obj.getQuery(), param);
+    visitList(obj.getSignal(), param);
     param.decIndent();
   }
 
@@ -1069,34 +1070,6 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
     param.decIndent();
 
-    return null;
-  }
-
-  @Override
-  protected Void visitHfsmQueryFunction(HfsmQueryFunction obj, StreamWriter param) {
-    param.wr("query ");
-    param.wr(obj.getName());
-    wrId(obj, param);
-    param.wr("(");
-    list(obj.getParam().getList(), "; ", param);
-    param.wr(")");
-    if (obj instanceof FuncWithReturn) {
-      param.wr(":");
-      visit(((FuncWithReturn) obj).getRet(), param);
-    }
-    for (FuncAttr attr : obj.getAttributes()) {
-      param.wr(" ");
-      param.wr(attr.toString());
-    }
-    param.nl();
-    if (obj instanceof FuncWithBody) {
-      param.incIndent();
-      visit(((FuncWithBody) obj).getBody(), param);
-      param.decIndent();
-      param.wr("end");
-      param.nl();
-    }
-    param.nl();
     return null;
   }
 

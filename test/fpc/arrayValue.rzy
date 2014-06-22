@@ -14,15 +14,12 @@ const
 
 component
   ArrayValue
-    input
-      inp( x: R{0,100} );
-    
-    output
-      out( x: R{0,100} );
+    slot   inp( x: R{0,100} );
+    signal out( x: R{0,100} );
 
-    implementation elementary
+  implementation elementary
     
-    function inp( x: R{0,100} )
+    slot inp( x: R{0,100} )
       out( data[x] );
     end
 

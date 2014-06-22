@@ -1,12 +1,11 @@
 component
   ArrayTest3
-    input
-      inp( x: R{0,31} ):R{0,31};
+    response inp( x: R{0,31} ):R{0,31};
       
   implementation elementary
 
     var
-      a : Array{32,R{0,31}} = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+      a : Array{32,R{0,31}} = [ _ := 0 ];
     
     entry
       i : R{0,32} = 0;
@@ -16,7 +15,7 @@ component
       end
     end
 
-    function inp( x: R{0,200} ):R{0,31}
+    response inp( x: R{0,200} ):R{0,31}
       return a[x mod 8];
     end
 

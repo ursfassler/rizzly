@@ -6,10 +6,9 @@ type
 
 component
   Union2
-    input
-      ind();
+    slot ind();
 
-    implementation elementary
+  implementation elementary
 
     var
       data : Uni = pos := 1;
@@ -22,7 +21,7 @@ component
       end
     end
   
-    function ind()
+    slot ind()
       x : R{0,10};
       case data of
         Uni.pos:

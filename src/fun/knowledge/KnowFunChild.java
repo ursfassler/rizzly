@@ -3,8 +3,6 @@ package fun.knowledge;
 import java.util.HashSet;
 import java.util.Set;
 
-import common.Direction;
-
 import error.ErrorType;
 import error.RError;
 import fun.Fun;
@@ -147,8 +145,7 @@ class KnowFunChildTraverser extends NullTraverser<Set<Named>, String> {
   @Override
   protected Set<Named> visitComponent(Component obj, String param) {
     Set<Named> rset = super.visitComponent(obj, param);
-    addIfFound(obj.getIface(Direction.in).find(param), rset);
-    addIfFound(obj.getIface(Direction.out).find(param), rset);
+    addIfFound(obj.getIface().find(param), rset);
     return rset;
   }
 

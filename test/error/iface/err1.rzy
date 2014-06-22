@@ -1,13 +1,12 @@
 
 component
   Err1
-    input
-      funcA();
-      funcB();
+    slot funcA();
+    slot funcB();
 
-    implementation elementary
+  implementation elementary
 
-    function funcA()
+    slot funcA()
     end
 
   end

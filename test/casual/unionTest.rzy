@@ -11,36 +11,35 @@ type
 
 component
   UnionTest 
-    input
-      set1( a, b: R{0,255} );
-      set2( c: R{0,65535} );
-      get1a():R{0,255};
-      get1b():R{0,255};
-      get2():R{0,65535};
+    slot     set1( a, b: R{0,255} );
+    slot     set2( c: R{0,65535} );
+    response get1a():R{0,255};
+    response get1b():R{0,255};
+    response get2():R{0,65535};
 
     implementation elementary
 
     var
       data : Uni = dat2 := 0;
   
-    function set1( a, b: R{0,255} )
+    slot set1( a, b: R{0,255} )
       data.dat1.a := a;
       data.dat1.b := b;
     end
     
-    function set2( c: R{0,65535} )
+    slot set2( c: R{0,65535} )
       data.dat2 := c;
     end
     
-    function get1a():R{0,255}
+    response get1a():R{0,255}
       return data.dat1.a;
     end
     
-    function get1b():R{0,255}
+    response get1b():R{0,255}
       return data.dat1.b;
     end
     
-    function get2():R{0,65535}
+    response get2():R{0,65535}
       return data.dat2;
     end
     

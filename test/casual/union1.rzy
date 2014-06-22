@@ -6,30 +6,29 @@ type
 
 component
   Union1
-    input
-      setByte( value: R{0,255} );
-      getByte():R{0,255};
-      setWord( value: R{0,65535} );
-      getWord():R{0,65535};
+    slot     setByte( value: R{0,255} );
+    response getByte():R{0,255};
+    slot     setWord( value: R{0,65535} );
+    response getWord():R{0,65535};
 
     implementation elementary
 
     var
       data : Uni = ( byte := 42 );
 
-    function setByte( value: R{0,255} )
+    slot setByte( value: R{0,255} )
       data.byte := value;
     end
     
-    function getByte():R{0,255}
+    response getByte():R{0,255}
       return data.byte;
     end
     
-    function setWord( value: R{0,65535} )
+    slot setWord( value: R{0,65535} )
       data.word := value;
     end
     
-    function getWord():R{0,65535}
+    response getWord():R{0,65535}
       return data.word;
     end
 

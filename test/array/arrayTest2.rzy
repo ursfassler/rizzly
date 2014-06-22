@@ -1,19 +1,18 @@
 component
   ArrayTest2
-    input
-      set( i: R{0,19}; x: R{0,199} );
-      get( i: R{0,19} ): R{0,199};
+    slot     set( i: R{0,19}; x: R{0,199} );
+    response get( i: R{0,19} ): R{0,199};
       
   implementation elementary
 
     var
       a : Array{20,R{0,199}} = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
     
-    function set( i: R{0,19}; x: R{0,199} )
+    slot set( i: R{0,19}; x: R{0,199} )
       a[i] := x;
     end
 
-    function get( i: R{0,19} ): R{0,199}
+    response get( i: R{0,19} ): R{0,199}
       return a[i];
     end
     

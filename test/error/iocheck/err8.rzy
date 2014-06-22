@@ -2,10 +2,9 @@
 
 component
   Err8
-    input
-      event();
+    slot event();
     
-    implementation hfsm(A)
+  implementation hfsm(A)
     
     var
       a : R{0,100} = 0;

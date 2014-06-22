@@ -12,15 +12,14 @@ import evl.function.impl.FuncIfaceInRet;
 import evl.function.impl.FuncIfaceInVoid;
 import evl.function.impl.FuncIfaceOutRet;
 import evl.function.impl.FuncIfaceOutVoid;
-import evl.function.impl.FuncInputHandlerEvent;
-import evl.function.impl.FuncInputHandlerQuery;
+import evl.function.impl.FuncImplResponse;
+import evl.function.impl.FuncImplSlot;
 import evl.function.impl.FuncPrivateRet;
 import evl.function.impl.FuncPrivateVoid;
 import evl.function.impl.FuncProtoRet;
 import evl.function.impl.FuncProtoVoid;
 import evl.function.impl.FuncSubHandlerEvent;
 import evl.function.impl.FuncSubHandlerQuery;
-import evl.hfsm.HfsmQueryFunction;
 import evl.hfsm.Transition;
 
 public class IoCheck extends NullTraverser<Void, Void> {
@@ -107,7 +106,7 @@ public class IoCheck extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncInputHandlerEvent(FuncInputHandlerEvent obj, Void param) {
+  protected Void visitFuncImplSlot(FuncImplSlot obj, Void param) {
     // is allowed to do everything
     assert (writes.containsKey(obj));
     assert (reads.containsKey(obj));
@@ -117,8 +116,8 @@ public class IoCheck extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncInputHandlerQuery(FuncInputHandlerQuery obj, Void param) {
-    checkQuery(obj, "Query input");
+  protected Void visitFuncImplResponse(FuncImplResponse obj, Void param) {
+    checkQuery(obj, "Response");
     return null;
   }
 
@@ -134,13 +133,7 @@ public class IoCheck extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitFuncSubHandlerQuery(FuncSubHandlerQuery obj, Void param) {
-    checkQuery(obj, "Query input");
-    return null;
-  }
-
-  @Override
-  protected Void visitHfsmQueryFunction(HfsmQueryFunction obj, Void param) {
-    checkQuery(obj, "Query");
+    checkQuery(obj, "Response");
     return null;
   }
 

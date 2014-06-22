@@ -1,10 +1,7 @@
 component
   StateVar1
-    input
-      ind( x: R{0,10} );
-    
-    output
-      out( x: R{0,10} );
+    slot   ind( x: R{0,10} );
+    signal out( x: R{0,10} );
     
   implementation elementary
     
@@ -15,7 +12,7 @@ component
       a := (a + 1) mod 11;
     end
     
-    function ind( x: R{0,10} )
+    slot ind( x: R{0,10} )
       a := (a + 1) mod 11;
       inc();
       out( a );

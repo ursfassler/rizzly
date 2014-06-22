@@ -6,17 +6,16 @@ type
 
 component
   Rec2
-    input
-      getX( p: Point ):R{0,100};
-      getY( p: Point ):R{0,100};
+    response getX( p: Point ):R{0,100};
+    response getY( p: Point ):R{0,100};
     
   implementation elementary
 
-    function getX( p: Point ):R{0,100}
+    response getX( p: Point ):R{0,100}
       return p.x;
     end
 
-    function getY( p: Point ):R{0,100}
+    response getY( p: Point ):R{0,100}
       return p.y;
     end
 

@@ -1,14 +1,11 @@
 component  
   Retval
-    input
-      ind():R{-20,20};
+    response ind():R{-20,20};
+    query    out():R{-20,20};
 
-    output
-      out():R{-20,20};
-
-    implementation elementary
+  implementation elementary
  
-    function ind():R{-20,20}
+    response ind():R{-20,20}
       x : R{-20,20} = out();
       return x;
     end

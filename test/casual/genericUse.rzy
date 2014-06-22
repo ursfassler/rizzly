@@ -3,9 +3,8 @@ import
 
 component
   GenericUse
-    input
-      set( x: R{0,255} );
-      get():R{0,255};
+    slot  set( x: R{0,255} );
+    query get():R{0,255};
     
   implementation composition
     component

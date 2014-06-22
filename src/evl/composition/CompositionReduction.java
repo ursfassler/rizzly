@@ -26,8 +26,8 @@ import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
 import evl.function.FunctionFactory;
 import evl.function.FunctionHeader;
-import evl.function.impl.FuncInputHandlerEvent;
-import evl.function.impl.FuncInputHandlerQuery;
+import evl.function.impl.FuncImplResponse;
+import evl.function.impl.FuncImplSlot;
 import evl.function.impl.FuncPrivateVoid;
 import evl.function.impl.FuncSubHandlerEvent;
 import evl.function.impl.FuncSubHandlerQuery;
@@ -86,8 +86,10 @@ public class CompositionReduction extends NullTraverser<Named, Void> {
   protected ImplElementary visitImplComposition(ImplComposition obj, Void param) {
     ImplElementary elem = new ImplElementary(obj.getInfo(), obj.getName());
     elem.getComponent().addAll(obj.getComponent());
-    elem.getInput().addAll(obj.getInput());
-    elem.getOutput().addAll(obj.getOutput());
+    elem.getSignal().addAll(obj.getSignal());
+    elem.getQuery().addAll(obj.getQuery());
+    elem.getSlot().addAll(obj.getSlot());
+    elem.getResponse().addAll(obj.getResponse());
     elem.setQueue(obj.getQueue());
 
     elem.setEntryFunc(makeEntryExitFunc(State.ENTRY_FUNC_NAME, elem.getFunction()));
@@ -121,14 +123,24 @@ public class CompositionReduction extends NullTraverser<Named, Void> {
 
     for (FuncIface src : input.keySet()) {
       List<Connection> conset = input.get(src);
-      FunctionBase func = genFunctions(conset, src, obj, FuncInputHandlerEvent.class, FuncInputHandlerQuery.class);
+      FunctionBase func;
+      if (src instanceof FuncWithReturn) {
+        func = genResponse(conset, (FuncWithReturn) src, obj, FuncImplResponse.class);
+      } else {
+        func = genSlot(conset, src, obj, FuncImplSlot.class);
+      }
       elem.getFunction().add(func);
     }
 
     for (Pair<CompUse, String> src : callback.keySet()) {
       List<Connection> conset = callback.get(src);
       FuncIfaceOut iface = getIface(src);
-      FunctionBase func = genFunctions(conset, iface, obj, FuncSubHandlerEvent.class, FuncSubHandlerQuery.class);
+      FunctionHeader func;
+      if (iface instanceof FuncWithReturn) {
+        func = genResponse(conset, (FuncWithReturn) iface, obj, FuncSubHandlerQuery.class);
+      } else {
+        func = genSlot(conset, iface, obj, FuncSubHandlerEvent.class);
+      }
       elem.addSubCallback(src.first.getName(), func);
     }
 
@@ -144,39 +156,45 @@ public class CompositionReduction extends NullTraverser<Named, Void> {
     return new Reference(info, func);
   }
 
-  public FunctionBase genFunctions(List<Connection> conset, FuncIface iface, Component comp, Class<? extends FunctionBase> kindVoid, Class<? extends FunctionBase> kindRet) {
+  public FunctionBase genSlot(List<Connection> conset, FuncIface iface, Component comp, Class<? extends FunctionBase> kind) {
     FunctionBase ptoto = Copy.copy((FunctionBase) iface);
 
-    Class<? extends FunctionBase> kind = iface instanceof FuncWithReturn ? kindRet : kindVoid;
-    FunctionBase impl = FunctionFactory.create(kind, info, ptoto.getName(), ptoto.getParam());
-    if (ptoto instanceof FuncWithReturn) {
-      ((FuncWithReturn) impl).setRet(((FuncWithReturn) ptoto).getRet());
-    }
+    FunctionBase impl = FunctionFactory.create(kind, info, iface.getName(), ptoto.getParam());
 
     Block body = new Block(info);
     ((FuncWithBody) impl).setBody(body);
 
-    if (ptoto instanceof FuncWithReturn) {
-      assert (conset.size() == 1); // typechecker should find this
-      assert (conset.get(0).getType() == MessageType.sync); // typechecker should find this
-      Connection con = conset.get(0);
-      ReturnExpr call = makeQueryCall(con.getEndpoint(Direction.out), (FuncWithReturn) impl);
-      body.getStatements().add(call);
-    } else {
-      for (Connection con : conset) {
-        switch (con.getType()) {
-        case sync:
-          body.getStatements().add(makeEventCall(con.getEndpoint(Direction.out), impl));
-          break;
-        case async:
-          body.getStatements().add(makePostQueueCall(con.getEndpoint(Direction.out), impl, comp));
-          break;
-        default:
-          RError.err(ErrorType.Error, con.getInfo(), "Unknown connection type: " + con.getType());
-          continue;
-        }
+    for (Connection con : conset) {
+      switch (con.getType()) {
+      case sync:
+        body.getStatements().add(makeEventCall(con.getEndpoint(Direction.out), impl));
+        break;
+      case async:
+        body.getStatements().add(makePostQueueCall(con.getEndpoint(Direction.out), impl, comp));
+        break;
+      default:
+        RError.err(ErrorType.Error, con.getInfo(), "Unknown connection type: " + con.getType());
+        continue;
       }
     }
+
+    return impl;
+  }
+
+  public FunctionBase genResponse(List<Connection> conset, FuncWithReturn iface, Component comp, Class<? extends FunctionBase> kind) {
+    FunctionBase ptoto = Copy.copy((FunctionBase) iface);
+
+    FunctionBase impl = FunctionFactory.create(kind, info, iface.getName(), ptoto.getParam());
+    ((FuncWithReturn) impl).setRet(((FuncWithReturn) ptoto).getRet());
+
+    Block body = new Block(info);
+    ((FuncWithBody) impl).setBody(body);
+
+    assert (conset.size() == 1); // typechecker should find this
+    assert (conset.get(0).getType() == MessageType.sync); // typechecker should find this
+    Connection con = conset.get(0);
+    ReturnExpr call = makeQueryCall(con.getEndpoint(Direction.out), (FuncWithReturn) impl);
+    body.getStatements().add(call);
 
     return impl;
   }
@@ -250,7 +268,7 @@ public class CompositionReduction extends NullTraverser<Named, Void> {
 
   private FuncIfaceOut getIface(Pair<CompUse, String> src) {
     Component comp = src.first.getLink();
-    FuncIfaceOut iface = comp.getOutput().find(src.second);
+    FuncIfaceOut iface = (FuncIfaceOut) comp.getIface(Direction.out).find(src.second);
     assert (iface != null);
     return iface;
   }

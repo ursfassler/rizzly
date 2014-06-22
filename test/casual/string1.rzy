@@ -1,10 +1,7 @@
 component
   String1
-    input
-      tick();
-    
-    output
-      text( x: String );
+    slot   tick();
+    signal text( x: String );
     
   implementation elementary
     
@@ -15,7 +12,7 @@ component
       k := 0;
     end
     
-    function tick()
+    slot tick()
       case k of
         0: text( 'Hello' ); end
         1: text( ' ' ); end

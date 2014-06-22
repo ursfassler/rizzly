@@ -45,8 +45,11 @@ public class Scanner implements PeekReader<Token> {
     keywords.put("Enum", TokenType.ENUM);
     keywords.put("return", TokenType.RETURN);
     keywords.put("import", TokenType.IMPORT);
-    keywords.put("input", TokenType.INPUT);
-    keywords.put("output", TokenType.OUTPUT);
+    keywords.put("query", TokenType.QUERY);
+    keywords.put("response", TokenType.RESPONSE);
+    keywords.put("signal", TokenType.SIGNAL);
+    keywords.put("slot", TokenType.SLOT);
+    keywords.put("interrupt", TokenType.INTERRUPT);
     keywords.put("for", TokenType.FOR);
     keywords.put("while", TokenType.WHILE);
     keywords.put("case", TokenType.CASE);

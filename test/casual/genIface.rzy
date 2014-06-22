@@ -1,33 +1,29 @@
 component
   GenIface
+    slot     in1in( x: R{0,10} );
+    response in1out():R{0,10};
+    slot     in2in( x: R{0,2000} );
+    response in2out():R{0,2000};
+    signal   out1in( x: R{0,10} );
+    query    out1out():R{0,10};
+    signal   out2in( x: R{0,2000} );
+    query    out2out():R{0,2000};
 
-    input
-      in1in( x: R{0,10} );
-      in1out():R{0,10};
-      in2in( x: R{0,2000} );
-      in2out():R{0,2000};
+  implementation elementary
 
-    output
-      out1in( x: R{0,10} );
-      out1out():R{0,10};
-      out2in( x: R{0,2000} );
-      out2out():R{0,2000};
-
-    implementation elementary
-
-    function in1in( x: R{0,10} )
+    slot in1in( x: R{0,10} )
       out1in( x );
     end
 
-    function in1out():R{0,10}
+    response in1out():R{0,10}
       return out1out();
     end
 
-    function in2in( x: R{0,2000} )
+    slot in2in( x: R{0,2000} )
       out2in( x );
     end
 
-    function in2out():R{0,2000}
+    response in2out():R{0,2000}
       return out2out();
     end
 

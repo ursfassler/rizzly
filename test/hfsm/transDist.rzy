@@ -1,41 +1,37 @@
 component
   TransDist
-
-  input
-    in( val: R{0,255} );
-  
-  output
-    out( val: R{0,255} );
+    slot   inp( val: R{0,255} );
+    signal out( val: R{0,255} );
     
   implementation hfsm(Top)
   
     state Top(A)
       transition 
-        Top to A by in( val: R{0,255} ) if val = 0 do
+        Top to A by inp( val: R{0,255} ) if val = 0 do
           out( 0 );
         end
         
-        B to A by in( val: R{0,255} ) if val = 1 do
+        B to A by inp( val: R{0,255} ) if val = 1 do
           out( 1 );
         end
       
       state A
         transition 
-          A to Top by in( val: R{0,255} ) if val = 2 do  // should not work since Top is in outer scope of A
+          A to Top by inp( val: R{0,255} ) if val = 2 do  // should not work since Top is in outer scope of A
             out( 2 );
           end
           
-          Top to A by in( val: R{0,255} ) if val = 3 do
+          Top to A by inp( val: R{0,255} ) if val = 3 do
             out( 3 );
           end
       end
 
       transition 
-        A to A by in( val: R{0,255} ) if val = 4 do
+        A to A by inp( val: R{0,255} ) if val = 4 do
           out( 4 );
         end
         
-        Top to B by in( val: R{0,255} ) do
+        Top to B by inp( val: R{0,255} ) do
           out( 5 );
         end
       

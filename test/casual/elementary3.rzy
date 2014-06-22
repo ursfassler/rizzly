@@ -2,19 +2,15 @@
 
 component
   Elementary3
-
-  input
-    tickIn();
-  
-  output
-    tickOut();
+    slot   tickIn();
+    signal tickOut();
 
   implementation elementary
 
     var
       count : R{0,1} = 0;
 
-    function tickIn()
+    slot tickIn()
       count := (count+1) mod 2;
       if count = 0 then
         tickOut();

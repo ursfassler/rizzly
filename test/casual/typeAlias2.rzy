@@ -7,10 +7,9 @@ type
   
 component
   TypeAlias2
-    input
-      ind();
+    slot ind();
   
-    implementation elementary
+  implementation elementary
 
     var
       a : Byte = 1;
@@ -19,7 +18,7 @@ component
       d : Unsigned{R{0,255}} = 4;
       e : Byte2 = 5;
       
-    function ind()
+    slot ind()
       a := 0;
       b := 0;
       c := 0;

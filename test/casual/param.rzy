@@ -1,7 +1,6 @@
 component
   Schmitt{Lower,Upper: R{0,1000}}
-    input
-      ind( value: R{0,1000} );
+    slot ind( value: R{0,1000} );
       
   implementation hfsm( Low )
     state Low end
@@ -15,8 +14,7 @@ component
   end
   
   Param
-    input
-      ind( value: R{0,1000} );
+    slot ind( value: R{0,1000} );
       
   implementation composition
     component

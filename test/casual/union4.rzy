@@ -12,10 +12,9 @@ type
 
 component
   Union4
-    input
-      get0():R{-100,100};
-      get1():R{-100,100};
-      get2():R{-100,100};
+    response get0():R{-100,100};
+    response get1():R{-100,100};
+    response get2():R{-100,100};
 
   implementation elementary
 
@@ -26,15 +25,15 @@ component
       uni.rec.dum := 0;
     end
       
-    function get0():R{-100,100}
+    response get0():R{-100,100}
       return uni.rec.pos;
     end
     
-    function get1():R{-100,100}
+    response get1():R{-100,100}
       return uni.rec.pos;
     end
 
-    function get2():R{-100,100}
+    response get2():R{-100,100}
       return uni.rec.pos;
     end
 

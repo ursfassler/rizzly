@@ -2,15 +2,12 @@
 
 component
   Err1
-    input
-      inp();
-      
-    output
-      out();
+    slot   inp();
+    signal out();
     
   implementation elementary
     
-    function inp()
+    slot inp()
       out.foo();      // .foo does not exist
     end
     

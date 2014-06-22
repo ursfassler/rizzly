@@ -1,10 +1,7 @@
 component
   ArrayTest1
-    input
-      inp( x: R{0,200} );
-      
-    output
-      out( x: R{0,200} );
+    slot   inp( x: R{0,200} );
+    signal out( x: R{0,200} );
 
   implementation elementary
 
@@ -19,7 +16,7 @@ component
       end
     end
 
-    function inp( x: R{0,200} )
+    slot inp( x: R{0,200} )
       out( a[x mod 20] );
     end
 

@@ -6,12 +6,11 @@ type
 
 component
   Union3
-    input
-      evt():R{0,1};
+    response evt():R{0,1};
 
-    implementation elementary
+  implementation elementary
 
-    function evt():R{0,1}
+    response evt():R{0,1}
       x: Uni;
       x := Uni.pos;
       if data is Uni.pos then

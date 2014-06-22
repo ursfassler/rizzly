@@ -1,16 +1,15 @@
-// Error: query is not allowed to write state
+// Error: response is not allowed to write state
 
 component
   Err2
-    input
-      query():R{0,100};
+    response what():R{0,100};
     
-    implementation elementary
+  implementation elementary
     
     var
       a : R{0,100} = 0;
     
-    function query():R{0,100}
+    response what():R{0,100}
       a := 42;
       return 0;
     end

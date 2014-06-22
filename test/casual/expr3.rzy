@@ -1,14 +1,11 @@
 component
   Expr3
-    input
-      in( x: R{0,10} );
+    slot   ind( x: R{0,10} );
+    signal out( x: R{0,4} );
 
-    output
-      out( x: R{0,4} );
+  implementation elementary
 
-    implementation elementary
-
-    function in( x: R{0,10} )
+    slot ind( x: R{0,10} )
       out( 1 + x * 10 mod 4 );
     end
   end

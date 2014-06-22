@@ -1,15 +1,12 @@
 component
   Boolext
-    input
-      tick( value: Boolean );
-    
-    output
-      on();
-      off();
+    slot   tick( value: Boolean );
+    signal on();
+    signal off();
       
     implementation elementary
 
-    function tick( value: Boolean )
+    slot tick( value: Boolean )
       if value then
         on();
       else

@@ -1,11 +1,7 @@
 component
   TransOrder
-
-  input
-    inp( val: R{0,63} );
-  
-  output
-    out( val: R{0,63} );
+    slot   inp( val: R{0,63} );
+    signal out( val: R{0,63} );
     
   implementation hfsm(A)
     function testBit( value: R{0,63}; bit: R{0,5} ):Boolean

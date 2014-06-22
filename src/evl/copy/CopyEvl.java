@@ -11,7 +11,9 @@ import evl.NullTraverser;
 import evl.expression.Expression;
 import evl.expression.reference.RefItem;
 import evl.function.FunctionBase;
+import evl.hfsm.State;
 import evl.hfsm.StateItem;
+import evl.hfsm.Transition;
 import evl.other.CompUse;
 import evl.other.ImplElementary;
 import evl.other.Named;
@@ -39,7 +41,6 @@ class CopyEvl extends NullTraverser<Evl, Void> {
   private CopyType type = new CopyType(this);
   private CopyStatement stmt = new CopyStatement(this);
   private CopyRef ref = new CopyRef(this);
-  private CopyStateItem cosi = new CopyStateItem(this);
 
   public Map<Named, Named> getCopied() {
     return copied;
@@ -133,11 +134,6 @@ class CopyEvl extends NullTraverser<Evl, Void> {
   }
 
   @Override
-  protected Evl visitStateItem(StateItem obj, Void param) {
-    return cosi.traverse(obj, param);
-  }
-
-  @Override
   protected Evl visitCompUse(CompUse obj, Void param) {
     return new CompUse(obj.getInfo(), obj.getName(), obj.getLink()); // we keep link to old Component
   }
@@ -146,8 +142,10 @@ class CopyEvl extends NullTraverser<Evl, Void> {
   protected Evl visitImplElementary(ImplElementary obj, Void param) {
     ImplElementary ret = new ImplElementary(obj.getInfo(), obj.getName());
 
-    ret.getInput().addAll(copy(obj.getInput().getList()));
-    ret.getOutput().addAll(copy(obj.getOutput().getList()));
+    ret.getSignal().addAll(copy(obj.getSignal().getList()));
+    ret.getSlot().addAll(copy(obj.getSlot().getList()));
+    ret.getResponse().addAll(copy(obj.getResponse().getList()));
+    ret.getQuery().addAll(copy(obj.getQuery().getList()));
     ret.setQueue(copy(obj.getQueue()));
     ret.getVariable().addAll(copy(obj.getVariable().getList()));
     ret.getConstant().addAll(copy(obj.getConstant().getList()));
@@ -158,6 +156,15 @@ class CopyEvl extends NullTraverser<Evl, Void> {
     ret.setExitFunc(copy(obj.getExitFunc()));
 
     return ret;
+  }
+
+  @Override
+  protected StateItem visitTransition(Transition obj, Void param) {
+    // State src = cast.copy(obj.getSrcS()); //TODO correct?
+    // State dst = cast.copy(obj.getDstS());
+    State src = obj.getSrc(); // TODO correct?
+    State dst = obj.getDst();
+    return new Transition(obj.getInfo(), obj.getName(), src, dst, copy(obj.getEventFunc()), copy(obj.getGuard()), copy(obj.getParam().getList()), copy(obj.getBody()));
   }
 
   @Override

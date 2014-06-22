@@ -6,12 +6,11 @@ type
 
 component
   Rec4
-    input
-      equal( a, b: Point ):Boolean;
+    response equal( a, b: Point ):Boolean;
     
   implementation elementary
 
-    function equal( a, b: Point ):Boolean
+    response equal( a, b: Point ):Boolean
       return a = b;
     end
 

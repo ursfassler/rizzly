@@ -1,7 +1,6 @@
 component
   Bitred
-    input
-      ind( x: R{0,10} );
+    slot ind( x: R{0,10} );
     
   implementation hfsm(A)
     state A

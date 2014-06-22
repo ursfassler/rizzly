@@ -1,21 +1,18 @@
 component
   DebugMsg
-    input
-      inFoo();
-      inBar();
-    
-    output
-      outFoo();
-      outBar();
+    slot   inFoo();
+    slot   inBar();
+    signal outFoo();
+    signal outBar();
 
   implementation elementary
 
-    function inFoo()
+    slot inFoo()
       outFoo();
       outBar();
     end
 
-    function inBar()
+    slot inBar()
       outBar();
     end
 

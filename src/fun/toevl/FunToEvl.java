@@ -15,9 +15,11 @@ import evl.composition.EndpointSelf;
 import evl.composition.EndpointSub;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
-import evl.function.FuncIfaceIn;
-import evl.function.FuncIfaceOut;
 import evl.function.FunctionBase;
+import evl.function.impl.FuncIfaceInRet;
+import evl.function.impl.FuncIfaceInVoid;
+import evl.function.impl.FuncIfaceOutRet;
+import evl.function.impl.FuncIfaceOutVoid;
 import evl.hfsm.State;
 import evl.hfsm.StateItem;
 import evl.other.CompUse;
@@ -56,14 +58,13 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
   private FunToEvlVariable var = new FunToEvlVariable(this);
   private FunToEvlCaseOptEntry caoe = new FunToEvlCaseOptEntry(this);
 
-  public FunToEvl(Map<FunctionHeader, Class<? extends FunctionBase>> funType) {
+  public FunToEvl() {
     super();
-    func = new FunToEvlFunc(this, map, funType);
+    func = new FunToEvlFunc(this, map);
   }
 
   public static evl.other.Namespace process(Namespace classes, String debugdir) {
-    Map<FunctionHeader, Class<? extends FunctionBase>> funType = FuncTypeCollector.process(classes);
-    FunToEvl funToAst = new FunToEvl(funType);
+    FunToEvl funToAst = new FunToEvl();
     return (evl.other.Namespace) funToAst.traverse(classes, null);
   }
 
@@ -175,11 +176,17 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
   protected Evl visitImplElementary(ImplElementary obj, Void param) {
     evl.other.ImplElementary comp = new evl.other.ImplElementary(obj.getInfo(), obj.getName());
     map.put(obj, comp);
-    for (FunctionHeader use : obj.getIface(Direction.out)) {
-      comp.getOutput().add((FuncIfaceOut) visit(use, null));
+    for (FunctionHeader use : obj.getQuery()) {
+      comp.getQuery().add((FuncIfaceOutRet) visit(use, null));
     }
-    for (FunctionHeader use : obj.getIface(Direction.in)) {
-      comp.getInput().add((FuncIfaceIn) visit(use, null));
+    for (FunctionHeader use : obj.getResponse()) {
+      comp.getResponse().add((FuncIfaceInRet) visit(use, null));
+    }
+    for (FunctionHeader use : obj.getSignal()) {
+      comp.getSignal().add((FuncIfaceOutVoid) visit(use, null));
+    }
+    for (FunctionHeader use : obj.getSlot()) {
+      comp.getSlot().add((FuncIfaceInVoid) visit(use, null));
     }
     for (Constant var : obj.getConstant()) {
       comp.getConstant().add((evl.variable.Constant) visit(var, null));
@@ -199,11 +206,17 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
   protected Evl visitImplHfsm(ImplHfsm obj, Void param) {
     evl.hfsm.ImplHfsm comp = new evl.hfsm.ImplHfsm(obj.getInfo(), obj.getName());
     map.put(obj, comp);
-    for (FunctionHeader use : obj.getIface(Direction.out)) {
-      comp.getOutput().add((FuncIfaceOut) visit(use, null));
+    for (FunctionHeader use : obj.getQuery()) {
+      comp.getQuery().add((FuncIfaceOutRet) visit(use, null));
     }
-    for (FunctionHeader use : obj.getIface(Direction.in)) {
-      comp.getInput().add((FuncIfaceIn) visit(use, null));
+    for (FunctionHeader use : obj.getResponse()) {
+      comp.getResponse().add((FuncIfaceInRet) visit(use, null));
+    }
+    for (FunctionHeader use : obj.getSignal()) {
+      comp.getSignal().add((FuncIfaceOutVoid) visit(use, null));
+    }
+    for (FunctionHeader use : obj.getSlot()) {
+      comp.getSlot().add((FuncIfaceInVoid) visit(use, null));
     }
     comp.setTopstate((evl.hfsm.StateComposite) visit(obj.getTopstate(), null));
     return comp;
@@ -213,11 +226,17 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
   protected Evl visitImplComposition(ImplComposition obj, Void param) {
     evl.composition.ImplComposition comp = new evl.composition.ImplComposition(obj.getInfo(), obj.getName());
     map.put(obj, comp);
-    for (FunctionHeader use : obj.getIface(Direction.out)) {
-      comp.getOutput().add((FuncIfaceOut) visit(use, null));
+    for (FunctionHeader use : obj.getQuery()) {
+      comp.getQuery().add((FuncIfaceOutRet) visit(use, null));
     }
-    for (FunctionHeader use : obj.getIface(Direction.in)) {
-      comp.getInput().add((FuncIfaceIn) visit(use, null));
+    for (FunctionHeader use : obj.getResponse()) {
+      comp.getResponse().add((FuncIfaceInRet) visit(use, null));
+    }
+    for (FunctionHeader use : obj.getSignal()) {
+      comp.getSignal().add((FuncIfaceOutVoid) visit(use, null));
+    }
+    for (FunctionHeader use : obj.getSlot()) {
+      comp.getSlot().add((FuncIfaceInVoid) visit(use, null));
     }
     for (fun.variable.CompUse use : obj.getComponent()) {
       comp.getComponent().add((evl.other.CompUse) visit(use, null));

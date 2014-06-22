@@ -1,9 +1,7 @@
 component
   Sub
-    input
-      inp();
-    output
-      out();
+    slot   inp();
+    signal out();
       
   implementation composition
     connection
@@ -12,10 +10,8 @@ component
   end
 
   Err2
-    input
-      inp();
-    output
-      out();
+    slot   inp();
+    signal out();
 
   implementation composition
     

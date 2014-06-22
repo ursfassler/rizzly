@@ -11,12 +11,11 @@ end
 
 component
   TemplFunc
-    input
-      in( x: R{0,20} ):R{0,10};
+    response in( x: R{0,20} ):R{0,10};
     
     implementation elementary
     
-    function in( x: R{0,20} ):R{0,10}
+    response in( x: R{0,20} ):R{0,10}
       return narrow{0,10}( x );
     end
 

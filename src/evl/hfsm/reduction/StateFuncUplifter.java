@@ -8,9 +8,9 @@ import common.Designator;
 import evl.Evl;
 import evl.NullTraverser;
 import evl.function.FunctionBase;
+import evl.function.impl.FuncImplResponse;
 import evl.function.impl.FuncPrivateRet;
 import evl.function.impl.FuncPrivateVoid;
-import evl.hfsm.HfsmQueryFunction;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.State;
 import evl.hfsm.Transition;
@@ -51,7 +51,7 @@ public class StateFuncUplifter extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitHfsmQueryFunction(HfsmQueryFunction obj, Designator param) {
+  protected Void visitFuncImplResponse(FuncImplResponse obj, Designator param) {
     return null;
   }
 

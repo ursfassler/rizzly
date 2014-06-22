@@ -6,15 +6,12 @@ type
 
 component
   Rec1
-    input
-      ind( x: R{0,100} );
-    
-    output
-      out( x: R{0,100} );
+    slot   ind( x: R{0,100} );
+    signal out( x: R{0,100} );
     
   implementation elementary
 
-    function ind( x: R{0,100} )
+    slot ind( x: R{0,100} )
       p : Point;
       p.x := x;
       p.y := 100 - p.x;

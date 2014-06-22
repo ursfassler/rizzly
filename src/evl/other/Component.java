@@ -6,13 +6,17 @@ import common.ElementInfo;
 
 import evl.EvlBase;
 import evl.function.FuncIface;
-import evl.function.FuncIfaceIn;
-import evl.function.FuncIfaceOut;
+import evl.function.impl.FuncIfaceInRet;
+import evl.function.impl.FuncIfaceInVoid;
+import evl.function.impl.FuncIfaceOutRet;
+import evl.function.impl.FuncIfaceOutVoid;
 
 abstract public class Component extends EvlBase implements Named {
   private String name;
-  final private ListOfNamed<FuncIfaceIn> input = new ListOfNamed<FuncIfaceIn>();
-  final private ListOfNamed<FuncIfaceOut> output = new ListOfNamed<FuncIfaceOut>();
+  final private ListOfNamed<FuncIfaceOutRet> query = new ListOfNamed<FuncIfaceOutRet>();
+  final private ListOfNamed<FuncIfaceInRet> response = new ListOfNamed<FuncIfaceInRet>();
+  final private ListOfNamed<FuncIfaceOutVoid> signal = new ListOfNamed<FuncIfaceOutVoid>();
+  final private ListOfNamed<FuncIfaceInVoid> slot = new ListOfNamed<FuncIfaceInVoid>();
   private Queue queue;
 
   public Component(ElementInfo info, String name) {
@@ -21,23 +25,48 @@ abstract public class Component extends EvlBase implements Named {
     queue = new Queue(Designator.NAME_SEP + Queue.DEFAULT_NAME + Designator.NAME_SEP + name);
   }
 
-  public ListOfNamed<FuncIfaceIn> getInput() {
-    return input;
+  public ListOfNamed<FuncIfaceOutRet> getQuery() {
+    return query;
   }
 
-  public ListOfNamed<FuncIfaceOut> getOutput() {
-    return output;
+  public ListOfNamed<FuncIfaceInRet> getResponse() {
+    return response;
+  }
+
+  public ListOfNamed<FuncIfaceOutVoid> getSignal() {
+    return signal;
+  }
+
+  public ListOfNamed<FuncIfaceInVoid> getSlot() {
+    return slot;
   }
 
   public ListOfNamed<? extends FuncIface> getIface(Direction dir) {
     switch (dir) {
-    case in:
-      return input;
-    case out:
-      return output;
+    case in: {
+      ListOfNamed<FuncIface> ret = new ListOfNamed<FuncIface>();
+      ret.addAll(response);
+      ret.addAll(slot);
+      return ret;
+    }
+    case out: {
+      ListOfNamed<FuncIface> ret = new ListOfNamed<FuncIface>();
+      ret.addAll(query);
+      ret.addAll(signal);
+      return ret;
+    }
     default:
       throw new RuntimeException("Not implemented: " + dir);
     }
+  }
+
+  public ListOfNamed<? extends FuncIface> getIface() {
+    ListOfNamed<FuncIface> ret = new ListOfNamed<FuncIface>();
+    ret.addAll(response);
+    ret.addAll(slot);
+    ret.addAll(query);
+    ret.addAll(signal);
+    return ret;
   }
 
   @Override

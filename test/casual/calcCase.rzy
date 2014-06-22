@@ -1,15 +1,11 @@
 component
   CalcCase
+    slot   ind( data: R{0,20} );
+    signal out( data: R{0,20} );
 
-    input
-      ind( data: R{0,20} );
+  implementation elementary
 
-    output
-      out( data: R{0,20} );
-
-    implementation elementary
-
-    function ind( x: R{0,20} )
+    slot ind( x: R{0,20} )
       case x+2 of
         2..10:
           out( 2 );

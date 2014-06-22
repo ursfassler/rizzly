@@ -1,12 +1,11 @@
 
 component
   EmptyElse
-    input
-      ind( x: R{0,20} ):R{0,10};
+    response ind( x: R{0,20} ):R{0,10};
     
-    implementation elementary
+  implementation elementary
     
-    function ind( x: R{0,20} ):R{0,10}
+    response ind( x: R{0,20} ):R{0,10}
       if x > 10 then
         x := R{0,10}( x - 10 );
       end

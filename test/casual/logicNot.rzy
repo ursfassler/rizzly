@@ -1,11 +1,10 @@
 
 component
   LogicNot
-    input
-      invert( value: Boolean ):Boolean;
+    response invert( value: Boolean ):Boolean;
       
   implementation elementary
-    function invert( value: Boolean ):Boolean
+    response invert( value: Boolean ):Boolean
       return not value;
     end
   end

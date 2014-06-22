@@ -1,45 +1,40 @@
 component
   DummyComp
-    input
-      infoo();
-      inbar();
-      inpoh();
-    
-    output
-      outfoo();
-      outbar();
-      outpoh();
+    slot   infoo();
+    slot   inbar();
+    slot   inpoh();
+    signal outfoo();
+    signal outbar();
+    signal outpoh();
 
-    implementation elementary
+  implementation elementary
 
-    function infoo()
+    slot infoo()
       outfoo();
       outbar();
     end
 
-    function inbar()
+    slot inbar()
       outbar();
       outpoh();
     end
 
-    function inpoh()
+    slot inpoh()
       outbar();
     end
 
   end
 
   Debug
-    input
-      infoo();
-      inbar();
-      inpoh();
+    slot   infoo();
+    slot   inbar();
+    slot   inpoh();
     
-    output
-      outfoo();
-      outbar();
-      outpoh();
+    signal outfoo();
+    signal outbar();
+    signal outpoh();
 
-    implementation composition
+  implementation composition
     
     component
       a : DummyComp;

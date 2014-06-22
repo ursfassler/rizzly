@@ -23,7 +23,7 @@ public class ImplElementaryParser extends ImplBaseParser {
   }
 
   // EBNF implementationElementary: "elementary" { entryCode | exitCode | compDeclBlock | varDeclBlock | constDeclBlock
-  // | privateFunction | entry | exit }
+  // | privateFunction | responseFunction | slotFunction | interruptFunction | entry | exit }
   private ImplElementary parseImplementationElementary(Token name) {
     ElementInfo info = expect(TokenType.ELEMENTARY).getInfo();
     ImplElementary comp = new ImplElementary(name.getInfo(), name.getData());
@@ -39,29 +39,26 @@ public class ImplElementaryParser extends ImplBaseParser {
 
     while (true)
       switch (peek().getType()) {
-      case ENTRY: {
+      case ENTRY:
         entryBody.getStatements().add(parseEntryCode());
         break;
-      }
-      case EXIT: {
+      case EXIT:
         exitBody.getStatements().add(parseExitCode());
         break;
-      }
-      case VAR: {
+      case VAR:
         comp.getVariable().addAll(parseVarDefBlock(StateVariable.class));
         break;
-      }
-      case CONST: {
+      case CONST:
         comp.getConstant().addAll(parseConstDefBlock(ConstPrivate.class));
         break;
-      }
-      case FUNCTION: {
-        comp.getFunction().add(parsePrivateFunction());
+      case FUNCTION:
+      case RESPONSE:
+      case SLOT:
+      case INTERRUPT:
+        comp.getFunction().add(parsePrivateFunction(peek().getType()));
         break;
-      }
-      default: {
+      default:
         return comp;
-      }
       }
   }
 

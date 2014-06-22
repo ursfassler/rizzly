@@ -1,14 +1,11 @@
 component
   Linking
-    input
-      ind();
-
-    output
-      linking();    // it has the same name as namespace ("linking"), may cause problem; should not
+    slot   ind();
+    signal linking();    // it has the same name as namespace ("linking"), may cause problem; should not
     
   implementation elementary
   
-    function ind()
+    slot ind()
       linking();
     end
   

@@ -2,15 +2,13 @@
 
 component
   Sub
-    output
-      funcA();
+    signal funcA();
       
     implementation elementary
   end
 
   Err7
-    output
-      funcA();
+    signal funcA();
       
   implementation composition
     

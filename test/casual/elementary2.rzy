@@ -2,16 +2,12 @@
 
 component
   Elementary2
-
-  input
-    tickIn();
-  
-  output
-    tickOut();
+    slot   tickIn();
+    signal tickOut();
 
   implementation elementary
 
-    function tickIn()
+    slot tickIn()
       tickOut();
     end
 

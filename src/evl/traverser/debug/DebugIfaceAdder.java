@@ -170,9 +170,9 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
   protected Void visitImplElementary(ImplElementary obj, Void param) {
 
     FuncIfaceOutVoid sendProto = makeMsg(Designator.NAME_SEP + "msgSend", "sender");
-    obj.getOutput().add(sendProto);
+    obj.getSignal().add(sendProto);
     FuncIfaceOutVoid recvProto = makeMsg(Designator.NAME_SEP + "msgRecv", "receiver");
-    obj.getOutput().add(recvProto);
+    obj.getSignal().add(recvProto);
 
     FuncPrivateVoid debugSend = makeDebugSend("iMsgSend", sendProto);
     FuncPrivateVoid debugRecv = makeDebugSend("iMsgRecv", recvProto);

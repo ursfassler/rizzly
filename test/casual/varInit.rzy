@@ -1,7 +1,7 @@
 component
   VarInit
 
-    implementation elementary
+  implementation elementary
 
     function foo1( x: R{0,255} ):R{0,255}
       a : R{0,255};

@@ -1,6 +1,6 @@
 component
   Err5
-    input
+    slot
       funcA();
 
     implementation elementary

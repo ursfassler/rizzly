@@ -1,20 +1,26 @@
-package evl.hfsm;
+package evl.function.impl;
 
 import common.ElementInfo;
 
 import evl.function.FuncWithBody;
 import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
+import evl.hfsm.StateItem;
 import evl.other.ListOfNamed;
 import evl.statement.Block;
 import evl.type.TypeRef;
 import evl.variable.FuncVariable;
 
-public class HfsmQueryFunction extends FunctionBase implements StateItem, FuncWithReturn, FuncWithBody {
+/**
+ * 
+ * @author urs
+ */
+public class FuncImplResponse extends FunctionBase implements StateItem, FuncWithReturn, FuncWithBody {
+
   private TypeRef ret = null;
   private Block body = null;
 
-  public HfsmQueryFunction(ElementInfo info, String name, ListOfNamed<FuncVariable> param) {
+  public FuncImplResponse(ElementInfo info, String name, ListOfNamed<FuncVariable> param) {
     super(info, name, param);
   }
 
@@ -41,4 +47,5 @@ public class HfsmQueryFunction extends FunctionBase implements StateItem, FuncWi
     assert (body != null);
     this.body = body;
   }
+
 }

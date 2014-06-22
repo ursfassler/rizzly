@@ -19,9 +19,15 @@ import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.Reference;
 import fun.function.impl.FuncEntryExit;
 import fun.function.impl.FuncGlobal;
+import fun.function.impl.FuncImplResponse;
+import fun.function.impl.FuncImplSlot;
 import fun.function.impl.FuncPrivateRet;
 import fun.function.impl.FuncPrivateVoid;
+import fun.function.impl.FuncProtQuery;
+import fun.function.impl.FuncProtResponse;
 import fun.function.impl.FuncProtRet;
+import fun.function.impl.FuncProtSignal;
+import fun.function.impl.FuncProtSlot;
 import fun.function.impl.FuncProtVoid;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.StateComposite;
@@ -71,6 +77,36 @@ import fun.variable.TemplateParameter;
 abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   protected abstract R visitDefault(Fun obj, P param);
+
+  @Override
+  protected R visitFuncImplResponse(FuncImplResponse obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitFuncImplSlot(FuncImplSlot obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitFuncProtSlot(FuncProtSlot obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitFuncProtSignal(FuncProtSignal obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitFuncProtQuery(FuncProtQuery obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitFuncProtResponse(FuncProtResponse obj, P param) {
+    return visitDefault(obj, param);
+  }
 
   @Override
   protected R visitExprList(ExprList obj, P param) {

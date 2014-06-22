@@ -22,9 +22,15 @@ import fun.expression.reference.Reference;
 import fun.function.FunctionHeader;
 import fun.function.impl.FuncEntryExit;
 import fun.function.impl.FuncGlobal;
+import fun.function.impl.FuncImplResponse;
+import fun.function.impl.FuncImplSlot;
 import fun.function.impl.FuncPrivateRet;
 import fun.function.impl.FuncPrivateVoid;
+import fun.function.impl.FuncProtQuery;
+import fun.function.impl.FuncProtResponse;
 import fun.function.impl.FuncProtRet;
+import fun.function.impl.FuncProtSignal;
+import fun.function.impl.FuncProtSlot;
 import fun.function.impl.FuncProtVoid;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.State;
@@ -149,6 +155,18 @@ public abstract class Traverser<R, P> {
       return visitFuncPrivateRet((FuncPrivateRet) obj, param);
     } else if (obj instanceof FuncEntryExit) {
       return visitFuncEntryExit((FuncEntryExit) obj, param);
+    } else if (obj instanceof FuncProtResponse) {
+      return visitFuncProtResponse((FuncProtResponse) obj, param);
+    } else if (obj instanceof FuncProtQuery) {
+      return visitFuncProtQuery((FuncProtQuery) obj, param);
+    } else if (obj instanceof FuncProtSignal) {
+      return visitFuncProtSignal((FuncProtSignal) obj, param);
+    } else if (obj instanceof FuncProtSlot) {
+      return visitFuncProtSlot((FuncProtSlot) obj, param);
+    } else if (obj instanceof FuncImplSlot) {
+      return visitFuncImplSlot((FuncImplSlot) obj, param);
+    } else if (obj instanceof FuncImplResponse) {
+      return visitFuncImplResponse((FuncImplResponse) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -339,6 +357,18 @@ public abstract class Traverser<R, P> {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
   }
+
+  abstract protected R visitFuncImplResponse(FuncImplResponse obj, P param);
+
+  abstract protected R visitFuncImplSlot(FuncImplSlot obj, P param);
+
+  abstract protected R visitFuncProtSlot(FuncProtSlot obj, P param);
+
+  abstract protected R visitFuncProtSignal(FuncProtSignal obj, P param);
+
+  abstract protected R visitFuncProtQuery(FuncProtQuery obj, P param);
+
+  abstract protected R visitFuncProtResponse(FuncProtResponse obj, P param);
 
   abstract protected R visitFuncEntryExit(FuncEntryExit obj, P param);
 

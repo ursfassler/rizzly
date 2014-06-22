@@ -2,7 +2,7 @@ package evl.traverser.modelcheck;
 
 import evl.Evl;
 import evl.NullTraverser;
-import evl.hfsm.HfsmQueryFunction;
+import evl.function.impl.FuncImplResponse;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.State;
 import evl.hfsm.Transition;
@@ -59,7 +59,7 @@ public class HfsmModelChecker extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitHfsmQueryFunction(HfsmQueryFunction obj, Void param) {
+  protected Void visitFuncImplResponse(FuncImplResponse obj, Void param) {
     // TODO check that state is not written
     return null;
   }

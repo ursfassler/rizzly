@@ -19,11 +19,10 @@ type
 
 component
   GenericDef{T:Type{Integer}}
-    input
-      set( item: T );
-      get():T;
+    slot     set( item: T );
+    response get():T;
 
-    implementation composition
+  implementation composition
 
     component
       sub1 : GenericSub{T};
@@ -39,9 +38,8 @@ component
   end
   
   GenSu{T:Type{Integer}}
-    input
-      set( item: T );
-      get():T;
+    slot     set( item: T );
+    response get():T;
     
   implementation elementary
     var
@@ -50,7 +48,7 @@ component
       dat3: The2Record{T,T} = ( a := 1, b := 2 );
       dat4: The3{T,TheRecord{T}} = ( a := 0, ( a := 2, b := 200 ) );
 
-    function set( item: T )
+    slot set( item: T )
       data := item;
     end
 

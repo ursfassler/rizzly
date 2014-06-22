@@ -6,15 +6,12 @@ type
 
 component
   FuncStruct
-    input
-      ind():R{0,255};
-    
-    output
-      out():Point;
+    response ind():R{0,255};
+    query    out():Point;
       
-    implementation elementary
+  implementation elementary
     
-    function ind():R{0,255}
+    response ind():R{0,255}
       return out().x;
     end
     

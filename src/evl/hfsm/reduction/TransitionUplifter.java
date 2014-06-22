@@ -5,7 +5,7 @@ import java.util.List;
 
 import evl.Evl;
 import evl.NullTraverser;
-import evl.hfsm.HfsmQueryFunction;
+import evl.function.impl.FuncImplResponse;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.State;
 import evl.hfsm.StateComposite;
@@ -44,7 +44,7 @@ public class TransitionUplifter extends NullTraverser<Void, List<Transition>> {
   }
 
   @Override
-  protected Void visitHfsmQueryFunction(HfsmQueryFunction obj, List<Transition> param) {
+  protected Void visitFuncImplResponse(FuncImplResponse obj, List<Transition> param) {
     return null;
   }
 

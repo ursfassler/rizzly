@@ -1,11 +1,10 @@
 component
   Linkorder2
-    input
-      ind();
+    slot ind();
       
   implementation elementary
   
-    function ind()
+    slot ind()
       foo();
     end
     

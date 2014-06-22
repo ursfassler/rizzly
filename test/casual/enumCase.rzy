@@ -11,12 +11,11 @@ type
 
 component
   EnumCase
-    input
-      ind( data: Weekday ):R{0,3};
+    response ind( data: Weekday ):R{0,3};
 
-    implementation elementary
+  implementation elementary
 
-    function ind( x: Weekday ):R{0,3}
+    response ind( x: Weekday ):R{0,3}
       case x of
         Weekday.Monday,Weekday.Wednesday:
           return 2;
@@ -32,6 +31,6 @@ component
         end
       end
     end
-
+    
   end
 

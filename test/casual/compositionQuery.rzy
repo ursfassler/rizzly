@@ -1,27 +1,21 @@
 component
   DummyComp
-    input
-      ind():R{0,100};
-    
-    output
-      out():R{0,100};
+    response ind():R{0,100};
+    query    out():R{0,100};
 
-    implementation elementary
+  implementation elementary
 
-    function ind():R{0,100}
+    response ind():R{0,100}
       return out();
     end
     
   end
 
   CompositionQuery
-    input
-      ind():R{0,100};
-    
-    output
-      out():R{0,100};
+    response ind():R{0,100};
+    query    out():R{0,100};
 
-    implementation composition
+  implementation composition
     
     component
       a : DummyComp;

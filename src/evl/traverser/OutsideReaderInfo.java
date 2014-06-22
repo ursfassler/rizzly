@@ -8,15 +8,14 @@ import evl.function.impl.FuncIfaceInRet;
 import evl.function.impl.FuncIfaceInVoid;
 import evl.function.impl.FuncIfaceOutRet;
 import evl.function.impl.FuncIfaceOutVoid;
-import evl.function.impl.FuncInputHandlerEvent;
-import evl.function.impl.FuncInputHandlerQuery;
+import evl.function.impl.FuncImplResponse;
+import evl.function.impl.FuncImplSlot;
 import evl.function.impl.FuncPrivateRet;
 import evl.function.impl.FuncPrivateVoid;
 import evl.function.impl.FuncProtoRet;
 import evl.function.impl.FuncProtoVoid;
 import evl.function.impl.FuncSubHandlerEvent;
 import evl.function.impl.FuncSubHandlerQuery;
-import evl.hfsm.HfsmQueryFunction;
 
 /**
  * Returns for every function if, it reads form outside. It gets the information only from the function type.
@@ -62,12 +61,12 @@ public class OutsideReaderInfo extends NullTraverser<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitFuncInputHandlerEvent(FuncInputHandlerEvent obj, Void param) {
+  protected Boolean visitFuncImplSlot(FuncImplSlot obj, Void param) {
     return false;
   }
 
   @Override
-  protected Boolean visitFuncInputHandlerQuery(FuncInputHandlerQuery obj, Void param) {
+  protected Boolean visitFuncImplResponse(FuncImplResponse obj, Void param) {
     return false;
   }
 
@@ -78,11 +77,6 @@ public class OutsideReaderInfo extends NullTraverser<Boolean, Void> {
 
   @Override
   protected Boolean visitFuncSubHandlerEvent(FuncSubHandlerEvent obj, Void param) {
-    return false;
-  }
-
-  @Override
-  protected Boolean visitHfsmQueryFunction(HfsmQueryFunction obj, Void param) {
     return false;
   }
 

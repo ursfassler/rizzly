@@ -2,9 +2,7 @@
 
 component
   UnusedState
-
-  input
-    tick();
+    slot tick();
 
   implementation hfsm(A)
 

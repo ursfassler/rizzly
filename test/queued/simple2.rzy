@@ -1,25 +1,19 @@
 component
 
   Dummy
-    input
-      ind();
-    
-    output
-      out();
+    slot   ind();
+    signal out();
 
   implementation elementary
-    function ind()
+    slot ind()
       out();
     end
       
   end
 
   Simple2
-    input
-      ind();
-    
-    output
-      out();
+    slot   ind();
+    signal out();
 
   implementation composition
     component

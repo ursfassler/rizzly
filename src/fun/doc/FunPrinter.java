@@ -36,9 +36,15 @@ import fun.function.FuncWithReturn;
 import fun.function.FunctionHeader;
 import fun.function.impl.FuncEntryExit;
 import fun.function.impl.FuncGlobal;
+import fun.function.impl.FuncImplResponse;
+import fun.function.impl.FuncImplSlot;
 import fun.function.impl.FuncPrivateRet;
 import fun.function.impl.FuncPrivateVoid;
+import fun.function.impl.FuncProtQuery;
+import fun.function.impl.FuncProtResponse;
 import fun.function.impl.FuncProtRet;
+import fun.function.impl.FuncProtSignal;
+import fun.function.impl.FuncProtSlot;
 import fun.function.impl.FuncProtVoid;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.State;
@@ -272,9 +278,11 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   protected Void visitComponent(Component obj, Void param) {
     wrGen(obj);
     xw.incIndent();
-    visitNamedSection("input", obj.getIface(Direction.in).getList());
+    visitList(obj.getResponse(), param);
+    visitList(obj.getSlot(), param);
     xw.sectionSeparator();
-    visitNamedSection("output", obj.getIface(Direction.out).getList());
+    visitList(obj.getQuery(), param);
+    visitList(obj.getSignal(), param);
     xw.sectionSeparator();
     xw.decIndent();
     super.visitComponent(obj, null);
@@ -916,11 +924,6 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncPrivate(FuncPrivateVoid obj, Void param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
   protected Void visitFuncPrivateRet(FuncPrivateRet obj, Void param) {
     xw.sectionSeparator();
     printFunc(obj, false);
@@ -929,6 +932,20 @@ public class FunPrinter extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitFuncPrivateVoid(FuncPrivateVoid obj, Void param) {
+    xw.sectionSeparator();
+    printFunc(obj, false);
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncImplResponse(FuncImplResponse obj, Void param) {
+    xw.sectionSeparator();
+    printFunc(obj, false);
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncImplSlot(FuncImplSlot obj, Void param) {
     xw.sectionSeparator();
     printFunc(obj, false);
     return null;
@@ -950,6 +967,30 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   protected Void visitFuncGlobal(FuncGlobal obj, Void param) {
     // xw.sectionSeparator();
     printFunc(obj, false);
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncProtSlot(FuncProtSlot obj, Void param) {
+    printFunc(obj, true);
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncProtSignal(FuncProtSignal obj, Void param) {
+    printFunc(obj, true);
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncProtQuery(FuncProtQuery obj, Void param) {
+    printFunc(obj, true);
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncProtResponse(FuncProtResponse obj, Void param) {
+    printFunc(obj, true);
     return null;
   }
 

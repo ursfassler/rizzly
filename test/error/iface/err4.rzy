@@ -1,17 +1,15 @@
 component
   Sub
-    output
-      funcA();
-      funcB();
+    signal funcA();
+    signal funcB();
       
   implementation elementary
   end
 
   Err4
-    output
-      funcA();
-      funcB();
-      funcC();
+    signal funcA();
+    signal funcB();
+    signal funcC();
       
   implementation composition
     

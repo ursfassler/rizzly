@@ -19,8 +19,8 @@ import evl.expression.reference.RefCall;
 import evl.expression.reference.RefItem;
 import evl.expression.reference.Reference;
 import evl.function.FuncWithBody;
+import evl.function.impl.FuncImplResponse;
 import evl.function.impl.FuncPrivateVoid;
-import evl.hfsm.HfsmQueryFunction;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.State;
 import evl.hfsm.StateComposite;
@@ -236,7 +236,7 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
         spos.put((State) itr, transList.size());
         stateList.add((State) itr);
       } else {
-        assert (itr instanceof HfsmQueryFunction);
+        assert (itr instanceof FuncImplResponse);
       }
     }
 
@@ -309,7 +309,7 @@ class TransitionEndpointCollector extends NullTraverser<Void, State> {
   }
 
   @Override
-  protected Void visitHfsmQueryFunction(HfsmQueryFunction obj, State param) {
+  protected Void visitFuncImplResponse(FuncImplResponse obj, State param) {
     return null;
   }
 

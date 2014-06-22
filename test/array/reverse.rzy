@@ -13,12 +13,11 @@ end
 
 component
   Reverse
-    input
-      data( x: Array{10,R{0,100}} ): Array{10,R{0,100}};
+    response data( x: Array{10,R{0,100}} ): Array{10,R{0,100}};
       
   implementation elementary
 
-    function data( x: Array{10,R{0,100}} ): Array{10,R{0,100}}
+    response data( x: Array{10,R{0,100}} ): Array{10,R{0,100}}
       return reverse{10,R{0,100}}( x );
     end
 

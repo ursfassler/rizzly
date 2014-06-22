@@ -1,14 +1,13 @@
 
 component
   ConstInit2
-    input
-      get():R{0,1000};
+    response get():R{0,1000};
       
   implementation elementary
     const
       Foo : Natural = 42;
       
-    function get():R{0,1000}
+    response get():R{0,1000}
       return Foo;
     end
   end      

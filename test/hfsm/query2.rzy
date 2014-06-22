@@ -1,8 +1,7 @@
 component
   Query2
-    input
-      tick();
-      read():R{0,100};
+    slot     tick();
+    response read():R{0,100};
     
   implementation hfsm( A )
   
@@ -20,7 +19,7 @@ component
     state C
     end
     
-    function read():R{0,100}
+    response read():R{0,100}
       return 0;
     end
   

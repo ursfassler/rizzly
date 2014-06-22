@@ -1,8 +1,7 @@
 component
   Query4
-    input
-      tick();
-      read( x: R{0,10} ):R{0,100};
+    slot     tick();
+    response read( x: R{0,10} ):R{0,100};
     
   implementation hfsm( A )
   
@@ -12,19 +11,19 @@ component
       C to A by tick();
   
     state A
-      function read( x: R{0,10} ):R{0,100}
+      response read( x: R{0,10} ):R{0,100}
         return x * 1;
       end
     end
       
     state B
-      function read( x: R{0,10} ):R{0,100}
+      response read( x: R{0,10} ):R{0,100}
         return x * 2;
       end
     end
 
     state C
-      function read( x: R{0,10} ):R{0,100}
+      response read( x: R{0,10} ):R{0,100}
         return x * 3;
       end
     end

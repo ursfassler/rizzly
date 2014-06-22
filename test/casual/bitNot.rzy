@@ -1,11 +1,10 @@
 
 component
   BitNot
-    input
-      invert( value: R{0,15} ):R{0,15};
+    response invert( value: R{0,15} ):R{0,15};
       
   implementation elementary
-    function invert( value: R{0,15} ):R{0,15}
+    response invert( value: R{0,15} ):R{0,15}
       return not value;
     end
   end

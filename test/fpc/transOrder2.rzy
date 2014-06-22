@@ -3,11 +3,8 @@
 component
   TransOrder2
 
-  input
-    inp( val: R{0,10} );
-  
-  output
-    out( val: R{0,10} );
+    slot   inp( val: R{0,10} );
+    signal out( val: R{0,10} );
     
   implementation hfsm(A)
     transition 

@@ -1,10 +1,7 @@
 component
   Transition1
-    input
-      ind();
-    
-    output
-      out();
+    slot   ind();
+    signal out();
     
   implementation hfsm(One)
       

@@ -7,15 +7,12 @@ type
 
 component
   Enumt
-    input
-      inp( x: R{0,100} );
-    
-    output
-      out( x: Color );
+    slot   inp( x: R{0,100} );
+    signal out( x: Color );
 
-    implementation elementary
+  implementation elementary
     
-    function inp( x: R{0,100} )
+    slot inp( x: R{0,100} )
       case x of
         0: out( Color.Red ); end
         1: out( Color.Green ); end

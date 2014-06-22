@@ -1,11 +1,8 @@
 
 component
   AlarmClock
-    input
-      tick();
-    
-    output
-      alarm();
+    slot   tick();
+    signal alarm();
     
   implementation hfsm(Counting)
     var

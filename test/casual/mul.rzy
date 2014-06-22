@@ -1,11 +1,10 @@
 component
   Mul
-    input
-      ind( a, b: R{0,65536} ):R{0,4294967296};
+    response ind( a, b: R{0,65536} ):R{0,4294967296};
 
-    implementation elementary
+  implementation elementary
 
-    function ind( a, b: R{0,65536} ):R{0,4294967296}
+    response ind( a, b: R{0,65536} ):R{0,4294967296}
       return a * b;
     end
 

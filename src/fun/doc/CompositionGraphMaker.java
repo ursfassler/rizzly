@@ -32,11 +32,19 @@ public class CompositionGraphMaker {
     Map<CompUse, SubComponent> compmap = new HashMap<CompUse, SubComponent>();
     Map<Designator, Interface> ifacemap = new HashMap<Designator, Interface>();
 
-    for (FunctionHeader iface : impl.getIface(Direction.in)) {
+    for (FunctionHeader iface : impl.getResponse()) {
       Interface niface = makeIface(new Designator("Self"), comp, iface, ifacemap, kb);
       comp.getInput().add(niface);
     }
-    for (FunctionHeader iface : impl.getIface(Direction.out)) {
+    for (FunctionHeader iface : impl.getSlot()) {
+      Interface niface = makeIface(new Designator("Self"), comp, iface, ifacemap, kb);
+      comp.getInput().add(niface);
+    }
+    for (FunctionHeader iface : impl.getQuery()) {
+      Interface niface = makeIface(new Designator("Self"), comp, iface, ifacemap, kb);
+      comp.getOutput().add(niface);
+    }
+    for (FunctionHeader iface : impl.getSignal()) {
       Interface niface = makeIface(new Designator("Self"), comp, iface, ifacemap, kb);
       comp.getOutput().add(niface);
     }
@@ -46,11 +54,19 @@ public class CompositionGraphMaker {
       Designator subpath = kp.get(comptype);
       SubComponent sub = new SubComponent(use.getName(), subpath, comptype.getName(), use.getInfo().getMetadata(METADATA_KEY));
 
-      for (FunctionHeader iface : comptype.getIface(Direction.in)) {
+      for (FunctionHeader iface : comptype.getResponse()) {
         Interface niface = makeIface(new Designator("Self", use.getName()), sub, iface, ifacemap, kb);
         sub.getInput().add(niface);
       }
-      for (FunctionHeader iface : comptype.getIface(Direction.out)) {
+      for (FunctionHeader iface : comptype.getSlot()) {
+        Interface niface = makeIface(new Designator("Self", use.getName()), sub, iface, ifacemap, kb);
+        sub.getInput().add(niface);
+      }
+      for (FunctionHeader iface : comptype.getQuery()) {
+        Interface niface = makeIface(new Designator("Self", use.getName()), sub, iface, ifacemap, kb);
+        sub.getOutput().add(niface);
+      }
+      for (FunctionHeader iface : comptype.getSignal()) {
         Interface niface = makeIface(new Designator("Self", use.getName()), sub, iface, ifacemap, kb);
         sub.getOutput().add(niface);
       }

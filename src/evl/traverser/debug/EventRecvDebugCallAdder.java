@@ -14,8 +14,8 @@ import evl.expression.reference.RefCall;
 import evl.expression.reference.Reference;
 import evl.function.FuncWithBody;
 import evl.function.FunctionBase;
-import evl.function.impl.FuncInputHandlerEvent;
-import evl.function.impl.FuncInputHandlerQuery;
+import evl.function.impl.FuncImplResponse;
+import evl.function.impl.FuncImplSlot;
 import evl.function.impl.FuncPrivateVoid;
 import evl.statement.CallStmt;
 
@@ -43,13 +43,13 @@ public class EventRecvDebugCallAdder extends DefTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncInputHandlerQuery(FuncInputHandlerQuery obj, Void param) {
+  protected Void visitFuncImplResponse(FuncImplResponse obj, Void param) {
     makeDebugCall(obj);
     return null;
   }
 
   @Override
-  protected Void visitFuncInputHandlerEvent(FuncInputHandlerEvent obj, Void param) {
+  protected Void visitFuncImplSlot(FuncImplSlot obj, Void param) {
     makeDebugCall(obj);
     return null;
   }

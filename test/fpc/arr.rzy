@@ -1,17 +1,14 @@
 component
   Arr
-    input
-      inp( x: Array{10,R{0,100}} );
-    
-    output
-      out( x: Array{3,R{0,100}} );
+    slot   inp( x: Array{10,R{0,100}} );
+    signal out( x: Array{3,R{0,100}} );
 
-    implementation elementary
+  implementation elementary
     
     var
-      a : Array{10,R{0,100}} = [ 90, 80, 70, 60, 50, 40, 30, 20, 10 ];
+      a : Array{10,R{0,100}} = [ 90, 80, 70, 60, 50, 40, 30, 20, 10, 0 ];
     
-    function inp( x: Array{10,R{0,100}} )
+    slot inp( x: Array{10,R{0,100}} )
       a := x;
       b : Array{3,R{0,100}};
       b[0] := a[0];

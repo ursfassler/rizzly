@@ -2,10 +2,8 @@
 
 component
   Forward
-    input
-      ind();                          //
-    output                            // 
-      out();
+    slot   ind();                          //
+    signal out();                         // 
       
   implementation composition          //dummy meta1
     connection
@@ -14,10 +12,8 @@ component
 
 
   Meta
-    input
-      in1();
-    output
-      out1();
+    slot     in1();
+    signal   out1();
       
   implementation composition          //geometry width="420"
   // bla bla 1

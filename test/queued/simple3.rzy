@@ -1,10 +1,7 @@
 component
   Simple3
-    input
-      ind( x: R{0,100} );
-    
-    output
-      out( x: R{0,100} );
+    slot   ind( x: R{0,100} );
+    signal out( x: R{0,100} );
 
   implementation composition
     

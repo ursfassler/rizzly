@@ -1,14 +1,13 @@
 component
   AlarmController
-    input
-      getTime():R{0,99};
-      time( seconds: R{0,99} );
+    response getTime():R{0,99};
+    slot time( seconds: R{0,99} );
     
   implementation hfsm(Disabled)
     var
       atime   : R{0,99} = 0;
       
-    function getTime():R{0,99}
+    response getTime():R{0,99}
       return atime;
     end
     

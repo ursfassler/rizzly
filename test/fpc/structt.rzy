@@ -6,24 +6,21 @@ type
 
 component
   Structt
-    input
-      in1( x, y: R{0,1000} );
-      in2( x: Point );
-    
-    output
-      out1( x: Point );
-      out2( x, y: R{0,1000} );
+    slot   in1( x, y: R{0,1000} );
+    slot   in2( x: Point );
+    signal out1( x: Point );
+    signal out2( x, y: R{0,1000} );
 
-    implementation elementary
+  implementation elementary
     
-    function in1( x, y: R{0,1000} )
+    slot in1( x, y: R{0,1000} )
       p : Point;
       p.x := x;
       p.y := y;
       out1( p );
     end
     
-    function in2( p: Point )
+    slot in2( p: Point )
       out2( p.x, p.y );
     end
 

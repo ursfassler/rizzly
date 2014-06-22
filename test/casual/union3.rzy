@@ -6,10 +6,9 @@ type
 
 component
   Union3
-    input
-      evt();
+    slot evt();
 
-    implementation elementary
+  implementation elementary
 
     var
       data : Uni = pos := 1;
@@ -22,7 +21,7 @@ component
       end
     end
   
-    function evt()
+    slot evt()
       x : R{0,10};
       if data is Uni.pos then
         x := data.pos;

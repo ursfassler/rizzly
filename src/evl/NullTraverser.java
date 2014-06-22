@@ -49,15 +49,14 @@ import evl.function.impl.FuncIfaceInRet;
 import evl.function.impl.FuncIfaceInVoid;
 import evl.function.impl.FuncIfaceOutRet;
 import evl.function.impl.FuncIfaceOutVoid;
-import evl.function.impl.FuncInputHandlerEvent;
-import evl.function.impl.FuncInputHandlerQuery;
+import evl.function.impl.FuncImplResponse;
+import evl.function.impl.FuncImplSlot;
 import evl.function.impl.FuncPrivateRet;
 import evl.function.impl.FuncPrivateVoid;
 import evl.function.impl.FuncProtoRet;
 import evl.function.impl.FuncProtoVoid;
 import evl.function.impl.FuncSubHandlerEvent;
 import evl.function.impl.FuncSubHandlerQuery;
-import evl.hfsm.HfsmQueryFunction;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.StateComposite;
 import evl.hfsm.StateSimple;
@@ -365,11 +364,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitHfsmQueryFunction(HfsmQueryFunction obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
   protected R visitReference(Reference obj, P param) {
     return visitDefault(obj, param);
   }
@@ -385,12 +379,12 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitFuncInputHandlerEvent(FuncInputHandlerEvent obj, P param) {
+  protected R visitFuncImplSlot(FuncImplSlot obj, P param) {
     return visitDefault(obj, param);
   }
 
   @Override
-  protected R visitFuncInputHandlerQuery(FuncInputHandlerQuery obj, P param) {
+  protected R visitFuncImplResponse(FuncImplResponse obj, P param) {
     return visitDefault(obj, param);
   }
 

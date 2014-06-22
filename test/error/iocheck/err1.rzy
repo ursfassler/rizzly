@@ -1,16 +1,13 @@
-// Error: query is not allowed to output
+// Error: response is not allowed to output
 
 component
   Err1
-    input
-      query():R{0,100};
-    
-    output
-      event();
+    response what():R{0,100};
+    signal   event();
       
-    implementation elementary
+  implementation elementary
     
-    function query():R{0,100}
+    response what():R{0,100}
       event();
       return 0;
     end

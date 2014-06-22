@@ -58,19 +58,17 @@ import evl.function.impl.FuncIfaceInRet;
 import evl.function.impl.FuncIfaceInVoid;
 import evl.function.impl.FuncIfaceOutRet;
 import evl.function.impl.FuncIfaceOutVoid;
-import evl.function.impl.FuncInputHandlerEvent;
-import evl.function.impl.FuncInputHandlerQuery;
+import evl.function.impl.FuncImplResponse;
+import evl.function.impl.FuncImplSlot;
 import evl.function.impl.FuncPrivateRet;
 import evl.function.impl.FuncPrivateVoid;
 import evl.function.impl.FuncProtoRet;
 import evl.function.impl.FuncProtoVoid;
 import evl.function.impl.FuncSubHandlerEvent;
 import evl.function.impl.FuncSubHandlerQuery;
-import evl.hfsm.HfsmQueryFunction;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.State;
 import evl.hfsm.StateComposite;
-import evl.hfsm.StateItem;
 import evl.hfsm.StateSimple;
 import evl.hfsm.Transition;
 import evl.other.CompUse;
@@ -163,8 +161,10 @@ public abstract class Traverser<R, P> {
       return visitNamedElement((NamedElement) obj, param);
     } else if (obj instanceof Connection) {
       return visitConnection((Connection) obj, param);
-    } else if (obj instanceof StateItem) {
-      return visitStateItem((StateItem) obj, param);
+    } else if (obj instanceof State) {
+      return visitState((State) obj, param);
+    } else if (obj instanceof Transition) {
+      return visitTransition((Transition) obj, param);
     } else if (obj instanceof CompUse) {
       return visitCompUse((CompUse) obj, param);
     } else if (obj instanceof Endpoint) {
@@ -243,18 +243,6 @@ public abstract class Traverser<R, P> {
     }
   }
 
-  protected R visitStateItem(StateItem obj, P param) {
-    if (obj instanceof State) {
-      return visitState((State) obj, param);
-    } else if (obj instanceof Transition) {
-      return visitTransition((Transition) obj, param);
-    } else if (obj instanceof HfsmQueryFunction) {
-      return visitHfsmQueryFunction((HfsmQueryFunction) obj, param);
-    } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
-    }
-  }
-
   protected R visitState(State obj, P param) {
     if (obj instanceof StateComposite) {
       return visitStateComposite((StateComposite) obj, param);
@@ -306,10 +294,10 @@ public abstract class Traverser<R, P> {
       return visitFuncPrivateRet((FuncPrivateRet) obj, param);
     } else if (obj instanceof FuncPrivateVoid) {
       return visitFuncPrivateVoid((FuncPrivateVoid) obj, param);
-    } else if (obj instanceof FuncInputHandlerQuery) {
-      return visitFuncInputHandlerQuery((FuncInputHandlerQuery) obj, param);
-    } else if (obj instanceof FuncInputHandlerEvent) {
-      return visitFuncInputHandlerEvent((FuncInputHandlerEvent) obj, param);
+    } else if (obj instanceof FuncImplResponse) {
+      return visitFuncImplResponse((FuncImplResponse) obj, param);
+    } else if (obj instanceof FuncImplSlot) {
+      return visitFuncImplSlot((FuncImplSlot) obj, param);
     } else if (obj instanceof FuncSubHandlerEvent) {
       return visitFuncSubHandlerEvent((FuncSubHandlerEvent) obj, param);
     } else if (obj instanceof FuncSubHandlerQuery) {
@@ -322,8 +310,6 @@ public abstract class Traverser<R, P> {
       return visitFuncIfaceOutRet((FuncIfaceOutRet) obj, param);
     } else if (obj instanceof FuncIfaceOutVoid) {
       return visitFuncIfaceOutVoid((FuncIfaceOutVoid) obj, param);
-    } else if (obj instanceof HfsmQueryFunction) {
-      return visitHfsmQueryFunction((HfsmQueryFunction) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -622,8 +608,6 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitImplElementary(ImplElementary obj, P param);
 
-  abstract protected R visitHfsmQueryFunction(HfsmQueryFunction obj, P param);
-
   abstract protected R visitTransition(Transition obj, P param);
 
   abstract protected R visitConnection(Connection obj, P param);
@@ -632,9 +616,9 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitFuncGlobal(FuncGlobal obj, P param);
 
-  abstract protected R visitFuncInputHandlerEvent(FuncInputHandlerEvent obj, P param);
+  abstract protected R visitFuncImplSlot(FuncImplSlot obj, P param);
 
-  abstract protected R visitFuncInputHandlerQuery(FuncInputHandlerQuery obj, P param);
+  abstract protected R visitFuncImplResponse(FuncImplResponse obj, P param);
 
   abstract protected R visitFuncSubHandlerQuery(FuncSubHandlerQuery obj, P param);
 

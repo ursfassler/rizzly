@@ -2,12 +2,8 @@
 
 component
   Hfsm
-
-  input
-    tick();
-  
-  output
-    evt( value: R{0,255} );
+    slot   tick();
+    signal evt( value: R{0,255} );
 
   implementation hfsm(A)
     transition 

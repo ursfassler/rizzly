@@ -1,8 +1,6 @@
 component
   StateVariable2
-
-  input
-    tick();
+    slot tick();
 
   implementation hfsm(A)
 

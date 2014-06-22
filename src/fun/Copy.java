@@ -30,9 +30,15 @@ import fun.function.FunctionFactory;
 import fun.function.FunctionHeader;
 import fun.function.impl.FuncEntryExit;
 import fun.function.impl.FuncGlobal;
+import fun.function.impl.FuncImplResponse;
+import fun.function.impl.FuncImplSlot;
 import fun.function.impl.FuncPrivateRet;
 import fun.function.impl.FuncPrivateVoid;
+import fun.function.impl.FuncProtQuery;
+import fun.function.impl.FuncProtResponse;
 import fun.function.impl.FuncProtRet;
+import fun.function.impl.FuncProtSignal;
+import fun.function.impl.FuncProtSlot;
 import fun.function.impl.FuncProtVoid;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.StateComposite;
@@ -254,8 +260,10 @@ class CopyFun extends Traverser<Fun, Void> {
   protected Fun visitImplHfsm(ImplHfsm obj, Void param) {
     ImplHfsm ret = new ImplHfsm(obj.getInfo(), obj.getName(), copy(obj.getTopstate()));
 
-    ret.getIface(Direction.in).addAll(copy(obj.getIface(Direction.in).getList()));
-    ret.getIface(Direction.out).addAll(copy(obj.getIface(Direction.out).getList()));
+    ret.getSignal().addAll(copy(obj.getSignal().getList()));
+    ret.getQuery().addAll(copy(obj.getQuery().getList()));
+    ret.getResponse().addAll(copy(obj.getResponse().getList()));
+    ret.getSlot().addAll(copy(obj.getSlot().getList()));
 
     return ret;
   }
@@ -264,8 +272,10 @@ class CopyFun extends Traverser<Fun, Void> {
   protected Fun visitImplComposition(ImplComposition obj, Void param) {
     ImplComposition ret = new ImplComposition(obj.getInfo(), obj.getName());
 
-    ret.getIface(Direction.in).addAll(copy(obj.getIface(Direction.in).getList()));
-    ret.getIface(Direction.out).addAll(copy(obj.getIface(Direction.out).getList()));
+    ret.getSignal().addAll(copy(obj.getSignal().getList()));
+    ret.getQuery().addAll(copy(obj.getQuery().getList()));
+    ret.getResponse().addAll(copy(obj.getResponse().getList()));
+    ret.getSlot().addAll(copy(obj.getSlot().getList()));
     ret.getConnection().addAll(copy(obj.getConnection()));
     ret.getComponent().addAll(copy(obj.getComponent().getList()));
 
@@ -276,8 +286,10 @@ class CopyFun extends Traverser<Fun, Void> {
   protected Fun visitImplElementary(ImplElementary obj, Void param) {
     ImplElementary ret = new ImplElementary(obj.getInfo(), obj.getName());
 
-    ret.getIface(Direction.in).addAll(copy(obj.getIface(Direction.in).getList()));
-    ret.getIface(Direction.out).addAll(copy(obj.getIface(Direction.out).getList()));
+    ret.getSignal().addAll(copy(obj.getSignal().getList()));
+    ret.getQuery().addAll(copy(obj.getQuery().getList()));
+    ret.getResponse().addAll(copy(obj.getResponse().getList()));
+    ret.getSlot().addAll(copy(obj.getSlot().getList()));
     ret.getVariable().addAll(copy(obj.getVariable().getList()));
     ret.getConstant().addAll(copy(obj.getConstant().getList()));
     ret.getFunction().addAll(copy(obj.getFunction().getList()));
@@ -537,6 +549,36 @@ class CopyFun extends Traverser<Fun, Void> {
 
   @Override
   protected Fun visitNamedElementValue(NamedElementValue obj, Void param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Fun visitFuncProtSlot(FuncProtSlot obj, Void param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Fun visitFuncProtSignal(FuncProtSignal obj, Void param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Fun visitFuncProtQuery(FuncProtQuery obj, Void param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Fun visitFuncProtResponse(FuncProtResponse obj, Void param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Fun visitFuncImplResponse(FuncImplResponse obj, Void param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Fun visitFuncImplSlot(FuncImplSlot obj, Void param) {
     throw new RuntimeException("not yet implemented");
   }
 

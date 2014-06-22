@@ -20,14 +20,13 @@ end
 
 component
   ConstInit3
-    input
-      get( idx: R{0,10} ):R{0,1000*1000};
+    response get( idx: R{0,10} ):R{0,1000*1000};
       
   implementation elementary
     const
       Fib = fibArray{10}();
       
-    function get( idx: R{0,10} ):R{0,1000*1000}
+    response get( idx: R{0,10} ):R{0,1000*1000}
       return Fib[idx];
     end
   end      

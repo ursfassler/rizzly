@@ -1,11 +1,8 @@
 component
   TransScope
-    input
-      inp();
-      
-    output
-      outA();
-      outB();
+    slot   inp();
+    signal outA();
+    signal outB();
     
   implementation hfsm( A )
     var

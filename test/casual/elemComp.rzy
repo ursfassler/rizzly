@@ -1,8 +1,7 @@
 
 component
   Sub{Init,Deinit:R{0,100}}
-    input
-      get():R{0,100};
+    response get():R{0,100};
       
   implementation elementary
     var
@@ -16,18 +15,17 @@ component
       value := Deinit;
     end
     
-    function get():R{0,100}
+    response get():R{0,100}
       return value;
     end
   end
 
   ElemComp
-    input
-      val1():R{0,100};
-      val2():R{0,100};
-      val3():R{0,100};
-      val4():R{0,100};
-      val5():R{0,100};
+    response val1():R{0,100};
+    response val2():R{0,100};
+    response val3():R{0,100};
+    response val4():R{0,100};
+    response val5():R{0,100};
       
   implementation composition
     component

@@ -12,15 +12,14 @@ import error.RError;
 import evl.Evl;
 import evl.composition.ImplComposition;
 import evl.function.impl.FuncGlobal;
-import evl.function.impl.FuncInputHandlerEvent;
-import evl.function.impl.FuncInputHandlerQuery;
+import evl.function.impl.FuncImplResponse;
+import evl.function.impl.FuncImplSlot;
 import evl.function.impl.FuncPrivateRet;
 import evl.function.impl.FuncPrivateVoid;
 import evl.function.impl.FuncProtoRet;
 import evl.function.impl.FuncProtoVoid;
 import evl.function.impl.FuncSubHandlerEvent;
 import evl.function.impl.FuncSubHandlerQuery;
-import evl.hfsm.HfsmQueryFunction;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.StateComposite;
 import evl.hfsm.StateSimple;
@@ -72,8 +71,8 @@ public class KnowScope extends KnowledgeEntry {
     priv.add(ConstPrivate.class);
     priv.add(FuncPrivateRet.class);
     priv.add(FuncPrivateVoid.class);
-    priv.add(FuncInputHandlerQuery.class); // TODO: sure?
-    priv.add(FuncInputHandlerEvent.class); // TODO: sure?
+    priv.add(FuncImplResponse.class); // TODO: sure?
+    priv.add(FuncImplSlot.class); // TODO: sure?
     priv.add(FuncSubHandlerQuery.class); // TODO: sure?
     priv.add(FuncSubHandlerEvent.class); // TODO: sure?
     priv.add(FuncProtoRet.class);
@@ -81,7 +80,6 @@ public class KnowScope extends KnowledgeEntry {
     priv.add(StateComposite.class);
     priv.add(StateSimple.class);
     priv.add(Transition.class);
-    priv.add(HfsmQueryFunction.class); // TODO: sure?
 
     local.add(FuncVariable.class);
 

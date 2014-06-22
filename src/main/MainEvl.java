@@ -359,24 +359,8 @@ public class MainEvl {
    */
   private static void checkUsefullness(Namespace aclasses) {
     for (Component comp : ClassGetter.get(Component.class, aclasses)) {
-      boolean in = false;
-      boolean out = false;
-      List<FuncIfaceOut> outFunc = comp.getOutput().getList();
-      List<FuncIfaceIn> inFunc = comp.getInput().getList();
-      for (FunctionHeader itr : inFunc) {
-        if (itr instanceof FuncWithReturn) {
-          out = true;
-        } else {
-          in = true;
-        }
-      }
-      for (FunctionHeader itr : outFunc) {
-        if (itr instanceof FuncWithReturn) {
-          in = true;
-        } else {
-          out = true;
-        }
-      }
+      boolean in = !comp.getSlot().isEmpty() || !comp.getQuery().isEmpty();
+      boolean out = !comp.getSignal().isEmpty() || !comp.getResponse().isEmpty();
       if (!in && !out) {
         RError.err(ErrorType.Warning, comp.getInfo(), "Component " + comp.getName() + " has no input and no output data flow");
       }
@@ -398,10 +382,11 @@ public class MainEvl {
    * @param rootdir
    */
   private static void checkRoot(Component root, String rootdir) {
-    for (FunctionHeader func : root.getOutput()) {
-      if (func instanceof FuncWithReturn) {
-        RError.err(ErrorType.Error, func.getInfo(), "Top component is not allowed to have queries in output (" + func.getName() + "." + func.getName() + ")");
-      }
+    for (FuncIfaceOut func : root.getQuery()) {
+      RError.err(ErrorType.Hint, func.getInfo(), func.getName());
+    }
+    if (!root.getQuery().isEmpty()) {
+      RError.err(ErrorType.Error, root.getInfo(), "Top component is not allowed to have queries in output");
     }
   }
 
@@ -484,7 +469,12 @@ public class MainEvl {
     PrettyPrinter.print(classes, rootdir + "instance.rzy", true);
     {
       Namespace root = classes.forcePath(new Designator("!env", "inst"));
-      for (FuncIfaceIn funcProto : top.getInput()) {
+      for (FuncIfaceIn funcProto : top.getSlot()) {
+        FunctionHeader impl = (FunctionHeader) root.findItem(funcProto.getName());
+        assert (impl != null);
+        impl.setAttribute(FuncAttr.Public);
+      }
+      for (FuncIfaceIn funcProto : top.getResponse()) {
         FunctionHeader impl = (FunctionHeader) root.findItem(funcProto.getName());
         assert (impl != null);
         impl.setAttribute(FuncAttr.Public);
@@ -548,8 +538,10 @@ public class MainEvl {
 
     env.getComponent().add(new CompUse(info, instname, top));
 
-    ListOfNamed<FunctionHeader> outprot = addOutIfaceFunc(top.getOutput(), kb);
-    for (FunctionHeader func : outprot) {
+    for (FunctionHeader func : addOutIfaceFunc(top.getSignal(), kb)) {
+      env.addSubCallback(instname, func);
+    }
+    for (FunctionHeader func : addOutIfaceFunc(top.getQuery(), kb)) {
       env.addSubCallback(instname, func);
     }
 
@@ -588,7 +580,7 @@ public class MainEvl {
     removeUnused(classes, g.vertexSet());
   }
 
-  private static ListOfNamed<FunctionHeader> addOutIfaceFunc(ListOfNamed<FuncIfaceOut> listOfNamed, KnowledgeBase kb) {
+  private static ListOfNamed<FunctionHeader> addOutIfaceFunc(ListOfNamed<? extends FuncIfaceOut> listOfNamed, KnowledgeBase kb) {
     ListOfNamed<FunctionHeader> ret = new ListOfNamed<FunctionHeader>();
 
     for (FunctionHeader func : listOfNamed) {

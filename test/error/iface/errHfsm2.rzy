@@ -1,10 +1,9 @@
 component
   ErrHfsm2
-    input
-      funcA();
-      funcB();
+    slot funcA();
+    slot funcB();
 
-    implementation hfsm( One )
+  implementation hfsm( One )
     
     state One
     end

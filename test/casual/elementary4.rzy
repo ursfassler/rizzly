@@ -2,12 +2,8 @@
 
 component
   Elementary4
-
-  input
-    evtIn( value: R{0,255} );
-    
-  output
-    evtOut( value: R{0,255} );
+    slot   evtIn( value: R{0,255} );
+    signal evtOut( value: R{0,255} );
 
   implementation elementary
 
@@ -15,7 +11,7 @@ component
       return v*v mod 201;
     end
 
-    function evtIn( value: R{0,255} )
+    slot evtIn( value: R{0,255} )
       evtOut( sqr( value mod 201 ) );
     end
   end

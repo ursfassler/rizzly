@@ -1,12 +1,11 @@
 
 component
   Convert1
-    input
-      ind( x: R{0,20} ):R{0,10};
+    response ind( x: R{0,20} ):R{0,10};
     
     implementation elementary
     
-    function ind( x: R{0,20} ):R{0,10}
+    response ind( x: R{0,20} ):R{0,10}
       return R{0,10}( x );
     end
 

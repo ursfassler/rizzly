@@ -16,7 +16,7 @@ import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
 import evl.function.FunctionBase;
 import evl.function.impl.FuncIfaceInVoid;
-import evl.function.impl.FuncInputHandlerEvent;
+import evl.function.impl.FuncImplSlot;
 import evl.hfsm.ImplHfsm;
 import evl.other.CompUse;
 import evl.other.ImplElementary;
@@ -77,15 +77,15 @@ public class SystemIfaceAdder extends NullTraverser<Void, Void> {
     { // add iface
       FuncIfaceInVoid recv = Copy.copy(recvFunc);
       FuncIfaceInVoid send = Copy.copy(sendFunc);
-      obj.getInput().add(recv);
-      obj.getInput().add(send);
+      obj.getSlot().add(recv);
+      obj.getSlot().add(send);
     }
 
     ArrayList<CompUse> compList = new ArrayList<CompUse>(obj.getComponent().getList());
     // FIXME this order may cause errors as it is not granted to be topological order
 
-    FuncInputHandlerEvent ctor = makeFunc(CONSTRUCT);
-    FuncInputHandlerEvent dtor = makeFunc(DESTRUCT);
+    FuncImplSlot ctor = makeFunc(CONSTRUCT);
+    FuncImplSlot dtor = makeFunc(DESTRUCT);
 
     {
       ArrayList<Statement> code = new ArrayList<Statement>();
@@ -124,8 +124,8 @@ public class SystemIfaceAdder extends NullTraverser<Void, Void> {
     return new CallStmt(info, call);
   }
 
-  private FuncInputHandlerEvent makeFunc(String funcname) {
-    FuncInputHandlerEvent rfunc = new FuncInputHandlerEvent(info, funcname, new ListOfNamed<FuncVariable>());
+  private FuncImplSlot makeFunc(String funcname) {
+    FuncImplSlot rfunc = new FuncImplSlot(info, funcname, new ListOfNamed<FuncVariable>());
     Block body = new Block(info);
     rfunc.setBody(body);
     return rfunc;

@@ -1,17 +1,16 @@
-// Error: query is not allowed to write state
+// Error: response is not allowed to write state
 
 component
   Err4
-    input
-      query():R{0,100};
+    response what():R{0,100};
     
-    implementation hfsm(A)
+  implementation hfsm(A)
     
     var
       a : R{0,100} = 0;
     
     state A
-      function query():R{0,100}
+      response what():R{0,100}
         a := 42;
         return 0;
       end

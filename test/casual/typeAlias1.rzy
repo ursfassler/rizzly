@@ -4,15 +4,14 @@ type
   
 component
   TypeAlias1
-    input
-      ind();
+    slot ind();
   
-    implementation elementary
+  implementation elementary
 
     var
       a : Unsigned{R{0,255}} = 0;
       
-    function ind()
+    slot ind()
       a := 0;
     end
     

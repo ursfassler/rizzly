@@ -6,14 +6,13 @@ end
 
 component
   ConstInit4
-    input
-      get():R{0,1000};
+    response get():R{0,1000};
       
   implementation elementary
     const
       K = tuwas{23}( 42 );
       
-    function get():R{0,1000}
+    response get():R{0,1000}
       return K;
     end
   end      

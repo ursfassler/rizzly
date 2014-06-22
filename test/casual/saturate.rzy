@@ -1,12 +1,11 @@
 
 component
   Saturate
-    input
-      tack( x: R{0,20} ):R{0,10};
+    response tack( x: R{0,20} ):R{0,10};
     
-    implementation elementary
+  implementation elementary
     
-    function tack( x: R{0,20} ):R{0,10}
+    response tack( x: R{0,20} ):R{0,10}
       if x > 10 then
         x := 10;
       end

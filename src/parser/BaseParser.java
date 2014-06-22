@@ -3,6 +3,7 @@ package parser;
 import java.util.ArrayList;
 import java.util.List;
 
+import common.ElementInfo;
 import common.Metadata;
 
 import error.ErrorType;
@@ -12,12 +13,22 @@ import fun.expression.AnyValue;
 import fun.expression.Expression;
 import fun.expression.reference.Reference;
 import fun.function.FuncWithBody;
+import fun.function.FuncWithReturn;
+import fun.function.FunctionFactory;
 import fun.function.FunctionHeader;
 import fun.function.impl.FuncGlobal;
+import fun.function.impl.FuncImplResponse;
+import fun.function.impl.FuncImplSlot;
+import fun.function.impl.FuncInterrupt;
 import fun.function.impl.FuncPrivateRet;
 import fun.function.impl.FuncPrivateVoid;
+import fun.function.impl.FuncProtQuery;
+import fun.function.impl.FuncProtResponse;
 import fun.function.impl.FuncProtRet;
+import fun.function.impl.FuncProtSignal;
+import fun.function.impl.FuncProtSlot;
 import fun.function.impl.FuncProtVoid;
+import fun.other.ListOfNamed;
 import fun.type.base.AnyType;
 import fun.variable.Constant;
 import fun.variable.FuncVariable;
@@ -47,33 +58,53 @@ public class BaseParser extends Parser {
     return new ExpressionParser(getScanner());
   }
 
-  // EBNF funcDefList: funcDef { funcDef }
-  protected List<FunctionHeader> parseFunctionDefList() {
-    List<FunctionHeader> res = new ArrayList<FunctionHeader>();
-    do {
-      res.add(parseFunctionDef());
-    } while (peek().getType() == TokenType.IDENTIFIER);
-    return res;
-  }
-
-  // EBNF fileUseList: vardef ";" { vardef ";" }
-  protected <T extends Variable> List<T> parseFileUseList(Class<T> kind) {
-    List<T> res = new ArrayList<T>();
-    do {
-      List<T> vardefs = stmt().parseVarDef(kind, InitType.NoInit);
-      expect(TokenType.SEMI);
-
-      ArrayList<Metadata> meta = getMetadata();
-      for (T var : vardefs) {
-        var.getInfo().getMetadata().addAll(meta);
+  // EBNF compIfaceList: ( queryHeader | responseHeader | signalHeader | slotHeader ) ";"
+  // EBNF queryHeader: "query" id vardeflist ":" typeref
+  // EBNF responseHeader: "response" id vardeflist ":" typeref
+  // EBNF signalHeader: "signal" id vardeflist
+  // EBNF slotHeader: "slot" id vardeflist
+  protected void parseCompIfaceList(ListOfNamed<FuncProtQuery> query, ListOfNamed<FuncProtResponse> response, ListOfNamed<FuncProtSignal> signal, ListOfNamed<FuncProtSlot> slot) {
+    while (true) {
+      switch (peek().getType()) {
+      case QUERY:
+        query.add(parseIfaceHeader(FuncProtQuery.class, TokenType.QUERY, true));
+        break;
+      case RESPONSE:
+        response.add(parseIfaceHeader(FuncProtResponse.class, TokenType.RESPONSE, true));
+        break;
+      case SIGNAL:
+        signal.add(parseIfaceHeader(FuncProtSignal.class, TokenType.SIGNAL, false));
+        break;
+      case SLOT:
+        slot.add(parseIfaceHeader(FuncProtSlot.class, TokenType.SLOT, false));
+        break;
+      default:
+        return;
       }
-
-      res.addAll(vardefs);
-    } while (peek().getType() == TokenType.IDENTIFIER);
-    return res;
+      expect(TokenType.SEMI);
+    }
   }
 
-  // EBNF funcDef: id vardeflist [ ":" typeref ] ";"
+  protected <T extends FunctionHeader> T parseIfaceHeader(Class<T> cl, TokenType type, boolean retarg) {
+    ElementInfo info = expect(type).getInfo();
+    String name = expect(TokenType.IDENTIFIER).getData();
+
+    List<FuncVariable> varlist = parseVardefList();
+
+    T func = FunctionFactory.create(cl, info);
+    if (retarg) {
+      expect(TokenType.COLON);
+      Reference ref = expr().parseRef();
+      ((FuncWithReturn) func).setRet(ref);
+    }
+
+    func.setName(name);
+    func.getParam().addAll(varlist);
+
+    return func;
+  }
+
+  // EBNF funcDef: ( "query" | "response" | "signal" | "slot" ) id vardeflist [ ":" typeref ] ";"
   protected FunctionHeader parseFunctionDef() {
     Token tok = expect(TokenType.IDENTIFIER);
 
@@ -95,6 +126,23 @@ public class BaseParser extends Parser {
     func.getParam().addAll(varlist);
 
     return func;
+  }
+
+  // EBNF fileUseList: vardef ";" { vardef ";" }
+  protected <T extends Variable> List<T> parseFileUseList(Class<T> kind) {
+    List<T> res = new ArrayList<T>();
+    do {
+      List<T> vardefs = stmt().parseVarDef(kind, InitType.NoInit);
+      expect(TokenType.SEMI);
+
+      ArrayList<Metadata> meta = getMetadata();
+      for (T var : vardefs) {
+        var.getInfo().getMetadata().addAll(meta);
+      }
+
+      res.addAll(vardefs);
+    } while (peek().getType() == TokenType.IDENTIFIER);
+    return res;
   }
 
   // EBNF constDefBlock: "const" constdef { constdef }
@@ -130,21 +178,47 @@ public class BaseParser extends Parser {
 
   // TODO can we merge it with another function parser?
   // EBNF privateFunction: "function" id vardeflist [ ":" typeref ] block "end"
-  protected FunctionHeader parsePrivateFunction() {
-    Token tok = expect(TokenType.FUNCTION);
+  protected FunctionHeader parsePrivateFunction(TokenType type) {
+    Token tok = expect(type);
 
     Token name = expect(TokenType.IDENTIFIER);
 
-    List<FuncVariable> varlist = parseVardefList();
+    List<FuncVariable> varlist;
 
     FunctionHeader func;
-    if (consumeIfEqual(TokenType.COLON)) {
-      FuncPrivateRet rfunc = new FuncPrivateRet(tok.getInfo());
+    switch (type) {
+    case FUNCTION:
+      varlist = parseVardefList();
+      if (consumeIfEqual(TokenType.COLON)) {
+        FuncPrivateRet rfunc = new FuncPrivateRet(tok.getInfo());
+        Reference ref = expr().parseRef();
+        rfunc.setRet(ref);
+        func = rfunc;
+      } else {
+        func = new FuncPrivateVoid(tok.getInfo());
+      }
+      break;
+    case RESPONSE:
+      varlist = parseVardefList();
+      expect(TokenType.COLON);
+      FuncImplResponse rfunc = new FuncImplResponse(tok.getInfo());
       Reference ref = expr().parseRef();
       rfunc.setRet(ref);
       func = rfunc;
-    } else {
-      func = new FuncPrivateVoid(tok.getInfo());
+      break;
+    case SLOT:
+      varlist = parseVardefList();
+      func = new FuncImplSlot(tok.getInfo());
+      break;
+    case INTERRUPT:
+      varlist = new ArrayList<FuncVariable>();
+      expect(TokenType.OPENPAREN);
+      expect(TokenType.CLOSEPAREN);
+      func = new FuncInterrupt(tok.getInfo());
+      break;
+    default:
+      RError.err(ErrorType.Fatal, tok.getInfo(), "Unhandled function type: " + type.name());
+      return null;
     }
 
     func.setName(name.getData());

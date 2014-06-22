@@ -11,7 +11,6 @@ import fun.expression.BoolValue;
 import fun.expression.Expression;
 import fun.expression.reference.RefName;
 import fun.expression.reference.Reference;
-import fun.function.FunctionHeader;
 import fun.function.impl.FuncEntryExit;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.State;
@@ -62,9 +61,9 @@ public class ImplHfsmParser extends ImplBaseParser {
       case VAR:
         state.getVariable().addAll(parseVarDefBlock(StateVariable.class));
         break;
+      case RESPONSE:
       case FUNCTION:
-        FunctionHeader func = parsePrivateFunction();
-        state.getItemList().add(func);
+        state.getItemList().add(parsePrivateFunction(peek().getType()));
         break;
       case TRANSITION:
         state.getItemList().addAll(parseTransitionDecl());

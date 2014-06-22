@@ -2,11 +2,8 @@
 
 component
   Dummy
-    input
-      inp();
-      
-    output
-      out();
+    slot   inp();
+    signal out();
       
   implementation elementary
     function inp()
@@ -15,11 +12,8 @@ component
   end
 
   Con2
-    input
-      inp();
-      
-    output
-      out();
+    slot   inp();
+    signal out();
       
   implementation composition
     component

@@ -1,14 +1,11 @@
 component
   ArrayTest4
-    input
-      inp( x: Array{10,R{0,31}} );
-      
-    output
-      out( x: Array{10,R{0,31}} );
+    slot   inp( x: Array{10,R{0,31}} );
+    signal out( x: Array{10,R{0,31}} );
       
   implementation elementary
 
-    function inp( x: Array{10,R{0,31}} )
+    slot inp( x: Array{10,R{0,31}} )
       out( x );
     end
 

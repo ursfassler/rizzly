@@ -4,16 +4,13 @@ const
 
 component
   Stringt
-    input
-      inp( value: String );
-    
-    output
-      out1( value: String );
-      out2( value: String );
+    slot   inp( value: String );
+    signal out1( value: String );
+    signal out2( value: String );
 
-    implementation elementary
+  implementation elementary
 
-    function inp( value: String )
+    slot inp( value: String )
       out1( value );
       out2( Name );
     end

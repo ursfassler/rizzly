@@ -90,7 +90,8 @@ public class CompInterfaceTypeChecker extends NullTraverser<Void, Void> {
   protected Void visitImplElementary(ImplElementary obj, Void param) {
     assert (obj.getComponent().isEmpty());
     assert (obj.getSubCallback().isEmpty());
-    checkInput(obj.getInput(), obj.getFunction());
+    checkInput(obj.getResponse(), obj.getFunction());
+    checkInput(obj.getSlot(), obj.getFunction());
     return null;
   }
 
@@ -99,7 +100,7 @@ public class CompInterfaceTypeChecker extends NullTraverser<Void, Void> {
     return null;
   }
 
-  private void checkInput(ListOfNamed<FuncIfaceIn> listOfNamed, ListOfNamed<FunctionHeader> inputFunc) {
+  private void checkInput(ListOfNamed<? extends FuncIfaceIn> listOfNamed, ListOfNamed<FunctionHeader> inputFunc) {
     for (FuncIfaceIn proto : listOfNamed) {
       FunctionHeader impl = inputFunc.find(proto.getName());
       if (impl == null) {

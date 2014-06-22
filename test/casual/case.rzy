@@ -1,15 +1,11 @@
 component
   Case
+    slot   ind( data: R{0,100} );
+    signal out( data: R{0,100} );
 
-    input
-      ind( data: R{0,100} );
+  implementation elementary
 
-    output
-      out( data: R{0,100} );
-
-    implementation elementary
-
-    function ind( x: R{0,100} )
+    slot ind( x: R{0,100} )
       case x of
         0:
           out( 2 );

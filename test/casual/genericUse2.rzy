@@ -1,27 +1,25 @@
 component
   GenericDef{T:Type{Integer}}
-    input
-      set( item: T );
-      get():T;
+    slot     set( item: T );
+    response get():T;
 
-    implementation elementary
+  implementation elementary
 
     var
       data: T = 0;
 
-    function set( item: T )
+    slot set( item: T )
       data := item;
     end
 
-    function get():T
+    response get():T
       return data;
     end
   end
 
   GenericUse2
-    input
-      set( x: R{0,255} );
-      get():R{0,255};
+    slot     set( x: R{0,255} );
+    response get():R{0,255};
     
   implementation composition
     component

@@ -34,10 +34,7 @@ public class EndpointSub extends Endpoint {
 
   @Override
   public FuncIface getIfaceUse() {
-    FuncIface ret = comp.getLink().getInput().find(iface);
-    if (ret == null) {
-      ret = comp.getLink().getOutput().find(iface);
-    }
+    FuncIface ret = comp.getLink().getIface().find(iface);
     assert (ret != null);
     return ret;
   }

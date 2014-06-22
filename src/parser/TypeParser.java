@@ -3,14 +3,16 @@ package parser;
 import java.util.ArrayList;
 import java.util.List;
 
-import common.Direction;
-
 import error.ErrorType;
 import error.RError;
 import fun.Copy;
 import fun.expression.reference.Reference;
-import fun.function.FunctionHeader;
+import fun.function.impl.FuncProtQuery;
+import fun.function.impl.FuncProtResponse;
+import fun.function.impl.FuncProtSignal;
+import fun.function.impl.FuncProtSlot;
 import fun.other.Component;
+import fun.other.ListOfNamed;
 import fun.type.Type;
 import fun.type.TypeGenerator;
 import fun.type.base.EnumElement;
@@ -63,23 +65,21 @@ public class TypeParser extends BaseParser {
     return type;
   }
 
-  // EBNF component: [ "input" funcDefList ] [ "output" funcDefList ] componentImplementation "end"
+  // EBNF component: compIfaceList componentImplementation "end"
   private Component parseComponent(Token name) {
-    List<FunctionHeader> in = new ArrayList<FunctionHeader>();
-    List<FunctionHeader> out = new ArrayList<FunctionHeader>();
+    ListOfNamed<FuncProtResponse> response = new ListOfNamed<FuncProtResponse>();
+    ListOfNamed<FuncProtQuery> query = new ListOfNamed<FuncProtQuery>();
+    ListOfNamed<FuncProtSignal> signal = new ListOfNamed<FuncProtSignal>();
+    ListOfNamed<FuncProtSlot> slot = new ListOfNamed<FuncProtSlot>();
 
-    if (consumeIfEqual(TokenType.INPUT)) {
-      in = parseFunctionDefList();
-    }
-
-    if (consumeIfEqual(TokenType.OUTPUT)) {
-      out = parseFunctionDefList();
-    }
+    parseCompIfaceList(query, response, signal, slot);
 
     Component iface = parseComponentImplementation(name);
 
-    iface.getIface(Direction.in).addAll(in);
-    iface.getIface(Direction.out).addAll(out);
+    iface.getResponse().addAll(response);
+    iface.getQuery().addAll(query);
+    iface.getSignal().addAll(signal);
+    iface.getSlot().addAll(slot);
 
     expect(TokenType.END);
 

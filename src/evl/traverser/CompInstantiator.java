@@ -62,7 +62,8 @@ public class CompInstantiator extends NullTraverser<ImplElementary, Designator> 
 
       SubCallbacks clist = new SubCallbacks(new ElementInfo(), compUse.getName());
       ifaceUsed.add(clist);
-      clist.addAll(comp.getOutput().getList());
+      clist.addAll(comp.getSignal().getList());
+      clist.addAll(comp.getQuery().getList());
 
       Namespace compSpace = ns.findSpace(compUse.getName());
       assert (compSpace != null);

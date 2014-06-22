@@ -29,8 +29,8 @@ import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
 import evl.function.FunctionHeader;
-import evl.function.impl.FuncInputHandlerEvent;
-import evl.function.impl.FuncInputHandlerQuery;
+import evl.function.impl.FuncImplResponse;
+import evl.function.impl.FuncImplSlot;
 import evl.function.impl.FuncPrivateVoid;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowPath;
@@ -163,7 +163,7 @@ public class QueueReduction {
       classes.add(qc);
 
       // function to return number of elements in queue
-      FuncInputHandlerQuery sizefunc = new FuncInputHandlerQuery(info, prefix + "count", new ListOfNamed<FuncVariable>());
+      FuncImplResponse sizefunc = new FuncImplResponse(info, prefix + "count", new ListOfNamed<FuncVariable>());
       sizefunc.setAttribute(FuncAttr.Public);
       sizefunc.setRet(qc.getType().copy());
       Block sfb = new Block(info);
@@ -173,7 +173,7 @@ public class QueueReduction {
 
       // create dispatch function
 
-      FuncInputHandlerEvent dispatcher = new FuncInputHandlerEvent(info, prefix + "dispatch", new ListOfNamed<FuncVariable>());
+      FuncImplSlot dispatcher = new FuncImplSlot(info, prefix + "dispatch", new ListOfNamed<FuncVariable>());
       dispatcher.setAttribute(FuncAttr.Public);
       Block body = createDispatchBody(funem, funrec, elements, qv, qh, qc);
       dispatcher.setBody(body);

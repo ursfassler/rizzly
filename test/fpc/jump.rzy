@@ -2,12 +2,8 @@
 
 component
   Jump
-
-  input
-    inp();
-  
-  output
-    out();
+    slot   inp();
+    signal out();
     
   implementation hfsm(A)
     state A(X)

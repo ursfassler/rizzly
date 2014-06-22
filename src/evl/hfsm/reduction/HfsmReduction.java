@@ -19,14 +19,13 @@ import evl.expression.Expression;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.Reference;
 import evl.function.FuncIfaceIn;
-import evl.function.FuncWithBody;
-import evl.function.FuncWithReturn;
 import evl.function.FunctionBase;
-import evl.function.impl.FuncInputHandlerEvent;
-import evl.function.impl.FuncInputHandlerQuery;
+import evl.function.impl.FuncIfaceInRet;
+import evl.function.impl.FuncIfaceInVoid;
+import evl.function.impl.FuncImplResponse;
+import evl.function.impl.FuncImplSlot;
 import evl.function.impl.FuncPrivateVoid;
 import evl.function.impl.FuncProtoVoid;
-import evl.hfsm.HfsmQueryFunction;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.State;
 import evl.hfsm.StateComposite;
@@ -93,8 +92,10 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
   @Override
   protected Named visitImplHfsm(ImplHfsm obj, Namespace param) {
     ImplElementary elem = new ImplElementary(obj.getInfo(), obj.getName());
-    elem.getInput().addAll(obj.getInput());
-    elem.getOutput().addAll(obj.getOutput());
+    elem.getResponse().addAll(obj.getResponse());
+    elem.getQuery().addAll(obj.getQuery());
+    elem.getSignal().addAll(obj.getSignal());
+    elem.getSlot().addAll(obj.getSlot());
     elem.getVariable().addAll(obj.getTopstate().getVariable());
     elem.getFunction().addAll(obj.getTopstate().getFunction());
 
@@ -110,26 +111,27 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
     dict.traverse(obj.getTopstate(), null);
 
     // create event handler
-    for (FuncIfaceIn header : elem.getInput()) {
-      FuncIfaceIn ptoto = Copy.copy(header);
-      FunctionBase func;
-      if (ptoto instanceof FuncWithReturn) {
-        func = new FuncInputHandlerQuery(obj.getInfo(), header.getName(), ptoto.getParam());
-        ((FuncWithReturn) func).setRet(((FuncWithReturn) ptoto).getRet());
-      } else {
-        func = new FuncInputHandlerEvent(obj.getInfo(), header.getName(), ptoto.getParam());
-      }
+    for (FuncIfaceInRet header : elem.getResponse()) {
+      FuncIfaceInRet ptoto = Copy.copy(header);
+      FuncImplResponse func = new FuncImplResponse(obj.getInfo(), header.getName(), ptoto.getParam());
+      func.setRet(ptoto.getRet());
       elem.getFunction().add(func);
 
-      Statement code;
-      if (func instanceof FuncWithReturn) {
-        code = addQueryCode(enumMap.keySet(), enumMap, states, stateVariable, (FuncInputHandlerQuery) func, func.getParam().getList());
-      } else {
-        code = addTransitionCode(enumMap.keySet(), enumMap, states, stateVariable, func.getName(), dict, func.getParam().getList());
-      }
+      Statement code = addQueryCode(enumMap.keySet(), enumMap, states, stateVariable, func, func.getParam().getList());
       Block bbl = new Block(info);
       bbl.getStatements().add(code);
-      ((FuncWithBody) func).setBody(bbl);
+      func.setBody(bbl);
+    }
+
+    for (FuncIfaceInVoid header : elem.getSlot()) {
+      FuncIfaceIn ptoto = Copy.copy(header);
+      FuncImplSlot func = new FuncImplSlot(obj.getInfo(), header.getName(), ptoto.getParam());
+      elem.getFunction().add(func);
+
+      Statement code = addTransitionCode(enumMap.keySet(), enumMap, states, stateVariable, func.getName(), dict, func.getParam().getList());
+      Block bbl = new Block(info);
+      bbl.getStatements().add(code);
+      func.setBody(bbl);
     }
 
     {
@@ -226,12 +228,12 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
     return ret;
   }
 
-  private CaseStmt addQueryCode(Collection<StateSimple> leafes, HashMap<StateSimple, EnumElement> enumMap, EnumType enumType, StateVariable stateVariable, FuncInputHandlerQuery func, List<FuncVariable> param) {
+  private CaseStmt addQueryCode(Collection<StateSimple> leafes, HashMap<StateSimple, EnumElement> enumMap, EnumType enumType, StateVariable stateVariable, FuncImplResponse func, List<FuncVariable> param) {
     List<CaseOpt> copt = new ArrayList<CaseOpt>();
 
     for (State state : leafes) {
 
-      HfsmQueryFunction query = getQuery(state, func.getName());
+      FuncImplResponse query = getQuery(state, func.getName());
 
       // from QueryDownPropagator
       assert (query.getBody().getStatements().size() == 1);
@@ -251,13 +253,13 @@ public class HfsmReduction extends NullTraverser<Named, Namespace> {
     return caseStmt;
   }
 
-  static private HfsmQueryFunction getQuery(State state, String funcName) {
-    for (HfsmQueryFunction itr : state.getItemList(HfsmQueryFunction.class)) {
+  static private FuncImplResponse getQuery(State state, String funcName) {
+    for (FuncImplResponse itr : state.getItemList(FuncImplResponse.class)) {
       if (itr.getName().equals(funcName)) {
         return itr;
       }
     }
-    RError.err(ErrorType.Fatal, state.getInfo(), "Query not found: " + funcName);
+    RError.err(ErrorType.Fatal, state.getInfo(), "Response not found: " + funcName);
     return null;
   }
 

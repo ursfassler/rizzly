@@ -2,13 +2,10 @@
 
 component
   Err7
-    input
-      inp();
+    slot   inp();
+    signal out();
     
-    output
-      out();
-    
-    implementation hfsm(A)
+  implementation hfsm(A)
     
     function foo():Boolean
       out();

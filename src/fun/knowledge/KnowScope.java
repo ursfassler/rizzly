@@ -14,7 +14,11 @@ import fun.function.impl.FuncEntryExit;
 import fun.function.impl.FuncGlobal;
 import fun.function.impl.FuncPrivateRet;
 import fun.function.impl.FuncPrivateVoid;
+import fun.function.impl.FuncProtQuery;
+import fun.function.impl.FuncProtResponse;
 import fun.function.impl.FuncProtRet;
+import fun.function.impl.FuncProtSignal;
+import fun.function.impl.FuncProtSlot;
 import fun.function.impl.FuncProtVoid;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.StateComposite;
@@ -95,6 +99,10 @@ public class KnowScope extends KnowledgeEntry {
     priv.add(FuncPrivateRet.class);
     priv.add(FuncProtVoid.class); // TODO: sure?
     priv.add(FuncProtRet.class); // TODO: sure?
+    priv.add(FuncProtResponse.class); // TODO: sure?
+    priv.add(FuncProtQuery.class); // TODO: sure?
+    priv.add(FuncProtSignal.class); // TODO: sure?
+    priv.add(FuncProtSlot.class); // TODO: sure?
 
     {
       @SuppressWarnings("rawtypes")

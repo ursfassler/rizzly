@@ -6,16 +6,12 @@ type
 
 component
   While
+    response ind( x: R{0,255} ):Point;
+    query    out( x: R{0,255} ):Point;
 
-    input
-      ind( x: R{0,255} ):Point;
+  implementation elementary
 
-    output
-      out( x: R{0,255} ):Point;
-
-    implementation elementary
-
-    function ind( x: R{0,255} ):Point
+    response ind( x: R{0,255} ):Point
       ret : Point;
       ret.x := 0;
       ret.y := 0;
