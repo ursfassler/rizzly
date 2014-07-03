@@ -44,14 +44,19 @@ public class ArrayTest extends BaseTest {
     compile("arrayTest4", TestSteps.COMPILE_TO_BIN, false, false);
   }
 
-  // TODO is this an error? or shouldn-t it be allowed?
-  /*
-   * @Test public void arrayTest5() { compile("arrayTest5", TestSteps.COMPILE_TO_BIN, false, false); }
-   */
+  @Test
+  public void arrayTest5() {
+    compile("arrayTest5", TestSteps.COMPILE_TO_BIN, false, false);
+  }
 
   @Test
   public void arrayTest6() {
     compile("arrayTest6", TestSteps.EXECUTE, false, false);
+  }
+
+  @Test
+  public void arrayTest7() {
+    compile("arrayTest7", TestSteps.COMPILE_TO_BIN, false, false);
   }
 
   @Test
