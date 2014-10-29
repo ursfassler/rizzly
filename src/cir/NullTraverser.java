@@ -31,8 +31,6 @@ import cir.statement.VarDefStmt;
 import cir.statement.WhileStmt;
 import cir.type.ArrayType;
 import cir.type.BooleanType;
-import cir.type.EnumElement;
-import cir.type.EnumType;
 import cir.type.NamedElement;
 import cir.type.PointerType;
 import cir.type.RangeType;
@@ -144,11 +142,6 @@ public abstract class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitEnumElement(EnumElement obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
   protected R visitCaseEntry(CaseEntry obj, P param) {
     return visitDefault(obj, param);
   }
@@ -245,11 +238,6 @@ public abstract class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitBlock(Block obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitEnumType(EnumType obj, P param) {
     return visitDefault(obj, param);
   }
 

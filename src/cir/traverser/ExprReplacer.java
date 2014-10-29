@@ -35,7 +35,6 @@ import cir.statement.VarDefStmt;
 import cir.statement.WhileStmt;
 import cir.type.ArrayType;
 import cir.type.BooleanType;
-import cir.type.EnumType;
 import cir.type.IntType;
 import cir.type.PointerType;
 import cir.type.StringType;
@@ -178,11 +177,6 @@ public class ExprReplacer<T> extends NullTraverser<Expression, T> {
   @Override
   protected Expression visitBlock(Block obj, T param) {
     visitList(obj.getStatement(), param);
-    return null;
-  }
-
-  @Override
-  protected Expression visitEnumType(EnumType obj, T param) {
     return null;
   }
 

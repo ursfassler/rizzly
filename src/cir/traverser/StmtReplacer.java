@@ -26,8 +26,6 @@ import cir.statement.Statement;
 import cir.statement.VarDefStmt;
 import cir.statement.WhileStmt;
 import cir.type.ArrayType;
-import cir.type.EnumElement;
-import cir.type.EnumType;
 import cir.type.IntType;
 import cir.type.NamedElement;
 import cir.type.StructType;
@@ -156,16 +154,6 @@ public class StmtReplacer<P> extends NullTraverser<Statement, P> {
 
   @Override
   protected Statement visitUnionType(UnionType obj, P param) {
-    return null;
-  }
-
-  @Override
-  protected Statement visitEnumType(EnumType obj, P param) {
-    return null;
-  }
-
-  @Override
-  protected Statement visitEnumElement(EnumElement obj, P param) {
     return null;
   }
 

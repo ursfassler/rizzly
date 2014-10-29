@@ -3,7 +3,6 @@ package cir.traverser;
 import cir.CirBase;
 import cir.NullTraverser;
 import cir.type.ArrayType;
-import cir.type.EnumType;
 import cir.type.IntType;
 import cir.type.StructType;
 import cir.type.Type;
@@ -48,11 +47,6 @@ public class TypeSizeGetter extends NullTraverser<Integer, Void> {
 
   @Override
   protected Integer visitVoidType(VoidType obj, Void param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Integer visitEnumType(EnumType obj, Void param) {
     throw new RuntimeException("not yet implemented");
   }
 

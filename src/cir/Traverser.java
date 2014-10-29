@@ -40,8 +40,6 @@ import cir.statement.VarDefStmt;
 import cir.statement.WhileStmt;
 import cir.type.ArrayType;
 import cir.type.BooleanType;
-import cir.type.EnumElement;
-import cir.type.EnumType;
 import cir.type.IntType;
 import cir.type.NamedElemType;
 import cir.type.NamedElement;
@@ -92,8 +90,6 @@ public abstract class Traverser<R, P> {
       return visitRefItem((RefItem) obj, param);
     else if (obj instanceof Variable)
       return visitVariable((Variable) obj, param);
-    else if (obj instanceof EnumElement)
-      return visitEnumElement((EnumElement) obj, param);
     else if (obj instanceof CaseEntry)
       return visitCaseEntry((CaseEntry) obj, param);
     else if (obj instanceof TypeRef)
@@ -210,8 +206,6 @@ public abstract class Traverser<R, P> {
       return visitRangeType((RangeType) obj, param);
     else if (obj instanceof NamedElemType)
       return visitNamedElemType((NamedElemType) obj, param);
-    else if (obj instanceof EnumType)
-      return visitEnumType((EnumType) obj, param);
     else if (obj instanceof VoidType)
       return visitVoidType((VoidType) obj, param);
     else if (obj instanceof TypeAlias)
@@ -267,8 +261,6 @@ public abstract class Traverser<R, P> {
   protected abstract R visitReturnVoid(ReturnVoid obj, P param);
 
   protected abstract R visitReturnValue(ReturnExpr obj, P param);
-
-  protected abstract R visitEnumElement(EnumElement obj, P param);
 
   protected abstract R visitCaseEntry(CaseEntry obj, P param);
 
@@ -327,8 +319,6 @@ public abstract class Traverser<R, P> {
   protected abstract R visitIf(IfStmt obj, P param);
 
   protected abstract R visitBlock(Block obj, P param);
-
-  protected abstract R visitEnumType(EnumType obj, P param);
 
   protected abstract R visitStructType(StructType obj, P param);
 

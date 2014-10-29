@@ -46,7 +46,6 @@ import fun.hfsm.State;
 import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
-import fun.other.FunList;
 import fun.other.ImplElementary;
 import fun.other.Named;
 import fun.other.Namespace;
@@ -131,12 +130,6 @@ public class FunPrinter extends NullTraverser<Void, Void> {
     }
   }
 
-  private void visitList(List<? extends Fun> list, Void param) {
-    for (int i = 0; i < list.size(); i++) {
-      visit(list.get(i), param);
-    }
-  }
-
   private void visitListNl(List<? extends Fun> list, Void param) {
     for (int i = 0; i < list.size(); i++) {
       visit(list.get(i), param);
@@ -158,17 +151,6 @@ public class FunPrinter extends NullTraverser<Void, Void> {
         visit(itr.next(), null);
       }
       xw.wr(after);
-    }
-  }
-
-  private void visitNamedSection(String name, FunList<? extends Fun> listOfNamed) {
-    if (!listOfNamed.isEmpty()) {
-      xw.sectionSeparator();
-      xw.kw(name);
-      xw.nl();
-      xw.incIndent();
-      visitList(listOfNamed, null);
-      xw.decIndent();
     }
   }
 

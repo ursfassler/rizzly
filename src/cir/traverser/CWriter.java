@@ -43,8 +43,6 @@ import cir.statement.VarDefStmt;
 import cir.statement.WhileStmt;
 import cir.type.ArrayType;
 import cir.type.BooleanType;
-import cir.type.EnumElement;
-import cir.type.EnumType;
 import cir.type.NamedElement;
 import cir.type.RangeType;
 import cir.type.SIntType;
@@ -436,31 +434,6 @@ public class CWriter extends NullTraverser<Void, Boolean> {
     sw.nl();
     sw.incIndent();
     visitList(obj.getElements(), param);
-    sw.decIndent();
-    sw.wr("} ");
-    sw.wr(name(obj));
-    sw.wr(";");
-    sw.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitEnumType(EnumType obj, Boolean param) {
-    sw.wr("typedef enum {");
-    sw.nl();
-    sw.incIndent();
-
-    for (int i = 0; i < obj.getElements().size(); i++) {
-      EnumElement elem = obj.getElements().get(i);
-      sw.wr(elem.getName());
-      sw.wr(" = ");
-      sw.wr(Integer.toString(elem.getValue()));
-      if (i + 1 < obj.getElements().size()) {
-        sw.wr(",");
-      }
-      sw.nl();
-    }
-
     sw.decIndent();
     sw.wr("} ");
     sw.wr(name(obj));

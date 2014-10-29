@@ -556,11 +556,6 @@ public class MainEvl {
     removeUnused(classes, g.vertexSet());
   }
 
-  private static EvlList<? extends Function> addOutIfaceFunc(EvlList<? extends Function> listOfNamed) {
-    EvlList<? extends Function> ret = Copy.copy(listOfNamed);
-    return ret;
-  }
-
   private static void removeUnused(Namespace ns, Set<? extends Evl> keep) {
     Set<Evl> remove = new HashSet<Evl>();
     for (Evl itr : ns.getChildren()) {

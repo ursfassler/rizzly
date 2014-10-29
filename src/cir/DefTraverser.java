@@ -32,8 +32,6 @@ import cir.statement.VarDefStmt;
 import cir.statement.WhileStmt;
 import cir.type.ArrayType;
 import cir.type.BooleanType;
-import cir.type.EnumElement;
-import cir.type.EnumType;
 import cir.type.NamedElement;
 import cir.type.PointerType;
 import cir.type.RangeType;
@@ -187,17 +185,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitUnsafeUnionType(UnsafeUnionType obj, P param) {
     visitList(obj.getElements(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitEnumType(EnumType obj, P param) {
-    visitList(obj.getElements(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitEnumElement(EnumElement obj, P param) {
     return null;
   }
 
