@@ -1,13 +1,9 @@
-component  
-  Retval
-    response ind():R{-20,20};
-    query    out():R{-20,20};
+Retval = Elementary
+  out : query():R{-20,20};
 
-  implementation elementary
- 
-    response ind():R{-20,20}
-      x : R{-20,20} = out();
-      return x;
-    end
+  ind : response():R{-20,20}
+    x : R{-20,20} = out();
+    return x;
   end
+end
 

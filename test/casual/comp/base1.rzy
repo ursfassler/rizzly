@@ -10,7 +10,7 @@ component
     output
       out   : Iface0;
 
-    implementation elementary
+    implementation Elementary
 
     function sqr( x: U{8} ):U{8}
      return x*x;

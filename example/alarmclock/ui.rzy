@@ -1,0 +1,76 @@
+import iface;
+
+Ui = Hfsm
+  mode : slot( value: Modes );
+  time : slot( value: Time );
+  alarm : slot( value: Time );
+
+  dispTime : signal( value: Time );
+
+  state( Top )
+    Top to Alarm by mode( value: Modes ) if value = Modes.SetAlaram;
+    Top to Time by mode( value: Modes );
+
+    Top : state( Time )
+      Time : state
+        Time to Time by time( value: iface.Time ) do
+          dispTime( value );
+        end
+      end
+
+      Alarm : state
+        Alarm to Alarm by alarm( value: iface.Time ) do
+          dispTime( value );
+        end
+      end
+    end
+  end
+end
+
+Blink = Hfsm
+  mode : slot( value: Modes );
+  tick : slot();
+
+  on : signal( value: Boolean );
+
+  state( On )
+    Blink to On by mode( value: Modes ) if value = Modes.ShowTime;
+    On to Blink by mode( value: Modes );
+  
+    On : state
+      entry
+        on( True );
+      end
+    end
+    
+    Blink : state(Hidden)
+      Hidden : state
+        timer   : R{0,20} = 20;
+
+        entry
+          on( False );
+        end
+        
+        Hidden to Hidden by tick() if timer > 0 do
+          timer := R{0,20}( timer - 1 );
+        end
+      end
+    
+      Visible : state
+        timer   : R{0,80} = 80;
+          
+        entry
+          on( True );
+        end
+        
+        Visible to Visible by tick() if timer > 0 do
+          timer := R{0,80}( timer - 1 );
+        end
+      end
+      
+      Visible to Hidden by tick();
+      Hidden to Visible by tick();
+    end
+  end
+end
+

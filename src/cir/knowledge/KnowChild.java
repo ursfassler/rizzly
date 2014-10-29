@@ -5,10 +5,10 @@ import java.util.Set;
 
 import cir.CirBase;
 import cir.NullTraverser;
-import cir.other.Variable;
 import cir.type.EnumType;
 import cir.type.StructType;
 import cir.type.UnionType;
+import cir.variable.Variable;
 
 public class KnowChild extends KnowledgeEntry {
 

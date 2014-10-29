@@ -1,5 +1,4 @@
-const
-  data : Array{10,R{0,100}} = [
+data : const Array{10,R{0,100}} = [
     10,
     20,
     1,
@@ -12,16 +11,12 @@ const
     7 
   ];
 
-component
-  ArrayValue
-    slot   inp( x: R{0,100} );
-    signal out( x: R{0,100} );
+ArrayValue = Elementary
+  out : signal( x: R{0,100} );
 
-  implementation elementary
-    
-    slot inp( x: R{0,100} )
-      out( data[x] );
-    end
-
+  inp : slot( x: R{0,100} )
+    out( data[x] );
   end
+
+end
 

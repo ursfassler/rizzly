@@ -1,19 +1,14 @@
 
-type
-  Point = Record
-    x : R{0,255};
-  end
+Point = Record
+  x : R{0,255};
+end
 
-component
-  FuncStruct
-    response ind():R{0,255};
-    query    out():Point;
-      
-  implementation elementary
+FuncStruct = Elementary
+  out : query():Point;
     
-    response ind():R{0,255}
-      return out().x;
-    end
-    
+  ind : response():R{0,255}
+    return out().x;
   end
+  
+end
 

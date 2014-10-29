@@ -21,7 +21,7 @@ public class KnowFun extends KnowledgeEntry {
     Named named = base.getRoot();
 
     for (String itr : ref.toList()) {
-      named = ((Namespace) named).find(itr);
+      named = ((Namespace) named).getChildren().find(itr);
       if (named == null) {
         RError.err(ErrorType.Error, info, "Namespace not found: " + ref);
       }
@@ -31,7 +31,7 @@ public class KnowFun extends KnowledgeEntry {
   }
 
   public Fun find(Designator ref) {
-    KnowFunChild kc = base.getEntry(KnowFunChild.class);
+    KnowChild kc = base.getEntry(KnowChild.class);
 
     Named named = base.getRoot();
 

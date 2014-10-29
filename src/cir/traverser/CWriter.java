@@ -26,13 +26,11 @@ import cir.expression.reference.RefIndex;
 import cir.expression.reference.RefName;
 import cir.expression.reference.Reference;
 import cir.function.Function;
-import cir.function.FunctionImpl;
+import cir.function.FunctionPrivate;
 import cir.function.FunctionPrototype;
-import cir.other.Constant;
-import cir.other.FuncVariable;
+import cir.function.FunctionPublic;
+import cir.other.Named;
 import cir.other.Program;
-import cir.other.StateVariable;
-import cir.other.Variable;
 import cir.statement.Assignment;
 import cir.statement.Block;
 import cir.statement.CallStmt;
@@ -48,6 +46,7 @@ import cir.type.BooleanType;
 import cir.type.EnumElement;
 import cir.type.EnumType;
 import cir.type.NamedElement;
+import cir.type.RangeType;
 import cir.type.SIntType;
 import cir.type.StringType;
 import cir.type.StructType;
@@ -57,506 +56,527 @@ import cir.type.UIntType;
 import cir.type.UnionType;
 import cir.type.UnsafeUnionType;
 import cir.type.VoidType;
+import cir.variable.Constant;
+import cir.variable.FuncVariable;
+import cir.variable.StateVariable;
+import cir.variable.Variable;
 
-import common.FuncAttr;
-
-public class CWriter extends NullTraverser<Void, StreamWriter> {
+public class CWriter extends NullTraverser<Void, Boolean> {
   public static final String ARRAY_DATA_NAME = "data";
-  private boolean printReferenceId = false;
+  final private boolean printReferenceId;
+  final private StreamWriter sw;
+
+  public CWriter(StreamWriter sw, boolean printReferenceId) {
+    super();
+    this.sw = sw;
+    this.printReferenceId = printReferenceId;
+  }
 
   static public void print(Cir obj, String filename, boolean printReferenceId) {
-    CWriter printer = new CWriter();
-    printer.printReferenceId = printReferenceId;
     try {
-      printer.traverse(obj, new StreamWriter(new PrintStream(filename)));
+      CWriter printer = new CWriter(new StreamWriter(new PrintStream(filename)), printReferenceId);
+      printer.traverse(obj, null);
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
   }
 
+  @Deprecated
+  private String name(Named obj) {
+    return obj.getName();
+  }
+
   @Override
-  protected Void visitDefault(CirBase obj, StreamWriter param) {
+  protected Void visitDefault(CirBase obj, Boolean param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
   @Override
-  protected Void visitProgram(Program obj, StreamWriter param) {
-    param.wr("#include <stdint.h>");
-    param.nl();
-    param.wr("#include <stdbool.h>");
-    param.nl();
-    param.nl();
+  protected Void visitProgram(Program obj, Boolean param) {
+    sw.wr("#include <stdint.h>");
+    sw.nl();
+    sw.wr("#include <stdbool.h>");
+    sw.nl();
+    sw.nl();
 
-    visitList(obj.getType(), param);
-    param.nl();
-
-    for (Function func : obj.getFunction()) {
-      writeFuncHeader(func, param);
-      param.wr(";");
-      param.nl();
-    }
-    param.nl();
-
-    visitList(obj.getVariable(), param);
-    param.nl();
-
-    visitList(obj.getFunction(), param);
-    param.nl();
+    visitList(obj.getType(), true);
+    sw.nl();
+    visitList(obj.getFunction(), false);
+    sw.nl();
+    visitList(obj.getVariable(), true);
+    sw.nl();
+    visitList(obj.getFunction(), true);
+    sw.nl();
 
     return null;
   }
 
   @Override
-  protected Void visitNumber(Number obj, StreamWriter param) {
-    param.wr(obj.getValue().toString());
+  protected Void visitNumber(Number obj, Boolean param) {
+    sw.wr(obj.getValue().toString());
     return null;
   }
 
   @Override
-  protected Void visitNoValue(NoValue obj, StreamWriter param) {
-    param.wr("_");
+  protected Void visitNoValue(NoValue obj, Boolean param) {
+    sw.wr("_");
     return null;
   }
 
   @Override
-  protected Void visitBinaryOp(BinaryOp obj, StreamWriter param) {
-    param.wr("(");
+  protected Void visitBinaryOp(BinaryOp obj, Boolean param) {
+    sw.wr("(");
     visit(obj.getLeft(), param);
-    param.wr(obj.getOp().toString());
+    sw.wr(obj.getOp().toString());
     visit(obj.getRight(), param);
-    param.wr(")");
+    sw.wr(")");
     return null;
   }
 
   @Override
-  protected Void visitUnaryOp(UnaryOp obj, StreamWriter param) {
-    param.wr("(");
-    param.wr(obj.getOp().toString());
+  protected Void visitUnaryOp(UnaryOp obj, Boolean param) {
+    sw.wr("(");
+    sw.wr(obj.getOp().toString());
     visit(obj.getExpr(), param);
-    param.wr(")");
+    sw.wr(")");
     return null;
   }
 
   @Override
-  protected Void visitReference(Reference obj, StreamWriter param) {
-    param.wr(obj.getRef().getName());
+  protected Void visitReference(Reference obj, Boolean param) {
+    sw.wr(name(obj.getRef()));
     visitList(obj.getOffset(), param);
     return null;
   }
 
   @Override
-  protected Void visitRefCall(RefCall obj, StreamWriter param) {
-    param.wr("(");
+  protected Void visitRefCall(RefCall obj, Boolean param) {
+    sw.wr("(");
     for (int i = 0; i < obj.getParameter().size(); i++) {
       if (i > 0) {
-        param.wr(",");
+        sw.wr(",");
       }
       visit(obj.getParameter().get(i), param);
     }
-    param.wr(")");
+    sw.wr(")");
     return null;
   }
 
   @Override
-  protected Void visitRefName(RefName obj, StreamWriter param) {
-    param.wr(".");
-    param.wr(obj.getName());
+  protected Void visitRefName(RefName obj, Boolean param) {
+    sw.wr(".");
+    sw.wr(obj.getName());
     return null;
   }
 
   @Override
-  protected Void visitRefIndex(RefIndex obj, StreamWriter param) {
-    param.wr(".");
-    param.wr(ARRAY_DATA_NAME);
-    param.wr("[");
+  protected Void visitRefIndex(RefIndex obj, Boolean param) {
+    sw.wr(".");
+    sw.wr(ARRAY_DATA_NAME);
+    sw.wr("[");
     visit(obj.getIndex(), param);
-    param.wr("]");
+    sw.wr("]");
     return null;
   }
 
-  protected void writeFuncHeader(Function obj, StreamWriter param) {
-    if (!obj.getAttributes().contains(FuncAttr.Public)) {
-      assert (!obj.getAttributes().contains(FuncAttr.Extern));
-      param.wr("static ");
-    }
-    if (obj.getAttributes().contains(FuncAttr.Extern)) {
-      assert (obj.getAttributes().contains(FuncAttr.Public));
-      param.wr("extern ");
-    }
-    visit(obj.getRetType(), param);
-    param.wr(" ");
-    param.wr(obj.getName());
-    param.wr("(");
+  protected void writeFuncHeader(Function obj) {
+    visit(obj.getRetType(), true);
+    sw.wr(" ");
+    sw.wr(name(obj));
+    sw.wr("(");
     if (obj.getArgument().isEmpty()) {
-      param.wr("void");
+      sw.wr("void");
     } else {
       for (int i = 0; i < obj.getArgument().size(); i++) {
         if (i > 0) {
-          param.wr(",");
+          sw.wr(",");
         }
         Variable var = obj.getArgument().get(i);
-        visit(var, param);
+        visit(var, true);
       }
     }
-    param.wr(")");
+    sw.wr(")");
   }
 
   @Override
-  protected Void visitFunctionPrototype(FunctionPrototype obj, StreamWriter param) {
-    param.wr("/* ");
-    param.wr(obj.getName());
-    param.wr(" */");
-    param.nl();
-    param.nl();
+  protected Void visitFunctionPrototype(FunctionPrototype obj, Boolean param) {
+    if (!param) {
+      sw.wr("extern ");
+      writeFuncHeader(obj);
+      sw.wr(";");
+      sw.nl();
+    }
     return null;
   }
 
   @Override
-  protected Void visitFunctionImpl(FunctionImpl obj, StreamWriter param) {
-    writeFuncHeader(obj, param);
-    param.nl();
-    visit(obj.getBody(), param);
-    param.nl();
+  protected Void visitFunctionPrivate(FunctionPrivate obj, Boolean param) {
+    sw.wr("static ");
+    writeFuncHeader(obj);
+    if (param) {
+      sw.nl();
+      visit(obj.getBody(), param);
+    } else {
+      sw.wr(";");
+    }
+    sw.nl();
     return null;
   }
 
   @Override
-  protected Void visitConstant(Constant obj, StreamWriter param) {
-    param.wr("static const ");
+  protected Void visitFunctionPublic(FunctionPublic obj, Boolean param) {
+    writeFuncHeader(obj);
+    if (param) {
+      sw.nl();
+      visit(obj.getBody(), param);
+    } else {
+      sw.wr(";");
+    }
+    sw.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitConstant(Constant obj, Boolean param) {
+    sw.wr("static const ");
     visit(obj.getType(), param);
-    param.wr(" ");
-    param.wr(obj.getName());
-    param.wr(" = ");
+    sw.wr(" ");
+    sw.wr(name(obj));
+    sw.wr(" = ");
     visit(obj.getDef(), param);
-    param.wr(";");
-    param.nl();
+    sw.wr(";");
+    sw.nl();
     return null;
   }
 
   @Override
-  protected Void visitStateVariable(StateVariable obj, StreamWriter param) {
-    param.wr("static ");
+  protected Void visitStateVariable(StateVariable obj, Boolean param) {
+    sw.wr("static ");
     visit(obj.getType(), param);
-    param.wr(" ");
-    param.wr(obj.getName());
-    param.wr(" = ");
+    sw.wr(" ");
+    sw.wr(name(obj));
+    sw.wr(" = ");
     visit(obj.getDef(), param);
-    param.wr(";");
-    param.nl();
+    sw.wr(";");
+    sw.nl();
     return null;
   }
 
   @Override
-  protected Void visitFuncVariable(FuncVariable obj, StreamWriter param) {
+  protected Void visitFuncVariable(FuncVariable obj, Boolean param) {
     visit(obj.getType(), param);
-    param.wr(" ");
-    param.wr(obj.getName());
+    sw.wr(" ");
+    sw.wr(name(obj));
     return null;
   }
 
   @Override
-  protected Void visitCallStmt(CallStmt obj, StreamWriter param) {
+  protected Void visitCallStmt(CallStmt obj, Boolean param) {
     visit(obj.getRef(), param);
-    param.wr(";");
-    param.nl();
+    sw.wr(";");
+    sw.nl();
     return null;
   }
 
   @Override
-  protected Void visitAssignment(Assignment obj, StreamWriter param) {
+  protected Void visitAssignment(Assignment obj, Boolean param) {
     visit(obj.getDst(), param);
-    param.wr(" = ");
+    sw.wr(" = ");
     visit(obj.getSrc(), param);
-    param.wr(";");
-    param.nl();
+    sw.wr(";");
+    sw.nl();
     return null;
   }
 
   @Override
-  protected Void visitBlock(Block obj, StreamWriter param) {
-    param.wr("{");
-    param.nl();
-    param.incIndent();
+  protected Void visitBlock(Block obj, Boolean param) {
+    sw.wr("{");
+    sw.nl();
+    sw.incIndent();
     visitList(obj.getStatement(), param);
-    param.decIndent();
-    param.wr("}");
-    param.nl();
+    sw.decIndent();
+    sw.wr("}");
+    sw.nl();
     return null;
   }
 
   @Override
-  protected Void visitSIntType(SIntType obj, StreamWriter param) {
-    param.wr("typedef ");
-    param.wr("int" + obj.getBytes() * 8 + "_t ");
-    param.wr(obj.getName());
-    param.wr(";");
-    param.nl();
+  protected Void visitRangeType(RangeType obj, Boolean param) {
+    sw.wr("\"" + obj.getName() + "\"");
+    sw.wr(";");
+    sw.nl();
     return null;
   }
 
   @Override
-  protected Void visitUIntType(UIntType obj, StreamWriter param) {
-    param.wr("typedef ");
-    param.wr("uint" + obj.getBytes() * 8 + "_t ");
-    param.wr(obj.getName());
-    param.wr(";");
-    param.nl();
+  protected Void visitSIntType(SIntType obj, Boolean param) {
+    sw.wr("typedef ");
+    sw.wr("int" + obj.getBytes() * 8 + "_t ");
+    sw.wr(name(obj));
+    sw.wr(";");
+    sw.nl();
     return null;
   }
 
   @Override
-  protected Void visitArrayType(ArrayType obj, StreamWriter param) {
-    param.wr("typedef struct {");
-    param.nl();
-    param.incIndent();
+  protected Void visitUIntType(UIntType obj, Boolean param) {
+    sw.wr("typedef ");
+    sw.wr("uint" + obj.getBytes() * 8 + "_t ");
+    sw.wr(name(obj));
+    sw.wr(";");
+    sw.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitArrayType(ArrayType obj, Boolean param) {
+    sw.wr("typedef struct {");
+    sw.nl();
+    sw.incIndent();
     visit(obj.getType(), param);
-    param.wr(" ");
-    param.wr(ARRAY_DATA_NAME);
-    param.wr("[");
-    param.wr(Integer.toString(obj.getSize()));
-    param.wr("]");
-    param.wr(";");
-    param.decIndent();
-    param.nl();
-    param.wr("} ");
-    param.wr(obj.getName());
-    param.wr(";");
-    param.nl();
+    sw.wr(" ");
+    sw.wr(ARRAY_DATA_NAME);
+    sw.wr("[");
+    sw.wr(Integer.toString(obj.getSize()));
+    sw.wr("]");
+    sw.wr(";");
+    sw.decIndent();
+    sw.nl();
+    sw.wr("} ");
+    sw.wr(name(obj));
+    sw.wr(";");
+    sw.nl();
     return null;
   }
 
   @Override
-  protected Void visitVoidType(VoidType obj, StreamWriter param) {
-    param.wr("/* "); // built in type
-    param.wr("typedef ");
-    param.wr("void ");
-    param.wr(obj.getName());
-    param.wr(";");
-    param.wr(" */");
-    param.nl();
+  protected Void visitVoidType(VoidType obj, Boolean param) {
+    sw.wr("typedef ");
+    sw.wr("void ");
+    sw.wr(name(obj));
+    sw.wr(";");
+    sw.nl();
     return null;
   }
 
   @Override
-  protected Void visitBooleanType(BooleanType obj, StreamWriter param) {
-    param.wr("/* "); // built in type
-    param.wr("typedef ");
-    param.wr("bool");
-    param.wr(" ");
-    param.wr(obj.getName());
-    param.wr(";");
-    param.wr(" */");
-    param.nl();
+  protected Void visitBooleanType(BooleanType obj, Boolean param) {
+    sw.wr("typedef ");
+    sw.wr("bool");
+    sw.wr(" ");
+    sw.wr(name(obj));
+    sw.wr(";");
+    sw.nl();
     return null;
   }
 
   @Override
-  protected Void visitStringType(StringType obj, StreamWriter param) {
-    param.wr("typedef ");
-    param.wr("char*");
-    param.wr(" ");
-    param.wr(obj.getName());
-    param.wr(";");
-    param.nl();
+  protected Void visitStringType(StringType obj, Boolean param) {
+    sw.wr("typedef ");
+    sw.wr("char*");
+    sw.wr(" ");
+    sw.wr(name(obj));
+    sw.wr(";");
+    sw.nl();
     return null;
   }
 
   @Override
-  protected Void visitTypeAlias(TypeAlias obj, StreamWriter param) {
-    param.wr("typedef ");
-    param.wr(obj.getRef().getName());
-    param.wr(" ");
-    param.wr(obj.getName());
-    param.wr(";");
-    param.nl();
+  protected Void visitTypeAlias(TypeAlias obj, Boolean param) {
+    sw.wr("typedef ");
+    sw.wr(name(obj.getRef()));
+    sw.wr(" ");
+    sw.wr(name(obj));
+    sw.wr(";");
+    sw.nl();
     return null;
   }
 
   @Override
-  protected Void visitUnsafeUnionType(UnsafeUnionType obj, StreamWriter param) {
-    param.wr("typedef union {");
-    param.nl();
-    param.incIndent();
+  protected Void visitUnsafeUnionType(UnsafeUnionType obj, Boolean param) {
+    sw.wr("typedef union {");
+    sw.nl();
+    sw.incIndent();
     visitList(obj.getElements(), param);
-    param.decIndent();
-    param.wr("} ");
-    param.wr(obj.getName());
-    param.wr(";");
-    param.nl();
+    sw.decIndent();
+    sw.wr("} ");
+    sw.wr(name(obj));
+    sw.wr(";");
+    sw.nl();
     return null;
   }
 
   @Override
-  protected Void visitUnionType(UnionType obj, StreamWriter param) {
-    param.wr("typedef struct {");
-    param.nl();
-    param.incIndent();
+  protected Void visitUnionType(UnionType obj, Boolean param) {
+    sw.wr("typedef struct {");
+    sw.nl();
+    sw.incIndent();
 
     visit(obj.getTag(), param);
 
-    param.wr("union {");
-    param.nl();
-    param.incIndent();
+    sw.wr("union {");
+    sw.nl();
+    sw.incIndent();
     visitList(obj.getElements(), param);
-    param.decIndent();
-    param.wr("};");
-    param.nl();
+    sw.decIndent();
+    sw.wr("};");
+    sw.nl();
 
-    param.decIndent();
-    param.wr("} ");
-    param.wr(obj.getName());
-    param.wr(";");
-    param.nl();
+    sw.decIndent();
+    sw.wr("} ");
+    sw.wr(name(obj));
+    sw.wr(";");
+    sw.nl();
     return null;
   }
 
   @Override
-  protected Void visitStructType(StructType obj, StreamWriter param) {
-    param.wr("typedef struct {");
-    param.nl();
-    param.incIndent();
+  protected Void visitStructType(StructType obj, Boolean param) {
+    sw.wr("typedef struct {");
+    sw.nl();
+    sw.incIndent();
     visitList(obj.getElements(), param);
-    param.decIndent();
-    param.wr("} ");
-    param.wr(obj.getName());
-    param.wr(";");
-    param.nl();
+    sw.decIndent();
+    sw.wr("} ");
+    sw.wr(name(obj));
+    sw.wr(";");
+    sw.nl();
     return null;
   }
 
   @Override
-  protected Void visitEnumType(EnumType obj, StreamWriter param) {
-    param.wr("typedef enum {");
-    param.nl();
-    param.incIndent();
+  protected Void visitEnumType(EnumType obj, Boolean param) {
+    sw.wr("typedef enum {");
+    sw.nl();
+    sw.incIndent();
 
     for (int i = 0; i < obj.getElements().size(); i++) {
       EnumElement elem = obj.getElements().get(i);
-      param.wr(elem.getName());
-      param.wr(" = ");
-      param.wr(Integer.toString(elem.getValue()));
+      sw.wr(elem.getName());
+      sw.wr(" = ");
+      sw.wr(Integer.toString(elem.getValue()));
       if (i + 1 < obj.getElements().size()) {
-        param.wr(",");
+        sw.wr(",");
       }
-      param.nl();
+      sw.nl();
     }
 
-    param.decIndent();
-    param.wr("} ");
-    param.wr(obj.getName());
-    param.wr(";");
-    param.nl();
+    sw.decIndent();
+    sw.wr("} ");
+    sw.wr(name(obj));
+    sw.wr(";");
+    sw.nl();
     return null;
   }
 
   @Override
-  protected Void visitNamedElement(NamedElement obj, StreamWriter param) {
+  protected Void visitNamedElement(NamedElement obj, Boolean param) {
     visit(obj.getType(), param);
-    param.wr(" ");
-    param.wr(obj.getName());
-    param.wr(";");
-    param.nl();
+    sw.wr(" ");
+    sw.wr(obj.getName());
+    sw.wr(";");
+    sw.nl();
     return null;
   }
 
   @Override
-  protected Void visitReturnVoid(ReturnVoid obj, StreamWriter param) {
-    param.wr("return;");
-    param.nl();
+  protected Void visitReturnVoid(ReturnVoid obj, Boolean param) {
+    sw.wr("return;");
+    sw.nl();
     return null;
   }
 
   @Override
-  protected Void visitReturnValue(ReturnExpr obj, StreamWriter param) {
-    param.wr("return ");
+  protected Void visitReturnValue(ReturnExpr obj, Boolean param) {
+    sw.wr("return ");
     visit(obj.getValue(), param);
-    param.wr(";");
-    param.nl();
+    sw.wr(";");
+    sw.nl();
     return null;
   }
 
   @Override
-  protected Void visitIf(IfStmt obj, StreamWriter param) {
-    param.wr("if( ");
+  protected Void visitIf(IfStmt obj, Boolean param) {
+    sw.wr("if( ");
     visit(obj.getCondition(), param);
-    param.wr(" )");
+    sw.wr(" )");
     visit(obj.getThenBlock(), param);
-    param.wr("else ");
+    sw.wr("else ");
     visit(obj.getElseBlock(), param);
     return null;
   }
 
   @Override
-  protected Void visitWhile(WhileStmt obj, StreamWriter param) {
-    param.wr("while( ");
+  protected Void visitWhile(WhileStmt obj, Boolean param) {
+    sw.wr("while( ");
     visit(obj.getCondition(), param);
-    param.wr(" )");
+    sw.wr(" )");
     visit(obj.getBlock(), param);
     return null;
   }
 
   @Override
-  protected Void visitVarDefStmt(VarDefStmt obj, StreamWriter param) {
+  protected Void visitVarDefStmt(VarDefStmt obj, Boolean param) {
     visit(obj.getVariable(), param);
-    param.wr(";");
-    param.nl();
+    sw.wr(";");
+    sw.nl();
     return null;
   }
 
   @Override
-  protected Void visitCaseStmt(CaseStmt obj, StreamWriter param) {
-    param.wr("switch( ");
+  protected Void visitCaseStmt(CaseStmt obj, Boolean param) {
+    sw.wr("switch( ");
     visit(obj.getCondition(), param);
-    param.wr(" ){");
-    param.nl();
-    param.incIndent();
+    sw.wr(" ){");
+    sw.nl();
+    sw.incIndent();
     visitList(obj.getEntries(), param);
 
-    param.wr("default:{");
-    param.nl();
-    param.incIndent();
+    sw.wr("default:{");
+    sw.nl();
+    sw.incIndent();
     visit(obj.getOtherwise(), param);
-    param.wr("break;");
-    param.nl();
-    param.decIndent();
-    param.wr("}");
-    param.nl();
+    sw.wr("break;");
+    sw.nl();
+    sw.decIndent();
+    sw.wr("}");
+    sw.nl();
 
-    param.decIndent();
-    param.wr("}");
-    param.nl();
+    sw.decIndent();
+    sw.wr("}");
+    sw.nl();
 
     return null;
   }
 
   @Override
-  protected Void visitCaseEntry(CaseEntry obj, StreamWriter param) {
+  protected Void visitCaseEntry(CaseEntry obj, Boolean param) {
     for (Range range : obj.getValues()) {
       for (BigInteger val : range) {
-        param.wr("case ");
-        param.wr(val.toString());
-        param.wr(": ");
+        sw.wr("case ");
+        sw.wr(val.toString());
+        sw.wr(": ");
       }
     }
-    param.wr("{");
-    param.nl();
-    param.incIndent();
+    sw.wr("{");
+    sw.nl();
+    sw.incIndent();
 
     visit(obj.getCode(), param);
-    param.wr("break;");
-    param.nl();
+    sw.wr("break;");
+    sw.nl();
 
-    param.decIndent();
-    param.wr("}");
-    param.nl();
+    sw.decIndent();
+    sw.wr("}");
+    sw.nl();
     return null;
   }
 
   @Override
-  protected Void visitStringValue(StringValue obj, StreamWriter param) {
-    param.wr("\"");
-    param.wr(escape(obj.getValue()));
-    param.wr("\"");
+  protected Void visitStringValue(StringValue obj, Boolean param) {
+    sw.wr("\"");
+    sw.wr(escape(obj.getValue()));
+    sw.wr("\"");
     return null;
   }
 
@@ -566,19 +586,19 @@ public class CWriter extends NullTraverser<Void, StreamWriter> {
     for (int i = 0; i < value.length(); i++) {
       char c = value.charAt(i);
       switch (c) {
-      case '\"':
-        ret += "\\\"";
-        break;
-      case '\n':
-        ret += "\\n";
-        break;
-      case '\t':
-        ret += "\\t";
-        break;
-      // TODO more symbols to escape?
-      default:
-        ret += c;
-        break;
+        case '\"':
+          ret += "\\\"";
+          break;
+        case '\n':
+          ret += "\\n";
+          break;
+        case '\t':
+          ret += "\\t";
+          break;
+        // TODO more symbols to escape?
+        default:
+          ret += c;
+          break;
       }
     }
 
@@ -586,78 +606,78 @@ public class CWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitArrayValue(ArrayValue obj, StreamWriter param) {
-    param.wr("{");
-    param.wr(" ." + ARRAY_DATA_NAME + " = {");
+  protected Void visitArrayValue(ArrayValue obj, Boolean param) {
+    sw.wr("{");
+    sw.wr(" ." + ARRAY_DATA_NAME + " = {");
     for (int i = 0; i < obj.getValue().size(); i++) {
       if (i > 0) {
-        param.wr(",");
+        sw.wr(",");
       }
       visit(obj.getValue().get(i), param);
     }
-    param.wr("} ");
-    param.wr("}");
+    sw.wr("} ");
+    sw.wr("}");
     return null;
   }
 
   @Override
-  protected Void visitElementValue(ElementValue obj, StreamWriter param) {
-    param.wr(".");
-    param.wr(obj.getName());
-    param.wr("=");
+  protected Void visitElementValue(ElementValue obj, Boolean param) {
+    sw.wr(".");
+    sw.wr(obj.getName());
+    sw.wr("=");
     visit(obj.getValue(), param);
-    param.wr(",");
+    sw.wr(",");
     return null;
   }
 
   @Override
-  protected Void visitUnsafeUnionValue(UnsafeUnionValue obj, StreamWriter param) {
-    param.wr("{");
+  protected Void visitUnsafeUnionValue(UnsafeUnionValue obj, Boolean param) {
+    sw.wr("{");
     visit(obj.getContentValue(), param);
-    param.wr("}");
+    sw.wr("}");
     return null;
   }
 
   @Override
-  protected Void visitUnionValue(UnionValue obj, StreamWriter param) {
-    param.wr("{");
+  protected Void visitUnionValue(UnionValue obj, Boolean param) {
+    sw.wr("{");
     visit(obj.getTagValue(), param);
-    // param.wr(",");
+    // sw.wr(",");
     visit(obj.getContentValue(), param);
-    param.wr("}");
+    sw.wr("}");
     return null;
   }
 
   @Override
-  protected Void visitStructValue(StructValue obj, StreamWriter param) {
-    param.wr("{");
+  protected Void visitStructValue(StructValue obj, Boolean param) {
+    sw.wr("{");
     visitList(obj.getValue(), param);
-    param.wr("}");
+    sw.wr("}");
     return null;
   }
 
   @Override
-  protected Void visitTypeRef(TypeRef obj, StreamWriter param) {
-    param.wr(obj.getRef().getName());
+  protected Void visitTypeRef(TypeRef obj, Boolean param) {
+    sw.wr(name(obj.getRef()));
     return null;
   }
 
   @Override
-  protected Void visitTypeCast(TypeCast obj, StreamWriter param) {
-    param.wr("((");
+  protected Void visitTypeCast(TypeCast obj, Boolean param) {
+    sw.wr("((");
     visit(obj.getCast(), param);
-    param.wr(")");
+    sw.wr(")");
     visit(obj.getValue(), param);
-    param.wr(")");
+    sw.wr(")");
     return null;
   }
 
   @Override
-  protected Void visitBoolValue(BoolValue obj, StreamWriter param) {
+  protected Void visitBoolValue(BoolValue obj, Boolean param) {
     if (obj.getValue()) {
-      param.wr("true");
+      sw.wr("true");
     } else {
-      param.wr("false");
+      sw.wr("false");
     }
     return null;
   }

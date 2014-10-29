@@ -1,65 +1,115 @@
 package parser;
 
-import common.ElementInfo;
+import java.util.ArrayList;
+import java.util.List;
 
-import fun.expression.reference.Reference;
-import fun.function.impl.FuncEntryExit;
-import fun.hfsm.State;
-import fun.other.Component;
+import common.ElementInfo;
+import common.Metadata;
+
+import error.ErrorType;
+import error.RError;
+import fun.Fun;
+import fun.other.CompImpl;
 import fun.other.ImplElementary;
-import fun.statement.Block;
+import fun.other.Template;
 import fun.variable.ConstPrivate;
 import fun.variable.StateVariable;
+import fun.variable.TemplateParameter;
 
 public class ImplElementaryParser extends ImplBaseParser {
-
   public ImplElementaryParser(Scanner scanner) {
     super(scanner);
   }
 
-  public static Component parse(Scanner scanner, Token name) {
+  public static CompImpl parse(Scanner scanner, String name) {
     ImplElementaryParser parser = new ImplElementaryParser(scanner);
     return parser.parseImplementationElementary(name);
   }
 
   // EBNF implementationElementary: "elementary" { entryCode | exitCode | compDeclBlock | varDeclBlock | constDeclBlock
   // | privateFunction | responseFunction | slotFunction | interruptFunction | entry | exit }
-  private ImplElementary parseImplementationElementary(Token name) {
+  private ImplElementary parseImplementationElementary(String name) {
     ElementInfo info = expect(TokenType.ELEMENTARY).getInfo();
-    ImplElementary comp = new ImplElementary(name.getInfo(), name.getData());
+    ArrayList<Metadata> meta = getMetadata();
+    info.getMetadata().addAll(meta);
+    ImplElementary comp = new ImplElementary(info, name);
 
-    Block entryBody = new Block(info);
-    Block exitBody = new Block(info);
-    FuncEntryExit entryFunc = makeEntryExitFunc(State.ENTRY_FUNC_NAME, entryBody);
-    FuncEntryExit exitFunc = makeEntryExitFunc(State.EXIT_FUNC_NAME, exitBody);
-    comp.getFunction().add(entryFunc);
-    comp.getFunction().add(exitFunc);
-    comp.setEntryFunc(new Reference(info, entryFunc));
-    comp.setExitFunc(new Reference(info, exitFunc));
+    while (!consumeIfEqual(TokenType.END)) {
+      if (peek().getType() == TokenType.IDENTIFIER) {
+        Token id = expect(TokenType.IDENTIFIER);
 
-    while (true)
-      switch (peek().getType()) {
+        if (consumeIfEqual(TokenType.EQUAL)) {
+          List<TemplateParameter> genpam;
+          if (peek().getType() == TokenType.OPENCURLY) {
+            genpam = parseGenericParam();
+          } else {
+            genpam = new ArrayList<TemplateParameter>();
+          }
+          Fun obj = parseDeclaration(id.getData());
+          Template decl = new Template(id.getInfo(), id.getData(), genpam, obj);
+          comp.getDeclaration().add(decl);
+        } else if (consumeIfEqual(TokenType.COLON)) {
+          Fun var = parseInstantiation(id.getData());
+          comp.getInstantiation().add(var);
+        } else {
+          Token got = peek();
+          RError.err(ErrorType.Error, got.getInfo(), "got unexpected token: " + got);
+          break;
+        }
+      } else {
+        parseAnonymous(comp);
+      }
+    }
+
+    return comp;
+  }
+
+  private void parseAnonymous(ImplElementary comp) {
+    switch (peek().getType()) {
       case ENTRY:
-        entryBody.getStatements().add(parseEntryCode());
+        comp.setEntryFunc(parseEntryCode());
         break;
       case EXIT:
-        exitBody.getStatements().add(parseExitCode());
+        comp.setExitFunc(parseExitCode());
         break;
-      case VAR:
-        comp.getVariable().addAll(parseVarDefBlock(StateVariable.class));
-        break;
-      case CONST:
-        comp.getConstant().addAll(parseConstDefBlock(ConstPrivate.class));
-        break;
-      case FUNCTION:
+      case INTERRUPT:
+        throw new RuntimeException("not yet implemented");
+      default:
+        RError.err(ErrorType.Fatal, peek().getInfo(), "not yet implemented: " + peek().getType());
+        throw new RuntimeException("not yet implemented: " + peek().getType());
+    }
+  }
+
+  private Fun parseInstantiation(String name) {
+    switch (peek().getType()) {
+      case CONST: {
+        ConstPrivate var = parseConstDef(ConstPrivate.class, name);
+        expect(TokenType.SEMI);
+        return var;
+      }
       case RESPONSE:
       case SLOT:
-      case INTERRUPT:
-        comp.getFunction().add(parsePrivateFunction(peek().getType()));
-        break;
-      default:
-        return comp;
+      case SIGNAL:
+      case QUERY: {
+        return parseFuncDef(peek().getType(), name, false);
       }
+      default: {
+        StateVariable var = parseVarDef2(StateVariable.class, name, InitType.MustInit);
+        expect(TokenType.SEMI);
+        return var;
+      }
+    }
+  }
+
+  private Fun parseDeclaration(String name) {
+    switch (peek().getType()) {
+      case FUNCTION:
+      case PROCEDURE:
+        return parseFuncDef(peek().getType(), name, false);
+      default: {
+        return type().parseTypeDef(name);
+      }
+    }
   }
 
 }

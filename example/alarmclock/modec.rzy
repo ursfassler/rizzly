@@ -1,0 +1,47 @@
+import iface;
+
+Mode = Hfsm
+  change : slot();
+  min : slot();
+  hour : slot();
+
+  changed : signal( mode: Modes );
+  timeMin : signal();
+  timeHour : signal();
+  timeUpdate : signal();
+  alarmMin : signal();
+  alarmHour : signal();
+  alarmUpdate : signal();
+
+  state( Normal )
+    Normal to SetTime by change();
+    SetTime to SetAlarm by change();
+    SetAlarm to Normal by change();
+  
+    Normal : state
+      entry
+        changed( Modes.ShowTime );
+        timeUpdate();
+      end
+    end
+
+    SetTime : state
+      entry
+        changed( Modes.SetTime );
+        timeUpdate();
+      end
+      SetTime to SetTime by min() do timeMin(); end
+      SetTime to SetTime by hour() do timeHour(); end
+    end
+
+    SetAlarm : state
+      entry
+        changed( Modes.SetAlaram );
+        alarmUpdate();
+      end
+      SetAlarm to SetAlarm by min() do alarmMin(); end
+      SetAlarm to SetAlarm by hour() do alarmHour(); end
+    end
+  end
+end
+

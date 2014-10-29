@@ -1,10 +1,13 @@
 package parser;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
+
+import util.Pair;
 
 import common.ElementInfo;
-import common.Metadata;
 
 import error.ErrorType;
 import error.RError;
@@ -12,24 +15,13 @@ import fun.Copy;
 import fun.expression.AnyValue;
 import fun.expression.Expression;
 import fun.expression.reference.Reference;
-import fun.function.FuncWithBody;
-import fun.function.FuncWithReturn;
+import fun.function.FuncHeader;
 import fun.function.FunctionFactory;
-import fun.function.FunctionHeader;
-import fun.function.impl.FuncGlobal;
-import fun.function.impl.FuncImplResponse;
-import fun.function.impl.FuncImplSlot;
-import fun.function.impl.FuncInterrupt;
-import fun.function.impl.FuncPrivateRet;
-import fun.function.impl.FuncPrivateVoid;
-import fun.function.impl.FuncProtQuery;
-import fun.function.impl.FuncProtResponse;
-import fun.function.impl.FuncProtRet;
-import fun.function.impl.FuncProtSignal;
-import fun.function.impl.FuncProtSlot;
-import fun.function.impl.FuncProtVoid;
-import fun.other.ListOfNamed;
+import fun.knowledge.KnowFuncType;
+import fun.other.FunList;
+import fun.statement.Block;
 import fun.type.base.AnyType;
+import fun.type.base.VoidType;
 import fun.variable.Constant;
 import fun.variable.FuncVariable;
 import fun.variable.TemplateParameter;
@@ -58,174 +50,42 @@ public class BaseParser extends Parser {
     return new ExpressionParser(getScanner());
   }
 
-  // EBNF compIfaceList: ( queryHeader | responseHeader | signalHeader | slotHeader ) ";"
-  // EBNF queryHeader: "query" id vardeflist ":" typeref
-  // EBNF responseHeader: "response" id vardeflist ":" typeref
-  // EBNF signalHeader: "signal" id vardeflist
-  // EBNF slotHeader: "slot" id vardeflist
-  protected void parseCompIfaceList(ListOfNamed<FuncProtQuery> query, ListOfNamed<FuncProtResponse> response, ListOfNamed<FuncProtSignal> signal, ListOfNamed<FuncProtSlot> slot) {
-    while (true) {
-      switch (peek().getType()) {
-      case QUERY:
-        query.add(parseIfaceHeader(FuncProtQuery.class, TokenType.QUERY, true));
-        break;
-      case RESPONSE:
-        response.add(parseIfaceHeader(FuncProtResponse.class, TokenType.RESPONSE, true));
-        break;
-      case SIGNAL:
-        signal.add(parseIfaceHeader(FuncProtSignal.class, TokenType.SIGNAL, false));
-        break;
-      case SLOT:
-        slot.add(parseIfaceHeader(FuncProtSlot.class, TokenType.SLOT, false));
-        break;
-      default:
-        return;
-      }
-      expect(TokenType.SEMI);
-    }
-  }
-
-  protected <T extends FunctionHeader> T parseIfaceHeader(Class<T> cl, TokenType type, boolean retarg) {
-    ElementInfo info = expect(type).getInfo();
-    String name = expect(TokenType.IDENTIFIER).getData();
-
-    List<FuncVariable> varlist = parseVardefList();
-
-    T func = FunctionFactory.create(cl, info);
-    if (retarg) {
-      expect(TokenType.COLON);
-      Reference ref = expr().parseRef();
-      ((FuncWithReturn) func).setRet(ref);
-    }
-
-    func.setName(name);
-    func.getParam().addAll(varlist);
-
-    return func;
-  }
-
-  // EBNF funcDef: ( "query" | "response" | "signal" | "slot" ) id vardeflist [ ":" typeref ] ";"
-  protected FunctionHeader parseFunctionDef() {
-    Token tok = expect(TokenType.IDENTIFIER);
-
-    List<FuncVariable> varlist = parseVardefList();
-
-    FunctionHeader func;
-    if (consumeIfEqual(TokenType.COLON)) {
-      Reference ref = expr().parseRef();
-      FuncProtRet rfunc = new FuncProtRet(tok.getInfo());
-      rfunc.setRet(ref);
-      func = rfunc;
-    } else {
-      func = new FuncProtVoid(tok.getInfo());
-    }
-
-    expect(TokenType.SEMI);
-
-    func.setName(tok.getData());
-    func.getParam().addAll(varlist);
-
-    return func;
-  }
-
-  // EBNF fileUseList: vardef ";" { vardef ";" }
-  protected <T extends Variable> List<T> parseFileUseList(Class<T> kind) {
-    List<T> res = new ArrayList<T>();
-    do {
-      List<T> vardefs = stmt().parseVarDef(kind, InitType.NoInit);
-      expect(TokenType.SEMI);
-
-      ArrayList<Metadata> meta = getMetadata();
-      for (T var : vardefs) {
-        var.getInfo().getMetadata().addAll(meta);
-      }
-
-      res.addAll(vardefs);
-    } while (peek().getType() == TokenType.IDENTIFIER);
-    return res;
-  }
-
-  // EBNF constDefBlock: "const" constdef { constdef }
-  protected <T extends Constant> List<T> parseConstDefBlock(Class<T> kind) {
-    List<T> res = new ArrayList<T>();
-    expect(TokenType.CONST);
-    do {
-      res.add(parseConstDef(kind));
-    } while (peek().getType() == TokenType.IDENTIFIER);
-    return res;
-  }
-
-  // EBNF globalFunction: "function" id genericParam vardeflist ":" ref block "end"
-  protected FuncGlobal parseGlobalFunction() {
-    Token tok = expect(TokenType.FUNCTION);
-
-    FuncGlobal func = new FuncGlobal(tok.getInfo());
-    func.setName(expect(TokenType.IDENTIFIER).getData());
-
-    func.getTemplateParam().addAll(parseGenericParam());
-
-    func.getParam().addAll(parseVardefList());
-
-    expect(TokenType.COLON);
-    Reference ref = expr().parseRef();
-    func.setRet(ref);
-
-    func.setBody(stmt().parseBlock());
-    expect(TokenType.END);
-
-    return func;
+  static Set<TokenType> typeSet(TokenType type) {
+    Set<TokenType> set = new HashSet<TokenType>();
+    set.add(type);
+    return set;
   }
 
   // TODO can we merge it with another function parser?
-  // EBNF privateFunction: "function" id vardeflist [ ":" typeref ] block "end"
-  protected FunctionHeader parsePrivateFunction(TokenType type) {
-    Token tok = expect(type);
-
-    Token name = expect(TokenType.IDENTIFIER);
-
-    List<FuncVariable> varlist;
-
-    FunctionHeader func;
-    switch (type) {
-    case FUNCTION:
-      varlist = parseVardefList();
-      if (consumeIfEqual(TokenType.COLON)) {
-        FuncPrivateRet rfunc = new FuncPrivateRet(tok.getInfo());
-        Reference ref = expr().parseRef();
-        rfunc.setRet(ref);
-        func = rfunc;
-      } else {
-        func = new FuncPrivateVoid(tok.getInfo());
-      }
-      break;
-    case RESPONSE:
-      varlist = parseVardefList();
-      expect(TokenType.COLON);
-      FuncImplResponse rfunc = new FuncImplResponse(tok.getInfo());
-      Reference ref = expr().parseRef();
-      rfunc.setRet(ref);
-      func = rfunc;
-      break;
-    case SLOT:
-      varlist = parseVardefList();
-      func = new FuncImplSlot(tok.getInfo());
-      break;
-    case INTERRUPT:
-      varlist = new ArrayList<FuncVariable>();
-      expect(TokenType.OPENPAREN);
-      expect(TokenType.CLOSEPAREN);
-      func = new FuncInterrupt(tok.getInfo());
-      break;
-    default:
-      RError.err(ErrorType.Fatal, tok.getInfo(), "Unhandled function type: " + type.name());
-      return null;
+  // EBNF privateFunction: "function" vardeflist [ ":" typeref ] ( block "end" | ";" )
+  protected FuncHeader parseFuncDef(TokenType type, String name, boolean neverHasBody) {
+    Token next = next();
+    if (!type.equals(next.getType())) {
+      RError.err(ErrorType.Error, next.getInfo(), "Found " + next.getType() + ", extected " + type);
     }
 
-    func.setName(name.getData());
-    func.getParam().addAll(varlist);
+    Class<? extends FuncHeader> cl = KnowFuncType.getClassOf(next.getType());
 
-    ((FuncWithBody) func).setBody(stmt().parseBlock());
-    expect(TokenType.END);
+    FunList<FuncVariable> varlist = parseVardefList();
+
+    Reference retType;
+    if (KnowFuncType.getWithRetval(cl)) {
+      expect(TokenType.COLON);
+      retType = expr().parseRef();
+    } else {
+      retType = new Reference(ElementInfo.NO, VoidType.NAME);
+    }
+
+    FuncHeader func;
+
+    if (!neverHasBody && KnowFuncType.getWithBody(cl)) {
+      Block body = stmt().parseBlock();
+      expect(TokenType.END);
+      func = FunctionFactory.create(cl, next.getInfo(), name, varlist, retType, body);
+    } else {
+      expect(TokenType.SEMI);
+      func = FunctionFactory.create(cl, next.getInfo(), name, varlist, retType);
+    }
 
     return func;
   }
@@ -233,7 +93,7 @@ public class BaseParser extends Parser {
   // EBNF vardefNoinit: id { "," id } ":" typeref
   // EBNF vardefCaninit: id { "," id } ":" typeref [ "=" exprList ]
   // EBNF vardefMustinit: id { "," id } ":" typeref "=" exprList
-  protected <T extends Variable> List<T> parseVarDef(Class<T> kind, InitType init) {
+  protected <T extends Variable> FunList<T> parseVarDef(Class<T> kind, InitType init) {
     List<Token> names = new ArrayList<Token>();
     do {
       Token id = expect(TokenType.IDENTIFIER);
@@ -243,7 +103,7 @@ public class BaseParser extends Parser {
     expect(TokenType.COLON);
     Reference type = expr().parseRef();
 
-    List<Expression> def = new ArrayList<Expression>();
+    FunList<Expression> def = new FunList<Expression>();
     if ((init == InitType.MustInit) || ((init == InitType.CanInit) && (peek().getType() == TokenType.EQUAL))) {
       expect(TokenType.EQUAL);
       def = expr().parseExprList();
@@ -258,7 +118,7 @@ public class BaseParser extends Parser {
       return null;
     }
 
-    List<T> ret = new ArrayList<T>();
+    FunList<T> ret = new FunList<T>();
     for (int i = 0; i < names.size(); i++) {
       Reference ntype = Copy.copy(type);
       T var;
@@ -267,15 +127,27 @@ public class BaseParser extends Parser {
       } else {
         var = VariableFactory.create(kind, names.get(i).getInfo(), names.get(i).getData(), ntype, def.get(i));
       }
-      ret.add((T) var);
+      ret.add(var);
     }
 
     return ret;
   }
 
+  // EBNF objDef: id [ "{" vardef { ";" vardef } "}" ]
+  protected Pair<Token, List<TemplateParameter>> parseObjDef() {
+    Token name = expect(TokenType.IDENTIFIER);
+    List<TemplateParameter> genpam;
+    if (peek().getType() == TokenType.OPENCURLY) {
+      genpam = parseGenericParam();
+    } else {
+      genpam = new ArrayList<TemplateParameter>();
+    }
+    return new Pair<Token, List<TemplateParameter>>(name, genpam);
+  }
+
   // EBNF genericParam: [ "{" vardef { ";" vardef } "}" ]
-  protected List<TemplateParameter> parseGenericParam() {
-    ArrayList<TemplateParameter> ret = new ArrayList<TemplateParameter>();
+  protected FunList<TemplateParameter> parseGenericParam() {
+    FunList<TemplateParameter> ret = new FunList<TemplateParameter>();
     if (consumeIfEqual(TokenType.OPENCURLY)) {
       do {
         List<TemplateParameter> param = parseVarDef(TemplateParameter.class, InitType.NoInit);
@@ -287,8 +159,8 @@ public class BaseParser extends Parser {
   }
 
   // EBNF vardeflist: "(" [ vardef { ";" vardef } ] ")"
-  protected List<FuncVariable> parseVardefList() {
-    List<FuncVariable> res = new ArrayList<FuncVariable>();
+  protected FunList<FuncVariable> parseVardefList() {
+    FunList<FuncVariable> res = new FunList<FuncVariable>();
     expect(TokenType.OPENPAREN);
     if (peek().getType() == TokenType.IDENTIFIER) {
       do {
@@ -300,21 +172,42 @@ public class BaseParser extends Parser {
     return res;
   }
 
-  // EBNF constdef: id [ ":" typeref ] "=" expr ";"
-  private <T extends Constant> T parseConstDef(Class<T> kind) {
-    Token id = expect(TokenType.IDENTIFIER);
+  // EBNF constdef: "const" [ typeref ] "=" expr
+  public <T extends Constant> T parseConstDef(Class<T> kind, String name) {
+    ElementInfo info = expect(TokenType.CONST).getInfo();
     Reference type;
-    if (consumeIfEqual(TokenType.COLON)) {
+    if (peek().getType() != TokenType.EQUAL) {
       type = expr().parseRef();
     } else {
-      type = new Reference(id.getInfo(), AnyType.NAME);
+      type = new Reference(info, AnyType.NAME);
     }
     expect(TokenType.EQUAL);
     Expression value = expr().parse();
-    expect(TokenType.SEMI);
 
-    T ret = VariableFactory.create(kind, id.getInfo(), id.getData(), type, value);
-    return ret;
+    return VariableFactory.create(kind, info, name, type, value);
   }
 
+  // EBNF vardefNoinit: typeref
+  // EBNF vardefCaninit: typeref [ "=" expr ]
+  // EBNF vardefMustinit: typeref "=" expr
+  public <T extends Variable> T parseVarDef2(Class<T> kind, String name, InitType init) {
+    Reference type = expr().parseRef();
+    Expression value;
+
+    if ((init == InitType.MustInit) || ((init == InitType.CanInit) && (peek().getType() == TokenType.EQUAL))) {
+      expect(TokenType.EQUAL);
+      value = expr().parse();
+    } else {
+      value = new AnyValue(type.getInfo());
+    }
+
+    T var;
+    if (init == InitType.NoInit) {
+      var = VariableFactory.create(kind, type.getInfo(), name, type);
+    } else {
+      var = VariableFactory.create(kind, type.getInfo(), name, type, value);
+    }
+
+    return var;
+  }
 }

@@ -1,9 +1,0 @@
-component
-  Err5
-    slot
-      funcA();
-
-    implementation elementary
-
-  end
-

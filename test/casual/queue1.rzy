@@ -1,91 +1,76 @@
-type
-  Msg1 = Record
-    dummy: R{0,0};
-  end
-  
-  Msg2 = Record
-    x: R{0,10};
-    y: R{0,10};
-  end
+Msg1 = Record
+  dummy: R{0,0};
+end
 
-  Msg3 = Record
-    x: R{-1000,1000};
-  end
-  
-  Msg4 = Record
-    x: Boolean;
-  end
-  
-  Msg = Union
-    msg1: Msg1;
-    msg2: Msg2;
-    msg3: Msg3;
-    msg4: Msg4;
-  end
+Msg2 = Record
+  x: R{0,10};
+  y: R{0,10};
+end
 
-const
-  Size = 10;
+Msg3 = Record
+  x: R{-1000,1000};
+end
 
-component
-  Queue1
-    slot     dispatch();
-    response count():R{0,Size};
-      
-    slot  inMsg1();
-    slot  inMsg2( x: R{0,10}; y: R{0,10} );
-    slot  inMsg3( x: R{-1000,1000} );
-    slot  inMsg4( x: Boolean );
-      
+Msg4 = Record
+  x: Boolean;
+end
+
+Msg = Union
+  msg1: Msg1;
+  msg2: Msg2;
+  msg3: Msg3;
+  msg4: Msg4;
+end
+
+Size : const = 10;
+
+Queue1 = Elementary
+  outMsg1 : signal();
+  outMsg2 : signal( x: R{0,10}; y: R{0,10} );
+  outMsg3 : signal( x: R{-1000,1000} );
+  outMsg4 : signal( x: Boolean );
+
+  queue : Array{Size,Msg} = [ _ := (msg3 := ( 0 )) ];
+  head  : R{0,Size-1} = 0;
+  size  : R{0,Size} = 0;
     
-    signal  outMsg1();
-    signal  outMsg2( x: R{0,10}; y: R{0,10} );
-    signal  outMsg3( x: R{-1000,1000} );
-    signal  outMsg4( x: Boolean );
-
-  implementation elementary
-
-    var
-      queue : Array{Size,Msg} = [ _ := (msg3 := ( 0 )) ];
-      head  : R{0,Size-1} = 0;
-      size  : R{0,Size} = 0;
-      
-    slot dispatch()
-      if size > 0 then
-        case queue[head] of
-          Msg.msg1: outMsg1(); end
-          Msg.msg2: outMsg2( queue[head].msg2.x, queue[head].msg2.y ); end
-          Msg.msg3: outMsg3( queue[head].msg3.x ); end
-          Msg.msg4: outMsg4( queue[head].msg4.x ); end
-        end
-        head := (head + 1) mod Size;
-        size := R{0,Size}(size - 1);
+  dispatch : slot()
+    if size > 0 then
+      case queue[head] of
+        Msg.msg1: outMsg1(); end
+        Msg.msg2: outMsg2( queue[head].msg2.x, queue[head].msg2.y ); end
+        Msg.msg3: outMsg3( queue[head].msg3.x ); end
+        Msg.msg4: outMsg4( queue[head].msg4.x ); end
       end
+      head := (head + 1) mod Size;
+      size := R{0,Size}(size - 1);
     end
-    
-    response count():R{0,Size}
-      return size;
-    end
-      
-    slot inMsg1()
-      queue[head+size].msg1.dummy := 0;
-      size := R{0,Size}(size + 1);
-    end
-    
-    slot inMsg2( x: R{0,10}; y: R{0,10} )
-      queue[head+size].msg2.x := x;
-      queue[head+size].msg2.y := y;
-      size := R{0,Size}(size + 1);
-    end
-    
-    slot inMsg3( x: R{-1000,1000} )
-      queue[head+size].msg3.x := x;
-      size := R{0,Size}(size + 1);
-    end
-    
-    slot inMsg4( x: Boolean )
-      queue[head+size].msg4.x := x;
-      size := R{0,Size}(size + 1);
-    end
-
   end
+  
+  count : response():R{0,Size}
+    return size;
+  end
+    
+  inMsg1 : slot()
+    queue[head+size].msg1.dummy := 0;
+    size := R{0,Size}(size + 1);
+  end
+  
+  inMsg2 : slot( x: R{0,10}; y: R{0,10} )
+    queue[head+size].msg2.x := x;
+    queue[head+size].msg2.y := y;
+    size := R{0,Size}(size + 1);
+  end
+  
+  inMsg3 : slot( x: R{-1000,1000} )
+    queue[head+size].msg3.x := x;
+    size := R{0,Size}(size + 1);
+  end
+  
+  inMsg4 : slot( x: Boolean )
+    queue[head+size].msg4.x := x;
+    size := R{0,Size}(size + 1);
+  end
+
+end
 

@@ -1,16 +1,12 @@
 // Error: response is not allowed to output
 
-component
-  Err1
-    response what():R{0,100};
-    signal   event();
-      
-  implementation elementary
+Err1 = Elementary
+  event : signal();
     
-    response what():R{0,100}
-      event();
-      return 0;
-    end
-    
+  what : response():R{0,100}
+    event();
+    return 0;
   end
+  
+end
 

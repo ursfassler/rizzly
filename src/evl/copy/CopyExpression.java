@@ -36,10 +36,12 @@ import evl.expression.binop.Plus;
 import evl.expression.binop.Shl;
 import evl.expression.binop.Shr;
 import evl.expression.reference.Reference;
+import evl.expression.reference.SimpleRef;
 import evl.expression.unop.BitNot;
 import evl.expression.unop.LogicNot;
 import evl.expression.unop.Not;
 import evl.expression.unop.Uminus;
+import evl.other.CompUse;
 
 public class CopyExpression extends NullTraverser<Expression, Void> {
 
@@ -53,6 +55,16 @@ public class CopyExpression extends NullTraverser<Expression, Void> {
   @Override
   protected Expression visitDefault(Evl obj, Void param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+  }
+
+  @Override
+  protected Expression visitCompUse(CompUse obj, Void param) {
+    return new CompUse(obj.getInfo(), obj.getLink(), obj.getName()); // we keep link to old type
+  }
+
+  @Override
+  protected Expression visitTypeRef(SimpleRef obj, Void param) {
+    return new SimpleRef(obj.getInfo(), obj.getLink()); // we keep link to old type
   }
 
   @Override
@@ -87,12 +99,12 @@ public class CopyExpression extends NullTraverser<Expression, Void> {
 
   @Override
   protected Expression visitArrayValue(ArrayValue obj, Void param) {
-    return new ArrayValue(obj.getInfo(), new ArrayList<Expression>(cast.copy(obj.getValue())));
+    return new ArrayValue(obj.getInfo(), cast.copy(obj.getValue()));
   }
 
   @Override
   protected Expression visitExprList(ExprList obj, Void param) {
-    return new ExprList(obj.getInfo(), new ArrayList<Expression>(cast.copy(obj.getValue())));
+    return new ExprList(obj.getInfo(), cast.copy(obj.getValue()));
   }
 
   @Override

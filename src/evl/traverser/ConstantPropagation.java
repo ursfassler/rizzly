@@ -41,7 +41,7 @@ public class ConstantPropagation extends ExprReplacer<Void> {
   protected Expression visitReference(Reference obj, Void param) {
     if (obj.getLink() instanceof Constant) {
       Constant constant = (Constant) obj.getLink();
-      Type type = constant.getType().getRef();
+      Type type = constant.getType().getLink();
       if (doReduce(type)) {
         assert (obj.getOffset().isEmpty());
         return visit(constant.getDef(), null);

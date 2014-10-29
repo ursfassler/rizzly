@@ -23,7 +23,7 @@ import evl.type.base.RangeType;
  * 
  */
 public class BitnotFixer extends ExprReplacer<Void> {
-  private final static ElementInfo info = new ElementInfo();
+  private final static ElementInfo info = ElementInfo.NO;
   private final KnowType kt;
 
   public BitnotFixer(KnowledgeBase kb) {

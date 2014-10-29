@@ -1,19 +1,20 @@
 package evl.hfsm.reduction;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import common.Designator;
 
 import evl.Evl;
 import evl.NullTraverser;
-import evl.function.FunctionBase;
-import evl.function.impl.FuncImplResponse;
-import evl.function.impl.FuncPrivateRet;
-import evl.function.impl.FuncPrivateVoid;
+import evl.function.Function;
+import evl.function.header.FuncPrivateRet;
+import evl.function.header.FuncPrivateVoid;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.State;
-import evl.hfsm.Transition;
+import evl.hfsm.StateItem;
+import evl.knowledge.KnowledgeBase;
 
 /**
  * Moves all functions of all states to the top-state.
@@ -22,36 +23,34 @@ import evl.hfsm.Transition;
  * 
  */
 public class StateFuncUplifter extends NullTraverser<Void, Designator> {
-  final private List<FunctionBase> func = new ArrayList<FunctionBase>();
+  final private List<Function> func = new ArrayList<Function>();
 
-  static public void process(ImplHfsm obj) {
-    StateFuncUplifter know = new StateFuncUplifter();
+  public StateFuncUplifter(KnowledgeBase kb) {
+    super();
+  }
+
+  static public void process(ImplHfsm obj, KnowledgeBase kb) {
+    StateFuncUplifter know = new StateFuncUplifter(kb);
     know.traverse(obj, null);
   }
 
-  public List<FunctionBase> getFunc() {
+  public List<Function> getFunc() {
     return func;
   }
 
   @Override
   protected Void visitDefault(Evl obj, Designator param) {
-    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+    if (obj instanceof StateItem) {
+      return null;
+    } else {
+      throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+    }
   }
 
   @Override
   protected Void visitImplHfsm(ImplHfsm obj, Designator param) {
     visit(obj.getTopstate(), new Designator());
-    obj.getTopstate().getFunction().addAll(func);
-    return null;
-  }
-
-  @Override
-  protected Void visitTransition(Transition obj, Designator param) {
-    return null;
-  }
-
-  @Override
-  protected Void visitFuncImplResponse(FuncImplResponse obj, Designator param) {
+    obj.getTopstate().getItem().addAll((Collection<? extends StateItem>) func);
     return null;
   }
 
@@ -60,10 +59,9 @@ public class StateFuncUplifter extends NullTraverser<Void, Designator> {
     param = new Designator(param, obj.getName());
     // visit(obj.getEntryCode(), param);//TODO correct? It is no longer a function and should not exist at this point
     // visit(obj.getExitCode(), param);
-    visitItr(obj.getFunction(), param);
-    visitItr(obj.getItem(), param);
+    visitList(obj.getItem(), param);
 
-    obj.getFunction().clear();
+    obj.getItem().removeAll(func);
 
     return null;
   }

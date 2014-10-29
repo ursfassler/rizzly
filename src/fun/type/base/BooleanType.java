@@ -2,19 +2,11 @@ package fun.type.base;
 
 import common.ElementInfo;
 
-import fun.other.ListOfNamed;
-import fun.variable.TemplateParameter;
-
 final public class BooleanType extends BaseType {
   public static final String NAME = "Boolean";
 
   public BooleanType() {
-    super(new ElementInfo(), NAME);
-  }
-
-  @Override
-  public ListOfNamed<TemplateParameter> getParamList() {
-    return new ListOfNamed<TemplateParameter>();
+    super(ElementInfo.NO, NAME);
   }
 
   @Override

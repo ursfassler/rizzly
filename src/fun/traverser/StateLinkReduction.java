@@ -6,7 +6,7 @@ import fun.expression.reference.RefItem;
 import fun.expression.reference.RefName;
 import fun.expression.reference.Reference;
 import fun.hfsm.State;
-import fun.knowledge.KnowFunChild;
+import fun.knowledge.KnowChild;
 import fun.knowledge.KnowledgeBase;
 import fun.other.Named;
 
@@ -17,10 +17,10 @@ import fun.other.Named;
  * 
  */
 public class StateLinkReduction extends DefTraverser<Void, Void> {
-  private final KnowFunChild kc;
+  private final KnowChild kc;
 
   public StateLinkReduction(KnowledgeBase kb) {
-    kc = kb.getEntry(KnowFunChild.class);
+    kc = kb.getEntry(KnowChild.class);
   }
 
   public static void process(Fun inst, KnowledgeBase kb) {
@@ -30,19 +30,20 @@ public class StateLinkReduction extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitReference(Reference obj, Void param) {
-    Named item = obj.getLink();
+    Fun item = obj.getLink();
     if (item instanceof State) {
       while (!obj.getOffset().isEmpty()) {
-        RefItem next = obj.getOffset().pop();
+        RefItem next = obj.getOffset().get(0);
+        obj.getOffset().remove(0);
         RefName name = (RefName) next;
 
-        item = (Named) kc.get(item, name.getName());
+        item = kc.get(item, name.getName());
         assert (item != null);
         if (!(item instanceof State)) {
           break;
         }
       }
-      obj.setLink(item);
+      obj.setLink((Named) item);
       obj.getOffset().clear();
     }
     return super.visitReference(obj, param);

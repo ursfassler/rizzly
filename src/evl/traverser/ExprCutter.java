@@ -4,8 +4,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import common.ElementInfo;
-import common.NameFactory;
 
+import error.ErrorType;
+import error.RError;
 import evl.Evl;
 import evl.NullTraverser;
 import evl.composition.ImplComposition;
@@ -19,12 +20,12 @@ import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefItem;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
-import evl.function.FuncWithBody;
-import evl.function.FunctionBase;
-import evl.knowledge.KnowPath;
+import evl.expression.reference.SimpleRef;
+import evl.function.Function;
 import evl.knowledge.KnowSimpleExpr;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
+import evl.other.EvlList;
 import evl.other.ImplElementary;
 import evl.other.Namespace;
 import evl.other.SubCallbacks;
@@ -43,7 +44,6 @@ import evl.statement.Statement;
 import evl.statement.VarDefStmt;
 import evl.statement.WhileStmt;
 import evl.type.Type;
-import evl.type.TypeRef;
 import evl.variable.FuncVariable;
 
 //TODO also split relation operands (only ref to var or constant)
@@ -75,32 +75,30 @@ public class ExprCutter extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitItr(Iterable<? extends Evl> list, Void param) {
+  protected Void visitList(EvlList<? extends Evl> list, Void param) {
     // against comodification error
-    ArrayList<Evl> old = new ArrayList<Evl>();
+    EvlList<Evl> old = new EvlList<Evl>();
     for (Evl itr : list) {
       old.add(itr);
     }
-    return super.visitItr(old, param);
+    return super.visitList(old, param);
   }
 
   @Override
   protected Void visitNamespace(Namespace obj, Void param) {
-    visitItr(obj, param);
+    visitList(obj.getChildren(), param);
     return null;
   }
 
   @Override
   protected Void visitSubCallbacks(SubCallbacks obj, Void param) {
-    visitItr(obj, param);
+    visitList(obj.getFunc(), param);
     return null;
   }
 
   @Override
-  protected Void visitFunctionBase(FunctionBase obj, Void param) {
-    if (obj instanceof FuncWithBody) {
-      visit(((FuncWithBody) obj).getBody(), null);
-    }
+  protected Void visitFunctionImpl(Function obj, Void param) {
+    visit(obj.getBody(), null);
     return null;
   }
 
@@ -112,8 +110,8 @@ public class ExprCutter extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitImplElementary(ImplElementary obj, Void param) {
-    visitItr(obj.getFunction(), param);
-    visitItr(obj.getSubCallback(), param);
+    visitList(obj.getFunction(), param);
+    visitList(obj.getSubCallback(), param);
     return null;
   }
 
@@ -169,7 +167,7 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
 
     if (!rs & !ls) {
       FuncVariable var = cutter.extract(obj.getRight(), param);
-      obj.setRight(new Reference(new ElementInfo(), var));
+      obj.setRight(new Reference(ElementInfo.NO, var));
     }
 
     return null;
@@ -186,7 +184,7 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
 
   @Override
   protected Void visitReference(Reference obj, List<Statement> param) {
-    visitItr(obj.getOffset(), param);
+    visitList(obj.getOffset(), param);
     return null;
   }
 
@@ -219,7 +217,7 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
 
   @Override
   protected Void visitWhileStmt(WhileStmt obj, List<Statement> param) {
-    assert (false);
+    RError.err(ErrorType.Fatal, obj.getInfo(), "can not yet correctly split while statement");
     // FIXME the following code is wrong. If we extract code from the condition, it has to go into all incoming edges of
     // the condition
     // => also in the body of the loop
@@ -252,7 +250,7 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
       obj.setCondition(new Reference(obj.getInfo(), var));
     }
     for (CaseOpt opt : obj.getOption()) {
-      visitItr(opt.getValue(), param);
+      visitList(opt.getValue(), param);
       visit(opt.getCode(), null);
     }
     visit(obj.getOtherwise(), null);
@@ -305,8 +303,8 @@ class Cutter extends ExprReplacer<List<Statement>> {
   private Type getType(Expression obj) {
     Type type = kt.get(obj);
 
-    KnowPath ka = kb.getEntry(KnowPath.class);
-    assert (ka.find(type) != null);
+    // KnowPath ka = kb.getEntry(KnowPath.class);
+    // assert (ka.find(type) != null);
 
     return type;
   }
@@ -314,7 +312,7 @@ class Cutter extends ExprReplacer<List<Statement>> {
   FuncVariable extract(Expression obj, List<Statement> param) {
     ElementInfo info = obj.getInfo();
     Type type = getType(obj);
-    FuncVariable var = new FuncVariable(info, NameFactory.getNew(), new TypeRef(obj.getInfo(), type));
+    FuncVariable var = new FuncVariable(info, "", new SimpleRef<Type>(obj.getInfo(), type));
     param.add(new VarDefStmt(info, var));
     param.add(new Assignment(info, new Reference(info, var), obj));
     return var;

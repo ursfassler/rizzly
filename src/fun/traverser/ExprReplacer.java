@@ -21,9 +21,10 @@ import fun.expression.reference.RefItem;
 import fun.expression.reference.RefName;
 import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.Reference;
-import fun.function.FuncWithReturn;
-import fun.function.FunctionHeader;
+import fun.function.FuncHeader;
 import fun.hfsm.Transition;
+import fun.other.ActualTemplateArgument;
+import fun.other.FunList;
 import fun.statement.Assignment;
 import fun.statement.CaseOptRange;
 import fun.statement.CaseOptValue;
@@ -31,7 +32,6 @@ import fun.statement.CaseStmt;
 import fun.statement.IfOption;
 import fun.statement.ReturnExpr;
 import fun.statement.While;
-import fun.type.base.TypeAlias;
 import fun.type.composed.NamedElement;
 import fun.variable.Constant;
 import fun.variable.Variable;
@@ -76,7 +76,17 @@ public class ExprReplacer<T> extends DefTraverser<Expression, T> {
 
   @Override
   protected Expression visitRefCompcall(RefTemplCall obj, T param) {
-    visitExprList(obj.getActualParameter(), param);
+    FunList<ActualTemplateArgument> list = obj.getActualParameter();
+    for (int i = 0; i < list.size(); i++) {
+      if (list.get(i) instanceof Expression) {
+        Expression old = (Expression) list.get(i);
+        Expression expr = visit(old, param);
+        if (expr == null) {
+          RError.err(ErrorType.Fatal, old.getInfo(), "not handled class: " + old.getClass().getCanonicalName());
+        }
+        list.set(i, expr);
+      }
+    }
     return null;
   }
 
@@ -170,7 +180,7 @@ public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   @Override
   protected Expression visitCaseStmt(CaseStmt obj, T param) {
     obj.setCondition(visit(obj.getCondition(), param));
-    visitItr(obj.getOption(), param);
+    visitList(obj.getOption(), param);
     visit(obj.getOtherwise(), param);
     return null;
   }
@@ -195,29 +205,21 @@ public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitTypeAlias(TypeAlias obj, T param) {
-    obj.setRef((Reference) visit(obj.getRef(), param));
-    return super.visitTypeAlias(obj, param);
-  }
-
-  @Override
   protected Expression visitVariable(Variable obj, T param) {
     obj.setType((Reference) visit(obj.getType(), param));
     return super.visitVariable(obj, param);
   }
 
   @Override
-  protected Expression visitFunctionHeader(FunctionHeader obj, T param) {
-    if (obj instanceof FuncWithReturn) {
-      ((FuncWithReturn) obj).setRet((Reference) visit(((FuncWithReturn) obj).getRet(), param));
-    }
-    return super.visitFunctionHeader(obj, param);
+  protected Expression visitNamedElementValue(NamedElementValue obj, T param) {
+    obj.setValue(visit(obj.getValue(), param));
+    return obj;
   }
 
   @Override
-  protected Expression visitNamedElementValue(NamedElementValue obj, T param) {
-    obj.setValue(visit(obj.getValue(), param));
-    return super.visitNamedElementValue(obj, param);
+  protected Expression visitFunctionHeader(FuncHeader obj, T param) {
+    obj.setRet((Reference) visit(obj.getRet(), param));
+    return super.visitFunctionHeader(obj, param);
   }
 
 }

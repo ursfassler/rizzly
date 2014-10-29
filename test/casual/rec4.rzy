@@ -1,18 +1,11 @@
-type
-  Point = Record
-    x : R{0,100};
-    y : R{0,100};
+Point = Record
+  x : R{0,100};
+  y : R{0,100};
+end
+
+Rec4 = Elementary
+  equal : response( a, b: Point ):Boolean
+    return a = b;
   end
-
-component
-  Rec4
-    response equal( a, b: Point ):Boolean;
-    
-  implementation elementary
-
-    response equal( a, b: Point ):Boolean
-      return a = b;
-    end
-
-  end
+end
 

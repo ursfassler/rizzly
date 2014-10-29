@@ -5,12 +5,12 @@ public enum Direction {
 
   public Direction other() {
     switch (this) {
-    case in:
-      return out;
-    case out:
-      return in;
-    default:
-      throw new RuntimeException("Unknown direction: " + this);
+      case in:
+        return out;
+      case out:
+        return in;
+      default:
+        throw new RuntimeException("Unknown direction: " + this);
     }
   }
 }

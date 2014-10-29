@@ -1,32 +1,22 @@
-component
-  GenericDef{T:Type{Integer}}
-    slot     set( item: T );
-    response get():T;
+GenericDef{T:Type{Integer}} = Elementary
+  data: T = 0;
 
-  implementation elementary
-
-    var
-      data: T = 0;
-
-    slot set( item: T )
-      data := item;
-    end
-
-    response get():T
-      return data;
-    end
+  set : slot( item: T )
+    data := item;
   end
 
-  GenericUse2
-    slot     set( x: R{0,255} );
-    response get():R{0,255};
+  get : response():T
+    return data;
+  end
+end
+
+GenericUse2 = Composition
+  set : slot( x: R{0,255} );
+  get : response():R{0,255};
+  
+  gen : GenericDef{R{0,255}};
     
-  implementation composition
-    component
-      gen : GenericDef{R{0,255}};
-      
-    connection
-      set -> gen.set;
-      get -> gen.get;
-  end
+  set -> gen.set;
+  get -> gen.get;
+end
 

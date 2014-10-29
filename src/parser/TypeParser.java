@@ -6,22 +6,15 @@ import java.util.List;
 import error.ErrorType;
 import error.RError;
 import fun.Copy;
+import fun.Fun;
 import fun.expression.reference.Reference;
-import fun.function.impl.FuncProtQuery;
-import fun.function.impl.FuncProtResponse;
-import fun.function.impl.FuncProtSignal;
-import fun.function.impl.FuncProtSlot;
-import fun.other.Component;
-import fun.other.ListOfNamed;
+import fun.other.CompImpl;
 import fun.type.Type;
-import fun.type.TypeGenerator;
 import fun.type.base.EnumElement;
 import fun.type.base.EnumType;
-import fun.type.base.TypeAlias;
 import fun.type.composed.NamedElement;
 import fun.type.composed.RecordType;
 import fun.type.composed.UnionType;
-import fun.variable.TemplateParameter;
 
 public class TypeParser extends BaseParser {
 
@@ -29,110 +22,45 @@ public class TypeParser extends BaseParser {
     super(scanner);
   }
 
-  // EBNF compdefsec: "component" compdecl { compdecl }
-  protected List<Component> parseComponentSection() {
-    expect(TokenType.COMPONENT);
-    List<Component> ret = new ArrayList<Component>();
-    do {
-      ret.add(parseCompdecl());
-    } while (peek().getType() == TokenType.IDENTIFIER);
-    return ret;
-  }
-
-  // EBNF typesec: "type" typedecl { typedecl }
-  protected List<Type> parseTypeSection() {
-    expect(TokenType.TYPE_SEC);
-    List<Type> ret = new ArrayList<Type>();
-    do {
-      ret.add(parseTypedecl());
-    } while (peek().getType() == TokenType.IDENTIFIER);
-    return ret;
-  }
-
-  // EBNF compdecl: id genericParam component
-  private Component parseCompdecl() {
-    Token name = expect(TokenType.IDENTIFIER);
-    List<TemplateParameter> genpam;
-    if (peek().getType() == TokenType.OPENCURLY) {
-      genpam = parseGenericParam();
-    } else {
-      genpam = new ArrayList<TemplateParameter>();
-    }
-
-    Component type = parseComponent(name);
-    type.getTemplateParam().addAll(genpam);
-
-    return type;
-  }
-
-  // EBNF component: compIfaceList componentImplementation "end"
-  private Component parseComponent(Token name) {
-    ListOfNamed<FuncProtResponse> response = new ListOfNamed<FuncProtResponse>();
-    ListOfNamed<FuncProtQuery> query = new ListOfNamed<FuncProtQuery>();
-    ListOfNamed<FuncProtSignal> signal = new ListOfNamed<FuncProtSignal>();
-    ListOfNamed<FuncProtSlot> slot = new ListOfNamed<FuncProtSlot>();
-
-    parseCompIfaceList(query, response, signal, slot);
-
-    Component iface = parseComponentImplementation(name);
-
-    iface.getResponse().addAll(response);
-    iface.getQuery().addAll(query);
-    iface.getSignal().addAll(signal);
-    iface.getSlot().addAll(slot);
-
-    expect(TokenType.END);
-
-    return iface;
-  }
-
-  // EBNF typedecl: id genericParam "=" typedef
-  private Type parseTypedecl() {
-    Token name = expect(TokenType.IDENTIFIER);
-    List<TemplateParameter> genpam;
-    if (peek().getType() == TokenType.OPENCURLY) {
-      genpam = parseGenericParam();
-    } else {
-      genpam = null;
-    }
-    expect(TokenType.EQUAL);
-
-    Type type = parseTypeDef(name.getData());
-    if (genpam != null) {
-      if (type instanceof TypeGenerator) {
-        ((TypeGenerator) type).getTemplateParam().addAll(genpam);
-      } else {
-        RError.err(ErrorType.Error, name.getInfo(), "Expected type template");
+  // EBNF compdecl: compIfaceList component "end"
+  public CompImpl parseCompdecl(String name) {
+    switch (peek().getType()) {
+      case ELEMENTARY:
+        return ImplElementaryParser.parse(getScanner(), name);
+      case COMPOSITION:
+        return ImplCompositionParser.parse(getScanner(), name);
+      case HFSM:
+        return ImplHfsmParser.parse(getScanner(), name);
+      default: {
+        wrongToken(TokenType.ELEMENTARY);
+        return null;
       }
-
     }
-
-    return type;
   }
 
   // EBNF typedef: recordtype | uniontype | enumtype | arraytype | derivatetype
-  private Type parseTypeDef(String name) {
+  public Fun parseTypeDef(String name) {
     switch (peek().getType()) {
-    case RECORD:
-      return parseRecordType(name);
-    case UNION:
-      return parseUnionType(name);
-    case ENUM:
-      return parseEnumType(name);
-    case IDENTIFIER:
-      return parseDerivateType(name);
-    default:
-      RError.err(ErrorType.Fatal, peek().getInfo(), "Expected record, union or type reference");
-      return null;
+      case RECORD:
+        return parseRecordType(name);
+      case UNION:
+        return parseUnionType(name);
+      case ENUM:
+        return parseEnumType(name);
+      case IDENTIFIER:
+        return parseDerivateType();
+      default:
+        RError.err(ErrorType.Fatal, peek().getInfo(), "Expected record, union or type reference");
+        return null;
     }
 
   }
 
   // EBNF derivatetype: ref ";"
-  private Type parseDerivateType(String name) {
+  private Reference parseDerivateType() {
     Reference ref = expr().parseRef();
     expect(TokenType.SEMI);
-    return new TypeAlias(ref.getInfo(), name, ref);
+    return ref;
   }
 
   // EBNF recordtype: "Record" { recordElem } "end"
@@ -202,20 +130,4 @@ public class TypeParser extends BaseParser {
     return ret;
   }
 
-  // EBNF componentImplementation: "implementation" ( implementationElementary | implementationComposition )
-  private Component parseComponentImplementation(Token name) {
-    expect(TokenType.IMPLEMENTATION);
-    switch (peek().getType()) {
-    case ELEMENTARY:
-      return ImplElementaryParser.parse(getScanner(), name);
-    case COMPOSITION:
-      return ImplCompositionParser.parse(getScanner(), name);
-    case HFSM:
-      return ImplHfsmParser.parse(getScanner(), name);
-    default: {
-      wrongToken(TokenType.ELEMENTARY);
-      return null;
-    }
-    }
-  }
 }

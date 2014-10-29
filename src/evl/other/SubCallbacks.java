@@ -2,34 +2,25 @@ package evl.other;
 
 import common.ElementInfo;
 
-import evl.Evl;
-import evl.function.FunctionHeader;
+import evl.EvlBase;
+import evl.expression.reference.SimpleRef;
+import evl.function.Function;
 
-public class SubCallbacks extends ListOfNamed<FunctionHeader> implements Named, Evl {
-  private ElementInfo info;
-  private String name;
+public class SubCallbacks extends EvlBase {
+  final private EvlList<Function> func = new EvlList<Function>();
+  final private SimpleRef<CompUse> compUse;
 
-  public SubCallbacks(ElementInfo info, String name) {
-    this.info = info;
-    this.name = name;
+  public SubCallbacks(ElementInfo info, SimpleRef<CompUse> compUse) {
+    super(info);
+    this.compUse = compUse;
   }
 
-  public String getName() {
-    return name;
+  public EvlList<Function> getFunc() {
+    return func;
   }
 
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  @Override
-  public ElementInfo getInfo() {
-    return info;
-  }
-
-  @Override
-  public String toString() {
-    return name;
+  public SimpleRef<CompUse> getCompUse() {
+    return compUse;
   }
 
 }

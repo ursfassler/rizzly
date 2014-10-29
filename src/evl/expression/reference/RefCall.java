@@ -1,22 +1,19 @@
 package evl.expression.reference;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
 import common.ElementInfo;
 
 import evl.expression.Expression;
+import evl.other.EvlList;
 
 final public class RefCall extends RefItem {
-  private List<Expression> actualParameter;
+  private EvlList<Expression> actualParameter;
 
-  public RefCall(ElementInfo info, Collection<Expression> actualParameter) {
+  public RefCall(ElementInfo info, EvlList<Expression> actualParameter) {
     super(info);
-    this.actualParameter = new ArrayList<Expression>(actualParameter);
+    this.actualParameter = new EvlList<Expression>(actualParameter);
   }
 
-  public List<Expression> getActualParameter() {
+  public EvlList<Expression> getActualParameter() {
     return actualParameter;
   }
 

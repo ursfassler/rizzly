@@ -23,23 +23,19 @@ public class Scanner implements PeekReader<Token> {
   private ArrayList<Metadata> metadata = new ArrayList<Metadata>();
 
   {
-    keywords.put("component", TokenType.COMPONENT);
-    keywords.put("connection", TokenType.CONNECTION);
-    keywords.put("implementation", TokenType.IMPLEMENTATION);
-    keywords.put("elementary", TokenType.ELEMENTARY);
-    keywords.put("composition", TokenType.COMPOSITION);
-    keywords.put("hfsm", TokenType.HFSM);
-    keywords.put("transition", TokenType.TRANSITION);
+    keywords.put("Elementary", TokenType.ELEMENTARY);
+    keywords.put("Composition", TokenType.COMPOSITION);
+    keywords.put("Hfsm", TokenType.HFSM);
     keywords.put("state", TokenType.STATE);
     keywords.put("to", TokenType.TO);
     keywords.put("by", TokenType.BY);
     keywords.put("entry", TokenType.ENTRY);
     keywords.put("exit", TokenType.EXIT);
     keywords.put("end", TokenType.END);
-    keywords.put("var", TokenType.VAR);
     keywords.put("const", TokenType.CONST);
+    keywords.put("register", TokenType.REGISTER);
     keywords.put("function", TokenType.FUNCTION);
-    keywords.put("type", TokenType.TYPE_SEC);
+    keywords.put("procedure", TokenType.PROCEDURE);
     keywords.put("Record", TokenType.RECORD);
     keywords.put("Union", TokenType.UNION);
     keywords.put("Enum", TokenType.ENUM);
@@ -134,64 +130,64 @@ public class Scanner implements PeekReader<Token> {
     }
     Symbol sym = reader.next();
     switch (sym.sym) {
-    case ' ':
-    case '\t':
-    case 13:
-    case '\n':
-      return token(TokenType.IGNORE, sym);
-    case '<':
-      return read_3C(sym);
-    case '=':
-      return token(TokenType.EQUAL, sym);
-    case '>':
-      return read_3E(sym);
-    case '-':
-      return read_2D(sym);
-    case ',':
-      return token(TokenType.COMMA, sym);
-    case ':':
-      return read_3A(sym);
-    case ';':
-      return token(TokenType.SEMI, sym);
-    case '\'':
-      return read_27(sym);
-    case '/':
-      return read_2F(sym);
-    case '.':
-      return read_2E(sym);
-    case '(':
-      return token(TokenType.OPENPAREN, sym);
-    case ')':
-      return token(TokenType.CLOSEPAREN, sym);
-    case '{':
-      return token(TokenType.OPENCURLY, sym);
-    case '}':
-      return token(TokenType.CLOSECURLY, sym);
-    case '[':
-      return token(TokenType.OPEN_ARRAY, sym);
-    case ']':
-      return token(TokenType.CLOSE_ARRAY, sym);
-    case '*':
-      return token(TokenType.STAR, sym);
-    case '+':
-      return token(TokenType.PLUS, sym);
-    default:
-      if (isAlpha(sym.sym)) {
-        String id = readIdentifier(Character.toString(sym.sym));
-        if (keywords.containsKey(id)) {
-          return token(keywords.get(id), sym);
+      case ' ':
+      case '\t':
+      case 13:
+      case '\n':
+        return token(TokenType.IGNORE, sym);
+      case '<':
+        return read_3C(sym);
+      case '=':
+        return token(TokenType.EQUAL, sym);
+      case '>':
+        return read_3E(sym);
+      case '-':
+        return read_2D(sym);
+      case ',':
+        return token(TokenType.COMMA, sym);
+      case ':':
+        return read_3A(sym);
+      case ';':
+        return token(TokenType.SEMI, sym);
+      case '\'':
+        return read_27(sym);
+      case '/':
+        return read_2F(sym);
+      case '.':
+        return read_2E(sym);
+      case '(':
+        return token(TokenType.OPENPAREN, sym);
+      case ')':
+        return token(TokenType.CLOSEPAREN, sym);
+      case '{':
+        return token(TokenType.OPENCURLY, sym);
+      case '}':
+        return token(TokenType.CLOSECURLY, sym);
+      case '[':
+        return token(TokenType.OPEN_ARRAY, sym);
+      case ']':
+        return token(TokenType.CLOSE_ARRAY, sym);
+      case '*':
+        return token(TokenType.STAR, sym);
+      case '+':
+        return token(TokenType.PLUS, sym);
+      default:
+        if (isAlpha(sym.sym)) {
+          String id = readIdentifier(Character.toString(sym.sym));
+          if (keywords.containsKey(id)) {
+            return token(keywords.get(id), sym);
+          } else {
+            TokenType type;
+            type = TokenType.IDENTIFIER;
+            Token toc = token(type, id, sym);
+            return toc;
+          }
+        } else if (isNummeric(sym.sym)) {
+          return readNumber(sym);
         } else {
-          TokenType type;
-          type = TokenType.IDENTIFIER;
-          Token toc = token(type, id, sym);
-          return toc;
+          RError.err(ErrorType.Error, source, sym.line, sym.row, "Unexpected character: #" + Integer.toHexString((int) sym.sym) + " (" + sym.sym + ")");
+          return specialToken(TokenType.IGNORE);
         }
-      } else if (isNummeric(sym.sym)) {
-        return readNumber(sym);
-      } else {
-        RError.err(ErrorType.Error, source, sym.line, sym.row, "Unexpected character: #" + Integer.toHexString((int) sym.sym) + " (" + sym.sym + ")");
-        return specialToken(TokenType.IGNORE);
-      }
     }
   }
 
@@ -244,16 +240,16 @@ public class Scanner implements PeekReader<Token> {
   private Token read_2F(Symbol start) {
     Symbol sym = reader.peek();
     switch (sym.sym) {
-    case '*':
-      reader.next();
-      seekTilEndComment();
-      return token(TokenType.IGNORE, start);
-    case '/':
-      reader.next();
-      parseMetadata(start);
-      return token(TokenType.IGNORE, start);
-    default:
-      return token(TokenType.DIV, start);
+      case '*':
+        reader.next();
+        seekTilEndComment();
+        return token(TokenType.IGNORE, start);
+      case '/':
+        reader.next();
+        parseMetadata(start);
+        return token(TokenType.IGNORE, start);
+      default:
+        return token(TokenType.DIV, start);
     }
   }
 
@@ -261,11 +257,11 @@ public class Scanner implements PeekReader<Token> {
   private Token read_2E(Symbol start) {
     Symbol sym = reader.peek();
     switch (sym.sym) {
-    case '.':
-      reader.next();
-      return token(TokenType.RANGE, start);
-    default:
-      return token(TokenType.PERIOD, start);
+      case '.':
+        reader.next();
+        return token(TokenType.RANGE, start);
+      default:
+        return token(TokenType.PERIOD, start);
     }
   }
 
@@ -273,11 +269,11 @@ public class Scanner implements PeekReader<Token> {
   private Token read_3A(Symbol start) {
     Symbol sym = reader.peek();
     switch (sym.sym) {
-    case '=':
-      reader.next();
-      return token(TokenType.BECOMES, start);
-    default:
-      return token(TokenType.COLON, start);
+      case '=':
+        reader.next();
+        return token(TokenType.BECOMES, start);
+      default:
+        return token(TokenType.COLON, start);
     }
   }
 
@@ -285,14 +281,14 @@ public class Scanner implements PeekReader<Token> {
   private Token read_3C(Symbol start) {
     Symbol sym = reader.peek();
     switch (sym.sym) {
-    case '=':
-      reader.next();
-      return token(TokenType.LEQ, start);
-    case '>':
-      reader.next();
-      return token(TokenType.NEQ, start);
-    default:
-      return token(TokenType.LOWER, start);
+      case '=':
+        reader.next();
+        return token(TokenType.LEQ, start);
+      case '>':
+        reader.next();
+        return token(TokenType.NEQ, start);
+      default:
+        return token(TokenType.LOWER, start);
     }
   }
 
@@ -300,14 +296,14 @@ public class Scanner implements PeekReader<Token> {
   private Token read_3E(Symbol start) {
     Symbol sym = reader.peek();
     switch (sym.sym) {
-    case '=':
-      reader.next();
-      return token(TokenType.GEQ, start);
-    case '>':
-      reader.next();
-      return token(TokenType.ASYNC_MSG, start);
-    default:
-      return token(TokenType.GREATER, start);
+      case '=':
+        reader.next();
+        return token(TokenType.GEQ, start);
+      case '>':
+        reader.next();
+        return token(TokenType.ASYNC_MSG, start);
+      default:
+        return token(TokenType.GREATER, start);
     }
   }
 
@@ -315,11 +311,11 @@ public class Scanner implements PeekReader<Token> {
   private Token read_2D(Symbol start) {
     Symbol sym = reader.peek();
     switch (sym.sym) {
-    case '>':
-      reader.next();
-      return token(TokenType.SYNC_MSG, start);
-    default:
-      return token(TokenType.MINUS, start);
+      case '>':
+        reader.next();
+        return token(TokenType.SYNC_MSG, start);
+      default:
+        return token(TokenType.MINUS, start);
     }
   }
 
@@ -379,14 +375,14 @@ public class Scanner implements PeekReader<Token> {
     String key = "";
     while (true) {
       switch (reader.peek().sym) {
-      case ' ':
-        reader.next();
-        return key;
-      case '\n':
-        return key;
-      default:
-        key += reader.next().sym;
-        break;
+        case ' ':
+          reader.next();
+          return key;
+        case '\n':
+          return key;
+        default:
+          key += reader.next().sym;
+          break;
       }
     }
   }

@@ -1,14 +1,14 @@
 package evl.traverser;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import util.StreamWriter;
 import cir.traverser.CWriter;
 
 import common.ElementInfo;
-import common.FuncAttr;
+import common.Property;
 
 import error.ErrorType;
 import error.RError;
@@ -16,14 +16,13 @@ import evl.Evl;
 import evl.NullTraverser;
 import evl.expression.BoolValue;
 import evl.expression.Number;
-import evl.function.FuncWithBody;
-import evl.function.FuncWithReturn;
-import evl.function.FunctionBase;
-import evl.function.FunctionHeader;
+import evl.expression.reference.SimpleRef;
+import evl.function.Function;
+import evl.knowledge.KnowledgeBase;
+import evl.other.EvlList;
 import evl.other.RizzlyProgram;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.type.Type;
-import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumElement;
@@ -32,6 +31,7 @@ import evl.type.base.RangeType;
 import evl.type.base.StringType;
 import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
+import evl.type.special.VoidType;
 import evl.variable.ConstGlobal;
 import evl.variable.ConstPrivate;
 import evl.variable.FuncVariable;
@@ -41,7 +41,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
   private final static String LibName = "LIB_NAME";
   private final List<String> debugNames; // hacky hacky
 
-  public FpcHeaderWriter(List<String> debugNames) {
+  public FpcHeaderWriter(List<String> debugNames, KnowledgeBase kb) {
     this.debugNames = debugNames;
   }
 
@@ -52,12 +52,12 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitRizzlyProgram(RizzlyProgram obj, StreamWriter param) {
-    List<FunctionHeader> funcProvided = new ArrayList<FunctionHeader>();
-    List<FunctionHeader> funcRequired = new ArrayList<FunctionHeader>();
+    EvlList<Function> funcProvided = new EvlList<Function>();
+    EvlList<Function> funcRequired = new EvlList<Function>();
 
-    for (FunctionHeader func : obj.getFunction()) {
-      if (func.getAttributes().contains(FuncAttr.Public)) {
-        if (func.getAttributes().contains(FuncAttr.Extern)) {
+    for (Function func : obj.getFunction()) {
+      if (func.properties().get(Property.Public) == Boolean.TRUE) {
+        if (func.properties().get(Property.Extern) == Boolean.TRUE) {
           funcRequired.add(func);
         } else {
           funcProvided.add(func);
@@ -75,7 +75,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.nl();
     param.nl();
 
-    if (!obj.getType().isEmpty()) {
+    if (!obj.getType().isEmpty() && !((obj.getType().size() == 1) && (obj.getType().get(0) instanceof VoidType))) {
       param.wr("type");
       param.nl();
 
@@ -116,7 +116,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
     param.nl();
 
-    visitItr(funcProvided, param);
+    visitList(funcProvided, param);
     param.nl();
 
     param.wr("{");
@@ -124,7 +124,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.wr("please provide the following functions:");
     param.nl();
     param.nl();
-    visitItr(funcRequired, param);
+    visitList(funcRequired, param);
     param.wr("}");
     param.nl();
     param.nl();
@@ -141,7 +141,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitFunctionBase(FunctionBase obj, StreamWriter param) {
+  protected Void visitFunctionImpl(Function obj, StreamWriter param) {
     writeFuncHeader(obj, param);
     return null;
   }
@@ -152,12 +152,12 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
     return null;
   }
 
-  protected void writeFuncHeader(FunctionBase obj, StreamWriter param) {
-    assert (obj.getAttributes().contains(FuncAttr.Public));
-    if (obj instanceof FuncWithReturn) {
-      param.wr("function");
-    } else {
+  protected void writeFuncHeader(Function obj, StreamWriter param) {
+    assert (obj.properties().get(Property.Public) == Boolean.TRUE);
+    if (obj.getRet().getLink() instanceof VoidType) {
       param.wr("procedure");
+    } else {
+      param.wr("function");
     }
     param.wr(" ");
     param.wr(obj.getName());
@@ -166,21 +166,21 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
       if (i > 0) {
         param.wr("; ");
       }
-      Variable var = obj.getParam().getList().get(i);
+      Variable var = obj.getParam().get(i);
       visit(var, param);
     }
     param.wr(")");
 
-    if (obj instanceof FuncWithReturn) {
+    if (!(obj.getRet().getLink() instanceof VoidType)) {
       param.wr(":");
-      visit(((FuncWithReturn) obj).getRet(), param);
+      visit(obj.getRet(), param);
     }
 
     param.wr(";");
     param.wr(" cdecl;");
 
-    if (!obj.getAttributes().contains(FuncAttr.Extern)) {
-      assert (obj.getAttributes().contains(FuncAttr.Public));
+    if (obj.properties().get(Property.Extern) != Boolean.TRUE) {
+      assert (obj.properties().get(Property.Public) == Boolean.TRUE);
       param.wr(" external ");
       param.wr(LibName);
       param.wr(";");
@@ -190,11 +190,10 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
     param.nl();
 
-    if (obj instanceof FuncWithBody) {
-      visit(((FuncWithBody) obj).getBody(), param);
-      param.nl();
-
-    }
+    // if (!obj.getBody().getStatements().isEmpty()) {
+    // visit(obj.getBody(), param);
+    // param.nl();
+    // }
   }
 
   @Override
@@ -212,17 +211,17 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   private String getName(boolean isNeg, int bytes, ElementInfo info) {
     switch (bytes) {
-    case 1:
-      return isNeg ? "Shortint" : "Byte";
-    case 2:
-      return isNeg ? "Smallint" : "Word";
-    case 4:
-      return isNeg ? "Longint" : "Cardinal";
-    case 8:
-      return isNeg ? "Int64" : "QWord";
-    default:
-      RError.err(ErrorType.Error, info, "Too many bytes for fpc backend: " + bytes);
-      return null;
+      case 1:
+        return isNeg ? "Shortint" : "Byte";
+      case 2:
+        return isNeg ? "Smallint" : "Word";
+      case 4:
+        return isNeg ? "Longint" : "Cardinal";
+      case 8:
+        return isNeg ? "Int64" : "QWord";
+      default:
+        RError.err(ErrorType.Error, info, "Too many bytes for fpc backend: " + bytes);
+        return null;
     }
   }
 
@@ -253,8 +252,8 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitTypeRef(TypeRef obj, StreamWriter param) {
-    param.wr(obj.getRef().getName());
+  protected Void visitTypeRef(SimpleRef obj, StreamWriter param) {
+    param.wr(obj.getLink().getName());
     return null;
   }
 
@@ -273,14 +272,6 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.wr(" = ");
     visit(obj.getDef(), param);
     param.wr(";");
-    param.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitEnumElement(EnumElement obj, StreamWriter param) {
-    param.wr(obj.getName());
-    param.wr(",");
     param.nl();
     return null;
   }
@@ -328,7 +319,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.wr(" = Record");
     param.nl();
     param.incIndent();
-    visitItr(obj.getElement(), param);
+    visitList(obj.getElement(), param);
     param.decIndent();
     param.wr("end;");
     param.nl();
@@ -342,7 +333,14 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.nl();
     param.incIndent();
 
-    visitItr(obj.getElement(), param);
+    Iterator<EnumElement> itr = obj.getElement().iterator();
+    while (itr.hasNext()) {
+      param.wr(itr.next().getName());
+      if (itr.hasNext()) {
+        param.wr(",");
+      }
+      param.nl();
+    }
 
     param.decIndent();
     param.wr(");");
@@ -354,7 +352,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
   protected Void visitNamedElement(NamedElement obj, StreamWriter param) {
     param.wr(obj.getName());
     param.wr(": ");
-    visit(obj.getType(), param);
+    visit(obj.getRef(), param);
     param.wr(";");
     param.nl();
     return null;
@@ -363,6 +361,13 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitBoolValue(BoolValue obj, StreamWriter param) {
     throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Void visitVoidType(VoidType obj, StreamWriter param) {
+    param.wr("{" + obj.getName() + "}");
+    param.nl();
+    return null;
   }
 
 }

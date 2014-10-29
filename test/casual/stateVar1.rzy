@@ -1,22 +1,17 @@
-component
-  StateVar1
-    slot   ind( x: R{0,10} );
-    signal out( x: R{0,10} );
+StateVar1 = Elementary
+  out : signal( x: R{0,10} );
     
-  implementation elementary
-    
-    var
-      a : R{0,10} = 0;
+  a : R{0,10} = 0;
       
-    function inc()
-      a := (a + 1) mod 11;
-    end
-    
-    slot ind( x: R{0,10} )
-      a := (a + 1) mod 11;
-      inc();
-      out( a );
-    end
-    
+  inc = procedure()
+    a := (a + 1) mod 11;
   end
+    
+  ind : slot( x: R{0,10} )
+    a := (a + 1) mod 11;
+    inc();
+    out( a );
+  end
+  
+end
 

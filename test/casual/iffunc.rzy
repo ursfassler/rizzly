@@ -1,19 +1,15 @@
-component
-  Iffunc
-    response ind( x: R{0,10} ):R{0,10};
-    
-  implementation elementary
-    function eval( x: R{0,10} ):Boolean
-      return x > 5;
-    end
-  
-    response ind( x: R{0,10} ):R{0,10}
-      if eval( x ) then
-        return 0;
-      else
-        return 10;
-      end
-    end
-      
+Iffunc = Elementary
+  eval = function( x: R{0,10} ):Boolean
+    return x > 5;
   end
+
+  ind : response( x: R{0,10} ):R{0,10}
+    if eval( x ) then
+      return 0;
+    else
+      return 10;
+    end
+  end
+    
+end
 

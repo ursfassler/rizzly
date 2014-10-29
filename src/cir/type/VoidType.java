@@ -1,8 +1,8 @@
 package cir.type;
 
 public class VoidType extends Type {
-  public VoidType() {
-    super("void");
+  public VoidType(String name) {
+    super(name);
   }
 
 }

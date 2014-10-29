@@ -22,4 +22,9 @@ abstract public class DefVariable extends Variable {
     this.def = def;
   }
 
+  @Override
+  public String toString() {
+    return super.toString() + " = " + def;
+  }
+
 }

@@ -1,25 +1,20 @@
-component
-  Schmitt{T:Type{Integer}; Lower, Upper: T}
-    input
-      changed( value: T );
-      
-    output
-      high();
-      low();
-      
-  implementation hfsm( Low )
-    state Low end
-    state High end
+Schmitt{T:Type{Integer}; Lower, Upper: T} = Hfsm
+  changed : slot( value: T );
     
-    transition
-      Low to High by changed( value: T ) if value >= Upper do
-        high();
-      end
-      
-      High to Low by changed( value: T ) if value <= Lower do
-        low();
-      end
+  high : signal();
+  low : signal();
+    
+  state( Low )
+    Low : state;
+    High : state;
+  
+    Low to High by changed( value: T ) if value >= Upper do
+      high();
+    end
+    
+    High to Low by changed( value: T ) if value <= Lower do
+      low();
+    end
   end
-  
-  
+end
 

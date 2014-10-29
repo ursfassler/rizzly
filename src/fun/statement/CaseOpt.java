@@ -1,16 +1,15 @@
 package fun.statement;
 
-import java.util.List;
-
 import common.ElementInfo;
 
 import fun.FunBase;
+import fun.other.FunList;
 
 public class CaseOpt extends FunBase {
-  private List<CaseOptEntry> value;
+  private FunList<CaseOptEntry> value;
   private Block code;
 
-  public CaseOpt(ElementInfo info, List<CaseOptEntry> value, Block code) {
+  public CaseOpt(ElementInfo info, FunList<CaseOptEntry> value, Block code) {
     super(info);
     this.value = value;
     this.code = code;
@@ -24,7 +23,7 @@ public class CaseOpt extends FunBase {
     this.code = code;
   }
 
-  public List<CaseOptEntry> getValue() {
+  public FunList<CaseOptEntry> getValue() {
     return value;
   }
 

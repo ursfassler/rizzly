@@ -3,7 +3,7 @@ package evl.other;
 import evl.Evl;
 
 public interface Named extends Evl {
-  public String getName();
+  String getName();
 
-  public void setName(String name);
+  void setName(String name);
 }

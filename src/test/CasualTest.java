@@ -106,8 +106,13 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
-  public void composition() {
-    compile("composition", TestSteps.EXECUTE, true, false);
+  public void composition2() {
+    compile("composition2", TestSteps.COMPILE_TO_ASM, false, false);
+  }
+
+  @Test
+  public void composition1() {
+    compile("composition1", TestSteps.EXECUTE, true, false);
   }
 
   @Test
@@ -157,6 +162,11 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  public void typeAlias3() {
+    compile("typeAlias3", TestSteps.COMPILE_TO_ASM, false, false);
+  }
+
+  @Test
   public void downCast() {
     compile("downCast", TestSteps.EXECUTE, false, false);
   }
@@ -177,6 +187,11 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  public void constfunc() {
+    compile("constfunc", TestSteps.COMPILE_TO_LLVM, false, false);
+  }
+
+  @Test
   public void constInit2() {
     compile("constInit2", TestSteps.COMPILE_TO_LLVM, false, false);
   }
@@ -189,6 +204,11 @@ public class CasualTest extends BaseTest {
   @Test
   public void constInit4() {
     compile("constInit4", TestSteps.EXECUTE, false, false);
+  }
+
+  @Test
+  public void constInit5() {
+    compile("constInit5", TestSteps.COMPILE_TO_ASM, false, false);
   }
 
   @Test
@@ -239,11 +259,6 @@ public class CasualTest extends BaseTest {
   @Test
   public void union4() {
     compile("union4", TestSteps.COMPILE_TO_ASM, false, false);// TODO make testcase
-  }
-
-  @Test
-  public void union5() {
-    compile("union5", TestSteps.COMPILE_TO_ASM, false, false);// TODO make testcase
   }
 
   @Test
@@ -359,6 +374,11 @@ public class CasualTest extends BaseTest {
   @Test
   public void boolext() {
     compile("boolext", TestSteps.COMPILE_TO_ASM, false, false);
+  }
+
+  @Test
+  public void array1() {
+    compile("array1", TestSteps.COMPILE_TO_ASM, false, false);
   }
 
   @Test

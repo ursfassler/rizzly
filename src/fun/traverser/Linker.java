@@ -1,11 +1,7 @@
 package fun.traverser;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 import common.Designator;
@@ -15,64 +11,48 @@ import error.RError;
 import fun.DefTraverser;
 import fun.Fun;
 import fun.composition.ImplComposition;
+import fun.expression.reference.BaseRef;
 import fun.expression.reference.DummyLinkTarget;
-import fun.expression.reference.Reference;
-import fun.function.impl.FuncEntryExit;
-import fun.function.impl.FuncGlobal;
-import fun.function.impl.FuncImplResponse;
-import fun.function.impl.FuncImplSlot;
-import fun.function.impl.FuncPrivateRet;
-import fun.function.impl.FuncPrivateVoid;
-import fun.function.impl.FuncProtRet;
-import fun.function.impl.FuncProtVoid;
+import fun.expression.reference.RefName;
+import fun.function.FuncHeader;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.State;
 import fun.hfsm.StateComposite;
+import fun.hfsm.StateContent;
 import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
+import fun.other.CompImpl;
+import fun.other.FunList;
 import fun.other.ImplElementary;
 import fun.other.Named;
+import fun.other.Namespace;
 import fun.other.RizzlyFile;
 import fun.other.SymbolTable;
+import fun.other.Template;
 import fun.statement.Block;
 import fun.statement.VarDefStmt;
 import fun.type.Type;
-import fun.type.base.TypeAlias;
 import fun.type.composed.RecordType;
 import fun.type.template.Range;
-import fun.type.template.RangeTemplate;
 
 public class Linker extends DefTraverser<Void, SymbolTable> {
-  final private HashMap<Designator, RizzlyFile> files = new HashMap<Designator, RizzlyFile>();
+  final private Namespace files;
   final private HashMap<State, SymbolTable> stateNames = new HashMap<State, SymbolTable>();
 
-  public Linker(Collection<RizzlyFile> fileList) {
-    for (RizzlyFile file : fileList) {
-      files.put(file.getFullName(), file);
-    }
+  public Linker(Namespace fileList) {
+    files = fileList;
   }
 
-  public static void process(Collection<? extends Fun> itms, Collection<RizzlyFile> fileList, SymbolTable sym) {
+  public static void process(Fun fun, Namespace fileList, SymbolTable sym) {
     Linker linker = new Linker(fileList);
-    for (Fun itm : itms) {
-      linker.traverse(itm, sym);
-    }
+    linker.traverse(fun, sym);
   }
 
-  public static void process(Collection<RizzlyFile> fileList, SymbolTable sym) {
+  public static void process(FunList<? extends Fun> fun, Namespace fileList, SymbolTable sym) {
     Linker linker = new Linker(fileList);
-    for (Fun file : fileList) {
-      linker.traverse(file, sym);
+    for (Fun itr : fun) {
+      linker.traverse(itr, sym);
     }
-  }
-
-  static public Collection<? extends Named> getPublics(RizzlyFile rzy) {
-    Collection<Named> ret = new ArrayList<Named>();
-    ret.addAll(rzy.getComp().getList());
-    ret.addAll(rzy.getConstant().getList());
-    ret.addAll(rzy.getFunction().getList());
-    ret.addAll(rzy.getType().getList());
-    return ret;
   }
 
   @Override
@@ -81,44 +61,58 @@ public class Linker extends DefTraverser<Void, SymbolTable> {
     SymbolTable rzys = new SymbolTable(pubs);
     SymbolTable locs = new SymbolTable(rzys);
 
-    List<Named> objs = new ArrayList<Named>();
+    FunList<Named> objs = new FunList<Named>();
     for (Designator des : obj.getImports()) {
-      RizzlyFile rzy = files.get(des);
+      RizzlyFile rzy = (RizzlyFile) files.getChildItem(des.toList());
       assert (rzy != null);
-      objs.addAll(getPublics(rzy));
-      rzys.add(rzy);
+      FunList<Named> named = rzy.getObjects().getItems(Named.class);
+      objs.addAll(named);
+      objs.add(rzy);
     }
 
     pubs.addAll(removeDuplicates(objs));
 
-    locs.addAll(obj.getComp().getList());
-    locs.addAll(obj.getConstant().getList());
-    locs.addAll(obj.getFunction().getList());
-    locs.addAll(obj.getType().getList());
+    locs.addAll(obj.getObjects());
+
     super.visitRizzlyFile(obj, locs);
     return null;
   }
 
-  private Collection<Named> removeDuplicates(List<Named> objs) {
+  private FunList<Named> removeDuplicates(FunList<Named> objs) {
     Set<String> ambigous = new HashSet<String>();
-    HashMap<String, Named> map = new HashMap<String, Named>();
+    FunList<Named> map = new FunList<Named>();
     for (Named itr : objs) {
       if (!ambigous.contains(itr.getName())) {
-        if (map.containsKey(itr.getName())) {
+        if (map.find(itr.getName()) != null) {
           map.remove(itr.getName());
           ambigous.add(itr.getName());
         } else {
-          map.put(itr.getName(), itr);
+          map.add(itr);
         }
       }
     }
-    return map.values();
+    return map;
   }
 
   @Override
-  protected Void visitReference(Reference obj, SymbolTable param) {
+  protected Void visitDeclaration(Template obj, SymbolTable param) {
+    param = new SymbolTable(param);
+    param.addAll(obj.getTempl());
+    visitList(obj.getTempl(), param);
+    visit(obj.getObject(), param);
+    return null;
+  }
+
+  @Override
+  protected Void visitRefName(RefName obj, SymbolTable param) {
+    // TODO: this needs special linking and may not be possible from beginning (but after evaluation)
+    return null;
+  }
+
+  @Override
+  protected Void visitBaseRef(BaseRef obj, SymbolTable param) {
     if (obj.getLink() instanceof DummyLinkTarget) {
-      String name = obj.getLink().getName();
+      String name = ((DummyLinkTarget) obj.getLink()).getName();
 
       Named link = param.find(name);
       if (link == null) {
@@ -128,83 +122,45 @@ public class Linker extends DefTraverser<Void, SymbolTable> {
 
       obj.setLink(link);
     }
-    return super.visitReference(obj, param);
+    return super.visitBaseRef(obj, param);
+  }
+
+  @Override
+  protected Void visitComponent(CompImpl obj, SymbolTable param) {
+    param = new SymbolTable(param);
+    param.addAll(obj.getObjects());
+    super.visitComponent(obj, param);
+    return null;
   }
 
   @Override
   protected Void visitImplComposition(ImplComposition obj, SymbolTable param) {
     param = new SymbolTable(param);
-    param.addAll(obj.getTemplateParam().getList());
-    param.addAll(obj.getQuery().getList());
-    param.addAll(obj.getSignal().getList());
-    param.addAll(obj.getResponse().getList());
-    param.addAll(obj.getSlot().getList());
-
-    visitList(obj.getTemplateParam(), param);
-    visitList(obj.getQuery(), param);
-    visitList(obj.getSignal(), param);
-    visitList(obj.getResponse(), param);
-    visitList(obj.getSlot(), param);
-
-    // TODO separate component header and implementation?
-    param = new SymbolTable(param);
-    param.addAll(obj.getComponent().getList());
-
-    visitList(obj.getComponent(), param);
-    visitItr(obj.getConnection(), param);
-
+    param.addAll(obj.getConnection());
+    param.addAll(obj.getInstantiation());
+    super.visitImplComposition(obj, param);
     return null;
   }
 
   @Override
   protected Void visitImplElementary(ImplElementary obj, SymbolTable param) {
     param = new SymbolTable(param);
-    param.addAll(obj.getTemplateParam().getList());
-    param.addAll(obj.getQuery().getList());
-    param.addAll(obj.getSignal().getList());
-    param.addAll(obj.getResponse().getList());
-    param.addAll(obj.getSlot().getList());
-
-    visitList(obj.getTemplateParam(), param);
-    visitList(obj.getQuery(), param);
-    visitList(obj.getSignal(), param);
-    visitList(obj.getResponse(), param);
-    visitList(obj.getSlot(), param);
-
-    // TODO separate component header and implementation?
-    param = new SymbolTable(param);
-    param.addAll(obj.getConstant().getList());
-    param.addAll(obj.getVariable().getList());
-    param.addAll(obj.getFunction().getList());
-
-    visitList(obj.getConstant(), param);
-    visitList(obj.getVariable(), param);
-    visitList(obj.getFunction(), param);
+    param.addAll(obj.getDeclaration());
+    param.addAll(obj.getInstantiation());
     visit(obj.getEntryFunc(), param);
     visit(obj.getExitFunc(), param);
-
+    super.visitImplElementary(obj, param);
     return null;
   }
 
   @Override
   protected Void visitImplHfsm(ImplHfsm obj, SymbolTable param) {
     param = new SymbolTable(param);
-    param.addAll(obj.getTemplateParam().getList());
-    param.addAll(obj.getQuery().getList());
-    param.addAll(obj.getSignal().getList());
-    param.addAll(obj.getResponse().getList());
-    param.addAll(obj.getSlot().getList());
-
-    visitList(obj.getTemplateParam(), param);
-    visitList(obj.getQuery(), param);
-    visitList(obj.getSignal(), param);
-    visitList(obj.getResponse(), param);
-    visitList(obj.getSlot(), param);
-    // TODO separate component header and implementation?
-
     TransitionStateLinker.process(obj);
 
     param = new SymbolTable(param);
+    visitList(obj.getInterface(), param);
+    param.addAll(obj.getInterface());
     visit(obj.getTopstate(), param);
 
     return null;
@@ -214,41 +170,34 @@ public class Linker extends DefTraverser<Void, SymbolTable> {
   protected Void visitState(State obj, SymbolTable param) {
     param = new SymbolTable(param);
 
-    param.addAll(obj.getVariable().getList());
-    param.addAll(obj.getItemList().getList());
+    param.addAll(obj.getItemList());
 
     assert (!stateNames.containsKey(obj));
     stateNames.put(obj, param);
 
-    return super.visitState(obj, param);
+    // visitList(obj.getItemList(), param);
+    visit(obj.getEntryFunc(), param);
+    visit(obj.getExitFunc(), param);
+
+    super.visitState(obj, param);
+
+    FunList<Transition> trans = obj.getItemList().getItems(Transition.class);
+    FunList<StateContent> rest = new FunList<StateContent>(obj.getItemList());
+    rest.removeAll(trans);
+    visitList(rest, param);
+    visitList(trans, param);
+
+    return null;
   }
 
   @Override
   protected Void visitStateSimple(StateSimple obj, SymbolTable param) {
-    visitItr(obj.getVariable(), param);
-    visit(obj.getEntryFuncRef(), param);
-    visit(obj.getExitFuncRef(), param);
-
-    List<Transition> trans = obj.getItemList().getItems(Transition.class);
-    List<Named> rest = new LinkedList<Named>(obj.getItemList().getList());
-    rest.removeAll(trans);
-    visitItr(rest, param);
-    visitItr(trans, param);
     return null;
   }
 
   @Override
   protected Void visitStateComposite(StateComposite obj, SymbolTable param) {
-    visitItr(obj.getVariable(), param);
     visit(obj.getInitial(), param);
-    visit(obj.getEntryFuncRef(), param);
-    visit(obj.getExitFuncRef(), param);
-
-    List<Transition> trans = obj.getItemList().getItems(Transition.class);
-    List<Named> rest = new LinkedList<Named>(obj.getItemList().getList());
-    rest.removeAll(trans);
-    visitItr(rest, param);
-    visitItr(trans, param);
     return null;
   }
 
@@ -260,13 +209,13 @@ public class Linker extends DefTraverser<Void, SymbolTable> {
     visitList(obj.getParam(), param);
 
     param = new SymbolTable(param);
-    param.addAll(obj.getParam().getList());
+    param.addAll(obj.getParam());
 
     // get context from src state and add event arguments
     SymbolTable srcNames = stateNames.get(obj.getSrc().getLink());
     assert (srcNames != null);
     srcNames = new SymbolTable(srcNames);
-    srcNames.addAll(obj.getParam().getList());
+    srcNames.addAll(obj.getParam());
     visit(obj.getGuard(), srcNames);
 
     visit(obj.getBody(), param);
@@ -274,105 +223,23 @@ public class Linker extends DefTraverser<Void, SymbolTable> {
   }
 
   @Override
-  protected Void visitFuncPrivateRet(FuncPrivateRet obj, SymbolTable param) {
+  protected Void visitFunctionHeader(FuncHeader obj, SymbolTable param) {
     param = new SymbolTable(param);
-    param.addAll(obj.getParam().getList());
-    super.visitFuncPrivateRet(obj, param);
-    return null;
-  }
-
-  @Override
-  protected Void visitFuncPrivateVoid(FuncPrivateVoid obj, SymbolTable param) {
-    param = new SymbolTable(param);
-    param.addAll(obj.getParam().getList());
-    super.visitFuncPrivateVoid(obj, param);
-    return null;
-  }
-
-  @Override
-  protected Void visitFuncImplResponse(FuncImplResponse obj, SymbolTable param) {
-    param = new SymbolTable(param);
-    param.addAll(obj.getParam().getList());
-    super.visitFuncImplResponse(obj, param);
-    return null;
-  }
-
-  @Override
-  protected Void visitFuncImplSlot(FuncImplSlot obj, SymbolTable param) {
-    param = new SymbolTable(param);
-    param.addAll(obj.getParam().getList());
-    super.visitFuncImplSlot(obj, param);
-    return null;
-  }
-
-  @Override
-  protected Void visitFuncProtRet(FuncProtRet obj, SymbolTable param) {
-    param = new SymbolTable(param);
-    param.addAll(obj.getParam().getList());
-    super.visitFuncProtRet(obj, param);
-    return null;
-  }
-
-  @Override
-  protected Void visitFuncProtVoid(FuncProtVoid obj, SymbolTable param) {
-    param = new SymbolTable(param);
-    param.addAll(obj.getParam().getList());
-    super.visitFuncProtVoid(obj, param);
-    return null;
-  }
-
-  @Override
-  protected Void visitFuncGlobal(FuncGlobal obj, SymbolTable param) {
-    param = new SymbolTable(param);
-    param.addAll(obj.getTemplateParam().getList());
-    param.addAll(obj.getParam().getList());
-    super.visitFuncGlobal(obj, param);
-    return null;
-  }
-
-  @Override
-  protected Void visitFuncPrivate(FuncPrivateVoid obj, SymbolTable param) {
-    param = new SymbolTable(param);
-    param.addAll(obj.getParam().getList());
-    super.visitFuncPrivate(obj, param);
-    return null;
-  }
-
-  @Override
-  protected Void visitFuncEntryExit(FuncEntryExit obj, SymbolTable param) {
-    param = new SymbolTable(param);
-    param.addAll(obj.getParam().getList());
-    super.visitFuncEntryExit(obj, param);
+    param.addAll(obj.getParam());
+    super.visitFunctionHeader(obj, param);
     return null;
   }
 
   @Override
   protected Void visitRecordType(RecordType obj, SymbolTable param) {
     param = new SymbolTable(param);
-    param.addAll(obj.getTemplateParam().getList());
     super.visitRecordType(obj, param);
-    return null;
-  }
-
-  @Override
-  protected Void visitTypeAlias(TypeAlias obj, SymbolTable param) {
-    param = new SymbolTable(param);
-    param.addAll(obj.getTemplateParam().getList());
-    super.visitTypeAlias(obj, param);
     return null;
   }
 
   @Override
   protected Void visitRange(Range obj, SymbolTable param) {
     throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Void visitRangeTemplate(RangeTemplate obj, SymbolTable param) {
-    param = new SymbolTable(param);
-    param.addAll(obj.getTemplateParam().getList());
-    super.visitRangeTemplate(obj, param);
-    return null;
   }
 
   @Override

@@ -1,27 +1,18 @@
-component
+Dummy = Elementary
+  out : signal();
 
-  Dummy
-    slot   ind();
-    signal out();
-
-  implementation elementary
-    slot ind()
-      out();
-    end
-      
+  ind : slot()
+    out();
   end
+end
 
-  Simple2
-    slot   ind();
-    signal out();
+Simple2 = Composition
+  ind : slot();
+  out : signal();
 
-  implementation composition
-    component
-      dummy : Dummy;
-      
-    connection
-      ind >> dummy.ind;
-      dummy.out >> out;
-      
-  end
+  dummy : Dummy;
+  
+  ind >> dummy.ind;
+  dummy.out >> out;
+end
 

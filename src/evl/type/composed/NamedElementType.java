@@ -1,25 +1,23 @@
 package evl.type.composed;
 
-import java.util.Collection;
-
 import common.ElementInfo;
 
-import evl.other.ListOfNamed;
+import evl.other.EvlList;
 import evl.type.Type;
 
 abstract public class NamedElementType extends Type {
-  final private ListOfNamed<NamedElement> element;
+  final private EvlList<NamedElement> element;
 
-  public NamedElementType(ElementInfo info, String name, Collection<NamedElement> element) {
+  public NamedElementType(ElementInfo info, String name, EvlList<NamedElement> element) {
     super(info, name);
-    this.element = new ListOfNamed<NamedElement>(element);
+    this.element = element;
   }
 
   public int getSize() {
     return element.size();
   }
 
-  public ListOfNamed<NamedElement> getElement() {
+  public EvlList<NamedElement> getElement() {
     return element;
   }
 

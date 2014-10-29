@@ -6,6 +6,7 @@ import java.util.List;
 import util.PointF;
 
 import common.Designator;
+import common.ElementInfo;
 import common.Metadata;
 
 final public class SubComponent extends Component {
@@ -13,8 +14,8 @@ final public class SubComponent extends Component {
   final private String instname;
   final private PointF pos = new PointF();
 
-  public SubComponent(String instname, Designator path, String classname, List<Metadata> metadata) {
-    super(path, classname, metadata);
+  public SubComponent(ElementInfo info, String instname, Designator path, String classname, List<Metadata> metadata) {
+    super(info, path, classname, metadata);
     this.instname = instname;
   }
 

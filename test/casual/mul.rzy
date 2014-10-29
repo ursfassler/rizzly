@@ -1,12 +1,6 @@
-component
-  Mul
-    response ind( a, b: R{0,65536} ):R{0,4294967296};
-
-  implementation elementary
-
-    response ind( a, b: R{0,65536} ):R{0,4294967296}
-      return a * b;
-    end
-
+Mul = Elementary
+  ind : response( a, b: R{0,65536} ):R{0,4294967296}
+    return a * b;
   end
+end
 

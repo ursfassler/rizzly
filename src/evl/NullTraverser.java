@@ -40,23 +40,20 @@ import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
+import evl.expression.reference.SimpleRef;
 import evl.expression.unop.BitNot;
 import evl.expression.unop.LogicNot;
 import evl.expression.unop.Not;
 import evl.expression.unop.Uminus;
-import evl.function.impl.FuncGlobal;
-import evl.function.impl.FuncIfaceInRet;
-import evl.function.impl.FuncIfaceInVoid;
-import evl.function.impl.FuncIfaceOutRet;
-import evl.function.impl.FuncIfaceOutVoid;
-import evl.function.impl.FuncImplResponse;
-import evl.function.impl.FuncImplSlot;
-import evl.function.impl.FuncPrivateRet;
-import evl.function.impl.FuncPrivateVoid;
-import evl.function.impl.FuncProtoRet;
-import evl.function.impl.FuncProtoVoid;
-import evl.function.impl.FuncSubHandlerEvent;
-import evl.function.impl.FuncSubHandlerQuery;
+import evl.function.header.FuncCtrlInDataIn;
+import evl.function.header.FuncCtrlInDataOut;
+import evl.function.header.FuncCtrlOutDataIn;
+import evl.function.header.FuncCtrlOutDataOut;
+import evl.function.header.FuncGlobal;
+import evl.function.header.FuncPrivateRet;
+import evl.function.header.FuncPrivateVoid;
+import evl.function.header.FuncSubHandlerEvent;
+import evl.function.header.FuncSubHandlerQuery;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.StateComposite;
 import evl.hfsm.StateSimple;
@@ -81,13 +78,11 @@ import evl.statement.ReturnVoid;
 import evl.statement.VarDefStmt;
 import evl.statement.WhileStmt;
 import evl.statement.intern.MsgPush;
-import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
-import evl.type.base.FunctionTypeRet;
-import evl.type.base.FunctionTypeVoid;
+import evl.type.base.FunctionType;
 import evl.type.base.RangeType;
 import evl.type.base.StringType;
 import evl.type.composed.NamedElement;
@@ -107,6 +102,16 @@ import evl.variable.StateVariable;
 abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   abstract protected R visitDefault(Evl obj, P param);
+
+  @Override
+  protected R visitCompUse(CompUse obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitNamedElement(NamedElement obj, P param) {
+    return visitDefault(obj, param);
+  }
 
   @Override
   protected R visitQueue(Queue obj, P param) {
@@ -154,22 +159,22 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitFuncIfaceOutVoid(FuncIfaceOutVoid obj, P param) {
+  protected R visitFuncIfaceOutVoid(FuncCtrlOutDataOut obj, P param) {
     return visitDefault(obj, param);
   }
 
   @Override
-  protected R visitFuncIfaceOutRet(FuncIfaceOutRet obj, P param) {
+  protected R visitFuncIfaceOutRet(FuncCtrlOutDataIn obj, P param) {
     return visitDefault(obj, param);
   }
 
   @Override
-  protected R visitFuncIfaceInVoid(FuncIfaceInVoid obj, P param) {
+  protected R visitFuncIfaceInVoid(FuncCtrlInDataIn obj, P param) {
     return visitDefault(obj, param);
   }
 
   @Override
-  protected R visitFuncIfaceInRet(FuncIfaceInRet obj, P param) {
+  protected R visitFuncIfaceInRet(FuncCtrlInDataOut obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -229,22 +234,12 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitCompUse(CompUse obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
   protected R visitRizzlyProgram(RizzlyProgram obj, P param) {
     return visitDefault(obj, param);
   }
 
   @Override
   protected R visitImplElementary(ImplElementary obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitFuncProtoRet(FuncProtoRet obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -314,11 +309,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitNamedElement(NamedElement obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
   protected R visitArrayType(ArrayType obj, P param) {
     return visitDefault(obj, param);
   }
@@ -379,27 +369,12 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitFuncImplSlot(FuncImplSlot obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitFuncImplResponse(FuncImplResponse obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
   protected R visitFuncPrivateVoid(FuncPrivateVoid obj, P param) {
     return visitDefault(obj, param);
   }
 
   @Override
   protected R visitFuncPrivateRet(FuncPrivateRet obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitFuncProtoVoid(FuncProtoVoid obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -414,12 +389,7 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitFunctionTypeVoid(FunctionTypeVoid obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitFunctionTypeRet(FunctionTypeRet obj, P param) {
+  protected R visitFunctionType(FunctionType obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -439,7 +409,7 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitTypeRef(TypeRef obj, P param) {
+  protected R visitTypeRef(SimpleRef obj, P param) {
     return visitDefault(obj, param);
   }
 

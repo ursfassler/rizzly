@@ -1,0 +1,12 @@
+
+Byte = R{0,255};
+
+TypeAlias3 = Elementary
+  a : Byte = 0;
+    
+  ind : slot()
+    a := 0;
+  end
+  
+end
+

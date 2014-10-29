@@ -1,20 +1,19 @@
 package fun.expression.reference;
 
-import java.util.List;
-
 import common.ElementInfo;
 
-import fun.expression.Expression;
+import fun.other.ActualTemplateArgument;
+import fun.other.FunList;
 
 final public class RefTemplCall extends RefItem {
-  final private List<Expression> actualParameter;
+  final private FunList<ActualTemplateArgument> actualParameter;
 
-  public RefTemplCall(ElementInfo info, List<Expression> expr) {
+  public RefTemplCall(ElementInfo info, FunList<ActualTemplateArgument> expr) {
     super(info);
     this.actualParameter = expr;
   }
 
-  public List<Expression> getActualParameter() {
+  public FunList<ActualTemplateArgument> getActualParameter() {
     return actualParameter;
   }
 
@@ -23,7 +22,7 @@ final public class RefTemplCall extends RefItem {
     String ret = "";
     ret += "{";
     boolean first = true;
-    for (Expression gen : actualParameter) {
+    for (ActualTemplateArgument gen : actualParameter) {
       if (first) {
         first = false;
       } else {

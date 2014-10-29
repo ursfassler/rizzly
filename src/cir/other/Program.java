@@ -6,6 +6,7 @@ import java.util.List;
 import cir.CirBase;
 import cir.function.Function;
 import cir.type.Type;
+import cir.variable.Variable;
 
 public class Program extends CirBase {
   final private String name;

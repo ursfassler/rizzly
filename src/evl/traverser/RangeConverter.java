@@ -9,11 +9,11 @@ import evl.expression.Expression;
 import evl.expression.TypeCast;
 import evl.expression.binop.ArithmeticOp;
 import evl.expression.binop.Relation;
+import evl.expression.reference.SimpleRef;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
 import evl.type.Type;
-import evl.type.TypeRef;
 import evl.type.base.RangeType;
 
 /**
@@ -23,7 +23,7 @@ import evl.type.base.RangeType;
  * 
  */
 public class RangeConverter extends ExprReplacer<Void> {
-  private static final ElementInfo info = new ElementInfo();
+  private static final ElementInfo info = ElementInfo.NO;
   private KnowBaseItem kbi;
   private KnowType kt;
 
@@ -51,7 +51,7 @@ public class RangeConverter extends ExprReplacer<Void> {
 
   private Expression replaceIfNeeded(Expression val, RangeType valType, RangeType commonType) {
     if (Range.leftIsSmallerEqual(valType.getNumbers(), commonType.getNumbers())) {
-      val = new TypeCast(info, new TypeRef(info, commonType), val);
+      val = new TypeCast(info, new SimpleRef<Type>(info, commonType), val);
     }
     return val;
   }

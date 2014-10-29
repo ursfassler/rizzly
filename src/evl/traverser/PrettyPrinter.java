@@ -8,12 +8,11 @@ import java.util.List;
 import util.StreamWriter;
 
 import common.Direction;
-import common.FuncAttr;
+import common.Property;
 
 import error.ErrorType;
 import error.RError;
 import evl.Evl;
-import evl.EvlBase;
 import evl.NullTraverser;
 import evl.composition.Connection;
 import evl.composition.EndpointSelf;
@@ -51,14 +50,21 @@ import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
+import evl.expression.reference.SimpleRef;
 import evl.expression.unop.BitNot;
 import evl.expression.unop.LogicNot;
 import evl.expression.unop.Not;
 import evl.expression.unop.Uminus;
-import evl.function.FuncIface;
-import evl.function.FuncWithBody;
-import evl.function.FuncWithReturn;
-import evl.function.FunctionBase;
+import evl.function.Function;
+import evl.function.header.FuncCtrlInDataIn;
+import evl.function.header.FuncCtrlInDataOut;
+import evl.function.header.FuncCtrlOutDataIn;
+import evl.function.header.FuncCtrlOutDataOut;
+import evl.function.header.FuncGlobal;
+import evl.function.header.FuncPrivateRet;
+import evl.function.header.FuncPrivateVoid;
+import evl.function.header.FuncSubHandlerEvent;
+import evl.function.header.FuncSubHandlerQuery;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.State;
 import evl.hfsm.StateComposite;
@@ -67,7 +73,6 @@ import evl.hfsm.Transition;
 import evl.other.CompUse;
 import evl.other.Component;
 import evl.other.ImplElementary;
-import evl.other.ListOfNamed;
 import evl.other.Named;
 import evl.other.Namespace;
 import evl.other.Queue;
@@ -87,7 +92,6 @@ import evl.statement.ReturnVoid;
 import evl.statement.VarDefStmt;
 import evl.statement.WhileStmt;
 import evl.statement.intern.MsgPush;
-import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumElement;
@@ -110,7 +114,7 @@ import evl.variable.Variable;
 
 public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
-  private boolean writeId;
+  final private boolean writeId;
 
   public PrettyPrinter(boolean writeId) {
     super();
@@ -131,23 +135,34 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getSimpleName());
   }
 
-  private void list(List<? extends Evl> list, String sep, StreamWriter param) {
-    for (int i = 0; i < list.size(); i++) {
-      if (i > 0) {
-        param.wr(sep);
-      }
-      visit(list.get(i), param);
-    }
-  }
-
   private void visitList(List<? extends Evl> list, StreamWriter param) {
     for (int i = 0; i < list.size(); i++) {
       visit(list.get(i), param);
     }
   }
 
-  private <T extends Named> void visitList(ListOfNamed<T> list, StreamWriter param) {
-    Iterator<T> itr = list.iterator();
+  private void visitListNl(List<? extends Evl> list, StreamWriter param) {
+    for (int i = 0; i < list.size(); i++) {
+      visit(list.get(i), param);
+      param.nl();
+    }
+  }
+
+  private void list(Iterable<? extends Evl> list, String sep, StreamWriter param) {
+    Iterator<? extends Evl> itr = list.iterator();
+    boolean first = true;
+    while (itr.hasNext()) {
+      if (first) {
+        first = false;
+      } else {
+        param.wr(sep);
+      }
+      visit(itr.next(), param);
+    }
+  }
+
+  private <T extends Evl> void visitList(Iterable<? extends Evl> list, StreamWriter param) {
+    Iterator<? extends Evl> itr = list.iterator();
     while (itr.hasNext()) {
       visit(itr.next(), param);
     }
@@ -159,12 +174,16 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     }
   }
 
+  private void name(Named obj, StreamWriter param) {
+    param.wr(obj.getName());
+  }
+
   @Override
   protected Void visitRizzlyProgram(RizzlyProgram obj, StreamWriter param) {
     param.nl();
-    visitOptList("type", obj.getType(), param);
-    visitOptList("const", obj.getConstant(), param);
-    visitOptList("var", obj.getVariable(), param);
+    visitListNl(obj.getType(), param);
+    visitListNl(obj.getConstant(), param);
+    visitListNl(obj.getVariable(), param);
     param.nl();
     visitList(obj.getFunction(), param);
     param.nl();
@@ -175,48 +194,26 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     return null;
   }
 
-  private void visitInterfaceDecl(String type, ListOfNamed<? extends FuncIface> listOfNamed, StreamWriter param) {
-    if (!listOfNamed.isEmpty()) {
-      param.wr(type);
-      param.nl();
-      param.incIndent();
-      visitList(listOfNamed, param);
-      param.decIndent();
-      param.nl();
-    }
-  }
-
-  protected void visitOptList(String name, ListOfNamed<? extends Named> type, StreamWriter param) {
-    if (type.isEmpty()) {
+  protected void visitOptList(String name, Iterable<? extends Evl> items, StreamWriter param) {
+    if (!items.iterator().hasNext()) {
       return;
     }
     param.wr(name);
     param.nl();
     param.incIndent();
-    visitList(type, param);
-    param.decIndent();
-  }
-
-  protected void visitOptList(String name, List<? extends EvlBase> type, StreamWriter param) {
-    if (type.isEmpty()) {
-      return;
-    }
-    param.wr(name);
-    param.nl();
-    param.incIndent();
-    visitList(type, param);
+    visitList(items, param);
     param.decIndent();
   }
 
   @Override
   protected Void visitNamespace(Namespace obj, StreamWriter param) {
     param.wr("namespace '");
-    param.wr(obj.getName());
+    name(obj, param);
     param.wr("'");
     wrId(obj, param);
     param.nl();
     param.incIndent();
-    visitList(obj.getItems(), param);
+    visitListNl(obj.getItems(), param);
     visitList(obj.getSpaces(), param);
     param.decIndent();
     param.wr("end");
@@ -227,12 +224,12 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitSubCallbacks(SubCallbacks obj, StreamWriter param) {
-    param.wr("namespace ");
-    param.wr(obj.getName());
+    param.wr("subcallback ");
+    name(obj.getCompUse().getLink(), param);
     wrId(obj, param);
     param.nl();
     param.incIndent();
-    visitList(obj.getList(), param);
+    visitList(obj.getFunc(), param);
     param.decIndent();
     param.wr("end");
     param.nl();
@@ -242,36 +239,27 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitCompUse(CompUse obj, StreamWriter param) {
-    param.wr(obj.getName());
+    name(obj, param);
     wrId(obj, param);
     param.wr(": ");
-    param.wr(obj.getLink().getName());
     wrId(obj.getLink(), param);
     param.wr(";");
     param.nl();
     return null;
   }
 
-  private void compHeader(Component obj, StreamWriter param) {
-    param.wr(obj.getName());
-    wrId(obj, param);
-    param.wr(" = Component");
-    param.nl();
-
-    param.incIndent();
-    param.nl();
-    visitList(obj.getResponse(), param);
-    visitList(obj.getSlot(), param);
-    visitList(obj.getQuery(), param);
-    visitList(obj.getSignal(), param);
-    param.decIndent();
-  }
-
   @Override
   protected Void visitComponent(Component obj, StreamWriter param) {
-    compHeader(obj, param);
-    param.incIndent();
     super.visitComponent(obj, param);
+
+    visitListNl(obj.getIface(), param);
+    visitList(obj.getFunction(), param);
+
+    param.nl();
+    param.wr("queue ");
+    visit(obj.getQueue(), param);
+    param.nl();
+
     param.decIndent();
     param.wr("end");
     param.nl();
@@ -281,17 +269,15 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitImplElementary(ImplElementary obj, StreamWriter param) {
-    param.wr("implementation elementary");
+    param.wr("elementary");
+    wrId(obj, param);
     param.nl();
     param.nl();
+    param.incIndent();
 
-    visitOptList("const", obj.getConstant(), param);
-    visitOptList("component", obj.getComponent(), param);
-    visitOptList("var", obj.getVariable(), param);
-
-    param.wr("queue ");
-    visit(obj.getQueue(), param);
-    param.nl();
+    visitListNl(obj.getComponent(), param);
+    visitListNl(obj.getConstant(), param);
+    visitListNl(obj.getVariable(), param);
 
     param.wr("entry: ");
     visit(obj.getEntryFunc(), param);
@@ -304,7 +290,6 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.nl();
 
     visitList(obj.getSubCallback(), param);
-    visitList(obj.getFunction(), param);
     return null;
   }
 
@@ -313,10 +298,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.wr("implementation composition");
     param.nl();
     param.nl();
-
-    param.wr("queue ");
-    visit(obj.getQueue(), param);
-    param.nl();
+    param.incIndent();
 
     visitOptList("component", obj.getComponent(), param);
     visitOptList("connection", obj.getConnection(), param);
@@ -328,14 +310,14 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   protected Void visitConnection(Connection obj, StreamWriter param) {
     visit(obj.getEndpoint(Direction.in), param);
     switch (obj.getType()) {
-    case sync:
-      param.wr(" -> ");
-      break;
-    case async:
-      param.wr(" >> ");
-      break;
-    default:
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Not yet implemented connection type: " + obj.getType());
+      case sync:
+        param.wr(" -> ");
+        break;
+      case async:
+        param.wr(" >> ");
+        break;
+      default:
+        RError.err(ErrorType.Fatal, obj.getInfo(), "Not yet implemented connection type: " + obj.getType());
     }
     visit(obj.getEndpoint(Direction.out), param);
     param.wr(";");
@@ -344,42 +326,95 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitFunctionBase(FunctionBase obj, StreamWriter param) {
-    param.wr("function ");
-    param.wr(obj.getName());
+  protected Void visitFunctionImpl(Function obj, StreamWriter param) {
+    name(obj, param);
+    param.wr(" ");
+    super.visitFunctionImpl(obj, param);
     wrId(obj, param);
     param.wr("(");
-    list(obj.getParam().getList(), "; ", param);
+    list(obj.getParam(), "; ", param);
     param.wr(")");
-    if (obj instanceof FuncWithReturn) {
-      param.wr(":");
-      visit(((FuncWithReturn) obj).getRet(), param);
+    param.wr(":");
+    visit(obj.getRet(), param);
+    if (obj.properties().get(Property.Extern) == Boolean.TRUE) {
+      param.wr(" extern");
     }
-    for (FuncAttr attr : obj.getAttributes()) {
-      param.wr(" ");
-      param.wr(attr.toString());
-    }
-    param.nl();
-    if (obj instanceof FuncWithBody) {
-      param.incIndent();
-      visit(((FuncWithBody) obj).getBody(), param);
-      param.decIndent();
-      param.wr("end");
-      param.nl();
+    if (obj.properties().get(Property.Public) == Boolean.TRUE) {
+      param.wr(" public");
     }
     param.nl();
+
+    param.incIndent();
+    visit(obj.getBody(), param);
+    param.decIndent();
+    param.wr("end");
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncIfaceOutVoid(FuncCtrlOutDataOut obj, StreamWriter param) {
+    param.wr("signal");
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncIfaceOutRet(FuncCtrlOutDataIn obj, StreamWriter param) {
+    param.wr("query");
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncIfaceInVoid(FuncCtrlInDataIn obj, StreamWriter param) {
+    param.wr("slot");
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncIfaceInRet(FuncCtrlInDataOut obj, StreamWriter param) {
+    param.wr("response");
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncGlobal(FuncGlobal obj, StreamWriter param) {
+    param.wr("function");
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncPrivateVoid(FuncPrivateVoid obj, StreamWriter param) {
+    param.wr("procedure");
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncPrivateRet(FuncPrivateRet obj, StreamWriter param) {
+    param.wr("function");
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncSubHandlerQuery(FuncSubHandlerQuery obj, StreamWriter param) {
+    param.wr("subresponse");
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncSubHandlerEvent(FuncSubHandlerEvent obj, StreamWriter param) {
+    param.wr("subslot");
     return null;
   }
 
   // ---- Type ----------------------------------------------------------------
   @Override
   protected Void visitEnumType(EnumType obj, StreamWriter param) {
+    param.wr("Enum ");
     param.wr(obj.getName());
     wrId(obj, param);
-    param.wr(" = Enum");
     param.nl();
     param.incIndent();
-    visitItr(obj.getElement(), param);
+    visitList(obj.getElement(), param);
     param.decIndent();
     param.wr("end");
     param.nl();
@@ -389,7 +424,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitEnumElement(EnumElement obj, StreamWriter param) {
-    param.wr(obj.getName().toString());
+    param.wr(obj.getName());
     wrId(obj, param);
     param.wr(";");
     param.nl();
@@ -398,14 +433,13 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitUnionType(UnionType obj, StreamWriter param) {
-    param.wr(obj.getName());
-    wrId(obj, param);
-    param.wr(" = Union(");
+    param.wr("Union(");
     visit(obj.getTag(), param);
     param.wr(")");
+    wrId(obj, param);
     param.nl();
     param.incIndent();
-    visitList(obj.getElement(), param);
+    visitListNl(obj.getElement(), param);
     param.decIndent();
     param.wr("end");
     param.nl();
@@ -415,12 +449,11 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitUnsafeUnionType(UnsafeUnionType obj, StreamWriter param) {
-    param.wr(obj.getName());
+    param.wr("UnsafeUnion");
     wrId(obj, param);
-    param.wr(" = UnsafeUnion");
     param.nl();
     param.incIndent();
-    visitList(obj.getElement(), param);
+    visitListNl(obj.getElement(), param);
     param.decIndent();
     param.wr("end");
     param.nl();
@@ -430,12 +463,11 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitRecordType(RecordType obj, StreamWriter param) {
-    param.wr(obj.getName());
+    param.wr("Record");
     wrId(obj, param);
-    param.wr(" = Record");
     param.nl();
     param.incIndent();
-    visitList(obj.getElement(), param);
+    visitListNl(obj.getElement(), param);
     param.decIndent();
     param.wr("end");
     param.nl();
@@ -446,9 +478,8 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitNamedElement(NamedElement obj, StreamWriter param) {
     param.wr(obj.getName());
-    wrId(obj, param);
-    param.wr(" : ");
-    visit(obj.getType(), param);
+    param.wr(": ");
+    visit(obj.getRef(), param);
     param.wr(";");
     param.nl();
     return null;
@@ -456,9 +487,8 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitBooleanType(BooleanType obj, StreamWriter param) {
-    param.wr(obj.getName());
+    param.wr("False..True");
     wrId(obj, param);
-    param.wr(" = False..True");
     param.nl();
     return null;
   }
@@ -466,17 +496,16 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitRangeValue(RangeValue obj, StreamWriter param) {
     param.wr(obj.toString());
+    wrId(obj, param);
     return null;
   }
 
   @Override
   protected Void visitRangeType(RangeType obj, StreamWriter param) {
-    param.wr(obj.getName());
-    wrId(obj, param);
-    param.wr(" = ");
     param.wr(obj.getNumbers().getLow().toString());
     param.wr("..");
     param.wr(obj.getNumbers().getHigh().toString());
+    wrId(obj, param);
     param.wr(";");
     param.nl();
     return null;
@@ -484,29 +513,22 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitIntegerType(IntegerType obj, StreamWriter param) {
-    param.wr(obj.getName());
-    wrId(obj, param);
-    param.wr(" = ");
     param.wr("ℤ");
+    wrId(obj, param);
     param.nl();
     return null;
   }
 
   @Override
   protected Void visitNaturalType(NaturalType obj, StreamWriter param) {
-    param.wr(obj.getName());
-    wrId(obj, param);
-    param.wr(" = ");
     param.wr("ℕ");
+    wrId(obj, param);
     param.nl();
     return null;
   }
 
   @Override
   protected Void visitStringType(StringType obj, StreamWriter param) {
-    param.wr(obj.getName());
-    wrId(obj, param);
-    param.wr(" = ");
     param.wr("*");
     param.nl();
     return null;
@@ -514,32 +536,31 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitAnyType(AnyType obj, StreamWriter param) {
-    param.wr(obj.getName());
-    wrId(obj, param);
-    param.wr(" = ");
     param.wr("*");
+    wrId(obj, param);
     param.nl();
     return null;
   }
 
   @Override
   protected Void visitVoidType(VoidType obj, StreamWriter param) {
-    param.wr(obj.getName());
-    wrId(obj, param);
-    param.wr(" = ");
     param.wr("∅");
+    wrId(obj, param);
     param.nl();
     return null;
   }
 
   @Override
   protected Void visitArrayType(ArrayType obj, StreamWriter param) {
-    param.wr(obj.getName());
-    wrId(obj, param);
-    param.wr(" = ");
+    param.wr("Array{");
     param.wr(obj.getSize().toString());
-    param.wr(" * ");
+    param.wr(",");
     visit(obj.getType(), param);
+    param.wr("}");
+    wrId(obj, param);
+    param.wr("\'");
+    param.wr(obj.getName());
+    param.wr("\'");
     param.nl();
     return null;
   }
@@ -646,7 +667,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.wr(" of");
     param.nl();
     param.incIndent();
-    visitItr(obj.getOption(), param);
+    visitList(obj.getOption(), param);
     if (!obj.getOtherwise().getStatements().isEmpty()) {
       param.wr("else");
       param.nl();
@@ -908,7 +929,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitVariable(Variable obj, StreamWriter param) {
-    param.wr(obj.getName());
+    name(obj, param);
     wrId(obj, param);
     param.wr(": ");
     visit(obj.getType(), param);
@@ -944,17 +965,17 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitTypeRef(TypeRef obj, StreamWriter param) {
-    param.wr(obj.getRef().getName());
-    wrId(obj.getRef(), param);
+  protected Void visitTypeRef(SimpleRef obj, StreamWriter param) {
+    name(obj.getLink(), param);
+    wrId(obj.getLink(), param);
     return null;
   }
 
   @Override
   protected Void visitReference(Reference obj, StreamWriter param) {
-    param.wr(obj.getLink().getName());
+    name(obj.getLink(), param);
     wrId(obj.getLink(), param);
-    visitItr(obj.getOffset(), param);
+    visitList(obj.getOffset(), param);
     return null;
   }
 
@@ -987,10 +1008,6 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.nl();
     param.nl();
 
-    param.wr("queue ");
-    visit(obj.getQueue(), param);
-    param.nl();
-
     visit(obj.getTopstate(), param);
 
     return null;
@@ -998,9 +1015,9 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitStateSimple(StateSimple obj, StreamWriter param) {
-    param.wr("state ");
-    param.wr(obj.getName());
+    name(obj, param);
     wrId(obj, param);
+    param.wr(" : state ");
     param.nl();
     param.incIndent();
     printStateContent(obj, param);
@@ -1012,11 +1029,12 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitStateComposite(StateComposite obj, StreamWriter param) {
-    param.wr("state ");
-    param.wr(obj.getName());
+    name(obj, param);
     wrId(obj, param);
+    param.wr(" : state ");
     param.wr("(");
-    param.wr(obj.getInitial().getName());
+    name(obj.getInitial().getLink(), param);
+    wrId(obj.getInitial().getLink(), param);
     param.wr(")");
     param.nl();
     param.incIndent();
@@ -1038,24 +1056,20 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.nl();
     param.nl();
 
-    visitOptList("var", obj.getVariable(), param);
-    visitList(obj.getFunction(), param);
-    visitList(obj.getItem(), param);
+    visitListNl(obj.getItem(), param);
   }
 
   @Override
   protected Void visitTransition(Transition obj, StreamWriter param) {
-    param.wr("transition");
-    param.nl();
-    param.incIndent();
-
-    param.wr(obj.getSrc().getName());
+    name(obj.getSrc().getLink(), param);
+    wrId(obj.getSrc().getLink(), param);
     param.wr(" to ");
-    param.wr(obj.getDst().getName());
+    name(obj.getDst().getLink(), param);
+    wrId(obj.getDst().getLink(), param);
     param.wr(" by ");
     visit(obj.getEventFunc(), param);
     param.wr("(");
-    list(obj.getParam().getList(), "; ", param);
+    list(obj.getParam(), "; ", param);
     param.wr(")");
     param.wr(" if ");
     visit(obj.getGuard(), param);
@@ -1068,22 +1082,22 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.nl();
     param.nl();
 
-    param.decIndent();
-
     return null;
   }
 
   @Override
   protected Void visitEndpointSelf(EndpointSelf obj, StreamWriter param) {
-    param.wr(obj.getIface().getName());
+    name(obj.getLink(), param);
+    wrId(obj.getLink(), param);
     return null;
   }
 
   @Override
   protected Void visitEndpointSub(EndpointSub obj, StreamWriter param) {
-    param.wr(obj.getComp().getName());
+    name(obj.getLink(), param);
+    wrId(obj.getLink(), param);
     param.wr(".");
-    param.wr(obj.getIface());
+    param.wr(obj.getFunction());
     return null;
   }
 
@@ -1111,7 +1125,6 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitQueue(Queue obj, StreamWriter param) {
-    param.wr(obj.getName());
     wrId(obj, param);
     param.nl();
     return null;

@@ -5,24 +5,20 @@
 
 package fun.knowledge;
 
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Set;
 
 import fun.other.Namespace;
-import fun.other.RizzlyFile;
 
 public class KnowledgeBase {
   final private HashMap<Class<? extends KnowledgeEntry>, KnowledgeEntry> entries = new HashMap<Class<? extends KnowledgeEntry>, KnowledgeEntry>();
   final private Namespace root;
-  final private Set<RizzlyFile> files;
+  final private Namespace files;
   final private String rootdir;
 
-  public KnowledgeBase(Namespace root, Collection<RizzlyFile> files, String rootdir) {
+  public KnowledgeBase(Namespace root, Namespace fileList, String rootdir) {
     super();
     this.root = root;
-    this.files = new HashSet<RizzlyFile>(files);
+    this.files = fileList;
     this.rootdir = rootdir;
   }
 
@@ -34,7 +30,7 @@ public class KnowledgeBase {
     return root;
   }
 
-  public Set<RizzlyFile> getFiles() {
+  public Namespace getFiles() {
     return files;
   }
 

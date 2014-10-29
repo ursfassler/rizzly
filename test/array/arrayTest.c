@@ -4,6 +4,7 @@
 #include  "output/inst.h"
 
 void _trap(){
+  printf( "trapped\n" );
   exit( EXIT_FAILURE );
 }
 

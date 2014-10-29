@@ -1,13 +1,9 @@
-component
-  Copy
-
-  implementation elementary
-
-    function foo()
-      a, b : Array{10,R{0,200}};
-      b[0] := 1;
-      a := b;
-    end
-
+Copy = Elementary
+  foo = procedure()
+    a, b : Array{10,R{0,200}};
+    b[0] := 1;
+    a := b;
   end
+
+end
 

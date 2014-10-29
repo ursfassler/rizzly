@@ -1,32 +1,27 @@
 //test ok
 
-component
-  Jump
-    slot   inp();
-    signal out();
-    
-  implementation hfsm(A)
-    state A(X)
-      state X
-      end
+Jump = Hfsm
+  inp : slot();
+  out : signal();
+  
+  state(A)
+    A : state(X)
+      X : state;
     end
     
-    state B(Y)
-      state Y
-      end
+    B : state(Y)
+      Y : state;
     end
     
-    state C(Z)
-      state Z
-      end
+    C : state(Z)
+      Z : state;
     end
     
-    transition 
-      A to B by inp();
-      B to C by inp();
-      C to A by inp() do
-        out();
-      end
-        
-  end
+    A to B by inp();
+    B to C by inp();
+    C to A by inp() do
+      out();
+    end
+  end        
+end
 

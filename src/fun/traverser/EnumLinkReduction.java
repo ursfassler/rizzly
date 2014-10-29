@@ -7,9 +7,8 @@ import fun.Fun;
 import fun.expression.reference.RefItem;
 import fun.expression.reference.RefName;
 import fun.expression.reference.Reference;
-import fun.knowledge.KnowFunChild;
+import fun.knowledge.KnowChild;
 import fun.knowledge.KnowledgeBase;
-import fun.other.Named;
 import fun.type.base.EnumElement;
 import fun.type.base.EnumType;
 
@@ -20,10 +19,10 @@ import fun.type.base.EnumType;
  * 
  */
 public class EnumLinkReduction extends DefTraverser<Void, Void> {
-  private final KnowFunChild kc;
+  private final KnowChild kc;
 
   public EnumLinkReduction(KnowledgeBase kb) {
-    kc = kb.getEntry(KnowFunChild.class);
+    kc = kb.getEntry(KnowChild.class);
   }
 
   public static void process(Fun inst, KnowledgeBase kb) {
@@ -33,10 +32,11 @@ public class EnumLinkReduction extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitReference(Reference obj, Void param) {
-    Named item = obj.getLink();
+    Fun item = obj.getLink();
     if (item instanceof EnumType) {
       if (!obj.getOffset().isEmpty()) {
-        RefItem next = obj.getOffset().pop();
+        RefItem next = obj.getOffset().get(0);
+        obj.getOffset().remove(0);
         if (!(next instanceof RefName)) {
           RError.err(ErrorType.Error, obj.getInfo(), "Expected named offset, got: " + next.getClass().getCanonicalName());
         }

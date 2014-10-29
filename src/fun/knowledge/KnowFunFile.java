@@ -1,13 +1,18 @@
 package fun.knowledge;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
+
+import util.Pair;
+
+import common.Designator;
 
 import error.ErrorType;
 import error.RError;
 import fun.DefTraverser;
 import fun.Fun;
-import fun.other.Named;
 import fun.other.RizzlyFile;
 
 /**
@@ -18,14 +23,15 @@ import fun.other.RizzlyFile;
  */
 public class KnowFunFile extends KnowledgeEntry {
   private KnowledgeBase base;
-  private Map<Named, RizzlyFile> cache = new HashMap<Named, RizzlyFile>();
+  private Map<Fun, RizzlyFile> cache = new HashMap<Fun, RizzlyFile>();
+  private Map<RizzlyFile, Designator> path = new HashMap<RizzlyFile, Designator>();
 
   @Override
   public void init(KnowledgeBase base) {
     this.base = base;
   }
 
-  public RizzlyFile get(Named obj) {
+  public RizzlyFile get(Fun obj) {
     RizzlyFile ret = find(obj);
     if (ret == null) {
       RError.err(ErrorType.Fatal, obj.getInfo(), "Object not reachable: " + obj);
@@ -33,7 +39,7 @@ public class KnowFunFile extends KnowledgeEntry {
     return ret;
   }
 
-  public RizzlyFile find(Named obj) {
+  public RizzlyFile find(Fun obj) {
     RizzlyFile ret = cache.get(obj);
     if (ret == null) {
       rebuild();
@@ -42,24 +48,32 @@ public class KnowFunFile extends KnowledgeEntry {
     return ret;
   }
 
+  public Designator path(RizzlyFile file) {
+    return path.get(file);
+  }
+
   private void rebuild() {
-    cache.clear();
+    clear();
     KnowFileTraverser traverser = new KnowFileTraverser(cache);
-    for (RizzlyFile file : base.getFiles()) {
-      traverser.traverse(file, null);
+    Set<Pair<Designator, RizzlyFile>> items = new HashSet<Pair<Designator, RizzlyFile>>();
+    base.getFiles().getItems(RizzlyFile.class, new Designator(), items);
+    for (Pair<Designator, RizzlyFile> file : items) {
+      traverser.traverse(file.second, null);
+      path.put(file.second, file.first);
     }
   }
 
   public void clear() {
     cache.clear();
+    path.clear();
   }
 
 }
 
 class KnowFileTraverser extends DefTraverser<Void, RizzlyFile> {
-  private Map<Named, RizzlyFile> cache;
+  private Map<Fun, RizzlyFile> cache;
 
-  public KnowFileTraverser(Map<Named, RizzlyFile> cache) {
+  public KnowFileTraverser(Map<Fun, RizzlyFile> cache) {
     super();
     this.cache = cache;
   }
@@ -72,13 +86,11 @@ class KnowFileTraverser extends DefTraverser<Void, RizzlyFile> {
 
   @Override
   protected Void visit(Fun obj, RizzlyFile param) {
-    if (obj instanceof Named) {
-      if (cache.containsKey(obj)) {
-        RizzlyFile oldparent = cache.get(obj);
-        RError.err(ErrorType.Fatal, obj.getInfo(), "Same object (" + obj + ") found 2 times: " + oldparent.getFullName() + " and " + param.getFullName());
-      }
-      cache.put((Named) obj, param);
+    if (cache.containsKey(obj)) {
+      RizzlyFile oldparent = cache.get(obj);
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Same object (" + obj + ") found 2 times: " + oldparent + " and " + param);
     }
+    cache.put(obj, param);
     return super.visit(obj, param);
   }
 

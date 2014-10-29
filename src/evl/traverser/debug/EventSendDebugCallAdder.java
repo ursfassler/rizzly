@@ -7,6 +7,8 @@ import java.util.List;
 import common.Designator;
 import common.ElementInfo;
 
+import error.ErrorType;
+import error.RError;
 import evl.DefTraverser;
 import evl.Evl;
 import evl.NullTraverser;
@@ -15,15 +17,18 @@ import evl.expression.Expression;
 import evl.expression.Number;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.Reference;
-import evl.function.FuncIfaceOut;
-import evl.function.FunctionBase;
-import evl.function.impl.FuncPrivateVoid;
+import evl.function.Function;
+import evl.function.header.FuncCtrlOutDataIn;
+import evl.function.header.FuncCtrlOutDataOut;
+import evl.function.header.FuncPrivateVoid;
+import evl.other.EvlList;
 import evl.other.ImplElementary;
 import evl.other.Namespace;
 import evl.other.SubCallbacks;
 import evl.statement.Block;
 import evl.statement.CallStmt;
 import evl.statement.Statement;
+import evl.statement.intern.MsgPush;
 import evl.type.Type;
 import evl.variable.ConstGlobal;
 
@@ -62,20 +67,20 @@ public class EventSendDebugCallAdder extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitSubCallbacks(SubCallbacks obj, Void param) {
-    visitItr(obj, param);
+    visitList(obj.getFunc(), param);
     return null;
   }
 
   @Override
   protected Void visitNamespace(Namespace obj, Void param) {
-    visitItr(obj, param);
+    visitList(obj.getChildren(), param);
     return null;
   }
 
   @Override
   protected Void visitImplElementary(ImplElementary obj, Void param) {
-    visitItr(obj.getFunction(), null);
-    visitItr(obj.getSubCallback(), null);
+    visitList(obj.getFunction(), null);
+    visitList(obj.getSubCallback(), null);
     return null;
   }
 
@@ -85,7 +90,7 @@ public class EventSendDebugCallAdder extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitFunctionBase(FunctionBase obj, Void param) {
+  protected Void visitFunctionImpl(Function obj, Void param) {
     st.traverse(obj, null);
     return null;
   }
@@ -95,7 +100,7 @@ class StmtTraverser extends DefTraverser<Void, List<Statement>> {
 
   private FuncPrivateVoid debugSend;
   private ArrayList<String> names;
-  static private ElementInfo info = new ElementInfo();
+  static private ElementInfo info = ElementInfo.NO;
 
   public StmtTraverser(FuncPrivateVoid debugSend, ArrayList<String> names) {
     super();
@@ -116,10 +121,18 @@ class StmtTraverser extends DefTraverser<Void, List<Statement>> {
   }
 
   @Override
+  protected Void visitMsgPush(MsgPush obj, List<Statement> param) {
+    RError.err(ErrorType.Fatal, obj.getInfo(), "Debug events not yet implemented for queued connections");
+    return null;
+  }
+
+  @Override
   protected Void visitReference(Reference obj, List<Statement> param) {
     super.visitReference(obj, param);
 
-    if (obj.getLink() instanceof FuncIfaceOut) {
+    boolean isOut = (obj.getLink() instanceof FuncCtrlOutDataIn) || (obj.getLink() instanceof FuncCtrlOutDataOut);
+
+    if (isOut) {
       assert (obj.getOffset().size() == 1);
       assert (obj.getOffset().get(0) instanceof RefCall);
 
@@ -139,7 +152,7 @@ class StmtTraverser extends DefTraverser<Void, List<Statement>> {
 
   private CallStmt makeCall(FuncPrivateVoid func, int numFunc) {
     // Self._sendMsg( numFunc );
-    List<Expression> actParam = new ArrayList<Expression>();
+    EvlList<Expression> actParam = new EvlList<Expression>();
     actParam.add(new Number(info, BigInteger.valueOf(numFunc)));
 
     Reference call = new Reference(info, func);

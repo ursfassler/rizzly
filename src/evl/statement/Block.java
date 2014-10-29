@@ -1,18 +1,17 @@
 package evl.statement;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import common.ElementInfo;
 
+import evl.other.EvlList;
+
 public class Block extends Statement {
-  final private List<Statement> statements = new ArrayList<Statement>();
+  final private EvlList<Statement> statements = new EvlList<Statement>();
 
   public Block(ElementInfo info) {
     super(info);
   }
 
-  public List<Statement> getStatements() {
+  public EvlList<Statement> getStatements() {
     return statements;
   }
 

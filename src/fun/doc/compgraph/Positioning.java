@@ -15,6 +15,11 @@ import util.Pair;
 import util.PointF;
 import util.SimpleGraph;
 
+import common.ElementInfo;
+
+import error.ErrorType;
+import error.RError;
+
 public class Positioning {
   private static final double X_COMP_DIST = 140;
   private static final double Y_COMP_OFFSET = 20;
@@ -107,8 +112,8 @@ public class Positioning {
     }
     Map<String, String> data = SimpleMetaParser.parse(sub.getMetadata());
 
-    sub.getPos().x = getDouble(data, "x");
-    sub.getPos().y = getDouble(data, "y");
+    sub.getPos().x = getDouble(data, "x", sub.getInfo());
+    sub.getPos().y = getDouble(data, "y", sub.getInfo());
   }
 
   private static void appendMeta(WorldComp g) {
@@ -117,12 +122,15 @@ public class Positioning {
     }
     Map<String, String> data = SimpleMetaParser.parse(g.getMetadata());
 
-    g.getSize().x = getDouble(data, "width");
-    g.getSize().y = getDouble(data, "height");
+    g.getSize().x = getDouble(data, "width", g.getInfo());
+    g.getSize().y = getDouble(data, "height", g.getInfo());
   }
 
-  private static double getDouble(Map<String, String> data, String key) {
-    assert (data.containsKey(key));
+  private static double getDouble(Map<String, String> data, String key, ElementInfo info) {
+
+    if (!data.containsKey(key)) {
+      RError.err(ErrorType.Error, info, "expected metadata: " + key);
+    }
     return Double.parseDouble(data.get(key));
   }
 

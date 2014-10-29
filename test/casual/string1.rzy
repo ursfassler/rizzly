@@ -3,7 +3,7 @@ component
     slot   tick();
     signal text( x: String );
     
-  implementation elementary
+  implementation Elementary
     
     var
       k : R{0,2};

@@ -4,6 +4,7 @@ import fun.DefTraverser;
 import fun.Fun;
 import fun.expression.Expression;
 import fun.knowledge.KnowledgeBase;
+import fun.other.ActualTemplateArgument;
 import fun.traverser.spezializer.ExprEvaluator;
 import fun.variable.Constant;
 
@@ -22,8 +23,8 @@ public class ConstEval extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitConstant(Constant obj, Void param) {
-    Expression value = ExprEvaluator.evaluate(obj.getDef(), new Memory(), kb);
-    obj.setDef(value);
+    ActualTemplateArgument value = ExprEvaluator.evaluate(obj.getDef(), new Memory(), kb);
+    obj.setDef((Expression) value);
     return null;
   }
 

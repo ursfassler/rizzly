@@ -7,7 +7,7 @@ import fun.NullTraverser;
 import fun.composition.ImplComposition;
 import fun.expression.reference.RefName;
 import fun.expression.reference.RefTemplCall;
-import fun.other.Component;
+import fun.other.CompImpl;
 import fun.other.Named;
 import fun.other.Namespace;
 import fun.other.RizzlyFile;
@@ -33,36 +33,37 @@ public class CompLinkReduction extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitNamespace(Namespace obj, Void param) {
-    visitItr(obj, param);
+    visitList(obj.getChildren(), param);
     return null;
   }
 
   @Override
   protected Void visitImplComposition(ImplComposition obj, Void param) {
-    visitItr(obj.getComponent(), param);
+    visitList(obj.getInstantiation().getItems(CompImpl.class), param);
     return null;
   }
 
   @Override
   protected Void visitCompUse(CompUse obj, Void param) {
-    Named item = obj.getType().getLink();
+    Named item = (Named) obj.getType().getLink();
 
     while (!obj.getType().getOffset().isEmpty()) {
-      if (obj.getType().getOffset().peek() instanceof RefTemplCall) {
+      if (obj.getType().getOffset().get(0) instanceof RefTemplCall) {
         break;
       }
-      RefName rn = (RefName) obj.getType().getOffset().pop();
+      RefName rn = (RefName) obj.getType().getOffset().get(0);
+      obj.getType().getOffset().remove(0);
       if (item instanceof RizzlyFile) {
-        item = ((RizzlyFile) item).getComp().find(rn.getName());
+        item = ((RizzlyFile) item).getObjects().getItems(CompImpl.class).find(rn.getName());
       } else if (item instanceof Namespace) {
-        item = ((Namespace) item).find(rn.getName());
+        item = ((Namespace) item).getChildren().find(rn.getName());
       } else {
         RError.err(ErrorType.Fatal, item.getInfo(), "Unhandled type: " + item.getClass().getCanonicalName());
       }
       assert (item != null);
     }
 
-    assert (item instanceof Component);
+    assert (item instanceof CompImpl);
     obj.getType().setLink(item);
 
     return null;

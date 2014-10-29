@@ -1,23 +1,11 @@
-// output of sub-component b is not connected
+// query is not connected
 
-component
-  Sub
-    signal funcA();
-      
-    implementation elementary
-  end
+Sub = Elementary
+  funcA : query():Boolean;
+end
 
-  Err7
-    signal funcA();
-      
-  implementation composition
-    
-    component
-      a : Sub;
-      b : Sub;
+Err7 = Composition
+  a : Sub;
 
-    connection
-      a.funcA -> funcA;
-      
-  end
+end
 

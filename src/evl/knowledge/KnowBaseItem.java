@@ -1,16 +1,17 @@
 package evl.knowledge;
 
 import java.math.BigInteger;
+import java.util.List;
 
 import util.Range;
 
 import common.ElementInfo;
 
-import error.ErrorType;
-import error.RError;
-import evl.other.Named;
+import evl.Evl;
+import evl.NullTraverser;
+import evl.expression.reference.SimpleRef;
+import evl.other.EvlList;
 import evl.type.Type;
-import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.RangeType;
@@ -28,38 +29,32 @@ public class KnowBaseItem extends KnowledgeEntry {
     this.kb = kb;
   }
 
-  public Named findItem(String name) {
-    return kb.getRoot().find(name);
+  public <T extends Evl> List<T> findItem(Class<T> kind) {
+    return kb.getRoot().getItems(kind, false);
   }
 
-  public void addItem(Named item) {
-    assert (findItem(item.getName()) == null);
-    kb.getRoot().add(item);
-
+  public Evl findItem(String name) {
+    return kb.getRoot().getChildren().find(name);
   }
 
-  // --------------------------------------------------------------------------
-  @SuppressWarnings("unchecked")
-  public <T extends Named> T get(Class<T> kind, String name) {
-    Named item = findItem(name);
-    if (item == null) {
-      RError.err(ErrorType.Fatal, "Base item not found: " + name);
-      return null;
+  @Deprecated
+  public void addItem(Evl item) {
+    kb.getRoot().getChildren().add(item);
+  }
+
+  private <T extends Type> T getPlainType(T type) {
+    List<? extends Type> types = findItem(type.getClass());
+    if (types.isEmpty()) {
+      addItem(type);
+      return type;
+    } else {
+      assert (types.size() == 1);
+      return (T) types.get(0);
     }
-    if (!kind.isAssignableFrom(item.getClass())) {
-      RError.err(ErrorType.Fatal, "Base item is of wrong type. Expected: " + kind.getCanonicalName() + "; got: " + item.getClass().getCanonicalName());
-      return null;
-    }
-    return (T) item;
   }
 
   public VoidType getVoidType() {
-    VoidType ret = (VoidType) findItem(VoidType.NAME);
-    if (ret == null) {
-      ret = new VoidType();
-      addItem(ret);
-    }
-    return ret;
+    return getPlainType(new VoidType());
   }
 
   /**
@@ -71,79 +66,72 @@ public class KnowBaseItem extends KnowledgeEntry {
   public RangeType getRangeType(int count) {
     BigInteger low = BigInteger.ZERO;
     BigInteger high = BigInteger.valueOf(count - 1);
-    return getRangeType(low, high);
-  }
-
-  /**
-   * Returns R{low,high}
-   * 
-   * @param count
-   * @return
-   */
-  @Deprecated
-  public RangeType getRangeType(BigInteger low, BigInteger high) {
-    Range range = new Range(low, high);
-    RangeType ret = (RangeType) findItem(RangeType.makeName(range));
-    if (ret == null) {
-      ret = new RangeType(range);
-      addItem(ret);
-    }
-    return ret;
+    return getNumsetType(new Range(low, high));
   }
 
   public RangeType getNumsetType(Range range) {
-    RangeType ret = (RangeType) findItem(RangeType.makeName(range));
-    if (ret == null) {
-      ret = new RangeType(range);
-      addItem(ret);
+    EvlList<RangeType> items = kb.getRoot().getChildren().getItems(RangeType.class);
+    for (RangeType itr : items) {
+      if (itr.getNumbers().equals(range)) {
+        return itr;
+      }
     }
+    RangeType ret = new RangeType(range);
+    kb.getRoot().getChildren().add(ret);
     return ret;
   }
 
   public ArrayType getArray(BigInteger size, Type type) {
-    TypeRef ref = new TypeRef(new ElementInfo(), type);
-    ArrayType ret = (ArrayType) findItem(ArrayType.makeName(size, ref));
-    if (ret == null) {
-      ret = new ArrayType(size, ref);
-      addItem(ret);
+    EvlList<ArrayType> items = kb.getRoot().getChildren().getItems(ArrayType.class);
+    for (ArrayType itr : items) {
+      if (itr.getSize().equals(size) && itr.getType().getLink().equals(type)) {
+        return itr;
+      }
     }
+
+    ArrayType ret = new ArrayType(size, new SimpleRef<Type>(ElementInfo.NO, type));
+    kb.getRoot().getChildren().add(ret);
     return ret;
   }
 
   public StringType getStringType() {
-    StringType ret = (StringType) findItem(StringType.NAME);
-    if (ret == null) {
-      ret = new StringType();
-      addItem(ret);
-    }
-    return ret;
+    return getPlainType(new StringType());
   }
 
   public BooleanType getBooleanType() {
-    BooleanType ret = (BooleanType) findItem(BooleanType.NAME);
-    if (ret == null) {
-      ret = new BooleanType();
-      addItem(ret);
-    }
-    return ret;
+    return getPlainType(new BooleanType());
   }
 
   public IntegerType getIntegerType() {
-    IntegerType ret = (IntegerType) findItem(IntegerType.NAME);
-    if (ret == null) {
-      ret = new IntegerType();
-      addItem(ret);
-    }
-    return ret;
+    return getPlainType(new IntegerType());
   }
 
   public NaturalType getNaturalType() {
-    NaturalType ret = (NaturalType) findItem(NaturalType.NAME);
-    if (ret == null) {
-      ret = new NaturalType();
-      addItem(ret);
-    }
-    return ret;
+    return getPlainType(new NaturalType());
+  }
+
+  public Type getType(Type ct) {
+    KnowBaseItemTypeFinder finder = new KnowBaseItemTypeFinder();
+    return finder.traverse(ct, this);
+  }
+
+}
+
+class KnowBaseItemTypeFinder extends NullTraverser<Type, KnowBaseItem> {
+
+  @Override
+  protected Type visitDefault(Evl obj, KnowBaseItem param) {
+    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+  }
+
+  @Override
+  protected Type visitArrayType(ArrayType obj, KnowBaseItem param) {
+    return param.getArray(obj.getSize(), obj.getType().getLink());
+  }
+
+  @Override
+  protected Type visitRangeType(RangeType obj, KnowBaseItem param) {
+    return param.getNumsetType(obj.getNumbers());
   }
 
 }

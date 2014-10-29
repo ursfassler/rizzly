@@ -8,6 +8,6 @@ public class AnyType extends BaseType {
   public static final String NAME = "Any";
 
   public AnyType() {
-    super(new ElementInfo(), NAME);
+    super(ElementInfo.NO, NAME);
   }
 }

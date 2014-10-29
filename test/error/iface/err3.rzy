@@ -1,21 +1,5 @@
-component
-  Sub
-    signal funcA();
-    signal funcB();
-      
-  implementation elementary
-  end
 
-  Err3
-    signal funcA();
-
-  implementation composition
-    
-    component
-      a : Sub;
-      
-    connection
-      a.funcA -> funcA;
-
-  end
+Err3 = Composition
+  funcA : response():Boolean;
+end
 

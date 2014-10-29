@@ -1,26 +1,20 @@
-type
-  Point = Record
-    x : R{0,100};
-    y : R{0,100};
+Point = Record
+  x : R{0,100};
+  y : R{0,100};
+end
+
+Rec = Elementary
+  out : signal( x: R{0,100} );
+  
+  p : Point = ( x := 0, y := 0 );
+  q : Point = ( x := 0, y := 0 );
+
+  ind : slot(  x: R{0,100}  )
+    p.x := (p.y + x) mod 100;
+    p.y := 100 - p.x;
+    q   := p;
+    out( q.y );
   end
 
-component
-  Rec
-    slot   ind( x: R{0,100} );
-    signal out( x: R{0,100} );
-    
-  implementation elementary
-
-    var
-      p : Point = ( x := 0, y := 0 );
-      q : Point = ( x := 0, y := 0 );
-
-    slot ind(  x: R{0,100}  )
-      p.x := (p.y + x) mod 100;
-      p.y := 100 - p.x;
-      q   := p;
-      out( q.y );
-    end
-
-  end
+end
 

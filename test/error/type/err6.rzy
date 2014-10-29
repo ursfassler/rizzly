@@ -1,9 +1,6 @@
 // Wrong number of initializer elements
 
-component
-  Err6
-  implementation elementary
-    var
-      a : Array{8,R{0,10}} = [0,0];
-  end
+Err6 = Elementary
+  a : Array{8,R{0,10}} = [0,0];
+end
 

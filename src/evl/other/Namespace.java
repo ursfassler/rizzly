@@ -1,6 +1,7 @@
 package evl.other;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -9,30 +10,28 @@ import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
+import evl.Evl;
+import evl.EvlBase;
 
-public class Namespace extends ListOfNamed<Named> implements Named {
-  final private ElementInfo info;
+public class Namespace extends EvlBase implements Named {
   private String name;
+  final private EvlList<Evl> children = new EvlList<Evl>();
 
   public Namespace(ElementInfo info, String name) {
-    super();
-    this.info = info;
+    super(info);
     this.name = name;
   }
 
-  public Named getChildItem(List<String> des) {
-    LinkedList<String> ipath = new LinkedList<String>(des);
-    Named parent = this;
+  public EvlList<Evl> getChildren() {
+    return children;
+  }
 
-    while (!ipath.isEmpty()) {
-      String name = ipath.pop();
-      Named child = ((Namespace) parent).find(name);
-      if (child == null) {
-        RError.err(ErrorType.Error, parent.getInfo(), "Name not found: " + name);
-      }
-      parent = child;
-    }
-    return parent;
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
   public Namespace forcePath(Designator des) {
@@ -55,33 +54,20 @@ public class Namespace extends ListOfNamed<Named> implements Named {
   public Namespace force(String ename) {
     Namespace ret = findSpace(ename);
     if (ret == null) {
-      ret = new Namespace(new ElementInfo(), ename);
+      assert (children.find(ename) == null);
+      ret = new Namespace(ElementInfo.NO, ename);
       add(ret);
     }
     return ret;
   }
 
-  public void add(Namespace space) {
-    assert (find(space.getName()) == null);
-    super.add(space);
+  public void add(Evl evl) {
+    children.add(evl);
   }
 
-  public void add(Named item) {
-    assert (find(item.getName()) == null);
-    super.add(item);
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public List<Namespace> getSpaces() {
-    List<Namespace> ret = new ArrayList<Namespace>();
-    for (Named itr : this) {
+  public EvlList<Namespace> getSpaces() {
+    EvlList<Namespace> ret = new EvlList<Namespace>();
+    for (Evl itr : children) {
       if (itr instanceof Namespace) {
         ret.add((Namespace) itr);
       }
@@ -89,9 +75,9 @@ public class Namespace extends ListOfNamed<Named> implements Named {
     return ret;
   }
 
-  public List<Named> getItems() {
-    List<Named> ret = new ArrayList<Named>();
-    for (Named itr : this) {
+  public EvlList<Evl> getItems() {
+    EvlList<Evl> ret = new EvlList<Evl>();
+    for (Evl itr : children) {
       if (!(itr instanceof Namespace)) {
         ret.add(itr);
       }
@@ -99,17 +85,8 @@ public class Namespace extends ListOfNamed<Named> implements Named {
     return ret;
   }
 
-  public Named find(String name) {
-    for (Named itr : this) {
-      if (itr.getName().equals(name)) {
-        return itr;
-      }
-    }
-    return null;
-  }
-
   public Namespace findSpace(String name) {
-    Named ret = find(name);
+    Evl ret = children.find(name);
     if (ret instanceof Namespace) {
       return (Namespace) ret;
     } else {
@@ -117,8 +94,8 @@ public class Namespace extends ListOfNamed<Named> implements Named {
     }
   }
 
-  public Named findItem(String name) {
-    Named ret = find(name);
+  public Evl findItem(String name) {
+    Evl ret = children.find(name);
     if (!(ret instanceof Namespace)) {
       return ret;
     } else {
@@ -126,21 +103,15 @@ public class Namespace extends ListOfNamed<Named> implements Named {
     }
   }
 
-  public void addAll(Iterable<? extends Named> list) {
-    for (Named itr : list) {
-      if (find(itr.getName()) != null) {
-        throw new RuntimeException("element already exists: " + itr.getName());
-      } else {
-        super.add(itr);
-      }
-    }
+  public void addAll(Collection<? extends Evl> list) {
+    children.addAll(list);
   }
 
   public void merge(Namespace space) {
     if (!name.equals(space.getName())) {
       throw new RuntimeException("names differ");
     }
-    for (Named itr : space.getItems()) {
+    for (Evl itr : space.getItems()) {
       add(itr);
     }
     for (Namespace itr : space.getSpaces()) {
@@ -151,11 +122,6 @@ public class Namespace extends ListOfNamed<Named> implements Named {
         sub.merge(itr);
       }
     }
-  }
-
-  @Override
-  public ElementInfo getInfo() {
-    return info;
   }
 
   public void subMerge(Named named) {
@@ -172,9 +138,9 @@ public class Namespace extends ListOfNamed<Named> implements Named {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends Named> List<T> getItems(Class<T> kind, boolean recursive) {
+  public <T extends Evl> List<T> getItems(Class<T> kind, boolean recursive) {
     List<T> ret = new ArrayList<T>();
-    for (Named itr : getItems()) {
+    for (Evl itr : getItems()) {
       if (kind.isAssignableFrom(itr.getClass())) {
         ret.add((T) itr);
       }
@@ -185,6 +151,21 @@ public class Namespace extends ListOfNamed<Named> implements Named {
       }
     }
     return ret;
+  }
+
+  public Evl getChildItem(List<String> des) {
+    LinkedList<String> ipath = new LinkedList<String>(des);
+    Evl parent = this;
+
+    while (!ipath.isEmpty()) {
+      String name = ipath.pop();
+      Evl child = ((Namespace) parent).getChildren().find(name);
+      if (child == null) {
+        RError.err(ErrorType.Error, parent.getInfo(), "Name not found: " + name);
+      }
+      parent = child;
+    }
+    return parent;
   }
 
   @Override

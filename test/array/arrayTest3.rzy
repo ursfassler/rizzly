@@ -1,23 +1,17 @@
-component
-  ArrayTest3
-    response inp( x: R{0,31} ):R{0,31};
-      
-  implementation elementary
-
-    var
-      a : Array{32,R{0,31}} = [ _ := 0 ];
-    
-    entry
-      i : R{0,32} = 0;
-      while i < 32 do
-        a[i] := R{0,31}( i );
-        i    := R{0,32}( i+1 );
-      end
+ArrayTest3 = Elementary
+  a : Array{32,R{0,31}} = [ _ := 0 ];
+  
+  entry
+    i : R{0,32} = 0;
+    while i < 32 do
+      a[i] := R{0,31}( i );
+      i    := R{0,32}( i+1 );
     end
-
-    response inp( x: R{0,200} ):R{0,31}
-      return a[x mod 8];
-    end
-
   end
+
+  inp : response( x: R{0,200} ):R{0,31}
+    return a[x mod 8];
+  end
+
+end
 

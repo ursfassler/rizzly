@@ -2,71 +2,56 @@ package evl.other;
 
 import common.ElementInfo;
 
-import evl.expression.reference.Reference;
-import evl.function.FunctionHeader;
+import evl.expression.reference.SimpleRef;
+import evl.function.header.FuncPrivateVoid;
 import evl.variable.Constant;
 import evl.variable.Variable;
 
-public class ImplElementary extends Component {
-  final private ListOfNamed<Variable> variable = new ListOfNamed<Variable>();
-  final private ListOfNamed<Constant> constant = new ListOfNamed<Constant>();
-  final private ListOfNamed<CompUse> component = new ListOfNamed<CompUse>();
-  final private ListOfNamed<FunctionHeader> function = new ListOfNamed<FunctionHeader>();
-  final private ListOfNamed<SubCallbacks> subComCallback = new ListOfNamed<SubCallbacks>();
-  private Reference entryFunc = null;
-  private Reference exitFunc = null;
+final public class ImplElementary extends Component {
+  final private EvlList<Variable> variable = new EvlList<Variable>();
+  final private EvlList<Constant> constant = new EvlList<Constant>();
+  final private EvlList<CompUse> component = new EvlList<CompUse>();
+  final private EvlList<SubCallbacks> subCallback = new EvlList<SubCallbacks>();
+  final private SimpleRef<FuncPrivateVoid> entryFunc;
+  final private SimpleRef<FuncPrivateVoid> exitFunc;
 
-  public ImplElementary(ElementInfo info, String name) {
+  public ImplElementary(ElementInfo info, String name, SimpleRef<FuncPrivateVoid> entryFunc, SimpleRef<FuncPrivateVoid> exitFunc) {
     super(info, name);
+    this.entryFunc = entryFunc;
+    this.exitFunc = exitFunc;
   }
 
-  public void addSubCallback(String namespace, FunctionHeader prot) {
-    SubCallbacks list = subComCallback.find(namespace);
-    if (list == null) {
-      list = new SubCallbacks(getInfo(), namespace);
-      subComCallback.add(list);
-    }
-    list.add(prot);
-  }
-
-  public ListOfNamed<Variable> getVariable() {
+  public EvlList<Variable> getVariable() {
     return variable;
   }
 
-  public ListOfNamed<Constant> getConstant() {
+  public EvlList<Constant> getConstant() {
     return constant;
   }
 
-  public ListOfNamed<FunctionHeader> getFunction() {
-    return function;
-  }
-
-  public ListOfNamed<CompUse> getComponent() {
+  public EvlList<CompUse> getComponent() {
     return component;
   }
 
-  public ListOfNamed<SubCallbacks> getSubCallback() {
-    return subComCallback;
+  public EvlList<SubCallbacks> getSubCallback() {
+    return subCallback;
   }
 
-  public Reference getEntryFunc() {
-    assert (entryFunc != null);
+  public SubCallbacks getSubCallback(CompUse use) {
+    for (SubCallbacks itr : subCallback) {
+      if (itr.getCompUse().getLink() == use) {
+        return itr;
+      }
+    }
+    return null;
+  }
+
+  public SimpleRef<FuncPrivateVoid> getEntryFunc() {
     return entryFunc;
   }
 
-  public void setEntryFunc(Reference entryFunc) {
-    assert (entryFunc != null);
-    this.entryFunc = entryFunc;
-  }
-
-  public Reference getExitFunc() {
-    assert (exitFunc != null);
+  public SimpleRef<FuncPrivateVoid> getExitFunc() {
     return exitFunc;
-  }
-
-  public void setExitFunc(Reference exitFunc) {
-    assert (exitFunc != null);
-    this.exitFunc = exitFunc;
   }
 
 }

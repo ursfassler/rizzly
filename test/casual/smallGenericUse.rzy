@@ -1,40 +1,31 @@
-type
-  TheRecord{T:Type{Natural}} = Record
-    a : T;
-    b : R{0,255};
-  end
+TheRecord{T:Type{Natural}} = Record
+  a : T;
+  b : R{0,255};
+end
 
-  The2Record{T:Type{Natural};S:Type{Any}} = Record
-    a : T;
-    b : S;
-  end
+The2Record{T:Type{Natural};S:Type{Any}} = Record
+  a : T;
+  b : S;
+end
 
-  The3Record{T:Type{Any}} = Record
-    a : R{0,255};
-    b : T;
-  end
+The3Record{T:Type{Any}} = Record
+  a : R{0,255};
+  b : T;
+end
 
-component
-  SmallGeneric{T:Type{Natural}}
-    implementation elementary
+SmallGeneric{T:Type{Natural}} = Elementary
+  dat1: TheRecord{T} = ( a := 0, b := 0 );
+  dat2: The2Record{T,Boolean} = ( a := 0, b := False );
+  dat3: The2Record{T,T} = (a:=0, b:=0);
+  dat4: The3Record{Boolean} = ( a:=0, b:=True );
+  dat5: The3Record{TheRecord{T}} = (a:=0, b:=( a:=0, b:=0));
+  dat6: The3Record{The2Record{T,Boolean}} = ( a:=0, b:=( a:=0, b:=True ) );
+  dat7: The3Record{The2Record{T,TheRecord{T}}} = (a:=0, b:=(a:=0, b:=(a:=0, b:=0)));
+  a: T = 0;
+end
 
-    var
-      dat1: TheRecord{T};
-      dat2: The2Record{T,Boolean};
-      dat3: The2Record{T,T};
-      dat4: The3Record{Boolean};
-      dat5: The3Record{TheRecord{T}};
-      dat6: The3Record{The2Record{T,Boolean}};
-      dat7: The3Record{The2Record{T,TheRecord{T}}};
-      a: T;
-  end
-
-  SmallGenericUse
-    implementation composition
-
-    component
-      gen1 : SmallGeneric{R{0,255}};
-      gen2 : SmallGeneric{R{0,65535}};
-    
-  end
+SmallGenericUse = Composition
+  gen1 : SmallGeneric{R{0,255}};
+  gen2 : SmallGeneric{R{0,65535}};
+end
 

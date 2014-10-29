@@ -15,8 +15,8 @@ public class QueueTest extends BaseTest {
   }
 
   @Test
-  public void composition() {
-    compile("composition", TestSteps.EXECUTE, true, false);
+  public void composition1() {
+    compile("composition1", TestSteps.EXECUTE, true, false);
   }
 
   @Test

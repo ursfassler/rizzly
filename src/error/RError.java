@@ -14,15 +14,16 @@ public class RError {
 
   public static void err(ErrorType type, String filename, int line, int col, String msg) {
     switch (type) {
-    case Hint:
-    case Warning: {
-      System.err.println(RException.mktxt(type, filename, line, col, msg));
-      break;
-    }
-    case Error:
-    case Fatal: {
-      throw new RException(type, filename, line, col, msg);
-    }
+      case Hint:
+      case Warning: {
+        System.err.println(RException.mktxt(type, filename, line, col, msg));
+        break;
+      }
+      case Error:
+      case Fatal:
+      case Assertion: {
+        throw new RException(type, filename, line, col, msg);
+      }
     }
   }
 
@@ -32,5 +33,17 @@ public class RError {
 
   public static void err(ErrorType error, String string) {
     err(error, "", -1, -1, string);
+  }
+
+  public static void ass(boolean condition, ElementInfo info, String msg) {
+    if (!condition) {
+      err(ErrorType.Assertion, info, msg);
+    }
+  }
+
+  public static void ass(boolean condition, ElementInfo info) {
+    if (!condition) {
+      err(ErrorType.Assertion, info, "");
+    }
   }
 }

@@ -3,7 +3,6 @@ package evl.traverser;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import common.ElementInfo;
@@ -19,12 +18,12 @@ import evl.expression.RecordValue;
 import evl.expression.UnionValue;
 import evl.expression.UnsafeUnionValue;
 import evl.expression.reference.Reference;
+import evl.expression.reference.SimpleRef;
 import evl.knowledge.KnowChild;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Named;
+import evl.other.EvlList;
 import evl.other.Namespace;
 import evl.type.Type;
-import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
@@ -53,7 +52,7 @@ public class InitVarTyper extends ExprReplacer<Type> {
   @Override
   protected Expression visitDefVariable(DefVariable obj, Type param) {
     assert (param == null);
-    Type type = obj.getType().getRef();
+    Type type = obj.getType().getLink();
     obj.setDef(visit(obj.getDef(), type));
     return null;
   }
@@ -63,7 +62,7 @@ public class InitVarTyper extends ExprReplacer<Type> {
     if (param instanceof ArrayType) {
       ArrayType at = (ArrayType) param;
       int size = at.getSize().intValue();
-      List<Expression> init = new ArrayList<Expression>(size);
+      EvlList<Expression> init = new EvlList<Expression>();
       for (int i = 0; i < size; i++) {
         init.add(null);
       }
@@ -73,7 +72,7 @@ public class InitVarTyper extends ExprReplacer<Type> {
           if (!((NamedElementValue) expr).getName().equals("_")) {
             RError.err(ErrorType.Error, expr.getInfo(), "Unknown name: " + ((NamedElementValue) expr).getName());
           } else {
-            expr = visit(((NamedElementValue) expr).getValue(), at.getType().getRef());
+            expr = visit(((NamedElementValue) expr).getValue(), at.getType().getLink());
             for (int i = 0; i < size; i++) {
               if (init.get(i) == null) {
                 init.set(i, Copy.copy(expr));
@@ -81,7 +80,7 @@ public class InitVarTyper extends ExprReplacer<Type> {
             }
           }
         } else {
-          init.set(idx, visit(expr, at.getType().getRef()));
+          init.set(idx, visit(expr, at.getType().getLink()));
           idx++;
         }
       }
@@ -107,7 +106,7 @@ public class InitVarTyper extends ExprReplacer<Type> {
     // FIXME recursion does not work
     if (param instanceof RecordType) {
       Collection<NamedElementValue> iv = toElemList(obj, param);
-      return new RecordValue(obj.getInfo(), iv, new TypeRef(obj.getInfo(), param));
+      return new RecordValue(obj.getInfo(), iv, new SimpleRef<Type>(obj.getInfo(), param));
     } else if (param instanceof UnsafeUnionType) {
       Map<String, Expression> map = toMap(obj);
       if (map.size() != 1) {
@@ -118,9 +117,9 @@ public class InitVarTyper extends ExprReplacer<Type> {
       Expression value = map.get(name);
       NamedElement elem = ((UnsafeUnionType) param).getElement().find(name);
 
-      value = visit(value, elem.getType().getRef());
+      value = visit(value, elem.getRef().getLink());
 
-      return new UnsafeUnionValue(obj.getInfo(), new NamedElementValue(obj.getInfo(), name, value), elem.getType().copy());
+      return new UnsafeUnionValue(obj.getInfo(), new NamedElementValue(obj.getInfo(), name, value), Copy.copy(elem.getRef()));
     } else if (obj.getValue().size() == 1) {
       // TODO do that at a different place
       return visit(obj.getValue().get(0), param);
@@ -145,13 +144,13 @@ public class InitVarTyper extends ExprReplacer<Type> {
 
   private Collection<NamedElementValue> toNamedElem(ElementInfo info, NamedElementType param, Map<String, Expression> map) {
     Collection<NamedElementValue> iv = new ArrayList<NamedElementValue>();
-    for (Named itr : param.getElement()) {
+    for (NamedElement itr : param.getElement()) {
       Expression value = map.remove(itr.getName());
       if (value == null) {
         RError.err(ErrorType.Error, info, "Missing initializer: " + itr.getName());
       } else {
         NamedElement elem = (NamedElement) kc.get(param, itr.getName(), value.getInfo());
-        value = visit(value, elem.getType().getRef());
+        value = visit(value, elem.getRef().getLink());
         iv.add(new NamedElementValue(value.getInfo(), itr.getName(), value));
       }
     }
@@ -181,7 +180,7 @@ public class InitVarTyper extends ExprReplacer<Type> {
   @Override
   protected Expression visitNamedElementValue(NamedElementValue obj, Type type) {
     if (type instanceof UnionType) {
-      EnumType et = (EnumType) ((UnionType) type).getTag().getType().getRef();
+      EnumType et = (EnumType) ((UnionType) type).getTag().getRef().getLink();
       EnumElement ele = (EnumElement) kc.get(et, obj.getName(), obj.getInfo());
 
       EnumElement value = (EnumElement) kc.get(et, obj.getName(), obj.getInfo());
@@ -190,20 +189,20 @@ public class InitVarTyper extends ExprReplacer<Type> {
 
       Expression ov = obj.getValue();
       NamedElement elem = (NamedElement) kc.get(type, obj.getName(), obj.getInfo());
-      ov = visit(ov, elem.getType().getRef());
+      ov = visit(ov, elem.getRef().getLink());
 
       NamedElementValue content = new NamedElementValue(obj.getInfo(), ele.getName(), ov);
 
-      UnionValue uv = new UnionValue(obj.getInfo(), tag, content, new TypeRef(obj.getInfo(), type));
+      UnionValue uv = new UnionValue(obj.getInfo(), tag, content, new SimpleRef<Type>(obj.getInfo(), type));
       return uv;
     } else if (type instanceof UnsafeUnionType) {
       Expression ov = obj.getValue();
       NamedElement elem = (NamedElement) kc.get(type, obj.getName(), obj.getInfo());
-      ov = visit(ov, elem.getType().getRef());
+      ov = visit(ov, elem.getRef().getLink());
 
       NamedElementValue content = new NamedElementValue(obj.getInfo(), elem.getName(), ov);
 
-      UnsafeUnionValue uv = new UnsafeUnionValue(obj.getInfo(), content, new TypeRef(obj.getInfo(), type));
+      UnsafeUnionValue uv = new UnsafeUnionValue(obj.getInfo(), content, new SimpleRef<Type>(obj.getInfo(), type));
       return uv;
     } else {
       throw new RuntimeException("not yet implemented: " + type.getClass().getCanonicalName());

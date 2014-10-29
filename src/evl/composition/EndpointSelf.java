@@ -1,40 +1,22 @@
 package evl.composition;
 
-import common.Designator;
 import common.ElementInfo;
 
-import evl.function.FuncIface;
+import evl.function.Function;
 
-final public class EndpointSelf extends Endpoint {
+final public class EndpointSelf extends Endpoint<Function> {
 
-  private FuncIface iface;
-
-  public EndpointSelf(ElementInfo info, FuncIface iface) {
-    super(info);
-    this.iface = iface;
-  }
-
-  public FuncIface getIface() {
-    return iface;
-  }
-
-  public void setIface(FuncIface iface) {
-    this.iface = iface;
+  public EndpointSelf(ElementInfo info, Function link) {
+    super(info, link);
   }
 
   @Override
-  public FuncIface getIfaceUse() {
-    return iface;
-  }
-
-  @Override
-  public Designator getDes() {
-    return new Designator(iface.getName());
+  public Function getFunc() {
+    return getLink();
   }
 
   @Override
   public String toString() {
-    return iface.getName();
+    return "self." + getLink().getName();
   }
-
 }

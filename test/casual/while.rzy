@@ -1,26 +1,21 @@
-type
-  Point = Record
-    x : R{0,255};
-    y : R{0,255};
-  end
+Point = Record
+  x : R{0,255};
+  y : R{0,255};
+end
 
-component
-  While
-    response ind( x: R{0,255} ):Point;
-    query    out( x: R{0,255} ):Point;
+While = Elementary
+  out : query( x: R{0,255} ):Point;
 
-  implementation elementary
-
-    response ind( x: R{0,255} ):Point
-      ret : Point;
-      ret.x := 0;
-      ret.y := 0;
-      i : R{0,256} = 0;
-      while i < x do
-        ret := out( x );
-        i := R{1,256}( i+1 );
-      end
-      return ret;
+  ind : response( x: R{0,255} ):Point
+    ret : Point;
+    ret.x := 0;
+    ret.y := 0;
+    i : R{0,256} = 0;
+    while i < x do
+      ret := out( x );
+      i := R{1,256}( i+1 );
     end
+    return ret;
   end
+end
 

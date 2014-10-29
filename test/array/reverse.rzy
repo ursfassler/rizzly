@@ -1,5 +1,5 @@
 
-function reverse{S:Natural;T:Type{Any}}( x: Array{S,T} ): Array{S,T}
+reverse{S:Natural;T:Type{Any}} = function( x: Array{S,T} ): Array{S,T}
   t : T;
   i : R{0,S/2+1} = 0;
   while i < S/2 do
@@ -11,15 +11,10 @@ function reverse{S:Natural;T:Type{Any}}( x: Array{S,T} ): Array{S,T}
   return x;
 end
 
-component
-  Reverse
-    response data( x: Array{10,R{0,100}} ): Array{10,R{0,100}};
-      
-  implementation elementary
-
-    response data( x: Array{10,R{0,100}} ): Array{10,R{0,100}}
-      return reverse{10,R{0,100}}( x );
-    end
-
+Reverse = Elementary
+  data : response( x: Array{10,R{0,100}} ): Array{10,R{0,100}}
+    return reverse{10,R{0,100}}( x );
   end
+
+end
 

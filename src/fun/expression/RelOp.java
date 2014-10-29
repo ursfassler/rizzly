@@ -13,23 +13,23 @@ public enum RelOp {
 
   public String toString() {
     switch (this) {
-    case EQUAL:
-      return "=";
-    case NOT_EQUAL:
-      return "<>";
-    case LESS:
-      return "<";
-    case LESS_EQUAL:
-      return "<=";
-    case GREATER:
-      return ">";
-    case GREATER_EQUEAL:
-      return ">=";
-    case IS:
-      return "is";
-    default:
-      RError.err(ErrorType.Fatal, "not supported yet");
-      return null;
+      case EQUAL:
+        return "=";
+      case NOT_EQUAL:
+        return "<>";
+      case LESS:
+        return "<";
+      case LESS_EQUAL:
+        return "<=";
+      case GREATER:
+        return ">";
+      case GREATER_EQUEAL:
+        return ">=";
+      case IS:
+        return "is";
+      default:
+        RError.err(ErrorType.Fatal, "not supported yet");
+        return null;
     }
   }
 }

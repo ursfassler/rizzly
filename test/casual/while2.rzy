@@ -1,15 +1,11 @@
-component
-  While2
-    slot   ind( x: R{0,100} );
-    signal out( x: R{0,100} );
+While2 = Elementary
+  out : signal( x: R{0,100} );
 
-  implementation elementary
-
-    slot ind( x: R{0,100} )
-      while x > 0 do
-        out( x );
-        x := R{0,100}( x-1 );
-      end
+  ind : slot( x: R{0,100} )
+    while x > 0 do
+      out( x );
+      x := R{0,100}( x-1 );
     end
   end
+end
 

@@ -1,16 +1,13 @@
 package cir.function;
 
 import java.util.List;
-import java.util.Set;
 
-import cir.other.FuncVariable;
 import cir.type.TypeRef;
+import cir.variable.FuncVariable;
 
-import common.FuncAttr;
+final public class FunctionPrototype extends Function {
 
-public class FunctionPrototype extends Function {
-
-  public FunctionPrototype(String name, TypeRef retType, List<FuncVariable> argument, Set<FuncAttr> attributes) {
-    super(name, retType, argument, attributes);
+  public FunctionPrototype(String name, TypeRef retType, List<FuncVariable> argument) {
+    super(name, retType, argument);
   }
 }

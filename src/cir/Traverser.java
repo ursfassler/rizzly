@@ -22,12 +22,10 @@ import cir.expression.reference.RefName;
 import cir.expression.reference.Reference;
 import cir.function.Function;
 import cir.function.FunctionImpl;
+import cir.function.FunctionPrivate;
 import cir.function.FunctionPrototype;
-import cir.other.Constant;
-import cir.other.FuncVariable;
+import cir.function.FunctionPublic;
 import cir.other.Program;
-import cir.other.StateVariable;
-import cir.other.Variable;
 import cir.statement.Assignment;
 import cir.statement.Block;
 import cir.statement.CallStmt;
@@ -59,6 +57,10 @@ import cir.type.UIntType;
 import cir.type.UnionType;
 import cir.type.UnsafeUnionType;
 import cir.type.VoidType;
+import cir.variable.Constant;
+import cir.variable.FuncVariable;
+import cir.variable.StateVariable;
+import cir.variable.Variable;
 
 public abstract class Traverser<R, P> {
   public R traverse(Cir obj, P param) {
@@ -105,6 +107,15 @@ public abstract class Traverser<R, P> {
       return visitFunctionImpl((FunctionImpl) obj, param);
     else if (obj instanceof FunctionPrototype)
       return visitFunctionPrototype((FunctionPrototype) obj, param);
+    else
+      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+  }
+
+  protected R visitFunctionImpl(FunctionImpl obj, P param) {
+    if (obj instanceof FunctionPublic)
+      return visitFunctionPublic((FunctionPublic) obj, param);
+    else if (obj instanceof FunctionPrivate)
+      return visitFunctionPrivate((FunctionPrivate) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
@@ -297,9 +308,11 @@ public abstract class Traverser<R, P> {
 
   protected abstract R visitReference(Reference obj, P param);
 
-  protected abstract R visitFunctionImpl(FunctionImpl obj, P param);
-
   protected abstract R visitFunctionPrototype(FunctionPrototype obj, P param);
+
+  protected abstract R visitFunctionPrivate(FunctionPrivate obj, P param);
+
+  protected abstract R visitFunctionPublic(FunctionPublic obj, P param);
 
   protected abstract R visitVarDefStmt(VarDefStmt obj, P param);
 

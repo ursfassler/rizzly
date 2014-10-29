@@ -62,26 +62,26 @@ public class Scanner implements PeekReader<Token> {
     ElementInfo info = reader.getInfo();
     Character sym = reader.next();
     switch (sym) {
-    case ' ':
-    case '\t':
-    case 13:
-    case '\n':
-      return token(TokenType.IGNORE, info);
-    case '=':
-      return token(TokenType.EQUAL, info);
-    case '\"':
-      return read_22(info);
-    default:
-      if (isAlphaNummeric(sym)) {
-        String id = readIdentifier(Character.toString(sym));
-        TokenType type;
-        type = TokenType.IDENTIFIER;
-        Token toc = token(type, id, info);
-        return toc;
-      } else {
-        RError.err(ErrorType.Error, info, "Unexpected character: #" + Integer.toHexString((int) sym) + " (" + sym + ")");
-        return specialToken(TokenType.IGNORE);
-      }
+      case ' ':
+      case '\t':
+      case 13:
+      case '\n':
+        return token(TokenType.IGNORE, info);
+      case '=':
+        return token(TokenType.EQUAL, info);
+      case '\"':
+        return read_22(info);
+      default:
+        if (isAlphaNummeric(sym)) {
+          String id = readIdentifier(Character.toString(sym));
+          TokenType type;
+          type = TokenType.IDENTIFIER;
+          Token toc = token(type, id, info);
+          return toc;
+        } else {
+          RError.err(ErrorType.Error, info, "Unexpected character: #" + Integer.toHexString((int) sym) + " (" + sym + ")");
+          return specialToken(TokenType.IGNORE);
+        }
     }
   }
 

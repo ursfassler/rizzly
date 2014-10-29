@@ -7,19 +7,15 @@ import error.ErrorType;
 import error.RError;
 import evl.Evl;
 import evl.NullTraverser;
-import evl.function.impl.FuncGlobal;
-import evl.function.impl.FuncIfaceInRet;
-import evl.function.impl.FuncIfaceInVoid;
-import evl.function.impl.FuncIfaceOutRet;
-import evl.function.impl.FuncIfaceOutVoid;
-import evl.function.impl.FuncImplResponse;
-import evl.function.impl.FuncImplSlot;
-import evl.function.impl.FuncPrivateRet;
-import evl.function.impl.FuncPrivateVoid;
-import evl.function.impl.FuncProtoRet;
-import evl.function.impl.FuncProtoVoid;
-import evl.function.impl.FuncSubHandlerEvent;
-import evl.function.impl.FuncSubHandlerQuery;
+import evl.function.header.FuncCtrlInDataIn;
+import evl.function.header.FuncCtrlInDataOut;
+import evl.function.header.FuncCtrlOutDataIn;
+import evl.function.header.FuncCtrlOutDataOut;
+import evl.function.header.FuncGlobal;
+import evl.function.header.FuncPrivateRet;
+import evl.function.header.FuncPrivateVoid;
+import evl.function.header.FuncSubHandlerEvent;
+import evl.function.header.FuncSubHandlerQuery;
 import evl.hfsm.Transition;
 
 public class IoCheck extends NullTraverser<Void, Void> {
@@ -68,24 +64,6 @@ public class IoCheck extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncProtoRet(FuncProtoRet obj, Void param) {
-    assert (writes.get(obj) == false);
-    assert (reads.get(obj) == false);
-    assert (outputs.get(obj) == false);
-    assert (inputs.get(obj) == true);
-    return null;
-  }
-
-  @Override
-  protected Void visitFuncProtoVoid(FuncProtoVoid obj, Void param) {
-    assert (writes.get(obj) == false);
-    assert (reads.get(obj) == false);
-    assert (outputs.get(obj) == true);
-    assert (inputs.get(obj) == false);
-    return null;
-  }
-
-  @Override
   protected Void visitFuncPrivateVoid(FuncPrivateVoid obj, Void param) {
     // is allowed to do everything
     assert (writes.containsKey(obj));
@@ -106,7 +84,7 @@ public class IoCheck extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncImplSlot(FuncImplSlot obj, Void param) {
+  protected Void visitFuncIfaceInVoid(FuncCtrlInDataIn obj, Void param) {
     // is allowed to do everything
     assert (writes.containsKey(obj));
     assert (reads.containsKey(obj));
@@ -116,7 +94,7 @@ public class IoCheck extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncImplResponse(FuncImplResponse obj, Void param) {
+  protected Void visitFuncIfaceInRet(FuncCtrlInDataOut obj, Void param) {
     checkQuery(obj, "Response");
     return null;
   }
@@ -149,7 +127,7 @@ public class IoCheck extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncIfaceOutVoid(FuncIfaceOutVoid obj, Void param) {
+  protected Void visitFuncIfaceOutVoid(FuncCtrlOutDataOut obj, Void param) {
     assert (writes.get(obj) == false);
     assert (reads.get(obj) == false);
     assert (outputs.get(obj) == true);
@@ -158,29 +136,11 @@ public class IoCheck extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncIfaceOutRet(FuncIfaceOutRet obj, Void param) {
+  protected Void visitFuncIfaceOutRet(FuncCtrlOutDataIn obj, Void param) {
     assert (writes.get(obj) == false);
     assert (reads.get(obj) == false);
     assert (outputs.get(obj) == false);
     assert (inputs.get(obj) == true);
-    return null;
-  }
-
-  @Override
-  protected Void visitFuncIfaceInVoid(FuncIfaceInVoid obj, Void param) {
-    assert (writes.get(obj) == false);
-    assert (reads.get(obj) == false);
-    assert (outputs.get(obj) == false);
-    assert (inputs.get(obj) == false);
-    return null;
-  }
-
-  @Override
-  protected Void visitFuncIfaceInRet(FuncIfaceInRet obj, Void param) {
-    assert (writes.get(obj) == false);
-    assert (reads.get(obj) == false);
-    assert (outputs.get(obj) == false);
-    assert (inputs.get(obj) == false);
     return null;
   }
 

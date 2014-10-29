@@ -16,9 +16,15 @@ import fun.doc.compgraph.SubComponent;
 import fun.doc.compgraph.WorldComp;
 import fun.expression.reference.RefName;
 import fun.expression.reference.Reference;
-import fun.function.FunctionHeader;
+import fun.function.FuncHeader;
+import fun.function.FuncQuery;
+import fun.function.FuncResponse;
+import fun.function.FuncSignal;
+import fun.function.FuncSlot;
 import fun.knowledge.KnowFunPath;
 import fun.knowledge.KnowledgeBase;
+import fun.other.CompImpl;
+import fun.other.Named;
 import fun.variable.CompUse;
 
 //TODO do we need the "Self" prefix?
@@ -27,46 +33,49 @@ public class CompositionGraphMaker {
 
   public static WorldComp make(Designator path, String name, ImplComposition impl, KnowledgeBase kb) {
     KnowFunPath kp = kb.getEntry(KnowFunPath.class);
-    WorldComp comp = new WorldComp(path, name, impl.getInfo().getMetadata(METADATA_KEY));
+    WorldComp comp = new WorldComp(impl.getInfo(), path, name, impl.getInfo().getMetadata(METADATA_KEY));
 
     Map<CompUse, SubComponent> compmap = new HashMap<CompUse, SubComponent>();
     Map<Designator, Interface> ifacemap = new HashMap<Designator, Interface>();
 
-    for (FunctionHeader iface : impl.getResponse()) {
+    // TODO cleanup
+    for (FuncResponse iface : impl.getInterface().getItems(FuncResponse.class)) {
       Interface niface = makeIface(new Designator("Self"), comp, iface, ifacemap, kb);
       comp.getInput().add(niface);
     }
-    for (FunctionHeader iface : impl.getSlot()) {
+    for (FuncSlot iface : impl.getInterface().getItems(FuncSlot.class)) {
       Interface niface = makeIface(new Designator("Self"), comp, iface, ifacemap, kb);
       comp.getInput().add(niface);
     }
-    for (FunctionHeader iface : impl.getQuery()) {
+    for (FuncQuery iface : impl.getInterface().getItems(FuncQuery.class)) {
       Interface niface = makeIface(new Designator("Self"), comp, iface, ifacemap, kb);
       comp.getOutput().add(niface);
     }
-    for (FunctionHeader iface : impl.getSignal()) {
+    for (FuncSignal iface : impl.getInterface().getItems(FuncSignal.class)) {
       Interface niface = makeIface(new Designator("Self"), comp, iface, ifacemap, kb);
       comp.getOutput().add(niface);
     }
 
-    for (CompUse use : impl.getComponent()) {
-      fun.other.Component comptype = (fun.other.Component) use.getType().getLink();
+    assert (impl.getObjects().getItems(CompUse.class).isEmpty());
+    for (CompUse use : impl.getInstantiation().getItems(CompUse.class)) {
+      fun.other.CompImpl comptype = (CompImpl) ((fun.other.Template) use.getType().getLink()).getObject();
       Designator subpath = kp.get(comptype);
-      SubComponent sub = new SubComponent(use.getName(), subpath, comptype.getName(), use.getInfo().getMetadata(METADATA_KEY));
+      SubComponent sub = new SubComponent(use.getInfo(), use.getName(), subpath, comptype.getName(), use.getInfo().getMetadata(METADATA_KEY));
 
-      for (FunctionHeader iface : comptype.getResponse()) {
+      // TODO cleanup
+      for (FuncResponse iface : comptype.getInterface().getItems(FuncResponse.class)) {
         Interface niface = makeIface(new Designator("Self", use.getName()), sub, iface, ifacemap, kb);
         sub.getInput().add(niface);
       }
-      for (FunctionHeader iface : comptype.getSlot()) {
+      for (FuncSlot iface : comptype.getInterface().getItems(FuncSlot.class)) {
         Interface niface = makeIface(new Designator("Self", use.getName()), sub, iface, ifacemap, kb);
         sub.getInput().add(niface);
       }
-      for (FunctionHeader iface : comptype.getQuery()) {
+      for (FuncQuery iface : comptype.getInterface().getItems(FuncQuery.class)) {
         Interface niface = makeIface(new Designator("Self", use.getName()), sub, iface, ifacemap, kb);
         sub.getOutput().add(niface);
       }
-      for (FunctionHeader iface : comptype.getSignal()) {
+      for (FuncSignal iface : comptype.getInterface().getItems(FuncSignal.class)) {
         Interface niface = makeIface(new Designator("Self", use.getName()), sub, iface, ifacemap, kb);
         sub.getOutput().add(niface);
       }
@@ -90,7 +99,7 @@ public class CompositionGraphMaker {
   private static Interface getIface(Reference ep, Map<Designator, Interface> ifacemap, KnowledgeBase kb) {
     assert (ep.getOffset().size() <= 1);
 
-    Designator name = new Designator("Self", ep.getLink().getName());
+    Designator name = new Designator("Self", ((Named) ep.getLink()).getName());
     if (!ep.getOffset().isEmpty()) {
       name = new Designator(name, ((RefName) ep.getOffset().get(0)).getName());
     }
@@ -104,7 +113,7 @@ public class CompositionGraphMaker {
     return iface;
   }
 
-  private static Interface makeIface(Designator name, Component sub, FunctionHeader iface, Map<Designator, Interface> ifacemap, KnowledgeBase kb) {
+  private static Interface makeIface(Designator name, Component sub, FuncHeader iface, Map<Designator, Interface> ifacemap, KnowledgeBase kb) {
     Interface niface = new Interface(sub, iface.getName());
     name = new Designator(name, iface.getName());
     assert (!ifacemap.containsKey(name));

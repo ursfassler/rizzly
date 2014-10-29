@@ -1,9 +1,6 @@
 package cir.expression.reference;
 
-import cir.Cir;
+import cir.other.Named;
 
-public interface Referencable extends Cir {
-  public String getName();
-
-  public void setName(String name);
+public interface Referencable extends Named {
 }

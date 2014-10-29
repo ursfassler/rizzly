@@ -1,8 +1,5 @@
 package evl;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
 import common.Direction;
 
 import evl.composition.Connection;
@@ -45,28 +42,27 @@ import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
+import evl.expression.reference.SimpleRef;
 import evl.expression.unop.BitNot;
 import evl.expression.unop.LogicNot;
 import evl.expression.unop.Not;
 import evl.expression.unop.Uminus;
-import evl.function.impl.FuncGlobal;
-import evl.function.impl.FuncIfaceInRet;
-import evl.function.impl.FuncIfaceInVoid;
-import evl.function.impl.FuncIfaceOutRet;
-import evl.function.impl.FuncIfaceOutVoid;
-import evl.function.impl.FuncImplResponse;
-import evl.function.impl.FuncImplSlot;
-import evl.function.impl.FuncPrivateRet;
-import evl.function.impl.FuncPrivateVoid;
-import evl.function.impl.FuncProtoRet;
-import evl.function.impl.FuncProtoVoid;
-import evl.function.impl.FuncSubHandlerEvent;
-import evl.function.impl.FuncSubHandlerQuery;
+import evl.function.Function;
+import evl.function.header.FuncCtrlInDataIn;
+import evl.function.header.FuncCtrlInDataOut;
+import evl.function.header.FuncCtrlOutDataIn;
+import evl.function.header.FuncCtrlOutDataOut;
+import evl.function.header.FuncGlobal;
+import evl.function.header.FuncPrivateRet;
+import evl.function.header.FuncPrivateVoid;
+import evl.function.header.FuncSubHandlerEvent;
+import evl.function.header.FuncSubHandlerQuery;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.StateComposite;
 import evl.hfsm.StateSimple;
 import evl.hfsm.Transition;
 import evl.other.CompUse;
+import evl.other.Component;
 import evl.other.ImplElementary;
 import evl.other.Namespace;
 import evl.other.Queue;
@@ -87,13 +83,11 @@ import evl.statement.Statement;
 import evl.statement.VarDefStmt;
 import evl.statement.WhileStmt;
 import evl.statement.intern.MsgPush;
-import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
-import evl.type.base.FunctionTypeRet;
-import evl.type.base.FunctionTypeVoid;
+import evl.type.base.FunctionType;
 import evl.type.base.RangeType;
 import evl.type.base.StringType;
 import evl.type.composed.NamedElement;
@@ -112,26 +106,20 @@ import evl.variable.StateVariable;
 
 public class DefTraverser<R, P> extends Traverser<R, P> {
 
-  protected R visitList(Collection<? extends Evl> list, P param) {
-    for (Evl itr : new ArrayList<Evl>(list)) {
-      visit(itr, param);
-    }
-    return null;
+  @Override
+  protected R visitComponent(Component obj, P param) {
+    visitList(obj.getFunction(), param);
+    visitList(obj.getIface(), param);
+    visit(obj.getQueue(), param);
+    return super.visitComponent(obj, param);
   }
 
   @Override
   protected R visitImplElementary(ImplElementary obj, P param) {
-    visitList(obj.getQuery().getList(), param);
-    visitList(obj.getSignal().getList(), param);
-    visitList(obj.getResponse().getList(), param);
-    visitList(obj.getSlot().getList(), param);
-    visit(obj.getQueue(), param);
-
-    visitList(obj.getConstant().getList(), param);
-    visitList(obj.getVariable().getList(), param);
-    visitList(obj.getComponent().getList(), param);
-    visitList(obj.getFunction().getList(), param);
-    visitList(obj.getSubCallback().getList(), param);
+    visitList(obj.getConstant(), param);
+    visitList(obj.getVariable(), param);
+    visitList(obj.getComponent(), param);
+    visitList(obj.getSubCallback(), param);
     visit(obj.getEntryFunc(), param);
     visit(obj.getExitFunc(), param);
     return null;
@@ -139,25 +127,13 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitImplComposition(ImplComposition obj, P param) {
-    visitList(obj.getQuery().getList(), param);
-    visitList(obj.getSignal().getList(), param);
-    visitList(obj.getResponse().getList(), param);
-    visitList(obj.getSlot().getList(), param);
-    visit(obj.getQueue(), param);
-
-    visitList(obj.getComponent().getList(), param);
+    visitList(obj.getComponent(), param);
     visitList(obj.getConnection(), param);
     return null;
   }
 
   @Override
   protected R visitImplHfsm(ImplHfsm obj, P param) {
-    visitList(obj.getQuery().getList(), param);
-    visitList(obj.getSignal().getList(), param);
-    visitList(obj.getResponse().getList(), param);
-    visitList(obj.getSlot().getList(), param);
-    visit(obj.getQueue(), param);
-
     visit(obj.getTopstate(), param);
     return null;
   }
@@ -189,34 +165,35 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitUnionType(UnionType obj, P param) {
     visit(obj.getTag(), param);
-    visitList(obj.getElement().getList(), param);
+    visitList(obj.getElement(), param);
     return null;
   }
 
   @Override
   protected R visitUnsafeUnionType(UnsafeUnionType obj, P param) {
-    visitList(obj.getElement().getList(), param);
+    visitList(obj.getElement(), param);
     return null;
   }
 
   @Override
   protected R visitRecordType(RecordType obj, P param) {
-    visitList(obj.getElement().getList(), param);
+    visitList(obj.getElement(), param);
     return null;
   }
 
   @Override
   protected R visitComponentType(ComponentType obj, P param) {
-    visitList(obj.getElement().getList(), param);
+    visitList(obj.getInput(), param);
+    visitList(obj.getOutput(), param);
     return null;
   }
 
   @Override
   protected R visitRizzlyProgram(RizzlyProgram obj, P param) {
-    visitList(obj.getType().getList(), param);
-    visitList(obj.getConstant().getList(), param);
-    visitList(obj.getVariable().getList(), param);
-    visitList(obj.getFunction().getList(), param);
+    visitList(obj.getType(), param);
+    visitList(obj.getConstant(), param);
+    visitList(obj.getVariable(), param);
+    visitList(obj.getFunction(), param);
     return null;
   }
 
@@ -233,7 +210,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitRefCall(RefCall obj, P param) {
-    visitItr(obj.getActualParameter(), param);
+    visitList(obj.getActualParameter(), param);
     return null;
   }
 
@@ -250,7 +227,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitEnumType(EnumType obj, P param) {
-    visitItr(obj.getElement(), param);
+    visitList(obj.getElement(), param);
     return null;
   }
 
@@ -272,11 +249,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitVoidType(VoidType obj, P param) {
-    return null;
-  }
-
-  @Override
-  protected R visitCompUse(CompUse obj, P param) {
     return null;
   }
 
@@ -309,19 +281,14 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitSubCallbacks(SubCallbacks obj, P param) {
-    visitItr(obj.getList(), param);
+    visit(obj.getCompUse(), param);
+    visitList(obj.getFunc(), param);
     return null;
   }
 
   @Override
   protected R visitNamespace(Namespace obj, P param) {
-    visitList(obj.getList(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitNamedElement(NamedElement obj, P param) {
-    visit(obj.getType(), param);
+    visitList(obj.getChildren(), param);
     return null;
   }
 
@@ -362,13 +329,13 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitArrayValue(ArrayValue obj, P param) {
-    visitItr(obj.getValue(), param);
+    visitList(obj.getValue(), param);
     return null;
   }
 
   @Override
   protected R visitExprList(ExprList obj, P param) {
-    visitItr(obj.getValue(), param);
+    visitList(obj.getValue(), param);
     return null;
   }
 
@@ -376,9 +343,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   protected R visitStateSimple(StateSimple obj, P param) {
     visit(obj.getEntryFunc(), param);
     visit(obj.getExitFunc(), param);
-    visitItr(obj.getVariable(), param);
-    visitItr(obj.getFunction(), param);
-    visitItr(obj.getItem(), param);
+    visitList(obj.getItem(), param);
     return null;
   }
 
@@ -386,23 +351,27 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   protected R visitStateComposite(StateComposite obj, P param) {
     visit(obj.getEntryFunc(), param);
     visit(obj.getExitFunc(), param);
-    visitItr(obj.getVariable(), param);
-    visitItr(obj.getFunction(), param);
-    visitItr(obj.getItem(), param);
+    visitList(obj.getItem(), param);
+    visit(obj.getInitial(), param);
     return null;
   }
 
   @Override
   protected R visitTransition(Transition obj, P param) {
-    visitItr(obj.getParam(), param);
+    visitList(obj.getParam(), param);
     visit(obj.getGuard(), param);
     visit(obj.getBody(), param);
     return null;
   }
 
   @Override
+  protected R visitTypeRef(SimpleRef obj, P param) {
+    return null;
+  }
+
+  @Override
   protected R visitReference(Reference obj, P param) {
-    visitItr(obj.getOffset(), param);
+    visitList(obj.getOffset(), param);
     return null;
   }
 
@@ -417,78 +386,32 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitFuncImplSlot(FuncImplSlot obj, P param) {
-    visitItr(obj.getParam(), param);
-    visit(obj.getBody(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitFuncImplResponse(FuncImplResponse obj, P param) {
-    visitItr(obj.getParam(), param);
-    visit(obj.getRet(), param);
-    visit(obj.getBody(), param);
-    return null;
-  }
-
-  @Override
   protected R visitFuncPrivateVoid(FuncPrivateVoid obj, P param) {
-    visitItr(obj.getParam(), param);
-    visit(obj.getBody(), param);
     return null;
   }
 
   @Override
   protected R visitFuncPrivateRet(FuncPrivateRet obj, P param) {
-    visitItr(obj.getParam(), param);
-    visit(obj.getRet(), param);
-    visit(obj.getBody(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitFuncProtoVoid(FuncProtoVoid obj, P param) {
-    visitItr(obj.getParam(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitFuncProtoRet(FuncProtoRet obj, P param) {
-    visitItr(obj.getParam(), param);
-    visit(obj.getRet(), param);
     return null;
   }
 
   @Override
   protected R visitFuncGlobal(FuncGlobal obj, P param) {
-    visitItr(obj.getParam(), param);
-    visit(obj.getRet(), param);
-    visit(obj.getBody(), param);
     return null;
   }
 
   @Override
   protected R visitFuncSubHandlerQuery(FuncSubHandlerQuery obj, P param) {
-    visitItr(obj.getParam(), param);
-    visit(obj.getRet(), param);
-    visit(obj.getBody(), param);
     return null;
   }
 
   @Override
   protected R visitFuncSubHandlerEvent(FuncSubHandlerEvent obj, P param) {
-    visitItr(obj.getParam(), param);
-    visit(obj.getBody(), param);
     return null;
   }
 
   @Override
-  protected R visitFunctionTypeVoid(FunctionTypeVoid obj, P param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected R visitFunctionTypeRet(FunctionTypeRet obj, P param) {
+  protected R visitFunctionType(FunctionType obj, P param) {
     throw new RuntimeException("not yet implemented");
   }
 
@@ -499,11 +422,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitEndpointSub(EndpointSub obj, P param) {
-    return null;
-  }
-
-  @Override
-  protected R visitTypeRef(TypeRef obj, P param) {
     return null;
   }
 
@@ -662,7 +580,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitIfStmt(IfStmt obj, P param) {
-    visitItr(obj.getOption(), param);
+    visitList(obj.getOption(), param);
     visit(obj.getDefblock(), param);
     return null;
   }
@@ -685,14 +603,14 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitCaseStmt(CaseStmt obj, P param) {
     visit(obj.getCondition(), param);
-    visitItr(obj.getOption(), param);
+    visitList(obj.getOption(), param);
     visit(obj.getOtherwise(), param);
     return null;
   }
 
   @Override
   protected R visitCaseOpt(CaseOpt obj, P param) {
-    visitItr(obj.getValue(), param);
+    visitList(obj.getValue(), param);
     visit(obj.getCode(), param);
     return null;
   }
@@ -733,28 +651,22 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitFuncIfaceOutVoid(FuncIfaceOutVoid obj, P param) {
-    visitItr(obj.getParam(), param);
+  protected R visitFuncIfaceOutVoid(FuncCtrlOutDataOut obj, P param) {
     return null;
   }
 
   @Override
-  protected R visitFuncIfaceOutRet(FuncIfaceOutRet obj, P param) {
-    visitItr(obj.getParam(), param);
-    visit(obj.getRet(), param);
+  protected R visitFuncIfaceOutRet(FuncCtrlOutDataIn obj, P param) {
     return null;
   }
 
   @Override
-  protected R visitFuncIfaceInVoid(FuncIfaceInVoid obj, P param) {
-    visitItr(obj.getParam(), param);
+  protected R visitFuncIfaceInVoid(FuncCtrlInDataIn obj, P param) {
     return null;
   }
 
   @Override
-  protected R visitFuncIfaceInRet(FuncIfaceInRet obj, P param) {
-    visitItr(obj.getParam(), param);
-    visit(obj.getRet(), param);
+  protected R visitFuncIfaceInRet(FuncCtrlInDataOut obj, P param) {
     return null;
   }
 
@@ -806,6 +718,26 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitQueue(Queue obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitFunctionImpl(Function obj, P param) {
+    super.visitFunctionImpl(obj, param);
+    visitList(obj.getParam(), param);
+    visit(obj.getRet(), param);
+    visit(obj.getBody(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitNamedElement(NamedElement obj, P param) {
+    visit(obj.getRef(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitCompUse(CompUse obj, P param) {
     return null;
   }
 

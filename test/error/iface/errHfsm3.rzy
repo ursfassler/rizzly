@@ -1,22 +1,19 @@
 // funcC is not an event
 
-component
-  ErrHfsm3
-    slot funcA();
-    slot funcB();
+ErrHfsm3 = Hfsm
+  funcA : slot();
+  funcB : slot();
 
-  implementation hfsm( One )
-    
-    state One
+  state(One)
+    One : state;
+  
+    funcC = procedure()
     end
     
-    function funcC()
-    end
-    
-    transition 
-      One to One by funcA();
-      One to One by funcB();
-      One to One by funcC();
-    
+    One to One by funcA();
+    One to One by funcB();
+    One to One by funcC();
   end
+  
+end
 

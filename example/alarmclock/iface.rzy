@@ -1,0 +1,16 @@
+
+TickPerSecond : const = 100;
+
+Time = Record
+  hour:    R{0,23}; 
+  minute:  R{0,59};
+  second:  R{0,59};
+end
+
+Modes = Enum
+  ShowTime;
+  SetTime;
+  SetAlaram;
+end
+
+

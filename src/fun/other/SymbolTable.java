@@ -17,7 +17,7 @@ import fun.Fun;
 public class SymbolTable {
 
   private SymbolTable parent;
-  private HashMap<String, Named> entries = new HashMap<String, Named>();
+  private Map<String, Named> entries = new HashMap<String, Named>();
 
   public SymbolTable(SymbolTable parent) {
     this.parent = parent;
@@ -50,38 +50,33 @@ public class SymbolTable {
     return find(name, true);
   }
 
-  public void addAll(Collection<? extends Named> syms) {
-    for (Named itr : syms) {
+  public void addAll(Collection<? extends Fun> syms) {
+    for (Fun itr : syms) {
       add(itr);
     }
   }
 
-  public void add(Named sym) {
-    Named old = find(sym.getName(), false);
+  public void add(Named obj) {
+    Fun old = find(obj.getName(), false);
     if (old != null) {
       if (old instanceof Fun) {
-        RError.err(ErrorType.Hint, ((Fun) old).getInfo(), "First definition was here");
-        RError.err(ErrorType.Error, ((Fun) sym).getInfo(), "Entry already defined: " + sym.getName());
+        RError.err(ErrorType.Hint, old.getInfo(), "First definition was here");
+        RError.err(ErrorType.Error, obj.getInfo(), "Entry already defined: " + obj.getName());
       } else {
-        RError.err(ErrorType.Error, "Entry already defined: " + sym.getName());
+        RError.err(ErrorType.Error, "Entry already defined: " + obj.getName());
       }
     }
-    entries.put(sym.getName(), sym);
+    entries.put(obj.getName(), obj);
+  }
+
+  public void add(Fun obj) {
+    if (obj instanceof Named) {
+      add((Named) obj);
+    }
   }
 
   public SymbolTable getParent() {
     return parent;
-  }
-
-  public Map<String, Named> getMap() {
-    Map<String, Named> ret;
-    if (parent == null) {
-      ret = new HashMap<String, Named>();
-    } else {
-      ret = parent.getMap();
-    }
-    ret.putAll(entries);
-    return ret;
   }
 
 }

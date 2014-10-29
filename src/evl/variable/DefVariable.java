@@ -3,12 +3,13 @@ package evl.variable;
 import common.ElementInfo;
 
 import evl.expression.Expression;
-import evl.type.TypeRef;
+import evl.expression.reference.SimpleRef;
+import evl.type.Type;
 
 abstract public class DefVariable extends Variable {
   private Expression def;
 
-  public DefVariable(ElementInfo info, String name, TypeRef type, Expression def) {
+  public DefVariable(ElementInfo info, String name, SimpleRef<Type> type, Expression def) {
     super(info, name, type);
     this.def = def;
   }

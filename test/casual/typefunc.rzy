@@ -1,5 +1,5 @@
 
-function getBits( nr: Natural ):Natural
+getBits = function( nr: Natural ):Natural
   bits : Natural = 0;
   while nr <> 0 do
     nr   := nr shr 1;
@@ -8,18 +8,14 @@ function getBits( nr: Natural ):Natural
   return bits;
 end
 
-type
-  Rec{T:Type{Any}} = Record
-    a : T;
-    b : T;
-  end
+Rec{T:Type{Any}} = Record
+  a : T;
+  b : T;
+end
 
-component
-  Typefunc
-    implementation elementary
-      var
-        a : R{0,getBits( 42 )} = 0;
-        b : R{0,255} = 0;
-        c : Rec{R{0,255}} = (a := 0, b := 0);
-  end
+Typefunc = Elementary
+  a : R{0,getBits( 42 )} = 0;
+  b : R{0,255} = 0;
+  c : Rec{R{0,255}} = (a := 0, b := 0);
+end
 

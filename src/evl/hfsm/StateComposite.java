@@ -2,20 +2,23 @@ package evl.hfsm;
 
 import common.ElementInfo;
 
-public class StateComposite extends State {
-  private State initial = null; // we can not set initial when creating the object because it creates a dependency
-                                // cycle
+import evl.expression.reference.SimpleRef;
+import evl.function.header.FuncPrivateVoid;
 
-  public StateComposite(ElementInfo info, String name) {
-    super(info, name);
+public class StateComposite extends State {
+  private SimpleRef<State> initial;
+
+  public StateComposite(ElementInfo info, String name, SimpleRef<FuncPrivateVoid> entryFunc, SimpleRef<FuncPrivateVoid> exitFunc, SimpleRef<State> initial) {
+    super(info, name, entryFunc, exitFunc);
+    this.initial = initial;
   }
 
-  public State getInitial() {
+  public SimpleRef<State> getInitial() {
     assert (initial != null);
     return initial;
   }
 
-  public void setInitial(State initial) {
+  public void setInitial(SimpleRef<State> initial) {
     assert (initial != null);
     this.initial = initial;
   }

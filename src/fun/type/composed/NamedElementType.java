@@ -2,11 +2,11 @@ package fun.type.composed;
 
 import common.ElementInfo;
 
-import fun.other.ListOfNamed;
-import fun.type.TypeGenerator;
+import fun.other.FunList;
+import fun.type.Type;
 
-abstract public class NamedElementType extends TypeGenerator {
-  final private ListOfNamed<NamedElement> element = new ListOfNamed<NamedElement>();
+abstract public class NamedElementType extends Type {
+  final private FunList<NamedElement> element = new FunList<NamedElement>();
 
   public NamedElementType(ElementInfo info, String name) {
     super(info, name);
@@ -16,7 +16,7 @@ abstract public class NamedElementType extends TypeGenerator {
     return element.size();
   }
 
-  public ListOfNamed<NamedElement> getElement() {
+  public FunList<NamedElement> getElement() {
     return element;
   }
 

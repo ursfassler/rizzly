@@ -1,18 +1,16 @@
 // Error: response is not allowed to write state
 
-component
-  Err3
-    response what():R{0,100};
-    signal   event();
-    
-  implementation hfsm(A)
-    
-    state A
-      response what():R{0,100}
+Err3 = Hfsm
+  what : response():R{0,100};
+  event : signal();
+  
+  state(A)
+    A : state
+      what : response():R{0,100}
         event();
         return 0;
       end
     end
-    
-  end
+  end  
+end
 

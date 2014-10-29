@@ -13,10 +13,7 @@ import cir.expression.reference.Reference;
 import cir.function.Function;
 import cir.function.FunctionImpl;
 import cir.function.FunctionPrototype;
-import cir.other.Constant;
-import cir.other.FuncVariable;
 import cir.other.Program;
-import cir.other.StateVariable;
 import cir.statement.Assignment;
 import cir.statement.Block;
 import cir.statement.CallStmt;
@@ -37,6 +34,9 @@ import cir.type.StructType;
 import cir.type.TypeAlias;
 import cir.type.UnionType;
 import cir.type.VoidType;
+import cir.variable.Constant;
+import cir.variable.FuncVariable;
+import cir.variable.StateVariable;
 
 public class StmtReplacer<P> extends NullTraverser<Statement, P> {
   @Override

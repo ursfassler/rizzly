@@ -29,7 +29,7 @@ public class StateReaderInfo extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitAssignment(Assignment obj, Void param) {
-    visitItr(obj.getLeft().getOffset(), param);
+    visitList(obj.getLeft().getOffset(), param);
     visit(obj.getRight(), param);
     return null;
   }

@@ -1,42 +1,37 @@
-component
-  TransDist
-    slot   inp( val: R{0,255} );
-    signal out( val: R{0,255} );
+TransDist = Hfsm
+  inp : slot( val: R{0,255} );
+  out : signal( val: R{0,255} );
     
-  implementation hfsm(Top)
-  
-    state Top(A)
-      transition 
-        Top to A by inp( val: R{0,255} ) if val = 0 do
-          out( 0 );
+  state(Top)
+    Top : state(A)
+      Top to A by inp( val: R{0,255} ) if val = 0 do
+        out( 0 );
+      end
+      
+      B to A by inp( val: R{0,255} ) if val = 1 do
+        out( 1 );
+      end
+      
+      A : state
+        A to Top by inp( val: R{0,255} ) if val = 2 do  // should not work since Top is in outer scope of A
+          out( 2 );
         end
         
-        B to A by inp( val: R{0,255} ) if val = 1 do
-          out( 1 );
+        Top to A by inp( val: R{0,255} ) if val = 3 do
+          out( 3 );
         end
-      
-      state A
-        transition 
-          A to Top by inp( val: R{0,255} ) if val = 2 do  // should not work since Top is in outer scope of A
-            out( 2 );
-          end
-          
-          Top to A by inp( val: R{0,255} ) if val = 3 do
-            out( 3 );
-          end
       end
 
-      transition 
-        A to A by inp( val: R{0,255} ) if val = 4 do
-          out( 4 );
-        end
-        
-        Top to B by inp( val: R{0,255} ) do
-          out( 5 );
-        end
-      
-      state B
+      A to A by inp( val: R{0,255} ) if val = 4 do
+        out( 4 );
       end
+      
+      Top to B by inp( val: R{0,255} ) do
+        out( 5 );
+      end
+      
+      B : state;
     end
   end
+end
 

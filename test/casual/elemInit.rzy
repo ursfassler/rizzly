@@ -1,23 +1,17 @@
-component
-  ElemInit 
-    response ind():R{0,50};
-
-  implementation elementary
+ElemInit = Elementary
+  x : R{0,50} = 1;
     
-    var
-      x : R{0,50} = 1;
-      
-    entry
-      x := 42;
-    end
-    
-    exit
-      x := 23;
-    end
-    
-    response ind():R{0,50}
-      return x;
-    end
-
+  entry
+    x := 42;
   end
+  
+  exit
+    x := 23;
+  end
+  
+  ind : response():R{0,50}
+    return x;
+  end
+
+end
 

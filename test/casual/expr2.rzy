@@ -1,46 +1,42 @@
 
-component
-  Expr2
-    slot   ind( x: R{0,20} );
-    signal out( x: R{0,20} );
+Expr2 = Elementary
+  out : signal( x: R{0,20} );
 
-  implementation elementary
-    
-    slot ind( x: R{0,20} )
-      y1 : R{0,20} = +x;
-      y2 : R{-20,20} = -x;
+  ind : slot( x: R{0,20} )
+    y1 : R{0,20} = +x;
+    y2 : R{-20,20} = -x;
 
-      y4 : R{0,68};
-      case x of
-        0..1: y4 := x + 2; end
-        2..3: y4 := R{0,68}( x - 2 ); end
-        4..5: y4 := x * 2; end
-        6..7: y4 := x / 2; end
-        8..9: y4 := x mod 2; end
-        10..11: y4 := x shr 2; end
-        12..13: y4 := x and 13; end
-        14..15: y4 := x or 14; end
-        16..17: y4 := R{0,68}( x shl 2 ); end
-        else y4 := x; end
-      end
-      
-      y5 : Boolean;
-      case x of
-        0..1: y5 := y4 < 10; end
-        2..3: y5 := y4 <= 10; end
-        4..5: y5 := y4 > 10; end
-        6..7: y5 := y4 >= 10; end
-        8..9: y5 := y4 = 10; end
-        10..11: y5 := y4 <> 10; end
-        else y5 := not (y4 = 10); end
-      end
-        
-      if y5 then
-        out( (y1 + y2 + y4 + 20) mod 21 );
-      else
-        out( 42 / 2 -10 );
-      end
+    y4 : R{0,68};
+    case x of
+      0..1: y4 := x + 2; end
+      2..3: y4 := R{0,68}( x - 2 ); end
+      4..5: y4 := x * 2; end
+      6..7: y4 := x / 2; end
+      8..9: y4 := x mod 2; end
+      10..11: y4 := x shr 2; end
+      12..13: y4 := x and 13; end
+      14..15: y4 := x or 14; end
+      16..17: y4 := R{0,68}( x shl 2 ); end
+      else y4 := x; end
     end
-
+    
+    y5 : Boolean;
+    case x of
+      0..1: y5 := y4 < 10; end
+      2..3: y5 := y4 <= 10; end
+      4..5: y5 := y4 > 10; end
+      6..7: y5 := y4 >= 10; end
+      8..9: y5 := y4 = 10; end
+      10..11: y5 := y4 <> 10; end
+      else y5 := not (y4 = 10); end
+    end
+      
+    if y5 then
+      out( (y1 + y2 + y4 + 20) mod 21 );
+    else
+      out( 42 / 2 -10 );
+    end
   end
+
+end
 

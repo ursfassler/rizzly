@@ -1,17 +1,13 @@
-component
-  ErrHfsm2
-    slot funcA();
-    slot funcB();
 
-  implementation hfsm( One )
-    
-    state One
-    end
-    
-    transition 
-      One to One by funcA();
-      One to One by funcB();
-      One to One by funcC();
-    
+ErrHfsm2 = Hfsm
+  funcA : slot();
+  funcB : slot();
+
+  state(One)
+    One : state;
+    One to One by funcA();
+    One to One by funcB();
+    One to One by funcC();
   end
+end
 

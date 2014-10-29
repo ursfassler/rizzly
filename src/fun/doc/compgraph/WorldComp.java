@@ -8,6 +8,7 @@ import java.util.Set;
 import util.PointF;
 
 import common.Designator;
+import common.ElementInfo;
 import common.Metadata;
 
 public class WorldComp extends Component {
@@ -16,8 +17,8 @@ public class WorldComp extends Component {
   final private List<SubComponent> comp = new ArrayList<SubComponent>();
   final private Set<Connection> conn = new HashSet<Connection>();
 
-  public WorldComp(Designator path, String classname, List<Metadata> metadata) {
-    super(path, classname, metadata);
+  public WorldComp(ElementInfo info, Designator path, String classname, List<Metadata> metadata) {
+    super(info, path, classname, metadata);
   }
 
   public List<SubComponent> getComp() {

@@ -1,23 +1,19 @@
-component
-  CalcCase
-    slot   ind( data: R{0,20} );
-    signal out( data: R{0,20} );
+CalcCase = Elementary
+  out : signal( data: R{0,20} );
 
-  implementation elementary
-
-    slot ind( x: R{0,20} )
-      case x+2 of
-        2..10:
-          out( 2 );
-        end
-        11:
-          out( 3 );
-        end
-        12..22:
-          out( 4 );
-        end
+  ind : slot( x: R{0,20} )
+    case x+2 of
+      2..10:
+        out( 2 );
+      end
+      11:
+        out( 3 );
+      end
+      12..22:
+        out( 4 );
       end
     end
-
   end
+
+end
 

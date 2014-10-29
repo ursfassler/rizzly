@@ -1,4 +1,3 @@
 
-const
-  Answer : R{0,255} = 42;
+Answer : const R{0,255} = 42;
 

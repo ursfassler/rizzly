@@ -1,6 +1,6 @@
 package cir.statement;
 
-import cir.other.FuncVariable;
+import cir.variable.FuncVariable;
 
 final public class VarDefStmt extends Statement {
   final private FuncVariable variable;

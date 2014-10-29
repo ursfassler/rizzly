@@ -14,7 +14,7 @@ final public class IntegerType extends BaseType {
   public final static String NAME = "Integer";
 
   public IntegerType() {
-    super(new ElementInfo(), NAME);
+    super(ElementInfo.NO, NAME);
   }
 
 }

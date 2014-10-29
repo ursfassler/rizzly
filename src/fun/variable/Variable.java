@@ -12,8 +12,9 @@ abstract public class Variable extends FunBase implements Named {
 
   public Variable(ElementInfo info, String name, Reference type) {
     super(info);
-    this.name = name;
+    assert (type != null);
     this.type = type;
+    this.name = name;
   }
 
   public Reference getType() {
@@ -21,11 +22,11 @@ abstract public class Variable extends FunBase implements Named {
   }
 
   public void setType(Reference type) {
+    assert (type != null);
     this.type = type;
   }
 
   public String getName() {
-    assert (name != null);
     return name;
   }
 
@@ -35,6 +36,6 @@ abstract public class Variable extends FunBase implements Named {
 
   @Override
   public String toString() {
-    return name.toString() + ":" + type.toString();
+    return name + ":" + type.toString();
   }
 }

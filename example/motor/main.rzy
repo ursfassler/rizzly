@@ -1,31 +1,24 @@
 
-import
-  motorController;
-  schmitt;
+import motorController;
+import schmitt;
+
+Controller = Composition
+  temperature : slot( value: R{-20,120} );
+  motorStart : slot();
+  motorStop : slot();
+    
+  on : signal();
+  off : signal();
   
-component
-  Controller
-    input
-      temperature( value: R{-20,120} );
-      motorStart();
-      motorStop();
-      
-    output
-      on();
-      off();
-    
-  implementation composition
-    component
-      tempSchmitt : Schmitt{R{-20,120},40,80};
-      motcntrl    : MotorController;
-    
-    connection
-      temperature       -> tempSchmitt.changed;
-      motorStart        -> motcntrl.start;
-      motorStop         -> motcntrl.stop;
-      tempSchmitt.high  -> motcntrl.overtemp;
-      tempSchmitt.low   -> motcntrl.normtemp;
-      motcntrl.on       -> on;
-      motcntrl.off      -> off;
-  end  
+  tempSchmitt : Schmitt{R{-20,120},40,80};
+  motcntrl    : MotorController;
+  
+  temperature       -> tempSchmitt.changed;
+  motorStart        -> motcntrl.start;
+  motorStop         -> motcntrl.stop;
+  tempSchmitt.high  -> motcntrl.overtemp;
+  tempSchmitt.low   -> motcntrl.normtemp;
+  motcntrl.on       -> on;
+  motcntrl.off      -> off;
+end  
 

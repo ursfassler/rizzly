@@ -1,0 +1,110 @@
+import iface;
+
+Time = Elementary
+  changed : signal( value: iface.Time );
+
+  ltime   : iface.Time = ( hour := 0, minute := 0, second := 0 );
+  lticks  : R{0,TickPerSecond-1} = 0;
+
+  entry
+    changed( ltime );
+  end
+  
+  update : slot()
+    changed( ltime );
+  end
+  
+  
+  get : response():iface.Time
+    return ltime;
+  end
+  
+  tick : slot()
+    if lticks < TickPerSecond-1 then
+      lticks := R{0,TickPerSecond-1}( lticks + 1 );
+    else
+      lticks := 0;
+      if ltime.second < 59 then
+        ltime.second := R{0,59}( ltime.second + 1 );
+      else
+        ltime.second := 0;
+        iIncMinute();
+      end
+      changed( ltime );
+    end
+  end
+
+  iIncMinute = procedure()
+    if ltime.minute < 59 then
+      ltime.minute := R{0,59}( ltime.minute + 1 );
+    else
+      ltime.minute := 0;
+      iIncHour();
+    end
+  end
+
+  iIncHour = procedure()
+    ltime.hour   := (ltime.hour + 1) mod 24;
+  end
+
+  incMinute : slot()
+    lticks        := 0;
+    ltime.second  := 0;
+    iIncMinute();
+    changed( ltime );
+  end
+
+  incHour : slot()
+    lticks        := 0;
+    ltime.second  := 0;
+    ltime.minute  := 0;
+    iIncHour();
+    changed( ltime );
+  end
+end
+
+Edge = Elementary
+  click : signal();
+
+  down : slot()
+    click();
+  end
+  
+  up : slot()
+  end
+end
+  
+Autorepeat = Hfsm
+  down : slot();
+  up : slot();
+  tick : slot();
+
+  click : signal();
+
+  state( Released )
+
+    Released : state;
+
+    Pressed : state
+      timer : R{0,30} = 30;
+        
+      Pressed to Pressed by tick() if timer > 0 do
+        timer := R{0,30}( timer - 1 );
+      end
+
+      Pressed to Pressed by tick() if timer = 0 do
+        timer := 5;
+        click();  
+      end
+    end
+
+    Released to Pressed by down() do
+      click();
+    end
+
+    Pressed to Released by up();
+  end
+
+end
+
+

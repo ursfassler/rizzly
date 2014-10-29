@@ -27,8 +27,8 @@ import fun.doc.compgraph.Positioning;
 import fun.doc.compgraph.WorldComp;
 import fun.knowledge.KnowFunPath;
 import fun.knowledge.KnowledgeBase;
-import fun.other.Component;
 import fun.other.RizzlyFile;
+import fun.other.Template;
 
 public class ComponentFilePrinter {
   private Document doc;
@@ -42,15 +42,7 @@ public class ComponentFilePrinter {
     this.kb = kb;
   }
 
-  public void write(RizzlyFile comp) {
-    createDoc(comp);
-    makeSource(comp);
-    makePicture(comp);
-    print(comp);
-  }
-
-  public void print(RizzlyFile comp) {
-    Designator path = comp.getFullName();
+  public void print(RizzlyFile comp, Designator path) {
     try {
       String filename = kb.getRootdir() + path + ".html";
 
@@ -73,9 +65,7 @@ public class ComponentFilePrinter {
     }
   }
 
-  public void createDoc(RizzlyFile comp) {
-    Designator path = comp.getFullName();
-
+  public void createDoc(RizzlyFile comp, Designator path) {
     try {
       DocumentBuilderFactory dbfac = DocumentBuilderFactory.newInstance();
       DocumentBuilder docBuilder;
@@ -134,14 +124,16 @@ public class ComponentFilePrinter {
 
   public void makePicture(RizzlyFile file) {
     KnowFunPath kp = kb.getEntry(KnowFunPath.class);
-    for (Component comp : file.getComp()) {
-      if (comp instanceof ImplComposition) {
+    assert (file.getObjects().getItems(ImplComposition.class).isEmpty());
+    for (Template decl : file.getObjects().getItems(Template.class)) {
+      if (decl.getObject() instanceof ImplComposition) {
+        ImplComposition comp = (ImplComposition) decl.getObject();
         Element title = doc.createElement("h2");
         title.appendChild(doc.createTextNode("Picture"));
         body.appendChild(title);
 
-        Designator path = kp.get(comp);
-        WorldComp g = CompositionGraphMaker.make(path, comp.getName(), (ImplComposition) comp, kb);
+        Designator path = kp.get(decl);
+        WorldComp g = CompositionGraphMaker.make(path, decl.getName(), comp, kb);
         Positioning.doPositioning(g);
         CompositionGraphPrinter pr = new CompositionGraphPrinter(doc);
         body.appendChild(pr.makeSvg(g));

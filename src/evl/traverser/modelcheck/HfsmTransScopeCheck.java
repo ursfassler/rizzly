@@ -39,7 +39,7 @@ public class HfsmTransScopeCheck extends NullTraverser<Set<State>, Void> {
 
   @Override
   protected Set<State> visitImplHfsm(ImplHfsm obj, Void param) {
-    List<State> states = obj.getTopstate().getItemList(State.class);
+    List<State> states = obj.getTopstate().getItem().getItems(State.class);
     for (State subState : states) {
       visit(subState, null);
     }
@@ -51,11 +51,11 @@ public class HfsmTransScopeCheck extends NullTraverser<Set<State>, Void> {
     Set<State> ret = new HashSet<State>();
     ret.add(obj);
 
-    for (State subState : obj.getItemList(State.class)) {
+    for (State subState : obj.getItem().getItems(State.class)) {
       ret.addAll(visit(subState, null));
     }
 
-    for (Transition trans : obj.getItemList(Transition.class)) {
+    for (Transition trans : obj.getItem().getItems(Transition.class)) {
       checkTransition(trans, ret);
     }
 
@@ -63,8 +63,8 @@ public class HfsmTransScopeCheck extends NullTraverser<Set<State>, Void> {
   }
 
   private void checkTransition(Transition trans, Set<State> allowed) {
-    check(trans.getSrc(), allowed, trans.getInfo(), "source");
-    check(trans.getDst(), allowed, trans.getInfo(), "destination");
+    check(trans.getSrc().getLink(), allowed, trans.getInfo(), "source");
+    check(trans.getDst().getLink(), allowed, trans.getInfo(), "destination");
   }
 
   private void check(State state, Set<State> allowed, ElementInfo info, String end) {

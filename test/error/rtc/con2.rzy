@@ -1,29 +1,22 @@
 // error: loop in connection graph for sub
 
-component
-  Dummy
-    slot   inp();
-    signal out();
-      
-  implementation elementary
-    function inp()
-      out();
-    end
+Dummy = Elementary
+  out : signal();
+    
+  inp : slot()
+    out();
   end
+end
 
-  Con2
-    slot   inp();
-    signal out();
-      
-  implementation composition
-    component
-      sub1 : Dummy;
-      sub2 : Dummy;
-      
-    connection
-      inp -> out;
-      sub1.out -> sub2.inp;
-      sub2.out -> sub1.inp;
-      
-  end
+Con2 = Composition
+  inp : slot();
+  out : signal();
+    
+  sub1 : Dummy;
+  sub2 : Dummy;
+  
+  inp -> out;
+  sub1.out -> sub2.inp;
+  sub2.out -> sub1.inp;
+end
 

@@ -2,7 +2,6 @@ package evl.traverser.debug;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.List;
 
 import common.ElementInfo;
 
@@ -12,11 +11,11 @@ import evl.expression.Expression;
 import evl.expression.Number;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.Reference;
-import evl.function.FuncWithBody;
-import evl.function.FunctionBase;
-import evl.function.impl.FuncImplResponse;
-import evl.function.impl.FuncImplSlot;
-import evl.function.impl.FuncPrivateVoid;
+import evl.function.Function;
+import evl.function.header.FuncCtrlInDataIn;
+import evl.function.header.FuncCtrlInDataOut;
+import evl.function.header.FuncPrivateVoid;
+import evl.other.EvlList;
 import evl.statement.CallStmt;
 
 /**
@@ -29,7 +28,7 @@ public class EventRecvDebugCallAdder extends DefTraverser<Void, Void> {
 
   private ArrayList<String> names;
   private FuncPrivateVoid msgRecvFunc;
-  static private ElementInfo info = new ElementInfo();
+  static private ElementInfo info = ElementInfo.NO;
 
   public EventRecvDebugCallAdder(ArrayList<String> names, FuncPrivateVoid msgRecvFunc) {
     super();
@@ -43,26 +42,26 @@ public class EventRecvDebugCallAdder extends DefTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncImplResponse(FuncImplResponse obj, Void param) {
+  protected Void visitFuncIfaceInRet(FuncCtrlInDataOut obj, Void param) {
     makeDebugCall(obj);
     return null;
   }
 
   @Override
-  protected Void visitFuncImplSlot(FuncImplSlot obj, Void param) {
+  protected Void visitFuncIfaceInVoid(FuncCtrlInDataIn obj, Void param) {
     makeDebugCall(obj);
     return null;
   }
 
-  public void makeDebugCall(FuncWithBody obj) {
+  public void makeDebugCall(Function obj) {
     int numFunc = names.indexOf(obj.getName());
     assert (numFunc >= 0);
     obj.getBody().getStatements().add(0, makeCall(msgRecvFunc, numFunc));
   }
 
-  private CallStmt makeCall(FunctionBase func, int numFunc) {
+  private CallStmt makeCall(Function func, int numFunc) {
     // _sendMsg( numFunc );
-    List<Expression> actParam = new ArrayList<Expression>();
+    EvlList<Expression> actParam = new EvlList<Expression>();
     actParam.add(new Number(info, BigInteger.valueOf(numFunc)));
 
     Reference call = new Reference(info, func);

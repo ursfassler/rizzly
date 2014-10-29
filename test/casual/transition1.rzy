@@ -1,26 +1,18 @@
-component
-  Transition1
-    slot   ind();
-    signal out();
+Transition1 = Hfsm
+  ind : slot();
+  out : signal();
+  
+  state(One)
+    One : state;
+    Two : state;
+    Three : state;
     
-  implementation hfsm(One)
-      
-    state One
+    One   to Two   by ind();
+    Two   to Three by ind();
+    Three to One   by ind() do
+      out();
     end
-    
-    state Two
-    end
-    
-    state Three
-    end
-    
-    transition 
-      One   to Two   by ind();
-      Two   to Three by ind();
-      Three to One   by ind() do
-        out();
-      end
-
     
   end
+end
 

@@ -1,18 +1,11 @@
 // Error: response is not allowed to write state
 
-component
-  Err2
-    response what():R{0,100};
-    
-  implementation elementary
-    
-    var
-      a : R{0,100} = 0;
-    
-    response what():R{0,100}
-      a := 42;
-      return 0;
-    end
-    
+Err2 = Elementary
+  a : R{0,100} = 0;
+  
+  what : response():R{0,100}
+    a := 42;
+    return 0;
   end
+end
 

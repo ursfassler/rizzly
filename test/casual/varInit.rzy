@@ -1,94 +1,90 @@
-component
-  VarInit
-
-  implementation elementary
-
-    function foo1( x: R{0,255} ):R{0,255}
-      a : R{0,255};
-      
-      if x > 20 then
-        a := 20;
-      ef x > 10 then
-        a := 10;
-      else
-        a := x;
-      end
-      
-      return a;
+VarInit = Elementary
+  foo1 = function( x: R{0,255} ):R{0,255}
+    a : R{0,255};
+    
+    if x > 20 then
+      a := 20;
+    ef x > 10 then
+      a := 10;
+    else
+      a := x;
     end
-
-    function foo2( x: R{0,255} ):R{0,255}
-      a : R{0,255};
-      
-      if x > 20 then
-        a := 20;
-      ef x > 10 then
-        a := 10;
-      else
-        return x;
-      end
-      
-      return a;
-    end
-
-    function foo3( x: R{0,255} ):R{0,255}
-      a : R{0,255};
-      
-      if x > 20 then
-        a := 20;
-      ef x > 10 then
-        return 10;
-      else
-        a := x;
-      end
-      
-      return a;
-    end
-
-    function foo4( x: R{0,255} ):R{0,255}
-      a : R{0,255};
-      
-      if x > 20 then
-       return 20;
-      ef x > 10 then
-        a := 10;
-      else
-        a := x;
-      end
-      
-      return a;
-    end
-
-    function foo5( x: R{0,255} ):R{0,255}
-      if x > 20 then
-        return 20;
-      ef x > 10 then
-        return 10;
-      else
-        return x;
-      end
-    end
-
-    function foo6( x: R{0,255} ):R{0,255}
-      a : R{0,255};
-      
-      case x of
-        20..29:
-          a := 20;
-        end
-        10..19:
-          a := 10;
-        end
-        0..9:
-          a := x;
-        end
-        else
-          a := 255 - x;
-        end
-      end
-      
-      return a;
-    end
-
+    
+    return a;
   end
+
+  foo2 = function( x: R{0,255} ):R{0,255}
+    a : R{0,255};
+    
+    if x > 20 then
+      a := 20;
+    ef x > 10 then
+      a := 10;
+    else
+      return x;
+    end
+    
+    return a;
+  end
+
+  foo3 = function( x: R{0,255} ):R{0,255}
+    a : R{0,255};
+    
+    if x > 20 then
+      a := 20;
+    ef x > 10 then
+      return 10;
+    else
+      a := x;
+    end
+    
+    return a;
+  end
+
+  foo4 = function( x: R{0,255} ):R{0,255}
+    a : R{0,255};
+    
+    if x > 20 then
+     return 20;
+    ef x > 10 then
+      a := 10;
+    else
+      a := x;
+    end
+    
+    return a;
+  end
+
+  foo5 = function( x: R{0,255} ):R{0,255}
+    if x > 20 then
+      return 20;
+    ef x > 10 then
+      return 10;
+    else
+      return x;
+    end
+  end
+
+  foo6 = function( x: R{0,255} ):R{0,255}
+    a : R{0,255};
+    
+    case x of
+      20..29:
+        a := 20;
+      end
+      10..19:
+        a := 10;
+      end
+      0..9:
+        a := x;
+      end
+      else
+        a := 255 - x;
+      end
+    end
+    
+    return a;
+  end
+
+end
 

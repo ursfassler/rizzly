@@ -3,101 +3,84 @@ package evl.traverser;
 import java.util.HashMap;
 import java.util.Map;
 
-import common.Designator;
-import common.ElementInfo;
-
-import error.ErrorType;
-import error.RError;
 import evl.Evl;
 import evl.NullTraverser;
 import evl.copy.Copy;
-import evl.function.FunctionHeader;
-import evl.knowledge.KnowledgeBase;
+import evl.copy.Relinker;
+import evl.function.Function;
 import evl.other.CompUse;
 import evl.other.Component;
+import evl.other.EvlList;
 import evl.other.ImplElementary;
-import evl.other.ListOfNamed;
 import evl.other.Named;
 import evl.other.Namespace;
 import evl.other.SubCallbacks;
 
-public class CompInstantiator extends NullTraverser<ImplElementary, Designator> {
-  private KnowledgeBase kb;
-  private Map<Named, Named> ifacemap = new HashMap<Named, Named>();
+public class CompInstantiator extends NullTraverser<ImplElementary, Namespace> {
+  final private Map<Named, Named> linkmap = new HashMap<Named, Named>();
 
-  public CompInstantiator(KnowledgeBase kb) {
-    super();
-    this.kb = kb;
-  }
-
-  public static Map<Named, Named> process(ImplElementary rizzlyFile, KnowledgeBase kb) {
-    CompInstantiator instantiator = new CompInstantiator(kb);
-    instantiator.traverse(rizzlyFile, new Designator());
-    return instantiator.ifacemap;
+  public static void process(ImplElementary root, Namespace container) {
+    CompInstantiator instantiator = new CompInstantiator();
+    instantiator.traverse(root, container);
+    Relinker.relink(container, instantiator.linkmap);
   }
 
   @Override
-  protected ImplElementary visitDefault(Evl obj, Designator param) {
+  protected ImplElementary visitDefault(Evl obj, Namespace param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
   @Override
-  protected ImplElementary visitImplElementary(ImplElementary obj, Designator param) {
-    Namespace ns = kb.getRoot().forceChildPath(param.toList());
-
+  protected ImplElementary visitImplElementary(ImplElementary obj, Namespace ns) {
     ImplElementary inst = Copy.copy(obj);
 
+    ns.addAll(inst.getIface());
     ns.addAll(inst.getConstant());
     ns.addAll(inst.getVariable());
     ns.addAll(inst.getFunction());
     ns.add(inst.getQueue());
+    ns.add(inst.getEntryFunc());
+    ns.add(inst.getExitFunc());
 
-    // XXX instantiated component should not have any function in Input nor Output
+    // ns.getChildren().removeAll(ns.getChildren().getItems(FuncCtrlOutDataIn.class));
+    // ns.getChildren().removeAll(ns.getChildren().getItems(FuncCtrlOutDataOut.class));
 
-    // FIXME This code is probably full of errors
-    ListOfNamed<SubCallbacks> ifaceUsed = new ListOfNamed<SubCallbacks>();
     for (CompUse compUse : inst.getComponent()) {
       Component comp = compUse.getLink();
-      comp = visit(comp, new Designator(param, compUse.getName()));
 
-      SubCallbacks clist = new SubCallbacks(new ElementInfo(), compUse.getName());
-      ifaceUsed.add(clist);
-      clist.addAll(comp.getSignal().getList());
-      clist.addAll(comp.getQuery().getList());
+      // copy / instantiate used component
+      Namespace usens = new Namespace(compUse.getInfo(), compUse.getName());
+      ImplElementary cpy = visit(comp, usens);
+      ns.add(usens);
+      linkmap.put(compUse, usens);
 
-      Namespace compSpace = ns.findSpace(compUse.getName());
-      assert (compSpace != null);
-      assert (!ifacemap.containsKey(compUse));
-      ifacemap.put(compUse, compSpace);
-    }
+      // route output interface to sub-callback implementation
+      for (Function impl : getSubCallback(inst.getSubCallback(), compUse).getFunc()) {
+        // get output declaration of instantiated sub-component
+        Function outdecl = (Function) cpy.getIface().find(impl.getName());
 
-    for (SubCallbacks compItem : inst.getSubCallback()) {
-      Namespace compspace = ns.findSpace(compItem.getName());
-      if (compspace == null) {
-        RError.err(ErrorType.Fatal, "Namespace should exist since subcomponent was created");
-        return null;
-      }
-      SubCallbacks clist = ifaceUsed.find(compItem.getName());
-      assert (clist != null);
+        assert (outdecl != null);
+        assert (usens.getChildren().contains(outdecl));
+        assert (!linkmap.containsKey(outdecl));
 
-      for (FunctionHeader iface : compItem) {
-        compspace.add(iface);
-      }
-    }
-
-    for (SubCallbacks comp : ifaceUsed) {
-      Namespace compSpace = ns.findSpace(comp.getName());
-      assert (compSpace != null);
-      for (FunctionHeader func : comp) {
-        Named ifaceSpace = compSpace.findItem(func.getName());
-        assert (ifaceSpace != null);
-        assert (ifaceSpace instanceof FunctionHeader);
-        assert (!ifacemap.containsKey(func));
-        ifacemap.put(func, ifaceSpace);
+        // change links to output declaration to the sub-callback of this component
+        linkmap.put(outdecl, impl);
+        usens.getChildren().remove(outdecl);
+        usens.add(impl);
       }
     }
 
     return inst;
+  }
+
+  private SubCallbacks getSubCallback(EvlList<SubCallbacks> subCallback, CompUse compUse) {
+    for (SubCallbacks suc : subCallback) {
+      if (suc.getCompUse().getLink() == compUse) {
+        return suc;
+      }
+    }
+    assert (false);
+    return null;
   }
 
 }

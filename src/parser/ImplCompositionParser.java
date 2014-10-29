@@ -1,7 +1,6 @@
 package parser;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import common.ElementInfo;
 import common.Metadata;
@@ -13,7 +12,9 @@ import fun.composition.Connection;
 import fun.composition.ImplComposition;
 import fun.expression.reference.RefName;
 import fun.expression.reference.Reference;
-import fun.other.Component;
+import fun.function.FuncHeader;
+import fun.other.CompImpl;
+import fun.variable.CompUse;
 
 public class ImplCompositionParser extends ImplBaseParser {
 
@@ -21,51 +22,62 @@ public class ImplCompositionParser extends ImplBaseParser {
     super(scanner);
   }
 
-  public static Component parse(Scanner scanner, Token name) {
+  public static CompImpl parse(Scanner scanner, String name) {
     ImplCompositionParser parser = new ImplCompositionParser(scanner);
     return parser.parseImplementationComposition(name);
   }
 
   // EBNF implementationComposition: "composition" { compDeclBlock | connectionDeclBlock }
-  private ImplComposition parseImplementationComposition(Token name) {
+  private ImplComposition parseImplementationComposition(String name) {
     ElementInfo info = expect(TokenType.COMPOSITION).getInfo();
     ArrayList<Metadata> meta = getMetadata();
     info.getMetadata().addAll(meta);
-    ImplComposition comp = new ImplComposition(info, name.getData());
+    ImplComposition comp = new ImplComposition(info, name);
 
-    while (true) {
-      switch (peek().getType()) {
-      case COMPONENT: {
-        comp.getComponent().addAll(parseCompDeclBlock());
-        break;
+    while (!consumeIfEqual(TokenType.END)) {
+      Token id = expect(TokenType.IDENTIFIER);
+
+      if (consumeIfEqual(TokenType.COLON)) {
+        parseInstantiation(id, comp);
+      } else {
+        Connection obj = parseConnection(id);
+        comp.getConnection().add(obj);
       }
-      case CONNECTION: {
-        comp.getConnection().addAll(parseConnectionDeclBlock());
+    }
+
+    return comp;
+  }
+
+  private void parseInstantiation(Token id, ImplComposition comp) {
+    switch (peek().getType()) {
+      case IDENTIFIER:
+        Reference type = expr().parseRef();
+        expect(TokenType.SEMI);
+        ArrayList<Metadata> meta = getMetadata();
+        id.getInfo().getMetadata().addAll(meta);
+        CompUse compUse = new CompUse(id.getInfo(), id.getData(), type);
+        comp.getInstantiation().add(compUse);
         break;
-      }
+      case RESPONSE:
+      case SLOT:
+      case SIGNAL:
+      case QUERY:
+        FuncHeader obj = parseFuncDef(peek().getType(), id.getData(), true);
+        comp.getInstantiation().add(obj);
+        break;
       default: {
-        return comp;
-      }
+        RError.err(ErrorType.Error, peek().getInfo(), "Expected interface function or reference");
+        break;
       }
     }
   }
 
-  // EBNF connectionDeclBlock: "connection" connection { connection }
-  private List<Connection> parseConnectionDeclBlock() {
-    expect(TokenType.CONNECTION);
-    List<Connection> ret = new ArrayList<Connection>();
-    do {
-      ret.add(parseConnection());
-    } while (peek().getType() == TokenType.IDENTIFIER);
-    return ret;
-  }
-
   // EBNF connection: endpoint msgType endpoint ";"
-  private Connection parseConnection() {
-    Reference src = parseEndpoint();
+  private Connection parseConnection(Token id) {
+    Reference src = parseEndpoint(id);
     ElementInfo info = peek().getInfo();
     MessageType type = parseMsgType();
-    Reference dst = parseEndpoint();
+    Reference dst = parseEndpoint(next());
     expect(TokenType.SEMI);
 
     ArrayList<Metadata> meta = getMetadata();
@@ -75,8 +87,11 @@ public class ImplCompositionParser extends ImplBaseParser {
   }
 
   // EBNF endpoint: id [ "." id ]
-  private Reference parseEndpoint() {
-    Token tok = expect(TokenType.IDENTIFIER);
+  private Reference parseEndpoint(Token tok) {
+    if (tok.getType() != TokenType.IDENTIFIER) {
+      RError.err(ErrorType.Error, tok.getInfo(), "Expected IDENTIFIER, got " + tok.getType());
+      return null;
+    }
     Reference ref = new Reference(tok.getInfo(), tok.getData());
     if (consumeIfEqual(TokenType.PERIOD)) {
       tok = expect(TokenType.IDENTIFIER);
@@ -89,16 +104,16 @@ public class ImplCompositionParser extends ImplBaseParser {
   private MessageType parseMsgType() {
     Token tok = next();
     switch (tok.getType()) {
-    case SYNC_MSG: {
-      return MessageType.sync;
-    }
-    case ASYNC_MSG: {
-      return MessageType.async;
-    }
-    default: {
-      RError.err(ErrorType.Error, tok.getInfo(), "Expected synchron or asynchron connection");
-      return null;
-    }
+      case SYNC_MSG: {
+        return MessageType.sync;
+      }
+      case ASYNC_MSG: {
+        return MessageType.async;
+      }
+      default: {
+        RError.err(ErrorType.Error, tok.getInfo(), "Expected synchron or asynchron connection");
+        return null;
+      }
     }
   }
 

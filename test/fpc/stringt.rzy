@@ -1,19 +1,13 @@
 
-const
-  Name : String = 'Hallo';
+Name : const String = 'Hallo';
 
-component
-  Stringt
-    slot   inp( value: String );
-    signal out1( value: String );
-    signal out2( value: String );
+Stringt = Elementary
+  out1 : signal( value: String );
+  out2 : signal( value: String );
 
-  implementation elementary
-
-    slot inp( value: String )
-      out1( value );
-      out2( Name );
-    end
-    
+  inp : slot( value: String )
+    out1( value );
+    out2( Name );
   end
+end
 

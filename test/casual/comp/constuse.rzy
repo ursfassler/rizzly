@@ -1,15 +1,7 @@
 
-import
-  iface.constdef;
+import iface.constdef;
 
-component
-  ConstUse
-      
-    implementation elementary
-
-    var
-      blaBla : Array{Answer,R{0,255}} = [ 0 ];
-
-
-  end
+ConstUse = Elementary
+  blaBla : const = Answer;
+end
 

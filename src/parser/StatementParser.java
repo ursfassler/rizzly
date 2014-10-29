@@ -9,7 +9,9 @@ import error.ErrorType;
 import error.RError;
 import fun.Copy;
 import fun.expression.Expression;
+import fun.expression.reference.DummyLinkTarget;
 import fun.expression.reference.Reference;
+import fun.other.FunList;
 import fun.statement.Assignment;
 import fun.statement.Block;
 import fun.statement.CallStmt;
@@ -39,40 +41,40 @@ public class StatementParser extends BaseParser {
     Block res = new Block(peek().getInfo());
     while (true) {
       switch (peek().getType()) {
-      case RETURN:
-        res.getStatements().add(parseReturn());
-        break;
-      case IF:
-        res.getStatements().add(parseIf());
-        break;
-      case WHILE:
-        res.getStatements().add(parseWhile());
-        break;
-      case CASE:
-        res.getStatements().add(parseCase());
-        break;
-      case IDENTIFIER:
-        res.getStatements().addAll(parseVardefOrAssignmentOrCallstmt());
-        break;
-      default:
-        return res;
+        case RETURN:
+          res.getStatements().add(parseReturn());
+          break;
+        case IF:
+          res.getStatements().add(parseIf());
+          break;
+        case WHILE:
+          res.getStatements().add(parseWhile());
+          break;
+        case CASE:
+          res.getStatements().add(parseCase());
+          break;
+        case IDENTIFIER:
+          res.getStatements().addAll(parseVardefOrAssignmentOrCallstmt());
+          break;
+        default:
+          return res;
       }
     }
   }
 
   // EBNF vardefstmt: vardefinitopt ";"
-  private List<Statement> parseVarDefStmt(List<Reference> lhs) {
+  private FunList<Statement> parseVarDefStmt(FunList<Reference> lhs) {
     List<Token> names = new ArrayList<Token>(lhs.size());
 
     for (Reference ae : lhs) {
       assert (ae.getOffset().isEmpty());
-      names.add(new Token(TokenType.IDENTIFIER, ae.getLink().getName(), ae.getInfo()));
+      names.add(new Token(TokenType.IDENTIFIER, ((DummyLinkTarget) ae.getLink()).getName(), ae.getInfo()));
     }
 
     expect(TokenType.COLON);
     Reference type = expr().parseRef();
 
-    List<Expression> def;
+    FunList<Expression> def;
     if (consumeIfEqual(TokenType.EQUAL)) {
       def = expr().parseExprList();
       if (names.size() != def.size()) {
@@ -83,7 +85,7 @@ public class StatementParser extends BaseParser {
       def = null;
     }
 
-    List<Statement> ret = new ArrayList<Statement>();
+    FunList<Statement> ret = new FunList<Statement>();
     for (int i = 0; i < names.size(); i++) {
       Reference ntype = Copy.copy(type);
       FuncVariable var = new FuncVariable(names.get(i).getInfo(), names.get(i).getData(), ntype);
@@ -102,7 +104,7 @@ public class StatementParser extends BaseParser {
   private Statement parseCase() {
     Token tok = expect(TokenType.CASE);
 
-    List<CaseOpt> optlist = new ArrayList<CaseOpt>();
+    FunList<CaseOpt> optlist = new FunList<CaseOpt>();
 
     Expression cond = expr().parse();
     expect(TokenType.OF);
@@ -126,7 +128,7 @@ public class StatementParser extends BaseParser {
 
   // EBNF caseopt : caseoptval { "," caseoptval } ":" block "end"
   private CaseOpt parseCaseopt() {
-    List<CaseOptEntry> optval = new ArrayList<CaseOptEntry>();
+    FunList<CaseOptEntry> optval = new FunList<CaseOptEntry>();
     do {
       optval.add(parseCaseoptval());
     } while (consumeIfEqual(TokenType.COMMA));
@@ -203,36 +205,36 @@ public class StatementParser extends BaseParser {
     return ret;
   }
 
-  private List<Statement> parseVardefOrAssignmentOrCallstmt() {
-    List<Reference> lhs = parseLhs();
+  private FunList<Statement> parseVardefOrAssignmentOrCallstmt() {
+    FunList<Reference> lhs = parseLhs();
     Token tok = peek();
     switch (tok.getType()) {
-    case COLON: {
-      return parseVarDefStmt(lhs);
-    }
-    case BECOMES: {
-      assert (lhs.size() == 1);
-      List<Statement> ret = new ArrayList<Statement>();
-      ret.add(parseAssignment(lhs.get(0)));
-      return ret;
-    }
-    case SEMI: {
-      assert (lhs.size() == 1);
-      tok = next();
-      List<Statement> ret = new ArrayList<Statement>();
-      ret.add(new CallStmt(tok.getInfo(), lhs.get(0)));
-      return ret;
-    }
-    default: {
-      error.RError.err(ErrorType.Fatal, peek().getInfo(), "Unexpected token: " + tok.getType());
-      return null;
-    }
+      case COLON: {
+        return parseVarDefStmt(lhs);
+      }
+      case BECOMES: {
+        assert (lhs.size() == 1);
+        FunList<Statement> ret = new FunList<Statement>();
+        ret.add(parseAssignment(lhs.get(0)));
+        return ret;
+      }
+      case SEMI: {
+        assert (lhs.size() == 1);
+        tok = next();
+        FunList<Statement> ret = new FunList<Statement>();
+        ret.add(new CallStmt(tok.getInfo(), lhs.get(0)));
+        return ret;
+      }
+      default: {
+        error.RError.err(ErrorType.Fatal, peek().getInfo(), "Unexpected token: " + tok.getType());
+        return null;
+      }
     }
   }
 
   // EBNF lhs: varref { "," varref }
-  private List<Reference> parseLhs() {
-    List<Reference> lhs = new ArrayList<Reference>();
+  private FunList<Reference> parseLhs() {
+    FunList<Reference> lhs = new FunList<Reference>();
     do {
       lhs.add(expr().parseRef());
     } while (consumeIfEqual(TokenType.COMMA));

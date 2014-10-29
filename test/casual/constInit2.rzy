@@ -1,14 +1,9 @@
 
-component
-  ConstInit2
-    response get():R{0,1000};
+ConstInit2 = Elementary
+  Foo : const Natural = 42;
       
-  implementation elementary
-    const
-      Foo : Natural = 42;
-      
-    response get():R{0,1000}
-      return Foo;
-    end
-  end      
+  get : response():R{0,1000}
+    return Foo;
+  end
+end      
 

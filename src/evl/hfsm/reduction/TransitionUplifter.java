@@ -5,11 +5,10 @@ import java.util.List;
 
 import evl.Evl;
 import evl.NullTraverser;
-import evl.function.impl.FuncImplResponse;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.State;
 import evl.hfsm.StateComposite;
-import evl.hfsm.StateSimple;
+import evl.hfsm.StateItem;
 import evl.hfsm.Transition;
 
 /**
@@ -27,7 +26,11 @@ public class TransitionUplifter extends NullTraverser<Void, List<Transition>> {
 
   @Override
   protected Void visitDefault(Evl obj, List<Transition> param) {
-    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+    if (obj instanceof StateItem) {
+      return null;
+    } else {
+      throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+    }
   }
 
   @Override
@@ -39,24 +42,14 @@ public class TransitionUplifter extends NullTraverser<Void, List<Transition>> {
   }
 
   @Override
-  protected Void visitStateSimple(StateSimple obj, List<Transition> param) {
-    return null;
-  }
-
-  @Override
-  protected Void visitFuncImplResponse(FuncImplResponse obj, List<Transition> param) {
-    return null;
-  }
-
-  @Override
   protected Void visitStateComposite(StateComposite obj, List<Transition> param) {
-    visitItr(obj.getItem(), param);
+    visitList(obj.getItem(), param);
     return null;
   }
 
   @Override
   protected Void visitState(State obj, List<Transition> param) {
-    List<Transition> transList = obj.getItemList(Transition.class);
+    List<Transition> transList = obj.getItem().getItems(Transition.class);
     param.addAll(transList);
     obj.getItem().removeAll(transList);
     return super.visitState(obj, param);

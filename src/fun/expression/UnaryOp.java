@@ -8,13 +8,13 @@ public enum UnaryOp {
 
   public String toString() {
     switch (this) {
-    case MINUS:
-      return "-";
-    case NOT:
-      return "not";
-    default:
-      RError.err(ErrorType.Fatal, "not supported yet: " + this.ordinal());
-      return null;
+      case MINUS:
+        return "-";
+      case NOT:
+        return "not";
+      default:
+        RError.err(ErrorType.Fatal, "not supported yet: " + this.ordinal());
+        return null;
     }
   }
 

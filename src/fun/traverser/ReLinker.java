@@ -4,23 +4,23 @@ import java.util.Map;
 
 import fun.DefTraverser;
 import fun.Fun;
-import fun.expression.reference.Reference;
+import fun.expression.reference.BaseRef;
 import fun.other.Named;
 
-public class ReLinker extends DefTraverser<Void, Map<? extends Named, ? extends Named>> {
+public class ReLinker extends DefTraverser<Void, Map<Fun, Fun>> {
 
-  public static void process(Fun classes, Map<? extends Named, ? extends Named> map) {
+  public static void process(Fun classes, Map<Fun, Fun> map) {
     ReLinker reLinker = new ReLinker();
     reLinker.traverse(classes, map);
   }
 
   @Override
-  protected Void visitReference(Reference obj, Map<? extends Named, ? extends Named> param) {
-    Named target = param.get(obj.getLink());
+  protected Void visitBaseRef(BaseRef obj, Map<Fun, Fun> param) {
+    Fun target = param.get(obj.getLink());
     if (target != null) {
-      obj.setLink(target);
+      obj.setLink((Named) target);
     }
-    return super.visitReference(obj, param);
+    return super.visitBaseRef(obj, param);
   }
 
 }

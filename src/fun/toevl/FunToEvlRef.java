@@ -1,12 +1,10 @@
 package fun.toevl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import error.ErrorType;
 import error.RError;
 import evl.expression.Expression;
 import evl.expression.reference.RefItem;
+import evl.other.EvlList;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.expression.reference.RefCall;
@@ -37,7 +35,7 @@ public class FunToEvlRef extends NullTraverser<RefItem, Void> {
 
   @Override
   protected RefItem visitRefCall(RefCall obj, Void param) {
-    List<Expression> ap = new ArrayList<Expression>();
+    EvlList<Expression> ap = new EvlList<Expression>();
     for (fun.expression.Expression expr : obj.getActualParameter()) {
       ap.add((Expression) fta.traverse(expr, null));
     }

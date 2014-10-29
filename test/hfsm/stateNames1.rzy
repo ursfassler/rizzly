@@ -1,22 +1,22 @@
 //test ok
 
-component
-  StateNames1
-    slot   tick();
-    signal evt( value: R{0,255} );
+StateNames1 = Hfsm
+  tick : slot();
+  evt : signal( value: R{0,255} );
 
-  implementation hfsm(A)
-    state A(A)
-      state A(A)
-        state A;
-        state B;
-        state C;
+  state(A)
+    A : state(A)
+      A : state(A)
+        A : state;
+        B : state;
+        C : state;
       end
-      state B(A)
-        state A;
-        state B;
-        state C;
+      B : state(A)
+        A : state;
+        B : state;
+        C : state;
       end
     end
-  end
+   end
+end
 

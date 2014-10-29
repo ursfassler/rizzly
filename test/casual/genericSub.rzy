@@ -1,10 +1,4 @@
-component
-  GenericSub{T:Type{Any}}
-    implementation elementary
-
-    var
-      sub: T;
-      
-  end
-
+GenericSub{T:Type{Any}} = Elementary
+  sub: T = _;
+end
 

@@ -44,11 +44,13 @@ import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefItem;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
+import evl.expression.reference.SimpleRef;
 import evl.expression.unop.BitNot;
 import evl.expression.unop.LogicNot;
 import evl.expression.unop.Not;
 import evl.expression.unop.Uminus;
 import evl.hfsm.Transition;
+import evl.other.CompUse;
 import evl.statement.Assignment;
 import evl.statement.CaseOptRange;
 import evl.statement.CaseOptValue;
@@ -75,6 +77,16 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
     Expression ret = super.visitExpression(obj, param);
     assert (ret != null);
     return ret;
+  }
+
+  @Override
+  protected Expression visitCompUse(CompUse obj, T param) {
+    return obj;
+  }
+
+  @Override
+  protected Expression visitTypeRef(SimpleRef obj, T param) {
+    return obj;
   }
 
   @Override
@@ -349,7 +361,7 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   protected Expression visitMsgPush(MsgPush obj, T param) {
     obj.setQueue((Reference) visit(obj.getQueue(), param));
     obj.setFunc((Reference) visit(obj.getFunc(), param));
-    visitItr(obj.getData(), param);
+    visitList(obj.getData(), param);
     return null;
   }
 

@@ -1,12 +1,8 @@
 
-component
-  Foo{Bar:Natural}
-  implementation elementary
-  end
+Foo{Bar:Natural} = Elementary
+end
 
-  Err2
-  implementation composition
-    component
-      foo: Foo;  // no template parameter
-  end
+Err2 = Composition
+  foo: Foo;  // no template parameter
+end
 

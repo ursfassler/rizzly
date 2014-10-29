@@ -1,37 +1,27 @@
-type
-  Uni = Union
-    byte  : R{0,255};
-    word  : R{0,65535};
+Uni = Union
+  byte  : R{0,255};
+  word  : R{0,65535};
+end
+
+Union1 = Elementary
+  data : Uni = ( byte := 42 );
+
+  setByte : slot( value: R{0,255} )
+    data.byte := value;
+  end
+  
+  getByte : response():R{0,255}
+    return data.byte;
+  end
+  
+  setWord : slot( value: R{0,65535} )
+    data.word := value;
+  end
+  
+  getWord : response():R{0,65535}
+    return data.word;
   end
 
-component
-  Union1
-    slot     setByte( value: R{0,255} );
-    response getByte():R{0,255};
-    slot     setWord( value: R{0,65535} );
-    response getWord():R{0,65535};
-
-    implementation elementary
-
-    var
-      data : Uni = ( byte := 42 );
-
-    slot setByte( value: R{0,255} )
-      data.byte := value;
-    end
-    
-    response getByte():R{0,255}
-      return data.byte;
-    end
-    
-    slot setWord( value: R{0,65535} )
-      data.word := value;
-    end
-    
-    response getWord():R{0,65535}
-      return data.word;
-    end
-
-  end
+end
 
 

@@ -40,11 +40,11 @@ public class Token {
   @Override
   public String toString() {
     switch (type) {
-    case IDENTIFIER:
-    case STRING:
-      return type + "(" + data + ")";
-    default:
-      return type.toString();
+      case IDENTIFIER:
+      case STRING:
+        return type + "(" + data + ")";
+      default:
+        return type.toString();
     }
   }
 }

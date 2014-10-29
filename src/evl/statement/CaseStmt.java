@@ -1,17 +1,16 @@
 package evl.statement;
 
-import java.util.List;
-
 import common.ElementInfo;
 
 import evl.expression.Expression;
+import evl.other.EvlList;
 
 public class CaseStmt extends Statement {
   private Expression condition;
-  private List<CaseOpt> option;
+  private EvlList<CaseOpt> option;
   private Block otherwise;
 
-  public CaseStmt(ElementInfo info, Expression condition, List<CaseOpt> option, Block otherwise) {
+  public CaseStmt(ElementInfo info, Expression condition, EvlList<CaseOpt> option, Block otherwise) {
     super(info);
     this.condition = condition;
     this.option = option;
@@ -34,7 +33,7 @@ public class CaseStmt extends Statement {
     this.otherwise = otherwise;
   }
 
-  public List<CaseOpt> getOption() {
+  public EvlList<CaseOpt> getOption() {
     return option;
   }
 

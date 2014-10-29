@@ -1,5 +1,7 @@
 package fun.other;
 
-public interface ActualTemplateArgument {
+import fun.Fun;
+
+public interface ActualTemplateArgument extends Fun {
 
 }

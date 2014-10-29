@@ -1,18 +1,14 @@
-component
-  Bool2
-    slot   tickIn( x: R{0,50} );
-    signal tickOut( x: R{0,50} );
-      
-    implementation elementary
+Bool2 = Elementary
+  tickOut : signal( x: R{0,50} );
 
-    slot tickIn( x: R{0,50} )
-      if (x = 0) = False then
-        tickOut( 7 );
-      else
-        tickOut( 8 );
-      end
+  tickIn : slot( x: R{0,50} )
+    if (x = 0) = False then
+      tickOut( 7 );
+    else
+      tickOut( 8 );
     end
-
   end
+
+end
 
 

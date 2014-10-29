@@ -31,38 +31,8 @@ public class Renamer extends DefTraverser<Void, Void> {
     cVarDeclToTop.traverse(cprog, null);
   }
 
-  private void rename(Named item) {
-    String name = cleanName(item.getName());
-    item.setName(name);
-  }
-
   private String cleanName(String name) {
-    String ret = "";
-    for (int i = 0; i < name.length(); i++) {
-      char sym = name.charAt(i);
-      switch (sym) {
-      case '{':
-        if (name.charAt(i + 1) != '}') {
-          ret += Designator.NAME_SEP;
-        }
-        break;
-      case '}':
-        break;
-      case ',':
-        ret += Designator.NAME_SEP;
-        break;
-      case '-':
-        ret += Designator.NAME_SEP;
-        break;
-      case '.':
-        ret += Designator.NAME_SEP;
-        break;
-      default:
-        assert ((sym >= 'a' && sym <= 'z') || (sym >= 'A' && sym <= 'Z') || (sym >= '0' && sym <= '9') || (sym == '_'));
-        ret += sym;
-        break;
-      }
-    }
+    String ret = cir.traverser.Renamer.cleanName(name);
 
     while (blacklist.contains(ret.toLowerCase())) {
       ret += Designator.NAME_SEP;
@@ -74,7 +44,9 @@ public class Renamer extends DefTraverser<Void, Void> {
   @Override
   protected Void visit(Evl obj, Void param) {
     if (obj instanceof Named) {
-      rename((Named) obj);
+      Named item = (Named) obj;
+      String name = cleanName(item.getName());
+      item.setName(name);
     }
     return super.visit(obj, param);
   }

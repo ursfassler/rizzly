@@ -1,32 +1,39 @@
 package fun.other;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+
+import util.Pair;
 
 import common.Designator;
 import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
+import fun.Fun;
+import fun.FunBase;
 
-public class Namespace extends ListOfNamed<Named> implements Named {
-  final private ElementInfo info;
+public class Namespace extends FunBase implements Named {
   private String name;
+  final private FunList<Fun> children = new FunList<Fun>();
 
   public Namespace(ElementInfo info, String name) {
-    super();
-    this.info = info;
+    super(info);
     this.name = name;
   }
 
-  public Named getChildItem(List<String> des) {
+  public FunList<Fun> getChildren() {
+    return children;
+  }
+
+  public Fun getChildItem(List<String> des) {
     LinkedList<String> ipath = new LinkedList<String>(des);
-    Named parent = this;
+    Fun parent = this;
 
     while (!ipath.isEmpty()) {
       String name = ipath.pop();
-      Named child = ((Namespace) parent).find(name);
+      Fun child = ((Namespace) parent).getChildren().find(name);
       if (child == null) {
         RError.err(ErrorType.Error, parent.getInfo(), "Name not found: " + name);
       }
@@ -56,29 +63,15 @@ public class Namespace extends ListOfNamed<Named> implements Named {
     assert (findItem(ename) == null);
     Namespace ret = findSpace(ename);
     if (ret == null) {
-      ret = new Namespace(new ElementInfo(), ename);
-      add(ret);
+      ret = new Namespace(ElementInfo.NO, ename);
+      children.add(ret);
     }
     return ret;
   }
 
-  public void add(Namespace space) {
-    assert (find(space.getName()) == null);
-    super.add(space);
-  }
-
-  public void add(Named item) {
-    assert (find(item.getName()) == null);
-    super.add(item);
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public List<Namespace> getSpaces() {
-    List<Namespace> ret = new ArrayList<Namespace>();
-    for (Named itr : this) {
+  public FunList<Namespace> getSpaces() {
+    FunList<Namespace> ret = new FunList<Namespace>();
+    for (Fun itr : children) {
       if (itr instanceof Namespace) {
         ret.add((Namespace) itr);
       }
@@ -86,9 +79,9 @@ public class Namespace extends ListOfNamed<Named> implements Named {
     return ret;
   }
 
-  public List<Named> getItems() {
-    List<Named> ret = new ArrayList<Named>();
-    for (Named itr : this) {
+  public FunList<Fun> getItems() {
+    FunList<Fun> ret = new FunList<Fun>();
+    for (Fun itr : children) {
       if (!(itr instanceof Namespace)) {
         ret.add(itr);
       }
@@ -96,17 +89,8 @@ public class Namespace extends ListOfNamed<Named> implements Named {
     return ret;
   }
 
-  public Named find(String name) {
-    for (Named itr : this) {
-      if (itr.getName().equals(name)) {
-        return itr;
-      }
-    }
-    return null;
-  }
-
   public Namespace findSpace(String name) {
-    Named ret = find(name);
+    Fun ret = children.find(name);
     if (ret instanceof Namespace) {
       return (Namespace) ret;
     } else {
@@ -114,8 +98,8 @@ public class Namespace extends ListOfNamed<Named> implements Named {
     }
   }
 
-  public Named findItem(String name) {
-    Named ret = find(name);
+  public Fun findItem(String name) {
+    Fun ret = children.find(name);
     if (!(ret instanceof Namespace)) {
       return ret;
     } else {
@@ -123,12 +107,12 @@ public class Namespace extends ListOfNamed<Named> implements Named {
     }
   }
 
-  public void addAll(Iterable<? extends Named> list) {
-    for (Named itr : list) {
-      if (find(itr.getName()) != null) {
-        throw new RuntimeException("element already exists: " + itr.getName());
+  public void addAll(Iterable<? extends Fun> list) {
+    for (Fun itr : list) {
+      if ((itr instanceof Named) && (children.find(((Named) itr).getName()) != null)) {
+        throw new RuntimeException("element already exists: " + ((Named) itr).getName());
       } else {
-        super.add(itr);
+        children.add(itr);
       }
     }
   }
@@ -137,13 +121,13 @@ public class Namespace extends ListOfNamed<Named> implements Named {
     if (!name.equals(space.getName())) {
       throw new RuntimeException("names differ");
     }
-    for (Named itr : space.getItems()) {
-      add(itr);
+    for (Fun itr : space.getItems()) {
+      children.add(itr);
     }
     for (Namespace itr : space.getSpaces()) {
       Namespace sub = findSpace(itr.getName());
       if (sub == null) {
-        add(itr);
+        children.add(itr);
       } else {
         sub.merge(itr);
       }
@@ -151,11 +135,10 @@ public class Namespace extends ListOfNamed<Named> implements Named {
   }
 
   @Override
-  public ElementInfo getInfo() {
-    return info;
+  public String getName() {
+    return name;
   }
 
-  @Override
   public void setName(String name) {
     this.name = name;
   }
@@ -166,27 +149,23 @@ public class Namespace extends ListOfNamed<Named> implements Named {
       if (old != null) {
         old.merge((Namespace) named);
       } else {
-        add(named);
+        children.add(named);
       }
     } else {
-      add(named);
+      children.add(named);
     }
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends Named> List<T> getItems(Class<T> kind, boolean recursive) {
-    List<T> ret = new ArrayList<T>();
-    for (Named itr : getItems()) {
+  public <T extends Fun> void getItems(Class<T> kind, Designator prefix, Collection<Pair<Designator, T>> items) {
+    for (Fun itr : getItems()) {
       if (kind.isAssignableFrom(itr.getClass())) {
-        ret.add((T) itr);
+        items.add(new Pair<Designator, T>(new Designator(prefix, ((Named) itr).getName()), (T) itr));
       }
     }
-    if (recursive) {
-      for (Namespace itr : getSpaces()) {
-        ret.addAll(itr.getItems(kind, true));
-      }
+    for (Namespace itr : getSpaces()) {
+      itr.getItems(kind, new Designator(prefix, itr.name), items);
     }
-    return ret;
   }
 
   @Override

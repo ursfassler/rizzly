@@ -2,8 +2,8 @@ package evl.hfsm.reduction;
 
 import evl.Evl;
 import evl.NullTraverser;
-import evl.function.impl.FuncImplResponse;
 import evl.hfsm.State;
+import evl.hfsm.StateItem;
 import evl.hfsm.Transition;
 
 /**
@@ -22,25 +22,24 @@ public class TransitionRedirecter extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitDefault(Evl obj, Void param) {
-    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
-  }
-
-  @Override
-  protected Void visitFuncImplResponse(FuncImplResponse obj, Void param) {
-    return null;
+    if (obj instanceof StateItem) {
+      return null;
+    } else {
+      throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+    }
   }
 
   @Override
   protected Void visitState(State obj, Void param) {
-    visitItr(obj.getItem(), null);
+    visitList(obj.getItem(), null);
     return null;
   }
 
   @Override
   protected Void visitTransition(Transition obj, Void param) {
-    State dst = obj.getDst();
+    State dst = obj.getDst().getLink();
     dst = initStateGetter.traverse(dst, null);
-    obj.setDst(dst);
+    obj.getDst().setLink(dst);
     return null;
   }
 

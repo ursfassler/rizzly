@@ -1,18 +1,21 @@
 package evl.hfsm.reduction;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
-import common.Designator;
 import common.ElementInfo;
 
 import evl.Evl;
 import evl.NullTraverser;
 import evl.expression.reference.Reference;
+import evl.expression.reference.SimpleRef;
 import evl.hfsm.ImplHfsm;
+import evl.hfsm.State;
 import evl.knowledge.KnowledgeBase;
+import evl.other.EvlList;
 import evl.other.Namespace;
 import evl.type.Type;
-import evl.type.TypeRef;
+import evl.type.composed.NamedElement;
 import evl.variable.Constant;
 import evl.variable.StateVariable;
 
@@ -28,7 +31,7 @@ public class HfsmToFsm extends NullTraverser<Void, Namespace> {
 
   public static void process(Namespace classes, KnowledgeBase kb) {
     HfsmToFsm reduction = new HfsmToFsm(kb);
-    reduction.visitItr(classes, null);
+    reduction.traverse(classes, null);
   }
 
   @Override
@@ -37,18 +40,18 @@ public class HfsmToFsm extends NullTraverser<Void, Namespace> {
   }
 
   @Override
-  protected Void visitItr(Iterable<? extends Evl> list, Namespace param) {
+  protected Void visitList(EvlList<? extends Evl> list, Namespace param) {
     // against comodification error
-    ArrayList<Evl> old = new ArrayList<Evl>();
+    EvlList<Evl> old = new EvlList<Evl>();
     for (Evl itr : list) {
       old.add(itr);
     }
-    return super.visitItr(old, param);
+    return super.visitList(old, param);
   }
 
   @Override
   protected Void visitNamespace(Namespace obj, Namespace param) {
-    visitItr(obj, obj);
+    visitList(obj.getChildren(), obj);
     return null;
   }
 
@@ -61,25 +64,30 @@ public class HfsmToFsm extends NullTraverser<Void, Namespace> {
     TransitionDownPropagator.process(obj, kb);
 
     {
-      StateVarPathGetter svpg = new StateVarPathGetter();
-      svpg.process(obj);
-      StateTypeBuilder stb = new StateTypeBuilder(param);
-      Type stateType = stb.traverse(obj.getTopstate(), new Designator(obj.getName()));
+      StateTypeBuilder stb = new StateTypeBuilder(param, kb);
+      NamedElement elem = stb.traverse(obj.getTopstate(), new EvlList<NamedElement>());
+      Type stateType = elem.getRef().getLink();
 
-      obj.getTopstate().setInitial(InitStateGetter.get(obj.getTopstate()));
+      obj.getTopstate().setInitial(new SimpleRef<State>(ElementInfo.NO, InitStateGetter.get(obj.getTopstate())));
 
       Constant def = stb.getInitVar().get(stateType);
 
       // TODO set correct values when switching states
-      StateVariable var = new StateVariable(new ElementInfo(), "data", new TypeRef(new ElementInfo(), stateType), new Reference(new ElementInfo(), def));
-      obj.getTopstate().getVariable().add(var);
-      StateVarReplacer.process(obj, var, svpg.getVpath());
+      StateVariable var = new StateVariable(ElementInfo.NO, "data", new SimpleRef<Type>(ElementInfo.NO, stateType), new Reference(ElementInfo.NO, def));
+      obj.getTopstate().getItem().add(var);
+
+      Map<StateVariable, EvlList<NamedElement>> epath = new HashMap<StateVariable, EvlList<NamedElement>>(stb.getEpath());
+      for (StateVariable sv : epath.keySet()) {
+        epath.get(sv).remove(0);
+      }
+
+      StateVarReplacer.process(obj, var, epath, kb);
     }
 
-    EntryExitUpdater.process(obj);
-    StateFuncUplifter.process(obj);
+    EntryExitUpdater.process(obj, kb);
+    StateFuncUplifter.process(obj, kb);
     TransitionUplifter.process(obj);
-    LeafStateUplifter.process(obj);
+    LeafStateUplifter.process(obj, kb);
 
     return null;
   }

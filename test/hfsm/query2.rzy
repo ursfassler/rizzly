@@ -1,27 +1,19 @@
-component
-  Query2
-    slot     tick();
-    response read():R{0,100};
+Query2 = Hfsm
+  tick : slot();
+  read : response():R{0,100};
+  
+  state( A )
+    A : state;
+    B : state;
+    C : state;
     
-  implementation hfsm( A )
-  
-    transition
-      A to B by tick();
-      B to C by tick();
-      C to A by tick();
-  
-    state A
-    end
-      
-    state B
-    end
+    A to B by tick();
+    B to C by tick();
+    C to A by tick();
 
-    state C
-    end
-    
-    response read():R{0,100}
+    read : response():R{0,100}
       return 0;
     end
-  
   end
+end
 

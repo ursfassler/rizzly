@@ -6,22 +6,19 @@ import java.util.Set;
 
 import evl.DefTraverser;
 import evl.Evl;
-import evl.expression.reference.Reference;
-import evl.other.CompUse;
-import evl.other.Named;
-import evl.type.TypeRef;
+import evl.expression.reference.BaseRef;
 
 public class DepCollector extends DefTraverser<Void, Void> {
 
-  private Set<Named> visited = new HashSet<Named>();
+  private Set<Evl> visited = new HashSet<Evl>();
 
-  public static Set<Named> process(Evl top) {
+  public static Set<Evl> process(Evl top) {
     DepCollector collector = new DepCollector();
     collector.traverse(top, null);
     return collector.visited;
   }
 
-  public static Set<Named> process(Collection<? extends Evl> pubfunc) {
+  public static Set<Evl> process(Collection<? extends Evl> pubfunc) {
     DepCollector collector = new DepCollector();
     for (Evl func : pubfunc) {
       collector.traverse(func, null);
@@ -32,32 +29,16 @@ public class DepCollector extends DefTraverser<Void, Void> {
   @Override
   protected Void visit(Evl obj, Void param) {
     if (!visited.contains(obj)) {
-      if (obj instanceof Named) {
-        visited.add((Named) obj);
-      }
+      visited.add(obj);
       super.visit(obj, param);
     }
     return null;
   }
 
   @Override
-  protected Void visitReference(Reference obj, Void param) {
-    super.visitReference(obj, param);
+  protected Void visitBaseRef(BaseRef obj, Void param) {
+    super.visitBaseRef(obj, param);
     visit(obj.getLink(), param);
-    return null;
-  }
-
-  @Override
-  protected Void visitCompUse(CompUse obj, Void param) {
-    super.visitCompUse(obj, param);
-    visit(obj.getLink(), param);
-    return null;
-  }
-
-  @Override
-  protected Void visitTypeRef(TypeRef obj, Void param) {
-    super.visitTypeRef(obj, param);
-    visit(obj.getRef(), param);
     return null;
   }
 

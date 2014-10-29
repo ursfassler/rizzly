@@ -1,11 +1,6 @@
-
-component
-  BitNot
-    response invert( value: R{0,15} ):R{0,15};
-      
-  implementation elementary
-    response invert( value: R{0,15} ):R{0,15}
-      return not value;
-    end
+BitNot = Elementary
+  invert : response( value: R{0,15} ):R{0,15}
+    return not value;
   end
+end
 

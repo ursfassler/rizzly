@@ -1,14 +1,15 @@
 package fun.toevl;
 
 import evl.Evl;
+import evl.expression.reference.SimpleRef;
 import evl.other.Component;
 import evl.type.Type;
-import evl.type.TypeRef;
 import evl.variable.Variable;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.expression.Expression;
 import fun.expression.reference.Reference;
+import fun.other.CompImpl;
 import fun.variable.CompUse;
 import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
@@ -30,11 +31,11 @@ public class FunToEvlVariable extends NullTraverser<Evl, Void> {
 
   // ----------------------------------------------------------------------------
 
-  private TypeRef copyType(Expression typeRef) {
+  private SimpleRef<Type> copyType(Expression typeRef) {
     Reference typeref = (Reference) typeRef;
     fun.type.Type nt = FunToEvl.getRefType(typeref);
     Type ecomp = (Type) fta.traverse(nt, null);
-    return new TypeRef(typeref.getInfo(), ecomp);
+    return new SimpleRef<Type>(typeref.getInfo(), ecomp);
   }
 
   @Override
@@ -61,9 +62,10 @@ public class FunToEvlVariable extends NullTraverser<Evl, Void> {
   protected Evl visitCompUse(CompUse obj, Void param) {
     Reference typeref = (Reference) obj.getType();
     assert (typeref.getOffset().isEmpty());
-    fun.other.Component nt = (fun.other.Component) typeref.getLink();
+    assert (typeref.getLink() instanceof CompImpl);
+    CompImpl nt = (CompImpl) typeref.getLink();
     Component ecomp = (Component) fta.traverse(nt, null);
-    return new evl.other.CompUse(obj.getInfo(), obj.getName(), ecomp);
+    return new evl.other.CompUse(obj.getInfo(), ecomp, obj.getName());
   }
 
 }

@@ -152,11 +152,12 @@ public class FpcTest extends BaseTest {
 
   public void test(String file, String comp, String output, boolean debugMsg) {
     compile(file, comp, true, debugMsg, false);
-    compilePas(file);
-    run(file, output);
+    String outdir = getRootdir() + "/output/";
+    compilePas(file, outdir);
+    run(file, output, outdir);
   }
 
-  private void run(String name, String output) {
+  private void run(String name, String output, String outdir) {
     String cmd = outdir + name;
     try {
       Process p;
@@ -171,7 +172,7 @@ public class FpcTest extends BaseTest {
     }
   }
 
-  private void compilePas(String name) {
+  private void compilePas(String name, String outdir) {
     String cmd = "fpc -Mobjfpc " + getRootdir() + name + ".pas -FE" + outdir + " -Fu" + outdir + " -Fl" + outdir + " -Fi" + outdir;
     try {
       Process p;

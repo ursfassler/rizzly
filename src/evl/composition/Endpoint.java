@@ -1,18 +1,15 @@
 package evl.composition;
 
-import common.Designator;
 import common.ElementInfo;
 
-import evl.EvlBase;
-import evl.function.FuncIface;
+import evl.expression.reference.BaseRef;
+import evl.function.Function;
+import evl.other.Named;
 
-abstract public class Endpoint extends EvlBase {
-
-  public Endpoint(ElementInfo info) {
-    super(info);
+abstract public class Endpoint<T extends Named> extends BaseRef<T> {
+  public Endpoint(ElementInfo info, T link) {
+    super(info, link);
   }
 
-  abstract public FuncIface getIfaceUse();
-
-  abstract public Designator getDes();
+  abstract public Function getFunc();
 }

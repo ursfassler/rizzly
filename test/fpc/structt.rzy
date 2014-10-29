@@ -1,28 +1,21 @@
-type
-  Point = Record
-    x : R{0,1000};
-    y : R{0,1000};
+Point = Record
+  x : R{0,1000};
+  y : R{0,1000};
+end
+
+Structt = Elementary
+  out1 : signal( x: Point );
+  out2 : signal( x, y: R{0,1000} );
+
+  in1 : slot( x, y: R{0,1000} )
+    p : Point;
+    p.x := x;
+    p.y := y;
+    out1( p );
   end
-
-component
-  Structt
-    slot   in1( x, y: R{0,1000} );
-    slot   in2( x: Point );
-    signal out1( x: Point );
-    signal out2( x, y: R{0,1000} );
-
-  implementation elementary
-    
-    slot in1( x, y: R{0,1000} )
-      p : Point;
-      p.x := x;
-      p.y := y;
-      out1( p );
-    end
-    
-    slot in2( p: Point )
-      out2( p.x, p.y );
-    end
-
+  
+  in2 : slot( p: Point )
+    out2( p.x, p.y );
   end
+end
 

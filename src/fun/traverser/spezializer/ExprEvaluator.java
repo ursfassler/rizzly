@@ -23,15 +23,19 @@ import fun.expression.reference.RefItem;
 import fun.expression.reference.RefName;
 import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.Reference;
-import fun.function.impl.FuncGlobal;
+import fun.function.FuncFunction;
 import fun.knowledge.KnowledgeBase;
+import fun.other.ActualTemplateArgument;
+import fun.other.FunList;
+import fun.other.Template;
 import fun.traverser.Memory;
+import fun.type.Type;
 import fun.variable.ConstGlobal;
 import fun.variable.FuncVariable;
 import fun.variable.TemplateParameter;
 import fun.variable.Variable;
 
-public class ExprEvaluator extends NullTraverser<Expression, Memory> {
+public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory> {
   private final KnowledgeBase kb;
 
   public ExprEvaluator(KnowledgeBase kb) {
@@ -39,7 +43,7 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
     this.kb = kb;
   }
 
-  public static Expression evaluate(Expression obj, Memory mem, KnowledgeBase kb) {
+  public static ActualTemplateArgument evaluate(Expression obj, Memory mem, KnowledgeBase kb) {
     ExprEvaluator evaluator = new ExprEvaluator(kb);
     return evaluator.traverse(obj, mem);
   }
@@ -47,7 +51,7 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
   private void visitExpList(List<Expression> expList, Memory param) {
     for (int i = 0; i < expList.size(); i++) {
       Expression expr = expList.get(i);
-      expr = visit(expr, param);
+      expr = (Expression) visit(expr, param);
       expList.set(i, expr);
     }
   }
@@ -57,13 +61,14 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
       RError.err(ErrorType.Fatal, obj.getInfo(), "Can not evaluate template");
       return null;
     } else if (param instanceof RefCall) {
-      assert (obj instanceof FuncGlobal);
-      return StmtExecutor.process((FuncGlobal) obj, ((RefCall) param).getActualParameter(), new Memory(), kb);
+      assert (obj instanceof FuncFunction);
+      FuncFunction func = (FuncFunction) obj;
+      return StmtExecutor.process(func, ((RefCall) param).getActualParameter(), new Memory(), kb);
     } else if (param instanceof RefIndex) {
       Variable var = (Variable) obj;
       Expression value = memory.get(var);
 
-      Expression idx = visit(((RefIndex) param).getIndex(), memory);
+      Expression idx = (Expression) visit(((RefIndex) param).getIndex(), memory);
       Expression elem = ElementGetter.INSTANCE.traverse(idx, value);
 
       return elem;
@@ -85,8 +90,19 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
   }
 
   @Override
+  protected ActualTemplateArgument visitType(Type obj, Memory param) {
+    return obj;
+  }
+
+  @Override
   protected Expression visitDefault(Fun obj, Memory param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+  }
+
+  @Override
+  protected ActualTemplateArgument visitDeclaration(Template obj, Memory param) {
+    Fun spec = Specializer.process(obj, new FunList<ActualTemplateArgument>(), kb);
+    return (ActualTemplateArgument) spec;
   }
 
   @Override
@@ -101,11 +117,11 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
 
   @Override
   protected Expression visitConstGlobal(ConstGlobal obj, Memory param) {
-    return visit(obj.getDef(), new Memory()); // new memory because global constant need no context
+    return (Expression) visit(obj.getDef(), new Memory()); // new memory because global constant need no context
   }
 
   @Override
-  protected Expression visitReference(Reference obj, Memory param) {
+  protected ActualTemplateArgument visitReference(Reference obj, Memory param) {
 
     Fun item = obj.getLink();
 
@@ -124,7 +140,8 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
 
   @Override
   protected Expression visitRefCompcall(RefTemplCall obj, Memory param) {
-    visitExpList(obj.getActualParameter(), param);
+    RError.err(ErrorType.Fatal, obj.getInfo(), "reimplement");
+    // visitExpList(obj.getActualParameter(), param);
     return null;
   }
 
@@ -135,7 +152,7 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
 
   @Override
   protected Expression visitRefIndex(RefIndex obj, Memory param) {
-    obj.setIndex(visit(obj.getIndex(), param));
+    obj.setIndex((Expression) visit(obj.getIndex(), param));
     return null;
   }
 
@@ -150,8 +167,8 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
 
   @Override
   protected Expression visitArithmeticOp(ArithmeticOp obj, Memory param) {
-    Expression left = visit(obj.getLeft(), param);
-    Expression right = visit(obj.getRight(), param);
+    Expression left = (Expression) visit(obj.getLeft(), param);
+    Expression right = (Expression) visit(obj.getRight(), param);
 
     if ((left instanceof Number) && (right instanceof Number)) {
       BigInteger lval = ((Number) left).getValue();
@@ -159,36 +176,36 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
       BigInteger res;
 
       switch (obj.getOp()) {
-      case AND:
-        res = lval.and(rval);
-        break;
-      case DIV:
-        res = lval.divide(rval);
-        break;
-      case MINUS:
-        res = lval.subtract(rval);
-        break;
-      case MOD:
-        res = lval.mod(rval);
-        break;
-      case MUL:
-        res = lval.multiply(rval);
-        break;
-      case OR:
-        res = lval.or(rval);
-        break;
-      case PLUS:
-        res = lval.add(rval);
-        break;
-      case SHL:
-        res = lval.shiftLeft(getInt(obj.getInfo(), rval));
-        break;
-      case SHR:
-        res = lval.shiftRight(getInt(obj.getInfo(), rval));
-        break;
-      default:
-        RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj.getOp());
-        return obj;
+        case AND:
+          res = lval.and(rval);
+          break;
+        case DIV:
+          res = lval.divide(rval);
+          break;
+        case MINUS:
+          res = lval.subtract(rval);
+          break;
+        case MOD:
+          res = lval.mod(rval);
+          break;
+        case MUL:
+          res = lval.multiply(rval);
+          break;
+        case OR:
+          res = lval.or(rval);
+          break;
+        case PLUS:
+          res = lval.add(rval);
+          break;
+        case SHL:
+          res = lval.shiftLeft(getInt(obj.getInfo(), rval));
+          break;
+        case SHR:
+          res = lval.shiftRight(getInt(obj.getInfo(), rval));
+          break;
+        default:
+          RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj.getOp());
+          return obj;
       }
       return new Number(obj.getInfo(), res);
     } else {
@@ -198,8 +215,8 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
 
   @Override
   protected Expression visitRelation(Relation obj, Memory param) {
-    Expression left = visit(obj.getLeft(), param);
-    Expression right = visit(obj.getRight(), param);
+    Expression left = (Expression) visit(obj.getLeft(), param);
+    Expression right = (Expression) visit(obj.getRight(), param);
 
     if ((left instanceof Number) && (right instanceof Number)) {
       BigInteger lval = ((Number) left).getValue();
@@ -207,27 +224,27 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
       boolean res;
 
       switch (obj.getOp()) {
-      case EQUAL:
-        res = lval.compareTo(rval) == 0;
-        break;
-      case GREATER:
-        res = lval.compareTo(rval) > 0;
-        break;
-      case GREATER_EQUEAL:
-        res = lval.compareTo(rval) >= 0;
-        break;
-      case LESS:
-        res = lval.compareTo(rval) < 0;
-        break;
-      case LESS_EQUAL:
-        res = lval.compareTo(rval) <= 0;
-        break;
-      case NOT_EQUAL:
-        res = lval.compareTo(rval) != 0;
-        break;
-      default:
-        RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj.getOp());
-        return null;
+        case EQUAL:
+          res = lval.compareTo(rval) == 0;
+          break;
+        case GREATER:
+          res = lval.compareTo(rval) > 0;
+          break;
+        case GREATER_EQUEAL:
+          res = lval.compareTo(rval) >= 0;
+          break;
+        case LESS:
+          res = lval.compareTo(rval) < 0;
+          break;
+        case LESS_EQUAL:
+          res = lval.compareTo(rval) <= 0;
+          break;
+        case NOT_EQUAL:
+          res = lval.compareTo(rval) != 0;
+          break;
+        default:
+          RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj.getOp());
+          return null;
       }
       return new BoolValue(obj.getInfo(), res);
     } else if ((left instanceof BoolValue) && (right instanceof BoolValue)) {
@@ -236,15 +253,15 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
       boolean res;
 
       switch (obj.getOp()) {
-      case EQUAL:
-        res = lval == rval;
-        break;
-      case NOT_EQUAL:
-        res = lval != rval;
-        break;
-      default:
-        RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj.getOp());
-        return obj;
+        case EQUAL:
+          res = lval == rval;
+          break;
+        case NOT_EQUAL:
+          res = lval != rval;
+          break;
+        default:
+          RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj.getOp());
+          return obj;
       }
       return new BoolValue(obj.getInfo(), res);
     } else {
@@ -260,19 +277,19 @@ public class ExprEvaluator extends NullTraverser<Expression, Memory> {
 
   @Override
   protected Expression visitUnaryExpression(UnaryExpression obj, Memory param) {
-    Expression expr = visit(obj.getExpr(), param);
+    Expression expr = (Expression) visit(obj.getExpr(), param);
 
     if ((expr instanceof Number)) {
       BigInteger eval = ((Number) expr).getValue();
       BigInteger res;
 
       switch (obj.getOp()) {
-      case MINUS:
-        res = eval.negate();
-        break;
-      default:
-        RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj.getOp());
-        return obj;
+        case MINUS:
+          res = eval.negate();
+          break;
+        default:
+          RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj.getOp());
+          return obj;
       }
       return new Number(obj.getInfo(), res);
     } else {

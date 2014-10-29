@@ -1,20 +1,15 @@
 //test ok
 
-component
-  Elementary3
-    slot   tickIn();
-    signal tickOut();
+Elementary3 = Elementary
+  tickOut : signal();
 
-  implementation elementary
+  count : R{0,1} = 0;
 
-    var
-      count : R{0,1} = 0;
-
-    slot tickIn()
-      count := (count+1) mod 2;
-      if count = 0 then
-        tickOut();
-      end
+  tickIn : slot()
+    count := (count+1) mod 2;
+    if count = 0 then
+      tickOut();
     end
   end
-  
+end
+

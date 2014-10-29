@@ -7,9 +7,9 @@ import fun.expression.reference.Reference;
 public class StateComposite extends State {
   private Reference initial;
 
-  public StateComposite(ElementInfo info, String name, String initial) {
+  public StateComposite(ElementInfo info, String name, Reference initial) {
     super(info, name);
-    this.initial = new Reference(info, initial);
+    this.initial = initial;
   }
 
   public Reference getInitial() {

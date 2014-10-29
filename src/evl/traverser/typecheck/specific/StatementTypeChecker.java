@@ -1,7 +1,5 @@
 package evl.traverser.typecheck.specific;
 
-import java.util.List;
-
 import error.ErrorType;
 import error.RError;
 import evl.Evl;
@@ -60,12 +58,6 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
     adder.traverse(obj, null);
   }
 
-  private void visitList(List<? extends Evl> list, Void sym) {
-    for (Evl itr : list) {
-      visit(itr, sym);
-    }
-  }
-
   private Type checkGetExpr(Expression expr) {
     ExpressionTypeChecker.process(expr, kb);
     return kt.get(expr);
@@ -94,7 +86,7 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
   }
 
   private void checkConstant(Constant obj) {
-    Type ret = obj.getType().getRef();
+    Type ret = obj.getType().getLink();
     Type defType = checkGetExpr(obj.getDef());
     if (!LeftIsContainerOfRightTest.process(ret, defType, kb)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Data type to big or incompatible in assignment: " + ret.getName() + " := " + defType.getName());
@@ -149,14 +141,14 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
       RError.err(ErrorType.Error, obj.getInfo(), "Condition variable has to be an integer, got: " + cond.getName());
     }
     // TODO check somewhere if case values are disjunct
-    visitItr(obj.getOption(), map);
+    visitList(obj.getOption(), map);
     visit(obj.getOtherwise(), map);
     return null;
   }
 
   @Override
   protected Void visitCaseOpt(CaseOpt obj, Void map) {
-    visitItr(obj.getValue(), map);
+    visitList(obj.getValue(), map);
     visit(obj.getCode(), map);
     return null;
   }

@@ -32,7 +32,7 @@ public class InitStateGetter extends NullTraverser<StateSimple, Void> {
 
   @Override
   protected StateSimple visitStateComposite(StateComposite obj, Void param) {
-    return visit(obj.getInitial(), param);
+    return visit(obj.getInitial().getLink(), param);
   }
 
   @Override

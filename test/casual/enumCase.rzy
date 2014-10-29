@@ -1,36 +1,30 @@
-type
-  Weekday = Enum
-    Monday;
-    Tuesday;
-    Wednesday;
-    Thursday;
-    Friday;
-    Saturday;
-    Sunday;
-  end
+Weekday = Enum
+  Monday;
+  Tuesday;
+  Wednesday;
+  Thursday;
+  Friday;
+  Saturday;
+  Sunday;
+end
 
-component
-  EnumCase
-    response ind( data: Weekday ):R{0,3};
-
-  implementation elementary
-
-    response ind( x: Weekday ):R{0,3}
-      case x of
-        Weekday.Monday,Weekday.Wednesday:
-          return 2;
-        end
-        Weekday.Tuesday:
-          return 0;
-        end
-        Weekday.Thursday..Weekday.Saturday:
-          return 1;
-        end
-        else
-          return 3;
-        end
+EnumCase = Elementary
+  ind : response( x: Weekday ):R{0,3}
+    case x of
+      Weekday.Monday,Weekday.Wednesday:
+        return 2;
+      end
+      Weekday.Tuesday:
+        return 0;
+      end
+      Weekday.Thursday..Weekday.Saturday:
+        return 1;
+      end
+      else
+        return 3;
       end
     end
-    
   end
+  
+end
 

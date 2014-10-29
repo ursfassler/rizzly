@@ -1,6 +1,6 @@
 
 
-function fibArray{ till: Natural }():Array{till,Natural}
+fibArray{ till: Natural } = function():Array{till,Natural}
   res : Array{till,Natural};
   
   res[0] := 0;
@@ -18,16 +18,11 @@ function fibArray{ till: Natural }():Array{till,Natural}
   return res;
 end
 
-component
-  ConstInit3
-    response get( idx: R{0,10} ):R{0,1000*1000};
-      
-  implementation elementary
-    const
-      Fib = fibArray{10}();
-      
-    response get( idx: R{0,10} ):R{0,1000*1000}
-      return Fib[idx];
-    end
-  end      
+ConstInit3 = Elementary
+  Fib : const = fibArray{10}();
+    
+  get : response( idx: R{0,10} ):R{0,1000*1000}
+    return Fib[idx];
+  end
+end      
 

@@ -1,7 +1,6 @@
 package evl.hfsm.reduction;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -16,24 +15,25 @@ import evl.NullTraverser;
 import evl.copy.Copy;
 import evl.expression.Expression;
 import evl.expression.reference.RefCall;
-import evl.expression.reference.RefItem;
 import evl.expression.reference.Reference;
-import evl.function.FuncWithBody;
-import evl.function.impl.FuncImplResponse;
-import evl.function.impl.FuncPrivateVoid;
+import evl.expression.reference.SimpleRef;
+import evl.function.Function;
+import evl.function.header.FuncPrivateVoid;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.State;
 import evl.hfsm.StateComposite;
 import evl.hfsm.StateItem;
 import evl.hfsm.StateSimple;
 import evl.hfsm.Transition;
+import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowParent;
 import evl.knowledge.KnowledgeBase;
-import evl.other.ListOfNamed;
+import evl.other.EvlList;
 import evl.statement.Assignment;
 import evl.statement.Block;
 import evl.statement.CallStmt;
 import evl.statement.Statement;
+import evl.type.Type;
 import evl.variable.FuncVariable;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
@@ -46,7 +46,7 @@ import evl.variable.Variable;
  */
 public class TransitionDownPropagator extends NullTraverser<Void, TransitionParam> {
 
-  private static final ElementInfo info = new ElementInfo();
+  private static final ElementInfo info = ElementInfo.NO;
   private final KnowParent kp;
   private final Map<Transition, State> tsrc;
   private final Map<Transition, State> tdst;
@@ -63,15 +63,20 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
   }
 
   public static void process(ImplHfsm hfsm, KnowledgeBase kb) {
+    KnowBaseItem kbi = kb.getEntry(KnowBaseItem.class);
+
     TransitionEndpointCollector tec = new TransitionEndpointCollector();
     tec.traverse(hfsm.getTopstate(), null);
 
     assert (tec.getTdst().size() == tec.getTsrc().size());
     assert (tec.getTdst().size() == tec.getTtop().size());
     Map<Transition, FuncPrivateVoid> tfunc = new HashMap<Transition, FuncPrivateVoid>();
+    int nr = 0;
     for (Transition trans : tec.getTdst().keySet()) {
-      FuncPrivateVoid func = makeTransBodyFunc(trans);
-      hfsm.getTopstate().getFunction().add(func);
+      String name = Designator.NAME_SEP + "trans" + nr;
+      nr++;
+      FuncPrivateVoid func = makeTransBodyFunc(trans, name, kbi);
+      hfsm.getTopstate().getItem().add(func);
       tfunc.put(trans, func);
     }
 
@@ -81,14 +86,15 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
 
   /**
    * Extracts a function out of the transition body
+   * 
+   * @param name
    */
-  private static FuncPrivateVoid makeTransBodyFunc(Transition trans) {
-    Collection<FuncVariable> params = Copy.copy(trans.getParam().getList());
-    FuncPrivateVoid func = new FuncPrivateVoid(info, trans.getName() + Designator.NAME_SEP + "transFunc", new ListOfNamed<FuncVariable>(params));
-    func.setBody(trans.getBody());
+  private static FuncPrivateVoid makeTransBodyFunc(Transition trans, String name, KnowBaseItem kbi) {
+    EvlList<FuncVariable> params = Copy.copy(trans.getParam());
+    FuncPrivateVoid func = new FuncPrivateVoid(info, name, params, new SimpleRef<Type>(info, kbi.getVoidType()), trans.getBody());
     trans.setBody(new Block(info));
 
-    HfsmReduction.relinkActualParameterRef(trans.getParam(), func.getParam().getList(), func.getBody());
+    HfsmReduction.relinkActualParameterRef(trans.getParam(), func.getParam(), func.getBody());
 
     return func;
   }
@@ -100,7 +106,7 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
 
   @Override
   protected Void visitStateSimple(StateSimple obj, TransitionParam param) {
-    List<Transition> transList = obj.getItemList(Transition.class);
+    EvlList<Transition> transList = obj.getItem().getItems(Transition.class);
     obj.getItem().removeAll(transList);
 
     filter(obj, param.before);
@@ -110,7 +116,7 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
       addTrans(obj, trans);
     }
     for (Transition trans : transList) {
-      trans.setSrc(obj);
+      trans.getSrc().setLink(obj);
       // obj.getItem().add(trans);
       addTrans(obj, trans);
     }
@@ -126,8 +132,7 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
     State dst = tdst.get(otrans);
     assert (dst != null);
     Transition trans = Copy.copy(otrans);
-    trans.setName(trans.getName() + Designator.NAME_SEP + src.getName()); // make name unique
-    trans.setSrc(src);
+    trans.getSrc().setLink(src);
 
     makeExitCalls(src, os, trans.getBody().getStatements());
     {
@@ -135,7 +140,7 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
       assert (func != null);
       Reference ref = new Reference(info, func);
 
-      ArrayList<Expression> param = new ArrayList<Expression>();
+      EvlList<Expression> param = new EvlList<Expression>();
       for (Variable acpar : trans.getParam()) {
         Reference parref = new Reference(info, acpar);
         param.add(parref);
@@ -160,7 +165,7 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
 
     makeVarInit(par, top, list);
 
-    for (StateVariable var : start.getVariable()) {
+    for (StateVariable var : start.getItem().getItems(StateVariable.class)) {
       Assignment init = new Assignment(var.getDef().getInfo(), new Reference(info, var), Copy.copy(var.getDef()));
       list.add(init);
     }
@@ -174,7 +179,7 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
     assert (par != null);
 
     makeEntryCalls(par, top, list);
-    list.add(makeCall(start.getEntryFunc()));
+    list.add(makeCall(start.getEntryFunc().getLink()));
   }
 
   private StateComposite getParent(State start) {
@@ -193,15 +198,13 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
     StateComposite par = getParent(start);
     assert (par != null);
 
-    list.add(makeCall(start.getExitFunc()));
+    list.add(makeCall(start.getExitFunc().getLink()));
     makeExitCalls(par, top, list);
   }
 
-  private CallStmt makeCall(Reference reference) {
-    assert (reference.getLink() instanceof FuncWithBody);
-    assert (reference.getOffset().isEmpty());
-    Reference ref = new Reference(info, reference.getLink(), new ArrayList<RefItem>());
-    ref.getOffset().add(new RefCall(info, new ArrayList<Expression>()));
+  private CallStmt makeCall(Function func) {
+    Reference ref = new Reference(info, func);
+    ref.getOffset().add(new RefCall(info, new EvlList<Expression>()));
     return new CallStmt(info, ref);
   }
 
@@ -235,8 +238,6 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
       } else if (itr instanceof State) {
         spos.put((State) itr, transList.size());
         stateList.add((State) itr);
-      } else {
-        assert (itr instanceof FuncImplResponse);
       }
     }
 
@@ -305,25 +306,24 @@ class TransitionEndpointCollector extends NullTraverser<Void, State> {
 
   @Override
   protected Void visitDefault(Evl obj, State param) {
-    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
-  }
-
-  @Override
-  protected Void visitFuncImplResponse(FuncImplResponse obj, State param) {
-    return null;
+    if (obj instanceof StateItem) {
+      return null;
+    } else {
+      throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+    }
   }
 
   @Override
   protected Void visitTransition(Transition obj, State param) {
     ttop.put(obj, param);
-    tsrc.put(obj, obj.getSrc());
-    tdst.put(obj, obj.getDst());
+    tsrc.put(obj, obj.getSrc().getLink());
+    tdst.put(obj, obj.getDst().getLink());
     return null;
   }
 
   @Override
   protected Void visitState(State obj, State param) {
-    visitItr(obj.getItem(), obj);
+    visitList(obj.getItem(), obj);
     return null;
   }
 

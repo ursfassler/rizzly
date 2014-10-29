@@ -13,34 +13,35 @@ import fun.expression.Number;
 import fun.expression.Relation;
 import fun.expression.StringValue;
 import fun.expression.UnaryExpression;
+import fun.expression.reference.BaseRef;
+import fun.expression.reference.DummyLinkTarget;
 import fun.expression.reference.RefCall;
 import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefItem;
 import fun.expression.reference.RefName;
 import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.Reference;
-import fun.function.FunctionHeader;
-import fun.function.impl.FuncEntryExit;
-import fun.function.impl.FuncGlobal;
-import fun.function.impl.FuncImplResponse;
-import fun.function.impl.FuncImplSlot;
-import fun.function.impl.FuncPrivateRet;
-import fun.function.impl.FuncPrivateVoid;
-import fun.function.impl.FuncProtQuery;
-import fun.function.impl.FuncProtResponse;
-import fun.function.impl.FuncProtRet;
-import fun.function.impl.FuncProtSignal;
-import fun.function.impl.FuncProtSlot;
-import fun.function.impl.FuncProtVoid;
+import fun.expression.reference.SimpleRef;
+import fun.function.FuncFunction;
+import fun.function.FuncHeader;
+import fun.function.FuncImpl;
+import fun.function.FuncProcedure;
+import fun.function.FuncProto;
+import fun.function.FuncQuery;
+import fun.function.FuncResponse;
+import fun.function.FuncSignal;
+import fun.function.FuncSlot;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.State;
 import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
-import fun.other.Component;
+import fun.other.CompImpl;
+import fun.other.FunList;
 import fun.other.ImplElementary;
 import fun.other.Namespace;
 import fun.other.RizzlyFile;
+import fun.other.Template;
 import fun.statement.Assignment;
 import fun.statement.Block;
 import fun.statement.CallStmt;
@@ -66,7 +67,6 @@ import fun.type.base.EnumType;
 import fun.type.base.IntegerType;
 import fun.type.base.NaturalType;
 import fun.type.base.StringType;
-import fun.type.base.TypeAlias;
 import fun.type.base.VoidType;
 import fun.type.composed.NamedElement;
 import fun.type.composed.NamedElementType;
@@ -76,12 +76,14 @@ import fun.type.template.Array;
 import fun.type.template.ArrayTemplate;
 import fun.type.template.Range;
 import fun.type.template.RangeTemplate;
+import fun.type.template.TypeTemplate;
 import fun.type.template.TypeType;
 import fun.type.template.TypeTypeTemplate;
 import fun.variable.CompUse;
 import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
 import fun.variable.Constant;
+import fun.variable.DefVariable;
 import fun.variable.FuncVariable;
 import fun.variable.StateVariable;
 import fun.variable.TemplateParameter;
@@ -93,7 +95,7 @@ public abstract class Traverser<R, P> {
     return visit(obj, param);
   }
 
-  protected R visitItr(Iterable<? extends Fun> list, P param) {
+  protected R visitList(FunList<? extends Fun> list, P param) {
     for (Fun ast : list) {
       visit(ast, param);
     }
@@ -107,8 +109,10 @@ public abstract class Traverser<R, P> {
       return visitRizzlyFile((RizzlyFile) obj, param);
     } else if (obj instanceof Type) {
       return visitType((Type) obj, param);
-    } else if (obj instanceof FunctionHeader) {
-      return visitFunctionHeader((FunctionHeader) obj, param);
+    } else if (obj instanceof FuncHeader) {
+      return visitFunctionHeader((FuncHeader) obj, param);
+    } else if (obj instanceof FuncImpl) {
+      return visitFuncImpl((FuncImpl) obj, param);
     } else if (obj instanceof Expression) {
       return visitExpression((Expression) obj, param);
     } else if (obj instanceof Statement) {
@@ -133,40 +137,50 @@ public abstract class Traverser<R, P> {
       return visitState((State) obj, param);
     } else if (obj instanceof Transition) {
       return visitTransition((Transition) obj, param);
-    } else if (obj instanceof Component) {
-      return visitComponent((Component) obj, param);
+    } else if (obj instanceof CompImpl) {
+      return visitComponent((CompImpl) obj, param);
     } else if (obj instanceof EnumElement) {
       return visitEnumElement((EnumElement) obj, param);
+    } else if (obj instanceof Template) {
+      return visitDeclaration((Template) obj, param);
+    } else if (obj instanceof DummyLinkTarget) {
+      return visitDummyLinkTarget((DummyLinkTarget) obj, param);
+    } else if (obj instanceof TypeTemplate) {
+      return visitTypeTemplate((TypeTemplate) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
   }
 
-  protected R visitFunctionHeader(FunctionHeader obj, P param) {
-    if (obj instanceof FuncGlobal) {
-      return visitFuncGlobal((FuncGlobal) obj, param);
-    } else if (obj instanceof FuncProtVoid) {
-      return visitFuncProtVoid((FuncProtVoid) obj, param);
-    } else if (obj instanceof FuncProtRet) {
-      return visitFuncProtRet((FuncProtRet) obj, param);
-    } else if (obj instanceof FuncPrivateVoid) {
-      return visitFuncPrivateVoid((FuncPrivateVoid) obj, param);
-    } else if (obj instanceof FuncPrivateRet) {
-      return visitFuncPrivateRet((FuncPrivateRet) obj, param);
-    } else if (obj instanceof FuncEntryExit) {
-      return visitFuncEntryExit((FuncEntryExit) obj, param);
-    } else if (obj instanceof FuncProtResponse) {
-      return visitFuncProtResponse((FuncProtResponse) obj, param);
-    } else if (obj instanceof FuncProtQuery) {
-      return visitFuncProtQuery((FuncProtQuery) obj, param);
-    } else if (obj instanceof FuncProtSignal) {
-      return visitFuncProtSignal((FuncProtSignal) obj, param);
-    } else if (obj instanceof FuncProtSlot) {
-      return visitFuncProtSlot((FuncProtSlot) obj, param);
-    } else if (obj instanceof FuncImplSlot) {
-      return visitFuncImplSlot((FuncImplSlot) obj, param);
-    } else if (obj instanceof FuncImplResponse) {
-      return visitFuncImplResponse((FuncImplResponse) obj, param);
+  protected R visitFunctionHeader(FuncHeader obj, P param) {
+    if (obj instanceof FuncImpl) {
+      return visitFuncImpl((FuncImpl) obj, param);
+    } else if (obj instanceof FuncProto) {
+      return visitFuncProto((FuncProto) obj, param);
+    } else {
+      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
+  }
+
+  protected R visitFuncProto(FuncProto obj, P param) {
+    if (obj instanceof FuncQuery) {
+      return visitFuncProtQuery((FuncQuery) obj, param);
+    } else if (obj instanceof FuncSignal) {
+      return visitFuncProtSignal((FuncSignal) obj, param);
+    } else {
+      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
+  }
+
+  protected R visitFuncImpl(FuncImpl obj, P param) {
+    if (obj instanceof FuncProcedure) {
+      return visitFuncPrivateVoid((FuncProcedure) obj, param);
+    } else if (obj instanceof FuncFunction) {
+      return visitFuncFunction((FuncFunction) obj, param);
+    } else if (obj instanceof FuncResponse) {
+      return visitFuncProtResponse((FuncResponse) obj, param);
+    } else if (obj instanceof FuncSlot) {
+      return visitFuncProtSlot((FuncSlot) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -193,16 +207,24 @@ public abstract class Traverser<R, P> {
   }
 
   protected R visitVariable(Variable obj, P param) {
-    if (obj instanceof StateVariable) {
-      return visitStateVariable((StateVariable) obj, param);
+    if (obj instanceof DefVariable) {
+      return visitDefVariable((DefVariable) obj, param);
     } else if (obj instanceof FuncVariable) {
       return visitFuncVariable((FuncVariable) obj, param);
-    } else if (obj instanceof Constant) {
-      return visitConstant((Constant) obj, param);
     } else if (obj instanceof TemplateParameter) {
       return visitTemplateParameter((TemplateParameter) obj, param);
     } else if (obj instanceof CompUse) {
       return visitCompUse((CompUse) obj, param);
+    } else {
+      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
+  }
+
+  protected R visitDefVariable(DefVariable obj, P param) {
+    if (obj instanceof StateVariable) {
+      return visitStateVariable((StateVariable) obj, param);
+    } else if (obj instanceof Constant) {
+      return visitConstant((Constant) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -267,12 +289,22 @@ public abstract class Traverser<R, P> {
       return visitRelation((Relation) obj, param);
     } else if (obj instanceof UnaryExpression) {
       return visitUnaryExpression((UnaryExpression) obj, param);
-    } else if (obj instanceof Reference) {
-      return visitReference((Reference) obj, param);
+    } else if (obj instanceof BaseRef) {
+      return visitBaseRef((BaseRef) obj, param);
     } else if (obj instanceof AnyValue) {
       return visitAnyValue((AnyValue) obj, param);
     } else if (obj instanceof NamedElementValue) {
       return visitNamedElementValue((NamedElementValue) obj, param);
+    } else {
+      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
+  }
+
+  protected R visitBaseRef(BaseRef obj, P param) {
+    if (obj instanceof Reference) {
+      return visitReference((Reference) obj, param);
+    } else if (obj instanceof SimpleRef) {
+      return visitSimpleRef((SimpleRef) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -292,18 +324,8 @@ public abstract class Traverser<R, P> {
     }
   }
 
-  protected R visitType(Type obj, P param) {
-    if (obj instanceof BaseType) {
-      return visitBaseType((BaseType) obj, param);
-    } else if (obj instanceof TypeType) {
-      return visitTypeType((TypeType) obj, param);
-    } else if (obj instanceof NamedElementType) {
-      return visitNamedElementType((NamedElementType) obj, param);
-    } else if (obj instanceof EnumType) {
-      return visitEnumType((EnumType) obj, param);
-    } else if (obj instanceof TypeAlias) {
-      return visitTypeAlias((TypeAlias) obj, param);
-    } else if (obj instanceof ArrayTemplate) {
+  protected R visitTypeTemplate(TypeTemplate obj, P param) {
+    if (obj instanceof ArrayTemplate) {
       return visitArrayTemplate((ArrayTemplate) obj, param);
     } else if (obj instanceof TypeTypeTemplate) {
       return visitTypeTypeTemplate((TypeTypeTemplate) obj, param);
@@ -314,7 +336,21 @@ public abstract class Traverser<R, P> {
     }
   }
 
-  protected R visitComponent(Component obj, P param) {
+  protected R visitType(Type obj, P param) {
+    if (obj instanceof BaseType) {
+      return visitBaseType((BaseType) obj, param);
+    } else if (obj instanceof TypeType) {
+      return visitTypeType((TypeType) obj, param);
+    } else if (obj instanceof NamedElementType) {
+      return visitNamedElementType((NamedElementType) obj, param);
+    } else if (obj instanceof EnumType) {
+      return visitEnumType((EnumType) obj, param);
+    } else {
+      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
+  }
+
+  protected R visitComponent(CompImpl obj, P param) {
     if (obj instanceof ImplElementary) {
       return visitImplElementary((ImplElementary) obj, param);
     } else if (obj instanceof ImplComposition) {
@@ -358,29 +394,19 @@ public abstract class Traverser<R, P> {
     }
   }
 
-  abstract protected R visitFuncImplResponse(FuncImplResponse obj, P param);
+  abstract protected R visitDeclaration(Template obj, P param);
 
-  abstract protected R visitFuncImplSlot(FuncImplSlot obj, P param);
+  abstract protected R visitFuncProtSlot(FuncSlot obj, P param);
 
-  abstract protected R visitFuncProtSlot(FuncProtSlot obj, P param);
+  abstract protected R visitFuncProtSignal(FuncSignal obj, P param);
 
-  abstract protected R visitFuncProtSignal(FuncProtSignal obj, P param);
+  abstract protected R visitFuncProtQuery(FuncQuery obj, P param);
 
-  abstract protected R visitFuncProtQuery(FuncProtQuery obj, P param);
+  abstract protected R visitFuncProtResponse(FuncResponse obj, P param);
 
-  abstract protected R visitFuncProtResponse(FuncProtResponse obj, P param);
+  abstract protected R visitFuncFunction(FuncFunction obj, P param);
 
-  abstract protected R visitFuncEntryExit(FuncEntryExit obj, P param);
-
-  abstract protected R visitFuncPrivateRet(FuncPrivateRet obj, P param);
-
-  abstract protected R visitFuncPrivateVoid(FuncPrivateVoid obj, P param);
-
-  abstract protected R visitFuncProtRet(FuncProtRet obj, P param);
-
-  abstract protected R visitFuncProtVoid(FuncProtVoid obj, P param);
-
-  abstract protected R visitFuncGlobal(FuncGlobal obj, P param);
+  abstract protected R visitFuncPrivateVoid(FuncProcedure obj, P param);
 
   abstract protected R visitStateSimple(StateSimple obj, P param);
 
@@ -397,8 +423,6 @@ public abstract class Traverser<R, P> {
   abstract protected R visitFuncVariable(FuncVariable obj, P param);
 
   abstract protected R visitStateVariable(StateVariable obj, P param);
-
-  abstract protected R visitTypeAlias(TypeAlias obj, P param);
 
   abstract protected R visitVoidType(VoidType obj, P param);
 
@@ -431,8 +455,6 @@ public abstract class Traverser<R, P> {
   abstract protected R visitTransition(Transition obj, P param);
 
   abstract protected R visitConnection(Connection obj, P param);
-
-  abstract protected R visitFuncPrivate(FuncPrivateVoid obj, P param);
 
   abstract protected R visitNamedElement(NamedElement obj, P param);
 
@@ -505,5 +527,9 @@ public abstract class Traverser<R, P> {
   abstract protected R visitNamedElementValue(NamedElementValue obj, P param);
 
   abstract protected R visitReference(Reference obj, P param);
+
+  abstract protected R visitSimpleRef(SimpleRef obj, P param);
+
+  abstract protected R visitDummyLinkTarget(DummyLinkTarget obj, P param);
 
 }

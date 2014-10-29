@@ -9,6 +9,7 @@ import evl.type.base.EnumType;
 import evl.type.base.RangeType;
 import evl.type.base.StringType;
 import evl.type.composed.RecordType;
+import evl.type.special.VoidType;
 
 public class CopyType extends NullTraverser<Type, Void> {
 
@@ -26,12 +27,13 @@ public class CopyType extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitRangeType(RangeType obj, Void param) {
-    return new RangeType(obj.getNumbers());
+    return new RangeType(obj.getInfo(), obj.getName(), obj.getNumbers());
   }
 
   @Override
   protected Type visitRecordType(RecordType obj, Void param) {
-    return new RecordType(obj.getInfo(), obj.getName(), cast.copy(obj.getElement().getList()));
+    RecordType type = new RecordType(obj.getInfo(), obj.getName(), cast.copy(obj.getElement()));
+    return type;
   }
 
   @Override
@@ -41,19 +43,24 @@ public class CopyType extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitArrayType(ArrayType obj, Void param) {
-    return new ArrayType(obj.getSize(), cast.copy(obj.getType()));
+    return new ArrayType(obj.getInfo(), obj.getName(), obj.getSize(), cast.copy(obj.getType()));
   }
 
   @Override
   protected Type visitEnumType(EnumType obj, Void param) {
     EnumType type = new EnumType(obj.getInfo(), obj.getName());
-    type.getElement().addAll(cast.copy(obj.getElement().getList()));
+    type.getElement().addAll(cast.copy(obj.getElement()));
     return type;
   }
 
   @Override
   protected Type visitBooleanType(BooleanType obj, Void param) {
     return new BooleanType();
+  }
+
+  @Override
+  protected Type visitVoidType(VoidType obj, Void param) {
+    return new VoidType();
   }
 
 }

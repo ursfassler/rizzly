@@ -1,14 +1,10 @@
 
-const
-  Answer : R{0,99} = 42;
+Answer : const R{0,99} = 42;
 
-component
-  TypedConst
-
-  implementation elementary
-    function foo():R{0,99}
-      return Answer;
-    end
-    
+TypedConst = Elementary
+  foo = function():R{0,99}
+    return Answer;
   end
+  
+end
 

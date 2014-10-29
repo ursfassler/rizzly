@@ -1,12 +1,7 @@
-component
-  Nop
-    slot   inp();
-    signal out();
+Nop = Composition
+  inp : slot();
+  out : signal();
 
-  implementation composition
-    
-    connection
-      inp -> out;
-
-  end
+  inp -> out;
+end
 

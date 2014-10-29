@@ -1,27 +1,22 @@
-component
-  Schmitt{Lower,Upper: R{0,1000}}
-    slot ind( value: R{0,1000} );
+Schmitt{Lower,Upper: R{0,1000}} = Hfsm
+  ind : slot( value: R{0,1000} );
       
-  implementation hfsm( Low )
-    state Low end
-    state High end
+  state( Low )
+    Low  : state;
+    High : state;
     
-    transition
-      Low to High by ind( value: R{0,1000} ) do
-        a : R{0,1000} = Upper;
-      end
-      High to Low by ind( value: R{0,1000} ) if value <= Lower;
+    Low to High by ind( value: R{0,1000} ) do
+      a : R{0,1000} = Upper;
+    end
+    High to Low by ind( value: R{0,1000} ) if value <= Lower;
   end
+end
   
-  Param
-    slot ind( value: R{0,1000} );
+Param = Composition
+  ind : slot( value: R{0,1000} );
+  
+  schmitt : Schmitt{90,110};
       
-  implementation composition
-    component
-      schmitt : Schmitt{90,110};
-      
-    connection
-      ind -> schmitt.ind;
-    
-  end
+  ind -> schmitt.ind;
+end
     

@@ -1,0 +1,11 @@
+
+Array1 = Elementary
+  vara  : Array{3,R{0,10}} = [ 2, 3, 5 ];
+
+  tickOut : response( x: R{0,2} ):R{0,10}
+    return vara[x];
+  end
+
+end
+
+

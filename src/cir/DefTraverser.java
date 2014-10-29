@@ -16,12 +16,10 @@ import cir.expression.reference.RefCall;
 import cir.expression.reference.RefIndex;
 import cir.expression.reference.RefName;
 import cir.expression.reference.Reference;
-import cir.function.FunctionImpl;
+import cir.function.FunctionPrivate;
 import cir.function.FunctionPrototype;
-import cir.other.Constant;
-import cir.other.FuncVariable;
+import cir.function.FunctionPublic;
 import cir.other.Program;
-import cir.other.StateVariable;
 import cir.statement.Assignment;
 import cir.statement.Block;
 import cir.statement.CallStmt;
@@ -48,6 +46,9 @@ import cir.type.UIntType;
 import cir.type.UnionType;
 import cir.type.UnsafeUnionType;
 import cir.type.VoidType;
+import cir.variable.Constant;
+import cir.variable.FuncVariable;
+import cir.variable.StateVariable;
 
 public class DefTraverser<R, P> extends Traverser<R, P> {
 
@@ -79,7 +80,15 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitFunctionImpl(FunctionImpl obj, P param) {
+  protected R visitFunctionPrivate(FunctionPrivate obj, P param) {
+    visitList(obj.getArgument(), param);
+    visit(obj.getRetType(), param);
+    visit(obj.getBody(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitFunctionPublic(FunctionPublic obj, P param) {
     visitList(obj.getArgument(), param);
     visit(obj.getRetType(), param);
     visit(obj.getBody(), param);

@@ -1,19 +1,18 @@
 package evl.statement.intern;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import common.ElementInfo;
 
 import evl.expression.Expression;
 import evl.expression.reference.Reference;
+import evl.other.EvlList;
 import evl.statement.Statement;
 
 public class MsgPush extends Statement {
   private Reference queue;
   private Reference func;
-  private final List<Expression> data = new ArrayList<Expression>();
+  private final EvlList<Expression> data = new EvlList<Expression>();
 
   public MsgPush(ElementInfo info, Reference queue, Reference func, Collection<Expression> data) {
     super(info);
@@ -38,7 +37,7 @@ public class MsgPush extends Statement {
     this.func = func;
   }
 
-  public List<Expression> getData() {
+  public EvlList<Expression> getData() {
     return data;
   }
 

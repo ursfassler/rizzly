@@ -11,20 +11,19 @@ import error.ErrorType;
 import error.RError;
 import evl.Evl;
 import evl.composition.ImplComposition;
-import evl.function.impl.FuncGlobal;
-import evl.function.impl.FuncImplResponse;
-import evl.function.impl.FuncImplSlot;
-import evl.function.impl.FuncPrivateRet;
-import evl.function.impl.FuncPrivateVoid;
-import evl.function.impl.FuncProtoRet;
-import evl.function.impl.FuncProtoVoid;
-import evl.function.impl.FuncSubHandlerEvent;
-import evl.function.impl.FuncSubHandlerQuery;
+import evl.function.header.FuncCtrlInDataIn;
+import evl.function.header.FuncCtrlInDataOut;
+import evl.function.header.FuncCtrlOutDataIn;
+import evl.function.header.FuncCtrlOutDataOut;
+import evl.function.header.FuncGlobal;
+import evl.function.header.FuncPrivateRet;
+import evl.function.header.FuncPrivateVoid;
+import evl.function.header.FuncSubHandlerEvent;
+import evl.function.header.FuncSubHandlerQuery;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.StateComposite;
 import evl.hfsm.StateSimple;
 import evl.hfsm.Transition;
-import evl.other.CompUse;
 import evl.other.ImplElementary;
 import evl.other.Queue;
 import evl.type.base.ArrayType;
@@ -39,6 +38,7 @@ import evl.variable.ConstGlobal;
 import evl.variable.ConstPrivate;
 import evl.variable.FuncVariable;
 import evl.variable.StateVariable;
+import fun.variable.CompUse;
 
 public class KnowScope extends KnowledgeEntry {
   @SuppressWarnings("rawtypes")
@@ -65,18 +65,19 @@ public class KnowScope extends KnowledgeEntry {
     global.add(ImplComposition.class);
     global.add(ImplHfsm.class);
 
+    global.add(FuncCtrlInDataIn.class);
+    global.add(FuncCtrlOutDataOut.class);
+    global.add(FuncCtrlInDataOut.class);
+    global.add(FuncCtrlOutDataIn.class);
+
     priv.add(Queue.class);
     priv.add(CompUse.class);
     priv.add(StateVariable.class);
     priv.add(ConstPrivate.class);
     priv.add(FuncPrivateRet.class);
     priv.add(FuncPrivateVoid.class);
-    priv.add(FuncImplResponse.class); // TODO: sure?
-    priv.add(FuncImplSlot.class); // TODO: sure?
     priv.add(FuncSubHandlerQuery.class); // TODO: sure?
     priv.add(FuncSubHandlerEvent.class); // TODO: sure?
-    priv.add(FuncProtoRet.class);
-    priv.add(FuncProtoVoid.class);
     priv.add(StateComposite.class);
     priv.add(StateSimple.class);
     priv.add(Transition.class);

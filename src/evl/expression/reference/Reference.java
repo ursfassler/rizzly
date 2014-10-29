@@ -1,55 +1,39 @@
 package evl.expression.reference;
 
-import java.util.Collection;
-import java.util.LinkedList;
-
 import common.ElementInfo;
 
-import evl.expression.Expression;
+import evl.other.EvlList;
 import evl.other.Named;
 
-public class Reference extends Expression {
-  final private LinkedList<RefItem> offset;
-  private Named link;
+final public class Reference extends BaseRef<Named> {
+  final private EvlList<RefItem> offset;
 
-  public Reference(ElementInfo info, Named link, Collection<RefItem> offset) {
-    super(info);
+  public Reference(ElementInfo info, Named link, EvlList<RefItem> offset) {
+    super(info, link);
     assert (link != null);
-    this.link = link;
-    this.offset = new LinkedList<RefItem>(offset);
+    this.offset = new EvlList<RefItem>(offset);
   }
 
   public Reference(ElementInfo info, Named link, RefItem itm) {
-    super(info);
+    super(info, link);
     assert (link != null);
-    this.link = link;
-    this.offset = new LinkedList<RefItem>();
+    this.offset = new EvlList<RefItem>();
     this.offset.add(itm);
   }
 
   public Reference(ElementInfo info, Named link) {
-    super(info);
+    super(info, link);
     assert (link != null);
-    this.link = link;
-    this.offset = new LinkedList<RefItem>();
+    this.offset = new EvlList<RefItem>();
   }
 
-  public LinkedList<RefItem> getOffset() {
+  public EvlList<RefItem> getOffset() {
     return offset;
-  }
-
-  public Named getLink() {
-    return link;
-  }
-
-  public void setLink(Named link) {
-    assert (link != null);
-    this.link = link;
   }
 
   @Override
   public String toString() {
-    String ret = link.getName();
+    String ret = super.toString();
     for (RefItem item : offset) {
       ret += item.toString();
     }

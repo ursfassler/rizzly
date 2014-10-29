@@ -2,8 +2,9 @@ package cir.type;
 
 import cir.CirBase;
 import cir.expression.reference.Referencable;
+import cir.other.Named;
 
-public class EnumElement extends CirBase implements Referencable {
+public class EnumElement extends CirBase implements Named, Referencable {
   private String name;
   private int value;
   private Type type;
@@ -27,7 +28,6 @@ public class EnumElement extends CirBase implements Referencable {
     return type;
   }
 
-  @Override
   public void setName(String name) {
     this.name = name;
   }

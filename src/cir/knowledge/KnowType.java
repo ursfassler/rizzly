@@ -7,13 +7,13 @@ import cir.expression.reference.RefIndex;
 import cir.expression.reference.RefItem;
 import cir.expression.reference.RefName;
 import cir.expression.reference.Reference;
-import cir.other.Variable;
 import cir.type.ArrayType;
 import cir.type.EnumElement;
 import cir.type.NamedElemType;
 import cir.type.NamedElement;
 import cir.type.Type;
 import cir.type.TypeRef;
+import cir.variable.Variable;
 
 public class KnowType extends KnowledgeEntry {
   private static KnowTypeTraverser traverser = new KnowTypeTraverser();

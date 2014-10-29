@@ -3,44 +3,40 @@ package evl.copy;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import evl.Evl;
 import evl.NullTraverser;
 import evl.expression.Expression;
 import evl.expression.reference.RefItem;
-import evl.function.FunctionBase;
-import evl.hfsm.State;
+import evl.function.Function;
 import evl.hfsm.StateItem;
 import evl.hfsm.Transition;
-import evl.other.CompUse;
+import evl.other.EvlList;
 import evl.other.ImplElementary;
 import evl.other.Named;
 import evl.other.Queue;
 import evl.other.RizzlyProgram;
 import evl.other.SubCallbacks;
 import evl.statement.CaseOpt;
-import evl.statement.CaseOptEntry;
 import evl.statement.CaseOptRange;
 import evl.statement.CaseOptValue;
 import evl.statement.IfOption;
 import evl.statement.Statement;
 import evl.type.Type;
-import evl.type.TypeRef;
 import evl.type.base.EnumElement;
 import evl.type.composed.NamedElement;
 import evl.variable.Variable;
 
 class CopyEvl extends NullTraverser<Evl, Void> {
   // / keeps the old -> new Named objects in order to relink references
-  private Map<Named, Named> copied = new HashMap<Named, Named>();
-  private CopyFunction func = new CopyFunction(this);
-  private CopyVariable var = new CopyVariable(this);
-  private CopyExpression expr = new CopyExpression(this);
-  private CopyType type = new CopyType(this);
-  private CopyStatement stmt = new CopyStatement(this);
-  private CopyRef ref = new CopyRef(this);
+  final private Map<Named, Named> copied = new HashMap<Named, Named>();
+  final private CopyFunction func = new CopyFunction(this);
+  final private CopyVariable var = new CopyVariable(this);
+  final private CopyExpression expr = new CopyExpression(this);
+  final private CopyType type = new CopyType(this);
+  final private CopyStatement stmt = new CopyStatement(this);
+  final private CopyRef ref = new CopyRef(this);
 
   public Map<Named, Named> getCopied() {
     return copied;
@@ -59,6 +55,14 @@ class CopyEvl extends NullTraverser<Evl, Void> {
     return ret;
   }
 
+  public <T extends Evl> EvlList<T> copy(EvlList<T> obj) {
+    EvlList<T> ret = new EvlList<T>();
+    for (T itr : obj) {
+      ret.add(copy(itr));
+    }
+    return ret;
+  }
+
   @Override
   protected Evl visitDefault(Evl obj, Void param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
@@ -66,45 +70,44 @@ class CopyEvl extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visit(Evl obj, Void param) {
-    if (obj instanceof Named) {
-      if (copied.containsKey(obj)) {
-        Named ret = copied.get(obj);
-        assert (ret != null);
-        return ret;
-      } else {
-        Evl nobj = super.visit(obj, param);
-        assert (nobj instanceof Named);
+    if (copied.containsKey(obj)) {
+      Evl ret = copied.get(obj);
+      assert (ret != null);
+      return ret;
+    } else {
+      Evl nobj = super.visit(obj, param);
+      if (obj instanceof Named) {
         copied.put((Named) obj, (Named) nobj);
-        return nobj;
       }
+      nobj.properties().putAll(obj.properties());
+      return nobj;
     }
-    return super.visit(obj, param);
   }
 
   @Override
   protected Evl visitRizzlyProgram(RizzlyProgram obj, Void param) {
-    RizzlyProgram ret = new RizzlyProgram(obj.getRootdir(), obj.getName());
-    ret.getConstant().addAll(copy(obj.getConstant().getList()));
-    ret.getFunction().addAll(copy(obj.getFunction().getList()));
-    ret.getType().addAll(copy(obj.getType().getList()));
-    ret.getVariable().addAll(copy(obj.getVariable().getList()));
+    RizzlyProgram ret = new RizzlyProgram(obj.getName());
+    ret.getConstant().addAll(copy(obj.getConstant()));
+    ret.getFunction().addAll(copy(obj.getFunction()));
+    ret.getType().addAll(copy(obj.getType()));
+    ret.getVariable().addAll(copy(obj.getVariable()));
     return ret;
   }
 
   @Override
   protected Evl visitQueue(Queue obj, Void param) {
-    return new Queue(obj.getName());
+    return new Queue();
   }
 
   @Override
   protected Evl visitSubCallbacks(SubCallbacks obj, Void param) {
-    SubCallbacks ret = new SubCallbacks(obj.getInfo(), obj.getName());
-    ret.addAll(copy(obj.getList()));
+    SubCallbacks ret = new SubCallbacks(obj.getInfo(), copy(obj.getCompUse()));
+    ret.getFunc().addAll(copy(obj.getFunc()));
     return ret;
   }
 
   @Override
-  protected Evl visitFunctionBase(FunctionBase obj, Void param) {
+  protected Evl visitFunctionImpl(Function obj, Void param) {
     return func.traverse(obj, param);
   }
 
@@ -134,47 +137,24 @@ class CopyEvl extends NullTraverser<Evl, Void> {
   }
 
   @Override
-  protected Evl visitCompUse(CompUse obj, Void param) {
-    return new CompUse(obj.getInfo(), obj.getName(), obj.getLink()); // we keep link to old Component
-  }
-
-  @Override
   protected Evl visitImplElementary(ImplElementary obj, Void param) {
-    ImplElementary ret = new ImplElementary(obj.getInfo(), obj.getName());
+    ImplElementary ret = new ImplElementary(obj.getInfo(), obj.getName(), copy(obj.getEntryFunc()), copy(obj.getExitFunc()));
 
-    ret.getSignal().addAll(copy(obj.getSignal().getList()));
-    ret.getSlot().addAll(copy(obj.getSlot().getList()));
-    ret.getResponse().addAll(copy(obj.getResponse().getList()));
-    ret.getQuery().addAll(copy(obj.getQuery().getList()));
+    ret.getFunction().addAll(copy(obj.getFunction()));
+    ret.getIface().addAll(copy(obj.getIface()));
+
     ret.setQueue(copy(obj.getQueue()));
-    ret.getVariable().addAll(copy(obj.getVariable().getList()));
-    ret.getConstant().addAll(copy(obj.getConstant().getList()));
-    ret.getComponent().addAll(copy(obj.getComponent().getList()));
-    ret.getFunction().addAll(copy(obj.getFunction().getList()));
-    ret.getSubCallback().addAll(copy(obj.getSubCallback().getList()));
-    ret.setEntryFunc(copy(obj.getEntryFunc()));
-    ret.setExitFunc(copy(obj.getExitFunc()));
+    ret.getVariable().addAll(copy(obj.getVariable()));
+    ret.getConstant().addAll(copy(obj.getConstant()));
+    ret.getComponent().addAll(copy(obj.getComponent()));
+    ret.getSubCallback().addAll(copy(obj.getSubCallback()));
 
     return ret;
   }
 
   @Override
   protected StateItem visitTransition(Transition obj, Void param) {
-    // State src = cast.copy(obj.getSrcS()); //TODO correct?
-    // State dst = cast.copy(obj.getDstS());
-    State src = obj.getSrc(); // TODO correct?
-    State dst = obj.getDst();
-    return new Transition(obj.getInfo(), obj.getName(), src, dst, copy(obj.getEventFunc()), copy(obj.getGuard()), copy(obj.getParam().getList()), copy(obj.getBody()));
-  }
-
-  @Override
-  protected Evl visitTypeRef(TypeRef obj, Void param) {
-    return new TypeRef(obj.getInfo(), obj.getRef()); // we keep link to old type
-  }
-
-  @Override
-  protected Evl visitNamedElement(NamedElement obj, Void param) {
-    return new NamedElement(obj.getInfo(), obj.getName(), copy(obj.getType()));
+    return new Transition(obj.getInfo(), copy(obj.getSrc()), copy(obj.getDst()), copy(obj.getEventFunc()), copy(obj.getGuard()), copy(obj.getParam()), copy(obj.getBody()));
   }
 
   @Override
@@ -189,11 +169,7 @@ class CopyEvl extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitCaseOpt(CaseOpt obj, Void param) {
-    List<CaseOptEntry> entries = new ArrayList<CaseOptEntry>();
-    for (CaseOptEntry itr : obj.getValue()) {
-      entries.add(copy(itr));
-    }
-    return new CaseOpt(obj.getInfo(), entries, copy(obj.getCode()));
+    return new CaseOpt(obj.getInfo(), copy(obj.getValue()), copy(obj.getCode()));
   }
 
   @Override
@@ -204,6 +180,11 @@ class CopyEvl extends NullTraverser<Evl, Void> {
   @Override
   protected Evl visitCaseOptRange(CaseOptRange obj, Void param) {
     return new CaseOptRange(obj.getInfo(), copy(obj.getStart()), copy(obj.getEnd()));
+  }
+
+  @Override
+  protected Evl visitNamedElement(NamedElement obj, Void param) {
+    return new NamedElement(obj.getInfo(), obj.getName(), copy(obj.getRef()));
   }
 
 }

@@ -1,13 +1,9 @@
-component
-  ArrayTest5
-    slot   inp( x: Array{10,R{0,31}} );
-    signal out( x: Array{10,R{0,100}} );
-      
-  implementation elementary
-
-    slot inp( x: Array{10,R{0,31}} )
-      out( x );
-    end
-
+ArrayTest5 = Elementary
+  out : signal( x: Array{10,R{0,100}} );
+    
+  inp : slot( x: Array{10,R{0,31}} )
+    out( x );
   end
+
+end
 

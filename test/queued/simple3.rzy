@@ -1,12 +1,7 @@
-component
-  Simple3
-    slot   ind( x: R{0,100} );
-    signal out( x: R{0,100} );
+Simple3 = Composition
+  ind : slot( x: R{0,100} );
+  out : signal( x: R{0,100} );
 
-  implementation composition
-    
-    connection
-      ind >> out;
-      
-  end
+  ind >> out;
+end
 

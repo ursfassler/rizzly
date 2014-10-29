@@ -1,52 +1,34 @@
 package evl.composition;
 
-import common.Designator;
 import common.ElementInfo;
 
-import evl.function.FuncIface;
+import evl.function.Function;
 import evl.other.CompUse;
 
-public class EndpointSub extends Endpoint {
-  private CompUse comp;
-  private String iface;
+final public class EndpointSub extends Endpoint<CompUse> {
+  private String function;
 
-  public EndpointSub(ElementInfo info, CompUse comp, String iface) {
-    super(info);
-    this.comp = comp;
-    this.iface = iface;
+  public EndpointSub(ElementInfo info, CompUse link, String function) {
+    super(info, link);
+    this.function = function;
   }
 
-  public CompUse getComp() {
-    return comp;
+  public String getFunction() {
+    return function;
   }
 
-  public void setComp(CompUse comp) {
-    this.comp = comp;
-  }
-
-  public String getIface() {
-    return iface;
-  }
-
-  public void setIface(String iface) {
-    this.iface = iface;
+  public void setFunction(String function) {
+    this.function = function;
   }
 
   @Override
-  public FuncIface getIfaceUse() {
-    FuncIface ret = comp.getLink().getIface().find(iface);
-    assert (ret != null);
-    return ret;
-  }
-
-  @Override
-  public Designator getDes() {
-    return new Designator(comp.getName(), iface);
+  public Function getFunc() {
+    return (Function) getLink().getLink().getIface().find(function);
   }
 
   @Override
   public String toString() {
-    return comp.getName() + "." + iface;
+    return getLink().getName() + "." + function;
   }
 
 }

@@ -1,41 +1,28 @@
 package fun.expression.reference;
 
-import java.util.LinkedList;
-
 import common.ElementInfo;
 
-import fun.expression.Expression;
+import fun.other.FunList;
 import fun.other.Named;
 
-final public class Reference extends Expression {
-  private Named link;
-  final private LinkedList<RefItem> offset = new LinkedList<RefItem>();
+final public class Reference extends BaseRef {
+  final private FunList<RefItem> offset = new FunList<RefItem>();
 
   public Reference(ElementInfo info, Named link) {
-    super(info);
-    this.link = link;
+    super(info, link);
   }
 
-  public Reference(ElementInfo info, String link) {
-    super(info);
-    this.link = new DummyLinkTarget(info, link);
+  public Reference(ElementInfo info, String name) {
+    super(info, new DummyLinkTarget(info, name));
   }
 
-  public Named getLink() {
-    return link;
-  }
-
-  public void setLink(Named link) {
-    this.link = link;
-  }
-
-  public LinkedList<RefItem> getOffset() {
+  public FunList<RefItem> getOffset() {
     return offset;
   }
 
   @Override
   public String toString() {
-    String ret = link.getName();
+    String ret = super.toString();
     for (RefItem item : offset) {
       ret += item.toString();
     }

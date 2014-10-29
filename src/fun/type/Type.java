@@ -3,10 +3,11 @@ package fun.type;
 import common.ElementInfo;
 
 import fun.FunBase;
+import fun.content.FileContent;
 import fun.other.ActualTemplateArgument;
 import fun.other.Named;
 
-abstract public class Type extends FunBase implements Named, ActualTemplateArgument {
+abstract public class Type extends FunBase implements Named, ActualTemplateArgument, FileContent {
   private String name;
 
   public Type(ElementInfo info, String name) {

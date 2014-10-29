@@ -2,47 +2,37 @@ package evl.other;
 
 import common.ElementInfo;
 
-import evl.Evl;
-import evl.function.FunctionBase;
+import evl.EvlBase;
+import evl.function.Function;
 import evl.type.Type;
 import evl.variable.Constant;
 import evl.variable.StateVariable;
 
-public class RizzlyProgram implements Evl {
-  private String rootdir;
+public class RizzlyProgram extends EvlBase {
   private String name;
-  private ListOfNamed<Type> type = new ListOfNamed<Type>();
-  private ListOfNamed<StateVariable> variable = new ListOfNamed<StateVariable>();
-  private ListOfNamed<Constant> constant = new ListOfNamed<Constant>();
-  private ListOfNamed<FunctionBase> function = new ListOfNamed<FunctionBase>();
+  private EvlList<Type> type = new EvlList<Type>();
+  private EvlList<StateVariable> variable = new EvlList<StateVariable>();
+  private EvlList<Constant> constant = new EvlList<Constant>();
+  private EvlList<Function> function = new EvlList<Function>();
 
-  public RizzlyProgram(String rootdir, String name) {
-    super();
-    this.rootdir = rootdir;
+  public RizzlyProgram(String name) {
+    super(ElementInfo.NO);
     this.name = name;
   }
 
-  public String getRootdir() {
-    return rootdir;
-  }
-
-  public ElementInfo getInfo() {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  public ListOfNamed<Type> getType() {
+  public EvlList<Type> getType() {
     return type;
   }
 
-  public ListOfNamed<StateVariable> getVariable() {
+  public EvlList<StateVariable> getVariable() {
     return variable;
   }
 
-  public ListOfNamed<FunctionBase> getFunction() {
+  public EvlList<Function> getFunction() {
     return function;
   }
 
-  public ListOfNamed<Constant> getConstant() {
+  public EvlList<Constant> getConstant() {
     return constant;
   }
 

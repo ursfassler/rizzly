@@ -1,19 +1,12 @@
 
-type
-  Unsigned{T:Type{Natural}} = T;
-  
-component
-  TypeAlias1
-    slot ind();
-  
-  implementation elementary
+Unsigned{T:Type{Natural}} = T;
 
-    var
-      a : Unsigned{R{0,255}} = 0;
-      
-    slot ind()
-      a := 0;
-    end
+TypeAlias1 = Elementary
+  a : Unsigned{R{0,255}} = 0;
     
+  ind : slot()
+    a := 0;
   end
+  
+end
 

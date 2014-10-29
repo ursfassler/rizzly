@@ -1,8 +1,6 @@
 package evl.queue;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -11,7 +9,7 @@ import java.util.Set;
 
 import common.Designator;
 import common.ElementInfo;
-import common.FuncAttr;
+import common.Property;
 
 import evl.DefTraverser;
 import evl.copy.Copy;
@@ -28,14 +26,14 @@ import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
-import evl.function.FunctionHeader;
-import evl.function.impl.FuncImplResponse;
-import evl.function.impl.FuncImplSlot;
-import evl.function.impl.FuncPrivateVoid;
+import evl.expression.reference.SimpleRef;
+import evl.function.Function;
+import evl.function.header.FuncCtrlInDataIn;
+import evl.function.header.FuncCtrlInDataOut;
+import evl.function.header.FuncPrivateVoid;
 import evl.knowledge.KnowBaseItem;
-import evl.knowledge.KnowPath;
 import evl.knowledge.KnowledgeBase;
-import evl.other.ListOfNamed;
+import evl.other.EvlList;
 import evl.other.Namespace;
 import evl.other.Queue;
 import evl.statement.Assignment;
@@ -52,7 +50,7 @@ import evl.statement.Statement;
 import evl.statement.VarDefStmt;
 import evl.statement.intern.MsgPush;
 import evl.traverser.ClassGetter;
-import evl.type.TypeRef;
+import evl.type.Type;
 import evl.type.base.ArrayType;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
@@ -64,14 +62,11 @@ import evl.variable.StateVariable;
 
 public class QueueReduction {
 
-  private static final String MsgTagName = Designator.NAME_SEP + "msg";
-
   public static void process(Namespace classes, KnowledgeBase kb) {
     KnowBaseItem kbi = kb.getEntry(KnowBaseItem.class);
-    KnowPath kp = kb.getEntry(KnowPath.class);
 
     { // TODO keep queues of active components
-      Queue queue = new Queue(Designator.NAME_SEP + Queue.DEFAULT_NAME);
+      Queue queue = new Queue();
       Map<Queue, Queue> map = new HashMap<Queue, Queue>();
       for (Queue old : ClassGetter.get(Queue.class, classes)) {
         map.put(old, queue);
@@ -83,39 +78,41 @@ public class QueueReduction {
     List<MsgPush> pushes = ClassGetter.get(MsgPush.class, classes);
 
     // Find destination functions
-    Map<Queue, Set<FunctionHeader>> queues = new HashMap<Queue, Set<FunctionHeader>>();
-    Set<FunctionHeader> funcs = new HashSet<FunctionHeader>();
+    Map<Queue, Set<Function>> queues = new HashMap<Queue, Set<Function>>();
+    Set<Function> funcs = new HashSet<Function>();
     for (MsgPush push : pushes) {
       Queue queue = (Queue) push.getQueue().getLink();
-      Set<FunctionHeader> set = queues.get(queue);
+      Set<Function> set = queues.get(queue);
       if (set == null) {
-        set = new HashSet<FunctionHeader>();
+        set = new HashSet<Function>();
         queues.put(queue, set);
       }
-      FunctionHeader func = (FunctionHeader) push.getFunc().getLink();
+      Function func = (Function) push.getFunc().getLink();
       set.add(func);
       funcs.add(func);
     }
 
     // create msg content types
-    Map<FunctionHeader, RecordType> funrec = new HashMap<FunctionHeader, RecordType>();
-    for (FunctionHeader func : funcs) {
-      Designator path = kp.get(func);
-      assert (path.size() > 0);
-      String name = new Designator(path, func.getName()).toString(Designator.NAME_SEP);
+    Map<Function, RecordType> funrec = new HashMap<Function, RecordType>();
+    for (Function func : funcs) {
+      // Designator path = kp.get(func);
+      // assert (path.size() > 0);
+      // String name = new Designator(path, func.getName()).toString(Designator.NAME_SEP);
+      String name = Integer.toString(func.hashCode());
 
-      RecordType rec = new RecordType(func.getInfo(), Designator.NAME_SEP + "msg" + Designator.NAME_SEP + name, new ArrayList<NamedElement>());
-
+      EvlList<NamedElement> elements = new EvlList<NamedElement>();
       for (FuncVariable arg : func.getParam()) {
-        rec.getElement().add(new NamedElement(arg.getInfo(), arg.getName(), arg.getType().copy()));
+        NamedElement elem = new NamedElement(arg.getInfo(), arg.getName(), new SimpleRef<Type>(ElementInfo.NO, arg.getType().getLink()));
+        elements.add(elem);
       }
+      RecordType rec = new RecordType(func.getInfo(), Designator.NAME_SEP + "msg" + Designator.NAME_SEP + name, elements);
 
       funrec.put(func, rec);
 
       classes.add(rec);
     }
 
-    Map<FunctionHeader, FuncPrivateVoid> pushfunc = new HashMap<FunctionHeader, FuncPrivateVoid>();
+    Map<Function, Function> pushfunc = new HashMap<Function, Function>();
 
     for (Queue queue : queues.keySet()) {
       // create queue type (union of records)
@@ -123,26 +120,30 @@ public class QueueReduction {
 
       ElementInfo info = queue.getInfo();
       EnumType msgType = new EnumType(info, prefix + "msgid");
-      Map<FunctionHeader, NamedElement> elements = new HashMap<FunctionHeader, NamedElement>();
+      Map<Function, NamedElement> elements = new HashMap<Function, NamedElement>();
 
-      Map<FunctionHeader, EnumElement> funem = new HashMap<FunctionHeader, EnumElement>();
+      Map<Function, EnumElement> funem = new HashMap<Function, EnumElement>();
 
-      for (FunctionHeader func : queues.get(queue)) {
-        Designator path = kp.get(func);
-        assert (path.size() > 0);
-        String name = new Designator(path, func.getName()).toString(Designator.NAME_SEP);
+      NamedElement tag = new NamedElement(info, "_tag", new SimpleRef<Type>(info, msgType));
 
-        NamedElement elem = new NamedElement(info, name, new TypeRef(info, funrec.get(func)));
+      EvlList<NamedElement> unielem = new EvlList<NamedElement>();
+      for (Function func : queues.get(queue)) {
+        // TODO add name
+        // Designator path = kp.get(func);
+        // assert (path.size() > 0);
+        // String name = new Designator(path, func.getName()).toString(Designator.NAME_SEP);
+        // String name = new Designator(path, Integer.toString(func.hashCode())).toString(Designator.NAME_SEP);
+
+        NamedElement elem = new NamedElement(info, func.getName(), new SimpleRef<Type>(info, funrec.get(func)));
         elements.put(func, elem);
+        unielem.add(elem);
 
-        EnumElement enumElem = new EnumElement(info, prefix + name);
+        EnumElement enumElem = new EnumElement(info, prefix + func.getName());
         msgType.getElement().add(enumElem);
 
         funem.put(func, enumElem);
       }
-
-      NamedElement tag = new NamedElement(info, MsgTagName, new TypeRef(info, msgType));
-      UnionType uni = new UnionType(info, prefix + "queue", elements.values(), tag);
+      UnionType uni = new UnionType(info, prefix + "queue", unielem, tag);
 
       classes.add(msgType);
       classes.add(uni);
@@ -151,47 +152,45 @@ public class QueueReduction {
 
       int queueSize = 20;  // FIXME remove magic
       // create queue variable
-      ArrayType qat = new ArrayType(BigInteger.valueOf(queueSize), new TypeRef(info, uni));
+      ArrayType qat = new ArrayType(BigInteger.valueOf(queueSize), new SimpleRef<Type>(info, uni));
       classes.add(qat);
-      StateVariable qv = new StateVariable(info, prefix + "vdata", new TypeRef(info, qat), new ArrayValue(info, new ArrayList<Expression>()));
+      StateVariable qv = new StateVariable(info, prefix + "vdata", new SimpleRef<Type>(info, qat), new ArrayValue(info, new EvlList<Expression>()));
       classes.add(qv);
 
-      StateVariable qh = new StateVariable(info, prefix + "vhead", new TypeRef(info, kbi.getRangeType(queueSize)), new Number(info, BigInteger.ZERO));
+      StateVariable qh = new StateVariable(info, prefix + "vhead", new SimpleRef<Type>(info, kbi.getRangeType(queueSize)), new Number(info, BigInteger.ZERO));
       classes.add(qh);
 
-      StateVariable qc = new StateVariable(info, prefix + "vcount", new TypeRef(info, kbi.getRangeType(queueSize + 1)), new Number(info, BigInteger.ZERO));
+      StateVariable qc = new StateVariable(info, prefix + "vcount", new SimpleRef<Type>(info, kbi.getRangeType(queueSize + 1)), new Number(info, BigInteger.ZERO));
       classes.add(qc);
 
       // function to return number of elements in queue
-      FuncImplResponse sizefunc = new FuncImplResponse(info, prefix + "count", new ListOfNamed<FuncVariable>());
-      sizefunc.setAttribute(FuncAttr.Public);
-      sizefunc.setRet(qc.getType().copy());
       Block sfb = new Block(info);
       sfb.getStatements().add(new ReturnExpr(info, new Reference(info, qc)));
-      sizefunc.setBody(sfb);
+      Function sizefunc = new FuncCtrlInDataOut(info, prefix + "count", new EvlList<FuncVariable>(), new SimpleRef<Type>(ElementInfo.NO, qc.getType().getLink()), sfb);
+      sizefunc.properties().put(Property.Public, true);
       classes.add(sizefunc);
 
       // create dispatch function
 
-      FuncImplSlot dispatcher = new FuncImplSlot(info, prefix + "dispatch", new ListOfNamed<FuncVariable>());
-      dispatcher.setAttribute(FuncAttr.Public);
       Block body = createDispatchBody(funem, funrec, elements, qv, qh, qc);
-      dispatcher.setBody(body);
+      Function dispatcher = new FuncCtrlInDataIn(info, prefix + "dispatch", new EvlList<FuncVariable>(), new SimpleRef<Type>(info, kbi.getVoidType()), body);
+      dispatcher.properties().put(Property.Public, true);
       classes.add(dispatcher);
 
       // create push functions
 
-      for (FunctionHeader func : queues.get(queue)) {
-        Designator path = kp.get(func);
-        assert (path.size() > 0);
-        String name = new Designator(path, func.getName()).toString(Designator.NAME_SEP);
+      for (Function func : queues.get(queue)) {
+        // Designator path = kp.get(func);
+        // assert (path.size() > 0);
+        // String name = new Designator(path, func.getName()).toString(Designator.NAME_SEP);
+        String name = func.getName();
 
-        FuncPrivateVoid pfunc = new FuncPrivateVoid(info, Designator.NAME_SEP + "push" + Designator.NAME_SEP + name, new ListOfNamed<FuncVariable>(Copy.copy(func.getParam().getList())));
+        EvlList<FuncVariable> param = Copy.copy(func.getParam());
+        Function impl = new FuncPrivateVoid(info, Designator.NAME_SEP + "push" + Designator.NAME_SEP + name, param, new SimpleRef<Type>(info, kbi.getVoidType()), createPushBody(param, qv, qh, qc, queueSize, uni, msgType, funem.get(func), elements.get(func)));
+        // impl.properties().put(Property.NAME, Designator.NAME_SEP + "push" + Designator.NAME_SEP + name);
 
-        pfunc.setBody(createPushBody(pfunc, qv, qh, qc, queueSize, uni, msgType, funem.get(func), elements.get(func)));
-
-        classes.add(pfunc);
-        pushfunc.put(func, pfunc);
+        classes.add(impl);
+        pushfunc.put(func, impl);
       }
 
     }
@@ -200,14 +199,14 @@ public class QueueReduction {
     pr.traverse(classes, pushfunc);
   }
 
-  private static Block createPushBody(FuncPrivateVoid pfunc, StateVariable qv, StateVariable qh, StateVariable qc, int queueSize, UnionType uni, EnumType msgType, EnumElement enumElement, NamedElement namedElement) {
-    ElementInfo info = pfunc.getInfo();
+  private static Block createPushBody(EvlList<FuncVariable> param, StateVariable qv, StateVariable qh, StateVariable qc, int queueSize, UnionType uni, EnumType msgType, EnumElement enumElement, NamedElement namedElement) {
+    ElementInfo info = ElementInfo.NO;
 
-    Collection<IfOption> option = new ArrayList<IfOption>();
+    EvlList<IfOption> option = new EvlList<IfOption>();
 
     Block pushbody = new Block(info);
 
-    FuncVariable idx = new FuncVariable(info, "wridx", new TypeRef(info, qh.getType().getRef()));
+    FuncVariable idx = new FuncVariable(info, "wridx", new SimpleRef<Type>(info, qh.getType().getLink()));
     pushbody.getStatements().add(new VarDefStmt(info, idx));
     pushbody.getStatements().add(new Assignment(info, new Reference(info, idx), new Mod(info, new Plus(info, new Reference(info, qh), new Reference(info, qc)), new Number(info, BigInteger.valueOf(queueSize)))));
 
@@ -216,7 +215,7 @@ public class QueueReduction {
     qir.getOffset().add(new RefName(info, uni.getTag().getName()));
     pushbody.getStatements().add(new Assignment(info, qir, new Reference(info, enumElement)));
 
-    for (FuncVariable arg : pfunc.getParam()) {
+    for (FuncVariable arg : param) {
       Reference elem = new Reference(info, qv);
       elem.getOffset().add(new RefIndex(info, new Reference(info, idx)));
       elem.getOffset().add(new RefName(info, namedElement.getName()));
@@ -235,25 +234,28 @@ public class QueueReduction {
     return body;
   }
 
-  private static Block createDispatchBody(Map<FunctionHeader, EnumElement> funem, Map<FunctionHeader, RecordType> funrec, Map<FunctionHeader, NamedElement> elements, StateVariable qdata, StateVariable qhead, StateVariable qsize) {
-    ElementInfo info = new ElementInfo();
+  private static Block createDispatchBody(Map<Function, EnumElement> funem, Map<Function, RecordType> funrec, Map<Function, NamedElement> elements, StateVariable qdata, StateVariable qhead, StateVariable qsize) {
+    ElementInfo info = ElementInfo.NO;
 
     Block body = new Block(info);
 
-    List<CaseOpt> opt = new ArrayList<CaseOpt>();
+    ArrayType dt = (ArrayType) qdata.getType().getLink();
+    UnionType ut = (UnionType) dt.getType().getLink();
+
+    EvlList<CaseOpt> opt = new EvlList<CaseOpt>();
     Reference ref = new Reference(info, qdata);
     ref.getOffset().add(new RefIndex(info, new Reference(info, qhead)));
-    ref.getOffset().add(new RefName(info, MsgTagName));
+    ref.getOffset().add(new RefName(info, ut.getTag().getName()));
     CaseStmt caseStmt = new CaseStmt(info, ref, opt, new Block(info));
 
-    for (FunctionHeader func : funem.keySet()) {
-      List<CaseOptEntry> value = new ArrayList<CaseOptEntry>();
+    for (Function func : funem.keySet()) {
+      EvlList<CaseOptEntry> value = new EvlList<CaseOptEntry>();
       value.add(new CaseOptValue(info, new Reference(info, funem.get(func))));
       CaseOpt copt = new CaseOpt(info, value, new Block(info));
 
       NamedElement un = elements.get(func);
       RecordType rec = funrec.get(func);
-      ArrayList<Expression> acarg = new ArrayList<Expression>();
+      EvlList<Expression> acarg = new EvlList<Expression>();
       for (NamedElement elem : rec.getElement()) {
         Reference vref = new Reference(info, qdata);
         vref.getOffset().add(new RefIndex(info, new Reference(info, qhead)));
@@ -272,7 +274,7 @@ public class QueueReduction {
     Assignment add = new Assignment(info, new Reference(info, qhead), new Plus(info, new Reference(info, qhead), new Number(info, BigInteger.ONE)));
     Assignment sub = new Assignment(info, new Reference(info, qsize), new Minus(info, new Reference(info, qsize), new Number(info, BigInteger.ONE)));
 
-    ArrayList<IfOption> option = new ArrayList<IfOption>();
+    EvlList<IfOption> option = new EvlList<IfOption>();
     IfOption ifOption = new IfOption(info, new Greater(info, new Reference(info, qsize), new Number(info, BigInteger.ZERO)), new Block(info));
     ifOption.getCode().getStatements().add(caseStmt);
     ifOption.getCode().getStatements().add(sub);
@@ -286,10 +288,10 @@ public class QueueReduction {
   }
 }
 
-class PushReplacer extends DefTraverser<Statement, Map<FunctionHeader, FuncPrivateVoid>> {
+class PushReplacer extends DefTraverser<Statement, Map<Function, Function>> {
 
   @Override
-  protected Statement visitBlock(Block obj, Map<FunctionHeader, FuncPrivateVoid> param) {
+  protected Statement visitBlock(Block obj, Map<Function, Function> param) {
     for (int i = 0; i < obj.getStatements().size(); i++) {
       Statement stmt = visit(obj.getStatements().get(i), param);
       if (stmt != null) {
@@ -300,7 +302,7 @@ class PushReplacer extends DefTraverser<Statement, Map<FunctionHeader, FuncPriva
   }
 
   @Override
-  protected Statement visitMsgPush(MsgPush obj, Map<FunctionHeader, FuncPrivateVoid> param) {
+  protected Statement visitMsgPush(MsgPush obj, Map<Function, Function> param) {
     assert (param.containsKey(obj.getFunc().getLink()));
 
     Reference call = new Reference(obj.getInfo(), param.get(obj.getFunc().getLink()));

@@ -1,18 +1,14 @@
 //test ok
 
-component
-  Elementary4
-    slot   evtIn( value: R{0,255} );
-    signal evtOut( value: R{0,255} );
+Elementary4 = Elementary
+  evtOut : signal( value: R{0,255} );
 
-  implementation elementary
-
-    function sqr( v: R{0,200} ):R{0,200}
-      return v*v mod 201;
-    end
-
-    slot evtIn( value: R{0,255} )
-      evtOut( sqr( value mod 201 ) );
-    end
+  sqr = function( v: R{0,200} ):R{0,200}
+    return v*v mod 201;
   end
-  
+
+  evtIn : slot( value: R{0,255} )
+    evtOut( sqr( value mod 201 ) );
+  end
+end
+

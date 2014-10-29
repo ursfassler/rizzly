@@ -1,21 +1,17 @@
-component
-  AlarmController
-    response getTime():R{0,99};
-    slot time( seconds: R{0,99} );
+AlarmController = Hfsm
+  getTime : response():R{0,99};
+  time    : slot( seconds: R{0,99} );
+  
+  state(Disabled)
+    atime   : R{0,99} = 0;
     
-  implementation hfsm(Disabled)
-    var
-      atime   : R{0,99} = 0;
-      
-    response getTime():R{0,99}
+    getTime : response():R{0,99}
       return atime;
     end
     
-    state Disabled
-    end
+    Disabled : state;
     
-    transition 
-      Disabled to Disabled by time( seconds: R{0,99} ) if 0 = seconds;
-    
-  end
+    Disabled to Disabled by time( seconds: R{0,99} ) if 0 = seconds;
+  end    
+end
 

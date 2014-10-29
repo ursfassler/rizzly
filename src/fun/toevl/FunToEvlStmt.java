@@ -1,11 +1,10 @@
 package fun.toevl;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import evl.expression.Expression;
 import evl.expression.reference.Reference;
+import evl.other.EvlList;
 import evl.statement.Statement;
+import evl.variable.FuncVariable;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.statement.Assignment;
@@ -55,7 +54,8 @@ public class FunToEvlStmt extends NullTraverser<Statement, Void> {
 
   @Override
   protected Statement visitVarDef(VarDefStmt obj, Void param) {
-    return new evl.statement.VarDefStmt(obj.getInfo(), (evl.variable.FuncVariable) fta.traverse(obj.getVariable(), null));
+    FuncVariable var = (FuncVariable) fta.traverse(obj.getVariable(), null);
+    return new evl.statement.VarDefStmt(obj.getInfo(), var);
   }
 
   @Override
@@ -70,7 +70,7 @@ public class FunToEvlStmt extends NullTraverser<Statement, Void> {
 
   @Override
   protected Statement visitCaseStmt(CaseStmt obj, Void param) {
-    List<evl.statement.CaseOpt> opt = new ArrayList<evl.statement.CaseOpt>();
+    EvlList<evl.statement.CaseOpt> opt = new EvlList<evl.statement.CaseOpt>();
     for (CaseOpt itr : obj.getOption()) {
       opt.add((evl.statement.CaseOpt) fta.traverse(itr, null));
     }
@@ -79,7 +79,7 @@ public class FunToEvlStmt extends NullTraverser<Statement, Void> {
 
   @Override
   protected Statement visitIfStmt(IfStmt obj, Void param) {
-    List<evl.statement.IfOption> opt = new ArrayList<evl.statement.IfOption>();
+    EvlList<evl.statement.IfOption> opt = new EvlList<evl.statement.IfOption>();
     for (IfOption itr : obj.getOption()) {
       evl.statement.IfOption nopt = new evl.statement.IfOption(obj.getInfo(), (Expression) fta.traverse(itr.getCondition(), null), (evl.statement.Block) fta.traverse(itr.getCode(), null));
       opt.add(nopt);

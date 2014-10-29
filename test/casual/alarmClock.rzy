@@ -1,27 +1,22 @@
 
-component
-  AlarmClock
-    slot   tick();
-    signal alarm();
+AlarmClock = Hfsm
+  tick : slot();
+  alarm : signal();
+  
+  state(Counting)
+    time    : R{0,5} = 5;
     
-  implementation hfsm(Counting)
-    var
-      time    : R{0,5} = 5;
-      
-    state Counting
+    Counting : state;
+    Off : state;
+    
+    Counting to Counting by tick() if time > 0 do
+      time := R{0,5}( time - 1 );
     end
     
-    state Off
+    Counting to Off by tick() if time = 0 do
+      alarm();
     end
-    
-    transition 
-      Counting to Counting by tick() if time > 0 do
-        time := R{0,5}( time - 1 );
-      end
-      
-      Counting to Off by tick() if time = 0 do
-        alarm();
-      end
-    
   end
+  
+end
 

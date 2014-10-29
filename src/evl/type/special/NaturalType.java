@@ -14,7 +14,7 @@ final public class NaturalType extends BaseType {
   public final static String NAME = "Natural";
 
   public NaturalType() {
-    super(new ElementInfo(), NAME);
+    super(ElementInfo.NO, NAME);
   }
 
 }

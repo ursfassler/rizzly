@@ -8,7 +8,7 @@ import fun.expression.reference.DummyLinkTarget;
 import fun.expression.reference.RefItem;
 import fun.expression.reference.RefName;
 import fun.expression.reference.Reference;
-import fun.knowledge.KnowFunChild;
+import fun.knowledge.KnowChild;
 import fun.other.Named;
 import fun.other.Namespace;
 import fun.other.RizzlyFile;
@@ -30,28 +30,30 @@ public class NamespaceLinkReduction extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitReference(Reference obj, Void param) {
-    Named item = obj.getLink();
+    Fun item = obj.getLink();
     assert (!(item instanceof DummyLinkTarget));
     while (item instanceof Namespace) {
-      RefItem next = obj.getOffset().pop();
+      RefItem next = obj.getOffset().get(0);
+      obj.getOffset().remove(0);
       if (!(next instanceof RefName)) {
         RError.err(ErrorType.Error, obj.getInfo(), "Expected named offset, got: " + next.getClass().getCanonicalName());
       }
       RefName name = (RefName) next;
-      item = ((Namespace) item).find(name.getName());
+      ((Namespace) item).getChildren().find(name.getName());
       assert (item != null); // type checker should find it?
     }
     if (item instanceof RizzlyFile) {
-      RefItem next = obj.getOffset().pop();
+      RefItem next = obj.getOffset().get(0);
+      obj.getOffset().remove(0);
       if (!(next instanceof RefName)) {
         RError.err(ErrorType.Error, obj.getInfo(), "Expected named offset, got: " + next.getClass().getCanonicalName());
       }
       RefName name = (RefName) next;
-      KnowFunChild kfc = new KnowFunChild();
+      KnowChild kfc = new KnowChild();
       item = kfc.get(item, name.getName());
       assert (item != null); // type checker should find it?
     }
-    obj.setLink(item);
+    obj.setLink((Named) item);
     return super.visitReference(obj, param);
   }
 

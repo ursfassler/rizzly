@@ -1,18 +1,17 @@
 package fun.statement;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import common.ElementInfo;
 
+import fun.other.FunList;
+
 public class Block extends Statement {
-  final private List<Statement> statements = new ArrayList<Statement>();
+  final private FunList<Statement> statements = new FunList<Statement>();
 
   public Block(ElementInfo info) {
     super(info);
   }
 
-  public List<Statement> getStatements() {
+  public FunList<Statement> getStatements() {
     return statements;
   }
 

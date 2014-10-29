@@ -1,24 +1,20 @@
 // Error: response is not allowed to output
 
-component
-  Err5
-    response what():R{0,100};
-    signal   event();
-      
-  implementation elementary
+Err5 = Elementary
+  event : signal();
     
-    function bar()
-      event();
-    end
-    
-    function foo()
-      bar();
-    end
-    
-    response what():R{0,100}
-      foo();
-      return 0;
-    end
-    
+  bar = procedure()
+    event();
   end
+  
+  foo = procedure()
+    bar();
+  end
+  
+  what : response():R{0,100}
+    foo();
+    return 0;
+  end
+  
+end
 

@@ -1,27 +1,24 @@
 package evl.composition;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import common.ElementInfo;
 
 import evl.other.CompUse;
 import evl.other.Component;
-import evl.other.ListOfNamed;
+import evl.other.EvlList;
 
 public class ImplComposition extends Component {
-  final private ListOfNamed<CompUse> component = new ListOfNamed<CompUse>();
-  final private List<Connection> connection = new ArrayList<Connection>();
+  final private EvlList<CompUse> component = new EvlList<CompUse>();
+  final private EvlList<Connection> connection = new EvlList<Connection>();
 
   public ImplComposition(ElementInfo info, String name) {
     super(info, name);
   }
 
-  public ListOfNamed<CompUse> getComponent() {
+  public EvlList<CompUse> getComponent() {
     return component;
   }
 
-  public List<Connection> getConnection() {
+  public EvlList<Connection> getConnection() {
     return connection;
   }
 

@@ -1,7 +1,5 @@
 package fun.toevl;
 
-import java.util.ArrayList;
-
 import error.ErrorType;
 import error.RError;
 import evl.Evl;
@@ -22,6 +20,8 @@ import evl.expression.binop.Or;
 import evl.expression.binop.Plus;
 import evl.expression.binop.Shl;
 import evl.expression.binop.Shr;
+import evl.other.EvlList;
+import evl.other.Named;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.expression.AnyValue;
@@ -36,6 +36,7 @@ import fun.expression.StringValue;
 import fun.expression.UnaryExpression;
 import fun.expression.reference.RefItem;
 import fun.expression.reference.Reference;
+import fun.expression.reference.SimpleRef;
 
 public class FunToEvlExpr extends NullTraverser<Evl, Void> {
   private FunToEvl fta;
@@ -53,12 +54,19 @@ public class FunToEvlExpr extends NullTraverser<Evl, Void> {
   // ----------------------------------------------------------------------------
   @Override
   protected Expression visitReference(Reference obj, Void param) {
-    ArrayList<evl.expression.reference.RefItem> ofs = new ArrayList<evl.expression.reference.RefItem>();
+    EvlList<evl.expression.reference.RefItem> ofs = new EvlList<evl.expression.reference.RefItem>();
     for (RefItem item : obj.getOffset()) {
       ofs.add((evl.expression.reference.RefItem) fta.traverse(item, null));
     }
-    evl.expression.reference.Reference ret = new evl.expression.reference.Reference(obj.getInfo(), (evl.other.Named) fta.traverse(obj.getLink(), null), ofs);
+    Named ref = (Named) fta.traverse(obj.getLink(), null);
+    evl.expression.reference.Reference ret = new evl.expression.reference.Reference(obj.getInfo(), ref, ofs);
     return ret;
+  }
+
+  @Override
+  protected Evl visitSimpleRef(SimpleRef obj, Void param) {
+    Evl ref = fta.traverse(obj.getLink(), null);
+    return new evl.expression.reference.SimpleRef(obj.getInfo(), (Named) ref);
   }
 
   @Override
@@ -73,7 +81,7 @@ public class FunToEvlExpr extends NullTraverser<Evl, Void> {
 
   @Override
   protected Expression visitArrayValue(ArrayValue obj, Void param) {
-    ArrayList<evl.expression.Expression> value = new ArrayList<evl.expression.Expression>();
+    EvlList<evl.expression.Expression> value = new EvlList<evl.expression.Expression>();
     for (fun.expression.Expression item : obj.getValue()) {
       value.add((evl.expression.Expression) fta.traverse(item, null));
     }
@@ -82,7 +90,7 @@ public class FunToEvlExpr extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitExprList(ExprList obj, Void param) {
-    ArrayList<evl.expression.Expression> value = new ArrayList<evl.expression.Expression>();
+    EvlList<evl.expression.Expression> value = new EvlList<evl.expression.Expression>();
     for (fun.expression.Expression item : obj.getValue()) {
       value.add((evl.expression.Expression) fta.traverse(item, null));
     }
@@ -107,26 +115,26 @@ public class FunToEvlExpr extends NullTraverser<Evl, Void> {
   @Override
   protected Expression visitArithmeticOp(ArithmeticOp obj, Void param) {
     switch (obj.getOp()) {
-    case PLUS:
-      return new Plus(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
-    case MINUS:
-      return new Minus(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
-    case MUL:
-      return new Mul(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
-    case DIV:
-      return new Div(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
-    case MOD:
-      return new Mod(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
-    case AND:
-      return new And(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
-    case OR:
-      return new Or(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
-    case SHL:
-      return new Shl(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
-    case SHR:
-      return new Shr(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
-    default:
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Unhandled case: " + obj.getOp());
+      case PLUS:
+        return new Plus(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
+      case MINUS:
+        return new Minus(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
+      case MUL:
+        return new Mul(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
+      case DIV:
+        return new Div(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
+      case MOD:
+        return new Mod(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
+      case AND:
+        return new And(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
+      case OR:
+        return new Or(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
+      case SHL:
+        return new Shl(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
+      case SHR:
+        return new Shr(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
+      default:
+        RError.err(ErrorType.Fatal, obj.getInfo(), "Unhandled case: " + obj.getOp());
     }
     return null;
   }
@@ -134,22 +142,22 @@ public class FunToEvlExpr extends NullTraverser<Evl, Void> {
   @Override
   protected Expression visitRelation(Relation obj, Void param) {
     switch (obj.getOp()) {
-    case EQUAL:
-      return new Equal(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
-    case NOT_EQUAL:
-      return new Notequal(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
-    case GREATER:
-      return new Greater(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
-    case GREATER_EQUEAL:
-      return new Greaterequal(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
-    case LESS:
-      return new Less(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
-    case LESS_EQUAL:
-      return new Lessequal(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
-    case IS:
-      return new Is(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
-    default:
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Unhandled case: " + obj.getOp());
+      case EQUAL:
+        return new Equal(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
+      case NOT_EQUAL:
+        return new Notequal(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
+      case GREATER:
+        return new Greater(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
+      case GREATER_EQUEAL:
+        return new Greaterequal(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
+      case LESS:
+        return new Less(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
+      case LESS_EQUAL:
+        return new Lessequal(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
+      case IS:
+        return new Is(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
+      default:
+        RError.err(ErrorType.Fatal, obj.getInfo(), "Unhandled case: " + obj.getOp());
     }
     return null;
   }
@@ -157,12 +165,12 @@ public class FunToEvlExpr extends NullTraverser<Evl, Void> {
   @Override
   protected Expression visitUnaryExpression(UnaryExpression obj, Void param) {
     switch (obj.getOp()) {
-    case MINUS:
-      return new evl.expression.unop.Uminus(obj.getInfo(), (Expression) fta.traverse(obj.getExpr(), null));
-    case NOT:
-      return new evl.expression.unop.Not(obj.getInfo(), (Expression) fta.traverse(obj.getExpr(), null));
-    default:
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Unhandled case: " + obj.getOp());
+      case MINUS:
+        return new evl.expression.unop.Uminus(obj.getInfo(), (Expression) fta.traverse(obj.getExpr(), null));
+      case NOT:
+        return new evl.expression.unop.Not(obj.getInfo(), (Expression) fta.traverse(obj.getExpr(), null));
+      default:
+        RError.err(ErrorType.Fatal, obj.getInfo(), "Unhandled case: " + obj.getOp());
     }
     return null;
   }

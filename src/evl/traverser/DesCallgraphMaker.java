@@ -10,12 +10,14 @@ import evl.expression.reference.RefCall;
 import evl.expression.reference.RefItem;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
-import evl.function.FunctionBase;
+import evl.function.Function;
 import evl.hfsm.ImplHfsm;
+import evl.knowledge.KnowPath;
+import evl.knowledge.KnowledgeBase;
+import evl.other.Component;
 import evl.other.ImplElementary;
 import evl.other.Namespace;
 import evl.other.RizzlyProgram;
-import evl.other.SubCallbacks;
 
 /**
  * Returns a callgraph of the entire (sub-) tree
@@ -23,19 +25,20 @@ import evl.other.SubCallbacks;
  * @author urs
  * 
  */
+// TODO verify output
 public class DesCallgraphMaker extends DefTraverser<Void, Designator> {
-
+  final private KnowPath kp;
   private SimpleGraph<Designator> callgraph = new SimpleGraph<Designator>();
 
-  public static SimpleGraph<Designator> make(ImplElementary inst) {
-    DesCallgraphMaker reduction = new DesCallgraphMaker();
-    reduction.traverse(inst, new Designator());
-    return reduction.callgraph;
+  public DesCallgraphMaker(KnowledgeBase kb) {
+    super();
+    this.kp = kb.getEntry(KnowPath.class);
   }
 
-  @Override
-  protected Void visitSubCallbacks(SubCallbacks obj, Designator param) {
-    return super.visitSubCallbacks(obj, new Designator(param, obj.getName()));
+  public static SimpleGraph<Designator> make(ImplElementary inst, KnowledgeBase kb) {
+    DesCallgraphMaker reduction = new DesCallgraphMaker(kb);
+    reduction.traverse(inst, new Designator());
+    return reduction.callgraph;
   }
 
   @Override
@@ -44,12 +47,11 @@ public class DesCallgraphMaker extends DefTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitFunctionBase(FunctionBase obj, Designator param) {
+  protected Void visitFunctionImpl(Function obj, Designator param) {
     assert (param != null);
-    param = new Designator(param, obj.getName());
-    assert (param.size() <= 3);
+    param = kp.get(obj);
     callgraph.addVertex(param);
-    return super.visitFunctionBase(obj, param);
+    return super.visitFunctionImpl(obj, param);
   }
 
   @Override
@@ -58,19 +60,17 @@ public class DesCallgraphMaker extends DefTraverser<Void, Designator> {
 
     Designator func = getIfFunc(obj);
     if (func != null) {
-      assert (func.size() <= 3);
-      assert (param.size() <= 3);
       callgraph.addVertex(func);
       callgraph.addEdge(param, func);
     }
     return null;
   }
 
-  static private Designator getIfFunc(Reference obj) {
+  private Designator getIfFunc(Reference obj) {
     if (obj.getOffset().isEmpty()) {
       return null;
     }
-    Designator ret = new Designator(obj.getLink().getName());
+    Designator ret = kp.get(obj.getLink());
     for (RefItem ref : obj.getOffset()) {
       if (ref instanceof RefCall) {
         break;
@@ -84,15 +84,23 @@ public class DesCallgraphMaker extends DefTraverser<Void, Designator> {
   }
 
   @Override
+  protected Void visitComponent(Component obj, Designator param) {
+    visitList(obj.getFunction(), param);
+    return null;
+  }
+
+  @Override
   protected Void visitImplComposition(ImplComposition obj, Designator param) {
     return super.visitImplComposition(obj, param);
   }
 
   @Override
   protected Void visitImplElementary(ImplElementary obj, Designator param) {
-    visitItr(obj.getFunction(), param);
-    visitItr(obj.getSubCallback(), param);
-    return null;
+    throw new RuntimeException("what is correct?");
+    // return super.visitImplElementary(obj, param);
+    //
+    // visitList(obj.getSubCallback(), param);
+    // return null;
   }
 
   @Override

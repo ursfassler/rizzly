@@ -2,52 +2,47 @@ package fun.other;
 
 import common.ElementInfo;
 
-import fun.expression.reference.Reference;
-import fun.function.FunctionHeader;
-import fun.variable.Constant;
-import fun.variable.Variable;
+import fun.Fun;
+import fun.content.CompIfaceContent;
+import fun.statement.Block;
 
-public class ImplElementary extends Component {
-  final private ListOfNamed<Variable> variable = new ListOfNamed<Variable>();
-  final private ListOfNamed<Constant> constant = new ListOfNamed<Constant>();
-  final private ListOfNamed<FunctionHeader> function = new ListOfNamed<FunctionHeader>();
-  private Reference entryFunc = null;
-  private Reference exitFunc = null;
+public class ImplElementary extends CompImpl {
+  final private FunList<Template> declaration = new FunList<Template>();
+  final private FunList<Fun> instantiation = new FunList<Fun>();
+  private Block entryFunc = new Block(ElementInfo.NO);
+  private Block exitFunc = new Block(ElementInfo.NO);
 
   public ImplElementary(ElementInfo info, String name) {
     super(info, name);
   }
 
-  public ListOfNamed<FunctionHeader> getFunction() {
-    return function;
+  public FunList<Template> getDeclaration() {
+    return declaration;
   }
 
-  public ListOfNamed<Variable> getVariable() {
-    return variable;
+  public FunList<Fun> getInstantiation() {
+    return instantiation;
   }
 
-  public ListOfNamed<Constant> getConstant() {
-    return constant;
-  }
-
-  public Reference getEntryFunc() {
-    assert (entryFunc != null);
+  public Block getEntryFunc() {
     return entryFunc;
   }
 
-  public void setEntryFunc(Reference entryFunc) {
-    assert (entryFunc != null);
-    this.entryFunc = entryFunc;
-  }
-
-  public Reference getExitFunc() {
-    assert (exitFunc != null);
+  public Block getExitFunc() {
     return exitFunc;
   }
 
-  public void setExitFunc(Reference exitFunc) {
-    assert (exitFunc != null);
+  public void setEntryFunc(Block entryFunc) {
+    this.entryFunc = entryFunc;
+  }
+
+  public void setExitFunc(Block exitFunc) {
     this.exitFunc = exitFunc;
+  }
+
+  @Override
+  public FunList<CompIfaceContent> getInterface() {
+    return findInterface(instantiation);
   }
 
 }

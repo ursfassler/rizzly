@@ -35,12 +35,12 @@ import evl.expression.binop.Plus;
 import evl.expression.binop.Shl;
 import evl.expression.binop.Shr;
 import evl.expression.reference.Reference;
+import evl.expression.reference.SimpleRef;
 import evl.expression.unop.Not;
 import evl.expression.unop.Uminus;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
 import evl.type.Type;
-import evl.type.TypeRef;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumType;
 import evl.type.base.RangeType;
@@ -48,8 +48,8 @@ import evl.type.base.RangeType;
 //TODO use KnowType to get types of children
 //TODO do not give type back
 public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
-  private KnowledgeBase kb;
-  private KnowType kt;
+  final private KnowledgeBase kb;
+  final private KnowType kt;
 
   public ExpressionTypeChecker(KnowledgeBase kb) {
     super();
@@ -128,8 +128,8 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
 
     if (!(type instanceof BooleanType)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Need boolean type for not, got: " + type.getName());  // TODO otherwise
-                                                                                                       // it is a bit
-                                                                                                       // not
+      // it is a bit
+      // not
       return null;
     }
     return null;
@@ -369,7 +369,7 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitTypeRef(TypeRef obj, Void param) {
+  protected Void visitTypeRef(SimpleRef obj, Void param) {
     return null;
   }
 

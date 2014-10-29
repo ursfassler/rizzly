@@ -2,31 +2,27 @@ package evl.type.base;
 
 import common.ElementInfo;
 
-import evl.other.ListOfNamed;
+import evl.other.EvlList;
 import evl.type.Type;
 
 public class EnumType extends Type {
-  final private ListOfNamed<EnumElement> element = new ListOfNamed<EnumElement>();
+  final private EvlList<EnumElement> element = new EvlList<EnumElement>();
 
   public EnumType(ElementInfo info, String name) {
     super(info, name);
   }
 
-  public ListOfNamed<EnumElement> getElement() {
+  public EvlList<EnumElement> getElement() {
     return element;
   }
 
+  @Deprecated
   public EnumElement find(String name) {
-    for (EnumElement itr : element) {
-      if (itr.getName().equals(name)) {
-        return itr;
-      }
-    }
-    return null;
+    return element.find(name);
   }
 
   public boolean isSupertypeOf(EnumType sub) {
-    return element.getList().containsAll(sub.element.getList());
+    return element.containsAll(sub.element);
   }
 
 }

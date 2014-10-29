@@ -1,19 +1,15 @@
-component
-  Boolext
-    slot   tick( value: Boolean );
-    signal on();
-    signal off();
-      
-    implementation elementary
-
-    slot tick( value: Boolean )
-      if value then
-        on();
-      else
-        off();
-      end
+Boolext = Elementary
+  on : signal();
+  off : signal();
+    
+  tick : slot( value: Boolean )
+    if value then
+      on();
+    else
+      off();
     end
-
   end
+
+end
 
 

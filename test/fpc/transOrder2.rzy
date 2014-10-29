@@ -1,25 +1,21 @@
 //test ok
 
-component
-  TransOrder2
-
-    slot   inp( val: R{0,10} );
-    signal out( val: R{0,10} );
-    
-  implementation hfsm(A)
-    transition 
-      A.AA to A by inp( val: R{0,10} ) do
-        out( 0 );
-      end
-      
-    state A(AA)
-      state AA
-      end
+TransOrder2 = Hfsm
+  inp : slot( val: R{0,10} );
+  out : signal( val: R{0,10} );
+  
+  state(A)
+    A.AA to A by inp( val: R{0,10} ) do
+      out( 0 );
     end
     
-    transition 
-      A to A by inp( val: R{0,10} ) do
-        out( 1 );
-      end
+    A : state(AA)
+      AA : state;
+    end
+  
+    A to A by inp( val: R{0,10} ) do
+      out( 1 );
+    end
   end
+end
 

@@ -58,7 +58,7 @@ public class CompareReplacer extends ExprReplacer<Void> {
 
 class MakeCompareFunction extends NullTraverser<Expression, Pair<Expression, Expression>> {
 
-  private static final ElementInfo info = new ElementInfo();
+  private static final ElementInfo info = ElementInfo.NO;
   private final KnowType kt;
 
   public MakeCompareFunction(KnowledgeBase kb) {

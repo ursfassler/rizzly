@@ -1,18 +1,18 @@
 package fun.expression;
 
-import java.util.List;
-
 import common.ElementInfo;
 
-public class ArrayValue extends Expression {
-  final private List<Expression> value;
+import fun.other.FunList;
 
-  public ArrayValue(ElementInfo info, List<Expression> value) {
+public class ArrayValue extends Expression {
+  final private FunList<Expression> value;
+
+  public ArrayValue(ElementInfo info, FunList<Expression> value) {
     super(info);
     this.value = value;
   }
 
-  public List<Expression> getValue() {
+  public FunList<Expression> getValue() {
     return value;
   }
 

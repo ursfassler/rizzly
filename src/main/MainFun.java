@@ -5,11 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
 
@@ -26,23 +23,20 @@ import fun.Fun;
 import fun.doc.DepGraph;
 import fun.doc.DocWriter;
 import fun.doc.FunPrinter;
-import fun.expression.AnyValue;
-import fun.expression.Expression;
+import fun.expression.reference.Reference;
 import fun.knowledge.KnowledgeBase;
-import fun.other.Component;
-import fun.other.Generator;
-import fun.other.Named;
+import fun.other.FunList;
 import fun.other.Namespace;
 import fun.other.RizzlyFile;
 import fun.other.SymbolTable;
+import fun.other.Template;
 import fun.traverser.CheckNames;
 import fun.traverser.CompLinkReduction;
-import fun.traverser.DeAlias;
 import fun.traverser.EnumLinkReduction;
 import fun.traverser.Linker;
 import fun.traverser.NamespaceLinkReduction;
 import fun.traverser.StateLinkReduction;
-import fun.traverser.spezializer.Specializer;
+import fun.traverser.spezializer.TypeEvalReplacer;
 import fun.type.Type;
 import fun.type.base.AnyType;
 import fun.type.base.BooleanType;
@@ -52,45 +46,39 @@ import fun.type.base.StringType;
 import fun.type.base.VoidType;
 import fun.type.template.ArrayTemplate;
 import fun.type.template.RangeTemplate;
+import fun.type.template.TypeTemplate;
 import fun.type.template.TypeTypeTemplate;
-import fun.variable.StateVariable;
+import fun.variable.CompUse;
+import fun.variable.TemplateParameter;
 
 public class MainFun {
-  private static ElementInfo info = new ElementInfo();
+  private static ElementInfo info = ElementInfo.NO;
 
-  public static Pair<String, Namespace> doFun(ClaOption opt, Designator rootfile, String debugdir, String docdir) {
-    Collection<RizzlyFile> fileList = loadFiles(rootfile, opt.getRootPath());
+  public static Pair<Namespace, CompUse> doFun(ClaOption opt, Designator rootfile, String debugdir, String docdir) {
+    Namespace fileList = loadFiles(rootfile, opt.getRootPath());
 
-    // System.out.println("loaded files:");
-    // for (RizzlyFile f : fileList) {
-    // System.out.print("  ");
-    // System.out.print(f.getFullName());
-    // System.out.println();
-    // }
+    print(fileList, debugdir + "loaded.rzy");
 
-    List<Type> types = new ArrayList<Type>();
-    types.addAll(genPrimitiveTypes());
-    types.addAll(genPrimitiveGenericTypes());
+    FunList<Fun> types = new FunList<Fun>();
+    genPrimitiveTypes(types);
+    genPrimitiveGenericTypes(types);
 
-    CheckNames.check(fileList, types);
+    CheckNames.check(fileList, types.names());
 
     SymbolTable sym = new SymbolTable();
-    for (Type typ : types) {
-      sym.add(typ);
-    }
+    sym.addAll(types);
     Linker.process(types, fileList, sym);
-    Linker.process(fileList, sym);
-    print(fileList, debugdir + "linked.rzy");
+    Linker.process(fileList, fileList, sym);
+    // print(fileList, debugdir + "linked.rzy", new KnowledgeBase(fileList, new
+    // HashSet<RizzlyFile>(), debugdir));
 
     Namespace classes = new Namespace(info, "!");
     classes.addAll(types);
-
-    for (RizzlyFile f : fileList) {
-      Namespace parent = classes.forceChildPath(f.getFullName().toList());
-      parent.addAll(f.getType());
-      parent.addAll(f.getComp());
-      parent.addAll(f.getConstant());
-      parent.addAll(f.getFunction());
+    Collection<Pair<Designator, RizzlyFile>> files = new ArrayList<Pair<Designator, RizzlyFile>>();
+    fileList.getItems(RizzlyFile.class, new Designator(), files);
+    for (Pair<Designator, RizzlyFile> f : files) {
+      Namespace parent = classes.forceChildPath(f.first.toList());
+      parent.addAll(f.second.getObjects());
     }
 
     KnowledgeBase kb = new KnowledgeBase(classes, fileList, debugdir);
@@ -102,33 +90,31 @@ public class MainFun {
     EnumLinkReduction.process(classes, kb);
     CompLinkReduction.process(classes);
 
+    DocWriter.print(files, kb);
+
+    Template rootdecl = (Template) classes.getChildItem(opt.getRootComp().toList());
+    CompUse root = new CompUse(ElementInfo.NO, "inst", new Reference(ElementInfo.NO, rootdecl));
+    classes.getChildren().add(root);
+
     print(classes, debugdir + "linkreduced.rzy");
-
-    Named root = classes.getChildItem(opt.getRootComp().toList());
-    DocWriter.print(fileList, new KnowledgeBase(classes, fileList, docdir)); // TODO reimplement
-
-    Component nroot = evaluate(root, classes, debugdir, fileList);
-    DeAlias.process(classes);
-
+    evaluate(classes, debugdir, fileList);
     print(classes, debugdir + "evaluated.rzy");
-    removeUnused(classes, nroot);
+
+    // FIXME if we remove everything unused, we can not typecheck that in EVL
+    removeUnused(classes, root, debugdir + "used.gv");
     print(classes, debugdir + "stripped.rzy");
-    printDepGraph(debugdir + "rdep.gv", classes, nroot);
-    return new Pair<String, Namespace>(nroot.getName(), classes);
+    // printDepGraph(debugdir + "rdep.gv", classes);
+    return new Pair<Namespace, CompUse>(classes, root);
   }
 
-  private static void printDepGraph(String debugdir, Namespace classes, Named root) {
-    SimpleGraph<Named> g = DepGraph.build(classes);
-    StateVariable instVar = new StateVariable(new ElementInfo(), "!inst", null, new AnyValue(new ElementInfo()));
-    g.addVertex(instVar);
-    g.addEdge(instVar, root);
+  private static void printDepGraph(String filename, SimpleGraph<Fun> g) {
     try {
       @SuppressWarnings("resource")
-      HtmlGraphWriter<Named, Pair<Named, Named>> writer = new HtmlGraphWriter<Named, Pair<Named, Named>>(new joGraph.Writer(new PrintStream(debugdir))) {
+      HtmlGraphWriter<Fun, Pair<Fun, Fun>> writer = new HtmlGraphWriter<Fun, Pair<Fun, Fun>>(new joGraph.Writer(new PrintStream(filename))) {
         @Override
-        protected void wrVertex(Named v) {
+        protected void wrVertex(Fun v) {
           wrVertexStart(v);
-          wrRow(v.getName());
+          wrRow(v.toString());
           wrVertexEnd();
         }
       };
@@ -138,85 +124,79 @@ public class MainFun {
     }
   }
 
-  private static Component evaluate(Named root, Namespace oldClasses, String debugdir, Collection<RizzlyFile> fileList) {
+  private static void evaluate(Namespace oldClasses, String debugdir, Namespace fileList) {
     KnowledgeBase kb = new KnowledgeBase(oldClasses, fileList, debugdir);
 
-    Named nroot = Specializer.process((Generator) root, new ArrayList<Expression>(), root.getInfo(), kb);
-
-    return (Component) nroot;
+    TypeEvalReplacer replacer = new TypeEvalReplacer(kb);
+    replacer.traverse(oldClasses, null);
   }
 
-  private static void removeUnused(Namespace classes, Named root) {
-    SimpleGraph<Named> g = DepGraph.build(root);
+  private static void removeUnused(Namespace classes, Fun root, String graphfile) {
+    SimpleGraph<Fun> g = DepGraph.build(root);
+    printDepGraph(graphfile, g);
     removeUnused(classes, g.vertexSet());
   }
 
-  private static void removeUnused(Namespace ns, Set<Named> keep) {
-    Set<Named> remove = new HashSet<Named>();
-    for (Named itr : ns) {
+  private static void removeUnused(Namespace ns, Set<Fun> keep) {
+    Set<Fun> remove = new HashSet<Fun>();
+    for (Fun itr : ns.getChildren()) {
       if (itr instanceof Namespace) {
         removeUnused((Namespace) itr, keep);
-      } else {
-        if (!keep.contains(itr)) {
-          remove.add(itr);
-        }
+      } else if (!keep.contains(itr)) {
+        remove.add(itr);
       }
     }
-    ns.removeAll(remove);
+    ns.getChildren().removeAll(remove);
   }
 
-  private static List<Type> genPrimitiveTypes() {
-    List<Type> ret = new ArrayList<Type>();
-    ret.add((Type) new BooleanType());
-    ret.add((Type) new VoidType());
-    ret.add((Type) new IntegerType());
-    ret.add((Type) new NaturalType());
-    ret.add((Type) new AnyType());
-    ret.add((Type) new StringType());
-    return ret;
+  private static void inst(Type object, FunList<Fun> container) {
+    container.add(object);
   }
 
-  private static List<Type> genPrimitiveGenericTypes() {
-    List<Type> ret = new ArrayList<Type>();
-    ret.add(new RangeTemplate());
-    ret.add(new ArrayTemplate());
-    ret.add(new TypeTypeTemplate());
-    return ret;
+  private static void templ(String name, FunList<TemplateParameter> list, TypeTemplate tmpl, FunList<Fun> container) {
+    Template decl = new Template(tmpl.getInfo(), name, list, tmpl);
+    container.add(decl);
   }
 
-  private static Collection<RizzlyFile> loadFiles(Designator rootname, String rootdir) {
-    Map<Designator, RizzlyFile> loaded = new HashMap<Designator, RizzlyFile>();
+  private static void genPrimitiveTypes(FunList<Fun> container) {
+    inst(new BooleanType(), container);
+    inst(VoidType.INSTANCE, container);
+    inst(new NaturalType(), container);
+    inst(new IntegerType(), container);
+    inst(new AnyType(), container);
+    inst(new StringType(), container);
+  }
+
+  private static void genPrimitiveGenericTypes(FunList<Fun> container) {
+    templ(RangeTemplate.NAME, RangeTemplate.makeParam(), new RangeTemplate(), container);
+    templ(ArrayTemplate.NAME, ArrayTemplate.makeParam(), new ArrayTemplate(), container);
+    templ(TypeTypeTemplate.NAME, TypeTypeTemplate.makeParam(), new TypeTypeTemplate(), container);
+  }
+
+  private static Namespace loadFiles(Designator rootname, String rootdir) {
+    Namespace loaded = new Namespace(info, "!!");
 
     Queue<Designator> toload = new LinkedList<Designator>();
     toload.add(rootname);
 
     while (!toload.isEmpty()) {
       Designator lname = toload.poll();
-      if (loaded.containsKey(lname)) {
+      assert (lname.size() > 0);
+      lname.sub(0, lname.size() - 1);
+      Namespace parent = loaded.forceChildPath(lname.sub(0, lname.size() - 1).toList());
+      if (parent.getChildren().find(lname.last()) != null) {
         continue;
       }
       String filename = rootdir + lname.toString(File.separator) + ClaOption.extension;
-      RizzlyFile lfile = FileParser.parse(filename);
-      lfile.setFullName(lname);
+      RizzlyFile lfile = FileParser.parse(filename, lname.last());
 
-      loaded.put(lname, lfile);
+      parent.getChildren().add(lfile);
+
       for (Designator name : lfile.getImports()) {
         toload.add(name);
       }
     }
-    return loaded.values();
-  }
-
-  static private void print(Collection<? extends Fun> list, String filename) {
-    try {
-      StreamWriter writer = new StreamWriter(new PrintStream(filename));
-      FunPrinter pp = new FunPrinter(writer);
-      for (Fun itr : list) {
-        pp.traverse(itr, null);
-      }
-    } catch (FileNotFoundException e) {
-      e.printStackTrace();
-    }
+    return loaded;
   }
 
   static private void print(Fun ast, String filename) {

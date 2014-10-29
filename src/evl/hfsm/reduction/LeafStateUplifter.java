@@ -11,11 +11,13 @@ import evl.hfsm.ImplHfsm;
 import evl.hfsm.State;
 import evl.hfsm.StateComposite;
 import evl.hfsm.StateSimple;
+import evl.knowledge.KnowledgeBase;
+import evl.other.EvlList;
 
 /**
  * Moves all leaf-states up. In the end, the top state only has former leaf states a children.
  * 
- * (The leaf states are the only states the state machoine can be in.)
+ * (The leaf states are the only states the state machine can be in.)
  * 
  * @author urs
  * 
@@ -23,8 +25,12 @@ import evl.hfsm.StateSimple;
 public class LeafStateUplifter extends NullTraverser<Void, Designator> {
   final private List<StateSimple> states = new ArrayList<StateSimple>();
 
-  static public void process(ImplHfsm obj) {
-    LeafStateUplifter know = new LeafStateUplifter();
+  public LeafStateUplifter(KnowledgeBase kb) {
+    super();
+  }
+
+  static public void process(ImplHfsm obj, KnowledgeBase kb) {
+    LeafStateUplifter know = new LeafStateUplifter(kb);
     know.traverse(obj, null);
   }
 
@@ -49,8 +55,8 @@ public class LeafStateUplifter extends NullTraverser<Void, Designator> {
 
   @Override
   protected Void visitStateComposite(StateComposite obj, Designator param) {
-    List<State> children = obj.getItemList(State.class);
-    visitItr(children, param);
+    EvlList<State> children = obj.getItem().getItems(State.class);
+    visitList(children, param);
     obj.getItem().removeAll(children);
     return null;
   }

@@ -1,14 +1,8 @@
 
-import
-  iface.constdef;
-  comp.constuse;
+import iface.constdef;
+import comp.constuse;
 
-component
-  ExtConst
-    implementation composition
-
-    component
-      comp : ConstUse;
-    
-  end
+ExtConst = Composition
+  comp : ConstUse;
+end
 

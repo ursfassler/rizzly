@@ -1,8 +1,7 @@
 package evl.copy;
 
-import java.util.Collection;
-
 import evl.Evl;
+import evl.other.EvlList;
 
 public final class Copy {
 
@@ -13,9 +12,9 @@ public final class Copy {
     return nobj;
   }
 
-  public static <T extends Evl> Collection<T> copy(Collection<T> obj) {
+  public static <T extends Evl> EvlList<T> copy(EvlList<T> obj) {
     CopyEvl copier = new CopyEvl();
-    Collection<T> nobj = copier.copy(obj);
+    EvlList<T> nobj = copier.copy(obj);
     Relinker.relink(nobj, copier.getCopied());
     return nobj;
   }

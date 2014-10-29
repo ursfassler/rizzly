@@ -1,20 +1,15 @@
-component
-  Linkorder
-    slot ind();
-      
-    implementation elementary
-    
-    slot ind()
-      foo();
-    end
-    
-    function foo()
-      bar();
-    end
-    
-    function bar()
-      foo();
-    end
-
+Linkorder = Elementary
+  ind : slot()
+    foo();
   end
+  
+  foo = procedure()
+    bar();
+  end
+  
+  bar = procedure()
+    foo();
+  end
+
+end
 

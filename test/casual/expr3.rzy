@@ -1,12 +1,8 @@
-component
-  Expr3
-    slot   ind( x: R{0,10} );
-    signal out( x: R{0,4} );
+Expr3 = Elementary
+  out : signal( x: R{0,4} );
 
-  implementation elementary
-
-    slot ind( x: R{0,10} )
-      out( 1 + x * 10 mod 4 );
-    end
+  ind : slot( x: R{0,10} )
+    out( 1 + x * 10 mod 4 );
   end
+end
 

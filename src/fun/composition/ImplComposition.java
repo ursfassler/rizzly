@@ -1,28 +1,30 @@
 package fun.composition;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import common.ElementInfo;
 
-import fun.other.Component;
-import fun.other.ListOfNamed;
-import fun.variable.CompUse;
+import fun.Fun;
+import fun.content.CompIfaceContent;
+import fun.other.CompImpl;
+import fun.other.FunList;
 
-public class ImplComposition extends Component {
-  final private ListOfNamed<CompUse> component = new ListOfNamed<CompUse>();
-  final private List<Connection> connection = new ArrayList<Connection>();
+public class ImplComposition extends CompImpl {
+  final private FunList<Fun> instantiation = new FunList<Fun>();
+  final private FunList<Connection> connection = new FunList<Connection>();
 
   public ImplComposition(ElementInfo info, String name) {
     super(info, name);
   }
 
-  public ListOfNamed<CompUse> getComponent() {
-    return component;
-  }
-
-  public List<Connection> getConnection() {
+  public FunList<Connection> getConnection() {
     return connection;
   }
 
+  public FunList<Fun> getInstantiation() {
+    return instantiation;
+  }
+
+  @Override
+  public FunList<CompIfaceContent> getInterface() {
+    return findInterface(instantiation);
+  }
 }

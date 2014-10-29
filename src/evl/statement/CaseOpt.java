@@ -1,16 +1,15 @@
 package evl.statement;
 
-import java.util.List;
-
 import common.ElementInfo;
 
 import evl.EvlBase;
+import evl.other.EvlList;
 
 public class CaseOpt extends EvlBase {
-  private List<CaseOptEntry> value;
+  private EvlList<CaseOptEntry> value;
   private Block code;
 
-  public CaseOpt(ElementInfo info, List<CaseOptEntry> value, Block code) {
+  public CaseOpt(ElementInfo info, EvlList<CaseOptEntry> value, Block code) {
     super(info);
     this.value = value;
     this.code = code;
@@ -24,7 +23,7 @@ public class CaseOpt extends EvlBase {
     this.code = code;
   }
 
-  public List<CaseOptEntry> getValue() {
+  public EvlList<CaseOptEntry> getValue() {
     return value;
   }
 

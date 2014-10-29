@@ -1,9 +1,6 @@
 package evl.hfsm.reduction;
 
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import common.Designator;
@@ -15,36 +12,34 @@ import evl.copy.Copy;
 import evl.expression.Expression;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.Reference;
-import evl.function.impl.FuncImplResponse;
-import evl.function.impl.FuncPrivateRet;
+import evl.function.header.FuncCtrlInDataOut;
+import evl.function.header.FuncPrivateRet;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.State;
 import evl.hfsm.StateComposite;
 import evl.hfsm.StateItem;
 import evl.hfsm.StateSimple;
-import evl.hfsm.Transition;
 import evl.knowledge.KnowledgeBase;
-import evl.other.ListOfNamed;
+import evl.other.EvlList;
 import evl.statement.Block;
 import evl.statement.ReturnExpr;
-import evl.variable.FuncVariable;
 import evl.variable.Variable;
 
 public class QueryDownPropagator extends NullTraverser<Void, QueryParam> {
-  private static final ElementInfo info = new ElementInfo();
-  private final Map<FuncImplResponse, FuncPrivateRet> map; // TODO do we need that?
+  private static final ElementInfo info = ElementInfo.NO;
+  private final Map<FuncCtrlInDataOut, FuncPrivateRet> map; // TODO do we need that?
 
-  public QueryDownPropagator(Map<FuncImplResponse, FuncPrivateRet> map) {
+  public QueryDownPropagator(Map<FuncCtrlInDataOut, FuncPrivateRet> map) {
     this.map = map;
   }
 
   public static void process(ImplHfsm hfsm, KnowledgeBase kb) {
-    Map<FuncImplResponse, FuncPrivateRet> qfunc = new HashMap<FuncImplResponse, FuncPrivateRet>();
+    Map<FuncCtrlInDataOut, FuncPrivateRet> qfunc = new HashMap<FuncCtrlInDataOut, FuncPrivateRet>();
     QueryFuncMaker qfmaker = new QueryFuncMaker(qfunc);
     qfmaker.traverse(hfsm.getTopstate(), new Designator());
 
     for (FuncPrivateRet func : qfunc.values()) {
-      hfsm.getTopstate().getFunction().add(func);
+      hfsm.getTopstate().getItem().add(func);
     }
 
     QueryDownPropagator redirecter = new QueryDownPropagator(qfunc);
@@ -58,28 +53,25 @@ public class QueryDownPropagator extends NullTraverser<Void, QueryParam> {
 
   @Override
   protected Void visitStateSimple(StateSimple obj, QueryParam param) {
-    List<FuncImplResponse> queryList = obj.getItemList(FuncImplResponse.class);
+    EvlList<FuncCtrlInDataOut> queryList = obj.getItem().getItems(FuncCtrlInDataOut.class);
     obj.getItem().removeAll(queryList);
 
-    ListOfNamed<FuncImplResponse> queries = new ListOfNamed<FuncImplResponse>();
+    EvlList<FuncCtrlInDataOut> queries = new EvlList<FuncCtrlInDataOut>();
 
-    for (FuncImplResponse query : param.before) {
+    for (FuncCtrlInDataOut query : param.before) {
       addQuery(queries, query);
     }
-    for (FuncImplResponse query : queryList) {
+    for (FuncCtrlInDataOut query : queryList) {
       addQuery(queries, query);
     }
-    for (FuncImplResponse query : param.after) {
+    for (FuncCtrlInDataOut query : param.after) {
       addQuery(queries, query);
     }
 
-    for (FuncImplResponse func : queries) {
-      FuncImplResponse cfunc = new FuncImplResponse(info, func.getName(), new ListOfNamed<FuncVariable>(Copy.copy(func.getParam().getList())));
-      cfunc.setRet(func.getRet().copy());
+    for (FuncCtrlInDataOut func : queries) {
+      FuncCtrlInDataOut cfunc = new FuncCtrlInDataOut(info, func.getName(), Copy.copy(func.getParam()), Copy.copy(func.getRet()), new Block(info));
 
-      cfunc.setBody(new Block(info));
-
-      ArrayList<Expression> acpar = new ArrayList<Expression>();
+      EvlList<Expression> acpar = new EvlList<Expression>();
       for (Variable par : cfunc.getParam()) {
         acpar.add(new Reference(info, par));
       }
@@ -93,26 +85,27 @@ public class QueryDownPropagator extends NullTraverser<Void, QueryParam> {
     return null;
   }
 
-  static private void addQuery(ListOfNamed<FuncImplResponse> queries, FuncImplResponse query) {
-    if (queries.find(query.getName()) == null) {
+  static private void addQuery(EvlList<FuncCtrlInDataOut> queries, FuncCtrlInDataOut query) {
+    if (!queries.contains(query)) {
       queries.add(query);
+    } else {
+      // Fixme oops, what now? Just remove it?
+      assert (false);
     }
   }
 
   @Override
   protected Void visitStateComposite(StateComposite obj, QueryParam param) {
     Map<State, Integer> spos = new HashMap<State, Integer>();
-    ArrayList<FuncImplResponse> queryList = new ArrayList<FuncImplResponse>();
-    ArrayList<State> stateList = new ArrayList<State>();
+    EvlList<FuncCtrlInDataOut> queryList = new EvlList<FuncCtrlInDataOut>();
+    EvlList<State> stateList = new EvlList<State>();
 
     for (StateItem itr : obj.getItem()) {
-      if (itr instanceof FuncImplResponse) {
-        queryList.add((FuncImplResponse) itr);
+      if (itr instanceof FuncCtrlInDataOut) {
+        queryList.add((FuncCtrlInDataOut) itr);
       } else if (itr instanceof State) {
         spos.put((State) itr, queryList.size());
         stateList.add((State) itr);
-      } else {
-        assert (itr instanceof Transition);
       }
     }
 
@@ -140,53 +133,52 @@ public class QueryDownPropagator extends NullTraverser<Void, QueryParam> {
 
 class QueryParam {
 
-  final public ArrayList<FuncImplResponse> before;
-  final public ArrayList<FuncImplResponse> after;
+  final public EvlList<FuncCtrlInDataOut> before;
+  final public EvlList<FuncCtrlInDataOut> after;
 
-  public QueryParam(List<FuncImplResponse> before, List<FuncImplResponse> after) {
+  public QueryParam(EvlList<FuncCtrlInDataOut> before, EvlList<FuncCtrlInDataOut> after) {
     super();
-    this.before = new ArrayList<FuncImplResponse>(before);
-    this.after = new ArrayList<FuncImplResponse>(after);
+    this.before = new EvlList<FuncCtrlInDataOut>(before);
+    this.after = new EvlList<FuncCtrlInDataOut>(after);
   }
 
   public QueryParam() {
     super();
-    this.before = new ArrayList<FuncImplResponse>();
-    this.after = new ArrayList<FuncImplResponse>();
+    this.before = new EvlList<FuncCtrlInDataOut>();
+    this.after = new EvlList<FuncCtrlInDataOut>();
   }
 
   public QueryParam(QueryParam parent) {
     super();
-    this.before = new ArrayList<FuncImplResponse>(parent.before);
-    this.after = new ArrayList<FuncImplResponse>(parent.after);
+    this.before = new EvlList<FuncCtrlInDataOut>(parent.before);
+    this.after = new EvlList<FuncCtrlInDataOut>(parent.after);
   }
 }
 
 class QueryFuncMaker extends NullTraverser<Void, Designator> {
 
-  private final Map<FuncImplResponse, FuncPrivateRet> qfunc;
+  private final Map<FuncCtrlInDataOut, FuncPrivateRet> qfunc;
 
-  public QueryFuncMaker(Map<FuncImplResponse, FuncPrivateRet> qfunc) {
+  public QueryFuncMaker(Map<FuncCtrlInDataOut, FuncPrivateRet> qfunc) {
     this.qfunc = qfunc;
   }
 
   @Override
   protected Void visitDefault(Evl obj, Designator param) {
-    throw new UnsupportedOperationException("Not supported yet: " + obj.getClass().getCanonicalName());
+    if (obj instanceof StateItem) {
+      return null;
+    } else {
+      throw new UnsupportedOperationException("Not supported yet: " + obj.getClass().getCanonicalName());
+    }
   }
 
   @Override
-  protected Void visitFuncImplResponse(FuncImplResponse obj, Designator param) {
+  protected Void visitFuncIfaceInRet(FuncCtrlInDataOut obj, Designator param) {
     param = new Designator(param, obj.getName());
+    FuncPrivateRet func = new FuncPrivateRet(ElementInfo.NO, param.toString(), Copy.copy(obj.getParam()), Copy.copy(obj.getRet()), obj.getBody());
+    obj.setBody(new Block(ElementInfo.NO));
 
-    Collection<FuncVariable> params = Copy.copy(obj.getParam().getList());
-    ElementInfo info = new ElementInfo();
-    FuncPrivateRet func = new FuncPrivateRet(info, param.toString(Designator.NAME_SEP), new ListOfNamed<FuncVariable>(params));
-    func.setRet(obj.getRet().copy());
-    func.setBody(obj.getBody());
-    obj.setBody(new Block(info));
-
-    HfsmReduction.relinkActualParameterRef(obj.getParam(), func.getParam().getList(), func.getBody());
+    HfsmReduction.relinkActualParameterRef(obj.getParam(), func.getParam(), func.getBody());
 
     qfunc.put(obj, func);
 
@@ -196,12 +188,8 @@ class QueryFuncMaker extends NullTraverser<Void, Designator> {
   @Override
   protected Void visitState(State obj, Designator param) {
     param = new Designator(param, obj.getName());
-    visitItr(obj.getItem(), param);
+    visitList(obj.getItem(), param);
     return null;
   }
 
-  @Override
-  protected Void visitTransition(Transition obj, Designator param) {
-    return null;
-  }
 }

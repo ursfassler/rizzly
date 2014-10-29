@@ -1,20 +1,15 @@
-component
-  DebugMsg
-    slot   inFoo();
-    slot   inBar();
-    signal outFoo();
-    signal outBar();
+DebugMsg = Elementary
+  outFoo : signal();
+  outBar : signal();
 
-  implementation elementary
-
-    slot inFoo()
-      outFoo();
-      outBar();
-    end
-
-    slot inBar()
-      outBar();
-    end
-
+  inFoo : slot()
+    outFoo();
+    outBar();
   end
+
+  inBar : slot()
+    outBar();
+  end
+
+end
 

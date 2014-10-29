@@ -6,6 +6,7 @@ import java.util.List;
 import util.PointF;
 
 import common.Designator;
+import common.ElementInfo;
 import common.Metadata;
 
 public abstract class Component implements Vertex {
@@ -20,11 +21,18 @@ public abstract class Component implements Vertex {
   final protected ArrayList<Interface> input = new ArrayList<Interface>();
   final protected ArrayList<Interface> output = new ArrayList<Interface>();
 
-  public Component(Designator path, String classname, List<Metadata> metadata) {
+  final private ElementInfo info;
+
+  public Component(ElementInfo info, Designator path, String classname, List<Metadata> metadata) {
     super();
     this.path = path;
     this.classname = classname;
     this.metadata = metadata;
+    this.info = info;
+  }
+
+  public ElementInfo getInfo() {
+    return info;
   }
 
   public List<Metadata> getMetadata() {

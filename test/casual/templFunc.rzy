@@ -13,7 +13,7 @@ component
   TemplFunc
     response in( x: R{0,20} ):R{0,10};
     
-    implementation elementary
+    implementation Elementary
     
     response in( x: R{0,20} ):R{0,10}
       return narrow{0,10}( x );

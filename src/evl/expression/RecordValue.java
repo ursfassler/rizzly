@@ -1,32 +1,32 @@
 package evl.expression;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 import common.ElementInfo;
 
-import evl.type.TypeRef;
+import evl.expression.reference.SimpleRef;
+import evl.other.EvlList;
+import evl.type.Type;
 
 public class RecordValue extends Expression {
-  final private List<NamedElementValue> value = new ArrayList<NamedElementValue>();
-  private TypeRef type;
+  final private EvlList<NamedElementValue> value = new EvlList<NamedElementValue>();
+  private SimpleRef<Type> type;
 
-  public RecordValue(ElementInfo info, Collection<NamedElementValue> value, TypeRef type) {
+  public RecordValue(ElementInfo info, Collection<NamedElementValue> value, SimpleRef<Type> type) {
     super(info);
     this.value.addAll(value);
     this.type = type;
   }
 
-  public List<NamedElementValue> getValue() {
+  public EvlList<NamedElementValue> getValue() {
     return value;
   }
 
-  public TypeRef getType() {
+  public SimpleRef<Type> getType() {
     return type;
   }
 
-  public void setType(TypeRef type) {
+  public void setType(SimpleRef<Type> type) {
     this.type = type;
   }
 

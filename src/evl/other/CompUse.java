@@ -2,40 +2,32 @@ package evl.other;
 
 import common.ElementInfo;
 
-import evl.EvlBase;
+import evl.expression.reference.BaseRef;
 
-final public class CompUse extends EvlBase implements Named {
+public class CompUse extends BaseRef<Component> implements Named, Comparable<CompUse> {
   private String name;
-  private Component link;
 
-  public CompUse(ElementInfo info, String name, Component type) {
-    super(info);
-    assert (name != null);
+  public CompUse(ElementInfo info, Component link, String name) {
+    super(info, link);
     this.name = name;
-    this.link = type;
-  }
-
-  public Component getLink() {
-    return link;
-  }
-
-  public void setLink(Component type) {
-    this.link = type;
   }
 
   public String getName() {
     return name;
   }
 
-  @Override
   public void setName(String name) {
-    assert (name != null);
     this.name = name;
   }
 
   @Override
+  public int compareTo(CompUse o) {
+    return name.compareTo(o.name);
+  }
+
+  @Override
   public String toString() {
-    return name.toString() + ":" + link.toString();
+    return name;
   }
 
 }

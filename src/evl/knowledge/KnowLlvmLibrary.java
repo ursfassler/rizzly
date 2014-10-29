@@ -2,17 +2,21 @@ package evl.knowledge;
 
 import common.Designator;
 import common.ElementInfo;
-import common.FuncAttr;
+import common.Property;
 
-import evl.function.impl.FuncProtoVoid;
-import evl.other.ListOfNamed;
+import evl.Evl;
+import evl.expression.reference.SimpleRef;
+import evl.function.header.FuncCtrlOutDataOut;
+import evl.other.EvlList;
 import evl.other.Named;
+import evl.statement.Block;
+import evl.type.Type;
 import evl.variable.FuncVariable;
 
 //TODO rename
 //TODO rename trap to runtime exception and provide arguments
 public class KnowLlvmLibrary extends KnowledgeEntry {
-  private static final ElementInfo info = new ElementInfo();
+  private static final ElementInfo info = ElementInfo.NO;
   private KnowledgeBase kb;
   private KnowBaseItem kbi;
 
@@ -22,26 +26,26 @@ public class KnowLlvmLibrary extends KnowledgeEntry {
     this.kbi = kb.getEntry(KnowBaseItem.class);
   }
 
-  private Named findItem(String name) {
-    return kb.getRoot().find(name);
+  private Evl findItem(String name) {
+    return kb.getRoot().getChildren().find(name);
   }
 
   private void addItem(Named item) {
-    assert (findItem(item.getName()) == null);
-    kb.getRoot().add(item);
-
+    kb.getRoot().getChildren().add(item);
   }
 
-  public FuncProtoVoid getTrap() {
+  public FuncCtrlOutDataOut getTrap() {
     final String NAME = Designator.NAME_SEP + "trap";
 
-    FuncProtoVoid ret = (FuncProtoVoid) findItem(NAME);
+    FuncCtrlOutDataOut ret = (FuncCtrlOutDataOut) findItem(NAME);
+
     if (ret == null) {
-      ret = new FuncProtoVoid(info, NAME, new ListOfNamed<FuncVariable>());
-      ret.getAttributes().add(FuncAttr.Extern);
-      ret.getAttributes().add(FuncAttr.Public);
+      ret = new FuncCtrlOutDataOut(info, NAME, new EvlList<FuncVariable>(), new SimpleRef<Type>(info, kbi.getVoidType()), new Block(info));
+      ret.properties().put(Property.Extern, true);
+      ret.properties().put(Property.Public, true);
       addItem(ret);
     }
+
     return ret;
   }
 

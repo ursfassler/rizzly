@@ -1,42 +1,33 @@
-type
-  Rec = Record
-    pos  : R{0,10};
-    neg  : R{-10,10};
-    ofs  : R{10,20};
-    dum  : R{0,0};
-  end
+Rec = Record
+  pos  : R{0,10};
+  neg  : R{-10,10};
+  ofs  : R{10,20};
+  dum  : R{0,0};
+end
 
-  Uni = Union
-    rec  : Rec;
-  end
+Uni = Union
+  rec  : Rec;
+end
 
-component
-  Union4
-    response get0():R{-100,100};
-    response get1():R{-100,100};
-    response get2():R{-100,100};
-
-  implementation elementary
-
-    var
-      uni : Uni = rec := ( pos := 2, neg := -3, ofs := 13, dum := 0 );
-      
-    entry
-      uni.rec.dum := 0;
-    end
-      
-    response get0():R{-100,100}
-      return uni.rec.pos;
-    end
+Union4 = Elementary
+  uni : Uni = rec := ( pos := 2, neg := -3, ofs := 13, dum := 0 );
     
-    response get1():R{-100,100}
-      return uni.rec.pos;
-    end
-
-    response get2():R{-100,100}
-      return uni.rec.pos;
-    end
-
+  entry
+    uni.rec.dum := 0;
   end
+    
+  get0 : response():R{-100,100}
+    return uni.rec.pos;
+  end
+  
+  get1 : response():R{-100,100}
+    return uni.rec.pos;
+  end
+
+  get2 : response():R{-100,100}
+    return uni.rec.pos;
+  end
+
+end
 
 

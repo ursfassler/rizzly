@@ -1,13 +1,9 @@
-component
-  ArrayTest7
-    slot   inp( x: Array{10,R{0,31}} );
-      
-  implementation elementary
 
-    slot inp( x: Array{10,R{0,31}} )
-      y: Array{10,R{0,100}};
-      y := x;
-    end
-
+ArrayTest7 = Elementary
+  inp : slot( x: Array{10,R{0,31}} )
+    y: Array{10,R{0,100}};
+    y := x;
   end
+
+end
 

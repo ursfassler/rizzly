@@ -3,21 +3,15 @@ package fun.hfsm;
 import common.ElementInfo;
 
 import fun.FunBase;
-import fun.expression.reference.Reference;
-import fun.other.ListOfNamed;
+import fun.other.FunList;
 import fun.other.Named;
-import fun.variable.Variable;
+import fun.statement.Block;
 
-abstract public class State extends FunBase implements Named {
-  public final static String TOPSTATE_NAME = "_top";
-  public static final String ENTRY_FUNC_NAME = "_entry";
-  public static final String EXIT_FUNC_NAME = "_exit";
-
+abstract public class State extends FunBase implements Named, StateContent {
   private String name;
-  private Reference entryFuncRef = null;
-  private Reference exitFuncRef = null;
-  final private ListOfNamed<Variable> variable = new ListOfNamed<Variable>(); // TODO also move into item
-  final protected ListOfNamed<Named> item = new ListOfNamed<Named>();
+  private Block entryFunc = null;
+  private Block exitFunc = null;
+  final protected FunList<StateContent> item = new FunList<StateContent>();
 
   public State(ElementInfo info, String name) {
     super(info);
@@ -32,33 +26,24 @@ abstract public class State extends FunBase implements Named {
     this.name = name;
   }
 
-  public ListOfNamed<Variable> getVariable() {
-    return variable;
+  public Block getEntryFunc() {
+    return entryFunc;
   }
 
-  public Reference getEntryFuncRef() {
-    return entryFuncRef;
+  public void setEntryFunc(Block entryFunc) {
+    this.entryFunc = entryFunc;
   }
 
-  public void setEntryFuncRef(Reference entryFuncRef) {
-    this.entryFuncRef = entryFuncRef;
+  public Block getExitFunc() {
+    return exitFunc;
   }
 
-  public Reference getExitFuncRef() {
-    return exitFuncRef;
+  public void setExitFunc(Block exitFunc) {
+    this.exitFunc = exitFunc;
   }
 
-  public void setExitFuncRef(Reference exitFuncRef) {
-    this.exitFuncRef = exitFuncRef;
-  }
-
-  public ListOfNamed<Named> getItemList() {
+  public FunList<StateContent> getItemList() {
     return item;
-  }
-
-  @Override
-  public String toString() {
-    return name;
   }
 
 }

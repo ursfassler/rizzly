@@ -1,59 +1,47 @@
-component
-  DummyComp
-    slot   infoo();
-    slot   inbar();
-    slot   inpoh();
-    signal outfoo();
-    signal outbar();
-    signal outpoh();
+DummyComp = Elementary
+  outfoo : signal();
+  outbar : signal();
+  outpoh : signal();
 
-  implementation elementary
-
-    slot infoo()
-      outfoo();
-      outbar();
-    end
-
-    slot inbar()
-      outbar();
-      outpoh();
-    end
-
-    slot inpoh()
-      outbar();
-    end
-
+  infoo : slot()
+    outfoo();
+    outbar();
   end
 
-  Debug
-    slot   infoo();
-    slot   inbar();
-    slot   inpoh();
-    
-    signal outfoo();
-    signal outbar();
-    signal outpoh();
-
-  implementation composition
-    
-    component
-      a : DummyComp;
-      b : DummyComp;
-    
-    connection
-      infoo -> a.infoo;
-      inbar -> a.inbar;
-      inpoh -> a.inpoh;
-      infoo -> b.infoo;
-      inbar -> b.inbar;
-      inpoh -> b.inpoh;
-    
-      a.outfoo -> b.infoo;
-      a.outbar -> b.inbar;
-      a.outpoh -> b.inpoh;
-      b.outfoo -> outfoo;
-      b.outbar -> outbar;
-      b.outpoh -> outpoh;
-    
+  inbar : slot()
+    outbar();
+    outpoh();
   end
+
+  inpoh : slot()
+    outbar();
+  end
+end
+
+Debug = Composition
+  infoo : slot();
+  inbar : slot();
+  inpoh : slot();
+  
+  outfoo: signal();
+  outbar : signal();
+  outpoh : signal();
+
+  a : DummyComp;
+  b : DummyComp;
+
+  infoo -> a.infoo;
+  inbar -> a.inbar;
+  inpoh -> a.inpoh;
+  infoo -> b.infoo;
+  inbar -> b.inbar;
+  inpoh -> b.inpoh;
+
+  a.outfoo -> b.infoo;
+  a.outbar -> b.inbar;
+  a.outpoh -> b.inpoh;
+  b.outfoo -> outfoo;
+  b.outbar -> outbar;
+  b.outpoh -> outpoh;
+end
 

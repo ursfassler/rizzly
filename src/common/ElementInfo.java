@@ -7,18 +7,13 @@ public class ElementInfo {
   private int line;
   private int row;
   final private ArrayList<Metadata> metadata = new ArrayList<Metadata>();
+  public final static ElementInfo NO = new ElementInfo("", 0, 0);
 
   public ElementInfo(String filename, int line, int row) {
     super();
     this.filename = filename;
     this.line = line;
     this.row = row;
-  }
-
-  public ElementInfo() {
-    this.filename = "";
-    this.line = 0;
-    this.row = 0;
   }
 
   public String getFilename() {

@@ -57,6 +57,9 @@ public class StreamWriter implements Writer {
   @Override
   public void wl(String text, String hint, String file, String id) {
     wr(text);
+    wr("[");
+    wr(id);
+    wr("]");
   }
 
   @Override
@@ -67,6 +70,9 @@ public class StreamWriter implements Writer {
   @Override
   public void wa(String name, String id) {
     wr(name);
+    wr("[");
+    wr(id);
+    wr("]");
   }
 
 }

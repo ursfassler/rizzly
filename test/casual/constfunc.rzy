@@ -1,0 +1,9 @@
+
+calc = function( x: R{0,99} ):R{0,99}
+  return 99 - x;
+end
+
+Constfunc = Elementary
+  BlaBla : const R{0,99} = calc(42);
+end
+

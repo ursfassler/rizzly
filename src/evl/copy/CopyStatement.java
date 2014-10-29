@@ -1,13 +1,10 @@
 package evl.copy;
 
-import java.util.ArrayList;
-
 import evl.Evl;
 import evl.NullTraverser;
 import evl.statement.Assignment;
 import evl.statement.Block;
 import evl.statement.CallStmt;
-import evl.statement.CaseOpt;
 import evl.statement.CaseStmt;
 import evl.statement.IfStmt;
 import evl.statement.ReturnExpr;
@@ -64,7 +61,7 @@ public class CopyStatement extends NullTraverser<Statement, Void> {
 
   @Override
   protected Statement visitCaseStmt(CaseStmt obj, Void param) {
-    return new CaseStmt(obj.getInfo(), cast.copy(obj.getCondition()), new ArrayList<CaseOpt>(cast.copy(obj.getOption())), cast.copy(obj.getOtherwise()));
+    return new CaseStmt(obj.getInfo(), cast.copy(obj.getCondition()), cast.copy(obj.getOption()), cast.copy(obj.getOtherwise()));
   }
 
   @Override

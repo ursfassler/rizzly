@@ -1,17 +1,13 @@
 package evl.traverser.typecheck;
 
-import java.util.ArrayList;
-
 import evl.DefTraverser;
 import evl.Evl;
 import evl.composition.ImplComposition;
 import evl.expression.Expression;
-import evl.function.FunctionBase;
+import evl.function.Function;
 import evl.hfsm.ImplHfsm;
 import evl.knowledge.KnowledgeBase;
 import evl.other.ImplElementary;
-import evl.other.ListOfNamed;
-import evl.other.Named;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.traverser.typecheck.specific.FunctionTypeChecker;
 import evl.traverser.typecheck.specific.StatementTypeChecker;
@@ -26,24 +22,17 @@ public class TypeChecker extends DefTraverser<Void, Void> {
     this.kb = kb;
   }
 
-  static public void process(Evl obj, KnowledgeBase kb, Void sym) {
+  static public void process(Evl obj, KnowledgeBase kb) {
     TypeChecker adder = new TypeChecker(kb);
-    adder.traverse(obj, sym);
-  }
-
-  public static void processList(ListOfNamed<? extends Named> variable, KnowledgeBase kb) {
-    TypeChecker adder = new TypeChecker(kb);
-    for (Named itr : new ArrayList<Named>(variable.getList())) {
-      adder.traverse(itr, null);
-    }
+    adder.traverse(obj, null);
   }
 
   @Override
   protected Void visitImplElementary(ImplElementary obj, Void sym) {
-    visitItr(obj.getVariable(), sym);
-    visitItr(obj.getConstant(), sym);
-    visitItr(obj.getFunction(), sym);
-    visitItr(obj.getSubCallback(), sym);
+    visitList(obj.getVariable(), sym);
+    visitList(obj.getConstant(), sym);
+    visitList(obj.getFunction(), sym);
+    visitList(obj.getSubCallback(), sym);
     return null;
   }
 
@@ -58,7 +47,7 @@ public class TypeChecker extends DefTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitFunctionBase(FunctionBase obj, Void sym) {
+  protected Void visitFunctionImpl(Function obj, Void sym) {
     FunctionTypeChecker.process(obj, kb);
     return null;
   }

@@ -1,28 +1,20 @@
 
-component
-  DownCast
-    response a( x: R{0,50000} ):R{0,200};
-    response b( x: R{0,50000} ):R{0,200};
-    response c( x: R{0,50000} ):R{0,200};
-    response d( x: R{0,50000} ):R{0,200};
-    
-  implementation elementary
-    
-    response a( x: R{0,50000} ):R{0,200}
-      return x and 127;
-    end
-    
-    response b( x: R{0,50000} ):R{0,200}
-      return x mod 201;
-    end
-
-    response c( x: R{0,50000} ):R{0,200}
-      return x and 31;
-    end
-    
-    response d( x: R{0,50000} ):R{0,200}
-      return x mod 42;
-    end
-
+DownCast = Elementary
+  a : response( x: R{0,50000} ):R{0,200}
+    return x and 127;
   end
+  
+  b : response( x: R{0,50000} ):R{0,200}
+    return x mod 201;
+  end
+
+  c : response( x: R{0,50000} ):R{0,200}
+    return x and 31;
+  end
+  
+  d : response( x: R{0,50000} ):R{0,200}
+    return x mod 42;
+  end
+
+end
 

@@ -3,25 +3,25 @@ package evl.variable;
 import common.ElementInfo;
 
 import evl.EvlBase;
+import evl.expression.reference.SimpleRef;
 import evl.other.Named;
-import evl.type.TypeRef;
+import evl.type.Type;
 
-abstract public class Variable extends EvlBase implements Named, Comparable<Variable> {
+abstract public class Variable extends EvlBase implements Named {
   private String name;
-  private TypeRef type;
+  private SimpleRef<Type> type;
 
-  public Variable(ElementInfo info, String name, TypeRef type) {
+  public Variable(ElementInfo info, String name, SimpleRef<Type> type) {
     super(info);
-    assert (name != null);
-    this.name = name;
     this.type = type;
+    this.name = name;
   }
 
-  public TypeRef getType() {
+  public SimpleRef<Type> getType() {
     return type;
   }
 
-  public void setType(TypeRef type) {
+  public void setType(SimpleRef<Type> type) {
     this.type = type;
   }
 
@@ -29,20 +29,13 @@ abstract public class Variable extends EvlBase implements Named, Comparable<Vari
     return name;
   }
 
-  @Override
   public void setName(String name) {
-    assert (name != null);
     this.name = name;
   }
 
   @Override
   public String toString() {
-    return name.toString() + ":" + type.getRef().getName();
-  }
-
-  @Override
-  public int compareTo(Variable o) {
-    return getName().compareTo(o.getName());
+    return name + ":" + type.getLink();
   }
 
 }

@@ -1,21 +1,16 @@
-component
-  StateVar
-    slot   ind( x: R{0,10} );
-    signal out( x: R{0,10} );
+StateVar = Elementary
+  out : signal( x: R{0,10} );
     
-  implementation elementary
-    
-    var
-      a : R{0,10} = 0;
+  a : R{0,10} = 0;
       
-    slot ind( x: R{0,10} )
-      if a < 10 then
-        a := R{0,10}( a + 1 );
-      else
-        a := 0;
-      end
-      out( a );
+  ind : slot( x: R{0,10} )
+    if a < 10 then
+      a := R{0,10}( a + 1 );
+    else
+      a := 0;
     end
-    
+    out( a );
   end
+  
+end
 

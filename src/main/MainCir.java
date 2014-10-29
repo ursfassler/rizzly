@@ -12,7 +12,6 @@ import util.Pair;
 import util.SimpleGraph;
 import cir.expression.reference.Reference;
 import cir.other.Program;
-import cir.other.Variable;
 import cir.traverser.BlockReduction;
 import cir.traverser.CWriter;
 import cir.traverser.RangeReplacer;
@@ -20,10 +19,12 @@ import cir.traverser.Renamer;
 import cir.traverser.VarDeclToTop;
 import cir.type.Type;
 import cir.type.TypeRef;
+import cir.variable.Variable;
 
 public class MainCir {
 
   public static Program doCir(Program cprog, String debugdir) {
+    CWriter.print(cprog, debugdir + "firstCir.rzy", true);
     RangeReplacer.process(cprog);
     CWriter.print(cprog, debugdir + "norange.rzy", true);
 
@@ -39,7 +40,7 @@ public class MainCir {
   }
 
   private static void toposortVar(List<Variable> list) {
-    SimpleGraph<cir.other.Variable> g = new SimpleGraph<cir.other.Variable>();
+    SimpleGraph<Variable> g = new SimpleGraph<Variable>();
     for (Variable u : list) {
       g.addVertex(u);
       Set<Variable> vs = getDirectUsedVariables(u);

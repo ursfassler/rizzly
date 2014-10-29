@@ -1,6 +1,7 @@
 package evl.traverser;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -14,7 +15,7 @@ import evl.Evl;
 import evl.expression.Expression;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.Reference;
-import evl.function.FunctionHeader;
+import evl.function.Function;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
@@ -43,14 +44,14 @@ public class OpenReplace extends DefTraverser<Void, Void> {
   public static void process(Evl evl, KnowledgeBase kb) {
     KnowBaseItem kbi = kb.getEntry(KnowBaseItem.class);
 
-    if ((kbi.findItem(IntegerType.NAME) == null) && (kbi.findItem(NaturalType.NAME) == null)) {
+    List<Type> openTypes = new ArrayList<Type>();
+    openTypes.addAll(kb.getRoot().getItems(IntegerType.class, false));
+    openTypes.addAll(kb.getRoot().getItems(NaturalType.class, false));
+
+    if (openTypes.isEmpty()) {
       // no open type used
       return;
     }
-
-    Set<Type> openTypes = new HashSet<Type>();
-    openTypes.add(kbi.getIntegerType());
-    openTypes.add(kbi.getNaturalType());
 
     List<RangeType> ranges = ClassGetter.get(RangeType.class, kb.getRoot());
     if (ranges.isEmpty()) {
@@ -60,20 +61,20 @@ public class OpenReplace extends DefTraverser<Void, Void> {
     OpenReplace replace = new OpenReplace(openTypes, kb);
     replace.traverse(evl, null);
     for (Variable var : replace.map.keySet()) {
-      assert (openTypes.contains(var.getType().getRef()));
+      assert (openTypes.contains(var.getType().getLink()));
       RangeType range = replace.map.get(var);
       range = kbi.getNumsetType(range.getNumbers());
-      var.getType().setRef(range);
+      var.getType().setLink(range);
     }
   }
 
   @Override
   protected Void visitReference(Reference obj, Void param) {
-    if ((obj.getLink() instanceof FunctionHeader) && !obj.getOffset().isEmpty()) {
-      FunctionHeader func = (FunctionHeader) obj.getLink();
+    if ((obj.getLink() instanceof Function) && !obj.getOffset().isEmpty()) {
+      Function func = (Function) obj.getLink();
       RefCall call = (RefCall) obj.getOffset().get(0);
 
-      List<FuncVariable> arg = func.getParam().getList();
+      List<FuncVariable> arg = func.getParam();
       List<Expression> acarg = call.getActualParameter();
 
       assert (arg.size() == acarg.size());
@@ -82,7 +83,7 @@ public class OpenReplace extends DefTraverser<Void, Void> {
         Variable iarg = arg.get(i);
         Expression iaca = acarg.get(i);
 
-        if (openTypes.contains(iarg.getType().getRef())) {
+        if (openTypes.contains(iarg.getType().getLink())) {
           Type provtype = kt.get(iaca);
           updateVar(iarg, provtype);
         }

@@ -1,24 +1,19 @@
-component
-  ArrayTest1
-    slot   inp( x: R{0,200} );
-    signal out( x: R{0,200} );
+ArrayTest1 = Elementary
+  out : signal( x: R{0,200} );
 
-  implementation elementary
-
-    var
-      a : Array{20,R{0,200}} = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
-    
-    entry
-      i : R{0,20} = 0;
-      while i < 20 do
-        a[i] := i * 10;
-        i    := R{0,20}( i + 1 );
-      end
+  a : Array{20,R{0,200}} = [0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0];
+  
+  entry
+    i : R{0,20} = 0;
+    while i < 20 do
+      a[i] := i * 10;
+      i    := R{0,20}( i + 1 );
     end
-
-    slot inp( x: R{0,200} )
-      out( a[x mod 20] );
-    end
-
   end
+
+  inp : slot( x: R{0,200} )
+    out( a[x mod 20] );
+  end
+
+end
 

@@ -2,22 +2,30 @@ package fun.hfsm;
 
 import common.ElementInfo;
 
-import fun.other.Component;
+import fun.content.CompIfaceContent;
+import fun.other.CompImpl;
+import fun.other.FunList;
 
-public class ImplHfsm extends Component {
-  private StateComposite topstate;
+public class ImplHfsm extends CompImpl {
+  final private FunList<CompIfaceContent> iface = new FunList<CompIfaceContent>();
+  private State topstate;
 
-  public ImplHfsm(ElementInfo info, String name, StateComposite topState) {
+  public ImplHfsm(ElementInfo info, String name, State topState) {
     super(info, name);
     topstate = topState;
   }
 
-  public StateComposite getTopstate() {
+  public State getTopstate() {
     return topstate;
   }
 
-  public void setTopstate(StateComposite topstate) {
+  public void setTopstate(State topstate) {
     this.topstate = topstate;
+  }
+
+  @Override
+  public FunList<CompIfaceContent> getInterface() {
+    return iface;
   }
 
 }

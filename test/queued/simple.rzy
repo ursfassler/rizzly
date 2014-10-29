@@ -1,12 +1,7 @@
-component
-  Simple
-    slot   ind();
-    signal out();
+Simple = Composition
+  ind : slot();
+  out : signal();
 
-  implementation composition
-    
-    connection
-      ind >> out;
-      
-  end
+  ind >> out;
+end
 

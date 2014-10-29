@@ -1,14 +1,20 @@
 package evl.traverser.modelcheck;
 
+import error.ErrorType;
+import error.RError;
 import evl.Evl;
 import evl.NullTraverser;
-import evl.function.impl.FuncImplResponse;
+import evl.function.header.FuncCtrlInDataIn;
+import evl.function.header.FuncCtrlInDataOut;
+import evl.function.header.FuncPrivateRet;
+import evl.function.header.FuncPrivateVoid;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.State;
 import evl.hfsm.Transition;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
 import evl.other.SubCallbacks;
+import evl.variable.StateVariable;
 
 //TODO check for unused states
 //TODO check if a transition is never used
@@ -36,7 +42,7 @@ public class HfsmModelChecker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitSubCallbacks(SubCallbacks obj, Void param) {
-    visitItr(obj, param);
+    visitList(obj.getFunc(), param);
     return null;
   }
 
@@ -48,19 +54,37 @@ public class HfsmModelChecker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitState(State obj, Void param) {
-    visitItr(obj.getItem(), param);
+    visitList(obj.getItem(), param);
     return null;
   }
 
   @Override
   protected Void visitTransition(Transition obj, Void param) {
     // TODO check that guard does not write state
+    if (!(obj.getEventFunc().getLink() instanceof FuncCtrlInDataIn)) {
+      RError.err(ErrorType.Error, obj.getInfo(), "transition can only be triggered by slot");
+    }
     return null;
   }
 
   @Override
-  protected Void visitFuncImplResponse(FuncImplResponse obj, Void param) {
+  protected Void visitFuncIfaceInRet(FuncCtrlInDataOut obj, Void param) {
     // TODO check that state is not written
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncPrivateVoid(FuncPrivateVoid obj, Void param) {
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncPrivateRet(FuncPrivateRet obj, Void param) {
+    return null;
+  }
+
+  @Override
+  protected Void visitStateVariable(StateVariable obj, Void param) {
     return null;
   }
 

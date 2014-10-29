@@ -50,6 +50,14 @@ public final class Designator implements Iterable<String> {
     return name.size();
   }
 
+  public Designator sub(int from, int to) {
+    return new Designator(name.subList(from, to));
+  }
+
+  public String last() {
+    return name.get(name.size() - 1);
+  }
+
   public ArrayList<String> toList() {
     return new ArrayList<String>(name);
   }

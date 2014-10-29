@@ -8,6 +8,6 @@ public class VoidType extends BaseType {
   public static final String NAME = "Void";
 
   public VoidType() {
-    super(new ElementInfo(), NAME);
+    super(ElementInfo.NO, NAME);
   }
 }

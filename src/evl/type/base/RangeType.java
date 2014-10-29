@@ -8,7 +8,12 @@ public class RangeType extends BaseType {
   final private Range range;
 
   public RangeType(Range range) {
-    super(new ElementInfo(), makeName(range));
+    super(ElementInfo.NO, makeName(range));
+    this.range = range;
+  }
+
+  public RangeType(ElementInfo info, String name, Range range) {
+    super(info, name);
     this.range = range;
   }
 

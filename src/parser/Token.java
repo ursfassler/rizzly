@@ -55,12 +55,12 @@ public class Token {
   @Override
   public String toString() {
     switch (type) {
-    case IDENTIFIER:
-      return type + "(" + data + ")";
-    case NUMBER:
-      return type + "(" + num + ")";
-    default:
-      return type.toString();
+      case IDENTIFIER:
+        return type + "(" + data + ")";
+      case NUMBER:
+        return type + "(" + num + ")";
+      default:
+        return type.toString();
     }
   }
 }

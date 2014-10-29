@@ -27,18 +27,19 @@ public class LinkReduction extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitReference(Reference obj, Void param) {
-    Named item = obj.getLink();
+    Evl item = obj.getLink();
     while (item instanceof Namespace) {
-      RefItem next = obj.getOffset().pop();
+      RefItem next = obj.getOffset().get(0);
+      obj.getOffset().remove(0);
       if (!(next instanceof RefName)) {
         // TODO check it with typechecker
         RError.err(ErrorType.Fatal, obj.getInfo(), "Expected named offset, got: " + next.getClass().getCanonicalName() + " (and why did the typechecker not find it?)");
       }
       RefName name = (RefName) next;
-      item = ((Namespace) item).find(name.getName());
+      item = ((Namespace) item).getChildren().find(name.getName());
       assert (item != null); // type checker should find it?
     }
-    obj.setLink(item);
+    obj.setLink((Named) item);
     return super.visitReference(obj, param);
   }
 

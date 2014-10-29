@@ -1,13 +1,6 @@
-
-component
-  Convert1
-    response ind( x: R{0,20} ):R{0,10};
-    
-    implementation elementary
-    
-    response ind( x: R{0,20} ):R{0,10}
-      return R{0,10}( x );
-    end
-
+Convert1 = Elementary
+  ind : response( x: R{0,20} ):R{0,10}
+    return R{0,10}( x );
   end
+end
 

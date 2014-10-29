@@ -1,16 +1,10 @@
 
-component
-  EmptyElse
-    response ind( x: R{0,20} ):R{0,10};
-    
-  implementation elementary
-    
-    response ind( x: R{0,20} ):R{0,10}
-      if x > 10 then
-        x := R{0,10}( x - 10 );
-      end
-      return R{0,10}( x );
+EmptyElse = Elementary
+  ind : response( x: R{0,20} ):R{0,10}
+    if x > 10 then
+      x := R{0,10}( x - 10 );
     end
-
+    return R{0,10}( x );
   end
+end
 

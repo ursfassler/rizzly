@@ -11,10 +11,11 @@ import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
+import evl.expression.reference.SimpleRef;
 import evl.expression.unop.UnaryExp;
-import evl.function.FunctionBase;
+import evl.function.Function;
 import evl.other.CompUse;
-import evl.type.TypeRef;
+import evl.other.EvlList;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.type.base.RangeType;
@@ -45,7 +46,7 @@ class SimpleGetter extends NullTraverser<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitItr(Iterable<? extends Evl> list, Void param) {
+  protected Boolean visitList(EvlList<? extends Evl> list, Void param) {
     for (Evl ast : list) {
       if (!visit(ast, param)) {
         return false;
@@ -56,7 +57,7 @@ class SimpleGetter extends NullTraverser<Boolean, Void> {
 
   @Override
   protected Boolean visitReference(Reference obj, Void param) {
-    boolean ret = visit(obj.getLink(), param) & visitItr(obj.getOffset(), param);
+    boolean ret = visit(obj.getLink(), param) & visitList(obj.getOffset(), param);
     return ret;
   }
 
@@ -76,8 +77,8 @@ class SimpleGetter extends NullTraverser<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitTypeRef(TypeRef obj, Void param) {
-    return visit(obj.getRef(), param);
+  protected Boolean visitTypeRef(SimpleRef obj, Void param) {
+    return visit(obj.getLink(), param);
   }
 
   @Override
@@ -152,7 +153,7 @@ class SimpleGetter extends NullTraverser<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitFunctionBase(FunctionBase obj, Void param) {
+  protected Boolean visitFunctionImpl(Function obj, Void param) {
     return false;
   }
 

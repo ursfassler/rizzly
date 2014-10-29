@@ -1,17 +1,16 @@
 package fun.statement;
 
-import java.util.List;
-
 import common.ElementInfo;
 
 import fun.expression.Expression;
+import fun.other.FunList;
 
 public class CaseStmt extends Statement {
   private Expression condition;
-  private List<CaseOpt> option;
+  private FunList<CaseOpt> option;
   private Block otherwise;
 
-  public CaseStmt(ElementInfo info, Expression condition, List<CaseOpt> option, Block otherwise) {
+  public CaseStmt(ElementInfo info, Expression condition, FunList<CaseOpt> option, Block otherwise) {
     super(info);
     this.condition = condition;
     this.option = option;
@@ -34,7 +33,7 @@ public class CaseStmt extends Statement {
     this.otherwise = otherwise;
   }
 
-  public List<CaseOpt> getOption() {
+  public FunList<CaseOpt> getOption() {
     return option;
   }
 

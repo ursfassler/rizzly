@@ -1,8 +1,5 @@
 package parser;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import common.ElementInfo;
 
 import error.ErrorType;
@@ -20,11 +17,14 @@ import fun.expression.Relation;
 import fun.expression.StringValue;
 import fun.expression.UnaryExpression;
 import fun.expression.UnaryOp;
+import fun.expression.reference.DummyLinkTarget;
 import fun.expression.reference.RefCall;
 import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefName;
 import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.Reference;
+import fun.other.ActualTemplateArgument;
+import fun.other.FunList;
 
 public class ExpressionParser extends Parser {
 
@@ -33,8 +33,8 @@ public class ExpressionParser extends Parser {
   }
 
   // EBNF exprList: expr { "," expr }
-  protected List<Expression> parseExprList() {
-    List<Expression> ret = new ArrayList<Expression>();
+  protected FunList<Expression> parseExprList() {
+    FunList<Expression> ret = new FunList<Expression>();
     do {
       ret.add(parse());
     } while (consumeIfEqual(TokenType.COMMA));
@@ -63,7 +63,7 @@ public class ExpressionParser extends Parser {
         return null;
       }
       Expression value = parseRelExpr();
-      return new NamedElementValue(expr.getInfo(), ((Reference) expr).getLink().getName(), value);
+      return new NamedElementValue(expr.getInfo(), ((DummyLinkTarget) ((Reference) expr).getLink()).getName(), value);
     } else {
       return expr;
     }
@@ -77,20 +77,20 @@ public class ExpressionParser extends Parser {
 
     while (true) {
       switch (peek().getType()) {
-      case PERIOD:
-        res.getOffset().add(parseRefName());
-        break;
-      case OPEN_ARRAY:
-        res.getOffset().add(parseRefIndex());
-        break;
-      case OPENPAREN:
-        res.getOffset().add(parseRefCall());
-        break;
-      case OPENCURLY:
-        res.getOffset().add(parseRefGeneric());
-        break;
-      default:
-        return res;
+        case PERIOD:
+          res.getOffset().add(parseRefName());
+          break;
+        case OPEN_ARRAY:
+          res.getOffset().add(parseRefIndex());
+          break;
+        case OPENPAREN:
+          res.getOffset().add(parseRefCall());
+          break;
+        case OPENCURLY:
+          res.getOffset().add(parseRefGeneric());
+          break;
+        default:
+          return res;
       }
     }
   }
@@ -99,13 +99,13 @@ public class ExpressionParser extends Parser {
   private ExpOp parseShiftOp() {
     Token tok = next();
     switch (tok.getType()) {
-    case SHR:
-      return ExpOp.SHR;
-    case SHL:
-      return ExpOp.SHL;
-    default:
-      RError.err(ErrorType.Error, tok.getInfo(), "unexpected token: " + tok);
-      return null;
+      case SHR:
+        return ExpOp.SHR;
+      case SHL:
+        return ExpOp.SHL;
+      default:
+        RError.err(ErrorType.Error, tok.getInfo(), "unexpected token: " + tok);
+        return null;
     }
   }
 
@@ -126,23 +126,23 @@ public class ExpressionParser extends Parser {
   private RelOp parseRelOp() {
     Token tok = next();
     switch (tok.getType()) {
-    case EQUAL:
-      return RelOp.EQUAL;
-    case NEQ:
-      return RelOp.NOT_EQUAL;
-    case LOWER:
-      return RelOp.LESS;
-    case LEQ:
-      return RelOp.LESS_EQUAL;
-    case GREATER:
-      return RelOp.GREATER;
-    case GEQ:
-      return RelOp.GREATER_EQUEAL;
-    case IS:
-      return RelOp.IS;
-    default:
-      RError.err(ErrorType.Error, tok.getInfo(), "unexpected token: " + tok);
-      return null;
+      case EQUAL:
+        return RelOp.EQUAL;
+      case NEQ:
+        return RelOp.NOT_EQUAL;
+      case LOWER:
+        return RelOp.LESS;
+      case LEQ:
+        return RelOp.LESS_EQUAL;
+      case GREATER:
+        return RelOp.GREATER;
+      case GEQ:
+        return RelOp.GREATER_EQUEAL;
+      case IS:
+        return RelOp.IS;
+      default:
+        RError.err(ErrorType.Error, tok.getInfo(), "unexpected token: " + tok);
+        return null;
     }
   }
 
@@ -151,15 +151,15 @@ public class ExpressionParser extends Parser {
     boolean negate = false;
     Token tok = peek();
     switch (tok.getType()) {
-    case PLUS:
-      next();
-      break;
-    case MINUS:
-      next();
-      negate = true;
-      break;
-    default:
-      break;
+      case PLUS:
+        next();
+        break;
+      case MINUS:
+        next();
+        negate = true;
+        break;
+      default:
+        break;
     }
     Expression term = parseTerm();
     if (negate) {
@@ -208,45 +208,45 @@ public class ExpressionParser extends Parser {
   private Expression parseFactor() {
     TokenType type = peek().getType();
     switch (type) {
-    case IDENTIFIER: {
-      return parseRef();
-    }
-    /*
-     * case STAR: { ElementInfo info = next().getInfo(); Reference ref = new ReferenceUnlinked(info);
-     * ref.getOffset().add(new RefName(info, AnyType.NAME)); return ref; }
-     */
-    case NUMBER: {
-      Token tok = expect(TokenType.NUMBER);
-      return new Number(tok.getInfo(), tok.getNum());
-    }
-    case STRING: {
-      Token tok = expect(TokenType.STRING);
-      return new StringValue(tok.getInfo(), tok.getData());
-    }
-    case FALSE: {
-      return new BoolValue(next().getInfo(), false);
-    }
-    case TRUE: {
-      return new BoolValue(next().getInfo(), true);
-    }
-    case NOT: {
-      return new UnaryExpression(next().getInfo(), parseFactor(), UnaryOp.NOT);
-    }
-    case OPEN_ARRAY: {
-      return parseArrayValue();
-    }
-    case OPENPAREN: {
-      ElementInfo info = expect(TokenType.OPENPAREN).getInfo();
-      List<Expression> list = parseExprList();
-      expect(TokenType.CLOSEPAREN);
-      if (list.size() == 1) {
-        return list.get(0);
-      } else {
-        return new ExprList(info, list);
+      case IDENTIFIER: {
+        return parseRef();
       }
-    }
-    default:
-      RError.err(ErrorType.Fatal, peek().getInfo(), "Unexpected token: " + type);
+      /*
+       * case STAR: { ElementInfo info = next().getInfo(); Reference ref = new ReferenceUnlinked(info);
+       * ref.getOffset().add(new RefName(info, AnyType.NAME)); return ref; }
+       */
+      case NUMBER: {
+        Token tok = expect(TokenType.NUMBER);
+        return new Number(tok.getInfo(), tok.getNum());
+      }
+      case STRING: {
+        Token tok = expect(TokenType.STRING);
+        return new StringValue(tok.getInfo(), tok.getData());
+      }
+      case FALSE: {
+        return new BoolValue(next().getInfo(), false);
+      }
+      case TRUE: {
+        return new BoolValue(next().getInfo(), true);
+      }
+      case NOT: {
+        return new UnaryExpression(next().getInfo(), parseFactor(), UnaryOp.NOT);
+      }
+      case OPEN_ARRAY: {
+        return parseArrayValue();
+      }
+      case OPENPAREN: {
+        ElementInfo info = expect(TokenType.OPENPAREN).getInfo();
+        FunList<Expression> list = parseExprList();
+        expect(TokenType.CLOSEPAREN);
+        if (list.size() == 1) {
+          return list.get(0);
+        } else {
+          return new ExprList(info, list);
+        }
+      }
+      default:
+        RError.err(ErrorType.Fatal, peek().getInfo(), "Unexpected token: " + type);
     }
     return null;
   }
@@ -277,9 +277,9 @@ public class ExpressionParser extends Parser {
   // EBNF refCall: "(" [ exprList ] ")"
   private RefCall parseRefCall() {
     Token tok = expect(TokenType.OPENPAREN);
-    List<Expression> expr;
+    FunList<Expression> expr;
     if (peek().getType() == TokenType.CLOSEPAREN) {
-      expr = new ArrayList<Expression>();
+      expr = new FunList<Expression>();
     } else {
       expr = parseExprList();
     }
@@ -290,11 +290,9 @@ public class ExpressionParser extends Parser {
   // EBNF refGeneric: "{" [ exprList ] "}"
   private RefTemplCall parseRefGeneric() {
     Token tok = expect(TokenType.OPENCURLY);
-    List<Expression> expr;
-    if (peek().getType() == TokenType.CLOSECURLY) {
-      expr = new ArrayList<Expression>();
-    } else {
-      expr = parseExprList();
+    FunList<ActualTemplateArgument> expr = new FunList<ActualTemplateArgument>();
+    if (peek().getType() != TokenType.CLOSECURLY) {
+      expr.addAll(parseExprList());
     }
     expect(TokenType.CLOSECURLY);
     return new RefTemplCall(tok.getInfo(), expr);
@@ -319,49 +317,49 @@ public class ExpressionParser extends Parser {
 
   private boolean isRelOp() {
     switch (peek().getType()) {
-    case EQUAL:
-    case NEQ:
-    case LOWER:
-    case LEQ:
-    case GREATER:
-    case GEQ:
-    case IS:
-      return true;
-    default:
-      return false;
+      case EQUAL:
+      case NEQ:
+      case LOWER:
+      case LEQ:
+      case GREATER:
+      case GEQ:
+      case IS:
+        return true;
+      default:
+        return false;
     }
   }
 
   private boolean isAddOp() {
     switch (peek().getType()) {
-    case PLUS:
-    case MINUS:
-    case OR:
-      return true;
-    default:
-      return false;
+      case PLUS:
+      case MINUS:
+      case OR:
+        return true;
+      default:
+        return false;
     }
   }
 
   private boolean isMulOp() {
     switch (peek().getType()) {
-    case STAR:
-    case DIV:
-    case MOD:
-    case AND:
-      return true;
-    default:
-      return false;
+      case STAR:
+      case DIV:
+      case MOD:
+      case AND:
+        return true;
+      default:
+        return false;
     }
   }
 
   private boolean isShiftOp() {
     switch (peek().getType()) {
-    case SHL:
-    case SHR:
-      return true;
-    default:
-      return false;
+      case SHL:
+      case SHR:
+        return true;
+      default:
+        return false;
     }
   }
 

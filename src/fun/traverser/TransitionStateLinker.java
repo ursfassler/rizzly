@@ -47,7 +47,7 @@ public class TransitionStateLinker {
 
   private static void link(Reference src, Map<String, State> sym, Set<String> amb) {
     if (src.getLink() instanceof DummyLinkTarget) {
-      String target = src.getLink().getName();
+      String target = ((DummyLinkTarget) src.getLink()).getName();
       if (amb.contains(target)) {
         RError.err(ErrorType.Error, src.getInfo(), "State name is ambigous: " + target);
       } else {
@@ -67,6 +67,7 @@ class StateCollector {
   final private Map<State, Integer> deepth = new HashMap<State, Integer>();
   final private Map<State, Map<String, State>> symbols = new HashMap<State, Map<String, State>>();
   final private Map<State, Set<String>> ambigous = new HashMap<State, Set<String>>();
+  final private Map<State, String> names = new HashMap<State, String>();
 
   public Map<String, State> getSymbols(State state) {
     return symbols.get(state);
@@ -77,7 +78,15 @@ class StateCollector {
   }
 
   public void makeTable(ImplHfsm hfsm) {
+    gatherNames(hfsm.getTopstate());
     visitState(hfsm.getTopstate(), 0);
+  }
+
+  private void gatherNames(State state) {
+    for (State sub : state.getItemList().getItems(State.class)) {
+      getNames().put(sub, sub.getName());
+      gatherNames(sub);
+    }
   }
 
   protected Set<State> visitState(State state, int param) {
@@ -102,31 +111,35 @@ class StateCollector {
   }
 
   private void add(State st, Map<String, State> sym, Map<String, Integer> amb) {
-    Integer ad = amb.get(st.getName());
+    Integer ad = amb.get(getNames().get(st));
     if (ad != null) {
-      assert (!sym.containsKey(st.getName()));
+      assert (!sym.containsKey(getNames().get(st)));
       int nd = deepth.get(st);
       if (nd < ad) {
-        amb.remove(st.getName());
-        sym.put(st.getName(), st);
+        amb.remove(getNames().get(st));
+        sym.put(getNames().get(st), st);
       }
     } else {
-      State os = sym.get(st.getName());
+      State os = sym.get(getNames().get(st));
       if (os == null) {
-        sym.put(st.getName(), st);
+        sym.put(getNames().get(st), st);
       } else {
         int nd = deepth.get(st);
         int od = deepth.get(os);
         if (nd > od) {
-          sym.put(st.getName(), st);
+          sym.put(getNames().get(st), st);
         } else if (nd == od) {
-          sym.remove(os.getName());
-          amb.put(os.getName(), od);
+          sym.remove(getNames().get(os));
+          amb.put(getNames().get(os), od);
         } else {
           assert (nd < od);
         }
       }
     }
+  }
+
+  public Map<State, String> getNames() {
+    return names;
   }
 
 }

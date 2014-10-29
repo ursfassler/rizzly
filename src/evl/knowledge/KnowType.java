@@ -1,11 +1,8 @@
 package evl.knowledge;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 import java.util.Map;
 
 import util.Range;
@@ -41,32 +38,29 @@ import evl.expression.binop.Plus;
 import evl.expression.binop.Relation;
 import evl.expression.binop.Shl;
 import evl.expression.binop.Shr;
-import evl.expression.reference.RefCall;
-import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefItem;
-import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
+import evl.expression.reference.SimpleRef;
 import evl.expression.unop.BitNot;
 import evl.expression.unop.LogicNot;
 import evl.expression.unop.Uminus;
-import evl.function.FuncIface;
-import evl.function.FuncWithReturn;
-import evl.function.FunctionBase;
+import evl.function.Function;
+import evl.function.InterfaceFunction;
 import evl.other.CompUse;
 import evl.other.Component;
+import evl.other.EvlList;
+import evl.traverser.RefTypeGetter;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import evl.type.Type;
-import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.type.base.FunctionType;
-import evl.type.base.FunctionTypeRet;
-import evl.type.base.FunctionTypeVoid;
 import evl.type.base.RangeType;
 import evl.type.composed.NamedElement;
 import evl.type.special.ComponentType;
+import evl.variable.FuncVariable;
 import evl.variable.Variable;
 
 public class KnowType extends KnowledgeEntry {
@@ -93,7 +87,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     super();
     kbi = kb.getEntry(KnowBaseItem.class);
     kp = kb.getEntry(KnowParent.class);
-    rtg = new RefTypeGetter(this, kb);
+    rtg = new RefTypeGetter(kb);
   }
 
   private void checkPositive(ElementInfo info, String op, Range lhs, Range rhs) {
@@ -124,40 +118,37 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
   }
 
   @Override
+  protected Type visitNamedElement(NamedElement obj, Void param) {
+    return visit(obj.getRef(), param);
+  }
+
+  @Override
   protected Type visitTypeCast(TypeCast obj, Void param) {
     return visit(obj.getCast(), param);
   }
 
   @Override
-  protected Type visitFunctionBase(FunctionBase obj, Void param) {
-    List<TypeRef> arg = new ArrayList<TypeRef>();
-    for (Variable var : obj.getParam()) {
-      arg.add(var.getType().copy());
+  protected Type visitFunctionImpl(Function obj, Void param) {
+    EvlList<SimpleRef<Type>> arg = new EvlList<SimpleRef<Type>>();
+    for (FuncVariable var : obj.getParam()) {
+      arg.add(new SimpleRef<Type>(ElementInfo.NO, var.getType().getLink()));
     }
-    String name = "T" + Designator.NAME_SEP + obj.getName();
-    FunctionType ft;
-
-    if (obj instanceof FuncWithReturn) {
-      TypeRef ret = ((FuncWithReturn) obj).getRet().copy();
-      ft = new FunctionTypeRet(obj.getInfo(), name, arg, ret);
-    } else {
-      ft = new FunctionTypeVoid(obj.getInfo(), name, arg);
-    }
-
-    return ft;
+    return new FunctionType(obj.getInfo(), obj.getName(), arg, new SimpleRef<Type>(ElementInfo.NO, obj.getRet().getLink()));
   }
 
   @Override
   protected Type visitComponent(Component obj, Void param) {
-    Collection<NamedElement> elements = new ArrayList<NamedElement>();
-    for (FuncIface itr : obj.getIface(Direction.in)) {
-      elements.add(new NamedElement(itr.getInfo(), itr.getName(), new TypeRef(itr.getInfo(), visit(itr, param))));
-    }
-    for (FuncIface itr : obj.getIface(Direction.out)) {
-      elements.add(new NamedElement(itr.getInfo(), itr.getName(), new TypeRef(itr.getInfo(), visit(itr, param))));
-    }
-    ComponentType ct = new ComponentType(obj.getInfo(), Designator.NAME_SEP + "T" + Designator.NAME_SEP + obj.getName(), elements);
+    ComponentType ct = new ComponentType(obj.getInfo(), Designator.NAME_SEP + "T" + Designator.NAME_SEP + obj.getName());
+    makeFuncTypes(ct.getInput(), obj.getIface(Direction.in));
+    makeFuncTypes(ct.getOutput(), obj.getIface(Direction.out));
     return ct;
+  }
+
+  private void makeFuncTypes(EvlList<NamedElement> flist, EvlList<InterfaceFunction> evlList) {
+    for (InterfaceFunction itr : evlList) {
+      NamedElement ne = new NamedElement(itr.getInfo(), itr.getName(), new SimpleRef<Type>(itr.getInfo(), visit(itr, null)));
+      flist.add(ne);
+    }
   }
 
   @Override
@@ -168,11 +159,6 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
   @Override
   protected Type visitNumber(Number obj, Void param) {
     return kbi.getNumsetType(new Range(obj.getValue(), obj.getValue()));
-  }
-
-  @Override
-  protected Type visitNamedElement(NamedElement obj, Void param) {
-    return visit(obj.getType(), param);
   }
 
   @Override
@@ -212,8 +198,13 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
   }
 
   @Override
-  protected Type visitTypeRef(TypeRef obj, Void param) {
-    return visit(obj.getRef(), param);
+  protected Type visitTypeRef(SimpleRef obj, Void param) {
+    return visit(obj.getLink(), param);
+  }
+
+  @Override
+  protected Type visitCompUse(CompUse obj, Void param) {
+    return visit(obj.getLink(), param);
   }
 
   @Override
@@ -487,11 +478,6 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     return kbi.getNumsetType(new Range(low, high));
   }
 
-  @Override
-  protected Type visitCompUse(CompUse obj, Void param) {
-    return visit(obj.getLink(), param);
-  }
-
   protected Type visitArrayValue(ArrayValue obj, Void param) {
     Iterator<Expression> itr = obj.getValue().iterator();
     assert (itr.hasNext());
@@ -503,83 +489,11 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
 
     RangeType et = kbi.getNumsetType(cont);
 
-    return new ArrayType(BigInteger.valueOf(obj.getValue().size()), new TypeRef(new ElementInfo(), et));
+    return new ArrayType(BigInteger.valueOf(obj.getValue().size()), new SimpleRef<Type>(ElementInfo.NO, et));
   }
 
   @Override
   protected Type visitStringValue(StringValue obj, Void param) {
     return kbi.getStringType();
   }
-}
-
-class RefTypeGetter extends NullTraverser<Type, Type> {
-  private KnowledgeBase kb;
-  private KnowBaseItem kbi;
-  private KnowTypeTraverser kt;
-
-  public RefTypeGetter(KnowTypeTraverser kt, KnowledgeBase kb) {
-    super();
-    this.kt = kt;
-    this.kb = kb;
-    kbi = kb.getEntry(KnowBaseItem.class);
-  }
-
-  @Override
-  protected Type visitDefault(Evl obj, Type param) {
-    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
-  }
-
-  @Override
-  protected Type visitTypeRef(TypeRef obj, Type param) {
-    return obj.getRef();
-  }
-
-  @Override
-  protected Type visitReference(Reference obj, Type param) {
-    Type ret = kt.traverse(obj.getLink(), null);
-    for (RefItem ref : obj.getOffset()) {
-      ret = visit(ref, ret);
-      assert (ret != null);
-    }
-    return ret;
-  }
-
-  @Override
-  protected Type visitRefCall(RefCall obj, Type sub) {
-    if (sub instanceof FunctionType) {
-      if (sub instanceof FunctionTypeRet) {
-        return visit(((FunctionTypeRet) sub).getRet(), null);
-      } else {
-        return kbi.getVoidType();
-      }
-    } else {
-      RError.err(ErrorType.Error, obj.getInfo(), "Not a function: " + obj.toString());
-      return null;
-    }
-  }
-
-  @Override
-  protected Type visitRefName(RefName obj, Type sub) {
-    if (sub instanceof EnumType) {
-      return sub;
-    } else {
-      KnowChild kc = kb.getEntry(KnowChild.class);
-      Evl etype = kc.find(sub, obj.getName());
-      if (etype == null) {
-        RError.err(ErrorType.Error, obj.getInfo(), "Child not found: " + obj.getName());
-      }
-      return kt.traverse(etype, null);
-    }
-  }
-
-  @Override
-  protected Type visitRefIndex(RefIndex obj, Type sub) {
-    if (sub instanceof ArrayType) {
-      return visit(((ArrayType) sub).getType(), null);
-    } else {
-      RError.err(ErrorType.Error, obj.getInfo(), "need array to index, got type: " + sub.getName());
-      return null;
-    }
-  }
-
 }

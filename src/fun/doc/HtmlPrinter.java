@@ -8,20 +8,15 @@ import util.Writer;
 import common.Designator;
 
 import fun.Fun;
-import fun.expression.reference.Reference;
-import fun.knowledge.KnowFunFile;
 import fun.knowledge.KnowFunPath;
 import fun.knowledge.KnowledgeBase;
 import fun.other.Named;
-import fun.other.RizzlyFile;
 
 public class HtmlPrinter extends FunPrinter {
-  private KnowFunFile kff;
   private KnowFunPath kfp;
 
   public HtmlPrinter(Writer xw, KnowledgeBase kb) {
     super(xw);
-    kff = kb.getEntry(KnowFunFile.class);
     kfp = kb.getEntry(KnowFunPath.class);
   }
 
@@ -38,27 +33,18 @@ public class HtmlPrinter extends FunPrinter {
       return "_" + Integer.toHexString(obj.hashCode());
     }
 
-    RizzlyFile file = kff.get(obj);
-
-    assert (file != null);
-    assert (fullpath.size() >= file.getFullName().size());
-
-    Designator locpath = new Designator(fullpath.toList().subList(file.getFullName().size(), fullpath.size()));
-    locpath = new Designator(locpath, obj.getName());
+    // TODO verify
+    // RizzlyFile file = kff.get(obj);
+    //
+    // assert (file != null);
+    // assert (fullpath.size() >= file.getFullName().size());
+    //
+    // Designator locpath = new Designator(fullpath.toList().subList(file.getFullName().size(), fullpath.size()));
+    // locpath = new Designator(locpath, obj.getName());
+    //
+    Designator locpath = new Designator(fullpath, obj.getName());
 
     return locpath.toString();
-  }
-
-  @Override
-  protected Designator getObjPath(Reference obj) {
-    RizzlyFile file = kff.find(obj.getLink()); // FIXME find better way to handle built in functions and so
-    Designator path;
-    if (file == null) {
-      path = new Designator();
-    } else {
-      path = file.getFullName();
-    }
-    return path;
   }
 
 }

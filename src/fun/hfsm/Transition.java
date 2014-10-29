@@ -5,33 +5,20 @@ import common.ElementInfo;
 import fun.FunBase;
 import fun.expression.Expression;
 import fun.expression.reference.Reference;
-import fun.other.ListOfNamed;
-import fun.other.Named;
+import fun.other.FunList;
 import fun.statement.Block;
 import fun.variable.FuncVariable;
 
-public class Transition extends FunBase implements Named {
-
-  private String name;
+public class Transition extends FunBase implements StateContent {
   private Reference src;
   private Reference dst;
   private Reference event;
-  final private ListOfNamed<FuncVariable> param = new ListOfNamed<FuncVariable>();
+  final private FunList<FuncVariable> param = new FunList<FuncVariable>();
   private Expression guard;
   private Block body;
 
-  public Transition(ElementInfo info, String name) {
+  public Transition(ElementInfo info) {
     super(info);
-    this.name = name;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public void setName(String name) {
-    this.name = name;
   }
 
   public Reference getSrc() {
@@ -66,7 +53,7 @@ public class Transition extends FunBase implements Named {
     this.event = event;
   }
 
-  public ListOfNamed<FuncVariable> getParam() {
+  public FunList<FuncVariable> getParam() {
     return param;
   }
 

@@ -1,24 +1,22 @@
 package evl.other;
 
+import common.Designator;
 import common.ElementInfo;
 
 import evl.EvlBase;
 
 public class Queue extends EvlBase implements Named {
-  public static final String DEFAULT_NAME = "queue";
-  private String name;
+  public static final String DEFAULT_NAME = Designator.NAME_SEP + "queue";
+  private String name = DEFAULT_NAME;
 
-  public Queue(String name) {
-    super(new ElementInfo());
-    this.name = name;
+  public Queue() {
+    super(ElementInfo.NO);
   }
 
-  @Override
   public String getName() {
     return name;
   }
 
-  @Override
   public void setName(String name) {
     this.name = name;
   }

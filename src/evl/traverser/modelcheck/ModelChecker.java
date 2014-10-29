@@ -1,17 +1,13 @@
 package evl.traverser.modelcheck;
 
-import java.util.ArrayList;
-
 import evl.DefTraverser;
 import evl.Evl;
 import evl.composition.ImplComposition;
 import evl.expression.Expression;
-import evl.function.FunctionBase;
+import evl.function.Function;
 import evl.hfsm.ImplHfsm;
 import evl.knowledge.KnowledgeBase;
 import evl.other.ImplElementary;
-import evl.other.ListOfNamed;
-import evl.other.Named;
 import evl.variable.Variable;
 
 public class ModelChecker extends DefTraverser<Void, Void> {
@@ -25,13 +21,6 @@ public class ModelChecker extends DefTraverser<Void, Void> {
   static public void process(Evl obj, KnowledgeBase kb) {
     ModelChecker adder = new ModelChecker(kb);
     adder.traverse(obj, null);
-  }
-
-  public static void processList(ListOfNamed<? extends Named> variable, KnowledgeBase kb) {
-    ModelChecker adder = new ModelChecker(kb);
-    for (Named itr : new ArrayList<Named>(variable.getList())) {
-      adder.traverse(itr, null);
-    }
   }
 
   @Override
@@ -51,7 +40,7 @@ public class ModelChecker extends DefTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitFunctionBase(FunctionBase obj, Void sym) {
+  protected Void visitFunctionImpl(Function obj, Void sym) {
     return null;
   }
 

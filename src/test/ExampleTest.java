@@ -11,12 +11,17 @@ public class ExampleTest extends BaseTest {
 
   @Override
   protected String getRootdir() {
-    return "";
+    return "../example/";
   }
 
   @Test
   public void motor() {
     compileExample("motor/", "main.Controller");
+  }
+
+  @Test
+  public void alarmclock() {
+    compileExample("alarmclock/", "clock.Clock");
   }
 
 }

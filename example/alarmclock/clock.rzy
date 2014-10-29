@@ -1,0 +1,91 @@
+import iface;
+import comp;
+import ui;
+import modec;
+import alarmController;
+import beeper;
+
+Clock = Composition
+  snoozeDown : slot();
+  snoozeUp : slot();
+  alarmDown : slot();
+  alarmUp : slot();
+  modeDown : slot();
+  modeUp : slot();
+  minuteDown : slot();
+  minuteUp : slot();
+  hourDown : slot();
+  hourUp : slot();
+  tick : slot();
+    
+  visible : signal( value: Boolean );
+  bell : signal( value: Boolean );
+  icon : signal( value: Modes );
+  alarmIcon : signal( visible: Boolean );
+  time : signal( value: iface.Time );
+
+  snoozeEdge    : Edge;                         //geometry x="160" y="20"
+  modeEdge      : Edge;                         //geometry x="160" y="100"
+  minAuto       : Autorepeat;                   //geometry x="160" y="180"
+  hourAuto      : Autorepeat;                   //geometry x="160" y="275"
+  alarmEdge     : Edge;                         //geometry x="160" y="370"
+  modeCmp       : Mode;                         //geometry x="280" y="165"
+  timeCmp       : comp.Time;                    //geometry x="420" y="165"
+  alarmTime     : comp.Time;                    //geometry x="490" y="340"
+  ui            : Ui;                           //geometry x="630" y="310"
+  blink         : Blink;                        //geometry x="420" y="40"
+  cntr          : AlarmController;              //geometry x="560" y="165"
+  beep          : Beeper;                       //geometry x="630" y="40"
+    
+  tick              -> hourAuto.tick;           //geometry path="66"
+  tick              -> minAuto.tick;            //geometry path="62"
+  tick              -> timeCmp.tick;            //geometry path="58 442 360"
+  tick              -> blink.tick;
+  tick              -> beep.tick;
+
+  snoozeDown        -> snoozeEdge.down;
+  snoozeUp          -> snoozeEdge.up;
+  alarmDown         -> alarmEdge.down;          //geometry path="100"
+  alarmUp           -> alarmEdge.up;            //geometry path="96"
+  modeDown          -> modeEdge.down;           //geometry path="92"
+  modeUp            -> modeEdge.up;             //geometry path="88"
+  hourDown          -> hourAuto.down;           //geometry path="84"
+  hourUp            -> hourAuto.up;             //geometry path="80"
+  minuteDown        -> minAuto.down;            //geometry path="76"
+  minuteUp          -> minAuto.up;              //geometry path="72"
+
+  minAuto.click     -> modeCmp.min;
+  hourAuto.click    -> modeCmp.hour;
+
+  modeCmp.changed   -> ui.mode;
+  modeCmp.changed   -> blink.mode;
+  
+  modeCmp.timeMin     -> timeCmp.incMinute;
+  modeCmp.timeHour    -> timeCmp.incHour;
+  modeCmp.timeUpdate  -> timeCmp.update;
+  modeCmp.alarmMin    -> alarmTime.incMinute;
+  modeCmp.alarmHour   -> alarmTime.incHour;
+  modeCmp.alarmUpdate -> alarmTime.update;
+  
+  timeCmp.changed   -> ui.time;
+  timeCmp.changed   -> cntr.time;
+  
+  alarmTime.changed -> ui.alarm;
+
+  snoozeEdge.click  -> beep.snooze;
+  alarmEdge.click   -> cntr.onOff;                //geometry path="365 280 490"
+  modeEdge.click    -> modeCmp.change;            //geometry path="220"
+  
+  cntr.getAlarmTime -> alarmTime.get;
+
+  modeCmp.changed                      -> icon;
+
+  cntr.alarm    -> beep.alarm;
+
+  ui.dispTime               -> time;
+  blink.on            -> visible;
+    
+  beep.bell         -> bell;
+  cntr.alarmIcon         -> alarmIcon;
+end
+

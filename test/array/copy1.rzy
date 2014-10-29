@@ -1,14 +1,9 @@
-component
-  Copy
+Copy = Elementary
+  a : Array{10,R{0,200}} = [0,0,0,0,0,0,0,0,0,0];
 
-  implementation elementary
-
-    var
-      a : Array{10,R{0,200}} = [0,0,0,0,0,0,0,0,0,0];
-
-    function foo()
-      b : Array{10,R{0,200}} = a;
-    end
-
+  foo = procedure()
+    b : Array{10,R{0,200}} = a;
   end
+
+end
 

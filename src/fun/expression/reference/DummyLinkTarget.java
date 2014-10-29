@@ -17,13 +17,9 @@ public class DummyLinkTarget extends FunBase implements Named {
     return name;
   }
 
-  public void setName(String name) {
-    this.name = name;
-  }
-
   @Override
-  public String toString() {
-    return name;
+  public void setName(String name) {
+    throw new RuntimeException("not yet implemented");
   }
 
 }

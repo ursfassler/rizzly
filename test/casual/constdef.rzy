@@ -1,18 +1,12 @@
 
-const
-  Answer : R{0,99} = 42;
+Answer : const R{0,99} = 42;
 
-component
-  Constdef
+Constdef = Elementary
+  BlaBla : const R{0,99} = 23;
 
-    implementation elementary
-
-    const
-      BlaBla : R{0,99} = 23;
-
-    function foo()
-      bar : R{0,99} = Answer;
-    end
-
+  foo = procedure()
+    bar : R{0,99} = Answer;
   end
+
+end
 

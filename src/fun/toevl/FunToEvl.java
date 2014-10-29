@@ -1,11 +1,11 @@
 package fun.toevl;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
+import common.Designator;
 import common.Direction;
+import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
@@ -15,37 +15,42 @@ import evl.composition.EndpointSelf;
 import evl.composition.EndpointSub;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
-import evl.function.FunctionBase;
-import evl.function.impl.FuncIfaceInRet;
-import evl.function.impl.FuncIfaceInVoid;
-import evl.function.impl.FuncIfaceOutRet;
-import evl.function.impl.FuncIfaceOutVoid;
+import evl.expression.reference.SimpleRef;
+import evl.function.Function;
+import evl.function.InterfaceFunction;
+import evl.function.header.FuncCtrlInDataIn;
+import evl.function.header.FuncPrivateVoid;
 import evl.hfsm.State;
 import evl.hfsm.StateItem;
 import evl.other.CompUse;
+import evl.other.EvlList;
+import evl.other.Named;
 import evl.statement.Block;
 import evl.statement.CaseOptEntry;
 import evl.type.Type;
-import evl.type.TypeRef;
+import evl.type.special.VoidType;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.composition.Connection;
 import fun.composition.ImplComposition;
+import fun.content.CompIfaceContent;
 import fun.expression.Expression;
+import fun.expression.reference.DummyLinkTarget;
 import fun.expression.reference.RefItem;
-import fun.function.FunctionHeader;
+import fun.function.FuncHeader;
+import fun.function.FuncImpl;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.StateComposite;
+import fun.hfsm.StateContent;
 import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
 import fun.other.ImplElementary;
-import fun.other.Named;
 import fun.other.Namespace;
 import fun.statement.CaseOpt;
 import fun.statement.Statement;
 import fun.type.base.EnumElement;
 import fun.type.composed.NamedElement;
-import fun.variable.Constant;
+import fun.variable.FuncVariable;
 import fun.variable.Variable;
 
 public class FunToEvl extends NullTraverser<Evl, Void> {
@@ -63,15 +68,25 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
     func = new FunToEvlFunc(this, map);
   }
 
-  public static evl.other.Namespace process(Namespace classes, String debugdir) {
-    FunToEvl funToAst = new FunToEvl();
-    return (evl.other.Namespace) funToAst.traverse(classes, null);
+  public Evl map(Fun fun) {
+    return map.get(fun);
   }
 
-  public static TypeRef toTypeRef(Reference ref) {
+  private VoidType getVoidType() {
+    VoidType voidType = (VoidType) visit(fun.type.base.VoidType.INSTANCE, null);
+    return voidType;
+  }
+
+  public static SimpleRef<Type> toTypeRef(Reference ref) {
     assert (ref.getOffset().isEmpty());
     assert (ref.getLink() instanceof Type);
-    TypeRef typeRef = new TypeRef(ref.getInfo(), (Type) ref.getLink());
+    SimpleRef<Type> typeRef = new SimpleRef<Type>(ref.getInfo(), (Type) ref.getLink());
+    return typeRef;
+  }
+
+  public static <T extends Named> SimpleRef<T> toSimple(Reference ref) {
+    assert (ref.getOffset().isEmpty());
+    SimpleRef<T> typeRef = new SimpleRef<T>(ref.getInfo(), (T) ref.getLink());
     return typeRef;
   }
 
@@ -79,7 +94,7 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
   protected Evl visit(Fun obj, Void param) {
     Evl cobj = map.get(obj);
     if (cobj == null) {
-      cobj = super.visit(obj, param);
+      cobj = super.visit(obj, null);
       assert (cobj != null);
       map.put(obj, cobj);
     }
@@ -92,24 +107,35 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
   }
 
   @Override
+  protected Evl visitDummyLinkTarget(DummyLinkTarget obj, Void param) {
+    RError.err(ErrorType.Fatal, obj.getInfo(), "DummyLinkTarget should no longer exist");
+    return null;
+  }
+
+  @Override
+  protected Evl visitSimpleRef(fun.expression.reference.SimpleRef obj, Void param) {
+    return new SimpleRef<Named>(obj.getInfo(), (Named) visit(obj.getLink(), param));
+  }
+
+  @Override
   protected Evl visitNamespace(Namespace obj, Void param) {
     evl.other.Namespace ret = new evl.other.Namespace(obj.getInfo(), obj.getName());
     map.put(obj, ret);
-    for (Named src : obj) {
-      evl.other.Named ni = (evl.other.Named) visit(src, param);
-      ret.add(ni);
+    for (Fun src : obj.getChildren()) {
+      Evl ni = visit(src, null);
+      ret.getChildren().add(ni);
     }
     return ret;
   }
 
   @Override
   protected Evl visitType(fun.type.Type obj, Void param) {
-    return type.traverse(obj, obj.getName());
+    return type.traverse(obj, param);
   }
 
   @Override
   protected Evl visitExpression(Expression obj, Void param) {
-    return expr.traverse(obj, param);
+    return expr.traverse(obj, null);
   }
 
   @Override
@@ -124,7 +150,7 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitVariable(Variable obj, Void param) {
-    return var.traverse(obj, null);
+    return var.traverse(obj, param);
   }
 
   @Override
@@ -133,8 +159,13 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
   }
 
   @Override
-  protected Evl visitFunctionHeader(FunctionHeader obj, Void param) {
-    return func.traverse(obj, null);
+  protected Evl visitFuncImpl(FuncImpl obj, Void param) {
+    return func.traverse(obj, param);
+  }
+
+  @Override
+  protected Evl visitFunctionHeader(FuncHeader obj, Void param) {
+    return func.traverse(obj, param);
   }
 
   @Override
@@ -157,48 +188,53 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
 
   private Endpoint refToEnp(Reference ref) {
     switch (ref.getOffset().size()) {
-    case 0: {
-      return new EndpointSelf(ref.getInfo(), (evl.function.FuncIface) ref.getLink());
-    }
-    case 1: {
-      CompUse comp = (CompUse) ref.getLink();
-      String iface = ((RefName) ref.getOffset().get(0)).getName();
-      return new EndpointSub(ref.getInfo(), comp, iface);
-    }
-    default: {
-      RError.err(ErrorType.Fatal, ref.getInfo(), "Unknown connection endpoint");
-      return null;
-    }
+      case 0: {
+        return new EndpointSelf(ref.getInfo(), (Function) ref.getLink());
+      }
+      case 1: {
+        CompUse comp = (CompUse) ref.getLink();
+        String name = ((RefName) ref.getOffset().get(0)).getName();
+        return new EndpointSub(ref.getInfo(), comp, name);
+      }
+      default: {
+        RError.err(ErrorType.Fatal, ref.getInfo(), "Unknown connection endpoint");
+        return null;
+      }
     }
   }
 
   @Override
   protected Evl visitImplElementary(ImplElementary obj, Void param) {
-    evl.other.ImplElementary comp = new evl.other.ImplElementary(obj.getInfo(), obj.getName());
+    VoidType voidType = getVoidType();
+    FuncPrivateVoid entryFunc = new FuncPrivateVoid(ElementInfo.NO, "_entry", new EvlList<evl.variable.FuncVariable>(), new SimpleRef<Type>(ElementInfo.NO, voidType), (Block) visit(obj.getEntryFunc(), null));
+    FuncPrivateVoid exitFunc = new FuncPrivateVoid(ElementInfo.NO, "_exit", new EvlList<evl.variable.FuncVariable>(), new SimpleRef<Type>(ElementInfo.NO, voidType), (Block) visit(obj.getExitFunc(), null));
+    // if this makes problems like loops, convert the body of the functions after the component
+
+    evl.other.ImplElementary comp = new evl.other.ImplElementary(obj.getInfo(), obj.getName(), new SimpleRef<FuncPrivateVoid>(ElementInfo.NO, entryFunc), new SimpleRef<FuncPrivateVoid>(ElementInfo.NO, exitFunc));
     map.put(obj, comp);
-    for (FunctionHeader use : obj.getQuery()) {
-      comp.getQuery().add((FuncIfaceOutRet) visit(use, null));
+
+    comp.getFunction().add(entryFunc);
+    comp.getFunction().add(exitFunc);
+    RError.ass(obj.getDeclaration().isEmpty(), obj.getInfo());
+
+    for (Fun itr : obj.getObjects()) {
+      Evl evl = visit(itr, param);
+      comp.getFunction().add((Function) evl);
     }
-    for (FunctionHeader use : obj.getResponse()) {
-      comp.getResponse().add((FuncIfaceInRet) visit(use, null));
+
+    for (Fun itr : obj.getInstantiation()) {
+      Evl ni = visit(itr, null);
+      if (ni instanceof evl.variable.Constant) {
+        comp.getConstant().add((evl.variable.Constant) ni);
+      } else if (ni instanceof evl.variable.Variable) {
+        comp.getVariable().add((evl.variable.Variable) ni);
+      } else if (ni instanceof InterfaceFunction) {
+        comp.getIface().add((InterfaceFunction) ni);
+      } else {
+        throw new RuntimeException("Not yet implemented: " + ni.getClass().getCanonicalName());
+      }
     }
-    for (FunctionHeader use : obj.getSignal()) {
-      comp.getSignal().add((FuncIfaceOutVoid) visit(use, null));
-    }
-    for (FunctionHeader use : obj.getSlot()) {
-      comp.getSlot().add((FuncIfaceInVoid) visit(use, null));
-    }
-    for (Constant var : obj.getConstant()) {
-      comp.getConstant().add((evl.variable.Constant) visit(var, null));
-    }
-    for (Variable var : obj.getVariable()) {
-      comp.getVariable().add((evl.variable.Variable) visit(var, null));
-    }
-    comp.setEntryFunc((Reference) visit(obj.getEntryFunc(), null));
-    comp.setExitFunc((Reference) visit(obj.getExitFunc(), null));
-    for (FunctionHeader item : obj.getFunction()) {
-      comp.getFunction().add((FunctionBase) visit(item, null));
-    }
+
     return comp;
   }
 
@@ -206,19 +242,18 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
   protected Evl visitImplHfsm(ImplHfsm obj, Void param) {
     evl.hfsm.ImplHfsm comp = new evl.hfsm.ImplHfsm(obj.getInfo(), obj.getName());
     map.put(obj, comp);
-    for (FunctionHeader use : obj.getQuery()) {
-      comp.getQuery().add((FuncIfaceOutRet) visit(use, null));
+
+    for (CompIfaceContent itr : obj.getInterface()) {
+      Evl ni = visit(itr, null);
+      if (ni instanceof InterfaceFunction) {
+        comp.getIface().add((InterfaceFunction) ni);
+      } else {
+        throw new RuntimeException("Not yet implemented: " + ni.getClass().getCanonicalName());
+      }
     }
-    for (FunctionHeader use : obj.getResponse()) {
-      comp.getResponse().add((FuncIfaceInRet) visit(use, null));
-    }
-    for (FunctionHeader use : obj.getSignal()) {
-      comp.getSignal().add((FuncIfaceOutVoid) visit(use, null));
-    }
-    for (FunctionHeader use : obj.getSlot()) {
-      comp.getSlot().add((FuncIfaceInVoid) visit(use, null));
-    }
+
     comp.setTopstate((evl.hfsm.StateComposite) visit(obj.getTopstate(), null));
+    comp.getTopstate().setName(Designator.NAME_SEP + "top");
     return comp;
   }
 
@@ -226,21 +261,18 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
   protected Evl visitImplComposition(ImplComposition obj, Void param) {
     evl.composition.ImplComposition comp = new evl.composition.ImplComposition(obj.getInfo(), obj.getName());
     map.put(obj, comp);
-    for (FunctionHeader use : obj.getQuery()) {
-      comp.getQuery().add((FuncIfaceOutRet) visit(use, null));
+
+    for (Fun itr : obj.getInstantiation()) {
+      Evl ni = visit(itr, null);
+      if (ni instanceof CompUse) {
+        comp.getComponent().add((CompUse) ni);
+      } else if (ni instanceof InterfaceFunction) {
+        comp.getIface().add((InterfaceFunction) ni);
+      } else {
+        throw new RuntimeException("Not yet implemented: " + ni.getClass().getCanonicalName());
+      }
     }
-    for (FunctionHeader use : obj.getResponse()) {
-      comp.getResponse().add((FuncIfaceInRet) visit(use, null));
-    }
-    for (FunctionHeader use : obj.getSignal()) {
-      comp.getSignal().add((FuncIfaceOutVoid) visit(use, null));
-    }
-    for (FunctionHeader use : obj.getSlot()) {
-      comp.getSlot().add((FuncIfaceInVoid) visit(use, null));
-    }
-    for (fun.variable.CompUse use : obj.getComponent()) {
-      comp.getComponent().add((evl.other.CompUse) visit(use, null));
-    }
+
     for (Connection con : obj.getConnection()) {
       comp.getConnection().add((evl.composition.Connection) visit(con, null));
     }
@@ -249,7 +281,7 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitCaseOpt(CaseOpt obj, Void param) {
-    List<CaseOptEntry> value = new ArrayList<CaseOptEntry>();
+    EvlList<CaseOptEntry> value = new EvlList<CaseOptEntry>();
     for (fun.statement.CaseOptEntry entry : obj.getValue()) {
       value.add((CaseOptEntry) visit(entry, null));
     }
@@ -258,76 +290,75 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
 
   // ----------------
 
-  @Override
-  protected Evl visitStateComposite(StateComposite obj, Void param) {
-    evl.hfsm.StateComposite state = new evl.hfsm.StateComposite(obj.getInfo(), obj.getName());
-    map.put(obj, state);
-
-    for (Variable var : obj.getVariable()) {
-      state.getVariable().add((evl.variable.StateVariable) traverse(var, null));
-    }
-    for (Named use : obj.getItemList()) {
+  private void convertContent(fun.hfsm.State obj, evl.hfsm.State state) {
+    for (StateContent use : obj.getItemList()) {
       Evl evl = traverse(use, null);
       if (evl instanceof StateItem) {
         state.getItem().add((StateItem) evl);
       } else {
-        assert (evl instanceof evl.function.FunctionHeader);
-        state.getFunction().add((evl.function.FunctionHeader) evl);
+        RError.err(ErrorType.Fatal, evl.getInfo(), "Unhandled state item: " + evl.getClass().getCanonicalName());
       }
     }
+  }
+
+  @Override
+  protected Evl visitStateComposite(StateComposite obj, Void param) {
+    SimpleRef<State> initref = toSimple((Reference) traverse(obj.getInitial(), null));
+
+    VoidType voidType = getVoidType();
+    FuncPrivateVoid entryFunc = new FuncPrivateVoid(ElementInfo.NO, "_entry", new EvlList<evl.variable.FuncVariable>(), new SimpleRef<Type>(ElementInfo.NO, voidType), new Block(ElementInfo.NO));
+    FuncPrivateVoid exitFunc = new FuncPrivateVoid(ElementInfo.NO, "_exit", new EvlList<evl.variable.FuncVariable>(), new SimpleRef<Type>(ElementInfo.NO, voidType), new Block(ElementInfo.NO));
+
+    evl.hfsm.StateComposite state = new evl.hfsm.StateComposite(obj.getInfo(), obj.getName(), new SimpleRef<FuncPrivateVoid>(ElementInfo.NO, entryFunc), new SimpleRef<FuncPrivateVoid>(ElementInfo.NO, exitFunc), initref);
+    state.getItem().add(entryFunc);
+    state.getItem().add(exitFunc);
+    map.put(obj, state);
+
+    convertContent(obj, state);
 
     // it is here to break dependency cycle
-    state.setEntryFunc((Reference) traverse(obj.getEntryFuncRef(), null));
-    state.setExitFunc((Reference) traverse(obj.getExitFuncRef(), null));
-    Reference initref = (Reference) traverse(obj.getInitial(), null);
-    assert (initref.getOffset().isEmpty());
-    state.setInitial((State) initref.getLink());
+    entryFunc.getBody().getStatements().addAll(((Block) traverse(obj.getEntryFunc(), null)).getStatements());
+    exitFunc.getBody().getStatements().addAll(((Block) traverse(obj.getExitFunc(), null)).getStatements());
 
     return state;
   }
 
   @Override
   protected Evl visitStateSimple(StateSimple obj, Void param) {
-    evl.hfsm.StateSimple state = new evl.hfsm.StateSimple(obj.getInfo(), obj.getName());
+    VoidType voidType = getVoidType();
+    FuncPrivateVoid entryFunc = new FuncPrivateVoid(ElementInfo.NO, "_entry", new EvlList<evl.variable.FuncVariable>(), new SimpleRef<Type>(ElementInfo.NO, voidType), new Block(ElementInfo.NO));
+    FuncPrivateVoid exitFunc = new FuncPrivateVoid(ElementInfo.NO, "_exit", new EvlList<evl.variable.FuncVariable>(), new SimpleRef<Type>(ElementInfo.NO, voidType), new Block(ElementInfo.NO));
+
+    evl.hfsm.StateSimple state = new evl.hfsm.StateSimple(obj.getInfo(), obj.getName(), new SimpleRef<FuncPrivateVoid>(ElementInfo.NO, entryFunc), new SimpleRef<FuncPrivateVoid>(ElementInfo.NO, exitFunc));
+    state.getItem().add(entryFunc);
+    state.getItem().add(exitFunc);
     map.put(obj, state);
-    for (Variable var : obj.getVariable()) {
-      state.getVariable().add((evl.variable.StateVariable) traverse(var, null));
-    }
-    for (Named use : obj.getItemList()) {
-      Evl evl = traverse(use, null);
-      if (evl instanceof StateItem) {
-        state.getItem().add((StateItem) evl);
-      } else {
-        assert (evl instanceof evl.function.FunctionHeader);
-        state.getFunction().add((evl.function.FunctionHeader) evl);
-      }
-    }
+
+    convertContent(obj, state);
 
     // it is here to break dependency cycle
-    state.setEntryFunc((Reference) traverse(obj.getEntryFuncRef(), null));
-    state.setExitFunc((Reference) traverse(obj.getExitFuncRef(), null));
+    entryFunc.getBody().getStatements().addAll(((Block) traverse(obj.getEntryFunc(), null)).getStatements());
+    exitFunc.getBody().getStatements().addAll(((Block) traverse(obj.getExitFunc(), null)).getStatements());
 
     return state;
   }
 
   @Override
   protected Evl visitTransition(Transition obj, Void param) {
-    List<evl.variable.FuncVariable> args = new ArrayList<evl.variable.FuncVariable>(obj.getParam().size());
-    for (fun.variable.FuncVariable itr : obj.getParam()) {
-      args.add((evl.variable.FuncVariable) traverse(itr, null));
+    EvlList<evl.variable.FuncVariable> args = new EvlList<evl.variable.FuncVariable>();
+    for (FuncVariable itr : obj.getParam()) {
+      evl.variable.FuncVariable var = (evl.variable.FuncVariable) traverse(itr, null);
+      args.add(var);
     }
-    evl.expression.reference.Reference src = (evl.expression.reference.Reference) traverse(obj.getSrc(), null);
-    evl.expression.reference.Reference dst = (evl.expression.reference.Reference) traverse(obj.getDst(), null);
-    evl.expression.reference.Reference evt = (evl.expression.reference.Reference) traverse(obj.getEvent(), null);
-    assert (src.getOffset().isEmpty());
-    assert (dst.getOffset().isEmpty());
-    assert (evt.getOffset().isEmpty());
+    SimpleRef<State> src = toSimple((evl.expression.reference.Reference) traverse(obj.getSrc(), null));
+    SimpleRef<State> dst = toSimple((evl.expression.reference.Reference) traverse(obj.getDst(), null));
+    SimpleRef<FuncCtrlInDataIn> evt = toSimple((evl.expression.reference.Reference) traverse(obj.getEvent(), null));
 
     evl.expression.Expression guard = (evl.expression.Expression) traverse(obj.getGuard(), null);
 
     Block nbody = (Block) traverse(obj.getBody(), null);
 
-    return new evl.hfsm.Transition(obj.getInfo(), obj.getName(), (State) src.getLink(), (State) dst.getLink(), evt, guard, args, nbody);
+    return new evl.hfsm.Transition(obj.getInfo(), src, dst, evt, guard, args, nbody);
   }
 
   static public fun.type.Type getRefType(fun.expression.reference.Reference ref) {
@@ -335,12 +366,12 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
       if (!ref.getOffset().isEmpty()) {
         RError.err(ErrorType.Error, ref.getOffset().get(0).getInfo(), "Type reference should not have offset anymore");
       }
-      fun.type.Type nt = (fun.type.Type) ref.getLink();
-      return nt;
+      return (fun.type.Type) ref.getLink();
     } else {
       RError.err(ErrorType.Hint, ref.getLink().getInfo(), "Definition was here");
       RError.err(ErrorType.Error, ref.getInfo(), "Need type");
       return null;
     }
   }
+
 }

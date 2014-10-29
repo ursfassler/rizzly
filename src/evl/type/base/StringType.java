@@ -8,7 +8,7 @@ public class StringType extends BaseType implements Evl {
   public static final String NAME = "String";
 
   public StringType() {
-    super(new ElementInfo(), NAME);
+    super(ElementInfo.NO, NAME);
   }
 
 }

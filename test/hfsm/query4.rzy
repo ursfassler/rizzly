@@ -1,32 +1,30 @@
-component
-  Query4
-    slot     tick();
-    response read( x: R{0,10} ):R{0,100};
+Query4 = Hfsm
+  tick : slot();
+  read : response( x: R{0,10} ):R{0,100};
     
-  implementation hfsm( A )
+  state( A )
+    A to B by tick();
+    B to C by tick();
+    C to A by tick();
   
-    transition
-      A to B by tick();
-      B to C by tick();
-      C to A by tick();
-  
-    state A
-      response read( x: R{0,10} ):R{0,100}
+    A : state
+      read : response( x: R{0,10} ):R{0,100}
         return x * 1;
       end
     end
       
-    state B
-      response read( x: R{0,10} ):R{0,100}
+    B : state
+      read : response( x: R{0,10} ):R{0,100}
         return x * 2;
       end
     end
 
-    state C
-      response read( x: R{0,10} ):R{0,100}
+    C : state
+      read : response( x: R{0,10} ):R{0,100}
         return x * 3;
       end
     end
     
   end
+end
 

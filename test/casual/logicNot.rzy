@@ -1,11 +1,7 @@
 
-component
-  LogicNot
-    response invert( value: Boolean ):Boolean;
-      
-  implementation elementary
-    response invert( value: Boolean ):Boolean
-      return not value;
-    end
+LogicNot = Elementary
+  invert : response( value: Boolean ):Boolean
+    return not value;
   end
+end
 

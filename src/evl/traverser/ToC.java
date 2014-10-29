@@ -3,7 +3,6 @@ package evl.traverser;
 import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -15,11 +14,18 @@ import cir.expression.NoValue;
 import cir.expression.Op;
 import cir.expression.reference.RefItem;
 import cir.function.FunctionImpl;
+import cir.function.FunctionPrivate;
 import cir.function.FunctionPrototype;
-import cir.other.Variable;
+import cir.function.FunctionPublic;
+import cir.type.NamedElement;
+import cir.type.TypeRef;
+import cir.variable.Variable;
 
-import common.FuncAttr;
+import common.Designator;
+import common.Property;
 
+import error.ErrorType;
+import error.RError;
 import evl.Evl;
 import evl.NullTraverser;
 import evl.expression.AnyValue;
@@ -55,12 +61,11 @@ import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
+import evl.expression.reference.SimpleRef;
 import evl.expression.unop.BitNot;
 import evl.expression.unop.LogicNot;
 import evl.expression.unop.Uminus;
-import evl.function.FuncWithBody;
-import evl.function.FuncWithReturn;
-import evl.function.FunctionBase;
+import evl.other.Named;
 import evl.other.RizzlyProgram;
 import evl.statement.Assignment;
 import evl.statement.Block;
@@ -78,12 +83,10 @@ import evl.statement.Statement;
 import evl.statement.VarDefStmt;
 import evl.statement.WhileStmt;
 import evl.type.Type;
-import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.RangeType;
 import evl.type.base.StringType;
-import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
 import evl.type.composed.UnsafeUnionType;
@@ -94,8 +97,8 @@ import evl.variable.Constant;
 import evl.variable.FuncVariable;
 import evl.variable.StateVariable;
 
-public class ToC extends NullTraverser<CirBase, Void> {
-  private Map<Evl, CirBase> map = new HashMap<Evl, CirBase>();
+public class ToC extends NullTraverser<CirBase, String> {
+  final private Map<Evl, CirBase> map = new HashMap<Evl, CirBase>();
 
   public static CirBase process(Evl obj) {
     ToC toC = new ToC();
@@ -113,13 +116,21 @@ public class ToC extends NullTraverser<CirBase, Void> {
     return intValue;
   }
 
+  private String getName(Named obj, String param) {
+    if (obj.getName().length() == 0) {
+      obj.setName(Designator.NAME_SEP + Integer.toHexString(obj.hashCode()));
+      RError.err(ErrorType.Warning, obj.getInfo(), obj.getClass().getSimpleName() + " with no name found! Calling it " + obj.getName());
+    }
+    return obj.getName();
+  }
+
   @Override
-  protected CirBase visitDefault(Evl obj, Void param) {
+  protected CirBase visitDefault(Evl obj, String param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
   @Override
-  protected CirBase visit(Evl obj, Void param) {
+  protected CirBase visit(Evl obj, String param) {
     CirBase cobj = map.get(obj);
     if (cobj == null) {
       cobj = super.visit(obj, param);
@@ -130,7 +141,7 @@ public class ToC extends NullTraverser<CirBase, Void> {
   }
 
   @Override
-  protected cir.other.Program visitRizzlyProgram(RizzlyProgram obj, Void param) {
+  protected cir.other.Program visitRizzlyProgram(RizzlyProgram obj, String param) {
     cir.other.Program prog = new cir.other.Program(obj.getName());
     for (Type type : obj.getType()) {
       cir.type.Type ct = (cir.type.Type) visit(type, param);
@@ -141,10 +152,10 @@ public class ToC extends NullTraverser<CirBase, Void> {
       prog.getVariable().add(ct);
     }
     for (Constant itr : obj.getConstant()) {
-      cir.other.Constant ct = (cir.other.Constant) visit(itr, param);
+      cir.variable.Constant ct = (cir.variable.Constant) visit(itr, param);
       prog.getVariable().add(ct);
     }
-    for (FunctionBase itr : obj.getFunction()) {
+    for (evl.function.Function itr : obj.getFunction()) {
       cir.function.Function ct = (cir.function.Function) visit(itr, param);
       prog.getFunction().add(ct);
     }
@@ -152,45 +163,43 @@ public class ToC extends NullTraverser<CirBase, Void> {
   }
 
   @Override
-  protected CirBase visitFunctionBase(FunctionBase obj, Void param) {
-    String name = obj.getName();
-
-    List<cir.other.FuncVariable> arg = new ArrayList<cir.other.FuncVariable>();
+  protected CirBase visitFunctionImpl(evl.function.Function obj, String param) {
+    List<cir.variable.FuncVariable> arg = new ArrayList<cir.variable.FuncVariable>();
     for (FuncVariable var : obj.getParam()) {
-      arg.add((cir.other.FuncVariable) visit(var, param));
+      arg.add((cir.variable.FuncVariable) visit(var, param));
     }
 
-    cir.type.TypeRef rettype;
-    if (obj instanceof FuncWithReturn) {
-      rettype = (cir.type.TypeRef) visit(((FuncWithReturn) obj).getRet(), null);
-    } else {
-      cir.type.VoidType ref = new cir.type.VoidType(); // FIXME ok to create it here? no, use single instance
-      rettype = new cir.type.TypeRef(ref);
-    }
+    cir.type.TypeRef rettype = (cir.type.TypeRef) visit(obj.getRet(), null);
 
     cir.function.Function ret;
-    if (obj instanceof FuncWithBody) {
-      ret = new FunctionImpl(name, rettype, arg, new HashSet<FuncAttr>(obj.getAttributes()));
-    } else {
-      ret = new FunctionPrototype(name, rettype, arg, new HashSet<FuncAttr>(obj.getAttributes()));
-    }
+    ret = createFunc(obj, getName(obj, param), arg, rettype);
 
     map.put(obj, ret); // otherwise the compiler follows recursive calls
-
-    if (obj instanceof FuncWithBody) {
-      ((FunctionImpl) ret).setBody((cir.statement.Block) visit(((FuncWithBody) obj).getBody(), param));
+    cir.statement.Block body = (cir.statement.Block) visit(obj.getBody(), param);
+    if (ret instanceof FunctionImpl) {
+      ((FunctionImpl) ret).getBody().getStatement().addAll(body.getStatement());
     }
 
     return ret;
   }
 
+  private cir.function.Function createFunc(evl.function.Function obj, String name, List<cir.variable.FuncVariable> arg, cir.type.TypeRef rettype) {
+    if (obj.properties().get(Property.Extern) == Boolean.TRUE) {
+      return new FunctionPrototype(name, rettype, arg);
+    } else if (obj.properties().get(Property.Public) == Boolean.TRUE) {
+      return new FunctionPublic(name, rettype, arg, new cir.statement.Block());
+    } else {
+      return new FunctionPrivate(name, rettype, arg, new cir.statement.Block());
+    }
+  }
+
   @Override
-  protected CirBase visitTypeCast(TypeCast obj, Void param) {
+  protected CirBase visitTypeCast(TypeCast obj, String param) {
     return new cir.expression.TypeCast((cir.type.TypeRef) visit(obj.getCast(), null), (cir.expression.Expression) visit(obj.getValue(), null));
   }
 
   @Override
-  protected CirBase visitRefCall(RefCall obj, Void param) {
+  protected CirBase visitRefCall(RefCall obj, String param) {
     cir.expression.reference.RefCall call = new cir.expression.reference.RefCall();
     for (Expression expr : obj.getActualParameter()) {
       cir.expression.Expression actarg = (cir.expression.Expression) visit(expr, param);
@@ -200,27 +209,27 @@ public class ToC extends NullTraverser<CirBase, Void> {
   }
 
   @Override
-  protected CirBase visitRefIndex(RefIndex obj, Void param) {
+  protected CirBase visitRefIndex(RefIndex obj, String param) {
     return new cir.expression.reference.RefIndex((cir.expression.Expression) visit(obj.getIndex(), param));
   }
 
   @Override
-  protected CirBase visitRefName(RefName obj, Void param) {
+  protected CirBase visitRefName(RefName obj, String param) {
     return new cir.expression.reference.RefName(obj.getName());
   }
 
   @Override
-  protected CirBase visitReturnVoid(ReturnVoid obj, Void param) {
+  protected CirBase visitReturnVoid(ReturnVoid obj, String param) {
     return new cir.statement.ReturnVoid();
   }
 
   @Override
-  protected CirBase visitReturnExpr(ReturnExpr obj, Void param) {
+  protected CirBase visitReturnExpr(ReturnExpr obj, String param) {
     return new cir.statement.ReturnExpr((cir.expression.Expression) visit(obj.getExpr(), param));
   }
 
   @Override
-  protected CirBase visitCaseOpt(CaseOpt obj, Void param) {
+  protected CirBase visitCaseOpt(CaseOpt obj, String param) {
     cir.statement.CaseEntry ret = new cir.statement.CaseEntry((cir.statement.Block) visit(obj.getCode(), param));
     for (CaseOptEntry entry : obj.getValue()) {
       if (entry instanceof CaseOptRange) {
@@ -238,48 +247,48 @@ public class ToC extends NullTraverser<CirBase, Void> {
   }
 
   @Override
-  protected CirBase visitConstGlobal(ConstGlobal obj, Void param) {
-    return new cir.other.Constant(obj.getName(), (cir.type.TypeRef) visit(obj.getType(), param), (cir.expression.Expression) visit(obj.getDef(), param));
+  protected CirBase visitConstGlobal(ConstGlobal obj, String param) {
+    return new cir.variable.Constant(getName(obj, param), (cir.type.TypeRef) visit(obj.getType(), param), (cir.expression.Expression) visit(obj.getDef(), param));
   }
 
   @Override
-  protected CirBase visitConstPrivate(ConstPrivate obj, Void param) {
-    return new cir.other.Constant(obj.getName(), (cir.type.TypeRef) visit(obj.getType(), param), (cir.expression.Expression) visit(obj.getDef(), param));
+  protected CirBase visitConstPrivate(ConstPrivate obj, String param) {
+    return new cir.variable.Constant(getName(obj, param), (cir.type.TypeRef) visit(obj.getType(), param), (cir.expression.Expression) visit(obj.getDef(), param));
   }
 
   @Override
-  protected CirBase visitStateVariable(StateVariable obj, Void param) {
-    return new cir.other.StateVariable(obj.getName(), (cir.type.TypeRef) visit(obj.getType(), param), (cir.expression.Expression) visit(obj.getDef(), param));
+  protected CirBase visitStateVariable(StateVariable obj, String param) {
+    return new cir.variable.StateVariable(getName(obj, param), (cir.type.TypeRef) visit(obj.getType(), param), (cir.expression.Expression) visit(obj.getDef(), param));
   }
 
   @Override
-  protected CirBase visitFuncVariable(FuncVariable obj, Void param) {
-    cir.other.FuncVariable var = new cir.other.FuncVariable(obj.getName(), (cir.type.TypeRef) visit(obj.getType(), param));
+  protected CirBase visitFuncVariable(FuncVariable obj, String param) {
+    cir.variable.FuncVariable var = new cir.variable.FuncVariable(getName(obj, param), (cir.type.TypeRef) visit(obj.getType(), param));
     return var;
   }
 
   @Override
-  protected CirBase visitRangeType(RangeType obj, Void param) {
-    return new cir.type.RangeType(obj.getNumbers().getLow(), obj.getNumbers().getHigh());
+  protected CirBase visitRangeType(RangeType obj, String param) {
+    return new cir.type.RangeType(getName(obj, param), obj.getNumbers().getLow(), obj.getNumbers().getHigh());
   }
 
   @Override
-  protected CirBase visitTypeRef(TypeRef obj, Void param) {
-    return new cir.type.TypeRef((cir.type.Type) visit(obj.getRef(), param));
+  protected CirBase visitTypeRef(SimpleRef obj, String param) {
+    return new cir.type.TypeRef((cir.type.Type) visit(obj.getLink(), param));
   }
 
   @Override
-  protected CirBase visitVoidType(VoidType obj, Void param) {
-    return new cir.type.VoidType();
+  protected CirBase visitVoidType(VoidType obj, String param) {
+    return new cir.type.VoidType(getName(obj, param));
   }
 
   @Override
-  protected CirBase visitNumber(Number obj, Void param) {
+  protected CirBase visitNumber(Number obj, String param) {
     return new cir.expression.Number(obj.getValue());
   }
 
   @Override
-  protected CirBase visitReference(Reference obj, Void param) {
+  protected CirBase visitReference(Reference obj, String param) {
     cir.expression.reference.Reference ref = new cir.expression.reference.Reference((cir.expression.reference.Referencable) visit(obj.getLink(), param));
     for (evl.expression.reference.RefItem itr : obj.getOffset()) {
       ref.getOffset().add((RefItem) visit(itr, null));
@@ -288,23 +297,23 @@ public class ToC extends NullTraverser<CirBase, Void> {
   }
 
   @Override
-  protected CirBase visitVarDef(VarDefStmt obj, Void param) {
-    cir.statement.VarDefStmt stmt = new cir.statement.VarDefStmt((cir.other.FuncVariable) visit(obj.getVariable(), param));
+  protected CirBase visitVarDef(VarDefStmt obj, String param) {
+    cir.statement.VarDefStmt stmt = new cir.statement.VarDefStmt((cir.variable.FuncVariable) visit(obj.getVariable(), param));
     return stmt;
   }
 
   @Override
-  protected CirBase visitCallStmt(CallStmt obj, Void param) {
+  protected CirBase visitCallStmt(CallStmt obj, String param) {
     return new cir.statement.CallStmt((cir.expression.reference.Reference) visit(obj.getCall(), param));
   }
 
   @Override
-  protected CirBase visitAssignment(Assignment obj, Void param) {
+  protected CirBase visitAssignment(Assignment obj, String param) {
     return new cir.statement.Assignment((cir.expression.reference.Reference) visit(obj.getLeft(), param), (cir.expression.Expression) visit(obj.getRight(), param));
   }
 
   @Override
-  protected CirBase visitCaseStmt(CaseStmt obj, Void param) {
+  protected CirBase visitCaseStmt(CaseStmt obj, String param) {
     cir.statement.CaseStmt stmt = new cir.statement.CaseStmt((cir.expression.Expression) visit(obj.getCondition(), param), (cir.statement.Block) visit(obj.getOtherwise(), param));
     for (CaseOpt entry : obj.getOption()) {
       cir.statement.CaseEntry centry = (cir.statement.CaseEntry) visit(entry, param);
@@ -314,12 +323,12 @@ public class ToC extends NullTraverser<CirBase, Void> {
   }
 
   @Override
-  protected CirBase visitWhileStmt(WhileStmt obj, Void param) {
+  protected CirBase visitWhileStmt(WhileStmt obj, String param) {
     return new cir.statement.WhileStmt((cir.expression.Expression) visit(obj.getCondition(), param), (cir.statement.Block) visit(obj.getBody(), param));
   }
 
   @Override
-  protected CirBase visitIfStmt(IfStmt obj, Void param) {
+  protected CirBase visitIfStmt(IfStmt obj, String param) {
     assert (obj.getOption().size() == 1);
     IfOption opt = obj.getOption().get(0);
     cir.statement.Block elseBlock = (cir.statement.Block) visit(obj.getDefblock(), param);
@@ -330,7 +339,7 @@ public class ToC extends NullTraverser<CirBase, Void> {
   }
 
   @Override
-  protected CirBase visitBlock(Block obj, Void param) {
+  protected CirBase visitBlock(Block obj, String param) {
     cir.statement.Block ret = new cir.statement.Block();
     for (Statement stmt : obj.getStatements()) {
       cir.statement.Statement cstmt = (cir.statement.Statement) visit(stmt, param);
@@ -340,9 +349,14 @@ public class ToC extends NullTraverser<CirBase, Void> {
   }
 
   @Override
-  protected CirBase visitRecordType(RecordType obj, Void param) {
-    cir.type.StructType type = new cir.type.StructType(obj.getName());
-    for (NamedElement elem : obj.getElement()) {
+  protected CirBase visitNamedElement(evl.type.composed.NamedElement obj, String param) {
+    return new NamedElement(obj.getName(), (TypeRef) visit(obj.getRef(), param));
+  }
+
+  @Override
+  protected CirBase visitRecordType(RecordType obj, String param) {
+    cir.type.StructType type = new cir.type.StructType(getName(obj, param));
+    for (evl.type.composed.NamedElement elem : obj.getElement()) {
       cir.type.NamedElement celem = (cir.type.NamedElement) visit(elem, param);
       type.getElements().add(celem);
     }
@@ -350,9 +364,9 @@ public class ToC extends NullTraverser<CirBase, Void> {
   }
 
   @Override
-  protected CirBase visitUnionType(UnionType obj, Void param) {
-    cir.type.UnionType type = new cir.type.UnionType(obj.getName(), (cir.type.NamedElement) visit(obj.getTag(), param));
-    for (NamedElement elem : obj.getElement()) {
+  protected CirBase visitUnionType(UnionType obj, String param) {
+    cir.type.UnionType type = new cir.type.UnionType(getName(obj, param), (cir.type.NamedElement) visit(obj.getTag(), param));
+    for (evl.type.composed.NamedElement elem : obj.getElement()) {
       cir.type.NamedElement celem = (cir.type.NamedElement) visit(elem, param);
       type.getElements().add(celem);
     }
@@ -360,9 +374,9 @@ public class ToC extends NullTraverser<CirBase, Void> {
   }
 
   @Override
-  protected CirBase visitUnsafeUnionType(UnsafeUnionType obj, Void param) {
-    cir.type.UnsafeUnionType type = new cir.type.UnsafeUnionType(obj.getName());
-    for (NamedElement elem : obj.getElement()) {
+  protected CirBase visitUnsafeUnionType(UnsafeUnionType obj, String param) {
+    cir.type.UnsafeUnionType type = new cir.type.UnsafeUnionType(getName(obj, param));
+    for (evl.type.composed.NamedElement elem : obj.getElement()) {
       cir.type.NamedElement celem = (cir.type.NamedElement) visit(elem, param);
       type.getElements().add(celem);
     }
@@ -370,22 +384,17 @@ public class ToC extends NullTraverser<CirBase, Void> {
   }
 
   @Override
-  protected CirBase visitNamedElement(NamedElement obj, Void param) {
-    return new cir.type.NamedElement(obj.getName(), (cir.type.TypeRef) visit(obj.getType(), param));
+  protected CirBase visitArrayType(ArrayType obj, String param) {
+    return new cir.type.ArrayType(getName(obj, param), (cir.type.TypeRef) visit(obj.getType(), param), toInt(obj.getSize()));
   }
 
   @Override
-  protected CirBase visitArrayType(ArrayType obj, Void param) {
-    return new cir.type.ArrayType(obj.getName(), (cir.type.TypeRef) visit(obj.getType(), param), toInt(obj.getSize()));
-  }
-
-  @Override
-  protected CirBase visitStringValue(StringValue obj, Void param) {
+  protected CirBase visitStringValue(StringValue obj, String param) {
     return new cir.expression.StringValue(obj.getValue());
   }
 
   @Override
-  protected CirBase visitArrayValue(ArrayValue obj, Void param) {
+  protected CirBase visitArrayValue(ArrayValue obj, String param) {
     cir.expression.ArrayValue ret = new cir.expression.ArrayValue();
     for (Expression expr : obj.getValue()) {
       cir.expression.Expression actarg = (cir.expression.Expression) visit(expr, param);
@@ -395,7 +404,7 @@ public class ToC extends NullTraverser<CirBase, Void> {
   }
 
   @Override
-  protected CirBase visitRecordValue(RecordValue obj, Void param) {
+  protected CirBase visitRecordValue(RecordValue obj, String param) {
     cir.expression.StructValue ret = new cir.expression.StructValue();
     for (NamedElementValue expr : obj.getValue()) {
       ElementValue actarg = (cir.expression.ElementValue) visit(expr, param);
@@ -405,52 +414,52 @@ public class ToC extends NullTraverser<CirBase, Void> {
   }
 
   @Override
-  protected CirBase visitNamedElementValue(NamedElementValue obj, Void param) {
+  protected CirBase visitNamedElementValue(NamedElementValue obj, String param) {
     return new cir.expression.ElementValue(obj.getName(), (cir.expression.Expression) visit(obj.getValue(), null));
   }
 
   @Override
-  protected CirBase visitUnsafeUnionValue(UnsafeUnionValue obj, Void param) {
+  protected CirBase visitUnsafeUnionValue(UnsafeUnionValue obj, String param) {
     return new cir.expression.UnsafeUnionValue((cir.expression.ElementValue) visit(obj.getContentValue(), param));
   }
 
   @Override
-  protected CirBase visitUnionValue(UnionValue obj, Void param) {
+  protected CirBase visitUnionValue(UnionValue obj, String param) {
     return new cir.expression.UnionValue((cir.expression.ElementValue) visit(obj.getTagValue(), null), (cir.expression.ElementValue) visit(obj.getContentValue(), param));
   }
 
   @Override
-  protected CirBase visitStringType(StringType obj, Void param) {
+  protected CirBase visitStringType(StringType obj, String param) {
     return new cir.type.StringType();
   }
 
   @Override
-  protected CirBase visitBooleanType(BooleanType obj, Void param) {
-    return new cir.type.BooleanType();
+  protected CirBase visitBooleanType(BooleanType obj, String param) {
+    return new cir.type.BooleanType(getName(obj, param));
   }
 
   @Override
-  protected CirBase visitBoolValue(BoolValue obj, Void param) {
+  protected CirBase visitBoolValue(BoolValue obj, String param) {
     return new cir.expression.BoolValue(obj.isValue());
   }
 
   @Override
-  protected CirBase visitAnyValue(AnyValue obj, Void param) {
+  protected CirBase visitAnyValue(AnyValue obj, String param) {
     return new NoValue();
   }
 
   @Override
-  protected CirBase visitUminus(Uminus obj, Void param) {
+  protected CirBase visitUminus(Uminus obj, String param) {
     return new cir.expression.UnaryOp(Op.MINUS, (cir.expression.Expression) visit(obj.getExpr(), null));
   }
 
   @Override
-  protected CirBase visitLogicNot(LogicNot obj, Void param) {
+  protected CirBase visitLogicNot(LogicNot obj, String param) {
     return new cir.expression.UnaryOp(Op.LOCNOT, (cir.expression.Expression) visit(obj.getExpr(), null));
   }
 
   @Override
-  protected CirBase visitBitNot(BitNot obj, Void param) {
+  protected CirBase visitBitNot(BitNot obj, String param) {
     return new cir.expression.UnaryOp(Op.BITNOT, (cir.expression.Expression) visit(obj.getExpr(), null));
   }
 
@@ -459,87 +468,87 @@ public class ToC extends NullTraverser<CirBase, Void> {
   }
 
   @Override
-  protected CirBase visitPlus(Plus obj, Void param) {
+  protected CirBase visitPlus(Plus obj, String param) {
     return transBinOp(obj, Op.PLUS);
   }
 
   @Override
-  protected CirBase visitLogicAnd(LogicAnd obj, Void param) {
+  protected CirBase visitLogicAnd(LogicAnd obj, String param) {
     return transBinOp(obj, Op.LOCAND);
   }
 
   @Override
-  protected CirBase visitGreaterequal(Greaterequal obj, Void param) {
+  protected CirBase visitGreaterequal(Greaterequal obj, String param) {
     return transBinOp(obj, Op.GREATER_EQUEAL);
   }
 
   @Override
-  protected CirBase visitNotequal(Notequal obj, Void param) {
+  protected CirBase visitNotequal(Notequal obj, String param) {
     return transBinOp(obj, Op.NOT_EQUAL);
   }
 
   @Override
-  protected CirBase visitLessequal(Lessequal obj, Void param) {
+  protected CirBase visitLessequal(Lessequal obj, String param) {
     return transBinOp(obj, Op.LESS_EQUAL);
   }
 
   @Override
-  protected CirBase visitLess(Less obj, Void param) {
+  protected CirBase visitLess(Less obj, String param) {
     return transBinOp(obj, Op.LESS);
   }
 
   @Override
-  protected CirBase visitGreater(Greater obj, Void param) {
+  protected CirBase visitGreater(Greater obj, String param) {
     return transBinOp(obj, Op.GREATER);
   }
 
   @Override
-  protected CirBase visitMinus(Minus obj, Void param) {
+  protected CirBase visitMinus(Minus obj, String param) {
     return transBinOp(obj, Op.MINUS);
   }
 
   @Override
-  protected CirBase visitMod(Mod obj, Void param) {
+  protected CirBase visitMod(Mod obj, String param) {
     return transBinOp(obj, Op.MOD);
   }
 
   @Override
-  protected CirBase visitMul(Mul obj, Void param) {
+  protected CirBase visitMul(Mul obj, String param) {
     return transBinOp(obj, Op.MUL);
   }
 
   @Override
-  protected CirBase visitDiv(Div obj, Void param) {
+  protected CirBase visitDiv(Div obj, String param) {
     return transBinOp(obj, Op.DIV);
   }
 
   @Override
-  protected CirBase visitEqual(Equal obj, Void param) {
+  protected CirBase visitEqual(Equal obj, String param) {
     return transBinOp(obj, Op.EQUAL);
   }
 
   @Override
-  protected CirBase visitBitAnd(BitAnd obj, Void param) {
+  protected CirBase visitBitAnd(BitAnd obj, String param) {
     return transBinOp(obj, Op.BITAND);
   }
 
   @Override
-  protected CirBase visitBitOr(BitOr obj, Void param) {
+  protected CirBase visitBitOr(BitOr obj, String param) {
     return transBinOp(obj, Op.BITOR);
   }
 
   @Override
-  protected CirBase visitLogicOr(LogicOr obj, Void param) {
+  protected CirBase visitLogicOr(LogicOr obj, String param) {
     return transBinOp(obj, Op.LOCOR);
   }
 
   @Override
-  protected CirBase visitShl(Shl obj, Void param) {
+  protected CirBase visitShl(Shl obj, String param) {
     return transBinOp(obj, Op.SHL);
   }
 
   @Override
-  protected CirBase visitShr(Shr obj, Void param) {
+  protected CirBase visitShr(Shr obj, String param) {
     return transBinOp(obj, Op.SHR);
   }
 

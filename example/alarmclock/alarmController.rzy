@@ -1,0 +1,36 @@
+import iface;
+
+OneSecond : const = 100;
+OneMinute : const = 60 * OneSecond;
+SnoozeDelay : const = 4 * OneMinute;
+
+AlarmController = Hfsm
+  time : slot( value: Time );
+  onOff : slot();
+
+  alarm : signal();
+  alarmIcon : signal( visible: Boolean );
+  getAlarmTime : query():Time;
+
+  state(Disabled)
+    Enabled to Disabled by onOff();
+    Disabled to Enabled by onOff();
+    
+    Disabled : state
+      entry
+        alarmIcon( False );
+      end
+    end
+
+    Enabled : state
+      entry
+        alarmIcon( True );
+      end
+
+      Enabled to Enabled by time( value: Time ) if value = getAlarmTime() do
+        alarm();
+      end
+    end
+  end
+end
+

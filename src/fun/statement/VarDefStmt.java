@@ -18,6 +18,6 @@ public class VarDefStmt extends Statement {
 
   @Override
   public String toString() {
-    return variable.toString();
+    return "def " + variable.toString();
   }
 }

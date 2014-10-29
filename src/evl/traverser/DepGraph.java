@@ -3,170 +3,50 @@ package evl.traverser;
 import java.util.Set;
 
 import util.SimpleGraph;
-
-import common.Scope;
-
-import error.ErrorType;
-import error.RError;
 import evl.DefTraverser;
 import evl.Evl;
-import evl.NullTraverser;
 import evl.expression.reference.Reference;
-import evl.function.FunctionBase;
-import evl.knowledge.KnowScope;
-import evl.other.CompUse;
-import evl.other.Named;
-import evl.other.Namespace;
-import evl.type.TypeRef;
-import evl.type.base.EnumElement;
-import evl.type.base.FunctionTypeRet;
-import evl.type.base.FunctionTypeVoid;
-import evl.type.composed.NamedElement;
-import evl.variable.Constant;
-import evl.variable.Variable;
+import evl.expression.reference.SimpleRef;
 
-public class DepGraph extends NullTraverser<Void, Void> {
-  private SubDep dep;
+public class DepGraph extends DefTraverser<Void, Evl> {
+  final private SimpleGraph<Evl> g = new SimpleGraph<Evl>();
 
-  public DepGraph() {
-    super();
-    dep = new SubDep(new SimpleGraph<Named>());
-  }
-
-  static public SimpleGraph<Named> build(Namespace ns) {
+  static public SimpleGraph<Evl> build(Evl evl) {
     DepGraph depGraph = new DepGraph();
-    depGraph.traverse(ns, null);
-    return depGraph.dep.getGraph();
+    depGraph.traverse(evl, evl);
+    return depGraph.g;
   }
 
-  public static SimpleGraph<Named> build(Set<? extends Named> roots) {
+  public static SimpleGraph<Evl> build(Set<? extends Evl> roots) {
     DepGraph depGraph = new DepGraph();
-    for (Named itr : roots) {
-      depGraph.traverse(itr, null);
+    for (Evl itr : roots) {
+      depGraph.traverse(itr, itr);
     }
-    assert (depGraph.dep.getGraph().vertexSet().containsAll(roots));
-    return depGraph.dep.getGraph();
+    return depGraph.g;
   }
 
   @Override
-  protected Void visitDefault(Evl obj, Void param) {
-    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
-  }
-
-  @Override
-  protected Void visitNamespace(Namespace obj, Void param) {
-    visitItr(obj, param);
-    return null;
-  }
-
-  @Override
-  protected Void visitConstant(Constant obj, Void param) {
-    dep.traverse(obj, obj);
-    return null;
-  }
-
-  @Override
-  protected Void visitFunctionBase(FunctionBase obj, Void param) {
-    dep.traverse(obj, obj);
-    return null;
-  }
-
-}
-
-class SubDep extends DefTraverser<Void, Named> {
-  private SimpleGraph<Named> g;
-
-  public SubDep(SimpleGraph<Named> g) {
-    super();
-    this.g = g;
-  }
-
-  public SimpleGraph<Named> getGraph() {
-    return g;
-  }
-
-  @Override
-  public Void traverse(Evl obj, Named param) {
-    g.addVertex(param);
-    return super.traverse(obj, param);
-  }
-
-  @Override
-  protected Void visitTypeRef(TypeRef obj, Named param) {
-    if (!g.containsVertex(obj.getRef())) {
-      g.addVertex(obj.getRef());
-      g.addEdge(param, obj.getRef());
-      visit(obj.getRef(), obj.getRef());
-    }
-    return super.visitTypeRef(obj, param);
-  }
-
-  @Override
-  protected Void visitReference(Reference obj, Named param) {
-    assert (param != null);
-    super.visitReference(obj, param);
-
-    Named dst = obj.getLink();
-    if (g.containsVertex(dst)) {
+  protected Void visit(Evl obj, Evl param) {
+    boolean visited = g.containsVertex(obj);
+    g.addVertex(obj);
+    g.addEdge(param, obj);
+    if (visited) {
       return null;
     }
-    g.addVertex(dst);
-    Scope scope = KnowScope.get(dst);
-    switch (scope) { // TODO do we need that?
-    case global:
-    case privat:
-      g.addEdge(param, dst);
-      break;
-    case local:
-      break;
-    default:
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Unhandled scope: " + scope);
-      break;
-    }
+    return super.visit(obj, obj);
+  }
 
-    visit(dst, dst);
-
+  @Override
+  protected Void visitTypeRef(SimpleRef obj, Evl param) {
+    super.visitTypeRef(obj, param);
+    visit(obj.getLink(), obj);
     return null;
   }
 
   @Override
-  protected Void visitCompUse(CompUse obj, Named param) {
-    g.addEdge(param, obj.getLink());
-    visit(obj.getLink(), obj.getLink());
-    return super.visitCompUse(obj, param);
-  }
-
-  @Override
-  protected Void visitNamedElement(NamedElement obj, Named param) {
-    g.addVertex(obj.getType().getRef());
-    g.addEdge(param, obj.getType().getRef());
-    visit(obj.getType().getRef(), obj.getType().getRef());
-    return super.visitNamedElement(obj, param);
-  }
-
-  @Override
-  protected Void visitFunctionTypeVoid(FunctionTypeVoid obj, Named param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Void visitFunctionTypeRet(FunctionTypeRet obj, Named param) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  protected Void visitVariable(Variable obj, Named param) {
-    visit(obj.getType(), param);
-    // g.addEdge(param, obj.getType());
-    // visit( obj.getType(), obj.getType() );
-    return super.visitVariable(obj, param);
-  }
-
-  @Override
-  protected Void visitEnumElement(EnumElement obj, Named param) {
-    // break cycle
-    // problem since enumElement is of its defining type
+  protected Void visitReference(Reference obj, Evl param) {
+    super.visitReference(obj, param);
+    visit(obj.getLink(), obj);
     return null;
   }
-
 }

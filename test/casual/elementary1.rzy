@@ -1,9 +1,5 @@
 //test ok
 
-component
-  Elementary1
-
-  implementation elementary
-
-  end
+Elementary1 = Elementary
+end
  

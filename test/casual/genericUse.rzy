@@ -1,17 +1,12 @@
-import
-  genericDef;
+import genericDef;
 
-component
-  GenericUse
-    slot  set( x: R{0,255} );
-    query get():R{0,255};
+GenericUse = Composition
+  set : slot( x: R{0,255} );
+  get : query():R{0,255};
+  
+  gen : GenericDef{R{0,255}};
     
-  implementation composition
-    component
-      gen : GenericDef{R{0,255}};
-      
-    connection
-      set -> gen.set;
-      get -> gen.get;
-  end
+  set -> gen.set;
+  get -> gen.get;
+end
 

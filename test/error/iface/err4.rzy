@@ -1,25 +1,18 @@
-component
-  Sub
-    signal funcA();
-    signal funcB();
-      
-  implementation elementary
-  end
 
-  Err4
-    signal funcA();
-    signal funcB();
-    signal funcC();
-      
-  implementation composition
-    
-    component
-      a : Sub;
+Sub = Elementary
+  funcA : signal();
+  funcB : signal();
+end
 
-    connection
-      a.funcA -> funcA;
-      a.funcB -> funcB;
-      a.funcC -> funcC;
+Err4 = Composition
+  funcA : signal();
+  funcB : signal();
+  funcC : signal();
     
-  end
+  a : Sub;
+
+  a.funcA -> funcA;
+  a.funcB -> funcB;
+  a.funcC -> funcC;
+end
 

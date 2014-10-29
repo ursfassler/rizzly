@@ -1,20 +1,19 @@
 package fun.expression.reference;
 
-import java.util.List;
-
 import common.ElementInfo;
 
 import fun.expression.Expression;
+import fun.other.FunList;
 
 final public class RefCall extends RefItem {
-  private List<Expression> actualParameter;
+  private FunList<Expression> actualParameter;
 
-  public RefCall(ElementInfo info, List<Expression> actualParameter) {
+  public RefCall(ElementInfo info, FunList<Expression> actualParameter) {
     super(info);
     this.actualParameter = actualParameter;
   }
 
-  public List<Expression> getActualParameter() {
+  public FunList<Expression> getActualParameter() {
     return actualParameter;
   }
 

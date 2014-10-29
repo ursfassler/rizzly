@@ -1,24 +1,28 @@
 package evl.traverser;
 
 import java.math.BigInteger;
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 import util.StreamWriter;
 import cir.traverser.CWriter;
 
-import common.FuncAttr;
+import common.Designator;
 
 import evl.Evl;
 import evl.NullTraverser;
 import evl.expression.Number;
-import evl.function.FunctionBase;
-import evl.function.impl.FuncProtoRet;
-import evl.function.impl.FuncProtoVoid;
+import evl.expression.reference.SimpleRef;
+import evl.function.Function;
+import evl.function.header.FuncCtrlInDataIn;
+import evl.function.header.FuncCtrlInDataOut;
+import evl.function.header.FuncCtrlOutDataIn;
+import evl.function.header.FuncCtrlOutDataOut;
+import evl.function.header.FuncSubHandlerEvent;
+import evl.function.header.FuncSubHandlerQuery;
+import evl.knowledge.KnowledgeBase;
+import evl.other.EvlList;
 import evl.other.RizzlyProgram;
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
-import evl.type.TypeRef;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumElement;
@@ -28,6 +32,7 @@ import evl.type.base.StringType;
 import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
+import evl.type.special.VoidType;
 import evl.variable.Variable;
 
 /**
@@ -38,7 +43,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   private final List<String> debugNames; // hacky hacky
 
-  public CHeaderWriter(List<String> debugNames) {
+  public CHeaderWriter(List<String> debugNames, KnowledgeBase kb) {
     this.debugNames = debugNames;
   }
 
@@ -79,10 +84,10 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
       param.nl();
     }
 
-    visitItr(obj.getType(), param);
-    visitItr(obj.getConstant(), param);
+    visitList(obj.getType(), param);
+    visitList(obj.getConstant(), param);
     assert (obj.getVariable().isEmpty());
-    visitItr(obj.getFunction(), param);
+    visitList(obj.getFunction(), param);
 
     param.nl();
     param.wr("#endif /* " + protname + " */");
@@ -96,7 +101,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.wr("typedef struct {");
     param.nl();
     param.incIndent();
-    visitItr(obj.getElement(), param);
+    visitList(obj.getElement(), param);
     param.decIndent();
     param.wr("} ");
     param.wr(obj.getName());
@@ -107,7 +112,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitNamedElement(NamedElement obj, StreamWriter param) {
-    visit(obj.getType(), param);
+    visit(obj.getRef(), param);
     param.wr(" ");
     param.wr(obj.getName());
     param.wr(";");
@@ -121,19 +126,15 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.wr("typedef enum {");
     param.nl();
     param.incIndent();
-    visitItr(obj.getElement(), param);
+    for (EnumElement elem : obj.getElement()) {
+      param.wr(obj.getName() + Designator.NAME_SEP + elem.getName());
+      param.wr(",");
+      param.nl();
+    }
     param.decIndent();
     param.wr("} ");
     param.wr(obj.getName());
     param.wr(";");
-    param.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitEnumElement(EnumElement obj, StreamWriter param) {
-    param.wr(obj.getName());
-    param.wr(",");
     param.nl();
     return null;
   }
@@ -145,8 +146,8 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitTypeRef(TypeRef obj, StreamWriter param) {
-    param.wr(obj.getRef().getName());
+  protected Void visitTypeRef(SimpleRef obj, StreamWriter param) {
+    param.wr(obj.getLink().getName());
     return null;
   }
 
@@ -228,6 +229,17 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
+  protected Void visitVoidType(VoidType obj, StreamWriter param) {
+    param.wr("typedef ");
+    param.wr("void");
+    param.wr(" ");
+    param.wr(obj.getName());
+    param.wr(";");
+    param.nl();
+    return null;
+  }
+
+  @Override
   protected Void visitUnionType(UnionType obj, StreamWriter param) {
     throw new UnsupportedOperationException("Not supported yet");
   }
@@ -240,7 +252,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
     return null;
   }
 
-  private void wrList(Collection<? extends Evl> list, String sep, StreamWriter param) {
+  private void wrList(EvlList<? extends Evl> list, String sep, StreamWriter param) {
     boolean first = true;
     for (Evl itr : list) {
       if (first) {
@@ -252,36 +264,56 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
     }
   }
 
-  private void wrAttr(Set<FuncAttr> attr, StreamWriter param) {
-    if (attr.contains(FuncAttr.Extern)) {
-      param.wr("// ");
-    } else {
-      param.wr("extern ");
-    }
-  }
-
-  private void wrPrototype(FunctionBase obj, StreamWriter param) {
+  private void wrPrototype(Function obj, StreamWriter param) {
+    visit(obj.getRet(), param);
+    param.wr(" ");
     param.wr(obj.getName());
     param.wr("(");
-    wrList(obj.getParam().getList(), ", ", param);
+    wrList(obj.getParam(), ", ", param);
     param.wr(");");
     param.nl();
   }
 
   @Override
-  protected Void visitFuncProtoVoid(FuncProtoVoid obj, StreamWriter param) {
-    wrAttr(obj.getAttributes(), param);
-    param.wr("void ");
+  protected Void visitFuncIfaceOutVoid(FuncCtrlOutDataOut obj, StreamWriter param) {
+    param.wr("// ");
     wrPrototype(obj, param);
     return null;
   }
 
   @Override
-  protected Void visitFuncProtoRet(FuncProtoRet obj, StreamWriter param) {
-    wrAttr(obj.getAttributes(), param);
-    visit(obj.getRet(), param);
-    param.wr(" ");
+  protected Void visitFuncIfaceOutRet(FuncCtrlOutDataIn obj, StreamWriter param) {
+    param.wr("// ");
     wrPrototype(obj, param);
     return null;
   }
+
+  @Override
+  protected Void visitFuncIfaceInVoid(FuncCtrlInDataIn obj, StreamWriter param) {
+    param.wr("extern ");
+    wrPrototype(obj, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncIfaceInRet(FuncCtrlInDataOut obj, StreamWriter param) {
+    param.wr("extern ");
+    wrPrototype(obj, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncSubHandlerQuery(FuncSubHandlerQuery obj, StreamWriter param) {
+    param.wr("// ");
+    wrPrototype(obj, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncSubHandlerEvent(FuncSubHandlerEvent obj, StreamWriter param) {
+    param.wr("// ");
+    wrPrototype(obj, param);
+    return null;
+  }
+
 }

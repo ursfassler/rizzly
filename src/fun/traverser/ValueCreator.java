@@ -1,8 +1,6 @@
 package fun.traverser;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
-import java.util.List;
 
 import evl.traverser.typecheck.specific.ExpressionTypeChecker;
 import fun.Fun;
@@ -10,8 +8,7 @@ import fun.NullTraverser;
 import fun.expression.ArrayValue;
 import fun.expression.Expression;
 import fun.expression.Number;
-import fun.expression.reference.Reference;
-import fun.type.Type;
+import fun.other.FunList;
 import fun.type.base.IntegerType;
 import fun.type.base.NaturalType;
 import fun.type.template.Array;
@@ -27,11 +24,6 @@ public class ValueCreator extends NullTraverser<Expression, Void> {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
-  private Type getType(Reference ref) {
-    assert (ref.getOffset().isEmpty());
-    return (Type) ref.getLink();
-  }
-
   @Override
   protected Expression visitIntegerType(IntegerType obj, Void param) {
     return new Number(obj.getInfo(), BigInteger.ZERO);
@@ -45,9 +37,9 @@ public class ValueCreator extends NullTraverser<Expression, Void> {
   @Override
   protected Expression visitArray(Array obj, Void param) {
     int size = ExpressionTypeChecker.getAsInt(obj.getSize(), obj.toString());
-    List<Expression> values = new ArrayList<Expression>(size);
+    FunList<Expression> values = new FunList<Expression>();
     for (int i = 0; i < size; i++) {
-      values.add(visit(getType(obj.getType()), null));
+      values.add(visit(obj.getType().getLink(), null));
     }
     return new ArrayValue(obj.getInfo(), values);
   }

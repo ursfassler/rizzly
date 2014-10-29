@@ -1,57 +1,46 @@
 package evl.hfsm;
 
-import java.util.Collection;
-
 import common.ElementInfo;
 
 import evl.EvlBase;
 import evl.expression.Expression;
-import evl.expression.reference.Reference;
-import evl.other.ListOfNamed;
+import evl.expression.reference.SimpleRef;
+import evl.function.header.FuncCtrlInDataIn;
+import evl.other.EvlList;
 import evl.statement.Block;
 import evl.variable.FuncVariable;
 
 public class Transition extends EvlBase implements StateItem {
-  private String name;
-  private State src; // TODO use reference
-  private State dst; // TODO use reference
-  private Reference eventFunc;
-  final private ListOfNamed<FuncVariable> param;
+  private SimpleRef<State> src;
+  private SimpleRef<State> dst;
+  private SimpleRef<FuncCtrlInDataIn> eventFunc;
+  final private EvlList<FuncVariable> param = new EvlList<FuncVariable>();
   private Expression guard;
   private Block body;
 
-  public Transition(ElementInfo info, String name, State src, State dst, Reference eventFunc, Expression guard, Collection<FuncVariable> param, Block body) {
+  public Transition(ElementInfo info, SimpleRef<State> src, SimpleRef<State> dst, SimpleRef<FuncCtrlInDataIn> eventFunc, Expression guard, EvlList<FuncVariable> param, Block body) {
     super(info);
-    this.name = name;
     this.src = src;
     this.dst = dst;
     this.eventFunc = eventFunc;
-    this.param = new ListOfNamed<FuncVariable>(param);
+    this.param.addAll(param);
     this.guard = guard;
     this.body = body;
   }
 
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public State getSrc() {
+  public SimpleRef<State> getSrc() {
     return src;
   }
 
-  public void setSrc(State src) {
+  public void setSrc(SimpleRef<State> src) {
     this.src = src;
   }
 
-  public State getDst() {
+  public SimpleRef<State> getDst() {
     return dst;
   }
 
-  public void setDst(State dst) {
+  public void setDst(SimpleRef<State> dst) {
     this.dst = dst;
   }
 
@@ -63,15 +52,15 @@ public class Transition extends EvlBase implements StateItem {
     this.guard = guard;
   }
 
-  public Reference getEventFunc() {
+  public SimpleRef<FuncCtrlInDataIn> getEventFunc() {
     return eventFunc;
   }
 
-  public void setEventFunc(Reference eventFunc) {
+  public void setEventFunc(SimpleRef<FuncCtrlInDataIn> eventFunc) {
     this.eventFunc = eventFunc;
   }
 
-  public ListOfNamed<FuncVariable> getParam() {
+  public EvlList<FuncVariable> getParam() {
     return param;
   }
 

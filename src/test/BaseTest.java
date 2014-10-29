@@ -13,8 +13,6 @@ import main.Main;
 import common.Designator;
 
 abstract public class BaseTest {
-  public final String outdir = getRootdir() + "output" + File.separator;
-  public final String cFile = outdir + "inst.c";
   private boolean strict = true;
 
   protected abstract String getRootdir();
@@ -25,29 +23,29 @@ abstract public class BaseTest {
     String testcase = String.valueOf(filename.charAt(0)).toUpperCase() + filename.substring(1, filename.length());
     String ns = filename;
     opt.init(getRootdir(), new Designator(ns, testcase), debugEvent, lazyModelCheck);
-    Main.compile(opt);
+    String outdir = Main.compile(opt);
 
     boolean compileBinary = false;
     boolean execute = false;
     boolean compileNative = false;
 
     switch (steps) {
-    case EXECUTE:
-      execute = true;
-    case COMPILE_TO_BIN:
-      compileBinary = true;
-    case COMPILE_TO_ASM:
-      compileNative = true;
+      case EXECUTE:
+        execute = true;
+      case COMPILE_TO_BIN:
+        compileBinary = true;
+      case COMPILE_TO_ASM:
+        compileNative = true;
     }
 
     if (compileNative) {
-      compileLlvm();
+      compileLlvm(outdir);
     }
     if (compileBinary) {
-      compileTest(filename);
+      compileTest(filename, outdir);
     }
     if (execute) {
-      executeTest(filename);
+      executeTest(filename, outdir);
     }
   }
 
@@ -60,8 +58,8 @@ abstract public class BaseTest {
       tc.add(st.nextToken());
     }
     opt.init(getRootdir() + dir, new Designator(tc), false, false);
-    Main.compile(opt);
-    compileLlvm();
+    String outdir = Main.compile(opt);
+    compileLlvm(outdir);
   }
 
   @Deprecated
@@ -69,10 +67,10 @@ abstract public class BaseTest {
     cleanup();
     ClaOption opt = new ClaOption();
     opt.init(getRootdir(), new Designator(namespace, comp), debugEvent, lazyModelCheck);
-    Main.compile(opt);
+    String outdir = Main.compile(opt);
 
     if (compileCfile) {
-      compileLlvm();
+      compileLlvm(outdir);
     }
   }
 
@@ -80,22 +78,22 @@ abstract public class BaseTest {
     this.strict = strict;
   }
 
-  public void compileLlvm() {
+  public void compileLlvm(String outdir) {
     // String cmd = "gcc -pedantic -ansi -Werror -Wall -Wextra -c " + cFile + " -o " + outdir + "libinst.a";
     // TODO use strict again
-    String cmd = "gcc -std=c11 -pedantic -Wall -Wextra -g -c " + cFile + " -o " + outdir + "libinst.a";
+    String cmd = "gcc -std=c11 -pedantic -Wall -Wextra -g -c " + outdir + "inst.c -o " + outdir + "libinst.a";
     // TODO use strict? yes
     // TODO use additional code checker
     execute(cmd, "could not compile c file");
   }
 
-  private void compileTest(String testcase) {
+  private void compileTest(String testcase, String outdir) {
     String flags = "-std=c11 -Wall -pedantic -Wall -Wextra -g";
     String cmd = "gcc " + flags + " " + getRootdir() + testcase + ".c" + " " + outdir + "libinst.a" + " -o" + outdir + "inst";
     execute(cmd, "could not compile test case");
   }
 
-  private void executeTest(String testcase) {
+  private void executeTest(String testcase, String outdir) {
     String cmd = outdir + "inst";
     execute(cmd, "test case failed");
   }
@@ -150,7 +148,7 @@ abstract public class BaseTest {
   }
 
   public void cleanup() {
-    File dir = new File(outdir);
+    File dir = new File(getRootdir() + "/output/");
     delete(dir);
   }
 

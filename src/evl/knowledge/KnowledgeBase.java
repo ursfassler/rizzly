@@ -48,4 +48,5 @@ public class KnowledgeBase {
     }
     return (T) entries.get(id);
   }
+
 }

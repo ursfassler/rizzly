@@ -4,12 +4,9 @@ import java.math.BigInteger;
 
 import common.ElementInfo;
 
-import fun.other.ListOfNamed;
-import fun.other.Named;
 import fun.type.base.BaseType;
-import fun.variable.TemplateParameter;
 
-final public class Range extends BaseType implements Named {
+final public class Range extends BaseType {
   final private BigInteger low;
   final private BigInteger high;
 
@@ -20,7 +17,11 @@ final public class Range extends BaseType implements Named {
     this.high = high;
   }
 
-  public static String makeName(BigInteger low, BigInteger high) {
+  public String makeName() {
+    return makeName(low, high);
+  }
+
+  static public String makeName(BigInteger low, BigInteger high) {
     return RangeTemplate.NAME + "{" + low.toString() + "," + high.toString() + "}";
   }
 
@@ -32,8 +33,4 @@ final public class Range extends BaseType implements Named {
     return high;
   }
 
-  @Override
-  public ListOfNamed<TemplateParameter> getParamList() {
-    return new ListOfNamed<TemplateParameter>();
-  }
 }

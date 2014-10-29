@@ -1,24 +1,18 @@
-type
-  Color = Enum
-    Red;
-    Green;
-    Blue;
-  end
+Color = Enum
+  Red;
+  Green;
+  Blue;
+end
 
-component
-  Enumt
-    slot   inp( x: R{0,100} );
-    signal out( x: Color );
+Enumt = Elementary
+  out : signal( x: Color );
 
-  implementation elementary
-    
-    slot inp( x: R{0,100} )
-      case x of
-        0: out( Color.Red ); end
-        1: out( Color.Green ); end
-        2: out( Color.Blue ); end
-      end
+  inp : slot( x: R{0,100} )
+    case x of
+      0: out( Color.Red ); end
+      1: out( Color.Green ); end
+      2: out( Color.Blue ); end
     end
-    
   end
+end
 

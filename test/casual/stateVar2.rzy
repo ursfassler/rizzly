@@ -1,22 +1,17 @@
-component
-  StateVar2
-    slot   ind( x: R{0,10} );
-    signal out( x: R{0,10} );
+StateVar2 = Elementary
+  out : signal( x: R{0,10} );
     
-  implementation elementary
-    
-    var
-      a : R{0,10} = 0;
+  a : R{0,10} = 0;
       
-    function addret( x: R{0,10} ):R{0,10}
-      a := (a + 1) mod 11;
-      return x;
-    end
-    
-    slot ind( x: R{0,10} )
-      a := addret( x );
-      out( a );
-    end
-    
+  addret = function( x: R{0,10} ):R{0,10}
+    a := (a + 1) mod 11;
+    return x;
   end
+  
+  ind : slot( x: R{0,10} )
+    a := addret( x );
+    out( a );
+  end
+  
+end
 

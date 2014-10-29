@@ -9,18 +9,13 @@ public class ErrIfaceTest extends ErrorTest {
   }
 
   @Test
-  public void err1() {
-    testForError("err1", "Err1", "Missing function implementation funcB");
-  }
-
-  @Test
   public void err2() {
     testForError("err2", "Err2", "can not connect from input");
   }
 
   @Test
   public void err3() {
-    testForError("err3", "Err3", "Interface a.funcB not connected");
+    testForError("err3", "Err3", "Interface funcA not connected");
   }
 
   @Test
@@ -29,13 +24,8 @@ public class ErrIfaceTest extends ErrorTest {
   }
 
   @Test
-  public void err5() {
-    testForError("err5", "Err5", "Missing function implementation funcA");
-  }
-
-  @Test
   public void err7() {
-    testForError("err7", "Err7", "Interface b.funcA not connected");
+    testForError("err7", "Err7", "Interface a.funcA not connected");
   }
 
   @Test
@@ -45,7 +35,7 @@ public class ErrIfaceTest extends ErrorTest {
 
   @Test
   public void errHfsm3() {
-    testForError("errHfsm3", "ErrHfsm3", "funcC is not an input event");
+    testForError("errHfsm3", "ErrHfsm3", "transition can only be triggered by slot");
   }
 
 }

@@ -1,23 +1,16 @@
-type
-  Point = Record
-    x : R{0,100};
-    y : R{0,100};
+Point = Record
+  x : R{0,100};
+  y : R{0,100};
+end
+
+Rec2 = Elementary
+  getX : response( p: Point ):R{0,100}
+    return p.x;
   end
 
-component
-  Rec2
-    response getX( p: Point ):R{0,100};
-    response getY( p: Point ):R{0,100};
-    
-  implementation elementary
-
-    response getX( p: Point ):R{0,100}
-      return p.x;
-    end
-
-    response getY( p: Point ):R{0,100}
-      return p.y;
-    end
-
+  getY : response( p: Point ):R{0,100}
+    return p.y;
   end
+
+end
 

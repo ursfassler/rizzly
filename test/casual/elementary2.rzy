@@ -1,15 +1,11 @@
 //test ok
 
-component
-  Elementary2
-    slot   tickIn();
-    signal tickOut();
+Elementary2 = Elementary
+  tickOut : signal();
 
-  implementation elementary
-
-    slot tickIn()
-      tickOut();
-    end
-
+  tickIn : slot()
+    tickOut();
   end
+
+end
 

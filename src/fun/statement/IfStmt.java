@@ -1,9 +1,8 @@
 package fun.statement;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import common.ElementInfo;
+
+import fun.other.FunList;
 
 /**
  * 
@@ -11,7 +10,7 @@ import common.ElementInfo;
  */
 public class IfStmt extends Statement {
 
-  private List<IfOption> option = new ArrayList<IfOption>();
+  private FunList<IfOption> option = new FunList<IfOption>();
   private Block defblock;
 
   public IfStmt(ElementInfo info) {
@@ -28,7 +27,7 @@ public class IfStmt extends Statement {
     this.defblock = defblock;
   }
 
-  public List<IfOption> getOption() {
+  public FunList<IfOption> getOption() {
     return option;
   }
 

@@ -10,9 +10,10 @@ import cir.traverser.CWriter;
 import common.Designator;
 
 import error.RException;
-import evl.other.Component;
 import fun.other.Namespace;
 import fun.toevl.FunToEvl;
+import fun.type.base.VoidType;
+import fun.variable.CompUse;
 
 //TODO set tag when writing to union
 //TODO allow writing of tag of union
@@ -22,11 +23,9 @@ import fun.toevl.FunToEvl;
 //TODO -- check that no references to old stuff exists (check that parent of every object is in the namespace tree)
 //TODO -- do name randomization and compile to see if references go outside
 //TODO add compiler switch to select backend (like --backend=ansiC --backend=funHtmlDoc)
-//TODO check metadata parser
 //TODO check for zero before division
 //TODO check range by user input
 //TODO check if event handling is in progress when starting event handling
-//TODO check stuff in joGraph (and remove)
 
 public class Main {
 
@@ -50,7 +49,7 @@ public class Main {
     System.exit(0);
   }
 
-  public static void compile(ClaOption opt) {
+  public static String compile(ClaOption opt) {
     Designator rootfile;
     String debugdir;
     String outdir;
@@ -69,27 +68,28 @@ public class Main {
       rootfile = new Designator(nl);
     }
 
-    Pair<String, Namespace> fret = MainFun.doFun(opt, rootfile, debugdir, docdir);
-    evl.other.Namespace aclasses = FunToEvl.process(fret.second, debugdir);
-    evl.traverser.PrettyPrinter.print(aclasses, debugdir + "afterFun.rzy", true);
-    evl.other.Component root;
-    {
-      ArrayList<String> nl = opt.getRootComp().toList();
-      nl.remove(nl.size() - 1);
-      nl.add(fret.first);
-      root = (Component) aclasses.getChildItem(nl);
+    Pair<Namespace, CompUse> fret = MainFun.doFun(opt, rootfile, debugdir, docdir);
+    // FIXME hacky, needed during conversation, but maybe removed
+    if (fret.first.getChildren().getItems(VoidType.class).isEmpty()) {
+      fret.first.getChildren().add(VoidType.INSTANCE);
     }
+    FunToEvl funToAst = new FunToEvl();
+    evl.other.Namespace aclasses = (evl.other.Namespace) funToAst.traverse(fret.first, null);
+    evl.other.CompUse root = (evl.other.CompUse) funToAst.map(fret.second);
 
     ArrayList<String> debugNames = new ArrayList<String>();
-    evl.other.RizzlyProgram prg = MainEvl.doEvl(opt, outdir, debugdir, aclasses, root, debugNames);
+    evl.other.RizzlyProgram prg = MainEvl.doEvl(opt, outdir, debugdir, root, aclasses, debugNames);
 
-    evl.traverser.PrettyPrinter.print(prg, debugdir + "beforeCir.rzy", true);
+    // evl.traverser.PrettyPrinter.print(prg, debugdir + "beforeCir.rzy", true);
 
     Program cprog = (cir.other.Program) evl.traverser.ToC.process(prg);
 
     cprog = MainCir.doCir(cprog, debugdir);
 
-    CWriter.print(cprog, outdir + prg.getName() + ".c", false);
+    String cfile = outdir + prg.getName() + ".c";
+    CWriter.print(cprog, cfile, false);
+
+    return outdir;
   }
 
 }

@@ -1,15 +1,10 @@
 
-
-component
-  Err1
-    slot   inp();
-    signal out();
-    
-  implementation elementary
-    
-    slot inp()
-      out.foo();      // .foo does not exist
-    end
-    
+Err1 = Elementary
+  out : signal();
+  
+  inp : slot()
+    out.foo();      // .foo does not exist
   end
+  
+end
 

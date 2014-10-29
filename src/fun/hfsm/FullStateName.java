@@ -6,8 +6,9 @@ import common.Designator;
 
 import fun.Fun;
 import fun.NullTraverser;
-import fun.function.FunctionHeader;
+import fun.function.FuncHeader;
 
+@Deprecated
 public class FullStateName extends NullTraverser<Void, Designator> {
   final private HashMap<State, Designator> names = new HashMap<State, Designator>();
 
@@ -37,19 +38,20 @@ public class FullStateName extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitFunctionHeader(FunctionHeader obj, Designator param) {
+  protected Void visitFunctionHeader(FuncHeader obj, Designator param) {
     return null;
   }
 
   @Override
   protected Void visitStateComposite(StateComposite obj, Designator param) {
-    visitItr(obj.getItemList(), param);
+    visitList(obj.getItemList(), param);
     return null;
   }
 
   @Override
   protected Void visitState(State obj, Designator param) {
-    param = new Designator(param, obj.getName());
+    assert (false);
+    // param = new Designator(param, obj.getName());
     names.put(obj, param);
     return super.visitState(obj, param);
   }

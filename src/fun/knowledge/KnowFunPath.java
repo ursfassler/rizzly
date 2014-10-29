@@ -9,20 +9,18 @@ import error.ErrorType;
 import error.RError;
 import fun.DefTraverser;
 import fun.Fun;
-import fun.function.FunctionHeader;
 import fun.other.Named;
-import fun.type.Type;
 
 public class KnowFunPath extends KnowledgeEntry {
   private KnowledgeBase base;
-  private Map<Named, Designator> cache = new HashMap<Named, Designator>();
+  private Map<Fun, Designator> cache = new HashMap<Fun, Designator>();
 
   @Override
   public void init(KnowledgeBase base) {
     this.base = base;
   }
 
-  public Designator get(Named obj) {
+  public Designator get(Fun obj) {
     Designator ret = find(obj);
     if (ret == null) {
       RError.err(ErrorType.Fatal, obj.getInfo(), "Object not reachable: " + obj);
@@ -30,7 +28,7 @@ public class KnowFunPath extends KnowledgeEntry {
     return ret;
   }
 
-  public Designator find(Named obj) {
+  public Designator find(Fun obj) {
     Designator ret = cache.get(obj);
     if (ret == null) {
       rebuild();
@@ -42,7 +40,7 @@ public class KnowFunPath extends KnowledgeEntry {
   private void rebuild() {
     cache.clear();
     KnowPathTraverser traverser = new KnowPathTraverser(cache);
-    traverser.visitItr(base.getRoot(), new Designator());
+    traverser.traverse(base.getRoot(), new Designator());
   }
 
   public void clear() {
@@ -52,16 +50,11 @@ public class KnowFunPath extends KnowledgeEntry {
 }
 
 class KnowPathTraverser extends DefTraverser<Void, Designator> {
-  private Map<Named, Designator> cache;
+  private Map<Fun, Designator> cache;
 
-  public KnowPathTraverser(Map<Named, Designator> cache) {
+  public KnowPathTraverser(Map<Fun, Designator> cache) {
     super();
     this.cache = cache;
-  }
-
-  @Override
-  protected Void visitItr(Iterable<? extends Fun> list, Designator param) {
-    return super.visitItr(list, param);
   }
 
   @Override
@@ -71,18 +64,10 @@ class KnowPathTraverser extends DefTraverser<Void, Designator> {
         Designator oldparent = cache.get(obj);
         RError.err(ErrorType.Fatal, obj.getInfo(), "Same object (" + obj + ") found 2 times: " + oldparent + " and " + param);
       }
-      cache.put((Named) obj, param);
+      cache.put(obj, param);
       param = new Designator(param, ((Named) obj).getName());
-      super.visit(obj, param);
-    } else if ((obj instanceof Type) || (obj instanceof FunctionHeader)) { // FIXME remove hacky stuff
-      super.visit(obj, param);
     }
-    return null;
-  }
-
-  @Override
-  protected Void visitFunctionHeader(FunctionHeader obj, Designator param) {
-    return null;
+    return super.visit(obj, param);
   }
 
 }

@@ -1,39 +1,32 @@
-type
-  Uni = Union
-    pos  : R{0,10};
-    neg  : R{-10,10};
+Uni = Union
+  pos  : R{0,10};
+  neg  : R{-10,10};
+end
+
+Union2 = Elementary
+  data : Uni = pos := 1;
+
+  abs = function( x: R{-10,10} ):R{0,10}
+    if x < 0 then
+      return R{0,10}( -x );
+    else
+      return R{0,10}( x );
+    end
   end
 
-component
-  Union2
-    slot ind();
-
-  implementation elementary
-
-    var
-      data : Uni = pos := 1;
-
-    function abs( x: R{-10,10} ):R{0,10}
-      if x < 0 then
-        return R{0,10}( -x );
-      else
-        return R{0,10}( x );
+  ind : slot()
+    x : R{0,10};
+    case data of
+      Uni.pos:
+        x := data.pos;
+      end
+      Uni.neg:
+        x := abs( data.neg );
       end
     end
+  end
   
-    slot ind()
-      x : R{0,10};
-      case data of
-        Uni.pos:
-          x := data.pos;
-        end
-        Uni.neg:
-          x := abs( data.neg );
-        end
-      end
-    end
-    
 
-  end
+end
 
 

@@ -1,28 +1,20 @@
-component
-  Sub
-    slot   inp();
-    signal out();
-      
-  implementation composition
-    connection
-      inp -> out;
-      
-  end
 
-  Err2
-    slot   inp();
-    signal out();
-
-  implementation composition
+Sub = Composition
+  inp : slot();
+  out : signal();
     
-    component
-      a : Sub;
-      
-    connection
-      inp -> a.inp;   // prevent error throwing
-      a.out -> out;   // prevent error throwing
-      
-      a.inp -> out;   // ERROR connect sub-input to output
+  inp -> out;
+end
 
-  end
+Err2 = Composition
+  inp : slot();
+  out : signal();
+
+  a : Sub;
+    
+  inp -> a.inp;   // prevent error throwing
+  a.out -> out;   // prevent error throwing
+  
+  a.inp -> out;   // ERROR connect sub-input to output
+end
 

@@ -6,7 +6,6 @@ import common.ElementInfo;
 import error.ErrorType;
 import error.RError;
 import evl.Evl;
-import evl.other.Named;
 import evl.other.Namespace;
 
 public class KnowEvl extends KnowledgeEntry {
@@ -18,10 +17,10 @@ public class KnowEvl extends KnowledgeEntry {
   }
 
   public Evl get(Designator ref, ElementInfo info) {
-    Named named = base.getRoot();
+    Namespace named = base.getRoot();
 
     for (String itr : ref.toList()) {
-      named = ((Namespace) named).find(itr);
+      named = (Namespace) named.findSpace(itr);
       if (named == null) {
         RError.err(ErrorType.Error, info, "Namespace not found: " + ref);
       }

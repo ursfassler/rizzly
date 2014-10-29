@@ -1,18 +1,13 @@
 // fail, use procedure to index array
 
-component
-  Err5
-    slot   inp();
-    signal out();
+Err5 = Elementary
+  a : Array{10,R{0,10}} = [ 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 ];
+  
+  out : signal();
 
-  implementation elementary
-
-    var
-      a : Array{10,R{0,10}} = [ 10, 9, 8, 7, 6, 5, 4, 3, 2, 1 ];
-    
-    slot inp()
-      return a[out()];
-    end
-    
+  inp : slot()
+    return a[out()];
   end
+  
+end
 

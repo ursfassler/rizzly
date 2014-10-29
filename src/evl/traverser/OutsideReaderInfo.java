@@ -2,20 +2,16 @@ package evl.traverser;
 
 import evl.Evl;
 import evl.NullTraverser;
-import evl.function.FunctionBase;
-import evl.function.impl.FuncGlobal;
-import evl.function.impl.FuncIfaceInRet;
-import evl.function.impl.FuncIfaceInVoid;
-import evl.function.impl.FuncIfaceOutRet;
-import evl.function.impl.FuncIfaceOutVoid;
-import evl.function.impl.FuncImplResponse;
-import evl.function.impl.FuncImplSlot;
-import evl.function.impl.FuncPrivateRet;
-import evl.function.impl.FuncPrivateVoid;
-import evl.function.impl.FuncProtoRet;
-import evl.function.impl.FuncProtoVoid;
-import evl.function.impl.FuncSubHandlerEvent;
-import evl.function.impl.FuncSubHandlerQuery;
+import evl.function.Function;
+import evl.function.header.FuncCtrlInDataIn;
+import evl.function.header.FuncCtrlInDataOut;
+import evl.function.header.FuncCtrlOutDataIn;
+import evl.function.header.FuncCtrlOutDataOut;
+import evl.function.header.FuncGlobal;
+import evl.function.header.FuncPrivateRet;
+import evl.function.header.FuncPrivateVoid;
+import evl.function.header.FuncSubHandlerEvent;
+import evl.function.header.FuncSubHandlerQuery;
 
 /**
  * Returns for every function if, it reads form outside. It gets the information only from the function type.
@@ -25,7 +21,7 @@ import evl.function.impl.FuncSubHandlerQuery;
  */
 public class OutsideReaderInfo extends NullTraverser<Boolean, Void> {
 
-  public static Boolean get(FunctionBase inst) {
+  public static Boolean get(Function inst) {
     OutsideReaderInfo reduction = new OutsideReaderInfo();
     return reduction.traverse(inst, null);
   }
@@ -51,26 +47,6 @@ public class OutsideReaderInfo extends NullTraverser<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitFuncProtoRet(FuncProtoRet obj, Void param) {
-    return true;
-  }
-
-  @Override
-  protected Boolean visitFuncProtoVoid(FuncProtoVoid obj, Void param) {
-    return false;
-  }
-
-  @Override
-  protected Boolean visitFuncImplSlot(FuncImplSlot obj, Void param) {
-    return false;
-  }
-
-  @Override
-  protected Boolean visitFuncImplResponse(FuncImplResponse obj, Void param) {
-    return false;
-  }
-
-  @Override
   protected Boolean visitFuncSubHandlerQuery(FuncSubHandlerQuery obj, Void param) {
     return false;
   }
@@ -81,22 +57,22 @@ public class OutsideReaderInfo extends NullTraverser<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitFuncIfaceOutVoid(FuncIfaceOutVoid obj, Void param) {
+  protected Boolean visitFuncIfaceOutVoid(FuncCtrlOutDataOut obj, Void param) {
     return false;
   }
 
   @Override
-  protected Boolean visitFuncIfaceOutRet(FuncIfaceOutRet obj, Void param) {
+  protected Boolean visitFuncIfaceOutRet(FuncCtrlOutDataIn obj, Void param) {
     return true;
   }
 
   @Override
-  protected Boolean visitFuncIfaceInVoid(FuncIfaceInVoid obj, Void param) {
+  protected Boolean visitFuncIfaceInVoid(FuncCtrlInDataIn obj, Void param) {
     return false;
   }
 
   @Override
-  protected Boolean visitFuncIfaceInRet(FuncIfaceInRet obj, Void param) {
+  protected Boolean visitFuncIfaceInRet(FuncCtrlInDataOut obj, Void param) {
     return false; // FIXME sure?
   }
 

@@ -3,9 +3,9 @@ package fun.type.template;
 import common.ElementInfo;
 
 import fun.expression.reference.Reference;
-import fun.type.TypeGenerator;
+import fun.type.Type;
 
-public class TypeType extends TypeGenerator {
+public class TypeType extends Type {
   private Reference type;
 
   public TypeType(ElementInfo info, Reference type) {
@@ -13,6 +13,8 @@ public class TypeType extends TypeGenerator {
     this.type = type;
   }
 
+  // TODO (re)move
+  @Deprecated
   public static String makeName(Reference type) {
     return TypeTypeTemplate.NAME + "{" + type.toString() + "}";
   }

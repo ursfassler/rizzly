@@ -3,17 +3,18 @@ package evl.type.composed;
 import common.ElementInfo;
 
 import evl.EvlBase;
+import evl.expression.reference.SimpleRef;
 import evl.other.Named;
-import evl.type.TypeRef;
+import evl.type.Type;
 
-public class NamedElement extends EvlBase implements Named {
+final public class NamedElement extends EvlBase implements Named {
   private String name;
-  private TypeRef type;
+  final private SimpleRef<Type> ref;
 
-  public NamedElement(ElementInfo info, String name, TypeRef type) {
+  public NamedElement(ElementInfo info, String name, SimpleRef<Type> ref) {
     super(info);
     this.name = name;
-    this.type = type;
+    this.ref = ref;
   }
 
   public String getName() {
@@ -24,17 +25,13 @@ public class NamedElement extends EvlBase implements Named {
     this.name = name;
   }
 
-  public TypeRef getType() {
-    return type;
-  }
-
-  public void setType(TypeRef type) {
-    this.type = type;
+  public SimpleRef<Type> getRef() {
+    return ref;
   }
 
   @Override
   public String toString() {
-    return name + ":" + type.toString();
+    return name + ref;
   }
 
 }

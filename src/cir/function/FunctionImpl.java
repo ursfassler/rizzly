@@ -1,27 +1,21 @@
 package cir.function;
 
 import java.util.List;
-import java.util.Set;
 
-import cir.other.FuncVariable;
 import cir.statement.Block;
 import cir.type.TypeRef;
+import cir.variable.FuncVariable;
 
-import common.FuncAttr;
+abstract public class FunctionImpl extends Function {
+  final private Block body;
 
-public class FunctionImpl extends Function {
-  private Block body;
-
-  public FunctionImpl(String name, TypeRef retType, List<FuncVariable> argument, Set<FuncAttr> attributes) {
-    super(name, retType, argument, attributes);
+  public FunctionImpl(String name, TypeRef retType, List<FuncVariable> argument, Block body) {
+    super(name, retType, argument);
+    this.body = body;
   }
 
   public Block getBody() {
     return body;
-  }
-
-  public void setBody(Block body) {
-    this.body = body;
   }
 
 }

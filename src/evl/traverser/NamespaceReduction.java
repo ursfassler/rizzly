@@ -4,36 +4,35 @@ import common.Designator;
 
 import evl.Evl;
 import evl.NullTraverser;
-import evl.function.FunctionBase;
-import evl.function.impl.FuncProtoRet;
-import evl.other.ListOfNamed;
+import evl.function.Function;
+import evl.knowledge.KnowledgeBase;
+import evl.other.EvlList;
 import evl.other.Named;
 import evl.other.Namespace;
 import evl.other.Queue;
-import evl.other.SubCallbacks;
 import evl.type.Type;
 import evl.variable.Constant;
 import evl.variable.StateVariable;
 
 // reduces names of named objects in named lists
 public class NamespaceReduction extends NullTraverser<Void, Designator> {
-  private ListOfNamed<Named> list = new ListOfNamed<Named>();
+  private EvlList<Evl> list = new EvlList<Evl>();
 
-  public static ListOfNamed<Named> process(Namespace names) {
-    NamespaceReduction reducer = new NamespaceReduction();
-    reducer.visitList(names, new Designator());
+  public NamespaceReduction(KnowledgeBase kb) {
+  }
+
+  public static EvlList<Evl> process(Namespace names, KnowledgeBase kb) {
+    NamespaceReduction reducer = new NamespaceReduction(kb);
+    for (Evl itr : names.getChildren()) {
+      reducer.visit(itr, new Designator());
+    }
     return reducer.list;
   }
 
-  private void visitList(Iterable<? extends Named> list, Designator param) {
-    for (Named itr : list) {
-      visit(itr, param);
-    }
-  }
-
   private void addToList(Designator param, Named itr) {
-    Designator des = new Designator(param, itr.getName());
-    itr.setName(des.toString(Designator.NAME_SEP));
+    if (param.size() > 0) {
+      itr.setName(param.toString(Designator.NAME_SEP));
+    }
     this.list.add(itr);
   }
 
@@ -43,21 +42,25 @@ public class NamespaceReduction extends NullTraverser<Void, Designator> {
   }
 
   @Override
+  protected Void visit(Evl obj, Designator param) {
+    if (obj instanceof Named) {
+      String name = ((Named) obj).getName();
+
+      assert (name.length() > 0);
+      param = new Designator(param, name);
+    }
+    super.visit(obj, param);
+    return null;
+  }
+
+  @Override
   protected Void visitNamespace(Namespace obj, Designator param) {
-    param = new Designator(param, obj.getName());
-    visitList(obj, param);
+    visitList(obj.getChildren(), param);
     return null;
   }
 
   @Override
-  protected Void visitSubCallbacks(SubCallbacks obj, Designator param) {
-    param = new Designator(param, obj.getName());
-    visitList(obj.getList(), param);
-    return null;
-  }
-
-  @Override
-  protected Void visitFunctionBase(FunctionBase obj, Designator param) {
+  protected Void visitFunctionImpl(Function obj, Designator param) {
     addToList(param, obj);
     return null;
   }
@@ -75,12 +78,6 @@ public class NamespaceReduction extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitFuncProtoRet(FuncProtoRet obj, Designator param) {
-    addToList(param, obj);
-    return null;
-  }
-
-  @Override
   protected Void visitType(Type obj, Designator param) {
     addToList(param, obj);
     return null;
@@ -91,5 +88,4 @@ public class NamespaceReduction extends NullTraverser<Void, Designator> {
     addToList(param, obj);
     return null;
   }
-
 }

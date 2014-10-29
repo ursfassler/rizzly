@@ -1,29 +1,24 @@
 package evl.hfsm;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import common.ElementInfo;
 
 import evl.EvlBase;
-import evl.expression.reference.Reference;
-import evl.function.FunctionHeader;
-import evl.other.ListOfNamed;
-import evl.variable.StateVariable;
+import evl.expression.reference.SimpleRef;
+import evl.function.header.FuncPrivateVoid;
+import evl.other.EvlList;
+import evl.other.Named;
 
-abstract public class State extends EvlBase implements StateItem {
-  public final static String TOPSTATE_NAME = "_top";
-
+abstract public class State extends EvlBase implements StateItem, Named {
   private String name;
-  private Reference entryFunc;
-  private Reference exitFunc;
-  final private ListOfNamed<FunctionHeader> function = new ListOfNamed<FunctionHeader>();
-  final private ListOfNamed<StateVariable> variable = new ListOfNamed<StateVariable>();
-  final protected List<StateItem> item = new ArrayList<StateItem>();
+  final private SimpleRef<FuncPrivateVoid> entryFunc;
+  final private SimpleRef<FuncPrivateVoid> exitFunc;
+  final protected EvlList<StateItem> item = new EvlList<StateItem>();
 
-  public State(ElementInfo info, String name) {
+  public State(ElementInfo info, String name, SimpleRef<FuncPrivateVoid> entryFunc, SimpleRef<FuncPrivateVoid> exitFunc) {
     super(info);
     this.name = name;
+    this.entryFunc = entryFunc;
+    this.exitFunc = exitFunc;
   }
 
   public String getName() {
@@ -34,52 +29,16 @@ abstract public class State extends EvlBase implements StateItem {
     this.name = name;
   }
 
-  public ListOfNamed<StateVariable> getVariable() {
-    return variable;
-  }
-
-  public ListOfNamed<FunctionHeader> getFunction() {
-    return function;
-  }
-
-  public Reference getEntryFunc() {
-    assert (entryFunc != null);
+  public SimpleRef<FuncPrivateVoid> getEntryFunc() {
     return entryFunc;
   }
 
-  public void setEntryFunc(Reference entryFunc) {
-    assert (entryFunc != null);
-    this.entryFunc = entryFunc;
-  }
-
-  public Reference getExitFunc() {
-    assert (exitFunc != null);
+  public SimpleRef<FuncPrivateVoid> getExitFunc() {
     return exitFunc;
   }
 
-  public void setExitFunc(Reference exitFunc) {
-    assert (exitFunc != null);
-    this.exitFunc = exitFunc;
-  }
-
-  public List<StateItem> getItem() {
+  public EvlList<StateItem> getItem() {
     return item;
-  }
-
-  @SuppressWarnings("unchecked")
-  public <T extends StateItem> List<T> getItemList(Class<T> kind) {
-    List<T> ret = new ArrayList<T>();
-    for (StateItem itr : item) {
-      if (kind.isInstance(itr)) {
-        ret.add((T) itr);
-      }
-    }
-    return ret;
-  }
-
-  @Override
-  public String toString() {
-    return name;
   }
 
 }

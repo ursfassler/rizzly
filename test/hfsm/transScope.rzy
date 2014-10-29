@@ -1,44 +1,37 @@
-component
-  TransScope
-    slot   inp();
-    signal outA();
-    signal outB();
-    
-  implementation hfsm( A )
-    var
-      a : R{0,0} = 0;     // this variable is never read since A.a and B.b shadows it
-      
-    transition
-      A to B by inp() if a = 0;   // guard is evaluated in the scope of the source state
-      B to A by inp() if a = 0;
+TransScope = Hfsm
+  inp : slot();
+  outA : signal();
+  outB : signal();
   
-    state A
-      var
-        a : R{0,4} = 4;
+  state( A )
+    a : R{0,0} = 0;     // this variable is never read since A.a and B.a shadows it
         
+    A to B by inp() if a = 0;   // guard is evaluated in the scope of the source state
+    B to A by inp() if a = 0;
+    
+    A : state
+      a : R{0,4} = 4;
+          
       entry
         outA();
       end
-      
-      transition
-        A to A by inp() if a > 0 do
-          a := R{0,4}( a - 1 );
-        end
+        
+      A to A by inp() if a > 0 do
+        a := R{0,4}( a - 1 );
+      end
     end
-      
-    state B
+        
+    B : state
       entry
         outB();
       end
-      
-      var
-        a : R{0,2} = 2;
         
-      transition
-        B to B by inp() if a > 0 do
-          a := R{0,2}( a - 1 );
-        end
+      a : R{0,2} = 2;
+          
+      B to B by inp() if a > 0 do
+        a := R{0,2}( a - 1 );
+      end
     end
-
   end
+end
 

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<language id="rizzly" _name="Rizzly" version="2.0" _section="Sources">
+  <metadata>
+    <property name="mimetypes">text/x-rizzly</property>
+    <property name="globs">*.rzy</property>
+    <property name="line-comment-start">//</property>
+    <property name="block-comment-start">/*</property>
+    <property name="block-comment-end">*/</property>
+  </metadata>
+
+  <styles>
+    <style id="comment" _name="Comment" map-to="def:comment"/>
+    <style id="string" _name="String" map-to="def:string"/>
+    <style id="keyword" _name="Keyword" map-to="def:keyword"/>
+    <style id="identifier" _name="Identifier" map-to="def:identifier"/>
+    <style id="decimal" _name="Decimal" map-to="def:decimal"/>
+  </styles>
+
+  <default-regex-options case-sensitive="true"/>
+
+  <definitions>
+    <context id="string" style-ref="string">
+      <start>'</start>
+      <end>'</end>
+    </context>
+
+    <context id="block-comment" style-ref="comment">
+      <start>/\*</start>
+      <end>\*/</end>
+      <include>
+        <context ref="def:in-comment"/>
+      </include>
+    </context>
+    
+    <context id="line-comment" style-ref="comment" end-at-line-end="true" >
+      <start>//</start>
+      <include>
+        <context ref="def:in-line-comment"/>
+      </include>
+    </context>
+
+    <context id="keyword" style-ref="keyword">
+      <keyword>Elementary</keyword>
+      <keyword>Composition</keyword>
+      <keyword>Hfsm</keyword>
+      <keyword>state</keyword>
+      <keyword>to</keyword>
+      <keyword>by</keyword>
+      <keyword>entry</keyword>
+      <keyword>exit</keyword>
+      <keyword>end</keyword>
+      <keyword>const</keyword>
+      <keyword>register</keyword>
+      <keyword>function</keyword>
+      <keyword>procedure</keyword>
+      <keyword>Record</keyword>
+      <keyword>Union</keyword>
+      <keyword>Enum</keyword>
+      <keyword>return</keyword>
+      <keyword>import</keyword>
+      <keyword>query</keyword>
+      <keyword>response</keyword>
+      <keyword>signal</keyword>
+      <keyword>slot</keyword>
+      <keyword>interrupt</keyword>
+      <keyword>for</keyword>
+      <keyword>while</keyword>
+      <keyword>case</keyword>
+      <keyword>do</keyword>
+      <keyword>of</keyword>
+      <keyword>if</keyword>
+      <keyword>then</keyword>
+      <keyword>ef</keyword>
+      <keyword>else</keyword>
+      
+      <keyword>is</keyword>
+      <keyword>as</keyword>
+      <keyword>in</keyword>
+      
+      <keyword>False</keyword>
+      <keyword>True</keyword>
+      
+      <keyword>not</keyword>
+      <keyword>or</keyword>
+      <keyword>mod</keyword>
+      <keyword>and</keyword>
+      <keyword>shr</keyword>
+      <keyword>shl</keyword>
+
+      
+      <keyword>Boolean</keyword>
+      <keyword>Void</keyword>
+      <keyword>Natural</keyword>
+      <keyword>Integer</keyword>
+      <keyword>String</keyword>
+      
+      <keyword>R</keyword>
+      <keyword>Array</keyword>
+      <keyword>Type</keyword>
+    </context>
+
+    <context id="identifier" style-ref="identifier">
+      <match extended="true">
+        [A-Za-z][A-Za-z0-9]*
+      </match>
+    </context>
+
+    <context id="number" style-ref="decimal">
+      <match extended="true">
+        (?&lt;![\w\.])
+        (([0-9]+)|([0-9]+\.[0-9]+([Ee][-]?[0-9]+)?))
+        (?![\w\.])
+      </match>
+    </context>
+
+    <context id="rizzly">
+      <include>
+        <context ref="string"/>
+        <context ref="block-comment"/>
+        <context ref="line-comment"/>
+        <context ref="keyword"/>
+        <context ref="number"/>
+	      <context ref="identifier"/>
+      </include>
+    </context>
+
+  </definitions>
+</language>

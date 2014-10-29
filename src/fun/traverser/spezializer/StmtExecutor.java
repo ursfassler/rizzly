@@ -1,6 +1,5 @@
 package fun.traverser.spezializer;
 
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -17,8 +16,9 @@ import fun.expression.Expression;
 import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefItem;
 import fun.expression.reference.Reference;
-import fun.function.impl.FuncGlobal;
+import fun.function.FuncFunction;
 import fun.knowledge.KnowledgeBase;
+import fun.other.FunList;
 import fun.statement.Assignment;
 import fun.statement.Block;
 import fun.statement.IfOption;
@@ -33,6 +33,7 @@ import fun.type.Type;
 import fun.type.base.NaturalType;
 import fun.type.template.Array;
 import fun.type.template.Range;
+import fun.variable.FuncVariable;
 import fun.variable.Variable;
 
 /**
@@ -50,14 +51,14 @@ public class StmtExecutor extends NullTraverser<Expression, Memory> {
     this.kb = kb;
   }
 
-  public static Expression process(FuncGlobal func, List<Expression> actparam, Memory mem, KnowledgeBase kb) {
+  public static Expression process(FuncFunction func, List<Expression> actparam, Memory mem, KnowledgeBase kb) {
     Memory memory = new Memory(mem);
 
     assert (func.getParam().size() == actparam.size());
 
     for (int i = 0; i < actparam.size(); i++) {
-      Variable var = func.getParam().getList().get(i);
-      Expression val = actparam.get(i);
+      FuncVariable var = func.getParam().get(i);
+      Expression val = (Expression) ExprEvaluator.evaluate(actparam.get(i), mem, kb);
       memory.createVar(var);
       memory.set(var, val);
     }
@@ -69,7 +70,7 @@ public class StmtExecutor extends NullTraverser<Expression, Memory> {
   }
 
   private Expression exeval(Expression expr, Memory mem) {
-    return ExprEvaluator.evaluate(expr, mem, kb);
+    return (Expression) ExprEvaluator.evaluate(expr, mem, kb);
   }
 
   private boolean toBool(Expression expr) {
@@ -83,14 +84,14 @@ public class StmtExecutor extends NullTraverser<Expression, Memory> {
   }
 
   @Override
-  protected Expression visitFuncGlobal(FuncGlobal obj, Memory param) {
+  protected Expression visitFuncFunction(FuncFunction obj, Memory param) {
     for (Statement stmt : obj.getBody().getStatements()) {
       Expression ret = visit(stmt, param);
       if (ret != null) {
         return ret;
       }
     }
-    return new AnyValue(new ElementInfo());
+    return new AnyValue(ElementInfo.NO);
   }
 
   @Override
@@ -117,11 +118,11 @@ public class StmtExecutor extends NullTraverser<Expression, Memory> {
       value = null;
     } else if (type instanceof Array) {
       Array at = (Array) type;
-      List<Expression> vals = new ArrayList<Expression>(at.getSize().intValue());
+      FunList<Expression> vals = new FunList<Expression>();
       for (int i = 0; i < at.getSize().intValue(); i++) {
         vals.add(null);
       }
-      value = new ArrayValue(new ElementInfo(), vals);
+      value = new ArrayValue(ElementInfo.NO, vals);
     } else {
       RError.err(ErrorType.Fatal, obj.getInfo(), "Unhandled type: " + type.getName());
       value = null;
@@ -150,7 +151,7 @@ public class StmtExecutor extends NullTraverser<Expression, Memory> {
     LinkedList<RefItem> offset = new LinkedList<RefItem>();
     for (RefItem itm : obj.getLeft().getOffset()) {
       if (itm instanceof RefIndex) {
-        itm = new RefIndex(new ElementInfo(), exeval(((RefIndex) itm).getIndex(), param));
+        itm = new RefIndex(ElementInfo.NO, exeval(((RefIndex) itm).getIndex(), param));
       }
       offset.add(itm);
     }
@@ -170,7 +171,7 @@ public class StmtExecutor extends NullTraverser<Expression, Memory> {
 
   @Override
   protected Expression visitReturnVoid(ReturnVoid obj, Memory param) {
-    return new AnyValue(new ElementInfo());
+    return new AnyValue(ElementInfo.NO);
   }
 
   @Override

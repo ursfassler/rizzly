@@ -15,12 +15,10 @@ import cir.expression.UnsafeUnionValue;
 import cir.expression.reference.RefCall;
 import cir.expression.reference.RefIndex;
 import cir.expression.reference.RefName;
-import cir.function.FunctionImpl;
+import cir.function.FunctionPrivate;
 import cir.function.FunctionPrototype;
-import cir.other.Constant;
-import cir.other.FuncVariable;
+import cir.function.FunctionPublic;
 import cir.other.Program;
-import cir.other.StateVariable;
 import cir.statement.Assignment;
 import cir.statement.Block;
 import cir.statement.CallStmt;
@@ -47,6 +45,9 @@ import cir.type.UIntType;
 import cir.type.UnionType;
 import cir.type.UnsafeUnionType;
 import cir.type.VoidType;
+import cir.variable.Constant;
+import cir.variable.FuncVariable;
+import cir.variable.StateVariable;
 
 public abstract class NullTraverser<R, P> extends Traverser<R, P> {
 
@@ -198,7 +199,12 @@ public abstract class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitFunctionImpl(FunctionImpl obj, P param) {
+  protected R visitFunctionPrivate(FunctionPrivate obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitFunctionPublic(FunctionPublic obj, P param) {
     return visitDefault(obj, param);
   }
 

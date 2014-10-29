@@ -1,29 +1,20 @@
-component
-  DummyComp
-    response ind():R{0,100};
-    query    out():R{0,100};
+DummyComp = Elementary
+  out : query():R{0,100};
 
-  implementation elementary
-
-    response ind():R{0,100}
-      return out();
-    end
-    
+  ind : response():R{0,100}
+    return out();
   end
+end
 
-  CompositionQuery
-    response ind():R{0,100};
-    query    out():R{0,100};
+CompositionQuery = Composition
+  ind : response():R{0,100};
+  out : query():R{0,100};
 
-  implementation composition
+  a : DummyComp;
+  b : DummyComp;
     
-    component
-      a : DummyComp;
-      b : DummyComp;
-    
-    connection
-      ind -> a.ind;
-      a.out -> b.ind;
-      b.out -> out;
-  end
+  ind -> a.ind;
+  a.out -> b.ind;
+  b.out -> out;
+end
 

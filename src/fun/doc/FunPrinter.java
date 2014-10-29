@@ -1,7 +1,6 @@
 package fun.doc;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -26,38 +25,33 @@ import fun.expression.Number;
 import fun.expression.Relation;
 import fun.expression.StringValue;
 import fun.expression.UnaryExpression;
+import fun.expression.reference.BaseRef;
+import fun.expression.reference.DummyLinkTarget;
 import fun.expression.reference.RefCall;
 import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefName;
 import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.Reference;
-import fun.function.FuncWithBody;
-import fun.function.FuncWithReturn;
-import fun.function.FunctionHeader;
-import fun.function.impl.FuncEntryExit;
-import fun.function.impl.FuncGlobal;
-import fun.function.impl.FuncImplResponse;
-import fun.function.impl.FuncImplSlot;
-import fun.function.impl.FuncPrivateRet;
-import fun.function.impl.FuncPrivateVoid;
-import fun.function.impl.FuncProtQuery;
-import fun.function.impl.FuncProtResponse;
-import fun.function.impl.FuncProtRet;
-import fun.function.impl.FuncProtSignal;
-import fun.function.impl.FuncProtSlot;
-import fun.function.impl.FuncProtVoid;
+import fun.expression.reference.SimpleRef;
+import fun.function.FuncFunction;
+import fun.function.FuncHeader;
+import fun.function.FuncImpl;
+import fun.function.FuncProcedure;
+import fun.function.FuncQuery;
+import fun.function.FuncResponse;
+import fun.function.FuncSignal;
+import fun.function.FuncSlot;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.State;
 import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
-import fun.other.Component;
-import fun.other.Generator;
+import fun.other.FunList;
 import fun.other.ImplElementary;
-import fun.other.ListOfNamed;
 import fun.other.Named;
 import fun.other.Namespace;
 import fun.other.RizzlyFile;
+import fun.other.Template;
 import fun.statement.Assignment;
 import fun.statement.Block;
 import fun.statement.CallStmt;
@@ -78,7 +72,6 @@ import fun.type.base.EnumType;
 import fun.type.base.IntegerType;
 import fun.type.base.NaturalType;
 import fun.type.base.StringType;
-import fun.type.base.TypeAlias;
 import fun.type.base.VoidType;
 import fun.type.composed.NamedElement;
 import fun.type.composed.NamedElementType;
@@ -91,11 +84,9 @@ import fun.type.template.RangeTemplate;
 import fun.type.template.TypeType;
 import fun.type.template.TypeTypeTemplate;
 import fun.variable.CompUse;
-import fun.variable.ConstGlobal;
-import fun.variable.ConstPrivate;
-import fun.variable.FuncVariable;
-import fun.variable.StateVariable;
-import fun.variable.TemplateParameter;
+import fun.variable.Constant;
+import fun.variable.DefVariable;
+import fun.variable.Variable;
 
 /**
  * Prints formated FUN objects to a specific writer.
@@ -119,16 +110,24 @@ public class FunPrinter extends NullTraverser<Void, Void> {
     return "_" + Integer.toHexString(obj.hashCode());
   }
 
-  protected Designator getObjPath(Reference obj) {
+  protected String getId(Fun obj, Void name) {
+    return "_" + Integer.toHexString(obj.hashCode());
+  }
+
+  protected Designator getObjPath(BaseRef obj) {
     return new Designator();
   }
 
-  private void list(List<? extends Fun> list, String sep, Void param) {
-    for (int i = 0; i < list.size(); i++) {
-      if (i > 0) {
+  private void list(Iterable<? extends Fun> list, String sep, Void param) {
+    Iterator<? extends Fun> itr = list.iterator();
+    boolean first = true;
+    while (itr.hasNext()) {
+      if (first) {
+        first = false;
+      } else {
         xw.wr(sep);
       }
-      visit(list.get(i), param);
+      visit(itr.next(), param);
     }
   }
 
@@ -138,36 +137,37 @@ public class FunPrinter extends NullTraverser<Void, Void> {
     }
   }
 
-  private <T extends Named> void visitList(ListOfNamed<T> list, Void param) {
-    Iterator<T> itr = list.iterator();
-    while (itr.hasNext()) {
-      visit(itr.next(), param);
+  private void visitListNl(List<? extends Fun> list, Void param) {
+    for (int i = 0; i < list.size(); i++) {
+      visit(list.get(i), param);
+      xw.nl();
     }
   }
 
-  private void visitOptList(String before, String sep, String after, Collection<? extends Fun> list) {
-    if (!list.isEmpty()) {
+  private void visitOptList(String before, String sep, String after, Iterable<? extends Fun> list) {
+    Iterator<? extends Fun> itr = list.iterator();
+    if (itr.hasNext()) {
       xw.wr(before);
       boolean first = true;
-      for (Fun itr : list) {
+      while (itr.hasNext()) {
         if (first) {
           first = false;
         } else {
           xw.wr(sep);
         }
-        visit(itr, null);
+        visit(itr.next(), null);
       }
       xw.wr(after);
     }
   }
 
-  private void visitNamedSection(String name, Collection<? extends Fun> data) {
-    if (!data.isEmpty()) {
+  private void visitNamedSection(String name, FunList<? extends Fun> listOfNamed) {
+    if (!listOfNamed.isEmpty()) {
       xw.sectionSeparator();
       xw.kw(name);
       xw.nl();
       xw.incIndent();
-      visitItr(data, null);
+      visitList(listOfNamed, null);
       xw.decIndent();
     }
   }
@@ -194,50 +194,16 @@ public class FunPrinter extends NullTraverser<Void, Void> {
     }
   }
 
-  private void printEntryExit(String name, Reference ref) {
-    assert (ref.getOffset().isEmpty());
-    FuncEntryExit func = (FuncEntryExit) ref.getLink();
-    if (!func.getBody().getStatements().isEmpty()) {
+  private void printEntryExit(String name, Block func) {
+    if (!func.getStatements().isEmpty()) {
       xw.kw(name);
       xw.nl();
       xw.incIndent();
-      visit(func.getBody(), null);
+      visit(func, null);
       xw.decIndent();
       xw.kw("end");
       xw.nl();
     }
-  }
-
-  private void printFunc(FunctionHeader func, boolean nofunc) {
-    if (!nofunc) {
-      xw.kw("function ");
-    }
-    xw.wa(func.getName(), getId(func));
-    xw.wr("(");
-    visitOptList("", "; ", "", func.getParam().getList());
-    xw.wr(")");
-    if (func instanceof FuncWithReturn) {
-      xw.wr(":");
-      visit(((FuncWithReturn) func).getRet(), null);
-    }
-    if (func instanceof FuncWithBody) {
-      xw.nl();
-      xw.incIndent();
-      visit(((FuncWithBody) func).getBody(), null);
-      xw.decIndent();
-      xw.kw("end");
-      xw.nl();
-    } else {
-      xw.wr(";");
-      xw.nl();
-    }
-  }
-
-  // TODO write that before generators like component
-  private void wrGen(Generator obj) {
-    xw.sectionSeparator();
-    xw.wa(obj.getName(), getId(obj));
-    visitOptList("{", "; ", "}", obj.getTemplateParam().getList());
   }
 
   @Override
@@ -245,21 +211,22 @@ public class FunPrinter extends NullTraverser<Void, Void> {
     assert (param == null);
     writeMeta(obj);
     visitImports(obj.getImports(), null);
-    xw.sectionSeparator();
-    visitNamedSection("const", obj.getConstant().getList());
-    xw.sectionSeparator();
-    visitList(obj.getFunction(), null);
-
-    visitNamedSection("type", obj.getType().getList());
-    visitList(obj.getFunction(), null);
-    visitNamedSection("component", obj.getComp().getList());
-
+    visitList(obj.getObjects(), param);
     return null;
   }
 
   @Override
   protected Void visitNamespace(Namespace obj, Void param) {
-    visitItr(obj, param);
+    xw.wa(obj.getName(), getId(obj));
+    xw.nl();
+    xw.incIndent();
+    for (Fun itr : obj.getChildren()) {
+      visit(itr, param);
+      xw.nl();
+    }
+    xw.decIndent();
+    xw.kw("end");
+    xw.nl();
     return null;
   }
 
@@ -275,33 +242,18 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitComponent(Component obj, Void param) {
-    wrGen(obj);
-    xw.incIndent();
-    visitList(obj.getResponse(), param);
-    visitList(obj.getSlot(), param);
-    xw.sectionSeparator();
-    visitList(obj.getQuery(), param);
-    visitList(obj.getSignal(), param);
-    xw.sectionSeparator();
-    xw.decIndent();
-    super.visitComponent(obj, null);
-    return null;
-  }
-
-  @Override
   protected Void visitImplElementary(ImplElementary obj, Void param) {
-    xw.kw("implementation elementary");
+    xw.wa("elementary", getId(obj, param));
     xw.nl();
     xw.incIndent();
-
-    visitNamedSection("const", obj.getConstant().getList());
-    visitNamedSection("var", obj.getVariable().getList());
+    writeMeta(obj);
 
     printEntryExit("entry", obj.getEntryFunc());
     printEntryExit("entry", obj.getExitFunc());
+    visitListNl(obj.getDeclaration(), param);
+    visitListNl(obj.getInstantiation(), param);
+    visitListNl(obj.getObjects(), param);
 
-    visitList(obj.getFunction(), param);
     xw.decIndent();
     xw.kw("end");
     xw.nl();
@@ -310,19 +262,18 @@ public class FunPrinter extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitImplComposition(ImplComposition obj, Void param) {
-    xw.kw("implementation composition");
+    xw.wa("composition", getId(obj, param));
     xw.nl();
-    writeMeta(obj);
     xw.incIndent();
+    writeMeta(obj);
 
-    visitNamedSection("component", obj.getComponent().getList());
-    xw.sectionSeparator();
-    visitNamedSection("connection", obj.getConnection());
-    xw.sectionSeparator();
+    visitListNl(obj.getInstantiation(), param);
+    visitListNl(obj.getConnection(), param);
+    visitList(obj.getObjects(), param);
+
     xw.decIndent();
     xw.kw("end");
     xw.nl();
-
     return null;
   }
 
@@ -330,14 +281,14 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   protected Void visitConnection(Connection obj, Void param) {
     visit(obj.getEndpoint(Direction.in), null);
     switch (obj.getType()) {
-    case sync:
-      xw.wr(" -> ");
-      break;
-    case async:
-      xw.wr(" >> ");
-      break;
-    default:
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Not yet implemented connection type: " + obj.getType());
+      case sync:
+        xw.wr(" -> ");
+        break;
+      case async:
+        xw.wr(" >> ");
+        break;
+      default:
+        RError.err(ErrorType.Fatal, obj.getInfo(), "Not yet implemented connection type: " + obj.getType());
     }
     visit(obj.getEndpoint(Direction.out), null);
     xw.wr(";");
@@ -346,23 +297,26 @@ public class FunPrinter extends NullTraverser<Void, Void> {
     return null;
   }
 
+  // ---- hfsm ----------------------------------------------------------------
+
   @Override
-  protected Void visitRangeTemplate(RangeTemplate obj, Void param) {
-    xw.wa(obj.getName(), getId(obj));
-    xw.wr(";");
-    xw.nl();
+  protected Void visitDeclaration(Template obj, Void param) {
+    String id = getId(obj, param);
+    xw.wa(obj.getName(), id);
+    xw.wr("{");
+    list(obj.getTempl(), "; ", param);
+    xw.wr("}");
+    xw.wr(" = ");
+    visit(obj.getObject(), param);
     return null;
   }
-
-  // ---- hfsm ----------------------------------------------------------------
 
   private void printStateBody(State obj) {
     xw.incIndent();
 
-    printEntryExit("entry", obj.getEntryFuncRef());
-    printEntryExit("exit", obj.getExitFuncRef());
-    visitNamedSection("var", obj.getVariable().getList());
-    visitList(obj.getItemList(), null);
+    printEntryExit("entry", obj.getEntryFunc());
+    printEntryExit("exit", obj.getExitFunc());
+    visitListNl(obj.getItemList(), null);
 
     xw.decIndent();
     xw.kw("end");
@@ -372,22 +326,24 @@ public class FunPrinter extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitImplHfsm(ImplHfsm obj, Void param) {
-    xw.kw("implementation hfsm");
-    xw.wr("(");
-    visit(obj.getTopstate().getInitial(), null);
-    xw.wr(")");
+    xw.wa("hfsm", getId(obj, param));
     xw.nl();
+    xw.incIndent();
+    writeMeta(obj);
 
-    printStateBody(obj.getTopstate());
+    visitList(obj.getInterface(), param);
+    visitList(obj.getObjects(), param);
+    visit(obj.getTopstate(), param);
 
+    xw.decIndent();
+    xw.kw("end");
+    xw.nl();
     return null;
   }
 
   @Override
   protected Void visitStateComposite(StateComposite obj, Void param) {
     xw.kw("state");
-    xw.wr(" ");
-    xw.wa(obj.getName(), getId(obj));
     xw.wr("(");
     visit(obj.getInitial(), null);
     xw.wr(")");
@@ -400,8 +356,6 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   @Override
   protected Void visitStateSimple(StateSimple obj, Void param) {
     xw.kw("state");
-    xw.wr(" ");
-    xw.wa(obj.getName(), getId(obj));
     xw.nl();
 
     printStateBody(obj);
@@ -424,7 +378,7 @@ public class FunPrinter extends NullTraverser<Void, Void> {
     xw.wr(" ");
     visit(obj.getEvent(), null);
     xw.wr("(");
-    list(obj.getParam().getList(), "; ", null);
+    list(obj.getParam(), "; ", null);
     xw.wr(")");
     if (!((obj.getGuard() instanceof BoolValue) && (((BoolValue) obj.getGuard()).isValue() == true))) {
       xw.wr(" ");
@@ -454,37 +408,26 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   // ---- Type ----------------------------------------------------------------
 
   @Override
-  protected Void visitTypeAlias(TypeAlias obj, Void param) {
-    xw.wa(obj.getName(), getId(obj));
-    xw.wr(" = ");
-    visit(obj.getRef(), null);
-    xw.wr(";");
+  protected Void visitRangeTemplate(RangeTemplate obj, Void param) {
+    xw.wa("<R{*,*}>", getId(obj, param));
     return null;
   }
 
   @Override
   protected Void visitStringType(StringType obj, Void param) {
-    xw.wa(obj.getName(), getId(obj));
-    xw.wr(" = ");
-    xw.kw(obj.getName());
-    xw.wr(";");
+    xw.wa("<String>", getId(obj, param));
     return null;
   }
 
   @Override
   protected Void visitVoidType(VoidType obj, Void param) {
-    xw.wa(obj.getName(), getId(obj));
-    xw.wr(" = ");
-    xw.kw(obj.getName());
-    xw.wr(";");
+    xw.wa("<∅>", getId(obj, param));
     return null;
   }
 
   @Override
   protected Void visitEnumType(EnumType obj, Void param) {
-    xw.wa(obj.getName(), getId(obj));
-    xw.wr(" = ");
-    xw.kw("Enum");
+    xw.wa("Enum", getId(obj, param));
     xw.nl();
     xw.incIndent();
     visitList(obj.getElement(), param);
@@ -521,9 +464,7 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   }
 
   private void writeNamedElementType(NamedElementType obj, String typename, Void param) {
-    wrGen(obj);
-    xw.wr(" = ");
-    xw.kw(typename);
+    xw.wa(typename, getId(obj, param));
     xw.nl();
     xw.incIndent();
     visitList(obj.getElement(), null);
@@ -534,48 +475,43 @@ public class FunPrinter extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitRange(Range obj, Void param) {
-    xw.wr(obj.getName());
+    xw.wa("<" + obj.getLow().toString() + ".." + obj.getHigh().toString() + ">", getId(obj, param));
     return null;
   }
 
   @Override
   protected Void visitArray(Array obj, Void param) {
-    xw.wr(obj.getName());
+    xw.wa(obj.getName(), getId(obj, param));
     return null;
   }
 
   @Override
   protected Void visitBooleanType(BooleanType obj, Void param) {
-    xw.kw(obj.getName());
-    xw.wr(";");
+    xw.wa(obj.getName(), getId(obj, param));
     return null;
   }
 
   @Override
   protected Void visitArrayTemplate(ArrayTemplate obj, Void param) {
-    xw.kw(obj.getName());
-    xw.wr(";");
+    xw.wa(obj.NAME, getId(obj, param));
     return null;
   }
 
   @Override
   protected Void visitIntegerType(IntegerType obj, Void param) {
-    xw.kw(obj.getName());
-    xw.wr(";");
+    xw.wa("<Z>", getId(obj, param));
     return null;
   }
 
   @Override
   protected Void visitNaturalType(NaturalType obj, Void param) {
-    xw.kw(obj.getName());
-    xw.wr(";");
+    xw.wa("<N>", getId(obj, param));
     return null;
   }
 
   @Override
   protected Void visitAnyType(AnyType obj, Void param) {
-    xw.kw(obj.getName());
-    xw.wr(";");
+    xw.wa("<*>", getId(obj, param));
     return null;
   }
 
@@ -590,8 +526,7 @@ public class FunPrinter extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitTypeTypeTemplate(TypeTypeTemplate obj, Void param) {
-    xw.kw(obj.getName());
-    xw.wr(";");
+    xw.wa("<Type{*}>", getId(obj, param));
     return null;
   }
 
@@ -617,7 +552,6 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   protected Void visitVarDef(VarDefStmt obj, Void param) {
     visit(obj.getVariable(), param);
     xw.wr(";");
-    xw.nl();
     return null;
   }
 
@@ -707,7 +641,7 @@ public class FunPrinter extends NullTraverser<Void, Void> {
     xw.kw("of");
     xw.nl();
     xw.incIndent();
-    visitItr(obj.getOption(), null);
+    visitList(obj.getOption(), null);
     if (!obj.getOtherwise().getStatements().isEmpty()) {
       xw.kw("else");
       xw.nl();
@@ -833,12 +767,34 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitReference(Reference obj, Void param) {
-    Designator path = getObjPath(obj);
-    String hint = obj.getLink().toString();
-    xw.wl(obj.getLink().getName(), hint, path.toString(), getId(obj.getLink()));
-    visitItr(obj.getOffset(), null);
+  protected Void visitSimpleRef(SimpleRef obj, Void param) {
+    wrRef(obj);
     return null;
+  }
+
+  @Override
+  protected Void visitReference(Reference obj, Void param) {
+    wrRef(obj);
+    visitList(obj.getOffset(), null);
+    return null;
+  }
+
+  private void wrRef(BaseRef obj) {
+    Designator path = getObjPath(obj);
+    if (path == null) {
+      path = new Designator();  // TODO: ok?
+    }
+    String hint = obj.getLink().toString();
+    String name;
+    if (obj.getLink() instanceof Named) {
+      name = ((Named) obj.getLink()).getName();
+    } else {
+      name = "???";
+    }
+    if (obj.getLink() instanceof DummyLinkTarget) {
+      name = "\"" + name + "\"";
+    }
+    xw.wl(name, hint, path.toString(), getId(obj.getLink(), null));
   }
 
   @Override
@@ -872,131 +828,96 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitConstPrivate(ConstPrivate obj, Void param) {
+  protected Void visitVariable(Variable obj, Void param) {
     xw.wa(obj.getName(), getId(obj));
-    xw.wr(": ");
-    visit(obj.getType(), null);
-    xw.wr(" = ");
-    visit(obj.getDef(), null);
-    xw.wr(";");
-    xw.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitConstGlobal(ConstGlobal obj, Void param) {
-    xw.wa(obj.getName(), getId(obj));
-    xw.wr(": ");
-    visit(obj.getType(), null);
-    xw.wr(" = ");
-    visit(obj.getDef(), null);
-    xw.wr(";");
-    xw.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitFuncVariable(FuncVariable obj, Void param) {
-    xw.wa(obj.getName(), getId(obj));
-    xw.wr(": ");
+    xw.wr(" : ");
+    if (obj instanceof Constant) {
+      xw.kw("const ");
+    }
     visit(obj.getType(), param);
+    if (obj instanceof DefVariable) {
+      xw.wr(" = ");
+      visit(((DefVariable) obj).getDef(), param);
+    }
     return null;
   }
 
   @Override
-  protected Void visitTemplateParameter(TemplateParameter obj, Void param) {
-    xw.wa(obj.getName(), getId(obj));
-    xw.wr(": ");
-    visit(obj.getType(), null);
+  protected Void visitConstant(Constant obj, Void param) {
+    super.visitConstant(obj, param);
+    xw.wr(";");
+    xw.nl();
+    return null;
+  }
+
+  private void printFuncImpl(FuncImpl obj) {
+    xw.nl();
+    xw.incIndent();
+    visit(obj.getBody(), null);
+    xw.decIndent();
+    xw.kw("end");
+    xw.nl();
+  }
+
+  private void printFunctionHeader(FuncHeader obj) {
+    xw.wr("[");
+    xw.wr(getId(obj, null));
+    xw.wr("]");
+    xw.wr("(");
+    visitOptList("", "; ", "", obj.getParam());
+    xw.wr(")");
+    xw.wr(":");
+    visit(obj.getRet(), null);
+  }
+
+  @Override
+  protected Void visitFuncFunction(FuncFunction obj, Void param) {
+    xw.wr("function");
+    printFunctionHeader(obj);
+    printFuncImpl(obj);
     return null;
   }
 
   @Override
-  protected Void visitStateVariable(StateVariable obj, Void param) {
-    xw.wa(obj.getName(), getId(obj));
-    xw.wr(": ");
-    visit(obj.getType(), null);
-    xw.wr(" = ");
-    visit(obj.getDef(), null);
+  protected Void visitFuncPrivateVoid(FuncProcedure obj, Void param) {
+    xw.wr("procedure");
+    printFunctionHeader(obj);
+    printFuncImpl(obj);
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncProtSlot(FuncSlot obj, Void param) {
+    xw.wr("slot");
+    printFunctionHeader(obj);
+    printFuncImpl(obj);
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncProtSignal(FuncSignal obj, Void param) {
+    xw.wr("signal");
+    printFunctionHeader(obj);
     xw.wr(";");
     xw.nl();
     return null;
   }
 
   @Override
-  protected Void visitFuncPrivateRet(FuncPrivateRet obj, Void param) {
-    xw.sectionSeparator();
-    printFunc(obj, false);
+  protected Void visitFuncProtQuery(FuncQuery obj, Void param) {
+    xw.wr("query");
+    printFunctionHeader(obj);
+    xw.wr(";");
+    xw.nl();
     return null;
   }
 
   @Override
-  protected Void visitFuncPrivateVoid(FuncPrivateVoid obj, Void param) {
-    xw.sectionSeparator();
-    printFunc(obj, false);
+  protected Void visitFuncProtResponse(FuncResponse obj, Void param) {
+    xw.wr("response");
+    printFunctionHeader(obj);
+    printFuncImpl(obj);
     return null;
-  }
-
-  @Override
-  protected Void visitFuncImplResponse(FuncImplResponse obj, Void param) {
-    xw.sectionSeparator();
-    printFunc(obj, false);
-    return null;
-  }
-
-  @Override
-  protected Void visitFuncImplSlot(FuncImplSlot obj, Void param) {
-    xw.sectionSeparator();
-    printFunc(obj, false);
-    return null;
-  }
-
-  @Override
-  protected Void visitFuncProtRet(FuncProtRet obj, Void param) {
-    printFunc(obj, true);
-    return null;
-  }
-
-  @Override
-  protected Void visitFuncProtVoid(FuncProtVoid obj, Void param) {
-    printFunc(obj, true);
-    return null;
-  }
-
-  @Override
-  protected Void visitFuncGlobal(FuncGlobal obj, Void param) {
-    // xw.sectionSeparator();
-    printFunc(obj, false);
-    return null;
-  }
-
-  @Override
-  protected Void visitFuncProtSlot(FuncProtSlot obj, Void param) {
-    printFunc(obj, true);
-    return null;
-  }
-
-  @Override
-  protected Void visitFuncProtSignal(FuncProtSignal obj, Void param) {
-    printFunc(obj, true);
-    return null;
-  }
-
-  @Override
-  protected Void visitFuncProtQuery(FuncProtQuery obj, Void param) {
-    printFunc(obj, true);
-    return null;
-  }
-
-  @Override
-  protected Void visitFuncProtResponse(FuncProtResponse obj, Void param) {
-    printFunc(obj, true);
-    return null;
-  }
-
-  @Override
-  protected Void visitFuncEntryExit(FuncEntryExit obj, Void param) {
-    return null; // it is written otherwise
   }
 
 }

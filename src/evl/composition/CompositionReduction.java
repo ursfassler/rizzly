@@ -19,190 +19,173 @@ import evl.expression.Expression;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
-import evl.function.FuncIface;
-import evl.function.FuncIfaceOut;
-import evl.function.FuncWithBody;
-import evl.function.FuncWithReturn;
-import evl.function.FunctionBase;
-import evl.function.FunctionFactory;
-import evl.function.FunctionHeader;
-import evl.function.impl.FuncImplResponse;
-import evl.function.impl.FuncImplSlot;
-import evl.function.impl.FuncPrivateVoid;
-import evl.function.impl.FuncSubHandlerEvent;
-import evl.function.impl.FuncSubHandlerQuery;
-import evl.knowledge.KnowParent;
+import evl.expression.reference.SimpleRef;
+import evl.function.Function;
+import evl.function.InterfaceFunction;
+import evl.function.header.FuncCtrlInDataIn;
+import evl.function.header.FuncCtrlInDataOut;
+import evl.function.header.FuncCtrlOutDataIn;
+import evl.function.header.FuncCtrlOutDataOut;
+import evl.function.header.FuncPrivateVoid;
+import evl.function.header.FuncSubHandlerEvent;
+import evl.function.header.FuncSubHandlerQuery;
+import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
 import evl.other.CompUse;
 import evl.other.Component;
+import evl.other.EvlList;
 import evl.other.ImplElementary;
-import evl.other.ListOfNamed;
-import evl.other.Named;
 import evl.other.Namespace;
+import evl.other.Queue;
+import evl.other.SubCallbacks;
 import evl.statement.Block;
 import evl.statement.CallStmt;
 import evl.statement.ReturnExpr;
 import evl.statement.intern.MsgPush;
+import evl.type.Type;
 import evl.variable.FuncVariable;
 import evl.variable.Variable;
-import fun.hfsm.State;
 
 //TODO cleanup
-public class CompositionReduction extends NullTraverser<Named, Void> {
+public class CompositionReduction extends NullTraverser<Evl, Void> {
 
-  private static final ElementInfo info = new ElementInfo();
+  private static final ElementInfo info = ElementInfo.NO;
   private Map<ImplComposition, ImplElementary> map = new HashMap<ImplComposition, ImplElementary>();
-  private final KnowParent kp;
+  private final KnowBaseItem kbi;
 
   public CompositionReduction(KnowledgeBase kb) {
     super();
-    kp = kb.getEntry(KnowParent.class);
+    kbi = kb.getEntry(KnowBaseItem.class);
   }
 
   public static Map<ImplComposition, ImplElementary> process(Namespace classes, KnowledgeBase kb) {
     CompositionReduction reduction = new CompositionReduction(kb);
-    reduction.visitItr(classes, null);
+    reduction.visit(classes, null);
     return reduction.map;
   }
 
   @Override
-  protected Named visitDefault(Evl obj, Void param) {
-    assert (obj instanceof Named);
-    return (Named) obj;
+  protected Evl visitDefault(Evl obj, Void param) {
+    return obj;
   }
 
   @Override
-  protected Named visitNamespace(Namespace obj, Void param) {
-    for (int i = 0; i < obj.getList().size(); i++) {
-      Named item = obj.getList().get(i);
+  protected Evl visitNamespace(Namespace obj, Void param) {
+    for (int i = 0; i < obj.getChildren().size(); i++) {
+      Evl item = obj.getChildren().get(i);
+      Map<Object, Object> prop = item.properties();
       item = visit(item, null);
       assert (item != null);
-      obj.getList().set(i, item);
+      item.properties().putAll(prop);
+      obj.getChildren().set(i, item);
     }
     return obj;
   }
 
   @Override
-  protected ImplElementary visitImplComposition(ImplComposition obj, Void param) {
-    ImplElementary elem = new ImplElementary(obj.getInfo(), obj.getName());
+  protected Evl visitImplComposition(ImplComposition obj, Void param) {
+
+    FuncPrivateVoid entry = new FuncPrivateVoid(info, "_entry", new EvlList<FuncVariable>(), new SimpleRef<Type>(info, kbi.getVoidType()), new Block(info));
+    FuncPrivateVoid exit = new FuncPrivateVoid(info, "_exit", new EvlList<FuncVariable>(), new SimpleRef<Type>(info, kbi.getVoidType()), new Block(info));
+
+    ImplElementary elem = new ImplElementary(obj.getInfo(), obj.getName(), new SimpleRef<FuncPrivateVoid>(info, entry), new SimpleRef<FuncPrivateVoid>(info, exit));
+    elem.getFunction().add(entry);
+    elem.getFunction().add(exit);
+
     elem.getComponent().addAll(obj.getComponent());
-    elem.getSignal().addAll(obj.getSignal());
-    elem.getQuery().addAll(obj.getQuery());
-    elem.getSlot().addAll(obj.getSlot());
-    elem.getResponse().addAll(obj.getResponse());
+    elem.getIface().addAll(obj.getIface());
+    elem.getFunction().addAll(obj.getFunction());
     elem.setQueue(obj.getQueue());
 
-    elem.setEntryFunc(makeEntryExitFunc(State.ENTRY_FUNC_NAME, elem.getFunction()));
-    elem.setExitFunc(makeEntryExitFunc(State.EXIT_FUNC_NAME, elem.getFunction()));
+    Map<Pair<CompUse, Function>, Function> coca = new HashMap<Pair<CompUse, Function>, Function>();
 
-    Map<FuncIface, List<Connection>> input = new HashMap<FuncIface, List<Connection>>();
-    Map<Pair<CompUse, String>, List<Connection>> callback = new HashMap<Pair<CompUse, String>, List<Connection>>();
+    for (CompUse compu : obj.getComponent()) {
+      SubCallbacks suc = new SubCallbacks(compu.getInfo(), new SimpleRef<CompUse>(info, compu));
+      elem.getSubCallback().add(suc);
+      for (InterfaceFunction out : compu.getLink().getIface(Direction.out)) {
+        Function suha = makeHandler((Function) out);
+        suc.getFunc().add(suha);
+        coca.put(new Pair<CompUse, Function>(compu, (Function) out), suha);
+      }
+    }
+
     for (Connection con : obj.getConnection()) {
       Endpoint src = con.getEndpoint(Direction.in);
 
       if (src instanceof EndpointSelf) {
-        FuncIface srcIface = ((EndpointSelf) src).getIface();
-        List<Connection> set = input.get(srcIface);
-        if (set == null) {
-          set = new ArrayList<Connection>();
-        }
-        set.add(con);
-        input.put(srcIface, set);
-      } else {
-        CompUse srcComp = ((EndpointSub) src).getComp();
-        String ifaceName = ((EndpointSub) src).getIface();
-        Pair<CompUse, String> key = new Pair<CompUse, String>(srcComp, ifaceName);
-        List<Connection> set = callback.get(key);
-        if (set == null) {
-          set = new ArrayList<Connection>();
-        }
-        set.add(con);
-        callback.put(key, set);
-      }
-    }
+        Function coniface = ((EndpointSelf) src).getLink();
 
-    for (FuncIface src : input.keySet()) {
-      List<Connection> conset = input.get(src);
-      FunctionBase func;
-      if (src instanceof FuncWithReturn) {
-        func = genResponse(conset, (FuncWithReturn) src, obj, FuncImplResponse.class);
-      } else {
-        func = genSlot(conset, src, obj, FuncImplSlot.class);
-      }
-      elem.getFunction().add(func);
-    }
+        if (coniface instanceof FuncCtrlInDataOut) {
+          // assert (elem.getResponse().contains(coniface));
+          assert (coniface.getBody().getStatements().isEmpty());
+          assert (con.getType() == MessageType.sync);
 
-    for (Pair<CompUse, String> src : callback.keySet()) {
-      List<Connection> conset = callback.get(src);
-      FuncIfaceOut iface = getIface(src);
-      FunctionHeader func;
-      if (iface instanceof FuncWithReturn) {
-        func = genResponse(conset, (FuncWithReturn) iface, obj, FuncSubHandlerQuery.class);
+          ReturnExpr call = makeQueryCall(con.getEndpoint(Direction.out), coniface);
+          coniface.getBody().getStatements().add(call);
+        } else if (coniface instanceof FuncCtrlInDataIn) {
+          // assert (elem.getSlot().contains(coniface));
+          genSlotCall(elem, con, coniface);
+        } else {
+          RError.err(ErrorType.Fatal, coniface.getInfo(), "Unexpected function type: " + coniface.getClass().getSimpleName());
+        }
       } else {
-        func = genSlot(conset, iface, obj, FuncSubHandlerEvent.class);
+        CompUse srcComp = ((EndpointSub) src).getLink();
+        InterfaceFunction funa = srcComp.getLink().getIface().find(((EndpointSub) src).getFunction());
+        Function coniface = (Function) funa;
+
+        Function suha = coca.get(new Pair<CompUse, Function>(srcComp, coniface));
+
+        if (coniface instanceof FuncCtrlOutDataIn) {
+          // assert (srcComp.getLink().getQuery().contains(coniface));
+          assert (suha.getBody().getStatements().isEmpty());
+          assert (con.getType() == MessageType.sync);
+
+          ReturnExpr call = makeQueryCall(con.getEndpoint(Direction.out), coniface);
+          suha.getBody().getStatements().add(call);
+        } else if (coniface instanceof FuncCtrlOutDataOut) {
+          genSlotCall(elem, con, suha);
+        } else {
+          RError.err(ErrorType.Fatal, coniface.getInfo(), "Unexpected function type: " + coniface.getClass().getSimpleName());
+        }
       }
-      elem.addSubCallback(src.first.getName(), func);
     }
 
     map.put(obj, elem);
-
     return elem;
   }
 
-  private Reference makeEntryExitFunc(String name, ListOfNamed<FunctionHeader> listOfNamed) {
-    FuncPrivateVoid func = new FuncPrivateVoid(info, name, new ListOfNamed<FuncVariable>());
-    func.setBody(new Block(info));
-    listOfNamed.add(func);
-    return new Reference(info, func);
-  }
-
-  public FunctionBase genSlot(List<Connection> conset, FuncIface iface, Component comp, Class<? extends FunctionBase> kind) {
-    FunctionBase ptoto = Copy.copy((FunctionBase) iface);
-
-    FunctionBase impl = FunctionFactory.create(kind, info, iface.getName(), ptoto.getParam());
-
-    Block body = new Block(info);
-    ((FuncWithBody) impl).setBody(body);
-
-    for (Connection con : conset) {
-      switch (con.getType()) {
+  private void genSlotCall(ImplElementary elem, Connection con, Function coniface) {
+    switch (con.getType()) {
       case sync:
-        body.getStatements().add(makeEventCall(con.getEndpoint(Direction.out), impl));
+        coniface.getBody().getStatements().add(makeEventCall(con.getEndpoint(Direction.out), coniface));
         break;
       case async:
-        body.getStatements().add(makePostQueueCall(con.getEndpoint(Direction.out), impl, comp));
+        coniface.getBody().getStatements().add(makePostQueueCall(con.getEndpoint(Direction.out), coniface, elem));
         break;
       default:
         RError.err(ErrorType.Error, con.getInfo(), "Unknown connection type: " + con.getType());
-        continue;
-      }
+        return;
     }
-
-    return impl;
   }
 
-  public FunctionBase genResponse(List<Connection> conset, FuncWithReturn iface, Component comp, Class<? extends FunctionBase> kind) {
-    FunctionBase ptoto = Copy.copy((FunctionBase) iface);
+  public static Function makeHandler(Function out) {
+    assert (out.getBody().getStatements().isEmpty());
 
-    FunctionBase impl = FunctionFactory.create(kind, info, iface.getName(), ptoto.getParam());
-    ((FuncWithReturn) impl).setRet(((FuncWithReturn) ptoto).getRet());
-
-    Block body = new Block(info);
-    ((FuncWithBody) impl).setBody(body);
-
-    assert (conset.size() == 1); // typechecker should find this
-    assert (conset.get(0).getType() == MessageType.sync); // typechecker should find this
-    Connection con = conset.get(0);
-    ReturnExpr call = makeQueryCall(con.getEndpoint(Direction.out), (FuncWithReturn) impl);
-    body.getStatements().add(call);
-
-    return impl;
+    Function func;
+    if (out instanceof FuncCtrlOutDataOut) {
+      func = new FuncSubHandlerEvent(ElementInfo.NO, out.getName(), Copy.copy(out.getParam()), new SimpleRef<Type>(ElementInfo.NO, out.getRet().getLink()), new Block(ElementInfo.NO));
+    } else if (out instanceof FuncCtrlOutDataIn) {
+      func = new FuncSubHandlerQuery(ElementInfo.NO, out.getName(), Copy.copy(out.getParam()), new SimpleRef<Type>(ElementInfo.NO, out.getRet().getLink()), new Block(ElementInfo.NO));
+    } else {
+      throw new RuntimeException("not yet implemented");
+    }
+    return func;
   }
 
-  static private ReturnExpr makeQueryCall(Endpoint ep, FuncWithReturn func) {
+  static private ReturnExpr makeQueryCall(Endpoint ep, Function func) {
     Reference ref = epToRef(ep);
 
-    List<Expression> actparam = new ArrayList<Expression>();
+    EvlList<Expression> actparam = new EvlList<Expression>();
     for (Variable var : func.getParam()) {
       actparam.add(new Reference(func.getInfo(), var));
     }
@@ -213,9 +196,7 @@ public class CompositionReduction extends NullTraverser<Named, Void> {
     return new ReturnExpr(info, ref);
   }
 
-  private MsgPush makePostQueueCall(Endpoint ep, FunctionBase func, Component comp) {
-    assert (!(func instanceof FuncWithReturn));
-
+  private MsgPush makePostQueueCall(Endpoint ep, Function func, Component comp) {
     Reference ref = epToRef(ep);
 
     List<Expression> actparam = new ArrayList<Expression>();
@@ -227,12 +208,11 @@ public class CompositionReduction extends NullTraverser<Named, Void> {
     return new MsgPush(func.getInfo(), queue, ref, actparam);
   }
 
-  static private CallStmt makeEventCall(Endpoint ep, FunctionBase func) {
-    assert (!(func instanceof FuncWithReturn));
+  static private CallStmt makeEventCall(Endpoint ep, Function func) {
 
     Reference ref = epToRef(ep);
 
-    List<Expression> actparam = new ArrayList<Expression>();
+    EvlList<Expression> actparam = new EvlList<Expression>();
     for (Variable var : func.getParam()) {
       actparam.add(new Reference(func.getInfo(), var));
     }
@@ -245,11 +225,11 @@ public class CompositionReduction extends NullTraverser<Named, Void> {
 
   static private Reference epToRef(Endpoint ep) {
     if (ep instanceof EndpointSelf) {
-      return new Reference(ep.getInfo(), ((EndpointSelf) ep).getIface());
+      return new Reference(ep.getInfo(), ((EndpointSelf) ep).getLink());
     } else {
       EndpointSub eps = (EndpointSub) ep;
-      Reference ref = new Reference(eps.getInfo(), eps.getComp());
-      ref.getOffset().add(new RefName(eps.getInfo(), eps.getIface()));
+      Reference ref = new Reference(eps.getInfo(), eps.getLink());
+      ref.getOffset().add(new RefName(eps.getInfo(), eps.getFunction()));
       return ref;
     }
   }
@@ -257,19 +237,13 @@ public class CompositionReduction extends NullTraverser<Named, Void> {
   private Reference getQueue(Endpoint ep, Component comp) {
     Reference ref;
     if (ep instanceof EndpointSub) {
-      ref = new Reference(ep.getInfo(), ((EndpointSub) ep).getComp());
-      String qname = ((EndpointSub) ep).getComp().getLink().getQueue().getName();
-      ref.getOffset().add(new RefName(info, qname));
+      ref = new Reference(ep.getInfo(), ((EndpointSub) ep).getLink());
+      Queue queue = ((EndpointSub) ep).getLink().getLink().getQueue();
+      ref.getOffset().add(new RefName(info, queue.getName()));
     } else {
       ref = new Reference(ep.getInfo(), comp.getQueue());
     }
     return ref;
   }
 
-  private FuncIfaceOut getIface(Pair<CompUse, String> src) {
-    Component comp = src.first.getLink();
-    FuncIfaceOut iface = (FuncIfaceOut) comp.getIface(Direction.out).find(src.second);
-    assert (iface != null);
-    return iface;
-  }
 }

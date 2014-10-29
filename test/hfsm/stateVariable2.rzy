@@ -1,21 +1,18 @@
-component
-  StateVariable2
-    slot tick();
+StateVariable2 = Hfsm
+  tick : slot();
 
-  implementation hfsm(A)
-
-    state A
-      var
-        a : R{0,255} = 0;
+  state(A)
+    A : state
+      a : R{0,255} = 0;
         
-      function tuwas()
+      tuwas = procedure()
         a := (a + 2) and 255;
       end
       
-      transition 
-        A to A by tick() do
-          a := (a + 1) mod 256;
-        end
+      A to A by tick() do
+        a := (a + 1) mod 256;
+      end
     end
   end
+end
 

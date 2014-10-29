@@ -1,18 +1,18 @@
 package evl.expression;
 
-import java.util.List;
-
 import common.ElementInfo;
 
-public class ArrayValue extends Expression {
-  final private List<Expression> value;
+import evl.other.EvlList;
 
-  public ArrayValue(ElementInfo info, List<Expression> value) {
+public class ArrayValue extends Expression {
+  final private EvlList<Expression> value;
+
+  public ArrayValue(ElementInfo info, EvlList<Expression> value) {
     super(info);
     this.value = value;
   }
 
-  public List<Expression> getValue() {
+  public EvlList<Expression> getValue() {
     return value;
   }
 

@@ -3,6 +3,8 @@ package fun.knowledge;
 import java.util.HashSet;
 import java.util.Set;
 
+import cir.type.TypeAlias;
+
 import common.Scope;
 
 import error.ErrorType;
@@ -10,22 +12,19 @@ import error.RError;
 import fun.Fun;
 import fun.composition.ImplComposition;
 import fun.expression.reference.DummyLinkTarget;
-import fun.function.impl.FuncEntryExit;
-import fun.function.impl.FuncGlobal;
-import fun.function.impl.FuncPrivateRet;
-import fun.function.impl.FuncPrivateVoid;
-import fun.function.impl.FuncProtQuery;
-import fun.function.impl.FuncProtResponse;
-import fun.function.impl.FuncProtRet;
-import fun.function.impl.FuncProtSignal;
-import fun.function.impl.FuncProtSlot;
-import fun.function.impl.FuncProtVoid;
+import fun.function.FuncFunction;
+import fun.function.FuncProcedure;
+import fun.function.FuncQuery;
+import fun.function.FuncResponse;
+import fun.function.FuncSignal;
+import fun.function.FuncSlot;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
 import fun.other.ImplElementary;
 import fun.other.RizzlyFile;
+import fun.other.Template;
 import fun.type.base.AnyType;
 import fun.type.base.BooleanType;
 import fun.type.base.EnumElement;
@@ -33,7 +32,6 @@ import fun.type.base.EnumType;
 import fun.type.base.IntegerType;
 import fun.type.base.NaturalType;
 import fun.type.base.StringType;
-import fun.type.base.TypeAlias;
 import fun.type.base.VoidType;
 import fun.type.composed.RecordType;
 import fun.type.composed.UnionType;
@@ -60,7 +58,6 @@ public class KnowScope extends KnowledgeEntry {
 
   static {
     global.add(ConstGlobal.class);
-    global.add(FuncGlobal.class);
 
     global.add(IntegerType.class);
     global.add(ArrayTemplate.class);
@@ -84,10 +81,10 @@ public class KnowScope extends KnowledgeEntry {
     global.add(ImplHfsm.class);
     global.add(DummyLinkTarget.class);
     global.add(RizzlyFile.class);
+    global.add(FuncFunction.class);  // FIXME: can also be private
 
     local.add(FuncVariable.class);
     local.add(TemplateParameter.class);
-    local.add(FuncEntryExit.class); // TODO: sure?
 
     priv.add(CompUse.class);
     priv.add(StateVariable.class);
@@ -95,14 +92,11 @@ public class KnowScope extends KnowledgeEntry {
     priv.add(StateComposite.class);
     priv.add(StateSimple.class);
     priv.add(Transition.class);
-    priv.add(FuncPrivateVoid.class);
-    priv.add(FuncPrivateRet.class);
-    priv.add(FuncProtVoid.class); // TODO: sure?
-    priv.add(FuncProtRet.class); // TODO: sure?
-    priv.add(FuncProtResponse.class); // TODO: sure?
-    priv.add(FuncProtQuery.class); // TODO: sure?
-    priv.add(FuncProtSignal.class); // TODO: sure?
-    priv.add(FuncProtSlot.class); // TODO: sure?
+    priv.add(FuncResponse.class); // TODO: sure?
+    priv.add(FuncQuery.class); // TODO: sure?
+    priv.add(FuncSignal.class); // TODO: sure?
+    priv.add(FuncSlot.class); // TODO: sure?
+    priv.add(FuncProcedure.class);  // FIXME: can also be private
 
     {
       @SuppressWarnings("rawtypes")
@@ -125,6 +119,8 @@ public class KnowScope extends KnowledgeEntry {
       return Scope.local;
     } else if (priv.contains(obj.getClass())) {
       return Scope.privat;
+    } else if (obj instanceof Template) {
+      return get(((Template) obj).getObject());
     } else {
       RError.err(ErrorType.Fatal, obj.getInfo(), "Unhandled class: " + obj.getClass().getCanonicalName());
       return null;

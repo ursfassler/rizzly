@@ -2,8 +2,8 @@ package cir.type;
 
 public class BooleanType extends Type {
 
-  public BooleanType() {
-    super("bool");
+  public BooleanType(String name) {
+    super(name);
   }
 
 }

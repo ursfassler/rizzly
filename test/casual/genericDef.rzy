@@ -1,61 +1,48 @@
-import
-  genericSub;
+import genericSub;
 
-type
-  TheRecord{T:Type{Integer}} = Record
-    a : T;
-    b : R{0,255};
+TheRecord{T:Type{Integer}} = Record
+  a : T;
+  b : R{0,255};
+end
+
+The2Record{T,S:Type{Any}} = Record
+  a : T;
+  b : S;
+end
+
+The3{T:Type{Integer};S:Type{Any}} = Record
+  a : T;
+  b : The2Record{T,S};
+end
+
+GenericDef{T:Type{Integer}} = Composition
+  set : slot( item: T );
+  get : response():T;
+
+  sub1 : GenericSub{T};
+  sub2 : GenericSub{R{0,65535}};
+  sub3 : GenericSub{Boolean};
+  sub4 : GenericSub{TheRecord{T}};
+  gen  : GenSu{T};
+  
+  set -> gen.set;
+  get -> gen.get;
+end
+
+GenSu{T:Type{Integer}} = Elementary
+  data: T = 0;
+  dat2: The2Record{T,Boolean} = ( a := 2, b := True );
+  dat3: The2Record{T,T} = ( a := 1, b := 2 );
+  dat4: The3{T,TheRecord{T}} = ( a := 0, ( a := 2, b := 200 ) );
+
+  set : slot( item: T )
+    data := item;
   end
 
-  The2Record{T,S:Type{Any}} = Record
-    a : T;
-    b : S;
+  get : response():T
+    return data;
   end
   
-  The3{T:Type{Integer};S:Type{Any}} = Record
-    a : T;
-    b : The2Record{T,S};
-  end
-
-component
-  GenericDef{T:Type{Integer}}
-    slot     set( item: T );
-    response get():T;
-
-  implementation composition
-
-    component
-      sub1 : GenericSub{T};
-      sub2 : GenericSub{R{0,65535}};
-      sub3 : GenericSub{Boolean};
-      sub4 : GenericSub{TheRecord{T}};
-      gen  : GenSu{T};
-      
-    connection
-      set -> gen.set;
-      get -> gen.get;
-
-  end
-  
-  GenSu{T:Type{Integer}}
-    slot     set( item: T );
-    response get():T;
-    
-  implementation elementary
-    var
-      data: T = 0;
-      dat2: The2Record{T,Boolean} = ( a := 2, b := True );
-      dat3: The2Record{T,T} = ( a := 1, b := 2 );
-      dat4: The3{T,TheRecord{T}} = ( a := 0, ( a := 2, b := 200 ) );
-
-    slot set( item: T )
-      data := item;
-    end
-
-    function get():T
-      return data;
-    end
-    
-  end
+end
 
 

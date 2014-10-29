@@ -47,10 +47,10 @@ public abstract class Parser {
 
   protected boolean isLhsOrUse() {
     switch (peek().getType()) {
-    case IDENTIFIER:
-      return true;
-    default:
-      return false;
+      case IDENTIFIER:
+        return true;
+      default:
+        return false;
     }
   }
 

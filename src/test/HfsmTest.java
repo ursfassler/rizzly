@@ -10,8 +10,8 @@ public class HfsmTest extends BaseTest {
   }
 
   @Test
-  public void hfsm() {
-    compile("hfsm", TestSteps.EXECUTE, false, false);
+  public void hfsm1() {
+    compile("hfsm1", TestSteps.EXECUTE, false, false);
   }
 
   @Test

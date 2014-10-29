@@ -1,9 +1,7 @@
 package evl.traverser;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import evl.DefTraverser;
+import evl.other.EvlList;
 import evl.other.RizzlyProgram;
 import evl.statement.Block;
 import evl.statement.IfOption;
@@ -25,7 +23,7 @@ public class IfCutter extends DefTraverser<Void, Void> {
     if (obj.getOption().size() > 1) {
       int optcount = obj.getOption().size();
       IfOption first = obj.getOption().get(0);
-      List<IfOption> opt = new ArrayList<IfOption>(obj.getOption());
+      EvlList<IfOption> opt = new EvlList<IfOption>(obj.getOption());
       obj.getOption().clear();
       obj.getOption().add(first);
       opt.remove(0);

@@ -1,0 +1,19 @@
+DummyComp = Elementary
+  out : signal();
+
+  ind : slot()
+    out();
+  end
+
+end
+
+Composition2 = Composition
+  ind : slot();
+  out : signal();
+
+  dummy : DummyComp;
+  
+  ind -> dummy.ind;
+  dummy.out -> out;
+end
+

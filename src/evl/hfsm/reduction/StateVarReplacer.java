@@ -1,36 +1,39 @@
 package evl.hfsm.reduction;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
 
-import common.Designator;
 import common.ElementInfo;
 
 import evl.DefTraverser;
-import evl.expression.reference.RefItem;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
-import evl.function.impl.FuncPrivateRet;
-import evl.function.impl.FuncPrivateVoid;
+import evl.function.header.FuncPrivateRet;
+import evl.function.header.FuncPrivateVoid;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.State;
 import evl.hfsm.Transition;
+import evl.knowledge.KnowledgeBase;
+import evl.other.EvlList;
+import evl.traverser.RefTypeGetter;
+import evl.type.Type;
+import evl.type.composed.NamedElement;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
 
 public class StateVarReplacer extends DefTraverser<Void, Void> {
-  final private Map<StateVariable, Designator> vpath;
   final private Variable dataVar;
+  final private Map<StateVariable, EvlList<NamedElement>> epath;
+  final private RefTypeGetter rtg;
 
-  public StateVarReplacer(Variable dataVar, Map<StateVariable, Designator> vpath) {
+  public StateVarReplacer(Variable dataVar, Map<StateVariable, EvlList<NamedElement>> epath, KnowledgeBase kb) {
     super();
-    this.vpath = vpath;
+    this.epath = epath;
     this.dataVar = dataVar;
+    rtg = new RefTypeGetter(kb);
   }
 
-  static public void process(ImplHfsm obj, Variable dataVar, Map<StateVariable, Designator> vpath) {
-    StateVarReplacer know = new StateVarReplacer(dataVar, vpath);
+  static public void process(ImplHfsm obj, Variable dataVar, Map<StateVariable, EvlList<NamedElement>> epath, KnowledgeBase kb) {
+    StateVarReplacer know = new StateVarReplacer(dataVar, epath, kb);
     know.traverse(obj, null);
   }
 
@@ -42,8 +45,7 @@ public class StateVarReplacer extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitState(State obj, Void param) {
-    visitItr(obj.getFunction(), param);
-    visitItr(obj.getItem(), param);
+    visitList(obj.getItem(), param);
     return null;
   }
 
@@ -69,21 +71,27 @@ public class StateVarReplacer extends DefTraverser<Void, Void> {
   @Override
   protected Void visitReference(Reference obj, Void param) {
     if (obj.getLink() == dataVar) {
-      visitItr(obj.getOffset(), param);
+      visitList(obj.getOffset(), param);
       return null;
     }
     super.visitReference(obj, param);
     if (obj.getLink() instanceof StateVariable) {
-      Designator offset = vpath.get(obj.getLink());
-      assert (offset != null);
+      EvlList<NamedElement> eofs = epath.get(obj.getLink());
+      assert (eofs != null);
 
-      List<RefItem> addOfs = new ArrayList<RefItem>();
-      for (String itr : offset) {
-        addOfs.add(new RefName(new ElementInfo(), itr));
-      }
+      assert (obj.getOffset().isEmpty()); // FIXME not always true (e.g. for access to struct)
+
+      Type type = dataVar.getType().getLink();
 
       obj.setLink(dataVar);
-      obj.getOffset().addAll(addOfs);
+      for (NamedElement itr : eofs) {
+        RefName ref = new RefName(ElementInfo.NO, itr.getName());
+
+        type = rtg.traverse(ref, type);  // sanity check
+
+        obj.getOffset().add(ref);
+      }
+
     }
     return null;
   }

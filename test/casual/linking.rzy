@@ -1,13 +1,8 @@
-component
-  Linking
-    slot   ind();
-    signal linking();    // it has the same name as namespace ("linking"), may cause problem; should not
-    
-  implementation elementary
+Linking = Elementary
+  linking : signal();    // it has the same name as namespace ("linking"), may cause problem; should not
   
-    slot ind()
-      linking();
-    end
-  
+  ind : slot()
+    linking();
   end
+end
 

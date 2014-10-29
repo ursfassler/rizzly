@@ -3,8 +3,7 @@ package fun;
 import common.ElementInfo;
 
 public abstract class FunBase implements Fun {
-
-  private ElementInfo info;
+  final private ElementInfo info;
 
   public FunBase(ElementInfo info) {
     super();

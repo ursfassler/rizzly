@@ -1,14 +1,10 @@
 // use of reserved keyword (R) as template argument name
 
-type
-  Rec{R:Any} = Record
-    a : R;
-  end
+Rec{R:Any} = Record
+  a : R;
+end
 
-component
-  Err3
-    implementation elementary
-      var
-        dat: Rec{Boolean} = a := False;
-  end
+Err3 = Elementary
+  dat: Rec{Boolean} = a := False;
+end
 

@@ -1,266 +1,193 @@
 package fun.traverser.spezializer;
 
-import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import common.Designator;
-import common.ElementInfo;
-
-import error.ErrorType;
-import error.RError;
 import fun.Copy;
 import fun.Fun;
-import fun.NullTraverser;
 import fun.expression.Expression;
-import fun.expression.Number;
-import fun.expression.reference.DummyLinkTarget;
+import fun.expression.reference.BaseRef;
 import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.Reference;
-import fun.knowledge.KnowFunPath;
+import fun.hfsm.State;
+import fun.hfsm.StateContent;
+import fun.knowledge.KnowInstance;
+import fun.knowledge.KnowParent;
 import fun.knowledge.KnowledgeBase;
 import fun.other.ActualTemplateArgument;
-import fun.other.Generator;
-import fun.other.Named;
+import fun.other.CompImpl;
+import fun.other.FunList;
 import fun.other.Namespace;
+import fun.other.Template;
 import fun.traverser.ConstEval;
-import fun.traverser.ExprReplacer;
 import fun.traverser.Memory;
-import fun.traverser.TypeEvalReplacer;
 import fun.type.Type;
-import fun.type.base.AnyType;
-import fun.type.base.IntegerType;
-import fun.type.base.NaturalType;
-import fun.type.base.TypeAlias;
-import fun.type.template.BuiltinTemplate;
-import fun.type.template.Range;
+import fun.type.template.TypeTemplate;
 import fun.type.template.TypeType;
 import fun.variable.Constant;
 import fun.variable.TemplateParameter;
 
-//TODO: cleanup
-//TODO: rename to instantiator?
+//TODO rethink it; make it clean
 public class Specializer {
 
-  public static Named process(Generator item, List<Expression> genspec, ElementInfo info, KnowledgeBase kb) {
-    List<ActualTemplateArgument> param = evalParam(item, genspec, info, kb);
-
-    String name = makeName(item.getName(), param);
-
-    KnowFunPath kp = kb.getEntry(KnowFunPath.class);
-    Designator path = kp.find(item);
-    Namespace parent = (Namespace) kb.getRoot().forceChildPath(path.toList());
-    Named inst = parent.find(name);
-    if (inst == null) {
-      if (item instanceof BuiltinTemplate) {
-        inst = GenericSpecializer.process((BuiltinTemplate) item, param, kb);
-      } else {
-        inst = instantiate(item, param, kb);
-        inst.setName(name);
-      }
-      assert (inst.getName().equals(name));
-      parent.add(inst);
+  public static Fun process(Template item, List<ActualTemplateArgument> genspec, KnowledgeBase kb) {
+    for (int i = 0; i < genspec.size(); i++) {
+      ActualTemplateArgument itr = genspec.get(i);
+      itr = eval(kb, itr);
+      genspec.set(i, itr);
     }
 
-    // TODO spare the ones we already checked
-    TypeEvalReplacer typeEvalReplacer = new TypeEvalReplacer(kb);
-    typeEvalReplacer.traverse(inst, null);
+    Fun templ = item.getObject();
 
-    ConstEval.process(inst, kb);
+    KnowInstance ki = kb.getEntry(KnowInstance.class);
+    Fun inst = ki.find(templ, genspec);
+
+    if (inst == null) {
+      if (templ instanceof TypeTemplate) {
+        inst = GenericSpecializer.process((TypeTemplate) templ, genspec, kb);
+        // TODO create clean name
+      } else {
+        inst = Copy.copy(templ);
+
+        TypeSpecTrav evaluator = new TypeSpecTrav();
+        Expression ri = evaluator.traverse(inst, makeMap(genspec, item.getTempl()));
+
+        // if inst is a reference, the new one is returned
+        if (ri != null) {
+          inst = ri;
+        }
+
+        KnowParent kp = kb.getEntry(KnowParent.class);
+        Fun parent = kp.get(item);
+
+        // TODO create clean name
+
+        addChild(inst, parent);
+      }
+
+      ki.add(templ, genspec, inst);
+
+      // evaluate
+      TypeEvalReplacer typeEvalReplacer = new TypeEvalReplacer(kb);
+      typeEvalReplacer.traverse(inst, null);
+
+      ConstEval.process(inst, kb);
+
+      // remove templates
+      TemplDel.process(inst);
+    }
+
+    while (inst instanceof Reference) {
+      Reference ref = (Reference) inst;
+      assert (ref.getOffset().isEmpty());
+      inst = ref.getLink();
+    }
+
+    assert (!(inst instanceof BaseRef));
 
     return inst;
   }
 
-  private static List<ActualTemplateArgument> evalParam(Generator item, List<Expression> genspec, ElementInfo info, KnowledgeBase kb) {
-    if (genspec.size() != item.getTemplateParam().size()) {
-      RError.err(ErrorType.Error, info, "Wrong number of parameter, expected " + item.getTemplateParam().size() + " got " + genspec.size());
-    }
-    assert (genspec.size() == item.getTemplateParam().size());
-
-    List<ActualTemplateArgument> ret = new ArrayList<ActualTemplateArgument>(genspec.size());
-
-    for (int i = 0; i < genspec.size(); i++) {
-      Reference tref = item.getTemplateParam().getList().get(i).getType();
-      Expression acarg = genspec.get(i);
-      Type type = evalType(tref, kb);
-      ActualTemplateArgument evald = ArgEvaluator.process(type, acarg, kb);
-      ret.add(evald);
-    }
-
-    return ret;
+  private static String makeName(Template item) {
+    return item.getName();
   }
 
-  private static Type evalType(Reference tref, KnowledgeBase kb) {
+  private static ActualTemplateArgument eval(KnowledgeBase kb, ActualTemplateArgument itr) {
+    if (itr instanceof Expression) {
+      itr = ExprEvaluator.evaluate((Expression) itr, new Memory(), kb);
+    }
+    while (itr instanceof Reference) {
+      Reference ref = (Reference) itr;
+      assert (ref.getOffset().isEmpty());
+      itr = (ActualTemplateArgument) ref.getLink();
+    }
+    return itr;
+  }
+
+  static ActualTemplateArgument eval(ActualTemplateArgument actualTemplateArgument, KnowledgeBase kb) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  private static void addChild(Fun inst, Fun parent) {
+    if (parent instanceof Namespace) {
+      ((Namespace) parent).getChildren().add(inst);
+    } else if (parent instanceof CompImpl) {
+      ((CompImpl) parent).getObjects().add(inst);
+    } else if (parent instanceof State) {
+      ((State) parent).getItemList().add((StateContent) inst);
+    } else {
+      throw new RuntimeException("not yet implemented: " + parent.getClass().getCanonicalName());
+    }
+  }
+
+  private static Map<TemplateParameter, ActualTemplateArgument> makeMap(List<ActualTemplateArgument> param, FunList<TemplateParameter> param1) {
+    Map<TemplateParameter, ActualTemplateArgument> map = new HashMap<TemplateParameter, ActualTemplateArgument>();
+    for (int i = 0; i < param.size(); i++) {
+      TemplateParameter var = param1.get(i);
+      ActualTemplateArgument val = param.get(i);
+      map.put(var, val);
+    }
+    return map;
+  }
+
+  static Type evalType(Reference tref, KnowledgeBase kb) {
     Type type;
     if (tref.getLink() instanceof TemplateParameter) {
       // we use a previous defined parameter, it has to be a "Type{*}" argument
       TemplateParameter pitm;
       pitm = (TemplateParameter) tref.getLink();
       tref = pitm.getType();
-      Named any = eval(tref, kb);
+      Fun any = eval(tref, kb);
       assert (any instanceof TypeType);
       any = eval(((TypeType) any).getType(), kb);
       type = (Type) any;
+    } else if (tref.getLink() instanceof Type) {
+      assert (tref.getOffset().isEmpty());
+      return (Type) tref.getLink();
     } else {
-      Named any = eval(tref, kb);
+      Fun any = eval(tref, kb);
       type = (Type) any;
     }
     return type;
   }
 
-  static Named eval(Reference obj, KnowledgeBase kb) {
+  private static Fun eval(Reference obj, KnowledgeBase kb) {
     if (obj.getLink() instanceof Constant) {
       assert (false);
     }
 
-    if (!(obj.getLink() instanceof Generator)) {
+    if (obj.getLink() instanceof Template) {
+      Template generator = (Template) obj.getLink();
+
+      FunList<ActualTemplateArgument> actparam;
+      if (obj.getOffset().isEmpty() || !(obj.getOffset().get(0) instanceof RefTemplCall)) {
+        assert (generator.getTempl().isEmpty());
+        actparam = new FunList<ActualTemplateArgument>();
+      } else {
+        assert (obj.getOffset().size() == 1);
+        assert (obj.getOffset().get(0) instanceof RefTemplCall);
+        actparam = ((RefTemplCall) obj.getOffset().get(0)).getActualParameter();
+      }
+
+      return Specializer.process(generator, actparam, kb);
+    } else if (obj.getLink() instanceof TypeTemplate) {
+      TypeTemplate generator = (TypeTemplate) obj.getLink();
+      assert (obj.getOffset().size() == 1);
+      assert (obj.getOffset().get(0) instanceof RefTemplCall);
+
+      List<ActualTemplateArgument> actparam = ((RefTemplCall) obj.getOffset().get(0)).getActualParameter();
+      return GenericSpecializer.process(generator, actparam, kb);
+    } else if (obj.getLink() instanceof Type) {
       assert (obj.getOffset().isEmpty());
       return obj.getLink();
-    }
-    Generator generator = (Generator) obj.getLink();
-    if (obj.getOffset().isEmpty() || !(obj.getOffset().get(0) instanceof RefTemplCall)) {
-      assert (generator.getTemplateParam().isEmpty());
-      return generator;
-    }
-    assert (obj.getOffset().size() == 1);
-    assert (obj.getOffset().get(0) instanceof RefTemplCall);
-
-    List<Expression> actparam = ((RefTemplCall) obj.getOffset().get(0)).getActualParameter();
-
-    return Specializer.process(generator, actparam, obj.getInfo(), kb);
-  }
-
-  static private String makeName(String name, List<ActualTemplateArgument> generic) {
-    if (!generic.isEmpty()) {
-      name += "{";
-      boolean first = true;
-      for (ActualTemplateArgument expr : generic) {
-        if (first) {
-          first = false;
-        } else {
-          name += ",";
-        }
-        if (expr instanceof Number) {
-          BigInteger ref = ((Number) expr).getValue();
-          name += ref.toString();
-        } else if (expr instanceof Named) {
-          name += ((Named) expr).getName();
-        } else {
-          throw new RuntimeException("not yet implemented: " + expr.getClass().getCanonicalName());
-        }
-      }
-      name += "}";
-    }
-    return name;
-  }
-
-  private static Generator instantiate(Generator template, List<ActualTemplateArgument> genspec, KnowledgeBase kb) {
-    List<TemplateParameter> param = template.getTemplateParam().getList();
-    template = Copy.copy(template);
-
-    Map<TemplateParameter, ActualTemplateArgument> map = new HashMap<TemplateParameter, ActualTemplateArgument>();
-    for (int i = 0; i < genspec.size(); i++) {
-      TemplateParameter var = param.get(i);
-      ActualTemplateArgument val = genspec.get(i);
-      // TODO can we ensure that val is evaluated?
-      map.put(var, val);
-    }
-
-    TypeSpecTrav evaluator = new TypeSpecTrav();
-    evaluator.traverse(template, map);
-
-    return template;
-  }
-}
-
-/**
- * Replaces a reference to a CompfuncParameter with the value of it
- * 
- * @author urs
- * 
- */
-class TypeSpecTrav extends ExprReplacer<Map<TemplateParameter, ActualTemplateArgument>> {
-
-  @Override
-  protected Expression visitReference(Reference obj, Map<TemplateParameter, ActualTemplateArgument> param) {
-    assert (!(obj.getLink() instanceof DummyLinkTarget));
-    super.visitReference(obj, param);
-
-    if (param.containsKey(obj.getLink())) {
-      ActualTemplateArgument repl = param.get(obj.getLink());
-      if (repl instanceof Type) {
-        return new Reference(obj.getInfo(), (Type) repl);
-      } else {
-        return (Expression) repl;
-      }
     } else {
-      assert (!(obj.getLink() instanceof TemplateParameter));
-      return obj;
+      throw new RuntimeException("not yet implemented: " + obj.getLink().getClass().getCanonicalName());
+      // if (!(obj.getLink() instanceof Declaration)) {
+      // assert (obj.getOffset().isEmpty());
+      // return obj.getLink();
+      // }
     }
-  }
-
-}
-
-class ArgEvaluator extends NullTraverser<ActualTemplateArgument, Expression> {
-  final private KnowledgeBase kb;
-
-  public ArgEvaluator(KnowledgeBase kb) {
-    super();
-    this.kb = kb;
-  }
-
-  public static ActualTemplateArgument process(Type type, Expression acarg, KnowledgeBase kb) {
-    ArgEvaluator argEvaluator = new ArgEvaluator(kb);
-    return argEvaluator.traverse(type, acarg);
-  }
-
-  @Override
-  protected ActualTemplateArgument visitDefault(Fun obj, Expression param) {
-    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
-  }
-
-  @Override
-  protected ActualTemplateArgument visitIntegerType(IntegerType obj, Expression param) {
-    Number num = (Number) ExprEvaluator.evaluate(param, new Memory(), kb);
-    return num;
-  }
-
-  @Override
-  protected ActualTemplateArgument visitNaturalType(NaturalType obj, Expression param) {
-    Number num = (Number) ExprEvaluator.evaluate(param, new Memory(), kb);
-    if (num.getValue().compareTo(BigInteger.ZERO) < 0) {
-      RError.err(ErrorType.Error, param.getInfo(), "Value for Natural type has to be >= 0");
-    }
-    return num;
-  }
-
-  @Override
-  protected ActualTemplateArgument visitRange(Range obj, Expression param) {
-    Number num = (Number) ExprEvaluator.evaluate(param, new Memory(), kb);
-    // TODO check type
-    return num;
-  }
-
-  @Override
-  protected ActualTemplateArgument visitAnyType(AnyType obj, Expression param) {
-    Type evald = (Type) Specializer.eval((Reference) param, kb);
-    return evald;
-  }
-
-  @Override
-  protected ActualTemplateArgument visitTypeAlias(TypeAlias obj, Expression param) {
-    ActualTemplateArgument evald = (ActualTemplateArgument) ExprEvaluator.evaluate(param, new Memory(), kb);
-    // TODO check type
-    return evald;
-  }
-
-  @Override
-  protected ActualTemplateArgument visitTypeType(TypeType obj, Expression param) {
-    ActualTemplateArgument evald = (ActualTemplateArgument) Specializer.eval((Reference) param, kb);
-    // TODO check type
-    return evald;
   }
 
 }

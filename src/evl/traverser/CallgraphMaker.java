@@ -7,13 +7,13 @@ import util.SimpleGraph;
 import evl.DefTraverser;
 import evl.Evl;
 import evl.NullTraverser;
+import evl.expression.reference.BaseRef;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefItem;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
-import evl.function.FuncWithReturn;
-import evl.function.FunctionBase;
+import evl.function.Function;
 import evl.hfsm.Transition;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowChild;
@@ -44,10 +44,9 @@ public class CallgraphMaker extends DefTraverser<Void, Evl> {
   }
 
   @Override
-  protected Void visitFunctionBase(FunctionBase obj, Evl param) {
-    assert (param == null);
+  protected Void visitFunctionImpl(Function obj, Evl param) {
     callgraph.addVertex(obj);
-    return super.visitFunctionBase(obj, obj);
+    return super.visitFunctionImpl(obj, obj);
   }
 
   @Override
@@ -64,18 +63,32 @@ public class CallgraphMaker extends DefTraverser<Void, Evl> {
   }
 
   @Override
+  protected Void visitBaseRef(BaseRef obj, Evl param) {
+    super.visitBaseRef(obj, param);
+
+    if (param != null) {
+      Evl head = obj.getLink();
+      if (head instanceof Function) {
+        callgraph.addVertex(head);
+        callgraph.addEdge(param, head);
+      }
+    }
+    return null;
+  }
+
+  @Override
   protected Void visitReference(Reference obj, Evl param) {
     super.visitReference(obj, param);
 
     if (param != null) {
-      Set<FunctionBase> target = new HashSet<FunctionBase>();
+      Set<Function> target = new HashSet<Function>();
 
       Evl item = obj.getLink();
       for (RefItem itr : obj.getOffset()) {
         item = RefGetter.process(itr, item, target, kb);
       }
 
-      for (FunctionBase head : target) {
+      for (Function head : target) {
         callgraph.addVertex(head);
         callgraph.addEdge(param, head);
       }
@@ -86,16 +99,16 @@ public class CallgraphMaker extends DefTraverser<Void, Evl> {
 }
 
 class RefGetter extends NullTraverser<Evl, Evl> {
-  private Set<FunctionBase> target;
+  private Set<Function> target;
   private KnowChild kfc;
   private KnowBaseItem kbi;
 
-  static public Evl process(RefItem refitm, Evl last, Set<FunctionBase> target, KnowledgeBase kb) {
+  static public Evl process(RefItem refitm, Evl last, Set<Function> target, KnowledgeBase kb) {
     RefGetter refChecker = new RefGetter(kb, target);
     return refChecker.traverse(refitm, last);
   }
 
-  public RefGetter(KnowledgeBase kb, Set<FunctionBase> target) {
+  public RefGetter(KnowledgeBase kb, Set<Function> target) {
     super();
     this.target = target;
     this.kfc = kb.getEntry(KnowChild.class);
@@ -113,13 +126,9 @@ class RefGetter extends NullTraverser<Evl, Evl> {
       // convert function
       return param;
     }
-    FunctionBase header = (FunctionBase) param;
+    Function header = (Function) param;
     target.add(header);
-    if (header instanceof FuncWithReturn) {
-      return ((FuncWithReturn) header).getRet().getRef();
-    } else {
-      return kbi.getVoidType();
-    }
+    return header.getRet().getLink();
   }
 
   @Override
@@ -130,9 +139,9 @@ class RefGetter extends NullTraverser<Evl, Evl> {
   @Override
   protected Evl visitRefIndex(RefIndex obj, Evl param) {
     Variable var = (Variable) param;
-    Type type = var.getType().getRef();
+    Type type = var.getType().getLink();
     ArrayType arrayType = (ArrayType) type;
-    return arrayType.getType().getRef();
+    return arrayType.getType().getLink();
   }
 
 }

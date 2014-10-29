@@ -3,7 +3,7 @@ package fun.other;
 import fun.Fun;
 
 public interface Named extends Fun {
-  public String getName();
+  String getName();
 
-  public void setName(String name);   // TODO can we remove this?
+  void setName(String name);
 }
