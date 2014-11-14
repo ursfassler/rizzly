@@ -3,7 +3,7 @@ import iface;
   
 Beeper = Hfsm
   alarm : slot();
-  snooze : slot();
+  off : slot();
   tick : slot();
 
   bell : signal( on: Boolean );
@@ -11,6 +11,7 @@ Beeper = Hfsm
   state( Off )
 
     Off to On by alarm();
+    On to Off by off();
   
     Off : state;
 
