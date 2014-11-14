@@ -1,3 +1,20 @@
+/**
+ *  This file is part of Rizzly.
+ *
+ *  Rizzly is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Rizzly is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package fun.traverser;
 
 import java.util.HashMap;
@@ -15,12 +32,12 @@ import fun.hfsm.Transition;
 
 /**
  * Links all src/dst states of all transitions in a hfsm implementation.
- * 
+ *
  * This is needed since the visibility of states is different than other rules. A transition can only come from / go to
  * a state that is on the same or a deeper level than the transition is defined.
- * 
+ *
  * @author urs
- * 
+ *
  */
 public class TransitionStateLinker {
 

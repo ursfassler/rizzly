@@ -1,3 +1,20 @@
+/**
+ *  This file is part of Rizzly.
+ *
+ *  Rizzly is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Rizzly is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package evl.hfsm.reduction;
 
 import java.util.ArrayList;
@@ -40,9 +57,9 @@ import evl.variable.Variable;
 
 /**
  * adds transitions to the children until leaf states also adds calls to exit and entry function
- * 
+ *
  * @author urs
- * 
+ *
  */
 public class TransitionDownPropagator extends NullTraverser<Void, TransitionParam> {
 
@@ -86,7 +103,7 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
 
   /**
    * Extracts a function out of the transition body
-   * 
+   *
    * @param name
    */
   private static FuncPrivateVoid makeTransBodyFunc(Transition trans, String name, KnowBaseItem kbi) {

@@ -1,3 +1,20 @@
+/**
+ *  This file is part of Rizzly.
+ *
+ *  Rizzly is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Rizzly is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package main;
 
 import java.io.FileNotFoundException;
@@ -222,7 +239,7 @@ public class MainEvl {
     HfsmTransScopeCheck.process(aclasses, kb);
 
     CompInterfaceTypeChecker.process(aclasses, kb); // check interfaces against
-                                                    // implementation
+    // implementation
     ModelChecker.process(aclasses, kb);
   }
 
@@ -300,7 +317,7 @@ public class MainEvl {
   // TODO provide a call/connection graph in the error message
   /**
    * Checks that Run To Completion semantic is not violated, i.e. that calls on component is a DAG
-   * 
+   *
    * @param kb
    */
   private static void checkForRtcViolation(Namespace aclasses, KnowledgeBase kb) {
@@ -363,9 +380,9 @@ public class MainEvl {
   // components.
   /**
    * Checks if there is a input and output data flow. Gives a warning otherwise.
-   * 
+   *
    * A component with only input or output data flow can not do a lot (or not more than a global function can do).
-   * 
+   *
    * @param aclasses
    * @param kb
    */
@@ -387,7 +404,7 @@ public class MainEvl {
   /**
    * Throws an error if an interface in the top component contains a query. Because we have to be sure that queries are
    * implement correctly.
-   * 
+   *
    * @param root
    * @param rootdir
    */

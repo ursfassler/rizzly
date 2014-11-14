@@ -1,3 +1,20 @@
+/**
+ *  This file is part of Rizzly.
+ *
+ *  Rizzly is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Rizzly is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
 package fun.doc;
 
 import java.util.ArrayList;
@@ -89,9 +106,9 @@ import fun.variable.Variable;
 
 /**
  * Prints formated FUN objects to a specific writer.
- * 
+ *
  * @author urs
- * 
+ *
  */
 public class FunPrinter extends NullTraverser<Void, Void> {
   private Writer xw;
@@ -475,7 +492,7 @@ public class FunPrinter extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitArrayTemplate(ArrayTemplate obj, Void param) {
-    xw.wa(obj.NAME, getId(obj, param));
+    xw.wa(ArrayTemplate.NAME, getId(obj, param));
     return null;
   }
 
@@ -769,7 +786,7 @@ public class FunPrinter extends NullTraverser<Void, Void> {
     String hint = obj.getLink().toString();
     String name;
     if (obj.getLink() instanceof Named) {
-      name = ((Named) obj.getLink()).getName();
+      name = obj.getLink().getName();
     } else {
       name = "???";
     }
