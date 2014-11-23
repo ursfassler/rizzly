@@ -221,6 +221,19 @@ public class InitVarTyper extends ExprReplacer<Type> {
 
       UnsafeUnionValue uv = new UnsafeUnionValue(obj.getInfo(), content, new SimpleRef<Type>(obj.getInfo(), type));
       return uv;
+    } else if (type instanceof ArrayType) {
+      if (!obj.getName().equals("_")) {
+        RError.err(ErrorType.Error, obj.getInfo(), "Unhandled name: " + obj.getName());
+        return null;
+      }
+      ArrayType at = (ArrayType) type;
+      Expression ev = visit(obj.getValue(), at.getType().getLink());
+
+      EvlList<Expression> value = new EvlList<Expression>();
+      for (int i = 0; i < at.getSize().intValue(); i++) {
+        value.add(Copy.copy(ev));
+      }
+      return new ArrayValue(obj.getInfo(), value);
     } else {
       throw new RuntimeException("not yet implemented: " + type.getClass().getCanonicalName());
     }

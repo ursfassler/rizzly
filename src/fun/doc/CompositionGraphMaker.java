@@ -41,7 +41,6 @@ import fun.function.FuncSlot;
 import fun.knowledge.KnowFunPath;
 import fun.knowledge.KnowledgeBase;
 import fun.other.CompImpl;
-import fun.other.Named;
 import fun.variable.CompUse;
 
 //TODO do we need the "Self" prefix?

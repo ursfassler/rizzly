@@ -29,6 +29,7 @@ import fun.NullTraverser;
 import fun.expression.ArithmeticOp;
 import fun.expression.ArrayValue;
 import fun.expression.BoolValue;
+import fun.expression.ExprList;
 import fun.expression.Expression;
 import fun.expression.Number;
 import fun.expression.Relation;
@@ -48,6 +49,7 @@ import fun.other.Template;
 import fun.traverser.Memory;
 import fun.type.Type;
 import fun.variable.ConstGlobal;
+import fun.variable.ConstPrivate;
 import fun.variable.FuncVariable;
 import fun.variable.TemplateParameter;
 import fun.variable.Variable;
@@ -135,6 +137,21 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
   @Override
   protected Expression visitConstGlobal(ConstGlobal obj, Memory param) {
     return (Expression) visit(obj.getDef(), new Memory()); // new memory because global constant need no context
+  }
+
+  @Override
+  protected ActualTemplateArgument visitConstPrivate(ConstPrivate obj, Memory param) {
+    return visit(obj.getDef(), param);
+  }
+
+  @Override
+  protected ArrayValue visitExprList(ExprList obj, Memory param) {
+    // TODO could the result be a record?
+    FunList<Expression> list = new FunList<Expression>();
+    for (Expression expr : obj.getValue()) {
+      list.add((Expression) visit(expr, param));
+    }
+    return new ArrayValue(obj.getInfo(), list);
   }
 
   @Override
