@@ -18,14 +18,12 @@
 package evl.hfsm.reduction;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import common.Designator;
 
 import evl.Evl;
 import evl.NullTraverser;
-import evl.function.Function;
 import evl.function.header.FuncPrivateRet;
 import evl.function.header.FuncPrivateVoid;
 import evl.hfsm.ImplHfsm;
@@ -40,7 +38,7 @@ import evl.knowledge.KnowledgeBase;
  *
  */
 public class StateFuncUplifter extends NullTraverser<Void, Designator> {
-  final private List<Function> func = new ArrayList<Function>();
+  final private List<StateItem> func = new ArrayList<StateItem>();
 
   public StateFuncUplifter(KnowledgeBase kb) {
     super();
@@ -49,10 +47,6 @@ public class StateFuncUplifter extends NullTraverser<Void, Designator> {
   static public void process(ImplHfsm obj, KnowledgeBase kb) {
     StateFuncUplifter know = new StateFuncUplifter(kb);
     know.traverse(obj, null);
-  }
-
-  public List<Function> getFunc() {
-    return func;
   }
 
   @Override
@@ -67,7 +61,7 @@ public class StateFuncUplifter extends NullTraverser<Void, Designator> {
   @Override
   protected Void visitImplHfsm(ImplHfsm obj, Designator param) {
     visit(obj.getTopstate(), new Designator());
-    obj.getTopstate().getItem().addAll((Collection<? extends StateItem>) func);
+    obj.getTopstate().getItem().addAll(func);
     return null;
   }
 
