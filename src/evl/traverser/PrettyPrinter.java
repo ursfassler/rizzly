@@ -286,7 +286,8 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitImplElementary(ImplElementary obj, StreamWriter param) {
-    param.wr("elementary");
+    param.wr("elementary ");
+    name(obj, param);
     wrId(obj, param);
     param.nl();
     param.nl();
@@ -312,7 +313,9 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitImplComposition(ImplComposition obj, StreamWriter param) {
-    param.wr("implementation composition");
+    param.wr("implementation composition ");
+    name(obj, param);
+    wrId(obj, param);
     param.nl();
     param.nl();
     param.incIndent();
@@ -450,7 +453,9 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitUnionType(UnionType obj, StreamWriter param) {
-    param.wr("Union(");
+    param.wr("Union ");
+    param.wr(obj.getName());
+    param.wr("(");
     visit(obj.getTag(), param);
     param.wr(")");
     wrId(obj, param);
@@ -466,7 +471,8 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitUnsafeUnionType(UnsafeUnionType obj, StreamWriter param) {
-    param.wr("UnsafeUnion");
+    param.wr("UnsafeUnion ");
+    param.wr(obj.getName());
     wrId(obj, param);
     param.nl();
     param.incIndent();
@@ -480,7 +486,8 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitRecordType(RecordType obj, StreamWriter param) {
-    param.wr("Record");
+    param.wr("Record ");
+    param.wr(obj.getName());
     wrId(obj, param);
     param.nl();
     param.incIndent();
@@ -1021,7 +1028,9 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitImplHfsm(ImplHfsm obj, StreamWriter param) {
-    param.wr("implementation hfsm");
+    param.wr("implementation hfsm ");
+    name(obj, param);
+    wrId(obj, param);
     param.nl();
     param.nl();
 

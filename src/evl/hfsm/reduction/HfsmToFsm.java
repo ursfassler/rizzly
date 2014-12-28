@@ -20,6 +20,7 @@ package evl.hfsm.reduction;
 import java.util.HashMap;
 import java.util.Map;
 
+import common.Designator;
 import common.ElementInfo;
 
 import evl.Evl;
@@ -74,6 +75,8 @@ public class HfsmToFsm extends NullTraverser<Void, Namespace> {
 
   @Override
   protected Void visitImplHfsm(ImplHfsm obj, Namespace param) {
+    // TODO make clean namespace-tree for hfsm types and constants
+    Namespace fsmSpace = param.force(Designator.NAME_SEP + obj.getName());
 
     QueryDownPropagator.process(obj, kb);
 
@@ -81,7 +84,7 @@ public class HfsmToFsm extends NullTraverser<Void, Namespace> {
     TransitionDownPropagator.process(obj, kb);
 
     {
-      StateTypeBuilder stb = new StateTypeBuilder(param, kb);
+      StateTypeBuilder stb = new StateTypeBuilder(fsmSpace, kb);
       NamedElement elem = stb.traverse(obj.getTopstate(), new EvlList<NamedElement>());
       Type stateType = elem.getRef().getLink();
 
