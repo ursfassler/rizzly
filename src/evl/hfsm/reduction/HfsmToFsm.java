@@ -20,6 +20,8 @@ package evl.hfsm.reduction;
 import java.util.HashMap;
 import java.util.Map;
 
+import operation.EvlOperation;
+
 import common.Designator;
 import common.ElementInfo;
 
@@ -32,6 +34,7 @@ import evl.hfsm.State;
 import evl.knowledge.KnowledgeBase;
 import evl.other.EvlList;
 import evl.other.Namespace;
+import evl.traverser.OpenReplace;
 import evl.type.Type;
 import evl.type.composed.NamedElement;
 import evl.variable.Constant;
@@ -39,17 +42,26 @@ import evl.variable.StateVariable;
 
 //TODO set correct values when switching states
 
-public class HfsmToFsm extends NullTraverser<Void, Namespace> {
-  KnowledgeBase kb;
+public class HfsmToFsm extends EvlPass {
 
-  public HfsmToFsm(KnowledgeBase kb) {
-    super();
-    this.kb = kb;
+  {
+    addDependency(OpenReplace.class);
   }
 
-  public static void process(Namespace classes, KnowledgeBase kb) {
-    HfsmToFsm reduction = new HfsmToFsm(kb);
-    reduction.traverse(classes, null);
+  @Override
+  public void process(Evl evl, KnowledgeBase kb) {
+    HfsmToFsmWorker reduction = new HfsmToFsmWorker(kb);
+    reduction.traverse(evl, null);
+  }
+
+}
+
+class HfsmToFsmWorker extends NullTraverser<Void, Namespace> {
+  KnowledgeBase kb;
+
+  public HfsmToFsmWorker(KnowledgeBase kb) {
+    super();
+    this.kb = kb;
   }
 
   @Override

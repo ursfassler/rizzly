@@ -19,9 +19,11 @@ package evl.traverser;
 
 import java.math.BigInteger;
 
+import operation.EvlOperation;
 import util.Range;
 import error.ErrorType;
 import error.RError;
+import evl.Evl;
 import evl.expression.Expression;
 import evl.expression.binop.And;
 import evl.expression.binop.BitAnd;
@@ -34,7 +36,6 @@ import evl.expression.unop.LogicNot;
 import evl.expression.unop.Not;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
 import evl.type.Type;
 import evl.type.base.BooleanType;
 import evl.type.base.RangeType;
@@ -46,13 +47,23 @@ import evl.type.base.RangeType;
  * @author urs
  *
  */
-public class BitLogicCategorizer extends ExprReplacer<KnowType> {
-  private final static BitLogicCategorizer INSTANCE = new BitLogicCategorizer();
+public class BitLogicCategorizer extends EvlPass {
+  private final static BitLogicCategorizerWorker INSTANCE = new BitLogicCategorizerWorker();
 
-  public static void process(Namespace aclasses, KnowledgeBase kb) {
-    KnowType kt = kb.getEntry(KnowType.class);
-    INSTANCE.traverse(aclasses, kt);
+  public BitLogicCategorizer() {
+    super();
+    addDependency(InitVarTyper.class);
   }
+
+  @Override
+  public void process(Evl evl, KnowledgeBase kb) {
+    KnowType kt = kb.getEntry(KnowType.class);
+    INSTANCE.traverse(evl, kt);
+  }
+
+}
+
+class BitLogicCategorizerWorker extends ExprReplacer<KnowType> {
 
   @Override
   protected Expression visitAnd(And obj, KnowType param) {

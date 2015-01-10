@@ -20,16 +20,20 @@ package evl.traverser;
 import java.util.HashMap;
 import java.util.Map;
 
+import operation.EvlOperation;
+
 import common.Designator;
 import common.ElementInfo;
 
 import evl.DefTraverser;
 import evl.Evl;
+import evl.composition.CompositionReduction;
 import evl.expression.Expression;
 import evl.expression.binop.Equal;
 import evl.expression.binop.Is;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
+import evl.hfsm.reduction.HfsmReduction;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
@@ -46,18 +50,28 @@ import evl.type.composed.UnionType;
 // TODO replace access to union instance u in ".. is .." and "case" with access to u.e
 // TODO replace also reference to element x of U to x' in E
 // DONE replace "is" with "=="
-public class ReduceUnion extends ExprReplacer<Void> {
+public class ReduceUnion extends EvlPass {
+  {
+    addDependency(HfsmReduction.class);
+    addDependency(CompositionReduction.class);
+  }
+
+  @Override
+  public void process(Evl evl, KnowledgeBase kb) {
+    ReduceUnionWorker inst = new ReduceUnionWorker(kb);
+
+    inst.traverse(evl, null);
+    // FIXME only provide namespace as evl?
+    ((Namespace) evl).addAll(inst.getUnion2enum().values());
+  }
+
+}
+
+class ReduceUnionWorker extends ExprReplacer<Void> {
   final private Map<UnionType, EnumType> union2enum = new HashMap<UnionType, EnumType>();
   final private KnowType kt;
 
-  public static void process(Namespace aclasses, KnowledgeBase kb) {
-    ReduceUnion inst = new ReduceUnion(kb);
-
-    inst.traverse(aclasses, null);
-    aclasses.addAll(inst.union2enum.values());
-  }
-
-  public ReduceUnion(KnowledgeBase kb) {
+  public ReduceUnionWorker(KnowledgeBase kb) {
     super();
     this.kt = kb.getEntry(KnowType.class);
   }
@@ -65,7 +79,7 @@ public class ReduceUnion extends ExprReplacer<Void> {
   @Override
   public Expression traverse(Evl obj, Void param) {
     Uni2Enum enu2uni = new Uni2Enum();
-    enu2uni.traverse(obj, union2enum);
+    enu2uni.traverse(obj, getUnion2enum());
     return super.traverse(obj, param);
   }
 
@@ -85,10 +99,10 @@ public class ReduceUnion extends ExprReplacer<Void> {
     obj = (Reference) super.visitReference(obj, param);
     if (obj.getLink() instanceof UnionType) {
       UnionType ut = (UnionType) obj.getLink();
-      assert (union2enum.containsKey(ut));
+      assert (getUnion2enum().containsKey(ut));
       assert (obj.getOffset().size() == 1);
       assert (obj.getOffset().get(0) instanceof RefName);
-      EnumType et = union2enum.get(ut);
+      EnumType et = getUnion2enum().get(ut);
       String ev = ((RefName) obj.getOffset().get(0)).getName();
       assert (et.getElement().find(ev) != null);
       return new Reference(obj.getInfo(), et, new RefName(ElementInfo.NO, ev));
@@ -109,6 +123,10 @@ public class ReduceUnion extends ExprReplacer<Void> {
     left = new Reference(left.getInfo(), left.getLink(), new RefName(ElementInfo.NO, ((UnionType) ut).getTag().getName()));
 
     return new Equal(obj.getInfo(), left, obj.getRight());
+  }
+
+  public Map<UnionType, EnumType> getUnion2enum() {
+    return union2enum;
   }
 
 }

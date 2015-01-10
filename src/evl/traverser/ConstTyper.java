@@ -17,6 +17,7 @@
 
 package evl.traverser;
 
+import operation.EvlOperation;
 import evl.DefTraverser;
 import evl.Evl;
 import evl.expression.reference.SimpleRef;
@@ -33,19 +34,25 @@ import evl.variable.Constant;
  * Sets and constrains types for all constants
  *
  */
-public class ConstTyper extends DefTraverser<Void, Void> {
+public class ConstTyper extends EvlPass {
+  @Override
+  public void process(Evl evl, KnowledgeBase kb) {
+    Typer replace = new Typer(kb);
+    replace.traverse(evl, null);
+  }
+}
+
+class Typer extends DefTraverser<Void, Void> {
   private final KnowType kt;
   private final KnowBaseItem kbi;
 
-  public ConstTyper(KnowledgeBase kb) {
+  public Typer(KnowledgeBase kb) {
     super();
     this.kt = kb.getEntry(KnowType.class);
     this.kbi = kb.getEntry(KnowBaseItem.class);
   }
 
   public static void process(Evl evl, KnowledgeBase kb) {
-    ConstTyper replace = new ConstTyper(kb);
-    replace.traverse(evl, null);
   }
 
   private static boolean isOpenType(Type type) {

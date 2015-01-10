@@ -22,6 +22,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import operation.EvlOperation;
 import util.Pair;
 
 import common.Direction;
@@ -32,6 +33,7 @@ import error.RError;
 import evl.Evl;
 import evl.NullTraverser;
 import evl.copy.Copy;
+import evl.copy.Relinker;
 import evl.expression.Expression;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefName;
@@ -59,26 +61,41 @@ import evl.statement.Block;
 import evl.statement.CallStmt;
 import evl.statement.ReturnExpr;
 import evl.statement.intern.MsgPush;
+import evl.traverser.OpenReplace;
 import evl.type.Type;
 import evl.variable.FuncVariable;
 import evl.variable.Variable;
 
-//TODO cleanup
-public class CompositionReduction extends NullTraverser<Evl, Void> {
+public class CompositionReduction extends EvlPass {
 
-  private static final ElementInfo info = ElementInfo.NO;
-  private Map<ImplComposition, ImplElementary> map = new HashMap<ImplComposition, ImplElementary>();
-  private final KnowBaseItem kbi;
-
-  public CompositionReduction(KnowledgeBase kb) {
-    super();
-    kbi = kb.getEntry(KnowBaseItem.class);
+  {
+    addDependency(OpenReplace.class);
   }
 
-  public static Map<ImplComposition, ImplElementary> process(Namespace classes, KnowledgeBase kb) {
-    CompositionReduction reduction = new CompositionReduction(kb);
-    reduction.visit(classes, null);
-    return reduction.map;
+  @Override
+  public void process(Evl evl, KnowledgeBase kb) {
+    CompositionReductionWorker reduction = new CompositionReductionWorker(kb);
+    reduction.traverse(evl, null);
+    Relinker.relink(evl, reduction.getMap());
+
+    // TODO reimplement
+    // if (map.containsKey(root)) {
+    // root = map.get(root);
+    // }
+  }
+
+}
+
+// TODO cleanup
+class CompositionReductionWorker extends NullTraverser<Evl, Void> {
+
+  private static final ElementInfo info = ElementInfo.NO;
+  private final Map<ImplComposition, ImplElementary> map = new HashMap<ImplComposition, ImplElementary>();
+  private final KnowBaseItem kbi;
+
+  public CompositionReductionWorker(KnowledgeBase kb) {
+    super();
+    kbi = kb.getEntry(KnowBaseItem.class);
   }
 
   @Override
@@ -167,7 +184,7 @@ public class CompositionReduction extends NullTraverser<Evl, Void> {
       }
     }
 
-    map.put(obj, elem);
+    getMap().put(obj, elem);
     return elem;
   }
 
@@ -261,6 +278,10 @@ public class CompositionReduction extends NullTraverser<Evl, Void> {
       ref = new Reference(ep.getInfo(), comp.getQueue());
     }
     return ref;
+  }
+
+  public Map<ImplComposition, ImplElementary> getMap() {
+    return map;
   }
 
 }

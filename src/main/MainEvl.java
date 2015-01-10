@@ -31,6 +31,7 @@ import java.util.Set;
 
 import org.jgrapht.traverse.TopologicalOrderIterator;
 
+import pass.EvlPass;
 import util.GraphHelper;
 import util.Pair;
 import util.SimpleGraph;
@@ -51,7 +52,6 @@ import evl.composition.Endpoint;
 import evl.composition.EndpointSub;
 import evl.composition.ImplComposition;
 import evl.copy.Copy;
-import evl.copy.Relinker;
 import evl.expression.reference.BaseRef;
 import evl.expression.reference.SimpleRef;
 import evl.function.Function;
@@ -63,10 +63,7 @@ import evl.function.header.FuncCtrlOutDataOut;
 import evl.function.header.FuncPrivateVoid;
 import evl.function.header.FuncSubHandlerEvent;
 import evl.function.header.FuncSubHandlerQuery;
-import evl.hfsm.ImplHfsm;
 import evl.hfsm.Transition;
-import evl.hfsm.reduction.HfsmReduction;
-import evl.hfsm.reduction.HfsmToFsm;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
 import evl.other.CompUse;
@@ -92,15 +89,11 @@ import evl.traverser.DepGraph;
 import evl.traverser.EnumReduction;
 import evl.traverser.FpcHeaderWriter;
 import evl.traverser.IfCutter;
-import evl.traverser.InitVarTyper;
-import evl.traverser.IntroduceConvert;
 import evl.traverser.LinkReduction;
 import evl.traverser.NamespaceReduction;
-import evl.traverser.OpenReplace;
 import evl.traverser.OutsideReaderInfo;
 import evl.traverser.OutsideWriterInfo;
 import evl.traverser.RangeConverter;
-import evl.traverser.ReduceUnion;
 import evl.traverser.SystemIfaceAdder;
 import evl.traverser.debug.CompCascadeDepth;
 import evl.traverser.debug.DebugIfaceAdder;
@@ -135,7 +128,7 @@ public class MainEvl {
     dp.print("afterFun");
     dp.print("evldep", DepGraph.build(aclasses));
 
-    ConstTyper.process(aclasses, kb);
+    (new ConstTyper()).process(aclasses, kb);
     dp.print("consttype");
 
     Component root = rootUse.getLink();
@@ -148,23 +141,7 @@ public class MainEvl {
 
     // FuncHeaderReplacer.process(aclasses, kb); //TODO remove if not used
 
-    IntroduceConvert.process(aclasses, kb);
-    OpenReplace.process(aclasses, kb);
-
-    dp.print("convert");
-
-    root = compositionReduction(aclasses, root, kb);
-    dp.print("compreduced");
-    root = hfsmReduction(root, opt, aclasses, dp, kb);
-
-    // FIXME: reimplement
-    ReduceUnion.process(aclasses, kb);
-    InitVarTyper.process(aclasses, kb);
-
-    dp.print("reduced");
-
-    // ExprCutter.process(aclasses, kb); // TODO reimplement
-    BitLogicCategorizer.process(aclasses, kb);
+    process(new BitLogicCategorizer(), aclasses, kb, dp);
 
     dp.print("normalized");
 
@@ -216,6 +193,36 @@ public class MainEvl {
 
     dp.print("instprog", prg);
     return prg;
+  }
+
+  private static void process(EvlPass op, Evl evl, KnowledgeBase kb, DebugPrinter dp) {
+    ArrayList<EvlPass> ops = new ArrayList<EvlPass>();
+
+    addDeps(op, ops);
+    Collections.reverse(ops);
+
+    for (EvlPass eop : ops) {
+      eop.process(evl, kb);
+      dp.print(eop.getName());
+    }
+  }
+
+  private static void addDeps(EvlPass op, ArrayList<EvlPass> ops) {
+    if (ops.contains(op)) {
+      return;
+    }
+    ops.add(op);
+    for (Class<? extends EvlPass> sop : op.getDependencies()) {
+      try {
+        addDeps(sop.newInstance(), ops);
+      } catch (InstantiationException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      } catch (IllegalAccessException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+    }
   }
 
   private static Set<String> makeBlacklist() {
@@ -421,30 +428,6 @@ public class MainEvl {
     if (!queries.isEmpty()) {
       RError.err(ErrorType.Error, root.getInfo(), "Top component is not allowed to have queries in output");
     }
-  }
-
-  private static Component compositionReduction(Namespace aclasses, Component root, KnowledgeBase kb) {
-    Map<ImplComposition, ImplElementary> map = CompositionReduction.process(aclasses, kb);
-    Relinker.relink(aclasses, map);
-    if (map.containsKey(root)) {
-      root = map.get(root);
-    }
-    return root;
-  }
-
-  private static Component hfsmReduction(Component root, ClaOption opt, Namespace classes, DebugPrinter dp, KnowledgeBase kb) {
-    // HfsmGraphviz.print(classes, debugdir + "hfsm.gv");//TODO reimplement
-    HfsmToFsm.process(classes, kb);
-    dp.print("fsm");
-
-    Map<ImplHfsm, ImplElementary> map = HfsmReduction.process(classes, new KnowledgeBase(classes, opt.getRootPath()));
-    Relinker.relink(classes, map);
-    // Linker.process(classes, knowledgeBase);
-
-    if (map.containsKey(root)) {
-      root = map.get(root);
-    }
-    return root;
   }
 
   private static ArrayList<String> addDebug(Namespace classes, Component root, DebugPrinter dp, KnowledgeBase kb) {

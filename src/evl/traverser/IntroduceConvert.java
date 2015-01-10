@@ -17,6 +17,8 @@
 
 package evl.traverser;
 
+import operation.EvlOperation;
+
 import common.Designator;
 import common.ElementInfo;
 
@@ -56,21 +58,26 @@ import evl.variable.FuncVariable;
  * with function _convert_R( low, high, value: Integer );
  *
  */
-public class IntroduceConvert extends DefTraverser<Void, Void> {
+public class IntroduceConvert extends EvlPass {
+
+  @Override
+  public void process(Evl evl, KnowledgeBase kb) {
+    IntroduceConvertWorker convert = new IntroduceConvertWorker(kb);
+    convert.traverse(evl, null);
+  }
+
+}
+
+class IntroduceConvertWorker extends DefTraverser<Void, Void> {
   private final KnowBaseItem kbi;
   private final KnowLlvmLibrary kll;
   static final private String CONVERT_PREFIX = Designator.NAME_SEP + "convert" + Designator.NAME_SEP;
   private static final ElementInfo info = ElementInfo.NO;
 
-  public IntroduceConvert(KnowledgeBase kb) {
+  public IntroduceConvertWorker(KnowledgeBase kb) {
     super();
     kbi = kb.getEntry(KnowBaseItem.class);
     kll = kb.getEntry(KnowLlvmLibrary.class);
-  }
-
-  public static void process(Evl evl, KnowledgeBase kb) {
-    IntroduceConvert convert = new IntroduceConvert(kb);
-    convert.traverse(evl, null);
   }
 
   @Override

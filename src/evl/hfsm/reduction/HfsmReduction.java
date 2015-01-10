@@ -21,6 +21,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import operation.EvlOperation;
+
 import common.Designator;
 import common.ElementInfo;
 
@@ -68,22 +70,38 @@ import evl.variable.FuncVariable;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
 
-public class HfsmReduction extends NullTraverser<Evl, Namespace> {
+public class HfsmReduction extends EvlPass {
+
+  {
+    addDependency(HfsmToFsm.class);
+  }
+
+  @Override
+  public void process(Evl evl, KnowledgeBase kb) {
+    HfsmReductionWorker reduction = new HfsmReductionWorker(kb);
+    reduction.traverse(evl, null);
+    Relinker.relink(evl, reduction.getMap());
+    // Linker.process(classes, knowledgeBase);
+
+    // TODO reimplement
+    // if (map.containsKey(root)) {
+    // root = map.get(root);
+    // }
+    // return root;
+  }
+
+}
+
+class HfsmReductionWorker extends NullTraverser<Evl, Namespace> {
 
   static final private ElementInfo info = ElementInfo.NO;
   final private KnowLlvmLibrary kll;
   final private KnowBaseItem kbi;
   final private Map<ImplHfsm, ImplElementary> map = new HashMap<ImplHfsm, ImplElementary>();
 
-  public HfsmReduction(KnowledgeBase kb) {
+  public HfsmReductionWorker(KnowledgeBase kb) {
     kll = kb.getEntry(KnowLlvmLibrary.class);
     kbi = kb.getEntry(KnowBaseItem.class);
-  }
-
-  public static Map<ImplHfsm, ImplElementary> process(Namespace classes, KnowledgeBase kb) {
-    HfsmReduction reduction = new HfsmReduction(kb);
-    reduction.traverse(classes, null);
-    return reduction.map;
   }
 
   @Override
@@ -161,7 +179,7 @@ public class HfsmReduction extends NullTraverser<Evl, Namespace> {
       elem.getExitFunc().setLink(fExit);
     }
 
-    map.put(obj, elem);
+    getMap().put(obj, elem);
     return elem;
   }
 
@@ -350,5 +368,9 @@ public class HfsmReduction extends NullTraverser<Evl, Namespace> {
     transCode.getStatements().add(setState);
 
     return transCode;
+  }
+
+  public Map<ImplHfsm, ImplElementary> getMap() {
+    return map;
   }
 }

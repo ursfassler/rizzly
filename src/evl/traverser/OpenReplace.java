@@ -19,13 +19,13 @@ package evl.traverser;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import operation.EvlOperation;
 import util.Range;
 import evl.DefTraverser;
 import evl.Evl;
@@ -47,42 +47,59 @@ import evl.variable.Variable;
  * Replaces open types (like Integer or Natural) of function arguments with appropriate range types.
  *
  */
-public class OpenReplace extends DefTraverser<Void, Void> {
-  private final KnowType kt;
-  private final Set<Type> openTypes;
-  private final Map<Variable, RangeType> map = new HashMap<Variable, RangeType>();
 
-  public OpenReplace(Collection<Type> openTypes, KnowledgeBase kb) {
-    super();
-    this.kt = kb.getEntry(KnowType.class);
-    this.openTypes = new HashSet<Type>(openTypes);
+public class OpenReplace extends EvlPass {
+
+  {
+    addDependency(IntroduceConvert.class);
   }
 
-  public static void process(Evl evl, KnowledgeBase kb) {
-    KnowBaseItem kbi = kb.getEntry(KnowBaseItem.class);
+  @Override
+  public void process(Evl evl, KnowledgeBase kb) {
+    OpenReplaceWorker worker = new OpenReplaceWorker(kb);
+    worker.traverse(evl, null);
+  }
+}
+
+class OpenReplaceWorker extends DefTraverser<Void, Void> {
+  private final KnowType kt;
+  private final KnowBaseItem kbi;
+  private final Set<Type> openTypes = new HashSet<Type>();
+  private final Map<Variable, RangeType> map = new HashMap<Variable, RangeType>();
+
+  public OpenReplaceWorker(KnowledgeBase kb) {
+    super();
+    this.kt = kb.getEntry(KnowType.class);
+    this.kbi = kb.getEntry(KnowBaseItem.class);
+  }
+
+  @Override
+  public Void traverse(Evl obj, Void param) {
+    map.clear();
 
     List<Type> openTypes = new ArrayList<Type>();
-    openTypes.addAll(kb.getRoot().getItems(IntegerType.class, false));
-    openTypes.addAll(kb.getRoot().getItems(NaturalType.class, false));
+    openTypes.addAll(ClassGetter.get(IntegerType.class, obj));
+    openTypes.addAll(ClassGetter.get(NaturalType.class, obj));
 
     if (openTypes.isEmpty()) {
       // no open type used
-      return;
+      return null;
     }
 
-    List<RangeType> ranges = ClassGetter.get(RangeType.class, kb.getRoot());
+    List<RangeType> ranges = ClassGetter.get(RangeType.class, obj);
     if (ranges.isEmpty()) {
-      return;
+      return null;
     }
 
-    OpenReplace replace = new OpenReplace(openTypes, kb);
-    replace.traverse(evl, null);
-    for (Variable var : replace.map.keySet()) {
+    super.traverse(obj, null);
+    for (Variable var : map.keySet()) {
       assert (openTypes.contains(var.getType().getLink()));
-      RangeType range = replace.map.get(var);
+      RangeType range = map.get(var);
       range = kbi.getNumsetType(range.getNumbers());
       var.getType().setLink(range);
     }
+
+    return null;
   }
 
   @Override

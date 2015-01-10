@@ -22,10 +22,13 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import operation.EvlOperation;
+
 import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
+import evl.Evl;
 import evl.copy.Copy;
 import evl.expression.ArrayValue;
 import evl.expression.ExprList;
@@ -39,7 +42,6 @@ import evl.expression.reference.SimpleRef;
 import evl.knowledge.KnowChild;
 import evl.knowledge.KnowledgeBase;
 import evl.other.EvlList;
-import evl.other.Namespace;
 import evl.type.Type;
 import evl.type.base.ArrayType;
 import evl.type.base.EnumElement;
@@ -53,15 +55,22 @@ import evl.variable.DefVariable;
 
 //TODO clean up
 // Type Inference (for union assignments)
-public class InitVarTyper extends ExprReplacer<Type> {
-  private final KnowChild kc;
-
-  public static void process(Namespace aclasses, KnowledgeBase kb) {
-    InitVarTyper inst = new InitVarTyper(kb);
-    inst.traverse(aclasses, null);
+public class InitVarTyper extends EvlPass {
+  {
+    addDependency(ReduceUnion.class);
   }
 
-  public InitVarTyper(KnowledgeBase kb) {
+  @Override
+  public void process(Evl evl, KnowledgeBase kb) {
+    InitVarTyperWorker inst = new InitVarTyperWorker(kb);
+    inst.traverse(evl, null);
+  }
+}
+
+class InitVarTyperWorker extends ExprReplacer<Type> {
+  private final KnowChild kc;
+
+  public InitVarTyperWorker(KnowledgeBase kb) {
     super();
     this.kc = kb.getEntry(KnowChild.class);
   }
