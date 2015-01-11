@@ -20,6 +20,8 @@ package evl.traverser;
 import java.util.ArrayList;
 import java.util.List;
 
+import pass.EvlPass;
+
 import common.ElementInfo;
 
 import error.ErrorType;
@@ -71,18 +73,21 @@ import evl.variable.FuncVariable;
  * @author urs
  *
  */
-public class ExprCutter extends NullTraverser<Void, Void> {
+public class ExprCutter extends EvlPass {
+  @Override
+  public void process(Namespace evl, KnowledgeBase kb) {
+    ExprCutterWorker cutter = new ExprCutterWorker(kb);
+    cutter.traverse(evl, null);
+  }
+}
+
+class ExprCutterWorker extends NullTraverser<Void, Void> {
 
   private StmtTraverser st;
 
-  public ExprCutter(KnowledgeBase kb) {
+  public ExprCutterWorker(KnowledgeBase kb) {
     super();
     this.st = new StmtTraverser(kb);
-  }
-
-  public static void process(Namespace classes, KnowledgeBase kb) {
-    ExprCutter cutter = new ExprCutter(kb);
-    cutter.traverse(classes, null);
   }
 
   @Override

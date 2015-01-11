@@ -19,25 +19,38 @@ package evl.knowledge;
 
 import java.util.HashMap;
 
+import evl.other.CompUse;
 import evl.other.Namespace;
 
 public class KnowledgeBase {
   final private HashMap<Class<? extends KnowledgeEntry>, KnowledgeEntry> entries = new HashMap<Class<? extends KnowledgeEntry>, KnowledgeEntry>();
   final private Namespace root;
-  final private String rootdir;
+  final private CompUse rootComp;
+  final private String outDir;
+  final private String debugDir;
 
-  public KnowledgeBase(Namespace root, String rootdir) {
+  public KnowledgeBase(Namespace root, CompUse rootComp, String outDir, String debugDir) {
     super();
     this.root = root;
-    this.rootdir = rootdir;
+    this.rootComp = rootComp;
+    this.debugDir = debugDir;
+    this.outDir = outDir;
   }
 
-  public String getRootdir() {
-    return rootdir;
+  public String getOutDir() {
+    return outDir;
+  }
+
+  public String getDebugDir() {
+    return debugDir;
   }
 
   public Namespace getRoot() {
     return root;
+  }
+
+  public CompUse getRootComp() {
+    return rootComp;
   }
 
   public void clear() {

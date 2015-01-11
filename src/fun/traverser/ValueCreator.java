@@ -19,7 +19,7 @@ package fun.traverser;
 
 import java.math.BigInteger;
 
-import evl.traverser.typecheck.specific.ExpressionTypeChecker;
+import evl.pass.check.type.specific.ExpressionTypeChecker;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.expression.ArrayValue;

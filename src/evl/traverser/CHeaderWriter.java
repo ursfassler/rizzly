@@ -39,7 +39,7 @@ import evl.function.header.FuncSubHandlerQuery;
 import evl.knowledge.KnowledgeBase;
 import evl.other.EvlList;
 import evl.other.RizzlyProgram;
-import evl.traverser.typecheck.specific.ExpressionTypeChecker;
+import evl.pass.check.type.specific.ExpressionTypeChecker;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumElement;

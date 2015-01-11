@@ -21,7 +21,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import operation.EvlOperation;
+import pass.EvlPass;
 
 import common.Designator;
 import common.ElementInfo;
@@ -77,7 +77,7 @@ public class HfsmReduction extends EvlPass {
   }
 
   @Override
-  public void process(Evl evl, KnowledgeBase kb) {
+  public void process(Namespace evl, KnowledgeBase kb) {
     HfsmReductionWorker reduction = new HfsmReductionWorker(kb);
     reduction.traverse(evl, null);
     Relinker.relink(evl, reduction.getMap());

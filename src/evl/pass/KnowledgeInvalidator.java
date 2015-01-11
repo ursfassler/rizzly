@@ -15,30 +15,17 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pass;
+package evl.pass;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import pass.EvlPass;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
 
-public abstract class EvlPass {
+public class KnowledgeInvalidator extends EvlPass {
 
-  public abstract void process(Namespace evl, KnowledgeBase kb);
-
-  private final Set<Class<? extends EvlPass>> depends = new HashSet<Class<? extends EvlPass>>();
-
-  public void addDependency(Class<? extends EvlPass> dep) {
-    depends.add(dep);
-  }
-
-  public Set<Class<? extends EvlPass>> getDependencies() {
-    return new HashSet<Class<? extends EvlPass>>(depends);
-  }
-
-  public String getName() {
-    return getClass().getName();
+  @Override
+  public void process(Namespace evl, KnowledgeBase kb) {
+    kb.clear();
   }
 
 }

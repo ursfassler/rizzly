@@ -21,7 +21,7 @@ import java.util.List;
 
 import error.ErrorType;
 import error.RError;
-import evl.traverser.typecheck.specific.ExpressionTypeChecker;
+import evl.pass.check.type.specific.ExpressionTypeChecker;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.expression.ArrayValue;

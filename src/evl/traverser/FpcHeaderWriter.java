@@ -38,7 +38,7 @@ import evl.function.Function;
 import evl.knowledge.KnowledgeBase;
 import evl.other.EvlList;
 import evl.other.RizzlyProgram;
-import evl.traverser.typecheck.specific.ExpressionTypeChecker;
+import evl.pass.check.type.specific.ExpressionTypeChecker;
 import evl.type.Type;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;

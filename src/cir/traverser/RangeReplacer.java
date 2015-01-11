@@ -31,7 +31,7 @@ import cir.type.Type;
 import cir.type.UIntType;
 import error.ErrorType;
 import error.RError;
-import evl.traverser.typecheck.specific.ExpressionTypeChecker;
+import evl.pass.check.type.specific.ExpressionTypeChecker;
 
 /**
  * Replaces range types with integer types

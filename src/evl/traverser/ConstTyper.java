@@ -17,13 +17,14 @@
 
 package evl.traverser;
 
-import operation.EvlOperation;
+import pass.EvlPass;
 import evl.DefTraverser;
 import evl.Evl;
 import evl.expression.reference.SimpleRef;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
+import evl.other.Namespace;
 import evl.type.Type;
 import evl.type.special.AnyType;
 import evl.type.special.IntegerType;
@@ -36,7 +37,7 @@ import evl.variable.Constant;
  */
 public class ConstTyper extends EvlPass {
   @Override
-  public void process(Evl evl, KnowledgeBase kb) {
+  public void process(Namespace evl, KnowledgeBase kb) {
     Typer replace = new Typer(kb);
     replace.traverse(evl, null);
   }

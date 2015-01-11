@@ -94,8 +94,7 @@ public class Main {
     evl.other.Namespace aclasses = (evl.other.Namespace) funToAst.traverse(fret.first, null);
     evl.other.CompUse root = (evl.other.CompUse) funToAst.map(fret.second);
 
-    ArrayList<String> debugNames = new ArrayList<String>();
-    evl.other.RizzlyProgram prg = MainEvl.doEvl(opt, outdir, debugdir, root, aclasses, debugNames);
+    evl.other.RizzlyProgram prg = MainEvl.doEvl(opt, outdir, debugdir, root, aclasses);
 
     // evl.traverser.PrettyPrinter.print(prg, debugdir + "beforeCir.rzy", true);
 

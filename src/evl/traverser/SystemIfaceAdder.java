@@ -21,6 +21,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
+import pass.EvlPass;
+
 import common.Designator;
 import common.ElementInfo;
 
@@ -49,23 +51,26 @@ import evl.statement.Statement;
 import evl.type.Type;
 import evl.variable.FuncVariable;
 
-public class SystemIfaceAdder extends NullTraverser<Void, Void> {
+public class SystemIfaceAdder extends EvlPass {
+  @Override
+  public void process(Namespace evl, KnowledgeBase kb) {
+    SystemIfaceAdderWorker reduction = new SystemIfaceAdderWorker(kb);
+    reduction.traverse(evl, null);
+    SystemIfaceCaller caller = new SystemIfaceCaller(reduction.getCtors(), reduction.getDtors());
+    caller.traverse(evl, null);
+  }
+}
+
+class SystemIfaceAdderWorker extends NullTraverser<Void, Void> {
   public static final String DESTRUCT = Designator.NAME_SEP + "destruct";
   public static final String CONSTRUCT = Designator.NAME_SEP + "construct";
   final private KnowledgeBase kb;
   final private HashMap<Component, Function> ctors = new HashMap<Component, Function>();
   final private HashMap<Component, Function> dtors = new HashMap<Component, Function>();
 
-  public SystemIfaceAdder(KnowledgeBase kb) {
+  public SystemIfaceAdderWorker(KnowledgeBase kb) {
     super();
     this.kb = kb;
-  }
-
-  public static void process(Evl obj, KnowledgeBase kb) {
-    SystemIfaceAdder reduction = new SystemIfaceAdder(kb);
-    reduction.traverse(obj, null);
-    SystemIfaceCaller caller = new SystemIfaceCaller(reduction.ctors, reduction.dtors);
-    caller.traverse(obj, null);
   }
 
   @Override
@@ -94,10 +99,10 @@ public class SystemIfaceAdder extends NullTraverser<Void, Void> {
   @Override
   protected Void visitImplElementary(ImplElementary obj, Void param) {
     Function ctor = makeFunc(obj, CONSTRUCT);
-    ctors.put(obj, ctor);
+    getCtors().put(obj, ctor);
 
     Function dtor = makeFunc(obj, DESTRUCT);
-    dtors.put(obj, dtor);
+    getDtors().put(obj, dtor);
 
     return null;
   }
@@ -108,6 +113,14 @@ public class SystemIfaceAdder extends NullTraverser<Void, Void> {
     FuncCtrlInDataIn rfunc = new FuncCtrlInDataIn(info, name, new EvlList<FuncVariable>(), new SimpleRef<Type>(info, kbi.getVoidType()), new Block(info));
     obj.getIface().add(rfunc);
     return rfunc;
+  }
+
+  public HashMap<Component, Function> getCtors() {
+    return ctors;
+  }
+
+  public HashMap<Component, Function> getDtors() {
+    return dtors;
   }
 }
 

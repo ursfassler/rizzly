@@ -187,6 +187,10 @@ public class Namespace extends EvlBase implements Named {
     return parent;
   }
 
+  public void clear() {
+    children.clear();
+  }
+
   @Override
   public String toString() {
     return name;

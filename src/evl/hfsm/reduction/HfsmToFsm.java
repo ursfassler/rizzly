@@ -20,7 +20,7 @@ package evl.hfsm.reduction;
 import java.util.HashMap;
 import java.util.Map;
 
-import operation.EvlOperation;
+import pass.EvlPass;
 
 import common.Designator;
 import common.ElementInfo;
@@ -34,7 +34,7 @@ import evl.hfsm.State;
 import evl.knowledge.KnowledgeBase;
 import evl.other.EvlList;
 import evl.other.Namespace;
-import evl.traverser.OpenReplace;
+import evl.pass.OpenReplace;
 import evl.type.Type;
 import evl.type.composed.NamedElement;
 import evl.variable.Constant;
@@ -49,7 +49,7 @@ public class HfsmToFsm extends EvlPass {
   }
 
   @Override
-  public void process(Evl evl, KnowledgeBase kb) {
+  public void process(Namespace evl, KnowledgeBase kb) {
     HfsmToFsmWorker reduction = new HfsmToFsmWorker(kb);
     reduction.traverse(evl, null);
   }
