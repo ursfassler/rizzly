@@ -79,7 +79,6 @@ import evl.other.CompUse;
 import evl.other.ImplElementary;
 import evl.other.Namespace;
 import evl.other.Queue;
-import evl.other.RizzlyProgram;
 import evl.other.SubCallbacks;
 import evl.statement.Assignment;
 import evl.statement.Block;
@@ -247,11 +246,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitRefIndex(RefIndex obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitRizzlyProgram(RizzlyProgram obj, P param) {
     return visitDefault(obj, param);
   }
 

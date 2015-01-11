@@ -46,7 +46,6 @@ import evl.other.Component;
 import evl.other.EvlList;
 import evl.other.ImplElementary;
 import evl.other.Namespace;
-import evl.other.RizzlyProgram;
 import evl.other.SubCallbacks;
 import evl.queue.QueueReduction;
 import evl.statement.Block;
@@ -64,12 +63,11 @@ public class Instantiation extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    RizzlyProgram prg = instantiate((ImplElementary) kb.getRootComp().getLink(), evl, null, kb);
-    evl.clear();
-    evl.add(prg);
+    instantiate((ImplElementary) kb.getRootComp().getLink(), evl, null, kb);
+    evl.setName(kb.getRootComp().getName());
   }
 
-  private static RizzlyProgram instantiate(ImplElementary top, Namespace classes, DebugPrinter dp, KnowledgeBase kb) {
+  private static void instantiate(ImplElementary top, Namespace classes, DebugPrinter dp, KnowledgeBase kb) {
     ImplElementary env = makeEnv(top, kb);
     classes.getChildren().add(env);
 
@@ -112,13 +110,12 @@ public class Instantiation extends EvlPass {
     EvlList<Evl> flat = NamespaceReduction.process(classes, kb);
     // dp.print("aflat");
 
-    RizzlyProgram prg = new RizzlyProgram("inst");
-    prg.getFunction().addAll(flat.getItems(Function.class));
-    prg.getVariable().addAll(flat.getItems(StateVariable.class));
-    prg.getConstant().addAll(flat.getItems(Constant.class));
-    prg.getType().addAll(flat.getItems(Type.class));
+    classes.clear();
 
-    return prg;
+    classes.addAll(flat.getItems(Function.class));
+    classes.addAll(flat.getItems(StateVariable.class));
+    classes.addAll(flat.getItems(Constant.class));
+    classes.addAll(flat.getItems(Type.class));
   }
 
   private static ImplElementary makeEnv(Component top, KnowledgeBase kb) {

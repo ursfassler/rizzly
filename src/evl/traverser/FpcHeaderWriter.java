@@ -37,7 +37,7 @@ import evl.expression.reference.SimpleRef;
 import evl.function.Function;
 import evl.knowledge.KnowledgeBase;
 import evl.other.EvlList;
-import evl.other.RizzlyProgram;
+import evl.other.Namespace;
 import evl.pass.check.type.specific.ExpressionTypeChecker;
 import evl.type.Type;
 import evl.type.base.ArrayType;
@@ -68,11 +68,11 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitRizzlyProgram(RizzlyProgram obj, StreamWriter param) {
+  protected Void visitNamespace(Namespace obj, StreamWriter param) {
     EvlList<Function> funcProvided = new EvlList<Function>();
     EvlList<Function> funcRequired = new EvlList<Function>();
 
-    for (Function func : obj.getFunction()) {
+    for (Function func : obj.getItems(Function.class, false)) {
       if (func.properties().get(Property.Public) == Boolean.TRUE) {
         if (func.properties().get(Property.Extern) == Boolean.TRUE) {
           funcRequired.add(func);
@@ -92,12 +92,14 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.nl();
     param.nl();
 
-    if (!obj.getType().isEmpty() && !((obj.getType().size() == 1) && (obj.getType().get(0) instanceof VoidType))) {
+    List<Type> types = obj.getItems(Type.class, false);
+
+    if (!types.isEmpty() && !((types.size() == 1) && (types.get(0) instanceof VoidType))) {
       param.wr("type");
       param.nl();
 
       param.incIndent();
-      for (Type type : obj.getType()) {
+      for (Type type : types) {
         visit(type, param);
       }
       param.decIndent();

@@ -94,15 +94,15 @@ public class Main {
     evl.other.Namespace aclasses = (evl.other.Namespace) funToAst.traverse(fret.first, null);
     evl.other.CompUse root = (evl.other.CompUse) funToAst.map(fret.second);
 
-    evl.other.RizzlyProgram prg = MainEvl.doEvl(opt, outdir, debugdir, root, aclasses);
+    MainEvl.doEvl(opt, outdir, debugdir, root, aclasses);
 
     // evl.traverser.PrettyPrinter.print(prg, debugdir + "beforeCir.rzy", true);
 
-    Program cprog = (cir.other.Program) evl.traverser.ToC.process(prg);
+    Program cprog = (cir.other.Program) evl.traverser.ToC.process(aclasses);
 
     cprog = MainCir.doCir(cprog, debugdir);
 
-    String cfile = outdir + prg.getName() + ".c";
+    String cfile = outdir + cprog.getName() + ".c";
     CWriter.print(cprog, cfile, false);
 
     return outdir;

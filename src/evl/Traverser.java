@@ -92,7 +92,6 @@ import evl.other.EvlList;
 import evl.other.ImplElementary;
 import evl.other.Namespace;
 import evl.other.Queue;
-import evl.other.RizzlyProgram;
 import evl.other.SubCallbacks;
 import evl.statement.Assignment;
 import evl.statement.Block;
@@ -154,8 +153,6 @@ public abstract class Traverser<R, P> {
   protected R visit(Evl obj, P param) {
     if (obj == null) {
       throw new RuntimeException("object is null");
-    } else if (obj instanceof RizzlyProgram) {
-      return visitRizzlyProgram((RizzlyProgram) obj, param);
     } else if (obj instanceof Type) {
       return visitType((Type) obj, param);
     } else if (obj instanceof Function) {
@@ -603,8 +600,6 @@ public abstract class Traverser<R, P> {
   abstract protected R visitRefName(RefName obj, P param);
 
   abstract protected R visitRefIndex(RefIndex obj, P param);
-
-  abstract protected R visitRizzlyProgram(RizzlyProgram obj, P param);
 
   abstract protected R visitImplHfsm(ImplHfsm obj, P param);
 

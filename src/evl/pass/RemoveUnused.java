@@ -29,30 +29,24 @@ import evl.Evl;
 import evl.function.Function;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
-import evl.other.RizzlyProgram;
 import evl.traverser.DepGraph;
 
-public class RemoveUnusedProgram extends EvlPass {
+public class RemoveUnused extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    for (RizzlyProgram prg : evl.getItems(RizzlyProgram.class, false)) {
-      Set<Function> roots = new HashSet<Function>();
+    Set<Function> roots = new HashSet<Function>();
 
-      for (Function func : prg.getFunction()) {
-        if (func.properties().get(Property.Public) == Boolean.TRUE) {
-          roots.add(func);
-        }
+    for (Function func : evl.getItems(Function.class, false)) {
+      if (func.properties().get(Property.Public) == Boolean.TRUE) {
+        roots.add(func);
       }
-
-      SimpleGraph<Evl> g = DepGraph.build(roots);
-
-      Set<Evl> keep = g.vertexSet();
-
-      prg.getConstant().retainAll(keep);
-      prg.getVariable().retainAll(keep);
-      prg.getFunction().retainAll(keep);
-      prg.getType().retainAll(keep);
     }
+
+    SimpleGraph<Evl> g = DepGraph.build(roots);
+
+    Set<Evl> keep = g.vertexSet();
+
+    evl.getChildren().retainAll(keep);
   }
 }

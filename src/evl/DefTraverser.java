@@ -83,7 +83,6 @@ import evl.other.Component;
 import evl.other.ImplElementary;
 import evl.other.Namespace;
 import evl.other.Queue;
-import evl.other.RizzlyProgram;
 import evl.other.SubCallbacks;
 import evl.statement.Assignment;
 import evl.statement.Block;
@@ -202,15 +201,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   protected R visitComponentType(ComponentType obj, P param) {
     visitList(obj.getInput(), param);
     visitList(obj.getOutput(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitRizzlyProgram(RizzlyProgram obj, P param) {
-    visitList(obj.getType(), param);
-    visitList(obj.getConstant(), param);
-    visitList(obj.getVariable(), param);
-    visitList(obj.getFunction(), param);
     return null;
   }
 

@@ -93,7 +93,6 @@ import evl.other.ImplElementary;
 import evl.other.Named;
 import evl.other.Namespace;
 import evl.other.Queue;
-import evl.other.RizzlyProgram;
 import evl.other.SubCallbacks;
 import evl.statement.Assignment;
 import evl.statement.Block;
@@ -193,22 +192,6 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   private void name(Named obj, StreamWriter param) {
     param.wr(obj.getName());
-  }
-
-  @Override
-  protected Void visitRizzlyProgram(RizzlyProgram obj, StreamWriter param) {
-    param.nl();
-    visitListNl(obj.getType(), param);
-    visitListNl(obj.getConstant(), param);
-    visitListNl(obj.getVariable(), param);
-    param.nl();
-    visitList(obj.getFunction(), param);
-    param.nl();
-    param.nl();
-    param.wr(" // ------------------------------------ ");
-    param.nl();
-    param.nl();
-    return null;
   }
 
   protected void visitOptList(String name, Iterable<? extends Evl> items, StreamWriter param) {

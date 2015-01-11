@@ -35,7 +35,6 @@ import evl.knowledge.KnowledgeBase;
 import evl.other.CompUse;
 import evl.other.Component;
 import evl.other.Namespace;
-import evl.other.RizzlyProgram;
 import evl.pass.BitLogicCategorizer;
 import evl.pass.BitnotFixer;
 import evl.pass.CompareReplacer;
@@ -51,7 +50,7 @@ import evl.pass.KnowledgeInvalidator;
 import evl.pass.OpenReplace;
 import evl.pass.RangeConverter;
 import evl.pass.ReduceUnion;
-import evl.pass.RemoveUnusedProgram;
+import evl.pass.RemoveUnused;
 import evl.pass.check.CompInterfaceTypeChecker;
 import evl.pass.check.HfsmTransScopeCheck;
 import evl.pass.check.Io;
@@ -72,7 +71,7 @@ import evl.type.special.VoidType;
 //TODO ensure that composition and hfsm use construct and destruct correctly
 
 public class MainEvl {
-  public static RizzlyProgram doEvl(ClaOption opt, String outdir, String debugdir, CompUse rootUse, Namespace aclasses) {
+  public static void doEvl(ClaOption opt, String outdir, String debugdir, CompUse rootUse, Namespace aclasses) {
     KnowledgeBase kb = new KnowledgeBase(aclasses, rootUse, outdir, debugdir);
     DebugPrinter dp = new DebugPrinter(aclasses, debugdir);
 
@@ -131,15 +130,12 @@ public class MainEvl {
     passes.add(EnumReduction.class);
     passes.add(ConstantPropagation.class);
 
-    passes.add(RemoveUnusedProgram.class);
+    passes.add(RemoveUnused.class);
     passes.add(KnowledgeInvalidator.class);
 
     passes.add(IfCutter.class);
 
     process(passes, aclasses, kb, dp);
-
-    assert (false);
-    return null;
   }
 
   private static void process(List<Class<? extends EvlPass>> passes, Namespace evl, KnowledgeBase kb, DebugPrinter dp) {

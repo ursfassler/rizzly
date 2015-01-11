@@ -32,8 +32,8 @@ import evl.hfsm.Transition;
 import evl.other.EvlList;
 import evl.other.ImplElementary;
 import evl.other.Named;
+import evl.other.Namespace;
 import evl.other.Queue;
-import evl.other.RizzlyProgram;
 import evl.other.SubCallbacks;
 import evl.statement.CaseOpt;
 import evl.statement.CaseOptRange;
@@ -102,16 +102,6 @@ class CopyEvl extends NullTraverser<Evl, Void> {
   }
 
   @Override
-  protected Evl visitRizzlyProgram(RizzlyProgram obj, Void param) {
-    RizzlyProgram ret = new RizzlyProgram(obj.getName());
-    ret.getConstant().addAll(copy(obj.getConstant()));
-    ret.getFunction().addAll(copy(obj.getFunction()));
-    ret.getType().addAll(copy(obj.getType()));
-    ret.getVariable().addAll(copy(obj.getVariable()));
-    return ret;
-  }
-
-  @Override
   protected Evl visitQueue(Queue obj, Void param) {
     return new Queue();
   }
@@ -151,6 +141,13 @@ class CopyEvl extends NullTraverser<Evl, Void> {
   @Override
   protected Evl visitRefItem(RefItem obj, Void param) {
     return ref.traverse(obj, param);
+  }
+
+  @Override
+  protected Evl visitNamespace(Namespace obj, Void param) {
+    Namespace ret = new Namespace(obj.getInfo(), obj.getName());
+    ret.addAll(copy(obj.getChildren()));
+    return ret;
   }
 
   @Override

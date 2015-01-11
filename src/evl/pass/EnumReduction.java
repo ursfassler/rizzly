@@ -23,10 +23,8 @@ import java.util.Map;
 
 import pass.EvlPass;
 import util.Range;
-
 import common.Designator;
 import common.ElementInfo;
-
 import evl.DefTraverser;
 import evl.expression.Number;
 import evl.expression.reference.BaseRef;
@@ -35,7 +33,6 @@ import evl.expression.reference.Reference;
 import evl.expression.reference.SimpleRef;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
-import evl.other.RizzlyProgram;
 import evl.type.Type;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
@@ -45,43 +42,37 @@ import evl.variable.ConstGlobal;
 public class EnumReduction extends EvlPass {
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    for (RizzlyProgram prg : evl.getItems(RizzlyProgram.class, false)) {
-      process(prg);
-    }
-  }
-
-  private static void process(RizzlyProgram prg) {
     Map<EnumType, RangeType> typeMap = new HashMap<EnumType, RangeType>();
     Map<EnumElement, ConstGlobal> elemMap = new HashMap<EnumElement, ConstGlobal>();
-
-    for (EnumType et : prg.getType().getItems(EnumType.class)) {
-
+    
+    for (EnumType et : evl.getItems(EnumType.class, false)) {
+    
       BigInteger idx = BigInteger.ZERO;
       for (EnumElement elem : et.getElement()) {
-        RangeType rt = makeRangeType(prg, new Range(idx, idx));
-
+        RangeType rt = makeRangeType(evl, new Range(idx, idx));
+    
         String name = et.getName() + Designator.NAME_SEP + elem.getName();
         ConstGlobal val = new ConstGlobal(elem.getInfo(), name, new SimpleRef<Type>(ElementInfo.NO, rt), new Number(ElementInfo.NO, idx));
-        prg.getConstant().add(val);
+        evl.add(val);
         elemMap.put(elem, val);
-
+    
         idx = idx.add(BigInteger.ONE);
       }
-
-      RangeType rt = makeRangeType(prg, new Range(BigInteger.ZERO, BigInteger.valueOf(et.getElement().size() - 1)));
+    
+      RangeType rt = makeRangeType(evl, new Range(BigInteger.ZERO, BigInteger.valueOf(et.getElement().size() - 1)));
       typeMap.put(et, rt);
     }
-
+    
     EnumReduce reduce = new EnumReduce(typeMap, elemMap);
-    reduce.traverse(prg, null);
+    reduce.traverse(evl, null);
   }
 
-  private static RangeType makeRangeType(RizzlyProgram prg, Range range) {
+  private static RangeType makeRangeType(Namespace prg, Range range) {
     String name = RangeType.makeName(range);
-    RangeType rt = (RangeType) prg.getType().find(name);
+    RangeType rt = (RangeType) prg.findItem(name);
     if (rt == null) {
       rt = new RangeType(range);
-      prg.getType().add(rt);
+      prg.add(rt);
     }
     return rt;
   }

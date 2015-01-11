@@ -83,7 +83,7 @@ import evl.expression.unop.BitNot;
 import evl.expression.unop.LogicNot;
 import evl.expression.unop.Uminus;
 import evl.other.Named;
-import evl.other.RizzlyProgram;
+import evl.other.Namespace;
 import evl.statement.Assignment;
 import evl.statement.Block;
 import evl.statement.CallStmt;
@@ -158,21 +158,21 @@ public class ToC extends NullTraverser<CirBase, String> {
   }
 
   @Override
-  protected cir.other.Program visitRizzlyProgram(RizzlyProgram obj, String param) {
+  protected CirBase visitNamespace(Namespace obj, String param) {
     cir.other.Program prog = new cir.other.Program(obj.getName());
-    for (Type type : obj.getType()) {
+    for (Type type : obj.getItems(Type.class, false)) {
       cir.type.Type ct = (cir.type.Type) visit(type, param);
       prog.getType().add(ct);
     }
-    for (StateVariable itr : obj.getVariable()) {
+    for (StateVariable itr : obj.getItems(StateVariable.class, false)) {
       Variable ct = (Variable) visit(itr, param);
       prog.getVariable().add(ct);
     }
-    for (Constant itr : obj.getConstant()) {
+    for (Constant itr : obj.getItems(Constant.class, false)) {
       cir.variable.Constant ct = (cir.variable.Constant) visit(itr, param);
       prog.getVariable().add(ct);
     }
-    for (evl.function.Function itr : obj.getFunction()) {
+    for (evl.function.Function itr : obj.getItems(evl.function.Function.class, false)) {
       cir.function.Function ct = (cir.function.Function) visit(itr, param);
       prog.getFunction().add(ct);
     }

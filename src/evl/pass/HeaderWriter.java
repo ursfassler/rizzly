@@ -32,6 +32,7 @@ import util.Pair;
 import util.SimpleGraph;
 import util.StreamWriter;
 
+import common.ElementInfo;
 import common.Property;
 
 import error.ErrorType;
@@ -44,7 +45,6 @@ import evl.expression.reference.SimpleRef;
 import evl.function.Function;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
-import evl.other.RizzlyProgram;
 import evl.traverser.CHeaderWriter;
 import evl.traverser.DepCollector;
 import evl.traverser.FpcHeaderWriter;
@@ -58,10 +58,7 @@ public class HeaderWriter extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    RizzlyProgram prg = evl.getItems(RizzlyProgram.class, false).get(0);
-    assert (prg != null);
-
-    evl.other.RizzlyProgram head = makeHeader(prg, kb.getDebugDir());
+    Namespace head = makeHeader(evl, kb.getDebugDir());
     Set<String> blacklist = makeBlacklist();
     Renamer.process(head, blacklist);
     List<String> names = new ArrayList<String>();  // TODO get names from code (see MainEvl.addDebug)
@@ -82,17 +79,17 @@ public class HeaderWriter extends EvlPass {
     return blacklist;
   }
 
-  private static RizzlyProgram makeHeader(RizzlyProgram prg, String debugdir) {
-    RizzlyProgram ret = new RizzlyProgram(prg.getName());
+  private static Namespace makeHeader(Namespace prg, String debugdir) {
+    Namespace ret = new Namespace(ElementInfo.NO, prg.getName());
     Set<Evl> anchor = new HashSet<Evl>();
-    for (Function func : prg.getFunction()) {
+    for (Function func : prg.getItems(Function.class, false)) {
       if (Boolean.TRUE.equals(func.properties().get(Property.Public))) {
         for (FuncVariable arg : func.getParam()) {
           anchor.add(arg.getType().getLink());
         }
         anchor.add(func.getRet().getLink());
 
-        ret.getFunction().add(func);
+        ret.add(func);
       }
     }
 
@@ -100,7 +97,7 @@ public class HeaderWriter extends EvlPass {
 
     for (Evl itr : dep) {
       if (itr instanceof evl.type.Type) {
-        ret.getType().add((evl.type.Type) itr);
+        ret.add(itr);
       } else if (itr instanceof SimpleRef) {
         // element of record type
       } else if (itr instanceof NamedElement) {
@@ -112,17 +109,17 @@ public class HeaderWriter extends EvlPass {
       }
     }
 
-    RizzlyProgram cpy = Copy.copy(ret);
-    for (Function func : cpy.getFunction()) {
+    Namespace cpy = Copy.copy(ret);
+    for (Function func : cpy.getItems(Function.class, false)) {
       func.getBody().getStatements().clear();
     }
 
-    toposort(cpy.getType());
+    toposort(cpy.getChildren());
 
     return cpy;
   }
 
-  private static void printCHeader(String outdir, RizzlyProgram cprog, List<String> debugNames, KnowledgeBase kb) {
+  private static void printCHeader(String outdir, Namespace cprog, List<String> debugNames, KnowledgeBase kb) {
     String cfilename = outdir + cprog.getName() + ".h";
     CHeaderWriter cwriter = new CHeaderWriter(debugNames, kb);
     try {
@@ -132,7 +129,7 @@ public class HeaderWriter extends EvlPass {
     }
   }
 
-  private static void printFpcHeader(String outdir, RizzlyProgram cprog, List<String> debugNames, KnowledgeBase kb) {
+  private static void printFpcHeader(String outdir, Namespace cprog, List<String> debugNames, KnowledgeBase kb) {
     String cfilename = outdir + cprog.getName() + ".pas";
     FpcHeaderWriter cwriter = new FpcHeaderWriter(debugNames, kb);
     try {
@@ -142,32 +139,32 @@ public class HeaderWriter extends EvlPass {
     }
   }
 
-  private static void toposort(List<evl.type.Type> list) {
-    SimpleGraph<evl.type.Type> g = new SimpleGraph<evl.type.Type>(list);
-    for (evl.type.Type u : list) {
+  private static void toposort(List<Evl> list) {
+    SimpleGraph<Evl> g = new SimpleGraph<Evl>(list);
+    for (Evl u : list) {
       Set<evl.type.Type> vs = getDirectUsedTypes(u);
       for (evl.type.Type v : vs) {
         g.addEdge(u, v);
       }
     }
 
-    ArrayList<evl.type.Type> old = new ArrayList<evl.type.Type>(list);
+    ArrayList<Evl> old = new ArrayList<Evl>(list);
     int size = list.size();
     list.clear();
-    LinkedList<evl.type.Type> nlist = new LinkedList<evl.type.Type>();
-    TopologicalOrderIterator<evl.type.Type, Pair<evl.type.Type, evl.type.Type>> itr = new TopologicalOrderIterator<evl.type.Type, Pair<evl.type.Type, evl.type.Type>>(g);
+    LinkedList<Evl> nlist = new LinkedList<Evl>();
+    TopologicalOrderIterator<Evl, Pair<Evl, Evl>> itr = new TopologicalOrderIterator<Evl, Pair<Evl, Evl>>(g);
     while (itr.hasNext()) {
       nlist.push(itr.next());
     }
     list.addAll(nlist);
 
-    ArrayList<evl.type.Type> diff = new ArrayList<evl.type.Type>(list);
+    ArrayList<Evl> diff = new ArrayList<Evl>(list);
     diff.removeAll(old);
     old.removeAll(list);
     assert (size == list.size());
   }
 
-  private static Set<evl.type.Type> getDirectUsedTypes(evl.type.Type u) {
+  private static Set<evl.type.Type> getDirectUsedTypes(Evl u) {
     DefTraverser<Void, Set<evl.type.Type>> getter = new DefTraverser<Void, Set<evl.type.Type>>() {
 
       @Override

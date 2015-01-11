@@ -38,7 +38,7 @@ import evl.function.header.FuncSubHandlerEvent;
 import evl.function.header.FuncSubHandlerQuery;
 import evl.knowledge.KnowledgeBase;
 import evl.other.EvlList;
-import evl.other.RizzlyProgram;
+import evl.other.Namespace;
 import evl.pass.check.type.specific.ExpressionTypeChecker;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
@@ -70,7 +70,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitRizzlyProgram(RizzlyProgram obj, StreamWriter param) {
+  protected Void visitNamespace(Namespace obj, StreamWriter param) {
     String protname = obj.getName().toUpperCase() + "_" + "H";
 
     param.wr("#ifndef " + protname);
@@ -101,10 +101,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
       param.nl();
     }
 
-    visitList(obj.getType(), param);
-    visitList(obj.getConstant(), param);
-    assert (obj.getVariable().isEmpty());
-    visitList(obj.getFunction(), param);
+    visitList(obj.getChildren(), param);
 
     param.nl();
     param.wr("#endif /* " + protname + " */");
