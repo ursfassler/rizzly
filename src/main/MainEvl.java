@@ -108,7 +108,7 @@ public class MainEvl {
     if (opt.doDebugEvent()) {
       // TODO reimplement
       // names.addAll(addDebug(aclasses, root, dp, kb));
-      RError.err(ErrorType.Fatal, "Debug currently not sopported");
+      RError.err(ErrorType.Fatal, "Debug currently not supported");
       // only for debugging
       // typecheck(classes, debugdir);
     }

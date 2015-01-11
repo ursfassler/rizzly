@@ -23,8 +23,10 @@ import java.util.Map;
 
 import pass.EvlPass;
 import util.Range;
+
 import common.Designator;
 import common.ElementInfo;
+
 import evl.DefTraverser;
 import evl.expression.Number;
 import evl.expression.reference.BaseRef;
@@ -44,25 +46,25 @@ public class EnumReduction extends EvlPass {
   public void process(Namespace evl, KnowledgeBase kb) {
     Map<EnumType, RangeType> typeMap = new HashMap<EnumType, RangeType>();
     Map<EnumElement, ConstGlobal> elemMap = new HashMap<EnumElement, ConstGlobal>();
-    
+
     for (EnumType et : evl.getItems(EnumType.class, false)) {
-    
+
       BigInteger idx = BigInteger.ZERO;
       for (EnumElement elem : et.getElement()) {
         RangeType rt = makeRangeType(evl, new Range(idx, idx));
-    
+
         String name = et.getName() + Designator.NAME_SEP + elem.getName();
         ConstGlobal val = new ConstGlobal(elem.getInfo(), name, new SimpleRef<Type>(ElementInfo.NO, rt), new Number(ElementInfo.NO, idx));
         evl.add(val);
         elemMap.put(elem, val);
-    
+
         idx = idx.add(BigInteger.ONE);
       }
-    
+
       RangeType rt = makeRangeType(evl, new Range(BigInteger.ZERO, BigInteger.valueOf(et.getElement().size() - 1)));
       typeMap.put(et, rt);
     }
-    
+
     EnumReduce reduce = new EnumReduce(typeMap, elemMap);
     reduce.traverse(evl, null);
   }

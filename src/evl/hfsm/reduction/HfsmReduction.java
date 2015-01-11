@@ -90,6 +90,18 @@ public class HfsmReduction extends EvlPass {
     // return root;
   }
 
+  /**
+   * relinking parameter references to new parameter
+   */
+  public static void relinkActualParameterRef(EvlList<FuncVariable> oldParam, EvlList<FuncVariable> newParam, Evl body) {
+    assert (newParam.size() == oldParam.size());
+    Map<Variable, Variable> map = new HashMap<Variable, Variable>();
+    for (int i = 0; i < newParam.size(); i++) {
+      map.put(oldParam.get(i), newParam.get(i));
+    }
+    Relinker.relink(body, map);
+  }
+
 }
 
 class HfsmReductionWorker extends NullTraverser<Evl, Namespace> {
@@ -183,18 +195,6 @@ class HfsmReductionWorker extends NullTraverser<Evl, Namespace> {
     return elem;
   }
 
-  /**
-   * relinking parameter references to new parameter
-   */
-  public static void relinkActualParameterRef(EvlList<FuncVariable> oldParam, EvlList<FuncVariable> newParam, Evl body) {
-    assert (newParam.size() == oldParam.size());
-    Map<Variable, Variable> map = new HashMap<Variable, Variable>();
-    for (int i = 0; i < newParam.size(); i++) {
-      map.put(oldParam.get(i), newParam.get(i));
-    }
-    Relinker.relink(body, map);
-  }
-
   private FuncPrivateVoid makeEntryFunc(State initial) {
     Block body = new Block(info);
 
@@ -266,7 +266,7 @@ class HfsmReductionWorker extends NullTraverser<Evl, Namespace> {
       assert (query.getBody().getStatements().size() == 1);
       ReturnExpr retcall = (ReturnExpr) query.getBody().getStatements().get(0);
 
-      relinkActualParameterRef(query.getParam(), param, retcall.getExpr());
+      HfsmReduction.relinkActualParameterRef(query.getParam(), param, retcall.getExpr());
 
       Block stateBb = new Block(info);
       stateBb.getStatements().add(retcall);
@@ -323,7 +323,8 @@ class HfsmReductionWorker extends NullTraverser<Evl, Namespace> {
     for (Transition trans : transList) {
       Block blockThen = makeTransition(trans, newparam, stateVariable, enumMap);
 
-      relinkActualParameterRef(trans.getParam(), newparam, trans.getGuard()); // relink references to arguments to the
+      HfsmReduction.relinkActualParameterRef(trans.getParam(), newparam, trans.getGuard()); // relink references to
+                                                                                            // arguments to the
       // new ones
 
       IfOption ifo = new IfOption(trans.getInfo(), trans.getGuard(), blockThen);
@@ -358,7 +359,7 @@ class HfsmReductionWorker extends NullTraverser<Evl, Namespace> {
     Block transCode = new Block(info);
 
     Block body = trans.getBody();
-    relinkActualParameterRef(trans.getParam(), param, body);
+    HfsmReduction.relinkActualParameterRef(trans.getParam(), param, body);
 
     transCode.getStatements().addAll(body.getStatements());
 
