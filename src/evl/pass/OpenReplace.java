@@ -18,12 +18,9 @@
 package evl.pass;
 
 import java.math.BigInteger;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import pass.EvlPass;
 import util.Range;
@@ -37,11 +34,8 @@ import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
-import evl.traverser.ClassGetter;
 import evl.type.Type;
 import evl.type.base.RangeType;
-import evl.type.special.IntegerType;
-import evl.type.special.NaturalType;
 import evl.variable.FuncVariable;
 import evl.variable.Variable;
 
@@ -51,11 +45,6 @@ import evl.variable.Variable;
  */
 
 public class OpenReplace extends EvlPass {
-
-  {
-    addDependency(IntroduceConvert.class);
-  }
-
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
     OpenReplaceWorker worker = new OpenReplaceWorker(kb);
@@ -66,7 +55,6 @@ public class OpenReplace extends EvlPass {
 class OpenReplaceWorker extends DefTraverser<Void, Void> {
   private final KnowType kt;
   private final KnowBaseItem kbi;
-  private final Set<Type> openTypes = new HashSet<Type>();
   private final Map<Variable, RangeType> map = new HashMap<Variable, RangeType>();
 
   public OpenReplaceWorker(KnowledgeBase kb) {
@@ -79,23 +67,8 @@ class OpenReplaceWorker extends DefTraverser<Void, Void> {
   public Void traverse(Evl obj, Void param) {
     map.clear();
 
-    List<Type> openTypes = new ArrayList<Type>();
-    openTypes.addAll(ClassGetter.get(IntegerType.class, obj));
-    openTypes.addAll(ClassGetter.get(NaturalType.class, obj));
-
-    if (openTypes.isEmpty()) {
-      // no open type used
-      return null;
-    }
-
-    List<RangeType> ranges = ClassGetter.get(RangeType.class, obj);
-    if (ranges.isEmpty()) {
-      return null;
-    }
-
     super.traverse(obj, null);
     for (Variable var : map.keySet()) {
-      assert (openTypes.contains(var.getType().getLink()));
       RangeType range = map.get(var);
       range = kbi.getNumsetType(range.getNumbers());
       var.getType().setLink(range);
@@ -119,10 +92,8 @@ class OpenReplaceWorker extends DefTraverser<Void, Void> {
         Variable iarg = arg.get(i);
         Expression iaca = acarg.get(i);
 
-        if (openTypes.contains(iarg.getType().getLink())) {
-          Type provtype = kt.get(iaca);
-          updateVar(iarg, provtype);
-        }
+        Type provtype = kt.get(iaca);
+        updateVar(iarg, provtype);
       }
     }
     return super.visitReference(obj, param);
