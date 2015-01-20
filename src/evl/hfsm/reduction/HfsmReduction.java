@@ -71,11 +71,6 @@ import evl.variable.StateVariable;
 import evl.variable.Variable;
 
 public class HfsmReduction extends EvlPass {
-
-  {
-    addDependency(HfsmToFsm.class);
-  }
-
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
     HfsmReductionWorker reduction = new HfsmReductionWorker(kb);
@@ -324,7 +319,7 @@ class HfsmReductionWorker extends NullTraverser<Evl, Namespace> {
       Block blockThen = makeTransition(trans, newparam, stateVariable, enumMap);
 
       HfsmReduction.relinkActualParameterRef(trans.getParam(), newparam, trans.getGuard()); // relink references to
-                                                                                            // arguments to the
+      // arguments to the
       // new ones
 
       IfOption ifo = new IfOption(trans.getInfo(), trans.getGuard(), blockThen);

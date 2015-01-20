@@ -34,7 +34,6 @@ import evl.hfsm.State;
 import evl.knowledge.KnowledgeBase;
 import evl.other.EvlList;
 import evl.other.Namespace;
-import evl.pass.OpenReplace;
 import evl.type.Type;
 import evl.type.composed.NamedElement;
 import evl.variable.Constant;
@@ -43,10 +42,6 @@ import evl.variable.StateVariable;
 //TODO set correct values when switching states
 
 public class HfsmToFsm extends EvlPass {
-
-  {
-    addDependency(OpenReplace.class);
-  }
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {

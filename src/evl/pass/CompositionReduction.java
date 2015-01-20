@@ -73,10 +73,6 @@ import evl.variable.Variable;
 
 public class CompositionReduction extends EvlPass {
 
-  {
-    addDependency(OpenReplace.class);
-  }
-
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
     CompositionReductionWorker reduction = new CompositionReductionWorker(kb);

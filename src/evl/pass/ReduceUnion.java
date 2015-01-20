@@ -32,7 +32,6 @@ import evl.expression.binop.Equal;
 import evl.expression.binop.Is;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
-import evl.hfsm.reduction.HfsmReduction;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
@@ -51,11 +50,6 @@ import evl.type.composed.UnionType;
 // TODO replace also reference to element x of U to x' in E
 // DONE replace "is" with "=="
 public class ReduceUnion extends EvlPass {
-  {
-    addDependency(HfsmReduction.class);
-    addDependency(CompositionReduction.class);
-  }
-
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
     ReduceUnionWorker inst = new ReduceUnionWorker(kb);

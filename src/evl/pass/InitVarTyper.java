@@ -57,10 +57,6 @@ import evl.variable.DefVariable;
 //TODO clean up
 // Type Inference (for union assignments)
 public class InitVarTyper extends EvlPass {
-  {
-    addDependency(ReduceUnion.class);
-  }
-
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
     InitVarTyperWorker inst = new InitVarTyperWorker(kb);

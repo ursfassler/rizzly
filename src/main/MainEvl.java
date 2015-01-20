@@ -59,6 +59,7 @@ import evl.pass.check.Root;
 import evl.pass.check.RtcViolation;
 import evl.pass.check.Usefullness;
 import evl.pass.check.type.TypeChecker;
+import evl.pass.infrastructure.LinkOk;
 import evl.traverser.ConstTyper;
 import evl.traverser.SystemIfaceAdder;
 import evl.traverser.debug.CompCascadeDepth;
@@ -155,26 +156,14 @@ public class MainEvl {
       } else {
         pass.process(evl, kb);
         dp.print(pass.getName());
+
+        selfCheck(evl, kb);
       }
     }
   }
 
-  private static void addDeps(EvlPass op, ArrayList<EvlPass> ops) {
-    if (ops.contains(op)) {
-      return;
-    }
-    ops.add(op);
-    for (Class<? extends EvlPass> sop : op.getDependencies()) {
-      try {
-        addDeps(sop.newInstance(), ops);
-      } catch (InstantiationException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      } catch (IllegalAccessException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
-    }
+  private static void selfCheck(Namespace evl, KnowledgeBase kb) {
+    (new LinkOk()).process(evl, kb);
   }
 
   @SuppressWarnings("unused")

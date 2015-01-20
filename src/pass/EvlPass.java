@@ -20,22 +20,18 @@ package pass;
 import java.util.HashSet;
 import java.util.Set;
 
+import evl.Evl;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
 
 public abstract class EvlPass {
 
+  protected final Set<Evl> requires = new HashSet<Evl>(); // need these classes
+  protected final Set<Evl> interruptive = new HashSet<Evl>(); // can not work with these classes
+  protected final Set<Evl> removes = new HashSet<Evl>(); // remove thes classes
+  protected final Set<Evl> adds = new HashSet<Evl>();  // add these classes
+
   public abstract void process(Namespace evl, KnowledgeBase kb);
-
-  private final Set<Class<? extends EvlPass>> depends = new HashSet<Class<? extends EvlPass>>();
-
-  public void addDependency(Class<? extends EvlPass> dep) {
-    depends.add(dep);
-  }
-
-  public Set<Class<? extends EvlPass>> getDependencies() {
-    return new HashSet<Class<? extends EvlPass>>(depends);
-  }
 
   public String getName() {
     return getClass().getName();
