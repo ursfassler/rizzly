@@ -167,7 +167,7 @@ public class StateTypeBuilder extends NullTraverser<NamedElement, EvlList<NamedE
 
     Constant initvalue = initVar.get(initStateElem.getRef().getLink());
     assert (initvalue != null);
-    NamedElementValue cont = new NamedElementValue(obj.getInfo(), getName(obj.getInitial().getLink()), new Reference(obj.getInfo(), Copy.copy(initvalue)));
+    NamedElementValue cont = new NamedElementValue(obj.getInfo(), getName(obj.getInitial().getLink()), new Reference(obj.getInfo(), initvalue));
     UnsafeUnionValue uninit = new UnsafeUnionValue(obj.getInfo(), cont, new SimpleRef<Type>(obj.getInfo(), union));
 
     RecordValue value = initValues.get(record);
