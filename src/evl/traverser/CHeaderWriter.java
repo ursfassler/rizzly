@@ -21,7 +21,6 @@ import java.math.BigInteger;
 import java.util.List;
 
 import util.StreamWriter;
-import cir.traverser.CWriter;
 
 import common.Designator;
 

@@ -100,16 +100,17 @@ class OpenReplaceWorker extends DefTraverser<Void, Void> {
   }
 
   private void updateVar(Variable var, Type type) {
-    assert (type instanceof RangeType);
-    RangeType range = (RangeType) type;
+    if (type instanceof RangeType) {
+      RangeType range = (RangeType) type;
 
-    if (map.containsKey(var)) {
-      RangeType old = map.get(var);
-      BigInteger low = range.getNumbers().getLow().min(old.getNumbers().getLow());
-      BigInteger high = range.getNumbers().getHigh().max(old.getNumbers().getHigh());
-      range = new RangeType(new Range(low, high));
+      if (map.containsKey(var)) {
+        RangeType old = map.get(var);
+        BigInteger low = range.getNumbers().getLow().min(old.getNumbers().getLow());
+        BigInteger high = range.getNumbers().getHigh().max(old.getNumbers().getHigh());
+        range = new RangeType(new Range(low, high));
+      }
+
+      map.put(var, range);
     }
-
-    map.put(var, range);
   }
 }

@@ -15,27 +15,18 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pass;
+package evl.type.out;
 
-import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
+import common.ElementInfo;
 
-public abstract class EvlPass {
+public class SIntType extends IntType {
 
-  /*
-   * protected final Set<Condition> precondition; protected final Set<Condition> postcondition;
-   *
-   * Condition may be something like NoClass( Integer )
-   *
-   * or TypeChecked, Linked, Reduced
-   *
-   * or MostClass( Namespace, 1 )
-   */
+  public SIntType(ElementInfo info, String name, int bytes) {
+    super(info, name, bytes);
+  }
 
-  public abstract void process(Namespace evl, KnowledgeBase kb);
-
-  public String getName() {
-    return getClass().getName();
+  static public String makeName(int bytes) {
+    return "S" + Integer.toString(8 * bytes);
   }
 
 }

@@ -22,7 +22,6 @@ import java.util.Iterator;
 import java.util.List;
 
 import util.StreamWriter;
-import cir.traverser.CWriter;
 
 import common.ElementInfo;
 import common.Property;

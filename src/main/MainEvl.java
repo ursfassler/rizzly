@@ -37,6 +37,8 @@ import evl.other.Component;
 import evl.other.Namespace;
 import evl.pass.BitLogicCategorizer;
 import evl.pass.BitnotFixer;
+import evl.pass.BlockReduction;
+import evl.pass.CRenamer;
 import evl.pass.CompareReplacer;
 import evl.pass.CompositionReduction;
 import evl.pass.ConstantPropagation;
@@ -49,8 +51,12 @@ import evl.pass.IntroduceConvert;
 import evl.pass.KnowledgeInvalidator;
 import evl.pass.OpenReplace;
 import evl.pass.RangeConverter;
+import evl.pass.RangeReplacer;
 import evl.pass.ReduceUnion;
 import evl.pass.RemoveUnused;
+import evl.pass.TypeSort;
+import evl.pass.VarDeclToTop;
+import evl.pass.VarSort;
 import evl.pass.check.CompInterfaceTypeChecker;
 import evl.pass.check.HfsmTransScopeCheck;
 import evl.pass.check.Io;
@@ -135,6 +141,21 @@ public class MainEvl {
     passes.add(KnowledgeInvalidator.class);
 
     passes.add(IfCutter.class);
+
+    // from cir
+
+    passes.add(RangeReplacer.class);
+    passes.add(RemoveUnused.class);
+
+    passes.add(BlockReduction.class);
+
+    passes.add(VarDeclToTop.class);
+
+    passes.add(CRenamer.class);
+
+    passes.add(TypeSort.class);
+
+    passes.add(VarSort.class);
 
     process(passes, aclasses, kb, dp);
   }

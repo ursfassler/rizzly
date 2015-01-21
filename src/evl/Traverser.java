@@ -124,6 +124,9 @@ import evl.type.composed.NamedElementType;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
 import evl.type.composed.UnsafeUnionType;
+import evl.type.out.IntType;
+import evl.type.out.SIntType;
+import evl.type.out.UIntType;
 import evl.type.special.AnyType;
 import evl.type.special.ComponentType;
 import evl.type.special.IntegerType;
@@ -516,10 +519,26 @@ public abstract class Traverser<R, P> {
       return visitIntegerType((IntegerType) obj, param);
     } else if (obj instanceof AnyType) {
       return visitAnyType((AnyType) obj, param);
+    } else if (obj instanceof IntType) {
+      return visitIntType((IntType) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
   }
+
+  protected R visitIntType(IntType obj, P param) {
+    if (obj instanceof SIntType) {
+      return visitSIntType((SIntType) obj, param);
+    } else if (obj instanceof UIntType) {
+      return visitUIntType((UIntType) obj, param);
+    } else {
+      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
+  }
+
+  abstract protected R visitUIntType(UIntType obj, P param);
+
+  abstract protected R visitSIntType(SIntType obj, P param);
 
   abstract protected R visitCompUse(CompUse obj, P param);
 

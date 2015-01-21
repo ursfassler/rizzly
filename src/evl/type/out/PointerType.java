@@ -15,27 +15,27 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pass;
+package evl.type.out;
 
-import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
+import common.ElementInfo;
 
-public abstract class EvlPass {
+import evl.expression.reference.BaseRef;
+import evl.type.Type;
 
-  /*
-   * protected final Set<Condition> precondition; protected final Set<Condition> postcondition;
-   *
-   * Condition may be something like NoClass( Integer )
-   *
-   * or TypeChecked, Linked, Reduced
-   *
-   * or MostClass( Namespace, 1 )
-   */
+public class PointerType extends Type {
+  private BaseRef<Type> type;
 
-  public abstract void process(Namespace evl, KnowledgeBase kb);
+  public PointerType(ElementInfo info, String name, BaseRef<Type> type) {
+    super(info, name);
+    this.type = type;
+  }
 
-  public String getName() {
-    return getClass().getName();
+  public BaseRef<Type> getType() {
+    return type;
+  }
+
+  public void setType(BaseRef<Type> type) {
+    this.type = type;
   }
 
 }

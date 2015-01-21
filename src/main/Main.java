@@ -21,12 +21,11 @@ import java.io.File;
 import java.util.ArrayList;
 
 import util.Pair;
-import cir.other.Program;
-import cir.traverser.CWriter;
 
 import common.Designator;
 
 import error.RException;
+import evl.traverser.CWriter;
 import fun.other.Namespace;
 import fun.toevl.FunToEvl;
 import fun.type.base.VoidType;
@@ -96,14 +95,8 @@ public class Main {
 
     MainEvl.doEvl(opt, outdir, debugdir, root, aclasses);
 
-    // evl.traverser.PrettyPrinter.print(prg, debugdir + "beforeCir.rzy", true);
-
-    Program cprog = (cir.other.Program) evl.traverser.ToC.process(aclasses);
-
-    cprog = MainCir.doCir(cprog, debugdir);
-
-    String cfile = outdir + cprog.getName() + ".c";
-    CWriter.print(cprog, cfile, false);
+    String cfile = outdir + "inst" + ".c";  // TODO get correct name
+    CWriter.print(aclasses, cfile);
 
     return outdir;
   }

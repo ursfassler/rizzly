@@ -17,7 +17,6 @@
 
 package evl.other;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -157,8 +156,8 @@ public class Namespace extends EvlBase implements Named {
   }
 
   @SuppressWarnings("unchecked")
-  public <T extends Evl> List<T> getItems(Class<T> kind, boolean recursive) {
-    List<T> ret = new ArrayList<T>();
+  public <T extends Evl> EvlList<T> getItems(Class<T> kind, boolean recursive) {
+    EvlList<T> ret = new EvlList<T>();
     for (Evl itr : getItems()) {
       if (kind.isAssignableFrom(itr.getClass())) {
         ret.add((T) itr);

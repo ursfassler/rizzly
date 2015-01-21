@@ -15,27 +15,31 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pass;
+package evl.statement;
 
-import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
+import util.Range;
 
-public abstract class EvlPass {
+import common.ElementInfo;
 
-  /*
-   * protected final Set<Condition> precondition; protected final Set<Condition> postcondition;
-   *
-   * Condition may be something like NoClass( Integer )
-   *
-   * or TypeChecked, Linked, Reduced
-   *
-   * or MostClass( Namespace, 1 )
-   */
+public class CaseOptSimple extends CaseOptEntry {
+  private Range value;
 
-  public abstract void process(Namespace evl, KnowledgeBase kb);
+  public CaseOptSimple(ElementInfo info, Range value) {
+    super(info);
+    this.value = value;
+  }
 
-  public String getName() {
-    return getClass().getName();
+  public Range getValue() {
+    return value;
+  }
+
+  public void setValue(Range value) {
+    this.value = value;
+  }
+
+  @Override
+  public String toString() {
+    return value.toString();
   }
 
 }

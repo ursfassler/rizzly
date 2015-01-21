@@ -110,6 +110,8 @@ import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
 import evl.type.composed.UnsafeUnionType;
+import evl.type.out.SIntType;
+import evl.type.out.UIntType;
 import evl.type.special.AnyType;
 import evl.type.special.ComponentType;
 import evl.type.special.IntegerType;
@@ -745,6 +747,16 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitCompUse(CompUse obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitUIntType(UIntType obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitSIntType(SIntType obj, P param) {
     return null;
   }
 

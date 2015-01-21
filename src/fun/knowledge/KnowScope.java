@@ -20,8 +20,6 @@ package fun.knowledge;
 import java.util.HashSet;
 import java.util.Set;
 
-import cir.type.TypeAlias;
-
 import common.Scope;
 
 import error.ErrorType;
@@ -88,7 +86,6 @@ public class KnowScope extends KnowledgeEntry {
     global.add(UnionType.class);
     global.add(Array.class);
     global.add(StringType.class);
-    global.add(TypeAlias.class);
     global.add(TypeType.class);
     global.add(EnumType.class);
     global.add(BooleanType.class);

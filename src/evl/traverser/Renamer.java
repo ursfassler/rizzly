@@ -49,7 +49,7 @@ public class Renamer extends DefTraverser<Void, Void> {
   }
 
   private String cleanName(String name) {
-    String ret = cir.traverser.Renamer.cleanName(name);
+    String ret = evl.pass.CRenamer.cleanName(name);
 
     while (blacklist.contains(ret.toLowerCase())) {
       ret += Designator.NAME_SEP;
