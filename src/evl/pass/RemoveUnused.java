@@ -48,5 +48,7 @@ public class RemoveUnused extends EvlPass {
     Set<Evl> keep = g.vertexSet();
 
     evl.getChildren().retainAll(keep);
+
+    kb.clear();
   }
 }

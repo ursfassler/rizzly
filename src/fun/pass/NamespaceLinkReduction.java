@@ -15,8 +15,9 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fun.traverser;
+package fun.pass;
 
+import pass.FunPass;
 import error.ErrorType;
 import error.RError;
 import fun.DefTraverser;
@@ -26,6 +27,7 @@ import fun.expression.reference.RefItem;
 import fun.expression.reference.RefName;
 import fun.expression.reference.Reference;
 import fun.knowledge.KnowChild;
+import fun.knowledge.KnowledgeBase;
 import fun.other.Named;
 import fun.other.Namespace;
 import fun.other.RizzlyFile;
@@ -38,12 +40,17 @@ import fun.other.RizzlyFile;
  * @author urs
  *
  */
-public class NamespaceLinkReduction extends DefTraverser<Void, Void> {
+public class NamespaceLinkReduction extends FunPass {
 
-  public static void process(Fun inst) {
-    NamespaceLinkReduction reduction = new NamespaceLinkReduction();
-    reduction.traverse(inst, null);
+  @Override
+  public void process(Namespace root, KnowledgeBase kb) {
+    NamespaceLinkReductionWorker reduction = new NamespaceLinkReductionWorker();
+    reduction.traverse(root, null);
   }
+
+}
+
+class NamespaceLinkReductionWorker extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitReference(Reference obj, Void param) {

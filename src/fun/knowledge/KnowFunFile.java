@@ -48,6 +48,12 @@ public class KnowFunFile extends KnowledgeEntry {
     this.base = base;
   }
 
+  public RizzlyFile get(Designator path) {
+    Fun item = base.getRoot().getChildItem(path.toList());
+    assert (item instanceof RizzlyFile);
+    return (RizzlyFile) item;
+  }
+
   public RizzlyFile get(Fun obj) {
     RizzlyFile ret = find(obj);
     if (ret == null) {
@@ -73,7 +79,7 @@ public class KnowFunFile extends KnowledgeEntry {
     clear();
     KnowFileTraverser traverser = new KnowFileTraverser(cache);
     Set<Pair<Designator, RizzlyFile>> items = new HashSet<Pair<Designator, RizzlyFile>>();
-    base.getFiles().getItems(RizzlyFile.class, new Designator(), items);
+    base.getRoot().getItems(RizzlyFile.class, new Designator(), items);
     for (Pair<Designator, RizzlyFile> file : items) {
       traverser.traverse(file.second, null);
       path.put(file.second, file.first);

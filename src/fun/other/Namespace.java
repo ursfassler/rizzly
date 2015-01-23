@@ -186,6 +186,22 @@ public class Namespace extends FunBase implements Named {
     }
   }
 
+  @SuppressWarnings("unchecked")
+  public <T extends Fun> FunList<T> getItems(Class<T> kind, boolean recursive) {
+    FunList<T> ret = new FunList<T>();
+    for (Fun itr : getItems()) {
+      if (kind.isAssignableFrom(itr.getClass())) {
+        ret.add((T) itr);
+      }
+    }
+    if (recursive) {
+      for (Namespace itr : getSpaces()) {
+        ret.addAll(itr.getItems(kind, true));
+      }
+    }
+    return ret;
+  }
+
   @Override
   public String toString() {
     return name;

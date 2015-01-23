@@ -51,6 +51,7 @@ import evl.knowledge.KnowLlvmLibrary;
 import evl.knowledge.KnowledgeBase;
 import evl.other.EvlList;
 import evl.other.ImplElementary;
+import evl.other.Named;
 import evl.other.Namespace;
 import evl.statement.Assignment;
 import evl.statement.Block;
@@ -73,16 +74,9 @@ import evl.variable.Variable;
 public class HfsmReduction extends EvlPass {
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    HfsmReductionWorker reduction = new HfsmReductionWorker(kb);
+    HfsmReductionTraverser reduction = new HfsmReductionTraverser(kb);
     reduction.traverse(evl, null);
     Relinker.relink(evl, reduction.getMap());
-    // Linker.process(classes, knowledgeBase);
-
-    // TODO reimplement
-    // if (map.containsKey(root)) {
-    // root = map.get(root);
-    // }
-    // return root;
   }
 
   /**
@@ -99,16 +93,16 @@ public class HfsmReduction extends EvlPass {
 
 }
 
-class HfsmReductionWorker extends NullTraverser<Evl, Namespace> {
+class HfsmReductionTraverser extends NullTraverser<Evl, Namespace> {
+  final private Reduction reduction;
 
-  static final private ElementInfo info = ElementInfo.NO;
-  final private KnowLlvmLibrary kll;
-  final private KnowBaseItem kbi;
-  final private Map<ImplHfsm, ImplElementary> map = new HashMap<ImplHfsm, ImplElementary>();
+  public HfsmReductionTraverser(KnowledgeBase kb) {
+    super();
+    reduction = new Reduction(kb);
+  }
 
-  public HfsmReductionWorker(KnowledgeBase kb) {
-    kll = kb.getEntry(KnowLlvmLibrary.class);
-    kbi = kb.getEntry(KnowBaseItem.class);
+  public Map<? extends Named, ? extends Named> getMap() {
+    return reduction.getMap();
   }
 
   @Override
@@ -118,19 +112,34 @@ class HfsmReductionWorker extends NullTraverser<Evl, Namespace> {
 
   @Override
   protected Evl visitNamespace(Namespace obj, Namespace param) {
-    EvlList<Evl> list = new EvlList<Evl>(obj.getChildren());
-    obj.getChildren().clear();
+    EvlList<Evl> list = obj.getChildren();
     for (int i = 0; i < list.size(); i++) {
       Evl item = list.get(i);
       item = visit(item, obj);
       assert (item != null);
-      obj.add(item);
+      list.set(i, item);
     }
     return obj;
   }
 
   @Override
   protected Evl visitImplHfsm(ImplHfsm obj, Namespace param) {
+    return reduction.reduce(obj, param);
+  }
+}
+
+class Reduction {
+  static final private ElementInfo info = ElementInfo.NO;
+  final private KnowLlvmLibrary kll;
+  final private KnowBaseItem kbi;
+  final private Map<ImplHfsm, ImplElementary> map = new HashMap<ImplHfsm, ImplElementary>();
+
+  public Reduction(KnowledgeBase kb) {
+    kll = kb.getEntry(KnowLlvmLibrary.class);
+    kbi = kb.getEntry(KnowBaseItem.class);
+  }
+
+  public ImplElementary reduce(ImplHfsm obj, Namespace param) {
     ImplElementary elem = new ImplElementary(obj.getInfo(), obj.getName(), new SimpleRef<FuncPrivateVoid>(info, null), new SimpleRef<FuncPrivateVoid>(info, null));
     elem.getIface().addAll(obj.getIface());
     elem.getFunction().addAll(obj.getFunction());

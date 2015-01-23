@@ -15,8 +15,9 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fun.traverser;
+package fun.pass;
 
+import pass.FunPass;
 import fun.DefTraverser;
 import fun.Fun;
 import fun.expression.reference.RefItem;
@@ -26,6 +27,7 @@ import fun.hfsm.State;
 import fun.knowledge.KnowChild;
 import fun.knowledge.KnowledgeBase;
 import fun.other.Named;
+import fun.other.Namespace;
 
 /**
  * Changes references to deepest state, e.g. _top.A.B -> B
@@ -33,16 +35,20 @@ import fun.other.Named;
  * @author urs
  *
  */
-public class StateLinkReduction extends DefTraverser<Void, Void> {
+public class StateLinkReduction extends FunPass {
+
+  @Override
+  public void process(Namespace root, KnowledgeBase kb) {
+    StateLinkReductionWorker reduction = new StateLinkReductionWorker(kb);
+    reduction.traverse(root, null);
+  }
+}
+
+class StateLinkReductionWorker extends DefTraverser<Void, Void> {
   private final KnowChild kc;
 
-  public StateLinkReduction(KnowledgeBase kb) {
+  public StateLinkReductionWorker(KnowledgeBase kb) {
     kc = kb.getEntry(KnowChild.class);
-  }
-
-  public static void process(Fun inst, KnowledgeBase kb) {
-    StateLinkReduction reduction = new StateLinkReduction(kb);
-    reduction.traverse(inst, null);
   }
 
   @Override

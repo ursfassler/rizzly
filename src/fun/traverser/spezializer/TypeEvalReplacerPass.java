@@ -15,27 +15,26 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package pass;
+package fun.traverser.spezializer;
 
-import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
+import pass.FunPass;
+import fun.knowledge.KnowledgeBase;
+import fun.other.Namespace;
 
-public abstract class EvlPass {
+/**
+ * Replaces all types with the evaluated expression:
+ *
+ * a : U{3+5} => a : U_8
+ *
+ * @author urs
+ *
+ */
+public class TypeEvalReplacerPass extends FunPass {
 
-  /*
-   * protected final Set<Condition> precondition; protected final Set<Condition> postcondition;
-   * 
-   * Condition may be something like NoClass( Integer )
-   * 
-   * or TypeChecked, Linked, Reduced
-   * 
-   * or MostClass( Namespace, 1 )
-   */
-
-  public abstract void process(Namespace evl, KnowledgeBase kb);
-
-  public String getName() {
-    return getClass().getName();
+  @Override
+  public void process(Namespace root, KnowledgeBase kb) {
+    kb.clear();
+    TypeEvalReplacer replacer = new TypeEvalReplacer(kb);
+    replacer.traverse(root, null);
   }
-
 }

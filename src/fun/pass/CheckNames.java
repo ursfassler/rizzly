@@ -15,22 +15,39 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fun.traverser;
+package fun.pass;
 
 import java.util.Collection;
 
+import pass.FunPass;
 import error.ErrorType;
 import error.RError;
 import fun.DefTraverser;
 import fun.Fun;
+import fun.knowledge.KnowledgeBase;
+import fun.other.FunList;
 import fun.other.Named;
+import fun.other.Namespace;
+import fun.type.Type;
 
-public class CheckNames extends DefTraverser<Void, Collection<String>> {
+public class CheckNames extends FunPass {
 
-  static public void check(Fun fun, Collection<String> blacklist) {
-    CheckNames checkNames = new CheckNames();
-    checkNames.traverse(fun, blacklist);
+  @Override
+  public void process(Namespace root, KnowledgeBase kb) {
+    FunList<Type> blacklist = root.getItems(Type.class, false);
+
+    FunList<Fun> tocheck = new FunList<Fun>(root.getChildren());
+    tocheck.removeAll(blacklist);
+
+    CheckNamesWorker checkNames = new CheckNamesWorker();
+    for (Fun itr : tocheck) {
+      checkNames.traverse(itr, blacklist.names());
+    }
   }
+
+}
+
+class CheckNamesWorker extends DefTraverser<Void, Collection<String>> {
 
   @Override
   protected Void visit(Fun obj, Collection<String> param) {

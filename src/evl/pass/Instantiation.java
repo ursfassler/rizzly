@@ -63,8 +63,10 @@ public class Instantiation extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
+    kb.clear();
+    String name = kb.getRootComp().getName();
     instantiate((ImplElementary) kb.getRootComp().getLink(), evl, null, kb);
-    evl.setName(kb.getRootComp().getName());
+    evl.setName(name);
   }
 
   private static void instantiate(ImplElementary top, Namespace classes, DebugPrinter dp, KnowledgeBase kb) {

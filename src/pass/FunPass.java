@@ -17,10 +17,10 @@
 
 package pass;
 
-import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
+import fun.knowledge.KnowledgeBase;
+import fun.other.Namespace;
 
-public abstract class EvlPass {
+public abstract class FunPass {
 
   /*
    * protected final Set<Condition> precondition; protected final Set<Condition> postcondition;
@@ -32,7 +32,7 @@ public abstract class EvlPass {
    * or MostClass( Namespace, 1 )
    */
 
-  public abstract void process(Namespace evl, KnowledgeBase kb);
+  public abstract void process(Namespace root, KnowledgeBase kb);
 
   public String getName() {
     return getClass().getName();

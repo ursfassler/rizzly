@@ -32,15 +32,7 @@ import fun.other.Named;
 import fun.other.Template;
 import fun.variable.ConstGlobal;
 
-/**
- * Replaces all types with the evaluated expression:
- *
- * a : U{3+5} => a : U_8
- *
- * @author urs
- *
- */
-public class TypeEvalReplacer extends DefTraverser<FunList<ActualTemplateArgument>, Void> {
+class TypeEvalReplacer extends DefTraverser<FunList<ActualTemplateArgument>, Void> {
 
   final private KnowledgeBase kb;
 

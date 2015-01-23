@@ -32,7 +32,6 @@ import evl.hfsm.reduction.HfsmReduction;
 import evl.hfsm.reduction.HfsmToFsm;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
-import evl.other.CompUse;
 import evl.other.Component;
 import evl.other.Namespace;
 import evl.pass.BitLogicCategorizer;
@@ -48,7 +47,6 @@ import evl.pass.IfCutter;
 import evl.pass.InitVarTyper;
 import evl.pass.Instantiation;
 import evl.pass.IntroduceConvert;
-import evl.pass.KnowledgeInvalidator;
 import evl.pass.OpenReplace;
 import evl.pass.RangeConverter;
 import evl.pass.RangeReplacer;
@@ -78,12 +76,9 @@ import evl.type.special.VoidType;
 //TODO ensure that composition and hfsm use construct and destruct correctly
 
 public class MainEvl {
-  public static void doEvl(ClaOption opt, String outdir, String debugdir, CompUse rootUse, Namespace aclasses) {
-    KnowledgeBase kb = new KnowledgeBase(aclasses, rootUse, outdir, debugdir);
+  public static void doEvl(ClaOption opt, String outdir, String debugdir, Namespace aclasses) {
+    KnowledgeBase kb = new KnowledgeBase(aclasses, outdir, debugdir);
     DebugPrinter dp = new DebugPrinter(aclasses, debugdir);
-
-    assert (aclasses.getChildren().contains(rootUse));
-    // aclasses.getChildren().remove(rootUse);
 
     List<Class<? extends EvlPass>> passes = new ArrayList<Class<? extends EvlPass>>();
 
@@ -125,8 +120,6 @@ public class MainEvl {
 
     passes.add(BitnotFixer.class);
 
-    passes.add(KnowledgeInvalidator.class);
-
     passes.add(Instantiation.class);
 
     passes.add(HeaderWriter.class);
@@ -138,7 +131,6 @@ public class MainEvl {
     passes.add(ConstantPropagation.class);
 
     passes.add(RemoveUnused.class);
-    passes.add(KnowledgeInvalidator.class);
 
     passes.add(IfCutter.class);
 

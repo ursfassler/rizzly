@@ -20,19 +20,18 @@ package evl.knowledge;
 import java.util.HashMap;
 
 import evl.other.CompUse;
+import evl.other.EvlList;
 import evl.other.Namespace;
 
 public class KnowledgeBase {
   final private HashMap<Class<? extends KnowledgeEntry>, KnowledgeEntry> entries = new HashMap<Class<? extends KnowledgeEntry>, KnowledgeEntry>();
   final private Namespace root;
-  final private CompUse rootComp;
   final private String outDir;
   final private String debugDir;
 
-  public KnowledgeBase(Namespace root, CompUse rootComp, String outDir, String debugDir) {
+  public KnowledgeBase(Namespace root, String outDir, String debugDir) {
     super();
     this.root = root;
-    this.rootComp = rootComp;
     this.debugDir = debugDir;
     this.outDir = outDir;
   }
@@ -50,7 +49,9 @@ public class KnowledgeBase {
   }
 
   public CompUse getRootComp() {
-    return rootComp;
+    EvlList<CompUse> list = root.getItems(CompUse.class, false);
+    assert (list.size() == 1);
+    return list.get(0);
   }
 
   public void clear() {

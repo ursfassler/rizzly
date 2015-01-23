@@ -19,31 +19,32 @@ package fun.knowledge;
 
 import java.util.HashMap;
 
+import main.ClaOption;
 import fun.other.Namespace;
 
 public class KnowledgeBase {
   final private HashMap<Class<? extends KnowledgeEntry>, KnowledgeEntry> entries = new HashMap<Class<? extends KnowledgeEntry>, KnowledgeEntry>();
   final private Namespace root;
-  final private Namespace files;
-  final private String rootdir;
+  final private String debugdir;
+  final private ClaOption options;
 
-  public KnowledgeBase(Namespace root, Namespace fileList, String rootdir) {
+  public KnowledgeBase(Namespace root, String debugdir, ClaOption options) {
     super();
     this.root = root;
-    this.files = fileList;
-    this.rootdir = rootdir;
+    this.debugdir = debugdir;
+    this.options = options;
   }
 
-  public String getRootdir() {
-    return rootdir;
+  public String getDebugDir() {
+    return debugdir;
   }
 
   public Namespace getRoot() {
     return root;
   }
 
-  public Namespace getFiles() {
-    return files;
+  public ClaOption getOptions() {
+    return options;
   }
 
   public void clear() {

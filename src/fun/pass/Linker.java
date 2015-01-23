@@ -15,18 +15,19 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fun.traverser;
+package fun.pass;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+
+import pass.FunPass;
 
 import common.Designator;
 
 import error.ErrorType;
 import error.RError;
 import fun.DefTraverser;
-import fun.Fun;
 import fun.composition.ImplComposition;
 import fun.expression.reference.BaseRef;
 import fun.expression.reference.DummyLinkTarget;
@@ -38,6 +39,8 @@ import fun.hfsm.StateComposite;
 import fun.hfsm.StateContent;
 import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
+import fun.knowledge.KnowFunFile;
+import fun.knowledge.KnowledgeBase;
 import fun.other.CompImpl;
 import fun.other.FunList;
 import fun.other.ImplElementary;
@@ -48,28 +51,35 @@ import fun.other.SymbolTable;
 import fun.other.Template;
 import fun.statement.Block;
 import fun.statement.VarDefStmt;
+import fun.traverser.TransitionStateLinker;
 import fun.type.Type;
 import fun.type.composed.RecordType;
 import fun.type.template.Range;
 
-public class Linker extends DefTraverser<Void, SymbolTable> {
-  final private Namespace files;
+public class Linker extends FunPass {
+
+  @Override
+  public void process(Namespace root, KnowledgeBase kb) {
+    LinkerWorker linker = new LinkerWorker(kb);
+    linker.traverse(root, new SymbolTable());
+  }
+
+}
+
+class LinkerWorker extends DefTraverser<Void, SymbolTable> {
+  final private KnowFunFile kf;
   final private HashMap<State, SymbolTable> stateNames = new HashMap<State, SymbolTable>();
 
-  public Linker(Namespace fileList) {
-    files = fileList;
+  public LinkerWorker(KnowledgeBase kb) {
+    super();
+    this.kf = kb.getEntry(KnowFunFile.class);
   }
 
-  public static void process(Fun fun, Namespace fileList, SymbolTable sym) {
-    Linker linker = new Linker(fileList);
-    linker.traverse(fun, sym);
-  }
-
-  public static void process(FunList<? extends Fun> fun, Namespace fileList, SymbolTable sym) {
-    Linker linker = new Linker(fileList);
-    for (Fun itr : fun) {
-      linker.traverse(itr, sym);
-    }
+  @Override
+  protected Void visitNamespace(Namespace obj, SymbolTable param) {
+    param = new SymbolTable(param);
+    param.addAll(obj.getChildren());
+    return super.visitNamespace(obj, param);
   }
 
   @Override
@@ -80,7 +90,7 @@ public class Linker extends DefTraverser<Void, SymbolTable> {
 
     FunList<Named> objs = new FunList<Named>();
     for (Designator des : obj.getImports()) {
-      RizzlyFile rzy = (RizzlyFile) files.getChildItem(des.toList());
+      RizzlyFile rzy = kf.get(des);
       assert (rzy != null);
       FunList<Named> named = rzy.getObjects().getItems(Named.class);
       objs.addAll(named);

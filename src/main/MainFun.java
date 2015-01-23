@@ -17,111 +17,91 @@
 
 package main;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.Queue;
-import java.util.Set;
+import java.util.List;
 
 import joGraph.HtmlGraphWriter;
-import parser.FileParser;
+import pass.FunPass;
 import util.Pair;
 import util.SimpleGraph;
 import util.StreamWriter;
 
-import common.Designator;
 import common.ElementInfo;
 
+import error.ErrorType;
+import error.RError;
 import fun.Fun;
-import fun.doc.DepGraph;
-import fun.doc.DocWriter;
 import fun.doc.FunPrinter;
-import fun.expression.reference.Reference;
 import fun.knowledge.KnowledgeBase;
-import fun.other.FunList;
 import fun.other.Namespace;
-import fun.other.RizzlyFile;
-import fun.other.SymbolTable;
-import fun.other.Template;
-import fun.traverser.CheckNames;
-import fun.traverser.CompLinkReduction;
-import fun.traverser.EnumLinkReduction;
-import fun.traverser.Linker;
-import fun.traverser.NamespaceLinkReduction;
-import fun.traverser.StateLinkReduction;
-import fun.traverser.spezializer.TypeEvalReplacer;
-import fun.type.Type;
-import fun.type.base.AnyType;
-import fun.type.base.BooleanType;
-import fun.type.base.IntegerType;
-import fun.type.base.NaturalType;
-import fun.type.base.StringType;
-import fun.type.base.VoidType;
-import fun.type.template.ArrayTemplate;
-import fun.type.template.RangeTemplate;
-import fun.type.template.TypeTemplate;
-import fun.type.template.TypeTypeTemplate;
-import fun.variable.CompUse;
-import fun.variable.TemplateParameter;
+import fun.pass.CheckNames;
+import fun.pass.CompLinkReduction;
+import fun.pass.EnumLinkReduction;
+import fun.pass.FileLoader;
+import fun.pass.FileReduction;
+import fun.pass.InternTypeAdder;
+import fun.pass.Linker;
+import fun.pass.NamespaceLinkReduction;
+import fun.pass.RootInstanceAdder;
+import fun.pass.StateLinkReduction;
+import fun.pass.UnusedRemover;
+import fun.traverser.spezializer.TypeEvalReplacerPass;
 
 public class MainFun {
-  private static ElementInfo info = ElementInfo.NO;
+  public static Namespace doFun(ClaOption opt, String debugdir) {
+    List<Class<? extends FunPass>> passes = new ArrayList<Class<? extends FunPass>>();
 
-  public static Pair<Namespace, CompUse> doFun(ClaOption opt, Designator rootfile, String debugdir, String docdir) {
-    Namespace fileList = loadFiles(rootfile, opt.getRootPath());
+    passes.add(FileLoader.class);
 
-    print(fileList, debugdir + "loaded.rzy");
+    passes.add(InternTypeAdder.class);
+    passes.add(CheckNames.class);
+    passes.add(Linker.class);
+    passes.add(FileReduction.class);
 
-    FunList<Fun> types = new FunList<Fun>();
-    genPrimitiveTypes(types);
-    genPrimitiveGenericTypes(types);
+    passes.add(NamespaceLinkReduction.class);
+    passes.add(StateLinkReduction.class);
+    passes.add(EnumLinkReduction.class);
+    passes.add(CompLinkReduction.class);
 
-    CheckNames.check(fileList, types.names());
+    passes.add(RootInstanceAdder.class);
 
-    SymbolTable sym = new SymbolTable();
-    sym.addAll(types);
-    Linker.process(types, fileList, sym);
-    Linker.process(fileList, fileList, sym);
-    // print(fileList, debugdir + "linked.rzy", new KnowledgeBase(fileList, new
-    // HashSet<RizzlyFile>(), debugdir));
+    passes.add(TypeEvalReplacerPass.class);
+    passes.add(UnusedRemover.class);
 
-    Namespace classes = new Namespace(info, "!");
-    classes.addAll(types);
-    Collection<Pair<Designator, RizzlyFile>> files = new ArrayList<Pair<Designator, RizzlyFile>>();
-    fileList.getItems(RizzlyFile.class, new Designator(), files);
-    for (Pair<Designator, RizzlyFile> f : files) {
-      Namespace parent = classes.forceChildPath(f.first.toList());
-      parent.addAll(f.second.getObjects());
+    Namespace classes = new Namespace(ElementInfo.NO, "!");
+    KnowledgeBase kb = new KnowledgeBase(classes, debugdir, opt);
+    process(passes, classes, kb);
+
+    return classes;
+  }
+
+  private static void process(List<Class<? extends FunPass>> passes, Namespace root, KnowledgeBase kb) {
+    for (Class<? extends FunPass> ecl : passes) {
+      FunPass pass = null;
+      try {
+        pass = ecl.newInstance();
+      } catch (InstantiationException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      } catch (IllegalAccessException e) {
+        // TODO Auto-generated catch block
+        e.printStackTrace();
+      }
+      if (pass == null) {
+        RError.err(ErrorType.Fatal, "Could not create pass: " + ecl.getName());
+      } else {
+        pass.process(root, kb);
+
+        print(root, kb.getDebugDir() + pass.getName() + ".rzy");
+
+        selfCheck(root, kb);
+      }
     }
+  }
 
-    KnowledgeBase kb = new KnowledgeBase(classes, fileList, debugdir);
-
-    print(classes, debugdir + "pretty.rzy");
-
-    NamespaceLinkReduction.process(classes);
-    StateLinkReduction.process(classes, kb);
-    EnumLinkReduction.process(classes, kb);
-    CompLinkReduction.process(classes);
-
-    DocWriter.print(files, kb);
-
-    Template rootdecl = (Template) classes.getChildItem(opt.getRootComp().toList());
-    CompUse root = new CompUse(ElementInfo.NO, "inst", new Reference(ElementInfo.NO, rootdecl));
-    classes.getChildren().add(root);
-
-    print(classes, debugdir + "linkreduced.rzy");
-    evaluate(classes, debugdir, fileList);
-    print(classes, debugdir + "evaluated.rzy");
-
-    // FIXME if we remove everything unused, we can not typecheck that in EVL
-    removeUnused(classes, root, debugdir + "used.gv");
-    print(classes, debugdir + "stripped.rzy");
-    // printDepGraph(debugdir + "rdep.gv", classes);
-    return new Pair<Namespace, CompUse>(classes, root);
+  private static void selfCheck(Namespace root, KnowledgeBase kb) {
   }
 
   private static void printDepGraph(String filename, SimpleGraph<Fun> g) {
@@ -139,81 +119,6 @@ public class MainFun {
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
-  }
-
-  private static void evaluate(Namespace oldClasses, String debugdir, Namespace fileList) {
-    KnowledgeBase kb = new KnowledgeBase(oldClasses, fileList, debugdir);
-
-    TypeEvalReplacer replacer = new TypeEvalReplacer(kb);
-    replacer.traverse(oldClasses, null);
-  }
-
-  private static void removeUnused(Namespace classes, Fun root, String graphfile) {
-    SimpleGraph<Fun> g = DepGraph.build(root);
-    printDepGraph(graphfile, g);
-    removeUnused(classes, g.vertexSet());
-  }
-
-  private static void removeUnused(Namespace ns, Set<Fun> keep) {
-    Set<Fun> remove = new HashSet<Fun>();
-    for (Fun itr : ns.getChildren()) {
-      if (itr instanceof Namespace) {
-        removeUnused((Namespace) itr, keep);
-      } else if (!keep.contains(itr)) {
-        remove.add(itr);
-      }
-    }
-    ns.getChildren().removeAll(remove);
-  }
-
-  private static void inst(Type object, FunList<Fun> container) {
-    container.add(object);
-  }
-
-  private static void templ(String name, FunList<TemplateParameter> list, TypeTemplate tmpl, FunList<Fun> container) {
-    Template decl = new Template(tmpl.getInfo(), name, list, tmpl);
-    container.add(decl);
-  }
-
-  private static void genPrimitiveTypes(FunList<Fun> container) {
-    inst(new BooleanType(), container);
-    inst(VoidType.INSTANCE, container);
-    inst(new NaturalType(), container);
-    inst(new IntegerType(), container);
-    inst(new AnyType(), container);
-    inst(new StringType(), container);
-  }
-
-  private static void genPrimitiveGenericTypes(FunList<Fun> container) {
-    templ(RangeTemplate.NAME, RangeTemplate.makeParam(), new RangeTemplate(), container);
-    templ(ArrayTemplate.NAME, ArrayTemplate.makeParam(), new ArrayTemplate(), container);
-    templ(TypeTypeTemplate.NAME, TypeTypeTemplate.makeParam(), new TypeTypeTemplate(), container);
-  }
-
-  private static Namespace loadFiles(Designator rootname, String rootdir) {
-    Namespace loaded = new Namespace(info, "!!");
-
-    Queue<Designator> toload = new LinkedList<Designator>();
-    toload.add(rootname);
-
-    while (!toload.isEmpty()) {
-      Designator lname = toload.poll();
-      assert (lname.size() > 0);
-      lname.sub(0, lname.size() - 1);
-      Namespace parent = loaded.forceChildPath(lname.sub(0, lname.size() - 1).toList());
-      if (parent.getChildren().find(lname.last()) != null) {
-        continue;
-      }
-      String filename = rootdir + lname.toString(File.separator) + ClaOption.extension;
-      RizzlyFile lfile = FileParser.parse(filename, lname.last());
-
-      parent.getChildren().add(lfile);
-
-      for (Designator name : lfile.getImports()) {
-        toload.add(name);
-      }
-    }
-    return loaded;
   }
 
   static private void print(Fun ast, String filename) {

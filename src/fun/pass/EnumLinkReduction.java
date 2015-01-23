@@ -15,8 +15,9 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fun.traverser;
+package fun.pass;
 
+import pass.FunPass;
 import error.ErrorType;
 import error.RError;
 import fun.DefTraverser;
@@ -26,6 +27,7 @@ import fun.expression.reference.RefName;
 import fun.expression.reference.Reference;
 import fun.knowledge.KnowChild;
 import fun.knowledge.KnowledgeBase;
+import fun.other.Namespace;
 import fun.type.base.EnumElement;
 import fun.type.base.EnumType;
 
@@ -35,16 +37,21 @@ import fun.type.base.EnumType;
  * @author urs
  *
  */
-public class EnumLinkReduction extends DefTraverser<Void, Void> {
-  private final KnowChild kc;
+public class EnumLinkReduction extends FunPass {
 
-  public EnumLinkReduction(KnowledgeBase kb) {
-    kc = kb.getEntry(KnowChild.class);
+  @Override
+  public void process(Namespace root, KnowledgeBase kb) {
+    EnumLinkReductionWorker reduction = new EnumLinkReductionWorker(kb);
+    reduction.traverse(root, null);
   }
 
-  public static void process(Fun inst, KnowledgeBase kb) {
-    EnumLinkReduction reduction = new EnumLinkReduction(kb);
-    reduction.traverse(inst, null);
+}
+
+class EnumLinkReductionWorker extends DefTraverser<Void, Void> {
+  private final KnowChild kc;
+
+  public EnumLinkReductionWorker(KnowledgeBase kb) {
+    kc = kb.getEntry(KnowChild.class);
   }
 
   @Override

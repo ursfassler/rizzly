@@ -20,16 +20,12 @@ package main;
 import java.io.File;
 import java.util.ArrayList;
 
-import util.Pair;
-
 import common.Designator;
 
 import error.RException;
 import evl.traverser.CWriter;
 import fun.other.Namespace;
 import fun.toevl.FunToEvl;
-import fun.type.base.VoidType;
-import fun.variable.CompUse;
 
 //TODO set tag when writing to union
 //TODO allow writing of tag of union
@@ -84,16 +80,11 @@ public class Main {
       rootfile = new Designator(nl);
     }
 
-    Pair<Namespace, CompUse> fret = MainFun.doFun(opt, rootfile, debugdir, docdir);
-    // FIXME hacky, needed during conversation, but maybe removed
-    if (fret.first.getChildren().getItems(VoidType.class).isEmpty()) {
-      fret.first.getChildren().add(VoidType.INSTANCE);
-    }
+    Namespace fret = MainFun.doFun(opt, debugdir);
     FunToEvl funToAst = new FunToEvl();
-    evl.other.Namespace aclasses = (evl.other.Namespace) funToAst.traverse(fret.first, null);
-    evl.other.CompUse root = (evl.other.CompUse) funToAst.map(fret.second);
+    evl.other.Namespace aclasses = (evl.other.Namespace) funToAst.traverse(fret, null);
 
-    MainEvl.doEvl(opt, outdir, debugdir, root, aclasses);
+    MainEvl.doEvl(opt, outdir, debugdir, aclasses);
 
     String cfile = outdir + "inst" + ".c";  // TODO get correct name
     CWriter.print(aclasses, cfile);

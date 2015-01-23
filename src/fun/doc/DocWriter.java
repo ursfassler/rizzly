@@ -29,8 +29,8 @@ import fun.other.RizzlyFile;
 public class DocWriter {
 
   static public void print(Collection<Pair<Designator, RizzlyFile>> files, KnowledgeBase kb) {
-    ComponentFilePrinter.printCodeStyle(kb.getRootdir());
-    CompositionGraphPrinter.printStyle(kb.getRootdir() + ComponentFilePrinter.CompositionStyleName);
+    ComponentFilePrinter.printCodeStyle(kb.getDebugDir());
+    CompositionGraphPrinter.printStyle(kb.getDebugDir() + ComponentFilePrinter.CompositionStyleName);
     for (Pair<Designator, RizzlyFile> file : files) {
       ComponentFilePrinter printer = new ComponentFilePrinter(kb);
       printer.createDoc(file.second, file.first);

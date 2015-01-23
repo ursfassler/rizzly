@@ -61,7 +61,7 @@ public class ComponentFilePrinter {
 
   public void print(RizzlyFile comp, Designator path) {
     try {
-      String filename = kb.getRootdir() + path + ".html";
+      String filename = kb.getDebugDir() + path + ".html";
 
       TransformerFactory transformerFactory = TransformerFactory.newInstance();
       Transformer transformer;

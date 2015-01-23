@@ -15,17 +15,25 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package evl.pass;
+package fun.pass;
 
-import pass.EvlPass;
-import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
+import pass.FunPass;
 
-public class KnowledgeInvalidator extends EvlPass {
+import common.ElementInfo;
+
+import fun.expression.reference.Reference;
+import fun.knowledge.KnowledgeBase;
+import fun.other.Namespace;
+import fun.other.Template;
+import fun.variable.CompUse;
+
+public class RootInstanceAdder extends FunPass {
 
   @Override
-  public void process(Namespace evl, KnowledgeBase kb) {
-    kb.clear();
+  public void process(Namespace root, KnowledgeBase kb) {
+    Template rootdecl = (Template) root.getChildItem(kb.getOptions().getRootComp().toList());
+    CompUse rootinst = new CompUse(ElementInfo.NO, "inst", new Reference(ElementInfo.NO, rootdecl));
+    root.getChildren().add(rootinst);
   }
 
 }

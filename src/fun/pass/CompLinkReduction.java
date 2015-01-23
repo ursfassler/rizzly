@@ -15,8 +15,9 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fun.traverser;
+package fun.pass;
 
+import pass.FunPass;
 import error.ErrorType;
 import error.RError;
 import fun.Fun;
@@ -24,6 +25,7 @@ import fun.NullTraverser;
 import fun.composition.ImplComposition;
 import fun.expression.reference.RefName;
 import fun.expression.reference.RefTemplCall;
+import fun.knowledge.KnowledgeBase;
 import fun.other.CompImpl;
 import fun.other.Named;
 import fun.other.Namespace;
@@ -36,12 +38,17 @@ import fun.variable.CompUse;
  * @author urs
  *
  */
-public class CompLinkReduction extends NullTraverser<Void, Void> {
+public class CompLinkReduction extends FunPass {
 
-  public static void process(Fun inst) {
-    CompLinkReduction reduction = new CompLinkReduction();
-    reduction.traverse(inst, null);
+  @Override
+  public void process(Namespace root, KnowledgeBase kb) {
+    CompLinkReductionWorker reduction = new CompLinkReductionWorker();
+    reduction.traverse(root, null);
   }
+
+}
+
+class CompLinkReductionWorker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitDefault(Fun obj, Void param) {
