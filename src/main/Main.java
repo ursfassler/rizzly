@@ -18,12 +18,8 @@
 package main;
 
 import java.io.File;
-import java.util.ArrayList;
-
-import common.Designator;
 
 import error.RException;
-import evl.traverser.CWriter;
 import fun.other.Namespace;
 import fun.toevl.FunToEvl;
 
@@ -62,7 +58,6 @@ public class Main {
   }
 
   public static String compile(ClaOption opt) {
-    Designator rootfile;
     String debugdir;
     String outdir;
     String docdir;
@@ -74,20 +69,12 @@ public class Main {
       (new File(outdir)).mkdirs();
       (new File(docdir)).mkdirs();
     }
-    {
-      ArrayList<String> nl = opt.getRootComp().toList();
-      nl.remove(nl.size() - 1);
-      rootfile = new Designator(nl);
-    }
 
     Namespace fret = MainFun.doFun(opt, debugdir);
     FunToEvl funToAst = new FunToEvl();
     evl.other.Namespace aclasses = (evl.other.Namespace) funToAst.traverse(fret, null);
 
     MainEvl.doEvl(opt, outdir, debugdir, aclasses);
-
-    String cfile = outdir + "inst" + ".c";  // TODO get correct name
-    CWriter.print(aclasses, cfile);
 
     return outdir;
   }

@@ -15,11 +15,12 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package evl.traverser;
+package evl.pass;
 
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 
+import pass.EvlPass;
 import util.StreamWriter;
 
 import common.Property;
@@ -63,6 +64,7 @@ import evl.expression.unop.LogicNot;
 import evl.expression.unop.Uminus;
 import evl.expression.unop.UnaryExp;
 import evl.function.Function;
+import evl.knowledge.KnowledgeBase;
 import evl.other.EvlList;
 import evl.other.Named;
 import evl.other.Namespace;
@@ -96,22 +98,28 @@ import evl.variable.FuncVariable;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
 
-public class CWriter extends NullTraverser<Void, Boolean> {
+public class CWriter extends EvlPass {
   public static final String ARRAY_DATA_NAME = "data";
-  final private StreamWriter sw;
 
-  public CWriter(StreamWriter sw) {
-    super();
-    this.sw = sw;
-  }
-
-  static public void print(Evl obj, String filename) {
+  @Override
+  public void process(Namespace evl, KnowledgeBase kb) {
+    String cfile = kb.getOutDir() + evl.getName() + ".c";
     try {
-      CWriter printer = new CWriter(new StreamWriter(new PrintStream(filename)));
-      printer.traverse(obj, null);
+      CWriterWorker printer = new CWriterWorker(new StreamWriter(new PrintStream(cfile)));
+      printer.traverse(evl, null);
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }
+  }
+
+}
+
+class CWriterWorker extends NullTraverser<Void, Boolean> {
+  final private StreamWriter sw;
+
+  public CWriterWorker(StreamWriter sw) {
+    super();
+    this.sw = sw;
   }
 
   @Deprecated
@@ -317,7 +325,7 @@ public class CWriter extends NullTraverser<Void, Boolean> {
   @Override
   protected Void visitRefIndex(RefIndex obj, Boolean param) {
     sw.wr(".");
-    sw.wr(ARRAY_DATA_NAME);
+    sw.wr(CWriter.ARRAY_DATA_NAME);
     sw.wr("[");
     visit(obj.getIndex(), param);
     sw.wr("]");
@@ -474,7 +482,7 @@ public class CWriter extends NullTraverser<Void, Boolean> {
     sw.incIndent();
     visit(obj.getType(), param);
     sw.wr(" ");
-    sw.wr(ARRAY_DATA_NAME);
+    sw.wr(CWriter.ARRAY_DATA_NAME);
     sw.wr("[");
     sw.wr(obj.getSize().toString());
     sw.wr("]");
@@ -737,7 +745,7 @@ public class CWriter extends NullTraverser<Void, Boolean> {
   @Override
   protected Void visitArrayValue(ArrayValue obj, Boolean param) {
     sw.wr("{");
-    sw.wr(" ." + ARRAY_DATA_NAME + " = {");
+    sw.wr(" ." + CWriter.ARRAY_DATA_NAME + " = {");
     for (int i = 0; i < obj.getValue().size(); i++) {
       if (i > 0) {
         sw.wr(",");

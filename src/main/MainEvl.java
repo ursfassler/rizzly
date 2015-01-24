@@ -34,6 +34,7 @@ import evl.pass.BitLogicCategorizer;
 import evl.pass.BitnotFixer;
 import evl.pass.BlockReduction;
 import evl.pass.CRenamer;
+import evl.pass.CWriter;
 import evl.pass.CompareReplacer;
 import evl.pass.CompositionReduction;
 import evl.pass.ConstantPropagation;
@@ -123,8 +124,6 @@ public class MainEvl {
 
     passes.add(IfCutter.class);
 
-    // from cir
-
     passes.add(RangeReplacer.class);
     passes.add(RemoveUnused.class);
 
@@ -137,6 +136,8 @@ public class MainEvl {
     passes.add(TypeSort.class);
 
     passes.add(VarSort.class);
+
+    passes.add(CWriter.class);
 
     process(passes, aclasses, kb, dp);
   }

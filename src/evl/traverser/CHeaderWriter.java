@@ -38,6 +38,7 @@ import evl.function.header.FuncSubHandlerQuery;
 import evl.knowledge.KnowledgeBase;
 import evl.other.EvlList;
 import evl.other.Namespace;
+import evl.pass.CWriter;
 import evl.pass.check.type.specific.ExpressionTypeChecker;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;

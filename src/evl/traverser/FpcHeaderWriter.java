@@ -37,6 +37,7 @@ import evl.function.Function;
 import evl.knowledge.KnowledgeBase;
 import evl.other.EvlList;
 import evl.other.Namespace;
+import evl.pass.CWriter;
 import evl.pass.check.type.specific.ExpressionTypeChecker;
 import evl.type.Type;
 import evl.type.base.ArrayType;
