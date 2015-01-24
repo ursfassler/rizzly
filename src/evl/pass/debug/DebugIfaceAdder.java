@@ -15,7 +15,7 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package evl.traverser.debug;
+package evl.pass.debug;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -29,6 +29,7 @@ import evl.NullTraverser;
 import evl.composition.ImplComposition;
 import evl.expression.Expression;
 import evl.expression.Number;
+import evl.expression.TypeCast;
 import evl.expression.binop.Plus;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
@@ -46,6 +47,8 @@ import evl.statement.Block;
 import evl.statement.CallStmt;
 import evl.statement.Statement;
 import evl.statement.VarDefStmt;
+import evl.traverser.debug.EventRecvDebugCallAdder;
+import evl.traverser.debug.EventSendDebugCallAdder;
 import evl.type.Type;
 import evl.type.base.ArrayType;
 import evl.type.base.RangeType;
@@ -67,11 +70,6 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     this.sizeType = sizeType;
     this.nameNumType = nameNumType;
     this.voidType = voidType;
-  }
-
-  public static void process(Evl obj, ArrayType arrayType, RangeType sizeType, RangeType nameNumType, VoidType voidType, ArrayList<String> names) {
-    DebugIfaceAdder reduction = new DebugIfaceAdder(arrayType, sizeType, nameNumType, voidType, names);
-    reduction.traverse(obj, null);
   }
 
   private FuncSubHandlerEvent makeRecvProto(RangeType sizeType) {
@@ -133,7 +131,7 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
 
     EvlList<FuncVariable> param = new EvlList<FuncVariable>();
     param.add(func);
-    FuncPrivateVoid rfunc = new FuncPrivateVoid(info, "_" + callname, param, tr(voidType), new Block(info));
+    FuncPrivateVoid rfunc = new FuncPrivateVoid(info, "_" + callname, param, tr(voidType), body);
 
     return rfunc;
   }
@@ -171,6 +169,7 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
       code.add(def);
 
       Expression expr = new Plus(info, new Reference(info, argSize), new Number(info, BigInteger.ONE));
+      expr = new TypeCast(info, new SimpleRef<Type>(info, sizeType), expr);
       Assignment ass = new Assignment(info, new Reference(info, sizeP1), expr);
       code.add(ass);
     }

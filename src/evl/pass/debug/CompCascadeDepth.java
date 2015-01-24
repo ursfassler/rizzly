@@ -15,7 +15,7 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package evl.traverser.debug;
+package evl.pass.debug;
 
 import evl.Evl;
 import evl.NullTraverser;
@@ -23,19 +23,34 @@ import evl.composition.ImplComposition;
 import evl.expression.reference.Reference;
 import evl.hfsm.ImplHfsm;
 import evl.other.CompUse;
-import evl.other.Component;
 import evl.other.ImplElementary;
+import evl.other.Namespace;
+import evl.type.Type;
 
 public class CompCascadeDepth extends NullTraverser<Integer, Void> {
-
-  public static int get(Component root) {
-    CompCascadeDepth counter = new CompCascadeDepth();
-    return counter.traverse(root, null);
-  }
 
   @Override
   protected Integer visitDefault(Evl obj, Void param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+  }
+
+  @Override
+  protected Integer visitNamespace(Namespace obj, Void param) {
+    int max = 0;
+    for (Evl itr : obj.getChildren()) {
+      max = Math.max(max, visit(itr, param));
+    }
+    return max;
+  }
+
+  @Override
+  protected Integer visitType(Type obj, Void param) {
+    return 0;
+  }
+
+  @Override
+  protected Integer visitCompUse(CompUse obj, Void param) {
+    return 0;
   }
 
   @Override

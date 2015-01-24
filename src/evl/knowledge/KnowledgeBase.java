@@ -54,8 +54,14 @@ public class KnowledgeBase {
     return list.get(0);
   }
 
+  // TODO rename to invalidate
   public void clear() {
     entries.clear();
+  }
+
+  // TODO rename to invalidate
+  public <T extends KnowledgeEntry> void clear(Class<T> id) {
+    entries.remove(id);
   }
 
   @SuppressWarnings("unchecked")

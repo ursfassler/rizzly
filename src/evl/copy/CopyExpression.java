@@ -30,6 +30,7 @@ import evl.expression.NamedElementValue;
 import evl.expression.Number;
 import evl.expression.RangeValue;
 import evl.expression.RecordValue;
+import evl.expression.StringValue;
 import evl.expression.TypeCast;
 import evl.expression.UnionValue;
 import evl.expression.UnsafeUnionValue;
@@ -112,6 +113,11 @@ public class CopyExpression extends NullTraverser<Expression, Void> {
   @Override
   protected Expression visitNumber(Number obj, Void param) {
     return new Number(obj.getInfo(), obj.getValue());
+  }
+
+  @Override
+  protected Expression visitStringValue(StringValue obj, Void param) {
+    return new StringValue(obj.getInfo(), obj.getValue());
   }
 
   @Override

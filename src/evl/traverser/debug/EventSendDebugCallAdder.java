@@ -28,10 +28,9 @@ import error.ErrorType;
 import error.RError;
 import evl.DefTraverser;
 import evl.Evl;
-import evl.NullTraverser;
-import evl.composition.ImplComposition;
 import evl.expression.Expression;
 import evl.expression.Number;
+import evl.expression.reference.BaseRef;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.Reference;
 import evl.function.Function;
@@ -39,15 +38,10 @@ import evl.function.header.FuncCtrlOutDataIn;
 import evl.function.header.FuncCtrlOutDataOut;
 import evl.function.header.FuncPrivateVoid;
 import evl.other.EvlList;
-import evl.other.ImplElementary;
-import evl.other.Namespace;
-import evl.other.SubCallbacks;
 import evl.statement.Block;
 import evl.statement.CallStmt;
 import evl.statement.Statement;
 import evl.statement.intern.MsgPush;
-import evl.type.Type;
-import evl.variable.ConstGlobal;
 
 /**
  * Inserts a message call whenever an event is sent
@@ -55,7 +49,7 @@ import evl.variable.ConstGlobal;
  * @author urs
  *
  */
-public class EventSendDebugCallAdder extends NullTraverser<Void, Void> {
+public class EventSendDebugCallAdder extends DefTraverser<Void, Void> {
 
   private StmtTraverser st;
 
@@ -67,43 +61,6 @@ public class EventSendDebugCallAdder extends NullTraverser<Void, Void> {
   public static void process(Evl obj, ArrayList<String> names, FuncPrivateVoid debugSend) {
     EventSendDebugCallAdder reduction = new EventSendDebugCallAdder(debugSend, names);
     reduction.traverse(obj, null);
-  }
-
-  @Override
-  protected Void visitDefault(Evl obj, Void param) {
-    if (!(obj instanceof Type)) {
-      throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
-    }
-    return null;
-  }
-
-  @Override
-  protected Void visitConstGlobal(ConstGlobal obj, Void param) {
-    return null;
-  }
-
-  @Override
-  protected Void visitSubCallbacks(SubCallbacks obj, Void param) {
-    visitList(obj.getFunc(), param);
-    return null;
-  }
-
-  @Override
-  protected Void visitNamespace(Namespace obj, Void param) {
-    visitList(obj.getChildren(), param);
-    return null;
-  }
-
-  @Override
-  protected Void visitImplElementary(ImplElementary obj, Void param) {
-    visitList(obj.getFunction(), null);
-    visitList(obj.getSubCallback(), null);
-    return null;
-  }
-
-  @Override
-  protected Void visitImplComposition(ImplComposition obj, Void param) {
-    throw new RuntimeException("not yet implemented");
   }
 
   @Override
@@ -144,15 +101,12 @@ class StmtTraverser extends DefTraverser<Void, List<Statement>> {
   }
 
   @Override
-  protected Void visitReference(Reference obj, List<Statement> param) {
-    super.visitReference(obj, param);
+  protected Void visitBaseRef(BaseRef obj, List<Statement> param) {
+    super.visitBaseRef(obj, param);
 
     boolean isOut = (obj.getLink() instanceof FuncCtrlOutDataIn) || (obj.getLink() instanceof FuncCtrlOutDataOut);
 
     if (isOut) {
-      assert (obj.getOffset().size() == 1);
-      assert (obj.getOffset().get(0) instanceof RefCall);
-
       String funcName = obj.getLink().getName();
 
       int numFunc = names.indexOf(funcName);

@@ -17,9 +17,7 @@
 
 package main;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -30,9 +28,7 @@ import error.RError;
 import evl.Evl;
 import evl.hfsm.reduction.HfsmReduction;
 import evl.hfsm.reduction.HfsmToFsm;
-import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Component;
 import evl.other.Namespace;
 import evl.pass.BitLogicCategorizer;
 import evl.pass.BitnotFixer;
@@ -41,6 +37,7 @@ import evl.pass.CRenamer;
 import evl.pass.CompareReplacer;
 import evl.pass.CompositionReduction;
 import evl.pass.ConstantPropagation;
+import evl.pass.DebugIface;
 import evl.pass.EnumReduction;
 import evl.pass.HeaderWriter;
 import evl.pass.IfCutter;
@@ -66,12 +63,6 @@ import evl.pass.check.type.TypeChecker;
 import evl.pass.infrastructure.LinkOk;
 import evl.traverser.ConstTyper;
 import evl.traverser.SystemIfaceAdder;
-import evl.traverser.debug.CompCascadeDepth;
-import evl.traverser.debug.DebugIfaceAdder;
-import evl.traverser.debug.MsgNamesGetter;
-import evl.type.base.ArrayType;
-import evl.type.base.RangeType;
-import evl.type.special.VoidType;
 
 //TODO ensure that composition and hfsm use construct and destruct correctly
 
@@ -108,11 +99,9 @@ public class MainEvl {
     passes.add(SystemIfaceAdder.class);
     // passes.add(ExprCutter.class); // TODO reimplement
     if (opt.doDebugEvent()) {
-      // TODO reimplement
-      // names.addAll(addDebug(aclasses, root, dp, kb));
-      RError.err(ErrorType.Fatal, "Debug currently not supported");
+      passes.add(DebugIface.class);
       // only for debugging
-      // typecheck(classes, debugdir);
+      // passes.add(TypeChecker.class);
     }
 
     passes.add(RangeConverter.class);
@@ -177,6 +166,7 @@ public class MainEvl {
 
   private static void selfCheck(Namespace evl, KnowledgeBase kb) {
     (new LinkOk()).process(evl, kb);
+    // (new TypeChecker()).process(evl, kb);
   }
 
   @SuppressWarnings("unused")
@@ -192,30 +182,6 @@ public class MainEvl {
       System.out.print(header);
       System.out.println();
     }
-  }
-
-  private static ArrayList<String> addDebug(Namespace classes, Component root, DebugPrinter dp, KnowledgeBase kb) {
-    ArrayList<String> names = new ArrayList<String>(MsgNamesGetter.get(classes));
-    if (names.isEmpty()) {
-      return names; // this means that there is no input nor output interface
-    }
-
-    KnowBaseItem kbi = kb.getEntry(KnowBaseItem.class);
-
-    int depth = CompCascadeDepth.get(root);
-    depth += 2;
-    Collections.sort(names);
-
-    RangeType symNameSizeType = kbi.getRangeType(names.size());
-    ArrayType arrayType = kbi.getArray(BigInteger.valueOf(depth), symNameSizeType);
-    RangeType sizeType = kbi.getRangeType(depth);
-    VoidType voidType = kbi.getVoidType();
-
-    DebugIfaceAdder.process(classes, arrayType, sizeType, symNameSizeType, voidType, names);
-
-    dp.print("debug");
-
-    return names;
   }
 
 }

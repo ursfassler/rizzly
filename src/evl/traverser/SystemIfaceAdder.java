@@ -39,6 +39,7 @@ import evl.function.Function;
 import evl.function.header.FuncCtrlInDataIn;
 import evl.hfsm.ImplHfsm;
 import evl.knowledge.KnowBaseItem;
+import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
 import evl.other.CompUse;
 import evl.other.Component;
@@ -58,6 +59,8 @@ public class SystemIfaceAdder extends EvlPass {
     reduction.traverse(evl, null);
     SystemIfaceCaller caller = new SystemIfaceCaller(reduction.getCtors(), reduction.getDtors());
     caller.traverse(evl, null);
+
+    kb.clear(KnowType.class);
   }
 }
 

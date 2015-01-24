@@ -51,7 +51,7 @@ static int error = 0;
 static void printMsg( uint8_t *list, int size ){
   int i;
   for( i = size-1; i >= 0; i-- ){
-    printf( DEBUG_NAMES[list[i]] );
+    printf( inst__DebugName(list[i]) );
     if( i > 0 ){
       printf( "." );
     }
@@ -92,7 +92,7 @@ static void checkStep( What what, uint8_t *list, int size ){
   }
   int i;
   for( i = 0; i < size; i++ ){
-    if( strcmp( as->path[i], DEBUG_NAMES[list[size-1-i]] ) != 0 ){
+    if( strcmp( as->path[i], inst__DebugName(list[size-1-i]) ) != 0 ){
       printError( as );
       goto error;
     }
@@ -107,11 +107,11 @@ static void checkStep( What what, uint8_t *list, int size ){
   printf( "\n" );
 }
 
-void inst__msgSend(Array_4_R_0_6 sender, R_0_3 size){
+void inst__msgSend(Array_4_R_0_7 sender, R_0_3 size){
   checkStep( DBG_SEND, sender.data, size );
 }
 
-void inst__msgRecv(Array_4_R_0_6 receiver, R_0_3 size){
+void inst__msgRecv(Array_4_R_0_7 receiver, R_0_3 size){
   checkStep( DBG_RECV, receiver.data, size );
 }
 
