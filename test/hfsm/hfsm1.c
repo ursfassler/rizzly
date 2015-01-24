@@ -21,7 +21,7 @@ static const int values[NUM_STEP] = {
 static int step = 0;
 static int error = 0;
 
-void inst_evt(R_0_255 value){
+void inst_evt(R_1_79 value){
   if( step >= NUM_STEP ){
     printf( "Too many steps" );
     goto error;
