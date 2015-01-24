@@ -200,8 +200,8 @@ class CompInterfaceTypeCheckerWorker extends NullTraverser<Void, Void> {
   protected Void visitConnection(Connection obj, Void param) {
     Endpoint srcEp = obj.getEndpoint(Direction.in);
     Endpoint dstEp = obj.getEndpoint(Direction.out);
-    Function srcType = srcEp.getFunc();
-    Function dstType = dstEp.getFunc();
+    Function srcType = getIfaceFunc(srcEp);
+    Function dstType = getIfaceFunc(dstEp);
 
     Type st = kt.get(srcType);
     Type dt = kt.get(dstType);
@@ -231,6 +231,14 @@ class CompInterfaceTypeCheckerWorker extends NullTraverser<Void, Void> {
     }
 
     return null;
+  }
+
+  private Function getIfaceFunc(Endpoint ep) {
+    Function func = ep.getFunc();
+    if (func == null) {
+      RError.err(ErrorType.Error, ep.getInfo(), "Interface not found: " + ep.toString());
+    }
+    return func;
   }
 
   private Direction getDir(Function func) {
