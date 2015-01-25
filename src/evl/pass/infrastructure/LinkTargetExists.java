@@ -29,7 +29,7 @@ import evl.expression.reference.BaseRef;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
 
-public class LinkOk extends EvlPass {
+public class LinkTargetExists extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {

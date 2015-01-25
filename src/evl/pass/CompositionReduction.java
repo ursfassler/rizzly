@@ -189,7 +189,7 @@ class CompositionReductionWorker extends NullTraverser<Evl, Void> {
           assert (suha.getBody().getStatements().isEmpty());
           assert (con.getType() == MessageType.sync);
 
-          ReturnExpr call = makeQueryCall(con.getEndpoint(Direction.out), coniface);
+          ReturnExpr call = makeQueryCall(con.getEndpoint(Direction.out), suha);
           suha.getBody().getStatements().add(call);
         } else if (coniface instanceof FuncCtrlOutDataOut) {
           genSlotCall(elem, con, suha);

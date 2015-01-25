@@ -61,7 +61,7 @@ import evl.pass.check.Root;
 import evl.pass.check.RtcViolation;
 import evl.pass.check.Usefullness;
 import evl.pass.check.type.TypeChecker;
-import evl.pass.infrastructure.LinkOk;
+import evl.pass.infrastructure.LinkTargetExists;
 import evl.traverser.ConstTyper;
 import evl.traverser.SystemIfaceAdder;
 
@@ -143,31 +143,35 @@ public class MainEvl {
   }
 
   private static void process(List<Class<? extends EvlPass>> passes, Namespace evl, KnowledgeBase kb, DebugPrinter dp) {
-    for (Class<? extends EvlPass> ecl : passes) {
-      EvlPass pass = null;
-      try {
-        pass = ecl.newInstance();
-      } catch (InstantiationException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      } catch (IllegalAccessException e) {
-        // TODO Auto-generated catch block
-        e.printStackTrace();
-      }
-      if (pass == null) {
-        RError.err(ErrorType.Fatal, "Could not create pass: " + ecl.getName());
-      } else {
-        pass.process(evl, kb);
-        dp.print(pass.getName());
+    List<Class<? extends EvlPass>> checks = new ArrayList<Class<? extends EvlPass>>();
+    checks.add(LinkTargetExists.class);
+    // checks.add(TypeChecker.class);
 
-        selfCheck(evl, kb);
+    for (Class<? extends EvlPass> ecl : passes) {
+      runPass(ecl, evl, kb);
+      dp.print(ecl.getName());
+      for (Class<? extends EvlPass> check : checks) {
+        runPass(check, evl, kb);
       }
     }
   }
 
-  private static void selfCheck(Namespace evl, KnowledgeBase kb) {
-    (new LinkOk()).process(evl, kb);
-    // (new TypeChecker()).process(evl, kb);
+  private static void runPass(Class<? extends EvlPass> ecl, Namespace evl, KnowledgeBase kb) {
+    EvlPass pass = null;
+    try {
+      pass = ecl.newInstance();
+    } catch (InstantiationException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    } catch (IllegalAccessException e) {
+      // TODO Auto-generated catch block
+      e.printStackTrace();
+    }
+    if (pass == null) {
+      RError.err(ErrorType.Fatal, "Could not create pass: " + ecl.getName());
+    } else {
+      pass.process(evl, kb);
+    }
   }
 
   @SuppressWarnings("unused")
