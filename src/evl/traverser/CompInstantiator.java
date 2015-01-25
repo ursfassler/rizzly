@@ -52,6 +52,7 @@ public class CompInstantiator extends NullTraverser<ImplElementary, Namespace> {
     ImplElementary inst = Copy.copy(obj);
 
     ns.addAll(inst.getIface());
+    ns.addAll(inst.getType());
     ns.addAll(inst.getConstant());
     ns.addAll(inst.getVariable());
     ns.addAll(inst.getFunction());

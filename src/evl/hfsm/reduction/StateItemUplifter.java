@@ -30,22 +30,24 @@ import evl.hfsm.ImplHfsm;
 import evl.hfsm.State;
 import evl.hfsm.StateItem;
 import evl.knowledge.KnowledgeBase;
+import evl.type.Type;
+import evl.variable.ConstPrivate;
 
 /**
- * Moves all functions of all states to the top-state.
+ * Moves items of all states to the top-state.
  *
  * @author urs
  *
  */
-public class StateFuncUplifter extends NullTraverser<Void, Designator> {
+public class StateItemUplifter extends NullTraverser<Void, Designator> {
   final private List<StateItem> func = new ArrayList<StateItem>();
 
-  public StateFuncUplifter(KnowledgeBase kb) {
+  public StateItemUplifter(KnowledgeBase kb) {
     super();
   }
 
   static public void process(ImplHfsm obj, KnowledgeBase kb) {
-    StateFuncUplifter know = new StateFuncUplifter(kb);
+    StateItemUplifter know = new StateItemUplifter(kb);
     know.traverse(obj, null);
   }
 
@@ -92,4 +94,21 @@ public class StateFuncUplifter extends NullTraverser<Void, Designator> {
     func.add(obj);
     return null;
   }
+
+  @Override
+  protected Void visitType(Type obj, Designator param) {
+    param = new Designator(param, obj.getName());
+    obj.setName(param.toString(Designator.NAME_SEP));
+    func.add(obj);
+    return null;
+  }
+
+  @Override
+  protected Void visitConstPrivate(ConstPrivate obj, Designator param) {
+    param = new Designator(param, obj.getName());
+    obj.setName(param.toString(Designator.NAME_SEP));
+    func.add(obj);
+    return null;
+  }
+
 }

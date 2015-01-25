@@ -18,7 +18,6 @@
 package evl.hfsm.reduction;
 
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.Map;
 
 import common.Designator;
@@ -35,11 +34,8 @@ import evl.expression.reference.SimpleRef;
 import evl.hfsm.State;
 import evl.hfsm.StateComposite;
 import evl.hfsm.StateSimple;
-import evl.knowledge.KnowParent;
-import evl.knowledge.KnowledgeBase;
 import evl.other.EvlList;
 import evl.other.Named;
-import evl.other.Namespace;
 import evl.type.Type;
 import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
@@ -57,19 +53,12 @@ import evl.variable.StateVariable;
 public class StateTypeBuilder extends NullTraverser<NamedElement, EvlList<NamedElement>> {
   public static final String SUB_ENTRY_NAME = Designator.NAME_SEP + "sub";
   public static final String CONST_PREFIX = Designator.NAME_SEP + "INIT" + Designator.NAME_SEP;
-  final private Namespace typeSpace;
-  final private KnowParent kp;
   final private Map<RecordType, RecordValue> initValues = new HashMap<RecordType, RecordValue>();
-  final private Map<RecordType, Constant> initVar = new HashMap<RecordType, Constant>();
+  final private Map<RecordType, ConstPrivate> initVar = new HashMap<RecordType, ConstPrivate>();
   final private Map<StateVariable, EvlList<NamedElement>> epath = new HashMap<StateVariable, EvlList<NamedElement>>();
+  final private Map<State, RecordType> stateType = new HashMap<State, RecordType>();
 
-  public StateTypeBuilder(Namespace typeSpace, KnowledgeBase kb) {
-    super();
-    this.typeSpace = typeSpace;
-    kp = kb.getEntry(KnowParent.class);
-  }
-
-  public Map<RecordType, Constant> getInitVar() {
+  public Map<RecordType, ConstPrivate> getInitVar() {
     return initVar;
   }
 
@@ -80,16 +69,6 @@ public class StateTypeBuilder extends NullTraverser<NamedElement, EvlList<NamedE
   private String getName(Named obj) {
     assert (obj.getName().length() > 0);
     return obj.getName();
-  }
-
-  // workaround to make sure that records do not have the same name if sustates have same names
-  private String getFullName(Named obj) {
-    LinkedList<String> full = new LinkedList<String>();
-    for (Evl evl = obj; evl instanceof State; evl = kp.getParent(evl)) {
-      full.addFirst(((State) evl).getName());
-    }
-
-    return (new Designator(full)).toString(Designator.NAME_SEP);
   }
 
   @Override
@@ -112,21 +91,20 @@ public class StateTypeBuilder extends NullTraverser<NamedElement, EvlList<NamedE
   }
 
   public RecordType makeRecord(State obj) {
-    String name = getFullName(obj);
-    name = Designator.NAME_SEP + name + Designator.NAME_SEP + "Data";
+    String name = Designator.NAME_SEP + "Data";
     RecordType record = new RecordType(obj.getInfo(), name, new EvlList<NamedElement>());
-    typeSpace.add(record);
 
+    obj.getItem().add(record);
+    stateType.put(obj, record);
     initValues.put(record, new RecordValue(obj.getInfo(), new EvlList<NamedElementValue>(), new SimpleRef<Type>(obj.getInfo(), record)));
 
     return record;
   }
 
   public UnsafeUnionType makeUnion(State obj) {
-    String name = getFullName(obj);
-    name = Designator.NAME_SEP + name + Designator.NAME_SEP + "Sub";
+    String name = Designator.NAME_SEP + "Sub";
     UnsafeUnionType union = new UnsafeUnionType(obj.getInfo(), name, new EvlList<NamedElement>());
-    typeSpace.add(union);
+    obj.getItem().add(union);
     return union;
   }
 
@@ -191,9 +169,9 @@ public class StateTypeBuilder extends NullTraverser<NamedElement, EvlList<NamedE
       epath.put(var, path);
     }
 
-    Constant init = new ConstPrivate(state.getInfo(), CONST_PREFIX + getName(type), new SimpleRef<Type>(state.getInfo(), type), value);
+    ConstPrivate init = new ConstPrivate(state.getInfo(), CONST_PREFIX + getName(type), new SimpleRef<Type>(state.getInfo(), type), value);
     initVar.put(type, init);
-    typeSpace.add(init);
+    state.getItem().add(init);
   }
 
 }

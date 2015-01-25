@@ -59,6 +59,10 @@ class TypeCheckerWorker extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitImplElementary(ImplElementary obj, Void sym) {
+    visitList(obj.getFunction(), sym);
+    visitList(obj.getIface(), sym);
+    visit(obj.getQueue(), sym);
+    visitList(obj.getType(), sym);
     visitList(obj.getVariable(), sym);
     visitList(obj.getConstant(), sym);
     visitList(obj.getFunction(), sym);

@@ -111,7 +111,7 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
     FuncPrivateVoid func = new FuncPrivateVoid(info, name, params, new SimpleRef<Type>(info, kbi.getVoidType()), trans.getBody());
     trans.setBody(new Block(info));
 
-    HfsmReduction.relinkActualParameterRef(trans.getParam(), func.getParam(), func.getBody());
+    FsmReduction.relinkActualParameterRef(trans.getParam(), func.getParam(), func.getBody());
 
     return func;
   }

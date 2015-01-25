@@ -26,8 +26,6 @@ import debug.DebugPrinter;
 import error.ErrorType;
 import error.RError;
 import evl.Evl;
-import evl.hfsm.reduction.HfsmReduction;
-import evl.hfsm.reduction.HfsmToFsm;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
 import evl.pass.BitLogicCategorizer;
@@ -41,6 +39,7 @@ import evl.pass.ConstantPropagation;
 import evl.pass.DebugIface;
 import evl.pass.EnumReduction;
 import evl.pass.HeaderWriter;
+import evl.pass.HfsmReduction;
 import evl.pass.IfCutter;
 import evl.pass.InitVarTyper;
 import evl.pass.Instantiation;
@@ -62,6 +61,7 @@ import evl.pass.check.RtcViolation;
 import evl.pass.check.Usefullness;
 import evl.pass.check.type.TypeChecker;
 import evl.pass.infrastructure.LinkTargetExists;
+import evl.pass.infrastructure.VarLinkOk;
 import evl.traverser.ConstTyper;
 import evl.traverser.SystemIfaceAdder;
 
@@ -91,7 +91,6 @@ public class MainEvl {
     passes.add(IntroduceConvert.class);
     passes.add(OpenReplace.class);
     passes.add(CompositionReduction.class);
-    passes.add(HfsmToFsm.class);
     passes.add(HfsmReduction.class);
     passes.add(ReduceUnion.class);
     passes.add(InitVarTyper.class);
@@ -145,6 +144,7 @@ public class MainEvl {
   private static void process(List<Class<? extends EvlPass>> passes, Namespace evl, KnowledgeBase kb, DebugPrinter dp) {
     List<Class<? extends EvlPass>> checks = new ArrayList<Class<? extends EvlPass>>();
     checks.add(LinkTargetExists.class);
+    checks.add(VarLinkOk.class);
     // checks.add(TypeChecker.class);
 
     for (Class<? extends EvlPass> ecl : passes) {

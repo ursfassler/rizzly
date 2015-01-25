@@ -247,6 +247,8 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
         comp.getVariable().add((evl.variable.Variable) ni);
       } else if (ni instanceof InterfaceFunction) {
         comp.getIface().add((InterfaceFunction) ni);
+      } else if (ni instanceof evl.type.Type) {
+        comp.getType().add((evl.type.Type) ni);
       } else {
         throw new RuntimeException("Not yet implemented: " + ni.getClass().getCanonicalName());
       }

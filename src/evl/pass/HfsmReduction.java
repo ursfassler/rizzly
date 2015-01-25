@@ -15,35 +15,25 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package evl.type;
+package evl.pass;
 
-import common.ElementInfo;
+import pass.EvlPass;
+import evl.copy.Relinker;
+import evl.hfsm.reduction.FsmReduction;
+import evl.hfsm.reduction.HfsmToFsm;
+import evl.knowledge.KnowledgeBase;
+import evl.other.Namespace;
 
-import evl.EvlBase;
-import evl.hfsm.StateItem;
-import evl.other.Named;
-
-abstract public class Type extends EvlBase implements Named, StateItem {
-  private String name;
-
-  public Type(ElementInfo info, String name) {
-    super(info);
-    this.name = name;
-  }
+public class HfsmReduction extends EvlPass {
 
   @Override
-  public String toString() {
-    return name;
-  }
+  public void process(Namespace evl, KnowledgeBase kb) {
+    HfsmToFsm toFsm = new HfsmToFsm(kb);
+    toFsm.traverse(evl, null);
 
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public void setName(String name) {
-    this.name = name;
+    FsmReduction reduction = new FsmReduction(kb);
+    reduction.traverse(evl, null);
+    Relinker.relink(evl, reduction.getMap());
   }
 
 }

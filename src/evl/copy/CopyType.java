@@ -26,6 +26,8 @@ import evl.type.base.EnumType;
 import evl.type.base.RangeType;
 import evl.type.base.StringType;
 import evl.type.composed.RecordType;
+import evl.type.composed.UnionType;
+import evl.type.composed.UnsafeUnionType;
 import evl.type.special.VoidType;
 
 public class CopyType extends NullTraverser<Type, Void> {
@@ -78,6 +80,18 @@ public class CopyType extends NullTraverser<Type, Void> {
   @Override
   protected Type visitVoidType(VoidType obj, Void param) {
     return new VoidType();
+  }
+
+  @Override
+  protected Type visitUnionType(UnionType obj, Void param) {
+    UnionType type = new UnionType(obj.getInfo(), obj.getName(), cast.copy(obj.getElement()), cast.copy(obj.getTag()));
+    return type;
+  }
+
+  @Override
+  protected Type visitUnsafeUnionType(UnsafeUnionType obj, Void param) {
+    UnsafeUnionType type = new UnsafeUnionType(obj.getInfo(), obj.getName(), cast.copy(obj.getElement()));
+    return type;
   }
 
 }

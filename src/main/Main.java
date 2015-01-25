@@ -34,6 +34,7 @@ import fun.toevl.FunToEvl;
 //TODO check for zero before division
 //TODO check range by user input
 //TODO check if event handling is in progress when starting event handling
+//TODO allow type declaration in elementary; make sure type is not escaping
 
 public class Main {
 

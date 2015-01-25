@@ -30,6 +30,7 @@ import evl.statement.IfStmt;
  * Ensures that the if statement has at most one option
  *
  */
+// TODO replace IfStmt with simple if stmt or remove simple if statement
 public class IfCutter extends EvlPass {
   static final private IfCutterWorker INSTANCE = new IfCutterWorker();
 

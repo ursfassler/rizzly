@@ -279,6 +279,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.incIndent();
 
     visitListNl(obj.getComponent(), param);
+    visitListNl(obj.getType(), param);
     visitListNl(obj.getConstant(), param);
     visitListNl(obj.getVariable(), param);
 

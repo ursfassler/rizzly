@@ -79,7 +79,6 @@ import evl.hfsm.StateComposite;
 import evl.hfsm.StateSimple;
 import evl.hfsm.Transition;
 import evl.other.CompUse;
-import evl.other.Component;
 import evl.other.ImplElementary;
 import evl.other.Namespace;
 import evl.other.Queue;
@@ -125,15 +124,11 @@ import evl.variable.StateVariable;
 public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
-  protected R visitComponent(Component obj, P param) {
+  protected R visitImplElementary(ImplElementary obj, P param) {
     visitList(obj.getFunction(), param);
     visitList(obj.getIface(), param);
     visit(obj.getQueue(), param);
-    return super.visitComponent(obj, param);
-  }
-
-  @Override
-  protected R visitImplElementary(ImplElementary obj, P param) {
+    visitList(obj.getType(), param);
     visitList(obj.getConstant(), param);
     visitList(obj.getVariable(), param);
     visitList(obj.getComponent(), param);
@@ -145,6 +140,9 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitImplComposition(ImplComposition obj, P param) {
+    visitList(obj.getFunction(), param);
+    visitList(obj.getIface(), param);
+    visit(obj.getQueue(), param);
     visitList(obj.getComponent(), param);
     visitList(obj.getConnection(), param);
     return null;
@@ -152,6 +150,9 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitImplHfsm(ImplHfsm obj, P param) {
+    visitList(obj.getFunction(), param);
+    visitList(obj.getIface(), param);
+    visit(obj.getQueue(), param);
     visit(obj.getTopstate(), param);
     return null;
   }

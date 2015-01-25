@@ -1,0 +1,25 @@
+
+Time = Elementary
+  readDigit: response( digit: R{0,3} ):R{0,9}
+    return digit;
+  end
+end
+
+Display = Elementary
+  readSym : query( digit: R{0,3} ):R{0,9};
+  
+  tick: slot()
+    readSym( 0 );
+  end
+end
+
+SubrespLink = Composition
+  tick: slot();
+  
+  display : Display;
+  time    : Time;
+  
+  tick -> display.tick;
+  display.readSym -> time.readDigit;
+end
+

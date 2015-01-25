@@ -21,8 +21,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import pass.EvlPass;
-
 import common.Designator;
 import common.ElementInfo;
 
@@ -71,12 +69,16 @@ import evl.variable.FuncVariable;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
 
-public class HfsmReduction extends EvlPass {
-  @Override
-  public void process(Namespace evl, KnowledgeBase kb) {
-    HfsmReductionTraverser reduction = new HfsmReductionTraverser(kb);
-    reduction.traverse(evl, null);
-    Relinker.relink(evl, reduction.getMap());
+public class FsmReduction extends NullTraverser<Evl, Namespace> {
+  final private Reduction reduction;
+
+  public FsmReduction(KnowledgeBase kb) {
+    super();
+    reduction = new Reduction(kb);
+  }
+
+  public Map<? extends Named, ? extends Named> getMap() {
+    return reduction.getMap();
   }
 
   /**
@@ -89,20 +91,6 @@ public class HfsmReduction extends EvlPass {
       map.put(oldParam.get(i), newParam.get(i));
     }
     Relinker.relink(body, map);
-  }
-
-}
-
-class HfsmReductionTraverser extends NullTraverser<Evl, Namespace> {
-  final private Reduction reduction;
-
-  public HfsmReductionTraverser(KnowledgeBase kb) {
-    super();
-    reduction = new Reduction(kb);
-  }
-
-  public Map<? extends Named, ? extends Named> getMap() {
-    return reduction.getMap();
   }
 
   @Override
@@ -148,6 +136,8 @@ class Reduction {
         elem.getVariable().add((Variable) item);
       } else if (item instanceof Function) {
         elem.getFunction().add((Function) item);
+      } else if (item instanceof Type) {
+        elem.getType().add((Type) item);
       } else if (item instanceof Transition) {
       } else if (item instanceof StateSimple) {
       } else {
@@ -270,7 +260,7 @@ class Reduction {
       assert (query.getBody().getStatements().size() == 1);
       ReturnExpr retcall = (ReturnExpr) query.getBody().getStatements().get(0);
 
-      HfsmReduction.relinkActualParameterRef(query.getParam(), param, retcall.getExpr());
+      FsmReduction.relinkActualParameterRef(query.getParam(), param, retcall.getExpr());
 
       Block stateBb = new Block(info);
       stateBb.getStatements().add(retcall);
@@ -327,7 +317,7 @@ class Reduction {
     for (Transition trans : transList) {
       Block blockThen = makeTransition(trans, newparam, stateVariable, enumMap);
 
-      HfsmReduction.relinkActualParameterRef(trans.getParam(), newparam, trans.getGuard()); // relink references to
+      FsmReduction.relinkActualParameterRef(trans.getParam(), newparam, trans.getGuard()); // relink references to
       // arguments to the
       // new ones
 
@@ -363,7 +353,7 @@ class Reduction {
     Block transCode = new Block(info);
 
     Block body = trans.getBody();
-    HfsmReduction.relinkActualParameterRef(trans.getParam(), param, body);
+    FsmReduction.relinkActualParameterRef(trans.getParam(), param, body);
 
     transCode.getStatements().addAll(body.getStatements());
 

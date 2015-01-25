@@ -21,10 +21,12 @@ import common.ElementInfo;
 
 import evl.expression.reference.SimpleRef;
 import evl.function.header.FuncPrivateVoid;
+import evl.type.Type;
 import evl.variable.Constant;
 import evl.variable.Variable;
 
 final public class ImplElementary extends Component {
+  final private EvlList<Type> type = new EvlList<Type>();
   final private EvlList<Variable> variable = new EvlList<Variable>();
   final private EvlList<Constant> constant = new EvlList<Constant>();
   final private EvlList<CompUse> component = new EvlList<CompUse>();
@@ -36,6 +38,10 @@ final public class ImplElementary extends Component {
     super(info, name);
     this.entryFunc = entryFunc;
     this.exitFunc = exitFunc;
+  }
+
+  public EvlList<Type> getType() {
+    return type;
   }
 
   public EvlList<Variable> getVariable() {

@@ -32,6 +32,11 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  public void subrespLink() {
+    compile("subrespLink", TestSteps.COMPILE_TO_LLVM, false, false);
+  }
+
+  @Test
   public void logicNot() {
     compile("logicNot", TestSteps.EXECUTE, false, false);
   }

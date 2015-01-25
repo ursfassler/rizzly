@@ -121,6 +121,7 @@ class KnowChildTraverser extends NullTraverser<Set<Evl>, String> {
   protected Set<Evl> visitImplElementary(ImplElementary obj, String param) {
     Set<Evl> rset = new HashSet<Evl>();
     addIfFound(obj.getComponent().find(param), rset);
+    addIfFound(obj.getType().find(param), rset);
     addIfFound(obj.getConstant().find(param), rset);
     addIfFound(obj.getVariable().find(param), rset);
     addIfFound(obj.getSubCallback().find(param), rset);

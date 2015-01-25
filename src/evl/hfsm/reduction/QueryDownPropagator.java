@@ -195,7 +195,7 @@ class QueryFuncMaker extends NullTraverser<Void, Designator> {
     FuncPrivateRet func = new FuncPrivateRet(ElementInfo.NO, param.toString(), Copy.copy(obj.getParam()), Copy.copy(obj.getRet()), obj.getBody());
     obj.setBody(new Block(ElementInfo.NO));
 
-    HfsmReduction.relinkActualParameterRef(obj.getParam(), func.getParam(), func.getBody());
+    FsmReduction.relinkActualParameterRef(obj.getParam(), func.getParam(), func.getBody());
 
     qfunc.put(obj, func);
 

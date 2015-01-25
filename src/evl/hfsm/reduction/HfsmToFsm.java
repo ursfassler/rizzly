@@ -20,9 +20,6 @@ package evl.hfsm.reduction;
 import java.util.HashMap;
 import java.util.Map;
 
-import pass.EvlPass;
-
-import common.Designator;
 import common.ElementInfo;
 
 import evl.Evl;
@@ -41,20 +38,10 @@ import evl.variable.StateVariable;
 
 //TODO set correct values when switching states
 
-public class HfsmToFsm extends EvlPass {
-
-  @Override
-  public void process(Namespace evl, KnowledgeBase kb) {
-    HfsmToFsmWorker reduction = new HfsmToFsmWorker(kb);
-    reduction.traverse(evl, null);
-  }
-
-}
-
-class HfsmToFsmWorker extends NullTraverser<Void, Namespace> {
+public class HfsmToFsm extends NullTraverser<Void, Namespace> {
   KnowledgeBase kb;
 
-  public HfsmToFsmWorker(KnowledgeBase kb) {
+  public HfsmToFsm(KnowledgeBase kb) {
     super();
     this.kb = kb;
   }
@@ -82,16 +69,13 @@ class HfsmToFsmWorker extends NullTraverser<Void, Namespace> {
 
   @Override
   protected Void visitImplHfsm(ImplHfsm obj, Namespace param) {
-    // TODO make clean namespace-tree for hfsm types and constants
-    Namespace fsmSpace = param.force(Designator.NAME_SEP + obj.getName());
-
     QueryDownPropagator.process(obj, kb);
 
     TransitionRedirecter.process(obj.getTopstate());
     TransitionDownPropagator.process(obj, kb);
 
     {
-      StateTypeBuilder stb = new StateTypeBuilder(fsmSpace, kb);
+      StateTypeBuilder stb = new StateTypeBuilder();
       NamedElement elem = stb.traverse(obj.getTopstate(), new EvlList<NamedElement>());
       Type stateType = elem.getRef().getLink();
 
@@ -112,7 +96,7 @@ class HfsmToFsmWorker extends NullTraverser<Void, Namespace> {
     }
 
     EntryExitUpdater.process(obj, kb);
-    StateFuncUplifter.process(obj, kb);
+    StateItemUplifter.process(obj, kb);
     TransitionUplifter.process(obj);
     LeafStateUplifter.process(obj, kb);
 
