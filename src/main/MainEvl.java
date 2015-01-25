@@ -22,9 +22,10 @@ import java.util.List;
 import java.util.Map;
 
 import pass.EvlPass;
+
+import common.Designator;
+
 import debug.DebugPrinter;
-import error.ErrorType;
-import error.RError;
 import evl.Evl;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
@@ -70,108 +71,109 @@ import evl.traverser.SystemIfaceAdder;
 public class MainEvl {
   public static void doEvl(ClaOption opt, String outdir, String debugdir, Namespace aclasses) {
     KnowledgeBase kb = new KnowledgeBase(aclasses, outdir, debugdir);
-    DebugPrinter dp = new DebugPrinter(aclasses, debugdir);
 
-    List<Class<? extends EvlPass>> passes = new ArrayList<Class<? extends EvlPass>>();
+    PassGroup passes = new PassGroup("evl");
 
-    passes.add(ConstTyper.class);
+    passes.addCheck(new LinkTargetExists());
+    passes.addCheck(new VarLinkOk());
+    // passes.addCheck(TypeChecker.class);
+
+    passes.add(new ConstTyper());
 
     if (!opt.doLazyModelCheck()) {
-      passes.add(Root.class);
-      passes.add(Usefullness.class);
-      passes.add(RtcViolation.class);
-      passes.add(Io.class);
-      passes.add(HfsmTransScopeCheck.class);
-      passes.add(CompInterfaceTypeChecker.class);
-      passes.add(ModelChecker.class);
+      // TODO check that model check does not change AST
+      PassGroup modelcheck = new PassGroup("modelcheck");
+      modelcheck.add(new Root());
+      modelcheck.add(new Usefullness());
+      modelcheck.add(new RtcViolation());
+      modelcheck.add(new Io());
+      modelcheck.add(new HfsmTransScopeCheck());
+      modelcheck.add(new CompInterfaceTypeChecker());
+      modelcheck.add(new ModelChecker());
+      passes.add(modelcheck);
     }
 
     // FuncHeaderReplacegr.process(aclasses, kb); //TODO remove if not used
 
-    passes.add(IntroduceConvert.class);
-    passes.add(OpenReplace.class);
-    passes.add(CompositionReduction.class);
-    passes.add(HfsmReduction.class);
-    passes.add(ReduceUnion.class);
-    passes.add(InitVarTyper.class);
-    passes.add(BitLogicCategorizer.class);
-    passes.add(TypeChecker.class);
-    passes.add(SystemIfaceAdder.class);
+    {
+      PassGroup reduction = new PassGroup("reduction");
+      reduction.checks.addAll(passes.checks);
+      reduction.add(new IntroduceConvert());
+      reduction.add(new OpenReplace());
+      reduction.add(new CompositionReduction());
+      reduction.add(new HfsmReduction());
+      reduction.add(new ReduceUnion());
+      passes.add(reduction);
+    }
+
+    passes.add(new InitVarTyper());
+    passes.add(new BitLogicCategorizer());
+    passes.add(new TypeChecker());
+    passes.add(new SystemIfaceAdder());
     // passes.add(ExprCutter.class); // TODO reimplement
     if (opt.doDebugEvent()) {
-      passes.add(DebugIface.class);
+      passes.add(new DebugIface());
       // only for debugging
       // passes.add(TypeChecker.class);
     }
 
-    passes.add(RangeConverter.class);
-    passes.add(CompareReplacer.class);
+    passes.add(new RangeConverter());
+    passes.add(new CompareReplacer());
 
-    passes.add(BitnotFixer.class);
+    passes.add(new BitnotFixer());
 
-    passes.add(Instantiation.class);
+    passes.add(new Instantiation());
 
-    passes.add(HeaderWriter.class);
+    passes.add(new HeaderWriter());
 
-    passes.add(ConstantPropagation.class);
+    passes.add(new ConstantPropagation());
 
     // Have to do it here since queue reduction creates enums
-    passes.add(EnumReduction.class);
-    passes.add(ConstantPropagation.class);
+    passes.add(new EnumReduction());
+    passes.add(new ConstantPropagation());
 
-    passes.add(RemoveUnused.class);
+    passes.add(new RemoveUnused());
 
-    passes.add(IfCutter.class);
+    passes.add(new IfCutter());
 
-    passes.add(RangeReplacer.class);
-    passes.add(RemoveUnused.class);
+    passes.add(new RangeReplacer());
+    passes.add(new RemoveUnused());
 
-    passes.add(BlockReduction.class);
+    {
+      PassGroup cprep = new PassGroup("cout");
+      cprep.checks.addAll(passes.checks);
+      cprep.add(new BlockReduction());
+      cprep.add(new VarDeclToTop());
+      cprep.add(new CRenamer());
+      cprep.add(new TypeSort());
+      cprep.add(new VarSort());
+      cprep.add(new CWriter());
+      passes.add(cprep);
+    }
 
-    passes.add(VarDeclToTop.class);
-
-    passes.add(CRenamer.class);
-
-    passes.add(TypeSort.class);
-
-    passes.add(VarSort.class);
-
-    passes.add(CWriter.class);
-
-    process(passes, aclasses, kb, dp);
+    process(passes, new Designator(), new DebugPrinter(aclasses, kb.getDebugDir()), aclasses, kb);
   }
 
-  private static void process(List<Class<? extends EvlPass>> passes, Namespace evl, KnowledgeBase kb, DebugPrinter dp) {
-    List<Class<? extends EvlPass>> checks = new ArrayList<Class<? extends EvlPass>>();
-    checks.add(LinkTargetExists.class);
-    checks.add(VarLinkOk.class);
-    // checks.add(TypeChecker.class);
-
-    for (Class<? extends EvlPass> ecl : passes) {
-      runPass(ecl, evl, kb);
-      dp.print(ecl.getName());
-      for (Class<? extends EvlPass> check : checks) {
-        runPass(check, evl, kb);
+  public static void process(PassGroup group, Designator prefix, DebugPrinter dp, Namespace evl, KnowledgeBase kb) {
+    prefix = new Designator(prefix, group.getName());
+    for (Pass pass : group.passes) {
+      if (pass instanceof PassGroup) {
+        process((PassGroup) pass, prefix, dp, evl, kb);
+        for (EvlPass check : group.checks) {
+          check.process(evl, kb);
+        }
+      } else if (pass instanceof PassItem) {
+        process((PassItem) pass, prefix, dp, evl, kb);
+      } else {
+        throw new RuntimeException("not yet implemented: " + pass.getClass().getCanonicalName());
       }
     }
   }
 
-  private static void runPass(Class<? extends EvlPass> ecl, Namespace evl, KnowledgeBase kb) {
-    EvlPass pass = null;
-    try {
-      pass = ecl.newInstance();
-    } catch (InstantiationException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    } catch (IllegalAccessException e) {
-      // TODO Auto-generated catch block
-      e.printStackTrace();
-    }
-    if (pass == null) {
-      RError.err(ErrorType.Fatal, "Could not create pass: " + ecl.getName());
-    } else {
-      pass.process(evl, kb);
-    }
+  public static void process(PassItem item, Designator prefix, DebugPrinter dp, Namespace evl, KnowledgeBase kb) {
+    prefix = new Designator(prefix, item.getName());
+    item.pass.process(evl, kb);
+    dp.print(prefix.toString("."));
   }
 
   @SuppressWarnings("unused")
@@ -187,6 +189,55 @@ public class MainEvl {
       System.out.print(header);
       System.out.println();
     }
+  }
+
+}
+
+class Pass {
+  final private String name;
+
+  Pass(String name) {
+    super();
+    this.name = name;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+}
+
+class PassItem extends Pass {
+  EvlPass pass;
+
+  public PassItem(EvlPass pass, String name) {
+    super(name);
+    this.pass = pass;
+  }
+}
+
+class PassGroup extends Pass {
+  List<Pass> passes = new ArrayList<Pass>();
+  List<EvlPass> checks = new ArrayList<EvlPass>();
+
+  PassGroup(String name) {
+    super(name);
+  }
+
+  public void add(EvlPass pass, String name) {
+    add(new PassItem(pass, name));
+  }
+
+  public void add(EvlPass pass) {
+    add(new PassItem(pass, pass.getClass().getSimpleName()));
+  }
+
+  public void add(Pass pass) {
+    passes.add(pass);
+  }
+
+  public void addCheck(EvlPass pass) {
+    checks.add(pass);
   }
 
 }

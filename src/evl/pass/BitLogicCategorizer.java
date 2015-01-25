@@ -49,12 +49,10 @@ import evl.type.base.RangeType;
  *
  */
 public class BitLogicCategorizer extends EvlPass {
-  private final static BitLogicCategorizerWorker INSTANCE = new BitLogicCategorizerWorker();
-
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
     KnowType kt = kb.getEntry(KnowType.class);
-    INSTANCE.traverse(evl, kt);
+    new BitLogicCategorizerWorker().traverse(evl, kt);
   }
 
 }

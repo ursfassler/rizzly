@@ -32,11 +32,10 @@ import evl.statement.IfStmt;
  */
 // TODO replace IfStmt with simple if stmt or remove simple if statement
 public class IfCutter extends EvlPass {
-  static final private IfCutterWorker INSTANCE = new IfCutterWorker();
-
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    INSTANCE.traverse(evl, null);
+    IfCutterWorker worker = new IfCutterWorker();
+    worker.traverse(evl, null);
   }
 
 }

@@ -36,11 +36,10 @@ import evl.variable.Constant;
  *
  */
 public class ConstantPropagation extends EvlPass {
-  final private static ConstantPropagationWorker INSTANCE = new ConstantPropagationWorker();
-
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    INSTANCE.traverse(evl, null);
+    ConstantPropagationWorker worker = new ConstantPropagationWorker();
+    worker.traverse(evl, null);
   }
 
 }

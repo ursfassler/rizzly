@@ -21,7 +21,6 @@ import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
 
 public abstract class EvlPass {
-
   /*
    * protected final Set<Condition> precondition; protected final Set<Condition> postcondition;
    * 
@@ -33,9 +32,4 @@ public abstract class EvlPass {
    */
 
   public abstract void process(Namespace evl, KnowledgeBase kb);
-
-  public String getName() {
-    return getClass().getName();
-  }
-
 }
