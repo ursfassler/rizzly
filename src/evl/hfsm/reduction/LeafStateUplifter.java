@@ -20,6 +20,8 @@ package evl.hfsm.reduction;
 import java.util.ArrayList;
 import java.util.List;
 
+import pass.EvlPass;
+
 import common.Designator;
 
 import evl.Evl;
@@ -30,6 +32,7 @@ import evl.hfsm.StateComposite;
 import evl.hfsm.StateSimple;
 import evl.knowledge.KnowledgeBase;
 import evl.other.EvlList;
+import evl.other.Namespace;
 
 /**
  * Moves all leaf-states up. In the end, the top state only has former leaf states a children.
@@ -39,16 +42,24 @@ import evl.other.EvlList;
  * @author urs
  *
  */
-public class LeafStateUplifter extends NullTraverser<Void, Designator> {
-  final private List<StateSimple> states = new ArrayList<StateSimple>();
 
-  public LeafStateUplifter(KnowledgeBase kb) {
-    super();
+public class LeafStateUplifter extends EvlPass {
+
+  @Override
+  public void process(Namespace evl, KnowledgeBase kb) {
+    for (ImplHfsm hfsm : evl.getItems(ImplHfsm.class, true)) {
+      LeafStateUplifterWorker know = new LeafStateUplifterWorker(kb);
+      know.traverse(hfsm, null);
+    }
   }
 
-  static public void process(ImplHfsm obj, KnowledgeBase kb) {
-    LeafStateUplifter know = new LeafStateUplifter(kb);
-    know.traverse(obj, null);
+}
+
+class LeafStateUplifterWorker extends NullTraverser<Void, Designator> {
+  final private List<StateSimple> states = new ArrayList<StateSimple>();
+
+  public LeafStateUplifterWorker(KnowledgeBase kb) {
+    super();
   }
 
   @Override

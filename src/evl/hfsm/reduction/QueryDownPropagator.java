@@ -20,6 +20,8 @@ package evl.hfsm.reduction;
 import java.util.HashMap;
 import java.util.Map;
 
+import pass.EvlPass;
+
 import common.Designator;
 import common.ElementInfo;
 
@@ -38,19 +40,21 @@ import evl.hfsm.StateItem;
 import evl.hfsm.StateSimple;
 import evl.knowledge.KnowledgeBase;
 import evl.other.EvlList;
+import evl.other.Namespace;
 import evl.statement.Block;
 import evl.statement.ReturnExpr;
 import evl.variable.Variable;
 
-public class QueryDownPropagator extends NullTraverser<Void, QueryParam> {
-  private static final ElementInfo info = ElementInfo.NO;
-  private final Map<FuncCtrlInDataOut, FuncPrivateRet> map; // TODO do we need that?
+public class QueryDownPropagator extends EvlPass {
 
-  public QueryDownPropagator(Map<FuncCtrlInDataOut, FuncPrivateRet> map) {
-    this.map = map;
+  @Override
+  public void process(Namespace evl, KnowledgeBase kb) {
+    for (ImplHfsm hfsm : evl.getItems(ImplHfsm.class, true)) {
+      process(hfsm, kb);
+    }
   }
 
-  public static void process(ImplHfsm hfsm, KnowledgeBase kb) {
+  private static void process(ImplHfsm hfsm, KnowledgeBase kb) {
     Map<FuncCtrlInDataOut, FuncPrivateRet> qfunc = new HashMap<FuncCtrlInDataOut, FuncPrivateRet>();
     QueryFuncMaker qfmaker = new QueryFuncMaker(qfunc);
     qfmaker.traverse(hfsm.getTopstate(), new Designator());
@@ -59,8 +63,18 @@ public class QueryDownPropagator extends NullTraverser<Void, QueryParam> {
       hfsm.getTopstate().getItem().add(func);
     }
 
-    QueryDownPropagator redirecter = new QueryDownPropagator(qfunc);
+    QueryDownPropagatorWorker redirecter = new QueryDownPropagatorWorker(qfunc);
     redirecter.traverse(hfsm.getTopstate(), new QueryParam());
+  }
+
+}
+
+class QueryDownPropagatorWorker extends NullTraverser<Void, QueryParam> {
+  private static final ElementInfo info = ElementInfo.NO;
+  private final Map<FuncCtrlInDataOut, FuncPrivateRet> map; // TODO do we need that?
+
+  public QueryDownPropagatorWorker(Map<FuncCtrlInDataOut, FuncPrivateRet> map) {
+    this.map = map;
   }
 
   @Override

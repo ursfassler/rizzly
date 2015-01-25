@@ -21,6 +21,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import pass.EvlPass;
+
 import common.Designator;
 import common.ElementInfo;
 
@@ -69,16 +71,13 @@ import evl.variable.FuncVariable;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
 
-public class FsmReduction extends NullTraverser<Evl, Namespace> {
-  final private Reduction reduction;
+public class FsmReduction extends EvlPass {
 
-  public FsmReduction(KnowledgeBase kb) {
-    super();
-    reduction = new Reduction(kb);
-  }
-
-  public Map<? extends Named, ? extends Named> getMap() {
-    return reduction.getMap();
+  @Override
+  public void process(Namespace evl, KnowledgeBase kb) {
+    FsmReductionWorker reduction = new FsmReductionWorker(kb);
+    reduction.traverse(evl, null);
+    Relinker.relink(evl, reduction.getMap());
   }
 
   /**
@@ -91,6 +90,20 @@ public class FsmReduction extends NullTraverser<Evl, Namespace> {
       map.put(oldParam.get(i), newParam.get(i));
     }
     Relinker.relink(body, map);
+  }
+
+}
+
+class FsmReductionWorker extends NullTraverser<Evl, Namespace> {
+  final private Reduction reduction;
+
+  public FsmReductionWorker(KnowledgeBase kb) {
+    super();
+    reduction = new Reduction(kb);
+  }
+
+  public Map<? extends Named, ? extends Named> getMap() {
+    return reduction.getMap();
   }
 
   @Override

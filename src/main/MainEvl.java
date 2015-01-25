@@ -27,6 +27,15 @@ import common.Designator;
 
 import debug.DebugPrinter;
 import evl.Evl;
+import evl.hfsm.reduction.EntryExitUpdater;
+import evl.hfsm.reduction.FsmReduction;
+import evl.hfsm.reduction.LeafStateUplifter;
+import evl.hfsm.reduction.QueryDownPropagator;
+import evl.hfsm.reduction.StateItemUplifter;
+import evl.hfsm.reduction.StateVarReplacer;
+import evl.hfsm.reduction.TransitionDownPropagator;
+import evl.hfsm.reduction.TransitionRedirecter;
+import evl.hfsm.reduction.TransitionUplifter;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
 import evl.pass.BitLogicCategorizer;
@@ -40,7 +49,6 @@ import evl.pass.ConstantPropagation;
 import evl.pass.DebugIface;
 import evl.pass.EnumReduction;
 import evl.pass.HeaderWriter;
-import evl.pass.HfsmReduction;
 import evl.pass.IfCutter;
 import evl.pass.InitVarTyper;
 import evl.pass.Instantiation;
@@ -101,7 +109,19 @@ public class MainEvl {
       reduction.add(new IntroduceConvert());
       reduction.add(new OpenReplace());
       reduction.add(new CompositionReduction());
-      reduction.add(new HfsmReduction());
+      {
+        PassGroup hfsm = new PassGroup("hfsm");
+        hfsm.add(new QueryDownPropagator());
+        hfsm.add(new TransitionRedirecter());
+        hfsm.add(new TransitionDownPropagator());
+        hfsm.add(new StateVarReplacer());
+        hfsm.add(new EntryExitUpdater());
+        hfsm.add(new StateItemUplifter());
+        hfsm.add(new TransitionUplifter());
+        hfsm.add(new LeafStateUplifter());
+        hfsm.add(new FsmReduction());
+        reduction.add(hfsm);
+      }
       reduction.add(new ReduceUnion());
       passes.add(reduction);
     }

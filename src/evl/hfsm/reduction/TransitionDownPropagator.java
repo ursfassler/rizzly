@@ -24,6 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import pass.EvlPass;
+
 import common.Designator;
 import common.ElementInfo;
 
@@ -46,6 +48,7 @@ import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowParent;
 import evl.knowledge.KnowledgeBase;
 import evl.other.EvlList;
+import evl.other.Namespace;
 import evl.statement.Assignment;
 import evl.statement.Block;
 import evl.statement.CallStmt;
@@ -61,25 +64,16 @@ import evl.variable.Variable;
  * @author urs
  *
  */
-public class TransitionDownPropagator extends NullTraverser<Void, TransitionParam> {
+public class TransitionDownPropagator extends EvlPass {
 
-  private static final ElementInfo info = ElementInfo.NO;
-  private final KnowParent kp;
-  private final Map<Transition, State> tsrc;
-  private final Map<Transition, State> tdst;
-  private final Map<Transition, State> ttop;
-  private final Map<Transition, FuncPrivateVoid> tfunc;
-
-  public TransitionDownPropagator(KnowledgeBase kb, Map<Transition, State> tsrc, Map<Transition, State> tdst, Map<Transition, State> ttop, Map<Transition, FuncPrivateVoid> tfunc) {
-    super();
-    this.tsrc = tsrc;
-    this.tdst = tdst;
-    this.ttop = ttop;
-    this.tfunc = tfunc;
-    kp = kb.getEntry(KnowParent.class);
+  @Override
+  public void process(Namespace evl, KnowledgeBase kb) {
+    for (ImplHfsm hfsm : evl.getItems(ImplHfsm.class, true)) {
+      process(hfsm, kb);
+    }
   }
 
-  public static void process(ImplHfsm hfsm, KnowledgeBase kb) {
+  private static void process(ImplHfsm hfsm, KnowledgeBase kb) {
     KnowBaseItem kbi = kb.getEntry(KnowBaseItem.class);
 
     TransitionEndpointCollector tec = new TransitionEndpointCollector();
@@ -97,7 +91,7 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
       tfunc.put(trans, func);
     }
 
-    TransitionDownPropagator redirecter = new TransitionDownPropagator(kb, tec.getTsrc(), tec.getTdst(), tec.getTtop(), tfunc);
+    TransitionDownPropagatorWorker redirecter = new TransitionDownPropagatorWorker(kb, tec.getTsrc(), tec.getTdst(), tec.getTtop(), tfunc);
     redirecter.traverse(hfsm.getTopstate(), new TransitionParam());
   }
 
@@ -108,12 +102,31 @@ public class TransitionDownPropagator extends NullTraverser<Void, TransitionPara
    */
   private static FuncPrivateVoid makeTransBodyFunc(Transition trans, String name, KnowBaseItem kbi) {
     EvlList<FuncVariable> params = Copy.copy(trans.getParam());
-    FuncPrivateVoid func = new FuncPrivateVoid(info, name, params, new SimpleRef<Type>(info, kbi.getVoidType()), trans.getBody());
-    trans.setBody(new Block(info));
+    FuncPrivateVoid func = new FuncPrivateVoid(ElementInfo.NO, name, params, new SimpleRef<Type>(ElementInfo.NO, kbi.getVoidType()), trans.getBody());
+    trans.setBody(new Block(ElementInfo.NO));
 
     FsmReduction.relinkActualParameterRef(trans.getParam(), func.getParam(), func.getBody());
 
     return func;
+  }
+
+}
+
+class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam> {
+  private static final ElementInfo info = ElementInfo.NO;
+  private final KnowParent kp;
+  private final Map<Transition, State> tsrc;
+  private final Map<Transition, State> tdst;
+  private final Map<Transition, State> ttop;
+  private final Map<Transition, FuncPrivateVoid> tfunc;
+
+  public TransitionDownPropagatorWorker(KnowledgeBase kb, Map<Transition, State> tsrc, Map<Transition, State> tdst, Map<Transition, State> ttop, Map<Transition, FuncPrivateVoid> tfunc) {
+    super();
+    this.tsrc = tsrc;
+    this.tdst = tdst;
+    this.ttop = ttop;
+    this.tfunc = tfunc;
+    kp = kb.getEntry(KnowParent.class);
   }
 
   @Override

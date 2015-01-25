@@ -20,6 +20,7 @@ package evl.hfsm.reduction;
 import java.util.ArrayList;
 import java.util.List;
 
+import pass.EvlPass;
 import evl.Evl;
 import evl.NullTraverser;
 import evl.hfsm.ImplHfsm;
@@ -27,6 +28,8 @@ import evl.hfsm.State;
 import evl.hfsm.StateComposite;
 import evl.hfsm.StateItem;
 import evl.hfsm.Transition;
+import evl.knowledge.KnowledgeBase;
+import evl.other.Namespace;
 
 /**
  * Moves all transitions of all states to the top-state.
@@ -34,12 +37,20 @@ import evl.hfsm.Transition;
  * @author urs
  *
  */
-public class TransitionUplifter extends NullTraverser<Void, List<Transition>> {
 
-  static public void process(ImplHfsm obj) {
-    TransitionUplifter know = new TransitionUplifter();
-    know.traverse(obj, null);
+public class TransitionUplifter extends EvlPass {
+
+  @Override
+  public void process(Namespace evl, KnowledgeBase kb) {
+    for (ImplHfsm hfsm : evl.getItems(ImplHfsm.class, true)) {
+      TransitionUplifterWorker know = new TransitionUplifterWorker();
+      know.traverse(hfsm, null);
+    }
   }
+
+}
+
+class TransitionUplifterWorker extends NullTraverser<Void, List<Transition>> {
 
   @Override
   protected Void visitDefault(Evl obj, List<Transition> param) {

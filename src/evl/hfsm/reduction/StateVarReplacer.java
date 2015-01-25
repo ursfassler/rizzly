@@ -17,13 +17,17 @@
 
 package evl.hfsm.reduction;
 
+import java.util.HashMap;
 import java.util.Map;
+
+import pass.EvlPass;
 
 import common.ElementInfo;
 
 import evl.DefTraverser;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
+import evl.expression.reference.SimpleRef;
 import evl.function.header.FuncPrivateRet;
 import evl.function.header.FuncPrivateVoid;
 import evl.hfsm.ImplHfsm;
@@ -31,27 +35,65 @@ import evl.hfsm.State;
 import evl.hfsm.Transition;
 import evl.knowledge.KnowledgeBase;
 import evl.other.EvlList;
+import evl.other.Namespace;
 import evl.traverser.RefTypeGetter;
 import evl.type.Type;
 import evl.type.composed.NamedElement;
+import evl.variable.Constant;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
 
-public class StateVarReplacer extends DefTraverser<Void, Void> {
+//TODO set correct values when switching states
+
+/**
+ * Introduces types and constants for states and their variables. Relinkes access to variables to access record
+ * elements.
+ *
+ * @author urs
+ *
+ */
+public class StateVarReplacer extends EvlPass {
+
+  @Override
+  public void process(Namespace evl, KnowledgeBase kb) {
+    for (ImplHfsm hfsm : evl.getItems(ImplHfsm.class, true)) {
+      process(hfsm, kb);
+    }
+  }
+
+  protected void process(ImplHfsm obj, KnowledgeBase kb) {
+    StateTypeBuilder stb = new StateTypeBuilder();
+    NamedElement elem = stb.traverse(obj.getTopstate(), new EvlList<NamedElement>());
+    Type stateType = elem.getRef().getLink();
+
+    obj.getTopstate().setInitial(new SimpleRef<State>(ElementInfo.NO, InitStateGetter.get(obj.getTopstate())));
+
+    Constant def = stb.getInitVar().get(stateType);
+
+    // TODO set correct values when switching states
+    StateVariable var = new StateVariable(ElementInfo.NO, "data", new SimpleRef<Type>(ElementInfo.NO, stateType), new Reference(ElementInfo.NO, def));
+    obj.getTopstate().getItem().add(var);
+
+    Map<StateVariable, EvlList<NamedElement>> epath = new HashMap<StateVariable, EvlList<NamedElement>>(stb.getEpath());
+    for (StateVariable sv : epath.keySet()) {
+      epath.get(sv).remove(0);
+    }
+
+    StateVarReplacerWorker replacer = new StateVarReplacerWorker(var, epath, kb);
+    replacer.traverse(obj, null);
+  }
+}
+
+class StateVarReplacerWorker extends DefTraverser<Void, Void> {
   final private Variable dataVar;
   final private Map<StateVariable, EvlList<NamedElement>> epath;
   final private RefTypeGetter rtg;
 
-  public StateVarReplacer(Variable dataVar, Map<StateVariable, EvlList<NamedElement>> epath, KnowledgeBase kb) {
+  public StateVarReplacerWorker(Variable dataVar, Map<StateVariable, EvlList<NamedElement>> epath, KnowledgeBase kb) {
     super();
     this.epath = epath;
     this.dataVar = dataVar;
     rtg = new RefTypeGetter(kb);
-  }
-
-  static public void process(ImplHfsm obj, Variable dataVar, Map<StateVariable, EvlList<NamedElement>> epath, KnowledgeBase kb) {
-    StateVarReplacer know = new StateVarReplacer(dataVar, epath, kb);
-    know.traverse(obj, null);
   }
 
   @Override

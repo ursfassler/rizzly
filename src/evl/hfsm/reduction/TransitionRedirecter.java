@@ -17,11 +17,15 @@
 
 package evl.hfsm.reduction;
 
+import pass.EvlPass;
 import evl.Evl;
 import evl.NullTraverser;
+import evl.hfsm.ImplHfsm;
 import evl.hfsm.State;
 import evl.hfsm.StateItem;
 import evl.hfsm.Transition;
+import evl.knowledge.KnowledgeBase;
+import evl.other.Namespace;
 
 /**
  * Sets the destination of a transition to the initial substate if the destination is a composite state
@@ -29,12 +33,21 @@ import evl.hfsm.Transition;
  * @author urs
  *
  */
-public class TransitionRedirecter extends NullTraverser<Void, Void> {
+public class TransitionRedirecter extends EvlPass {
+
+  @Override
+  public void process(Namespace evl, KnowledgeBase kb) {
+    for (ImplHfsm hfsm : evl.getItems(ImplHfsm.class, true)) {
+      TransitionRedirecterWorker redirecter = new TransitionRedirecterWorker();
+      redirecter.traverse(hfsm.getTopstate(), null);
+    }
+  }
+}
+
+class TransitionRedirecterWorker extends NullTraverser<Void, Void> {
   final private InitStateGetter initStateGetter = new InitStateGetter();
 
   public static void process(State top) {
-    TransitionRedirecter redirecter = new TransitionRedirecter();
-    redirecter.traverse(top, null);
   }
 
   @Override

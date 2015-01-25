@@ -19,6 +19,8 @@ package evl.hfsm.reduction;
 
 import java.util.LinkedList;
 
+import pass.EvlPass;
+
 import common.ElementInfo;
 
 import evl.Evl;
@@ -37,6 +39,7 @@ import evl.hfsm.StateSimple;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
 import evl.other.EvlList;
+import evl.other.Namespace;
 import evl.statement.Block;
 import evl.statement.CallStmt;
 import evl.statement.Statement;
@@ -50,17 +53,24 @@ import evl.variable.FuncVariable;
  * @author urs
  *
  */
-public class EntryExitUpdater extends NullTraverser<Void, EePar> {
-  private final KnowBaseItem kbi;
+public class EntryExitUpdater extends EvlPass {
 
-  public EntryExitUpdater(KnowledgeBase kb) {
-    super();
-    this.kbi = kb.getEntry(KnowBaseItem.class);
+  @Override
+  public void process(Namespace evl, KnowledgeBase kb) {
+    for (ImplHfsm hfsm : evl.getItems(ImplHfsm.class, true)) {
+      EntryExitUpdaterWorker know = new EntryExitUpdaterWorker(kb);
+      know.traverse(hfsm, null);
+    }
   }
 
-  static public void process(ImplHfsm obj, KnowledgeBase kb) {
-    EntryExitUpdater know = new EntryExitUpdater(kb);
-    know.traverse(obj, null);
+}
+
+class EntryExitUpdaterWorker extends NullTraverser<Void, EePar> {
+  private final KnowBaseItem kbi;
+
+  public EntryExitUpdaterWorker(KnowledgeBase kb) {
+    super();
+    this.kbi = kb.getEntry(KnowBaseItem.class);
   }
 
   @Override

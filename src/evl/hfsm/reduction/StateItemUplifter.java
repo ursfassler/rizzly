@@ -20,6 +20,8 @@ package evl.hfsm.reduction;
 import java.util.ArrayList;
 import java.util.List;
 
+import pass.EvlPass;
+
 import common.Designator;
 
 import evl.Evl;
@@ -30,6 +32,7 @@ import evl.hfsm.ImplHfsm;
 import evl.hfsm.State;
 import evl.hfsm.StateItem;
 import evl.knowledge.KnowledgeBase;
+import evl.other.Namespace;
 import evl.type.Type;
 import evl.variable.ConstPrivate;
 
@@ -39,16 +42,22 @@ import evl.variable.ConstPrivate;
  * @author urs
  *
  */
-public class StateItemUplifter extends NullTraverser<Void, Designator> {
+public class StateItemUplifter extends EvlPass {
+
+  @Override
+  public void process(Namespace evl, KnowledgeBase kb) {
+    for (ImplHfsm hfsm : evl.getItems(ImplHfsm.class, true)) {
+      StateItemUplifterWorker know = new StateItemUplifterWorker(kb);
+      know.traverse(hfsm, null);
+    }
+  }
+}
+
+class StateItemUplifterWorker extends NullTraverser<Void, Designator> {
   final private List<StateItem> func = new ArrayList<StateItem>();
 
-  public StateItemUplifter(KnowledgeBase kb) {
+  public StateItemUplifterWorker(KnowledgeBase kb) {
     super();
-  }
-
-  static public void process(ImplHfsm obj, KnowledgeBase kb) {
-    StateItemUplifter know = new StateItemUplifter(kb);
-    know.traverse(obj, null);
   }
 
   @Override
