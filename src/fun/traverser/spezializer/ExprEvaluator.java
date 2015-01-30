@@ -80,7 +80,8 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
       RError.err(ErrorType.Fatal, obj.getInfo(), "Can not evaluate template");
       return null;
     } else if (param instanceof RefCall) {
-      assert (obj instanceof FuncFunction);
+      // TODO add execution of type cast (see casual/ctfeCast.rzy)
+      RError.ass(obj instanceof FuncFunction, obj.getInfo(), "expected funtion, got " + obj.getClass().getName());
       FuncFunction func = (FuncFunction) obj;
       return StmtExecutor.process(func, ((RefCall) param).getActualParameter(), new Memory(), kb);
     } else if (param instanceof RefIndex) {

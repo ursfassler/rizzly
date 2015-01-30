@@ -1,0 +1,12 @@
+double = function(n: R{0,100}):R{0,200}
+  return n*2;
+end
+
+CtfeCast = Elementary
+  value : const R{0,100} = R{0,100}(double(42));
+    
+  get : response():R{0,100}
+    return value;
+  end
+end      
+

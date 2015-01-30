@@ -32,6 +32,11 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  public void ctfeCast() {
+    compile("ctfeCast", TestSteps.COMPILE_TO_LLVM, false, false);
+  }
+
+  @Test
   public void subrespLink() {
     compile("subrespLink", TestSteps.COMPILE_TO_LLVM, false, false);
   }
