@@ -105,6 +105,7 @@ import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
 import evl.type.composed.UnsafeUnionType;
+import evl.type.out.AliasType;
 import evl.type.out.SIntType;
 import evl.type.out.UIntType;
 import evl.type.special.AnyType;
@@ -120,6 +121,11 @@ import evl.variable.StateVariable;
 abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   abstract protected R visitDefault(Evl obj, P param);
+
+  @Override
+  protected R visitAliasType(AliasType obj, P param) {
+    return visitDefault(obj, param);
+  }
 
   @Override
   protected R visitUIntType(UIntType obj, P param) {

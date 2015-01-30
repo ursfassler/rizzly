@@ -58,12 +58,12 @@ public class ArrayTest extends BaseTest {
 
   @Test
   public void arrayTest4() {
-    compile("arrayTest4", TestSteps.COMPILE_TO_BIN, false, false);
+    compile("arrayTest4", TestSteps.EXECUTE, false, false);
   }
 
   @Test
   public void arrayTest5() {
-    compile("arrayTest5", TestSteps.COMPILE_TO_BIN, false, false);
+    compile("arrayTest5", TestSteps.EXECUTE, false, false);
   }
 
   @Test
@@ -73,7 +73,7 @@ public class ArrayTest extends BaseTest {
 
   @Test
   public void arrayTest7() {
-    compile("arrayTest7", TestSteps.COMPILE_TO_BIN, false, false);
+    compile("arrayTest7", TestSteps.COMPILE_TO_ASM, false, false);
   }
 
   @Test

@@ -118,6 +118,7 @@ import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
 import evl.type.composed.UnsafeUnionType;
+import evl.type.out.AliasType;
 import evl.type.out.SIntType;
 import evl.type.out.UIntType;
 import evl.type.special.AnyType;
@@ -491,6 +492,16 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.wr(": ");
     visit(obj.getRef(), param);
     param.wr(";");
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitAliasType(AliasType obj, StreamWriter param) {
+    param.wr(obj.getName());
+    wrId(obj, param);
+    param.wr(" = ");
+    visit(obj.getRef(), param);
     param.nl();
     return null;
   }

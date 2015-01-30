@@ -19,17 +19,17 @@ int main(){
   uint8_t i;
   Array_10_R_0_31 in;
 
-  for( i = 0; i <= 10; i++ ){
+  for( i = 0; i < 10; i++ ){
     in.data[i] = (i * 17) % 32;
   }
     
   inst_inp( in );
   
-  for( i = 0; i <= 10; i++ ){
+  for( i = 0; i < 10; i++ ){
     in.data[i] = 0;
   }
   
-  for( i = 0; i <= 10; i++ ){
+  for( i = 0; i < 10; i++ ){
     R_0_31 exp = (i * 17) % 32;
     printf( "%i: %i <> %i\n", i, exp, out.data[i] );
     if( exp != out.data[i] ){

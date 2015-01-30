@@ -58,6 +58,7 @@ import evl.pass.RangeConverter;
 import evl.pass.RangeReplacer;
 import evl.pass.ReduceUnion;
 import evl.pass.RemoveUnused;
+import evl.pass.TypeMerge;
 import evl.pass.TypeSort;
 import evl.pass.VarDeclToTop;
 import evl.pass.VarSort;
@@ -164,6 +165,7 @@ public class MainEvl {
       cprep.checks.addAll(passes.checks);
       cprep.add(new BlockReduction());
       cprep.add(new VarDeclToTop());
+      cprep.add(new TypeMerge());
       cprep.add(new CRenamer());
       cprep.add(new TypeSort());
       cprep.add(new VarSort());

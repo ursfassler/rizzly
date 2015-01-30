@@ -109,6 +109,7 @@ import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
 import evl.type.composed.UnsafeUnionType;
+import evl.type.out.AliasType;
 import evl.type.out.SIntType;
 import evl.type.out.UIntType;
 import evl.type.special.AnyType;
@@ -758,6 +759,12 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitSIntType(SIntType obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitAliasType(AliasType obj, P param) {
+    visit(obj.getRef(), param);
     return null;
   }
 

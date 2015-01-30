@@ -90,6 +90,7 @@ import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
 import evl.type.composed.UnsafeUnionType;
+import evl.type.out.AliasType;
 import evl.type.out.SIntType;
 import evl.type.out.UIntType;
 import evl.type.special.VoidType;
@@ -443,6 +444,17 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
     visitList(obj.getStatements(), param);
     sw.decIndent();
     sw.wr("}");
+    sw.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitAliasType(AliasType obj, Boolean param) {
+    sw.wr("typedef ");
+    visit(obj.getRef(), param);
+    sw.wr(" ");
+    sw.wr(name(obj));
+    sw.wr(";");
     sw.nl();
     return null;
   }

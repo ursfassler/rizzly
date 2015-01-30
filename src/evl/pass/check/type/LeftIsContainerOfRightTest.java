@@ -34,6 +34,9 @@ import evl.type.base.RangeType;
 import evl.type.base.StringType;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
+import evl.type.composed.UnsafeUnionType;
+import evl.type.out.SIntType;
+import evl.type.out.UIntType;
 import evl.type.special.IntegerType;
 import evl.type.special.NaturalType;
 import evl.type.special.VoidType;
@@ -52,9 +55,14 @@ public class LeftIsContainerOfRightTest extends NullTraverser<Boolean, Type> {
     return test.traverse(left, right);
   }
 
+  public static boolean areEual(Type left, Type right, KnowledgeBase kb) {
+    LeftIsContainerOfRightTest test = new LeftIsContainerOfRightTest(kb);
+    return test.traverse(left, right) && test.traverse(right, left);
+  }
+
   @Override
-  protected Boolean visitDefault(Evl obj, Type param) {
-    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+  protected Boolean visitDefault(Evl left, Type right) {
+    throw new RuntimeException("not yet implemented: " + left.getClass().getCanonicalName());
   }
 
   @Override
@@ -99,13 +107,13 @@ public class LeftIsContainerOfRightTest extends NullTraverser<Boolean, Type> {
   }
 
   @Override
-  protected Boolean visitNaturalType(NaturalType obj, Type param) {
-    return isDerivativeOf(obj.getClass(), param);
+  protected Boolean visitNaturalType(NaturalType left, Type right) {
+    return isDerivativeOf(left.getClass(), right);
   }
 
   @Override
-  protected Boolean visitIntegerType(IntegerType obj, Type param) {
-    return isDerivativeOf(obj.getClass(), param);
+  protected Boolean visitIntegerType(IntegerType left, Type right) {
+    return isDerivativeOf(left.getClass(), right);
   }
 
   @Override
@@ -114,9 +122,27 @@ public class LeftIsContainerOfRightTest extends NullTraverser<Boolean, Type> {
   }
 
   @Override
-  protected Boolean visitRangeType(RangeType obj, Type right) {
+  protected Boolean visitUIntType(UIntType left, Type right) {
+    if (right instanceof UIntType) {
+      return left.getBytes() <= ((UIntType) right).getBytes();
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  protected Boolean visitSIntType(SIntType left, Type right) {
+    if (right instanceof SIntType) {
+      return left.getBytes() <= ((SIntType) right).getBytes();
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  protected Boolean visitRangeType(RangeType left, Type right) {
     if (right instanceof RangeType) {
-      Range lr = obj.getNumbers();
+      Range lr = left.getNumbers();
       Range rr = ((RangeType) right).getNumbers();
 
       return Range.leftIsSmallerEqual(rr, lr); // TODO test
@@ -156,7 +182,12 @@ public class LeftIsContainerOfRightTest extends NullTraverser<Boolean, Type> {
 
   @Override
   protected Boolean visitUnionType(UnionType left, Type right) {
-    throw new RuntimeException("not yet implemented");
+    return left == right;  // XXX is this correct?
+  }
+
+  @Override
+  protected Boolean visitUnsafeUnionType(UnsafeUnionType left, Type right) {
+    return left == right;  // XXX is this correct?
   }
 
   @Override

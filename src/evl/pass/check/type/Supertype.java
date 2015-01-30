@@ -29,6 +29,7 @@ import evl.type.base.EnumType;
 import evl.type.base.RangeType;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
+import evl.type.composed.UnsafeUnionType;
 import evl.type.special.NaturalType;
 import evl.type.special.VoidType;
 
@@ -60,13 +61,18 @@ public class Supertype extends NullTraverser<Type, Void> {
   }
 
   @Override
-  protected Type visitRecordType(RecordType obj, Void param) {
-    throw new RuntimeException("not yet implemented");
+  protected Type visitUnionType(UnionType obj, Void param) {
+    return obj;
   }
 
   @Override
-  protected Type visitUnionType(UnionType obj, Void param) {
-    throw new RuntimeException("not yet implemented");
+  protected Type visitUnsafeUnionType(UnsafeUnionType obj, Void param) {
+    return obj;
+  }
+
+  @Override
+  protected Type visitRecordType(RecordType obj, Void param) {
+    return obj;
   }
 
   @Override
@@ -82,7 +88,8 @@ public class Supertype extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitBooleanType(BooleanType obj, Void param) {
-    throw new RuntimeException("not yet implemented");
+    assert (kbi.getBooleanType() == obj);
+    return kbi.getBooleanType();
   }
 
   @Override
