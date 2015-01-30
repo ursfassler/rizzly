@@ -18,6 +18,8 @@
 package fun.pass;
 
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 
 import pass.FunPass;
 import error.ErrorType;
@@ -28,10 +30,20 @@ import fun.knowledge.KnowledgeBase;
 import fun.other.FunList;
 import fun.other.Named;
 import fun.other.Namespace;
+import fun.other.Template;
 import fun.type.Type;
+import fun.type.template.ArrayTemplate;
+import fun.type.template.RangeTemplate;
+import fun.type.template.TypeTypeTemplate;
 
+/**
+ * Check if a reserved name is used.
+ *
+ * @author urs
+ *
+ */
 public class CheckNames extends FunPass {
-
+  // TODO find more elegant way to check Template names
   @Override
   public void process(Namespace root, KnowledgeBase kb) {
     FunList<Type> blacklist = root.getItems(Type.class, false);
@@ -39,12 +51,22 @@ public class CheckNames extends FunPass {
     FunList<Fun> tocheck = new FunList<Fun>(root.getChildren());
     tocheck.removeAll(blacklist);
 
+    Set<String> names = new HashSet<String>(blacklist.names());
+    names.addAll(getTemplateNames());
+
     CheckNamesWorker checkNames = new CheckNamesWorker();
     for (Fun itr : tocheck) {
-      checkNames.traverse(itr, blacklist.names());
+      checkNames.traverse(itr, names);
     }
   }
 
+  private Set<String> getTemplateNames() {
+    Set<String> ret = new HashSet<String>();
+    ret.add(RangeTemplate.NAME);
+    ret.add(ArrayTemplate.NAME);
+    ret.add(TypeTypeTemplate.NAME);
+    return ret;
+  }
 }
 
 class CheckNamesWorker extends DefTraverser<Void, Collection<String>> {
@@ -52,11 +74,10 @@ class CheckNamesWorker extends DefTraverser<Void, Collection<String>> {
   @Override
   protected Void visit(Fun obj, Collection<String> param) {
     if (obj instanceof Named) {
-      if (param.contains(((Named) obj).getName())) {
+      if (param.contains(((Named) obj).getName()) && !(obj instanceof Template)) {
         RError.err(ErrorType.Error, obj.getInfo(), "Expected name, got keyword " + ((Named) obj).getName());
       }
     }
     return super.visit(obj, param);
   }
-
 }
