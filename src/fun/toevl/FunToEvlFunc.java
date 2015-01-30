@@ -23,6 +23,8 @@ import common.ElementInfo;
 
 import evl.Evl;
 import evl.expression.reference.SimpleRef;
+import evl.function.Function;
+import evl.function.FunctionFactory;
 import evl.function.header.FuncCtrlInDataIn;
 import evl.function.header.FuncCtrlInDataOut;
 import evl.function.header.FuncCtrlOutDataIn;
@@ -36,6 +38,7 @@ import fun.Fun;
 import fun.NullTraverser;
 import fun.function.FuncFunction;
 import fun.function.FuncHeader;
+import fun.function.FuncImpl;
 import fun.function.FuncProcedure;
 import fun.function.FuncQuery;
 import fun.function.FuncResponse;
@@ -80,40 +83,46 @@ public class FunToEvlFunc extends NullTraverser<Evl, Void> {
     return fparam;
   }
 
+  private <T extends Function> T genfunc(FuncHeader obj, Class<T> cl) {
+    Type nt = (Type) fta.traverse(FunToEvl.getRefType(obj.getRet()), null);
+    T func = FunctionFactory.create(cl, obj.getInfo(), obj.getName(), genpa(obj), new SimpleRef<Type>(obj.getRet().getInfo(), nt), new Block(ElementInfo.NO));
+    fta.map.put(obj, func);
+    if (obj instanceof FuncImpl) {
+      func.setBody((Block) fta.visit(((FuncImpl) obj).getBody(), null));
+    }
+    return func;
+  }
+
+  // ----------------------------------------------------------------------------
+
   @Override
   protected FuncCtrlInDataIn visitFuncProtSlot(FuncSlot obj, Void param) {
-    Type nt = (Type) fta.traverse(FunToEvl.getRefType(obj.getRet()), null);
-    return new FuncCtrlInDataIn(obj.getInfo(), obj.getName(), genpa(obj), new SimpleRef<Type>(obj.getRet().getInfo(), nt), (Block) fta.visit(obj.getBody(), param));
+    return genfunc(obj, FuncCtrlInDataIn.class);
   }
 
   @Override
   protected FuncPrivateVoid visitFuncPrivateVoid(FuncProcedure obj, Void param) {
-    Type nt = (Type) fta.traverse(FunToEvl.getRefType(obj.getRet()), null);
-    return new FuncPrivateVoid(obj.getInfo(), obj.getName(), genpa(obj), new SimpleRef<Type>(obj.getRet().getInfo(), nt), (Block) fta.visit(obj.getBody(), param));
+    return genfunc(obj, FuncPrivateVoid.class);
   }
 
   @Override
   protected FuncCtrlInDataOut visitFuncProtResponse(FuncResponse obj, Void param) {
-    Type nt = (Type) fta.traverse(FunToEvl.getRefType(obj.getRet()), null);
-    return new FuncCtrlInDataOut(obj.getInfo(), obj.getName(), genpa(obj), new SimpleRef<Type>(obj.getRet().getInfo(), nt), (Block) fta.visit(obj.getBody(), param));
+    return genfunc(obj, FuncCtrlInDataOut.class);
   }
 
   @Override
   protected FuncCtrlOutDataOut visitFuncProtSignal(FuncSignal obj, Void param) {
-    Type nt = (Type) fta.traverse(FunToEvl.getRefType(obj.getRet()), null);
-    return new FuncCtrlOutDataOut(obj.getInfo(), obj.getName(), genpa(obj), new SimpleRef<Type>(obj.getRet().getInfo(), nt), new Block(ElementInfo.NO));
+    return genfunc(obj, FuncCtrlOutDataOut.class);
   }
 
   @Override
   protected FuncCtrlOutDataIn visitFuncProtQuery(FuncQuery obj, Void param) {
-    Type nt = (Type) fta.traverse(FunToEvl.getRefType(obj.getRet()), null);
-    return new FuncCtrlOutDataIn(obj.getInfo(), obj.getName(), genpa(obj), new SimpleRef<Type>(obj.getRet().getInfo(), nt), new Block(ElementInfo.NO));
+    return genfunc(obj, FuncCtrlOutDataIn.class);
   }
 
   @Override
   protected FuncPrivateRet visitFuncFunction(FuncFunction obj, Void param) {
-    Type nt = (Type) fta.traverse(FunToEvl.getRefType(obj.getRet()), null);
-    return new evl.function.header.FuncPrivateRet(obj.getInfo(), obj.getName(), genpa(obj), new SimpleRef<Type>(obj.getRet().getInfo(), nt), (Block) fta.visit(obj.getBody(), param));
+    return genfunc(obj, FuncPrivateRet.class);
   }
 
 }
