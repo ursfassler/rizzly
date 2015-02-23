@@ -21,23 +21,23 @@ import common.ElementInfo;
 
 import fun.expression.Expression;
 import fun.expression.reference.Reference;
+import fun.other.FunList;
 
 /**
  *
  * @author urs
  */
 public class Assignment extends Statement {
-
-  private Reference left;
+  final private FunList<Reference> left;
   private Expression right;
 
-  public Assignment(ElementInfo info, Reference left, Expression right) {
+  public Assignment(ElementInfo info, FunList<Reference> left, Expression right) {
     super(info);
     this.left = left;
     this.right = right;
   }
 
-  public Reference getLeft() {
+  public FunList<Reference> getLeft() {
     return left;
   }
 
@@ -47,10 +47,6 @@ public class Assignment extends Statement {
 
   public void setRight(Expression right) {
     this.right = right;
-  }
-
-  public void setLeft(Reference left) {
-    this.left = left;
   }
 
   @Override

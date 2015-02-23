@@ -1,10 +1,10 @@
 ArrayTest3 = Elementary
-  a : Array{32,R{0,31}} = [ _ := 0 ];
+  a : Array{32,R{0,31}};
   
   entry
     i : R{0,32} = 0;
     while i < 32 do
-      a[i] := R{0,31}( i );
+      a[R{0,31}(i)] := R{0,31}( i );
       i    := R{0,32}( i+1 );
     end
   end

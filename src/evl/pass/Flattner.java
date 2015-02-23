@@ -15,12 +15,14 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package evl.traverser;
+package evl.pass;
+
+import pass.EvlPass;
 
 import common.Designator;
 
+import evl.DefTraverser;
 import evl.Evl;
-import evl.NullTraverser;
 import evl.function.Function;
 import evl.knowledge.KnowledgeBase;
 import evl.other.EvlList;
@@ -31,31 +33,40 @@ import evl.type.Type;
 import evl.variable.Constant;
 import evl.variable.StateVariable;
 
-// reduces names of named objects in named lists
-public class NamespaceReduction extends NullTraverser<Void, Designator> {
-  private EvlList<Evl> list = new EvlList<Evl>();
+public class Flattner extends EvlPass {
 
-  public NamespaceReduction(KnowledgeBase kb) {
-  }
-
-  public static EvlList<Evl> process(Namespace names, KnowledgeBase kb) {
-    NamespaceReduction reducer = new NamespaceReduction(kb);
-    for (Evl itr : names.getChildren()) {
+  @Override
+  public void process(Namespace evl, KnowledgeBase kb) {
+    NamespaceReduction reducer = new NamespaceReduction();
+    for (Evl itr : evl.getChildren()) {
       reducer.visit(itr, new Designator());
     }
-    return reducer.list;
+
+    EvlList<Evl> flat = reducer.getList();
+
+    evl.clear();
+
+    evl.addAll(flat.getItems(Function.class));
+    evl.addAll(flat.getItems(StateVariable.class));
+    evl.addAll(flat.getItems(Constant.class));
+    evl.addAll(flat.getItems(Type.class));
+  }
+
+}
+
+// reduces names of named objects in named lists
+class NamespaceReduction extends DefTraverser<Void, Designator> {
+  final private EvlList<Evl> list = new EvlList<Evl>();
+
+  public EvlList<Evl> getList() {
+    return list;
   }
 
   private void addToList(Designator param, Named itr) {
     if (param.size() > 0) {
       itr.setName(param.toString(Designator.NAME_SEP));
     }
-    this.list.add(itr);
-  }
-
-  @Override
-  protected Void visitDefault(Evl obj, Designator param) {
-    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+    list.add(itr);
   }
 
   @Override
@@ -63,7 +74,7 @@ public class NamespaceReduction extends NullTraverser<Void, Designator> {
     if (obj instanceof Named) {
       String name = ((Named) obj).getName();
 
-      assert (name.length() > 0);
+      // assert (name.length() > 0);
       param = new Designator(param, name);
     }
     super.visit(obj, param);
@@ -71,13 +82,7 @@ public class NamespaceReduction extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitNamespace(Namespace obj, Designator param) {
-    visitList(obj.getChildren(), param);
-    return null;
-  }
-
-  @Override
-  protected Void visitFunctionImpl(Function obj, Designator param) {
+  protected Void visitFunction(Function obj, Designator param) {
     addToList(param, obj);
     return null;
   }
@@ -105,4 +110,5 @@ public class NamespaceReduction extends NullTraverser<Void, Designator> {
     addToList(param, obj);
     return null;
   }
+
 }

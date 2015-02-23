@@ -28,6 +28,7 @@ import evl.type.base.StringType;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
 import evl.type.composed.UnsafeUnionType;
+import evl.type.out.AliasType;
 import evl.type.special.VoidType;
 
 public class CopyType extends NullTraverser<Type, Void> {
@@ -92,6 +93,11 @@ public class CopyType extends NullTraverser<Type, Void> {
   protected Type visitUnsafeUnionType(UnsafeUnionType obj, Void param) {
     UnsafeUnionType type = new UnsafeUnionType(obj.getInfo(), obj.getName(), cast.copy(obj.getElement()));
     return type;
+  }
+
+  @Override
+  protected Type visitAliasType(AliasType obj, Void param) {
+    return new AliasType(obj.getInfo(), obj.getName(), cast.copy(obj.getRef()));
   }
 
 }

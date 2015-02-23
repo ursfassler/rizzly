@@ -22,16 +22,15 @@ import java.lang.reflect.InvocationTargetException;
 
 import common.ElementInfo;
 
-import fun.expression.reference.Reference;
 import fun.other.FunList;
 import fun.statement.Block;
 import fun.variable.FuncVariable;
 
 public class FunctionFactory {
-  static public <T extends FuncHeader> T create(Class<T> type, ElementInfo info, String name, FunList<FuncVariable> param, Reference retType) {
+  static public <T extends FuncHeader> T create(Class<T> type, ElementInfo info, String name, FunList<FuncVariable> param, FuncReturn retType) {
     T ret = null;
     try {
-      Constructor<T> c = type.getDeclaredConstructor(ElementInfo.class, String.class, FunList.class, Reference.class);
+      Constructor<T> c = type.getDeclaredConstructor(ElementInfo.class, String.class, FunList.class, FuncReturn.class);
       ret = c.newInstance(info, name, param, retType);
     } catch (InstantiationException e) {
       e.printStackTrace();
@@ -49,10 +48,10 @@ public class FunctionFactory {
     return ret;
   }
 
-  static public <T extends FuncHeader> T create(Class<T> type, ElementInfo info, String name, FunList<FuncVariable> param, Reference retType, Block body) {
+  static public <T extends FuncHeader> T create(Class<T> type, ElementInfo info, String name, FunList<FuncVariable> param, FuncReturn retType, Block body) {
     T ret = null;
     try {
-      Constructor<T> c = type.getDeclaredConstructor(ElementInfo.class, String.class, FunList.class, Reference.class, Block.class);
+      Constructor<T> c = type.getDeclaredConstructor(ElementInfo.class, String.class, FunList.class, FuncReturn.class, Block.class);
       ret = c.newInstance(info, name, param, retType, body);
     } catch (InstantiationException e) {
       e.printStackTrace();

@@ -22,7 +22,6 @@ import java.util.Map;
 import common.ElementInfo;
 
 import evl.Evl;
-import evl.expression.reference.SimpleRef;
 import evl.function.Function;
 import evl.function.FunctionFactory;
 import evl.function.header.FuncCtrlInDataIn;
@@ -31,9 +30,9 @@ import evl.function.header.FuncCtrlOutDataIn;
 import evl.function.header.FuncCtrlOutDataOut;
 import evl.function.header.FuncPrivateRet;
 import evl.function.header.FuncPrivateVoid;
+import evl.function.ret.FuncReturn;
 import evl.other.EvlList;
 import evl.statement.Block;
-import evl.type.Type;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.function.FuncFunction;
@@ -84,8 +83,8 @@ public class FunToEvlFunc extends NullTraverser<Evl, Void> {
   }
 
   private <T extends Function> T genfunc(FuncHeader obj, Class<T> cl) {
-    Type nt = (Type) fta.traverse(FunToEvl.getRefType(obj.getRet()), null);
-    T func = FunctionFactory.create(cl, obj.getInfo(), obj.getName(), genpa(obj), new SimpleRef<Type>(obj.getRet().getInfo(), nt), new Block(ElementInfo.NO));
+    FuncReturn ret = (FuncReturn) fta.traverse(obj.getRet(), null);
+    T func = FunctionFactory.create(cl, obj.getInfo(), obj.getName(), genpa(obj), ret, new Block(ElementInfo.NO));
     fta.map.put(obj, func);
     if (obj instanceof FuncImpl) {
       func.setBody((Block) fta.visit(((FuncImpl) obj).getBody(), null));
@@ -96,27 +95,27 @@ public class FunToEvlFunc extends NullTraverser<Evl, Void> {
   // ----------------------------------------------------------------------------
 
   @Override
-  protected FuncCtrlInDataIn visitFuncProtSlot(FuncSlot obj, Void param) {
+  protected FuncCtrlInDataIn visitFuncSlot(FuncSlot obj, Void param) {
     return genfunc(obj, FuncCtrlInDataIn.class);
   }
 
   @Override
-  protected FuncPrivateVoid visitFuncPrivateVoid(FuncProcedure obj, Void param) {
+  protected FuncPrivateVoid visitFuncProcedure(FuncProcedure obj, Void param) {
     return genfunc(obj, FuncPrivateVoid.class);
   }
 
   @Override
-  protected FuncCtrlInDataOut visitFuncProtResponse(FuncResponse obj, Void param) {
+  protected FuncCtrlInDataOut visitFuncResponse(FuncResponse obj, Void param) {
     return genfunc(obj, FuncCtrlInDataOut.class);
   }
 
   @Override
-  protected FuncCtrlOutDataOut visitFuncProtSignal(FuncSignal obj, Void param) {
+  protected FuncCtrlOutDataOut visitFuncSignal(FuncSignal obj, Void param) {
     return genfunc(obj, FuncCtrlOutDataOut.class);
   }
 
   @Override
-  protected FuncCtrlOutDataIn visitFuncProtQuery(FuncQuery obj, Void param) {
+  protected FuncCtrlOutDataIn visitFuncQuery(FuncQuery obj, Void param) {
     return genfunc(obj, FuncCtrlOutDataIn.class);
   }
 

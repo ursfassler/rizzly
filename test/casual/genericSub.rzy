@@ -1,4 +1,4 @@
 GenericSub{T:Type{Any}} = Elementary
-  sub: T = _;
+  sub: T;
 end
 

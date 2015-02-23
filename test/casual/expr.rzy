@@ -14,20 +14,20 @@ Expr = Elementary
   out4tack : query():Point;
   out4tock : signal();
     
-  a : Array{10,Point} = [ ( x := 10, y := 20 ) ];
+  a : Array{10,Point} = ( [ x := 10, y := 20 ] );
   f : R{0,255} = 20;
   
   foo = function( x, y, z: R{0,255} ):R{0,255}
     if x > z then
-      a[(z*2+y) mod 100].x := x;
+      a((z*2+y) mod 100).x := x;
     else
       t : R{0,510} = y + out4tack().x;
       if t > 255 then
         t := 255;
       end
-      a[out2tack(x)-z].y := R{0,255}( t );
+      a(out2tack(x)-z).y := R{0,255}( t );
     end
-    return (x + y * z + a[out1tack(x)].y * a[out1tack(y)].x) mod 256;
+    return (x + y * z + a(out1tack(x)).y * a(out1tack(y)).x) mod 256;
   end
   
   inTick : slot( x: R{0,255} )

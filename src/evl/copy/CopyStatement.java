@@ -19,7 +19,8 @@ package evl.copy;
 
 import evl.Evl;
 import evl.NullTraverser;
-import evl.statement.Assignment;
+import evl.statement.AssignmentMulti;
+import evl.statement.AssignmentSingle;
 import evl.statement.Block;
 import evl.statement.CallStmt;
 import evl.statement.CaseStmt;
@@ -57,8 +58,13 @@ public class CopyStatement extends NullTraverser<Statement, Void> {
   }
 
   @Override
-  protected Statement visitAssignment(Assignment obj, Void param) {
-    return new Assignment(obj.getInfo(), cast.copy(obj.getLeft()), cast.copy(obj.getRight()));
+  protected Statement visitAssignmentMulti(AssignmentMulti obj, Void param) {
+    return new AssignmentMulti(obj.getInfo(), cast.copy(obj.getLeft()), cast.copy(obj.getRight()));
+  }
+
+  @Override
+  protected Statement visitAssignmentSingle(AssignmentSingle obj, Void param) {
+    return new AssignmentSingle(obj.getInfo(), cast.copy(obj.getLeft()), cast.copy(obj.getRight()));
   }
 
   @Override

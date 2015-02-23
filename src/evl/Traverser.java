@@ -25,13 +25,14 @@ import evl.composition.ImplComposition;
 import evl.expression.AnyValue;
 import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
-import evl.expression.ExprList;
 import evl.expression.Expression;
-import evl.expression.NamedElementValue;
+import evl.expression.NamedElementsValue;
+import evl.expression.NamedValue;
 import evl.expression.Number;
 import evl.expression.RangeValue;
 import evl.expression.RecordValue;
 import evl.expression.StringValue;
+import evl.expression.TupleValue;
 import evl.expression.TypeCast;
 import evl.expression.UnionValue;
 import evl.expression.UnsafeUnionValue;
@@ -81,6 +82,10 @@ import evl.function.header.FuncPrivateRet;
 import evl.function.header.FuncPrivateVoid;
 import evl.function.header.FuncSubHandlerEvent;
 import evl.function.header.FuncSubHandlerQuery;
+import evl.function.ret.FuncReturn;
+import evl.function.ret.FuncReturnNone;
+import evl.function.ret.FuncReturnTuple;
+import evl.function.ret.FuncReturnType;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.State;
 import evl.hfsm.StateComposite;
@@ -94,6 +99,8 @@ import evl.other.Namespace;
 import evl.other.Queue;
 import evl.other.SubCallbacks;
 import evl.statement.Assignment;
+import evl.statement.AssignmentMulti;
+import evl.statement.AssignmentSingle;
 import evl.statement.Block;
 import evl.statement.CallStmt;
 import evl.statement.CaseOpt;
@@ -119,6 +126,7 @@ import evl.type.base.EnumType;
 import evl.type.base.FunctionType;
 import evl.type.base.RangeType;
 import evl.type.base.StringType;
+import evl.type.base.TupleType;
 import evl.type.composed.NamedElement;
 import evl.type.composed.NamedElementType;
 import evl.type.composed.RecordType;
@@ -160,7 +168,7 @@ public abstract class Traverser<R, P> {
     } else if (obj instanceof Type) {
       return visitType((Type) obj, param);
     } else if (obj instanceof Function) {
-      return visitFunctionImpl((Function) obj, param);
+      return visitFunction((Function) obj, param);
     } else if (obj instanceof Expression) {
       return visitExpression((Expression) obj, param);
     } else if (obj instanceof Variable) {
@@ -195,6 +203,22 @@ public abstract class Traverser<R, P> {
       return visitComponent((Component) obj, param);
     } else if (obj instanceof NamedElement) {
       return visitNamedElement((NamedElement) obj, param);
+    } else if (obj instanceof FuncReturn) {
+      return visitFuncReturn((FuncReturn) obj, param);
+    } else if (obj instanceof NamedValue) {
+      return visitNamedValue((NamedValue) obj, param);
+    } else {
+      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
+  }
+
+  protected R visitFuncReturn(FuncReturn obj, P param) {
+    if (obj instanceof FuncReturnNone) {
+      return visitFuncReturnNone((FuncReturnNone) obj, param);
+    } else if (obj instanceof FuncReturnType) {
+      return visitFuncReturnType((FuncReturnType) obj, param);
+    } else if (obj instanceof FuncReturnTuple) {
+      return visitFuncReturnTuple((FuncReturnTuple) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -228,6 +252,15 @@ public abstract class Traverser<R, P> {
       return visitCaseStmt((CaseStmt) obj, param);
     else if (obj instanceof MsgPush)
       return visitMsgPush((MsgPush) obj, param);
+    else
+      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+  }
+
+  protected R visitAssignment(Assignment obj, P param) {
+    if (obj instanceof AssignmentSingle)
+      return visitAssignmentSingle((AssignmentSingle) obj, param);
+    else if (obj instanceof AssignmentMulti)
+      return visitAssignmentMulti((AssignmentMulti) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
@@ -291,7 +324,7 @@ public abstract class Traverser<R, P> {
     }
   }
 
-  protected R visitFunctionImpl(Function obj, P param) {
+  protected R visitFunction(Function obj, P param) {
     if (obj instanceof FuncGlobal) {
       return visitFuncGlobal((FuncGlobal) obj, param);
     } else if (obj instanceof FuncPrivateVoid) {
@@ -311,7 +344,7 @@ public abstract class Traverser<R, P> {
     } else if (obj instanceof FuncCtrlOutDataOut) {
       return visitFuncIfaceOutVoid((FuncCtrlOutDataOut) obj, param);
     } else if (obj instanceof Function) {
-      return visitFunctionImpl(obj, param);
+      return visitFunction(obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -324,8 +357,8 @@ public abstract class Traverser<R, P> {
       return visitStringValue((StringValue) obj, param);
     } else if (obj instanceof ArrayValue) {
       return visitArrayValue((ArrayValue) obj, param);
-    } else if (obj instanceof ExprList) {
-      return visitExprList((ExprList) obj, param);
+    } else if (obj instanceof TupleValue) {
+      return visitTupleValue((TupleValue) obj, param);
     } else if (obj instanceof BoolValue) {
       return visitBoolValue((BoolValue) obj, param);
     } else if (obj instanceof BinaryExp) {
@@ -340,14 +373,14 @@ public abstract class Traverser<R, P> {
       return visitTypeCast((TypeCast) obj, param);
     } else if (obj instanceof AnyValue) {
       return visitAnyValue((AnyValue) obj, param);
-    } else if (obj instanceof NamedElementValue) {
-      return visitNamedElementValue((NamedElementValue) obj, param);
     } else if (obj instanceof UnionValue) {
       return visitUnionValue((UnionValue) obj, param);
     } else if (obj instanceof UnsafeUnionValue) {
       return visitUnsafeUnionValue((UnsafeUnionValue) obj, param);
     } else if (obj instanceof RecordValue) {
       return visitRecordValue((RecordValue) obj, param);
+    } else if (obj instanceof NamedElementsValue) {
+      return visitNamedElementsValue((NamedElementsValue) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -355,7 +388,7 @@ public abstract class Traverser<R, P> {
 
   protected R visitBaseRef(BaseRef obj, P param) {
     if (obj instanceof SimpleRef) {
-      return visitTypeRef((SimpleRef) obj, param);
+      return visitSimpleRef((SimpleRef) obj, param);
     } else if (obj instanceof Reference) {
       return visitReference((Reference) obj, param);
     } else if (obj instanceof Endpoint) {
@@ -524,6 +557,8 @@ public abstract class Traverser<R, P> {
       return visitIntType((IntType) obj, param);
     } else if (obj instanceof AliasType) {
       return visitAliasType((AliasType) obj, param);
+    } else if (obj instanceof TupleType) {
+      return visitTupleType((TupleType) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -539,7 +574,15 @@ public abstract class Traverser<R, P> {
     }
   }
 
+  abstract protected R visitFuncReturnTuple(FuncReturnTuple obj, P param);
+
+  abstract protected R visitFuncReturnType(FuncReturnType obj, P param);
+
+  abstract protected R visitFuncReturnNone(FuncReturnNone obj, P param);
+
   abstract protected R visitAliasType(AliasType obj, P param);
+
+  abstract protected R visitTupleType(TupleType obj, P param);
 
   abstract protected R visitUIntType(UIntType obj, P param);
 
@@ -571,7 +614,9 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitCallStmt(CallStmt obj, P param);
 
-  abstract protected R visitAssignment(Assignment obj, P param);
+  abstract protected R visitAssignmentSingle(AssignmentSingle obj, P param);
+
+  abstract protected R visitAssignmentMulti(AssignmentMulti obj, P param);
 
   abstract protected R visitReturnExpr(ReturnExpr obj, P param);
 
@@ -579,7 +624,7 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitBlock(Block obj, P param);
 
-  abstract protected R visitTypeRef(SimpleRef obj, P param);
+  abstract protected R visitSimpleRef(SimpleRef obj, P param);
 
   abstract protected R visitEndpointSelf(EndpointSelf obj, P param);
 
@@ -667,7 +712,7 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitArrayValue(ArrayValue obj, P param);
 
-  abstract protected R visitExprList(ExprList obj, P param);
+  abstract protected R visitTupleValue(TupleValue obj, P param);
 
   abstract protected R visitStringValue(StringValue obj, P param);
 
@@ -675,11 +720,13 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitAnyValue(AnyValue obj, P param);
 
-  abstract protected R visitNamedElementValue(NamedElementValue obj, P param);
+  abstract protected R visitNamedValue(NamedValue obj, P param);
 
   abstract protected R visitUnsafeUnionValue(UnsafeUnionValue obj, P param);
 
   abstract protected R visitUnionValue(UnionValue obj, P param);
+
+  abstract protected R visitNamedElementsValue(NamedElementsValue obj, P param);
 
   abstract protected R visitRecordValue(RecordValue obj, P param);
 
@@ -738,4 +785,5 @@ public abstract class Traverser<R, P> {
   abstract protected R visitIs(Is obj, P param);
 
   abstract protected R visitNamedElement(NamedElement obj, P param);
+
 }

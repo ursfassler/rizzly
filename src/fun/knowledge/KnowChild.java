@@ -122,7 +122,7 @@ class KnowFunChildTraverser extends DefTraverser<Void, KfctState> {
   }
 
   @Override
-  protected Void visitDeclaration(Template obj, KfctState param) {
+  protected Void visitTemplate(Template obj, KfctState param) {
     visitList(obj.getTempl(), param);
     visit(obj.getObject(), KfctState.AddChildren);
     return null;

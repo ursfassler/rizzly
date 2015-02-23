@@ -43,6 +43,7 @@ import evl.copy.Copy;
 import evl.expression.reference.BaseRef;
 import evl.expression.reference.SimpleRef;
 import evl.function.Function;
+import evl.function.ret.FuncReturn;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
 import evl.traverser.CHeaderWriter;
@@ -87,7 +88,7 @@ public class HeaderWriter extends EvlPass {
         for (FuncVariable arg : func.getParam()) {
           anchor.add(arg.getType().getLink());
         }
-        anchor.add(func.getRet().getLink());
+        anchor.add(func.getRet());
 
         ret.add(func);
       }
@@ -104,6 +105,7 @@ public class HeaderWriter extends EvlPass {
         // element of record type
       } else if (itr instanceof EnumElement) {
         // element of enumerator type
+      } else if (itr instanceof FuncReturn) {
       } else {
         RError.err(ErrorType.Fatal, itr.getInfo(), "Object should not be used in header file: " + itr.getClass().getCanonicalName());
       }

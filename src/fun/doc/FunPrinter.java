@@ -33,14 +33,15 @@ import fun.Fun;
 import fun.NullTraverser;
 import fun.composition.Connection;
 import fun.composition.ImplComposition;
+import fun.expression.AnyValue;
 import fun.expression.ArithmeticOp;
-import fun.expression.ArrayValue;
 import fun.expression.BoolValue;
-import fun.expression.ExprList;
-import fun.expression.NamedElementValue;
+import fun.expression.NamedElementsValue;
+import fun.expression.NamedValue;
 import fun.expression.Number;
 import fun.expression.Relation;
 import fun.expression.StringValue;
+import fun.expression.TupleValue;
 import fun.expression.UnaryExpression;
 import fun.expression.reference.BaseRef;
 import fun.expression.reference.DummyLinkTarget;
@@ -56,6 +57,9 @@ import fun.function.FuncImpl;
 import fun.function.FuncProcedure;
 import fun.function.FuncQuery;
 import fun.function.FuncResponse;
+import fun.function.FuncReturnNone;
+import fun.function.FuncReturnTuple;
+import fun.function.FuncReturnType;
 import fun.function.FuncSignal;
 import fun.function.FuncSlot;
 import fun.hfsm.ImplHfsm;
@@ -299,7 +303,7 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   // ---- hfsm ----------------------------------------------------------------
 
   @Override
-  protected Void visitDeclaration(Template obj, Void param) {
+  protected Void visitTemplate(Template obj, Void param) {
     String id = getId(obj, param);
     xw.wa(obj.getName(), id);
     xw.wr("{");
@@ -539,7 +543,7 @@ public class FunPrinter extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitAssignment(Assignment obj, Void param) {
-    visit(obj.getLeft(), null);
+    visitList(obj.getLeft(), null);
     xw.wr(" := ");
     visit(obj.getRight(), null);
     xw.wr(";");
@@ -548,8 +552,10 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitVarDef(VarDefStmt obj, Void param) {
-    visit(obj.getVariable(), param);
+  protected Void visitVarDefStmt(VarDefStmt obj, Void param) {
+    visitList(obj.getVariable(), param);
+    xw.wr(" = ");
+    visit(obj.getInitial(), param);
     xw.wr(";");
     return null;
   }
@@ -708,6 +714,12 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   }
 
   @Override
+  protected Void visitAnyValue(AnyValue obj, Void param) {
+    xw.kw("_");
+    return null;
+  }
+
+  @Override
   protected Void visitBoolValue(BoolValue obj, Void param) {
     xw.kw(obj.isValue() ? "True" : "False");
     return null;
@@ -728,25 +740,23 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitArrayValue(ArrayValue obj, Void param) {
+  protected Void visitNamedValue(NamedValue obj, Void param) {
+    xw.wr(obj.getName());
+    xw.wr(" := ");
+    visit(obj.getValue(), null);
+    return null;
+  }
+
+  @Override
+  protected Void visitNamedElementsValue(NamedElementsValue obj, Void param) {
     xw.wr("[");
-    list(obj.getValue(), ", ", null);
+    list(obj.getValue(), ", ", param);
     xw.wr("]");
     return null;
   }
 
   @Override
-  protected Void visitNamedElementValue(NamedElementValue obj, Void param) {
-    xw.wr("(");
-    xw.wr(obj.getName());
-    xw.wr(" := ");
-    visit(obj.getValue(), null);
-    xw.wr(")");
-    return null;
-  }
-
-  @Override
-  protected Void visitExprList(ExprList obj, Void param) {
+  protected Void visitTupleValue(TupleValue obj, Void param) {
     xw.wr("(");
     list(obj.getValue(), ", ", null);
     xw.wr(")");
@@ -804,25 +814,23 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitRefCall(RefCall obj, Void param) {
-    xw.wr("(");
-    list(obj.getActualParameter(), ", ", null);
-    xw.wr(")");
-    return null;
-  }
-
-  @Override
-  protected Void visitRefCompcall(RefTemplCall obj, Void param) {
-    visitOptList("{", ", ", "}", obj.getActualParameter()); // FIXME it is a bit hacky, but maybe needed to make output
-    // nicer
-    return null;
-  }
-
-  @Override
   protected Void visitRefIndex(RefIndex obj, Void param) {
     xw.wr("[");
-    visit(obj.getIndex(), null);
+    visit(obj.getIndex(), param);
     xw.wr("]");
+    return null;
+  }
+
+  @Override
+  protected Void visitRefCall(RefCall obj, Void param) {
+    visit(obj.getActualParameter(), param);
+    return null;
+  }
+
+  @Override
+  protected Void visitRefTemplCall(RefTemplCall obj, Void param) {
+    visitOptList("{", ", ", "}", obj.getActualParameter()); // FIXME it is a bit hacky, but maybe needed to make output
+    // nicer
     return null;
   }
 
@@ -858,6 +866,27 @@ public class FunPrinter extends NullTraverser<Void, Void> {
     xw.nl();
   }
 
+  @Override
+  protected Void visitFuncReturnTuple(FuncReturnTuple obj, Void param) {
+    xw.wr(":");
+    xw.wr("(");
+    visitOptList("", "; ", "", obj.getParam());
+    xw.wr(")");
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncReturnType(FuncReturnType obj, Void param) {
+    xw.wr(":");
+    visit(obj.getType(), param);
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncReturnNone(FuncReturnNone obj, Void param) {
+    return null;
+  }
+
   private void printFunctionHeader(FuncHeader obj) {
     xw.wr("[");
     xw.wr(getId(obj, null));
@@ -865,7 +894,6 @@ public class FunPrinter extends NullTraverser<Void, Void> {
     xw.wr("(");
     visitOptList("", "; ", "", obj.getParam());
     xw.wr(")");
-    xw.wr(":");
     visit(obj.getRet(), null);
   }
 
@@ -878,7 +906,7 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncPrivateVoid(FuncProcedure obj, Void param) {
+  protected Void visitFuncProcedure(FuncProcedure obj, Void param) {
     xw.wr("procedure");
     printFunctionHeader(obj);
     printFuncImpl(obj);
@@ -886,7 +914,7 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncProtSlot(FuncSlot obj, Void param) {
+  protected Void visitFuncSlot(FuncSlot obj, Void param) {
     xw.wr("slot");
     printFunctionHeader(obj);
     printFuncImpl(obj);
@@ -894,7 +922,7 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncProtSignal(FuncSignal obj, Void param) {
+  protected Void visitFuncSignal(FuncSignal obj, Void param) {
     xw.wr("signal");
     printFunctionHeader(obj);
     xw.wr(";");
@@ -903,7 +931,7 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncProtQuery(FuncQuery obj, Void param) {
+  protected Void visitFuncQuery(FuncQuery obj, Void param) {
     xw.wr("query");
     printFunctionHeader(obj);
     xw.wr(";");
@@ -912,7 +940,7 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncProtResponse(FuncResponse obj, Void param) {
+  protected Void visitFuncResponse(FuncResponse obj, Void param) {
     xw.wr("response");
     printFunctionHeader(obj);
     printFuncImpl(obj);

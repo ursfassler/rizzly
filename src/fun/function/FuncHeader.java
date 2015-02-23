@@ -21,7 +21,6 @@ import common.ElementInfo;
 
 import fun.Fun;
 import fun.FunBase;
-import fun.expression.reference.Reference;
 import fun.other.FunList;
 import fun.other.Named;
 import fun.variable.FuncVariable;
@@ -29,9 +28,9 @@ import fun.variable.FuncVariable;
 abstract public class FuncHeader extends FunBase implements Named {
   private String name;
   final private FunList<FuncVariable> param = new FunList<FuncVariable>();
-  private Reference ret;
+  private FuncReturn ret;
 
-  public FuncHeader(ElementInfo info, String name, FunList<FuncVariable> param, Reference ret) {
+  public FuncHeader(ElementInfo info, String name, FunList<FuncVariable> param, FuncReturn ret) {
     super(info);
     this.name = name;
     this.param.addAll(param);
@@ -52,11 +51,11 @@ abstract public class FuncHeader extends FunBase implements Named {
     return param;
   }
 
-  public Reference getRet() {
+  public FuncReturn getRet() {
     return ret;
   }
 
-  public void setRet(Reference ret) {
+  public void setRet(FuncReturn ret) {
     this.ret = ret;
   }
 

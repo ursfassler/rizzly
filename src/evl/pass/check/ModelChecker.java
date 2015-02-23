@@ -64,7 +64,7 @@ class ModelCheckerWorker extends DefTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitFunctionImpl(Function obj, Void sym) {
+  protected Void visitFunction(Function obj, Void sym) {
     return null;
   }
 

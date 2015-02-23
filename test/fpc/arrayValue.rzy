@@ -1,4 +1,4 @@
-data : const Array{10,R{0,100}} = [
+data : const Array{10,R{0,100}} = (
     10,
     20,
     1,
@@ -9,7 +9,7 @@ data : const Array{10,R{0,100}} = [
     5,
     12,
     7 
-  ];
+  );
 
 ArrayValue = Elementary
   out : signal( x: R{0,100} );

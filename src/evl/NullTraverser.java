@@ -24,12 +24,13 @@ import evl.composition.ImplComposition;
 import evl.expression.AnyValue;
 import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
-import evl.expression.ExprList;
-import evl.expression.NamedElementValue;
+import evl.expression.NamedElementsValue;
+import evl.expression.NamedValue;
 import evl.expression.Number;
 import evl.expression.RangeValue;
 import evl.expression.RecordValue;
 import evl.expression.StringValue;
+import evl.expression.TupleValue;
 import evl.expression.TypeCast;
 import evl.expression.UnionValue;
 import evl.expression.UnsafeUnionValue;
@@ -71,6 +72,9 @@ import evl.function.header.FuncPrivateRet;
 import evl.function.header.FuncPrivateVoid;
 import evl.function.header.FuncSubHandlerEvent;
 import evl.function.header.FuncSubHandlerQuery;
+import evl.function.ret.FuncReturnNone;
+import evl.function.ret.FuncReturnTuple;
+import evl.function.ret.FuncReturnType;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.StateComposite;
 import evl.hfsm.StateSimple;
@@ -80,7 +84,8 @@ import evl.other.ImplElementary;
 import evl.other.Namespace;
 import evl.other.Queue;
 import evl.other.SubCallbacks;
-import evl.statement.Assignment;
+import evl.statement.AssignmentMulti;
+import evl.statement.AssignmentSingle;
 import evl.statement.Block;
 import evl.statement.CallStmt;
 import evl.statement.CaseOpt;
@@ -101,6 +106,7 @@ import evl.type.base.EnumType;
 import evl.type.base.FunctionType;
 import evl.type.base.RangeType;
 import evl.type.base.StringType;
+import evl.type.base.TupleType;
 import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
@@ -121,6 +127,36 @@ import evl.variable.StateVariable;
 abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   abstract protected R visitDefault(Evl obj, P param);
+
+  @Override
+  protected R visitAssignmentSingle(AssignmentSingle obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitNamedElementsValue(NamedElementsValue obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitTupleType(TupleType obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitFuncReturnTuple(FuncReturnTuple obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitFuncReturnType(FuncReturnType obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitFuncReturnNone(FuncReturnNone obj, P param) {
+    return visitDefault(obj, param);
+  }
 
   @Override
   protected R visitAliasType(AliasType obj, P param) {
@@ -168,7 +204,7 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitExprList(ExprList obj, P param) {
+  protected R visitTupleValue(TupleValue obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -178,7 +214,7 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitNamedElementValue(NamedElementValue obj, P param) {
+  protected R visitNamedValue(NamedValue obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -438,7 +474,7 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitTypeRef(SimpleRef obj, P param) {
+  protected R visitSimpleRef(SimpleRef obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -583,7 +619,7 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitAssignment(Assignment obj, P param) {
+  protected R visitAssignmentMulti(AssignmentMulti obj, P param) {
     return visitDefault(obj, param);
   }
 

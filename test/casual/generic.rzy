@@ -6,6 +6,6 @@ R2{T:Any} = Record
 end
 
 Generic = Elementary
-  x: R2{R1} = b := _;
+  x: R2{R1} = [ b := []];
 end
 

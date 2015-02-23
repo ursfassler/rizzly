@@ -85,4 +85,9 @@ abstract public class Component extends EvlBase implements Named {
     this.queue = queue;
   }
 
+  @Override
+  public String toString() {
+    return name;
+  }
+
 }

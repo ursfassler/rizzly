@@ -38,7 +38,7 @@ public class CopyFunction extends NullTraverser<Evl, Void> {
   }
 
   @Override
-  protected Function visitFunctionImpl(Function obj, Void param) {
+  protected Function visitFunction(Function obj, Void param) {
     EvlList<FuncVariable> arg = cast.copy(obj.getParam());
     Function ret = FunctionFactory.create(obj.getClass(), obj.getInfo(), obj.getName(), arg, cast.copy(obj.getRet()), cast.copy(obj.getBody()));
     cast.getCopied().put(obj, ret);

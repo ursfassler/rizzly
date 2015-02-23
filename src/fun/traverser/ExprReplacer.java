@@ -22,15 +22,16 @@ import java.util.List;
 import error.ErrorType;
 import error.RError;
 import fun.DefTraverser;
+import fun.expression.AnyValue;
 import fun.expression.ArithmeticOp;
-import fun.expression.ArrayValue;
 import fun.expression.BoolValue;
-import fun.expression.ExprList;
 import fun.expression.Expression;
-import fun.expression.NamedElementValue;
+import fun.expression.NamedElementsValue;
+import fun.expression.NamedValue;
 import fun.expression.Number;
 import fun.expression.Relation;
 import fun.expression.StringValue;
+import fun.expression.TupleValue;
 import fun.expression.UnaryExpression;
 import fun.expression.reference.RefCall;
 import fun.expression.reference.RefIndex;
@@ -38,7 +39,6 @@ import fun.expression.reference.RefItem;
 import fun.expression.reference.RefName;
 import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.Reference;
-import fun.function.FuncHeader;
 import fun.hfsm.Transition;
 import fun.other.ActualTemplateArgument;
 import fun.other.FunList;
@@ -48,6 +48,7 @@ import fun.statement.CaseOptValue;
 import fun.statement.CaseStmt;
 import fun.statement.IfOption;
 import fun.statement.ReturnExpr;
+import fun.statement.VarDefStmt;
 import fun.statement.While;
 import fun.type.composed.NamedElement;
 import fun.variable.Constant;
@@ -82,7 +83,7 @@ public class ExprReplacer<T> extends DefTraverser<Expression, T> {
 
   @Override
   protected Expression visitRefCall(RefCall obj, T param) {
-    visitExprList(obj.getActualParameter(), param);
+    visitTupleValue(obj.getActualParameter(), param);
     return null;
   }
 
@@ -92,7 +93,7 @@ public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitRefCompcall(RefTemplCall obj, T param) {
+  protected Expression visitRefTemplCall(RefTemplCall obj, T param) {
     FunList<ActualTemplateArgument> list = obj.getActualParameter();
     for (int i = 0; i < list.size(); i++) {
       if (list.get(i) instanceof Expression) {
@@ -138,19 +139,18 @@ public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitArrayValue(ArrayValue obj, T param) {
-    visitExprList(obj.getValue(), param);
-    return obj;
-  }
-
-  @Override
-  protected Expression visitExprList(ExprList obj, T param) {
+  protected Expression visitTupleValue(TupleValue obj, T param) {
     visitExprList(obj.getValue(), param);
     return obj;
   }
 
   @Override
   protected Expression visitBoolValue(BoolValue obj, T param) {
+    return obj;
+  }
+
+  @Override
+  protected Expression visitAnyValue(AnyValue obj, T param) {
     return obj;
   }
 
@@ -188,8 +188,14 @@ public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   }
 
   @Override
+  protected Expression visitVarDefStmt(VarDefStmt obj, T param) {
+    obj.setInitial(visit(obj.getInitial(), param));
+    return null;
+  }
+
+  @Override
   protected Expression visitAssignment(Assignment obj, T param) {
-    obj.setLeft((Reference) visit(obj.getLeft(), param)); // FIXME this (cast) looks hacky
+    visitList(obj.getLeft(), param);
     obj.setRight(visit(obj.getRight(), param));
     return null;
   }
@@ -222,21 +228,21 @@ public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   }
 
   @Override
+  protected Expression visitNamedElementsValue(NamedElementsValue obj, T param) {
+    super.visitNamedElementsValue(obj, param);
+    return obj;
+  }
+
+  @Override
   protected Expression visitVariable(Variable obj, T param) {
     obj.setType((Reference) visit(obj.getType(), param));
     return super.visitVariable(obj, param);
   }
 
   @Override
-  protected Expression visitNamedElementValue(NamedElementValue obj, T param) {
+  protected Expression visitNamedValue(NamedValue obj, T param) {
     obj.setValue(visit(obj.getValue(), param));
-    return obj;
-  }
-
-  @Override
-  protected Expression visitFunctionHeader(FuncHeader obj, T param) {
-    obj.setRet((Reference) visit(obj.getRet(), param));
-    return super.visitFunctionHeader(obj, param);
+    return null;
   }
 
 }

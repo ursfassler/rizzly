@@ -52,6 +52,6 @@ public class ErrTypeTest extends ErrorTest {
 
   @Test
   public void err6() {
-    testForError("err6", "Err6", "Elements not initialized: [2, 3, 4, 5, 6, 7]");
+    testForError("err6", "Err6", "Expected 8 elements, got 2");
   }
 }

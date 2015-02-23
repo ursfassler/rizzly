@@ -20,7 +20,6 @@ package fun.function;
 import common.ElementInfo;
 
 import fun.content.CompIfaceContent;
-import fun.expression.reference.Reference;
 import fun.other.FunList;
 import fun.variable.FuncVariable;
 
@@ -30,7 +29,7 @@ import fun.variable.FuncVariable;
  */
 public class FuncQuery extends FuncProto implements CompIfaceContent {
 
-  public FuncQuery(ElementInfo info, String name, FunList<FuncVariable> param, Reference ret) {
+  public FuncQuery(ElementInfo info, String name, FunList<FuncVariable> param, FuncReturn ret) {
     super(info, name, param, ret);
   }
 

@@ -32,12 +32,14 @@ import error.ErrorType;
 import error.RError;
 import evl.Evl;
 import evl.NullTraverser;
+import evl.expression.AnyValue;
 import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
 import evl.expression.Expression;
 import evl.expression.Number;
 import evl.expression.RecordValue;
 import evl.expression.StringValue;
+import evl.expression.TupleValue;
 import evl.expression.TypeCast;
 import evl.expression.UnionValue;
 import evl.expression.UnsafeUnionValue;
@@ -63,6 +65,9 @@ import evl.expression.unop.LogicNot;
 import evl.expression.unop.Uminus;
 import evl.function.Function;
 import evl.function.InterfaceFunction;
+import evl.function.ret.FuncReturnNone;
+import evl.function.ret.FuncReturnTuple;
+import evl.function.ret.FuncReturnType;
 import evl.other.CompUse;
 import evl.other.Component;
 import evl.other.EvlList;
@@ -75,7 +80,9 @@ import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.type.base.FunctionType;
 import evl.type.base.RangeType;
+import evl.type.base.TupleType;
 import evl.type.composed.NamedElement;
+import evl.type.composed.RecordType;
 import evl.type.special.ComponentType;
 import evl.variable.FuncVariable;
 import evl.variable.Variable;
@@ -145,12 +152,12 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
   }
 
   @Override
-  protected Type visitFunctionImpl(Function obj, Void param) {
+  protected Type visitFunction(Function obj, Void param) {
     EvlList<SimpleRef<Type>> arg = new EvlList<SimpleRef<Type>>();
     for (FuncVariable var : obj.getParam()) {
       arg.add(new SimpleRef<Type>(ElementInfo.NO, var.getType().getLink()));
     }
-    return new FunctionType(obj.getInfo(), obj.getName(), arg, new SimpleRef<Type>(ElementInfo.NO, obj.getRet().getLink()));
+    return new FunctionType(obj.getInfo(), obj.getName(), arg, new SimpleRef<Type>(ElementInfo.NO, visit(obj.getRet(), param)));
   }
 
   @Override
@@ -166,6 +173,11 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
       NamedElement ne = new NamedElement(itr.getInfo(), itr.getName(), new SimpleRef<Type>(itr.getInfo(), visit(itr, null)));
       flist.add(ne);
     }
+  }
+
+  @Override
+  protected Type visitAnyValue(AnyValue obj, Void param) {
+    return kbi.getAnyType();
   }
 
   @Override
@@ -186,6 +198,20 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
   @Override
   protected Type visitRecordValue(RecordValue obj, Void param) {
     return visit(obj.getType(), param);
+  }
+
+  @Override
+  protected Type visitTupleValue(TupleValue obj, Void param) {
+    if (obj.getValue().size() == 1) {
+      return visit(obj.getValue().get(0), param);
+    } else {
+      EvlList<SimpleRef<Type>> elem = new EvlList<SimpleRef<Type>>();
+      for (Expression expr : obj.getValue()) {
+        SimpleRef<Type> ref = new SimpleRef<Type>(expr.getInfo(), visit(expr, null));
+        elem.add(ref);
+      }
+      return new TupleType(obj.getInfo(), "", elem);
+    }
   }
 
   @Override
@@ -215,13 +241,32 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
   }
 
   @Override
-  protected Type visitTypeRef(SimpleRef obj, Void param) {
+  protected Type visitSimpleRef(SimpleRef obj, Void param) {
     return visit(obj.getLink(), param);
   }
 
   @Override
   protected Type visitCompUse(CompUse obj, Void param) {
     return visit(obj.getLink(), param);
+  }
+
+  @Override
+  protected Type visitFuncReturnTuple(FuncReturnTuple obj, Void param) {
+    EvlList<NamedElement> types = new EvlList<NamedElement>();
+    for (FuncVariable var : obj.getParam()) {
+      types.add(new NamedElement(ElementInfo.NO, var.getName(), new SimpleRef<Type>(ElementInfo.NO, visit(var, param))));
+    }
+    return new RecordType(obj.getInfo(), "", types);
+  }
+
+  @Override
+  protected Type visitFuncReturnType(FuncReturnType obj, Void param) {
+    return visit(obj.getType(), param);
+  }
+
+  @Override
+  protected Type visitFuncReturnNone(FuncReturnNone obj, Void param) {
+    return kbi.getVoidType();
   }
 
   @Override

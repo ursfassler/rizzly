@@ -19,12 +19,11 @@ package evl.function.header;
 
 import common.ElementInfo;
 
-import evl.expression.reference.SimpleRef;
 import evl.function.Function;
+import evl.function.ret.FuncReturn;
 import evl.hfsm.StateItem;
 import evl.other.EvlList;
 import evl.statement.Block;
-import evl.type.Type;
 import evl.variable.FuncVariable;
 
 /**
@@ -33,7 +32,7 @@ import evl.variable.FuncVariable;
  */
 public class FuncPrivateVoid extends Function implements StateItem {
 
-  public FuncPrivateVoid(ElementInfo info, String name, EvlList<FuncVariable> param, SimpleRef<Type> ret, Block body) {
+  public FuncPrivateVoid(ElementInfo info, String name, EvlList<FuncVariable> param, FuncReturn ret, Block body) {
     super(info, name, param, ret, body);
   }
 }

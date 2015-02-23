@@ -20,7 +20,7 @@ package evl.expression.reference;
 import common.ElementInfo;
 
 final public class RefName extends RefItem {
-  final private String name;
+  private String name;
 
   public RefName(ElementInfo info, String name) {
     super(info);
@@ -29,6 +29,10 @@ final public class RefName extends RefItem {
 
   public String getName() {
     return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
   @Override

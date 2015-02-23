@@ -15,15 +15,18 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package evl.pass.check.type;
+package evl.knowledge;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
+import util.Pair;
 import util.Range;
 import evl.Evl;
 import evl.NullTraverser;
 import evl.expression.reference.SimpleRef;
-import evl.knowledge.KnowledgeBase;
+import evl.pass.check.type.Supertype;
 import evl.type.Type;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
@@ -32,32 +35,51 @@ import evl.type.base.EnumType;
 import evl.type.base.FunctionType;
 import evl.type.base.RangeType;
 import evl.type.base.StringType;
+import evl.type.base.TupleType;
+import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
 import evl.type.composed.UnsafeUnionType;
 import evl.type.out.SIntType;
 import evl.type.out.UIntType;
+import evl.type.special.AnyType;
 import evl.type.special.IntegerType;
 import evl.type.special.NaturalType;
 import evl.type.special.VoidType;
 
-public class LeftIsContainerOfRightTest extends NullTraverser<Boolean, Type> {
+public class KnowLeftIsContainerOfRight extends KnowledgeEntry {
+  final private HashMap<Pair<Type, Type>, Boolean> cache = new HashMap<Pair<Type, Type>, Boolean>();
+  private KnowLeftIsContainerOfRightWorker worker;
 
+  @Override
+  public void init(KnowledgeBase base) {
+    worker = new KnowLeftIsContainerOfRightWorker(base);
+  }
+
+  public boolean get(Type left, Type right) {
+    if (right instanceof AnyType) {
+      return true;
+    }
+
+    Pair<Type, Type> pair = new Pair<Type, Type>(left, right);
+    if (!cache.containsKey(pair)) {
+      cache.put(pair, worker.traverse(left, right));
+    }
+    return cache.get(pair);
+  }
+
+  public boolean areEqual(Type left, Type right) {
+    return get(left, right) && get(right, left);
+  }
+
+}
+
+class KnowLeftIsContainerOfRightWorker extends NullTraverser<Boolean, Type> {
   private KnowledgeBase kb;
 
-  public LeftIsContainerOfRightTest(KnowledgeBase kb) {
+  public KnowLeftIsContainerOfRightWorker(KnowledgeBase kb) {
     super();
     this.kb = kb;
-  }
-
-  public static boolean process(Type left, Type right, KnowledgeBase kb) {
-    LeftIsContainerOfRightTest test = new LeftIsContainerOfRightTest(kb);
-    return test.traverse(left, right);
-  }
-
-  public static boolean areEual(Type left, Type right, KnowledgeBase kb) {
-    LeftIsContainerOfRightTest test = new LeftIsContainerOfRightTest(kb);
-    return test.traverse(left, right) && test.traverse(right, left);
   }
 
   @Override
@@ -70,7 +92,7 @@ public class LeftIsContainerOfRightTest extends NullTraverser<Boolean, Type> {
     return super.visit(left, right);
   }
 
-  public Boolean isDerivativeOf(Class<? extends Type> baseClass, Type type) {
+  private Boolean isDerivativeOf(Class<? extends Type> baseClass, Type type) {
     while (!(baseClass.isInstance(type))) {
       Type parent = getSupertype(type);
       if (parent == type) {
@@ -153,17 +175,42 @@ public class LeftIsContainerOfRightTest extends NullTraverser<Boolean, Type> {
 
   @Override
   protected Boolean visitBooleanType(BooleanType left, Type right) {
-    return true;
+    return right instanceof BooleanType;
   }
 
   @Override
   protected Boolean visitStringType(StringType left, Type right) {
-    return true;
+    return right instanceof StringType;
+  }
+
+  @Override
+  protected Boolean visitTupleType(TupleType obj, Type right) {
+    if (right instanceof TupleType) {
+      return process(obj.getTypes(), ((TupleType) right).getTypes());
+    } else if (right instanceof RecordType) {
+      List<SimpleRef<Type>> rtypes = new ArrayList<SimpleRef<Type>>();
+      for (NamedElement elem : ((RecordType) right).getElement()) {
+        rtypes.add(elem.getRef());
+      }
+      return process(obj.getTypes(), rtypes);
+    } else {
+      throw new RuntimeException("not yet implemented: " + right);
+    }
   }
 
   @Override
   protected Boolean visitRecordType(RecordType left, Type right) {
-    return left.equals(right); // TODO check if left is supertype of right
+    if (left.equals(right)) {
+      return true;
+    } else if (right instanceof TupleType) {
+      List<SimpleRef<Type>> lt = new ArrayList<SimpleRef<Type>>();
+      for (NamedElement elem : left.getElement()) {
+        lt.add(elem.getRef());
+      }
+      return process(lt, ((TupleType) right).getTypes());
+    } else {
+      return false; // TODO check if left is supertype of right
+    }
   }
 
   @Override

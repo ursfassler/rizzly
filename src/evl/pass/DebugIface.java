@@ -31,6 +31,7 @@ import evl.expression.Number;
 import evl.expression.StringValue;
 import evl.expression.reference.SimpleRef;
 import evl.function.header.FuncCtrlInDataOut;
+import evl.function.ret.FuncReturnType;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
 import evl.other.EvlList;
@@ -86,7 +87,7 @@ public class DebugIface extends EvlPass {
     EvlList<FuncVariable> args = new EvlList<FuncVariable>();
     args.add(arg);
     Block body = new Block(info);
-    FuncCtrlInDataOut func = new FuncCtrlInDataOut(info, Designator.NAME_SEP + funcName, args, new SimpleRef<Type>(info, stringType), body);
+    FuncCtrlInDataOut func = new FuncCtrlInDataOut(info, Designator.NAME_SEP + funcName, args, new FuncReturnType(info, new SimpleRef<Type>(info, stringType)), body);
 
     EvlList<CaseOpt> option = new EvlList<CaseOpt>();
     Block otherwise = new Block(info);

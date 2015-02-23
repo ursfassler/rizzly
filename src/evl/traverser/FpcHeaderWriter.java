@@ -34,6 +34,8 @@ import evl.expression.BoolValue;
 import evl.expression.Number;
 import evl.expression.reference.SimpleRef;
 import evl.function.Function;
+import evl.function.ret.FuncReturnNone;
+import evl.function.ret.FuncReturnType;
 import evl.knowledge.KnowledgeBase;
 import evl.other.EvlList;
 import evl.other.Namespace;
@@ -160,7 +162,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitFunctionImpl(Function obj, StreamWriter param) {
+  protected Void visitFunction(Function obj, StreamWriter param) {
     writeFuncHeader(obj, param);
     return null;
   }
@@ -171,9 +173,21 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
     return null;
   }
 
+  @Override
+  protected Void visitFuncReturnType(FuncReturnType obj, StreamWriter param) {
+    param.wr(":");
+    visit(obj.getType(), param);
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncReturnNone(FuncReturnNone obj, StreamWriter param) {
+    return null;
+  }
+
   protected void writeFuncHeader(Function obj, StreamWriter param) {
     assert (obj.properties().get(Property.Public) == Boolean.TRUE);
-    if (obj.getRet().getLink() instanceof VoidType) {
+    if (obj.getRet() instanceof FuncReturnNone) {
       param.wr("procedure");
     } else {
       param.wr("function");
@@ -190,10 +204,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
     }
     param.wr(")");
 
-    if (!(obj.getRet().getLink() instanceof VoidType)) {
-      param.wr(":");
-      visit(obj.getRet(), param);
-    }
+    visit(obj.getRet(), param);
 
     param.wr(";");
     param.wr(" cdecl;");
@@ -271,7 +282,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitTypeRef(SimpleRef obj, StreamWriter param) {
+  protected Void visitSimpleRef(SimpleRef obj, StreamWriter param) {
     param.wr(obj.getLink().getName());
     return null;
   }

@@ -100,7 +100,7 @@ class KnowChildTraverser extends NullTraverser<Set<Evl>, String> {
   }
 
   @Override
-  protected Set<Evl> visitTypeRef(SimpleRef obj, String param) {
+  protected Set<Evl> visitSimpleRef(SimpleRef obj, String param) {
     return visit(obj.getLink(), param);
   }
 
@@ -221,7 +221,7 @@ class KnowChildTraverser extends NullTraverser<Set<Evl>, String> {
   }
 
   @Override
-  protected Set<Evl> visitFunctionImpl(Function obj, String param) {
+  protected Set<Evl> visitFunction(Function obj, String param) {
     return new HashSet<Evl>();
   }
 

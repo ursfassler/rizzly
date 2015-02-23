@@ -23,10 +23,10 @@ import error.RError;
 import evl.pass.check.type.specific.ExpressionTypeChecker;
 import fun.Fun;
 import fun.NullTraverser;
-import fun.expression.ArrayValue;
 import fun.expression.Expression;
 import fun.expression.Number;
-import fun.expression.reference.RefIndex;
+import fun.expression.TupleValue;
+import fun.expression.reference.RefCall;
 import fun.expression.reference.RefItem;
 
 public class ElementSetter extends NullTraverser<Expression, Pair<Expression, Expression>> {
@@ -42,18 +42,19 @@ public class ElementSetter extends NullTraverser<Expression, Pair<Expression, Ex
   }
 
   @Override
-  protected Expression visitRefIndex(RefIndex obj, Pair<Expression, Expression> param) {
-    visit(obj.getIndex(), param);
+  protected Expression visitRefCall(RefCall obj, Pair<Expression, Expression> param) {
+    RError.ass(obj.getActualParameter().getValue().size() == 1, obj.getInfo());
+    visit(obj.getActualParameter().getValue().get(0), param);
     return null;
   }
 
   @Override
   protected Expression visitNumber(Number obj, Pair<Expression, Expression> param) {
     int idx = ExpressionTypeChecker.getAsInt(obj.getValue(), obj.toString());
-    if (!(param.first instanceof ArrayValue)) {
+    if (!(param.first instanceof TupleValue)) {
       RError.err(ErrorType.Fatal, obj.getInfo(), "Expected array value");
     }
-    ArrayValue arrv = (ArrayValue) param.first;
+    TupleValue arrv = (TupleValue) param.first;
     arrv.getValue().set(idx, param.second);
     return null;
   }

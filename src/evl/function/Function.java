@@ -21,20 +21,19 @@ import common.ElementInfo;
 
 import evl.Evl;
 import evl.EvlBase;
-import evl.expression.reference.SimpleRef;
+import evl.function.ret.FuncReturn;
 import evl.other.EvlList;
 import evl.other.Named;
 import evl.statement.Block;
-import evl.type.Type;
 import evl.variable.FuncVariable;
 
 abstract public class Function extends EvlBase implements Named {
   private String name;
   final private EvlList<FuncVariable> param = new EvlList<FuncVariable>();
-  private SimpleRef<Type> ret = null;
+  private FuncReturn ret;
   private Block body;
 
-  public Function(ElementInfo info, String name, EvlList<FuncVariable> param, SimpleRef<Type> ret, Block body) {
+  public Function(ElementInfo info, String name, EvlList<FuncVariable> param, FuncReturn ret, Block body) {
     super(info);
     this.name = name;
     this.param.addAll(param);
@@ -64,11 +63,11 @@ abstract public class Function extends EvlBase implements Named {
     return param;
   }
 
-  public SimpleRef<Type> getRet() {
+  public FuncReturn getRet() {
     return ret;
   }
 
-  public void setRet(SimpleRef<Type> ret) {
+  public void setRet(FuncReturn ret) {
     this.ret = ret;
   }
 

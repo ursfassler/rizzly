@@ -34,6 +34,7 @@ import evl.function.Function;
 import evl.hfsm.Transition;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowChild;
+import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
 import evl.type.Type;
 import evl.type.base.ArrayType;
@@ -61,9 +62,9 @@ public class CallgraphMaker extends DefTraverser<Void, Evl> {
   }
 
   @Override
-  protected Void visitFunctionImpl(Function obj, Evl param) {
+  protected Void visitFunction(Function obj, Evl param) {
     callgraph.addVertex(obj);
-    return super.visitFunctionImpl(obj, obj);
+    return super.visitFunction(obj, obj);
   }
 
   @Override
@@ -119,6 +120,7 @@ class RefGetter extends NullTraverser<Evl, Evl> {
   private Set<Function> target;
   private KnowChild kfc;
   private KnowBaseItem kbi;
+  final private KnowType kt;
 
   static public Evl process(RefItem refitm, Evl last, Set<Function> target, KnowledgeBase kb) {
     RefGetter refChecker = new RefGetter(kb, target);
@@ -130,6 +132,7 @@ class RefGetter extends NullTraverser<Evl, Evl> {
     this.target = target;
     this.kfc = kb.getEntry(KnowChild.class);
     kbi = kb.getEntry(KnowBaseItem.class);
+    kt = kb.getEntry(KnowType.class);
   }
 
   @Override
@@ -145,7 +148,7 @@ class RefGetter extends NullTraverser<Evl, Evl> {
     }
     Function header = (Function) param;
     target.add(header);
-    return header.getRet().getLink();
+    return kt.get(header.getRet());
   }
 
   @Override

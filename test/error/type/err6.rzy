@@ -1,6 +1,6 @@
 // Wrong number of initializer elements
 
 Err6 = Elementary
-  a : Array{8,R{0,10}} = [0,0];
+  a : Array{8,R{0,10}} = (0,0);
 end
 

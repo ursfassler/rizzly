@@ -48,7 +48,7 @@ public class RefTypeGetter extends NullTraverser<Type, Type> {
   }
 
   @Override
-  protected Type visitTypeRef(SimpleRef obj, Type param) {
+  protected Type visitSimpleRef(SimpleRef obj, Type param) {
     return (Type) obj.getLink();
   }
 

@@ -26,7 +26,7 @@ import common.ElementInfo;
 import evl.Evl;
 import evl.NullTraverser;
 import evl.copy.Copy;
-import evl.expression.NamedElementValue;
+import evl.expression.NamedValue;
 import evl.expression.RecordValue;
 import evl.expression.UnsafeUnionValue;
 import evl.expression.reference.Reference;
@@ -96,7 +96,7 @@ public class StateTypeBuilder extends NullTraverser<NamedElement, EvlList<NamedE
 
     obj.getItem().add(record);
     stateType.put(obj, record);
-    initValues.put(record, new RecordValue(obj.getInfo(), new EvlList<NamedElementValue>(), new SimpleRef<Type>(obj.getInfo(), record)));
+    initValues.put(record, new RecordValue(obj.getInfo(), new EvlList<NamedValue>(), new SimpleRef<Type>(obj.getInfo(), record)));
 
     return record;
   }
@@ -145,12 +145,12 @@ public class StateTypeBuilder extends NullTraverser<NamedElement, EvlList<NamedE
 
     Constant initvalue = initVar.get(initStateElem.getRef().getLink());
     assert (initvalue != null);
-    NamedElementValue cont = new NamedElementValue(obj.getInfo(), getName(obj.getInitial().getLink()), new Reference(obj.getInfo(), initvalue));
+    NamedValue cont = new NamedValue(obj.getInfo(), getName(obj.getInitial().getLink()), new Reference(obj.getInfo(), initvalue));
     UnsafeUnionValue uninit = new UnsafeUnionValue(obj.getInfo(), cont, new SimpleRef<Type>(obj.getInfo(), union));
 
     RecordValue value = initValues.get(record);
     assert (value != null);
-    value.getValue().add(new NamedElementValue(obj.getInfo(), SUB_ENTRY_NAME, uninit));
+    value.getValue().add(new NamedValue(obj.getInfo(), SUB_ENTRY_NAME, uninit));
 
     return dataElem;
   }
@@ -162,7 +162,7 @@ public class StateTypeBuilder extends NullTraverser<NamedElement, EvlList<NamedE
     for (StateVariable var : state.getItem().getItems(StateVariable.class)) {
       NamedElement item = new NamedElement(var.getInfo(), getName(var), Copy.copy(var.getType()));
       type.getElement().add(item);
-      value.getValue().add(new NamedElementValue(var.getInfo(), getName(var), Copy.copy(var.getDef())));
+      value.getValue().add(new NamedValue(var.getInfo(), getName(var), Copy.copy(var.getDef())));
 
       EvlList<NamedElement> path = new EvlList<NamedElement>(param);
       path.add(item);

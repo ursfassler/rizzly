@@ -29,6 +29,7 @@ import evl.NullTraverser;
 import evl.composition.ImplComposition;
 import evl.expression.Expression;
 import evl.expression.Number;
+import evl.expression.TupleValue;
 import evl.expression.TypeCast;
 import evl.expression.binop.Plus;
 import evl.expression.reference.RefCall;
@@ -38,11 +39,13 @@ import evl.expression.reference.SimpleRef;
 import evl.function.header.FuncCtrlOutDataOut;
 import evl.function.header.FuncPrivateVoid;
 import evl.function.header.FuncSubHandlerEvent;
+import evl.function.ret.FuncReturnNone;
 import evl.other.CompUse;
 import evl.other.EvlList;
 import evl.other.ImplElementary;
 import evl.other.Namespace;
 import evl.statement.Assignment;
+import evl.statement.AssignmentSingle;
 import evl.statement.Block;
 import evl.statement.CallStmt;
 import evl.statement.Statement;
@@ -79,7 +82,7 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     FuncVariable size = new FuncVariable(info, "size", tr(sizeType));
     param.add(size);
 
-    FuncSubHandlerEvent func = new FuncSubHandlerEvent(info, Designator.NAME_SEP + "msgRecv", param, tr(voidType), new Block(info));
+    FuncSubHandlerEvent func = new FuncSubHandlerEvent(info, Designator.NAME_SEP + "msgRecv", param, new FuncReturnNone(info), new Block(info));
     func.setBody(new Block(info));
     return func;
   }
@@ -95,7 +98,7 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     FuncVariable size = new FuncVariable(info, "size", new SimpleRef<Type>(info, sizeType));
     param.add(size);
 
-    FuncSubHandlerEvent func = new FuncSubHandlerEvent(info, Designator.NAME_SEP + "msgSend", param, tr(voidType), new Block(info));
+    FuncSubHandlerEvent func = new FuncSubHandlerEvent(info, Designator.NAME_SEP + "msgSend", param, new FuncReturnNone(info), new Block(info));
     return func;
   }
 
@@ -114,14 +117,14 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
 
       Reference left = new Reference(info, path, new RefIndex(info, new Number(info, BigInteger.ZERO)));
       Reference right = new Reference(info, func);
-      Assignment ass = new Assignment(info, left, right);
+      Assignment ass = new AssignmentSingle(info, left, right);
       body.getStatements().add(ass);
     }
 
     { // _debug.msgSend( path, 1 );
-      EvlList<Expression> actParam = new EvlList<Expression>();
-      actParam.add(new Reference(info, path));
-      actParam.add(new Number(info, BigInteger.valueOf(1)));
+      TupleValue actParam = new TupleValue(info);
+      actParam.getValue().add(new Reference(info, path));
+      actParam.getValue().add(new Number(info, BigInteger.valueOf(1)));
 
       Reference call = new Reference(info, sendProto);
       call.getOffset().add(new RefCall(info, actParam));
@@ -131,7 +134,7 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
 
     EvlList<FuncVariable> param = new EvlList<FuncVariable>();
     param.add(func);
-    FuncPrivateVoid rfunc = new FuncPrivateVoid(info, "_" + callname, param, tr(voidType), body);
+    FuncPrivateVoid rfunc = new FuncPrivateVoid(info, "_" + callname, param, new FuncReturnNone(info), body);
 
     return rfunc;
   }
@@ -158,7 +161,7 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     { // sender[size] := x;
       Reference left = new Reference(info, pArray, new RefIndex(info, new Reference(info, argSize)));
       Number right = new Number(info, BigInteger.valueOf(x));
-      Assignment ass = new Assignment(info, left, right);
+      Assignment ass = new AssignmentSingle(info, left, right);
       code.add(ass);
     }
 
@@ -170,14 +173,14 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
 
       Expression expr = new Plus(info, new Reference(info, argSize), new Number(info, BigInteger.ONE));
       expr = new TypeCast(info, new SimpleRef<Type>(info, sizeType), expr);
-      Assignment ass = new Assignment(info, new Reference(info, sizeP1), expr);
+      Assignment ass = new AssignmentSingle(info, new Reference(info, sizeP1), expr);
       code.add(ass);
     }
 
     { // Self._debug.sendMsg( sender, sizeP1 );
-      EvlList<Expression> actParam = new EvlList<Expression>();
-      actParam.add(new Reference(info, pArray));
-      actParam.add(new Reference(info, sizeP1));
+      TupleValue actParam = new TupleValue(info);
+      actParam.getValue().add(new Reference(info, pArray));
+      actParam.getValue().add(new Reference(info, sizeP1));
 
       Reference call = new Reference(info, proto);
       call.getOffset().add(new RefCall(info, actParam));
@@ -234,7 +237,7 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     FuncVariable size = new FuncVariable(info, "size", new SimpleRef<Type>(info, sizeType));
     param.add(size);
 
-    FuncCtrlOutDataOut sendFunc = new FuncCtrlOutDataOut(info, funcName, param, tr(voidType), new Block(info));
+    FuncCtrlOutDataOut sendFunc = new FuncCtrlOutDataOut(info, funcName, param, new FuncReturnNone(info), new Block(info));
     return sendFunc;
   }
 

@@ -94,7 +94,7 @@ class SimpleGetter extends NullTraverser<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitTypeRef(SimpleRef obj, Void param) {
+  protected Boolean visitSimpleRef(SimpleRef obj, Void param) {
     return visit(obj.getLink(), param);
   }
 
@@ -170,7 +170,7 @@ class SimpleGetter extends NullTraverser<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitFunctionImpl(Function obj, Void param) {
+  protected Boolean visitFunction(Function obj, Void param) {
     return false;
   }
 

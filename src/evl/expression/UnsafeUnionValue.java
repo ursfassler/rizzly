@@ -23,20 +23,20 @@ import evl.expression.reference.SimpleRef;
 import evl.type.Type;
 
 public class UnsafeUnionValue extends Expression {
-  private NamedElementValue contentValue;
+  private NamedValue contentValue;
   private SimpleRef<Type> type;
 
-  public UnsafeUnionValue(ElementInfo info, NamedElementValue contentValue, SimpleRef<Type> type) {
+  public UnsafeUnionValue(ElementInfo info, NamedValue contentValue, SimpleRef<Type> type) {
     super(info);
     this.contentValue = contentValue;
     this.type = type;
   }
 
-  public NamedElementValue getContentValue() {
+  public NamedValue getContentValue() {
     return contentValue;
   }
 
-  public void setContentValue(NamedElementValue contentValue) {
+  public void setContentValue(NamedValue contentValue) {
     this.contentValue = contentValue;
   }
 

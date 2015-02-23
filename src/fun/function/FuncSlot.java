@@ -20,7 +20,6 @@ package fun.function;
 import common.ElementInfo;
 
 import fun.content.CompIfaceContent;
-import fun.expression.reference.Reference;
 import fun.other.FunList;
 import fun.statement.Block;
 import fun.variable.FuncVariable;
@@ -31,11 +30,11 @@ import fun.variable.FuncVariable;
  */
 public class FuncSlot extends FuncImpl implements CompIfaceContent {
 
-  public FuncSlot(ElementInfo info, String name, FunList<FuncVariable> param, Reference ret, Block body) {
+  public FuncSlot(ElementInfo info, String name, FunList<FuncVariable> param, FuncReturn ret, Block body) {
     super(info, name, param, ret, body);
   }
 
-  public FuncSlot(ElementInfo info, String name, FunList<FuncVariable> param, Reference ret) {
+  public FuncSlot(ElementInfo info, String name, FunList<FuncVariable> param, FuncReturn ret) {
     super(info, name, param, ret, new Block(info));
   }
 

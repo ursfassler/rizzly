@@ -25,13 +25,14 @@ import evl.DefTraverser;
 import evl.expression.AnyValue;
 import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
-import evl.expression.ExprList;
 import evl.expression.Expression;
-import evl.expression.NamedElementValue;
+import evl.expression.NamedElementsValue;
+import evl.expression.NamedValue;
 import evl.expression.Number;
 import evl.expression.RangeValue;
 import evl.expression.RecordValue;
 import evl.expression.StringValue;
+import evl.expression.TupleValue;
 import evl.expression.TypeCast;
 import evl.expression.UnionValue;
 import evl.expression.UnsafeUnionValue;
@@ -68,7 +69,8 @@ import evl.expression.unop.Not;
 import evl.expression.unop.Uminus;
 import evl.hfsm.Transition;
 import evl.other.CompUse;
-import evl.statement.Assignment;
+import evl.statement.AssignmentMulti;
+import evl.statement.AssignmentSingle;
 import evl.statement.CaseOptRange;
 import evl.statement.CaseOptValue;
 import evl.statement.IfOption;
@@ -78,14 +80,14 @@ import evl.variable.DefVariable;
 
 abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
 
-  protected void visitExprList(List<Expression> list, T param) {
+  protected <E extends Expression> void visitExprList(List<E> list, T param) {
     for (int i = 0; i < list.size(); i++) {
       Expression old = list.get(i);
       Expression expr = visit(old, param);
       if (expr == null) {
         RError.err(ErrorType.Fatal, old.getInfo(), "not handled class: " + old.getClass().getCanonicalName());
       }
-      list.set(i, expr);
+      list.set(i, (E) expr);
     }
   }
 
@@ -102,7 +104,7 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitTypeRef(SimpleRef obj, T param) {
+  protected Expression visitSimpleRef(SimpleRef obj, T param) {
     return obj;
   }
 
@@ -122,7 +124,7 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
 
   @Override
   protected Expression visitRefCall(RefCall obj, T param) {
-    visitExprList(obj.getActualParameter(), param);
+    visitTupleValue(obj.getActualParameter(), param);
     return null;
   }
 
@@ -283,27 +285,32 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitExprList(ExprList obj, T param) {
+  protected Expression visitTupleValue(TupleValue obj, T param) {
     visitExprList(obj.getValue(), param);
     return obj;
   }
 
   @Override
-  protected Expression visitNamedElementValue(NamedElementValue obj, T param) {
+  protected Expression visitNamedElementsValue(NamedElementsValue obj, T param) {
+    visitList(obj.getValue(), param);
+    return obj;
+  }
+
+  @Override
+  protected Expression visitNamedValue(NamedValue obj, T param) {
     obj.setValue(visit(obj.getValue(), param));
+    return null;
+  }
+
+  @Override
+  protected Expression visitUnionValue(UnionValue obj, T param) {
+    super.visitUnionValue(obj, param);
     return obj;
   }
 
   @Override
   protected Expression visitUnsafeUnionValue(UnsafeUnionValue obj, T param) {
-    obj.setContentValue((NamedElementValue) visit(obj.getContentValue(), param));
-    return obj;
-  }
-
-  @Override
-  protected Expression visitUnionValue(UnionValue obj, T param) {
-    obj.setTagValue((NamedElementValue) visit(obj.getTagValue(), param));
-    obj.setContentValue((NamedElementValue) visit(obj.getContentValue(), param));
+    super.visitUnsafeUnionValue(obj, param);
     return obj;
   }
 
@@ -355,7 +362,14 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitAssignment(Assignment obj, T param) {
+  protected Expression visitAssignmentMulti(AssignmentMulti obj, T param) {
+    visitExprList(obj.getLeft(), param);
+    obj.setRight(visit(obj.getRight(), param));
+    return null;
+  }
+
+  @Override
+  protected Expression visitAssignmentSingle(AssignmentSingle obj, T param) {
     obj.setLeft((Reference) visit(obj.getLeft(), param));
     obj.setRight(visit(obj.getRight(), param));
     return null;

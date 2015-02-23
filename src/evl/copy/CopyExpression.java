@@ -24,13 +24,14 @@ import evl.NullTraverser;
 import evl.expression.AnyValue;
 import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
-import evl.expression.ExprList;
 import evl.expression.Expression;
-import evl.expression.NamedElementValue;
+import evl.expression.NamedElementsValue;
+import evl.expression.NamedValue;
 import evl.expression.Number;
 import evl.expression.RangeValue;
 import evl.expression.RecordValue;
 import evl.expression.StringValue;
+import evl.expression.TupleValue;
 import evl.expression.TypeCast;
 import evl.expression.UnionValue;
 import evl.expression.UnsafeUnionValue;
@@ -81,7 +82,7 @@ public class CopyExpression extends NullTraverser<Expression, Void> {
   }
 
   @Override
-  protected Expression visitTypeRef(SimpleRef obj, Void param) {
+  protected Expression visitSimpleRef(SimpleRef obj, Void param) {
     return new SimpleRef(obj.getInfo(), obj.getLink()); // we keep link to old type
   }
 
@@ -126,18 +127,18 @@ public class CopyExpression extends NullTraverser<Expression, Void> {
   }
 
   @Override
-  protected Expression visitExprList(ExprList obj, Void param) {
-    return new ExprList(obj.getInfo(), cast.copy(obj.getValue()));
+  protected Expression visitTupleValue(TupleValue obj, Void param) {
+    return new TupleValue(obj.getInfo(), cast.copy(obj.getValue()));
   }
 
   @Override
   protected Expression visitRecordValue(RecordValue obj, Void param) {
-    return new RecordValue(obj.getInfo(), new ArrayList<NamedElementValue>(cast.copy(obj.getValue())), cast.copy(obj.getType()));
+    return new RecordValue(obj.getInfo(), new ArrayList<NamedValue>(cast.copy(obj.getValue())), cast.copy(obj.getType()));
   }
 
   @Override
-  protected Expression visitNamedElementValue(NamedElementValue obj, Void param) {
-    return new NamedElementValue(obj.getInfo(), obj.getName(), cast.copy(obj.getValue()));
+  protected Expression visitNamedElementsValue(NamedElementsValue obj, Void param) {
+    return new NamedElementsValue(obj.getInfo(), cast.copy(obj.getValue()));
   }
 
   @Override

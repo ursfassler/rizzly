@@ -29,6 +29,7 @@ import evl.Evl;
 import evl.NullTraverser;
 import evl.copy.Copy;
 import evl.expression.Expression;
+import evl.expression.TupleValue;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.Reference;
 import evl.function.header.FuncCtrlInDataOut;
@@ -102,9 +103,9 @@ class QueryDownPropagatorWorker extends NullTraverser<Void, QueryParam> {
     for (FuncCtrlInDataOut func : queries) {
       FuncCtrlInDataOut cfunc = new FuncCtrlInDataOut(info, func.getName(), Copy.copy(func.getParam()), Copy.copy(func.getRet()), new Block(info));
 
-      EvlList<Expression> acpar = new EvlList<Expression>();
+      TupleValue acpar = new TupleValue(info, new EvlList<Expression>());
       for (Variable par : cfunc.getParam()) {
-        acpar.add(new Reference(info, par));
+        acpar.getValue().add(new Reference(info, par));
       }
       Reference call = new Reference(info, map.get(func));
       call.getOffset().add(new RefCall(info, acpar));

@@ -19,6 +19,7 @@ package evl.knowledge;
 
 import java.math.BigInteger;
 import java.util.List;
+import java.util.Set;
 
 import util.Range;
 
@@ -26,13 +27,19 @@ import common.ElementInfo;
 
 import evl.Evl;
 import evl.NullTraverser;
+import evl.copy.Copy;
 import evl.expression.reference.SimpleRef;
 import evl.other.EvlList;
 import evl.type.Type;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
+import evl.type.base.EnumElement;
+import evl.type.base.EnumType;
 import evl.type.base.RangeType;
 import evl.type.base.StringType;
+import evl.type.composed.NamedElement;
+import evl.type.composed.RecordType;
+import evl.type.special.AnyType;
 import evl.type.special.IntegerType;
 import evl.type.special.NaturalType;
 import evl.type.special.VoidType;
@@ -40,10 +47,12 @@ import evl.type.special.VoidType;
 public class KnowBaseItem extends KnowledgeEntry {
 
   private KnowledgeBase kb;
+  private KnowUniqueName kun;
 
   @Override
   public void init(KnowledgeBase kb) {
     this.kb = kb;
+    kun = kb.getEntry(KnowUniqueName.class);
   }
 
   public <T extends Evl> List<T> findItem(Class<T> kind) {
@@ -111,8 +120,53 @@ public class KnowBaseItem extends KnowledgeEntry {
     return ret;
   }
 
+  public RecordType getRecord(EvlList<NamedElement> element) {
+    EvlList<RecordType> items = kb.getRoot().getChildren().getItems(RecordType.class);
+    for (RecordType itr : items) {
+      if (equal(element, itr.getElement())) {
+        return itr;
+      }
+    }
+
+    RecordType ret = new RecordType(ElementInfo.NO, kun.get("record"), Copy.copy(element));
+    kb.getRoot().getChildren().add(ret);
+    return ret;
+  }
+
+  private boolean equal(EvlList<NamedElement> left, EvlList<NamedElement> right) {
+    if (left.size() != right.size()) {
+      return false;
+    }
+    for (int i = 0; i < left.size(); i++) {
+      if (!left.get(i).getName().equals(right.get(i).getName()) || !left.get(i).getRef().getLink().equals(right.get(i).getRef().getLink())) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  public EnumType getEnumType(Set<String> elements) {
+    EvlList<EnumType> items = kb.getRoot().getChildren().getItems(EnumType.class);
+    for (EnumType itr : items) {
+      if (itr.getNames().equals(elements)) {
+        return itr;
+      }
+    }
+
+    EnumType ret = new EnumType(ElementInfo.NO, kun.get("enum"));
+    for (String name : elements) {
+      ret.getElement().add(new EnumElement(ElementInfo.NO, name));
+    }
+    kb.getRoot().getChildren().add(ret);
+    return ret;
+  }
+
   public StringType getStringType() {
     return getPlainType(new StringType());
+  }
+
+  public AnyType getAnyType() {
+    return getPlainType(new AnyType());
   }
 
   public BooleanType getBooleanType() {
@@ -139,6 +193,21 @@ class KnowBaseItemTypeFinder extends NullTraverser<Type, KnowBaseItem> {
   @Override
   protected Type visitDefault(Evl obj, KnowBaseItem param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+  }
+
+  @Override
+  protected Type visitEnumType(EnumType obj, KnowBaseItem param) {
+    return param.getEnumType(obj.getNames());
+  }
+
+  @Override
+  protected Type visitBooleanType(BooleanType obj, KnowBaseItem param) {
+    return param.getBooleanType();
+  }
+
+  @Override
+  protected Type visitRecordType(RecordType obj, KnowBaseItem param) {
+    return param.getRecord(obj.getElement());
   }
 
   @Override

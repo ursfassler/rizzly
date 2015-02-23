@@ -17,6 +17,9 @@
 
 package evl.type.base;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import common.ElementInfo;
 
 import evl.other.EvlList;
@@ -40,6 +43,14 @@ public class EnumType extends Type {
 
   public boolean isSupertypeOf(EnumType sub) {
     return element.containsAll(sub.element);
+  }
+
+  public Set<String> getNames() {
+    Set<String> ret = new HashSet<String>();
+    for (EnumElement elem : element) {
+      ret.add(elem.getName());
+    }
+    return ret;
   }
 
 }

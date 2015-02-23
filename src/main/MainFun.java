@@ -47,6 +47,7 @@ import fun.pass.NamespaceLinkReduction;
 import fun.pass.RootInstanceAdder;
 import fun.pass.StateLinkReduction;
 import fun.pass.UnusedRemover;
+import fun.pass.VarDefSplitter;
 import fun.traverser.spezializer.TypeEvalReplacerPass;
 
 public class MainFun {
@@ -68,6 +69,7 @@ public class MainFun {
     passes.add(RootInstanceAdder.class);
 
     passes.add(TypeEvalReplacerPass.class);
+    passes.add(VarDefSplitter.class);
     passes.add(UnusedRemover.class);
 
     Namespace classes = new Namespace(ElementInfo.NO, "!");

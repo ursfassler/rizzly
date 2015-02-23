@@ -4,7 +4,7 @@ Uni = Union
 end
 
 Union2 = Elementary
-  data : Uni = pos := 1;
+  data : Uni = [pos := 1];
 
   abs = function( x: R{-10,10} ):R{0,10}
     if x < 0 then

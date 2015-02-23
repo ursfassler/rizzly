@@ -19,22 +19,36 @@ package fun.statement;
 
 import common.ElementInfo;
 
+import fun.expression.Expression;
+import fun.other.FunList;
 import fun.variable.FuncVariable;
 
 public class VarDefStmt extends Statement {
-  private FuncVariable variable;
+  final private FunList<FuncVariable> variable;
+  private Expression initial;
 
-  public VarDefStmt(ElementInfo info, FuncVariable variable) {
+  public VarDefStmt(ElementInfo info, FunList<FuncVariable> variable, Expression initial) {
     super(info);
+    assert (initial != null);
     this.variable = variable;
+    this.initial = initial;
   }
 
-  public FuncVariable getVariable() {
+  public FunList<FuncVariable> getVariable() {
     return variable;
+  }
+
+  public Expression getInitial() {
+    return initial;
+  }
+
+  public void setInitial(Expression initial) {
+    assert (initial != null);
+    this.initial = initial;
   }
 
   @Override
   public String toString() {
-    return "def " + variable.toString();
+    return variable.toString() + " := " + initial;
   }
 }

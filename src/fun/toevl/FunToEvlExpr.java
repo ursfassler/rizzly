@@ -43,13 +43,12 @@ import fun.Fun;
 import fun.NullTraverser;
 import fun.expression.AnyValue;
 import fun.expression.ArithmeticOp;
-import fun.expression.ArrayValue;
 import fun.expression.BoolValue;
-import fun.expression.ExprList;
-import fun.expression.NamedElementValue;
+import fun.expression.NamedElementsValue;
 import fun.expression.Number;
 import fun.expression.Relation;
 import fun.expression.StringValue;
+import fun.expression.TupleValue;
 import fun.expression.UnaryExpression;
 import fun.expression.reference.RefItem;
 import fun.expression.reference.Reference;
@@ -97,26 +96,21 @@ public class FunToEvlExpr extends NullTraverser<Evl, Void> {
   }
 
   @Override
-  protected Expression visitArrayValue(ArrayValue obj, Void param) {
+  protected Evl visitTupleValue(TupleValue obj, Void param) {
     EvlList<evl.expression.Expression> value = new EvlList<evl.expression.Expression>();
     for (fun.expression.Expression item : obj.getValue()) {
       value.add((evl.expression.Expression) fta.traverse(item, null));
     }
-    return new evl.expression.ArrayValue(obj.getInfo(), value);
+    return new evl.expression.TupleValue(obj.getInfo(), value);
   }
 
   @Override
-  protected Evl visitExprList(ExprList obj, Void param) {
-    EvlList<evl.expression.Expression> value = new EvlList<evl.expression.Expression>();
-    for (fun.expression.Expression item : obj.getValue()) {
-      value.add((evl.expression.Expression) fta.traverse(item, null));
+  protected Evl visitNamedElementsValue(NamedElementsValue obj, Void param) {
+    EvlList<evl.expression.NamedValue> value = new EvlList<evl.expression.NamedValue>();
+    for (fun.expression.NamedValue item : obj.getValue()) {
+      value.add((evl.expression.NamedValue) fta.traverse(item, null));
     }
-    return new evl.expression.ExprList(obj.getInfo(), value);
-  }
-
-  @Override
-  protected Evl visitNamedElementValue(NamedElementValue obj, Void param) {
-    return new evl.expression.NamedElementValue(obj.getInfo(), obj.getName(), (Expression) fta.traverse(obj.getValue(), null));
+    return new evl.expression.NamedElementsValue(obj.getInfo(), value);
   }
 
   @Override

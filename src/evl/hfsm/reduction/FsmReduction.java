@@ -32,6 +32,7 @@ import evl.Evl;
 import evl.NullTraverser;
 import evl.copy.Relinker;
 import evl.expression.Expression;
+import evl.expression.TupleValue;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.Reference;
 import evl.expression.reference.SimpleRef;
@@ -40,6 +41,7 @@ import evl.function.header.FuncCtrlInDataIn;
 import evl.function.header.FuncCtrlInDataOut;
 import evl.function.header.FuncCtrlOutDataOut;
 import evl.function.header.FuncPrivateVoid;
+import evl.function.ret.FuncReturnNone;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.State;
 import evl.hfsm.StateComposite;
@@ -54,6 +56,7 @@ import evl.other.ImplElementary;
 import evl.other.Named;
 import evl.other.Namespace;
 import evl.statement.Assignment;
+import evl.statement.AssignmentSingle;
 import evl.statement.Block;
 import evl.statement.CallStmt;
 import evl.statement.CaseOpt;
@@ -207,14 +210,14 @@ class Reduction {
 
     body.getStatements().add(makeCall(initial.getEntryFunc().getLink()));
 
-    FuncPrivateVoid rfunc = new FuncPrivateVoid(info, Designator.NAME_SEP + "stateentry", new EvlList<FuncVariable>(), new SimpleRef<Type>(ElementInfo.NO, kbi.getVoidType()), body);
+    FuncPrivateVoid rfunc = new FuncPrivateVoid(info, Designator.NAME_SEP + "stateentry", new EvlList<FuncVariable>(), new FuncReturnNone(ElementInfo.NO), body);
     return rfunc;
   }
 
   private Block makeErrorBb() {
     Block bberror = new Block(info);
     FuncCtrlOutDataOut trap = kll.getTrap();
-    bberror.getStatements().add(new CallStmt(info, new Reference(info, trap, new RefCall(info, new EvlList<Expression>()))));
+    bberror.getStatements().add(new CallStmt(info, new Reference(info, trap, new RefCall(info, new TupleValue(info, new EvlList<Expression>())))));
     return bberror;
   }
 
@@ -235,7 +238,7 @@ class Reduction {
     Block body = new Block(info);
     body.getStatements().add(caseStmt);
 
-    FuncPrivateVoid rfunc = new FuncPrivateVoid(info, "_exit", new EvlList<FuncVariable>(), new SimpleRef<Type>(ElementInfo.NO, kbi.getVoidType()), body);
+    FuncPrivateVoid rfunc = new FuncPrivateVoid(info, "_exit", new EvlList<FuncVariable>(), new FuncReturnNone(ElementInfo.NO), body);
     rfunc.setBody(body);
 
     return rfunc;
@@ -244,7 +247,7 @@ class Reduction {
   static private CallStmt makeCall(Function func) {
     assert (func.getParam().isEmpty());
     Reference call = new Reference(info, func);
-    call.getOffset().add(new RefCall(info, new EvlList<Expression>()));
+    call.getOffset().add(new RefCall(info, new TupleValue(info, new EvlList<Expression>())));
 
     return new CallStmt(info, call);
   }
@@ -372,7 +375,7 @@ class Reduction {
 
     EnumElement src = enumMap.get(trans.getDst().getLink());
     assert (src != null);
-    Assignment setState = new Assignment(info, new Reference(info, stateVariable), new Reference(info, src));
+    Assignment setState = new AssignmentSingle(info, new Reference(info, stateVariable), new Reference(info, src));
     transCode.getStatements().add(setState);
 
     return transCode;

@@ -27,6 +27,7 @@ import error.RError;
 import evl.DefTraverser;
 import evl.expression.Expression;
 import evl.expression.Number;
+import evl.expression.TupleValue;
 import evl.expression.TypeCast;
 import evl.expression.binop.Lessequal;
 import evl.expression.binop.LogicAnd;
@@ -36,6 +37,7 @@ import evl.expression.reference.Reference;
 import evl.expression.reference.SimpleRef;
 import evl.function.Function;
 import evl.function.header.FuncGlobal;
+import evl.function.ret.FuncReturnType;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowLlvmLibrary;
 import evl.knowledge.KnowledgeBase;
@@ -107,7 +109,7 @@ class IntroduceConvertWorker extends DefTraverser<Void, Void> {
     }
 
     assert (ret.getParam().size() == 1);
-    assert (ret.getRet().getLink() == resType);
+    // assert (ret.getRet().getLink() == resType);
 
     return ret;
   }
@@ -139,7 +141,7 @@ class IntroduceConvertWorker extends DefTraverser<Void, Void> {
       // TODO insert call to debug output with error message
       // TODO throw exception
       Reference call = new Reference(info, kll.getTrap());
-      call.getOffset().add(new RefCall(info, new EvlList<Expression>()));
+      call.getOffset().add(new RefCall(info, new TupleValue(info, new EvlList<Expression>())));
       ReturnExpr trap = new ReturnExpr(info, new Number(info, resType.getNumbers().getLow()));
 
       error.getStatements().add(new CallStmt(info, call));
@@ -151,7 +153,7 @@ class IntroduceConvertWorker extends DefTraverser<Void, Void> {
 
     EvlList<FuncVariable> param = new EvlList<FuncVariable>();
     param.add(value);
-    FuncGlobal ret = new FuncGlobal(info, CONVERT_PREFIX + resType.getName(), param, new SimpleRef<Type>(info, resType), body);
+    FuncGlobal ret = new FuncGlobal(info, CONVERT_PREFIX + resType.getName(), param, new FuncReturnType(info, new SimpleRef<Type>(info, resType)), body);
 
     return ret;
   }

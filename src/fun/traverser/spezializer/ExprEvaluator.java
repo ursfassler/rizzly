@@ -26,17 +26,16 @@ import error.ErrorType;
 import error.RError;
 import fun.Fun;
 import fun.NullTraverser;
+import fun.expression.AnyValue;
 import fun.expression.ArithmeticOp;
-import fun.expression.ArrayValue;
 import fun.expression.BoolValue;
-import fun.expression.ExprList;
 import fun.expression.Expression;
 import fun.expression.Number;
 import fun.expression.Relation;
 import fun.expression.StringValue;
+import fun.expression.TupleValue;
 import fun.expression.UnaryExpression;
 import fun.expression.reference.RefCall;
-import fun.expression.reference.RefIndex;
 import fun.expression.reference.RefItem;
 import fun.expression.reference.RefName;
 import fun.expression.reference.RefTemplCall;
@@ -52,7 +51,6 @@ import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
 import fun.variable.FuncVariable;
 import fun.variable.TemplateParameter;
-import fun.variable.Variable;
 
 public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory> {
   private final KnowledgeBase kb;
@@ -83,15 +81,15 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
       // TODO add execution of type cast (see casual/ctfeCast.rzy)
       RError.ass(obj instanceof FuncFunction, obj.getInfo(), "expected funtion, got " + obj.getClass().getName());
       FuncFunction func = (FuncFunction) obj;
-      return StmtExecutor.process(func, ((RefCall) param).getActualParameter(), new Memory(), kb);
-    } else if (param instanceof RefIndex) {
-      Variable var = (Variable) obj;
-      Expression value = memory.get(var);
-
-      Expression idx = (Expression) visit(((RefIndex) param).getIndex(), memory);
-      Expression elem = ElementGetter.INSTANCE.traverse(idx, value);
-
-      return elem;
+      return StmtExecutor.process(func, ((RefCall) param).getActualParameter().getValue(), new Memory(), kb);
+      // } else if (param instanceof RefIndex) {
+      // Variable var = (Variable) obj;
+      // Expression value = memory.get(var);
+      //
+      // Expression idx = (Expression) visit(((RefIndex) param).getIndex(), memory);
+      // Expression elem = ElementGetter.INSTANCE.traverse(idx, value);
+      //
+      // return elem;
     } else {
       throw new RuntimeException("Dont know what to do with: " + param.getClass().getCanonicalName());
     }
@@ -120,9 +118,14 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
   }
 
   @Override
-  protected ActualTemplateArgument visitDeclaration(Template obj, Memory param) {
+  protected ActualTemplateArgument visitTemplate(Template obj, Memory param) {
     Fun spec = Specializer.process(obj, new FunList<ActualTemplateArgument>(), kb);
     return (ActualTemplateArgument) spec;
+  }
+
+  @Override
+  protected ActualTemplateArgument visitAnyValue(AnyValue obj, Memory param) {
+    return obj;
   }
 
   @Override
@@ -146,13 +149,16 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
   }
 
   @Override
-  protected ArrayValue visitExprList(ExprList obj, Memory param) {
-    // TODO could the result be a record?
-    FunList<Expression> list = new FunList<Expression>();
-    for (Expression expr : obj.getValue()) {
-      list.add((Expression) visit(expr, param));
+  protected Expression visitTupleValue(TupleValue obj, Memory param) {
+    if (obj.getValue().size() == 1) {
+      return (Expression) visit(obj.getValue().get(0), param);
+    } else {
+      FunList<Expression> list = new FunList<Expression>();
+      for (Expression expr : obj.getValue()) {
+        list.add((Expression) visit(expr, param));
+      }
+      return new TupleValue(obj.getInfo(), list);
     }
-    return new ArrayValue(obj.getInfo(), list);
   }
 
   @Override
@@ -169,12 +175,12 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
 
   @Override
   protected Expression visitRefCall(RefCall obj, Memory param) {
-    visitExpList(obj.getActualParameter(), param);
+    visitExpList(obj.getActualParameter().getValue(), param);
     return null;
   }
 
   @Override
-  protected Expression visitRefCompcall(RefTemplCall obj, Memory param) {
+  protected Expression visitRefTemplCall(RefTemplCall obj, Memory param) {
     RError.err(ErrorType.Fatal, obj.getInfo(), "reimplement");
     // visitExpList(obj.getActualParameter(), param);
     return null;
@@ -183,12 +189,6 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
   @Override
   protected Expression visitRefName(RefName obj, Memory param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
-  }
-
-  @Override
-  protected Expression visitRefIndex(RefIndex obj, Memory param) {
-    obj.setIndex((Expression) visit(obj.getIndex(), param));
-    return null;
   }
 
   private int getInt(ElementInfo info, BigInteger rval) {
@@ -302,12 +302,6 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
     } else {
       return obj;
     }
-  }
-
-  @Override
-  protected Expression visitArrayValue(ArrayValue obj, Memory param) {
-    visitExpList(obj.getValue(), param);
-    return obj;
   }
 
   @Override

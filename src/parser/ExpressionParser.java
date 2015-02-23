@@ -22,16 +22,16 @@ import common.ElementInfo;
 import error.ErrorType;
 import error.RError;
 import fun.expression.ArithmeticOp;
-import fun.expression.ArrayValue;
 import fun.expression.BoolValue;
 import fun.expression.ExpOp;
-import fun.expression.ExprList;
 import fun.expression.Expression;
-import fun.expression.NamedElementValue;
+import fun.expression.NamedElementsValue;
+import fun.expression.NamedValue;
 import fun.expression.Number;
 import fun.expression.RelOp;
 import fun.expression.Relation;
 import fun.expression.StringValue;
+import fun.expression.TupleValue;
 import fun.expression.UnaryExpression;
 import fun.expression.UnaryOp;
 import fun.expression.reference.DummyLinkTarget;
@@ -58,6 +58,51 @@ public class ExpressionParser extends Parser {
     return ret;
   }
 
+  // EBNF tupleValue: "(" [ exprList ] ")"
+  protected TupleValue parseTupleValue() {
+    FunList<Expression> list;
+
+    ElementInfo info = expect(TokenType.OPENPAREN).getInfo();
+    if (peek().getType() != TokenType.CLOSEPAREN) {
+      list = parseExprList();
+    } else {
+      list = new FunList<Expression>();
+    }
+    expect(TokenType.CLOSEPAREN);
+
+    return new TupleValue(info, list);
+  }
+
+  // EBNF parseNamedElementsValue: "[" [ assExpr { "," assExpr } ] "]"
+  protected NamedElementsValue parseNamedElementsValue() {
+    FunList<NamedValue> list = new FunList<NamedValue>();
+
+    ElementInfo info = expect(TokenType.OPENBRACKETS).getInfo();
+    if (peek().getType() != TokenType.CLOSEBRACKETS) {
+      do {
+        list.add(parseAssExpr());
+      } while (consumeIfEqual(TokenType.COMMA));
+    }
+    expect(TokenType.CLOSEBRACKETS);
+
+    return new NamedElementsValue(info, list);
+  }
+
+  // EBNF assExpr: relExpr | ( id ":=" relExpr )
+  protected NamedValue parseAssExpr() {
+    Expression expr = parseRelExpr();
+    if (consumeIfEqual(TokenType.BECOMES)) {
+      if (!(expr instanceof Reference) || !((Reference) expr).getOffset().isEmpty()) {
+        RError.err(ErrorType.Error, expr.getInfo(), "expected identifier for assignment");
+        return null;
+      }
+      Expression value = parseRelExpr();
+      return new NamedValue(expr.getInfo(), ((DummyLinkTarget) ((Reference) expr).getLink()).getName(), value);
+    } else {
+      return new NamedValue(expr.getInfo(), null, expr);
+    }
+  }
+
   // EBNF relExpr: shiftExpr [ relOp shiftExpr ]
   protected Expression parseRelExpr() {
     Expression expr = parseShiftExpr();
@@ -71,23 +116,13 @@ public class ExpressionParser extends Parser {
     }
   }
 
-  // EBNF expr: relExpr | ( id ":=" relExpr )
+  // EBNF expr: relExpr
   protected Expression parse() {
-    Expression expr = parseRelExpr();
-    if (consumeIfEqual(TokenType.BECOMES)) {
-      if (!(expr instanceof Reference) || !((Reference) expr).getOffset().isEmpty()) {
-        RError.err(ErrorType.Error, expr.getInfo(), "expected identifier for assignment");
-        return null;
-      }
-      Expression value = parseRelExpr();
-      return new NamedElementValue(expr.getInfo(), ((DummyLinkTarget) ((Reference) expr).getLink()).getName(), value);
-    } else {
-      return expr;
-    }
+    return parseRelExpr();
   }
 
-  // actually it has to be: ref: id { refName } [ refGeneric ] { refName | refIndex | refCall }
-  // EBNF ref: id { refName | refIndex | refCall | refGeneric }
+  // actually it has to be: ref: id { refName } [ refGeneric ] { refName | refCall }
+  // EBNF ref: id { refName | refCall | refIndex | refGeneric }
   protected Reference parseRef() {
     Token head = expect(TokenType.IDENTIFIER);
     Reference res = new Reference(head.getInfo(), head.getData());
@@ -97,14 +132,14 @@ public class ExpressionParser extends Parser {
         case PERIOD:
           res.getOffset().add(parseRefName());
           break;
-        case OPEN_ARRAY:
-          res.getOffset().add(parseRefIndex());
-          break;
         case OPENPAREN:
           res.getOffset().add(parseRefCall());
           break;
         case OPENCURLY:
           res.getOffset().add(parseRefGeneric());
+          break;
+        case OPENBRACKETS:
+          res.getOffset().add(parseRefIndex());
           break;
         default:
           return res;
@@ -221,7 +256,7 @@ public class ExpressionParser extends Parser {
     return null;
   }
 
-  // EBNF factor: ref | number | string | arrayValue | "False" | "True" | "not" factor | "(" exprList ")"
+  // EBNF factor: ref | number | string | arrayValue | "False" | "True" | "not" factor | tupleValue | namedElementsValue
   private Expression parseFactor() {
     TokenType type = peek().getType();
     switch (type) {
@@ -249,31 +284,16 @@ public class ExpressionParser extends Parser {
       case NOT: {
         return new UnaryExpression(next().getInfo(), parseFactor(), UnaryOp.NOT);
       }
-      case OPEN_ARRAY: {
-        return parseArrayValue();
-      }
       case OPENPAREN: {
-        ElementInfo info = expect(TokenType.OPENPAREN).getInfo();
-        FunList<Expression> list = parseExprList();
-        expect(TokenType.CLOSEPAREN);
-        if (list.size() == 1) {
-          return list.get(0);
-        } else {
-          return new ExprList(info, list);
-        }
+        return parseTupleValue();
+      }
+      case OPENBRACKETS: {
+        return parseNamedElementsValue();
       }
       default:
         RError.err(ErrorType.Fatal, peek().getInfo(), "Unexpected token: " + type);
     }
     return null;
-  }
-
-  // EBNF arrayValue: "[" exprList "]"
-  private Expression parseArrayValue() {
-    Token tok = expect(TokenType.OPEN_ARRAY);
-    ArrayValue ret = new ArrayValue(tok.getInfo(), parseExprList());
-    expect(TokenType.CLOSE_ARRAY);
-    return ret;
   }
 
   // EBNF refName: "." id
@@ -283,25 +303,10 @@ public class ExpressionParser extends Parser {
     return new RefName(tok.getInfo(), name);
   }
 
-  // EBNF refIndex: "[" expr "]"
-  private RefIndex parseRefIndex() {
-    Token tok = expect(TokenType.OPEN_ARRAY);
-    Expression expr = parse();
-    expect(TokenType.CLOSE_ARRAY);
-    return new RefIndex(tok.getInfo(), expr);
-  }
-
-  // EBNF refCall: "(" [ exprList ] ")"
+  // EBNF refCall: tupleValue
   private RefCall parseRefCall() {
-    Token tok = expect(TokenType.OPENPAREN);
-    FunList<Expression> expr;
-    if (peek().getType() == TokenType.CLOSEPAREN) {
-      expr = new FunList<Expression>();
-    } else {
-      expr = parseExprList();
-    }
-    expect(TokenType.CLOSEPAREN);
-    return new RefCall(tok.getInfo(), expr);
+    TupleValue arg = parseTupleValue();
+    return new RefCall(arg.getInfo(), arg);
   }
 
   // EBNF refGeneric: "{" [ exprList ] "}"
@@ -313,6 +318,14 @@ public class ExpressionParser extends Parser {
     }
     expect(TokenType.CLOSECURLY);
     return new RefTemplCall(tok.getInfo(), expr);
+  }
+
+  // EBNF refIndex: "[" expr "]"
+  private RefIndex parseRefIndex() {
+    Token tok = expect(TokenType.OPENBRACKETS);
+    Expression index = parse();
+    expect(TokenType.CLOSEBRACKETS);
+    return new RefIndex(tok.getInfo(), index);
   }
 
   // EBNF addOp: "+" | "-" | "or"

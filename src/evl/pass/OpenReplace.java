@@ -19,7 +19,6 @@ package evl.pass;
 
 import java.math.BigInteger;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import pass.EvlPass;
@@ -33,6 +32,7 @@ import evl.function.Function;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
+import evl.other.EvlList;
 import evl.other.Namespace;
 import evl.type.Type;
 import evl.type.base.RangeType;
@@ -83,8 +83,8 @@ class OpenReplaceWorker extends DefTraverser<Void, Void> {
       Function func = (Function) obj.getLink();
       RefCall call = (RefCall) obj.getOffset().get(0);
 
-      List<FuncVariable> arg = func.getParam();
-      List<Expression> acarg = call.getActualParameter();
+      EvlList<FuncVariable> arg = func.getParam();
+      EvlList<Expression> acarg = call.getActualParameter().getValue();
 
       assert (arg.size() == acarg.size());
 

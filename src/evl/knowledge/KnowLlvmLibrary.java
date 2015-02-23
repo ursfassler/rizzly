@@ -22,12 +22,11 @@ import common.ElementInfo;
 import common.Property;
 
 import evl.Evl;
-import evl.expression.reference.SimpleRef;
 import evl.function.header.FuncCtrlOutDataOut;
+import evl.function.ret.FuncReturnNone;
 import evl.other.EvlList;
 import evl.other.Named;
 import evl.statement.Block;
-import evl.type.Type;
 import evl.variable.FuncVariable;
 
 //TODO rename
@@ -35,12 +34,10 @@ import evl.variable.FuncVariable;
 public class KnowLlvmLibrary extends KnowledgeEntry {
   private static final ElementInfo info = ElementInfo.NO;
   private KnowledgeBase kb;
-  private KnowBaseItem kbi;
 
   @Override
   public void init(KnowledgeBase kb) {
     this.kb = kb;
-    this.kbi = kb.getEntry(KnowBaseItem.class);
   }
 
   private Evl findItem(String name) {
@@ -57,7 +54,7 @@ public class KnowLlvmLibrary extends KnowledgeEntry {
     FuncCtrlOutDataOut ret = (FuncCtrlOutDataOut) findItem(NAME);
 
     if (ret == null) {
-      ret = new FuncCtrlOutDataOut(info, NAME, new EvlList<FuncVariable>(), new SimpleRef<Type>(info, kbi.getVoidType()), new Block(info));
+      ret = new FuncCtrlOutDataOut(info, NAME, new EvlList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
       ret.properties().put(Property.Extern, true);
       ret.properties().put(Property.Public, true);
       addItem(ret);
@@ -65,5 +62,4 @@ public class KnowLlvmLibrary extends KnowledgeEntry {
 
     return ret;
   }
-
 }

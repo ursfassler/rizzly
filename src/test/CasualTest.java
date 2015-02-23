@@ -32,6 +32,36 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  public void tuple2() {
+    compile("tuple2", TestSteps.COMPILE_TO_LLVM, false, false);
+  }
+
+  @Test
+  public void mulret1() {
+    compile("mulret1", TestSteps.COMPILE_TO_LLVM, false, false);
+  }
+
+  @Test
+  public void mulret2() {
+    compile("mulret2", TestSteps.COMPILE_TO_LLVM, false, false);
+  }
+
+  @Test
+  public void mulret3() {
+    compile("mulret3", TestSteps.COMPILE_TO_LLVM, false, false);
+  }
+
+  @Test
+  public void mulret4() {
+    compile("mulret4", TestSteps.COMPILE_TO_LLVM, false, false);
+  }
+
+  @Test
+  public void mulret5() {
+    compile("mulret5", TestSteps.COMPILE_TO_LLVM, false, false);
+  }
+
+  @Test
   public void ctfeCast() {
     compile("ctfeCast", TestSteps.COMPILE_TO_LLVM, false, false);
   }

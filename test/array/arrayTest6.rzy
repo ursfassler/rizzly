@@ -1,5 +1,5 @@
 ArrayTest6 = Elementary
-  data: Array{10,R{0,31}} = [0,0,0,0,0,0,0,0,0,0];
+  data: Array{10,R{0,31}} = (0,0,0,0,0,0,0,0,0,0);
 
   set : slot( x: Array{10,R{0,31}} )
     data := x;

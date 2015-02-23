@@ -20,7 +20,6 @@ package evl.pass.check.io;
 import evl.DefTraverser;
 import evl.Evl;
 import evl.expression.reference.Reference;
-import evl.statement.Assignment;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
 
@@ -42,13 +41,6 @@ public class StateReaderInfo extends DefTraverser<Void, Void> {
 
   private boolean isStateVariable(Variable var) {
     return var instanceof StateVariable;
-  }
-
-  @Override
-  protected Void visitAssignment(Assignment obj, Void param) {
-    visitList(obj.getLeft().getOffset(), param);
-    visit(obj.getRight(), param);
-    return null;
   }
 
   @Override

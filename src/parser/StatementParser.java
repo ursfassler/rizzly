@@ -17,16 +17,13 @@
 
 package parser;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
 import fun.Copy;
+import fun.expression.AnyValue;
 import fun.expression.Expression;
-import fun.expression.reference.DummyLinkTarget;
 import fun.expression.reference.Reference;
 import fun.other.FunList;
 import fun.statement.Assignment;
@@ -71,7 +68,7 @@ public class StatementParser extends BaseParser {
           res.getStatements().add(parseCase());
           break;
         case IDENTIFIER:
-          res.getStatements().addAll(parseVardefOrAssignmentOrCallstmt());
+          res.getStatements().add(parseVardefOrAssignmentOrCallstmt());
           break;
         default:
           return res;
@@ -79,42 +76,32 @@ public class StatementParser extends BaseParser {
     }
   }
 
-  // EBNF vardefstmt: vardefinitopt ";"
-  private FunList<Statement> parseVarDefStmt(FunList<Reference> lhs) {
-    List<Token> names = new ArrayList<Token>(lhs.size());
-
-    for (Reference ae : lhs) {
-      assert (ae.getOffset().isEmpty());
-      names.add(new Token(TokenType.IDENTIFIER, ((DummyLinkTarget) ae.getLink()).getName(), ae.getInfo()));
-    }
-
-    expect(TokenType.COLON);
+  // EBNF vardefstmt: lhs ":" ref [ "=" expr ] ";"
+  private VarDefStmt parseVarDefStmt(FunList<Reference> lhs) {
+    ElementInfo info = expect(TokenType.COLON).getInfo();
     Reference type = expr().parseRef();
 
-    FunList<Expression> def;
+    Expression initial;
     if (consumeIfEqual(TokenType.EQUAL)) {
-      def = expr().parseExprList();
-      if (names.size() != def.size()) {
-        RError.err(ErrorType.Error, names.get(0).getInfo(), "expected " + names.size() + " init values, got " + def.size());
-        return null;
-      }
+      initial = expr().parse();
     } else {
-      def = null;
-    }
-
-    FunList<Statement> ret = new FunList<Statement>();
-    for (int i = 0; i < names.size(); i++) {
-      Reference ntype = Copy.copy(type);
-      FuncVariable var = new FuncVariable(names.get(i).getInfo(), names.get(i).getData(), ntype);
-      ret.add(new VarDefStmt(var.getInfo(), var));
-      if (def != null) {
-        ret.add(new Assignment(var.getInfo(), new Reference(var.getInfo(), var), def.get(i)));
-      }
+      initial = new AnyValue(info);
     }
 
     expect(TokenType.SEMI);
 
-    return ret;
+    FunList<FuncVariable> variables = new FunList<FuncVariable>();
+    for (Reference ref : lhs) {
+      if (!ref.getOffset().isEmpty()) {
+        RError.err(ErrorType.Error, ref.getInfo(), "expected identifier");
+      }
+
+      Reference ntype = Copy.copy(type);
+      FuncVariable var = new FuncVariable(ref.getInfo(), ref.getLink().getName(), ntype);
+      variables.add(var);
+    }
+
+    return new VarDefStmt(info, variables, initial);
   }
 
   // EBNF casestmt: "case" expression "do" caseopt { caseopt } [ "else" block "end" ] "end"
@@ -222,7 +209,7 @@ public class StatementParser extends BaseParser {
     return ret;
   }
 
-  private FunList<Statement> parseVardefOrAssignmentOrCallstmt() {
+  private Statement parseVardefOrAssignmentOrCallstmt() {
     FunList<Reference> lhs = parseLhs();
     Token tok = peek();
     switch (tok.getType()) {
@@ -230,17 +217,12 @@ public class StatementParser extends BaseParser {
         return parseVarDefStmt(lhs);
       }
       case BECOMES: {
-        assert (lhs.size() == 1);
-        FunList<Statement> ret = new FunList<Statement>();
-        ret.add(parseAssignment(lhs.get(0)));
-        return ret;
+        return parseAssignment(lhs);
       }
       case SEMI: {
         assert (lhs.size() == 1);
         tok = next();
-        FunList<Statement> ret = new FunList<Statement>();
-        ret.add(new CallStmt(tok.getInfo(), lhs.get(0)));
-        return ret;
+        return new CallStmt(tok.getInfo(), lhs.get(0));
       }
       default: {
         error.RError.err(ErrorType.Fatal, peek().getInfo(), "Unexpected token: " + tok.getType());
@@ -258,8 +240,8 @@ public class StatementParser extends BaseParser {
     return lhs;
   }
 
-  // EBNF assignment: varref ":=" expr ";"
-  private Assignment parseAssignment(Reference ref) {
+  // EBNF assignment: lhs ":=" expr ";"
+  private Assignment parseAssignment(FunList<Reference> ref) {
     Token tok = expect(TokenType.BECOMES);
     Expression rhs = expr().parse();
     expect(TokenType.SEMI);

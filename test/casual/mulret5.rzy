@@ -1,0 +1,14 @@
+Mulret5 = Elementary
+  bla = function():(a, b: R{0,10})
+    return (2, 3);
+  end
+
+  tuwas : response():R{0,20}
+    if (2, 4) = bla() then
+      return 1;
+    else
+      return 2;
+    end
+  end
+end
+

@@ -30,6 +30,8 @@ public class Transition extends FunBase implements StateContent {
   private Reference src;
   private Reference dst;
   private Reference event;
+  @Deprecated
+  // XXX use namedEle,ment with tupleType as in function
   final private FunList<FuncVariable> param = new FunList<FuncVariable>();
   private Expression guard;
   private Block body;

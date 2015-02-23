@@ -1,5 +1,5 @@
 Copy = Elementary
-  a : Array{10,R{0,200}} = [0,0,0,0,0,0,0,0,0,0];
+  a : Array{10,R{0,200}} = (0,0,0,0,0,0,0,0,0,0);
 
   foo = procedure()
     b : Array{10,R{0,200}} = a;

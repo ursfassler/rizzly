@@ -20,6 +20,7 @@ import error.ErrorType;
 import error.RError;
 import evl.Evl;
 import evl.NullTraverser;
+import evl.expression.Expression;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefIndex;
 import evl.expression.reference.RefItem;
@@ -28,10 +29,10 @@ import evl.expression.reference.Reference;
 import evl.expression.reference.SimpleRef;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowChild;
+import evl.knowledge.KnowLeftIsContainerOfRight;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
 import evl.other.EvlList;
-import evl.pass.check.type.LeftIsContainerOfRightTest;
 import evl.type.Type;
 import evl.type.base.ArrayType;
 import evl.type.base.EnumType;
@@ -42,12 +43,14 @@ public class RefTypeChecker extends NullTraverser<Type, Type> {
   final private KnowledgeBase kb;
   final private KnowBaseItem kbi;
   final private KnowType kt;
+  final private KnowLeftIsContainerOfRight kc;
 
   public RefTypeChecker(KnowledgeBase kb) {
     super();
     this.kb = kb;
     kbi = kb.getEntry(KnowBaseItem.class);
     kt = kb.getEntry(KnowType.class);
+    kc = kb.getEntry(KnowLeftIsContainerOfRight.class);
   }
 
   static public void process(Reference ast, KnowledgeBase kb) {
@@ -74,15 +77,16 @@ public class RefTypeChecker extends NullTraverser<Type, Type> {
   protected Type visitRefCall(RefCall obj, Type sub) {
     if (sub instanceof FunctionType) {
       EvlList<SimpleRef<Type>> arg = ((FunctionType) sub).getArg();
-      if (arg.size() != obj.getActualParameter().size()) {
-        RError.err(ErrorType.Error, obj.getInfo(), "Need " + arg.size() + " arguments, got " + obj.getActualParameter().size());
+      EvlList<Expression> argval = obj.getActualParameter().getValue();
+      if (arg.size() != argval.size()) {
+        RError.err(ErrorType.Error, obj.getInfo(), "Need " + arg.size() + " arguments, got " + argval.size());
         return null;
       }
       for (int i = 0; i < arg.size(); i++) {
         Type partype = arg.get(i).getLink();
-        Type valtype = kt.get(obj.getActualParameter().get(i));
-        if (!LeftIsContainerOfRightTest.process(partype, valtype, kb)) {
-          RError.err(ErrorType.Error, obj.getActualParameter().get(i).getInfo(), "Data type to big or incompatible (argument " + (i + 1) + ", " + partype.getName() + " := " + valtype.getName() + ")");
+        Type valtype = kt.get(argval.get(i));
+        if (!kc.get(partype, valtype)) {
+          RError.err(ErrorType.Error, argval.get(i).getInfo(), "Data type to big or incompatible (argument " + (i + 1) + ", " + partype.getName() + " := " + valtype.getName() + ")");
         }
       }
       return ((FunctionType) sub).getRet().getLink();
@@ -111,7 +115,7 @@ public class RefTypeChecker extends NullTraverser<Type, Type> {
   protected Type visitRefIndex(RefIndex obj, Type sub) {
     Type index = kt.get(obj.getIndex());
     if (sub instanceof ArrayType) {
-      if (!LeftIsContainerOfRightTest.process(kbi.getIntegerType(), index, kb)) {
+      if (!kc.get(kbi.getIntegerType(), index)) {
         RError.err(ErrorType.Error, obj.getInfo(), "need integer type to index array, got: " + index.getName());
       }
       return ((ArrayType) sub).getType().getLink();

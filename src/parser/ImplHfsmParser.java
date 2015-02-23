@@ -147,7 +147,7 @@ public class ImplHfsmParser extends ImplBaseParser {
       case RESPONSE:
         return parseFuncDef(peek().getType(), name, false);
       default:
-        StateVariable var = parseVarDef2(StateVariable.class, name, InitType.MustInit);
+        StateVariable var = parseVarDef2(StateVariable.class, name);
         expect(TokenType.SEMI);
         return var;
     }

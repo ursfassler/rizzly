@@ -23,30 +23,30 @@ import evl.expression.reference.SimpleRef;
 import evl.type.Type;
 
 public class UnionValue extends Expression {
-  private NamedElementValue tagValue;
-  private NamedElementValue contentValue;
+  private NamedValue tagValue;
+  private NamedValue contentValue;
   private SimpleRef<Type> type;
 
-  public UnionValue(ElementInfo info, NamedElementValue tagValue, NamedElementValue contentValue, SimpleRef<Type> type) {
+  public UnionValue(ElementInfo info, NamedValue tagValue, NamedValue contentValue, SimpleRef<Type> type) {
     super(info);
     this.tagValue = tagValue;
     this.contentValue = contentValue;
     this.type = type;
   }
 
-  public NamedElementValue getTagValue() {
+  public NamedValue getTagValue() {
     return tagValue;
   }
 
-  public void setTagValue(NamedElementValue tagValue) {
+  public void setTagValue(NamedValue tagValue) {
     this.tagValue = tagValue;
   }
 
-  public NamedElementValue getContentValue() {
+  public NamedValue getContentValue() {
     return contentValue;
   }
 
-  public void setContentValue(NamedElementValue contentValue) {
+  public void setContentValue(NamedValue contentValue) {
     this.contentValue = contentValue;
   }
 

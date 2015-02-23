@@ -33,11 +33,12 @@ import evl.Evl;
 import evl.NullTraverser;
 import evl.copy.Copy;
 import evl.expression.Expression;
+import evl.expression.TupleValue;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.Reference;
-import evl.expression.reference.SimpleRef;
 import evl.function.Function;
 import evl.function.header.FuncPrivateVoid;
+import evl.function.ret.FuncReturnNone;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.State;
 import evl.hfsm.StateComposite;
@@ -50,10 +51,10 @@ import evl.knowledge.KnowledgeBase;
 import evl.other.EvlList;
 import evl.other.Namespace;
 import evl.statement.Assignment;
+import evl.statement.AssignmentSingle;
 import evl.statement.Block;
 import evl.statement.CallStmt;
 import evl.statement.Statement;
-import evl.type.Type;
 import evl.variable.FuncVariable;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
@@ -102,7 +103,7 @@ public class TransitionDownPropagator extends EvlPass {
    */
   private static FuncPrivateVoid makeTransBodyFunc(Transition trans, String name, KnowBaseItem kbi) {
     EvlList<FuncVariable> params = Copy.copy(trans.getParam());
-    FuncPrivateVoid func = new FuncPrivateVoid(ElementInfo.NO, name, params, new SimpleRef<Type>(ElementInfo.NO, kbi.getVoidType()), trans.getBody());
+    FuncPrivateVoid func = new FuncPrivateVoid(ElementInfo.NO, name, params, new FuncReturnNone(ElementInfo.NO), trans.getBody());
     trans.setBody(new Block(ElementInfo.NO));
 
     FsmReduction.relinkActualParameterRef(trans.getParam(), func.getParam(), func.getBody());
@@ -170,10 +171,10 @@ class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam
       assert (func != null);
       Reference ref = new Reference(info, func);
 
-      EvlList<Expression> param = new EvlList<Expression>();
+      TupleValue param = new TupleValue(info, new EvlList<Expression>());
       for (Variable acpar : trans.getParam()) {
         Reference parref = new Reference(info, acpar);
-        param.add(parref);
+        param.getValue().add(parref);
       }
 
       ref.getOffset().add(new RefCall(info, param));
@@ -196,7 +197,7 @@ class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam
     makeVarInit(par, top, list);
 
     for (StateVariable var : start.getItem().getItems(StateVariable.class)) {
-      Assignment init = new Assignment(var.getDef().getInfo(), new Reference(info, var), Copy.copy(var.getDef()));
+      Assignment init = new AssignmentSingle(var.getDef().getInfo(), new Reference(info, var), Copy.copy(var.getDef()));
       list.add(init);
     }
   }
@@ -234,7 +235,7 @@ class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam
 
   private CallStmt makeCall(Function func) {
     Reference ref = new Reference(info, func);
-    ref.getOffset().add(new RefCall(info, new EvlList<Expression>()));
+    ref.getOffset().add(new RefCall(info, new TupleValue(info, new EvlList<Expression>())));
     return new CallStmt(info, ref);
   }
 

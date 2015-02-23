@@ -20,8 +20,8 @@ package fun.toevl;
 import error.ErrorType;
 import error.RError;
 import evl.expression.Expression;
+import evl.expression.TupleValue;
 import evl.expression.reference.RefItem;
-import evl.other.EvlList;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.expression.reference.RefCall;
@@ -45,18 +45,14 @@ public class FunToEvlRef extends NullTraverser<RefItem, Void> {
   // ----------------------------------------------------------------------------
 
   @Override
-  protected RefItem visitRefCompcall(RefTemplCall obj, Void param) {
+  protected RefItem visitRefTemplCall(RefTemplCall obj, Void param) {
     RError.err(ErrorType.Fatal, obj.getInfo(), "Unresolved compcall");
     throw new RuntimeException("not yet implemented");
   }
 
   @Override
   protected RefItem visitRefCall(RefCall obj, Void param) {
-    EvlList<Expression> ap = new EvlList<Expression>();
-    for (fun.expression.Expression expr : obj.getActualParameter()) {
-      ap.add((Expression) fta.traverse(expr, null));
-    }
-    return new evl.expression.reference.RefCall(obj.getInfo(), ap);
+    return new evl.expression.reference.RefCall(obj.getInfo(), (TupleValue) fta.visit(obj.getActualParameter(), param));
   }
 
   @Override
@@ -66,7 +62,6 @@ public class FunToEvlRef extends NullTraverser<RefItem, Void> {
 
   @Override
   protected RefItem visitRefIndex(RefIndex obj, Void param) {
-    return new evl.expression.reference.RefIndex(obj.getInfo(), (Expression) fta.traverse(obj.getIndex(), null));
+    return new evl.expression.reference.RefIndex(obj.getInfo(), (Expression) fta.traverse(obj.getIndex(), param));
   }
-
 }

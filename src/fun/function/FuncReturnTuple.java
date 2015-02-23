@@ -15,39 +15,23 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fun.expression;
+package fun.function;
 
 import common.ElementInfo;
 
-public class NamedElementValue extends Expression {
-  private String name;
-  private Expression value;
+import fun.other.FunList;
+import fun.variable.FuncVariable;
 
-  public NamedElementValue(ElementInfo info, String name, Expression value) {
+final public class FuncReturnTuple extends FuncReturn {
+  final private FunList<FuncVariable> param;
+
+  public FuncReturnTuple(ElementInfo info, FunList<FuncVariable> param) {
     super(info);
-    this.name = name;
-    this.value = value;
+    this.param = param;
   }
 
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public void setValue(Expression value) {
-    this.value = value;
-  }
-
-  public Expression getValue() {
-    return value;
-  }
-
-  @Override
-  public String toString() {
-    return name + ":=" + value;
+  public FunList<FuncVariable> getParam() {
+    return param;
   }
 
 }

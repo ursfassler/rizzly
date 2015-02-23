@@ -24,6 +24,7 @@ import evl.DefTraverser;
 import evl.Evl;
 import evl.expression.reference.Reference;
 import evl.expression.reference.SimpleRef;
+import evl.function.Function;
 
 public class DepGraph extends DefTraverser<Void, Evl> {
   final private SimpleGraph<Evl> g = new SimpleGraph<Evl>();
@@ -54,8 +55,8 @@ public class DepGraph extends DefTraverser<Void, Evl> {
   }
 
   @Override
-  protected Void visitTypeRef(SimpleRef obj, Evl param) {
-    super.visitTypeRef(obj, param);
+  protected Void visitSimpleRef(SimpleRef obj, Evl param) {
+    super.visitSimpleRef(obj, param);
     visit(obj.getLink(), obj);
     return null;
   }
@@ -66,4 +67,10 @@ public class DepGraph extends DefTraverser<Void, Evl> {
     visit(obj.getLink(), obj);
     return null;
   }
+
+  @Override
+  protected Void visitFunction(Function obj, Evl param) {
+    return super.visitFunction(obj, param);
+  }
+
 }

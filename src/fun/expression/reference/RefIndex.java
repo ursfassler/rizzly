@@ -39,7 +39,7 @@ final public class RefIndex extends RefItem {
 
   @Override
   public String toString() {
-    return "[" + index + "]";
+    return index.toString();
   }
 
 }

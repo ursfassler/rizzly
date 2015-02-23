@@ -122,7 +122,7 @@ class LinkerWorker extends DefTraverser<Void, SymbolTable> {
   }
 
   @Override
-  protected Void visitDeclaration(Template obj, SymbolTable param) {
+  protected Void visitTemplate(Template obj, SymbolTable param) {
     param = new SymbolTable(param);
     param.addAll(obj.getTempl());
     visitList(obj.getTempl(), param);
@@ -275,9 +275,9 @@ class LinkerWorker extends DefTraverser<Void, SymbolTable> {
   }
 
   @Override
-  protected Void visitVarDef(VarDefStmt obj, SymbolTable param) {
-    param.add(obj.getVariable());
-    super.visitVarDef(obj, param);
+  protected Void visitVarDefStmt(VarDefStmt obj, SymbolTable param) {
+    param.addAll(obj.getVariable());
+    super.visitVarDefStmt(obj, param);
     return null;
   }
 

@@ -41,6 +41,7 @@ import evl.composition.MessageType;
 import evl.copy.Copy;
 import evl.copy.Relinker;
 import evl.expression.Expression;
+import evl.expression.TupleValue;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
@@ -54,6 +55,7 @@ import evl.function.header.FuncCtrlOutDataOut;
 import evl.function.header.FuncPrivateVoid;
 import evl.function.header.FuncSubHandlerEvent;
 import evl.function.header.FuncSubHandlerQuery;
+import evl.function.ret.FuncReturnNone;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
 import evl.other.CompUse;
@@ -67,7 +69,6 @@ import evl.statement.Block;
 import evl.statement.CallStmt;
 import evl.statement.ReturnExpr;
 import evl.statement.intern.MsgPush;
-import evl.type.Type;
 import evl.variable.FuncVariable;
 import evl.variable.Variable;
 
@@ -90,9 +91,9 @@ public class CompositionReduction extends EvlPass {
 
     Function func;
     if (out instanceof FuncCtrlOutDataOut) {
-      func = new FuncSubHandlerEvent(ElementInfo.NO, out.getName(), Copy.copy(out.getParam()), new SimpleRef<Type>(ElementInfo.NO, out.getRet().getLink()), new Block(ElementInfo.NO));
+      func = new FuncSubHandlerEvent(ElementInfo.NO, out.getName(), Copy.copy(out.getParam()), Copy.copy(out.getRet()), new Block(ElementInfo.NO));
     } else if (out instanceof FuncCtrlOutDataIn) {
-      func = new FuncSubHandlerQuery(ElementInfo.NO, out.getName(), Copy.copy(out.getParam()), new SimpleRef<Type>(ElementInfo.NO, out.getRet().getLink()), new Block(ElementInfo.NO));
+      func = new FuncSubHandlerQuery(ElementInfo.NO, out.getName(), Copy.copy(out.getParam()), Copy.copy(out.getRet()), new Block(ElementInfo.NO));
     } else {
       throw new RuntimeException("not yet implemented");
     }
@@ -134,8 +135,8 @@ class CompositionReductionWorker extends NullTraverser<Evl, Void> {
   @Override
   protected Evl visitImplComposition(ImplComposition obj, Void param) {
 
-    FuncPrivateVoid entry = new FuncPrivateVoid(info, "_entry", new EvlList<FuncVariable>(), new SimpleRef<Type>(info, kbi.getVoidType()), new Block(info));
-    FuncPrivateVoid exit = new FuncPrivateVoid(info, "_exit", new EvlList<FuncVariable>(), new SimpleRef<Type>(info, kbi.getVoidType()), new Block(info));
+    FuncPrivateVoid entry = new FuncPrivateVoid(info, "_entry", new EvlList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
+    FuncPrivateVoid exit = new FuncPrivateVoid(info, "_exit", new EvlList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
 
     ImplElementary elem = new ImplElementary(obj.getInfo(), obj.getName(), new SimpleRef<FuncPrivateVoid>(info, entry), new SimpleRef<FuncPrivateVoid>(info, exit));
     elem.getFunction().add(entry);
@@ -220,9 +221,9 @@ class CompositionReductionWorker extends NullTraverser<Evl, Void> {
   static private ReturnExpr makeQueryCall(Endpoint ep, Function func) {
     Reference ref = epToRef(ep);
 
-    EvlList<Expression> actparam = new EvlList<Expression>();
+    TupleValue actparam = new TupleValue(info, new EvlList<Expression>());
     for (Variable var : func.getParam()) {
-      actparam.add(new Reference(func.getInfo(), var));
+      actparam.getValue().add(new Reference(func.getInfo(), var));
     }
 
     RefCall call = new RefCall(func.getInfo(), actparam);
@@ -247,9 +248,9 @@ class CompositionReductionWorker extends NullTraverser<Evl, Void> {
 
     Reference ref = epToRef(ep);
 
-    EvlList<Expression> actparam = new EvlList<Expression>();
+    TupleValue actparam = new TupleValue(info, new EvlList<Expression>());
     for (Variable var : func.getParam()) {
-      actparam.add(new Reference(func.getInfo(), var));
+      actparam.getValue().add(new Reference(func.getInfo(), var));
     }
 
     RefCall call = new RefCall(func.getInfo(), actparam);

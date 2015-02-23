@@ -15,27 +15,26 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package evl.expression;
+package fun.function;
 
 import common.ElementInfo;
 
-import evl.other.EvlList;
+import fun.expression.reference.Reference;
 
-public class ExprList extends Expression {
-  final private EvlList<Expression> value;
+public class FuncReturnType extends FuncReturn {
+  private Reference type;
 
-  public ExprList(ElementInfo info, EvlList<Expression> value) {
+  public FuncReturnType(ElementInfo info, Reference type) {
     super(info);
-    this.value = value;
+    this.type = type;
   }
 
-  public EvlList<Expression> getValue() {
-    return value;
+  public Reference getType() {
+    return type;
   }
 
-  @Override
-  public String toString() {
-    return value.toString();
+  public void setType(Reference type) {
+    this.type = type;
   }
 
 }

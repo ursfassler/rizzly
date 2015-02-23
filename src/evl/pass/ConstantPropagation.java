@@ -18,6 +18,7 @@
 package evl.pass;
 
 import pass.EvlPass;
+import evl.copy.Copy;
 import evl.expression.Expression;
 import evl.expression.reference.Reference;
 import evl.knowledge.KnowledgeBase;
@@ -53,7 +54,7 @@ class ConstantPropagationWorker extends ExprReplacer<Void> {
       return true;
     } else if (type instanceof ArrayType) {
       return false;
-    } else if (type instanceof StringType) {  // TODO decide by size?
+    } else if (type instanceof StringType) {
       return false;
     } else if (type instanceof RecordType) {
       return true;    // Because of C
@@ -68,7 +69,7 @@ class ConstantPropagationWorker extends ExprReplacer<Void> {
       Type type = constant.getType().getLink();
       if (doReduce(type)) {
         assert (obj.getOffset().isEmpty());
-        return visit(constant.getDef(), null);
+        return Copy.copy(visit(constant.getDef(), null));
       }
     }
     return super.visitReference(obj, param);

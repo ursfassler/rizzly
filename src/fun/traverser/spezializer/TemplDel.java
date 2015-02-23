@@ -52,7 +52,7 @@ public class TemplDel extends DefTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitDeclaration(Template obj, Void param) {
+  protected Void visitTemplate(Template obj, Void param) {
     RError.err(ErrorType.Fatal, obj.getInfo(), "missed template");
     return null;
   }

@@ -23,6 +23,7 @@ import common.Designator;
 
 import evl.DefTraverser;
 import evl.Evl;
+import evl.expression.reference.RefName;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Named;
 import evl.other.Namespace;
@@ -56,16 +57,13 @@ public class CRenamer extends EvlPass {
         case '}':
           break;
         case ',':
-          ret += Designator.NAME_SEP;
-          break;
         case '-':
+        case '.':
+        case ':':
           ret += Designator.NAME_SEP;
           break;
         case '!':
           // ret += Designator.NAME_SEP;
-          break;
-        case '.':
-          ret += Designator.NAME_SEP;
           break;
         default:
           assert ((sym >= 'a' && sym <= 'z') || (sym >= 'A' && sym <= 'Z') || (sym >= '0' && sym <= '9') || (sym == '_'));
@@ -87,6 +85,13 @@ class RenamerWorker extends DefTraverser<Void, Void> {
       ((Named) obj).setName(name);
     }
     return super.visit(obj, param);
+  }
+
+  @Override
+  protected Void visitRefName(RefName obj, Void param) {
+    String name = CRenamer.cleanName(obj.getName());
+    obj.setName(name);
+    return null;
   }
 
 }

@@ -32,6 +32,7 @@ import evl.composition.ImplComposition;
 import evl.expression.BoolValue;
 import evl.expression.Expression;
 import evl.expression.Number;
+import evl.expression.TupleValue;
 import evl.expression.TypeCast;
 import evl.expression.binop.BinaryExp;
 import evl.expression.reference.RefCall;
@@ -41,14 +42,17 @@ import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
 import evl.expression.reference.SimpleRef;
 import evl.function.Function;
+import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowSimpleExpr;
 import evl.knowledge.KnowType;
+import evl.knowledge.KnowUniqueName;
 import evl.knowledge.KnowledgeBase;
 import evl.other.EvlList;
 import evl.other.ImplElementary;
 import evl.other.Namespace;
 import evl.other.SubCallbacks;
-import evl.statement.Assignment;
+import evl.statement.AssignmentMulti;
+import evl.statement.AssignmentSingle;
 import evl.statement.Block;
 import evl.statement.CallStmt;
 import evl.statement.CaseOpt;
@@ -119,7 +123,7 @@ class ExprCutterWorker extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitFunctionImpl(Function obj, Void param) {
+  protected Void visitFunction(Function obj, Void param) {
     visit(obj.getBody(), null);
     return null;
   }
@@ -134,6 +138,7 @@ class ExprCutterWorker extends NullTraverser<Void, Void> {
   protected Void visitImplElementary(ImplElementary obj, Void param) {
     visitList(obj.getFunction(), param);
     visitList(obj.getSubCallback(), param);
+    visitList(obj.getIface(), param);
     return null;
   }
 
@@ -180,14 +185,36 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
   }
 
   @Override
-  protected Void visitAssignment(Assignment obj, List<Statement> param) {
+  protected Void visitAssignmentSingle(AssignmentSingle obj, List<Statement> param) {
     obj.setRight(cutter.traverse(obj.getRight(), param));
-    visit(obj.getLeft(), param);
 
     boolean rs = KnowSimpleExpr.isSimple(obj.getRight());
     boolean ls = KnowSimpleExpr.isSimple(obj.getLeft());
 
-    if (!rs & !ls) {
+    if (!rs && !ls) {
+      FuncVariable var = cutter.extract(obj.getRight(), param);
+      obj.setRight(new Reference(ElementInfo.NO, var));
+    }
+
+    return null;
+  }
+
+  @Override
+  protected Void visitAssignmentMulti(AssignmentMulti obj, List<Statement> param) {
+    obj.setRight(cutter.traverse(obj.getRight(), param));
+    visitList(obj.getLeft(), param);
+
+    boolean rs = KnowSimpleExpr.isSimple(obj.getRight());
+    boolean ls;
+
+    RError.ass(!obj.getLeft().isEmpty(), obj.getInfo(), "expected at least one item on the left");
+    if (obj.getLeft().size() == 1) {
+      ls = KnowSimpleExpr.isSimple(obj.getLeft().get(0));
+    } else {
+      throw new UnsupportedOperationException("Not supported yet");
+    }
+
+    if (!rs && !ls) {
       FuncVariable var = cutter.extract(obj.getRight(), param);
       obj.setRight(new Reference(ElementInfo.NO, var));
     }
@@ -222,11 +249,12 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
   @Override
   protected Void visitRefCall(RefCall obj, List<Statement> param) {
     super.visitRefCall(obj, param);
-    for (int i = 0; i < obj.getActualParameter().size(); i++) {
-      Expression expr = obj.getActualParameter().get(i);
+    EvlList<Expression> value = obj.getActualParameter().getValue();
+    for (int i = 0; i < value.size(); i++) {
+      Expression expr = value.get(i);
       if (cd.traverse(expr, null)) {
         FuncVariable var = cutter.extract(expr, param);
-        obj.getActualParameter().set(i, new Reference(obj.getInfo(), var));
+        value.set(i, new Reference(obj.getInfo(), var));
       }
     }
     return null;
@@ -311,33 +339,36 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
 }
 
 class Cutter extends ExprReplacer<List<Statement>> {
-
-  private KnowledgeBase kb;
-  private KnowType kt;
-  private CallDetector cd = new CallDetector();
+  final private KnowBaseItem kbi;
+  final private KnowType kt;
+  final private KnowUniqueName kun;
+  final private CallDetector cd = new CallDetector();
 
   public Cutter(KnowledgeBase kb) {
     super();
-    this.kb = kb;
     kt = kb.getEntry(KnowType.class);
+    kbi = kb.getEntry(KnowBaseItem.class);
+    kun = kb.getEntry(KnowUniqueName.class);
   }
 
   private Type getType(Expression obj) {
     Type type = kt.get(obj);
-
-    // KnowPath ka = kb.getEntry(KnowPath.class);
-    // assert (ka.find(type) != null);
-
+    type = kbi.getType(type);
     return type;
   }
 
   FuncVariable extract(Expression obj, List<Statement> param) {
     ElementInfo info = obj.getInfo();
     Type type = getType(obj);
-    FuncVariable var = new FuncVariable(info, "", new SimpleRef<Type>(obj.getInfo(), type));
+    FuncVariable var = new FuncVariable(info, kun.get("locvar"), new SimpleRef<Type>(obj.getInfo(), type));
     param.add(new VarDefStmt(info, var));
-    param.add(new Assignment(info, new Reference(info, var), obj));
+    param.add(new AssignmentSingle(info, new Reference(info, var), obj));
     return var;
+  }
+
+  @Override
+  protected Expression visitFunction(Function obj, List<Statement> param) {
+    return super.visitFunction(obj, param);
   }
 
   @Override
@@ -368,16 +399,16 @@ class Cutter extends ExprReplacer<List<Statement>> {
   }
 
   @Override
-  protected Expression visitRefCall(RefCall obj, List<Statement> param) {
-    super.visitRefCall(obj, param);
-    for (int i = 0; i < obj.getActualParameter().size(); i++) {
-      Expression expr = obj.getActualParameter().get(i);
+  protected Expression visitTupleValue(TupleValue obj, List<Statement> param) {
+    super.visitTupleValue(obj, param);
+    for (int i = 0; i < obj.getValue().size(); i++) {
+      Expression expr = obj.getValue().get(i);
       if (cd.traverse(expr, null)) {
         FuncVariable var = extract(expr, param);
-        obj.getActualParameter().set(i, new Reference(obj.getInfo(), var));
+        obj.getValue().set(i, new Reference(obj.getInfo(), var));
       }
     }
-    return null;
+    return obj;
   }
 
   @Override

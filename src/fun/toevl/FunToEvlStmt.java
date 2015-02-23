@@ -17,6 +17,8 @@
 
 package fun.toevl;
 
+import error.ErrorType;
+import error.RError;
 import evl.expression.Expression;
 import evl.expression.reference.Reference;
 import evl.other.EvlList;
@@ -61,7 +63,23 @@ public class FunToEvlStmt extends NullTraverser<Statement, Void> {
 
   @Override
   protected Statement visitAssignment(Assignment obj, Void param) {
-    return new evl.statement.Assignment(obj.getInfo(), (evl.expression.reference.Reference) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
+    switch (obj.getLeft().size()) {
+      case 0: {
+        RError.err(ErrorType.Fatal, obj.getInfo(), "assignment needs at least one item on the left side");
+        return null;
+      }
+      case 1: {
+        return new evl.statement.AssignmentSingle(obj.getInfo(), (Reference) fta.traverse(obj.getLeft().get(0), null), (Expression) fta.traverse(obj.getRight(), null));
+      }
+      default: {
+        EvlList<Reference> lhs = new EvlList<Reference>();
+        for (fun.expression.reference.Reference lv : obj.getLeft()) {
+          Reference er = (evl.expression.reference.Reference) fta.traverse(lv, null);
+          lhs.add(er);
+        }
+        return new evl.statement.AssignmentMulti(obj.getInfo(), lhs, (Expression) fta.traverse(obj.getRight(), null));
+      }
+    }
   }
 
   @Override
@@ -70,8 +88,9 @@ public class FunToEvlStmt extends NullTraverser<Statement, Void> {
   }
 
   @Override
-  protected Statement visitVarDef(VarDefStmt obj, Void param) {
-    FuncVariable var = (FuncVariable) fta.traverse(obj.getVariable(), null);
+  protected Statement visitVarDefStmt(VarDefStmt obj, Void param) {
+    RError.ass(obj.getVariable().size() == 1, obj.getInfo(), "expected exactly 1 variable, got " + obj.getVariable().size());
+    FuncVariable var = (FuncVariable) fta.traverse(obj.getVariable().get(0), null);
     return new evl.statement.VarDefStmt(obj.getInfo(), var);
   }
 

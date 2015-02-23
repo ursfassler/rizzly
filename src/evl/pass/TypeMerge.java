@@ -28,10 +28,10 @@ import util.SimpleGraph;
 import error.RError;
 import evl.copy.Relinker;
 import evl.expression.reference.SimpleRef;
+import evl.knowledge.KnowLeftIsContainerOfRight;
 import evl.knowledge.KnowledgeBase;
 import evl.other.EvlList;
 import evl.other.Namespace;
-import evl.pass.check.type.LeftIsContainerOfRightTest;
 import evl.type.Type;
 import evl.type.out.AliasType;
 
@@ -46,10 +46,12 @@ public class TypeMerge extends EvlPass {
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
     EvlList<Type> types = evl.getItems(Type.class, true);
-    Set<Set<Type>> ss = sameSets(kb, types);
+    Set<Set<Type>> ss = sameSets(kb.getEntry(KnowLeftIsContainerOfRight.class), types);
 
     Map<Type, Type> linkmap = linkmap(ss, evl);
     Relinker.relink(evl, linkmap);
+
+    kb.clear();
   }
 
   /**
@@ -89,9 +91,9 @@ public class TypeMerge extends EvlPass {
     return root;
   }
 
-  private Set<Set<Type>> sameSets(KnowledgeBase kb, EvlList<Type> types) {
+  private Set<Set<Type>> sameSets(KnowLeftIsContainerOfRight kc, EvlList<Type> types) {
     types = new EvlList<Type>(types);
-    SimpleGraph<Type> same = findSame(types, kb);
+    SimpleGraph<Type> same = findSame(types, kc);
     GraphHelper.doTransitiveClosure(same);
     Set<Set<Type>> ss = new HashSet<Set<Type>>();
     for (int i = 0; i < types.size(); i++) {
@@ -104,7 +106,7 @@ public class TypeMerge extends EvlPass {
     return ss;
   }
 
-  private SimpleGraph<Type> findSame(EvlList<Type> types, KnowledgeBase kb) {
+  private SimpleGraph<Type> findSame(EvlList<Type> types, KnowLeftIsContainerOfRight kc) {
     SimpleGraph<Type> ret = new SimpleGraph<Type>();
     for (Type type : types) {
       ret.addVertex(type);
@@ -113,7 +115,7 @@ public class TypeMerge extends EvlPass {
       Type first = types.get(i);
       for (int k = i + 1; k < types.size(); k++) {
         Type second = types.get(k);
-        if (LeftIsContainerOfRightTest.areEual(first, second, kb)) {
+        if (kc.areEqual(first, second)) {
           ret.addEdge(first, second);
           ret.addEdge(second, first);
         }

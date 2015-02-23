@@ -19,7 +19,9 @@ package evl.pass.check.io;
 
 import evl.DefTraverser;
 import evl.Evl;
-import evl.statement.Assignment;
+import evl.expression.reference.Reference;
+import evl.statement.AssignmentMulti;
+import evl.statement.AssignmentSingle;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
 
@@ -43,15 +45,27 @@ public class StateWriterInfo extends DefTraverser<Void, Void> {
     return var instanceof StateVariable;
   }
 
-  @Override
-  protected Void visitAssignment(Assignment obj, Void param) {
-    if (obj.getLeft().getLink() instanceof Variable) {
-      Variable var = (Variable) obj.getLeft().getLink();
+  private void checkRef(Reference ref) {
+    if (ref.getLink() instanceof Variable) {
+      Variable var = (Variable) ref.getLink();
       if (isStateVariable(var)) {
         writeState = true;
       }
     }
+  }
+
+  @Override
+  protected Void visitAssignmentSingle(AssignmentSingle obj, Void param) {
+    Reference ref = obj.getLeft();
+    checkRef(ref);
     return null;
   }
 
+  @Override
+  protected Void visitAssignmentMulti(AssignmentMulti obj, Void param) {
+    for (Reference ref : obj.getLeft()) {
+      checkRef(ref);
+    }
+    return null;
+  }
 }

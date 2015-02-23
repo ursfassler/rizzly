@@ -52,10 +52,14 @@ import fun.composition.Connection;
 import fun.composition.ImplComposition;
 import fun.content.CompIfaceContent;
 import fun.expression.Expression;
+import fun.expression.NamedValue;
 import fun.expression.reference.DummyLinkTarget;
 import fun.expression.reference.RefItem;
 import fun.function.FuncHeader;
 import fun.function.FuncImpl;
+import fun.function.FuncReturnNone;
+import fun.function.FuncReturnTuple;
+import fun.function.FuncReturnType;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.StateComposite;
 import fun.hfsm.StateContent;
@@ -222,9 +226,8 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitImplElementary(ImplElementary obj, Void param) {
-    VoidType voidType = getVoidType();
-    FuncPrivateVoid entryFunc = new FuncPrivateVoid(ElementInfo.NO, "_entry", new EvlList<evl.variable.FuncVariable>(), new SimpleRef<Type>(ElementInfo.NO, voidType), (Block) visit(obj.getEntryFunc(), null));
-    FuncPrivateVoid exitFunc = new FuncPrivateVoid(ElementInfo.NO, "_exit", new EvlList<evl.variable.FuncVariable>(), new SimpleRef<Type>(ElementInfo.NO, voidType), (Block) visit(obj.getExitFunc(), null));
+    FuncPrivateVoid entryFunc = new FuncPrivateVoid(ElementInfo.NO, "_entry", new EvlList<evl.variable.FuncVariable>(), new evl.function.ret.FuncReturnNone(ElementInfo.NO), (Block) visit(obj.getEntryFunc(), null));
+    FuncPrivateVoid exitFunc = new FuncPrivateVoid(ElementInfo.NO, "_exit", new EvlList<evl.variable.FuncVariable>(), new evl.function.ret.FuncReturnNone(ElementInfo.NO), (Block) visit(obj.getExitFunc(), null));
     // if this makes problems like loops, convert the body of the functions after the component
 
     evl.other.ImplElementary comp = new evl.other.ImplElementary(obj.getInfo(), obj.getName(), new SimpleRef<FuncPrivateVoid>(ElementInfo.NO, entryFunc), new SimpleRef<FuncPrivateVoid>(ElementInfo.NO, exitFunc));
@@ -255,6 +258,11 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
     }
 
     return comp;
+  }
+
+  private evl.variable.FuncVariable mvr(String name) {
+    VoidType voidType = getVoidType();
+    return new evl.variable.FuncVariable(ElementInfo.NO, name, new SimpleRef<Type>(ElementInfo.NO, voidType));
   }
 
   @Override
@@ -324,9 +332,8 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
   protected Evl visitStateComposite(StateComposite obj, Void param) {
     SimpleRef<State> initref = toSimple((Reference) traverse(obj.getInitial(), null));
 
-    VoidType voidType = getVoidType();
-    FuncPrivateVoid entryFunc = new FuncPrivateVoid(ElementInfo.NO, "_entry", new EvlList<evl.variable.FuncVariable>(), new SimpleRef<Type>(ElementInfo.NO, voidType), new Block(ElementInfo.NO));
-    FuncPrivateVoid exitFunc = new FuncPrivateVoid(ElementInfo.NO, "_exit", new EvlList<evl.variable.FuncVariable>(), new SimpleRef<Type>(ElementInfo.NO, voidType), new Block(ElementInfo.NO));
+    FuncPrivateVoid entryFunc = new FuncPrivateVoid(ElementInfo.NO, "_entry", new EvlList<evl.variable.FuncVariable>(), new evl.function.ret.FuncReturnNone(ElementInfo.NO), new Block(ElementInfo.NO));
+    FuncPrivateVoid exitFunc = new FuncPrivateVoid(ElementInfo.NO, "_exit", new EvlList<evl.variable.FuncVariable>(), new evl.function.ret.FuncReturnNone(ElementInfo.NO), new Block(ElementInfo.NO));
 
     evl.hfsm.StateComposite state = new evl.hfsm.StateComposite(obj.getInfo(), obj.getName(), new SimpleRef<FuncPrivateVoid>(ElementInfo.NO, entryFunc), new SimpleRef<FuncPrivateVoid>(ElementInfo.NO, exitFunc), initref);
     state.getItem().add(entryFunc);
@@ -344,9 +351,8 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitStateSimple(StateSimple obj, Void param) {
-    VoidType voidType = getVoidType();
-    FuncPrivateVoid entryFunc = new FuncPrivateVoid(ElementInfo.NO, "_entry", new EvlList<evl.variable.FuncVariable>(), new SimpleRef<Type>(ElementInfo.NO, voidType), new Block(ElementInfo.NO));
-    FuncPrivateVoid exitFunc = new FuncPrivateVoid(ElementInfo.NO, "_exit", new EvlList<evl.variable.FuncVariable>(), new SimpleRef<Type>(ElementInfo.NO, voidType), new Block(ElementInfo.NO));
+    FuncPrivateVoid entryFunc = new FuncPrivateVoid(ElementInfo.NO, "_entry", new EvlList<evl.variable.FuncVariable>(), new evl.function.ret.FuncReturnNone(ElementInfo.NO), new Block(ElementInfo.NO));
+    FuncPrivateVoid exitFunc = new FuncPrivateVoid(ElementInfo.NO, "_exit", new EvlList<evl.variable.FuncVariable>(), new evl.function.ret.FuncReturnNone(ElementInfo.NO), new Block(ElementInfo.NO));
 
     evl.hfsm.StateSimple state = new evl.hfsm.StateSimple(obj.getInfo(), obj.getName(), new SimpleRef<FuncPrivateVoid>(ElementInfo.NO, entryFunc), new SimpleRef<FuncPrivateVoid>(ElementInfo.NO, exitFunc));
     state.getItem().add(entryFunc);
@@ -380,7 +386,35 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
     return new evl.hfsm.Transition(obj.getInfo(), src, dst, evt, guard, args, nbody);
   }
 
-  static public fun.type.Type getRefType(fun.expression.reference.Reference ref) {
+  @Override
+  protected Evl visitFuncReturnTuple(FuncReturnTuple obj, Void param) {
+    EvlList<evl.variable.FuncVariable> arg = new EvlList<evl.variable.FuncVariable>();
+    for (FuncVariable itr : obj.getParam()) {
+      evl.variable.FuncVariable var = (evl.variable.FuncVariable) traverse(itr, null);
+      arg.add(var);
+    }
+    return new evl.function.ret.FuncReturnTuple(obj.getInfo(), arg);
+  }
+
+  @Override
+  protected Evl visitFuncReturnType(FuncReturnType obj, Void param) {
+    Type nt = (Type) traverse(FunToEvl.getRefType(obj.getType()), null);
+    return new evl.function.ret.FuncReturnType(obj.getInfo(), new SimpleRef<Type>(obj.getInfo(), nt));
+  }
+
+  @Override
+  protected Evl visitFuncReturnNone(FuncReturnNone obj, Void param) {
+    return new evl.function.ret.FuncReturnNone(obj.getInfo());
+  }
+
+  @Override
+  protected Evl visitNamedValue(NamedValue obj, Void param) {
+    return new evl.expression.NamedValue(obj.getInfo(), obj.getName(), (evl.expression.Expression) traverse(obj.getValue(), null));
+  }
+
+  static public fun.type.Type getRefType(Fun type) {
+    RError.ass(type instanceof fun.expression.reference.Reference, type.getInfo(), "Expected reference, got: " + type.getClass().getName());
+    fun.expression.reference.Reference ref = (fun.expression.reference.Reference) type;
     if (ref.getLink() instanceof fun.type.Type) {
       if (!ref.getOffset().isEmpty()) {
         RError.err(ErrorType.Error, ref.getOffset().get(0).getInfo(), "Type reference should not have offset anymore");

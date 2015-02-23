@@ -1,0 +1,12 @@
+Mulret3 = Elementary
+  bla = function():(a, b: R{0,10})
+    return (2, 3);
+  end
+
+  tuwas : response():R{0,20}
+    c : R{0,10};
+    c, _ := bla();
+    return c;
+  end
+end
+

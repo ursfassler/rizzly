@@ -18,22 +18,16 @@
 package evl.pass;
 
 import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
 
 import pass.EvlPass;
-
-import common.ElementInfo;
-
 import error.ErrorType;
 import error.RError;
-import evl.copy.Copy;
 import evl.expression.ArrayValue;
-import evl.expression.ExprList;
 import evl.expression.Expression;
-import evl.expression.NamedElementValue;
+import evl.expression.NamedElementsValue;
+import evl.expression.NamedValue;
 import evl.expression.RecordValue;
+import evl.expression.TupleValue;
 import evl.expression.UnionValue;
 import evl.expression.UnsafeUnionValue;
 import evl.expression.reference.Reference;
@@ -48,7 +42,6 @@ import evl.type.base.ArrayType;
 import evl.type.base.EnumElement;
 import evl.type.base.EnumType;
 import evl.type.composed.NamedElement;
-import evl.type.composed.NamedElementType;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
 import evl.type.composed.UnsafeUnionType;
@@ -91,21 +84,8 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
       }
       int idx = 0;
       for (Expression expr : obj.getValue()) {
-        if (expr instanceof NamedElementValue) {
-          if (!((NamedElementValue) expr).getName().equals("_")) {
-            RError.err(ErrorType.Error, expr.getInfo(), "Unknown name: " + ((NamedElementValue) expr).getName());
-          } else {
-            expr = visit(((NamedElementValue) expr).getValue(), at.getType().getLink());
-            for (int i = 0; i < size; i++) {
-              if (init.get(i) == null) {
-                init.set(i, Copy.copy(expr));
-              }
-            }
-          }
-        } else {
-          init.set(idx, visit(expr, at.getType().getLink()));
-          idx++;
-        }
+        init.set(idx, visit(expr, at.getType().getLink()));
+        idx++;
       }
 
       ArrayList<Integer> missing = new ArrayList<Integer>();
@@ -125,96 +105,43 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
   }
 
   @Override
-  protected Expression visitExprList(ExprList obj, Type param) {
-    // FIXME recursion does not work
-    if (param instanceof RecordType) {
-      Collection<NamedElementValue> iv = toElemList(obj, param);
-      return new RecordValue(obj.getInfo(), iv, new SimpleRef<Type>(obj.getInfo(), param));
-    } else if (param instanceof UnsafeUnionType) {
-      Map<String, Expression> map = toMap(obj);
-      if (map.size() != 1) {
-        RError.err(ErrorType.Error, obj.getInfo(), "Union need exactly 1 value");
-      }
+  protected Expression visitTupleValue(TupleValue obj, Type param) {
+    if (param == null) {
+      // we propably came from an function call
+      return obj;
+    }
 
-      String name = map.keySet().iterator().next();
-      Expression value = map.get(name);
-      NamedElement elem = ((UnsafeUnionType) param).getElement().find(name);
-
-      value = visit(value, elem.getRef().getLink());
-
-      return new UnsafeUnionValue(obj.getInfo(), new NamedElementValue(obj.getInfo(), name, value), Copy.copy(elem.getRef()));
-    } else if (obj.getValue().size() == 1) {
+    if (obj.getValue().size() == 1) {
       // TODO do that at a different place
       return visit(obj.getValue().get(0), param);
+    } else if (obj.getValue().size() == 0) {
+      return obj;
+    } else if (param instanceof ArrayType) {
+      ArrayType at = (ArrayType) param;
+      if (obj.getValue().size() != at.getSize().intValue()) {
+        RError.err(ErrorType.Error, obj.getInfo(), "Expected " + at.getSize().toString() + " elements, got " + obj.getValue().size());
+      }
+      return new ArrayValue(obj.getInfo(), obj.getValue());
     } else {
       throw new RuntimeException("not yet implemented: " + param.getClass().getCanonicalName());
     }
   }
 
-  private Collection<NamedElementValue> toElemList(ExprList obj, Type param) {
-    Map<String, Expression> map = toMap(obj);
-
-    Collection<NamedElementValue> iv = toNamedElem(obj.getInfo(), (NamedElementType) param, map);
-
-    if (!map.isEmpty()) {
-      for (String key : map.keySet()) {
-        RError.err(ErrorType.Warning, map.get(key).getInfo(), "Unknown item: " + key);
-      }
-      RError.err(ErrorType.Error, obj.getInfo(), "Too many items");
-    }
-    return iv;
-  }
-
-  private Collection<NamedElementValue> toNamedElem(ElementInfo info, NamedElementType param, Map<String, Expression> map) {
-    Collection<NamedElementValue> iv = new ArrayList<NamedElementValue>();
-    for (NamedElement itr : param.getElement()) {
-      Expression value = map.remove(itr.getName());
-      if (value == null) {
-        RError.err(ErrorType.Error, info, "Missing initializer: " + itr.getName());
-      } else {
-        NamedElement elem = (NamedElement) kc.get(param, itr.getName(), value.getInfo());
-        value = visit(value, elem.getRef().getLink());
-        iv.add(new NamedElementValue(value.getInfo(), itr.getName(), value));
-      }
-    }
-    return iv;
-  }
-
-  private Map<String, Expression> toMap(ExprList obj) {
-    Map<String, Expression> map = new HashMap<String, Expression>();
-    for (Expression itr : obj.getValue()) {
-      if (itr instanceof NamedElementValue) {
-        String name = ((NamedElementValue) itr).getName();
-        Expression value = ((NamedElementValue) itr).getValue();
-
-        if (map.containsKey(name)) {
-          RError.err(ErrorType.Warning, map.get(name).getInfo(), "First defined here");
-          RError.err(ErrorType.Error, itr.getInfo(), "Duplicated entry");
-        } else {
-          map.put(name, value);
-        }
-      } else {
-        RError.err(ErrorType.Error, itr.getInfo(), "Expected named element value, got: " + itr.getClass().getCanonicalName());
-      }
-    }
-    return map;
-  }
-
   @Override
-  protected Expression visitNamedElementValue(NamedElementValue obj, Type type) {
+  protected Expression visitNamedValue(NamedValue obj, Type type) {
     if (type instanceof UnionType) {
       EnumType et = (EnumType) ((UnionType) type).getTag().getRef().getLink();
       EnumElement ele = (EnumElement) kc.get(et, obj.getName(), obj.getInfo());
 
       EnumElement value = (EnumElement) kc.get(et, obj.getName(), obj.getInfo());
 
-      NamedElementValue tag = new NamedElementValue(obj.getInfo(), ((UnionType) type).getTag().getName(), new Reference(obj.getInfo(), value));
+      NamedValue tag = new NamedValue(obj.getInfo(), ((UnionType) type).getTag().getName(), new Reference(obj.getInfo(), value));
 
       Expression ov = obj.getValue();
       NamedElement elem = (NamedElement) kc.get(type, obj.getName(), obj.getInfo());
       ov = visit(ov, elem.getRef().getLink());
 
-      NamedElementValue content = new NamedElementValue(obj.getInfo(), ele.getName(), ov);
+      NamedValue content = new NamedValue(obj.getInfo(), ele.getName(), ov);
 
       UnionValue uv = new UnionValue(obj.getInfo(), tag, content, new SimpleRef<Type>(obj.getInfo(), type));
       return uv;
@@ -223,23 +150,13 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
       NamedElement elem = (NamedElement) kc.get(type, obj.getName(), obj.getInfo());
       ov = visit(ov, elem.getRef().getLink());
 
-      NamedElementValue content = new NamedElementValue(obj.getInfo(), elem.getName(), ov);
+      NamedValue content = new NamedValue(obj.getInfo(), elem.getName(), ov);
 
       UnsafeUnionValue uv = new UnsafeUnionValue(obj.getInfo(), content, new SimpleRef<Type>(obj.getInfo(), type));
       return uv;
     } else if (type instanceof ArrayType) {
-      if (!obj.getName().equals("_")) {
-        RError.err(ErrorType.Error, obj.getInfo(), "Unhandled name: " + obj.getName());
-        return null;
-      }
-      ArrayType at = (ArrayType) type;
-      Expression ev = visit(obj.getValue(), at.getType().getLink());
-
-      EvlList<Expression> value = new EvlList<Expression>();
-      for (int i = 0; i < at.getSize().intValue(); i++) {
-        value.add(Copy.copy(ev));
-      }
-      return new ArrayValue(obj.getInfo(), value);
+      RError.err(ErrorType.Error, obj.getInfo(), "ArrayType only initializable by TupleValue");
+      return null;
     } else {
       throw new RuntimeException("not yet implemented: " + type.getClass().getCanonicalName());
     }
@@ -251,6 +168,21 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
       return obj; // we assume it is right
     } else {
       throw new RuntimeException("not yet implemented: " + param.getClass().getCanonicalName());
+    }
+  }
+
+  @Override
+  protected Expression visitNamedElementsValue(NamedElementsValue obj, Type type) {
+    if (type instanceof RecordType) {
+      return new RecordValue(obj.getInfo(), obj.getValue(), new SimpleRef<Type>(obj.getInfo(), type));
+    } else if ((type instanceof UnionType) || (type instanceof UnsafeUnionType)) {
+      if (obj.getValue().size() != 1) {
+        RError.err(ErrorType.Error, obj.getInfo(), "need exactly one entry for union type, got " + obj.getValue().size());
+        return null;
+      }
+      return visit(obj.getValue().get(0), type);
+    } else {
+      throw new RuntimeException("not yet implemented: " + type.getClass().getCanonicalName());
     }
   }
 

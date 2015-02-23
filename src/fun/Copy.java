@@ -28,13 +28,13 @@ import fun.composition.Connection;
 import fun.composition.ImplComposition;
 import fun.expression.AnyValue;
 import fun.expression.ArithmeticOp;
-import fun.expression.ArrayValue;
 import fun.expression.BoolValue;
-import fun.expression.ExprList;
-import fun.expression.NamedElementValue;
+import fun.expression.NamedElementsValue;
+import fun.expression.NamedValue;
 import fun.expression.Number;
 import fun.expression.Relation;
 import fun.expression.StringValue;
+import fun.expression.TupleValue;
 import fun.expression.UnaryExpression;
 import fun.expression.reference.DummyLinkTarget;
 import fun.expression.reference.RefCall;
@@ -47,6 +47,9 @@ import fun.function.FuncFunction;
 import fun.function.FuncProcedure;
 import fun.function.FuncQuery;
 import fun.function.FuncResponse;
+import fun.function.FuncReturnNone;
+import fun.function.FuncReturnTuple;
+import fun.function.FuncReturnType;
 import fun.function.FuncSignal;
 import fun.function.FuncSlot;
 import fun.hfsm.ImplHfsm;
@@ -161,17 +164,17 @@ class CopyFun extends Traverser<Fun, Void> {
   }
 
   @Override
-  protected Fun visitRefCall(RefCall obj, Void param) {
-    return new RefCall(obj.getInfo(), copy(obj.getActualParameter()));
-  }
-
-  @Override
   protected Fun visitRefIndex(RefIndex obj, Void param) {
     return new RefIndex(obj.getInfo(), copy(obj.getIndex()));
   }
 
   @Override
-  protected Fun visitRefCompcall(RefTemplCall obj, Void param) {
+  protected Fun visitRefCall(RefCall obj, Void param) {
+    return new RefCall(obj.getInfo(), copy(obj.getActualParameter()));
+  }
+
+  @Override
+  protected Fun visitRefTemplCall(RefTemplCall obj, Void param) {
     return new RefTemplCall(obj.getInfo(), copy(obj.getActualParameter()));
   }
 
@@ -401,8 +404,8 @@ class CopyFun extends Traverser<Fun, Void> {
   }
 
   @Override
-  protected Fun visitVarDef(VarDefStmt obj, Void param) {
-    return new VarDefStmt(obj.getInfo(), copy(obj.getVariable()));
+  protected Fun visitVarDefStmt(VarDefStmt obj, Void param) {
+    return new VarDefStmt(obj.getInfo(), copy(obj.getVariable()), copy(obj.getInitial()));
   }
 
   @Override
@@ -466,13 +469,8 @@ class CopyFun extends Traverser<Fun, Void> {
   }
 
   @Override
-  protected Fun visitArrayValue(ArrayValue obj, Void param) {
-    return new ArrayValue(obj.getInfo(), copy(obj.getValue()));
-  }
-
-  @Override
-  protected Fun visitExprList(ExprList obj, Void param) {
-    return new ExprList(obj.getInfo(), copy(obj.getValue()));
+  protected Fun visitTupleValue(TupleValue obj, Void param) {
+    return new TupleValue(obj.getInfo(), copy(obj.getValue()));
   }
 
   @Override
@@ -494,36 +492,41 @@ class CopyFun extends Traverser<Fun, Void> {
 
   @Override
   protected Fun visitAnyValue(AnyValue obj, Void param) {
-    throw new RuntimeException("not yet implemented");
+    return new AnyValue(obj.getInfo());
   }
 
   @Override
-  protected Fun visitNamedElementValue(NamedElementValue obj, Void param) {
-    return new NamedElementValue(obj.getInfo(), obj.getName(), copy(obj.getValue()));
+  protected Fun visitNamedElementsValue(NamedElementsValue obj, Void param) {
+    return new NamedElementsValue(obj.getInfo(), copy(obj.getValue()));
   }
 
   @Override
-  protected Fun visitDeclaration(Template obj, Void param) {
+  protected Fun visitNamedValue(NamedValue obj, Void param) {
+    return new NamedValue(obj.getInfo(), obj.getName(), copy(obj.getValue()));
+  }
+
+  @Override
+  protected Fun visitTemplate(Template obj, Void param) {
     return new Template(obj.getInfo(), obj.getName(), copy(obj.getTempl()), copy(obj.getObject()));
   }
 
   @Override
-  protected Fun visitFuncProtSlot(FuncSlot obj, Void param) {
+  protected Fun visitFuncSlot(FuncSlot obj, Void param) {
     return new FuncSlot(obj.getInfo(), obj.getName(), copy(obj.getParam()), copy(obj.getRet()), copy(obj.getBody()));
   }
 
   @Override
-  protected Fun visitFuncProtSignal(FuncSignal obj, Void param) {
+  protected Fun visitFuncSignal(FuncSignal obj, Void param) {
     return new FuncSignal(obj.getInfo(), obj.getName(), copy(obj.getParam()), copy(obj.getRet()));
   }
 
   @Override
-  protected Fun visitFuncProtQuery(FuncQuery obj, Void param) {
+  protected Fun visitFuncQuery(FuncQuery obj, Void param) {
     return new FuncQuery(obj.getInfo(), obj.getName(), copy(obj.getParam()), copy(obj.getRet()));
   }
 
   @Override
-  protected Fun visitFuncProtResponse(FuncResponse obj, Void param) {
+  protected Fun visitFuncResponse(FuncResponse obj, Void param) {
     return new FuncResponse(obj.getInfo(), obj.getName(), copy(obj.getParam()), copy(obj.getRet()), copy(obj.getBody()));
   }
 
@@ -533,8 +536,23 @@ class CopyFun extends Traverser<Fun, Void> {
   }
 
   @Override
-  protected Fun visitFuncPrivateVoid(FuncProcedure obj, Void param) {
+  protected Fun visitFuncProcedure(FuncProcedure obj, Void param) {
     return new FuncProcedure(obj.getInfo(), obj.getName(), copy(obj.getParam()), copy(obj.getRet()), copy(obj.getBody()));
+  }
+
+  @Override
+  protected Fun visitFuncReturnTuple(FuncReturnTuple obj, Void param) {
+    return new FuncReturnTuple(obj.getInfo(), copy(obj.getParam()));
+  }
+
+  @Override
+  protected Fun visitFuncReturnType(FuncReturnType obj, Void param) {
+    return new FuncReturnType(obj.getInfo(), copy(obj.getType()));
+  }
+
+  @Override
+  protected Fun visitFuncReturnNone(FuncReturnNone obj, Void param) {
+    return new FuncReturnNone(obj.getInfo());
   }
 
   @Override

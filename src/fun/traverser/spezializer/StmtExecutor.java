@@ -27,11 +27,12 @@ import error.RError;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.expression.AnyValue;
-import fun.expression.ArrayValue;
 import fun.expression.BoolValue;
 import fun.expression.Expression;
-import fun.expression.reference.RefIndex;
+import fun.expression.TupleValue;
+import fun.expression.reference.RefCall;
 import fun.expression.reference.RefItem;
+import fun.expression.reference.RefName;
 import fun.expression.reference.Reference;
 import fun.function.FuncFunction;
 import fun.knowledge.KnowledgeBase;
@@ -46,10 +47,6 @@ import fun.statement.Statement;
 import fun.statement.VarDefStmt;
 import fun.statement.While;
 import fun.traverser.Memory;
-import fun.type.Type;
-import fun.type.base.NaturalType;
-import fun.type.template.Array;
-import fun.type.template.Range;
 import fun.variable.FuncVariable;
 import fun.variable.Variable;
 
@@ -123,31 +120,14 @@ public class StmtExecutor extends NullTraverser<Expression, Memory> {
   }
 
   @Override
-  protected Expression visitVarDef(VarDefStmt obj, Memory param) {
-    Expression value;
+  protected Expression visitVarDefStmt(VarDefStmt obj, Memory param) {
+    Expression value = exeval(obj.getInitial(), param);
 
-    Reference tr = obj.getVariable().getType();
-    assert (tr.getOffset().isEmpty());
-    Type type = (Type) tr.getLink();
-    if (type instanceof Range) {
-      value = null;
-    } else if (type instanceof NaturalType) {
-      value = null;
-    } else if (type instanceof Array) {
-      Array at = (Array) type;
-      FunList<Expression> vals = new FunList<Expression>();
-      for (int i = 0; i < at.getSize().intValue(); i++) {
-        vals.add(null);
+    for (Variable var : obj.getVariable()) {
+      param.createVar(var);
+      if (!(value instanceof AnyValue)) {
+        param.set(var, value);
       }
-      value = new ArrayValue(ElementInfo.NO, vals);
-    } else {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Unhandled type: " + type.getName());
-      value = null;
-    }
-
-    param.createVar(obj.getVariable());
-    if (value != null) {
-      param.set(obj.getVariable(), value);
     }
 
     return null;
@@ -155,29 +135,57 @@ public class StmtExecutor extends NullTraverser<Expression, Memory> {
 
   @Override
   protected Expression visitAssignment(Assignment obj, Memory param) {
-    Variable var = (Variable) obj.getLeft().getLink();
     Expression rhs = exeval(obj.getRight(), param);
 
-    if (obj.getLeft().getOffset().isEmpty()) {
+    FunList<Expression> value;
+
+    if (obj.getLeft().size() > 1) {
+      RError.ass(rhs instanceof TupleValue, obj.getInfo(), "expected tuple on the right");
+      value = ((TupleValue) rhs).getValue();
+    } else {
+      value = new FunList<Expression>();
+      value.add(rhs);
+    }
+
+    // FIXME what if a function call is on the rhs?
+    RError.ass(obj.getLeft().size() == value.size(), obj.getInfo(), "expect same number of elemnts on both sides, got " + obj.getLeft().size() + " <-> " + value.size());
+
+    for (int i = 0; i < value.size(); i++) {
+      assign(obj.getLeft().get(i), value.get(i), param);
+    }
+
+    return null;
+  }
+
+  private void assign(Reference lhs, Expression rhs, Memory param) {
+    Variable var = (Variable) lhs.getLink();
+
+    if (lhs.getOffset().isEmpty()) {
       param.set(var, rhs);
-      return null;
+      return;
     }
 
     Expression value = param.get(var);
 
     LinkedList<RefItem> offset = new LinkedList<RefItem>();
-    for (RefItem itm : obj.getLeft().getOffset()) {
-      if (itm instanceof RefIndex) {
-        itm = new RefIndex(ElementInfo.NO, exeval(((RefIndex) itm).getIndex(), param));
+    for (RefItem itm : lhs.getOffset()) {
+      if (itm instanceof RefCall) {
+        FunList<Expression> val = ((RefCall) itm).getActualParameter().getValue();
+        RError.ass(val.size() == 1, itm.getInfo(), "expected exactly 1 argument, got " + val.size());
+        val.set(0, exeval(val.get(0), param));
+        itm = new RefCall(ElementInfo.NO, new TupleValue(itm.getInfo(), val));
+      } else if (itm instanceof RefName) {
+      } else {
+        RError.err(ErrorType.Fatal, itm.getInfo(), "unexpected item: " + itm);
       }
+
       offset.add(itm);
     }
+
     RefItem last = offset.pollLast();
     Expression elem = ElementGetter.get(value, offset);
 
     ElementSetter.set(elem, last, rhs);
-
-    return null;
   }
 
   @Override

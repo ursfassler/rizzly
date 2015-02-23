@@ -15,27 +15,45 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fun.expression;
+package evl.expression;
 
 import common.ElementInfo;
 
-import fun.other.FunList;
+import evl.other.EvlList;
 
-public class ExprList extends Expression {
-  final private FunList<Expression> value;
+public class TupleValue extends Expression {
+  final private EvlList<Expression> value;
 
-  public ExprList(ElementInfo info, FunList<Expression> value) {
+  public TupleValue(ElementInfo info, EvlList<Expression> value) {
     super(info);
+    assert (value != null);
     this.value = value;
   }
 
-  public FunList<Expression> getValue() {
+  public TupleValue(ElementInfo info) {
+    super(info);
+    this.value = new EvlList<Expression>();
+  }
+
+  public EvlList<Expression> getValue() {
     return value;
   }
 
   @Override
   public String toString() {
-    return value.toString();
+    String ret = "";
+    ret += "(";
+    boolean first = true;
+    for (Expression gen : value) {
+      if (first) {
+        first = false;
+      } else {
+        ret += ",";
+      }
+      ret += gen.toString();
+    }
+    ret += ")";
+    return ret;
   }
 
 }

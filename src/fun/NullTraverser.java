@@ -21,13 +21,13 @@ import fun.composition.Connection;
 import fun.composition.ImplComposition;
 import fun.expression.AnyValue;
 import fun.expression.ArithmeticOp;
-import fun.expression.ArrayValue;
 import fun.expression.BoolValue;
-import fun.expression.ExprList;
-import fun.expression.NamedElementValue;
+import fun.expression.NamedElementsValue;
+import fun.expression.NamedValue;
 import fun.expression.Number;
 import fun.expression.Relation;
 import fun.expression.StringValue;
+import fun.expression.TupleValue;
 import fun.expression.UnaryExpression;
 import fun.expression.reference.DummyLinkTarget;
 import fun.expression.reference.RefCall;
@@ -40,6 +40,9 @@ import fun.function.FuncFunction;
 import fun.function.FuncProcedure;
 import fun.function.FuncQuery;
 import fun.function.FuncResponse;
+import fun.function.FuncReturnNone;
+import fun.function.FuncReturnTuple;
+import fun.function.FuncReturnType;
 import fun.function.FuncSignal;
 import fun.function.FuncSlot;
 import fun.hfsm.ImplHfsm;
@@ -92,6 +95,21 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   protected abstract R visitDefault(Fun obj, P param);
 
   @Override
+  protected R visitFuncReturnTuple(FuncReturnTuple obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitFuncReturnType(FuncReturnType obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitFuncReturnNone(FuncReturnNone obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
   protected R visitDummyLinkTarget(DummyLinkTarget obj, P param) {
     return visitDefault(obj, param);
   }
@@ -107,42 +125,42 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitFuncPrivateVoid(FuncProcedure obj, P param) {
+  protected R visitFuncProcedure(FuncProcedure obj, P param) {
     return visitDefault(obj, param);
   }
 
   @Override
-  protected R visitFuncProtSlot(FuncSlot obj, P param) {
+  protected R visitFuncSlot(FuncSlot obj, P param) {
     return visitDefault(obj, param);
   }
 
   @Override
-  protected R visitFuncProtSignal(FuncSignal obj, P param) {
+  protected R visitFuncSignal(FuncSignal obj, P param) {
     return visitDefault(obj, param);
   }
 
   @Override
-  protected R visitFuncProtQuery(FuncQuery obj, P param) {
+  protected R visitFuncQuery(FuncQuery obj, P param) {
     return visitDefault(obj, param);
   }
 
   @Override
-  protected R visitFuncProtResponse(FuncResponse obj, P param) {
+  protected R visitFuncResponse(FuncResponse obj, P param) {
     return visitDefault(obj, param);
   }
 
   @Override
-  protected R visitExprList(ExprList obj, P param) {
+  protected R visitTupleValue(TupleValue obj, P param) {
     return visitDefault(obj, param);
   }
 
   @Override
-  protected R visitNamedElementValue(NamedElementValue obj, P param) {
+  protected R visitNamedValue(NamedValue obj, P param) {
     return visitDefault(obj, param);
   }
 
   @Override
-  protected R visitArrayValue(ArrayValue obj, P param) {
+  protected R visitNamedElementsValue(NamedElementsValue obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -217,7 +235,7 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitVarDef(VarDefStmt obj, P param) {
+  protected R visitVarDefStmt(VarDefStmt obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -277,7 +295,7 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitRefCompcall(RefTemplCall obj, P param) {
+  protected R visitRefTemplCall(RefTemplCall obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -432,7 +450,7 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitDeclaration(Template obj, P param) {
+  protected R visitTemplate(Template obj, P param) {
     return visitDefault(obj, param);
   }
 

@@ -15,27 +15,28 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fun.expression;
+package fun.type.base;
 
 import common.ElementInfo;
 
+import fun.expression.reference.Reference;
 import fun.other.FunList;
 
-public class ArrayValue extends Expression {
-  final private FunList<Expression> value;
+public class TupleType extends BaseType {
+  final private FunList<Reference> types;
 
-  public ArrayValue(ElementInfo info, FunList<Expression> value) {
-    super(info);
-    this.value = value;
+  public TupleType(ElementInfo info, String name, FunList<Reference> types) {
+    super(info, name);
+    this.types = types;
   }
 
-  public FunList<Expression> getValue() {
-    return value;
+  public TupleType(ElementInfo info, String name) {
+    super(info, name);
+    this.types = new FunList<Reference>();
   }
 
-  @Override
-  public String toString() {
-    return value.toString();
+  public FunList<Reference> getTypes() {
+    return types;
   }
 
 }

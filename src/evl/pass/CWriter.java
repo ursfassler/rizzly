@@ -29,7 +29,7 @@ import evl.Evl;
 import evl.NullTraverser;
 import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
-import evl.expression.NamedElementValue;
+import evl.expression.NamedValue;
 import evl.expression.RecordValue;
 import evl.expression.StringValue;
 import evl.expression.TypeCast;
@@ -64,11 +64,13 @@ import evl.expression.unop.LogicNot;
 import evl.expression.unop.Uminus;
 import evl.expression.unop.UnaryExp;
 import evl.function.Function;
+import evl.function.ret.FuncReturnNone;
+import evl.function.ret.FuncReturnType;
 import evl.knowledge.KnowledgeBase;
 import evl.other.EvlList;
 import evl.other.Named;
 import evl.other.Namespace;
-import evl.statement.Assignment;
+import evl.statement.AssignmentSingle;
 import evl.statement.Block;
 import evl.statement.CallStmt;
 import evl.statement.CaseOpt;
@@ -306,11 +308,11 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
   @Override
   protected Void visitRefCall(RefCall obj, Boolean param) {
     sw.wr("(");
-    for (int i = 0; i < obj.getActualParameter().size(); i++) {
+    for (int i = 0; i < obj.getActualParameter().getValue().size(); i++) {
       if (i > 0) {
         sw.wr(",");
       }
-      visit(obj.getActualParameter().get(i), param);
+      visit(obj.getActualParameter().getValue().get(i), param);
     }
     sw.wr(")");
     return null;
@@ -330,6 +332,18 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
     sw.wr("[");
     visit(obj.getIndex(), param);
     sw.wr("]");
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncReturnType(FuncReturnType obj, Boolean param) {
+    visit(obj.getType(), param);
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncReturnNone(FuncReturnNone obj, Boolean param) {
+    sw.wr("void");
     return null;
   }
 
@@ -353,7 +367,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
   }
 
   @Override
-  protected Void visitFunctionImpl(Function obj, Boolean param) {
+  protected Void visitFunction(Function obj, Boolean param) {
     if (obj.properties().containsKey(Property.Extern)) {
       if (!param) {
         sw.wr("extern ");
@@ -427,7 +441,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
   }
 
   @Override
-  protected Void visitAssignment(Assignment obj, Boolean param) {
+  protected Void visitAssignmentSingle(AssignmentSingle obj, Boolean param) {
     visit(obj.getLeft(), param);
     sw.wr(" = ");
     visit(obj.getRight(), param);
@@ -770,7 +784,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
   }
 
   @Override
-  protected Void visitNamedElementValue(NamedElementValue obj, Boolean param) {
+  protected Void visitNamedValue(NamedValue obj, Boolean param) {
     sw.wr(".");
     sw.wr(obj.getName());
     sw.wr("=");
@@ -806,7 +820,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
   }
 
   @Override
-  protected Void visitTypeRef(SimpleRef obj, Boolean param) {
+  protected Void visitSimpleRef(SimpleRef obj, Boolean param) {
     sw.wr(name(obj.getLink()));
     return null;
   }

@@ -32,7 +32,6 @@ import evl.expression.Number;
 import evl.expression.RangeValue;
 import evl.expression.StringValue;
 import evl.expression.TypeCast;
-import evl.expression.binop.BinaryExp;
 import evl.expression.binop.BitAnd;
 import evl.expression.binop.BitOr;
 import evl.expression.binop.Div;
@@ -55,6 +54,7 @@ import evl.expression.reference.Reference;
 import evl.expression.reference.SimpleRef;
 import evl.expression.unop.Not;
 import evl.expression.unop.Uminus;
+import evl.knowledge.KnowComparable;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
 import evl.type.Type;
@@ -62,16 +62,16 @@ import evl.type.base.BooleanType;
 import evl.type.base.EnumType;
 import evl.type.base.RangeType;
 
-//use KnowType to get types of children
-//TODO do not give type back
 public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
   final private KnowledgeBase kb;
   final private KnowType kt;
+  final private KnowComparable kc;
 
   public ExpressionTypeChecker(KnowledgeBase kb) {
     super();
     this.kb = kb;
     kt = kb.getEntry(KnowType.class);
+    kc = kb.getEntry(KnowComparable.class);
   }
 
   static public void process(Expression ast, KnowledgeBase kb) {
@@ -161,9 +161,9 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
     return null;
   }
 
-  private void testForSame(Type lhs, Type rhs, BinaryExp obj) {
-    if (lhs.getClass() != rhs.getClass()) { // TODO make it better
-      RError.err(ErrorType.Error, obj.getInfo(), "Incompatible types: " + lhs.getName() + " <-> " + rhs.getName());
+  private void testForEqualComparable(Type lhs, Type rhs, ElementInfo info) {
+    if (!kc.get(lhs, rhs)) {
+      RError.err(ErrorType.Error, info, "Incompatible types: " + lhs.getName() + " <-> " + rhs.getName());
     }
   }
 
@@ -172,7 +172,7 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
     super.visitEqual(obj, param);
     Type lhs = kt.get(obj.getLeft());
     Type rhs = kt.get(obj.getRight());
-    testForSame(lhs, rhs, obj);
+    testForEqualComparable(lhs, rhs, obj.getInfo());
     return null;
   }
 
@@ -181,7 +181,7 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
     super.visitNotequal(obj, param);
     Type lhs = kt.get(obj.getLeft());
     Type rhs = kt.get(obj.getRight());
-    testForSame(lhs, rhs, obj);
+    testForEqualComparable(lhs, rhs, obj.getInfo());
     return null;
   }
 
@@ -386,7 +386,7 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitTypeRef(SimpleRef obj, Void param) {
+  protected Void visitSimpleRef(SimpleRef obj, Void param) {
     return null;
   }
 

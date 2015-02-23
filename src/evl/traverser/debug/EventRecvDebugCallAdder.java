@@ -24,15 +24,14 @@ import common.ElementInfo;
 
 import evl.DefTraverser;
 import evl.Evl;
-import evl.expression.Expression;
 import evl.expression.Number;
+import evl.expression.TupleValue;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.Reference;
 import evl.function.Function;
 import evl.function.header.FuncCtrlInDataIn;
 import evl.function.header.FuncCtrlInDataOut;
 import evl.function.header.FuncPrivateVoid;
-import evl.other.EvlList;
 import evl.statement.CallStmt;
 
 /**
@@ -78,8 +77,8 @@ public class EventRecvDebugCallAdder extends DefTraverser<Void, Void> {
 
   private CallStmt makeCall(Function func, int numFunc) {
     // _sendMsg( numFunc );
-    EvlList<Expression> actParam = new EvlList<Expression>();
-    actParam.add(new Number(info, BigInteger.valueOf(numFunc)));
+    TupleValue actParam = new TupleValue(info);
+    actParam.getValue().add(new Number(info, BigInteger.valueOf(numFunc)));
 
     Reference call = new Reference(info, func);
     call.getOffset().add(new RefCall(info, actParam));

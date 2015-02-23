@@ -19,36 +19,28 @@ package evl.expression.reference;
 
 import common.ElementInfo;
 
-import evl.expression.Expression;
-import evl.other.EvlList;
+import evl.expression.TupleValue;
 
 final public class RefCall extends RefItem {
-  private EvlList<Expression> actualParameter;
+  private TupleValue actualParameter;
 
-  public RefCall(ElementInfo info, EvlList<Expression> actualParameter) {
+  public RefCall(ElementInfo info, TupleValue actualParameter) {
     super(info);
-    this.actualParameter = new EvlList<Expression>(actualParameter);
+    assert (actualParameter != null);
+    this.actualParameter = actualParameter;
   }
 
-  public EvlList<Expression> getActualParameter() {
+  public TupleValue getActualParameter() {
     return actualParameter;
+  }
+
+  public void setActualParameter(TupleValue actualParameter) {
+    this.actualParameter = actualParameter;
   }
 
   @Override
   public String toString() {
-    String ret = "";
-    ret += "(";
-    boolean first = true;
-    for (Expression gen : actualParameter) {
-      if (first) {
-        first = false;
-      } else {
-        ret += ",";
-      }
-      ret += gen.toString();
-    }
-    ret += ")";
-    return ret;
+    return actualParameter.toString();
   }
 
 }

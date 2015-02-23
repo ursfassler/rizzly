@@ -24,10 +24,10 @@ import error.RError;
 import evl.pass.check.type.specific.ExpressionTypeChecker;
 import fun.Fun;
 import fun.NullTraverser;
-import fun.expression.ArrayValue;
 import fun.expression.Expression;
 import fun.expression.Number;
-import fun.expression.reference.RefIndex;
+import fun.expression.TupleValue;
+import fun.expression.reference.RefCall;
 import fun.expression.reference.RefItem;
 
 public class ElementGetter extends NullTraverser<Expression, Expression> {
@@ -46,17 +46,18 @@ public class ElementGetter extends NullTraverser<Expression, Expression> {
   }
 
   @Override
-  protected Expression visitRefIndex(RefIndex obj, Expression param) {
-    return visit(obj.getIndex(), param);
+  protected Expression visitRefCall(RefCall obj, Expression param) {
+    RError.ass(obj.getActualParameter().getValue().size() == 1, obj.getInfo());
+    return visit(obj.getActualParameter().getValue().get(0), param);
   }
 
   @Override
   protected Expression visitNumber(Number obj, Expression param) {
     int idx = ExpressionTypeChecker.getAsInt(obj.getValue(), obj.toString());
-    if (!(param instanceof ArrayValue)) {
+    if (!(param instanceof TupleValue)) {
       RError.err(ErrorType.Fatal, obj.getInfo(), "Expected array value");
     }
-    ArrayValue arrv = (ArrayValue) param;
+    TupleValue arrv = (TupleValue) param;
     return arrv.getValue().get(idx);
   }
 

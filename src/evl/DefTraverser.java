@@ -26,12 +26,13 @@ import evl.composition.ImplComposition;
 import evl.expression.AnyValue;
 import evl.expression.ArrayValue;
 import evl.expression.BoolValue;
-import evl.expression.ExprList;
-import evl.expression.NamedElementValue;
+import evl.expression.NamedElementsValue;
+import evl.expression.NamedValue;
 import evl.expression.Number;
 import evl.expression.RangeValue;
 import evl.expression.RecordValue;
 import evl.expression.StringValue;
+import evl.expression.TupleValue;
 import evl.expression.TypeCast;
 import evl.expression.UnionValue;
 import evl.expression.UnsafeUnionValue;
@@ -74,6 +75,9 @@ import evl.function.header.FuncPrivateRet;
 import evl.function.header.FuncPrivateVoid;
 import evl.function.header.FuncSubHandlerEvent;
 import evl.function.header.FuncSubHandlerQuery;
+import evl.function.ret.FuncReturnNone;
+import evl.function.ret.FuncReturnTuple;
+import evl.function.ret.FuncReturnType;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.StateComposite;
 import evl.hfsm.StateSimple;
@@ -83,7 +87,8 @@ import evl.other.ImplElementary;
 import evl.other.Namespace;
 import evl.other.Queue;
 import evl.other.SubCallbacks;
-import evl.statement.Assignment;
+import evl.statement.AssignmentMulti;
+import evl.statement.AssignmentSingle;
 import evl.statement.Block;
 import evl.statement.CallStmt;
 import evl.statement.CaseOpt;
@@ -105,6 +110,7 @@ import evl.type.base.EnumType;
 import evl.type.base.FunctionType;
 import evl.type.base.RangeType;
 import evl.type.base.StringType;
+import evl.type.base.TupleType;
 import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
 import evl.type.composed.UnionType;
@@ -123,6 +129,35 @@ import evl.variable.FuncVariable;
 import evl.variable.StateVariable;
 
 public class DefTraverser<R, P> extends Traverser<R, P> {
+
+  @Override
+  protected R visitNamedElementsValue(NamedElementsValue obj, P param) {
+    visitList(obj.getValue(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitTupleType(TupleType obj, P param) {
+    visitList(obj.getTypes(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitFuncReturnTuple(FuncReturnTuple obj, P param) {
+    visitList(obj.getParam(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitFuncReturnType(FuncReturnType obj, P param) {
+    visit(obj.getType(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitFuncReturnNone(FuncReturnNone obj, P param) {
+    return null;
+  }
 
   @Override
   protected R visitImplElementary(ImplElementary obj, P param) {
@@ -176,9 +211,16 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitAssignment(Assignment obj, P param) {
+  protected R visitAssignmentMulti(AssignmentMulti obj, P param) {
+    visitList(obj.getLeft(), param);
     visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitAssignmentSingle(AssignmentSingle obj, P param) {
     visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
     return null;
   }
 
@@ -221,7 +263,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitRefCall(RefCall obj, P param) {
-    visitList(obj.getActualParameter(), param);
+    visit(obj.getActualParameter(), param);
     return null;
   }
 
@@ -345,7 +387,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitExprList(ExprList obj, P param) {
+  protected R visitTupleValue(TupleValue obj, P param) {
     visitList(obj.getValue(), param);
     return null;
   }
@@ -376,7 +418,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitTypeRef(SimpleRef obj, P param) {
+  protected R visitSimpleRef(SimpleRef obj, P param) {
     return null;
   }
 
@@ -692,7 +734,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitNamedElementValue(NamedElementValue obj, P param) {
+  protected R visitNamedValue(NamedValue obj, P param) {
     visit(obj.getValue(), param);
     return null;
   }
@@ -733,8 +775,8 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitFunctionImpl(Function obj, P param) {
-    super.visitFunctionImpl(obj, param);
+  protected R visitFunction(Function obj, P param) {
+    super.visitFunction(obj, param);
     visitList(obj.getParam(), param);
     visit(obj.getRet(), param);
     visit(obj.getBody(), param);

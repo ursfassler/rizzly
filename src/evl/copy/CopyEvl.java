@@ -25,8 +25,12 @@ import java.util.Map;
 import evl.Evl;
 import evl.NullTraverser;
 import evl.expression.Expression;
+import evl.expression.NamedValue;
 import evl.expression.reference.RefItem;
 import evl.function.Function;
+import evl.function.ret.FuncReturnNone;
+import evl.function.ret.FuncReturnTuple;
+import evl.function.ret.FuncReturnType;
 import evl.hfsm.StateItem;
 import evl.hfsm.Transition;
 import evl.other.EvlList;
@@ -45,7 +49,7 @@ import evl.type.base.EnumElement;
 import evl.type.composed.NamedElement;
 import evl.variable.Variable;
 
-class CopyEvl extends NullTraverser<Evl, Void> {
+public class CopyEvl extends NullTraverser<Evl, Void> {
   // / keeps the old -> new Named objects in order to relink references
   final private Map<Named, Named> copied = new HashMap<Named, Named>();
   final private CopyFunction func = new CopyFunction(this);
@@ -114,7 +118,7 @@ class CopyEvl extends NullTraverser<Evl, Void> {
   }
 
   @Override
-  protected Evl visitFunctionImpl(Function obj, Void param) {
+  protected Evl visitFunction(Function obj, Void param) {
     return func.traverse(obj, param);
   }
 
@@ -141,6 +145,21 @@ class CopyEvl extends NullTraverser<Evl, Void> {
   @Override
   protected Evl visitRefItem(RefItem obj, Void param) {
     return ref.traverse(obj, param);
+  }
+
+  @Override
+  protected Evl visitFuncReturnTuple(FuncReturnTuple obj, Void param) {
+    return new FuncReturnTuple(obj.getInfo(), copy(obj.getParam()));
+  }
+
+  @Override
+  protected Evl visitFuncReturnType(FuncReturnType obj, Void param) {
+    return new FuncReturnType(obj.getInfo(), copy(obj.getType()));
+  }
+
+  @Override
+  protected Evl visitFuncReturnNone(FuncReturnNone obj, Void param) {
+    return new FuncReturnNone(obj.getInfo());
   }
 
   @Override
@@ -200,6 +219,11 @@ class CopyEvl extends NullTraverser<Evl, Void> {
   @Override
   protected Evl visitNamedElement(NamedElement obj, Void param) {
     return new NamedElement(obj.getInfo(), obj.getName(), copy(obj.getRef()));
+  }
+
+  @Override
+  protected Evl visitNamedValue(NamedValue obj, Void param) {
+    return new NamedValue(obj.getInfo(), obj.getName(), copy(obj.getValue()));
   }
 
 }

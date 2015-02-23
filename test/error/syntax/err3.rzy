@@ -5,6 +5,6 @@ Rec{R:Any} = Record
 end
 
 Err3 = Elementary
-  dat: Rec{Boolean} = a := False;
+  dat: Rec{Boolean} = [ a := False ];
 end
 

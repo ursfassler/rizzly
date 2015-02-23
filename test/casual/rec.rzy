@@ -6,8 +6,8 @@ end
 Rec = Elementary
   out : signal( x: R{0,100} );
   
-  p : Point = ( x := 0, y := 0 );
-  q : Point = ( x := 0, y := 0 );
+  p : Point = [ x := 0, y := 0 ];
+  q : Point = [ x := 0, y := 0 ];
 
   ind : slot(  x: R{0,100}  )
     p.x := (p.y + x) mod 100;

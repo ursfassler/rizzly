@@ -28,8 +28,8 @@ import error.ErrorType;
 import error.RError;
 import evl.DefTraverser;
 import evl.Evl;
-import evl.expression.Expression;
 import evl.expression.Number;
+import evl.expression.TupleValue;
 import evl.expression.reference.BaseRef;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.Reference;
@@ -37,7 +37,6 @@ import evl.function.Function;
 import evl.function.header.FuncCtrlOutDataIn;
 import evl.function.header.FuncCtrlOutDataOut;
 import evl.function.header.FuncPrivateVoid;
-import evl.other.EvlList;
 import evl.statement.Block;
 import evl.statement.CallStmt;
 import evl.statement.Statement;
@@ -64,7 +63,7 @@ public class EventSendDebugCallAdder extends DefTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitFunctionImpl(Function obj, Void param) {
+  protected Void visitFunction(Function obj, Void param) {
     st.traverse(obj, null);
     return null;
   }
@@ -123,8 +122,8 @@ class StmtTraverser extends DefTraverser<Void, List<Statement>> {
 
   private CallStmt makeCall(FuncPrivateVoid func, int numFunc) {
     // Self._sendMsg( numFunc );
-    EvlList<Expression> actParam = new EvlList<Expression>();
-    actParam.add(new Number(info, BigInteger.valueOf(numFunc)));
+    TupleValue actParam = new TupleValue(info);
+    actParam.getValue().add(new Number(info, BigInteger.valueOf(numFunc)));
 
     Reference call = new Reference(info, func);
     call.getOffset().add(new RefCall(info, actParam));

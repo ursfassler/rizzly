@@ -9,7 +9,7 @@ Uni = Union
 end
 
 UnionTest = Elementary
-  data : Uni = dat2 := 0;
+  data : Uni = [ dat2 := 0 ];
 
   set1 : slot( a, b: R{0,255} )
     data.dat1.a := a;

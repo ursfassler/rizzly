@@ -14,13 +14,13 @@ The3Record{T:Type{Any}} = Record
 end
 
 SmallGeneric{T:Type{Natural}} = Elementary
-  dat1: TheRecord{T} = ( a := 0, b := 0 );
-  dat2: The2Record{T,Boolean} = ( a := 0, b := False );
-  dat3: The2Record{T,T} = (a:=0, b:=0);
-  dat4: The3Record{Boolean} = ( a:=0, b:=True );
-  dat5: The3Record{TheRecord{T}} = (a:=0, b:=( a:=0, b:=0));
-  dat6: The3Record{The2Record{T,Boolean}} = ( a:=0, b:=( a:=0, b:=True ) );
-  dat7: The3Record{The2Record{T,TheRecord{T}}} = (a:=0, b:=(a:=0, b:=(a:=0, b:=0)));
+  dat1: TheRecord{T} = [ a := 0, b := 0 ];
+  dat2: The2Record{T,Boolean} = [ a := 0, b := False ];
+  dat3: The2Record{T,T} = [a:=0, b:=0];
+  dat4: The3Record{Boolean} = [ a:=0, b:=True ];
+  dat5: The3Record{TheRecord{T}} = [a:=0, b:=[ a:=0, b:=0]];
+  dat6: The3Record{The2Record{T,Boolean}} = [ a:=0, b:=[ a:=0, b:=True ]];
+  dat7: The3Record{The2Record{T,TheRecord{T}}} = [a:=0, b:=[a:=0, b:=[a:=0, b:=0]]];
   a: T = 0;
 end
 

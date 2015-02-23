@@ -22,9 +22,9 @@ import java.math.BigInteger;
 import evl.pass.check.type.specific.ExpressionTypeChecker;
 import fun.Fun;
 import fun.NullTraverser;
-import fun.expression.ArrayValue;
 import fun.expression.Expression;
 import fun.expression.Number;
+import fun.expression.TupleValue;
 import fun.other.FunList;
 import fun.type.base.IntegerType;
 import fun.type.base.NaturalType;
@@ -58,7 +58,7 @@ public class ValueCreator extends NullTraverser<Expression, Void> {
     for (int i = 0; i < size; i++) {
       values.add(visit(obj.getType().getLink(), null));
     }
-    return new ArrayValue(obj.getInfo(), values);
+    return new TupleValue(obj.getInfo(), values);
   }
 
 }

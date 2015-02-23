@@ -24,6 +24,7 @@ import evl.composition.ImplComposition;
 import evl.expression.Expression;
 import evl.function.Function;
 import evl.hfsm.ImplHfsm;
+import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
 import evl.other.ImplElementary;
 import evl.other.Namespace;
@@ -81,7 +82,7 @@ class TypeCheckerWorker extends DefTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitFunctionImpl(Function obj, Void sym) {
+  protected Void visitFunction(Function obj, Void sym) {
     checkFunc(obj, kb);
     return null;
   }
@@ -107,8 +108,8 @@ class TypeCheckerWorker extends DefTraverser<Void, Void> {
     for (Variable param : obj.getParam()) {
       TypeChecker.process(param, kb);
     }
-    Type ret;
-    ret = obj.getRet().getLink();
+    KnowType kt = kb.getEntry(KnowType.class);
+    Type ret = kt.get(obj.getRet());
     StatementTypeChecker.process(obj.getBody(), ret, kb);
   }
 }

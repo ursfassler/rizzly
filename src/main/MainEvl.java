@@ -48,18 +48,25 @@ import evl.pass.CompositionReduction;
 import evl.pass.ConstantPropagation;
 import evl.pass.DebugIface;
 import evl.pass.EnumReduction;
+import evl.pass.Flattner;
 import evl.pass.HeaderWriter;
 import evl.pass.IfCutter;
 import evl.pass.InitVarTyper;
 import evl.pass.Instantiation;
 import evl.pass.IntroduceConvert;
+import evl.pass.LinkReduction;
 import evl.pass.OpenReplace;
 import evl.pass.RangeConverter;
 import evl.pass.RangeReplacer;
+import evl.pass.ReduceAliasType;
+import evl.pass.ReduceTuple;
 import evl.pass.ReduceUnion;
 import evl.pass.RemoveUnused;
+import evl.pass.RetStructIntroducer;
+import evl.pass.TupleAssignReduction;
 import evl.pass.TypeMerge;
 import evl.pass.TypeSort;
+import evl.pass.TypeUplift;
 import evl.pass.VarDeclToTop;
 import evl.pass.VarSort;
 import evl.pass.check.CompInterfaceTypeChecker;
@@ -71,7 +78,9 @@ import evl.pass.check.RtcViolation;
 import evl.pass.check.Usefullness;
 import evl.pass.check.type.TypeChecker;
 import evl.pass.infrastructure.LinkTargetExists;
+import evl.pass.infrastructure.SingleDefinition;
 import evl.pass.infrastructure.VarLinkOk;
+import evl.queue.QueueReduction;
 import evl.traverser.ConstTyper;
 import evl.traverser.SystemIfaceAdder;
 
@@ -85,6 +94,7 @@ public class MainEvl {
 
     passes.addCheck(new LinkTargetExists());
     passes.addCheck(new VarLinkOk());
+    passes.addCheck(new SingleDefinition());
     // passes.addCheck(TypeChecker.class);
 
     passes.add(new ConstTyper());
@@ -123,7 +133,9 @@ public class MainEvl {
         hfsm.add(new FsmReduction());
         reduction.add(hfsm);
       }
+      reduction.add(new ReduceAliasType());
       reduction.add(new ReduceUnion());
+      reduction.add(new ReduceTuple());
       passes.add(reduction);
     }
 
@@ -131,19 +143,33 @@ public class MainEvl {
     passes.add(new BitLogicCategorizer());
     passes.add(new TypeChecker());
     passes.add(new SystemIfaceAdder());
-    // passes.add(ExprCutter.class); // TODO reimplement
+
+    passes.add(new RetStructIntroducer());
+    passes.add(new TupleAssignReduction());
+    // passes.add(new ExprCutter());
+
     if (opt.doDebugEvent()) {
       passes.add(new DebugIface());
       // only for debugging
       // passes.add(TypeChecker.class);
     }
 
-    passes.add(new RangeConverter());
+    passes.add(new TypeUplift());
     passes.add(new CompareReplacer());
+    passes.add(new RangeConverter());
 
     passes.add(new BitnotFixer());
 
-    passes.add(new Instantiation());
+    {
+      PassGroup inst = new PassGroup("instantiation");
+      // inst.checks.addAll(passes.checks);
+      inst.add(new Instantiation());
+      inst.add(new LinkReduction());
+      inst.add(new QueueReduction());
+      inst.add(new Flattner());
+      inst.add(new RemoveUnused());
+      passes.add(inst);
+    }
 
     passes.add(new HeaderWriter());
 
@@ -163,6 +189,7 @@ public class MainEvl {
     {
       PassGroup cprep = new PassGroup("cout");
       cprep.checks.addAll(passes.checks);
+
       cprep.add(new BlockReduction());
       cprep.add(new VarDeclToTop());
       cprep.add(new TypeMerge());
@@ -181,13 +208,13 @@ public class MainEvl {
     for (Pass pass : group.passes) {
       if (pass instanceof PassGroup) {
         process((PassGroup) pass, prefix, dp, evl, kb);
-        for (EvlPass check : group.checks) {
-          check.process(evl, kb);
-        }
       } else if (pass instanceof PassItem) {
         process((PassItem) pass, prefix, dp, evl, kb);
       } else {
         throw new RuntimeException("not yet implemented: " + pass.getClass().getCanonicalName());
+      }
+      for (EvlPass check : group.checks) {
+        check.process(evl, kb);
       }
     }
   }

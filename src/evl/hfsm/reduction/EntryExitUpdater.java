@@ -26,11 +26,12 @@ import common.ElementInfo;
 import evl.Evl;
 import evl.NullTraverser;
 import evl.expression.Expression;
+import evl.expression.TupleValue;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.Reference;
-import evl.expression.reference.SimpleRef;
 import evl.function.Function;
 import evl.function.header.FuncPrivateVoid;
+import evl.function.ret.FuncReturnNone;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.State;
 import evl.hfsm.StateComposite;
@@ -43,7 +44,6 @@ import evl.other.Namespace;
 import evl.statement.Block;
 import evl.statement.CallStmt;
 import evl.statement.Statement;
-import evl.type.Type;
 import evl.variable.FuncVariable;
 
 /**
@@ -105,7 +105,7 @@ class EntryExitUpdaterWorker extends NullTraverser<Void, EePar> {
   }
 
   public FuncPrivateVoid makeFunc(LinkedList<Function> list, String name) {
-    FuncPrivateVoid func = new FuncPrivateVoid(ElementInfo.NO, name, new EvlList<FuncVariable>(), new SimpleRef<Type>(ElementInfo.NO, kbi.getVoidType()), new Block(ElementInfo.NO));
+    FuncPrivateVoid func = new FuncPrivateVoid(ElementInfo.NO, name, new EvlList<FuncVariable>(), new FuncReturnNone(ElementInfo.NO), new Block(ElementInfo.NO));
 
     for (Function cf : list) {
       Statement stmt = makeCall(cf);
@@ -118,7 +118,7 @@ class EntryExitUpdaterWorker extends NullTraverser<Void, EePar> {
   private CallStmt makeCall(Function func) {
     assert (func.getParam().isEmpty());
     Reference ref = new Reference(ElementInfo.NO, func);
-    ref.getOffset().add(new RefCall(ElementInfo.NO, new EvlList<Expression>()));
+    ref.getOffset().add(new RefCall(ElementInfo.NO, new TupleValue(ElementInfo.NO, new EvlList<Expression>())));
     return new CallStmt(ElementInfo.NO, ref);
   }
 

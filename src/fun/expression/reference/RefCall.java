@@ -19,36 +19,27 @@ package fun.expression.reference;
 
 import common.ElementInfo;
 
-import fun.expression.Expression;
-import fun.other.FunList;
+import fun.expression.TupleValue;
 
 final public class RefCall extends RefItem {
-  private FunList<Expression> actualParameter;
+  private TupleValue actualParameter;
 
-  public RefCall(ElementInfo info, FunList<Expression> actualParameter) {
+  public RefCall(ElementInfo info, TupleValue actualParameter) {
     super(info);
     this.actualParameter = actualParameter;
   }
 
-  public FunList<Expression> getActualParameter() {
+  public TupleValue getActualParameter() {
     return actualParameter;
+  }
+
+  public void setActualParameter(TupleValue actualParameter) {
+    this.actualParameter = actualParameter;
   }
 
   @Override
   public String toString() {
-    String ret = "";
-    ret += "(";
-    boolean first = true;
-    for (Expression gen : actualParameter) {
-      if (first) {
-        first = false;
-      } else {
-        ret += ",";
-      }
-      ret += gen.toString();
-    }
-    ret += ")";
-    return ret;
+    return actualParameter.toString();
   }
 
 }

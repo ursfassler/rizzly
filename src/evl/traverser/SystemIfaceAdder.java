@@ -31,14 +31,14 @@ import evl.Evl;
 import evl.NullTraverser;
 import evl.composition.ImplComposition;
 import evl.expression.Expression;
+import evl.expression.TupleValue;
 import evl.expression.reference.RefCall;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
-import evl.expression.reference.SimpleRef;
 import evl.function.Function;
 import evl.function.header.FuncCtrlInDataIn;
+import evl.function.ret.FuncReturnNone;
 import evl.hfsm.ImplHfsm;
-import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
 import evl.other.CompUse;
@@ -49,7 +49,6 @@ import evl.other.Namespace;
 import evl.statement.Block;
 import evl.statement.CallStmt;
 import evl.statement.Statement;
-import evl.type.Type;
 import evl.variable.FuncVariable;
 
 public class SystemIfaceAdder extends EvlPass {
@@ -112,8 +111,7 @@ class SystemIfaceAdderWorker extends NullTraverser<Void, Void> {
 
   private Function makeFunc(ImplElementary obj, String name) {
     ElementInfo info = ElementInfo.NO;
-    KnowBaseItem kbi = kb.getEntry(KnowBaseItem.class);
-    FuncCtrlInDataIn rfunc = new FuncCtrlInDataIn(info, name, new EvlList<FuncVariable>(), new SimpleRef<Type>(info, kbi.getVoidType()), new Block(info));
+    FuncCtrlInDataIn rfunc = new FuncCtrlInDataIn(info, name, new EvlList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
     obj.getIface().add(rfunc);
     return rfunc;
   }
@@ -211,7 +209,7 @@ class SystemIfaceCaller extends NullTraverser<Void, Void> {
     ElementInfo info = ElementInfo.NO;
     assert (ref.getParam().isEmpty());
     Reference call = new Reference(ref.getInfo(), ref);
-    call.getOffset().add(new RefCall(info, new EvlList<Expression>()));
+    call.getOffset().add(new RefCall(info, new TupleValue(info, new EvlList<Expression>())));
     return new CallStmt(info, call);
   }
 
@@ -221,7 +219,7 @@ class SystemIfaceCaller extends NullTraverser<Void, Void> {
     RError.ass(func.getParam().isEmpty(), func.getInfo(), "expected (de)constructor to have no parameter");
     Reference fref = new Reference(info, self);
     fref.getOffset().add(new RefName(info, func.getName()));
-    fref.getOffset().add(new RefCall(info, new EvlList<Expression>()));
+    fref.getOffset().add(new RefCall(info, new TupleValue(info, new EvlList<Expression>())));
     return new CallStmt(info, fref);
   }
 }

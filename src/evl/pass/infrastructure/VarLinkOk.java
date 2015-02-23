@@ -34,7 +34,9 @@ import evl.knowledge.KnowParent;
 import evl.knowledge.KnowledgeBase;
 import evl.other.ImplElementary;
 import evl.other.Namespace;
+import evl.other.SubCallbacks;
 import evl.statement.VarDefStmt;
+import evl.type.Type;
 import evl.variable.ConstPrivate;
 import evl.variable.StateVariable;
 import evl.variable.Variable;
@@ -50,12 +52,12 @@ public class VarLinkOk extends EvlPass {
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
     VarLinkOkWorker worker = new VarLinkOkWorker(kb);
-    worker.traverse(evl, new HashSet<Variable>());
+    worker.traverse(evl, new HashSet<Evl>());
   }
 
 }
 
-class VarLinkOkWorker extends DefTraverser<Void, Set<Variable>> {
+class VarLinkOkWorker extends DefTraverser<Void, Set<Evl>> {
   private final KnowParent kp;
 
   public VarLinkOkWorker(KnowledgeBase kb) {
@@ -63,59 +65,61 @@ class VarLinkOkWorker extends DefTraverser<Void, Set<Variable>> {
     this.kp = kb.getEntry(KnowParent.class);
   }
 
-  private Set<Variable> add(Set<Variable> param, Collection<? extends Variable> items) {
-    param = new HashSet<Variable>(param);
+  private Set<Evl> add(Set<Evl> param, Collection<? extends Evl> items) {
+    param = new HashSet<Evl>(param);
     param.addAll(items);
     return param;
   }
 
   @Override
-  protected Void visitNamespace(Namespace obj, Set<Variable> param) {
+  protected Void visitNamespace(Namespace obj, Set<Evl> param) {
     param = add(param, obj.getItems(Variable.class, false));
+    param = add(param, obj.getItems(Type.class, false));
     return super.visitNamespace(obj, param);
   }
 
   @Override
-  protected Void visitImplElementary(ImplElementary obj, Set<Variable> param) {
-    param = new HashSet<Variable>(param);
+  protected Void visitImplElementary(ImplElementary obj, Set<Evl> param) {
+    param = new HashSet<Evl>(param);
     param.addAll(obj.getVariable());
     param.addAll(obj.getConstant());
+    param.addAll(obj.getType());
     return super.visitImplElementary(obj, param);
   }
 
   @Override
-  protected Void visitState(State obj, Set<Variable> param) {
-    param = new HashSet<Variable>(param);
+  protected Void visitState(State obj, Set<Evl> param) {
+    param = new HashSet<Evl>(param);
     param = add(param, obj.getItem().getItems(StateVariable.class));
     return super.visitState(obj, param);
   }
 
   @Override
-  protected Void visitVarDef(VarDefStmt obj, Set<Variable> param) {
+  protected Void visitVarDef(VarDefStmt obj, Set<Evl> param) {
     super.visitVarDef(obj, param);
     param.add(obj.getVariable());
     return null;
   }
 
   @Override
-  protected Void visitFunctionImpl(Function obj, Set<Variable> param) {
+  protected Void visitFunction(Function obj, Set<Evl> param) {
     param = add(param, obj.getParam());
-    return super.visitFunctionImpl(obj, param);
+    return super.visitFunction(obj, param);
   }
 
   @Override
-  protected Void visitBaseRef(BaseRef obj, Set<Variable> param) {
-    if (obj.getLink() instanceof Variable) {
+  protected Void visitBaseRef(BaseRef obj, Set<Evl> param) {
+    if ((obj.getLink() instanceof Variable) || (obj.getLink() instanceof Type)) {
       if (!param.contains(obj.getLink())) {
-        RError.err(ErrorType.Fatal, obj.getInfo(), "variable " + obj.getLink().toString() + " not visible from here");
+        RError.err(ErrorType.Fatal, obj.getInfo(), "object " + obj.getLink().toString() + " not visible from here");
       }
     }
     return super.visitBaseRef(obj, param);
   }
 
   @Override
-  protected Void visitTransition(Transition obj, Set<Variable> param) {
-    param = new HashSet<Variable>(param);
+  protected Void visitTransition(Transition obj, Set<Evl> param) {
+    param = new HashSet<Evl>(param);
     param.addAll(obj.getParam());
     visit(obj.getBody(), param);
     addAllToTop(obj.getSrc().getLink(), param);
@@ -123,7 +127,7 @@ class VarLinkOkWorker extends DefTraverser<Void, Set<Variable>> {
     return null;
   }
 
-  private void addAllToTop(State state, Set<Variable> param) {
+  private void addAllToTop(State state, Set<Evl> param) {
     while (true) {
       param.addAll(state.getItem().getItems(StateVariable.class));
       param.addAll(state.getItem().getItems(ConstPrivate.class));
@@ -134,6 +138,11 @@ class VarLinkOkWorker extends DefTraverser<Void, Set<Variable>> {
         return;
       }
     }
+  }
+
+  @Override
+  protected Void visitSubCallbacks(SubCallbacks obj, Set<Evl> param) {
+    return super.visitSubCallbacks(obj, param);
   }
 
 }

@@ -27,6 +27,7 @@ import error.ErrorType;
 import error.RError;
 import evl.DefTraverser;
 import evl.Evl;
+import evl.other.Named;
 import evl.type.base.EnumElement;
 
 /**
@@ -51,6 +52,19 @@ public class KnowParent extends KnowledgeEntry {
       RError.err(ErrorType.Fatal, obj.getInfo(), "Object not reachable: " + obj);
     }
     return ret;
+  }
+
+  public Designator getPath(Named obj) {
+    if (!cache.containsKey(obj)) {
+      rebuild();
+    }
+
+    LinkedList<String> name = new LinkedList<String>();
+    while (obj != null) {
+      name.push(obj.getName());
+      obj = (Named) cache.get(obj);
+    }
+    return new Designator(name);
   }
 
   private void rebuild() {

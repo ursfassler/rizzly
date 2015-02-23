@@ -19,11 +19,13 @@ package evl.expression;
 
 import common.ElementInfo;
 
-public class NamedElementValue extends Expression {
+import evl.EvlBase;
+
+public class NamedValue extends EvlBase {
   private String name;
   private Expression value;
 
-  public NamedElementValue(ElementInfo info, String name, Expression value) {
+  public NamedValue(ElementInfo info, String name, Expression value) {
     super(info);
     this.name = name;
     this.value = value;

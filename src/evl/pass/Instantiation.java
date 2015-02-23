@@ -17,114 +17,70 @@
 
 package evl.pass;
 
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 
 import pass.EvlPass;
-import util.SimpleGraph;
 
 import common.Direction;
 import common.ElementInfo;
 import common.Property;
 
-import debug.DebugPrinter;
+import error.RError;
 import evl.Evl;
+import evl.NullTraverser;
+import evl.copy.CopyEvl;
+import evl.copy.Relinker;
 import evl.expression.reference.SimpleRef;
 import evl.function.Function;
 import evl.function.InterfaceFunction;
-import evl.function.header.FuncCtrlInDataIn;
-import evl.function.header.FuncCtrlInDataOut;
-import evl.function.header.FuncCtrlOutDataIn;
-import evl.function.header.FuncCtrlOutDataOut;
 import evl.function.header.FuncPrivateVoid;
-import evl.function.header.FuncSubHandlerEvent;
-import evl.function.header.FuncSubHandlerQuery;
-import evl.knowledge.KnowBaseItem;
+import evl.function.ret.FuncReturnNone;
 import evl.knowledge.KnowledgeBase;
 import evl.other.CompUse;
 import evl.other.Component;
 import evl.other.EvlList;
 import evl.other.ImplElementary;
+import evl.other.Named;
 import evl.other.Namespace;
 import evl.other.SubCallbacks;
-import evl.queue.QueueReduction;
 import evl.statement.Block;
-import evl.traverser.CompInstantiator;
-import evl.traverser.DepGraph;
-import evl.traverser.LinkReduction;
-import evl.traverser.NamespaceReduction;
-import evl.type.Type;
-import evl.type.special.VoidType;
-import evl.variable.Constant;
 import evl.variable.FuncVariable;
-import evl.variable.StateVariable;
 
 public class Instantiation extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    kb.clear();
-    String name = kb.getRootComp().getName();
-    instantiate((ImplElementary) kb.getRootComp().getLink(), evl, null, kb);
-    evl.setName(name);
-  }
+    CompUse instComp = kb.getRootComp();
+    evl.getChildren().remove(instComp);
 
-  private static void instantiate(ImplElementary top, Namespace classes, DebugPrinter dp, KnowledgeBase kb) {
-    ImplElementary env = makeEnv(top, kb);
-    classes.getChildren().add(env);
+    ImplElementary env = makeEnv(instComp.getLink(), kb);
+    evl.getChildren().add(env);
 
-    // dp.print("env");
-    CompInstantiator.process(env, classes);
-    // dp.print("insta");
+    CompInstantiatorWorker instantiator = new CompInstantiatorWorker();
+    ImplElementary inst = instantiator.traverse(env, evl);
+    Relinker.relink(evl, instantiator.getLinkmap());
 
-    // FIXME hacky
-    Namespace inst = classes.findSpace("!inst");
+    evl.setName(instComp.getName());
 
-    LinkReduction.process(inst);
-    // dp.print("instance");
-
-    // List<Namespace> instes = inst.getChildren().getItems(Namespace.class);
-    // assert (instes.size() == 1);
-    // inst = instes.get(0);
+    assert (inst.getIface().isEmpty());
 
     Set<Evl> pubfunc = new HashSet<Evl>();
-    pubfunc.addAll(inst.getChildren().getItems(FuncCtrlInDataIn.class));
-    pubfunc.addAll(inst.getChildren().getItems(FuncCtrlInDataOut.class));
-    pubfunc.addAll(inst.getChildren().getItems(FuncCtrlOutDataIn.class));
-    pubfunc.addAll(inst.getChildren().getItems(FuncCtrlOutDataOut.class));
-    pubfunc.addAll(inst.getChildren().getItems(FuncSubHandlerEvent.class));
-    pubfunc.addAll(inst.getChildren().getItems(FuncSubHandlerQuery.class));
+    pubfunc.addAll(inst.getSubCallback());
+    RError.ass(inst.getComponent().size() == 1, inst.getInfo(), "Only expected one instance");
+    pubfunc.addAll(inst.getComponent().get(0).getLink().getIface());
 
     for (Evl nam : pubfunc) {
-      // TODO shouldn't be FuncCtrlOutDataOut instead FuncSubHandlerEvent?
       nam.properties().put(Property.Public, true);
     }
-
-    // dp.print("bflatAll", DepGraph.build(classes));
-
-    // Use only stuff which is referenced from public input functions
-    removeUnused(classes, pubfunc, dp);
-    kb.clear();
-    QueueReduction.process(inst, kb);
-
-    // dp.print("bflat", DepGraph.build(classes));
-    // dp.print("bflat");
-    EvlList<Evl> flat = NamespaceReduction.process(classes, kb);
-    // dp.print("aflat");
-
-    classes.clear();
-
-    classes.addAll(flat.getItems(Function.class));
-    classes.addAll(flat.getItems(StateVariable.class));
-    classes.addAll(flat.getItems(Constant.class));
-    classes.addAll(flat.getItems(Type.class));
   }
 
   private static ImplElementary makeEnv(Component top, KnowledgeBase kb) {
-    VoidType vt = kb.getEntry(KnowBaseItem.class).getVoidType();
     ElementInfo info = ElementInfo.NO;
-    FuncPrivateVoid entry = new FuncPrivateVoid(info, "entry", new EvlList<FuncVariable>(), new SimpleRef<Type>(info, vt), new Block(info));
-    FuncPrivateVoid exit = new FuncPrivateVoid(info, "exit", new EvlList<FuncVariable>(), new SimpleRef<Type>(info, vt), new Block(info));
+    FuncPrivateVoid entry = new FuncPrivateVoid(info, "entry", new EvlList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
+    FuncPrivateVoid exit = new FuncPrivateVoid(info, "exit", new EvlList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
     ImplElementary env = new ImplElementary(ElementInfo.NO, "", new SimpleRef<FuncPrivateVoid>(info, entry), new SimpleRef<FuncPrivateVoid>(info, exit));
     env.getFunction().add(entry);
     env.getFunction().add(exit);
@@ -146,24 +102,75 @@ public class Instantiation extends EvlPass {
     return env;
   }
 
-  private static void removeUnused(Namespace classes, Set<? extends Evl> pubfunc, DebugPrinter dp) {
-    SimpleGraph<Evl> g = DepGraph.build(pubfunc);
-    // dp.print("instused", g);
-    removeUnused(classes, g.vertexSet());
+}
+
+class CompInstantiatorWorker extends NullTraverser<ImplElementary, Namespace> {
+  final private Map<Named, Named> linkmap = new HashMap<Named, Named>();
+
+  @Override
+  protected ImplElementary visitDefault(Evl obj, Namespace param) {
+    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
-  private static void removeUnused(Namespace ns, Set<? extends Evl> keep) {
-    Set<Evl> remove = new HashSet<Evl>();
-    for (Evl itr : ns.getChildren()) {
-      if (itr instanceof Namespace) {
-        removeUnused((Namespace) itr, keep);
-      } else {
-        if (!keep.contains(itr)) {
-          remove.add(itr);
-        }
+  @Override
+  protected ImplElementary visitImplElementary(ImplElementary obj, Namespace ns) {
+    CopyEvl copy = new CopyEvl();
+    ImplElementary inst = copy.copy(obj);
+    Relinker.relink(inst, copy.getCopied());
+
+    ns.addAll(inst.getIface());
+    ns.addAll(inst.getType());
+    ns.addAll(inst.getConstant());
+    ns.addAll(inst.getVariable());
+    ns.addAll(inst.getFunction());
+    ns.add(inst.getQueue());
+    ns.add(inst.getEntryFunc());
+    ns.add(inst.getExitFunc());
+
+    // ns.getChildren().removeAll(ns.getChildren().getItems(FuncCtrlOutDataIn.class));
+    // ns.getChildren().removeAll(ns.getChildren().getItems(FuncCtrlOutDataOut.class));
+
+    for (CompUse compUse : inst.getComponent()) {
+      Component comp = compUse.getLink();
+
+      // copy / instantiate used component
+      Namespace usens = new Namespace(compUse.getInfo(), compUse.getName());
+      ImplElementary cpy = visit(comp, usens);
+      compUse.setLink(cpy);
+      ns.add(usens);
+      linkmap.put(compUse, usens);
+
+      // route output interface to sub-callback implementation
+      for (Function impl : getSubCallback(inst.getSubCallback(), compUse).getFunc()) {
+        // get output declaration of instantiated sub-component
+        Function outdecl = (Function) cpy.getIface().find(impl.getName());
+
+        assert (outdecl != null);
+        assert (usens.getChildren().contains(outdecl));
+        assert (!linkmap.containsKey(outdecl));
+
+        // change links to output declaration to the sub-callback of this component
+        linkmap.put(outdecl, impl);
+        usens.getChildren().remove(outdecl);
+        usens.add(impl);
       }
     }
-    ns.getChildren().removeAll(remove);
+
+    return inst;
+  }
+
+  private SubCallbacks getSubCallback(EvlList<SubCallbacks> subCallback, CompUse compUse) {
+    for (SubCallbacks suc : subCallback) {
+      if (suc.getCompUse().getLink() == compUse) {
+        return suc;
+      }
+    }
+    assert (false);
+    return null;
+  }
+
+  public Map<Named, Named> getLinkmap() {
+    return linkmap;
   }
 
 }

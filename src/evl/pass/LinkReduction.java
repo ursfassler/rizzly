@@ -15,8 +15,9 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package evl.traverser;
+package evl.pass;
 
+import pass.EvlPass;
 import error.ErrorType;
 import error.RError;
 import evl.DefTraverser;
@@ -24,6 +25,7 @@ import evl.Evl;
 import evl.expression.reference.RefItem;
 import evl.expression.reference.RefName;
 import evl.expression.reference.Reference;
+import evl.knowledge.KnowledgeBase;
 import evl.other.Named;
 import evl.other.Namespace;
 
@@ -35,12 +37,20 @@ import evl.other.Namespace;
  * @author urs
  *
  */
-public class LinkReduction extends DefTraverser<Void, Void> {
+public class LinkReduction extends EvlPass {
 
-  public static void process(Evl inst) {
-    LinkReduction reduction = new LinkReduction();
+  @Override
+  public void process(Namespace evl, KnowledgeBase kb) {
+    // FIXME hacky
+    Namespace inst = evl.findSpace("!inst");
+
+    LinkReductionWorker reduction = new LinkReductionWorker();
     reduction.traverse(inst, null);
   }
+
+}
+
+class LinkReductionWorker extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitReference(Reference obj, Void param) {

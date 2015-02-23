@@ -179,14 +179,14 @@ public class Scanner implements PeekReader<Token> {
         return token(TokenType.OPENPAREN, sym);
       case ')':
         return token(TokenType.CLOSEPAREN, sym);
+      case '[':
+        return token(TokenType.OPENBRACKETS, sym);
+      case ']':
+        return token(TokenType.CLOSEBRACKETS, sym);
       case '{':
         return token(TokenType.OPENCURLY, sym);
       case '}':
         return token(TokenType.CLOSECURLY, sym);
-      case '[':
-        return token(TokenType.OPEN_ARRAY, sym);
-      case ']':
-        return token(TokenType.CLOSE_ARRAY, sym);
       case '*':
         return token(TokenType.STAR, sym);
       case '+':

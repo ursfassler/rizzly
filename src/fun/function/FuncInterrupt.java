@@ -19,7 +19,6 @@ package fun.function;
 
 import common.ElementInfo;
 
-import fun.expression.reference.Reference;
 import fun.other.FunList;
 import fun.statement.Block;
 import fun.variable.FuncVariable;
@@ -31,7 +30,7 @@ import fun.variable.FuncVariable;
  */
 final public class FuncInterrupt extends FuncImpl {
 
-  public FuncInterrupt(ElementInfo info, String name, FunList<FuncVariable> param, Reference ret, Block body) {
+  public FuncInterrupt(ElementInfo info, String name, FunList<FuncVariable> param, FuncReturn ret, Block body) {
     super(info, name, param, ret, body);
   }
 

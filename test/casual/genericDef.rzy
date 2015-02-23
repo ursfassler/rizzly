@@ -31,9 +31,9 @@ end
 
 GenSu{T:Type{Integer}} = Elementary
   data: T = 0;
-  dat2: The2Record{T,Boolean} = ( a := 2, b := True );
-  dat3: The2Record{T,T} = ( a := 1, b := 2 );
-  dat4: The3{T,TheRecord{T}} = ( a := 0, ( a := 2, b := 200 ) );
+  dat2: The2Record{T,Boolean} = [ a := 2, b := True ];
+  dat3: The2Record{T,T} = [ a := 1, b := 2 ];
+  dat4: The3{T,TheRecord{T}} = [ a := 0, [ a := 2, b := 200 ] ];
 
   set : slot( item: T )
     data := item;

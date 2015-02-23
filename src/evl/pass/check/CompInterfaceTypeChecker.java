@@ -41,13 +41,13 @@ import evl.function.header.FuncCtrlOutDataIn;
 import evl.function.header.FuncCtrlOutDataOut;
 import evl.hfsm.ImplHfsm;
 import evl.hfsm.Transition;
+import evl.knowledge.KnowLeftIsContainerOfRight;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
 import evl.other.CompUse;
 import evl.other.Component;
 import evl.other.ImplElementary;
 import evl.other.Namespace;
-import evl.pass.check.type.LeftIsContainerOfRightTest;
 import evl.traverser.ClassGetter;
 import evl.type.Type;
 import evl.variable.Constant;
@@ -64,13 +64,13 @@ public class CompInterfaceTypeChecker extends EvlPass {
 
 class CompInterfaceTypeCheckerWorker extends NullTraverser<Void, Void> {
 
-  private KnowledgeBase kb;
-  private KnowType kt;
+  final private KnowType kt;
+  final private KnowLeftIsContainerOfRight kc;
 
   public CompInterfaceTypeCheckerWorker(KnowledgeBase kb) {
     super();
-    this.kb = kb;
     this.kt = kb.getEntry(KnowType.class);
+    this.kc = kb.getEntry(KnowLeftIsContainerOfRight.class);
   }
 
   @Override
@@ -84,7 +84,7 @@ class CompInterfaceTypeCheckerWorker extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitFunctionImpl(Function obj, Void param) {
+  protected Void visitFunction(Function obj, Void param) {
     return null;
   }
 
@@ -206,7 +206,7 @@ class CompInterfaceTypeCheckerWorker extends NullTraverser<Void, Void> {
     Type st = kt.get(srcType);
     Type dt = kt.get(dstType);
 
-    if (!LeftIsContainerOfRightTest.process(dt, st, kb)) {
+    if (!kc.get(dt, st)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Invalid connection: " + st + " -> " + dt);
     }
 

@@ -32,6 +32,7 @@ import evl.traverser.PrettyPrinter;
 public class DebugPrinter {
   private Evl root;
   private String debugdir;
+  private int nr = 0;
 
   public DebugPrinter(Evl root, String debugdir) {
     super();
@@ -44,11 +45,13 @@ public class DebugPrinter {
   }
 
   public void print(String info, Evl root) {
-    PrettyPrinter.print(root, debugdir + info + ".rzy", true);
+    PrettyPrinter.print(root, debugdir + nr + " " + info + ".rzy", true);
+    nr++;
   }
 
   public void print(String info, SimpleGraph<Evl> root) {
-    printGraph(debugdir + info + ".gv", root);
+    printGraph(debugdir + nr + " " + info + ".gv", root);
+    nr++;
   }
 
   private static <T extends Evl> void printGraph(String filename, Graph<T, Pair<T, T>> cg) {

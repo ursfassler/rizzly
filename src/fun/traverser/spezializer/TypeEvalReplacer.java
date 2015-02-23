@@ -50,7 +50,7 @@ class TypeEvalReplacer extends DefTraverser<FunList<ActualTemplateArgument>, Voi
   }
 
   @Override
-  protected FunList<ActualTemplateArgument> visitDeclaration(Template obj, Void param) {
+  protected FunList<ActualTemplateArgument> visitTemplate(Template obj, Void param) {
     return null;
   }
 

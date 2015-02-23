@@ -35,6 +35,8 @@ import evl.function.header.FuncCtrlOutDataIn;
 import evl.function.header.FuncCtrlOutDataOut;
 import evl.function.header.FuncSubHandlerEvent;
 import evl.function.header.FuncSubHandlerQuery;
+import evl.function.ret.FuncReturnNone;
+import evl.function.ret.FuncReturnType;
 import evl.knowledge.KnowledgeBase;
 import evl.other.EvlList;
 import evl.other.Namespace;
@@ -160,7 +162,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitTypeRef(SimpleRef obj, StreamWriter param) {
+  protected Void visitSimpleRef(SimpleRef obj, StreamWriter param) {
     param.wr(obj.getLink().getName());
     return null;
   }
@@ -276,6 +278,18 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
       }
       visit(itr, param);
     }
+  }
+
+  @Override
+  protected Void visitFuncReturnType(FuncReturnType obj, StreamWriter param) {
+    visit(obj.getType(), param);
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncReturnNone(FuncReturnNone obj, StreamWriter param) {
+    param.wr("void");
+    return null;
   }
 
   private void wrPrototype(Function obj, StreamWriter param) {
