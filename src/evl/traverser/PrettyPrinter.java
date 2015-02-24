@@ -41,7 +41,6 @@ import evl.expression.BoolValue;
 import evl.expression.NamedElementsValue;
 import evl.expression.NamedValue;
 import evl.expression.Number;
-import evl.expression.RangeValue;
 import evl.expression.RecordValue;
 import evl.expression.StringValue;
 import evl.expression.TupleValue;
@@ -536,13 +535,6 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.wr("False..True");
     wrId(obj, param);
     param.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitRangeValue(RangeValue obj, StreamWriter param) {
-    param.wr(obj.toString());
-    wrId(obj, param);
     return null;
   }
 

@@ -29,7 +29,6 @@ import evl.DefTraverser;
 import evl.expression.BoolValue;
 import evl.expression.Expression;
 import evl.expression.Number;
-import evl.expression.RangeValue;
 import evl.expression.StringValue;
 import evl.expression.TypeCast;
 import evl.expression.binop.BitAnd;
@@ -367,11 +366,6 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitNumber(Number obj, Void param) {
-    return null;
-  }
-
-  @Override
-  protected Void visitRangeValue(RangeValue obj, Void param) {
     return null;
   }
 

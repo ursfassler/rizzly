@@ -29,7 +29,6 @@ import evl.expression.Expression;
 import evl.expression.NamedElementsValue;
 import evl.expression.NamedValue;
 import evl.expression.Number;
-import evl.expression.RangeValue;
 import evl.expression.RecordValue;
 import evl.expression.StringValue;
 import evl.expression.TupleValue;
@@ -185,8 +184,6 @@ public abstract class Traverser<R, P> {
       return visitState((State) obj, param);
     } else if (obj instanceof Transition) {
       return visitTransition((Transition) obj, param);
-    } else if (obj instanceof Expression) {
-      return visitExpression((Expression) obj, param);
     } else if (obj instanceof Statement) {
       return visitStatement((Statement) obj, param);
     } else if (obj instanceof IfOption) {
@@ -367,8 +364,6 @@ public abstract class Traverser<R, P> {
       return visitUnaryExp((UnaryExp) obj, param);
     } else if (obj instanceof BaseRef) {
       return visitBaseRef((BaseRef) obj, param);
-    } else if (obj instanceof RangeValue) {
-      return visitRangeValue((RangeValue) obj, param);
     } else if (obj instanceof TypeCast) {
       return visitTypeCast((TypeCast) obj, param);
     } else if (obj instanceof AnyValue) {
@@ -729,8 +724,6 @@ public abstract class Traverser<R, P> {
   abstract protected R visitNamedElementsValue(NamedElementsValue obj, P param);
 
   abstract protected R visitRecordValue(RecordValue obj, P param);
-
-  abstract protected R visitRangeValue(RangeValue obj, P param);
 
   abstract protected R visitTypeCast(TypeCast obj, P param);
 

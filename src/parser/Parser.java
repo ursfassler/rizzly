@@ -62,15 +62,6 @@ public abstract class Parser {
     return name;
   }
 
-  protected boolean isLhsOrUse() {
-    switch (peek().getType()) {
-      case IDENTIFIER:
-        return true;
-      default:
-        return false;
-    }
-  }
-
   protected boolean consumeIfEqual(TokenType tok) {
     if (scanner.peek().getType() == tok) {
       scanner.next();

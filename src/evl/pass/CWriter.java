@@ -86,7 +86,6 @@ import evl.statement.WhileStmt;
 import evl.type.Type;
 import evl.type.base.ArrayType;
 import evl.type.base.BooleanType;
-import evl.type.base.RangeType;
 import evl.type.base.StringType;
 import evl.type.composed.NamedElement;
 import evl.type.composed.RecordType;
@@ -468,14 +467,6 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
     visit(obj.getRef(), param);
     sw.wr(" ");
     sw.wr(name(obj));
-    sw.wr(";");
-    sw.nl();
-    return null;
-  }
-
-  @Override
-  protected Void visitRangeType(RangeType obj, Boolean param) {
-    sw.wr("\"" + obj.getName() + "\"");
     sw.wr(";");
     sw.nl();
     return null;

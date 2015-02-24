@@ -44,23 +44,9 @@ public final class Designator implements Iterable<String> {
     this.name.add(name1);
   }
 
-  public Designator(Designator old) {
-    this.name = new ArrayList<String>(old.name);
-  }
-
   public Designator(Designator des, String name) {
     this.name = new ArrayList<String>(des.name);
     this.name.add(name);
-  }
-
-  public Designator(Designator des, List<String> suffix) {
-    this.name = new ArrayList<String>(des.name);
-    this.name.addAll(suffix);
-  }
-
-  public Designator(String prefix, Designator suffix) {
-    this.name = new ArrayList<String>(suffix.name);
-    this.name.add(0, prefix);
   }
 
   public int size() {

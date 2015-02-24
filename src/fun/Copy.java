@@ -17,9 +17,7 @@
 
 package fun;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import common.Direction;
@@ -118,14 +116,6 @@ class CopyFun extends Traverser<Fun, Void> {
   @SuppressWarnings("unchecked")
   public <T extends Fun> T copy(T obj) {
     return (T) visit(obj, null);
-  }
-
-  public <T extends Fun> List<T> copy(List<T> obj) {
-    List<T> ret = new ArrayList<T>();
-    for (T itr : obj) {
-      ret.add(copy(itr));
-    }
-    return ret;
   }
 
   public <T extends Fun> FunList<T> copy(FunList<T> obj) {

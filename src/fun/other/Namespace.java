@@ -134,23 +134,6 @@ public class Namespace extends FunBase implements Named {
     }
   }
 
-  public void merge(Namespace space) {
-    if (!name.equals(space.getName())) {
-      throw new RuntimeException("names differ");
-    }
-    for (Fun itr : space.getItems()) {
-      children.add(itr);
-    }
-    for (Namespace itr : space.getSpaces()) {
-      Namespace sub = findSpace(itr.getName());
-      if (sub == null) {
-        children.add(itr);
-      } else {
-        sub.merge(itr);
-      }
-    }
-  }
-
   @Override
   public String getName() {
     return name;
@@ -159,19 +142,6 @@ public class Namespace extends FunBase implements Named {
   @Override
   public void setName(String name) {
     this.name = name;
-  }
-
-  public void subMerge(Named named) {
-    if (named instanceof Namespace) {
-      Namespace old = findSpace(named.getName());
-      if (old != null) {
-        old.merge((Namespace) named);
-      } else {
-        children.add(named);
-      }
-    } else {
-      children.add(named);
-    }
   }
 
   @SuppressWarnings("unchecked")

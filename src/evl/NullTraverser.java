@@ -27,7 +27,6 @@ import evl.expression.BoolValue;
 import evl.expression.NamedElementsValue;
 import evl.expression.NamedValue;
 import evl.expression.Number;
-import evl.expression.RangeValue;
 import evl.expression.RecordValue;
 import evl.expression.StringValue;
 import evl.expression.TupleValue;
@@ -565,11 +564,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitRangeType(RangeType obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitRangeValue(RangeValue obj, P param) {
     return visitDefault(obj, param);
   }
 

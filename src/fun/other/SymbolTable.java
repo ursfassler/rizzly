@@ -21,8 +21,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import common.ElementInfo;
-
 import error.ErrorType;
 import error.RError;
 import fun.Fun;
@@ -42,15 +40,6 @@ public class SymbolTable {
 
   public SymbolTable() {
     this.parent = null;
-  }
-
-  public Named get(String name, ElementInfo info) {
-    Named res = find(name, true);
-    if (res == null) {
-      RError.err(ErrorType.Error, info, "Entry not found: " + name);
-      return null;
-    }
-    return res;
   }
 
   public Named find(String name, boolean recursive) {

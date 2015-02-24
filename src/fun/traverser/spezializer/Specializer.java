@@ -106,10 +106,6 @@ public class Specializer {
     return inst;
   }
 
-  private static String makeName(Template item) {
-    return item.getName();
-  }
-
   private static ActualTemplateArgument eval(KnowledgeBase kb, ActualTemplateArgument itr) {
     if (itr instanceof Expression) {
       itr = ExprEvaluator.evaluate((Expression) itr, new Memory(), kb);

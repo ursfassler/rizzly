@@ -29,7 +29,6 @@ import evl.expression.BoolValue;
 import evl.expression.NamedElementsValue;
 import evl.expression.NamedValue;
 import evl.expression.Number;
-import evl.expression.RangeValue;
 import evl.expression.RecordValue;
 import evl.expression.StringValue;
 import evl.expression.TupleValue;
@@ -616,11 +615,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitRangeType(RangeType obj, P param) {
-    return null;
-  }
-
-  @Override
-  protected R visitRangeValue(RangeValue obj, P param) {
     return null;
   }
 

@@ -132,8 +132,6 @@ public abstract class Traverser<R, P> {
       return visitType((Type) obj, param);
     } else if (obj instanceof FuncHeader) {
       return visitFunctionHeader((FuncHeader) obj, param);
-    } else if (obj instanceof FuncImpl) {
-      return visitFuncImpl((FuncImpl) obj, param);
     } else if (obj instanceof Expression) {
       return visitExpression((Expression) obj, param);
     } else if (obj instanceof Statement) {

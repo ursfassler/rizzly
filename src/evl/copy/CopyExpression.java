@@ -28,7 +28,6 @@ import evl.expression.Expression;
 import evl.expression.NamedElementsValue;
 import evl.expression.NamedValue;
 import evl.expression.Number;
-import evl.expression.RangeValue;
 import evl.expression.RecordValue;
 import evl.expression.StringValue;
 import evl.expression.TupleValue;
@@ -104,11 +103,6 @@ public class CopyExpression extends NullTraverser<Expression, Void> {
   @Override
   protected Expression visitAnyValue(AnyValue obj, Void param) {
     return new AnyValue(obj.getInfo());
-  }
-
-  @Override
-  protected Expression visitRangeValue(RangeValue obj, Void param) {
-    return new RangeValue(obj.getInfo(), obj.getValues());
   }
 
   @Override

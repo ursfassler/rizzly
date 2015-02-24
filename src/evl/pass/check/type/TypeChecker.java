@@ -55,9 +55,6 @@ class TypeCheckerWorker extends DefTraverser<Void, Void> {
     this.kb = kb;
   }
 
-  static public void process(Evl obj, KnowledgeBase kb) {
-  }
-
   @Override
   protected Void visitImplElementary(ImplElementary obj, Void sym) {
     visitList(obj.getFunction(), sym);
