@@ -1,7 +1,9 @@
 //test ok
 
-Elementary4 = Elementary
+Elementary4 = Component
   evtOut : signal( x: R{0,255} );
+  evtIn : slot( x: R{0,255} );
+elementary
 
   sqr = function( x: R{0,200} ):R{0,200}
     return x*x mod 201;

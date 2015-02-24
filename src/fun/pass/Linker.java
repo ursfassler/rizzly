@@ -155,7 +155,7 @@ class LinkerWorker extends DefTraverser<Void, SymbolTable> {
   @Override
   protected Void visitComponent(CompImpl obj, SymbolTable param) {
     param = new SymbolTable(param);
-    param.addAll(obj.getObjects());
+    param.addAll(obj.getIface());
     super.visitComponent(obj, param);
     return null;
   }
@@ -186,8 +186,8 @@ class LinkerWorker extends DefTraverser<Void, SymbolTable> {
     TransitionStateLinker.process(obj);
 
     param = new SymbolTable(param);
-    visitList(obj.getInterface(), param);
-    param.addAll(obj.getInterface());
+    visitList(obj.getIface(), param);
+    param.addAll(obj.getIface());
     visit(obj.getTopstate(), param);
 
     return null;

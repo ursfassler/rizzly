@@ -3,7 +3,13 @@ Uni = Union
   word  : R{0,65535};
 end
 
-Union1 = Elementary
+Union1 = Component
+  setByte : slot( value: R{0,255} );
+  getByte : response():R{0,255};
+  setWord : slot( value: R{0,65535} );
+  getWord : response():R{0,65535};
+
+elementary
   data : Uni = [ byte := 42 ];
 
   setByte : slot( value: R{0,255} )

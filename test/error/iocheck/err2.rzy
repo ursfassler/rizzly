@@ -1,6 +1,9 @@
 // Error: response is not allowed to write state
 
-Err2 = Elementary
+Err2 = Component
+  what : response():R{0,100};
+
+elementary
   a : R{0,100} = 0;
   
   what : response():R{0,100}

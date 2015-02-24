@@ -1,7 +1,8 @@
-Simple = Composition
+Simple = Component
   ind : slot();
   out : signal();
 
+composition
   ind >> out;
 end
 

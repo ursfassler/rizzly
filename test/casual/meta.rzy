@@ -1,20 +1,21 @@
 //testcase
 
-Forward = Composition  //dummy meta1
+Forward = Component  //dummy meta1
   ind : slot();                          //
   out : signal();                         // 
       
+composition
   ind -> out;
 end
 
-Meta = Composition                  //geometry width="420"
-  // bla bla 1
-  //geometry height="140"
-  // bla bla 2
-  
+Meta = Component                  //geometry width="420"
   in1  : slot();
   out1 : signal();
       
+  // bla bla 1
+  //geometry height="140"
+  // bla bla 2
+composition
   a : Forward;                    //geometry x="140" y="20"
   b : Forward;                    //geometry x="280" y="65"
     

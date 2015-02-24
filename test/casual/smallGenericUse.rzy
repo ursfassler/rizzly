@@ -13,7 +13,8 @@ The3Record{T:Type{Any}} = Record
   b : T;
 end
 
-SmallGeneric{T:Type{Natural}} = Elementary
+SmallGeneric{T:Type{Natural}} = Component
+elementary
   dat1: TheRecord{T} = [ a := 0, b := 0 ];
   dat2: The2Record{T,Boolean} = [ a := 0, b := False ];
   dat3: The2Record{T,T} = [a:=0, b:=0];
@@ -24,7 +25,8 @@ SmallGeneric{T:Type{Natural}} = Elementary
   a: T = 0;
 end
 
-SmallGenericUse = Composition
+SmallGenericUse = Component
+composition
   gen1 : SmallGeneric{R{0,255}};
   gen2 : SmallGeneric{R{0,65535}};
 end

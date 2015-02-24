@@ -1,9 +1,15 @@
-GenIface = Elementary
+GenIface = Component
   out1in  : signal( x: R{0,10} );
   out1out : query():R{0,10};
   out2in  : signal( x: R{0,2000} );
   out2out : query():R{0,2000};
 
+  in1in : slot( x: R{0,10} );
+  in1out : response():R{0,10};
+  in2in : slot( x: R{0,2000} );
+  in2out: response():R{0,2000};
+  
+elementary
   in1in : slot( x: R{0,10} )
     out1in( x );
   end

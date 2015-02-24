@@ -1,15 +1,18 @@
-Dummy = Elementary
+Dummy = Component
   out : signal();
+  ind : slot();
 
+elementary
   ind : slot()
     out();
   end
 end
 
-Simple2 = Composition
+Simple2 = Component
   ind : slot();
   out : signal();
 
+composition
   dummy : Dummy;
   
   ind >> dummy.ind;

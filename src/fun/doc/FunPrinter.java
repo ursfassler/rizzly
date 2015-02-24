@@ -67,6 +67,7 @@ import fun.hfsm.State;
 import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
+import fun.other.CompImpl;
 import fun.other.ImplElementary;
 import fun.other.Named;
 import fun.other.Namespace;
@@ -244,18 +245,26 @@ public class FunPrinter extends NullTraverser<Void, Void> {
     return null;
   }
 
-  @Override
-  protected Void visitImplElementary(ImplElementary obj, Void param) {
-    xw.wa("elementary", getId(obj, param));
+  private void compHeader(CompImpl obj) {
+    xw.kw("Component");
     xw.nl();
     xw.incIndent();
     writeMeta(obj);
+    visitList(obj.getIface(), null);
+    xw.decIndent();
+    xw.kw("implementation ");
+  }
 
+  @Override
+  protected Void visitImplElementary(ImplElementary obj, Void param) {
+    compHeader(obj);
+    xw.kw("elementary");
+    xw.nl();
+    xw.incIndent();
     printEntryExit("entry", obj.getEntryFunc());
     printEntryExit("entry", obj.getExitFunc());
     visitListNl(obj.getDeclaration(), param);
     visitListNl(obj.getInstantiation(), param);
-    visitListNl(obj.getObjects(), param);
 
     xw.decIndent();
     xw.kw("end");
@@ -265,14 +274,13 @@ public class FunPrinter extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitImplComposition(ImplComposition obj, Void param) {
-    xw.wa("composition", getId(obj, param));
+    compHeader(obj);
+    xw.kw("composition");
     xw.nl();
     xw.incIndent();
-    writeMeta(obj);
 
     visitListNl(obj.getInstantiation(), param);
     visitListNl(obj.getConnection(), param);
-    visitList(obj.getObjects(), param);
 
     xw.decIndent();
     xw.kw("end");
@@ -329,13 +337,11 @@ public class FunPrinter extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitImplHfsm(ImplHfsm obj, Void param) {
-    xw.wa("hfsm", getId(obj, param));
+    compHeader(obj);
+    xw.kw("hfsm");
     xw.nl();
     xw.incIndent();
-    writeMeta(obj);
 
-    visitList(obj.getInterface(), param);
-    visitList(obj.getObjects(), param);
     visit(obj.getTopstate(), param);
 
     xw.decIndent();

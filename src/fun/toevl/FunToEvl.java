@@ -50,7 +50,6 @@ import fun.Fun;
 import fun.NullTraverser;
 import fun.composition.Connection;
 import fun.composition.ImplComposition;
-import fun.content.CompIfaceContent;
 import fun.expression.Expression;
 import fun.expression.NamedValue;
 import fun.expression.reference.DummyLinkTarget;
@@ -237,9 +236,9 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
     comp.getFunction().add(exitFunc);
     RError.ass(obj.getDeclaration().isEmpty(), obj.getInfo());
 
-    for (Fun itr : obj.getObjects()) {
+    for (Fun itr : obj.getIface()) {
       Evl evl = visit(itr, param);
-      comp.getFunction().add((Function) evl);
+      comp.getIface().add((InterfaceFunction) evl);
     }
 
     for (Fun itr : obj.getInstantiation()) {
@@ -248,8 +247,8 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
         comp.getConstant().add((evl.variable.Constant) ni);
       } else if (ni instanceof evl.variable.Variable) {
         comp.getVariable().add((evl.variable.Variable) ni);
-      } else if (ni instanceof InterfaceFunction) {
-        comp.getIface().add((InterfaceFunction) ni);
+      } else if (ni instanceof Function) {
+        comp.getFunction().add((Function) ni);
       } else if (ni instanceof evl.type.Type) {
         comp.getType().add((evl.type.Type) ni);
       } else {
@@ -270,13 +269,9 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
     evl.hfsm.ImplHfsm comp = new evl.hfsm.ImplHfsm(obj.getInfo(), obj.getName());
     map.put(obj, comp);
 
-    for (CompIfaceContent itr : obj.getInterface()) {
-      Evl ni = visit(itr, null);
-      if (ni instanceof InterfaceFunction) {
-        comp.getIface().add((InterfaceFunction) ni);
-      } else {
-        throw new RuntimeException("Not yet implemented: " + ni.getClass().getCanonicalName());
-      }
+    for (Fun itr : obj.getIface()) {
+      Evl evl = visit(itr, param);
+      comp.getIface().add((InterfaceFunction) evl);
     }
 
     comp.setTopstate((evl.hfsm.StateComposite) visit(obj.getTopstate(), null));
@@ -288,6 +283,11 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
   protected Evl visitImplComposition(ImplComposition obj, Void param) {
     evl.composition.ImplComposition comp = new evl.composition.ImplComposition(obj.getInfo(), obj.getName());
     map.put(obj, comp);
+
+    for (Fun itr : obj.getIface()) {
+      Evl evl = visit(itr, param);
+      comp.getIface().add((InterfaceFunction) evl);
+    }
 
     for (Fun itr : obj.getInstantiation()) {
       Evl ni = visit(itr, null);

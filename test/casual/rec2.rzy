@@ -3,7 +3,11 @@ Point = Record
   y : R{0,100};
 end
 
-Rec2 = Elementary
+Rec2 = Component
+  getX : response( p: Point ):R{0,100};
+  getY : response( p: Point ):R{0,100};
+
+elementary
   getX : response( p: Point ):R{0,100}
     return p.x;
   end

@@ -1,7 +1,10 @@
 
 Unsigned{T:Type{Natural}} = T;
 
-TypeAlias1 = Elementary
+TypeAlias1 = Component
+  ind : slot();
+
+elementary
   a : Unsigned{R{0,255}} = 0;
     
   ind : slot()

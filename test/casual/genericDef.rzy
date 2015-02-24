@@ -15,10 +15,11 @@ The3{T:Type{Integer};S:Type{Any}} = Record
   b : The2Record{T,S};
 end
 
-GenericDef{T:Type{Integer}} = Composition
+GenericDef{T:Type{Integer}} = Component
   set : slot( item: T );
   get : response():T;
 
+composition
   sub1 : GenericSub{T};
   sub2 : GenericSub{R{0,65535}};
   sub3 : GenericSub{Boolean};
@@ -29,7 +30,11 @@ GenericDef{T:Type{Integer}} = Composition
   get -> gen.get;
 end
 
-GenSu{T:Type{Integer}} = Elementary
+GenSu{T:Type{Integer}} = Component
+  set : slot( item: T );
+  get : response():T;
+
+elementary
   data: T = 0;
   dat2: The2Record{T,Boolean} = [ a := 2, b := True ];
   dat3: The2Record{T,T} = [ a := 1, b := 2 ];

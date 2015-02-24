@@ -4,7 +4,10 @@ tuwas{ max: Natural } = function( x: Natural ):R{0,max}
   return x mod (max+1);
 end
 
-ConstInit4 = Elementary
+ConstInit4 = Component
+  get : response():R{0,1000};
+
+elementary
   K : const = tuwas{23}( 42 );
     
   get : response():R{0,1000}

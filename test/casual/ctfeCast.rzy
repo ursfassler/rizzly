@@ -2,7 +2,10 @@ double = function(n: R{0,100}):R{0,200}
   return n*2;
 end
 
-CtfeCast = Elementary
+CtfeCast = Component
+  get : response():R{0,100};
+
+elementary
   value : const R{0,100} = R{0,100}(double(42));
     
   get : response():R{0,100}

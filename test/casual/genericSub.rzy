@@ -1,4 +1,5 @@
-GenericSub{T:Type{Any}} = Elementary
+GenericSub{T:Type{Any}} = Component
+elementary
   sub: T;
 end
 

@@ -1,5 +1,6 @@
 //test ok
 
-Elementary1 = Elementary
+Elementary1 = Component
+elementary
 end
- 
+

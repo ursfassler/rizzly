@@ -1,4 +1,7 @@
-Mulret4 = Elementary
+Mulret4 = Component
+  tuwas : response():R{0,20};
+
+elementary
   bla = function():(a, b: R{0,10})
     return (2, 3);
   end

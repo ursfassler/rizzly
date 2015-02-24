@@ -1,6 +1,8 @@
-ArrayTest1 = Elementary
+ArrayTest1 = Component
   out : signal( x: R{0,200} );
+  inp : slot( x: R{0,200} );
 
+elementary
   a : Array{20,R{0,200}} = (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
   
   entry

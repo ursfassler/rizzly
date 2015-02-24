@@ -1,0 +1,26 @@
+import helloWorld;
+
+Reader = Component
+  data : signal();
+elementary
+end
+
+Writer{text: String} = Component
+  speak : slot();
+
+elementary
+  speak : slot()
+  end
+end
+
+World = Component
+composition
+  read  : Reader;
+  hello : Writer{'Hello'};
+  world : Writer{'World'};
+  hw    : HelloWorld;
+  
+  read.data -> hw.say;
+  hw.hello -> hello.speak;
+  hw.world -> world.speak;
+end

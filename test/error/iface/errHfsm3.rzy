@@ -1,19 +1,17 @@
 // funcC is not an event
 
-ErrHfsm3 = Hfsm
+ErrHfsm3 = Component
   funcA : slot();
   funcB : slot();
 
-  state(One)
-    One : state;
-  
-    funcC = procedure()
-    end
-    
-    One to One by funcA();
-    One to One by funcB();
-    One to One by funcC();
+hfsm(One)
+  One : state;
+
+  funcC = procedure()
   end
   
+  One to One by funcA();
+  One to One by funcB();
+  One to One by funcC();
 end
 

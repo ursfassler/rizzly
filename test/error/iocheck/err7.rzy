@@ -1,20 +1,18 @@
 // Error: transition guard is not allowed to write state
 
-Err7 = Hfsm
+Err7 = Component
   inp : slot();
   out : signal();
 
-  state(A)
-    foo = function():Boolean
-      out();
-      return True;
-    end
-    
-    A : state;
-    B : state;
-    
-    A to B by inp() if foo();
+hfsm(A)
+  foo = function():Boolean
+    out();
+    return True;
   end
   
+  A : state;
+  B : state;
+  
+  A to B by inp() if foo();
 end
 

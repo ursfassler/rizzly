@@ -1,6 +1,8 @@
-Bool2 = Elementary
+Bool2 = Component
   tickOut : signal( x: R{0,50} );
+  tickIn : slot( x: R{0,50} );
 
+elementary
   tickIn : slot( x: R{0,50} )
     if (x = 0) = False then
       tickOut( 7 );

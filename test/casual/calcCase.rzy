@@ -1,5 +1,8 @@
-CalcCase = Elementary
+CalcCase = Component
   out : signal( data: R{0,20} );
+  ind : slot( x: R{0,20} );
+
+elementary
 
   ind : slot( x: R{0,20} )
     case x+2 of

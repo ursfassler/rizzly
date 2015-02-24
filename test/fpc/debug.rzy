@@ -1,8 +1,13 @@
-DummyComp = Elementary
+DummyComp = Component
   outfoo : signal();
   outbar : signal();
   outpoh : signal();
 
+  infoo : slot();
+  inbar : slot();
+  inpoh : slot();
+
+elementary
   infoo : slot()
     outfoo();
     outbar();
@@ -18,7 +23,7 @@ DummyComp = Elementary
   end
 end
 
-Debug = Composition
+Debug = Component
   infoo : slot();
   inbar : slot();
   inpoh : slot();
@@ -27,6 +32,7 @@ Debug = Composition
   outbar : signal();
   outpoh : signal();
 
+composition
   a : DummyComp;
   b : DummyComp;
 

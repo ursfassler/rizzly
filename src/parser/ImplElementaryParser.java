@@ -105,9 +105,7 @@ public class ImplElementaryParser extends ImplBaseParser {
         return var;
       }
       case RESPONSE:
-      case SLOT:
-      case SIGNAL:
-      case QUERY: {
+      case SLOT: {
         return parseFuncDef(peek().getType(), name, false);
       }
       default: {

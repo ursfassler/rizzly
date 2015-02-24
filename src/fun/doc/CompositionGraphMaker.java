@@ -55,43 +55,42 @@ public class CompositionGraphMaker {
     Map<Designator, Interface> ifacemap = new HashMap<Designator, Interface>();
 
     // TODO cleanup
-    for (FuncResponse iface : impl.getInterface().getItems(FuncResponse.class)) {
+    for (FuncResponse iface : impl.getIface().getItems(FuncResponse.class)) {
       Interface niface = makeIface(new Designator("Self"), comp, iface, ifacemap, kb);
       comp.getInput().add(niface);
     }
-    for (FuncSlot iface : impl.getInterface().getItems(FuncSlot.class)) {
+    for (FuncSlot iface : impl.getIface().getItems(FuncSlot.class)) {
       Interface niface = makeIface(new Designator("Self"), comp, iface, ifacemap, kb);
       comp.getInput().add(niface);
     }
-    for (FuncQuery iface : impl.getInterface().getItems(FuncQuery.class)) {
+    for (FuncQuery iface : impl.getIface().getItems(FuncQuery.class)) {
       Interface niface = makeIface(new Designator("Self"), comp, iface, ifacemap, kb);
       comp.getOutput().add(niface);
     }
-    for (FuncSignal iface : impl.getInterface().getItems(FuncSignal.class)) {
+    for (FuncSignal iface : impl.getIface().getItems(FuncSignal.class)) {
       Interface niface = makeIface(new Designator("Self"), comp, iface, ifacemap, kb);
       comp.getOutput().add(niface);
     }
 
-    assert (impl.getObjects().getItems(CompUse.class).isEmpty());
     for (CompUse use : impl.getInstantiation().getItems(CompUse.class)) {
       fun.other.CompImpl comptype = (CompImpl) ((fun.other.Template) use.getType().getLink()).getObject();
       Designator subpath = kp.get(comptype);
       SubComponent sub = new SubComponent(use.getInfo(), use.getName(), subpath, comptype.getName(), use.getInfo().getMetadata(METADATA_KEY));
 
       // TODO cleanup
-      for (FuncResponse iface : comptype.getInterface().getItems(FuncResponse.class)) {
+      for (FuncResponse iface : comptype.getIface().getItems(FuncResponse.class)) {
         Interface niface = makeIface(new Designator("Self", use.getName()), sub, iface, ifacemap, kb);
         sub.getInput().add(niface);
       }
-      for (FuncSlot iface : comptype.getInterface().getItems(FuncSlot.class)) {
+      for (FuncSlot iface : comptype.getIface().getItems(FuncSlot.class)) {
         Interface niface = makeIface(new Designator("Self", use.getName()), sub, iface, ifacemap, kb);
         sub.getInput().add(niface);
       }
-      for (FuncQuery iface : comptype.getInterface().getItems(FuncQuery.class)) {
+      for (FuncQuery iface : comptype.getIface().getItems(FuncQuery.class)) {
         Interface niface = makeIface(new Designator("Self", use.getName()), sub, iface, ifacemap, kb);
         sub.getOutput().add(niface);
       }
-      for (FuncSignal iface : comptype.getInterface().getItems(FuncSignal.class)) {
+      for (FuncSignal iface : comptype.getIface().getItems(FuncSignal.class)) {
         Interface niface = makeIface(new Designator("Self", use.getName()), sub, iface, ifacemap, kb);
         sub.getOutput().add(niface);
       }

@@ -1,6 +1,9 @@
 // Error: response is not allowed to write state
 
-Err6 = Elementary
+Err6 = Component
+  what : response():R{0,100};
+
+elementary
   a : R{0,100} = 0;
   
   bar = procedure()

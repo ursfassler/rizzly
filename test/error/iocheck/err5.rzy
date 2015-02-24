@@ -1,8 +1,10 @@
 // Error: response is not allowed to output
 
-Err5 = Elementary
+Err5 = Component
   event : signal();
-    
+  what : response():R{0,100};
+
+elementary
   bar = procedure()
     event();
   end

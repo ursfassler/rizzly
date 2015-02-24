@@ -1,7 +1,8 @@
 
 import iface.constdef;
 
-ConstUse = Elementary
+ConstUse = Component
+elementary
   blaBla : const = Answer;
 end
 

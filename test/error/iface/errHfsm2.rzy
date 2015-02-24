@@ -1,13 +1,12 @@
 
-ErrHfsm2 = Hfsm
+ErrHfsm2 = Component
   funcA : slot();
   funcB : slot();
 
-  state(One)
-    One : state;
-    One to One by funcA();
-    One to One by funcB();
-    One to One by funcC();
-  end
+hfsm(One)
+  One : state;
+  One to One by funcA();
+  One to One by funcB();
+  One to One by funcC();
 end
 

@@ -1,4 +1,8 @@
-ArrayTest2 = Elementary
+ArrayTest2 = Component
+  set : slot( i: R{0,19}; x: R{0,199} );
+  get : response( i: R{0,19} ): R{0,199};
+
+elementary
   a : Array{20,R{0,199}} = (0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0);
   
   set : slot( i: R{0,19}; x: R{0,199} )

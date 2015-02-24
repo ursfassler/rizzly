@@ -1,7 +1,10 @@
 
 Byte = R{0,255};
 
-TypeAlias3 = Elementary
+TypeAlias3 = Component
+  ind : slot();
+
+elementary
   a : Byte = 0;
     
   ind : slot()

@@ -1,6 +1,8 @@
-Linking = Elementary
+Linking = Component
   linking : signal();    // it has the same name as namespace ("linking"), may cause problem; should not
-  
+  ind : slot();
+
+elementary
   ind : slot()
     linking();
   end

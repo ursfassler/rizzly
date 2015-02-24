@@ -29,7 +29,6 @@ import fun.composition.Connection;
 import fun.composition.ImplComposition;
 import fun.expression.reference.RefName;
 import fun.expression.reference.Reference;
-import fun.function.FuncHeader;
 import fun.other.CompImpl;
 import fun.variable.CompUse;
 
@@ -74,13 +73,6 @@ public class ImplCompositionParser extends ImplBaseParser {
         id.getInfo().getMetadata().addAll(meta);
         CompUse compUse = new CompUse(id.getInfo(), id.getData(), type);
         comp.getInstantiation().add(compUse);
-        break;
-      case RESPONSE:
-      case SLOT:
-      case SIGNAL:
-      case QUERY:
-        FuncHeader obj = parseFuncDef(peek().getType(), id.getData(), true);
-        comp.getInstantiation().add(obj);
         break;
       default: {
         RError.err(ErrorType.Error, peek().getInfo(), "Expected interface function or reference");

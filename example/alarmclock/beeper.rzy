@@ -1,47 +1,46 @@
 
 import iface;
   
-Beeper = Hfsm
+Beeper = Component
   alarm : slot();
   off : slot();
   tick : slot();
 
   bell : signal( on: Boolean );
 
-  state( Off )
+hfsm( Off )
 
-    Off to On by alarm();
-    On to Off by off();
-  
-    Off : state;
+  Off to On by alarm();
+  On to Off by off();
 
-    On : state( Beep )
-      Beep : state
-        entry
-          bell( True );
-        end
-        exit
-          bell( False );
-        end
-        
-        timer   : R{0,20} = 20;
-        
-        Beep to Beep by tick() if timer > 0 do
-          timer := R{0,20}( timer - 1 );
-        end
+  Off : state;
+
+  On : state( Beep )
+    Beep : state
+      entry
+        bell( True );
       end
-
-      Pause : state
-        timer   : R{0,20} = 20;
-        
-        Pause to Pause by tick() if timer > 0 do
-          timer := R{0,20}( timer - 1 );
-        end
+      exit
+        bell( False );
       end
       
-      Beep to Pause by tick();  // if timer = 0
-      Pause to Beep by tick();  // if timer = 0
+      timer   : R{0,20} = 20;
+      
+      Beep to Beep by tick() if timer > 0 do
+        timer := R{0,20}( timer - 1 );
+      end
     end
+
+    Pause : state
+      timer   : R{0,20} = 20;
+      
+      Pause to Pause by tick() if timer > 0 do
+        timer := R{0,20}( timer - 1 );
+      end
+    end
+    
+    Beep to Pause by tick();  // if timer = 0
+    Pause to Beep by tick();  // if timer = 0
   end
 end
 

@@ -1,8 +1,10 @@
 // Error: response is not allowed to output
 
-Err1 = Elementary
+Err1 = Component
   event : signal();
+  what : response():R{0,100};
     
+elementary
   what : response():R{0,100}
     event();
     return 0;

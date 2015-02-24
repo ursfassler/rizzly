@@ -1,4 +1,7 @@
-Tuple2 = Elementary
+Tuple2 = Component
+  tuwas : response(a, b: R{0,10}):R{0,10};
+
+elementary
   tuwas : response(a, b: R{0,10}):R{0,10}
     if (a, b) = (2, 4) then
       return 1;

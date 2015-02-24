@@ -18,7 +18,10 @@ fibArray{ till: Natural } = function():Array{till,Natural}
   return res;
 end
 
-ConstInit3 = Elementary
+ConstInit3 = Component
+  get : response( idx: R{0,10} ):R{0,1000*1000};
+
+elementary
   Fib : const = fibArray{10}();
     
   get : response( idx: R{0,10} ):R{0,1000*1000}

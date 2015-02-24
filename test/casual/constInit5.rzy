@@ -6,11 +6,13 @@ end
 
 Answer : const R{0,255} = something( 42 );
 
-ConstInit5 = Composition
+ConstInit5 = Component
+composition
   comp2 : Dummy{Answer/2};
 end
 
-Dummy{S:R{0,255}} = Elementary
+Dummy{S:R{0,255}} = Component
+elementary
   Dada : const R{-100,100} = something(S);
 end
 

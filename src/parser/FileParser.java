@@ -93,9 +93,7 @@ public class FileParser extends BaseParser {
       case FUNCTION: {
         return parseFuncDef(TokenType.FUNCTION, name, false);
       }
-      case ELEMENTARY:
-      case HFSM:
-      case COMPOSITION: {
+      case COMPONENT: {
         return type().parseCompdecl(name);
       }
       default: {

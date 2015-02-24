@@ -8,7 +8,10 @@ Weekday = Enum
   Sunday;
 end
 
-Err1 = Elementary
+Err1 = Component
+  foo : slot( x: Weekday );
+
+elementary
   foo : slot( x: Weekday )
     z : R{0,10} = x;
   end

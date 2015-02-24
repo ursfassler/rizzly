@@ -4,7 +4,8 @@ Color = Enum
   Blue;
 end
   
-EnumTest = Elementary
+EnumTest = Component
+elementary
   foo = procedure()
     color : Color = Color.Red;
     if color = Color.Green then

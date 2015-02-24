@@ -2,7 +2,7 @@
 import motorController;
 import schmitt;
 
-Controller = Composition
+Controller = Component
   temperature : slot( value: R{-20,120} );
   motorStart : slot();
   motorStop : slot();
@@ -10,6 +10,7 @@ Controller = Composition
   on : signal();
   off : signal();
   
+composition
   tempSchmitt : Schmitt{R{-20,120},40,80};
   motcntrl    : MotorController;
   

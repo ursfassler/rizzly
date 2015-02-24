@@ -4,7 +4,8 @@ Rec{R:Any} = Record
   a : R;
 end
 
-Err3 = Elementary
+Err3 = Component
+elementary
   dat: Rec{Boolean} = [ a := False ];
 end
 

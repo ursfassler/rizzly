@@ -1,4 +1,7 @@
-ElemInit = Elementary
+ElemInit = Component
+  ind : response():R{0,50};
+  
+elementary
   x : R{0,50} = 1;
     
   entry

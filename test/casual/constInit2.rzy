@@ -1,5 +1,8 @@
 
-ConstInit2 = Elementary
+ConstInit2 = Component
+  get : response():R{0,1000};
+
+elementary
   Foo : const Natural = 42;
       
   get : response():R{0,1000}

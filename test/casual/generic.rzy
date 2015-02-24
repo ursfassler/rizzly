@@ -5,7 +5,8 @@ R2{T:Any} = Record
   b : T;
 end
 
-Generic = Elementary
+Generic = Component
+elementary
   x: R2{R1} = [ b := []];
 end
 

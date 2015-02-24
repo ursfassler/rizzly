@@ -3,7 +3,10 @@ Point = Record
   y : R{0,100};
 end
 
-Rec4 = Elementary
+Rec4 = Component
+  equal : response( a, b: Point ):Boolean;
+
+elementary
   equal : response( a, b: Point ):Boolean
     return a = b;
   end

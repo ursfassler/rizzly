@@ -1,6 +1,8 @@
-Retval = Elementary
+Retval = Component
   out : query():R{-20,20};
+  ind : response():R{-20,20};
 
+elementary
   ind : response():R{-20,20}
     x : R{-20,20} = out();
     return x;

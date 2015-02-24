@@ -1,9 +1,10 @@
 import genericDef;
 
-GenericUse = Composition
+GenericUse = Component
   set : slot( x: R{0,255} );
   get : query():R{0,255};
   
+composition
   gen : GenericDef{R{0,255}};
     
   set -> gen.set;

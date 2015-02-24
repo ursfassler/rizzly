@@ -1,8 +1,10 @@
 
-Foo{Bar:Natural} = Elementary
+Foo{Bar:Natural} = Component
+elementary
 end
 
-Err2 = Composition
+Err2 = Component
+composition
   foo: Foo;  // no template parameter
 end
 

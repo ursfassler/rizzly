@@ -1,6 +1,8 @@
-ArrayTest5 = Elementary
+ArrayTest5 = Component
   out : signal( x: Array{10,R{0,100}} );
+  inp : slot( x: Array{10,R{0,31}} );
     
+elementary
   inp : slot( x: Array{10,R{0,31}} )
     out( x );
   end

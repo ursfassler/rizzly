@@ -1,0 +1,3 @@
+rizzly.lang
+Syntax coloring for gtksourceview-3.0, e.g. gedit. Copy file to ~/.local/share/gtksourceview-3.0/language-specs/
+

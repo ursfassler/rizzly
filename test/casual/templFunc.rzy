@@ -1,6 +1,6 @@
 
 
-function narrow{low,high:Integer}( x: R{-1000,10000} ):R{low,high}
+narrow{low,high:Integer} = function( x: R{-1000,10000} ):R{low,high}
   if (x >= low) and (x <= high) then
     return R{low,high}( x );
   else
@@ -9,15 +9,13 @@ function narrow{low,high:Integer}( x: R{-1000,10000} ):R{low,high}
 end
 
 
-component
-  TemplFunc
-    response in( x: R{0,20} ):R{0,10};
-    
-    implementation Elementary
-    
-    response in( x: R{0,20} ):R{0,10}
-      return narrow{0,10}( x );
-    end
+TemplFunc = Component
+  inp : response( x: R{0,20} ):R{0,10};
 
+elementary
+  inp : response( x: R{0,20} ):R{0,10}
+    return narrow{0,10}( x );
   end
+
+end
 

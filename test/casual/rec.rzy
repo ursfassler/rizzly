@@ -3,9 +3,11 @@ Point = Record
   y : R{0,100};
 end
 
-Rec = Elementary
+Rec = Component
   out : signal( x: R{0,100} );
-  
+  ind : slot(  x: R{0,100}  );
+
+elementary
   p : Point = [ x := 0, y := 0 ];
   q : Point = [ x := 0, y := 0 ];
 

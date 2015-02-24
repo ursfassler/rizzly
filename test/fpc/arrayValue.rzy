@@ -11,9 +11,11 @@ data : const Array{10,R{0,100}} = (
     7 
   );
 
-ArrayValue = Elementary
+ArrayValue = Component
   out : signal( x: R{0,100} );
+  inp : slot( x: R{0,100} );
 
+elementary
   inp : slot( x: R{0,100} )
     out( data[x] );
   end

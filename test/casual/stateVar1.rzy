@@ -1,6 +1,8 @@
-StateVar1 = Elementary
+StateVar1 = Component
   out : signal( x: R{0,10} );
+  ind : slot( x: R{0,10} );
     
+elementary
   a : R{0,10} = 0;
       
   inc = procedure()

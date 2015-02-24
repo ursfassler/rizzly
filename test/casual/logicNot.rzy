@@ -1,5 +1,8 @@
 
-LogicNot = Elementary
+LogicNot = Component
+  invert : response( value: Boolean ):Boolean;
+
+elementary
   invert : response( value: Boolean ):Boolean
     return not value;
   end

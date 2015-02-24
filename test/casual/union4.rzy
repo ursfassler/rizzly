@@ -9,7 +9,12 @@ Uni = Union
   rec  : Rec;
 end
 
-Union4 = Elementary
+Union4 = Component
+  get0 : response():R{-100,100};
+  get1 : response():R{-100,100};
+  get2 : response():R{-100,100};
+
+elementary
   uni : Uni = [ rec := [ pos := 2, neg := -3, ofs := 13, dum := 0 ] ];
     
   entry

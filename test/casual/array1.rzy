@@ -1,5 +1,8 @@
 
-Array1 = Elementary
+Array1 = Component
+  tickOut : response( x: R{0,2} ):R{0,10};
+
+elementary
   vara  : Array{3,R{0,10}} = ( 2, 3, 5 );
 
   tickOut : response( x: R{0,2} ):R{0,10}

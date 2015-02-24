@@ -5,7 +5,7 @@ import modec;
 import alarmController;
 import beeper;
 
-Clock = Composition
+Clock = Component
   snoozeDown : slot();
   snoozeUp : slot();
   alarmDown : slot();
@@ -24,6 +24,7 @@ Clock = Composition
   alarmIcon : signal( visible: Boolean );
   time : signal( value: iface.Time );
 
+composition
   snoozeEdge    : Edge;                         //geometry x="160" y="20"
   modeEdge      : Edge;                         //geometry x="160" y="100"
   minAuto       : Autorepeat;                   //geometry x="160" y="180"

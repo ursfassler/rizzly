@@ -63,7 +63,7 @@ class CompLinkReductionWorker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitImplComposition(ImplComposition obj, Void param) {
-    visitList(obj.getInstantiation().getItems(CompImpl.class), param);
+    visitList(obj.getInstantiation(), param);
     return null;
   }
 

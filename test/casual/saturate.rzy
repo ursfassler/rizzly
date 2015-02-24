@@ -1,4 +1,7 @@
-Saturate = Elementary
+Saturate = Component
+  tack : response( x: R{0,20} ):R{0,10};
+
+elementary
   tack : response( x: R{0,20} ):R{0,10}
     if x > 10 then
       x := 10;

@@ -1,4 +1,7 @@
-Range3 = Elementary
+Range3 = Component
+  ind : response( x: R{0,10} ):R{0,3};
+
+elementary
   ind : response( x: R{0,10} ):R{0,3}
     if (x > 3) and (x <= 7) then
       return R{0,3}( x - 4 );

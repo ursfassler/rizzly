@@ -8,7 +8,10 @@ calcTable = function(n: R{0,100}):Array{10,R{0,100}}
   return res;
 end
 
-ConstInit6 = Elementary
+ConstInit6 = Component
+  get : response( idx: R{0,10} ):R{0,100};
+  
+elementary
   lookuptable : const = calcTable(57);
     
   get : response( idx: R{0,10} ):R{0,100}

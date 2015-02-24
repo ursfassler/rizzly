@@ -1,7 +1,9 @@
-Boolext = Elementary
+Boolext = Component
   on : signal();
   off : signal();
-    
+  tick : slot( value: Boolean );
+
+elementary
   tick : slot( value: Boolean )
     if value then
       on();

@@ -1,4 +1,5 @@
-VarInit = Elementary
+VarInit = Component
+elementary
   foo1 = function( x: R{0,255} ):R{0,255}
     a : R{0,255};
     

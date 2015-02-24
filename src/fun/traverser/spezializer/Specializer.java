@@ -33,8 +33,8 @@ import fun.knowledge.KnowInstance;
 import fun.knowledge.KnowParent;
 import fun.knowledge.KnowledgeBase;
 import fun.other.ActualTemplateArgument;
-import fun.other.CompImpl;
 import fun.other.FunList;
+import fun.other.ImplElementary;
 import fun.other.Namespace;
 import fun.other.Template;
 import fun.traverser.ConstEval;
@@ -129,8 +129,8 @@ public class Specializer {
   private static void addChild(Fun inst, Fun parent) {
     if (parent instanceof Namespace) {
       ((Namespace) parent).getChildren().add(inst);
-    } else if (parent instanceof CompImpl) {
-      ((CompImpl) parent).getObjects().add(inst);
+    } else if (parent instanceof ImplElementary) {
+      ((ImplElementary) parent).getInstantiation().add(inst);
     } else if (parent instanceof State) {
       ((State) parent).getItemList().add((StateContent) inst);
     } else {

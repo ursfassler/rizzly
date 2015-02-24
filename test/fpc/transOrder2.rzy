@@ -1,21 +1,20 @@
 //test ok
 
-TransOrder2 = Hfsm
+TransOrder2 = Component
   inp : slot( val: R{0,10} );
   out : signal( val: R{0,10} );
   
-  state(A)
-    A.AA to A by inp( val: R{0,10} ) do
-      out( 0 );
-    end
-    
-    A : state(AA)
-      AA : state;
-    end
+hfsm(A)
+  A.AA to A by inp( val: R{0,10} ) do
+    out( 0 );
+  end
   
-    A to A by inp( val: R{0,10} ) do
-      out( 1 );
-    end
+  A : state(AA)
+    AA : state;
+  end
+
+  A to A by inp( val: R{0,10} ) do
+    out( 1 );
   end
 end
 

@@ -1,11 +1,12 @@
 // query is not connected
 
-Sub = Elementary
+Sub = Component
   funcA : query():Boolean;
+elementary
 end
 
-Err7 = Composition
+Err7 = Component
+composition
   a : Sub;
-
 end
 

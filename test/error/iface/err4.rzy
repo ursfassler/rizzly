@@ -1,14 +1,16 @@
 
-Sub = Elementary
+Sub = Component
   funcA : signal();
   funcB : signal();
+elementary
 end
 
-Err4 = Composition
+Err4 = Component
   funcA : signal();
   funcB : signal();
   funcC : signal();
     
+composition
   a : Sub;
 
   a.funcA -> funcA;

@@ -1,25 +1,22 @@
-component
-  String1
-    slot   tick();
-    signal text( x: String );
+String1 = Component
+  tick : slot();
+  text : signal( x: String );
+  
+elementary
+  k : R{0,2};
     
-  implementation Elementary
-    
-    var
-      k : R{0,2};
-      
-    entry
-      k := 0;
-    end
-    
-    slot tick()
-      case k of
-        0: text( 'Hello' ); end
-        1: text( ' ' ); end
-        2: text( 'World' ); end
-      end
-      k := (k + 1) mod 3;
-    end
-    
+  entry
+    k := 0;
   end
+  
+  tick : slot()
+    case k of
+      0: text( 'Hello' ); end
+      1: text( ' ' ); end
+      2: text( 'World' ); end
+    end
+    k := (k + 1) mod 3;
+  end
+  
+end
 

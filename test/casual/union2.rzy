@@ -3,7 +3,10 @@ Uni = Union
   neg  : R{-10,10};
 end
 
-Union2 = Elementary
+Union2 = Component
+  ind : slot();
+
+elementary
   data : Uni = [pos := 1];
 
   abs = function( x: R{-10,10} ):R{0,10}

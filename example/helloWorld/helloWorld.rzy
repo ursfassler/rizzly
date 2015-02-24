@@ -1,0 +1,18 @@
+HelloWorld = Component
+  hello : signal();
+  world : signal();
+  say : slot();
+  
+elementary
+  first : Boolean = True;
+  
+  say : slot()
+    if first then
+      hello();
+    else
+      world();
+    end
+    first := not first;
+  end
+end
+

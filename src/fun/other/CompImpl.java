@@ -19,14 +19,13 @@ package fun.other;
 
 import common.ElementInfo;
 
-import fun.Fun;
 import fun.FunBase;
-import fun.content.CompIfaceContent;
 import fun.content.FileContent;
+import fun.function.FuncHeader;
 
 abstract public class CompImpl extends FunBase implements FileContent, Named {
   private String name;
-  private final FunList<Fun> objects = new FunList<Fun>();
+  private final FunList<FuncHeader> iface = new FunList<FuncHeader>();
 
   public CompImpl(ElementInfo info, String name) {
     super(info);
@@ -43,13 +42,8 @@ abstract public class CompImpl extends FunBase implements FileContent, Named {
     this.name = name;
   }
 
-  public FunList<Fun> getObjects() {
-    return objects;
+  public FunList<FuncHeader> getIface() {
+    return iface;
   }
 
-  public abstract FunList<CompIfaceContent> getInterface();
-
-  static protected FunList<CompIfaceContent> findInterface(FunList<Fun> instantiation) {
-    return instantiation.getItems(CompIfaceContent.class);
-  }
 }

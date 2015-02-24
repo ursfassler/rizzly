@@ -1,15 +1,18 @@
-DummyComp = Elementary
+DummyComp = Component
   out : query():R{0,100};
+  ind : response():R{0,100};
 
+elementary
   ind : response():R{0,100}
     return out();
   end
 end
 
-CompositionQuery = Composition
+CompositionQuery = Component
   ind : response():R{0,100};
   out : query():R{0,100};
 
+composition
   a : DummyComp;
   b : DummyComp;
     

@@ -4,7 +4,7 @@ Point = Record
   y : R{0,255};
 end
 
-Expr = Elementary
+Expr = Component
   out1tick : signal( x: R{0,255} );
   out1tack : query( x: R{0,255} ):R{0,255};
   out2tick : signal( x: R{0,255} );
@@ -14,6 +14,10 @@ Expr = Elementary
   out4tack : query():Point;
   out4tock : signal();
     
+  inTick : slot( x: R{0,255} );
+  inTack : response( x: R{0,255} ):R{0,255};
+
+elementary
   a : Array{10,Point} = ( [ x := 10, y := 20 ] );
   f : R{0,255} = 20;
   

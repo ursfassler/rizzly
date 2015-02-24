@@ -25,7 +25,9 @@ import error.RError;
 import fun.Copy;
 import fun.Fun;
 import fun.expression.reference.Reference;
+import fun.function.FuncHeader;
 import fun.other.CompImpl;
+import fun.other.FunList;
 import fun.type.Type;
 import fun.type.base.EnumElement;
 import fun.type.base.EnumType;
@@ -33,26 +35,58 @@ import fun.type.composed.NamedElement;
 import fun.type.composed.RecordType;
 import fun.type.composed.UnionType;
 
+//TODO cleanup (mostly components)
+//TODO update EBNF
 public class TypeParser extends BaseParser {
 
   public TypeParser(Scanner scanner) {
     super(scanner);
   }
 
-  // EBNF compdecl: compIfaceList component "end"
+  // EBNF compdecl: "Component" compIfaceList implementation
   public CompImpl parseCompdecl(String name) {
+    expect(TokenType.COMPONENT);
+    FunList<FuncHeader> list = parseCompIfaceList();
+    CompImpl comp;
     switch (peek().getType()) {
       case ELEMENTARY:
-        return ImplElementaryParser.parse(getScanner(), name);
+        comp = ImplElementaryParser.parse(getScanner(), name);
+        break;
       case COMPOSITION:
-        return ImplCompositionParser.parse(getScanner(), name);
+        comp = ImplCompositionParser.parse(getScanner(), name);
+        break;
       case HFSM:
-        return ImplHfsmParser.parse(getScanner(), name);
+        comp = ImplHfsmParser.parse(getScanner(), name);
+        break;
       default: {
         wrongToken(TokenType.ELEMENTARY);
         return null;
       }
     }
+    comp.getIface().addAll(list);
+    return comp;
+  }
+
+  // EBNF compIfaceList: { funcHeader }
+  private FunList<FuncHeader> parseCompIfaceList() {
+    FunList<FuncHeader> func = new FunList<FuncHeader>();
+    while (peek().getType() == TokenType.IDENTIFIER) {
+      Token name = expect(TokenType.IDENTIFIER);
+      expect(TokenType.COLON);
+      switch (peek().getType()) {
+        case RESPONSE:
+        case SLOT:
+        case SIGNAL:
+        case QUERY: {
+          func.add(parseFuncDef(peek().getType(), name.getData(), true));
+          break;
+        }
+        default: {
+          RError.err(ErrorType.Error, peek().getInfo(), "expected slot, signal, query or response");
+        }
+      }
+    }
+    return func;
   }
 
   // EBNF typedef: recordtype | uniontype | enumtype | arraytype | derivatetype

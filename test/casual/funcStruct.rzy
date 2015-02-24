@@ -3,9 +3,11 @@ Point = Record
   x : R{0,255};
 end
 
-FuncStruct = Elementary
+FuncStruct = Component
   out : query():Point;
+  ind : response():R{0,255};
     
+elementary
   ind : response():R{0,255}
     return out().x;
   end

@@ -40,9 +40,10 @@ public class Scanner implements PeekReader<Token> {
   private ArrayList<Metadata> metadata = new ArrayList<Metadata>();
 
   {
-    keywords.put("Elementary", TokenType.ELEMENTARY);
-    keywords.put("Composition", TokenType.COMPOSITION);
-    keywords.put("Hfsm", TokenType.HFSM);
+    keywords.put("Component", TokenType.COMPONENT);
+    keywords.put("elementary", TokenType.ELEMENTARY);
+    keywords.put("composition", TokenType.COMPOSITION);
+    keywords.put("hfsm", TokenType.HFSM);
     keywords.put("state", TokenType.STATE);
     keywords.put("to", TokenType.TO);
     keywords.put("by", TokenType.BY);

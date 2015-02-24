@@ -2,7 +2,8 @@
 import iface.constdef;
 import comp.constuse;
 
-ExtConst = Composition
+ExtConst = Component
+composition
   comp : ConstUse;
 end
 

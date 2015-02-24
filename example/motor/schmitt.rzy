@@ -1,20 +1,19 @@
-Schmitt{T:Type{Integer}; Lower, Upper: T} = Hfsm
+Schmitt{T:Type{Integer}; Lower, Upper: T} = Component
   changed : slot( value: T );
     
   high : signal();
   low : signal();
     
-  state( Low )
-    Low : state;
-    High : state;
+hfsm( Low )
+  Low : state;
+  High : state;
+
+  Low to High by changed( value: T ) if value >= Upper do
+    high();
+  end
   
-    Low to High by changed( value: T ) if value >= Upper do
-      high();
-    end
-    
-    High to Low by changed( value: T ) if value <= Lower do
-      low();
-    end
+  High to Low by changed( value: T ) if value <= Lower do
+    low();
   end
 end
 

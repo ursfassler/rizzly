@@ -1,27 +1,26 @@
 // State BB, AB, CA, CB, C are never reached
 
-UnusedState = Hfsm
+UnusedState = Component
   tick : slot();
 
-  state(A)
-    A : state(AA)
-      AA : state;
-      AB : state;
-    end
-
-    B : state(BA)
-      BA : state;
-      BB : state;
-    end
-
-    C : state(CA)
-      CA : state;
-      CB : state;
-    end
-
-    A to BA by tick();
-    BA to A by tick();
-    BB to A by tick();
+hfsm(A)
+  A : state(AA)
+    AA : state;
+    AB : state;
   end
+
+  B : state(BA)
+    BA : state;
+    BB : state;
+  end
+
+  C : state(CA)
+    CA : state;
+    CB : state;
+  end
+
+  A to BA by tick();
+  BA to A by tick();
+  BB to A by tick();
 end
 

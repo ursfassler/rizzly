@@ -123,25 +123,24 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   protected R visitImplElementary(ImplElementary obj, P param) {
     visit(obj.getEntryFunc(), param);
     visit(obj.getExitFunc(), param);
+    visitList(obj.getIface(), param);
     visitList(obj.getDeclaration(), param);
     visitList(obj.getInstantiation(), param);
-    visitList(obj.getObjects(), param);
     return null;
   }
 
   @Override
   protected R visitImplComposition(ImplComposition obj, P param) {
+    visitList(obj.getIface(), param);
     visitList(obj.getInstantiation(), param);
     visitList(obj.getConnection(), param);
-    visitList(obj.getObjects(), param);
     return null;
   }
 
   @Override
   protected R visitImplHfsm(ImplHfsm obj, P param) {
-    visitList(obj.getInterface(), param);
+    visitList(obj.getIface(), param);
     visit(obj.getTopstate(), param);
-    visitList(obj.getObjects(), param);
     return null;
   }
 

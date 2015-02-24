@@ -1,7 +1,9 @@
 
-Range = Elementary
+Range = Component
   out : signal( x: R{0,10} );
-    
+  ind : slot( x: R{0,10} );
+
+elementary
   a : R{0,10} = 0;
   
   ind : slot( x: R{0,10} )

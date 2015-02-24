@@ -1,7 +1,10 @@
-DebugMsg = Elementary
+DebugMsg = Component
   outFoo : signal();
   outBar : signal();
-
+  inFoo : slot();
+  inBar : slot();
+  
+elementary
   inFoo : slot()
     outFoo();
     outBar();

@@ -271,7 +271,7 @@ class CopyFun extends Traverser<Fun, Void> {
   protected Fun visitImplHfsm(ImplHfsm obj, Void param) {
     ImplHfsm ret = new ImplHfsm(obj.getInfo(), obj.getName(), copy(obj.getTopstate()));
 
-    ret.getInterface().addAll(copy(obj.getInterface()));
+    ret.getIface().addAll(copy(obj.getIface()));
 
     return ret;
   }
@@ -280,6 +280,7 @@ class CopyFun extends Traverser<Fun, Void> {
   protected Fun visitImplComposition(ImplComposition obj, Void param) {
     ImplComposition ret = new ImplComposition(obj.getInfo(), obj.getName());
 
+    ret.getIface().addAll(copy(obj.getIface()));
     ret.getInstantiation().addAll(copy(obj.getInstantiation()));
     ret.getConnection().addAll(copy(obj.getConnection()));
 
@@ -290,7 +291,7 @@ class CopyFun extends Traverser<Fun, Void> {
   protected Fun visitImplElementary(ImplElementary obj, Void param) {
     ImplElementary ret = new ImplElementary(obj.getInfo(), obj.getName());
 
-    ret.getObjects().addAll(copy(obj.getObjects()));
+    ret.getIface().addAll(copy(obj.getIface()));
     ret.getDeclaration().addAll(copy(obj.getDeclaration()));
     ret.getInstantiation().addAll(copy(obj.getInstantiation()));
     ret.setEntryFunc(copy(obj.getEntryFunc()));

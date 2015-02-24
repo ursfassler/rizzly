@@ -47,6 +47,7 @@ import evl.pass.CompareReplacer;
 import evl.pass.CompositionReduction;
 import evl.pass.ConstantPropagation;
 import evl.pass.DebugIface;
+import evl.pass.ElementaryReduction;
 import evl.pass.EnumReduction;
 import evl.pass.Flattner;
 import evl.pass.HeaderWriter;
@@ -119,6 +120,7 @@ public class MainEvl {
       reduction.checks.addAll(passes.checks);
       reduction.add(new IntroduceConvert());
       reduction.add(new OpenReplace());
+      reduction.add(new ElementaryReduction());
       reduction.add(new CompositionReduction());
       {
         PassGroup hfsm = new PassGroup("hfsm");

@@ -7,8 +7,11 @@ end
 TheBool = Boolean;
 TheArray = Array{3,Boolean};
 
-Bool = Elementary
+Bool = Component
   tickOut : signal( x: R{0,255} );
+  tickIn : slot( x: R{0,255} );
+
+elementary
 
   varA  : Rec = [ a := False, b := True, c := False ];
   varB  : Boolean = True;  //TODO what with TheBool?

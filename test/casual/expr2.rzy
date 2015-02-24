@@ -1,7 +1,9 @@
 
-Expr2 = Elementary
+Expr2 = Component
   out : signal( x: R{0,20} );
+  ind : slot( x: R{0,20} );
 
+elementary
   ind : slot( x: R{0,20} )
     y1 : R{0,20} = +x;
     y2 : R{-20,20} = -x;

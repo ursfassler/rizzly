@@ -1,5 +1,11 @@
 
-DownCast = Elementary
+DownCast = Component
+  a : response( x: R{0,50000} ):R{0,200};
+  b : response( x: R{0,50000} ):R{0,200};
+  c : response( x: R{0,50000} ):R{0,200};
+  d : response( x: R{0,50000} ):R{0,200};
+
+elementary
   a : response( x: R{0,50000} ):R{0,200}
     return x and 127;
   end

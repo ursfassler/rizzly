@@ -1,21 +1,27 @@
 
-Time = Elementary
+Time = Component
+  readDigit: response( digit: R{0,3} ):R{0,9};
+
+elementary
   readDigit: response( digit: R{0,3} ):R{0,9}
     return digit;
   end
 end
 
-Display = Elementary
+Display = Component
   readSym : query( digit: R{0,3} ):R{0,9};
+  tick: slot();
   
+elementary
   tick: slot()
     readSym( 0 );
   end
 end
 
-SubrespLink = Composition
+SubrespLink = Component
   tick: slot();
   
+composition
   display : Display;
   time    : Time;
   

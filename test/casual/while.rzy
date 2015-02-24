@@ -3,9 +3,11 @@ Point = Record
   y : R{0,255};
 end
 
-While = Elementary
+While = Component
   out : query( x: R{0,255} ):Point;
+  ind : response( x: R{0,255} ):Point;
 
+elementary
   ind : response( x: R{0,255} ):Point
     ret : Point;
     ret.x := 0;

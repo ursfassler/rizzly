@@ -1,25 +1,24 @@
-Query3 = Hfsm
+Query3 = Component
   tick : slot();
   read : response():R{0,100};
   
-  state( A )
-    A to B by tick();
-    B to C by tick();
-    C to A by tick();
+hfsm( A )
+  A to B by tick();
+  B to C by tick();
+  C to A by tick();
 
-    read : response():R{0,100}
-      return 57;
+  read : response():R{0,100}
+    return 57;
+  end
+
+  A : state;
+    
+  B : state
+    read : response():R{0,100}     // this response is never used
+      return 42;
     end
+  end
 
-    A : state;
-      
-    B : state
-      read : response():R{0,100}     // this response is never used
-        return 42;
-      end
-    end
-
-    C : state;
-  end    
-end
+  C : state;
+end    
 

@@ -1,22 +1,21 @@
 //test ok
 
-StateNames1 = Hfsm
+StateNames1 = Component
   tick : slot();
   evt : signal( value: R{0,255} );
 
-  state(A)
+hfsm(A)
+  A : state(A)
     A : state(A)
-      A : state(A)
-        A : state;
-        B : state;
-        C : state;
-      end
-      B : state(A)
-        A : state;
-        B : state;
-        C : state;
-      end
+      A : state;
+      B : state;
+      C : state;
     end
-   end
+    B : state(A)
+      A : state;
+      B : state;
+      C : state;
+    end
+  end
 end
 

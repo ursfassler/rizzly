@@ -1,17 +1,16 @@
 // Error: response is not allowed to write state
 
-Err4 = Hfsm
+Err4 = Component
   what : response():R{0,100};
 
-  state(A)
-    a : R{0,100} = 0;
-    
-    A : state
-      what : response():R{0,100}
-        a := 42;
-        return 0;
-      end
+hfsm(A)
+  a : R{0,100} = 0;
+  
+  A : state
+    what : response():R{0,100}
+      a := 42;
+      return 0;
     end
-  end  
+  end
 end
 

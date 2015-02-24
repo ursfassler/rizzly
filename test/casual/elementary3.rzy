@@ -1,7 +1,10 @@
 //test ok
 
-Elementary3 = Elementary
+Elementary3 = Component
   tickOut : signal();
+  tickIn : slot();
+  
+elementary
 
   count : R{0,1} = 0;
 

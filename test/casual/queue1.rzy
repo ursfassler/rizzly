@@ -24,12 +24,20 @@ end
 
 Size : const = 10;
 
-Queue1 = Elementary
+Queue1 = Component
   outMsg1 : signal();
   outMsg2 : signal( x: R{0,10}; y: R{0,10} );
   outMsg3 : signal( x: R{-1000,1000} );
   outMsg4 : signal( x: Boolean );
 
+  dispatch : slot();
+  count : response():R{0,Size};
+  inMsg1 : slot();
+  inMsg2 : slot( x: R{0,10}; y: R{0,10} );
+  inMsg3 : slot( x: R{-1000,1000} );
+  inMsg4 : slot( x: Boolean );
+
+elementary
   queue : Array{Size,Msg} = [ _ := (msg3 := ( 0 )) ];
   head  : R{0,Size-1} = 0;
   size  : R{0,Size} = 0;

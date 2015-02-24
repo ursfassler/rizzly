@@ -1,7 +1,9 @@
 
-Err1 = Elementary
+Err1 = Component
   out : signal();
+  inp : slot();
   
+elementary
   inp : slot()
     out.foo();      // .foo does not exist
   end

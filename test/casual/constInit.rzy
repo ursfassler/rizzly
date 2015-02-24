@@ -6,13 +6,15 @@ end
 
 Answer : const R{0,255} = something( 42 );
 
-ConstInit = Composition
+ConstInit = Component
+composition
   comp1 : Dummy{1};
   comp2 : Dummy{Answer/2};
   test  : Test;
 end
   
-Test = Elementary
+Test = Component
+elementary
   BlaBla : const R{0,255} = something( 23 );
   BluBlu : const R{0,255} = Answer;
   BleBle : const R{0,Answer} = 1;
@@ -22,7 +24,8 @@ Test = Elementary
   b : R{0,Answer+2} = 0;
 end      
 
-Dummy{S:R{0,255}} = Elementary
+Dummy{S:R{0,255}} = Component
+elementary
   Dodo : const R{0,S} = 1;
   Dudu : const R{0,255} = S;
   Dada : const R{-100,100} = something(S) / 2 - 100;

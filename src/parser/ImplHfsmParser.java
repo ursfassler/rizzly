@@ -25,7 +25,6 @@ import common.ElementInfo;
 import error.ErrorType;
 import error.RError;
 import fun.Fun;
-import fun.content.CompIfaceContent;
 import fun.expression.BoolValue;
 import fun.expression.Expression;
 import fun.expression.reference.DummyLinkTarget;
@@ -39,7 +38,6 @@ import fun.hfsm.StateContent;
 import fun.hfsm.StateSimple;
 import fun.hfsm.Transition;
 import fun.other.CompImpl;
-import fun.other.FunList;
 import fun.other.Template;
 import fun.statement.Block;
 import fun.variable.ConstPrivate;
@@ -56,43 +54,17 @@ public class ImplHfsmParser extends ImplBaseParser {
     return parser.parseImplementationHfsm(name);
   }
 
-  // EBNF implementationComposition: "hfsm" compDeclBlock stateBody
+  // EBNF implementationComposition: "hfsm" "(" id ")" stateBody "end"
   private CompImpl parseImplementationHfsm(String name) {
     ElementInfo info = expect(TokenType.HFSM).getInfo();
-
-    FunList<CompIfaceContent> iface = new FunList<CompIfaceContent>();
-
-    while (peek().getType() != TokenType.STATE) {
-      Token id = expect(TokenType.IDENTIFIER);
-      expect(TokenType.COLON);
-      CompIfaceContent obj = (CompIfaceContent) parseIfaceDeclaration(id.getData());
-
-      iface.add(obj);
-    }
-
-    State top = parseState("!top");
-
-    expect(TokenType.END);
+    expect(TokenType.OPENPAREN);
+    String initial = expect(TokenType.IDENTIFIER).getData();
+    expect(TokenType.CLOSEPAREN);
+    State top = new StateComposite(info, "!top", new Reference(info, new DummyLinkTarget(info, initial)));
+    parseStateBody(top);
 
     ImplHfsm implHfsm = new ImplHfsm(info, name, top);
-    implHfsm.getInterface().addAll(iface);
     return implHfsm;
-  }
-
-  // as in implCompositionParser
-  private FuncHeader parseIfaceDeclaration(String name) {
-    switch (peek().getType()) {
-      case RESPONSE:
-      case SLOT:
-      case SIGNAL:
-      case QUERY:
-        return parseFuncDef(peek().getType(), name, true);
-      default: {
-        // return type().parseTypedecl();
-        RError.err(ErrorType.Error, peek().getInfo(), "Expected interface function");
-        return null;
-      }
-    }
   }
 
   // EBNF stateBody: { entryCode | exitCode | varDeclBlock | funcDecl | transitionDecl | state }

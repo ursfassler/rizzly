@@ -13,7 +13,8 @@ Rec{T:Type{Any}} = Record
   b : T;
 end
 
-Typefunc = Elementary
+Typefunc = Component
+elementary
   a : R{0,getBits( 42 )} = 0;
   b : R{0,255} = 0;
   c : Rec{R{0,255}} = [a := 0, b := 0];

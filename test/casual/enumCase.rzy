@@ -8,7 +8,10 @@ Weekday = Enum
   Sunday;
 end
 
-EnumCase = Elementary
+EnumCase = Component
+  ind : response( x: Weekday ):R{0,3};
+
+elementary
   ind : response( x: Weekday ):R{0,3}
     case x of
       Weekday.Monday,Weekday.Wednesday:

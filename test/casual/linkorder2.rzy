@@ -1,4 +1,7 @@
-Linkorder2 = Elementary
+Linkorder2 = Component
+  ind : slot();
+
+elementary
   ind : slot()
     foo();
   end

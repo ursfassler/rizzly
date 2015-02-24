@@ -4,9 +4,11 @@ Color = Enum
   Blue;
 end
 
-Enumt = Elementary
+Enumt = Component
   out : signal( x: Color );
+  inp : slot( x: R{0,100} );
 
+elementary
   inp : slot( x: R{0,100} )
     case x of
       0: out( Color.Red ); end

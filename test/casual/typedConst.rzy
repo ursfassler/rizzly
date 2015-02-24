@@ -1,7 +1,8 @@
 
 Answer : const R{0,99} = 42;
 
-TypedConst = Elementary
+TypedConst = Component
+elementary
   foo = function():R{0,99}
     return Answer;
   end

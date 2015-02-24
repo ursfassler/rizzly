@@ -1,6 +1,8 @@
-Expr3 = Elementary
+Expr3 = Component
   out : signal( x: R{0,4} );
+  ind : slot( x: R{0,10} );
 
+elementary
   ind : slot( x: R{0,10} )
     out( 1 + x * 10 mod 4 );
   end

@@ -1,20 +1,20 @@
-Schmitt{Lower,Upper: R{0,1000}} = Hfsm
+Schmitt{Lower,Upper: R{0,1000}} = Component
   ind : slot( value: R{0,1000} );
-      
-  state( Low )
-    Low  : state;
-    High : state;
-    
-    Low to High by ind( value: R{0,1000} ) do
-      a : R{0,1000} = Upper;
-    end
-    High to Low by ind( value: R{0,1000} ) if value <= Lower;
+
+hfsm( Low )
+  Low  : state;
+  High : state;
+  
+  Low to High by ind( value: R{0,1000} ) do
+    a : R{0,1000} = Upper;
   end
+  High to Low by ind( value: R{0,1000} ) if value <= Lower;
 end
   
-Param = Composition
+Param = Component
   ind : slot( value: R{0,1000} );
-  
+
+composition
   schmitt : Schmitt{90,110};
       
   ind -> schmitt.ind;

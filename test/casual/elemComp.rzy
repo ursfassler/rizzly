@@ -1,5 +1,8 @@
 
-Sub{Init,Deinit:R{0,100}} = Elementary
+Sub{Init,Deinit:R{0,100}} = Component
+  get : response():R{0,100};
+
+elementary
   value : R{0,100} = 0;
   
   entry
@@ -15,13 +18,14 @@ Sub{Init,Deinit:R{0,100}} = Elementary
   end
 end
 
-ElemComp = Composition
+ElemComp = Component
   val1 : response():R{0,100};
   val2 : response():R{0,100};
   val3 : response():R{0,100};
   val4 : response():R{0,100};
   val5 : response():R{0,100};
     
+composition
   sub1 : Sub{10,20};
   sub2 : Sub{20,30};
   sub3 : Sub{30,40};

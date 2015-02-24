@@ -1,16 +1,19 @@
-DummyComp = Elementary
+DummyComp = Component
   out : signal();
+  ind : slot();
 
+elementary
   ind : slot()
     out();
   end
 
 end
 
-Composition1 = Composition
+Composition1 = Component
   ind : slot();
   out : signal();
 
+composition
   a : DummyComp;
   b : DummyComp;
   c : DummyComp;

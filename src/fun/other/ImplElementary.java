@@ -20,7 +20,6 @@ package fun.other;
 import common.ElementInfo;
 
 import fun.Fun;
-import fun.content.CompIfaceContent;
 import fun.statement.Block;
 
 public class ImplElementary extends CompImpl {
@@ -55,11 +54,6 @@ public class ImplElementary extends CompImpl {
 
   public void setExitFunc(Block exitFunc) {
     this.exitFunc = exitFunc;
-  }
-
-  @Override
-  public FunList<CompIfaceContent> getInterface() {
-    return findInterface(instantiation);
   }
 
 }

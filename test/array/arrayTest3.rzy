@@ -1,4 +1,7 @@
-ArrayTest3 = Elementary
+ArrayTest3 = Component
+  inp : response( x: R{0,200} ):R{0,31};
+
+elementary
   a : Array{32,R{0,31}};
   
   entry

@@ -1,15 +1,17 @@
 
-Sub = Composition
+Sub = Component
   inp : slot();
   out : signal();
     
+composition
   inp -> out;
 end
 
-Err2 = Composition
+Err2 = Component
   inp : slot();
   out : signal();
 
+composition
   a : Sub;
     
   inp -> a.inp;   // prevent error throwing

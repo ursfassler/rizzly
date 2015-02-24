@@ -1,4 +1,7 @@
-Range2 = Elementary
+Range2 = Component
+  ind : response( x: R{0,255} ):R{0,255};
+
+elementary
   ind : response( x: R{0,255} ):R{0,255}
     t : R{0,510} = x * 2;
     if t > 255 then

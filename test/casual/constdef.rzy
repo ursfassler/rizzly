@@ -1,7 +1,8 @@
 
 Answer : const R{0,99} = 42;
 
-Constdef = Elementary
+Constdef = Component
+elementary
   BlaBla : const R{0,99} = 23;
 
   foo = procedure()

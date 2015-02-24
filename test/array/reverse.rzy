@@ -11,7 +11,10 @@ reverse{S:Natural;T:Type{Any}} = function( x: Array{S,T} ): Array{S,T}
   return x;
 end
 
-Reverse = Elementary
+Reverse = Component
+  data : response( x: Array{10,R{0,100}} ): Array{10,R{0,100}};
+
+elementary
   data : response( x: Array{10,R{0,100}} ): Array{10,R{0,100}}
     return reverse{10,R{0,100}}( x );
   end
