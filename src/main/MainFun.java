@@ -38,6 +38,7 @@ import fun.knowledge.KnowledgeBase;
 import fun.other.Namespace;
 import fun.pass.CheckNames;
 import fun.pass.CompLinkReduction;
+import fun.pass.DocWriter;
 import fun.pass.EnumLinkReduction;
 import fun.pass.FileLoader;
 import fun.pass.FileReduction;
@@ -59,6 +60,9 @@ public class MainFun {
     passes.add(InternTypeAdder.class);
     passes.add(CheckNames.class);
     passes.add(Linker.class);
+    if (opt.getDocOutput()) {
+      passes.add(DocWriter.class);
+    }
     passes.add(FileReduction.class);
 
     passes.add(NamespaceLinkReduction.class);

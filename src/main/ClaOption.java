@@ -35,6 +35,7 @@ public class ClaOption {
   private String rootPath;
   private Designator rootComp;
   private boolean debugEvent;
+  private boolean docOutput;
   private boolean lazyModelCheck;
 
   public String getRootPath() {
@@ -53,6 +54,10 @@ public class ClaOption {
     return lazyModelCheck;
   }
 
+  public boolean getDocOutput() {
+    return docOutput;
+  }
+
   public void init(String rootPath, Designator rootComp, boolean debugEvent, boolean lazyModelCheck) {
     this.rootPath = rootPath;
     this.rootComp = rootComp;
@@ -66,6 +71,7 @@ public class ClaOption {
     opt.addOption("p", "rootdir", true, "directory of the project, default is the working directory");
     opt.addOption("r", "rootcomp", true, "path of the root component");
     opt.addOption("i", "input", true, "input file, the root component needs the same name as the file but beginning with an uppercase letter");
+    opt.addOption(null, "doc", false, "generate documentation");
     opt.addOption(null, "debugEvent", false, "produce code to get informed whenever a event is sent or received");
     opt.addOption(null, "lazyModelCheck", false, "Do not check constraints of model. Very insecure!");
 
@@ -132,6 +138,7 @@ public class ClaOption {
 
       debugEvent = cmd.hasOption("debugEvent");
       lazyModelCheck = cmd.hasOption("lazyModelCheck");
+      docOutput = cmd.hasOption("doc");
 
       return true;
     } catch (ParseException e) {
