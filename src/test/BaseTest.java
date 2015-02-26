@@ -49,9 +49,9 @@ abstract public class BaseTest {
     switch (steps) {
       case EXECUTE:
         execute = true;
-      case COMPILE_TO_BIN:
+      case COMPILE_TESTCASE:
         compileBinary = true;
-      case COMPILE_TO_ASM:
+      case COMPILE_TO_LIB:
         compileNative = true;
     }
 

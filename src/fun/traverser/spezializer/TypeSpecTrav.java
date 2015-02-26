@@ -19,6 +19,7 @@ package fun.traverser.spezializer;
 
 import java.util.Map;
 
+import fun.Copy;
 import fun.expression.Expression;
 import fun.expression.reference.DummyLinkTarget;
 import fun.expression.reference.Reference;
@@ -45,7 +46,7 @@ public class TypeSpecTrav extends ExprReplacer<Map<TemplateParameter, ActualTemp
       if (repl instanceof Type) {
         return new Reference(obj.getInfo(), (Type) repl);
       } else {
-        return (Expression) repl;
+        return Copy.copy((Expression) repl);
       }
     } else {
       assert (!(obj.getLink() instanceof TemplateParameter));

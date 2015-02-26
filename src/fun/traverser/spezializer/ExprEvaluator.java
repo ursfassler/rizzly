@@ -30,17 +30,17 @@ import fun.expression.AnyValue;
 import fun.expression.ArithmeticOp;
 import fun.expression.BoolValue;
 import fun.expression.Expression;
+import fun.expression.NamedElementsValue;
+import fun.expression.NamedValue;
 import fun.expression.Number;
 import fun.expression.Relation;
 import fun.expression.StringValue;
 import fun.expression.TupleValue;
 import fun.expression.UnaryExpression;
 import fun.expression.reference.RefCall;
-import fun.expression.reference.RefItem;
 import fun.expression.reference.RefName;
 import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.Reference;
-import fun.function.FuncFunction;
 import fun.knowledge.KnowledgeBase;
 import fun.other.ActualTemplateArgument;
 import fun.other.FunList;
@@ -49,6 +49,7 @@ import fun.traverser.Memory;
 import fun.type.Type;
 import fun.variable.ConstGlobal;
 import fun.variable.ConstPrivate;
+import fun.variable.Constant;
 import fun.variable.FuncVariable;
 import fun.variable.TemplateParameter;
 
@@ -70,28 +71,6 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
       Expression expr = expList.get(i);
       expr = (Expression) visit(expr, param);
       expList.set(i, expr);
-    }
-  }
-
-  private Fun executeRef(Fun obj, RefItem param, Memory memory) {
-    if (param instanceof RefTemplCall) {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Can not evaluate template");
-      return null;
-    } else if (param instanceof RefCall) {
-      // TODO add execution of type cast (see casual/ctfeCast.rzy)
-      RError.ass(obj instanceof FuncFunction, obj.getInfo(), "expected funtion, got " + obj.getClass().getName());
-      FuncFunction func = (FuncFunction) obj;
-      return StmtExecutor.process(func, ((RefCall) param).getActualParameter().getValue(), new Memory(), kb);
-      // } else if (param instanceof RefIndex) {
-      // Variable var = (Variable) obj;
-      // Expression value = memory.get(var);
-      //
-      // Expression idx = (Expression) visit(((RefIndex) param).getIndex(), memory);
-      // Expression elem = ElementGetter.INSTANCE.traverse(idx, value);
-      //
-      // return elem;
-    } else {
-      throw new RuntimeException("Dont know what to do with: " + param.getClass().getCanonicalName());
     }
   }
 
@@ -124,6 +103,14 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
   }
 
   @Override
+  protected ActualTemplateArgument visitNamedElementsValue(NamedElementsValue obj, Memory param) {
+    for (NamedValue itr : obj.getValue()) {
+      itr.setValue((Expression) visit(itr.getValue(), param));
+    }
+    return obj;
+  }
+
+  @Override
   protected ActualTemplateArgument visitAnyValue(AnyValue obj, Memory param) {
     return obj;
   }
@@ -135,6 +122,11 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
 
   @Override
   protected Expression visitStringValue(StringValue obj, Memory param) {
+    return obj;
+  }
+
+  @Override
+  protected ActualTemplateArgument visitBoolValue(BoolValue obj, Memory param) {
     return obj;
   }
 
@@ -163,14 +155,13 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
 
   @Override
   protected ActualTemplateArgument visitReference(Reference obj, Memory param) {
-
-    Fun item = obj.getLink();
-
-    for (RefItem itr : obj.getOffset()) {
-      item = executeRef(item, itr, param);
+    // TODO move constant evaluation to another place
+    if (obj.getLink() instanceof Constant) {
+      Constant cst = (Constant) obj.getLink();
+      ActualTemplateArgument eco = visit(cst.getDef(), param);
+      cst.setDef((Expression) eco);
     }
-
-    return visit(item, param);
+    return visit(RefEvaluator.execute(obj, param, kb), param);
   }
 
   @Override

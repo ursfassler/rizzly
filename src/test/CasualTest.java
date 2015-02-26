@@ -33,42 +33,42 @@ public class CasualTest extends BaseTest {
 
   @Test
   public void tuple2() {
-    compile("tuple2", TestSteps.COMPILE_TO_LLVM, false, false);
+    compile("tuple2", TestSteps.COMPILE_TO_C, false, false);
   }
 
   @Test
   public void mulret1() {
-    compile("mulret1", TestSteps.COMPILE_TO_LLVM, false, false);
+    compile("mulret1", TestSteps.COMPILE_TO_C, false, false);
   }
 
   @Test
   public void mulret2() {
-    compile("mulret2", TestSteps.COMPILE_TO_LLVM, false, false);
+    compile("mulret2", TestSteps.COMPILE_TO_C, false, false);
   }
 
   @Test
   public void mulret3() {
-    compile("mulret3", TestSteps.COMPILE_TO_LLVM, false, false);
+    compile("mulret3", TestSteps.COMPILE_TO_C, false, false);
   }
 
   @Test
   public void mulret4() {
-    compile("mulret4", TestSteps.COMPILE_TO_LLVM, false, false);
+    compile("mulret4", TestSteps.COMPILE_TO_C, false, false);
   }
 
   @Test
   public void mulret5() {
-    compile("mulret5", TestSteps.COMPILE_TO_LLVM, false, false);
+    compile("mulret5", TestSteps.COMPILE_TO_C, false, false);
   }
 
   @Test
   public void ctfeCast() {
-    compile("ctfeCast", TestSteps.COMPILE_TO_LLVM, false, false);
+    compile("ctfeCast", TestSteps.COMPILE_TO_C, false, false);
   }
 
   @Test
   public void subrespLink() {
-    compile("subrespLink", TestSteps.COMPILE_TO_LLVM, false, false);
+    compile("subrespLink", TestSteps.COMPILE_TO_C, false, false);
   }
 
   @Test
@@ -139,17 +139,17 @@ public class CasualTest extends BaseTest {
 
   @Test
   public void generic() {
-    compile("generic", TestSteps.COMPILE_TO_ASM, false, false);
+    compile("generic", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test
   public void smallGenericUse() {
-    compile("smallGenericUse", TestSteps.COMPILE_TO_ASM, false, false);
+    compile("smallGenericUse", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test
   public void linkorder() {
-    compile("linkorder", TestSteps.COMPILE_TO_ASM, false, false);
+    compile("linkorder", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test
@@ -164,7 +164,7 @@ public class CasualTest extends BaseTest {
 
   @Test
   public void composition2() {
-    compile("composition2", TestSteps.COMPILE_TO_ASM, false, false);
+    compile("composition2", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test
@@ -179,7 +179,7 @@ public class CasualTest extends BaseTest {
 
   @Test
   public void typefunc() {
-    compile("typefunc", TestSteps.COMPILE_TO_ASM, false, false);
+    compile("typefunc", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test
@@ -205,22 +205,22 @@ public class CasualTest extends BaseTest {
 
   @Test
   public void varInit() {
-    compile("varInit", TestSteps.COMPILE_TO_PIR, false, false);
+    compile("varInit", TestSteps.COMPILE_TO_C, false, false);
   }
 
   @Test
   public void typeAlias1() {
-    compile("typeAlias1", TestSteps.COMPILE_TO_ASM, false, false);
+    compile("typeAlias1", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test
   public void typeAlias2() {
-    compile("typeAlias2", TestSteps.COMPILE_TO_ASM, false, false);
+    compile("typeAlias2", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test
   public void typeAlias3() {
-    compile("typeAlias3", TestSteps.COMPILE_TO_ASM, false, false);
+    compile("typeAlias3", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test
@@ -230,27 +230,27 @@ public class CasualTest extends BaseTest {
 
   @Test
   public void linkorder2() {
-    compile("linkorder2", TestSteps.COMPILE_TO_ASM, false, false);
+    compile("linkorder2", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test
   public void genIface() {
-    compile("genIface", TestSteps.COMPILE_TO_BIN, false, true);
+    compile("genIface", TestSteps.COMPILE_TESTCASE, false, true);
   }
 
   @Test
   public void constInit() {
-    compile("constInit", TestSteps.COMPILE_TO_LLVM, false, false);
+    compile("constInit", TestSteps.COMPILE_TO_C, false, false);
   }
 
   @Test
   public void constfunc() {
-    compile("constfunc", TestSteps.COMPILE_TO_LLVM, false, false);
+    compile("constfunc", TestSteps.COMPILE_TO_C, false, false);
   }
 
   @Test
   public void constInit2() {
-    compile("constInit2", TestSteps.COMPILE_TO_LLVM, false, false);
+    compile("constInit2", TestSteps.COMPILE_TO_C, false, false);
   }
 
   @Test
@@ -265,18 +265,18 @@ public class CasualTest extends BaseTest {
 
   @Test
   public void constInit5() {
-    compile("constInit5", TestSteps.COMPILE_TO_ASM, false, false);
+    compile("constInit5", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   // TODO add test case
   @Test
   public void constInit6() {
-    compile("constInit6", TestSteps.COMPILE_TO_ASM, false, false);
+    compile("constInit6", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test
   public void alarmController() {
-    compile("alarmController", TestSteps.COMPILE_TO_ASM, false, false);
+    compile("alarmController", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test
@@ -306,82 +306,82 @@ public class CasualTest extends BaseTest {
 
   @Test
   public void union1() {
-    compile("union1", TestSteps.COMPILE_TO_ASM, false, false);// TODO make testcase
+    compile("union1", TestSteps.COMPILE_TO_LIB, false, false);// TODO make testcase
   }
 
   @Test
   public void union2() {
-    compile("union2", TestSteps.COMPILE_TO_ASM, false, false);// TODO make testcase
+    compile("union2", TestSteps.COMPILE_TO_LIB, false, false);// TODO make testcase
   }
 
   @Test
   public void union3() {
-    compile("union3", TestSteps.COMPILE_TO_ASM, false, false);// TODO make testcase
+    compile("union3", TestSteps.COMPILE_TO_LIB, false, false);// TODO make testcase
   }
 
   @Test
   public void union4() {
-    compile("union4", TestSteps.COMPILE_TO_ASM, false, false);// TODO make testcase
+    compile("union4", TestSteps.COMPILE_TO_LIB, false, false);// TODO make testcase
   }
 
   @Test
   public void unionTest() {
-    compile("unionTest", TestSteps.COMPILE_TO_ASM, false, false); // TODO make testcase
+    compile("unionTest", TestSteps.COMPILE_TO_LIB, false, false); // TODO make testcase
   }
 
   @Test
   public void typedConst() {
-    compile("typedConst", TestSteps.COMPILE_TO_PIR, false, false);
+    compile("typedConst", TestSteps.COMPILE_TO_C, false, false);
   }
 
   @Test
   public void constdef() {
-    compile("constdef", TestSteps.COMPILE_TO_PIR, false, false);
+    compile("constdef", TestSteps.COMPILE_TO_C, false, false);
   }
 
   @Test
   public void constdef2() {
-    compile("constdef2", TestSteps.COMPILE_TO_PIR, false, false);
+    compile("constdef2", TestSteps.COMPILE_TO_C, false, false);
   }
 
   @Test
   public void extConst() {
-    compile("extConst", TestSteps.COMPILE_TO_PIR, false, false);
+    compile("extConst", TestSteps.COMPILE_TO_C, false, false);
   }
 
   @Test
   public void genericUse2() {
-    compile("genericUse2", TestSteps.COMPILE_TO_PIR, false, false);
+    compile("genericUse2", TestSteps.COMPILE_TO_C, false, false);
   }
 
   @Test
   public void genericUse() {
-    compile("genericUse", TestSteps.COMPILE_TO_PIR, false, false);
+    compile("genericUse", TestSteps.COMPILE_TO_C, false, false);
   }
 
   @Test
   public void elementary1() {
-    compile("elementary1", TestSteps.COMPILE_TO_ASM, false, false);
+    compile("elementary1", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test
   public void elementary2() {
-    compile("elementary2", TestSteps.COMPILE_TO_BIN, false, false);
+    compile("elementary2", TestSteps.COMPILE_TESTCASE, false, false);
   }
 
   @Test
   public void elementary3() {
-    compile("elementary3", TestSteps.COMPILE_TO_BIN, false, false);
+    compile("elementary3", TestSteps.COMPILE_TESTCASE, false, false);
   }
 
   @Test
   public void elementary4() {
-    compile("elementary4", TestSteps.COMPILE_TO_BIN, false, false);
+    compile("elementary4", TestSteps.COMPILE_TESTCASE, false, false);
   }
 
   @Test
   public void bitred() {
-    compile("bitred", TestSteps.COMPILE_TO_ASM, false, false);
+    compile("bitred", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test
@@ -391,27 +391,27 @@ public class CasualTest extends BaseTest {
 
   @Test
   public void param() {
-    compile("param", TestSteps.COMPILE_TO_LLVM, false, false);
+    compile("param", TestSteps.COMPILE_TO_C, false, false);
   }
 
   @Test
   public void emptyElse() {
-    compile("emptyElse", TestSteps.COMPILE_TO_LLVM, false, false);
+    compile("emptyElse", TestSteps.COMPILE_TO_C, false, false);
   }
 
   @Test
   public void saturate() {
-    compile("saturate", TestSteps.COMPILE_TO_LLVM, false, true);
+    compile("saturate", TestSteps.COMPILE_TO_C, false, true);
   }
 
   @Test
   public void range2() {
-    compile("range2", TestSteps.COMPILE_TO_LLVM, false, true);
+    compile("range2", TestSteps.COMPILE_TO_C, false, true);
   }
 
   @Test
   public void range3() {
-    compile("range3", TestSteps.COMPILE_TO_LLVM, false, true);
+    compile("range3", TestSteps.COMPILE_TO_C, false, true);
   }
 
   @Test
@@ -426,7 +426,7 @@ public class CasualTest extends BaseTest {
 
   @Test
   public void funcStruct() {
-    compile("funcStruct", TestSteps.COMPILE_TO_ASM, false, true);
+    compile("funcStruct", TestSteps.COMPILE_TO_LIB, false, true);
   }
 
   @Test
@@ -436,12 +436,12 @@ public class CasualTest extends BaseTest {
 
   @Test
   public void boolext() {
-    compile("boolext", TestSteps.COMPILE_TO_ASM, false, false);
+    compile("boolext", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test
   public void array1() {
-    compile("array1", TestSteps.COMPILE_TO_ASM, false, false);
+    compile("array1", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test

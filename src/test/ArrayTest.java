@@ -27,6 +27,11 @@ public class ArrayTest extends BaseTest {
   }
 
   @Test
+  public void arrayInit1() {
+    compile("arrayInit1", TestSteps.COMPILE_TO_LIB, false, false);
+  }
+
+  @Test
   public void copy1() {
     compile("copy1", "Copy", true, false, false);
   }
@@ -73,7 +78,7 @@ public class ArrayTest extends BaseTest {
 
   @Test
   public void arrayTest7() {
-    compile("arrayTest7", TestSteps.COMPILE_TO_ASM, false, false);
+    compile("arrayTest7", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test

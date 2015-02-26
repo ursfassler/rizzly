@@ -340,8 +340,6 @@ public abstract class Traverser<R, P> {
       return visitFuncIfaceOutRet((FuncCtrlOutDataIn) obj, param);
     } else if (obj instanceof FuncCtrlOutDataOut) {
       return visitFuncIfaceOutVoid((FuncCtrlOutDataOut) obj, param);
-    } else if (obj instanceof Function) {
-      return visitFunction(obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }

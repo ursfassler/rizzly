@@ -1,0 +1,12 @@
+// Wrong array index type
+
+Err7 = Component
+  get: response( idx: R{0,3} ):R{0,10};
+elementary
+  a : Array{3,R{0,10}} = (0, 0, 0);
+  
+  get: response( idx: R{0,3} ):R{0,10}
+    return a[idx];
+  end
+end
+

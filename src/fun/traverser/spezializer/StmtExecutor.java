@@ -17,24 +17,21 @@
 
 package fun.traverser.spezializer;
 
-import java.util.LinkedList;
 import java.util.List;
 
 import common.ElementInfo;
 
-import error.ErrorType;
 import error.RError;
+import fun.Copy;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.expression.AnyValue;
 import fun.expression.BoolValue;
 import fun.expression.Expression;
 import fun.expression.TupleValue;
-import fun.expression.reference.RefCall;
-import fun.expression.reference.RefItem;
-import fun.expression.reference.RefName;
 import fun.expression.reference.Reference;
 import fun.function.FuncFunction;
+import fun.knowledge.KnowEmptyValue;
 import fun.knowledge.KnowledgeBase;
 import fun.other.FunList;
 import fun.statement.Assignment;
@@ -47,6 +44,7 @@ import fun.statement.Statement;
 import fun.statement.VarDefStmt;
 import fun.statement.While;
 import fun.traverser.Memory;
+import fun.type.Type;
 import fun.variable.FuncVariable;
 import fun.variable.Variable;
 
@@ -125,8 +123,12 @@ public class StmtExecutor extends NullTraverser<Expression, Memory> {
 
     for (Variable var : obj.getVariable()) {
       param.createVar(var);
-      if (!(value instanceof AnyValue)) {
-        param.set(var, value);
+      if (value instanceof AnyValue) {
+        Type type = (Type) var.getType().getLink();
+        Expression empty = kb.getEntry(KnowEmptyValue.class).get(type);
+        param.set(var, Copy.copy(empty));
+      } else {
+        param.set(var, Copy.copy(value));
       }
     }
 
@@ -158,34 +160,14 @@ public class StmtExecutor extends NullTraverser<Expression, Memory> {
   }
 
   private void assign(Reference lhs, Expression rhs, Memory param) {
+    rhs = Copy.copy(rhs);
+
     Variable var = (Variable) lhs.getLink();
+    Expression root = param.get(var);
 
-    if (lhs.getOffset().isEmpty()) {
-      param.set(var, rhs);
-      return;
-    }
-
-    Expression value = param.get(var);
-
-    LinkedList<RefItem> offset = new LinkedList<RefItem>();
-    for (RefItem itm : lhs.getOffset()) {
-      if (itm instanceof RefCall) {
-        FunList<Expression> val = ((RefCall) itm).getActualParameter().getValue();
-        RError.ass(val.size() == 1, itm.getInfo(), "expected exactly 1 argument, got " + val.size());
-        val.set(0, exeval(val.get(0), param));
-        itm = new RefCall(ElementInfo.NO, new TupleValue(itm.getInfo(), val));
-      } else if (itm instanceof RefName) {
-      } else {
-        RError.err(ErrorType.Fatal, itm.getInfo(), "unexpected item: " + itm);
-      }
-
-      offset.add(itm);
-    }
-
-    RefItem last = offset.pollLast();
-    Expression elem = ElementGetter.get(value, offset);
-
-    ElementSetter.set(elem, last, rhs);
+    Fun lvalue = RefEvaluator.execute(root, lhs.getOffset(), param, kb);
+    root = ValueReplacer.set(root, (Expression) lvalue, rhs);
+    param.set(var, root);
   }
 
   @Override

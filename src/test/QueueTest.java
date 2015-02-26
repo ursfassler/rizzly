@@ -38,12 +38,12 @@ public class QueueTest extends BaseTest {
 
   @Test
   public void simple() {
-    compile("simple", TestSteps.COMPILE_TO_ASM, false, false);
+    compile("simple", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test
   public void simple2() {
-    compile("simple2", TestSteps.COMPILE_TO_ASM, false, false);
+    compile("simple2", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test

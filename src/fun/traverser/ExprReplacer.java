@@ -189,6 +189,7 @@ public class ExprReplacer<T> extends DefTraverser<Expression, T> {
 
   @Override
   protected Expression visitVarDefStmt(VarDefStmt obj, T param) {
+    visitList(obj.getVariable(), param);
     obj.setInitial(visit(obj.getInitial(), param));
     return null;
   }

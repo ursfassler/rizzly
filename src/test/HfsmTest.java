@@ -43,7 +43,7 @@ public class HfsmTest extends BaseTest {
 
   @Test
   public void query2() {
-    compile("query2", TestSteps.COMPILE_TO_ASM, false, false);
+    compile("query2", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test
@@ -58,12 +58,12 @@ public class HfsmTest extends BaseTest {
 
   @Test
   public void unusedState() {
-    compile("unusedState", TestSteps.COMPILE_TO_PIR, false, false); // TODO check for warnings
+    compile("unusedState", TestSteps.COMPILE_TO_C, false, false); // TODO check for warnings
   }
 
   @Test
   public void stateVariable2() {
-    compile("stateVariable2", TestSteps.COMPILE_TO_ASM, false, false);
+    compile("stateVariable2", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test

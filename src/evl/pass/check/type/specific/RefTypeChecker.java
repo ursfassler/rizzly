@@ -37,6 +37,7 @@ import evl.type.Type;
 import evl.type.base.ArrayType;
 import evl.type.base.EnumType;
 import evl.type.base.FunctionType;
+import evl.type.base.RangeType;
 
 //TODO check if this class does not too much (i.e. check and return type)
 public class RefTypeChecker extends NullTraverser<Type, Type> {
@@ -115,8 +116,9 @@ public class RefTypeChecker extends NullTraverser<Type, Type> {
   protected Type visitRefIndex(RefIndex obj, Type sub) {
     Type index = kt.get(obj.getIndex());
     if (sub instanceof ArrayType) {
-      if (!kc.get(kbi.getIntegerType(), index)) {
-        RError.err(ErrorType.Error, obj.getInfo(), "need integer type to index array, got: " + index.getName());
+      RangeType ait = kbi.getRangeType(((ArrayType) sub).getSize().intValue());
+      if (!kc.get(ait, index)) {
+        RError.err(ErrorType.Error, obj.getInfo(), "array index type is " + ait.getName() + ", got " + index.getName());
       }
       return ((ArrayType) sub).getType().getLink();
     } else {

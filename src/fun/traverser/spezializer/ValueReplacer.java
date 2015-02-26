@@ -15,8 +15,27 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package test;
+package fun.traverser.spezializer;
 
-public enum TestSteps {
-  COMPILE_TO_FUN, COMPILE_TO_EVL, COMPILE_TO_C, COMPILE_TO_LIB, COMPILE_TESTCASE, EXECUTE
+import util.Pair;
+import fun.Fun;
+import fun.expression.Expression;
+import fun.traverser.ExprReplacer;
+
+public class ValueReplacer extends ExprReplacer<Pair<Expression, Expression>> {
+  static final private ValueReplacer INSTANCE = new ValueReplacer();
+
+  static public Expression set(Expression root, Expression oldValue, Expression newValue) {
+    return INSTANCE.traverse(root, new Pair<Expression, Expression>(oldValue, newValue));
+  }
+
+  @Override
+  protected Expression visit(Fun obj, Pair<Expression, Expression> param) {
+    if (obj == param.first) {
+      return param.second;
+    } else {
+      return super.visit(obj, param);
+    }
+  }
+
 }

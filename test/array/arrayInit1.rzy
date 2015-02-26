@@ -1,0 +1,18 @@
+
+arrayInit{N: Natural; T: Type} = function(init: T):Array{N, T}
+  res : Array{N, T};
+  i : R{0, N+1} = 0;
+  
+  while i < N do
+    res[i] := init;
+    i := R{0, N+1}( i + 1 );
+  end
+  
+  return res;
+end
+
+ArrayInit1 = Component
+elementary
+  aconfig : Array{10, R{0,20}} = arrayInit{10,R{0,20}}( 15 );
+end
+
