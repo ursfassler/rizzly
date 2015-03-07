@@ -34,6 +34,7 @@ import fun.statement.CaseStmt;
 import fun.statement.IfOption;
 import fun.statement.IfStmt;
 import fun.statement.ReturnExpr;
+import fun.statement.ReturnVoid;
 import fun.statement.VarDefStmt;
 import fun.statement.While;
 
@@ -85,6 +86,11 @@ public class FunToEvlStmt extends NullTraverser<Statement, Void> {
   @Override
   protected Statement visitReturnExpr(ReturnExpr obj, Void param) {
     return new evl.statement.ReturnExpr(obj.getInfo(), (Expression) fta.traverse(obj.getExpr(), null));
+  }
+
+  @Override
+  protected Statement visitReturnVoid(ReturnVoid obj, Void param) {
+    return new evl.statement.ReturnVoid(obj.getInfo());
   }
 
   @Override

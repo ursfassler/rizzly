@@ -429,7 +429,7 @@ class CopyFun extends Traverser<Fun, Void> {
 
   @Override
   protected Fun visitReturnVoid(ReturnVoid obj, Void param) {
-    throw new RuntimeException("not yet implemented");
+    return new ReturnVoid(obj.getInfo());
   }
 
   @Override
