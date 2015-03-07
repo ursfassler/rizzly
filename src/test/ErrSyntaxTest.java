@@ -39,4 +39,19 @@ public class ErrSyntaxTest extends ErrorTest {
   public void err3() {
     testForError("err3", "Err3", "Expected name, got keyword R");
   }
+
+  @Test
+  public void err4() {
+    testForError("err4", "Err4", "");
+  }
+
+  @Test
+  public void err5() {
+    testForError("err5", "Err5", "");
+  }
+
+  @Test
+  public void err6() {
+    testForError("err6", "Err6", "");
+  }
 }

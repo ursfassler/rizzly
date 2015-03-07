@@ -1,0 +1,12 @@
+
+Err6 = Component
+  test : slot(x: R{0,10});
+
+elementary
+  buffer  : Array{10, R{0,10}} = ();
+  
+  test : slot(x: R{0,10})
+    buffer[3] := x;
+  end
+end
+
