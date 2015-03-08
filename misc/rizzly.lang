@@ -89,6 +89,7 @@
       <keyword>shr</keyword>
       <keyword>shl</keyword>
 
+      <keyword>default</keyword>
       
       <keyword>Boolean</keyword>
       <keyword>Void</keyword>

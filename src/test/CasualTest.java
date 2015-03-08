@@ -32,6 +32,11 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  public void defaultInit() {
+    compile("defaultInit", TestSteps.COMPILE_TO_C, false, false);
+  }
+
+  @Test
   public void tuple2() {
     compile("tuple2", TestSteps.COMPILE_TO_C, false, false);
   }

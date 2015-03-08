@@ -21,11 +21,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import pass.Condition;
 import pass.EvlPass;
 
 import common.Designator;
 
 import debug.DebugPrinter;
+import error.RError;
 import evl.Evl;
 import evl.hfsm.reduction.EntryExitUpdater;
 import evl.hfsm.reduction.FsmReduction;
@@ -222,9 +224,17 @@ public class MainEvl {
   }
 
   public static void process(PassItem item, Designator prefix, DebugPrinter dp, Namespace evl, KnowledgeBase kb) {
+    for (Condition cond : item.pass.getPrecondition()) {
+      RError.ass(cond.check(evl, kb), item.getName() + ": precondition does not hold: " + cond.getName());
+    }
+
     prefix = new Designator(prefix, item.getName());
     item.pass.process(evl, kb);
     dp.print(prefix.toString("."));
+
+    for (Condition cond : item.pass.getPostcondition()) {
+      RError.ass(cond.check(evl, kb), item.getName() + ": postcondition does not hold: " + cond.getName());
+    }
   }
 
   @SuppressWarnings("unused")

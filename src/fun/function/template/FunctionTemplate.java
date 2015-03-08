@@ -15,43 +15,30 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fun.expression;
+package fun.function.template;
 
 import common.ElementInfo;
 
+import fun.FunBase;
+import fun.expression.reference.Reference;
 import fun.other.FunList;
+import fun.variable.TemplateParameter;
 
-public class TupleValue extends Expression {
-  final private FunList<Expression> value;
+public abstract class FunctionTemplate extends FunBase {
 
-  public TupleValue(ElementInfo info) {
+  public FunctionTemplate(ElementInfo info) {
     super(info);
-    this.value = new FunList<Expression>();
   }
 
-  public TupleValue(ElementInfo info, FunList<Expression> value) {
-    super(info);
-    this.value = value;
+  abstract public FunList<TemplateParameter> makeParam();
+
+  abstract public String getName();
+
+  static protected TemplateParameter inst(String name, String type) {
+    return new TemplateParameter(ElementInfo.NO, name, new Reference(ElementInfo.NO, type));
   }
 
-  public FunList<Expression> getValue() {
-    return value;
-  }
-
-  @Override
-  public String toString() {
-    String ret = "";
-    ret += "(";
-    boolean first = true;
-    for (Expression gen : value) {
-      if (first) {
-        first = false;
-      } else {
-        ret += ",";
-      }
-      ret += gen.toString();
-    }
-    ret += ")";
-    return ret;
+  protected static TemplateParameter inst(String name, Reference type) {
+    return new TemplateParameter(ElementInfo.NO, name, type);
   }
 }

@@ -17,6 +17,7 @@
 
 package fun.knowledge;
 
+import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -25,9 +26,15 @@ import common.ElementInfo;
 import fun.Copy;
 import fun.Fun;
 import fun.NullTraverser;
-import fun.expression.AnyValue;
+import fun.expression.BoolValue;
 import fun.expression.Expression;
+import fun.expression.NamedElementsValue;
+import fun.expression.NamedValue;
+import fun.expression.Number;
+import fun.expression.StringValue;
 import fun.expression.TupleValue;
+import fun.expression.reference.RefName;
+import fun.expression.reference.Reference;
 import fun.other.FunList;
 import fun.type.Type;
 import fun.type.base.BooleanType;
@@ -35,6 +42,8 @@ import fun.type.base.EnumType;
 import fun.type.base.IntegerType;
 import fun.type.base.NaturalType;
 import fun.type.base.StringType;
+import fun.type.composed.NamedElement;
+import fun.type.composed.RecordType;
 import fun.type.template.Array;
 import fun.type.template.Range;
 
@@ -64,32 +73,42 @@ class KnowEmptyValueGenerator extends NullTraverser<Expression, Void> {
 
   @Override
   protected Expression visitBooleanType(BooleanType obj, Void param) {
-    return new AnyValue(ElementInfo.NO);
+    return new BoolValue(ElementInfo.NO, false);
   }
 
   @Override
   protected Expression visitStringType(StringType obj, Void param) {
-    return new AnyValue(ElementInfo.NO);
+    return new StringValue(ElementInfo.NO, "");
   }
 
   @Override
   protected Expression visitEnumType(EnumType obj, Void param) {
-    return new AnyValue(ElementInfo.NO);
+    Reference ref = new Reference(ElementInfo.NO, obj);
+    ref.getOffset().add(new RefName(ElementInfo.NO, obj.getElement().get(0).getName()));
+    return ref;
   }
 
   @Override
   protected Expression visitIntegerType(IntegerType obj, Void param) {
-    return new AnyValue(ElementInfo.NO);
+    return new fun.expression.Number(ElementInfo.NO, BigInteger.ZERO);
   }
 
   @Override
   protected Expression visitNaturalType(NaturalType obj, Void param) {
-    return new AnyValue(ElementInfo.NO);
+    return new fun.expression.Number(ElementInfo.NO, BigInteger.ZERO);
   }
 
   @Override
   protected Expression visitRange(Range obj, Void param) {
-    return new AnyValue(ElementInfo.NO);
+    BigInteger val;
+    if (obj.getHigh().compareTo(BigInteger.ZERO) < 0) {
+      val = obj.getHigh();
+    } else if (obj.getLow().compareTo(BigInteger.ZERO) > 0) {
+      val = obj.getLow();
+    } else {
+      val = BigInteger.ZERO;
+    }
+    return new Number(ElementInfo.NO, val);
   }
 
   @Override
@@ -101,4 +120,16 @@ class KnowEmptyValueGenerator extends NullTraverser<Expression, Void> {
     }
     return new TupleValue(ElementInfo.NO, tv);
   }
+
+  @Override
+  protected Expression visitRecordType(RecordType obj, Void param) {
+    FunList<NamedValue> value = new FunList<NamedValue>();
+
+    for (NamedElement elem : obj.getElement()) {
+      value.add(new NamedValue(ElementInfo.NO, elem.getName(), visit(elem.getType().getLink(), param)));
+    }
+
+    return new NamedElementsValue(ElementInfo.NO, value);
+  }
+
 }

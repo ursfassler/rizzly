@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import pass.EvlPass;
+import pass.NoItem;
 import util.Pair;
 
 import common.Direction;
@@ -73,6 +74,12 @@ import evl.variable.FuncVariable;
 import evl.variable.Variable;
 
 public class CompositionReduction extends EvlPass {
+  public CompositionReduction() {
+    postcondition.add(new NoItem(Connection.class));
+    postcondition.add(new NoItem(EndpointSelf.class));
+    postcondition.add(new NoItem(EndpointSub.class));
+    postcondition.add(new NoItem(ImplComposition.class));
+  }
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {

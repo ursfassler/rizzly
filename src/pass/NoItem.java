@@ -17,31 +17,30 @@
 
 package pass;
 
-import java.util.HashSet;
-import java.util.Set;
-
+import evl.EvlBase;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
+import evl.traverser.ClassGetter;
 
-public abstract class EvlPass {
-  /*
-   * Condition may be something like NoClass( Integer )
-   * 
-   * or TypeChecked, Linked, Reduced
-   * 
-   * or MostClass( Namespace, 1 )
-   */
+public class NoItem extends Condition {
+  final private Class<? extends EvlBase> type;
 
-  protected final Set<Condition> precondition = new HashSet<Condition>();
-  protected final Set<Condition> postcondition = new HashSet<Condition>();
-
-  public Set<Condition> getPrecondition() {
-    return precondition;
+  public NoItem(Class<? extends EvlBase> type) {
+    super();
+    this.type = type;
   }
 
-  public Set<Condition> getPostcondition() {
-    return postcondition;
+  public Class<? extends EvlBase> getType() {
+    return type;
   }
 
-  public abstract void process(Namespace evl, KnowledgeBase kb);
+  @Override
+  public boolean check(Namespace root, KnowledgeBase kb) {
+    return ClassGetter.get(type, root).isEmpty();
+  }
+
+  @Override
+  public String getName() {
+    return "NoItem<" + type.getName() + ">";
+  }
 }

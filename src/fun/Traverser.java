@@ -52,6 +52,8 @@ import fun.function.FuncReturnTuple;
 import fun.function.FuncReturnType;
 import fun.function.FuncSignal;
 import fun.function.FuncSlot;
+import fun.function.template.DefaultValueTemplate;
+import fun.function.template.FunctionTemplate;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.State;
 import fun.hfsm.StateComposite;
@@ -166,6 +168,8 @@ public abstract class Traverser<R, P> {
       return visitDummyLinkTarget((DummyLinkTarget) obj, param);
     } else if (obj instanceof TypeTemplate) {
       return visitTypeTemplate((TypeTemplate) obj, param);
+    } else if (obj instanceof FunctionTemplate) {
+      return visitFunctionTemplate((FunctionTemplate) obj, param);
     } else if (obj instanceof FuncReturn) {
       return visitFuncReturn((FuncReturn) obj, param);
     } else if (obj instanceof NamedValue) {
@@ -357,6 +361,14 @@ public abstract class Traverser<R, P> {
     }
   }
 
+  protected R visitFunctionTemplate(FunctionTemplate obj, P param) {
+    if (obj instanceof DefaultValueTemplate) {
+      return visitDefaultValueTemplate((DefaultValueTemplate) obj, param);
+    } else {
+      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
+  }
+
   protected R visitTypeTemplate(TypeTemplate obj, P param) {
     if (obj instanceof ArrayTemplate) {
       return visitArrayTemplate((ArrayTemplate) obj, param);
@@ -498,6 +510,8 @@ public abstract class Traverser<R, P> {
   abstract protected R visitConnection(Connection obj, P param);
 
   abstract protected R visitNamedElement(NamedElement obj, P param);
+
+  abstract protected R visitDefaultValueTemplate(DefaultValueTemplate obj, P param);
 
   abstract protected R visitNaturalType(NaturalType obj, P param);
 

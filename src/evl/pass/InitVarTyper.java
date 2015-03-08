@@ -18,6 +18,8 @@
 package evl.pass;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 import pass.EvlPass;
 import error.ErrorType;
@@ -165,6 +167,7 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
   @Override
   protected Expression visitRecordValue(RecordValue obj, Type param) {
     if (param instanceof RecordType) {
+      assert (obj.getType().getLink() == param);
       return obj; // we assume it is right
     } else {
       throw new RuntimeException("not yet implemented: " + param.getClass().getCanonicalName());
@@ -173,17 +176,36 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
 
   @Override
   protected Expression visitNamedElementsValue(NamedElementsValue obj, Type type) {
+    EvlList<NamedValue> value = obj.getValue();
     if (type instanceof RecordType) {
-      return new RecordValue(obj.getInfo(), obj.getValue(), new SimpleRef<Type>(obj.getInfo(), type));
+      Map<String, Type> eletype = getTypes(((RecordType) type).getElement());
+      for (NamedValue itm : value) {
+        Type et = eletype.get(itm.getName());
+        if (et == null) {
+          RError.err(ErrorType.Error, obj.getInfo(), "Record have no element named " + itm.getName());
+          return null;
+        }
+        itm.setValue(visit(itm.getValue(), et));
+      }
+      return new RecordValue(obj.getInfo(), value, new SimpleRef<Type>(obj.getInfo(), type));
     } else if ((type instanceof UnionType) || (type instanceof UnsafeUnionType)) {
-      if (obj.getValue().size() != 1) {
-        RError.err(ErrorType.Error, obj.getInfo(), "need exactly one entry for union type, got " + obj.getValue().size());
+      if (value.size() != 1) {
+        RError.err(ErrorType.Error, obj.getInfo(), "need exactly one entry for union type, got " + value.size());
         return null;
       }
-      return visit(obj.getValue().get(0), type);
+      return visit(value.get(0), type);
     } else {
       throw new RuntimeException("not yet implemented: " + type.getClass().getCanonicalName());
     }
+  }
+
+  private Map<String, Type> getTypes(EvlList<NamedElement> element) {
+    Map<String, Type> ret = new HashMap<String, Type>();
+    for (NamedElement elem : element) {
+      RError.ass(!ret.containsKey(elem.getName()), elem.getInfo(), "Entry with name " + elem.getName() + " already defined");
+      ret.put(elem.getName(), elem.getRef().getLink());
+    }
+    return ret;
   }
 
 }

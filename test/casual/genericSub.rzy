@@ -1,5 +1,5 @@
 GenericSub{T:Type{Any}} = Component
 elementary
-  sub: T;
+  sub: T = default{T}();
 end
 

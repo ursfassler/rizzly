@@ -17,31 +17,11 @@
 
 package pass;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
 
-public abstract class EvlPass {
-  /*
-   * Condition may be something like NoClass( Integer )
-   * 
-   * or TypeChecked, Linked, Reduced
-   * 
-   * or MostClass( Namespace, 1 )
-   */
+public abstract class Condition {
+  abstract public boolean check(Namespace root, KnowledgeBase kb);
 
-  protected final Set<Condition> precondition = new HashSet<Condition>();
-  protected final Set<Condition> postcondition = new HashSet<Condition>();
-
-  public Set<Condition> getPrecondition() {
-    return precondition;
-  }
-
-  public Set<Condition> getPostcondition() {
-    return postcondition;
-  }
-
-  public abstract void process(Namespace evl, KnowledgeBase kb);
+  abstract public String getName();
 }

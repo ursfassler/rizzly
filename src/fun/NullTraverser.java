@@ -45,6 +45,7 @@ import fun.function.FuncReturnTuple;
 import fun.function.FuncReturnType;
 import fun.function.FuncSignal;
 import fun.function.FuncSlot;
+import fun.function.template.DefaultValueTemplate;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
@@ -93,6 +94,11 @@ import fun.variable.TemplateParameter;
 abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   protected abstract R visitDefault(Fun obj, P param);
+
+  @Override
+  protected R visitDefaultValueTemplate(DefaultValueTemplate obj, P param) {
+    return visitDefault(obj, param);
+  }
 
   @Override
   protected R visitFuncReturnTuple(FuncReturnTuple obj, P param) {

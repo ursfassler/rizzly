@@ -1,0 +1,72 @@
+TheEnum = Enum
+  A;
+  B;
+  C;
+end
+
+TheRecord = Record
+  a: R{10,20};
+  b: Boolean;
+  c: Array{4,R{2,4}};
+end
+
+DefaultInit = Component
+  getA : response():Boolean;
+//  getB : response():TheEnum;
+  getC : response():R{-10,10};
+  getD : response():R{0,10};
+  getE : response():R{-10,0};
+  getF : response():R{-20,-10};
+  getG : response():R{10,20};
+  getH : response():Array{4,R{2,4}};
+  getI : response():TheRecord;
+  
+elementary
+  a : Boolean = default{Boolean}();
+//  b : TheEnum = default{TheEnum}();
+  c : R{-10,10} = default{R{-10,10}}();
+  d : R{0,10} = default{R{0,10}}();
+  e : R{-10,0} = default{R{-10,0}}();
+  f : R{-20,-10} = default{R{-20,-10}}();
+  g : R{10,20} = default{R{10,20}}();
+  h : Array{4,R{2,4}} = default{Array{4,R{2,4}}}();
+  i : TheRecord = default{TheRecord}();
+  
+  getA : response():Boolean
+    return a;
+  end
+  /*
+  getB : response():TheEnum
+    return b;
+  end
+  */
+  getC : response():R{-10,10}
+    return c;
+  end
+  
+  getD : response():R{0,10}
+    return d;
+  end
+  
+  getE : response():R{-10,0}
+    return e;
+  end
+  
+  getF : response():R{-20,-10}
+    return f;
+  end
+  
+  getG : response():R{10,20}
+    return g;
+  end
+  
+  getH : response():Array{4,R{2,4}}
+    return h;
+  end
+  
+  getI : response():TheRecord
+    return i;
+  end
+
+end      
+

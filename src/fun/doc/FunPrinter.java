@@ -62,6 +62,7 @@ import fun.function.FuncReturnTuple;
 import fun.function.FuncReturnType;
 import fun.function.FuncSignal;
 import fun.function.FuncSlot;
+import fun.function.template.DefaultValueTemplate;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.State;
 import fun.hfsm.StateComposite;
@@ -950,6 +951,12 @@ public class FunPrinter extends NullTraverser<Void, Void> {
     xw.wr("response");
     printFunctionHeader(obj);
     printFuncImpl(obj);
+    return null;
+  }
+
+  @Override
+  protected Void visitDefaultValueTemplate(DefaultValueTemplate obj, Void param) {
+    xw.wa(obj.getName(), getId(obj, param));
     return null;
   }
 

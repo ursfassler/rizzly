@@ -20,6 +20,7 @@ package evl.pass;
 import java.math.BigInteger;
 
 import pass.EvlPass;
+import pass.NoItem;
 import util.Range;
 import error.ErrorType;
 import error.RError;
@@ -49,6 +50,12 @@ import evl.type.base.RangeType;
  *
  */
 public class BitLogicCategorizer extends EvlPass {
+  public BitLogicCategorizer() {
+    postcondition.add(new NoItem(And.class));
+    postcondition.add(new NoItem(Or.class));
+    postcondition.add(new NoItem(Not.class));
+  }
+
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
     KnowType kt = kb.getEntry(KnowType.class);

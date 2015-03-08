@@ -36,25 +36,25 @@ import fun.type.template.RangeTemplate;
 import fun.type.template.TypeTemplate;
 import fun.type.template.TypeTypeTemplate;
 
-public class GenericSpecializer extends NullTraverser<Type, List<ActualTemplateArgument>> {
+public class TypeTemplateSpecializer extends NullTraverser<Type, List<ActualTemplateArgument>> {
   private final KnowledgeBase kb;
   private final KnowInstance ki;
   private final KnowBaseItem kbi;
 
-  public GenericSpecializer(KnowledgeBase kb) {
+  public TypeTemplateSpecializer(KnowledgeBase kb) {
     this.kb = kb;
     ki = kb.getEntry(KnowInstance.class);
     kbi = kb.getEntry(KnowBaseItem.class);
   }
 
+  public static Type process(TypeTemplate type, List<ActualTemplateArgument> genspec, KnowledgeBase kb) {
+    TypeTemplateSpecializer specializer = new TypeTemplateSpecializer(kb);
+    return specializer.traverse(type, genspec);
+  }
+
   @Override
   protected Type visitDefault(Fun obj, List<ActualTemplateArgument> param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
-  }
-
-  public static Type process(TypeTemplate type, List<ActualTemplateArgument> genspec, KnowledgeBase kb) {
-    GenericSpecializer specializer = new GenericSpecializer(kb);
-    return specializer.traverse(type, genspec);
   }
 
   @Override

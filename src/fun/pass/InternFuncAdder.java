@@ -15,43 +15,31 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package fun.expression;
+package fun.pass;
 
-import common.ElementInfo;
-
+import pass.FunPass;
+import fun.Fun;
+import fun.function.template.DefaultValueTemplate;
+import fun.function.template.FunctionTemplate;
+import fun.knowledge.KnowledgeBase;
 import fun.other.FunList;
+import fun.other.Namespace;
+import fun.other.Template;
 
-public class TupleValue extends Expression {
-  final private FunList<Expression> value;
-
-  public TupleValue(ElementInfo info) {
-    super(info);
-    this.value = new FunList<Expression>();
-  }
-
-  public TupleValue(ElementInfo info, FunList<Expression> value) {
-    super(info);
-    this.value = value;
-  }
-
-  public FunList<Expression> getValue() {
-    return value;
-  }
+public class InternFuncAdder extends FunPass {
 
   @Override
-  public String toString() {
-    String ret = "";
-    ret += "(";
-    boolean first = true;
-    for (Expression gen : value) {
-      if (first) {
-        first = false;
-      } else {
-        ret += ",";
-      }
-      ret += gen.toString();
-    }
-    ret += ")";
-    return ret;
+  public void process(Namespace root, KnowledgeBase kb) {
+    genTemplateFunctions(root.getChildren());
   }
+
+  private static void genTemplateFunctions(FunList<Fun> container) {
+    templ(new DefaultValueTemplate(), container);
+  }
+
+  private static void templ(FunctionTemplate tmpl, FunList<Fun> container) {
+    Template decl = new Template(tmpl.getInfo(), tmpl.getName(), tmpl.makeParam(), tmpl);
+    container.add(decl);
+  }
+
 }

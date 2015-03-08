@@ -109,7 +109,7 @@ public class ImplElementaryParser extends ImplBaseParser {
         return parseFuncDef(peek().getType(), name, false);
       }
       default: {
-        StateVariable var = parseVarDef2(StateVariable.class, name);
+        StateVariable var = parseStateVardef(name);
         expect(TokenType.SEMI);
         return var;
       }

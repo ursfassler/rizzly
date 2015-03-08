@@ -27,6 +27,7 @@ import fun.expression.Expression;
 import fun.expression.reference.BaseRef;
 import fun.expression.reference.RefTemplCall;
 import fun.expression.reference.Reference;
+import fun.function.template.FunctionTemplate;
 import fun.hfsm.State;
 import fun.hfsm.StateContent;
 import fun.knowledge.KnowInstance;
@@ -62,8 +63,9 @@ public class Specializer {
 
     if (inst == null) {
       if (templ instanceof TypeTemplate) {
-        inst = GenericSpecializer.process((TypeTemplate) templ, genspec, kb);
-        // TODO create clean name
+        inst = TypeTemplateSpecializer.process((TypeTemplate) templ, genspec, kb);
+      } else if (templ instanceof FunctionTemplate) {
+        inst = FunctionTemplateSpecializer.process((FunctionTemplate) templ, genspec, kb);
       } else {
         inst = Copy.copy(templ);
 
@@ -190,7 +192,7 @@ public class Specializer {
       assert (obj.getOffset().get(0) instanceof RefTemplCall);
 
       List<ActualTemplateArgument> actparam = ((RefTemplCall) obj.getOffset().get(0)).getActualParameter();
-      return GenericSpecializer.process(generator, actparam, kb);
+      return TypeTemplateSpecializer.process(generator, actparam, kb);
     } else if (obj.getLink() instanceof Type) {
       assert (obj.getOffset().isEmpty());
       return obj.getLink();

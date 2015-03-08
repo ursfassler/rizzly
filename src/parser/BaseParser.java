@@ -43,6 +43,7 @@ import fun.statement.Block;
 import fun.type.base.AnyType;
 import fun.variable.Constant;
 import fun.variable.FuncVariable;
+import fun.variable.StateVariable;
 import fun.variable.TemplateParameter;
 import fun.variable.Variable;
 import fun.variable.VariableFactory;
@@ -139,6 +140,14 @@ public class BaseParser extends Parser {
     return ret;
   }
 
+  // EBNF stateVardef: typeref "=" expr
+  public StateVariable parseStateVardef(String name) {
+    Reference type = expr().parseRef();
+    expect(TokenType.EQUAL);
+    Expression init = expr().parse();
+    return new StateVariable(type.getInfo(), name, type, init);
+  }
+
   // EBNF objDef: id [ "{" vardef { ";" vardef } "}" ]
   protected Pair<Token, List<TemplateParameter>> parseObjDef() {
     Token name = expect(TokenType.IDENTIFIER);
@@ -193,12 +202,4 @@ public class BaseParser extends Parser {
     return VariableFactory.create(kind, info, name, type, value);
   }
 
-  // EBNF vardefMustinit: typeref "=" expr
-  public <T extends Variable> T parseVarDef2(Class<T> kind, String name) {
-    Reference type = expr().parseRef();
-    expect(TokenType.EQUAL);
-    Expression value = expr().parse();
-
-    return VariableFactory.create(kind, type.getInfo(), name, type, value);
-  }
 }

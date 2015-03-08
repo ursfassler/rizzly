@@ -63,4 +63,10 @@ public class RError {
       err(ErrorType.Assertion, info, "");
     }
   }
+
+  public static void ass(boolean condition, String msg) {
+    if (!condition) {
+      err(ErrorType.Assertion, ElementInfo.NO, msg);
+    }
+  }
 }

@@ -50,6 +50,7 @@ import fun.function.FuncReturnTuple;
 import fun.function.FuncReturnType;
 import fun.function.FuncSignal;
 import fun.function.FuncSlot;
+import fun.function.template.DefaultValueTemplate;
 import fun.hfsm.ImplHfsm;
 import fun.hfsm.StateComposite;
 import fun.hfsm.StateSimple;
@@ -320,6 +321,11 @@ class CopyFun extends Traverser<Fun, Void> {
   @Override
   protected Fun visitTypeType(TypeType obj, Void param) {
     throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Fun visitDefaultValueTemplate(DefaultValueTemplate obj, Void param) {
+    return new DefaultValueTemplate();
   }
 
   @Override

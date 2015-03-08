@@ -817,9 +817,9 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitArrayValue(ArrayValue obj, StreamWriter param) {
-    param.wr("[");
+    param.wr("Array(");
     list(obj.getValue(), ", ", param);
-    param.wr("]");
+    param.wr(")");
     return null;
   }
 
@@ -867,9 +867,10 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitRecordValue(RecordValue obj, StreamWriter param) {
-    param.wr("(");
+    visit(obj.getType(), param);
+    param.wr("[");
     list(obj.getValue(), ", ", param);
-    param.wr(")");
+    param.wr("]");
     return null;
   }
 

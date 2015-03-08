@@ -42,6 +42,7 @@ import fun.pass.DocWriter;
 import fun.pass.EnumLinkReduction;
 import fun.pass.FileLoader;
 import fun.pass.FileReduction;
+import fun.pass.InternFuncAdder;
 import fun.pass.InternTypeAdder;
 import fun.pass.Linker;
 import fun.pass.NamespaceLinkReduction;
@@ -59,6 +60,7 @@ public class MainFun {
     passes.add(FileLoader.class);
 
     passes.add(InternTypeAdder.class);
+    passes.add(InternFuncAdder.class);
     passes.add(CheckNames.class);
     passes.add(Linker.class);
     if (opt.getDocOutput()) {
