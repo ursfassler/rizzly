@@ -46,6 +46,7 @@ import evl.expression.UnsafeUnionValue;
 import evl.expression.binop.And;
 import evl.expression.binop.BitAnd;
 import evl.expression.binop.BitOr;
+import evl.expression.binop.BitXor;
 import evl.expression.binop.Div;
 import evl.expression.binop.LogicAnd;
 import evl.expression.binop.LogicOr;
@@ -394,6 +395,34 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     BigInteger low = lhs.getLow().max(rhs.getLow());
 
     return kbi.getNumsetType(new Range(low, high));
+  }
+
+  @Override
+  protected Type visitBitXor(BitXor obj, Void param) {
+    Type lhst = visit(obj.getLeft(), param);
+    Type rhst = visit(obj.getRight(), param);
+
+    if (lhst instanceof RangeType) {
+      assert (rhst instanceof RangeType);
+      Range lhs = ((RangeType) lhst).getNumbers();
+      Range rhs = ((RangeType) rhst).getNumbers();
+
+      checkPositive(obj.getInfo(), "xor", lhs, rhs);
+
+      BigInteger bigger = lhs.getHigh().max(rhs.getHigh());
+
+      int bits = ExpressionTypeChecker.bitCount(bigger);
+      BigInteger ones = ExpressionTypeChecker.makeOnes(bits);
+      BigInteger high = bigger.or(ones);
+
+      return kbi.getNumsetType(new Range(BigInteger.ZERO, high));
+    } else if (lhst instanceof BooleanType) {
+      assert (rhst instanceof BooleanType);
+      return lhst;
+    } else {
+      RError.err(ErrorType.Error, lhst.getInfo(), "Expected range or boolean type");
+      return null;
+    }
   }
 
   @Override

@@ -82,6 +82,7 @@ public class Scanner implements PeekReader<Token> {
     keywords.put("True", TokenType.TRUE);
 
     keywords.put("not", TokenType.NOT);
+    keywords.put("xor", TokenType.XOR);
     keywords.put("or", TokenType.OR);
     keywords.put("mod", TokenType.MOD);
     keywords.put("and", TokenType.AND);

@@ -39,6 +39,7 @@ import evl.expression.binop.And;
 import evl.expression.binop.BinaryExp;
 import evl.expression.binop.BitAnd;
 import evl.expression.binop.BitOr;
+import evl.expression.binop.BitXor;
 import evl.expression.binop.Div;
 import evl.expression.binop.Equal;
 import evl.expression.binop.Greater;
@@ -225,6 +226,11 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
 
   @Override
   protected Expression visitBitOr(BitOr obj, T param) {
+    return defaultBinaryOp(obj, param);
+  }
+
+  @Override
+  protected Expression visitBitXor(BitXor obj, T param) {
     return defaultBinaryOp(obj, param);
   }
 

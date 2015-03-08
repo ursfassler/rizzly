@@ -28,8 +28,10 @@ import evl.expression.Expression;
 import evl.expression.binop.And;
 import evl.expression.binop.BitAnd;
 import evl.expression.binop.BitOr;
+import evl.expression.binop.BitXor;
 import evl.expression.binop.LogicAnd;
 import evl.expression.binop.LogicOr;
+import evl.expression.binop.Notequal;
 import evl.expression.binop.Or;
 import evl.expression.unop.BitNot;
 import evl.expression.unop.LogicNot;
@@ -65,6 +67,19 @@ public class BitLogicCategorizer extends EvlPass {
 }
 
 class BitLogicCategorizerWorker extends ExprReplacer<KnowType> {
+
+  @Override
+  protected Expression visitBitXor(BitXor obj, KnowType param) {
+    super.visitBitXor(obj, param);
+    Type lt = param.get(obj.getLeft());
+    Type rt = param.get(obj.getRight());
+    assert ((lt instanceof BooleanType) == (rt instanceof BooleanType));
+    if (lt instanceof BooleanType) {
+      return new Notequal(obj.getInfo(), obj.getLeft(), obj.getRight());
+    } else {
+      return obj;
+    }
+  }
 
   @Override
   protected Expression visitAnd(And obj, KnowType param) {

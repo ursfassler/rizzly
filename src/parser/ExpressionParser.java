@@ -252,6 +252,9 @@ public class ExpressionParser extends Parser {
     if (consumeIfEqual(TokenType.AND)) {
       return ExpOp.AND;
     }
+    if (consumeIfEqual(TokenType.XOR)) {
+      return ExpOp.XOR;
+    }
     RError.err(ErrorType.Fatal, peek().getInfo(), "Unexpected token");
     return null;
   }
@@ -377,6 +380,7 @@ public class ExpressionParser extends Parser {
       case DIV:
       case MOD:
       case AND:
+      case XOR:
         return true;
       default:
         return false;

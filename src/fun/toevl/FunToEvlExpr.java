@@ -22,6 +22,7 @@ import error.RError;
 import evl.Evl;
 import evl.expression.Expression;
 import evl.expression.binop.And;
+import evl.expression.binop.BitXor;
 import evl.expression.binop.Div;
 import evl.expression.binop.Equal;
 import evl.expression.binop.Greater;
@@ -144,6 +145,8 @@ public class FunToEvlExpr extends NullTraverser<Evl, Void> {
         return new Shl(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
       case SHR:
         return new Shr(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
+      case XOR:
+        return new BitXor(obj.getInfo(), (Expression) fta.traverse(obj.getLeft(), null), (Expression) fta.traverse(obj.getRight(), null));
       default:
         RError.err(ErrorType.Fatal, obj.getInfo(), "Unhandled case: " + obj.getOp());
     }

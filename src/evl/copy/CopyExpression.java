@@ -37,6 +37,7 @@ import evl.expression.UnsafeUnionValue;
 import evl.expression.binop.And;
 import evl.expression.binop.BitAnd;
 import evl.expression.binop.BitOr;
+import evl.expression.binop.BitXor;
 import evl.expression.binop.Div;
 import evl.expression.binop.Equal;
 import evl.expression.binop.Greater;
@@ -248,6 +249,11 @@ public class CopyExpression extends NullTraverser<Expression, Void> {
   @Override
   protected Expression visitBitOr(BitOr obj, Void param) {
     return new BitOr(obj.getInfo(), cast.copy(obj.getLeft()), cast.copy(obj.getRight()));
+  }
+
+  @Override
+  protected Expression visitBitXor(BitXor obj, Void param) {
+    return new BitXor(obj.getInfo(), cast.copy(obj.getLeft()), cast.copy(obj.getRight()));
   }
 
   @Override

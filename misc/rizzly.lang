@@ -88,6 +88,7 @@
       <keyword>and</keyword>
       <keyword>shr</keyword>
       <keyword>shl</keyword>
+      <keyword>xor</keyword>
 
       <keyword>default</keyword>
       

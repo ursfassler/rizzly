@@ -40,6 +40,7 @@ import evl.expression.binop.ArithmeticOp;
 import evl.expression.binop.BinaryExp;
 import evl.expression.binop.BitAnd;
 import evl.expression.binop.BitOr;
+import evl.expression.binop.BitXor;
 import evl.expression.binop.Div;
 import evl.expression.binop.Equal;
 import evl.expression.binop.Greater;
@@ -452,6 +453,8 @@ public abstract class Traverser<R, P> {
       return visitBitAnd((BitAnd) obj, param);
     } else if (obj instanceof BitOr) {
       return visitBitOr((BitOr) obj, param);
+    } else if (obj instanceof BitXor) {
+      return visitBitXor((BitXor) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -752,6 +755,8 @@ public abstract class Traverser<R, P> {
   abstract protected R visitBitAnd(BitAnd obj, P param);
 
   abstract protected R visitBitOr(BitOr obj, P param);
+
+  abstract protected R visitBitXor(BitXor obj, P param);
 
   abstract protected R visitLogicOr(LogicOr obj, P param);
 

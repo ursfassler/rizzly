@@ -32,6 +32,16 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  public void xorBool() {
+    compile("xorBool", TestSteps.EXECUTE, false, false);
+  }
+
+  @Test
+  public void xor() {
+    compile("xor", TestSteps.EXECUTE, false, false);
+  }
+
+  @Test
   public void defaultInit() {
     compile("defaultInit", TestSteps.COMPILE_TO_C, false, false);
   }

@@ -1,0 +1,9 @@
+Xor = Component
+  calc : response(a, b: R{0,255}):R{0,255};
+  
+elementary
+  calc : response(a, b: R{0,255}):R{0,255}
+    return a xor b;
+  end
+end      
+

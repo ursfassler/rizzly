@@ -25,14 +25,14 @@ import evl.expression.Expression;
  *
  * @author urs
  */
-public class LogicXor extends Logical {
+public class BitXor extends ArithmeticOp {
 
-  public LogicXor(ElementInfo info, Expression left, Expression right) {
+  public BitXor(ElementInfo info, Expression left, Expression right) {
     super(info, left, right);
   }
 
   @Override
   public String getOpName() {
-    return "=";
+    return "xor";
   }
 }

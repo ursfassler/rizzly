@@ -26,7 +26,7 @@ import error.RError;
  */
 public enum ExpOp {
 
-  PLUS, MINUS, MUL, DIV, OR, MOD, AND, SHR, SHL;
+  PLUS, MINUS, MUL, DIV, OR, MOD, AND, SHR, SHL, XOR;
 
   @Override
   public String toString() {
@@ -49,6 +49,8 @@ public enum ExpOp {
         return " shl ";
       case SHR:
         return " shr ";
+      case XOR:
+        return " xor ";
       default:
         RError.err(ErrorType.Fatal, "not supported yet: " + this.ordinal());
         return null;

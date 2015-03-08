@@ -38,6 +38,7 @@ import evl.expression.UnsafeUnionValue;
 import evl.expression.binop.And;
 import evl.expression.binop.BitAnd;
 import evl.expression.binop.BitOr;
+import evl.expression.binop.BitXor;
 import evl.expression.binop.Div;
 import evl.expression.binop.Equal;
 import evl.expression.binop.Greater;
@@ -678,6 +679,13 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitBitOr(BitOr obj, P param) {
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitBitXor(BitXor obj, P param) {
     visit(obj.getLeft(), param);
     visit(obj.getRight(), param);
     return null;

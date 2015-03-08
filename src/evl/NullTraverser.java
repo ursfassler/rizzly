@@ -36,6 +36,7 @@ import evl.expression.UnsafeUnionValue;
 import evl.expression.binop.And;
 import evl.expression.binop.BitAnd;
 import evl.expression.binop.BitOr;
+import evl.expression.binop.BitXor;
 import evl.expression.binop.Div;
 import evl.expression.binop.Equal;
 import evl.expression.binop.Greater;
@@ -126,6 +127,11 @@ import evl.variable.StateVariable;
 abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   abstract protected R visitDefault(Evl obj, P param);
+
+  @Override
+  protected R visitBitXor(BitXor obj, P param) {
+    return visitDefault(obj, param);
+  }
 
   @Override
   protected R visitAssignmentSingle(AssignmentSingle obj, P param) {

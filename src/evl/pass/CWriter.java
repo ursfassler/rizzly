@@ -38,6 +38,7 @@ import evl.expression.UnsafeUnionValue;
 import evl.expression.binop.BinaryExp;
 import evl.expression.binop.BitAnd;
 import evl.expression.binop.BitOr;
+import evl.expression.binop.BitXor;
 import evl.expression.binop.Div;
 import evl.expression.binop.Equal;
 import evl.expression.binop.Greater;
@@ -261,6 +262,11 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
   @Override
   protected Void visitBitOr(BitOr obj, Boolean param) {
     return binexp(obj, "|", param);
+  }
+
+  @Override
+  protected Void visitBitXor(BitXor obj, Boolean param) {
+    return binexp(obj, "^", param);
   }
 
   @Override
