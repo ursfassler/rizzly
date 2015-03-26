@@ -40,6 +40,7 @@ import evl.hfsm.reduction.TransitionRedirecter;
 import evl.hfsm.reduction.TransitionUplifter;
 import evl.knowledge.KnowledgeBase;
 import evl.other.Namespace;
+import evl.pass.AlwaysGreater;
 import evl.pass.BitLogicCategorizer;
 import evl.pass.BitnotFixer;
 import evl.pass.BlockReduction;
@@ -52,12 +53,14 @@ import evl.pass.DebugIface;
 import evl.pass.ElementaryReduction;
 import evl.pass.EnumReduction;
 import evl.pass.Flattner;
+import evl.pass.FuncInliner;
 import evl.pass.HeaderWriter;
 import evl.pass.IfCutter;
 import evl.pass.InitVarTyper;
 import evl.pass.Instantiation;
 import evl.pass.IntroduceConvert;
 import evl.pass.LinkReduction;
+import evl.pass.NoCallEmptyFunc;
 import evl.pass.OpenReplace;
 import evl.pass.RangeConverter;
 import evl.pass.RangeReplacer;
@@ -66,6 +69,8 @@ import evl.pass.ReduceTuple;
 import evl.pass.ReduceUnion;
 import evl.pass.RemoveUnused;
 import evl.pass.RetStructIntroducer;
+import evl.pass.TautoExprDel;
+import evl.pass.TautoStmtDel;
 import evl.pass.TupleAssignReduction;
 import evl.pass.TypeMerge;
 import evl.pass.TypeSort;
@@ -158,6 +163,8 @@ public class MainEvl {
       // passes.add(TypeChecker.class);
     }
 
+    passes.add(new AlwaysGreater());
+
     passes.add(new TypeUplift());
     passes.add(new CompareReplacer());
     passes.add(new RangeConverter());
@@ -191,10 +198,24 @@ public class MainEvl {
     passes.add(new RemoveUnused());
 
     {
+      PassGroup optimize = new PassGroup("optimize");
+      optimize.checks.addAll(passes.checks);
+
+      optimize.add(new BlockReduction());
+      optimize.add(new NoCallEmptyFunc());
+      optimize.add(new RemoveUnused());
+      optimize.add(new FuncInliner());
+      optimize.add(new TautoExprDel());
+      optimize.add(new TautoStmtDel());
+      optimize.add(new RemoveUnused());
+      optimize.add(new BlockReduction());
+      passes.add(optimize);
+    }
+
+    {
       PassGroup cprep = new PassGroup("cout");
       cprep.checks.addAll(passes.checks);
 
-      cprep.add(new BlockReduction());
       cprep.add(new VarDeclToTop());
       cprep.add(new TypeMerge());
       cprep.add(new CRenamer());
