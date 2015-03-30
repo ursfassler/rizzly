@@ -24,6 +24,7 @@ import evl.statement.AssignmentSingle;
 import evl.statement.Block;
 import evl.statement.CallStmt;
 import evl.statement.CaseStmt;
+import evl.statement.ForStmt;
 import evl.statement.IfStmt;
 import evl.statement.ReturnExpr;
 import evl.statement.ReturnVoid;
@@ -100,6 +101,11 @@ public class CopyStatement extends NullTraverser<Statement, Void> {
   @Override
   protected Statement visitMsgPush(MsgPush obj, Void param) {
     return new MsgPush(obj.getInfo(), cast.copy(obj.getQueue()), cast.copy(obj.getFunc()), cast.copy(obj.getData()));
+  }
+
+  @Override
+  protected Statement visitForStmt(ForStmt obj, Void param) {
+    return new ForStmt(obj.getInfo(), cast.copy(obj.getIterator()), cast.copy(obj.getBlock()));
   }
 
 }

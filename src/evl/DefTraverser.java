@@ -95,6 +95,7 @@ import evl.statement.CaseOpt;
 import evl.statement.CaseOptRange;
 import evl.statement.CaseOptValue;
 import evl.statement.CaseStmt;
+import evl.statement.ForStmt;
 import evl.statement.IfOption;
 import evl.statement.IfStmt;
 import evl.statement.ReturnExpr;
@@ -809,6 +810,13 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitAliasType(AliasType obj, P param) {
     visit(obj.getRef(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitForStmt(ForStmt obj, P param) {
+    visit(obj.getIterator(), param);
+    visit(obj.getBlock(), param);
     return null;
   }
 

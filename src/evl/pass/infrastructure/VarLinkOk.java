@@ -35,6 +35,7 @@ import evl.knowledge.KnowledgeBase;
 import evl.other.ImplElementary;
 import evl.other.Namespace;
 import evl.other.SubCallbacks;
+import evl.statement.ForStmt;
 import evl.statement.VarDefStmt;
 import evl.type.Type;
 import evl.variable.ConstPrivate;
@@ -98,6 +99,14 @@ class VarLinkOkWorker extends DefTraverser<Void, Set<Evl>> {
   protected Void visitVarDef(VarDefStmt obj, Set<Evl> param) {
     super.visitVarDef(obj, param);
     param.add(obj.getVariable());
+    return null;
+  }
+
+  @Override
+  protected Void visitForStmt(ForStmt obj, Set<Evl> param) {
+    param = new HashSet<Evl>(param);
+    param.add(obj.getIterator());
+    super.visitForStmt(obj, param);
     return null;
   }
 

@@ -53,6 +53,7 @@ import evl.pass.DebugIface;
 import evl.pass.ElementaryReduction;
 import evl.pass.EnumReduction;
 import evl.pass.Flattner;
+import evl.pass.ForReduction;
 import evl.pass.FuncInliner;
 import evl.pass.HeaderWriter;
 import evl.pass.IfCutter;
@@ -164,6 +165,8 @@ public class MainEvl {
     }
 
     passes.add(new AlwaysGreater());
+
+    passes.add(new ForReduction());
 
     passes.add(new TypeUplift());
     passes.add(new CompareReplacer());

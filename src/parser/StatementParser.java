@@ -34,6 +34,7 @@ import fun.statement.CaseOptEntry;
 import fun.statement.CaseOptRange;
 import fun.statement.CaseOptValue;
 import fun.statement.CaseStmt;
+import fun.statement.ForStmt;
 import fun.statement.IfOption;
 import fun.statement.IfStmt;
 import fun.statement.Return;
@@ -50,7 +51,7 @@ public class StatementParser extends BaseParser {
     super(scanner);
   }
 
-  // EBNF block: { ( return | vardeclstmt | assignment | callstmt | ifstmt | whilestmt | casestmt ) }
+  // EBNF block: { ( return | vardeclstmt | assignment | callstmt | ifstmt | whilestmt | casestmt | forstmt ) }
   protected Block parseBlock() {
     Block res = new Block(peek().getInfo());
     while (true) {
@@ -66,6 +67,9 @@ public class StatementParser extends BaseParser {
           break;
         case CASE:
           res.getStatements().add(parseCase());
+          break;
+        case FOR:
+          res.getStatements().add(parseFor());
           break;
         case IDENTIFIER:
           res.getStatements().add(parseVardefOrAssignmentOrCallstmt());
@@ -164,6 +168,24 @@ public class StatementParser extends BaseParser {
 
     While stmt = new While(tok.getInfo(), cond, block);
     return stmt;
+  }
+
+  // EBNF forstmt: "for" identifier "in" typeref "do" block "end"
+  private Statement parseFor() {
+    Token tok = expect(TokenType.FOR);
+
+    String name = expect(TokenType.IDENTIFIER).getData();
+    expect(TokenType.IN);
+    Reference type = expr().parseRef();
+    expect(TokenType.DO);
+    Block block = parseBlock();
+    expect(TokenType.END);
+
+    FuncVariable var = new FuncVariable(tok.getInfo(), name, type);
+
+    RError.err(ErrorType.Warning, tok.getInfo(), "for loop is very experimental");
+
+    return new ForStmt(tok.getInfo(), var, block);
   }
 
   // EBNF ifstmt: "if" expression "then" block { "ef" expression "then" block } [ "else" block ] "end"

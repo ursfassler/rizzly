@@ -108,6 +108,7 @@ import evl.statement.CaseOptEntry;
 import evl.statement.CaseOptRange;
 import evl.statement.CaseOptValue;
 import evl.statement.CaseStmt;
+import evl.statement.ForStmt;
 import evl.statement.IfOption;
 import evl.statement.IfStmt;
 import evl.statement.Return;
@@ -250,6 +251,8 @@ public abstract class Traverser<R, P> {
       return visitCaseStmt((CaseStmt) obj, param);
     else if (obj instanceof MsgPush)
       return visitMsgPush((MsgPush) obj, param);
+    else if (obj instanceof ForStmt)
+      return visitForStmt((ForStmt) obj, param);
     else
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
@@ -593,6 +596,8 @@ public abstract class Traverser<R, P> {
   abstract protected R visitAnyType(AnyType obj, P param);
 
   abstract protected R visitWhileStmt(WhileStmt obj, P param);
+
+  abstract protected R visitForStmt(ForStmt obj, P param);
 
   abstract protected R visitCaseStmt(CaseStmt obj, P param);
 

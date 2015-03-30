@@ -61,6 +61,7 @@ import fun.statement.CaseOpt;
 import fun.statement.CaseOptRange;
 import fun.statement.CaseOptValue;
 import fun.statement.CaseStmt;
+import fun.statement.ForStmt;
 import fun.statement.IfOption;
 import fun.statement.IfStmt;
 import fun.statement.ReturnExpr;
@@ -94,6 +95,11 @@ import fun.variable.TemplateParameter;
 abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   protected abstract R visitDefault(Fun obj, P param);
+
+  @Override
+  protected R visitForStmt(ForStmt obj, P param) {
+    return visitDefault(obj, param);
+  }
 
   @Override
   protected R visitDefaultValueTemplate(DefaultValueTemplate obj, P param) {

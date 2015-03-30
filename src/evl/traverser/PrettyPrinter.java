@@ -105,6 +105,7 @@ import evl.statement.CaseOpt;
 import evl.statement.CaseOptRange;
 import evl.statement.CaseOptValue;
 import evl.statement.CaseStmt;
+import evl.statement.ForStmt;
 import evl.statement.IfOption;
 import evl.statement.IfStmt;
 import evl.statement.ReturnExpr;
@@ -689,6 +690,23 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.nl();
     param.incIndent();
     visit(obj.getBody(), param);
+    param.decIndent();
+    param.wr("end");
+    param.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitForStmt(ForStmt obj, StreamWriter param) {
+    param.wr("for ");
+    param.wr(obj.getIterator().getName());
+    wrId(obj.getIterator(), param);
+    param.wr(" in ");
+    visit(obj.getIterator().getType(), param);
+    param.wr(" do");
+    param.nl();
+    param.incIndent();
+    visit(obj.getBlock(), param);
     param.decIndent();
     param.wr("end");
     param.nl();

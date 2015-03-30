@@ -81,6 +81,7 @@ import fun.statement.CaseOpt;
 import fun.statement.CaseOptRange;
 import fun.statement.CaseOptValue;
 import fun.statement.CaseStmt;
+import fun.statement.ForStmt;
 import fun.statement.IfOption;
 import fun.statement.IfStmt;
 import fun.statement.ReturnExpr;
@@ -602,6 +603,23 @@ public class FunPrinter extends NullTraverser<Void, Void> {
     xw.nl();
     xw.incIndent();
     visit(obj.getBody(), null);
+    xw.decIndent();
+    xw.kw("end");
+    xw.nl();
+    return null;
+  }
+
+  @Override
+  protected Void visitForStmt(ForStmt obj, Void param) {
+    xw.kw("for");
+    xw.wr(" ");
+    xw.wa(obj.getIterator().getName(), getId(obj.getIterator()));
+    xw.kw(" in ");
+    visit(obj.getIterator().getType(), param);
+    xw.kw(" do");
+    xw.nl();
+    xw.incIndent();
+    visit(obj.getBlock(), null);
     xw.decIndent();
     xw.kw("end");
     xw.nl();

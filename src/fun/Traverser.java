@@ -73,6 +73,7 @@ import fun.statement.CaseOptEntry;
 import fun.statement.CaseOptRange;
 import fun.statement.CaseOptValue;
 import fun.statement.CaseStmt;
+import fun.statement.ForStmt;
 import fun.statement.IfOption;
 import fun.statement.IfStmt;
 import fun.statement.Return;
@@ -296,6 +297,8 @@ public abstract class Traverser<R, P> {
       return visitWhile((While) obj, param);
     } else if (obj instanceof CaseStmt) {
       return visitCaseStmt((CaseStmt) obj, param);
+    } else if (obj instanceof ForStmt) {
+      return visitForStmt((ForStmt) obj, param);
     } else {
       throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
     }
@@ -548,6 +551,8 @@ public abstract class Traverser<R, P> {
   abstract protected R visitIfOption(IfOption obj, P param);
 
   abstract protected R visitVarDefStmt(VarDefStmt obj, P param);
+
+  abstract protected R visitForStmt(ForStmt obj, P param);
 
   abstract protected R visitIfStmt(IfStmt obj, P param);
 

@@ -50,6 +50,7 @@ import fun.other.RizzlyFile;
 import fun.other.SymbolTable;
 import fun.other.Template;
 import fun.statement.Block;
+import fun.statement.ForStmt;
 import fun.statement.VarDefStmt;
 import fun.traverser.TransitionStateLinker;
 import fun.type.Type;
@@ -278,6 +279,14 @@ class LinkerWorker extends DefTraverser<Void, SymbolTable> {
   protected Void visitVarDefStmt(VarDefStmt obj, SymbolTable param) {
     param.addAll(obj.getVariable());
     super.visitVarDefStmt(obj, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitForStmt(ForStmt obj, SymbolTable param) {
+    param = new SymbolTable(param);
+    param.add(obj.getIterator());
+    super.visitForStmt(obj, param);
     return null;
   }
 

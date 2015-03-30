@@ -37,6 +37,7 @@ import evl.statement.CaseOpt;
 import evl.statement.CaseOptRange;
 import evl.statement.CaseOptValue;
 import evl.statement.CaseStmt;
+import evl.statement.ForStmt;
 import evl.statement.IfOption;
 import evl.statement.IfStmt;
 import evl.statement.ReturnExpr;
@@ -48,6 +49,7 @@ import evl.statement.intern.MsgPush;
 import evl.type.Type;
 import evl.type.base.BooleanType;
 import evl.type.base.EnumElement;
+import evl.type.base.RangeType;
 import evl.type.base.TupleType;
 import evl.variable.ConstGlobal;
 import evl.variable.ConstPrivate;
@@ -131,6 +133,16 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitFuncVariable(FuncVariable obj, Void map) {
+    return null;
+  }
+
+  @Override
+  protected Void visitForStmt(ForStmt obj, Void param) {
+    Type cond = obj.getIterator().getType().getLink();
+    if (!(cond instanceof RangeType)) {
+      RError.err(ErrorType.Error, obj.getInfo(), "For loop only supports range type (at the moment), got: " + cond.getName());
+    }
+    visit(obj.getBlock(), param);
     return null;
   }
 

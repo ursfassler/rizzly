@@ -65,6 +65,7 @@ import fun.statement.CaseOpt;
 import fun.statement.CaseOptRange;
 import fun.statement.CaseOptValue;
 import fun.statement.CaseStmt;
+import fun.statement.ForStmt;
 import fun.statement.IfOption;
 import fun.statement.IfStmt;
 import fun.statement.ReturnExpr;
@@ -551,6 +552,13 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitDummyLinkTarget(DummyLinkTarget obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitForStmt(ForStmt obj, P param) {
+    visit(obj.getIterator(), param);
+    visit(obj.getBlock(), param);
     return null;
   }
 

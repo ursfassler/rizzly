@@ -31,6 +31,7 @@ import fun.statement.Block;
 import fun.statement.CallStmt;
 import fun.statement.CaseOpt;
 import fun.statement.CaseStmt;
+import fun.statement.ForStmt;
 import fun.statement.IfOption;
 import fun.statement.IfStmt;
 import fun.statement.ReturnExpr;
@@ -130,4 +131,8 @@ public class FunToEvlStmt extends NullTraverser<Statement, Void> {
     return new evl.statement.IfStmt(obj.getInfo(), opt, (evl.statement.Block) fta.traverse(obj.getDefblock(), null));
   }
 
+  @Override
+  protected Statement visitForStmt(ForStmt obj, Void param) {
+    return new evl.statement.ForStmt(obj.getInfo(), (evl.variable.FuncVariable) fta.traverse(obj.getIterator(), param), (evl.statement.Block) fta.traverse(obj.getBlock(), param));
+  }
 }

@@ -32,6 +32,11 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  public void for1() {
+    compile("for1", TestSteps.EXECUTE, false, false);
+  }
+
+  @Test
   public void xorBool() {
     compile("xorBool", TestSteps.EXECUTE, false, false);
   }

@@ -67,6 +67,7 @@ import fun.statement.CaseOpt;
 import fun.statement.CaseOptRange;
 import fun.statement.CaseOptValue;
 import fun.statement.CaseStmt;
+import fun.statement.ForStmt;
 import fun.statement.IfOption;
 import fun.statement.IfStmt;
 import fun.statement.ReturnExpr;
@@ -553,7 +554,13 @@ class CopyFun extends Traverser<Fun, Void> {
   }
 
   @Override
+  protected Fun visitForStmt(ForStmt obj, Void param) {
+    return new ForStmt(obj.getInfo(), copy(obj.getIterator()), copy(obj.getBlock()));
+  }
+
+  @Override
   protected Fun visitDummyLinkTarget(DummyLinkTarget obj, Void param) {
     throw new RuntimeException("not yet implemented");
   }
+
 }

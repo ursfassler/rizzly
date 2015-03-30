@@ -92,6 +92,7 @@ import evl.statement.CaseOpt;
 import evl.statement.CaseOptRange;
 import evl.statement.CaseOptValue;
 import evl.statement.CaseStmt;
+import evl.statement.ForStmt;
 import evl.statement.IfOption;
 import evl.statement.IfStmt;
 import evl.statement.ReturnExpr;
@@ -127,6 +128,11 @@ import evl.variable.StateVariable;
 abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   abstract protected R visitDefault(Evl obj, P param);
+
+  @Override
+  protected R visitForStmt(ForStmt obj, P param) {
+    return visitDefault(obj, param);
+  }
 
   @Override
   protected R visitBitXor(BitXor obj, P param) {
