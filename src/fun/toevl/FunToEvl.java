@@ -209,12 +209,15 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
   private Endpoint refToEnp(Reference ref) {
     switch (ref.getOffset().size()) {
       case 0: {
-        return new EndpointSelf(ref.getInfo(), (Function) ref.getLink());
+        Named link = ref.getLink();
+        RError.ass(link instanceof Function, ref.getInfo(), "expected function for: " + link.getName());
+        return new EndpointSelf(ref.getInfo(), (Function) link);
       }
       case 1: {
-        CompUse comp = (CompUse) ref.getLink();
+        Named link = ref.getLink();
+        RError.ass(link instanceof CompUse, ref.getInfo(), "expected compuse for: " + link.getName());
         String name = ((RefName) ref.getOffset().get(0)).getName();
-        return new EndpointSub(ref.getInfo(), comp, name);
+        return new EndpointSub(ref.getInfo(), (CompUse) link, name);
       }
       default: {
         RError.err(ErrorType.Fatal, ref.getInfo(), "Unknown connection endpoint");
@@ -225,11 +228,12 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitImplElementary(ImplElementary obj, Void param) {
-    FuncPrivateVoid entryFunc = new FuncPrivateVoid(ElementInfo.NO, "_entry", new EvlList<evl.variable.FuncVariable>(), new evl.function.ret.FuncReturnNone(ElementInfo.NO), (Block) visit(obj.getEntryFunc(), null));
-    FuncPrivateVoid exitFunc = new FuncPrivateVoid(ElementInfo.NO, "_exit", new EvlList<evl.variable.FuncVariable>(), new evl.function.ret.FuncReturnNone(ElementInfo.NO), (Block) visit(obj.getExitFunc(), null));
+    ElementInfo info = obj.getInfo();
+    FuncPrivateVoid entryFunc = new FuncPrivateVoid(info, "_entry", new EvlList<evl.variable.FuncVariable>(), new evl.function.ret.FuncReturnNone(info), (Block) visit(obj.getEntryFunc(), null));
+    FuncPrivateVoid exitFunc = new FuncPrivateVoid(info, "_exit", new EvlList<evl.variable.FuncVariable>(), new evl.function.ret.FuncReturnNone(info), (Block) visit(obj.getExitFunc(), null));
     // if this makes problems like loops, convert the body of the functions after the component
 
-    evl.other.ImplElementary comp = new evl.other.ImplElementary(obj.getInfo(), obj.getName(), new SimpleRef<FuncPrivateVoid>(ElementInfo.NO, entryFunc), new SimpleRef<FuncPrivateVoid>(ElementInfo.NO, exitFunc));
+    evl.other.ImplElementary comp = new evl.other.ImplElementary(obj.getInfo(), obj.getName(), new SimpleRef<FuncPrivateVoid>(info, entryFunc), new SimpleRef<FuncPrivateVoid>(info, exitFunc));
     map.put(obj, comp);
 
     comp.getFunction().add(entryFunc);
@@ -330,12 +334,14 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitStateComposite(StateComposite obj, Void param) {
+    ElementInfo info = obj.getInfo();
+    
     SimpleRef<State> initref = toSimple((Reference) traverse(obj.getInitial(), null));
 
-    FuncPrivateVoid entryFunc = new FuncPrivateVoid(ElementInfo.NO, "_entry", new EvlList<evl.variable.FuncVariable>(), new evl.function.ret.FuncReturnNone(ElementInfo.NO), new Block(ElementInfo.NO));
-    FuncPrivateVoid exitFunc = new FuncPrivateVoid(ElementInfo.NO, "_exit", new EvlList<evl.variable.FuncVariable>(), new evl.function.ret.FuncReturnNone(ElementInfo.NO), new Block(ElementInfo.NO));
+    FuncPrivateVoid entryFunc = new FuncPrivateVoid(info, "_entry", new EvlList<evl.variable.FuncVariable>(), new evl.function.ret.FuncReturnNone(info), new Block(info));
+    FuncPrivateVoid exitFunc = new FuncPrivateVoid(info, "_exit", new EvlList<evl.variable.FuncVariable>(), new evl.function.ret.FuncReturnNone(info), new Block(info));
 
-    evl.hfsm.StateComposite state = new evl.hfsm.StateComposite(obj.getInfo(), obj.getName(), new SimpleRef<FuncPrivateVoid>(ElementInfo.NO, entryFunc), new SimpleRef<FuncPrivateVoid>(ElementInfo.NO, exitFunc), initref);
+    evl.hfsm.StateComposite state = new evl.hfsm.StateComposite(obj.getInfo(), obj.getName(), new SimpleRef<FuncPrivateVoid>(info, entryFunc), new SimpleRef<FuncPrivateVoid>(info, exitFunc), initref);
     state.getItem().add(entryFunc);
     state.getItem().add(exitFunc);
     map.put(obj, state);
@@ -351,10 +357,11 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitStateSimple(StateSimple obj, Void param) {
-    FuncPrivateVoid entryFunc = new FuncPrivateVoid(ElementInfo.NO, "_entry", new EvlList<evl.variable.FuncVariable>(), new evl.function.ret.FuncReturnNone(ElementInfo.NO), new Block(ElementInfo.NO));
-    FuncPrivateVoid exitFunc = new FuncPrivateVoid(ElementInfo.NO, "_exit", new EvlList<evl.variable.FuncVariable>(), new evl.function.ret.FuncReturnNone(ElementInfo.NO), new Block(ElementInfo.NO));
+    ElementInfo info = obj.getInfo();
+    FuncPrivateVoid entryFunc = new FuncPrivateVoid(info, "_entry", new EvlList<evl.variable.FuncVariable>(), new evl.function.ret.FuncReturnNone(info), new Block(info));
+    FuncPrivateVoid exitFunc = new FuncPrivateVoid(info, "_exit", new EvlList<evl.variable.FuncVariable>(), new evl.function.ret.FuncReturnNone(info), new Block(info));
 
-    evl.hfsm.StateSimple state = new evl.hfsm.StateSimple(obj.getInfo(), obj.getName(), new SimpleRef<FuncPrivateVoid>(ElementInfo.NO, entryFunc), new SimpleRef<FuncPrivateVoid>(ElementInfo.NO, exitFunc));
+    evl.hfsm.StateSimple state = new evl.hfsm.StateSimple(obj.getInfo(), obj.getName(), new SimpleRef<FuncPrivateVoid>(info, entryFunc), new SimpleRef<FuncPrivateVoid>(info, exitFunc));
     state.getItem().add(entryFunc);
     state.getItem().add(exitFunc);
     map.put(obj, state);

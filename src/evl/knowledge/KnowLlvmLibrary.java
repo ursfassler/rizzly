@@ -32,7 +32,6 @@ import evl.variable.FuncVariable;
 //TODO rename
 //TODO rename trap to runtime exception and provide arguments
 public class KnowLlvmLibrary extends KnowledgeEntry {
-  private static final ElementInfo info = ElementInfo.NO;
   private KnowledgeBase kb;
 
   @Override
@@ -50,6 +49,7 @@ public class KnowLlvmLibrary extends KnowledgeEntry {
 
   public FuncCtrlOutDataOut getTrap() {
     final String NAME = Designator.NAME_SEP + "trap";
+    final ElementInfo info = new ElementInfo(NAME, 0, 0);
 
     FuncCtrlOutDataOut ret = (FuncCtrlOutDataOut) findItem(NAME);
 

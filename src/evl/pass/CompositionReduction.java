@@ -98,9 +98,9 @@ public class CompositionReduction extends EvlPass {
 
     Function func;
     if (out instanceof FuncCtrlOutDataOut) {
-      func = new FuncSubHandlerEvent(ElementInfo.NO, out.getName(), Copy.copy(out.getParam()), Copy.copy(out.getRet()), new Block(ElementInfo.NO));
+      func = new FuncSubHandlerEvent(out.getInfo(), out.getName(), Copy.copy(out.getParam()), Copy.copy(out.getRet()), new Block(ElementInfo.NO));
     } else if (out instanceof FuncCtrlOutDataIn) {
-      func = new FuncSubHandlerQuery(ElementInfo.NO, out.getName(), Copy.copy(out.getParam()), Copy.copy(out.getRet()), new Block(ElementInfo.NO));
+      func = new FuncSubHandlerQuery(out.getInfo(), out.getName(), Copy.copy(out.getParam()), Copy.copy(out.getRet()), new Block(ElementInfo.NO));
     } else {
       throw new RuntimeException("not yet implemented");
     }
@@ -141,6 +141,7 @@ class CompositionReductionWorker extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitImplComposition(ImplComposition obj, Void param) {
+    ElementInfo info = obj.getInfo();
 
     FuncPrivateVoid entry = new FuncPrivateVoid(info, "_entry", new EvlList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
     FuncPrivateVoid exit = new FuncPrivateVoid(info, "_exit", new EvlList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
