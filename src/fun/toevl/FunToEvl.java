@@ -335,7 +335,7 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
   @Override
   protected Evl visitStateComposite(StateComposite obj, Void param) {
     ElementInfo info = obj.getInfo();
-    
+
     SimpleRef<State> initref = toSimple((Reference) traverse(obj.getInitial(), null));
 
     FuncPrivateVoid entryFunc = new FuncPrivateVoid(info, "_entry", new EvlList<evl.variable.FuncVariable>(), new evl.function.ret.FuncReturnNone(info), new Block(info));

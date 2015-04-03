@@ -18,8 +18,10 @@
 package evl.pass;
 
 import pass.EvlPass;
+
 import common.Designator;
 import common.ElementInfo;
+
 import error.ErrorType;
 import error.RError;
 import evl.DefTraverser;
@@ -114,7 +116,7 @@ class IntroduceConvertWorker extends DefTraverser<Void, Void> {
   private FuncGlobal makeConvertRange(RangeType resType) {
     String name = CONVERT_PREFIX + resType.getName();
     ElementInfo info = new ElementInfo(name, 0, 0);
-    
+
     Block body = new Block(info);
     FuncVariable value = new FuncVariable(info, "value", new SimpleRef<Type>(info, kbi.getIntegerType()));
 
