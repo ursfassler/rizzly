@@ -21,22 +21,24 @@ import common.ElementInfo;
 
 import evl.data.function.Function;
 
-final public class EndpointSub extends Endpoint<CompUse> {
+final public class EndpointSub extends Endpoint {
+  final public CompUse component;
   final public String function;
 
-  public EndpointSub(ElementInfo info, CompUse link, String function) {
-    super(info, link);
+  public EndpointSub(ElementInfo info, CompUse component, String function) {
+    super(info);
+    this.component = component;
     this.function = function;
   }
 
   @Override
   public Function getFunc() {
-    return (Function) link.instref.link.iface.find(function);
+    return component.instref.link.iface.find(function);
   }
 
   @Override
   public String toString() {
-    return link.name + "." + function;
+    return component.name + "." + function;
   }
 
 }

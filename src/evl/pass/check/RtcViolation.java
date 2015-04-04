@@ -78,8 +78,8 @@ public class RtcViolation extends EvlPass {
       Endpoint src = con.endpoint.get(Direction.in);
       Endpoint dst = con.endpoint.get(Direction.out);
       if ((src instanceof EndpointSub) && (dst instanceof EndpointSub)) {
-        CompUse srcComp = ((EndpointSub) src).link;
-        CompUse dstComp = ((EndpointSub) dst).link;
+        CompUse srcComp = ((EndpointSub) src).component;
+        CompUse dstComp = ((EndpointSub) dst).component;
         ret.addVertex(srcComp);
         ret.addVertex(dstComp);
         ret.addEdge(srcComp, dstComp);

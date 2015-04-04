@@ -203,6 +203,8 @@ public abstract class Traverser<R, P> {
       return visitFuncReturn((FuncReturn) obj, param);
     } else if (obj instanceof NamedValue) {
       return visitNamedValue((NamedValue) obj, param);
+    } else if (obj instanceof Endpoint) {
+      return visitEndpoint((Endpoint) obj, param);
     } else {
       throwUnknownObjectError(obj);
       return null;
@@ -438,8 +440,6 @@ public abstract class Traverser<R, P> {
       return visitSimpleRef((SimpleRef) obj, param);
     } else if (obj instanceof Reference) {
       return visitReference((Reference) obj, param);
-    } else if (obj instanceof Endpoint) {
-      return visitEndpoint((Endpoint) obj, param);
     } else {
       throwUnknownObjectError(obj);
       return null;

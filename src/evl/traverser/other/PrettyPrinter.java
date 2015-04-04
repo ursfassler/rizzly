@@ -1179,15 +1179,13 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitEndpointSelf(EndpointSelf obj, StreamWriter param) {
-    name(obj.link, param);
-    wrId(obj.link, param);
+    visit(obj.funcRef, param);
     return null;
   }
 
   @Override
   protected Void visitEndpointSub(EndpointSub obj, StreamWriter param) {
-    name(obj.link, param);
-    wrId(obj.link, param);
+    visit(obj.component, param);
     param.wr(".");
     param.wr(obj.function);
     return null;

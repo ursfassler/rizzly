@@ -19,14 +19,13 @@ package evl.data.component.composition;
 
 import common.ElementInfo;
 
-import evl.data.Named;
-import evl.data.expression.reference.BaseRef;
+import evl.data.EvlBase;
 import evl.data.function.Function;
 
-//TODO remove generics
-abstract public class Endpoint<T extends Named> extends BaseRef<T> {
-  public Endpoint(ElementInfo info, T link) {
-    super(info, link);
+abstract public class Endpoint extends EvlBase {
+
+  public Endpoint(ElementInfo info) {
+    super(info);
   }
 
   abstract public Function getFunc();

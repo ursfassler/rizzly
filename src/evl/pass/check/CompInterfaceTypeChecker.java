@@ -176,7 +176,7 @@ class CompInterfaceTypeCheckerWorker extends NullTraverser<Void, Void> {
     for (Connection itr : connection) {
       if (itr.endpoint.get(dir) instanceof EndpointSub) {
         EndpointSub ep = (EndpointSub) itr.endpoint.get(dir);
-        if ((ep.link == use) && (ep.getFunc() == ifaceuse)) {
+        if ((ep.component == use) && (ep.getFunc() == ifaceuse)) {
           return true;
         }
       }

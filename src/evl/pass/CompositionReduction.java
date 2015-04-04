@@ -161,9 +161,9 @@ class CompositionReductionWorker extends NullTraverser<Evl, Void> {
       SubCallbacks suc = new SubCallbacks(compu.getInfo(), new SimpleRef<CompUse>(info, compu));
       elem.subCallback.add(suc);
       for (InterfaceFunction out : compu.instref.link.getIface(Direction.out)) {
-        Function suha = CompositionReduction.makeHandler((Function) out);
+        Function suha = CompositionReduction.makeHandler(out);
         suc.func.add(suha);
-        coca.put(new Pair<CompUse, Function>(compu, (Function) out), suha);
+        coca.put(new Pair<CompUse, Function>(compu, out), suha);
       }
     }
 
@@ -171,7 +171,7 @@ class CompositionReductionWorker extends NullTraverser<Evl, Void> {
       Endpoint src = con.endpoint.get(Direction.in);
 
       if (src instanceof EndpointSelf) {
-        Function coniface = ((EndpointSelf) src).link;
+        Function coniface = src.getFunc();
 
         if (coniface instanceof FuncCtrlInDataOut) {
           // assert (elem.getResponse().contains(coniface));
@@ -187,9 +187,9 @@ class CompositionReductionWorker extends NullTraverser<Evl, Void> {
           RError.err(ErrorType.Fatal, coniface.getInfo(), "Unexpected function type: " + coniface.getClass().getSimpleName());
         }
       } else {
-        CompUse srcComp = ((EndpointSub) src).link;
+        CompUse srcComp = ((EndpointSub) src).component;
         InterfaceFunction funa = srcComp.instref.link.iface.find(((EndpointSub) src).function);
-        Function coniface = (Function) funa;
+        Function coniface = funa;
 
         Function suha = coca.get(new Pair<CompUse, Function>(srcComp, coniface));
 
@@ -269,10 +269,10 @@ class CompositionReductionWorker extends NullTraverser<Evl, Void> {
 
   static private Reference epToRef(Endpoint ep) {
     if (ep instanceof EndpointSelf) {
-      return new Reference(ep.getInfo(), ((EndpointSelf) ep).link);
+      return new Reference(ep.getInfo(), ((EndpointSelf) ep).getFunc());
     } else {
       EndpointSub eps = (EndpointSub) ep;
-      Reference ref = new Reference(eps.getInfo(), eps.link);
+      Reference ref = new Reference(eps.getInfo(), eps.component);
       ref.offset.add(new RefName(eps.getInfo(), eps.function));
       return ref;
     }
@@ -281,8 +281,8 @@ class CompositionReductionWorker extends NullTraverser<Evl, Void> {
   private Reference getQueue(Endpoint ep, Component comp) {
     Reference ref;
     if (ep instanceof EndpointSub) {
-      ref = new Reference(ep.getInfo(), ((EndpointSub) ep).link);
-      Queue queue = ((EndpointSub) ep).link.instref.link.queue;
+      ref = new Reference(ep.getInfo(), ((EndpointSub) ep).component);
+      Queue queue = ((EndpointSub) ep).component.instref.link.queue;
       ref.offset.add(new RefName(info, queue.name));
     } else {
       ref = new Reference(ep.getInfo(), comp.queue);

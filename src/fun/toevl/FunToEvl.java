@@ -211,7 +211,7 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
       case 0: {
         Named link = ref.link;
         RError.ass(link instanceof Function, ref.getInfo(), "expected function for: " + link.name);
-        return new EndpointSelf(ref.getInfo(), (Function) link);
+        return new EndpointSelf(ref.getInfo(), new SimpleRef<Function>(ref.getInfo(), (Function) link));
       }
       case 1: {
         Named link = ref.link;

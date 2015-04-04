@@ -19,21 +19,24 @@ package evl.data.component.composition;
 
 import common.ElementInfo;
 
+import evl.data.expression.reference.SimpleRef;
 import evl.data.function.Function;
 
-final public class EndpointSelf extends Endpoint<Function> {
+final public class EndpointSelf extends Endpoint {
+  final public SimpleRef<Function> funcRef;
 
-  public EndpointSelf(ElementInfo info, Function link) {
-    super(info, link);
+  public EndpointSelf(ElementInfo info, SimpleRef<Function> funcRef) {
+    super(info);
+    this.funcRef = funcRef;
   }
 
   @Override
   public Function getFunc() {
-    return link;
+    return funcRef.link;
   }
 
   @Override
   public String toString() {
-    return "self." + link.name;
+    return "self." + funcRef.link.name;
   }
 }
