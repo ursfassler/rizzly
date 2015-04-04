@@ -27,12 +27,11 @@ import util.StreamWriter;
 import common.Direction;
 import common.Property;
 
-import error.ErrorType;
-import error.RError;
 import evl.data.Evl;
 import evl.data.Named;
 import evl.data.Namespace;
 import evl.data.component.Component;
+import evl.data.component.composition.AsynchroniusConnection;
 import evl.data.component.composition.CompUse;
 import evl.data.component.composition.Connection;
 import evl.data.component.composition.EndpointSelf;
@@ -40,6 +39,7 @@ import evl.data.component.composition.EndpointSub;
 import evl.data.component.composition.ImplComposition;
 import evl.data.component.composition.Queue;
 import evl.data.component.composition.SubCallbacks;
+import evl.data.component.composition.SynchroniusConnection;
 import evl.data.component.elementary.ImplElementary;
 import evl.data.component.hfsm.ImplHfsm;
 import evl.data.component.hfsm.State;
@@ -317,22 +317,23 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     return null;
   }
 
-  @Override
-  protected Void visitConnection(Connection obj, StreamWriter param) {
+  private void writeConnection(Connection obj, String connector, StreamWriter param) {
     visit(obj.endpoint.get(Direction.in), param);
-    switch (obj.type) {
-      case sync:
-        param.wr(" -> ");
-        break;
-      case async:
-        param.wr(" >> ");
-        break;
-      default:
-        RError.err(ErrorType.Fatal, obj.getInfo(), "Not yet implemented connection type: " + obj.type);
-    }
+    param.wr(connector);
     visit(obj.endpoint.get(Direction.out), param);
     param.wr(";");
     param.nl();
+  }
+
+  @Override
+  protected Void visitSynchroniusConnection(SynchroniusConnection obj, StreamWriter param) {
+    writeConnection(obj, " -> ", param);
+    return null;
+  }
+
+  @Override
+  protected Void visitAsynchroniusConnection(AsynchroniusConnection obj, StreamWriter param) {
+    writeConnection(obj, " >> ", param);
     return null;
   }
 

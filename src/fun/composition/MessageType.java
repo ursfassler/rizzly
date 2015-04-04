@@ -15,7 +15,7 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package evl.data.component.composition;
+package fun.composition;
 
 public enum MessageType {
   sync, async;

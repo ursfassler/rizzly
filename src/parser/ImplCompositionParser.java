@@ -24,9 +24,9 @@ import common.Metadata;
 
 import error.ErrorType;
 import error.RError;
-import evl.data.component.composition.MessageType;
 import fun.composition.Connection;
 import fun.composition.ImplComposition;
+import fun.composition.MessageType;
 import fun.expression.reference.RefName;
 import fun.expression.reference.Reference;
 import fun.other.CompImpl;

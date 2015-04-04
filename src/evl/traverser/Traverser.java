@@ -23,6 +23,7 @@ import evl.data.EvlList;
 import evl.data.Named;
 import evl.data.Namespace;
 import evl.data.component.Component;
+import evl.data.component.composition.AsynchroniusConnection;
 import evl.data.component.composition.CompUse;
 import evl.data.component.composition.Connection;
 import evl.data.component.composition.Endpoint;
@@ -31,6 +32,7 @@ import evl.data.component.composition.EndpointSub;
 import evl.data.component.composition.ImplComposition;
 import evl.data.component.composition.Queue;
 import evl.data.component.composition.SubCallbacks;
+import evl.data.component.composition.SynchroniusConnection;
 import evl.data.component.elementary.ImplElementary;
 import evl.data.component.hfsm.ImplHfsm;
 import evl.data.component.hfsm.State;
@@ -232,6 +234,17 @@ public abstract class Traverser<R, P> {
       return visitNamedElement((NamedElement) obj, param);
     } else if (obj instanceof CompUse) {
       return visitCompUse((CompUse) obj, param);
+    } else {
+      throwUnknownObjectError(obj);
+      return null;
+    }
+  }
+
+  protected R visitConnection(Connection obj, P param) {
+    if (obj instanceof AsynchroniusConnection) {
+      return visitAsynchroniusConnection((AsynchroniusConnection) obj, param);
+    } else if (obj instanceof SynchroniusConnection) {
+      return visitSynchroniusConnection((SynchroniusConnection) obj, param);
     } else {
       throwUnknownObjectError(obj);
       return null;
@@ -637,6 +650,10 @@ public abstract class Traverser<R, P> {
     throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
 
+  abstract protected R visitSynchroniusConnection(SynchroniusConnection obj, P param);
+
+  abstract protected R visitAsynchroniusConnection(AsynchroniusConnection obj, P param);
+
   abstract protected R visitFuncReturnTuple(FuncReturnTuple obj, P param);
 
   abstract protected R visitFuncReturnType(FuncReturnType obj, P param);
@@ -742,8 +759,6 @@ public abstract class Traverser<R, P> {
   abstract protected R visitImplElementary(ImplElementary obj, P param);
 
   abstract protected R visitTransition(Transition obj, P param);
-
-  abstract protected R visitConnection(Connection obj, P param);
 
   abstract protected R visitFuncGlobal(FuncGlobal obj, P param);
 

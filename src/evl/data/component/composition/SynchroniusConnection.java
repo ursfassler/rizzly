@@ -1,6 +1,6 @@
 /**
  *  This file is part of Rizzly.
- *
+ * 
  *  Rizzly is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -17,22 +17,18 @@
 
 package evl.data.component.composition;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import common.Direction;
 import common.ElementInfo;
 
-import evl.data.EvlBase;
+final public class SynchroniusConnection extends Connection {
 
-abstract public class Connection extends EvlBase {
-  final public Map<Direction, Endpoint> endpoint;
+  public SynchroniusConnection(ElementInfo info, Endpoint src, Endpoint dst) {
+    super(info, src, dst);
+  }
 
-  public Connection(ElementInfo info, Endpoint src, Endpoint dst) {
-    super(info);
-    endpoint = new HashMap<Direction, Endpoint>();
-    endpoint.put(Direction.in, src);
-    endpoint.put(Direction.out, dst);
+  @Override
+  public String toString() {
+    return endpoint.get(Direction.in) + " -> " + endpoint.get(Direction.out);
   }
 
 }

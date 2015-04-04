@@ -37,15 +37,16 @@ import evl.data.Evl;
 import evl.data.EvlList;
 import evl.data.Namespace;
 import evl.data.component.Component;
+import evl.data.component.composition.AsynchroniusConnection;
 import evl.data.component.composition.CompUse;
 import evl.data.component.composition.Connection;
 import evl.data.component.composition.Endpoint;
 import evl.data.component.composition.EndpointSelf;
 import evl.data.component.composition.EndpointSub;
 import evl.data.component.composition.ImplComposition;
-import evl.data.component.composition.MessageType;
 import evl.data.component.composition.Queue;
 import evl.data.component.composition.SubCallbacks;
+import evl.data.component.composition.SynchroniusConnection;
 import evl.data.component.elementary.ImplElementary;
 import evl.data.expression.Expression;
 import evl.data.expression.TupleValue;
@@ -176,7 +177,7 @@ class CompositionReductionWorker extends NullTraverser<Evl, Void> {
         if (coniface instanceof FuncCtrlInDataOut) {
           // assert (elem.getResponse().contains(coniface));
           assert (coniface.body.statements.isEmpty());
-          assert (con.type == MessageType.sync);
+          assert (con instanceof SynchroniusConnection);
 
           ReturnExpr call = makeQueryCall(con.endpoint.get(Direction.out), coniface);
           coniface.body.statements.add(call);
@@ -196,7 +197,7 @@ class CompositionReductionWorker extends NullTraverser<Evl, Void> {
         if (coniface instanceof FuncCtrlOutDataIn) {
           // assert (srcComp.getLink().getQuery().contains(coniface));
           assert (suha.body.statements.isEmpty());
-          assert (con.type == MessageType.sync);
+          assert (con instanceof SynchroniusConnection);
 
           ReturnExpr call = makeQueryCall(con.endpoint.get(Direction.out), suha);
           suha.body.statements.add(call);
@@ -213,16 +214,12 @@ class CompositionReductionWorker extends NullTraverser<Evl, Void> {
   }
 
   private void genSlotCall(ImplElementary elem, Connection con, Function coniface) {
-    switch (con.type) {
-      case sync:
-        coniface.body.statements.add(makeEventCall(con.endpoint.get(Direction.out), coniface));
-        break;
-      case async:
-        coniface.body.statements.add(makePostQueueCall(con.endpoint.get(Direction.out), coniface, elem));
-        break;
-      default:
-        RError.err(ErrorType.Error, con.getInfo(), "Unknown connection type: " + con.type);
-        return;
+    if (con instanceof SynchroniusConnection) {
+      coniface.body.statements.add(makeEventCall(con.endpoint.get(Direction.out), coniface));
+    } else if (con instanceof AsynchroniusConnection) {
+      coniface.body.statements.add(makePostQueueCall(con.endpoint.get(Direction.out), coniface, elem));
+    } else {
+      RError.err(ErrorType.Error, con.getInfo(), "Unknown connection type: " + con.getClass().getCanonicalName());
     }
   }
 

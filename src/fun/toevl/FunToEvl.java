@@ -203,7 +203,15 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
   protected Evl visitConnection(Connection obj, Void param) {
     Reference srcref = (Reference) traverse(obj.getEndpoint(Direction.in), null);
     Reference dstref = (Reference) traverse(obj.getEndpoint(Direction.out), null);
-    return new evl.data.component.composition.Connection(obj.getInfo(), refToEnp(srcref), refToEnp(dstref), obj.getType());
+    switch (obj.getType()) {
+      case async:
+        return new evl.data.component.composition.AsynchroniusConnection(obj.getInfo(), refToEnp(srcref), refToEnp(dstref));
+      case sync:
+        return new evl.data.component.composition.SynchroniusConnection(obj.getInfo(), refToEnp(srcref), refToEnp(dstref));
+      default:
+        RError.err(ErrorType.Fatal, obj.getInfo(), "Unknown message type: " + obj.getType());
+        return null;
+    }
   }
 
   private Endpoint refToEnp(Reference ref) {

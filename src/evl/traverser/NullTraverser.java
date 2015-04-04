@@ -19,13 +19,14 @@ package evl.traverser;
 
 import evl.data.Evl;
 import evl.data.Namespace;
+import evl.data.component.composition.AsynchroniusConnection;
 import evl.data.component.composition.CompUse;
-import evl.data.component.composition.Connection;
 import evl.data.component.composition.EndpointSelf;
 import evl.data.component.composition.EndpointSub;
 import evl.data.component.composition.ImplComposition;
 import evl.data.component.composition.Queue;
 import evl.data.component.composition.SubCallbacks;
+import evl.data.component.composition.SynchroniusConnection;
 import evl.data.component.elementary.ImplElementary;
 import evl.data.component.hfsm.ImplHfsm;
 import evl.data.component.hfsm.StateComposite;
@@ -129,6 +130,16 @@ import evl.data.variable.StateVariable;
 abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   abstract protected R visitDefault(Evl obj, P param);
+
+  @Override
+  protected R visitSynchroniusConnection(SynchroniusConnection obj, P param) {
+    return visitDefault(obj, param);
+  }
+
+  @Override
+  protected R visitAsynchroniusConnection(AsynchroniusConnection obj, P param) {
+    return visitDefault(obj, param);
+  }
 
   @Override
   protected R visitForStmt(ForStmt obj, P param) {
@@ -402,11 +413,6 @@ abstract public class NullTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitImplComposition(ImplComposition obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitConnection(Connection obj, P param) {
     return visitDefault(obj, param);
   }
 

@@ -20,13 +20,14 @@ package evl.traverser;
 import common.Direction;
 
 import evl.data.Namespace;
+import evl.data.component.composition.AsynchroniusConnection;
 import evl.data.component.composition.CompUse;
-import evl.data.component.composition.Connection;
 import evl.data.component.composition.EndpointSelf;
 import evl.data.component.composition.EndpointSub;
 import evl.data.component.composition.ImplComposition;
 import evl.data.component.composition.Queue;
 import evl.data.component.composition.SubCallbacks;
+import evl.data.component.composition.SynchroniusConnection;
 import evl.data.component.elementary.ImplElementary;
 import evl.data.component.hfsm.ImplHfsm;
 import evl.data.component.hfsm.StateComposite;
@@ -365,7 +366,14 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitConnection(Connection obj, P param) {
+  protected R visitSynchroniusConnection(SynchroniusConnection obj, P param) {
+    visit(obj.endpoint.get(Direction.in), param);
+    visit(obj.endpoint.get(Direction.out), param);
+    return null;
+  }
+
+  @Override
+  protected R visitAsynchroniusConnection(AsynchroniusConnection obj, P param) {
     visit(obj.endpoint.get(Direction.in), param);
     visit(obj.endpoint.get(Direction.out), param);
     return null;
