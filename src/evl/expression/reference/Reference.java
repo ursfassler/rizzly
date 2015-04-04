@@ -23,7 +23,7 @@ import evl.other.EvlList;
 import evl.other.Named;
 
 final public class Reference extends BaseRef<Named> {
-  final private EvlList<RefItem> offset;
+  public final EvlList<RefItem> offset;
 
   public Reference(ElementInfo info, Named link, EvlList<RefItem> offset) {
     super(info, link);
@@ -42,10 +42,6 @@ final public class Reference extends BaseRef<Named> {
     super(info, link);
     assert (link != null);
     this.offset = new EvlList<RefItem>();
-  }
-
-  public EvlList<RefItem> getOffset() {
-    return offset;
   }
 
   @Override

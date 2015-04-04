@@ -22,7 +22,7 @@ import common.ElementInfo;
 import evl.other.EvlList;
 
 public class TupleValue extends Expression {
-  final private EvlList<Expression> value;
+  final public EvlList<Expression> value;
 
   public TupleValue(ElementInfo info, EvlList<Expression> value) {
     super(info);
@@ -33,10 +33,6 @@ public class TupleValue extends Expression {
   public TupleValue(ElementInfo info) {
     super(info);
     this.value = new EvlList<Expression>();
-  }
-
-  public EvlList<Expression> getValue() {
-    return value;
   }
 
   @Override

@@ -63,13 +63,13 @@ class DispatchFunctionFactory {
 
     Block body = new Block(info);
 
-    ArrayType dt = (ArrayType) queueVariables.getQueue().getType().getLink();
-    UnionType ut = (UnionType) dt.getType().getLink();
+    ArrayType dt = (ArrayType) queueVariables.getQueue().type.link;
+    UnionType ut = (UnionType) dt.type.link;
 
     EvlList<CaseOpt> opt = new EvlList<CaseOpt>();
     Reference ref = new Reference(info, queueVariables.getQueue());
-    ref.getOffset().add(new RefIndex(info, new Reference(info, queueVariables.getHead())));
-    ref.getOffset().add(new RefName(info, ut.getTag().getName()));
+    ref.offset.add(new RefIndex(info, new Reference(info, queueVariables.getHead())));
+    ref.offset.add(new RefName(info, ut.tag.getName()));
     CaseStmt caseStmt = new CaseStmt(info, ref, opt, new Block(info));
 
     for (Function func : queueTypes.getFuncToMsgType().keySet()) {
@@ -80,19 +80,19 @@ class DispatchFunctionFactory {
       NamedElement un = queueTypes.getFuncToElem().get(func);
       RecordType rec = queueTypes.getFuncToRecord().get(func);
       TupleValue acarg = new TupleValue(info);
-      for (NamedElement elem : rec.getElement()) {
+      for (NamedElement elem : rec.element) {
         Reference vref = new Reference(info, queueVariables.getQueue());
-        vref.getOffset().add(new RefIndex(info, new Reference(info, queueVariables.getHead())));
-        vref.getOffset().add(new RefName(info, un.getName()));
-        vref.getOffset().add(new RefName(info, elem.getName()));
-        acarg.getValue().add(vref);
+        vref.offset.add(new RefIndex(info, new Reference(info, queueVariables.getHead())));
+        vref.offset.add(new RefName(info, un.getName()));
+        vref.offset.add(new RefName(info, elem.getName()));
+        acarg.value.add(vref);
       }
 
       Reference call = new Reference(info, func);
-      call.getOffset().add(new RefCall(info, acarg));
-      copt.getCode().getStatements().add(new CallStmt(info, call));
+      call.offset.add(new RefCall(info, acarg));
+      copt.code.statements.add(new CallStmt(info, call));
 
-      caseStmt.getOption().add(copt);
+      caseStmt.option.add(copt);
     }
 
     AssignmentSingle add = new AssignmentSingle(info, new Reference(info, queueVariables.getHead()), new Plus(info, new Reference(info, queueVariables.getHead()), new Number(info, BigInteger.ONE)));
@@ -100,14 +100,14 @@ class DispatchFunctionFactory {
 
     EvlList<IfOption> option = new EvlList<IfOption>();
     IfOption ifOption = new IfOption(info, new Greater(info, new Reference(info, queueVariables.getCount()), new Number(info, BigInteger.ZERO)), new Block(info));
-    ifOption.getCode().getStatements().add(caseStmt);
-    ifOption.getCode().getStatements().add(sub);
-    ifOption.getCode().getStatements().add(add);
+    ifOption.code.statements.add(caseStmt);
+    ifOption.code.statements.add(sub);
+    ifOption.code.statements.add(add);
 
     option.add(ifOption);
     IfStmt ifc = new IfStmt(info, option, new Block(info));
 
-    body.getStatements().add(ifc);
+    body.statements.add(ifc);
     return body;
   }
 }

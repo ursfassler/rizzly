@@ -22,7 +22,7 @@ import util.Range;
 import common.ElementInfo;
 
 public class RangeType extends BaseType {
-  final private Range range;
+  final public Range range;
 
   public RangeType(Range range) {
     super(ElementInfo.NO, makeName(range));
@@ -36,10 +36,6 @@ public class RangeType extends BaseType {
 
   public static String makeName(Range range) {
     return "R{" + range.getLow() + "," + range.getHigh() + "}";
-  }
-
-  public Range getNumbers() {
-    return range;
   }
 
 }

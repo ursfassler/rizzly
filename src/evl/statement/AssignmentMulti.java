@@ -27,9 +27,9 @@ import evl.other.EvlList;
  *
  * @author urs
  */
-final public class AssignmentMulti extends Assignment<EvlList<Reference>> {
+final public class AssignmentMulti extends Assignment {
 
-  final private EvlList<Reference> left;
+  final public EvlList<Reference> left;
 
   public AssignmentMulti(ElementInfo info, EvlList<Reference> left, Expression right) {
     super(info, right);
@@ -38,8 +38,7 @@ final public class AssignmentMulti extends Assignment<EvlList<Reference>> {
   }
 
   @Override
-  public EvlList<Reference> getLeft() {
-    return left;
+  public String toString() {
+    return left + " := " + right;
   }
-
 }

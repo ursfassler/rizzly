@@ -84,12 +84,12 @@ class StmtTraverser extends DefTraverser<Void, List<Statement>> {
   @Override
   protected Void visitBlock(Block obj, List<Statement> param) {
     List<Statement> sl = new ArrayList<Statement>();
-    for (Statement stmt : obj.getStatements()) {
+    for (Statement stmt : obj.statements) {
       visit(stmt, sl);
       sl.add(stmt);
     }
-    obj.getStatements().clear();
-    obj.getStatements().addAll(sl);
+    obj.statements.clear();
+    obj.statements.addAll(sl);
     return null;
   }
 
@@ -103,10 +103,10 @@ class StmtTraverser extends DefTraverser<Void, List<Statement>> {
   protected Void visitBaseRef(BaseRef obj, List<Statement> param) {
     super.visitBaseRef(obj, param);
 
-    boolean isOut = (obj.getLink() instanceof FuncCtrlOutDataIn) || (obj.getLink() instanceof FuncCtrlOutDataOut);
+    boolean isOut = (obj.link instanceof FuncCtrlOutDataIn) || (obj.link instanceof FuncCtrlOutDataOut);
 
     if (isOut) {
-      String funcName = obj.getLink().getName();
+      String funcName = obj.link.getName();
 
       int numFunc = names.indexOf(funcName);
       if (numFunc >= 0) {
@@ -123,10 +123,10 @@ class StmtTraverser extends DefTraverser<Void, List<Statement>> {
   private CallStmt makeCall(FuncPrivateVoid func, int numFunc) {
     // Self._sendMsg( numFunc );
     TupleValue actParam = new TupleValue(info);
-    actParam.getValue().add(new Number(info, BigInteger.valueOf(numFunc)));
+    actParam.value.add(new Number(info, BigInteger.valueOf(numFunc)));
 
     Reference call = new Reference(info, func);
-    call.getOffset().add(new RefCall(info, actParam));
+    call.offset.add(new RefCall(info, actParam));
 
     return new CallStmt(info, call);
   }

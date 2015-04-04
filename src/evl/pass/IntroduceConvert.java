@@ -83,10 +83,10 @@ class IntroduceConvertWorker extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitReference(Reference obj, Void param) {
-    if ((obj.getLink() instanceof Type) && !obj.getOffset().isEmpty() && (obj.getOffset().get(0) instanceof RefCall)) {
-      Type resType = (Type) obj.getLink();
+    if ((obj.link instanceof Type) && !obj.offset.isEmpty() && (obj.offset.get(0) instanceof RefCall)) {
+      Type resType = (Type) obj.link;
       Function convertFunc = getConvertFunc(resType);
-      obj.setLink(convertFunc);
+      obj.link = convertFunc;
     }
     return super.visitReference(obj, param);
   }
@@ -107,7 +107,7 @@ class IntroduceConvertWorker extends DefTraverser<Void, Void> {
       kbi.addItem(ret);
     }
 
-    assert (ret.getParam().size() == 1);
+    assert (ret.param.size() == 1);
     // assert (ret.getRet().getLink() == resType);
 
     return ret;
@@ -125,8 +125,8 @@ class IntroduceConvertWorker extends DefTraverser<Void, Void> {
     EvlList<IfOption> option = new EvlList<IfOption>();
 
     { // test
-      Relation aboveLower = new Lessequal(info, new Number(info, resType.getNumbers().getLow()), new Reference(info, value));
-      Relation belowHigher = new Lessequal(info, new Reference(info, value), new Number(info, resType.getNumbers().getHigh()));
+      Relation aboveLower = new Lessequal(info, new Number(info, resType.range.getLow()), new Reference(info, value));
+      Relation belowHigher = new Lessequal(info, new Reference(info, value), new Number(info, resType.range.getHigh()));
       Expression cond = new LogicAnd(info, aboveLower, belowHigher);
       IfOption opt = new IfOption(info, cond, ok);
       option.add(opt);
@@ -135,7 +135,7 @@ class IntroduceConvertWorker extends DefTraverser<Void, Void> {
     { // ok, cast
       TypeCast cast = new TypeCast(info, new SimpleRef<Type>(info, resType), new Reference(info, value));
       ReturnExpr ret = new ReturnExpr(info, cast);
-      ok.getStatements().add(ret);
+      ok.statements.add(ret);
     }
 
     { // error, do something
@@ -143,15 +143,15 @@ class IntroduceConvertWorker extends DefTraverser<Void, Void> {
       // TODO insert call to debug output with error message
       // TODO throw exception
       Reference call = new Reference(info, kll.getTrap());
-      call.getOffset().add(new RefCall(info, new TupleValue(info, new EvlList<Expression>())));
-      ReturnExpr trap = new ReturnExpr(info, new Number(info, resType.getNumbers().getLow()));
+      call.offset.add(new RefCall(info, new TupleValue(info, new EvlList<Expression>())));
+      ReturnExpr trap = new ReturnExpr(info, new Number(info, resType.range.getLow()));
 
-      error.getStatements().add(new CallStmt(info, call));
-      error.getStatements().add(trap);
+      error.statements.add(new CallStmt(info, call));
+      error.statements.add(trap);
     }
 
     IfStmt ifstmt = new IfStmt(info, option, error);
-    body.getStatements().add(ifstmt);
+    body.statements.add(ifstmt);
 
     EvlList<FuncVariable> param = new EvlList<FuncVariable>();
     param.add(value);

@@ -22,20 +22,12 @@ import common.ElementInfo;
 import evl.expression.Expression;
 
 abstract public class UnaryExp extends Expression {
-  private Expression expr;
-
-  public UnaryExp(ElementInfo info, Expression expr) {
-    super(info);
-    this.expr = expr;
-  }
+  public Expression expr;
 
   abstract public String getOpName();
 
-  public Expression getExpr() {
-    return expr;
-  }
-
-  public void setExpr(Expression expr) {
+  public UnaryExp(ElementInfo info, Expression expr) {
+    super(info);
     this.expr = expr;
   }
 

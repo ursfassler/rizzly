@@ -26,24 +26,12 @@ import evl.other.EvlList;
 import evl.type.Type;
 
 public class RecordValue extends Expression {
-  final private EvlList<NamedValue> value = new EvlList<NamedValue>();
-  private SimpleRef<Type> type;
+  final public EvlList<NamedValue> value = new EvlList<NamedValue>();
+  public SimpleRef<Type> type;
 
   public RecordValue(ElementInfo info, Collection<NamedValue> value, SimpleRef<Type> type) {
     super(info);
     this.value.addAll(value);
-    this.type = type;
-  }
-
-  public EvlList<NamedValue> getValue() {
-    return value;
-  }
-
-  public SimpleRef<Type> getType() {
-    return type;
-  }
-
-  public void setType(SimpleRef<Type> type) {
     this.type = type;
   }
 

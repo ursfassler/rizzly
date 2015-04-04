@@ -22,18 +22,10 @@ import util.Range;
 import common.ElementInfo;
 
 public class CaseOptSimple extends CaseOptEntry {
-  private Range value;
+  public Range value;
 
   public CaseOptSimple(ElementInfo info, Range value) {
     super(info);
-    this.value = value;
-  }
-
-  public Range getValue() {
-    return value;
-  }
-
-  public void setValue(Range value) {
     this.value = value;
   }
 

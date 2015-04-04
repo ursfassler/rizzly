@@ -23,15 +23,11 @@ import evl.other.EvlList;
 import evl.variable.FuncVariable;
 
 final public class FuncReturnTuple extends FuncReturn {
-  final private EvlList<FuncVariable> param;
+  final public EvlList<FuncVariable> param;
 
   public FuncReturnTuple(ElementInfo info, EvlList<FuncVariable> param) {
     super(info);
     this.param = param;
-  }
-
-  public EvlList<FuncVariable> getParam() {
-    return param;
   }
 
 }

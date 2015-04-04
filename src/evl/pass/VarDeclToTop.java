@@ -42,7 +42,7 @@ class VarDeclToTopWorker extends DefTraverser<Void, Void> {
   @Override
   protected Void visitBlock(Block obj, Void param) {
     LinkedList<Statement> nlist = new LinkedList<Statement>();
-    for (Statement itr : obj.getStatements()) {
+    for (Statement itr : obj.statements) {
       visit(itr, param);
       if (itr instanceof VarDefStmt) {
         nlist.addFirst(itr);
@@ -50,8 +50,8 @@ class VarDeclToTopWorker extends DefTraverser<Void, Void> {
         nlist.addLast(itr);
       }
     }
-    obj.getStatements().clear();
-    obj.getStatements().addAll(nlist);
+    obj.statements.clear();
+    obj.statements.addAll(nlist);
     return null;
   }
 

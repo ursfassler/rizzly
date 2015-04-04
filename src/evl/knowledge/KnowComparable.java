@@ -106,8 +106,8 @@ class KnowComparableWorker extends NullTraverser<Boolean, Type> {
       return false;
     }
     for (int i = 0; i < left.size(); i++) {
-      Type lefttype = left.get(i).getLink();
-      Type righttype = right.get(i).getLink();
+      Type lefttype = left.get(i).link;
+      Type righttype = right.get(i).link;
       if (!visit(lefttype, righttype)) {
         return false;
       }
@@ -158,13 +158,13 @@ class KnowComparableWorker extends NullTraverser<Boolean, Type> {
   @Override
   protected Boolean visitTupleType(TupleType obj, Type right) {
     if (right instanceof TupleType) {
-      return process(obj.getTypes(), ((TupleType) right).getTypes());
+      return process(obj.types, ((TupleType) right).types);
     } else if (right instanceof RecordType) {
       List<SimpleRef<Type>> rtypes = new ArrayList<SimpleRef<Type>>();
-      for (NamedElement elem : ((RecordType) right).getElement()) {
-        rtypes.add(elem.getRef());
+      for (NamedElement elem : ((RecordType) right).element) {
+        rtypes.add(elem.ref);
       }
-      return process(obj.getTypes(), rtypes);
+      return process(obj.types, rtypes);
     } else {
       throw new RuntimeException("not yet implemented: " + right);
     }
@@ -176,10 +176,10 @@ class KnowComparableWorker extends NullTraverser<Boolean, Type> {
       return true;
     } else if (right instanceof TupleType) {
       List<SimpleRef<Type>> lt = new ArrayList<SimpleRef<Type>>();
-      for (NamedElement elem : left.getElement()) {
-        lt.add(elem.getRef());
+      for (NamedElement elem : left.element) {
+        lt.add(elem.ref);
       }
-      return process(lt, ((TupleType) right).getTypes());
+      return process(lt, ((TupleType) right).types);
     } else {
       return false; // TODO check if left is supertype of right
     }
@@ -188,18 +188,18 @@ class KnowComparableWorker extends NullTraverser<Boolean, Type> {
   @Override
   protected Boolean visitArrayType(ArrayType left, Type right) {
     if (right instanceof ArrayType) {
-      Type lefttype = left.getType().getLink();
-      Type righttype = ((ArrayType) right).getType().getLink();
+      Type lefttype = left.type.link;
+      Type righttype = ((ArrayType) right).type.link;
       if (!visit(lefttype, righttype)) {
         return false;
       }
-      return left.getSize().compareTo(((ArrayType) right).getSize()) <= 0;
+      return left.size.compareTo(((ArrayType) right).size) <= 0;
     } else if (right instanceof TupleType) {
       List<SimpleRef<Type>> lt = new ArrayList<SimpleRef<Type>>();
-      for (int i = 0; i < left.getSize().intValue(); i++) {
-        lt.add(left.getType());
+      for (int i = 0; i < left.size.intValue(); i++) {
+        lt.add(left.type);
       }
-      return process(lt, ((TupleType) right).getTypes());
+      return process(lt, ((TupleType) right).types);
     } else {
       return false;
     }

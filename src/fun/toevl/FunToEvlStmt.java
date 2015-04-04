@@ -58,7 +58,7 @@ public class FunToEvlStmt extends NullTraverser<Statement, Void> {
   protected Statement visitBlock(Block obj, Void param) {
     evl.statement.Block block = new evl.statement.Block(obj.getInfo());
     for (fun.statement.Statement stmt : obj.getStatements()) {
-      block.getStatements().add((Statement) fta.visit(stmt, null));
+      block.statements.add((Statement) fta.visit(stmt, null));
     }
     return block;
   }

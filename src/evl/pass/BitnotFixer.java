@@ -64,7 +64,7 @@ class BitnotFixerWorker extends ExprReplacer<Void> {
   protected Expression visitBitNot(BitNot obj, Void param) {
     obj = (BitNot) super.visitBitNot(obj, param);
     Type type = kt.get(obj);
-    Range range = ((RangeType) type).getNumbers();
+    Range range = ((RangeType) type).range;
     assert (range.getLow().equals(BigInteger.ZERO));
     int bits = range.getHigh().bitCount();
     BigInteger mask = BigInteger.valueOf(2).pow(bits).subtract(BigInteger.ONE);

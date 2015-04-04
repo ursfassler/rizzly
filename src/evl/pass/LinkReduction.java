@@ -54,19 +54,19 @@ class LinkReductionWorker extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitReference(Reference obj, Void param) {
-    Evl item = obj.getLink();
+    Evl item = obj.link;
     while (item instanceof Namespace) {
-      RefItem next = obj.getOffset().get(0);
-      obj.getOffset().remove(0);
+      RefItem next = obj.offset.get(0);
+      obj.offset.remove(0);
       if (!(next instanceof RefName)) {
         // TODO check it with typechecker
         RError.err(ErrorType.Fatal, obj.getInfo(), "Expected named offset, got: " + next.getClass().getCanonicalName() + " (and why did the typechecker not find it?)");
       }
       RefName name = (RefName) next;
-      item = ((Namespace) item).getChildren().find(name.getName());
+      item = ((Namespace) item).getChildren().find(name.name);
       assert (item != null); // type checker should find it?
     }
-    obj.setLink((Named) item);
+    obj.link = (Named) item;
     return super.visitReference(obj, param);
   }
 

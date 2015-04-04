@@ -98,15 +98,15 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
   }
 
   public static SimpleRef<Type> toTypeRef(Reference ref) {
-    assert (ref.getOffset().isEmpty());
-    assert (ref.getLink() instanceof Type);
-    SimpleRef<Type> typeRef = new SimpleRef<Type>(ref.getInfo(), (Type) ref.getLink());
+    assert (ref.offset.isEmpty());
+    assert (ref.link instanceof Type);
+    SimpleRef<Type> typeRef = new SimpleRef<Type>(ref.getInfo(), (Type) ref.link);
     return typeRef;
   }
 
   public static <T extends Named> SimpleRef<T> toSimple(Reference ref) {
-    assert (ref.getOffset().isEmpty());
-    SimpleRef<T> typeRef = new SimpleRef<T>(ref.getInfo(), (T) ref.getLink());
+    assert (ref.offset.isEmpty());
+    SimpleRef<T> typeRef = new SimpleRef<T>(ref.getInfo(), (T) ref.link);
     return typeRef;
   }
 
@@ -207,16 +207,16 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
   }
 
   private Endpoint refToEnp(Reference ref) {
-    switch (ref.getOffset().size()) {
+    switch (ref.offset.size()) {
       case 0: {
-        Named link = ref.getLink();
+        Named link = ref.link;
         RError.ass(link instanceof Function, ref.getInfo(), "expected function for: " + link.getName());
         return new EndpointSelf(ref.getInfo(), (Function) link);
       }
       case 1: {
-        Named link = ref.getLink();
+        Named link = ref.link;
         RError.ass(link instanceof CompUse, ref.getInfo(), "expected compuse for: " + link.getName());
-        String name = ((RefName) ref.getOffset().get(0)).getName();
+        String name = ((RefName) ref.offset.get(0)).name;
         return new EndpointSub(ref.getInfo(), (CompUse) link, name);
       }
       default: {
@@ -236,25 +236,25 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
     evl.other.ImplElementary comp = new evl.other.ImplElementary(obj.getInfo(), obj.getName(), new SimpleRef<FuncPrivateVoid>(info, entryFunc), new SimpleRef<FuncPrivateVoid>(info, exitFunc));
     map.put(obj, comp);
 
-    comp.getFunction().add(entryFunc);
-    comp.getFunction().add(exitFunc);
+    comp.function.add(entryFunc);
+    comp.function.add(exitFunc);
     RError.ass(obj.getDeclaration().isEmpty(), obj.getInfo());
 
     for (Fun itr : obj.getIface()) {
       Evl evl = visit(itr, param);
-      comp.getIface().add((InterfaceFunction) evl);
+      comp.iface.add((InterfaceFunction) evl);
     }
 
     for (Fun itr : obj.getInstantiation()) {
       Evl ni = visit(itr, null);
       if (ni instanceof evl.variable.Constant) {
-        comp.getConstant().add((evl.variable.Constant) ni);
+        comp.constant.add((evl.variable.Constant) ni);
       } else if (ni instanceof evl.variable.Variable) {
-        comp.getVariable().add((evl.variable.Variable) ni);
+        comp.variable.add((evl.variable.Variable) ni);
       } else if (ni instanceof Function) {
-        comp.getFunction().add((Function) ni);
+        comp.function.add((Function) ni);
       } else if (ni instanceof evl.type.Type) {
-        comp.getType().add((evl.type.Type) ni);
+        comp.type.add((evl.type.Type) ni);
       } else {
         throw new RuntimeException("Not yet implemented: " + ni.getClass().getCanonicalName());
       }
@@ -275,11 +275,11 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
 
     for (Fun itr : obj.getIface()) {
       Evl evl = visit(itr, param);
-      comp.getIface().add((InterfaceFunction) evl);
+      comp.iface.add((InterfaceFunction) evl);
     }
 
-    comp.setTopstate((evl.hfsm.StateComposite) visit(obj.getTopstate(), null));
-    comp.getTopstate().setName(Designator.NAME_SEP + "top");
+    comp.topstate = (evl.hfsm.StateComposite) visit(obj.getTopstate(), null);
+    comp.topstate.setName(Designator.NAME_SEP + "top");
     return comp;
   }
 
@@ -290,22 +290,22 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
 
     for (Fun itr : obj.getIface()) {
       Evl evl = visit(itr, param);
-      comp.getIface().add((InterfaceFunction) evl);
+      comp.iface.add((InterfaceFunction) evl);
     }
 
     for (Fun itr : obj.getInstantiation()) {
       Evl ni = visit(itr, null);
       if (ni instanceof CompUse) {
-        comp.getComponent().add((CompUse) ni);
+        comp.component.add((CompUse) ni);
       } else if (ni instanceof InterfaceFunction) {
-        comp.getIface().add((InterfaceFunction) ni);
+        comp.iface.add((InterfaceFunction) ni);
       } else {
         throw new RuntimeException("Not yet implemented: " + ni.getClass().getCanonicalName());
       }
     }
 
     for (Connection con : obj.getConnection()) {
-      comp.getConnection().add((evl.composition.Connection) visit(con, null));
+      comp.connection.add((evl.composition.Connection) visit(con, null));
     }
     return comp;
   }
@@ -325,7 +325,7 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
     for (StateContent use : obj.getItemList()) {
       Evl evl = traverse(use, null);
       if (evl instanceof StateItem) {
-        state.getItem().add((StateItem) evl);
+        state.item.add((StateItem) evl);
       } else {
         RError.err(ErrorType.Fatal, evl.getInfo(), "Unhandled state item: " + evl.getClass().getCanonicalName());
       }
@@ -342,15 +342,15 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
     FuncPrivateVoid exitFunc = new FuncPrivateVoid(info, "_exit", new EvlList<evl.variable.FuncVariable>(), new evl.function.ret.FuncReturnNone(info), new Block(info));
 
     evl.hfsm.StateComposite state = new evl.hfsm.StateComposite(obj.getInfo(), obj.getName(), new SimpleRef<FuncPrivateVoid>(info, entryFunc), new SimpleRef<FuncPrivateVoid>(info, exitFunc), initref);
-    state.getItem().add(entryFunc);
-    state.getItem().add(exitFunc);
+    state.item.add(entryFunc);
+    state.item.add(exitFunc);
     map.put(obj, state);
 
     convertContent(obj, state);
 
     // it is here to break dependency cycle
-    entryFunc.getBody().getStatements().addAll(((Block) traverse(obj.getEntryFunc(), null)).getStatements());
-    exitFunc.getBody().getStatements().addAll(((Block) traverse(obj.getExitFunc(), null)).getStatements());
+    entryFunc.body.statements.addAll(((Block) traverse(obj.getEntryFunc(), null)).statements);
+    exitFunc.body.statements.addAll(((Block) traverse(obj.getExitFunc(), null)).statements);
 
     return state;
   }
@@ -362,15 +362,15 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
     FuncPrivateVoid exitFunc = new FuncPrivateVoid(info, "_exit", new EvlList<evl.variable.FuncVariable>(), new evl.function.ret.FuncReturnNone(info), new Block(info));
 
     evl.hfsm.StateSimple state = new evl.hfsm.StateSimple(obj.getInfo(), obj.getName(), new SimpleRef<FuncPrivateVoid>(info, entryFunc), new SimpleRef<FuncPrivateVoid>(info, exitFunc));
-    state.getItem().add(entryFunc);
-    state.getItem().add(exitFunc);
+    state.item.add(entryFunc);
+    state.item.add(exitFunc);
     map.put(obj, state);
 
     convertContent(obj, state);
 
     // it is here to break dependency cycle
-    entryFunc.getBody().getStatements().addAll(((Block) traverse(obj.getEntryFunc(), null)).getStatements());
-    exitFunc.getBody().getStatements().addAll(((Block) traverse(obj.getExitFunc(), null)).getStatements());
+    entryFunc.body.statements.addAll(((Block) traverse(obj.getEntryFunc(), null)).statements);
+    exitFunc.body.statements.addAll(((Block) traverse(obj.getExitFunc(), null)).statements);
 
     return state;
   }

@@ -48,7 +48,7 @@ public class TypeSizeGetter extends NullTraverser<Integer, Void> {
 
   @Override
   protected Integer visitBaseRef(BaseRef obj, Void param) {
-    return visit(obj.getLink(), param);
+    return visit(obj.link, param);
   }
 
   @Override
@@ -73,14 +73,14 @@ public class TypeSizeGetter extends NullTraverser<Integer, Void> {
 
   @Override
   protected Integer visitArrayType(ArrayType obj, Void param) {
-    int tsize = visit(obj.getType(), param);
+    int tsize = visit(obj.type, param);
     tsize = roundUp(tsize);
-    return obj.getSize().intValue() * tsize;
+    return obj.size.intValue() * tsize;
   }
 
   @Override
   protected Integer visitIntType(IntType obj, Void param) {
-    return obj.getBytes();
+    return obj.bytes;
   }
 
 }

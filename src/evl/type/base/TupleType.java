@@ -24,15 +24,11 @@ import evl.other.EvlList;
 import evl.type.Type;
 
 public class TupleType extends BaseType {
-  final private EvlList<SimpleRef<Type>> types;
+  final public EvlList<SimpleRef<Type>> types;
 
   public TupleType(ElementInfo info, String name, EvlList<SimpleRef<Type>> types) {
     super(info, name);
     this.types = types;
-  }
-
-  public EvlList<SimpleRef<Type>> getTypes() {
-    return types;
   }
 
 }

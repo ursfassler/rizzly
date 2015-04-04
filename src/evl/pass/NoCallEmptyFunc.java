@@ -34,8 +34,8 @@ class NoCallEmptyFuncWorker extends StmtReplacer<Function> {
 
   @Override
   protected List<Statement> visitCallStmt(CallStmt obj, Function param) {
-    if (obj.getCall().getLink() instanceof Function) {
-      Function func = (Function) obj.getCall().getLink();
+    if (obj.call.link instanceof Function) {
+      Function func = (Function) obj.call.link;
 
       if (!keep.contains(func) && !remove.contains(func)) {
         check(func, param);
@@ -69,7 +69,7 @@ class NoCallEmptyFuncWorker extends StmtReplacer<Function> {
   }
 
   private boolean removable(Function func) {
-    return func.getBody().getStatements().isEmpty() && !func.properties().containsKey(Property.Public) && !func.properties().containsKey(Property.Extern);
+    return func.body.statements.isEmpty() && !func.properties().containsKey(Property.Public) && !func.properties().containsKey(Property.Extern);
 
   }
 }

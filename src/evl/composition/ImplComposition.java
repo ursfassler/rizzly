@@ -24,19 +24,11 @@ import evl.other.Component;
 import evl.other.EvlList;
 
 public class ImplComposition extends Component {
-  final private EvlList<CompUse> component = new EvlList<CompUse>();
-  final private EvlList<Connection> connection = new EvlList<Connection>();
+  final public EvlList<CompUse> component = new EvlList<CompUse>();
+  final public EvlList<Connection> connection = new EvlList<Connection>();
 
   public ImplComposition(ElementInfo info, String name) {
     super(info, name);
-  }
-
-  public EvlList<CompUse> getComponent() {
-    return component;
-  }
-
-  public EvlList<Connection> getConnection() {
-    return connection;
   }
 
 }

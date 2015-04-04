@@ -64,22 +64,22 @@ class TransitionUplifterWorker extends NullTraverser<Void, List<Transition>> {
   @Override
   protected Void visitImplHfsm(ImplHfsm obj, List<Transition> param) {
     List<Transition> list = new ArrayList<Transition>();
-    visit(obj.getTopstate(), list);
-    obj.getTopstate().getItem().addAll(list);
+    visit(obj.topstate, list);
+    obj.topstate.item.addAll(list);
     return null;
   }
 
   @Override
   protected Void visitStateComposite(StateComposite obj, List<Transition> param) {
-    visitList(obj.getItem(), param);
+    visitList(obj.item, param);
     return null;
   }
 
   @Override
   protected Void visitState(State obj, List<Transition> param) {
-    List<Transition> transList = obj.getItem().getItems(Transition.class);
+    List<Transition> transList = obj.item.getItems(Transition.class);
     param.addAll(transList);
-    obj.getItem().removeAll(transList);
+    obj.item.removeAll(transList);
     return super.visitState(obj, param);
   }
 

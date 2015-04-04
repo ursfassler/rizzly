@@ -22,29 +22,13 @@ import common.ElementInfo;
 import evl.EvlBase;
 
 public class NamedValue extends EvlBase {
-  private String name;
-  private Expression value;
+  public final String name;
+  public Expression value;
 
   public NamedValue(ElementInfo info, String name, Expression value) {
     super(info);
     this.name = name;
     this.value = value;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  public void setValue(Expression value) {
-    this.value = value;
-  }
-
-  public Expression getValue() {
-    return value;
   }
 
   @Override

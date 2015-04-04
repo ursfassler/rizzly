@@ -79,11 +79,11 @@ class ReduceUnionWorker extends ExprReplacer<Void> {
 
   @Override
   protected Expression visitCaseStmt(CaseStmt obj, Void param) {
-    Type et = kt.get(obj.getCondition());
+    Type et = kt.get(obj.condition);
     if (et instanceof UnionType) {
-      assert (obj.getCondition() instanceof Reference);
-      Reference cond = (Reference) obj.getCondition();
-      cond.getOffset().add(new RefName(ElementInfo.NO, ((UnionType) et).getTag().getName()));
+      assert (obj.condition instanceof Reference);
+      Reference cond = (Reference) obj.condition;
+      cond.offset.add(new RefName(ElementInfo.NO, ((UnionType) et).tag.getName()));
     }
     return super.visitCaseStmt(obj, param);
   }
@@ -91,13 +91,13 @@ class ReduceUnionWorker extends ExprReplacer<Void> {
   @Override
   protected Expression visitReference(Reference obj, Void param) {
     obj = (Reference) super.visitReference(obj, param);
-    if (obj.getLink() instanceof UnionType) {
-      UnionType ut = (UnionType) obj.getLink();
+    if (obj.link instanceof UnionType) {
+      UnionType ut = (UnionType) obj.link;
       assert (getUnion2enum().containsKey(ut));
-      assert (obj.getOffset().size() == 1);
-      assert (obj.getOffset().get(0) instanceof RefName);
+      assert (obj.offset.size() == 1);
+      assert (obj.offset.get(0) instanceof RefName);
       EnumType et = getUnion2enum().get(ut);
-      String ev = ((RefName) obj.getOffset().get(0)).getName();
+      String ev = ((RefName) obj.offset.get(0)).name;
       assert (et.getElement().find(ev) != null);
       return new Reference(obj.getInfo(), et, new RefName(ElementInfo.NO, ev));
     }
@@ -107,16 +107,16 @@ class ReduceUnionWorker extends ExprReplacer<Void> {
   @Override
   protected Expression visitIs(Is obj, Void param) {
     super.visitIs(obj, param);
-    Reference left = (Reference) visit(obj.getLeft(), null);
+    Reference left = (Reference) visit(obj.left, null);
 
-    assert (left.getOffset().isEmpty());
+    assert (left.offset.isEmpty());
 
     Type ut = kt.get(left);
     assert (ut instanceof UnionType);
 
-    left = new Reference(left.getInfo(), left.getLink(), new RefName(ElementInfo.NO, ((UnionType) ut).getTag().getName()));
+    left = new Reference(left.getInfo(), left.link, new RefName(ElementInfo.NO, ((UnionType) ut).tag.getName()));
 
-    return new Equal(obj.getInfo(), left, obj.getRight());
+    return new Equal(obj.getInfo(), left, obj.right);
   }
 
   public Map<UnionType, EnumType> getUnion2enum() {
@@ -134,12 +134,12 @@ class Uni2Enum extends DefTraverser<Void, Map<UnionType, EnumType>> {
 
     EnumType et = new EnumType(ElementInfo.NO, ENUM_PREFIX + Designator.NAME_SEP + obj.getName());
 
-    for (NamedElement elem : obj.getElement()) {
+    for (NamedElement elem : obj.element) {
       EnumElement ee = new EnumElement(ElementInfo.NO, elem.getName());
       et.getElement().add(ee);
     }
 
-    obj.getTag().getRef().setLink(et);
+    obj.tag.ref.link = et;
 
     param.put(obj, et);
     return null;

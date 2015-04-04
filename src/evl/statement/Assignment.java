@@ -25,26 +25,12 @@ import evl.expression.Expression;
  *
  * @author urs
  */
-public abstract class Assignment<T> extends Statement {
-  private Expression right;
+public abstract class Assignment extends Statement {
+  public Expression right;
 
   public Assignment(ElementInfo info, Expression right) {
     super(info);
     this.right = right;
   }
 
-  public abstract T getLeft();
-
-  public Expression getRight() {
-    return right;
-  }
-
-  public void setRight(Expression right) {
-    this.right = right;
-  }
-
-  @Override
-  public String toString() {
-    return getLeft() + " := " + right;
-  }
 }

@@ -35,10 +35,10 @@ public class Root extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    Component root = kb.getRootComp().getLink();
+    Component root = kb.getRootComp().link;
 
     EvlList<FuncCtrlOutDataIn> queries = new EvlList<FuncCtrlOutDataIn>();
-    for (InterfaceFunction itr : root.getIface()) {
+    for (InterfaceFunction itr : root.iface) {
       if (itr instanceof FuncCtrlOutDataIn) {
         queries.add((FuncCtrlOutDataIn) itr);
       }

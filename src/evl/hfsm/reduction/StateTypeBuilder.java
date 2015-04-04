@@ -94,7 +94,7 @@ public class StateTypeBuilder extends NullTraverser<NamedElement, EvlList<NamedE
     String name = Designator.NAME_SEP + "Data";
     RecordType record = new RecordType(obj.getInfo(), name, new EvlList<NamedElement>());
 
-    obj.getItem().add(record);
+    obj.item.add(record);
     stateType.put(obj, record);
     initValues.put(record, new RecordValue(obj.getInfo(), new EvlList<NamedValue>(), new SimpleRef<Type>(obj.getInfo(), record)));
 
@@ -104,7 +104,7 @@ public class StateTypeBuilder extends NullTraverser<NamedElement, EvlList<NamedE
   public UnsafeUnionType makeUnion(State obj) {
     String name = Designator.NAME_SEP + "Sub";
     UnsafeUnionType union = new UnsafeUnionType(obj.getInfo(), name, new EvlList<NamedElement>());
-    obj.getItem().add(union);
+    obj.item.add(union);
     return union;
   }
 
@@ -125,16 +125,16 @@ public class StateTypeBuilder extends NullTraverser<NamedElement, EvlList<NamedE
 
     UnsafeUnionType union = makeUnion(obj);
     NamedElement subElem = new NamedElement(obj.getInfo(), Designator.NAME_SEP + "sub", new SimpleRef<Type>(ElementInfo.NO, union));
-    record.getElement().add(subElem);
+    record.element.add(subElem);
 
     param.add(subElem);
 
     NamedElement initStateElem = null;
-    for (State sub : obj.getItem().getItems(State.class)) {
+    for (State sub : obj.item.getItems(State.class)) {
       NamedElement item = visit(sub, param);
-      union.getElement().add(item);
+      union.element.add(item);
 
-      if (sub == obj.getInitial().getLink()) {
+      if (sub == obj.initial.link) {
         assert (initStateElem == null);
         initStateElem = item;
       }
@@ -143,14 +143,14 @@ public class StateTypeBuilder extends NullTraverser<NamedElement, EvlList<NamedE
 
     // set default state
 
-    Constant initvalue = initVar.get(initStateElem.getRef().getLink());
+    Constant initvalue = initVar.get(initStateElem.ref.link);
     assert (initvalue != null);
-    NamedValue cont = new NamedValue(obj.getInfo(), getName(obj.getInitial().getLink()), new Reference(obj.getInfo(), initvalue));
+    NamedValue cont = new NamedValue(obj.getInfo(), getName(obj.initial.link), new Reference(obj.getInfo(), initvalue));
     UnsafeUnionValue uninit = new UnsafeUnionValue(obj.getInfo(), cont, new SimpleRef<Type>(obj.getInfo(), union));
 
     RecordValue value = initValues.get(record);
     assert (value != null);
-    value.getValue().add(new NamedValue(obj.getInfo(), SUB_ENTRY_NAME, uninit));
+    value.value.add(new NamedValue(obj.getInfo(), SUB_ENTRY_NAME, uninit));
 
     return dataElem;
   }
@@ -159,10 +159,10 @@ public class StateTypeBuilder extends NullTraverser<NamedElement, EvlList<NamedE
     RecordValue value = initValues.get(type);
     assert (value != null);
 
-    for (StateVariable var : state.getItem().getItems(StateVariable.class)) {
-      NamedElement item = new NamedElement(var.getInfo(), getName(var), Copy.copy(var.getType()));
-      type.getElement().add(item);
-      value.getValue().add(new NamedValue(var.getInfo(), getName(var), Copy.copy(var.getDef())));
+    for (StateVariable var : state.item.getItems(StateVariable.class)) {
+      NamedElement item = new NamedElement(var.getInfo(), getName(var), Copy.copy(var.type));
+      type.element.add(item);
+      value.value.add(new NamedValue(var.getInfo(), getName(var), Copy.copy(var.def)));
 
       EvlList<NamedElement> path = new EvlList<NamedElement>(param);
       path.add(item);
@@ -171,7 +171,7 @@ public class StateTypeBuilder extends NullTraverser<NamedElement, EvlList<NamedE
 
     ConstPrivate init = new ConstPrivate(state.getInfo(), CONST_PREFIX + getName(type), new SimpleRef<Type>(state.getInfo(), type), value);
     initVar.put(type, init);
-    state.getItem().add(init);
+    state.item.add(init);
   }
 
 }

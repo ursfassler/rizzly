@@ -23,6 +23,7 @@ import evl.expression.reference.BaseRef;
 import evl.function.Function;
 import evl.other.Named;
 
+//TODO remove generics
 abstract public class Endpoint<T extends Named> extends BaseRef<T> {
   public Endpoint(ElementInfo info, T link) {
     super(info, link);

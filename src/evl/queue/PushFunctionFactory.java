@@ -52,7 +52,7 @@ class PushFunctionFactory {
     // String name = new Designator(path, func.getName()).toString(Designator.NAME_SEP);
     String name = func.getName();
 
-    EvlList<FuncVariable> param = Copy.copy(func.getParam());
+    EvlList<FuncVariable> param = Copy.copy(func.param);
     Function impl = new FuncPrivateVoid(info, Designator.NAME_SEP + "push" + Designator.NAME_SEP + name, param, new FuncReturnNone(info), createPushBody(param, queueVariables, queueTypes, queueTypes.getFuncToMsgType().get(func), queueTypes.getFuncToElem().get(func)));
     // impl.properties().put(Property.NAME, Designator.NAME_SEP + "push" + Designator.NAME_SEP + name);
     return impl;
@@ -65,31 +65,31 @@ class PushFunctionFactory {
 
     Block pushbody = new Block(info);
 
-    FuncVariable idx = new FuncVariable(info, "wridx", new SimpleRef<Type>(info, queueVariables.getHead().getType().getLink()));
-    pushbody.getStatements().add(new VarDefStmt(info, idx));
-    pushbody.getStatements().add(new AssignmentSingle(info, new Reference(info, idx), new Mod(info, new Plus(info, new Reference(info, queueVariables.getHead()), new Reference(info, queueVariables.getCount())), new Number(info, BigInteger.valueOf(queueTypes.queueLength())))));
+    FuncVariable idx = new FuncVariable(info, "wridx", new SimpleRef<Type>(info, queueVariables.getHead().type.link));
+    pushbody.statements.add(new VarDefStmt(info, idx));
+    pushbody.statements.add(new AssignmentSingle(info, new Reference(info, idx), new Mod(info, new Plus(info, new Reference(info, queueVariables.getHead()), new Reference(info, queueVariables.getCount())), new Number(info, BigInteger.valueOf(queueTypes.queueLength())))));
 
     Reference qir = new Reference(info, queueVariables.getQueue());
-    qir.getOffset().add(new RefIndex(info, new Reference(info, idx)));
-    qir.getOffset().add(new RefName(info, queueTypes.getMessage().getTag().getName()));
-    pushbody.getStatements().add(new AssignmentSingle(info, qir, new Reference(info, enumElement)));
+    qir.offset.add(new RefIndex(info, new Reference(info, idx)));
+    qir.offset.add(new RefName(info, queueTypes.getMessage().tag.getName()));
+    pushbody.statements.add(new AssignmentSingle(info, qir, new Reference(info, enumElement)));
 
     for (FuncVariable arg : param) {
       Reference elem = new Reference(info, queueVariables.getQueue());
-      elem.getOffset().add(new RefIndex(info, new Reference(info, idx)));
-      elem.getOffset().add(new RefName(info, namedElement.getName()));
-      elem.getOffset().add(new RefName(info, arg.getName()));
+      elem.offset.add(new RefIndex(info, new Reference(info, idx)));
+      elem.offset.add(new RefName(info, namedElement.getName()));
+      elem.offset.add(new RefName(info, arg.getName()));
 
-      pushbody.getStatements().add(new AssignmentSingle(info, elem, new Reference(info, arg)));
+      pushbody.statements.add(new AssignmentSingle(info, elem, new Reference(info, arg)));
     }
 
-    pushbody.getStatements().add(new AssignmentSingle(info, new Reference(info, queueVariables.getCount()), new Plus(info, new Reference(info, queueVariables.getCount()), new Number(info, BigInteger.ONE))));
+    pushbody.statements.add(new AssignmentSingle(info, new Reference(info, queueVariables.getCount()), new Plus(info, new Reference(info, queueVariables.getCount()), new Number(info, BigInteger.ONE))));
 
     IfOption ifok = new IfOption(info, new Less(info, new Reference(info, queueVariables.getCount()), new Number(info, BigInteger.valueOf(queueTypes.queueLength()))), pushbody);
     option.add(ifok);
 
     Block body = new Block(info);
-    body.getStatements().add(new IfStmt(info, option, new Block(info))); // TODO add error code
+    body.statements.add(new IfStmt(info, option, new Block(info))); // TODO add error code
     return body;
   }
 

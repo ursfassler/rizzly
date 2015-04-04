@@ -22,28 +22,12 @@ import common.ElementInfo;
 import evl.variable.FuncVariable;
 
 public class ForStmt extends Statement {
-  private FuncVariable iterator;
-  private Block block;
+  public FuncVariable iterator;
+  public Block block;
 
   public ForStmt(ElementInfo info, FuncVariable iterator, Block block) {
     super(info);
     this.iterator = iterator;
-    this.block = block;
-  }
-
-  public FuncVariable getIterator() {
-    return iterator;
-  }
-
-  public void setIterator(FuncVariable iterator) {
-    this.iterator = iterator;
-  }
-
-  public Block getBlock() {
-    return block;
-  }
-
-  public void setBlock(Block block) {
     this.block = block;
   }
 

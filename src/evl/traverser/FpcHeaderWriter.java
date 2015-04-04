@@ -169,14 +169,14 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitNumber(Number obj, StreamWriter param) {
-    param.wr(obj.getValue().toString());
+    param.wr(obj.value.toString());
     return null;
   }
 
   @Override
   protected Void visitFuncReturnType(FuncReturnType obj, StreamWriter param) {
     param.wr(":");
-    visit(obj.getType(), param);
+    visit(obj.type, param);
     return null;
   }
 
@@ -187,7 +187,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   protected void writeFuncHeader(Function obj, StreamWriter param) {
     assert (obj.properties().get(Property.Public) == Boolean.TRUE);
-    if (obj.getRet() instanceof FuncReturnNone) {
+    if (obj.ret instanceof FuncReturnNone) {
       param.wr("procedure");
     } else {
       param.wr("function");
@@ -195,16 +195,16 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.wr(" ");
     param.wr(obj.getName());
     param.wr("(");
-    for (int i = 0; i < obj.getParam().size(); i++) {
+    for (int i = 0; i < obj.param.size(); i++) {
       if (i > 0) {
         param.wr("; ");
       }
-      Variable var = obj.getParam().get(i);
+      Variable var = obj.param.get(i);
       visit(var, param);
     }
     param.wr(")");
 
-    visit(obj.getRet(), param);
+    visit(obj.ret, param);
 
     param.wr(";");
     param.wr(" cdecl;");
@@ -257,8 +257,8 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitRangeType(RangeType obj, StreamWriter param) {
-    boolean isNeg = obj.getNumbers().getLow().compareTo(BigInteger.ZERO) < 0;
-    BigInteger max = getPos(obj.getNumbers().getHigh()).max(getPos(obj.getNumbers().getLow()));
+    boolean isNeg = obj.range.getLow().compareTo(BigInteger.ZERO) < 0;
+    BigInteger max = getPos(obj.range.getHigh()).max(getPos(obj.range.getLow()));
     int bits = ExpressionTypeChecker.bitCount(max);
     assert (bits >= 0);
     if (isNeg) {
@@ -283,7 +283,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitSimpleRef(SimpleRef obj, StreamWriter param) {
-    param.wr(obj.getLink().getName());
+    param.wr(obj.link.getName());
     return null;
   }
 
@@ -296,11 +296,11 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
   protected Void visitConstGlobal(ConstGlobal obj, StreamWriter param) {
     assert (false);
     param.wr("static const ");
-    visit(obj.getType(), param);
+    visit(obj.type, param);
     param.wr(" ");
     param.wr(obj.getName());
     param.wr(" = ");
-    visit(obj.getDef(), param);
+    visit(obj.def, param);
     param.wr(";");
     param.nl();
     return null;
@@ -310,7 +310,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
   protected Void visitFuncVariable(FuncVariable obj, StreamWriter param) {
     param.wr(obj.getName());
     param.wr(": ");
-    visit(obj.getType(), param);
+    visit(obj.type, param);
     return null;
   }
 
@@ -332,9 +332,9 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.incIndent();
     param.wr(CWriter.ARRAY_DATA_NAME);
     param.wr(": Array[0..");
-    param.wr(obj.getSize().subtract(BigInteger.ONE).toString());
+    param.wr(obj.size.subtract(BigInteger.ONE).toString());
     param.wr("] of ");
-    visit(obj.getType(), param);
+    visit(obj.type, param);
     param.wr(";");
     param.nl();
     param.decIndent();
@@ -349,7 +349,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.wr(" = Record");
     param.nl();
     param.incIndent();
-    visitList(obj.getElement(), param);
+    visitList(obj.element, param);
     param.decIndent();
     param.wr("end;");
     param.nl();
@@ -382,7 +382,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
   protected Void visitNamedElement(NamedElement obj, StreamWriter param) {
     param.wr(obj.getName());
     param.wr(": ");
-    visit(obj.getRef(), param);
+    visit(obj.ref, param);
     param.wr(";");
     param.nl();
     return null;

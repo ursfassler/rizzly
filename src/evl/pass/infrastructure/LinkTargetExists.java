@@ -64,7 +64,7 @@ class LinkOkWorker extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitBaseRef(BaseRef obj, Void param) {
-    target.add(obj.getLink());
+    target.add(obj.link);
     return super.visitBaseRef(obj, param);
   }
 

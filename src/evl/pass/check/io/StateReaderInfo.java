@@ -45,8 +45,8 @@ public class StateReaderInfo extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitReference(Reference obj, Void param) {
-    if (obj.getLink() instanceof Variable) {
-      Variable var = (Variable) obj.getLink();
+    if (obj.link instanceof Variable) {
+      Variable var = (Variable) obj.link;
       if (isStateVariable(var)) {
         readState = true;
       }

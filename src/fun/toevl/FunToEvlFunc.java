@@ -87,7 +87,7 @@ public class FunToEvlFunc extends NullTraverser<Evl, Void> {
     T func = FunctionFactory.create(cl, obj.getInfo(), obj.getName(), genpa(obj), ret, new Block(ElementInfo.NO));
     fta.map.put(obj, func);
     if (obj instanceof FuncImpl) {
-      func.setBody((Block) fta.visit(((FuncImpl) obj).getBody(), null));
+      func.body = (Block) fta.visit(((FuncImpl) obj).getBody(), null);
     }
     return func;
   }

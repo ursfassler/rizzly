@@ -66,10 +66,10 @@ class BacklinkTraverser extends DefTraverser<Void, Map<Evl, Set<BaseRef<Named>>>
 
   @Override
   protected Void visitBaseRef(BaseRef obj, Map<Evl, Set<BaseRef<Named>>> param) {
-    Set<BaseRef<Named>> set = param.get(obj.getLink());
+    Set<BaseRef<Named>> set = param.get(obj.link);
     if (set == null) {
       set = new HashSet<BaseRef<Named>>();
-      param.put(obj.getLink(), set);
+      param.put(obj.link, set);
     }
     set.add(obj);
     return super.visitBaseRef(obj, param);

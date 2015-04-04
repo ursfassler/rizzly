@@ -133,25 +133,25 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitNamedElementsValue(NamedElementsValue obj, P param) {
-    visitList(obj.getValue(), param);
+    visitList(obj.value, param);
     return null;
   }
 
   @Override
   protected R visitTupleType(TupleType obj, P param) {
-    visitList(obj.getTypes(), param);
+    visitList(obj.types, param);
     return null;
   }
 
   @Override
   protected R visitFuncReturnTuple(FuncReturnTuple obj, P param) {
-    visitList(obj.getParam(), param);
+    visitList(obj.param, param);
     return null;
   }
 
   @Override
   protected R visitFuncReturnType(FuncReturnType obj, P param) {
-    visit(obj.getType(), param);
+    visit(obj.type, param);
     return null;
   }
 
@@ -162,35 +162,35 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitImplElementary(ImplElementary obj, P param) {
-    visitList(obj.getFunction(), param);
-    visitList(obj.getIface(), param);
-    visit(obj.getQueue(), param);
-    visitList(obj.getType(), param);
-    visitList(obj.getConstant(), param);
-    visitList(obj.getVariable(), param);
-    visitList(obj.getComponent(), param);
-    visitList(obj.getSubCallback(), param);
-    visit(obj.getEntryFunc(), param);
-    visit(obj.getExitFunc(), param);
+    visitList(obj.function, param);
+    visitList(obj.iface, param);
+    visit(obj.queue, param);
+    visitList(obj.type, param);
+    visitList(obj.constant, param);
+    visitList(obj.variable, param);
+    visitList(obj.component, param);
+    visitList(obj.subCallback, param);
+    visit(obj.entryFunc, param);
+    visit(obj.exitFunc, param);
     return null;
   }
 
   @Override
   protected R visitImplComposition(ImplComposition obj, P param) {
-    visitList(obj.getFunction(), param);
-    visitList(obj.getIface(), param);
-    visit(obj.getQueue(), param);
-    visitList(obj.getComponent(), param);
-    visitList(obj.getConnection(), param);
+    visitList(obj.function, param);
+    visitList(obj.iface, param);
+    visit(obj.queue, param);
+    visitList(obj.component, param);
+    visitList(obj.connection, param);
     return null;
   }
 
   @Override
   protected R visitImplHfsm(ImplHfsm obj, P param) {
-    visitList(obj.getFunction(), param);
-    visitList(obj.getIface(), param);
-    visit(obj.getQueue(), param);
-    visit(obj.getTopstate(), param);
+    visitList(obj.function, param);
+    visitList(obj.iface, param);
+    visit(obj.queue, param);
+    visit(obj.topstate, param);
     return null;
   }
 
@@ -201,53 +201,53 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitVarDef(VarDefStmt obj, P param) {
-    visit(obj.getVariable(), param);
+    visit(obj.variable, param);
     return null;
   }
 
   @Override
   protected R visitCallStmt(CallStmt obj, P param) {
-    visit(obj.getCall(), param);
+    visit(obj.call, param);
     return null;
   }
 
   @Override
   protected R visitAssignmentMulti(AssignmentMulti obj, P param) {
-    visitList(obj.getLeft(), param);
-    visit(obj.getRight(), param);
+    visitList(obj.left, param);
+    visit(obj.right, param);
     return null;
   }
 
   @Override
   protected R visitAssignmentSingle(AssignmentSingle obj, P param) {
-    visit(obj.getLeft(), param);
-    visit(obj.getRight(), param);
+    visit(obj.left, param);
+    visit(obj.right, param);
     return null;
   }
 
   @Override
   protected R visitUnionType(UnionType obj, P param) {
-    visit(obj.getTag(), param);
-    visitList(obj.getElement(), param);
+    visit(obj.tag, param);
+    visitList(obj.element, param);
     return null;
   }
 
   @Override
   protected R visitUnsafeUnionType(UnsafeUnionType obj, P param) {
-    visitList(obj.getElement(), param);
+    visitList(obj.element, param);
     return null;
   }
 
   @Override
   protected R visitRecordType(RecordType obj, P param) {
-    visitList(obj.getElement(), param);
+    visitList(obj.element, param);
     return null;
   }
 
   @Override
   protected R visitComponentType(ComponentType obj, P param) {
-    visitList(obj.getInput(), param);
-    visitList(obj.getOutput(), param);
+    visitList(obj.input, param);
+    visitList(obj.output, param);
     return null;
   }
 
@@ -258,19 +258,19 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitRefIndex(RefIndex obj, P param) {
-    visit(obj.getIndex(), param);
+    visit(obj.index, param);
     return null;
   }
 
   @Override
   protected R visitRefCall(RefCall obj, P param) {
-    visit(obj.getActualParameter(), param);
+    visit(obj.actualParameter, param);
     return null;
   }
 
   @Override
   protected R visitArrayType(ArrayType obj, P param) {
-    visit(obj.getType(), param);
+    visit(obj.type, param);
     return null;
   }
 
@@ -292,7 +292,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitReturnExpr(ReturnExpr obj, P param) {
-    visit(obj.getExpr(), param);
+    visit(obj.expr, param);
     return null;
   }
 
@@ -308,35 +308,35 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitFuncVariable(FuncVariable obj, P param) {
-    visit(obj.getType(), param);
+    visit(obj.type, param);
     return null;
   }
 
   @Override
   protected R visitStateVariable(StateVariable obj, P param) {
-    visit(obj.getType(), param);
-    visit(obj.getDef(), param);
+    visit(obj.type, param);
+    visit(obj.def, param);
     return null;
   }
 
   @Override
   protected R visitConstPrivate(ConstPrivate obj, P param) {
-    visit(obj.getType(), param);
-    visit(obj.getDef(), param);
+    visit(obj.type, param);
+    visit(obj.def, param);
     return null;
   }
 
   @Override
   protected R visitConstGlobal(ConstGlobal obj, P param) {
-    visit(obj.getType(), param);
-    visit(obj.getDef(), param);
+    visit(obj.type, param);
+    visit(obj.def, param);
     return null;
   }
 
   @Override
   protected R visitSubCallbacks(SubCallbacks obj, P param) {
-    visit(obj.getCompUse(), param);
-    visitList(obj.getFunc(), param);
+    visit(obj.compUse, param);
+    visitList(obj.func, param);
     return null;
   }
 
@@ -348,14 +348,14 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitCaseOptRange(CaseOptRange obj, P param) {
-    visit(obj.getStart(), param);
-    visit(obj.getEnd(), param);
+    visit(obj.start, param);
+    visit(obj.end, param);
     return null;
   }
 
   @Override
   protected R visitCaseOptValue(CaseOptValue obj, P param) {
-    visit(obj.getValue(), param);
+    visit(obj.value, param);
     return null;
   }
 
@@ -366,8 +366,8 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitConnection(Connection obj, P param) {
-    visit(obj.getEndpoint(Direction.in), param);
-    visit(obj.getEndpoint(Direction.out), param);
+    visit(obj.endpoint.get(Direction.in), param);
+    visit(obj.endpoint.get(Direction.out), param);
     return null;
   }
 
@@ -383,38 +383,38 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitArrayValue(ArrayValue obj, P param) {
-    visitList(obj.getValue(), param);
+    visitList(obj.value, param);
     return null;
   }
 
   @Override
   protected R visitTupleValue(TupleValue obj, P param) {
-    visitList(obj.getValue(), param);
+    visitList(obj.value, param);
     return null;
   }
 
   @Override
   protected R visitStateSimple(StateSimple obj, P param) {
-    visit(obj.getEntryFunc(), param);
-    visit(obj.getExitFunc(), param);
-    visitList(obj.getItem(), param);
+    visit(obj.entryFunc, param);
+    visit(obj.exitFunc, param);
+    visitList(obj.item, param);
     return null;
   }
 
   @Override
   protected R visitStateComposite(StateComposite obj, P param) {
-    visit(obj.getEntryFunc(), param);
-    visit(obj.getExitFunc(), param);
-    visitList(obj.getItem(), param);
-    visit(obj.getInitial(), param);
+    visit(obj.entryFunc, param);
+    visit(obj.exitFunc, param);
+    visitList(obj.item, param);
+    visit(obj.initial, param);
     return null;
   }
 
   @Override
   protected R visitTransition(Transition obj, P param) {
-    visitList(obj.getParam(), param);
-    visit(obj.getGuard(), param);
-    visit(obj.getBody(), param);
+    visitList(obj.param, param);
+    visit(obj.guard, param);
+    visit(obj.body, param);
     return null;
   }
 
@@ -425,7 +425,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitReference(Reference obj, P param) {
-    visitList(obj.getOffset(), param);
+    visitList(obj.offset, param);
     return null;
   }
 
@@ -481,137 +481,137 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitAnd(And obj, P param) {
-    visit(obj.getLeft(), param);
-    visit(obj.getRight(), param);
+    visit(obj.left, param);
+    visit(obj.right, param);
     return null;
   }
 
   @Override
   protected R visitDiv(Div obj, P param) {
-    visit(obj.getLeft(), param);
-    visit(obj.getRight(), param);
+    visit(obj.left, param);
+    visit(obj.right, param);
     return null;
   }
 
   @Override
   protected R visitEqual(Equal obj, P param) {
-    visit(obj.getLeft(), param);
-    visit(obj.getRight(), param);
+    visit(obj.left, param);
+    visit(obj.right, param);
     return null;
   }
 
   @Override
   protected R visitGreater(Greater obj, P param) {
-    visit(obj.getLeft(), param);
-    visit(obj.getRight(), param);
+    visit(obj.left, param);
+    visit(obj.right, param);
     return null;
   }
 
   @Override
   protected R visitGreaterequal(Greaterequal obj, P param) {
-    visit(obj.getLeft(), param);
-    visit(obj.getRight(), param);
+    visit(obj.left, param);
+    visit(obj.right, param);
     return null;
   }
 
   @Override
   protected R visitLess(Less obj, P param) {
-    visit(obj.getLeft(), param);
-    visit(obj.getRight(), param);
+    visit(obj.left, param);
+    visit(obj.right, param);
     return null;
   }
 
   @Override
   protected R visitIs(Is obj, P param) {
-    visit(obj.getLeft(), param);
-    visit(obj.getRight(), param);
+    visit(obj.left, param);
+    visit(obj.right, param);
     return null;
   }
 
   @Override
   protected R visitLessequal(Lessequal obj, P param) {
-    visit(obj.getLeft(), param);
-    visit(obj.getRight(), param);
+    visit(obj.left, param);
+    visit(obj.right, param);
     return null;
   }
 
   @Override
   protected R visitMinus(Minus obj, P param) {
-    visit(obj.getLeft(), param);
-    visit(obj.getRight(), param);
+    visit(obj.left, param);
+    visit(obj.right, param);
     return null;
   }
 
   @Override
   protected R visitMod(Mod obj, P param) {
-    visit(obj.getLeft(), param);
-    visit(obj.getRight(), param);
+    visit(obj.left, param);
+    visit(obj.right, param);
     return null;
   }
 
   @Override
   protected R visitMul(Mul obj, P param) {
-    visit(obj.getLeft(), param);
-    visit(obj.getRight(), param);
+    visit(obj.left, param);
+    visit(obj.right, param);
     return null;
   }
 
   @Override
   protected R visitNot(Not obj, P param) {
-    visit(obj.getExpr(), param);
+    visit(obj.expr, param);
     return null;
   }
 
   @Override
   protected R visitLogicNot(LogicNot obj, P param) {
-    visit(obj.getExpr(), param);
+    visit(obj.expr, param);
     return null;
   }
 
   @Override
   protected R visitBitNot(BitNot obj, P param) {
-    visit(obj.getExpr(), param);
+    visit(obj.expr, param);
     return null;
   }
 
   @Override
   protected R visitNotequal(Notequal obj, P param) {
-    visit(obj.getLeft(), param);
-    visit(obj.getRight(), param);
+    visit(obj.left, param);
+    visit(obj.right, param);
     return null;
   }
 
   @Override
   protected R visitOr(Or obj, P param) {
-    visit(obj.getLeft(), param);
-    visit(obj.getRight(), param);
+    visit(obj.left, param);
+    visit(obj.right, param);
     return null;
   }
 
   @Override
   protected R visitPlus(Plus obj, P param) {
-    visit(obj.getLeft(), param);
-    visit(obj.getRight(), param);
+    visit(obj.left, param);
+    visit(obj.right, param);
     return null;
   }
 
   @Override
   protected R visitShl(Shl obj, P param) {
-    visit(obj.getLeft(), param);
-    visit(obj.getRight(), param);
+    visit(obj.left, param);
+    visit(obj.right, param);
     return null;
   }
 
   @Override
   protected R visitShr(Shr obj, P param) {
-    visit(obj.getLeft(), param);
-    visit(obj.getRight(), param);
+    visit(obj.left, param);
+    visit(obj.right, param);
     return null;
   }
 
   @Override
   protected R visitUminus(Uminus obj, P param) {
-    visit(obj.getExpr(), param);
+    visit(obj.expr, param);
     return null;
   }
 
@@ -622,28 +622,28 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitWhileStmt(WhileStmt obj, P param) {
-    visit(obj.getCondition(), param);
-    visit(obj.getBody(), param);
+    visit(obj.condition, param);
+    visit(obj.body, param);
     return null;
   }
 
   @Override
   protected R visitIfStmt(IfStmt obj, P param) {
-    visitList(obj.getOption(), param);
-    visit(obj.getDefblock(), param);
+    visitList(obj.option, param);
+    visit(obj.defblock, param);
     return null;
   }
 
   @Override
   protected R visitIfOption(IfOption obj, P param) {
-    visit(obj.getCondition(), param);
-    visit(obj.getCode(), param);
+    visit(obj.condition, param);
+    visit(obj.code, param);
     return null;
   }
 
   @Override
   protected R visitBlock(Block obj, P param) {
-    for (Statement stmt : obj.getStatements()) {
+    for (Statement stmt : obj.statements) {
       visit(stmt, param);
     }
     return null;
@@ -651,58 +651,58 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitCaseStmt(CaseStmt obj, P param) {
-    visit(obj.getCondition(), param);
-    visitList(obj.getOption(), param);
-    visit(obj.getOtherwise(), param);
+    visit(obj.condition, param);
+    visitList(obj.option, param);
+    visit(obj.otherwise, param);
     return null;
   }
 
   @Override
   protected R visitCaseOpt(CaseOpt obj, P param) {
-    visitList(obj.getValue(), param);
-    visit(obj.getCode(), param);
+    visitList(obj.value, param);
+    visit(obj.code, param);
     return null;
   }
 
   @Override
   protected R visitTypeCast(TypeCast obj, P param) {
-    visit(obj.getCast(), param);
-    visit(obj.getValue(), param);
+    visit(obj.cast, param);
+    visit(obj.value, param);
     return null;
   }
 
   @Override
   protected R visitBitAnd(BitAnd obj, P param) {
-    visit(obj.getLeft(), param);
-    visit(obj.getRight(), param);
+    visit(obj.left, param);
+    visit(obj.right, param);
     return null;
   }
 
   @Override
   protected R visitBitOr(BitOr obj, P param) {
-    visit(obj.getLeft(), param);
-    visit(obj.getRight(), param);
+    visit(obj.left, param);
+    visit(obj.right, param);
     return null;
   }
 
   @Override
   protected R visitBitXor(BitXor obj, P param) {
-    visit(obj.getLeft(), param);
-    visit(obj.getRight(), param);
+    visit(obj.left, param);
+    visit(obj.right, param);
     return null;
   }
 
   @Override
   protected R visitLogicOr(LogicOr obj, P param) {
-    visit(obj.getLeft(), param);
-    visit(obj.getRight(), param);
+    visit(obj.left, param);
+    visit(obj.right, param);
     return null;
   }
 
   @Override
   protected R visitLogicAnd(LogicAnd obj, P param) {
-    visit(obj.getLeft(), param);
-    visit(obj.getRight(), param);
+    visit(obj.left, param);
+    visit(obj.right, param);
     return null;
   }
 
@@ -738,37 +738,37 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitNamedValue(NamedValue obj, P param) {
-    visit(obj.getValue(), param);
+    visit(obj.value, param);
     return null;
   }
 
   @Override
   protected R visitUnionValue(UnionValue obj, P param) {
-    visit(obj.getTagValue(), param);
-    visit(obj.getContentValue(), param);
-    visit(obj.getType(), param);
+    visit(obj.tagValue, param);
+    visit(obj.contentValue, param);
+    visit(obj.type, param);
     return null;
   }
 
   @Override
   protected R visitUnsafeUnionValue(UnsafeUnionValue obj, P param) {
-    visit(obj.getContentValue(), param);
-    visit(obj.getType(), param);
+    visit(obj.contentValue, param);
+    visit(obj.type, param);
     return null;
   }
 
   @Override
   protected R visitRecordValue(RecordValue obj, P param) {
-    visitList(obj.getValue(), param);
-    visit(obj.getType(), param);
+    visitList(obj.value, param);
+    visit(obj.type, param);
     return null;
   }
 
   @Override
   protected R visitMsgPush(MsgPush obj, P param) {
-    visit(obj.getQueue(), param);
-    visit(obj.getFunc(), param);
-    visitList(obj.getData(), param);
+    visit(obj.queue, param);
+    visit(obj.func, param);
+    visitList(obj.data, param);
     return null;
   }
 
@@ -780,15 +780,15 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   @Override
   protected R visitFunction(Function obj, P param) {
     super.visitFunction(obj, param);
-    visitList(obj.getParam(), param);
-    visit(obj.getRet(), param);
-    visit(obj.getBody(), param);
+    visitList(obj.param, param);
+    visit(obj.ret, param);
+    visit(obj.body, param);
     return null;
   }
 
   @Override
   protected R visitNamedElement(NamedElement obj, P param) {
-    visit(obj.getRef(), param);
+    visit(obj.ref, param);
     return null;
   }
 
@@ -809,14 +809,14 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitAliasType(AliasType obj, P param) {
-    visit(obj.getRef(), param);
+    visit(obj.ref, param);
     return null;
   }
 
   @Override
   protected R visitForStmt(ForStmt obj, P param) {
-    visit(obj.getIterator(), param);
-    visit(obj.getBlock(), param);
+    visit(obj.iterator, param);
+    visit(obj.block, param);
     return null;
   }
 

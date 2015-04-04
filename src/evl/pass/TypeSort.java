@@ -77,8 +77,8 @@ public class TypeSort extends EvlPass {
     DefTraverser<Void, Set<Type>> getter = new DefTraverser<Void, Set<Type>>() {
       @Override
       protected Void visitBaseRef(BaseRef obj, Set<Type> param) {
-        if (obj.getLink() instanceof Type) {
-          param.add((Type) obj.getLink());
+        if (obj.link instanceof Type) {
+          param.add((Type) obj.link);
         }
         return null;
       }

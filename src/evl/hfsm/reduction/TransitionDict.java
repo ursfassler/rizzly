@@ -57,14 +57,14 @@ public class TransitionDict extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitState(State obj, Void param) {
-    visitList(obj.getItem(), param);
+    visitList(obj.item, param);
     return null;
   }
 
   @Override
   protected Void visitTransition(Transition obj, Void param) {
-    State src = obj.getSrc().getLink();
-    FuncCtrlInDataIn func = obj.getEventFunc().getLink();
+    State src = obj.src.link;
+    FuncCtrlInDataIn func = obj.eventFunc.link;
     List<Transition> list = get(src, func);
     list.add(obj);
 

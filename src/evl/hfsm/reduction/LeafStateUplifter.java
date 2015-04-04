@@ -69,8 +69,8 @@ class LeafStateUplifterWorker extends NullTraverser<Void, Designator> {
 
   @Override
   protected Void visitImplHfsm(ImplHfsm obj, Designator param) {
-    visit(obj.getTopstate(), new Designator());
-    obj.getTopstate().getItem().addAll(states);
+    visit(obj.topstate, new Designator());
+    obj.topstate.item.addAll(states);
     return null;
   }
 
@@ -83,9 +83,9 @@ class LeafStateUplifterWorker extends NullTraverser<Void, Designator> {
 
   @Override
   protected Void visitStateComposite(StateComposite obj, Designator param) {
-    EvlList<State> children = obj.getItem().getItems(State.class);
+    EvlList<State> children = obj.item.getItems(State.class);
     visitList(children, param);
-    obj.getItem().removeAll(children);
+    obj.item.removeAll(children);
     return null;
   }
 

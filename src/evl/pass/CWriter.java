@@ -163,17 +163,17 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
 
   @Override
   protected Void visitNumber(evl.expression.Number obj, Boolean param) {
-    sw.wr(obj.getValue().toString());
+    sw.wr(obj.value.toString());
     return null;
   }
 
   private Void relation(Relation obj, String op, Boolean param) {
     sw.wr("(");
-    visit(obj.getLeft(), param);
+    visit(obj.left, param);
     sw.wr(" ");
     sw.wr(op);
     sw.wr(" ");
-    visit(obj.getRight(), param);
+    visit(obj.right, param);
     sw.wr(")");
     return null;
   }
@@ -210,11 +210,11 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
 
   private Void binexp(BinaryExp obj, String exp, Boolean param) {
     sw.wr("(");
-    visit(obj.getLeft(), param);
+    visit(obj.left, param);
     sw.wr(" ");
     sw.wr(exp);
     sw.wr(" ");
-    visit(obj.getRight(), param);
+    visit(obj.right, param);
     sw.wr(")");
     return null;
   }
@@ -283,7 +283,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
     sw.wr("(");
     sw.wr(exp);
     sw.wr(" ");
-    visit(obj.getExpr(), param);
+    visit(obj.expr, param);
     sw.wr(")");
     return null;
   }
@@ -305,19 +305,19 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
 
   @Override
   protected Void visitReference(Reference obj, Boolean param) {
-    sw.wr(name(obj.getLink()));
-    visitList(obj.getOffset(), param);
+    sw.wr(name(obj.link));
+    visitList(obj.offset, param);
     return null;
   }
 
   @Override
   protected Void visitRefCall(RefCall obj, Boolean param) {
     sw.wr("(");
-    for (int i = 0; i < obj.getActualParameter().getValue().size(); i++) {
+    for (int i = 0; i < obj.actualParameter.value.size(); i++) {
       if (i > 0) {
         sw.wr(",");
       }
-      visit(obj.getActualParameter().getValue().get(i), param);
+      visit(obj.actualParameter.value.get(i), param);
     }
     sw.wr(")");
     return null;
@@ -326,7 +326,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
   @Override
   protected Void visitRefName(RefName obj, Boolean param) {
     sw.wr(".");
-    sw.wr(obj.getName());
+    sw.wr(obj.name);
     return null;
   }
 
@@ -335,14 +335,14 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
     sw.wr(".");
     sw.wr(CWriter.ARRAY_DATA_NAME);
     sw.wr("[");
-    visit(obj.getIndex(), param);
+    visit(obj.index, param);
     sw.wr("]");
     return null;
   }
 
   @Override
   protected Void visitFuncReturnType(FuncReturnType obj, Boolean param) {
-    visit(obj.getType(), param);
+    visit(obj.type, param);
     return null;
   }
 
@@ -353,18 +353,18 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
   }
 
   protected void writeFuncHeader(Function obj) {
-    visit(obj.getRet(), true);
+    visit(obj.ret, true);
     sw.wr(" ");
     sw.wr(name(obj));
     sw.wr("(");
-    if (obj.getParam().isEmpty()) {
+    if (obj.param.isEmpty()) {
       sw.wr("void");
     } else {
-      for (int i = 0; i < obj.getParam().size(); i++) {
+      for (int i = 0; i < obj.param.size(); i++) {
         if (i > 0) {
           sw.wr(",");
         }
-        Variable var = obj.getParam().get(i);
+        Variable var = obj.param.get(i);
         visit(var, true);
       }
     }
@@ -384,7 +384,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
       writeFuncHeader(obj);
       if (param) {
         sw.nl();
-        visit(obj.getBody(), param);
+        visit(obj.body, param);
       } else {
         sw.wr(";");
       }
@@ -394,7 +394,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
       writeFuncHeader(obj);
       if (param) {
         sw.nl();
-        visit(obj.getBody(), param);
+        visit(obj.body, param);
       } else {
         sw.wr(";");
       }
@@ -406,11 +406,11 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
   @Override
   protected Void visitConstant(Constant obj, Boolean param) {
     sw.wr("static const ");
-    visit(obj.getType(), param);
+    visit(obj.type, param);
     sw.wr(" ");
     sw.wr(name(obj));
     sw.wr(" = ");
-    visit(obj.getDef(), param);
+    visit(obj.def, param);
     sw.wr(";");
     sw.nl();
     return null;
@@ -419,11 +419,11 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
   @Override
   protected Void visitStateVariable(StateVariable obj, Boolean param) {
     sw.wr("static ");
-    visit(obj.getType(), param);
+    visit(obj.type, param);
     sw.wr(" ");
     sw.wr(name(obj));
     sw.wr(" = ");
-    visit(obj.getDef(), param);
+    visit(obj.def, param);
     sw.wr(";");
     sw.nl();
     return null;
@@ -431,7 +431,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
 
   @Override
   protected Void visitFuncVariable(FuncVariable obj, Boolean param) {
-    visit(obj.getType(), param);
+    visit(obj.type, param);
     sw.wr(" ");
     sw.wr(name(obj));
     return null;
@@ -439,7 +439,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
 
   @Override
   protected Void visitCallStmt(CallStmt obj, Boolean param) {
-    visit(obj.getCall(), param);
+    visit(obj.call, param);
     sw.wr(";");
     sw.nl();
     return null;
@@ -447,9 +447,9 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
 
   @Override
   protected Void visitAssignmentSingle(AssignmentSingle obj, Boolean param) {
-    visit(obj.getLeft(), param);
+    visit(obj.left, param);
     sw.wr(" = ");
-    visit(obj.getRight(), param);
+    visit(obj.right, param);
     sw.wr(";");
     sw.nl();
     return null;
@@ -460,7 +460,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
     sw.wr("{");
     sw.nl();
     sw.incIndent();
-    visitList(obj.getStatements(), param);
+    visitList(obj.statements, param);
     sw.decIndent();
     sw.wr("}");
     sw.nl();
@@ -470,7 +470,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
   @Override
   protected Void visitAliasType(AliasType obj, Boolean param) {
     sw.wr("typedef ");
-    visit(obj.getRef(), param);
+    visit(obj.ref, param);
     sw.wr(" ");
     sw.wr(name(obj));
     sw.wr(";");
@@ -481,7 +481,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
   @Override
   protected Void visitSIntType(SIntType obj, Boolean param) {
     sw.wr("typedef ");
-    sw.wr("int" + obj.getBytes() * 8 + "_t ");
+    sw.wr("int" + obj.bytes * 8 + "_t ");
     sw.wr(name(obj));
     sw.wr(";");
     sw.nl();
@@ -491,7 +491,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
   @Override
   protected Void visitUIntType(UIntType obj, Boolean param) {
     sw.wr("typedef ");
-    sw.wr("uint" + obj.getBytes() * 8 + "_t ");
+    sw.wr("uint" + obj.bytes * 8 + "_t ");
     sw.wr(name(obj));
     sw.wr(";");
     sw.nl();
@@ -503,11 +503,11 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
     sw.wr("typedef struct {");
     sw.nl();
     sw.incIndent();
-    visit(obj.getType(), param);
+    visit(obj.type, param);
     sw.wr(" ");
     sw.wr(CWriter.ARRAY_DATA_NAME);
     sw.wr("[");
-    sw.wr(obj.getSize().toString());
+    sw.wr(obj.size.toString());
     sw.wr("]");
     sw.wr(";");
     sw.decIndent();
@@ -556,7 +556,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
     sw.wr("typedef union {");
     sw.nl();
     sw.incIndent();
-    visitList(obj.getElement(), param);
+    visitList(obj.element, param);
     sw.decIndent();
     sw.wr("} ");
     sw.wr(name(obj));
@@ -571,12 +571,12 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
     sw.nl();
     sw.incIndent();
 
-    visit(obj.getTag(), param);
+    visit(obj.tag, param);
 
     sw.wr("union {");
     sw.nl();
     sw.incIndent();
-    visitList(obj.getElement(), param);
+    visitList(obj.element, param);
     sw.decIndent();
     sw.wr("};");
     sw.nl();
@@ -594,7 +594,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
     sw.wr("typedef struct {");
     sw.nl();
     sw.incIndent();
-    visitList(obj.getElement(), param);
+    visitList(obj.element, param);
     sw.decIndent();
     sw.wr("} ");
     sw.wr(name(obj));
@@ -605,7 +605,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
 
   @Override
   protected Void visitNamedElement(NamedElement obj, Boolean param) {
-    visit(obj.getRef(), param);
+    visit(obj.ref, param);
     sw.wr(" ");
     sw.wr(obj.getName());
     sw.wr(";");
@@ -623,7 +623,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
   @Override
   protected Void visitReturnExpr(ReturnExpr obj, Boolean param) {
     sw.wr("return ");
-    visit(obj.getExpr(), param);
+    visit(obj.expr, param);
     sw.wr(";");
     sw.nl();
     return null;
@@ -633,20 +633,20 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
   protected Void visitIfStmt(IfStmt obj, Boolean param) {
     boolean first = true;
 
-    for (IfOption opt : obj.getOption()) {
+    for (IfOption opt : obj.option) {
       if (!first) {
         sw.wr(" else ");
       } else {
         first = false;
       }
       sw.wr("if( ");
-      visit(opt.getCondition(), param);
+      visit(opt.condition, param);
       sw.wr(" )");
-      visit(opt.getCode(), param);
+      visit(opt.code, param);
     }
 
     sw.wr(" else ");
-    visit(obj.getDefblock(), param);
+    visit(obj.defblock, param);
 
     return null;
   }
@@ -654,15 +654,15 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
   @Override
   protected Void visitWhileStmt(WhileStmt obj, Boolean param) {
     sw.wr("while( ");
-    visit(obj.getCondition(), param);
+    visit(obj.condition, param);
     sw.wr(" )");
-    visit(obj.getBody(), param);
+    visit(obj.body, param);
     return null;
   }
 
   @Override
   protected Void visitVarDef(VarDefStmt obj, Boolean param) {
-    visit(obj.getVariable(), param);
+    visit(obj.variable, param);
     sw.wr(";");
     sw.nl();
     return null;
@@ -671,16 +671,16 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
   @Override
   protected Void visitCaseStmt(CaseStmt obj, Boolean param) {
     sw.wr("switch( ");
-    visit(obj.getCondition(), param);
+    visit(obj.condition, param);
     sw.wr(" ){");
     sw.nl();
     sw.incIndent();
-    visitList(obj.getOption(), param);
+    visitList(obj.option, param);
 
     sw.wr("default:{");
     sw.nl();
     sw.incIndent();
-    visit(obj.getOtherwise(), param);
+    visit(obj.otherwise, param);
     sw.wr("break;");
     sw.nl();
     sw.decIndent();
@@ -696,12 +696,12 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
 
   @Override
   protected Void visitCaseOpt(CaseOpt obj, Boolean param) {
-    visitList(obj.getValue(), param);
+    visitList(obj.value, param);
     sw.wr("{");
     sw.nl();
     sw.incIndent();
 
-    visit(obj.getCode(), param);
+    visit(obj.code, param);
     sw.wr("break;");
     sw.nl();
 
@@ -713,21 +713,21 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
 
   @Override
   protected Void visitCaseOptRange(CaseOptRange obj, Boolean param) {
-    evl.expression.Number numStart = (evl.expression.Number) obj.getStart();
-    evl.expression.Number numEnd = (evl.expression.Number) obj.getEnd();
+    evl.expression.Number numStart = (evl.expression.Number) obj.start;
+    evl.expression.Number numEnd = (evl.expression.Number) obj.end;
     sw.wr("case ");
-    sw.wr(numStart.getValue().toString());
+    sw.wr(numStart.value.toString());
     sw.wr(" ... ");
-    sw.wr(numEnd.getValue().toString());
+    sw.wr(numEnd.value.toString());
     sw.wr(": ");
     return null;
   }
 
   @Override
   protected Void visitCaseOptValue(CaseOptValue obj, Boolean param) {
-    evl.expression.Number num = (evl.expression.Number) obj.getValue();
+    evl.expression.Number num = (evl.expression.Number) obj.value;
     sw.wr("case ");
-    sw.wr(num.getValue().toString());
+    sw.wr(num.value.toString());
     sw.wr(": ");
     return null;
   }
@@ -735,7 +735,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
   @Override
   protected Void visitStringValue(StringValue obj, Boolean param) {
     sw.wr("\"");
-    sw.wr(escape(obj.getValue()));
+    sw.wr(escape(obj.value));
     sw.wr("\"");
     return null;
   }
@@ -769,11 +769,11 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
   protected Void visitArrayValue(ArrayValue obj, Boolean param) {
     sw.wr("{");
     sw.wr(" ." + CWriter.ARRAY_DATA_NAME + " = {");
-    for (int i = 0; i < obj.getValue().size(); i++) {
+    for (int i = 0; i < obj.value.size(); i++) {
       if (i > 0) {
         sw.wr(",");
       }
-      visit(obj.getValue().get(i), param);
+      visit(obj.value.get(i), param);
     }
     sw.wr("} ");
     sw.wr("}");
@@ -783,9 +783,9 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
   @Override
   protected Void visitNamedValue(NamedValue obj, Boolean param) {
     sw.wr(".");
-    sw.wr(obj.getName());
+    sw.wr(obj.name);
     sw.wr("=");
-    visit(obj.getValue(), param);
+    visit(obj.value, param);
     sw.wr(",");
     return null;
   }
@@ -793,7 +793,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
   @Override
   protected Void visitUnsafeUnionValue(UnsafeUnionValue obj, Boolean param) {
     sw.wr("{");
-    visit(obj.getContentValue(), param);
+    visit(obj.contentValue, param);
     sw.wr("}");
     return null;
   }
@@ -801,9 +801,9 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
   @Override
   protected Void visitUnionValue(UnionValue obj, Boolean param) {
     sw.wr("{");
-    visit(obj.getTagValue(), param);
+    visit(obj.tagValue, param);
     // sw.wr(",");
-    visit(obj.getContentValue(), param);
+    visit(obj.contentValue, param);
     sw.wr("}");
     return null;
   }
@@ -811,30 +811,30 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
   @Override
   protected Void visitRecordValue(RecordValue obj, Boolean param) {
     sw.wr("{");
-    visitList(obj.getValue(), param);
+    visitList(obj.value, param);
     sw.wr("}");
     return null;
   }
 
   @Override
   protected Void visitSimpleRef(SimpleRef obj, Boolean param) {
-    sw.wr(name(obj.getLink()));
+    sw.wr(name(obj.link));
     return null;
   }
 
   @Override
   protected Void visitTypeCast(TypeCast obj, Boolean param) {
     sw.wr("((");
-    visit(obj.getCast(), param);
+    visit(obj.cast, param);
     sw.wr(")");
-    visit(obj.getValue(), param);
+    visit(obj.value, param);
     sw.wr(")");
     return null;
   }
 
   @Override
   protected Void visitBoolValue(BoolValue obj, Boolean param) {
-    if (obj.isValue()) {
+    if (obj.value) {
       sw.wr("true");
     } else {
       sw.wr("false");

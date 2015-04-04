@@ -56,8 +56,8 @@ public class CompCascadeDepth extends NullTraverser<Integer, Void> {
   @Override
   protected Integer visitImplElementary(ImplElementary obj, Void param) {
     int max = 0;
-    for (CompUse itr : obj.getComponent()) {
-      max = Math.max(max, visit(itr.getLink(), param));
+    for (CompUse itr : obj.component) {
+      max = Math.max(max, visit(itr.link, param));
     }
     return max + 1;
   }
@@ -65,8 +65,8 @@ public class CompCascadeDepth extends NullTraverser<Integer, Void> {
   @Override
   protected Integer visitImplComposition(ImplComposition obj, Void param) {
     int max = 0;
-    for (CompUse itr : obj.getComponent()) {
-      max = Math.max(max, visit(itr.getLink(), param));
+    for (CompUse itr : obj.component) {
+      max = Math.max(max, visit(itr.link, param));
     }
     return max + 1;
   }
@@ -78,8 +78,8 @@ public class CompCascadeDepth extends NullTraverser<Integer, Void> {
 
   @Override
   protected Integer visitReference(Reference obj, Void param) {
-    assert (obj.getOffset().isEmpty());
-    return visit(obj.getLink(), param);
+    assert (obj.offset.isEmpty());
+    return visit(obj.link, param);
   }
 
 }

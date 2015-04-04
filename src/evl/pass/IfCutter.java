@@ -44,19 +44,19 @@ class IfCutterWorker extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitIfStmt(IfStmt obj, Void param) {
-    if (obj.getOption().size() > 1) {
-      int optcount = obj.getOption().size();
-      IfOption first = obj.getOption().get(0);
-      EvlList<IfOption> opt = new EvlList<IfOption>(obj.getOption());
-      obj.getOption().clear();
-      obj.getOption().add(first);
+    if (obj.option.size() > 1) {
+      int optcount = obj.option.size();
+      IfOption first = obj.option.get(0);
+      EvlList<IfOption> opt = new EvlList<IfOption>(obj.option);
+      obj.option.clear();
+      obj.option.add(first);
       opt.remove(0);
-      assert (obj.getOption().size() + opt.size() == optcount);
+      assert (obj.option.size() + opt.size() == optcount);
 
-      IfStmt nif = new IfStmt(opt.get(0).getInfo(), opt, obj.getDefblock());
+      IfStmt nif = new IfStmt(opt.get(0).getInfo(), opt, obj.defblock);
       Block newElse = new Block(obj.getInfo());
-      newElse.getStatements().add(nif);
-      obj.setDefblock(newElse);
+      newElse.statements.add(nif);
+      obj.defblock = newElse;
     }
     return super.visitIfStmt(obj, param);
   }

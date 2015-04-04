@@ -89,8 +89,8 @@ class RenamerWorker extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitRefName(RefName obj, Void param) {
-    String name = CRenamer.cleanName(obj.getName());
-    obj.setName(name);
+    String name = CRenamer.cleanName(obj.name);
+    obj.name = name;
     return null;
   }
 

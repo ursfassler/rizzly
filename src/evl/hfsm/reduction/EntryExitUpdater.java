@@ -84,7 +84,7 @@ class EntryExitUpdaterWorker extends NullTraverser<Void, EePar> {
 
   @Override
   protected Void visitImplHfsm(ImplHfsm obj, EePar param) {
-    visit(obj.getTopstate(), new EePar());
+    visit(obj.topstate, new EePar());
     return null;
   }
 
@@ -96,12 +96,12 @@ class EntryExitUpdaterWorker extends NullTraverser<Void, EePar> {
 
   public void changeEe(State obj, EePar param) {
     FuncPrivateVoid entry = makeFunc(param.entry, "_centry");
-    obj.getItem().add(entry);
-    obj.getEntryFunc().setLink(entry);
+    obj.item.add(entry);
+    obj.entryFunc.link = entry;
 
     FuncPrivateVoid exit = makeFunc(param.exit, "_cexit");
-    obj.getItem().add(exit);
-    obj.getExitFunc().setLink(exit);
+    obj.item.add(exit);
+    obj.exitFunc.link = exit;
   }
 
   public FuncPrivateVoid makeFunc(LinkedList<Function> list, String name) {
@@ -109,22 +109,22 @@ class EntryExitUpdaterWorker extends NullTraverser<Void, EePar> {
 
     for (Function cf : list) {
       Statement stmt = makeCall(cf);
-      func.getBody().getStatements().add(stmt);
+      func.body.statements.add(stmt);
     }
 
     return func;
   }
 
   private CallStmt makeCall(Function func) {
-    assert (func.getParam().isEmpty());
+    assert (func.param.isEmpty());
     Reference ref = new Reference(ElementInfo.NO, func);
-    ref.getOffset().add(new RefCall(ElementInfo.NO, new TupleValue(ElementInfo.NO, new EvlList<Expression>())));
+    ref.offset.add(new RefCall(ElementInfo.NO, new TupleValue(ElementInfo.NO, new EvlList<Expression>())));
     return new CallStmt(ElementInfo.NO, ref);
   }
 
   @Override
   protected Void visitStateComposite(StateComposite obj, EePar param) {
-    visitList(obj.getItem(), param);
+    visitList(obj.item, param);
     changeEe(obj, param);
     return null;
   }
@@ -132,8 +132,8 @@ class EntryExitUpdaterWorker extends NullTraverser<Void, EePar> {
   @Override
   protected Void visitState(State obj, EePar param) {
     param = new EePar(param);
-    param.entry.addLast(obj.getEntryFunc().getLink());
-    param.exit.addFirst(obj.getExitFunc().getLink());
+    param.entry.addLast(obj.entryFunc.link);
+    param.exit.addFirst(obj.exitFunc.link);
     return super.visitState(obj, param);
   }
 

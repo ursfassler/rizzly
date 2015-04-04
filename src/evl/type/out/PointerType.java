@@ -23,18 +23,10 @@ import evl.expression.reference.BaseRef;
 import evl.type.Type;
 
 public class PointerType extends Type {
-  private BaseRef<Type> type;
+  public BaseRef<Type> type;
 
   public PointerType(ElementInfo info, String name, BaseRef<Type> type) {
     super(info, name);
-    this.type = type;
-  }
-
-  public BaseRef<Type> getType() {
-    return type;
-  }
-
-  public void setType(BaseRef<Type> type) {
     this.type = type;
   }
 

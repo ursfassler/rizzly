@@ -27,15 +27,11 @@ import common.ElementInfo;
  */
 final public class Number extends Expression {
 
-  final private BigInteger value;
+  final public BigInteger value;
 
   public Number(ElementInfo info, BigInteger value) {
     super(info);
     this.value = value;
-  }
-
-  public BigInteger getValue() {
-    return value;
   }
 
   @Override

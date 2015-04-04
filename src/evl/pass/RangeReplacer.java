@@ -100,12 +100,12 @@ class RangeReplacerWorker extends NullTraverser<Void, Void> {
   protected Void visitRangeType(RangeType obj, Void param) {
     // TODO implement also for signed
     // TODO add range offset movement (i.e. move R{10,20} to R{0,10})
-    BigInteger low = obj.getNumbers().getLow();
+    BigInteger low = obj.range.getLow();
     boolean hasNeg = low.compareTo(BigInteger.ZERO) < 0; // TODO ok?
     if (hasNeg) {
       low = low.add(BigInteger.ONE).abs();
     }
-    BigInteger max = low.max(obj.getNumbers().getHigh());
+    BigInteger max = low.max(obj.range.getHigh());
     int bits = ExpressionTypeChecker.bitCount(max);
     if (hasNeg) {
       bits++;

@@ -63,16 +63,16 @@ public class StateVarReplacer extends EvlPass {
 
   protected void process(ImplHfsm obj, KnowledgeBase kb) {
     StateTypeBuilder stb = new StateTypeBuilder();
-    NamedElement elem = stb.traverse(obj.getTopstate(), new EvlList<NamedElement>());
-    Type stateType = elem.getRef().getLink();
+    NamedElement elem = stb.traverse(obj.topstate, new EvlList<NamedElement>());
+    Type stateType = elem.ref.link;
 
-    obj.getTopstate().setInitial(new SimpleRef<State>(ElementInfo.NO, InitStateGetter.get(obj.getTopstate())));
+    obj.topstate.initial = new SimpleRef<State>(ElementInfo.NO, InitStateGetter.get(obj.topstate));
 
     Constant def = stb.getInitVar().get(stateType);
 
     // TODO set correct values when switching states
     StateVariable var = new StateVariable(ElementInfo.NO, "data", new SimpleRef<Type>(ElementInfo.NO, stateType), new Reference(ElementInfo.NO, def));
-    obj.getTopstate().getItem().add(var);
+    obj.topstate.item.add(var);
 
     Map<StateVariable, EvlList<NamedElement>> epath = new HashMap<StateVariable, EvlList<NamedElement>>(stb.getEpath());
     for (StateVariable sv : epath.keySet()) {
@@ -98,57 +98,57 @@ class StateVarReplacerWorker extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitImplHfsm(ImplHfsm obj, Void param) {
-    visit(obj.getTopstate(), param);
+    visit(obj.topstate, param);
     return null;
   }
 
   @Override
   protected Void visitState(State obj, Void param) {
-    visitList(obj.getItem(), param);
+    visitList(obj.item, param);
     return null;
   }
 
   @Override
   protected Void visitTransition(Transition obj, Void param) {
-    visit(obj.getGuard(), param);
-    visit(obj.getBody(), param);
+    visit(obj.guard, param);
+    visit(obj.body, param);
     return null;
   }
 
   @Override
   protected Void visitFuncPrivateVoid(FuncPrivateVoid obj, Void param) {
-    visit(obj.getBody(), param);
+    visit(obj.body, param);
     return null;
   }
 
   @Override
   protected Void visitFuncPrivateRet(FuncPrivateRet obj, Void param) {
-    visit(obj.getBody(), param);
+    visit(obj.body, param);
     return null;
   }
 
   @Override
   protected Void visitReference(Reference obj, Void param) {
-    if (obj.getLink() == dataVar) {
-      visitList(obj.getOffset(), param);
+    if (obj.link == dataVar) {
+      visitList(obj.offset, param);
       return null;
     }
     super.visitReference(obj, param);
-    if (obj.getLink() instanceof StateVariable) {
-      EvlList<NamedElement> eofs = epath.get(obj.getLink());
+    if (obj.link instanceof StateVariable) {
+      EvlList<NamedElement> eofs = epath.get(obj.link);
       assert (eofs != null);
 
-      assert (obj.getOffset().isEmpty()); // FIXME not always true (e.g. for access to struct)
+      assert (obj.offset.isEmpty()); // FIXME not always true (e.g. for access to struct)
 
-      Type type = dataVar.getType().getLink();
+      Type type = dataVar.type.link;
 
-      obj.setLink(dataVar);
+      obj.link = dataVar;
       for (NamedElement itr : eofs) {
         RefName ref = new RefName(ElementInfo.NO, itr.getName());
 
         type = rtg.traverse(ref, type);  // sanity check
 
-        obj.getOffset().add(ref);
+        obj.offset.add(ref);
       }
 
     }

@@ -71,16 +71,16 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
   protected List<Statement> visitAssignmentSingle(AssignmentSingle obj, Void param) {
     int rightCount;
 
-    if (obj.getRight() instanceof TupleValue) {
-      rightCount = ((TupleValue) obj.getRight()).getValue().size();
-    } else if (obj.getRight() instanceof NamedElementsValue) {
-      rightCount = ((NamedElementsValue) obj.getRight()).getValue().size();
+    if (obj.right instanceof TupleValue) {
+      rightCount = ((TupleValue) obj.right).value.size();
+    } else if (obj.right instanceof NamedElementsValue) {
+      rightCount = ((NamedElementsValue) obj.right).value.size();
     } else {
       rightCount = 1;
     }
 
     if (rightCount > 1) {
-      return assignOneOne(obj.getLeft(), obj.getRight());
+      return assignOneOne(obj.left, obj.right);
     } else {
       return null;
     }
@@ -90,12 +90,12 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
   protected List<Statement> visitAssignmentMulti(AssignmentMulti obj, Void param) {
     int leftCount, rightCount;
 
-    leftCount = obj.getLeft().size();
+    leftCount = obj.left.size();
 
-    if (obj.getRight() instanceof TupleValue) {
-      rightCount = ((TupleValue) obj.getRight()).getValue().size();
-    } else if (obj.getRight() instanceof NamedElementsValue) {
-      rightCount = ((NamedElementsValue) obj.getRight()).getValue().size();
+    if (obj.right instanceof TupleValue) {
+      rightCount = ((TupleValue) obj.right).value.size();
+    } else if (obj.right instanceof NamedElementsValue) {
+      rightCount = ((NamedElementsValue) obj.right).value.size();
     } else {
       rightCount = 1;
     }
@@ -107,9 +107,9 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
     if ((leftCount > 1) && (rightCount > 1)) {
       throw new RuntimeException("not yet implemented");
     } else if (leftCount > 1) {
-      return assignMulOne(obj.getLeft(), obj.getRight());
+      return assignMulOne(obj.left, obj.right);
     } else if (rightCount > 1) {
-      return assignOneOne(obj.getLeft().get(0), obj.getRight());
+      return assignOneOne(obj.left.get(0), obj.right);
     } else {
       return null;
     }
@@ -118,10 +118,10 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
   private List<Statement> assignOneOne(Reference left, Expression right) {
     if (right instanceof TupleValue) {
       TupleValue gen = (TupleValue) right;
-      return assignOne(left, gen.getValue());
+      return assignOne(left, gen.value);
     } else {
       NamedElementsValue gen = (NamedElementsValue) right;
-      return assignOneNamed(left, gen.getValue());
+      return assignOneNamed(left, gen.value);
     }
   }
 
@@ -139,8 +139,8 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
 
       for (int i = 0; i < left.size(); i++) {
         Reference lr = left.get(i);
-        if (!(lr.getLink() instanceof AnyValue)) {
-          String elemName = ((RecordType) rt).getElement().get(i).getName();
+        if (!(lr.link instanceof AnyValue)) {
+          String elemName = ((RecordType) rt).element.get(i).getName();
           Reference rr = new Reference(info, var, new RefName(info, elemName));
           ret.add(new AssignmentSingle(info, lr, rr));
         }
@@ -171,7 +171,7 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
 
     for (int i = 0; i < value.size(); i++) {
       Reference subref = Copy.copy(left);
-      subref.getOffset().add(new RefName(ElementInfo.NO, rt.getElement().get(i).getName()));
+      subref.offset.add(new RefName(ElementInfo.NO, rt.element.get(i).getName()));
       Expression subVal = value.get(i);
       RError.ass(!(subVal instanceof NamedElementsValue), subVal.getInfo(), "Named element values for tuple not yet supported: " + subVal.toString());
       AssignmentSingle ass = new AssignmentSingle(left.getInfo(), subref, subVal);

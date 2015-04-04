@@ -145,15 +145,15 @@ class Reduction {
 
   public ImplElementary reduce(ImplHfsm obj, Namespace param) {
     ImplElementary elem = new ImplElementary(obj.getInfo(), obj.getName(), new SimpleRef<FuncPrivateVoid>(info, null), new SimpleRef<FuncPrivateVoid>(info, null));
-    elem.getIface().addAll(obj.getIface());
-    elem.getFunction().addAll(obj.getFunction());
-    for (StateItem item : obj.getTopstate().getItem()) {
+    elem.iface.addAll(obj.iface);
+    elem.function.addAll(obj.function);
+    for (StateItem item : obj.topstate.item) {
       if (item instanceof Variable) {
-        elem.getVariable().add((Variable) item);
+        elem.variable.add((Variable) item);
       } else if (item instanceof Function) {
-        elem.getFunction().add((Function) item);
+        elem.function.add((Function) item);
       } else if (item instanceof Type) {
-        elem.getType().add((Type) item);
+        elem.type.add((Type) item);
       } else if (item instanceof Transition) {
       } else if (item instanceof StateSimple) {
       } else {
@@ -161,44 +161,44 @@ class Reduction {
       }
     }
 
-    EnumType states = new EnumType(obj.getTopstate().getInfo(), obj.getName() + Designator.NAME_SEP + "State");
-    HashMap<StateSimple, EnumElement> enumMap = makeEnumElem(obj.getTopstate(), states);
+    EnumType states = new EnumType(obj.topstate.getInfo(), obj.getName() + Designator.NAME_SEP + "State");
+    HashMap<StateSimple, EnumElement> enumMap = makeEnumElem(obj.topstate, states);
 
     param.add(states);
     // String ena = (String) enumMap.get(obj.getTopstate().getInitial()).properties().get(Property.NAME);
-    EnumElement ena = enumMap.get(obj.getTopstate().getInitial().getLink());
+    EnumElement ena = enumMap.get(obj.topstate.initial.link);
     Reference initState = makeEnumElemRef(states, ena);
     StateVariable stateVariable = new StateVariable(obj.getInfo(), "_statevar", new SimpleRef<Type>(info, states), initState);
-    elem.getVariable().add(stateVariable);
+    elem.variable.add(stateVariable);
 
     TransitionDict dict = new TransitionDict();
-    dict.traverse(obj.getTopstate(), null);
+    dict.traverse(obj.topstate, null);
 
     // create event handler
-    for (FuncCtrlInDataOut func : elem.getIface().getItems(FuncCtrlInDataOut.class)) {
-      assert (func.getBody().getStatements().isEmpty());
-      Statement code = addQueryCode(enumMap.keySet(), enumMap, states, stateVariable, func, func.getParam());
+    for (FuncCtrlInDataOut func : elem.iface.getItems(FuncCtrlInDataOut.class)) {
+      assert (func.body.statements.isEmpty());
+      Statement code = addQueryCode(enumMap.keySet(), enumMap, states, stateVariable, func, func.param);
       Block bbl = new Block(info);
-      bbl.getStatements().add(code);
-      func.setBody(bbl);
+      bbl.statements.add(code);
+      func.body = bbl;
     }
 
-    for (FuncCtrlInDataIn func : elem.getIface().getItems(FuncCtrlInDataIn.class)) {
-      assert (func.getBody().getStatements().isEmpty());
-      Statement code = addTransitionCode(enumMap.keySet(), enumMap, states, stateVariable, func, dict, func.getParam());
+    for (FuncCtrlInDataIn func : elem.iface.getItems(FuncCtrlInDataIn.class)) {
+      assert (func.body.statements.isEmpty());
+      Statement code = addTransitionCode(enumMap.keySet(), enumMap, states, stateVariable, func, dict, func.param);
       Block bbl = new Block(info);
-      bbl.getStatements().add(code);
-      func.setBody(bbl);
+      bbl.statements.add(code);
+      func.body = bbl;
     }
 
     {
-      FuncPrivateVoid fEntry = makeEntryFunc(obj.getTopstate().getInitial().getLink());
-      elem.getFunction().add(fEntry);
-      elem.getEntryFunc().setLink(fEntry);
+      FuncPrivateVoid fEntry = makeEntryFunc(obj.topstate.initial.link);
+      elem.function.add(fEntry);
+      elem.entryFunc.link = fEntry;
 
       FuncPrivateVoid fExit = makeExitFunc(states, enumMap, stateVariable);
-      elem.getFunction().add(fExit);
-      elem.getExitFunc().setLink(fExit);
+      elem.function.add(fExit);
+      elem.exitFunc.link = fExit;
     }
 
     getMap().put(obj, elem);
@@ -208,7 +208,7 @@ class Reduction {
   private FuncPrivateVoid makeEntryFunc(State initial) {
     Block body = new Block(info);
 
-    body.getStatements().add(makeCall(initial.getEntryFunc().getLink()));
+    body.statements.add(makeCall(initial.entryFunc.link));
 
     FuncPrivateVoid rfunc = new FuncPrivateVoid(info, Designator.NAME_SEP + "stateentry", new EvlList<FuncVariable>(), new FuncReturnNone(ElementInfo.NO), body);
     return rfunc;
@@ -217,7 +217,7 @@ class Reduction {
   private Block makeErrorBb() {
     Block bberror = new Block(info);
     FuncCtrlOutDataOut trap = kll.getTrap();
-    bberror.getStatements().add(new CallStmt(info, new Reference(info, trap, new RefCall(info, new TupleValue(info, new EvlList<Expression>())))));
+    bberror.statements.add(new CallStmt(info, new Reference(info, trap, new RefCall(info, new TupleValue(info, new EvlList<Expression>())))));
     return bberror;
   }
 
@@ -229,32 +229,32 @@ class Reduction {
       Reference eref = makeEnumElemRef(etype, enumMap.get(src));
       Block obb = new Block(info);
       CaseOpt opt = makeCaseOption(eref, obb);
-      obb.getStatements().add(makeCall(src.getExitFunc().getLink())); // TODO ok?
+      obb.statements.add(makeCall(src.exitFunc.link)); // TODO ok?
       option.add(opt);
     }
 
     CaseStmt caseStmt = new CaseStmt(info, new Reference(info, stateVariable), option, makeErrorBb());
 
     Block body = new Block(info);
-    body.getStatements().add(caseStmt);
+    body.statements.add(caseStmt);
 
     FuncPrivateVoid rfunc = new FuncPrivateVoid(info, "_exit", new EvlList<FuncVariable>(), new FuncReturnNone(ElementInfo.NO), body);
-    rfunc.setBody(body);
+    rfunc.body = body;
 
     return rfunc;
   }
 
   static private CallStmt makeCall(Function func) {
-    assert (func.getParam().isEmpty());
+    assert (func.param.isEmpty());
     Reference call = new Reference(info, func);
-    call.getOffset().add(new RefCall(info, new TupleValue(info, new EvlList<Expression>())));
+    call.offset.add(new RefCall(info, new TupleValue(info, new EvlList<Expression>())));
 
     return new CallStmt(info, call);
   }
 
   static private HashMap<StateSimple, EnumElement> makeEnumElem(StateComposite topstate, EnumType stateEnum) {
     HashMap<StateSimple, EnumElement> ret = new HashMap<StateSimple, EnumElement>();
-    for (State state : topstate.getItem().getItems(State.class)) {
+    for (State state : topstate.item.getItems(State.class)) {
       assert (state instanceof StateSimple);
 
       EnumElement element = new EnumElement(info, state.getName());
@@ -273,13 +273,13 @@ class Reduction {
       FuncCtrlInDataOut query = getQuery(state, func.getName());
 
       // from QueryDownPropagator
-      assert (query.getBody().getStatements().size() == 1);
-      ReturnExpr retcall = (ReturnExpr) query.getBody().getStatements().get(0);
+      assert (query.body.statements.size() == 1);
+      ReturnExpr retcall = (ReturnExpr) query.body.statements.get(0);
 
-      FsmReduction.relinkActualParameterRef(query.getParam(), param, retcall.getExpr());
+      FsmReduction.relinkActualParameterRef(query.param, param, retcall.expr);
 
       Block stateBb = new Block(info);
-      stateBb.getStatements().add(retcall);
+      stateBb.statements.add(retcall);
       CaseOpt opt = makeCaseOption(makeEnumElemRef(enumType, enumMap.get(state)), stateBb);
 
       copt.add(opt);
@@ -292,7 +292,7 @@ class Reduction {
 
   static private FuncCtrlInDataOut getQuery(State state, String funcName) {
     assert (funcName != null);
-    for (FuncCtrlInDataOut itr : state.getItem().getItems(FuncCtrlInDataOut.class)) {
+    for (FuncCtrlInDataOut itr : state.item.getItems(FuncCtrlInDataOut.class)) {
       if (funcName.equals(itr.getName())) {
         return itr;
       }
@@ -312,7 +312,7 @@ class Reduction {
 
       EvlList<Transition> transList = getter.get(src, funcName);
       if (!transList.isEmpty()) {
-        body.getStatements().add(makeGuardedTrans(transList, param, stateVariable, enumMap));
+        body.statements.add(makeGuardedTrans(transList, param, stateVariable, enumMap));
       }
 
       options.add(opt);
@@ -333,11 +333,11 @@ class Reduction {
     for (Transition trans : transList) {
       Block blockThen = makeTransition(trans, newparam, stateVariable, enumMap);
 
-      FsmReduction.relinkActualParameterRef(trans.getParam(), newparam, trans.getGuard()); // relink references to
+      FsmReduction.relinkActualParameterRef(trans.param, newparam, trans.guard); // relink references to
       // arguments to the
       // new ones
 
-      IfOption ifo = new IfOption(trans.getInfo(), trans.getGuard(), blockThen);
+      IfOption ifo = new IfOption(trans.getInfo(), trans.guard, blockThen);
       option.add(ifo);
     }
 
@@ -368,15 +368,15 @@ class Reduction {
   static private Block makeTransition(Transition trans, EvlList<FuncVariable> param, StateVariable stateVariable, HashMap<StateSimple, EnumElement> enumMap) {
     Block transCode = new Block(info);
 
-    Block body = trans.getBody();
-    FsmReduction.relinkActualParameterRef(trans.getParam(), param, body);
+    Block body = trans.body;
+    FsmReduction.relinkActualParameterRef(trans.param, param, body);
 
-    transCode.getStatements().addAll(body.getStatements());
+    transCode.statements.addAll(body.statements);
 
-    EnumElement src = enumMap.get(trans.getDst().getLink());
+    EnumElement src = enumMap.get(trans.dst.link);
     assert (src != null);
     Assignment setState = new AssignmentSingle(info, new Reference(info, stateVariable), new Reference(info, src));
-    transCode.getStatements().add(setState);
+    transCode.statements.add(setState);
 
     return transCode;
   }

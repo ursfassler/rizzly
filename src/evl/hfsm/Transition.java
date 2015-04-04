@@ -28,12 +28,12 @@ import evl.statement.Block;
 import evl.variable.FuncVariable;
 
 public class Transition extends EvlBase implements StateItem {
-  private SimpleRef<State> src;
-  private SimpleRef<State> dst;
-  private SimpleRef<FuncCtrlInDataIn> eventFunc;
-  final private EvlList<FuncVariable> param = new EvlList<FuncVariable>();
-  private Expression guard;
-  private Block body;
+  public SimpleRef<State> src;
+  public SimpleRef<State> dst;
+  public SimpleRef<FuncCtrlInDataIn> eventFunc;
+  final public EvlList<FuncVariable> param = new EvlList<FuncVariable>();
+  public Expression guard;
+  public Block body;
 
   public Transition(ElementInfo info, SimpleRef<State> src, SimpleRef<State> dst, SimpleRef<FuncCtrlInDataIn> eventFunc, Expression guard, EvlList<FuncVariable> param, Block body) {
     super(info);
@@ -42,50 +42,6 @@ public class Transition extends EvlBase implements StateItem {
     this.eventFunc = eventFunc;
     this.param.addAll(param);
     this.guard = guard;
-    this.body = body;
-  }
-
-  public SimpleRef<State> getSrc() {
-    return src;
-  }
-
-  public void setSrc(SimpleRef<State> src) {
-    this.src = src;
-  }
-
-  public SimpleRef<State> getDst() {
-    return dst;
-  }
-
-  public void setDst(SimpleRef<State> dst) {
-    this.dst = dst;
-  }
-
-  public Expression getGuard() {
-    return guard;
-  }
-
-  public void setGuard(Expression guard) {
-    this.guard = guard;
-  }
-
-  public SimpleRef<FuncCtrlInDataIn> getEventFunc() {
-    return eventFunc;
-  }
-
-  public void setEventFunc(SimpleRef<FuncCtrlInDataIn> eventFunc) {
-    this.eventFunc = eventFunc;
-  }
-
-  public EvlList<FuncVariable> getParam() {
-    return param;
-  }
-
-  public Block getBody() {
-    return body;
-  }
-
-  public void setBody(Block body) {
     this.body = body;
   }
 

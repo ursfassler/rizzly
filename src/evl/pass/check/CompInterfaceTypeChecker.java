@@ -114,8 +114,8 @@ class CompInterfaceTypeCheckerWorker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitImplElementary(ImplElementary obj, Void param) {
-    assert (obj.getComponent().isEmpty());
-    assert (obj.getSubCallback().isEmpty());
+    assert (obj.component.isEmpty());
+    assert (obj.subCallback.isEmpty());
     return null;
   }
 
@@ -128,12 +128,12 @@ class CompInterfaceTypeCheckerWorker extends NullTraverser<Void, Void> {
   protected Void visitImplComposition(ImplComposition obj, Void param) {
     // TODO do checks over whole implementation, i.e. not splitting when functions has return value
     // TODO check for cycles
-    visitList(obj.getConnection(), param);
+    visitList(obj.connection, param);
 
     checkSelfIface(obj, Direction.out);
     checkSelfIface(obj, Direction.in);
 
-    for (CompUse use : obj.getComponent()) {
+    for (CompUse use : obj.component) {
       checkIface(obj, use, Direction.in);
       checkIface(obj, use, Direction.out);
     }
@@ -143,7 +143,7 @@ class CompInterfaceTypeCheckerWorker extends NullTraverser<Void, Void> {
 
   private void checkSelfIface(ImplComposition obj, Direction dir) {
     for (InterfaceFunction ifaceuse : obj.getIface(dir)) {
-      if (!ifaceIsConnected(ifaceuse, dir, obj.getConnection())) {
+      if (!ifaceIsConnected(ifaceuse, dir, obj.connection)) {
         ErrorType etype;
         if (ifaceuse instanceof FuncCtrlInDataOut) {
           etype = ErrorType.Error;
@@ -156,9 +156,9 @@ class CompInterfaceTypeCheckerWorker extends NullTraverser<Void, Void> {
   }
 
   private Component checkIface(ImplComposition obj, CompUse use, Direction dir) {
-    Component type = use.getLink();
+    Component type = use.link;
     for (InterfaceFunction ifaceuse : type.getIface(dir)) {
-      if (!ifaceIsConnected(use, ifaceuse, dir.other(), obj.getConnection())) {
+      if (!ifaceIsConnected(use, ifaceuse, dir.other(), obj.connection)) {
         ErrorType etype;
         if (ifaceuse instanceof FuncCtrlOutDataIn) {
           etype = ErrorType.Error;
@@ -174,9 +174,9 @@ class CompInterfaceTypeCheckerWorker extends NullTraverser<Void, Void> {
 
   private boolean ifaceIsConnected(CompUse use, InterfaceFunction ifaceuse, Direction dir, List<Connection> connection) {
     for (Connection itr : connection) {
-      if (itr.getEndpoint(dir) instanceof EndpointSub) {
-        EndpointSub ep = (EndpointSub) itr.getEndpoint(dir);
-        if ((ep.getLink() == use) && (ep.getFunc() == ifaceuse)) {
+      if (itr.endpoint.get(dir) instanceof EndpointSub) {
+        EndpointSub ep = (EndpointSub) itr.endpoint.get(dir);
+        if ((ep.link == use) && (ep.getFunc() == ifaceuse)) {
           return true;
         }
       }
@@ -186,8 +186,8 @@ class CompInterfaceTypeCheckerWorker extends NullTraverser<Void, Void> {
 
   private boolean ifaceIsConnected(InterfaceFunction ifaceuse, Direction dir, List<Connection> connection) {
     for (Connection itr : connection) {
-      if (itr.getEndpoint(dir) instanceof EndpointSelf) {
-        Endpoint ep = itr.getEndpoint(dir);
+      if (itr.endpoint.get(dir) instanceof EndpointSelf) {
+        Endpoint ep = itr.endpoint.get(dir);
         if (ep.getFunc() == ifaceuse) {
           return true;
         }
@@ -198,8 +198,8 @@ class CompInterfaceTypeCheckerWorker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitConnection(Connection obj, Void param) {
-    Endpoint srcEp = obj.getEndpoint(Direction.in);
-    Endpoint dstEp = obj.getEndpoint(Direction.out);
+    Endpoint srcEp = obj.endpoint.get(Direction.in);
+    Endpoint dstEp = obj.endpoint.get(Direction.out);
     Function srcType = getIfaceFunc(srcEp);
     Function dstType = getIfaceFunc(dstEp);
 

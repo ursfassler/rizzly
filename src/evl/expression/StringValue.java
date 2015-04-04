@@ -25,15 +25,11 @@ import common.ElementInfo;
  */
 final public class StringValue extends Expression {
 
-  final private String value;
+  final public String value;
 
   public StringValue(ElementInfo info, String value) {
     super(info);
     this.value = value;
-  }
-
-  public String getValue() {
-    return value;
   }
 
   @Override

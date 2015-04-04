@@ -24,21 +24,13 @@ import evl.other.EvlList;
 import evl.type.Type;
 
 final public class FunctionType extends Type {
-  private EvlList<SimpleRef<Type>> arg;
-  final private SimpleRef<Type> ret;
+  final public EvlList<SimpleRef<Type>> arg;
+  final public SimpleRef<Type> ret;
 
   public FunctionType(ElementInfo info, String name, EvlList<SimpleRef<Type>> arg, SimpleRef<Type> ret) {
     super(info, name);
     this.arg = arg;
     this.ret = ret;
-  }
-
-  public EvlList<SimpleRef<Type>> getArg() {
-    return arg;
-  }
-
-  public SimpleRef<Type> getRet() {
-    return ret;
   }
 
   @Override

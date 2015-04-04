@@ -95,7 +95,7 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
       RError.err(ErrorType.Fatal, expr.getInfo(), "Expected range type, got " + lhs.getName());
       return null;
     } else {
-      return ((RangeType) lhs).getNumbers();
+      return ((RangeType) lhs).range;
     }
   }
 
@@ -136,7 +136,7 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitNot(Not obj, Void param) {
-    Type type = kt.get(obj.getExpr());
+    Type type = kt.get(obj.expr);
     if (type instanceof EnumType) {
       RError.err(ErrorType.Error, obj.getInfo(), "operation not possible on enumerator");
       return null;
@@ -153,7 +153,7 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitUminus(Uminus obj, Void param) {
-    Type type = kt.get(obj.getExpr());
+    Type type = kt.get(obj.expr);
     if (!(type instanceof RangeType)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Need ordinal type for minus, got: " + type.getName());
     }
@@ -169,8 +169,8 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
   @Override
   protected Void visitEqual(Equal obj, Void param) {
     super.visitEqual(obj, param);
-    Type lhs = kt.get(obj.getLeft());
-    Type rhs = kt.get(obj.getRight());
+    Type lhs = kt.get(obj.left);
+    Type rhs = kt.get(obj.right);
     testForEqualComparable(lhs, rhs, obj.getInfo());
     return null;
   }
@@ -178,8 +178,8 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
   @Override
   protected Void visitNotequal(Notequal obj, Void param) {
     super.visitNotequal(obj, param);
-    Type lhs = kt.get(obj.getLeft());
-    Type rhs = kt.get(obj.getRight());
+    Type lhs = kt.get(obj.left);
+    Type rhs = kt.get(obj.right);
     testForEqualComparable(lhs, rhs, obj.getInfo());
     return null;
   }
@@ -187,47 +187,47 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
   @Override
   protected Void visitGreater(Greater obj, Void param) {
     super.visitGreater(obj, param);
-    getRange(obj.getLeft());
-    getRange(obj.getRight());
+    getRange(obj.left);
+    getRange(obj.right);
     return null;
   }
 
   @Override
   protected Void visitGreaterequal(Greaterequal obj, Void param) {
     super.visitGreaterequal(obj, param);
-    getRange(obj.getLeft());
-    getRange(obj.getRight());
+    getRange(obj.left);
+    getRange(obj.right);
     return null;
   }
 
   @Override
   protected Void visitLess(Less obj, Void param) {
     super.visitLess(obj, param);
-    getRange(obj.getLeft());
-    getRange(obj.getRight());
+    getRange(obj.left);
+    getRange(obj.right);
     return null;
   }
 
   @Override
   protected Void visitLessequal(Lessequal obj, Void param) {
     super.visitLessequal(obj, param);
-    getRange(obj.getLeft());
-    getRange(obj.getRight());
+    getRange(obj.left);
+    getRange(obj.right);
     return null;
   }
 
   @Override
   protected Void visitBitAnd(BitAnd obj, Void param) {
     super.visitBitAnd(obj, param);
-    Type lhst = kt.get(obj.getLeft());
-    Type rhst = kt.get(obj.getRight());
+    Type lhst = kt.get(obj.left);
+    Type rhst = kt.get(obj.right);
 
     if (lhst instanceof RangeType) {
       if (!(rhst instanceof RangeType)) {
         RError.err(ErrorType.Fatal, rhst.getInfo(), "Expected range type");
       }
-      Range lhs = getRange(obj.getLeft());
-      Range rhs = getRange(obj.getRight());
+      Range lhs = getRange(obj.left);
+      Range rhs = getRange(obj.right);
       checkPositive(obj.getInfo(), "and", lhs, rhs);
     } else if (lhst instanceof BooleanType) {
       // TODO we should not get here
@@ -243,8 +243,8 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
   @Override
   protected Void visitLogicAnd(LogicAnd obj, Void param) {
     super.visitLogicAnd(obj, param);
-    Type lhst = kt.get(obj.getLeft());
-    Type rhst = kt.get(obj.getRight());
+    Type lhst = kt.get(obj.left);
+    Type rhst = kt.get(obj.right);
 
     if (!(lhst instanceof BooleanType)) {
       RError.err(ErrorType.Error, lhst.getInfo(), "Expected boolean type at the left side");
@@ -258,8 +258,8 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
   @Override
   protected Void visitBitOr(BitOr obj, Void param) {
     super.visitBitOr(obj, param);
-    Type lhst = kt.get(obj.getLeft());
-    Type rhst = kt.get(obj.getRight());
+    Type lhst = kt.get(obj.left);
+    Type rhst = kt.get(obj.right);
 
     if (!(lhst instanceof RangeType)) {
       RError.err(ErrorType.Fatal, lhst.getInfo(), "Expected range type");
@@ -267,8 +267,8 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
     if (!(rhst instanceof RangeType)) {
       RError.err(ErrorType.Fatal, rhst.getInfo(), "Expected range type");
     }
-    Range lhs = getRange(obj.getLeft());
-    Range rhs = getRange(obj.getRight());
+    Range lhs = getRange(obj.left);
+    Range rhs = getRange(obj.right);
     checkPositive(obj.getInfo(), "and", lhs, rhs);
     return null;
   }
@@ -282,8 +282,8 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
   @Override
   protected Void visitDiv(Div obj, Void param) {
     super.visitDiv(obj, param);
-    getRange(obj.getLeft());
-    Range rhs = getRange(obj.getRight());
+    getRange(obj.left);
+    Range rhs = getRange(obj.right);
     if ((rhs.getLow().compareTo(BigInteger.ZERO) == 0) && (rhs.getHigh().compareTo(BigInteger.ZERO) == 0)) {
       RError.err(ErrorType.Error, obj.getInfo(), "division by zero");
     }
@@ -293,16 +293,16 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
   @Override
   protected Void visitMinus(Minus obj, Void param) {
     super.visitMinus(obj, param);
-    getRange(obj.getLeft());
-    getRange(obj.getRight());
+    getRange(obj.left);
+    getRange(obj.right);
     return null;
   }
 
   @Override
   protected Void visitMod(Mod obj, Void param) {
     super.visitMod(obj, param);
-    Range lhs = getRange(obj.getLeft());
-    Range rhs = getRange(obj.getRight());
+    Range lhs = getRange(obj.left);
+    Range rhs = getRange(obj.right);
     checkPositive(obj.getInfo(), "mod", lhs); // TODO implement mod correctly (and not with 'urem' instruction) and
     // remove this check
     if (rhs.getLow().compareTo(BigInteger.ZERO) <= 0) {
@@ -314,16 +314,16 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
   @Override
   protected Void visitMul(Mul obj, Void param) {
     super.visitMul(obj, param);
-    getRange(obj.getLeft());
-    getRange(obj.getRight());
+    getRange(obj.left);
+    getRange(obj.right);
     return null;
   }
 
   @Override
   protected Void visitOr(Or obj, Void param) {
     super.visitOr(obj, param);
-    Range lhs = getRange(obj.getLeft());
-    Range rhs = getRange(obj.getRight());
+    Range lhs = getRange(obj.left);
+    Range rhs = getRange(obj.right);
     checkPositive(obj.getInfo(), "or", lhs, rhs);
     return null;
   }
@@ -331,16 +331,16 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
   @Override
   protected Void visitPlus(Plus obj, Void param) {
     super.visitPlus(obj, param);
-    getRange(obj.getLeft());
-    getRange(obj.getRight());
+    getRange(obj.left);
+    getRange(obj.right);
     return null;
   }
 
   @Override
   protected Void visitShl(Shl obj, Void param) {
     super.visitShl(obj, param);
-    Range lhs = getRange(obj.getLeft());
-    Range rhs = getRange(obj.getRight());
+    Range lhs = getRange(obj.left);
+    Range rhs = getRange(obj.right);
     checkPositive(obj.getInfo(), "shl", lhs, rhs);
     return null;
   }
@@ -348,8 +348,8 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
   @Override
   protected Void visitShr(Shr obj, Void param) {
     super.visitShr(obj, param);
-    Range lhs = getRange(obj.getLeft());
-    Range rhs = getRange(obj.getRight());
+    Range lhs = getRange(obj.left);
+    Range rhs = getRange(obj.right);
     checkPositive(obj.getInfo(), "shr", lhs, rhs);
     return null;
   }
@@ -357,8 +357,8 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
   @Override
   protected Void visitTypeCast(TypeCast obj, Void param) {
     super.visitTypeCast(obj, param);
-    getRange(obj.getValue());
-    if (!(kt.get(obj.getCast()) instanceof RangeType)) {
+    getRange(obj.value);
+    if (!(kt.get(obj.cast) instanceof RangeType)) {
       RError.err(ErrorType.Error, obj.getInfo(), "can only cast to range type");
     }
     return null;

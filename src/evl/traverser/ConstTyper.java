@@ -62,12 +62,12 @@ class Typer extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitConstant(Constant obj, Void param) {
-    if (isOpenType(obj.getType().getLink())) {
-      Type ct = kt.get(obj.getDef());
+    if (isOpenType(obj.type.link)) {
+      Type ct = kt.get(obj.def);
 
       ct = kbi.getType(ct);
 
-      obj.setType(new SimpleRef<Type>(obj.getInfo(), ct));
+      obj.type = new SimpleRef<Type>(obj.getInfo(), ct);
     }
     super.visitConstant(obj, param);
     return null;

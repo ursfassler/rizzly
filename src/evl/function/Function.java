@@ -29,9 +29,9 @@ import evl.variable.FuncVariable;
 
 abstract public class Function extends EvlBase implements Named {
   private String name;
-  final private EvlList<FuncVariable> param = new EvlList<FuncVariable>();
-  private FuncReturn ret;
-  private Block body;
+  final public EvlList<FuncVariable> param = new EvlList<FuncVariable>();
+  public FuncReturn ret;
+  public Block body;
 
   public Function(ElementInfo info, String name, EvlList<FuncVariable> param, FuncReturn ret, Block body) {
     super(info);
@@ -49,26 +49,6 @@ abstract public class Function extends EvlBase implements Named {
   @Override
   public void setName(String name) {
     this.name = name;
-  }
-
-  public Block getBody() {
-    return body;
-  }
-
-  public void setBody(Block body) {
-    this.body = body;
-  }
-
-  public EvlList<FuncVariable> getParam() {
-    return param;
-  }
-
-  public FuncReturn getRet() {
-    return ret;
-  }
-
-  public void setRet(FuncReturn ret) {
-    this.ret = ret;
   }
 
   @Override

@@ -71,11 +71,11 @@ public class CallgraphMaker extends DefTraverser<Void, Evl> {
   protected Void visitTransition(Transition obj, Evl param) {
     assert (param == null);
 
-    callgraph.addVertex(obj.getGuard());
-    visit(obj.getGuard(), obj.getGuard());
+    callgraph.addVertex(obj.guard);
+    visit(obj.guard, obj.guard);
 
-    callgraph.addVertex(obj.getBody());
-    visit(obj.getBody(), obj.getBody());
+    callgraph.addVertex(obj.body);
+    visit(obj.body, obj.body);
 
     return null;
   }
@@ -85,7 +85,7 @@ public class CallgraphMaker extends DefTraverser<Void, Evl> {
     super.visitBaseRef(obj, param);
 
     if (param != null) {
-      Evl head = obj.getLink();
+      Evl head = obj.link;
       if (head instanceof Function) {
         callgraph.addVertex(head);
         callgraph.addEdge(param, head);
@@ -101,8 +101,8 @@ public class CallgraphMaker extends DefTraverser<Void, Evl> {
     if (param != null) {
       Set<Function> target = new HashSet<Function>();
 
-      Evl item = obj.getLink();
-      for (RefItem itr : obj.getOffset()) {
+      Evl item = obj.link;
+      for (RefItem itr : obj.offset) {
         item = RefGetter.process(itr, item, target, kb);
       }
 
@@ -148,20 +148,20 @@ class RefGetter extends NullTraverser<Evl, Evl> {
     }
     Function header = (Function) param;
     target.add(header);
-    return kt.get(header.getRet());
+    return kt.get(header.ret);
   }
 
   @Override
   protected Evl visitRefName(RefName obj, Evl param) {
-    return kfc.get(param, obj.getName(), obj.getInfo());
+    return kfc.get(param, obj.name, obj.getInfo());
   }
 
   @Override
   protected Evl visitRefIndex(RefIndex obj, Evl param) {
     Variable var = (Variable) param;
-    Type type = var.getType().getLink();
+    Type type = var.type.link;
     ArrayType arrayType = (ArrayType) type;
-    return arrayType.getType().getLink();
+    return arrayType.type.link;
   }
 
 }

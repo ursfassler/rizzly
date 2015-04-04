@@ -37,11 +37,11 @@ class TautoStmtDelWorker extends StmtReplacer<Void> {
 
     EvlList<IfOption> keep = new EvlList<IfOption>();
 
-    for (IfOption opt : obj.getOption()) {
-      if (kc.isConst(opt.getCondition())) {
-        BoolValue value = (BoolValue) opt.getCondition();
-        if (value.isValue()) {
-          obj.setDefblock(opt.getCode());
+    for (IfOption opt : obj.option) {
+      if (kc.isConst(opt.condition)) {
+        BoolValue value = (BoolValue) opt.condition;
+        if (value.value) {
+          obj.defblock = opt.code;
           break;
         }
       } else {
@@ -51,11 +51,11 @@ class TautoStmtDelWorker extends StmtReplacer<Void> {
 
     if (keep.isEmpty()) {
       List<Statement> ret = new EvlList<Statement>();
-      ret.add(obj.getDefblock());
+      ret.add(obj.defblock);
       return ret;
     } else {
-      obj.getOption().clear();
-      obj.getOption().addAll(keep);
+      obj.option.clear();
+      obj.option.addAll(keep);
       return null;
     }
   }

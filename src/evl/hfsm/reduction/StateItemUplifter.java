@@ -71,8 +71,8 @@ class StateItemUplifterWorker extends NullTraverser<Void, Designator> {
 
   @Override
   protected Void visitImplHfsm(ImplHfsm obj, Designator param) {
-    visit(obj.getTopstate(), new Designator());
-    obj.getTopstate().getItem().addAll(func);
+    visit(obj.topstate, new Designator());
+    obj.topstate.item.addAll(func);
     return null;
   }
 
@@ -81,9 +81,9 @@ class StateItemUplifterWorker extends NullTraverser<Void, Designator> {
     param = new Designator(param, obj.getName());
     // visit(obj.getEntryCode(), param);//TODO correct? It is no longer a function and should not exist at this point
     // visit(obj.getExitCode(), param);
-    visitList(obj.getItem(), param);
+    visitList(obj.item, param);
 
-    obj.getItem().removeAll(func);
+    obj.item.removeAll(func);
 
     return null;
   }

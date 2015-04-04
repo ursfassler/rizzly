@@ -34,8 +34,8 @@ import evl.variable.FuncVariable;
 class CountFunctionFactory {
   static public Function create(String prefix, ElementInfo info, QueueVariables queueVariables) {
     Block sfb = new Block(info);
-    sfb.getStatements().add(new ReturnExpr(info, new Reference(info, queueVariables.getCount())));
-    Function sizefunc = new FuncCtrlInDataOut(info, prefix + "count", new EvlList<FuncVariable>(), new FuncReturnType(info, new SimpleRef<Type>(ElementInfo.NO, queueVariables.getCount().getType().getLink())), sfb);
+    sfb.statements.add(new ReturnExpr(info, new Reference(info, queueVariables.getCount())));
+    Function sizefunc = new FuncCtrlInDataOut(info, prefix + "count", new EvlList<FuncVariable>(), new FuncReturnType(info, new SimpleRef<Type>(ElementInfo.NO, queueVariables.getCount().type.link)), sfb);
     sizefunc.properties().put(Property.Public, true);
     return sizefunc;
   }

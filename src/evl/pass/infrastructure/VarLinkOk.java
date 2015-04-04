@@ -82,45 +82,45 @@ class VarLinkOkWorker extends DefTraverser<Void, Set<Evl>> {
   @Override
   protected Void visitImplElementary(ImplElementary obj, Set<Evl> param) {
     param = new HashSet<Evl>(param);
-    param.addAll(obj.getVariable());
-    param.addAll(obj.getConstant());
-    param.addAll(obj.getType());
+    param.addAll(obj.variable);
+    param.addAll(obj.constant);
+    param.addAll(obj.type);
     return super.visitImplElementary(obj, param);
   }
 
   @Override
   protected Void visitState(State obj, Set<Evl> param) {
     param = new HashSet<Evl>(param);
-    param = add(param, obj.getItem().getItems(StateVariable.class));
+    param = add(param, obj.item.getItems(StateVariable.class));
     return super.visitState(obj, param);
   }
 
   @Override
   protected Void visitVarDef(VarDefStmt obj, Set<Evl> param) {
     super.visitVarDef(obj, param);
-    param.add(obj.getVariable());
+    param.add(obj.variable);
     return null;
   }
 
   @Override
   protected Void visitForStmt(ForStmt obj, Set<Evl> param) {
     param = new HashSet<Evl>(param);
-    param.add(obj.getIterator());
+    param.add(obj.iterator);
     super.visitForStmt(obj, param);
     return null;
   }
 
   @Override
   protected Void visitFunction(Function obj, Set<Evl> param) {
-    param = add(param, obj.getParam());
+    param = add(param, obj.param);
     return super.visitFunction(obj, param);
   }
 
   @Override
   protected Void visitBaseRef(BaseRef obj, Set<Evl> param) {
-    if ((obj.getLink() instanceof Variable) || (obj.getLink() instanceof Type)) {
-      if (!param.contains(obj.getLink())) {
-        RError.err(ErrorType.Fatal, obj.getInfo(), "object " + obj.getLink().toString() + " not visible from here");
+    if ((obj.link instanceof Variable) || (obj.link instanceof Type)) {
+      if (!param.contains(obj.link)) {
+        RError.err(ErrorType.Fatal, obj.getInfo(), "object " + obj.link.toString() + " not visible from here");
       }
     }
     return super.visitBaseRef(obj, param);
@@ -129,17 +129,17 @@ class VarLinkOkWorker extends DefTraverser<Void, Set<Evl>> {
   @Override
   protected Void visitTransition(Transition obj, Set<Evl> param) {
     param = new HashSet<Evl>(param);
-    param.addAll(obj.getParam());
-    visit(obj.getBody(), param);
-    addAllToTop(obj.getSrc().getLink(), param);
-    visit(obj.getGuard(), param);
+    param.addAll(obj.param);
+    visit(obj.body, param);
+    addAllToTop(obj.src.link, param);
+    visit(obj.guard, param);
     return null;
   }
 
   private void addAllToTop(State state, Set<Evl> param) {
     while (true) {
-      param.addAll(state.getItem().getItems(StateVariable.class));
-      param.addAll(state.getItem().getItems(ConstPrivate.class));
+      param.addAll(state.item.getItems(StateVariable.class));
+      param.addAll(state.item.getItems(ConstPrivate.class));
       Evl parent = kp.getParent(state);
       if (parent instanceof State) {
         state = (State) parent;

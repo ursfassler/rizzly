@@ -33,10 +33,10 @@ class PushReplacer extends DefTraverser<Statement, Map<Function, Function>> {
 
   @Override
   protected Statement visitBlock(Block obj, Map<Function, Function> param) {
-    for (int i = 0; i < obj.getStatements().size(); i++) {
-      Statement stmt = visit(obj.getStatements().get(i), param);
+    for (int i = 0; i < obj.statements.size(); i++) {
+      Statement stmt = visit(obj.statements.get(i), param);
       if (stmt != null) {
-        obj.getStatements().set(i, stmt);
+        obj.statements.set(i, stmt);
       }
     }
     return null;
@@ -44,10 +44,10 @@ class PushReplacer extends DefTraverser<Statement, Map<Function, Function>> {
 
   @Override
   protected Statement visitMsgPush(MsgPush obj, Map<Function, Function> param) {
-    assert (param.containsKey(obj.getFunc().getLink()));
+    assert (param.containsKey(obj.func.link));
 
-    Reference call = new Reference(obj.getInfo(), param.get(obj.getFunc().getLink()));
-    call.getOffset().add(new RefCall(obj.getInfo(), new TupleValue(obj.getInfo(), obj.getData())));
+    Reference call = new Reference(obj.getInfo(), param.get(obj.func.link));
+    call.offset.add(new RefCall(obj.getInfo(), new TupleValue(obj.getInfo(), obj.data)));
 
     return new CallStmt(obj.getInfo(), call);
   }

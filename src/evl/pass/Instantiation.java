@@ -56,7 +56,7 @@ public class Instantiation extends EvlPass {
     CompUse instComp = kb.getRootComp();
     evl.getChildren().remove(instComp);
 
-    ImplElementary env = makeEnv(instComp.getLink(), kb);
+    ImplElementary env = makeEnv(instComp.link, kb);
     evl.getChildren().add(env);
 
     CompInstantiatorWorker instantiator = new CompInstantiatorWorker();
@@ -65,12 +65,12 @@ public class Instantiation extends EvlPass {
 
     evl.setName(instComp.getName());
 
-    assert (inst.getIface().isEmpty());
+    assert (inst.iface.isEmpty());
 
     Set<Evl> pubfunc = new HashSet<Evl>();
-    pubfunc.addAll(inst.getSubCallback());
-    RError.ass(inst.getComponent().size() == 1, inst.getInfo(), "Only expected one instance");
-    pubfunc.addAll(inst.getComponent().get(0).getLink().getIface());
+    pubfunc.addAll(inst.subCallback);
+    RError.ass(inst.component.size() == 1, inst.getInfo(), "Only expected one instance");
+    pubfunc.addAll(inst.component.get(0).link.iface);
 
     for (Evl nam : pubfunc) {
       nam.properties().put(Property.Public, true);
@@ -82,20 +82,20 @@ public class Instantiation extends EvlPass {
     FuncPrivateVoid entry = new FuncPrivateVoid(info, "entry", new EvlList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
     FuncPrivateVoid exit = new FuncPrivateVoid(info, "exit", new EvlList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
     ImplElementary env = new ImplElementary(ElementInfo.NO, "", new SimpleRef<FuncPrivateVoid>(info, entry), new SimpleRef<FuncPrivateVoid>(info, exit));
-    env.getFunction().add(entry);
-    env.getFunction().add(exit);
+    env.function.add(entry);
+    env.function.add(exit);
 
     CompUse item = new CompUse(ElementInfo.NO, top, "!inst");
-    env.getComponent().add(item);
+    env.component.add(item);
 
-    for (CompUse compu : env.getComponent()) {
+    for (CompUse compu : env.component) {
       SubCallbacks suc = new SubCallbacks(compu.getInfo(), new SimpleRef<CompUse>(ElementInfo.NO, compu));
-      env.getSubCallback().add(suc);
-      for (InterfaceFunction out : compu.getLink().getIface(Direction.out)) {
+      env.subCallback.add(suc);
+      for (InterfaceFunction out : compu.link.getIface(Direction.out)) {
         Function suha = CompositionReduction.makeHandler((Function) out);
         suha.properties().put(Property.Extern, true);
         suha.properties().put(Property.Public, true);
-        suc.getFunc().add(suha);
+        suc.func.add(suha);
       }
     }
 
@@ -118,32 +118,32 @@ class CompInstantiatorWorker extends NullTraverser<ImplElementary, Namespace> {
     ImplElementary inst = copy.copy(obj);
     Relinker.relink(inst, copy.getCopied());
 
-    ns.addAll(inst.getIface());
-    ns.addAll(inst.getType());
-    ns.addAll(inst.getConstant());
-    ns.addAll(inst.getVariable());
-    ns.addAll(inst.getFunction());
-    ns.add(inst.getQueue());
-    ns.add(inst.getEntryFunc());
-    ns.add(inst.getExitFunc());
+    ns.addAll(inst.iface);
+    ns.addAll(inst.type);
+    ns.addAll(inst.constant);
+    ns.addAll(inst.variable);
+    ns.addAll(inst.function);
+    ns.add(inst.queue);
+    ns.add(inst.entryFunc);
+    ns.add(inst.exitFunc);
 
     // ns.getChildren().removeAll(ns.getChildren().getItems(FuncCtrlOutDataIn.class));
     // ns.getChildren().removeAll(ns.getChildren().getItems(FuncCtrlOutDataOut.class));
 
-    for (CompUse compUse : inst.getComponent()) {
-      Component comp = compUse.getLink();
+    for (CompUse compUse : inst.component) {
+      Component comp = compUse.link;
 
       // copy / instantiate used component
       Namespace usens = new Namespace(compUse.getInfo(), compUse.getName());
       ImplElementary cpy = visit(comp, usens);
-      compUse.setLink(cpy);
+      compUse.link = cpy;
       ns.add(usens);
       linkmap.put(compUse, usens);
 
       // route output interface to sub-callback implementation
-      for (Function impl : getSubCallback(inst.getSubCallback(), compUse).getFunc()) {
+      for (Function impl : getSubCallback(inst.subCallback, compUse).func) {
         // get output declaration of instantiated sub-component
-        Function outdecl = (Function) cpy.getIface().find(impl.getName());
+        Function outdecl = (Function) cpy.iface.find(impl.getName());
 
         assert (outdecl != null);
         assert (usens.getChildren().contains(outdecl));
@@ -161,7 +161,7 @@ class CompInstantiatorWorker extends NullTraverser<ImplElementary, Namespace> {
 
   private SubCallbacks getSubCallback(EvlList<SubCallbacks> subCallback, CompUse compUse) {
     for (SubCallbacks suc : subCallback) {
-      if (suc.getCompUse().getLink() == compUse) {
+      if (suc.compUse.link == compUse) {
         return suc;
       }
     }

@@ -58,14 +58,14 @@ public class QueryDownPropagator extends EvlPass {
   private static void process(ImplHfsm hfsm, KnowledgeBase kb) {
     Map<FuncCtrlInDataOut, FuncPrivateRet> qfunc = new HashMap<FuncCtrlInDataOut, FuncPrivateRet>();
     QueryFuncMaker qfmaker = new QueryFuncMaker(qfunc);
-    qfmaker.traverse(hfsm.getTopstate(), new Designator());
+    qfmaker.traverse(hfsm.topstate, new Designator());
 
     for (FuncPrivateRet func : qfunc.values()) {
-      hfsm.getTopstate().getItem().add(func);
+      hfsm.topstate.item.add(func);
     }
 
     QueryDownPropagatorWorker redirecter = new QueryDownPropagatorWorker(qfunc);
-    redirecter.traverse(hfsm.getTopstate(), new QueryParam());
+    redirecter.traverse(hfsm.topstate, new QueryParam());
   }
 
 }
@@ -85,8 +85,8 @@ class QueryDownPropagatorWorker extends NullTraverser<Void, QueryParam> {
 
   @Override
   protected Void visitStateSimple(StateSimple obj, QueryParam param) {
-    EvlList<FuncCtrlInDataOut> queryList = obj.getItem().getItems(FuncCtrlInDataOut.class);
-    obj.getItem().removeAll(queryList);
+    EvlList<FuncCtrlInDataOut> queryList = obj.item.getItems(FuncCtrlInDataOut.class);
+    obj.item.removeAll(queryList);
 
     EvlList<FuncCtrlInDataOut> queries = new EvlList<FuncCtrlInDataOut>();
 
@@ -101,17 +101,17 @@ class QueryDownPropagatorWorker extends NullTraverser<Void, QueryParam> {
     }
 
     for (FuncCtrlInDataOut func : queries) {
-      FuncCtrlInDataOut cfunc = new FuncCtrlInDataOut(info, func.getName(), Copy.copy(func.getParam()), Copy.copy(func.getRet()), new Block(info));
+      FuncCtrlInDataOut cfunc = new FuncCtrlInDataOut(info, func.getName(), Copy.copy(func.param), Copy.copy(func.ret), new Block(info));
 
       TupleValue acpar = new TupleValue(info, new EvlList<Expression>());
-      for (Variable par : cfunc.getParam()) {
-        acpar.getValue().add(new Reference(info, par));
+      for (Variable par : cfunc.param) {
+        acpar.value.add(new Reference(info, par));
       }
       Reference call = new Reference(info, map.get(func));
-      call.getOffset().add(new RefCall(info, acpar));
-      cfunc.getBody().getStatements().add(new ReturnExpr(info, call));
+      call.offset.add(new RefCall(info, acpar));
+      cfunc.body.statements.add(new ReturnExpr(info, call));
 
-      obj.getItem().add(cfunc); // TODO ok or copy?
+      obj.item.add(cfunc); // TODO ok or copy?
     }
 
     return null;
@@ -132,7 +132,7 @@ class QueryDownPropagatorWorker extends NullTraverser<Void, QueryParam> {
     EvlList<FuncCtrlInDataOut> queryList = new EvlList<FuncCtrlInDataOut>();
     EvlList<State> stateList = new EvlList<State>();
 
-    for (StateItem itr : obj.getItem()) {
+    for (StateItem itr : obj.item) {
       if (itr instanceof FuncCtrlInDataOut) {
         queryList.add((FuncCtrlInDataOut) itr);
       } else if (itr instanceof State) {
@@ -141,7 +141,7 @@ class QueryDownPropagatorWorker extends NullTraverser<Void, QueryParam> {
       }
     }
 
-    obj.getItem().removeAll(queryList);
+    obj.item.removeAll(queryList);
 
     // build parameter for every substate
     Map<State, QueryParam> spar = new HashMap<State, QueryParam>();
@@ -207,10 +207,10 @@ class QueryFuncMaker extends NullTraverser<Void, Designator> {
   @Override
   protected Void visitFuncIfaceInRet(FuncCtrlInDataOut obj, Designator param) {
     param = new Designator(param, obj.getName());
-    FuncPrivateRet func = new FuncPrivateRet(ElementInfo.NO, param.toString(), Copy.copy(obj.getParam()), Copy.copy(obj.getRet()), obj.getBody());
-    obj.setBody(new Block(ElementInfo.NO));
+    FuncPrivateRet func = new FuncPrivateRet(ElementInfo.NO, param.toString(), Copy.copy(obj.param), Copy.copy(obj.ret), obj.body);
+    obj.body = new Block(ElementInfo.NO);
 
-    FsmReduction.relinkActualParameterRef(obj.getParam(), func.getParam(), func.getBody());
+    FsmReduction.relinkActualParameterRef(obj.param, func.param, func.body);
 
     qfunc.put(obj, func);
 
@@ -220,7 +220,7 @@ class QueryFuncMaker extends NullTraverser<Void, Designator> {
   @Override
   protected Void visitState(State obj, Designator param) {
     param = new Designator(param, obj.getName());
-    visitList(obj.getItem(), param);
+    visitList(obj.item, param);
     return null;
   }
 

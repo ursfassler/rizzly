@@ -26,8 +26,8 @@ import evl.expression.reference.SimpleRef;
 import evl.type.Type;
 
 public class ArrayType extends BaseType implements Evl {
-  private SimpleRef<Type> type;
-  private BigInteger size;
+  final public SimpleRef<Type> type;
+  final public BigInteger size;
 
   public ArrayType(BigInteger size, SimpleRef<Type> type) {
     super(ElementInfo.NO, makeName(size, type));
@@ -42,23 +42,7 @@ public class ArrayType extends BaseType implements Evl {
   }
 
   public static String makeName(BigInteger size, SimpleRef<Type> type) {
-    return "Array{" + size + "," + type.getLink().getName() + "}";
-  }
-
-  public String makeName() {
-    return makeName(size, type);
-  }
-
-  public SimpleRef<Type> getType() {
-    return type;
-  }
-
-  public void setType(SimpleRef<Type> type) {
-    this.type = type;
-  }
-
-  public BigInteger getSize() {
-    return size;
+    return "Array{" + size + "," + type.link.getName() + "}";
   }
 
 }

@@ -49,7 +49,7 @@ public class RefTypeGetter extends NullTraverser<Type, Type> {
 
   @Override
   protected Type visitSimpleRef(SimpleRef obj, Type param) {
-    return (Type) obj.getLink();
+    return (Type) obj.link;
   }
 
   @Override
@@ -66,7 +66,7 @@ public class RefTypeGetter extends NullTraverser<Type, Type> {
   @Override
   protected Type visitRefCall(RefCall obj, Type sub) {
     if (sub instanceof FunctionType) {
-      return ((FunctionType) sub).getRet().getLink();
+      return ((FunctionType) sub).ret.link;
     } else {
       RError.err(ErrorType.Error, obj.getInfo(), "Not a function: " + obj.toString());
       return null;
@@ -78,19 +78,19 @@ public class RefTypeGetter extends NullTraverser<Type, Type> {
     if (sub instanceof EnumType) {
       return sub;
     } else {
-      String name = obj.getName();
+      String name = obj.name;
       NamedElement etype = (NamedElement) kc.find(sub, name);
       if (etype == null) {
         RError.err(ErrorType.Error, obj.getInfo(), "Child not found: " + obj);
       }
-      return etype.getRef().getLink();
+      return etype.ref.link;
     }
   }
 
   @Override
   protected Type visitRefIndex(RefIndex obj, Type sub) {
     if (sub instanceof ArrayType) {
-      return visit(((ArrayType) sub).getType(), null);
+      return visit(((ArrayType) sub).type, null);
     } else {
       RError.err(ErrorType.Error, obj.getInfo(), "need array to index, got type: " + sub.getName());
       return null;

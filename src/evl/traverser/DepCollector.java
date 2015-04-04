@@ -55,7 +55,7 @@ public class DepCollector extends DefTraverser<Void, Void> {
   @Override
   protected Void visitBaseRef(BaseRef obj, Void param) {
     super.visitBaseRef(obj, param);
-    visit(obj.getLink(), param);
+    visit(obj.link, param);
     return null;
   }
 

@@ -78,15 +78,15 @@ class TypeUpliftWorker extends DefTraverser<Void, Designator> {
   @Override
   protected Void visitImplElementary(ImplElementary obj, Designator param) {
     super.visitImplElementary(obj, param);
-    obj.getType().clear();
+    obj.type.clear();
     return null;
   }
 
   @Override
   protected Void visitState(State obj, Designator param) {
     super.visitState(obj, param);
-    EvlList<Type> types = obj.getItem().getItems(Type.class);
-    obj.getItem().removeAll(types);
+    EvlList<Type> types = obj.item.getItems(Type.class);
+    obj.item.removeAll(types);
     return null;
   }
 

@@ -41,15 +41,15 @@ class BlockReductionWorker extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitBlock(Block obj, Void param) {
-    List<Statement> old = new ArrayList<Statement>(obj.getStatements());
-    obj.getStatements().clear();
+    List<Statement> old = new ArrayList<Statement>(obj.statements);
+    obj.statements.clear();
 
     for (Statement stmt : old) {
       visitStatement(stmt, null);
       if (stmt instanceof Block) {
-        obj.getStatements().addAll(((Block) stmt).getStatements());
+        obj.statements.addAll(((Block) stmt).statements);
       } else {
-        obj.getStatements().add(stmt);
+        obj.statements.add(stmt);
       }
     }
 

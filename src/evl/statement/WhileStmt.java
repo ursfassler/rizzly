@@ -27,25 +27,13 @@ import evl.expression.Expression;
  */
 public class WhileStmt extends Statement {
 
-  private Expression condition;
-  private Block body;
+  public Expression condition;
+  public Block body;
 
   public WhileStmt(ElementInfo info, Expression condition, Block body) {
     super(info);
     this.condition = condition;
     this.body = body;
-  }
-
-  public Block getBody() {
-    return body;
-  }
-
-  public Expression getCondition() {
-    return condition;
-  }
-
-  public void setCondition(Expression condition) {
-    this.condition = condition;
   }
 
   @Override

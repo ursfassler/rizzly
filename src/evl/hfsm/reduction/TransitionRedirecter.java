@@ -39,7 +39,7 @@ public class TransitionRedirecter extends EvlPass {
   public void process(Namespace evl, KnowledgeBase kb) {
     for (ImplHfsm hfsm : evl.getItems(ImplHfsm.class, true)) {
       TransitionRedirecterWorker redirecter = new TransitionRedirecterWorker();
-      redirecter.traverse(hfsm.getTopstate(), null);
+      redirecter.traverse(hfsm.topstate, null);
     }
   }
 }
@@ -61,15 +61,15 @@ class TransitionRedirecterWorker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitState(State obj, Void param) {
-    visitList(obj.getItem(), null);
+    visitList(obj.item, null);
     return null;
   }
 
   @Override
   protected Void visitTransition(Transition obj, Void param) {
-    State dst = obj.getDst().getLink();
+    State dst = obj.dst.link;
     dst = initStateGetter.traverse(dst, null);
-    obj.getDst().setLink(dst);
+    obj.dst.link = dst;
     return null;
   }
 

@@ -78,7 +78,7 @@ public class TransitionDownPropagator extends EvlPass {
     KnowBaseItem kbi = kb.getEntry(KnowBaseItem.class);
 
     TransitionEndpointCollector tec = new TransitionEndpointCollector();
-    tec.traverse(hfsm.getTopstate(), null);
+    tec.traverse(hfsm.topstate, null);
 
     assert (tec.getTdst().size() == tec.getTsrc().size());
     assert (tec.getTdst().size() == tec.getTtop().size());
@@ -88,12 +88,12 @@ public class TransitionDownPropagator extends EvlPass {
       String name = Designator.NAME_SEP + "trans" + nr;
       nr++;
       FuncPrivateVoid func = makeTransBodyFunc(trans, name, kbi);
-      hfsm.getTopstate().getItem().add(func);
+      hfsm.topstate.item.add(func);
       tfunc.put(trans, func);
     }
 
     TransitionDownPropagatorWorker redirecter = new TransitionDownPropagatorWorker(kb, tec.getTsrc(), tec.getTdst(), tec.getTtop(), tfunc);
-    redirecter.traverse(hfsm.getTopstate(), new TransitionParam());
+    redirecter.traverse(hfsm.topstate, new TransitionParam());
   }
 
   /**
@@ -102,11 +102,11 @@ public class TransitionDownPropagator extends EvlPass {
    * @param name
    */
   private static FuncPrivateVoid makeTransBodyFunc(Transition trans, String name, KnowBaseItem kbi) {
-    EvlList<FuncVariable> params = Copy.copy(trans.getParam());
-    FuncPrivateVoid func = new FuncPrivateVoid(ElementInfo.NO, name, params, new FuncReturnNone(ElementInfo.NO), trans.getBody());
-    trans.setBody(new Block(ElementInfo.NO));
+    EvlList<FuncVariable> params = Copy.copy(trans.param);
+    FuncPrivateVoid func = new FuncPrivateVoid(ElementInfo.NO, name, params, new FuncReturnNone(ElementInfo.NO), trans.body);
+    trans.body = new Block(ElementInfo.NO);
 
-    FsmReduction.relinkActualParameterRef(trans.getParam(), func.getParam(), func.getBody());
+    FsmReduction.relinkActualParameterRef(trans.param, func.param, func.body);
 
     return func;
   }
@@ -137,8 +137,8 @@ class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam
 
   @Override
   protected Void visitStateSimple(StateSimple obj, TransitionParam param) {
-    EvlList<Transition> transList = obj.getItem().getItems(Transition.class);
-    obj.getItem().removeAll(transList);
+    EvlList<Transition> transList = obj.item.getItems(Transition.class);
+    obj.item.removeAll(transList);
 
     filter(obj, param.before);
     filter(obj, param.after);
@@ -147,7 +147,7 @@ class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam
       addTrans(obj, trans);
     }
     for (Transition trans : transList) {
-      trans.getSrc().setLink(obj);
+      trans.src.link = obj;
       // obj.getItem().add(trans);
       addTrans(obj, trans);
     }
@@ -163,28 +163,28 @@ class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam
     State dst = tdst.get(otrans);
     assert (dst != null);
     Transition trans = Copy.copy(otrans);
-    trans.getSrc().setLink(src);
+    trans.src.link = src;
 
-    makeExitCalls(src, os, trans.getBody().getStatements());
+    makeExitCalls(src, os, trans.body.statements);
     {
       FuncPrivateVoid func = tfunc.get(otrans);
       assert (func != null);
       Reference ref = new Reference(info, func);
 
       TupleValue param = new TupleValue(info, new EvlList<Expression>());
-      for (Variable acpar : trans.getParam()) {
+      for (Variable acpar : trans.param) {
         Reference parref = new Reference(info, acpar);
-        param.getValue().add(parref);
+        param.value.add(parref);
       }
 
-      ref.getOffset().add(new RefCall(info, param));
+      ref.offset.add(new RefCall(info, param));
       CallStmt call = new CallStmt(info, ref);
-      trans.getBody().getStatements().add(call);
+      trans.body.statements.add(call);
     }
-    makeVarInit(dst, os, trans.getBody().getStatements());
-    makeEntryCalls(dst, os, trans.getBody().getStatements());
+    makeVarInit(dst, os, trans.body.statements);
+    makeEntryCalls(dst, os, trans.body.statements);
 
-    src.getItem().add(trans);
+    src.item.add(trans);
   }
 
   private void makeVarInit(State start, State top, List<Statement> list) {
@@ -196,8 +196,8 @@ class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam
 
     makeVarInit(par, top, list);
 
-    for (StateVariable var : start.getItem().getItems(StateVariable.class)) {
-      Assignment init = new AssignmentSingle(var.getDef().getInfo(), new Reference(info, var), Copy.copy(var.getDef()));
+    for (StateVariable var : start.item.getItems(StateVariable.class)) {
+      Assignment init = new AssignmentSingle(var.def.getInfo(), new Reference(info, var), Copy.copy(var.def));
       list.add(init);
     }
   }
@@ -210,7 +210,7 @@ class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam
     assert (par != null);
 
     makeEntryCalls(par, top, list);
-    list.add(makeCall(start.getEntryFunc().getLink()));
+    list.add(makeCall(start.entryFunc.link));
   }
 
   private StateComposite getParent(State start) {
@@ -229,13 +229,13 @@ class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam
     StateComposite par = getParent(start);
     assert (par != null);
 
-    list.add(makeCall(start.getExitFunc().getLink()));
+    list.add(makeCall(start.exitFunc.link));
     makeExitCalls(par, top, list);
   }
 
   private CallStmt makeCall(Function func) {
     Reference ref = new Reference(info, func);
-    ref.getOffset().add(new RefCall(info, new TupleValue(info, new EvlList<Expression>())));
+    ref.offset.add(new RefCall(info, new TupleValue(info, new EvlList<Expression>())));
     return new CallStmt(info, ref);
   }
 
@@ -262,7 +262,7 @@ class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam
     ArrayList<Transition> transList = new ArrayList<Transition>();
     ArrayList<State> stateList = new ArrayList<State>();
 
-    for (StateItem itr : obj.getItem()) {
+    for (StateItem itr : obj.item) {
       if (itr instanceof Transition) {
         Transition trans = (Transition) itr;
         transList.add(trans);
@@ -272,7 +272,7 @@ class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam
       }
     }
 
-    obj.getItem().removeAll(transList);
+    obj.item.removeAll(transList);
 
     // build parameter for every substate
     Map<State, TransitionParam> spar = new HashMap<State, TransitionParam>();
@@ -347,14 +347,14 @@ class TransitionEndpointCollector extends NullTraverser<Void, State> {
   @Override
   protected Void visitTransition(Transition obj, State param) {
     ttop.put(obj, param);
-    tsrc.put(obj, obj.getSrc().getLink());
-    tdst.put(obj, obj.getDst().getLink());
+    tsrc.put(obj, obj.src.link);
+    tdst.put(obj, obj.dst.link);
     return null;
   }
 
   @Override
   protected Void visitState(State obj, State param) {
-    visitList(obj.getItem(), obj);
+    visitList(obj.item, obj);
     return null;
   }
 

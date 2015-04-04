@@ -46,8 +46,8 @@ public class StateWriterInfo extends DefTraverser<Void, Void> {
   }
 
   private void checkRef(Reference ref) {
-    if (ref.getLink() instanceof Variable) {
-      Variable var = (Variable) ref.getLink();
+    if (ref.link instanceof Variable) {
+      Variable var = (Variable) ref.link;
       if (isStateVariable(var)) {
         writeState = true;
       }
@@ -56,14 +56,14 @@ public class StateWriterInfo extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitAssignmentSingle(AssignmentSingle obj, Void param) {
-    Reference ref = obj.getLeft();
+    Reference ref = obj.left;
     checkRef(ref);
     return null;
   }
 
   @Override
   protected Void visitAssignmentMulti(AssignmentMulti obj, Void param) {
-    for (Reference ref : obj.getLeft()) {
+    for (Reference ref : obj.left) {
       checkRef(ref);
     }
     return null;

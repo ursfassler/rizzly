@@ -101,7 +101,7 @@ class KnowChildTraverser extends NullTraverser<Set<Evl>, String> {
 
   @Override
   protected Set<Evl> visitSimpleRef(SimpleRef obj, String param) {
-    return visit(obj.getLink(), param);
+    return visit(obj.link, param);
   }
 
   @Override
@@ -112,34 +112,34 @@ class KnowChildTraverser extends NullTraverser<Set<Evl>, String> {
   @Override
   protected Set<Evl> visitComponent(Component obj, String param) {
     Set<Evl> rset = super.visitComponent(obj, param);
-    addIfFound(obj.getIface().find(param), rset);
-    addIfFound(obj.getFunction().find(param), rset);
+    addIfFound(obj.iface.find(param), rset);
+    addIfFound(obj.function.find(param), rset);
     return rset;
   }
 
   @Override
   protected Set<Evl> visitImplElementary(ImplElementary obj, String param) {
     Set<Evl> rset = new HashSet<Evl>();
-    addIfFound(obj.getComponent().find(param), rset);
-    addIfFound(obj.getType().find(param), rset);
-    addIfFound(obj.getConstant().find(param), rset);
-    addIfFound(obj.getVariable().find(param), rset);
-    addIfFound(obj.getSubCallback().find(param), rset);
+    addIfFound(obj.component.find(param), rset);
+    addIfFound(obj.type.find(param), rset);
+    addIfFound(obj.constant.find(param), rset);
+    addIfFound(obj.variable.find(param), rset);
+    addIfFound(obj.subCallback.find(param), rset);
     return rset;
   }
 
   @Override
   protected Set<Evl> visitImplComposition(ImplComposition obj, String param) {
     Set<Evl> rset = new HashSet<Evl>();
-    addIfFound(obj.getComponent().find(param), rset);
+    addIfFound(obj.component.find(param), rset);
     return rset;
   }
 
   @Override
   protected Set<Evl> visitImplHfsm(ImplHfsm obj, String param) {
-    Set<Evl> rset = visit(obj.getTopstate(), param);
-    if (obj.getTopstate().getName().equals(param)) {
-      rset.add(obj.getTopstate());
+    Set<Evl> rset = visit(obj.topstate, param);
+    if (obj.topstate.getName().equals(param)) {
+      rset.add(obj.topstate);
     }
     return rset;
   }
@@ -147,7 +147,7 @@ class KnowChildTraverser extends NullTraverser<Set<Evl>, String> {
   @Override
   protected Set<Evl> visitState(State obj, String param) {
     Set<Evl> rset = super.visitState(obj, param);
-    addIfFound(obj.getItem().find(param), rset);
+    addIfFound(obj.item.find(param), rset);
     return rset;
   }
 
@@ -159,52 +159,52 @@ class KnowChildTraverser extends NullTraverser<Set<Evl>, String> {
   @Override
   protected Set<Evl> visitStateComposite(StateComposite obj, String param) {
     Set<Evl> rset = new HashSet<Evl>();
-    EvlList<State> children = new EvlList<State>(obj.getItem().getItems(State.class));
+    EvlList<State> children = new EvlList<State>(obj.item.getItems(State.class));
     addIfFound(children.find(param), rset);
     return rset;
   }
 
   @Override
   protected Set<Evl> visitVariable(Variable obj, String param) {
-    Evl typ = obj.getType();
+    Evl typ = obj.type;
     return visit(typ, param);
   }
 
   @Override
   protected Set<Evl> visitCompUse(CompUse obj, String param) {
-    return visit(obj.getLink(), param);
+    return visit(obj.link, param);
   }
 
   @Override
   protected Set<Evl> visitRecordType(RecordType obj, String param) {
-    return retopt(obj.getElement().find(param));
+    return retopt(obj.element.find(param));
   }
 
   @Override
   protected Set<Evl> visitUnionType(UnionType obj, String param) {
-    Set<Evl> rset = retopt(obj.getElement().find(param));
-    if (obj.getTag().getName() == param) {
-      rset.add(obj.getTag());
+    Set<Evl> rset = retopt(obj.element.find(param));
+    if (obj.tag.getName() == param) {
+      rset.add(obj.tag);
     }
     return rset;
   }
 
   @Override
   protected Set<Evl> visitUnsafeUnionType(UnsafeUnionType obj, String param) {
-    return retopt(obj.getElement().find(param));
+    return retopt(obj.element.find(param));
   }
 
   @Override
   protected Set<Evl> visitComponentType(ComponentType obj, String param) {
     Set<Evl> rset = new HashSet<Evl>();
-    addIfFound(obj.getInput().find(param), rset);
-    addIfFound(obj.getOutput().find(param), rset);
+    addIfFound(obj.input.find(param), rset);
+    addIfFound(obj.output.find(param), rset);
     return rset;
   }
 
   @Override
   protected Set<Evl> visitNamedElement(NamedElement obj, String param) {
-    return visit(obj.getRef(), param);
+    return visit(obj.ref, param);
   }
 
   @Override

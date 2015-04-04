@@ -57,14 +57,14 @@ class TypeCheckerWorker extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitImplElementary(ImplElementary obj, Void sym) {
-    visitList(obj.getFunction(), sym);
-    visitList(obj.getIface(), sym);
-    visit(obj.getQueue(), sym);
-    visitList(obj.getType(), sym);
-    visitList(obj.getVariable(), sym);
-    visitList(obj.getConstant(), sym);
-    visitList(obj.getFunction(), sym);
-    visitList(obj.getSubCallback(), sym);
+    visitList(obj.function, sym);
+    visitList(obj.iface, sym);
+    visit(obj.queue, sym);
+    visitList(obj.type, sym);
+    visitList(obj.variable, sym);
+    visitList(obj.constant, sym);
+    visitList(obj.function, sym);
+    visitList(obj.subCallback, sym);
     return null;
   }
 
@@ -102,11 +102,11 @@ class TypeCheckerWorker extends DefTraverser<Void, Void> {
   }
 
   public static void checkFunc(Function obj, KnowledgeBase kb) {
-    for (Variable param : obj.getParam()) {
+    for (Variable param : obj.param) {
       TypeChecker.process(param, kb);
     }
     KnowType kt = kb.getEntry(KnowType.class);
-    Type ret = kt.get(obj.getRet());
-    StatementTypeChecker.process(obj.getBody(), ret, kb);
+    Type ret = kt.get(obj.ret);
+    StatementTypeChecker.process(obj.body, ret, kb);
   }
 }

@@ -20,18 +20,10 @@ package evl.expression.reference;
 import common.ElementInfo;
 
 final public class RefName extends RefItem {
-  private String name;
+  public String name;
 
   public RefName(ElementInfo info, String name) {
     super(info);
-    this.name = name;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-  public void setName(String name) {
     this.name = name;
   }
 

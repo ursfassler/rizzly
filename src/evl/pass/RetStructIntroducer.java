@@ -81,18 +81,18 @@ class RetStructIntroducerWorker extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitFunction(Function func, Void param) {
-    if (!(func.getRet() instanceof FuncReturnTuple)) {
+    if (!(func.ret instanceof FuncReturnTuple)) {
       return null;
     }
 
     ElementInfo info = ElementInfo.NO;
 
     Map<FuncVariable, NamedElement> varMap = new HashMap<FuncVariable, NamedElement>();
-    RecordType type = makeRecord(((FuncReturnTuple) func.getRet()), varMap);
+    RecordType type = makeRecord(((FuncReturnTuple) func.ret), varMap);
 
-    FuncVariable retVar = new FuncVariable(func.getRet().getInfo(), kun.get("ret"), new SimpleRef<Type>(func.getRet().getInfo(), type));
-    func.setRet(new FuncReturnType(func.getRet().getInfo(), new SimpleRef<Type>(info, type)));
-    func.getBody().getStatements().add(0, new VarDefStmt(info, retVar));
+    FuncVariable retVar = new FuncVariable(func.ret.getInfo(), kun.get("ret"), new SimpleRef<Type>(func.ret.getInfo(), type));
+    func.ret = new FuncReturnType(func.ret.getInfo(), new SimpleRef<Type>(info, type));
+    func.body.statements.add(0, new VarDefStmt(info, retVar));
 
     VarReplacer varRepl = new VarReplacer(retVar, varMap);
     varRepl.traverse(func, null);
@@ -105,14 +105,14 @@ class RetStructIntroducerWorker extends DefTraverser<Void, Void> {
 
   private RecordType makeRecord(FuncReturnTuple furet, Map<FuncVariable, NamedElement> varMap) {
     EvlList<NamedElement> element = new EvlList<NamedElement>();
-    for (FuncVariable var : furet.getParam()) {
-      NamedElement elem = new NamedElement(var.getInfo(), var.getName(), var.getType());
+    for (FuncVariable var : furet.param) {
+      NamedElement elem = new NamedElement(var.getInfo(), var.getName(), var.type);
       element.add(elem);
     }
     RecordType type = kbi.getRecord(element);
     for (int i = 0; i < type.getSize(); i++) {
-      FuncVariable var = furet.getParam().get(i);
-      NamedElement elem = type.getElement().get(i);
+      FuncVariable var = furet.param.get(i);
+      NamedElement elem = type.element.get(i);
       assert (var.getName().equals(elem.getName()));
       varMap.put(var, elem);
     }
@@ -138,7 +138,7 @@ class VarReplacer extends ExprReplacer<Void> {
   @Override
   protected Expression visitSimpleRef(SimpleRef obj, Void param) {
     super.visitSimpleRef(obj, param);
-    NamedElement elem = varMap.get(obj.getLink());
+    NamedElement elem = varMap.get(obj.link);
     if (elem == null) {
       return obj;
     } else {
@@ -149,10 +149,10 @@ class VarReplacer extends ExprReplacer<Void> {
   @Override
   protected Expression visitReference(Reference obj, Void param) {
     super.visitReference(obj, param);
-    NamedElement elem = varMap.get(obj.getLink());
+    NamedElement elem = varMap.get(obj.link);
     if (elem != null) {
-      obj.setLink(retVar);
-      obj.getOffset().add(0, new RefName(obj.getInfo(), elem.getName()));
+      obj.link = retVar;
+      obj.offset.add(0, new RefName(obj.getInfo(), elem.getName()));
     }
     return obj;
   }
@@ -175,7 +175,7 @@ class RetReplacer extends StmtReplacer<Void> {
   @Override
   protected List<Statement> visitReturnExpr(ReturnExpr obj, Void param) {
     List<Statement> ret = new ArrayList<Statement>();
-    ret.add(new AssignmentSingle(obj.getExpr().getInfo(), new Reference(obj.getInfo(), retVar), obj.getExpr()));
+    ret.add(new AssignmentSingle(obj.expr.getInfo(), new Reference(obj.getInfo(), retVar), obj.expr));
     ret.add(new ReturnExpr(obj.getInfo(), new SimpleRef<FuncVariable>(obj.getInfo(), retVar)));
     return ret;
   }

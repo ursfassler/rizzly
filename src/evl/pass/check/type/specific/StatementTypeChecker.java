@@ -96,7 +96,7 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitVarDef(VarDefStmt obj, Void sym) {
-    visit(obj.getVariable(), sym);
+    visit(obj.variable, sym);
 
     return null;
   }
@@ -112,8 +112,8 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
   }
 
   private void checkConstant(Constant obj) {
-    Type ret = obj.getType().getLink();
-    Type defType = checkGetExpr(obj.getDef());
+    Type ret = obj.type.link;
+    Type defType = checkGetExpr(obj.def);
     if (!kc.get(ret, defType)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Data type to big or incompatible in assignment: " + ret.getName() + " := " + defType.getName());
     }
@@ -138,61 +138,61 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitForStmt(ForStmt obj, Void param) {
-    Type cond = obj.getIterator().getType().getLink();
+    Type cond = obj.iterator.type.link;
     if (!(cond instanceof RangeType)) {
       RError.err(ErrorType.Error, obj.getInfo(), "For loop only supports range type (at the moment), got: " + cond.getName());
     }
-    visit(obj.getBlock(), param);
+    visit(obj.block, param);
     return null;
   }
 
   @Override
   protected Void visitWhileStmt(WhileStmt obj, Void param) {
-    Type cond = checkGetExpr(obj.getCondition());
+    Type cond = checkGetExpr(obj.condition);
     if (!(cond instanceof BooleanType)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Need boolean type, got: " + cond.getName());
     }
-    visit(obj.getBody(), param);
+    visit(obj.body, param);
     return null;
   }
 
   @Override
   protected Void visitIfStmt(IfStmt obj, Void param) {
-    for (IfOption opt : obj.getOption()) {
-      Type cond = checkGetExpr(opt.getCondition());
+    for (IfOption opt : obj.option) {
+      Type cond = checkGetExpr(opt.condition);
       if (!(cond instanceof BooleanType)) {
         RError.err(ErrorType.Error, opt.getInfo(), "Need boolean type, got: " + cond.getName());
       }
-      visit(opt.getCode(), param);
+      visit(opt.code, param);
     }
-    visit(obj.getDefblock(), param);
+    visit(obj.defblock, param);
     return null;
   }
 
   @Override
   protected Void visitCaseStmt(CaseStmt obj, Void map) {
-    Type cond = checkGetExpr(obj.getCondition());
+    Type cond = checkGetExpr(obj.condition);
     // TODO enumerator, union and boolean should also be allowed
     if (!kc.get(kbi.getIntegerType(), cond)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Condition variable has to be an integer, got: " + cond.getName());
     }
     // TODO check somewhere if case values are disjunct
-    visitList(obj.getOption(), map);
-    visit(obj.getOtherwise(), map);
+    visitList(obj.option, map);
+    visit(obj.otherwise, map);
     return null;
   }
 
   @Override
   protected Void visitCaseOpt(CaseOpt obj, Void map) {
-    visitList(obj.getValue(), map);
-    visit(obj.getCode(), map);
+    visitList(obj.value, map);
+    visit(obj.code, map);
     return null;
   }
 
   @Override
   protected Void visitCaseOptRange(CaseOptRange obj, Void map) {
-    Type start = checkGetExpr(obj.getStart());
-    Type end = checkGetExpr(obj.getEnd());
+    Type start = checkGetExpr(obj.start);
+    Type end = checkGetExpr(obj.end);
     if (!kc.get(kbi.getIntegerType(), start)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Case value has to be an integer (start), got: " + start.getName());
     }
@@ -204,7 +204,7 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitCaseOptValue(CaseOptValue obj, Void map) {
-    Type value = checkGetExpr(obj.getValue());
+    Type value = checkGetExpr(obj.value);
     if (!kc.get(kbi.getIntegerType(), value)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Case value has to be an integer, got: " + value.getName());
     }
@@ -213,14 +213,14 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitCallStmt(CallStmt obj, Void map) {
-    ExpressionTypeChecker.process(obj.getCall(), kb);
+    ExpressionTypeChecker.process(obj.call, kb);
     return null;
   }
 
   @Override
   protected Void visitAssignmentSingle(AssignmentSingle obj, Void param) {
-    Type lhs = checkGetExpr(obj.getLeft());
-    Type rhs = checkGetExpr(obj.getRight());
+    Type lhs = checkGetExpr(obj.left);
+    Type rhs = checkGetExpr(obj.right);
     if (!kc.get(lhs, rhs)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Data type to big or incompatible in assignment: " + lhs.getName() + " := " + rhs.getName());
     }
@@ -230,7 +230,7 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
   @Override
   protected Void visitAssignmentMulti(AssignmentMulti obj, Void param) {
     EvlList<Type> ll = new EvlList<Type>();
-    for (Reference ref : obj.getLeft()) {
+    for (Reference ref : obj.left) {
       ll.add(checkGetExpr(ref));
     }
     Type lhs;
@@ -243,7 +243,7 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
       }
       lhs = new TupleType(obj.getInfo(), "", tl);
     }
-    Type rhs = checkGetExpr(obj.getRight());
+    Type rhs = checkGetExpr(obj.right);
     if (!kc.get(lhs, rhs)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Data type to big or incompatible in assignment: " + lhs.getName() + " := " + rhs.getName());
     }
@@ -252,13 +252,13 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitBlock(Block obj, Void map) {
-    visitList(obj.getStatements(), null);
+    visitList(obj.statements, null);
     return null;
   }
 
   @Override
   protected Void visitReturnExpr(ReturnExpr obj, Void map) {
-    Type ret = checkGetExpr(obj.getExpr());
+    Type ret = checkGetExpr(obj.expr);
     if (!kc.get(funcReturn, ret)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Data type to big or incompatible to return: " + funcReturn.getName() + " := " + ret.getName());
     }
@@ -272,7 +272,7 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitMsgPush(MsgPush obj, Void param) {
-    Type func = checkGetExpr(obj.getFunc());
+    Type func = checkGetExpr(obj.func);
     // TODO implement check
     RError.err(ErrorType.Warning, obj.getInfo(), "Type check for push function not yet implemented");
     return null;

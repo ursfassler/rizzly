@@ -70,8 +70,8 @@ class OpenReplaceWorker extends DefTraverser<Void, Void> {
     super.traverse(obj, null);
     for (Variable var : map.keySet()) {
       RangeType range = map.get(var);
-      range = kbi.getNumsetType(range.getNumbers());
-      var.getType().setLink(range);
+      range = kbi.getNumsetType(range.range);
+      var.type.link = range;
     }
 
     return null;
@@ -79,12 +79,12 @@ class OpenReplaceWorker extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitReference(Reference obj, Void param) {
-    if ((obj.getLink() instanceof Function) && !obj.getOffset().isEmpty()) {
-      Function func = (Function) obj.getLink();
-      RefCall call = (RefCall) obj.getOffset().get(0);
+    if ((obj.link instanceof Function) && !obj.offset.isEmpty()) {
+      Function func = (Function) obj.link;
+      RefCall call = (RefCall) obj.offset.get(0);
 
-      EvlList<FuncVariable> arg = func.getParam();
-      EvlList<Expression> acarg = call.getActualParameter().getValue();
+      EvlList<FuncVariable> arg = func.param;
+      EvlList<Expression> acarg = call.actualParameter.value;
 
       assert (arg.size() == acarg.size());
 
@@ -105,8 +105,8 @@ class OpenReplaceWorker extends DefTraverser<Void, Void> {
 
       if (map.containsKey(var)) {
         RangeType old = map.get(var);
-        BigInteger low = range.getNumbers().getLow().min(old.getNumbers().getLow());
-        BigInteger high = range.getNumbers().getHigh().max(old.getNumbers().getHigh());
+        BigInteger low = range.range.getLow().min(old.range.getLow());
+        BigInteger high = range.range.getHigh().max(old.range.getHigh());
         range = new RangeType(new Range(low, high));
       }
 

@@ -60,18 +60,18 @@ class FuncInlinerWorker extends StmtReplacer<Function> {
   protected List<Statement> visitCallStmt(CallStmt obj, Function param) {
     // TODO also if a function is called in a expression
 
-    if (obj.getCall().getLink() instanceof Function) {
+    if (obj.call.link instanceof Function) {
       assert (param != null);
-      Function func = (Function) obj.getCall().getLink();
+      Function func = (Function) obj.call.link;
 
       List<Statement> fr = visit(func, param);
       assert (fr == null);
 
       if (doInline(func) && (func != param)) {
         // RError.err(ErrorType.Hint, param.getName() + " :: " + func.getName());
-        assert (obj.getCall().getOffset().size() == 1);  // FIXME maybe not true in the future
-        RefCall call = (RefCall) obj.getCall().getOffset().get(0);
-        return inline(func, call.getActualParameter());
+        assert (obj.call.offset.size() == 1);  // FIXME maybe not true in the future
+        RefCall call = (RefCall) obj.call.offset.get(0);
+        return inline(func, call.actualParameter);
       }
     }
 
@@ -80,7 +80,7 @@ class FuncInlinerWorker extends StmtReplacer<Function> {
 
   private boolean doInline(Function func) {
     if (!func.properties().containsKey(Property.Public) && !func.properties().containsKey(Property.Extern)) {
-      if (ClassGetter.get(Return.class, func.getBody()).isEmpty()) {
+      if (ClassGetter.get(Return.class, func.body).isEmpty()) {
         int refCount = kbl.get(func).size();
         // assert(refCount > 0); //XXX why is this not true?
 
@@ -88,7 +88,7 @@ class FuncInlinerWorker extends StmtReplacer<Function> {
           return true;
         }
 
-        if (func.getBody().getStatements().size() == 1) {
+        if (func.body.statements.size() == 1) {
           return true;
         }
       }
@@ -97,15 +97,15 @@ class FuncInlinerWorker extends StmtReplacer<Function> {
   }
 
   private List<Statement> inline(Function func, TupleValue actualParameter) {
-    RError.ass(func.getParam().size() == actualParameter.getValue().size(), "expected same number of arguments");
+    RError.ass(func.param.size() == actualParameter.value.size(), "expected same number of arguments");
 
     func = Copy.copy(func);
 
     List<Statement> ret = new EvlList<Statement>();
 
-    for (int i = 0; i < func.getParam().size(); i++) {
-      FuncVariable inner = func.getParam().get(i);
-      Expression arg = actualParameter.getValue().get(i);
+    for (int i = 0; i < func.param.size(); i++) {
+      FuncVariable inner = func.param.get(i);
+      Expression arg = actualParameter.value.get(i);
 
       inner.setName(kun.get(inner.getName()));
 
@@ -116,7 +116,7 @@ class FuncInlinerWorker extends StmtReplacer<Function> {
       ret.add(ass);
     }
 
-    ret.addAll(func.getBody().getStatements());
+    ret.addAll(func.body.statements);
 
     return ret;
   }

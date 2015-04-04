@@ -47,12 +47,12 @@ public class CopyType extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitRangeType(RangeType obj, Void param) {
-    return new RangeType(obj.getInfo(), obj.getName(), obj.getNumbers());
+    return new RangeType(obj.getInfo(), obj.getName(), obj.range);
   }
 
   @Override
   protected Type visitRecordType(RecordType obj, Void param) {
-    RecordType type = new RecordType(obj.getInfo(), obj.getName(), cast.copy(obj.getElement()));
+    RecordType type = new RecordType(obj.getInfo(), obj.getName(), cast.copy(obj.element));
     return type;
   }
 
@@ -63,7 +63,7 @@ public class CopyType extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitArrayType(ArrayType obj, Void param) {
-    return new ArrayType(obj.getInfo(), obj.getName(), obj.getSize(), cast.copy(obj.getType()));
+    return new ArrayType(obj.getInfo(), obj.getName(), obj.size, cast.copy(obj.type));
   }
 
   @Override
@@ -85,19 +85,19 @@ public class CopyType extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitUnionType(UnionType obj, Void param) {
-    UnionType type = new UnionType(obj.getInfo(), obj.getName(), cast.copy(obj.getElement()), cast.copy(obj.getTag()));
+    UnionType type = new UnionType(obj.getInfo(), obj.getName(), cast.copy(obj.element), cast.copy(obj.tag));
     return type;
   }
 
   @Override
   protected Type visitUnsafeUnionType(UnsafeUnionType obj, Void param) {
-    UnsafeUnionType type = new UnsafeUnionType(obj.getInfo(), obj.getName(), cast.copy(obj.getElement()));
+    UnsafeUnionType type = new UnsafeUnionType(obj.getInfo(), obj.getName(), cast.copy(obj.element));
     return type;
   }
 
   @Override
   protected Type visitAliasType(AliasType obj, Void param) {
-    return new AliasType(obj.getInfo(), obj.getName(), cast.copy(obj.getRef()));
+    return new AliasType(obj.getInfo(), obj.getName(), cast.copy(obj.ref));
   }
 
 }

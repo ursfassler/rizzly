@@ -50,15 +50,15 @@ class CreateRecordFromFunc extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitMsgPush(MsgPush obj, Void param) {
-    Function func = (Function) obj.getFunc().getLink();
+    Function func = (Function) obj.func.link;
     // Designator path = kp.get(func);
     // assert (path.size() > 0);
     // String name = new Designator(path, func.getName()).toString(Designator.NAME_SEP);
     String name = Integer.toString(func.hashCode());
 
     EvlList<NamedElement> elements = new EvlList<NamedElement>();
-    for (FuncVariable arg : func.getParam()) {
-      NamedElement elem = new NamedElement(arg.getInfo(), arg.getName(), new SimpleRef<Type>(ElementInfo.NO, arg.getType().getLink()));
+    for (FuncVariable arg : func.param) {
+      NamedElement elem = new NamedElement(arg.getInfo(), arg.getName(), new SimpleRef<Type>(ElementInfo.NO, arg.type.link));
       elements.add(elem);
     }
     RecordType rec = new RecordType(func.getInfo(), Designator.NAME_SEP + "msg" + Designator.NAME_SEP + name, elements);

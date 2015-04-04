@@ -26,13 +26,13 @@ import evl.variable.Constant;
 import evl.variable.Variable;
 
 final public class ImplElementary extends Component {
-  final private EvlList<Type> type = new EvlList<Type>();
-  final private EvlList<Variable> variable = new EvlList<Variable>();
-  final private EvlList<Constant> constant = new EvlList<Constant>();
-  final private EvlList<CompUse> component = new EvlList<CompUse>();
-  final private EvlList<SubCallbacks> subCallback = new EvlList<SubCallbacks>();
-  final private SimpleRef<FuncPrivateVoid> entryFunc;
-  final private SimpleRef<FuncPrivateVoid> exitFunc;
+  final public EvlList<Type> type = new EvlList<Type>();
+  final public EvlList<Variable> variable = new EvlList<Variable>();
+  final public EvlList<Constant> constant = new EvlList<Constant>();
+  final public EvlList<CompUse> component = new EvlList<CompUse>();
+  final public EvlList<SubCallbacks> subCallback = new EvlList<SubCallbacks>();
+  final public SimpleRef<FuncPrivateVoid> entryFunc;
+  final public SimpleRef<FuncPrivateVoid> exitFunc;
 
   public ImplElementary(ElementInfo info, String name, SimpleRef<FuncPrivateVoid> entryFunc, SimpleRef<FuncPrivateVoid> exitFunc) {
     super(info, name);
@@ -40,41 +40,14 @@ final public class ImplElementary extends Component {
     this.exitFunc = exitFunc;
   }
 
-  public EvlList<Type> getType() {
-    return type;
-  }
-
-  public EvlList<Variable> getVariable() {
-    return variable;
-  }
-
-  public EvlList<Constant> getConstant() {
-    return constant;
-  }
-
-  public EvlList<CompUse> getComponent() {
-    return component;
-  }
-
-  public EvlList<SubCallbacks> getSubCallback() {
-    return subCallback;
-  }
-
+  @Deprecated
   public SubCallbacks getSubCallback(CompUse use) {
     for (SubCallbacks itr : subCallback) {
-      if (itr.getCompUse().getLink() == use) {
+      if (itr.compUse.link == use) {
         return itr;
       }
     }
     return null;
-  }
-
-  public SimpleRef<FuncPrivateVoid> getEntryFunc() {
-    return entryFunc;
-  }
-
-  public SimpleRef<FuncPrivateVoid> getExitFunc() {
-    return exitFunc;
   }
 
 }

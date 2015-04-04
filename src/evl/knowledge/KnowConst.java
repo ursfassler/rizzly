@@ -42,12 +42,12 @@ class KnowConstTraverser extends NullTraverser<Boolean, Void> {
 
   @Override
   protected Boolean visitBinaryExp(BinaryExp obj, Void param) {
-    return visit(obj.getLeft(), param) && visit(obj.getRight(), param);
+    return visit(obj.left, param) && visit(obj.right, param);
   }
 
   @Override
   protected Boolean visitArithmeticOp(ArithmeticOp obj, Void param) {
-    return visit(obj.getLeft(), param) && visit(obj.getRight(), param);
+    return visit(obj.left, param) && visit(obj.right, param);
   }
 
   @Override
@@ -58,7 +58,7 @@ class KnowConstTraverser extends NullTraverser<Boolean, Void> {
 
   @Override
   protected Boolean visitTypeCast(TypeCast obj, Void param) {
-    return visit(obj.getValue(), param);
+    return visit(obj.value, param);
   }
 
   @Override

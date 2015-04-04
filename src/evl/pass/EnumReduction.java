@@ -93,17 +93,17 @@ class EnumReduce extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitReference(Reference obj, Void param) {
-    if (typeMap.containsKey(obj.getLink())) {
-      if (!obj.getOffset().isEmpty() && (obj.getOffset().get(0) instanceof RefName)) {
+    if (typeMap.containsKey(obj.link)) {
+      if (!obj.offset.isEmpty() && (obj.offset.get(0) instanceof RefName)) {
         // replace a link to EnumType.EnumName with a link to the corresponding constant
-        assert (obj.getOffset().size() == 1);
-        String elemName = ((RefName) obj.getOffset().get(0)).getName();
-        EnumType ent = (EnumType) obj.getLink();
+        assert (obj.offset.size() == 1);
+        String elemName = ((RefName) obj.offset.get(0)).name;
+        EnumType ent = (EnumType) obj.link;
         EnumElement elem = ent.getElement().find(elemName);
         assert (elem != null);
         assert (elemMap.containsKey(elem));
-        obj.getOffset().clear();
-        obj.setLink(elemMap.get(elem));
+        obj.offset.clear();
+        obj.link = elemMap.get(elem);
       }
     }
     return super.visitReference(obj, param);
@@ -113,12 +113,12 @@ class EnumReduce extends DefTraverser<Void, Void> {
   protected Void visitBaseRef(BaseRef obj, Void param) {
     super.visitBaseRef(obj, param);
     // link to type
-    if (typeMap.containsKey(obj.getLink())) {
-      obj.setLink(typeMap.get(obj.getLink()));
+    if (typeMap.containsKey(obj.link)) {
+      obj.link = typeMap.get(obj.link);
     }
     // direct link to enum element (internal reduction)
-    if (elemMap.containsKey(obj.getLink())) {
-      obj.setLink(elemMap.get(obj.getLink()));
+    if (elemMap.containsKey(obj.link)) {
+      obj.link = elemMap.get(obj.link);
     }
     return null;
   }

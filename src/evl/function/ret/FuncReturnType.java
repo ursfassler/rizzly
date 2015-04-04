@@ -23,18 +23,10 @@ import evl.expression.reference.SimpleRef;
 import evl.type.Type;
 
 public class FuncReturnType extends FuncReturn {
-  private SimpleRef<Type> type;
+  final public SimpleRef<Type> type;
 
   public FuncReturnType(ElementInfo info, SimpleRef<Type> type) {
     super(info);
-    this.type = type;
-  }
-
-  public SimpleRef<Type> getType() {
-    return type;
-  }
-
-  public void setType(SimpleRef<Type> type) {
     this.type = type;
   }
 

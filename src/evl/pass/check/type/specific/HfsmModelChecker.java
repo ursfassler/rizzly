@@ -59,26 +59,26 @@ public class HfsmModelChecker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitSubCallbacks(SubCallbacks obj, Void param) {
-    visitList(obj.getFunc(), param);
+    visitList(obj.func, param);
     return null;
   }
 
   @Override
   protected Void visitImplHfsm(ImplHfsm obj, Void param) {
-    visit(obj.getTopstate(), param);
+    visit(obj.topstate, param);
     return null;
   }
 
   @Override
   protected Void visitState(State obj, Void param) {
-    visitList(obj.getItem(), param);
+    visitList(obj.item, param);
     return null;
   }
 
   @Override
   protected Void visitTransition(Transition obj, Void param) {
     // TODO check that guard does not write state
-    if (!(obj.getEventFunc().getLink() instanceof FuncCtrlInDataIn)) {
+    if (!(obj.eventFunc.link instanceof FuncCtrlInDataIn)) {
       RError.err(ErrorType.Error, obj.getInfo(), "transition can only be triggered by slot");
     }
     return null;

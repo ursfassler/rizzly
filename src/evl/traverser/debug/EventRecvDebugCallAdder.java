@@ -72,16 +72,16 @@ public class EventRecvDebugCallAdder extends DefTraverser<Void, Void> {
   public void makeDebugCall(Function obj) {
     int numFunc = names.indexOf(obj.getName());
     assert (numFunc >= 0);
-    obj.getBody().getStatements().add(0, makeCall(msgRecvFunc, numFunc));
+    obj.body.statements.add(0, makeCall(msgRecvFunc, numFunc));
   }
 
   private CallStmt makeCall(Function func, int numFunc) {
     // _sendMsg( numFunc );
     TupleValue actParam = new TupleValue(info);
-    actParam.getValue().add(new Number(info, BigInteger.valueOf(numFunc)));
+    actParam.value.add(new Number(info, BigInteger.valueOf(numFunc)));
 
     Reference call = new Reference(info, func);
-    call.getOffset().add(new RefCall(info, actParam));
+    call.offset.add(new RefCall(info, actParam));
 
     return new CallStmt(info, call);
   }

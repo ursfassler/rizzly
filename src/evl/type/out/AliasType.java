@@ -24,18 +24,10 @@ import evl.type.Type;
 import evl.type.base.BaseType;
 
 public class AliasType extends BaseType {
-  private SimpleRef<Type> ref;
+  public SimpleRef<Type> ref;
 
   public AliasType(ElementInfo info, String name, SimpleRef<Type> ref) {
     super(info, name);
-    this.ref = ref;
-  }
-
-  public SimpleRef<Type> getRef() {
-    return ref;
-  }
-
-  public void setRef(SimpleRef<Type> ref) {
     this.ref = ref;
   }
 

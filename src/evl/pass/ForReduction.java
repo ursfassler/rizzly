@@ -80,32 +80,32 @@ class ForReductionWorker extends StmtReplacer<Void> {
     // TODO implement for other types than range types
     ElementInfo info = obj.getInfo();
 
-    FuncVariable itr = obj.getIterator();
-    RangeType rt = (RangeType) itr.getType().getLink();
+    FuncVariable itr = obj.iterator;
+    RangeType rt = (RangeType) itr.type.link;
 
     Block block = new Block(obj.getInfo());
 
     FuncVariable loopCond = new FuncVariable(info, kun.get("run"), new SimpleRef<Type>(info, kbi.getBooleanType()));
 
-    block.getStatements().add(new VarDefStmt(info, loopCond));
-    block.getStatements().add(new AssignmentSingle(info, new Reference(info, loopCond), new BoolValue(info, true)));
+    block.statements.add(new VarDefStmt(info, loopCond));
+    block.statements.add(new AssignmentSingle(info, new Reference(info, loopCond), new BoolValue(info, true)));
 
-    block.getStatements().add(new VarDefStmt(info, itr));
-    block.getStatements().add(new AssignmentSingle(info, new Reference(info, itr), new Number(info, rt.getNumbers().getLow())));
+    block.statements.add(new VarDefStmt(info, itr));
+    block.statements.add(new AssignmentSingle(info, new Reference(info, itr), new Number(info, rt.range.getLow())));
 
     Block body = new Block(info);
-    block.getStatements().add(new WhileStmt(info, new Reference(info, loopCond), body));
+    block.statements.add(new WhileStmt(info, new Reference(info, loopCond), body));
 
-    body.getStatements().add(obj.getBlock());
+    body.statements.add(obj.block);
     EvlList<IfOption> option = new EvlList<IfOption>();
     Block defblock = new Block(info);
 
     Block inc = new Block(info);
-    option.add(new IfOption(info, new Less(info, new Reference(info, itr), new Number(info, rt.getNumbers().getHigh())), inc));
-    inc.getStatements().add(new AssignmentSingle(info, new Reference(info, itr), new Plus(info, new Reference(info, itr), new Number(info, BigInteger.ONE))));
-    defblock.getStatements().add(new AssignmentSingle(info, new Reference(info, loopCond), new BoolValue(info, false)));
+    option.add(new IfOption(info, new Less(info, new Reference(info, itr), new Number(info, rt.range.getHigh())), inc));
+    inc.statements.add(new AssignmentSingle(info, new Reference(info, itr), new Plus(info, new Reference(info, itr), new Number(info, BigInteger.ONE))));
+    defblock.statements.add(new AssignmentSingle(info, new Reference(info, loopCond), new BoolValue(info, false)));
 
-    body.getStatements().add(new IfStmt(info, option, defblock));
+    body.statements.add(new IfStmt(info, option, defblock));
 
     return list(block);
   }

@@ -95,7 +95,7 @@ class QueueTypes {
   }
 
   public int queueLength() {
-    return queue.getSize().intValue();
+    return queue.size.intValue();
   }
 
   public ArrayType getQueue() {

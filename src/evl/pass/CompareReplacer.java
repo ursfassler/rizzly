@@ -85,13 +85,13 @@ class CompareReplacerWorker extends ExprReplacer<Void> {
   @Override
   protected Expression visitEqual(Equal obj, Void param) {
     obj = (Equal) super.visitEqual(obj, param);
-    return MakeCompareFunction.makeCmpExpr(obj.getLeft(), obj.getRight(), kb);
+    return MakeCompareFunction.makeCmpExpr(obj.left, obj.right, kb);
   }
 
   @Override
   protected Expression visitNotequal(Notequal obj, Void param) {
     obj = (Notequal) super.visitNotequal(obj, param);
-    return new LogicNot(obj.getInfo(), MakeCompareFunction.makeCmpExpr(obj.getLeft(), obj.getRight(), kb));
+    return new LogicNot(obj.getInfo(), MakeCompareFunction.makeCmpExpr(obj.left, obj.right, kb));
   }
 
 }
@@ -147,17 +147,17 @@ class MakeCompareFunction extends NullTraverser<Expression, Pair<Expression, Exp
     if (rt instanceof TupleType) {
       assert (param.first instanceof TupleValue);
       assert (param.second instanceof TupleValue);
-      FuncPrivateRet func = makeCompare(lt.getTypes(), ((TupleType) rt).getTypes());
+      FuncPrivateRet func = makeCompare(lt.types, ((TupleType) rt).types);
       TupleValue acpar = new TupleValue(info);
-      acpar.getValue().addAll(((TupleValue) param.first).getValue());
-      acpar.getValue().addAll(((TupleValue) param.second).getValue());
+      acpar.value.addAll(((TupleValue) param.first).value);
+      acpar.value.addAll(((TupleValue) param.second).value);
       Reference call = new Reference(info, func, new RefCall(info, acpar));
       return call;
     } else if (rt instanceof RecordType) {
-      FuncPrivateRet func = makeCompare(lt.getTypes(), (RecordType) rt);
+      FuncPrivateRet func = makeCompare(lt.types, (RecordType) rt);
       TupleValue acpar = new TupleValue(info);
-      acpar.getValue().addAll(((TupleValue) param.first).getValue());
-      acpar.getValue().add(param.second);
+      acpar.value.addAll(((TupleValue) param.first).value);
+      acpar.value.add(param.second);
       Reference call = new Reference(info, func, new RefCall(info, acpar));
       return call;
     } else {
@@ -169,7 +169,7 @@ class MakeCompareFunction extends NullTraverser<Expression, Pair<Expression, Exp
     EvlList<FuncVariable> param = new EvlList<FuncVariable>();
     EvlList<FuncVariable> left = new EvlList<FuncVariable>();
     for (SimpleRef<Type> rtr : lt) {
-      left.add(new FuncVariable(info, "left" + left.size(), new SimpleRef<Type>(info, rtr.getLink())));
+      left.add(new FuncVariable(info, "left" + left.size(), new SimpleRef<Type>(info, rtr.link)));
     }
     FuncVariable right = new FuncVariable(info, "right", new SimpleRef<Type>(info, rt));
     param.addAll(left);
@@ -177,9 +177,9 @@ class MakeCompareFunction extends NullTraverser<Expression, Pair<Expression, Exp
 
     Expression expr = new BoolValue(info, true);
 
-    for (int i = 0; i < rt.getElement().size(); i++) {
+    for (int i = 0; i < rt.element.size(); i++) {
       Reference leftVal = new Reference(info, left.get(i));
-      Reference rightVal = new Reference(info, right, new RefName(info, rt.getElement().get(i).getName()));
+      Reference rightVal = new Reference(info, right, new RefName(info, rt.element.get(i).getName()));
       Expression ac = make(leftVal, rightVal);
       expr = new LogicAnd(info, expr, ac);
     }
@@ -191,11 +191,11 @@ class MakeCompareFunction extends NullTraverser<Expression, Pair<Expression, Exp
     EvlList<FuncVariable> param = new EvlList<FuncVariable>();
     EvlList<FuncVariable> left = new EvlList<FuncVariable>();
     for (SimpleRef<Type> ltr : lt) {
-      left.add(new FuncVariable(info, "left" + left.size(), new SimpleRef<Type>(info, ltr.getLink())));
+      left.add(new FuncVariable(info, "left" + left.size(), new SimpleRef<Type>(info, ltr.link)));
     }
     EvlList<FuncVariable> right = new EvlList<FuncVariable>();
     for (SimpleRef<Type> rtr : rt) {
-      right.add(new FuncVariable(info, "right" + right.size(), new SimpleRef<Type>(info, rtr.getLink())));
+      right.add(new FuncVariable(info, "right" + right.size(), new SimpleRef<Type>(info, rtr.link)));
     }
     param.addAll(left);
     param.addAll(right);
@@ -220,16 +220,16 @@ class MakeCompareFunction extends NullTraverser<Expression, Pair<Expression, Exp
       assert (lt == rt);
       FuncPrivateRet func = makeCompare(lt);
       TupleValue acpar = new TupleValue(info);
-      acpar.getValue().add(param.first);
-      acpar.getValue().add(param.second);
+      acpar.value.add(param.first);
+      acpar.value.add(param.second);
       Reference call = new Reference(info, func, new RefCall(info, acpar));
       return call;
     } else if (rt instanceof TupleType) {
       assert (param.second instanceof TupleValue);
-      FuncPrivateRet func = makeCompare(lt, ((TupleType) rt).getTypes());
+      FuncPrivateRet func = makeCompare(lt, ((TupleType) rt).types);
       TupleValue acpar = new TupleValue(info);
-      acpar.getValue().add(param.first);
-      acpar.getValue().addAll(((TupleValue) param.second).getValue());
+      acpar.value.add(param.first);
+      acpar.value.addAll(((TupleValue) param.second).value);
       Reference call = new Reference(info, func, new RefCall(info, acpar));
       return call;
     } else {
@@ -242,15 +242,15 @@ class MakeCompareFunction extends NullTraverser<Expression, Pair<Expression, Exp
     FuncVariable left = new FuncVariable(info, "left", new SimpleRef<Type>(info, lt));
     EvlList<FuncVariable> right = new EvlList<FuncVariable>();
     for (SimpleRef<Type> rtr : rt) {
-      right.add(new FuncVariable(info, "right" + right.size(), new SimpleRef<Type>(info, rtr.getLink())));
+      right.add(new FuncVariable(info, "right" + right.size(), new SimpleRef<Type>(info, rtr.link)));
     }
     param.add(left);
     param.addAll(right);
 
     Expression expr = new BoolValue(info, true);
 
-    for (int i = 0; i < lt.getElement().size(); i++) {
-      Reference leftVal = new Reference(info, left, new RefName(info, lt.getElement().get(i).getName()));
+    for (int i = 0; i < lt.element.size(); i++) {
+      Reference leftVal = new Reference(info, left, new RefName(info, lt.element.get(i).getName()));
       Reference rightVal = new Reference(info, right.get(i));
       Expression ac = make(leftVal, rightVal);
       expr = new LogicAnd(info, expr, ac);
@@ -267,7 +267,7 @@ class MakeCompareFunction extends NullTraverser<Expression, Pair<Expression, Exp
     param.add(right);
 
     Expression expr = new BoolValue(info, true);
-    for (NamedElement itr : both.getElement()) {
+    for (NamedElement itr : both.element) {
       String name = itr.getName();
       Reference lr = new Reference(info, left, new RefName(info, name));
       Reference rr = new Reference(info, right, new RefName(info, name));
@@ -280,7 +280,7 @@ class MakeCompareFunction extends NullTraverser<Expression, Pair<Expression, Exp
 
   private FuncPrivateRet makeFunc(EvlList<FuncVariable> param, Expression expr) {
     Block body = new Block(info);
-    body.getStatements().add(new ReturnExpr(info, expr));
+    body.statements.add(new ReturnExpr(info, expr));
     FuncPrivateRet func = new FuncPrivateRet(info, kun.get("cmp"), param, new FuncReturnType(info, new SimpleRef<Type>(info, kbi.getBooleanType())), body);
     kbi.addItem(func);
     return func;

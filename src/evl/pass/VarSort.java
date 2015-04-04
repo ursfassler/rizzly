@@ -80,8 +80,8 @@ public class VarSort extends EvlPass {
 
       @Override
       protected Void visitBaseRef(BaseRef obj, Set<Variable> param) {
-        if (obj.getLink() instanceof Variable) {
-          param.add((Variable) obj.getLink());
+        if (obj.link instanceof Variable) {
+          param.add((Variable) obj.link);
         }
         return super.visitBaseRef(obj, param);
       }

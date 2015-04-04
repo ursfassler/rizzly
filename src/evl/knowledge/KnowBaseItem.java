@@ -98,7 +98,7 @@ public class KnowBaseItem extends KnowledgeEntry {
   public RangeType getNumsetType(Range range) {
     EvlList<RangeType> items = kb.getRoot().getChildren().getItems(RangeType.class);
     for (RangeType itr : items) {
-      if (itr.getNumbers().equals(range)) {
+      if (itr.range.equals(range)) {
         return itr;
       }
     }
@@ -110,7 +110,7 @@ public class KnowBaseItem extends KnowledgeEntry {
   public ArrayType getArray(BigInteger size, Type type) {
     EvlList<ArrayType> items = kb.getRoot().getChildren().getItems(ArrayType.class);
     for (ArrayType itr : items) {
-      if (itr.getSize().equals(size) && itr.getType().getLink().equals(type)) {
+      if (itr.size.equals(size) && itr.type.link.equals(type)) {
         return itr;
       }
     }
@@ -123,7 +123,7 @@ public class KnowBaseItem extends KnowledgeEntry {
   public RecordType getRecord(EvlList<NamedElement> element) {
     EvlList<RecordType> items = kb.getRoot().getChildren().getItems(RecordType.class);
     for (RecordType itr : items) {
-      if (equal(element, itr.getElement())) {
+      if (equal(element, itr.element)) {
         return itr;
       }
     }
@@ -138,7 +138,7 @@ public class KnowBaseItem extends KnowledgeEntry {
       return false;
     }
     for (int i = 0; i < left.size(); i++) {
-      if (!left.get(i).getName().equals(right.get(i).getName()) || !left.get(i).getRef().getLink().equals(right.get(i).getRef().getLink())) {
+      if (!left.get(i).getName().equals(right.get(i).getName()) || !left.get(i).ref.link.equals(right.get(i).ref.link)) {
         return false;
       }
     }
@@ -207,17 +207,17 @@ class KnowBaseItemTypeFinder extends NullTraverser<Type, KnowBaseItem> {
 
   @Override
   protected Type visitRecordType(RecordType obj, KnowBaseItem param) {
-    return param.getRecord(obj.getElement());
+    return param.getRecord(obj.element);
   }
 
   @Override
   protected Type visitArrayType(ArrayType obj, KnowBaseItem param) {
-    return param.getArray(obj.getSize(), obj.getType().getLink());
+    return param.getArray(obj.size, obj.type.link);
   }
 
   @Override
   protected Type visitRangeType(RangeType obj, KnowBaseItem param) {
-    return param.getNumsetType(obj.getNumbers());
+    return param.getNumsetType(obj.range);
   }
 
 }

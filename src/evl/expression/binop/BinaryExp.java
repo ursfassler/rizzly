@@ -27,30 +27,14 @@ import evl.expression.Expression;
  */
 abstract public class BinaryExp extends Expression {
 
-  private Expression left;
-  private Expression right;
+  public Expression left;
+  public Expression right;
+
+  abstract public String getOpName();
 
   public BinaryExp(ElementInfo info, Expression left, Expression right) {
     super(info);
     this.left = left;
-    this.right = right;
-  }
-
-  abstract public String getOpName();
-
-  public Expression getLeft() {
-    return left;
-  }
-
-  public Expression getRight() {
-    return right;
-  }
-
-  public void setLeft(Expression left) {
-    this.left = left;
-  }
-
-  public void setRight(Expression right) {
     this.right = right;
   }
 

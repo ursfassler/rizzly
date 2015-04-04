@@ -38,8 +38,8 @@ class ReduceTupleWorker extends ExprReplacer<Void> {
 
   @Override
   protected Expression visitTupleValue(TupleValue obj, Void param) {
-    if (obj.getValue().size() == 1) {
-      return visit(obj.getValue().get(0), param);
+    if (obj.value.size() == 1) {
+      return visit(obj.value.get(0), param);
     } else {
       return super.visitTupleValue(obj, param);
     }

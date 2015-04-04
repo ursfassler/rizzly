@@ -22,15 +22,11 @@ import common.ElementInfo;
 import evl.type.base.BaseType;
 
 abstract public class IntType extends BaseType {
-  private final int bytes;
+  final public int bytes;
 
   public IntType(ElementInfo info, String name, int bytes) {
     super(info, name);
     this.bytes = bytes;
-  }
-
-  public int getBytes() {
-    return bytes;
   }
 
 }

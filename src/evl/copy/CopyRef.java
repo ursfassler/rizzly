@@ -39,17 +39,17 @@ public class CopyRef extends NullTraverser<RefItem, Void> {
 
   @Override
   protected RefItem visitRefCall(RefCall obj, Void param) {
-    return new RefCall(obj.getInfo(), cast.copy(obj.getActualParameter()));
+    return new RefCall(obj.getInfo(), cast.copy(obj.actualParameter));
   }
 
   @Override
   protected RefItem visitRefName(RefName obj, Void param) {
-    return new RefName(obj.getInfo(), obj.getName());
+    return new RefName(obj.getInfo(), obj.name);
   }
 
   @Override
   protected RefItem visitRefIndex(RefIndex obj, Void param) {
-    return new RefIndex(obj.getInfo(), cast.copy(obj.getIndex()));
+    return new RefIndex(obj.getInfo(), cast.copy(obj.index));
   }
 
 }

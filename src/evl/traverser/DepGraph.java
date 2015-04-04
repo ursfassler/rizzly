@@ -57,14 +57,14 @@ public class DepGraph extends DefTraverser<Void, Evl> {
   @Override
   protected Void visitSimpleRef(SimpleRef obj, Evl param) {
     super.visitSimpleRef(obj, param);
-    visit(obj.getLink(), obj);
+    visit(obj.link, obj);
     return null;
   }
 
   @Override
   protected Void visitReference(Reference obj, Evl param) {
     super.visitReference(obj, param);
-    visit(obj.getLink(), obj);
+    visit(obj.link, obj);
     return null;
   }
 

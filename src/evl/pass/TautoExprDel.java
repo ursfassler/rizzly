@@ -23,24 +23,24 @@ public class TautoExprDel extends EvlPass {
 class TautoExprDelWorker extends ExprReplacer<Void> {
 
   private boolean isTrue(Expression expr) {
-    return (expr instanceof BoolValue) && ((BoolValue) expr).isValue();
+    return (expr instanceof BoolValue) && ((BoolValue) expr).value;
   }
 
   private boolean isFalse(Expression expr) {
-    return (expr instanceof BoolValue) && !((BoolValue) expr).isValue();
+    return (expr instanceof BoolValue) && !((BoolValue) expr).value;
   }
 
   @Override
   protected Expression visitLogicOr(LogicOr obj, Void param) {
     obj = (LogicOr) super.visitLogicOr(obj, param);
 
-    if (isFalse(obj.getLeft())) {
-      return obj.getRight();
+    if (isFalse(obj.left)) {
+      return obj.right;
     }
-    if (isFalse(obj.getRight())) {
-      return obj.getLeft();
+    if (isFalse(obj.right)) {
+      return obj.left;
     }
-    if (isTrue(obj.getLeft()) || isTrue(obj.getRight())) {
+    if (isTrue(obj.left) || isTrue(obj.right)) {
       // FIXME keep side effects
       return new BoolValue(obj.getInfo(), true);
     }
@@ -52,13 +52,13 @@ class TautoExprDelWorker extends ExprReplacer<Void> {
   protected Expression visitLogicAnd(LogicAnd obj, Void param) {
     obj = (LogicAnd) super.visitLogicAnd(obj, param);
 
-    if (isTrue(obj.getLeft())) {
-      return obj.getRight();
+    if (isTrue(obj.left)) {
+      return obj.right;
     }
-    if (isTrue(obj.getRight())) {
-      return obj.getLeft();
+    if (isTrue(obj.right)) {
+      return obj.left;
     }
-    if (isFalse(obj.getLeft()) || isFalse(obj.getRight())) {
+    if (isFalse(obj.left) || isFalse(obj.right)) {
       // FIXME keep side effects
       return new BoolValue(obj.getInfo(), false);
     }
@@ -70,10 +70,10 @@ class TautoExprDelWorker extends ExprReplacer<Void> {
   protected Expression visitLogicNot(LogicNot obj, Void param) {
     obj = (LogicNot) super.visitLogicNot(obj, param);
 
-    if (isTrue(obj.getExpr())) {
+    if (isTrue(obj.expr)) {
       return new BoolValue(obj.getInfo(), false);
     }
-    if (isFalse(obj.getExpr())) {
+    if (isFalse(obj.expr)) {
       return new BoolValue(obj.getInfo(), true);
     }
 

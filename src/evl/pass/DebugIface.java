@@ -78,7 +78,7 @@ public class DebugIface extends EvlPass {
 
     FuncCtrlInDataOut func = makeNameGetter("DebugName", symNameSizeType, names, stringType);
     func.properties().put(Property.Public, true);
-    kb.getRootComp().getLink().getFunction().add(func);
+    kb.getRootComp().link.function.add(func);
   }
 
   private static FuncCtrlInDataOut makeNameGetter(String funcName, RangeType nameSizeType, ArrayList<String> names, StringType stringType) {
@@ -92,17 +92,17 @@ public class DebugIface extends EvlPass {
     EvlList<CaseOpt> option = new EvlList<CaseOpt>();
     Block otherwise = new Block(info);
     CaseStmt cs = new CaseStmt(info, new SimpleRef<FuncVariable>(info, arg), option, otherwise);
-    body.getStatements().add(cs);
+    body.statements.add(cs);
 
     for (int i = 0; i < names.size(); i++) {
       EvlList<CaseOptEntry> values = new EvlList<CaseOptEntry>();
       values.add(new CaseOptValue(info, new Number(info, BigInteger.valueOf(i))));
       Block code = new Block(info);
-      code.getStatements().add(new ReturnExpr(info, new StringValue(info, names.get(i))));
+      code.statements.add(new ReturnExpr(info, new StringValue(info, names.get(i))));
       option.add(new CaseOpt(info, values, code));
     }
 
-    otherwise.getStatements().add(new ReturnExpr(info, new StringValue(info, "")));
+    otherwise.statements.add(new ReturnExpr(info, new StringValue(info, "")));
 
     return func;
   }

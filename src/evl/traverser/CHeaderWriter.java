@@ -117,7 +117,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.wr("typedef struct {");
     param.nl();
     param.incIndent();
-    visitList(obj.getElement(), param);
+    visitList(obj.element, param);
     param.decIndent();
     param.wr("} ");
     param.wr(obj.getName());
@@ -128,7 +128,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitNamedElement(NamedElement obj, StreamWriter param) {
-    visit(obj.getRef(), param);
+    visit(obj.ref, param);
     param.wr(" ");
     param.wr(obj.getName());
     param.wr(";");
@@ -157,13 +157,13 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitNumber(Number obj, StreamWriter param) {
-    param.wr(obj.getValue().toString());
+    param.wr(obj.value.toString());
     return null;
   }
 
   @Override
   protected Void visitSimpleRef(SimpleRef obj, StreamWriter param) {
-    param.wr(obj.getLink().getName());
+    param.wr(obj.link.getName());
     return null;
   }
 
@@ -188,8 +188,8 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitRangeType(RangeType obj, StreamWriter param) {
-    boolean isNeg = obj.getNumbers().getLow().compareTo(BigInteger.ZERO) < 0;
-    BigInteger max = getPos(obj.getNumbers().getHigh()).max(getPos(obj.getNumbers().getLow()));
+    boolean isNeg = obj.range.getLow().compareTo(BigInteger.ZERO) < 0;
+    BigInteger max = getPos(obj.range.getHigh()).max(getPos(obj.range.getLow()));
     int bits = ExpressionTypeChecker.bitCount(max);
     assert (bits >= 0);
     if (isNeg) {
@@ -217,11 +217,11 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.wr("typedef struct {");
     param.nl();
     param.incIndent();
-    visit(obj.getType(), param);
+    visit(obj.type, param);
     param.wr(" ");
     param.wr(CWriter.ARRAY_DATA_NAME);
     param.wr("[");
-    param.wr(obj.getSize().toString());
+    param.wr(obj.size.toString());
     param.wr("]");
     param.wr(";");
     param.decIndent();
@@ -262,7 +262,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitVariable(Variable obj, StreamWriter param) {
-    visit(obj.getType(), param);
+    visit(obj.type, param);
     param.wr(" ");
     param.wr(obj.getName());
     return null;
@@ -282,7 +282,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitFuncReturnType(FuncReturnType obj, StreamWriter param) {
-    visit(obj.getType(), param);
+    visit(obj.type, param);
     return null;
   }
 
@@ -293,11 +293,11 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   private void wrPrototype(Function obj, StreamWriter param) {
-    visit(obj.getRet(), param);
+    visit(obj.ret, param);
     param.wr(" ");
     param.wr(obj.getName());
     param.wr("(");
-    wrList(obj.getParam(), ", ", param);
+    wrList(obj.param, ", ", param);
     param.wr(");");
     param.nl();
   }

@@ -28,7 +28,7 @@ import evl.type.base.BaseType;
  *
  */
 final public class NaturalType extends BaseType {
-  public final static String NAME = "Natural";
+  final static public String NAME = "Natural";
 
   public NaturalType() {
     super(ElementInfo.NO, NAME);

@@ -29,11 +29,11 @@ final public class EndpointSelf extends Endpoint<Function> {
 
   @Override
   public Function getFunc() {
-    return getLink();
+    return link;
   }
 
   @Override
   public String toString() {
-    return "self." + getLink().getName();
+    return "self." + link.getName();
   }
 }

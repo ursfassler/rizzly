@@ -134,12 +134,12 @@ public class IoCheck extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitTransition(Transition obj, Void param) {
-    assert (writes.containsKey(obj.getBody()));
-    assert (reads.containsKey(obj.getBody()));
-    assert (outputs.containsKey(obj.getBody()));
-    assert (inputs.containsKey(obj.getBody()));
+    assert (writes.containsKey(obj.body));
+    assert (reads.containsKey(obj.body));
+    assert (outputs.containsKey(obj.body));
+    assert (inputs.containsKey(obj.body));
 
-    checkQuery(obj.getGuard(), "Transition guard");
+    checkQuery(obj.guard, "Transition guard");
     return null;
   }
 

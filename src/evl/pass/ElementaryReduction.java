@@ -56,10 +56,10 @@ public class ElementaryReduction extends EvlPass {
 
     for (ImplElementary impl : evl.getItems(ImplElementary.class, true)) {
 
-      EvlList<FuncCtrlInDataIn> slotImpl = impl.getFunction().getItems(FuncCtrlInDataIn.class);
-      EvlList<FuncCtrlInDataOut> responseImpl = impl.getFunction().getItems(FuncCtrlInDataOut.class);
-      EvlList<FuncCtrlInDataIn> slotProto = impl.getIface().getItems(FuncCtrlInDataIn.class);
-      EvlList<FuncCtrlInDataOut> responseProto = impl.getIface().getItems(FuncCtrlInDataOut.class);
+      EvlList<FuncCtrlInDataIn> slotImpl = impl.function.getItems(FuncCtrlInDataIn.class);
+      EvlList<FuncCtrlInDataOut> responseImpl = impl.function.getItems(FuncCtrlInDataOut.class);
+      EvlList<FuncCtrlInDataIn> slotProto = impl.iface.getItems(FuncCtrlInDataIn.class);
+      EvlList<FuncCtrlInDataOut> responseProto = impl.iface.getItems(FuncCtrlInDataOut.class);
 
       if (!checkForAll(slotImpl, slotProto, "interface declaration") | !checkForAll(responseImpl, responseProto, "interface declaration") | !checkForAll(responseProto, responseImpl, "implementation")) {
         return;
@@ -68,8 +68,8 @@ public class ElementaryReduction extends EvlPass {
       merge(slotImpl, slotProto, map, kb);
       merge(responseImpl, responseProto, map, kb);
 
-      impl.getFunction().removeAll(slotImpl);
-      impl.getFunction().removeAll(responseImpl);
+      impl.function.removeAll(slotImpl);
+      impl.function.removeAll(responseImpl);
     }
 
     Relinker.relink(evl, map);
@@ -94,30 +94,30 @@ public class ElementaryReduction extends EvlPass {
   }
 
   private void merge(Function func, Function proto, Map<Named, Named> map, KnowledgeBase kb) {
-    assert (proto.getBody().getStatements().isEmpty());
+    assert (proto.body.statements.isEmpty());
 
     KnowLeftIsContainerOfRight kc = kb.getEntry(KnowLeftIsContainerOfRight.class);
 
-    Type ft = getType(func.getParam());
-    Type pt = getType(proto.getParam());
+    Type ft = getType(func.param);
+    Type pt = getType(proto.param);
     if (!kc.get(ft, pt)) {
       RError.err(ErrorType.Hint, proto.getInfo(), "Prototype is here");
       RError.err(ErrorType.Error, func.getInfo(), "Implementation (argument) is not compatible with prototype");
     }
 
     KnowType kt = kb.getEntry(KnowType.class);
-    Type fr = kt.get(func.getRet());
-    Type pr = kt.get(proto.getRet());
+    Type fr = kt.get(func.ret);
+    Type pr = kt.get(proto.ret);
     if (!kc.get(pr, fr)) {
-      RError.err(ErrorType.Hint, proto.getRet().getInfo(), "Prototype is here");
-      RError.err(ErrorType.Error, func.getRet().getInfo(), "Implementation (return) is not compatible with prototype");
+      RError.err(ErrorType.Hint, proto.ret.getInfo(), "Prototype is here");
+      RError.err(ErrorType.Error, func.ret.getInfo(), "Implementation (return) is not compatible with prototype");
     }
 
-    proto.getBody().getStatements().addAll(func.getBody().getStatements());
-    func.getBody().getStatements().clear();
+    proto.body.statements.addAll(func.body.statements);
+    func.body.statements.clear();
 
-    for (int i = 0; i < func.getParam().size(); i++) {
-      map.put(func.getParam().get(i), proto.getParam().get(i));
+    for (int i = 0; i < func.param.size(); i++) {
+      map.put(func.param.get(i), proto.param.get(i));
     }
     map.put(func, proto);
   }
@@ -125,7 +125,7 @@ public class ElementaryReduction extends EvlPass {
   private Type getType(EvlList<FuncVariable> param) {
     EvlList<SimpleRef<Type>> types = new EvlList<SimpleRef<Type>>();
     for (FuncVariable var : param) {
-      types.add(var.getType());
+      types.add(var.type);
     }
     TupleType tt = new TupleType(ElementInfo.NO, "", types);
     return tt;

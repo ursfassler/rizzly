@@ -24,9 +24,11 @@ import common.ElementInfo;
 import evl.Evl;
 import evl.EvlBase;
 
+//TODO is this class data or object?
+
 public class Namespace extends EvlBase implements Named {
   private String name;
-  final private EvlList<Evl> children = new EvlList<Evl>();
+  final public EvlList<Evl> children = new EvlList<Evl>();
 
   public Namespace(ElementInfo info, String name) {
     super(info);

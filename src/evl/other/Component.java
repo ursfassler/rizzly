@@ -30,9 +30,9 @@ import evl.function.header.FuncCtrlOutDataOut;
 
 abstract public class Component extends EvlBase implements Named {
   private String name;
-  private Queue queue;
-  final private EvlList<InterfaceFunction> iface = new EvlList<InterfaceFunction>();
-  final private EvlList<Function> function = new EvlList<Function>();
+  public Queue queue;
+  final public EvlList<InterfaceFunction> iface = new EvlList<InterfaceFunction>();
+  final public EvlList<Function> function = new EvlList<Function>();
 
   public Component(ElementInfo info, String name) {
     super(info);
@@ -48,10 +48,6 @@ abstract public class Component extends EvlBase implements Named {
   @Override
   public void setName(String name) {
     this.name = name;
-  }
-
-  public EvlList<Function> getFunction() {
-    return function;
   }
 
   public EvlList<InterfaceFunction> getIface(Direction dir) {
@@ -71,18 +67,6 @@ abstract public class Component extends EvlBase implements Named {
         throw new RuntimeException("Not implemented: " + dir);
     }
     return ret;
-  }
-
-  public EvlList<InterfaceFunction> getIface() {
-    return iface;
-  }
-
-  public Queue getQueue() {
-    return queue;
-  }
-
-  public void setQueue(Queue queue) {
-    this.queue = queue;
   }
 
   @Override

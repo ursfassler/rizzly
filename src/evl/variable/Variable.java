@@ -26,20 +26,12 @@ import evl.type.Type;
 
 abstract public class Variable extends EvlBase implements Named {
   private String name;
-  private SimpleRef<Type> type;
+  public SimpleRef<Type> type;
 
   public Variable(ElementInfo info, String name, SimpleRef<Type> type) {
     super(info);
     this.type = type;
     this.name = name;
-  }
-
-  public SimpleRef<Type> getType() {
-    return type;
-  }
-
-  public void setType(SimpleRef<Type> type) {
-    this.type = type;
   }
 
   @Override
@@ -54,7 +46,7 @@ abstract public class Variable extends EvlBase implements Named {
 
   @Override
   public String toString() {
-    return name + ":" + type.getLink();
+    return name + ":" + type.link;
   }
 
 }

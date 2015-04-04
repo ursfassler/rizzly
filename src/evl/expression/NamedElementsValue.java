@@ -22,15 +22,11 @@ import common.ElementInfo;
 import evl.other.EvlList;
 
 public class NamedElementsValue extends Expression {
-  final private EvlList<NamedValue> value;
+  final public EvlList<NamedValue> value;
 
   public NamedElementsValue(ElementInfo info, EvlList<NamedValue> value) {
     super(info);
     this.value = value;
-  }
-
-  public EvlList<NamedValue> getValue() {
-    return value;
   }
 
 }

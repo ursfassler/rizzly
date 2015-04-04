@@ -70,8 +70,8 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
   @Override
   protected Expression visitDefVariable(DefVariable obj, Type param) {
     assert (param == null);
-    Type type = obj.getType().getLink();
-    obj.setDef(visit(obj.getDef(), type));
+    Type type = obj.type.link;
+    obj.def = visit(obj.def, type);
     return null;
   }
 
@@ -79,14 +79,14 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
   protected Expression visitArrayValue(ArrayValue obj, Type param) {
     if (param instanceof ArrayType) {
       ArrayType at = (ArrayType) param;
-      int size = at.getSize().intValue();
+      int size = at.size.intValue();
       EvlList<Expression> init = new EvlList<Expression>();
       for (int i = 0; i < size; i++) {
         init.add(null);
       }
       int idx = 0;
-      for (Expression expr : obj.getValue()) {
-        init.set(idx, visit(expr, at.getType().getLink()));
+      for (Expression expr : obj.value) {
+        init.set(idx, visit(expr, at.type.link));
         idx++;
       }
 
@@ -113,17 +113,17 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
       return obj;
     }
 
-    if (obj.getValue().size() == 1) {
+    if (obj.value.size() == 1) {
       // TODO do that at a different place
-      return visit(obj.getValue().get(0), param);
-    } else if (obj.getValue().size() == 0) {
+      return visit(obj.value.get(0), param);
+    } else if (obj.value.size() == 0) {
       return obj;
     } else if (param instanceof ArrayType) {
       ArrayType at = (ArrayType) param;
-      if (obj.getValue().size() != at.getSize().intValue()) {
-        RError.err(ErrorType.Error, obj.getInfo(), "Expected " + at.getSize().toString() + " elements, got " + obj.getValue().size());
+      if (obj.value.size() != at.size.intValue()) {
+        RError.err(ErrorType.Error, obj.getInfo(), "Expected " + at.size.toString() + " elements, got " + obj.value.size());
       }
-      return new ArrayValue(obj.getInfo(), obj.getValue());
+      return new ArrayValue(obj.getInfo(), obj.value);
     } else {
       throw new RuntimeException("not yet implemented: " + param.getClass().getCanonicalName());
     }
@@ -132,25 +132,25 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
   @Override
   protected Expression visitNamedValue(NamedValue obj, Type type) {
     if (type instanceof UnionType) {
-      EnumType et = (EnumType) ((UnionType) type).getTag().getRef().getLink();
-      EnumElement ele = (EnumElement) kc.get(et, obj.getName(), obj.getInfo());
+      EnumType et = (EnumType) ((UnionType) type).tag.ref.link;
+      EnumElement ele = (EnumElement) kc.get(et, obj.name, obj.getInfo());
 
-      EnumElement value = (EnumElement) kc.get(et, obj.getName(), obj.getInfo());
+      EnumElement value = (EnumElement) kc.get(et, obj.name, obj.getInfo());
 
-      NamedValue tag = new NamedValue(obj.getInfo(), ((UnionType) type).getTag().getName(), new Reference(obj.getInfo(), value));
+      NamedValue tag = new NamedValue(obj.getInfo(), ((UnionType) type).tag.getName(), new Reference(obj.getInfo(), value));
 
-      Expression ov = obj.getValue();
-      NamedElement elem = (NamedElement) kc.get(type, obj.getName(), obj.getInfo());
-      ov = visit(ov, elem.getRef().getLink());
+      Expression ov = obj.value;
+      NamedElement elem = (NamedElement) kc.get(type, obj.name, obj.getInfo());
+      ov = visit(ov, elem.ref.link);
 
       NamedValue content = new NamedValue(obj.getInfo(), ele.getName(), ov);
 
       UnionValue uv = new UnionValue(obj.getInfo(), tag, content, new SimpleRef<Type>(obj.getInfo(), type));
       return uv;
     } else if (type instanceof UnsafeUnionType) {
-      Expression ov = obj.getValue();
-      NamedElement elem = (NamedElement) kc.get(type, obj.getName(), obj.getInfo());
-      ov = visit(ov, elem.getRef().getLink());
+      Expression ov = obj.value;
+      NamedElement elem = (NamedElement) kc.get(type, obj.name, obj.getInfo());
+      ov = visit(ov, elem.ref.link);
 
       NamedValue content = new NamedValue(obj.getInfo(), elem.getName(), ov);
 
@@ -167,7 +167,7 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
   @Override
   protected Expression visitRecordValue(RecordValue obj, Type param) {
     if (param instanceof RecordType) {
-      assert (obj.getType().getLink() == param);
+      assert (obj.type.link == param);
       return obj; // we assume it is right
     } else {
       throw new RuntimeException("not yet implemented: " + param.getClass().getCanonicalName());
@@ -176,16 +176,16 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
 
   @Override
   protected Expression visitNamedElementsValue(NamedElementsValue obj, Type type) {
-    EvlList<NamedValue> value = obj.getValue();
+    EvlList<NamedValue> value = obj.value;
     if (type instanceof RecordType) {
-      Map<String, Type> eletype = getTypes(((RecordType) type).getElement());
+      Map<String, Type> eletype = getTypes(((RecordType) type).element);
       for (NamedValue itm : value) {
-        Type et = eletype.get(itm.getName());
+        Type et = eletype.get(itm.name);
         if (et == null) {
-          RError.err(ErrorType.Error, obj.getInfo(), "Record have no element named " + itm.getName());
+          RError.err(ErrorType.Error, obj.getInfo(), "Record have no element named " + itm.name);
           return null;
         }
-        itm.setValue(visit(itm.getValue(), et));
+        itm.value = visit(itm.value, et);
       }
       return new RecordValue(obj.getInfo(), value, new SimpleRef<Type>(obj.getInfo(), type));
     } else if ((type instanceof UnionType) || (type instanceof UnsafeUnionType)) {
@@ -203,7 +203,7 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
     Map<String, Type> ret = new HashMap<String, Type>();
     for (NamedElement elem : element) {
       RError.ass(!ret.containsKey(elem.getName()), elem.getInfo(), "Entry with name " + elem.getName() + " already defined");
-      ret.put(elem.getName(), elem.getRef().getLink());
+      ret.put(elem.getName(), elem.ref.link);
     }
     return ret;
   }

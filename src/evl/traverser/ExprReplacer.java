@@ -110,7 +110,7 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
 
   @Override
   protected Expression visitReference(Reference obj, T param) {
-    for (RefItem item : obj.getOffset()) {
+    for (RefItem item : obj.offset) {
       visit(item, param);
     }
     return obj;
@@ -118,13 +118,13 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
 
   @Override
   protected Expression visitRefIndex(RefIndex obj, T param) {
-    obj.setIndex(visit(obj.getIndex(), param));
+    obj.index = visit(obj.index, param);
     return null;
   }
 
   @Override
   protected Expression visitRefCall(RefCall obj, T param) {
-    visitTupleValue(obj.getActualParameter(), param);
+    visitTupleValue(obj.actualParameter, param);
     return null;
   }
 
@@ -134,8 +134,8 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   }
 
   private Expression defaultBinaryOp(BinaryExp obj, T param) {
-    obj.setLeft(visit(obj.getLeft(), param));
-    obj.setRight(visit(obj.getRight(), param));
+    obj.left = visit(obj.left, param);
+    obj.right = visit(obj.right, param);
     return obj;
   }
 
@@ -246,25 +246,25 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
 
   @Override
   protected Expression visitNot(Not obj, T param) {
-    obj.setExpr(visit(obj.getExpr(), param));
+    obj.expr = visit(obj.expr, param);
     return obj;
   }
 
   @Override
   protected Expression visitLogicNot(LogicNot obj, T param) {
-    obj.setExpr(visit(obj.getExpr(), param));
+    obj.expr = visit(obj.expr, param);
     return obj;
   }
 
   @Override
   protected Expression visitBitNot(BitNot obj, T param) {
-    obj.setExpr(visit(obj.getExpr(), param));
+    obj.expr = visit(obj.expr, param);
     return obj;
   }
 
   @Override
   protected Expression visitUminus(Uminus obj, T param) {
-    obj.setExpr(visit(obj.getExpr(), param));
+    obj.expr = visit(obj.expr, param);
     return obj;
   }
 
@@ -280,25 +280,25 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
 
   @Override
   protected Expression visitArrayValue(ArrayValue obj, T param) {
-    visitExprList(obj.getValue(), param);
+    visitExprList(obj.value, param);
     return obj;
   }
 
   @Override
   protected Expression visitTupleValue(TupleValue obj, T param) {
-    visitExprList(obj.getValue(), param);
+    visitExprList(obj.value, param);
     return obj;
   }
 
   @Override
   protected Expression visitNamedElementsValue(NamedElementsValue obj, T param) {
-    visitList(obj.getValue(), param);
+    visitList(obj.value, param);
     return obj;
   }
 
   @Override
   protected Expression visitNamedValue(NamedValue obj, T param) {
-    obj.setValue(visit(obj.getValue(), param));
+    obj.value = visit(obj.value, param);
     return null;
   }
 
@@ -316,7 +316,7 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
 
   @Override
   protected Expression visitRecordValue(RecordValue obj, T param) {
-    visitList(obj.getValue(), param);
+    visitList(obj.value, param);
     return obj;
   }
 
@@ -332,67 +332,67 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
 
   @Override
   protected Expression visitTypeCast(TypeCast obj, T param) {
-    obj.setValue(visit(obj.getValue(), param));
+    obj.value = visit(obj.value, param);
     return obj;
   }
 
   @Override
   protected Expression visitReturnExpr(ReturnExpr obj, T param) {
-    obj.setExpr(visit(obj.getExpr(), param));
+    obj.expr = visit(obj.expr, param);
     return null;
   }
 
   @Override
   protected Expression visitCaseOptValue(CaseOptValue obj, T param) {
-    obj.setValue(visit(obj.getValue(), param));
+    obj.value = visit(obj.value, param);
     return null;
   }
 
   @Override
   protected Expression visitCaseOptRange(CaseOptRange obj, T param) {
-    obj.setStart(visit(obj.getStart(), param));
-    obj.setEnd(visit(obj.getEnd(), param));
+    obj.start = visit(obj.start, param);
+    obj.end = visit(obj.end, param);
     return null;
   }
 
   @Override
   protected Expression visitDefVariable(DefVariable obj, T param) {
-    obj.setDef(visit(obj.getDef(), param));
+    obj.def = visit(obj.def, param);
     return null;
   }
 
   @Override
   protected Expression visitAssignmentMulti(AssignmentMulti obj, T param) {
-    visitExprList(obj.getLeft(), param);
-    obj.setRight(visit(obj.getRight(), param));
+    visitExprList(obj.left, param);
+    obj.right = visit(obj.right, param);
     return null;
   }
 
   @Override
   protected Expression visitAssignmentSingle(AssignmentSingle obj, T param) {
-    obj.setLeft((Reference) visit(obj.getLeft(), param));
-    obj.setRight(visit(obj.getRight(), param));
+    obj.left = (Reference) visit(obj.left, param);
+    obj.right = visit(obj.right, param);
     return null;
   }
 
   @Override
   protected Expression visitTransition(Transition obj, T param) {
-    obj.setGuard(visit(obj.getGuard(), param));
+    obj.guard = visit(obj.guard, param);
     return super.visitTransition(obj, param);
   }
 
   @Override
   protected Expression visitIfOption(IfOption obj, T param) {
-    obj.setCondition(visit(obj.getCondition(), param));
-    visit(obj.getCode(), param);
+    obj.condition = visit(obj.condition, param);
+    visit(obj.code, param);
     return null;
   }
 
   @Override
   protected Expression visitMsgPush(MsgPush obj, T param) {
-    obj.setQueue((Reference) visit(obj.getQueue(), param));
-    obj.setFunc((Reference) visit(obj.getFunc(), param));
-    visitList(obj.getData(), param);
+    obj.queue = (Reference) visit(obj.queue, param);
+    obj.func = (Reference) visit(obj.func, param);
+    visitList(obj.data, param);
     return null;
   }
 

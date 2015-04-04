@@ -29,8 +29,4 @@ abstract public class Return extends Statement {
     super(info);
   }
 
-  @Override
-  public String toString() {
-    return "return";
-  }
 }

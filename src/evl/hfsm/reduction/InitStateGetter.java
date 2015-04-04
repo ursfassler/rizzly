@@ -49,14 +49,14 @@ public class InitStateGetter extends NullTraverser<StateSimple, Void> {
 
   @Override
   protected StateSimple visitStateComposite(StateComposite obj, Void param) {
-    return visit(obj.getInitial().getLink(), param);
+    return visit(obj.initial.link, param);
   }
 
   @Override
   protected StateSimple visitReference(Reference obj, Void param) {
     assert (false);
-    assert (obj.getOffset().isEmpty());
-    return visit(obj.getLink(), param);
+    assert (obj.offset.isEmpty());
+    return visit(obj.link, param);
   }
 
 }

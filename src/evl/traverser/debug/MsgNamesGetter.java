@@ -45,7 +45,7 @@ public class MsgNamesGetter extends DefTraverser<Void, Set<String>> {
   protected Void visitImplElementary(ImplElementary obj, Set<String> param) {
     visitList(obj.getIface(Direction.in), param);
     visitList(obj.getIface(Direction.out), param);
-    visitList(obj.getComponent(), param);
+    visitList(obj.component, param);
     return null;
   }
 
@@ -53,7 +53,7 @@ public class MsgNamesGetter extends DefTraverser<Void, Set<String>> {
   protected Void visitImplComposition(ImplComposition obj, Set<String> param) {
     visitList(obj.getIface(Direction.in), param);
     visitList(obj.getIface(Direction.out), param);
-    visitList(obj.getComponent(), param);
+    visitList(obj.component, param);
     return null;
   }
 

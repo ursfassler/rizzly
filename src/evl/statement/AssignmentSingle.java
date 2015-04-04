@@ -26,8 +26,8 @@ import evl.expression.reference.Reference;
  *
  * @author urs
  */
-final public class AssignmentSingle extends Assignment<Reference> {
-  private Reference left;
+final public class AssignmentSingle extends Assignment {
+  public Reference left;
 
   public AssignmentSingle(ElementInfo info, Reference left, Expression right) {
     super(info, right);
@@ -35,12 +35,7 @@ final public class AssignmentSingle extends Assignment<Reference> {
   }
 
   @Override
-  public Reference getLeft() {
-    return left;
+  public String toString() {
+    return left + " := " + right;
   }
-
-  public void setLeft(Reference left) {
-    this.left = left;
-  }
-
 }

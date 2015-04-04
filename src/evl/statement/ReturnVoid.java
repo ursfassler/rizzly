@@ -27,4 +27,9 @@ public class ReturnVoid extends Return {
   public ReturnVoid(ElementInfo info) {
     super(info);
   }
+
+  @Override
+  public String toString() {
+    return "return";
+  }
 }

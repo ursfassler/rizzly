@@ -112,8 +112,8 @@ public class CopyEvl extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitSubCallbacks(SubCallbacks obj, Void param) {
-    SubCallbacks ret = new SubCallbacks(obj.getInfo(), copy(obj.getCompUse()));
-    ret.getFunc().addAll(copy(obj.getFunc()));
+    SubCallbacks ret = new SubCallbacks(obj.getInfo(), copy(obj.compUse));
+    ret.func.addAll(copy(obj.func));
     return ret;
   }
 
@@ -149,12 +149,12 @@ public class CopyEvl extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitFuncReturnTuple(FuncReturnTuple obj, Void param) {
-    return new FuncReturnTuple(obj.getInfo(), copy(obj.getParam()));
+    return new FuncReturnTuple(obj.getInfo(), copy(obj.param));
   }
 
   @Override
   protected Evl visitFuncReturnType(FuncReturnType obj, Void param) {
-    return new FuncReturnType(obj.getInfo(), copy(obj.getType()));
+    return new FuncReturnType(obj.getInfo(), copy(obj.type));
   }
 
   @Override
@@ -171,24 +171,24 @@ public class CopyEvl extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitImplElementary(ImplElementary obj, Void param) {
-    ImplElementary ret = new ImplElementary(obj.getInfo(), obj.getName(), copy(obj.getEntryFunc()), copy(obj.getExitFunc()));
+    ImplElementary ret = new ImplElementary(obj.getInfo(), obj.getName(), copy(obj.entryFunc), copy(obj.exitFunc));
 
-    ret.getFunction().addAll(copy(obj.getFunction()));
-    ret.getIface().addAll(copy(obj.getIface()));
+    ret.function.addAll(copy(obj.function));
+    ret.iface.addAll(copy(obj.iface));
 
-    ret.setQueue(copy(obj.getQueue()));
-    ret.getType().addAll(copy(obj.getType()));
-    ret.getVariable().addAll(copy(obj.getVariable()));
-    ret.getConstant().addAll(copy(obj.getConstant()));
-    ret.getComponent().addAll(copy(obj.getComponent()));
-    ret.getSubCallback().addAll(copy(obj.getSubCallback()));
+    ret.queue = copy(obj.queue);
+    ret.type.addAll(copy(obj.type));
+    ret.variable.addAll(copy(obj.variable));
+    ret.constant.addAll(copy(obj.constant));
+    ret.component.addAll(copy(obj.component));
+    ret.subCallback.addAll(copy(obj.subCallback));
 
     return ret;
   }
 
   @Override
   protected StateItem visitTransition(Transition obj, Void param) {
-    return new Transition(obj.getInfo(), copy(obj.getSrc()), copy(obj.getDst()), copy(obj.getEventFunc()), copy(obj.getGuard()), copy(obj.getParam()), copy(obj.getBody()));
+    return new Transition(obj.getInfo(), copy(obj.src), copy(obj.dst), copy(obj.eventFunc), copy(obj.guard), copy(obj.param), copy(obj.body));
   }
 
   @Override
@@ -198,32 +198,32 @@ public class CopyEvl extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitIfOption(IfOption obj, Void param) {
-    return new IfOption(obj.getInfo(), copy(obj.getCondition()), copy(obj.getCode()));
+    return new IfOption(obj.getInfo(), copy(obj.condition), copy(obj.code));
   }
 
   @Override
   protected Evl visitCaseOpt(CaseOpt obj, Void param) {
-    return new CaseOpt(obj.getInfo(), copy(obj.getValue()), copy(obj.getCode()));
+    return new CaseOpt(obj.getInfo(), copy(obj.value), copy(obj.code));
   }
 
   @Override
   protected Evl visitCaseOptValue(CaseOptValue obj, Void param) {
-    return new CaseOptValue(obj.getInfo(), copy(obj.getValue()));
+    return new CaseOptValue(obj.getInfo(), copy(obj.value));
   }
 
   @Override
   protected Evl visitCaseOptRange(CaseOptRange obj, Void param) {
-    return new CaseOptRange(obj.getInfo(), copy(obj.getStart()), copy(obj.getEnd()));
+    return new CaseOptRange(obj.getInfo(), copy(obj.start), copy(obj.end));
   }
 
   @Override
   protected Evl visitNamedElement(NamedElement obj, Void param) {
-    return new NamedElement(obj.getInfo(), obj.getName(), copy(obj.getRef()));
+    return new NamedElement(obj.getInfo(), obj.getName(), copy(obj.ref));
   }
 
   @Override
   protected Evl visitNamedValue(NamedValue obj, Void param) {
-    return new NamedValue(obj.getInfo(), obj.getName(), copy(obj.getValue()));
+    return new NamedValue(obj.getInfo(), obj.name, copy(obj.value));
   }
 
 }

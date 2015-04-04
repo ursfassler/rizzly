@@ -66,8 +66,8 @@ public class RefTypeChecker extends NullTraverser<Type, Type> {
 
   @Override
   protected Type visitReference(Reference obj, Type param) {
-    Type ret = kt.get(obj.getLink());
-    for (RefItem ref : obj.getOffset()) {
+    Type ret = kt.get(obj.link);
+    for (RefItem ref : obj.offset) {
       ret = visit(ref, ret);
       assert (ret != null);
     }
@@ -77,20 +77,20 @@ public class RefTypeChecker extends NullTraverser<Type, Type> {
   @Override
   protected Type visitRefCall(RefCall obj, Type sub) {
     if (sub instanceof FunctionType) {
-      EvlList<SimpleRef<Type>> arg = ((FunctionType) sub).getArg();
-      EvlList<Expression> argval = obj.getActualParameter().getValue();
+      EvlList<SimpleRef<Type>> arg = ((FunctionType) sub).arg;
+      EvlList<Expression> argval = obj.actualParameter.value;
       if (arg.size() != argval.size()) {
         RError.err(ErrorType.Error, obj.getInfo(), "Need " + arg.size() + " arguments, got " + argval.size());
         return null;
       }
       for (int i = 0; i < arg.size(); i++) {
-        Type partype = arg.get(i).getLink();
+        Type partype = arg.get(i).link;
         Type valtype = kt.get(argval.get(i));
         if (!kc.get(partype, valtype)) {
           RError.err(ErrorType.Error, argval.get(i).getInfo(), "Data type to big or incompatible (argument " + (i + 1) + ", " + partype.getName() + " := " + valtype.getName() + ")");
         }
       }
-      return ((FunctionType) sub).getRet().getLink();
+      return ((FunctionType) sub).ret.link;
     } else {
       RError.err(ErrorType.Error, obj.getInfo(), "Not a function: " + obj.toString());
       return null;
@@ -103,7 +103,7 @@ public class RefTypeChecker extends NullTraverser<Type, Type> {
       return sub;
     } else {
       KnowChild kc = kb.getEntry(KnowChild.class);
-      String name = obj.getName();
+      String name = obj.name;
       Evl etype = kc.find(sub, name);
       if (etype == null) {
         RError.err(ErrorType.Error, obj.getInfo(), "Child not found: " + name);
@@ -114,13 +114,13 @@ public class RefTypeChecker extends NullTraverser<Type, Type> {
 
   @Override
   protected Type visitRefIndex(RefIndex obj, Type sub) {
-    Type index = kt.get(obj.getIndex());
+    Type index = kt.get(obj.index);
     if (sub instanceof ArrayType) {
-      RangeType ait = kbi.getRangeType(((ArrayType) sub).getSize().intValue());
+      RangeType ait = kbi.getRangeType(((ArrayType) sub).size.intValue());
       if (!kc.get(ait, index)) {
         RError.err(ErrorType.Error, obj.getInfo(), "array index type is " + ait.getName() + ", got " + index.getName());
       }
-      return ((ArrayType) sub).getType().getLink();
+      return ((ArrayType) sub).type.link;
     } else {
       RError.err(ErrorType.Error, obj.getInfo(), "need array to index, got type: " + sub.getName());
       return null;

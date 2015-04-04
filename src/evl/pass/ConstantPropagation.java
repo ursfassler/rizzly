@@ -64,12 +64,12 @@ class ConstantPropagationWorker extends ExprReplacer<Void> {
 
   @Override
   protected Expression visitReference(Reference obj, Void param) {
-    if (obj.getLink() instanceof Constant) {
-      Constant constant = (Constant) obj.getLink();
-      Type type = constant.getType().getLink();
+    if (obj.link instanceof Constant) {
+      Constant constant = (Constant) obj.link;
+      Type type = constant.type.link;
       if (doReduce(type)) {
-        assert (obj.getOffset().isEmpty());
-        return Copy.copy(visit(constant.getDef(), null));
+        assert (obj.offset.isEmpty());
+        return Copy.copy(visit(constant.def, null));
       }
     }
     return super.visitReference(obj, param);

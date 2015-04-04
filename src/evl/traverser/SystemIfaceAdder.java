@@ -112,7 +112,7 @@ class SystemIfaceAdderWorker extends NullTraverser<Void, Void> {
   private Function makeFunc(ImplElementary obj, String name) {
     ElementInfo info = ElementInfo.NO;
     FuncCtrlInDataIn rfunc = new FuncCtrlInDataIn(info, name, new EvlList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
-    obj.getIface().add(rfunc);
+    obj.iface.add(rfunc);
     return rfunc;
   }
 
@@ -158,7 +158,7 @@ class SystemIfaceCaller extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitImplElementary(ImplElementary obj, Void param) {
-    EvlList<CompUse> compList = new EvlList<CompUse>(obj.getComponent());
+    EvlList<CompUse> compList = new EvlList<CompUse>(obj.component);
     // FIXME this order may cause errors as it is not granted to be topological
     // order
 
@@ -168,26 +168,26 @@ class SystemIfaceCaller extends NullTraverser<Void, Void> {
     {
       ArrayList<Statement> code = new ArrayList<Statement>();
       for (CompUse cuse : compList) {
-        Function sctor = getCtor(cuse.getLink());
+        Function sctor = getCtor(cuse.link);
         CallStmt call = makeCall(cuse, sctor);
         code.add(call);
       }
-      code.add(makeCall(obj.getEntryFunc().getLink()));
+      code.add(makeCall(obj.entryFunc.link));
 
-      ctor.getBody().getStatements().addAll(code);
+      ctor.body.statements.addAll(code);
     }
 
     {
       ArrayList<Statement> code = new ArrayList<Statement>();
-      code.add(makeCall(obj.getExitFunc().getLink()));
+      code.add(makeCall(obj.exitFunc.link));
       Collections.reverse(compList);
       for (CompUse cuse : compList) {
-        Function sdtor = getDtor(cuse.getLink());
+        Function sdtor = getDtor(cuse.link);
         CallStmt call = makeCall(cuse, sdtor);
         code.add(call);
       }
 
-      dtor.getBody().getStatements().addAll(code);
+      dtor.body.statements.addAll(code);
     }
 
     return null;
@@ -207,19 +207,19 @@ class SystemIfaceCaller extends NullTraverser<Void, Void> {
 
   private CallStmt makeCall(Function ref) {
     ElementInfo info = ElementInfo.NO;
-    assert (ref.getParam().isEmpty());
+    assert (ref.param.isEmpty());
     Reference call = new Reference(ref.getInfo(), ref);
-    call.getOffset().add(new RefCall(info, new TupleValue(info, new EvlList<Expression>())));
+    call.offset.add(new RefCall(info, new TupleValue(info, new EvlList<Expression>())));
     return new CallStmt(info, call);
   }
 
   @Deprecated
   private CallStmt makeCall(CompUse self, Function func) {
     ElementInfo info = ElementInfo.NO;
-    RError.ass(func.getParam().isEmpty(), func.getInfo(), "expected (de)constructor to have no parameter");
+    RError.ass(func.param.isEmpty(), func.getInfo(), "expected (de)constructor to have no parameter");
     Reference fref = new Reference(info, self);
-    fref.getOffset().add(new RefName(info, func.getName()));
-    fref.getOffset().add(new RefCall(info, new TupleValue(info, new EvlList<Expression>())));
+    fref.offset.add(new RefName(info, func.getName()));
+    fref.offset.add(new RefCall(info, new TupleValue(info, new EvlList<Expression>())));
     return new CallStmt(info, fref);
   }
 }

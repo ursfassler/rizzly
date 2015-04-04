@@ -71,11 +71,11 @@ class BitLogicCategorizerWorker extends ExprReplacer<KnowType> {
   @Override
   protected Expression visitBitXor(BitXor obj, KnowType param) {
     super.visitBitXor(obj, param);
-    Type lt = param.get(obj.getLeft());
-    Type rt = param.get(obj.getRight());
+    Type lt = param.get(obj.left);
+    Type rt = param.get(obj.right);
     assert ((lt instanceof BooleanType) == (rt instanceof BooleanType));
     if (lt instanceof BooleanType) {
-      return new Notequal(obj.getInfo(), obj.getLeft(), obj.getRight());
+      return new Notequal(obj.getInfo(), obj.left, obj.right);
     } else {
       return obj;
     }
@@ -84,44 +84,44 @@ class BitLogicCategorizerWorker extends ExprReplacer<KnowType> {
   @Override
   protected Expression visitAnd(And obj, KnowType param) {
     super.visitAnd(obj, param);
-    Type lt = param.get(obj.getLeft());
-    Type rt = param.get(obj.getRight());
+    Type lt = param.get(obj.left);
+    Type rt = param.get(obj.right);
     assert ((lt instanceof BooleanType) == (rt instanceof BooleanType));
     if (lt instanceof BooleanType) {
-      return new LogicAnd(obj.getInfo(), obj.getLeft(), obj.getRight());
+      return new LogicAnd(obj.getInfo(), obj.left, obj.right);
     } else {
-      return new BitAnd(obj.getInfo(), obj.getLeft(), obj.getRight());
+      return new BitAnd(obj.getInfo(), obj.left, obj.right);
     }
   }
 
   @Override
   protected Expression visitOr(Or obj, KnowType param) {
     super.visitOr(obj, param);
-    Type lt = param.get(obj.getLeft());
-    Type rt = param.get(obj.getRight());
+    Type lt = param.get(obj.left);
+    Type rt = param.get(obj.right);
     assert ((lt instanceof BooleanType) == (rt instanceof BooleanType));
     if (lt instanceof BooleanType) {
-      return new LogicOr(obj.getInfo(), obj.getLeft(), obj.getRight());
+      return new LogicOr(obj.getInfo(), obj.left, obj.right);
     } else {
-      return new BitOr(obj.getInfo(), obj.getLeft(), obj.getRight());
+      return new BitOr(obj.getInfo(), obj.left, obj.right);
     }
   }
 
   @Override
   protected Expression visitNot(Not obj, KnowType param) {
     super.visitNot(obj, param);
-    Type type = param.get(obj.getExpr());
+    Type type = param.get(obj.expr);
     if (type instanceof BooleanType) {
-      return new LogicNot(obj.getInfo(), obj.getExpr());
+      return new LogicNot(obj.getInfo(), obj.expr);
     } else if (type instanceof RangeType) {
-      Range range = ((RangeType) type).getNumbers();
+      Range range = ((RangeType) type).range;
       int bits = range.getHigh().bitCount();
       BigInteger exp = BigInteger.valueOf(2).pow(bits).subtract(BigInteger.ONE);
       if (!range.getLow().equals(BigInteger.ZERO) || !exp.equals(range.getHigh())) {
         RError.err(ErrorType.Error, obj.getInfo(), "not only allowed for R{0,2^n-1}");
         return null;
       }
-      return new BitNot(obj.getInfo(), obj.getExpr());
+      return new BitNot(obj.getInfo(), obj.expr);
     } else {
       RError.err(ErrorType.Error, obj.getInfo(), "not only implemented for boolean and range types");
       return null;

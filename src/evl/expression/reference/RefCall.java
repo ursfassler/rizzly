@@ -22,19 +22,11 @@ import common.ElementInfo;
 import evl.expression.TupleValue;
 
 final public class RefCall extends RefItem {
-  private TupleValue actualParameter;
+  final public TupleValue actualParameter;
 
   public RefCall(ElementInfo info, TupleValue actualParameter) {
     super(info);
     assert (actualParameter != null);
-    this.actualParameter = actualParameter;
-  }
-
-  public TupleValue getActualParameter() {
-    return actualParameter;
-  }
-
-  public void setActualParameter(TupleValue actualParameter) {
     this.actualParameter = actualParameter;
   }
 

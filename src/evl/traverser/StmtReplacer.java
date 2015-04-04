@@ -50,15 +50,15 @@ public class StmtReplacer<T> extends DefTraverser<List<Statement>, T> {
 
   @Override
   protected List<Statement> visitBlock(Block obj, T param) {
-    EvlList<Statement> oldStmt = new EvlList<Statement>(obj.getStatements());
-    obj.getStatements().clear();
+    EvlList<Statement> oldStmt = new EvlList<Statement>(obj.statements);
+    obj.statements.clear();
 
     for (Statement stmt : oldStmt) {
       List<Statement> retStmt = visit(stmt, param);
       if (retStmt == null) {
-        obj.getStatements().add(stmt);
+        obj.statements.add(stmt);
       } else {
-        obj.getStatements().addAll(retStmt);
+        obj.statements.addAll(retStmt);
       }
     }
     return null;

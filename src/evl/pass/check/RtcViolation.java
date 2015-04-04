@@ -55,7 +55,7 @@ public class RtcViolation extends EvlPass {
       List<ImplElementary> elemset = ClassGetter.get(ImplElementary.class, evl);
       for (ImplElementary elem : elemset) {
         SimpleGraph<Evl> cg = CallgraphMaker.make(elem, kb);
-        assert (elem.getComponent().isEmpty());
+        assert (elem.component.isEmpty());
         // TODO do we need to check here?
         // TODO check somewhere that slots and responses don't call slot and responses
         // checkRtcViolation(cg, 3, elem.getInfo());
@@ -64,7 +64,7 @@ public class RtcViolation extends EvlPass {
     {
       List<ImplComposition> elemset = ClassGetter.get(ImplComposition.class, evl);
       for (ImplComposition elem : elemset) {
-        SimpleGraph<CompUse> cg = makeCallgraph(elem.getConnection());
+        SimpleGraph<CompUse> cg = makeCallgraph(elem.connection);
         checkRtcViolation(cg, 2, elem.getInfo());
       }
     }
@@ -74,11 +74,11 @@ public class RtcViolation extends EvlPass {
   private static SimpleGraph<CompUse> makeCallgraph(List<Connection> connection) {
     SimpleGraph<CompUse> ret = new SimpleGraph<CompUse>();
     for (Connection con : connection) {
-      Endpoint src = con.getEndpoint(Direction.in);
-      Endpoint dst = con.getEndpoint(Direction.out);
+      Endpoint src = con.endpoint.get(Direction.in);
+      Endpoint dst = con.endpoint.get(Direction.out);
       if ((src instanceof EndpointSub) && (dst instanceof EndpointSub)) {
-        CompUse srcComp = ((EndpointSub) src).getLink();
-        CompUse dstComp = ((EndpointSub) dst).getLink();
+        CompUse srcComp = ((EndpointSub) src).link;
+        CompUse dstComp = ((EndpointSub) dst).link;
         ret.addVertex(srcComp);
         ret.addVertex(dstComp);
         ret.addEdge(srcComp, dstComp);

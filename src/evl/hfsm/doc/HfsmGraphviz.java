@@ -71,7 +71,7 @@ public class HfsmGraphviz extends DefTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitImplHfsm(ImplHfsm obj, StreamWriter param) {
-    visit(obj.getTopstate(), param);
+    visit(obj.topstate, param);
     return null;
   }
 
@@ -82,7 +82,7 @@ public class HfsmGraphviz extends DefTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitStateComposite(StateComposite obj, StreamWriter param) {
-    for (State child : obj.getItem().getItems(State.class)) {
+    for (State child : obj.item.getItems(State.class)) {
       wrEdge(obj, child, "", 1, param);
       visit(child, param);
     }
@@ -93,7 +93,7 @@ public class HfsmGraphviz extends DefTraverser<Void, StreamWriter> {
   protected Void visitState(State obj, StreamWriter param) {
     param.wr(getId(obj) + " [label=\"" + obj.getName() + "\"];");
     param.nl();
-    visitList(obj.getItem().getItems(Transition.class), param);
+    visitList(obj.item.getItems(Transition.class), param);
     return super.visitState(obj, param);
   }
 
@@ -123,7 +123,7 @@ public class HfsmGraphviz extends DefTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitTransition(Transition obj, StreamWriter param) {
-    wrEdge(obj.getSrc().getLink(), obj.getDst().getLink(), obj.getEventFunc().getLink().getName(), 0, param);
+    wrEdge(obj.src.link, obj.dst.link, obj.eventFunc.link.getName(), 0, param);
     return null;
   }
 

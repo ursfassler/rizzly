@@ -74,7 +74,7 @@ class RangeConverterWorker extends ExprReplacer<Void> {
   }
 
   private Expression replaceIfNeeded(Expression val, RangeType valType, RangeType commonType) {
-    if (Range.leftIsSmallerEqual(valType.getNumbers(), commonType.getNumbers())) {
+    if (Range.leftIsSmallerEqual(valType.range, commonType.range)) {
       val = new TypeCast(info, new SimpleRef<Type>(info, commonType), val);
     }
     return val;
@@ -84,8 +84,8 @@ class RangeConverterWorker extends ExprReplacer<Void> {
   protected Expression visitArithmeticOp(ArithmeticOp obj, Void param) {
     obj = (ArithmeticOp) super.visitArithmeticOp(obj, param);
 
-    Type lb = kt.get(obj.getLeft());
-    Type rb = kt.get(obj.getRight());
+    Type lb = kt.get(obj.left);
+    Type rb = kt.get(obj.right);
 
     if (isNotRange(lb, rb)) {
       return obj;
@@ -95,12 +95,12 @@ class RangeConverterWorker extends ExprReplacer<Void> {
     RangeType rt = (RangeType) rb;
     RangeType dt = (RangeType) kt.get(obj);
 
-    Range it = Range.grow(lt.getNumbers(), rt.getNumbers());
-    Range btr = Range.grow(it, dt.getNumbers());
+    Range it = Range.grow(lt.range, rt.range);
+    Range btr = Range.grow(it, dt.range);
     RangeType bt = kbi.getNumsetType(btr); // add bt to program
 
-    obj.setLeft(replaceIfNeeded(obj.getLeft(), lt, bt));
-    obj.setRight(replaceIfNeeded(obj.getRight(), rt, bt));
+    obj.left = replaceIfNeeded(obj.left, lt, bt);
+    obj.right = replaceIfNeeded(obj.right, rt, bt);
 
     // TODO reimplement downcast, but with different function than conversion
     // if (RangeType.isBigger(bt, dt)) {
@@ -116,8 +116,8 @@ class RangeConverterWorker extends ExprReplacer<Void> {
   protected Expression visitRelation(Relation obj, Void param) {
     obj = (Relation) super.visitRelation(obj, param);
 
-    Type lb = kt.get(obj.getLeft());
-    Type rb = kt.get(obj.getRight());
+    Type lb = kt.get(obj.left);
+    Type rb = kt.get(obj.right);
 
     if (isNotRange(lb, rb)) {
       return obj;
@@ -126,11 +126,11 @@ class RangeConverterWorker extends ExprReplacer<Void> {
     RangeType lt = (RangeType) lb;
     RangeType rt = (RangeType) rb;
 
-    Range it = Range.grow(lt.getNumbers(), rt.getNumbers());
+    Range it = Range.grow(lt.range, rt.range);
     RangeType bt = kbi.getNumsetType(it); // add bt to program
 
-    obj.setLeft(replaceIfNeeded(obj.getLeft(), lt, bt));
-    obj.setRight(replaceIfNeeded(obj.getRight(), rt, bt));
+    obj.left = replaceIfNeeded(obj.left, lt, bt);
+    obj.right = replaceIfNeeded(obj.right, rt, bt);
 
     return obj;
   }

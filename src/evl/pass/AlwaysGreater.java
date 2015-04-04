@@ -38,7 +38,7 @@ class AlwaysGreaterWorker extends ExprReplacer<Void> {
   private Range getRange(Expression expr) {
     Type type = kt.get(expr);
     if (type instanceof RangeType) {
-      return ((RangeType) type).getNumbers();
+      return ((RangeType) type).range;
     } else {
       return null;
     }
@@ -76,8 +76,8 @@ class AlwaysGreaterWorker extends ExprReplacer<Void> {
 
   @Override
   protected Expression visitLessequal(Lessequal obj, Void param) {
-    Range lr = getRange(obj.getLeft());
-    Range rr = getRange(obj.getRight());
+    Range lr = getRange(obj.left);
+    Range rr = getRange(obj.right);
 
     if ((lr != null) && (rr != null)) {
       if (lr.getHigh().compareTo(rr.getLow()) <= 0) {

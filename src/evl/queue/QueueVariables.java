@@ -71,7 +71,7 @@ class QueueVariables {
   }
 
   private int queueLength(ArrayType queueType) {
-    return queueType.getSize().intValue();
+    return queueType.size.intValue();
   }
 
   public StateVariable getQueue() {

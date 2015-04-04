@@ -27,18 +27,10 @@ import evl.expression.Expression;
  */
 public class ReturnExpr extends Return {
 
-  private Expression expr;
+  public Expression expr;
 
   public ReturnExpr(ElementInfo info, Expression expr) {
     super(info);
-    this.expr = expr;
-  }
-
-  public Expression getExpr() {
-    return expr;
-  }
-
-  public void setExpr(Expression expr) {
     this.expr = expr;
   }
 

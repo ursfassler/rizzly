@@ -49,33 +49,33 @@ public class CopyStatement extends NullTraverser<Statement, Void> {
   @Override
   protected Statement visitBlock(Block obj, Void param) {
     Block ret = new Block(obj.getInfo());
-    ret.getStatements().addAll(cast.copy(obj.getStatements()));
+    ret.statements.addAll(cast.copy(obj.statements));
     return ret;
   }
 
   @Override
   protected Statement visitVarDef(VarDefStmt obj, Void param) {
-    return new VarDefStmt(obj.getInfo(), cast.copy(obj.getVariable()));
+    return new VarDefStmt(obj.getInfo(), cast.copy(obj.variable));
   }
 
   @Override
   protected Statement visitAssignmentMulti(AssignmentMulti obj, Void param) {
-    return new AssignmentMulti(obj.getInfo(), cast.copy(obj.getLeft()), cast.copy(obj.getRight()));
+    return new AssignmentMulti(obj.getInfo(), cast.copy(obj.left), cast.copy(obj.right));
   }
 
   @Override
   protected Statement visitAssignmentSingle(AssignmentSingle obj, Void param) {
-    return new AssignmentSingle(obj.getInfo(), cast.copy(obj.getLeft()), cast.copy(obj.getRight()));
+    return new AssignmentSingle(obj.getInfo(), cast.copy(obj.left), cast.copy(obj.right));
   }
 
   @Override
   protected Statement visitCallStmt(CallStmt obj, Void param) {
-    return new CallStmt(obj.getInfo(), cast.copy(obj.getCall()));
+    return new CallStmt(obj.getInfo(), cast.copy(obj.call));
   }
 
   @Override
   protected Statement visitReturnExpr(ReturnExpr obj, Void param) {
-    return new ReturnExpr(obj.getInfo(), cast.copy(obj.getExpr()));
+    return new ReturnExpr(obj.getInfo(), cast.copy(obj.expr));
   }
 
   @Override
@@ -85,27 +85,27 @@ public class CopyStatement extends NullTraverser<Statement, Void> {
 
   @Override
   protected Statement visitCaseStmt(CaseStmt obj, Void param) {
-    return new CaseStmt(obj.getInfo(), cast.copy(obj.getCondition()), cast.copy(obj.getOption()), cast.copy(obj.getOtherwise()));
+    return new CaseStmt(obj.getInfo(), cast.copy(obj.condition), cast.copy(obj.option), cast.copy(obj.otherwise));
   }
 
   @Override
   protected Statement visitIfStmt(IfStmt obj, Void param) {
-    return new IfStmt(obj.getInfo(), cast.copy(obj.getOption()), cast.copy(obj.getDefblock()));
+    return new IfStmt(obj.getInfo(), cast.copy(obj.option), cast.copy(obj.defblock));
   }
 
   @Override
   protected Statement visitWhileStmt(WhileStmt obj, Void param) {
-    return new WhileStmt(obj.getInfo(), cast.copy(obj.getCondition()), cast.copy(obj.getBody()));
+    return new WhileStmt(obj.getInfo(), cast.copy(obj.condition), cast.copy(obj.body));
   }
 
   @Override
   protected Statement visitMsgPush(MsgPush obj, Void param) {
-    return new MsgPush(obj.getInfo(), cast.copy(obj.getQueue()), cast.copy(obj.getFunc()), cast.copy(obj.getData()));
+    return new MsgPush(obj.getInfo(), cast.copy(obj.queue), cast.copy(obj.func), cast.copy(obj.data));
   }
 
   @Override
   protected Statement visitForStmt(ForStmt obj, Void param) {
-    return new ForStmt(obj.getInfo(), cast.copy(obj.getIterator()), cast.copy(obj.getBlock()));
+    return new ForStmt(obj.getInfo(), cast.copy(obj.iterator), cast.copy(obj.block));
   }
 
 }

@@ -28,7 +28,7 @@ import evl.type.base.BaseType;
  *
  */
 final public class IntegerType extends BaseType {
-  public final static String NAME = "Integer";
+  final static public String NAME = "Integer";
 
   public IntegerType() {
     super(ElementInfo.NO, NAME);

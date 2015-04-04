@@ -22,7 +22,7 @@ import common.ElementInfo;
 import evl.type.base.BaseType;
 
 public class VoidType extends BaseType {
-  public static final String NAME = "Void";
+  final static public String NAME = "Void";
 
   public VoidType() {
     super(ElementInfo.NO, NAME);

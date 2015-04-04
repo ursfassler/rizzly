@@ -83,7 +83,7 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     param.add(size);
 
     FuncSubHandlerEvent func = new FuncSubHandlerEvent(info, Designator.NAME_SEP + "msgRecv", param, new FuncReturnNone(info), new Block(info));
-    func.setBody(new Block(info));
+    func.body = new Block(info);
     return func;
   }
 
@@ -110,7 +110,7 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     FuncVariable path = new FuncVariable(info, "path", new SimpleRef<Type>(info, arrayType));
     { // path : Array{D,N};
       VarDefStmt def = new VarDefStmt(info, path);
-      body.getStatements().add(def);
+      body.statements.add(def);
     }
 
     { // path[0] := func;
@@ -118,18 +118,18 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
       Reference left = new Reference(info, path, new RefIndex(info, new Number(info, BigInteger.ZERO)));
       Reference right = new Reference(info, func);
       Assignment ass = new AssignmentSingle(info, left, right);
-      body.getStatements().add(ass);
+      body.statements.add(ass);
     }
 
     { // _debug.msgSend( path, 1 );
       TupleValue actParam = new TupleValue(info);
-      actParam.getValue().add(new Reference(info, path));
-      actParam.getValue().add(new Number(info, BigInteger.valueOf(1)));
+      actParam.value.add(new Reference(info, path));
+      actParam.value.add(new Number(info, BigInteger.valueOf(1)));
 
       Reference call = new Reference(info, sendProto);
-      call.getOffset().add(new RefCall(info, actParam));
+      call.offset.add(new RefCall(info, actParam));
 
-      body.getStatements().add(new CallStmt(info, call));
+      body.statements.add(new CallStmt(info, call));
     }
 
     EvlList<FuncVariable> param = new EvlList<FuncVariable>();
@@ -179,11 +179,11 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
 
     { // Self._debug.sendMsg( sender, sizeP1 );
       TupleValue actParam = new TupleValue(info);
-      actParam.getValue().add(new Reference(info, pArray));
-      actParam.getValue().add(new Reference(info, sizeP1));
+      actParam.value.add(new Reference(info, pArray));
+      actParam.value.add(new Reference(info, sizeP1));
 
       Reference call = new Reference(info, proto);
-      call.getOffset().add(new RefCall(info, actParam));
+      call.offset.add(new RefCall(info, actParam));
 
       code.add(new CallStmt(info, call));
     }
@@ -195,34 +195,34 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
   protected Void visitImplElementary(ImplElementary obj, Void param) {
 
     FuncCtrlOutDataOut sendProto = makeMsg(Designator.NAME_SEP + "msgSend", "sender");
-    obj.getIface().add(sendProto);
+    obj.iface.add(sendProto);
     FuncCtrlOutDataOut recvProto = makeMsg(Designator.NAME_SEP + "msgRecv", "receiver");
-    obj.getIface().add(recvProto);
+    obj.iface.add(recvProto);
 
     FuncPrivateVoid debugSend = makeDebugSend("iMsgSend", sendProto);
     FuncPrivateVoid debugRecv = makeDebugSend("iMsgRecv", recvProto);
-    obj.getFunction().add(debugSend);
-    obj.getFunction().add(debugRecv);
+    obj.function.add(debugSend);
+    obj.function.add(debugRecv);
 
     EventSendDebugCallAdder.process(obj, names, debugSend);
     EventRecvDebugCallAdder.process(obj, names, debugRecv);
 
     {// add callback
 
-      for (CompUse use : obj.getComponent()) {
+      for (CompUse use : obj.component) {
 
         {
           FuncSubHandlerEvent recv = makeRecvProto(sizeType);
-          List<Statement> body = makeCode(recv.getName(), recv.getParam().get(0), recv.getParam().get(1), recvProto, use.getName());
-          recv.getBody().getStatements().addAll(body);
-          obj.getSubCallback(use).getFunc().add(recv);
+          List<Statement> body = makeCode(recv.getName(), recv.param.get(0), recv.param.get(1), recvProto, use.getName());
+          recv.body.statements.addAll(body);
+          obj.getSubCallback(use).func.add(recv);
         }
 
         {
           FuncSubHandlerEvent send = makeSendProto(sizeType);
-          List<Statement> body = makeCode(send.getName(), send.getParam().get(0), send.getParam().get(1), sendProto, use.getName());
-          send.getBody().getStatements().addAll(body);
-          obj.getSubCallback(use).getFunc().add(send);
+          List<Statement> body = makeCode(send.getName(), send.param.get(0), send.param.get(1), sendProto, use.getName());
+          send.body.statements.addAll(body);
+          obj.getSubCallback(use).func.add(send);
         }
       }
     }

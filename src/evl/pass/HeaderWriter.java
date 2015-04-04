@@ -85,10 +85,10 @@ public class HeaderWriter extends EvlPass {
     Set<Evl> anchor = new HashSet<Evl>();
     for (Function func : prg.getItems(Function.class, false)) {
       if (Boolean.TRUE.equals(func.properties().get(Property.Public))) {
-        for (FuncVariable arg : func.getParam()) {
-          anchor.add(arg.getType().getLink());
+        for (FuncVariable arg : func.param) {
+          anchor.add(arg.type.link);
         }
-        anchor.add(func.getRet());
+        anchor.add(func.ret);
 
         ret.add(func);
       }
@@ -113,7 +113,7 @@ public class HeaderWriter extends EvlPass {
 
     Namespace cpy = Copy.copy(ret);
     for (Function func : cpy.getItems(Function.class, false)) {
-      func.getBody().getStatements().clear();
+      func.body.statements.clear();
     }
 
     toposort(cpy.getChildren());
@@ -171,8 +171,8 @@ public class HeaderWriter extends EvlPass {
 
       @Override
       protected Void visitBaseRef(BaseRef obj, Set<Type> param) {
-        if (obj.getLink() instanceof Type) {
-          param.add((Type) obj.getLink());
+        if (obj.link instanceof Type) {
+          param.add((Type) obj.link);
         }
         return super.visitBaseRef(obj, param);
       }

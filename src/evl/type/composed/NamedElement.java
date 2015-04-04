@@ -26,7 +26,7 @@ import evl.type.Type;
 
 final public class NamedElement extends EvlBase implements Named {
   private String name;
-  final private SimpleRef<Type> ref;
+  final public SimpleRef<Type> ref;
 
   public NamedElement(ElementInfo info, String name, SimpleRef<Type> ref) {
     super(info);
@@ -42,10 +42,6 @@ final public class NamedElement extends EvlBase implements Named {
   @Override
   public void setName(String name) {
     this.name = name;
-  }
-
-  public SimpleRef<Type> getRef() {
-    return ref;
   }
 
   @Override

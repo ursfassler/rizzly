@@ -40,8 +40,8 @@ public class Relinker extends DefTraverser<Void, Map<? extends Named, ? extends 
 
   @Override
   protected Void visitBaseRef(BaseRef obj, Map<? extends Named, ? extends Named> param) {
-    if (param.containsKey(obj.getLink())) {
-      obj.setLink(param.get(obj.getLink()));
+    if (param.containsKey(obj.link)) {
+      obj.link = param.get(obj.link);
     }
     return super.visitBaseRef(obj, param);
   }
