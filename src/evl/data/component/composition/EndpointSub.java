@@ -31,7 +31,7 @@ final public class EndpointSub extends Endpoint<CompUse> {
 
   @Override
   public Function getFunc() {
-    return (Function) link.instance.link.iface.find(function);
+    return (Function) link.instref.link.iface.find(function);
   }
 
   @Override

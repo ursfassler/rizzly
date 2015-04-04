@@ -248,7 +248,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitCompUse(CompUse obj, Void param) {
-    return visit(obj.instance, param);
+    return visit(obj.instref, param);
   }
 
   @Override

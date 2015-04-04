@@ -19,6 +19,7 @@ package evl.pass.check;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import pass.EvlPass;
@@ -90,7 +91,7 @@ public class RtcViolation extends EvlPass {
   private static void checkRtcViolation(SimpleGraph<CompUse> cg, int n, ElementInfo info) {
     GraphHelper.doTransitiveClosure(cg);
     ArrayList<CompUse> vs = new ArrayList<CompUse>(cg.vertexSet());
-    Collections.sort(vs);
+    Collections.sort(vs, nameComparator());
     EvlList<CompUse> erritems = new EvlList<CompUse>();
     for (CompUse v : cg.vertexSet()) {
       if (cg.containsEdge(v, v)) {
@@ -98,7 +99,7 @@ public class RtcViolation extends EvlPass {
       }
     }
     if (!erritems.isEmpty()) {
-      Collections.sort(erritems);
+      Collections.sort(erritems, nameComparator());
       for (CompUse v : erritems) {
         RError.err(ErrorType.Hint, v.getInfo(), "Involved component: " + v.name);
       }
@@ -106,4 +107,12 @@ public class RtcViolation extends EvlPass {
     }
   }
 
+  private static Comparator<CompUse> nameComparator() {
+    return new Comparator<CompUse>() {
+      @Override
+      public int compare(CompUse left, CompUse right) {
+        return left.name.compareTo(right.name);
+      }
+    };
+  }
 }

@@ -172,7 +172,7 @@ class KnowChildTraverser extends NullTraverser<Set<Evl>, String> {
 
   @Override
   protected Set<Evl> visitCompUse(CompUse obj, String param) {
-    return visit(obj.instance, param);
+    return visit(obj.instref, param);
   }
 
   @Override

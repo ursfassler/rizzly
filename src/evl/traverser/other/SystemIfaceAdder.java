@@ -168,7 +168,7 @@ class SystemIfaceCaller extends NullTraverser<Void, Void> {
     {
       ArrayList<Statement> code = new ArrayList<Statement>();
       for (CompUse cuse : compList) {
-        Function sctor = getCtor(cuse.instance.link);
+        Function sctor = getCtor(cuse.instref.link);
         CallStmt call = makeCall(cuse, sctor);
         code.add(call);
       }
@@ -182,7 +182,7 @@ class SystemIfaceCaller extends NullTraverser<Void, Void> {
       code.add(makeCall(obj.exitFunc.link));
       Collections.reverse(compList);
       for (CompUse cuse : compList) {
-        Function sdtor = getDtor(cuse.instance.link);
+        Function sdtor = getDtor(cuse.instref.link);
         CallStmt call = makeCall(cuse, sdtor);
         code.add(call);
       }

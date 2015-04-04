@@ -249,7 +249,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     name(obj, param);
     wrId(obj, param);
     param.wr(": ");
-    wrId(obj.instance, param);
+    wrId(obj.instref, param);
     param.wr(";");
     param.nl();
     return null;

@@ -22,25 +22,13 @@ import common.ElementInfo;
 import evl.data.Named;
 import evl.data.component.Component;
 import evl.data.expression.reference.BaseRef;
-import evl.data.expression.reference.SimpleRef;
 
-public class CompUse extends Named implements Comparable<CompUse> {
-  final public BaseRef<Component> instance;
+public class CompUse extends Named {
+  final public BaseRef<Component> instref;
 
-  public CompUse(ElementInfo info, String name, BaseRef<Component> instance) {
+  public CompUse(ElementInfo info, String name, BaseRef<Component> instref) {
     super(info, name);
-    this.instance = instance;
-  }
-
-  @Deprecated
-  public CompUse(ElementInfo info, Component link, String name) {
-    super(info, name);
-    instance = new SimpleRef(info, link);
-  }
-
-  @Override
-  public int compareTo(CompUse o) {
-    return name.compareTo(o.name);
+    this.instref = instref;
   }
 
 }

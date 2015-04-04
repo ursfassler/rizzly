@@ -794,7 +794,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitCompUse(CompUse obj, P param) {
-    visit(obj.instance, param);
+    visit(obj.instref, param);
     return null;
   }
 

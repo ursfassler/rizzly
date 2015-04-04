@@ -156,7 +156,7 @@ class CompInterfaceTypeCheckerWorker extends NullTraverser<Void, Void> {
   }
 
   private Component checkIface(ImplComposition obj, CompUse use, Direction dir) {
-    Component type = use.instance.link;
+    Component type = use.instref.link;
     for (InterfaceFunction ifaceuse : type.getIface(dir)) {
       if (!ifaceIsConnected(use, ifaceuse, dir.other(), obj.connection)) {
         ErrorType etype;

@@ -56,7 +56,7 @@ public class Instantiation extends EvlPass {
     CompUse instComp = kb.getRootComp();
     evl.children.remove(instComp);
 
-    ImplElementary env = makeEnv(instComp.instance.link, kb);
+    ImplElementary env = makeEnv(instComp.instref.link, kb);
     evl.children.add(env);
 
     CompInstantiatorWorker instantiator = new CompInstantiatorWorker();
@@ -70,7 +70,7 @@ public class Instantiation extends EvlPass {
     Set<Evl> pubfunc = new HashSet<Evl>();
     pubfunc.addAll(inst.subCallback);
     RError.ass(inst.component.size() == 1, inst.getInfo(), "Only expected one instance");
-    pubfunc.addAll(inst.component.get(0).instance.link.iface);
+    pubfunc.addAll(inst.component.get(0).instref.link.iface);
 
     for (Evl nam : pubfunc) {
       nam.properties().put(Property.Public, true);
@@ -91,7 +91,7 @@ public class Instantiation extends EvlPass {
     for (CompUse compu : env.component) {
       SubCallbacks suc = new SubCallbacks(compu.getInfo(), new SimpleRef<CompUse>(ElementInfo.NO, compu));
       env.subCallback.add(suc);
-      for (InterfaceFunction out : compu.instance.link.getIface(Direction.out)) {
+      for (InterfaceFunction out : compu.instref.link.getIface(Direction.out)) {
         Function suha = CompositionReduction.makeHandler((Function) out);
         suha.properties().put(Property.Extern, true);
         suha.properties().put(Property.Public, true);
@@ -131,12 +131,12 @@ class CompInstantiatorWorker extends NullTraverser<ImplElementary, Namespace> {
     // ns.getChildren().removeAll(ns.getChildren().getItems(FuncCtrlOutDataOut.class));
 
     for (CompUse compUse : inst.component) {
-      Component comp = compUse.instance.link;
+      Component comp = compUse.instref.link;
 
       // copy / instantiate used component
       Namespace usens = new Namespace(compUse.getInfo(), compUse.name);
       ImplElementary cpy = visit(comp, usens);
-      compUse.instance.link = cpy;
+      compUse.instref.link = cpy;
       ns.children.add(usens);
       linkmap.put(compUse, usens);
 

@@ -229,7 +229,7 @@ public class CopyEvl extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitCompUse(CompUse obj, Void param) {
-    return new CompUse(obj.getInfo(), obj.name, copy(obj.instance)); // we keep link to old type
+    return new CompUse(obj.getInfo(), obj.name, copy(obj.instref)); // we keep link to old type
   }
 
 }

@@ -160,7 +160,7 @@ class CompositionReductionWorker extends NullTraverser<Evl, Void> {
     for (CompUse compu : obj.component) {
       SubCallbacks suc = new SubCallbacks(compu.getInfo(), new SimpleRef<CompUse>(info, compu));
       elem.subCallback.add(suc);
-      for (InterfaceFunction out : compu.instance.link.getIface(Direction.out)) {
+      for (InterfaceFunction out : compu.instref.link.getIface(Direction.out)) {
         Function suha = CompositionReduction.makeHandler((Function) out);
         suc.func.add(suha);
         coca.put(new Pair<CompUse, Function>(compu, (Function) out), suha);
@@ -188,7 +188,7 @@ class CompositionReductionWorker extends NullTraverser<Evl, Void> {
         }
       } else {
         CompUse srcComp = ((EndpointSub) src).link;
-        InterfaceFunction funa = srcComp.instance.link.iface.find(((EndpointSub) src).function);
+        InterfaceFunction funa = srcComp.instref.link.iface.find(((EndpointSub) src).function);
         Function coniface = (Function) funa;
 
         Function suha = coca.get(new Pair<CompUse, Function>(srcComp, coniface));
@@ -282,7 +282,7 @@ class CompositionReductionWorker extends NullTraverser<Evl, Void> {
     Reference ref;
     if (ep instanceof EndpointSub) {
       ref = new Reference(ep.getInfo(), ((EndpointSub) ep).link);
-      Queue queue = ((EndpointSub) ep).link.instance.link.queue;
+      Queue queue = ((EndpointSub) ep).link.instref.link.queue;
       ref.offset.add(new RefName(info, queue.name));
     } else {
       ref = new Reference(ep.getInfo(), comp.queue);

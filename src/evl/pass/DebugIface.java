@@ -78,7 +78,7 @@ public class DebugIface extends EvlPass {
 
     FuncCtrlInDataOut func = makeNameGetter("DebugName", symNameSizeType, names, stringType);
     func.properties().put(Property.Public, true);
-    kb.getRootComp().instance.link.function.add(func);
+    kb.getRootComp().instref.link.function.add(func);
   }
 
   private static FuncCtrlInDataOut makeNameGetter(String funcName, RangeType nameSizeType, ArrayList<String> names, StringType stringType) {
