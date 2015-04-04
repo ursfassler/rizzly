@@ -22,17 +22,17 @@ import java.util.ArrayList;
 
 import common.ElementInfo;
 
-import evl.DefTraverser;
-import evl.Evl;
-import evl.expression.Number;
-import evl.expression.TupleValue;
-import evl.expression.reference.RefCall;
-import evl.expression.reference.Reference;
-import evl.function.Function;
-import evl.function.header.FuncCtrlInDataIn;
-import evl.function.header.FuncCtrlInDataOut;
-import evl.function.header.FuncPrivateVoid;
-import evl.statement.CallStmt;
+import evl.data.Evl;
+import evl.data.expression.Number;
+import evl.data.expression.TupleValue;
+import evl.data.expression.reference.RefCall;
+import evl.data.expression.reference.Reference;
+import evl.data.function.Function;
+import evl.data.function.header.FuncCtrlInDataIn;
+import evl.data.function.header.FuncCtrlInDataOut;
+import evl.data.function.header.FuncPrivateVoid;
+import evl.data.statement.CallStmt;
+import evl.traverser.DefTraverser;
 
 /**
  * Inserts a message call whenever an event is received

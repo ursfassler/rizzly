@@ -24,29 +24,29 @@ import pass.EvlPass;
 
 import common.ElementInfo;
 
-import evl.expression.BoolValue;
-import evl.expression.Number;
-import evl.expression.binop.Less;
-import evl.expression.binop.Plus;
-import evl.expression.reference.Reference;
-import evl.expression.reference.SimpleRef;
+import evl.data.EvlList;
+import evl.data.Namespace;
+import evl.data.expression.BoolValue;
+import evl.data.expression.Number;
+import evl.data.expression.binop.Less;
+import evl.data.expression.binop.Plus;
+import evl.data.expression.reference.Reference;
+import evl.data.expression.reference.SimpleRef;
+import evl.data.statement.AssignmentSingle;
+import evl.data.statement.Block;
+import evl.data.statement.ForStmt;
+import evl.data.statement.IfOption;
+import evl.data.statement.IfStmt;
+import evl.data.statement.Statement;
+import evl.data.statement.VarDefStmt;
+import evl.data.statement.WhileStmt;
+import evl.data.type.Type;
+import evl.data.type.base.RangeType;
+import evl.data.variable.FuncVariable;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowUniqueName;
 import evl.knowledge.KnowledgeBase;
-import evl.other.EvlList;
-import evl.other.Namespace;
-import evl.statement.AssignmentSingle;
-import evl.statement.Block;
-import evl.statement.ForStmt;
-import evl.statement.IfOption;
-import evl.statement.IfStmt;
-import evl.statement.Statement;
-import evl.statement.VarDefStmt;
-import evl.statement.WhileStmt;
-import evl.traverser.StmtReplacer;
-import evl.type.Type;
-import evl.type.base.RangeType;
-import evl.variable.FuncVariable;
+import evl.traverser.other.StmtReplacer;
 
 /**
  * Replaces for loops with while loops

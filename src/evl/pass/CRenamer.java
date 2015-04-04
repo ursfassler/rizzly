@@ -21,12 +21,12 @@ import pass.EvlPass;
 
 import common.Designator;
 
-import evl.DefTraverser;
-import evl.Evl;
-import evl.expression.reference.RefName;
+import evl.data.Evl;
+import evl.data.Named;
+import evl.data.Namespace;
+import evl.data.expression.reference.RefName;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Named;
-import evl.other.Namespace;
+import evl.traverser.DefTraverser;
 
 //TODO how to ensure that names are unique?
 //TODO merge with Renamer?

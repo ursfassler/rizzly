@@ -19,19 +19,19 @@ package evl.pass.check.type;
 
 import java.math.BigInteger;
 
-import evl.Evl;
-import evl.NullTraverser;
+import evl.data.Evl;
+import evl.data.type.Type;
+import evl.data.type.base.BooleanType;
+import evl.data.type.base.EnumType;
+import evl.data.type.base.RangeType;
+import evl.data.type.composed.RecordType;
+import evl.data.type.composed.UnionType;
+import evl.data.type.composed.UnsafeUnionType;
+import evl.data.type.special.NaturalType;
+import evl.data.type.special.VoidType;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
-import evl.type.Type;
-import evl.type.base.BooleanType;
-import evl.type.base.EnumType;
-import evl.type.base.RangeType;
-import evl.type.composed.RecordType;
-import evl.type.composed.UnionType;
-import evl.type.composed.UnsafeUnionType;
-import evl.type.special.NaturalType;
-import evl.type.special.VoidType;
+import evl.traverser.NullTraverser;
 
 public class Supertype extends NullTraverser<Type, Void> {
   private KnowBaseItem kbi;

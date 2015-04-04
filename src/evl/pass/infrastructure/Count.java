@@ -21,10 +21,10 @@ import java.util.HashMap;
 import java.util.Map;
 
 import pass.EvlPass;
-import evl.DefTraverser;
-import evl.Evl;
+import evl.data.Evl;
+import evl.data.Namespace;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
+import evl.traverser.DefTraverser;
 
 public class Count extends EvlPass {
 

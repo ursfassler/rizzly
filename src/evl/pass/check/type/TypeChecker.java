@@ -18,21 +18,21 @@
 package evl.pass.check.type;
 
 import pass.EvlPass;
-import evl.DefTraverser;
-import evl.Evl;
-import evl.composition.ImplComposition;
-import evl.expression.Expression;
-import evl.function.Function;
-import evl.hfsm.ImplHfsm;
+import evl.data.Evl;
+import evl.data.Namespace;
+import evl.data.component.composition.ImplComposition;
+import evl.data.component.elementary.ImplElementary;
+import evl.data.component.hfsm.ImplHfsm;
+import evl.data.expression.Expression;
+import evl.data.function.Function;
+import evl.data.type.Type;
+import evl.data.type.base.EnumType;
+import evl.data.variable.Variable;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
-import evl.other.ImplElementary;
-import evl.other.Namespace;
 import evl.pass.check.type.specific.ExpressionTypeChecker;
 import evl.pass.check.type.specific.StatementTypeChecker;
-import evl.type.Type;
-import evl.type.base.EnumType;
-import evl.variable.Variable;
+import evl.traverser.DefTraverser;
 
 public class TypeChecker extends EvlPass {
   static public void process(Evl evl, KnowledgeBase kb) {

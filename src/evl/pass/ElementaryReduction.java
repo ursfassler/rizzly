@@ -27,20 +27,20 @@ import common.ElementInfo;
 import error.ErrorType;
 import error.RError;
 import evl.copy.Relinker;
-import evl.expression.reference.SimpleRef;
-import evl.function.Function;
-import evl.function.header.FuncCtrlInDataIn;
-import evl.function.header.FuncCtrlInDataOut;
+import evl.data.EvlList;
+import evl.data.Named;
+import evl.data.Namespace;
+import evl.data.component.elementary.ImplElementary;
+import evl.data.expression.reference.SimpleRef;
+import evl.data.function.Function;
+import evl.data.function.header.FuncCtrlInDataIn;
+import evl.data.function.header.FuncCtrlInDataOut;
+import evl.data.type.Type;
+import evl.data.type.base.TupleType;
+import evl.data.variable.FuncVariable;
 import evl.knowledge.KnowLeftIsContainerOfRight;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
-import evl.other.EvlList;
-import evl.other.ImplElementary;
-import evl.other.Named;
-import evl.other.Namespace;
-import evl.type.Type;
-import evl.type.base.TupleType;
-import evl.variable.FuncVariable;
 
 /**
  * Checks and moves the implementation of the slot and response to the interface

@@ -23,11 +23,11 @@ import java.util.Set;
 import pass.EvlPass;
 import error.ErrorType;
 import error.RError;
-import evl.DefTraverser;
-import evl.Evl;
-import evl.expression.reference.BaseRef;
+import evl.data.Evl;
+import evl.data.Namespace;
+import evl.data.expression.reference.BaseRef;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
+import evl.traverser.DefTraverser;
 
 public class LinkTargetExists extends EvlPass {
 

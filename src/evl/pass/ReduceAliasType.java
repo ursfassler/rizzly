@@ -23,12 +23,12 @@ import java.util.List;
 import pass.EvlPass;
 import error.ErrorType;
 import error.RError;
-import evl.DefTraverser;
-import evl.expression.reference.BaseRef;
+import evl.data.Named;
+import evl.data.Namespace;
+import evl.data.expression.reference.BaseRef;
+import evl.data.type.out.AliasType;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Named;
-import evl.other.Namespace;
-import evl.type.out.AliasType;
+import evl.traverser.DefTraverser;
 
 public class ReduceAliasType extends EvlPass {
 

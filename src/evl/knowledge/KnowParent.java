@@ -25,10 +25,10 @@ import common.Designator;
 
 import error.ErrorType;
 import error.RError;
-import evl.DefTraverser;
-import evl.Evl;
-import evl.other.Named;
-import evl.type.base.EnumElement;
+import evl.data.Evl;
+import evl.data.Named;
+import evl.data.type.base.EnumElement;
+import evl.traverser.DefTraverser;
 
 /**
  * Knows the parent of most objects

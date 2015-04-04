@@ -18,26 +18,26 @@ package evl.pass.check.type.specific;
 
 import error.ErrorType;
 import error.RError;
-import evl.Evl;
-import evl.NullTraverser;
-import evl.expression.Expression;
-import evl.expression.reference.RefCall;
-import evl.expression.reference.RefIndex;
-import evl.expression.reference.RefItem;
-import evl.expression.reference.RefName;
-import evl.expression.reference.Reference;
-import evl.expression.reference.SimpleRef;
+import evl.data.Evl;
+import evl.data.EvlList;
+import evl.data.expression.Expression;
+import evl.data.expression.reference.RefCall;
+import evl.data.expression.reference.RefIndex;
+import evl.data.expression.reference.RefItem;
+import evl.data.expression.reference.RefName;
+import evl.data.expression.reference.Reference;
+import evl.data.expression.reference.SimpleRef;
+import evl.data.type.Type;
+import evl.data.type.base.ArrayType;
+import evl.data.type.base.EnumType;
+import evl.data.type.base.FunctionType;
+import evl.data.type.base.RangeType;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowChild;
 import evl.knowledge.KnowLeftIsContainerOfRight;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
-import evl.other.EvlList;
-import evl.type.Type;
-import evl.type.base.ArrayType;
-import evl.type.base.EnumType;
-import evl.type.base.FunctionType;
-import evl.type.base.RangeType;
+import evl.traverser.NullTraverser;
 
 //TODO check if this class does not too much (i.e. check and return type)
 public class RefTypeChecker extends NullTraverser<Type, Type> {

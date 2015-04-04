@@ -19,11 +19,11 @@ package fun.toevl;
 
 import error.ErrorType;
 import error.RError;
-import evl.expression.Expression;
-import evl.expression.reference.Reference;
-import evl.other.EvlList;
-import evl.statement.Statement;
-import evl.variable.FuncVariable;
+import evl.data.EvlList;
+import evl.data.expression.Expression;
+import evl.data.expression.reference.Reference;
+import evl.data.statement.Statement;
+import evl.data.variable.FuncVariable;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.statement.Assignment;
@@ -56,7 +56,7 @@ public class FunToEvlStmt extends NullTraverser<Statement, Void> {
 
   @Override
   protected Statement visitBlock(Block obj, Void param) {
-    evl.statement.Block block = new evl.statement.Block(obj.getInfo());
+    evl.data.statement.Block block = new evl.data.statement.Block(obj.getInfo());
     for (fun.statement.Statement stmt : obj.getStatements()) {
       block.statements.add((Statement) fta.visit(stmt, null));
     }
@@ -71,68 +71,68 @@ public class FunToEvlStmt extends NullTraverser<Statement, Void> {
         return null;
       }
       case 1: {
-        return new evl.statement.AssignmentSingle(obj.getInfo(), (Reference) fta.traverse(obj.getLeft().get(0), null), (Expression) fta.traverse(obj.getRight(), null));
+        return new evl.data.statement.AssignmentSingle(obj.getInfo(), (Reference) fta.traverse(obj.getLeft().get(0), null), (Expression) fta.traverse(obj.getRight(), null));
       }
       default: {
         EvlList<Reference> lhs = new EvlList<Reference>();
         for (fun.expression.reference.Reference lv : obj.getLeft()) {
-          Reference er = (evl.expression.reference.Reference) fta.traverse(lv, null);
+          Reference er = (evl.data.expression.reference.Reference) fta.traverse(lv, null);
           lhs.add(er);
         }
-        return new evl.statement.AssignmentMulti(obj.getInfo(), lhs, (Expression) fta.traverse(obj.getRight(), null));
+        return new evl.data.statement.AssignmentMulti(obj.getInfo(), lhs, (Expression) fta.traverse(obj.getRight(), null));
       }
     }
   }
 
   @Override
   protected Statement visitReturnExpr(ReturnExpr obj, Void param) {
-    return new evl.statement.ReturnExpr(obj.getInfo(), (Expression) fta.traverse(obj.getExpr(), null));
+    return new evl.data.statement.ReturnExpr(obj.getInfo(), (Expression) fta.traverse(obj.getExpr(), null));
   }
 
   @Override
   protected Statement visitReturnVoid(ReturnVoid obj, Void param) {
-    return new evl.statement.ReturnVoid(obj.getInfo());
+    return new evl.data.statement.ReturnVoid(obj.getInfo());
   }
 
   @Override
   protected Statement visitVarDefStmt(VarDefStmt obj, Void param) {
     RError.ass(obj.getVariable().size() == 1, obj.getInfo(), "expected exactly 1 variable, got " + obj.getVariable().size());
     FuncVariable var = (FuncVariable) fta.traverse(obj.getVariable().get(0), null);
-    return new evl.statement.VarDefStmt(obj.getInfo(), var);
+    return new evl.data.statement.VarDefStmt(obj.getInfo(), var);
   }
 
   @Override
   protected Statement visitWhile(While obj, Void param) {
-    return new evl.statement.WhileStmt(obj.getInfo(), (Expression) fta.traverse(obj.getCondition(), null), (evl.statement.Block) fta.visit(obj.getBody(), null));
+    return new evl.data.statement.WhileStmt(obj.getInfo(), (Expression) fta.traverse(obj.getCondition(), null), (evl.data.statement.Block) fta.visit(obj.getBody(), null));
   }
 
   @Override
   protected Statement visitCallStmt(CallStmt obj, Void param) {
-    return new evl.statement.CallStmt(obj.getInfo(), (Reference) fta.traverse(obj.getCall(), null));
+    return new evl.data.statement.CallStmt(obj.getInfo(), (Reference) fta.traverse(obj.getCall(), null));
   }
 
   @Override
   protected Statement visitCaseStmt(CaseStmt obj, Void param) {
-    EvlList<evl.statement.CaseOpt> opt = new EvlList<evl.statement.CaseOpt>();
+    EvlList<evl.data.statement.CaseOpt> opt = new EvlList<evl.data.statement.CaseOpt>();
     for (CaseOpt itr : obj.getOption()) {
-      opt.add((evl.statement.CaseOpt) fta.traverse(itr, null));
+      opt.add((evl.data.statement.CaseOpt) fta.traverse(itr, null));
     }
-    return new evl.statement.CaseStmt(obj.getInfo(), (Expression) fta.traverse(obj.getCondition(), null), opt, (evl.statement.Block) fta.traverse(obj.getOtherwise(), null));
+    return new evl.data.statement.CaseStmt(obj.getInfo(), (Expression) fta.traverse(obj.getCondition(), null), opt, (evl.data.statement.Block) fta.traverse(obj.getOtherwise(), null));
   }
 
   @Override
   protected Statement visitIfStmt(IfStmt obj, Void param) {
-    EvlList<evl.statement.IfOption> opt = new EvlList<evl.statement.IfOption>();
+    EvlList<evl.data.statement.IfOption> opt = new EvlList<evl.data.statement.IfOption>();
     for (IfOption itr : obj.getOption()) {
-      evl.statement.IfOption nopt = new evl.statement.IfOption(obj.getInfo(), (Expression) fta.traverse(itr.getCondition(), null), (evl.statement.Block) fta.traverse(itr.getCode(), null));
+      evl.data.statement.IfOption nopt = new evl.data.statement.IfOption(obj.getInfo(), (Expression) fta.traverse(itr.getCondition(), null), (evl.data.statement.Block) fta.traverse(itr.getCode(), null));
       opt.add(nopt);
     }
 
-    return new evl.statement.IfStmt(obj.getInfo(), opt, (evl.statement.Block) fta.traverse(obj.getDefblock(), null));
+    return new evl.data.statement.IfStmt(obj.getInfo(), opt, (evl.data.statement.Block) fta.traverse(obj.getDefblock(), null));
   }
 
   @Override
   protected Statement visitForStmt(ForStmt obj, Void param) {
-    return new evl.statement.ForStmt(obj.getInfo(), (evl.variable.FuncVariable) fta.traverse(obj.getIterator(), param), (evl.statement.Block) fta.traverse(obj.getBlock(), param));
+    return new evl.data.statement.ForStmt(obj.getInfo(), (evl.data.variable.FuncVariable) fta.traverse(obj.getIterator(), param), (evl.data.statement.Block) fta.traverse(obj.getBlock(), param));
   }
 }

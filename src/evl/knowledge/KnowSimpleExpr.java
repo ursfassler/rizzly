@@ -17,30 +17,30 @@
 
 package evl.knowledge;
 
-import evl.Evl;
-import evl.NullTraverser;
-import evl.expression.BoolValue;
-import evl.expression.Expression;
-import evl.expression.Number;
-import evl.expression.StringValue;
-import evl.expression.binop.BinaryExp;
-import evl.expression.reference.RefCall;
-import evl.expression.reference.RefIndex;
-import evl.expression.reference.RefName;
-import evl.expression.reference.Reference;
-import evl.expression.reference.SimpleRef;
-import evl.expression.unop.UnaryExp;
-import evl.function.Function;
-import evl.other.CompUse;
-import evl.other.EvlList;
-import evl.type.base.EnumElement;
-import evl.type.base.EnumType;
-import evl.type.base.RangeType;
-import evl.type.composed.RecordType;
-import evl.type.special.NaturalType;
-import evl.variable.ConstGlobal;
-import evl.variable.FuncVariable;
-import evl.variable.StateVariable;
+import evl.data.Evl;
+import evl.data.EvlList;
+import evl.data.component.composition.CompUse;
+import evl.data.expression.BoolValue;
+import evl.data.expression.Expression;
+import evl.data.expression.Number;
+import evl.data.expression.StringValue;
+import evl.data.expression.binop.BinaryExp;
+import evl.data.expression.reference.RefCall;
+import evl.data.expression.reference.RefIndex;
+import evl.data.expression.reference.RefName;
+import evl.data.expression.reference.Reference;
+import evl.data.expression.reference.SimpleRef;
+import evl.data.expression.unop.UnaryExp;
+import evl.data.function.Function;
+import evl.data.type.base.EnumElement;
+import evl.data.type.base.EnumType;
+import evl.data.type.base.RangeType;
+import evl.data.type.composed.RecordType;
+import evl.data.type.special.NaturalType;
+import evl.data.variable.ConstGlobal;
+import evl.data.variable.FuncVariable;
+import evl.data.variable.StateVariable;
+import evl.traverser.NullTraverser;
 
 /**
  *

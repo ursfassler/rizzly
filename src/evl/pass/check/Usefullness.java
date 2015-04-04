@@ -20,14 +20,14 @@ package evl.pass.check;
 import pass.EvlPass;
 import error.ErrorType;
 import error.RError;
-import evl.function.header.FuncCtrlInDataIn;
-import evl.function.header.FuncCtrlInDataOut;
-import evl.function.header.FuncCtrlOutDataIn;
-import evl.function.header.FuncCtrlOutDataOut;
+import evl.data.Namespace;
+import evl.data.component.Component;
+import evl.data.function.header.FuncCtrlInDataIn;
+import evl.data.function.header.FuncCtrlInDataOut;
+import evl.data.function.header.FuncCtrlOutDataIn;
+import evl.data.function.header.FuncCtrlOutDataOut;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Component;
-import evl.other.Namespace;
-import evl.traverser.ClassGetter;
+import evl.traverser.other.ClassGetter;
 
 // TODO do test in FUN part, issues warnings only once for parameterized
 // components.

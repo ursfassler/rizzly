@@ -22,11 +22,11 @@ import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
-import evl.expression.reference.SimpleRef;
-import evl.other.EvlList;
-import evl.type.Type;
-import evl.type.base.EnumElement;
-import evl.type.composed.NamedElement;
+import evl.data.EvlList;
+import evl.data.expression.reference.SimpleRef;
+import evl.data.type.Type;
+import evl.data.type.base.EnumElement;
+import evl.data.type.composed.NamedElement;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.type.base.AnyType;
@@ -59,27 +59,27 @@ public class FunToEvlType extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitBooleanType(BooleanType obj, Void param) {
-    return new evl.type.base.BooleanType();
+    return new evl.data.type.base.BooleanType();
   }
 
   @Override
   protected Type visitVoidType(VoidType obj, Void param) {
-    return new evl.type.special.VoidType();
+    return new evl.data.type.special.VoidType();
   }
 
   @Override
   protected Type visitIntegerType(IntegerType obj, Void param) {
-    return new evl.type.special.IntegerType();
+    return new evl.data.type.special.IntegerType();
   }
 
   @Override
   protected Type visitNaturalType(NaturalType obj, Void param) {
-    return new evl.type.special.NaturalType();
+    return new evl.data.type.special.NaturalType();
   }
 
   @Override
   protected Type visitAnyType(AnyType obj, Void param) {
-    return new evl.type.special.AnyType();
+    return new evl.data.type.special.AnyType();
   }
 
   @Override
@@ -90,17 +90,17 @@ public class FunToEvlType extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitStringType(StringType obj, Void param) {
-    return new evl.type.base.StringType();
+    return new evl.data.type.base.StringType();
   }
 
   @Override
   protected Type visitRange(Range obj, Void param) {
-    return new evl.type.base.RangeType(obj.getInfo(), obj.getName(), new util.Range(obj.getLow(), obj.getHigh()));
+    return new evl.data.type.base.RangeType(obj.getInfo(), obj.getName(), new util.Range(obj.getLow(), obj.getHigh()));
   }
 
   @Override
   protected Type visitEnumType(EnumType obj, Void param) {
-    evl.type.base.EnumType ret = new evl.type.base.EnumType(obj.getInfo(), obj.getName());
+    evl.data.type.base.EnumType ret = new evl.data.type.base.EnumType(obj.getInfo(), obj.getName());
     for (fun.type.base.EnumElement elem : obj.getElement()) {
       ret.getElement().add((EnumElement) fta.visit(elem, null));
     }
@@ -113,7 +113,7 @@ public class FunToEvlType extends NullTraverser<Type, Void> {
     for (fun.type.composed.NamedElement elem : obj.getElement()) {
       element.add((NamedElement) fta.traverse(elem, null));
     }
-    return new evl.type.composed.RecordType(obj.getInfo(), obj.getName(), element);
+    return new evl.data.type.composed.RecordType(obj.getInfo(), obj.getName(), element);
   }
 
   @Override
@@ -127,13 +127,13 @@ public class FunToEvlType extends NullTraverser<Type, Void> {
     NamedElement tag = new NamedElement(ElementInfo.NO, Designator.NAME_SEP + "tag", new SimpleRef<Type>(ElementInfo.NO, voidType));
     // FIXME get singleton
 
-    return new evl.type.composed.UnionType(obj.getInfo(), obj.getName(), element, tag);
+    return new evl.data.type.composed.UnionType(obj.getInfo(), obj.getName(), element, tag);
   }
 
   @Override
   protected Type visitArray(Array obj, Void param) {
     SimpleRef<Type> ref = (SimpleRef<Type>) fta.traverse(obj.getType(), null);
-    return new evl.type.base.ArrayType(obj.getInfo(), obj.getName(), obj.getSize(), ref);
+    return new evl.data.type.base.ArrayType(obj.getInfo(), obj.getName(), obj.getSize(), ref);
   }
 
 }

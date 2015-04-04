@@ -28,11 +28,11 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
 import pass.EvlPass;
 import util.Pair;
 import util.SimpleGraph;
-import evl.DefTraverser;
-import evl.expression.reference.BaseRef;
+import evl.data.Namespace;
+import evl.data.expression.reference.BaseRef;
+import evl.data.type.Type;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
-import evl.type.Type;
+import evl.traverser.DefTraverser;
 
 public class TypeSort extends EvlPass {
 

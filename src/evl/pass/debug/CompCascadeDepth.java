@@ -17,15 +17,15 @@
 
 package evl.pass.debug;
 
-import evl.Evl;
-import evl.NullTraverser;
-import evl.composition.ImplComposition;
-import evl.expression.reference.Reference;
-import evl.hfsm.ImplHfsm;
-import evl.other.CompUse;
-import evl.other.ImplElementary;
-import evl.other.Namespace;
-import evl.type.Type;
+import evl.data.Evl;
+import evl.data.Namespace;
+import evl.data.component.composition.CompUse;
+import evl.data.component.composition.ImplComposition;
+import evl.data.component.elementary.ImplElementary;
+import evl.data.component.hfsm.ImplHfsm;
+import evl.data.expression.reference.Reference;
+import evl.data.type.Type;
+import evl.traverser.NullTraverser;
 
 public class CompCascadeDepth extends NullTraverser<Integer, Void> {
 

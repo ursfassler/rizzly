@@ -23,7 +23,7 @@ import java.util.Map;
 import common.Direction;
 import common.ElementInfo;
 
-import evl.composition.MessageType;
+import evl.data.component.composition.MessageType;
 import fun.FunBase;
 import fun.expression.reference.Reference;
 

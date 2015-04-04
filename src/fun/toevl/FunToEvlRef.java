@@ -19,9 +19,9 @@ package fun.toevl;
 
 import error.ErrorType;
 import error.RError;
-import evl.expression.Expression;
-import evl.expression.TupleValue;
-import evl.expression.reference.RefItem;
+import evl.data.expression.Expression;
+import evl.data.expression.TupleValue;
+import evl.data.expression.reference.RefItem;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.expression.reference.RefCall;
@@ -52,16 +52,16 @@ public class FunToEvlRef extends NullTraverser<RefItem, Void> {
 
   @Override
   protected RefItem visitRefCall(RefCall obj, Void param) {
-    return new evl.expression.reference.RefCall(obj.getInfo(), (TupleValue) fta.visit(obj.getActualParameter(), param));
+    return new evl.data.expression.reference.RefCall(obj.getInfo(), (TupleValue) fta.visit(obj.getActualParameter(), param));
   }
 
   @Override
   protected RefItem visitRefName(RefName obj, Void param) {
-    return new evl.expression.reference.RefName(obj.getInfo(), obj.getName());
+    return new evl.data.expression.reference.RefName(obj.getInfo(), obj.getName());
   }
 
   @Override
   protected RefItem visitRefIndex(RefIndex obj, Void param) {
-    return new evl.expression.reference.RefIndex(obj.getInfo(), (Expression) fta.traverse(obj.getIndex(), param));
+    return new evl.data.expression.reference.RefIndex(obj.getInfo(), (Expression) fta.traverse(obj.getIndex(), param));
   }
 }

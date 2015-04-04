@@ -10,13 +10,13 @@ import common.Property;
 
 import error.ErrorType;
 import error.RError;
-import evl.function.Function;
+import evl.data.EvlList;
+import evl.data.Namespace;
+import evl.data.function.Function;
+import evl.data.statement.CallStmt;
+import evl.data.statement.Statement;
 import evl.knowledge.KnowledgeBase;
-import evl.other.EvlList;
-import evl.other.Namespace;
-import evl.statement.CallStmt;
-import evl.statement.Statement;
-import evl.traverser.StmtReplacer;
+import evl.traverser.other.StmtReplacer;
 
 public class NoCallEmptyFunc extends EvlPass {
 

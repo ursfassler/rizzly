@@ -17,12 +17,12 @@
 
 package evl.copy;
 
-import evl.Evl;
-import evl.NullTraverser;
-import evl.function.Function;
-import evl.function.FunctionFactory;
-import evl.other.EvlList;
-import evl.variable.FuncVariable;
+import evl.data.Evl;
+import evl.data.EvlList;
+import evl.data.function.Function;
+import evl.data.function.FunctionFactory;
+import evl.data.variable.FuncVariable;
+import evl.traverser.NullTraverser;
 
 public class CopyFunction extends NullTraverser<Evl, Void> {
   private CopyEvl cast;

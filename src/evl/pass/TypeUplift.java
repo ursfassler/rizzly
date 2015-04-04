@@ -21,15 +21,15 @@ import pass.EvlPass;
 
 import common.Designator;
 
-import evl.DefTraverser;
-import evl.Evl;
-import evl.hfsm.State;
+import evl.data.Evl;
+import evl.data.EvlList;
+import evl.data.Named;
+import evl.data.Namespace;
+import evl.data.component.elementary.ImplElementary;
+import evl.data.component.hfsm.State;
+import evl.data.type.Type;
 import evl.knowledge.KnowledgeBase;
-import evl.other.EvlList;
-import evl.other.ImplElementary;
-import evl.other.Named;
-import evl.other.Namespace;
-import evl.type.Type;
+import evl.traverser.DefTraverser;
 
 /**
  * Moves all types to the top level

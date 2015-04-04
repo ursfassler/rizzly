@@ -19,19 +19,19 @@ package evl.pass.check.type.specific;
 
 import error.ErrorType;
 import error.RError;
-import evl.Evl;
-import evl.NullTraverser;
-import evl.function.header.FuncCtrlInDataIn;
-import evl.function.header.FuncCtrlInDataOut;
-import evl.function.header.FuncPrivateRet;
-import evl.function.header.FuncPrivateVoid;
-import evl.hfsm.ImplHfsm;
-import evl.hfsm.State;
-import evl.hfsm.Transition;
+import evl.data.Evl;
+import evl.data.component.composition.SubCallbacks;
+import evl.data.component.hfsm.ImplHfsm;
+import evl.data.component.hfsm.State;
+import evl.data.component.hfsm.Transition;
+import evl.data.function.header.FuncCtrlInDataIn;
+import evl.data.function.header.FuncCtrlInDataOut;
+import evl.data.function.header.FuncPrivateRet;
+import evl.data.function.header.FuncPrivateVoid;
+import evl.data.variable.StateVariable;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
-import evl.other.SubCallbacks;
-import evl.variable.StateVariable;
+import evl.traverser.NullTraverser;
 
 //TODO check for unused states
 //TODO check if a transition is never used

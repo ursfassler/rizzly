@@ -25,81 +25,81 @@ import util.StreamWriter;
 
 import common.Property;
 
-import evl.Evl;
-import evl.NullTraverser;
-import evl.expression.ArrayValue;
-import evl.expression.BoolValue;
-import evl.expression.NamedValue;
-import evl.expression.RecordValue;
-import evl.expression.StringValue;
-import evl.expression.TypeCast;
-import evl.expression.UnionValue;
-import evl.expression.UnsafeUnionValue;
-import evl.expression.binop.BinaryExp;
-import evl.expression.binop.BitAnd;
-import evl.expression.binop.BitOr;
-import evl.expression.binop.BitXor;
-import evl.expression.binop.Div;
-import evl.expression.binop.Equal;
-import evl.expression.binop.Greater;
-import evl.expression.binop.Greaterequal;
-import evl.expression.binop.Less;
-import evl.expression.binop.Lessequal;
-import evl.expression.binop.LogicAnd;
-import evl.expression.binop.LogicOr;
-import evl.expression.binop.Minus;
-import evl.expression.binop.Mod;
-import evl.expression.binop.Mul;
-import evl.expression.binop.Notequal;
-import evl.expression.binop.Plus;
-import evl.expression.binop.Relation;
-import evl.expression.binop.Shl;
-import evl.expression.binop.Shr;
-import evl.expression.reference.RefCall;
-import evl.expression.reference.RefIndex;
-import evl.expression.reference.RefName;
-import evl.expression.reference.Reference;
-import evl.expression.reference.SimpleRef;
-import evl.expression.unop.BitNot;
-import evl.expression.unop.LogicNot;
-import evl.expression.unop.Uminus;
-import evl.expression.unop.UnaryExp;
-import evl.function.Function;
-import evl.function.ret.FuncReturnNone;
-import evl.function.ret.FuncReturnType;
+import evl.data.Evl;
+import evl.data.EvlList;
+import evl.data.Named;
+import evl.data.Namespace;
+import evl.data.expression.ArrayValue;
+import evl.data.expression.BoolValue;
+import evl.data.expression.NamedValue;
+import evl.data.expression.RecordValue;
+import evl.data.expression.StringValue;
+import evl.data.expression.TypeCast;
+import evl.data.expression.UnionValue;
+import evl.data.expression.UnsafeUnionValue;
+import evl.data.expression.binop.BinaryExp;
+import evl.data.expression.binop.BitAnd;
+import evl.data.expression.binop.BitOr;
+import evl.data.expression.binop.BitXor;
+import evl.data.expression.binop.Div;
+import evl.data.expression.binop.Equal;
+import evl.data.expression.binop.Greater;
+import evl.data.expression.binop.Greaterequal;
+import evl.data.expression.binop.Less;
+import evl.data.expression.binop.Lessequal;
+import evl.data.expression.binop.LogicAnd;
+import evl.data.expression.binop.LogicOr;
+import evl.data.expression.binop.Minus;
+import evl.data.expression.binop.Mod;
+import evl.data.expression.binop.Mul;
+import evl.data.expression.binop.Notequal;
+import evl.data.expression.binop.Plus;
+import evl.data.expression.binop.Relation;
+import evl.data.expression.binop.Shl;
+import evl.data.expression.binop.Shr;
+import evl.data.expression.reference.RefCall;
+import evl.data.expression.reference.RefIndex;
+import evl.data.expression.reference.RefName;
+import evl.data.expression.reference.Reference;
+import evl.data.expression.reference.SimpleRef;
+import evl.data.expression.unop.BitNot;
+import evl.data.expression.unop.LogicNot;
+import evl.data.expression.unop.Uminus;
+import evl.data.expression.unop.UnaryExp;
+import evl.data.function.Function;
+import evl.data.function.ret.FuncReturnNone;
+import evl.data.function.ret.FuncReturnType;
+import evl.data.statement.AssignmentSingle;
+import evl.data.statement.Block;
+import evl.data.statement.CallStmt;
+import evl.data.statement.CaseOpt;
+import evl.data.statement.CaseOptRange;
+import evl.data.statement.CaseOptValue;
+import evl.data.statement.CaseStmt;
+import evl.data.statement.IfOption;
+import evl.data.statement.IfStmt;
+import evl.data.statement.ReturnExpr;
+import evl.data.statement.ReturnVoid;
+import evl.data.statement.VarDefStmt;
+import evl.data.statement.WhileStmt;
+import evl.data.type.Type;
+import evl.data.type.base.ArrayType;
+import evl.data.type.base.BooleanType;
+import evl.data.type.base.StringType;
+import evl.data.type.composed.NamedElement;
+import evl.data.type.composed.RecordType;
+import evl.data.type.composed.UnionType;
+import evl.data.type.composed.UnsafeUnionType;
+import evl.data.type.out.AliasType;
+import evl.data.type.out.SIntType;
+import evl.data.type.out.UIntType;
+import evl.data.type.special.VoidType;
+import evl.data.variable.Constant;
+import evl.data.variable.FuncVariable;
+import evl.data.variable.StateVariable;
+import evl.data.variable.Variable;
 import evl.knowledge.KnowledgeBase;
-import evl.other.EvlList;
-import evl.other.Named;
-import evl.other.Namespace;
-import evl.statement.AssignmentSingle;
-import evl.statement.Block;
-import evl.statement.CallStmt;
-import evl.statement.CaseOpt;
-import evl.statement.CaseOptRange;
-import evl.statement.CaseOptValue;
-import evl.statement.CaseStmt;
-import evl.statement.IfOption;
-import evl.statement.IfStmt;
-import evl.statement.ReturnExpr;
-import evl.statement.ReturnVoid;
-import evl.statement.VarDefStmt;
-import evl.statement.WhileStmt;
-import evl.type.Type;
-import evl.type.base.ArrayType;
-import evl.type.base.BooleanType;
-import evl.type.base.StringType;
-import evl.type.composed.NamedElement;
-import evl.type.composed.RecordType;
-import evl.type.composed.UnionType;
-import evl.type.composed.UnsafeUnionType;
-import evl.type.out.AliasType;
-import evl.type.out.SIntType;
-import evl.type.out.UIntType;
-import evl.type.special.VoidType;
-import evl.variable.Constant;
-import evl.variable.FuncVariable;
-import evl.variable.StateVariable;
-import evl.variable.Variable;
+import evl.traverser.NullTraverser;
 
 public class CWriter extends EvlPass {
   public static final String ARRAY_DATA_NAME = "data";
@@ -162,7 +162,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
   }
 
   @Override
-  protected Void visitNumber(evl.expression.Number obj, Boolean param) {
+  protected Void visitNumber(evl.data.expression.Number obj, Boolean param) {
     sw.wr(obj.value.toString());
     return null;
   }
@@ -713,8 +713,8 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
 
   @Override
   protected Void visitCaseOptRange(CaseOptRange obj, Boolean param) {
-    evl.expression.Number numStart = (evl.expression.Number) obj.start;
-    evl.expression.Number numEnd = (evl.expression.Number) obj.end;
+    evl.data.expression.Number numStart = (evl.data.expression.Number) obj.start;
+    evl.data.expression.Number numEnd = (evl.data.expression.Number) obj.end;
     sw.wr("case ");
     sw.wr(numStart.value.toString());
     sw.wr(" ... ");
@@ -725,7 +725,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
 
   @Override
   protected Void visitCaseOptValue(CaseOptValue obj, Boolean param) {
-    evl.expression.Number num = (evl.expression.Number) obj.value;
+    evl.data.expression.Number num = (evl.data.expression.Number) obj.value;
     sw.wr("case ");
     sw.wr(num.value.toString());
     sw.wr(": ");

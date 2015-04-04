@@ -17,11 +17,11 @@
 
 package fun.toevl;
 
-import evl.Evl;
-import evl.expression.reference.SimpleRef;
-import evl.other.Component;
-import evl.type.Type;
-import evl.variable.Variable;
+import evl.data.Evl;
+import evl.data.component.Component;
+import evl.data.expression.reference.SimpleRef;
+import evl.data.type.Type;
+import evl.data.variable.Variable;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.expression.Expression;
@@ -57,22 +57,22 @@ public class FunToEvlVariable extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitFuncVariable(FuncVariable obj, Void param) {
-    return new evl.variable.FuncVariable(obj.getInfo(), obj.getName(), copyType(obj.getType()));
+    return new evl.data.variable.FuncVariable(obj.getInfo(), obj.getName(), copyType(obj.getType()));
   }
 
   @Override
   protected Evl visitStateVariable(StateVariable obj, Void param) {
-    return new evl.variable.StateVariable(obj.getInfo(), obj.getName(), copyType(obj.getType()), (evl.expression.Expression) fta.traverse(obj.getDef(), null));
+    return new evl.data.variable.StateVariable(obj.getInfo(), obj.getName(), copyType(obj.getType()), (evl.data.expression.Expression) fta.traverse(obj.getDef(), null));
   }
 
   @Override
   protected Evl visitConstPrivate(ConstPrivate obj, Void param) {
-    return new evl.variable.ConstPrivate(obj.getInfo(), obj.getName(), copyType(obj.getType()), (evl.expression.Expression) fta.traverse(obj.getDef(), null));
+    return new evl.data.variable.ConstPrivate(obj.getInfo(), obj.getName(), copyType(obj.getType()), (evl.data.expression.Expression) fta.traverse(obj.getDef(), null));
   }
 
   @Override
   protected Evl visitConstGlobal(ConstGlobal obj, Void param) {
-    return new evl.variable.ConstGlobal(obj.getInfo(), obj.getName(), copyType(obj.getType()), (evl.expression.Expression) fta.traverse(obj.getDef(), null));
+    return new evl.data.variable.ConstGlobal(obj.getInfo(), obj.getName(), copyType(obj.getType()), (evl.data.expression.Expression) fta.traverse(obj.getDef(), null));
   }
 
   @Override
@@ -82,7 +82,7 @@ public class FunToEvlVariable extends NullTraverser<Evl, Void> {
     assert (typeref.getLink() instanceof CompImpl);
     CompImpl nt = (CompImpl) typeref.getLink();
     Component ecomp = (Component) fta.traverse(nt, null);
-    return new evl.other.CompUse(obj.getInfo(), ecomp, obj.getName());
+    return new evl.data.component.composition.CompUse(obj.getInfo(), ecomp, obj.getName());
   }
 
 }

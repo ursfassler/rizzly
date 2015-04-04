@@ -30,18 +30,18 @@ import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
-import evl.Evl;
-import evl.composition.Connection;
-import evl.composition.Endpoint;
-import evl.composition.EndpointSub;
-import evl.composition.ImplComposition;
+import evl.data.Evl;
+import evl.data.EvlList;
+import evl.data.Namespace;
+import evl.data.component.composition.CompUse;
+import evl.data.component.composition.Connection;
+import evl.data.component.composition.Endpoint;
+import evl.data.component.composition.EndpointSub;
+import evl.data.component.composition.ImplComposition;
+import evl.data.component.elementary.ImplElementary;
 import evl.knowledge.KnowledgeBase;
-import evl.other.CompUse;
-import evl.other.EvlList;
-import evl.other.ImplElementary;
-import evl.other.Namespace;
-import evl.traverser.CallgraphMaker;
-import evl.traverser.ClassGetter;
+import evl.traverser.other.CallgraphMaker;
+import evl.traverser.other.ClassGetter;
 
 // TODO provide a call/connection graph in the error message
 /**

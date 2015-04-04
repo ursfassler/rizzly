@@ -23,10 +23,10 @@ import java.util.Set;
 import pass.EvlPass;
 import error.ErrorType;
 import error.RError;
-import evl.DefTraverser;
-import evl.Evl;
+import evl.data.Evl;
+import evl.data.Namespace;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
+import evl.traverser.DefTraverser;
 
 /**
  * Checks that a object has only one parent

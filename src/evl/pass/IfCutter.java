@@ -18,13 +18,13 @@
 package evl.pass;
 
 import pass.EvlPass;
-import evl.DefTraverser;
+import evl.data.EvlList;
+import evl.data.Namespace;
+import evl.data.statement.Block;
+import evl.data.statement.IfOption;
+import evl.data.statement.IfStmt;
 import evl.knowledge.KnowledgeBase;
-import evl.other.EvlList;
-import evl.other.Namespace;
-import evl.statement.Block;
-import evl.statement.IfOption;
-import evl.statement.IfStmt;
+import evl.traverser.DefTraverser;
 
 /**
  * Ensures that the if statement has at most one option

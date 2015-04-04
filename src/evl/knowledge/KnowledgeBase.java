@@ -19,9 +19,9 @@ package evl.knowledge;
 
 import java.util.HashMap;
 
-import evl.other.CompUse;
-import evl.other.EvlList;
-import evl.other.Namespace;
+import evl.data.EvlList;
+import evl.data.Namespace;
+import evl.data.component.composition.CompUse;
 
 public class KnowledgeBase {
   final private HashMap<Class<? extends KnowledgeEntry>, KnowledgeEntry> entries = new HashMap<Class<? extends KnowledgeEntry>, KnowledgeEntry>();

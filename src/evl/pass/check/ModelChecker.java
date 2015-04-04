@@ -18,16 +18,16 @@
 package evl.pass.check;
 
 import pass.EvlPass;
-import evl.DefTraverser;
-import evl.composition.ImplComposition;
-import evl.expression.Expression;
-import evl.function.Function;
-import evl.hfsm.ImplHfsm;
+import evl.data.Namespace;
+import evl.data.component.composition.ImplComposition;
+import evl.data.component.elementary.ImplElementary;
+import evl.data.component.hfsm.ImplHfsm;
+import evl.data.expression.Expression;
+import evl.data.function.Function;
+import evl.data.variable.Variable;
 import evl.knowledge.KnowledgeBase;
-import evl.other.ImplElementary;
-import evl.other.Namespace;
 import evl.pass.check.type.specific.HfsmModelChecker;
-import evl.variable.Variable;
+import evl.traverser.DefTraverser;
 
 public class ModelChecker extends EvlPass {
 

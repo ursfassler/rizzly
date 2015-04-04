@@ -24,23 +24,23 @@ import java.util.Set;
 import pass.EvlPass;
 import error.ErrorType;
 import error.RError;
-import evl.DefTraverser;
-import evl.Evl;
-import evl.expression.reference.BaseRef;
-import evl.function.Function;
-import evl.hfsm.State;
-import evl.hfsm.Transition;
+import evl.data.Evl;
+import evl.data.Namespace;
+import evl.data.component.composition.SubCallbacks;
+import evl.data.component.elementary.ImplElementary;
+import evl.data.component.hfsm.State;
+import evl.data.component.hfsm.Transition;
+import evl.data.expression.reference.BaseRef;
+import evl.data.function.Function;
+import evl.data.statement.ForStmt;
+import evl.data.statement.VarDefStmt;
+import evl.data.type.Type;
+import evl.data.variable.ConstPrivate;
+import evl.data.variable.StateVariable;
+import evl.data.variable.Variable;
 import evl.knowledge.KnowParent;
 import evl.knowledge.KnowledgeBase;
-import evl.other.ImplElementary;
-import evl.other.Namespace;
-import evl.other.SubCallbacks;
-import evl.statement.ForStmt;
-import evl.statement.VarDefStmt;
-import evl.type.Type;
-import evl.variable.ConstPrivate;
-import evl.variable.StateVariable;
-import evl.variable.Variable;
+import evl.traverser.DefTraverser;
 
 /**
  * Verifies that links to variables are ok, i.e. they are declared before use and in a visible scope.

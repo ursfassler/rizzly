@@ -27,14 +27,14 @@ import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
-import evl.Evl;
-import evl.NullTraverser;
-import evl.hfsm.ImplHfsm;
-import evl.hfsm.State;
-import evl.hfsm.Transition;
+import evl.data.Evl;
+import evl.data.Namespace;
+import evl.data.component.hfsm.ImplHfsm;
+import evl.data.component.hfsm.State;
+import evl.data.component.hfsm.Transition;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
-import evl.traverser.ClassGetter;
+import evl.traverser.NullTraverser;
+import evl.traverser.other.ClassGetter;
 
 /**
  * Checks if the states (src,dst) of a transition are reachable from the transition (inner scope)

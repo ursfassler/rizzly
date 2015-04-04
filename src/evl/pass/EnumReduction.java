@@ -27,19 +27,19 @@ import util.Range;
 import common.Designator;
 import common.ElementInfo;
 
-import evl.DefTraverser;
-import evl.expression.Number;
-import evl.expression.reference.BaseRef;
-import evl.expression.reference.RefName;
-import evl.expression.reference.Reference;
-import evl.expression.reference.SimpleRef;
+import evl.data.Namespace;
+import evl.data.expression.Number;
+import evl.data.expression.reference.BaseRef;
+import evl.data.expression.reference.RefName;
+import evl.data.expression.reference.Reference;
+import evl.data.expression.reference.SimpleRef;
+import evl.data.type.Type;
+import evl.data.type.base.EnumElement;
+import evl.data.type.base.EnumType;
+import evl.data.type.base.RangeType;
+import evl.data.variable.ConstGlobal;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
-import evl.type.Type;
-import evl.type.base.EnumElement;
-import evl.type.base.EnumType;
-import evl.type.base.RangeType;
-import evl.variable.ConstGlobal;
+import evl.traverser.DefTraverser;
 
 public class EnumReduction extends EvlPass {
   @Override

@@ -26,8 +26,8 @@ import org.jgrapht.Graph;
 
 import util.Pair;
 import util.SimpleGraph;
-import evl.Evl;
-import evl.traverser.PrettyPrinter;
+import evl.data.Evl;
+import evl.traverser.other.PrettyPrinter;
 
 public class DebugPrinter {
   private Evl root;

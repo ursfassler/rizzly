@@ -22,18 +22,18 @@ import util.Range;
 
 import common.ElementInfo;
 
-import evl.expression.Expression;
-import evl.expression.TypeCast;
-import evl.expression.binop.ArithmeticOp;
-import evl.expression.binop.Relation;
-import evl.expression.reference.SimpleRef;
+import evl.data.Namespace;
+import evl.data.expression.Expression;
+import evl.data.expression.TypeCast;
+import evl.data.expression.binop.ArithmeticOp;
+import evl.data.expression.binop.Relation;
+import evl.data.expression.reference.SimpleRef;
+import evl.data.type.Type;
+import evl.data.type.base.RangeType;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
-import evl.traverser.ExprReplacer;
-import evl.type.Type;
-import evl.type.base.RangeType;
+import evl.traverser.other.ExprReplacer;
 
 /**
  * Insert typecasts in expressions to fit the destination type

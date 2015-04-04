@@ -24,16 +24,16 @@ import util.Range;
 
 import common.ElementInfo;
 
-import evl.expression.Expression;
-import evl.expression.Number;
-import evl.expression.binop.BitAnd;
-import evl.expression.unop.BitNot;
+import evl.data.Namespace;
+import evl.data.expression.Expression;
+import evl.data.expression.Number;
+import evl.data.expression.binop.BitAnd;
+import evl.data.expression.unop.BitNot;
+import evl.data.type.Type;
+import evl.data.type.base.RangeType;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
-import evl.traverser.ExprReplacer;
-import evl.type.Type;
-import evl.type.base.RangeType;
+import evl.traverser.other.ExprReplacer;
 
 /**
  * Cuts back the result of bitnot operations

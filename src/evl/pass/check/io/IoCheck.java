@@ -22,18 +22,18 @@ import java.util.Map;
 
 import error.ErrorType;
 import error.RError;
-import evl.Evl;
-import evl.NullTraverser;
-import evl.function.header.FuncCtrlInDataIn;
-import evl.function.header.FuncCtrlInDataOut;
-import evl.function.header.FuncCtrlOutDataIn;
-import evl.function.header.FuncCtrlOutDataOut;
-import evl.function.header.FuncGlobal;
-import evl.function.header.FuncPrivateRet;
-import evl.function.header.FuncPrivateVoid;
-import evl.function.header.FuncSubHandlerEvent;
-import evl.function.header.FuncSubHandlerQuery;
-import evl.hfsm.Transition;
+import evl.data.Evl;
+import evl.data.component.hfsm.Transition;
+import evl.data.function.header.FuncCtrlInDataIn;
+import evl.data.function.header.FuncCtrlInDataOut;
+import evl.data.function.header.FuncCtrlOutDataIn;
+import evl.data.function.header.FuncCtrlOutDataOut;
+import evl.data.function.header.FuncGlobal;
+import evl.data.function.header.FuncPrivateRet;
+import evl.data.function.header.FuncPrivateVoid;
+import evl.data.function.header.FuncSubHandlerEvent;
+import evl.data.function.header.FuncSubHandlerQuery;
+import evl.traverser.NullTraverser;
 
 public class IoCheck extends NullTraverser<Void, Void> {
   private Map<? extends Evl, Boolean> writes;

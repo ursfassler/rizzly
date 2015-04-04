@@ -37,23 +37,23 @@ import common.Property;
 
 import error.ErrorType;
 import error.RError;
-import evl.DefTraverser;
-import evl.Evl;
 import evl.copy.Copy;
-import evl.expression.reference.BaseRef;
-import evl.expression.reference.SimpleRef;
-import evl.function.Function;
-import evl.function.ret.FuncReturn;
+import evl.data.Evl;
+import evl.data.Namespace;
+import evl.data.expression.reference.BaseRef;
+import evl.data.expression.reference.SimpleRef;
+import evl.data.function.Function;
+import evl.data.function.ret.FuncReturn;
+import evl.data.type.Type;
+import evl.data.type.base.EnumElement;
+import evl.data.type.composed.NamedElement;
+import evl.data.variable.FuncVariable;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
-import evl.traverser.CHeaderWriter;
-import evl.traverser.DepCollector;
-import evl.traverser.FpcHeaderWriter;
-import evl.traverser.Renamer;
-import evl.type.Type;
-import evl.type.base.EnumElement;
-import evl.type.composed.NamedElement;
-import evl.variable.FuncVariable;
+import evl.traverser.DefTraverser;
+import evl.traverser.other.CHeaderWriter;
+import evl.traverser.other.DepCollector;
+import evl.traverser.other.FpcHeaderWriter;
+import evl.traverser.other.Renamer;
 
 public class HeaderWriter extends EvlPass {
 
@@ -97,7 +97,7 @@ public class HeaderWriter extends EvlPass {
     Set<Evl> dep = DepCollector.process(anchor);
 
     for (Evl itr : dep) {
-      if (itr instanceof evl.type.Type) {
+      if (itr instanceof evl.data.type.Type) {
         ret.add(itr);
       } else if (itr instanceof SimpleRef) {
         // element of record type
@@ -144,8 +144,8 @@ public class HeaderWriter extends EvlPass {
   private static void toposort(List<Evl> list) {
     SimpleGraph<Evl> g = new SimpleGraph<Evl>(list);
     for (Evl u : list) {
-      Set<evl.type.Type> vs = getDirectUsedTypes(u);
-      for (evl.type.Type v : vs) {
+      Set<evl.data.type.Type> vs = getDirectUsedTypes(u);
+      for (evl.data.type.Type v : vs) {
         g.addEdge(u, v);
       }
     }
@@ -166,8 +166,8 @@ public class HeaderWriter extends EvlPass {
     assert (size == list.size());
   }
 
-  private static Set<evl.type.Type> getDirectUsedTypes(Evl u) {
-    DefTraverser<Void, Set<evl.type.Type>> getter = new DefTraverser<Void, Set<evl.type.Type>>() {
+  private static Set<evl.data.type.Type> getDirectUsedTypes(Evl u) {
+    DefTraverser<Void, Set<evl.data.type.Type>> getter = new DefTraverser<Void, Set<evl.data.type.Type>>() {
 
       @Override
       protected Void visitBaseRef(BaseRef obj, Set<Type> param) {
@@ -177,7 +177,7 @@ public class HeaderWriter extends EvlPass {
         return super.visitBaseRef(obj, param);
       }
     };
-    Set<evl.type.Type> vs = new HashSet<evl.type.Type>();
+    Set<evl.data.type.Type> vs = new HashSet<evl.data.type.Type>();
     getter.traverse(u, vs);
     return vs;
   }

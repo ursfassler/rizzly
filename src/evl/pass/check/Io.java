@@ -23,18 +23,18 @@ import java.util.Map;
 import pass.EvlPass;
 import util.GraphHelper;
 import util.SimpleGraph;
-import evl.Evl;
-import evl.function.Function;
-import evl.hfsm.Transition;
+import evl.data.Evl;
+import evl.data.Namespace;
+import evl.data.component.hfsm.Transition;
+import evl.data.function.Function;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
 import evl.pass.check.io.IoCheck;
 import evl.pass.check.io.StateReaderInfo;
 import evl.pass.check.io.StateWriterInfo;
-import evl.traverser.CallgraphMaker;
-import evl.traverser.ClassGetter;
-import evl.traverser.OutsideReaderInfo;
-import evl.traverser.OutsideWriterInfo;
+import evl.traverser.other.CallgraphMaker;
+import evl.traverser.other.ClassGetter;
+import evl.traverser.other.OutsideReaderInfo;
+import evl.traverser.other.OutsideWriterInfo;
 
 /**
  * Checks that only allowed functions change state or write output

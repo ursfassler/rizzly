@@ -20,14 +20,14 @@ package evl.pass;
 import pass.EvlPass;
 import error.ErrorType;
 import error.RError;
-import evl.DefTraverser;
-import evl.Evl;
-import evl.expression.reference.RefItem;
-import evl.expression.reference.RefName;
-import evl.expression.reference.Reference;
+import evl.data.Evl;
+import evl.data.Named;
+import evl.data.Namespace;
+import evl.data.expression.reference.RefItem;
+import evl.data.expression.reference.RefName;
+import evl.data.expression.reference.Reference;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Named;
-import evl.other.Namespace;
+import evl.traverser.DefTraverser;
 
 /**
  * Follows offset when link is to namespace until it finds a different object.

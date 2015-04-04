@@ -25,11 +25,11 @@ import util.SimpleGraph;
 
 import common.Property;
 
-import evl.Evl;
-import evl.function.Function;
+import evl.data.Evl;
+import evl.data.Namespace;
+import evl.data.function.Function;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
-import evl.traverser.DepGraph;
+import evl.traverser.other.DepGraph;
 
 public class RemoveUnused extends EvlPass {
 

@@ -17,13 +17,13 @@
 
 package evl.pass.check.io;
 
-import evl.DefTraverser;
-import evl.Evl;
-import evl.expression.reference.Reference;
-import evl.statement.AssignmentMulti;
-import evl.statement.AssignmentSingle;
-import evl.variable.StateVariable;
-import evl.variable.Variable;
+import evl.data.Evl;
+import evl.data.expression.reference.Reference;
+import evl.data.statement.AssignmentMulti;
+import evl.data.statement.AssignmentSingle;
+import evl.data.variable.StateVariable;
+import evl.data.variable.Variable;
+import evl.traverser.DefTraverser;
 
 /**
  * Returns for every function if it writes state. It does not check called functions nor it uses information from the

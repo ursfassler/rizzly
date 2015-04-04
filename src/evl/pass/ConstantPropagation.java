@@ -19,18 +19,18 @@ package evl.pass;
 
 import pass.EvlPass;
 import evl.copy.Copy;
-import evl.expression.Expression;
-import evl.expression.reference.Reference;
+import evl.data.Namespace;
+import evl.data.expression.Expression;
+import evl.data.expression.reference.Reference;
+import evl.data.type.Type;
+import evl.data.type.base.ArrayType;
+import evl.data.type.base.EnumType;
+import evl.data.type.base.RangeType;
+import evl.data.type.base.StringType;
+import evl.data.type.composed.RecordType;
+import evl.data.variable.Constant;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
-import evl.traverser.ExprReplacer;
-import evl.type.Type;
-import evl.type.base.ArrayType;
-import evl.type.base.EnumType;
-import evl.type.base.RangeType;
-import evl.type.base.StringType;
-import evl.type.composed.RecordType;
-import evl.variable.Constant;
+import evl.traverser.other.ExprReplacer;
 
 /**
  * Propagates (some) constant values where they are used

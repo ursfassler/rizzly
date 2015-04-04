@@ -17,12 +17,12 @@
 
 package evl.copy;
 
-import evl.Evl;
-import evl.NullTraverser;
-import evl.expression.reference.RefCall;
-import evl.expression.reference.RefIndex;
-import evl.expression.reference.RefItem;
-import evl.expression.reference.RefName;
+import evl.data.Evl;
+import evl.data.expression.reference.RefCall;
+import evl.data.expression.reference.RefIndex;
+import evl.data.expression.reference.RefItem;
+import evl.data.expression.reference.RefName;
+import evl.traverser.NullTraverser;
 
 public class CopyRef extends NullTraverser<RefItem, Void> {
   private CopyEvl cast;

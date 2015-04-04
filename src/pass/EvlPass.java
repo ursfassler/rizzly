@@ -20,8 +20,8 @@ package pass;
 import java.util.HashSet;
 import java.util.Set;
 
+import evl.data.Namespace;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
 
 public abstract class EvlPass {
   /*

@@ -21,13 +21,13 @@ import common.Designator;
 import common.ElementInfo;
 import common.Property;
 
-import evl.Evl;
-import evl.function.header.FuncCtrlOutDataOut;
-import evl.function.ret.FuncReturnNone;
-import evl.other.EvlList;
-import evl.other.Named;
-import evl.statement.Block;
-import evl.variable.FuncVariable;
+import evl.data.Evl;
+import evl.data.EvlList;
+import evl.data.Named;
+import evl.data.function.header.FuncCtrlOutDataOut;
+import evl.data.function.ret.FuncReturnNone;
+import evl.data.statement.Block;
+import evl.data.variable.FuncVariable;
 
 //TODO rename
 //TODO rename trap to runtime exception and provide arguments

@@ -26,30 +26,30 @@ import pass.EvlPass;
 
 import common.ElementInfo;
 
-import evl.DefTraverser;
-import evl.expression.Expression;
-import evl.expression.reference.RefName;
-import evl.expression.reference.Reference;
-import evl.expression.reference.SimpleRef;
-import evl.function.Function;
-import evl.function.ret.FuncReturnTuple;
-import evl.function.ret.FuncReturnType;
+import evl.data.EvlList;
+import evl.data.Namespace;
+import evl.data.expression.Expression;
+import evl.data.expression.reference.RefName;
+import evl.data.expression.reference.Reference;
+import evl.data.expression.reference.SimpleRef;
+import evl.data.function.Function;
+import evl.data.function.ret.FuncReturnTuple;
+import evl.data.function.ret.FuncReturnType;
+import evl.data.statement.AssignmentSingle;
+import evl.data.statement.ReturnExpr;
+import evl.data.statement.ReturnVoid;
+import evl.data.statement.Statement;
+import evl.data.statement.VarDefStmt;
+import evl.data.type.Type;
+import evl.data.type.composed.NamedElement;
+import evl.data.type.composed.RecordType;
+import evl.data.variable.FuncVariable;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowUniqueName;
 import evl.knowledge.KnowledgeBase;
-import evl.other.EvlList;
-import evl.other.Namespace;
-import evl.statement.AssignmentSingle;
-import evl.statement.ReturnExpr;
-import evl.statement.ReturnVoid;
-import evl.statement.Statement;
-import evl.statement.VarDefStmt;
-import evl.traverser.ExprReplacer;
-import evl.traverser.StmtReplacer;
-import evl.type.Type;
-import evl.type.composed.NamedElement;
-import evl.type.composed.RecordType;
-import evl.variable.FuncVariable;
+import evl.traverser.DefTraverser;
+import evl.traverser.other.ExprReplacer;
+import evl.traverser.other.StmtReplacer;
 
 /**
  * Replaces function FuncReturnTuple with introduced record and FuncReturnType

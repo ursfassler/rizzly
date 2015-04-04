@@ -29,25 +29,25 @@ import common.ElementInfo;
 import common.Property;
 
 import error.RError;
-import evl.Evl;
-import evl.NullTraverser;
 import evl.copy.CopyEvl;
 import evl.copy.Relinker;
-import evl.expression.reference.SimpleRef;
-import evl.function.Function;
-import evl.function.InterfaceFunction;
-import evl.function.header.FuncPrivateVoid;
-import evl.function.ret.FuncReturnNone;
+import evl.data.Evl;
+import evl.data.EvlList;
+import evl.data.Named;
+import evl.data.Namespace;
+import evl.data.component.Component;
+import evl.data.component.composition.CompUse;
+import evl.data.component.composition.SubCallbacks;
+import evl.data.component.elementary.ImplElementary;
+import evl.data.expression.reference.SimpleRef;
+import evl.data.function.Function;
+import evl.data.function.InterfaceFunction;
+import evl.data.function.header.FuncPrivateVoid;
+import evl.data.function.ret.FuncReturnNone;
+import evl.data.statement.Block;
+import evl.data.variable.FuncVariable;
 import evl.knowledge.KnowledgeBase;
-import evl.other.CompUse;
-import evl.other.Component;
-import evl.other.EvlList;
-import evl.other.ImplElementary;
-import evl.other.Named;
-import evl.other.Namespace;
-import evl.other.SubCallbacks;
-import evl.statement.Block;
-import evl.variable.FuncVariable;
+import evl.traverser.NullTraverser;
 
 public class Instantiation extends EvlPass {
 

@@ -2,21 +2,21 @@ package evl.knowledge;
 
 import error.ErrorType;
 import error.RError;
-import evl.Evl;
-import evl.NullTraverser;
-import evl.expression.ArrayValue;
-import evl.expression.BoolValue;
-import evl.expression.Number;
-import evl.expression.RecordValue;
-import evl.expression.StringValue;
-import evl.expression.TupleValue;
-import evl.expression.TypeCast;
-import evl.expression.UnionValue;
-import evl.expression.UnsafeUnionValue;
-import evl.expression.binop.ArithmeticOp;
-import evl.expression.binop.BinaryExp;
-import evl.expression.reference.Reference;
-import evl.expression.reference.SimpleRef;
+import evl.data.Evl;
+import evl.data.expression.ArrayValue;
+import evl.data.expression.BoolValue;
+import evl.data.expression.Number;
+import evl.data.expression.RecordValue;
+import evl.data.expression.StringValue;
+import evl.data.expression.TupleValue;
+import evl.data.expression.TypeCast;
+import evl.data.expression.UnionValue;
+import evl.data.expression.UnsafeUnionValue;
+import evl.data.expression.binop.ArithmeticOp;
+import evl.data.expression.binop.BinaryExp;
+import evl.data.expression.reference.Reference;
+import evl.data.expression.reference.SimpleRef;
+import evl.traverser.NullTraverser;
 
 public class KnowConst extends KnowledgeEntry {
   private final KnowConstTraverser kct = new KnowConstTraverser();

@@ -27,13 +27,13 @@ import util.GraphHelper;
 import util.SimpleGraph;
 import error.RError;
 import evl.copy.Relinker;
-import evl.expression.reference.SimpleRef;
+import evl.data.EvlList;
+import evl.data.Namespace;
+import evl.data.expression.reference.SimpleRef;
+import evl.data.type.Type;
+import evl.data.type.out.AliasType;
 import evl.knowledge.KnowLeftIsContainerOfRight;
 import evl.knowledge.KnowledgeBase;
-import evl.other.EvlList;
-import evl.other.Namespace;
-import evl.type.Type;
-import evl.type.out.AliasType;
 
 /**
  * Find equal types with different names and merge them

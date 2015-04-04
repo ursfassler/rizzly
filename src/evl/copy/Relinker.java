@@ -19,11 +19,11 @@ package evl.copy;
 
 import java.util.Map;
 
-import evl.DefTraverser;
-import evl.Evl;
-import evl.expression.reference.BaseRef;
-import evl.other.EvlList;
-import evl.other.Named;
+import evl.data.Evl;
+import evl.data.EvlList;
+import evl.data.Named;
+import evl.data.expression.reference.BaseRef;
+import evl.traverser.DefTraverser;
 
 public class Relinker extends DefTraverser<Void, Map<? extends Named, ? extends Named>> {
   static private final Relinker INSTANCE = new Relinker();

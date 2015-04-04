@@ -73,7 +73,7 @@ public class Main {
 
     Namespace fret = MainFun.doFun(opt, debugdir);
     FunToEvl funToAst = new FunToEvl();
-    evl.other.Namespace aclasses = (evl.other.Namespace) funToAst.traverse(fret, null);
+    evl.data.Namespace aclasses = (evl.data.Namespace) funToAst.traverse(fret, null);
 
     MainEvl.doEvl(opt, outdir, debugdir, aclasses);
 

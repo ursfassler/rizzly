@@ -2,20 +2,20 @@ package evl.pass;
 
 import pass.EvlPass;
 import util.Range;
-import evl.expression.BoolValue;
-import evl.expression.Expression;
-import evl.expression.binop.Equal;
-import evl.expression.binop.Greater;
-import evl.expression.binop.Greaterequal;
-import evl.expression.binop.Less;
-import evl.expression.binop.Lessequal;
-import evl.expression.binop.Notequal;
+import evl.data.Namespace;
+import evl.data.expression.BoolValue;
+import evl.data.expression.Expression;
+import evl.data.expression.binop.Equal;
+import evl.data.expression.binop.Greater;
+import evl.data.expression.binop.Greaterequal;
+import evl.data.expression.binop.Less;
+import evl.data.expression.binop.Lessequal;
+import evl.data.expression.binop.Notequal;
+import evl.data.type.Type;
+import evl.data.type.base.RangeType;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
-import evl.traverser.ExprReplacer;
-import evl.type.Type;
-import evl.type.base.RangeType;
+import evl.traverser.other.ExprReplacer;
 
 public class AlwaysGreater extends EvlPass {
 

@@ -28,18 +28,9 @@ import common.Designator;
 
 import debug.DebugPrinter;
 import error.RError;
-import evl.Evl;
-import evl.hfsm.reduction.EntryExitUpdater;
-import evl.hfsm.reduction.FsmReduction;
-import evl.hfsm.reduction.LeafStateUplifter;
-import evl.hfsm.reduction.QueryDownPropagator;
-import evl.hfsm.reduction.StateItemUplifter;
-import evl.hfsm.reduction.StateVarReplacer;
-import evl.hfsm.reduction.TransitionDownPropagator;
-import evl.hfsm.reduction.TransitionRedirecter;
-import evl.hfsm.reduction.TransitionUplifter;
+import evl.data.Evl;
+import evl.data.Namespace;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
 import evl.pass.AlwaysGreater;
 import evl.pass.BitLogicCategorizer;
 import evl.pass.BitnotFixer;
@@ -86,12 +77,21 @@ import evl.pass.check.Root;
 import evl.pass.check.RtcViolation;
 import evl.pass.check.Usefullness;
 import evl.pass.check.type.TypeChecker;
+import evl.pass.hfsm.reduction.EntryExitUpdater;
+import evl.pass.hfsm.reduction.FsmReduction;
+import evl.pass.hfsm.reduction.LeafStateUplifter;
+import evl.pass.hfsm.reduction.QueryDownPropagator;
+import evl.pass.hfsm.reduction.StateItemUplifter;
+import evl.pass.hfsm.reduction.StateVarReplacer;
+import evl.pass.hfsm.reduction.TransitionDownPropagator;
+import evl.pass.hfsm.reduction.TransitionRedirecter;
+import evl.pass.hfsm.reduction.TransitionUplifter;
 import evl.pass.infrastructure.LinkTargetExists;
 import evl.pass.infrastructure.SingleDefinition;
 import evl.pass.infrastructure.VarLinkOk;
-import evl.queue.QueueReduction;
-import evl.traverser.ConstTyper;
-import evl.traverser.SystemIfaceAdder;
+import evl.pass.queue.QueueReduction;
+import evl.traverser.other.ConstTyper;
+import evl.traverser.other.SystemIfaceAdder;
 
 //TODO ensure that composition and hfsm use construct and destruct correctly
 

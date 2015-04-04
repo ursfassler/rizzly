@@ -21,18 +21,18 @@ import java.util.Map;
 
 import common.ElementInfo;
 
-import evl.Evl;
-import evl.function.Function;
-import evl.function.FunctionFactory;
-import evl.function.header.FuncCtrlInDataIn;
-import evl.function.header.FuncCtrlInDataOut;
-import evl.function.header.FuncCtrlOutDataIn;
-import evl.function.header.FuncCtrlOutDataOut;
-import evl.function.header.FuncPrivateRet;
-import evl.function.header.FuncPrivateVoid;
-import evl.function.ret.FuncReturn;
-import evl.other.EvlList;
-import evl.statement.Block;
+import evl.data.Evl;
+import evl.data.EvlList;
+import evl.data.function.Function;
+import evl.data.function.FunctionFactory;
+import evl.data.function.header.FuncCtrlInDataIn;
+import evl.data.function.header.FuncCtrlInDataOut;
+import evl.data.function.header.FuncCtrlOutDataIn;
+import evl.data.function.header.FuncCtrlOutDataOut;
+import evl.data.function.header.FuncPrivateRet;
+import evl.data.function.header.FuncPrivateVoid;
+import evl.data.function.ret.FuncReturn;
+import evl.data.statement.Block;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.function.FuncFunction;
@@ -73,10 +73,10 @@ public class FunToEvlFunc extends NullTraverser<Evl, Void> {
 
   // ----------------------------------------------------------------------------
 
-  public EvlList<evl.variable.FuncVariable> genpa(FuncHeader obj) {
-    EvlList<evl.variable.FuncVariable> fparam = new EvlList<evl.variable.FuncVariable>();
+  public EvlList<evl.data.variable.FuncVariable> genpa(FuncHeader obj) {
+    EvlList<evl.data.variable.FuncVariable> fparam = new EvlList<evl.data.variable.FuncVariable>();
     for (FuncVariable itr : obj.getParam()) {
-      evl.variable.FuncVariable var = (evl.variable.FuncVariable) fta.traverse(itr, null);
+      evl.data.variable.FuncVariable var = (evl.data.variable.FuncVariable) fta.traverse(itr, null);
       fparam.add(var);
     }
     return fparam;

@@ -25,23 +25,23 @@ import pass.EvlPass;
 import common.Designator;
 import common.ElementInfo;
 
-import evl.DefTraverser;
-import evl.Evl;
-import evl.expression.Expression;
-import evl.expression.binop.Equal;
-import evl.expression.binop.Is;
-import evl.expression.reference.RefName;
-import evl.expression.reference.Reference;
+import evl.data.Evl;
+import evl.data.Namespace;
+import evl.data.expression.Expression;
+import evl.data.expression.binop.Equal;
+import evl.data.expression.binop.Is;
+import evl.data.expression.reference.RefName;
+import evl.data.expression.reference.Reference;
+import evl.data.statement.CaseStmt;
+import evl.data.type.Type;
+import evl.data.type.base.EnumElement;
+import evl.data.type.base.EnumType;
+import evl.data.type.composed.NamedElement;
+import evl.data.type.composed.UnionType;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
-import evl.statement.CaseStmt;
-import evl.traverser.ExprReplacer;
-import evl.type.Type;
-import evl.type.base.EnumElement;
-import evl.type.base.EnumType;
-import evl.type.composed.NamedElement;
-import evl.type.composed.UnionType;
+import evl.traverser.DefTraverser;
+import evl.traverser.other.ExprReplacer;
 
 //TODO documentation
 // DONE introduce enum E for union U

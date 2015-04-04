@@ -25,24 +25,24 @@ import util.Range;
 
 import common.ElementInfo;
 
-import evl.Evl;
-import evl.NullTraverser;
 import evl.copy.Copy;
-import evl.expression.reference.SimpleRef;
-import evl.other.EvlList;
-import evl.type.Type;
-import evl.type.base.ArrayType;
-import evl.type.base.BooleanType;
-import evl.type.base.EnumElement;
-import evl.type.base.EnumType;
-import evl.type.base.RangeType;
-import evl.type.base.StringType;
-import evl.type.composed.NamedElement;
-import evl.type.composed.RecordType;
-import evl.type.special.AnyType;
-import evl.type.special.IntegerType;
-import evl.type.special.NaturalType;
-import evl.type.special.VoidType;
+import evl.data.Evl;
+import evl.data.EvlList;
+import evl.data.expression.reference.SimpleRef;
+import evl.data.type.Type;
+import evl.data.type.base.ArrayType;
+import evl.data.type.base.BooleanType;
+import evl.data.type.base.EnumElement;
+import evl.data.type.base.EnumType;
+import evl.data.type.base.RangeType;
+import evl.data.type.base.StringType;
+import evl.data.type.composed.NamedElement;
+import evl.data.type.composed.RecordType;
+import evl.data.type.special.AnyType;
+import evl.data.type.special.IntegerType;
+import evl.data.type.special.NaturalType;
+import evl.data.type.special.VoidType;
+import evl.traverser.NullTraverser;
 
 public class KnowBaseItem extends KnowledgeEntry {
 

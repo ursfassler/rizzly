@@ -17,13 +17,13 @@
 
 package evl.copy;
 
-import evl.Evl;
-import evl.NullTraverser;
-import evl.variable.ConstGlobal;
-import evl.variable.ConstPrivate;
-import evl.variable.FuncVariable;
-import evl.variable.StateVariable;
-import evl.variable.Variable;
+import evl.data.Evl;
+import evl.data.variable.ConstGlobal;
+import evl.data.variable.ConstPrivate;
+import evl.data.variable.FuncVariable;
+import evl.data.variable.StateVariable;
+import evl.data.variable.Variable;
+import evl.traverser.NullTraverser;
 
 public class CopyVariable extends NullTraverser<Variable, Void> {
   private CopyEvl cast;

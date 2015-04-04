@@ -17,8 +17,8 @@
 
 package evl.copy;
 
-import evl.Evl;
-import evl.other.EvlList;
+import evl.data.Evl;
+import evl.data.EvlList;
 
 public final class Copy {
 

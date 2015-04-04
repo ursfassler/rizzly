@@ -19,27 +19,27 @@ package fun.toevl;
 
 import error.ErrorType;
 import error.RError;
-import evl.Evl;
-import evl.expression.Expression;
-import evl.expression.binop.And;
-import evl.expression.binop.BitXor;
-import evl.expression.binop.Div;
-import evl.expression.binop.Equal;
-import evl.expression.binop.Greater;
-import evl.expression.binop.Greaterequal;
-import evl.expression.binop.Is;
-import evl.expression.binop.Less;
-import evl.expression.binop.Lessequal;
-import evl.expression.binop.Minus;
-import evl.expression.binop.Mod;
-import evl.expression.binop.Mul;
-import evl.expression.binop.Notequal;
-import evl.expression.binop.Or;
-import evl.expression.binop.Plus;
-import evl.expression.binop.Shl;
-import evl.expression.binop.Shr;
-import evl.other.EvlList;
-import evl.other.Named;
+import evl.data.Evl;
+import evl.data.EvlList;
+import evl.data.Named;
+import evl.data.expression.Expression;
+import evl.data.expression.binop.And;
+import evl.data.expression.binop.BitXor;
+import evl.data.expression.binop.Div;
+import evl.data.expression.binop.Equal;
+import evl.data.expression.binop.Greater;
+import evl.data.expression.binop.Greaterequal;
+import evl.data.expression.binop.Is;
+import evl.data.expression.binop.Less;
+import evl.data.expression.binop.Lessequal;
+import evl.data.expression.binop.Minus;
+import evl.data.expression.binop.Mod;
+import evl.data.expression.binop.Mul;
+import evl.data.expression.binop.Notequal;
+import evl.data.expression.binop.Or;
+import evl.data.expression.binop.Plus;
+import evl.data.expression.binop.Shl;
+import evl.data.expression.binop.Shr;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.expression.AnyValue;
@@ -71,57 +71,57 @@ public class FunToEvlExpr extends NullTraverser<Evl, Void> {
   // ----------------------------------------------------------------------------
   @Override
   protected Expression visitReference(Reference obj, Void param) {
-    EvlList<evl.expression.reference.RefItem> ofs = new EvlList<evl.expression.reference.RefItem>();
+    EvlList<evl.data.expression.reference.RefItem> ofs = new EvlList<evl.data.expression.reference.RefItem>();
     for (RefItem item : obj.getOffset()) {
-      ofs.add((evl.expression.reference.RefItem) fta.traverse(item, null));
+      ofs.add((evl.data.expression.reference.RefItem) fta.traverse(item, null));
     }
     Named ref = (Named) fta.traverse(obj.getLink(), null);
-    evl.expression.reference.Reference ret = new evl.expression.reference.Reference(obj.getInfo(), ref, ofs);
+    evl.data.expression.reference.Reference ret = new evl.data.expression.reference.Reference(obj.getInfo(), ref, ofs);
     return ret;
   }
 
   @Override
   protected Evl visitSimpleRef(SimpleRef obj, Void param) {
     Evl ref = fta.traverse(obj.getLink(), null);
-    return new evl.expression.reference.SimpleRef(obj.getInfo(), (Named) ref);
+    return new evl.data.expression.reference.SimpleRef(obj.getInfo(), (Named) ref);
   }
 
   @Override
   protected Expression visitNumber(Number obj, Void param) {
-    return new evl.expression.Number(obj.getInfo(), obj.getValue());
+    return new evl.data.expression.Number(obj.getInfo(), obj.getValue());
   }
 
   @Override
   protected Expression visitStringValue(StringValue obj, Void param) {
-    return new evl.expression.StringValue(obj.getInfo(), obj.getValue());
+    return new evl.data.expression.StringValue(obj.getInfo(), obj.getValue());
   }
 
   @Override
   protected Evl visitTupleValue(TupleValue obj, Void param) {
-    EvlList<evl.expression.Expression> value = new EvlList<evl.expression.Expression>();
+    EvlList<evl.data.expression.Expression> value = new EvlList<evl.data.expression.Expression>();
     for (fun.expression.Expression item : obj.getValue()) {
-      value.add((evl.expression.Expression) fta.traverse(item, null));
+      value.add((evl.data.expression.Expression) fta.traverse(item, null));
     }
-    return new evl.expression.TupleValue(obj.getInfo(), value);
+    return new evl.data.expression.TupleValue(obj.getInfo(), value);
   }
 
   @Override
   protected Evl visitNamedElementsValue(NamedElementsValue obj, Void param) {
-    EvlList<evl.expression.NamedValue> value = new EvlList<evl.expression.NamedValue>();
+    EvlList<evl.data.expression.NamedValue> value = new EvlList<evl.data.expression.NamedValue>();
     for (fun.expression.NamedValue item : obj.getValue()) {
-      value.add((evl.expression.NamedValue) fta.traverse(item, null));
+      value.add((evl.data.expression.NamedValue) fta.traverse(item, null));
     }
-    return new evl.expression.NamedElementsValue(obj.getInfo(), value);
+    return new evl.data.expression.NamedElementsValue(obj.getInfo(), value);
   }
 
   @Override
   protected Expression visitBoolValue(BoolValue obj, Void param) {
-    return new evl.expression.BoolValue(obj.getInfo(), obj.isValue());
+    return new evl.data.expression.BoolValue(obj.getInfo(), obj.isValue());
   }
 
   @Override
   protected Evl visitAnyValue(AnyValue obj, Void param) {
-    return new evl.expression.AnyValue(obj.getInfo());
+    return new evl.data.expression.AnyValue(obj.getInfo());
   }
 
   @Override
@@ -180,9 +180,9 @@ public class FunToEvlExpr extends NullTraverser<Evl, Void> {
   protected Expression visitUnaryExpression(UnaryExpression obj, Void param) {
     switch (obj.getOp()) {
       case MINUS:
-        return new evl.expression.unop.Uminus(obj.getInfo(), (Expression) fta.traverse(obj.getExpr(), null));
+        return new evl.data.expression.unop.Uminus(obj.getInfo(), (Expression) fta.traverse(obj.getExpr(), null));
       case NOT:
-        return new evl.expression.unop.Not(obj.getInfo(), (Expression) fta.traverse(obj.getExpr(), null));
+        return new evl.data.expression.unop.Not(obj.getInfo(), (Expression) fta.traverse(obj.getExpr(), null));
       default:
         RError.err(ErrorType.Fatal, obj.getInfo(), "Unhandled case: " + obj.getOp());
     }

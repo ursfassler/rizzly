@@ -20,12 +20,12 @@ package evl.pass;
 import java.util.LinkedList;
 
 import pass.EvlPass;
-import evl.DefTraverser;
+import evl.data.Namespace;
+import evl.data.statement.Block;
+import evl.data.statement.Statement;
+import evl.data.statement.VarDefStmt;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
-import evl.statement.Block;
-import evl.statement.Statement;
-import evl.statement.VarDefStmt;
+import evl.traverser.DefTraverser;
 
 public class VarDeclToTop extends EvlPass {
 

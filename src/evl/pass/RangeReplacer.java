@@ -27,17 +27,17 @@ import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
-import evl.Evl;
-import evl.NullTraverser;
 import evl.copy.Relinker;
+import evl.data.Evl;
+import evl.data.Namespace;
+import evl.data.type.Type;
+import evl.data.type.base.RangeType;
+import evl.data.type.out.IntType;
+import evl.data.type.out.SIntType;
+import evl.data.type.out.UIntType;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
 import evl.pass.check.type.specific.ExpressionTypeChecker;
-import evl.type.Type;
-import evl.type.base.RangeType;
-import evl.type.out.IntType;
-import evl.type.out.SIntType;
-import evl.type.out.UIntType;
+import evl.traverser.NullTraverser;
 
 /**
  * Replaces range types with integer types

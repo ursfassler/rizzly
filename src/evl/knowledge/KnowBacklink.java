@@ -24,10 +24,10 @@ import java.util.Set;
 
 import error.ErrorType;
 import error.RError;
-import evl.DefTraverser;
-import evl.Evl;
-import evl.expression.reference.BaseRef;
-import evl.other.Named;
+import evl.data.Evl;
+import evl.data.Named;
+import evl.data.expression.reference.BaseRef;
+import evl.traverser.DefTraverser;
 
 public class KnowBacklink extends KnowledgeEntry {
   private KnowledgeBase kb;

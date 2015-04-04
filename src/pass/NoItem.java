@@ -17,10 +17,10 @@
 
 package pass;
 
-import evl.EvlBase;
+import evl.data.EvlBase;
+import evl.data.Namespace;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
-import evl.traverser.ClassGetter;
+import evl.traverser.other.ClassGetter;
 
 public class NoItem extends Condition {
   final private Class<? extends EvlBase> type;

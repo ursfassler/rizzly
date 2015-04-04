@@ -21,17 +21,17 @@ import pass.EvlPass;
 
 import common.Designator;
 
-import evl.DefTraverser;
-import evl.Evl;
-import evl.function.Function;
+import evl.data.Evl;
+import evl.data.EvlList;
+import evl.data.Named;
+import evl.data.Namespace;
+import evl.data.component.composition.Queue;
+import evl.data.function.Function;
+import evl.data.type.Type;
+import evl.data.variable.Constant;
+import evl.data.variable.StateVariable;
 import evl.knowledge.KnowledgeBase;
-import evl.other.EvlList;
-import evl.other.Named;
-import evl.other.Namespace;
-import evl.other.Queue;
-import evl.type.Type;
-import evl.variable.Constant;
-import evl.variable.StateVariable;
+import evl.traverser.DefTraverser;
 
 public class Flattner extends EvlPass {
 

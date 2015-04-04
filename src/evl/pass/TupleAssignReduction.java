@@ -27,26 +27,26 @@ import common.ElementInfo;
 
 import error.RError;
 import evl.copy.Copy;
-import evl.expression.AnyValue;
-import evl.expression.Expression;
-import evl.expression.NamedElementsValue;
-import evl.expression.NamedValue;
-import evl.expression.TupleValue;
-import evl.expression.reference.RefName;
-import evl.expression.reference.Reference;
-import evl.expression.reference.SimpleRef;
+import evl.data.EvlList;
+import evl.data.Namespace;
+import evl.data.expression.AnyValue;
+import evl.data.expression.Expression;
+import evl.data.expression.NamedElementsValue;
+import evl.data.expression.NamedValue;
+import evl.data.expression.TupleValue;
+import evl.data.expression.reference.RefName;
+import evl.data.expression.reference.Reference;
+import evl.data.expression.reference.SimpleRef;
+import evl.data.statement.AssignmentMulti;
+import evl.data.statement.AssignmentSingle;
+import evl.data.statement.Statement;
+import evl.data.statement.VarDefStmt;
+import evl.data.type.Type;
+import evl.data.type.composed.RecordType;
+import evl.data.variable.FuncVariable;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
-import evl.other.EvlList;
-import evl.other.Namespace;
-import evl.statement.AssignmentMulti;
-import evl.statement.AssignmentSingle;
-import evl.statement.Statement;
-import evl.statement.VarDefStmt;
-import evl.traverser.StmtReplacer;
-import evl.type.Type;
-import evl.type.composed.RecordType;
-import evl.variable.FuncVariable;
+import evl.traverser.other.StmtReplacer;
 
 //TODO merge parts with InitVarTyper
 public class TupleAssignReduction extends EvlPass {

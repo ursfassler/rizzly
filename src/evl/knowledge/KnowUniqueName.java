@@ -19,9 +19,9 @@ package evl.knowledge;
 
 import common.Designator;
 
-import evl.DefTraverser;
-import evl.Evl;
-import evl.other.Named;
+import evl.data.Evl;
+import evl.data.Named;
+import evl.traverser.DefTraverser;
 
 public class KnowUniqueName extends KnowledgeEntry {
   static final String START = Designator.NAME_SEP;

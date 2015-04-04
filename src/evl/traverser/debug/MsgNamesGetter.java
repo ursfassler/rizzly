@@ -22,15 +22,15 @@ import java.util.Set;
 
 import common.Direction;
 
-import evl.DefTraverser;
-import evl.Evl;
-import evl.composition.ImplComposition;
-import evl.function.header.FuncCtrlInDataIn;
-import evl.function.header.FuncCtrlInDataOut;
-import evl.function.header.FuncCtrlOutDataIn;
-import evl.function.header.FuncCtrlOutDataOut;
-import evl.other.CompUse;
-import evl.other.ImplElementary;
+import evl.data.Evl;
+import evl.data.component.composition.CompUse;
+import evl.data.component.composition.ImplComposition;
+import evl.data.component.elementary.ImplElementary;
+import evl.data.function.header.FuncCtrlInDataIn;
+import evl.data.function.header.FuncCtrlInDataOut;
+import evl.data.function.header.FuncCtrlOutDataIn;
+import evl.data.function.header.FuncCtrlOutDataOut;
+import evl.traverser.DefTraverser;
 
 public class MsgNamesGetter extends DefTraverser<Void, Set<String>> {
 

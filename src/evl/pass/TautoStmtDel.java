@@ -3,15 +3,15 @@ package evl.pass;
 import java.util.List;
 
 import pass.EvlPass;
-import evl.expression.BoolValue;
+import evl.data.EvlList;
+import evl.data.Namespace;
+import evl.data.expression.BoolValue;
+import evl.data.statement.IfOption;
+import evl.data.statement.IfStmt;
+import evl.data.statement.Statement;
 import evl.knowledge.KnowConst;
 import evl.knowledge.KnowledgeBase;
-import evl.other.EvlList;
-import evl.other.Namespace;
-import evl.statement.IfOption;
-import evl.statement.IfStmt;
-import evl.statement.Statement;
-import evl.traverser.StmtReplacer;
+import evl.traverser.other.StmtReplacer;
 
 public class TautoStmtDel extends EvlPass {
 

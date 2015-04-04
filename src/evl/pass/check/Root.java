@@ -20,12 +20,12 @@ package evl.pass.check;
 import pass.EvlPass;
 import error.ErrorType;
 import error.RError;
-import evl.function.InterfaceFunction;
-import evl.function.header.FuncCtrlOutDataIn;
+import evl.data.EvlList;
+import evl.data.Namespace;
+import evl.data.component.Component;
+import evl.data.function.InterfaceFunction;
+import evl.data.function.header.FuncCtrlOutDataIn;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Component;
-import evl.other.EvlList;
-import evl.other.Namespace;
 
 /**
  * Throws an error if an interface in the top component contains a query. Because we have to be sure that queries are

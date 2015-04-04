@@ -21,11 +21,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 import pass.EvlPass;
-import evl.DefTraverser;
+import evl.data.Namespace;
+import evl.data.statement.Block;
+import evl.data.statement.Statement;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
-import evl.statement.Block;
-import evl.statement.Statement;
+import evl.traverser.DefTraverser;
 
 public class BlockReduction extends EvlPass {
 

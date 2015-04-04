@@ -18,11 +18,11 @@
 package evl.pass;
 
 import pass.EvlPass;
-import evl.expression.Expression;
-import evl.expression.TupleValue;
+import evl.data.Namespace;
+import evl.data.expression.Expression;
+import evl.data.expression.TupleValue;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
-import evl.traverser.ExprReplacer;
+import evl.traverser.other.ExprReplacer;
 
 public class ReduceTuple extends EvlPass {
 

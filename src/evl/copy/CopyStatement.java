@@ -17,21 +17,21 @@
 
 package evl.copy;
 
-import evl.Evl;
-import evl.NullTraverser;
-import evl.statement.AssignmentMulti;
-import evl.statement.AssignmentSingle;
-import evl.statement.Block;
-import evl.statement.CallStmt;
-import evl.statement.CaseStmt;
-import evl.statement.ForStmt;
-import evl.statement.IfStmt;
-import evl.statement.ReturnExpr;
-import evl.statement.ReturnVoid;
-import evl.statement.Statement;
-import evl.statement.VarDefStmt;
-import evl.statement.WhileStmt;
-import evl.statement.intern.MsgPush;
+import evl.data.Evl;
+import evl.data.statement.AssignmentMulti;
+import evl.data.statement.AssignmentSingle;
+import evl.data.statement.Block;
+import evl.data.statement.CallStmt;
+import evl.data.statement.CaseStmt;
+import evl.data.statement.ForStmt;
+import evl.data.statement.IfStmt;
+import evl.data.statement.ReturnExpr;
+import evl.data.statement.ReturnVoid;
+import evl.data.statement.Statement;
+import evl.data.statement.VarDefStmt;
+import evl.data.statement.WhileStmt;
+import evl.data.statement.intern.MsgPush;
+import evl.traverser.NullTraverser;
 
 public class CopyStatement extends NullTraverser<Statement, Void> {
   private CopyEvl cast;

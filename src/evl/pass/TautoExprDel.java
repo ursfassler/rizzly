@@ -1,14 +1,14 @@
 package evl.pass;
 
 import pass.EvlPass;
-import evl.expression.BoolValue;
-import evl.expression.Expression;
-import evl.expression.binop.LogicAnd;
-import evl.expression.binop.LogicOr;
-import evl.expression.unop.LogicNot;
+import evl.data.Namespace;
+import evl.data.expression.BoolValue;
+import evl.data.expression.Expression;
+import evl.data.expression.binop.LogicAnd;
+import evl.data.expression.binop.LogicOr;
+import evl.data.expression.unop.LogicNot;
 import evl.knowledge.KnowledgeBase;
-import evl.other.Namespace;
-import evl.traverser.ExprReplacer;
+import evl.traverser.other.ExprReplacer;
 
 public class TautoExprDel extends EvlPass {
 

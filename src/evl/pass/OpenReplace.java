@@ -23,21 +23,21 @@ import java.util.Map;
 
 import pass.EvlPass;
 import util.Range;
-import evl.DefTraverser;
-import evl.Evl;
-import evl.expression.Expression;
-import evl.expression.reference.RefCall;
-import evl.expression.reference.Reference;
-import evl.function.Function;
+import evl.data.Evl;
+import evl.data.EvlList;
+import evl.data.Namespace;
+import evl.data.expression.Expression;
+import evl.data.expression.reference.RefCall;
+import evl.data.expression.reference.Reference;
+import evl.data.function.Function;
+import evl.data.type.Type;
+import evl.data.type.base.RangeType;
+import evl.data.variable.FuncVariable;
+import evl.data.variable.Variable;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
-import evl.other.EvlList;
-import evl.other.Namespace;
-import evl.type.Type;
-import evl.type.base.RangeType;
-import evl.variable.FuncVariable;
-import evl.variable.Variable;
+import evl.traverser.DefTraverser;
 
 /**
  * Replaces open types (like Integer or Natural) of function arguments with appropriate range types.

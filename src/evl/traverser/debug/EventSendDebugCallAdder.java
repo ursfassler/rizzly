@@ -26,21 +26,21 @@ import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
-import evl.DefTraverser;
-import evl.Evl;
-import evl.expression.Number;
-import evl.expression.TupleValue;
-import evl.expression.reference.BaseRef;
-import evl.expression.reference.RefCall;
-import evl.expression.reference.Reference;
-import evl.function.Function;
-import evl.function.header.FuncCtrlOutDataIn;
-import evl.function.header.FuncCtrlOutDataOut;
-import evl.function.header.FuncPrivateVoid;
-import evl.statement.Block;
-import evl.statement.CallStmt;
-import evl.statement.Statement;
-import evl.statement.intern.MsgPush;
+import evl.data.Evl;
+import evl.data.expression.Number;
+import evl.data.expression.TupleValue;
+import evl.data.expression.reference.BaseRef;
+import evl.data.expression.reference.RefCall;
+import evl.data.expression.reference.Reference;
+import evl.data.function.Function;
+import evl.data.function.header.FuncCtrlOutDataIn;
+import evl.data.function.header.FuncCtrlOutDataOut;
+import evl.data.function.header.FuncPrivateVoid;
+import evl.data.statement.Block;
+import evl.data.statement.CallStmt;
+import evl.data.statement.Statement;
+import evl.data.statement.intern.MsgPush;
+import evl.traverser.DefTraverser;
 
 /**
  * Inserts a message call whenever an event is sent

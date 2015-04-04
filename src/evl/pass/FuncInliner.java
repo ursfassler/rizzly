@@ -9,24 +9,24 @@ import common.Property;
 
 import error.RError;
 import evl.copy.Copy;
-import evl.expression.Expression;
-import evl.expression.TupleValue;
-import evl.expression.reference.RefCall;
-import evl.expression.reference.Reference;
-import evl.function.Function;
+import evl.data.EvlList;
+import evl.data.Namespace;
+import evl.data.expression.Expression;
+import evl.data.expression.TupleValue;
+import evl.data.expression.reference.RefCall;
+import evl.data.expression.reference.Reference;
+import evl.data.function.Function;
+import evl.data.statement.AssignmentSingle;
+import evl.data.statement.CallStmt;
+import evl.data.statement.Return;
+import evl.data.statement.Statement;
+import evl.data.statement.VarDefStmt;
+import evl.data.variable.FuncVariable;
 import evl.knowledge.KnowBacklink;
 import evl.knowledge.KnowUniqueName;
 import evl.knowledge.KnowledgeBase;
-import evl.other.EvlList;
-import evl.other.Namespace;
-import evl.statement.AssignmentSingle;
-import evl.statement.CallStmt;
-import evl.statement.Return;
-import evl.statement.Statement;
-import evl.statement.VarDefStmt;
-import evl.traverser.ClassGetter;
-import evl.traverser.StmtReplacer;
-import evl.variable.FuncVariable;
+import evl.traverser.other.ClassGetter;
+import evl.traverser.other.StmtReplacer;
 
 public class FuncInliner extends EvlPass {
 

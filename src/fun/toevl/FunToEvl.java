@@ -26,26 +26,26 @@ import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
-import evl.Evl;
-import evl.composition.Endpoint;
-import evl.composition.EndpointSelf;
-import evl.composition.EndpointSub;
-import evl.expression.reference.RefName;
-import evl.expression.reference.Reference;
-import evl.expression.reference.SimpleRef;
-import evl.function.Function;
-import evl.function.InterfaceFunction;
-import evl.function.header.FuncCtrlInDataIn;
-import evl.function.header.FuncPrivateVoid;
-import evl.hfsm.State;
-import evl.hfsm.StateItem;
-import evl.other.CompUse;
-import evl.other.EvlList;
-import evl.other.Named;
-import evl.statement.Block;
-import evl.statement.CaseOptEntry;
-import evl.type.Type;
-import evl.type.special.VoidType;
+import evl.data.Evl;
+import evl.data.EvlList;
+import evl.data.Named;
+import evl.data.component.composition.CompUse;
+import evl.data.component.composition.Endpoint;
+import evl.data.component.composition.EndpointSelf;
+import evl.data.component.composition.EndpointSub;
+import evl.data.component.hfsm.State;
+import evl.data.component.hfsm.StateItem;
+import evl.data.expression.reference.RefName;
+import evl.data.expression.reference.Reference;
+import evl.data.expression.reference.SimpleRef;
+import evl.data.function.Function;
+import evl.data.function.InterfaceFunction;
+import evl.data.function.header.FuncCtrlInDataIn;
+import evl.data.function.header.FuncPrivateVoid;
+import evl.data.statement.Block;
+import evl.data.statement.CaseOptEntry;
+import evl.data.type.Type;
+import evl.data.type.special.VoidType;
 import fun.Fun;
 import fun.NullTraverser;
 import fun.composition.Connection;
@@ -139,7 +139,7 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitNamespace(Namespace obj, Void param) {
-    evl.other.Namespace ret = new evl.other.Namespace(obj.getInfo(), obj.getName());
+    evl.data.Namespace ret = new evl.data.Namespace(obj.getInfo(), obj.getName());
     map.put(obj, ret);
     for (Fun src : obj.getChildren()) {
       Evl ni = visit(src, null);
@@ -191,19 +191,19 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
   @Override
   protected Evl visitNamedElement(NamedElement obj, Void param) {
     Reference ref = (Reference) traverse(obj.getType(), null);
-    return new evl.type.composed.NamedElement(obj.getInfo(), obj.getName(), FunToEvl.toTypeRef(ref));
+    return new evl.data.type.composed.NamedElement(obj.getInfo(), obj.getName(), FunToEvl.toTypeRef(ref));
   }
 
   @Override
   protected Evl visitEnumElement(EnumElement obj, Void param) {
-    return new evl.type.base.EnumElement(obj.getInfo(), obj.getName());
+    return new evl.data.type.base.EnumElement(obj.getInfo(), obj.getName());
   }
 
   @Override
   protected Evl visitConnection(Connection obj, Void param) {
     Reference srcref = (Reference) traverse(obj.getEndpoint(Direction.in), null);
     Reference dstref = (Reference) traverse(obj.getEndpoint(Direction.out), null);
-    return new evl.composition.Connection(obj.getInfo(), refToEnp(srcref), refToEnp(dstref), obj.getType());
+    return new evl.data.component.composition.Connection(obj.getInfo(), refToEnp(srcref), refToEnp(dstref), obj.getType());
   }
 
   private Endpoint refToEnp(Reference ref) {
@@ -229,11 +229,11 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
   @Override
   protected Evl visitImplElementary(ImplElementary obj, Void param) {
     ElementInfo info = obj.getInfo();
-    FuncPrivateVoid entryFunc = new FuncPrivateVoid(info, "_entry", new EvlList<evl.variable.FuncVariable>(), new evl.function.ret.FuncReturnNone(info), (Block) visit(obj.getEntryFunc(), null));
-    FuncPrivateVoid exitFunc = new FuncPrivateVoid(info, "_exit", new EvlList<evl.variable.FuncVariable>(), new evl.function.ret.FuncReturnNone(info), (Block) visit(obj.getExitFunc(), null));
+    FuncPrivateVoid entryFunc = new FuncPrivateVoid(info, "_entry", new EvlList<evl.data.variable.FuncVariable>(), new evl.data.function.ret.FuncReturnNone(info), (Block) visit(obj.getEntryFunc(), null));
+    FuncPrivateVoid exitFunc = new FuncPrivateVoid(info, "_exit", new EvlList<evl.data.variable.FuncVariable>(), new evl.data.function.ret.FuncReturnNone(info), (Block) visit(obj.getExitFunc(), null));
     // if this makes problems like loops, convert the body of the functions after the component
 
-    evl.other.ImplElementary comp = new evl.other.ImplElementary(obj.getInfo(), obj.getName(), new SimpleRef<FuncPrivateVoid>(info, entryFunc), new SimpleRef<FuncPrivateVoid>(info, exitFunc));
+    evl.data.component.elementary.ImplElementary comp = new evl.data.component.elementary.ImplElementary(obj.getInfo(), obj.getName(), new SimpleRef<FuncPrivateVoid>(info, entryFunc), new SimpleRef<FuncPrivateVoid>(info, exitFunc));
     map.put(obj, comp);
 
     comp.function.add(entryFunc);
@@ -247,14 +247,14 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
 
     for (Fun itr : obj.getInstantiation()) {
       Evl ni = visit(itr, null);
-      if (ni instanceof evl.variable.Constant) {
-        comp.constant.add((evl.variable.Constant) ni);
-      } else if (ni instanceof evl.variable.Variable) {
-        comp.variable.add((evl.variable.Variable) ni);
+      if (ni instanceof evl.data.variable.Constant) {
+        comp.constant.add((evl.data.variable.Constant) ni);
+      } else if (ni instanceof evl.data.variable.Variable) {
+        comp.variable.add((evl.data.variable.Variable) ni);
       } else if (ni instanceof Function) {
         comp.function.add((Function) ni);
-      } else if (ni instanceof evl.type.Type) {
-        comp.type.add((evl.type.Type) ni);
+      } else if (ni instanceof evl.data.type.Type) {
+        comp.type.add((evl.data.type.Type) ni);
       } else {
         throw new RuntimeException("Not yet implemented: " + ni.getClass().getCanonicalName());
       }
@@ -263,14 +263,14 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
     return comp;
   }
 
-  private evl.variable.FuncVariable mvr(String name) {
+  private evl.data.variable.FuncVariable mvr(String name) {
     VoidType voidType = getVoidType();
-    return new evl.variable.FuncVariable(ElementInfo.NO, name, new SimpleRef<Type>(ElementInfo.NO, voidType));
+    return new evl.data.variable.FuncVariable(ElementInfo.NO, name, new SimpleRef<Type>(ElementInfo.NO, voidType));
   }
 
   @Override
   protected Evl visitImplHfsm(ImplHfsm obj, Void param) {
-    evl.hfsm.ImplHfsm comp = new evl.hfsm.ImplHfsm(obj.getInfo(), obj.getName());
+    evl.data.component.hfsm.ImplHfsm comp = new evl.data.component.hfsm.ImplHfsm(obj.getInfo(), obj.getName());
     map.put(obj, comp);
 
     for (Fun itr : obj.getIface()) {
@@ -278,14 +278,14 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
       comp.iface.add((InterfaceFunction) evl);
     }
 
-    comp.topstate = (evl.hfsm.StateComposite) visit(obj.getTopstate(), null);
+    comp.topstate = (evl.data.component.hfsm.StateComposite) visit(obj.getTopstate(), null);
     comp.topstate.setName(Designator.NAME_SEP + "top");
     return comp;
   }
 
   @Override
   protected Evl visitImplComposition(ImplComposition obj, Void param) {
-    evl.composition.ImplComposition comp = new evl.composition.ImplComposition(obj.getInfo(), obj.getName());
+    evl.data.component.composition.ImplComposition comp = new evl.data.component.composition.ImplComposition(obj.getInfo(), obj.getName());
     map.put(obj, comp);
 
     for (Fun itr : obj.getIface()) {
@@ -305,7 +305,7 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
     }
 
     for (Connection con : obj.getConnection()) {
-      comp.connection.add((evl.composition.Connection) visit(con, null));
+      comp.connection.add((evl.data.component.composition.Connection) visit(con, null));
     }
     return comp;
   }
@@ -316,12 +316,12 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
     for (fun.statement.CaseOptEntry entry : obj.getValue()) {
       value.add((CaseOptEntry) visit(entry, null));
     }
-    return new evl.statement.CaseOpt(obj.getInfo(), value, (Block) visit(obj.getCode(), null));
+    return new evl.data.statement.CaseOpt(obj.getInfo(), value, (Block) visit(obj.getCode(), null));
   }
 
   // ----------------
 
-  private void convertContent(fun.hfsm.State obj, evl.hfsm.State state) {
+  private void convertContent(fun.hfsm.State obj, evl.data.component.hfsm.State state) {
     for (StateContent use : obj.getItemList()) {
       Evl evl = traverse(use, null);
       if (evl instanceof StateItem) {
@@ -338,10 +338,10 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
 
     SimpleRef<State> initref = toSimple((Reference) traverse(obj.getInitial(), null));
 
-    FuncPrivateVoid entryFunc = new FuncPrivateVoid(info, "_entry", new EvlList<evl.variable.FuncVariable>(), new evl.function.ret.FuncReturnNone(info), new Block(info));
-    FuncPrivateVoid exitFunc = new FuncPrivateVoid(info, "_exit", new EvlList<evl.variable.FuncVariable>(), new evl.function.ret.FuncReturnNone(info), new Block(info));
+    FuncPrivateVoid entryFunc = new FuncPrivateVoid(info, "_entry", new EvlList<evl.data.variable.FuncVariable>(), new evl.data.function.ret.FuncReturnNone(info), new Block(info));
+    FuncPrivateVoid exitFunc = new FuncPrivateVoid(info, "_exit", new EvlList<evl.data.variable.FuncVariable>(), new evl.data.function.ret.FuncReturnNone(info), new Block(info));
 
-    evl.hfsm.StateComposite state = new evl.hfsm.StateComposite(obj.getInfo(), obj.getName(), new SimpleRef<FuncPrivateVoid>(info, entryFunc), new SimpleRef<FuncPrivateVoid>(info, exitFunc), initref);
+    evl.data.component.hfsm.StateComposite state = new evl.data.component.hfsm.StateComposite(obj.getInfo(), obj.getName(), new SimpleRef<FuncPrivateVoid>(info, entryFunc), new SimpleRef<FuncPrivateVoid>(info, exitFunc), initref);
     state.item.add(entryFunc);
     state.item.add(exitFunc);
     map.put(obj, state);
@@ -358,10 +358,10 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
   @Override
   protected Evl visitStateSimple(StateSimple obj, Void param) {
     ElementInfo info = obj.getInfo();
-    FuncPrivateVoid entryFunc = new FuncPrivateVoid(info, "_entry", new EvlList<evl.variable.FuncVariable>(), new evl.function.ret.FuncReturnNone(info), new Block(info));
-    FuncPrivateVoid exitFunc = new FuncPrivateVoid(info, "_exit", new EvlList<evl.variable.FuncVariable>(), new evl.function.ret.FuncReturnNone(info), new Block(info));
+    FuncPrivateVoid entryFunc = new FuncPrivateVoid(info, "_entry", new EvlList<evl.data.variable.FuncVariable>(), new evl.data.function.ret.FuncReturnNone(info), new Block(info));
+    FuncPrivateVoid exitFunc = new FuncPrivateVoid(info, "_exit", new EvlList<evl.data.variable.FuncVariable>(), new evl.data.function.ret.FuncReturnNone(info), new Block(info));
 
-    evl.hfsm.StateSimple state = new evl.hfsm.StateSimple(obj.getInfo(), obj.getName(), new SimpleRef<FuncPrivateVoid>(info, entryFunc), new SimpleRef<FuncPrivateVoid>(info, exitFunc));
+    evl.data.component.hfsm.StateSimple state = new evl.data.component.hfsm.StateSimple(obj.getInfo(), obj.getName(), new SimpleRef<FuncPrivateVoid>(info, entryFunc), new SimpleRef<FuncPrivateVoid>(info, exitFunc));
     state.item.add(entryFunc);
     state.item.add(exitFunc);
     map.put(obj, state);
@@ -377,46 +377,46 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitTransition(Transition obj, Void param) {
-    EvlList<evl.variable.FuncVariable> args = new EvlList<evl.variable.FuncVariable>();
+    EvlList<evl.data.variable.FuncVariable> args = new EvlList<evl.data.variable.FuncVariable>();
     for (FuncVariable itr : obj.getParam()) {
-      evl.variable.FuncVariable var = (evl.variable.FuncVariable) traverse(itr, null);
+      evl.data.variable.FuncVariable var = (evl.data.variable.FuncVariable) traverse(itr, null);
       args.add(var);
     }
-    SimpleRef<State> src = toSimple((evl.expression.reference.Reference) traverse(obj.getSrc(), null));
-    SimpleRef<State> dst = toSimple((evl.expression.reference.Reference) traverse(obj.getDst(), null));
-    SimpleRef<FuncCtrlInDataIn> evt = toSimple((evl.expression.reference.Reference) traverse(obj.getEvent(), null));
+    SimpleRef<State> src = toSimple((evl.data.expression.reference.Reference) traverse(obj.getSrc(), null));
+    SimpleRef<State> dst = toSimple((evl.data.expression.reference.Reference) traverse(obj.getDst(), null));
+    SimpleRef<FuncCtrlInDataIn> evt = toSimple((evl.data.expression.reference.Reference) traverse(obj.getEvent(), null));
 
-    evl.expression.Expression guard = (evl.expression.Expression) traverse(obj.getGuard(), null);
+    evl.data.expression.Expression guard = (evl.data.expression.Expression) traverse(obj.getGuard(), null);
 
     Block nbody = (Block) traverse(obj.getBody(), null);
 
-    return new evl.hfsm.Transition(obj.getInfo(), src, dst, evt, guard, args, nbody);
+    return new evl.data.component.hfsm.Transition(obj.getInfo(), src, dst, evt, guard, args, nbody);
   }
 
   @Override
   protected Evl visitFuncReturnTuple(FuncReturnTuple obj, Void param) {
-    EvlList<evl.variable.FuncVariable> arg = new EvlList<evl.variable.FuncVariable>();
+    EvlList<evl.data.variable.FuncVariable> arg = new EvlList<evl.data.variable.FuncVariable>();
     for (FuncVariable itr : obj.getParam()) {
-      evl.variable.FuncVariable var = (evl.variable.FuncVariable) traverse(itr, null);
+      evl.data.variable.FuncVariable var = (evl.data.variable.FuncVariable) traverse(itr, null);
       arg.add(var);
     }
-    return new evl.function.ret.FuncReturnTuple(obj.getInfo(), arg);
+    return new evl.data.function.ret.FuncReturnTuple(obj.getInfo(), arg);
   }
 
   @Override
   protected Evl visitFuncReturnType(FuncReturnType obj, Void param) {
     Type nt = (Type) traverse(FunToEvl.getRefType(obj.getType()), null);
-    return new evl.function.ret.FuncReturnType(obj.getInfo(), new SimpleRef<Type>(obj.getInfo(), nt));
+    return new evl.data.function.ret.FuncReturnType(obj.getInfo(), new SimpleRef<Type>(obj.getInfo(), nt));
   }
 
   @Override
   protected Evl visitFuncReturnNone(FuncReturnNone obj, Void param) {
-    return new evl.function.ret.FuncReturnNone(obj.getInfo());
+    return new evl.data.function.ret.FuncReturnNone(obj.getInfo());
   }
 
   @Override
   protected Evl visitNamedValue(NamedValue obj, Void param) {
-    return new evl.expression.NamedValue(obj.getInfo(), obj.getName(), (evl.expression.Expression) traverse(obj.getValue(), null));
+    return new evl.data.expression.NamedValue(obj.getInfo(), obj.getName(), (evl.data.expression.Expression) traverse(obj.getValue(), null));
   }
 
   static public fun.type.Type getRefType(Fun type) {
