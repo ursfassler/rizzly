@@ -52,7 +52,7 @@ public class RangeReplacer extends EvlPass {
   public void process(Namespace evl, KnowledgeBase kb) {
 
     RangeReplacerWorker changer = new RangeReplacerWorker();
-    for (Type old : ClassGetter.get(Type.class, evl)) {
+    for (Type old : ClassGetter.getRecursive(Type.class, evl)) {
       changer.traverse(old, null);
     }
 

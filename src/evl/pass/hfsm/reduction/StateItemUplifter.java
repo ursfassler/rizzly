@@ -47,7 +47,7 @@ public class StateItemUplifter extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    for (ImplHfsm hfsm : ClassGetter.get(ImplHfsm.class, evl)) {
+    for (ImplHfsm hfsm : ClassGetter.getRecursive(ImplHfsm.class, evl)) {
       StateItemUplifterWorker know = new StateItemUplifterWorker(kb);
       know.traverse(hfsm, null);
     }

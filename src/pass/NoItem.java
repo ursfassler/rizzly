@@ -36,7 +36,7 @@ public class NoItem extends Condition {
 
   @Override
   public boolean check(Namespace root, KnowledgeBase kb) {
-    return ClassGetter.get(type, root).isEmpty();
+    return ClassGetter.getRecursive(type, root).isEmpty();
   }
 
   @Override

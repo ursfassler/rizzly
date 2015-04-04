@@ -48,7 +48,7 @@ public class LeafStateUplifter extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    for (ImplHfsm hfsm : ClassGetter.get(ImplHfsm.class, evl)) {
+    for (ImplHfsm hfsm : ClassGetter.getRecursive(ImplHfsm.class, evl)) {
       LeafStateUplifterWorker know = new LeafStateUplifterWorker(kb);
       know.traverse(hfsm, null);
     }

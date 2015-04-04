@@ -46,7 +46,7 @@ public class HfsmTransScopeCheck extends EvlPass {
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
     HfsmTransScopeCheckWorker check = new HfsmTransScopeCheckWorker();
-    List<ImplHfsm> hfsms = ClassGetter.get(ImplHfsm.class, evl);
+    List<ImplHfsm> hfsms = ClassGetter.getRecursive(ImplHfsm.class, evl);
     for (ImplHfsm hfsm : hfsms) {
       check.traverse(hfsm, null);
     }

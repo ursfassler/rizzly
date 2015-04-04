@@ -80,7 +80,7 @@ class FuncInlinerWorker extends StmtReplacer<Function> {
 
   private boolean doInline(Function func) {
     if (!func.properties().containsKey(Property.Public) && !func.properties().containsKey(Property.Extern)) {
-      if (ClassGetter.get(Return.class, func.body).isEmpty()) {
+      if (ClassGetter.getRecursive(Return.class, func.body).isEmpty()) {
         int refCount = kbl.get(func).size();
         // assert(refCount > 0); //XXX why is this not true?
 

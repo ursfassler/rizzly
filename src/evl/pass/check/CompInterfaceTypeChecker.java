@@ -103,7 +103,7 @@ class CompInterfaceTypeCheckerWorker extends NullTraverser<Void, Void> {
   protected Void visitImplHfsm(ImplHfsm obj, Void param) {
     // TODO can we merge with test for elementary?
     // TODO test also other stuff?
-    List<Transition> transList = ClassGetter.get(Transition.class, obj);
+    List<Transition> transList = ClassGetter.getRecursive(Transition.class, obj);
 
     for (Transition tr : transList) {
       // TODO check if tr.getEventFunc() has compatible parameters

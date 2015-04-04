@@ -70,7 +70,7 @@ class OpenReplaceWorker extends DefTraverser<Void, Void> {
     super.traverse(obj, null);
     for (Variable var : map.keySet()) {
       RangeType range = map.get(var);
-      range = kbi.getNumsetType(range.range);
+      range = kbi.getRangeType(range.range);
       var.type.link = range;
     }
 

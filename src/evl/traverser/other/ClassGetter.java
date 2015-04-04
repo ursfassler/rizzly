@@ -40,17 +40,9 @@ public class ClassGetter<T extends Evl> extends DefTraverser<Void, Void> {
     return ret;
   }
 
-  static public <T extends Evl> EvlList<T> get(Class<T> kind, Evl root) {
+  static public <T extends Evl> EvlList<T> getRecursive(Class<T> kind, Evl root) {
     ClassGetter<T> getter = new ClassGetter<T>(kind);
     getter.traverse(root, null);
-    return getter.ret;
-  }
-
-  static public <T extends Evl> EvlList<T> getAll(Class<T> kind, Iterable<? extends Evl> root) {
-    ClassGetter<T> getter = new ClassGetter<T>(kind);
-    for (Evl itr : root) {
-      getter.traverse(itr, null);
-    }
     return getter.ret;
   }
 

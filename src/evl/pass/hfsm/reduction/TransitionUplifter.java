@@ -43,7 +43,7 @@ public class TransitionUplifter extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    for (ImplHfsm hfsm : ClassGetter.get(ImplHfsm.class, evl)) {
+    for (ImplHfsm hfsm : ClassGetter.getRecursive(ImplHfsm.class, evl)) {
       TransitionUplifterWorker know = new TransitionUplifterWorker();
       know.traverse(hfsm, null);
     }

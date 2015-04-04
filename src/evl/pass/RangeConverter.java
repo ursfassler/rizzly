@@ -97,7 +97,7 @@ class RangeConverterWorker extends ExprReplacer<Void> {
 
     Range it = Range.grow(lt.range, rt.range);
     Range btr = Range.grow(it, dt.range);
-    RangeType bt = kbi.getNumsetType(btr); // add bt to program
+    RangeType bt = kbi.getRangeType(btr); // add bt to program
 
     obj.left = replaceIfNeeded(obj.left, lt, bt);
     obj.right = replaceIfNeeded(obj.right, rt, bt);
@@ -127,7 +127,7 @@ class RangeConverterWorker extends ExprReplacer<Void> {
     RangeType rt = (RangeType) rb;
 
     Range it = Range.grow(lt.range, rt.range);
-    RangeType bt = kbi.getNumsetType(it); // add bt to program
+    RangeType bt = kbi.getRangeType(it); // add bt to program
 
     obj.left = replaceIfNeeded(obj.left, lt, bt);
     obj.right = replaceIfNeeded(obj.right, rt, bt);

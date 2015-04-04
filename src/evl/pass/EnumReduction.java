@@ -55,7 +55,7 @@ public class EnumReduction extends EvlPass {
 
       BigInteger idx = BigInteger.ZERO;
       for (EnumElement elem : et.getElement()) {
-        RangeType rt = kbi.getNumsetType(new Range(idx, idx));
+        RangeType rt = kbi.getRangeType(new Range(idx, idx));
 
         String name = et.name + Designator.NAME_SEP + elem.name;
         ConstGlobal val = new ConstGlobal(elem.getInfo(), name, new SimpleRef<Type>(ElementInfo.NO, rt), new Number(ElementInfo.NO, idx));

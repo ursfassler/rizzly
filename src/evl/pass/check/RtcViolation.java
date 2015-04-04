@@ -52,7 +52,7 @@ public class RtcViolation extends EvlPass {
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
     {
-      List<ImplElementary> elemset = ClassGetter.get(ImplElementary.class, evl);
+      List<ImplElementary> elemset = ClassGetter.getRecursive(ImplElementary.class, evl);
       for (ImplElementary elem : elemset) {
         SimpleGraph<Evl> cg = CallgraphMaker.make(elem, kb);
         assert (elem.component.isEmpty());
@@ -62,7 +62,7 @@ public class RtcViolation extends EvlPass {
       }
     }
     {
-      List<ImplComposition> elemset = ClassGetter.get(ImplComposition.class, evl);
+      List<ImplComposition> elemset = ClassGetter.getRecursive(ImplComposition.class, evl);
       for (ImplComposition elem : elemset) {
         SimpleGraph<CompUse> cg = makeCallgraph(elem.connection);
         checkRtcViolation(cg, 2, elem.getInfo());

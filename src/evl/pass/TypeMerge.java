@@ -46,7 +46,7 @@ public class TypeMerge extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    EvlList<Type> types = ClassGetter.get(Type.class, evl);
+    EvlList<Type> types = ClassGetter.getRecursive(Type.class, evl);
     Set<Set<Type>> ss = sameSets(kb.getEntry(KnowLeftIsContainerOfRight.class), types);
 
     Map<Type, Type> linkmap = linkmap(ss, evl);

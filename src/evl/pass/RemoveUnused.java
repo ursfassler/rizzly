@@ -38,7 +38,7 @@ public class RemoveUnused extends EvlPass {
   public void process(Namespace evl, KnowledgeBase kb) {
     Set<Function> roots = new HashSet<Function>();
 
-    for (Function func : ClassGetter.get(Function.class, evl)) {
+    for (Function func : ClassGetter.getRecursive(Function.class, evl)) {
       if (func.properties().get(Property.Public) == Boolean.TRUE) {
         roots.add(func);
       }

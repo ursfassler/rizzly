@@ -40,7 +40,7 @@ public class Usefullness extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    for (Component comp : ClassGetter.get(Component.class, evl)) {
+    for (Component comp : ClassGetter.getRecursive(Component.class, evl)) {
       boolean inEmpty = comp.iface.getItems(FuncCtrlInDataIn.class).isEmpty() && comp.iface.getItems(FuncCtrlOutDataIn.class).isEmpty();
       boolean outEmpty = comp.iface.getItems(FuncCtrlOutDataOut.class).isEmpty() && comp.iface.getItems(FuncCtrlInDataOut.class).isEmpty();
       String name = comp.name;

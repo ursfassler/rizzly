@@ -39,7 +39,7 @@ public class TypeSort extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    List<Type> types = ClassGetter.get(Type.class, evl);
+    List<Type> types = ClassGetter.getRecursive(Type.class, evl);
     assert (evl.children.containsAll(types));
 
     toposort(types);

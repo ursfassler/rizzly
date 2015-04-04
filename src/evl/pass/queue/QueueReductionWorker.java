@@ -74,7 +74,7 @@ class QueueReductionWorker {
 
   private Map<Queue, Queue> mapQueuesToOne(Queue queue) {
     Map<Queue, Queue> map = new HashMap<Queue, Queue>();
-    for (Queue old : ClassGetter.get(Queue.class, root)) {
+    for (Queue old : ClassGetter.getRecursive(Queue.class, root)) {
       map.put(old, queue);
     }
     return map;

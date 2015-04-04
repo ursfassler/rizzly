@@ -188,7 +188,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitNumber(Number obj, Void param) {
-    return kbi.getNumsetType(new Range(obj.value, obj.value));
+    return kbi.getRangeType(new Range(obj.value, obj.value));
   }
 
   @Override
@@ -294,7 +294,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     BigInteger high = lr.getHigh().shiftLeft(ExpressionTypeChecker.getAsInt(rr.getHigh(), "shl"));
     BigInteger low = lr.getLow().shiftLeft(ExpressionTypeChecker.getAsInt(rr.getLow(), "shl"));
 
-    return kbi.getNumsetType(new Range(low, high));
+    return kbi.getRangeType(new Range(low, high));
   }
 
   @Override
@@ -311,7 +311,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     BigInteger high = lr.getHigh().shiftRight(ExpressionTypeChecker.getAsInt(rr.getHigh(), "shl"));
     BigInteger low = lr.getLow().shiftRight(ExpressionTypeChecker.getAsInt(rr.getLow(), "shl"));
 
-    return kbi.getNumsetType(new Range(low, high));
+    return kbi.getRangeType(new Range(low, high));
   }
 
   @Override
@@ -328,7 +328,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     BigInteger low = lr.getLow().add(rr.getLow());
     BigInteger high = lr.getHigh().add(rr.getHigh());
 
-    return kbi.getNumsetType(new Range(low, high));
+    return kbi.getRangeType(new Range(low, high));
   }
 
   @Override
@@ -345,7 +345,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     BigInteger low = lr.getLow().subtract(rr.getHigh());
     BigInteger high = lr.getHigh().subtract(rr.getLow());
 
-    return kbi.getNumsetType(new Range(low, high));
+    return kbi.getRangeType(new Range(low, high));
 
   }
 
@@ -394,7 +394,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     BigInteger high = bigger.or(ones);
     BigInteger low = lhs.getLow().max(rhs.getLow());
 
-    return kbi.getNumsetType(new Range(low, high));
+    return kbi.getRangeType(new Range(low, high));
   }
 
   @Override
@@ -415,7 +415,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
       BigInteger ones = ExpressionTypeChecker.makeOnes(bits);
       BigInteger high = bigger.or(ones);
 
-      return kbi.getNumsetType(new Range(BigInteger.ZERO, high));
+      return kbi.getRangeType(new Range(BigInteger.ZERO, high));
     } else if (lhst instanceof BooleanType) {
       assert (rhst instanceof BooleanType);
       return lhst;
@@ -445,7 +445,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
   private Type bitAnd(ElementInfo info, Range lhs, Range rhs) {
     checkPositive(info, "and", lhs, rhs);
     BigInteger high = lhs.getHigh().min(rhs.getHigh()); // TODO ok?
-    return kbi.getNumsetType(new Range(BigInteger.ZERO, high));
+    return kbi.getRangeType(new Range(BigInteger.ZERO, high));
   }
 
   @Override
@@ -484,7 +484,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     BigInteger low = BigInteger.ZERO;
     BigInteger high = lr.getHigh().min(rr.getHigh().subtract(BigInteger.ONE));
 
-    return kbi.getNumsetType(new Range(low, high));
+    return kbi.getRangeType(new Range(low, high));
   }
 
   @Override
@@ -503,7 +503,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     BigInteger low = lr.getLow().multiply(rr.getLow());
     BigInteger high = lr.getHigh().multiply(rr.getHigh());
 
-    return kbi.getNumsetType(new Range(low, high));
+    return kbi.getRangeType(new Range(low, high));
   }
 
   @Override
@@ -537,7 +537,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     BigInteger low = lr.getLow().divide(rhigh);
     BigInteger high = lr.getHigh().divide(rlow);
 
-    return kbi.getNumsetType(new Range(low, high));
+    return kbi.getRangeType(new Range(low, high));
   }
 
   @Override
@@ -566,7 +566,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     Range lr = ((RangeType) lhs).range;
     BigInteger low = BigInteger.ZERO.subtract(lr.getHigh());
     BigInteger high = BigInteger.ZERO.subtract(lr.getLow());
-    return kbi.getNumsetType(new Range(low, high));
+    return kbi.getRangeType(new Range(low, high));
   }
 
   @Override
@@ -579,7 +579,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
       cont = Range.grow(cont, ntype);
     }
 
-    RangeType et = kbi.getNumsetType(cont);
+    RangeType et = kbi.getRangeType(cont);
 
     return new ArrayType(BigInteger.valueOf(obj.value.size()), new SimpleRef<Type>(ElementInfo.NO, et));
   }

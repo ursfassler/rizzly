@@ -51,7 +51,7 @@ public class QueryDownPropagator extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    for (ImplHfsm hfsm : ClassGetter.get(ImplHfsm.class, evl)) {
+    for (ImplHfsm hfsm : ClassGetter.getRecursive(ImplHfsm.class, evl)) {
       process(hfsm, kb);
     }
   }

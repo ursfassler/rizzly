@@ -74,8 +74,8 @@ public class Io extends EvlPass {
     // print(writes, reads, outputs, inputs);
 
     IoCheck ioCheck = new IoCheck(writes, reads, outputs, inputs);
-    ioCheck.check(ClassGetter.get(Function.class, evl));
-    ioCheck.check(ClassGetter.get(Transition.class, evl));
+    ioCheck.check(ClassGetter.getRecursive(Function.class, evl));
+    ioCheck.check(ClassGetter.getRecursive(Transition.class, evl));
   }
 
   private static <T extends Evl> Map<T, Boolean> doTransStuff(SimpleGraph<T> cg, Map<? extends Evl, Boolean> does) {

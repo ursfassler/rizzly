@@ -55,7 +55,7 @@ public class ElementaryReduction extends EvlPass {
   public void process(Namespace evl, KnowledgeBase kb) {
     Map<Named, Named> map = new HashMap<Named, Named>();
 
-    for (ImplElementary impl : ClassGetter.get(ImplElementary.class, evl)) {
+    for (ImplElementary impl : ClassGetter.getRecursive(ImplElementary.class, evl)) {
 
       EvlList<FuncCtrlInDataIn> slotImpl = impl.function.getItems(FuncCtrlInDataIn.class);
       EvlList<FuncCtrlInDataOut> responseImpl = impl.function.getItems(FuncCtrlInDataOut.class);

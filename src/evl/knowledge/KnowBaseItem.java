@@ -95,11 +95,10 @@ public class KnowBaseItem extends KnowledgeEntry {
   public RangeType getRangeType(int count) {
     BigInteger low = BigInteger.ZERO;
     BigInteger high = BigInteger.valueOf(count - 1);
-    return getNumsetType(new Range(low, high));
+    return getRangeType(new Range(low, high));
   }
 
-  // TODO rename
-  public RangeType getNumsetType(Range range) {
+  public RangeType getRangeType(Range range) {
     EvlList<RangeType> items = kb.getRoot().children.getItems(RangeType.class);
     for (RangeType itr : items) {
       if (itr.range.equals(range)) {
@@ -221,7 +220,7 @@ class KnowBaseItemTypeFinder extends NullTraverser<Type, KnowBaseItem> {
 
   @Override
   protected Type visitRangeType(RangeType obj, KnowBaseItem param) {
-    return param.getNumsetType(obj.range);
+    return param.getRangeType(obj.range);
   }
 
 }
