@@ -69,7 +69,7 @@ class DispatchFunctionFactory {
     EvlList<CaseOpt> opt = new EvlList<CaseOpt>();
     Reference ref = new Reference(info, queueVariables.getQueue());
     ref.offset.add(new RefIndex(info, new Reference(info, queueVariables.getHead())));
-    ref.offset.add(new RefName(info, ut.tag.getName()));
+    ref.offset.add(new RefName(info, ut.tag.name));
     CaseStmt caseStmt = new CaseStmt(info, ref, opt, new Block(info));
 
     for (Function func : queueTypes.getFuncToMsgType().keySet()) {
@@ -83,8 +83,8 @@ class DispatchFunctionFactory {
       for (NamedElement elem : rec.element) {
         Reference vref = new Reference(info, queueVariables.getQueue());
         vref.offset.add(new RefIndex(info, new Reference(info, queueVariables.getHead())));
-        vref.offset.add(new RefName(info, un.getName()));
-        vref.offset.add(new RefName(info, elem.getName()));
+        vref.offset.add(new RefName(info, un.name));
+        vref.offset.add(new RefName(info, elem.name));
         acarg.value.add(vref);
       }
 

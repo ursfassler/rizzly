@@ -19,29 +19,16 @@ package evl.data.type.composed;
 
 import common.ElementInfo;
 
-import evl.data.EvlBase;
 import evl.data.Named;
 import evl.data.expression.reference.SimpleRef;
 import evl.data.type.Type;
 
-final public class NamedElement extends EvlBase implements Named {
-  private String name;
+final public class NamedElement extends Named {
   final public SimpleRef<Type> ref;
 
   public NamedElement(ElementInfo info, String name, SimpleRef<Type> ref) {
-    super(info);
-    this.name = name;
+    super(info, name);
     this.ref = ref;
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public void setName(String name) {
-    this.name = name;
   }
 
   @Override

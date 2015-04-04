@@ -62,8 +62,8 @@ public class Renamer extends DefTraverser<Void, Void> {
   protected Void visit(Evl obj, Void param) {
     if (obj instanceof Named) {
       Named item = (Named) obj;
-      String name = cleanName(item.getName());
-      item.setName(name);
+      String name = cleanName(item.name);
+      item.name = name;
     }
     return super.visit(obj, param);
   }

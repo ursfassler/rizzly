@@ -59,31 +59,31 @@ public class MsgNamesGetter extends DefTraverser<Void, Set<String>> {
 
   @Override
   protected Void visitCompUse(CompUse obj, Set<String> param) {
-    param.add(obj.getName());
+    param.add(obj.name);
     return null;
   }
 
   @Override
   protected Void visitFuncIfaceOutVoid(FuncCtrlOutDataOut obj, Set<String> param) {
-    param.add(obj.getName());
+    param.add(obj.name);
     return null;
   }
 
   @Override
   protected Void visitFuncIfaceOutRet(FuncCtrlOutDataIn obj, Set<String> param) {
-    param.add(obj.getName());
+    param.add(obj.name);
     return null;
   }
 
   @Override
   protected Void visitFuncIfaceInVoid(FuncCtrlInDataIn obj, Set<String> param) {
-    param.add(obj.getName());
+    param.add(obj.name);
     return null;
   }
 
   @Override
   protected Void visitFuncIfaceInRet(FuncCtrlInDataOut obj, Set<String> param) {
-    param.add(obj.getName());
+    param.add(obj.name);
     return null;
   }
 

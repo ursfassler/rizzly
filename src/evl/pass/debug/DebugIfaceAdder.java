@@ -213,14 +213,14 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
 
         {
           FuncSubHandlerEvent recv = makeRecvProto(sizeType);
-          List<Statement> body = makeCode(recv.getName(), recv.param.get(0), recv.param.get(1), recvProto, use.getName());
+          List<Statement> body = makeCode(recv.name, recv.param.get(0), recv.param.get(1), recvProto, use.name);
           recv.body.statements.addAll(body);
           obj.getSubCallback(use).func.add(recv);
         }
 
         {
           FuncSubHandlerEvent send = makeSendProto(sizeType);
-          List<Statement> body = makeCode(send.getName(), send.param.get(0), send.param.get(1), sendProto, use.getName());
+          List<Statement> body = makeCode(send.name, send.param.get(0), send.param.get(1), sendProto, use.name);
           send.body.statements.addAll(body);
           obj.getSubCallback(use).func.add(send);
         }

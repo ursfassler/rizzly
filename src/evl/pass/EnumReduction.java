@@ -53,7 +53,7 @@ public class EnumReduction extends EvlPass {
       for (EnumElement elem : et.getElement()) {
         RangeType rt = makeRangeType(evl, new Range(idx, idx));
 
-        String name = et.getName() + Designator.NAME_SEP + elem.getName();
+        String name = et.name + Designator.NAME_SEP + elem.name;
         ConstGlobal val = new ConstGlobal(elem.getInfo(), name, new SimpleRef<Type>(ElementInfo.NO, rt), new Number(ElementInfo.NO, idx));
         evl.add(val);
         elemMap.put(elem, val);

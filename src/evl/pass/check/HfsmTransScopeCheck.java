@@ -93,7 +93,7 @@ class HfsmTransScopeCheckWorker extends NullTraverser<Set<State>, Void> {
 
   private void check(State state, Set<State> allowed, ElementInfo info, String end) {
     if (!allowed.contains(state)) {
-      RError.err(ErrorType.Error, info, "Connection to state which is in outer scope for " + end + " (" + state.getName() + ")");
+      RError.err(ErrorType.Error, info, "Connection to state which is in outer scope for " + end + " (" + state.name + ")");
     }
   }
 }

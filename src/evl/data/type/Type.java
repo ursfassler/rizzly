@@ -19,31 +19,12 @@ package evl.data.type;
 
 import common.ElementInfo;
 
-import evl.data.EvlBase;
 import evl.data.Named;
 import evl.data.component.hfsm.StateItem;
 
-abstract public class Type extends EvlBase implements Named, StateItem {
-  private String name;
-
+abstract public class Type extends Named implements StateItem {
   public Type(ElementInfo info, String name) {
-    super(info);
-    this.name = name;
-  }
-
-  @Override
-  public String toString() {
-    return name;
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public void setName(String name) {
-    this.name = name;
+    super(info, name);
   }
 
 }

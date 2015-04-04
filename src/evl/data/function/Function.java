@@ -20,35 +20,22 @@ package evl.data.function;
 import common.ElementInfo;
 
 import evl.data.Evl;
-import evl.data.EvlBase;
 import evl.data.EvlList;
 import evl.data.Named;
 import evl.data.function.ret.FuncReturn;
 import evl.data.statement.Block;
 import evl.data.variable.FuncVariable;
 
-abstract public class Function extends EvlBase implements Named {
-  private String name;
+abstract public class Function extends Named {
   final public EvlList<FuncVariable> param = new EvlList<FuncVariable>();
   public FuncReturn ret;
   public Block body;
 
   public Function(ElementInfo info, String name, EvlList<FuncVariable> param, FuncReturn ret, Block body) {
-    super(info);
-    this.name = name;
+    super(info, name);
     this.param.addAll(param);
     this.ret = ret;
     this.body = body;
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public void setName(String name) {
-    this.name = name;
   }
 
   @Override

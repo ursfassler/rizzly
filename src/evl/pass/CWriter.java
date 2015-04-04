@@ -106,7 +106,7 @@ public class CWriter extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    String cfile = kb.getOutDir() + evl.getName() + ".c";
+    String cfile = kb.getOutDir() + evl.name + ".c";
     try {
       CWriterWorker printer = new CWriterWorker(new StreamWriter(new PrintStream(cfile)));
       printer.traverse(evl, null);
@@ -127,7 +127,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
 
   @Deprecated
   private String name(Named obj) {
-    return obj.getName();
+    return obj.name;
   }
 
   @Override
@@ -607,7 +607,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
   protected Void visitNamedElement(NamedElement obj, Boolean param) {
     visit(obj.ref, param);
     sw.wr(" ");
-    sw.wr(obj.getName());
+    sw.wr(obj.name);
     sw.wr(";");
     sw.nl();
     return null;

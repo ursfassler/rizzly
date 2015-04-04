@@ -179,7 +179,7 @@ class MakeCompareFunction extends NullTraverser<Expression, Pair<Expression, Exp
 
     for (int i = 0; i < rt.element.size(); i++) {
       Reference leftVal = new Reference(info, left.get(i));
-      Reference rightVal = new Reference(info, right, new RefName(info, rt.element.get(i).getName()));
+      Reference rightVal = new Reference(info, right, new RefName(info, rt.element.get(i).name));
       Expression ac = make(leftVal, rightVal);
       expr = new LogicAnd(info, expr, ac);
     }
@@ -250,7 +250,7 @@ class MakeCompareFunction extends NullTraverser<Expression, Pair<Expression, Exp
     Expression expr = new BoolValue(info, true);
 
     for (int i = 0; i < lt.element.size(); i++) {
-      Reference leftVal = new Reference(info, left, new RefName(info, lt.element.get(i).getName()));
+      Reference leftVal = new Reference(info, left, new RefName(info, lt.element.get(i).name));
       Reference rightVal = new Reference(info, right.get(i));
       Expression ac = make(leftVal, rightVal);
       expr = new LogicAnd(info, expr, ac);
@@ -268,7 +268,7 @@ class MakeCompareFunction extends NullTraverser<Expression, Pair<Expression, Exp
 
     Expression expr = new BoolValue(info, true);
     for (NamedElement itr : both.element) {
-      String name = itr.getName();
+      String name = itr.name;
       Reference lr = new Reference(info, left, new RefName(info, name));
       Reference rr = new Reference(info, right, new RefName(info, name));
       Expression ac = make(lr, rr);

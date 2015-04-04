@@ -82,7 +82,7 @@ public class FunToEvlVariable extends NullTraverser<Evl, Void> {
     assert (typeref.getLink() instanceof CompImpl);
     CompImpl nt = (CompImpl) typeref.getLink();
     Component ecomp = (Component) fta.traverse(nt, null);
-    return new evl.data.component.composition.CompUse(obj.getInfo(), ecomp, obj.getName());
+    return new evl.data.component.composition.CompUse(obj.getInfo(), obj.getName(), new SimpleRef<Component>(obj.getInfo(), ecomp));
   }
 
 }

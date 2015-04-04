@@ -73,7 +73,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitNamespace(Namespace obj, StreamWriter param) {
-    String protname = obj.getName().toUpperCase() + "_" + "H";
+    String protname = obj.name.toUpperCase() + "_" + "H";
 
     param.wr("#ifndef " + protname);
     param.nl();
@@ -120,7 +120,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
     visitList(obj.element, param);
     param.decIndent();
     param.wr("} ");
-    param.wr(obj.getName());
+    param.wr(obj.name);
     param.wr(";");
     param.nl();
     return null;
@@ -130,7 +130,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
   protected Void visitNamedElement(NamedElement obj, StreamWriter param) {
     visit(obj.ref, param);
     param.wr(" ");
-    param.wr(obj.getName());
+    param.wr(obj.name);
     param.wr(";");
     param.nl();
     return null;
@@ -143,13 +143,13 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.nl();
     param.incIndent();
     for (EnumElement elem : obj.getElement()) {
-      param.wr(obj.getName() + Designator.NAME_SEP + elem.getName());
+      param.wr(obj.name + Designator.NAME_SEP + elem.name);
       param.wr(",");
       param.nl();
     }
     param.decIndent();
     param.wr("} ");
-    param.wr(obj.getName());
+    param.wr(obj.name);
     param.wr(";");
     param.nl();
     return null;
@@ -163,7 +163,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitSimpleRef(SimpleRef obj, StreamWriter param) {
-    param.wr(obj.link.getName());
+    param.wr(obj.link.name);
     return null;
   }
 
@@ -180,7 +180,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.wr("typedef ");
     param.wr("bool");
     param.wr(" ");
-    param.wr(obj.getName());
+    param.wr(obj.name);
     param.wr(";");
     param.nl();
     return null;
@@ -205,7 +205,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.wr("typedef ");
     param.wr((isNeg ? "" : "u") + "int" + bits + "_t");
     param.wr(" ");
-    param.wr(obj.getName());
+    param.wr(obj.name);
     param.wr(";");
     param.nl();
 
@@ -227,7 +227,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.decIndent();
     param.nl();
     param.wr("} ");
-    param.wr(obj.getName());
+    param.wr(obj.name);
     param.wr(";");
     param.nl();
     return null;
@@ -238,7 +238,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.wr("typedef ");
     param.wr("char*");
     param.wr(" ");
-    param.wr(obj.getName());
+    param.wr(obj.name);
     param.wr(";");
     param.nl();
     return null;
@@ -249,7 +249,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.wr("typedef ");
     param.wr("void");
     param.wr(" ");
-    param.wr(obj.getName());
+    param.wr(obj.name);
     param.wr(";");
     param.nl();
     return null;
@@ -264,7 +264,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
   protected Void visitVariable(Variable obj, StreamWriter param) {
     visit(obj.type, param);
     param.wr(" ");
-    param.wr(obj.getName());
+    param.wr(obj.name);
     return null;
   }
 
@@ -295,7 +295,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
   private void wrPrototype(Function obj, StreamWriter param) {
     visit(obj.ret, param);
     param.wr(" ");
-    param.wr(obj.getName());
+    param.wr(obj.name);
     param.wr("(");
     wrList(obj.param, ", ", param);
     param.wr(");");

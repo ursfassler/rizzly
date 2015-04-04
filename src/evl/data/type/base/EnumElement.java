@@ -19,30 +19,11 @@ package evl.data.type.base;
 
 import common.ElementInfo;
 
-import evl.data.EvlBase;
 import evl.data.Named;
 
-final public class EnumElement extends EvlBase implements Named {
-  private String name;
-
+final public class EnumElement extends Named {
   public EnumElement(ElementInfo info, String name) {
-    super(info);
-    this.name = name;
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public void setName(String name) {
-    this.name = name;
-  }
-
-  @Override
-  public String toString() {
-    return name;
+    super(info, name);
   }
 
 }

@@ -56,7 +56,7 @@ class QueueReductionWorker {
       return;
     }
 
-    String prefix = queue.getName() + Designator.NAME_SEP;
+    String prefix = queue.name + Designator.NAME_SEP;
 
     Map<Function, Function> pushfunc = createQueue(prefix, funcToRecord, queue.getInfo());
 

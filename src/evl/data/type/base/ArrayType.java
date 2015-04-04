@@ -41,7 +41,7 @@ public class ArrayType extends BaseType {
   }
 
   public static String makeName(BigInteger size, SimpleRef<Type> type) {
-    return "Array{" + size + "," + type.link.getName() + "}";
+    return "Array{" + size + "," + type.link.name + "}";
   }
 
 }

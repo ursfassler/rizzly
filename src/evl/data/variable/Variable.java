@@ -19,29 +19,16 @@ package evl.data.variable;
 
 import common.ElementInfo;
 
-import evl.data.EvlBase;
 import evl.data.Named;
 import evl.data.expression.reference.SimpleRef;
 import evl.data.type.Type;
 
-abstract public class Variable extends EvlBase implements Named {
-  private String name;
+abstract public class Variable extends Named {
   public SimpleRef<Type> type;
 
   public Variable(ElementInfo info, String name, SimpleRef<Type> type) {
-    super(info);
+    super(info, name);
     this.type = type;
-    this.name = name;
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public void setName(String name) {
-    this.name = name;
   }
 
   @Override

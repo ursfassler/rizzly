@@ -70,7 +70,7 @@ public class EventRecvDebugCallAdder extends DefTraverser<Void, Void> {
   }
 
   public void makeDebugCall(Function obj) {
-    int numFunc = names.indexOf(obj.getName());
+    int numFunc = names.indexOf(obj.name);
     assert (numFunc >= 0);
     obj.body.statements.add(0, makeCall(msgRecvFunc, numFunc));
   }

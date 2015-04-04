@@ -106,7 +106,7 @@ class StmtTraverser extends DefTraverser<Void, List<Statement>> {
     boolean isOut = (obj.link instanceof FuncCtrlOutDataIn) || (obj.link instanceof FuncCtrlOutDataOut);
 
     if (isOut) {
-      String funcName = obj.link.getName();
+      String funcName = obj.link.name;
 
       int numFunc = names.indexOf(funcName);
       if (numFunc >= 0) {

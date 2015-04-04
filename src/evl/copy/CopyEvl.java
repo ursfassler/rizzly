@@ -26,6 +26,7 @@ import evl.data.Evl;
 import evl.data.EvlList;
 import evl.data.Named;
 import evl.data.Namespace;
+import evl.data.component.composition.CompUse;
 import evl.data.component.composition.Queue;
 import evl.data.component.composition.SubCallbacks;
 import evl.data.component.elementary.ImplElementary;
@@ -164,14 +165,14 @@ public class CopyEvl extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitNamespace(Namespace obj, Void param) {
-    Namespace ret = new Namespace(obj.getInfo(), obj.getName());
+    Namespace ret = new Namespace(obj.getInfo(), obj.name);
     ret.addAll(copy(obj.getChildren()));
     return ret;
   }
 
   @Override
   protected Evl visitImplElementary(ImplElementary obj, Void param) {
-    ImplElementary ret = new ImplElementary(obj.getInfo(), obj.getName(), copy(obj.entryFunc), copy(obj.exitFunc));
+    ImplElementary ret = new ImplElementary(obj.getInfo(), obj.name, copy(obj.entryFunc), copy(obj.exitFunc));
 
     ret.function.addAll(copy(obj.function));
     ret.iface.addAll(copy(obj.iface));
@@ -193,7 +194,7 @@ public class CopyEvl extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitEnumElement(EnumElement obj, Void param) {
-    return new EnumElement(obj.getInfo(), obj.getName());
+    return new EnumElement(obj.getInfo(), obj.name);
   }
 
   @Override
@@ -218,12 +219,17 @@ public class CopyEvl extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitNamedElement(NamedElement obj, Void param) {
-    return new NamedElement(obj.getInfo(), obj.getName(), copy(obj.ref));
+    return new NamedElement(obj.getInfo(), obj.name, copy(obj.ref));
   }
 
   @Override
   protected Evl visitNamedValue(NamedValue obj, Void param) {
     return new NamedValue(obj.getInfo(), obj.name, copy(obj.value));
+  }
+
+  @Override
+  protected Evl visitCompUse(CompUse obj, Void param) {
+    return new CompUse(obj.getInfo(), obj.name, copy(obj.instance)); // we keep link to old type
   }
 
 }

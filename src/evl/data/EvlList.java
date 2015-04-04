@@ -41,7 +41,7 @@ public class EvlList<T extends Evl> extends ArrayList<T> {
     EvlList<T> ret = new EvlList<T>();
     for (T itr : this) {
       if (itr instanceof Named) {
-        if (((Named) itr).getName().equals(name)) {
+        if (((Named) itr).name.equals(name)) {
           ret.add(itr);
         }
       }

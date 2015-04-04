@@ -17,8 +17,18 @@
 
 package evl.data;
 
-public interface Named extends Evl {
-  String getName();
+import common.ElementInfo;
 
-  void setName(String name);
+public class Named extends EvlBase {
+  public String name;
+
+  public Named(ElementInfo info, String name) {
+    super(info);
+    this.name = name;
+  }
+
+  @Override
+  public String toString() {
+    return name;
+  }
 }

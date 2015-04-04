@@ -35,7 +35,7 @@ public class Root extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    Component root = kb.getRootComp().link;
+    Component root = kb.getRootComp().instance.link;
 
     EvlList<FuncCtrlOutDataIn> queries = new EvlList<FuncCtrlOutDataIn>();
     for (InterfaceFunction itr : root.iface) {
@@ -44,7 +44,7 @@ public class Root extends EvlPass {
       }
     }
     for (FuncCtrlOutDataIn func : queries) {
-      RError.err(ErrorType.Hint, func.getInfo(), func.getName());
+      RError.err(ErrorType.Hint, func.getInfo(), func.name);
     }
     if (!queries.isEmpty()) {
       RError.err(ErrorType.Error, root.getInfo(), "Top component is not allowed to have queries in output");

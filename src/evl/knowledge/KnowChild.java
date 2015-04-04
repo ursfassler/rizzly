@@ -138,7 +138,7 @@ class KnowChildTraverser extends NullTraverser<Set<Evl>, String> {
   @Override
   protected Set<Evl> visitImplHfsm(ImplHfsm obj, String param) {
     Set<Evl> rset = visit(obj.topstate, param);
-    if (obj.topstate.getName().equals(param)) {
+    if (obj.topstate.name.equals(param)) {
       rset.add(obj.topstate);
     }
     return rset;
@@ -172,7 +172,7 @@ class KnowChildTraverser extends NullTraverser<Set<Evl>, String> {
 
   @Override
   protected Set<Evl> visitCompUse(CompUse obj, String param) {
-    return visit(obj.link, param);
+    return visit(obj.instance, param);
   }
 
   @Override
@@ -183,7 +183,7 @@ class KnowChildTraverser extends NullTraverser<Set<Evl>, String> {
   @Override
   protected Set<Evl> visitUnionType(UnionType obj, String param) {
     Set<Evl> rset = retopt(obj.element.find(param));
-    if (obj.tag.getName() == param) {
+    if (obj.tag.name == param) {
       rset.add(obj.tag);
     }
     return rset;

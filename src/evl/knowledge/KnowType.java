@@ -158,12 +158,12 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     for (FuncVariable var : obj.param) {
       arg.add(new SimpleRef<Type>(ElementInfo.NO, var.type.link));
     }
-    return new FunctionType(obj.getInfo(), obj.getName(), arg, new SimpleRef<Type>(ElementInfo.NO, visit(obj.ret, param)));
+    return new FunctionType(obj.getInfo(), obj.name, arg, new SimpleRef<Type>(ElementInfo.NO, visit(obj.ret, param)));
   }
 
   @Override
   protected Type visitComponent(Component obj, Void param) {
-    ComponentType ct = new ComponentType(obj.getInfo(), Designator.NAME_SEP + "T" + Designator.NAME_SEP + obj.getName());
+    ComponentType ct = new ComponentType(obj.getInfo(), Designator.NAME_SEP + "T" + Designator.NAME_SEP + obj.name);
     makeFuncTypes(ct.input, obj.getIface(Direction.in));
     makeFuncTypes(ct.output, obj.getIface(Direction.out));
     return ct;
@@ -171,7 +171,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
 
   private void makeFuncTypes(EvlList<NamedElement> flist, EvlList<InterfaceFunction> evlList) {
     for (InterfaceFunction itr : evlList) {
-      NamedElement ne = new NamedElement(itr.getInfo(), itr.getName(), new SimpleRef<Type>(itr.getInfo(), visit(itr, null)));
+      NamedElement ne = new NamedElement(itr.getInfo(), itr.name, new SimpleRef<Type>(itr.getInfo(), visit(itr, null)));
       flist.add(ne);
     }
   }
@@ -248,14 +248,14 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitCompUse(CompUse obj, Void param) {
-    return visit(obj.link, param);
+    return visit(obj.instance, param);
   }
 
   @Override
   protected Type visitFuncReturnTuple(FuncReturnTuple obj, Void param) {
     EvlList<NamedElement> types = new EvlList<NamedElement>();
     for (FuncVariable var : obj.param) {
-      types.add(new NamedElement(ElementInfo.NO, var.getName(), new SimpleRef<Type>(ElementInfo.NO, visit(var, param))));
+      types.add(new NamedElement(ElementInfo.NO, var.name, new SimpleRef<Type>(ElementInfo.NO, visit(var, param))));
     }
     return new RecordType(obj.getInfo(), "", types);
   }

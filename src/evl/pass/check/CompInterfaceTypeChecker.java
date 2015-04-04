@@ -150,13 +150,13 @@ class CompInterfaceTypeCheckerWorker extends NullTraverser<Void, Void> {
         } else {
           etype = ErrorType.Hint;
         }
-        RError.err(etype, ifaceuse.getInfo(), "Interface " + ifaceuse.getName() + " not connected");
+        RError.err(etype, ifaceuse.getInfo(), "Interface " + ifaceuse.name + " not connected");
       }
     }
   }
 
   private Component checkIface(ImplComposition obj, CompUse use, Direction dir) {
-    Component type = use.link;
+    Component type = use.instance.link;
     for (InterfaceFunction ifaceuse : type.getIface(dir)) {
       if (!ifaceIsConnected(use, ifaceuse, dir.other(), obj.connection)) {
         ErrorType etype;
@@ -165,8 +165,8 @@ class CompInterfaceTypeCheckerWorker extends NullTraverser<Void, Void> {
         } else {
           etype = ErrorType.Hint;
         }
-        RError.err(ErrorType.Hint, ifaceuse.getInfo(), "Interface " + ifaceuse.getName() + " declared here");
-        RError.err(etype, use.getInfo(), "Interface " + use.getName() + "." + ifaceuse.getName() + " not connected");
+        RError.err(ErrorType.Hint, ifaceuse.getInfo(), "Interface " + ifaceuse.name + " declared here");
+        RError.err(etype, use.getInfo(), "Interface " + use.name + "." + ifaceuse.name + " not connected");
       }
     }
     return type;

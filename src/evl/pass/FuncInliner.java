@@ -107,7 +107,7 @@ class FuncInlinerWorker extends StmtReplacer<Function> {
       FuncVariable inner = func.param.get(i);
       Expression arg = actualParameter.value.get(i);
 
-      inner.setName(kun.get(inner.getName()));
+      inner.name = kun.get(inner.name);
 
       VarDefStmt def = new VarDefStmt(inner.getInfo(), inner);
       AssignmentSingle ass = new AssignmentSingle(arg.getInfo(), new Reference(ElementInfo.NO, inner), arg);

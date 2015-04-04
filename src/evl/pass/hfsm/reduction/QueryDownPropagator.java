@@ -101,7 +101,7 @@ class QueryDownPropagatorWorker extends NullTraverser<Void, QueryParam> {
     }
 
     for (FuncCtrlInDataOut func : queries) {
-      FuncCtrlInDataOut cfunc = new FuncCtrlInDataOut(info, func.getName(), Copy.copy(func.param), Copy.copy(func.ret), new Block(info));
+      FuncCtrlInDataOut cfunc = new FuncCtrlInDataOut(info, func.name, Copy.copy(func.param), Copy.copy(func.ret), new Block(info));
 
       TupleValue acpar = new TupleValue(info, new EvlList<Expression>());
       for (Variable par : cfunc.param) {
@@ -206,7 +206,7 @@ class QueryFuncMaker extends NullTraverser<Void, Designator> {
 
   @Override
   protected Void visitFuncIfaceInRet(FuncCtrlInDataOut obj, Designator param) {
-    param = new Designator(param, obj.getName());
+    param = new Designator(param, obj.name);
     FuncPrivateRet func = new FuncPrivateRet(ElementInfo.NO, param.toString(), Copy.copy(obj.param), Copy.copy(obj.ret), obj.body);
     obj.body = new Block(ElementInfo.NO);
 
@@ -219,7 +219,7 @@ class QueryFuncMaker extends NullTraverser<Void, Designator> {
 
   @Override
   protected Void visitState(State obj, Designator param) {
-    param = new Designator(param, obj.getName());
+    param = new Designator(param, obj.name);
     visitList(obj.item, param);
     return null;
   }

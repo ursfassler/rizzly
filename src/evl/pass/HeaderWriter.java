@@ -81,7 +81,7 @@ public class HeaderWriter extends EvlPass {
   }
 
   private static Namespace makeHeader(Namespace prg, String debugdir) {
-    Namespace ret = new Namespace(ElementInfo.NO, prg.getName());
+    Namespace ret = new Namespace(ElementInfo.NO, prg.name);
     Set<Evl> anchor = new HashSet<Evl>();
     for (Function func : prg.getItems(Function.class, false)) {
       if (Boolean.TRUE.equals(func.properties().get(Property.Public))) {
@@ -122,7 +122,7 @@ public class HeaderWriter extends EvlPass {
   }
 
   private static void printCHeader(String outdir, Namespace cprog, List<String> debugNames, KnowledgeBase kb) {
-    String cfilename = outdir + cprog.getName() + ".h";
+    String cfilename = outdir + cprog.name + ".h";
     CHeaderWriter cwriter = new CHeaderWriter(debugNames, kb);
     try {
       cwriter.traverse(cprog, new StreamWriter(new PrintStream(cfilename)));
@@ -132,7 +132,7 @@ public class HeaderWriter extends EvlPass {
   }
 
   private static void printFpcHeader(String outdir, Namespace cprog, List<String> debugNames, KnowledgeBase kb) {
-    String cfilename = outdir + cprog.getName() + ".pas";
+    String cfilename = outdir + cprog.name + ".pas";
     FpcHeaderWriter cwriter = new FpcHeaderWriter(debugNames, kb);
     try {
       cwriter.traverse(cprog, new StreamWriter(new PrintStream(cfilename)));

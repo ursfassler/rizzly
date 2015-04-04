@@ -138,7 +138,7 @@ public class KnowBaseItem extends KnowledgeEntry {
       return false;
     }
     for (int i = 0; i < left.size(); i++) {
-      if (!left.get(i).getName().equals(right.get(i).getName()) || !left.get(i).ref.link.equals(right.get(i).ref.link)) {
+      if (!left.get(i).name.equals(right.get(i).name) || !left.get(i).ref.link.equals(right.get(i).ref.link)) {
         return false;
       }
     }

@@ -21,7 +21,6 @@ import java.util.List;
 
 import error.ErrorType;
 import error.RError;
-import evl.data.component.composition.CompUse;
 import evl.data.component.hfsm.Transition;
 import evl.data.expression.AnyValue;
 import evl.data.expression.ArrayValue;
@@ -96,11 +95,6 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
     Expression ret = super.visitExpression(obj, param);
     assert (ret != null);
     return ret;
-  }
-
-  @Override
-  protected Expression visitCompUse(CompUse obj, T param) {
-    return obj;
   }
 
   @Override

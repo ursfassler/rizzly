@@ -144,7 +144,7 @@ class Reduction {
   }
 
   public ImplElementary reduce(ImplHfsm obj, Namespace param) {
-    ImplElementary elem = new ImplElementary(obj.getInfo(), obj.getName(), new SimpleRef<FuncPrivateVoid>(info, null), new SimpleRef<FuncPrivateVoid>(info, null));
+    ImplElementary elem = new ImplElementary(obj.getInfo(), obj.name, new SimpleRef<FuncPrivateVoid>(info, null), new SimpleRef<FuncPrivateVoid>(info, null));
     elem.iface.addAll(obj.iface);
     elem.function.addAll(obj.function);
     for (StateItem item : obj.topstate.item) {
@@ -161,7 +161,7 @@ class Reduction {
       }
     }
 
-    EnumType states = new EnumType(obj.topstate.getInfo(), obj.getName() + Designator.NAME_SEP + "State");
+    EnumType states = new EnumType(obj.topstate.getInfo(), obj.name + Designator.NAME_SEP + "State");
     HashMap<StateSimple, EnumElement> enumMap = makeEnumElem(obj.topstate, states);
 
     param.add(states);
@@ -257,7 +257,7 @@ class Reduction {
     for (State state : topstate.item.getItems(State.class)) {
       assert (state instanceof StateSimple);
 
-      EnumElement element = new EnumElement(info, state.getName());
+      EnumElement element = new EnumElement(info, state.name);
       stateEnum.getElement().add(element);
 
       ret.put((StateSimple) state, element);
@@ -270,7 +270,7 @@ class Reduction {
 
     for (State state : leafes) {
 
-      FuncCtrlInDataOut query = getQuery(state, func.getName());
+      FuncCtrlInDataOut query = getQuery(state, func.name);
 
       // from QueryDownPropagator
       assert (query.body.statements.size() == 1);
@@ -293,7 +293,7 @@ class Reduction {
   static private FuncCtrlInDataOut getQuery(State state, String funcName) {
     assert (funcName != null);
     for (FuncCtrlInDataOut itr : state.item.getItems(FuncCtrlInDataOut.class)) {
-      if (funcName.equals(itr.getName())) {
+      if (funcName.equals(itr.name)) {
         return itr;
       }
     }

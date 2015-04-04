@@ -64,7 +64,7 @@ class NamespaceReduction extends DefTraverser<Void, Designator> {
 
   private void addToList(Designator param, Named itr) {
     if (param.size() > 0) {
-      itr.setName(param.toString(Designator.NAME_SEP));
+      itr.name = param.toString(Designator.NAME_SEP);
     }
     list.add(itr);
   }
@@ -72,7 +72,7 @@ class NamespaceReduction extends DefTraverser<Void, Designator> {
   @Override
   protected Void visit(Evl obj, Designator param) {
     if (obj instanceof Named) {
-      String name = ((Named) obj).getName();
+      String name = ((Named) obj).name;
 
       // assert (name.length() > 0);
       param = new Designator(param, name);

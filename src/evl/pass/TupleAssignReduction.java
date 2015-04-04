@@ -29,7 +29,6 @@ import error.RError;
 import evl.copy.Copy;
 import evl.data.EvlList;
 import evl.data.Namespace;
-import evl.data.expression.AnyValue;
 import evl.data.expression.Expression;
 import evl.data.expression.NamedElementsValue;
 import evl.data.expression.NamedValue;
@@ -139,11 +138,9 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
 
       for (int i = 0; i < left.size(); i++) {
         Reference lr = left.get(i);
-        if (!(lr.link instanceof AnyValue)) {
-          String elemName = ((RecordType) rt).element.get(i).getName();
-          Reference rr = new Reference(info, var, new RefName(info, elemName));
-          ret.add(new AssignmentSingle(info, lr, rr));
-        }
+        String elemName = ((RecordType) rt).element.get(i).name;
+        Reference rr = new Reference(info, var, new RefName(info, elemName));
+        ret.add(new AssignmentSingle(info, lr, rr));
       }
 
       return ret;
@@ -171,7 +168,7 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
 
     for (int i = 0; i < value.size(); i++) {
       Reference subref = Copy.copy(left);
-      subref.offset.add(new RefName(ElementInfo.NO, rt.element.get(i).getName()));
+      subref.offset.add(new RefName(ElementInfo.NO, rt.element.get(i).name));
       Expression subVal = value.get(i);
       RError.ass(!(subVal instanceof NamedElementsValue), subVal.getInfo(), "Named element values for tuple not yet supported: " + subVal.toString());
       AssignmentSingle ass = new AssignmentSingle(left.getInfo(), subref, subVal);

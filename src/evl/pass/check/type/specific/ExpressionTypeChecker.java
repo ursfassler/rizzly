@@ -92,7 +92,7 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
   private Range getRange(Expression expr) {
     Type lhs = kt.get(expr);
     if (!(lhs instanceof RangeType)) {
-      RError.err(ErrorType.Fatal, expr.getInfo(), "Expected range type, got " + lhs.getName());
+      RError.err(ErrorType.Fatal, expr.getInfo(), "Expected range type, got " + lhs.name);
       return null;
     } else {
       return ((RangeType) lhs).range;
@@ -143,7 +143,7 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
     }
 
     if (!(type instanceof BooleanType)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "Need boolean type for not, got: " + type.getName());  // TODO otherwise
+      RError.err(ErrorType.Error, obj.getInfo(), "Need boolean type for not, got: " + type.name);  // TODO otherwise
       // it is a bit
       // not
       return null;
@@ -155,14 +155,14 @@ public class ExpressionTypeChecker extends DefTraverser<Void, Void> {
   protected Void visitUminus(Uminus obj, Void param) {
     Type type = kt.get(obj.expr);
     if (!(type instanceof RangeType)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "Need ordinal type for minus, got: " + type.getName());
+      RError.err(ErrorType.Error, obj.getInfo(), "Need ordinal type for minus, got: " + type.name);
     }
     return null;
   }
 
   private void testForEqualComparable(Type lhs, Type rhs, ElementInfo info) {
     if (!kc.get(lhs, rhs)) {
-      RError.err(ErrorType.Error, info, "Incompatible types: " + lhs.getName() + " <-> " + rhs.getName());
+      RError.err(ErrorType.Error, info, "Incompatible types: " + lhs.name + " <-> " + rhs.name);
     }
   }
 

@@ -21,13 +21,12 @@ import common.ElementInfo;
 
 import evl.data.EvlList;
 import evl.data.component.hfsm.StateItem;
-import evl.data.function.Function;
 import evl.data.function.InterfaceFunction;
 import evl.data.function.ret.FuncReturn;
 import evl.data.statement.Block;
 import evl.data.variable.FuncVariable;
 
-public class FuncCtrlInDataOut extends Function implements InterfaceFunction, StateItem {
+public class FuncCtrlInDataOut extends InterfaceFunction implements StateItem {
   public FuncCtrlInDataOut(ElementInfo info, String name, EvlList<FuncVariable> param, FuncReturn ret, Block body) {
     super(info, name, param, ret, body);
   }

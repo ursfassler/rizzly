@@ -84,7 +84,7 @@ class QueueTypes {
   private EnumElement createElemFromFunc(EvlList<NamedElement> unielem, Function func) {
     Designator path = kp.getPath(func);
     assert (path.size() > 0);
-    String name = new Designator(path, func.getName()).toString(Designator.NAME_SEP);
+    String name = new Designator(path, func.name).toString(Designator.NAME_SEP);
 
     NamedElement elem = new NamedElement(info, name, new SimpleRef<Type>(info, funcToRecord.get(func)));
     funcToElem.put(func, elem);

@@ -67,8 +67,8 @@ public class StateTypeBuilder extends NullTraverser<NamedElement, EvlList<NamedE
   }
 
   private String getName(Named obj) {
-    assert (obj.getName().length() > 0);
-    return obj.getName();
+    assert (obj.name.length() > 0);
+    return obj.name;
   }
 
   @Override
@@ -80,7 +80,7 @@ public class StateTypeBuilder extends NullTraverser<NamedElement, EvlList<NamedE
   protected NamedElement visitStateSimple(StateSimple obj, EvlList<NamedElement> param) {
     RecordType record = makeRecord(obj);
 
-    NamedElement dataElem = new NamedElement(obj.getInfo(), obj.getName(), new SimpleRef<Type>(ElementInfo.NO, record));
+    NamedElement dataElem = new NamedElement(obj.getInfo(), obj.name, new SimpleRef<Type>(ElementInfo.NO, record));
 
     param = new EvlList<NamedElement>(param);
     param.add(dataElem);

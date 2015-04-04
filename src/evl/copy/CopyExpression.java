@@ -20,7 +20,6 @@ package evl.copy;
 import java.util.ArrayList;
 
 import evl.data.Evl;
-import evl.data.component.composition.CompUse;
 import evl.data.expression.AnyValue;
 import evl.data.expression.ArrayValue;
 import evl.data.expression.BoolValue;
@@ -74,11 +73,6 @@ public class CopyExpression extends NullTraverser<Expression, Void> {
   @Override
   protected Expression visitDefault(Evl obj, Void param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
-  }
-
-  @Override
-  protected Expression visitCompUse(CompUse obj, Void param) {
-    return new CompUse(obj.getInfo(), obj.link, obj.getName()); // we keep link to old type
   }
 
   @Override

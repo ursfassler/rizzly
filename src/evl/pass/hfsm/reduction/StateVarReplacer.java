@@ -144,7 +144,7 @@ class StateVarReplacerWorker extends DefTraverser<Void, Void> {
 
       obj.link = dataVar;
       for (NamedElement itr : eofs) {
-        RefName ref = new RefName(ElementInfo.NO, itr.getName());
+        RefName ref = new RefName(ElementInfo.NO, itr.name);
 
         type = rtg.traverse(ref, type);  // sanity check
 

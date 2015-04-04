@@ -58,7 +58,7 @@ class CreateRecordFromFunc extends DefTraverser<Void, Void> {
 
     EvlList<NamedElement> elements = new EvlList<NamedElement>();
     for (FuncVariable arg : func.param) {
-      NamedElement elem = new NamedElement(arg.getInfo(), arg.getName(), new SimpleRef<Type>(ElementInfo.NO, arg.type.link));
+      NamedElement elem = new NamedElement(arg.getInfo(), arg.name, new SimpleRef<Type>(ElementInfo.NO, arg.type.link));
       elements.add(elem);
     }
     RecordType rec = new RecordType(func.getInfo(), Designator.NAME_SEP + "msg" + Designator.NAME_SEP + name, elements);

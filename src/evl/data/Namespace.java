@@ -23,27 +23,15 @@ import common.ElementInfo;
 
 //TODO is this class data or object?
 
-public class Namespace extends EvlBase implements Named {
-  private String name;
+public class Namespace extends Named {
   final public EvlList<Evl> children = new EvlList<Evl>();
 
   public Namespace(ElementInfo info, String name) {
-    super(info);
-    this.name = name;
+    super(info, name);
   }
 
   public EvlList<Evl> getChildren() {
     return children;
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public void setName(String name) {
-    this.name = name;
   }
 
   public void add(Evl evl) {
@@ -110,11 +98,6 @@ public class Namespace extends EvlBase implements Named {
 
   public void clear() {
     children.clear();
-  }
-
-  @Override
-  public String toString() {
-    return name;
   }
 
 }

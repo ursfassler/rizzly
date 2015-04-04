@@ -78,9 +78,9 @@ public class ElementaryReduction extends EvlPass {
   private boolean checkForAll(EvlList<? extends Function> test, EvlList<? extends Function> set, String what) {
     boolean ret = true;
     for (Function func : test) {
-      Function proto = set.find(func.getName());
+      Function proto = set.find(func.name);
       if (proto == null) {
-        RError.err(ErrorType.Error, func.getInfo(), what + " not found for " + func.getName());
+        RError.err(ErrorType.Error, func.getInfo(), what + " not found for " + func.name);
         ret = false;
       }
     }
@@ -89,7 +89,7 @@ public class ElementaryReduction extends EvlPass {
 
   private void merge(EvlList<? extends Function> test, EvlList<? extends Function> set, Map<Named, Named> map, KnowledgeBase kb) {
     for (Function func : test) {
-      merge(func, set.find(func.getName()), map, kb);
+      merge(func, set.find(func.name), map, kb);
     }
   }
 

@@ -47,12 +47,12 @@ public class CopyType extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitRangeType(RangeType obj, Void param) {
-    return new RangeType(obj.getInfo(), obj.getName(), obj.range);
+    return new RangeType(obj.getInfo(), obj.name, obj.range);
   }
 
   @Override
   protected Type visitRecordType(RecordType obj, Void param) {
-    RecordType type = new RecordType(obj.getInfo(), obj.getName(), cast.copy(obj.element));
+    RecordType type = new RecordType(obj.getInfo(), obj.name, cast.copy(obj.element));
     return type;
   }
 
@@ -63,12 +63,12 @@ public class CopyType extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitArrayType(ArrayType obj, Void param) {
-    return new ArrayType(obj.getInfo(), obj.getName(), obj.size, cast.copy(obj.type));
+    return new ArrayType(obj.getInfo(), obj.name, obj.size, cast.copy(obj.type));
   }
 
   @Override
   protected Type visitEnumType(EnumType obj, Void param) {
-    EnumType type = new EnumType(obj.getInfo(), obj.getName());
+    EnumType type = new EnumType(obj.getInfo(), obj.name);
     type.getElement().addAll(cast.copy(obj.getElement()));
     return type;
   }
@@ -85,19 +85,19 @@ public class CopyType extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitUnionType(UnionType obj, Void param) {
-    UnionType type = new UnionType(obj.getInfo(), obj.getName(), cast.copy(obj.element), cast.copy(obj.tag));
+    UnionType type = new UnionType(obj.getInfo(), obj.name, cast.copy(obj.element), cast.copy(obj.tag));
     return type;
   }
 
   @Override
   protected Type visitUnsafeUnionType(UnsafeUnionType obj, Void param) {
-    UnsafeUnionType type = new UnsafeUnionType(obj.getInfo(), obj.getName(), cast.copy(obj.element));
+    UnsafeUnionType type = new UnsafeUnionType(obj.getInfo(), obj.name, cast.copy(obj.element));
     return type;
   }
 
   @Override
   protected Type visitAliasType(AliasType obj, Void param) {
-    return new AliasType(obj.getInfo(), obj.getName(), cast.copy(obj.ref));
+    return new AliasType(obj.getInfo(), obj.name, cast.copy(obj.ref));
   }
 
 }

@@ -85,7 +85,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
     }
 
     param.wr("unit ");
-    param.wr(obj.getName());
+    param.wr(obj.name);
     param.wr(";");
     param.nl();
     param.nl();
@@ -114,7 +114,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.incIndent();
     param.wr(LibName);
     param.wr(" = '");
-    param.wr(obj.getName());
+    param.wr(obj.name);
     param.wr("';");
     param.decIndent();
     param.nl();
@@ -193,7 +193,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
       param.wr("function");
     }
     param.wr(" ");
-    param.wr(obj.getName());
+    param.wr(obj.name);
     param.wr("(");
     for (int i = 0; i < obj.param.size(); i++) {
       if (i > 0) {
@@ -272,7 +272,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
     String tname = getName(isNeg, bits, obj.getInfo());
 
-    param.wr(obj.getName());
+    param.wr(obj.name);
     param.wr(" = ");
     param.wr(tname);
     param.wr(";");
@@ -283,7 +283,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitSimpleRef(SimpleRef obj, StreamWriter param) {
-    param.wr(obj.link.getName());
+    param.wr(obj.link.name);
     return null;
   }
 
@@ -298,7 +298,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.wr("static const ");
     visit(obj.type, param);
     param.wr(" ");
-    param.wr(obj.getName());
+    param.wr(obj.name);
     param.wr(" = ");
     visit(obj.def, param);
     param.wr(";");
@@ -308,7 +308,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitFuncVariable(FuncVariable obj, StreamWriter param) {
-    param.wr(obj.getName());
+    param.wr(obj.name);
     param.wr(": ");
     visit(obj.type, param);
     return null;
@@ -316,7 +316,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitStringType(StringType obj, StreamWriter param) {
-    param.wr(obj.getName());
+    param.wr(obj.name);
     param.wr(" = ");
     param.wr("PChar");
     param.wr(";");
@@ -326,7 +326,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitArrayType(ArrayType obj, StreamWriter param) {
-    param.wr(obj.getName());
+    param.wr(obj.name);
     param.wr(" = Record");
     param.nl();
     param.incIndent();
@@ -345,7 +345,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitRecordType(RecordType obj, StreamWriter param) {
-    param.wr(obj.getName());
+    param.wr(obj.name);
     param.wr(" = Record");
     param.nl();
     param.incIndent();
@@ -358,14 +358,14 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitEnumType(EnumType obj, StreamWriter param) {
-    param.wr(obj.getName());
+    param.wr(obj.name);
     param.wr(" = (");
     param.nl();
     param.incIndent();
 
     Iterator<EnumElement> itr = obj.getElement().iterator();
     while (itr.hasNext()) {
-      param.wr(itr.next().getName());
+      param.wr(itr.next().name);
       if (itr.hasNext()) {
         param.wr(",");
       }
@@ -380,7 +380,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitNamedElement(NamedElement obj, StreamWriter param) {
-    param.wr(obj.getName());
+    param.wr(obj.name);
     param.wr(": ");
     visit(obj.ref, param);
     param.wr(";");
@@ -395,7 +395,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitVoidType(VoidType obj, StreamWriter param) {
-    param.wr("{" + obj.getName() + "}");
+    param.wr("{" + obj.name + "}");
     param.nl();
     return null;
   }

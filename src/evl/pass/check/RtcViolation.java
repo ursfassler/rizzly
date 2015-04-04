@@ -100,7 +100,7 @@ public class RtcViolation extends EvlPass {
     if (!erritems.isEmpty()) {
       Collections.sort(erritems);
       for (CompUse v : erritems) {
-        RError.err(ErrorType.Hint, v.getInfo(), "Involved component: " + v.getName());
+        RError.err(ErrorType.Hint, v.getInfo(), "Involved component: " + v.name);
       }
       RError.err(ErrorType.Error, info, "Violation of run to completion detected");
     }

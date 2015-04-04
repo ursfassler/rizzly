@@ -20,7 +20,6 @@ package evl.data.component;
 import common.Direction;
 import common.ElementInfo;
 
-import evl.data.EvlBase;
 import evl.data.EvlList;
 import evl.data.Named;
 import evl.data.component.composition.Queue;
@@ -31,26 +30,14 @@ import evl.data.function.header.FuncCtrlInDataOut;
 import evl.data.function.header.FuncCtrlOutDataIn;
 import evl.data.function.header.FuncCtrlOutDataOut;
 
-abstract public class Component extends EvlBase implements Named {
-  private String name;
+abstract public class Component extends Named {
   public Queue queue;
   final public EvlList<InterfaceFunction> iface = new EvlList<InterfaceFunction>();
   final public EvlList<Function> function = new EvlList<Function>();
 
   public Component(ElementInfo info, String name) {
-    super(info);
-    this.name = name;
+    super(info, name);
     queue = new Queue();
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public void setName(String name) {
-    this.name = name;
   }
 
   public EvlList<InterfaceFunction> getIface(Direction dir) {
@@ -70,11 +57,6 @@ abstract public class Component extends EvlBase implements Named {
         throw new RuntimeException("Not implemented: " + dir);
     }
     return ret;
-  }
-
-  @Override
-  public String toString() {
-    return name;
   }
 
 }

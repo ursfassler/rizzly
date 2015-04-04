@@ -92,7 +92,7 @@ public class RefTypeGetter extends NullTraverser<Type, Type> {
     if (sub instanceof ArrayType) {
       return visit(((ArrayType) sub).type, null);
     } else {
-      RError.err(ErrorType.Error, obj.getInfo(), "need array to index, got type: " + sub.getName());
+      RError.err(ErrorType.Error, obj.getInfo(), "need array to index, got type: " + sub.name);
       return null;
     }
   }

@@ -115,7 +115,7 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
     Type ret = obj.type.link;
     Type defType = checkGetExpr(obj.def);
     if (!kc.get(ret, defType)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "Data type to big or incompatible in assignment: " + ret.getName() + " := " + defType.getName());
+      RError.err(ErrorType.Error, obj.getInfo(), "Data type to big or incompatible in assignment: " + ret.name + " := " + defType.name);
     }
   }
 
@@ -140,7 +140,7 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
   protected Void visitForStmt(ForStmt obj, Void param) {
     Type cond = obj.iterator.type.link;
     if (!(cond instanceof RangeType)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "For loop only supports range type (at the moment), got: " + cond.getName());
+      RError.err(ErrorType.Error, obj.getInfo(), "For loop only supports range type (at the moment), got: " + cond.name);
     }
     visit(obj.block, param);
     return null;
@@ -150,7 +150,7 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
   protected Void visitWhileStmt(WhileStmt obj, Void param) {
     Type cond = checkGetExpr(obj.condition);
     if (!(cond instanceof BooleanType)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "Need boolean type, got: " + cond.getName());
+      RError.err(ErrorType.Error, obj.getInfo(), "Need boolean type, got: " + cond.name);
     }
     visit(obj.body, param);
     return null;
@@ -161,7 +161,7 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
     for (IfOption opt : obj.option) {
       Type cond = checkGetExpr(opt.condition);
       if (!(cond instanceof BooleanType)) {
-        RError.err(ErrorType.Error, opt.getInfo(), "Need boolean type, got: " + cond.getName());
+        RError.err(ErrorType.Error, opt.getInfo(), "Need boolean type, got: " + cond.name);
       }
       visit(opt.code, param);
     }
@@ -174,7 +174,7 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
     Type cond = checkGetExpr(obj.condition);
     // TODO enumerator, union and boolean should also be allowed
     if (!kc.get(kbi.getIntegerType(), cond)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "Condition variable has to be an integer, got: " + cond.getName());
+      RError.err(ErrorType.Error, obj.getInfo(), "Condition variable has to be an integer, got: " + cond.name);
     }
     // TODO check somewhere if case values are disjunct
     visitList(obj.option, map);
@@ -194,10 +194,10 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
     Type start = checkGetExpr(obj.start);
     Type end = checkGetExpr(obj.end);
     if (!kc.get(kbi.getIntegerType(), start)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "Case value has to be an integer (start), got: " + start.getName());
+      RError.err(ErrorType.Error, obj.getInfo(), "Case value has to be an integer (start), got: " + start.name);
     }
     if (!kc.get(kbi.getIntegerType(), end)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "Case value has to be an integer (end), got: " + end.getName());
+      RError.err(ErrorType.Error, obj.getInfo(), "Case value has to be an integer (end), got: " + end.name);
     }
     return null;
   }
@@ -206,7 +206,7 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
   protected Void visitCaseOptValue(CaseOptValue obj, Void map) {
     Type value = checkGetExpr(obj.value);
     if (!kc.get(kbi.getIntegerType(), value)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "Case value has to be an integer, got: " + value.getName());
+      RError.err(ErrorType.Error, obj.getInfo(), "Case value has to be an integer, got: " + value.name);
     }
     return null;
   }
@@ -222,7 +222,7 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
     Type lhs = checkGetExpr(obj.left);
     Type rhs = checkGetExpr(obj.right);
     if (!kc.get(lhs, rhs)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "Data type to big or incompatible in assignment: " + lhs.getName() + " := " + rhs.getName());
+      RError.err(ErrorType.Error, obj.getInfo(), "Data type to big or incompatible in assignment: " + lhs.name + " := " + rhs.name);
     }
     return null;
   }
@@ -245,7 +245,7 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
     }
     Type rhs = checkGetExpr(obj.right);
     if (!kc.get(lhs, rhs)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "Data type to big or incompatible in assignment: " + lhs.getName() + " := " + rhs.getName());
+      RError.err(ErrorType.Error, obj.getInfo(), "Data type to big or incompatible in assignment: " + lhs.name + " := " + rhs.name);
     }
     return null;
   }
@@ -260,7 +260,7 @@ public class StatementTypeChecker extends NullTraverser<Void, Void> {
   protected Void visitReturnExpr(ReturnExpr obj, Void map) {
     Type ret = checkGetExpr(obj.expr);
     if (!kc.get(funcReturn, ret)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "Data type to big or incompatible to return: " + funcReturn.getName() + " := " + ret.getName());
+      RError.err(ErrorType.Error, obj.getInfo(), "Data type to big or incompatible to return: " + funcReturn.name + " := " + ret.name);
     }
     return null;
   }

@@ -48,7 +48,7 @@ public class EnumType extends Type {
   public Set<String> getNames() {
     Set<String> ret = new HashSet<String>();
     for (EnumElement elem : element) {
-      ret.add(elem.getName());
+      ret.add(elem.name);
     }
     return ret;
   }

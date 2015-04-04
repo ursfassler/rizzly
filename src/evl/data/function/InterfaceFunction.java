@@ -17,9 +17,17 @@
 
 package evl.data.function;
 
-import evl.data.Evl;
-import evl.data.Named;
+import common.ElementInfo;
 
-public interface InterfaceFunction extends Evl, Named {
+import evl.data.EvlList;
+import evl.data.function.ret.FuncReturn;
+import evl.data.statement.Block;
+import evl.data.variable.FuncVariable;
+
+abstract public class InterfaceFunction extends Function {
+
+  public InterfaceFunction(ElementInfo info, String name, EvlList<FuncVariable> param, FuncReturn ret, Block body) {
+    super(info, name, param, ret, body);
+  }
 
 }

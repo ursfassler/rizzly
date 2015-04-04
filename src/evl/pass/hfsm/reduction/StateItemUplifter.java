@@ -78,7 +78,7 @@ class StateItemUplifterWorker extends NullTraverser<Void, Designator> {
 
   @Override
   protected Void visitState(State obj, Designator param) {
-    param = new Designator(param, obj.getName());
+    param = new Designator(param, obj.name);
     // visit(obj.getEntryCode(), param);//TODO correct? It is no longer a function and should not exist at this point
     // visit(obj.getExitCode(), param);
     visitList(obj.item, param);
@@ -90,32 +90,32 @@ class StateItemUplifterWorker extends NullTraverser<Void, Designator> {
 
   @Override
   protected Void visitFuncPrivateVoid(FuncPrivateVoid obj, Designator param) {
-    param = new Designator(param, obj.getName());
-    obj.setName(param.toString(Designator.NAME_SEP));
+    param = new Designator(param, obj.name);
+    obj.name = param.toString(Designator.NAME_SEP);
     func.add(obj);
     return null;
   }
 
   @Override
   protected Void visitFuncPrivateRet(FuncPrivateRet obj, Designator param) {
-    param = new Designator(param, obj.getName());
-    obj.setName(param.toString(Designator.NAME_SEP));
+    param = new Designator(param, obj.name);
+    obj.name = param.toString(Designator.NAME_SEP);
     func.add(obj);
     return null;
   }
 
   @Override
   protected Void visitType(Type obj, Designator param) {
-    param = new Designator(param, obj.getName());
-    obj.setName(param.toString(Designator.NAME_SEP));
+    param = new Designator(param, obj.name);
+    obj.name = param.toString(Designator.NAME_SEP);
     func.add(obj);
     return null;
   }
 
   @Override
   protected Void visitConstPrivate(ConstPrivate obj, Designator param) {
-    param = new Designator(param, obj.getName());
-    obj.setName(param.toString(Designator.NAME_SEP));
+    param = new Designator(param, obj.name);
+    obj.name = param.toString(Designator.NAME_SEP);
     func.add(obj);
     return null;
   }

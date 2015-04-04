@@ -199,7 +199,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   }
 
   private void name(Named obj, StreamWriter param) {
-    param.wr(obj.getName());
+    param.wr(obj.name);
   }
 
   protected void visitOptList(String name, Iterable<? extends Evl> items, StreamWriter param) {
@@ -250,7 +250,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     name(obj, param);
     wrId(obj, param);
     param.wr(": ");
-    wrId(obj.link, param);
+    wrId(obj.instance, param);
     param.wr(";");
     param.nl();
     return null;
@@ -442,7 +442,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitEnumType(EnumType obj, StreamWriter param) {
     param.wr("Enum ");
-    param.wr(obj.getName());
+    param.wr(obj.name);
     wrId(obj, param);
     param.nl();
     param.incIndent();
@@ -456,7 +456,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitEnumElement(EnumElement obj, StreamWriter param) {
-    param.wr(obj.getName());
+    param.wr(obj.name);
     wrId(obj, param);
     param.wr(";");
     param.nl();
@@ -466,7 +466,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitUnionType(UnionType obj, StreamWriter param) {
     param.wr("Union ");
-    param.wr(obj.getName());
+    param.wr(obj.name);
     param.wr("(");
     visit(obj.tag, param);
     param.wr(")");
@@ -484,7 +484,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitUnsafeUnionType(UnsafeUnionType obj, StreamWriter param) {
     param.wr("UnsafeUnion ");
-    param.wr(obj.getName());
+    param.wr(obj.name);
     wrId(obj, param);
     param.nl();
     param.incIndent();
@@ -499,7 +499,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitRecordType(RecordType obj, StreamWriter param) {
     param.wr("Record ");
-    param.wr(obj.getName());
+    param.wr(obj.name);
     wrId(obj, param);
     param.nl();
     param.incIndent();
@@ -513,7 +513,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitNamedElement(NamedElement obj, StreamWriter param) {
-    param.wr(obj.getName());
+    param.wr(obj.name);
     param.wr(": ");
     visit(obj.ref, param);
     param.wr(";");
@@ -523,7 +523,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitAliasType(AliasType obj, StreamWriter param) {
-    param.wr(obj.getName());
+    param.wr(obj.name);
     wrId(obj, param);
     param.wr(" = ");
     visit(obj.ref, param);
@@ -616,7 +616,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     param.wr("}");
     wrId(obj, param);
     param.wr("\'");
-    param.wr(obj.getName());
+    param.wr(obj.name);
     param.wr("\'");
     param.nl();
     return null;
@@ -699,7 +699,7 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
   @Override
   protected Void visitForStmt(ForStmt obj, StreamWriter param) {
     param.wr("for ");
-    param.wr(obj.iterator.getName());
+    param.wr(obj.iterator.name);
     wrId(obj.iterator, param);
     param.wr(" in ");
     visit(obj.iterator.type, param);

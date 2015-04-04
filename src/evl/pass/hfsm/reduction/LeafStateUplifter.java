@@ -76,7 +76,7 @@ class LeafStateUplifterWorker extends NullTraverser<Void, Designator> {
 
   @Override
   protected Void visitStateSimple(StateSimple obj, Designator param) {
-    obj.setName(param.toString(Designator.NAME_SEP));
+    obj.name = param.toString(Designator.NAME_SEP);
     states.add(obj);
     return null;
   }
@@ -91,7 +91,7 @@ class LeafStateUplifterWorker extends NullTraverser<Void, Designator> {
 
   @Override
   protected Void visitState(State obj, Designator param) {
-    param = new Designator(param, obj.getName());
+    param = new Designator(param, obj.name);
     return super.visitState(obj, param);
   }
 

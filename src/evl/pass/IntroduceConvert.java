@@ -92,18 +92,18 @@ class IntroduceConvertWorker extends DefTraverser<Void, Void> {
   }
 
   private Function getConvertFunc(Type resType) {
-    String name = CONVERT_PREFIX + resType.getName();
+    String name = CONVERT_PREFIX + resType.name;
 
     Function ret = (Function) kbi.findItem(name);
     if (ret == null) {
       if (resType instanceof RangeType) {
         ret = makeConvertRange((RangeType) resType);
       } else {
-        RError.err(ErrorType.Fatal, "Unknown convert target: " + resType.getName());
+        RError.err(ErrorType.Fatal, "Unknown convert target: " + resType.name);
         return null;
       }
       assert (ret != null);
-      assert (name.equals(ret.getName()));
+      assert (name.equals(ret.name));
       kbi.addItem(ret);
     }
 
@@ -114,7 +114,7 @@ class IntroduceConvertWorker extends DefTraverser<Void, Void> {
   }
 
   private FuncGlobal makeConvertRange(RangeType resType) {
-    String name = CONVERT_PREFIX + resType.getName();
+    String name = CONVERT_PREFIX + resType.name;
     ElementInfo info = new ElementInfo(name, 0, 0);
 
     Block body = new Block(info);

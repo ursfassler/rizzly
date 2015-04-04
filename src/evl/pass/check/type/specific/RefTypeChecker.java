@@ -87,7 +87,7 @@ public class RefTypeChecker extends NullTraverser<Type, Type> {
         Type partype = arg.get(i).link;
         Type valtype = kt.get(argval.get(i));
         if (!kc.get(partype, valtype)) {
-          RError.err(ErrorType.Error, argval.get(i).getInfo(), "Data type to big or incompatible (argument " + (i + 1) + ", " + partype.getName() + " := " + valtype.getName() + ")");
+          RError.err(ErrorType.Error, argval.get(i).getInfo(), "Data type to big or incompatible (argument " + (i + 1) + ", " + partype.name + " := " + valtype.name + ")");
         }
       }
       return ((FunctionType) sub).ret.link;
@@ -118,11 +118,11 @@ public class RefTypeChecker extends NullTraverser<Type, Type> {
     if (sub instanceof ArrayType) {
       RangeType ait = kbi.getRangeType(((ArrayType) sub).size.intValue());
       if (!kc.get(ait, index)) {
-        RError.err(ErrorType.Error, obj.getInfo(), "array index type is " + ait.getName() + ", got " + index.getName());
+        RError.err(ErrorType.Error, obj.getInfo(), "array index type is " + ait.name + ", got " + index.name);
       }
       return ((ArrayType) sub).type.link;
     } else {
-      RError.err(ErrorType.Error, obj.getInfo(), "need array to index, got type: " + sub.getName());
+      RError.err(ErrorType.Error, obj.getInfo(), "need array to index, got type: " + sub.name);
       return null;
     }
   }

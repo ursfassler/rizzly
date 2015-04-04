@@ -52,9 +52,9 @@ class ReduceAliasTypeWorker extends DefTraverser<Void, Void> {
       link = ((AliasType) link).ref.link;
       if (checked.contains(link)) {
         for (Named itr : checked) {
-          RError.err(ErrorType.Hint, itr.getInfo(), "part of recursive type alias: " + itr.getName());
+          RError.err(ErrorType.Hint, itr.getInfo(), "part of recursive type alias: " + itr.name);
         }
-        RError.err(ErrorType.Error, obj.getInfo(), "recursive type alias found: " + obj.link.getName());
+        RError.err(ErrorType.Error, obj.getInfo(), "recursive type alias found: " + obj.link.name);
       }
     }
     obj.link = link;

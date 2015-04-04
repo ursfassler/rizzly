@@ -106,14 +106,14 @@ class RetStructIntroducerWorker extends DefTraverser<Void, Void> {
   private RecordType makeRecord(FuncReturnTuple furet, Map<FuncVariable, NamedElement> varMap) {
     EvlList<NamedElement> element = new EvlList<NamedElement>();
     for (FuncVariable var : furet.param) {
-      NamedElement elem = new NamedElement(var.getInfo(), var.getName(), var.type);
+      NamedElement elem = new NamedElement(var.getInfo(), var.name, var.type);
       element.add(elem);
     }
     RecordType type = kbi.getRecord(element);
     for (int i = 0; i < type.getSize(); i++) {
       FuncVariable var = furet.param.get(i);
       NamedElement elem = type.element.get(i);
-      assert (var.getName().equals(elem.getName()));
+      assert (var.name.equals(elem.name));
       varMap.put(var, elem);
     }
     return type;
@@ -142,7 +142,7 @@ class VarReplacer extends ExprReplacer<Void> {
     if (elem == null) {
       return obj;
     } else {
-      return new Reference(obj.getInfo(), retVar, new RefName(obj.getInfo(), elem.getName()));
+      return new Reference(obj.getInfo(), retVar, new RefName(obj.getInfo(), elem.name));
     }
   }
 
@@ -152,7 +152,7 @@ class VarReplacer extends ExprReplacer<Void> {
     NamedElement elem = varMap.get(obj.link);
     if (elem != null) {
       obj.link = retVar;
-      obj.offset.add(0, new RefName(obj.getInfo(), elem.getName()));
+      obj.offset.add(0, new RefName(obj.getInfo(), elem.name));
     }
     return obj;
   }

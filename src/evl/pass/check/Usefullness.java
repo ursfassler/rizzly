@@ -43,7 +43,7 @@ public class Usefullness extends EvlPass {
     for (Component comp : ClassGetter.get(Component.class, evl)) {
       boolean inEmpty = comp.iface.getItems(FuncCtrlInDataIn.class).isEmpty() && comp.iface.getItems(FuncCtrlOutDataIn.class).isEmpty();
       boolean outEmpty = comp.iface.getItems(FuncCtrlOutDataOut.class).isEmpty() && comp.iface.getItems(FuncCtrlInDataOut.class).isEmpty();
-      String name = comp.getName();
+      String name = comp.name;
       if (inEmpty && outEmpty) {
         RError.err(ErrorType.Warning, comp.getInfo(), "Component " + name + " has no input and no output data flow");
       } else if (outEmpty) {

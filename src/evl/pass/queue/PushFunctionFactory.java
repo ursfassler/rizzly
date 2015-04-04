@@ -50,7 +50,7 @@ class PushFunctionFactory {
     // Designator path = kp.get(func);
     // assert (path.size() > 0);
     // String name = new Designator(path, func.getName()).toString(Designator.NAME_SEP);
-    String name = func.getName();
+    String name = func.name;
 
     EvlList<FuncVariable> param = Copy.copy(func.param);
     Function impl = new FuncPrivateVoid(info, Designator.NAME_SEP + "push" + Designator.NAME_SEP + name, param, new FuncReturnNone(info), createPushBody(param, queueVariables, queueTypes, queueTypes.getFuncToMsgType().get(func), queueTypes.getFuncToElem().get(func)));
@@ -71,14 +71,14 @@ class PushFunctionFactory {
 
     Reference qir = new Reference(info, queueVariables.getQueue());
     qir.offset.add(new RefIndex(info, new Reference(info, idx)));
-    qir.offset.add(new RefName(info, queueTypes.getMessage().tag.getName()));
+    qir.offset.add(new RefName(info, queueTypes.getMessage().tag.name));
     pushbody.statements.add(new AssignmentSingle(info, qir, new Reference(info, enumElement)));
 
     for (FuncVariable arg : param) {
       Reference elem = new Reference(info, queueVariables.getQueue());
       elem.offset.add(new RefIndex(info, new Reference(info, idx)));
-      elem.offset.add(new RefName(info, namedElement.getName()));
-      elem.offset.add(new RefName(info, arg.getName()));
+      elem.offset.add(new RefName(info, namedElement.name));
+      elem.offset.add(new RefName(info, arg.name));
 
       pushbody.statements.add(new AssignmentSingle(info, elem, new Reference(info, arg)));
     }

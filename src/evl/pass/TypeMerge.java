@@ -69,7 +69,7 @@ public class TypeMerge extends EvlPass {
 
       for (Type type : itr) {
         if (type != root) {
-          AliasType alias = new AliasType(type.getInfo(), type.getName(), new SimpleRef<Type>(type.getInfo(), root));
+          AliasType alias = new AliasType(type.getInfo(), type.name, new SimpleRef<Type>(type.getInfo(), root));
           linkmap.put(type, alias);
 
           RError.ass(typespace.getChildren().contains(type), type.getInfo(), "merging types in subtree not yet implemented");
@@ -84,7 +84,7 @@ public class TypeMerge extends EvlPass {
   private Type getRoot(Set<Type> itr) {
     Type root = null;
     for (Type type : itr) {
-      if ((root == null) || (type.getName().compareTo(root.getName()) < 0)) {
+      if ((root == null) || (type.name.compareTo(root.name) < 0)) {
         root = type;
       }
     }

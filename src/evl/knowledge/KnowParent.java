@@ -61,7 +61,7 @@ public class KnowParent extends KnowledgeEntry {
 
     LinkedList<String> name = new LinkedList<String>();
     while (obj != null) {
-      name.push(obj.getName());
+      name.push(obj.name);
       obj = (Named) cache.get(obj);
     }
     return new Designator(name);

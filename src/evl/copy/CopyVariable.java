@@ -40,22 +40,22 @@ public class CopyVariable extends NullTraverser<Variable, Void> {
 
   @Override
   protected Variable visitFuncVariable(FuncVariable obj, Void param) {
-    return new FuncVariable(obj.getInfo(), obj.getName(), cast.copy(obj.type));
+    return new FuncVariable(obj.getInfo(), obj.name, cast.copy(obj.type));
   }
 
   @Override
   protected Variable visitStateVariable(StateVariable obj, Void param) {
-    return new StateVariable(obj.getInfo(), obj.getName(), cast.copy(obj.type), cast.copy(obj.def));
+    return new StateVariable(obj.getInfo(), obj.name, cast.copy(obj.type), cast.copy(obj.def));
   }
 
   @Override
   protected Variable visitConstPrivate(ConstPrivate obj, Void param) {
-    return new ConstPrivate(obj.getInfo(), obj.getName(), cast.copy(obj.type), cast.copy(obj.def));
+    return new ConstPrivate(obj.getInfo(), obj.name, cast.copy(obj.type), cast.copy(obj.def));
   }
 
   @Override
   protected Variable visitConstGlobal(ConstGlobal obj, Void param) {
-    return new ConstGlobal(obj.getInfo(), obj.getName(), cast.copy(obj.type), cast.copy(obj.def));
+    return new ConstGlobal(obj.getInfo(), obj.name, cast.copy(obj.type), cast.copy(obj.def));
   }
 
 }

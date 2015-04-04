@@ -168,7 +168,7 @@ class SystemIfaceCaller extends NullTraverser<Void, Void> {
     {
       ArrayList<Statement> code = new ArrayList<Statement>();
       for (CompUse cuse : compList) {
-        Function sctor = getCtor(cuse.link);
+        Function sctor = getCtor(cuse.instance.link);
         CallStmt call = makeCall(cuse, sctor);
         code.add(call);
       }
@@ -182,7 +182,7 @@ class SystemIfaceCaller extends NullTraverser<Void, Void> {
       code.add(makeCall(obj.exitFunc.link));
       Collections.reverse(compList);
       for (CompUse cuse : compList) {
-        Function sdtor = getDtor(cuse.link);
+        Function sdtor = getDtor(cuse.instance.link);
         CallStmt call = makeCall(cuse, sdtor);
         code.add(call);
       }
@@ -218,7 +218,7 @@ class SystemIfaceCaller extends NullTraverser<Void, Void> {
     ElementInfo info = ElementInfo.NO;
     RError.ass(func.param.isEmpty(), func.getInfo(), "expected (de)constructor to have no parameter");
     Reference fref = new Reference(info, self);
-    fref.offset.add(new RefName(info, func.getName()));
+    fref.offset.add(new RefName(info, func.name));
     fref.offset.add(new RefCall(info, new TupleValue(info, new EvlList<Expression>())));
     return new CallStmt(info, fref);
   }

@@ -63,14 +63,14 @@ class TypeUpliftWorker extends DefTraverser<Void, Designator> {
   @Override
   protected Void visit(Evl obj, Designator param) {
     if (obj instanceof Named) {
-      param = new Designator(param, ((Named) obj).getName());
+      param = new Designator(param, ((Named) obj).name);
     }
     return super.visit(obj, param);
   }
 
   @Override
   protected Void visitType(Type obj, Designator param) {
-    obj.setName(param.toString());
+    obj.name = param.toString();
     types.add(obj);
     return null;
   }

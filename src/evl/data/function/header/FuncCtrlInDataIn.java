@@ -20,13 +20,12 @@ package evl.data.function.header;
 import common.ElementInfo;
 
 import evl.data.EvlList;
-import evl.data.function.Function;
 import evl.data.function.InterfaceFunction;
 import evl.data.function.ret.FuncReturn;
 import evl.data.statement.Block;
 import evl.data.variable.FuncVariable;
 
-public class FuncCtrlInDataIn extends Function implements InterfaceFunction {
+public class FuncCtrlInDataIn extends InterfaceFunction {
 
   public FuncCtrlInDataIn(ElementInfo info, String name, EvlList<FuncVariable> param, FuncReturn ret, Block body) {
     super(info, name, param, ret, body);

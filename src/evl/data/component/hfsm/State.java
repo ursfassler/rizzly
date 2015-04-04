@@ -19,33 +19,20 @@ package evl.data.component.hfsm;
 
 import common.ElementInfo;
 
-import evl.data.EvlBase;
 import evl.data.EvlList;
 import evl.data.Named;
 import evl.data.expression.reference.SimpleRef;
 import evl.data.function.header.FuncPrivateVoid;
 
-abstract public class State extends EvlBase implements StateItem, Named {
-  private String name;
+abstract public class State extends Named implements StateItem {
   final public SimpleRef<FuncPrivateVoid> entryFunc;
   final public SimpleRef<FuncPrivateVoid> exitFunc;
   final public EvlList<StateItem> item = new EvlList<StateItem>();
 
   public State(ElementInfo info, String name, SimpleRef<FuncPrivateVoid> entryFunc, SimpleRef<FuncPrivateVoid> exitFunc) {
-    super(info);
-    this.name = name;
+    super(info, name);
     this.entryFunc = entryFunc;
     this.exitFunc = exitFunc;
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public void setName(String name) {
-    this.name = name;
   }
 
 }

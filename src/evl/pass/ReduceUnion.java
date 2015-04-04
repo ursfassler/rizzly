@@ -83,7 +83,7 @@ class ReduceUnionWorker extends ExprReplacer<Void> {
     if (et instanceof UnionType) {
       assert (obj.condition instanceof Reference);
       Reference cond = (Reference) obj.condition;
-      cond.offset.add(new RefName(ElementInfo.NO, ((UnionType) et).tag.getName()));
+      cond.offset.add(new RefName(ElementInfo.NO, ((UnionType) et).tag.name));
     }
     return super.visitCaseStmt(obj, param);
   }
@@ -114,7 +114,7 @@ class ReduceUnionWorker extends ExprReplacer<Void> {
     Type ut = kt.get(left);
     assert (ut instanceof UnionType);
 
-    left = new Reference(left.getInfo(), left.link, new RefName(ElementInfo.NO, ((UnionType) ut).tag.getName()));
+    left = new Reference(left.getInfo(), left.link, new RefName(ElementInfo.NO, ((UnionType) ut).tag.name));
 
     return new Equal(obj.getInfo(), left, obj.right);
   }
@@ -132,10 +132,10 @@ class Uni2Enum extends DefTraverser<Void, Map<UnionType, EnumType>> {
   protected Void visitUnionType(UnionType obj, Map<UnionType, EnumType> param) {
     assert (!param.containsKey(obj));
 
-    EnumType et = new EnumType(ElementInfo.NO, ENUM_PREFIX + Designator.NAME_SEP + obj.getName());
+    EnumType et = new EnumType(ElementInfo.NO, ENUM_PREFIX + Designator.NAME_SEP + obj.name);
 
     for (NamedElement elem : obj.element) {
-      EnumElement ee = new EnumElement(ElementInfo.NO, elem.getName());
+      EnumElement ee = new EnumElement(ElementInfo.NO, elem.name);
       et.getElement().add(ee);
     }
 

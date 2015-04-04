@@ -137,13 +137,13 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
 
       EnumElement value = (EnumElement) kc.get(et, obj.name, obj.getInfo());
 
-      NamedValue tag = new NamedValue(obj.getInfo(), ((UnionType) type).tag.getName(), new Reference(obj.getInfo(), value));
+      NamedValue tag = new NamedValue(obj.getInfo(), ((UnionType) type).tag.name, new Reference(obj.getInfo(), value));
 
       Expression ov = obj.value;
       NamedElement elem = (NamedElement) kc.get(type, obj.name, obj.getInfo());
       ov = visit(ov, elem.ref.link);
 
-      NamedValue content = new NamedValue(obj.getInfo(), ele.getName(), ov);
+      NamedValue content = new NamedValue(obj.getInfo(), ele.name, ov);
 
       UnionValue uv = new UnionValue(obj.getInfo(), tag, content, new SimpleRef<Type>(obj.getInfo(), type));
       return uv;
@@ -152,7 +152,7 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
       NamedElement elem = (NamedElement) kc.get(type, obj.name, obj.getInfo());
       ov = visit(ov, elem.ref.link);
 
-      NamedValue content = new NamedValue(obj.getInfo(), elem.getName(), ov);
+      NamedValue content = new NamedValue(obj.getInfo(), elem.name, ov);
 
       UnsafeUnionValue uv = new UnsafeUnionValue(obj.getInfo(), content, new SimpleRef<Type>(obj.getInfo(), type));
       return uv;
@@ -202,8 +202,8 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
   private Map<String, Type> getTypes(EvlList<NamedElement> element) {
     Map<String, Type> ret = new HashMap<String, Type>();
     for (NamedElement elem : element) {
-      RError.ass(!ret.containsKey(elem.getName()), elem.getInfo(), "Entry with name " + elem.getName() + " already defined");
-      ret.put(elem.getName(), elem.ref.link);
+      RError.ass(!ret.containsKey(elem.name), elem.getInfo(), "Entry with name " + elem.name + " already defined");
+      ret.put(elem.name, elem.ref.link);
     }
     return ret;
   }

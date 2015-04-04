@@ -31,12 +31,12 @@ final public class EndpointSub extends Endpoint<CompUse> {
 
   @Override
   public Function getFunc() {
-    return (Function) link.link.iface.find(function);
+    return (Function) link.instance.link.iface.find(function);
   }
 
   @Override
   public String toString() {
-    return link.getName() + "." + function;
+    return link.name + "." + function;
   }
 
 }

@@ -210,12 +210,12 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
     switch (ref.offset.size()) {
       case 0: {
         Named link = ref.link;
-        RError.ass(link instanceof Function, ref.getInfo(), "expected function for: " + link.getName());
+        RError.ass(link instanceof Function, ref.getInfo(), "expected function for: " + link.name);
         return new EndpointSelf(ref.getInfo(), (Function) link);
       }
       case 1: {
         Named link = ref.link;
-        RError.ass(link instanceof CompUse, ref.getInfo(), "expected compuse for: " + link.getName());
+        RError.ass(link instanceof CompUse, ref.getInfo(), "expected compuse for: " + link.name);
         String name = ((RefName) ref.offset.get(0)).name;
         return new EndpointSub(ref.getInfo(), (CompUse) link, name);
       }
@@ -279,7 +279,7 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
     }
 
     comp.topstate = (evl.data.component.hfsm.StateComposite) visit(obj.getTopstate(), null);
-    comp.topstate.setName(Designator.NAME_SEP + "top");
+    comp.topstate.name = Designator.NAME_SEP + "top";
     return comp;
   }
 

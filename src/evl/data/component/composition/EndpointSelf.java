@@ -34,6 +34,6 @@ final public class EndpointSelf extends Endpoint<Function> {
 
   @Override
   public String toString() {
-    return "self." + link.getName();
+    return "self." + link.name;
   }
 }

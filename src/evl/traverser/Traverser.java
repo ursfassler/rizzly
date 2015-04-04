@@ -18,7 +18,9 @@
 package evl.traverser;
 
 import evl.data.Evl;
+import evl.data.EvlBase;
 import evl.data.EvlList;
+import evl.data.Named;
 import evl.data.Namespace;
 import evl.data.component.Component;
 import evl.data.component.composition.CompUse;
@@ -86,6 +88,7 @@ import evl.data.expression.unop.Not;
 import evl.data.expression.unop.Uminus;
 import evl.data.expression.unop.UnaryExp;
 import evl.data.function.Function;
+import evl.data.function.InterfaceFunction;
 import evl.data.function.header.FuncCtrlInDataIn;
 import evl.data.function.header.FuncCtrlInDataOut;
 import evl.data.function.header.FuncCtrlOutDataIn;
@@ -167,24 +170,25 @@ public abstract class Traverser<R, P> {
   protected R visit(Evl obj, P param) {
     if (obj == null) {
       throw new RuntimeException("object is null");
-    } else if (obj instanceof Type) {
-      return visitType((Type) obj, param);
-    } else if (obj instanceof Function) {
-      return visitFunction((Function) obj, param);
+    } else if (obj instanceof EvlBase) {
+      return visitEvlBase((EvlBase) obj, param);
+    } else {
+      throwUnknownObjectError(obj);
+      return null;
+    }
+  }
+
+  protected R visitEvlBase(EvlBase obj, P param) {
+    if (obj instanceof Named) {
+      return visitNamed((Named) obj, param);
     } else if (obj instanceof Expression) {
       return visitExpression((Expression) obj, param);
-    } else if (obj instanceof Variable) {
-      return visitVariable((Variable) obj, param);
     } else if (obj instanceof SubCallbacks) {
       return visitSubCallbacks((SubCallbacks) obj, param);
     } else if (obj instanceof RefItem) {
       return visitRefItem((RefItem) obj, param);
-    } else if (obj instanceof Namespace) {
-      return visitNamespace((Namespace) obj, param);
     } else if (obj instanceof Connection) {
       return visitConnection((Connection) obj, param);
-    } else if (obj instanceof State) {
-      return visitState((State) obj, param);
     } else if (obj instanceof Transition) {
       return visitTransition((Transition) obj, param);
     } else if (obj instanceof Statement) {
@@ -195,6 +199,27 @@ public abstract class Traverser<R, P> {
       return visitCaseOpt((CaseOpt) obj, param);
     } else if (obj instanceof CaseOptEntry) {
       return visitCaseOptEntry((CaseOptEntry) obj, param);
+    } else if (obj instanceof FuncReturn) {
+      return visitFuncReturn((FuncReturn) obj, param);
+    } else if (obj instanceof NamedValue) {
+      return visitNamedValue((NamedValue) obj, param);
+    } else {
+      throwUnknownObjectError(obj);
+      return null;
+    }
+  }
+
+  protected R visitNamed(Named obj, P param) {
+    if (obj instanceof Type) {
+      return visitType((Type) obj, param);
+    } else if (obj instanceof Function) {
+      return visitFunction((Function) obj, param);
+    } else if (obj instanceof Variable) {
+      return visitVariable((Variable) obj, param);
+    } else if (obj instanceof Namespace) {
+      return visitNamespace((Namespace) obj, param);
+    } else if (obj instanceof State) {
+      return visitState((State) obj, param);
     } else if (obj instanceof Queue) {
       return visitQueue((Queue) obj, param);
     } else if (obj instanceof EnumElement) {
@@ -203,12 +228,11 @@ public abstract class Traverser<R, P> {
       return visitComponent((Component) obj, param);
     } else if (obj instanceof NamedElement) {
       return visitNamedElement((NamedElement) obj, param);
-    } else if (obj instanceof FuncReturn) {
-      return visitFuncReturn((FuncReturn) obj, param);
-    } else if (obj instanceof NamedValue) {
-      return visitNamedValue((NamedValue) obj, param);
+    } else if (obj instanceof CompUse) {
+      return visitCompUse((CompUse) obj, param);
     } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+      throwUnknownObjectError(obj);
+      return null;
     }
   }
 
@@ -220,60 +244,69 @@ public abstract class Traverser<R, P> {
     } else if (obj instanceof FuncReturnTuple) {
       return visitFuncReturnTuple((FuncReturnTuple) obj, param);
     } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+      throwUnknownObjectError(obj);
+      return null;
     }
   }
 
   protected R visitCaseOptEntry(CaseOptEntry obj, P param) {
-    if (obj instanceof CaseOptValue)
+    if (obj instanceof CaseOptValue) {
       return visitCaseOptValue((CaseOptValue) obj, param);
-    else if (obj instanceof CaseOptRange)
+    } else if (obj instanceof CaseOptRange) {
       return visitCaseOptRange((CaseOptRange) obj, param);
-    else
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    } else {
+      throwUnknownObjectError(obj);
+      return null;
+    }
   }
 
   protected R visitStatement(Statement obj, P param) {
-    if (obj instanceof Block)
+    if (obj instanceof Block) {
       return visitBlock((Block) obj, param);
-    else if (obj instanceof Assignment)
+    } else if (obj instanceof Assignment) {
       return visitAssignment((Assignment) obj, param);
-    else if (obj instanceof CallStmt)
+    } else if (obj instanceof CallStmt) {
       return visitCallStmt((CallStmt) obj, param);
-    else if (obj instanceof IfStmt)
+    } else if (obj instanceof IfStmt) {
       return visitIfStmt((IfStmt) obj, param);
-    else if (obj instanceof Return)
+    } else if (obj instanceof Return) {
       return visitReturn((Return) obj, param);
-    else if (obj instanceof VarDefStmt)
+    } else if (obj instanceof VarDefStmt) {
       return visitVarDef((VarDefStmt) obj, param);
-    else if (obj instanceof WhileStmt)
+    } else if (obj instanceof WhileStmt) {
       return visitWhileStmt((WhileStmt) obj, param);
-    else if (obj instanceof CaseStmt)
+    } else if (obj instanceof CaseStmt) {
       return visitCaseStmt((CaseStmt) obj, param);
-    else if (obj instanceof MsgPush)
+    } else if (obj instanceof MsgPush) {
       return visitMsgPush((MsgPush) obj, param);
-    else if (obj instanceof ForStmt)
+    } else if (obj instanceof ForStmt) {
       return visitForStmt((ForStmt) obj, param);
-    else
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    } else {
+      throwUnknownObjectError(obj);
+      return null;
+    }
   }
 
   protected R visitAssignment(Assignment obj, P param) {
-    if (obj instanceof AssignmentSingle)
+    if (obj instanceof AssignmentSingle) {
       return visitAssignmentSingle((AssignmentSingle) obj, param);
-    else if (obj instanceof AssignmentMulti)
+    } else if (obj instanceof AssignmentMulti) {
       return visitAssignmentMulti((AssignmentMulti) obj, param);
-    else
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    } else {
+      throwUnknownObjectError(obj);
+      return null;
+    }
   }
 
   protected R visitReturn(Return obj, P param) {
-    if (obj instanceof ReturnVoid)
+    if (obj instanceof ReturnVoid) {
       return visitReturnVoid((ReturnVoid) obj, param);
-    else if (obj instanceof ReturnExpr)
+    } else if (obj instanceof ReturnExpr) {
       return visitReturnExpr((ReturnExpr) obj, param);
-    else
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    } else {
+      throwUnknownObjectError(obj);
+      return null;
+    }
   }
 
   protected R visitEndpoint(Endpoint obj, P param) {
@@ -282,7 +315,8 @@ public abstract class Traverser<R, P> {
     } else if (obj instanceof EndpointSelf) {
       return visitEndpointSelf((EndpointSelf) obj, param);
     } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+      throwUnknownObjectError(obj);
+      return null;
     }
   }
 
@@ -292,7 +326,8 @@ public abstract class Traverser<R, P> {
     } else if (obj instanceof StateSimple) {
       return visitStateSimple((StateSimple) obj, param);
     } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+      throwUnknownObjectError(obj);
+      return null;
     }
   }
 
@@ -302,7 +337,8 @@ public abstract class Traverser<R, P> {
     } else if (obj instanceof FuncVariable) {
       return visitFuncVariable((FuncVariable) obj, param);
     } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+      throwUnknownObjectError(obj);
+      return null;
     }
   }
 
@@ -312,7 +348,8 @@ public abstract class Traverser<R, P> {
     } else if (obj instanceof Constant) {
       return visitConstant((Constant) obj, param);
     } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+      throwUnknownObjectError(obj);
+      return null;
     }
   }
 
@@ -322,23 +359,33 @@ public abstract class Traverser<R, P> {
     } else if (obj instanceof ConstGlobal) {
       return visitConstGlobal((ConstGlobal) obj, param);
     } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+      throwUnknownObjectError(obj);
+      return null;
     }
   }
 
   protected R visitFunction(Function obj, P param) {
-    if (obj instanceof FuncGlobal) {
+    if (obj instanceof InterfaceFunction) {
+      return visitInterfaceFunction((InterfaceFunction) obj, param);
+    } else if (obj instanceof FuncGlobal) {
       return visitFuncGlobal((FuncGlobal) obj, param);
     } else if (obj instanceof FuncPrivateVoid) {
       return visitFuncPrivateVoid((FuncPrivateVoid) obj, param);
-    } else if (obj instanceof FuncCtrlInDataIn) {
-      return visitFuncIfaceInVoid((FuncCtrlInDataIn) obj, param);
     } else if (obj instanceof FuncPrivateRet) {
       return visitFuncPrivateRet((FuncPrivateRet) obj, param);
     } else if (obj instanceof FuncSubHandlerEvent) {
       return visitFuncSubHandlerEvent((FuncSubHandlerEvent) obj, param);
     } else if (obj instanceof FuncSubHandlerQuery) {
       return visitFuncSubHandlerQuery((FuncSubHandlerQuery) obj, param);
+    } else {
+      throwUnknownObjectError(obj);
+      return null;
+    }
+  }
+
+  protected R visitInterfaceFunction(InterfaceFunction obj, P param) {
+    if (obj instanceof FuncCtrlInDataIn) {
+      return visitFuncIfaceInVoid((FuncCtrlInDataIn) obj, param);
     } else if (obj instanceof FuncCtrlInDataOut) {
       return visitFuncIfaceInRet((FuncCtrlInDataOut) obj, param);
     } else if (obj instanceof FuncCtrlOutDataIn) {
@@ -346,7 +393,8 @@ public abstract class Traverser<R, P> {
     } else if (obj instanceof FuncCtrlOutDataOut) {
       return visitFuncIfaceOutVoid((FuncCtrlOutDataOut) obj, param);
     } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+      throwUnknownObjectError(obj);
+      return null;
     }
   }
 
@@ -380,7 +428,8 @@ public abstract class Traverser<R, P> {
     } else if (obj instanceof NamedElementsValue) {
       return visitNamedElementsValue((NamedElementsValue) obj, param);
     } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+      throwUnknownObjectError(obj);
+      return null;
     }
   }
 
@@ -391,10 +440,9 @@ public abstract class Traverser<R, P> {
       return visitReference((Reference) obj, param);
     } else if (obj instanceof Endpoint) {
       return visitEndpoint((Endpoint) obj, param);
-    } else if (obj instanceof CompUse) {
-      return visitCompUse((CompUse) obj, param);
     } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+      throwUnknownObjectError(obj);
+      return null;
     }
   }
 
@@ -408,7 +456,8 @@ public abstract class Traverser<R, P> {
     } else if (obj instanceof LogicNot) {
       return visitLogicNot((LogicNot) obj, param);
     } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+      throwUnknownObjectError(obj);
+      return null;
     }
   }
 
@@ -424,7 +473,8 @@ public abstract class Traverser<R, P> {
     } else if (obj instanceof Or) {
       return visitOr((Or) obj, param);
     } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+      throwUnknownObjectError(obj);
+      return null;
     }
   }
 
@@ -434,7 +484,8 @@ public abstract class Traverser<R, P> {
     } else if (obj instanceof LogicOr) {
       return visitLogicOr((LogicOr) obj, param);
     } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+      throwUnknownObjectError(obj);
+      return null;
     }
   }
 
@@ -460,7 +511,8 @@ public abstract class Traverser<R, P> {
     } else if (obj instanceof BitXor) {
       return visitBitXor((BitXor) obj, param);
     } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+      throwUnknownObjectError(obj);
+      return null;
     }
   }
 
@@ -480,7 +532,8 @@ public abstract class Traverser<R, P> {
     } else if (obj instanceof Is) {
       return visitIs((Is) obj, param);
     } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+      throwUnknownObjectError(obj);
+      return null;
     }
   }
 
@@ -492,7 +545,8 @@ public abstract class Traverser<R, P> {
     } else if (obj instanceof RefCall) {
       return visitRefCall((RefCall) obj, param);
     } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+      throwUnknownObjectError(obj);
+      return null;
     }
   }
 
@@ -508,7 +562,8 @@ public abstract class Traverser<R, P> {
     } else if (obj instanceof ComponentType) {
       return visitComponentType((ComponentType) obj, param);
     } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+      throwUnknownObjectError(obj);
+      return null;
     }
   }
 
@@ -520,7 +575,8 @@ public abstract class Traverser<R, P> {
     } else if (obj instanceof ImplHfsm) {
       return visitImplHfsm((ImplHfsm) obj, param);
     } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+      throwUnknownObjectError(obj);
+      return null;
     }
   }
 
@@ -532,7 +588,8 @@ public abstract class Traverser<R, P> {
     } else if (obj instanceof UnsafeUnionType) {
       return visitUnsafeUnionType((UnsafeUnionType) obj, param);
     } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+      throwUnknownObjectError(obj);
+      return null;
     }
   }
 
@@ -560,7 +617,8 @@ public abstract class Traverser<R, P> {
     } else if (obj instanceof TupleType) {
       return visitTupleType((TupleType) obj, param);
     } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+      throwUnknownObjectError(obj);
+      return null;
     }
   }
 
@@ -570,8 +628,13 @@ public abstract class Traverser<R, P> {
     } else if (obj instanceof UIntType) {
       return visitUIntType((UIntType) obj, param);
     } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+      throwUnknownObjectError(obj);
+      return null;
     }
+  }
+
+  private void throwUnknownObjectError(Evl obj) {
+    throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
 
   abstract protected R visitFuncReturnTuple(FuncReturnTuple obj, P param);

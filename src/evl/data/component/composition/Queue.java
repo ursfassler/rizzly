@@ -20,25 +20,13 @@ package evl.data.component.composition;
 import common.Designator;
 import common.ElementInfo;
 
-import evl.data.EvlBase;
 import evl.data.Named;
 
-public class Queue extends EvlBase implements Named {
+public class Queue extends Named {
   public static final String DEFAULT_NAME = Designator.NAME_SEP + "queue";
-  private String name = DEFAULT_NAME;
 
   public Queue() {
-    super(ElementInfo.NO);
-  }
-
-  @Override
-  public String getName() {
-    return name;
-  }
-
-  @Override
-  public void setName(String name) {
-    this.name = name;
+    super(ElementInfo.NO, DEFAULT_NAME);
   }
 
 }
