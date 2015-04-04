@@ -58,6 +58,7 @@ import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowParent;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.NullTraverser;
+import evl.traverser.other.ClassGetter;
 
 /**
  * adds transitions to the children until leaf states also adds calls to exit and entry function
@@ -69,7 +70,7 @@ public class TransitionDownPropagator extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    for (ImplHfsm hfsm : evl.getItems(ImplHfsm.class, true)) {
+    for (ImplHfsm hfsm : ClassGetter.get(ImplHfsm.class, evl)) {
       process(hfsm, kb);
     }
   }

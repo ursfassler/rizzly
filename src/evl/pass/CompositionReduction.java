@@ -128,13 +128,13 @@ class CompositionReductionWorker extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitNamespace(Namespace obj, Void param) {
-    for (int i = 0; i < obj.getChildren().size(); i++) {
-      Evl item = obj.getChildren().get(i);
+    for (int i = 0; i < obj.children.size(); i++) {
+      Evl item = obj.children.get(i);
       Map<Object, Object> prop = item.properties();
       item = visit(item, null);
       assert (item != null);
       item.properties().putAll(prop);
-      obj.getChildren().set(i, item);
+      obj.children.set(i, item);
     }
     return obj;
   }

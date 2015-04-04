@@ -116,7 +116,7 @@ class FsmReductionWorker extends NullTraverser<Evl, Namespace> {
 
   @Override
   protected Evl visitNamespace(Namespace obj, Namespace param) {
-    EvlList<Evl> list = obj.getChildren();
+    EvlList<Evl> list = obj.children;
     for (int i = 0; i < list.size(); i++) {
       Evl item = list.get(i);
       item = visit(item, obj);
@@ -164,7 +164,7 @@ class Reduction {
     EnumType states = new EnumType(obj.topstate.getInfo(), obj.name + Designator.NAME_SEP + "State");
     HashMap<StateSimple, EnumElement> enumMap = makeEnumElem(obj.topstate, states);
 
-    param.add(states);
+    param.children.add(states);
     // String ena = (String) enumMap.get(obj.getTopstate().getInitial()).properties().get(Property.NAME);
     EnumElement ena = enumMap.get(obj.topstate.initial.link);
     Reference initState = makeEnumElemRef(states, ena);

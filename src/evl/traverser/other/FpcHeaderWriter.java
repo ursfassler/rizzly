@@ -74,7 +74,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
     EvlList<Function> funcProvided = new EvlList<Function>();
     EvlList<Function> funcRequired = new EvlList<Function>();
 
-    for (Function func : obj.getItems(Function.class, false)) {
+    for (Function func : ClassGetter.filter(Function.class, obj.children)) {
       if (func.properties().get(Property.Public) == Boolean.TRUE) {
         if (func.properties().get(Property.Extern) == Boolean.TRUE) {
           funcRequired.add(func);
@@ -94,7 +94,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.nl();
     param.nl();
 
-    List<Type> types = obj.getItems(Type.class, false);
+    List<Type> types = ClassGetter.filter(Type.class, obj.children);
 
     if (!types.isEmpty() && !((types.size() == 1) && (types.get(0) instanceof VoidType))) {
       param.wr("type");

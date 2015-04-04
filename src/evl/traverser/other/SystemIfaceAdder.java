@@ -84,7 +84,7 @@ class SystemIfaceAdderWorker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitNamespace(Namespace obj, Void param) {
-    visitList(obj.getChildren(), param);
+    visitList(obj.children, param);
     return null;
   }
 
@@ -142,7 +142,7 @@ class SystemIfaceCaller extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitNamespace(Namespace obj, Void param) {
-    visitList(obj.getChildren(), param);
+    visitList(obj.children, param);
     return null;
   }
 

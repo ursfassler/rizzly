@@ -30,6 +30,7 @@ import evl.data.component.hfsm.StateItem;
 import evl.data.component.hfsm.Transition;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.NullTraverser;
+import evl.traverser.other.ClassGetter;
 
 /**
  * Moves all transitions of all states to the top-state.
@@ -42,7 +43,7 @@ public class TransitionUplifter extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    for (ImplHfsm hfsm : evl.getItems(ImplHfsm.class, true)) {
+    for (ImplHfsm hfsm : ClassGetter.get(ImplHfsm.class, evl)) {
       TransitionUplifterWorker know = new TransitionUplifterWorker();
       know.traverse(hfsm, null);
     }

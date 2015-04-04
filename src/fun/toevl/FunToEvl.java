@@ -143,7 +143,7 @@ public class FunToEvl extends NullTraverser<Evl, Void> {
     map.put(obj, ret);
     for (Fun src : obj.getChildren()) {
       Evl ni = visit(src, null);
-      ret.getChildren().add(ni);
+      ret.children.add(ni);
     }
     return ret;
   }

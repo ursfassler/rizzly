@@ -64,7 +64,7 @@ class CreateRecordFromFunc extends DefTraverser<Void, Void> {
     RecordType rec = new RecordType(func.getInfo(), Designator.NAME_SEP + "msg" + Designator.NAME_SEP + name, elements);
 
     getMapping().put(func, rec);
-    root.add(rec);
+    root.children.add(rec);
 
     return null;
   }

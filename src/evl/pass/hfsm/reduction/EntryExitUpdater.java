@@ -45,6 +45,7 @@ import evl.data.variable.FuncVariable;
 import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.NullTraverser;
+import evl.traverser.other.ClassGetter;
 
 /**
  * For every state, a new entry and exit function is added. This new function contains calls to the parent entry or exit
@@ -57,7 +58,7 @@ public class EntryExitUpdater extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    for (ImplHfsm hfsm : evl.getItems(ImplHfsm.class, true)) {
+    for (ImplHfsm hfsm : ClassGetter.get(ImplHfsm.class, evl)) {
       EntryExitUpdaterWorker know = new EntryExitUpdaterWorker(kb);
       know.traverse(hfsm, null);
     }

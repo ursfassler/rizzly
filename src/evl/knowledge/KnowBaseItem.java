@@ -28,6 +28,7 @@ import common.ElementInfo;
 import evl.copy.Copy;
 import evl.data.Evl;
 import evl.data.EvlList;
+import evl.data.Namespace;
 import evl.data.expression.reference.SimpleRef;
 import evl.data.type.Type;
 import evl.data.type.base.ArrayType;
@@ -43,6 +44,7 @@ import evl.data.type.special.IntegerType;
 import evl.data.type.special.NaturalType;
 import evl.data.type.special.VoidType;
 import evl.traverser.NullTraverser;
+import evl.traverser.other.ClassGetter;
 
 public class KnowBaseItem extends KnowledgeEntry {
 
@@ -56,16 +58,17 @@ public class KnowBaseItem extends KnowledgeEntry {
   }
 
   public <T extends Evl> List<T> findItem(Class<T> kind) {
-    return kb.getRoot().getItems(kind, false);
+    Namespace r = kb.getRoot();
+    return ClassGetter.filter(kind, r.children);
   }
 
   public Evl findItem(String name) {
-    return kb.getRoot().getChildren().find(name);
+    return kb.getRoot().children.find(name);
   }
 
   @Deprecated
   public void addItem(Evl item) {
-    kb.getRoot().getChildren().add(item);
+    kb.getRoot().children.add(item);
   }
 
   private <T extends Type> T getPlainType(T type) {
@@ -95,20 +98,21 @@ public class KnowBaseItem extends KnowledgeEntry {
     return getNumsetType(new Range(low, high));
   }
 
+  // TODO rename
   public RangeType getNumsetType(Range range) {
-    EvlList<RangeType> items = kb.getRoot().getChildren().getItems(RangeType.class);
+    EvlList<RangeType> items = kb.getRoot().children.getItems(RangeType.class);
     for (RangeType itr : items) {
       if (itr.range.equals(range)) {
         return itr;
       }
     }
     RangeType ret = new RangeType(range);
-    kb.getRoot().getChildren().add(ret);
+    kb.getRoot().children.add(ret);
     return ret;
   }
 
   public ArrayType getArray(BigInteger size, Type type) {
-    EvlList<ArrayType> items = kb.getRoot().getChildren().getItems(ArrayType.class);
+    EvlList<ArrayType> items = kb.getRoot().children.getItems(ArrayType.class);
     for (ArrayType itr : items) {
       if (itr.size.equals(size) && itr.type.link.equals(type)) {
         return itr;
@@ -116,12 +120,12 @@ public class KnowBaseItem extends KnowledgeEntry {
     }
 
     ArrayType ret = new ArrayType(size, new SimpleRef<Type>(ElementInfo.NO, type));
-    kb.getRoot().getChildren().add(ret);
+    kb.getRoot().children.add(ret);
     return ret;
   }
 
   public RecordType getRecord(EvlList<NamedElement> element) {
-    EvlList<RecordType> items = kb.getRoot().getChildren().getItems(RecordType.class);
+    EvlList<RecordType> items = kb.getRoot().children.getItems(RecordType.class);
     for (RecordType itr : items) {
       if (equal(element, itr.element)) {
         return itr;
@@ -129,7 +133,7 @@ public class KnowBaseItem extends KnowledgeEntry {
     }
 
     RecordType ret = new RecordType(ElementInfo.NO, kun.get("record"), Copy.copy(element));
-    kb.getRoot().getChildren().add(ret);
+    kb.getRoot().children.add(ret);
     return ret;
   }
 
@@ -146,7 +150,7 @@ public class KnowBaseItem extends KnowledgeEntry {
   }
 
   public EnumType getEnumType(Set<String> elements) {
-    EvlList<EnumType> items = kb.getRoot().getChildren().getItems(EnumType.class);
+    EvlList<EnumType> items = kb.getRoot().children.getItems(EnumType.class);
     for (EnumType itr : items) {
       if (itr.getNames().equals(elements)) {
         return itr;
@@ -157,7 +161,7 @@ public class KnowBaseItem extends KnowledgeEntry {
     for (String name : elements) {
       ret.getElement().add(new EnumElement(ElementInfo.NO, name));
     }
-    kb.getRoot().getChildren().add(ret);
+    kb.getRoot().children.add(ret);
     return ret;
   }
 

@@ -45,12 +45,13 @@ import evl.data.statement.ReturnExpr;
 import evl.data.variable.Variable;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.NullTraverser;
+import evl.traverser.other.ClassGetter;
 
 public class QueryDownPropagator extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    for (ImplHfsm hfsm : evl.getItems(ImplHfsm.class, true)) {
+    for (ImplHfsm hfsm : ClassGetter.get(ImplHfsm.class, evl)) {
       process(hfsm, kb);
     }
   }

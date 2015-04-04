@@ -41,6 +41,7 @@ import evl.data.variable.Variable;
 import evl.knowledge.KnowParent;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.DefTraverser;
+import evl.traverser.other.ClassGetter;
 
 /**
  * Verifies that links to variables are ok, i.e. they are declared before use and in a visible scope.
@@ -74,8 +75,8 @@ class VarLinkOkWorker extends DefTraverser<Void, Set<Evl>> {
 
   @Override
   protected Void visitNamespace(Namespace obj, Set<Evl> param) {
-    param = add(param, obj.getItems(Variable.class, false));
-    param = add(param, obj.getItems(Type.class, false));
+    param = add(param, ClassGetter.filter(Variable.class, obj.children));
+    param = add(param, ClassGetter.filter(Type.class, obj.children));
     return super.visitNamespace(obj, param);
   }
 

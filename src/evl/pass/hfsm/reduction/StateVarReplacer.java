@@ -41,6 +41,7 @@ import evl.data.variable.StateVariable;
 import evl.data.variable.Variable;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.DefTraverser;
+import evl.traverser.other.ClassGetter;
 import evl.traverser.other.RefTypeGetter;
 
 //TODO set correct values when switching states
@@ -56,7 +57,7 @@ public class StateVarReplacer extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    for (ImplHfsm hfsm : evl.getItems(ImplHfsm.class, true)) {
+    for (ImplHfsm hfsm : ClassGetter.get(ImplHfsm.class, evl)) {
       process(hfsm, kb);
     }
   }

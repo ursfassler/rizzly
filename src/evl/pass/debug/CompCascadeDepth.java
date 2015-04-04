@@ -37,7 +37,7 @@ public class CompCascadeDepth extends NullTraverser<Integer, Void> {
   @Override
   protected Integer visitNamespace(Namespace obj, Void param) {
     int max = 0;
-    for (Evl itr : obj.getChildren()) {
+    for (Evl itr : obj.children) {
       max = Math.max(max, visit(itr, param));
     }
     return max;

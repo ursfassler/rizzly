@@ -56,7 +56,7 @@ public class ReduceUnion extends EvlPass {
 
     inst.traverse(evl, null);
     // FIXME only provide namespace as evl?
-    evl.addAll(inst.getUnion2enum().values());
+    evl.children.addAll(inst.getUnion2enum().values());
   }
 
 }

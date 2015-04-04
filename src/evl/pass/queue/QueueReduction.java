@@ -19,13 +19,18 @@ package evl.pass.queue;
 
 import pass.EvlPass;
 import evl.data.Namespace;
+import evl.knowledge.KnowChild;
 import evl.knowledge.KnowledgeBase;
 
 public class QueueReduction extends EvlPass {
 
   @Override
   public void process(Namespace classes, KnowledgeBase kb) {
-    QueueReductionWorker worker = new QueueReductionWorker(classes.findSpace("!inst"), kb);
+    // FIXME hacky
+    KnowChild kc = kb.getEntry(KnowChild.class);
+    Namespace inst = (Namespace) kc.find(classes, "!inst");
+
+    QueueReductionWorker worker = new QueueReductionWorker(inst, kb);
     worker.process();
   }
 }

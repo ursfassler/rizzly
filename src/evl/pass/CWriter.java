@@ -100,6 +100,7 @@ import evl.data.variable.StateVariable;
 import evl.data.variable.Variable;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.NullTraverser;
+import evl.traverser.other.ClassGetter;
 
 public class CWriter extends EvlPass {
   public static final String ARRAY_DATA_NAME = "data";
@@ -137,11 +138,11 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
 
   @Override
   protected Void visitNamespace(Namespace obj, Boolean param) {
-    EvlList<Type> types = obj.getItems(Type.class, false);
-    EvlList<Function> functions = obj.getItems(Function.class, false);
-    EvlList<Variable> variables = obj.getItems(Variable.class, false);
+    EvlList<Type> types = ClassGetter.filter(Type.class, obj.children);
+    EvlList<Function> functions = ClassGetter.filter(Function.class, obj.children);
+    EvlList<Variable> variables = ClassGetter.filter(Variable.class, obj.children);
 
-    assert (types.size() + functions.size() + variables.size() == obj.getChildren().size());
+    assert (types.size() + functions.size() + variables.size() == obj.children.size());
 
     sw.wr("#include <stdint.h>");
     sw.nl();

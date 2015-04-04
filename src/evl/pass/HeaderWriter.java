@@ -51,6 +51,7 @@ import evl.data.variable.FuncVariable;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.DefTraverser;
 import evl.traverser.other.CHeaderWriter;
+import evl.traverser.other.ClassGetter;
 import evl.traverser.other.DepCollector;
 import evl.traverser.other.FpcHeaderWriter;
 import evl.traverser.other.Renamer;
@@ -83,14 +84,14 @@ public class HeaderWriter extends EvlPass {
   private static Namespace makeHeader(Namespace prg, String debugdir) {
     Namespace ret = new Namespace(ElementInfo.NO, prg.name);
     Set<Evl> anchor = new HashSet<Evl>();
-    for (Function func : prg.getItems(Function.class, false)) {
+    for (Function func : ClassGetter.filter(Function.class, prg.children)) {
       if (Boolean.TRUE.equals(func.properties().get(Property.Public))) {
         for (FuncVariable arg : func.param) {
           anchor.add(arg.type.link);
         }
         anchor.add(func.ret);
 
-        ret.add(func);
+        ret.children.add(func);
       }
     }
 
@@ -98,7 +99,7 @@ public class HeaderWriter extends EvlPass {
 
     for (Evl itr : dep) {
       if (itr instanceof evl.data.type.Type) {
-        ret.add(itr);
+        ret.children.add(itr);
       } else if (itr instanceof SimpleRef) {
         // element of record type
       } else if (itr instanceof NamedElement) {
@@ -112,11 +113,11 @@ public class HeaderWriter extends EvlPass {
     }
 
     Namespace cpy = Copy.copy(ret);
-    for (Function func : cpy.getItems(Function.class, false)) {
+    for (Function func : ClassGetter.filter(Function.class, cpy.children)) {
       func.body.statements.clear();
     }
 
-    toposort(cpy.getChildren());
+    toposort(cpy.children);
 
     return cpy;
   }

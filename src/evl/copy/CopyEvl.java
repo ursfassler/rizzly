@@ -166,7 +166,7 @@ public class CopyEvl extends NullTraverser<Evl, Void> {
   @Override
   protected Evl visitNamespace(Namespace obj, Void param) {
     Namespace ret = new Namespace(obj.getInfo(), obj.name);
-    ret.addAll(copy(obj.getChildren()));
+    ret.children.addAll(copy(obj.children));
     return ret;
   }
 

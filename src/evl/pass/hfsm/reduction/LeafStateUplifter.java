@@ -33,6 +33,7 @@ import evl.data.component.hfsm.StateComposite;
 import evl.data.component.hfsm.StateSimple;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.NullTraverser;
+import evl.traverser.other.ClassGetter;
 
 /**
  * Moves all leaf-states up. In the end, the top state only has former leaf states a children.
@@ -47,7 +48,7 @@ public class LeafStateUplifter extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    for (ImplHfsm hfsm : evl.getItems(ImplHfsm.class, true)) {
+    for (ImplHfsm hfsm : ClassGetter.get(ImplHfsm.class, evl)) {
       LeafStateUplifterWorker know = new LeafStateUplifterWorker(kb);
       know.traverse(hfsm, null);
     }

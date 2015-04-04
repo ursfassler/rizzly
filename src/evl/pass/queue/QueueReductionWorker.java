@@ -46,7 +46,7 @@ class QueueReductionWorker {
 
   public void process() {
     Queue queue = reduceQueuesToOne();
-    root.add(queue);
+    root.children.add(queue);
 
     CreateRecordFromFunc createMsgContentTypes = new CreateRecordFromFunc(root);
     createMsgContentTypes.traverse(root, null);
@@ -83,9 +83,9 @@ class QueueReductionWorker {
   private Map<Function, Function> createQueue(String prefix, Map<Function, RecordType> funcToRecord, ElementInfo info) {
     QueueTypes queueTypes = new QueueTypes(prefix, funcToRecord, info, kb);
     queueTypes.create(queueLength);
-    root.add(queueTypes.getMsgType());
-    root.add(queueTypes.getMessage());
-    root.add(queueTypes.getQueue());
+    root.children.add(queueTypes.getMsgType());
+    root.children.add(queueTypes.getMessage());
+    root.children.add(queueTypes.getQueue());
 
     QueueVariables queueVariables = createQueue(prefix, info, queueTypes);
     return createPushFunctions(info, queueVariables, queueTypes);
@@ -94,15 +94,15 @@ class QueueReductionWorker {
   private QueueVariables createQueue(String prefix, ElementInfo info, QueueTypes queueTypes) {
     QueueVariables queueVariables = new QueueVariables(prefix, info, kb);
     queueVariables.create(queueTypes.getQueue());
-    root.add(queueVariables.getQueue());
-    root.add(queueVariables.getHead());
-    root.add(queueVariables.getCount());
+    root.children.add(queueVariables.getQueue());
+    root.children.add(queueVariables.getHead());
+    root.children.add(queueVariables.getCount());
 
     Function sizefunc = CountFunctionFactory.create(prefix, info, queueVariables);
-    root.add(sizefunc);
+    root.children.add(sizefunc);
 
     Function dispatcher = DispatchFunctionFactory.create(prefix, info, queueVariables, queueTypes);
-    root.add(dispatcher);
+    root.children.add(dispatcher);
     return queueVariables;
   }
 
@@ -111,7 +111,7 @@ class QueueReductionWorker {
     for (Function func : queueTypes.getQueuedFunctions()) {
       Function impl = PushFunctionFactory.create(info, queueVariables, queueTypes, func);
 
-      root.add(impl);
+      root.children.add(impl);
       pushfunc.put(func, impl);
     }
     return pushfunc;

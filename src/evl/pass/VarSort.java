@@ -33,6 +33,7 @@ import evl.data.expression.reference.BaseRef;
 import evl.data.variable.Variable;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.DefTraverser;
+import evl.traverser.other.ClassGetter;
 
 //TODO merge with TypeSort?
 
@@ -40,12 +41,12 @@ public class VarSort extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    List<Variable> vars = evl.getItems(Variable.class, true);
-    assert (evl.getChildren().containsAll(vars));
+    List<Variable> vars = ClassGetter.filter(Variable.class, evl.children);
+    assert (evl.children.containsAll(vars));
 
     toposortVar(vars);
-    evl.getChildren().removeAll(vars);
-    evl.getChildren().addAll(vars);
+    evl.children.removeAll(vars);
+    evl.children.addAll(vars);
   }
 
   private static void toposortVar(List<Variable> list) {

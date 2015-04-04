@@ -30,6 +30,7 @@ import evl.data.component.hfsm.State;
 import evl.data.type.Type;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.DefTraverser;
+import evl.traverser.other.ClassGetter;
 
 /**
  * Moves all types to the top level
@@ -43,12 +44,12 @@ public class TypeUplift extends EvlPass {
   public void process(Namespace evl, KnowledgeBase kb) {
     EvlList<Type> newTypes = new EvlList<Type>();
     TypeUpliftWorker worker = new TypeUpliftWorker(newTypes);
-    for (Evl itm : evl.getChildren()) {
+    for (Evl itm : evl.children) {
       if (!(itm instanceof Type)) {
         worker.visit(itm, new Designator());
       }
     }
-    evl.addAll(newTypes);
+    evl.children.addAll(newTypes);
   }
 }
 
@@ -93,8 +94,8 @@ class TypeUpliftWorker extends DefTraverser<Void, Designator> {
   @Override
   protected Void visitNamespace(Namespace obj, Designator param) {
     super.visitNamespace(obj, param);
-    EvlList<Type> types = obj.getItems(Type.class, false);
-    obj.getChildren().removeAll(types);
+    EvlList<Type> types = ClassGetter.filter(Type.class, obj.children);
+    obj.children.removeAll(types);
     return null;
   }
 

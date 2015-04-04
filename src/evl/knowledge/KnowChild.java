@@ -210,7 +210,7 @@ class KnowChildTraverser extends NullTraverser<Set<Evl>, String> {
   @Override
   protected Set<Evl> visitNamespace(Namespace obj, String param) {
     Set<Evl> rset = new HashSet<Evl>();
-    addIfFound(obj.getChildren().find(param), rset);
+    addIfFound(obj.children.find(param), rset);
     return rset;
   }
 

@@ -17,28 +17,36 @@
 
 package evl.traverser.other;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import evl.data.Evl;
+import evl.data.EvlList;
 import evl.traverser.DefTraverser;
 
 public class ClassGetter<T extends Evl> extends DefTraverser<Void, Void> {
-  private List<T> ret = new ArrayList<T>();
-  private Class<T> kind;
+  final private EvlList<T> ret = new EvlList<T>();
+  final private Class<T> kind;
 
   public ClassGetter(Class<T> kind) {
     super();
     this.kind = kind;
   }
 
-  static public <T extends Evl> List<T> get(Class<T> kind, Evl root) {
+  static public <T extends Evl> EvlList<T> filter(Class<T> kind, EvlList<Evl> list) {
+    EvlList<T> ret = new EvlList<T>();
+    for (Evl itr : list) {
+      if (kind.isAssignableFrom(itr.getClass())) {
+        ret.add((T) itr);
+      }
+    }
+    return ret;
+  }
+
+  static public <T extends Evl> EvlList<T> get(Class<T> kind, Evl root) {
     ClassGetter<T> getter = new ClassGetter<T>(kind);
     getter.traverse(root, null);
     return getter.ret;
   }
 
-  static public <T extends Evl> List<T> getAll(Class<T> kind, Iterable<? extends Evl> root) {
+  static public <T extends Evl> EvlList<T> getAll(Class<T> kind, Iterable<? extends Evl> root) {
     ClassGetter<T> getter = new ClassGetter<T>(kind);
     for (Evl itr : root) {
       getter.traverse(itr, null);

@@ -33,17 +33,18 @@ import evl.data.expression.reference.BaseRef;
 import evl.data.type.Type;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.DefTraverser;
+import evl.traverser.other.ClassGetter;
 
 public class TypeSort extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    List<Type> types = evl.getItems(Type.class, true);
-    assert (evl.getChildren().containsAll(types));
+    List<Type> types = ClassGetter.get(Type.class, evl);
+    assert (evl.children.containsAll(types));
 
     toposort(types);
-    evl.getChildren().removeAll(types);
-    evl.getChildren().addAll(types);
+    evl.children.removeAll(types);
+    evl.children.addAll(types);
   }
 
   private static void toposort(List<Type> list) {

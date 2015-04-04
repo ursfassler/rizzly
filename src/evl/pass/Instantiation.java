@@ -54,10 +54,10 @@ public class Instantiation extends EvlPass {
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
     CompUse instComp = kb.getRootComp();
-    evl.getChildren().remove(instComp);
+    evl.children.remove(instComp);
 
     ImplElementary env = makeEnv(instComp.instance.link, kb);
-    evl.getChildren().add(env);
+    evl.children.add(env);
 
     CompInstantiatorWorker instantiator = new CompInstantiatorWorker();
     ImplElementary inst = instantiator.traverse(env, evl);
@@ -118,14 +118,14 @@ class CompInstantiatorWorker extends NullTraverser<ImplElementary, Namespace> {
     ImplElementary inst = copy.copy(obj);
     Relinker.relink(inst, copy.getCopied());
 
-    ns.addAll(inst.iface);
-    ns.addAll(inst.type);
-    ns.addAll(inst.constant);
-    ns.addAll(inst.variable);
-    ns.addAll(inst.function);
-    ns.add(inst.queue);
-    ns.add(inst.entryFunc);
-    ns.add(inst.exitFunc);
+    ns.children.addAll(inst.iface);
+    ns.children.addAll(inst.type);
+    ns.children.addAll(inst.constant);
+    ns.children.addAll(inst.variable);
+    ns.children.addAll(inst.function);
+    ns.children.add(inst.queue);
+    ns.children.add(inst.entryFunc);
+    ns.children.add(inst.exitFunc);
 
     // ns.getChildren().removeAll(ns.getChildren().getItems(FuncCtrlOutDataIn.class));
     // ns.getChildren().removeAll(ns.getChildren().getItems(FuncCtrlOutDataOut.class));
@@ -137,7 +137,7 @@ class CompInstantiatorWorker extends NullTraverser<ImplElementary, Namespace> {
       Namespace usens = new Namespace(compUse.getInfo(), compUse.name);
       ImplElementary cpy = visit(comp, usens);
       compUse.instance.link = cpy;
-      ns.add(usens);
+      ns.children.add(usens);
       linkmap.put(compUse, usens);
 
       // route output interface to sub-callback implementation
@@ -146,13 +146,13 @@ class CompInstantiatorWorker extends NullTraverser<ImplElementary, Namespace> {
         Function outdecl = (Function) cpy.iface.find(impl.name);
 
         assert (outdecl != null);
-        assert (usens.getChildren().contains(outdecl));
+        assert (usens.children.contains(outdecl));
         assert (!linkmap.containsKey(outdecl));
 
         // change links to output declaration to the sub-callback of this component
         linkmap.put(outdecl, impl);
-        usens.getChildren().remove(outdecl);
-        usens.add(impl);
+        usens.children.remove(outdecl);
+        usens.children.add(impl);
       }
     }
 

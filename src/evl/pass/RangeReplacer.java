@@ -38,6 +38,7 @@ import evl.data.type.out.UIntType;
 import evl.knowledge.KnowledgeBase;
 import evl.pass.check.type.specific.ExpressionTypeChecker;
 import evl.traverser.NullTraverser;
+import evl.traverser.other.ClassGetter;
 
 /**
  * Replaces range types with integer types
@@ -51,12 +52,12 @@ public class RangeReplacer extends EvlPass {
   public void process(Namespace evl, KnowledgeBase kb) {
 
     RangeReplacerWorker changer = new RangeReplacerWorker();
-    for (Type old : evl.getItems(Type.class, true)) {
+    for (Type old : ClassGetter.get(Type.class, evl)) {
       changer.traverse(old, null);
     }
 
-    evl.addAll(changer.getSigned().values());
-    evl.addAll(changer.getUnsigned().values());
+    evl.children.addAll(changer.getSigned().values());
+    evl.children.addAll(changer.getUnsigned().values());
 
     Relinker.relink(evl, changer.getMap());
   }

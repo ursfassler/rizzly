@@ -342,7 +342,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitNamespace(Namespace obj, P param) {
-    visitList(obj.getChildren(), param);
+    visitList(obj.children, param);
     return null;
   }
 

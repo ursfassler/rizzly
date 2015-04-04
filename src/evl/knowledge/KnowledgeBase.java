@@ -22,6 +22,7 @@ import java.util.HashMap;
 import evl.data.EvlList;
 import evl.data.Namespace;
 import evl.data.component.composition.CompUse;
+import evl.traverser.other.ClassGetter;
 
 public class KnowledgeBase {
   final private HashMap<Class<? extends KnowledgeEntry>, KnowledgeEntry> entries = new HashMap<Class<? extends KnowledgeEntry>, KnowledgeEntry>();
@@ -49,7 +50,7 @@ public class KnowledgeBase {
   }
 
   public CompUse getRootComp() {
-    EvlList<CompUse> list = root.getItems(CompUse.class, false);
+    EvlList<CompUse> list = ClassGetter.filter(CompUse.class, root.children);
     assert (list.size() == 1);
     return list.get(0);
   }

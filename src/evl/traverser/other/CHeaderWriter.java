@@ -103,7 +103,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
       param.nl();
     }
 
-    visitList(obj.getChildren(), param);
+    visitList(obj.children, param);
 
     param.nl();
     param.wr("#endif /* " + protname + " */");

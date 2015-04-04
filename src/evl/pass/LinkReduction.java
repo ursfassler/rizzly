@@ -26,6 +26,7 @@ import evl.data.Namespace;
 import evl.data.expression.reference.RefItem;
 import evl.data.expression.reference.RefName;
 import evl.data.expression.reference.Reference;
+import evl.knowledge.KnowChild;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.DefTraverser;
 
@@ -42,12 +43,12 @@ public class LinkReduction extends EvlPass {
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
     // FIXME hacky
-    Namespace inst = evl.findSpace("!inst");
+    KnowChild kc = kb.getEntry(KnowChild.class);
+    Namespace inst = (Namespace) kc.find(evl, "!inst");
 
     LinkReductionWorker reduction = new LinkReductionWorker();
     reduction.traverse(inst, null);
   }
-
 }
 
 class LinkReductionWorker extends DefTraverser<Void, Void> {
@@ -63,7 +64,7 @@ class LinkReductionWorker extends DefTraverser<Void, Void> {
         RError.err(ErrorType.Fatal, obj.getInfo(), "Expected named offset, got: " + next.getClass().getCanonicalName() + " (and why did the typechecker not find it?)");
       }
       RefName name = (RefName) next;
-      item = ((Namespace) item).getChildren().find(name.name);
+      item = ((Namespace) item).children.find(name.name);
       assert (item != null); // type checker should find it?
     }
     obj.link = (Named) item;

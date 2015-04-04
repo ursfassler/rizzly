@@ -26,6 +26,7 @@ import evl.data.component.hfsm.StateItem;
 import evl.data.component.hfsm.Transition;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.NullTraverser;
+import evl.traverser.other.ClassGetter;
 
 /**
  * Sets the destination of a transition to the initial substate if the destination is a composite state
@@ -37,7 +38,7 @@ public class TransitionRedirecter extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    for (ImplHfsm hfsm : evl.getItems(ImplHfsm.class, true)) {
+    for (ImplHfsm hfsm : ClassGetter.get(ImplHfsm.class, evl)) {
       TransitionRedirecterWorker redirecter = new TransitionRedirecterWorker();
       redirecter.traverse(hfsm.topstate, null);
     }

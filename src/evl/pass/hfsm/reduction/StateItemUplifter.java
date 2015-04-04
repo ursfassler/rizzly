@@ -35,6 +35,7 @@ import evl.data.type.Type;
 import evl.data.variable.ConstPrivate;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.NullTraverser;
+import evl.traverser.other.ClassGetter;
 
 /**
  * Moves items of all states to the top-state.
@@ -46,7 +47,7 @@ public class StateItemUplifter extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    for (ImplHfsm hfsm : evl.getItems(ImplHfsm.class, true)) {
+    for (ImplHfsm hfsm : ClassGetter.get(ImplHfsm.class, evl)) {
       StateItemUplifterWorker know = new StateItemUplifterWorker(kb);
       know.traverse(hfsm, null);
     }

@@ -38,18 +38,18 @@ public class Flattner extends EvlPass {
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
     NamespaceReduction reducer = new NamespaceReduction();
-    for (Evl itr : evl.getChildren()) {
+    for (Evl itr : evl.children) {
       reducer.visit(itr, new Designator());
     }
 
     EvlList<Evl> flat = reducer.getList();
 
-    evl.clear();
+    evl.children.clear();
 
-    evl.addAll(flat.getItems(Function.class));
-    evl.addAll(flat.getItems(StateVariable.class));
-    evl.addAll(flat.getItems(Constant.class));
-    evl.addAll(flat.getItems(Type.class));
+    evl.children.addAll(flat.getItems(Function.class));
+    evl.children.addAll(flat.getItems(StateVariable.class));
+    evl.children.addAll(flat.getItems(Constant.class));
+    evl.children.addAll(flat.getItems(Type.class));
   }
 
 }

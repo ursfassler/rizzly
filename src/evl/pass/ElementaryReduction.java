@@ -41,6 +41,7 @@ import evl.data.variable.FuncVariable;
 import evl.knowledge.KnowLeftIsContainerOfRight;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
+import evl.traverser.other.ClassGetter;
 
 /**
  * Checks and moves the implementation of the slot and response to the interface
@@ -54,7 +55,7 @@ public class ElementaryReduction extends EvlPass {
   public void process(Namespace evl, KnowledgeBase kb) {
     Map<Named, Named> map = new HashMap<Named, Named>();
 
-    for (ImplElementary impl : evl.getItems(ImplElementary.class, true)) {
+    for (ImplElementary impl : ClassGetter.get(ImplElementary.class, evl)) {
 
       EvlList<FuncCtrlInDataIn> slotImpl = impl.function.getItems(FuncCtrlInDataIn.class);
       EvlList<FuncCtrlInDataOut> responseImpl = impl.function.getItems(FuncCtrlInDataOut.class);

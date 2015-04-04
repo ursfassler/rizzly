@@ -38,45 +38,39 @@ import evl.data.type.base.EnumElement;
 import evl.data.type.base.EnumType;
 import evl.data.type.base.RangeType;
 import evl.data.variable.ConstGlobal;
+import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.DefTraverser;
+import evl.traverser.other.ClassGetter;
 
 public class EnumReduction extends EvlPass {
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
+    KnowBaseItem kbi = kb.getEntry(KnowBaseItem.class);
+
     Map<EnumType, RangeType> typeMap = new HashMap<EnumType, RangeType>();
     Map<EnumElement, ConstGlobal> elemMap = new HashMap<EnumElement, ConstGlobal>();
 
-    for (EnumType et : evl.getItems(EnumType.class, false)) {
+    for (EnumType et : ClassGetter.filter(EnumType.class, evl.children)) {
 
       BigInteger idx = BigInteger.ZERO;
       for (EnumElement elem : et.getElement()) {
-        RangeType rt = makeRangeType(evl, new Range(idx, idx));
+        RangeType rt = kbi.getNumsetType(new Range(idx, idx));
 
         String name = et.name + Designator.NAME_SEP + elem.name;
         ConstGlobal val = new ConstGlobal(elem.getInfo(), name, new SimpleRef<Type>(ElementInfo.NO, rt), new Number(ElementInfo.NO, idx));
-        evl.add(val);
+        evl.children.add(val);
         elemMap.put(elem, val);
 
         idx = idx.add(BigInteger.ONE);
       }
 
-      RangeType rt = makeRangeType(evl, new Range(BigInteger.ZERO, BigInteger.valueOf(et.getElement().size() - 1)));
+      RangeType rt = kbi.getRangeType(et.getElement().size());
       typeMap.put(et, rt);
     }
 
     EnumReduce reduce = new EnumReduce(typeMap, elemMap);
     reduce.traverse(evl, null);
-  }
-
-  private static RangeType makeRangeType(Namespace prg, Range range) {
-    String name = RangeType.makeName(range);
-    RangeType rt = (RangeType) prg.findItem(name);
-    if (rt == null) {
-      rt = new RangeType(range);
-      prg.add(rt);
-    }
-    return rt;
   }
 
 }

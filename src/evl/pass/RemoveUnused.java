@@ -29,6 +29,7 @@ import evl.data.Evl;
 import evl.data.Namespace;
 import evl.data.function.Function;
 import evl.knowledge.KnowledgeBase;
+import evl.traverser.other.ClassGetter;
 import evl.traverser.other.DepGraph;
 
 public class RemoveUnused extends EvlPass {
@@ -37,7 +38,7 @@ public class RemoveUnused extends EvlPass {
   public void process(Namespace evl, KnowledgeBase kb) {
     Set<Function> roots = new HashSet<Function>();
 
-    for (Function func : evl.getItems(Function.class, true)) {
+    for (Function func : ClassGetter.get(Function.class, evl)) {
       if (func.properties().get(Property.Public) == Boolean.TRUE) {
         roots.add(func);
       }
@@ -47,7 +48,7 @@ public class RemoveUnused extends EvlPass {
 
     Set<Evl> keep = g.vertexSet();
 
-    evl.getChildren().retainAll(keep);
+    evl.children.retainAll(keep);
 
     kb.clear();
   }

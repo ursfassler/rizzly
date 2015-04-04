@@ -34,6 +34,7 @@ import evl.data.type.Type;
 import evl.data.type.out.AliasType;
 import evl.knowledge.KnowLeftIsContainerOfRight;
 import evl.knowledge.KnowledgeBase;
+import evl.traverser.other.ClassGetter;
 
 /**
  * Find equal types with different names and merge them
@@ -45,7 +46,7 @@ public class TypeMerge extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    EvlList<Type> types = evl.getItems(Type.class, true);
+    EvlList<Type> types = ClassGetter.get(Type.class, evl);
     Set<Set<Type>> ss = sameSets(kb.getEntry(KnowLeftIsContainerOfRight.class), types);
 
     Map<Type, Type> linkmap = linkmap(ss, evl);
@@ -72,9 +73,9 @@ public class TypeMerge extends EvlPass {
           AliasType alias = new AliasType(type.getInfo(), type.name, new SimpleRef<Type>(type.getInfo(), root));
           linkmap.put(type, alias);
 
-          RError.ass(typespace.getChildren().contains(type), type.getInfo(), "merging types in subtree not yet implemented");
-          typespace.getChildren().remove(type);
-          typespace.add(alias);
+          RError.ass(typespace.children.contains(type), type.getInfo(), "merging types in subtree not yet implemented");
+          typespace.children.remove(type);
+          typespace.children.add(alias);
         }
       }
     }

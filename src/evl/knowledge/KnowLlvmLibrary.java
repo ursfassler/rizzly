@@ -40,11 +40,11 @@ public class KnowLlvmLibrary extends KnowledgeEntry {
   }
 
   private Evl findItem(String name) {
-    return kb.getRoot().getChildren().find(name);
+    return kb.getRoot().children.find(name);
   }
 
   private void addItem(Named item) {
-    kb.getRoot().getChildren().add(item);
+    kb.getRoot().children.add(item);
   }
 
   public FuncCtrlOutDataOut getTrap() {
