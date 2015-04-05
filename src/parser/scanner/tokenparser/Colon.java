@@ -15,20 +15,29 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package parser;
+package parser.scanner.tokenparser;
 
-/**
- *
- * @author urs
- */
-public class Symbol {
-  public final char sym;
-  public final int line;
-  public final int row;
+import parser.PeekReader;
+import parser.scanner.Symbol;
+import parser.scanner.Token;
+import parser.scanner.TokenType;
 
-  public Symbol(char sym, int line, int row) {
-    this.sym = sym;
-    this.line = line;
-    this.row = row;
+public class Colon extends TokenParser {
+
+  public Colon(PeekReader<Symbol> reader) {
+    super(reader);
+  }
+
+  @Override
+  public Token parse() {
+    Symbol first = reader.next();
+    Symbol sym = reader.peek();
+    switch (sym.sym) {
+      case '=':
+        reader.next();
+        return Helper.token(TokenType.BECOMES, first);
+      default:
+        return Helper.token(TokenType.COLON, first);
+    }
   }
 }

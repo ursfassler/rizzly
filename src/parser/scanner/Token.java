@@ -15,7 +15,7 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package parser;
+package parser.scanner;
 
 import java.math.BigInteger;
 

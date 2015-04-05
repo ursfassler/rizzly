@@ -19,6 +19,10 @@ package parser;
 
 import java.util.ArrayList;
 
+import parser.scanner.Scanner;
+import parser.scanner.Token;
+import parser.scanner.TokenType;
+
 import common.ElementInfo;
 import common.Metadata;
 

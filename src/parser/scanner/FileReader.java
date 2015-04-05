@@ -15,7 +15,7 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package parser;
+package parser.scanner;
 
 import java.io.BufferedReader;
 import java.io.FileInputStream;
@@ -26,6 +26,7 @@ import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import parser.PeekReader;
 import error.ErrorType;
 import error.RError;
 
@@ -34,13 +35,14 @@ import error.RError;
  * @author urs
  */
 public class FileReader implements PeekReader<Symbol> {
-
+  final private String filename;
   private BufferedReader stream = null;
   private int lineNr = 1;
   private int row = 1;
   private Symbol nextSym = null;
 
   public FileReader(String filename) {
+    this.filename = filename;
     try {
       stream = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "UTF8"));
       next();
@@ -90,7 +92,7 @@ public class FileReader implements PeekReader<Symbol> {
         nextSym = null;
         closeFile();
       } else {
-        nextSym = new Symbol((char) intch, lineNr, row);
+        nextSym = new Symbol((char) intch, filename, lineNr, row);
       }
 
       return sym;

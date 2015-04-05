@@ -20,7 +20,7 @@ package fun.knowledge;
 import java.util.HashMap;
 import java.util.Map;
 
-import parser.TokenType;
+import parser.scanner.TokenType;
 import fun.function.FuncFunction;
 import fun.function.FuncHeader;
 import fun.function.FuncInterrupt;

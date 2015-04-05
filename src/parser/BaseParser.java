@@ -22,6 +22,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import parser.scanner.Scanner;
+import parser.scanner.Token;
+import parser.scanner.TokenType;
 import util.Pair;
 
 import common.ElementInfo;

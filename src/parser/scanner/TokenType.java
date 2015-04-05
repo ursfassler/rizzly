@@ -15,34 +15,10 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package parser;
+package parser.scanner;
 
-import parser.scanner.Scanner;
-import parser.scanner.TokenType;
-import fun.statement.Block;
-
-abstract public class ImplBaseParser extends BaseParser {
-
-  public ImplBaseParser(Scanner scanner) {
-    super(scanner);
-  }
-
-  // EBNF entryCode: "entry" block "end"
-  protected Block parseEntryCode() {
-    expect(TokenType.ENTRY);
-    Block entry;
-    entry = stmt().parseBlock();
-    expect(TokenType.END);
-    return entry;
-  }
-
-  // EBNF exitCode: "exit" block "end"
-  protected Block parseExitCode() {
-    expect(TokenType.EXIT);
-    Block entry;
-    entry = stmt().parseBlock();
-    expect(TokenType.END);
-    return entry;
-  }
+//TODO cleanup, remove unused tokens
+public enum TokenType {
+  ERROR, STAR, DIV, PLUS, MINUS, EQUAL, NEQ, LOWER, GEQ, LEQ, GREATER, PERIOD, RANGE, COMMA, OPENPAREN, CLOSEPAREN, OPENBRACKETS, CLOSEBRACKETS, BECOMES, THEN, DO, OF, NUMBER, IDENTIFIER, SEMI, ELSE, IF, EF, WHILE, CASE, FOR, RETURN, EOF, IGNORE, COLON, OR, XOR, CONST, FUNCTION, PROCEDURE, END, NOT, MOD, AND, COMPONENT, ELEMENTARY, COMPOSITION, HFSM, RECORD, UNION, ENUM, IMPORT, QUERY, RESPONSE, SIGNAL, SLOT, INTERRUPT, SYNC_MSG, ASYNC_MSG, OPENCURLY, CLOSECURLY, SHR, SHL, FALSE, TRUE, STRING, STATE, TO, BY, ENTRY, EXIT, IS, AS, IN, REGISTER
 
 }

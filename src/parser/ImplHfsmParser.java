@@ -20,6 +20,10 @@ package parser;
 import java.util.ArrayList;
 import java.util.List;
 
+import parser.scanner.Scanner;
+import parser.scanner.Token;
+import parser.scanner.TokenType;
+
 import common.ElementInfo;
 
 import error.ErrorType;

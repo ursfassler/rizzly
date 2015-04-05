@@ -15,34 +15,22 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package parser;
+package parser.scanner;
 
-import parser.scanner.Scanner;
-import parser.scanner.TokenType;
-import fun.statement.Block;
+/**
+ *
+ * @author urs
+ */
+public class Symbol {
+  public final char sym;
+  public final String filename;
+  public final int line;
+  public final int row;
 
-abstract public class ImplBaseParser extends BaseParser {
-
-  public ImplBaseParser(Scanner scanner) {
-    super(scanner);
+  public Symbol(char sym, String filename, int line, int row) {
+    this.sym = sym;
+    this.filename = filename;
+    this.line = line;
+    this.row = row;
   }
-
-  // EBNF entryCode: "entry" block "end"
-  protected Block parseEntryCode() {
-    expect(TokenType.ENTRY);
-    Block entry;
-    entry = stmt().parseBlock();
-    expect(TokenType.END);
-    return entry;
-  }
-
-  // EBNF exitCode: "exit" block "end"
-  protected Block parseExitCode() {
-    expect(TokenType.EXIT);
-    Block entry;
-    entry = stmt().parseBlock();
-    expect(TokenType.END);
-    return entry;
-  }
-
 }

@@ -15,34 +15,25 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package parser;
+package parser.scanner.tokenparser;
 
-import parser.scanner.Scanner;
+import parser.PeekReader;
+import parser.scanner.Symbol;
+import parser.scanner.Token;
 import parser.scanner.TokenType;
-import fun.statement.Block;
 
-abstract public class ImplBaseParser extends BaseParser {
+public class OneSymbol extends TokenParser {
+  final private TokenType type;
 
-  public ImplBaseParser(Scanner scanner) {
-    super(scanner);
+  public OneSymbol(TokenType type, PeekReader<Symbol> reader) {
+    super(reader);
+    this.type = type;
   }
 
-  // EBNF entryCode: "entry" block "end"
-  protected Block parseEntryCode() {
-    expect(TokenType.ENTRY);
-    Block entry;
-    entry = stmt().parseBlock();
-    expect(TokenType.END);
-    return entry;
-  }
-
-  // EBNF exitCode: "exit" block "end"
-  protected Block parseExitCode() {
-    expect(TokenType.EXIT);
-    Block entry;
-    entry = stmt().parseBlock();
-    expect(TokenType.END);
-    return entry;
+  @Override
+  public Token parse() {
+    Symbol sym = reader.next();
+    return Helper.token(type, sym);
   }
 
 }
