@@ -53,7 +53,7 @@ import evl.data.variable.FuncVariable;
 import evl.data.variable.Variable;
 import evl.knowledge.KnowledgeBase;
 import evl.pass.CWriter;
-import evl.pass.check.type.specific.ExpressionTypeChecker;
+import evl.pass.typecheck.ExpressionTypecheck;
 import evl.traverser.NullTraverser;
 
 public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
@@ -259,7 +259,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
   protected Void visitRangeType(RangeType obj, StreamWriter param) {
     boolean isNeg = obj.range.getLow().compareTo(BigInteger.ZERO) < 0;
     BigInteger max = getPos(obj.range.getHigh()).max(getPos(obj.range.getLow()));
-    int bits = ExpressionTypeChecker.bitCount(max);
+    int bits = ExpressionTypecheck.bitCount(max);
     assert (bits >= 0);
     if (isNeg) {
       bits++;

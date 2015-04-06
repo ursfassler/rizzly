@@ -42,7 +42,6 @@ import evl.data.type.special.AnyType;
 import evl.data.type.special.IntegerType;
 import evl.data.type.special.NaturalType;
 import evl.data.type.special.VoidType;
-import evl.pass.check.type.Supertype;
 import evl.traverser.NullTraverser;
 
 public class KnowComparable extends KnowledgeEntry {

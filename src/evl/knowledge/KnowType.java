@@ -84,7 +84,7 @@ import evl.data.type.composed.RecordType;
 import evl.data.type.special.ComponentType;
 import evl.data.variable.FuncVariable;
 import evl.data.variable.Variable;
-import evl.pass.check.type.specific.ExpressionTypeChecker;
+import evl.pass.typecheck.ExpressionTypecheck;
 import evl.traverser.NullTraverser;
 import evl.traverser.other.RefTypeGetter;
 
@@ -291,8 +291,8 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     Range lr = ((RangeType) lhs).range;
     Range rr = ((RangeType) rhs).range;
 
-    BigInteger high = lr.getHigh().shiftLeft(ExpressionTypeChecker.getAsInt(rr.getHigh(), "shl"));
-    BigInteger low = lr.getLow().shiftLeft(ExpressionTypeChecker.getAsInt(rr.getLow(), "shl"));
+    BigInteger high = lr.getHigh().shiftLeft(ExpressionTypecheck.getAsInt(rr.getHigh(), "shl"));
+    BigInteger low = lr.getLow().shiftLeft(ExpressionTypecheck.getAsInt(rr.getLow(), "shl"));
 
     return kbi.getRangeType(new Range(low, high));
   }
@@ -308,8 +308,8 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     Range lr = ((RangeType) lhs).range;
     Range rr = ((RangeType) rhs).range;
 
-    BigInteger high = lr.getHigh().shiftRight(ExpressionTypeChecker.getAsInt(rr.getHigh(), "shl"));
-    BigInteger low = lr.getLow().shiftRight(ExpressionTypeChecker.getAsInt(rr.getLow(), "shl"));
+    BigInteger high = lr.getHigh().shiftRight(ExpressionTypecheck.getAsInt(rr.getHigh(), "shl"));
+    BigInteger low = lr.getLow().shiftRight(ExpressionTypecheck.getAsInt(rr.getLow(), "shl"));
 
     return kbi.getRangeType(new Range(low, high));
   }
@@ -389,8 +389,8 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     BigInteger bigger = lhs.getHigh().max(rhs.getHigh());
     BigInteger smaller = lhs.getHigh().min(rhs.getHigh());
 
-    int bits = ExpressionTypeChecker.bitCount(smaller);
-    BigInteger ones = ExpressionTypeChecker.makeOnes(bits);
+    int bits = ExpressionTypecheck.bitCount(smaller);
+    BigInteger ones = ExpressionTypecheck.makeOnes(bits);
     BigInteger high = bigger.or(ones);
     BigInteger low = lhs.getLow().max(rhs.getLow());
 
@@ -411,8 +411,8 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
 
       BigInteger bigger = lhs.getHigh().max(rhs.getHigh());
 
-      int bits = ExpressionTypeChecker.bitCount(bigger);
-      BigInteger ones = ExpressionTypeChecker.makeOnes(bits);
+      int bits = ExpressionTypecheck.bitCount(bigger);
+      BigInteger ones = ExpressionTypecheck.makeOnes(bits);
       BigInteger high = bigger.or(ones);
 
       return kbi.getRangeType(new Range(BigInteger.ZERO, high));

@@ -36,7 +36,7 @@ import evl.data.type.out.IntType;
 import evl.data.type.out.SIntType;
 import evl.data.type.out.UIntType;
 import evl.knowledge.KnowledgeBase;
-import evl.pass.check.type.specific.ExpressionTypeChecker;
+import evl.pass.typecheck.ExpressionTypecheck;
 import evl.traverser.NullTraverser;
 import evl.traverser.other.ClassGetter;
 
@@ -107,7 +107,7 @@ class RangeReplacerWorker extends NullTraverser<Void, Void> {
       low = low.add(BigInteger.ONE).abs();
     }
     BigInteger max = low.max(obj.range.getHigh());
-    int bits = ExpressionTypeChecker.bitCount(max);
+    int bits = ExpressionTypecheck.bitCount(max);
     if (hasNeg) {
       bits++;
     }

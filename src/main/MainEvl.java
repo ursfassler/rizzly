@@ -43,15 +43,12 @@ import evl.pass.ConstantPropagation;
 import evl.pass.DebugIface;
 import evl.pass.ElementaryReduction;
 import evl.pass.EnumReduction;
-import evl.pass.Flattner;
 import evl.pass.ForReduction;
 import evl.pass.FuncInliner;
 import evl.pass.HeaderWriter;
 import evl.pass.IfCutter;
 import evl.pass.InitVarTyper;
-import evl.pass.Instantiation;
 import evl.pass.IntroduceConvert;
-import evl.pass.LinkReduction;
 import evl.pass.NoCallEmptyFunc;
 import evl.pass.OpenReplace;
 import evl.pass.RangeConverter;
@@ -69,89 +66,41 @@ import evl.pass.TypeSort;
 import evl.pass.TypeUplift;
 import evl.pass.VarDeclToTop;
 import evl.pass.VarSort;
-import evl.pass.check.CompInterfaceTypeChecker;
-import evl.pass.check.HfsmTransScopeCheck;
-import evl.pass.check.Io;
-import evl.pass.check.ModelChecker;
-import evl.pass.check.Root;
-import evl.pass.check.RtcViolation;
-import evl.pass.check.Usefullness;
-import evl.pass.check.type.TypeChecker;
-import evl.pass.hfsm.reduction.EntryExitUpdater;
-import evl.pass.hfsm.reduction.FsmReduction;
-import evl.pass.hfsm.reduction.LeafStateUplifter;
-import evl.pass.hfsm.reduction.QueryDownPropagator;
-import evl.pass.hfsm.reduction.StateItemUplifter;
-import evl.pass.hfsm.reduction.StateVarReplacer;
-import evl.pass.hfsm.reduction.TransitionDownPropagator;
-import evl.pass.hfsm.reduction.TransitionRedirecter;
-import evl.pass.hfsm.reduction.TransitionUplifter;
-import evl.pass.infrastructure.LinkTargetExists;
-import evl.pass.infrastructure.SingleDefinition;
-import evl.pass.infrastructure.VarLinkOk;
-import evl.pass.queue.QueueReduction;
+import evl.pass.hfsmreduction.HfsmReduction;
+import evl.pass.instantiation.Instantiation;
+import evl.pass.modelcheck.Modelcheck;
+import evl.pass.sanitycheck.Sanitycheck;
+import evl.pass.typecheck.Typecheck;
 import evl.traverser.other.ConstTyper;
 import evl.traverser.other.SystemIfaceAdder;
-
-//TODO ensure that composition and hfsm use construct and destruct correctly
 
 public class MainEvl {
   public static void doEvl(ClaOption opt, String outdir, String debugdir, Namespace aclasses) {
     KnowledgeBase kb = new KnowledgeBase(aclasses, outdir, debugdir);
+    PassGroup passes = evlPasses(opt);
+    process(passes, new Designator(), new DebugPrinter(aclasses, kb.getDebugDir()), aclasses, kb);
+  }
 
+  // TODO split up
+  private static PassGroup evlPasses(ClaOption opt) {
     PassGroup passes = new PassGroup("evl");
 
-    passes.addCheck(new LinkTargetExists());
-    passes.addCheck(new VarLinkOk());
-    passes.addCheck(new SingleDefinition());
-    // passes.addCheck(TypeChecker.class);
+    passes.checks.add(new Sanitycheck());
 
     passes.add(new ConstTyper());
 
     if (!opt.doLazyModelCheck()) {
       // TODO check that model check does not change AST
-      PassGroup modelcheck = new PassGroup("modelcheck");
-      modelcheck.add(new Root());
-      modelcheck.add(new Usefullness());
-      modelcheck.add(new RtcViolation());
-      modelcheck.add(new Io());
-      modelcheck.add(new HfsmTransScopeCheck());
-      modelcheck.add(new CompInterfaceTypeChecker());
-      modelcheck.add(new ModelChecker());
-      passes.add(modelcheck);
+      passes.add(new Modelcheck());
     }
 
     // FuncHeaderReplacegr.process(aclasses, kb); //TODO remove if not used
 
-    {
-      PassGroup reduction = new PassGroup("reduction");
-      reduction.checks.addAll(passes.checks);
-      reduction.add(new IntroduceConvert());
-      reduction.add(new OpenReplace());
-      reduction.add(new ElementaryReduction());
-      reduction.add(new CompositionReduction());
-      {
-        PassGroup hfsm = new PassGroup("hfsm");
-        hfsm.add(new QueryDownPropagator());
-        hfsm.add(new TransitionRedirecter());
-        hfsm.add(new TransitionDownPropagator());
-        hfsm.add(new StateVarReplacer());
-        hfsm.add(new EntryExitUpdater());
-        hfsm.add(new StateItemUplifter());
-        hfsm.add(new TransitionUplifter());
-        hfsm.add(new LeafStateUplifter());
-        hfsm.add(new FsmReduction());
-        reduction.add(hfsm);
-      }
-      reduction.add(new ReduceAliasType());
-      reduction.add(new ReduceUnion());
-      reduction.add(new ReduceTuple());
-      passes.add(reduction);
-    }
+    passes.passes.add(reduce(passes));
 
     passes.add(new InitVarTyper());
     passes.add(new BitLogicCategorizer());
-    passes.add(new TypeChecker());
+    passes.add(new Typecheck());
     passes.add(new SystemIfaceAdder());
 
     passes.add(new RetStructIntroducer());
@@ -174,16 +123,7 @@ public class MainEvl {
 
     passes.add(new BitnotFixer());
 
-    {
-      PassGroup inst = new PassGroup("instantiation");
-      // inst.checks.addAll(passes.checks);
-      inst.add(new Instantiation());
-      inst.add(new LinkReduction());
-      inst.add(new QueueReduction());
-      inst.add(new Flattner());
-      inst.add(new RemoveUnused());
-      passes.add(inst);
-    }
+    passes.add(new Instantiation());
 
     passes.add(new HeaderWriter());
 
@@ -200,35 +140,54 @@ public class MainEvl {
     passes.add(new RangeReplacer());
     passes.add(new RemoveUnused());
 
-    {
-      PassGroup optimize = new PassGroup("optimize");
-      optimize.checks.addAll(passes.checks);
+    passes.passes.add(optimize(passes));
 
-      optimize.add(new BlockReduction());
-      optimize.add(new NoCallEmptyFunc());
-      optimize.add(new RemoveUnused());
-      optimize.add(new FuncInliner());
-      optimize.add(new TautoExprDel());
-      optimize.add(new TautoStmtDel());
-      optimize.add(new RemoveUnused());
-      optimize.add(new BlockReduction());
-      passes.add(optimize);
-    }
+    passes.passes.add(prepareForC(passes));
 
-    {
-      PassGroup cprep = new PassGroup("cout");
-      cprep.checks.addAll(passes.checks);
+    passes.add(new CWriter());
+    return passes;
+  }
 
-      cprep.add(new VarDeclToTop());
-      cprep.add(new TypeMerge());
-      cprep.add(new CRenamer());
-      cprep.add(new TypeSort());
-      cprep.add(new VarSort());
-      cprep.add(new CWriter());
-      passes.add(cprep);
-    }
+  private static PassGroup prepareForC(PassGroup passes) {
+    PassGroup cprep = new PassGroup("cout");
+    cprep.checks.addAll(passes.checks);
 
-    process(passes, new Designator(), new DebugPrinter(aclasses, kb.getDebugDir()), aclasses, kb);
+    cprep.add(new VarDeclToTop());
+    cprep.add(new TypeMerge());
+    cprep.add(new CRenamer());
+    cprep.add(new TypeSort());
+    cprep.add(new VarSort());
+    return cprep;
+  }
+
+  private static PassGroup optimize(PassGroup passes) {
+    PassGroup optimize = new PassGroup("optimize");
+    optimize.checks.addAll(passes.checks);
+
+    optimize.add(new BlockReduction());
+    optimize.add(new NoCallEmptyFunc());
+    optimize.add(new RemoveUnused());
+    optimize.add(new FuncInliner());
+    optimize.add(new TautoExprDel());
+    optimize.add(new TautoStmtDel());
+    optimize.add(new RemoveUnused());
+    optimize.add(new BlockReduction());
+    return optimize;
+  }
+
+  // TODO separate things / better naming
+  private static PassGroup reduce(PassGroup passes) {
+    PassGroup reduction = new PassGroup("reduction");
+    reduction.checks.addAll(passes.checks);
+    reduction.add(new IntroduceConvert());
+    reduction.add(new OpenReplace());
+    reduction.add(new ElementaryReduction());
+    reduction.add(new CompositionReduction());
+    reduction.add(new HfsmReduction());
+    reduction.add(new ReduceAliasType());
+    reduction.add(new ReduceUnion());
+    reduction.add(new ReduceTuple());
+    return reduction;
   }
 
   public static void process(PassGroup group, Designator prefix, DebugPrinter dp, Namespace evl, KnowledgeBase kb) {
@@ -302,27 +261,19 @@ class PassItem extends Pass {
 }
 
 class PassGroup extends Pass {
-  List<Pass> passes = new ArrayList<Pass>();
-  List<EvlPass> checks = new ArrayList<EvlPass>();
+  final public List<Pass> passes = new ArrayList<Pass>();
+  final public List<EvlPass> checks = new ArrayList<EvlPass>();
 
   PassGroup(String name) {
     super(name);
   }
 
   public void add(EvlPass pass, String name) {
-    add(new PassItem(pass, name));
+    passes.add(new PassItem(pass, name));
   }
 
   public void add(EvlPass pass) {
-    add(new PassItem(pass, pass.getClass().getSimpleName()));
-  }
-
-  public void add(Pass pass) {
-    passes.add(pass);
-  }
-
-  public void addCheck(EvlPass pass) {
-    checks.add(pass);
+    passes.add(new PassItem(pass, pass.getClass().getSimpleName()));
   }
 
 }
