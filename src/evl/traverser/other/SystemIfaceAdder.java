@@ -54,7 +54,7 @@ import evl.traverser.NullTraverser;
 public class SystemIfaceAdder extends EvlPass {
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    SystemIfaceAdderWorker reduction = new SystemIfaceAdderWorker(kb);
+    SystemIfaceAdderWorker reduction = new SystemIfaceAdderWorker();
     reduction.traverse(evl, null);
     SystemIfaceCaller caller = new SystemIfaceCaller(reduction.getCtors(), reduction.getDtors());
     caller.traverse(evl, null);
@@ -66,14 +66,8 @@ public class SystemIfaceAdder extends EvlPass {
 class SystemIfaceAdderWorker extends NullTraverser<Void, Void> {
   public static final String DESTRUCT = Designator.NAME_SEP + "destruct";
   public static final String CONSTRUCT = Designator.NAME_SEP + "construct";
-  final private KnowledgeBase kb;
   final private HashMap<Component, Function> ctors = new HashMap<Component, Function>();
   final private HashMap<Component, Function> dtors = new HashMap<Component, Function>();
-
-  public SystemIfaceAdderWorker(KnowledgeBase kb) {
-    super();
-    this.kb = kb;
-  }
 
   @Override
   protected Void visitDefault(Evl obj, Void param) {

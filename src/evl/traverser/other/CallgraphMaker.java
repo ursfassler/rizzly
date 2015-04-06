@@ -33,7 +33,6 @@ import evl.data.function.Function;
 import evl.data.type.Type;
 import evl.data.type.base.ArrayType;
 import evl.data.variable.Variable;
-import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowChild;
 import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
@@ -119,7 +118,6 @@ public class CallgraphMaker extends DefTraverser<Void, Evl> {
 class RefGetter extends NullTraverser<Evl, Evl> {
   private Set<Function> target;
   private KnowChild kfc;
-  private KnowBaseItem kbi;
   final private KnowType kt;
 
   static public Evl process(RefItem refitm, Evl last, Set<Function> target, KnowledgeBase kb) {
@@ -131,7 +129,6 @@ class RefGetter extends NullTraverser<Evl, Evl> {
     super();
     this.target = target;
     this.kfc = kb.getEntry(KnowChild.class);
-    kbi = kb.getEntry(KnowBaseItem.class);
     kt = kb.getEntry(KnowType.class);
   }
 

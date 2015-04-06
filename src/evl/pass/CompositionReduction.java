@@ -70,7 +70,6 @@ import evl.data.statement.ReturnExpr;
 import evl.data.statement.intern.MsgPush;
 import evl.data.variable.FuncVariable;
 import evl.data.variable.Variable;
-import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.NullTraverser;
 
@@ -84,7 +83,7 @@ public class CompositionReduction extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    CompositionReductionWorker reduction = new CompositionReductionWorker(kb);
+    CompositionReductionWorker reduction = new CompositionReductionWorker();
     reduction.traverse(evl, null);
     Relinker.relink(evl, reduction.getMap());
 
@@ -115,12 +114,6 @@ class CompositionReductionWorker extends NullTraverser<Evl, Void> {
 
   private static final ElementInfo info = ElementInfo.NO;
   private final Map<ImplComposition, ImplElementary> map = new HashMap<ImplComposition, ImplElementary>();
-  private final KnowBaseItem kbi;
-
-  public CompositionReductionWorker(KnowledgeBase kb) {
-    super();
-    kbi = kb.getEntry(KnowBaseItem.class);
-  }
 
   @Override
   protected Evl visitDefault(Evl obj, Void param) {
