@@ -61,7 +61,7 @@ public class FileParser extends BaseParser {
   private RizzlyFile parseFile(String filename, String name) {
     ElementInfo info = peek().getInfo();
     ArrayList<Metadata> meta = getMetadata();
-    info.getMetadata().addAll(meta);
+    info.metadata.addAll(meta);
     List<Designator> imp = parseImport();
 
     RizzlyFile ret = new RizzlyFile(info, name, imp);

@@ -52,7 +52,7 @@ public class ImplElementaryParser extends ImplBaseParser {
   private ImplElementary parseImplementationElementary(String name) {
     ElementInfo info = expect(TokenType.ELEMENTARY).getInfo();
     ArrayList<Metadata> meta = getMetadata();
-    info.getMetadata().addAll(meta);
+    info.metadata.addAll(meta);
     ImplElementary comp = new ImplElementary(info, name);
 
     while (!consumeIfEqual(TokenType.END)) {

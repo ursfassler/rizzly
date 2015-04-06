@@ -17,12 +17,14 @@
 
 package fun.doc;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
 import common.Designator;
 import common.Direction;
+import common.Metadata;
 
 import error.ErrorType;
 import error.RError;
@@ -49,7 +51,7 @@ public class CompositionGraphMaker {
 
   public static WorldComp make(Designator path, String name, ImplComposition impl, KnowledgeBase kb) {
     KnowFunPath kp = kb.getEntry(KnowFunPath.class);
-    WorldComp comp = new WorldComp(impl.getInfo(), path, name, impl.getInfo().getMetadata(METADATA_KEY));
+    WorldComp comp = new WorldComp(impl.getInfo(), path, name, filterMetadata(impl.getInfo().metadata, METADATA_KEY));
 
     Map<CompUse, SubComponent> compmap = new HashMap<CompUse, SubComponent>();
     Map<Designator, Interface> ifacemap = new HashMap<Designator, Interface>();
@@ -75,7 +77,7 @@ public class CompositionGraphMaker {
     for (CompUse use : impl.getInstantiation().getItems(CompUse.class)) {
       fun.other.CompImpl comptype = (CompImpl) ((fun.other.Template) use.getType().getLink()).getObject();
       Designator subpath = kp.get(comptype);
-      SubComponent sub = new SubComponent(use.getInfo(), use.getName(), subpath, comptype.getName(), use.getInfo().getMetadata(METADATA_KEY));
+      SubComponent sub = new SubComponent(use.getInfo(), use.getName(), subpath, comptype.getName(), filterMetadata(use.getInfo().metadata, METADATA_KEY));
 
       // TODO cleanup
       for (FuncResponse iface : comptype.getIface().getItems(FuncResponse.class)) {
@@ -102,7 +104,7 @@ public class CompositionGraphMaker {
     for (fun.composition.Connection con : impl.getConnection()) {
       Interface src = getIface(con.getEndpoint(Direction.in), ifacemap, kb);
       Interface dst = getIface(con.getEndpoint(Direction.out), ifacemap, kb);
-      fun.doc.compgraph.Connection ncon = new fun.doc.compgraph.Connection(src, dst, con.getInfo().getMetadata(METADATA_KEY));
+      fun.doc.compgraph.Connection ncon = new fun.doc.compgraph.Connection(src, dst, filterMetadata(con.getInfo().metadata, METADATA_KEY));
       src.getConnection().add(ncon);
       dst.getConnection().add(ncon);
       comp.getConn().add(ncon);
@@ -134,6 +136,16 @@ public class CompositionGraphMaker {
     assert (!ifacemap.containsKey(name));
     ifacemap.put(name, niface);
     return niface;
+  }
+
+  private static ArrayList<Metadata> filterMetadata(ArrayList<Metadata> metadata, String filterKey) {
+    ArrayList<Metadata> ret = new ArrayList<Metadata>();
+    for (Metadata itr : metadata) {
+      if (itr.getKey().equals(filterKey)) {
+        ret.add(itr);
+      }
+    }
+    return ret;
   }
 
 }

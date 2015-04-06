@@ -83,7 +83,7 @@ public class MetadataReader implements PeekReader<Character> {
   public ElementInfo getInfo() {
     ElementInfo metaInfo = getActualMeta().getInfo();
     int keySize = getActualMeta().getKey().length() + 1;
-    ElementInfo info = new ElementInfo(metaInfo.getFilename(), metaInfo.getLine(), metaInfo.getRow() + pos + keySize);
+    ElementInfo info = new ElementInfo(metaInfo.filename, metaInfo.line, metaInfo.row + pos + keySize);
     return info;
   }
 

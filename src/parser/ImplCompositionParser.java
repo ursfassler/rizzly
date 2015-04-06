@@ -51,7 +51,7 @@ public class ImplCompositionParser extends ImplBaseParser {
   private ImplComposition parseImplementationComposition(String name) {
     ElementInfo info = expect(TokenType.COMPOSITION).getInfo();
     ArrayList<Metadata> meta = getMetadata();
-    info.getMetadata().addAll(meta);
+    info.metadata.addAll(meta);
     ImplComposition comp = new ImplComposition(info, name);
 
     while (!consumeIfEqual(TokenType.END)) {
@@ -74,7 +74,7 @@ public class ImplCompositionParser extends ImplBaseParser {
         Reference type = expr().parseRef();
         expect(TokenType.SEMI);
         ArrayList<Metadata> meta = getMetadata();
-        id.getInfo().getMetadata().addAll(meta);
+        id.getInfo().metadata.addAll(meta);
         CompUse compUse = new CompUse(id.getInfo(), id.getData(), type);
         comp.getInstantiation().add(compUse);
         break;
@@ -94,7 +94,7 @@ public class ImplCompositionParser extends ImplBaseParser {
     expect(TokenType.SEMI);
 
     ArrayList<Metadata> meta = getMetadata();
-    info.getMetadata().addAll(meta);
+    info.metadata.addAll(meta);
 
     return new Connection(info, src, dst, type);
   }

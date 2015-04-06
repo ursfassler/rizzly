@@ -20,43 +20,17 @@ package common;
 import java.util.ArrayList;
 
 public class ElementInfo {
-  private String filename;
-  private int line;
-  private int row;
-  final private ArrayList<Metadata> metadata = new ArrayList<Metadata>();
-  public final static ElementInfo NO = new ElementInfo("", 0, 0);
+  final public String filename;
+  final public int line;
+  final public int row;
+  final public ArrayList<Metadata> metadata = new ArrayList<Metadata>();
+  static final public ElementInfo NO = new ElementInfo("", 0, 0);
 
   public ElementInfo(String filename, int line, int row) {
     super();
     this.filename = filename;
     this.line = line;
     this.row = row;
-  }
-
-  public String getFilename() {
-    return filename;
-  }
-
-  public int getLine() {
-    return line;
-  }
-
-  public int getRow() {
-    return row;
-  }
-
-  public ArrayList<Metadata> getMetadata() {
-    return metadata;
-  }
-
-  public ArrayList<Metadata> getMetadata(String filterKey) {
-    ArrayList<Metadata> ret = new ArrayList<Metadata>();
-    for (Metadata itr : metadata) {
-      if (itr.getKey().equals(filterKey)) {
-        ret.add(itr);
-      }
-    }
-    return ret;
   }
 
   @Override

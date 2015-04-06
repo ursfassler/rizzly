@@ -45,7 +45,7 @@ public class RError {
   }
 
   public static void err(ErrorType error, ElementInfo info, String string) {
-    err(error, info.getFilename(), info.getLine(), info.getRow(), string);
+    err(error, info.filename, info.line, info.row, string);
   }
 
   public static void err(ErrorType error, String string) {

@@ -179,7 +179,7 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   }
 
   private void writeMeta(Fun obj) {
-    ArrayList<Metadata> metadata = obj.getInfo().getMetadata();
+    ArrayList<Metadata> metadata = obj.getInfo().metadata;
     for (Metadata meta : metadata) {
       xw.wc("//" + meta.getKey() + " " + meta.getValue());
       xw.nl();
