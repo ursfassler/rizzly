@@ -5,7 +5,6 @@ import java.util.List;
 import pass.EvlPass;
 
 import common.ElementInfo;
-import common.Property;
 
 import error.RError;
 import evl.copy.Copy;
@@ -16,6 +15,7 @@ import evl.data.expression.TupleValue;
 import evl.data.expression.reference.RefCall;
 import evl.data.expression.reference.Reference;
 import evl.data.function.Function;
+import evl.data.function.FunctionProperty;
 import evl.data.statement.AssignmentSingle;
 import evl.data.statement.CallStmt;
 import evl.data.statement.Return;
@@ -79,7 +79,7 @@ class FuncInlinerWorker extends StmtReplacer<Function> {
   }
 
   private boolean doInline(Function func) {
-    if (!func.properties().containsKey(Property.Public) && !func.properties().containsKey(Property.Extern)) {
+    if (func.property == FunctionProperty.Private) {
       if (ClassGetter.getRecursive(Return.class, func.body).isEmpty()) {
         int refCount = kbl.get(func).size();
         // assert(refCount > 0); //XXX why is this not true?

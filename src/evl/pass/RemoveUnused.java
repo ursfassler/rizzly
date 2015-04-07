@@ -22,12 +22,10 @@ import java.util.Set;
 
 import pass.EvlPass;
 import util.SimpleGraph;
-
-import common.Property;
-
 import evl.data.Evl;
 import evl.data.Namespace;
 import evl.data.function.Function;
+import evl.data.function.FunctionProperty;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.other.ClassGetter;
 import evl.traverser.other.DepGraph;
@@ -39,7 +37,7 @@ public class RemoveUnused extends EvlPass {
     Set<Function> roots = new HashSet<Function>();
 
     for (Function func : ClassGetter.getRecursive(Function.class, evl)) {
-      if (func.properties().get(Property.Public) == Boolean.TRUE) {
+      if ((func.property == FunctionProperty.Public) || (func.property == FunctionProperty.External)) {
         roots.add(func);
       }
     }

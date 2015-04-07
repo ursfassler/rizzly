@@ -22,9 +22,6 @@ import java.io.PrintStream;
 
 import pass.EvlPass;
 import util.StreamWriter;
-
-import common.Property;
-
 import evl.data.Evl;
 import evl.data.EvlList;
 import evl.data.Named;
@@ -374,32 +371,36 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
 
   @Override
   protected Void visitFunction(Function obj, Boolean param) {
-    if (obj.properties().containsKey(Property.Extern)) {
-      if (!param) {
-        sw.wr("extern ");
+    switch (obj.property) {
+      case External:
+        if (!param) {
+          sw.wr("extern ");
+          writeFuncHeader(obj);
+          sw.wr(";");
+          sw.nl();
+        }
+        break;
+      case Public:
         writeFuncHeader(obj);
-        sw.wr(";");
+        if (param) {
+          sw.nl();
+          visit(obj.body, param);
+        } else {
+          sw.wr(";");
+        }
         sw.nl();
-      }
-    } else if (obj.properties().containsKey(Property.Public)) {
-      writeFuncHeader(obj);
-      if (param) {
+        break;
+      case Private:
+        sw.wr("static ");
+        writeFuncHeader(obj);
+        if (param) {
+          sw.nl();
+          visit(obj.body, param);
+        } else {
+          sw.wr(";");
+        }
         sw.nl();
-        visit(obj.body, param);
-      } else {
-        sw.wr(";");
-      }
-      sw.nl();
-    } else {
-      sw.wr("static ");
-      writeFuncHeader(obj);
-      if (param) {
-        sw.nl();
-        visit(obj.body, param);
-      } else {
-        sw.wr(";");
-      }
-      sw.nl();
+        break;
     }
     return null;
   }

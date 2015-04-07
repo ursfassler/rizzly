@@ -25,7 +25,6 @@ import java.util.List;
 import util.StreamWriter;
 
 import common.Direction;
-import common.Property;
 
 import evl.data.Evl;
 import evl.data.Named;
@@ -84,6 +83,7 @@ import evl.data.expression.unop.LogicNot;
 import evl.data.expression.unop.Not;
 import evl.data.expression.unop.Uminus;
 import evl.data.function.Function;
+import evl.data.function.FunctionProperty;
 import evl.data.function.header.FuncCtrlInDataIn;
 import evl.data.function.header.FuncCtrlInDataOut;
 import evl.data.function.header.FuncCtrlOutDataIn;
@@ -368,10 +368,10 @@ public class PrettyPrinter extends NullTraverser<Void, StreamWriter> {
     list(obj.param, "; ", param);
     param.wr(")");
     visit(obj.ret, param);
-    if (obj.properties().get(Property.Extern) == Boolean.TRUE) {
+    if (obj.property == FunctionProperty.External) {
       param.wr(" extern");
     }
-    if (obj.properties().get(Property.Public) == Boolean.TRUE) {
+    if (obj.property == FunctionProperty.Public) {
       param.wr(" public");
     }
     param.nl();

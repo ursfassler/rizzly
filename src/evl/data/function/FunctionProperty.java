@@ -15,8 +15,8 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package common;
+package evl.data.function;
 
-public enum Property {
-  Public, Extern,
+public enum FunctionProperty {
+  Private, Public, External
 }

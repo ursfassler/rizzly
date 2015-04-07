@@ -5,14 +5,12 @@ import java.util.List;
 import java.util.Set;
 
 import pass.EvlPass;
-
-import common.Property;
-
 import error.ErrorType;
 import error.RError;
 import evl.data.EvlList;
 import evl.data.Namespace;
 import evl.data.function.Function;
+import evl.data.function.FunctionProperty;
 import evl.data.statement.CallStmt;
 import evl.data.statement.Statement;
 import evl.knowledge.KnowledgeBase;
@@ -69,7 +67,7 @@ class NoCallEmptyFuncWorker extends StmtReplacer<Function> {
   }
 
   private boolean removable(Function func) {
-    return func.body.statements.isEmpty() && !func.properties().containsKey(Property.Public) && !func.properties().containsKey(Property.Extern);
+    return func.body.statements.isEmpty() && (func.property == FunctionProperty.Private);
 
   }
 }

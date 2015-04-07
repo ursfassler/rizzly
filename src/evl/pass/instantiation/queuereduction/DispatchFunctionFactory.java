@@ -20,7 +20,6 @@ package evl.pass.instantiation.queuereduction;
 import java.math.BigInteger;
 
 import common.ElementInfo;
-import common.Property;
 
 import evl.data.EvlList;
 import evl.data.expression.Number;
@@ -33,6 +32,7 @@ import evl.data.expression.reference.RefIndex;
 import evl.data.expression.reference.RefName;
 import evl.data.expression.reference.Reference;
 import evl.data.function.Function;
+import evl.data.function.FunctionProperty;
 import evl.data.function.header.FuncCtrlInDataIn;
 import evl.data.function.ret.FuncReturnNone;
 import evl.data.statement.AssignmentSingle;
@@ -54,7 +54,7 @@ class DispatchFunctionFactory {
   static public Function create(String prefix, ElementInfo info, QueueVariables queueVariables, QueueTypes queueTypes) {
     Block body = createDispatchBody(queueVariables, queueTypes);
     Function dispatcher = new FuncCtrlInDataIn(info, prefix + "dispatch", new EvlList<FuncVariable>(), new FuncReturnNone(info), body);
-    dispatcher.properties().put(Property.Public, true);
+    dispatcher.property = FunctionProperty.Public;
     return dispatcher;
   }
 

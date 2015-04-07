@@ -17,33 +17,27 @@
 
 package evl.data.function;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import common.ElementInfo;
 
 import evl.data.Evl;
 import evl.data.EvlList;
 import evl.data.Named;
 import evl.data.function.ret.FuncReturn;
+import evl.data.function.ret.FuncReturnNone;
 import evl.data.statement.Block;
 import evl.data.variable.FuncVariable;
 
 abstract public class Function extends Named {
-  final private HashMap<Object, Object> properties = new HashMap<Object, Object>();
   final public EvlList<FuncVariable> param = new EvlList<FuncVariable>();
-  public FuncReturn ret;
-  public Block body;
+  public FuncReturn ret = new FuncReturnNone(ElementInfo.NO);
+  public Block body = new Block(ElementInfo.NO);
+  public FunctionProperty property = FunctionProperty.Private;
 
   public Function(ElementInfo info, String name, EvlList<FuncVariable> param, FuncReturn ret, Block body) {
     super(info, name);
     this.param.addAll(param);
     this.ret = ret;
     this.body = body;
-  }
-
-  public Map<Object, Object> properties() {
-    return properties;
   }
 
   @Override
@@ -57,10 +51,10 @@ abstract public class Function extends Named {
     return ret;
   }
 
-  private String l2s(EvlList<FuncVariable> param2) {
+  static private String l2s(EvlList<FuncVariable> param) {
     String ret = "";
     boolean first = true;
-    for (Evl tp : param2) {
+    for (Evl tp : param) {
       if (first) {
         first = false;
       } else {

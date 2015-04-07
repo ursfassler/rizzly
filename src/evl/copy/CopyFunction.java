@@ -42,7 +42,7 @@ public class CopyFunction extends NullTraverser<Evl, Void> {
     EvlList<FuncVariable> arg = cast.copy(obj.param);
     Function ret = FunctionFactory.create(obj.getClass(), obj.getInfo(), obj.name, arg, cast.copy(obj.ret), cast.copy(obj.body));
     cast.getCopied().put(obj, ret);
-    ret.properties().putAll(obj.properties());
+    ret.property = obj.property;
     return ret;
   }
 

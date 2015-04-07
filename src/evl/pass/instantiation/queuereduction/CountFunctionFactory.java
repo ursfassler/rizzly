@@ -1,6 +1,6 @@
 /**
  *  This file is part of Rizzly.
- * 
+ *
  *  Rizzly is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -18,12 +18,12 @@
 package evl.pass.instantiation.queuereduction;
 
 import common.ElementInfo;
-import common.Property;
 
 import evl.data.EvlList;
 import evl.data.expression.reference.Reference;
 import evl.data.expression.reference.SimpleRef;
 import evl.data.function.Function;
+import evl.data.function.FunctionProperty;
 import evl.data.function.header.FuncCtrlInDataOut;
 import evl.data.function.ret.FuncReturnType;
 import evl.data.statement.Block;
@@ -36,7 +36,7 @@ class CountFunctionFactory {
     Block sfb = new Block(info);
     sfb.statements.add(new ReturnExpr(info, new Reference(info, queueVariables.getCount())));
     Function sizefunc = new FuncCtrlInDataOut(info, prefix + "count", new EvlList<FuncVariable>(), new FuncReturnType(info, new SimpleRef<Type>(ElementInfo.NO, queueVariables.getCount().type.link)), sfb);
-    sizefunc.properties().put(Property.Public, true);
+    sizefunc.property = FunctionProperty.Public;
     return sizefunc;
   }
 

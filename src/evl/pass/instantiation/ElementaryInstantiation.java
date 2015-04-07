@@ -26,7 +26,6 @@ import pass.EvlPass;
 
 import common.Direction;
 import common.ElementInfo;
-import common.Property;
 
 import error.RError;
 import evl.copy.CopyEvl;
@@ -41,6 +40,7 @@ import evl.data.component.composition.SubCallbacks;
 import evl.data.component.elementary.ImplElementary;
 import evl.data.expression.reference.SimpleRef;
 import evl.data.function.Function;
+import evl.data.function.FunctionProperty;
 import evl.data.function.InterfaceFunction;
 import evl.data.function.header.FuncPrivateVoid;
 import evl.data.function.ret.FuncReturnNone;
@@ -75,7 +75,9 @@ public class ElementaryInstantiation extends EvlPass {
     pubfunc.addAll(inst.component.get(0).instref.link.iface);
 
     for (Function nam : pubfunc) {
-      nam.properties().put(Property.Public, true);
+      if (nam.property == FunctionProperty.Private) {
+        nam.property = FunctionProperty.Public;
+      }
     }
   }
 
@@ -95,8 +97,7 @@ public class ElementaryInstantiation extends EvlPass {
       env.subCallback.add(suc);
       for (InterfaceFunction out : compu.instref.link.getIface(Direction.out)) {
         Function suha = CompositionReduction.makeHandler(out);
-        suha.properties().put(Property.Extern, true);
-        suha.properties().put(Property.Public, true);
+        suha.property = FunctionProperty.External;
         suc.func.add(suha);
       }
     }

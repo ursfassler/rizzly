@@ -24,7 +24,6 @@ import java.util.List;
 import util.StreamWriter;
 
 import common.ElementInfo;
-import common.Property;
 
 import error.ErrorType;
 import error.RError;
@@ -35,6 +34,7 @@ import evl.data.expression.BoolValue;
 import evl.data.expression.Number;
 import evl.data.expression.reference.SimpleRef;
 import evl.data.function.Function;
+import evl.data.function.FunctionProperty;
 import evl.data.function.ret.FuncReturnNone;
 import evl.data.function.ret.FuncReturnType;
 import evl.data.type.Type;
@@ -75,12 +75,15 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
     EvlList<Function> funcRequired = new EvlList<Function>();
 
     for (Function func : ClassGetter.filter(Function.class, obj.children)) {
-      if (func.properties().get(Property.Public) == Boolean.TRUE) {
-        if (func.properties().get(Property.Extern) == Boolean.TRUE) {
-          funcRequired.add(func);
-        } else {
+      switch (func.property) {
+        case Private:
+          break;
+        case Public:
           funcProvided.add(func);
-        }
+          break;
+        case External:
+          funcRequired.add(func);
+          break;
       }
     }
 
@@ -186,7 +189,6 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   protected void writeFuncHeader(Function obj, StreamWriter param) {
-    assert (obj.properties().get(Property.Public) == Boolean.TRUE);
     if (obj.ret instanceof FuncReturnNone) {
       param.wr("procedure");
     } else {
@@ -209,13 +211,12 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.wr(";");
     param.wr(" cdecl;");
 
-    if (obj.properties().get(Property.Extern) != Boolean.TRUE) {
-      assert (obj.properties().get(Property.Public) == Boolean.TRUE);
+    if (obj.property == FunctionProperty.External) {
+      param.wr(" public;");
+    } else {
       param.wr(" external ");
       param.wr(LibName);
       param.wr(";");
-    } else {
-      param.wr(" public;");
     }
 
     param.nl();

@@ -25,13 +25,13 @@ import pass.EvlPass;
 
 import common.Designator;
 import common.ElementInfo;
-import common.Property;
 
 import evl.data.EvlList;
 import evl.data.Namespace;
 import evl.data.expression.Number;
 import evl.data.expression.StringValue;
 import evl.data.expression.reference.SimpleRef;
+import evl.data.function.FunctionProperty;
 import evl.data.function.header.FuncCtrlInDataOut;
 import evl.data.function.ret.FuncReturnType;
 import evl.data.statement.Block;
@@ -77,7 +77,7 @@ public class DebugIface extends EvlPass {
     reduction.traverse(evl, null);
 
     FuncCtrlInDataOut func = makeNameGetter("DebugName", symNameSizeType, names, stringType);
-    func.properties().put(Property.Public, true);
+    func.property = FunctionProperty.Public;
     kb.getRootComp().instref.link.function.add(func);
   }
 

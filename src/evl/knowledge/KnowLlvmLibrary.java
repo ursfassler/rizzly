@@ -19,11 +19,11 @@ package evl.knowledge;
 
 import common.Designator;
 import common.ElementInfo;
-import common.Property;
 
 import evl.data.Evl;
 import evl.data.EvlList;
 import evl.data.Named;
+import evl.data.function.FunctionProperty;
 import evl.data.function.header.FuncCtrlOutDataOut;
 import evl.data.function.ret.FuncReturnNone;
 import evl.data.statement.Block;
@@ -55,8 +55,7 @@ public class KnowLlvmLibrary extends KnowledgeEntry {
 
     if (ret == null) {
       ret = new FuncCtrlOutDataOut(info, NAME, new EvlList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
-      ret.properties().put(Property.Extern, true);
-      ret.properties().put(Property.Public, true);
+      ret.property = FunctionProperty.External;
       addItem(ret);
     }
 

@@ -33,7 +33,6 @@ import util.SimpleGraph;
 import util.StreamWriter;
 
 import common.ElementInfo;
-import common.Property;
 
 import error.ErrorType;
 import error.RError;
@@ -43,6 +42,7 @@ import evl.data.Namespace;
 import evl.data.expression.reference.BaseRef;
 import evl.data.expression.reference.SimpleRef;
 import evl.data.function.Function;
+import evl.data.function.FunctionProperty;
 import evl.data.function.ret.FuncReturn;
 import evl.data.type.Type;
 import evl.data.type.base.EnumElement;
@@ -85,7 +85,7 @@ public class HeaderWriter extends EvlPass {
     Namespace ret = new Namespace(ElementInfo.NO, prg.name);
     Set<Evl> anchor = new HashSet<Evl>();
     for (Function func : ClassGetter.filter(Function.class, prg.children)) {
-      if (Boolean.TRUE.equals(func.properties().get(Property.Public))) {
+      if ((func.property == FunctionProperty.Public) || (func.property == FunctionProperty.External)) {
         for (FuncVariable arg : func.param) {
           anchor.add(arg.type.link);
         }
