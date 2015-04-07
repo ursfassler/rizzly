@@ -17,8 +17,6 @@
 
 package evl.data;
 
-import java.util.Map;
-
 import common.ElementInfo;
 
 /**
@@ -27,6 +25,4 @@ import common.ElementInfo;
  */
 public interface Evl {
   public ElementInfo getInfo();
-
-  public Map<Object, Object> properties();
 }

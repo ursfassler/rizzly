@@ -46,6 +46,14 @@ public class ClassGetter<T extends Evl> extends DefTraverser<Void, Void> {
     return getter.ret;
   }
 
+  static public <T extends Evl> EvlList<T> getRecursive(Class<T> kind, EvlList<? extends Evl> list) {
+    ClassGetter<T> getter = new ClassGetter<T>(kind);
+    for (Evl itr : list) {
+      getter.traverse(itr, null);
+    }
+    return getter.ret;
+  }
+
   @Override
   protected Void visit(Evl obj, Void param) {
     if (kind.isAssignableFrom(obj.getClass())) {

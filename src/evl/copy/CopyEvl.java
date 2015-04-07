@@ -101,7 +101,6 @@ public class CopyEvl extends NullTraverser<Evl, Void> {
       if (obj instanceof Named) {
         copied.put((Named) obj, (Named) nobj);
       }
-      nobj.properties().putAll(obj.properties());
       return nobj;
     }
   }

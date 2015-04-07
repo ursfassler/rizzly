@@ -49,6 +49,7 @@ import evl.data.variable.FuncVariable;
 import evl.knowledge.KnowledgeBase;
 import evl.pass.CompositionReduction;
 import evl.traverser.NullTraverser;
+import evl.traverser.other.ClassGetter;
 
 public class ElementaryInstantiation extends EvlPass {
 
@@ -68,12 +69,12 @@ public class ElementaryInstantiation extends EvlPass {
 
     assert (inst.iface.isEmpty());
 
-    Set<Evl> pubfunc = new HashSet<Evl>();
-    pubfunc.addAll(inst.subCallback);
+    Set<Function> pubfunc = new HashSet<Function>();
+    pubfunc.addAll(ClassGetter.getRecursive(Function.class, inst.subCallback));
     RError.ass(inst.component.size() == 1, inst.getInfo(), "Only expected one instance");
     pubfunc.addAll(inst.component.get(0).instref.link.iface);
 
-    for (Evl nam : pubfunc) {
+    for (Function nam : pubfunc) {
       nam.properties().put(Property.Public, true);
     }
   }
@@ -93,7 +94,7 @@ public class ElementaryInstantiation extends EvlPass {
       SubCallbacks suc = new SubCallbacks(compu.getInfo(), new SimpleRef<CompUse>(ElementInfo.NO, compu));
       env.subCallback.add(suc);
       for (InterfaceFunction out : compu.instref.link.getIface(Direction.out)) {
-        Function suha = CompositionReduction.makeHandler((Function) out);
+        Function suha = CompositionReduction.makeHandler(out);
         suha.properties().put(Property.Extern, true);
         suha.properties().put(Property.Public, true);
         suc.func.add(suha);
@@ -144,7 +145,7 @@ class CompInstantiatorWorker extends NullTraverser<ImplElementary, Namespace> {
       // route output interface to sub-callback implementation
       for (Function impl : getSubCallback(inst.subCallback, compUse).func) {
         // get output declaration of instantiated sub-component
-        Function outdecl = (Function) cpy.iface.find(impl.name);
+        Function outdecl = cpy.iface.find(impl.name);
 
         assert (outdecl != null);
         assert (usens.children.contains(outdecl));
