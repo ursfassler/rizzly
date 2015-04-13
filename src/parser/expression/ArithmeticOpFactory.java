@@ -17,6 +17,7 @@
 
 package parser.expression;
 
+import ast.ElementInfo;
 import ast.data.expression.Expression;
 import ast.data.expression.binop.And;
 import ast.data.expression.binop.BitXor;
@@ -28,9 +29,6 @@ import ast.data.expression.binop.Or;
 import ast.data.expression.binop.Plus;
 import ast.data.expression.binop.Shl;
 import ast.data.expression.binop.Shr;
-
-import common.ElementInfo;
-
 import error.ErrorType;
 import error.RError;
 

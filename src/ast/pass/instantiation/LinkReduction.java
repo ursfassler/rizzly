@@ -17,7 +17,6 @@
 
 package ast.pass.instantiation;
 
-import pass.AstPass;
 import ast.data.Ast;
 import ast.data.Named;
 import ast.data.Namespace;
@@ -26,6 +25,7 @@ import ast.data.expression.reference.RefName;
 import ast.data.expression.reference.Reference;
 import ast.knowledge.KnowChild;
 import ast.knowledge.KnowledgeBase;
+import ast.pass.AstPass;
 import ast.traverser.DefTraverser;
 import error.ErrorType;
 import error.RError;

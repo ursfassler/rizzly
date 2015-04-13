@@ -17,6 +17,7 @@
 
 package ast.pass.instantiation.queuereduction;
 
+import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.data.AstList;
 import ast.data.expression.reference.Reference;
@@ -27,8 +28,6 @@ import ast.data.function.ret.FuncReturnType;
 import ast.data.statement.Block;
 import ast.data.statement.ReturnExpr;
 import ast.data.variable.FuncVariable;
-
-import common.ElementInfo;
 
 class CountFunctionFactory {
   static public Function create(String prefix, ElementInfo info, QueueVariables queueVariables) {

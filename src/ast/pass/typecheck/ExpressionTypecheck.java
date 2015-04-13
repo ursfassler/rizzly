@@ -19,7 +19,8 @@ package ast.pass.typecheck;
 
 import java.math.BigInteger;
 
-import util.Range;
+import ast.ElementInfo;
+import ast.data.Range;
 import ast.data.expression.BoolValue;
 import ast.data.expression.Expression;
 import ast.data.expression.Number;
@@ -55,9 +56,6 @@ import ast.knowledge.KnowComparable;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.traverser.DefTraverser;
-
-import common.ElementInfo;
-
 import error.ErrorType;
 import error.RError;
 

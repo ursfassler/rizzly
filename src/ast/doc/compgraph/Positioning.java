@@ -29,11 +29,8 @@ import java.util.StringTokenizer;
 
 import metadata.parser.SimpleMetaParser;
 import util.Pair;
-import util.PointF;
-import util.SimpleGraph;
-
-import common.ElementInfo;
-
+import ast.ElementInfo;
+import ast.doc.SimpleGraph;
 import error.ErrorType;
 import error.RError;
 

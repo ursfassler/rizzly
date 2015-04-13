@@ -17,9 +17,8 @@
 
 package ast.data.statement;
 
-import util.Range;
-
-import common.ElementInfo;
+import ast.ElementInfo;
+import ast.data.Range;
 
 public class CaseOptSimple extends CaseOptEntry {
   public Range value;

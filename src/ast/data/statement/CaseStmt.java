@@ -17,10 +17,9 @@
 
 package ast.data.statement;
 
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.expression.Expression;
-
-import common.ElementInfo;
 
 public class CaseStmt extends Statement {
   public Expression condition;

@@ -17,11 +17,10 @@
 
 package ast.data.type.base;
 
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.expression.reference.TypeRef;
 import ast.data.type.Type;
-
-import common.ElementInfo;
 
 final public class FunctionType extends Type {
   final public AstList<TypeRef> arg;

@@ -23,9 +23,7 @@ import java.util.List;
 import parser.scanner.Scanner;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
-
-import common.Metadata;
-
+import ast.data.Metadata;
 import error.ErrorType;
 import error.RError;
 

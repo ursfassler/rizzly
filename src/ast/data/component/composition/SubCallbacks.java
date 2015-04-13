@@ -17,12 +17,11 @@
 
 package ast.data.component.composition;
 
+import ast.ElementInfo;
 import ast.data.AstBase;
 import ast.data.AstList;
 import ast.data.expression.reference.SimpleRef;
 import ast.data.function.Function;
-
-import common.ElementInfo;
 
 public class SubCallbacks extends AstBase {
   final public AstList<Function> func = new AstList<Function>();

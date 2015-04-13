@@ -17,9 +17,8 @@
 
 package ast.data.component.hfsm;
 
+import ast.ElementInfo;
 import ast.data.component.Component;
-
-import common.ElementInfo;
 
 public class ImplHfsm extends Component {
   public StateComposite topstate;

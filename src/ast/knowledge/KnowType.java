@@ -22,11 +22,14 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
-import util.Range;
+import ast.Designator;
+import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
+import ast.data.Range;
 import ast.data.component.Component;
 import ast.data.component.composition.CompUse;
+import ast.data.component.composition.Direction;
 import ast.data.expression.AnyValue;
 import ast.data.expression.ArrayValue;
 import ast.data.expression.BoolValue;
@@ -81,11 +84,6 @@ import ast.data.variable.Variable;
 import ast.pass.typecheck.ExpressionTypecheck;
 import ast.traverser.NullTraverser;
 import ast.traverser.other.RefTypeGetter;
-
-import common.Designator;
-import common.Direction;
-import common.ElementInfo;
-
 import error.ErrorType;
 import error.RError;
 

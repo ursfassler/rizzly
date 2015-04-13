@@ -17,9 +17,8 @@
 
 package ast.data.expression.reference;
 
+import ast.ElementInfo;
 import ast.data.AstBase;
-
-import common.ElementInfo;
 
 abstract public class RefItem extends AstBase {
   public RefItem(ElementInfo info) {

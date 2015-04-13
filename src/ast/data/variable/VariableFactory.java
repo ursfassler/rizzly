@@ -20,10 +20,9 @@ package ast.data.variable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+import ast.ElementInfo;
 import ast.data.expression.Expression;
 import ast.data.expression.reference.TypeRef;
-
-import common.ElementInfo;
 
 public class VariableFactory {
   static public <T extends Variable> T create(Class<T> kind, ElementInfo info, String name, TypeRef type, Expression def) {

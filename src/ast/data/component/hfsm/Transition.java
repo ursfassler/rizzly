@@ -17,6 +17,7 @@
 
 package ast.data.component.hfsm;
 
+import ast.ElementInfo;
 import ast.data.AstBase;
 import ast.data.AstList;
 import ast.data.expression.Expression;
@@ -24,8 +25,6 @@ import ast.data.expression.reference.FuncRef;
 import ast.data.expression.reference.StateRef;
 import ast.data.statement.Block;
 import ast.data.variable.FuncVariable;
-
-import common.ElementInfo;
 
 public class Transition extends AstBase implements StateContent {
   public StateRef src;

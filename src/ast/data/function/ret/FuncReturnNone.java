@@ -17,7 +17,7 @@
 
 package ast.data.function.ret;
 
-import common.ElementInfo;
+import ast.ElementInfo;
 
 public class FuncReturnNone extends FuncReturn {
 

@@ -22,8 +22,7 @@ import java.math.BigInteger;
 import parser.scanner.Symbol;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
-
-import common.ElementInfo;
+import ast.ElementInfo;
 
 /**
  *

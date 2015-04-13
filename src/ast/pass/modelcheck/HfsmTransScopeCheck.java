@@ -21,18 +21,16 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import pass.AstPass;
+import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.component.hfsm.ImplHfsm;
 import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.Transition;
 import ast.knowledge.KnowledgeBase;
+import ast.pass.AstPass;
 import ast.traverser.NullTraverser;
 import ast.traverser.other.ClassGetter;
-
-import common.ElementInfo;
-
 import error.ErrorType;
 import error.RError;
 

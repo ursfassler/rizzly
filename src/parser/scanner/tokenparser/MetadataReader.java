@@ -19,7 +19,7 @@ package parser.scanner.tokenparser;
 
 import java.util.ArrayList;
 
-import common.Metadata;
+import ast.data.Metadata;
 
 public interface MetadataReader {
   public ArrayList<Metadata> getMetadata();

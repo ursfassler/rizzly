@@ -19,7 +19,7 @@ package parser.scanner;
 
 import java.math.BigInteger;
 
-import common.ElementInfo;
+import ast.ElementInfo;
 
 /**
  *

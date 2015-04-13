@@ -17,9 +17,8 @@
 
 package ast.data.expression.binop;
 
+import ast.ElementInfo;
 import ast.data.expression.Expression;
-
-import common.ElementInfo;
 
 /**
  *

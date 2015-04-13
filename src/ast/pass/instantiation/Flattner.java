@@ -17,7 +17,7 @@
 
 package ast.pass.instantiation;
 
-import pass.AstPass;
+import ast.Designator;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
@@ -28,10 +28,9 @@ import ast.data.type.Type;
 import ast.data.variable.Constant;
 import ast.data.variable.StateVariable;
 import ast.knowledge.KnowledgeBase;
+import ast.pass.AstPass;
 import ast.traverser.DefTraverser;
 import ast.traverser.other.ClassGetter;
-
-import common.Designator;
 
 public class Flattner extends AstPass {
 

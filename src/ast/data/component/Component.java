@@ -17,8 +17,10 @@
 
 package ast.data.component;
 
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.Named;
+import ast.data.component.composition.Direction;
 import ast.data.component.composition.Queue;
 import ast.data.function.Function;
 import ast.data.function.InterfaceFunction;
@@ -27,9 +29,6 @@ import ast.data.function.header.FuncResponse;
 import ast.data.function.header.FuncSignal;
 import ast.data.function.header.FuncSlot;
 import ast.traverser.other.ClassGetter;
-
-import common.Direction;
-import common.ElementInfo;
 
 abstract public class Component extends Named {
   public Queue queue;

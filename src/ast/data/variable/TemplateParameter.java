@@ -17,9 +17,8 @@
 
 package ast.data.variable;
 
+import ast.ElementInfo;
 import ast.data.expression.reference.TypeRef;
-
-import common.ElementInfo;
 
 final public class TemplateParameter extends Variable {
 

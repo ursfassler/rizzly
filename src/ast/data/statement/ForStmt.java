@@ -17,9 +17,8 @@
 
 package ast.data.statement;
 
+import ast.ElementInfo;
 import ast.data.variable.FuncVariable;
-
-import common.ElementInfo;
 
 public class ForStmt extends Statement {
   public FuncVariable iterator;

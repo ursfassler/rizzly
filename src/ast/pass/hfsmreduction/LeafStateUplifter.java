@@ -20,7 +20,7 @@ package ast.pass.hfsmreduction;
 import java.util.ArrayList;
 import java.util.List;
 
-import pass.AstPass;
+import ast.Designator;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -29,10 +29,9 @@ import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateSimple;
 import ast.knowledge.KnowledgeBase;
+import ast.pass.AstPass;
 import ast.traverser.NullTraverser;
 import ast.traverser.other.ClassGetter;
-
-import common.Designator;
 
 /**
  * Moves all leaf-states up. In the end, the top state only has former leaf states a children.

@@ -22,8 +22,7 @@ import main.Main;
 
 import org.junit.Assert;
 
-import common.Designator;
-
+import ast.Designator;
 import error.RException;
 
 public abstract class ErrorTest {

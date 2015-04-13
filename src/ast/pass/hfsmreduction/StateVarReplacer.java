@@ -20,7 +20,7 @@ package ast.pass.hfsmreduction;
 import java.util.HashMap;
 import java.util.Map;
 
-import pass.AstPass;
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.component.hfsm.ImplHfsm;
@@ -38,11 +38,10 @@ import ast.data.variable.StateVariable;
 import ast.data.variable.Variable;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
+import ast.pass.AstPass;
 import ast.traverser.DefTraverser;
 import ast.traverser.other.ClassGetter;
 import ast.traverser.other.RefTypeGetter;
-
-import common.ElementInfo;
 
 //TODO set correct values when switching states
 

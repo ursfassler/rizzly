@@ -20,6 +20,7 @@ package ast.knowledge;
 import java.util.HashSet;
 import java.util.Set;
 
+import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
@@ -43,9 +44,6 @@ import ast.data.type.special.ComponentType;
 import ast.data.variable.Variable;
 import ast.traverser.NullTraverser;
 import ast.traverser.other.ClassGetter;
-
-import common.ElementInfo;
-
 import error.ErrorType;
 import error.RError;
 

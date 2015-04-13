@@ -17,9 +17,8 @@
 
 package ast.data.function.ret;
 
+import ast.ElementInfo;
 import ast.data.AstBase;
-
-import common.ElementInfo;
 
 abstract public class FuncReturn extends AstBase {
 

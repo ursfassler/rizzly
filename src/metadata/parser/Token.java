@@ -17,7 +17,7 @@
 
 package metadata.parser;
 
-import common.ElementInfo;
+import ast.ElementInfo;
 
 /**
  *

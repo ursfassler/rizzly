@@ -17,11 +17,10 @@
 
 package ast.data.type.special;
 
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.type.Type;
 import ast.data.type.composed.NamedElement;
-
-import common.ElementInfo;
 
 public class ComponentType extends Type {
   final public AstList<NamedElement> input = new AstList<NamedElement>();

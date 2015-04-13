@@ -17,12 +17,11 @@
 
 package ast.data.function;
 
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.function.ret.FuncReturn;
 import ast.data.statement.Block;
 import ast.data.variable.FuncVariable;
-
-import common.ElementInfo;
 
 abstract public class InterfaceFunction extends Function {
 

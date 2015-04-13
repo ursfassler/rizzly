@@ -23,17 +23,15 @@ import java.util.List;
 import parser.scanner.Scanner;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
+import ast.ElementInfo;
 import ast.data.Ast;
+import ast.data.Metadata;
 import ast.data.raw.RawComponent;
 import ast.data.raw.RawElementary;
 import ast.data.template.Template;
 import ast.data.variable.ConstPrivate;
 import ast.data.variable.StateVariable;
 import ast.data.variable.TemplateParameter;
-
-import common.ElementInfo;
-import common.Metadata;
-
 import error.ErrorType;
 import error.RError;
 

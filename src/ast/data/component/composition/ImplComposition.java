@@ -17,10 +17,9 @@
 
 package ast.data.component.composition;
 
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.component.Component;
-
-import common.ElementInfo;
 
 public class ImplComposition extends Component {
   final public AstList<CompUse> component = new AstList<CompUse>();

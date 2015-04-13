@@ -17,8 +17,8 @@
 
 package ast.pass.specializer;
 
-import pass.AstPass;
 import ast.knowledge.KnowledgeBase;
+import ast.pass.AstPass;
 
 /**
  * Replaces all types with the evaluated expression:

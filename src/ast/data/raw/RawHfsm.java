@@ -17,9 +17,8 @@
 
 package ast.data.raw;
 
+import ast.ElementInfo;
 import ast.data.component.hfsm.StateComposite;
-
-import common.ElementInfo;
 
 public class RawHfsm extends RawComponent {
   private StateComposite topstate;

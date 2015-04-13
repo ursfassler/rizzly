@@ -17,9 +17,8 @@
 
 package ast.data.type.base;
 
-import util.Range;
-
-import common.ElementInfo;
+import ast.ElementInfo;
+import ast.data.Range;
 
 public class RangeType extends BaseType {
   final public Range range;

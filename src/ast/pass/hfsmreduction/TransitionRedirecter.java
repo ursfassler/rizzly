@@ -17,7 +17,6 @@
 
 package ast.pass.hfsmreduction;
 
-import pass.AstPass;
 import ast.data.Ast;
 import ast.data.Named;
 import ast.data.Namespace;
@@ -27,6 +26,7 @@ import ast.data.component.hfsm.StateContent;
 import ast.data.component.hfsm.Transition;
 import ast.data.expression.reference.SimpleRef;
 import ast.knowledge.KnowledgeBase;
+import ast.pass.AstPass;
 import ast.traverser.NullTraverser;
 import ast.traverser.other.ClassGetter;
 

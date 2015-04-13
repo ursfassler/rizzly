@@ -17,8 +17,6 @@
 
 package ast.doc.compgraph;
 
-import util.PointF;
-
 public class Via implements Vertex {
   private PointF pos;
 

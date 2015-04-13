@@ -27,7 +27,7 @@ import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 
-import common.Designator;
+import ast.Designator;
 
 public class ClaOption {
   static public final String extension = ".rzy";

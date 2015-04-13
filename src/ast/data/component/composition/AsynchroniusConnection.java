@@ -17,8 +17,7 @@
 
 package ast.data.component.composition;
 
-import common.Direction;
-import common.ElementInfo;
+import ast.ElementInfo;
 
 final public class AsynchroniusConnection extends Connection {
 

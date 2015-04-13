@@ -17,10 +17,9 @@
 
 package ast.data.type.composed;
 
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.type.Type;
-
-import common.ElementInfo;
 
 abstract public class NamedElementType extends Type {
   final public AstList<NamedElement> element;

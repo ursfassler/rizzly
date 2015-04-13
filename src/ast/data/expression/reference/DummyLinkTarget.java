@@ -17,9 +17,8 @@
 
 package ast.data.expression.reference;
 
+import ast.ElementInfo;
 import ast.data.Named;
-
-import common.ElementInfo;
 
 public class DummyLinkTarget extends Named {
   public DummyLinkTarget(ElementInfo info, String name) {

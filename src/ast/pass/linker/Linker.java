@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import pass.AstPass;
+import ast.Designator;
 import ast.data.AstList;
 import ast.data.Named;
 import ast.data.Namespace;
@@ -46,12 +46,10 @@ import ast.data.type.Type;
 import ast.data.type.base.RangeType;
 import ast.knowledge.KnowFile;
 import ast.knowledge.KnowledgeBase;
+import ast.pass.AstPass;
 import ast.traverser.DefTraverser;
 import ast.traverser.other.ClassGetter;
 import ast.traverser.other.TransitionStateLinker;
-
-import common.Designator;
-
 import error.ErrorType;
 import error.RError;
 

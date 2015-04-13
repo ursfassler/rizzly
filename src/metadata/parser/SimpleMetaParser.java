@@ -21,9 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import common.ElementInfo;
-import common.Metadata;
-
+import ast.ElementInfo;
+import ast.data.Metadata;
 import error.ErrorType;
 import error.RError;
 

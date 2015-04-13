@@ -17,11 +17,10 @@
 
 package ast.data.variable;
 
+import ast.ElementInfo;
 import ast.data.component.hfsm.StateContent;
 import ast.data.expression.Expression;
 import ast.data.expression.reference.TypeRef;
-
-import common.ElementInfo;
 
 public class StateVariable extends DefVariable implements StateContent {
 

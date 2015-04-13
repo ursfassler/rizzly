@@ -21,7 +21,7 @@ import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.List;
 
-import util.StreamWriter;
+import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -46,13 +46,11 @@ import ast.data.variable.ConstGlobal;
 import ast.data.variable.ConstPrivate;
 import ast.data.variable.FuncVariable;
 import ast.data.variable.Variable;
+import ast.doc.StreamWriter;
 import ast.knowledge.KnowledgeBase;
-import ast.pass.CWriter;
+import ast.pass.others.CWriter;
 import ast.pass.typecheck.ExpressionTypecheck;
 import ast.traverser.NullTraverser;
-
-import common.ElementInfo;
-
 import error.ErrorType;
 import error.RError;
 

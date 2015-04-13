@@ -21,11 +21,12 @@ import java.math.BigInteger;
 import java.util.List;
 import java.util.Set;
 
-import util.Range;
+import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
+import ast.data.Range;
 import ast.data.expression.reference.Reference;
 import ast.data.expression.reference.SimpleRef;
 import ast.data.type.Type;
@@ -44,8 +45,6 @@ import ast.data.type.special.VoidType;
 import ast.data.type.template.TypeType;
 import ast.traverser.NullTraverser;
 import ast.traverser.other.ClassGetter;
-
-import common.ElementInfo;
 
 public class KnowBaseItem extends KnowledgeEntry {
 

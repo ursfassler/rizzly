@@ -17,6 +17,7 @@
 
 package parser.expression;
 
+import ast.ElementInfo;
 import ast.data.expression.Expression;
 import ast.data.expression.binop.Equal;
 import ast.data.expression.binop.Greater;
@@ -26,9 +27,6 @@ import ast.data.expression.binop.Less;
 import ast.data.expression.binop.Lessequal;
 import ast.data.expression.binop.Notequal;
 import ast.data.expression.binop.Relation;
-
-import common.ElementInfo;
-
 import error.ErrorType;
 import error.RError;
 

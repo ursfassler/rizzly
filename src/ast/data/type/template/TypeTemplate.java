@@ -17,11 +17,10 @@
 
 package ast.data.type.template;
 
+import ast.ElementInfo;
 import ast.data.Named;
 import ast.data.expression.reference.Reference;
 import ast.data.variable.TemplateParameter;
-
-import common.ElementInfo;
 
 public class TypeTemplate extends Named {
 

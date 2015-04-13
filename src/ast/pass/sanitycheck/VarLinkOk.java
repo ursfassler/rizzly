@@ -21,7 +21,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import pass.AstPass;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.component.composition.SubCallbacks;
@@ -38,6 +37,7 @@ import ast.data.variable.StateVariable;
 import ast.data.variable.Variable;
 import ast.knowledge.KnowParent;
 import ast.knowledge.KnowledgeBase;
+import ast.pass.AstPass;
 import ast.traverser.DefTraverser;
 import ast.traverser.other.ClassGetter;
 import error.ErrorType;

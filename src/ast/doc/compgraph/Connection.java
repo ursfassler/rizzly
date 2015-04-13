@@ -20,7 +20,7 @@ package ast.doc.compgraph;
 import java.util.LinkedList;
 import java.util.List;
 
-import common.Metadata;
+import ast.data.Metadata;
 
 public class Connection {
   final private Interface src;

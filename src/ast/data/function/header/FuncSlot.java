@@ -17,13 +17,12 @@
 
 package ast.data.function.header;
 
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.function.InterfaceFunction;
 import ast.data.function.ret.FuncReturn;
 import ast.data.statement.Block;
 import ast.data.variable.FuncVariable;
-
-import common.ElementInfo;
 
 public class FuncSlot extends InterfaceFunction {
 

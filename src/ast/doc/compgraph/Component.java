@@ -20,11 +20,9 @@ package ast.doc.compgraph;
 import java.util.ArrayList;
 import java.util.List;
 
-import util.PointF;
-
-import common.Designator;
-import common.ElementInfo;
-import common.Metadata;
+import ast.Designator;
+import ast.ElementInfo;
+import ast.data.Metadata;
 
 public abstract class Component implements Vertex {
   public static final double Y_IFACE_DIST = 15;

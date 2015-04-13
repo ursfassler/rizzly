@@ -19,6 +19,8 @@ package ast.pass.instantiation.queuereduction;
 
 import java.math.BigInteger;
 
+import ast.Designator;
+import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.data.AstList;
 import ast.data.expression.Number;
@@ -39,9 +41,6 @@ import ast.data.statement.VarDefStmt;
 import ast.data.type.base.EnumElement;
 import ast.data.type.composed.NamedElement;
 import ast.data.variable.FuncVariable;
-
-import common.Designator;
-import common.ElementInfo;
 
 class PushFunctionFactory {
   static public Function create(ElementInfo info, QueueVariables queueVariables, QueueTypes queueTypes, Function func) {

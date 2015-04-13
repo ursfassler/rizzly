@@ -17,11 +17,10 @@
 
 package ast.data.variable;
 
+import ast.ElementInfo;
 import ast.data.component.hfsm.StateContent;
 import ast.data.expression.Expression;
 import ast.data.expression.reference.TypeRef;
-
-import common.ElementInfo;
 
 public class ConstPrivate extends Constant implements StateContent {
   public ConstPrivate(ElementInfo info, String name, TypeRef type, Expression def) {

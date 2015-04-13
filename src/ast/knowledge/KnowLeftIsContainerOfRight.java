@@ -22,8 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 
 import util.Pair;
-import util.Range;
 import ast.data.Ast;
+import ast.data.Range;
 import ast.data.expression.reference.TypeRef;
 import ast.data.type.Type;
 import ast.data.type.base.ArrayType;

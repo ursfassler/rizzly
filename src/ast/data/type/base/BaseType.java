@@ -17,9 +17,8 @@
 
 package ast.data.type.base;
 
+import ast.ElementInfo;
 import ast.data.type.Type;
-
-import common.ElementInfo;
 
 abstract public class BaseType extends Type {
   public BaseType(ElementInfo info, String name) {

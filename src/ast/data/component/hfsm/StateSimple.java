@@ -17,10 +17,9 @@
 
 package ast.data.component.hfsm;
 
+import ast.ElementInfo;
 import ast.data.expression.reference.SimpleRef;
 import ast.data.function.header.FuncProcedure;
-
-import common.ElementInfo;
 
 public class StateSimple extends State {
 

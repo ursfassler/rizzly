@@ -17,7 +17,7 @@
 
 package ast.data.type.out;
 
-import common.ElementInfo;
+import ast.ElementInfo;
 
 public class SIntType extends IntType {
 

@@ -17,10 +17,9 @@
 
 package ast.data.type.template;
 
+import ast.ElementInfo;
 import ast.data.expression.reference.Reference;
 import ast.data.type.Type;
-
-import common.ElementInfo;
 
 public class TypeType extends Type {
   private Reference type;

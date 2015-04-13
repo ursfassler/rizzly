@@ -18,9 +18,7 @@
 package metadata.parser;
 
 import parser.PeekReader;
-
-import common.ElementInfo;
-
+import ast.ElementInfo;
 import error.ErrorType;
 import error.RError;
 

@@ -17,10 +17,9 @@
 
 package ast.data.expression.reference;
 
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.template.ActualTemplateArgument;
-
-import common.ElementInfo;
 
 final public class RefTemplCall extends RefItem {
   final public AstList<ActualTemplateArgument> actualParameter;

@@ -17,7 +17,6 @@
 
 package ast.pass.modelcheck;
 
-import pass.AstPass;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -31,6 +30,7 @@ import ast.data.function.header.FuncResponse;
 import ast.data.function.header.FuncSlot;
 import ast.data.variable.StateVariable;
 import ast.knowledge.KnowledgeBase;
+import ast.pass.AstPass;
 import ast.traverser.NullTraverser;
 import ast.traverser.other.ClassGetter;
 import error.ErrorType;

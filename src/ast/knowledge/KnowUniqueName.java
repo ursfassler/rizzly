@@ -17,11 +17,10 @@
 
 package ast.knowledge;
 
+import ast.Designator;
 import ast.data.Ast;
 import ast.data.Named;
 import ast.traverser.DefTraverser;
-
-import common.Designator;
 
 public class KnowUniqueName extends KnowledgeEntry {
   static final String START = Designator.NAME_SEP;

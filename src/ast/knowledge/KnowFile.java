@@ -20,14 +20,12 @@ package ast.knowledge;
 import java.util.HashMap;
 import java.util.Map;
 
+import ast.Designator;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.file.RizzlyFile;
 import ast.traverser.DefTraverser;
 import ast.traverser.NullTraverser;
-
-import common.Designator;
-
 import error.ErrorType;
 import error.RError;
 

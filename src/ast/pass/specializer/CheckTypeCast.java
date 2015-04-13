@@ -17,15 +17,13 @@
 
 package ast.pass.specializer;
 
+import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.expression.AnyValue;
 import ast.data.expression.Expression;
 import ast.data.type.Type;
 import ast.data.type.base.RangeType;
 import ast.traverser.NullTraverser;
-
-import common.ElementInfo;
-
 import error.ErrorType;
 import error.RError;
 

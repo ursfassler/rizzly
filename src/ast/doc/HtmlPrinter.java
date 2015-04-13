@@ -19,14 +19,11 @@ package ast.doc;
 
 import org.w3c.dom.Element;
 
-import util.HtmlWriter;
-import util.Writer;
+import ast.Designator;
 import ast.data.Ast;
 import ast.data.Named;
 import ast.knowledge.KnowPath;
 import ast.knowledge.KnowledgeBase;
-
-import common.Designator;
 
 public class HtmlPrinter extends FunPrinter {
   private KnowPath kfp;

@@ -21,6 +21,8 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import ast.Designator;
+import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -55,9 +57,6 @@ import ast.data.variable.FuncVariable;
 import ast.traverser.NullTraverser;
 import ast.traverser.debug.EventRecvDebugCallAdder;
 import ast.traverser.debug.EventSendDebugCallAdder;
-
-import common.Designator;
-import common.ElementInfo;
 
 public class DebugIfaceAdder extends NullTraverser<Void, Void> {
   final private ArrayType arrayType;

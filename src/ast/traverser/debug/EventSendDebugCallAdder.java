@@ -21,6 +21,8 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
+import ast.Designator;
+import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.expression.Number;
 import ast.data.expression.TupleValue;
@@ -36,10 +38,6 @@ import ast.data.statement.CallStmt;
 import ast.data.statement.MsgPush;
 import ast.data.statement.Statement;
 import ast.traverser.DefTraverser;
-
-import common.Designator;
-import common.ElementInfo;
-
 import error.ErrorType;
 import error.RError;
 

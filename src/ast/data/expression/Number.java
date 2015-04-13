@@ -19,7 +19,7 @@ package ast.data.expression;
 
 import java.math.BigInteger;
 
-import common.ElementInfo;
+import ast.ElementInfo;
 
 /**
  *

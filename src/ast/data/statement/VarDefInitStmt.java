@@ -17,11 +17,10 @@
 
 package ast.data.statement;
 
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.expression.Expression;
 import ast.data.variable.FuncVariable;
-
-import common.ElementInfo;
 
 public class VarDefInitStmt extends Statement {
   final public AstList<FuncVariable> variable;

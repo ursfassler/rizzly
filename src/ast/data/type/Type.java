@@ -17,11 +17,10 @@
 
 package ast.data.type;
 
+import ast.ElementInfo;
 import ast.data.Named;
 import ast.data.component.hfsm.StateContent;
 import ast.data.template.ActualTemplateArgument;
-
-import common.ElementInfo;
 
 abstract public class Type extends Named implements StateContent, ActualTemplateArgument {
   public Type(ElementInfo info, String name) {

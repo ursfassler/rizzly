@@ -21,6 +21,7 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
+import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.data.Ast;
 import ast.data.AstList;
@@ -44,8 +45,6 @@ import ast.data.type.composed.RecordType;
 import ast.data.type.special.IntegerType;
 import ast.data.type.special.NaturalType;
 import ast.traverser.NullTraverser;
-
-import common.ElementInfo;
 
 public class KnowEmptyValue extends KnowledgeEntry {
   final private Map<Type, Expression> cache = new HashMap<Type, Expression>();

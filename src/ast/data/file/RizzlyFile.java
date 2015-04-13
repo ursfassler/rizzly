@@ -19,12 +19,11 @@ package ast.data.file;
 
 import java.util.List;
 
+import ast.Designator;
+import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
-
-import common.Designator;
-import common.ElementInfo;
 
 /**
  *

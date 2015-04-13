@@ -17,10 +17,9 @@
 
 package ast.data.expression;
 
+import ast.ElementInfo;
 import ast.data.expression.reference.SimpleRef;
 import ast.data.type.Type;
-
-import common.ElementInfo;
 
 public class UnsafeUnionValue extends Expression {
   public NamedValue contentValue;

@@ -19,6 +19,7 @@ package ast.pass.instantiation.queuereduction;
 
 import java.math.BigInteger;
 
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.expression.Number;
 import ast.data.expression.TupleValue;
@@ -49,8 +50,6 @@ import ast.data.type.composed.UnionType;
 import ast.data.variable.FuncVariable;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
-
-import common.ElementInfo;
 
 class DispatchFunctionFactory {
   final private KnowType kt;

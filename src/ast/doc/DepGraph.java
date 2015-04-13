@@ -17,7 +17,6 @@
 
 package ast.doc;
 
-import util.SimpleGraph;
 import ast.data.Ast;
 import ast.data.expression.reference.BaseRef;
 import ast.traverser.DefTraverser;

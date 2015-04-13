@@ -17,9 +17,8 @@
 
 package ast.data.type.out;
 
+import ast.ElementInfo;
 import ast.data.type.base.BaseType;
-
-import common.ElementInfo;
 
 abstract public class IntType extends BaseType {
   final public int bytes;

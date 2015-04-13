@@ -20,10 +20,8 @@ package ast.data.component.composition;
 import java.util.HashMap;
 import java.util.Map;
 
+import ast.ElementInfo;
 import ast.data.AstBase;
-
-import common.Direction;
-import common.ElementInfo;
 
 abstract public class Connection extends AstBase {
   final public Map<Direction, Endpoint> endpoint;

@@ -22,6 +22,8 @@ import java.util.ArrayList;
 import parser.scanner.Scanner;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
+import ast.ElementInfo;
+import ast.data.Metadata;
 import ast.data.component.composition.AsynchroniusConnection;
 import ast.data.component.composition.CompUse;
 import ast.data.component.composition.Endpoint;
@@ -31,10 +33,6 @@ import ast.data.expression.reference.RefName;
 import ast.data.expression.reference.Reference;
 import ast.data.raw.RawComponent;
 import ast.data.raw.RawComposition;
-
-import common.ElementInfo;
-import common.Metadata;
-
 import error.ErrorType;
 import error.RError;
 

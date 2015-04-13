@@ -20,12 +20,10 @@ package ast.knowledge;
 import java.util.HashMap;
 import java.util.Map;
 
+import ast.Designator;
 import ast.data.Ast;
 import ast.data.Named;
 import ast.traverser.DefTraverser;
-
-import common.Designator;
-
 import error.ErrorType;
 import error.RError;
 

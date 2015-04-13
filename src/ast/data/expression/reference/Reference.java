@@ -17,11 +17,10 @@
 
 package ast.data.expression.reference;
 
+import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
-
-import common.ElementInfo;
 
 public class Reference extends BaseRef<Named> {
   public final AstList<RefItem> offset;

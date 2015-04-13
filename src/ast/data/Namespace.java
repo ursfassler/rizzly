@@ -17,7 +17,7 @@
 
 package ast.data;
 
-import common.ElementInfo;
+import ast.ElementInfo;
 
 public class Namespace extends Named {
   final public AstList<Ast> children = new AstList<Ast>();

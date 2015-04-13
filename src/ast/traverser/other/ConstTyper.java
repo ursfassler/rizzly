@@ -17,7 +17,6 @@
 
 package ast.traverser.other;
 
-import pass.AstPass;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.expression.reference.SimpleRef;
@@ -29,6 +28,7 @@ import ast.data.variable.Constant;
 import ast.knowledge.KnowBaseItem;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
+import ast.pass.AstPass;
 import ast.traverser.DefTraverser;
 
 /**

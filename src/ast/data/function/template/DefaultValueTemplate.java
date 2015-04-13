@@ -17,10 +17,9 @@
 
 package ast.data.function.template;
 
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.variable.TemplateParameter;
-
-import common.ElementInfo;
 
 public class DefaultValueTemplate extends FunctionTemplate {
   public static final String NAME = "default";

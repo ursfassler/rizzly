@@ -21,14 +21,16 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-import util.Writer;
+import ast.Designator;
 import ast.data.Ast;
 import ast.data.AstList;
+import ast.data.Metadata;
 import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.component.Component;
 import ast.data.component.composition.AsynchroniusConnection;
 import ast.data.component.composition.Connection;
+import ast.data.component.composition.Direction;
 import ast.data.component.composition.EndpointRaw;
 import ast.data.component.composition.EndpointSelf;
 import ast.data.component.composition.EndpointSub;
@@ -122,10 +124,6 @@ import ast.data.variable.FuncVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.Variable;
 import ast.traverser.NullTraverser;
-
-import common.Designator;
-import common.Direction;
-import common.Metadata;
 
 /**
  * Prints formated FUN objects to a specific writer.

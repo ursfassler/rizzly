@@ -19,11 +19,11 @@ package ast.traverser.other;
 
 import java.util.Set;
 
-import util.SimpleGraph;
 import ast.data.Ast;
 import ast.data.expression.reference.Reference;
 import ast.data.expression.reference.SimpleRef;
 import ast.data.function.Function;
+import ast.doc.SimpleGraph;
 import ast.traverser.DefTraverser;
 
 public class DepGraph extends DefTraverser<Void, Ast> {

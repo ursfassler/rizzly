@@ -20,14 +20,14 @@ package ast.pass.modelcheck;
 import java.util.HashMap;
 import java.util.Map;
 
-import pass.AstPass;
-import util.GraphHelper;
-import util.SimpleGraph;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.component.hfsm.Transition;
 import ast.data.function.Function;
+import ast.doc.SimpleGraph;
 import ast.knowledge.KnowledgeBase;
+import ast.pass.AstPass;
+import ast.pass.helper.GraphHelper;
 import ast.pass.modelcheck.io.IoCheck;
 import ast.pass.modelcheck.io.StateReaderInfo;
 import ast.pass.modelcheck.io.StateWriterInfo;

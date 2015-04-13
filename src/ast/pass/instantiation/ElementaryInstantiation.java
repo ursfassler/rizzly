@@ -22,7 +22,7 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import pass.AstPass;
+import ast.ElementInfo;
 import ast.copy.CopyAst;
 import ast.copy.Relinker;
 import ast.data.Ast;
@@ -31,6 +31,7 @@ import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.component.Component;
 import ast.data.component.composition.CompUse;
+import ast.data.component.composition.Direction;
 import ast.data.component.composition.SubCallbacks;
 import ast.data.component.elementary.ImplElementary;
 import ast.data.expression.reference.SimpleRef;
@@ -42,13 +43,10 @@ import ast.data.function.ret.FuncReturnNone;
 import ast.data.statement.Block;
 import ast.data.variable.FuncVariable;
 import ast.knowledge.KnowledgeBase;
-import ast.pass.CompositionReduction;
+import ast.pass.AstPass;
+import ast.pass.others.CompositionReduction;
 import ast.traverser.NullTraverser;
 import ast.traverser.other.ClassGetter;
-
-import common.Direction;
-import common.ElementInfo;
-
 import error.RError;
 
 public class ElementaryInstantiation extends AstPass {

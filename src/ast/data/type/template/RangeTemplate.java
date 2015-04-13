@@ -17,10 +17,9 @@
 
 package ast.data.type.template;
 
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.variable.TemplateParameter;
-
-import common.ElementInfo;
 
 final public class RangeTemplate extends TypeTemplate {
   public static final String NAME = "R";

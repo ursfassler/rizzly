@@ -17,10 +17,9 @@
 
 package ast.data.variable;
 
+import ast.ElementInfo;
 import ast.data.Named;
 import ast.data.expression.reference.TypeRef;
-
-import common.ElementInfo;
 
 abstract public class Variable extends Named {
   public TypeRef type;

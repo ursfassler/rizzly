@@ -17,11 +17,10 @@
 
 package ast.data.raw;
 
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.component.composition.CompUse;
 import ast.data.component.composition.Connection;
-
-import common.ElementInfo;
 
 public class RawComposition extends RawComponent {
   final private AstList<CompUse> instantiation = new AstList<CompUse>();

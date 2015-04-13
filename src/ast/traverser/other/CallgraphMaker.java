@@ -20,7 +20,6 @@ package ast.traverser.other;
 import java.util.HashSet;
 import java.util.Set;
 
-import util.SimpleGraph;
 import ast.data.Ast;
 import ast.data.component.hfsm.Transition;
 import ast.data.expression.reference.BaseRef;
@@ -33,6 +32,7 @@ import ast.data.function.Function;
 import ast.data.type.Type;
 import ast.data.type.base.ArrayType;
 import ast.data.variable.Variable;
+import ast.doc.SimpleGraph;
 import ast.knowledge.KnowChild;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;

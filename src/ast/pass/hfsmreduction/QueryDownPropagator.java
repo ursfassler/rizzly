@@ -20,7 +20,8 @@ package ast.pass.hfsmreduction;
 import java.util.HashMap;
 import java.util.Map;
 
-import pass.AstPass;
+import ast.Designator;
+import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.data.Ast;
 import ast.data.AstList;
@@ -40,11 +41,9 @@ import ast.data.statement.Block;
 import ast.data.statement.ReturnExpr;
 import ast.data.variable.Variable;
 import ast.knowledge.KnowledgeBase;
+import ast.pass.AstPass;
 import ast.traverser.NullTraverser;
 import ast.traverser.other.ClassGetter;
-
-import common.Designator;
-import common.ElementInfo;
 
 public class QueryDownPropagator extends AstPass {
 

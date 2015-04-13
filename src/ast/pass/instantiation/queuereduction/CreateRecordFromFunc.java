@@ -20,6 +20,7 @@ package ast.pass.instantiation.queuereduction;
 import java.util.HashMap;
 import java.util.Map;
 
+import ast.Designator;
 import ast.copy.Copy;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -29,8 +30,6 @@ import ast.data.type.composed.NamedElement;
 import ast.data.type.composed.RecordType;
 import ast.data.variable.FuncVariable;
 import ast.traverser.DefTraverser;
-
-import common.Designator;
 
 class CreateRecordFromFunc extends DefTraverser<Void, Void> {
   final private Map<Function, RecordType> funcToRecord = new HashMap<Function, RecordType>();

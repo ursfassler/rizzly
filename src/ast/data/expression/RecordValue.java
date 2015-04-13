@@ -19,11 +19,10 @@ package ast.data.expression;
 
 import java.util.Collection;
 
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.expression.reference.SimpleRef;
 import ast.data.type.Type;
-
-import common.ElementInfo;
 
 public class RecordValue extends Expression {
   final public AstList<NamedValue> value = new AstList<NamedValue>();

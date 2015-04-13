@@ -21,6 +21,7 @@ import parser.Parser;
 import parser.scanner.Scanner;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.expression.BoolValue;
 import ast.data.expression.Expression;
@@ -37,9 +38,6 @@ import ast.data.expression.reference.Reference;
 import ast.data.expression.unop.Not;
 import ast.data.expression.unop.Uminus;
 import ast.data.template.ActualTemplateArgument;
-
-import common.ElementInfo;
-
 import error.ErrorType;
 import error.RError;
 

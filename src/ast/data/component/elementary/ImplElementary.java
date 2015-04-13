@@ -17,6 +17,7 @@
 
 package ast.data.component.elementary;
 
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.component.Component;
 import ast.data.component.composition.CompUse;
@@ -26,8 +27,6 @@ import ast.data.function.header.FuncProcedure;
 import ast.data.type.Type;
 import ast.data.variable.Constant;
 import ast.data.variable.Variable;
-
-import common.ElementInfo;
 
 final public class ImplElementary extends Component {
   final public AstList<Type> type = new AstList<Type>();

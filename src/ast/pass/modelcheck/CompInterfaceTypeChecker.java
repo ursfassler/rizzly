@@ -19,12 +19,13 @@ package ast.pass.modelcheck;
 
 import java.util.List;
 
-import pass.AstPass;
+import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.component.Component;
 import ast.data.component.composition.CompUse;
 import ast.data.component.composition.Connection;
+import ast.data.component.composition.Direction;
 import ast.data.component.composition.Endpoint;
 import ast.data.component.composition.EndpointSelf;
 import ast.data.component.composition.EndpointSub;
@@ -43,12 +44,9 @@ import ast.data.variable.Constant;
 import ast.knowledge.KnowLeftIsContainerOfRight;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
+import ast.pass.AstPass;
 import ast.traverser.NullTraverser;
 import ast.traverser.other.ClassGetter;
-
-import common.Direction;
-import common.ElementInfo;
-
 import error.ErrorType;
 import error.RError;
 

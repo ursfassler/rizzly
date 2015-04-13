@@ -17,11 +17,10 @@
 
 package ast.data.statement;
 
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.expression.Expression;
 import ast.data.expression.reference.Reference;
-
-import common.ElementInfo;
 
 /**
  *

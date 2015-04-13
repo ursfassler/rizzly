@@ -22,6 +22,7 @@ import java.util.Set;
 
 import ast.data.Ast;
 import ast.data.component.composition.CompUse;
+import ast.data.component.composition.Direction;
 import ast.data.component.composition.ImplComposition;
 import ast.data.component.elementary.ImplElementary;
 import ast.data.function.header.FuncQuery;
@@ -29,8 +30,6 @@ import ast.data.function.header.FuncResponse;
 import ast.data.function.header.FuncSignal;
 import ast.data.function.header.FuncSlot;
 import ast.traverser.DefTraverser;
-
-import common.Direction;
 
 public class MsgNamesGetter extends DefTraverser<Void, Set<String>> {
 

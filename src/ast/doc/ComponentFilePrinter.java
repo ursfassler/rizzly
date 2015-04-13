@@ -35,7 +35,7 @@ import javax.xml.transform.stream.StreamResult;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import util.HtmlWriter;
+import ast.Designator;
 import ast.data.file.RizzlyFile;
 import ast.data.raw.RawComposition;
 import ast.data.template.Template;
@@ -44,8 +44,6 @@ import ast.doc.compgraph.WorldComp;
 import ast.knowledge.KnowPath;
 import ast.knowledge.KnowledgeBase;
 import ast.traverser.other.ClassGetter;
-
-import common.Designator;
 
 public class ComponentFilePrinter {
   private Document doc;

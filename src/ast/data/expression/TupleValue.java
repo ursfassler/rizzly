@@ -17,9 +17,8 @@
 
 package ast.data.expression;
 
+import ast.ElementInfo;
 import ast.data.AstList;
-
-import common.ElementInfo;
 
 public class TupleValue extends Expression {
   final public AstList<Expression> value;

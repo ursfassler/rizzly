@@ -17,10 +17,9 @@
 
 package ast.data.component.composition;
 
+import ast.ElementInfo;
 import ast.data.expression.reference.SimpleRef;
 import ast.data.function.Function;
-
-import common.ElementInfo;
 
 final public class EndpointSelf extends Endpoint {
   final public SimpleRef<Function> funcRef;

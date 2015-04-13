@@ -17,9 +17,8 @@
 
 package ast.data.type.special;
 
+import ast.ElementInfo;
 import ast.data.type.base.BaseType;
-
-import common.ElementInfo;
 
 public class VoidType extends BaseType {
   final static public String NAME = "Void";

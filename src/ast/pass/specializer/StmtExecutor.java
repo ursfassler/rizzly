@@ -19,6 +19,7 @@ package ast.pass.specializer;
 
 import java.util.List;
 
+import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.data.Ast;
 import ast.data.AstList;
@@ -39,9 +40,6 @@ import ast.interpreter.Memory;
 import ast.knowledge.KnowEmptyValue;
 import ast.knowledge.KnowledgeBase;
 import ast.traverser.NullTraverser;
-
-import common.ElementInfo;
-
 import error.RError;
 
 /**

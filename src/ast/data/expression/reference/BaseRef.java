@@ -17,11 +17,10 @@
 
 package ast.data.expression.reference;
 
+import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.Named;
 import ast.data.expression.Expression;
-
-import common.ElementInfo;
 
 abstract public class BaseRef<T extends Named> extends Expression implements TypeRef, StateRef, FuncRef, CompRef {
   public T link;

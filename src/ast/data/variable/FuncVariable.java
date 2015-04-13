@@ -17,9 +17,8 @@
 
 package ast.data.variable;
 
+import ast.ElementInfo;
 import ast.data.expression.reference.TypeRef;
-
-import common.ElementInfo;
 
 public class FuncVariable extends Variable {
 

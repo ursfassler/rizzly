@@ -28,6 +28,7 @@ import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.component.composition.AsynchroniusConnection;
 import ast.data.component.composition.CompUse;
+import ast.data.component.composition.Direction;
 import ast.data.component.composition.EndpointRaw;
 import ast.data.component.composition.Queue;
 import ast.data.component.composition.SubCallbacks;
@@ -57,8 +58,6 @@ import ast.data.type.base.EnumElement;
 import ast.data.type.composed.NamedElement;
 import ast.data.variable.Variable;
 import ast.traverser.NullTraverser;
-
-import common.Direction;
 
 public class CopyAst extends NullTraverser<Ast, Void> {
   // / keeps the old -> new Named objects in order to relink references

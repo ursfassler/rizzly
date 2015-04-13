@@ -20,11 +20,9 @@ package ast.doc.compgraph;
 import java.util.ArrayList;
 import java.util.List;
 
-import util.PointF;
-
-import common.Designator;
-import common.ElementInfo;
-import common.Metadata;
+import ast.Designator;
+import ast.ElementInfo;
+import ast.data.Metadata;
 
 final public class SubComponent extends Component {
   private static final PointF ErrorPoint = new PointF(Double.NaN, Double.NaN);

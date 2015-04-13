@@ -17,13 +17,12 @@
 
 package ast.data.type.template;
 
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.expression.reference.RefTemplCall;
 import ast.data.expression.reference.Reference;
 import ast.data.template.ActualTemplateArgument;
 import ast.data.variable.TemplateParameter;
-
-import common.ElementInfo;
 
 final public class ArrayTemplate extends TypeTemplate {
   public static final String NAME = "Array";

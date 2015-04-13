@@ -17,10 +17,9 @@
 
 package ast.data.component.composition;
 
+import ast.Designator;
+import ast.ElementInfo;
 import ast.data.Named;
-
-import common.Designator;
-import common.ElementInfo;
 
 public class Queue extends Named {
   public static final String DEFAULT_NAME = Designator.NAME_SEP + "queue";

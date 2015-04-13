@@ -17,13 +17,13 @@
 
 package ast.pass.modelcheck;
 
-import pass.AstPass;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.component.Component;
 import ast.data.function.InterfaceFunction;
 import ast.data.function.header.FuncQuery;
 import ast.knowledge.KnowledgeBase;
+import ast.pass.AstPass;
 import error.ErrorType;
 import error.RError;
 

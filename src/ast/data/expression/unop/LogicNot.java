@@ -17,9 +17,8 @@
 
 package ast.data.expression.unop;
 
+import ast.ElementInfo;
 import ast.data.expression.Expression;
-
-import common.ElementInfo;
 
 final public class LogicNot extends UnaryExp {
 

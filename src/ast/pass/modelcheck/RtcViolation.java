@@ -22,25 +22,23 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
-import pass.AstPass;
-import util.GraphHelper;
-import util.SimpleGraph;
+import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.component.composition.CompUse;
 import ast.data.component.composition.Connection;
+import ast.data.component.composition.Direction;
 import ast.data.component.composition.Endpoint;
 import ast.data.component.composition.EndpointSub;
 import ast.data.component.composition.ImplComposition;
 import ast.data.component.elementary.ImplElementary;
+import ast.doc.SimpleGraph;
 import ast.knowledge.KnowledgeBase;
+import ast.pass.AstPass;
+import ast.pass.helper.GraphHelper;
 import ast.traverser.other.CallgraphMaker;
 import ast.traverser.other.ClassGetter;
-
-import common.Direction;
-import common.ElementInfo;
-
 import error.ErrorType;
 import error.RError;
 

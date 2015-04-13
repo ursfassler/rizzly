@@ -20,6 +20,7 @@ package ast.traverser;
 import ast.data.Namespace;
 import ast.data.component.composition.AsynchroniusConnection;
 import ast.data.component.composition.CompUse;
+import ast.data.component.composition.Direction;
 import ast.data.component.composition.EndpointRaw;
 import ast.data.component.composition.EndpointSelf;
 import ast.data.component.composition.EndpointSub;
@@ -141,8 +142,6 @@ import ast.data.variable.ConstPrivate;
 import ast.data.variable.FuncVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.TemplateParameter;
-
-import common.Direction;
 
 public class DefTraverser<R, P> extends Traverser<R, P> {
 

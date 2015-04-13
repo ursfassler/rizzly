@@ -23,6 +23,7 @@ import java.util.List;
 import parser.scanner.Scanner;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
+import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.component.hfsm.StateComposite;
@@ -45,9 +46,6 @@ import ast.data.template.Template;
 import ast.data.variable.ConstPrivate;
 import ast.data.variable.FuncVariable;
 import ast.data.variable.TemplateParameter;
-
-import common.ElementInfo;
-
 import error.ErrorType;
 import error.RError;
 

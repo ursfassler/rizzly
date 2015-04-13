@@ -17,7 +17,7 @@
 
 package ast.data.type.base;
 
-import common.ElementInfo;
+import ast.ElementInfo;
 
 public class BooleanType extends BaseType {
   public static final String NAME = "Boolean";

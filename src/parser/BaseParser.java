@@ -27,6 +27,7 @@ import parser.scanner.Scanner;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
 import util.Pair;
+import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.data.AstList;
 import ast.data.expression.Expression;
@@ -44,9 +45,6 @@ import ast.data.variable.TemplateParameter;
 import ast.data.variable.Variable;
 import ast.data.variable.VariableFactory;
 import ast.knowledge.KnowFuncType;
-
-import common.ElementInfo;
-
 import error.ErrorType;
 import error.RError;
 

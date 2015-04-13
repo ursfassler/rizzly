@@ -22,11 +22,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import util.PointF;
-
-import common.Designator;
-import common.ElementInfo;
-import common.Metadata;
+import ast.Designator;
+import ast.ElementInfo;
+import ast.data.Metadata;
 
 public class WorldComp extends Component {
   final private PointF size = new PointF(140, 35);

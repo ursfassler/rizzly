@@ -17,12 +17,11 @@
 
 package ast.data.function.template;
 
+import ast.ElementInfo;
 import ast.data.AstBase;
 import ast.data.AstList;
 import ast.data.expression.reference.Reference;
 import ast.data.variable.TemplateParameter;
-
-import common.ElementInfo;
 
 public abstract class FunctionTemplate extends AstBase {
 

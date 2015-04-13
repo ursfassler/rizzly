@@ -17,10 +17,9 @@
 
 package ast.data.expression.reference;
 
+import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.Named;
-
-import common.ElementInfo;
 
 public class SimpleRef<T extends Named> extends BaseRef<T> {
 

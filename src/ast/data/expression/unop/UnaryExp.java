@@ -17,9 +17,8 @@
 
 package ast.data.expression.unop;
 
+import ast.ElementInfo;
 import ast.data.expression.Expression;
-
-import common.ElementInfo;
 
 abstract public class UnaryExp extends Expression {
   public Expression expr;

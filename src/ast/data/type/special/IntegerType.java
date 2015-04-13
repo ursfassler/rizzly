@@ -17,9 +17,8 @@
 
 package ast.data.type.special;
 
+import ast.ElementInfo;
 import ast.data.type.base.BaseType;
-
-import common.ElementInfo;
 
 /**
  * Use this type only for type checking and not for code production.

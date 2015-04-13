@@ -17,7 +17,7 @@
 
 package ast.data.type.base;
 
-import common.ElementInfo;
+import ast.ElementInfo;
 
 public class StringType extends BaseType {
   public static final String NAME = "String";

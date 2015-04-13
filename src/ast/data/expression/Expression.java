@@ -17,10 +17,9 @@
 
 package ast.data.expression;
 
+import ast.ElementInfo;
 import ast.data.AstBase;
 import ast.data.template.ActualTemplateArgument;
-
-import common.ElementInfo;
 
 /**
  *

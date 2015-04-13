@@ -19,11 +19,10 @@ package ast.traverser.other;
 
 import java.util.Set;
 
+import ast.Designator;
 import ast.data.Ast;
 import ast.data.Named;
 import ast.traverser.DefTraverser;
-
-import common.Designator;
 
 //TODO how to ensure that names are unique?
 //TODO use blacklist with keywords
@@ -49,7 +48,7 @@ public class Renamer extends DefTraverser<Void, Void> {
   }
 
   private String cleanName(String name) {
-    String ret = ast.pass.CRenamer.cleanName(name);
+    String ret = ast.pass.others.CRenamer.cleanName(name);
 
     while (blacklist.contains(ret.toLowerCase())) {
       ret += Designator.NAME_SEP;

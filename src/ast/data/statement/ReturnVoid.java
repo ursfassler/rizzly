@@ -17,7 +17,7 @@
 
 package ast.data.statement;
 
-import common.ElementInfo;
+import ast.ElementInfo;
 
 /**
  *

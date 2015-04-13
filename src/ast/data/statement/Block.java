@@ -17,9 +17,8 @@
 
 package ast.data.statement;
 
+import ast.ElementInfo;
 import ast.data.AstList;
-
-import common.ElementInfo;
 
 public class Block extends Statement {
   final public AstList<Statement> statements = new AstList<Statement>();

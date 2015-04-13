@@ -17,11 +17,10 @@
 
 package ast.data.raw;
 
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.Named;
 import ast.data.function.Function;
-
-import common.ElementInfo;
 
 abstract public class RawComponent extends Named {
   private final AstList<Function> iface = new AstList<Function>();

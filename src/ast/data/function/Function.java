@@ -17,6 +17,7 @@
 
 package ast.data.function;
 
+import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
@@ -25,8 +26,6 @@ import ast.data.function.ret.FuncReturn;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.statement.Block;
 import ast.data.variable.FuncVariable;
-
-import common.ElementInfo;
 
 abstract public class Function extends Named implements StateContent {
   final public AstList<FuncVariable> param = new AstList<FuncVariable>();

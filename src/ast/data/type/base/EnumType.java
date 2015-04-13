@@ -20,10 +20,9 @@ package ast.data.type.base;
 import java.util.HashSet;
 import java.util.Set;
 
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.type.Type;
-
-import common.ElementInfo;
 
 //TODO cleanup, convert to data
 public class EnumType extends Type {

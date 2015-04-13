@@ -21,7 +21,8 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-import pass.AstPass;
+import ast.Designator;
+import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -44,11 +45,8 @@ import ast.data.statement.Statement;
 import ast.data.variable.FuncVariable;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
+import ast.pass.AstPass;
 import ast.traverser.NullTraverser;
-
-import common.Designator;
-import common.ElementInfo;
-
 import error.RError;
 
 public class SystemIfaceAdder extends AstPass {

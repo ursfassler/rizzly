@@ -23,10 +23,8 @@ import parser.PeekReader;
 import parser.scanner.Symbol;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
-
-import common.ElementInfo;
-import common.Metadata;
-
+import ast.ElementInfo;
+import ast.data.Metadata;
 import error.ErrorType;
 import error.RError;
 

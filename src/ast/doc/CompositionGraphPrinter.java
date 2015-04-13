@@ -25,15 +25,14 @@ import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import util.PointF;
+import ast.Designator;
 import ast.doc.compgraph.Component;
 import ast.doc.compgraph.Connection;
 import ast.doc.compgraph.Interface;
+import ast.doc.compgraph.PointF;
 import ast.doc.compgraph.SubComponent;
 import ast.doc.compgraph.Vertex;
 import ast.doc.compgraph.WorldComp;
-
-import common.Designator;
 
 //DOM
 

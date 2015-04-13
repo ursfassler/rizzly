@@ -20,8 +20,8 @@ package ast.pass.specializer;
 import java.math.BigInteger;
 import java.util.List;
 
-import util.Range;
 import ast.data.Ast;
+import ast.data.Range;
 import ast.data.expression.Number;
 import ast.data.template.ActualTemplateArgument;
 import ast.data.type.Type;

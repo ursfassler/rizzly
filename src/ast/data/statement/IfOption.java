@@ -17,10 +17,9 @@
 
 package ast.data.statement;
 
+import ast.ElementInfo;
 import ast.data.AstBase;
 import ast.data.expression.Expression;
-
-import common.ElementInfo;
 
 public class IfOption extends AstBase {
   public Expression condition;

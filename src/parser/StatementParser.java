@@ -20,6 +20,7 @@ package parser;
 import parser.scanner.Scanner;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
+import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.data.AstList;
 import ast.data.expression.AnyValue;
@@ -42,9 +43,6 @@ import ast.data.statement.Statement;
 import ast.data.statement.VarDefInitStmt;
 import ast.data.statement.WhileStmt;
 import ast.data.variable.FuncVariable;
-
-import common.ElementInfo;
-
 import error.ErrorType;
 import error.RError;
 

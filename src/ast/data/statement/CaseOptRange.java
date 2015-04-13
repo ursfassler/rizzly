@@ -17,9 +17,8 @@
 
 package ast.data.statement;
 
+import ast.ElementInfo;
 import ast.data.expression.Expression;
-
-import common.ElementInfo;
 
 public class CaseOptRange extends CaseOptEntry {
   public Expression start;

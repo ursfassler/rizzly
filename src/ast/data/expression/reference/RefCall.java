@@ -17,9 +17,8 @@
 
 package ast.data.expression.reference;
 
+import ast.ElementInfo;
 import ast.data.expression.TupleValue;
-
-import common.ElementInfo;
 
 public class RefCall extends RefItem {
   final public TupleValue actualParameter;

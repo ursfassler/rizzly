@@ -17,10 +17,9 @@
 
 package ast.data.variable;
 
+import ast.ElementInfo;
 import ast.data.expression.Expression;
 import ast.data.expression.reference.TypeRef;
-
-import common.ElementInfo;
 
 public class ConstGlobal extends Constant {
   public ConstGlobal(ElementInfo info, String name, TypeRef type, Expression def) {

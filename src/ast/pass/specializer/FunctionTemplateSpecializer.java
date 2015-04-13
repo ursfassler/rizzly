@@ -19,6 +19,8 @@ package ast.pass.specializer;
 
 import java.util.List;
 
+import ast.Designator;
+import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.expression.Expression;
@@ -39,9 +41,6 @@ import ast.knowledge.KnowEmptyValue;
 import ast.knowledge.KnowInstance;
 import ast.knowledge.KnowledgeBase;
 import ast.traverser.NullTraverser;
-
-import common.Designator;
-import common.ElementInfo;
 
 public class FunctionTemplateSpecializer extends NullTraverser<Function, List<ActualTemplateArgument>> {
   private final KnowledgeBase kb;

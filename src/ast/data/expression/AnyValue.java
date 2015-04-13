@@ -17,7 +17,7 @@
 
 package ast.data.expression;
 
-import common.ElementInfo;
+import ast.ElementInfo;
 
 public class AnyValue extends Expression {
   static final public String NAME = "?";

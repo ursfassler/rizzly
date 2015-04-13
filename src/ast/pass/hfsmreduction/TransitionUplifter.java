@@ -20,7 +20,6 @@ package ast.pass.hfsmreduction;
 import java.util.ArrayList;
 import java.util.List;
 
-import pass.AstPass;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.component.hfsm.ImplHfsm;
@@ -29,6 +28,7 @@ import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateContent;
 import ast.data.component.hfsm.Transition;
 import ast.knowledge.KnowledgeBase;
+import ast.pass.AstPass;
 import ast.traverser.NullTraverser;
 import ast.traverser.other.ClassGetter;
 

@@ -20,11 +20,11 @@ package ast.pass.sanitycheck;
 import java.util.HashSet;
 import java.util.Set;
 
-import pass.AstPass;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.expression.reference.BaseRef;
 import ast.knowledge.KnowledgeBase;
+import ast.pass.AstPass;
 import ast.traverser.DefTraverser;
 import error.ErrorType;
 import error.RError;

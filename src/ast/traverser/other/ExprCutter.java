@@ -20,7 +20,7 @@ package ast.traverser.other;
 import java.util.ArrayList;
 import java.util.List;
 
-import pass.AstPass;
+import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -62,10 +62,8 @@ import ast.knowledge.KnowSimpleExpr;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowUniqueName;
 import ast.knowledge.KnowledgeBase;
+import ast.pass.AstPass;
 import ast.traverser.NullTraverser;
-
-import common.ElementInfo;
-
 import error.ErrorType;
 import error.RError;
 

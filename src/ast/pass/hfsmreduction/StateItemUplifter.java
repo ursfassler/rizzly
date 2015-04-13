@@ -20,7 +20,7 @@ package ast.pass.hfsmreduction;
 import java.util.ArrayList;
 import java.util.List;
 
-import pass.AstPass;
+import ast.Designator;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.component.hfsm.ImplHfsm;
@@ -31,10 +31,9 @@ import ast.data.function.header.FuncProcedure;
 import ast.data.type.Type;
 import ast.data.variable.ConstPrivate;
 import ast.knowledge.KnowledgeBase;
+import ast.pass.AstPass;
 import ast.traverser.NullTraverser;
 import ast.traverser.other.ClassGetter;
-
-import common.Designator;
 
 /**
  * Moves items of all states to the top-state.

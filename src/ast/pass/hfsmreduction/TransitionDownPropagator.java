@@ -24,7 +24,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import pass.AstPass;
+import ast.Designator;
+import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.data.Ast;
 import ast.data.AstList;
@@ -54,11 +55,9 @@ import ast.data.variable.Variable;
 import ast.knowledge.KnowBaseItem;
 import ast.knowledge.KnowParent;
 import ast.knowledge.KnowledgeBase;
+import ast.pass.AstPass;
 import ast.traverser.NullTraverser;
 import ast.traverser.other.ClassGetter;
-
-import common.Designator;
-import common.ElementInfo;
 
 /**
  * adds transitions to the children until leaf states also adds calls to exit and entry function

@@ -58,9 +58,6 @@ import ast.data.variable.ConstPrivate;
 import ast.data.variable.FuncVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.TemplateParameter;
-
-import common.Scope;
-
 import error.ErrorType;
 import error.RError;
 

@@ -20,6 +20,7 @@ package ast.pass.specializer;
 import java.math.BigInteger;
 import java.util.List;
 
+import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.expression.BoolValue;
@@ -56,9 +57,6 @@ import ast.data.variable.TemplateParameter;
 import ast.interpreter.Memory;
 import ast.knowledge.KnowledgeBase;
 import ast.traverser.NullTraverser;
-
-import common.ElementInfo;
-
 import error.ErrorType;
 import error.RError;
 

@@ -20,6 +20,7 @@ package ast.traverser.debug;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
+import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.expression.Number;
 import ast.data.expression.TupleValue;
@@ -31,8 +32,6 @@ import ast.data.function.header.FuncResponse;
 import ast.data.function.header.FuncSlot;
 import ast.data.statement.CallStmt;
 import ast.traverser.DefTraverser;
-
-import common.ElementInfo;
 
 /**
  * Inserts a message call whenever an event is received

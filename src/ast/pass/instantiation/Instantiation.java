@@ -17,9 +17,9 @@
 
 package ast.pass.instantiation;
 
-import ast.pass.GroupPass;
-import ast.pass.RemoveUnused;
 import ast.pass.instantiation.queuereduction.QueueReduction;
+import ast.pass.others.GroupPass;
+import ast.pass.others.RemoveUnused;
 
 public class Instantiation extends GroupPass {
 

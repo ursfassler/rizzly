@@ -21,12 +21,10 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import ast.Designator;
 import ast.data.Ast;
 import ast.data.type.base.EnumElement;
 import ast.traverser.DefTraverser;
-
-import common.Designator;
-
 import error.ErrorType;
 import error.RError;
 

@@ -17,7 +17,7 @@
 
 package ast.pass.hfsmreduction;
 
-import ast.pass.GroupPass;
+import ast.pass.others.GroupPass;
 
 public class HfsmReduction extends GroupPass {
 

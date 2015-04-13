@@ -17,12 +17,11 @@
 
 package ast.data.component.hfsm;
 
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.Named;
 import ast.data.expression.reference.SimpleRef;
 import ast.data.function.header.FuncProcedure;
-
-import common.ElementInfo;
 
 abstract public class State extends Named implements StateContent {
   public SimpleRef<FuncProcedure> entryFunc;

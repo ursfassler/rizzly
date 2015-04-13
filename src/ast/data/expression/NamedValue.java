@@ -17,9 +17,8 @@
 
 package ast.data.expression;
 
+import ast.ElementInfo;
 import ast.data.AstBase;
-
-import common.ElementInfo;
 
 public class NamedValue extends AstBase {
   public final String name;

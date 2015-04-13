@@ -17,10 +17,9 @@
 
 package ast.data.function.ret;
 
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.variable.FuncVariable;
-
-import common.ElementInfo;
 
 public class FuncReturnTuple extends FuncReturn {
   final public AstList<FuncVariable> param;

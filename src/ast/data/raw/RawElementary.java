@@ -17,12 +17,11 @@
 
 package ast.data.raw;
 
+import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.statement.Block;
 import ast.data.template.Template;
-
-import common.ElementInfo;
 
 public class RawElementary extends RawComponent {
   final private AstList<Template> declaration = new AstList<Template>();

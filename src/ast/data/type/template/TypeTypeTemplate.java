@@ -17,10 +17,9 @@
 
 package ast.data.type.template;
 
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.variable.TemplateParameter;
-
-import common.ElementInfo;
 
 public class TypeTypeTemplate extends TypeTemplate {
   public static final String NAME = "Type";

@@ -17,7 +17,6 @@
 
 package ast.pass.typecheck;
 
-import pass.AstPass;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.component.composition.ImplComposition;
@@ -30,6 +29,7 @@ import ast.data.type.base.EnumType;
 import ast.data.variable.Variable;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
+import ast.pass.AstPass;
 import ast.traverser.DefTraverser;
 
 public class Typecheck extends AstPass {

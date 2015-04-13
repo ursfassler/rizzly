@@ -17,7 +17,7 @@
 
 package ast.pass.sanitycheck;
 
-import ast.pass.GroupPass;
+import ast.pass.others.GroupPass;
 
 public class Sanitycheck extends GroupPass {
 

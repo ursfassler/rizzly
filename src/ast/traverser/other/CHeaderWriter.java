@@ -20,7 +20,7 @@ package ast.traverser.other;
 import java.math.BigInteger;
 import java.util.List;
 
-import util.StreamWriter;
+import ast.Designator;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -46,12 +46,11 @@ import ast.data.type.composed.RecordType;
 import ast.data.type.composed.UnionType;
 import ast.data.type.special.VoidType;
 import ast.data.variable.Variable;
+import ast.doc.StreamWriter;
 import ast.knowledge.KnowledgeBase;
-import ast.pass.CWriter;
+import ast.pass.others.CWriter;
 import ast.pass.typecheck.ExpressionTypecheck;
 import ast.traverser.NullTraverser;
-
-import common.Designator;
 
 /**
  *

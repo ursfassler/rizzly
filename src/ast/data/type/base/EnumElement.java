@@ -17,9 +17,8 @@
 
 package ast.data.type.base;
 
+import ast.ElementInfo;
 import ast.data.Named;
-
-import common.ElementInfo;
 
 public class EnumElement extends Named {
   public EnumElement(ElementInfo info, String name) {

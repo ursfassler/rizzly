@@ -25,16 +25,14 @@ import parser.scanner.Scanner;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
 import util.Pair;
+import ast.Designator;
+import ast.ElementInfo;
 import ast.data.Ast;
+import ast.data.Metadata;
 import ast.data.file.RizzlyFile;
 import ast.data.template.Template;
 import ast.data.variable.ConstGlobal;
 import ast.data.variable.TemplateParameter;
-
-import common.Designator;
-import common.ElementInfo;
-import common.Metadata;
-
 import error.ErrorType;
 import error.RError;
 

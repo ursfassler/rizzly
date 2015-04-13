@@ -17,10 +17,9 @@
 
 package ast.data.type.out;
 
+import ast.ElementInfo;
 import ast.data.expression.reference.BaseRef;
 import ast.data.type.Type;
-
-import common.ElementInfo;
 
 public class PointerType extends Type {
   public BaseRef<Type> type;

@@ -17,11 +17,10 @@
 
 package ast.data.type.out;
 
+import ast.ElementInfo;
 import ast.data.expression.reference.SimpleRef;
 import ast.data.type.Type;
 import ast.data.type.base.BaseType;
-
-import common.ElementInfo;
 
 public class AliasType extends BaseType {
   public SimpleRef<Type> ref;

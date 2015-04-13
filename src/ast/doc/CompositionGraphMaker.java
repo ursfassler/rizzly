@@ -22,8 +22,11 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.Map;
 
+import ast.Designator;
+import ast.data.Metadata;
 import ast.data.component.composition.CompUse;
 import ast.data.component.composition.Connection;
+import ast.data.component.composition.Direction;
 import ast.data.component.composition.EndpointRaw;
 import ast.data.expression.reference.Reference;
 import ast.data.function.Function;
@@ -40,11 +43,6 @@ import ast.doc.compgraph.WorldComp;
 import ast.knowledge.KnowPath;
 import ast.knowledge.KnowledgeBase;
 import ast.traverser.other.ClassGetter;
-
-import common.Designator;
-import common.Direction;
-import common.Metadata;
-
 import error.ErrorType;
 import error.RError;
 

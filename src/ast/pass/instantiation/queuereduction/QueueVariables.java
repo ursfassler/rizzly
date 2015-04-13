@@ -19,6 +19,7 @@ package ast.pass.instantiation.queuereduction;
 
 import java.math.BigInteger;
 
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.expression.ArrayValue;
 import ast.data.expression.Expression;
@@ -30,8 +31,6 @@ import ast.data.type.base.ArrayType;
 import ast.data.variable.StateVariable;
 import ast.knowledge.KnowBaseItem;
 import ast.knowledge.KnowledgeBase;
-
-import common.ElementInfo;
 
 class QueueVariables {
   private StateVariable queue;

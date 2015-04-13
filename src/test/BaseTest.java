@@ -26,8 +26,7 @@ import java.util.StringTokenizer;
 
 import main.ClaOption;
 import main.Main;
-
-import common.Designator;
+import ast.Designator;
 
 abstract public class BaseTest {
   private boolean strict = true;

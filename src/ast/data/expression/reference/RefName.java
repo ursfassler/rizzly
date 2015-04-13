@@ -17,7 +17,7 @@
 
 package ast.data.expression.reference;
 
-import common.ElementInfo;
+import ast.ElementInfo;
 
 public class RefName extends RefItem {
   public String name;

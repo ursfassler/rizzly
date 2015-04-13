@@ -19,7 +19,7 @@ package ast.pass.hfsmreduction;
 
 import java.util.LinkedList;
 
-import pass.AstPass;
+import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -41,10 +41,9 @@ import ast.data.statement.Statement;
 import ast.data.variable.FuncVariable;
 import ast.knowledge.KnowBaseItem;
 import ast.knowledge.KnowledgeBase;
+import ast.pass.AstPass;
 import ast.traverser.NullTraverser;
 import ast.traverser.other.ClassGetter;
-
-import common.ElementInfo;
 
 /**
  * For every state, a new entry and exit function is added. This new function contains calls to the parent entry or exit

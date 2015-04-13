@@ -19,11 +19,10 @@ package ast.data.statement;
 
 import java.util.Collection;
 
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.expression.Expression;
 import ast.data.expression.reference.Reference;
-
-import common.ElementInfo;
 
 public class MsgPush extends Statement {
   public Reference queue;

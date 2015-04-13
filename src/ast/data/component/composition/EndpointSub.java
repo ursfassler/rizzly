@@ -17,11 +17,10 @@
 
 package ast.data.component.composition;
 
+import ast.ElementInfo;
 import ast.data.component.Component;
 import ast.data.expression.reference.SimpleRef;
 import ast.data.function.Function;
-
-import common.ElementInfo;
 
 final public class EndpointSub extends Endpoint {
   final public SimpleRef<CompUse> component;

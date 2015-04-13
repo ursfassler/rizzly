@@ -21,9 +21,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import parser.PeekReader;
-
-import common.ElementInfo;
-import common.Metadata;
+import ast.ElementInfo;
+import ast.data.Metadata;
 
 /**
  *

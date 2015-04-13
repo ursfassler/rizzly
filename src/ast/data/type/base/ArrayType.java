@@ -19,11 +19,10 @@ package ast.data.type.base;
 
 import java.math.BigInteger;
 
+import ast.ElementInfo;
 import ast.data.expression.reference.SimpleRef;
 import ast.data.expression.reference.TypeRef;
 import ast.data.type.Type;
-
-import common.ElementInfo;
 
 public class ArrayType extends BaseType {
   final public TypeRef type;

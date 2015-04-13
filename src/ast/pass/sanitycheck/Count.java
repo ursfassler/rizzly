@@ -20,10 +20,10 @@ package ast.pass.sanitycheck;
 import java.util.HashMap;
 import java.util.Map;
 
-import pass.AstPass;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.knowledge.KnowledgeBase;
+import ast.pass.AstPass;
 import ast.traverser.DefTraverser;
 
 public class Count extends AstPass {

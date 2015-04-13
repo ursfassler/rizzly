@@ -17,9 +17,8 @@
 
 package ast.data.expression.reference;
 
+import ast.ElementInfo;
 import ast.data.expression.Expression;
-
-import common.ElementInfo;
 
 public class RefIndex extends RefItem {
   public Expression index;

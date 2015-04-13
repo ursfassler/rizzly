@@ -17,10 +17,9 @@
 
 package ast.data.statement;
 
+import ast.ElementInfo;
 import ast.data.AstBase;
 import ast.data.AstList;
-
-import common.ElementInfo;
 
 public class CaseOpt extends AstBase {
   final public AstList<CaseOptEntry> value;

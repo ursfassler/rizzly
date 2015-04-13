@@ -17,6 +17,8 @@
 
 package ast.knowledge;
 
+import ast.Designator;
+import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
@@ -25,9 +27,6 @@ import ast.data.function.header.FuncSignal;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.statement.Block;
 import ast.data.variable.FuncVariable;
-
-import common.Designator;
-import common.ElementInfo;
 
 //TODO rename
 //TODO rename trap to runtime exception and provide arguments

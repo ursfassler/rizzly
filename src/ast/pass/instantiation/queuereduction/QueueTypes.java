@@ -22,6 +22,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import ast.Designator;
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.expression.reference.SimpleRef;
 import ast.data.function.Function;
@@ -35,9 +37,6 @@ import ast.data.type.composed.UnionType;
 import ast.knowledge.KnowParent;
 import ast.knowledge.KnowPath;
 import ast.knowledge.KnowledgeBase;
-
-import common.Designator;
-import common.ElementInfo;
 
 class QueueTypes {
   private ArrayType queue;

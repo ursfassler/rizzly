@@ -20,7 +20,8 @@ package ast.pass.instantiation.queuereduction;
 import java.util.HashMap;
 import java.util.Map;
 
-import pass.AstPass;
+import ast.Designator;
+import ast.ElementInfo;
 import ast.copy.Relinker;
 import ast.data.Namespace;
 import ast.data.component.composition.Queue;
@@ -28,10 +29,8 @@ import ast.data.function.Function;
 import ast.data.type.composed.RecordType;
 import ast.knowledge.KnowChild;
 import ast.knowledge.KnowledgeBase;
+import ast.pass.AstPass;
 import ast.traverser.other.ClassGetter;
-
-import common.Designator;
-import common.ElementInfo;
 
 public class QueueReduction extends AstPass {
 

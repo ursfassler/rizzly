@@ -20,12 +20,11 @@ package ast.data.function;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
+import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.function.ret.FuncReturn;
 import ast.data.statement.Block;
 import ast.data.variable.FuncVariable;
-
-import common.ElementInfo;
 
 public class FunctionFactory {
   static public <T extends Function> T create(Class<T> type, ElementInfo info, String name, AstList<FuncVariable> param, FuncReturn retType, Block body) {

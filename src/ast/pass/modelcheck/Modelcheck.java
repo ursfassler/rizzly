@@ -17,7 +17,7 @@
 
 package ast.pass.modelcheck;
 
-import ast.pass.GroupPass;
+import ast.pass.others.GroupPass;
 
 public class Modelcheck extends GroupPass {
 

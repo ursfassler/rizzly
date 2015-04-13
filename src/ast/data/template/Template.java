@@ -19,13 +19,12 @@ package ast.data.template;
 
 import java.util.List;
 
+import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
 import ast.data.component.hfsm.StateContent;
 import ast.data.variable.TemplateParameter;
-
-import common.ElementInfo;
 
 //TODO do we need anonymous templates? it is easier if they are named.
 public class Template extends Named implements StateContent {

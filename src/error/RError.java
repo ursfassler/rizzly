@@ -17,7 +17,7 @@
 
 package error;
 
-import common.ElementInfo;
+import ast.ElementInfo;
 
 //TODO introduce enum with entry for every error
 //TODO make errors language independent (see above)
