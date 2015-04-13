@@ -15,7 +15,7 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.traverser.other;
+package ast.pass.linker;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -28,6 +28,7 @@ import ast.data.expression.reference.DummyLinkTarget;
 import ast.data.expression.reference.Reference;
 import ast.data.expression.reference.StateRef;
 import ast.data.raw.RawHfsm;
+import ast.traverser.other.ClassGetter;
 import error.ErrorType;
 import error.RError;
 

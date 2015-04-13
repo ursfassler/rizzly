@@ -21,19 +21,6 @@ import java.io.File;
 
 import error.RException;
 
-//TODO set tag when writing to union
-//TODO allow writing of tag of union
-//TODO check that union/record is fully initialized before passing to other function
-//TODO pass records by reference to functions (test case rec2)
-//TODO add compiler self tests:
-//TODO -- check that no references to old stuff exists (check that parent of every object is in the namespace tree)
-//TODO -- do name randomization and compile to see if references go outside
-//TODO add compiler switch to select backend (like --backend=ansiC --backend=funHtmlDoc)
-//TODO check for zero before division
-//TODO check range by user input
-//TODO check if event handling is in progress when starting event handling
-//TODO allow type declaration in elementary; make sure type is not escaping
-
 public class Main {
 
   /**

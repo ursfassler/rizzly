@@ -48,6 +48,7 @@ import ast.pass.others.CWriter;
 import ast.pass.others.CheckNames;
 import ast.pass.others.CheckSimpleTypeRef;
 import ast.pass.others.CompareReplacer;
+import ast.pass.others.ConstTyper;
 import ast.pass.others.ConstantPropagation;
 import ast.pass.others.DebugIface;
 import ast.pass.others.DocWriter;
@@ -62,6 +63,7 @@ import ast.pass.others.RangeConverter;
 import ast.pass.others.RetStructIntroducer;
 import ast.pass.others.RootInstanceAdder;
 import ast.pass.others.StateVarInitExecutor;
+import ast.pass.others.SystemIfaceAdder;
 import ast.pass.others.TypeMerge;
 import ast.pass.others.TypeSort;
 import ast.pass.others.TypeUplift;
@@ -90,8 +92,6 @@ import ast.pass.reduction.StateLinkReduction;
 import ast.pass.reduction.TupleAssignReduction;
 import ast.pass.reduction.hfsm.HfsmReduction;
 import ast.pass.specializer.TypeEvalReplacerPass;
-import ast.traverser.other.ConstTyper;
-import ast.traverser.other.SystemIfaceAdder;
 import error.RError;
 
 public class Passes {
@@ -117,7 +117,7 @@ public class Passes {
       passes.add(new Modelcheck());
     }
 
-    // FuncHeaderReplacegr.process(aclasses, kb); //TODO remove if not used
+    // FuncHeaderReplacer.process(aclasses, kb); //TODO remove if not used
 
     passes.passes.add(reduce(passes));
 

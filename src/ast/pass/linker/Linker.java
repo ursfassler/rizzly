@@ -49,7 +49,6 @@ import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.traverser.DefTraverser;
 import ast.traverser.other.ClassGetter;
-import ast.traverser.other.TransitionStateLinker;
 import error.ErrorType;
 import error.RError;
 

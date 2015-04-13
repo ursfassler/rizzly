@@ -59,8 +59,6 @@ class FuncInlinerWorker extends StmtReplacer<Void> {
 
   @Override
   protected List<Statement> visitCallStmt(CallStmt obj, Void param) {
-    // TODO also if a function is called in a expression
-
     if (obj.call.link instanceof Function) {
       Function func = (Function) obj.call.link;
 
@@ -68,10 +66,7 @@ class FuncInlinerWorker extends StmtReplacer<Void> {
       assert (fr == null);
 
       if (canInline(func)) {
-        // RError.err(ErrorType.Hint, param.getName() + " :: " +
-        // func.getName());
-        assert (obj.call.offset.size() == 1); // FIXME maybe not true in the
-        // future
+        assert (obj.call.offset.size() == 1);
         RefCall call = (RefCall) obj.call.offset.get(0);
         return inline(func, call.actualParameter);
       }
@@ -91,7 +86,6 @@ class FuncInlinerWorker extends StmtReplacer<Void> {
 
   private boolean onlyOnceUsed(Function func) {
     int refCount = kbl.get(func).size();
-    // assert(refCount > 0); //XXX why is this not true?
     return refCount <= 1;
   }
 

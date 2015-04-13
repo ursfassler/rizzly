@@ -99,7 +99,6 @@ abstract public class BaseTest {
     // " -o " + outdir + "libinst.a";
     // TODO use strict again
     String cmd = "gcc -std=c11 -pedantic -Wall -Wextra -g -c " + outdir + "inst.c -o " + outdir + "libinst.a";
-    // TODO use strict? yes
     // TODO use additional code checker
     execute(cmd, "could not compile c file");
   }

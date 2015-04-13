@@ -856,11 +856,7 @@ public class FunPrinter extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitRefTemplCall(RefTemplCall obj, Void param) {
-    visitOptList("{", ", ", "}", obj.actualParameter); // FIXME it is a bit
-    // hacky, but maybe
-    // needed to make
-    // output
-    // nicer
+    visitOptList("{", ", ", "}", obj.actualParameter);
     return null;
   }
 

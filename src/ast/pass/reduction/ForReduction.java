@@ -77,7 +77,6 @@ class ForReductionWorker extends StmtReplacer<Void> {
 
   @Override
   protected List<Statement> visitForStmt(ForStmt obj, Void param) {
-    // TODO documentation
     // TODO implement for other types than range types
     ElementInfo info = obj.getInfo();
 

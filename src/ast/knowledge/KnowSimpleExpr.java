@@ -130,13 +130,12 @@ class SimpleGetter extends NullTraverser<Boolean, Void> {
 
   @Override
   protected Boolean visitConstGlobal(ConstGlobal obj, Void param) {
-    return visit(obj.type, param); // TODO ok?
+    return visit(obj.type, param);
   }
 
   @Override
   protected Boolean visitFuncVariable(FuncVariable obj, Void param) {
     return true;
-    // return visit(obj.getType(),param);
   }
 
   @Override

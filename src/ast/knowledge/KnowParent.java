@@ -81,8 +81,7 @@ class KnowParentTraverser extends DefTraverser<Void, Ast> {
   protected Void visit(Ast obj, Ast param) {
     assert (obj != param);
     if (cache.containsKey(obj)) {
-      if (!(obj instanceof EnumElement)) { // FIXME remove this hack (new enum
-        // type system?)
+      if (!(obj instanceof EnumElement)) { // FIXME remove this hack (new enum type system?)
         Ast oldparent = cache.get(obj);
         RError.err(ErrorType.Hint, "First time was here:  " + getPath(oldparent));
         RError.err(ErrorType.Hint, "Second time was here: " + getPath(param));

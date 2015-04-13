@@ -221,7 +221,6 @@ class Reduction {
     return bberror;
   }
 
-  // TODO ok?
   private FuncProcedure makeExitFunc(EnumType etype, HashMap<StateSimple, EnumElement> enumMap, StateVariable stateVariable) {
 
     AstList<CaseOpt> option = new AstList<CaseOpt>();
@@ -229,7 +228,7 @@ class Reduction {
       Reference eref = makeEnumElemRef(etype, enumMap.get(src));
       Block obb = new Block(info);
       CaseOpt opt = makeCaseOption(eref, obb);
-      obb.statements.add(makeCall(src.exitFunc.link)); // TODO ok?
+      obb.statements.add(makeCall(src.exitFunc.link));
       option.add(opt);
     }
 

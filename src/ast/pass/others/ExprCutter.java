@@ -15,7 +15,7 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.traverser.other;
+package ast.pass.others;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +64,7 @@ import ast.knowledge.KnowUniqueName;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.traverser.NullTraverser;
+import ast.traverser.other.ExprReplacer;
 import error.ErrorType;
 import error.RError;
 

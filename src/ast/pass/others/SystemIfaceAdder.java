@@ -15,7 +15,7 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.traverser.other;
+package ast.pass.others;
 
 import java.util.ArrayList;
 import java.util.Collections;
