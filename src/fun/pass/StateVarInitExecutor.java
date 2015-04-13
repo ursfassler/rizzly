@@ -17,14 +17,12 @@
 
 package fun.pass;
 
-import pass.FunPass;
-import fun.DefTraverser;
-import fun.expression.Expression;
-import fun.knowledge.KnowledgeBase;
-import fun.other.Namespace;
+import pass.EvlPass;
+import evl.data.expression.Expression;
+import evl.knowledge.KnowledgeBase;
+import evl.traverser.DefTraverser;
 import fun.traverser.Memory;
 import fun.traverser.spezializer.ExprEvaluator;
-import fun.variable.StateVariable;
 
 /**
  * Execute initial values of state variables (for static initialization)
@@ -32,10 +30,10 @@ import fun.variable.StateVariable;
  * @author urs
  *
  */
-public class StateVarInitExecutor extends FunPass {
+public class StateVarInitExecutor extends EvlPass {
 
   @Override
-  public void process(Namespace root, KnowledgeBase kb) {
+  public void process(evl.data.Namespace root, KnowledgeBase kb) {
     StateVarInitExecutorWorker worker = new StateVarInitExecutorWorker();
     worker.traverse(root, kb);
   }
@@ -45,9 +43,10 @@ public class StateVarInitExecutor extends FunPass {
 class StateVarInitExecutorWorker extends DefTraverser<Void, KnowledgeBase> {
 
   @Override
-  protected Void visitStateVariable(StateVariable obj, KnowledgeBase param) {
-    Expression val = (Expression) ExprEvaluator.evaluate(obj.getDef(), new Memory(), param);
-    obj.setDef(val);
+  protected Void visitStateVariable(evl.data.variable.StateVariable obj, KnowledgeBase param) {
+    Expression val = (Expression) ExprEvaluator.evaluate(obj.def, new Memory(), param);
+    assert (val != null);
+    obj.def = val;
     return null;
   }
 

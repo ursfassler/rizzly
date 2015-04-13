@@ -22,6 +22,7 @@ import util.Pair;
 
 import common.ElementInfo;
 
+import evl.copy.Copy;
 import evl.data.Evl;
 import evl.data.EvlList;
 import evl.data.Namespace;
@@ -35,8 +36,9 @@ import evl.data.expression.reference.RefCall;
 import evl.data.expression.reference.RefName;
 import evl.data.expression.reference.Reference;
 import evl.data.expression.reference.SimpleRef;
+import evl.data.expression.reference.TypeRef;
 import evl.data.expression.unop.LogicNot;
-import evl.data.function.header.FuncPrivateRet;
+import evl.data.function.header.FuncFunction;
 import evl.data.function.ret.FuncReturnType;
 import evl.data.statement.Block;
 import evl.data.statement.ReturnExpr;
@@ -147,14 +149,14 @@ class MakeCompareFunction extends NullTraverser<Expression, Pair<Expression, Exp
     if (rt instanceof TupleType) {
       assert (param.first instanceof TupleValue);
       assert (param.second instanceof TupleValue);
-      FuncPrivateRet func = makeCompare(lt.types, ((TupleType) rt).types);
+      FuncFunction func = makeCompare(lt.types, ((TupleType) rt).types);
       TupleValue acpar = new TupleValue(info);
       acpar.value.addAll(((TupleValue) param.first).value);
       acpar.value.addAll(((TupleValue) param.second).value);
       Reference call = new Reference(info, func, new RefCall(info, acpar));
       return call;
     } else if (rt instanceof RecordType) {
-      FuncPrivateRet func = makeCompare(lt.types, (RecordType) rt);
+      FuncFunction func = makeCompare(lt.types, (RecordType) rt);
       TupleValue acpar = new TupleValue(info);
       acpar.value.addAll(((TupleValue) param.first).value);
       acpar.value.add(param.second);
@@ -165,11 +167,11 @@ class MakeCompareFunction extends NullTraverser<Expression, Pair<Expression, Exp
     }
   }
 
-  private FuncPrivateRet makeCompare(EvlList<SimpleRef<Type>> lt, RecordType rt) {
+  private FuncFunction makeCompare(EvlList<TypeRef> lt, RecordType rt) {
     EvlList<FuncVariable> param = new EvlList<FuncVariable>();
     EvlList<FuncVariable> left = new EvlList<FuncVariable>();
-    for (SimpleRef<Type> rtr : lt) {
-      left.add(new FuncVariable(info, "left" + left.size(), new SimpleRef<Type>(info, rtr.link)));
+    for (TypeRef rtr : lt) {
+      left.add(new FuncVariable(info, "left" + left.size(), Copy.copy(rtr)));
     }
     FuncVariable right = new FuncVariable(info, "right", new SimpleRef<Type>(info, rt));
     param.addAll(left);
@@ -187,15 +189,15 @@ class MakeCompareFunction extends NullTraverser<Expression, Pair<Expression, Exp
     return makeFunc(param, expr);
   }
 
-  private FuncPrivateRet makeCompare(EvlList<SimpleRef<Type>> lt, EvlList<SimpleRef<Type>> rt) {
+  private FuncFunction makeCompare(EvlList<TypeRef> lt, EvlList<TypeRef> rt) {
     EvlList<FuncVariable> param = new EvlList<FuncVariable>();
     EvlList<FuncVariable> left = new EvlList<FuncVariable>();
-    for (SimpleRef<Type> ltr : lt) {
-      left.add(new FuncVariable(info, "left" + left.size(), new SimpleRef<Type>(info, ltr.link)));
+    for (TypeRef ltr : lt) {
+      left.add(new FuncVariable(info, "left" + left.size(), Copy.copy(ltr)));
     }
     EvlList<FuncVariable> right = new EvlList<FuncVariable>();
-    for (SimpleRef<Type> rtr : rt) {
-      right.add(new FuncVariable(info, "right" + right.size(), new SimpleRef<Type>(info, rtr.link)));
+    for (TypeRef rtr : rt) {
+      right.add(new FuncVariable(info, "right" + right.size(), Copy.copy(rtr)));
     }
     param.addAll(left);
     param.addAll(right);
@@ -218,7 +220,7 @@ class MakeCompareFunction extends NullTraverser<Expression, Pair<Expression, Exp
 
     if (rt instanceof RecordType) {
       assert (lt == rt);
-      FuncPrivateRet func = makeCompare(lt);
+      FuncFunction func = makeCompare(lt);
       TupleValue acpar = new TupleValue(info);
       acpar.value.add(param.first);
       acpar.value.add(param.second);
@@ -226,7 +228,7 @@ class MakeCompareFunction extends NullTraverser<Expression, Pair<Expression, Exp
       return call;
     } else if (rt instanceof TupleType) {
       assert (param.second instanceof TupleValue);
-      FuncPrivateRet func = makeCompare(lt, ((TupleType) rt).types);
+      FuncFunction func = makeCompare(lt, ((TupleType) rt).types);
       TupleValue acpar = new TupleValue(info);
       acpar.value.add(param.first);
       acpar.value.addAll(((TupleValue) param.second).value);
@@ -237,12 +239,12 @@ class MakeCompareFunction extends NullTraverser<Expression, Pair<Expression, Exp
     }
   }
 
-  private FuncPrivateRet makeCompare(RecordType lt, EvlList<SimpleRef<Type>> rt) {
+  private FuncFunction makeCompare(RecordType lt, EvlList<TypeRef> rt) {
     EvlList<FuncVariable> param = new EvlList<FuncVariable>();
     FuncVariable left = new FuncVariable(info, "left", new SimpleRef<Type>(info, lt));
     EvlList<FuncVariable> right = new EvlList<FuncVariable>();
-    for (SimpleRef<Type> rtr : rt) {
-      right.add(new FuncVariable(info, "right" + right.size(), new SimpleRef<Type>(info, rtr.link)));
+    for (TypeRef rtr : rt) {
+      right.add(new FuncVariable(info, "right" + right.size(), Copy.copy(rtr)));
     }
     param.add(left);
     param.addAll(right);
@@ -259,7 +261,7 @@ class MakeCompareFunction extends NullTraverser<Expression, Pair<Expression, Exp
     return makeFunc(param, expr);
   }
 
-  private FuncPrivateRet makeCompare(RecordType both) {
+  private FuncFunction makeCompare(RecordType both) {
     EvlList<FuncVariable> param = new EvlList<FuncVariable>();
     FuncVariable left = new FuncVariable(info, "left", new SimpleRef<Type>(info, both));
     FuncVariable right = new FuncVariable(info, "right", new SimpleRef<Type>(info, both));
@@ -278,10 +280,10 @@ class MakeCompareFunction extends NullTraverser<Expression, Pair<Expression, Exp
     return makeFunc(param, expr);
   }
 
-  private FuncPrivateRet makeFunc(EvlList<FuncVariable> param, Expression expr) {
+  private FuncFunction makeFunc(EvlList<FuncVariable> param, Expression expr) {
     Block body = new Block(info);
     body.statements.add(new ReturnExpr(info, expr));
-    FuncPrivateRet func = new FuncPrivateRet(info, kun.get("cmp"), param, new FuncReturnType(info, new SimpleRef<Type>(info, kbi.getBooleanType())), body);
+    FuncFunction func = new FuncFunction(info, kun.get("cmp"), param, new FuncReturnType(info, new SimpleRef<Type>(info, kbi.getBooleanType())), body);
     kbi.addItem(func);
     return func;
   }

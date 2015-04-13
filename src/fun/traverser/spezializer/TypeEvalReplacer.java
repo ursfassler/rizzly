@@ -19,20 +19,20 @@ package fun.traverser.spezializer;
 
 import error.ErrorType;
 import error.RError;
-import fun.DefTraverser;
-import fun.Fun;
-import fun.expression.reference.BaseRef;
-import fun.expression.reference.RefTemplCall;
-import fun.expression.reference.Reference;
-import fun.expression.reference.SimpleRef;
-import fun.knowledge.KnowledgeBase;
+import evl.data.Evl;
+import evl.data.EvlList;
+import evl.data.Named;
+import evl.data.expression.reference.BaseRef;
+import evl.data.expression.reference.RefTemplCall;
+import evl.data.expression.reference.Reference;
+import evl.data.expression.reference.SimpleRef;
+import evl.data.variable.ConstGlobal;
+import evl.knowledge.KnowledgeBase;
+import evl.traverser.DefTraverser;
 import fun.other.ActualTemplateArgument;
-import fun.other.FunList;
-import fun.other.Named;
 import fun.other.Template;
-import fun.variable.ConstGlobal;
 
-class TypeEvalReplacer extends DefTraverser<FunList<ActualTemplateArgument>, Void> {
+class TypeEvalReplacer extends DefTraverser<EvlList<ActualTemplateArgument>, Void> {
 
   final private KnowledgeBase kb;
 
@@ -42,54 +42,56 @@ class TypeEvalReplacer extends DefTraverser<FunList<ActualTemplateArgument>, Voi
   }
 
   @Override
-  protected FunList<ActualTemplateArgument> visitList(FunList<? extends Fun> list, Void param) {
-    for (Fun ast : new FunList<Fun>(list)) {
+  protected EvlList<ActualTemplateArgument> visitList(EvlList<? extends Evl> list, Void param) {
+    for (Evl ast : new EvlList<Evl>(list)) {
       visit(ast, param);
     }
     return null;
   }
 
   @Override
-  protected FunList<ActualTemplateArgument> visitTemplate(Template obj, Void param) {
+  protected EvlList<ActualTemplateArgument> visitTemplate(Template obj, Void param) {
     return null;
   }
 
   @Override
-  protected FunList<ActualTemplateArgument> visitBaseRef(BaseRef obj, Void param) {
-    FunList<ActualTemplateArgument> arg = super.visitBaseRef(obj, param);
-    if (obj.getLink() instanceof Template) {
+  protected EvlList<ActualTemplateArgument> visitBaseRef(BaseRef obj, Void param) {
+    EvlList<ActualTemplateArgument> arg = super.visitBaseRef(obj, param);
+    if (obj.link instanceof Template) {
       RError.ass(arg != null, obj.getInfo());
-      Template template = (Template) obj.getLink();
-      // FIXME problem: entries only used to name templates, not instantiate them
-      // TODO names by themselves should use template arguments, but then, they are templates
+      Template template = (Template) obj.link;
+      // FIXME problem: entries only used to name templates, not instantiate
+      // them
+      // TODO names by themselves should use template arguments, but then, they
+      // are templates
       if (template.getTempl().size() != arg.size()) {
         RError.err(ErrorType.Error, obj.getInfo(), "Wrong number of parameter, expected " + template.getTempl().size() + " got " + arg.size());
         return null;
       }
-      Fun inst = Specializer.process(template, arg, kb);
-      obj.setLink((Named) inst);
-    } else if ((obj.getLink() instanceof ConstGlobal)) {
+      Evl inst = Specializer.process(template, arg, kb);
+      obj.link = (Named) inst;
+    } else if ((obj.link instanceof ConstGlobal)) {
       // FIXME this is a temporary workaround, the copy should be done in the
       // instantiater (Specializer?)
-      visit(obj.getLink(), null); // somebody has to instantiate the constant
+      visit(obj.link, null); // somebody has to instantiate the constant
     }
     return null;
   }
 
   @Override
-  protected FunList<ActualTemplateArgument> visitSimpleRef(SimpleRef obj, Void param) {
+  protected EvlList<ActualTemplateArgument> visitSimpleRef(SimpleRef obj, Void param) {
     super.visitSimpleRef(obj, param);
-    return new FunList<ActualTemplateArgument>();
+    return new EvlList<ActualTemplateArgument>();
   }
 
   @Override
-  protected FunList<ActualTemplateArgument> visitReference(Reference obj, Void param) {
+  protected EvlList<ActualTemplateArgument> visitReference(Reference obj, Void param) {
     super.visitReference(obj, param);
-    FunList<ActualTemplateArgument> arg = new FunList<ActualTemplateArgument>();
-    if (!obj.getOffset().isEmpty()) {
-      if (obj.getOffset().get(0) instanceof RefTemplCall) {
-        arg = ((RefTemplCall) obj.getOffset().get(0)).getActualParameter();
-        obj.getOffset().remove(0);
+    EvlList<ActualTemplateArgument> arg = new EvlList<ActualTemplateArgument>();
+    if (!obj.offset.isEmpty()) {
+      if (obj.offset.get(0) instanceof RefTemplCall) {
+        arg = ((RefTemplCall) obj.offset.get(0)).actualParameter;
+        obj.offset.remove(0);
       }
     }
     return arg;

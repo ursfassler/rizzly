@@ -33,13 +33,13 @@ import evl.data.expression.reference.BaseRef;
 import evl.data.expression.reference.RefCall;
 import evl.data.expression.reference.Reference;
 import evl.data.function.Function;
-import evl.data.function.header.FuncCtrlOutDataIn;
-import evl.data.function.header.FuncCtrlOutDataOut;
-import evl.data.function.header.FuncPrivateVoid;
+import evl.data.function.header.FuncProcedure;
+import evl.data.function.header.FuncQuery;
+import evl.data.function.header.FuncSignal;
 import evl.data.statement.Block;
 import evl.data.statement.CallStmt;
+import evl.data.statement.MsgPush;
 import evl.data.statement.Statement;
-import evl.data.statement.intern.MsgPush;
 import evl.traverser.DefTraverser;
 
 /**
@@ -52,12 +52,12 @@ public class EventSendDebugCallAdder extends DefTraverser<Void, Void> {
 
   private StmtTraverser st;
 
-  public EventSendDebugCallAdder(FuncPrivateVoid debugSend, ArrayList<String> names) {
+  public EventSendDebugCallAdder(FuncProcedure debugSend, ArrayList<String> names) {
     super();
     st = new StmtTraverser(debugSend, names);
   }
 
-  public static void process(Evl obj, ArrayList<String> names, FuncPrivateVoid debugSend) {
+  public static void process(Evl obj, ArrayList<String> names, FuncProcedure debugSend) {
     EventSendDebugCallAdder reduction = new EventSendDebugCallAdder(debugSend, names);
     reduction.traverse(obj, null);
   }
@@ -71,11 +71,11 @@ public class EventSendDebugCallAdder extends DefTraverser<Void, Void> {
 
 class StmtTraverser extends DefTraverser<Void, List<Statement>> {
 
-  private FuncPrivateVoid debugSend;
+  private FuncProcedure debugSend;
   private ArrayList<String> names;
   static private ElementInfo info = ElementInfo.NO;
 
-  public StmtTraverser(FuncPrivateVoid debugSend, ArrayList<String> names) {
+  public StmtTraverser(FuncProcedure debugSend, ArrayList<String> names) {
     super();
     this.debugSend = debugSend;
     this.names = names;
@@ -103,7 +103,7 @@ class StmtTraverser extends DefTraverser<Void, List<Statement>> {
   protected Void visitBaseRef(BaseRef obj, List<Statement> param) {
     super.visitBaseRef(obj, param);
 
-    boolean isOut = (obj.link instanceof FuncCtrlOutDataIn) || (obj.link instanceof FuncCtrlOutDataOut);
+    boolean isOut = (obj.link instanceof FuncQuery) || (obj.link instanceof FuncSignal);
 
     if (isOut) {
       String funcName = obj.link.name;
@@ -120,7 +120,7 @@ class StmtTraverser extends DefTraverser<Void, List<Statement>> {
     return null;
   }
 
-  private CallStmt makeCall(FuncPrivateVoid func, int numFunc) {
+  private CallStmt makeCall(FuncProcedure func, int numFunc) {
     // Self._sendMsg( numFunc );
     TupleValue actParam = new TupleValue(info);
     actParam.value.add(new Number(info, BigInteger.valueOf(numFunc)));

@@ -37,7 +37,7 @@ import evl.data.expression.reference.RefCall;
 import evl.data.expression.reference.Reference;
 import evl.data.expression.reference.SimpleRef;
 import evl.data.function.Function;
-import evl.data.function.header.FuncGlobal;
+import evl.data.function.header.FuncFunction;
 import evl.data.function.ret.FuncReturnType;
 import evl.data.statement.Block;
 import evl.data.statement.CallStmt;
@@ -113,7 +113,7 @@ class IntroduceConvertWorker extends DefTraverser<Void, Void> {
     return ret;
   }
 
-  private FuncGlobal makeConvertRange(RangeType resType) {
+  private FuncFunction makeConvertRange(RangeType resType) {
     String name = CONVERT_PREFIX + resType.name;
     ElementInfo info = new ElementInfo(name, 0, 0);
 
@@ -125,8 +125,8 @@ class IntroduceConvertWorker extends DefTraverser<Void, Void> {
     EvlList<IfOption> option = new EvlList<IfOption>();
 
     { // test
-      Relation aboveLower = new Lessequal(info, new Number(info, resType.range.getLow()), new Reference(info, value));
-      Relation belowHigher = new Lessequal(info, new Reference(info, value), new Number(info, resType.range.getHigh()));
+      Relation aboveLower = new Lessequal(info, new Number(info, resType.range.low), new Reference(info, value));
+      Relation belowHigher = new Lessequal(info, new Reference(info, value), new Number(info, resType.range.high));
       Expression cond = new LogicAnd(info, aboveLower, belowHigher);
       IfOption opt = new IfOption(info, cond, ok);
       option.add(opt);
@@ -144,7 +144,7 @@ class IntroduceConvertWorker extends DefTraverser<Void, Void> {
       // TODO throw exception
       Reference call = new Reference(info, kll.getTrap());
       call.offset.add(new RefCall(info, new TupleValue(info, new EvlList<Expression>())));
-      ReturnExpr trap = new ReturnExpr(info, new Number(info, resType.range.getLow()));
+      ReturnExpr trap = new ReturnExpr(info, new Number(info, resType.range.low));
 
       error.statements.add(new CallStmt(info, call));
       error.statements.add(trap);
@@ -155,7 +155,7 @@ class IntroduceConvertWorker extends DefTraverser<Void, Void> {
 
     EvlList<FuncVariable> param = new EvlList<FuncVariable>();
     param.add(value);
-    FuncGlobal ret = new FuncGlobal(info, name, param, new FuncReturnType(info, new SimpleRef<Type>(info, resType)), body);
+    FuncFunction ret = new FuncFunction(info, name, param, new FuncReturnType(info, new SimpleRef<Type>(info, resType)), body);
 
     return ret;
   }

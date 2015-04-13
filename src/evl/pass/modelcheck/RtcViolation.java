@@ -58,7 +58,8 @@ public class RtcViolation extends EvlPass {
         SimpleGraph<Evl> cg = CallgraphMaker.make(elem, kb);
         assert (elem.component.isEmpty());
         // TODO do we need to check here?
-        // TODO check somewhere that slots and responses don't call slot and responses
+        // TODO check somewhere that slots and responses don't call slot and
+        // responses
         // checkRtcViolation(cg, 3, elem.getInfo());
       }
     }
@@ -78,8 +79,8 @@ public class RtcViolation extends EvlPass {
       Endpoint src = con.endpoint.get(Direction.in);
       Endpoint dst = con.endpoint.get(Direction.out);
       if ((src instanceof EndpointSub) && (dst instanceof EndpointSub)) {
-        CompUse srcComp = ((EndpointSub) src).component;
-        CompUse dstComp = ((EndpointSub) dst).component;
+        CompUse srcComp = ((EndpointSub) src).component.link;
+        CompUse dstComp = ((EndpointSub) dst).component.link;
         ret.addVertex(srcComp);
         ret.addVertex(dstComp);
         ret.addEdge(srcComp, dstComp);

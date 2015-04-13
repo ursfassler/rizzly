@@ -26,7 +26,6 @@ import common.Designator;
 import error.ErrorType;
 import error.RError;
 import evl.data.Evl;
-import evl.data.Named;
 import evl.data.type.base.EnumElement;
 import evl.traverser.DefTraverser;
 
@@ -42,7 +41,7 @@ public class KnowParent extends KnowledgeEntry {
     this.base = base;
   }
 
-  public Evl getParent(Evl obj) {
+  public Evl get(Evl obj) {
     Evl ret = cache.get(obj);
     if (ret == null) {
       rebuild();
@@ -52,19 +51,6 @@ public class KnowParent extends KnowledgeEntry {
       RError.err(ErrorType.Fatal, obj.getInfo(), "Object not reachable: " + obj);
     }
     return ret;
-  }
-
-  public Designator getPath(Named obj) {
-    if (!cache.containsKey(obj)) {
-      rebuild();
-    }
-
-    LinkedList<String> name = new LinkedList<String>();
-    while (obj != null) {
-      name.push(obj.name);
-      obj = (Named) cache.get(obj);
-    }
-    return new Designator(name);
   }
 
   private void rebuild() {
@@ -96,7 +82,8 @@ class KnowParentTraverser extends DefTraverser<Void, Evl> {
   protected Void visit(Evl obj, Evl param) {
     assert (obj != param);
     if (cache.containsKey(obj)) {
-      if (!(obj instanceof EnumElement)) { // FIXME remove this hack (new enum type system?)
+      if (!(obj instanceof EnumElement)) { // FIXME remove this hack (new enum
+        // type system?)
         Evl oldparent = cache.get(obj);
         RError.err(ErrorType.Hint, "First time was here:  " + getPath(oldparent));
         RError.err(ErrorType.Hint, "Second time was here: " + getPath(param));

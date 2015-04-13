@@ -35,7 +35,7 @@ public class RangeType extends BaseType {
   }
 
   public static String makeName(Range range) {
-    return "R{" + range.getLow() + "," + range.getHigh() + "}";
+    return "R{" + range.low + "," + range.high + "}";
   }
 
 }

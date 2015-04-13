@@ -37,6 +37,18 @@ public class EvlList<T extends Evl> extends ArrayList<T> {
     return super.add(item);
   }
 
+  public Named findFirst(String name) {
+    for (Evl itr : this) {
+      if (itr instanceof Named) {
+        if (((Named) itr).name.equals(name)) {
+          return (Named) itr;
+        }
+      }
+    }
+    return null;
+  }
+
+  @Deprecated
   public T find(String name) {
     EvlList<T> ret = new EvlList<T>();
     for (T itr : this) {
@@ -59,17 +71,6 @@ public class EvlList<T extends Evl> extends ArrayList<T> {
         RError.err(ErrorType.Fatal, "Found more than one entry with name " + name);
         return null;
     }
-  }
-
-  @SuppressWarnings("unchecked")
-  public <R extends T> EvlList<R> getItems(Class<R> kind) {
-    EvlList<R> ret = new EvlList<R>();
-    for (T itr : this) {
-      if (kind.isAssignableFrom(itr.getClass())) {
-        ret.add((R) itr);
-      }
-    }
-    return ret;
   }
 
 }

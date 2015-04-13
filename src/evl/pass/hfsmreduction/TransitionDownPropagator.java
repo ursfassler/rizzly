@@ -36,15 +36,16 @@ import evl.data.Namespace;
 import evl.data.component.hfsm.ImplHfsm;
 import evl.data.component.hfsm.State;
 import evl.data.component.hfsm.StateComposite;
-import evl.data.component.hfsm.StateItem;
+import evl.data.component.hfsm.StateContent;
 import evl.data.component.hfsm.StateSimple;
 import evl.data.component.hfsm.Transition;
 import evl.data.expression.Expression;
 import evl.data.expression.TupleValue;
 import evl.data.expression.reference.RefCall;
 import evl.data.expression.reference.Reference;
+import evl.data.expression.reference.SimpleRef;
 import evl.data.function.Function;
-import evl.data.function.header.FuncPrivateVoid;
+import evl.data.function.header.FuncProcedure;
 import evl.data.function.ret.FuncReturnNone;
 import evl.data.statement.Assignment;
 import evl.data.statement.AssignmentSingle;
@@ -83,12 +84,12 @@ public class TransitionDownPropagator extends EvlPass {
 
     assert (tec.getTdst().size() == tec.getTsrc().size());
     assert (tec.getTdst().size() == tec.getTtop().size());
-    Map<Transition, FuncPrivateVoid> tfunc = new HashMap<Transition, FuncPrivateVoid>();
+    Map<Transition, FuncProcedure> tfunc = new HashMap<Transition, FuncProcedure>();
     int nr = 0;
     for (Transition trans : tec.getTdst().keySet()) {
       String name = Designator.NAME_SEP + "trans" + nr;
       nr++;
-      FuncPrivateVoid func = makeTransBodyFunc(trans, name, kbi);
+      FuncProcedure func = makeTransBodyFunc(trans, name, kbi);
       hfsm.topstate.item.add(func);
       tfunc.put(trans, func);
     }
@@ -102,9 +103,9 @@ public class TransitionDownPropagator extends EvlPass {
    *
    * @param name
    */
-  private static FuncPrivateVoid makeTransBodyFunc(Transition trans, String name, KnowBaseItem kbi) {
+  private static FuncProcedure makeTransBodyFunc(Transition trans, String name, KnowBaseItem kbi) {
     EvlList<FuncVariable> params = Copy.copy(trans.param);
-    FuncPrivateVoid func = new FuncPrivateVoid(ElementInfo.NO, name, params, new FuncReturnNone(ElementInfo.NO), trans.body);
+    FuncProcedure func = new FuncProcedure(ElementInfo.NO, name, params, new FuncReturnNone(ElementInfo.NO), trans.body);
     trans.body = new Block(ElementInfo.NO);
 
     FsmReduction.relinkActualParameterRef(trans.param, func.param, func.body);
@@ -120,9 +121,9 @@ class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam
   private final Map<Transition, State> tsrc;
   private final Map<Transition, State> tdst;
   private final Map<Transition, State> ttop;
-  private final Map<Transition, FuncPrivateVoid> tfunc;
+  private final Map<Transition, FuncProcedure> tfunc;
 
-  public TransitionDownPropagatorWorker(KnowledgeBase kb, Map<Transition, State> tsrc, Map<Transition, State> tdst, Map<Transition, State> ttop, Map<Transition, FuncPrivateVoid> tfunc) {
+  public TransitionDownPropagatorWorker(KnowledgeBase kb, Map<Transition, State> tsrc, Map<Transition, State> tdst, Map<Transition, State> ttop, Map<Transition, FuncProcedure> tfunc) {
     super();
     this.tsrc = tsrc;
     this.tdst = tdst;
@@ -138,7 +139,7 @@ class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam
 
   @Override
   protected Void visitStateSimple(StateSimple obj, TransitionParam param) {
-    EvlList<Transition> transList = obj.item.getItems(Transition.class);
+    EvlList<Transition> transList = ClassGetter.filter(Transition.class, obj.item);
     obj.item.removeAll(transList);
 
     filter(obj, param.before);
@@ -148,7 +149,7 @@ class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam
       addTrans(obj, trans);
     }
     for (Transition trans : transList) {
-      trans.src.link = obj;
+      trans.src = new SimpleRef<State>(trans.src.getInfo(), obj);
       // obj.getItem().add(trans);
       addTrans(obj, trans);
     }
@@ -164,11 +165,11 @@ class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam
     State dst = tdst.get(otrans);
     assert (dst != null);
     Transition trans = Copy.copy(otrans);
-    trans.src.link = src;
+    trans.src = new SimpleRef<State>(trans.src.getInfo(), src);
 
     makeExitCalls(src, os, trans.body.statements);
     {
-      FuncPrivateVoid func = tfunc.get(otrans);
+      FuncProcedure func = tfunc.get(otrans);
       assert (func != null);
       Reference ref = new Reference(info, func);
 
@@ -197,7 +198,7 @@ class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam
 
     makeVarInit(par, top, list);
 
-    for (StateVariable var : start.item.getItems(StateVariable.class)) {
+    for (StateVariable var : ClassGetter.filter(StateVariable.class, start.item)) {
       Assignment init = new AssignmentSingle(var.def.getInfo(), new Reference(info, var), Copy.copy(var.def));
       list.add(init);
     }
@@ -215,7 +216,7 @@ class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam
   }
 
   private StateComposite getParent(State start) {
-    Evl parent = kp.getParent(start);
+    Evl parent = kp.get(start);
     if (parent instanceof StateComposite) {
       return (StateComposite) parent;
     } else {
@@ -263,7 +264,7 @@ class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam
     ArrayList<Transition> transList = new ArrayList<Transition>();
     ArrayList<State> stateList = new ArrayList<State>();
 
-    for (StateItem itr : obj.item) {
+    for (StateContent itr : obj.item) {
       if (itr instanceof Transition) {
         Transition trans = (Transition) itr;
         transList.add(trans);
@@ -338,7 +339,7 @@ class TransitionEndpointCollector extends NullTraverser<Void, State> {
 
   @Override
   protected Void visitDefault(Evl obj, State param) {
-    if (obj instanceof StateItem) {
+    if (obj instanceof StateContent) {
       return null;
     } else {
       throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
@@ -348,8 +349,8 @@ class TransitionEndpointCollector extends NullTraverser<Void, State> {
   @Override
   protected Void visitTransition(Transition obj, State param) {
     ttop.put(obj, param);
-    tsrc.put(obj, obj.src.link);
-    tdst.put(obj, obj.dst.link);
+    tsrc.put(obj, (State) obj.src.getTarget());
+    tdst.put(obj, (State) obj.dst.getTarget());
     return null;
   }
 

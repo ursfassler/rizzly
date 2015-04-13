@@ -48,16 +48,18 @@ public class QueueReduction extends EvlPass {
 }
 
 class QueueReductionWorker {
-  private static final int queueLength = 20;  // FIXME remove magic
+  private static final int queueLength = 20; // FIXME remove magic
 
   final private Namespace root;
 
   final private KnowledgeBase kb;
+  final private DispatchFunctionFactory dispatchFactory;
 
   public QueueReductionWorker(Namespace root, KnowledgeBase kb) {
     super();
     this.root = root;
     this.kb = kb;
+    dispatchFactory = new DispatchFunctionFactory(kb);
   }
 
   public void process() {
@@ -117,7 +119,7 @@ class QueueReductionWorker {
     Function sizefunc = CountFunctionFactory.create(prefix, info, queueVariables);
     root.children.add(sizefunc);
 
-    Function dispatcher = DispatchFunctionFactory.create(prefix, info, queueVariables, queueTypes);
+    Function dispatcher = dispatchFactory.create(prefix, info, queueVariables, queueTypes);
     root.children.add(dispatcher);
     return queueVariables;
   }

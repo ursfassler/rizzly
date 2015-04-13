@@ -19,28 +19,25 @@ package fun.traverser.spezializer;
 
 import error.ErrorType;
 import error.RError;
-import fun.Fun;
-import fun.NullTraverser;
-import fun.expression.Expression;
-import fun.expression.Number;
-import fun.expression.TupleValue;
-import fun.expression.reference.RefCall;
-import fun.expression.reference.RefIndex;
-import fun.expression.reference.RefItem;
-import fun.expression.reference.RefName;
-import fun.expression.reference.RefTemplCall;
-import fun.expression.reference.Reference;
-import fun.function.FuncFunction;
-import fun.function.FuncImpl;
-import fun.knowledge.KnowledgeBase;
-import fun.other.FunList;
+import evl.data.Evl;
+import evl.data.EvlList;
+import evl.data.expression.Expression;
+import evl.data.expression.Number;
+import evl.data.expression.reference.RefCall;
+import evl.data.expression.reference.RefIndex;
+import evl.data.expression.reference.RefItem;
+import evl.data.expression.reference.RefTemplCall;
+import evl.data.function.Function;
+import evl.data.function.header.FuncFunction;
+import evl.data.type.Type;
+import evl.data.type.base.BaseType;
+import evl.data.variable.Constant;
+import evl.data.variable.Variable;
+import evl.knowledge.KnowledgeBase;
+import evl.traverser.NullTraverser;
 import fun.traverser.Memory;
-import fun.type.Type;
-import fun.type.base.BaseType;
-import fun.variable.Constant;
-import fun.variable.Variable;
 
-public class RefEvaluator extends NullTraverser<Expression, Fun> {
+public class RefEvaluator extends NullTraverser<Expression, Evl> {
   final private Memory memory;
   final private KnowledgeBase kb;
 
@@ -50,38 +47,38 @@ public class RefEvaluator extends NullTraverser<Expression, Fun> {
     this.kb = kb;
   }
 
-  public static Fun execute(Reference ref, Memory memory, KnowledgeBase kb) {
-    if (ref.getLink() instanceof Constant) {
-      Fun val = ((Constant) ref.getLink()).getDef();
-      Fun item = RefEvaluator.execute(val, ref.getOffset(), memory, kb);
+  public static Evl execute(evl.data.expression.reference.Reference ref, Memory memory, KnowledgeBase kb) {
+    if (ref.link instanceof Constant) {
+      Evl val = ((evl.data.variable.Constant) ref.link).def;
+      Evl item = RefEvaluator.execute(val, ref.offset, memory, kb);
       return item;
-    } else if (ref.getLink() instanceof Variable) {
-      Expression val = memory.get((Variable) ref.getLink());
-      Fun item = RefEvaluator.execute(val, ref.getOffset(), memory, kb);
+    } else if (ref.link instanceof Variable) {
+      Expression val = memory.get((evl.data.variable.Variable) ref.link);
+      Evl item = RefEvaluator.execute(val, ref.offset, memory, kb);
       return item;
-    } else if (ref.getLink() instanceof FuncImpl) {
-      Fun item = RefEvaluator.execute(ref.getLink(), ref.getOffset(), memory, kb);
+    } else if (ref.link instanceof Function) {
+      Evl item = RefEvaluator.execute(ref.link, ref.offset, memory, kb);
       return item;
-    } else if (ref.getLink() instanceof Type) {
-      Fun item = RefEvaluator.execute(ref.getLink(), ref.getOffset(), memory, kb);
+    } else if (ref.link instanceof Type) {
+      Evl item = RefEvaluator.execute(ref.link, ref.offset, memory, kb);
       return item;
     } else {
-      assert (ref.getOffset().isEmpty());
-      return ref.getLink();
+      assert (ref.offset.isEmpty());
+      return ref.link;
     }
   }
 
-  public static Fun execute(Fun root, FunList<RefItem> offset, Memory memory, KnowledgeBase kb) {
+  public static Evl execute(Evl root, EvlList<RefItem> offset, Memory memory, KnowledgeBase kb) {
     RefEvaluator evaluator = new RefEvaluator(memory, kb);
 
-    for (RefItem ri : offset) {
+    for (evl.data.expression.reference.RefItem ri : offset) {
       root = evaluator.traverse(ri, root);
     }
     return root;
   }
 
   @Override
-  protected Expression visitDefault(Fun obj, Fun param) {
+  protected evl.data.expression.Expression visitDefault(Evl obj, Evl param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getName());
   }
 
@@ -89,14 +86,14 @@ public class RefEvaluator extends NullTraverser<Expression, Fun> {
     return (Expression) ExprEvaluator.evaluate(expr, memory, kb);
   }
 
-  private Expression call(FuncFunction func, FunList<Expression> value) {
+  private evl.data.expression.Expression call(FuncFunction func, EvlList<Expression> value) {
     return StmtExecutor.process(func, value, new Memory(), kb);
   }
 
   @Override
-  protected Expression visitRefCall(RefCall obj, Fun param) {
+  protected evl.data.expression.Expression visitRefCall(RefCall obj, Evl param) {
     if (param instanceof BaseType) {
-      FunList<Expression> values = obj.getActualParameter().getValue();
+      EvlList<Expression> values = obj.actualParameter.value;
       RError.ass(values.size() == 1, obj.getInfo(), "expected exactly 1 argument, got " + values.size());
       Expression value = eval(values.get(0));
       return CheckTypeCast.check((Type) param, value);
@@ -104,29 +101,29 @@ public class RefEvaluator extends NullTraverser<Expression, Fun> {
       // TODO add execution of type cast (see casual/ctfeCast.rzy)
       RError.ass(param instanceof FuncFunction, param.getInfo(), "expected funtion, got " + param.getClass().getName());
       FuncFunction func = (FuncFunction) param;
-      return call(func, obj.getActualParameter().getValue());
+      return call(func, obj.actualParameter.value);
     }
   }
 
   @Override
-  protected Expression visitRefName(RefName obj, Fun param) {
+  protected evl.data.expression.Expression visitRefName(evl.data.expression.reference.RefName obj, Evl param) {
     throw new RuntimeException("not yet implemented");
   }
 
   @Override
-  protected Expression visitRefIndex(RefIndex obj, Fun param) {
-    TupleValue value = (TupleValue) param;
+  protected evl.data.expression.Expression visitRefIndex(RefIndex obj, Evl param) {
+    evl.data.expression.TupleValue value = (evl.data.expression.TupleValue) param;
 
-    Expression idx = eval(obj.getIndex());
+    evl.data.expression.Expression idx = eval(obj.index);
     assert (idx instanceof Number);
-    int ii = ((Number) idx).getValue().intValue();
-    Expression elem = value.getValue().get(ii);
+    int ii = ((evl.data.expression.Number) idx).value.intValue();
+    evl.data.expression.Expression elem = value.value.get(ii);
 
     return elem;
   }
 
   @Override
-  protected Expression visitRefTemplCall(RefTemplCall obj, Fun param) {
+  protected evl.data.expression.Expression visitRefTemplCall(RefTemplCall obj, Evl param) {
     RError.err(ErrorType.Fatal, obj.getInfo(), "Can not evaluate template");
     return null;
   }

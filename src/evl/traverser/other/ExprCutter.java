@@ -96,7 +96,8 @@ class ExprCutterWorker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitDefault(Evl obj, Void param) {
-    // throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+    // throw new RuntimeException("not yet implemented: " +
+    // obj.getClass().getCanonicalName());
     return null;
   }
 
@@ -268,7 +269,8 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
   @Override
   protected Void visitWhileStmt(WhileStmt obj, List<Statement> param) {
     RError.err(ErrorType.Fatal, obj.getInfo(), "can not yet correctly split while statement");
-    // FIXME the following code is wrong. If we extract code from the condition, it has to go into all incoming edges of
+    // FIXME the following code is wrong. If we extract code from the condition,
+    // it has to go into all incoming edges of
     // the condition
     // => also in the body of the loop
     if (!KnowSimpleExpr.isSimple(obj.condition)) {

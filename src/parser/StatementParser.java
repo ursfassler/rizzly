@@ -25,29 +25,28 @@ import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
-import fun.Copy;
-import fun.expression.AnyValue;
-import fun.expression.Expression;
-import fun.expression.reference.Reference;
-import fun.other.FunList;
-import fun.statement.Assignment;
-import fun.statement.Block;
-import fun.statement.CallStmt;
-import fun.statement.CaseOpt;
-import fun.statement.CaseOptEntry;
-import fun.statement.CaseOptRange;
-import fun.statement.CaseOptValue;
-import fun.statement.CaseStmt;
-import fun.statement.ForStmt;
-import fun.statement.IfOption;
-import fun.statement.IfStmt;
-import fun.statement.Return;
-import fun.statement.ReturnExpr;
-import fun.statement.ReturnVoid;
-import fun.statement.Statement;
-import fun.statement.VarDefStmt;
-import fun.statement.While;
-import fun.variable.FuncVariable;
+import evl.copy.Copy;
+import evl.data.EvlList;
+import evl.data.expression.AnyValue;
+import evl.data.expression.Expression;
+import evl.data.expression.reference.Reference;
+import evl.data.statement.AssignmentMulti;
+import evl.data.statement.Block;
+import evl.data.statement.CallStmt;
+import evl.data.statement.CaseOpt;
+import evl.data.statement.CaseOptEntry;
+import evl.data.statement.CaseOptRange;
+import evl.data.statement.CaseOptValue;
+import evl.data.statement.CaseStmt;
+import evl.data.statement.ForStmt;
+import evl.data.statement.IfOption;
+import evl.data.statement.IfStmt;
+import evl.data.statement.ReturnExpr;
+import evl.data.statement.ReturnVoid;
+import evl.data.statement.Statement;
+import evl.data.statement.VarDefInitStmt;
+import evl.data.statement.WhileStmt;
+import evl.data.variable.FuncVariable;
 
 public class StatementParser extends BaseParser {
 
@@ -55,28 +54,29 @@ public class StatementParser extends BaseParser {
     super(scanner);
   }
 
-  // EBNF block: { ( return | vardeclstmt | assignment | callstmt | ifstmt | whilestmt | casestmt | forstmt ) }
+  // EBNF block: { ( return | vardeclstmt | assignment | callstmt | ifstmt |
+  // whilestmt | casestmt | forstmt ) }
   protected Block parseBlock() {
     Block res = new Block(peek().getInfo());
     while (true) {
       switch (peek().getType()) {
         case RETURN:
-          res.getStatements().add(parseReturn());
+          res.statements.add(parseReturn());
           break;
         case IF:
-          res.getStatements().add(parseIf());
+          res.statements.add(parseIf());
           break;
         case WHILE:
-          res.getStatements().add(parseWhile());
+          res.statements.add(parseWhile());
           break;
         case CASE:
-          res.getStatements().add(parseCase());
+          res.statements.add(parseCase());
           break;
         case FOR:
-          res.getStatements().add(parseFor());
+          res.statements.add(parseFor());
           break;
         case IDENTIFIER:
-          res.getStatements().add(parseVardefOrAssignmentOrCallstmt());
+          res.statements.add(parseVardefOrAssignmentOrCallstmt());
           break;
         default:
           return res;
@@ -85,7 +85,7 @@ public class StatementParser extends BaseParser {
   }
 
   // EBNF vardefstmt: lhs ":" ref [ "=" expr ] ";"
-  private VarDefStmt parseVarDefStmt(FunList<Reference> lhs) {
+  private VarDefInitStmt parseVarDefStmt(EvlList<Reference> lhs) {
     ElementInfo info = expect(TokenType.COLON).getInfo();
     Reference type = expr().parseRef();
 
@@ -98,25 +98,26 @@ public class StatementParser extends BaseParser {
 
     expect(TokenType.SEMI);
 
-    FunList<FuncVariable> variables = new FunList<FuncVariable>();
+    EvlList<FuncVariable> variables = new EvlList<FuncVariable>();
     for (Reference ref : lhs) {
-      if (!ref.getOffset().isEmpty()) {
+      if (!ref.offset.isEmpty()) {
         RError.err(ErrorType.Error, ref.getInfo(), "expected identifier");
       }
 
       Reference ntype = Copy.copy(type);
-      FuncVariable var = new FuncVariable(ref.getInfo(), ref.getLink().getName(), ntype);
+      evl.data.variable.FuncVariable var = new FuncVariable(ref.getInfo(), ref.link.name, ntype);
       variables.add(var);
     }
 
-    return new VarDefStmt(info, variables, initial);
+    return new VarDefInitStmt(info, variables, initial);
   }
 
-  // EBNF casestmt: "case" expression "do" caseopt { caseopt } [ "else" block "end" ] "end"
+  // EBNF casestmt: "case" expression "do" caseopt { caseopt } [ "else" block
+  // "end" ] "end"
   private Statement parseCase() {
     Token tok = expect(TokenType.CASE);
 
-    FunList<CaseOpt> optlist = new FunList<CaseOpt>();
+    EvlList<CaseOpt> optlist = new EvlList<CaseOpt>();
 
     Expression cond = expr().parse();
     expect(TokenType.OF);
@@ -140,7 +141,7 @@ public class StatementParser extends BaseParser {
 
   // EBNF caseopt : caseoptval { "," caseoptval } ":" block "end"
   private CaseOpt parseCaseopt() {
-    FunList<CaseOptEntry> optval = new FunList<CaseOptEntry>();
+    EvlList<CaseOptEntry> optval = new EvlList<CaseOptEntry>();
     do {
       optval.add(parseCaseoptval());
     } while (consumeIfEqual(TokenType.COMMA));
@@ -170,7 +171,7 @@ public class StatementParser extends BaseParser {
     Block block = parseBlock();
     expect(TokenType.END);
 
-    While stmt = new While(tok.getInfo(), cond, block);
+    evl.data.statement.WhileStmt stmt = new WhileStmt(tok.getInfo(), cond, block);
     return stmt;
   }
 
@@ -192,29 +193,30 @@ public class StatementParser extends BaseParser {
     return new ForStmt(tok.getInfo(), var, block);
   }
 
-  // EBNF ifstmt: "if" expression "then" block { "ef" expression "then" block } [ "else" block ] "end"
+  // EBNF ifstmt: "if" expression "then" block { "ef" expression "then" block }
+  // [ "else" block ] "end"
   private Statement parseIf() {
     Token tok = expect(TokenType.IF);
 
-    IfStmt stmt = new IfStmt(tok.getInfo());
+    evl.data.statement.IfStmt stmt = new IfStmt(tok.getInfo());
 
     {
       Expression expr = expr().parse();
       expect(TokenType.THEN);
       Block block = parseBlock();
-      stmt.addOption(new IfOption(expr.getInfo(), expr, block));
+      stmt.option.add(new IfOption(expr.getInfo(), expr, block));
     }
 
     while (consumeIfEqual(TokenType.EF)) {
       Expression expr = expr().parse();
       expect(TokenType.THEN);
       Block block = parseBlock();
-      stmt.addOption(new IfOption(expr.getInfo(), expr, block));
+      stmt.option.add(new IfOption(expr.getInfo(), expr, block));
     }
 
     while (consumeIfEqual(TokenType.ELSE)) {
       Block block = parseBlock();
-      stmt.setDefblock(block);
+      stmt.defblock = block;
     }
 
     expect(TokenType.END);
@@ -225,7 +227,7 @@ public class StatementParser extends BaseParser {
   // EBNF return: "return" [ expression ] ";"
   private Statement parseReturn() {
     Token tok = expect(TokenType.RETURN);
-    Return ret;
+    evl.data.statement.Return ret;
     if (peek().getType() != TokenType.SEMI) {
       ret = new ReturnExpr(tok.getInfo(), expr().parse());
     } else {
@@ -236,7 +238,7 @@ public class StatementParser extends BaseParser {
   }
 
   private Statement parseVardefOrAssignmentOrCallstmt() {
-    FunList<Reference> lhs = parseLhs();
+    EvlList<Reference> lhs = parseLhs();
     Token tok = peek();
     switch (tok.getType()) {
       case COLON: {
@@ -258,8 +260,8 @@ public class StatementParser extends BaseParser {
   }
 
   // EBNF lhs: varref { "," varref }
-  private FunList<Reference> parseLhs() {
-    FunList<Reference> lhs = new FunList<Reference>();
+  private EvlList<Reference> parseLhs() {
+    EvlList<Reference> lhs = new EvlList<Reference>();
     do {
       lhs.add(expr().parseRef());
     } while (consumeIfEqual(TokenType.COMMA));
@@ -267,11 +269,11 @@ public class StatementParser extends BaseParser {
   }
 
   // EBNF assignment: lhs ":=" expr ";"
-  private Assignment parseAssignment(FunList<Reference> ref) {
+  private AssignmentMulti parseAssignment(EvlList<Reference> ref) {
     Token tok = expect(TokenType.BECOMES);
     Expression rhs = expr().parse();
     expect(TokenType.SEMI);
-    return new Assignment(tok.getInfo(), ref, rhs);
+    return new AssignmentMulti(tok.getInfo(), ref, rhs);
   }
 
 }

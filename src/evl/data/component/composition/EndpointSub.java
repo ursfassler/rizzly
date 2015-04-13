@@ -19,13 +19,15 @@ package evl.data.component.composition;
 
 import common.ElementInfo;
 
+import evl.data.component.Component;
+import evl.data.expression.reference.SimpleRef;
 import evl.data.function.Function;
 
 final public class EndpointSub extends Endpoint {
-  final public CompUse component;
+  final public SimpleRef<CompUse> component;
   final public String function;
 
-  public EndpointSub(ElementInfo info, CompUse component, String function) {
+  public EndpointSub(ElementInfo info, SimpleRef<CompUse> component, String function) {
     super(info);
     this.component = component;
     this.function = function;
@@ -33,12 +35,13 @@ final public class EndpointSub extends Endpoint {
 
   @Override
   public Function getFunc() {
-    return component.instref.link.iface.find(function);
+    Component comp = (Component) component.link.compRef.getTarget();
+    return comp.iface.find(function);
   }
 
   @Override
   public String toString() {
-    return component.name + "." + function;
+    return component.link.name + "." + function;
   }
 
 }

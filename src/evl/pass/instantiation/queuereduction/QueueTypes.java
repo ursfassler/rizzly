@@ -36,6 +36,7 @@ import evl.data.type.composed.NamedElement;
 import evl.data.type.composed.RecordType;
 import evl.data.type.composed.UnionType;
 import evl.knowledge.KnowParent;
+import evl.knowledge.KnowPath;
 import evl.knowledge.KnowledgeBase;
 
 class QueueTypes {
@@ -50,6 +51,7 @@ class QueueTypes {
   final private String prefix;
   final private ElementInfo info;
   final private KnowParent kp;
+  final private KnowPath kpath;
 
   public QueueTypes(String prefix, Map<Function, RecordType> funcToRecord, ElementInfo info, KnowledgeBase kb) {
     super();
@@ -57,6 +59,7 @@ class QueueTypes {
     this.funcToRecord = funcToRecord;
     this.info = info;
     this.kp = kb.getEntry(KnowParent.class);
+    this.kpath = kb.getEntry(KnowPath.class);
   }
 
   public void create(int queueLength) {
@@ -82,7 +85,7 @@ class QueueTypes {
   }
 
   private EnumElement createElemFromFunc(EvlList<NamedElement> unielem, Function func) {
-    Designator path = kp.getPath(func);
+    Designator path = kpath.get(func);
     assert (path.size() > 0);
     String name = new Designator(path, func.name).toString(Designator.NAME_SEP);
 

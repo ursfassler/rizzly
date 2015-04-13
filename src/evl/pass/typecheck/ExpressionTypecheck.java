@@ -84,7 +84,7 @@ public class ExpressionTypecheck extends DefTraverser<Void, Void> {
   }
 
   private void checkPositive(ElementInfo info, String op, Range range) {
-    if (range.getLow().compareTo(BigInteger.ZERO) < 0) {
+    if (range.low.compareTo(BigInteger.ZERO) < 0) {
       RError.err(ErrorType.Error, info, op + " only allowed for positive types");
     }
   }
@@ -143,7 +143,8 @@ public class ExpressionTypecheck extends DefTraverser<Void, Void> {
     }
 
     if (!(type instanceof BooleanType)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "Need boolean type for not, got: " + type.name);  // TODO otherwise
+      RError.err(ErrorType.Error, obj.getInfo(), "Need boolean type for not, got: " + type.name); // TODO
+                                                                                                  // otherwise
       // it is a bit
       // not
       return null;
@@ -284,7 +285,7 @@ public class ExpressionTypecheck extends DefTraverser<Void, Void> {
     super.visitDiv(obj, param);
     getRange(obj.left);
     Range rhs = getRange(obj.right);
-    if ((rhs.getLow().compareTo(BigInteger.ZERO) == 0) && (rhs.getHigh().compareTo(BigInteger.ZERO) == 0)) {
+    if ((rhs.low.compareTo(BigInteger.ZERO) == 0) && (rhs.high.compareTo(BigInteger.ZERO) == 0)) {
       RError.err(ErrorType.Error, obj.getInfo(), "division by zero");
     }
     return null;
@@ -303,9 +304,11 @@ public class ExpressionTypecheck extends DefTraverser<Void, Void> {
     super.visitMod(obj, param);
     Range lhs = getRange(obj.left);
     Range rhs = getRange(obj.right);
-    checkPositive(obj.getInfo(), "mod", lhs); // TODO implement mod correctly (and not with 'urem' instruction) and
+    checkPositive(obj.getInfo(), "mod", lhs); // TODO implement mod correctly
+                                              // (and not with 'urem'
+                                              // instruction) and
     // remove this check
-    if (rhs.getLow().compareTo(BigInteger.ZERO) <= 0) {
+    if (rhs.low.compareTo(BigInteger.ZERO) <= 0) {
       RError.err(ErrorType.Error, obj.getInfo(), "right side of mod has to be greater than 0");
     }
     return null;

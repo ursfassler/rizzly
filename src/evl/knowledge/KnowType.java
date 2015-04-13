@@ -63,6 +63,7 @@ import evl.data.expression.binop.Shr;
 import evl.data.expression.reference.RefItem;
 import evl.data.expression.reference.Reference;
 import evl.data.expression.reference.SimpleRef;
+import evl.data.expression.reference.TypeRef;
 import evl.data.expression.unop.BitNot;
 import evl.data.expression.unop.LogicNot;
 import evl.data.expression.unop.Uminus;
@@ -93,7 +94,7 @@ public class KnowType extends KnowledgeEntry {
 
   @Override
   public void init(KnowledgeBase base) {
-    ktt = new KnowTypeTraverser(base);
+    ktt = new KnowTypeTraverser(this, base);
   }
 
   public Type get(Evl evl) {
@@ -108,11 +109,11 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
   final private RefTypeGetter rtg;
   final private KnowParent kp;
 
-  public KnowTypeTraverser(KnowledgeBase kb) {
+  public KnowTypeTraverser(KnowType kt, KnowledgeBase kb) {
     super();
     kbi = kb.getEntry(KnowBaseItem.class);
     kp = kb.getEntry(KnowParent.class);
-    rtg = new RefTypeGetter(kb);
+    rtg = new RefTypeGetter(kt, kb);
   }
 
   private void checkPositive(ElementInfo info, String op, Range lhs, Range rhs) {
@@ -121,7 +122,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
   }
 
   private void checkPositive(ElementInfo info, String op, Range range) {
-    if (range.getLow().compareTo(BigInteger.ZERO) < 0) {
+    if (range.low.compareTo(BigInteger.ZERO) < 0) {
       RError.err(ErrorType.Error, info, op + " only allowed for positive types");
     }
   }
@@ -144,7 +145,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitNamedElement(NamedElement obj, Void param) {
-    return visit(obj.ref, param);
+    return visit(obj.typeref, param);
   }
 
   @Override
@@ -154,9 +155,9 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitFunction(Function obj, Void param) {
-    EvlList<SimpleRef<Type>> arg = new EvlList<SimpleRef<Type>>();
+    EvlList<TypeRef> arg = new EvlList<TypeRef>();
     for (FuncVariable var : obj.param) {
-      arg.add(new SimpleRef<Type>(ElementInfo.NO, var.type.link));
+      arg.add(new SimpleRef<Type>(ElementInfo.NO, visit(var.type, null)));
     }
     return new FunctionType(obj.getInfo(), obj.name, arg, new SimpleRef<Type>(ElementInfo.NO, visit(obj.ret, param)));
   }
@@ -206,9 +207,9 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     if (obj.value.size() == 1) {
       return visit(obj.value.get(0), param);
     } else {
-      EvlList<SimpleRef<Type>> elem = new EvlList<SimpleRef<Type>>();
+      EvlList<TypeRef> elem = new EvlList<TypeRef>();
       for (Expression expr : obj.value) {
-        SimpleRef<Type> ref = new SimpleRef<Type>(expr.getInfo(), visit(expr, null));
+        TypeRef ref = new SimpleRef<Type>(expr.getInfo(), visit(expr, null));
         elem.add(ref);
       }
       return new TupleType(obj.getInfo(), "", elem);
@@ -222,7 +223,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitEnumElement(EnumElement obj, Void param) {
-    Evl parent = kp.getParent(obj);
+    Evl parent = kp.get(obj);
     assert (parent instanceof EnumType);
     return (EnumType) parent;
   }
@@ -248,14 +249,14 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitCompUse(CompUse obj, Void param) {
-    return visit(obj.instref, param);
+    return visit(obj.compRef, param);
   }
 
   @Override
   protected Type visitFuncReturnTuple(FuncReturnTuple obj, Void param) {
     EvlList<NamedElement> types = new EvlList<NamedElement>();
     for (FuncVariable var : obj.param) {
-      types.add(new NamedElement(ElementInfo.NO, var.name, new SimpleRef<Type>(ElementInfo.NO, visit(var, param))));
+      types.add(new NamedElement(ElementInfo.NO, var.name, var.type));
     }
     return new RecordType(obj.getInfo(), "", types);
   }
@@ -291,8 +292,8 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     Range lr = ((RangeType) lhs).range;
     Range rr = ((RangeType) rhs).range;
 
-    BigInteger high = lr.getHigh().shiftLeft(ExpressionTypecheck.getAsInt(rr.getHigh(), "shl"));
-    BigInteger low = lr.getLow().shiftLeft(ExpressionTypecheck.getAsInt(rr.getLow(), "shl"));
+    BigInteger high = lr.high.shiftLeft(ExpressionTypecheck.getAsInt(rr.high, "shl"));
+    BigInteger low = lr.low.shiftLeft(ExpressionTypecheck.getAsInt(rr.low, "shl"));
 
     return kbi.getRangeType(new Range(low, high));
   }
@@ -308,8 +309,8 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     Range lr = ((RangeType) lhs).range;
     Range rr = ((RangeType) rhs).range;
 
-    BigInteger high = lr.getHigh().shiftRight(ExpressionTypecheck.getAsInt(rr.getHigh(), "shl"));
-    BigInteger low = lr.getLow().shiftRight(ExpressionTypecheck.getAsInt(rr.getLow(), "shl"));
+    BigInteger high = lr.high.shiftRight(ExpressionTypecheck.getAsInt(rr.high, "shl"));
+    BigInteger low = lr.low.shiftRight(ExpressionTypecheck.getAsInt(rr.low, "shl"));
 
     return kbi.getRangeType(new Range(low, high));
   }
@@ -325,8 +326,8 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     Range lr = ((RangeType) lhs).range;
     Range rr = ((RangeType) rhs).range;
 
-    BigInteger low = lr.getLow().add(rr.getLow());
-    BigInteger high = lr.getHigh().add(rr.getHigh());
+    BigInteger low = lr.low.add(rr.low);
+    BigInteger high = lr.high.add(rr.high);
 
     return kbi.getRangeType(new Range(low, high));
   }
@@ -342,8 +343,8 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     Range lr = ((RangeType) lhs).range;
     Range rr = ((RangeType) rhs).range;
 
-    BigInteger low = lr.getLow().subtract(rr.getHigh());
-    BigInteger high = lr.getHigh().subtract(rr.getLow());
+    BigInteger low = lr.low.subtract(rr.high);
+    BigInteger high = lr.high.subtract(rr.low);
 
     return kbi.getRangeType(new Range(low, high));
 
@@ -386,13 +387,13 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
   private Type bitOr(ElementInfo info, Range lhs, Range rhs) {
     checkPositive(info, "or", lhs, rhs);
 
-    BigInteger bigger = lhs.getHigh().max(rhs.getHigh());
-    BigInteger smaller = lhs.getHigh().min(rhs.getHigh());
+    BigInteger bigger = lhs.high.max(rhs.high);
+    BigInteger smaller = lhs.high.min(rhs.high);
 
     int bits = ExpressionTypecheck.bitCount(smaller);
     BigInteger ones = ExpressionTypecheck.makeOnes(bits);
     BigInteger high = bigger.or(ones);
-    BigInteger low = lhs.getLow().max(rhs.getLow());
+    BigInteger low = lhs.low.max(rhs.low);
 
     return kbi.getRangeType(new Range(low, high));
   }
@@ -409,7 +410,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
 
       checkPositive(obj.getInfo(), "xor", lhs, rhs);
 
-      BigInteger bigger = lhs.getHigh().max(rhs.getHigh());
+      BigInteger bigger = lhs.high.max(rhs.high);
 
       int bits = ExpressionTypecheck.bitCount(bigger);
       BigInteger ones = ExpressionTypecheck.makeOnes(bits);
@@ -444,7 +445,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
 
   private Type bitAnd(ElementInfo info, Range lhs, Range rhs) {
     checkPositive(info, "and", lhs, rhs);
-    BigInteger high = lhs.getHigh().min(rhs.getHigh()); // TODO ok?
+    BigInteger high = lhs.high.min(rhs.high); // TODO ok?
     return kbi.getRangeType(new Range(BigInteger.ZERO, high));
   }
 
@@ -478,11 +479,14 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     Range lr = ((RangeType) lhs).range;
     Range rr = ((RangeType) rhs).range;
 
-    assert (lr.getLow().compareTo(BigInteger.ZERO) >= 0); // TODO implement mod correctly for negative numbers
-    assert (rr.getLow().compareTo(BigInteger.ZERO) > 0); // type checker has to find this
+    assert (lr.low.compareTo(BigInteger.ZERO) >= 0); // TODO implement mod
+    // correctly for
+    // negative numbers
+    assert (rr.low.compareTo(BigInteger.ZERO) > 0); // type checker has to
+    // find this
 
     BigInteger low = BigInteger.ZERO;
-    BigInteger high = lr.getHigh().min(rr.getHigh().subtract(BigInteger.ONE));
+    BigInteger high = lr.high.min(rr.high.subtract(BigInteger.ONE));
 
     return kbi.getRangeType(new Range(low, high));
   }
@@ -500,8 +504,8 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
 
     // FIXME correct when values are negative?
 
-    BigInteger low = lr.getLow().multiply(rr.getLow());
-    BigInteger high = lr.getHigh().multiply(rr.getHigh());
+    BigInteger low = lr.low.multiply(rr.low);
+    BigInteger high = lr.high.multiply(rr.high);
 
     return kbi.getRangeType(new Range(low, high));
   }
@@ -517,12 +521,12 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     Range lr = ((RangeType) lhs).range;
     Range rr = ((RangeType) rhs).range;
 
-    if ((lr.getLow().compareTo(BigInteger.ZERO) < 0) || (rr.getLow().compareTo(BigInteger.ZERO) < 0)) {
+    if ((lr.low.compareTo(BigInteger.ZERO) < 0) || (rr.low.compareTo(BigInteger.ZERO) < 0)) {
       RError.err(ErrorType.Fatal, obj.getInfo(), "sorry, I am too lazy to check for negative numbers");
     }
 
-    BigInteger rhigh = rr.getHigh();
-    BigInteger rlow = rr.getLow();
+    BigInteger rhigh = rr.high;
+    BigInteger rlow = rr.low;
 
     assert ((rlow.compareTo(BigInteger.ZERO) != 0) || (rhigh.compareTo(BigInteger.ZERO) != 0));
 
@@ -534,8 +538,8 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
       rlow = rlow.add(BigInteger.ONE);
     }
 
-    BigInteger low = lr.getLow().divide(rhigh);
-    BigInteger high = lr.getHigh().divide(rlow);
+    BigInteger low = lr.low.divide(rhigh);
+    BigInteger high = lr.high.divide(rlow);
 
     return kbi.getRangeType(new Range(low, high));
   }
@@ -551,10 +555,10 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     assert (type instanceof RangeType);
 
     Range range = ((RangeType) type).range;
-    assert (range.getLow().equals(BigInteger.ZERO));
-    int bits = range.getHigh().bitCount();
+    assert (range.low.equals(BigInteger.ZERO));
+    int bits = range.high.bitCount();
     BigInteger exp = BigInteger.valueOf(2).pow(bits).subtract(BigInteger.ONE);
-    assert (exp.equals(range.getHigh()));
+    assert (exp.equals(range.high));
 
     return type;
   }
@@ -564,8 +568,8 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     Type lhs = visit(obj.expr, param);
     assert (lhs instanceof RangeType);
     Range lr = ((RangeType) lhs).range;
-    BigInteger low = BigInteger.ZERO.subtract(lr.getHigh());
-    BigInteger high = BigInteger.ZERO.subtract(lr.getLow());
+    BigInteger low = BigInteger.ZERO.subtract(lr.high);
+    BigInteger high = BigInteger.ZERO.subtract(lr.low);
     return kbi.getRangeType(new Range(low, high));
   }
 

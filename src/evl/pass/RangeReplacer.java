@@ -68,7 +68,10 @@ class RangeReplacerWorker extends NullTraverser<Void, Void> {
   private final Map<Integer, SIntType> signed = new HashMap<Integer, SIntType>();
   private final Map<Integer, UIntType> unsigned = new HashMap<Integer, UIntType>();
   private final Map<RangeType, Type> map = new HashMap<RangeType, Type>();
-  private final int allowedByteSizes[] = { 1, 2, 4, 8 }; // TODO make a parameter (is probably target specific)
+  private final int allowedByteSizes[] = { 1, 2, 4, 8 }; // TODO make a
+                                                         // parameter (is
+                                                         // probably target
+                                                         // specific)
 
   public Map<Integer, SIntType> getSigned() {
     return signed;
@@ -101,12 +104,12 @@ class RangeReplacerWorker extends NullTraverser<Void, Void> {
   protected Void visitRangeType(RangeType obj, Void param) {
     // TODO implement also for signed
     // TODO add range offset movement (i.e. move R{10,20} to R{0,10})
-    BigInteger low = obj.range.getLow();
+    BigInteger low = obj.range.low;
     boolean hasNeg = low.compareTo(BigInteger.ZERO) < 0; // TODO ok?
     if (hasNeg) {
       low = low.add(BigInteger.ONE).abs();
     }
-    BigInteger max = low.max(obj.range.getHigh());
+    BigInteger max = low.max(obj.range.high);
     int bits = ExpressionTypecheck.bitCount(max);
     if (hasNeg) {
       bits++;

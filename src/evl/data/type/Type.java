@@ -20,9 +20,10 @@ package evl.data.type;
 import common.ElementInfo;
 
 import evl.data.Named;
-import evl.data.component.hfsm.StateItem;
+import evl.data.component.hfsm.StateContent;
+import fun.other.ActualTemplateArgument;
 
-abstract public class Type extends Named implements StateItem {
+abstract public class Type extends Named implements StateContent, ActualTemplateArgument {
   public Type(ElementInfo info, String name) {
     super(info, name);
   }

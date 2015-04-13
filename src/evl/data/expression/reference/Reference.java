@@ -19,10 +19,11 @@ package evl.data.expression.reference;
 
 import common.ElementInfo;
 
+import evl.data.Evl;
 import evl.data.EvlList;
 import evl.data.Named;
 
-final public class Reference extends BaseRef<Named> {
+public class Reference extends BaseRef<Named> {
   public final EvlList<RefItem> offset;
 
   public Reference(ElementInfo info, Named link, EvlList<RefItem> offset) {
@@ -44,6 +45,11 @@ final public class Reference extends BaseRef<Named> {
     this.offset = new EvlList<RefItem>();
   }
 
+  public Reference(ElementInfo info, String name) {
+    super(info, new DummyLinkTarget(info, name));
+    this.offset = new EvlList<RefItem>();
+  }
+
   @Override
   public String toString() {
     String ret = super.toString();
@@ -51,6 +57,12 @@ final public class Reference extends BaseRef<Named> {
       ret += item.toString();
     }
     return ret;
+  }
+
+  @Override
+  public Evl getTarget() {
+    assert (offset.isEmpty()); // FIXME make it correct or remove function
+    return link;
   }
 
 }

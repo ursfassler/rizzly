@@ -18,8 +18,8 @@
 package fun.traverser.spezializer;
 
 import util.Pair;
-import fun.Fun;
-import fun.expression.Expression;
+import evl.data.Evl;
+import evl.data.expression.Expression;
 import fun.traverser.ExprReplacer;
 
 public class ValueReplacer extends ExprReplacer<Pair<Expression, Expression>> {
@@ -30,7 +30,7 @@ public class ValueReplacer extends ExprReplacer<Pair<Expression, Expression>> {
   }
 
   @Override
-  protected Expression visit(Fun obj, Pair<Expression, Expression> param) {
+  protected evl.data.expression.Expression visit(Evl obj, Pair<Expression, Expression> param) {
     if (obj == param.first) {
       return param.second;
     } else {

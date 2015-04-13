@@ -22,10 +22,10 @@ import error.ErrorType;
 import error.RError;
 import evl.data.Namespace;
 import evl.data.component.Component;
-import evl.data.function.header.FuncCtrlInDataIn;
-import evl.data.function.header.FuncCtrlInDataOut;
-import evl.data.function.header.FuncCtrlOutDataIn;
-import evl.data.function.header.FuncCtrlOutDataOut;
+import evl.data.function.header.FuncQuery;
+import evl.data.function.header.FuncResponse;
+import evl.data.function.header.FuncSignal;
+import evl.data.function.header.FuncSlot;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.other.ClassGetter;
 
@@ -41,8 +41,8 @@ public class Usefullness extends EvlPass {
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
     for (Component comp : ClassGetter.getRecursive(Component.class, evl)) {
-      boolean inEmpty = comp.iface.getItems(FuncCtrlInDataIn.class).isEmpty() && comp.iface.getItems(FuncCtrlOutDataIn.class).isEmpty();
-      boolean outEmpty = comp.iface.getItems(FuncCtrlOutDataOut.class).isEmpty() && comp.iface.getItems(FuncCtrlInDataOut.class).isEmpty();
+      boolean inEmpty = ClassGetter.filter(FuncSlot.class, comp.iface).isEmpty() && ClassGetter.filter(FuncQuery.class, comp.iface).isEmpty();
+      boolean outEmpty = ClassGetter.filter(FuncSignal.class, comp.iface).isEmpty() && ClassGetter.filter(FuncResponse.class, comp.iface).isEmpty();
       String name = comp.name;
       if (inEmpty && outEmpty) {
         RError.err(ErrorType.Warning, comp.getInfo(), "Component " + name + " has no input and no output data flow");

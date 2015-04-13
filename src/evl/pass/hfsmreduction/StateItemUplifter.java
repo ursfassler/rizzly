@@ -28,9 +28,9 @@ import evl.data.Evl;
 import evl.data.Namespace;
 import evl.data.component.hfsm.ImplHfsm;
 import evl.data.component.hfsm.State;
-import evl.data.component.hfsm.StateItem;
-import evl.data.function.header.FuncPrivateRet;
-import evl.data.function.header.FuncPrivateVoid;
+import evl.data.component.hfsm.StateContent;
+import evl.data.function.header.FuncFunction;
+import evl.data.function.header.FuncProcedure;
 import evl.data.type.Type;
 import evl.data.variable.ConstPrivate;
 import evl.knowledge.KnowledgeBase;
@@ -55,7 +55,7 @@ public class StateItemUplifter extends EvlPass {
 }
 
 class StateItemUplifterWorker extends NullTraverser<Void, Designator> {
-  final private List<StateItem> func = new ArrayList<StateItem>();
+  final private List<StateContent> func = new ArrayList<StateContent>();
 
   public StateItemUplifterWorker(KnowledgeBase kb) {
     super();
@@ -63,7 +63,7 @@ class StateItemUplifterWorker extends NullTraverser<Void, Designator> {
 
   @Override
   protected Void visitDefault(Evl obj, Designator param) {
-    if (obj instanceof StateItem) {
+    if (obj instanceof StateContent) {
       return null;
     } else {
       throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
@@ -80,7 +80,8 @@ class StateItemUplifterWorker extends NullTraverser<Void, Designator> {
   @Override
   protected Void visitState(State obj, Designator param) {
     param = new Designator(param, obj.name);
-    // visit(obj.getEntryCode(), param);//TODO correct? It is no longer a function and should not exist at this point
+    // visit(obj.getEntryCode(), param);//TODO correct? It is no longer a
+    // function and should not exist at this point
     // visit(obj.getExitCode(), param);
     visitList(obj.item, param);
 
@@ -90,7 +91,7 @@ class StateItemUplifterWorker extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitFuncPrivateVoid(FuncPrivateVoid obj, Designator param) {
+  protected Void visitFuncProcedure(FuncProcedure obj, Designator param) {
     param = new Designator(param, obj.name);
     obj.name = param.toString(Designator.NAME_SEP);
     func.add(obj);
@@ -98,7 +99,7 @@ class StateItemUplifterWorker extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitFuncPrivateRet(FuncPrivateRet obj, Designator param) {
+  protected Void visitFuncFunction(FuncFunction obj, Designator param) {
     param = new Designator(param, obj.name);
     obj.name = param.toString(Designator.NAME_SEP);
     func.add(obj);

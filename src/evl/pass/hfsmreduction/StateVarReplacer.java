@@ -32,13 +32,14 @@ import evl.data.component.hfsm.Transition;
 import evl.data.expression.reference.RefName;
 import evl.data.expression.reference.Reference;
 import evl.data.expression.reference.SimpleRef;
-import evl.data.function.header.FuncPrivateRet;
-import evl.data.function.header.FuncPrivateVoid;
+import evl.data.function.header.FuncFunction;
+import evl.data.function.header.FuncProcedure;
 import evl.data.type.Type;
 import evl.data.type.composed.NamedElement;
 import evl.data.variable.Constant;
 import evl.data.variable.StateVariable;
 import evl.data.variable.Variable;
+import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.DefTraverser;
 import evl.traverser.other.ClassGetter;
@@ -63,9 +64,11 @@ public class StateVarReplacer extends EvlPass {
   }
 
   protected void process(ImplHfsm obj, KnowledgeBase kb) {
-    StateTypeBuilder stb = new StateTypeBuilder();
+    KnowType kt = kb.getEntry(KnowType.class);
+
+    StateTypeBuilder stb = new StateTypeBuilder(kb);
     NamedElement elem = stb.traverse(obj.topstate, new EvlList<NamedElement>());
-    Type stateType = elem.ref.link;
+    Type stateType = kt.get(elem.typeref);
 
     obj.topstate.initial = new SimpleRef<State>(ElementInfo.NO, InitStateGetter.get(obj.topstate));
 
@@ -89,12 +92,14 @@ class StateVarReplacerWorker extends DefTraverser<Void, Void> {
   final private Variable dataVar;
   final private Map<StateVariable, EvlList<NamedElement>> epath;
   final private RefTypeGetter rtg;
+  final private KnowType kt;
 
   public StateVarReplacerWorker(Variable dataVar, Map<StateVariable, EvlList<NamedElement>> epath, KnowledgeBase kb) {
     super();
     this.epath = epath;
     this.dataVar = dataVar;
-    rtg = new RefTypeGetter(kb);
+    kt = kb.getEntry(KnowType.class);
+    rtg = new RefTypeGetter(kt, kb);
   }
 
   @Override
@@ -117,13 +122,13 @@ class StateVarReplacerWorker extends DefTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncPrivateVoid(FuncPrivateVoid obj, Void param) {
+  protected Void visitFuncProcedure(FuncProcedure obj, Void param) {
     visit(obj.body, param);
     return null;
   }
 
   @Override
-  protected Void visitFuncPrivateRet(FuncPrivateRet obj, Void param) {
+  protected Void visitFuncFunction(FuncFunction obj, Void param) {
     visit(obj.body, param);
     return null;
   }
@@ -139,15 +144,16 @@ class StateVarReplacerWorker extends DefTraverser<Void, Void> {
       EvlList<NamedElement> eofs = epath.get(obj.link);
       assert (eofs != null);
 
-      assert (obj.offset.isEmpty()); // FIXME not always true (e.g. for access to struct)
+      assert (obj.offset.isEmpty()); // FIXME not always true (e.g. for access
+      // to struct)
 
-      Type type = dataVar.type.link;
+      Type type = kt.get(dataVar.type);
 
       obj.link = dataVar;
       for (NamedElement itr : eofs) {
         RefName ref = new RefName(ElementInfo.NO, itr.name);
 
-        type = rtg.traverse(ref, type);  // sanity check
+        type = rtg.traverse(ref, type); // sanity check
 
         obj.offset.add(ref);
       }

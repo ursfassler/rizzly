@@ -27,7 +27,7 @@ import evl.data.type.base.BaseType;
  * @author urs
  *
  */
-final public class NaturalType extends BaseType {
+public class NaturalType extends BaseType {
   final static public String NAME = "Natural";
 
   public NaturalType() {

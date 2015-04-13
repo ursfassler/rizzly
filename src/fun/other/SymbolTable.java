@@ -23,7 +23,8 @@ import java.util.Map;
 
 import error.ErrorType;
 import error.RError;
-import fun.Fun;
+import evl.data.Evl;
+import evl.data.Named;
 
 /**
  *
@@ -56,26 +57,26 @@ public class SymbolTable {
     return find(name, true);
   }
 
-  public void addAll(Collection<? extends Fun> syms) {
-    for (Fun itr : syms) {
+  public void addAll(Collection<? extends Evl> syms) {
+    for (Evl itr : syms) {
       add(itr);
     }
   }
 
   public void add(Named obj) {
-    Fun old = find(obj.getName(), false);
+    Evl old = find(obj.name, false);
     if (old != null) {
-      if (old instanceof Fun) {
+      if (old instanceof Evl) {
         RError.err(ErrorType.Hint, old.getInfo(), "First definition was here");
-        RError.err(ErrorType.Error, obj.getInfo(), "Entry already defined: " + obj.getName());
+        RError.err(ErrorType.Error, obj.getInfo(), "Entry already defined: " + obj.name);
       } else {
-        RError.err(ErrorType.Error, "Entry already defined: " + obj.getName());
+        RError.err(ErrorType.Error, "Entry already defined: " + obj.name);
       }
     }
-    entries.put(obj.getName(), obj);
+    entries.put(obj.name, obj);
   }
 
-  public void add(Fun obj) {
+  public void add(Evl obj) {
     if (obj instanceof Named) {
       add((Named) obj);
     }

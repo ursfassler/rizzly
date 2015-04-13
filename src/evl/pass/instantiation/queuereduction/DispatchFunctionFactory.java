@@ -33,7 +33,7 @@ import evl.data.expression.reference.RefName;
 import evl.data.expression.reference.Reference;
 import evl.data.function.Function;
 import evl.data.function.FunctionProperty;
-import evl.data.function.header.FuncCtrlInDataIn;
+import evl.data.function.header.FuncSlot;
 import evl.data.function.ret.FuncReturnNone;
 import evl.data.statement.AssignmentSingle;
 import evl.data.statement.Block;
@@ -49,22 +49,31 @@ import evl.data.type.composed.NamedElement;
 import evl.data.type.composed.RecordType;
 import evl.data.type.composed.UnionType;
 import evl.data.variable.FuncVariable;
+import evl.knowledge.KnowType;
+import evl.knowledge.KnowledgeBase;
 
 class DispatchFunctionFactory {
-  static public Function create(String prefix, ElementInfo info, QueueVariables queueVariables, QueueTypes queueTypes) {
+  final private KnowType kt;
+
+  public DispatchFunctionFactory(KnowledgeBase kb) {
+    super();
+    this.kt = kb.getEntry(KnowType.class);
+  }
+
+  public Function create(String prefix, ElementInfo info, QueueVariables queueVariables, QueueTypes queueTypes) {
     Block body = createDispatchBody(queueVariables, queueTypes);
-    Function dispatcher = new FuncCtrlInDataIn(info, prefix + "dispatch", new EvlList<FuncVariable>(), new FuncReturnNone(info), body);
+    Function dispatcher = new FuncSlot(info, prefix + "dispatch", new EvlList<FuncVariable>(), new FuncReturnNone(info), body);
     dispatcher.property = FunctionProperty.Public;
     return dispatcher;
   }
 
-  static private Block createDispatchBody(QueueVariables queueVariables, QueueTypes queueTypes) {
+  private Block createDispatchBody(QueueVariables queueVariables, QueueTypes queueTypes) {
     ElementInfo info = ElementInfo.NO;
 
     Block body = new Block(info);
 
-    ArrayType dt = (ArrayType) queueVariables.getQueue().type.link;
-    UnionType ut = (UnionType) dt.type.link;
+    ArrayType dt = (ArrayType) kt.get(queueVariables.getQueue().type);
+    UnionType ut = (UnionType) kt.get(dt.type);
 
     EvlList<CaseOpt> opt = new EvlList<CaseOpt>();
     Reference ref = new Reference(info, queueVariables.getQueue());

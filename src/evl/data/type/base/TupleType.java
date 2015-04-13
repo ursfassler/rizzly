@@ -20,13 +20,12 @@ package evl.data.type.base;
 import common.ElementInfo;
 
 import evl.data.EvlList;
-import evl.data.expression.reference.SimpleRef;
-import evl.data.type.Type;
+import evl.data.expression.reference.TypeRef;
 
 public class TupleType extends BaseType {
-  final public EvlList<SimpleRef<Type>> types;
+  final public EvlList<TypeRef> types;
 
-  public TupleType(ElementInfo info, String name, EvlList<SimpleRef<Type>> types) {
+  public TupleType(ElementInfo info, String name, EvlList<TypeRef> types) {
     super(info, name);
     this.types = types;
   }

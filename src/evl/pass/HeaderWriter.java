@@ -63,7 +63,8 @@ public class HeaderWriter extends EvlPass {
     Namespace head = makeHeader(evl, kb.getDebugDir());
     Set<String> blacklist = makeBlacklist();
     Renamer.process(head, blacklist);
-    List<String> names = new ArrayList<String>();  // TODO get names from code (see MainEvl.addDebug)
+    List<String> names = new ArrayList<String>(); // TODO get names from code
+    // (see MainEvl.addDebug)
     printCHeader(kb.getOutDir(), head, names, kb);
     printFpcHeader(kb.getOutDir(), head, names, kb);
   }
@@ -87,7 +88,7 @@ public class HeaderWriter extends EvlPass {
     for (Function func : ClassGetter.filter(Function.class, prg.children)) {
       if ((func.property == FunctionProperty.Public) || (func.property == FunctionProperty.External)) {
         for (FuncVariable arg : func.param) {
-          anchor.add(arg.type.link);
+          anchor.add(((SimpleRef<Type>) arg.type).link);
         }
         anchor.add(func.ret);
 

@@ -21,7 +21,7 @@ import common.ElementInfo;
 
 import evl.data.expression.Expression;
 
-final public class RefIndex extends RefItem {
+public class RefIndex extends RefItem {
   public Expression index;
 
   public RefIndex(ElementInfo info, Expression index) {

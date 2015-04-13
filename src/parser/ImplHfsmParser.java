@@ -28,62 +28,69 @@ import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
-import fun.Fun;
-import fun.expression.BoolValue;
-import fun.expression.Expression;
-import fun.expression.reference.DummyLinkTarget;
-import fun.expression.reference.RefName;
-import fun.expression.reference.Reference;
-import fun.function.FuncHeader;
-import fun.hfsm.ImplHfsm;
-import fun.hfsm.State;
-import fun.hfsm.StateComposite;
-import fun.hfsm.StateContent;
-import fun.hfsm.StateSimple;
-import fun.hfsm.Transition;
-import fun.other.CompImpl;
+import evl.data.Evl;
+import evl.data.EvlList;
+import evl.data.component.hfsm.StateComposite;
+import evl.data.component.hfsm.StateContent;
+import evl.data.component.hfsm.StateSimple;
+import evl.data.component.hfsm.Transition;
+import evl.data.expression.BoolValue;
+import evl.data.expression.Expression;
+import evl.data.expression.reference.DummyLinkTarget;
+import evl.data.expression.reference.RefName;
+import evl.data.expression.reference.Reference;
+import evl.data.expression.reference.SimpleRef;
+import evl.data.function.Function;
+import evl.data.function.header.FuncProcedure;
+import evl.data.function.ret.FuncReturnNone;
+import evl.data.statement.Block;
+import evl.data.variable.ConstPrivate;
+import evl.data.variable.FuncVariable;
+import evl.data.variable.TemplateParameter;
+import fun.other.RawComponent;
+import fun.other.RawHfsm;
 import fun.other.Template;
-import fun.statement.Block;
-import fun.variable.ConstPrivate;
-import fun.variable.StateVariable;
-import fun.variable.TemplateParameter;
 
 public class ImplHfsmParser extends ImplBaseParser {
   public ImplHfsmParser(Scanner scanner) {
     super(scanner);
   }
 
-  public static CompImpl parse(Scanner scanner, String name) {
+  public static RawComponent parse(Scanner scanner, String name) {
     ImplHfsmParser parser = new ImplHfsmParser(scanner);
     return parser.parseImplementationHfsm(name);
   }
 
   // EBNF implementationComposition: "hfsm" "(" id ")" stateBody "end"
-  private CompImpl parseImplementationHfsm(String name) {
+  private RawComponent parseImplementationHfsm(String name) {
     ElementInfo info = expect(TokenType.HFSM).getInfo();
     expect(TokenType.OPENPAREN);
     String initial = expect(TokenType.IDENTIFIER).getData();
     expect(TokenType.CLOSEPAREN);
-    State top = new StateComposite(info, "!top", new Reference(info, new DummyLinkTarget(info, initial)));
+    FuncProcedure entry = makeProc("_entry"); // FIXME get names from outside
+    FuncProcedure exit = makeProc("_exit");// FIXME get names from outside
+    StateComposite top = new StateComposite(info, "!top", new SimpleRef<FuncProcedure>(info, entry), new SimpleRef<FuncProcedure>(info, exit), new Reference(info, new DummyLinkTarget(info, initial)));
+    top.item.add(entry);
+    top.item.add(exit);
     parseStateBody(top);
 
-    ImplHfsm implHfsm = new ImplHfsm(info, name, top);
+    RawHfsm implHfsm = new RawHfsm(info, name, top);
     return implHfsm;
   }
 
-  // EBNF stateBody: { entryCode | exitCode | varDeclBlock | funcDecl | transitionDecl | state }
-  private <T extends State> void parseStateBody(T state) {
-    Block entryBody = new Block(state.getInfo());
-    Block exitBody = new Block(state.getInfo());
-    initEntryExit(state, entryBody, exitBody);
+  // EBNF stateBody: { entryCode | exitCode | varDeclBlock | funcDecl |
+  // transitionDecl | state }
+  private <T extends evl.data.component.hfsm.State> void parseStateBody(evl.data.component.hfsm.State state) {
+    Block entryBody = state.entryFunc.link.body;
+    Block exitBody = state.exitFunc.link.body;
 
     while (!consumeIfEqual(TokenType.END)) {
       switch (peek().getType()) {
         case ENTRY:
-          entryBody.getStatements().add(parseEntryCode());
+          entryBody.statements.add(parseEntryCode());
           break;
         case EXIT:
-          exitBody.getStatements().add(parseExitCode());
+          exitBody.statements.add(parseExitCode());
           break;
         default:
           Token id = expect(TokenType.IDENTIFIER);
@@ -96,40 +103,40 @@ public class ImplHfsmParser extends ImplBaseParser {
               } else {
                 genpam = new ArrayList<TemplateParameter>();
               }
-              FuncHeader obj = parseStateDeclaration(id.getData());
-              state.getItemList().add(new Template(id.getInfo(), id.getData(), genpam, obj));
+              Function obj = parseStateDeclaration(id.getData());
+              state.item.add(new Template(id.getInfo(), id.getData(), genpam, obj));
               break;
             case COLON:
               expect(TokenType.COLON);
-              Fun inst = parseStateInstantiation(id.getData());
-              state.getItemList().add((StateContent) inst);
+              Evl inst = parseStateInstantiation(id.getData());
+              state.item.add((StateContent) inst);
               break;
             default:
-              state.getItemList().add(parseTransition(id));
+              state.item.add(parseTransition(id));
               break;
           }
       }
     }
   }
 
-  private Fun parseStateInstantiation(String name) {
+  private Evl parseStateInstantiation(String name) {
     switch (peek().getType()) {
       case STATE:
         return parseState(name);
       case CONST:
-        ConstPrivate con = parseConstDef(ConstPrivate.class, name);
+        evl.data.variable.ConstPrivate con = parseConstDef(ConstPrivate.class, name);
         expect(TokenType.SEMI);
         return con;
       case RESPONSE:
         return parseFuncDef(peek().getType(), name, false);
       default:
-        StateVariable var = parseStateVardef(name);
+        evl.data.variable.StateVariable var = parseStateVardef(name);
         expect(TokenType.SEMI);
         return var;
     }
   }
 
-  private FuncHeader parseStateDeclaration(String name) {
+  private Function parseStateDeclaration(String name) {
     switch (peek().getType()) {
       case FUNCTION:
       case PROCEDURE:
@@ -142,42 +149,47 @@ public class ImplHfsmParser extends ImplBaseParser {
     }
   }
 
-  private void initEntryExit(State state, Block entryBody, Block exitBody) {
-    state.setEntryFunc(entryBody);
-    state.setExitFunc(exitBody);
-  }
-
   // EBNF stateDecl: "state" ( ";" | ( [ "(" id ")" ] stateBody ) )
-  private State parseState(String name) {
+  private evl.data.component.hfsm.State parseState(String name) {
     ElementInfo info = expect(TokenType.STATE).getInfo();
 
-    State state;
+    evl.data.component.hfsm.State state;
+    FuncProcedure entry = makeProc("_entry"); // FIXME get names from outside
+    FuncProcedure exit = makeProc("_exit");// FIXME get names from outside
     if (consumeIfEqual(TokenType.SEMI)) {
-      state = new StateSimple(info, name);
-      initEntryExit(state, new Block(state.getInfo()), new Block(state.getInfo()));
+      state = new StateSimple(info, name, new SimpleRef<FuncProcedure>(info, entry), new SimpleRef<FuncProcedure>(info, exit));
+      state.item.add(entry);
+      state.item.add(exit);
     } else {
       if (consumeIfEqual(TokenType.OPENPAREN)) {
         String initial = expect(TokenType.IDENTIFIER).getData();
         expect(TokenType.CLOSEPAREN);
-        state = new StateComposite(info, name, new Reference(info, new DummyLinkTarget(info, initial)));
+        state = new StateComposite(info, name, new SimpleRef<FuncProcedure>(info, entry), new SimpleRef<FuncProcedure>(info, exit), new Reference(info, new DummyLinkTarget(info, initial)));
       } else {
-        state = new StateSimple(info, name);
+        state = new StateSimple(info, name, new SimpleRef<FuncProcedure>(info, entry), new SimpleRef<FuncProcedure>(info, exit));
       }
+      state.item.add(entry);
+      state.item.add(exit);
 
       parseStateBody(state);
     }
     return state;
   }
 
-  // EBNF transition: nameRef "to" nameRef "by" transitionEvent [ "if" expr ] ( ";" | "do" block "end" )
+  static private FuncProcedure makeProc(String name) {
+    return new FuncProcedure(ElementInfo.NO, name, new EvlList<FuncVariable>(), new FuncReturnNone(ElementInfo.NO), new Block(ElementInfo.NO));
+  }
+
+  // EBNF transition: nameRef "to" nameRef "by" transitionEvent [ "if" expr ] (
+  // ";" | "do" block "end" )
   private Transition parseTransition(Token id) {
     Reference src = parseNameRef(id);
     ElementInfo info = expect(TokenType.TO).getInfo();
     Reference dst = parseNameRef();
 
-    Transition ret = new Transition(info);
-    ret.setSrc(src);
-    ret.setDst(dst);
+    Transition ret = Transition.create(info);
+    ret.src = src;
+    ret.dst = dst;
 
     expect(TokenType.BY);
     parseTransitionEvent(ret);
@@ -188,7 +200,7 @@ public class ImplHfsmParser extends ImplBaseParser {
       } else {
         guard = new BoolValue(info, true);
       }
-      ret.setGuard(guard);
+      ret.guard = guard;
     }
     {
       Block body;
@@ -199,7 +211,7 @@ public class ImplHfsmParser extends ImplBaseParser {
         body = stmt().parseBlock();
         expect(TokenType.END);
       }
-      ret.setBody(body);
+      ret.body = body;
     }
     return ret;
   }
@@ -214,18 +226,18 @@ public class ImplHfsmParser extends ImplBaseParser {
 
     while (consumeIfEqual(TokenType.PERIOD)) {
       Token tok = expect(TokenType.IDENTIFIER);
-      ret.getOffset().add(new RefName(tok.getInfo(), tok.getData()));
+      ret.offset.add(new RefName(tok.getInfo(), tok.getData()));
     }
 
     return ret;
   }
 
   // EBNF transitionEvent: id vardeflist
-  private void parseTransitionEvent(Transition ret) {
+  private void parseTransitionEvent(evl.data.component.hfsm.Transition ret) {
     Token tok = expect(TokenType.IDENTIFIER);
     Reference name = new Reference(tok.getInfo(), tok.getData());
-    ret.setEvent(name);
-    ret.getParam().addAll(parseVardefList());
+    ret.eventFunc = name;
+    ret.param.addAll(parseVardefList());
   }
 
 }

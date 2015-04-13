@@ -25,6 +25,7 @@ import common.ElementInfo;
 import evl.data.EvlList;
 import evl.data.type.Type;
 
+//TODO cleanup, convert to data
 public class EnumType extends Type {
   final private EvlList<EnumElement> element = new EvlList<EnumElement>();
 

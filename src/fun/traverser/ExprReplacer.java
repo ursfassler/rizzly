@@ -21,40 +21,44 @@ import java.util.List;
 
 import error.ErrorType;
 import error.RError;
-import fun.DefTraverser;
-import fun.expression.AnyValue;
-import fun.expression.ArithmeticOp;
-import fun.expression.BoolValue;
-import fun.expression.Expression;
-import fun.expression.NamedElementsValue;
-import fun.expression.NamedValue;
-import fun.expression.Number;
-import fun.expression.Relation;
-import fun.expression.StringValue;
-import fun.expression.TupleValue;
-import fun.expression.UnaryExpression;
-import fun.expression.reference.RefCall;
-import fun.expression.reference.RefIndex;
-import fun.expression.reference.RefItem;
-import fun.expression.reference.RefName;
-import fun.expression.reference.RefTemplCall;
-import fun.expression.reference.Reference;
-import fun.hfsm.Transition;
+import evl.data.EvlList;
+import evl.data.component.composition.CompUse;
+import evl.data.component.hfsm.StateComposite;
+import evl.data.component.hfsm.StateSimple;
+import evl.data.component.hfsm.Transition;
+import evl.data.expression.Expression;
+import evl.data.expression.binop.And;
+import evl.data.expression.binop.ArithmeticOp;
+import evl.data.expression.binop.Or;
+import evl.data.expression.binop.Relation;
+import evl.data.expression.reference.CompRef;
+import evl.data.expression.reference.FuncRef;
+import evl.data.expression.reference.RefCall;
+import evl.data.expression.reference.RefIndex;
+import evl.data.expression.reference.RefTemplCall;
+import evl.data.expression.reference.Reference;
+import evl.data.expression.reference.SimpleRef;
+import evl.data.expression.reference.StateRef;
+import evl.data.expression.reference.TypeRef;
+import evl.data.expression.unop.UnaryExp;
+import evl.data.function.header.FuncProcedure;
+import evl.data.function.ret.FuncReturnType;
+import evl.data.statement.AssignmentMulti;
+import evl.data.statement.IfOption;
+import evl.data.statement.VarDefInitStmt;
+import evl.data.type.composed.NamedElement;
+import evl.data.variable.Variable;
+import evl.traverser.DefTraverser;
 import fun.other.ActualTemplateArgument;
-import fun.other.FunList;
-import fun.statement.Assignment;
-import fun.statement.CaseOptRange;
-import fun.statement.CaseOptValue;
-import fun.statement.CaseStmt;
-import fun.statement.IfOption;
-import fun.statement.ReturnExpr;
-import fun.statement.VarDefStmt;
-import fun.statement.While;
-import fun.type.composed.NamedElement;
-import fun.variable.Constant;
-import fun.variable.Variable;
 
 public class ExprReplacer<T> extends DefTraverser<Expression, T> {
+
+  @Override
+  protected Expression visitExpression(Expression obj, T param) {
+    Expression ret = super.visitExpression(obj, param);
+    assert (ret != null);
+    return ret;
+  }
 
   protected void visitExprList(List<Expression> list, T param) {
     for (int i = 0; i < list.size(); i++) {
@@ -68,33 +72,38 @@ public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitReference(Reference obj, T param) {
-    for (RefItem item : obj.getOffset()) {
+  protected Expression visitSimpleRef(SimpleRef obj, T param) {
+    return obj;
+  }
+
+  @Override
+  protected evl.data.expression.Expression visitReference(Reference obj, T param) {
+    for (evl.data.expression.reference.RefItem item : obj.offset) {
       visit(item, param);
     }
     return obj;
   }
 
   @Override
-  protected Expression visitRefIndex(RefIndex obj, T param) {
-    obj.setIndex(visit(obj.getIndex(), param));
+  protected evl.data.expression.Expression visitRefIndex(RefIndex obj, T param) {
+    obj.index = visit(obj.index, param);
     return null;
   }
 
   @Override
-  protected Expression visitRefCall(RefCall obj, T param) {
-    visitTupleValue(obj.getActualParameter(), param);
+  protected evl.data.expression.Expression visitRefCall(RefCall obj, T param) {
+    visitTupleValue(obj.actualParameter, param);
     return null;
   }
 
   @Override
-  protected Expression visitRefName(RefName obj, T param) {
+  protected evl.data.expression.Expression visitRefName(evl.data.expression.reference.RefName obj, T param) {
     return super.visitRefName(obj, param);
   }
 
   @Override
-  protected Expression visitRefTemplCall(RefTemplCall obj, T param) {
-    FunList<ActualTemplateArgument> list = obj.getActualParameter();
+  protected evl.data.expression.Expression visitRefTemplCall(RefTemplCall obj, T param) {
+    EvlList<ActualTemplateArgument> list = obj.actualParameter;
     for (int i = 0; i < list.size(); i++) {
       if (list.get(i) instanceof Expression) {
         Expression old = (Expression) list.get(i);
@@ -109,141 +118,194 @@ public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitArithmeticOp(ArithmeticOp obj, T param) {
-    obj.setLeft(visit(obj.getLeft(), param));
-    obj.setRight(visit(obj.getRight(), param));
+  protected Expression visitAnd(And obj, T param) {
+    obj.left = visit(obj.left, param);
+    obj.right = visit(obj.right, param);
     return obj;
   }
 
   @Override
-  protected Expression visitNumber(Number obj, T param) {
+  protected Expression visitOr(Or obj, T param) {
+    obj.left = visit(obj.left, param);
+    obj.right = visit(obj.right, param);
     return obj;
   }
 
   @Override
-  protected Expression visitRelation(Relation obj, T param) {
-    obj.setLeft(visit(obj.getLeft(), param));
-    obj.setRight(visit(obj.getRight(), param));
+  protected evl.data.expression.Expression visitArithmeticOp(ArithmeticOp obj, T param) {
+    obj.left = visit(obj.left, param);
+    obj.right = visit(obj.right, param);
     return obj;
   }
 
   @Override
-  protected Expression visitUnaryExpression(UnaryExpression obj, T param) {
-    obj.setExpr(visit(obj.getExpr(), param));
+  protected evl.data.expression.Expression visitNumber(evl.data.expression.Number obj, T param) {
     return obj;
   }
 
   @Override
-  protected Expression visitStringValue(StringValue obj, T param) {
+  protected evl.data.expression.Expression visitRelation(Relation obj, T param) {
+    obj.left = visit(obj.left, param);
+    obj.right = visit(obj.right, param);
     return obj;
   }
 
   @Override
-  protected Expression visitTupleValue(TupleValue obj, T param) {
-    visitExprList(obj.getValue(), param);
+  protected Expression visitUnaryExp(UnaryExp obj, T param) {
+    obj.expr = visit(obj.expr, param);
     return obj;
   }
 
   @Override
-  protected Expression visitBoolValue(BoolValue obj, T param) {
+  protected evl.data.expression.Expression visitStringValue(evl.data.expression.StringValue obj, T param) {
     return obj;
   }
 
   @Override
-  protected Expression visitAnyValue(AnyValue obj, T param) {
+  protected evl.data.expression.Expression visitTupleValue(evl.data.expression.TupleValue obj, T param) {
+    visitExprList(obj.value, param);
     return obj;
   }
 
   @Override
-  protected Expression visitReturnExpr(ReturnExpr obj, T param) {
-    obj.setExpr(visit(obj.getExpr(), param));
+  protected evl.data.expression.Expression visitBoolValue(evl.data.expression.BoolValue obj, T param) {
+    return obj;
+  }
+
+  @Override
+  protected evl.data.expression.Expression visitAnyValue(evl.data.expression.AnyValue obj, T param) {
+    return obj;
+  }
+
+  @Override
+  protected evl.data.expression.Expression visitReturnExpr(evl.data.statement.ReturnExpr obj, T param) {
+    obj.expr = visit(obj.expr, param);
     return null;
   }
 
   @Override
-  protected Expression visitCaseOptValue(CaseOptValue obj, T param) {
-    obj.setValue(visit(obj.getValue(), param));
+  protected evl.data.expression.Expression visitCaseOptValue(evl.data.statement.CaseOptValue obj, T param) {
+    obj.value = visit(obj.value, param);
     return null;
   }
 
   @Override
-  protected Expression visitCaseOptRange(CaseOptRange obj, T param) {
-    obj.setStart(visit(obj.getStart(), param));
-    obj.setEnd(visit(obj.getEnd(), param));
+  protected evl.data.expression.Expression visitCaseOptRange(evl.data.statement.CaseOptRange obj, T param) {
+    obj.start = visit(obj.start, param);
+    obj.end = visit(obj.end, param);
     return null;
   }
 
   @Override
-  protected Expression visitIfOption(IfOption obj, T param) {
-    obj.setCondition(visit(obj.getCondition(), param));
-    visit(obj.getCode(), param);
+  protected evl.data.expression.Expression visitIfOption(IfOption obj, T param) {
+    obj.condition = visit(obj.condition, param);
+    visit(obj.code, param);
     return null;
   }
 
   @Override
-  protected Expression visitConstant(Constant obj, T param) {
-    visit(obj.getType(), param);
-    obj.setDef(visit(obj.getDef(), param));
+  protected evl.data.expression.Expression visitConstant(evl.data.variable.Constant obj, T param) {
+    visit(obj.type, param);
+    obj.def = visit(obj.def, param);
     return null;
   }
 
   @Override
-  protected Expression visitVarDefStmt(VarDefStmt obj, T param) {
-    visitList(obj.getVariable(), param);
-    obj.setInitial(visit(obj.getInitial(), param));
+  protected evl.data.expression.Expression visitVarDefInitStmt(VarDefInitStmt obj, T param) {
+    visitList(obj.variable, param);
+    obj.initial = visit(obj.initial, param);
     return null;
   }
 
   @Override
-  protected Expression visitAssignment(Assignment obj, T param) {
-    visitList(obj.getLeft(), param);
-    obj.setRight(visit(obj.getRight(), param));
+  protected evl.data.expression.Expression visitAssignmentMulti(AssignmentMulti obj, T param) {
+    visitList(obj.left, param);
+    obj.right = visit(obj.right, param);
     return null;
   }
 
   @Override
-  protected Expression visitCaseStmt(CaseStmt obj, T param) {
-    obj.setCondition(visit(obj.getCondition(), param));
-    visitList(obj.getOption(), param);
-    visit(obj.getOtherwise(), param);
+  protected evl.data.expression.Expression visitCaseStmt(evl.data.statement.CaseStmt obj, T param) {
+    obj.condition = visit(obj.condition, param);
+    visitList(obj.option, param);
+    visit(obj.otherwise, param);
     return null;
   }
 
   @Override
-  protected Expression visitWhile(While obj, T param) {
-    obj.setCondition(visit(obj.getCondition(), param));
-    visit(obj.getBody(), param);
+  protected evl.data.expression.Expression visitWhileStmt(evl.data.statement.WhileStmt obj, T param) {
+    obj.condition = visit(obj.condition, param);
+    visit(obj.body, param);
     return null;
   }
 
   @Override
-  protected Expression visitTransition(Transition obj, T param) {
-    obj.setGuard(visit(obj.getGuard(), param));
+  protected evl.data.expression.Expression visitTransition(Transition obj, T param) {
+    obj.src = (StateRef) visit(obj.src, param);
+    obj.dst = (StateRef) visit(obj.dst, param);
+    obj.eventFunc = (FuncRef) visit(obj.eventFunc, param);
+    obj.guard = visit(obj.guard, param);
     return super.visitTransition(obj, param);
   }
 
   @Override
   protected Expression visitNamedElement(NamedElement obj, T param) {
-    obj.setType((Reference) visit(obj.getType(), param));
+    obj.typeref = (TypeRef) visit(obj.typeref, param);
     return super.visitNamedElement(obj, param);
   }
 
   @Override
-  protected Expression visitNamedElementsValue(NamedElementsValue obj, T param) {
+  protected evl.data.expression.Expression visitNamedElementsValue(evl.data.expression.NamedElementsValue obj, T param) {
     super.visitNamedElementsValue(obj, param);
     return obj;
   }
 
   @Override
   protected Expression visitVariable(Variable obj, T param) {
-    obj.setType((Reference) visit(obj.getType(), param));
+    TypeRef type = (TypeRef) visit(obj.type, param);
+    assert (type != null);
+    obj.type = type;
     return super.visitVariable(obj, param);
   }
 
   @Override
-  protected Expression visitNamedValue(NamedValue obj, T param) {
-    obj.setValue(visit(obj.getValue(), param));
+  protected Expression visitNamedValue(evl.data.expression.NamedValue obj, T param) {
+    Expression value = visit(obj.value, param);
+    assert (value != null);
+    obj.value = value;
     return null;
+  }
+
+  @Override
+  protected Expression visitFuncReturnType(FuncReturnType obj, T param) {
+    obj.type = (TypeRef) visit(obj.type, param);
+    return super.visitFuncReturnType(obj, param);
+  }
+
+  @Override
+  protected Expression visitCompUse(CompUse obj, T param) {
+    obj.compRef = (CompRef) visit(obj.compRef, param);
+    return super.visitCompUse(obj, param);
+  }
+
+  @Override
+  protected Expression visitStateSimple(StateSimple obj, T param) {
+    obj.entryFunc = (SimpleRef<FuncProcedure>) visit(obj.entryFunc, param);
+    obj.exitFunc = (SimpleRef<FuncProcedure>) visit(obj.exitFunc, param);
+    assert (obj.entryFunc != null);
+    assert (obj.exitFunc != null);
+    return super.visitStateSimple(obj, param);
+  }
+
+  @Override
+  protected Expression visitStateComposite(StateComposite obj, T param) {
+    obj.entryFunc = (SimpleRef<FuncProcedure>) visit(obj.entryFunc, param);
+    obj.exitFunc = (SimpleRef<FuncProcedure>) visit(obj.exitFunc, param);
+    obj.initial = (StateRef) visit(obj.initial, param);
+    assert (obj.entryFunc != null);
+    assert (obj.exitFunc != null);
+    assert (obj.initial != null);
+    return super.visitStateComposite(obj, param);
   }
 
 }

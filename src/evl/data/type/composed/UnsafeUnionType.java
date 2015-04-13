@@ -27,4 +27,7 @@ public class UnsafeUnionType extends NamedElementType {
     super(info, name, element);
   }
 
+  public UnsafeUnionType(ElementInfo info, String name) {
+    super(info, name);
+  }
 }

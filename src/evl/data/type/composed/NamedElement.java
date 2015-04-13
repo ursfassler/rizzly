@@ -20,20 +20,19 @@ package evl.data.type.composed;
 import common.ElementInfo;
 
 import evl.data.Named;
-import evl.data.expression.reference.SimpleRef;
-import evl.data.type.Type;
+import evl.data.expression.reference.TypeRef;
 
 final public class NamedElement extends Named {
-  final public SimpleRef<Type> ref;
+  public TypeRef typeref;
 
-  public NamedElement(ElementInfo info, String name, SimpleRef<Type> ref) {
+  public NamedElement(ElementInfo info, String name, TypeRef typeref) {
     super(info, name);
-    this.ref = ref;
+    this.typeref = typeref;
   }
 
   @Override
   public String toString() {
-    return name + ref;
+    return name + typeref;
   }
 
 }

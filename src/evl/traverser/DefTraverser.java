@@ -22,6 +22,7 @@ import common.Direction;
 import evl.data.Namespace;
 import evl.data.component.composition.AsynchroniusConnection;
 import evl.data.component.composition.CompUse;
+import evl.data.component.composition.EndpointRaw;
 import evl.data.component.composition.EndpointSelf;
 import evl.data.component.composition.EndpointSub;
 import evl.data.component.composition.ImplComposition;
@@ -66,28 +67,31 @@ import evl.data.expression.binop.Or;
 import evl.data.expression.binop.Plus;
 import evl.data.expression.binop.Shl;
 import evl.data.expression.binop.Shr;
+import evl.data.expression.reference.DummyLinkTarget;
 import evl.data.expression.reference.RefCall;
 import evl.data.expression.reference.RefIndex;
 import evl.data.expression.reference.RefName;
+import evl.data.expression.reference.RefTemplCall;
 import evl.data.expression.reference.Reference;
 import evl.data.expression.reference.SimpleRef;
 import evl.data.expression.unop.BitNot;
 import evl.data.expression.unop.LogicNot;
 import evl.data.expression.unop.Not;
 import evl.data.expression.unop.Uminus;
+import evl.data.file.RizzlyFile;
 import evl.data.function.Function;
-import evl.data.function.header.FuncCtrlInDataIn;
-import evl.data.function.header.FuncCtrlInDataOut;
-import evl.data.function.header.FuncCtrlOutDataIn;
-import evl.data.function.header.FuncCtrlOutDataOut;
-import evl.data.function.header.FuncGlobal;
-import evl.data.function.header.FuncPrivateRet;
-import evl.data.function.header.FuncPrivateVoid;
+import evl.data.function.header.FuncFunction;
+import evl.data.function.header.FuncProcedure;
+import evl.data.function.header.FuncQuery;
+import evl.data.function.header.FuncResponse;
+import evl.data.function.header.FuncSignal;
+import evl.data.function.header.FuncSlot;
 import evl.data.function.header.FuncSubHandlerEvent;
 import evl.data.function.header.FuncSubHandlerQuery;
 import evl.data.function.ret.FuncReturnNone;
 import evl.data.function.ret.FuncReturnTuple;
 import evl.data.function.ret.FuncReturnType;
+import evl.data.function.template.DefaultValueTemplate;
 import evl.data.statement.AssignmentMulti;
 import evl.data.statement.AssignmentSingle;
 import evl.data.statement.Block;
@@ -99,12 +103,13 @@ import evl.data.statement.CaseStmt;
 import evl.data.statement.ForStmt;
 import evl.data.statement.IfOption;
 import evl.data.statement.IfStmt;
+import evl.data.statement.MsgPush;
 import evl.data.statement.ReturnExpr;
 import evl.data.statement.ReturnVoid;
 import evl.data.statement.Statement;
+import evl.data.statement.VarDefInitStmt;
 import evl.data.statement.VarDefStmt;
 import evl.data.statement.WhileStmt;
-import evl.data.statement.intern.MsgPush;
 import evl.data.type.base.ArrayType;
 import evl.data.type.base.BooleanType;
 import evl.data.type.base.EnumElement;
@@ -125,10 +130,19 @@ import evl.data.type.special.ComponentType;
 import evl.data.type.special.IntegerType;
 import evl.data.type.special.NaturalType;
 import evl.data.type.special.VoidType;
+import evl.data.type.template.ArrayTemplate;
+import evl.data.type.template.RangeTemplate;
+import evl.data.type.template.TypeType;
+import evl.data.type.template.TypeTypeTemplate;
 import evl.data.variable.ConstGlobal;
 import evl.data.variable.ConstPrivate;
 import evl.data.variable.FuncVariable;
 import evl.data.variable.StateVariable;
+import evl.data.variable.TemplateParameter;
+import fun.other.RawComposition;
+import fun.other.RawElementary;
+import fun.other.RawHfsm;
+import fun.other.Template;
 
 public class DefTraverser<R, P> extends Traverser<R, P> {
 
@@ -420,6 +434,9 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitTransition(Transition obj, P param) {
+    visit(obj.src, param);
+    visit(obj.dst, param);
+    visit(obj.eventFunc, param);
     visitList(obj.param, param);
     visit(obj.guard, param);
     visit(obj.body, param);
@@ -448,17 +465,12 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitFuncPrivateVoid(FuncPrivateVoid obj, P param) {
+  protected R visitFuncProcedure(FuncProcedure obj, P param) {
     return null;
   }
 
   @Override
-  protected R visitFuncPrivateRet(FuncPrivateRet obj, P param) {
-    return null;
-  }
-
-  @Override
-  protected R visitFuncGlobal(FuncGlobal obj, P param) {
+  protected R visitFuncFunction(FuncFunction obj, P param) {
     return null;
   }
 
@@ -479,11 +491,19 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitEndpointSelf(EndpointSelf obj, P param) {
+    visit(obj.funcRef, param);
     return null;
   }
 
   @Override
   protected R visitEndpointSub(EndpointSub obj, P param) {
+    visit(obj.component, param);
+    return null;
+  }
+
+  @Override
+  protected R visitEndpointRaw(EndpointRaw obj, P param) {
+    visit(obj.ref, param);
     return null;
   }
 
@@ -715,22 +735,22 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitFuncIfaceOutVoid(FuncCtrlOutDataOut obj, P param) {
+  protected R visitFuncSignal(FuncSignal obj, P param) {
     return null;
   }
 
   @Override
-  protected R visitFuncIfaceOutRet(FuncCtrlOutDataIn obj, P param) {
+  protected R visitFuncQuery(FuncQuery obj, P param) {
     return null;
   }
 
   @Override
-  protected R visitFuncIfaceInVoid(FuncCtrlInDataIn obj, P param) {
+  protected R visitFuncSlot(FuncSlot obj, P param) {
     return null;
   }
 
   @Override
-  protected R visitFuncIfaceInRet(FuncCtrlInDataOut obj, P param) {
+  protected R visitFuncResponse(FuncResponse obj, P param) {
     return null;
   }
 
@@ -796,13 +816,13 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitNamedElement(NamedElement obj, P param) {
-    visit(obj.ref, param);
+    visit(obj.typeref, param);
     return null;
   }
 
   @Override
   protected R visitCompUse(CompUse obj, P param) {
-    visit(obj.instref, param);
+    visit(obj.compRef, param);
     return null;
   }
 
@@ -826,6 +846,95 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   protected R visitForStmt(ForStmt obj, P param) {
     visit(obj.iterator, param);
     visit(obj.block, param);
+    return null;
+  }
+
+  // /////////////////////////////////////////////
+
+  @Override
+  protected R visitDefaultValueTemplate(DefaultValueTemplate obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitRizzlyFile(RizzlyFile obj, P param) {
+    visitList(obj.getObjects(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitRawElementary(RawElementary obj, P param) {
+    visit(obj.getEntryFunc(), param);
+    visit(obj.getExitFunc(), param);
+    visitList(obj.getIface(), param);
+    visitList(obj.getDeclaration(), param);
+    visitList(obj.getInstantiation(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitRawComposition(RawComposition obj, P param) {
+    visitList(obj.getIface(), param);
+    visitList(obj.getInstantiation(), param);
+    visitList(obj.getConnection(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitRawHfsm(RawHfsm obj, P param) {
+    visitList(obj.getIface(), param);
+    visit(obj.getTopstate(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitVarDefInitStmt(VarDefInitStmt obj, P param) {
+    visitList(obj.variable, param);
+    visit(obj.initial, param);
+    return null;
+  }
+
+  @Override
+  protected R visitRefTemplCall(RefTemplCall obj, P param) {
+    visitList(obj.actualParameter, param);
+    return null;
+  }
+
+  @Override
+  protected R visitTemplateParameter(TemplateParameter obj, P param) {
+    visit(obj.type, param);
+    return null;
+  }
+
+  @Override
+  protected R visitTypeTypeTemplate(TypeTypeTemplate obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitTypeType(TypeType obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitRangeTemplate(RangeTemplate obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitTemplate(Template obj, P param) {
+    visitList(obj.getTempl(), param);
+    visit(obj.getObject(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitArrayTemplate(ArrayTemplate obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitDummyLinkTarget(DummyLinkTarget obj, P param) {
     return null;
   }
 

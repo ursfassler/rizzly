@@ -84,7 +84,7 @@ class LeafStateUplifterWorker extends NullTraverser<Void, Designator> {
 
   @Override
   protected Void visitStateComposite(StateComposite obj, Designator param) {
-    EvlList<State> children = obj.item.getItems(State.class);
+    EvlList<State> children = ClassGetter.filter(State.class, obj.item);
     visitList(children, param);
     obj.item.removeAll(children);
     return null;

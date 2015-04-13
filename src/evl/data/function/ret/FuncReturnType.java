@@ -19,13 +19,12 @@ package evl.data.function.ret;
 
 import common.ElementInfo;
 
-import evl.data.expression.reference.SimpleRef;
-import evl.data.type.Type;
+import evl.data.expression.reference.TypeRef;
 
 public class FuncReturnType extends FuncReturn {
-  final public SimpleRef<Type> type;
+  public TypeRef type;
 
-  public FuncReturnType(ElementInfo info, SimpleRef<Type> type) {
+  public FuncReturnType(ElementInfo info, TypeRef type) {
     super(info);
     this.type = type;
   }

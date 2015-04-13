@@ -19,25 +19,23 @@ package evl.pass.instantiation.queuereduction;
 
 import common.ElementInfo;
 
+import evl.copy.Copy;
 import evl.data.EvlList;
 import evl.data.expression.reference.Reference;
-import evl.data.expression.reference.SimpleRef;
 import evl.data.function.Function;
 import evl.data.function.FunctionProperty;
-import evl.data.function.header.FuncCtrlInDataOut;
+import evl.data.function.header.FuncResponse;
 import evl.data.function.ret.FuncReturnType;
 import evl.data.statement.Block;
 import evl.data.statement.ReturnExpr;
-import evl.data.type.Type;
 import evl.data.variable.FuncVariable;
 
 class CountFunctionFactory {
   static public Function create(String prefix, ElementInfo info, QueueVariables queueVariables) {
     Block sfb = new Block(info);
     sfb.statements.add(new ReturnExpr(info, new Reference(info, queueVariables.getCount())));
-    Function sizefunc = new FuncCtrlInDataOut(info, prefix + "count", new EvlList<FuncVariable>(), new FuncReturnType(info, new SimpleRef<Type>(ElementInfo.NO, queueVariables.getCount().type.link)), sfb);
+    Function sizefunc = new FuncResponse(info, prefix + "count", new EvlList<FuncVariable>(), new FuncReturnType(info, Copy.copy(queueVariables.getCount().type)), sfb);
     sizefunc.property = FunctionProperty.Public;
     return sizefunc;
   }
-
 }

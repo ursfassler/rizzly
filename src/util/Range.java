@@ -21,8 +21,8 @@ import java.math.BigInteger;
 import java.util.Iterator;
 
 final public class Range implements Iterable<BigInteger> {
-  final private BigInteger low;
-  final private BigInteger high;
+  final public BigInteger low;
+  final public BigInteger high;
 
   public Range(BigInteger low, BigInteger high) {
     assert (low.compareTo(high) <= 0);
@@ -30,24 +30,16 @@ final public class Range implements Iterable<BigInteger> {
     this.high = high;
   }
 
-  public BigInteger getLow() {
-    return low;
-  }
-
-  public BigInteger getHigh() {
-    return high;
-  }
-
   static public Range grow(Range a, Range b) {
-    BigInteger low = a.getLow().min(b.getLow());
-    BigInteger high = a.getHigh().max(b.getHigh());
+    BigInteger low = a.low.min(b.low);
+    BigInteger high = a.high.max(b.high);
     assert (low.compareTo(high) <= 0);
     return new Range(low, high);
   }
 
   static public Range narrow(Range a, Range b) {
-    BigInteger low = a.getLow().max(b.getLow());
-    BigInteger high = a.getHigh().min(b.getHigh());
+    BigInteger low = a.low.max(b.low);
+    BigInteger high = a.high.min(b.high);
     assert (low.compareTo(high) <= 0);
     return new Range(low, high);
   }

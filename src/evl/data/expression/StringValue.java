@@ -23,7 +23,7 @@ import common.ElementInfo;
  *
  * @author urs
  */
-final public class StringValue extends Expression {
+public class StringValue extends Expression {
 
   final public String value;
 

@@ -21,30 +21,29 @@ import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
-import fun.Fun;
-import fun.NullTraverser;
-import fun.expression.AnyValue;
-import fun.expression.Expression;
-import fun.expression.Number;
-import fun.type.Type;
-import fun.type.template.Range;
+import evl.data.Evl;
+import evl.data.expression.AnyValue;
+import evl.data.expression.Expression;
+import evl.data.type.Type;
+import evl.data.type.base.RangeType;
+import evl.traverser.NullTraverser;
 
 public class CheckTypeCast extends NullTraverser<Expression, Expression> {
   static final private CheckTypeCast INSTANCE = new CheckTypeCast();
 
-  public static Expression check(Type type, Expression value) {
+  public static evl.data.expression.Expression check(Type type, Expression value) {
     return INSTANCE.traverse(type, value);
   }
 
   @Override
-  protected Expression visitDefault(Fun obj, Expression param) {
+  protected evl.data.expression.Expression visitDefault(Evl obj, Expression param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getName());
   }
 
   @Override
-  protected Expression visitRange(Range obj, Expression param) {
-    Number num = (Number) param;
-    if ((obj.getLow().compareTo(num.getValue()) > 0) || (obj.getHigh().compareTo(num.getValue()) < 0)) {
+  protected evl.data.expression.Expression visitRangeType(RangeType obj, Expression param) {
+    evl.data.expression.Number num = (evl.data.expression.Number) param;
+    if ((obj.range.low.compareTo(num.value) > 0) || (obj.range.high.compareTo(num.value) < 0)) {
       RError.err(ErrorType.Error, param.getInfo(), "value " + num.toString() + " not in range " + obj.toString());
       return new AnyValue(ElementInfo.NO);
     }

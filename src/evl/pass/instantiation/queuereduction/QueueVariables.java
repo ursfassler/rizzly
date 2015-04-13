@@ -26,6 +26,7 @@ import evl.data.expression.ArrayValue;
 import evl.data.expression.Expression;
 import evl.data.expression.Number;
 import evl.data.expression.reference.SimpleRef;
+import evl.data.expression.reference.TypeRef;
 import evl.data.type.Type;
 import evl.data.type.base.ArrayType;
 import evl.data.variable.StateVariable;
@@ -58,7 +59,7 @@ class QueueVariables {
     return new ArrayValue(info, new EvlList<Expression>());
   }
 
-  private SimpleRef<Type> makeRef(Type type) {
+  private TypeRef makeRef(Type type) {
     return new SimpleRef<Type>(info, type);
   }
 

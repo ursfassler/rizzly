@@ -32,14 +32,14 @@ import evl.data.Namespace;
 import evl.data.component.hfsm.ImplHfsm;
 import evl.data.component.hfsm.State;
 import evl.data.component.hfsm.StateComposite;
-import evl.data.component.hfsm.StateItem;
+import evl.data.component.hfsm.StateContent;
 import evl.data.component.hfsm.StateSimple;
 import evl.data.expression.Expression;
 import evl.data.expression.TupleValue;
 import evl.data.expression.reference.RefCall;
 import evl.data.expression.reference.Reference;
-import evl.data.function.header.FuncCtrlInDataOut;
-import evl.data.function.header.FuncPrivateRet;
+import evl.data.function.header.FuncFunction;
+import evl.data.function.header.FuncResponse;
 import evl.data.statement.Block;
 import evl.data.statement.ReturnExpr;
 import evl.data.variable.Variable;
@@ -57,11 +57,11 @@ public class QueryDownPropagator extends EvlPass {
   }
 
   private static void process(ImplHfsm hfsm, KnowledgeBase kb) {
-    Map<FuncCtrlInDataOut, FuncPrivateRet> qfunc = new HashMap<FuncCtrlInDataOut, FuncPrivateRet>();
+    Map<FuncResponse, FuncFunction> qfunc = new HashMap<FuncResponse, FuncFunction>();
     QueryFuncMaker qfmaker = new QueryFuncMaker(qfunc);
     qfmaker.traverse(hfsm.topstate, new Designator());
 
-    for (FuncPrivateRet func : qfunc.values()) {
+    for (FuncFunction func : qfunc.values()) {
       hfsm.topstate.item.add(func);
     }
 
@@ -73,9 +73,10 @@ public class QueryDownPropagator extends EvlPass {
 
 class QueryDownPropagatorWorker extends NullTraverser<Void, QueryParam> {
   private static final ElementInfo info = ElementInfo.NO;
-  private final Map<FuncCtrlInDataOut, FuncPrivateRet> map; // TODO do we need that?
+  private final Map<FuncResponse, FuncFunction> map; // TODO do we need
+                                                     // that?
 
-  public QueryDownPropagatorWorker(Map<FuncCtrlInDataOut, FuncPrivateRet> map) {
+  public QueryDownPropagatorWorker(Map<FuncResponse, FuncFunction> map) {
     this.map = map;
   }
 
@@ -86,23 +87,23 @@ class QueryDownPropagatorWorker extends NullTraverser<Void, QueryParam> {
 
   @Override
   protected Void visitStateSimple(StateSimple obj, QueryParam param) {
-    EvlList<FuncCtrlInDataOut> queryList = obj.item.getItems(FuncCtrlInDataOut.class);
+    EvlList<FuncResponse> queryList = ClassGetter.filter(FuncResponse.class, obj.item);
     obj.item.removeAll(queryList);
 
-    EvlList<FuncCtrlInDataOut> queries = new EvlList<FuncCtrlInDataOut>();
+    EvlList<FuncResponse> queries = new EvlList<FuncResponse>();
 
-    for (FuncCtrlInDataOut query : param.before) {
+    for (FuncResponse query : param.before) {
       addQuery(queries, query);
     }
-    for (FuncCtrlInDataOut query : queryList) {
+    for (FuncResponse query : queryList) {
       addQuery(queries, query);
     }
-    for (FuncCtrlInDataOut query : param.after) {
+    for (FuncResponse query : param.after) {
       addQuery(queries, query);
     }
 
-    for (FuncCtrlInDataOut func : queries) {
-      FuncCtrlInDataOut cfunc = new FuncCtrlInDataOut(info, func.name, Copy.copy(func.param), Copy.copy(func.ret), new Block(info));
+    for (FuncResponse func : queries) {
+      FuncResponse cfunc = new FuncResponse(info, func.name, Copy.copy(func.param), Copy.copy(func.ret), new Block(info));
 
       TupleValue acpar = new TupleValue(info, new EvlList<Expression>());
       for (Variable par : cfunc.param) {
@@ -118,7 +119,7 @@ class QueryDownPropagatorWorker extends NullTraverser<Void, QueryParam> {
     return null;
   }
 
-  static private void addQuery(EvlList<FuncCtrlInDataOut> queries, FuncCtrlInDataOut query) {
+  static private void addQuery(EvlList<FuncResponse> queries, FuncResponse query) {
     if (!queries.contains(query)) {
       queries.add(query);
     } else {
@@ -130,12 +131,12 @@ class QueryDownPropagatorWorker extends NullTraverser<Void, QueryParam> {
   @Override
   protected Void visitStateComposite(StateComposite obj, QueryParam param) {
     Map<State, Integer> spos = new HashMap<State, Integer>();
-    EvlList<FuncCtrlInDataOut> queryList = new EvlList<FuncCtrlInDataOut>();
+    EvlList<FuncResponse> queryList = new EvlList<FuncResponse>();
     EvlList<State> stateList = new EvlList<State>();
 
-    for (StateItem itr : obj.item) {
-      if (itr instanceof FuncCtrlInDataOut) {
-        queryList.add((FuncCtrlInDataOut) itr);
+    for (StateContent itr : obj.item) {
+      if (itr instanceof FuncResponse) {
+        queryList.add((FuncResponse) itr);
       } else if (itr instanceof State) {
         spos.put((State) itr, queryList.size());
         stateList.add((State) itr);
@@ -166,39 +167,39 @@ class QueryDownPropagatorWorker extends NullTraverser<Void, QueryParam> {
 
 class QueryParam {
 
-  final public EvlList<FuncCtrlInDataOut> before;
-  final public EvlList<FuncCtrlInDataOut> after;
+  final public EvlList<FuncResponse> before;
+  final public EvlList<FuncResponse> after;
 
-  public QueryParam(EvlList<FuncCtrlInDataOut> before, EvlList<FuncCtrlInDataOut> after) {
+  public QueryParam(EvlList<FuncResponse> before, EvlList<FuncResponse> after) {
     super();
-    this.before = new EvlList<FuncCtrlInDataOut>(before);
-    this.after = new EvlList<FuncCtrlInDataOut>(after);
+    this.before = new EvlList<FuncResponse>(before);
+    this.after = new EvlList<FuncResponse>(after);
   }
 
   public QueryParam() {
     super();
-    this.before = new EvlList<FuncCtrlInDataOut>();
-    this.after = new EvlList<FuncCtrlInDataOut>();
+    this.before = new EvlList<FuncResponse>();
+    this.after = new EvlList<FuncResponse>();
   }
 
   public QueryParam(QueryParam parent) {
     super();
-    this.before = new EvlList<FuncCtrlInDataOut>(parent.before);
-    this.after = new EvlList<FuncCtrlInDataOut>(parent.after);
+    this.before = new EvlList<FuncResponse>(parent.before);
+    this.after = new EvlList<FuncResponse>(parent.after);
   }
 }
 
 class QueryFuncMaker extends NullTraverser<Void, Designator> {
 
-  private final Map<FuncCtrlInDataOut, FuncPrivateRet> qfunc;
+  private final Map<FuncResponse, FuncFunction> qfunc;
 
-  public QueryFuncMaker(Map<FuncCtrlInDataOut, FuncPrivateRet> qfunc) {
+  public QueryFuncMaker(Map<FuncResponse, FuncFunction> qfunc) {
     this.qfunc = qfunc;
   }
 
   @Override
   protected Void visitDefault(Evl obj, Designator param) {
-    if (obj instanceof StateItem) {
+    if (obj instanceof StateContent) {
       return null;
     } else {
       throw new UnsupportedOperationException("Not supported yet: " + obj.getClass().getCanonicalName());
@@ -206,9 +207,9 @@ class QueryFuncMaker extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitFuncIfaceInRet(FuncCtrlInDataOut obj, Designator param) {
+  protected Void visitFuncResponse(FuncResponse obj, Designator param) {
     param = new Designator(param, obj.name);
-    FuncPrivateRet func = new FuncPrivateRet(ElementInfo.NO, param.toString(), Copy.copy(obj.param), Copy.copy(obj.ret), obj.body);
+    FuncFunction func = new FuncFunction(ElementInfo.NO, param.toString(), Copy.copy(obj.param), Copy.copy(obj.ret), obj.body);
     obj.body = new Block(ElementInfo.NO);
 
     FsmReduction.relinkActualParameterRef(obj.param, func.param, func.body);

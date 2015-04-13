@@ -22,12 +22,13 @@ import common.ElementInfo;
 import evl.data.Evl;
 import evl.data.EvlList;
 import evl.data.Named;
+import evl.data.component.hfsm.StateContent;
 import evl.data.function.ret.FuncReturn;
 import evl.data.function.ret.FuncReturnNone;
 import evl.data.statement.Block;
 import evl.data.variable.FuncVariable;
 
-abstract public class Function extends Named {
+abstract public class Function extends Named implements StateContent {
   final public EvlList<FuncVariable> param = new EvlList<FuncVariable>();
   public FuncReturn ret = new FuncReturnNone(ElementInfo.NO);
   public Block body = new Block(ElementInfo.NO);

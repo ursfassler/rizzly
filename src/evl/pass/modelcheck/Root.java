@@ -24,7 +24,7 @@ import evl.data.EvlList;
 import evl.data.Namespace;
 import evl.data.component.Component;
 import evl.data.function.InterfaceFunction;
-import evl.data.function.header.FuncCtrlOutDataIn;
+import evl.data.function.header.FuncQuery;
 import evl.knowledge.KnowledgeBase;
 
 /**
@@ -35,15 +35,15 @@ public class Root extends EvlPass {
 
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    Component root = kb.getRootComp().instref.link;
+    Component root = (Component) kb.getRootComp().compRef.getTarget();
 
-    EvlList<FuncCtrlOutDataIn> queries = new EvlList<FuncCtrlOutDataIn>();
+    EvlList<FuncQuery> queries = new EvlList<FuncQuery>();
     for (InterfaceFunction itr : root.iface) {
-      if (itr instanceof FuncCtrlOutDataIn) {
-        queries.add((FuncCtrlOutDataIn) itr);
+      if (itr instanceof FuncQuery) {
+        queries.add((FuncQuery) itr);
       }
     }
-    for (FuncCtrlOutDataIn func : queries) {
+    for (FuncQuery func : queries) {
       RError.err(ErrorType.Hint, func.getInfo(), func.name);
     }
     if (!queries.isEmpty()) {

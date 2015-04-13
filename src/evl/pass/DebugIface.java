@@ -28,11 +28,12 @@ import common.ElementInfo;
 
 import evl.data.EvlList;
 import evl.data.Namespace;
+import evl.data.component.Component;
 import evl.data.expression.Number;
 import evl.data.expression.StringValue;
 import evl.data.expression.reference.SimpleRef;
 import evl.data.function.FunctionProperty;
-import evl.data.function.header.FuncCtrlInDataOut;
+import evl.data.function.header.FuncResponse;
 import evl.data.function.ret.FuncReturnType;
 import evl.data.statement.Block;
 import evl.data.statement.CaseOpt;
@@ -76,18 +77,19 @@ public class DebugIface extends EvlPass {
     DebugIfaceAdder reduction = new DebugIfaceAdder(arrayType, sizeType, symNameSizeType, voidType, names);
     reduction.traverse(evl, null);
 
-    FuncCtrlInDataOut func = makeNameGetter("DebugName", symNameSizeType, names, stringType);
+    FuncResponse func = makeNameGetter("DebugName", symNameSizeType, names, stringType);
     func.property = FunctionProperty.Public;
-    kb.getRootComp().instref.link.function.add(func);
+    Component rootComp = (Component) kb.getRootComp().compRef.getTarget();
+    rootComp.function.add(func);
   }
 
-  private static FuncCtrlInDataOut makeNameGetter(String funcName, RangeType nameSizeType, ArrayList<String> names, StringType stringType) {
+  private static FuncResponse makeNameGetter(String funcName, RangeType nameSizeType, ArrayList<String> names, StringType stringType) {
     ElementInfo info = ElementInfo.NO;
     FuncVariable arg = new FuncVariable(info, "idx", new SimpleRef<Type>(info, nameSizeType));
     EvlList<FuncVariable> args = new EvlList<FuncVariable>();
     args.add(arg);
     Block body = new Block(info);
-    FuncCtrlInDataOut func = new FuncCtrlInDataOut(info, Designator.NAME_SEP + funcName, args, new FuncReturnType(info, new SimpleRef<Type>(info, stringType)), body);
+    FuncResponse func = new FuncResponse(info, Designator.NAME_SEP + funcName, args, new FuncReturnType(info, new SimpleRef<Type>(info, stringType)), body);
 
     EvlList<CaseOpt> option = new EvlList<CaseOpt>();
     Block otherwise = new Block(info);

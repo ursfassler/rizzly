@@ -80,11 +80,11 @@ class AlwaysGreaterWorker extends ExprReplacer<Void> {
     Range rr = getRange(obj.right);
 
     if ((lr != null) && (rr != null)) {
-      if (lr.getHigh().compareTo(rr.getLow()) <= 0) {
+      if (lr.high.compareTo(rr.low) <= 0) {
         // 0,1 <= 1,257
         return new BoolValue(obj.getInfo(), true);
       }
-      if (rr.getHigh().compareTo(lr.getLow()) < 0) {
+      if (rr.high.compareTo(lr.low) < 0) {
         // 10,20 <= 0,9
         return new BoolValue(obj.getInfo(), false);
       }

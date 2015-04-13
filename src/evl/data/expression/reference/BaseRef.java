@@ -19,10 +19,11 @@ package evl.data.expression.reference;
 
 import common.ElementInfo;
 
+import evl.data.Evl;
 import evl.data.Named;
 import evl.data.expression.Expression;
 
-abstract public class BaseRef<T extends Named> extends Expression {
+abstract public class BaseRef<T extends Named> extends Expression implements TypeRef, StateRef, FuncRef, CompRef {
   public T link;
 
   public BaseRef(ElementInfo info, T link) {
@@ -34,4 +35,7 @@ abstract public class BaseRef<T extends Named> extends Expression {
   public String toString() {
     return "->" + link;
   }
+
+  @Override
+  abstract public Evl getTarget();
 }

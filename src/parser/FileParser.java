@@ -32,11 +32,11 @@ import common.Metadata;
 
 import error.ErrorType;
 import error.RError;
-import fun.Fun;
-import fun.other.RizzlyFile;
+import evl.data.Evl;
+import evl.data.file.RizzlyFile;
+import evl.data.variable.ConstGlobal;
+import evl.data.variable.TemplateParameter;
 import fun.other.Template;
-import fun.variable.ConstGlobal;
-import fun.variable.TemplateParameter;
 
 /**
  *
@@ -57,7 +57,8 @@ public class FileParser extends BaseParser {
 
   // ---- Parser Functions ----
 
-  // EBNF file: import { ifacedefsec | compdefsec | typesec | constDeclBlock | globalFunction }
+  // EBNF file: import { ifacedefsec | compdefsec | typesec | constDeclBlock |
+  // globalFunction }
   private RizzlyFile parseFile(String filename, String name) {
     ElementInfo info = peek().getInfo();
     ArrayList<Metadata> meta = getMetadata();
@@ -70,7 +71,7 @@ public class FileParser extends BaseParser {
       Pair<Token, List<TemplateParameter>> def = parseObjDef();
 
       if (consumeIfEqual(TokenType.EQUAL)) {
-        Fun object = parseDeclaration(def.first.getData());
+        Evl object = parseDeclaration(def.first.getData());
         Template decl = new Template(def.first.getInfo(), def.first.getData(), def.second, object);
         ret.getObjects().add(decl);
       } else if (consumeIfEqual(TokenType.COLON)) {
@@ -92,7 +93,7 @@ public class FileParser extends BaseParser {
     return ret;
   }
 
-  private Fun parseDeclaration(String name) {
+  private Evl parseDeclaration(String name) {
     switch (peek().getType()) {
       case FUNCTION: {
         return parseFuncDef(TokenType.FUNCTION, name, false);

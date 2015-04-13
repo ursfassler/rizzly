@@ -20,15 +20,14 @@ package evl.data.component.composition;
 import common.ElementInfo;
 
 import evl.data.Named;
-import evl.data.component.Component;
-import evl.data.expression.reference.BaseRef;
+import evl.data.expression.reference.CompRef;
 
 public class CompUse extends Named {
-  final public BaseRef<Component> instref;
+  public CompRef compRef;
 
-  public CompUse(ElementInfo info, String name, BaseRef<Component> instref) {
+  public CompUse(ElementInfo info, String name, CompRef compRef) {
     super(info, name);
-    this.instref = instref;
+    this.compRef = compRef;
   }
 
 }

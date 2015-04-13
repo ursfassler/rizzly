@@ -45,6 +45,7 @@ import evl.data.type.composed.NamedElement;
 import evl.data.type.composed.RecordType;
 import evl.data.variable.FuncVariable;
 import evl.knowledge.KnowBaseItem;
+import evl.knowledge.KnowType;
 import evl.knowledge.KnowUniqueName;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.DefTraverser;
@@ -72,11 +73,13 @@ public class RetStructIntroducer extends EvlPass {
 class RetStructIntroducerWorker extends DefTraverser<Void, Void> {
   final private KnowBaseItem kbi;
   final private KnowUniqueName kun;
+  final private KnowType kt;
 
   public RetStructIntroducerWorker(KnowledgeBase kb) {
     super();
     kbi = kb.getEntry(KnowBaseItem.class);
     kun = kb.getEntry(KnowUniqueName.class);
+    kt = kb.getEntry(KnowType.class);
   }
 
   @Override
@@ -110,7 +113,7 @@ class RetStructIntroducerWorker extends DefTraverser<Void, Void> {
       element.add(elem);
     }
     RecordType type = kbi.getRecord(element);
-    for (int i = 0; i < type.getSize(); i++) {
+    for (int i = 0; i < type.element.size(); i++) {
       FuncVariable var = furet.param.get(i);
       NamedElement elem = type.element.get(i);
       assert (var.name.equals(elem.name));

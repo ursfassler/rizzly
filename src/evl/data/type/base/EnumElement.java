@@ -21,7 +21,7 @@ import common.ElementInfo;
 
 import evl.data.Named;
 
-final public class EnumElement extends Named {
+public class EnumElement extends Named {
   public EnumElement(ElementInfo info, String name) {
     super(info, name);
   }

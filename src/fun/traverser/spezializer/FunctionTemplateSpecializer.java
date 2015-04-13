@@ -22,28 +22,28 @@ import java.util.List;
 import common.Designator;
 import common.ElementInfo;
 
-import fun.Fun;
-import fun.NullTraverser;
-import fun.expression.Expression;
-import fun.expression.reference.Reference;
-import fun.function.FuncFunction;
-import fun.function.FuncImpl;
-import fun.function.FuncReturnType;
-import fun.function.template.DefaultValueTemplate;
-import fun.function.template.FunctionTemplate;
-import fun.knowledge.KnowBaseItem;
-import fun.knowledge.KnowEmptyValue;
-import fun.knowledge.KnowInstance;
-import fun.knowledge.KnowledgeBase;
+import evl.data.Evl;
+import evl.data.EvlList;
+import evl.data.expression.Expression;
+import evl.data.expression.reference.Reference;
+import evl.data.function.Function;
+import evl.data.function.header.FuncFunction;
+import evl.data.function.ret.FuncReturnType;
+import evl.data.function.template.DefaultValueTemplate;
+import evl.data.function.template.FunctionTemplate;
+import evl.data.statement.Block;
+import evl.data.statement.ReturnExpr;
+import evl.data.type.Type;
+import evl.data.type.special.AnyType;
+import evl.data.variable.FuncVariable;
+import evl.knowledge.KnowBaseItem;
+import evl.knowledge.KnowEmptyValue;
+import evl.knowledge.KnowInstance;
+import evl.knowledge.KnowledgeBase;
+import evl.traverser.NullTraverser;
 import fun.other.ActualTemplateArgument;
-import fun.other.FunList;
-import fun.statement.Block;
-import fun.statement.ReturnExpr;
-import fun.type.Type;
-import fun.type.base.AnyType;
-import fun.variable.FuncVariable;
 
-public class FunctionTemplateSpecializer extends NullTraverser<FuncImpl, List<ActualTemplateArgument>> {
+public class FunctionTemplateSpecializer extends NullTraverser<Function, List<ActualTemplateArgument>> {
   private final KnowledgeBase kb;
   private final KnowInstance ki;
   private final KnowBaseItem kbi;
@@ -56,24 +56,24 @@ public class FunctionTemplateSpecializer extends NullTraverser<FuncImpl, List<Ac
     kev = kb.getEntry(KnowEmptyValue.class);
   }
 
-  public static FuncImpl process(FunctionTemplate type, List<ActualTemplateArgument> genspec, KnowledgeBase kb) {
+  public static Function process(FunctionTemplate type, List<ActualTemplateArgument> genspec, KnowledgeBase kb) {
     FunctionTemplateSpecializer specializer = new FunctionTemplateSpecializer(kb);
     return specializer.traverse(type, genspec);
   }
 
   @Override
-  protected FuncImpl visitDefault(Fun obj, List<ActualTemplateArgument> param) {
+  protected Function visitDefault(Evl obj, List<ActualTemplateArgument> param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
   @Override
-  protected FuncImpl visitDefaultValueTemplate(DefaultValueTemplate obj, List<ActualTemplateArgument> param) {
+  protected Function visitDefaultValueTemplate(DefaultValueTemplate obj, List<ActualTemplateArgument> param) {
     assert (param.size() == 1);
-    FuncImpl ret = (FuncImpl) ki.find(obj, param);
+    Function ret = (Function) ki.find(obj, param);
     if (ret == null) {
       Type type = (Type) ArgEvaluator.process(new AnyType(), param.get(0), kb);
 
-      String name = obj.getName() + Designator.NAME_SEP + type.getName();
+      String name = obj.getName() + Designator.NAME_SEP + type.name;
 
       ret = makeFunc(name, type);
       ki.add(obj, param, ret);
@@ -82,11 +82,11 @@ public class FunctionTemplateSpecializer extends NullTraverser<FuncImpl, List<Ac
     return ret;
   }
 
-  private FuncImpl makeFunc(String name, Type type) {
+  private Function makeFunc(String name, Type type) {
     ElementInfo info = ElementInfo.NO;
     Block body = new Block(info);
     Expression empty = kev.get(type);
-    body.getStatements().add(new ReturnExpr(info, empty));
-    return new FuncFunction(info, name, new FunList<FuncVariable>(), new FuncReturnType(info, new Reference(info, type)), body);
+    body.statements.add(new ReturnExpr(info, empty));
+    return new FuncFunction(info, name, new EvlList<FuncVariable>(), new FuncReturnType(info, new Reference(info, type)), body);
   }
 }

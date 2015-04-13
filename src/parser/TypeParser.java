@@ -25,18 +25,17 @@ import parser.scanner.Token;
 import parser.scanner.TokenType;
 import error.ErrorType;
 import error.RError;
-import fun.Copy;
-import fun.Fun;
-import fun.expression.reference.Reference;
-import fun.function.FuncHeader;
-import fun.other.CompImpl;
-import fun.other.FunList;
-import fun.type.Type;
-import fun.type.base.EnumElement;
-import fun.type.base.EnumType;
-import fun.type.composed.NamedElement;
-import fun.type.composed.RecordType;
-import fun.type.composed.UnionType;
+import evl.copy.Copy;
+import evl.data.Evl;
+import evl.data.EvlList;
+import evl.data.expression.reference.TypeRef;
+import evl.data.function.Function;
+import evl.data.type.base.EnumElement;
+import evl.data.type.base.EnumType;
+import evl.data.type.composed.NamedElement;
+import evl.data.type.composed.RecordType;
+import evl.data.type.composed.UnsafeUnionType;
+import fun.other.RawComponent;
 
 //TODO cleanup (mostly components)
 //TODO update EBNF
@@ -47,10 +46,10 @@ public class TypeParser extends BaseParser {
   }
 
   // EBNF compdecl: "Component" compIfaceList implementation
-  public CompImpl parseCompdecl(String name) {
+  public RawComponent parseCompdecl(String name) {
     expect(TokenType.COMPONENT);
-    FunList<FuncHeader> list = parseCompIfaceList();
-    CompImpl comp;
+    EvlList<Function> list = parseCompIfaceList();
+    RawComponent comp;
     switch (peek().getType()) {
       case ELEMENTARY:
         comp = ImplElementaryParser.parse(getScanner(), name);
@@ -71,8 +70,8 @@ public class TypeParser extends BaseParser {
   }
 
   // EBNF compIfaceList: { funcHeader }
-  private FunList<FuncHeader> parseCompIfaceList() {
-    FunList<FuncHeader> func = new FunList<FuncHeader>();
+  private EvlList<Function> parseCompIfaceList() {
+    EvlList<Function> func = new EvlList<Function>();
     while (peek().getType() == TokenType.IDENTIFIER) {
       Token name = expect(TokenType.IDENTIFIER);
       expect(TokenType.COLON);
@@ -93,7 +92,7 @@ public class TypeParser extends BaseParser {
   }
 
   // EBNF typedef: recordtype | uniontype | enumtype | arraytype | derivatetype
-  public Fun parseTypeDef(String name) {
+  public Evl parseTypeDef(String name) {
     switch (peek().getType()) {
       case RECORD:
         return parseRecordType(name);
@@ -111,18 +110,18 @@ public class TypeParser extends BaseParser {
   }
 
   // EBNF derivatetype: ref ";"
-  private Reference parseDerivateType() {
-    Reference ref = expr().parseRef();
+  private evl.data.expression.reference.Reference parseDerivateType() {
+    evl.data.expression.reference.Reference ref = expr().parseRef();
     expect(TokenType.SEMI);
     return ref;
   }
 
   // EBNF recordtype: "Record" { recordElem } "end"
-  private Type parseRecordType(String name) {
+  private evl.data.type.Type parseRecordType(String name) {
     Token tok = expect(TokenType.RECORD);
-    RecordType ret = new RecordType(tok.getInfo(), name);
+    evl.data.type.composed.RecordType ret = new RecordType(tok.getInfo(), name);
     while (peek().getType() != TokenType.END) {
-      ret.getElement().addAll(parseRecordElem());
+      ret.element.addAll(parseRecordElem());
     }
     expect(TokenType.END);
     RError.err(ErrorType.Warning, tok.getInfo(), "Type checking of records is not yet fully implemented");
@@ -130,13 +129,13 @@ public class TypeParser extends BaseParser {
   }
 
   // EBNF unionType: "Union" { recordElem } "end"
-  private Type parseUnionType(String name) {
+  private evl.data.type.Type parseUnionType(String name) {
     Token tok = expect(TokenType.UNION);
 
-    UnionType ret = new UnionType(tok.getInfo(), name);
+    UnsafeUnionType ret = new UnsafeUnionType(tok.getInfo(), name);
 
     while (peek().getType() != TokenType.END) {
-      ret.getElement().addAll(parseRecordElem());
+      ret.element.addAll(parseRecordElem());
     }
     expect(TokenType.END);
     RError.err(ErrorType.Warning, tok.getInfo(), "Unions are probably broken and do not work as intended");
@@ -144,10 +143,10 @@ public class TypeParser extends BaseParser {
   }
 
   // EBNF enumType: "Enum" { enumElem } "end"
-  private Type parseEnumType(String name) {
+  private evl.data.type.Type parseEnumType(String name) {
     Token tok = expect(TokenType.ENUM);
 
-    EnumType type = new EnumType(tok.getInfo(), name);
+    evl.data.type.base.EnumType type = new EnumType(tok.getInfo(), name);
 
     while (peek().getType() != TokenType.END) {
       Token elemTok = parseEnumElem();
@@ -165,12 +164,12 @@ public class TypeParser extends BaseParser {
       id.add(expect(TokenType.IDENTIFIER));
     } while (consumeIfEqual(TokenType.COMMA));
     expect(TokenType.COLON);
-    Reference type = expr().parseRef();
+    TypeRef type = expr().parseRef();
     expect(TokenType.SEMI);
 
     List<NamedElement> res = new ArrayList<NamedElement>(id.size());
     for (Token name : id) {
-      Reference ctype = Copy.copy(type);
+      TypeRef ctype = Copy.copy(type);
       res.add(new NamedElement(name.getInfo(), name.getData(), ctype));
     }
 

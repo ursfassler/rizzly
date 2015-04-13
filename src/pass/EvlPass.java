@@ -44,4 +44,9 @@ public abstract class EvlPass {
   }
 
   public abstract void process(Namespace evl, KnowledgeBase kb);
+
+  @Deprecated
+  public String getName() {
+    return getClass().getName();
+  }
 }

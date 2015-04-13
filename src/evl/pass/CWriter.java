@@ -607,7 +607,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
 
   @Override
   protected Void visitNamedElement(NamedElement obj, Boolean param) {
-    visit(obj.ref, param);
+    visit(obj.typeref, param);
     sw.wr(" ");
     sw.wr(obj.name);
     sw.wr(";");

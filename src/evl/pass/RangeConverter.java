@@ -104,7 +104,8 @@ class RangeConverterWorker extends ExprReplacer<Void> {
 
     // TODO reimplement downcast, but with different function than conversion
     // if (RangeType.isBigger(bt, dt)) {
-    // SsaVariable irv = new SsaVariable(NameFactory.getNew(), new TypeRef(bt));
+    // SsaVariable irv = new SsaVariable(NameFactory.getNew(), new
+    // SimpleRef<Type>(bt));
     // TypeCast rex = new TypeCast(obj.getVariable(), new VarRefSimple(irv));
     // obj.setVariable(irv);
     // ret.add(rex);

@@ -41,7 +41,7 @@ import evl.data.expression.reference.RefCall;
 import evl.data.expression.reference.RefName;
 import evl.data.expression.reference.Reference;
 import evl.data.function.Function;
-import evl.data.function.header.FuncCtrlInDataIn;
+import evl.data.function.header.FuncSlot;
 import evl.data.function.ret.FuncReturnNone;
 import evl.data.statement.Block;
 import evl.data.statement.CallStmt;
@@ -105,7 +105,7 @@ class SystemIfaceAdderWorker extends NullTraverser<Void, Void> {
 
   private Function makeFunc(ImplElementary obj, String name) {
     ElementInfo info = ElementInfo.NO;
-    FuncCtrlInDataIn rfunc = new FuncCtrlInDataIn(info, name, new EvlList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
+    FuncSlot rfunc = new FuncSlot(info, name, new EvlList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
     obj.iface.add(rfunc);
     return rfunc;
   }
@@ -162,7 +162,7 @@ class SystemIfaceCaller extends NullTraverser<Void, Void> {
     {
       ArrayList<Statement> code = new ArrayList<Statement>();
       for (CompUse cuse : compList) {
-        Function sctor = getCtor(cuse.instref.link);
+        Function sctor = getCtor((Component) cuse.compRef.getTarget());
         CallStmt call = makeCall(cuse, sctor);
         code.add(call);
       }
@@ -176,7 +176,7 @@ class SystemIfaceCaller extends NullTraverser<Void, Void> {
       code.add(makeCall(obj.exitFunc.link));
       Collections.reverse(compList);
       for (CompUse cuse : compList) {
-        Function sdtor = getDtor(cuse.instref.link);
+        Function sdtor = getDtor((Component) cuse.compRef.getTarget());
         CallStmt call = makeCall(cuse, sdtor);
         code.add(call);
       }

@@ -20,12 +20,13 @@ package evl.data.expression;
 import common.ElementInfo;
 
 import evl.data.EvlBase;
+import fun.other.ActualTemplateArgument;
 
 /**
  *
  * @author urs
  */
-abstract public class Expression extends EvlBase {
+abstract public class Expression extends EvlBase implements ActualTemplateArgument {
 
   public Expression(ElementInfo info) {
     super(info);

@@ -17,27 +17,26 @@
 
 package fun.pass;
 
-import pass.FunPass;
-import fun.Fun;
-import fun.function.template.DefaultValueTemplate;
-import fun.function.template.FunctionTemplate;
-import fun.knowledge.KnowledgeBase;
-import fun.other.FunList;
-import fun.other.Namespace;
+import pass.EvlPass;
+import evl.data.Evl;
+import evl.data.EvlList;
+import evl.data.function.template.DefaultValueTemplate;
+import evl.data.function.template.FunctionTemplate;
+import evl.knowledge.KnowledgeBase;
 import fun.other.Template;
 
-public class InternFuncAdder extends FunPass {
+public class InternFuncAdder extends EvlPass {
 
   @Override
-  public void process(Namespace root, KnowledgeBase kb) {
-    genTemplateFunctions(root.getChildren());
+  public void process(evl.data.Namespace root, KnowledgeBase kb) {
+    genTemplateFunctions(root.children);
   }
 
-  private static void genTemplateFunctions(FunList<Fun> container) {
+  private static void genTemplateFunctions(EvlList<Evl> container) {
     templ(new DefaultValueTemplate(), container);
   }
 
-  private static void templ(FunctionTemplate tmpl, FunList<Fun> container) {
+  private static void templ(FunctionTemplate tmpl, EvlList<Evl> container) {
     Template decl = new Template(tmpl.getInfo(), tmpl.getName(), tmpl.makeParam(), tmpl);
     container.add(decl);
   }

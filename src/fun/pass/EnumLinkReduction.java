@@ -17,19 +17,17 @@
 
 package fun.pass;
 
-import pass.FunPass;
+import pass.EvlPass;
 import error.ErrorType;
 import error.RError;
-import fun.DefTraverser;
-import fun.Fun;
-import fun.expression.reference.RefItem;
-import fun.expression.reference.RefName;
-import fun.expression.reference.Reference;
-import fun.knowledge.KnowChild;
-import fun.knowledge.KnowledgeBase;
-import fun.other.Namespace;
-import fun.type.base.EnumElement;
-import fun.type.base.EnumType;
+import evl.data.Evl;
+import evl.data.expression.reference.RefName;
+import evl.data.expression.reference.Reference;
+import evl.data.type.base.EnumElement;
+import evl.data.type.base.EnumType;
+import evl.knowledge.KnowChild;
+import evl.knowledge.KnowledgeBase;
+import evl.traverser.DefTraverser;
 
 /**
  * Changes references to enums, e.g. Weekday.Tuesday -> Tuesday
@@ -37,10 +35,10 @@ import fun.type.base.EnumType;
  * @author urs
  *
  */
-public class EnumLinkReduction extends FunPass {
+public class EnumLinkReduction extends EvlPass {
 
   @Override
-  public void process(Namespace root, KnowledgeBase kb) {
+  public void process(evl.data.Namespace root, KnowledgeBase kb) {
     EnumLinkReductionWorker reduction = new EnumLinkReductionWorker(kb);
     reduction.traverse(root, null);
   }
@@ -56,20 +54,20 @@ class EnumLinkReductionWorker extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitReference(Reference obj, Void param) {
-    Fun item = obj.getLink();
+    Evl item = obj.link;
     if (item instanceof EnumType) {
-      if (!obj.getOffset().isEmpty()) {
-        RefItem next = obj.getOffset().get(0);
-        obj.getOffset().remove(0);
+      if (!obj.offset.isEmpty()) {
+        evl.data.expression.reference.RefItem next = obj.offset.get(0);
+        obj.offset.remove(0);
         if (!(next instanceof RefName)) {
           RError.err(ErrorType.Error, obj.getInfo(), "Expected named offset, got: " + next.getClass().getCanonicalName());
         }
-        Fun elem = kc.find(item, ((RefName) next).getName());
+        Evl elem = kc.find(item, ((evl.data.expression.reference.RefName) next).name);
         if (elem == null) {
-          RError.err(ErrorType.Error, obj.getInfo(), "Element not found: " + ((RefName) next).getName());
+          RError.err(ErrorType.Error, obj.getInfo(), "Element not found: " + ((evl.data.expression.reference.RefName) next).name);
         }
         if (elem instanceof EnumElement) {
-          obj.setLink((EnumElement) elem);
+          obj.link = (EnumElement) elem;
         } else {
           RError.err(ErrorType.Error, obj.getInfo(), "Expected enumerator element, got: " + elem.getClass().getCanonicalName());
         }

@@ -17,23 +17,24 @@
 
 package fun.pass;
 
-import pass.FunPass;
+import pass.EvlPass;
 
 import common.ElementInfo;
 
-import fun.expression.reference.Reference;
-import fun.knowledge.KnowledgeBase;
-import fun.other.Namespace;
+import evl.data.component.composition.CompUse;
+import evl.data.expression.reference.Reference;
+import evl.knowledge.KnowChild;
+import evl.knowledge.KnowledgeBase;
 import fun.other.Template;
-import fun.variable.CompUse;
 
-public class RootInstanceAdder extends FunPass {
+public class RootInstanceAdder extends EvlPass {
 
   @Override
-  public void process(Namespace root, KnowledgeBase kb) {
-    Template rootdecl = (Template) root.getChildItem(kb.getOptions().getRootComp().toList());
-    CompUse rootinst = new CompUse(ElementInfo.NO, "inst", new Reference(ElementInfo.NO, rootdecl));
-    root.getChildren().add(rootinst);
+  public void process(evl.data.Namespace root, KnowledgeBase kb) {
+    KnowChild kc = kb.getEntry(KnowChild.class);
+    Template rootdecl = (Template) kc.get(root, kb.getOptions().getRootComp().toList(), root.getInfo());
+    evl.data.component.composition.CompUse rootinst = new CompUse(ElementInfo.NO, "inst", new Reference(ElementInfo.NO, rootdecl));
+    root.children.add(rootinst);
   }
 
 }

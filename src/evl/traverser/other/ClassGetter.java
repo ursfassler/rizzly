@@ -17,6 +17,8 @@
 
 package evl.traverser.other;
 
+import java.util.Collection;
+
 import evl.data.Evl;
 import evl.data.EvlList;
 import evl.traverser.DefTraverser;
@@ -30,7 +32,7 @@ public class ClassGetter<T extends Evl> extends DefTraverser<Void, Void> {
     this.kind = kind;
   }
 
-  static public <T extends Evl> EvlList<T> filter(Class<T> kind, EvlList<Evl> list) {
+  static public <T extends Evl> EvlList<T> filter(Class<T> kind, Collection<? extends Evl> list) {
     EvlList<T> ret = new EvlList<T>();
     for (Evl itr : list) {
       if (kind.isAssignableFrom(itr.getClass())) {

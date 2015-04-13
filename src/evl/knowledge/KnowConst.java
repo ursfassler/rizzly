@@ -63,7 +63,8 @@ class KnowConstTraverser extends NullTraverser<Boolean, Void> {
 
   @Override
   protected Boolean visitReference(Reference obj, Void param) {
-    RError.err(ErrorType.Warning, obj.getInfo(), "fix me"); // TODO follow reference
+    RError.err(ErrorType.Warning, obj.getInfo(), "fix me"); // TODO follow
+                                                            // reference
     return false;
   }
 

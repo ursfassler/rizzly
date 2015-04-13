@@ -41,6 +41,7 @@ import evl.data.expression.binop.Div;
 import evl.data.expression.binop.Equal;
 import evl.data.expression.binop.Greater;
 import evl.data.expression.binop.Greaterequal;
+import evl.data.expression.binop.Is;
 import evl.data.expression.binop.Less;
 import evl.data.expression.binop.Lessequal;
 import evl.data.expression.binop.LogicAnd;
@@ -178,6 +179,11 @@ public class CopyExpression extends NullTraverser<Expression, Void> {
   @Override
   protected Expression visitLessequal(Lessequal obj, Void param) {
     return new Lessequal(obj.getInfo(), cast.copy(obj.left), cast.copy(obj.right));
+  }
+
+  @Override
+  protected Expression visitIs(Is obj, Void param) {
+    return new Is(obj.getInfo(), cast.copy(obj.left), cast.copy(obj.right));
   }
 
   @Override

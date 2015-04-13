@@ -19,7 +19,7 @@ package evl.data.expression.reference;
 
 import common.ElementInfo;
 
-final public class RefName extends RefItem {
+public class RefName extends RefItem {
   public String name;
 
   public RefName(ElementInfo info, String name) {

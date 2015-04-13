@@ -17,8 +17,8 @@
 
 package fun.other;
 
-import fun.Fun;
+import evl.data.Evl;
 
-public interface ActualTemplateArgument extends Fun {
+public interface ActualTemplateArgument extends Evl {
 
 }

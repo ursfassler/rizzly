@@ -18,25 +18,25 @@
 package fun.doc;
 
 import util.SimpleGraph;
-import fun.DefTraverser;
-import fun.Fun;
-import fun.expression.reference.BaseRef;
+import evl.data.Evl;
+import evl.data.expression.reference.BaseRef;
+import evl.traverser.DefTraverser;
 
-public class DepGraph extends DefTraverser<Void, Fun> {
-  final private SimpleGraph<Fun> g = new SimpleGraph<Fun>();
+public class DepGraph extends DefTraverser<Void, Evl> {
+  final private SimpleGraph<Evl> g = new SimpleGraph<Evl>();
 
-  static public SimpleGraph<Fun> build(Fun root) {
+  static public SimpleGraph<Evl> build(Evl root) {
     DepGraph depGraph = new DepGraph();
     depGraph.traverse(root, root);
     return depGraph.g;
   }
 
-  public SimpleGraph<Fun> getGraph() {
+  public SimpleGraph<Evl> getGraph() {
     return g;
   }
 
   @Override
-  protected Void visit(Fun obj, Fun param) {
+  protected Void visit(Evl obj, Evl param) {
     boolean visited = g.containsVertex(obj);
     g.addVertex(obj);
     g.addEdge(param, obj);
@@ -47,9 +47,9 @@ public class DepGraph extends DefTraverser<Void, Fun> {
   }
 
   @Override
-  protected Void visitBaseRef(BaseRef obj, Fun param) {
+  protected Void visitBaseRef(BaseRef obj, Evl param) {
     super.visitBaseRef(obj, param);
-    visit(obj.getLink(), obj);
+    visit(obj.link, obj);
     return null;
   }
 

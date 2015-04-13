@@ -20,8 +20,6 @@ package main;
 import java.io.File;
 
 import error.RException;
-import fun.other.Namespace;
-import fun.toevl.FunToEvl;
 
 //TODO set tag when writing to union
 //TODO allow writing of tag of union
@@ -71,11 +69,7 @@ public class Main {
       (new File(docdir)).mkdirs();
     }
 
-    Namespace fret = MainFun.doFun(opt, debugdir);
-    FunToEvl funToAst = new FunToEvl();
-    evl.data.Namespace aclasses = (evl.data.Namespace) funToAst.traverse(fret, null);
-
-    MainEvl.doEvl(opt, outdir, debugdir, aclasses);
+    MainEvl.doEvl(opt, outdir, debugdir);
 
     return outdir;
   }

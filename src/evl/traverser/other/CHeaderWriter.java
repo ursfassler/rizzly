@@ -30,10 +30,10 @@ import evl.data.Namespace;
 import evl.data.expression.Number;
 import evl.data.expression.reference.SimpleRef;
 import evl.data.function.Function;
-import evl.data.function.header.FuncCtrlInDataIn;
-import evl.data.function.header.FuncCtrlInDataOut;
-import evl.data.function.header.FuncCtrlOutDataIn;
-import evl.data.function.header.FuncCtrlOutDataOut;
+import evl.data.function.header.FuncQuery;
+import evl.data.function.header.FuncResponse;
+import evl.data.function.header.FuncSignal;
+import evl.data.function.header.FuncSlot;
 import evl.data.function.header.FuncSubHandlerEvent;
 import evl.data.function.header.FuncSubHandlerQuery;
 import evl.data.function.ret.FuncReturnNone;
@@ -128,7 +128,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitNamedElement(NamedElement obj, StreamWriter param) {
-    visit(obj.ref, param);
+    visit(obj.typeref, param);
     param.wr(" ");
     param.wr(obj.name);
     param.wr(";");
@@ -188,8 +188,8 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitRangeType(RangeType obj, StreamWriter param) {
-    boolean isNeg = obj.range.getLow().compareTo(BigInteger.ZERO) < 0;
-    BigInteger max = getPos(obj.range.getHigh()).max(getPos(obj.range.getLow()));
+    boolean isNeg = obj.range.low.compareTo(BigInteger.ZERO) < 0;
+    BigInteger max = getPos(obj.range.high).max(getPos(obj.range.low));
     int bits = ExpressionTypecheck.bitCount(max);
     assert (bits >= 0);
     if (isNeg) {
@@ -303,28 +303,28 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitFuncIfaceOutVoid(FuncCtrlOutDataOut obj, StreamWriter param) {
+  protected Void visitFuncSignal(FuncSignal obj, StreamWriter param) {
     param.wr("// ");
     wrPrototype(obj, param);
     return null;
   }
 
   @Override
-  protected Void visitFuncIfaceOutRet(FuncCtrlOutDataIn obj, StreamWriter param) {
+  protected Void visitFuncQuery(FuncQuery obj, StreamWriter param) {
     param.wr("// ");
     wrPrototype(obj, param);
     return null;
   }
 
   @Override
-  protected Void visitFuncIfaceInVoid(FuncCtrlInDataIn obj, StreamWriter param) {
+  protected Void visitFuncSlot(FuncSlot obj, StreamWriter param) {
     param.wr("extern ");
     wrPrototype(obj, param);
     return null;
   }
 
   @Override
-  protected Void visitFuncIfaceInRet(FuncCtrlInDataOut obj, StreamWriter param) {
+  protected Void visitFuncResponse(FuncResponse obj, StreamWriter param) {
     param.wr("extern ");
     wrPrototype(obj, param);
     return null;

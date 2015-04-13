@@ -44,6 +44,7 @@ import evl.data.type.Type;
 import evl.data.type.base.RangeType;
 import evl.data.variable.FuncVariable;
 import evl.knowledge.KnowBaseItem;
+import evl.knowledge.KnowType;
 import evl.knowledge.KnowUniqueName;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.other.StmtReplacer;
@@ -67,11 +68,13 @@ public class ForReduction extends EvlPass {
 class ForReductionWorker extends StmtReplacer<Void> {
   final private KnowBaseItem kbi;
   final private KnowUniqueName kun;
+  final private KnowType kt;
 
   public ForReductionWorker(KnowledgeBase kb) {
     super();
     this.kbi = kb.getEntry(KnowBaseItem.class);
     this.kun = kb.getEntry(KnowUniqueName.class);
+    this.kt = kb.getEntry(KnowType.class);
   }
 
   @Override
@@ -81,7 +84,7 @@ class ForReductionWorker extends StmtReplacer<Void> {
     ElementInfo info = obj.getInfo();
 
     FuncVariable itr = obj.iterator;
-    RangeType rt = (RangeType) itr.type.link;
+    RangeType rt = (RangeType) kt.get(itr.type);
 
     Block block = new Block(obj.getInfo());
 
@@ -91,7 +94,7 @@ class ForReductionWorker extends StmtReplacer<Void> {
     block.statements.add(new AssignmentSingle(info, new Reference(info, loopCond), new BoolValue(info, true)));
 
     block.statements.add(new VarDefStmt(info, itr));
-    block.statements.add(new AssignmentSingle(info, new Reference(info, itr), new Number(info, rt.range.getLow())));
+    block.statements.add(new AssignmentSingle(info, new Reference(info, itr), new Number(info, rt.range.low)));
 
     Block body = new Block(info);
     block.statements.add(new WhileStmt(info, new Reference(info, loopCond), body));
@@ -101,7 +104,7 @@ class ForReductionWorker extends StmtReplacer<Void> {
     Block defblock = new Block(info);
 
     Block inc = new Block(info);
-    option.add(new IfOption(info, new Less(info, new Reference(info, itr), new Number(info, rt.range.getHigh())), inc));
+    option.add(new IfOption(info, new Less(info, new Reference(info, itr), new Number(info, rt.range.high)), inc));
     inc.statements.add(new AssignmentSingle(info, new Reference(info, itr), new Plus(info, new Reference(info, itr), new Number(info, BigInteger.ONE))));
     defblock.statements.add(new AssignmentSingle(info, new Reference(info, loopCond), new BoolValue(info, false)));
 

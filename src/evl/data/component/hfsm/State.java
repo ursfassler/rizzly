@@ -22,14 +22,14 @@ import common.ElementInfo;
 import evl.data.EvlList;
 import evl.data.Named;
 import evl.data.expression.reference.SimpleRef;
-import evl.data.function.header.FuncPrivateVoid;
+import evl.data.function.header.FuncProcedure;
 
-abstract public class State extends Named implements StateItem {
-  final public SimpleRef<FuncPrivateVoid> entryFunc;
-  final public SimpleRef<FuncPrivateVoid> exitFunc;
-  final public EvlList<StateItem> item = new EvlList<StateItem>();
+abstract public class State extends Named implements StateContent {
+  public SimpleRef<FuncProcedure> entryFunc;
+  public SimpleRef<FuncProcedure> exitFunc;
+  final public EvlList<StateContent> item = new EvlList<StateContent>();
 
-  public State(ElementInfo info, String name, SimpleRef<FuncPrivateVoid> entryFunc, SimpleRef<FuncPrivateVoid> exitFunc) {
+  public State(ElementInfo info, String name, SimpleRef<FuncProcedure> entryFunc, SimpleRef<FuncProcedure> exitFunc) {
     super(info, name);
     this.entryFunc = entryFunc;
     this.exitFunc = exitFunc;

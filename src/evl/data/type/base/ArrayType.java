@@ -22,26 +22,28 @@ import java.math.BigInteger;
 import common.ElementInfo;
 
 import evl.data.expression.reference.SimpleRef;
+import evl.data.expression.reference.TypeRef;
 import evl.data.type.Type;
 
 public class ArrayType extends BaseType {
-  final public SimpleRef<Type> type;
+  final public TypeRef type;
   final public BigInteger size;
 
-  public ArrayType(BigInteger size, SimpleRef<Type> type) {
+  public ArrayType(BigInteger size, TypeRef type) {
     super(ElementInfo.NO, makeName(size, type));
     this.type = type;
     this.size = size;
   }
 
-  public ArrayType(ElementInfo info, String name, BigInteger size, SimpleRef<Type> type) {
+  public ArrayType(ElementInfo info, String name, BigInteger size, TypeRef type) {
     super(info, name);
     this.type = type;
     this.size = size;
   }
 
-  public static String makeName(BigInteger size, SimpleRef<Type> type) {
-    return "Array{" + size + "," + type.link.name + "}";
+  // TODO extract to own/naming class
+  public static String makeName(BigInteger size, TypeRef type) {
+    return "Array{" + size + "," + ((SimpleRef<Type>) type).link.name + "}";
   }
 
 }

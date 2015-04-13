@@ -27,13 +27,12 @@ import evl.data.expression.reference.Reference;
  *
  * @author urs
  */
-final public class AssignmentMulti extends Assignment {
+public class AssignmentMulti extends Assignment {
 
   final public EvlList<Reference> left;
 
   public AssignmentMulti(ElementInfo info, EvlList<Reference> left, Expression right) {
     super(info, right);
-    assert (left.size() > 1);
     this.left = left;
   }
 

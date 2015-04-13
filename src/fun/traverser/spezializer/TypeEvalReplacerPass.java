@@ -17,9 +17,8 @@
 
 package fun.traverser.spezializer;
 
-import pass.FunPass;
-import fun.knowledge.KnowledgeBase;
-import fun.other.Namespace;
+import pass.EvlPass;
+import evl.knowledge.KnowledgeBase;
 
 /**
  * Replaces all types with the evaluated expression:
@@ -29,10 +28,10 @@ import fun.other.Namespace;
  * @author urs
  *
  */
-public class TypeEvalReplacerPass extends FunPass {
+public class TypeEvalReplacerPass extends EvlPass {
 
   @Override
-  public void process(Namespace root, KnowledgeBase kb) {
+  public void process(evl.data.Namespace root, KnowledgeBase kb) {
     kb.clear();
     TypeEvalReplacer replacer = new TypeEvalReplacer(kb);
     replacer.traverse(root, null);

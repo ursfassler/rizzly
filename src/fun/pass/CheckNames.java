@@ -21,20 +21,22 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
-import pass.FunPass;
+import pass.EvlPass;
 import error.ErrorType;
 import error.RError;
-import fun.DefTraverser;
-import fun.Fun;
-import fun.knowledge.KnowledgeBase;
-import fun.other.FunList;
-import fun.other.Named;
-import fun.other.Namespace;
+import evl.data.Evl;
+import evl.data.EvlList;
+import evl.data.Named;
+import evl.data.Namespace;
+import evl.data.type.Type;
+import evl.data.type.template.ArrayTemplate;
+import evl.data.type.template.RangeTemplate;
+import evl.data.type.template.TypeTemplate;
+import evl.data.type.template.TypeTypeTemplate;
+import evl.knowledge.KnowledgeBase;
+import evl.traverser.DefTraverser;
+import evl.traverser.other.ClassGetter;
 import fun.other.Template;
-import fun.type.Type;
-import fun.type.template.ArrayTemplate;
-import fun.type.template.RangeTemplate;
-import fun.type.template.TypeTypeTemplate;
 
 /**
  * Check if a reserved name is used.
@@ -42,22 +44,32 @@ import fun.type.template.TypeTypeTemplate;
  * @author urs
  *
  */
-public class CheckNames extends FunPass {
+public class CheckNames extends EvlPass {
   // TODO find more elegant way to check Template names
   @Override
   public void process(Namespace root, KnowledgeBase kb) {
-    FunList<Type> blacklist = root.getItems(Type.class, false);
+    EvlList<Type> blacklist = ClassGetter.filter(Type.class, root.children);
 
-    FunList<Fun> tocheck = new FunList<Fun>(root.getChildren());
+    EvlList<Evl> tocheck = new EvlList<Evl>(root.children);
     tocheck.removeAll(blacklist);
 
-    Set<String> names = new HashSet<String>(blacklist.names());
+    Set<String> names = getNames(blacklist);
     names.addAll(getTemplateNames());
 
     CheckNamesWorker checkNames = new CheckNamesWorker();
-    for (Fun itr : tocheck) {
+    for (Evl itr : tocheck) {
       checkNames.traverse(itr, names);
     }
+  }
+
+  static private Set<String> getNames(Collection<? extends Named> list) {
+    Set<String> names = new HashSet<String>();
+
+    for (Named itr : list) {
+      names.add(itr.name);
+    }
+
+    return names;
   }
 
   private Set<String> getTemplateNames() {
@@ -72,10 +84,10 @@ public class CheckNames extends FunPass {
 class CheckNamesWorker extends DefTraverser<Void, Collection<String>> {
 
   @Override
-  protected Void visit(Fun obj, Collection<String> param) {
+  protected Void visit(Evl obj, Collection<String> param) {
     if (obj instanceof Named) {
-      if (param.contains(((Named) obj).getName()) && !(obj instanceof Template)) {
-        RError.err(ErrorType.Error, obj.getInfo(), "Expected name, got keyword " + ((Named) obj).getName());
+      if (param.contains(((Named) obj).name) && !(obj instanceof Template) && !(obj instanceof TypeTemplate)) {
+        RError.err(ErrorType.Error, obj.getInfo(), "Expected name, got keyword " + ((Named) obj).name);
       }
     }
     return super.visit(obj, param);

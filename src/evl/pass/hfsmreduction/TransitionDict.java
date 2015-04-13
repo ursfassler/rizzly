@@ -24,18 +24,18 @@ import java.util.Map;
 import evl.data.Evl;
 import evl.data.EvlList;
 import evl.data.component.hfsm.State;
-import evl.data.component.hfsm.StateItem;
+import evl.data.component.hfsm.StateContent;
 import evl.data.component.hfsm.Transition;
-import evl.data.function.header.FuncCtrlInDataIn;
+import evl.data.function.header.FuncSlot;
 import evl.traverser.NullTraverser;
 
 public class TransitionDict extends NullTraverser<Void, Void> {
-  private Map<State, Map<FuncCtrlInDataIn, EvlList<Transition>>> transition = new HashMap<State, Map<FuncCtrlInDataIn, EvlList<Transition>>>();
+  private Map<State, Map<FuncSlot, EvlList<Transition>>> transition = new HashMap<State, Map<FuncSlot, EvlList<Transition>>>();
 
-  public EvlList<Transition> get(State src, FuncCtrlInDataIn func) {
-    Map<FuncCtrlInDataIn, EvlList<Transition>> smap = transition.get(src);
+  public EvlList<Transition> get(State src, FuncSlot func) {
+    Map<FuncSlot, EvlList<Transition>> smap = transition.get(src);
     if (smap == null) {
-      smap = new HashMap<FuncCtrlInDataIn, EvlList<Transition>>();
+      smap = new HashMap<FuncSlot, EvlList<Transition>>();
       transition.put(src, smap);
     }
     EvlList<Transition> fmap = smap.get(func);
@@ -48,7 +48,7 @@ public class TransitionDict extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitDefault(Evl obj, Void param) {
-    if (obj instanceof StateItem) {
+    if (obj instanceof StateContent) {
       return null;
     } else {
       throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
@@ -63,8 +63,8 @@ public class TransitionDict extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitTransition(Transition obj, Void param) {
-    State src = obj.src.link;
-    FuncCtrlInDataIn func = obj.eventFunc.link;
+    State src = (State) obj.src.getTarget();
+    FuncSlot func = (FuncSlot) obj.eventFunc.getTarget();
     List<Transition> list = get(src, func);
     list.add(obj);
 

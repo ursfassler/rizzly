@@ -20,21 +20,22 @@ package fun.traverser.spezializer;
 import java.math.BigInteger;
 import java.util.List;
 
-import fun.Fun;
-import fun.NullTraverser;
-import fun.expression.Number;
-import fun.knowledge.KnowBaseItem;
-import fun.knowledge.KnowInstance;
-import fun.knowledge.KnowledgeBase;
+import util.Range;
+import evl.data.Evl;
+import evl.data.expression.Number;
+import evl.data.type.Type;
+import evl.data.type.special.AnyType;
+import evl.data.type.special.IntegerType;
+import evl.data.type.special.NaturalType;
+import evl.data.type.template.ArrayTemplate;
+import evl.data.type.template.RangeTemplate;
+import evl.data.type.template.TypeTemplate;
+import evl.data.type.template.TypeTypeTemplate;
+import evl.knowledge.KnowBaseItem;
+import evl.knowledge.KnowInstance;
+import evl.knowledge.KnowledgeBase;
+import evl.traverser.NullTraverser;
 import fun.other.ActualTemplateArgument;
-import fun.type.Type;
-import fun.type.base.AnyType;
-import fun.type.base.IntegerType;
-import fun.type.base.NaturalType;
-import fun.type.template.ArrayTemplate;
-import fun.type.template.RangeTemplate;
-import fun.type.template.TypeTemplate;
-import fun.type.template.TypeTypeTemplate;
 
 public class TypeTemplateSpecializer extends NullTraverser<Type, List<ActualTemplateArgument>> {
   private final KnowledgeBase kb;
@@ -53,49 +54,49 @@ public class TypeTemplateSpecializer extends NullTraverser<Type, List<ActualTemp
   }
 
   @Override
-  protected Type visitDefault(Fun obj, List<ActualTemplateArgument> param) {
+  protected evl.data.type.Type visitDefault(Evl obj, List<ActualTemplateArgument> param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
   @Override
-  protected Type visitRangeTemplate(RangeTemplate obj, List<ActualTemplateArgument> param) {
+  protected evl.data.type.Type visitRangeTemplate(RangeTemplate obj, List<ActualTemplateArgument> param) {
     assert (param.size() == 2);
-    Type ret = (Type) ki.find(obj, param);
+    evl.data.type.Type ret = (evl.data.type.Type) ki.find(obj, param);
     if (ret == null) {
       ActualTemplateArgument low = ArgEvaluator.process(new IntegerType(), param.get(0), kb);
       assert (low instanceof Number);
       ActualTemplateArgument high = ArgEvaluator.process(new IntegerType(), param.get(1), kb);
       assert (high instanceof Number);
-      ret = kbi.getRangeType(((Number) low).getValue(), ((Number) high).getValue());
+      ret = kbi.getRangeType(new Range(((Number) low).value, ((Number) high).value));
       ki.add(obj, param, ret);
     }
     return ret;
   }
 
   @Override
-  protected Type visitArrayTemplate(ArrayTemplate obj, List<ActualTemplateArgument> param) {
+  protected evl.data.type.Type visitArrayTemplate(ArrayTemplate obj, List<ActualTemplateArgument> param) {
     assert (param.size() == 2);
-    Type ret = (Type) ki.find(obj, param);
+    evl.data.type.Type ret = (evl.data.type.Type) ki.find(obj, param);
     if (ret == null) {
       ActualTemplateArgument size = ArgEvaluator.process(new NaturalType(), param.get(0), kb);
       ActualTemplateArgument type = ArgEvaluator.process(new AnyType(), param.get(1), kb);
       assert (type instanceof Type);
       assert (size instanceof Number);
-      BigInteger count = ((Number) size).getValue();
-      ret = kbi.getArray(count, (Type) type);
+      BigInteger count = ((evl.data.expression.Number) size).value;
+      ret = kbi.getArray(count, (evl.data.type.Type) type);
       ki.add(obj, param, ret);
     }
     return ret;
   }
 
   @Override
-  protected Type visitTypeTypeTemplate(TypeTypeTemplate obj, List<ActualTemplateArgument> param) {
-    Type ret = (Type) ki.find(obj, param);
+  protected evl.data.type.Type visitTypeTypeTemplate(TypeTypeTemplate obj, List<ActualTemplateArgument> param) {
+    evl.data.type.Type ret = (evl.data.type.Type) ki.find(obj, param);
     if (ret == null) {
       assert (param.size() == 1);
       ActualTemplateArgument type = ArgEvaluator.process(new AnyType(), param.get(0), kb);
       assert (type instanceof Type);
-      ret = kbi.getTypeType((Type) type);
+      ret = kbi.getTypeType((evl.data.type.Type) type);
       ki.add(obj, param, ret);
     }
     return ret;

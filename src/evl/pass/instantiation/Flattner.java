@@ -32,6 +32,7 @@ import evl.data.variable.Constant;
 import evl.data.variable.StateVariable;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.DefTraverser;
+import evl.traverser.other.ClassGetter;
 
 public class Flattner extends EvlPass {
 
@@ -46,10 +47,10 @@ public class Flattner extends EvlPass {
 
     evl.children.clear();
 
-    evl.children.addAll(flat.getItems(Function.class));
-    evl.children.addAll(flat.getItems(StateVariable.class));
-    evl.children.addAll(flat.getItems(Constant.class));
-    evl.children.addAll(flat.getItems(Type.class));
+    evl.children.addAll(ClassGetter.filter(Function.class, flat));
+    evl.children.addAll(ClassGetter.filter(StateVariable.class, flat));
+    evl.children.addAll(ClassGetter.filter(Constant.class, flat));
+    evl.children.addAll(ClassGetter.filter(Type.class, flat));
   }
 
 }

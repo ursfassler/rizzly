@@ -17,20 +17,20 @@
 
 package fun.pass;
 
-import pass.FunPass;
+import pass.EvlPass;
 import error.ErrorType;
 import error.RError;
-import fun.Fun;
-import fun.NullTraverser;
-import fun.composition.ImplComposition;
-import fun.expression.reference.RefName;
-import fun.expression.reference.RefTemplCall;
-import fun.knowledge.KnowledgeBase;
-import fun.other.CompImpl;
-import fun.other.Named;
-import fun.other.Namespace;
-import fun.other.RizzlyFile;
-import fun.variable.CompUse;
+import evl.data.Evl;
+import evl.data.Named;
+import evl.data.Namespace;
+import evl.data.expression.reference.RefTemplCall;
+import evl.data.expression.reference.Reference;
+import evl.data.file.RizzlyFile;
+import evl.knowledge.KnowledgeBase;
+import evl.traverser.NullTraverser;
+import evl.traverser.other.ClassGetter;
+import fun.other.RawComponent;
+import fun.other.RawComposition;
 
 /**
  * Changes references to components, e.g. comp.foo.Bar -> Bar
@@ -38,10 +38,10 @@ import fun.variable.CompUse;
  * @author urs
  *
  */
-public class CompLinkReduction extends FunPass {
+public class CompLinkReduction extends EvlPass {
 
   @Override
-  public void process(Namespace root, KnowledgeBase kb) {
+  public void process(evl.data.Namespace root, KnowledgeBase kb) {
     CompLinkReductionWorker reduction = new CompLinkReductionWorker();
     reduction.traverse(root, null);
   }
@@ -51,44 +51,45 @@ public class CompLinkReduction extends FunPass {
 class CompLinkReductionWorker extends NullTraverser<Void, Void> {
 
   @Override
-  protected Void visitDefault(Fun obj, Void param) {
+  protected Void visitDefault(Evl obj, Void param) {
     return null;
   }
 
   @Override
   protected Void visitNamespace(Namespace obj, Void param) {
-    visitList(obj.getChildren(), param);
+    visitList(obj.children, param);
     return null;
   }
 
   @Override
-  protected Void visitImplComposition(ImplComposition obj, Void param) {
+  protected Void visitRawComposition(RawComposition obj, Void param) {
     visitList(obj.getInstantiation(), param);
     return null;
   }
 
   @Override
-  protected Void visitCompUse(CompUse obj, Void param) {
-    Named item = obj.getType().getLink();
+  protected Void visitCompUse(evl.data.component.composition.CompUse obj, Void param) {
+    Reference compRef = (Reference) obj.compRef;
+    Named item = compRef.link;
 
-    while (!obj.getType().getOffset().isEmpty()) {
-      if (obj.getType().getOffset().get(0) instanceof RefTemplCall) {
+    while (!compRef.offset.isEmpty()) {
+      if (compRef.offset.get(0) instanceof RefTemplCall) {
         break;
       }
-      RefName rn = (RefName) obj.getType().getOffset().get(0);
-      obj.getType().getOffset().remove(0);
+      evl.data.expression.reference.RefName rn = (evl.data.expression.reference.RefName) compRef.offset.get(0);
+      compRef.offset.remove(0);
       if (item instanceof RizzlyFile) {
-        item = ((RizzlyFile) item).getObjects().getItems(CompImpl.class).find(rn.getName());
+        item = ClassGetter.filter(RawComponent.class, ((RizzlyFile) item).getObjects()).find(rn.name);
       } else if (item instanceof Namespace) {
-        item = ((Namespace) item).getChildren().find(rn.getName());
+        item = (Named) ((evl.data.Namespace) item).children.find(rn.name);
       } else {
         RError.err(ErrorType.Fatal, item.getInfo(), "Unhandled type: " + item.getClass().getCanonicalName());
       }
       assert (item != null);
     }
 
-    assert (item instanceof CompImpl);
-    obj.getType().setLink(item);
+    assert (item instanceof RawComponent);
+    compRef.link = item;
 
     return null;
   }

@@ -165,7 +165,8 @@ public class Positioning {
     for (Connection e : comp.getConn()) {
       Integer u = map.get(e.getSrc().getOwner());
       Integer v = map.get(e.getDst().getOwner());
-      if ((u != null) && (v != null)) { // otherwise one end is at the owner component -> not relevant
+      if ((u != null) && (v != null)) { // otherwise one end is at the owner
+                                        // component -> not relevant
         g.addEdge(u, v);
         start.remove(v);
       }

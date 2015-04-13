@@ -58,7 +58,9 @@ public class HfsmTest extends BaseTest {
 
   @Test
   public void unusedState() {
-    compile("unusedState", TestSteps.COMPILE_TO_C, false, false); // TODO check for warnings
+    compile("unusedState", TestSteps.COMPILE_TO_C, false, false); // TODO check
+                                                                  // for
+                                                                  // warnings
   }
 
   @Test

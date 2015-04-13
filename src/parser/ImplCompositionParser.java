@@ -28,13 +28,15 @@ import common.Metadata;
 
 import error.ErrorType;
 import error.RError;
-import fun.composition.Connection;
-import fun.composition.ImplComposition;
-import fun.composition.MessageType;
-import fun.expression.reference.RefName;
-import fun.expression.reference.Reference;
-import fun.other.CompImpl;
-import fun.variable.CompUse;
+import evl.data.component.composition.AsynchroniusConnection;
+import evl.data.component.composition.CompUse;
+import evl.data.component.composition.Endpoint;
+import evl.data.component.composition.EndpointRaw;
+import evl.data.component.composition.SynchroniusConnection;
+import evl.data.expression.reference.RefName;
+import evl.data.expression.reference.Reference;
+import fun.other.RawComponent;
+import fun.other.RawComposition;
 
 public class ImplCompositionParser extends ImplBaseParser {
 
@@ -42,17 +44,18 @@ public class ImplCompositionParser extends ImplBaseParser {
     super(scanner);
   }
 
-  public static CompImpl parse(Scanner scanner, String name) {
+  public static RawComponent parse(Scanner scanner, String name) {
     ImplCompositionParser parser = new ImplCompositionParser(scanner);
     return parser.parseImplementationComposition(name);
   }
 
-  // EBNF implementationComposition: "composition" { compDeclBlock | connectionDeclBlock }
-  private ImplComposition parseImplementationComposition(String name) {
+  // EBNF implementationComposition: "composition" { compDeclBlock |
+  // connectionDeclBlock }
+  private RawComposition parseImplementationComposition(String name) {
     ElementInfo info = expect(TokenType.COMPOSITION).getInfo();
     ArrayList<Metadata> meta = getMetadata();
     info.metadata.addAll(meta);
-    ImplComposition comp = new ImplComposition(info, name);
+    RawComposition comp = new RawComposition(info, name);
 
     while (!consumeIfEqual(TokenType.END)) {
       Token id = expect(TokenType.IDENTIFIER);
@@ -60,7 +63,7 @@ public class ImplCompositionParser extends ImplBaseParser {
       if (consumeIfEqual(TokenType.COLON)) {
         parseInstantiation(id, comp);
       } else {
-        Connection obj = parseConnection(id);
+        evl.data.component.composition.Connection obj = parseConnection(id);
         comp.getConnection().add(obj);
       }
     }
@@ -68,14 +71,14 @@ public class ImplCompositionParser extends ImplBaseParser {
     return comp;
   }
 
-  private void parseInstantiation(Token id, ImplComposition comp) {
+  private void parseInstantiation(Token id, RawComposition comp) {
     switch (peek().getType()) {
       case IDENTIFIER:
         Reference type = expr().parseRef();
         expect(TokenType.SEMI);
         ArrayList<Metadata> meta = getMetadata();
         id.getInfo().metadata.addAll(meta);
-        CompUse compUse = new CompUse(id.getInfo(), id.getData(), type);
+        evl.data.component.composition.CompUse compUse = new CompUse(id.getInfo(), id.getData(), type);
         comp.getInstantiation().add(compUse);
         break;
       default: {
@@ -86,21 +89,30 @@ public class ImplCompositionParser extends ImplBaseParser {
   }
 
   // EBNF connection: endpoint msgType endpoint ";"
-  private Connection parseConnection(Token id) {
-    Reference src = parseEndpoint(id);
+  private evl.data.component.composition.Connection parseConnection(Token id) {
+    Endpoint src = parseEndpoint(id);
     ElementInfo info = peek().getInfo();
     MessageType type = parseMsgType();
-    Reference dst = parseEndpoint(next());
+    Endpoint dst = parseEndpoint(next());
     expect(TokenType.SEMI);
 
     ArrayList<Metadata> meta = getMetadata();
     info.metadata.addAll(meta);
 
-    return new Connection(info, src, dst, type);
+    switch (type) {
+      case sync:
+        return new SynchroniusConnection(info, src, dst);
+      case async:
+        return new AsynchroniusConnection(info, src, dst);
+      default:
+        RError.err(ErrorType.Fatal, info, "Unknown connection type: " + type);
+        return null;
+
+    }
   }
 
   // EBNF endpoint: id [ "." id ]
-  private Reference parseEndpoint(Token tok) {
+  private Endpoint parseEndpoint(Token tok) {
     if (tok.getType() != TokenType.IDENTIFIER) {
       RError.err(ErrorType.Error, tok.getInfo(), "Expected IDENTIFIER, got " + tok.getType());
       return null;
@@ -108,9 +120,9 @@ public class ImplCompositionParser extends ImplBaseParser {
     Reference ref = new Reference(tok.getInfo(), tok.getData());
     if (consumeIfEqual(TokenType.PERIOD)) {
       tok = expect(TokenType.IDENTIFIER);
-      ref.getOffset().add(new RefName(tok.getInfo(), tok.getData()));
+      ref.offset.add(new RefName(tok.getInfo(), tok.getData()));
     }
-    return ref;
+    return new EndpointRaw(tok.getInfo(), ref);
   }
 
   // EBNF msgType: "->" | ">>"
@@ -130,4 +142,8 @@ public class ImplCompositionParser extends ImplBaseParser {
     }
   }
 
+}
+
+enum MessageType {
+  sync, async
 }

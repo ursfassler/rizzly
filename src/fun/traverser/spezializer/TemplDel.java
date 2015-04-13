@@ -22,9 +22,9 @@ import java.util.Set;
 
 import error.ErrorType;
 import error.RError;
-import fun.DefTraverser;
-import fun.Fun;
-import fun.other.FunList;
+import evl.data.Evl;
+import evl.data.EvlList;
+import evl.traverser.DefTraverser;
 import fun.other.Template;
 
 /**
@@ -33,14 +33,14 @@ import fun.other.Template;
 public class TemplDel extends DefTraverser<Void, Void> {
   static private final TemplDel INSTANCE = new TemplDel();
 
-  public static void process(Fun fun) {
+  public static void process(Evl fun) {
     INSTANCE.traverse(fun, null);
   }
 
   @Override
-  protected Void visitList(FunList<? extends Fun> list, Void param) {
+  protected Void visitList(EvlList<? extends Evl> list, Void param) {
     Set<Template> remove = new HashSet<Template>();
-    for (Fun ast : list) {
+    for (Evl ast : list) {
       if (ast instanceof Template) {
         remove.add((Template) ast);
       } else {

@@ -25,6 +25,7 @@ import pass.Condition;
 import pass.EvlPass;
 
 import common.Designator;
+import common.ElementInfo;
 
 import debug.DebugPrinter;
 import error.RError;
@@ -73,10 +74,32 @@ import evl.pass.sanitycheck.Sanitycheck;
 import evl.pass.typecheck.Typecheck;
 import evl.traverser.other.ConstTyper;
 import evl.traverser.other.SystemIfaceAdder;
+import fun.pass.CheckNames;
+import fun.pass.CheckSimpleTypeRef;
+import fun.pass.CompLinkReduction;
+import fun.pass.DocWriter;
+import fun.pass.EnumLinkReduction;
+import fun.pass.FileLoader;
+import fun.pass.FileReduction;
+import fun.pass.InternFuncAdder;
+import fun.pass.InternTypeAdder;
+import fun.pass.Linker;
+import fun.pass.NamespaceLinkReduction;
+import fun.pass.ReduceMultiAssignment;
+import fun.pass.ReduceRawComp;
+import fun.pass.ReduceVarDefInit;
+import fun.pass.RootInstanceAdder;
+import fun.pass.SimplifyRef;
+import fun.pass.StateLinkReduction;
+import fun.pass.StateVarInitExecutor;
+import fun.pass.UnusedRemover;
+import fun.pass.VarDefSplitter;
+import fun.traverser.spezializer.TypeEvalReplacerPass;
 
 public class MainEvl {
-  public static void doEvl(ClaOption opt, String outdir, String debugdir, Namespace aclasses) {
-    KnowledgeBase kb = new KnowledgeBase(aclasses, outdir, debugdir);
+  public static void doEvl(ClaOption opt, String outdir, String debugdir) {
+    Namespace aclasses = new Namespace(ElementInfo.NO, "!");
+    KnowledgeBase kb = new KnowledgeBase(aclasses, outdir, debugdir, opt);
     PassGroup passes = evlPasses(opt);
     process(passes, new Designator(), new DebugPrinter(aclasses, kb.getDebugDir()), aclasses, kb);
   }
@@ -86,6 +109,8 @@ public class MainEvl {
     PassGroup passes = new PassGroup("evl");
 
     passes.checks.add(new Sanitycheck());
+
+    passes.passes.add(funPasses(opt));
 
     passes.add(new ConstTyper());
 
@@ -145,6 +170,45 @@ public class MainEvl {
     passes.passes.add(prepareForC(passes));
 
     passes.add(new CWriter());
+    return passes;
+  }
+
+  private static PassGroup funPasses(ClaOption opt) {
+    PassGroup passes = new PassGroup("fun");
+
+    passes.add(new FileLoader());
+
+    passes.add(new InternTypeAdder());
+    passes.add(new InternFuncAdder());
+
+    passes.add(new CheckNames());
+    passes.add(new Linker());
+    if (opt.getDocOutput()) {
+      passes.add(new DocWriter());
+    }
+    passes.add(new FileReduction());
+
+    passes.add(new NamespaceLinkReduction());
+    passes.add(new StateLinkReduction());
+    passes.add(new EnumLinkReduction());
+    passes.add(new CompLinkReduction());
+
+    passes.add(new RootInstanceAdder());
+
+    passes.add(new TypeEvalReplacerPass());
+
+    passes.add(new VarDefSplitter());
+    passes.add(new UnusedRemover());
+    passes.add(new StateVarInitExecutor());
+    passes.add(new UnusedRemover());
+
+    // what was in FunToEvl
+    passes.add(new ReduceMultiAssignment());
+    passes.add(new ReduceRawComp());
+    passes.add(new SimplifyRef());
+    passes.add(new CheckSimpleTypeRef());
+    passes.add(new ReduceVarDefInit());
+
     return passes;
   }
 

@@ -126,7 +126,8 @@ public class HtmlWriter implements Writer {
     Element div = doc.createElement("div");
     root.appendChild(div);
     root = div;
-    wr(" "); // FIXME all tested browsers have had problems with empty div tags (add indention); fix CSS or so
+    wr(" "); // FIXME all tested browsers have had problems with empty div tags
+             // (add indention); fix CSS or so
     wroteSecSep.push(true);
   }
 

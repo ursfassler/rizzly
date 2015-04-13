@@ -21,45 +21,45 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import fun.Copy;
-import fun.Fun;
-import fun.expression.Expression;
-import fun.expression.reference.BaseRef;
-import fun.expression.reference.RefTemplCall;
-import fun.expression.reference.Reference;
-import fun.function.template.FunctionTemplate;
-import fun.hfsm.State;
-import fun.hfsm.StateContent;
-import fun.knowledge.KnowInstance;
-import fun.knowledge.KnowParent;
-import fun.knowledge.KnowledgeBase;
+import evl.copy.Copy;
+import evl.data.Evl;
+import evl.data.EvlList;
+import evl.data.Namespace;
+import evl.data.component.hfsm.State;
+import evl.data.component.hfsm.StateContent;
+import evl.data.expression.Expression;
+import evl.data.expression.reference.BaseRef;
+import evl.data.expression.reference.RefTemplCall;
+import evl.data.expression.reference.Reference;
+import evl.data.function.template.FunctionTemplate;
+import evl.data.type.Type;
+import evl.data.type.template.TypeTemplate;
+import evl.data.type.template.TypeType;
+import evl.data.variable.Constant;
+import evl.data.variable.TemplateParameter;
+import evl.knowledge.KnowInstance;
+import evl.knowledge.KnowParent;
+import evl.knowledge.KnowledgeBase;
 import fun.other.ActualTemplateArgument;
-import fun.other.FunList;
-import fun.other.ImplElementary;
-import fun.other.Namespace;
+import fun.other.RawElementary;
 import fun.other.Template;
 import fun.traverser.ConstEval;
 import fun.traverser.Memory;
-import fun.type.Type;
-import fun.type.template.TypeTemplate;
-import fun.type.template.TypeType;
-import fun.variable.Constant;
-import fun.variable.TemplateParameter;
 
 //TODO rethink it; make it clean
 public class Specializer {
 
-  public static Fun process(Template item, List<ActualTemplateArgument> genspec, KnowledgeBase kb) {
+  public static Evl process(Template item, List<ActualTemplateArgument> genspec, KnowledgeBase kb) {
     for (int i = 0; i < genspec.size(); i++) {
       ActualTemplateArgument itr = genspec.get(i);
       itr = eval(kb, itr);
       genspec.set(i, itr);
     }
 
-    Fun templ = item.getObject();
+    Evl templ = item.getObject();
 
     KnowInstance ki = kb.getEntry(KnowInstance.class);
-    Fun inst = ki.find(templ, genspec);
+    Evl inst = ki.find(templ, genspec);
 
     if (inst == null) {
       if (templ instanceof TypeTemplate) {
@@ -78,7 +78,7 @@ public class Specializer {
         }
 
         KnowParent kp = kb.getEntry(KnowParent.class);
-        Fun parent = kp.get(item);
+        Evl parent = kp.get(item);
 
         // TODO create clean name
 
@@ -98,9 +98,9 @@ public class Specializer {
     }
 
     while (inst instanceof Reference) {
-      Reference ref = (Reference) inst;
-      assert (ref.getOffset().isEmpty());
-      inst = ref.getLink();
+      evl.data.expression.reference.Reference ref = (evl.data.expression.reference.Reference) inst;
+      assert (ref.offset.isEmpty());
+      inst = ref.link;
     }
 
     assert (!(inst instanceof BaseRef));
@@ -114,29 +114,29 @@ public class Specializer {
     }
     while (itr instanceof Reference) {
       Reference ref = (Reference) itr;
-      assert (ref.getOffset().isEmpty());
-      itr = (ActualTemplateArgument) ref.getLink();
+      assert (ref.offset.isEmpty());
+      itr = (ActualTemplateArgument) ref.link;
     }
     return itr;
   }
 
-  static ActualTemplateArgument eval(ActualTemplateArgument actualTemplateArgument, KnowledgeBase kb) {
+  static ActualTemplateArgument eval(ActualTemplateArgument actualTemplateArgument, evl.knowledge.KnowledgeBase kb) {
     throw new RuntimeException("not yet implemented");
   }
 
-  private static void addChild(Fun inst, Fun parent) {
+  private static void addChild(Evl inst, Evl parent) {
     if (parent instanceof Namespace) {
-      ((Namespace) parent).getChildren().add(inst);
-    } else if (parent instanceof ImplElementary) {
-      ((ImplElementary) parent).getInstantiation().add(inst);
+      ((evl.data.Namespace) parent).children.add(inst);
+    } else if (parent instanceof RawElementary) {
+      ((RawElementary) parent).getInstantiation().add(inst);
     } else if (parent instanceof State) {
-      ((State) parent).getItemList().add((StateContent) inst);
+      ((evl.data.component.hfsm.State) parent).item.add((StateContent) inst);
     } else {
       throw new RuntimeException("not yet implemented: " + parent.getClass().getCanonicalName());
     }
   }
 
-  private static Map<TemplateParameter, ActualTemplateArgument> makeMap(List<ActualTemplateArgument> param, FunList<TemplateParameter> param1) {
+  private static Map<TemplateParameter, ActualTemplateArgument> makeMap(List<ActualTemplateArgument> param, EvlList<TemplateParameter> param1) {
     Map<TemplateParameter, ActualTemplateArgument> map = new HashMap<TemplateParameter, ActualTemplateArgument>();
     for (int i = 0; i < param.size(); i++) {
       TemplateParameter var = param1.get(i);
@@ -148,56 +148,56 @@ public class Specializer {
 
   static Type evalType(Reference tref, KnowledgeBase kb) {
     Type type;
-    if (tref.getLink() instanceof TemplateParameter) {
+    if (tref.link instanceof TemplateParameter) {
       // we use a previous defined parameter, it has to be a "Type{*}" argument
       TemplateParameter pitm;
-      pitm = (TemplateParameter) tref.getLink();
-      tref = pitm.getType();
-      Fun any = eval(tref, kb);
+      pitm = (TemplateParameter) tref.link;
+      tref = (Reference) pitm.type;
+      Evl any = eval(tref, kb);
       assert (any instanceof TypeType);
       any = eval(((TypeType) any).getType(), kb);
       type = (Type) any;
-    } else if (tref.getLink() instanceof Type) {
-      assert (tref.getOffset().isEmpty());
-      return (Type) tref.getLink();
+    } else if (tref.link instanceof Type) {
+      assert (tref.offset.isEmpty());
+      return (Type) tref.link;
     } else {
-      Fun any = eval(tref, kb);
+      Evl any = eval(tref, kb);
       type = (Type) any;
     }
     return type;
   }
 
-  private static Fun eval(Reference obj, KnowledgeBase kb) {
-    if (obj.getLink() instanceof Constant) {
+  private static Evl eval(Reference obj, KnowledgeBase kb) {
+    if (obj.link instanceof Constant) {
       assert (false);
     }
 
-    if (obj.getLink() instanceof Template) {
-      Template generator = (Template) obj.getLink();
+    if (obj.link instanceof Template) {
+      Template generator = (Template) obj.link;
 
-      FunList<ActualTemplateArgument> actparam;
-      if (obj.getOffset().isEmpty() || !(obj.getOffset().get(0) instanceof RefTemplCall)) {
+      EvlList<ActualTemplateArgument> actparam;
+      if (obj.offset.isEmpty() || !(obj.offset.get(0) instanceof RefTemplCall)) {
         assert (generator.getTempl().isEmpty());
-        actparam = new FunList<ActualTemplateArgument>();
+        actparam = new EvlList<ActualTemplateArgument>();
       } else {
-        assert (obj.getOffset().size() == 1);
-        assert (obj.getOffset().get(0) instanceof RefTemplCall);
-        actparam = ((RefTemplCall) obj.getOffset().get(0)).getActualParameter();
+        assert (obj.offset.size() == 1);
+        assert (obj.offset.get(0) instanceof RefTemplCall);
+        actparam = ((RefTemplCall) obj.offset.get(0)).actualParameter;
       }
 
       return Specializer.process(generator, actparam, kb);
-    } else if (obj.getLink() instanceof TypeTemplate) {
-      TypeTemplate generator = (TypeTemplate) obj.getLink();
-      assert (obj.getOffset().size() == 1);
-      assert (obj.getOffset().get(0) instanceof RefTemplCall);
+    } else if (obj.link instanceof TypeTemplate) {
+      TypeTemplate generator = (TypeTemplate) obj.link;
+      assert (obj.offset.size() == 1);
+      assert (obj.offset.get(0) instanceof RefTemplCall);
 
-      List<ActualTemplateArgument> actparam = ((RefTemplCall) obj.getOffset().get(0)).getActualParameter();
+      List<ActualTemplateArgument> actparam = ((RefTemplCall) obj.offset.get(0)).actualParameter;
       return TypeTemplateSpecializer.process(generator, actparam, kb);
-    } else if (obj.getLink() instanceof Type) {
-      assert (obj.getOffset().isEmpty());
-      return obj.getLink();
+    } else if (obj.link instanceof Type) {
+      assert (obj.offset.isEmpty());
+      return obj.link;
     } else {
-      throw new RuntimeException("not yet implemented: " + obj.getLink().getClass().getCanonicalName());
+      throw new RuntimeException("not yet implemented: " + obj.link.getClass().getCanonicalName());
       // if (!(obj.getLink() instanceof Declaration)) {
       // assert (obj.getOffset().isEmpty());
       // return obj.getLink();

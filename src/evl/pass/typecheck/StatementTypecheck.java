@@ -24,6 +24,7 @@ import evl.data.EvlList;
 import evl.data.expression.Expression;
 import evl.data.expression.reference.Reference;
 import evl.data.expression.reference.SimpleRef;
+import evl.data.expression.reference.TypeRef;
 import evl.data.statement.AssignmentMulti;
 import evl.data.statement.AssignmentSingle;
 import evl.data.statement.Block;
@@ -35,12 +36,12 @@ import evl.data.statement.CaseStmt;
 import evl.data.statement.ForStmt;
 import evl.data.statement.IfOption;
 import evl.data.statement.IfStmt;
+import evl.data.statement.MsgPush;
 import evl.data.statement.ReturnExpr;
 import evl.data.statement.ReturnVoid;
 import evl.data.statement.Statement;
 import evl.data.statement.VarDefStmt;
 import evl.data.statement.WhileStmt;
-import evl.data.statement.intern.MsgPush;
 import evl.data.type.Type;
 import evl.data.type.base.BooleanType;
 import evl.data.type.base.EnumElement;
@@ -112,7 +113,7 @@ public class StatementTypecheck extends NullTraverser<Void, Void> {
   }
 
   private void checkConstant(Constant obj) {
-    Type ret = obj.type.link;
+    Type ret = kt.get(obj.type);
     Type defType = checkGetExpr(obj.def);
     if (!kc.get(ret, defType)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Data type to big or incompatible in assignment: " + ret.name + " := " + defType.name);
@@ -138,7 +139,7 @@ public class StatementTypecheck extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitForStmt(ForStmt obj, Void param) {
-    Type cond = obj.iterator.type.link;
+    Type cond = kt.get(obj.iterator.type);
     if (!(cond instanceof RangeType)) {
       RError.err(ErrorType.Error, obj.getInfo(), "For loop only supports range type (at the moment), got: " + cond.name);
     }
@@ -237,7 +238,7 @@ public class StatementTypecheck extends NullTraverser<Void, Void> {
     if (ll.size() == 1) {
       lhs = ll.get(0);
     } else {
-      EvlList<SimpleRef<Type>> tl = new EvlList<SimpleRef<Type>>();
+      EvlList<TypeRef> tl = new EvlList<TypeRef>();
       for (Type lt : ll) {
         tl.add(new SimpleRef<Type>(lt.getInfo(), lt));
       }

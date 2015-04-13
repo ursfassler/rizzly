@@ -32,6 +32,7 @@ import evl.data.expression.binop.Equal;
 import evl.data.expression.binop.Is;
 import evl.data.expression.reference.RefName;
 import evl.data.expression.reference.Reference;
+import evl.data.expression.reference.SimpleRef;
 import evl.data.statement.CaseStmt;
 import evl.data.type.Type;
 import evl.data.type.base.EnumElement;
@@ -139,10 +140,9 @@ class Uni2Enum extends DefTraverser<Void, Map<UnionType, EnumType>> {
       et.getElement().add(ee);
     }
 
-    obj.tag.ref.link = et;
+    obj.tag.typeref = new SimpleRef<Type>(ElementInfo.NO, et);
 
     param.put(obj, et);
     return null;
   }
-
 }

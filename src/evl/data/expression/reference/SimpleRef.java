@@ -19,11 +19,17 @@ package evl.data.expression.reference;
 
 import common.ElementInfo;
 
+import evl.data.Evl;
 import evl.data.Named;
 
-final public class SimpleRef<T extends Named> extends BaseRef<T> {
+public class SimpleRef<T extends Named> extends BaseRef<T> {
 
   public SimpleRef(ElementInfo info, T link) {
     super(info, link);
+  }
+
+  @Override
+  public Evl getTarget() {
+    return link;
   }
 }

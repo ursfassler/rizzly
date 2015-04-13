@@ -25,10 +25,11 @@ import evl.data.Named;
 import evl.data.component.composition.Queue;
 import evl.data.function.Function;
 import evl.data.function.InterfaceFunction;
-import evl.data.function.header.FuncCtrlInDataIn;
-import evl.data.function.header.FuncCtrlInDataOut;
-import evl.data.function.header.FuncCtrlOutDataIn;
-import evl.data.function.header.FuncCtrlOutDataOut;
+import evl.data.function.header.FuncQuery;
+import evl.data.function.header.FuncResponse;
+import evl.data.function.header.FuncSignal;
+import evl.data.function.header.FuncSlot;
+import evl.traverser.other.ClassGetter;
 
 abstract public class Component extends Named {
   public Queue queue;
@@ -44,13 +45,13 @@ abstract public class Component extends Named {
     EvlList<InterfaceFunction> ret = new EvlList<InterfaceFunction>();
     switch (dir) {
       case in: {
-        ret.addAll(iface.getItems(FuncCtrlInDataOut.class));
-        ret.addAll(iface.getItems(FuncCtrlInDataIn.class));
+        ret.addAll(ClassGetter.filter(FuncResponse.class, iface));
+        ret.addAll(ClassGetter.filter(FuncSlot.class, iface));
         break;
       }
       case out: {
-        ret.addAll(iface.getItems(FuncCtrlOutDataIn.class));
-        ret.addAll(iface.getItems(FuncCtrlOutDataOut.class));
+        ret.addAll(ClassGetter.filter(FuncQuery.class, iface));
+        ret.addAll(ClassGetter.filter(FuncSignal.class, iface));
         break;
       }
       default:

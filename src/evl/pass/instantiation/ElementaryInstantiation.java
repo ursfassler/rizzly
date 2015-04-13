@@ -42,7 +42,7 @@ import evl.data.expression.reference.SimpleRef;
 import evl.data.function.Function;
 import evl.data.function.FunctionProperty;
 import evl.data.function.InterfaceFunction;
-import evl.data.function.header.FuncPrivateVoid;
+import evl.data.function.header.FuncProcedure;
 import evl.data.function.ret.FuncReturnNone;
 import evl.data.statement.Block;
 import evl.data.variable.FuncVariable;
@@ -58,7 +58,7 @@ public class ElementaryInstantiation extends EvlPass {
     CompUse instComp = kb.getRootComp();
     evl.children.remove(instComp);
 
-    ImplElementary env = makeEnv(instComp.instref.link, kb);
+    ImplElementary env = makeEnv((Component) instComp.compRef.getTarget(), kb);
     evl.children.add(env);
 
     CompInstantiatorWorker instantiator = new CompInstantiatorWorker();
@@ -72,7 +72,8 @@ public class ElementaryInstantiation extends EvlPass {
     Set<Function> pubfunc = new HashSet<Function>();
     pubfunc.addAll(ClassGetter.getRecursive(Function.class, inst.subCallback));
     RError.ass(inst.component.size() == 1, inst.getInfo(), "Only expected one instance");
-    pubfunc.addAll(inst.component.get(0).instref.link.iface);
+    Component targetComp = (Component) inst.component.get(0).compRef.getTarget();
+    pubfunc.addAll(targetComp.iface);
 
     for (Function nam : pubfunc) {
       if (nam.property == FunctionProperty.Private) {
@@ -83,9 +84,9 @@ public class ElementaryInstantiation extends EvlPass {
 
   private static ImplElementary makeEnv(Component top, KnowledgeBase kb) {
     ElementInfo info = ElementInfo.NO;
-    FuncPrivateVoid entry = new FuncPrivateVoid(info, "entry", new EvlList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
-    FuncPrivateVoid exit = new FuncPrivateVoid(info, "exit", new EvlList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
-    ImplElementary env = new ImplElementary(ElementInfo.NO, "", new SimpleRef<FuncPrivateVoid>(info, entry), new SimpleRef<FuncPrivateVoid>(info, exit));
+    FuncProcedure entry = new FuncProcedure(info, "entry", new EvlList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
+    FuncProcedure exit = new FuncProcedure(info, "exit", new EvlList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
+    ImplElementary env = new ImplElementary(ElementInfo.NO, "", new SimpleRef<FuncProcedure>(info, entry), new SimpleRef<FuncProcedure>(info, exit));
     env.function.add(entry);
     env.function.add(exit);
 
@@ -95,7 +96,8 @@ public class ElementaryInstantiation extends EvlPass {
     for (CompUse compu : env.component) {
       SubCallbacks suc = new SubCallbacks(compu.getInfo(), new SimpleRef<CompUse>(ElementInfo.NO, compu));
       env.subCallback.add(suc);
-      for (InterfaceFunction out : compu.instref.link.getIface(Direction.out)) {
+      Component refComp = (Component) compu.compRef.getTarget();
+      for (InterfaceFunction out : refComp.getIface(Direction.out)) {
         Function suha = CompositionReduction.makeHandler(out);
         suha.property = FunctionProperty.External;
         suc.func.add(suha);
@@ -134,12 +136,12 @@ class CompInstantiatorWorker extends NullTraverser<ImplElementary, Namespace> {
     // ns.getChildren().removeAll(ns.getChildren().getItems(FuncCtrlOutDataOut.class));
 
     for (CompUse compUse : inst.component) {
-      Component comp = compUse.instref.link;
+      Component comp = (Component) compUse.compRef.getTarget();
 
       // copy / instantiate used component
       Namespace usens = new Namespace(compUse.getInfo(), compUse.name);
       ImplElementary cpy = visit(comp, usens);
-      compUse.instref.link = cpy;
+      compUse.compRef = new SimpleRef<Component>(compUse.getInfo(), cpy);
       ns.children.add(usens);
       linkmap.put(compUse, usens);
 
@@ -152,7 +154,8 @@ class CompInstantiatorWorker extends NullTraverser<ImplElementary, Namespace> {
         assert (usens.children.contains(outdecl));
         assert (!linkmap.containsKey(outdecl));
 
-        // change links to output declaration to the sub-callback of this component
+        // change links to output declaration to the sub-callback of this
+        // component
         linkmap.put(outdecl, impl);
         usens.children.remove(outdecl);
         usens.children.add(impl);

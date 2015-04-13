@@ -25,12 +25,13 @@ import evl.data.statement.CallStmt;
 import evl.data.statement.CaseStmt;
 import evl.data.statement.ForStmt;
 import evl.data.statement.IfStmt;
+import evl.data.statement.MsgPush;
 import evl.data.statement.ReturnExpr;
 import evl.data.statement.ReturnVoid;
 import evl.data.statement.Statement;
+import evl.data.statement.VarDefInitStmt;
 import evl.data.statement.VarDefStmt;
 import evl.data.statement.WhileStmt;
-import evl.data.statement.intern.MsgPush;
 import evl.traverser.NullTraverser;
 
 public class CopyStatement extends NullTraverser<Statement, Void> {
@@ -108,4 +109,8 @@ public class CopyStatement extends NullTraverser<Statement, Void> {
     return new ForStmt(obj.getInfo(), cast.copy(obj.iterator), cast.copy(obj.block));
   }
 
+  @Override
+  protected Statement visitVarDefInitStmt(VarDefInitStmt obj, Void param) {
+    return new VarDefInitStmt(obj.getInfo(), cast.copy(obj.variable), cast.copy(obj.initial));
+  }
 }

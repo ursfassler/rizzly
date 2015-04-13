@@ -89,7 +89,8 @@ class EnumReduce extends DefTraverser<Void, Void> {
   protected Void visitReference(Reference obj, Void param) {
     if (typeMap.containsKey(obj.link)) {
       if (!obj.offset.isEmpty() && (obj.offset.get(0) instanceof RefName)) {
-        // replace a link to EnumType.EnumName with a link to the corresponding constant
+        // replace a link to EnumType.EnumName with a link to the corresponding
+        // constant
         assert (obj.offset.size() == 1);
         String elemName = ((RefName) obj.offset.get(0)).name;
         EnumType ent = (EnumType) obj.link;

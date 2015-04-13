@@ -20,11 +20,11 @@ package evl.data.component.hfsm;
 import common.ElementInfo;
 
 import evl.data.expression.reference.SimpleRef;
-import evl.data.function.header.FuncPrivateVoid;
+import evl.data.function.header.FuncProcedure;
 
-final public class StateSimple extends State {
+public class StateSimple extends State {
 
-  public StateSimple(ElementInfo info, String name, SimpleRef<FuncPrivateVoid> entryFunc, SimpleRef<FuncPrivateVoid> exitFunc) {
+  public StateSimple(ElementInfo info, String name, SimpleRef<FuncProcedure> entryFunc, SimpleRef<FuncProcedure> exitFunc) {
     super(info, name, entryFunc, exitFunc);
   }
 

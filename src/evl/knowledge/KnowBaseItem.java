@@ -29,6 +29,7 @@ import evl.copy.Copy;
 import evl.data.Evl;
 import evl.data.EvlList;
 import evl.data.Namespace;
+import evl.data.expression.reference.Reference;
 import evl.data.expression.reference.SimpleRef;
 import evl.data.type.Type;
 import evl.data.type.base.ArrayType;
@@ -43,6 +44,7 @@ import evl.data.type.special.AnyType;
 import evl.data.type.special.IntegerType;
 import evl.data.type.special.NaturalType;
 import evl.data.type.special.VoidType;
+import evl.data.type.template.TypeType;
 import evl.traverser.NullTraverser;
 import evl.traverser.other.ClassGetter;
 
@@ -99,7 +101,7 @@ public class KnowBaseItem extends KnowledgeEntry {
   }
 
   public RangeType getRangeType(Range range) {
-    EvlList<RangeType> items = kb.getRoot().children.getItems(RangeType.class);
+    EvlList<RangeType> items = ClassGetter.filter(RangeType.class, kb.getRoot().children);
     for (RangeType itr : items) {
       if (itr.range.equals(range)) {
         return itr;
@@ -110,10 +112,23 @@ public class KnowBaseItem extends KnowledgeEntry {
     return ret;
   }
 
+  public TypeType getTypeType(Type type) {
+    EvlList<TypeType> items = ClassGetter.filter(TypeType.class, kb.getRoot().children);
+    for (TypeType itr : items) {
+      assert (itr.getType().offset.isEmpty());
+      if (itr.getType().link == type) {
+        return itr;
+      }
+    }
+    TypeType ret = new TypeType(ElementInfo.NO, new Reference(ElementInfo.NO, type));
+    kb.getRoot().children.add(ret);
+    return ret;
+  }
+
   public ArrayType getArray(BigInteger size, Type type) {
-    EvlList<ArrayType> items = kb.getRoot().children.getItems(ArrayType.class);
+    EvlList<ArrayType> items = ClassGetter.filter(ArrayType.class, kb.getRoot().children);
     for (ArrayType itr : items) {
-      if (itr.size.equals(size) && itr.type.link.equals(type)) {
+      if (itr.size.equals(size) && ((SimpleRef<Type>) itr.type).link.equals(type)) {
         return itr;
       }
     }
@@ -124,7 +139,7 @@ public class KnowBaseItem extends KnowledgeEntry {
   }
 
   public RecordType getRecord(EvlList<NamedElement> element) {
-    EvlList<RecordType> items = kb.getRoot().children.getItems(RecordType.class);
+    EvlList<RecordType> items = ClassGetter.filter(RecordType.class, kb.getRoot().children);
     for (RecordType itr : items) {
       if (equal(element, itr.element)) {
         return itr;
@@ -141,15 +156,20 @@ public class KnowBaseItem extends KnowledgeEntry {
       return false;
     }
     for (int i = 0; i < left.size(); i++) {
-      if (!left.get(i).name.equals(right.get(i).name) || !left.get(i).ref.link.equals(right.get(i).ref.link)) {
+      if (!left.get(i).name.equals(right.get(i).name) || !equal(left, right, i)) {
         return false;
       }
     }
     return true;
   }
 
+  private boolean equal(EvlList<NamedElement> left, EvlList<NamedElement> right, int i) {
+    // FIXME only works for simple ref
+    return ((SimpleRef<Type>) left.get(i).typeref).link.equals(((SimpleRef<Type>) right.get(i).typeref).link);
+  }
+
   public EnumType getEnumType(Set<String> elements) {
-    EvlList<EnumType> items = kb.getRoot().children.getItems(EnumType.class);
+    EvlList<EnumType> items = ClassGetter.filter(EnumType.class, kb.getRoot().children);
     for (EnumType itr : items) {
       if (itr.getNames().equals(elements)) {
         return itr;
@@ -185,13 +205,19 @@ public class KnowBaseItem extends KnowledgeEntry {
   }
 
   public Type getType(Type ct) {
-    KnowBaseItemTypeFinder finder = new KnowBaseItemTypeFinder();
+    KnowBaseItemTypeFinder finder = new KnowBaseItemTypeFinder(kb);
     return finder.traverse(ct, this);
   }
 
 }
 
 class KnowBaseItemTypeFinder extends NullTraverser<Type, KnowBaseItem> {
+  final private KnowType kt;
+
+  public KnowBaseItemTypeFinder(KnowledgeBase kb) {
+    super();
+    this.kt = kb.getEntry(KnowType.class);
+  }
 
   @Override
   protected Type visitDefault(Evl obj, KnowBaseItem param) {
@@ -215,7 +241,7 @@ class KnowBaseItemTypeFinder extends NullTraverser<Type, KnowBaseItem> {
 
   @Override
   protected Type visitArrayType(ArrayType obj, KnowBaseItem param) {
-    return param.getArray(obj.size, obj.type.link);
+    return param.getArray(obj.size, kt.get(obj.type));
   }
 
   @Override

@@ -29,31 +29,33 @@ import common.Metadata;
 
 import error.ErrorType;
 import error.RError;
-import fun.Fun;
-import fun.other.CompImpl;
-import fun.other.ImplElementary;
+import evl.data.Evl;
+import evl.data.variable.ConstPrivate;
+import evl.data.variable.StateVariable;
+import evl.data.variable.TemplateParameter;
+import fun.other.RawComponent;
+import fun.other.RawElementary;
 import fun.other.Template;
-import fun.variable.ConstPrivate;
-import fun.variable.StateVariable;
-import fun.variable.TemplateParameter;
 
 public class ImplElementaryParser extends ImplBaseParser {
   public ImplElementaryParser(Scanner scanner) {
     super(scanner);
   }
 
-  public static CompImpl parse(Scanner scanner, String name) {
+  public static RawComponent parse(Scanner scanner, String name) {
     ImplElementaryParser parser = new ImplElementaryParser(scanner);
     return parser.parseImplementationElementary(name);
   }
 
-  // EBNF implementationElementary: "elementary" { entryCode | exitCode | compDeclBlock | varDeclBlock | constDeclBlock
-  // | privateFunction | responseFunction | slotFunction | interruptFunction | entry | exit }
-  private ImplElementary parseImplementationElementary(String name) {
+  // EBNF implementationElementary: "elementary" { entryCode | exitCode |
+  // compDeclBlock | varDeclBlock | constDeclBlock
+  // | privateFunction | responseFunction | slotFunction | interruptFunction |
+  // entry | exit }
+  private RawElementary parseImplementationElementary(String name) {
     ElementInfo info = expect(TokenType.ELEMENTARY).getInfo();
     ArrayList<Metadata> meta = getMetadata();
     info.metadata.addAll(meta);
-    ImplElementary comp = new ImplElementary(info, name);
+    RawElementary comp = new RawElementary(info, name);
 
     while (!consumeIfEqual(TokenType.END)) {
       if (peek().getType() == TokenType.IDENTIFIER) {
@@ -66,11 +68,11 @@ public class ImplElementaryParser extends ImplBaseParser {
           } else {
             genpam = new ArrayList<TemplateParameter>();
           }
-          Fun obj = parseDeclaration(id.getData());
+          Evl obj = parseDeclaration(id.getData());
           Template decl = new Template(id.getInfo(), id.getData(), genpam, obj);
           comp.getDeclaration().add(decl);
         } else if (consumeIfEqual(TokenType.COLON)) {
-          Fun var = parseInstantiation(id.getData());
+          Evl var = parseInstantiation(id.getData());
           comp.getInstantiation().add(var);
         } else {
           Token got = peek();
@@ -85,7 +87,7 @@ public class ImplElementaryParser extends ImplBaseParser {
     return comp;
   }
 
-  private void parseAnonymous(ImplElementary comp) {
+  private void parseAnonymous(RawElementary comp) {
     switch (peek().getType()) {
       case ENTRY:
         comp.setEntryFunc(parseEntryCode());
@@ -101,7 +103,7 @@ public class ImplElementaryParser extends ImplBaseParser {
     }
   }
 
-  private Fun parseInstantiation(String name) {
+  private Evl parseInstantiation(String name) {
     switch (peek().getType()) {
       case CONST: {
         ConstPrivate var = parseConstDef(ConstPrivate.class, name);
@@ -120,7 +122,7 @@ public class ImplElementaryParser extends ImplBaseParser {
     }
   }
 
-  private Fun parseDeclaration(String name) {
+  private Evl parseDeclaration(String name) {
     switch (peek().getType()) {
       case FUNCTION:
       case PROCEDURE:

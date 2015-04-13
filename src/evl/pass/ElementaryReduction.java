@@ -32,9 +32,10 @@ import evl.data.Named;
 import evl.data.Namespace;
 import evl.data.component.elementary.ImplElementary;
 import evl.data.expression.reference.SimpleRef;
+import evl.data.expression.reference.TypeRef;
 import evl.data.function.Function;
-import evl.data.function.header.FuncCtrlInDataIn;
-import evl.data.function.header.FuncCtrlInDataOut;
+import evl.data.function.header.FuncResponse;
+import evl.data.function.header.FuncSlot;
 import evl.data.type.Type;
 import evl.data.type.base.TupleType;
 import evl.data.variable.FuncVariable;
@@ -57,10 +58,10 @@ public class ElementaryReduction extends EvlPass {
 
     for (ImplElementary impl : ClassGetter.getRecursive(ImplElementary.class, evl)) {
 
-      EvlList<FuncCtrlInDataIn> slotImpl = impl.function.getItems(FuncCtrlInDataIn.class);
-      EvlList<FuncCtrlInDataOut> responseImpl = impl.function.getItems(FuncCtrlInDataOut.class);
-      EvlList<FuncCtrlInDataIn> slotProto = impl.iface.getItems(FuncCtrlInDataIn.class);
-      EvlList<FuncCtrlInDataOut> responseProto = impl.iface.getItems(FuncCtrlInDataOut.class);
+      EvlList<FuncSlot> slotImpl = ClassGetter.filter(FuncSlot.class, impl.function);
+      EvlList<FuncResponse> responseImpl = ClassGetter.filter(FuncResponse.class, impl.function);
+      EvlList<FuncSlot> slotProto = ClassGetter.filter(FuncSlot.class, impl.iface);
+      EvlList<FuncResponse> responseProto = ClassGetter.filter(FuncResponse.class, impl.iface);
 
       if (!checkForAll(slotImpl, slotProto, "interface declaration") | !checkForAll(responseImpl, responseProto, "interface declaration") | !checkForAll(responseProto, responseImpl, "implementation")) {
         return;
@@ -98,15 +99,15 @@ public class ElementaryReduction extends EvlPass {
     assert (proto.body.statements.isEmpty());
 
     KnowLeftIsContainerOfRight kc = kb.getEntry(KnowLeftIsContainerOfRight.class);
+    KnowType kt = kb.getEntry(KnowType.class);
 
-    Type ft = getType(func.param);
-    Type pt = getType(proto.param);
+    Type ft = getType(func.param, kt);
+    Type pt = getType(proto.param, kt);
     if (!kc.get(ft, pt)) {
       RError.err(ErrorType.Hint, proto.getInfo(), "Prototype is here");
       RError.err(ErrorType.Error, func.getInfo(), "Implementation (argument) is not compatible with prototype");
     }
 
-    KnowType kt = kb.getEntry(KnowType.class);
     Type fr = kt.get(func.ret);
     Type pr = kt.get(proto.ret);
     if (!kc.get(pr, fr)) {
@@ -123,10 +124,10 @@ public class ElementaryReduction extends EvlPass {
     map.put(func, proto);
   }
 
-  private Type getType(EvlList<FuncVariable> param) {
-    EvlList<SimpleRef<Type>> types = new EvlList<SimpleRef<Type>>();
+  private Type getType(EvlList<FuncVariable> param, KnowType kt) {
+    EvlList<TypeRef> types = new EvlList<TypeRef>();
     for (FuncVariable var : param) {
-      types.add(var.type);
+      types.add(new SimpleRef<Type>(ElementInfo.NO, kt.get(var.type)));
     }
     TupleType tt = new TupleType(ElementInfo.NO, "", types);
     return tt;

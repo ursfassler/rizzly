@@ -27,4 +27,8 @@ public class RecordType extends NamedElementType {
     super(info, name, element);
   }
 
+  public RecordType(ElementInfo info, String name) {
+    super(info, name);
+  }
+
 }

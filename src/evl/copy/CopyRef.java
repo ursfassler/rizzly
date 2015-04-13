@@ -22,6 +22,7 @@ import evl.data.expression.reference.RefCall;
 import evl.data.expression.reference.RefIndex;
 import evl.data.expression.reference.RefItem;
 import evl.data.expression.reference.RefName;
+import evl.data.expression.reference.RefTemplCall;
 import evl.traverser.NullTraverser;
 
 public class CopyRef extends NullTraverser<RefItem, Void> {
@@ -35,6 +36,11 @@ public class CopyRef extends NullTraverser<RefItem, Void> {
   @Override
   protected RefItem visitDefault(Evl obj, Void param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+  }
+
+  @Override
+  protected RefItem visitRefTemplCall(RefTemplCall obj, Void param) {
+    return new RefTemplCall(obj.getInfo(), cast.copy(obj.actualParameter));
   }
 
   @Override

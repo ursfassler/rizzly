@@ -25,8 +25,8 @@ import evl.data.expression.reference.Reference;
 import evl.data.function.Function;
 import evl.data.statement.Block;
 import evl.data.statement.CallStmt;
+import evl.data.statement.MsgPush;
 import evl.data.statement.Statement;
-import evl.data.statement.intern.MsgPush;
 import evl.traverser.DefTraverser;
 
 class PushReplacer extends DefTraverser<Statement, Map<Function, Function>> {

@@ -17,20 +17,19 @@
 
 package fun.pass;
 
-import pass.FunPass;
+import pass.EvlPass;
 import error.ErrorType;
 import error.RError;
-import fun.DefTraverser;
-import fun.Fun;
-import fun.expression.reference.DummyLinkTarget;
-import fun.expression.reference.RefItem;
-import fun.expression.reference.RefName;
-import fun.expression.reference.Reference;
-import fun.knowledge.KnowChild;
-import fun.knowledge.KnowledgeBase;
-import fun.other.Named;
-import fun.other.Namespace;
-import fun.other.RizzlyFile;
+import evl.data.Evl;
+import evl.data.Named;
+import evl.data.Namespace;
+import evl.data.expression.reference.DummyLinkTarget;
+import evl.data.expression.reference.RefName;
+import evl.data.expression.reference.Reference;
+import evl.data.file.RizzlyFile;
+import evl.knowledge.KnowChild;
+import evl.knowledge.KnowledgeBase;
+import evl.traverser.DefTraverser;
 
 /**
  * Follows offset when link is to namespace until it finds a different object.
@@ -40,7 +39,7 @@ import fun.other.RizzlyFile;
  * @author urs
  *
  */
-public class NamespaceLinkReduction extends FunPass {
+public class NamespaceLinkReduction extends EvlPass {
 
   @Override
   public void process(Namespace root, KnowledgeBase kb) {
@@ -54,30 +53,30 @@ class NamespaceLinkReductionWorker extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitReference(Reference obj, Void param) {
-    Fun item = obj.getLink();
+    Evl item = obj.link;
     assert (!(item instanceof DummyLinkTarget));
     while (item instanceof Namespace) {
-      RefItem next = obj.getOffset().get(0);
-      obj.getOffset().remove(0);
+      evl.data.expression.reference.RefItem next = obj.offset.get(0);
+      obj.offset.remove(0);
       if (!(next instanceof RefName)) {
         RError.err(ErrorType.Error, obj.getInfo(), "Expected named offset, got: " + next.getClass().getCanonicalName());
       }
-      RefName name = (RefName) next;
-      ((Namespace) item).getChildren().find(name.getName());
+      evl.data.expression.reference.RefName name = (evl.data.expression.reference.RefName) next;
+      ((evl.data.Namespace) item).children.find(name.name);
       assert (item != null); // type checker should find it?
     }
     if (item instanceof RizzlyFile) {
-      RefItem next = obj.getOffset().get(0);
-      obj.getOffset().remove(0);
+      evl.data.expression.reference.RefItem next = obj.offset.get(0);
+      obj.offset.remove(0);
       if (!(next instanceof RefName)) {
         RError.err(ErrorType.Error, obj.getInfo(), "Expected named offset, got: " + next.getClass().getCanonicalName());
       }
-      RefName name = (RefName) next;
+      evl.data.expression.reference.RefName name = (evl.data.expression.reference.RefName) next;
       KnowChild kfc = new KnowChild();
-      item = kfc.get(item, name.getName());
+      item = kfc.get(item, name.name, item.getInfo());
       assert (item != null); // type checker should find it?
     }
-    obj.setLink((Named) item);
+    obj.link = (Named) item;
     return super.visitReference(obj, param);
   }
 

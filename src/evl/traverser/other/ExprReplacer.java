@@ -72,8 +72,8 @@ import evl.data.statement.AssignmentSingle;
 import evl.data.statement.CaseOptRange;
 import evl.data.statement.CaseOptValue;
 import evl.data.statement.IfOption;
+import evl.data.statement.MsgPush;
 import evl.data.statement.ReturnExpr;
-import evl.data.statement.intern.MsgPush;
 import evl.data.variable.DefVariable;
 import evl.traverser.DefTraverser;
 

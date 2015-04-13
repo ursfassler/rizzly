@@ -20,20 +20,19 @@ package evl.data.variable;
 import common.ElementInfo;
 
 import evl.data.Named;
-import evl.data.expression.reference.SimpleRef;
-import evl.data.type.Type;
+import evl.data.expression.reference.TypeRef;
 
 abstract public class Variable extends Named {
-  public SimpleRef<Type> type;
+  public TypeRef type;
 
-  public Variable(ElementInfo info, String name, SimpleRef<Type> type) {
+  public Variable(ElementInfo info, String name, TypeRef type) {
     super(info, name);
     this.type = type;
   }
 
   @Override
   public String toString() {
-    return name + ":" + type.link;
+    return name + ":" + type;
   }
 
 }

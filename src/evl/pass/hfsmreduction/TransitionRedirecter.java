@@ -19,11 +19,13 @@ package evl.pass.hfsmreduction;
 
 import pass.EvlPass;
 import evl.data.Evl;
+import evl.data.Named;
 import evl.data.Namespace;
 import evl.data.component.hfsm.ImplHfsm;
 import evl.data.component.hfsm.State;
-import evl.data.component.hfsm.StateItem;
+import evl.data.component.hfsm.StateContent;
 import evl.data.component.hfsm.Transition;
+import evl.data.expression.reference.SimpleRef;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.NullTraverser;
 import evl.traverser.other.ClassGetter;
@@ -53,7 +55,7 @@ class TransitionRedirecterWorker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitDefault(Evl obj, Void param) {
-    if (obj instanceof StateItem) {
+    if (obj instanceof StateContent) {
       return null;
     } else {
       throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
@@ -68,9 +70,9 @@ class TransitionRedirecterWorker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitTransition(Transition obj, Void param) {
-    State dst = obj.dst.link;
+    State dst = (State) obj.dst.getTarget();
     dst = initStateGetter.traverse(dst, null);
-    obj.dst.link = dst;
+    obj.dst = new SimpleRef<Named>(obj.dst.getInfo(), dst);
     return null;
   }
 

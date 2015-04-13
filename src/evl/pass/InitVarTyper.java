@@ -46,6 +46,7 @@ import evl.data.type.composed.UnionType;
 import evl.data.type.composed.UnsafeUnionType;
 import evl.data.variable.DefVariable;
 import evl.knowledge.KnowChild;
+import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.other.ExprReplacer;
 
@@ -61,16 +62,18 @@ public class InitVarTyper extends EvlPass {
 
 class InitVarTyperWorker extends ExprReplacer<Type> {
   private final KnowChild kc;
+  private final KnowType kt;
 
   public InitVarTyperWorker(KnowledgeBase kb) {
     super();
     this.kc = kb.getEntry(KnowChild.class);
+    this.kt = kb.getEntry(KnowType.class);
   }
 
   @Override
   protected Expression visitDefVariable(DefVariable obj, Type param) {
     assert (param == null);
-    Type type = obj.type.link;
+    Type type = kt.get(obj.type);
     obj.def = visit(obj.def, type);
     return null;
   }
@@ -86,7 +89,7 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
       }
       int idx = 0;
       for (Expression expr : obj.value) {
-        init.set(idx, visit(expr, at.type.link));
+        init.set(idx, visit(expr, kt.get(at.type)));
         idx++;
       }
 
@@ -132,7 +135,7 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
   @Override
   protected Expression visitNamedValue(NamedValue obj, Type type) {
     if (type instanceof UnionType) {
-      EnumType et = (EnumType) ((UnionType) type).tag.ref.link;
+      EnumType et = (EnumType) kt.get(((UnionType) type).tag.typeref);
       EnumElement ele = (EnumElement) kc.get(et, obj.name, obj.getInfo());
 
       EnumElement value = (EnumElement) kc.get(et, obj.name, obj.getInfo());
@@ -141,7 +144,7 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
 
       Expression ov = obj.value;
       NamedElement elem = (NamedElement) kc.get(type, obj.name, obj.getInfo());
-      ov = visit(ov, elem.ref.link);
+      ov = visit(ov, kt.get(elem.typeref));
 
       NamedValue content = new NamedValue(obj.getInfo(), ele.name, ov);
 
@@ -150,7 +153,7 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
     } else if (type instanceof UnsafeUnionType) {
       Expression ov = obj.value;
       NamedElement elem = (NamedElement) kc.get(type, obj.name, obj.getInfo());
-      ov = visit(ov, elem.ref.link);
+      ov = visit(ov, kt.get(elem.typeref));
 
       NamedValue content = new NamedValue(obj.getInfo(), elem.name, ov);
 
@@ -203,9 +206,8 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
     Map<String, Type> ret = new HashMap<String, Type>();
     for (NamedElement elem : element) {
       RError.ass(!ret.containsKey(elem.name), elem.getInfo(), "Entry with name " + elem.name + " already defined");
-      ret.put(elem.name, elem.ref.link);
+      ret.put(elem.name, kt.get(elem.typeref));
     }
     return ret;
   }
-
 }

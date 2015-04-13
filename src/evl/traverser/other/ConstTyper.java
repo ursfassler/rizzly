@@ -62,7 +62,7 @@ class Typer extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitConstant(Constant obj, Void param) {
-    if (isOpenType(obj.type.link)) {
+    if (isOpenType(kt.get(obj.type))) {
       Type ct = kt.get(obj.def);
 
       ct = kbi.getType(ct);

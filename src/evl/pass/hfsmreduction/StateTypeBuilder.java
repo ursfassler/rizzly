@@ -42,7 +42,10 @@ import evl.data.type.composed.UnsafeUnionType;
 import evl.data.variable.ConstPrivate;
 import evl.data.variable.Constant;
 import evl.data.variable.StateVariable;
+import evl.knowledge.KnowType;
+import evl.knowledge.KnowledgeBase;
 import evl.traverser.NullTraverser;
+import evl.traverser.other.ClassGetter;
 
 /**
  * Creates a type with data of states for whole state machine
@@ -57,6 +60,13 @@ public class StateTypeBuilder extends NullTraverser<NamedElement, EvlList<NamedE
   final private Map<RecordType, ConstPrivate> initVar = new HashMap<RecordType, ConstPrivate>();
   final private Map<StateVariable, EvlList<NamedElement>> epath = new HashMap<StateVariable, EvlList<NamedElement>>();
   final private Map<State, RecordType> stateType = new HashMap<State, RecordType>();
+
+  final private KnowType kt;
+
+  public StateTypeBuilder(KnowledgeBase kb) {
+    super();
+    this.kt = kb.getEntry(KnowType.class);
+  }
 
   public Map<RecordType, ConstPrivate> getInitVar() {
     return initVar;
@@ -130,11 +140,11 @@ public class StateTypeBuilder extends NullTraverser<NamedElement, EvlList<NamedE
     param.add(subElem);
 
     NamedElement initStateElem = null;
-    for (State sub : obj.item.getItems(State.class)) {
+    for (State sub : ClassGetter.filter(State.class, obj.item)) {
       NamedElement item = visit(sub, param);
       union.element.add(item);
 
-      if (sub == obj.initial.link) {
+      if (sub == obj.initial.getTarget()) {
         assert (initStateElem == null);
         initStateElem = item;
       }
@@ -143,9 +153,9 @@ public class StateTypeBuilder extends NullTraverser<NamedElement, EvlList<NamedE
 
     // set default state
 
-    Constant initvalue = initVar.get(initStateElem.ref.link);
+    Constant initvalue = initVar.get(kt.get(initStateElem.typeref));
     assert (initvalue != null);
-    NamedValue cont = new NamedValue(obj.getInfo(), getName(obj.initial.link), new Reference(obj.getInfo(), initvalue));
+    NamedValue cont = new NamedValue(obj.getInfo(), getName((Named) obj.initial.getTarget()), new Reference(obj.getInfo(), initvalue));
     UnsafeUnionValue uninit = new UnsafeUnionValue(obj.getInfo(), cont, new SimpleRef<Type>(obj.getInfo(), union));
 
     RecordValue value = initValues.get(record);
@@ -159,7 +169,7 @@ public class StateTypeBuilder extends NullTraverser<NamedElement, EvlList<NamedE
     RecordValue value = initValues.get(type);
     assert (value != null);
 
-    for (StateVariable var : state.item.getItems(StateVariable.class)) {
+    for (StateVariable var : ClassGetter.filter(StateVariable.class, state.item)) {
       NamedElement item = new NamedElement(var.getInfo(), getName(var), Copy.copy(var.type));
       type.element.add(item);
       value.value.add(new NamedValue(var.getInfo(), getName(var), Copy.copy(var.def)));

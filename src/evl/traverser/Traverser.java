@@ -27,6 +27,7 @@ import evl.data.component.composition.AsynchroniusConnection;
 import evl.data.component.composition.CompUse;
 import evl.data.component.composition.Connection;
 import evl.data.component.composition.Endpoint;
+import evl.data.component.composition.EndpointRaw;
 import evl.data.component.composition.EndpointSelf;
 import evl.data.component.composition.EndpointSub;
 import evl.data.component.composition.ImplComposition;
@@ -78,10 +79,12 @@ import evl.data.expression.binop.Relation;
 import evl.data.expression.binop.Shl;
 import evl.data.expression.binop.Shr;
 import evl.data.expression.reference.BaseRef;
+import evl.data.expression.reference.DummyLinkTarget;
 import evl.data.expression.reference.RefCall;
 import evl.data.expression.reference.RefIndex;
 import evl.data.expression.reference.RefItem;
 import evl.data.expression.reference.RefName;
+import evl.data.expression.reference.RefTemplCall;
 import evl.data.expression.reference.Reference;
 import evl.data.expression.reference.SimpleRef;
 import evl.data.expression.unop.BitNot;
@@ -89,21 +92,23 @@ import evl.data.expression.unop.LogicNot;
 import evl.data.expression.unop.Not;
 import evl.data.expression.unop.Uminus;
 import evl.data.expression.unop.UnaryExp;
+import evl.data.file.RizzlyFile;
 import evl.data.function.Function;
 import evl.data.function.InterfaceFunction;
-import evl.data.function.header.FuncCtrlInDataIn;
-import evl.data.function.header.FuncCtrlInDataOut;
-import evl.data.function.header.FuncCtrlOutDataIn;
-import evl.data.function.header.FuncCtrlOutDataOut;
-import evl.data.function.header.FuncGlobal;
-import evl.data.function.header.FuncPrivateRet;
-import evl.data.function.header.FuncPrivateVoid;
+import evl.data.function.header.FuncFunction;
+import evl.data.function.header.FuncProcedure;
+import evl.data.function.header.FuncQuery;
+import evl.data.function.header.FuncResponse;
+import evl.data.function.header.FuncSignal;
+import evl.data.function.header.FuncSlot;
 import evl.data.function.header.FuncSubHandlerEvent;
 import evl.data.function.header.FuncSubHandlerQuery;
 import evl.data.function.ret.FuncReturn;
 import evl.data.function.ret.FuncReturnNone;
 import evl.data.function.ret.FuncReturnTuple;
 import evl.data.function.ret.FuncReturnType;
+import evl.data.function.template.DefaultValueTemplate;
+import evl.data.function.template.FunctionTemplate;
 import evl.data.statement.Assignment;
 import evl.data.statement.AssignmentMulti;
 import evl.data.statement.AssignmentSingle;
@@ -117,13 +122,14 @@ import evl.data.statement.CaseStmt;
 import evl.data.statement.ForStmt;
 import evl.data.statement.IfOption;
 import evl.data.statement.IfStmt;
+import evl.data.statement.MsgPush;
 import evl.data.statement.Return;
 import evl.data.statement.ReturnExpr;
 import evl.data.statement.ReturnVoid;
 import evl.data.statement.Statement;
+import evl.data.statement.VarDefInitStmt;
 import evl.data.statement.VarDefStmt;
 import evl.data.statement.WhileStmt;
-import evl.data.statement.intern.MsgPush;
 import evl.data.type.Type;
 import evl.data.type.base.ArrayType;
 import evl.data.type.base.BaseType;
@@ -148,13 +154,24 @@ import evl.data.type.special.ComponentType;
 import evl.data.type.special.IntegerType;
 import evl.data.type.special.NaturalType;
 import evl.data.type.special.VoidType;
+import evl.data.type.template.ArrayTemplate;
+import evl.data.type.template.RangeTemplate;
+import evl.data.type.template.TypeTemplate;
+import evl.data.type.template.TypeType;
+import evl.data.type.template.TypeTypeTemplate;
 import evl.data.variable.ConstGlobal;
 import evl.data.variable.ConstPrivate;
 import evl.data.variable.Constant;
 import evl.data.variable.DefVariable;
 import evl.data.variable.FuncVariable;
 import evl.data.variable.StateVariable;
+import evl.data.variable.TemplateParameter;
 import evl.data.variable.Variable;
+import fun.other.RawComponent;
+import fun.other.RawComposition;
+import fun.other.RawElementary;
+import fun.other.RawHfsm;
+import fun.other.Template;
 
 public abstract class Traverser<R, P> {
 
@@ -207,6 +224,8 @@ public abstract class Traverser<R, P> {
       return visitNamedValue((NamedValue) obj, param);
     } else if (obj instanceof Endpoint) {
       return visitEndpoint((Endpoint) obj, param);
+    } else if (obj instanceof FunctionTemplate) {
+      return visitFunctionTemplate((FunctionTemplate) obj, param);
     } else {
       throwUnknownObjectError(obj);
       return null;
@@ -234,6 +253,14 @@ public abstract class Traverser<R, P> {
       return visitNamedElement((NamedElement) obj, param);
     } else if (obj instanceof CompUse) {
       return visitCompUse((CompUse) obj, param);
+    } else if (obj instanceof RizzlyFile) {
+      return visitRizzlyFile((RizzlyFile) obj, param);
+    } else if (obj instanceof Template) {
+      return visitTemplate((Template) obj, param);
+    } else if (obj instanceof RawComponent) {
+      return visitRawComponent((RawComponent) obj, param);
+    } else if (obj instanceof TypeTemplate) {
+      return visitTypeTemplate((TypeTemplate) obj, param);
     } else {
       throwUnknownObjectError(obj);
       return null;
@@ -296,6 +323,8 @@ public abstract class Traverser<R, P> {
       return visitMsgPush((MsgPush) obj, param);
     } else if (obj instanceof ForStmt) {
       return visitForStmt((ForStmt) obj, param);
+    } else if (obj instanceof VarDefInitStmt) {
+      return visitVarDefInitStmt((VarDefInitStmt) obj, param);
     } else {
       throwUnknownObjectError(obj);
       return null;
@@ -329,6 +358,8 @@ public abstract class Traverser<R, P> {
       return visitEndpointSub((EndpointSub) obj, param);
     } else if (obj instanceof EndpointSelf) {
       return visitEndpointSelf((EndpointSelf) obj, param);
+    } else if (obj instanceof EndpointRaw) {
+      return visitEndpointRaw((EndpointRaw) obj, param);
     } else {
       throwUnknownObjectError(obj);
       return null;
@@ -351,6 +382,8 @@ public abstract class Traverser<R, P> {
       return visitDefVariable((DefVariable) obj, param);
     } else if (obj instanceof FuncVariable) {
       return visitFuncVariable((FuncVariable) obj, param);
+    } else if (obj instanceof TemplateParameter) {
+      return visitTemplateParameter((TemplateParameter) obj, param);
     } else {
       throwUnknownObjectError(obj);
       return null;
@@ -382,16 +415,26 @@ public abstract class Traverser<R, P> {
   protected R visitFunction(Function obj, P param) {
     if (obj instanceof InterfaceFunction) {
       return visitInterfaceFunction((InterfaceFunction) obj, param);
-    } else if (obj instanceof FuncGlobal) {
-      return visitFuncGlobal((FuncGlobal) obj, param);
-    } else if (obj instanceof FuncPrivateVoid) {
-      return visitFuncPrivateVoid((FuncPrivateVoid) obj, param);
-    } else if (obj instanceof FuncPrivateRet) {
-      return visitFuncPrivateRet((FuncPrivateRet) obj, param);
+    } else if (obj instanceof FuncProcedure) {
+      return visitFuncProcedure((FuncProcedure) obj, param);
+    } else if (obj instanceof FuncFunction) {
+      return visitFuncFunction((FuncFunction) obj, param);
     } else if (obj instanceof FuncSubHandlerEvent) {
       return visitFuncSubHandlerEvent((FuncSubHandlerEvent) obj, param);
     } else if (obj instanceof FuncSubHandlerQuery) {
       return visitFuncSubHandlerQuery((FuncSubHandlerQuery) obj, param);
+    } else if (obj instanceof FuncQuery) {
+      return visitFuncQuery((FuncQuery) obj, param);
+    } else if (obj instanceof FuncSignal) {
+      return visitFuncSignal((FuncSignal) obj, param);
+    } else if (obj instanceof FuncProcedure) {
+      return visitFuncProcedure((FuncProcedure) obj, param);
+    } else if (obj instanceof FuncFunction) {
+      return visitFuncFunction((FuncFunction) obj, param);
+    } else if (obj instanceof FuncResponse) {
+      return visitFuncResponse((FuncResponse) obj, param);
+    } else if (obj instanceof FuncSlot) {
+      return visitFuncSlot((FuncSlot) obj, param);
     } else {
       throwUnknownObjectError(obj);
       return null;
@@ -399,14 +442,14 @@ public abstract class Traverser<R, P> {
   }
 
   protected R visitInterfaceFunction(InterfaceFunction obj, P param) {
-    if (obj instanceof FuncCtrlInDataIn) {
-      return visitFuncIfaceInVoid((FuncCtrlInDataIn) obj, param);
-    } else if (obj instanceof FuncCtrlInDataOut) {
-      return visitFuncIfaceInRet((FuncCtrlInDataOut) obj, param);
-    } else if (obj instanceof FuncCtrlOutDataIn) {
-      return visitFuncIfaceOutRet((FuncCtrlOutDataIn) obj, param);
-    } else if (obj instanceof FuncCtrlOutDataOut) {
-      return visitFuncIfaceOutVoid((FuncCtrlOutDataOut) obj, param);
+    if (obj instanceof FuncSlot) {
+      return visitFuncSlot((FuncSlot) obj, param);
+    } else if (obj instanceof FuncResponse) {
+      return visitFuncResponse((FuncResponse) obj, param);
+    } else if (obj instanceof FuncQuery) {
+      return visitFuncQuery((FuncQuery) obj, param);
+    } else if (obj instanceof FuncSignal) {
+      return visitFuncSignal((FuncSignal) obj, param);
     } else {
       throwUnknownObjectError(obj);
       return null;
@@ -442,6 +485,10 @@ public abstract class Traverser<R, P> {
       return visitRecordValue((RecordValue) obj, param);
     } else if (obj instanceof NamedElementsValue) {
       return visitNamedElementsValue((NamedElementsValue) obj, param);
+    } else if (obj instanceof ArithmeticOp) {
+      return visitArithmeticOp((ArithmeticOp) obj, param);
+    } else if (obj instanceof Relation) {
+      return visitRelation((Relation) obj, param);
     } else {
       throwUnknownObjectError(obj);
       return null;
@@ -557,6 +604,8 @@ public abstract class Traverser<R, P> {
       return visitRefName((RefName) obj, param);
     } else if (obj instanceof RefCall) {
       return visitRefCall((RefCall) obj, param);
+    } else if (obj instanceof RefTemplCall) {
+      return visitRefTemplCall((RefTemplCall) obj, param);
     } else {
       throwUnknownObjectError(obj);
       return null;
@@ -650,6 +699,8 @@ public abstract class Traverser<R, P> {
     throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
 
+  abstract protected R visitNamedElement(NamedElement obj, P param);
+
   abstract protected R visitSynchroniusConnection(SynchroniusConnection obj, P param);
 
   abstract protected R visitAsynchroniusConnection(AsynchroniusConnection obj, P param);
@@ -712,6 +763,8 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitEndpointSub(EndpointSub obj, P param);
 
+  abstract protected R visitEndpointRaw(EndpointRaw obj, P param);
+
   abstract protected R visitReference(Reference obj, P param);
 
   abstract protected R visitStateSimple(StateSimple obj, P param);
@@ -760,23 +813,21 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitTransition(Transition obj, P param);
 
-  abstract protected R visitFuncGlobal(FuncGlobal obj, P param);
-
   abstract protected R visitFuncSubHandlerQuery(FuncSubHandlerQuery obj, P param);
 
   abstract protected R visitFuncSubHandlerEvent(FuncSubHandlerEvent obj, P param);
 
-  abstract protected R visitFuncPrivateVoid(FuncPrivateVoid obj, P param);
+  abstract protected R visitFuncProcedure(FuncProcedure obj, P param);
 
-  abstract protected R visitFuncPrivateRet(FuncPrivateRet obj, P param);
+  abstract protected R visitFuncFunction(FuncFunction obj, P param);
 
-  abstract protected R visitFuncIfaceOutVoid(FuncCtrlOutDataOut obj, P param);
+  abstract protected R visitFuncSignal(FuncSignal obj, P param);
 
-  abstract protected R visitFuncIfaceOutRet(FuncCtrlOutDataIn obj, P param);
+  abstract protected R visitFuncQuery(FuncQuery obj, P param);
 
-  abstract protected R visitFuncIfaceInVoid(FuncCtrlInDataIn obj, P param);
+  abstract protected R visitFuncSlot(FuncSlot obj, P param);
 
-  abstract protected R visitFuncIfaceInRet(FuncCtrlInDataOut obj, P param);
+  abstract protected R visitFuncResponse(FuncResponse obj, P param);
 
   abstract protected R visitRecordType(RecordType obj, P param);
 
@@ -864,6 +915,66 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitIs(Is obj, P param);
 
-  abstract protected R visitNamedElement(NamedElement obj, P param);
+  // /////
+
+  protected R visitFunctionTemplate(FunctionTemplate obj, P param) {
+    if (obj instanceof DefaultValueTemplate) {
+      return visitDefaultValueTemplate((DefaultValueTemplate) obj, param);
+    } else {
+      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
+  }
+
+  protected R visitTypeTemplate(TypeTemplate obj, P param) {
+    if (obj instanceof ArrayTemplate) {
+      return visitArrayTemplate((ArrayTemplate) obj, param);
+    } else if (obj instanceof TypeTypeTemplate) {
+      return visitTypeTypeTemplate((TypeTypeTemplate) obj, param);
+    } else if (obj instanceof RangeTemplate) {
+      return visitRangeTemplate((RangeTemplate) obj, param);
+    } else {
+      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
+  }
+
+  protected R visitRawComponent(RawComponent obj, P param) {
+    if (obj instanceof RawElementary) {
+      return visitRawElementary((RawElementary) obj, param);
+    } else if (obj instanceof RawComposition) {
+      return visitRawComposition((RawComposition) obj, param);
+    } else if (obj instanceof RawHfsm) {
+      return visitRawHfsm((RawHfsm) obj, param);
+    } else {
+      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
+    }
+  }
+
+  abstract protected R visitTemplate(Template obj, P param);
+
+  abstract protected R visitRizzlyFile(RizzlyFile obj, P param);
+
+  abstract protected R visitTemplateParameter(TemplateParameter obj, P param);
+
+  abstract protected R visitRefTemplCall(RefTemplCall obj, P param);
+
+  abstract protected R visitRawHfsm(RawHfsm obj, P param);
+
+  abstract protected R visitRawComposition(RawComposition obj, P param);
+
+  abstract protected R visitRawElementary(RawElementary obj, P param);
+
+  abstract protected R visitDefaultValueTemplate(DefaultValueTemplate obj, P param);
+
+  abstract protected R visitTypeType(TypeType obj, P param);
+
+  abstract protected R visitTypeTypeTemplate(TypeTypeTemplate obj, P param);
+
+  abstract protected R visitArrayTemplate(ArrayTemplate obj, P param);
+
+  abstract protected R visitRangeTemplate(RangeTemplate obj, P param);
+
+  abstract protected R visitVarDefInitStmt(VarDefInitStmt obj, P param);
+
+  abstract protected R visitDummyLinkTarget(DummyLinkTarget obj, P param);
 
 }

@@ -22,20 +22,24 @@ import common.ElementInfo;
 import evl.data.EvlBase;
 import evl.data.EvlList;
 import evl.data.expression.Expression;
-import evl.data.expression.reference.SimpleRef;
-import evl.data.function.header.FuncCtrlInDataIn;
+import evl.data.expression.reference.FuncRef;
+import evl.data.expression.reference.StateRef;
 import evl.data.statement.Block;
 import evl.data.variable.FuncVariable;
 
-public class Transition extends EvlBase implements StateItem {
-  public SimpleRef<State> src;
-  public SimpleRef<State> dst;
-  public SimpleRef<FuncCtrlInDataIn> eventFunc;
+public class Transition extends EvlBase implements StateContent {
+  public StateRef src;
+  public StateRef dst;
+  public FuncRef eventFunc;
   final public EvlList<FuncVariable> param = new EvlList<FuncVariable>();
   public Expression guard;
   public Block body;
 
-  public Transition(ElementInfo info, SimpleRef<State> src, SimpleRef<State> dst, SimpleRef<FuncCtrlInDataIn> eventFunc, Expression guard, EvlList<FuncVariable> param, Block body) {
+  static public Transition create(ElementInfo info) {
+    return new Transition(info, null, null, null, null, new EvlList<FuncVariable>(), new Block(info));
+  }
+
+  public Transition(ElementInfo info, StateRef src, StateRef dst, FuncRef eventFunc, Expression guard, EvlList<FuncVariable> param, Block body) {
     super(info);
     this.src = src;
     this.dst = dst;

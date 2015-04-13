@@ -20,39 +20,40 @@ package fun.pass;
 import java.util.HashSet;
 import java.util.Set;
 
-import pass.FunPass;
+import pass.EvlPass;
 import util.SimpleGraph;
-import fun.Fun;
+import evl.data.Evl;
+import evl.data.EvlList;
+import evl.data.Namespace;
+import evl.data.component.composition.CompUse;
+import evl.data.type.base.BaseType;
+import evl.knowledge.KnowledgeBase;
+import evl.traverser.other.ClassGetter;
 import fun.doc.DepGraph;
-import fun.knowledge.KnowledgeBase;
-import fun.other.FunList;
-import fun.other.Namespace;
-import fun.type.base.BaseType;
-import fun.variable.CompUse;
 
 // FIXME if we remove everything unused, we can not typecheck that in EVL
-public class UnusedRemover extends FunPass {
+public class UnusedRemover extends EvlPass {
 
   @Override
-  public void process(Namespace root, KnowledgeBase kb) {
-    FunList<CompUse> list = root.getItems(CompUse.class, false);
+  public void process(evl.data.Namespace root, KnowledgeBase kb) {
+    EvlList<CompUse> list = ClassGetter.filter(CompUse.class, root.children);
     assert (list.size() == 1);
-    SimpleGraph<Fun> g = DepGraph.build(list.get(0));
-    Set<Fun> keep = g.vertexSet();
-    keep.addAll(root.getItems(BaseType.class, false));
+    SimpleGraph<Evl> g = DepGraph.build(list.get(0));
+    Set<Evl> keep = g.vertexSet();
+    keep.addAll(ClassGetter.filter(BaseType.class, root.children));
     removeUnused(root, keep);
   }
 
-  private static void removeUnused(Namespace ns, Set<Fun> keep) {
-    Set<Fun> remove = new HashSet<Fun>();
-    for (Fun itr : ns.getChildren()) {
+  private static void removeUnused(evl.data.Namespace ns, Set<Evl> keep) {
+    Set<Evl> remove = new HashSet<Evl>();
+    for (Evl itr : ns.children) {
       if (itr instanceof Namespace) {
-        removeUnused((Namespace) itr, keep);
+        removeUnused((evl.data.Namespace) itr, keep);
       } else if (!keep.contains(itr)) {
         remove.add(itr);
       }
     }
-    ns.getChildren().removeAll(remove);
+    ns.children.removeAll(remove);
   }
 
 }

@@ -28,9 +28,9 @@ import evl.data.expression.TupleValue;
 import evl.data.expression.reference.RefCall;
 import evl.data.expression.reference.Reference;
 import evl.data.function.Function;
-import evl.data.function.header.FuncCtrlInDataIn;
-import evl.data.function.header.FuncCtrlInDataOut;
-import evl.data.function.header.FuncPrivateVoid;
+import evl.data.function.header.FuncProcedure;
+import evl.data.function.header.FuncResponse;
+import evl.data.function.header.FuncSlot;
 import evl.data.statement.CallStmt;
 import evl.traverser.DefTraverser;
 
@@ -43,28 +43,28 @@ import evl.traverser.DefTraverser;
 public class EventRecvDebugCallAdder extends DefTraverser<Void, Void> {
 
   private ArrayList<String> names;
-  private FuncPrivateVoid msgRecvFunc;
+  private FuncProcedure msgRecvFunc;
   static private ElementInfo info = ElementInfo.NO;
 
-  public EventRecvDebugCallAdder(ArrayList<String> names, FuncPrivateVoid msgRecvFunc) {
+  public EventRecvDebugCallAdder(ArrayList<String> names, FuncProcedure msgRecvFunc) {
     super();
     this.names = names;
     this.msgRecvFunc = msgRecvFunc;
   }
 
-  public static void process(Evl obj, ArrayList<String> names, FuncPrivateVoid msgRecvFunc) {
+  public static void process(Evl obj, ArrayList<String> names, FuncProcedure msgRecvFunc) {
     EventRecvDebugCallAdder reduction = new EventRecvDebugCallAdder(names, msgRecvFunc);
     reduction.traverse(obj, null);
   }
 
   @Override
-  protected Void visitFuncIfaceInRet(FuncCtrlInDataOut obj, Void param) {
+  protected Void visitFuncResponse(FuncResponse obj, Void param) {
     makeDebugCall(obj);
     return null;
   }
 
   @Override
-  protected Void visitFuncIfaceInVoid(FuncCtrlInDataIn obj, Void param) {
+  protected Void visitFuncSlot(FuncSlot obj, Void param) {
     makeDebugCall(obj);
     return null;
   }

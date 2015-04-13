@@ -19,13 +19,12 @@ package evl.traverser.other;
 
 import evl.data.Evl;
 import evl.data.function.Function;
-import evl.data.function.header.FuncCtrlInDataIn;
-import evl.data.function.header.FuncCtrlInDataOut;
-import evl.data.function.header.FuncCtrlOutDataIn;
-import evl.data.function.header.FuncCtrlOutDataOut;
-import evl.data.function.header.FuncGlobal;
-import evl.data.function.header.FuncPrivateRet;
-import evl.data.function.header.FuncPrivateVoid;
+import evl.data.function.header.FuncFunction;
+import evl.data.function.header.FuncProcedure;
+import evl.data.function.header.FuncQuery;
+import evl.data.function.header.FuncResponse;
+import evl.data.function.header.FuncSignal;
+import evl.data.function.header.FuncSlot;
 import evl.data.function.header.FuncSubHandlerEvent;
 import evl.data.function.header.FuncSubHandlerQuery;
 import evl.traverser.NullTraverser;
@@ -49,17 +48,12 @@ public class OutsideWriterInfo extends NullTraverser<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitFuncGlobal(FuncGlobal obj, Void param) {
+  protected Boolean visitFuncProcedure(FuncProcedure obj, Void param) {
     return false;
   }
 
   @Override
-  protected Boolean visitFuncPrivateVoid(FuncPrivateVoid obj, Void param) {
-    return false;
-  }
-
-  @Override
-  protected Boolean visitFuncPrivateRet(FuncPrivateRet obj, Void param) {
+  protected Boolean visitFuncFunction(FuncFunction obj, Void param) {
     return false;
   }
 
@@ -74,22 +68,22 @@ public class OutsideWriterInfo extends NullTraverser<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitFuncIfaceOutVoid(FuncCtrlOutDataOut obj, Void param) {
+  protected Boolean visitFuncSignal(FuncSignal obj, Void param) {
     return true;
   }
 
   @Override
-  protected Boolean visitFuncIfaceOutRet(FuncCtrlOutDataIn obj, Void param) {
+  protected Boolean visitFuncQuery(FuncQuery obj, Void param) {
     return false;
   }
 
   @Override
-  protected Boolean visitFuncIfaceInVoid(FuncCtrlInDataIn obj, Void param) {
+  protected Boolean visitFuncSlot(FuncSlot obj, Void param) {
     return false; // FIXME sure?
   }
 
   @Override
-  protected Boolean visitFuncIfaceInRet(FuncCtrlInDataOut obj, Void param) {
+  protected Boolean visitFuncResponse(FuncResponse obj, Void param) {
     return false;
   }
 

@@ -17,53 +17,52 @@
 
 package fun.pass;
 
-import pass.FunPass;
-import fun.Fun;
-import fun.knowledge.KnowledgeBase;
-import fun.other.FunList;
-import fun.other.Namespace;
+import pass.EvlPass;
+import evl.data.Evl;
+import evl.data.EvlList;
+import evl.data.type.Type;
+import evl.data.type.base.BooleanType;
+import evl.data.type.base.StringType;
+import evl.data.type.special.AnyType;
+import evl.data.type.special.IntegerType;
+import evl.data.type.special.NaturalType;
+import evl.data.type.special.VoidType;
+import evl.data.type.template.ArrayTemplate;
+import evl.data.type.template.RangeTemplate;
+import evl.data.type.template.TypeTemplate;
+import evl.data.type.template.TypeTypeTemplate;
+import evl.data.variable.TemplateParameter;
+import evl.knowledge.KnowledgeBase;
 import fun.other.Template;
-import fun.type.Type;
-import fun.type.base.AnyType;
-import fun.type.base.BooleanType;
-import fun.type.base.IntegerType;
-import fun.type.base.NaturalType;
-import fun.type.base.StringType;
-import fun.type.base.VoidType;
-import fun.type.template.ArrayTemplate;
-import fun.type.template.RangeTemplate;
-import fun.type.template.TypeTemplate;
-import fun.type.template.TypeTypeTemplate;
-import fun.variable.TemplateParameter;
 
-public class InternTypeAdder extends FunPass {
+public class InternTypeAdder extends EvlPass {
 
   @Override
-  public void process(Namespace root, KnowledgeBase kb) {
-    genPrimitiveTypes(root.getChildren());
-    genPrimitiveGenericTypes(root.getChildren());
+  public void process(evl.data.Namespace root, KnowledgeBase kb) {
+    genPrimitiveTypes(root.children);
+    genPrimitiveGenericTypes(root.children);
   }
 
-  private static void genPrimitiveTypes(FunList<Fun> container) {
+  private static void genPrimitiveTypes(EvlList<Evl> container) {
     inst(new BooleanType(), container);
-    inst(VoidType.INSTANCE, container);
+    inst(new VoidType(), container);
     inst(new NaturalType(), container);
     inst(new IntegerType(), container);
     inst(new AnyType(), container);
     inst(new StringType(), container);
   }
 
-  private static void genPrimitiveGenericTypes(FunList<Fun> container) {
+  private static void genPrimitiveGenericTypes(EvlList<Evl> container) {
     templ(RangeTemplate.NAME, RangeTemplate.makeParam(), new RangeTemplate(), container);
     templ(ArrayTemplate.NAME, ArrayTemplate.makeParam(), new ArrayTemplate(), container);
     templ(TypeTypeTemplate.NAME, TypeTypeTemplate.makeParam(), new TypeTypeTemplate(), container);
   }
 
-  private static void inst(Type object, FunList<Fun> container) {
+  private static void inst(Type object, EvlList<Evl> container) {
     container.add(object);
   }
 
-  private static void templ(String name, FunList<TemplateParameter> list, TypeTemplate tmpl, FunList<Fun> container) {
+  private static void templ(String name, EvlList<TemplateParameter> list, TypeTemplate tmpl, EvlList<Evl> container) {
     Template decl = new Template(tmpl.getInfo(), name, list, tmpl);
     container.add(decl);
   }

@@ -20,11 +20,10 @@ package evl.data.variable;
 import common.ElementInfo;
 
 import evl.data.expression.Expression;
-import evl.data.expression.reference.SimpleRef;
-import evl.data.type.Type;
+import evl.data.expression.reference.TypeRef;
 
-final public class ConstGlobal extends Constant {
-  public ConstGlobal(ElementInfo info, String name, SimpleRef<Type> type, Expression def) {
+public class ConstGlobal extends Constant {
+  public ConstGlobal(ElementInfo info, String name, TypeRef type, Expression def) {
     super(info, name, type, def);
   }
 

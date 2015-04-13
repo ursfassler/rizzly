@@ -27,7 +27,7 @@ import evl.data.type.base.BaseType;
  * @author urs
  *
  */
-final public class IntegerType extends BaseType {
+public class IntegerType extends BaseType {
   final static public String NAME = "Integer";
 
   public IntegerType() {

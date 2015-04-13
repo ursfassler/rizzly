@@ -24,7 +24,7 @@ import evl.data.Evl;
 import evl.data.EvlList;
 import evl.data.Named;
 import evl.data.function.FunctionProperty;
-import evl.data.function.header.FuncCtrlOutDataOut;
+import evl.data.function.header.FuncSignal;
 import evl.data.function.ret.FuncReturnNone;
 import evl.data.statement.Block;
 import evl.data.variable.FuncVariable;
@@ -47,14 +47,14 @@ public class KnowLlvmLibrary extends KnowledgeEntry {
     kb.getRoot().children.add(item);
   }
 
-  public FuncCtrlOutDataOut getTrap() {
+  public FuncSignal getTrap() {
     final String NAME = Designator.NAME_SEP + "trap";
     final ElementInfo info = new ElementInfo(NAME, 0, 0);
 
-    FuncCtrlOutDataOut ret = (FuncCtrlOutDataOut) findItem(NAME);
+    FuncSignal ret = (FuncSignal) findItem(NAME);
 
     if (ret == null) {
-      ret = new FuncCtrlOutDataOut(info, NAME, new EvlList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
+      ret = new FuncSignal(info, NAME, new EvlList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
       ret.property = FunctionProperty.External;
       addItem(ret);
     }

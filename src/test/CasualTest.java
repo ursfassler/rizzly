@@ -131,7 +131,8 @@ public class CasualTest extends BaseTest {
     compile("rec1", TestSteps.EXECUTE, false, false);
   }
 
-  // TODO pass composite types by reference to functions, bring this tests to work
+  // TODO pass composite types by reference to functions, bring this tests to
+  // work
   @Test
   public void rec2() {
     compile("rec2", TestSteps.EXECUTE, false, false);
@@ -326,27 +327,32 @@ public class CasualTest extends BaseTest {
 
   @Test
   public void union1() {
-    compile("union1", TestSteps.COMPILE_TO_LIB, false, false);// TODO make testcase
+    compile("union1", TestSteps.COMPILE_TO_LIB, false, false);// TODO make
+                                                              // testcase
   }
 
   @Test
   public void union2() {
-    compile("union2", TestSteps.COMPILE_TO_LIB, false, false);// TODO make testcase
+    compile("union2", TestSteps.COMPILE_TO_LIB, false, false);// TODO make
+                                                              // testcase
   }
 
   @Test
   public void union3() {
-    compile("union3", TestSteps.COMPILE_TO_LIB, false, false);// TODO make testcase
+    compile("union3", TestSteps.COMPILE_TO_LIB, false, false);// TODO make
+                                                              // testcase
   }
 
   @Test
   public void union4() {
-    compile("union4", TestSteps.COMPILE_TO_LIB, false, false);// TODO make testcase
+    compile("union4", TestSteps.COMPILE_TO_LIB, false, false);// TODO make
+                                                              // testcase
   }
 
   @Test
   public void unionTest() {
-    compile("unionTest", TestSteps.COMPILE_TO_LIB, false, false); // TODO make testcase
+    compile("unionTest", TestSteps.COMPILE_TO_LIB, false, false); // TODO make
+                                                                  // testcase
   }
 
   @Test

@@ -23,12 +23,16 @@ import java.util.Map;
 
 import pass.EvlPass;
 import util.Range;
+
+import common.ElementInfo;
+
 import evl.data.Evl;
 import evl.data.EvlList;
 import evl.data.Namespace;
 import evl.data.expression.Expression;
 import evl.data.expression.reference.RefCall;
 import evl.data.expression.reference.Reference;
+import evl.data.expression.reference.SimpleRef;
 import evl.data.function.Function;
 import evl.data.type.Type;
 import evl.data.type.base.RangeType;
@@ -71,7 +75,7 @@ class OpenReplaceWorker extends DefTraverser<Void, Void> {
     for (Variable var : map.keySet()) {
       RangeType range = map.get(var);
       range = kbi.getRangeType(range.range);
-      var.type.link = range;
+      var.type = new SimpleRef<Type>(ElementInfo.NO, range);
     }
 
     return null;
@@ -105,8 +109,8 @@ class OpenReplaceWorker extends DefTraverser<Void, Void> {
 
       if (map.containsKey(var)) {
         RangeType old = map.get(var);
-        BigInteger low = range.range.getLow().min(old.range.getLow());
-        BigInteger high = range.range.getHigh().max(old.range.getHigh());
+        BigInteger low = range.range.low.min(old.range.low);
+        BigInteger high = range.range.high.max(old.range.high);
         range = new RangeType(new Range(low, high));
       }
 

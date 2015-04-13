@@ -22,6 +22,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import parser.expression.ExpressionParser;
 import parser.scanner.Scanner;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
@@ -31,25 +32,23 @@ import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
-import fun.Copy;
-import fun.expression.Expression;
-import fun.expression.reference.Reference;
-import fun.function.FuncHeader;
-import fun.function.FuncReturn;
-import fun.function.FuncReturnNone;
-import fun.function.FuncReturnTuple;
-import fun.function.FuncReturnType;
-import fun.function.FunctionFactory;
-import fun.knowledge.KnowFuncType;
-import fun.other.FunList;
-import fun.statement.Block;
-import fun.type.base.AnyType;
-import fun.variable.Constant;
-import fun.variable.FuncVariable;
-import fun.variable.StateVariable;
-import fun.variable.TemplateParameter;
-import fun.variable.Variable;
-import fun.variable.VariableFactory;
+import evl.copy.Copy;
+import evl.data.EvlList;
+import evl.data.expression.Expression;
+import evl.data.expression.reference.Reference;
+import evl.data.function.Function;
+import evl.data.function.FunctionFactory;
+import evl.data.function.ret.FuncReturnNone;
+import evl.data.function.ret.FuncReturnTuple;
+import evl.data.function.ret.FuncReturnType;
+import evl.data.statement.Block;
+import evl.data.variable.Constant;
+import evl.data.variable.FuncVariable;
+import evl.data.variable.StateVariable;
+import evl.data.variable.TemplateParameter;
+import evl.data.variable.Variable;
+import evl.knowledge.KnowFuncType;
+import fun.VariableFactory;
 
 public class BaseParser extends Parser {
 
@@ -76,40 +75,39 @@ public class BaseParser extends Parser {
   }
 
   // TODO can we merge it with another function parser?
-  // EBNF privateFunction: "function" vardeflist funcReturn ( block "end" | ";" )
-  protected FuncHeader parseFuncDef(TokenType type, String name, boolean neverHasBody) {
+  // EBNF privateFunction: "function" vardeflist funcReturn ( block "end" | ";"
+  // )
+  protected Function parseFuncDef(TokenType type, String name, boolean neverHasBody) {
     Token next = next();
     if (!type.equals(next.getType())) {
       RError.err(ErrorType.Error, next.getInfo(), "Found " + next.getType() + ", extected " + type);
     }
 
-    Class<? extends FuncHeader> cl = KnowFuncType.getClassOf(next.getType());
+    Class<? extends Function> cl = KnowFuncType.getClassOf(next.getType());
 
-    FunList<FuncVariable> varlist = parseVardefList();
+    EvlList<FuncVariable> varlist = parseVardefList();
 
-    FuncReturn retType;
+    evl.data.function.ret.FuncReturn retType;
     if (KnowFuncType.getWithRetval(cl)) {
       retType = parseFuncReturn();
     } else {
       retType = new FuncReturnNone(ElementInfo.NO);
     }
 
-    FuncHeader func;
-
+    Block body;
     if (!neverHasBody && KnowFuncType.getWithBody(cl)) {
-      Block body = stmt().parseBlock();
+      body = stmt().parseBlock();
       expect(TokenType.END);
-      func = FunctionFactory.create(cl, next.getInfo(), name, varlist, retType, body);
     } else {
       expect(TokenType.SEMI);
-      func = FunctionFactory.create(cl, next.getInfo(), name, varlist, retType);
+      body = new Block(peek().getInfo());
     }
 
-    return func;
+    return FunctionFactory.create(cl, next.getInfo(), name, varlist, retType, body);
   }
 
   // EBNF: funcReturn: [ ":" ( typeref | vardeflist ) ]
-  protected FuncReturn parseFuncReturn() {
+  protected evl.data.function.ret.FuncReturn parseFuncReturn() {
     ElementInfo info = peek().getInfo();
     if (consumeIfEqual(TokenType.COLON)) {
       if (peek().getType() == TokenType.OPENPAREN) {
@@ -123,7 +121,7 @@ public class BaseParser extends Parser {
   }
 
   // EBNF vardefNoinit: id { "," id } ":" typeref
-  protected <T extends Variable> FunList<T> parseVarDef(Class<T> kind) {
+  protected <T extends Variable> EvlList<T> parseVarDef(Class<T> kind) {
     List<Token> names = new ArrayList<Token>();
     do {
       Token id = expect(TokenType.IDENTIFIER);
@@ -134,7 +132,7 @@ public class BaseParser extends Parser {
 
     Reference type = expr().parseRef();
 
-    FunList<T> ret = new FunList<T>();
+    EvlList<T> ret = new EvlList<T>();
     for (int i = 0; i < names.size(); i++) {
       Reference ntype = Copy.copy(type);
       ret.add(VariableFactory.create(kind, names.get(i).getInfo(), names.get(i).getData(), ntype));
@@ -164,8 +162,8 @@ public class BaseParser extends Parser {
   }
 
   // EBNF genericParam: [ "{" vardef { ";" vardef } "}" ]
-  protected FunList<TemplateParameter> parseGenericParam() {
-    FunList<TemplateParameter> ret = new FunList<TemplateParameter>();
+  protected EvlList<TemplateParameter> parseGenericParam() {
+    EvlList<TemplateParameter> ret = new EvlList<TemplateParameter>();
     if (consumeIfEqual(TokenType.OPENCURLY)) {
       do {
         List<TemplateParameter> param = parseVarDef(TemplateParameter.class);
@@ -177,8 +175,8 @@ public class BaseParser extends Parser {
   }
 
   // EBNF vardeflist: "(" [ vardef { ";" vardef } ] ")"
-  protected FunList<FuncVariable> parseVardefList() {
-    FunList<FuncVariable> res = new FunList<FuncVariable>();
+  protected EvlList<FuncVariable> parseVardefList() {
+    EvlList<FuncVariable> res = new EvlList<FuncVariable>();
     expect(TokenType.OPENPAREN);
     if (peek().getType() == TokenType.IDENTIFIER) {
       do {
@@ -193,14 +191,14 @@ public class BaseParser extends Parser {
   // EBNF constdef: "const" [ typeref ] "=" expr
   public <T extends Constant> T parseConstDef(Class<T> kind, String name) {
     ElementInfo info = expect(TokenType.CONST).getInfo();
-    Reference type;
+    evl.data.expression.reference.Reference type;
     if (peek().getType() != TokenType.EQUAL) {
       type = expr().parseRef();
     } else {
-      type = new Reference(info, AnyType.NAME);
+      type = new Reference(info, evl.data.type.special.AnyType.NAME);
     }
     expect(TokenType.EQUAL);
-    Expression value = expr().parse();
+    evl.data.expression.Expression value = expr().parse();
 
     return VariableFactory.create(kind, info, name, type, value);
   }

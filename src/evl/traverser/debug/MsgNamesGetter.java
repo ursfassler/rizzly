@@ -26,10 +26,10 @@ import evl.data.Evl;
 import evl.data.component.composition.CompUse;
 import evl.data.component.composition.ImplComposition;
 import evl.data.component.elementary.ImplElementary;
-import evl.data.function.header.FuncCtrlInDataIn;
-import evl.data.function.header.FuncCtrlInDataOut;
-import evl.data.function.header.FuncCtrlOutDataIn;
-import evl.data.function.header.FuncCtrlOutDataOut;
+import evl.data.function.header.FuncQuery;
+import evl.data.function.header.FuncResponse;
+import evl.data.function.header.FuncSignal;
+import evl.data.function.header.FuncSlot;
 import evl.traverser.DefTraverser;
 
 public class MsgNamesGetter extends DefTraverser<Void, Set<String>> {
@@ -64,25 +64,25 @@ public class MsgNamesGetter extends DefTraverser<Void, Set<String>> {
   }
 
   @Override
-  protected Void visitFuncIfaceOutVoid(FuncCtrlOutDataOut obj, Set<String> param) {
+  protected Void visitFuncSignal(FuncSignal obj, Set<String> param) {
     param.add(obj.name);
     return null;
   }
 
   @Override
-  protected Void visitFuncIfaceOutRet(FuncCtrlOutDataIn obj, Set<String> param) {
+  protected Void visitFuncQuery(FuncQuery obj, Set<String> param) {
     param.add(obj.name);
     return null;
   }
 
   @Override
-  protected Void visitFuncIfaceInVoid(FuncCtrlInDataIn obj, Set<String> param) {
+  protected Void visitFuncSlot(FuncSlot obj, Set<String> param) {
     param.add(obj.name);
     return null;
   }
 
   @Override
-  protected Void visitFuncIfaceInRet(FuncCtrlInDataOut obj, Set<String> param) {
+  protected Void visitFuncResponse(FuncResponse obj, Set<String> param) {
     param.add(obj.name);
     return null;
   }

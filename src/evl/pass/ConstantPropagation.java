@@ -29,6 +29,7 @@ import evl.data.type.base.RangeType;
 import evl.data.type.base.StringType;
 import evl.data.type.composed.RecordType;
 import evl.data.variable.Constant;
+import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.other.ExprReplacer;
 
@@ -39,13 +40,19 @@ import evl.traverser.other.ExprReplacer;
 public class ConstantPropagation extends EvlPass {
   @Override
   public void process(Namespace evl, KnowledgeBase kb) {
-    ConstantPropagationWorker worker = new ConstantPropagationWorker();
+    ConstantPropagationWorker worker = new ConstantPropagationWorker(kb);
     worker.traverse(evl, null);
   }
 
 }
 
 class ConstantPropagationWorker extends ExprReplacer<Void> {
+  final private KnowType kt;
+
+  public ConstantPropagationWorker(KnowledgeBase kb) {
+    super();
+    this.kt = kb.getEntry(KnowType.class);
+  }
 
   private boolean doReduce(Type type) {
     if (type instanceof RangeType) {
@@ -57,7 +64,7 @@ class ConstantPropagationWorker extends ExprReplacer<Void> {
     } else if (type instanceof StringType) {
       return false;
     } else if (type instanceof RecordType) {
-      return true;    // Because of C
+      return true; // Because of C
     }
     throw new RuntimeException("not yet implemented:" + type.getClass().getCanonicalName());
   }
@@ -66,7 +73,7 @@ class ConstantPropagationWorker extends ExprReplacer<Void> {
   protected Expression visitReference(Reference obj, Void param) {
     if (obj.link instanceof Constant) {
       Constant constant = (Constant) obj.link;
-      Type type = constant.type.link;
+      Type type = kt.get(constant.type);
       if (doReduce(type)) {
         assert (obj.offset.isEmpty());
         return Copy.copy(visit(constant.def, null));

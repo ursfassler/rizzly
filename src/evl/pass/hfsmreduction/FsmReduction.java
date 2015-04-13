@@ -37,7 +37,7 @@ import evl.data.component.elementary.ImplElementary;
 import evl.data.component.hfsm.ImplHfsm;
 import evl.data.component.hfsm.State;
 import evl.data.component.hfsm.StateComposite;
-import evl.data.component.hfsm.StateItem;
+import evl.data.component.hfsm.StateContent;
 import evl.data.component.hfsm.StateSimple;
 import evl.data.component.hfsm.Transition;
 import evl.data.expression.Expression;
@@ -46,10 +46,10 @@ import evl.data.expression.reference.RefCall;
 import evl.data.expression.reference.Reference;
 import evl.data.expression.reference.SimpleRef;
 import evl.data.function.Function;
-import evl.data.function.header.FuncCtrlInDataIn;
-import evl.data.function.header.FuncCtrlInDataOut;
-import evl.data.function.header.FuncCtrlOutDataOut;
-import evl.data.function.header.FuncPrivateVoid;
+import evl.data.function.header.FuncProcedure;
+import evl.data.function.header.FuncResponse;
+import evl.data.function.header.FuncSignal;
+import evl.data.function.header.FuncSlot;
 import evl.data.function.ret.FuncReturnNone;
 import evl.data.statement.Assignment;
 import evl.data.statement.AssignmentSingle;
@@ -73,6 +73,7 @@ import evl.knowledge.KnowBaseItem;
 import evl.knowledge.KnowLlvmLibrary;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.NullTraverser;
+import evl.traverser.other.ClassGetter;
 
 public class FsmReduction extends EvlPass {
 
@@ -144,10 +145,10 @@ class Reduction {
   }
 
   public ImplElementary reduce(ImplHfsm obj, Namespace param) {
-    ImplElementary elem = new ImplElementary(obj.getInfo(), obj.name, new SimpleRef<FuncPrivateVoid>(info, null), new SimpleRef<FuncPrivateVoid>(info, null));
+    ImplElementary elem = new ImplElementary(obj.getInfo(), obj.name, new SimpleRef<FuncProcedure>(info, null), new SimpleRef<FuncProcedure>(info, null));
     elem.iface.addAll(obj.iface);
     elem.function.addAll(obj.function);
-    for (StateItem item : obj.topstate.item) {
+    for (StateContent item : obj.topstate.item) {
       if (item instanceof Variable) {
         elem.variable.add((Variable) item);
       } else if (item instanceof Function) {
@@ -165,8 +166,9 @@ class Reduction {
     HashMap<StateSimple, EnumElement> enumMap = makeEnumElem(obj.topstate, states);
 
     param.children.add(states);
-    // String ena = (String) enumMap.get(obj.getTopstate().getInitial()).properties().get(Property.NAME);
-    EnumElement ena = enumMap.get(obj.topstate.initial.link);
+    // String ena = (String)
+    // enumMap.get(obj.getTopstate().getInitial()).properties().get(Property.NAME);
+    EnumElement ena = enumMap.get(obj.topstate.initial.getTarget());
     Reference initState = makeEnumElemRef(states, ena);
     StateVariable stateVariable = new StateVariable(obj.getInfo(), "_statevar", new SimpleRef<Type>(info, states), initState);
     elem.variable.add(stateVariable);
@@ -175,7 +177,7 @@ class Reduction {
     dict.traverse(obj.topstate, null);
 
     // create event handler
-    for (FuncCtrlInDataOut func : elem.iface.getItems(FuncCtrlInDataOut.class)) {
+    for (FuncResponse func : ClassGetter.filter(FuncResponse.class, elem.iface)) {
       assert (func.body.statements.isEmpty());
       Statement code = addQueryCode(enumMap.keySet(), enumMap, states, stateVariable, func, func.param);
       Block bbl = new Block(info);
@@ -183,7 +185,7 @@ class Reduction {
       func.body = bbl;
     }
 
-    for (FuncCtrlInDataIn func : elem.iface.getItems(FuncCtrlInDataIn.class)) {
+    for (FuncSlot func : ClassGetter.filter(FuncSlot.class, elem.iface)) {
       assert (func.body.statements.isEmpty());
       Statement code = addTransitionCode(enumMap.keySet(), enumMap, states, stateVariable, func, dict, func.param);
       Block bbl = new Block(info);
@@ -192,11 +194,11 @@ class Reduction {
     }
 
     {
-      FuncPrivateVoid fEntry = makeEntryFunc(obj.topstate.initial.link);
+      FuncProcedure fEntry = makeEntryFunc((State) obj.topstate.initial.getTarget());
       elem.function.add(fEntry);
       elem.entryFunc.link = fEntry;
 
-      FuncPrivateVoid fExit = makeExitFunc(states, enumMap, stateVariable);
+      FuncProcedure fExit = makeExitFunc(states, enumMap, stateVariable);
       elem.function.add(fExit);
       elem.exitFunc.link = fExit;
     }
@@ -205,24 +207,24 @@ class Reduction {
     return elem;
   }
 
-  private FuncPrivateVoid makeEntryFunc(State initial) {
+  private FuncProcedure makeEntryFunc(State initial) {
     Block body = new Block(info);
 
     body.statements.add(makeCall(initial.entryFunc.link));
 
-    FuncPrivateVoid rfunc = new FuncPrivateVoid(info, Designator.NAME_SEP + "stateentry", new EvlList<FuncVariable>(), new FuncReturnNone(ElementInfo.NO), body);
+    FuncProcedure rfunc = new FuncProcedure(info, Designator.NAME_SEP + "stateentry", new EvlList<FuncVariable>(), new FuncReturnNone(ElementInfo.NO), body);
     return rfunc;
   }
 
   private Block makeErrorBb() {
     Block bberror = new Block(info);
-    FuncCtrlOutDataOut trap = kll.getTrap();
+    FuncSignal trap = kll.getTrap();
     bberror.statements.add(new CallStmt(info, new Reference(info, trap, new RefCall(info, new TupleValue(info, new EvlList<Expression>())))));
     return bberror;
   }
 
   // TODO ok?
-  private FuncPrivateVoid makeExitFunc(EnumType etype, HashMap<StateSimple, EnumElement> enumMap, StateVariable stateVariable) {
+  private FuncProcedure makeExitFunc(EnumType etype, HashMap<StateSimple, EnumElement> enumMap, StateVariable stateVariable) {
 
     EvlList<CaseOpt> option = new EvlList<CaseOpt>();
     for (State src : enumMap.keySet()) {
@@ -238,7 +240,7 @@ class Reduction {
     Block body = new Block(info);
     body.statements.add(caseStmt);
 
-    FuncPrivateVoid rfunc = new FuncPrivateVoid(info, "_exit", new EvlList<FuncVariable>(), new FuncReturnNone(ElementInfo.NO), body);
+    FuncProcedure rfunc = new FuncProcedure(info, "_exit", new EvlList<FuncVariable>(), new FuncReturnNone(ElementInfo.NO), body);
     rfunc.body = body;
 
     return rfunc;
@@ -254,7 +256,7 @@ class Reduction {
 
   static private HashMap<StateSimple, EnumElement> makeEnumElem(StateComposite topstate, EnumType stateEnum) {
     HashMap<StateSimple, EnumElement> ret = new HashMap<StateSimple, EnumElement>();
-    for (State state : topstate.item.getItems(State.class)) {
+    for (State state : ClassGetter.filter(State.class, topstate.item)) {
       assert (state instanceof StateSimple);
 
       EnumElement element = new EnumElement(info, state.name);
@@ -265,12 +267,12 @@ class Reduction {
     return ret;
   }
 
-  private CaseStmt addQueryCode(Collection<StateSimple> leafes, HashMap<StateSimple, EnumElement> enumMap, EnumType enumType, StateVariable stateVariable, FuncCtrlInDataOut func, EvlList<FuncVariable> param) {
+  private CaseStmt addQueryCode(Collection<StateSimple> leafes, HashMap<StateSimple, EnumElement> enumMap, EnumType enumType, StateVariable stateVariable, FuncResponse func, EvlList<FuncVariable> param) {
     EvlList<CaseOpt> copt = new EvlList<CaseOpt>();
 
     for (State state : leafes) {
 
-      FuncCtrlInDataOut query = getQuery(state, func.name);
+      FuncResponse query = getQuery(state, func.name);
 
       // from QueryDownPropagator
       assert (query.body.statements.size() == 1);
@@ -290,9 +292,9 @@ class Reduction {
     return caseStmt;
   }
 
-  static private FuncCtrlInDataOut getQuery(State state, String funcName) {
+  static private FuncResponse getQuery(State state, String funcName) {
     assert (funcName != null);
-    for (FuncCtrlInDataOut itr : state.item.getItems(FuncCtrlInDataOut.class)) {
+    for (FuncResponse itr : ClassGetter.filter(FuncResponse.class, state.item)) {
       if (funcName.equals(itr.name)) {
         return itr;
       }
@@ -301,7 +303,7 @@ class Reduction {
     return null;
   }
 
-  private CaseStmt addTransitionCode(Collection<StateSimple> leafes, HashMap<StateSimple, EnumElement> enumMap, EnumType enumType, StateVariable stateVariable, FuncCtrlInDataIn funcName, TransitionDict getter, EvlList<FuncVariable> param) {
+  private CaseStmt addTransitionCode(Collection<StateSimple> leafes, HashMap<StateSimple, EnumElement> enumMap, EnumType enumType, StateVariable stateVariable, FuncSlot funcName, TransitionDict getter, EvlList<FuncVariable> param) {
 
     EvlList<CaseOpt> options = new EvlList<CaseOpt>();
 
@@ -333,7 +335,9 @@ class Reduction {
     for (Transition trans : transList) {
       Block blockThen = makeTransition(trans, newparam, stateVariable, enumMap);
 
-      FsmReduction.relinkActualParameterRef(trans.param, newparam, trans.guard); // relink references to
+      FsmReduction.relinkActualParameterRef(trans.param, newparam, trans.guard); // relink
+      // references
+      // to
       // arguments to the
       // new ones
 
@@ -373,7 +377,7 @@ class Reduction {
 
     transCode.statements.addAll(body.statements);
 
-    EnumElement src = enumMap.get(trans.dst.link);
+    EnumElement src = enumMap.get(trans.dst.getTarget());
     assert (src != null);
     Assignment setState = new AssignmentSingle(info, new Reference(info, stateVariable), new Reference(info, src));
     transCode.statements.add(setState);

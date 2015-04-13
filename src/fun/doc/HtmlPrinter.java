@@ -24,20 +24,20 @@ import util.Writer;
 
 import common.Designator;
 
-import fun.Fun;
-import fun.knowledge.KnowFunPath;
-import fun.knowledge.KnowledgeBase;
-import fun.other.Named;
+import evl.data.Evl;
+import evl.data.Named;
+import evl.knowledge.KnowPath;
+import evl.knowledge.KnowledgeBase;
 
 public class HtmlPrinter extends FunPrinter {
-  private KnowFunPath kfp;
+  private KnowPath kfp;
 
   public HtmlPrinter(Writer xw, KnowledgeBase kb) {
     super(xw);
-    kfp = kb.getEntry(KnowFunPath.class);
+    kfp = kb.getEntry(KnowPath.class);
   }
 
-  public static void print(Fun ast, Element parent, KnowledgeBase kb) {
+  public static void print(Evl ast, Element parent, KnowledgeBase kb) {
     HtmlPrinter pp = new HtmlPrinter(new HtmlWriter(parent), kb);
     pp.traverse(ast, null);
   }
@@ -56,10 +56,12 @@ public class HtmlPrinter extends FunPrinter {
     // assert (file != null);
     // assert (fullpath.size() >= file.getFullName().size());
     //
-    // Designator locpath = new Designator(fullpath.toList().subList(file.getFullName().size(), fullpath.size()));
-    // locpath = new Designator(locpath, obj.getName());
+    // Designator locpath = new
+    // Designator(fullpath.toList().subList(file.getFullName().size(),
+    // fullpath.size()));
+    // locpath = new Designator(locpath, obj.name);
     //
-    Designator locpath = new Designator(fullpath, obj.getName());
+    Designator locpath = new Designator(fullpath, obj.name);
 
     return locpath.toString();
   }

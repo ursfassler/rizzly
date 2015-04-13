@@ -19,12 +19,11 @@ package evl.data.variable;
 
 import common.ElementInfo;
 
-import evl.data.expression.reference.SimpleRef;
-import evl.data.type.Type;
+import evl.data.expression.reference.TypeRef;
 
-final public class FuncVariable extends Variable {
+public class FuncVariable extends Variable {
 
-  public FuncVariable(ElementInfo info, String name, SimpleRef<Type> type) {
+  public FuncVariable(ElementInfo info, String name, TypeRef type) {
     super(info, name, type);
   }
 

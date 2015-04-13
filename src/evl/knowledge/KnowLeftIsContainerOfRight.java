@@ -24,7 +24,7 @@ import java.util.List;
 import util.Pair;
 import util.Range;
 import evl.data.Evl;
-import evl.data.expression.reference.SimpleRef;
+import evl.data.expression.reference.TypeRef;
 import evl.data.type.Type;
 import evl.data.type.base.ArrayType;
 import evl.data.type.base.BooleanType;
@@ -74,11 +74,13 @@ public class KnowLeftIsContainerOfRight extends KnowledgeEntry {
 }
 
 class KnowLeftIsContainerOfRightWorker extends NullTraverser<Boolean, Type> {
-  private KnowledgeBase kb;
+  final private KnowledgeBase kb;
+  final private KnowType kt;
 
   public KnowLeftIsContainerOfRightWorker(KnowledgeBase kb) {
     super();
     this.kb = kb;
+    this.kt = kb.getEntry(KnowType.class);
   }
 
   @Override
@@ -106,13 +108,13 @@ class KnowLeftIsContainerOfRightWorker extends NullTraverser<Boolean, Type> {
     return Supertype.get(right, kb);
   }
 
-  private boolean process(List<SimpleRef<Type>> left, List<SimpleRef<Type>> right) {
+  private boolean process(List<TypeRef> left, List<TypeRef> right) {
     if (left.size() != right.size()) {
       return false;
     }
     for (int i = 0; i < left.size(); i++) {
-      Type lefttype = left.get(i).link;
-      Type righttype = right.get(i).link;
+      Type lefttype = kt.get(left.get(i));
+      Type righttype = kt.get(right.get(i));
       if (!visit(lefttype, righttype)) {
         return false;
       }
@@ -122,8 +124,8 @@ class KnowLeftIsContainerOfRightWorker extends NullTraverser<Boolean, Type> {
 
   @Override
   protected Boolean visitFunctionType(FunctionType left, Type right) {
-    Type leftret = left.ret.link;
-    Type rightret = ((FunctionType) right).ret.link;
+    Type leftret = kt.get(left.ret);
+    Type rightret = kt.get(((FunctionType) right).ret);
     return visit(leftret, rightret) && process(left.arg, ((FunctionType) right).arg);
   }
 
@@ -187,9 +189,9 @@ class KnowLeftIsContainerOfRightWorker extends NullTraverser<Boolean, Type> {
     if (right instanceof TupleType) {
       return process(obj.types, ((TupleType) right).types);
     } else if (right instanceof RecordType) {
-      List<SimpleRef<Type>> rtypes = new ArrayList<SimpleRef<Type>>();
+      List<TypeRef> rtypes = new ArrayList<TypeRef>();
       for (NamedElement elem : ((RecordType) right).element) {
-        rtypes.add(elem.ref);
+        rtypes.add(elem.typeref);
       }
       return process(obj.types, rtypes);
     } else {
@@ -202,9 +204,9 @@ class KnowLeftIsContainerOfRightWorker extends NullTraverser<Boolean, Type> {
     if (left.equals(right)) {
       return true;
     } else if (right instanceof TupleType) {
-      List<SimpleRef<Type>> lt = new ArrayList<SimpleRef<Type>>();
+      List<TypeRef> lt = new ArrayList<TypeRef>();
       for (NamedElement elem : left.element) {
-        lt.add(elem.ref);
+        lt.add(elem.typeref);
       }
       return process(lt, ((TupleType) right).types);
     } else {
@@ -215,8 +217,8 @@ class KnowLeftIsContainerOfRightWorker extends NullTraverser<Boolean, Type> {
   @Override
   protected Boolean visitArrayType(ArrayType left, Type right) {
     if (right instanceof ArrayType) {
-      Type lefttype = left.type.link;
-      Type righttype = ((ArrayType) right).type.link;
+      Type lefttype = kt.get(left.type);
+      Type righttype = kt.get(((ArrayType) right).type);
       if (!visit(lefttype, righttype)) {
         return false;
       }
@@ -228,12 +230,12 @@ class KnowLeftIsContainerOfRightWorker extends NullTraverser<Boolean, Type> {
 
   @Override
   protected Boolean visitUnionType(UnionType left, Type right) {
-    return left == right;  // XXX is this correct?
+    return left == right; // XXX is this correct?
   }
 
   @Override
   protected Boolean visitUnsafeUnionType(UnsafeUnionType left, Type right) {
-    return left == right;  // XXX is this correct?
+    return left == right; // XXX is this correct?
   }
 
   @Override

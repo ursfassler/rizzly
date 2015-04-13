@@ -27,10 +27,10 @@ import evl.data.component.composition.SubCallbacks;
 import evl.data.component.hfsm.ImplHfsm;
 import evl.data.component.hfsm.State;
 import evl.data.component.hfsm.Transition;
-import evl.data.function.header.FuncCtrlInDataIn;
-import evl.data.function.header.FuncCtrlInDataOut;
-import evl.data.function.header.FuncPrivateRet;
-import evl.data.function.header.FuncPrivateVoid;
+import evl.data.function.header.FuncFunction;
+import evl.data.function.header.FuncProcedure;
+import evl.data.function.header.FuncResponse;
+import evl.data.function.header.FuncSlot;
 import evl.data.variable.StateVariable;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.NullTraverser;
@@ -80,25 +80,25 @@ class HfsmModelCheckerWorker extends NullTraverser<Void, Void> {
   @Override
   protected Void visitTransition(Transition obj, Void param) {
     // TODO check that guard does not write state
-    if (!(obj.eventFunc.link instanceof FuncCtrlInDataIn)) {
+    if (!(obj.eventFunc.getTarget() instanceof FuncSlot)) {
       RError.err(ErrorType.Error, obj.getInfo(), "transition can only be triggered by slot");
     }
     return null;
   }
 
   @Override
-  protected Void visitFuncIfaceInRet(FuncCtrlInDataOut obj, Void param) {
+  protected Void visitFuncResponse(FuncResponse obj, Void param) {
     // TODO check that state is not written
     return null;
   }
 
   @Override
-  protected Void visitFuncPrivateVoid(FuncPrivateVoid obj, Void param) {
+  protected Void visitFuncProcedure(FuncProcedure obj, Void param) {
     return null;
   }
 
   @Override
-  protected Void visitFuncPrivateRet(FuncPrivateRet obj, Void param) {
+  protected Void visitFuncFunction(FuncFunction obj, Void param) {
     return null;
   }
 

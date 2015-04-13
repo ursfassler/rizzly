@@ -29,14 +29,14 @@ import evl.data.Namespace;
 import evl.data.component.hfsm.ImplHfsm;
 import evl.data.component.hfsm.State;
 import evl.data.component.hfsm.StateComposite;
-import evl.data.component.hfsm.StateItem;
+import evl.data.component.hfsm.StateContent;
 import evl.data.component.hfsm.StateSimple;
 import evl.data.expression.Expression;
 import evl.data.expression.TupleValue;
 import evl.data.expression.reference.RefCall;
 import evl.data.expression.reference.Reference;
 import evl.data.function.Function;
-import evl.data.function.header.FuncPrivateVoid;
+import evl.data.function.header.FuncProcedure;
 import evl.data.function.ret.FuncReturnNone;
 import evl.data.statement.Block;
 import evl.data.statement.CallStmt;
@@ -76,7 +76,7 @@ class EntryExitUpdaterWorker extends NullTraverser<Void, EePar> {
 
   @Override
   protected Void visitDefault(Evl obj, EePar param) {
-    if (obj instanceof StateItem) {
+    if (obj instanceof StateContent) {
       return null;
     } else {
       throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
@@ -96,17 +96,17 @@ class EntryExitUpdaterWorker extends NullTraverser<Void, EePar> {
   }
 
   public void changeEe(State obj, EePar param) {
-    FuncPrivateVoid entry = makeFunc(param.entry, "_centry");
+    FuncProcedure entry = makeFunc(param.entry, "_centry");
     obj.item.add(entry);
     obj.entryFunc.link = entry;
 
-    FuncPrivateVoid exit = makeFunc(param.exit, "_cexit");
+    FuncProcedure exit = makeFunc(param.exit, "_cexit");
     obj.item.add(exit);
     obj.exitFunc.link = exit;
   }
 
-  public FuncPrivateVoid makeFunc(LinkedList<Function> list, String name) {
-    FuncPrivateVoid func = new FuncPrivateVoid(ElementInfo.NO, name, new EvlList<FuncVariable>(), new FuncReturnNone(ElementInfo.NO), new Block(ElementInfo.NO));
+  public FuncProcedure makeFunc(LinkedList<Function> list, String name) {
+    FuncProcedure func = new FuncProcedure(ElementInfo.NO, name, new EvlList<FuncVariable>(), new FuncReturnNone(ElementInfo.NO), new Block(ElementInfo.NO));
 
     for (Function cf : list) {
       Statement stmt = makeCall(cf);

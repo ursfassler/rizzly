@@ -26,7 +26,7 @@ import evl.data.expression.reference.RefIndex;
 import evl.data.expression.reference.RefItem;
 import evl.data.expression.reference.RefName;
 import evl.data.expression.reference.Reference;
-import evl.data.expression.reference.SimpleRef;
+import evl.data.expression.reference.TypeRef;
 import evl.data.type.Type;
 import evl.data.type.base.ArrayType;
 import evl.data.type.base.EnumType;
@@ -77,20 +77,20 @@ public class ReferenceTypecheck extends NullTraverser<Type, Type> {
   @Override
   protected Type visitRefCall(RefCall obj, Type sub) {
     if (sub instanceof FunctionType) {
-      EvlList<SimpleRef<Type>> arg = ((FunctionType) sub).arg;
+      EvlList<TypeRef> arg = ((FunctionType) sub).arg;
       EvlList<Expression> argval = obj.actualParameter.value;
       if (arg.size() != argval.size()) {
         RError.err(ErrorType.Error, obj.getInfo(), "Need " + arg.size() + " arguments, got " + argval.size());
         return null;
       }
       for (int i = 0; i < arg.size(); i++) {
-        Type partype = arg.get(i).link;
+        Type partype = kt.get(arg.get(i));
         Type valtype = kt.get(argval.get(i));
         if (!kc.get(partype, valtype)) {
           RError.err(ErrorType.Error, argval.get(i).getInfo(), "Data type to big or incompatible (argument " + (i + 1) + ", " + partype.name + " := " + valtype.name + ")");
         }
       }
-      return ((FunctionType) sub).ret.link;
+      return kt.get(((FunctionType) sub).ret);
     } else {
       RError.err(ErrorType.Error, obj.getInfo(), "Not a function: " + obj.toString());
       return null;
@@ -120,7 +120,7 @@ public class ReferenceTypecheck extends NullTraverser<Type, Type> {
       if (!kc.get(ait, index)) {
         RError.err(ErrorType.Error, obj.getInfo(), "array index type is " + ait.name + ", got " + index.name);
       }
-      return ((ArrayType) sub).type.link;
+      return kt.get(((ArrayType) sub).type);
     } else {
       RError.err(ErrorType.Error, obj.getInfo(), "need array to index, got type: " + sub.name);
       return null;

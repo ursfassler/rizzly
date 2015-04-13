@@ -20,12 +20,13 @@ package evl.data.component.hfsm;
 import common.ElementInfo;
 
 import evl.data.expression.reference.SimpleRef;
-import evl.data.function.header.FuncPrivateVoid;
+import evl.data.expression.reference.StateRef;
+import evl.data.function.header.FuncProcedure;
 
 public class StateComposite extends State {
-  public SimpleRef<State> initial;
+  public StateRef initial;
 
-  public StateComposite(ElementInfo info, String name, SimpleRef<FuncPrivateVoid> entryFunc, SimpleRef<FuncPrivateVoid> exitFunc, SimpleRef<State> initial) {
+  public StateComposite(ElementInfo info, String name, SimpleRef<FuncProcedure> entryFunc, SimpleRef<FuncProcedure> exitFunc, StateRef initial) {
     super(info, name, entryFunc, exitFunc);
     this.initial = initial;
   }

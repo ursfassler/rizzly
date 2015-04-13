@@ -56,18 +56,18 @@ import evl.data.expression.reference.Reference;
 import evl.data.expression.reference.SimpleRef;
 import evl.data.function.Function;
 import evl.data.function.InterfaceFunction;
-import evl.data.function.header.FuncCtrlInDataIn;
-import evl.data.function.header.FuncCtrlInDataOut;
-import evl.data.function.header.FuncCtrlOutDataIn;
-import evl.data.function.header.FuncCtrlOutDataOut;
-import evl.data.function.header.FuncPrivateVoid;
+import evl.data.function.header.FuncProcedure;
+import evl.data.function.header.FuncQuery;
+import evl.data.function.header.FuncResponse;
+import evl.data.function.header.FuncSignal;
+import evl.data.function.header.FuncSlot;
 import evl.data.function.header.FuncSubHandlerEvent;
 import evl.data.function.header.FuncSubHandlerQuery;
 import evl.data.function.ret.FuncReturnNone;
 import evl.data.statement.Block;
 import evl.data.statement.CallStmt;
+import evl.data.statement.MsgPush;
 import evl.data.statement.ReturnExpr;
-import evl.data.statement.intern.MsgPush;
 import evl.data.variable.FuncVariable;
 import evl.data.variable.Variable;
 import evl.knowledge.KnowledgeBase;
@@ -97,9 +97,9 @@ public class CompositionReduction extends EvlPass {
     assert (out.body.statements.isEmpty());
 
     Function func;
-    if (out instanceof FuncCtrlOutDataOut) {
+    if (out instanceof FuncSignal) {
       func = new FuncSubHandlerEvent(out.getInfo(), out.name, Copy.copy(out.param), Copy.copy(out.ret), new Block(ElementInfo.NO));
-    } else if (out instanceof FuncCtrlOutDataIn) {
+    } else if (out instanceof FuncQuery) {
       func = new FuncSubHandlerQuery(out.getInfo(), out.name, Copy.copy(out.param), Copy.copy(out.ret), new Block(ElementInfo.NO));
     } else {
       throw new RuntimeException("not yet implemented");
@@ -135,10 +135,10 @@ class CompositionReductionWorker extends NullTraverser<Evl, Void> {
   protected Evl visitImplComposition(ImplComposition obj, Void param) {
     ElementInfo info = obj.getInfo();
 
-    FuncPrivateVoid entry = new FuncPrivateVoid(info, "_entry", new EvlList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
-    FuncPrivateVoid exit = new FuncPrivateVoid(info, "_exit", new EvlList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
+    FuncProcedure entry = new FuncProcedure(info, "_entry", new EvlList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
+    FuncProcedure exit = new FuncProcedure(info, "_exit", new EvlList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
 
-    ImplElementary elem = new ImplElementary(obj.getInfo(), obj.name, new SimpleRef<FuncPrivateVoid>(info, entry), new SimpleRef<FuncPrivateVoid>(info, exit));
+    ImplElementary elem = new ImplElementary(obj.getInfo(), obj.name, new SimpleRef<FuncProcedure>(info, entry), new SimpleRef<FuncProcedure>(info, exit));
     elem.function.add(entry);
     elem.function.add(exit);
 
@@ -152,7 +152,8 @@ class CompositionReductionWorker extends NullTraverser<Evl, Void> {
     for (CompUse compu : obj.component) {
       SubCallbacks suc = new SubCallbacks(compu.getInfo(), new SimpleRef<CompUse>(info, compu));
       elem.subCallback.add(suc);
-      for (InterfaceFunction out : compu.instref.link.getIface(Direction.out)) {
+      Component usedComp = (Component) compu.compRef.getTarget();
+      for (InterfaceFunction out : usedComp.getIface(Direction.out)) {
         Function suha = CompositionReduction.makeHandler(out);
         suc.func.add(suha);
         coca.put(new Pair<CompUse, Function>(compu, out), suha);
@@ -165,34 +166,35 @@ class CompositionReductionWorker extends NullTraverser<Evl, Void> {
       if (src instanceof EndpointSelf) {
         Function coniface = src.getFunc();
 
-        if (coniface instanceof FuncCtrlInDataOut) {
+        if (coniface instanceof FuncResponse) {
           // assert (elem.getResponse().contains(coniface));
           assert (coniface.body.statements.isEmpty());
           assert (con instanceof SynchroniusConnection);
 
           ReturnExpr call = makeQueryCall(con.endpoint.get(Direction.out), coniface);
           coniface.body.statements.add(call);
-        } else if (coniface instanceof FuncCtrlInDataIn) {
+        } else if (coniface instanceof FuncSlot) {
           // assert (elem.getSlot().contains(coniface));
           genSlotCall(elem, con, coniface);
         } else {
           RError.err(ErrorType.Fatal, coniface.getInfo(), "Unexpected function type: " + coniface.getClass().getSimpleName());
         }
       } else {
-        CompUse srcComp = ((EndpointSub) src).component;
-        InterfaceFunction funa = srcComp.instref.link.iface.find(((EndpointSub) src).function);
+        CompUse srcCompRef = ((EndpointSub) src).component.link;
+        Component srcComp = (Component) srcCompRef.compRef.getTarget();
+        InterfaceFunction funa = srcComp.iface.find(((EndpointSub) src).function);
         Function coniface = funa;
 
-        Function suha = coca.get(new Pair<CompUse, Function>(srcComp, coniface));
+        Function suha = coca.get(new Pair<CompUse, Function>(srcCompRef, coniface));
 
-        if (coniface instanceof FuncCtrlOutDataIn) {
+        if (coniface instanceof FuncQuery) {
           // assert (srcComp.getLink().getQuery().contains(coniface));
           assert (suha.body.statements.isEmpty());
           assert (con instanceof SynchroniusConnection);
 
           ReturnExpr call = makeQueryCall(con.endpoint.get(Direction.out), suha);
           suha.body.statements.add(call);
-        } else if (coniface instanceof FuncCtrlOutDataOut) {
+        } else if (coniface instanceof FuncSignal) {
           genSlotCall(elem, con, suha);
         } else {
           RError.err(ErrorType.Fatal, coniface.getInfo(), "Unexpected function type: " + coniface.getClass().getSimpleName());
@@ -260,7 +262,7 @@ class CompositionReductionWorker extends NullTraverser<Evl, Void> {
       return new Reference(ep.getInfo(), ((EndpointSelf) ep).getFunc());
     } else {
       EndpointSub eps = (EndpointSub) ep;
-      Reference ref = new Reference(eps.getInfo(), eps.component);
+      Reference ref = new Reference(eps.getInfo(), eps.component.link);
       ref.offset.add(new RefName(eps.getInfo(), eps.function));
       return ref;
     }
@@ -269,8 +271,9 @@ class CompositionReductionWorker extends NullTraverser<Evl, Void> {
   private Reference getQueue(Endpoint ep, Component comp) {
     Reference ref;
     if (ep instanceof EndpointSub) {
-      ref = new Reference(ep.getInfo(), ((EndpointSub) ep).component);
-      Queue queue = ((EndpointSub) ep).component.instref.link.queue;
+      ref = new Reference(ep.getInfo(), ((EndpointSub) ep).component.link);
+      Component refComp = (Component) ((EndpointSub) ep).component.link.compRef.getTarget();
+      Queue queue = refComp.queue;
       ref.offset.add(new RefName(info, queue.name));
     } else {
       ref = new Reference(ep.getInfo(), comp.queue);

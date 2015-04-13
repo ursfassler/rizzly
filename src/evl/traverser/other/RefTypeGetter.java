@@ -31,15 +31,18 @@ import evl.data.type.base.EnumType;
 import evl.data.type.base.FunctionType;
 import evl.data.type.composed.NamedElement;
 import evl.knowledge.KnowChild;
+import evl.knowledge.KnowType;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.NullTraverser;
 
 public class RefTypeGetter extends NullTraverser<Type, Type> {
   final private KnowChild kc;
+  final private KnowType kt; // FIXME remove cyclic dependency
 
-  public RefTypeGetter(KnowledgeBase kb) {
+  public RefTypeGetter(KnowType kt, KnowledgeBase kb) {
     super();
     kc = kb.getEntry(KnowChild.class);
+    this.kt = kt;
   }
 
   @Override
@@ -66,7 +69,7 @@ public class RefTypeGetter extends NullTraverser<Type, Type> {
   @Override
   protected Type visitRefCall(RefCall obj, Type sub) {
     if (sub instanceof FunctionType) {
-      return ((FunctionType) sub).ret.link;
+      return kt.get(((FunctionType) sub).ret);
     } else {
       RError.err(ErrorType.Error, obj.getInfo(), "Not a function: " + obj.toString());
       return null;
@@ -83,7 +86,7 @@ public class RefTypeGetter extends NullTraverser<Type, Type> {
       if (etype == null) {
         RError.err(ErrorType.Error, obj.getInfo(), "Child not found: " + obj);
       }
-      return etype.ref.link;
+      return kt.get(etype.typeref);
     }
   }
 

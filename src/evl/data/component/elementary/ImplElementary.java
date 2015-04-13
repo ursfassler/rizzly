@@ -24,7 +24,7 @@ import evl.data.component.Component;
 import evl.data.component.composition.CompUse;
 import evl.data.component.composition.SubCallbacks;
 import evl.data.expression.reference.SimpleRef;
-import evl.data.function.header.FuncPrivateVoid;
+import evl.data.function.header.FuncProcedure;
 import evl.data.type.Type;
 import evl.data.variable.Constant;
 import evl.data.variable.Variable;
@@ -35,10 +35,10 @@ final public class ImplElementary extends Component {
   final public EvlList<Constant> constant = new EvlList<Constant>();
   final public EvlList<CompUse> component = new EvlList<CompUse>();
   final public EvlList<SubCallbacks> subCallback = new EvlList<SubCallbacks>();
-  final public SimpleRef<FuncPrivateVoid> entryFunc;
-  final public SimpleRef<FuncPrivateVoid> exitFunc;
+  final public SimpleRef<FuncProcedure> entryFunc;
+  final public SimpleRef<FuncProcedure> exitFunc;
 
-  public ImplElementary(ElementInfo info, String name, SimpleRef<FuncPrivateVoid> entryFunc, SimpleRef<FuncPrivateVoid> exitFunc) {
+  public ImplElementary(ElementInfo info, String name, SimpleRef<FuncProcedure> entryFunc, SimpleRef<FuncProcedure> exitFunc) {
     super(info, name);
     this.entryFunc = entryFunc;
     this.exitFunc = exitFunc;

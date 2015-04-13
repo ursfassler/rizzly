@@ -22,9 +22,9 @@ import java.util.Map;
 
 import error.ErrorType;
 import error.RError;
-import fun.expression.Expression;
-import fun.expression.reference.Reference;
-import fun.variable.Variable;
+import evl.data.expression.Expression;
+import evl.data.expression.reference.Reference;
+import evl.data.variable.Variable;
 
 public class Memory {
   private Map<Variable, Expression> values = new HashMap<Variable, Expression>();
@@ -55,7 +55,7 @@ public class Memory {
     values.put(var, value);
   }
 
-  public Expression get(Variable var) {
+  public Expression get(evl.data.variable.Variable var) {
     assert (var != null);
     assert (values.containsKey(var));
     Expression expr = values.get(var);
@@ -63,13 +63,13 @@ public class Memory {
     return expr;
   }
 
-  public boolean contains(Variable name) {
+  public boolean contains(evl.data.variable.Variable name) {
     return values.containsKey(name);
   }
 
-  public Variable find(String name) {
-    for (Variable var : values.keySet()) {
-      if (var.getName().equals(name)) {
+  public evl.data.variable.Variable find(String name) {
+    for (evl.data.variable.Variable var : values.keySet()) {
+      if (var.name.equals(name)) {
         return var;
       }
     }

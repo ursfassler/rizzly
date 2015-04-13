@@ -26,8 +26,9 @@ import org.jgrapht.Graph;
 
 import util.Pair;
 import util.SimpleGraph;
+import util.StreamWriter;
 import evl.data.Evl;
-import evl.traverser.other.PrettyPrinter;
+import fun.doc.FunPrinter;
 
 public class DebugPrinter {
   private Evl root;
@@ -45,8 +46,19 @@ public class DebugPrinter {
   }
 
   public void print(String info, Evl root) {
-    PrettyPrinter.print(root, debugdir + nr + " " + info + ".rzy", true);
+    String filename = debugdir + nr + " " + info + ".rzy";
+    print(root, filename);
     nr++;
+  }
+
+  static private void print(Evl ast, String filename) {
+    try {
+      StreamWriter writer = new StreamWriter(new PrintStream(filename));
+      FunPrinter pp = new FunPrinter(writer);
+      pp.traverse(ast, null);
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
   }
 
   public void print(String info, SimpleGraph<Evl> root) {

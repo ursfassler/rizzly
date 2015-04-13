@@ -17,17 +17,14 @@
 
 package fun.pass;
 
-import pass.FunPass;
-import fun.DefTraverser;
-import fun.Fun;
-import fun.expression.reference.RefItem;
-import fun.expression.reference.RefName;
-import fun.expression.reference.Reference;
-import fun.hfsm.State;
-import fun.knowledge.KnowChild;
-import fun.knowledge.KnowledgeBase;
-import fun.other.Named;
-import fun.other.Namespace;
+import pass.EvlPass;
+import evl.data.Evl;
+import evl.data.Named;
+import evl.data.component.hfsm.State;
+import evl.data.expression.reference.Reference;
+import evl.knowledge.KnowChild;
+import evl.knowledge.KnowledgeBase;
+import evl.traverser.DefTraverser;
 
 /**
  * Changes references to deepest state, e.g. _top.A.B -> B
@@ -35,10 +32,10 @@ import fun.other.Namespace;
  * @author urs
  *
  */
-public class StateLinkReduction extends FunPass {
+public class StateLinkReduction extends EvlPass {
 
   @Override
-  public void process(Namespace root, KnowledgeBase kb) {
+  public void process(evl.data.Namespace root, KnowledgeBase kb) {
     StateLinkReductionWorker reduction = new StateLinkReductionWorker(kb);
     reduction.traverse(root, null);
   }
@@ -53,21 +50,21 @@ class StateLinkReductionWorker extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitReference(Reference obj, Void param) {
-    Fun item = obj.getLink();
+    Evl item = obj.link;
     if (item instanceof State) {
-      while (!obj.getOffset().isEmpty()) {
-        RefItem next = obj.getOffset().get(0);
-        obj.getOffset().remove(0);
-        RefName name = (RefName) next;
+      while (!obj.offset.isEmpty()) {
+        evl.data.expression.reference.RefItem next = obj.offset.get(0);
+        obj.offset.remove(0);
+        evl.data.expression.reference.RefName name = (evl.data.expression.reference.RefName) next;
 
-        item = kc.get(item, name.getName());
+        item = kc.get(item, name.name, item.getInfo());
         assert (item != null);
         if (!(item instanceof State)) {
           break;
         }
       }
-      obj.setLink((Named) item);
-      obj.getOffset().clear();
+      obj.link = (Named) item;
+      obj.offset.clear();
     }
     return super.visitReference(obj, param);
   }

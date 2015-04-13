@@ -26,7 +26,7 @@ import evl.data.Namespace;
 import evl.data.component.hfsm.ImplHfsm;
 import evl.data.component.hfsm.State;
 import evl.data.component.hfsm.StateComposite;
-import evl.data.component.hfsm.StateItem;
+import evl.data.component.hfsm.StateContent;
 import evl.data.component.hfsm.Transition;
 import evl.knowledge.KnowledgeBase;
 import evl.traverser.NullTraverser;
@@ -55,7 +55,7 @@ class TransitionUplifterWorker extends NullTraverser<Void, List<Transition>> {
 
   @Override
   protected Void visitDefault(Evl obj, List<Transition> param) {
-    if (obj instanceof StateItem) {
+    if (obj instanceof StateContent) {
       return null;
     } else {
       throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
@@ -78,7 +78,7 @@ class TransitionUplifterWorker extends NullTraverser<Void, List<Transition>> {
 
   @Override
   protected Void visitState(State obj, List<Transition> param) {
-    List<Transition> transList = obj.item.getItems(Transition.class);
+    List<Transition> transList = ClassGetter.filter(Transition.class, obj.item);
     param.addAll(transList);
     obj.item.removeAll(transList);
     return super.visitState(obj, param);

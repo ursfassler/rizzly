@@ -39,12 +39,13 @@ import util.HtmlWriter;
 
 import common.Designator;
 
-import fun.composition.ImplComposition;
+import evl.data.file.RizzlyFile;
+import evl.knowledge.KnowPath;
+import evl.knowledge.KnowledgeBase;
+import evl.traverser.other.ClassGetter;
 import fun.doc.compgraph.Positioning;
 import fun.doc.compgraph.WorldComp;
-import fun.knowledge.KnowFunPath;
-import fun.knowledge.KnowledgeBase;
-import fun.other.RizzlyFile;
+import fun.other.RawComposition;
 import fun.other.Template;
 
 public class ComponentFilePrinter {
@@ -140,17 +141,17 @@ public class ComponentFilePrinter {
   }
 
   public void makePicture(RizzlyFile file) {
-    KnowFunPath kp = kb.getEntry(KnowFunPath.class);
-    assert (file.getObjects().getItems(ImplComposition.class).isEmpty());
-    for (Template decl : file.getObjects().getItems(Template.class)) {
-      if (decl.getObject() instanceof ImplComposition) {
-        ImplComposition comp = (ImplComposition) decl.getObject();
+    KnowPath kp = kb.getEntry(KnowPath.class);
+    assert (ClassGetter.filter(RawComposition.class, file.getObjects()).isEmpty());
+    for (Template decl : ClassGetter.filter(Template.class, file.getObjects())) {
+      if (decl.getObject() instanceof RawComposition) {
+        RawComposition comp = (RawComposition) decl.getObject();
         Element title = doc.createElement("h2");
         title.appendChild(doc.createTextNode("Picture"));
         body.appendChild(title);
 
         Designator path = kp.get(decl);
-        WorldComp g = CompositionGraphMaker.make(path, decl.getName(), comp, kb);
+        WorldComp g = CompositionGraphMaker.make(path, decl.name, comp, kb);
         Positioning.doPositioning(g);
         CompositionGraphPrinter pr = new CompositionGraphPrinter(doc);
         body.appendChild(pr.makeSvg(g));

@@ -17,21 +17,20 @@
 
 package fun.pass;
 
-import pass.FunPass;
+import pass.EvlPass;
 
 import common.ElementInfo;
 
-import fun.DefTraverser;
-import fun.expression.AnyValue;
-import fun.expression.reference.Reference;
-import fun.knowledge.KnowledgeBase;
-import fun.other.FunList;
-import fun.other.Namespace;
-import fun.statement.Assignment;
-import fun.statement.Block;
-import fun.statement.Statement;
-import fun.statement.VarDefStmt;
-import fun.variable.FuncVariable;
+import evl.data.EvlList;
+import evl.data.expression.AnyValue;
+import evl.data.expression.reference.Reference;
+import evl.data.statement.AssignmentMulti;
+import evl.data.statement.Block;
+import evl.data.statement.Statement;
+import evl.data.statement.VarDefInitStmt;
+import evl.data.variable.FuncVariable;
+import evl.knowledge.KnowledgeBase;
+import evl.traverser.DefTraverser;
 
 /**
  * Splits variable definitions such that only 1 variable is defined per variable definition statement. If the variable
@@ -40,59 +39,59 @@ import fun.variable.FuncVariable;
  * @author urs
  *
  */
-public class VarDefSplitter extends FunPass {
+public class VarDefSplitter extends EvlPass {
 
   @Override
-  public void process(Namespace root, KnowledgeBase kb) {
+  public void process(evl.data.Namespace root, KnowledgeBase kb) {
     VarDefSplitterWorker worker = new VarDefSplitterWorker();
     worker.traverse(root, null);
   }
 
 }
 
-class VarDefSplitterWorker extends DefTraverser<FunList<Statement>, Void> {
+class VarDefSplitterWorker extends DefTraverser<EvlList<Statement>, Void> {
 
   @Override
-  protected FunList<Statement> visitBlock(Block obj, Void param) {
-    FunList<Statement> list = new FunList<Statement>();
-    for (Statement stmt : obj.getStatements()) {
-      FunList<Statement> ret = visit(stmt, param);
+  protected EvlList<Statement> visitBlock(Block obj, Void param) {
+    EvlList<Statement> list = new EvlList<Statement>();
+    for (Statement stmt : obj.statements) {
+      EvlList<Statement> ret = visit(stmt, param);
       if (ret == null) {
         list.add(stmt);
       } else {
         list.addAll(ret);
       }
     }
-    obj.getStatements().clear();
-    obj.getStatements().addAll(list);
+    obj.statements.clear();
+    obj.statements.addAll(list);
     return null;
   }
 
   @Override
-  protected FunList<Statement> visitVarDefStmt(VarDefStmt obj, Void param) {
-    FunList<Statement> ret = new FunList<Statement>();
+  protected EvlList<Statement> visitVarDefInitStmt(VarDefInitStmt obj, Void param) {
+    EvlList<Statement> ret = new EvlList<Statement>();
 
-    FuncVariable firstVar = null;
+    evl.data.variable.FuncVariable firstVar = null;
 
-    for (FuncVariable var : obj.getVariable()) {
+    for (FuncVariable var : obj.variable) {
       ElementInfo info = var.getInfo();
 
       // variable definition
-      FunList<FuncVariable> sl = new FunList<FuncVariable>();
+      EvlList<FuncVariable> sl = new EvlList<FuncVariable>();
       sl.add(var);
-      ret.add(new VarDefStmt(info, sl, new AnyValue(info)));
+      ret.add(new VarDefInitStmt(info, sl, new AnyValue(info)));
 
       // assign initial value
-      if (!(obj.getInitial() instanceof AnyValue)) {
+      if (!(obj.initial instanceof AnyValue)) {
         if (firstVar == null) {
-          FunList<Reference> al = new FunList<Reference>();
+          EvlList<Reference> al = new EvlList<Reference>();
           al.add(new Reference(info, var));
-          ret.add(new Assignment(var.getInfo(), al, obj.getInitial()));
+          ret.add(new AssignmentMulti(var.getInfo(), al, obj.initial));
           firstVar = var;
         } else {
-          FunList<Reference> al = new FunList<Reference>();
+          EvlList<Reference> al = new EvlList<Reference>();
           al.add(new Reference(info, var));
-          ret.add(new Assignment(var.getInfo(), al, new Reference(info, firstVar)));
+          ret.add(new AssignmentMulti(var.getInfo(), al, new Reference(info, firstVar)));
         }
       }
     }

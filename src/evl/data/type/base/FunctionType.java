@@ -20,14 +20,14 @@ package evl.data.type.base;
 import common.ElementInfo;
 
 import evl.data.EvlList;
-import evl.data.expression.reference.SimpleRef;
+import evl.data.expression.reference.TypeRef;
 import evl.data.type.Type;
 
 final public class FunctionType extends Type {
-  final public EvlList<SimpleRef<Type>> arg;
-  final public SimpleRef<Type> ret;
+  final public EvlList<TypeRef> arg;
+  final public TypeRef ret;
 
-  public FunctionType(ElementInfo info, String name, EvlList<SimpleRef<Type>> arg, SimpleRef<Type> ret) {
+  public FunctionType(ElementInfo info, String name, EvlList<TypeRef> arg, TypeRef ret) {
     super(info, name);
     this.arg = arg;
     this.ret = ret;

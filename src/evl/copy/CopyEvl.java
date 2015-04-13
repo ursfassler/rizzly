@@ -22,15 +22,21 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
+import common.Direction;
+
 import evl.data.Evl;
 import evl.data.EvlList;
 import evl.data.Named;
 import evl.data.Namespace;
+import evl.data.component.composition.AsynchroniusConnection;
 import evl.data.component.composition.CompUse;
+import evl.data.component.composition.EndpointRaw;
 import evl.data.component.composition.Queue;
 import evl.data.component.composition.SubCallbacks;
+import evl.data.component.composition.SynchroniusConnection;
 import evl.data.component.elementary.ImplElementary;
-import evl.data.component.hfsm.StateItem;
+import evl.data.component.hfsm.StateComposite;
+import evl.data.component.hfsm.StateSimple;
 import evl.data.component.hfsm.Transition;
 import evl.data.expression.Expression;
 import evl.data.expression.NamedValue;
@@ -49,6 +55,10 @@ import evl.data.type.base.EnumElement;
 import evl.data.type.composed.NamedElement;
 import evl.data.variable.Variable;
 import evl.traverser.NullTraverser;
+import fun.other.RawComposition;
+import fun.other.RawElementary;
+import fun.other.RawHfsm;
+import fun.other.Template;
 
 public class CopyEvl extends NullTraverser<Evl, Void> {
   // / keeps the old -> new Named objects in order to relink references
@@ -187,7 +197,7 @@ public class CopyEvl extends NullTraverser<Evl, Void> {
   }
 
   @Override
-  protected StateItem visitTransition(Transition obj, Void param) {
+  protected Evl visitTransition(Transition obj, Void param) {
     return new Transition(obj.getInfo(), copy(obj.src), copy(obj.dst), copy(obj.eventFunc), copy(obj.guard), copy(obj.param), copy(obj.body));
   }
 
@@ -218,7 +228,7 @@ public class CopyEvl extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitNamedElement(NamedElement obj, Void param) {
-    return new NamedElement(obj.getInfo(), obj.name, copy(obj.ref));
+    return new NamedElement(obj.getInfo(), obj.name, copy(obj.typeref));
   }
 
   @Override
@@ -228,7 +238,80 @@ public class CopyEvl extends NullTraverser<Evl, Void> {
 
   @Override
   protected Evl visitCompUse(CompUse obj, Void param) {
-    return new CompUse(obj.getInfo(), obj.name, copy(obj.instref)); // we keep link to old type
+    return new CompUse(obj.getInfo(), obj.name, copy(obj.compRef)); // we keep
+    // link to
+    // old type
+  }
+
+  @Override
+  protected Evl visitRawHfsm(RawHfsm obj, Void param) {
+    RawHfsm ret = new RawHfsm(obj.getInfo(), obj.name, copy(obj.getTopstate()));
+
+    ret.getIface().addAll(copy(obj.getIface()));
+
+    return ret;
+  }
+
+  @Override
+  protected Evl visitRawComposition(RawComposition obj, Void param) {
+    RawComposition ret = new RawComposition(obj.getInfo(), obj.name);
+
+    ret.getIface().addAll(copy(obj.getIface()));
+    ret.getInstantiation().addAll(copy(obj.getInstantiation()));
+    ret.getConnection().addAll(copy(obj.getConnection()));
+
+    return ret;
+  }
+
+  @Override
+  protected Evl visitRawElementary(RawElementary obj, Void param) {
+    RawElementary ret = new RawElementary(obj.getInfo(), obj.name);
+
+    ret.getIface().addAll(copy(obj.getIface()));
+    ret.getDeclaration().addAll(copy(obj.getDeclaration()));
+    ret.getInstantiation().addAll(copy(obj.getInstantiation()));
+    ret.setEntryFunc(copy(obj.getEntryFunc()));
+    ret.setExitFunc(copy(obj.getExitFunc()));
+
+    return ret;
+  }
+
+  @Override
+  protected Evl visitStateSimple(StateSimple obj, Void param) {
+    evl.data.component.hfsm.StateSimple ret = new StateSimple(obj.getInfo(), obj.name, copy(obj.entryFunc), copy(obj.exitFunc));
+
+    ret.item.addAll(copy(obj.item));
+
+    return ret;
+  }
+
+  @Override
+  protected Evl visitStateComposite(StateComposite obj, Void param) {
+    evl.data.component.hfsm.StateComposite ret = new StateComposite(obj.getInfo(), obj.name, copy(obj.entryFunc), copy(obj.exitFunc), copy(obj.initial));
+
+    ret.item.addAll(copy(obj.item));
+
+    return ret;
+  }
+
+  @Override
+  protected Evl visitTemplate(Template obj, Void param) {
+    return new Template(obj.getInfo(), obj.name, copy(obj.getTempl()), copy(obj.getObject()));
+  }
+
+  @Override
+  protected Evl visitSynchroniusConnection(SynchroniusConnection obj, Void param) {
+    return new SynchroniusConnection(obj.getInfo(), copy(obj.endpoint.get(Direction.in)), copy(obj.endpoint.get(Direction.out)));
+  }
+
+  @Override
+  protected Evl visitAsynchroniusConnection(AsynchroniusConnection obj, Void param) {
+    return new AsynchroniusConnection(obj.getInfo(), copy(obj.endpoint.get(Direction.in)), copy(obj.endpoint.get(Direction.out)));
+  }
+
+  @Override
+  protected Evl visitEndpointRaw(EndpointRaw obj, Void param) {
+    return new EndpointRaw(obj.getInfo(), copy(obj.ref));
   }
 
 }

@@ -30,8 +30,9 @@ abstract public class NamedElementType extends Type {
     this.element = element;
   }
 
-  public int getSize() {
-    return element.size();
+  public NamedElementType(ElementInfo info, String name) {
+    super(info, name);
+    this.element = new EvlList<NamedElement>();
   }
 
 }

@@ -22,7 +22,7 @@ import common.ElementInfo;
 import evl.data.EvlList;
 import evl.data.variable.FuncVariable;
 
-final public class FuncReturnTuple extends FuncReturn {
+public class FuncReturnTuple extends FuncReturn {
   final public EvlList<FuncVariable> param;
 
   public FuncReturnTuple(ElementInfo info, EvlList<FuncVariable> param) {

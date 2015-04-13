@@ -17,25 +17,25 @@
 
 package fun.pass;
 
-import pass.FunPass;
+import pass.EvlPass;
 
 import common.Designator;
 
-import fun.Fun;
-import fun.NullTraverser;
+import evl.data.Evl;
+import evl.data.Named;
+import evl.data.Namespace;
+import evl.data.file.RizzlyFile;
+import evl.data.type.Type;
+import evl.knowledge.KnowledgeBase;
+import evl.traverser.NullTraverser;
 import fun.doc.ComponentFilePrinter;
 import fun.doc.CompositionGraphPrinter;
-import fun.knowledge.KnowledgeBase;
-import fun.other.Named;
-import fun.other.Namespace;
-import fun.other.RizzlyFile;
 import fun.other.Template;
-import fun.type.Type;
 
-public class DocWriter extends FunPass {
+public class DocWriter extends EvlPass {
 
   @Override
-  public void process(Namespace root, KnowledgeBase kb) {
+  public void process(evl.data.Namespace root, KnowledgeBase kb) {
     ComponentFilePrinter.printCodeStyle(kb.getDebugDir());
     CompositionGraphPrinter.printStyle(kb.getDebugDir() + ComponentFilePrinter.CompositionStyleName);
 
@@ -54,20 +54,20 @@ class DocWriterWorker extends NullTraverser<Void, Designator> {
   }
 
   @Override
-  protected Void visitDefault(Fun obj, Designator param) {
+  protected Void visitDefault(Evl obj, Designator param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getName());
   }
 
   @Override
   protected Void visitNamespace(Namespace obj, Designator param) {
-    visitList(obj.getChildren(), param);
+    visitList(obj.children, param);
     return null;
   }
 
   @Override
-  protected Void visit(Fun obj, Designator param) {
+  protected Void visit(Evl obj, Designator param) {
     if (obj instanceof Named) {
-      param = new Designator(param, ((Named) obj).getName());
+      param = new Designator(param, ((Named) obj).name);
     }
     return super.visit(obj, param);
   }

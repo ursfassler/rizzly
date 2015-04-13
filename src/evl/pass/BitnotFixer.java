@@ -65,10 +65,10 @@ class BitnotFixerWorker extends ExprReplacer<Void> {
     obj = (BitNot) super.visitBitNot(obj, param);
     Type type = kt.get(obj);
     Range range = ((RangeType) type).range;
-    assert (range.getLow().equals(BigInteger.ZERO));
-    int bits = range.getHigh().bitCount();
+    assert (range.low.equals(BigInteger.ZERO));
+    int bits = range.high.bitCount();
     BigInteger mask = BigInteger.valueOf(2).pow(bits).subtract(BigInteger.ONE);
-    assert (mask.equals(range.getHigh()));
+    assert (mask.equals(range.high));
     return new BitAnd(info, obj, new Number(info, mask));
   }
 

@@ -29,7 +29,8 @@ import evl.traverser.NullTraverser;
 
 public class TypeSizeGetter extends NullTraverser<Integer, Void> {
 
-  private static int ByteAlignment = 1; // TODO get this information from somewhere else
+  private static int ByteAlignment = 1; // TODO get this information from
+                                        // somewhere else
 
   public static int get(Type type) {
     TypeSizeGetter getter = new TypeSizeGetter();

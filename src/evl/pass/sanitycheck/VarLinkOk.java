@@ -92,7 +92,7 @@ class VarLinkOkWorker extends DefTraverser<Void, Set<Evl>> {
   @Override
   protected Void visitState(State obj, Set<Evl> param) {
     param = new HashSet<Evl>(param);
-    param = add(param, obj.item.getItems(StateVariable.class));
+    param = add(param, ClassGetter.filter(StateVariable.class, obj.item));
     return super.visitState(obj, param);
   }
 
@@ -131,17 +131,20 @@ class VarLinkOkWorker extends DefTraverser<Void, Set<Evl>> {
   protected Void visitTransition(Transition obj, Set<Evl> param) {
     param = new HashSet<Evl>(param);
     param.addAll(obj.param);
+    visit(obj.src, param);
+    visit(obj.dst, param);
+    visit(obj.eventFunc, param);
     visit(obj.body, param);
-    addAllToTop(obj.src.link, param);
+    addAllToTop((State) obj.src.getTarget(), param);
     visit(obj.guard, param);
     return null;
   }
 
   private void addAllToTop(State state, Set<Evl> param) {
     while (true) {
-      param.addAll(state.item.getItems(StateVariable.class));
-      param.addAll(state.item.getItems(ConstPrivate.class));
-      Evl parent = kp.getParent(state);
+      param.addAll(ClassGetter.filter(StateVariable.class, state.item));
+      param.addAll(ClassGetter.filter(ConstPrivate.class, state.item));
+      Evl parent = kp.get(state);
       if (parent instanceof State) {
         state = (State) parent;
       } else {

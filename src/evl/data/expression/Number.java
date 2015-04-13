@@ -25,7 +25,7 @@ import common.ElementInfo;
  *
  * @author urs
  */
-final public class Number extends Expression {
+public class Number extends Expression {
 
   final public BigInteger value;
 

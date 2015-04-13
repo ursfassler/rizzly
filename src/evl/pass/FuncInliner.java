@@ -68,8 +68,10 @@ class FuncInlinerWorker extends StmtReplacer<Function> {
       assert (fr == null);
 
       if (doInline(func) && (func != param)) {
-        // RError.err(ErrorType.Hint, param.getName() + " :: " + func.getName());
-        assert (obj.call.offset.size() == 1);  // FIXME maybe not true in the future
+        // RError.err(ErrorType.Hint, param.getName() + " :: " +
+        // func.getName());
+        assert (obj.call.offset.size() == 1); // FIXME maybe not true in the
+                                              // future
         RefCall call = (RefCall) obj.call.offset.get(0);
         return inline(func, call.actualParameter);
       }

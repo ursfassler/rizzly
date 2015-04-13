@@ -26,7 +26,7 @@ import evl.data.expression.reference.Reference;
  *
  * @author urs
  */
-final public class AssignmentSingle extends Assignment {
+public class AssignmentSingle extends Assignment {
   public Reference left;
 
   public AssignmentSingle(ElementInfo info, Reference left, Expression right) {

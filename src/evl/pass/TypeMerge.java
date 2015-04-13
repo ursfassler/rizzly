@@ -63,7 +63,8 @@ public class TypeMerge extends EvlPass {
    */
   private Map<Type, Type> linkmap(Set<Set<Type>> ss, Namespace typespace) {
 
-    // TODO by just getting the alphabetical first type this leads to strange or wrong names / types (e.g. for arrays)
+    // TODO by just getting the alphabetical first type this leads to strange or
+    // wrong names / types (e.g. for arrays)
     Map<Type, Type> linkmap = new HashMap<Type, Type>();
     for (Set<Type> itr : ss) {
       Type root = getRoot(itr);

@@ -96,7 +96,8 @@ abstract public class BaseTest {
   }
 
   public void compileLlvm(String outdir) {
-    // String cmd = "gcc -pedantic -ansi -Werror -Wall -Wextra -c " + cFile + " -o " + outdir + "libinst.a";
+    // String cmd = "gcc -pedantic -ansi -Werror -Wall -Wextra -c " + cFile +
+    // " -o " + outdir + "libinst.a";
     // TODO use strict again
     String cmd = "gcc -std=c11 -pedantic -Wall -Wextra -g -c " + outdir + "inst.c -o " + outdir + "libinst.a";
     // TODO use strict? yes

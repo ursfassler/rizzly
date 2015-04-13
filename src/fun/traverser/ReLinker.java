@@ -19,23 +19,23 @@ package fun.traverser;
 
 import java.util.Map;
 
-import fun.DefTraverser;
-import fun.Fun;
-import fun.expression.reference.BaseRef;
-import fun.other.Named;
+import evl.data.Evl;
+import evl.data.Named;
+import evl.data.expression.reference.BaseRef;
+import evl.traverser.DefTraverser;
 
-public class ReLinker extends DefTraverser<Void, Map<Fun, Fun>> {
+public class ReLinker extends DefTraverser<Void, Map<Evl, Evl>> {
 
-  public static void process(Fun classes, Map<Fun, Fun> map) {
+  public static void process(Evl classes, Map<Evl, Evl> map) {
     ReLinker reLinker = new ReLinker();
     reLinker.traverse(classes, map);
   }
 
   @Override
-  protected Void visitBaseRef(BaseRef obj, Map<Fun, Fun> param) {
-    Fun target = param.get(obj.getLink());
+  protected Void visitBaseRef(BaseRef obj, Map<Evl, Evl> param) {
+    Evl target = param.get(obj.link);
     if (target != null) {
-      obj.setLink((Named) target);
+      obj.link = (Named) target;
     }
     return super.visitBaseRef(obj, param);
   }

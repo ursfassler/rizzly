@@ -17,16 +17,16 @@
 
 package fun.pass;
 
-import pass.FunPass;
-import fun.DefTraverser;
-import fun.knowledge.KnowledgeBase;
-import fun.other.Namespace;
-import fun.other.RizzlyFile;
+import pass.EvlPass;
+import evl.data.Namespace;
+import evl.data.file.RizzlyFile;
+import evl.knowledge.KnowledgeBase;
+import evl.traverser.DefTraverser;
 
-public class FileReduction extends FunPass {
+public class FileReduction extends EvlPass {
 
   @Override
-  public void process(Namespace root, KnowledgeBase kb) {
+  public void process(evl.data.Namespace root, KnowledgeBase kb) {
     FileReductionWorker reduction = new FileReductionWorker();
     reduction.traverse(root, null);
   }
@@ -37,11 +37,11 @@ class FileReductionWorker extends DefTraverser<Void, Namespace> {
 
   @Override
   protected Void visitRizzlyFile(RizzlyFile obj, Namespace param) {
-    assert (param.getChildren().contains(obj));
-    int idx = param.getChildren().indexOf(obj);
-    Namespace space = new Namespace(obj.getInfo(), obj.getName());
-    space.addAll(obj.getObjects());
-    param.getChildren().set(idx, space);
+    assert (param.children.contains(obj));
+    int idx = param.children.indexOf(obj);
+    evl.data.Namespace space = new Namespace(obj.getInfo(), obj.name);
+    space.children.addAll(obj.getObjects());
+    param.children.set(idx, space);
     return null;
   }
 

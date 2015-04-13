@@ -96,7 +96,8 @@ class TypeCheckerWorker extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitEnumType(EnumType obj, Void param) {
-    return null; // we do not type check them (assignment of number does not work)
+    return null; // we do not type check them (assignment of number does not
+                 // work)
   }
 
   public static void checkFunc(Function obj, KnowledgeBase kb) {

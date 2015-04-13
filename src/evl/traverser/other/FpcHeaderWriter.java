@@ -258,8 +258,8 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitRangeType(RangeType obj, StreamWriter param) {
-    boolean isNeg = obj.range.getLow().compareTo(BigInteger.ZERO) < 0;
-    BigInteger max = getPos(obj.range.getHigh()).max(getPos(obj.range.getLow()));
+    boolean isNeg = obj.range.low.compareTo(BigInteger.ZERO) < 0;
+    BigInteger max = getPos(obj.range.high).max(getPos(obj.range.low));
     int bits = ExpressionTypecheck.bitCount(max);
     assert (bits >= 0);
     if (isNeg) {
@@ -383,7 +383,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
   protected Void visitNamedElement(NamedElement obj, StreamWriter param) {
     param.wr(obj.name);
     param.wr(": ");
-    visit(obj.ref, param);
+    visit(obj.typeref, param);
     param.wr(";");
     param.nl();
     return null;

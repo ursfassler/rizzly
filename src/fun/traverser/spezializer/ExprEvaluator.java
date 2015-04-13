@@ -24,34 +24,42 @@ import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
-import fun.Fun;
-import fun.NullTraverser;
-import fun.expression.AnyValue;
-import fun.expression.ArithmeticOp;
-import fun.expression.BoolValue;
-import fun.expression.Expression;
-import fun.expression.NamedElementsValue;
-import fun.expression.NamedValue;
-import fun.expression.Number;
-import fun.expression.Relation;
-import fun.expression.StringValue;
-import fun.expression.TupleValue;
-import fun.expression.UnaryExpression;
-import fun.expression.reference.RefCall;
-import fun.expression.reference.RefName;
-import fun.expression.reference.RefTemplCall;
-import fun.expression.reference.Reference;
-import fun.knowledge.KnowledgeBase;
+import evl.data.Evl;
+import evl.data.EvlList;
+import evl.data.expression.BoolValue;
+import evl.data.expression.Expression;
+import evl.data.expression.Number;
+import evl.data.expression.TupleValue;
+import evl.data.expression.binop.And;
+import evl.data.expression.binop.Div;
+import evl.data.expression.binop.Equal;
+import evl.data.expression.binop.Greater;
+import evl.data.expression.binop.Greaterequal;
+import evl.data.expression.binop.Is;
+import evl.data.expression.binop.Less;
+import evl.data.expression.binop.Lessequal;
+import evl.data.expression.binop.Minus;
+import evl.data.expression.binop.Mod;
+import evl.data.expression.binop.Mul;
+import evl.data.expression.binop.Notequal;
+import evl.data.expression.binop.Or;
+import evl.data.expression.binop.Plus;
+import evl.data.expression.binop.Shl;
+import evl.data.expression.binop.Shr;
+import evl.data.expression.reference.RefCall;
+import evl.data.expression.reference.RefTemplCall;
+import evl.data.expression.reference.Reference;
+import evl.data.expression.unop.Not;
+import evl.data.expression.unop.Uminus;
+import evl.data.type.Type;
+import evl.data.variable.Constant;
+import evl.data.variable.FuncVariable;
+import evl.data.variable.TemplateParameter;
+import evl.knowledge.KnowledgeBase;
+import evl.traverser.NullTraverser;
 import fun.other.ActualTemplateArgument;
-import fun.other.FunList;
 import fun.other.Template;
 import fun.traverser.Memory;
-import fun.type.Type;
-import fun.variable.ConstGlobal;
-import fun.variable.ConstPrivate;
-import fun.variable.Constant;
-import fun.variable.FuncVariable;
-import fun.variable.TemplateParameter;
 
 public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory> {
   private final KnowledgeBase kb;
@@ -75,13 +83,13 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
   }
 
   @Override
-  protected Expression visitFuncVariable(FuncVariable obj, Memory param) {
+  protected evl.data.expression.Expression visitFuncVariable(FuncVariable obj, Memory param) {
     assert (param.contains(obj));
     return param.get(obj);
   }
 
   @Override
-  protected Expression visitTemplateParameter(TemplateParameter obj, Memory param) {
+  protected evl.data.expression.Expression visitTemplateParameter(TemplateParameter obj, Memory param) {
     assert (param.contains(obj));
     return param.get(obj);
   }
@@ -92,61 +100,68 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
   }
 
   @Override
-  protected Expression visitDefault(Fun obj, Memory param) {
+  protected evl.data.expression.Expression visitDefault(Evl obj, Memory param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
   @Override
   protected ActualTemplateArgument visitTemplate(Template obj, Memory param) {
-    Fun spec = Specializer.process(obj, new FunList<ActualTemplateArgument>(), kb);
+    Evl spec = Specializer.process(obj, new EvlList<ActualTemplateArgument>(), kb);
     return (ActualTemplateArgument) spec;
   }
 
   @Override
-  protected ActualTemplateArgument visitNamedElementsValue(NamedElementsValue obj, Memory param) {
-    for (NamedValue itr : obj.getValue()) {
-      itr.setValue((Expression) visit(itr.getValue(), param));
+  protected ActualTemplateArgument visitNamedElementsValue(evl.data.expression.NamedElementsValue obj, Memory param) {
+    for (evl.data.expression.NamedValue itr : obj.value) {
+      Expression value = (Expression) visit(itr.value, param);
+      assert (value != null);
+      itr.value = value;
     }
     return obj;
   }
 
   @Override
-  protected ActualTemplateArgument visitAnyValue(AnyValue obj, Memory param) {
+  protected ActualTemplateArgument visitAnyValue(evl.data.expression.AnyValue obj, Memory param) {
     return obj;
   }
 
   @Override
-  protected Expression visitNumber(Number obj, Memory param) {
+  protected evl.data.expression.Expression visitNumber(evl.data.expression.Number obj, Memory param) {
     return obj;
   }
 
   @Override
-  protected Expression visitStringValue(StringValue obj, Memory param) {
+  protected evl.data.expression.Expression visitStringValue(evl.data.expression.StringValue obj, Memory param) {
     return obj;
   }
 
   @Override
-  protected ActualTemplateArgument visitBoolValue(BoolValue obj, Memory param) {
+  protected ActualTemplateArgument visitBoolValue(evl.data.expression.BoolValue obj, Memory param) {
     return obj;
   }
 
   @Override
-  protected Expression visitConstGlobal(ConstGlobal obj, Memory param) {
-    return (Expression) visit(obj.getDef(), new Memory()); // new memory because global constant need no context
+  protected evl.data.expression.Expression visitConstGlobal(evl.data.variable.ConstGlobal obj, Memory param) {
+    return (evl.data.expression.Expression) visit(obj.def, new Memory()); // new
+    // memory
+    // because
+    // global
+    // constant
+    // need no context
   }
 
   @Override
-  protected ActualTemplateArgument visitConstPrivate(ConstPrivate obj, Memory param) {
-    return visit(obj.getDef(), param);
+  protected ActualTemplateArgument visitConstPrivate(evl.data.variable.ConstPrivate obj, Memory param) {
+    return visit(obj.def, param);
   }
 
   @Override
-  protected Expression visitTupleValue(TupleValue obj, Memory param) {
-    if (obj.getValue().size() == 1) {
-      return (Expression) visit(obj.getValue().get(0), param);
+  protected evl.data.expression.Expression visitTupleValue(evl.data.expression.TupleValue obj, Memory param) {
+    if (obj.value.size() == 1) {
+      return (evl.data.expression.Expression) visit(obj.value.get(0), param);
     } else {
-      FunList<Expression> list = new FunList<Expression>();
-      for (Expression expr : obj.getValue()) {
+      EvlList<Expression> list = new EvlList<Expression>();
+      for (Expression expr : obj.value) {
         list.add((Expression) visit(expr, param));
       }
       return new TupleValue(obj.getInfo(), list);
@@ -156,29 +171,29 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
   @Override
   protected ActualTemplateArgument visitReference(Reference obj, Memory param) {
     // TODO move constant evaluation to another place
-    if (obj.getLink() instanceof Constant) {
-      Constant cst = (Constant) obj.getLink();
-      ActualTemplateArgument eco = visit(cst.getDef(), param);
-      cst.setDef((Expression) eco);
+    if (obj.link instanceof Constant) {
+      evl.data.variable.Constant cst = (evl.data.variable.Constant) obj.link;
+      ActualTemplateArgument eco = visit(cst.def, param);
+      cst.def = (Expression) eco;
     }
     return visit(RefEvaluator.execute(obj, param, kb), param);
   }
 
   @Override
-  protected Expression visitRefCall(RefCall obj, Memory param) {
-    visitExpList(obj.getActualParameter().getValue(), param);
+  protected evl.data.expression.Expression visitRefCall(RefCall obj, Memory param) {
+    visitExpList(obj.actualParameter.value, param);
     return null;
   }
 
   @Override
-  protected Expression visitRefTemplCall(RefTemplCall obj, Memory param) {
+  protected evl.data.expression.Expression visitRefTemplCall(RefTemplCall obj, Memory param) {
     RError.err(ErrorType.Fatal, obj.getInfo(), "reimplement");
     // visitExpList(obj.getActualParameter(), param);
     return null;
   }
 
   @Override
-  protected Expression visitRefName(RefName obj, Memory param) {
+  protected evl.data.expression.Expression visitRefName(evl.data.expression.reference.RefName obj, Memory param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
@@ -192,47 +207,15 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
   }
 
   @Override
-  protected Expression visitArithmeticOp(ArithmeticOp obj, Memory param) {
-    Expression left = (Expression) visit(obj.getLeft(), param);
-    Expression right = (Expression) visit(obj.getRight(), param);
+  protected ActualTemplateArgument visitAnd(And obj, Memory param) {
+    evl.data.expression.Expression left = (evl.data.expression.Expression) visit(obj.left, param);
+    evl.data.expression.Expression right = (evl.data.expression.Expression) visit(obj.right, param);
 
-    if ((left instanceof Number) && (right instanceof Number)) {
-      BigInteger lval = ((Number) left).getValue();
-      BigInteger rval = ((Number) right).getValue();
+    if (areNumber(left, right)) {
+      BigInteger lval = ((evl.data.expression.Number) left).value;
+      BigInteger rval = ((evl.data.expression.Number) right).value;
       BigInteger res;
-
-      switch (obj.getOp()) {
-        case AND:
-          res = lval.and(rval);
-          break;
-        case DIV:
-          res = lval.divide(rval);
-          break;
-        case MINUS:
-          res = lval.subtract(rval);
-          break;
-        case MOD:
-          res = lval.mod(rval);
-          break;
-        case MUL:
-          res = lval.multiply(rval);
-          break;
-        case OR:
-          res = lval.or(rval);
-          break;
-        case PLUS:
-          res = lval.add(rval);
-          break;
-        case SHL:
-          res = lval.shiftLeft(getInt(obj.getInfo(), rval));
-          break;
-        case SHR:
-          res = lval.shiftRight(getInt(obj.getInfo(), rval));
-          break;
-        default:
-          RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj.getOp());
-          return obj;
-      }
+      res = lval.and(rval);
       return new Number(obj.getInfo(), res);
     } else {
       return obj;
@@ -240,55 +223,247 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
   }
 
   @Override
-  protected Expression visitRelation(Relation obj, Memory param) {
-    Expression left = (Expression) visit(obj.getLeft(), param);
-    Expression right = (Expression) visit(obj.getRight(), param);
+  protected ActualTemplateArgument visitDiv(Div obj, Memory param) {
+    evl.data.expression.Expression left = (evl.data.expression.Expression) visit(obj.left, param);
+    evl.data.expression.Expression right = (evl.data.expression.Expression) visit(obj.right, param);
 
-    if ((left instanceof Number) && (right instanceof Number)) {
-      BigInteger lval = ((Number) left).getValue();
-      BigInteger rval = ((Number) right).getValue();
-      boolean res;
+    if (areNumber(left, right)) {
+      BigInteger lval = ((evl.data.expression.Number) left).value;
+      BigInteger rval = ((evl.data.expression.Number) right).value;
+      BigInteger res;
+      res = lval.divide(rval);
+      return new Number(obj.getInfo(), res);
+    } else {
+      return obj;
+    }
+  }
 
-      switch (obj.getOp()) {
-        case EQUAL:
-          res = lval.compareTo(rval) == 0;
-          break;
-        case GREATER:
-          res = lval.compareTo(rval) > 0;
-          break;
-        case GREATER_EQUEAL:
-          res = lval.compareTo(rval) >= 0;
-          break;
-        case LESS:
-          res = lval.compareTo(rval) < 0;
-          break;
-        case LESS_EQUAL:
-          res = lval.compareTo(rval) <= 0;
-          break;
-        case NOT_EQUAL:
-          res = lval.compareTo(rval) != 0;
-          break;
-        default:
-          RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj.getOp());
-          return null;
-      }
+  @Override
+  protected ActualTemplateArgument visitMinus(Minus obj, Memory param) {
+    evl.data.expression.Expression left = (evl.data.expression.Expression) visit(obj.left, param);
+    evl.data.expression.Expression right = (evl.data.expression.Expression) visit(obj.right, param);
+
+    if (areNumber(left, right)) {
+      BigInteger lval = ((evl.data.expression.Number) left).value;
+      BigInteger rval = ((evl.data.expression.Number) right).value;
+      BigInteger res;
+      res = lval.subtract(rval);
+      return new Number(obj.getInfo(), res);
+    } else {
+      return obj;
+    }
+  }
+
+  @Override
+  protected ActualTemplateArgument visitMod(Mod obj, Memory param) {
+    evl.data.expression.Expression left = (evl.data.expression.Expression) visit(obj.left, param);
+    evl.data.expression.Expression right = (evl.data.expression.Expression) visit(obj.right, param);
+
+    if (areNumber(left, right)) {
+      BigInteger lval = ((evl.data.expression.Number) left).value;
+      BigInteger rval = ((evl.data.expression.Number) right).value;
+      BigInteger res;
+      res = lval.mod(rval);
+      return new Number(obj.getInfo(), res);
+    } else {
+      return obj;
+    }
+  }
+
+  @Override
+  protected ActualTemplateArgument visitMul(Mul obj, Memory param) {
+    evl.data.expression.Expression left = (evl.data.expression.Expression) visit(obj.left, param);
+    evl.data.expression.Expression right = (evl.data.expression.Expression) visit(obj.right, param);
+
+    if (areNumber(left, right)) {
+      BigInteger lval = ((evl.data.expression.Number) left).value;
+      BigInteger rval = ((evl.data.expression.Number) right).value;
+      BigInteger res;
+      res = lval.multiply(rval);
+      return new Number(obj.getInfo(), res);
+    } else {
+      return obj;
+    }
+  }
+
+  @Override
+  protected ActualTemplateArgument visitOr(Or obj, Memory param) {
+    evl.data.expression.Expression left = (evl.data.expression.Expression) visit(obj.left, param);
+    evl.data.expression.Expression right = (evl.data.expression.Expression) visit(obj.right, param);
+
+    if (areNumber(left, right)) {
+      BigInteger lval = ((evl.data.expression.Number) left).value;
+      BigInteger rval = ((evl.data.expression.Number) right).value;
+      BigInteger res;
+      res = lval.or(rval);
+      return new Number(obj.getInfo(), res);
+    } else {
+      return obj;
+    }
+  }
+
+  @Override
+  protected ActualTemplateArgument visitPlus(Plus obj, Memory param) {
+    evl.data.expression.Expression left = (evl.data.expression.Expression) visit(obj.left, param);
+    evl.data.expression.Expression right = (evl.data.expression.Expression) visit(obj.right, param);
+
+    if (areNumber(left, right)) {
+      BigInteger lval = ((evl.data.expression.Number) left).value;
+      BigInteger rval = ((evl.data.expression.Number) right).value;
+      BigInteger res;
+      res = lval.add(rval);
+      return new Number(obj.getInfo(), res);
+    } else {
+      return obj;
+    }
+  }
+
+  @Override
+  protected ActualTemplateArgument visitShl(Shl obj, Memory param) {
+    evl.data.expression.Expression left = (evl.data.expression.Expression) visit(obj.left, param);
+    evl.data.expression.Expression right = (evl.data.expression.Expression) visit(obj.right, param);
+
+    if (areNumber(left, right)) {
+      BigInteger lval = ((evl.data.expression.Number) left).value;
+      BigInteger rval = ((evl.data.expression.Number) right).value;
+      BigInteger res;
+      res = lval.shiftLeft(getInt(obj.getInfo(), rval));
+      return new Number(obj.getInfo(), res);
+    } else {
+      return obj;
+    }
+  }
+
+  @Override
+  protected ActualTemplateArgument visitShr(Shr obj, Memory param) {
+    evl.data.expression.Expression left = (evl.data.expression.Expression) visit(obj.left, param);
+    evl.data.expression.Expression right = (evl.data.expression.Expression) visit(obj.right, param);
+
+    if (areNumber(left, right)) {
+      BigInteger lval = ((evl.data.expression.Number) left).value;
+      BigInteger rval = ((evl.data.expression.Number) right).value;
+      BigInteger res;
+      res = lval.shiftRight(getInt(obj.getInfo(), rval));
+      return new Number(obj.getInfo(), res);
+    } else {
+      return obj;
+    }
+  }
+
+  @Override
+  protected ActualTemplateArgument visitEqual(Equal obj, Memory param) {
+    evl.data.expression.Expression left = (evl.data.expression.Expression) visit(obj.left, param);
+    evl.data.expression.Expression right = (evl.data.expression.Expression) visit(obj.right, param);
+
+    if (areNumber(left, right)) {
+      BigInteger lval = ((evl.data.expression.Number) left).value;
+      BigInteger rval = ((evl.data.expression.Number) right).value;
+      boolean res = lval.compareTo(rval) == 0;
       return new BoolValue(obj.getInfo(), res);
-    } else if ((left instanceof BoolValue) && (right instanceof BoolValue)) {
-      boolean lval = ((BoolValue) left).isValue();
-      boolean rval = ((BoolValue) right).isValue();
-      boolean res;
+    } else if (areBool(left, right)) {
+      boolean lval = ((evl.data.expression.BoolValue) left).value;
+      boolean rval = ((evl.data.expression.BoolValue) right).value;
+      boolean res = lval == rval;
+      return new BoolValue(obj.getInfo(), res);
+    } else {
+      return obj;
+    }
+  }
 
-      switch (obj.getOp()) {
-        case EQUAL:
-          res = lval == rval;
-          break;
-        case NOT_EQUAL:
-          res = lval != rval;
-          break;
-        default:
-          RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj.getOp());
-          return obj;
-      }
+  private boolean areBool(evl.data.expression.Expression left, evl.data.expression.Expression right) {
+    return (left instanceof BoolValue) && (right instanceof BoolValue);
+  }
+
+  private boolean areNumber(evl.data.expression.Expression left, evl.data.expression.Expression right) {
+    return (left instanceof Number) && (right instanceof Number);
+  }
+
+  @Override
+  protected ActualTemplateArgument visitGreater(Greater obj, Memory param) {
+    evl.data.expression.Expression left = (evl.data.expression.Expression) visit(obj.left, param);
+    evl.data.expression.Expression right = (evl.data.expression.Expression) visit(obj.right, param);
+
+    if (areNumber(left, right)) {
+      BigInteger lval = ((evl.data.expression.Number) left).value;
+      BigInteger rval = ((evl.data.expression.Number) right).value;
+      boolean res = lval.compareTo(rval) > 0;
+      return new BoolValue(obj.getInfo(), res);
+    } else if (areBool(left, right)) {
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj);
+      return obj;
+    } else {
+      return obj;
+    }
+  }
+
+  @Override
+  protected ActualTemplateArgument visitGreaterequal(Greaterequal obj, Memory param) {
+    evl.data.expression.Expression left = (evl.data.expression.Expression) visit(obj.left, param);
+    evl.data.expression.Expression right = (evl.data.expression.Expression) visit(obj.right, param);
+
+    if (areNumber(left, right)) {
+      BigInteger lval = ((evl.data.expression.Number) left).value;
+      BigInteger rval = ((evl.data.expression.Number) right).value;
+      boolean res = lval.compareTo(rval) >= 0;
+      return new BoolValue(obj.getInfo(), res);
+    } else if (areBool(left, right)) {
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj);
+      return obj;
+    } else {
+      return obj;
+    }
+  }
+
+  @Override
+  protected ActualTemplateArgument visitLess(Less obj, Memory param) {
+    evl.data.expression.Expression left = (evl.data.expression.Expression) visit(obj.left, param);
+    evl.data.expression.Expression right = (evl.data.expression.Expression) visit(obj.right, param);
+
+    if (areNumber(left, right)) {
+      BigInteger lval = ((evl.data.expression.Number) left).value;
+      BigInteger rval = ((evl.data.expression.Number) right).value;
+      boolean res = lval.compareTo(rval) < 0;
+      return new BoolValue(obj.getInfo(), res);
+    } else if (areBool(left, right)) {
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj);
+      return obj;
+    } else {
+      return obj;
+    }
+  }
+
+  @Override
+  protected ActualTemplateArgument visitLessequal(Lessequal obj, Memory param) {
+    evl.data.expression.Expression left = (evl.data.expression.Expression) visit(obj.left, param);
+    evl.data.expression.Expression right = (evl.data.expression.Expression) visit(obj.right, param);
+
+    if (areNumber(left, right)) {
+      BigInteger lval = ((evl.data.expression.Number) left).value;
+      BigInteger rval = ((evl.data.expression.Number) right).value;
+      boolean res = lval.compareTo(rval) <= 0;
+      return new BoolValue(obj.getInfo(), res);
+    } else if (areBool(left, right)) {
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj);
+      return obj;
+    } else {
+      return obj;
+    }
+  }
+
+  @Override
+  protected ActualTemplateArgument visitNotequal(Notequal obj, Memory param) {
+    evl.data.expression.Expression left = (evl.data.expression.Expression) visit(obj.left, param);
+    evl.data.expression.Expression right = (evl.data.expression.Expression) visit(obj.right, param);
+
+    if (areNumber(left, right)) {
+      BigInteger lval = ((evl.data.expression.Number) left).value;
+      BigInteger rval = ((evl.data.expression.Number) right).value;
+      boolean res = lval.compareTo(rval) != 0;
+      return new BoolValue(obj.getInfo(), res);
+    } else if (areBool(left, right)) {
+      boolean lval = ((evl.data.expression.BoolValue) left).value;
+      boolean rval = ((evl.data.expression.BoolValue) right).value;
+      boolean res = lval != rval;
       return new BoolValue(obj.getInfo(), res);
     } else {
       return obj;
@@ -296,23 +471,34 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
   }
 
   @Override
-  protected Expression visitUnaryExpression(UnaryExpression obj, Memory param) {
-    Expression expr = (Expression) visit(obj.getExpr(), param);
+  protected ActualTemplateArgument visitIs(Is obj, Memory param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected ActualTemplateArgument visitUminus(Uminus obj, Memory param) {
+    evl.data.expression.Expression expr = (evl.data.expression.Expression) visit(obj.expr, param);
 
     if ((expr instanceof Number)) {
-      BigInteger eval = ((Number) expr).getValue();
+      BigInteger eval = ((evl.data.expression.Number) expr).value;
       BigInteger res;
 
-      switch (obj.getOp()) {
-        case MINUS:
-          res = eval.negate();
-          break;
-        default:
-          RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj.getOp());
-          return obj;
-      }
+      res = eval.negate();
       return new Number(obj.getInfo(), res);
     } else {
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Can not evaluate unary minus on " + expr.getClass().getName());
+      return obj;
+    }
+  }
+
+  @Override
+  protected ActualTemplateArgument visitNot(Not obj, Memory param) {
+    evl.data.expression.Expression expr = (evl.data.expression.Expression) visit(obj.expr, param);
+
+    if ((expr instanceof BoolValue)) {
+      return new BoolValue(obj.getInfo(), !((BoolValue) expr).value);
+    } else {
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Can not evaluate not on " + expr.getClass().getName());
       return obj;
     }
   }

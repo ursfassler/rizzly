@@ -23,7 +23,7 @@ import java.util.List;
 
 import util.Pair;
 import evl.data.Evl;
-import evl.data.expression.reference.SimpleRef;
+import evl.data.expression.reference.TypeRef;
 import evl.data.type.Type;
 import evl.data.type.base.ArrayType;
 import evl.data.type.base.BooleanType;
@@ -67,12 +67,15 @@ public class KnowComparable extends KnowledgeEntry {
 
 }
 
+// TODO merge with KnowLeftIsContainerOfRightWorker
 class KnowComparableWorker extends NullTraverser<Boolean, Type> {
-  private KnowledgeBase kb;
+  final private KnowledgeBase kb;
+  final private KnowType kt;
 
   public KnowComparableWorker(KnowledgeBase kb) {
     super();
     this.kb = kb;
+    this.kt = kb.getEntry(KnowType.class);
   }
 
   @Override
@@ -100,13 +103,13 @@ class KnowComparableWorker extends NullTraverser<Boolean, Type> {
     return Supertype.get(right, kb);
   }
 
-  private boolean process(List<SimpleRef<Type>> left, List<SimpleRef<Type>> right) {
+  private boolean process(List<TypeRef> left, List<TypeRef> right) {
     if (left.size() != right.size()) {
       return false;
     }
     for (int i = 0; i < left.size(); i++) {
-      Type lefttype = left.get(i).link;
-      Type righttype = right.get(i).link;
+      Type lefttype = kt.get(left.get(i));
+      Type righttype = kt.get(right.get(i));
       if (!visit(lefttype, righttype)) {
         return false;
       }
@@ -159,9 +162,9 @@ class KnowComparableWorker extends NullTraverser<Boolean, Type> {
     if (right instanceof TupleType) {
       return process(obj.types, ((TupleType) right).types);
     } else if (right instanceof RecordType) {
-      List<SimpleRef<Type>> rtypes = new ArrayList<SimpleRef<Type>>();
+      List<TypeRef> rtypes = new ArrayList<TypeRef>();
       for (NamedElement elem : ((RecordType) right).element) {
-        rtypes.add(elem.ref);
+        rtypes.add(elem.typeref);
       }
       return process(obj.types, rtypes);
     } else {
@@ -174,9 +177,9 @@ class KnowComparableWorker extends NullTraverser<Boolean, Type> {
     if (left.equals(right)) {
       return true;
     } else if (right instanceof TupleType) {
-      List<SimpleRef<Type>> lt = new ArrayList<SimpleRef<Type>>();
+      List<TypeRef> lt = new ArrayList<TypeRef>();
       for (NamedElement elem : left.element) {
-        lt.add(elem.ref);
+        lt.add(elem.typeref);
       }
       return process(lt, ((TupleType) right).types);
     } else {
@@ -187,14 +190,14 @@ class KnowComparableWorker extends NullTraverser<Boolean, Type> {
   @Override
   protected Boolean visitArrayType(ArrayType left, Type right) {
     if (right instanceof ArrayType) {
-      Type lefttype = left.type.link;
-      Type righttype = ((ArrayType) right).type.link;
+      Type lefttype = kt.get(left.type);
+      Type righttype = kt.get(((ArrayType) right).type);
       if (!visit(lefttype, righttype)) {
         return false;
       }
       return left.size.compareTo(((ArrayType) right).size) <= 0;
     } else if (right instanceof TupleType) {
-      List<SimpleRef<Type>> lt = new ArrayList<SimpleRef<Type>>();
+      List<TypeRef> lt = new ArrayList<TypeRef>();
       for (int i = 0; i < left.size.intValue(); i++) {
         lt.add(left.type);
       }
@@ -206,12 +209,12 @@ class KnowComparableWorker extends NullTraverser<Boolean, Type> {
 
   @Override
   protected Boolean visitUnionType(UnionType left, Type right) {
-    return left == right;  // XXX is this correct?
+    return left == right; // XXX is this correct?
   }
 
   @Override
   protected Boolean visitUnsafeUnionType(UnsafeUnionType left, Type right) {
-    return left == right;  // XXX is this correct?
+    return left == right; // XXX is this correct?
   }
 
   @Override

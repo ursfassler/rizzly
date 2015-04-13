@@ -1,6 +1,6 @@
 /**
  *  This file is part of Rizzly.
- * 
+ *
  *  Rizzly is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -21,14 +21,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 import common.Designator;
-import common.ElementInfo;
 
+import evl.copy.Copy;
 import evl.data.EvlList;
 import evl.data.Namespace;
-import evl.data.expression.reference.SimpleRef;
 import evl.data.function.Function;
-import evl.data.statement.intern.MsgPush;
-import evl.data.type.Type;
+import evl.data.statement.MsgPush;
 import evl.data.type.composed.NamedElement;
 import evl.data.type.composed.RecordType;
 import evl.data.variable.FuncVariable;
@@ -53,12 +51,13 @@ class CreateRecordFromFunc extends DefTraverser<Void, Void> {
     Function func = (Function) obj.func.link;
     // Designator path = kp.get(func);
     // assert (path.size() > 0);
-    // String name = new Designator(path, func.getName()).toString(Designator.NAME_SEP);
+    // String name = new Designator(path,
+    // func.getName()).toString(Designator.NAME_SEP);
     String name = Integer.toString(func.hashCode());
 
     EvlList<NamedElement> elements = new EvlList<NamedElement>();
     for (FuncVariable arg : func.param) {
-      NamedElement elem = new NamedElement(arg.getInfo(), arg.name, new SimpleRef<Type>(ElementInfo.NO, arg.type.link));
+      NamedElement elem = new NamedElement(arg.getInfo(), arg.name, Copy.copy(arg.type));
       elements.add(elem);
     }
     RecordType rec = new RecordType(func.getInfo(), Designator.NAME_SEP + "msg" + Designator.NAME_SEP + name, elements);

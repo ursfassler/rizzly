@@ -19,14 +19,14 @@ package fun.traverser.spezializer;
 
 import java.util.Map;
 
-import fun.Copy;
-import fun.expression.Expression;
-import fun.expression.reference.DummyLinkTarget;
-import fun.expression.reference.Reference;
+import evl.copy.Copy;
+import evl.data.expression.Expression;
+import evl.data.expression.reference.DummyLinkTarget;
+import evl.data.expression.reference.Reference;
+import evl.data.type.Type;
+import evl.data.variable.TemplateParameter;
 import fun.other.ActualTemplateArgument;
 import fun.traverser.ExprReplacer;
-import fun.type.Type;
-import fun.variable.TemplateParameter;
 
 /**
  * Replaces a reference to a CompfuncParameter with the value of it
@@ -37,19 +37,19 @@ import fun.variable.TemplateParameter;
 public class TypeSpecTrav extends ExprReplacer<Map<TemplateParameter, ActualTemplateArgument>> {
 
   @Override
-  protected Expression visitReference(Reference obj, Map<TemplateParameter, ActualTemplateArgument> param) {
-    assert (!(obj.getLink() instanceof DummyLinkTarget));
+  protected evl.data.expression.Expression visitReference(Reference obj, Map<TemplateParameter, ActualTemplateArgument> param) {
+    assert (!(obj.link instanceof DummyLinkTarget));
     super.visitReference(obj, param);
 
-    if (param.containsKey(obj.getLink())) {
-      ActualTemplateArgument repl = param.get(obj.getLink());
+    if (param.containsKey(obj.link)) {
+      ActualTemplateArgument repl = param.get(obj.link);
       if (repl instanceof Type) {
-        return new Reference(obj.getInfo(), (Type) repl);
+        return new Reference(obj.getInfo(), (evl.data.type.Type) repl);
       } else {
         return Copy.copy((Expression) repl);
       }
     } else {
-      assert (!(obj.getLink() instanceof TemplateParameter));
+      assert (!(obj.link instanceof TemplateParameter));
       return obj;
     }
   }

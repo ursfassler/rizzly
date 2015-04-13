@@ -21,7 +21,7 @@ import common.ElementInfo;
 
 import evl.data.expression.TupleValue;
 
-final public class RefCall extends RefItem {
+public class RefCall extends RefItem {
   final public TupleValue actualParameter;
 
   public RefCall(ElementInfo info, TupleValue actualParameter) {

@@ -24,11 +24,13 @@ import java.util.Set;
 
 import error.ErrorType;
 import error.RError;
-import fun.expression.reference.DummyLinkTarget;
-import fun.expression.reference.Reference;
-import fun.hfsm.ImplHfsm;
-import fun.hfsm.State;
-import fun.hfsm.Transition;
+import evl.data.component.hfsm.State;
+import evl.data.component.hfsm.Transition;
+import evl.data.expression.reference.DummyLinkTarget;
+import evl.data.expression.reference.Reference;
+import evl.data.expression.reference.StateRef;
+import evl.traverser.other.ClassGetter;
+import fun.other.RawHfsm;
 
 /**
  * Links all src/dst states of all transitions in a hfsm implementation.
@@ -41,38 +43,40 @@ import fun.hfsm.Transition;
  */
 public class TransitionStateLinker {
 
-  public static void process(ImplHfsm obj) {
+  public static void process(RawHfsm obj) {
     StateCollector isc = new StateCollector();
     isc.makeTable(obj);
 
     visitState(obj.getTopstate(), isc);
   }
 
-  private static void visitState(State state, StateCollector isc) {
+  private static void visitState(evl.data.component.hfsm.State state, StateCollector isc) {
     Map<String, State> sym = isc.getSymbols(state);
     Set<String> amb = isc.getAmbigous(state);
 
-    for (Transition tr : state.getItemList().getItems(Transition.class)) {
-      link(tr.getSrc(), sym, amb);
-      link(tr.getDst(), sym, amb);
+    for (evl.data.component.hfsm.Transition tr : ClassGetter.filter(Transition.class, state.item)) {
+      link(tr.src, sym, amb);
+      link(tr.dst, sym, amb);
     }
 
-    for (State sub : state.getItemList().getItems(State.class)) {
+    for (evl.data.component.hfsm.State sub : ClassGetter.filter(State.class, state.item)) {
       visitState(sub, isc);
     }
   }
 
-  private static void link(Reference src, Map<String, State> sym, Set<String> amb) {
-    if (src.getLink() instanceof DummyLinkTarget) {
-      String target = ((DummyLinkTarget) src.getLink()).getName();
+  private static void link(StateRef sref, Map<String, State> sym, Set<String> amb) {
+    Reference ref = (Reference) sref;
+
+    if (ref.link instanceof DummyLinkTarget) {
+      String target = ((DummyLinkTarget) ref.link).name;
       if (amb.contains(target)) {
-        RError.err(ErrorType.Error, src.getInfo(), "State name is ambigous: " + target);
+        RError.err(ErrorType.Error, ref.getInfo(), "State name is ambigous: " + target);
       } else {
         State st = sym.get(target);
         if (st == null) {
-          RError.err(ErrorType.Error, src.getInfo(), "State not found: " + target);
+          RError.err(ErrorType.Error, ref.getInfo(), "State not found: " + target);
         } else {
-          src.setLink(st);
+          ref.link = st;
         }
       }
     }
@@ -86,22 +90,22 @@ class StateCollector {
   final private Map<State, Set<String>> ambigous = new HashMap<State, Set<String>>();
   final private Map<State, String> names = new HashMap<State, String>();
 
-  public Map<String, State> getSymbols(State state) {
+  public Map<String, State> getSymbols(evl.data.component.hfsm.State state) {
     return symbols.get(state);
   }
 
-  public Set<String> getAmbigous(State state) {
+  public Set<String> getAmbigous(evl.data.component.hfsm.State state) {
     return ambigous.get(state);
   }
 
-  public void makeTable(ImplHfsm hfsm) {
+  public void makeTable(RawHfsm hfsm) {
     gatherNames(hfsm.getTopstate());
     visitState(hfsm.getTopstate(), 0);
   }
 
-  private void gatherNames(State state) {
-    for (State sub : state.getItemList().getItems(State.class)) {
-      getNames().put(sub, sub.getName());
+  private void gatherNames(evl.data.component.hfsm.State state) {
+    for (State sub : ClassGetter.filter(State.class, state.item)) {
+      getNames().put(sub, sub.name);
       gatherNames(sub);
     }
   }
@@ -110,7 +114,7 @@ class StateCollector {
     deepth.put(state, param);
     Set<State> all = new HashSet<State>();
     all.add(state);
-    for (State sub : state.getItemList().getItems(State.class)) {
+    for (State sub : ClassGetter.filter(State.class, state.item)) {
       all.addAll(visitState(sub, param + 1));
     }
 
@@ -137,7 +141,7 @@ class StateCollector {
         sym.put(getNames().get(st), st);
       }
     } else {
-      State os = sym.get(getNames().get(st));
+      evl.data.component.hfsm.State os = sym.get(getNames().get(st));
       if (os == null) {
         sym.put(getNames().get(st), st);
       } else {

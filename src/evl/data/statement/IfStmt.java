@@ -31,8 +31,14 @@ public class IfStmt extends Statement {
 
   public IfStmt(ElementInfo info, EvlList<IfOption> option, Block defblock) {
     super(info);
-    this.option = new EvlList<IfOption>(option);
+    this.option = option;
     this.defblock = defblock;
+  }
+
+  public IfStmt(ElementInfo info) {
+    super(info);
+    this.option = new EvlList<IfOption>();
+    this.defblock = new Block(info);
   }
 
 }

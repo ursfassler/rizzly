@@ -46,6 +46,7 @@ import evl.data.type.composed.UnsafeUnionType;
 import evl.data.type.special.ComponentType;
 import evl.data.variable.Variable;
 import evl.traverser.NullTraverser;
+import evl.traverser.other.ClassGetter;
 
 public class KnowChild extends KnowledgeEntry {
   private KnowChildTraverser kct;
@@ -53,6 +54,13 @@ public class KnowChild extends KnowledgeEntry {
   @Override
   public void init(KnowledgeBase base) {
     kct = new KnowChildTraverser();
+  }
+
+  public Evl get(Evl root, Iterable<String> path, ElementInfo info) {
+    for (String child : path) {
+      root = get(root, child, info);
+    }
+    return root;
   }
 
   public Evl get(Evl sub, String name, ElementInfo info) {
@@ -95,7 +103,8 @@ class KnowChildTraverser extends NullTraverser<Set<Evl>, String> {
   @Override
   protected Set<Evl> visitDefault(Evl obj, String param) {
     throw new RuntimeException("Not yet implemented: " + obj.getClass().getCanonicalName());
-    // RError.err(ErrorType.Warning, obj.getInfo(), "Element can not have a named child");
+    // RError.err(ErrorType.Warning, obj.getInfo(),
+    // "Element can not have a named child");
     // return new HashSet<Evl>();
   }
 
@@ -159,7 +168,7 @@ class KnowChildTraverser extends NullTraverser<Set<Evl>, String> {
   @Override
   protected Set<Evl> visitStateComposite(StateComposite obj, String param) {
     Set<Evl> rset = new HashSet<Evl>();
-    EvlList<State> children = new EvlList<State>(obj.item.getItems(State.class));
+    EvlList<State> children = new EvlList<State>(ClassGetter.filter(State.class, obj.item));
     addIfFound(children.find(param), rset);
     return rset;
   }
@@ -172,7 +181,7 @@ class KnowChildTraverser extends NullTraverser<Set<Evl>, String> {
 
   @Override
   protected Set<Evl> visitCompUse(CompUse obj, String param) {
-    return visit(obj.instref, param);
+    return visit(obj.compRef, param);
   }
 
   @Override
@@ -204,7 +213,7 @@ class KnowChildTraverser extends NullTraverser<Set<Evl>, String> {
 
   @Override
   protected Set<Evl> visitNamedElement(NamedElement obj, String param) {
-    return visit(obj.ref, param);
+    return visit(obj.typeref, param);
   }
 
   @Override

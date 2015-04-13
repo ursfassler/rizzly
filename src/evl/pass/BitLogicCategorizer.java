@@ -115,9 +115,9 @@ class BitLogicCategorizerWorker extends ExprReplacer<KnowType> {
       return new LogicNot(obj.getInfo(), obj.expr);
     } else if (type instanceof RangeType) {
       Range range = ((RangeType) type).range;
-      int bits = range.getHigh().bitCount();
+      int bits = range.high.bitCount();
       BigInteger exp = BigInteger.valueOf(2).pow(bits).subtract(BigInteger.ONE);
-      if (!range.getLow().equals(BigInteger.ZERO) || !exp.equals(range.getHigh())) {
+      if (!range.low.equals(BigInteger.ZERO) || !exp.equals(range.high)) {
         RError.err(ErrorType.Error, obj.getInfo(), "not only allowed for R{0,2^n-1}");
         return null;
       }

@@ -129,7 +129,8 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
 
     Type rt = kt.get(right);
     if (rt instanceof RecordType) {
-      String name = Designator.NAME_SEP + "var";  // XXX add pass to make names unique
+      String name = Designator.NAME_SEP + "var"; // XXX add pass to make names
+      // unique
       FuncVariable var = new FuncVariable(info, name, new SimpleRef<Type>(info, rt));
 
       List<Statement> ret = new ArrayList<Statement>();
@@ -163,7 +164,7 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
   }
 
   private List<Statement> assignOneRecord(Reference left, RecordType rt, EvlList<Expression> value) {
-    RError.ass(rt.getSize() == value.size(), left.getInfo(), "expected same number of elementds, got: " + rt.getSize() + " <-> " + value.size());
+    RError.ass(rt.element.size() == value.size(), left.getInfo(), "expected same number of elementds, got: " + rt.element.size() + " <-> " + value.size());
     List<Statement> ret = new ArrayList<Statement>(value.size());
 
     for (int i = 0; i < value.size(); i++) {

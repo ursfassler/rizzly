@@ -40,10 +40,10 @@ import evl.data.component.hfsm.ImplHfsm;
 import evl.data.component.hfsm.Transition;
 import evl.data.function.Function;
 import evl.data.function.InterfaceFunction;
-import evl.data.function.header.FuncCtrlInDataIn;
-import evl.data.function.header.FuncCtrlInDataOut;
-import evl.data.function.header.FuncCtrlOutDataIn;
-import evl.data.function.header.FuncCtrlOutDataOut;
+import evl.data.function.header.FuncQuery;
+import evl.data.function.header.FuncResponse;
+import evl.data.function.header.FuncSignal;
+import evl.data.function.header.FuncSlot;
 import evl.data.type.Type;
 import evl.data.variable.Constant;
 import evl.knowledge.KnowLeftIsContainerOfRight;
@@ -126,7 +126,8 @@ class CompInterfaceTypeCheckerWorker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitImplComposition(ImplComposition obj, Void param) {
-    // TODO do checks over whole implementation, i.e. not splitting when functions has return value
+    // TODO do checks over whole implementation, i.e. not splitting when
+    // functions has return value
     // TODO check for cycles
     visitList(obj.connection, param);
 
@@ -145,7 +146,7 @@ class CompInterfaceTypeCheckerWorker extends NullTraverser<Void, Void> {
     for (InterfaceFunction ifaceuse : obj.getIface(dir)) {
       if (!ifaceIsConnected(ifaceuse, dir, obj.connection)) {
         ErrorType etype;
-        if (ifaceuse instanceof FuncCtrlInDataOut) {
+        if (ifaceuse instanceof FuncResponse) {
           etype = ErrorType.Error;
         } else {
           etype = ErrorType.Hint;
@@ -156,11 +157,11 @@ class CompInterfaceTypeCheckerWorker extends NullTraverser<Void, Void> {
   }
 
   private Component checkIface(ImplComposition obj, CompUse use, Direction dir) {
-    Component type = use.instref.link;
+    Component type = (Component) use.compRef.getTarget();
     for (InterfaceFunction ifaceuse : type.getIface(dir)) {
       if (!ifaceIsConnected(use, ifaceuse, dir.other(), obj.connection)) {
         ErrorType etype;
-        if (ifaceuse instanceof FuncCtrlOutDataIn) {
+        if (ifaceuse instanceof FuncQuery) {
           etype = ErrorType.Error;
         } else {
           etype = ErrorType.Hint;
@@ -176,7 +177,7 @@ class CompInterfaceTypeCheckerWorker extends NullTraverser<Void, Void> {
     for (Connection itr : connection) {
       if (itr.endpoint.get(dir) instanceof EndpointSub) {
         EndpointSub ep = (EndpointSub) itr.endpoint.get(dir);
-        if ((ep.component == use) && (ep.getFunc() == ifaceuse)) {
+        if ((ep.component.link == use) && (ep.getFunc() == ifaceuse)) {
           return true;
         }
       }
@@ -242,13 +243,13 @@ class CompInterfaceTypeCheckerWorker extends NullTraverser<Void, Void> {
   }
 
   private Direction getDir(Function func) {
-    if (func instanceof FuncCtrlInDataIn) {
+    if (func instanceof FuncSlot) {
       return Direction.in;
-    } else if (func instanceof FuncCtrlInDataOut) {
+    } else if (func instanceof FuncResponse) {
       return Direction.in;
-    } else if (func instanceof FuncCtrlOutDataIn) {
+    } else if (func instanceof FuncQuery) {
       return Direction.out;
-    } else if (func instanceof FuncCtrlOutDataOut) {
+    } else if (func instanceof FuncSignal) {
       return Direction.out;
     } else {
       RError.err(ErrorType.Fatal, func.getInfo(), "Unexpected function type: " + func.getClass().getCanonicalName());
