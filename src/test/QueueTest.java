@@ -17,6 +17,7 @@
 
 package test;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class QueueTest extends BaseTest {
@@ -32,6 +33,7 @@ public class QueueTest extends BaseTest {
   }
 
   @Test
+  @Ignore
   public void composition1() {
     compile("composition1", TestSteps.EXECUTE, true, false);
   }

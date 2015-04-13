@@ -17,6 +17,7 @@
 
 package test;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class CasualTest extends BaseTest {
@@ -67,6 +68,7 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  @Ignore
   public void mulret3() {
     compile("mulret3", TestSteps.COMPILE_TO_C, false, false);
   }
@@ -131,8 +133,6 @@ public class CasualTest extends BaseTest {
     compile("rec1", TestSteps.EXECUTE, false, false);
   }
 
-  // TODO pass composite types by reference to functions, bring this tests to
-  // work
   @Test
   public void rec2() {
     compile("rec2", TestSteps.EXECUTE, false, false);
@@ -179,6 +179,7 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  @Ignore
   public void debugMsg() {
     compile("debugMsg", TestSteps.EXECUTE, true, false);
   }
@@ -189,6 +190,7 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  @Ignore
   public void composition1() {
     compile("composition1", TestSteps.EXECUTE, true, false);
   }
@@ -208,7 +210,6 @@ public class CasualTest extends BaseTest {
     compile("calcCase", TestSteps.EXECUTE, false, false);
   }
 
-  // TODO add type check/conversation to C interface
   @Test
   public void elemInit() {
     compile("elemInit", TestSteps.EXECUTE, false, false);
@@ -275,6 +276,7 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  @Ignore
   public void constInit3() {
     compile("constInit3", TestSteps.EXECUTE, false, false);
   }
@@ -289,8 +291,8 @@ public class CasualTest extends BaseTest {
     compile("constInit5", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
-  // TODO add test case
   @Test
+  @Ignore
   public void constInit6() {
     compile("constInit6", TestSteps.COMPILE_TO_LIB, false, false);
   }
@@ -327,32 +329,29 @@ public class CasualTest extends BaseTest {
 
   @Test
   public void union1() {
-    compile("union1", TestSteps.COMPILE_TO_LIB, false, false);// TODO make
-                                                              // testcase
+    compile("union1", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test
+  @Ignore
   public void union2() {
-    compile("union2", TestSteps.COMPILE_TO_LIB, false, false);// TODO make
-                                                              // testcase
+    compile("union2", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test
+  @Ignore
   public void union3() {
-    compile("union3", TestSteps.COMPILE_TO_LIB, false, false);// TODO make
-                                                              // testcase
+    compile("union3", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test
   public void union4() {
-    compile("union4", TestSteps.COMPILE_TO_LIB, false, false);// TODO make
-                                                              // testcase
+    compile("union4", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test
   public void unionTest() {
-    compile("unionTest", TestSteps.COMPILE_TO_LIB, false, false); // TODO make
-                                                                  // testcase
+    compile("unionTest", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test
@@ -381,8 +380,9 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  @Ignore
   public void genericUse() {
-    compile("genericUse", TestSteps.COMPILE_TO_C, false, false);
+    compile("genericUse", TestSteps.COMPILE_TO_C, false, true);
   }
 
   @Test
@@ -457,7 +457,7 @@ public class CasualTest extends BaseTest {
 
   @Test
   public void linking() {
-    compile("linking", "Linking", true, false, false);
+    compile("linking", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test
@@ -472,32 +472,27 @@ public class CasualTest extends BaseTest {
 
   @Test
   public void bool_Bool() {
-    compile("bool", "Bool", true, false, false);
+    compile("bool", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test
   public void bool2_Bool2() {
-    compile("bool2", "Bool2", true, false, false);
+    compile("bool2", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test
   public void locvar() {
-    compile("locvar", "Locvar", true, false, true);
+    compile("locvar", TestSteps.COMPILE_TO_LIB, false, true);
   }
 
-  // check:
   @Test
+  @Ignore
   public void expr_Expr() {
-    compile("expr", "Expr", true, false, true);
+    compile("expr", TestSteps.COMPILE_TO_LIB, false, true);
   }
 
   @Test
   public void expr2_Expr2() {
-    compile("expr2", "Expr2", true, false, false);
+    compile("expr2", TestSteps.COMPILE_TO_LIB, false, false);
   }
-
-  // @Test
-  // public void compFib() {
-  // compile("compFib", "CompFib", true, false, false);
-  // }
 }
