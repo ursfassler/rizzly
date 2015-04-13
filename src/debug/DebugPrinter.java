@@ -27,15 +27,15 @@ import org.jgrapht.Graph;
 import util.Pair;
 import util.SimpleGraph;
 import util.StreamWriter;
-import evl.data.Evl;
-import fun.doc.FunPrinter;
+import ast.data.Ast;
+import ast.doc.FunPrinter;
 
 public class DebugPrinter {
-  private Evl root;
+  private Ast root;
   private String debugdir;
   private int nr = 0;
 
-  public DebugPrinter(Evl root, String debugdir) {
+  public DebugPrinter(Ast root, String debugdir) {
     super();
     this.root = root;
     this.debugdir = debugdir;
@@ -45,13 +45,13 @@ public class DebugPrinter {
     print(info, root);
   }
 
-  public void print(String info, Evl root) {
+  public void print(String info, Ast root) {
     String filename = debugdir + nr + " " + info + ".rzy";
     print(root, filename);
     nr++;
   }
 
-  static private void print(Evl ast, String filename) {
+  static private void print(Ast ast, String filename) {
     try {
       StreamWriter writer = new StreamWriter(new PrintStream(filename));
       FunPrinter pp = new FunPrinter(writer);
@@ -61,12 +61,12 @@ public class DebugPrinter {
     }
   }
 
-  public void print(String info, SimpleGraph<Evl> root) {
+  public void print(String info, SimpleGraph<Ast> root) {
     printGraph(debugdir + nr + " " + info + ".gv", root);
     nr++;
   }
 
-  private static <T extends Evl> void printGraph(String filename, Graph<T, Pair<T, T>> cg) {
+  private static <T extends Ast> void printGraph(String filename, Graph<T, Pair<T, T>> cg) {
     try {
       @SuppressWarnings("resource")
       HtmlGraphWriter<T, Pair<T, T>> writer = new HtmlGraphWriter<T, Pair<T, T>>(new joGraph.Writer(new PrintStream(filename))) {

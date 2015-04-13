@@ -20,33 +20,33 @@ package parser;
 import parser.scanner.Scanner;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
+import ast.copy.Copy;
+import ast.data.AstList;
+import ast.data.expression.AnyValue;
+import ast.data.expression.Expression;
+import ast.data.expression.reference.Reference;
+import ast.data.statement.AssignmentMulti;
+import ast.data.statement.Block;
+import ast.data.statement.CallStmt;
+import ast.data.statement.CaseOpt;
+import ast.data.statement.CaseOptEntry;
+import ast.data.statement.CaseOptRange;
+import ast.data.statement.CaseOptValue;
+import ast.data.statement.CaseStmt;
+import ast.data.statement.ForStmt;
+import ast.data.statement.IfOption;
+import ast.data.statement.IfStmt;
+import ast.data.statement.ReturnExpr;
+import ast.data.statement.ReturnVoid;
+import ast.data.statement.Statement;
+import ast.data.statement.VarDefInitStmt;
+import ast.data.statement.WhileStmt;
+import ast.data.variable.FuncVariable;
 
 import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
-import evl.copy.Copy;
-import evl.data.EvlList;
-import evl.data.expression.AnyValue;
-import evl.data.expression.Expression;
-import evl.data.expression.reference.Reference;
-import evl.data.statement.AssignmentMulti;
-import evl.data.statement.Block;
-import evl.data.statement.CallStmt;
-import evl.data.statement.CaseOpt;
-import evl.data.statement.CaseOptEntry;
-import evl.data.statement.CaseOptRange;
-import evl.data.statement.CaseOptValue;
-import evl.data.statement.CaseStmt;
-import evl.data.statement.ForStmt;
-import evl.data.statement.IfOption;
-import evl.data.statement.IfStmt;
-import evl.data.statement.ReturnExpr;
-import evl.data.statement.ReturnVoid;
-import evl.data.statement.Statement;
-import evl.data.statement.VarDefInitStmt;
-import evl.data.statement.WhileStmt;
-import evl.data.variable.FuncVariable;
 
 public class StatementParser extends BaseParser {
 
@@ -85,7 +85,7 @@ public class StatementParser extends BaseParser {
   }
 
   // EBNF vardefstmt: lhs ":" ref [ "=" expr ] ";"
-  private VarDefInitStmt parseVarDefStmt(EvlList<Reference> lhs) {
+  private VarDefInitStmt parseVarDefStmt(AstList<Reference> lhs) {
     ElementInfo info = expect(TokenType.COLON).getInfo();
     Reference type = expr().parseRef();
 
@@ -98,14 +98,14 @@ public class StatementParser extends BaseParser {
 
     expect(TokenType.SEMI);
 
-    EvlList<FuncVariable> variables = new EvlList<FuncVariable>();
+    AstList<FuncVariable> variables = new AstList<FuncVariable>();
     for (Reference ref : lhs) {
       if (!ref.offset.isEmpty()) {
         RError.err(ErrorType.Error, ref.getInfo(), "expected identifier");
       }
 
       Reference ntype = Copy.copy(type);
-      evl.data.variable.FuncVariable var = new FuncVariable(ref.getInfo(), ref.link.name, ntype);
+      ast.data.variable.FuncVariable var = new FuncVariable(ref.getInfo(), ref.link.name, ntype);
       variables.add(var);
     }
 
@@ -117,7 +117,7 @@ public class StatementParser extends BaseParser {
   private Statement parseCase() {
     Token tok = expect(TokenType.CASE);
 
-    EvlList<CaseOpt> optlist = new EvlList<CaseOpt>();
+    AstList<CaseOpt> optlist = new AstList<CaseOpt>();
 
     Expression cond = expr().parse();
     expect(TokenType.OF);
@@ -141,7 +141,7 @@ public class StatementParser extends BaseParser {
 
   // EBNF caseopt : caseoptval { "," caseoptval } ":" block "end"
   private CaseOpt parseCaseopt() {
-    EvlList<CaseOptEntry> optval = new EvlList<CaseOptEntry>();
+    AstList<CaseOptEntry> optval = new AstList<CaseOptEntry>();
     do {
       optval.add(parseCaseoptval());
     } while (consumeIfEqual(TokenType.COMMA));
@@ -171,7 +171,7 @@ public class StatementParser extends BaseParser {
     Block block = parseBlock();
     expect(TokenType.END);
 
-    evl.data.statement.WhileStmt stmt = new WhileStmt(tok.getInfo(), cond, block);
+    ast.data.statement.WhileStmt stmt = new WhileStmt(tok.getInfo(), cond, block);
     return stmt;
   }
 
@@ -198,7 +198,7 @@ public class StatementParser extends BaseParser {
   private Statement parseIf() {
     Token tok = expect(TokenType.IF);
 
-    evl.data.statement.IfStmt stmt = new IfStmt(tok.getInfo());
+    ast.data.statement.IfStmt stmt = new IfStmt(tok.getInfo());
 
     {
       Expression expr = expr().parse();
@@ -227,7 +227,7 @@ public class StatementParser extends BaseParser {
   // EBNF return: "return" [ expression ] ";"
   private Statement parseReturn() {
     Token tok = expect(TokenType.RETURN);
-    evl.data.statement.Return ret;
+    ast.data.statement.Return ret;
     if (peek().getType() != TokenType.SEMI) {
       ret = new ReturnExpr(tok.getInfo(), expr().parse());
     } else {
@@ -238,7 +238,7 @@ public class StatementParser extends BaseParser {
   }
 
   private Statement parseVardefOrAssignmentOrCallstmt() {
-    EvlList<Reference> lhs = parseLhs();
+    AstList<Reference> lhs = parseLhs();
     Token tok = peek();
     switch (tok.getType()) {
       case COLON: {
@@ -260,8 +260,8 @@ public class StatementParser extends BaseParser {
   }
 
   // EBNF lhs: varref { "," varref }
-  private EvlList<Reference> parseLhs() {
-    EvlList<Reference> lhs = new EvlList<Reference>();
+  private AstList<Reference> parseLhs() {
+    AstList<Reference> lhs = new AstList<Reference>();
     do {
       lhs.add(expr().parseRef());
     } while (consumeIfEqual(TokenType.COMMA));
@@ -269,7 +269,7 @@ public class StatementParser extends BaseParser {
   }
 
   // EBNF assignment: lhs ":=" expr ";"
-  private AssignmentMulti parseAssignment(EvlList<Reference> ref) {
+  private AssignmentMulti parseAssignment(AstList<Reference> ref) {
     Token tok = expect(TokenType.BECOMES);
     Expression rhs = expr().parse();
     expect(TokenType.SEMI);

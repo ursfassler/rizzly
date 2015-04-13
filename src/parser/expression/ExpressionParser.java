@@ -21,28 +21,27 @@ import parser.Parser;
 import parser.scanner.Scanner;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
+import ast.data.AstList;
+import ast.data.expression.BoolValue;
+import ast.data.expression.Expression;
+import ast.data.expression.NamedElementsValue;
+import ast.data.expression.NamedValue;
+import ast.data.expression.StringValue;
+import ast.data.expression.TupleValue;
+import ast.data.expression.reference.DummyLinkTarget;
+import ast.data.expression.reference.RefCall;
+import ast.data.expression.reference.RefIndex;
+import ast.data.expression.reference.RefName;
+import ast.data.expression.reference.RefTemplCall;
+import ast.data.expression.reference.Reference;
+import ast.data.expression.unop.Not;
+import ast.data.expression.unop.Uminus;
+import ast.data.template.ActualTemplateArgument;
 
 import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
-import evl.data.EvlList;
-import evl.data.expression.BoolValue;
-import evl.data.expression.Expression;
-import evl.data.expression.NamedElementsValue;
-import evl.data.expression.NamedValue;
-import evl.data.expression.Number;
-import evl.data.expression.StringValue;
-import evl.data.expression.TupleValue;
-import evl.data.expression.reference.DummyLinkTarget;
-import evl.data.expression.reference.RefCall;
-import evl.data.expression.reference.RefIndex;
-import evl.data.expression.reference.RefName;
-import evl.data.expression.reference.RefTemplCall;
-import evl.data.expression.reference.Reference;
-import evl.data.expression.unop.Not;
-import evl.data.expression.unop.Uminus;
-import fun.other.ActualTemplateArgument;
 
 public class ExpressionParser extends Parser {
 
@@ -51,8 +50,8 @@ public class ExpressionParser extends Parser {
   }
 
   // EBNF exprList: expr { "," expr }
-  protected EvlList<Expression> parseExprList() {
-    EvlList<Expression> ret = new EvlList<Expression>();
+  protected AstList<Expression> parseExprList() {
+    AstList<Expression> ret = new AstList<Expression>();
     do {
       ret.add(parse());
     } while (consumeIfEqual(TokenType.COMMA));
@@ -61,13 +60,13 @@ public class ExpressionParser extends Parser {
 
   // EBNF tupleValue: "(" [ exprList ] ")"
   protected TupleValue parseTupleValue() {
-    EvlList<Expression> list;
+    AstList<Expression> list;
 
     ElementInfo info = expect(TokenType.OPENPAREN).getInfo();
     if (peek().getType() != TokenType.CLOSEPAREN) {
       list = parseExprList();
     } else {
-      list = new EvlList<Expression>();
+      list = new AstList<Expression>();
     }
     expect(TokenType.CLOSEPAREN);
 
@@ -75,8 +74,8 @@ public class ExpressionParser extends Parser {
   }
 
   // EBNF parseNamedElementsValue: "[" [ assExpr { "," assExpr } ] "]"
-  protected evl.data.expression.NamedElementsValue parseNamedElementsValue() {
-    EvlList<NamedValue> list = new EvlList<NamedValue>();
+  protected ast.data.expression.NamedElementsValue parseNamedElementsValue() {
+    AstList<NamedValue> list = new AstList<NamedValue>();
 
     ElementInfo info = expect(TokenType.OPENBRACKETS).getInfo();
     if (peek().getType() != TokenType.CLOSEBRACKETS) {
@@ -93,12 +92,12 @@ public class ExpressionParser extends Parser {
   protected NamedValue parseAssExpr() {
     Expression expr = parseRelExpr();
     if (consumeIfEqual(TokenType.BECOMES)) {
-      if (!(expr instanceof Reference) || !((evl.data.expression.reference.Reference) expr).offset.isEmpty()) {
+      if (!(expr instanceof Reference) || !((ast.data.expression.reference.Reference) expr).offset.isEmpty()) {
         RError.err(ErrorType.Error, expr.getInfo(), "expected identifier for assignment");
         return null;
       }
       Expression value = parseRelExpr();
-      return new NamedValue(expr.getInfo(), ((DummyLinkTarget) ((evl.data.expression.reference.Reference) expr).link).name, value);
+      return new NamedValue(expr.getInfo(), ((DummyLinkTarget) ((ast.data.expression.reference.Reference) expr).link).name, value);
     } else {
       return new NamedValue(expr.getInfo(), null, expr);
     }
@@ -275,7 +274,7 @@ public class ExpressionParser extends Parser {
        */
       case NUMBER: {
         Token tok = expect(TokenType.NUMBER);
-        return new Number(tok.getInfo(), tok.getNum());
+        return new ast.data.expression.Number(tok.getInfo(), tok.getNum());
       }
       case STRING: {
         Token tok = expect(TokenType.STRING);
@@ -303,22 +302,22 @@ public class ExpressionParser extends Parser {
   }
 
   // EBNF refName: "." id
-  private evl.data.expression.reference.RefName parseRefName() {
+  private ast.data.expression.reference.RefName parseRefName() {
     Token tok = expect(TokenType.PERIOD);
     String name = expect(TokenType.IDENTIFIER).getData();
     return new RefName(tok.getInfo(), name);
   }
 
   // EBNF refCall: tupleValue
-  private evl.data.expression.reference.RefCall parseRefCall() {
-    evl.data.expression.TupleValue arg = parseTupleValue();
+  private ast.data.expression.reference.RefCall parseRefCall() {
+    ast.data.expression.TupleValue arg = parseTupleValue();
     return new RefCall(arg.getInfo(), arg);
   }
 
   // EBNF refGeneric: "{" [ exprList ] "}"
   private RefTemplCall parseRefGeneric() {
     Token tok = expect(TokenType.OPENCURLY);
-    EvlList<ActualTemplateArgument> expr = new EvlList<ActualTemplateArgument>();
+    AstList<ActualTemplateArgument> expr = new AstList<ActualTemplateArgument>();
     if (peek().getType() != TokenType.CLOSECURLY) {
       expr.addAll(parseExprList());
     }
@@ -327,7 +326,7 @@ public class ExpressionParser extends Parser {
   }
 
   // EBNF refIndex: "[" expr "]"
-  private evl.data.expression.reference.RefIndex parseRefIndex() {
+  private ast.data.expression.reference.RefIndex parseRefIndex() {
     Token tok = expect(TokenType.OPENBRACKETS);
     Expression index = parse();
     expect(TokenType.CLOSEBRACKETS);

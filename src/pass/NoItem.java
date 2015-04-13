@@ -17,20 +17,20 @@
 
 package pass;
 
-import evl.data.EvlBase;
-import evl.data.Namespace;
-import evl.knowledge.KnowledgeBase;
-import evl.traverser.other.ClassGetter;
+import ast.data.AstBase;
+import ast.data.Namespace;
+import ast.knowledge.KnowledgeBase;
+import ast.traverser.other.ClassGetter;
 
 public class NoItem extends Condition {
-  final private Class<? extends EvlBase> type;
+  final private Class<? extends AstBase> type;
 
-  public NoItem(Class<? extends EvlBase> type) {
+  public NoItem(Class<? extends AstBase> type) {
     super();
     this.type = type;
   }
 
-  public Class<? extends EvlBase> getType() {
+  public Class<? extends AstBase> getType() {
     return type;
   }
 

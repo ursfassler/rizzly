@@ -23,19 +23,19 @@ import java.util.List;
 import parser.scanner.Scanner;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
+import ast.data.Ast;
+import ast.data.raw.RawComponent;
+import ast.data.raw.RawElementary;
+import ast.data.template.Template;
+import ast.data.variable.ConstPrivate;
+import ast.data.variable.StateVariable;
+import ast.data.variable.TemplateParameter;
 
 import common.ElementInfo;
 import common.Metadata;
 
 import error.ErrorType;
 import error.RError;
-import evl.data.Evl;
-import evl.data.variable.ConstPrivate;
-import evl.data.variable.StateVariable;
-import evl.data.variable.TemplateParameter;
-import fun.other.RawComponent;
-import fun.other.RawElementary;
-import fun.other.Template;
 
 public class ImplElementaryParser extends ImplBaseParser {
   public ImplElementaryParser(Scanner scanner) {
@@ -68,11 +68,11 @@ public class ImplElementaryParser extends ImplBaseParser {
           } else {
             genpam = new ArrayList<TemplateParameter>();
           }
-          Evl obj = parseDeclaration(id.getData());
+          Ast obj = parseDeclaration(id.getData());
           Template decl = new Template(id.getInfo(), id.getData(), genpam, obj);
           comp.getDeclaration().add(decl);
         } else if (consumeIfEqual(TokenType.COLON)) {
-          Evl var = parseInstantiation(id.getData());
+          Ast var = parseInstantiation(id.getData());
           comp.getInstantiation().add(var);
         } else {
           Token got = peek();
@@ -103,7 +103,7 @@ public class ImplElementaryParser extends ImplBaseParser {
     }
   }
 
-  private Evl parseInstantiation(String name) {
+  private Ast parseInstantiation(String name) {
     switch (peek().getType()) {
       case CONST: {
         ConstPrivate var = parseConstDef(ConstPrivate.class, name);
@@ -122,7 +122,7 @@ public class ImplElementaryParser extends ImplBaseParser {
     }
   }
 
-  private Evl parseDeclaration(String name) {
+  private Ast parseDeclaration(String name) {
     switch (peek().getType()) {
       case FUNCTION:
       case PROCEDURE:

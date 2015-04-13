@@ -69,7 +69,7 @@ public class Main {
       (new File(docdir)).mkdirs();
     }
 
-    MainEvl.doEvl(opt, outdir, debugdir);
+    Passes.process(opt, outdir, debugdir);
 
     return outdir;
   }

@@ -1,0 +1,161 @@
+/**
+ *  This file is part of Rizzly.
+ *
+ *  Rizzly is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Rizzly is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package ast.pass.sanitycheck;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
+import pass.AstPass;
+import ast.data.Ast;
+import ast.data.Namespace;
+import ast.data.component.composition.SubCallbacks;
+import ast.data.component.elementary.ImplElementary;
+import ast.data.component.hfsm.State;
+import ast.data.component.hfsm.Transition;
+import ast.data.expression.reference.BaseRef;
+import ast.data.function.Function;
+import ast.data.statement.ForStmt;
+import ast.data.statement.VarDefStmt;
+import ast.data.type.Type;
+import ast.data.variable.ConstPrivate;
+import ast.data.variable.StateVariable;
+import ast.data.variable.Variable;
+import ast.knowledge.KnowParent;
+import ast.knowledge.KnowledgeBase;
+import ast.traverser.DefTraverser;
+import ast.traverser.other.ClassGetter;
+import error.ErrorType;
+import error.RError;
+
+/**
+ * Verifies that links to variables are ok, i.e. they are declared before use and in a visible scope.
+ *
+ * @author urs
+ *
+ */
+public class VarLinkOk extends AstPass {
+
+  @Override
+  public void process(Namespace ast, KnowledgeBase kb) {
+    VarLinkOkWorker worker = new VarLinkOkWorker(kb);
+    worker.traverse(ast, new HashSet<Ast>());
+  }
+
+}
+
+class VarLinkOkWorker extends DefTraverser<Void, Set<Ast>> {
+  private final KnowParent kp;
+
+  public VarLinkOkWorker(KnowledgeBase kb) {
+    super();
+    this.kp = kb.getEntry(KnowParent.class);
+  }
+
+  private Set<Ast> add(Set<Ast> param, Collection<? extends Ast> items) {
+    param = new HashSet<Ast>(param);
+    param.addAll(items);
+    return param;
+  }
+
+  @Override
+  protected Void visitNamespace(Namespace obj, Set<Ast> param) {
+    param = add(param, ClassGetter.filter(Variable.class, obj.children));
+    param = add(param, ClassGetter.filter(Type.class, obj.children));
+    return super.visitNamespace(obj, param);
+  }
+
+  @Override
+  protected Void visitImplElementary(ImplElementary obj, Set<Ast> param) {
+    param = new HashSet<Ast>(param);
+    param.addAll(obj.variable);
+    param.addAll(obj.constant);
+    param.addAll(obj.type);
+    return super.visitImplElementary(obj, param);
+  }
+
+  @Override
+  protected Void visitState(State obj, Set<Ast> param) {
+    param = new HashSet<Ast>(param);
+    param = add(param, ClassGetter.filter(StateVariable.class, obj.item));
+    return super.visitState(obj, param);
+  }
+
+  @Override
+  protected Void visitVarDef(VarDefStmt obj, Set<Ast> param) {
+    super.visitVarDef(obj, param);
+    param.add(obj.variable);
+    return null;
+  }
+
+  @Override
+  protected Void visitForStmt(ForStmt obj, Set<Ast> param) {
+    param = new HashSet<Ast>(param);
+    param.add(obj.iterator);
+    super.visitForStmt(obj, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitFunction(Function obj, Set<Ast> param) {
+    param = add(param, obj.param);
+    return super.visitFunction(obj, param);
+  }
+
+  @Override
+  protected Void visitBaseRef(BaseRef obj, Set<Ast> param) {
+    if ((obj.link instanceof Variable) || (obj.link instanceof Type)) {
+      if (!param.contains(obj.link)) {
+        RError.err(ErrorType.Fatal, obj.getInfo(), "object " + obj.link.toString() + " not visible from here");
+      }
+    }
+    return super.visitBaseRef(obj, param);
+  }
+
+  @Override
+  protected Void visitTransition(Transition obj, Set<Ast> param) {
+    param = new HashSet<Ast>(param);
+    param.addAll(obj.param);
+    visit(obj.src, param);
+    visit(obj.dst, param);
+    visit(obj.eventFunc, param);
+    visit(obj.body, param);
+    addAllToTop((State) obj.src.getTarget(), param);
+    visit(obj.guard, param);
+    return null;
+  }
+
+  private void addAllToTop(State state, Set<Ast> param) {
+    while (true) {
+      param.addAll(ClassGetter.filter(StateVariable.class, state.item));
+      param.addAll(ClassGetter.filter(ConstPrivate.class, state.item));
+      Ast parent = kp.get(state);
+      if (parent instanceof State) {
+        state = (State) parent;
+      } else {
+        return;
+      }
+    }
+  }
+
+  @Override
+  protected Void visitSubCallbacks(SubCallbacks obj, Set<Ast> param) {
+    return super.visitSubCallbacks(obj, param);
+  }
+
+}

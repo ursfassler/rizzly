@@ -22,21 +22,21 @@ import java.util.ArrayList;
 import parser.scanner.Scanner;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
+import ast.data.component.composition.AsynchroniusConnection;
+import ast.data.component.composition.CompUse;
+import ast.data.component.composition.Endpoint;
+import ast.data.component.composition.EndpointRaw;
+import ast.data.component.composition.SynchroniusConnection;
+import ast.data.expression.reference.RefName;
+import ast.data.expression.reference.Reference;
+import ast.data.raw.RawComponent;
+import ast.data.raw.RawComposition;
 
 import common.ElementInfo;
 import common.Metadata;
 
 import error.ErrorType;
 import error.RError;
-import evl.data.component.composition.AsynchroniusConnection;
-import evl.data.component.composition.CompUse;
-import evl.data.component.composition.Endpoint;
-import evl.data.component.composition.EndpointRaw;
-import evl.data.component.composition.SynchroniusConnection;
-import evl.data.expression.reference.RefName;
-import evl.data.expression.reference.Reference;
-import fun.other.RawComponent;
-import fun.other.RawComposition;
 
 public class ImplCompositionParser extends ImplBaseParser {
 
@@ -63,7 +63,7 @@ public class ImplCompositionParser extends ImplBaseParser {
       if (consumeIfEqual(TokenType.COLON)) {
         parseInstantiation(id, comp);
       } else {
-        evl.data.component.composition.Connection obj = parseConnection(id);
+        ast.data.component.composition.Connection obj = parseConnection(id);
         comp.getConnection().add(obj);
       }
     }
@@ -78,7 +78,7 @@ public class ImplCompositionParser extends ImplBaseParser {
         expect(TokenType.SEMI);
         ArrayList<Metadata> meta = getMetadata();
         id.getInfo().metadata.addAll(meta);
-        evl.data.component.composition.CompUse compUse = new CompUse(id.getInfo(), id.getData(), type);
+        ast.data.component.composition.CompUse compUse = new CompUse(id.getInfo(), id.getData(), type);
         comp.getInstantiation().add(compUse);
         break;
       default: {
@@ -89,7 +89,7 @@ public class ImplCompositionParser extends ImplBaseParser {
   }
 
   // EBNF connection: endpoint msgType endpoint ";"
-  private evl.data.component.composition.Connection parseConnection(Token id) {
+  private ast.data.component.composition.Connection parseConnection(Token id) {
     Endpoint src = parseEndpoint(id);
     ElementInfo info = peek().getInfo();
     MessageType type = parseMsgType();

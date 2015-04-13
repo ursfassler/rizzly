@@ -216,7 +216,7 @@ public class CasualTest extends BaseTest {
 
   @Test
   public void meta() {
-    compile("meta", TestSteps.COMPILE_TO_EVL, false, false);
+    compile("meta", TestSteps.COMPILE_TO_AST, false, false);
   }
 
   @Test

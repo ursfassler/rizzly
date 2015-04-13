@@ -27,28 +27,28 @@ import parser.scanner.Scanner;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
 import util.Pair;
+import ast.copy.Copy;
+import ast.data.AstList;
+import ast.data.expression.Expression;
+import ast.data.expression.reference.Reference;
+import ast.data.function.Function;
+import ast.data.function.FunctionFactory;
+import ast.data.function.ret.FuncReturnNone;
+import ast.data.function.ret.FuncReturnTuple;
+import ast.data.function.ret.FuncReturnType;
+import ast.data.statement.Block;
+import ast.data.variable.Constant;
+import ast.data.variable.FuncVariable;
+import ast.data.variable.StateVariable;
+import ast.data.variable.TemplateParameter;
+import ast.data.variable.Variable;
+import ast.data.variable.VariableFactory;
+import ast.knowledge.KnowFuncType;
 
 import common.ElementInfo;
 
 import error.ErrorType;
 import error.RError;
-import evl.copy.Copy;
-import evl.data.EvlList;
-import evl.data.expression.Expression;
-import evl.data.expression.reference.Reference;
-import evl.data.function.Function;
-import evl.data.function.FunctionFactory;
-import evl.data.function.ret.FuncReturnNone;
-import evl.data.function.ret.FuncReturnTuple;
-import evl.data.function.ret.FuncReturnType;
-import evl.data.statement.Block;
-import evl.data.variable.Constant;
-import evl.data.variable.FuncVariable;
-import evl.data.variable.StateVariable;
-import evl.data.variable.TemplateParameter;
-import evl.data.variable.Variable;
-import evl.knowledge.KnowFuncType;
-import fun.VariableFactory;
 
 public class BaseParser extends Parser {
 
@@ -85,9 +85,9 @@ public class BaseParser extends Parser {
 
     Class<? extends Function> cl = KnowFuncType.getClassOf(next.getType());
 
-    EvlList<FuncVariable> varlist = parseVardefList();
+    AstList<FuncVariable> varlist = parseVardefList();
 
-    evl.data.function.ret.FuncReturn retType;
+    ast.data.function.ret.FuncReturn retType;
     if (KnowFuncType.getWithRetval(cl)) {
       retType = parseFuncReturn();
     } else {
@@ -107,7 +107,7 @@ public class BaseParser extends Parser {
   }
 
   // EBNF: funcReturn: [ ":" ( typeref | vardeflist ) ]
-  protected evl.data.function.ret.FuncReturn parseFuncReturn() {
+  protected ast.data.function.ret.FuncReturn parseFuncReturn() {
     ElementInfo info = peek().getInfo();
     if (consumeIfEqual(TokenType.COLON)) {
       if (peek().getType() == TokenType.OPENPAREN) {
@@ -121,7 +121,7 @@ public class BaseParser extends Parser {
   }
 
   // EBNF vardefNoinit: id { "," id } ":" typeref
-  protected <T extends Variable> EvlList<T> parseVarDef(Class<T> kind) {
+  protected <T extends Variable> AstList<T> parseVarDef(Class<T> kind) {
     List<Token> names = new ArrayList<Token>();
     do {
       Token id = expect(TokenType.IDENTIFIER);
@@ -132,7 +132,7 @@ public class BaseParser extends Parser {
 
     Reference type = expr().parseRef();
 
-    EvlList<T> ret = new EvlList<T>();
+    AstList<T> ret = new AstList<T>();
     for (int i = 0; i < names.size(); i++) {
       Reference ntype = Copy.copy(type);
       ret.add(VariableFactory.create(kind, names.get(i).getInfo(), names.get(i).getData(), ntype));
@@ -162,8 +162,8 @@ public class BaseParser extends Parser {
   }
 
   // EBNF genericParam: [ "{" vardef { ";" vardef } "}" ]
-  protected EvlList<TemplateParameter> parseGenericParam() {
-    EvlList<TemplateParameter> ret = new EvlList<TemplateParameter>();
+  protected AstList<TemplateParameter> parseGenericParam() {
+    AstList<TemplateParameter> ret = new AstList<TemplateParameter>();
     if (consumeIfEqual(TokenType.OPENCURLY)) {
       do {
         List<TemplateParameter> param = parseVarDef(TemplateParameter.class);
@@ -175,8 +175,8 @@ public class BaseParser extends Parser {
   }
 
   // EBNF vardeflist: "(" [ vardef { ";" vardef } ] ")"
-  protected EvlList<FuncVariable> parseVardefList() {
-    EvlList<FuncVariable> res = new EvlList<FuncVariable>();
+  protected AstList<FuncVariable> parseVardefList() {
+    AstList<FuncVariable> res = new AstList<FuncVariable>();
     expect(TokenType.OPENPAREN);
     if (peek().getType() == TokenType.IDENTIFIER) {
       do {
@@ -191,14 +191,14 @@ public class BaseParser extends Parser {
   // EBNF constdef: "const" [ typeref ] "=" expr
   public <T extends Constant> T parseConstDef(Class<T> kind, String name) {
     ElementInfo info = expect(TokenType.CONST).getInfo();
-    evl.data.expression.reference.Reference type;
+    ast.data.expression.reference.Reference type;
     if (peek().getType() != TokenType.EQUAL) {
       type = expr().parseRef();
     } else {
-      type = new Reference(info, evl.data.type.special.AnyType.NAME);
+      type = new Reference(info, ast.data.type.special.AnyType.NAME);
     }
     expect(TokenType.EQUAL);
-    evl.data.expression.Expression value = expr().parse();
+    ast.data.expression.Expression value = expr().parse();
 
     return VariableFactory.create(kind, info, name, type, value);
   }

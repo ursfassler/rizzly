@@ -17,8 +17,8 @@
 
 package pass;
 
-import evl.data.Namespace;
-import evl.knowledge.KnowledgeBase;
+import ast.data.Namespace;
+import ast.knowledge.KnowledgeBase;
 
 public abstract class Condition {
   abstract public boolean check(Namespace root, KnowledgeBase kb);

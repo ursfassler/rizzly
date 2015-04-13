@@ -75,6 +75,6 @@ public class HfsmTest extends BaseTest {
 
   @Test
   public void stateNames1() {
-    compile("stateNames1", TestSteps.COMPILE_TO_EVL, false, false);
+    compile("stateNames1", TestSteps.COMPILE_TO_AST, false, false);
   }
 }

@@ -19,7 +19,7 @@ package parser;
 
 import parser.scanner.Scanner;
 import parser.scanner.TokenType;
-import evl.data.statement.Block;
+import ast.data.statement.Block;
 
 abstract public class ImplBaseParser extends BaseParser {
 
