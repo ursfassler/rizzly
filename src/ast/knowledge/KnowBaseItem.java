@@ -29,6 +29,7 @@ import ast.data.Namespace;
 import ast.data.Range;
 import ast.data.expression.reference.Reference;
 import ast.data.expression.reference.SimpleRef;
+import ast.data.expression.reference.TypeRef;
 import ast.data.type.Type;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
@@ -36,6 +37,7 @@ import ast.data.type.base.EnumElement;
 import ast.data.type.base.EnumType;
 import ast.data.type.base.RangeType;
 import ast.data.type.base.StringType;
+import ast.data.type.base.TupleType;
 import ast.data.type.composed.NamedElement;
 import ast.data.type.composed.RecordType;
 import ast.data.type.special.AnyType;
@@ -149,21 +151,55 @@ public class KnowBaseItem extends KnowledgeEntry {
     return ret;
   }
 
-  private boolean equal(AstList<NamedElement> left, AstList<NamedElement> right) {
+  public TupleType getTupleType(AstList<TypeRef> types) {
+    AstList<TupleType> items = ClassGetter.filter(TupleType.class, kb.getRoot().children);
+    for (TupleType itr : items) {
+      if (equalTypes(types, itr.types)) {
+        return itr;
+      }
+    }
+
+    TupleType ret = new TupleType(ElementInfo.NO, kun.get("tupleType"), Copy.copy(types));
+    kb.getRoot().children.add(ret);
+    return ret;
+  }
+
+  private boolean equalTypes(AstList<TypeRef> left, AstList<TypeRef> right) {
     if (left.size() != right.size()) {
       return false;
     }
     for (int i = 0; i < left.size(); i++) {
-      if (!left.get(i).name.equals(right.get(i).name) || !equal(left, right, i)) {
+      TypeRef leftItr = left.get(i);
+      TypeRef rightItr = right.get(i);
+      if (!equal(leftItr, rightItr)) {
         return false;
       }
     }
     return true;
   }
 
-  private boolean equal(AstList<NamedElement> left, AstList<NamedElement> right, int i) {
+  private boolean equal(TypeRef left, TypeRef right) {
     // FIXME only works for simple ref
-    return ((SimpleRef<Type>) left.get(i).typeref).link.equals(((SimpleRef<Type>) right.get(i).typeref).link);
+    return ((SimpleRef<Type>) left).link.equals(((SimpleRef<Type>) right).link);
+  }
+
+  private boolean equal(AstList<NamedElement> left, AstList<NamedElement> right) {
+    if (left.size() != right.size()) {
+      return false;
+    }
+    for (int i = 0; i < left.size(); i++) {
+      NamedElement leftItr = left.get(i);
+      NamedElement rightItr = right.get(i);
+      if (!equal(leftItr, rightItr)) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private boolean equal(NamedElement left, NamedElement right) {
+    // FIXME only works for simple ref
+    return ((SimpleRef<Type>) left.typeref).link.equals(((SimpleRef<Type>) right.typeref).link) && left.name.equals(right.name);
   }
 
   public EnumType getEnumType(Set<String> elements) {
@@ -245,6 +281,11 @@ class KnowBaseItemTypeFinder extends NullTraverser<Type, KnowBaseItem> {
   @Override
   protected Type visitRangeType(RangeType obj, KnowBaseItem param) {
     return param.getRangeType(obj.range);
+  }
+
+  @Override
+  protected Type visitTupleType(TupleType obj, KnowBaseItem param) {
+    return param.getTupleType(obj.types);
   }
 
 }

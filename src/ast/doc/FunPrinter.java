@@ -107,6 +107,7 @@ import ast.data.statement.VarDefStmt;
 import ast.data.template.Template;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.RangeType;
+import ast.data.type.base.TupleType;
 import ast.data.type.composed.NamedElement;
 import ast.data.type.composed.NamedElementType;
 import ast.data.type.composed.UnionType;
@@ -495,6 +496,18 @@ public class FunPrinter extends NullTraverser<Void, Void> {
     xw.decIndent();
     xw.kw("end");
     xw.nl();
+  }
+
+  @Override
+  protected Void visitTupleType(TupleType obj, Void param) {
+    xw.wa(obj.name, getId(obj, param));
+    xw.nl();
+    xw.incIndent();
+    visitList(obj.types, null);
+    xw.decIndent();
+    xw.kw("end");
+    xw.nl();
+    return null;
   }
 
   @Override

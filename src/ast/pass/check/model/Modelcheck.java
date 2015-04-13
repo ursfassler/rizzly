@@ -15,21 +15,21 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.instantiation;
+package ast.pass.check.model;
 
-import ast.pass.instantiation.queuereduction.QueueReduction;
-import ast.pass.optimize.RemoveUnused;
 import ast.pass.others.GroupPass;
 
-public class Instantiation extends GroupPass {
+public class Modelcheck extends GroupPass {
 
-  public Instantiation() {
+  public Modelcheck() {
     super();
-    append(new ElementaryInstantiation());
-    append(new LinkReduction());
-    append(new QueueReduction());
-    append(new Flattner());
-    append(new RemoveUnused());
+    append(new Root());
+    append(new Usefullness());
+    append(new RtcViolation());
+    append(new Io());
+    append(new HfsmTransScopeCheck());
+    append(new CompInterfaceTypeChecker());
+    append(new HfsmModelChecker());
   }
 
 }

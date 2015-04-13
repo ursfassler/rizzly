@@ -81,7 +81,7 @@ import ast.data.type.composed.RecordType;
 import ast.data.type.special.ComponentType;
 import ast.data.variable.FuncVariable;
 import ast.data.variable.Variable;
-import ast.pass.typecheck.ExpressionTypecheck;
+import ast.pass.check.type.ExpressionTypecheck;
 import ast.traverser.NullTraverser;
 import ast.traverser.other.RefTypeGetter;
 import error.ErrorType;

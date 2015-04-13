@@ -44,7 +44,7 @@ import ast.data.statement.Block;
 import ast.data.variable.FuncVariable;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.pass.others.CompositionReduction;
+import ast.pass.reduction.CompositionReduction;
 import ast.traverser.NullTraverser;
 import ast.traverser.other.ClassGetter;
 import error.RError;

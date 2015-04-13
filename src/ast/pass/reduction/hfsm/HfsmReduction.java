@@ -15,21 +15,23 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.instantiation;
+package ast.pass.reduction.hfsm;
 
-import ast.pass.instantiation.queuereduction.QueueReduction;
-import ast.pass.optimize.RemoveUnused;
 import ast.pass.others.GroupPass;
 
-public class Instantiation extends GroupPass {
+public class HfsmReduction extends GroupPass {
 
-  public Instantiation() {
+  public HfsmReduction() {
     super();
-    append(new ElementaryInstantiation());
-    append(new LinkReduction());
-    append(new QueueReduction());
-    append(new Flattner());
-    append(new RemoveUnused());
+    append(new QueryDownPropagator());
+    append(new TransitionRedirecter());
+    append(new TransitionDownPropagator());
+    append(new StateVarReplacer());
+    append(new EntryExitUpdater());
+    append(new StateItemUplifter());
+    append(new TransitionUplifter());
+    append(new LeafStateUplifter());
+    append(new FsmReduction());
   }
 
 }

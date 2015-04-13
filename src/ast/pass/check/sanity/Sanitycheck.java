@@ -15,21 +15,17 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.instantiation;
+package ast.pass.check.sanity;
 
-import ast.pass.instantiation.queuereduction.QueueReduction;
-import ast.pass.optimize.RemoveUnused;
 import ast.pass.others.GroupPass;
 
-public class Instantiation extends GroupPass {
+public class Sanitycheck extends GroupPass {
 
-  public Instantiation() {
+  public Sanitycheck() {
     super();
-    append(new ElementaryInstantiation());
-    append(new LinkReduction());
-    append(new QueueReduction());
-    append(new Flattner());
-    append(new RemoveUnused());
+    append(new LinkTargetExists());
+    append(new VarLinkOk());
+    append(new SingleDefinition());
   }
 
 }
