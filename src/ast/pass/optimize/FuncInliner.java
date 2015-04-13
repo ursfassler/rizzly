@@ -45,7 +45,7 @@ public class FuncInliner extends AstPass {
   }
 }
 
-class FuncInlinerWorker extends StmtReplacer<Function> {
+class FuncInlinerWorker extends StmtReplacer<Void> {
   private final KnowBacklink kbl;
   private final KnowUniqueName kun;
   private final Set<Pair<Ast, Ast>> callset;
@@ -58,26 +58,16 @@ class FuncInlinerWorker extends StmtReplacer<Function> {
   }
 
   @Override
-  protected List<Statement> visitFunction(Function obj, Function param) {
-    if (obj == param) {
-      // recursion
-      return null;
-    }
-    return super.visitFunction(obj, obj);
-  }
-
-  @Override
-  protected List<Statement> visitCallStmt(CallStmt obj, Function param) {
+  protected List<Statement> visitCallStmt(CallStmt obj, Void param) {
     // TODO also if a function is called in a expression
 
     if (obj.call.link instanceof Function) {
-      assert (param != null);
       Function func = (Function) obj.call.link;
 
       List<Statement> fr = visit(func, param);
       assert (fr == null);
 
-      if (canInline(func) && (func != param)) {
+      if (canInline(func)) {
         // RError.err(ErrorType.Hint, param.getName() + " :: " +
         // func.getName());
         assert (obj.call.offset.size() == 1); // FIXME maybe not true in the
@@ -96,8 +86,7 @@ class FuncInlinerWorker extends StmtReplacer<Function> {
 
   private boolean isNotRecursive(Function func) {
     Pair<Function, Function> selfCall = new Pair<Function, Function>(func, func);
-    // return !callset.contains(selfCall);
-    return true;
+    return !callset.contains(selfCall);
   }
 
   private boolean onlyOnceUsed(Function func) {
