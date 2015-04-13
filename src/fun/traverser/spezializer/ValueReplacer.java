@@ -20,7 +20,7 @@ package fun.traverser.spezializer;
 import util.Pair;
 import evl.data.Evl;
 import evl.data.expression.Expression;
-import fun.traverser.ExprReplacer;
+import evl.traverser.other.ExprReplacer;
 
 public class ValueReplacer extends ExprReplacer<Pair<Expression, Expression>> {
   static final private ValueReplacer INSTANCE = new ValueReplacer();

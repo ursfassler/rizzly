@@ -25,8 +25,8 @@ import evl.data.expression.reference.DummyLinkTarget;
 import evl.data.expression.reference.Reference;
 import evl.data.type.Type;
 import evl.data.variable.TemplateParameter;
+import evl.traverser.other.ExprReplacer;
 import fun.other.ActualTemplateArgument;
-import fun.traverser.ExprReplacer;
 
 /**
  * Replaces a reference to a CompfuncParameter with the value of it

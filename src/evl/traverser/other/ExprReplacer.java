@@ -21,6 +21,10 @@ import java.util.List;
 
 import error.ErrorType;
 import error.RError;
+import evl.data.EvlList;
+import evl.data.component.composition.CompUse;
+import evl.data.component.hfsm.StateComposite;
+import evl.data.component.hfsm.StateSimple;
 import evl.data.component.hfsm.Transition;
 import evl.data.expression.AnyValue;
 import evl.data.expression.ArrayValue;
@@ -57,25 +61,40 @@ import evl.data.expression.binop.Or;
 import evl.data.expression.binop.Plus;
 import evl.data.expression.binop.Shl;
 import evl.data.expression.binop.Shr;
+import evl.data.expression.reference.CompRef;
+import evl.data.expression.reference.FuncRef;
 import evl.data.expression.reference.RefCall;
 import evl.data.expression.reference.RefIndex;
 import evl.data.expression.reference.RefItem;
 import evl.data.expression.reference.RefName;
+import evl.data.expression.reference.RefTemplCall;
 import evl.data.expression.reference.Reference;
 import evl.data.expression.reference.SimpleRef;
+import evl.data.expression.reference.StateRef;
+import evl.data.expression.reference.TypeRef;
 import evl.data.expression.unop.BitNot;
 import evl.data.expression.unop.LogicNot;
 import evl.data.expression.unop.Not;
 import evl.data.expression.unop.Uminus;
+import evl.data.expression.unop.UnaryExp;
+import evl.data.function.header.FuncProcedure;
+import evl.data.function.ret.FuncReturnType;
 import evl.data.statement.AssignmentMulti;
 import evl.data.statement.AssignmentSingle;
 import evl.data.statement.CaseOptRange;
 import evl.data.statement.CaseOptValue;
+import evl.data.statement.CaseStmt;
 import evl.data.statement.IfOption;
 import evl.data.statement.MsgPush;
 import evl.data.statement.ReturnExpr;
+import evl.data.statement.VarDefInitStmt;
+import evl.data.statement.WhileStmt;
+import evl.data.type.composed.NamedElement;
+import evl.data.variable.Constant;
 import evl.data.variable.DefVariable;
+import evl.data.variable.Variable;
 import evl.traverser.DefTraverser;
+import fun.other.ActualTemplateArgument;
 
 abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
 
@@ -93,7 +112,9 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   @Override
   protected Expression visitExpression(Expression obj, T param) {
     Expression ret = super.visitExpression(obj, param);
-    assert (ret != null);
+    if (ret == null) {
+      RError.err(ErrorType.Fatal, obj.getInfo(), "not handled class: " + obj.getClass().getCanonicalName());
+    }
     return ret;
   }
 
@@ -127,9 +148,27 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
     return super.visitRefName(obj, param);
   }
 
+  @Override
+  protected Expression visitRefTemplCall(RefTemplCall obj, T param) {
+    EvlList<ActualTemplateArgument> list = obj.actualParameter;
+    for (int i = 0; i < list.size(); i++) {
+      if (list.get(i) instanceof Expression) {
+        Expression old = (Expression) list.get(i);
+        Expression expr = visit(old, param);
+        list.set(i, expr);
+      }
+    }
+    return null;
+  }
+
   private Expression defaultBinaryOp(BinaryExp obj, T param) {
     obj.left = visit(obj.left, param);
     obj.right = visit(obj.right, param);
+    return obj;
+  }
+
+  private Expression defaultUnaryOp(UnaryExp obj, T param) {
+    obj.expr = visit(obj.expr, param);
     return obj;
   }
 
@@ -240,26 +279,22 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
 
   @Override
   protected Expression visitNot(Not obj, T param) {
-    obj.expr = visit(obj.expr, param);
-    return obj;
+    return defaultUnaryOp(obj, param);
   }
 
   @Override
   protected Expression visitLogicNot(LogicNot obj, T param) {
-    obj.expr = visit(obj.expr, param);
-    return obj;
+    return defaultUnaryOp(obj, param);
   }
 
   @Override
   protected Expression visitBitNot(BitNot obj, T param) {
-    obj.expr = visit(obj.expr, param);
-    return obj;
+    return defaultUnaryOp(obj, param);
   }
 
   @Override
   protected Expression visitUminus(Uminus obj, T param) {
-    obj.expr = visit(obj.expr, param);
-    return obj;
+    return defaultUnaryOp(obj, param);
   }
 
   @Override
@@ -286,7 +321,7 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
 
   @Override
   protected Expression visitNamedElementsValue(NamedElementsValue obj, T param) {
-    visitList(obj.value, param);
+    super.visitNamedElementsValue(obj, param);
     return obj;
   }
 
@@ -310,17 +345,7 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
 
   @Override
   protected Expression visitRecordValue(RecordValue obj, T param) {
-    visitList(obj.value, param);
-    return obj;
-  }
-
-  @Override
-  protected Expression visitAnyValue(AnyValue obj, T param) {
-    return obj;
-  }
-
-  @Override
-  protected Expression visitBoolValue(BoolValue obj, T param) {
+    super.visitRecordValue(obj, param);
     return obj;
   }
 
@@ -370,12 +395,6 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitTransition(Transition obj, T param) {
-    obj.guard = visit(obj.guard, param);
-    return super.visitTransition(obj, param);
-  }
-
-  @Override
   protected Expression visitIfOption(IfOption obj, T param) {
     obj.condition = visit(obj.condition, param);
     visit(obj.code, param);
@@ -386,8 +405,94 @@ abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
   protected Expression visitMsgPush(MsgPush obj, T param) {
     obj.queue = (Reference) visit(obj.queue, param);
     obj.func = (Reference) visit(obj.func, param);
-    visitList(obj.data, param);
+    visitExprList(obj.data, param);
     return null;
   }
 
+  @Override
+  protected Expression visitBoolValue(BoolValue obj, T param) {
+    return obj;
+  }
+
+  @Override
+  protected Expression visitAnyValue(AnyValue obj, T param) {
+    return obj;
+  }
+
+  @Override
+  protected Expression visitConstant(Constant obj, T param) {
+    visit(obj.type, param);
+    obj.def = visit(obj.def, param);
+    return null;
+  }
+
+  @Override
+  protected Expression visitVarDefInitStmt(VarDefInitStmt obj, T param) {
+    obj.initial = visit(obj.initial, param);
+    return super.visitVarDefInitStmt(obj, param);
+  }
+
+  @Override
+  protected Expression visitCaseStmt(CaseStmt obj, T param) {
+    obj.condition = visit(obj.condition, param);
+    visit(obj.otherwise, param);
+    return super.visitCaseStmt(obj, param);
+  }
+
+  @Override
+  protected Expression visitWhileStmt(WhileStmt obj, T param) {
+    obj.condition = visit(obj.condition, param);
+    visit(obj.body, param);
+    return null;
+  }
+
+  @Override
+  protected Expression visitTransition(Transition obj, T param) {
+    obj.src = (StateRef) visit(obj.src, param);
+    obj.dst = (StateRef) visit(obj.dst, param);
+    obj.eventFunc = (FuncRef) visit(obj.eventFunc, param);
+    obj.guard = visit(obj.guard, param);
+    return super.visitTransition(obj, param);
+  }
+
+  @Override
+  protected Expression visitNamedElement(NamedElement obj, T param) {
+    obj.typeref = (TypeRef) visit(obj.typeref, param);
+    return super.visitNamedElement(obj, param);
+  }
+
+  @Override
+  protected Expression visitVariable(Variable obj, T param) {
+    TypeRef type = (TypeRef) visit(obj.type, param);
+    assert (type != null);
+    obj.type = type;
+    return super.visitVariable(obj, param);
+  }
+
+  @Override
+  protected Expression visitFuncReturnType(FuncReturnType obj, T param) {
+    obj.type = (TypeRef) visit(obj.type, param);
+    return super.visitFuncReturnType(obj, param);
+  }
+
+  @Override
+  protected Expression visitCompUse(CompUse obj, T param) {
+    obj.compRef = (CompRef) visit(obj.compRef, param);
+    return super.visitCompUse(obj, param);
+  }
+
+  @Override
+  protected Expression visitStateSimple(StateSimple obj, T param) {
+    obj.entryFunc = (SimpleRef<FuncProcedure>) visit(obj.entryFunc, param);
+    obj.exitFunc = (SimpleRef<FuncProcedure>) visit(obj.exitFunc, param);
+    return super.visitStateSimple(obj, param);
+  }
+
+  @Override
+  protected Expression visitStateComposite(StateComposite obj, T param) {
+    obj.entryFunc = (SimpleRef<FuncProcedure>) visit(obj.entryFunc, param);
+    obj.exitFunc = (SimpleRef<FuncProcedure>) visit(obj.exitFunc, param);
+    obj.initial = (StateRef) visit(obj.initial, param);
+    return super.visitStateComposite(obj, param);
+  }
 }

@@ -10,8 +10,8 @@ import evl.data.expression.reference.Reference;
 import evl.data.expression.reference.SimpleRef;
 import evl.data.type.Type;
 import evl.knowledge.KnowledgeBase;
+import evl.traverser.other.ExprReplacer;
 import fun.other.RawComponent;
-import fun.traverser.ExprReplacer;
 
 public class SimplifyRef extends EvlPass {
 
