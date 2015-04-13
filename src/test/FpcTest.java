@@ -20,6 +20,7 @@ package test;
 import java.io.IOException;
 
 import org.junit.Assert;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class FpcTest extends BaseTest {
@@ -45,6 +46,7 @@ public class FpcTest extends BaseTest {
   }
 
   @Test
+  @Ignore
   public void enumt() {
     test("enumt", "Enumt", "start enumt\nenumt_Red\nenumt_Green\nenumt_Blue\nend enumt\n", false);
   }

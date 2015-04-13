@@ -9,7 +9,7 @@ Time = Component
   incHour : slot();
 
 elementary
-  ltime   : iface.Time = ( hour := 0, minute := 0, second := 0 );
+  ltime   : iface.Time = [ hour := 0, minute := 0, second := 0 ];
   lticks  : R{0,TickPerSecond-1} = 0;
 
   entry

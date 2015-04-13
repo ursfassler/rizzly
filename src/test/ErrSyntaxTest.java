@@ -17,6 +17,7 @@
 
 package test;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ErrSyntaxTest extends ErrorTest {
@@ -42,15 +43,16 @@ public class ErrSyntaxTest extends ErrorTest {
 
   @Test
   public void err4() {
-    testForError("err4", "Err4", "");
+    testForError("err4", "Err4", "Name not found: C");
   }
 
   @Test
   public void err5() {
-    testForError("err5", "Err5", "");
+    testForError("err5", "Err5", "Expected value, got type");
   }
 
   @Test
+  @Ignore
   public void err6() {
     testForError("err6", "Err6", "");
   }

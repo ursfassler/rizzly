@@ -33,12 +33,12 @@ public class ArrayTest extends BaseTest {
 
   @Test
   public void copy1() {
-    compile("copy1", "Copy", true, false, false);
+    compile("copy1", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test
   public void copy2() {
-    compile("copy2", "Copy", true, false, false);
+    compile("copy2", TestSteps.COMPILE_TO_LIB, false, false);
   }
 
   @Test

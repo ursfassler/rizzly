@@ -17,6 +17,7 @@
 
 package test;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class ExampleTest extends BaseTest {
@@ -37,6 +38,7 @@ public class ExampleTest extends BaseTest {
   }
 
   @Test
+  @Ignore
   public void alarmclock() {
     compileExample("alarmclock/", "clock.Clock");
   }

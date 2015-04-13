@@ -57,11 +57,19 @@ public class ArgEvaluator extends NullTraverser<ActualTemplateArgument, ActualTe
 
   @Override
   protected ActualTemplateArgument visitNaturalType(ast.data.type.special.NaturalType obj, ActualTemplateArgument param) {
-    ast.data.expression.Number num = (ast.data.expression.Number) ExprEvaluator.evaluate((Expression) param, new Memory(), kb);
-    if (num.value.compareTo(BigInteger.ZERO) < 0) {
-      RError.err(ErrorType.Error, param.getInfo(), "Value for Natural type has to be >= 0");
+    if (param instanceof Type) {
+      RError.err(ErrorType.Error, param.getInfo(), "Expected value, got type");
+      return null;
+    } else if (param instanceof Expression) {
+      ast.data.expression.Number num = (ast.data.expression.Number) ExprEvaluator.evaluate((Expression) param, new Memory(), kb);
+      if (num.value.compareTo(BigInteger.ZERO) < 0) {
+        RError.err(ErrorType.Error, param.getInfo(), "Value for Natural type has to be >= 0");
+      }
+      return num;
+    } else {
+      RError.err(ErrorType.Fatal, param.getInfo(), "template argument not implemented: " + param.getClass().getName());
+      return null;
     }
-    return num;
   }
 
   @Override

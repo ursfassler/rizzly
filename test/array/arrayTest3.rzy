@@ -2,7 +2,7 @@ ArrayTest3 = Component
   inp : response( x: R{0,200} ):R{0,31};
 
 elementary
-  a : Array{32,R{0,31}};
+  a : Array{32,R{0,31}} = default{Array{32,R{0,31}}}();
   
   entry
     i : R{0,32} = 0;
