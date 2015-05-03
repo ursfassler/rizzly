@@ -57,9 +57,7 @@ public class CheckNames extends AstPass {
     names.addAll(getTemplateNames());
 
     CheckNamesWorker checkNames = new CheckNamesWorker();
-    for (Ast itr : tocheck) {
-      checkNames.traverse(itr, names);
-    }
+    checkNames.traverse(tocheck, names);
   }
 
   static private Set<String> getNames(Collection<? extends Named> list) {

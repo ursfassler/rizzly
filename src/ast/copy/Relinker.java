@@ -33,9 +33,7 @@ public class Relinker extends DefTraverser<Void, Map<? extends Named, ? extends 
   }
 
   static public void relink(AstList<? extends Ast> obj, Map<? extends Named, ? extends Named> map) {
-    for (Ast itr : obj) {
-      relink(itr, map);
-    }
+    INSTANCE.traverse(obj, map);
   }
 
   @Override

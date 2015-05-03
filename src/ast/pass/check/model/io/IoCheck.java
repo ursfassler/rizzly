@@ -49,9 +49,7 @@ public class IoCheck extends NullTraverser<Void, Void> {
   }
 
   public void check(Collection<? extends Ast> funcs) {
-    for (Ast func : funcs) {
-      traverse(func, null);
-    }
+    traverse(funcs, null);
   }
 
   @Override

@@ -18,6 +18,7 @@
 package ast.pass.reduction.hfsm;
 
 import ast.data.Ast;
+import ast.data.AstList;
 import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.component.hfsm.ImplHfsm;
@@ -41,18 +42,14 @@ public class TransitionRedirecter extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    for (ImplHfsm hfsm : Collector.select(ast, new IsClass(ImplHfsm.class)).castTo(ImplHfsm.class)) {
-      TransitionRedirecterWorker redirecter = new TransitionRedirecterWorker();
-      redirecter.traverse(hfsm.topstate, null);
-    }
+    TransitionRedirecterWorker redirecter = new TransitionRedirecterWorker();
+    AstList<? extends Ast> hfsm = Collector.select(ast, new IsClass(ImplHfsm.class));
+    redirecter.traverse(hfsm, null);
   }
 }
 
 class TransitionRedirecterWorker extends NullTraverser<Void, Void> {
-  final private InitStateGetter initStateGetter = new InitStateGetter();
-
-  public static void process(State top) {
-  }
+  static final private InitStateGetter initStateGetter = new InitStateGetter();
 
   @Override
   protected Void visitDefault(Ast obj, Void param) {
@@ -61,6 +58,12 @@ class TransitionRedirecterWorker extends NullTraverser<Void, Void> {
     } else {
       throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
     }
+  }
+
+  @Override
+  protected Void visitImplHfsm(ImplHfsm obj, Void param) {
+    visit(obj.topstate, null);
+    return null;
   }
 
   @Override

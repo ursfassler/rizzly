@@ -18,6 +18,7 @@
 package ast.pass.others;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 import ast.ElementInfo;
@@ -101,7 +102,7 @@ class ExprCutterWorker extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitList(AstList<? extends Ast> list, Void param) {
+  protected Void visitList(Collection<? extends Ast> list, Void param) {
     // against comodification error
     AstList<Ast> old = new AstList<Ast>();
     for (Ast itr : list) {
@@ -430,6 +431,8 @@ class Cutter extends ExprReplacer<List<Statement>> {
 
 }
 
+// TODO change to Specification
+@Deprecated
 class CallDetector extends NullTraverser<Boolean, Void> {
 
   @Override

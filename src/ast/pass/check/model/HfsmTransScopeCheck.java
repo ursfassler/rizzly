@@ -47,9 +47,7 @@ public class HfsmTransScopeCheck extends AstPass {
   public void process(Namespace ast, KnowledgeBase kb) {
     HfsmTransScopeCheckWorker check = new HfsmTransScopeCheckWorker();
     List<? extends Ast> hfsms = Collector.select(ast, new IsClass(ImplHfsm.class));
-    for (Ast hfsm : hfsms) {
-      check.traverse(hfsm, null);
-    }
+    check.traverse(hfsms, null);
   }
 
 }

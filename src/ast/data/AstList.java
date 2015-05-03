@@ -18,6 +18,7 @@
 package ast.data;
 
 import java.util.ArrayList;
+import java.util.Collection;
 
 import error.ErrorType;
 import error.RError;
@@ -28,7 +29,7 @@ public class AstList<T extends Ast> extends ArrayList<T> {
   public AstList() {
   }
 
-  public AstList(AstList<? extends T> list) {
+  public AstList(Collection<? extends T> list) {
     super(list);
   }
 

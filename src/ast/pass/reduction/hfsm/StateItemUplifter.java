@@ -22,6 +22,7 @@ import java.util.List;
 
 import ast.Designator;
 import ast.data.Ast;
+import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.component.hfsm.ImplHfsm;
 import ast.data.component.hfsm.State;
@@ -46,10 +47,9 @@ public class StateItemUplifter extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    for (Ast hfsm : Collector.select(ast, new IsClass(ImplHfsm.class))) {
-      StateItemUplifterWorker know = new StateItemUplifterWorker(kb);
-      know.traverse(hfsm, null);
-    }
+    StateItemUplifterWorker know = new StateItemUplifterWorker(kb);
+    AstList<? extends Ast> hfsm = Collector.select(ast, new IsClass(ImplHfsm.class));
+    know.traverse(hfsm, null);
   }
 }
 
@@ -71,6 +71,7 @@ class StateItemUplifterWorker extends NullTraverser<Void, Designator> {
 
   @Override
   protected Void visitImplHfsm(ImplHfsm obj, Designator param) {
+    func.clear();
     visit(obj.topstate, new Designator());
     obj.topstate.item.addAll(func);
     return null;

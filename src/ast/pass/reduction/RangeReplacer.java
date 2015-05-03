@@ -24,6 +24,7 @@ import java.util.Map;
 import ast.ElementInfo;
 import ast.copy.Relinker;
 import ast.data.Ast;
+import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.type.Type;
 import ast.data.type.base.RangeType;
@@ -51,9 +52,8 @@ public class RangeReplacer extends AstPass {
   public void process(Namespace ast, KnowledgeBase kb) {
 
     RangeReplacerWorker changer = new RangeReplacerWorker();
-    for (Ast old : Collector.select(ast, new IsClass(Type.class))) {
-      changer.traverse(old, null);
-    }
+    AstList<? extends Ast> oldTypes = Collector.select(ast, new IsClass(Type.class));
+    changer.traverse(oldTypes, null);
 
     ast.children.addAll(changer.getSigned().values());
     ast.children.addAll(changer.getUnsigned().values());

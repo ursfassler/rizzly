@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ast.data.Ast;
+import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.component.hfsm.ImplHfsm;
 import ast.data.component.hfsm.State;
@@ -45,10 +46,9 @@ public class TransitionUplifter extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    for (Ast hfsm : Collector.select(ast, new IsClass(ImplHfsm.class))) {
-      TransitionUplifterWorker know = new TransitionUplifterWorker();
-      know.traverse(hfsm, null);
-    }
+    TransitionUplifterWorker know = new TransitionUplifterWorker();
+    AstList<? extends Ast> hfsm = Collector.select(ast, new IsClass(ImplHfsm.class));
+    know.traverse(hfsm, null);
   }
 
 }

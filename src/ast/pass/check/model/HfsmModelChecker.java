@@ -45,11 +45,9 @@ public class HfsmModelChecker extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    AstList<? extends Ast> hfsms = Collector.select(ast, new IsClass(ImplHfsm.class));
     HfsmModelCheckerWorker check = new HfsmModelCheckerWorker();
-    for (Ast hfsm : hfsms) {
-      check.traverse(hfsm, null);
-    }
+    AstList<? extends Ast> hfsms = Collector.select(ast, new IsClass(ImplHfsm.class));
+    check.traverse(hfsms, null);
   }
 }
 

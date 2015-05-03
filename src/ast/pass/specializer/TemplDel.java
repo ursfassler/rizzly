@@ -17,11 +17,11 @@
 
 package ast.pass.specializer;
 
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
 import ast.data.Ast;
-import ast.data.AstList;
 import ast.data.template.Template;
 import ast.traverser.DefTraverser;
 import error.ErrorType;
@@ -38,7 +38,7 @@ public class TemplDel extends DefTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitList(AstList<? extends Ast> list, Void param) {
+  protected Void visitList(Collection<? extends Ast> list, Void param) {
     Set<Template> remove = new HashSet<Template>();
     for (Ast ast : list) {
       if (ast instanceof Template) {

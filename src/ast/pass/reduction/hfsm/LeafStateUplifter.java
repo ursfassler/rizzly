@@ -48,12 +48,10 @@ public class LeafStateUplifter extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    for (Ast hfsm : Collector.select(ast, new IsClass(ImplHfsm.class))) {
-      LeafStateUplifterWorker know = new LeafStateUplifterWorker(kb);
-      know.traverse(hfsm, null);
-    }
+    LeafStateUplifterWorker know = new LeafStateUplifterWorker(kb);
+    AstList<? extends Ast> hfsm = Collector.select(ast, new IsClass(ImplHfsm.class));
+    know.traverse(hfsm, null);
   }
-
 }
 
 class LeafStateUplifterWorker extends NullTraverser<Void, Designator> {
@@ -70,6 +68,7 @@ class LeafStateUplifterWorker extends NullTraverser<Void, Designator> {
 
   @Override
   protected Void visitImplHfsm(ImplHfsm obj, Designator param) {
+    states.clear();
     visit(obj.topstate, new Designator());
     obj.topstate.item.addAll(states);
     return null;

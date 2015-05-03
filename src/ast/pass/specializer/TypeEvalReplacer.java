@@ -17,6 +17,8 @@
 
 package ast.pass.specializer;
 
+import java.util.Collection;
+
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
@@ -42,7 +44,7 @@ class TypeEvalReplacer extends DefTraverser<AstList<ActualTemplateArgument>, Voi
   }
 
   @Override
-  protected AstList<ActualTemplateArgument> visitList(AstList<? extends Ast> list, Void param) {
+  protected AstList<ActualTemplateArgument> visitList(Collection<? extends Ast> list, Void param) {
     for (Ast ast : new AstList<Ast>(list)) {
       visit(ast, param);
     }

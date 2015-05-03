@@ -37,9 +37,7 @@ public class DepCollector extends DefTraverser<Void, Void> {
 
   public static Set<Ast> process(Collection<? extends Ast> pubfunc) {
     DepCollector collector = new DepCollector();
-    for (Ast func : pubfunc) {
-      collector.traverse(func, null);
-    }
+    collector.traverse(pubfunc, null);
     return collector.visited;
   }
 

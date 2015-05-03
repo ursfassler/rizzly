@@ -31,9 +31,7 @@ public class Collector {
 
   static public AstList<? extends Ast> select(AstList<? extends Ast> roots, Specification spec) {
     CollectorTraverser traverser = new CollectorTraverser(spec);
-    for (Ast root : roots) {
-      traverser.traverse(root, null);
-    }
+    traverser.traverse(roots, null);
     return traverser.getMatched();
   }
 }

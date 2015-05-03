@@ -17,6 +17,8 @@
 
 package ast.traverser;
 
+import java.util.Collection;
+
 import ast.data.Ast;
 import ast.data.AstBase;
 import ast.data.AstList;
@@ -175,11 +177,15 @@ import ast.data.variable.Variable;
 
 public abstract class Traverser<R, P> {
 
+  public R traverse(Collection<? extends Ast> list, P param) {
+    return visitList(list, param);
+  }
+
   public R traverse(Ast obj, P param) {
     return visit(obj, param);
   }
 
-  protected R visitList(AstList<? extends Ast> list, P param) {
+  protected R visitList(Collection<? extends Ast> list, P param) {
     for (Ast itr : new AstList<Ast>(list)) {
       visit(itr, param);
     }

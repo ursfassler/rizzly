@@ -17,8 +17,9 @@
 
 package ast.specification;
 
+import java.util.Collection;
+
 import ast.data.Ast;
-import ast.data.AstList;
 import ast.data.component.composition.CompUse;
 import ast.data.expression.BoolValue;
 import ast.data.expression.Number;
@@ -60,7 +61,7 @@ class SimpleGetter extends NullTraverser<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitList(AstList<? extends Ast> list, Void param) {
+  protected Boolean visitList(Collection<? extends Ast> list, Void param) {
     for (Ast ast : list) {
       if (!visit(ast, param)) {
         return false;
