@@ -17,18 +17,17 @@
 
 package ast.pass.others;
 
-import ast.Designator;
 import ast.data.Ast;
 import ast.data.AstList;
-import ast.data.Named;
 import ast.data.Namespace;
-import ast.data.component.elementary.ImplElementary;
-import ast.data.component.hfsm.State;
 import ast.data.type.Type;
 import ast.knowledge.KnowledgeBase;
+import ast.manipulator.Manipulate;
+import ast.manipulator.PathPrefixer;
 import ast.pass.AstPass;
-import ast.specification.TypeFilter;
-import ast.traverser.DefTraverser;
+import ast.repository.Collector;
+import ast.specification.IsClass;
+import ast.specification.Specification;
 
 /**
  * Moves all types to the top level
@@ -40,61 +39,11 @@ public class TypeUplift extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    AstList<Type> newTypes = new AstList<Type>();
-    TypeUpliftWorker worker = new TypeUpliftWorker(newTypes);
-    for (Ast itm : ast.children) {
-      if (!(itm instanceof Type)) {
-        worker.visit(itm, new Designator());
-      }
-    }
-    ast.children.addAll(newTypes);
+    Specification type = new IsClass(Type.class);
+    PathPrefixer.prefix(ast.children, type);
+
+    AstList<? extends Ast> types = Collector.select(ast, type);
+    Manipulate.remove(ast, type);
+    ast.children.addAll(types);
   }
-}
-
-class TypeUpliftWorker extends DefTraverser<Void, Designator> {
-  final private AstList<Type> types;
-
-  public TypeUpliftWorker(AstList<Type> types) {
-    super();
-    this.types = types;
-  }
-
-  @Override
-  protected Void visit(Ast obj, Designator param) {
-    if (obj instanceof Named) {
-      param = new Designator(param, ((Named) obj).name);
-    }
-    return super.visit(obj, param);
-  }
-
-  @Override
-  protected Void visitType(Type obj, Designator param) {
-    obj.name = param.toString();
-    types.add(obj);
-    return null;
-  }
-
-  @Override
-  protected Void visitImplElementary(ImplElementary obj, Designator param) {
-    super.visitImplElementary(obj, param);
-    obj.type.clear();
-    return null;
-  }
-
-  @Override
-  protected Void visitState(State obj, Designator param) {
-    super.visitState(obj, param);
-    AstList<Type> types = TypeFilter.select(obj.item, Type.class);
-    obj.item.removeAll(types);
-    return null;
-  }
-
-  @Override
-  protected Void visitNamespace(Namespace obj, Designator param) {
-    super.visitNamespace(obj, param);
-    AstList<Type> types = TypeFilter.select(obj.children, Type.class);
-    obj.children.removeAll(types);
-    return null;
-  }
-
 }

@@ -17,6 +17,8 @@
 
 package ast.manipulator;
 
+import java.util.Collection;
+
 import ast.Designator;
 import ast.data.Ast;
 import ast.data.Named;
@@ -27,6 +29,11 @@ public class PathPrefixer {
   static public void prefix(Ast root, Specification spec) {
     PathPrefixerTraverser traverser = new PathPrefixerTraverser(spec);
     traverser.traverse(root, new Designator());
+  }
+
+  static public void prefix(Collection<Ast> roots, Specification spec) {
+    PathPrefixerTraverser traverser = new PathPrefixerTraverser(spec);
+    traverser.traverse(roots, new Designator());
   }
 }
 

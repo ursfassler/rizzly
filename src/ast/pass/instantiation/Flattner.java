@@ -17,97 +17,43 @@
 
 package ast.pass.instantiation;
 
-import ast.Designator;
+import java.util.Collection;
+import java.util.HashSet;
+
 import ast.data.Ast;
 import ast.data.AstList;
-import ast.data.Named;
 import ast.data.Namespace;
-import ast.data.component.composition.Queue;
 import ast.data.function.Function;
 import ast.data.type.Type;
 import ast.data.variable.Constant;
 import ast.data.variable.StateVariable;
 import ast.knowledge.KnowledgeBase;
+import ast.manipulator.PathPrefixer;
 import ast.pass.AstPass;
-import ast.specification.TypeFilter;
-import ast.traverser.DefTraverser;
+import ast.repository.Collector;
+import ast.specification.IsClass;
+import ast.specification.OrSpec;
+import ast.specification.Specification;
 
 public class Flattner extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    NamespaceReduction reducer = new NamespaceReduction();
-    for (Ast itr : ast.children) {
-      reducer.visit(itr, new Designator());
-    }
+    Specification spec = extractSpec();
 
-    AstList<Ast> flat = reducer.getList();
-
+    PathPrefixer.prefix(ast.children, spec);
+    AstList<? extends Ast> items = Collector.select(ast, spec);
     ast.children.clear();
-
-    ast.children.addAll(TypeFilter.select(flat, Function.class));
-    ast.children.addAll(TypeFilter.select(flat, StateVariable.class));
-    ast.children.addAll(TypeFilter.select(flat, Constant.class));
-    ast.children.addAll(TypeFilter.select(flat, Type.class));
+    ast.children.addAll(items);
   }
 
-}
-
-// reduces names of named objects in named lists
-class NamespaceReduction extends DefTraverser<Void, Designator> {
-  final private AstList<Ast> list = new AstList<Ast>();
-
-  public AstList<Ast> getList() {
-    return list;
+  private Specification extractSpec() {
+    Collection<Specification> orcol = new HashSet<Specification>();
+    orcol.add(new IsClass(Function.class));
+    orcol.add(new IsClass(StateVariable.class));
+    orcol.add(new IsClass(Constant.class));
+    orcol.add(new IsClass(Type.class));
+    Specification spec = new OrSpec(orcol);
+    return spec;
   }
-
-  private void addToList(Designator param, Named itr) {
-    if (param.size() > 0) {
-      itr.name = param.toString(Designator.NAME_SEP);
-    }
-    list.add(itr);
-  }
-
-  @Override
-  protected Void visit(Ast obj, Designator param) {
-    if (obj instanceof Named) {
-      String name = ((Named) obj).name;
-
-      // assert (name.length() > 0);
-      param = new Designator(param, name);
-    }
-    super.visit(obj, param);
-    return null;
-  }
-
-  @Override
-  protected Void visitFunction(Function obj, Designator param) {
-    addToList(param, obj);
-    return null;
-  }
-
-  @Override
-  protected Void visitStateVariable(StateVariable obj, Designator param) {
-    addToList(param, obj);
-    return null;
-  }
-
-  @Override
-  protected Void visitConstant(Constant obj, Designator param) {
-    addToList(param, obj);
-    return null;
-  }
-
-  @Override
-  protected Void visitType(Type obj, Designator param) {
-    addToList(param, obj);
-    return null;
-  }
-
-  @Override
-  protected Void visitQueue(Queue obj, Designator param) {
-    addToList(param, obj);
-    return null;
-  }
-
 }
