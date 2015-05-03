@@ -17,30 +17,18 @@
 
 package ast.pass;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import ast.data.Namespace;
 import ast.knowledge.KnowledgeBase;
+import ast.specification.AlwaysTrueSpec;
+import ast.specification.Specification;
 
 public abstract class AstPass {
-  /*
-   * Condition may be something like NoClass( Integer )
-   * 
-   * or TypeChecked, Linked, Reduced
-   * 
-   * or MostClass( Namespace, 1 )
-   */
-
-  protected final Set<Condition> precondition = new HashSet<Condition>();
-  protected final Set<Condition> postcondition = new HashSet<Condition>();
-
-  public Set<Condition> getPrecondition() {
-    return precondition;
+  public Specification getPrecondition() {
+    return new AlwaysTrueSpec();
   }
 
-  public Set<Condition> getPostcondition() {
-    return postcondition;
+  public Specification getPostcondition() {
+    return new AlwaysTrueSpec();
   }
 
   public abstract void process(Namespace ast, KnowledgeBase kb);

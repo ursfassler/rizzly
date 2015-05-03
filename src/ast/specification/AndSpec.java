@@ -17,21 +17,35 @@
 
 package ast.specification;
 
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
+
 import ast.data.Ast;
 
 public class AndSpec extends Specification {
-  final private Specification leftSpec;
-  final private Specification rightSpec;
+  final private Set<Specification> spec;
 
   public AndSpec(Specification leftSpec, Specification rightSpec) {
     super();
-    this.leftSpec = leftSpec;
-    this.rightSpec = rightSpec;
+    spec = new HashSet<Specification>();
+    spec.add(leftSpec);
+    spec.add(rightSpec);
+  }
+
+  public AndSpec(Collection<Specification> spec) {
+    super();
+    this.spec = new HashSet<Specification>(spec);
   }
 
   @Override
   public boolean isSatisfiedBy(Ast candidate) {
-    return leftSpec.isSatisfiedBy(candidate) && rightSpec.isSatisfiedBy(candidate);
+    for (Specification itr : spec) {
+      if (!itr.isSatisfiedBy(candidate)) {
+        return false;
+      }
+    }
+    return true;
   }
 
 }

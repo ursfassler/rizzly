@@ -15,29 +15,15 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass;
+package ast.specification;
 
-import ast.data.AstBase;
-import ast.data.Namespace;
-import ast.knowledge.KnowledgeBase;
-import ast.repository.Match;
-import ast.specification.IsClass;
+import ast.data.Ast;
 
-public class NoItem extends Condition {
-  final private IsClass spec;
-
-  public NoItem(Class<? extends AstBase> type) {
-    super();
-    this.spec = new IsClass(type);
-  }
+public class AlwaysTrueSpec extends Specification {
 
   @Override
-  public boolean check(Namespace root, KnowledgeBase kb) {
-    return Match.hasNoItem(root, spec);
+  public boolean isSatisfiedBy(Ast candidate) {
+    return true;
   }
 
-  @Override
-  public String getName() {
-    return "NoItem<" + spec.kind.getName() + ">";
-  }
 }

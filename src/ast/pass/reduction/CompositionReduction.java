@@ -18,7 +18,9 @@
 package ast.pass.reduction;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -66,17 +68,23 @@ import ast.data.variable.FuncVariable;
 import ast.data.variable.Variable;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.pass.NoItem;
+import ast.specification.AndSpec;
+import ast.specification.IsClass;
+import ast.specification.Specification;
 import ast.traverser.NullTraverser;
 import error.ErrorType;
 import error.RError;
 
 public class CompositionReduction extends AstPass {
-  public CompositionReduction() {
-    postcondition.add(new NoItem(Connection.class));
-    postcondition.add(new NoItem(EndpointSelf.class));
-    postcondition.add(new NoItem(EndpointSub.class));
-    postcondition.add(new NoItem(ImplComposition.class));
+
+  @Override
+  public Specification getPostcondition() {
+    Collection<Specification> specset = new HashSet<Specification>();
+    specset.add(new IsClass(Connection.class).not());
+    specset.add(new IsClass(EndpointSelf.class).not());
+    specset.add(new IsClass(EndpointSub.class).not());
+    specset.add(new IsClass(ImplComposition.class).not());
+    return new AndSpec(specset);
   }
 
   @Override

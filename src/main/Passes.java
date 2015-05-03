@@ -28,7 +28,6 @@ import ast.data.Namespace;
 import ast.debug.DebugPrinter;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.pass.Condition;
 import ast.pass.check.model.Modelcheck;
 import ast.pass.check.sanity.Sanitycheck;
 import ast.pass.check.type.Typecheck;
@@ -269,17 +268,13 @@ public class Passes {
   }
 
   public static void process(PassItem item, Designator prefix, DebugPrinter dp, Namespace ast, KnowledgeBase kb) {
-    for (Condition cond : item.pass.getPrecondition()) {
-      RError.ass(cond.check(ast, kb), item.getName() + ": precondition does not hold: " + cond.getName());
-    }
+    RError.ass(item.pass.getPrecondition().isSatisfiedBy(ast), item.getName() + ": precondition does not hold");
 
     prefix = new Designator(prefix, item.getName());
     item.pass.process(ast, kb);
     dp.print(prefix.toString("."));
 
-    for (Condition cond : item.pass.getPostcondition()) {
-      RError.ass(cond.check(ast, kb), item.getName() + ": postcondition does not hold: " + cond.getName());
-    }
+    RError.ass(item.pass.getPostcondition().isSatisfiedBy(ast), item.getName() + ": postcondition does not hold");
   }
 
   @SuppressWarnings("unused")
