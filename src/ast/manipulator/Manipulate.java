@@ -15,7 +15,7 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.repository;
+package ast.manipulator;
 
 import java.util.Collection;
 
@@ -44,12 +44,6 @@ class Remover extends DefTraverser<Void, Void> {
   protected Void visitList(Collection<? extends Ast> list, Void param) {
     list.removeAll(List.select(list, spec));
     return super.visitList(list, param);
-  }
-
-  @Override
-  protected Void visit(Ast obj, Void param) {
-    assert (!spec.isSatisfiedBy(obj));
-    return super.visit(obj, param);
   }
 
 }

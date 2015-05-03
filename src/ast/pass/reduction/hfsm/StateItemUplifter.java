@@ -17,25 +17,27 @@
 
 package ast.pass.reduction.hfsm;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Collection;
+import java.util.HashSet;
 
-import ast.Designator;
-import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.component.hfsm.ImplHfsm;
-import ast.data.component.hfsm.State;
+import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateContent;
+import ast.data.component.hfsm.StateSimple;
 import ast.data.function.header.FuncFunction;
 import ast.data.function.header.FuncProcedure;
 import ast.data.type.Type;
 import ast.data.variable.ConstPrivate;
 import ast.knowledge.KnowledgeBase;
+import ast.manipulator.Manipulate;
+import ast.manipulator.PathPrefixer;
 import ast.pass.AstPass;
 import ast.repository.Collector;
 import ast.specification.IsClass;
-import ast.traverser.NullTraverser;
+import ast.specification.OrSpec;
+import ast.specification.Specification;
 
 /**
  * Moves items of all states to the top-state.
@@ -44,82 +46,41 @@ import ast.traverser.NullTraverser;
  *
  */
 public class StateItemUplifter extends AstPass {
+  private final static Specification contentSpec = makeContentSpec();
+  private final static Specification leafStateSpec = new IsClass(StateSimple.class);
+  private final static Specification compStateSpec = new IsClass(StateComposite.class);
+  private final static Specification renameSpec = contentSpec.or(leafStateSpec);
+
+  static private Specification makeContentSpec() {
+    Collection<Specification> orSpecs = new HashSet<Specification>();
+    orSpecs.add(new IsClass(FuncProcedure.class));
+    orSpecs.add(new IsClass(FuncFunction.class));
+    orSpecs.add(new IsClass(Type.class));
+    orSpecs.add(new IsClass(ConstPrivate.class));
+    return new OrSpec(orSpecs);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    StateItemUplifterWorker know = new StateItemUplifterWorker(kb);
-    AstList<? extends Ast> hfsm = Collector.select(ast, new IsClass(ImplHfsm.class));
-    know.traverse(hfsm, null);
-  }
-}
-
-class StateItemUplifterWorker extends NullTraverser<Void, Designator> {
-  final private List<StateContent> func = new ArrayList<StateContent>();
-
-  public StateItemUplifterWorker(KnowledgeBase kb) {
-    super();
-  }
-
-  @Override
-  protected Void visitDefault(Ast obj, Designator param) {
-    if (obj instanceof StateContent) {
-      return null;
-    } else {
-      throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+    AstList<ImplHfsm> hfsmList = Collector.select(ast, new IsClass(ImplHfsm.class)).castTo(ImplHfsm.class);
+    for (ImplHfsm hfsm : hfsmList) {
+      process(hfsm);
     }
   }
 
-  @Override
-  protected Void visitImplHfsm(ImplHfsm obj, Designator param) {
-    func.clear();
-    visit(obj.topstate, new Designator());
-    obj.topstate.item.addAll(func);
-    return null;
+  private void process(ImplHfsm hfsm) {
+    PathPrefixer.prefix(hfsm, renameSpec);
+
+    moveToTop(hfsm.topstate, contentSpec);
+    moveToTop(hfsm.topstate, leafStateSpec);
+
+    Manipulate.remove(hfsm.topstate, compStateSpec);
   }
 
-  @Override
-  protected Void visitState(State obj, Designator param) {
-    param = new Designator(param, obj.name);
-    // visit(obj.getEntryCode(), param);//TODO correct? It is no longer a
-    // function and should not exist at this point
-    // visit(obj.getExitCode(), param);
-    visitList(obj.item, param);
-
-    obj.item.removeAll(func);
-
-    return null;
-  }
-
-  @Override
-  protected Void visitFuncProcedure(FuncProcedure obj, Designator param) {
-    param = new Designator(param, obj.name);
-    obj.name = param.toString(Designator.NAME_SEP);
-    func.add(obj);
-    return null;
-  }
-
-  @Override
-  protected Void visitFuncFunction(FuncFunction obj, Designator param) {
-    param = new Designator(param, obj.name);
-    obj.name = param.toString(Designator.NAME_SEP);
-    func.add(obj);
-    return null;
-  }
-
-  @Override
-  protected Void visitType(Type obj, Designator param) {
-    param = new Designator(param, obj.name);
-    obj.name = param.toString(Designator.NAME_SEP);
-    func.add(obj);
-    return null;
-  }
-
-  @Override
-  protected Void visitConstPrivate(ConstPrivate obj, Designator param) {
-    param = new Designator(param, obj.name);
-    obj.name = param.toString(Designator.NAME_SEP);
-    func.add(obj);
-    return null;
+  private void moveToTop(StateComposite top, Specification spec) {
+    AstList<StateContent> content = Collector.select(top, spec).castTo(StateContent.class);
+    Manipulate.remove(top, spec);
+    top.item.addAll(content);
   }
 
 }

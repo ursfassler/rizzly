@@ -29,8 +29,6 @@ public class HfsmReduction extends GroupPass {
     append(new StateVarReplacer());
     append(new EntryExitUpdater());
     append(new StateItemUplifter());
-    append(new TransitionUplifter());
-    append(new LeafStateUplifter());
     append(new FsmReduction());
   }
 
