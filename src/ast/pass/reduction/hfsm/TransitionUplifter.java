@@ -17,23 +17,16 @@
 
 package ast.pass.reduction.hfsm;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.component.hfsm.ImplHfsm;
-import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.StateComposite;
-import ast.data.component.hfsm.StateContent;
 import ast.data.component.hfsm.Transition;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.Collector;
+import ast.repository.Manipulate;
 import ast.specification.IsClass;
-import ast.specification.TypeFilter;
-import ast.traverser.NullTraverser;
 
 /**
  * Moves all transitions of all states to the top-state.
@@ -46,44 +39,18 @@ public class TransitionUplifter extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    TransitionUplifterWorker know = new TransitionUplifterWorker();
-    AstList<? extends Ast> hfsm = Collector.select(ast, new IsClass(ImplHfsm.class));
-    know.traverse(hfsm, null);
-  }
-
-}
-
-class TransitionUplifterWorker extends NullTraverser<Void, List<Transition>> {
-
-  @Override
-  protected Void visitDefault(Ast obj, List<Transition> param) {
-    if (obj instanceof StateContent) {
-      return null;
-    } else {
-      throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+    AstList<ImplHfsm> hfsmList = Collector.select(ast, new IsClass(ImplHfsm.class)).castTo(ImplHfsm.class);
+    for (ImplHfsm hfsm : hfsmList) {
+      StateComposite topstate = hfsm.topstate;
+      moveAllTransitionToTop(topstate);
     }
   }
 
-  @Override
-  protected Void visitImplHfsm(ImplHfsm obj, List<Transition> param) {
-    List<Transition> list = new ArrayList<Transition>();
-    visit(obj.topstate, list);
-    obj.topstate.item.addAll(list);
-    return null;
-  }
-
-  @Override
-  protected Void visitStateComposite(StateComposite obj, List<Transition> param) {
-    visitList(obj.item, param);
-    return null;
-  }
-
-  @Override
-  protected Void visitState(State obj, List<Transition> param) {
-    List<Transition> transList = TypeFilter.select(obj.item, Transition.class);
-    param.addAll(transList);
-    obj.item.removeAll(transList);
-    return super.visitState(obj, param);
+  private void moveAllTransitionToTop(StateComposite topstate) {
+    final IsClass isTransition = new IsClass(Transition.class);
+    AstList<Transition> transitions = Collector.select(topstate, isTransition).castTo(Transition.class);
+    Manipulate.remove(topstate, isTransition);
+    topstate.item.addAll(transitions);
   }
 
 }
