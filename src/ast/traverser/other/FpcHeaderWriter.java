@@ -50,6 +50,10 @@ import ast.doc.StreamWriter;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.check.type.ExpressionTypecheck;
 import ast.pass.others.CWriter;
+import ast.specification.ExternalFunction;
+import ast.specification.Filter;
+import ast.specification.PublicFunction;
+import ast.specification.TypeFilter;
 import ast.traverser.NullTraverser;
 import error.ErrorType;
 import error.RError;
@@ -69,22 +73,6 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
   @Override
   protected Void visitNamespace(Namespace obj, StreamWriter param) {
-    AstList<Function> funcProvided = new AstList<Function>();
-    AstList<Function> funcRequired = new AstList<Function>();
-
-    for (Function func : ClassGetter.filter(Function.class, obj.children)) {
-      switch (func.property) {
-        case Private:
-          break;
-        case Public:
-          funcProvided.add(func);
-          break;
-        case External:
-          funcRequired.add(func);
-          break;
-      }
-    }
-
     param.wr("unit ");
     param.wr(obj.name);
     param.wr(";");
@@ -95,7 +83,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.nl();
     param.nl();
 
-    List<Type> types = ClassGetter.filter(Type.class, obj.children);
+    List<Type> types = TypeFilter.select(obj.children, Type.class);
 
     if (!types.isEmpty() && !((types.size() == 1) && (types.get(0) instanceof VoidType))) {
       param.wr("type");
@@ -138,6 +126,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
     param.nl();
 
+    AstList<Ast> funcProvided = Filter.select(obj.children, new PublicFunction());
     visitList(funcProvided, param);
     param.nl();
 
@@ -146,6 +135,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.wr("please provide the following functions:");
     param.nl();
     param.nl();
+    AstList<Ast> funcRequired = Filter.select(obj.children, new ExternalFunction());
     visitList(funcRequired, param);
     param.wr("}");
     param.nl();

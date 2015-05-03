@@ -37,6 +37,10 @@ public class AstList<T extends Ast> extends ArrayList<T> {
     return super.add(item);
   }
 
+  public <C extends Ast> AstList<C> castTo(Class<C> kind) {
+    return new AstList<C>((AstList<? extends C>) this);
+  }
+
   public Named findFirst(String name) {
     for (Ast itr : this) {
       if (itr instanceof Named) {
