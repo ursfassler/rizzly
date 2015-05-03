@@ -17,30 +17,24 @@
 
 package ast.pass.optimize;
 
-import java.util.HashSet;
 import java.util.Set;
 
 import ast.data.Ast;
+import ast.data.AstList;
 import ast.data.Namespace;
-import ast.data.function.Function;
-import ast.data.function.FunctionProperty;
 import ast.doc.SimpleGraph;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.other.ClassGetter;
+import ast.repository.Collector;
+import ast.specification.ExternalFunction;
+import ast.specification.PublicFunction;
 import ast.traverser.other.DepGraph;
 
 public class RemoveUnused extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    Set<Function> roots = new HashSet<Function>();
-
-    for (Function func : ClassGetter.getRecursive(Function.class, ast)) {
-      if ((func.property == FunctionProperty.Public) || (func.property == FunctionProperty.External)) {
-        roots.add(func);
-      }
-    }
+    AstList<? extends Ast> roots = Collector.select(ast, new PublicFunction().or(new ExternalFunction()));
 
     SimpleGraph<Ast> g = DepGraph.build(roots);
 

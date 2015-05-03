@@ -30,8 +30,10 @@ import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateSimple;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.repository.Collector;
+import ast.specification.IsClass;
+import ast.specification.TypeFilter;
 import ast.traverser.NullTraverser;
-import ast.traverser.other.ClassGetter;
 
 /**
  * Moves all leaf-states up. In the end, the top state only has former leaf states a children.
@@ -46,7 +48,7 @@ public class LeafStateUplifter extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    for (ImplHfsm hfsm : ClassGetter.getRecursive(ImplHfsm.class, ast)) {
+    for (Ast hfsm : Collector.select(ast, new IsClass(ImplHfsm.class))) {
       LeafStateUplifterWorker know = new LeafStateUplifterWorker(kb);
       know.traverse(hfsm, null);
     }
@@ -82,7 +84,7 @@ class LeafStateUplifterWorker extends NullTraverser<Void, Designator> {
 
   @Override
   protected Void visitStateComposite(StateComposite obj, Designator param) {
-    AstList<State> children = ClassGetter.filter(State.class, obj.item);
+    AstList<State> children = TypeFilter.select(obj.item, State.class);
     visitList(children, param);
     obj.item.removeAll(children);
     return null;

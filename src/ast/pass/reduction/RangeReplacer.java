@@ -33,8 +33,9 @@ import ast.data.type.out.UIntType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.pass.check.type.ExpressionTypecheck;
+import ast.repository.Collector;
+import ast.specification.IsClass;
 import ast.traverser.NullTraverser;
-import ast.traverser.other.ClassGetter;
 import error.ErrorType;
 import error.RError;
 
@@ -50,7 +51,7 @@ public class RangeReplacer extends AstPass {
   public void process(Namespace ast, KnowledgeBase kb) {
 
     RangeReplacerWorker changer = new RangeReplacerWorker();
-    for (Type old : ClassGetter.getRecursive(Type.class, ast)) {
+    for (Ast old : Collector.select(ast, new IsClass(Type.class))) {
       changer.traverse(old, null);
     }
 
@@ -67,9 +68,10 @@ class RangeReplacerWorker extends NullTraverser<Void, Void> {
   private final Map<Integer, UIntType> unsigned = new HashMap<Integer, UIntType>();
   private final Map<RangeType, Type> map = new HashMap<RangeType, Type>();
   private final int allowedByteSizes[] = { 1, 2, 4, 8 }; // TODO make a
-                                                         // parameter (is
-                                                         // probably target
-                                                         // specific)
+
+  // parameter (is
+  // probably target
+  // specific)
 
   public Map<Integer, SIntType> getSigned() {
     return signed;

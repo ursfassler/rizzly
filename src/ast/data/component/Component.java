@@ -28,7 +28,7 @@ import ast.data.function.header.FuncQuery;
 import ast.data.function.header.FuncResponse;
 import ast.data.function.header.FuncSignal;
 import ast.data.function.header.FuncSlot;
-import ast.traverser.other.ClassGetter;
+import ast.specification.TypeFilter;
 
 abstract public class Component extends Named {
   public Queue queue;
@@ -44,13 +44,13 @@ abstract public class Component extends Named {
     AstList<InterfaceFunction> ret = new AstList<InterfaceFunction>();
     switch (dir) {
       case in: {
-        ret.addAll(ClassGetter.filter(FuncResponse.class, iface));
-        ret.addAll(ClassGetter.filter(FuncSlot.class, iface));
+        ret.addAll(TypeFilter.select(iface, FuncResponse.class));
+        ret.addAll(TypeFilter.select(iface, FuncSlot.class));
         break;
       }
       case out: {
-        ret.addAll(ClassGetter.filter(FuncQuery.class, iface));
-        ret.addAll(ClassGetter.filter(FuncSignal.class, iface));
+        ret.addAll(TypeFilter.select(iface, FuncQuery.class));
+        ret.addAll(TypeFilter.select(iface, FuncSignal.class));
         break;
       }
       default:

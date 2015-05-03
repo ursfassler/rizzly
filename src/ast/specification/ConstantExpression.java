@@ -35,7 +35,7 @@ import ast.traverser.NullTraverser;
 import error.ErrorType;
 import error.RError;
 
-public class ConstantExpression implements Specification {
+public class ConstantExpression extends Specification {
   static public final ConstantExpression INSTANCE = new ConstantExpression();
   static private final ConstTraverser ct = new ConstTraverser();
 

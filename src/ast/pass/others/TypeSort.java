@@ -32,14 +32,15 @@ import ast.data.type.Type;
 import ast.doc.SimpleGraph;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.repository.Collector;
+import ast.specification.IsClass;
 import ast.traverser.DefTraverser;
-import ast.traverser.other.ClassGetter;
 
 public class TypeSort extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    List<Type> types = ClassGetter.getRecursive(Type.class, ast);
+    List<Type> types = Collector.select(ast, new IsClass(Type.class)).castTo(Type.class);
     assert (ast.children.containsAll(types));
 
     toposort(types);

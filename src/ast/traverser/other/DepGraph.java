@@ -17,7 +17,7 @@
 
 package ast.traverser.other;
 
-import java.util.Set;
+import java.util.Collection;
 
 import ast.data.Ast;
 import ast.data.expression.reference.Reference;
@@ -35,7 +35,7 @@ public class DepGraph extends DefTraverser<Void, Ast> {
     return depGraph.g;
   }
 
-  public static SimpleGraph<Ast> build(Set<? extends Ast> roots) {
+  public static SimpleGraph<Ast> build(Collection<? extends Ast> roots) {
     DepGraph depGraph = new DepGraph();
     for (Ast itr : roots) {
       depGraph.traverse(itr, itr);

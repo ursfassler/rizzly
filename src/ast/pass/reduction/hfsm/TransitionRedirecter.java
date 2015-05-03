@@ -27,8 +27,9 @@ import ast.data.component.hfsm.Transition;
 import ast.data.expression.reference.SimpleRef;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.repository.Collector;
+import ast.specification.IsClass;
 import ast.traverser.NullTraverser;
-import ast.traverser.other.ClassGetter;
 
 /**
  * Sets the destination of a transition to the initial substate if the destination is a composite state
@@ -40,7 +41,7 @@ public class TransitionRedirecter extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    for (ImplHfsm hfsm : ClassGetter.getRecursive(ImplHfsm.class, ast)) {
+    for (ImplHfsm hfsm : Collector.select(ast, new IsClass(ImplHfsm.class)).castTo(ImplHfsm.class)) {
       TransitionRedirecterWorker redirecter = new TransitionRedirecterWorker();
       redirecter.traverse(hfsm.topstate, null);
     }

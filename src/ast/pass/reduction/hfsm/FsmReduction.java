@@ -68,8 +68,8 @@ import ast.knowledge.KnowBaseItem;
 import ast.knowledge.KnowLlvmLibrary;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.specification.TypeFilter;
 import ast.traverser.NullTraverser;
-import ast.traverser.other.ClassGetter;
 import error.ErrorType;
 import error.RError;
 
@@ -175,7 +175,7 @@ class Reduction {
     dict.traverse(obj.topstate, null);
 
     // create event handler
-    for (FuncResponse func : ClassGetter.filter(FuncResponse.class, elem.iface)) {
+    for (FuncResponse func : TypeFilter.select(elem.iface, FuncResponse.class)) {
       assert (func.body.statements.isEmpty());
       Statement code = addQueryCode(enumMap.keySet(), enumMap, states, stateVariable, func, func.param);
       Block bbl = new Block(info);
@@ -183,7 +183,7 @@ class Reduction {
       func.body = bbl;
     }
 
-    for (FuncSlot func : ClassGetter.filter(FuncSlot.class, elem.iface)) {
+    for (FuncSlot func : TypeFilter.select(elem.iface, FuncSlot.class)) {
       assert (func.body.statements.isEmpty());
       Statement code = addTransitionCode(enumMap.keySet(), enumMap, states, stateVariable, func, dict, func.param);
       Block bbl = new Block(info);
@@ -253,7 +253,7 @@ class Reduction {
 
   static private HashMap<StateSimple, EnumElement> makeEnumElem(StateComposite topstate, EnumType stateEnum) {
     HashMap<StateSimple, EnumElement> ret = new HashMap<StateSimple, EnumElement>();
-    for (State state : ClassGetter.filter(State.class, topstate.item)) {
+    for (State state : TypeFilter.select(topstate.item, State.class)) {
       assert (state instanceof StateSimple);
 
       EnumElement element = new EnumElement(info, state.name);
@@ -291,7 +291,7 @@ class Reduction {
 
   static private FuncResponse getQuery(State state, String funcName) {
     assert (funcName != null);
-    for (FuncResponse itr : ClassGetter.filter(FuncResponse.class, state.item)) {
+    for (FuncResponse itr : TypeFilter.select(state.item, FuncResponse.class)) {
       if (funcName.equals(itr.name)) {
         return itr;
       }

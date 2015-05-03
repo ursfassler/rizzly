@@ -47,8 +47,8 @@ import ast.data.type.base.RangeType;
 import ast.knowledge.KnowFile;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.specification.TypeFilter;
 import ast.traverser.DefTraverser;
-import ast.traverser.other.ClassGetter;
 import error.ErrorType;
 import error.RError;
 
@@ -88,7 +88,7 @@ class LinkerWorker extends DefTraverser<Void, SymbolTable> {
     for (Designator des : obj.getImports()) {
       RizzlyFile rzy = kf.get(des);
       assert (rzy != null);
-      AstList<Named> named = ClassGetter.filter(Named.class, rzy.getObjects());
+      AstList<Named> named = TypeFilter.select(rzy.getObjects(), Named.class);
       objs.addAll(named);
       objs.add(rzy);
     }
@@ -205,7 +205,7 @@ class LinkerWorker extends DefTraverser<Void, SymbolTable> {
 
     super.visitState(obj, param);
 
-    AstList<Transition> trans = ClassGetter.filter(Transition.class, obj.item);
+    AstList<Transition> trans = TypeFilter.select(obj.item, Transition.class);
     AstList<StateContent> rest = new AstList<StateContent>(obj.item);
     rest.removeAll(trans);
     visitList(rest, param);

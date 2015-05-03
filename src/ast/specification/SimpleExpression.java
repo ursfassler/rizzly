@@ -41,7 +41,7 @@ import ast.data.variable.FuncVariable;
 import ast.data.variable.StateVariable;
 import ast.traverser.NullTraverser;
 
-public class SimpleExpression implements Specification {
+public class SimpleExpression extends Specification {
   static public final SimpleExpression INSTANCE = new SimpleExpression();
   static private final SimpleGetter getter = new SimpleGetter();
 

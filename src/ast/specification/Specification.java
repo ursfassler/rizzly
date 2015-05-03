@@ -19,6 +19,18 @@ package ast.specification;
 
 import ast.data.Ast;
 
-public interface Specification {
-  boolean isSatisfiedBy(Ast candidate);
+abstract public class Specification {
+  abstract public boolean isSatisfiedBy(Ast candidate);
+
+  public Specification or(Specification other) {
+    return new OrSpec(this, other);
+  }
+
+  public Specification and(Specification other) {
+    return new AndSpec(this, other);
+  }
+
+  public Specification not() {
+    return new NotSpec(this);
+  }
 }

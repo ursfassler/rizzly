@@ -22,9 +22,23 @@ import java.util.Collection;
 import ast.data.Ast;
 import ast.data.AstList;
 
-public class TypeFilter {
+public class List {
+  static public <T extends Ast> AstList<T> select(Collection<T> list, Specification spec) {
+    AstList<T> ret = new AstList<T>();
+    for (T itr : list) {
+      if (spec.isSatisfiedBy(itr)) {
+        ret.add(itr);
+      }
+    }
+    return ret;
+  }
 
-  static public <T extends Ast> AstList<T> select(Collection<? extends Ast> list, Class<T> kind) {
-    return List.select(list, new IsClass(kind)).castTo(kind);
+  static public boolean contains(Collection<? extends Ast> list, Specification spec) {
+    for (Ast itr : list) {
+      if (spec.isSatisfiedBy(itr)) {
+        return true;
+      }
+    }
+    return false;
   }
 }

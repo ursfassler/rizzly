@@ -38,7 +38,9 @@ import ast.knowledge.KnowLeftIsContainerOfRight;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.other.ClassGetter;
+import ast.repository.Collector;
+import ast.specification.IsClass;
+import ast.specification.TypeFilter;
 import error.ErrorType;
 import error.RError;
 
@@ -54,12 +56,12 @@ public class ElementaryReduction extends AstPass {
   public void process(Namespace ast, KnowledgeBase kb) {
     Map<Named, Named> map = new HashMap<Named, Named>();
 
-    for (ImplElementary impl : ClassGetter.getRecursive(ImplElementary.class, ast)) {
+    for (ImplElementary impl : Collector.select(ast, new IsClass(ImplElementary.class)).castTo(ImplElementary.class)) {
 
-      AstList<FuncSlot> slotImpl = ClassGetter.filter(FuncSlot.class, impl.function);
-      AstList<FuncResponse> responseImpl = ClassGetter.filter(FuncResponse.class, impl.function);
-      AstList<FuncSlot> slotProto = ClassGetter.filter(FuncSlot.class, impl.iface);
-      AstList<FuncResponse> responseProto = ClassGetter.filter(FuncResponse.class, impl.iface);
+      AstList<FuncSlot> slotImpl = TypeFilter.select(impl.function, FuncSlot.class);
+      AstList<FuncResponse> responseImpl = TypeFilter.select(impl.function, FuncResponse.class);
+      AstList<FuncSlot> slotProto = TypeFilter.select(impl.iface, FuncSlot.class);
+      AstList<FuncResponse> responseProto = TypeFilter.select(impl.iface, FuncResponse.class);
 
       if (!checkForAll(slotImpl, slotProto, "interface declaration") | !checkForAll(responseImpl, responseProto, "interface declaration") | !checkForAll(responseProto, responseImpl, "implementation")) {
         return;

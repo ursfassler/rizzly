@@ -17,14 +17,19 @@
 
 package ast.specification;
 
-import java.util.Collection;
-
 import ast.data.Ast;
-import ast.data.AstList;
 
-public class TypeFilter {
+public class IsClass extends Specification {
+  final public Class<? extends Ast> kind;
 
-  static public <T extends Ast> AstList<T> select(Collection<? extends Ast> list, Class<T> kind) {
-    return List.select(list, new IsClass(kind)).castTo(kind);
+  public IsClass(Class<? extends Ast> kind) {
+    super();
+    this.kind = kind;
   }
+
+  @Override
+  public boolean isSatisfiedBy(Ast candidate) {
+    return kind.isAssignableFrom(candidate.getClass());
+  }
+
 }

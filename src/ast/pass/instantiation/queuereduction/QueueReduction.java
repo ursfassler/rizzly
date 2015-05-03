@@ -30,7 +30,8 @@ import ast.data.type.composed.RecordType;
 import ast.knowledge.KnowChild;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.other.ClassGetter;
+import ast.repository.Collector;
+import ast.specification.IsClass;
 
 public class QueueReduction extends AstPass {
 
@@ -90,7 +91,7 @@ class QueueReductionWorker {
 
   private Map<Queue, Queue> mapQueuesToOne(Queue queue) {
     Map<Queue, Queue> map = new HashMap<Queue, Queue>();
-    for (Queue old : ClassGetter.getRecursive(Queue.class, root)) {
+    for (Queue old : Collector.select(root, new IsClass(Queue.class)).castTo(Queue.class)) {
       map.put(old, queue);
     }
     return map;

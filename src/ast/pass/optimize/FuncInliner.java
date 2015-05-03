@@ -27,8 +27,9 @@ import ast.knowledge.KnowUniqueName;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.pass.helper.GraphHelper;
+import ast.repository.Match;
+import ast.specification.IsClass;
 import ast.traverser.other.CallgraphMaker;
-import ast.traverser.other.ClassGetter;
 import ast.traverser.other.StmtReplacer;
 import error.RError;
 
@@ -98,7 +99,7 @@ class FuncInlinerWorker extends StmtReplacer<Void> {
   }
 
   private boolean hasNoReturnStatements(Function func) {
-    return ClassGetter.getRecursive(Return.class, func.body).isEmpty();
+    return Match.hasNoItem(func.body, new IsClass(Return.class));
   }
 
   private List<Statement> inline(Function func, TupleValue actualParameter) {

@@ -37,8 +37,9 @@ import ast.doc.SimpleGraph;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.pass.helper.GraphHelper;
+import ast.repository.Collector;
+import ast.specification.IsClass;
 import ast.traverser.other.CallgraphMaker;
-import ast.traverser.other.ClassGetter;
 import error.ErrorType;
 import error.RError;
 
@@ -51,7 +52,7 @@ public class RtcViolation extends AstPass {
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
     {
-      List<ImplElementary> elemset = ClassGetter.getRecursive(ImplElementary.class, ast);
+      List<ImplElementary> elemset = Collector.select(ast, new IsClass(ImplElementary.class)).castTo(ImplElementary.class);
       for (ImplElementary elem : elemset) {
         SimpleGraph<Ast> cg = CallgraphMaker.make(elem, kb);
         assert (elem.component.isEmpty());
@@ -62,7 +63,7 @@ public class RtcViolation extends AstPass {
       }
     }
     {
-      List<ImplComposition> elemset = ClassGetter.getRecursive(ImplComposition.class, ast);
+      List<ImplComposition> elemset = Collector.select(ast, new IsClass(ImplComposition.class)).castTo(ImplComposition.class);
       for (ImplComposition elem : elemset) {
         SimpleGraph<CompUse> cg = makeCallgraph(elem.connection);
         checkRtcViolation(cg, 2, elem.getInfo());

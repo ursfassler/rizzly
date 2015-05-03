@@ -17,14 +17,21 @@
 
 package ast.specification;
 
-import java.util.Collection;
-
 import ast.data.Ast;
-import ast.data.AstList;
 
-public class TypeFilter {
+public class AndSpec extends Specification {
+  final private Specification leftSpec;
+  final private Specification rightSpec;
 
-  static public <T extends Ast> AstList<T> select(Collection<? extends Ast> list, Class<T> kind) {
-    return List.select(list, new IsClass(kind)).castTo(kind);
+  public AndSpec(Specification leftSpec, Specification rightSpec) {
+    super();
+    this.leftSpec = leftSpec;
+    this.rightSpec = rightSpec;
   }
+
+  @Override
+  public boolean isSatisfiedBy(Ast candidate) {
+    return leftSpec.isSatisfiedBy(candidate) && rightSpec.isSatisfiedBy(candidate);
+  }
+
 }

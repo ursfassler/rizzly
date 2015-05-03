@@ -96,8 +96,8 @@ import ast.data.variable.Variable;
 import ast.doc.StreamWriter;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.specification.TypeFilter;
 import ast.traverser.NullTraverser;
-import ast.traverser.other.ClassGetter;
 
 public class CWriter extends AstPass {
   public static final String ARRAY_DATA_NAME = "data";
@@ -135,9 +135,9 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
 
   @Override
   protected Void visitNamespace(Namespace obj, Boolean param) {
-    AstList<Type> types = ClassGetter.filter(Type.class, obj.children);
-    AstList<Function> functions = ClassGetter.filter(Function.class, obj.children);
-    AstList<Variable> variables = ClassGetter.filter(Variable.class, obj.children);
+    AstList<Type> types = TypeFilter.select(obj.children, Type.class);
+    AstList<Function> functions = TypeFilter.select(obj.children, Function.class);
+    AstList<Variable> variables = TypeFilter.select(obj.children, Variable.class);
 
     assert (types.size() + functions.size() + variables.size() == obj.children.size());
 

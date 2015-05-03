@@ -27,8 +27,8 @@ import ast.data.raw.RawComponent;
 import ast.data.raw.RawComposition;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.specification.TypeFilter;
 import ast.traverser.NullTraverser;
-import ast.traverser.other.ClassGetter;
 import error.ErrorType;
 import error.RError;
 
@@ -79,7 +79,7 @@ class CompLinkReductionWorker extends NullTraverser<Void, Void> {
       ast.data.expression.reference.RefName rn = (ast.data.expression.reference.RefName) compRef.offset.get(0);
       compRef.offset.remove(0);
       if (item instanceof RizzlyFile) {
-        item = ClassGetter.filter(RawComponent.class, ((RizzlyFile) item).getObjects()).find(rn.name);
+        item = TypeFilter.select(((RizzlyFile) item).getObjects(), RawComponent.class).find(rn.name);
       } else if (item instanceof Namespace) {
         item = (Named) ((ast.data.Namespace) item).children.find(rn.name);
       } else {

@@ -20,27 +20,24 @@ package ast.pass;
 import ast.data.AstBase;
 import ast.data.Namespace;
 import ast.knowledge.KnowledgeBase;
-import ast.traverser.other.ClassGetter;
+import ast.repository.Match;
+import ast.specification.IsClass;
 
 public class NoItem extends Condition {
-  final private Class<? extends AstBase> type;
+  final private IsClass spec;
 
   public NoItem(Class<? extends AstBase> type) {
     super();
-    this.type = type;
-  }
-
-  public Class<? extends AstBase> getType() {
-    return type;
+    this.spec = new IsClass(type);
   }
 
   @Override
   public boolean check(Namespace root, KnowledgeBase kb) {
-    return ClassGetter.getRecursive(type, root).isEmpty();
+    return Match.hasNoItem(root, spec);
   }
 
   @Override
   public String getName() {
-    return "NoItem<" + type.getName() + ">";
+    return "NoItem<" + spec.kind.getName() + ">";
   }
 }

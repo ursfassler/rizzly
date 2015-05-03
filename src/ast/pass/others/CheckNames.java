@@ -33,8 +33,8 @@ import ast.data.type.template.TypeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.specification.TypeFilter;
 import ast.traverser.DefTraverser;
-import ast.traverser.other.ClassGetter;
 import error.ErrorType;
 import error.RError;
 
@@ -48,7 +48,7 @@ public class CheckNames extends AstPass {
   // TODO find more elegant way to check Template names
   @Override
   public void process(Namespace root, KnowledgeBase kb) {
-    AstList<Type> blacklist = ClassGetter.filter(Type.class, root.children);
+    AstList<Type> blacklist = TypeFilter.select(root.children, Type.class);
 
     AstList<Ast> tocheck = new AstList<Ast>(root.children);
     tocheck.removeAll(blacklist);

@@ -43,7 +43,7 @@ import ast.doc.compgraph.Positioning;
 import ast.doc.compgraph.WorldComp;
 import ast.knowledge.KnowPath;
 import ast.knowledge.KnowledgeBase;
-import ast.traverser.other.ClassGetter;
+import ast.specification.TypeFilter;
 
 public class ComponentFilePrinter {
   private Document doc;
@@ -139,8 +139,8 @@ public class ComponentFilePrinter {
 
   public void makePicture(RizzlyFile file) {
     KnowPath kp = kb.getEntry(KnowPath.class);
-    assert (ClassGetter.filter(RawComposition.class, file.getObjects()).isEmpty());
-    for (Template decl : ClassGetter.filter(Template.class, file.getObjects())) {
+    assert (TypeFilter.select(file.getObjects(), RawComposition.class).isEmpty());
+    for (Template decl : TypeFilter.select(file.getObjects(), Template.class)) {
       if (decl.getObject() instanceof RawComposition) {
         RawComposition comp = (RawComposition) decl.getObject();
         Element title = doc.createElement("h2");

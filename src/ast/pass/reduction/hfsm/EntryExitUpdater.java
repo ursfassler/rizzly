@@ -42,8 +42,9 @@ import ast.data.variable.FuncVariable;
 import ast.knowledge.KnowBaseItem;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.repository.Collector;
+import ast.specification.IsClass;
 import ast.traverser.NullTraverser;
-import ast.traverser.other.ClassGetter;
 
 /**
  * For every state, a new entry and exit function is added. This new function contains calls to the parent entry or exit
@@ -56,7 +57,7 @@ public class EntryExitUpdater extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    for (ImplHfsm hfsm : ClassGetter.getRecursive(ImplHfsm.class, ast)) {
+    for (Ast hfsm : Collector.select(ast, new IsClass(ImplHfsm.class))) {
       EntryExitUpdaterWorker know = new EntryExitUpdaterWorker(kb);
       know.traverse(hfsm, null);
     }

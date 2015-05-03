@@ -45,8 +45,8 @@ import ast.data.type.special.IntegerType;
 import ast.data.type.special.NaturalType;
 import ast.data.type.special.VoidType;
 import ast.data.type.template.TypeType;
+import ast.specification.TypeFilter;
 import ast.traverser.NullTraverser;
-import ast.traverser.other.ClassGetter;
 
 public class KnowBaseItem extends KnowledgeEntry {
 
@@ -61,7 +61,7 @@ public class KnowBaseItem extends KnowledgeEntry {
 
   public <T extends Ast> List<T> findItem(Class<T> kind) {
     Namespace r = kb.getRoot();
-    return ClassGetter.filter(kind, r.children);
+    return TypeFilter.select(r.children, kind);
   }
 
   public Ast findItem(String name) {
@@ -101,7 +101,7 @@ public class KnowBaseItem extends KnowledgeEntry {
   }
 
   public RangeType getRangeType(Range range) {
-    AstList<RangeType> items = ClassGetter.filter(RangeType.class, kb.getRoot().children);
+    AstList<RangeType> items = TypeFilter.select(kb.getRoot().children, RangeType.class);
     for (RangeType itr : items) {
       if (itr.range.equals(range)) {
         return itr;
@@ -113,7 +113,7 @@ public class KnowBaseItem extends KnowledgeEntry {
   }
 
   public TypeType getTypeType(Type type) {
-    AstList<TypeType> items = ClassGetter.filter(TypeType.class, kb.getRoot().children);
+    AstList<TypeType> items = TypeFilter.select(kb.getRoot().children, TypeType.class);
     for (TypeType itr : items) {
       assert (itr.getType().offset.isEmpty());
       if (itr.getType().link == type) {
@@ -126,7 +126,7 @@ public class KnowBaseItem extends KnowledgeEntry {
   }
 
   public ArrayType getArray(BigInteger size, Type type) {
-    AstList<ArrayType> items = ClassGetter.filter(ArrayType.class, kb.getRoot().children);
+    AstList<ArrayType> items = TypeFilter.select(kb.getRoot().children, ArrayType.class);
     for (ArrayType itr : items) {
       if (itr.size.equals(size) && ((SimpleRef<Type>) itr.type).link.equals(type)) {
         return itr;
@@ -139,7 +139,7 @@ public class KnowBaseItem extends KnowledgeEntry {
   }
 
   public RecordType getRecord(AstList<NamedElement> element) {
-    AstList<RecordType> items = ClassGetter.filter(RecordType.class, kb.getRoot().children);
+    AstList<RecordType> items = TypeFilter.select(kb.getRoot().children, RecordType.class);
     for (RecordType itr : items) {
       if (equal(element, itr.element)) {
         return itr;
@@ -152,7 +152,7 @@ public class KnowBaseItem extends KnowledgeEntry {
   }
 
   public TupleType getTupleType(AstList<TypeRef> types) {
-    AstList<TupleType> items = ClassGetter.filter(TupleType.class, kb.getRoot().children);
+    AstList<TupleType> items = TypeFilter.select(kb.getRoot().children, TupleType.class);
     for (TupleType itr : items) {
       if (equalTypes(types, itr.types)) {
         return itr;
@@ -203,7 +203,7 @@ public class KnowBaseItem extends KnowledgeEntry {
   }
 
   public EnumType getEnumType(Set<String> elements) {
-    AstList<EnumType> items = ClassGetter.filter(EnumType.class, kb.getRoot().children);
+    AstList<EnumType> items = TypeFilter.select(kb.getRoot().children, EnumType.class);
     for (EnumType itr : items) {
       if (itr.getNames().equals(elements)) {
         return itr;

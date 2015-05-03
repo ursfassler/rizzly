@@ -15,16 +15,19 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.specification;
-
-import java.util.Collection;
+package ast.repository;
 
 import ast.data.Ast;
-import ast.data.AstList;
+import ast.specification.Specification;
 
-public class TypeFilter {
+public class Match {
+  // TODO optimize
+  static public boolean hasItem(Ast root, Specification spec) {
+    return !hasNoItem(root, spec);
+  }
 
-  static public <T extends Ast> AstList<T> select(Collection<? extends Ast> list, Class<T> kind) {
-    return List.select(list, new IsClass(kind)).castTo(kind);
+  // TODO optimize
+  static public boolean hasNoItem(Ast root, Specification spec) {
+    return Collector.select(root, spec).isEmpty();
   }
 }

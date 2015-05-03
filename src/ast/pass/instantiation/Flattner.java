@@ -29,8 +29,8 @@ import ast.data.variable.Constant;
 import ast.data.variable.StateVariable;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.specification.TypeFilter;
 import ast.traverser.DefTraverser;
-import ast.traverser.other.ClassGetter;
 
 public class Flattner extends AstPass {
 
@@ -45,10 +45,10 @@ public class Flattner extends AstPass {
 
     ast.children.clear();
 
-    ast.children.addAll(ClassGetter.filter(Function.class, flat));
-    ast.children.addAll(ClassGetter.filter(StateVariable.class, flat));
-    ast.children.addAll(ClassGetter.filter(Constant.class, flat));
-    ast.children.addAll(ClassGetter.filter(Type.class, flat));
+    ast.children.addAll(TypeFilter.select(flat, Function.class));
+    ast.children.addAll(TypeFilter.select(flat, StateVariable.class));
+    ast.children.addAll(TypeFilter.select(flat, Constant.class));
+    ast.children.addAll(TypeFilter.select(flat, Type.class));
   }
 
 }

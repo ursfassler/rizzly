@@ -39,8 +39,9 @@ import ast.data.variable.Variable;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.repository.Collector;
+import ast.specification.IsClass;
 import ast.traverser.DefTraverser;
-import ast.traverser.other.ClassGetter;
 import ast.traverser.other.RefTypeGetter;
 
 //TODO set correct values when switching states
@@ -56,7 +57,7 @@ public class StateVarReplacer extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    for (ImplHfsm hfsm : ClassGetter.getRecursive(ImplHfsm.class, ast)) {
+    for (ImplHfsm hfsm : Collector.select(ast, new IsClass(ImplHfsm.class)).castTo(ImplHfsm.class)) {
       process(hfsm, kb);
     }
   }

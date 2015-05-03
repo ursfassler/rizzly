@@ -31,8 +31,9 @@ import ast.pass.check.model.io.IoCheck;
 import ast.pass.check.model.io.StateReaderInfo;
 import ast.pass.check.model.io.StateWriterInfo;
 import ast.pass.helper.GraphHelper;
+import ast.repository.Collector;
+import ast.specification.IsClass;
 import ast.traverser.other.CallgraphMaker;
-import ast.traverser.other.ClassGetter;
 import ast.traverser.other.OutsideReaderInfo;
 import ast.traverser.other.OutsideWriterInfo;
 
@@ -74,8 +75,8 @@ public class Io extends AstPass {
     // print(writes, reads, outputs, inputs);
 
     IoCheck ioCheck = new IoCheck(writes, reads, outputs, inputs);
-    ioCheck.check(ClassGetter.getRecursive(Function.class, ast));
-    ioCheck.check(ClassGetter.getRecursive(Transition.class, ast));
+    ioCheck.check(Collector.select(ast, new IsClass(Function.class)));
+    ioCheck.check(Collector.select(ast, new IsClass(Transition.class)));
   }
 
   private static <T extends Ast> Map<T, Boolean> doTransStuff(SimpleGraph<T> cg, Map<? extends Ast, Boolean> does) {

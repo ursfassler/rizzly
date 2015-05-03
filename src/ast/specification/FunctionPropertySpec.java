@@ -21,7 +21,7 @@ import ast.data.Ast;
 import ast.data.function.Function;
 import ast.data.function.FunctionProperty;
 
-abstract public class FunctionPropertySpec implements Specification {
+abstract public class FunctionPropertySpec extends Specification {
 
   abstract protected FunctionProperty getProperty();
 

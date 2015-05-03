@@ -42,15 +42,17 @@ import ast.data.statement.ReturnExpr;
 import ast.data.variable.Variable;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.repository.Collector;
+import ast.specification.IsClass;
+import ast.specification.TypeFilter;
 import ast.traverser.NullTraverser;
-import ast.traverser.other.ClassGetter;
 
 public class QueryDownPropagator extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    for (ImplHfsm hfsm : ClassGetter.getRecursive(ImplHfsm.class, ast)) {
-      process(hfsm, kb);
+    for (Ast hfsm : Collector.select(ast, new IsClass(ImplHfsm.class))) {
+      process((ImplHfsm) hfsm, kb);
     }
   }
 
@@ -72,7 +74,8 @@ public class QueryDownPropagator extends AstPass {
 class QueryDownPropagatorWorker extends NullTraverser<Void, QueryParam> {
   private static final ElementInfo info = ElementInfo.NO;
   private final Map<FuncResponse, FuncFunction> map; // TODO do we need
-                                                     // that?
+
+  // that?
 
   public QueryDownPropagatorWorker(Map<FuncResponse, FuncFunction> map) {
     this.map = map;
@@ -85,7 +88,7 @@ class QueryDownPropagatorWorker extends NullTraverser<Void, QueryParam> {
 
   @Override
   protected Void visitStateSimple(StateSimple obj, QueryParam param) {
-    AstList<FuncResponse> queryList = ClassGetter.filter(FuncResponse.class, obj.item);
+    AstList<FuncResponse> queryList = TypeFilter.select(obj.item, FuncResponse.class);
     obj.item.removeAll(queryList);
 
     AstList<FuncResponse> queries = new AstList<FuncResponse>();

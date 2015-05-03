@@ -31,11 +31,11 @@ import util.Pair;
 import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.data.Ast;
+import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.expression.reference.BaseRef;
 import ast.data.expression.reference.SimpleRef;
 import ast.data.function.Function;
-import ast.data.function.FunctionProperty;
 import ast.data.function.ret.FuncReturn;
 import ast.data.type.Type;
 import ast.data.type.base.EnumElement;
@@ -45,9 +45,12 @@ import ast.doc.SimpleGraph;
 import ast.doc.StreamWriter;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.specification.ExternalFunction;
+import ast.specification.OrSpec;
+import ast.specification.PublicFunction;
+import ast.specification.TypeFilter;
 import ast.traverser.DefTraverser;
 import ast.traverser.other.CHeaderWriter;
-import ast.traverser.other.ClassGetter;
 import ast.traverser.other.DepCollector;
 import ast.traverser.other.FpcHeaderWriter;
 import ast.traverser.other.Renamer;
@@ -83,16 +86,15 @@ public class HeaderWriter extends AstPass {
   private static Namespace makeHeader(Namespace prg, String debugdir) {
     Namespace ret = new Namespace(ElementInfo.NO, prg.name);
     Set<Ast> anchor = new HashSet<Ast>();
-    for (Function func : ClassGetter.filter(Function.class, prg.children)) {
-      if ((func.property == FunctionProperty.Public) || (func.property == FunctionProperty.External)) {
-        for (FuncVariable arg : func.param) {
-          anchor.add(((SimpleRef<Type>) arg.type).link);
-        }
-        anchor.add(func.ret);
 
-        ret.children.add(func);
+    AstList<Function> functions = ast.specification.List.select(prg.children, new OrSpec(new PublicFunction(), new ExternalFunction())).castTo(Function.class);
+    for (Function func : functions) {
+      for (FuncVariable arg : func.param) {
+        anchor.add(((SimpleRef<Type>) arg.type).link);
       }
+      anchor.add(func.ret);
     }
+    ret.children.addAll(functions);
 
     Set<Ast> dep = DepCollector.process(anchor);
 
@@ -112,7 +114,7 @@ public class HeaderWriter extends AstPass {
     }
 
     Namespace cpy = Copy.copy(ret);
-    for (Function func : ClassGetter.filter(Function.class, cpy.children)) {
+    for (Function func : TypeFilter.select(cpy.children, Function.class)) {
       func.body.statements.clear();
     }
 
@@ -141,7 +143,7 @@ public class HeaderWriter extends AstPass {
     }
   }
 
-  private static void toposort(List<Ast> list) {
+  private static void toposort(AstList<Ast> list) {
     SimpleGraph<Ast> g = new SimpleGraph<Ast>(list);
     for (Ast u : list) {
       Set<ast.data.type.Type> vs = getDirectUsedTypes(u);

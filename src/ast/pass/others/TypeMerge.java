@@ -33,20 +33,18 @@ import ast.knowledge.KnowLeftIsContainerOfRight;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.pass.helper.GraphHelper;
-import ast.traverser.other.ClassGetter;
+import ast.repository.Collector;
+import ast.specification.IsClass;
 import error.RError;
 
 /**
  * Find equal types with different names and merge them
- *
- * @author urs
- *
  */
 public class TypeMerge extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    AstList<Type> types = ClassGetter.getRecursive(Type.class, ast);
+    AstList<Type> types = Collector.select(ast, new IsClass(Type.class)).castTo(Type.class);
     Set<Set<Type>> ss = sameSets(kb.getEntry(KnowLeftIsContainerOfRight.class), types);
 
     Map<Type, Type> linkmap = linkmap(ss, ast);

@@ -27,8 +27,8 @@ import ast.data.component.hfsm.State;
 import ast.data.type.Type;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.specification.TypeFilter;
 import ast.traverser.DefTraverser;
-import ast.traverser.other.ClassGetter;
 
 /**
  * Moves all types to the top level
@@ -84,7 +84,7 @@ class TypeUpliftWorker extends DefTraverser<Void, Designator> {
   @Override
   protected Void visitState(State obj, Designator param) {
     super.visitState(obj, param);
-    AstList<Type> types = ClassGetter.filter(Type.class, obj.item);
+    AstList<Type> types = TypeFilter.select(obj.item, Type.class);
     obj.item.removeAll(types);
     return null;
   }
@@ -92,7 +92,7 @@ class TypeUpliftWorker extends DefTraverser<Void, Designator> {
   @Override
   protected Void visitNamespace(Namespace obj, Designator param) {
     super.visitNamespace(obj, param);
-    AstList<Type> types = ClassGetter.filter(Type.class, obj.children);
+    AstList<Type> types = TypeFilter.select(obj.children, Type.class);
     obj.children.removeAll(types);
     return null;
   }

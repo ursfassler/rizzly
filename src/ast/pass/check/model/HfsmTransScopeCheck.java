@@ -29,8 +29,10 @@ import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.Transition;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.repository.Collector;
+import ast.specification.IsClass;
+import ast.specification.TypeFilter;
 import ast.traverser.NullTraverser;
-import ast.traverser.other.ClassGetter;
 import error.ErrorType;
 import error.RError;
 
@@ -44,8 +46,8 @@ public class HfsmTransScopeCheck extends AstPass {
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
     HfsmTransScopeCheckWorker check = new HfsmTransScopeCheckWorker();
-    List<ImplHfsm> hfsms = ClassGetter.getRecursive(ImplHfsm.class, ast);
-    for (ImplHfsm hfsm : hfsms) {
+    List<? extends Ast> hfsms = Collector.select(ast, new IsClass(ImplHfsm.class));
+    for (Ast hfsm : hfsms) {
       check.traverse(hfsm, null);
     }
   }
@@ -61,7 +63,7 @@ class HfsmTransScopeCheckWorker extends NullTraverser<Set<State>, Void> {
 
   @Override
   protected Set<State> visitImplHfsm(ImplHfsm obj, Void param) {
-    List<State> states = ClassGetter.filter(State.class, obj.topstate.item);
+    List<State> states = TypeFilter.select(obj.topstate.item, State.class);
     for (State subState : states) {
       visit(subState, null);
     }
@@ -73,11 +75,11 @@ class HfsmTransScopeCheckWorker extends NullTraverser<Set<State>, Void> {
     Set<State> ret = new HashSet<State>();
     ret.add(obj);
 
-    for (State subState : ClassGetter.filter(State.class, obj.item)) {
+    for (State subState : TypeFilter.select(obj.item, State.class)) {
       ret.addAll(visit(subState, null));
     }
 
-    for (Transition trans : ClassGetter.filter(Transition.class, obj.item)) {
+    for (Transition trans : TypeFilter.select(obj.item, Transition.class)) {
       checkTransition(trans, ret);
     }
 

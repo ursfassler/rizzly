@@ -42,8 +42,8 @@ import ast.data.type.composed.UnionType;
 import ast.data.type.composed.UnsafeUnionType;
 import ast.data.type.special.ComponentType;
 import ast.data.variable.Variable;
+import ast.specification.TypeFilter;
 import ast.traverser.NullTraverser;
-import ast.traverser.other.ClassGetter;
 import error.ErrorType;
 import error.RError;
 
@@ -167,7 +167,7 @@ class KnowChildTraverser extends NullTraverser<Set<Ast>, String> {
   @Override
   protected Set<Ast> visitStateComposite(StateComposite obj, String param) {
     Set<Ast> rset = new HashSet<Ast>();
-    AstList<State> children = new AstList<State>(ClassGetter.filter(State.class, obj.item));
+    AstList<State> children = new AstList<State>(TypeFilter.select(obj.item, State.class));
     addIfFound(children.find(param), rset);
     return rset;
   }

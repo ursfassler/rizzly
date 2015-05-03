@@ -56,8 +56,10 @@ import ast.knowledge.KnowBaseItem;
 import ast.knowledge.KnowParent;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.repository.Collector;
+import ast.specification.IsClass;
+import ast.specification.TypeFilter;
 import ast.traverser.NullTraverser;
-import ast.traverser.other.ClassGetter;
 
 /**
  * adds transitions to the children until leaf states also adds calls to exit and entry function
@@ -69,7 +71,7 @@ public class TransitionDownPropagator extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    for (ImplHfsm hfsm : ClassGetter.getRecursive(ImplHfsm.class, ast)) {
+    for (ImplHfsm hfsm : Collector.select(ast, new IsClass(ImplHfsm.class)).castTo(ImplHfsm.class)) {
       process(hfsm, kb);
     }
   }
@@ -137,7 +139,7 @@ class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam
 
   @Override
   protected Void visitStateSimple(StateSimple obj, TransitionParam param) {
-    AstList<Transition> transList = ClassGetter.filter(Transition.class, obj.item);
+    AstList<Transition> transList = TypeFilter.select(obj.item, Transition.class);
     obj.item.removeAll(transList);
 
     filter(obj, param.before);
@@ -196,7 +198,7 @@ class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam
 
     makeVarInit(par, top, list);
 
-    for (StateVariable var : ClassGetter.filter(StateVariable.class, start.item)) {
+    for (StateVariable var : TypeFilter.select(start.item, StateVariable.class)) {
       Assignment init = new AssignmentSingle(var.def.getInfo(), new Reference(info, var), Copy.copy(var.def));
       list.add(init);
     }

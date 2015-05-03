@@ -32,8 +32,9 @@ import ast.data.type.Type;
 import ast.data.variable.ConstPrivate;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.repository.Collector;
+import ast.specification.IsClass;
 import ast.traverser.NullTraverser;
-import ast.traverser.other.ClassGetter;
 
 /**
  * Moves items of all states to the top-state.
@@ -45,7 +46,7 @@ public class StateItemUplifter extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    for (ImplHfsm hfsm : ClassGetter.getRecursive(ImplHfsm.class, ast)) {
+    for (Ast hfsm : Collector.select(ast, new IsClass(ImplHfsm.class))) {
       StateItemUplifterWorker know = new StateItemUplifterWorker(kb);
       know.traverse(hfsm, null);
     }

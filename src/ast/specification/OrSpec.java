@@ -19,7 +19,7 @@ package ast.specification;
 
 import ast.data.Ast;
 
-public class OrSpec implements Specification {
+public class OrSpec extends Specification {
   final private Specification leftSpec;
   final private Specification rightSpec;
 

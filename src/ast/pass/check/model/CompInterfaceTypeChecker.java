@@ -45,8 +45,9 @@ import ast.knowledge.KnowLeftIsContainerOfRight;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.repository.Collector;
+import ast.specification.IsClass;
 import ast.traverser.NullTraverser;
-import ast.traverser.other.ClassGetter;
 import error.ErrorType;
 import error.RError;
 
@@ -101,7 +102,7 @@ class CompInterfaceTypeCheckerWorker extends NullTraverser<Void, Void> {
   protected Void visitImplHfsm(ImplHfsm obj, Void param) {
     // TODO can we merge with test for elementary?
     // TODO test also other stuff?
-    List<Transition> transList = ClassGetter.getRecursive(Transition.class, obj);
+    List<Transition> transList = Collector.select(obj, new IsClass(Transition.class)).castTo(Transition.class);
 
     for (Transition tr : transList) {
       // TODO check if tr.getEventFunc() has compatible parameters

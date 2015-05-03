@@ -38,8 +38,8 @@ import ast.data.variable.ConstGlobal;
 import ast.knowledge.KnowBaseItem;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.specification.TypeFilter;
 import ast.traverser.DefTraverser;
-import ast.traverser.other.ClassGetter;
 
 public class EnumReduction extends AstPass {
   @Override
@@ -49,7 +49,7 @@ public class EnumReduction extends AstPass {
     Map<EnumType, RangeType> typeMap = new HashMap<EnumType, RangeType>();
     Map<EnumElement, ConstGlobal> elemMap = new HashMap<EnumElement, ConstGlobal>();
 
-    for (EnumType et : ClassGetter.filter(EnumType.class, ast.children)) {
+    for (EnumType et : TypeFilter.select(ast.children, EnumType.class)) {
 
       BigInteger idx = BigInteger.ZERO;
       for (EnumElement elem : et.getElement()) {

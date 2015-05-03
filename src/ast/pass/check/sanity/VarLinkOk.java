@@ -38,8 +38,8 @@ import ast.data.variable.Variable;
 import ast.knowledge.KnowParent;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.specification.TypeFilter;
 import ast.traverser.DefTraverser;
-import ast.traverser.other.ClassGetter;
 import error.ErrorType;
 import error.RError;
 
@@ -75,8 +75,8 @@ class VarLinkOkWorker extends DefTraverser<Void, Set<Ast>> {
 
   @Override
   protected Void visitNamespace(Namespace obj, Set<Ast> param) {
-    param = add(param, ClassGetter.filter(Variable.class, obj.children));
-    param = add(param, ClassGetter.filter(Type.class, obj.children));
+    param = add(param, TypeFilter.select(obj.children, Variable.class));
+    param = add(param, TypeFilter.select(obj.children, Type.class));
     return super.visitNamespace(obj, param);
   }
 
@@ -92,7 +92,7 @@ class VarLinkOkWorker extends DefTraverser<Void, Set<Ast>> {
   @Override
   protected Void visitState(State obj, Set<Ast> param) {
     param = new HashSet<Ast>(param);
-    param = add(param, ClassGetter.filter(StateVariable.class, obj.item));
+    param = add(param, TypeFilter.select(obj.item, StateVariable.class));
     return super.visitState(obj, param);
   }
 
@@ -142,8 +142,8 @@ class VarLinkOkWorker extends DefTraverser<Void, Set<Ast>> {
 
   private void addAllToTop(State state, Set<Ast> param) {
     while (true) {
-      param.addAll(ClassGetter.filter(StateVariable.class, state.item));
-      param.addAll(ClassGetter.filter(ConstPrivate.class, state.item));
+      param.addAll(TypeFilter.select(state.item, StateVariable.class));
+      param.addAll(TypeFilter.select(state.item, ConstPrivate.class));
       Ast parent = kp.get(state);
       if (parent instanceof State) {
         state = (State) parent;

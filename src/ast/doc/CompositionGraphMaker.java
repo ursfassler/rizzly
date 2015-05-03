@@ -42,7 +42,7 @@ import ast.doc.compgraph.SubComponent;
 import ast.doc.compgraph.WorldComp;
 import ast.knowledge.KnowPath;
 import ast.knowledge.KnowledgeBase;
-import ast.traverser.other.ClassGetter;
+import ast.specification.TypeFilter;
 import error.ErrorType;
 import error.RError;
 
@@ -58,42 +58,42 @@ public class CompositionGraphMaker {
     Map<Designator, Interface> ifacemap = new HashMap<Designator, Interface>();
 
     // TODO cleanup
-    for (FuncResponse iface : ClassGetter.filter(FuncResponse.class, impl.getIface())) {
+    for (FuncResponse iface : TypeFilter.select(impl.getIface(), FuncResponse.class)) {
       Interface niface = makeIface(new Designator("Self"), comp, iface, ifacemap, kb);
       comp.getInput().add(niface);
     }
-    for (FuncSlot iface : ClassGetter.filter(FuncSlot.class, impl.getIface())) {
+    for (FuncSlot iface : TypeFilter.select(impl.getIface(), FuncSlot.class)) {
       Interface niface = makeIface(new Designator("Self"), comp, iface, ifacemap, kb);
       comp.getInput().add(niface);
     }
-    for (FuncQuery iface : ClassGetter.filter(FuncQuery.class, impl.getIface())) {
+    for (FuncQuery iface : TypeFilter.select(impl.getIface(), FuncQuery.class)) {
       Interface niface = makeIface(new Designator("Self"), comp, iface, ifacemap, kb);
       comp.getOutput().add(niface);
     }
-    for (FuncSignal iface : ClassGetter.filter(FuncSignal.class, impl.getIface())) {
+    for (FuncSignal iface : TypeFilter.select(impl.getIface(), FuncSignal.class)) {
       Interface niface = makeIface(new Designator("Self"), comp, iface, ifacemap, kb);
       comp.getOutput().add(niface);
     }
 
-    for (CompUse use : ClassGetter.filter(CompUse.class, impl.getInstantiation())) {
+    for (CompUse use : TypeFilter.select(impl.getInstantiation(), CompUse.class)) {
       ast.data.raw.RawComponent comptype = (RawComponent) ((ast.data.template.Template) ((Reference) use.compRef).link).getObject();
       Designator subpath = kp.get(comptype);
       SubComponent sub = new SubComponent(use.getInfo(), use.name, subpath, comptype.name, filterMetadata(use.getInfo().metadata, METADATA_KEY));
 
       // TODO cleanup
-      for (FuncResponse iface : ClassGetter.filter(FuncResponse.class, comptype.getIface())) {
+      for (FuncResponse iface : TypeFilter.select(comptype.getIface(), FuncResponse.class)) {
         Interface niface = makeIface(new Designator("Self", use.name), sub, iface, ifacemap, kb);
         sub.getInput().add(niface);
       }
-      for (FuncSlot iface : ClassGetter.filter(FuncSlot.class, comptype.getIface())) {
+      for (FuncSlot iface : TypeFilter.select(comptype.getIface(), FuncSlot.class)) {
         Interface niface = makeIface(new Designator("Self", use.name), sub, iface, ifacemap, kb);
         sub.getInput().add(niface);
       }
-      for (FuncQuery iface : ClassGetter.filter(FuncQuery.class, comptype.getIface())) {
+      for (FuncQuery iface : TypeFilter.select(comptype.getIface(), FuncQuery.class)) {
         Interface niface = makeIface(new Designator("Self", use.name), sub, iface, ifacemap, kb);
         sub.getOutput().add(niface);
       }
-      for (FuncSignal iface : ClassGetter.filter(FuncSignal.class, comptype.getIface())) {
+      for (FuncSignal iface : TypeFilter.select(comptype.getIface(), FuncSignal.class)) {
         Interface niface = makeIface(new Designator("Self", use.name), sub, iface, ifacemap, kb);
         sub.getOutput().add(niface);
       }

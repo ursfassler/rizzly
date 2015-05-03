@@ -29,18 +29,18 @@ import ast.doc.DepGraph;
 import ast.doc.SimpleGraph;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.other.ClassGetter;
+import ast.specification.TypeFilter;
 
 // FIXME if we remove everything unused, we can not typecheck that in EVL
 public class UnusedRemover extends AstPass {
 
   @Override
   public void process(ast.data.Namespace root, KnowledgeBase kb) {
-    AstList<CompUse> list = ClassGetter.filter(CompUse.class, root.children);
+    AstList<CompUse> list = TypeFilter.select(root.children, CompUse.class);
     assert (list.size() == 1);
     SimpleGraph<Ast> g = DepGraph.build(list.get(0));
     Set<Ast> keep = g.vertexSet();
-    keep.addAll(ClassGetter.filter(BaseType.class, root.children));
+    keep.addAll(TypeFilter.select(root.children, BaseType.class));
     removeUnused(root, keep);
   }
 

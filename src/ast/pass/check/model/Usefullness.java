@@ -25,7 +25,10 @@ import ast.data.function.header.FuncSignal;
 import ast.data.function.header.FuncSlot;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.other.ClassGetter;
+import ast.repository.Collector;
+import ast.specification.IsClass;
+import ast.specification.List;
+import ast.specification.NotSpec;
 import error.ErrorType;
 import error.RError;
 
@@ -40,9 +43,9 @@ public class Usefullness extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    for (Component comp : ClassGetter.getRecursive(Component.class, ast)) {
-      boolean inEmpty = ClassGetter.filter(FuncSlot.class, comp.iface).isEmpty() && ClassGetter.filter(FuncQuery.class, comp.iface).isEmpty();
-      boolean outEmpty = ClassGetter.filter(FuncSignal.class, comp.iface).isEmpty() && ClassGetter.filter(FuncResponse.class, comp.iface).isEmpty();
+    for (Component comp : Collector.select(ast, new IsClass(Component.class)).castTo(Component.class)) {
+      boolean inEmpty = List.contains(comp.iface, new NotSpec(new IsClass(FuncSlot.class).or(new IsClass(FuncQuery.class))));
+      boolean outEmpty = List.contains(comp.iface, new NotSpec(new IsClass(FuncSignal.class).or(new IsClass(FuncResponse.class))));
       String name = comp.name;
       if (inEmpty && outEmpty) {
         RError.err(ErrorType.Warning, comp.getInfo(), "Component " + name + " has no input and no output data flow");
@@ -53,5 +56,4 @@ public class Usefullness extends AstPass {
       }
     }
   }
-
 }

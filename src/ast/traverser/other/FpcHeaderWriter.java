@@ -51,7 +51,6 @@ import ast.knowledge.KnowledgeBase;
 import ast.pass.check.type.ExpressionTypecheck;
 import ast.pass.others.CWriter;
 import ast.specification.ExternalFunction;
-import ast.specification.Filter;
 import ast.specification.PublicFunction;
 import ast.specification.TypeFilter;
 import ast.traverser.NullTraverser;
@@ -126,7 +125,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
 
     param.nl();
 
-    AstList<Ast> funcProvided = Filter.select(obj.children, new PublicFunction());
+    AstList<Ast> funcProvided = ast.specification.List.select(obj.children, new PublicFunction());
     visitList(funcProvided, param);
     param.nl();
 
@@ -135,7 +134,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.wr("please provide the following functions:");
     param.nl();
     param.nl();
-    AstList<Ast> funcRequired = Filter.select(obj.children, new ExternalFunction());
+    AstList<Ast> funcRequired = ast.specification.List.select(obj.children, new ExternalFunction());
     visitList(funcRequired, param);
     param.wr("}");
     param.nl();

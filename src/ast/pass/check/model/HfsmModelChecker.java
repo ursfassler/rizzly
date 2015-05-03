@@ -31,8 +31,9 @@ import ast.data.function.header.FuncSlot;
 import ast.data.variable.StateVariable;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.repository.Collector;
+import ast.specification.IsClass;
 import ast.traverser.NullTraverser;
-import ast.traverser.other.ClassGetter;
 import error.ErrorType;
 import error.RError;
 
@@ -44,9 +45,9 @@ public class HfsmModelChecker extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    AstList<ImplHfsm> hfsms = ClassGetter.getRecursive(ImplHfsm.class, ast);
+    AstList<? extends Ast> hfsms = Collector.select(ast, new IsClass(ImplHfsm.class));
     HfsmModelCheckerWorker check = new HfsmModelCheckerWorker();
-    for (ImplHfsm hfsm : hfsms) {
+    for (Ast hfsm : hfsms) {
       check.traverse(hfsm, null);
     }
   }

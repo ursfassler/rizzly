@@ -32,8 +32,8 @@ import ast.data.variable.Variable;
 import ast.doc.SimpleGraph;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.specification.TypeFilter;
 import ast.traverser.DefTraverser;
-import ast.traverser.other.ClassGetter;
 
 //TODO merge with TypeSort?
 
@@ -41,7 +41,7 @@ public class VarSort extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    List<Variable> vars = ClassGetter.filter(Variable.class, ast.children);
+    List<Variable> vars = TypeFilter.select(ast.children, Variable.class);
     assert (ast.children.containsAll(vars));
 
     toposortVar(vars);

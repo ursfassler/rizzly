@@ -28,7 +28,7 @@ import ast.data.expression.reference.DummyLinkTarget;
 import ast.data.expression.reference.Reference;
 import ast.data.expression.reference.StateRef;
 import ast.data.raw.RawHfsm;
-import ast.traverser.other.ClassGetter;
+import ast.specification.TypeFilter;
 import error.ErrorType;
 import error.RError;
 
@@ -54,12 +54,12 @@ public class TransitionStateLinker {
     Map<String, State> sym = isc.getSymbols(state);
     Set<String> amb = isc.getAmbigous(state);
 
-    for (ast.data.component.hfsm.Transition tr : ClassGetter.filter(Transition.class, state.item)) {
+    for (ast.data.component.hfsm.Transition tr : TypeFilter.select(state.item, Transition.class)) {
       link(tr.src, sym, amb);
       link(tr.dst, sym, amb);
     }
 
-    for (ast.data.component.hfsm.State sub : ClassGetter.filter(State.class, state.item)) {
+    for (ast.data.component.hfsm.State sub : TypeFilter.select(state.item, State.class)) {
       visitState(sub, isc);
     }
   }
@@ -104,7 +104,7 @@ class StateCollector {
   }
 
   private void gatherNames(ast.data.component.hfsm.State state) {
-    for (State sub : ClassGetter.filter(State.class, state.item)) {
+    for (State sub : TypeFilter.select(state.item, State.class)) {
       getNames().put(sub, sub.name);
       gatherNames(sub);
     }
@@ -114,7 +114,7 @@ class StateCollector {
     deepth.put(state, param);
     Set<State> all = new HashSet<State>();
     all.add(state);
-    for (State sub : ClassGetter.filter(State.class, state.item)) {
+    for (State sub : TypeFilter.select(state.item, State.class)) {
       all.addAll(visitState(sub, param + 1));
     }
 

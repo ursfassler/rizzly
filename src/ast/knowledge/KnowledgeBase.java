@@ -23,7 +23,7 @@ import main.ClaOption;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.component.composition.CompUse;
-import ast.traverser.other.ClassGetter;
+import ast.specification.TypeFilter;
 
 public class KnowledgeBase {
   final public HashMap<Class<? extends KnowledgeEntry>, KnowledgeEntry> entries = new HashMap<Class<? extends KnowledgeEntry>, KnowledgeEntry>();
@@ -57,7 +57,7 @@ public class KnowledgeBase {
   }
 
   public CompUse getRootComp() {
-    AstList<CompUse> list = ClassGetter.filter(CompUse.class, root.children);
+    AstList<CompUse> list = TypeFilter.select(root.children, CompUse.class);
     assert (list.size() == 1);
     return list.get(0);
   }

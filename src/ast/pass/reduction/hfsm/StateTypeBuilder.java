@@ -43,8 +43,8 @@ import ast.data.variable.Constant;
 import ast.data.variable.StateVariable;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
+import ast.specification.TypeFilter;
 import ast.traverser.NullTraverser;
-import ast.traverser.other.ClassGetter;
 
 /**
  * Creates a type with data of states for whole state machine
@@ -139,7 +139,7 @@ public class StateTypeBuilder extends NullTraverser<NamedElement, AstList<NamedE
     param.add(subElem);
 
     NamedElement initStateElem = null;
-    for (State sub : ClassGetter.filter(State.class, obj.item)) {
+    for (State sub : TypeFilter.select(obj.item, State.class)) {
       NamedElement item = visit(sub, param);
       union.element.add(item);
 
@@ -168,7 +168,7 @@ public class StateTypeBuilder extends NullTraverser<NamedElement, AstList<NamedE
     RecordValue value = initValues.get(type);
     assert (value != null);
 
-    for (StateVariable var : ClassGetter.filter(StateVariable.class, state.item)) {
+    for (StateVariable var : TypeFilter.select(state.item, StateVariable.class)) {
       NamedElement item = new NamedElement(var.getInfo(), getName(var), Copy.copy(var.type));
       type.element.add(item);
       value.value.add(new NamedValue(var.getInfo(), getName(var), Copy.copy(var.def)));

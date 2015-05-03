@@ -29,8 +29,10 @@ import ast.data.component.hfsm.StateContent;
 import ast.data.component.hfsm.Transition;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.repository.Collector;
+import ast.specification.IsClass;
+import ast.specification.TypeFilter;
 import ast.traverser.NullTraverser;
-import ast.traverser.other.ClassGetter;
 
 /**
  * Moves all transitions of all states to the top-state.
@@ -43,7 +45,7 @@ public class TransitionUplifter extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    for (ImplHfsm hfsm : ClassGetter.getRecursive(ImplHfsm.class, ast)) {
+    for (Ast hfsm : Collector.select(ast, new IsClass(ImplHfsm.class))) {
       TransitionUplifterWorker know = new TransitionUplifterWorker();
       know.traverse(hfsm, null);
     }
@@ -78,7 +80,7 @@ class TransitionUplifterWorker extends NullTraverser<Void, List<Transition>> {
 
   @Override
   protected Void visitState(State obj, List<Transition> param) {
-    List<Transition> transList = ClassGetter.filter(Transition.class, obj.item);
+    List<Transition> transList = TypeFilter.select(obj.item, Transition.class);
     param.addAll(transList);
     obj.item.removeAll(transList);
     return super.visitState(obj, param);

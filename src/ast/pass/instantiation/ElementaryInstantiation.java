@@ -45,8 +45,9 @@ import ast.data.variable.FuncVariable;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.pass.reduction.CompositionReduction;
+import ast.repository.Collector;
+import ast.specification.IsClass;
 import ast.traverser.NullTraverser;
-import ast.traverser.other.ClassGetter;
 import error.RError;
 
 public class ElementaryInstantiation extends AstPass {
@@ -68,7 +69,7 @@ public class ElementaryInstantiation extends AstPass {
     assert (inst.iface.isEmpty());
 
     Set<Function> pubfunc = new HashSet<Function>();
-    pubfunc.addAll(ClassGetter.getRecursive(Function.class, inst.subCallback));
+    pubfunc.addAll(Collector.select(inst.subCallback, new IsClass(Function.class)).castTo(Function.class));
     RError.ass(inst.component.size() == 1, inst.getInfo(), "Only expected one instance");
     Component targetComp = (Component) inst.component.get(0).compRef.getTarget();
     pubfunc.addAll(targetComp.iface);

@@ -17,20 +17,19 @@
 
 package ast.specification;
 
-import java.util.Collection;
-
 import ast.data.Ast;
-import ast.data.AstList;
 
-public class Filter {
-  static public <T extends Ast> AstList<T> select(Collection<T> list, Specification spec) {
-    AstList<T> ret = new AstList<T>();
-    for (T itr : list) {
-      if (spec.isSatisfiedBy(itr)) {
-        ret.add(itr);
-      }
-    }
-    return ret;
+public class NotSpec extends Specification {
+  final private Specification spec;
+
+  public NotSpec(Specification spec) {
+    super();
+    this.spec = spec;
+  }
+
+  @Override
+  public boolean isSatisfiedBy(Ast candidate) {
+    return !spec.isSatisfiedBy(candidate);
   }
 
 }
