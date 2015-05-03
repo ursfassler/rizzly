@@ -28,9 +28,7 @@ import ast.data.Namespace;
 import ast.data.component.composition.ImplComposition;
 import ast.data.component.composition.SubCallbacks;
 import ast.data.component.elementary.ImplElementary;
-import ast.data.expression.BoolValue;
 import ast.data.expression.Expression;
-import ast.data.expression.Number;
 import ast.data.expression.TupleValue;
 import ast.data.expression.TypeCast;
 import ast.data.expression.binop.BinaryExp;
@@ -63,6 +61,8 @@ import ast.knowledge.KnowType;
 import ast.knowledge.KnowUniqueName;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.repository.Match;
+import ast.specification.IsClass;
 import ast.specification.SimpleExpression;
 import ast.traverser.NullTraverser;
 import ast.traverser.other.ExprReplacer;
@@ -151,7 +151,6 @@ class ExprCutterWorker extends NullTraverser<Void, Void> {
 
 class StmtTraverser extends NullTraverser<Void, List<Statement>> {
   private Cutter cutter;
-  private CallDetector cd = new CallDetector();
 
   public StmtTraverser(KnowledgeBase kb) {
     super();
@@ -254,7 +253,7 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
     AstList<Expression> value = obj.actualParameter.value;
     for (int i = 0; i < value.size(); i++) {
       Expression expr = value.get(i);
-      if (cd.traverse(expr, null)) {
+      if (Cutter.doesCall(expr)) {
         FuncVariable var = cutter.extract(expr, param);
         value.set(i, new Reference(obj.getInfo(), var));
       }
@@ -345,13 +344,16 @@ class Cutter extends ExprReplacer<List<Statement>> {
   final private KnowBaseItem kbi;
   final private KnowType kt;
   final private KnowUniqueName kun;
-  final private CallDetector cd = new CallDetector();
 
   public Cutter(KnowledgeBase kb) {
     super();
     kt = kb.getEntry(KnowType.class);
     kbi = kb.getEntry(KnowBaseItem.class);
     kun = kb.getEntry(KnowUniqueName.class);
+  }
+
+  static public boolean doesCall(Expression expr) {
+    return Match.hasItem(expr, new IsClass(RefCall.class));
   }
 
   private Type getType(Expression obj) {
@@ -394,7 +396,7 @@ class Cutter extends ExprReplacer<List<Statement>> {
   @Override
   protected Expression visitRefIndex(RefIndex obj, List<Statement> param) {
     super.visitRefIndex(obj, param);
-    if (cd.traverse(obj.index, null)) {
+    if (doesCall(obj.index)) {
       FuncVariable var = extract(obj.index, param);
       obj.index = new Reference(obj.getInfo(), var);
     }
@@ -406,7 +408,7 @@ class Cutter extends ExprReplacer<List<Statement>> {
     super.visitTupleValue(obj, param);
     for (int i = 0; i < obj.value.size(); i++) {
       Expression expr = obj.value.get(i);
-      if (cd.traverse(expr, null)) {
+      if (doesCall(expr)) {
         FuncVariable var = extract(expr, param);
         obj.value.set(i, new Reference(obj.getInfo(), var));
       }
@@ -429,49 +431,4 @@ class Cutter extends ExprReplacer<List<Statement>> {
     return new Reference(obj.getInfo(), var);
   }
 
-}
-
-// TODO change to Specification
-@Deprecated
-class CallDetector extends NullTraverser<Boolean, Void> {
-
-  @Override
-  protected Boolean visitDefault(Ast obj, Void param) {
-    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
-  }
-
-  @Override
-  protected Boolean visitReference(Reference obj, Void param) {
-    for (RefItem itr : obj.offset) {
-      if (visit(itr, null)) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  @Override
-  protected Boolean visitRefCall(RefCall obj, Void param) {
-    return true;
-  }
-
-  @Override
-  protected Boolean visitRefName(RefName obj, Void param) {
-    return false;
-  }
-
-  @Override
-  protected Boolean visitRefIndex(RefIndex obj, Void param) {
-    return visit(obj.index, null);
-  }
-
-  @Override
-  protected Boolean visitNumber(Number obj, Void param) {
-    return false;
-  }
-
-  @Override
-  protected Boolean visitBoolValue(BoolValue obj, Void param) {
-    return false;
-  }
 }
