@@ -15,13 +15,12 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.knowledge;
+package ast.specification;
 
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.component.composition.CompUse;
 import ast.data.expression.BoolValue;
-import ast.data.expression.Expression;
 import ast.data.expression.Number;
 import ast.data.expression.StringValue;
 import ast.data.expression.binop.BinaryExp;
@@ -42,17 +41,15 @@ import ast.data.variable.FuncVariable;
 import ast.data.variable.StateVariable;
 import ast.traverser.NullTraverser;
 
-/**
- *
- * @author urs
- */
-public class KnowSimpleExpr {
+public class SimpleExpression implements Specification {
+  static public final SimpleExpression INSTANCE = new SimpleExpression();
+  static private final SimpleGetter getter = new SimpleGetter();
 
-  static final SimpleGetter getter = new SimpleGetter();
-
-  public static boolean isSimple(Expression expr) {
-    return getter.traverse(expr, null);
+  @Override
+  public boolean isSatisfiedBy(Ast candidate) {
+    return getter.traverse(candidate, null);
   }
+
 }
 
 class SimpleGetter extends NullTraverser<Boolean, Void> {

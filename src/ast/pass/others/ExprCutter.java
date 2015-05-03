@@ -58,11 +58,11 @@ import ast.data.statement.WhileStmt;
 import ast.data.type.Type;
 import ast.data.variable.FuncVariable;
 import ast.knowledge.KnowBaseItem;
-import ast.knowledge.KnowSimpleExpr;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowUniqueName;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.specification.SimpleExpression;
 import ast.traverser.NullTraverser;
 import ast.traverser.other.ExprReplacer;
 import error.ErrorType;
@@ -149,15 +149,16 @@ class ExprCutterWorker extends NullTraverser<Void, Void> {
 }
 
 class StmtTraverser extends NullTraverser<Void, List<Statement>> {
-
-  private KnowledgeBase kb;
   private Cutter cutter;
   private CallDetector cd = new CallDetector();
 
   public StmtTraverser(KnowledgeBase kb) {
     super();
-    this.kb = kb;
     cutter = new Cutter(kb);
+  }
+
+  private boolean isSimple(Expression value) {
+    return SimpleExpression.INSTANCE.isSatisfiedBy(value);
   }
 
   @Override
@@ -188,8 +189,8 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
   protected Void visitAssignmentSingle(AssignmentSingle obj, List<Statement> param) {
     obj.right = cutter.traverse(obj.right, param);
 
-    boolean rs = KnowSimpleExpr.isSimple(obj.right);
-    boolean ls = KnowSimpleExpr.isSimple(obj.left);
+    boolean rs = isSimple(obj.right);
+    boolean ls = isSimple(obj.left);
 
     if (!rs && !ls) {
       FuncVariable var = cutter.extract(obj.right, param);
@@ -204,12 +205,12 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
     obj.right = cutter.traverse(obj.right, param);
     visitList(obj.left, param);
 
-    boolean rs = KnowSimpleExpr.isSimple(obj.right);
+    boolean rs = isSimple(obj.right);
     boolean ls;
 
     RError.ass(!obj.left.isEmpty(), obj.getInfo(), "expected at least one item on the left");
     if (obj.left.size() == 1) {
-      ls = KnowSimpleExpr.isSimple(obj.left.get(0));
+      ls = isSimple(obj.left.get(0));
     } else {
       throw new UnsupportedOperationException("Not supported yet");
     }
@@ -224,7 +225,7 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
 
   @Override
   protected Void visitTypeCast(TypeCast obj, List<Statement> param) {
-    if (!KnowSimpleExpr.isSimple(obj.value)) {
+    if (!isSimple(obj.value)) {
       FuncVariable var = cutter.extract(obj.value, param);
       obj.value = new Reference(obj.getInfo(), var);
     }
@@ -239,7 +240,7 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
 
   @Override
   protected Void visitRefIndex(RefIndex obj, List<Statement> param) {
-    if (!KnowSimpleExpr.isSimple(obj.index)) {
+    if (!isSimple(obj.index)) {
       FuncVariable var = cutter.extract(obj.index, param);
       obj.index = new Reference(obj.getInfo(), var);
     }
@@ -272,7 +273,7 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
     // it has to go into all incoming edges of
     // the condition
     // => also in the body of the loop
-    if (!KnowSimpleExpr.isSimple(obj.condition)) {
+    if (!isSimple(obj.condition)) {
       FuncVariable var = cutter.extract(obj.condition, param);
       obj.condition = new Reference(obj.getInfo(), var);
     }
@@ -283,7 +284,7 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
   @Override
   protected Void visitIfStmt(IfStmt obj, List<Statement> param) {
     for (IfOption opt : obj.option) {
-      if (!KnowSimpleExpr.isSimple(opt.condition)) {
+      if (!isSimple(opt.condition)) {
         FuncVariable var = cutter.extract(opt.condition, param);
         opt.condition = new Reference(obj.getInfo(), var);
       }
@@ -296,7 +297,7 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
 
   @Override
   protected Void visitCaseStmt(CaseStmt obj, List<Statement> param) {
-    if (!KnowSimpleExpr.isSimple(obj.condition)) {
+    if (!isSimple(obj.condition)) {
       FuncVariable var = cutter.extract(obj.condition, param);
       obj.condition = new Reference(obj.getInfo(), var);
     }
@@ -310,14 +311,14 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
 
   @Override
   protected Void visitCaseOptValue(CaseOptValue obj, List<Statement> param) {
-    assert (KnowSimpleExpr.isSimple(obj.value));
+    assert (isSimple(obj.value));
     return null;
   }
 
   @Override
   protected Void visitCaseOptRange(CaseOptRange obj, List<Statement> param) {
-    assert (KnowSimpleExpr.isSimple(obj.start));
-    assert (KnowSimpleExpr.isSimple(obj.end));
+    assert (isSimple(obj.start));
+    assert (isSimple(obj.end));
     return null;
   }
 

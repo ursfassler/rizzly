@@ -1,4 +1,21 @@
-package ast.knowledge;
+/**
+ *  This file is part of Rizzly.
+ *
+ *  Rizzly is free software: you can redistribute it and/or modify
+ *  it under the terms of the GNU General Public License as published by
+ *  the Free Software Foundation, either version 3 of the License, or
+ *  (at your option) any later version.
+ *
+ *  Rizzly is distributed in the hope that it will be useful,
+ *  but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *  GNU General Public License for more details.
+ *
+ *  You should have received a copy of the GNU General Public License
+ *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
+ */
+
+package ast.specification;
 
 import ast.data.Ast;
 import ast.data.expression.ArrayValue;
@@ -18,21 +35,18 @@ import ast.traverser.NullTraverser;
 import error.ErrorType;
 import error.RError;
 
-public class KnowConst extends KnowledgeEntry {
-  private final KnowConstTraverser kct = new KnowConstTraverser();
+public class ConstantExpression implements Specification {
+  static public final ConstantExpression INSTANCE = new ConstantExpression();
+  static private final ConstTraverser ct = new ConstTraverser();
 
   @Override
-  public void init(KnowledgeBase base) {
-  }
-
-  public boolean isConst(Ast ast) {
-    Boolean ret = kct.traverse(ast, null);
-    return ret;
+  public boolean isSatisfiedBy(Ast candidate) {
+    return ct.traverse(candidate, null);
   }
 
 }
 
-class KnowConstTraverser extends NullTraverser<Boolean, Void> {
+class ConstTraverser extends NullTraverser<Boolean, Void> {
 
   @Override
   protected Boolean visitDefault(Ast obj, Void param) {
@@ -64,7 +78,7 @@ class KnowConstTraverser extends NullTraverser<Boolean, Void> {
   @Override
   protected Boolean visitReference(Reference obj, Void param) {
     RError.err(ErrorType.Warning, obj.getInfo(), "fix me"); // TODO follow
-                                                            // reference
+    // reference
     return false;
   }
 
