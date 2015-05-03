@@ -106,7 +106,7 @@ class LinkerWorker extends DefTraverser<Void, SymbolTable> {
     AstList<Named> map = new AstList<Named>();
     for (Named itr : objs) {
       if (!ambigous.contains(itr.name)) {
-        if (map.findFirst(itr.name) != null) {
+        if ((Named) map.find(itr.name) != null) {
           map.remove(itr.name);
           ambigous.add(itr.name);
         } else {

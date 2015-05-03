@@ -23,7 +23,6 @@ import java.util.Set;
 import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
-import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.component.Component;
 import ast.data.component.composition.CompUse;
@@ -42,6 +41,8 @@ import ast.data.type.composed.UnionType;
 import ast.data.type.composed.UnsafeUnionType;
 import ast.data.type.special.ComponentType;
 import ast.data.variable.Variable;
+import ast.specification.HasName;
+import ast.specification.List;
 import ast.specification.TypeFilter;
 import ast.traverser.NullTraverser;
 import error.ErrorType;
@@ -91,12 +92,8 @@ public class KnowChild extends KnowledgeEntry {
 
 class KnowChildTraverser extends NullTraverser<Set<Ast>, String> {
 
-  public Set<Ast> retopt(Named res) {
-    Set<Ast> rset = new HashSet<Ast>();
-    if (res != null) {
-      rset.add(res);
-    }
-    return rset;
+  private AstList<? extends Ast> filterName(AstList<? extends Ast> item, String name) {
+    return List.select(item, new HasName(name));
   }
 
   @Override
@@ -114,32 +111,32 @@ class KnowChildTraverser extends NullTraverser<Set<Ast>, String> {
 
   @Override
   protected Set<Ast> visitEnumType(EnumType obj, String param) {
-    return retopt(obj.find(param));
+    return new HashSet<Ast>(filterName(obj.getElement(), param));
   }
 
   @Override
   protected Set<Ast> visitComponent(Component obj, String param) {
     Set<Ast> rset = super.visitComponent(obj, param);
-    addIfFound(obj.iface.find(param), rset);
-    addIfFound(obj.function.find(param), rset);
+    rset.addAll(filterName(obj.iface, param));
+    rset.addAll(filterName(obj.function, param));
     return rset;
   }
 
   @Override
   protected Set<Ast> visitImplElementary(ImplElementary obj, String param) {
     Set<Ast> rset = new HashSet<Ast>();
-    addIfFound(obj.component.find(param), rset);
-    addIfFound(obj.type.find(param), rset);
-    addIfFound(obj.constant.find(param), rset);
-    addIfFound(obj.variable.find(param), rset);
-    addIfFound(obj.subCallback.find(param), rset);
+    rset.addAll(filterName(obj.component, param));
+    rset.addAll(filterName(obj.type, param));
+    rset.addAll(filterName(obj.constant, param));
+    rset.addAll(filterName(obj.variable, param));
+    rset.addAll(filterName(obj.subCallback, param));
     return rset;
   }
 
   @Override
   protected Set<Ast> visitImplComposition(ImplComposition obj, String param) {
     Set<Ast> rset = new HashSet<Ast>();
-    addIfFound(obj.component.find(param), rset);
+    rset.addAll(filterName(obj.component, param));
     return rset;
   }
 
@@ -155,7 +152,7 @@ class KnowChildTraverser extends NullTraverser<Set<Ast>, String> {
   @Override
   protected Set<Ast> visitState(State obj, String param) {
     Set<Ast> rset = super.visitState(obj, param);
-    addIfFound(obj.item.find(param), rset);
+    rset.addAll(filterName(obj.item, param));
     return rset;
   }
 
@@ -167,8 +164,8 @@ class KnowChildTraverser extends NullTraverser<Set<Ast>, String> {
   @Override
   protected Set<Ast> visitStateComposite(StateComposite obj, String param) {
     Set<Ast> rset = new HashSet<Ast>();
-    AstList<State> children = new AstList<State>(TypeFilter.select(obj.item, State.class));
-    addIfFound(children.find(param), rset);
+    AstList<State> children = TypeFilter.select(obj.item, State.class);
+    rset.addAll(filterName(children, param));
     return rset;
   }
 
@@ -185,12 +182,12 @@ class KnowChildTraverser extends NullTraverser<Set<Ast>, String> {
 
   @Override
   protected Set<Ast> visitRecordType(RecordType obj, String param) {
-    return retopt(obj.element.find(param));
+    return new HashSet<Ast>(filterName(obj.element, param));
   }
 
   @Override
   protected Set<Ast> visitUnionType(UnionType obj, String param) {
-    Set<Ast> rset = retopt(obj.element.find(param));
+    Set<Ast> rset = new HashSet<Ast>(filterName(obj.element, param));
     if (obj.tag.name == param) {
       rset.add(obj.tag);
     }
@@ -199,14 +196,14 @@ class KnowChildTraverser extends NullTraverser<Set<Ast>, String> {
 
   @Override
   protected Set<Ast> visitUnsafeUnionType(UnsafeUnionType obj, String param) {
-    return retopt(obj.element.find(param));
+    return new HashSet<Ast>(filterName(obj.element, param));
   }
 
   @Override
   protected Set<Ast> visitComponentType(ComponentType obj, String param) {
     Set<Ast> rset = new HashSet<Ast>();
-    addIfFound(obj.input.find(param), rset);
-    addIfFound(obj.output.find(param), rset);
+    rset.addAll(filterName(obj.input, param));
+    rset.addAll(filterName(obj.output, param));
     return rset;
   }
 
@@ -218,14 +215,8 @@ class KnowChildTraverser extends NullTraverser<Set<Ast>, String> {
   @Override
   protected Set<Ast> visitNamespace(Namespace obj, String param) {
     Set<Ast> rset = new HashSet<Ast>();
-    addIfFound(obj.children.find(param), rset);
+    rset.addAll(filterName(obj.children, param));
     return rset;
-  }
-
-  private void addIfFound(Ast item, Set<Ast> rset) {
-    if (item != null) {
-      rset.add(item);
-    }
   }
 
   @Override

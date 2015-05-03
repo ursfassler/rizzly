@@ -39,6 +39,8 @@ import ast.data.type.composed.UnionType;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.repository.Match;
+import ast.specification.HasName;
 import ast.traverser.DefTraverser;
 import ast.traverser.other.ExprReplacer;
 
@@ -97,7 +99,7 @@ class ReduceUnionWorker extends ExprReplacer<Void> {
       assert (obj.offset.get(0) instanceof RefName);
       EnumType et = getUnion2enum().get(ut);
       String ev = ((RefName) obj.offset.get(0)).name;
-      assert (et.getElement().find(ev) != null);
+      assert (Match.hasItem(et, new HasName(ev)));
       return new Reference(obj.getInfo(), et, new RefName(ElementInfo.NO, ev));
     }
     return obj;

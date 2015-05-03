@@ -20,6 +20,8 @@ package ast.data;
 import java.util.ArrayList;
 import java.util.Collection;
 
+import ast.specification.HasName;
+import ast.specification.List;
 import error.ErrorType;
 import error.RError;
 
@@ -42,27 +44,9 @@ public class AstList<T extends Ast> extends ArrayList<T> {
     return new AstList<C>((AstList<? extends C>) this);
   }
 
-  public Named findFirst(String name) {
-    for (Ast itr : this) {
-      if (itr instanceof Named) {
-        if (((Named) itr).name.equals(name)) {
-          return (Named) itr;
-        }
-      }
-    }
-    return null;
-  }
-
   @Deprecated
   public T find(String name) {
-    AstList<T> ret = new AstList<T>();
-    for (T itr : this) {
-      if (itr instanceof Named) {
-        if (((Named) itr).name.equals(name)) {
-          ret.add(itr);
-        }
-      }
-    }
+    AstList<T> ret = List.select(this, new HasName(name));
 
     switch (ret.size()) {
       case 0:
