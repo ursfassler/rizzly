@@ -5,13 +5,17 @@ StateVar2 = Component
 elementary
   a : R{0,10} = 0;
       
-  addret = function( x: R{0,10} ):R{0,10}
+  add = procedure( x: R{0,10} )
     a := (a + 1) mod 11;
+  end
+  
+  ret = function( x: R{0,10} ):R{0,10}
     return x;
   end
   
   ind : slot( x: R{0,10} )
-    a := addret( x );
+    add( x );
+    a := ret( x );
     out( a );
   end
   

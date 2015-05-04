@@ -1,19 +1,18 @@
-// Error: transition guard is not allowed to write state
+// Error: function is not allowed to write state
 
 Err8 = Component
   event : slot();
   
-hfsm(A)
+elementary
   a : R{0,100} = 0;
   
+  event : slot()
+    foo();
+  end
+
   foo = function():Boolean
     a := 42;
     return a > 10;
   end
-  
-  A : state;
-  B : state;
-  
-  A to B by event() if foo();
 end
 

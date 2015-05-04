@@ -15,7 +15,7 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.traverser.other;
+package ast.repository;
 
 import ast.data.Ast;
 import ast.data.function.Function;
@@ -29,62 +29,59 @@ import ast.data.function.header.FuncSubHandlerEvent;
 import ast.data.function.header.FuncSubHandlerQuery;
 import ast.traverser.NullTraverser;
 
-/**
- * Returns for every function if, it writes to outside. It gets the information only from the function type.
- *
- * @author urs
- *
- */
-public class OutsideWriterInfo extends NullTraverser<Boolean, Void> {
+public class FunctionTypeName {
+  static final private FunctionTypeNameDispatcher dispatcher = new FunctionTypeNameDispatcher();
 
-  public static Boolean get(Function inst) {
-    OutsideWriterInfo reduction = new OutsideWriterInfo();
-    return reduction.traverse(inst, null);
+  static public String get(Function function) {
+    return dispatcher.traverse(function, null);
+  }
+}
+
+class FunctionTypeNameDispatcher extends NullTraverser<String, Void> {
+
+  @Override
+  protected String visitDefault(Ast obj, Void param) {
+    throw new RuntimeException("not yet implemented: " + obj.getClass().getName());
   }
 
   @Override
-  protected Boolean visitDefault(Ast obj, Void param) {
-    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
+  protected String visitFuncSignal(FuncSignal obj, Void param) {
+    return "signal";
   }
 
   @Override
-  protected Boolean visitFuncProcedure(FuncProcedure obj, Void param) {
-    return false;
+  protected String visitFuncQuery(FuncQuery obj, Void param) {
+    return "query";
   }
 
   @Override
-  protected Boolean visitFuncFunction(FuncFunction obj, Void param) {
-    return false;
+  protected String visitFuncSlot(FuncSlot obj, Void param) {
+    return "slot";
   }
 
   @Override
-  protected Boolean visitFuncSubHandlerQuery(FuncSubHandlerQuery obj, Void param) {
-    return false;
+  protected String visitFuncResponse(FuncResponse obj, Void param) {
+    return "response";
   }
 
   @Override
-  protected Boolean visitFuncSubHandlerEvent(FuncSubHandlerEvent obj, Void param) {
-    return false;
+  protected String visitFuncProcedure(FuncProcedure obj, Void param) {
+    return "procedure";
   }
 
   @Override
-  protected Boolean visitFuncSignal(FuncSignal obj, Void param) {
-    return true;
+  protected String visitFuncFunction(FuncFunction obj, Void param) {
+    return "function";
   }
 
   @Override
-  protected Boolean visitFuncQuery(FuncQuery obj, Void param) {
-    return false;
+  protected String visitFuncSubHandlerQuery(FuncSubHandlerQuery obj, Void param) {
+    return "sub-response";
   }
 
   @Override
-  protected Boolean visitFuncSlot(FuncSlot obj, Void param) {
-    return false; // FIXME sure?
-  }
-
-  @Override
-  protected Boolean visitFuncResponse(FuncResponse obj, Void param) {
-    return false;
+  protected String visitFuncSubHandlerEvent(FuncSubHandlerEvent obj, Void param) {
+    return "sub-slot";
   }
 
 }

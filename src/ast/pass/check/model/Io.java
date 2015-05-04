@@ -17,78 +17,45 @@
 
 package ast.pass.check.model;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import ast.data.Ast;
+import ast.data.AstList;
 import ast.data.Namespace;
-import ast.data.component.hfsm.Transition;
 import ast.data.function.Function;
-import ast.doc.SimpleGraph;
+import ast.data.statement.Statement;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.pass.check.model.io.IoCheck;
-import ast.pass.check.model.io.StateReaderInfo;
-import ast.pass.check.model.io.StateWriterInfo;
-import ast.pass.helper.GraphHelper;
 import ast.repository.Collector;
-import ast.specification.IsClass;
-import ast.traverser.other.CallgraphMaker;
-import ast.traverser.other.OutsideReaderInfo;
-import ast.traverser.other.OutsideWriterInfo;
+import ast.repository.FunctionTypeName;
+import ast.specification.PureFunction;
+import ast.specification.StateChangeStmt;
+import error.ErrorType;
+import error.RError;
 
 /**
- * Checks that only allowed functions change state or write output
+ * Checks that functions do not change state
  */
 public class Io extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    SimpleGraph<Ast> cg = CallgraphMaker.make(ast, kb);
-    // printGraph(kb.getRootdir() + "callgraph.gv", cg);
-
-    Map<Ast, Boolean> writes = new HashMap<Ast, Boolean>();
-    Map<Ast, Boolean> reads = new HashMap<Ast, Boolean>();
-    Map<Ast, Boolean> outputs = new HashMap<Ast, Boolean>();
-    Map<Ast, Boolean> inputs = new HashMap<Ast, Boolean>();
-    for (Ast header : cg.vertexSet()) {
-      writes.put(header, StateWriterInfo.get(header));
-      reads.put(header, StateReaderInfo.get(header));
-      if (header instanceof Function) {
-        inputs.put(header, OutsideReaderInfo.get((Function) header));
-        outputs.put(header, OutsideWriterInfo.get((Function) header));
-      } else {
-        inputs.put(header, false);
-        outputs.put(header, false);
-      }
+    AstList<Function> functions = Collector.select(ast, new PureFunction()).castTo(Function.class);
+    for (Function func : functions) {
+      checkFunc(func);
     }
-    // print(writes, reads, outputs, inputs);
-
-    GraphHelper.doTransitiveClosure(cg);
-
-    writes = doTransStuff(cg, writes);
-    reads = doTransStuff(cg, reads);
-    outputs = doTransStuff(cg, outputs);
-    inputs = doTransStuff(cg, inputs);
-
-    // System.out.println("-------");
-    // print(writes, reads, outputs, inputs);
-
-    IoCheck ioCheck = new IoCheck(writes, reads, outputs, inputs);
-    ioCheck.check(Collector.select(ast, new IsClass(Function.class)));
-    ioCheck.check(Collector.select(ast, new IsClass(Transition.class)));
   }
 
-  private static <T extends Ast> Map<T, Boolean> doTransStuff(SimpleGraph<T> cg, Map<? extends Ast, Boolean> does) {
-    Map<T, Boolean> ret = new HashMap<T, Boolean>();
-    for (T u : cg.vertexSet()) {
-      boolean doThings = does.get(u);
-      for (Ast v : cg.getOutVertices(u)) {
-        doThings |= does.get(v);
+  private void checkFunc(Function func) {
+    AstList<Statement> modifiers = getStateModifiers(func);
+    if (!modifiers.isEmpty()) {
+      for (Ast modifier : modifiers) {
+        RError.err(ErrorType.Hint, modifier.getInfo(), "here");
       }
-      ret.put(u, doThings);
+      RError.err(ErrorType.Error, func.getInfo(), FunctionTypeName.get(func) + " (" + func.name + ") is not allowed to change state");
     }
-    return ret;
+  }
+
+  private AstList<Statement> getStateModifiers(Function func) {
+    return Collector.select(func, new StateChangeStmt()).castTo(Statement.class);
   }
 
 }

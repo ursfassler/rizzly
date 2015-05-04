@@ -27,42 +27,42 @@ public class ErrIoTest extends ErrorTest {
 
   @Test
   public void err1() {
-    testForError("err1", "Err1", "Response sends event");
+    testForError("err1", "Err1", "response (what) is not allowed to change state");
   }
 
   @Test
   public void err2() {
-    testForError("err2", "Err2", "Response writes state");
+    testForError("err2", "Err2", "response (what) is not allowed to change state");
   }
 
   @Test
   public void err3() {
-    testForError("err3", "Err3", "Response sends event");
+    testForError("err3", "Err3", "response (what) is not allowed to change state");
   }
 
   @Test
   public void err4() {
-    testForError("err4", "Err4", "Response writes state");
+    testForError("err4", "Err4", "response (what) is not allowed to change state");
   }
 
   @Test
   public void err5() {
-    testForError("err5", "Err5", "Response sends event");
+    testForError("err5", "Err5", "response (what) is not allowed to change state");
   }
 
   @Test
   public void err6() {
-    testForError("err6", "Err6", "Response writes state");
+    testForError("err6", "Err6", "response (what) is not allowed to change state");
   }
 
   @Test
   public void err7() {
-    testForError("err7", "Err7", "Transition guard sends event");
+    testForError("err7", "Err7", "function (foo) is not allowed to change state");
   }
 
   @Test
   public void err8() {
-    testForError("err8", "Err8", "Transition guard writes state");
+    testForError("err8", "Err8", "function (foo) is not allowed to change state");
   }
 
 }
