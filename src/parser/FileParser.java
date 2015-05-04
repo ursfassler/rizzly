@@ -61,9 +61,8 @@ public class FileParser extends BaseParser {
     ElementInfo info = peek().getInfo();
     ArrayList<Metadata> meta = getMetadata();
     info.metadata.addAll(meta);
-    List<Designator> imp = parseImport();
-
-    RizzlyFile ret = new RizzlyFile(info, name, imp);
+    RizzlyFile ret = new RizzlyFile(info, name);
+    ret.imports.addAll(parseImport());
 
     while (peek().getType() == TokenType.IDENTIFIER) {
       Pair<Token, List<TemplateParameter>> def = parseObjDef();
@@ -71,7 +70,7 @@ public class FileParser extends BaseParser {
       if (consumeIfEqual(TokenType.EQUAL)) {
         Ast object = parseDeclaration(def.first.getData());
         Template decl = new Template(def.first.getInfo(), def.first.getData(), def.second, object);
-        ret.getObjects().add(decl);
+        ret.objects.add(decl);
       } else if (consumeIfEqual(TokenType.COLON)) {
         if (!def.second.isEmpty()) {
           RError.err(ErrorType.Error, def.second.get(0).getInfo(), "no generic arguments allowed for instantiations");
@@ -79,7 +78,7 @@ public class FileParser extends BaseParser {
         ConstGlobal object = type().parseConstDef(ConstGlobal.class, def.first.getData());
         expect(TokenType.SEMI);
 
-        ret.getObjects().add(object);
+        ret.objects.add(object);
       } else {
         Token got = peek();
         RError.err(ErrorType.Error, got.getInfo(), "got unexpected token: " + got);

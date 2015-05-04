@@ -85,17 +85,17 @@ class LinkerWorker extends DefTraverser<Void, SymbolTable> {
     SymbolTable locs = new SymbolTable(rzys);
 
     AstList<Named> objs = new AstList<Named>();
-    for (Designator des : obj.getImports()) {
+    for (Designator des : obj.imports) {
       RizzlyFile rzy = kf.get(des);
       assert (rzy != null);
-      AstList<Named> named = TypeFilter.select(rzy.getObjects(), Named.class);
+      AstList<Named> named = TypeFilter.select(rzy.objects, Named.class);
       objs.addAll(named);
       objs.add(rzy);
     }
 
     pubs.addAll(removeDuplicates(objs));
 
-    locs.addAll(obj.getObjects());
+    locs.addAll(obj.objects);
 
     super.visitRizzlyFile(obj, locs);
     return null;

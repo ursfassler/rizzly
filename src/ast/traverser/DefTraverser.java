@@ -857,7 +857,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitRizzlyFile(RizzlyFile obj, P param) {
-    visitList(obj.getObjects(), param);
+    visitList(obj.objects, param);
     return null;
   }
 

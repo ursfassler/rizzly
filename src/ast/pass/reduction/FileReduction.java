@@ -40,7 +40,7 @@ class FileReductionWorker extends DefTraverser<Void, Namespace> {
     assert (param.children.contains(obj));
     int idx = param.children.indexOf(obj);
     ast.data.Namespace space = new Namespace(obj.getInfo(), obj.name);
-    space.children.addAll(obj.getObjects());
+    space.children.addAll(obj.objects);
     param.children.set(idx, space);
     return null;
   }

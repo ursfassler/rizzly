@@ -231,8 +231,8 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   protected Void visitRizzlyFile(RizzlyFile obj, Void param) {
     assert (param == null);
     writeMeta(obj);
-    visitImports(obj.getImports(), null);
-    visitList(obj.getObjects(), param);
+    visitImports(obj.imports, null);
+    visitList(obj.objects, param);
     return null;
   }
 

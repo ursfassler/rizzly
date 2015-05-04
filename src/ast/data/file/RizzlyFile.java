@@ -17,6 +17,7 @@
 
 package ast.data.file;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import ast.Designator;
@@ -30,25 +31,11 @@ import ast.data.Named;
  * @author urs
  */
 final public class RizzlyFile extends Named {
-  final private List<Designator> imports;
-  final private AstList<Ast> objects = new AstList<Ast>();
+  final public List<Designator> imports = new ArrayList<Designator>();
+  final public AstList<Ast> objects = new AstList<Ast>();
 
-  public RizzlyFile(ElementInfo info, String name, List<Designator> imports) {
+  public RizzlyFile(ElementInfo info, String name) {
     super(info, name);
-    this.imports = imports;
-  }
-
-  public List<Designator> getImports() {
-    return imports;
-  }
-
-  public AstList<Ast> getObjects() {
-    return objects;
-  }
-
-  @Override
-  public String toString() {
-    return name;
   }
 
 }

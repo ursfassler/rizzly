@@ -79,7 +79,7 @@ class CompLinkReductionWorker extends NullTraverser<Void, Void> {
       ast.data.expression.reference.RefName rn = (ast.data.expression.reference.RefName) compRef.offset.get(0);
       compRef.offset.remove(0);
       if (item instanceof RizzlyFile) {
-        item = TypeFilter.select(((RizzlyFile) item).getObjects(), RawComponent.class).find(rn.name);
+        item = TypeFilter.select(((RizzlyFile) item).objects, RawComponent.class).find(rn.name);
       } else if (item instanceof Namespace) {
         item = (Named) ((ast.data.Namespace) item).children.find(rn.name);
       } else {
