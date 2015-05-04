@@ -69,7 +69,7 @@ class QueueTypes {
       // TODO better name
       EnumElement enumElem = createElemFromFunc(unielem, func);
 
-      msgType.getElement().add(enumElem);
+      msgType.element.add(enumElem);
       funcToType.put(func, enumElem);
     }
 

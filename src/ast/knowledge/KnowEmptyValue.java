@@ -91,7 +91,7 @@ class KnowEmptyValueGenerator extends NullTraverser<Expression, Void> {
   @Override
   protected ast.data.expression.Expression visitEnumType(EnumType obj, Void param) {
     ast.data.expression.reference.Reference ref = new Reference(ElementInfo.NO, obj);
-    ref.offset.add(new RefName(ElementInfo.NO, obj.getElement().get(0).name));
+    ref.offset.add(new RefName(ElementInfo.NO, obj.element.get(0).name));
     return ref;
   }
 

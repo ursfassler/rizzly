@@ -111,7 +111,7 @@ class KnowChildTraverser extends NullTraverser<Set<Ast>, String> {
 
   @Override
   protected Set<Ast> visitEnumType(EnumType obj, String param) {
-    return new HashSet<Ast>(filterName(obj.getElement(), param));
+    return new HashSet<Ast>(filterName(obj.element, param));
   }
 
   @Override

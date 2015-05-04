@@ -455,7 +455,7 @@ public class FunPrinter extends NullTraverser<Void, Void> {
     xw.wa("Enum", getId(obj, param));
     xw.nl();
     xw.incIndent();
-    visitList(obj.getElement(), param);
+    visitList(obj.element, param);
     xw.decIndent();
     xw.kw("end");
     return null;

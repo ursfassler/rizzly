@@ -150,7 +150,7 @@ public class TypeParser extends BaseParser {
 
     while (peek().getType() != TokenType.END) {
       Token elemTok = parseEnumElem();
-      type.getElement().add(new EnumElement(elemTok.getInfo(), elemTok.getData()));
+      type.element.add(new EnumElement(elemTok.getInfo(), elemTok.getData()));
     }
 
     expect(TokenType.END);

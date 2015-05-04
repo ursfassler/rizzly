@@ -52,7 +52,7 @@ public class EnumReduction extends AstPass {
     for (EnumType et : TypeFilter.select(ast.children, EnumType.class)) {
 
       BigInteger idx = BigInteger.ZERO;
-      for (EnumElement elem : et.getElement()) {
+      for (EnumElement elem : et.element) {
         RangeType rt = kbi.getRangeType(new Range(idx, idx));
 
         String name = et.name + Designator.NAME_SEP + elem.name;
@@ -63,7 +63,7 @@ public class EnumReduction extends AstPass {
         idx = idx.add(BigInteger.ONE);
       }
 
-      RangeType rt = kbi.getRangeType(et.getElement().size());
+      RangeType rt = kbi.getRangeType(et.element.size());
       typeMap.put(et, rt);
     }
 
@@ -92,7 +92,7 @@ class EnumReduce extends DefTraverser<Void, Void> {
         assert (obj.offset.size() == 1);
         String elemName = ((RefName) obj.offset.get(0)).name;
         EnumType ent = (EnumType) obj.link;
-        EnumElement elem = ent.getElement().find(elemName);
+        EnumElement elem = ent.element.find(elemName);
         assert (elem != null);
         assert (elemMap.containsKey(elem));
         obj.offset.clear();

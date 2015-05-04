@@ -257,7 +257,7 @@ class Reduction {
       assert (state instanceof StateSimple);
 
       EnumElement element = new EnumElement(info, state.name);
-      stateEnum.getElement().add(element);
+      stateEnum.element.add(element);
 
       ret.put((StateSimple) state, element);
     }
@@ -347,7 +347,7 @@ class Reduction {
   }
 
   private static Reference makeEnumElemRef(EnumType type, EnumElement enumElement) {
-    assert (type.getElement().contains(enumElement));
+    assert (type.element.contains(enumElement));
     EnumElement elem = enumElement;
     // EnumElement elem = type.find(enumElement);
 

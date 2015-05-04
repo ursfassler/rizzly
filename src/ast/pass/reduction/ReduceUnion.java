@@ -137,7 +137,7 @@ class Uni2Enum extends DefTraverser<Void, Map<UnionType, EnumType>> {
 
     for (NamedElement elem : obj.element) {
       EnumElement ee = new EnumElement(ElementInfo.NO, elem.name);
-      et.getElement().add(ee);
+      et.element.add(ee);
     }
 
     obj.tag.typeref = new SimpleRef<Type>(ElementInfo.NO, et);

@@ -69,7 +69,7 @@ public class CopyType extends NullTraverser<Type, Void> {
   @Override
   protected Type visitEnumType(EnumType obj, Void param) {
     EnumType type = new EnumType(obj.getInfo(), obj.name);
-    type.getElement().addAll(cast.copy(obj.getElement()));
+    type.element.addAll(cast.copy(obj.element));
     return type;
   }
 

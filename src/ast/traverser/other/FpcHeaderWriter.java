@@ -351,7 +351,7 @@ public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.nl();
     param.incIndent();
 
-    Iterator<EnumElement> itr = obj.getElement().iterator();
+    Iterator<EnumElement> itr = obj.element.iterator();
     while (itr.hasNext()) {
       param.wr(itr.next().name);
       if (itr.hasNext()) {

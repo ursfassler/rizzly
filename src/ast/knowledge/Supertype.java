@@ -75,7 +75,7 @@ public class Supertype extends NullTraverser<Type, Void> {
 
   @Override
   protected Type visitEnumType(EnumType obj, Void param) {
-    return kbi.getRangeType(obj.getElement().size());
+    return kbi.getRangeType(obj.element.size());
   }
 
   @Override

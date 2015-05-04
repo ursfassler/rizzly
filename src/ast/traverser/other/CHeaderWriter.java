@@ -140,7 +140,7 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
     param.wr("typedef enum {");
     param.nl();
     param.incIndent();
-    for (EnumElement elem : obj.getElement()) {
+    for (EnumElement elem : obj.element) {
       param.wr(obj.name + Designator.NAME_SEP + elem.name);
       param.wr(",");
       param.nl();

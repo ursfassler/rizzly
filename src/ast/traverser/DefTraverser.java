@@ -295,7 +295,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitEnumType(EnumType obj, P param) {
-    visitList(obj.getElement(), param);
+    visitList(obj.element, param);
     return null;
   }
 

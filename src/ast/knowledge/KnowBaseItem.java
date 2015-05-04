@@ -212,7 +212,7 @@ public class KnowBaseItem extends KnowledgeEntry {
 
     EnumType ret = new EnumType(ElementInfo.NO, kun.get("enum"));
     for (String name : elements) {
-      ret.getElement().add(new EnumElement(ElementInfo.NO, name));
+      ret.element.add(new EnumElement(ElementInfo.NO, name));
     }
     kb.getRoot().children.add(ret);
     return ret;

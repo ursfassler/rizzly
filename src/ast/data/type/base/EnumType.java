@@ -24,25 +24,11 @@ import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.type.Type;
 
-//TODO cleanup, convert to data
 public class EnumType extends Type {
-  final private AstList<EnumElement> element = new AstList<EnumElement>();
+  final public AstList<EnumElement> element = new AstList<EnumElement>();
 
   public EnumType(ElementInfo info, String name) {
     super(info, name);
-  }
-
-  public AstList<EnumElement> getElement() {
-    return element;
-  }
-
-  @Deprecated
-  public EnumElement find(String name) {
-    return element.find(name);
-  }
-
-  public boolean isSupertypeOf(EnumType sub) {
-    return element.containsAll(sub.element);
   }
 
   public Set<String> getNames() {
