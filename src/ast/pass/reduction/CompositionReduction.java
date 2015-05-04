@@ -68,6 +68,7 @@ import ast.data.variable.FuncVariable;
 import ast.data.variable.Variable;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.repository.NameFilter;
 import ast.specification.AndSpec;
 import ast.specification.IsClass;
 import ast.specification.Specification;
@@ -188,7 +189,7 @@ class CompositionReductionWorker extends NullTraverser<Ast, Void> {
       } else {
         CompUse srcCompRef = ((EndpointSub) src).component.link;
         Component srcComp = (Component) srcCompRef.compRef.getTarget();
-        InterfaceFunction funa = srcComp.iface.find(((EndpointSub) src).function);
+        InterfaceFunction funa = NameFilter.select(srcComp.iface, ((EndpointSub) src).function);
         Function coniface = funa;
 
         Function suha = coca.get(new Pair<CompUse, Function>(srcCompRef, coniface));

@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.expression.ArrayValue;
@@ -42,10 +43,12 @@ import ast.data.type.composed.RecordType;
 import ast.data.type.composed.UnionType;
 import ast.data.type.composed.UnsafeUnionType;
 import ast.data.variable.DefVariable;
-import ast.knowledge.KnowChild;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.repository.ChildCollector;
+import ast.repository.Single;
+import ast.specification.HasName;
 import ast.traverser.other.ExprReplacer;
 import error.ErrorType;
 import error.RError;
@@ -61,12 +64,10 @@ public class InitVarTyper extends AstPass {
 }
 
 class InitVarTyperWorker extends ExprReplacer<Type> {
-  private final KnowChild kc;
   private final KnowType kt;
 
   public InitVarTyperWorker(KnowledgeBase kb) {
     super();
-    this.kc = kb.getEntry(KnowChild.class);
     this.kt = kb.getEntry(KnowType.class);
   }
 
@@ -136,23 +137,21 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
   protected Expression visitNamedValue(NamedValue obj, Type type) {
     if (type instanceof UnionType) {
       EnumType et = (EnumType) kt.get(((UnionType) type).tag.typeref);
-      EnumElement ele = (EnumElement) kc.get(et, obj.name, obj.getInfo());
-
-      EnumElement value = (EnumElement) kc.get(et, obj.name, obj.getInfo());
+      EnumElement value = (EnumElement) getChild(obj, et);
 
       NamedValue tag = new NamedValue(obj.getInfo(), ((UnionType) type).tag.name, new Reference(obj.getInfo(), value));
 
       Expression ov = obj.value;
-      NamedElement elem = (NamedElement) kc.get(type, obj.name, obj.getInfo());
+      NamedElement elem = (NamedElement) getChild(obj, type);
       ov = visit(ov, kt.get(elem.typeref));
 
-      NamedValue content = new NamedValue(obj.getInfo(), ele.name, ov);
+      NamedValue content = new NamedValue(obj.getInfo(), value.name, ov);
 
       UnionValue uv = new UnionValue(obj.getInfo(), tag, content, new SimpleRef<Type>(obj.getInfo(), type));
       return uv;
     } else if (type instanceof UnsafeUnionType) {
       Expression ov = obj.value;
-      NamedElement elem = (NamedElement) kc.get(type, obj.name, obj.getInfo());
+      NamedElement elem = (NamedElement) getChild(obj, type);
       ov = visit(ov, kt.get(elem.typeref));
 
       NamedValue content = new NamedValue(obj.getInfo(), elem.name, ov);
@@ -165,6 +164,10 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
     } else {
       throw new RuntimeException("not yet implemented: " + type.getClass().getCanonicalName());
     }
+  }
+
+  private Ast getChild(NamedValue obj, Ast et) {
+    return Single.force(ChildCollector.select(et, new HasName(obj.name)), obj.getInfo());
   }
 
   @Override

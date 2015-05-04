@@ -28,20 +28,18 @@ import ast.data.type.base.ArrayType;
 import ast.data.type.base.EnumType;
 import ast.data.type.base.FunctionType;
 import ast.data.type.composed.NamedElement;
-import ast.knowledge.KnowChild;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
+import ast.repository.ChildByName;
 import ast.traverser.NullTraverser;
 import error.ErrorType;
 import error.RError;
 
 public class RefTypeGetter extends NullTraverser<Type, Type> {
-  final private KnowChild kc;
   final private KnowType kt; // FIXME remove cyclic dependency
 
   public RefTypeGetter(KnowType kt, KnowledgeBase kb) {
     super();
-    kc = kb.getEntry(KnowChild.class);
     this.kt = kt;
   }
 
@@ -82,7 +80,7 @@ public class RefTypeGetter extends NullTraverser<Type, Type> {
       return sub;
     } else {
       String name = obj.name;
-      NamedElement etype = (NamedElement) kc.find(sub, name);
+      NamedElement etype = (NamedElement) ChildByName.find(sub, name);
       if (etype == null) {
         RError.err(ErrorType.Error, obj.getInfo(), "Child not found: " + obj);
       }

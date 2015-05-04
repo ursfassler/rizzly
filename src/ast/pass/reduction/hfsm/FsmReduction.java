@@ -68,7 +68,7 @@ import ast.knowledge.KnowBaseItem;
 import ast.knowledge.KnowLlvmLibrary;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.specification.TypeFilter;
+import ast.repository.TypeFilter;
 import ast.traverser.NullTraverser;
 import error.ErrorType;
 import error.RError;

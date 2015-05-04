@@ -31,11 +31,12 @@ import ast.data.expression.reference.Reference;
 import ast.data.function.Function;
 import ast.data.type.Type;
 import ast.data.type.base.ArrayType;
+import ast.data.type.composed.NamedElement;
 import ast.data.variable.Variable;
 import ast.doc.SimpleGraph;
-import ast.knowledge.KnowChild;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
+import ast.repository.ChildByName;
 import ast.traverser.DefTraverser;
 import ast.traverser.NullTraverser;
 
@@ -112,12 +113,12 @@ public class CallgraphMaker extends DefTraverser<Void, Ast> {
     }
     return null;
   }
-
 }
 
+// FIXME make it cleaner
+@Deprecated
 class RefGetter extends NullTraverser<Ast, Ast> {
   private Set<Function> target;
-  private KnowChild kfc;
   final private KnowType kt;
 
   static public Ast process(RefItem refitm, Ast last, Set<Function> target, KnowledgeBase kb) {
@@ -128,7 +129,6 @@ class RefGetter extends NullTraverser<Ast, Ast> {
   public RefGetter(KnowledgeBase kb, Set<Function> target) {
     super();
     this.target = target;
-    this.kfc = kb.getEntry(KnowChild.class);
     kt = kb.getEntry(KnowType.class);
   }
 
@@ -150,7 +150,17 @@ class RefGetter extends NullTraverser<Ast, Ast> {
 
   @Override
   protected Ast visitRefName(RefName obj, Ast param) {
-    return kfc.get(param, obj.name, obj.getInfo());
+
+    // FIXME remove this hack
+    if (param instanceof Variable) {
+      param = ((BaseRef) ((Variable) param).type).link;
+    } else if (param instanceof NamedElement) {
+      param = ((BaseRef) ((NamedElement) param).typeref).link;
+    } else if (param instanceof BaseRef) {
+      param = ((BaseRef) param).link;
+    }
+
+    return ChildByName.get(param, obj.name, obj.getInfo());
   }
 
   @Override

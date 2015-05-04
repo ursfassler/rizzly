@@ -24,6 +24,7 @@ import ast.Designator;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.file.RizzlyFile;
+import ast.repository.ChildByName;
 import ast.traverser.DefTraverser;
 import ast.traverser.NullTraverser;
 import error.ErrorType;
@@ -46,8 +47,7 @@ public class KnowFile extends KnowledgeEntry {
   }
 
   public RizzlyFile get(Designator path) {
-    KnowChild kc = base.getEntry(KnowChild.class);
-    Ast item = kc.get(base.getRoot(), path.toList(), base.getRoot().getInfo());
+    Ast item = ChildByName.get(base.getRoot(), path, base.getRoot().getInfo());
     assert (item instanceof RizzlyFile);
     return (RizzlyFile) item;
   }

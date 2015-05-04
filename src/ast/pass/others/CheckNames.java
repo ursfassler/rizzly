@@ -33,7 +33,7 @@ import ast.data.type.template.TypeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.specification.TypeFilter;
+import ast.repository.TypeFilter;
 import ast.traverser.DefTraverser;
 import error.ErrorType;
 import error.RError;

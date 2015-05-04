@@ -33,8 +33,8 @@ import ast.data.Namespace;
 import ast.data.file.RizzlyFile;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.repository.List;
 import ast.specification.HasName;
-import ast.specification.List;
 
 public class FileLoader extends AstPass {
 

@@ -134,7 +134,6 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
     return null;
   }
 
-  // FIXME we can not guarantee that the order is still true after PIR
   @Override
   protected Void visitEnumType(EnumType obj, StreamWriter param) {
     param.wr("typedef enum {");

@@ -47,7 +47,8 @@ import ast.data.type.base.RangeType;
 import ast.knowledge.KnowFile;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.specification.TypeFilter;
+import ast.repository.NameFilter;
+import ast.repository.TypeFilter;
 import ast.traverser.DefTraverser;
 import error.ErrorType;
 import error.RError;
@@ -106,7 +107,7 @@ class LinkerWorker extends DefTraverser<Void, SymbolTable> {
     AstList<Named> map = new AstList<Named>();
     for (Named itr : objs) {
       if (!ambigous.contains(itr.name)) {
-        if ((Named) map.find(itr.name) != null) {
+        if (NameFilter.select(map, itr.name) != null) {
           map.remove(itr.name);
           ambigous.add(itr.name);
         } else {

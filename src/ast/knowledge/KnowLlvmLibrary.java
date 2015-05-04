@@ -27,6 +27,7 @@ import ast.data.function.header.FuncSignal;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.statement.Block;
 import ast.data.variable.FuncVariable;
+import ast.repository.NameFilter;
 
 //TODO rename
 //TODO rename trap to runtime exception and provide arguments
@@ -39,7 +40,7 @@ public class KnowLlvmLibrary extends KnowledgeEntry {
   }
 
   private Ast findItem(String name) {
-    return kb.getRoot().children.find(name);
+    return NameFilter.select(kb.getRoot().children, name);
   }
 
   private void addItem(Named item) {

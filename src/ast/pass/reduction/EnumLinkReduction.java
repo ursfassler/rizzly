@@ -22,9 +22,9 @@ import ast.data.expression.reference.RefName;
 import ast.data.expression.reference.Reference;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.EnumType;
-import ast.knowledge.KnowChild;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.repository.ChildByName;
 import ast.traverser.DefTraverser;
 import error.ErrorType;
 import error.RError;
@@ -39,18 +39,13 @@ public class EnumLinkReduction extends AstPass {
 
   @Override
   public void process(ast.data.Namespace root, KnowledgeBase kb) {
-    EnumLinkReductionWorker reduction = new EnumLinkReductionWorker(kb);
+    EnumLinkReductionWorker reduction = new EnumLinkReductionWorker();
     reduction.traverse(root, null);
   }
 
 }
 
 class EnumLinkReductionWorker extends DefTraverser<Void, Void> {
-  private final KnowChild kc;
-
-  public EnumLinkReductionWorker(KnowledgeBase kb) {
-    kc = kb.getEntry(KnowChild.class);
-  }
 
   @Override
   protected Void visitReference(Reference obj, Void param) {
@@ -62,7 +57,7 @@ class EnumLinkReductionWorker extends DefTraverser<Void, Void> {
         if (!(next instanceof RefName)) {
           RError.err(ErrorType.Error, obj.getInfo(), "Expected named offset, got: " + next.getClass().getCanonicalName());
         }
-        Ast elem = kc.find(item, ((ast.data.expression.reference.RefName) next).name);
+        Ast elem = ChildByName.find(item, ((ast.data.expression.reference.RefName) next).name);
         if (elem == null) {
           RError.err(ErrorType.Error, obj.getInfo(), "Element not found: " + ((ast.data.expression.reference.RefName) next).name);
         }

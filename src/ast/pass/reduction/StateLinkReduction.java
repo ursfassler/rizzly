@@ -20,10 +20,11 @@ package ast.pass.reduction;
 import ast.data.Ast;
 import ast.data.Named;
 import ast.data.component.hfsm.State;
+import ast.data.expression.reference.RefName;
 import ast.data.expression.reference.Reference;
-import ast.knowledge.KnowChild;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.repository.ChildByName;
 import ast.traverser.DefTraverser;
 
 /**
@@ -36,17 +37,12 @@ public class StateLinkReduction extends AstPass {
 
   @Override
   public void process(ast.data.Namespace root, KnowledgeBase kb) {
-    StateLinkReductionWorker reduction = new StateLinkReductionWorker(kb);
+    StateLinkReductionWorker reduction = new StateLinkReductionWorker();
     reduction.traverse(root, null);
   }
 }
 
 class StateLinkReductionWorker extends DefTraverser<Void, Void> {
-  private final KnowChild kc;
-
-  public StateLinkReductionWorker(KnowledgeBase kb) {
-    kc = kb.getEntry(KnowChild.class);
-  }
 
   @Override
   protected Void visitReference(Reference obj, Void param) {
@@ -55,9 +51,7 @@ class StateLinkReductionWorker extends DefTraverser<Void, Void> {
       while (!obj.offset.isEmpty()) {
         ast.data.expression.reference.RefItem next = obj.offset.get(0);
         obj.offset.remove(0);
-        ast.data.expression.reference.RefName name = (ast.data.expression.reference.RefName) next;
-
-        item = kc.get(item, name.name, item.getInfo());
+        item = ChildByName.get(item, ((RefName) next).name, item.getInfo());
         assert (item != null);
         if (!(item instanceof State)) {
           break;

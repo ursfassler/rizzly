@@ -38,7 +38,8 @@ import ast.data.variable.ConstGlobal;
 import ast.knowledge.KnowBaseItem;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.specification.TypeFilter;
+import ast.repository.NameFilter;
+import ast.repository.TypeFilter;
 import ast.traverser.DefTraverser;
 
 public class EnumReduction extends AstPass {
@@ -92,7 +93,7 @@ class EnumReduce extends DefTraverser<Void, Void> {
         assert (obj.offset.size() == 1);
         String elemName = ((RefName) obj.offset.get(0)).name;
         EnumType ent = (EnumType) obj.link;
-        EnumElement elem = ent.element.find(elemName);
+        EnumElement elem = NameFilter.select(ent.element, elemName);
         assert (elem != null);
         assert (elemMap.containsKey(elem));
         obj.offset.clear();

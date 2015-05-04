@@ -24,9 +24,12 @@ import ast.data.expression.reference.DummyLinkTarget;
 import ast.data.expression.reference.RefName;
 import ast.data.expression.reference.Reference;
 import ast.data.file.RizzlyFile;
-import ast.knowledge.KnowChild;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.repository.ChildCollector;
+import ast.repository.NameFilter;
+import ast.repository.Single;
+import ast.specification.HasName;
 import ast.traverser.DefTraverser;
 import error.ErrorType;
 import error.RError;
@@ -62,7 +65,7 @@ class NamespaceLinkReductionWorker extends DefTraverser<Void, Void> {
         RError.err(ErrorType.Error, obj.getInfo(), "Expected named offset, got: " + next.getClass().getCanonicalName());
       }
       ast.data.expression.reference.RefName name = (ast.data.expression.reference.RefName) next;
-      ((ast.data.Namespace) item).children.find(name.name);
+      Ast find = NameFilter.select(((ast.data.Namespace) item).children, name.name);
       assert (item != null); // type checker should find it?
     }
     if (item instanceof RizzlyFile) {
@@ -72,8 +75,7 @@ class NamespaceLinkReductionWorker extends DefTraverser<Void, Void> {
         RError.err(ErrorType.Error, obj.getInfo(), "Expected named offset, got: " + next.getClass().getCanonicalName());
       }
       ast.data.expression.reference.RefName name = (ast.data.expression.reference.RefName) next;
-      KnowChild kfc = new KnowChild();
-      item = kfc.get(item, name.name, item.getInfo());
+      item = Single.force(ChildCollector.select(item, new HasName(name.name)), item.getInfo());
       assert (item != null); // type checker should find it?
     }
     obj.link = (Named) item;

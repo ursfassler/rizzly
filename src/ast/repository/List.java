@@ -15,35 +15,31 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.manipulator;
+package ast.repository;
 
 import java.util.Collection;
 
 import ast.data.Ast;
-import ast.repository.List;
+import ast.data.AstList;
 import ast.specification.Specification;
-import ast.traverser.DefTraverser;
 
-public class Manipulate {
-  static public void remove(Ast root, Specification spec) {
-    Remover traverser = new Remover(spec);
-    traverser.traverse(root, null);
+public class List {
+  static public <T extends Ast> AstList<T> select(Collection<T> list, Specification spec) {
+    AstList<T> ret = new AstList<T>();
+    for (T itr : list) {
+      if (spec.isSatisfiedBy(itr)) {
+        ret.add(itr);
+      }
+    }
+    return ret;
   }
 
-}
-
-class Remover extends DefTraverser<Void, Void> {
-  final private Specification spec;
-
-  public Remover(Specification spec) {
-    super();
-    this.spec = spec;
+  static public boolean contains(Collection<? extends Ast> list, Specification spec) {
+    for (Ast itr : list) {
+      if (spec.isSatisfiedBy(itr)) {
+        return true;
+      }
+    }
+    return false;
   }
-
-  @Override
-  protected Void visitList(Collection<? extends Ast> list, Void param) {
-    list.removeAll(List.select(list, spec));
-    return super.visitList(list, param);
-  }
-
 }

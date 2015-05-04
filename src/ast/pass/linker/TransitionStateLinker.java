@@ -28,7 +28,7 @@ import ast.data.expression.reference.DummyLinkTarget;
 import ast.data.expression.reference.Reference;
 import ast.data.expression.reference.StateRef;
 import ast.data.raw.RawHfsm;
-import ast.specification.TypeFilter;
+import ast.repository.TypeFilter;
 import error.ErrorType;
 import error.RError;
 

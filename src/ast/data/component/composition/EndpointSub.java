@@ -21,6 +21,7 @@ import ast.ElementInfo;
 import ast.data.component.Component;
 import ast.data.expression.reference.SimpleRef;
 import ast.data.function.Function;
+import ast.repository.NameFilter;
 
 final public class EndpointSub extends Endpoint {
   final public SimpleRef<CompUse> component;
@@ -35,7 +36,7 @@ final public class EndpointSub extends Endpoint {
   @Override
   public Function getFunc() {
     Component comp = (Component) component.link.compRef.getTarget();
-    return comp.iface.find(function);
+    return NameFilter.select(comp.iface, function);
   }
 
   @Override

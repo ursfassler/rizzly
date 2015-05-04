@@ -32,7 +32,7 @@ import ast.data.variable.Variable;
 import ast.doc.SimpleGraph;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.specification.TypeFilter;
+import ast.repository.TypeFilter;
 import ast.traverser.DefTraverser;
 
 //TODO merge with TypeSort?

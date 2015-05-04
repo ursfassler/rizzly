@@ -23,9 +23,10 @@ import ast.data.Namespace;
 import ast.data.expression.reference.RefItem;
 import ast.data.expression.reference.RefName;
 import ast.data.expression.reference.Reference;
-import ast.knowledge.KnowChild;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.repository.ChildByName;
+import ast.repository.NameFilter;
 import ast.traverser.DefTraverser;
 import error.ErrorType;
 import error.RError;
@@ -43,8 +44,7 @@ public class LinkReduction extends AstPass {
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
     // FIXME hacky
-    KnowChild kc = kb.getEntry(KnowChild.class);
-    Namespace inst = (Namespace) kc.find(ast, "!inst");
+    Namespace inst = (Namespace) ChildByName.find(ast, "!inst");
 
     LinkReductionWorker reduction = new LinkReductionWorker();
     reduction.traverse(inst, null);
@@ -64,7 +64,7 @@ class LinkReductionWorker extends DefTraverser<Void, Void> {
         RError.err(ErrorType.Fatal, obj.getInfo(), "Expected named offset, got: " + next.getClass().getCanonicalName() + " (and why did the typechecker not find it?)");
       }
       RefName name = (RefName) next;
-      item = ((Namespace) item).children.find(name.name);
+      item = NameFilter.select(((Namespace) item).children, name.name);
       assert (item != null); // type checker should find it?
     }
     obj.link = (Named) item;

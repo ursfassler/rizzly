@@ -39,8 +39,9 @@ import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.Collector;
+import ast.repository.NameFilter;
+import ast.repository.TypeFilter;
 import ast.specification.IsClass;
-import ast.specification.TypeFilter;
 import error.ErrorType;
 import error.RError;
 
@@ -80,7 +81,7 @@ public class ElementaryReduction extends AstPass {
   private boolean checkForAll(AstList<? extends Function> test, AstList<? extends Function> set, String what) {
     boolean ret = true;
     for (Function func : test) {
-      Function proto = set.find(func.name);
+      Function proto = NameFilter.select(set, func.name);
       if (proto == null) {
         RError.err(ErrorType.Error, func.getInfo(), what + " not found for " + func.name);
         ret = false;
@@ -91,7 +92,7 @@ public class ElementaryReduction extends AstPass {
 
   private void merge(AstList<? extends Function> test, AstList<? extends Function> set, Map<Named, Named> map, KnowledgeBase kb) {
     for (Function func : test) {
-      merge(func, set.find(func.name), map, kb);
+      merge(func, NameFilter.select(set, func.name), map, kb);
     }
   }
 

@@ -27,9 +27,9 @@ import ast.data.Namespace;
 import ast.data.component.composition.Queue;
 import ast.data.function.Function;
 import ast.data.type.composed.RecordType;
-import ast.knowledge.KnowChild;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.repository.ChildByName;
 import ast.repository.Collector;
 import ast.specification.IsClass;
 
@@ -38,8 +38,7 @@ public class QueueReduction extends AstPass {
   @Override
   public void process(Namespace classes, KnowledgeBase kb) {
     // FIXME hacky
-    KnowChild kc = kb.getEntry(KnowChild.class);
-    Namespace inst = (Namespace) kc.find(classes, "!inst");
+    Namespace inst = (Namespace) ChildByName.find(classes, "!inst");
 
     QueueReductionWorker worker = new QueueReductionWorker(inst, kb);
     worker.process();

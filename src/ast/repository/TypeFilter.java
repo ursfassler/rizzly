@@ -15,12 +15,13 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.specification;
+package ast.repository;
 
 import java.util.Collection;
 
 import ast.data.Ast;
 import ast.data.AstList;
+import ast.specification.IsClass;
 
 public class TypeFilter {
 

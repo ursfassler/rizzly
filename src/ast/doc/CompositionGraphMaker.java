@@ -42,7 +42,7 @@ import ast.doc.compgraph.SubComponent;
 import ast.doc.compgraph.WorldComp;
 import ast.knowledge.KnowPath;
 import ast.knowledge.KnowledgeBase;
-import ast.specification.TypeFilter;
+import ast.repository.TypeFilter;
 import error.ErrorType;
 import error.RError;
 

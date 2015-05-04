@@ -20,11 +20,6 @@ package ast.data;
 import java.util.ArrayList;
 import java.util.Collection;
 
-import ast.specification.HasName;
-import ast.specification.List;
-import error.ErrorType;
-import error.RError;
-
 public class AstList<T extends Ast> extends ArrayList<T> {
   private static final long serialVersionUID = 2599344789209692487L;
 
@@ -43,23 +38,4 @@ public class AstList<T extends Ast> extends ArrayList<T> {
   public <C extends Ast> AstList<C> castTo(Class<C> kind) {
     return new AstList<C>((AstList<? extends C>) this);
   }
-
-  @Deprecated
-  public T find(String name) {
-    AstList<T> ret = List.select(this, new HasName(name));
-
-    switch (ret.size()) {
-      case 0:
-        return null;
-      case 1:
-        return ret.get(0);
-      default:
-        for (T itr : ret) {
-          RError.err(ErrorType.Hint, itr.getInfo(), "this");
-        }
-        RError.err(ErrorType.Fatal, "Found more than one entry with name " + name);
-        return null;
-    }
-  }
-
 }

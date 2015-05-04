@@ -28,7 +28,7 @@ import ast.data.function.header.FuncQuery;
 import ast.data.function.header.FuncResponse;
 import ast.data.function.header.FuncSignal;
 import ast.data.function.header.FuncSlot;
-import ast.specification.TypeFilter;
+import ast.repository.TypeFilter;
 
 abstract public class Component extends Named {
   public Queue queue;

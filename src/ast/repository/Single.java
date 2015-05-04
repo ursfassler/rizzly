@@ -15,30 +15,35 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.specification;
+package ast.repository;
 
-import java.util.Collection;
-
+import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
+import error.ErrorType;
+import error.RError;
 
-public class List {
-  static public <T extends Ast> AstList<T> select(Collection<T> list, Specification spec) {
-    AstList<T> ret = new AstList<T>();
-    for (T itr : list) {
-      if (spec.isSatisfiedBy(itr)) {
-        ret.add(itr);
-      }
+public class Single {
+
+  static public <T extends Ast> T force(AstList<? extends T> list, ElementInfo info) {
+    switch (list.size()) {
+      case 1:
+        return list.get(0);
+      case 0:
+        RError.err(ErrorType.Fatal, info, "Item not found");
+        return null;
+      default:
+        RError.err(ErrorType.Fatal, info, "To many items found");
+        return null;
     }
-    return ret;
   }
 
-  static public boolean contains(Collection<? extends Ast> list, Specification spec) {
-    for (Ast itr : list) {
-      if (spec.isSatisfiedBy(itr)) {
-        return true;
-      }
+  static public <T extends Ast> T find(AstList<? extends T> list) {
+    if (list.size() == 1) {
+      return list.get(0);
+    } else {
+      return null;
     }
-    return false;
   }
+
 }

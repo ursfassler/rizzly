@@ -46,6 +46,7 @@ import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.pass.reduction.CompositionReduction;
 import ast.repository.Collector;
+import ast.repository.NameFilter;
 import ast.specification.IsClass;
 import ast.traverser.NullTraverser;
 import error.RError;
@@ -147,7 +148,7 @@ class CompInstantiatorWorker extends NullTraverser<ImplElementary, Namespace> {
       // route output interface to sub-callback implementation
       for (Function impl : getSubCallback(inst.subCallback, compUse).func) {
         // get output declaration of instantiated sub-component
-        Function outdecl = cpy.iface.find(impl.name);
+        Function outdecl = NameFilter.select(cpy.iface, impl.name);
 
         assert (outdecl != null);
         assert (usens.children.contains(outdecl));

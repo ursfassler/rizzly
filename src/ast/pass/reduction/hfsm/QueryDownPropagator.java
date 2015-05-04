@@ -43,8 +43,8 @@ import ast.data.variable.Variable;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.Collector;
+import ast.repository.TypeFilter;
 import ast.specification.IsClass;
-import ast.specification.TypeFilter;
 import ast.traverser.NullTraverser;
 
 public class QueryDownPropagator extends AstPass {

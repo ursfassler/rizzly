@@ -27,7 +27,8 @@ import ast.data.raw.RawComponent;
 import ast.data.raw.RawComposition;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.specification.TypeFilter;
+import ast.repository.NameFilter;
+import ast.repository.TypeFilter;
 import ast.traverser.NullTraverser;
 import error.ErrorType;
 import error.RError;
@@ -79,9 +80,9 @@ class CompLinkReductionWorker extends NullTraverser<Void, Void> {
       ast.data.expression.reference.RefName rn = (ast.data.expression.reference.RefName) compRef.offset.get(0);
       compRef.offset.remove(0);
       if (item instanceof RizzlyFile) {
-        item = TypeFilter.select(((RizzlyFile) item).objects, RawComponent.class).find(rn.name);
+        item = NameFilter.select(TypeFilter.select(((RizzlyFile) item).objects, RawComponent.class), rn.name);
       } else if (item instanceof Namespace) {
-        item = (Named) ((ast.data.Namespace) item).children.find(rn.name);
+        item = (Named) NameFilter.select(((ast.data.Namespace) item).children, rn.name);
       } else {
         RError.err(ErrorType.Fatal, item.getInfo(), "Unhandled type: " + item.getClass().getCanonicalName());
       }

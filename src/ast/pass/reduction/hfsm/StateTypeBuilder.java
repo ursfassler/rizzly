@@ -43,7 +43,7 @@ import ast.data.variable.Constant;
 import ast.data.variable.StateVariable;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
-import ast.specification.TypeFilter;
+import ast.repository.TypeFilter;
 import ast.traverser.NullTraverser;
 
 /**

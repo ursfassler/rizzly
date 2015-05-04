@@ -29,7 +29,7 @@ import ast.doc.DepGraph;
 import ast.doc.SimpleGraph;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.specification.TypeFilter;
+import ast.repository.TypeFilter;
 
 // FIXME if we remove everything unused, we can not typecheck that in EVL
 public class UnusedRemover extends AstPass {

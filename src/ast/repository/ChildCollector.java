@@ -15,35 +15,47 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.manipulator;
-
-import java.util.Collection;
+package ast.repository;
 
 import ast.data.Ast;
-import ast.repository.List;
+import ast.data.AstList;
+import ast.specification.HasName;
 import ast.specification.Specification;
 import ast.traverser.DefTraverser;
 
-public class Manipulate {
-  static public void remove(Ast root, Specification spec) {
-    Remover traverser = new Remover(spec);
-    traverser.traverse(root, null);
+public class ChildCollector {
+
+  static public AstList<Ast> select(Ast sub, HasName spec) {
+    ChildCollectorTraverser collector = new ChildCollectorTraverser(spec);
+    collector.traverse(sub, true);
+    return collector.getMatched();
   }
 
 }
 
-class Remover extends DefTraverser<Void, Void> {
+class ChildCollectorTraverser extends DefTraverser<Void, Boolean> {
+  final private AstList<Ast> matched = new AstList<Ast>();
   final private Specification spec;
 
-  public Remover(Specification spec) {
+  public ChildCollectorTraverser(Specification spec) {
     super();
     this.spec = spec;
   }
 
   @Override
-  protected Void visitList(Collection<? extends Ast> list, Void param) {
-    list.removeAll(List.select(list, spec));
-    return super.visitList(list, param);
+  protected Void visit(Ast obj, Boolean param) {
+    if (param) {
+      super.visit(obj, false);
+    } else {
+      if (spec.isSatisfiedBy(obj)) {
+        getMatched().add(obj);
+      }
+    }
+    return null;
+  }
+
+  public AstList<Ast> getMatched() {
+    return matched;
   }
 
 }

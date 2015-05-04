@@ -31,10 +31,10 @@ import ast.data.type.base.EnumType;
 import ast.data.type.base.FunctionType;
 import ast.data.type.base.RangeType;
 import ast.knowledge.KnowBaseItem;
-import ast.knowledge.KnowChild;
 import ast.knowledge.KnowLeftIsContainerOfRight;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
+import ast.repository.ChildByName;
 import ast.traverser.NullTraverser;
 import error.ErrorType;
 import error.RError;
@@ -102,9 +102,8 @@ public class ReferenceTypecheck extends NullTraverser<Type, Type> {
     if (sub instanceof EnumType) {
       return sub;
     } else {
-      KnowChild kc = kb.getEntry(KnowChild.class);
       String name = obj.name;
-      Ast etype = kc.find(sub, name);
+      Ast etype = ChildByName.find(sub, name);
       if (etype == null) {
         RError.err(ErrorType.Error, obj.getInfo(), "Child not found: " + name);
       }

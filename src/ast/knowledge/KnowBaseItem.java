@@ -45,7 +45,8 @@ import ast.data.type.special.IntegerType;
 import ast.data.type.special.NaturalType;
 import ast.data.type.special.VoidType;
 import ast.data.type.template.TypeType;
-import ast.specification.TypeFilter;
+import ast.repository.NameFilter;
+import ast.repository.TypeFilter;
 import ast.traverser.NullTraverser;
 
 public class KnowBaseItem extends KnowledgeEntry {
@@ -65,7 +66,7 @@ public class KnowBaseItem extends KnowledgeEntry {
   }
 
   public Ast findItem(String name) {
-    return kb.getRoot().children.find(name);
+    return NameFilter.select(kb.getRoot().children, name);
   }
 
   @Deprecated
