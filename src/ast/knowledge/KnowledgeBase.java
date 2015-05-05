@@ -23,7 +23,7 @@ import main.ClaOption;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.component.composition.CompUse;
-import ast.repository.TypeFilter;
+import ast.repository.query.TypeFilter;
 
 public class KnowledgeBase {
   final public HashMap<Class<? extends KnowledgeEntry>, KnowledgeEntry> entries = new HashMap<Class<? extends KnowledgeEntry>, KnowledgeEntry>();

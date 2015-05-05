@@ -15,7 +15,7 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.repository;
+package ast.repository.query;
 
 import ast.data.Ast;
 import ast.data.function.Function;

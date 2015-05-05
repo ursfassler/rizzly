@@ -45,10 +45,10 @@ import ast.data.type.base.StringType;
 import ast.data.type.special.VoidType;
 import ast.data.variable.FuncVariable;
 import ast.knowledge.KnowledgeBase;
-import ast.manipulator.TypeRepo;
 import ast.pass.AstPass;
 import ast.pass.debug.CompCascadeDepth;
 import ast.pass.debug.DebugIfaceAdder;
+import ast.repository.manipulator.TypeRepo;
 import ast.traverser.debug.MsgNamesGetter;
 
 public class DebugIface extends AstPass {

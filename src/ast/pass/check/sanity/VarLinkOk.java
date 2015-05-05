@@ -38,7 +38,7 @@ import ast.data.variable.Variable;
 import ast.knowledge.KnowParent;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.repository.TypeFilter;
+import ast.repository.query.TypeFilter;
 import ast.traverser.DefTraverser;
 import error.ErrorType;
 import error.RError;

@@ -30,7 +30,7 @@ import ast.data.type.Type;
 import ast.data.type.base.ArrayType;
 import ast.data.variable.StateVariable;
 import ast.knowledge.KnowledgeBase;
-import ast.manipulator.TypeRepo;
+import ast.repository.manipulator.TypeRepo;
 
 class QueueVariables {
   private StateVariable queue;

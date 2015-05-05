@@ -40,7 +40,7 @@ import ast.data.type.composed.UnionType;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.repository.Match;
+import ast.repository.query.Match;
 import ast.specification.HasName;
 import ast.traverser.DefTraverser;
 import ast.traverser.other.ExprReplacer;

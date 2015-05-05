@@ -27,7 +27,7 @@ import ast.knowledge.KnowUniqueName;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.pass.helper.GraphHelper;
-import ast.repository.Match;
+import ast.repository.query.Match;
 import ast.specification.IsClass;
 import ast.traverser.other.CallgraphMaker;
 import ast.traverser.other.StmtReplacer;

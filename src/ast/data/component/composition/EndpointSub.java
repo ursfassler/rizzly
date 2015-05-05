@@ -21,7 +21,7 @@ import ast.ElementInfo;
 import ast.data.component.Component;
 import ast.data.expression.reference.SimpleRef;
 import ast.data.function.Function;
-import ast.repository.NameFilter;
+import ast.repository.query.NameFilter;
 
 final public class EndpointSub extends Endpoint {
   final public SimpleRef<CompUse> component;

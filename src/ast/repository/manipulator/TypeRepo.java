@@ -15,7 +15,7 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.manipulator;
+package ast.repository.manipulator;
 
 import java.math.BigInteger;
 import java.util.Set;

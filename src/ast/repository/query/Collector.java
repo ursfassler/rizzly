@@ -15,45 +15,45 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.manipulator;
+package ast.repository.query;
 
-import java.util.Collection;
-
-import ast.Designator;
 import ast.data.Ast;
-import ast.data.Named;
+import ast.data.AstList;
 import ast.specification.Specification;
 import ast.traverser.DefTraverser;
 
-public class PathPrefixer {
-  static public void prefix(Ast root, Specification spec) {
-    PathPrefixerTraverser traverser = new PathPrefixerTraverser(spec);
-    traverser.traverse(root, new Designator());
+public class Collector {
+  static public AstList<? extends Ast> select(Ast root, Specification spec) {
+    CollectorTraverser traverser = new CollectorTraverser(spec);
+    traverser.traverse(root, null);
+    return traverser.getMatched();
   }
 
-  static public void prefix(Collection<Ast> roots, Specification spec) {
-    PathPrefixerTraverser traverser = new PathPrefixerTraverser(spec);
-    traverser.traverse(roots, new Designator());
+  static public AstList<? extends Ast> select(AstList<? extends Ast> roots, Specification spec) {
+    CollectorTraverser traverser = new CollectorTraverser(spec);
+    traverser.traverse(roots, null);
+    return traverser.getMatched();
   }
 }
 
-class PathPrefixerTraverser extends DefTraverser<Void, Designator> {
+class CollectorTraverser extends DefTraverser<Void, Void> {
+  final private AstList<Ast> matched = new AstList<Ast>();
   final private Specification spec;
 
-  public PathPrefixerTraverser(Specification spec) {
+  public CollectorTraverser(Specification spec) {
     super();
     this.spec = spec;
   }
 
   @Override
-  protected Void visit(Ast obj, Designator param) {
-    if (obj instanceof Named) {
-      param = new Designator(param, ((Named) obj).name);
-    }
+  protected Void visit(Ast obj, Void param) {
     if (spec.isSatisfiedBy(obj)) {
-      assert (obj instanceof Named);
-      ((Named) obj).name = param.toString(Designator.NAME_SEP);
+      matched.add(obj);
     }
     return super.visit(obj, param);
+  }
+
+  public AstList<Ast> getMatched() {
+    return matched;
   }
 }

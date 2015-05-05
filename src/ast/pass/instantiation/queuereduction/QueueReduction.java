@@ -29,8 +29,8 @@ import ast.data.function.Function;
 import ast.data.type.composed.RecordType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.repository.ChildByName;
-import ast.repository.Collector;
+import ast.repository.query.ChildByName;
+import ast.repository.query.Collector;
 import ast.specification.IsClass;
 
 public class QueueReduction extends AstPass {

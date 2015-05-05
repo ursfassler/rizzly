@@ -22,10 +22,10 @@ import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.type.Type;
 import ast.knowledge.KnowledgeBase;
-import ast.manipulator.Manipulate;
-import ast.manipulator.PathPrefixer;
 import ast.pass.AstPass;
-import ast.repository.Collector;
+import ast.repository.manipulator.Manipulate;
+import ast.repository.manipulator.PathPrefixer;
+import ast.repository.query.Collector;
 import ast.specification.IsClass;
 import ast.specification.Specification;
 

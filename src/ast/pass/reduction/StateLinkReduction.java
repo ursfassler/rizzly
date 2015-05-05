@@ -24,7 +24,7 @@ import ast.data.expression.reference.RefName;
 import ast.data.expression.reference.Reference;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.repository.ChildByName;
+import ast.repository.query.ChildByName;
 import ast.traverser.DefTraverser;
 
 /**

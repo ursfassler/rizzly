@@ -28,7 +28,7 @@ import ast.data.component.hfsm.Transition;
 import ast.data.expression.reference.SimpleRef;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.repository.Collector;
+import ast.repository.query.Collector;
 import ast.specification.IsClass;
 import ast.traverser.NullTraverser;
 

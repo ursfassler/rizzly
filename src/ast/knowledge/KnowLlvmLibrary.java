@@ -27,7 +27,7 @@ import ast.data.function.header.FuncSignal;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.statement.Block;
 import ast.data.variable.FuncVariable;
-import ast.repository.NameFilter;
+import ast.repository.query.NameFilter;
 
 //TODO rename
 //TODO rename trap to runtime exception and provide arguments

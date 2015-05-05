@@ -15,17 +15,35 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.repository;
+package ast.repository.manipulator;
 
 import java.util.Collection;
 
 import ast.data.Ast;
-import ast.data.AstList;
-import ast.specification.IsClass;
+import ast.repository.query.List;
+import ast.specification.Specification;
+import ast.traverser.DefTraverser;
 
-public class TypeFilter {
-
-  static public <T extends Ast> AstList<T> select(Collection<? extends Ast> list, Class<T> kind) {
-    return List.select(list, new IsClass(kind)).castTo(kind);
+public class Manipulate {
+  static public void remove(Ast root, Specification spec) {
+    Remover traverser = new Remover(spec);
+    traverser.traverse(root, null);
   }
+
+}
+
+class Remover extends DefTraverser<Void, Void> {
+  final private Specification spec;
+
+  public Remover(Specification spec) {
+    super();
+    this.spec = spec;
+  }
+
+  @Override
+  protected Void visitList(Collection<? extends Ast> list, Void param) {
+    list.removeAll(List.select(list, spec));
+    return super.visitList(list, param);
+  }
+
 }

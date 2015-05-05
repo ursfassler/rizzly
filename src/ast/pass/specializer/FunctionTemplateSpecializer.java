@@ -39,7 +39,7 @@ import ast.data.variable.FuncVariable;
 import ast.knowledge.KnowEmptyValue;
 import ast.knowledge.KnowInstance;
 import ast.knowledge.KnowledgeBase;
-import ast.manipulator.RepoAdder;
+import ast.repository.manipulator.RepoAdder;
 import ast.traverser.NullTraverser;
 
 public class FunctionTemplateSpecializer extends NullTraverser<Function, List<ActualTemplateArgument>> {

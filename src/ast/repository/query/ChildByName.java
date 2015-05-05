@@ -15,22 +15,36 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.repository;
+package ast.repository.query;
 
+import ast.Designator;
 import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
+import ast.specification.HasName;
 import error.ErrorType;
 import error.RError;
 
-public class Single {
+public class ChildByName {
 
-  static public <T extends Ast> T force(AstList<? extends T> list, ElementInfo info) {
+  static public Ast get(Ast root, Designator path, ElementInfo info) {
+    for (String child : path) {
+      root = Single.force(ChildCollector.select(root, new HasName(child)), info);
+    }
+    return root;
+  }
+
+  static public Ast find(Ast parent, String name) {
+    return Single.find(ChildCollector.select(parent, new HasName(name)));
+  }
+
+  public static Ast get(Ast parent, String name, ElementInfo info) {
+    AstList<Ast> list = ChildCollector.select(parent, new HasName(name));
     switch (list.size()) {
       case 1:
         return list.get(0);
       case 0:
-        RError.err(ErrorType.Fatal, info, "Item not found");
+        RError.err(ErrorType.Fatal, info, "Name not found: " + name);
         return null;
       default:
         RError.err(ErrorType.Fatal, info, "To many items found");
@@ -38,19 +52,4 @@ public class Single {
     }
   }
 
-  static public <T extends Ast> T find(AstList<? extends T> list) {
-    if (list.size() == 1) {
-      return list.get(0);
-    } else {
-      return null;
-    }
-  }
-
-  static public <T extends Ast> T first(AstList<? extends T> list) {
-    if (!list.isEmpty()) {
-      return list.get(0);
-    } else {
-      return null;
-    }
-  }
 }

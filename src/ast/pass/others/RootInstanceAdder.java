@@ -23,7 +23,7 @@ import ast.data.expression.reference.Reference;
 import ast.data.template.Template;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.repository.ChildByName;
+import ast.repository.query.ChildByName;
 
 public class RootInstanceAdder extends AstPass {
 

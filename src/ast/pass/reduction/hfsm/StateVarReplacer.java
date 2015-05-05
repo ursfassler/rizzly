@@ -39,7 +39,7 @@ import ast.data.variable.Variable;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.repository.Collector;
+import ast.repository.query.Collector;
 import ast.specification.IsClass;
 import ast.traverser.DefTraverser;
 import ast.traverser.other.RefTypeGetter;

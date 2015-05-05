@@ -37,7 +37,7 @@ import ast.doc.SimpleGraph;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.pass.helper.GraphHelper;
-import ast.repository.Collector;
+import ast.repository.query.Collector;
 import ast.specification.IsClass;
 import ast.traverser.other.CallgraphMaker;
 import error.ErrorType;

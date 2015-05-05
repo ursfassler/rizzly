@@ -34,7 +34,7 @@ import ast.data.type.template.TypeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
 import ast.knowledge.KnowInstance;
 import ast.knowledge.KnowledgeBase;
-import ast.manipulator.TypeRepo;
+import ast.repository.manipulator.TypeRepo;
 import ast.traverser.NullTraverser;
 
 public class TypeTemplateSpecializer extends NullTraverser<Type, List<ActualTemplateArgument>> {

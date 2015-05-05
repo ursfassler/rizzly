@@ -45,7 +45,7 @@ import ast.doc.SimpleGraph;
 import ast.doc.StreamWriter;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.repository.TypeFilter;
+import ast.repository.query.TypeFilter;
 import ast.specification.ExternalFunction;
 import ast.specification.OrSpec;
 import ast.specification.PublicFunction;
@@ -87,7 +87,7 @@ public class HeaderWriter extends AstPass {
     Namespace ret = new Namespace(ElementInfo.NO, prg.name);
     Set<Ast> anchor = new HashSet<Ast>();
 
-    AstList<Function> functions = ast.repository.List.select(prg.children, new OrSpec(new PublicFunction(), new ExternalFunction())).castTo(Function.class);
+    AstList<Function> functions = ast.repository.query.List.select(prg.children, new OrSpec(new PublicFunction(), new ExternalFunction())).castTo(Function.class);
     for (Function func : functions) {
       for (FuncVariable arg : func.param) {
         anchor.add(((SimpleRef<Type>) arg.type).link);

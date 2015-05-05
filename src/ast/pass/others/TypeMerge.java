@@ -33,7 +33,7 @@ import ast.knowledge.KnowLeftIsContainerOfRight;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.pass.helper.GraphHelper;
-import ast.repository.Collector;
+import ast.repository.query.Collector;
 import ast.specification.IsClass;
 import error.RError;
 

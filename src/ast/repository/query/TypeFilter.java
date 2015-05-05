@@ -15,16 +15,17 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.repository;
+package ast.repository.query;
 
 import java.util.Collection;
 
 import ast.data.Ast;
-import ast.specification.HasName;
+import ast.data.AstList;
+import ast.specification.IsClass;
 
-public class NameFilter {
+public class TypeFilter {
 
-  static public <T extends Ast> T select(Collection<? extends T> list, String name) {
-    return Single.find(List.select(list, new HasName(name)));
+  static public <T extends Ast> AstList<T> select(Collection<? extends Ast> list, Class<T> kind) {
+    return List.select(list, new IsClass(kind)).castTo(kind);
   }
 }

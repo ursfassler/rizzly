@@ -30,7 +30,7 @@ import ast.data.type.base.FunctionType;
 import ast.data.type.composed.NamedElement;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
-import ast.repository.ChildByName;
+import ast.repository.query.ChildByName;
 import ast.traverser.NullTraverser;
 import error.ErrorType;
 import error.RError;

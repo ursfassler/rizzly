@@ -40,9 +40,9 @@ import ast.data.statement.CallStmt;
 import ast.data.statement.Statement;
 import ast.data.variable.FuncVariable;
 import ast.knowledge.KnowledgeBase;
-import ast.manipulator.TypeRepo;
 import ast.pass.AstPass;
-import ast.repository.Collector;
+import ast.repository.manipulator.TypeRepo;
+import ast.repository.query.Collector;
 import ast.specification.IsClass;
 import ast.traverser.NullTraverser;
 

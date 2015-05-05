@@ -15,19 +15,16 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.repository;
+package ast.repository.query;
+
+import java.util.Collection;
 
 import ast.data.Ast;
-import ast.specification.Specification;
+import ast.specification.HasName;
 
-public class Match {
-  // TODO optimize
-  static public boolean hasItem(Ast root, Specification spec) {
-    return !hasNoItem(root, spec);
-  }
+public class NameFilter {
 
-  // TODO optimize
-  static public boolean hasNoItem(Ast root, Specification spec) {
-    return Collector.select(root, spec).isEmpty();
+  static public <T extends Ast> T select(Collection<? extends T> list, String name) {
+    return Single.find(List.select(list, new HasName(name)));
   }
 }

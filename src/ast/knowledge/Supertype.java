@@ -29,7 +29,7 @@ import ast.data.type.composed.UnionType;
 import ast.data.type.composed.UnsafeUnionType;
 import ast.data.type.special.NaturalType;
 import ast.data.type.special.VoidType;
-import ast.manipulator.TypeRepo;
+import ast.repository.manipulator.TypeRepo;
 import ast.traverser.NullTraverser;
 
 public class Supertype extends NullTraverser<Type, Void> {

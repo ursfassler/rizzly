@@ -29,8 +29,8 @@ import ast.data.type.Type;
 import ast.data.type.base.RangeType;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
-import ast.manipulator.TypeRepo;
 import ast.pass.AstPass;
+import ast.repository.manipulator.TypeRepo;
 import ast.traverser.other.ExprReplacer;
 
 /**

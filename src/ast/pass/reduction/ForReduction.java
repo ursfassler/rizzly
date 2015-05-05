@@ -43,8 +43,8 @@ import ast.data.variable.FuncVariable;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowUniqueName;
 import ast.knowledge.KnowledgeBase;
-import ast.manipulator.TypeRepo;
 import ast.pass.AstPass;
+import ast.repository.manipulator.TypeRepo;
 import ast.traverser.other.StmtReplacer;
 
 /**

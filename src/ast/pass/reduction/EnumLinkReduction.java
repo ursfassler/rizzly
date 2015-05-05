@@ -24,7 +24,7 @@ import ast.data.type.base.EnumElement;
 import ast.data.type.base.EnumType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.repository.ChildByName;
+import ast.repository.query.ChildByName;
 import ast.traverser.DefTraverser;
 import error.ErrorType;
 import error.RError;

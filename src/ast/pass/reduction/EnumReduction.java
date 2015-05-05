@@ -36,10 +36,10 @@ import ast.data.type.base.EnumType;
 import ast.data.type.base.RangeType;
 import ast.data.variable.ConstGlobal;
 import ast.knowledge.KnowledgeBase;
-import ast.manipulator.TypeRepo;
 import ast.pass.AstPass;
-import ast.repository.NameFilter;
-import ast.repository.TypeFilter;
+import ast.repository.manipulator.TypeRepo;
+import ast.repository.query.NameFilter;
+import ast.repository.query.TypeFilter;
 import ast.traverser.DefTraverser;
 
 public class EnumReduction extends AstPass {

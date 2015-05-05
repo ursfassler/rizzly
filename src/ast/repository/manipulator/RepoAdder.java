@@ -15,14 +15,14 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.manipulator;
+package ast.repository.manipulator;
 
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.knowledge.KnowledgeBase;
-import ast.repository.ChildCollector;
-import ast.repository.NameFilter;
-import ast.repository.Single;
+import ast.repository.query.ChildCollector;
+import ast.repository.query.NameFilter;
+import ast.repository.query.Single;
 import ast.specification.Equals;
 
 public class RepoAdder {

@@ -34,7 +34,7 @@ import ast.data.type.base.RangeTypeFactory;
 import ast.knowledge.KnowLeftIsContainerOfRight;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
-import ast.repository.ChildByName;
+import ast.repository.query.ChildByName;
 import ast.traverser.NullTraverser;
 import error.ErrorType;
 import error.RError;

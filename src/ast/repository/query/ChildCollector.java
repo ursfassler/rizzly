@@ -15,45 +15,46 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.repository;
+package ast.repository.query;
 
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.specification.Specification;
 import ast.traverser.DefTraverser;
 
-public class Collector {
-  static public AstList<? extends Ast> select(Ast root, Specification spec) {
-    CollectorTraverser traverser = new CollectorTraverser(spec);
-    traverser.traverse(root, null);
-    return traverser.getMatched();
+public class ChildCollector {
+
+  static public AstList<Ast> select(Ast sub, Specification spec) {
+    ChildCollectorTraverser collector = new ChildCollectorTraverser(spec);
+    collector.traverse(sub, true);
+    return collector.getMatched();
   }
 
-  static public AstList<? extends Ast> select(AstList<? extends Ast> roots, Specification spec) {
-    CollectorTraverser traverser = new CollectorTraverser(spec);
-    traverser.traverse(roots, null);
-    return traverser.getMatched();
-  }
 }
 
-class CollectorTraverser extends DefTraverser<Void, Void> {
+class ChildCollectorTraverser extends DefTraverser<Void, Boolean> {
   final private AstList<Ast> matched = new AstList<Ast>();
   final private Specification spec;
 
-  public CollectorTraverser(Specification spec) {
+  public ChildCollectorTraverser(Specification spec) {
     super();
     this.spec = spec;
   }
 
   @Override
-  protected Void visit(Ast obj, Void param) {
-    if (spec.isSatisfiedBy(obj)) {
-      matched.add(obj);
+  protected Void visit(Ast obj, Boolean param) {
+    if (param) {
+      super.visit(obj, false);
+    } else {
+      if (spec.isSatisfiedBy(obj)) {
+        getMatched().add(obj);
+      }
     }
-    return super.visit(obj, param);
+    return null;
   }
 
   public AstList<Ast> getMatched() {
     return matched;
   }
+
 }

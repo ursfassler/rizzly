@@ -43,7 +43,7 @@ import ast.doc.compgraph.Positioning;
 import ast.doc.compgraph.WorldComp;
 import ast.knowledge.KnowPath;
 import ast.knowledge.KnowledgeBase;
-import ast.repository.TypeFilter;
+import ast.repository.query.TypeFilter;
 
 public class ComponentFilePrinter {
   private Document doc;

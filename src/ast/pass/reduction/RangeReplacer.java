@@ -34,7 +34,7 @@ import ast.data.type.out.UIntType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.pass.check.type.ExpressionTypecheck;
-import ast.repository.Collector;
+import ast.repository.query.Collector;
 import ast.specification.IsClass;
 import ast.traverser.NullTraverser;
 import error.ErrorType;

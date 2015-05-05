@@ -24,7 +24,7 @@ import ast.Designator;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.file.RizzlyFile;
-import ast.repository.ChildByName;
+import ast.repository.query.ChildByName;
 import ast.traverser.DefTraverser;
 import ast.traverser.NullTraverser;
 import error.ErrorType;

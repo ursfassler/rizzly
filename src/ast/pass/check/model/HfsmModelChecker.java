@@ -31,7 +31,7 @@ import ast.data.function.header.FuncSlot;
 import ast.data.variable.StateVariable;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.repository.Collector;
+import ast.repository.query.Collector;
 import ast.specification.IsClass;
 import ast.traverser.NullTraverser;
 import error.ErrorType;

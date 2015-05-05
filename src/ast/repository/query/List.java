@@ -15,7 +15,7 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.repository;
+package ast.repository.query;
 
 import java.util.Collection;
 

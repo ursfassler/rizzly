@@ -68,7 +68,7 @@ import ast.data.variable.FuncVariable;
 import ast.data.variable.Variable;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.repository.NameFilter;
+import ast.repository.query.NameFilter;
 import ast.specification.AndSpec;
 import ast.specification.IsClass;
 import ast.specification.Specification;
