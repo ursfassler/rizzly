@@ -56,10 +56,10 @@ import ast.data.statement.VarDefStmt;
 import ast.data.statement.WhileStmt;
 import ast.data.type.Type;
 import ast.data.variable.FuncVariable;
-import ast.knowledge.KnowBaseItem;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowUniqueName;
 import ast.knowledge.KnowledgeBase;
+import ast.manipulator.TypeRepo;
 import ast.pass.AstPass;
 import ast.repository.Match;
 import ast.specification.IsClass;
@@ -341,14 +341,14 @@ class StmtTraverser extends NullTraverser<Void, List<Statement>> {
 }
 
 class Cutter extends ExprReplacer<List<Statement>> {
-  final private KnowBaseItem kbi;
+  final private TypeRepo kbi;
   final private KnowType kt;
   final private KnowUniqueName kun;
 
   public Cutter(KnowledgeBase kb) {
     super();
     kt = kb.getEntry(KnowType.class);
-    kbi = kb.getEntry(KnowBaseItem.class);
+    kbi = new TypeRepo(kb);
     kun = kb.getEntry(KnowUniqueName.class);
   }
 

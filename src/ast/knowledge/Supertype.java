@@ -29,14 +29,15 @@ import ast.data.type.composed.UnionType;
 import ast.data.type.composed.UnsafeUnionType;
 import ast.data.type.special.NaturalType;
 import ast.data.type.special.VoidType;
+import ast.manipulator.TypeRepo;
 import ast.traverser.NullTraverser;
 
 public class Supertype extends NullTraverser<Type, Void> {
-  private KnowBaseItem kbi;
+  private TypeRepo kbi;
 
   public Supertype(KnowledgeBase kb) {
     super();
-    this.kbi = kb.getEntry(KnowBaseItem.class);
+    kbi = new TypeRepo(kb);
   }
 
   static public Type get(Type typ, KnowledgeBase kb) {

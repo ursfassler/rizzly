@@ -45,13 +45,13 @@ import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.RangeType;
 import ast.data.type.base.TupleType;
+import ast.data.type.special.IntegerType;
 import ast.data.variable.ConstGlobal;
 import ast.data.variable.ConstPrivate;
 import ast.data.variable.Constant;
 import ast.data.variable.FuncVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.Variable;
-import ast.knowledge.KnowBaseItem;
 import ast.knowledge.KnowLeftIsContainerOfRight;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
@@ -62,14 +62,13 @@ import error.RError;
 public class StatementTypecheck extends NullTraverser<Void, Void> {
   final private KnowledgeBase kb;
   final private KnowType kt;
-  final private KnowBaseItem kbi;
   final private KnowLeftIsContainerOfRight kc;
   final private Type funcReturn;
+  static final private IntegerType intType = new IntegerType();
 
   public StatementTypecheck(KnowledgeBase kb, Type funcReturn) {
     super();
     this.kb = kb;
-    kbi = kb.getEntry(KnowBaseItem.class);
     kt = kb.getEntry(KnowType.class);
     kc = kb.getEntry(KnowLeftIsContainerOfRight.class);
     this.funcReturn = funcReturn;
@@ -174,7 +173,7 @@ public class StatementTypecheck extends NullTraverser<Void, Void> {
   protected Void visitCaseStmt(CaseStmt obj, Void map) {
     Type cond = checkGetExpr(obj.condition);
     // TODO enumerator, union and boolean should also be allowed
-    if (!kc.get(kbi.getIntegerType(), cond)) {
+    if (!kc.get(intType, cond)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Condition variable has to be an integer, got: " + cond.name);
     }
     // TODO check somewhere if case values are disjunct
@@ -194,10 +193,10 @@ public class StatementTypecheck extends NullTraverser<Void, Void> {
   protected Void visitCaseOptRange(CaseOptRange obj, Void map) {
     Type start = checkGetExpr(obj.start);
     Type end = checkGetExpr(obj.end);
-    if (!kc.get(kbi.getIntegerType(), start)) {
+    if (!kc.get(intType, start)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Case value has to be an integer (start), got: " + start.name);
     }
-    if (!kc.get(kbi.getIntegerType(), end)) {
+    if (!kc.get(intType, end)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Case value has to be an integer (end), got: " + end.name);
     }
     return null;
@@ -206,7 +205,7 @@ public class StatementTypecheck extends NullTraverser<Void, Void> {
   @Override
   protected Void visitCaseOptValue(CaseOptValue obj, Void map) {
     Type value = checkGetExpr(obj.value);
-    if (!kc.get(kbi.getIntegerType(), value)) {
+    if (!kc.get(intType, value)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Case value has to be an integer, got: " + value.name);
     }
     return null;

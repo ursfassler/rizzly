@@ -29,8 +29,8 @@ import ast.data.expression.reference.TypeRef;
 import ast.data.type.Type;
 import ast.data.type.base.ArrayType;
 import ast.data.variable.StateVariable;
-import ast.knowledge.KnowBaseItem;
 import ast.knowledge.KnowledgeBase;
+import ast.manipulator.TypeRepo;
 
 class QueueVariables {
   private StateVariable queue;
@@ -39,13 +39,13 @@ class QueueVariables {
 
   final private String prefix;
   final private ElementInfo info;
-  final private KnowBaseItem kbi;
+  final private TypeRepo kbi;
 
   public QueueVariables(String prefix, ElementInfo info, KnowledgeBase kb) {
     super();
     this.prefix = prefix;
     this.info = info;
-    this.kbi = kb.getEntry(KnowBaseItem.class);
+    this.kbi = new TypeRepo(kb);
   }
 
   void create(ArrayType queueType) {

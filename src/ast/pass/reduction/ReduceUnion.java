@@ -34,6 +34,7 @@ import ast.data.statement.CaseStmt;
 import ast.data.type.Type;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.EnumType;
+import ast.data.type.base.EnumTypeFactory;
 import ast.data.type.composed.NamedElement;
 import ast.data.type.composed.UnionType;
 import ast.knowledge.KnowType;
@@ -133,7 +134,7 @@ class Uni2Enum extends DefTraverser<Void, Map<UnionType, EnumType>> {
   protected Void visitUnionType(UnionType obj, Map<UnionType, EnumType> param) {
     assert (!param.containsKey(obj));
 
-    EnumType et = new EnumType(ElementInfo.NO, ENUM_PREFIX + Designator.NAME_SEP + obj.name);
+    EnumType et = EnumTypeFactory.create(ENUM_PREFIX + Designator.NAME_SEP + obj.name);
 
     for (NamedElement elem : obj.element) {
       EnumElement ee = new EnumElement(ElementInfo.NO, elem.name);

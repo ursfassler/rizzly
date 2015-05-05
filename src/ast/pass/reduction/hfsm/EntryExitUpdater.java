@@ -39,8 +39,8 @@ import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.Statement;
 import ast.data.variable.FuncVariable;
-import ast.knowledge.KnowBaseItem;
 import ast.knowledge.KnowledgeBase;
+import ast.manipulator.TypeRepo;
 import ast.pass.AstPass;
 import ast.repository.Collector;
 import ast.specification.IsClass;
@@ -66,11 +66,11 @@ public class EntryExitUpdater extends AstPass {
 }
 
 class EntryExitUpdaterWorker extends NullTraverser<Void, EePar> {
-  private final KnowBaseItem kbi;
+  private final TypeRepo kbi;
 
   public EntryExitUpdaterWorker(KnowledgeBase kb) {
     super();
-    this.kbi = kb.getEntry(KnowBaseItem.class);
+    kbi = new TypeRepo(kb);
   }
 
   @Override

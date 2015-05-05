@@ -40,10 +40,10 @@ import ast.data.statement.WhileStmt;
 import ast.data.type.Type;
 import ast.data.type.base.RangeType;
 import ast.data.variable.FuncVariable;
-import ast.knowledge.KnowBaseItem;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowUniqueName;
 import ast.knowledge.KnowledgeBase;
+import ast.manipulator.TypeRepo;
 import ast.pass.AstPass;
 import ast.traverser.other.StmtReplacer;
 
@@ -64,13 +64,13 @@ public class ForReduction extends AstPass {
 }
 
 class ForReductionWorker extends StmtReplacer<Void> {
-  final private KnowBaseItem kbi;
+  final private TypeRepo kbi;
   final private KnowUniqueName kun;
   final private KnowType kt;
 
   public ForReductionWorker(KnowledgeBase kb) {
     super();
-    this.kbi = kb.getEntry(KnowBaseItem.class);
+    kbi = new TypeRepo(kb);
     this.kun = kb.getEntry(KnowUniqueName.class);
     this.kt = kb.getEntry(KnowType.class);
   }

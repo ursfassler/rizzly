@@ -30,7 +30,7 @@ import ast.data.expression.reference.TypeRef;
 import ast.data.function.Function;
 import ast.data.raw.RawComponent;
 import ast.data.type.base.EnumElement;
-import ast.data.type.base.EnumType;
+import ast.data.type.base.EnumTypeFactory;
 import ast.data.type.composed.NamedElement;
 import ast.data.type.composed.RecordType;
 import ast.data.type.composed.UnsafeUnionType;
@@ -146,7 +146,7 @@ public class TypeParser extends BaseParser {
   private ast.data.type.Type parseEnumType(String name) {
     Token tok = expect(TokenType.ENUM);
 
-    ast.data.type.base.EnumType type = new EnumType(tok.getInfo(), name);
+    ast.data.type.base.EnumType type = EnumTypeFactory.create(tok.getInfo(), name);
 
     while (peek().getType() != TokenType.END) {
       Token elemTok = parseEnumElem();

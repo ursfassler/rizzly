@@ -17,15 +17,29 @@
 
 package ast.data.type.base;
 
+import java.math.BigInteger;
+
 import ast.ElementInfo;
 import ast.data.Range;
 
-public class RangeType extends BaseType {
-  final public Range range;
+public class RangeTypeFactory {
 
-  public RangeType(ElementInfo info, String name, Range range) {
-    super(info, name);
-    this.range = range;
+  static public RangeType create(Range range) {
+    return new RangeType(ElementInfo.NO, makeName(range), range);
+  }
+
+  static public RangeType create(BigInteger low, BigInteger high) {
+    return create(new Range(low, high));
+  }
+
+  public static RangeType create(int count) {
+    BigInteger low = BigInteger.ZERO;
+    BigInteger high = BigInteger.valueOf(count - 1);
+    return create(low, high);
+  }
+
+  public static String makeName(Range range) {
+    return "R{" + range.low + "," + range.high + "}";
   }
 
 }

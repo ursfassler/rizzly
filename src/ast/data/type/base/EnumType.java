@@ -25,10 +25,11 @@ import ast.data.AstList;
 import ast.data.type.Type;
 
 public class EnumType extends Type {
-  final public AstList<EnumElement> element = new AstList<EnumElement>();
+  final public AstList<EnumElement> element;
 
-  public EnumType(ElementInfo info, String name) {
+  public EnumType(ElementInfo info, String name, AstList<EnumElement> element) {
     super(info, name);
+    this.element = element;
   }
 
   public Set<String> getNames() {

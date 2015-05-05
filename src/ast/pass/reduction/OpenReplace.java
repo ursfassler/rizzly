@@ -25,7 +25,6 @@ import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
-import ast.data.Range;
 import ast.data.expression.Expression;
 import ast.data.expression.reference.RefCall;
 import ast.data.expression.reference.Reference;
@@ -33,11 +32,12 @@ import ast.data.expression.reference.SimpleRef;
 import ast.data.function.Function;
 import ast.data.type.Type;
 import ast.data.type.base.RangeType;
+import ast.data.type.base.RangeTypeFactory;
 import ast.data.variable.FuncVariable;
 import ast.data.variable.Variable;
-import ast.knowledge.KnowBaseItem;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
+import ast.manipulator.TypeRepo;
 import ast.pass.AstPass;
 import ast.traverser.DefTraverser;
 
@@ -56,13 +56,13 @@ public class OpenReplace extends AstPass {
 
 class OpenReplaceWorker extends DefTraverser<Void, Void> {
   private final KnowType kt;
-  private final KnowBaseItem kbi;
+  private final TypeRepo kbi;
   private final Map<Variable, RangeType> map = new HashMap<Variable, RangeType>();
 
   public OpenReplaceWorker(KnowledgeBase kb) {
     super();
     this.kt = kb.getEntry(KnowType.class);
-    this.kbi = kb.getEntry(KnowBaseItem.class);
+    kbi = new TypeRepo(kb);
   }
 
   @Override
@@ -109,7 +109,7 @@ class OpenReplaceWorker extends DefTraverser<Void, Void> {
         RangeType old = map.get(var);
         BigInteger low = range.range.low.min(old.range.low);
         BigInteger high = range.range.high.max(old.range.high);
-        range = new RangeType(new Range(low, high));
+        range = RangeTypeFactory.create(low, high);
       }
 
       map.put(var, range);

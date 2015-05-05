@@ -52,7 +52,6 @@ import ast.data.statement.Statement;
 import ast.data.variable.FuncVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.Variable;
-import ast.knowledge.KnowBaseItem;
 import ast.knowledge.KnowParent;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
@@ -77,8 +76,6 @@ public class TransitionDownPropagator extends AstPass {
   }
 
   private static void process(ImplHfsm hfsm, KnowledgeBase kb) {
-    KnowBaseItem kbi = kb.getEntry(KnowBaseItem.class);
-
     TransitionEndpointCollector tec = new TransitionEndpointCollector();
     tec.traverse(hfsm.topstate, null);
 
@@ -89,7 +86,7 @@ public class TransitionDownPropagator extends AstPass {
     for (Transition trans : tec.getTdst().keySet()) {
       String name = Designator.NAME_SEP + "trans" + nr;
       nr++;
-      FuncProcedure func = makeTransBodyFunc(trans, name, kbi);
+      FuncProcedure func = makeTransBodyFunc(trans, name);
       hfsm.topstate.item.add(func);
       tfunc.put(trans, func);
     }
@@ -103,7 +100,7 @@ public class TransitionDownPropagator extends AstPass {
    *
    * @param name
    */
-  private static FuncProcedure makeTransBodyFunc(Transition trans, String name, KnowBaseItem kbi) {
+  private static FuncProcedure makeTransBodyFunc(Transition trans, String name) {
     AstList<FuncVariable> params = Copy.copy(trans.param);
     FuncProcedure func = new FuncProcedure(ElementInfo.NO, name, params, new FuncReturnNone(ElementInfo.NO), trans.body);
     trans.body = new Block(ElementInfo.NO);

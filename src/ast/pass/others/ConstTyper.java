@@ -25,9 +25,9 @@ import ast.data.type.special.AnyType;
 import ast.data.type.special.IntegerType;
 import ast.data.type.special.NaturalType;
 import ast.data.variable.Constant;
-import ast.knowledge.KnowBaseItem;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
+import ast.manipulator.TypeRepo;
 import ast.pass.AstPass;
 import ast.traverser.DefTraverser;
 
@@ -45,12 +45,12 @@ public class ConstTyper extends AstPass {
 
 class Typer extends DefTraverser<Void, Void> {
   private final KnowType kt;
-  private final KnowBaseItem kbi;
+  private final TypeRepo kbi;
 
   public Typer(KnowledgeBase kb) {
     super();
     this.kt = kb.getEntry(KnowType.class);
-    this.kbi = kb.getEntry(KnowBaseItem.class);
+    kbi = new TypeRepo(kb);
   }
 
   public static void process(Ast ast, KnowledgeBase kb) {

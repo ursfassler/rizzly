@@ -44,8 +44,8 @@ import ast.data.type.base.RangeType;
 import ast.data.type.base.StringType;
 import ast.data.type.special.VoidType;
 import ast.data.variable.FuncVariable;
-import ast.knowledge.KnowBaseItem;
 import ast.knowledge.KnowledgeBase;
+import ast.manipulator.TypeRepo;
 import ast.pass.AstPass;
 import ast.pass.debug.CompCascadeDepth;
 import ast.pass.debug.DebugIfaceAdder;
@@ -59,8 +59,7 @@ public class DebugIface extends AstPass {
     if (names.isEmpty()) {
       return; // this means that there is no input nor output interface
     }
-
-    KnowBaseItem kbi = kb.getEntry(KnowBaseItem.class);
+    TypeRepo kbi = new TypeRepo(kb);
 
     int depth = (new CompCascadeDepth()).traverse(kb.getRoot(), null);
     depth += 2;

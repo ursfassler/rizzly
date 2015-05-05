@@ -36,23 +36,23 @@ import ast.data.template.ActualTemplateArgument;
 import ast.data.type.Type;
 import ast.data.type.special.AnyType;
 import ast.data.variable.FuncVariable;
-import ast.knowledge.KnowBaseItem;
 import ast.knowledge.KnowEmptyValue;
 import ast.knowledge.KnowInstance;
 import ast.knowledge.KnowledgeBase;
+import ast.manipulator.RepoAdder;
 import ast.traverser.NullTraverser;
 
 public class FunctionTemplateSpecializer extends NullTraverser<Function, List<ActualTemplateArgument>> {
   private final KnowledgeBase kb;
   private final KnowInstance ki;
-  private final KnowBaseItem kbi;
   private final KnowEmptyValue kev;
+  private final RepoAdder ra;
 
   public FunctionTemplateSpecializer(KnowledgeBase kb) {
     this.kb = kb;
     ki = kb.getEntry(KnowInstance.class);
-    kbi = kb.getEntry(KnowBaseItem.class);
     kev = kb.getEntry(KnowEmptyValue.class);
+    ra = new RepoAdder(kb);
   }
 
   public static Function process(FunctionTemplate type, List<ActualTemplateArgument> genspec, KnowledgeBase kb) {
@@ -76,7 +76,7 @@ public class FunctionTemplateSpecializer extends NullTraverser<Function, List<Ac
 
       ret = makeFunc(name, type);
       ki.add(obj, param, ret);
-      kbi.addItem(ret);
+      ra.add(ret);
     }
     return ret;
   }

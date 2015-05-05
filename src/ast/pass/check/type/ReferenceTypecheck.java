@@ -30,7 +30,7 @@ import ast.data.type.base.ArrayType;
 import ast.data.type.base.EnumType;
 import ast.data.type.base.FunctionType;
 import ast.data.type.base.RangeType;
-import ast.knowledge.KnowBaseItem;
+import ast.data.type.base.RangeTypeFactory;
 import ast.knowledge.KnowLeftIsContainerOfRight;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
@@ -41,15 +41,11 @@ import error.RError;
 
 //TODO check if this class does not too much (i.e. check and return type)
 public class ReferenceTypecheck extends NullTraverser<Type, Type> {
-  final private KnowledgeBase kb;
-  final private KnowBaseItem kbi;
   final private KnowType kt;
   final private KnowLeftIsContainerOfRight kc;
 
   public ReferenceTypecheck(KnowledgeBase kb) {
     super();
-    this.kb = kb;
-    kbi = kb.getEntry(KnowBaseItem.class);
     kt = kb.getEntry(KnowType.class);
     kc = kb.getEntry(KnowLeftIsContainerOfRight.class);
   }
@@ -115,7 +111,7 @@ public class ReferenceTypecheck extends NullTraverser<Type, Type> {
   protected Type visitRefIndex(RefIndex obj, Type sub) {
     Type index = kt.get(obj.index);
     if (sub instanceof ArrayType) {
-      RangeType ait = kbi.getRangeType(((ArrayType) sub).size.intValue());
+      RangeType ait = RangeTypeFactory.create(((ArrayType) sub).size.intValue());
       if (!kc.get(ait, index)) {
         RError.err(ErrorType.Error, obj.getInfo(), "array index type is " + ait.name + ", got " + index.name);
       }

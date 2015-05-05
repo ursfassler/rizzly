@@ -32,20 +32,20 @@ import ast.data.type.template.ArrayTemplate;
 import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
-import ast.knowledge.KnowBaseItem;
 import ast.knowledge.KnowInstance;
 import ast.knowledge.KnowledgeBase;
+import ast.manipulator.TypeRepo;
 import ast.traverser.NullTraverser;
 
 public class TypeTemplateSpecializer extends NullTraverser<Type, List<ActualTemplateArgument>> {
   private final KnowledgeBase kb;
   private final KnowInstance ki;
-  private final KnowBaseItem kbi;
+  private final TypeRepo kbi;
 
   public TypeTemplateSpecializer(KnowledgeBase kb) {
     this.kb = kb;
     ki = kb.getEntry(KnowInstance.class);
-    kbi = kb.getEntry(KnowBaseItem.class);
+    kbi = new TypeRepo(kb);
   }
 
   public static Type process(TypeTemplate type, List<ActualTemplateArgument> genspec, KnowledgeBase kb) {

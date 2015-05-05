@@ -46,4 +46,11 @@ public class Single {
     }
   }
 
+  static public <T extends Ast> T first(AstList<? extends T> list) {
+    if (!list.isEmpty()) {
+      return list.get(0);
+    } else {
+      return null;
+    }
+  }
 }

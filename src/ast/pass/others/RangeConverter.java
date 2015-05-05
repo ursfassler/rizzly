@@ -27,9 +27,9 @@ import ast.data.expression.binop.Relation;
 import ast.data.expression.reference.SimpleRef;
 import ast.data.type.Type;
 import ast.data.type.base.RangeType;
-import ast.knowledge.KnowBaseItem;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
+import ast.manipulator.TypeRepo;
 import ast.pass.AstPass;
 import ast.traverser.other.ExprReplacer;
 
@@ -51,12 +51,12 @@ public class RangeConverter extends AstPass {
 
 class RangeConverterWorker extends ExprReplacer<Void> {
   private static final ElementInfo info = ElementInfo.NO;
-  private KnowBaseItem kbi;
+  private TypeRepo kbi;
   private KnowType kt;
 
   public RangeConverterWorker(KnowledgeBase kb) {
     super();
-    this.kbi = kb.getEntry(KnowBaseItem.class);
+    kbi = new TypeRepo(kb);
     this.kt = kb.getEntry(KnowType.class);
   }
 

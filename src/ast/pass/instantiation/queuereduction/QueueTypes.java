@@ -17,7 +17,6 @@
 
 package ast.pass.instantiation.queuereduction;
 
-import java.math.BigInteger;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,12 +28,13 @@ import ast.data.expression.reference.SimpleRef;
 import ast.data.function.Function;
 import ast.data.type.Type;
 import ast.data.type.base.ArrayType;
+import ast.data.type.base.ArrayTypeFactory;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.EnumType;
+import ast.data.type.base.EnumTypeFactory;
 import ast.data.type.composed.NamedElement;
 import ast.data.type.composed.RecordType;
 import ast.data.type.composed.UnionType;
-import ast.knowledge.KnowParent;
 import ast.knowledge.KnowPath;
 import ast.knowledge.KnowledgeBase;
 
@@ -49,7 +49,6 @@ class QueueTypes {
 
   final private String prefix;
   final private ElementInfo info;
-  final private KnowParent kp;
   final private KnowPath kpath;
 
   public QueueTypes(String prefix, Map<Function, RecordType> funcToRecord, ElementInfo info, KnowledgeBase kb) {
@@ -57,12 +56,11 @@ class QueueTypes {
     this.prefix = prefix;
     this.funcToRecord = funcToRecord;
     this.info = info;
-    this.kp = kb.getEntry(KnowParent.class);
     this.kpath = kb.getEntry(KnowPath.class);
   }
 
   public void create(int queueLength) {
-    msgType = new EnumType(info, prefix + "msgid");
+    msgType = EnumTypeFactory.create(info, prefix + "msgid");
 
     AstList<NamedElement> unielem = new AstList<NamedElement>();
     for (Function func : getQueuedFunctions()) {
@@ -80,7 +78,7 @@ class QueueTypes {
   }
 
   private ArrayType createQueueType(int queueSize, UnionType uni) {
-    return new ArrayType(BigInteger.valueOf(queueSize), new SimpleRef<Type>(info, uni));
+    return ArrayTypeFactory.create(queueSize, uni);
   }
 
   private EnumElement createElemFromFunc(AstList<NamedElement> unielem, Function func) {

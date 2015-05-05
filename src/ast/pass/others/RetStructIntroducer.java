@@ -41,10 +41,10 @@ import ast.data.type.Type;
 import ast.data.type.composed.NamedElement;
 import ast.data.type.composed.RecordType;
 import ast.data.variable.FuncVariable;
-import ast.knowledge.KnowBaseItem;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowUniqueName;
 import ast.knowledge.KnowledgeBase;
+import ast.manipulator.TypeRepo;
 import ast.pass.AstPass;
 import ast.traverser.DefTraverser;
 import ast.traverser.other.ExprReplacer;
@@ -69,13 +69,13 @@ public class RetStructIntroducer extends AstPass {
 }
 
 class RetStructIntroducerWorker extends DefTraverser<Void, Void> {
-  final private KnowBaseItem kbi;
+  final private TypeRepo kbi;
   final private KnowUniqueName kun;
   final private KnowType kt;
 
   public RetStructIntroducerWorker(KnowledgeBase kb) {
     super();
-    kbi = kb.getEntry(KnowBaseItem.class);
+    kbi = new TypeRepo(kb);
     kun = kb.getEntry(KnowUniqueName.class);
     kt = kb.getEntry(KnowType.class);
   }

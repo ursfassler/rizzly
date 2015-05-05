@@ -49,10 +49,11 @@ import ast.data.type.composed.NamedElement;
 import ast.data.type.composed.RecordType;
 import ast.data.type.composed.UnionType;
 import ast.data.variable.FuncVariable;
-import ast.knowledge.KnowBaseItem;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowUniqueName;
 import ast.knowledge.KnowledgeBase;
+import ast.manipulator.RepoAdder;
+import ast.manipulator.TypeRepo;
 import ast.pass.AstPass;
 import ast.traverser.NullTraverser;
 import ast.traverser.other.ExprReplacer;
@@ -101,13 +102,15 @@ class MakeCompareFunction extends NullTraverser<Expression, Pair<Expression, Exp
   private static final ElementInfo info = ElementInfo.NO;
   private final KnowType kt;
   private final KnowUniqueName kun;
-  private final KnowBaseItem kbi;
+  private final TypeRepo kbi;
+  private final RepoAdder ra;
 
   public MakeCompareFunction(KnowledgeBase kb) {
     super();
     kt = kb.getEntry(KnowType.class);
     kun = kb.getEntry(KnowUniqueName.class);
-    kbi = kb.getEntry(KnowBaseItem.class);
+    kbi = new TypeRepo(kb);
+    ra = new RepoAdder(kb);
   }
 
   static public Expression makeCmpExpr(Expression left, Expression right, KnowledgeBase kb) {
@@ -282,7 +285,7 @@ class MakeCompareFunction extends NullTraverser<Expression, Pair<Expression, Exp
     Block body = new Block(info);
     body.statements.add(new ReturnExpr(info, expr));
     FuncFunction func = new FuncFunction(info, kun.get("cmp"), param, new FuncReturnType(info, new SimpleRef<Type>(info, kbi.getBooleanType())), body);
-    kbi.addItem(func);
+    ra.add(func);
     return func;
   }
 

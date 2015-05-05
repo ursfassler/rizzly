@@ -42,9 +42,10 @@ import ast.data.statement.ReturnExpr;
 import ast.data.type.Type;
 import ast.data.type.base.RangeType;
 import ast.data.variable.FuncVariable;
-import ast.knowledge.KnowBaseItem;
 import ast.knowledge.KnowLlvmLibrary;
 import ast.knowledge.KnowledgeBase;
+import ast.manipulator.RepoAdder;
+import ast.manipulator.TypeRepo;
 import ast.pass.AstPass;
 import ast.traverser.DefTraverser;
 import error.ErrorType;
@@ -69,14 +70,16 @@ public class IntroduceConvert extends AstPass {
 }
 
 class IntroduceConvertWorker extends DefTraverser<Void, Void> {
-  private final KnowBaseItem kbi;
+  private final TypeRepo kbi;
+  private final RepoAdder ra;
   private final KnowLlvmLibrary kll;
   static final private String CONVERT_PREFIX = Designator.NAME_SEP + "convert" + Designator.NAME_SEP;
 
   public IntroduceConvertWorker(KnowledgeBase kb) {
     super();
-    kbi = kb.getEntry(KnowBaseItem.class);
+    kbi = new TypeRepo(kb);
     kll = kb.getEntry(KnowLlvmLibrary.class);
+    ra = new RepoAdder(kb);
   }
 
   @Override
@@ -92,7 +95,7 @@ class IntroduceConvertWorker extends DefTraverser<Void, Void> {
   private Function getConvertFunc(Type resType) {
     String name = CONVERT_PREFIX + resType.name;
 
-    Function ret = (Function) kbi.findItem(name);
+    Function ret = (Function) ra.find(name);
     if (ret == null) {
       if (resType instanceof RangeType) {
         ret = makeConvertRange((RangeType) resType);
@@ -102,7 +105,7 @@ class IntroduceConvertWorker extends DefTraverser<Void, Void> {
       }
       assert (ret != null);
       assert (name.equals(ret.name));
-      kbi.addItem(ret);
+      ra.add(ret);
     }
 
     assert (ret.param.size() == 1);

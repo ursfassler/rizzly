@@ -35,8 +35,8 @@ import ast.data.type.base.EnumElement;
 import ast.data.type.base.EnumType;
 import ast.data.type.base.RangeType;
 import ast.data.variable.ConstGlobal;
-import ast.knowledge.KnowBaseItem;
 import ast.knowledge.KnowledgeBase;
+import ast.manipulator.TypeRepo;
 import ast.pass.AstPass;
 import ast.repository.NameFilter;
 import ast.repository.TypeFilter;
@@ -45,7 +45,7 @@ import ast.traverser.DefTraverser;
 public class EnumReduction extends AstPass {
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    KnowBaseItem kbi = kb.getEntry(KnowBaseItem.class);
+    TypeRepo kbi = new TypeRepo(kb);
 
     Map<EnumType, RangeType> typeMap = new HashMap<EnumType, RangeType>();
     Map<EnumElement, ConstGlobal> elemMap = new HashMap<EnumElement, ConstGlobal>();

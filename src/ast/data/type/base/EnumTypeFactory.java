@@ -17,15 +17,27 @@
 
 package ast.data.type.base;
 
+import java.util.Set;
+
 import ast.ElementInfo;
-import ast.data.Range;
+import ast.data.AstList;
 
-public class RangeType extends BaseType {
-  final public Range range;
+public class EnumTypeFactory {
 
-  public RangeType(ElementInfo info, String name, Range range) {
-    super(info, name);
-    this.range = range;
+  static public EnumType create(String name, Set<String> items) {
+    EnumType ret = create(name);
+    for (String item : items) {
+      ret.element.add(new EnumElement(ElementInfo.NO, item));
+    }
+    return ret;
+  }
+
+  static public EnumType create(ElementInfo info, String name) {
+    return new EnumType(info, name, new AstList<EnumElement>());
+  }
+
+  public static EnumType create(String name) {
+    return create(ElementInfo.NO, name);
   }
 
 }

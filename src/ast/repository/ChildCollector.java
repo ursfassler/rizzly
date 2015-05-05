@@ -19,13 +19,12 @@ package ast.repository;
 
 import ast.data.Ast;
 import ast.data.AstList;
-import ast.specification.HasName;
 import ast.specification.Specification;
 import ast.traverser.DefTraverser;
 
 public class ChildCollector {
 
-  static public AstList<Ast> select(Ast sub, HasName spec) {
+  static public AstList<Ast> select(Ast sub, Specification spec) {
     ChildCollectorTraverser collector = new ChildCollectorTraverser(spec);
     collector.traverse(sub, true);
     return collector.getMatched();

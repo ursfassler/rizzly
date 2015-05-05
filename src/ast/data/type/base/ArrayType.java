@@ -20,29 +20,16 @@ package ast.data.type.base;
 import java.math.BigInteger;
 
 import ast.ElementInfo;
-import ast.data.expression.reference.SimpleRef;
 import ast.data.expression.reference.TypeRef;
-import ast.data.type.Type;
 
 public class ArrayType extends BaseType {
   final public TypeRef type;
   final public BigInteger size;
 
-  public ArrayType(BigInteger size, TypeRef type) {
-    super(ElementInfo.NO, makeName(size, type));
-    this.type = type;
-    this.size = size;
-  }
-
   public ArrayType(ElementInfo info, String name, BigInteger size, TypeRef type) {
     super(info, name);
     this.type = type;
     this.size = size;
-  }
-
-  // TODO extract to own/naming class
-  public static String makeName(BigInteger size, TypeRef type) {
-    return "Array{" + size + "," + ((SimpleRef<Type>) type).link.name + "}";
   }
 
 }

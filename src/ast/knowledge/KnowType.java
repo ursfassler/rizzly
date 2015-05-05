@@ -69,7 +69,7 @@ import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FuncReturnTuple;
 import ast.data.function.ret.FuncReturnType;
 import ast.data.type.Type;
-import ast.data.type.base.ArrayType;
+import ast.data.type.base.ArrayTypeFactory;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.EnumType;
@@ -81,6 +81,7 @@ import ast.data.type.composed.RecordType;
 import ast.data.type.special.ComponentType;
 import ast.data.variable.FuncVariable;
 import ast.data.variable.Variable;
+import ast.manipulator.TypeRepo;
 import ast.pass.check.type.ExpressionTypecheck;
 import ast.traverser.NullTraverser;
 import ast.traverser.other.RefTypeGetter;
@@ -103,13 +104,13 @@ public class KnowType extends KnowledgeEntry {
 
 class KnowTypeTraverser extends NullTraverser<Type, Void> {
   private final Map<Ast, Type> cache = new HashMap<Ast, Type>();
-  final private KnowBaseItem kbi;
+  final private TypeRepo kbi;
   final private RefTypeGetter rtg;
   final private KnowParent kp;
 
   public KnowTypeTraverser(KnowType kt, KnowledgeBase kb) {
     super();
-    kbi = kb.getEntry(KnowBaseItem.class);
+    kbi = new TypeRepo(kb);
     kp = kb.getEntry(KnowParent.class);
     rtg = new RefTypeGetter(kt, kb);
   }
@@ -583,7 +584,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
 
     RangeType et = kbi.getRangeType(cont);
 
-    return new ArrayType(BigInteger.valueOf(obj.value.size()), new SimpleRef<Type>(ElementInfo.NO, et));
+    return ArrayTypeFactory.create(obj.value.size(), et);
   }
 
   @Override

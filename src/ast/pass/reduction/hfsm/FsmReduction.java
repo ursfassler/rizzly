@@ -61,10 +61,10 @@ import ast.data.statement.Statement;
 import ast.data.type.Type;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.EnumType;
+import ast.data.type.base.EnumTypeFactory;
 import ast.data.variable.FuncVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.Variable;
-import ast.knowledge.KnowBaseItem;
 import ast.knowledge.KnowLlvmLibrary;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
@@ -134,12 +134,10 @@ class FsmReductionWorker extends NullTraverser<Ast, Namespace> {
 class Reduction {
   static final private ElementInfo info = ElementInfo.NO;
   final private KnowLlvmLibrary kll;
-  final private KnowBaseItem kbi;
   final private Map<ImplHfsm, ImplElementary> map = new HashMap<ImplHfsm, ImplElementary>();
 
   public Reduction(KnowledgeBase kb) {
     kll = kb.getEntry(KnowLlvmLibrary.class);
-    kbi = kb.getEntry(KnowBaseItem.class);
   }
 
   public ImplElementary reduce(ImplHfsm obj, Namespace param) {
@@ -160,7 +158,7 @@ class Reduction {
       }
     }
 
-    EnumType states = new EnumType(obj.topstate.getInfo(), obj.name + Designator.NAME_SEP + "State");
+    EnumType states = EnumTypeFactory.create(obj.topstate.getInfo(), obj.name + Designator.NAME_SEP + "State");
     HashMap<StateSimple, EnumElement> enumMap = makeEnumElem(obj.topstate, states);
 
     param.children.add(states);

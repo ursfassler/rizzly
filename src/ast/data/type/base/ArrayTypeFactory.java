@@ -17,15 +17,28 @@
 
 package ast.data.type.base;
 
+import java.math.BigInteger;
+
 import ast.ElementInfo;
-import ast.data.Range;
+import ast.data.expression.reference.SimpleRef;
+import ast.data.expression.reference.TypeRef;
+import ast.data.type.Type;
 
-public class RangeType extends BaseType {
-  final public Range range;
+public class ArrayTypeFactory {
+  static public ArrayType create(BigInteger size, TypeRef type) {
+    return new ArrayType(ElementInfo.NO, makeName(size, type), size, type);
+  }
 
-  public RangeType(ElementInfo info, String name, Range range) {
-    super(info, name);
-    this.range = range;
+  static public ArrayType create(int size, Type type) {
+    return create(BigInteger.valueOf(size), type);
+  }
+
+  public static ArrayType create(BigInteger size, Type type) {
+    return create(size, new SimpleRef<Type>(ElementInfo.NO, type));
+  }
+
+  static public String makeName(BigInteger size, TypeRef type) {
+    return "Array{" + size + "," + ((SimpleRef<Type>) type).link.name + "}";
   }
 
 }
