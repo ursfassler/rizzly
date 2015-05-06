@@ -27,10 +27,10 @@ import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.template.Template;
 import ast.data.type.Type;
-import ast.data.type.template.ArrayTemplate;
-import ast.data.type.template.RangeTemplate;
+import ast.data.type.template.ArrayTemplateFactory;
+import ast.data.type.template.RangeTemplateFactory;
 import ast.data.type.template.TypeTemplate;
-import ast.data.type.template.TypeTypeTemplate;
+import ast.data.type.template.TypeTypeTemplateFactory;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.TypeFilter;
@@ -72,9 +72,9 @@ public class CheckNames extends AstPass {
 
   private Set<String> getTemplateNames() {
     Set<String> ret = new HashSet<String>();
-    ret.add(RangeTemplate.NAME);
-    ret.add(ArrayTemplate.NAME);
-    ret.add(TypeTypeTemplate.NAME);
+    ret.add(RangeTemplateFactory.NAME);
+    ret.add(ArrayTemplateFactory.NAME);
+    ret.add(TypeTypeTemplateFactory.NAME);
     return ret;
   }
 }

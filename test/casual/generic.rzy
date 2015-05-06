@@ -1,7 +1,7 @@
 R1 = Record
 end
 
-R2{T:Any} = Record
+R2{T:Type{Any}} = Record
   b : T;
 end
 

@@ -30,7 +30,7 @@ public class ValueReplacer extends ExprReplacer<Pair<Expression, Expression>> {
   }
 
   @Override
-  protected ast.data.expression.Expression visit(Ast obj, Pair<Expression, Expression> param) {
+  protected Expression visit(Ast obj, Pair<Expression, Expression> param) {
     if (obj == param.first) {
       return param.second;
     } else {

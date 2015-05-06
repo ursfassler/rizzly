@@ -15,32 +15,17 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.type.template;
+package ast.data.template;
 
 import ast.ElementInfo;
-import ast.data.expression.reference.Reference;
+import ast.data.expression.reference.SimpleRef;
 import ast.data.type.Type;
+import ast.data.variable.TemplateParameter;
 
-public class TypeType extends Type {
-  private Reference type;
+public abstract class TemplateFactory {
 
-  public TypeType(ElementInfo info, Reference type) {
-    super(info, makeName(type));
-    this.type = type;
-  }
-
-  // TODO (re)move
-  @Deprecated
-  public static String makeName(ast.data.expression.reference.Reference type) {
-    return TypeTypeTemplate.NAME + "{" + type.toString() + "}";
-  }
-
-  public Reference getType() {
-    return type;
-  }
-
-  public void setType(Reference type) {
-    this.type = type;
+  static protected TemplateParameter makeParam(String name, Type type) {
+    return new TemplateParameter(ElementInfo.NO, name, new SimpleRef<Type>(ElementInfo.NO, type));
   }
 
 }

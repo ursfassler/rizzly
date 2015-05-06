@@ -15,30 +15,26 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.others;
+package ast.data.type.template;
 
-import ast.data.Ast;
+import ast.ElementInfo;
 import ast.data.AstList;
-import ast.data.function.template.DefaultValueTemplate;
-import ast.data.function.template.FunctionTemplate;
 import ast.data.template.Template;
-import ast.knowledge.KnowledgeBase;
-import ast.pass.AstPass;
+import ast.data.template.TemplateFactory;
+import ast.data.type.special.TypeType;
+import ast.data.variable.TemplateParameter;
 
-public class InternFuncAdder extends AstPass {
+public class TypeTypeTemplateFactory extends TemplateFactory {
+  public static final String NAME = "Type";
+  public static final String[] PARAM = { "T" };
 
-  @Override
-  public void process(ast.data.Namespace root, KnowledgeBase kb) {
-    genTemplateFunctions(root.children);
+  public static Template create(TypeType typeTypeAny) {
+    return new Template(ElementInfo.NO, NAME, getParameter(typeTypeAny), new TypeTypeTemplate());
   }
 
-  private static void genTemplateFunctions(AstList<Ast> container) {
-    templ(new DefaultValueTemplate(), container);
+  private static AstList<TemplateParameter> getParameter(TypeType typeTypeAny) {
+    AstList<TemplateParameter> ret = new AstList<TemplateParameter>();
+    ret.add(makeParam(PARAM[0], typeTypeAny));
+    return ret;
   }
-
-  private static void templ(FunctionTemplate tmpl, AstList<Ast> container) {
-    Template decl = new Template(tmpl.getInfo(), tmpl.getName(), tmpl.makeParam(), tmpl);
-    container.add(decl);
-  }
-
 }

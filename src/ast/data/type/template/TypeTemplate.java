@@ -19,8 +19,6 @@ package ast.data.type.template;
 
 import ast.ElementInfo;
 import ast.data.Named;
-import ast.data.expression.reference.Reference;
-import ast.data.variable.TemplateParameter;
 
 public class TypeTemplate extends Named {
 
@@ -28,11 +26,4 @@ public class TypeTemplate extends Named {
     super(info, name);
   }
 
-  static protected TemplateParameter inst(String name, String type) {
-    return new TemplateParameter(ElementInfo.NO, name, new Reference(ElementInfo.NO, type));
-  }
-
-  protected static TemplateParameter inst(String name, Reference type) {
-    return new TemplateParameter(ElementInfo.NO, name, type);
-  }
 }

@@ -25,26 +25,18 @@ import ast.data.Range;
 import ast.data.expression.Number;
 import ast.data.template.ActualTemplateArgument;
 import ast.data.type.Type;
-import ast.data.type.special.AnyType;
-import ast.data.type.special.IntegerType;
-import ast.data.type.special.NaturalType;
 import ast.data.type.template.ArrayTemplate;
 import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
-import ast.knowledge.KnowInstance;
 import ast.knowledge.KnowledgeBase;
 import ast.repository.manipulator.TypeRepo;
 import ast.traverser.NullTraverser;
 
 public class TypeTemplateSpecializer extends NullTraverser<Type, List<ActualTemplateArgument>> {
-  private final KnowledgeBase kb;
-  private final KnowInstance ki;
   private final TypeRepo kbi;
 
   public TypeTemplateSpecializer(KnowledgeBase kb) {
-    this.kb = kb;
-    ki = kb.getEntry(KnowInstance.class);
     kbi = new TypeRepo(kb);
   }
 
@@ -61,44 +53,32 @@ public class TypeTemplateSpecializer extends NullTraverser<Type, List<ActualTemp
   @Override
   protected ast.data.type.Type visitRangeTemplate(RangeTemplate obj, List<ActualTemplateArgument> param) {
     assert (param.size() == 2);
-    ast.data.type.Type ret = (ast.data.type.Type) ki.find(obj, param);
-    if (ret == null) {
-      ActualTemplateArgument low = ArgEvaluator.process(new IntegerType(), param.get(0), kb);
-      assert (low instanceof Number);
-      ActualTemplateArgument high = ArgEvaluator.process(new IntegerType(), param.get(1), kb);
-      assert (high instanceof Number);
-      ret = kbi.getRangeType(new Range(((Number) low).value, ((Number) high).value));
-      ki.add(obj, param, ret);
-    }
-    return ret;
+    assert (param.get(0) instanceof Number);
+    assert (param.get(1) instanceof Number);
+
+    Number low = (Number) param.get(0);
+    Number high = (Number) param.get(1);
+    return kbi.getRangeType(new Range(low.value, high.value));
   }
 
   @Override
   protected ast.data.type.Type visitArrayTemplate(ArrayTemplate obj, List<ActualTemplateArgument> param) {
     assert (param.size() == 2);
-    ast.data.type.Type ret = (ast.data.type.Type) ki.find(obj, param);
-    if (ret == null) {
-      ActualTemplateArgument size = ArgEvaluator.process(new NaturalType(), param.get(0), kb);
-      ActualTemplateArgument type = ArgEvaluator.process(new AnyType(), param.get(1), kb);
-      assert (type instanceof Type);
-      assert (size instanceof Number);
-      BigInteger count = ((ast.data.expression.Number) size).value;
-      ret = kbi.getArray(count, (ast.data.type.Type) type);
-      ki.add(obj, param, ret);
-    }
-    return ret;
+    assert (param.get(0) instanceof Number);
+    assert (param.get(1) instanceof Type);
+
+    Number size = (Number) param.get(0);
+    Type type = (Type) param.get(1);
+    BigInteger count = size.value;
+    return kbi.getArray(count, type);
   }
 
   @Override
-  protected ast.data.type.Type visitTypeTypeTemplate(TypeTypeTemplate obj, List<ActualTemplateArgument> param) {
-    ast.data.type.Type ret = (ast.data.type.Type) ki.find(obj, param);
-    if (ret == null) {
-      assert (param.size() == 1);
-      ActualTemplateArgument type = ArgEvaluator.process(new AnyType(), param.get(0), kb);
-      assert (type instanceof Type);
-      ret = kbi.getTypeType((ast.data.type.Type) type);
-      ki.add(obj, param, ret);
-    }
-    return ret;
+  protected Type visitTypeTypeTemplate(TypeTypeTemplate obj, List<ActualTemplateArgument> param) {
+    assert (param.size() == 1);
+    assert (param.get(0) instanceof Type);
+
+    Type type = (Type) param.get(0);
+    return kbi.getTypeType(type);
   }
 }

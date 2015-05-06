@@ -18,21 +18,11 @@
 package ast.data.type.template;
 
 import ast.ElementInfo;
-import ast.data.AstList;
-import ast.data.variable.TemplateParameter;
 
 public class TypeTypeTemplate extends TypeTemplate {
-  public static final String NAME = "Type";
-  public static final String[] PARAM = { "T" };
 
   public TypeTypeTemplate() {
-    super(ElementInfo.NO, NAME);
-  }
-
-  public static AstList<TemplateParameter> makeParam() {
-    AstList<TemplateParameter> ret = new AstList<TemplateParameter>();
-    ret.add(inst(PARAM[0], ast.data.type.special.AnyType.NAME));
-    return ret;
+    super(ElementInfo.NO, "TypeTypeTemplate");
   }
 
 }

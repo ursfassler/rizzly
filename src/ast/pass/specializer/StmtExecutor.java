@@ -32,8 +32,12 @@ import ast.data.function.header.FuncFunction;
 import ast.data.statement.AssignmentMulti;
 import ast.data.statement.Block;
 import ast.data.statement.IfOption;
+import ast.data.statement.IfStmt;
+import ast.data.statement.ReturnExpr;
+import ast.data.statement.ReturnVoid;
 import ast.data.statement.Statement;
 import ast.data.statement.VarDefInitStmt;
+import ast.data.statement.WhileStmt;
 import ast.data.type.Type;
 import ast.data.variable.Variable;
 import ast.interpreter.Memory;
@@ -50,49 +54,51 @@ import error.RError;
  *
  */
 public class StmtExecutor extends NullTraverser<Expression, Memory> {
-  private KnowledgeBase kb;
+  private final InstanceRepo ir;
+  private final KnowledgeBase kb;
 
-  public StmtExecutor(KnowledgeBase kb) {
+  public StmtExecutor(InstanceRepo ir, KnowledgeBase kb) {
     super();
+    this.ir = ir;
     this.kb = kb;
   }
 
-  public static ast.data.expression.Expression process(FuncFunction func, List<Expression> actparam, Memory mem, KnowledgeBase kb) {
+  public static Expression process(FuncFunction func, List<Expression> actparam, Memory mem, InstanceRepo ir, KnowledgeBase kb) {
     Memory memory = new Memory(mem);
 
     assert (func.param.size() == actparam.size());
 
     for (int i = 0; i < actparam.size(); i++) {
       ast.data.variable.FuncVariable var = func.param.get(i);
-      Expression val = (Expression) ExprEvaluator.evaluate(actparam.get(i), mem, kb);
+      Expression val = ExprEvaluator.evaluate(actparam.get(i), mem, ir, kb);
       memory.createVar(var);
       memory.set(var, val);
     }
 
-    StmtExecutor executor = new StmtExecutor(kb);
-    ast.data.expression.Expression ret = executor.traverse(func, memory);
+    StmtExecutor executor = new StmtExecutor(ir, kb);
+    Expression ret = executor.traverse(func, memory);
     assert (ret != null);
     return ret;
   }
 
   private Expression exeval(Expression expr, Memory mem) {
-    return (Expression) ExprEvaluator.evaluate(expr, mem, kb);
+    return ExprEvaluator.evaluate(expr, mem, ir, kb);
   }
 
-  private boolean toBool(ast.data.expression.Expression expr) {
+  private boolean toBool(Expression expr) {
     assert (expr instanceof BoolValue);
-    return ((ast.data.expression.BoolValue) expr).value;
+    return ((BoolValue) expr).value;
   }
 
   @Override
-  protected ast.data.expression.Expression visitDefault(Ast obj, Memory param) {
+  protected Expression visitDefault(Ast obj, Memory param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
   @Override
-  protected ast.data.expression.Expression visitFuncFunction(FuncFunction obj, Memory param) {
+  protected Expression visitFuncFunction(FuncFunction obj, Memory param) {
     for (Statement stmt : obj.body.statements) {
-      ast.data.expression.Expression ret = visit(stmt, param);
+      Expression ret = visit(stmt, param);
       if (ret != null) {
         return ret;
       }
@@ -101,9 +107,9 @@ public class StmtExecutor extends NullTraverser<Expression, Memory> {
   }
 
   @Override
-  protected ast.data.expression.Expression visitBlock(Block obj, Memory param) {
+  protected Expression visitBlock(Block obj, Memory param) {
     for (Statement stmt : obj.statements) {
-      ast.data.expression.Expression ret = visit(stmt, param);
+      Expression ret = visit(stmt, param);
       if (ret != null) {
         return ret;
       }
@@ -112,7 +118,7 @@ public class StmtExecutor extends NullTraverser<Expression, Memory> {
   }
 
   @Override
-  protected ast.data.expression.Expression visitVarDefInitStmt(VarDefInitStmt obj, Memory param) {
+  protected Expression visitVarDefInitStmt(VarDefInitStmt obj, Memory param) {
     Expression value = exeval(obj.initial, param);
 
     for (Variable var : obj.variable) {
@@ -130,14 +136,14 @@ public class StmtExecutor extends NullTraverser<Expression, Memory> {
   }
 
   @Override
-  protected ast.data.expression.Expression visitAssignmentMulti(AssignmentMulti obj, Memory param) {
+  protected Expression visitAssignmentMulti(AssignmentMulti obj, Memory param) {
     Expression rhs = exeval(obj.right, param);
 
     AstList<Expression> value;
 
     if (obj.left.size() > 1) {
       RError.ass(rhs instanceof TupleValue, obj.getInfo(), "expected tuple on the right");
-      value = ((ast.data.expression.TupleValue) rhs).value;
+      value = ((TupleValue) rhs).value;
     } else {
       value = new AstList<Expression>();
       value.add(rhs);
@@ -153,32 +159,32 @@ public class StmtExecutor extends NullTraverser<Expression, Memory> {
     return null;
   }
 
-  private void assign(ast.data.expression.reference.Reference lhs, Expression rhs, Memory param) {
+  private void assign(Reference lhs, Expression rhs, Memory param) {
     rhs = Copy.copy(rhs);
 
     Variable var = (Variable) lhs.link;
     Expression root = param.get(var);
 
-    Ast lvalue = RefEvaluator.execute(root, lhs.offset, param, kb);
+    Ast lvalue = RefEvaluator.execute(root, lhs.offset, param, ir, kb);
     root = ValueReplacer.set(root, (Expression) lvalue, rhs);
     param.set(var, root);
   }
 
   @Override
-  protected ast.data.expression.Expression visitReturnExpr(ast.data.statement.ReturnExpr obj, Memory param) {
-    ast.data.expression.Expression rhs = exeval(obj.expr, param);
+  protected Expression visitReturnExpr(ReturnExpr obj, Memory param) {
+    Expression rhs = exeval(obj.expr, param);
     return rhs;
   }
 
   @Override
-  protected ast.data.expression.Expression visitReturnVoid(ast.data.statement.ReturnVoid obj, Memory param) {
+  protected Expression visitReturnVoid(ReturnVoid obj, Memory param) {
     return new AnyValue(ElementInfo.NO);
   }
 
   @Override
-  protected ast.data.expression.Expression visitWhileStmt(ast.data.statement.WhileStmt obj, Memory param) {
+  protected Expression visitWhileStmt(WhileStmt obj, Memory param) {
     while (toBool(exeval(obj.condition, param))) {
-      ast.data.expression.Expression ret = visit(obj.body, param);
+      Expression ret = visit(obj.body, param);
       if (ret != null) {
         return ret;
       }
@@ -187,7 +193,7 @@ public class StmtExecutor extends NullTraverser<Expression, Memory> {
   }
 
   @Override
-  protected ast.data.expression.Expression visitIfStmt(ast.data.statement.IfStmt obj, Memory param) {
+  protected Expression visitIfStmt(IfStmt obj, Memory param) {
     for (IfOption opt : obj.option) {
       if (toBool(exeval(opt.condition, param))) {
         return visit(opt.code, param);

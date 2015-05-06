@@ -30,6 +30,7 @@ import ast.data.type.base.StringType;
 import ast.data.type.composed.RecordType;
 import ast.data.type.special.IntegerType;
 import ast.data.type.special.NaturalType;
+import ast.data.type.special.TypeType;
 import ast.data.type.special.VoidType;
 import ast.traverser.NullTraverser;
 
@@ -154,6 +155,16 @@ class EqualTraverser extends NullTraverser<Boolean, Object> {
   protected Boolean visitEnumType(EnumType obj, Object param) {
     // TODO compare strings
     throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Boolean visitTypeType(TypeType obj, Object param) {
+    if (param instanceof TypeType) {
+      TypeType other = (TypeType) param;
+      return obj.type.equals(other.type);
+    } else {
+      return false;
+    }
   }
 
 }

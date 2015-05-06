@@ -18,10 +18,24 @@
 package ast.data.function.template;
 
 import ast.ElementInfo;
+import ast.data.AstList;
+import ast.data.template.Template;
+import ast.data.template.TemplateFactory;
+import ast.data.type.special.TypeType;
+import ast.data.variable.TemplateParameter;
 
-public class DefaultValueTemplate extends FunctionTemplate {
-  public DefaultValueTemplate() {
-    super(ElementInfo.NO, "DefaultValueTemplate");
+public class DefaultValueTemplateFactory extends TemplateFactory {
+  public static final String NAME = "default";
+  public static final String[] PARAM = { "type" };
+
+  public static Template create(TypeType typeTypeAny) {
+    return new Template(ElementInfo.NO, NAME, getParameter(typeTypeAny), new DefaultValueTemplate());
+  }
+
+  private static AstList<TemplateParameter> getParameter(TypeType typeTypeAny) {
+    AstList<TemplateParameter> ret = new AstList<TemplateParameter>();
+    ret.add(makeParam(PARAM[0], typeTypeAny));
+    return ret;
   }
 
 }

@@ -35,11 +35,12 @@ import error.ErrorType;
 import error.RError;
 
 class TypeEvalReplacer extends DefTraverser<AstList<ActualTemplateArgument>, Void> {
-
+  final private InstanceRepo ir;
   final private KnowledgeBase kb;
 
-  public TypeEvalReplacer(KnowledgeBase kb) {
+  public TypeEvalReplacer(InstanceRepo ir, KnowledgeBase kb) {
     super();
+    this.ir = ir;
     this.kb = kb;
   }
 
@@ -70,7 +71,7 @@ class TypeEvalReplacer extends DefTraverser<AstList<ActualTemplateArgument>, Voi
         RError.err(ErrorType.Error, obj.getInfo(), "Wrong number of parameter, expected " + template.getTempl().size() + " got " + arg.size());
         return null;
       }
-      Ast inst = Specializer.process(template, arg, kb);
+      Ast inst = Specializer.process(template, arg, ir, kb);
       obj.link = (Named) inst;
     } else if ((obj.link instanceof ConstGlobal)) {
       // FIXME this is a temporary workaround, the copy should be done in the

@@ -18,26 +18,12 @@
 package ast.data.function.template;
 
 import ast.ElementInfo;
-import ast.data.AstBase;
-import ast.data.AstList;
-import ast.data.expression.reference.Reference;
-import ast.data.variable.TemplateParameter;
+import ast.data.Named;
 
-public abstract class FunctionTemplate extends AstBase {
+public abstract class FunctionTemplate extends Named {
 
-  public FunctionTemplate(ElementInfo info) {
-    super(info);
+  public FunctionTemplate(ElementInfo info, String name) {
+    super(info, name);
   }
 
-  abstract public AstList<TemplateParameter> makeParam();
-
-  abstract public String getName();
-
-  static protected TemplateParameter inst(String name, String type) {
-    return new TemplateParameter(ElementInfo.NO, name, new Reference(ElementInfo.NO, type));
-  }
-
-  protected static TemplateParameter inst(String name, Reference type) {
-    return new TemplateParameter(ElementInfo.NO, name, type);
-  }
 }

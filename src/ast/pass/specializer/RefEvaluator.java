@@ -25,8 +25,10 @@ import ast.data.expression.reference.RefCall;
 import ast.data.expression.reference.RefIndex;
 import ast.data.expression.reference.RefItem;
 import ast.data.expression.reference.RefTemplCall;
+import ast.data.expression.reference.Reference;
 import ast.data.function.Function;
 import ast.data.function.header.FuncFunction;
+import ast.data.template.Template;
 import ast.data.type.Type;
 import ast.data.type.base.BaseType;
 import ast.data.variable.Constant;
@@ -38,29 +40,34 @@ import error.ErrorType;
 import error.RError;
 
 public class RefEvaluator extends NullTraverser<Expression, Ast> {
-  final private Memory memory;
+  private final InstanceRepo ir;
   final private KnowledgeBase kb;
+  final private Memory memory;
 
-  public RefEvaluator(Memory memory, KnowledgeBase kb) {
+  public RefEvaluator(Memory memory, InstanceRepo ir, KnowledgeBase kb) {
     super();
     this.memory = memory;
+    this.ir = ir;
     this.kb = kb;
   }
 
-  public static Ast execute(ast.data.expression.reference.Reference ref, Memory memory, KnowledgeBase kb) {
+  public static Ast execute(Reference ref, Memory memory, InstanceRepo ir, KnowledgeBase kb) {
     if (ref.link instanceof Constant) {
-      Ast val = ((ast.data.variable.Constant) ref.link).def;
-      Ast item = RefEvaluator.execute(val, ref.offset, memory, kb);
+      Ast val = ((Constant) ref.link).def;
+      Ast item = RefEvaluator.execute(val, ref.offset, memory, ir, kb);
       return item;
     } else if (ref.link instanceof Variable) {
-      Expression val = memory.get((ast.data.variable.Variable) ref.link);
-      Ast item = RefEvaluator.execute(val, ref.offset, memory, kb);
+      Expression val = memory.get((Variable) ref.link);
+      Ast item = RefEvaluator.execute(val, ref.offset, memory, ir, kb);
       return item;
     } else if (ref.link instanceof Function) {
-      Ast item = RefEvaluator.execute(ref.link, ref.offset, memory, kb);
+      Ast item = RefEvaluator.execute(ref.link, ref.offset, memory, ir, kb);
       return item;
     } else if (ref.link instanceof Type) {
-      Ast item = RefEvaluator.execute(ref.link, ref.offset, memory, kb);
+      Ast item = RefEvaluator.execute(ref.link, ref.offset, memory, ir, kb);
+      return item;
+    } else if (ref.link instanceof Template) {
+      Ast item = RefEvaluator.execute(ref.link, ref.offset, memory, ir, kb);
       return item;
     } else {
       assert (ref.offset.isEmpty());
@@ -68,8 +75,8 @@ public class RefEvaluator extends NullTraverser<Expression, Ast> {
     }
   }
 
-  public static Ast execute(Ast root, AstList<RefItem> offset, Memory memory, KnowledgeBase kb) {
-    RefEvaluator evaluator = new RefEvaluator(memory, kb);
+  public static Ast execute(Ast root, AstList<RefItem> offset, Memory memory, InstanceRepo ir, KnowledgeBase kb) {
+    RefEvaluator evaluator = new RefEvaluator(memory, ir, kb);
 
     for (ast.data.expression.reference.RefItem ri : offset) {
       root = evaluator.traverse(ri, root);
@@ -83,11 +90,11 @@ public class RefEvaluator extends NullTraverser<Expression, Ast> {
   }
 
   private Expression eval(Expression expr) {
-    return (Expression) ExprEvaluator.evaluate(expr, memory, kb);
+    return ExprEvaluator.evaluate(expr, memory, ir, kb);
   }
 
   private ast.data.expression.Expression call(FuncFunction func, AstList<Expression> value) {
-    return StmtExecutor.process(func, value, new Memory(), kb);
+    return StmtExecutor.process(func, value, new Memory(), ir, kb);
   }
 
   @Override

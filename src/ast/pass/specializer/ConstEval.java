@@ -15,38 +15,30 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.others;
+package ast.pass.specializer;
 
-import ast.data.expression.Expression;
+import ast.data.Ast;
 import ast.interpreter.Memory;
 import ast.knowledge.KnowledgeBase;
-import ast.pass.AstPass;
-import ast.pass.specializer.ExprEvaluator;
 import ast.traverser.DefTraverser;
 
-/**
- * Execute initial values of state variables (for static initialization)
- *
- * @author urs
- *
- */
-public class StateVarInitExecutor extends AstPass {
+public class ConstEval extends DefTraverser<Void, Void> {
+  private final KnowledgeBase kb;
 
-  @Override
-  public void process(ast.data.Namespace root, KnowledgeBase kb) {
-    StateVarInitExecutorWorker worker = new StateVarInitExecutorWorker();
-    worker.traverse(root, kb);
+  public ConstEval(KnowledgeBase kb) {
+    super();
+    this.kb = kb;
   }
 
-}
-
-class StateVarInitExecutorWorker extends DefTraverser<Void, KnowledgeBase> {
+  public static void process(Ast classes, KnowledgeBase kb) {
+    ConstEval eval = new ConstEval(kb);
+    eval.traverse(classes, null);
+  }
 
   @Override
-  protected Void visitStateVariable(ast.data.variable.StateVariable obj, KnowledgeBase param) {
-    Expression val = (Expression) ExprEvaluator.evaluate(obj.def, new Memory(), param);
-    assert (val != null);
-    obj.def = val;
+  protected Void visitConstant(ast.data.variable.Constant obj, Void param) {
+    InstanceRepo ir = new InstanceRepo();
+    obj.def = ExprEvaluator.evaluate(obj.def, new Memory(), ir, kb);
     return null;
   }
 

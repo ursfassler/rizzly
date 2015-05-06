@@ -115,9 +115,9 @@ import ast.data.type.composed.UnsafeUnionType;
 import ast.data.type.out.AliasType;
 import ast.data.type.out.SIntType;
 import ast.data.type.out.UIntType;
+import ast.data.type.special.TypeType;
 import ast.data.type.template.ArrayTemplate;
 import ast.data.type.template.RangeTemplate;
-import ast.data.type.template.TypeType;
 import ast.data.type.template.TypeTypeTemplate;
 import ast.data.variable.Constant;
 import ast.data.variable.DefVariable;
@@ -530,7 +530,7 @@ public class FunPrinter extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitArrayTemplate(ArrayTemplate obj, Void param) {
-    xw.wa(ArrayTemplate.NAME, getId(obj, param));
+    xw.wa(obj.name, getId(obj, param));
     return null;
   }
 
@@ -554,9 +554,9 @@ public class FunPrinter extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitTypeType(TypeType obj, Void param) {
-    xw.wr(TypeTypeTemplate.NAME);
+    xw.wr(obj.name);
     xw.wr("(");
-    visit(obj.getType(), null);
+    visit(obj.type, null);
     xw.wr(")");
     return null;
   }
@@ -975,7 +975,7 @@ public class FunPrinter extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitDefaultValueTemplate(DefaultValueTemplate obj, Void param) {
-    xw.wa(obj.getName(), getId(obj, param));
+    xw.wa(obj.name, getId(obj, param));
     return null;
   }
 

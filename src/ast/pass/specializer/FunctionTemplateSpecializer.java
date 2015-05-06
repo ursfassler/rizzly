@@ -34,29 +34,25 @@ import ast.data.statement.Block;
 import ast.data.statement.ReturnExpr;
 import ast.data.template.ActualTemplateArgument;
 import ast.data.type.Type;
-import ast.data.type.special.AnyType;
 import ast.data.variable.FuncVariable;
 import ast.knowledge.KnowEmptyValue;
-import ast.knowledge.KnowInstance;
 import ast.knowledge.KnowledgeBase;
 import ast.repository.manipulator.RepoAdder;
 import ast.traverser.NullTraverser;
 
 public class FunctionTemplateSpecializer extends NullTraverser<Function, List<ActualTemplateArgument>> {
-  private final KnowledgeBase kb;
-  private final KnowInstance ki;
+  private final InstanceRepo ki;
   private final KnowEmptyValue kev;
   private final RepoAdder ra;
 
-  public FunctionTemplateSpecializer(KnowledgeBase kb) {
-    this.kb = kb;
-    ki = kb.getEntry(KnowInstance.class);
+  public FunctionTemplateSpecializer(InstanceRepo ki, KnowledgeBase kb) {
+    this.ki = ki;
     kev = kb.getEntry(KnowEmptyValue.class);
     ra = new RepoAdder(kb);
   }
 
-  public static Function process(FunctionTemplate type, List<ActualTemplateArgument> genspec, KnowledgeBase kb) {
-    FunctionTemplateSpecializer specializer = new FunctionTemplateSpecializer(kb);
+  public static Function process(FunctionTemplate type, List<ActualTemplateArgument> genspec, InstanceRepo ki, KnowledgeBase kb) {
+    FunctionTemplateSpecializer specializer = new FunctionTemplateSpecializer(ki, kb);
     return specializer.traverse(type, genspec);
   }
 
@@ -68,11 +64,13 @@ public class FunctionTemplateSpecializer extends NullTraverser<Function, List<Ac
   @Override
   protected Function visitDefaultValueTemplate(DefaultValueTemplate obj, List<ActualTemplateArgument> param) {
     assert (param.size() == 1);
+    assert (param.get(0) instanceof Type);
+
     Function ret = (Function) ki.find(obj, param);
     if (ret == null) {
-      Type type = (Type) ArgEvaluator.process(new AnyType(), param.get(0), kb);
+      Type type = (Type) param.get(0);
 
-      String name = obj.getName() + Designator.NAME_SEP + type.name;
+      String name = obj.name + Designator.NAME_SEP + type.name;
 
       ret = makeFunc(name, type);
       ki.add(obj, param, ret);

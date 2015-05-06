@@ -31,6 +31,8 @@ import ast.pass.AstPass;
 import ast.pass.check.model.Modelcheck;
 import ast.pass.check.sanity.Sanitycheck;
 import ast.pass.check.type.Typecheck;
+import ast.pass.eval.GlobalConstEval;
+import ast.pass.eval.TemplateArgEval;
 import ast.pass.instantiation.Instantiation;
 import ast.pass.linker.Linker;
 import ast.pass.optimize.AlwaysGreater;
@@ -55,13 +57,11 @@ import ast.pass.others.FileLoader;
 import ast.pass.others.HeaderWriter;
 import ast.pass.others.IfCutter;
 import ast.pass.others.InitVarTyper;
-import ast.pass.others.InternFuncAdder;
-import ast.pass.others.InternTypeAdder;
+import ast.pass.others.InternsAdder;
 import ast.pass.others.IntroduceConvert;
 import ast.pass.others.RangeConverter;
 import ast.pass.others.RetStructIntroducer;
 import ast.pass.others.RootInstanceAdder;
-import ast.pass.others.StateVarInitExecutor;
 import ast.pass.others.SystemIfaceAdder;
 import ast.pass.others.TypeMerge;
 import ast.pass.others.TypeSort;
@@ -90,6 +90,7 @@ import ast.pass.reduction.SimplifyRef;
 import ast.pass.reduction.StateLinkReduction;
 import ast.pass.reduction.TupleAssignReduction;
 import ast.pass.reduction.hfsm.HfsmReduction;
+import ast.pass.specializer.StateVarInitExecutor;
 import ast.pass.specializer.TypeEvalReplacerPass;
 import error.RError;
 
@@ -175,8 +176,7 @@ public class Passes {
 
     passes.add(new FileLoader());
 
-    passes.add(new InternTypeAdder());
-    passes.add(new InternFuncAdder());
+    passes.add(new InternsAdder());
 
     passes.add(new CheckNames());
     passes.add(new Linker());
@@ -185,6 +185,8 @@ public class Passes {
     }
     passes.add(new FileReduction());
 
+    passes.add(new TemplateArgEval());
+
     passes.add(new NamespaceLinkReduction());
     passes.add(new StateLinkReduction());
     passes.add(new EnumLinkReduction());
@@ -192,6 +194,7 @@ public class Passes {
 
     passes.add(new RootInstanceAdder());
 
+    passes.add(new GlobalConstEval());
     passes.add(new TypeEvalReplacerPass());
 
     passes.add(new VarDefSplitter());

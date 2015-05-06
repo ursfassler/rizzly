@@ -15,26 +15,18 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.specializer;
+package ast.data.type.special;
 
-import ast.knowledge.KnowledgeBase;
-import ast.pass.AstPass;
+import ast.ElementInfo;
+import ast.data.Named;
+import ast.data.expression.reference.SimpleRef;
+import ast.data.type.Type;
+import ast.data.type.template.TypeTypeTemplateFactory;
 
-/**
- * Replaces all types with the evaluated expression:
- *
- * a : U{3+5} => a : U_8
- *
- * @author urs
- *
- */
-public class TypeEvalReplacerPass extends AstPass {
+public class TypeTypeFactory {
 
-  @Override
-  public void process(ast.data.Namespace root, KnowledgeBase kb) {
-    kb.clear();
-    InstanceRepo ir = new InstanceRepo();
-    TypeEvalReplacer replacer = new TypeEvalReplacer(ir, kb);
-    replacer.traverse(root, null);
+  static public TypeType create(Type type) {
+    String name = TypeTypeTemplateFactory.NAME + "{" + type.name + "}";
+    return new TypeType(ElementInfo.NO, name, new SimpleRef<Named>(ElementInfo.NO, type));
   }
 }

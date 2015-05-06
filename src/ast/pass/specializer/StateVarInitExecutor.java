@@ -17,24 +17,34 @@
 
 package ast.pass.specializer;
 
+import ast.interpreter.Memory;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.traverser.DefTraverser;
 
 /**
- * Replaces all types with the evaluated expression:
- *
- * a : U{3+5} => a : U_8
+ * Execute initial values of state variables (for static initialization)
  *
  * @author urs
  *
  */
-public class TypeEvalReplacerPass extends AstPass {
+public class StateVarInitExecutor extends AstPass {
 
   @Override
   public void process(ast.data.Namespace root, KnowledgeBase kb) {
-    kb.clear();
-    InstanceRepo ir = new InstanceRepo();
-    TypeEvalReplacer replacer = new TypeEvalReplacer(ir, kb);
-    replacer.traverse(root, null);
+    StateVarInitExecutorWorker worker = new StateVarInitExecutorWorker();
+    worker.traverse(root, kb);
   }
+
+}
+
+class StateVarInitExecutorWorker extends DefTraverser<Void, KnowledgeBase> {
+
+  @Override
+  protected Void visitStateVariable(ast.data.variable.StateVariable obj, KnowledgeBase param) {
+    InstanceRepo ir = new InstanceRepo();
+    obj.def = ExprEvaluator.evaluate(obj.def, new Memory(), ir, param);
+    return null;
+  }
+
 }

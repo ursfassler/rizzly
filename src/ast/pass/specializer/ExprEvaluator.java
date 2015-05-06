@@ -23,9 +23,13 @@ import java.util.List;
 import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
+import ast.data.expression.AnyValue;
 import ast.data.expression.BoolValue;
 import ast.data.expression.Expression;
+import ast.data.expression.NamedElementsValue;
+import ast.data.expression.NamedValue;
 import ast.data.expression.Number;
+import ast.data.expression.StringValue;
 import ast.data.expression.TupleValue;
 import ast.data.expression.binop.And;
 import ast.data.expression.binop.Div;
@@ -44,12 +48,11 @@ import ast.data.expression.binop.Plus;
 import ast.data.expression.binop.Shl;
 import ast.data.expression.binop.Shr;
 import ast.data.expression.reference.RefCall;
+import ast.data.expression.reference.RefName;
 import ast.data.expression.reference.RefTemplCall;
 import ast.data.expression.reference.Reference;
 import ast.data.expression.unop.Not;
 import ast.data.expression.unop.Uminus;
-import ast.data.template.ActualTemplateArgument;
-import ast.data.template.Template;
 import ast.data.type.Type;
 import ast.data.variable.Constant;
 import ast.data.variable.FuncVariable;
@@ -60,59 +63,58 @@ import ast.traverser.NullTraverser;
 import error.ErrorType;
 import error.RError;
 
-public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory> {
+public class ExprEvaluator extends NullTraverser<Expression, Void> {
+  private final Memory memory;
+  private final InstanceRepo ir;
   private final KnowledgeBase kb;
 
-  public ExprEvaluator(KnowledgeBase kb) {
+  public ExprEvaluator(Memory memory, InstanceRepo ir, KnowledgeBase kb) {
     super();
+    this.memory = memory;
+    this.ir = ir;
     this.kb = kb;
   }
 
-  public static ActualTemplateArgument evaluate(Expression obj, Memory mem, KnowledgeBase kb) {
-    ExprEvaluator evaluator = new ExprEvaluator(kb);
-    return evaluator.traverse(obj, mem);
+  public static Expression evaluate(Expression obj, Memory memory, InstanceRepo ir, KnowledgeBase kb) {
+    ExprEvaluator evaluator = new ExprEvaluator(memory, ir, kb);
+    return evaluator.traverse(obj, null);
   }
 
-  private void visitExpList(List<Expression> expList, Memory param) {
+  private void visitExpList(List<Expression> expList, Void param) {
     for (int i = 0; i < expList.size(); i++) {
       Expression expr = expList.get(i);
-      expr = (Expression) visit(expr, param);
+      expr = visit(expr, param);
       expList.set(i, expr);
     }
   }
 
   @Override
-  protected ast.data.expression.Expression visitFuncVariable(FuncVariable obj, Memory param) {
-    assert (param.contains(obj));
-    return param.get(obj);
+  protected Expression visitFuncVariable(FuncVariable obj, Void param) {
+    assert (memory.contains(obj));
+    return memory.get(obj);
   }
 
   @Override
-  protected ast.data.expression.Expression visitTemplateParameter(TemplateParameter obj, Memory param) {
-    assert (param.contains(obj));
-    return param.get(obj);
+  protected Expression visitTemplateParameter(TemplateParameter obj, Void param) {
+    assert (memory.contains(obj));
+    return memory.get(obj);
   }
 
   @Override
-  protected ActualTemplateArgument visitType(Type obj, Memory param) {
-    return obj;
-  }
-
-  @Override
-  protected ast.data.expression.Expression visitDefault(Ast obj, Memory param) {
+  protected Expression visitDefault(Ast obj, Void param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
   @Override
-  protected ActualTemplateArgument visitTemplate(Template obj, Memory param) {
-    Ast spec = Specializer.process(obj, new AstList<ActualTemplateArgument>(), kb);
-    return (ActualTemplateArgument) spec;
+  protected Expression visitType(Type obj, Void param) {
+    RError.err(ErrorType.Error, obj.getInfo(), "Expected value, got type");
+    return null;
   }
 
   @Override
-  protected ActualTemplateArgument visitNamedElementsValue(ast.data.expression.NamedElementsValue obj, Memory param) {
-    for (ast.data.expression.NamedValue itr : obj.value) {
-      Expression value = (Expression) visit(itr.value, param);
+  protected Expression visitNamedElementsValue(NamedElementsValue obj, Void param) {
+    for (NamedValue itr : obj.value) {
+      Expression value = visit(itr.value, param);
       assert (value != null);
       itr.value = value;
     }
@@ -120,79 +122,73 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
   }
 
   @Override
-  protected ActualTemplateArgument visitAnyValue(ast.data.expression.AnyValue obj, Memory param) {
+  protected Expression visitAnyValue(AnyValue obj, Void param) {
     return obj;
   }
 
   @Override
-  protected ast.data.expression.Expression visitNumber(ast.data.expression.Number obj, Memory param) {
+  protected Expression visitNumber(Number obj, Void param) {
     return obj;
   }
 
   @Override
-  protected ast.data.expression.Expression visitStringValue(ast.data.expression.StringValue obj, Memory param) {
+  protected Expression visitStringValue(StringValue obj, Void param) {
     return obj;
   }
 
   @Override
-  protected ActualTemplateArgument visitBoolValue(ast.data.expression.BoolValue obj, Memory param) {
+  protected Expression visitBoolValue(BoolValue obj, Void param) {
     return obj;
   }
 
   @Override
-  protected ast.data.expression.Expression visitConstGlobal(ast.data.variable.ConstGlobal obj, Memory param) {
-    return (ast.data.expression.Expression) visit(obj.def, new Memory()); // new
-    // memory
-    // because
-    // global
-    // constant
-    // need no context
-  }
-
-  @Override
-  protected ActualTemplateArgument visitConstPrivate(ast.data.variable.ConstPrivate obj, Memory param) {
+  protected Expression visitConstGlobal(ast.data.variable.ConstGlobal obj, Void param) {
     return visit(obj.def, param);
   }
 
   @Override
-  protected ast.data.expression.Expression visitTupleValue(ast.data.expression.TupleValue obj, Memory param) {
+  protected Expression visitConstPrivate(ast.data.variable.ConstPrivate obj, Void param) {
+    return visit(obj.def, param);
+  }
+
+  @Override
+  protected Expression visitTupleValue(TupleValue obj, Void param) {
     if (obj.value.size() == 1) {
-      return (ast.data.expression.Expression) visit(obj.value.get(0), param);
+      return visit(obj.value.get(0), param);
     } else {
       AstList<Expression> list = new AstList<Expression>();
       for (Expression expr : obj.value) {
-        list.add((Expression) visit(expr, param));
+        list.add(visit(expr, param));
       }
       return new TupleValue(obj.getInfo(), list);
     }
   }
 
   @Override
-  protected ActualTemplateArgument visitReference(Reference obj, Memory param) {
+  protected Expression visitReference(Reference obj, Void param) {
     // TODO move constant evaluation to another place
     if (obj.link instanceof Constant) {
-      ast.data.variable.Constant cst = (ast.data.variable.Constant) obj.link;
-      ActualTemplateArgument eco = visit(cst.def, param);
-      cst.def = (Expression) eco;
+      Constant cst = (Constant) obj.link;
+      cst.def = visit(cst.def, param);
     }
-    return visit(RefEvaluator.execute(obj, param, kb), param);
+    return visit(RefEvaluator.execute(obj, memory, ir, kb), param);
   }
 
   @Override
-  protected ast.data.expression.Expression visitRefCall(RefCall obj, Memory param) {
+  protected Expression visitRefCall(RefCall obj, Void param) {
     visitExpList(obj.actualParameter.value, param);
     return null;
   }
 
   @Override
-  protected ast.data.expression.Expression visitRefTemplCall(RefTemplCall obj, Memory param) {
+  protected Expression visitRefTemplCall(RefTemplCall obj, Void param) {
     RError.err(ErrorType.Fatal, obj.getInfo(), "reimplement");
     // visitExpList(obj.getActualParameter(), param);
     return null;
   }
 
   @Override
-  protected ast.data.expression.Expression visitRefName(ast.data.expression.reference.RefName obj, Memory param) {
+  protected Expression visitRefName(RefName obj, Void param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
@@ -206,13 +202,13 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
   }
 
   @Override
-  protected ActualTemplateArgument visitAnd(And obj, Memory param) {
-    ast.data.expression.Expression left = (ast.data.expression.Expression) visit(obj.left, param);
-    ast.data.expression.Expression right = (ast.data.expression.Expression) visit(obj.right, param);
+  protected Expression visitAnd(And obj, Void param) {
+    Expression left = visit(obj.left, param);
+    Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((ast.data.expression.Number) left).value;
-      BigInteger rval = ((ast.data.expression.Number) right).value;
+      BigInteger lval = ((Number) left).value;
+      BigInteger rval = ((Number) right).value;
       BigInteger res;
       res = lval.and(rval);
       return new Number(obj.getInfo(), res);
@@ -222,13 +218,13 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
   }
 
   @Override
-  protected ActualTemplateArgument visitDiv(Div obj, Memory param) {
-    ast.data.expression.Expression left = (ast.data.expression.Expression) visit(obj.left, param);
-    ast.data.expression.Expression right = (ast.data.expression.Expression) visit(obj.right, param);
+  protected Expression visitDiv(Div obj, Void param) {
+    Expression left = visit(obj.left, param);
+    Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((ast.data.expression.Number) left).value;
-      BigInteger rval = ((ast.data.expression.Number) right).value;
+      BigInteger lval = ((Number) left).value;
+      BigInteger rval = ((Number) right).value;
       BigInteger res;
       res = lval.divide(rval);
       return new Number(obj.getInfo(), res);
@@ -238,13 +234,13 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
   }
 
   @Override
-  protected ActualTemplateArgument visitMinus(Minus obj, Memory param) {
-    ast.data.expression.Expression left = (ast.data.expression.Expression) visit(obj.left, param);
-    ast.data.expression.Expression right = (ast.data.expression.Expression) visit(obj.right, param);
+  protected Expression visitMinus(Minus obj, Void param) {
+    Expression left = visit(obj.left, param);
+    Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((ast.data.expression.Number) left).value;
-      BigInteger rval = ((ast.data.expression.Number) right).value;
+      BigInteger lval = ((Number) left).value;
+      BigInteger rval = ((Number) right).value;
       BigInteger res;
       res = lval.subtract(rval);
       return new Number(obj.getInfo(), res);
@@ -254,13 +250,13 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
   }
 
   @Override
-  protected ActualTemplateArgument visitMod(Mod obj, Memory param) {
-    ast.data.expression.Expression left = (ast.data.expression.Expression) visit(obj.left, param);
-    ast.data.expression.Expression right = (ast.data.expression.Expression) visit(obj.right, param);
+  protected Expression visitMod(Mod obj, Void param) {
+    Expression left = visit(obj.left, param);
+    Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((ast.data.expression.Number) left).value;
-      BigInteger rval = ((ast.data.expression.Number) right).value;
+      BigInteger lval = ((Number) left).value;
+      BigInteger rval = ((Number) right).value;
       BigInteger res;
       res = lval.mod(rval);
       return new Number(obj.getInfo(), res);
@@ -270,13 +266,13 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
   }
 
   @Override
-  protected ActualTemplateArgument visitMul(Mul obj, Memory param) {
-    ast.data.expression.Expression left = (ast.data.expression.Expression) visit(obj.left, param);
-    ast.data.expression.Expression right = (ast.data.expression.Expression) visit(obj.right, param);
+  protected Expression visitMul(Mul obj, Void param) {
+    Expression left = visit(obj.left, param);
+    Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((ast.data.expression.Number) left).value;
-      BigInteger rval = ((ast.data.expression.Number) right).value;
+      BigInteger lval = ((Number) left).value;
+      BigInteger rval = ((Number) right).value;
       BigInteger res;
       res = lval.multiply(rval);
       return new Number(obj.getInfo(), res);
@@ -286,13 +282,13 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
   }
 
   @Override
-  protected ActualTemplateArgument visitOr(Or obj, Memory param) {
-    ast.data.expression.Expression left = (ast.data.expression.Expression) visit(obj.left, param);
-    ast.data.expression.Expression right = (ast.data.expression.Expression) visit(obj.right, param);
+  protected Expression visitOr(Or obj, Void param) {
+    Expression left = visit(obj.left, param);
+    Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((ast.data.expression.Number) left).value;
-      BigInteger rval = ((ast.data.expression.Number) right).value;
+      BigInteger lval = ((Number) left).value;
+      BigInteger rval = ((Number) right).value;
       BigInteger res;
       res = lval.or(rval);
       return new Number(obj.getInfo(), res);
@@ -302,13 +298,13 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
   }
 
   @Override
-  protected ActualTemplateArgument visitPlus(Plus obj, Memory param) {
-    ast.data.expression.Expression left = (ast.data.expression.Expression) visit(obj.left, param);
-    ast.data.expression.Expression right = (ast.data.expression.Expression) visit(obj.right, param);
+  protected Expression visitPlus(Plus obj, Void param) {
+    Expression left = visit(obj.left, param);
+    Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((ast.data.expression.Number) left).value;
-      BigInteger rval = ((ast.data.expression.Number) right).value;
+      BigInteger lval = ((Number) left).value;
+      BigInteger rval = ((Number) right).value;
       BigInteger res;
       res = lval.add(rval);
       return new Number(obj.getInfo(), res);
@@ -318,13 +314,13 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
   }
 
   @Override
-  protected ActualTemplateArgument visitShl(Shl obj, Memory param) {
-    ast.data.expression.Expression left = (ast.data.expression.Expression) visit(obj.left, param);
-    ast.data.expression.Expression right = (ast.data.expression.Expression) visit(obj.right, param);
+  protected Expression visitShl(Shl obj, Void param) {
+    Expression left = visit(obj.left, param);
+    Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((ast.data.expression.Number) left).value;
-      BigInteger rval = ((ast.data.expression.Number) right).value;
+      BigInteger lval = ((Number) left).value;
+      BigInteger rval = ((Number) right).value;
       BigInteger res;
       res = lval.shiftLeft(getInt(obj.getInfo(), rval));
       return new Number(obj.getInfo(), res);
@@ -334,13 +330,13 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
   }
 
   @Override
-  protected ActualTemplateArgument visitShr(Shr obj, Memory param) {
-    ast.data.expression.Expression left = (ast.data.expression.Expression) visit(obj.left, param);
-    ast.data.expression.Expression right = (ast.data.expression.Expression) visit(obj.right, param);
+  protected Expression visitShr(Shr obj, Void param) {
+    Expression left = visit(obj.left, param);
+    Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((ast.data.expression.Number) left).value;
-      BigInteger rval = ((ast.data.expression.Number) right).value;
+      BigInteger lval = ((Number) left).value;
+      BigInteger rval = ((Number) right).value;
       BigInteger res;
       res = lval.shiftRight(getInt(obj.getInfo(), rval));
       return new Number(obj.getInfo(), res);
@@ -350,18 +346,18 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
   }
 
   @Override
-  protected ActualTemplateArgument visitEqual(Equal obj, Memory param) {
-    ast.data.expression.Expression left = (ast.data.expression.Expression) visit(obj.left, param);
-    ast.data.expression.Expression right = (ast.data.expression.Expression) visit(obj.right, param);
+  protected Expression visitEqual(Equal obj, Void param) {
+    Expression left = visit(obj.left, param);
+    Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((ast.data.expression.Number) left).value;
-      BigInteger rval = ((ast.data.expression.Number) right).value;
+      BigInteger lval = ((Number) left).value;
+      BigInteger rval = ((Number) right).value;
       boolean res = lval.compareTo(rval) == 0;
       return new BoolValue(obj.getInfo(), res);
     } else if (areBool(left, right)) {
-      boolean lval = ((ast.data.expression.BoolValue) left).value;
-      boolean rval = ((ast.data.expression.BoolValue) right).value;
+      boolean lval = ((BoolValue) left).value;
+      boolean rval = ((BoolValue) right).value;
       boolean res = lval == rval;
       return new BoolValue(obj.getInfo(), res);
     } else {
@@ -369,22 +365,22 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
     }
   }
 
-  private boolean areBool(ast.data.expression.Expression left, ast.data.expression.Expression right) {
+  private boolean areBool(Expression left, Expression right) {
     return (left instanceof BoolValue) && (right instanceof BoolValue);
   }
 
-  private boolean areNumber(ast.data.expression.Expression left, ast.data.expression.Expression right) {
+  private boolean areNumber(Expression left, Expression right) {
     return (left instanceof Number) && (right instanceof Number);
   }
 
   @Override
-  protected ActualTemplateArgument visitGreater(Greater obj, Memory param) {
-    ast.data.expression.Expression left = (ast.data.expression.Expression) visit(obj.left, param);
-    ast.data.expression.Expression right = (ast.data.expression.Expression) visit(obj.right, param);
+  protected Expression visitGreater(Greater obj, Void param) {
+    Expression left = visit(obj.left, param);
+    Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((ast.data.expression.Number) left).value;
-      BigInteger rval = ((ast.data.expression.Number) right).value;
+      BigInteger lval = ((Number) left).value;
+      BigInteger rval = ((Number) right).value;
       boolean res = lval.compareTo(rval) > 0;
       return new BoolValue(obj.getInfo(), res);
     } else if (areBool(left, right)) {
@@ -396,13 +392,13 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
   }
 
   @Override
-  protected ActualTemplateArgument visitGreaterequal(Greaterequal obj, Memory param) {
-    ast.data.expression.Expression left = (ast.data.expression.Expression) visit(obj.left, param);
-    ast.data.expression.Expression right = (ast.data.expression.Expression) visit(obj.right, param);
+  protected Expression visitGreaterequal(Greaterequal obj, Void param) {
+    Expression left = visit(obj.left, param);
+    Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((ast.data.expression.Number) left).value;
-      BigInteger rval = ((ast.data.expression.Number) right).value;
+      BigInteger lval = ((Number) left).value;
+      BigInteger rval = ((Number) right).value;
       boolean res = lval.compareTo(rval) >= 0;
       return new BoolValue(obj.getInfo(), res);
     } else if (areBool(left, right)) {
@@ -414,13 +410,13 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
   }
 
   @Override
-  protected ActualTemplateArgument visitLess(Less obj, Memory param) {
-    ast.data.expression.Expression left = (ast.data.expression.Expression) visit(obj.left, param);
-    ast.data.expression.Expression right = (ast.data.expression.Expression) visit(obj.right, param);
+  protected Expression visitLess(Less obj, Void param) {
+    Expression left = visit(obj.left, param);
+    Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((ast.data.expression.Number) left).value;
-      BigInteger rval = ((ast.data.expression.Number) right).value;
+      BigInteger lval = ((Number) left).value;
+      BigInteger rval = ((Number) right).value;
       boolean res = lval.compareTo(rval) < 0;
       return new BoolValue(obj.getInfo(), res);
     } else if (areBool(left, right)) {
@@ -432,13 +428,13 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
   }
 
   @Override
-  protected ActualTemplateArgument visitLessequal(Lessequal obj, Memory param) {
-    ast.data.expression.Expression left = (ast.data.expression.Expression) visit(obj.left, param);
-    ast.data.expression.Expression right = (ast.data.expression.Expression) visit(obj.right, param);
+  protected Expression visitLessequal(Lessequal obj, Void param) {
+    Expression left = visit(obj.left, param);
+    Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((ast.data.expression.Number) left).value;
-      BigInteger rval = ((ast.data.expression.Number) right).value;
+      BigInteger lval = ((Number) left).value;
+      BigInteger rval = ((Number) right).value;
       boolean res = lval.compareTo(rval) <= 0;
       return new BoolValue(obj.getInfo(), res);
     } else if (areBool(left, right)) {
@@ -450,18 +446,18 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
   }
 
   @Override
-  protected ActualTemplateArgument visitNotequal(Notequal obj, Memory param) {
-    ast.data.expression.Expression left = (ast.data.expression.Expression) visit(obj.left, param);
-    ast.data.expression.Expression right = (ast.data.expression.Expression) visit(obj.right, param);
+  protected Expression visitNotequal(Notequal obj, Void param) {
+    Expression left = visit(obj.left, param);
+    Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((ast.data.expression.Number) left).value;
-      BigInteger rval = ((ast.data.expression.Number) right).value;
+      BigInteger lval = ((Number) left).value;
+      BigInteger rval = ((Number) right).value;
       boolean res = lval.compareTo(rval) != 0;
       return new BoolValue(obj.getInfo(), res);
     } else if (areBool(left, right)) {
-      boolean lval = ((ast.data.expression.BoolValue) left).value;
-      boolean rval = ((ast.data.expression.BoolValue) right).value;
+      boolean lval = ((BoolValue) left).value;
+      boolean rval = ((BoolValue) right).value;
       boolean res = lval != rval;
       return new BoolValue(obj.getInfo(), res);
     } else {
@@ -470,16 +466,16 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
   }
 
   @Override
-  protected ActualTemplateArgument visitIs(Is obj, Memory param) {
+  protected Expression visitIs(Is obj, Void param) {
     throw new RuntimeException("not yet implemented");
   }
 
   @Override
-  protected ActualTemplateArgument visitUminus(Uminus obj, Memory param) {
-    ast.data.expression.Expression expr = (ast.data.expression.Expression) visit(obj.expr, param);
+  protected Expression visitUminus(Uminus obj, Void param) {
+    Expression expr = visit(obj.expr, param);
 
     if ((expr instanceof Number)) {
-      BigInteger eval = ((ast.data.expression.Number) expr).value;
+      BigInteger eval = ((Number) expr).value;
       BigInteger res;
 
       res = eval.negate();
@@ -491,8 +487,8 @@ public class ExprEvaluator extends NullTraverser<ActualTemplateArgument, Memory>
   }
 
   @Override
-  protected ActualTemplateArgument visitNot(Not obj, Memory param) {
-    ast.data.expression.Expression expr = (ast.data.expression.Expression) visit(obj.expr, param);
+  protected Expression visitNot(Not obj, Void param) {
+    Expression expr = visit(obj.expr, param);
 
     if ((expr instanceof BoolValue)) {
       return new BoolValue(obj.getInfo(), !((BoolValue) expr).value);

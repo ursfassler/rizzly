@@ -35,12 +35,12 @@ public class CheckTypeCast extends NullTraverser<Expression, Expression> {
   }
 
   @Override
-  protected ast.data.expression.Expression visitDefault(Ast obj, Expression param) {
+  protected Expression visitDefault(Ast obj, Expression param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getName());
   }
 
   @Override
-  protected ast.data.expression.Expression visitRangeType(RangeType obj, Expression param) {
+  protected Expression visitRangeType(RangeType obj, Expression param) {
     ast.data.expression.Number num = (ast.data.expression.Number) param;
     if ((obj.range.low.compareTo(num.value) > 0) || (obj.range.high.compareTo(num.value) < 0)) {
       RError.err(ErrorType.Error, param.getInfo(), "value " + num.toString() + " not in range " + obj.toString());

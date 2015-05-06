@@ -18,32 +18,11 @@
 package ast.data.type.template;
 
 import ast.ElementInfo;
-import ast.data.AstList;
-import ast.data.expression.reference.RefTemplCall;
-import ast.data.expression.reference.Reference;
-import ast.data.template.ActualTemplateArgument;
-import ast.data.variable.TemplateParameter;
 
 final public class ArrayTemplate extends TypeTemplate {
-  public static final String NAME = "Array";
-  public static final String[] PARAM = { "S", "T" };
 
   public ArrayTemplate() {
-    super(ElementInfo.NO, NAME);
-  }
-
-  static public AstList<TemplateParameter> makeParam() {
-    AstList<TemplateParameter> ret = new AstList<TemplateParameter>();
-
-    ret.add(inst(PARAM[0], ast.data.type.special.IntegerType.NAME));
-
-    Reference type = new Reference(ElementInfo.NO, TypeTypeTemplate.NAME);
-    AstList<ActualTemplateArgument> typeparam = new AstList<ActualTemplateArgument>();
-    typeparam.add(new Reference(ElementInfo.NO, ast.data.type.special.AnyType.NAME));
-    type.offset.add(new RefTemplCall(ElementInfo.NO, typeparam));
-    ret.add(inst(PARAM[1], type));
-
-    return ret;
+    super(ElementInfo.NO, "ArrayTemplate");
   }
 
 }

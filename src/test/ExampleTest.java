@@ -33,6 +33,7 @@ public class ExampleTest extends BaseTest {
   }
 
   @Test
+  @Ignore
   public void motor() {
     compileExample("motor/", "main.Controller");
   }

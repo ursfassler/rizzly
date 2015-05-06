@@ -15,34 +15,26 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.traverser.other;
+package ast.pass.specializer;
 
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import util.Pair;
 import ast.data.Ast;
-import ast.data.expression.Expression;
 import ast.data.template.ActualTemplateArgument;
-import ast.interpreter.Memory;
-import ast.knowledge.KnowledgeBase;
-import ast.pass.specializer.ExprEvaluator;
-import ast.traverser.DefTraverser;
 
-public class ConstEval extends DefTraverser<Void, Void> {
-  private final KnowledgeBase kb;
+@Deprecated
+public class InstanceRepo {
+  final private Map<Pair<Ast, List<ActualTemplateArgument>>, Ast> instances = new HashMap<Pair<Ast, List<ActualTemplateArgument>>, Ast>();
 
-  public ConstEval(KnowledgeBase kb) {
-    super();
-    this.kb = kb;
+  public Ast find(Ast fun, List<ActualTemplateArgument> param) {
+    return instances.get(new Pair<Ast, List<ActualTemplateArgument>>(fun, param));
   }
 
-  public static void process(Ast classes, KnowledgeBase kb) {
-    ConstEval eval = new ConstEval(kb);
-    eval.traverse(classes, null);
-  }
-
-  @Override
-  protected Void visitConstant(ast.data.variable.Constant obj, Void param) {
-    ActualTemplateArgument value = ExprEvaluator.evaluate(obj.def, new Memory(), kb);
-    obj.def = ((Expression) value);
-    return null;
+  public void add(Ast fun, List<ActualTemplateArgument> param, Ast inst) {
+    instances.put(new Pair<Ast, List<ActualTemplateArgument>>(fun, param), inst);
   }
 
 }

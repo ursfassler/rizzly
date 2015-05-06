@@ -18,22 +18,11 @@
 package ast.data.type.template;
 
 import ast.ElementInfo;
-import ast.data.AstList;
-import ast.data.variable.TemplateParameter;
 
 final public class RangeTemplate extends TypeTemplate {
-  public static final String NAME = "R";
-  public static final String[] PARAM = { "low", "high" };
 
   public RangeTemplate() {
-    super(ElementInfo.NO, NAME);
-  }
-
-  static public AstList<TemplateParameter> makeParam() {
-    AstList<TemplateParameter> ret = new AstList<TemplateParameter>();
-    ret.add(inst(PARAM[0], ast.data.type.special.IntegerType.NAME));
-    ret.add(inst(PARAM[1], ast.data.type.special.IntegerType.NAME));
-    return ret;
+    super(ElementInfo.NO, "RangeTemplate");
   }
 
 }

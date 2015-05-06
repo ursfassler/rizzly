@@ -24,7 +24,6 @@ import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.data.AstList;
 import ast.data.Range;
-import ast.data.expression.reference.Reference;
 import ast.data.expression.reference.TypeRef;
 import ast.data.type.Type;
 import ast.data.type.base.ArrayType;
@@ -41,8 +40,9 @@ import ast.data.type.composed.RecordType;
 import ast.data.type.special.AnyType;
 import ast.data.type.special.IntegerType;
 import ast.data.type.special.NaturalType;
+import ast.data.type.special.TypeType;
+import ast.data.type.special.TypeTypeFactory;
 import ast.data.type.special.VoidType;
-import ast.data.type.template.TypeType;
 import ast.knowledge.KnowUniqueName;
 import ast.knowledge.KnowledgeBase;
 
@@ -64,7 +64,7 @@ public class TypeRepo {
   }
 
   public TypeType getTypeType(Type type) {
-    return getType(new TypeType(ElementInfo.NO, new Reference(ElementInfo.NO, type)));
+    return getType(TypeTypeFactory.create(type));
   }
 
   public RecordType getRecord(AstList<NamedElement> element) {

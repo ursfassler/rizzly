@@ -1,5 +1,5 @@
 
-arrayInit{N: Natural; T: Type} = function(init: T):Array{N, T}
+arrayInit{N: Natural; T: Type{Any}} = function(init: T):Array{N, T}
   res : Array{N, T};
   i : R{0, N+1} = 0;
   

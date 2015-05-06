@@ -160,11 +160,11 @@ import ast.data.type.special.AnyType;
 import ast.data.type.special.ComponentType;
 import ast.data.type.special.IntegerType;
 import ast.data.type.special.NaturalType;
+import ast.data.type.special.TypeType;
 import ast.data.type.special.VoidType;
 import ast.data.type.template.ArrayTemplate;
 import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTemplate;
-import ast.data.type.template.TypeType;
 import ast.data.type.template.TypeTypeTemplate;
 import ast.data.variable.ConstGlobal;
 import ast.data.variable.ConstPrivate;
@@ -230,8 +230,6 @@ public abstract class Traverser<R, P> {
       return visitNamedValue((NamedValue) obj, param);
     } else if (obj instanceof Endpoint) {
       return visitEndpoint((Endpoint) obj, param);
-    } else if (obj instanceof FunctionTemplate) {
-      return visitFunctionTemplate((FunctionTemplate) obj, param);
     } else {
       throwUnknownObjectError(obj);
       return null;
@@ -267,6 +265,8 @@ public abstract class Traverser<R, P> {
       return visitRawComponent((RawComponent) obj, param);
     } else if (obj instanceof TypeTemplate) {
       return visitTypeTemplate((TypeTemplate) obj, param);
+    } else if (obj instanceof FunctionTemplate) {
+      return visitFunctionTemplate((FunctionTemplate) obj, param);
     } else {
       throwUnknownObjectError(obj);
       return null;
@@ -629,6 +629,8 @@ public abstract class Traverser<R, P> {
       return visitEnumType((EnumType) obj, param);
     } else if (obj instanceof ComponentType) {
       return visitComponentType((ComponentType) obj, param);
+    } else if (obj instanceof TypeType) {
+      return visitTypeType((TypeType) obj, param);
     } else {
       throwUnknownObjectError(obj);
       return null;
@@ -695,6 +697,41 @@ public abstract class Traverser<R, P> {
       return visitSIntType((SIntType) obj, param);
     } else if (obj instanceof UIntType) {
       return visitUIntType((UIntType) obj, param);
+    } else {
+      throwUnknownObjectError(obj);
+      return null;
+    }
+  }
+
+  protected R visitFunctionTemplate(FunctionTemplate obj, P param) {
+    if (obj instanceof DefaultValueTemplate) {
+      return visitDefaultValueTemplate((DefaultValueTemplate) obj, param);
+    } else {
+      throwUnknownObjectError(obj);
+      return null;
+    }
+  }
+
+  protected R visitTypeTemplate(TypeTemplate obj, P param) {
+    if (obj instanceof ArrayTemplate) {
+      return visitArrayTemplate((ArrayTemplate) obj, param);
+    } else if (obj instanceof TypeTypeTemplate) {
+      return visitTypeTypeTemplate((TypeTypeTemplate) obj, param);
+    } else if (obj instanceof RangeTemplate) {
+      return visitRangeTemplate((RangeTemplate) obj, param);
+    } else {
+      throwUnknownObjectError(obj);
+      return null;
+    }
+  }
+
+  protected R visitRawComponent(RawComponent obj, P param) {
+    if (obj instanceof RawElementary) {
+      return visitRawElementary((RawElementary) obj, param);
+    } else if (obj instanceof RawComposition) {
+      return visitRawComposition((RawComposition) obj, param);
+    } else if (obj instanceof RawHfsm) {
+      return visitRawHfsm((RawHfsm) obj, param);
     } else {
       throwUnknownObjectError(obj);
       return null;
@@ -920,40 +957,6 @@ public abstract class Traverser<R, P> {
   abstract protected R visitGreaterequal(Greaterequal obj, P param);
 
   abstract protected R visitIs(Is obj, P param);
-
-  // /////
-
-  protected R visitFunctionTemplate(FunctionTemplate obj, P param) {
-    if (obj instanceof DefaultValueTemplate) {
-      return visitDefaultValueTemplate((DefaultValueTemplate) obj, param);
-    } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
-    }
-  }
-
-  protected R visitTypeTemplate(TypeTemplate obj, P param) {
-    if (obj instanceof ArrayTemplate) {
-      return visitArrayTemplate((ArrayTemplate) obj, param);
-    } else if (obj instanceof TypeTypeTemplate) {
-      return visitTypeTypeTemplate((TypeTypeTemplate) obj, param);
-    } else if (obj instanceof RangeTemplate) {
-      return visitRangeTemplate((RangeTemplate) obj, param);
-    } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
-    }
-  }
-
-  protected R visitRawComponent(RawComponent obj, P param) {
-    if (obj instanceof RawElementary) {
-      return visitRawElementary((RawElementary) obj, param);
-    } else if (obj instanceof RawComposition) {
-      return visitRawComposition((RawComposition) obj, param);
-    } else if (obj instanceof RawHfsm) {
-      return visitRawHfsm((RawHfsm) obj, param);
-    } else {
-      throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
-    }
-  }
 
   abstract protected R visitTemplate(Template obj, P param);
 
