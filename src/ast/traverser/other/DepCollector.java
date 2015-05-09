@@ -22,7 +22,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import ast.data.Ast;
-import ast.data.expression.reference.BaseRef;
+import ast.data.reference.Reference;
 import ast.traverser.DefTraverser;
 
 public class DepCollector extends DefTraverser<Void, Void> {
@@ -51,8 +51,8 @@ public class DepCollector extends DefTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitBaseRef(BaseRef obj, Void param) {
-    super.visitBaseRef(obj, param);
+  protected Void visitReference(Reference obj, Void param) {
+    super.visitReference(obj, param);
     visit(obj.link, param);
     return null;
   }

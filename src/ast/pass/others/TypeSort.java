@@ -27,7 +27,7 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
 
 import util.Pair;
 import ast.data.Namespace;
-import ast.data.expression.reference.BaseRef;
+import ast.data.reference.Reference;
 import ast.data.type.Type;
 import ast.doc.SimpleGraph;
 import ast.knowledge.KnowledgeBase;
@@ -78,7 +78,7 @@ public class TypeSort extends AstPass {
   private static Set<Type> getDirectUsedTypes(Type u) {
     DefTraverser<Void, Set<Type>> getter = new DefTraverser<Void, Set<Type>>() {
       @Override
-      protected Void visitBaseRef(BaseRef obj, Set<Type> param) {
+      protected Void visitReference(Reference obj, Set<Type> param) {
         if (obj.link instanceof Type) {
           param.add((Type) obj.link);
         }

@@ -20,14 +20,13 @@ package ast.data.component.composition;
 import ast.ElementInfo;
 import ast.data.AstBase;
 import ast.data.AstList;
-import ast.data.expression.reference.SimpleRef;
 import ast.data.function.Function;
 
 public class SubCallbacks extends AstBase {
   final public AstList<Function> func = new AstList<Function>();
-  final public SimpleRef<CompUse> compUse;
+  final public CompUseRef compUse;
 
-  public SubCallbacks(ElementInfo info, SimpleRef<CompUse> compUse) {
+  public SubCallbacks(ElementInfo info, CompUseRef compUse) {
     super(info);
     this.compUse = compUse;
   }

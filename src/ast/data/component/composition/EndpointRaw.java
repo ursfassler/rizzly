@@ -18,8 +18,8 @@
 package ast.data.component.composition;
 
 import ast.ElementInfo;
-import ast.data.expression.reference.Reference;
 import ast.data.function.Function;
+import ast.data.reference.Reference;
 
 final public class EndpointRaw extends Endpoint {
   final public Reference ref;

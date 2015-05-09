@@ -26,21 +26,24 @@ import parser.scanner.TokenType;
 import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
+import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateContent;
+import ast.data.component.hfsm.StateRef;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.component.hfsm.Transition;
-import ast.data.expression.BoolValue;
 import ast.data.expression.Expression;
-import ast.data.expression.reference.DummyLinkTarget;
-import ast.data.expression.reference.RefName;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.SimpleRef;
+import ast.data.expression.value.BoolValue;
+import ast.data.function.FuncRef;
+import ast.data.function.FuncRefFactory;
 import ast.data.function.Function;
 import ast.data.function.header.FuncProcedure;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.raw.RawComponent;
 import ast.data.raw.RawHfsm;
+import ast.data.reference.RefFactory;
+import ast.data.reference.RefName;
+import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.template.Template;
 import ast.data.variable.ConstPrivate;
@@ -67,7 +70,7 @@ public class ImplHfsmParser extends ImplBaseParser {
     expect(TokenType.CLOSEPAREN);
     FuncProcedure entry = makeProc("_entry"); // FIXME get names from outside
     FuncProcedure exit = makeProc("_exit");// FIXME get names from outside
-    StateComposite top = new StateComposite(info, "!top", new SimpleRef<FuncProcedure>(info, entry), new SimpleRef<FuncProcedure>(info, exit), new Reference(info, new DummyLinkTarget(info, initial)));
+    StateComposite top = new StateComposite(info, "!top", FuncRefFactory.create(info, entry), FuncRefFactory.create(info, exit), new StateRef(info, RefFactory.create(info, initial)));
     top.item.add(entry);
     top.item.add(exit);
     parseStateBody(top);
@@ -78,9 +81,9 @@ public class ImplHfsmParser extends ImplBaseParser {
 
   // EBNF stateBody: { entryCode | exitCode | varDeclBlock | funcDecl |
   // transitionDecl | state }
-  private <T extends ast.data.component.hfsm.State> void parseStateBody(ast.data.component.hfsm.State state) {
-    Block entryBody = state.entryFunc.link.body;
-    Block exitBody = state.exitFunc.link.body;
+  private <T extends State> void parseStateBody(State state) {
+    Block entryBody = state.entryFunc.getTarget().body;
+    Block exitBody = state.exitFunc.getTarget().body;
 
     while (!consumeIfEqual(TokenType.END)) {
       switch (peek().getType()) {
@@ -155,16 +158,16 @@ public class ImplHfsmParser extends ImplBaseParser {
     FuncProcedure entry = makeProc("_entry"); // FIXME get names from outside
     FuncProcedure exit = makeProc("_exit");// FIXME get names from outside
     if (consumeIfEqual(TokenType.SEMI)) {
-      state = new StateSimple(info, name, new SimpleRef<FuncProcedure>(info, entry), new SimpleRef<FuncProcedure>(info, exit));
+      state = new StateSimple(info, name, FuncRefFactory.create(info, entry), FuncRefFactory.create(info, exit));
       state.item.add(entry);
       state.item.add(exit);
     } else {
       if (consumeIfEqual(TokenType.OPENPAREN)) {
         String initial = expect(TokenType.IDENTIFIER).getData();
         expect(TokenType.CLOSEPAREN);
-        state = new StateComposite(info, name, new SimpleRef<FuncProcedure>(info, entry), new SimpleRef<FuncProcedure>(info, exit), new Reference(info, new DummyLinkTarget(info, initial)));
+        state = new StateComposite(info, name, FuncRefFactory.create(info, entry), FuncRefFactory.create(info, exit), new StateRef(info, RefFactory.create(info, initial)));
       } else {
-        state = new StateSimple(info, name, new SimpleRef<FuncProcedure>(info, entry), new SimpleRef<FuncProcedure>(info, exit));
+        state = new StateSimple(info, name, FuncRefFactory.create(info, entry), FuncRefFactory.create(info, exit));
       }
       state.item.add(entry);
       state.item.add(exit);
@@ -181,61 +184,51 @@ public class ImplHfsmParser extends ImplBaseParser {
   // EBNF transition: nameRef "to" nameRef "by" transitionEvent [ "if" expr ] (
   // ";" | "do" block "end" )
   private Transition parseTransition(Token id) {
-    Reference src = parseNameRef(id);
+    StateRef src = parseNameRef(id);
     ElementInfo info = expect(TokenType.TO).getInfo();
-    Reference dst = parseNameRef();
-
-    Transition ret = Transition.create(info);
-    ret.src = src;
-    ret.dst = dst;
+    StateRef dst = parseNameRef();
 
     expect(TokenType.BY);
-    parseTransitionEvent(ret);
-    {
-      Expression guard;
-      if (consumeIfEqual(TokenType.IF)) {
-        guard = expr().parse();
-      } else {
-        guard = new BoolValue(info, true);
-      }
-      ret.guard = guard;
+
+    Token tok = expect(TokenType.IDENTIFIER);
+    Reference name = RefFactory.full(tok.getInfo(), tok.getData());
+    FuncRef eventFunc = new FuncRef(name.getInfo(), name);
+
+    AstList<FuncVariable> param = parseVardefList();
+
+    Expression guard;
+    if (consumeIfEqual(TokenType.IF)) {
+      guard = expr().parse();
+    } else {
+      guard = new BoolValue(info, true);
     }
-    {
-      Block body;
-      if (consumeIfEqual(TokenType.SEMI)) {
-        body = new Block(info);
-      } else {
-        expect(TokenType.DO);
-        body = stmt().parseBlock();
-        expect(TokenType.END);
-      }
-      ret.body = body;
+
+    Block body;
+    if (consumeIfEqual(TokenType.SEMI)) {
+      body = new Block(info);
+    } else {
+      expect(TokenType.DO);
+      body = stmt().parseBlock();
+      expect(TokenType.END);
     }
-    return ret;
+
+    return new Transition(info, src, dst, eventFunc, guard, param, body);
   }
 
   // EBNF nameRef: Designator
-  private Reference parseNameRef() {
+  private StateRef parseNameRef() {
     return parseNameRef(expect(TokenType.IDENTIFIER));
   }
 
-  private Reference parseNameRef(Token tokh) {
-    Reference ret = new Reference(tokh.getInfo(), tokh.getData());
+  private StateRef parseNameRef(Token tokh) {
+    Reference ret = RefFactory.full(tokh.getInfo(), tokh.getData());
 
     while (consumeIfEqual(TokenType.PERIOD)) {
       Token tok = expect(TokenType.IDENTIFIER);
       ret.offset.add(new RefName(tok.getInfo(), tok.getData()));
     }
 
-    return ret;
-  }
-
-  // EBNF transitionEvent: id vardeflist
-  private void parseTransitionEvent(ast.data.component.hfsm.Transition ret) {
-    Token tok = expect(TokenType.IDENTIFIER);
-    Reference name = new Reference(tok.getInfo(), tok.getData());
-    ret.eventFunc = name;
-    ret.param.addAll(parseVardefList());
+    return new StateRef(ret.getInfo(), ret);
   }
 
 }

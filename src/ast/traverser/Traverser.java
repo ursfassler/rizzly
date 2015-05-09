@@ -24,9 +24,11 @@ import ast.data.AstBase;
 import ast.data.AstList;
 import ast.data.Named;
 import ast.data.Namespace;
+import ast.data.component.CompRef;
 import ast.data.component.Component;
 import ast.data.component.composition.AsynchroniusConnection;
 import ast.data.component.composition.CompUse;
+import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.Connection;
 import ast.data.component.composition.Endpoint;
 import ast.data.component.composition.EndpointRaw;
@@ -40,21 +42,12 @@ import ast.data.component.elementary.ImplElementary;
 import ast.data.component.hfsm.ImplHfsm;
 import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.StateComposite;
+import ast.data.component.hfsm.StateRef;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.component.hfsm.Transition;
-import ast.data.expression.AnyValue;
-import ast.data.expression.ArrayValue;
-import ast.data.expression.BoolValue;
 import ast.data.expression.Expression;
-import ast.data.expression.NamedElementsValue;
-import ast.data.expression.NamedValue;
-import ast.data.expression.Number;
-import ast.data.expression.RecordValue;
-import ast.data.expression.StringValue;
-import ast.data.expression.TupleValue;
+import ast.data.expression.RefExp;
 import ast.data.expression.TypeCast;
-import ast.data.expression.UnionValue;
-import ast.data.expression.UnsafeUnionValue;
 import ast.data.expression.binop.And;
 import ast.data.expression.binop.ArithmeticOp;
 import ast.data.expression.binop.BinaryExp;
@@ -80,21 +73,24 @@ import ast.data.expression.binop.Plus;
 import ast.data.expression.binop.Relation;
 import ast.data.expression.binop.Shl;
 import ast.data.expression.binop.Shr;
-import ast.data.expression.reference.BaseRef;
-import ast.data.expression.reference.DummyLinkTarget;
-import ast.data.expression.reference.RefCall;
-import ast.data.expression.reference.RefIndex;
-import ast.data.expression.reference.RefItem;
-import ast.data.expression.reference.RefName;
-import ast.data.expression.reference.RefTemplCall;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.SimpleRef;
 import ast.data.expression.unop.BitNot;
 import ast.data.expression.unop.LogicNot;
 import ast.data.expression.unop.Not;
 import ast.data.expression.unop.Uminus;
 import ast.data.expression.unop.UnaryExp;
+import ast.data.expression.value.AnyValue;
+import ast.data.expression.value.ArrayValue;
+import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.NamedElementsValue;
+import ast.data.expression.value.NamedValue;
+import ast.data.expression.value.NumberValue;
+import ast.data.expression.value.RecordValue;
+import ast.data.expression.value.StringValue;
+import ast.data.expression.value.TupleValue;
+import ast.data.expression.value.UnionValue;
+import ast.data.expression.value.UnsafeUnionValue;
 import ast.data.file.RizzlyFile;
+import ast.data.function.FuncRef;
 import ast.data.function.Function;
 import ast.data.function.InterfaceFunction;
 import ast.data.function.header.FuncFunction;
@@ -115,6 +111,14 @@ import ast.data.raw.RawComponent;
 import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
+import ast.data.reference.DummyLinkTarget;
+import ast.data.reference.RefCall;
+import ast.data.reference.RefIndex;
+import ast.data.reference.RefItem;
+import ast.data.reference.RefName;
+import ast.data.reference.RefTemplCall;
+import ast.data.reference.Reference;
+import ast.data.reference.TypedRef;
 import ast.data.statement.Assignment;
 import ast.data.statement.AssignmentMulti;
 import ast.data.statement.AssignmentSingle;
@@ -138,6 +142,7 @@ import ast.data.statement.VarDefStmt;
 import ast.data.statement.WhileStmt;
 import ast.data.template.Template;
 import ast.data.type.Type;
+import ast.data.type.TypeRef;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BaseType;
 import ast.data.type.base.BooleanType;
@@ -230,6 +235,27 @@ public abstract class Traverser<R, P> {
       return visitNamedValue((NamedValue) obj, param);
     } else if (obj instanceof Endpoint) {
       return visitEndpoint((Endpoint) obj, param);
+    } else if (obj instanceof TypedRef) {
+      return visitTypedRef((TypedRef) obj, param);
+    } else if (obj instanceof Reference) {
+      return visitReference((Reference) obj, param);
+    } else {
+      throwUnknownObjectError(obj);
+      return null;
+    }
+  }
+
+  protected R visitTypedRef(TypedRef obj, P param) {
+    if (obj instanceof TypeRef) {
+      return visitTypeRef((TypeRef) obj, param);
+    } else if (obj instanceof FuncRef) {
+      return visitFuncRef((FuncRef) obj, param);
+    } else if (obj instanceof CompRef) {
+      return visitCompRef((CompRef) obj, param);
+    } else if (obj instanceof StateRef) {
+      return visitStateRef((StateRef) obj, param);
+    } else if (obj instanceof CompUseRef) {
+      return visitCompUseRef((CompUseRef) obj, param);
     } else {
       throwUnknownObjectError(obj);
       return null;
@@ -463,8 +489,8 @@ public abstract class Traverser<R, P> {
   }
 
   protected R visitExpression(Expression obj, P param) {
-    if (obj instanceof Number) {
-      return visitNumber((Number) obj, param);
+    if (obj instanceof NumberValue) {
+      return visitNumber((NumberValue) obj, param);
     } else if (obj instanceof StringValue) {
       return visitStringValue((StringValue) obj, param);
     } else if (obj instanceof ArrayValue) {
@@ -477,8 +503,8 @@ public abstract class Traverser<R, P> {
       return visitBinaryExp((BinaryExp) obj, param);
     } else if (obj instanceof UnaryExp) {
       return visitUnaryExp((UnaryExp) obj, param);
-    } else if (obj instanceof BaseRef) {
-      return visitBaseRef((BaseRef) obj, param);
+    } else if (obj instanceof RefExp) {
+      return visitRefExpr((RefExp) obj, param);
     } else if (obj instanceof TypeCast) {
       return visitTypeCast((TypeCast) obj, param);
     } else if (obj instanceof AnyValue) {
@@ -495,17 +521,6 @@ public abstract class Traverser<R, P> {
       return visitArithmeticOp((ArithmeticOp) obj, param);
     } else if (obj instanceof Relation) {
       return visitRelation((Relation) obj, param);
-    } else {
-      throwUnknownObjectError(obj);
-      return null;
-    }
-  }
-
-  protected R visitBaseRef(BaseRef obj, P param) {
-    if (obj instanceof SimpleRef) {
-      return visitSimpleRef((SimpleRef) obj, param);
-    } else if (obj instanceof Reference) {
-      return visitReference((Reference) obj, param);
     } else {
       throwUnknownObjectError(obj);
       return null;
@@ -742,6 +757,18 @@ public abstract class Traverser<R, P> {
     throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
 
+  abstract protected R visitCompUseRef(CompUseRef obj, P param);
+
+  abstract protected R visitStateRef(StateRef obj, P param);
+
+  abstract protected R visitCompRef(CompRef obj, P param);
+
+  abstract protected R visitFuncRef(FuncRef obj, P param);
+
+  abstract protected R visitTypeRef(TypeRef obj, P param);
+
+  abstract protected R visitRefExpr(RefExp obj, P param);
+
   abstract protected R visitNamedElement(NamedElement obj, P param);
 
   abstract protected R visitSynchroniusConnection(SynchroniusConnection obj, P param);
@@ -799,8 +826,6 @@ public abstract class Traverser<R, P> {
   abstract protected R visitReturnVoid(ReturnVoid obj, P param);
 
   abstract protected R visitBlock(Block obj, P param);
-
-  abstract protected R visitSimpleRef(SimpleRef obj, P param);
 
   abstract protected R visitEndpointSelf(EndpointSelf obj, P param);
 
@@ -890,7 +915,7 @@ public abstract class Traverser<R, P> {
 
   abstract protected R visitStringValue(StringValue obj, P param);
 
-  abstract protected R visitNumber(Number obj, P param);
+  abstract protected R visitNumber(NumberValue obj, P param);
 
   abstract protected R visitAnyValue(AnyValue obj, P param);
 

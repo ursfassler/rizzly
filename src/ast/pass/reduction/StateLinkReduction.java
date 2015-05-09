@@ -20,8 +20,8 @@ package ast.pass.reduction;
 import ast.data.Ast;
 import ast.data.Named;
 import ast.data.component.hfsm.State;
-import ast.data.expression.reference.RefName;
-import ast.data.expression.reference.Reference;
+import ast.data.reference.RefName;
+import ast.data.reference.Reference;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.ChildByName;
@@ -49,7 +49,7 @@ class StateLinkReductionWorker extends DefTraverser<Void, Void> {
     Ast item = obj.link;
     if (item instanceof State) {
       while (!obj.offset.isEmpty()) {
-        ast.data.expression.reference.RefItem next = obj.offset.get(0);
+        ast.data.reference.RefItem next = obj.offset.get(0);
         obj.offset.remove(0);
         item = ChildByName.get(item, ((RefName) next).name, item.getInfo());
         assert (item != null);

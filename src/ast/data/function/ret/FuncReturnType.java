@@ -18,7 +18,7 @@
 package ast.data.function.ret;
 
 import ast.ElementInfo;
-import ast.data.expression.reference.TypeRef;
+import ast.data.type.TypeRef;
 
 public class FuncReturnType extends FuncReturn {
   public TypeRef type;

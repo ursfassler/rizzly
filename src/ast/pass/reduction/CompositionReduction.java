@@ -34,6 +34,7 @@ import ast.data.Namespace;
 import ast.data.component.Component;
 import ast.data.component.composition.AsynchroniusConnection;
 import ast.data.component.composition.CompUse;
+import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.Connection;
 import ast.data.component.composition.Direction;
 import ast.data.component.composition.Endpoint;
@@ -45,11 +46,10 @@ import ast.data.component.composition.SubCallbacks;
 import ast.data.component.composition.SynchroniusConnection;
 import ast.data.component.elementary.ImplElementary;
 import ast.data.expression.Expression;
-import ast.data.expression.TupleValue;
-import ast.data.expression.reference.RefCall;
-import ast.data.expression.reference.RefName;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.SimpleRef;
+import ast.data.expression.RefExp;
+import ast.data.expression.value.TupleValue;
+import ast.data.function.FuncRef;
+import ast.data.function.FuncRefFactory;
 import ast.data.function.Function;
 import ast.data.function.InterfaceFunction;
 import ast.data.function.header.FuncProcedure;
@@ -60,6 +60,10 @@ import ast.data.function.header.FuncSlot;
 import ast.data.function.header.FuncSubHandlerEvent;
 import ast.data.function.header.FuncSubHandlerQuery;
 import ast.data.function.ret.FuncReturnNone;
+import ast.data.reference.RefCall;
+import ast.data.reference.RefFactory;
+import ast.data.reference.RefName;
+import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.MsgPush;
@@ -145,7 +149,7 @@ class CompositionReductionWorker extends NullTraverser<Ast, Void> {
     FuncProcedure entry = new FuncProcedure(info, "_entry", new AstList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
     FuncProcedure exit = new FuncProcedure(info, "_exit", new AstList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
 
-    ImplElementary elem = new ImplElementary(obj.getInfo(), obj.name, new SimpleRef<FuncProcedure>(info, entry), new SimpleRef<FuncProcedure>(info, exit));
+    ImplElementary elem = new ImplElementary(obj.getInfo(), obj.name, FuncRefFactory.create(info, entry), FuncRefFactory.create(info, exit));
     elem.function.add(entry);
     elem.function.add(exit);
 
@@ -157,9 +161,9 @@ class CompositionReductionWorker extends NullTraverser<Ast, Void> {
     Map<Pair<CompUse, Function>, Function> coca = new HashMap<Pair<CompUse, Function>, Function>();
 
     for (CompUse compu : obj.component) {
-      SubCallbacks suc = new SubCallbacks(compu.getInfo(), new SimpleRef<CompUse>(info, compu));
+      SubCallbacks suc = new SubCallbacks(compu.getInfo(), new CompUseRef(info, RefFactory.create(info, compu)));
       elem.subCallback.add(suc);
-      Component usedComp = (Component) compu.compRef.getTarget();
+      Component usedComp = compu.compRef.getTarget();
       for (InterfaceFunction out : usedComp.getIface(Direction.out)) {
         Function suha = CompositionReduction.makeHandler(out);
         suc.func.add(suha);
@@ -187,8 +191,8 @@ class CompositionReductionWorker extends NullTraverser<Ast, Void> {
           RError.err(ErrorType.Fatal, coniface.getInfo(), "Unexpected function type: " + coniface.getClass().getSimpleName());
         }
       } else {
-        CompUse srcCompRef = ((EndpointSub) src).component.link;
-        Component srcComp = (Component) srcCompRef.compRef.getTarget();
+        CompUse srcCompRef = ((EndpointSub) src).component.getTarget();
+        Component srcComp = srcCompRef.compRef.getTarget();
         InterfaceFunction funa = NameFilter.select(srcComp.iface, ((EndpointSub) src).function);
         Function coniface = funa;
 
@@ -228,13 +232,13 @@ class CompositionReductionWorker extends NullTraverser<Ast, Void> {
 
     TupleValue actparam = new TupleValue(info, new AstList<Expression>());
     for (Variable var : func.param) {
-      actparam.value.add(new Reference(func.getInfo(), var));
+      actparam.value.add(new RefExp(info, RefFactory.full(func.getInfo(), var)));
     }
 
     RefCall call = new RefCall(func.getInfo(), actparam);
     ref.offset.add(call);
 
-    return new ReturnExpr(info, ref);
+    return new ReturnExpr(info, new RefExp(info, ref));
   }
 
   private MsgPush makePostQueueCall(Endpoint ep, Function func, Component comp) {
@@ -242,11 +246,11 @@ class CompositionReductionWorker extends NullTraverser<Ast, Void> {
 
     List<Expression> actparam = new ArrayList<Expression>();
     for (Variable var : func.param) {
-      actparam.add(new Reference(func.getInfo(), var));
+      actparam.add(new RefExp(info, RefFactory.full(func.getInfo(), var)));
     }
 
     Reference queue = getQueue(ep, comp);
-    return new MsgPush(func.getInfo(), queue, ref, actparam);
+    return new MsgPush(func.getInfo(), queue, new FuncRef(info, ref), actparam);
   }
 
   static private CallStmt makeEventCall(Endpoint ep, Function func) {
@@ -255,7 +259,7 @@ class CompositionReductionWorker extends NullTraverser<Ast, Void> {
 
     TupleValue actparam = new TupleValue(info, new AstList<Expression>());
     for (Variable var : func.param) {
-      actparam.value.add(new Reference(func.getInfo(), var));
+      actparam.value.add(new RefExp(info, RefFactory.full(func.getInfo(), var)));
     }
 
     RefCall call = new RefCall(func.getInfo(), actparam);
@@ -266,10 +270,10 @@ class CompositionReductionWorker extends NullTraverser<Ast, Void> {
 
   static private Reference epToRef(Endpoint ep) {
     if (ep instanceof EndpointSelf) {
-      return new Reference(ep.getInfo(), ((EndpointSelf) ep).getFunc());
+      return RefFactory.full(ep.getInfo(), ((EndpointSelf) ep).getFunc());
     } else {
       EndpointSub eps = (EndpointSub) ep;
-      Reference ref = new Reference(eps.getInfo(), eps.component.link);
+      Reference ref = RefFactory.full(eps.getInfo(), eps.component.getTarget());
       ref.offset.add(new RefName(eps.getInfo(), eps.function));
       return ref;
     }
@@ -278,12 +282,12 @@ class CompositionReductionWorker extends NullTraverser<Ast, Void> {
   private Reference getQueue(Endpoint ep, Component comp) {
     Reference ref;
     if (ep instanceof EndpointSub) {
-      ref = new Reference(ep.getInfo(), ((EndpointSub) ep).component.link);
-      Component refComp = (Component) ((EndpointSub) ep).component.link.compRef.getTarget();
+      ref = RefFactory.full(ep.getInfo(), ((EndpointSub) ep).component.getTarget());
+      Component refComp = ((EndpointSub) ep).component.getTarget().compRef.getTarget();
       Queue queue = refComp.queue;
       ref.offset.add(new RefName(info, queue.name));
     } else {
-      ref = new Reference(ep.getInfo(), comp.queue);
+      ref = RefFactory.full(ep.getInfo(), comp.queue);
     }
     return ref;
   }

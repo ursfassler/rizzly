@@ -26,23 +26,23 @@ import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.component.Component;
-import ast.data.expression.Number;
-import ast.data.expression.StringValue;
-import ast.data.expression.reference.SimpleRef;
+import ast.data.expression.RefExp;
+import ast.data.expression.value.NumberValue;
+import ast.data.expression.value.StringValue;
 import ast.data.function.FunctionProperty;
 import ast.data.function.header.FuncResponse;
 import ast.data.function.ret.FuncReturnType;
+import ast.data.reference.RefFactory;
 import ast.data.statement.Block;
 import ast.data.statement.CaseOpt;
 import ast.data.statement.CaseOptEntry;
 import ast.data.statement.CaseOptValue;
 import ast.data.statement.CaseStmt;
 import ast.data.statement.ReturnExpr;
-import ast.data.type.Type;
+import ast.data.type.TypeRefFactory;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.RangeType;
 import ast.data.type.base.StringType;
-import ast.data.type.special.VoidType;
 import ast.data.variable.FuncVariable;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
@@ -68,34 +68,33 @@ public class DebugIface extends AstPass {
     RangeType symNameSizeType = kbi.getRangeType(names.size());
     ArrayType arrayType = kbi.getArray(BigInteger.valueOf(depth), symNameSizeType);
     RangeType sizeType = kbi.getRangeType(depth);
-    VoidType voidType = kbi.getVoidType();
     StringType stringType = kbi.getStringType();
 
-    DebugIfaceAdder reduction = new DebugIfaceAdder(arrayType, sizeType, symNameSizeType, voidType, names);
+    DebugIfaceAdder reduction = new DebugIfaceAdder(arrayType, sizeType, symNameSizeType, names);
     reduction.traverse(ast, null);
 
     FuncResponse func = makeNameGetter("DebugName", symNameSizeType, names, stringType);
     func.property = FunctionProperty.Public;
-    Component rootComp = (Component) kb.getRootComp().compRef.getTarget();
+    Component rootComp = kb.getRootComp().compRef.getTarget();
     rootComp.function.add(func);
   }
 
   private static FuncResponse makeNameGetter(String funcName, RangeType nameSizeType, ArrayList<String> names, StringType stringType) {
     ElementInfo info = ElementInfo.NO;
-    FuncVariable arg = new FuncVariable(info, "idx", new SimpleRef<Type>(info, nameSizeType));
+    FuncVariable arg = new FuncVariable(info, "idx", TypeRefFactory.create(info, nameSizeType));
     AstList<FuncVariable> args = new AstList<FuncVariable>();
     args.add(arg);
     Block body = new Block(info);
-    FuncResponse func = new FuncResponse(info, Designator.NAME_SEP + funcName, args, new FuncReturnType(info, new SimpleRef<Type>(info, stringType)), body);
+    FuncResponse func = new FuncResponse(info, Designator.NAME_SEP + funcName, args, new FuncReturnType(info, TypeRefFactory.create(info, stringType)), body);
 
     AstList<CaseOpt> option = new AstList<CaseOpt>();
     Block otherwise = new Block(info);
-    CaseStmt cs = new CaseStmt(info, new SimpleRef<FuncVariable>(info, arg), option, otherwise);
+    CaseStmt cs = new CaseStmt(info, new RefExp(info, RefFactory.create(info, arg)), option, otherwise);
     body.statements.add(cs);
 
     for (int i = 0; i < names.size(); i++) {
       AstList<CaseOptEntry> values = new AstList<CaseOptEntry>();
-      values.add(new CaseOptValue(info, new Number(info, BigInteger.valueOf(i))));
+      values.add(new CaseOptValue(info, new NumberValue(info, BigInteger.valueOf(i))));
       Block code = new Block(info);
       code.statements.add(new ReturnExpr(info, new StringValue(info, names.get(i))));
       option.add(new CaseOpt(info, values, code));

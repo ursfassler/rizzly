@@ -19,15 +19,14 @@ package ast.data.component.composition;
 
 import ast.ElementInfo;
 import ast.data.component.Component;
-import ast.data.expression.reference.SimpleRef;
 import ast.data.function.Function;
 import ast.repository.query.NameFilter;
 
 final public class EndpointSub extends Endpoint {
-  final public SimpleRef<CompUse> component;
+  final public CompUseRef component;
   final public String function;
 
-  public EndpointSub(ElementInfo info, SimpleRef<CompUse> component, String function) {
+  public EndpointSub(ElementInfo info, CompUseRef component, String function) {
     super(info);
     this.component = component;
     this.function = function;
@@ -35,13 +34,13 @@ final public class EndpointSub extends Endpoint {
 
   @Override
   public Function getFunc() {
-    Component comp = (Component) component.link.compRef.getTarget();
+    Component comp = component.getTarget().compRef.getTarget();
     return NameFilter.select(comp.iface, function);
   }
 
   @Override
   public String toString() {
-    return component.link.name + "." + function;
+    return component.getTarget().name + "." + function;
   }
 
 }

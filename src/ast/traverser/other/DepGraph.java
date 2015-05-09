@@ -20,9 +20,8 @@ package ast.traverser.other;
 import java.util.Collection;
 
 import ast.data.Ast;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.SimpleRef;
 import ast.data.function.Function;
+import ast.data.reference.Reference;
 import ast.doc.SimpleGraph;
 import ast.traverser.DefTraverser;
 
@@ -52,13 +51,6 @@ public class DepGraph extends DefTraverser<Void, Ast> {
       return null;
     }
     return super.visit(obj, obj);
-  }
-
-  @Override
-  protected Void visitSimpleRef(SimpleRef obj, Ast param) {
-    super.visitSimpleRef(obj, param);
-    visit(obj.link, obj);
-    return null;
   }
 
   @Override

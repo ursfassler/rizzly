@@ -19,10 +19,7 @@ package ast.pass.check.type;
 
 import ast.data.Ast;
 import ast.data.AstList;
-import ast.data.expression.Expression;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.SimpleRef;
-import ast.data.expression.reference.TypeRef;
+import ast.data.reference.Reference;
 import ast.data.statement.AssignmentMulti;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
@@ -41,6 +38,8 @@ import ast.data.statement.Statement;
 import ast.data.statement.VarDefStmt;
 import ast.data.statement.WhileStmt;
 import ast.data.type.Type;
+import ast.data.type.TypeRef;
+import ast.data.type.TypeRefFactory;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.RangeType;
@@ -84,7 +83,7 @@ public class StatementTypecheck extends NullTraverser<Void, Void> {
     adder.traverse(obj, null);
   }
 
-  private Type checkGetExpr(Expression expr) {
+  private Type checkGetExpr(Ast expr) {
     ExpressionTypecheck.process(expr, kb);
     return kt.get(expr);
   }
@@ -239,7 +238,7 @@ public class StatementTypecheck extends NullTraverser<Void, Void> {
     } else {
       AstList<TypeRef> tl = new AstList<TypeRef>();
       for (Type lt : ll) {
-        tl.add(new SimpleRef<Type>(lt.getInfo(), lt));
+        tl.add(TypeRefFactory.create(lt.getInfo(), lt));
       }
       lhs = new TupleType(obj.getInfo(), "", tl);
     }

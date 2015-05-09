@@ -18,24 +18,24 @@
 package ast.data.component.composition;
 
 import ast.ElementInfo;
-import ast.data.expression.reference.SimpleRef;
+import ast.data.function.FuncRef;
 import ast.data.function.Function;
 
 final public class EndpointSelf extends Endpoint {
-  final public SimpleRef<Function> funcRef;
+  final public FuncRef funcRef;
 
-  public EndpointSelf(ElementInfo info, SimpleRef<Function> funcRef) {
+  public EndpointSelf(ElementInfo info, FuncRef funcRef) {
     super(info);
     this.funcRef = funcRef;
   }
 
   @Override
   public Function getFunc() {
-    return funcRef.link;
+    return funcRef.getTarget();
   }
 
   @Override
   public String toString() {
-    return "self." + funcRef.link.name;
+    return "self." + funcRef.getTarget().name;
   }
 }

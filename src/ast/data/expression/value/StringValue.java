@@ -15,13 +15,27 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.expression.reference;
+package ast.data.expression.value;
 
 import ast.ElementInfo;
-import ast.data.AstBase;
+import ast.data.expression.Expression;
 
-abstract public class RefItem extends AstBase {
-  public RefItem(ElementInfo info) {
+/**
+ *
+ * @author urs
+ */
+public class StringValue extends Expression {
+
+  final public String value;
+
+  public StringValue(ElementInfo info, String value) {
     super(info);
+    this.value = value;
   }
+
+  @Override
+  public String toString() {
+    return "'" + value + "'";
+  }
+
 }

@@ -20,11 +20,9 @@ package ast.pass.check.type;
 import java.math.BigInteger;
 
 import ast.ElementInfo;
+import ast.data.Ast;
 import ast.data.Range;
-import ast.data.expression.BoolValue;
 import ast.data.expression.Expression;
-import ast.data.expression.Number;
-import ast.data.expression.StringValue;
 import ast.data.expression.TypeCast;
 import ast.data.expression.binop.BitAnd;
 import ast.data.expression.binop.BitOr;
@@ -44,10 +42,12 @@ import ast.data.expression.binop.Or;
 import ast.data.expression.binop.Plus;
 import ast.data.expression.binop.Shl;
 import ast.data.expression.binop.Shr;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.SimpleRef;
 import ast.data.expression.unop.Not;
 import ast.data.expression.unop.Uminus;
+import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.NumberValue;
+import ast.data.expression.value.StringValue;
+import ast.data.reference.Reference;
 import ast.data.type.Type;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumType;
@@ -71,7 +71,7 @@ public class ExpressionTypecheck extends DefTraverser<Void, Void> {
     kc = kb.getEntry(KnowComparable.class);
   }
 
-  static public void process(Expression ast, KnowledgeBase kb) {
+  static public void process(Ast ast, KnowledgeBase kb) {
     ExpressionTypecheck adder = new ExpressionTypecheck(kb);
     adder.traverse(ast, null);
   }
@@ -142,7 +142,7 @@ public class ExpressionTypecheck extends DefTraverser<Void, Void> {
 
     if (!(type instanceof BooleanType)) {
       RError.err(ErrorType.Error, obj.getInfo(), "Need boolean type for not, got: " + type.name); // TODO
-                                                                                                  // otherwise
+      // otherwise
       // it is a bit
       // not
       return null;
@@ -303,8 +303,8 @@ public class ExpressionTypecheck extends DefTraverser<Void, Void> {
     Range lhs = getRange(obj.left);
     Range rhs = getRange(obj.right);
     checkPositive(obj.getInfo(), "mod", lhs); // TODO implement mod correctly
-                                              // (and not with 'urem'
-                                              // instruction) and
+    // (and not with 'urem'
+    // instruction) and
     // remove this check
     if (rhs.low.compareTo(BigInteger.ZERO) <= 0) {
       RError.err(ErrorType.Error, obj.getInfo(), "right side of mod has to be greater than 0");
@@ -366,7 +366,7 @@ public class ExpressionTypecheck extends DefTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitNumber(Number obj, Void param) {
+  protected Void visitNumber(NumberValue obj, Void param) {
     return null;
   }
 
@@ -377,11 +377,6 @@ public class ExpressionTypecheck extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitBoolValue(BoolValue obj, Void param) {
-    return null;
-  }
-
-  @Override
-  protected Void visitSimpleRef(SimpleRef obj, Void param) {
     return null;
   }
 

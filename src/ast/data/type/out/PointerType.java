@@ -18,13 +18,13 @@
 package ast.data.type.out;
 
 import ast.ElementInfo;
-import ast.data.expression.reference.BaseRef;
 import ast.data.type.Type;
+import ast.data.type.TypeRef;
 
 public class PointerType extends Type {
-  public BaseRef<Type> type;
+  public TypeRef type;
 
-  public PointerType(ElementInfo info, String name, BaseRef<Type> type) {
+  public PointerType(ElementInfo info, String name, TypeRef type) {
     super(info, name);
     this.type = type;
   }

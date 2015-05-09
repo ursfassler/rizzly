@@ -20,10 +20,10 @@ package ast.pass.reduction;
 import ast.data.Ast;
 import ast.data.Named;
 import ast.data.Namespace;
-import ast.data.expression.reference.DummyLinkTarget;
-import ast.data.expression.reference.RefName;
-import ast.data.expression.reference.Reference;
 import ast.data.file.RizzlyFile;
+import ast.data.reference.DummyLinkTarget;
+import ast.data.reference.RefName;
+import ast.data.reference.Reference;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.ChildCollector;
@@ -59,22 +59,22 @@ class NamespaceLinkReductionWorker extends DefTraverser<Void, Void> {
     Ast item = obj.link;
     assert (!(item instanceof DummyLinkTarget));
     while (item instanceof Namespace) {
-      ast.data.expression.reference.RefItem next = obj.offset.get(0);
+      ast.data.reference.RefItem next = obj.offset.get(0);
       obj.offset.remove(0);
       if (!(next instanceof RefName)) {
         RError.err(ErrorType.Error, obj.getInfo(), "Expected named offset, got: " + next.getClass().getCanonicalName());
       }
-      ast.data.expression.reference.RefName name = (ast.data.expression.reference.RefName) next;
+      ast.data.reference.RefName name = (ast.data.reference.RefName) next;
       Ast find = NameFilter.select(((ast.data.Namespace) item).children, name.name);
       assert (item != null); // type checker should find it?
     }
     if (item instanceof RizzlyFile) {
-      ast.data.expression.reference.RefItem next = obj.offset.get(0);
+      ast.data.reference.RefItem next = obj.offset.get(0);
       obj.offset.remove(0);
       if (!(next instanceof RefName)) {
         RError.err(ErrorType.Error, obj.getInfo(), "Expected named offset, got: " + next.getClass().getCanonicalName());
       }
-      ast.data.expression.reference.RefName name = (ast.data.expression.reference.RefName) next;
+      ast.data.reference.RefName name = (ast.data.reference.RefName) next;
       item = Single.force(ChildCollector.select(item, new HasName(name.name)), item.getInfo());
       assert (item != null); // type checker should find it?
     }

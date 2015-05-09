@@ -18,14 +18,13 @@
 package ast.data.type.special;
 
 import ast.ElementInfo;
-import ast.data.Named;
-import ast.data.expression.reference.BaseRef;
 import ast.data.type.Type;
+import ast.data.type.TypeRef;
 
 public class TypeType extends Type {
-  public BaseRef<Named> type;
+  public TypeRef type;
 
-  public TypeType(ElementInfo info, String name, BaseRef<Named> type) {
+  public TypeType(ElementInfo info, String name, TypeRef type) {
     super(info, name);
     this.type = type;
   }

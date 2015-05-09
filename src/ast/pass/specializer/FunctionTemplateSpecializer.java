@@ -24,7 +24,6 @@ import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.expression.Expression;
-import ast.data.expression.reference.Reference;
 import ast.data.function.Function;
 import ast.data.function.header.FuncFunction;
 import ast.data.function.ret.FuncReturnType;
@@ -34,6 +33,7 @@ import ast.data.statement.Block;
 import ast.data.statement.ReturnExpr;
 import ast.data.template.ActualTemplateArgument;
 import ast.data.type.Type;
+import ast.data.type.TypeRefFactory;
 import ast.data.variable.FuncVariable;
 import ast.knowledge.KnowEmptyValue;
 import ast.knowledge.KnowledgeBase;
@@ -84,6 +84,6 @@ public class FunctionTemplateSpecializer extends NullTraverser<Function, List<Ac
     Block body = new Block(info);
     Expression empty = kev.get(type);
     body.statements.add(new ReturnExpr(info, empty));
-    return new FuncFunction(info, name, new AstList<FuncVariable>(), new FuncReturnType(info, new Reference(info, type)), body);
+    return new FuncFunction(info, name, new AstList<FuncVariable>(), new FuncReturnType(info, TypeRefFactory.create(info, type)), body);
   }
 }

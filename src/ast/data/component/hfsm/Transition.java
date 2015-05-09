@@ -21,8 +21,7 @@ import ast.ElementInfo;
 import ast.data.AstBase;
 import ast.data.AstList;
 import ast.data.expression.Expression;
-import ast.data.expression.reference.FuncRef;
-import ast.data.expression.reference.StateRef;
+import ast.data.function.FuncRef;
 import ast.data.statement.Block;
 import ast.data.variable.FuncVariable;
 
@@ -33,10 +32,6 @@ public class Transition extends AstBase implements StateContent {
   final public AstList<FuncVariable> param = new AstList<FuncVariable>();
   public Expression guard;
   public Block body;
-
-  static public Transition create(ElementInfo info) {
-    return new Transition(info, null, null, null, null, new AstList<FuncVariable>(), new Block(info));
-  }
 
   public Transition(ElementInfo info, StateRef src, StateRef dst, FuncRef eventFunc, Expression guard, AstList<FuncVariable> param, Block body) {
     super(info);

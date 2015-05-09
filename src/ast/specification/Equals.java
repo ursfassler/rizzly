@@ -21,7 +21,8 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import ast.data.Ast;
-import ast.data.expression.reference.SimpleRef;
+import ast.data.reference.Reference;
+import ast.data.type.TypeRef;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumType;
@@ -112,10 +113,10 @@ class EqualTraverser extends NullTraverser<Boolean, Object> {
   }
 
   @Override
-  protected Boolean visitSimpleRef(SimpleRef obj, Object param) {
-    if (param instanceof SimpleRef) {
-      SimpleRef other = (SimpleRef) param;
-      return obj.link == other.link;
+  protected Boolean visitReference(Reference obj, Object param) {
+    if (param instanceof Reference) {
+      Reference other = (Reference) param;
+      return (obj.link == other.link) && visitList(obj.offset, other.offset);
     } else {
       return false;
     }
@@ -162,6 +163,16 @@ class EqualTraverser extends NullTraverser<Boolean, Object> {
     if (param instanceof TypeType) {
       TypeType other = (TypeType) param;
       return obj.type.equals(other.type);
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  protected Boolean visitTypeRef(TypeRef obj, Object param) {
+    if (param instanceof TypeRef) {
+      TypeRef other = (TypeRef) param;
+      return visit(obj.ref, other.ref);
     } else {
       return false;
     }

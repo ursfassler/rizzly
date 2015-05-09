@@ -31,13 +31,15 @@ import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.data.AstList;
 import ast.data.expression.Expression;
-import ast.data.expression.reference.Reference;
 import ast.data.function.Function;
 import ast.data.function.FunctionFactory;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FuncReturnTuple;
 import ast.data.function.ret.FuncReturnType;
+import ast.data.reference.RefFactory;
 import ast.data.statement.Block;
+import ast.data.type.TypeRef;
+import ast.data.type.special.AnyType;
 import ast.data.variable.Constant;
 import ast.data.variable.FuncVariable;
 import ast.data.variable.StateVariable;
@@ -111,7 +113,7 @@ public class BaseParser extends Parser {
       if (peek().getType() == TokenType.OPENPAREN) {
         return new FuncReturnTuple(info, parseVardefList());
       } else {
-        return new FuncReturnType(info, expr().parseRef());
+        return new FuncReturnType(info, expr().parseRefType());
       }
     } else {
       return new FuncReturnNone(ElementInfo.NO);
@@ -128,11 +130,11 @@ public class BaseParser extends Parser {
 
     expect(TokenType.COLON);
 
-    Reference type = expr().parseRef();
+    TypeRef type = expr().parseRefType();
 
     AstList<T> ret = new AstList<T>();
     for (int i = 0; i < names.size(); i++) {
-      Reference ntype = Copy.copy(type);
+      TypeRef ntype = Copy.copy(type);
       ret.add(VariableFactory.create(kind, names.get(i).getInfo(), names.get(i).getData(), ntype));
     }
 
@@ -141,7 +143,7 @@ public class BaseParser extends Parser {
 
   // EBNF stateVardef: typeref "=" expr
   public StateVariable parseStateVardef(String name) {
-    Reference type = expr().parseRef();
+    TypeRef type = expr().parseRefType();
     expect(TokenType.EQUAL);
     Expression init = expr().parse();
     return new StateVariable(type.getInfo(), name, type, init);
@@ -189,11 +191,11 @@ public class BaseParser extends Parser {
   // EBNF constdef: "const" [ typeref ] "=" expr
   public <T extends Constant> T parseConstDef(Class<T> kind, String name) {
     ElementInfo info = expect(TokenType.CONST).getInfo();
-    ast.data.expression.reference.Reference type;
+    TypeRef type;
     if (peek().getType() != TokenType.EQUAL) {
-      type = expr().parseRef();
+      type = expr().parseRefType();
     } else {
-      type = new Reference(info, ast.data.type.special.AnyType.NAME);
+      type = new TypeRef(info, RefFactory.create(info, AnyType.NAME));
     }
     expect(TokenType.EQUAL);
     ast.data.expression.Expression value = expr().parse();

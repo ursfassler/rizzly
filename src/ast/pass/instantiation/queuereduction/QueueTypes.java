@@ -24,9 +24,8 @@ import java.util.Map;
 import ast.Designator;
 import ast.ElementInfo;
 import ast.data.AstList;
-import ast.data.expression.reference.SimpleRef;
 import ast.data.function.Function;
-import ast.data.type.Type;
+import ast.data.type.TypeRefFactory;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.ArrayTypeFactory;
 import ast.data.type.base.EnumElement;
@@ -71,7 +70,7 @@ class QueueTypes {
       funcToType.put(func, enumElem);
     }
 
-    NamedElement tag = new NamedElement(info, "_tag", new SimpleRef<Type>(info, msgType));
+    NamedElement tag = new NamedElement(info, "_tag", TypeRefFactory.create(info, msgType));
     message = new UnionType(info, prefix + "queue", unielem, tag);
 
     queue = createQueueType(queueLength, message);
@@ -86,7 +85,7 @@ class QueueTypes {
     assert (path.size() > 0);
     String name = new Designator(path, func.name).toString(Designator.NAME_SEP);
 
-    NamedElement elem = new NamedElement(info, name, new SimpleRef<Type>(info, funcToRecord.get(func)));
+    NamedElement elem = new NamedElement(info, name, TypeRefFactory.create(info, funcToRecord.get(func)));
     funcToElem.put(func, elem);
     unielem.add(elem);
 

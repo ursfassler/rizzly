@@ -19,7 +19,7 @@ package ast.data.type.base;
 
 import ast.ElementInfo;
 import ast.data.AstList;
-import ast.data.expression.reference.TypeRef;
+import ast.data.type.TypeRef;
 
 public class TupleType extends BaseType {
   final public AstList<TypeRef> types;

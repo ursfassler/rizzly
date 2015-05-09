@@ -27,8 +27,8 @@ import ast.data.component.composition.SubCallbacks;
 import ast.data.component.elementary.ImplElementary;
 import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.Transition;
-import ast.data.expression.reference.BaseRef;
 import ast.data.function.Function;
+import ast.data.reference.Reference;
 import ast.data.statement.ForStmt;
 import ast.data.statement.VarDefStmt;
 import ast.data.type.Type;
@@ -118,13 +118,13 @@ class VarLinkOkWorker extends DefTraverser<Void, Set<Ast>> {
   }
 
   @Override
-  protected Void visitBaseRef(BaseRef obj, Set<Ast> param) {
+  protected Void visitReference(Reference obj, Set<Ast> param) {
     if ((obj.link instanceof Variable) || (obj.link instanceof Type)) {
       if (!param.contains(obj.link)) {
         RError.err(ErrorType.Fatal, obj.getInfo(), "object " + obj.link.toString() + " not visible from here");
       }
     }
-    return super.visitBaseRef(obj, param);
+    return super.visitReference(obj, param);
   }
 
   @Override
@@ -135,7 +135,7 @@ class VarLinkOkWorker extends DefTraverser<Void, Set<Ast>> {
     visit(obj.dst, param);
     visit(obj.eventFunc, param);
     visit(obj.body, param);
-    addAllToTop((State) obj.src.getTarget(), param);
+    addAllToTop(obj.src.getTarget(), param);
     visit(obj.guard, param);
     return null;
   }

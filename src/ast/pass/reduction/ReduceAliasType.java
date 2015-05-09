@@ -22,7 +22,7 @@ import java.util.List;
 
 import ast.data.Named;
 import ast.data.Namespace;
-import ast.data.expression.reference.BaseRef;
+import ast.data.reference.Reference;
 import ast.data.type.out.AliasType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
@@ -43,13 +43,13 @@ public class ReduceAliasType extends AstPass {
 class ReduceAliasTypeWorker extends DefTraverser<Void, Void> {
 
   @Override
-  protected Void visitBaseRef(BaseRef obj, Void param) {
-    super.visitBaseRef(obj, param);
+  protected Void visitReference(Reference obj, Void param) {
+    super.visitReference(obj, param);
     Named link = obj.link;
     List<Named> checked = new ArrayList<Named>();
     while (link instanceof AliasType) {
       checked.add(link);
-      link = ((AliasType) link).ref.link;
+      link = ((AliasType) link).ref.getTarget();
       if (checked.contains(link)) {
         for (Named itr : checked) {
           RError.err(ErrorType.Hint, itr.getInfo(), "part of recursive type alias: " + itr.name);

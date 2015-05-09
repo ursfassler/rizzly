@@ -19,8 +19,8 @@ package ast.pass.others;
 
 import ast.data.Ast;
 import ast.data.Namespace;
-import ast.data.expression.reference.SimpleRef;
 import ast.data.type.Type;
+import ast.data.type.TypeRefFactory;
 import ast.data.type.special.AnyType;
 import ast.data.type.special.IntegerType;
 import ast.data.type.special.NaturalType;
@@ -67,7 +67,7 @@ class Typer extends DefTraverser<Void, Void> {
 
       ct = kbi.getType(ct);
 
-      obj.type = new SimpleRef<Type>(obj.getInfo(), ct);
+      obj.type = TypeRefFactory.create(obj.getInfo(), ct);
     }
     super.visitConstant(obj, param);
     return null;

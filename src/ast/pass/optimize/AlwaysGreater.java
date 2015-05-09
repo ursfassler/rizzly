@@ -2,7 +2,6 @@ package ast.pass.optimize;
 
 import ast.data.Namespace;
 import ast.data.Range;
-import ast.data.expression.BoolValue;
 import ast.data.expression.Expression;
 import ast.data.expression.binop.Equal;
 import ast.data.expression.binop.Greater;
@@ -10,6 +9,7 @@ import ast.data.expression.binop.Greaterequal;
 import ast.data.expression.binop.Less;
 import ast.data.expression.binop.Lessequal;
 import ast.data.expression.binop.Notequal;
+import ast.data.expression.value.BoolValue;
 import ast.data.type.Type;
 import ast.data.type.base.RangeType;
 import ast.knowledge.KnowType;

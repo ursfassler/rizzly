@@ -18,7 +18,7 @@
 package ast.doc;
 
 import ast.data.Ast;
-import ast.data.expression.reference.BaseRef;
+import ast.data.reference.Reference;
 import ast.traverser.DefTraverser;
 
 public class DepGraph extends DefTraverser<Void, Ast> {
@@ -46,8 +46,8 @@ public class DepGraph extends DefTraverser<Void, Ast> {
   }
 
   @Override
-  protected Void visitBaseRef(BaseRef obj, Ast param) {
-    super.visitBaseRef(obj, param);
+  protected Void visitReference(Reference obj, Ast param) {
+    super.visitReference(obj, param);
     visit(obj.link, obj);
     return null;
   }

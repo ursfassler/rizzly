@@ -15,26 +15,13 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.expression.reference;
+package ast.data.component.hfsm;
 
 import ast.ElementInfo;
-import ast.data.Ast;
-import ast.data.Named;
-import ast.data.expression.Expression;
+import ast.data.reference.RefFactory;
 
-abstract public class BaseRef<T extends Named> extends Expression implements TypeRef, StateRef, FuncRef, CompRef {
-  public T link;
-
-  public BaseRef(ElementInfo info, T link) {
-    super(info);
-    this.link = link;
+public class StateRefFactory {
+  public static StateRef create(ElementInfo info, State comp) {
+    return new StateRef(info, RefFactory.create(info, comp));
   }
-
-  @Override
-  public String toString() {
-    return "->" + link;
-  }
-
-  @Override
-  abstract public Ast getTarget();
 }

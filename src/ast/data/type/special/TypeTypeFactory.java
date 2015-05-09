@@ -18,15 +18,14 @@
 package ast.data.type.special;
 
 import ast.ElementInfo;
-import ast.data.Named;
-import ast.data.expression.reference.SimpleRef;
 import ast.data.type.Type;
+import ast.data.type.TypeRefFactory;
 import ast.data.type.template.TypeTypeTemplateFactory;
 
 public class TypeTypeFactory {
 
   static public TypeType create(Type type) {
     String name = TypeTypeTemplateFactory.NAME + "{" + type.name + "}";
-    return new TypeType(ElementInfo.NO, name, new SimpleRef<Named>(ElementInfo.NO, type));
+    return new TypeType(ElementInfo.NO, name, TypeRefFactory.create(ElementInfo.NO, type));
   }
 }

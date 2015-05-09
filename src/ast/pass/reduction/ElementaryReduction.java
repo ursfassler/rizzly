@@ -26,12 +26,12 @@ import ast.data.AstList;
 import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.component.elementary.ImplElementary;
-import ast.data.expression.reference.SimpleRef;
-import ast.data.expression.reference.TypeRef;
 import ast.data.function.Function;
 import ast.data.function.header.FuncResponse;
 import ast.data.function.header.FuncSlot;
 import ast.data.type.Type;
+import ast.data.type.TypeRef;
+import ast.data.type.TypeRefFactory;
 import ast.data.type.base.TupleType;
 import ast.data.variable.FuncVariable;
 import ast.knowledge.KnowLeftIsContainerOfRight;
@@ -128,7 +128,7 @@ public class ElementaryReduction extends AstPass {
   private Type getType(AstList<FuncVariable> param, KnowType kt) {
     AstList<TypeRef> types = new AstList<TypeRef>();
     for (FuncVariable var : param) {
-      types.add(new SimpleRef<Type>(ElementInfo.NO, kt.get(var.type)));
+      types.add(TypeRefFactory.create(ElementInfo.NO, kt.get(var.type)));
     }
     TupleType tt = new TupleType(ElementInfo.NO, "", types);
     return tt;

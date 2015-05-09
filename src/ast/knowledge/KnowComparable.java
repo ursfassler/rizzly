@@ -23,8 +23,8 @@ import java.util.List;
 
 import util.Pair;
 import ast.data.Ast;
-import ast.data.expression.reference.TypeRef;
 import ast.data.type.Type;
+import ast.data.type.TypeRef;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumElement;

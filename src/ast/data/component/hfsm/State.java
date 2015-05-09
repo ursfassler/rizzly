@@ -20,15 +20,14 @@ package ast.data.component.hfsm;
 import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.Named;
-import ast.data.expression.reference.SimpleRef;
-import ast.data.function.header.FuncProcedure;
+import ast.data.function.FuncRef;
 
 abstract public class State extends Named implements StateContent {
-  public SimpleRef<FuncProcedure> entryFunc;
-  public SimpleRef<FuncProcedure> exitFunc;
+  public FuncRef entryFunc;
+  public FuncRef exitFunc;
   final public AstList<StateContent> item = new AstList<StateContent>();
 
-  public State(ElementInfo info, String name, SimpleRef<FuncProcedure> entryFunc, SimpleRef<FuncProcedure> exitFunc) {
+  public State(ElementInfo info, String name, FuncRef entryFunc, FuncRef exitFunc) {
     super(info, name);
     this.entryFunc = entryFunc;
     this.exitFunc = exitFunc;

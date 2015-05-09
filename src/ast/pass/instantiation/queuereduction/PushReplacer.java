@@ -1,6 +1,6 @@
 /**
  *  This file is part of Rizzly.
- * 
+ *
  *  Rizzly is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -19,10 +19,9 @@ package ast.pass.instantiation.queuereduction;
 
 import java.util.Map;
 
-import ast.data.expression.TupleValue;
-import ast.data.expression.reference.RefCall;
-import ast.data.expression.reference.Reference;
 import ast.data.function.Function;
+import ast.data.reference.RefFactory;
+import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.MsgPush;
@@ -44,12 +43,10 @@ class PushReplacer extends DefTraverser<Statement, Map<Function, Function>> {
 
   @Override
   protected Statement visitMsgPush(MsgPush obj, Map<Function, Function> param) {
-    assert (param.containsKey(obj.func.link));
+    Function func = param.get(obj.func.getTarget());
+    assert (func != null);
 
-    Reference call = new Reference(obj.getInfo(), param.get(obj.func.link));
-    call.offset.add(new RefCall(obj.getInfo(), new TupleValue(obj.getInfo(), obj.data)));
-
+    Reference call = RefFactory.call(obj.getInfo(), func, obj.data);
     return new CallStmt(obj.getInfo(), call);
   }
-
 }

@@ -20,14 +20,14 @@ package ast.pass.specializer;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.expression.Expression;
-import ast.data.expression.Number;
-import ast.data.expression.reference.RefCall;
-import ast.data.expression.reference.RefIndex;
-import ast.data.expression.reference.RefItem;
-import ast.data.expression.reference.RefTemplCall;
-import ast.data.expression.reference.Reference;
+import ast.data.expression.value.NumberValue;
 import ast.data.function.Function;
 import ast.data.function.header.FuncFunction;
+import ast.data.reference.RefCall;
+import ast.data.reference.RefIndex;
+import ast.data.reference.RefItem;
+import ast.data.reference.RefTemplCall;
+import ast.data.reference.Reference;
 import ast.data.template.Template;
 import ast.data.type.Type;
 import ast.data.type.base.BaseType;
@@ -78,7 +78,7 @@ public class RefEvaluator extends NullTraverser<Expression, Ast> {
   public static Ast execute(Ast root, AstList<RefItem> offset, Memory memory, InstanceRepo ir, KnowledgeBase kb) {
     RefEvaluator evaluator = new RefEvaluator(memory, ir, kb);
 
-    for (ast.data.expression.reference.RefItem ri : offset) {
+    for (ast.data.reference.RefItem ri : offset) {
       root = evaluator.traverse(ri, root);
     }
     return root;
@@ -113,17 +113,17 @@ public class RefEvaluator extends NullTraverser<Expression, Ast> {
   }
 
   @Override
-  protected ast.data.expression.Expression visitRefName(ast.data.expression.reference.RefName obj, Ast param) {
+  protected ast.data.expression.Expression visitRefName(ast.data.reference.RefName obj, Ast param) {
     throw new RuntimeException("not yet implemented");
   }
 
   @Override
   protected ast.data.expression.Expression visitRefIndex(RefIndex obj, Ast param) {
-    ast.data.expression.TupleValue value = (ast.data.expression.TupleValue) param;
+    ast.data.expression.value.TupleValue value = (ast.data.expression.value.TupleValue) param;
 
     ast.data.expression.Expression idx = eval(obj.index);
-    assert (idx instanceof Number);
-    int ii = ((ast.data.expression.Number) idx).value.intValue();
+    assert (idx instanceof NumberValue);
+    int ii = ((ast.data.expression.value.NumberValue) idx).value.intValue();
     ast.data.expression.Expression elem = value.value.get(ii);
 
     return elem;

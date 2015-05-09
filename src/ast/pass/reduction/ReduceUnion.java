@@ -25,13 +25,15 @@ import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.expression.Expression;
+import ast.data.expression.RefExp;
 import ast.data.expression.binop.Equal;
 import ast.data.expression.binop.Is;
-import ast.data.expression.reference.RefName;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.SimpleRef;
+import ast.data.reference.RefFactory;
+import ast.data.reference.RefName;
+import ast.data.reference.Reference;
 import ast.data.statement.CaseStmt;
 import ast.data.type.Type;
+import ast.data.type.TypeRefFactory;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.EnumType;
 import ast.data.type.base.EnumTypeFactory;
@@ -83,8 +85,8 @@ class ReduceUnionWorker extends ExprReplacer<Void> {
   protected Expression visitCaseStmt(CaseStmt obj, Void param) {
     Type et = kt.get(obj.condition);
     if (et instanceof UnionType) {
-      assert (obj.condition instanceof Reference);
-      Reference cond = (Reference) obj.condition;
+      assert (obj.condition instanceof RefExp);
+      Reference cond = (Reference) ((RefExp) obj.condition).ref;
       cond.offset.add(new RefName(ElementInfo.NO, ((UnionType) et).tag.name));
     }
     return super.visitCaseStmt(obj, param);
@@ -92,7 +94,7 @@ class ReduceUnionWorker extends ExprReplacer<Void> {
 
   @Override
   protected Expression visitReference(Reference obj, Void param) {
-    obj = (Reference) super.visitReference(obj, param);
+    super.visitReference(obj, param);
     if (obj.link instanceof UnionType) {
       UnionType ut = (UnionType) obj.link;
       assert (getUnion2enum().containsKey(ut));
@@ -101,24 +103,26 @@ class ReduceUnionWorker extends ExprReplacer<Void> {
       EnumType et = getUnion2enum().get(ut);
       String ev = ((RefName) obj.offset.get(0)).name;
       assert (Match.hasItem(et, new HasName(ev)));
-      return new Reference(obj.getInfo(), et, new RefName(ElementInfo.NO, ev));
+      obj.link = et;
+      obj.offset.clear();
+      obj.offset.add(new RefName(ElementInfo.NO, ev));
     }
-    return obj;
+    return null;
   }
 
   @Override
   protected Expression visitIs(Is obj, Void param) {
     super.visitIs(obj, param);
-    Reference left = (Reference) visit(obj.left, null);
+    Reference left = (Reference) ((RefExp) visit(obj.left, null)).ref;
 
     assert (left.offset.isEmpty());
 
     Type ut = kt.get(left);
     assert (ut instanceof UnionType);
 
-    left = new Reference(left.getInfo(), left.link, new RefName(ElementInfo.NO, ((UnionType) ut).tag.name));
+    left = RefFactory.create(left.getInfo(), left.link, new RefName(ElementInfo.NO, ((UnionType) ut).tag.name));
 
-    return new Equal(obj.getInfo(), left, obj.right);
+    return new Equal(obj.getInfo(), new RefExp(left.getInfo(), left), obj.right);
   }
 
   public Map<UnionType, EnumType> getUnion2enum() {
@@ -141,7 +145,7 @@ class Uni2Enum extends DefTraverser<Void, Map<UnionType, EnumType>> {
       et.element.add(ee);
     }
 
-    obj.tag.typeref = new SimpleRef<Type>(ElementInfo.NO, et);
+    obj.tag.typeref = TypeRefFactory.create(ElementInfo.NO, et);
 
     param.put(obj, et);
     return null;

@@ -24,14 +24,8 @@ import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
 import ast.data.Namespace;
-import ast.data.expression.ArrayValue;
-import ast.data.expression.BoolValue;
-import ast.data.expression.NamedValue;
-import ast.data.expression.RecordValue;
-import ast.data.expression.StringValue;
+import ast.data.expression.RefExp;
 import ast.data.expression.TypeCast;
-import ast.data.expression.UnionValue;
-import ast.data.expression.UnsafeUnionValue;
 import ast.data.expression.binop.BinaryExp;
 import ast.data.expression.binop.BitAnd;
 import ast.data.expression.binop.BitOr;
@@ -52,18 +46,24 @@ import ast.data.expression.binop.Plus;
 import ast.data.expression.binop.Relation;
 import ast.data.expression.binop.Shl;
 import ast.data.expression.binop.Shr;
-import ast.data.expression.reference.RefCall;
-import ast.data.expression.reference.RefIndex;
-import ast.data.expression.reference.RefName;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.SimpleRef;
 import ast.data.expression.unop.BitNot;
 import ast.data.expression.unop.LogicNot;
 import ast.data.expression.unop.Uminus;
 import ast.data.expression.unop.UnaryExp;
+import ast.data.expression.value.ArrayValue;
+import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.NamedValue;
+import ast.data.expression.value.RecordValue;
+import ast.data.expression.value.StringValue;
+import ast.data.expression.value.UnionValue;
+import ast.data.expression.value.UnsafeUnionValue;
 import ast.data.function.Function;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FuncReturnType;
+import ast.data.reference.RefCall;
+import ast.data.reference.RefIndex;
+import ast.data.reference.RefName;
+import ast.data.reference.Reference;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
@@ -78,6 +78,7 @@ import ast.data.statement.ReturnVoid;
 import ast.data.statement.VarDefStmt;
 import ast.data.statement.WhileStmt;
 import ast.data.type.Type;
+import ast.data.type.TypeRef;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.StringType;
@@ -160,7 +161,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
   }
 
   @Override
-  protected Void visitNumber(ast.data.expression.Number obj, Boolean param) {
+  protected Void visitNumber(ast.data.expression.value.NumberValue obj, Boolean param) {
     sw.wr(obj.value.toString());
     return null;
   }
@@ -299,6 +300,12 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
   @Override
   protected Void visitUminus(Uminus obj, Boolean param) {
     return unexp(obj, "-", param);
+  }
+
+  @Override
+  protected Void visitRefExpr(RefExp obj, Boolean param) {
+    visit(obj.ref, param);
+    return null;
   }
 
   @Override
@@ -715,8 +722,8 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
 
   @Override
   protected Void visitCaseOptRange(CaseOptRange obj, Boolean param) {
-    ast.data.expression.Number numStart = (ast.data.expression.Number) obj.start;
-    ast.data.expression.Number numEnd = (ast.data.expression.Number) obj.end;
+    ast.data.expression.value.NumberValue numStart = (ast.data.expression.value.NumberValue) obj.start;
+    ast.data.expression.value.NumberValue numEnd = (ast.data.expression.value.NumberValue) obj.end;
     sw.wr("case ");
     sw.wr(numStart.value.toString());
     sw.wr(" ... ");
@@ -727,7 +734,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
 
   @Override
   protected Void visitCaseOptValue(CaseOptValue obj, Boolean param) {
-    ast.data.expression.Number num = (ast.data.expression.Number) obj.value;
+    ast.data.expression.value.NumberValue num = (ast.data.expression.value.NumberValue) obj.value;
     sw.wr("case ");
     sw.wr(num.value.toString());
     sw.wr(": ");
@@ -757,7 +764,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
         case '\t':
           ret += "\\t";
           break;
-        // TODO more symbols to escape?
+          // TODO more symbols to escape?
         default:
           ret += c;
           break;
@@ -819,8 +826,8 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
   }
 
   @Override
-  protected Void visitSimpleRef(SimpleRef obj, Boolean param) {
-    sw.wr(name(obj.link));
+  protected Void visitTypeRef(TypeRef obj, Boolean param) {
+    visit(obj.ref, param);
     return null;
   }
 

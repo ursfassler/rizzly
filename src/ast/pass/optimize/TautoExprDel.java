@@ -1,11 +1,11 @@
 package ast.pass.optimize;
 
 import ast.data.Namespace;
-import ast.data.expression.BoolValue;
 import ast.data.expression.Expression;
 import ast.data.expression.binop.LogicAnd;
 import ast.data.expression.binop.LogicOr;
 import ast.data.expression.unop.LogicNot;
+import ast.data.expression.value.BoolValue;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.traverser.other.ExprReplacer;

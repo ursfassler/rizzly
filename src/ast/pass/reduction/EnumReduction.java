@@ -25,12 +25,10 @@ import ast.Designator;
 import ast.ElementInfo;
 import ast.data.Namespace;
 import ast.data.Range;
-import ast.data.expression.Number;
-import ast.data.expression.reference.BaseRef;
-import ast.data.expression.reference.RefName;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.SimpleRef;
-import ast.data.type.Type;
+import ast.data.expression.value.NumberValue;
+import ast.data.reference.RefName;
+import ast.data.reference.Reference;
+import ast.data.type.TypeRefFactory;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.EnumType;
 import ast.data.type.base.RangeType;
@@ -57,7 +55,7 @@ public class EnumReduction extends AstPass {
         RangeType rt = kbi.getRangeType(new Range(idx, idx));
 
         String name = et.name + Designator.NAME_SEP + elem.name;
-        ConstGlobal val = new ConstGlobal(elem.getInfo(), name, new SimpleRef<Type>(ElementInfo.NO, rt), new Number(ElementInfo.NO, idx));
+        ConstGlobal val = new ConstGlobal(elem.getInfo(), name, TypeRefFactory.create(ElementInfo.NO, rt), new NumberValue(ElementInfo.NO, idx));
         ast.children.add(val);
         elemMap.put(elem, val);
 
@@ -100,12 +98,9 @@ class EnumReduce extends DefTraverser<Void, Void> {
         obj.link = elemMap.get(elem);
       }
     }
-    return super.visitReference(obj, param);
-  }
 
-  @Override
-  protected Void visitBaseRef(BaseRef obj, Void param) {
-    super.visitBaseRef(obj, param);
+    super.visitReference(obj, param);
+
     // link to type
     if (typeMap.containsKey(obj.link)) {
       obj.link = typeMap.get(obj.link);
@@ -114,6 +109,7 @@ class EnumReduce extends DefTraverser<Void, Void> {
     if (elemMap.containsKey(obj.link)) {
       obj.link = elemMap.get(obj.link);
     }
+
     return null;
   }
 

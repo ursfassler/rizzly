@@ -18,11 +18,11 @@
 package ast.copy;
 
 import ast.data.Ast;
-import ast.data.expression.reference.RefCall;
-import ast.data.expression.reference.RefIndex;
-import ast.data.expression.reference.RefItem;
-import ast.data.expression.reference.RefName;
-import ast.data.expression.reference.RefTemplCall;
+import ast.data.reference.RefCall;
+import ast.data.reference.RefIndex;
+import ast.data.reference.RefItem;
+import ast.data.reference.RefName;
+import ast.data.reference.RefTemplCall;
 import ast.traverser.NullTraverser;
 
 public class CopyRef extends NullTraverser<RefItem, Void> {

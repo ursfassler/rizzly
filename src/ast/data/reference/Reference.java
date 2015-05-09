@@ -15,53 +15,36 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.expression.reference;
+package ast.data.reference;
 
 import ast.ElementInfo;
 import ast.data.Ast;
+import ast.data.AstBase;
 import ast.data.AstList;
 import ast.data.Named;
 
-public class Reference extends BaseRef<Named> {
+public class Reference extends AstBase {
+  public Named link;
   public final AstList<RefItem> offset;
 
   public Reference(ElementInfo info, Named link, AstList<RefItem> offset) {
-    super(info, link);
-    assert (link != null);
-    this.offset = new AstList<RefItem>(offset);
+    super(info);
+    this.link = link;
+    this.offset = offset;
   }
 
-  public Reference(ElementInfo info, Named link, RefItem itm) {
-    super(info, link);
-    assert (link != null);
-    this.offset = new AstList<RefItem>();
-    this.offset.add(itm);
-  }
-
-  public Reference(ElementInfo info, Named link) {
-    super(info, link);
-    assert (link != null);
-    this.offset = new AstList<RefItem>();
-  }
-
-  public Reference(ElementInfo info, String name) {
-    super(info, new DummyLinkTarget(info, name));
-    this.offset = new AstList<RefItem>();
+  public Ast getTarget() {
+    assert (offset.isEmpty()); // FIXME make it correct or remove function
+    return link;
   }
 
   @Override
   public String toString() {
-    String ret = super.toString();
+    String ret = "->" + link;
     for (RefItem item : offset) {
       ret += item.toString();
     }
     return ret;
-  }
-
-  @Override
-  public Ast getTarget() {
-    assert (offset.isEmpty()); // FIXME make it correct or remove function
-    return link;
   }
 
 }

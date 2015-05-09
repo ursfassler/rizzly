@@ -22,14 +22,14 @@ import java.util.Set;
 
 import ast.data.Ast;
 import ast.data.component.hfsm.Transition;
-import ast.data.expression.reference.BaseRef;
-import ast.data.expression.reference.RefCall;
-import ast.data.expression.reference.RefIndex;
-import ast.data.expression.reference.RefItem;
-import ast.data.expression.reference.RefName;
-import ast.data.expression.reference.Reference;
 import ast.data.function.Function;
+import ast.data.reference.RefCall;
+import ast.data.reference.RefIndex;
+import ast.data.reference.RefItem;
+import ast.data.reference.RefName;
+import ast.data.reference.Reference;
 import ast.data.type.Type;
+import ast.data.type.TypeRef;
 import ast.data.type.base.ArrayType;
 import ast.data.type.composed.NamedElement;
 import ast.data.variable.Variable;
@@ -77,20 +77,6 @@ public class CallgraphMaker extends DefTraverser<Void, Ast> {
     callgraph.addVertex(obj.body);
     visit(obj.body, obj.body);
 
-    return null;
-  }
-
-  @Override
-  protected Void visitBaseRef(BaseRef obj, Ast param) {
-    super.visitBaseRef(obj, param);
-
-    if (param != null) {
-      Ast head = obj.link;
-      if (head instanceof Function) {
-        callgraph.addVertex(head);
-        callgraph.addEdge(param, head);
-      }
-    }
     return null;
   }
 
@@ -153,11 +139,14 @@ class RefGetter extends NullTraverser<Ast, Ast> {
 
     // FIXME remove this hack
     if (param instanceof Variable) {
-      param = ((BaseRef) ((Variable) param).type).link;
+      param = (((Variable) param).type).ref.getTarget();
     } else if (param instanceof NamedElement) {
-      param = ((BaseRef) ((NamedElement) param).typeref).link;
-    } else if (param instanceof BaseRef) {
-      param = ((BaseRef) param).link;
+      param = (((NamedElement) param).typeref).ref.getTarget();
+    } else if (param instanceof Reference) {
+      param = ((Reference) param).getTarget();
+    }
+    if (param instanceof TypeRef) {
+      param = ((TypeRef) param).ref.getTarget();
     }
 
     return ChildByName.get(param, obj.name, obj.getInfo());
@@ -170,5 +159,4 @@ class RefGetter extends NullTraverser<Ast, Ast> {
     ArrayType arrayType = (ArrayType) type;
     return arrayType.type;
   }
-
 }

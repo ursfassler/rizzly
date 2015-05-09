@@ -15,21 +15,22 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.expression.reference;
+package ast.data.expression.value;
 
 import ast.ElementInfo;
+import ast.data.expression.Expression;
 
-public class RefName extends RefItem {
-  public String name;
+public class BoolValue extends Expression {
+  public final boolean value;
 
-  public RefName(ElementInfo info, String name) {
+  public BoolValue(ElementInfo info, boolean value) {
     super(info);
-    this.name = name;
+    this.value = value;
   }
 
   @Override
   public String toString() {
-    return "." + name;
+    return Boolean.toString(value);
   }
 
 }

@@ -18,19 +18,19 @@
 package ast.specification;
 
 import ast.data.Ast;
-import ast.data.expression.ArrayValue;
-import ast.data.expression.BoolValue;
-import ast.data.expression.Number;
-import ast.data.expression.RecordValue;
-import ast.data.expression.StringValue;
-import ast.data.expression.TupleValue;
+import ast.data.expression.RefExp;
 import ast.data.expression.TypeCast;
-import ast.data.expression.UnionValue;
-import ast.data.expression.UnsafeUnionValue;
 import ast.data.expression.binop.ArithmeticOp;
 import ast.data.expression.binop.BinaryExp;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.SimpleRef;
+import ast.data.expression.value.ArrayValue;
+import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.NumberValue;
+import ast.data.expression.value.RecordValue;
+import ast.data.expression.value.StringValue;
+import ast.data.expression.value.TupleValue;
+import ast.data.expression.value.UnionValue;
+import ast.data.expression.value.UnsafeUnionValue;
+import ast.data.reference.Reference;
 import ast.traverser.NullTraverser;
 import error.ErrorType;
 import error.RError;
@@ -55,6 +55,11 @@ class ConstTraverser extends NullTraverser<Boolean, Void> {
   }
 
   @Override
+  protected Boolean visitRefExpr(RefExp obj, Void param) {
+    return visit(obj.ref, param);
+  }
+
+  @Override
   protected Boolean visitBinaryExp(BinaryExp obj, Void param) {
     return visit(obj.left, param) && visit(obj.right, param);
   }
@@ -62,12 +67,6 @@ class ConstTraverser extends NullTraverser<Boolean, Void> {
   @Override
   protected Boolean visitArithmeticOp(ArithmeticOp obj, Void param) {
     return visit(obj.left, param) && visit(obj.right, param);
-  }
-
-  @Override
-  protected Boolean visitSimpleRef(SimpleRef obj, Void param) {
-    // TODO Auto-generated method stub
-    throw new RuntimeException("not yet implemented");
   }
 
   @Override
@@ -113,7 +112,7 @@ class ConstTraverser extends NullTraverser<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitNumber(Number obj, Void param) {
+  protected Boolean visitNumber(NumberValue obj, Void param) {
     return true;
   }
 

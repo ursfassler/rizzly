@@ -21,7 +21,7 @@ import java.util.Map;
 
 import ast.data.Ast;
 import ast.data.Named;
-import ast.data.expression.reference.BaseRef;
+import ast.data.reference.Reference;
 import ast.traverser.DefTraverser;
 
 public class ReLinker extends DefTraverser<Void, Map<Ast, Ast>> {
@@ -32,12 +32,12 @@ public class ReLinker extends DefTraverser<Void, Map<Ast, Ast>> {
   }
 
   @Override
-  protected Void visitBaseRef(BaseRef obj, Map<Ast, Ast> param) {
+  protected Void visitReference(Reference obj, Map<Ast, Ast> param) {
     Ast target = param.get(obj.link);
     if (target != null) {
       obj.link = (Named) target;
     }
-    return super.visitBaseRef(obj, param);
+    return super.visitReference(obj, param);
   }
 
 }

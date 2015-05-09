@@ -10,11 +10,11 @@ import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.expression.Expression;
-import ast.data.expression.TupleValue;
-import ast.data.expression.reference.RefCall;
-import ast.data.expression.reference.Reference;
+import ast.data.expression.value.TupleValue;
 import ast.data.function.Function;
 import ast.data.function.FunctionProperty;
+import ast.data.reference.RefCall;
+import ast.data.reference.RefFactory;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.CallStmt;
 import ast.data.statement.Return;
@@ -116,7 +116,7 @@ class FuncInlinerWorker extends StmtReplacer<Void> {
       inner.name = kun.get(inner.name);
 
       VarDefStmt def = new VarDefStmt(inner.getInfo(), inner);
-      AssignmentSingle ass = new AssignmentSingle(arg.getInfo(), new Reference(ElementInfo.NO, inner), arg);
+      AssignmentSingle ass = new AssignmentSingle(arg.getInfo(), RefFactory.full(ElementInfo.NO, inner), arg);
 
       ret.add(def);
       ret.add(ass);

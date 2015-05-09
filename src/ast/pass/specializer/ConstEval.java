@@ -18,6 +18,7 @@
 package ast.pass.specializer;
 
 import ast.data.Ast;
+import ast.data.variable.Constant;
 import ast.interpreter.Memory;
 import ast.knowledge.KnowledgeBase;
 import ast.traverser.DefTraverser;
@@ -36,7 +37,7 @@ public class ConstEval extends DefTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitConstant(ast.data.variable.Constant obj, Void param) {
+  protected Void visitConstant(Constant obj, Void param) {
     InstanceRepo ir = new InstanceRepo();
     obj.def = ExprEvaluator.evaluate(obj.def, new Memory(), ir, kb);
     return null;

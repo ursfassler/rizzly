@@ -23,12 +23,12 @@ import java.util.List;
 import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.Namespace;
-import ast.data.expression.BoolValue;
-import ast.data.expression.Number;
+import ast.data.expression.RefExp;
 import ast.data.expression.binop.Less;
 import ast.data.expression.binop.Plus;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.SimpleRef;
+import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.NumberValue;
+import ast.data.reference.RefFactory;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.ForStmt;
@@ -37,7 +37,7 @@ import ast.data.statement.IfStmt;
 import ast.data.statement.Statement;
 import ast.data.statement.VarDefStmt;
 import ast.data.statement.WhileStmt;
-import ast.data.type.Type;
+import ast.data.type.TypeRefFactory;
 import ast.data.type.base.RangeType;
 import ast.data.variable.FuncVariable;
 import ast.knowledge.KnowType;
@@ -85,25 +85,25 @@ class ForReductionWorker extends StmtReplacer<Void> {
 
     Block block = new Block(obj.getInfo());
 
-    FuncVariable loopCond = new FuncVariable(info, kun.get("run"), new SimpleRef<Type>(info, kbi.getBooleanType()));
+    FuncVariable loopCond = new FuncVariable(info, kun.get("run"), TypeRefFactory.create(info, kbi.getBooleanType()));
 
     block.statements.add(new VarDefStmt(info, loopCond));
-    block.statements.add(new AssignmentSingle(info, new Reference(info, loopCond), new BoolValue(info, true)));
+    block.statements.add(new AssignmentSingle(info, RefFactory.full(info, loopCond), new BoolValue(info, true)));
 
     block.statements.add(new VarDefStmt(info, itr));
-    block.statements.add(new AssignmentSingle(info, new Reference(info, itr), new Number(info, rt.range.low)));
+    block.statements.add(new AssignmentSingle(info, RefFactory.full(info, itr), new NumberValue(info, rt.range.low)));
 
     Block body = new Block(info);
-    block.statements.add(new WhileStmt(info, new Reference(info, loopCond), body));
+    block.statements.add(new WhileStmt(info, new RefExp(info, RefFactory.full(info, loopCond)), body));
 
     body.statements.add(obj.block);
     AstList<IfOption> option = new AstList<IfOption>();
     Block defblock = new Block(info);
 
     Block inc = new Block(info);
-    option.add(new IfOption(info, new Less(info, new Reference(info, itr), new Number(info, rt.range.high)), inc));
-    inc.statements.add(new AssignmentSingle(info, new Reference(info, itr), new Plus(info, new Reference(info, itr), new Number(info, BigInteger.ONE))));
-    defblock.statements.add(new AssignmentSingle(info, new Reference(info, loopCond), new BoolValue(info, false)));
+    option.add(new IfOption(info, new Less(info, new RefExp(info, RefFactory.full(info, itr)), new NumberValue(info, rt.range.high)), inc));
+    inc.statements.add(new AssignmentSingle(info, RefFactory.full(info, itr), new Plus(info, new RefExp(info, RefFactory.full(info, itr)), new NumberValue(info, BigInteger.ONE))));
+    defblock.statements.add(new AssignmentSingle(info, RefFactory.full(info, loopCond), new BoolValue(info, false)));
 
     body.statements.add(new IfStmt(info, option, defblock));
 

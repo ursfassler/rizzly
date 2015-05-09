@@ -26,8 +26,10 @@ import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
 import ast.data.Namespace;
+import ast.data.component.CompRef;
 import ast.data.component.composition.AsynchroniusConnection;
 import ast.data.component.composition.CompUse;
+import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.Direction;
 import ast.data.component.composition.EndpointRaw;
 import ast.data.component.composition.Queue;
@@ -35,11 +37,13 @@ import ast.data.component.composition.SubCallbacks;
 import ast.data.component.composition.SynchroniusConnection;
 import ast.data.component.elementary.ImplElementary;
 import ast.data.component.hfsm.StateComposite;
+import ast.data.component.hfsm.StateRef;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.component.hfsm.Transition;
 import ast.data.expression.Expression;
-import ast.data.expression.NamedValue;
-import ast.data.expression.reference.RefItem;
+import ast.data.expression.RefExp;
+import ast.data.expression.value.NamedValue;
+import ast.data.function.FuncRef;
 import ast.data.function.Function;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FuncReturnTuple;
@@ -47,6 +51,8 @@ import ast.data.function.ret.FuncReturnType;
 import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
+import ast.data.reference.RefItem;
+import ast.data.reference.Reference;
 import ast.data.statement.CaseOpt;
 import ast.data.statement.CaseOptRange;
 import ast.data.statement.CaseOptValue;
@@ -54,6 +60,7 @@ import ast.data.statement.IfOption;
 import ast.data.statement.Statement;
 import ast.data.template.Template;
 import ast.data.type.Type;
+import ast.data.type.TypeRef;
 import ast.data.type.base.EnumElement;
 import ast.data.type.composed.NamedElement;
 import ast.data.variable.Variable;
@@ -112,6 +119,36 @@ public class CopyAst extends NullTraverser<Ast, Void> {
       }
       return nobj;
     }
+  }
+
+  @Override
+  protected Ast visitTypeRef(TypeRef obj, Void param) {
+    return new TypeRef(obj.getInfo(), copy(obj.ref));
+  }
+
+  @Override
+  protected Ast visitStateRef(StateRef obj, Void param) {
+    return new StateRef(obj.getInfo(), copy(obj.ref));
+  }
+
+  @Override
+  protected Ast visitCompRef(CompRef obj, Void param) {
+    return new CompRef(obj.getInfo(), copy(obj.ref));
+  }
+
+  @Override
+  protected Ast visitFuncRef(FuncRef obj, Void param) {
+    return new FuncRef(obj.getInfo(), copy(obj.ref));
+  }
+
+  @Override
+  protected Ast visitCompUseRef(CompUseRef obj, Void param) {
+    return new CompUseRef(obj.getInfo(), copy(obj.ref));
+  }
+
+  @Override
+  protected Ast visitReference(Reference obj, Void param) {
+    return new Reference(obj.getInfo(), obj.link, copy(obj.offset));
   }
 
   @Override
@@ -311,6 +348,11 @@ public class CopyAst extends NullTraverser<Ast, Void> {
   @Override
   protected Ast visitEndpointRaw(EndpointRaw obj, Void param) {
     return new EndpointRaw(obj.getInfo(), copy(obj.ref));
+  }
+
+  @Override
+  protected Ast visitRefExpr(RefExp obj, Void param) {
+    throw new RuntimeException("not yet implemented");
   }
 
 }

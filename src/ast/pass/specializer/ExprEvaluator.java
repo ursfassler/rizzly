@@ -23,14 +23,8 @@ import java.util.List;
 import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
-import ast.data.expression.AnyValue;
-import ast.data.expression.BoolValue;
 import ast.data.expression.Expression;
-import ast.data.expression.NamedElementsValue;
-import ast.data.expression.NamedValue;
-import ast.data.expression.Number;
-import ast.data.expression.StringValue;
-import ast.data.expression.TupleValue;
+import ast.data.expression.RefExp;
 import ast.data.expression.binop.And;
 import ast.data.expression.binop.Div;
 import ast.data.expression.binop.Equal;
@@ -47,12 +41,19 @@ import ast.data.expression.binop.Or;
 import ast.data.expression.binop.Plus;
 import ast.data.expression.binop.Shl;
 import ast.data.expression.binop.Shr;
-import ast.data.expression.reference.RefCall;
-import ast.data.expression.reference.RefName;
-import ast.data.expression.reference.RefTemplCall;
-import ast.data.expression.reference.Reference;
 import ast.data.expression.unop.Not;
 import ast.data.expression.unop.Uminus;
+import ast.data.expression.value.AnyValue;
+import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.NamedElementsValue;
+import ast.data.expression.value.NamedValue;
+import ast.data.expression.value.NumberValue;
+import ast.data.expression.value.StringValue;
+import ast.data.expression.value.TupleValue;
+import ast.data.reference.RefCall;
+import ast.data.reference.RefName;
+import ast.data.reference.RefTemplCall;
+import ast.data.reference.Reference;
 import ast.data.type.Type;
 import ast.data.variable.Constant;
 import ast.data.variable.FuncVariable;
@@ -127,7 +128,7 @@ public class ExprEvaluator extends NullTraverser<Expression, Void> {
   }
 
   @Override
-  protected Expression visitNumber(Number obj, Void param) {
+  protected Expression visitNumber(NumberValue obj, Void param) {
     return obj;
   }
 
@@ -162,6 +163,11 @@ public class ExprEvaluator extends NullTraverser<Expression, Void> {
       }
       return new TupleValue(obj.getInfo(), list);
     }
+  }
+
+  @Override
+  protected Expression visitRefExpr(RefExp obj, Void param) {
+    return visit(obj.ref, param);
   }
 
   @Override
@@ -207,11 +213,11 @@ public class ExprEvaluator extends NullTraverser<Expression, Void> {
     Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((Number) left).value;
-      BigInteger rval = ((Number) right).value;
+      BigInteger lval = ((NumberValue) left).value;
+      BigInteger rval = ((NumberValue) right).value;
       BigInteger res;
       res = lval.and(rval);
-      return new Number(obj.getInfo(), res);
+      return new NumberValue(obj.getInfo(), res);
     } else {
       return obj;
     }
@@ -223,11 +229,11 @@ public class ExprEvaluator extends NullTraverser<Expression, Void> {
     Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((Number) left).value;
-      BigInteger rval = ((Number) right).value;
+      BigInteger lval = ((NumberValue) left).value;
+      BigInteger rval = ((NumberValue) right).value;
       BigInteger res;
       res = lval.divide(rval);
-      return new Number(obj.getInfo(), res);
+      return new NumberValue(obj.getInfo(), res);
     } else {
       return obj;
     }
@@ -239,11 +245,11 @@ public class ExprEvaluator extends NullTraverser<Expression, Void> {
     Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((Number) left).value;
-      BigInteger rval = ((Number) right).value;
+      BigInteger lval = ((NumberValue) left).value;
+      BigInteger rval = ((NumberValue) right).value;
       BigInteger res;
       res = lval.subtract(rval);
-      return new Number(obj.getInfo(), res);
+      return new NumberValue(obj.getInfo(), res);
     } else {
       return obj;
     }
@@ -255,11 +261,11 @@ public class ExprEvaluator extends NullTraverser<Expression, Void> {
     Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((Number) left).value;
-      BigInteger rval = ((Number) right).value;
+      BigInteger lval = ((NumberValue) left).value;
+      BigInteger rval = ((NumberValue) right).value;
       BigInteger res;
       res = lval.mod(rval);
-      return new Number(obj.getInfo(), res);
+      return new NumberValue(obj.getInfo(), res);
     } else {
       return obj;
     }
@@ -271,11 +277,11 @@ public class ExprEvaluator extends NullTraverser<Expression, Void> {
     Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((Number) left).value;
-      BigInteger rval = ((Number) right).value;
+      BigInteger lval = ((NumberValue) left).value;
+      BigInteger rval = ((NumberValue) right).value;
       BigInteger res;
       res = lval.multiply(rval);
-      return new Number(obj.getInfo(), res);
+      return new NumberValue(obj.getInfo(), res);
     } else {
       return obj;
     }
@@ -287,11 +293,11 @@ public class ExprEvaluator extends NullTraverser<Expression, Void> {
     Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((Number) left).value;
-      BigInteger rval = ((Number) right).value;
+      BigInteger lval = ((NumberValue) left).value;
+      BigInteger rval = ((NumberValue) right).value;
       BigInteger res;
       res = lval.or(rval);
-      return new Number(obj.getInfo(), res);
+      return new NumberValue(obj.getInfo(), res);
     } else {
       return obj;
     }
@@ -303,11 +309,11 @@ public class ExprEvaluator extends NullTraverser<Expression, Void> {
     Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((Number) left).value;
-      BigInteger rval = ((Number) right).value;
+      BigInteger lval = ((NumberValue) left).value;
+      BigInteger rval = ((NumberValue) right).value;
       BigInteger res;
       res = lval.add(rval);
-      return new Number(obj.getInfo(), res);
+      return new NumberValue(obj.getInfo(), res);
     } else {
       return obj;
     }
@@ -319,11 +325,11 @@ public class ExprEvaluator extends NullTraverser<Expression, Void> {
     Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((Number) left).value;
-      BigInteger rval = ((Number) right).value;
+      BigInteger lval = ((NumberValue) left).value;
+      BigInteger rval = ((NumberValue) right).value;
       BigInteger res;
       res = lval.shiftLeft(getInt(obj.getInfo(), rval));
-      return new Number(obj.getInfo(), res);
+      return new NumberValue(obj.getInfo(), res);
     } else {
       return obj;
     }
@@ -335,11 +341,11 @@ public class ExprEvaluator extends NullTraverser<Expression, Void> {
     Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((Number) left).value;
-      BigInteger rval = ((Number) right).value;
+      BigInteger lval = ((NumberValue) left).value;
+      BigInteger rval = ((NumberValue) right).value;
       BigInteger res;
       res = lval.shiftRight(getInt(obj.getInfo(), rval));
-      return new Number(obj.getInfo(), res);
+      return new NumberValue(obj.getInfo(), res);
     } else {
       return obj;
     }
@@ -351,8 +357,8 @@ public class ExprEvaluator extends NullTraverser<Expression, Void> {
     Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((Number) left).value;
-      BigInteger rval = ((Number) right).value;
+      BigInteger lval = ((NumberValue) left).value;
+      BigInteger rval = ((NumberValue) right).value;
       boolean res = lval.compareTo(rval) == 0;
       return new BoolValue(obj.getInfo(), res);
     } else if (areBool(left, right)) {
@@ -370,7 +376,7 @@ public class ExprEvaluator extends NullTraverser<Expression, Void> {
   }
 
   private boolean areNumber(Expression left, Expression right) {
-    return (left instanceof Number) && (right instanceof Number);
+    return (left instanceof NumberValue) && (right instanceof NumberValue);
   }
 
   @Override
@@ -379,8 +385,8 @@ public class ExprEvaluator extends NullTraverser<Expression, Void> {
     Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((Number) left).value;
-      BigInteger rval = ((Number) right).value;
+      BigInteger lval = ((NumberValue) left).value;
+      BigInteger rval = ((NumberValue) right).value;
       boolean res = lval.compareTo(rval) > 0;
       return new BoolValue(obj.getInfo(), res);
     } else if (areBool(left, right)) {
@@ -397,8 +403,8 @@ public class ExprEvaluator extends NullTraverser<Expression, Void> {
     Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((Number) left).value;
-      BigInteger rval = ((Number) right).value;
+      BigInteger lval = ((NumberValue) left).value;
+      BigInteger rval = ((NumberValue) right).value;
       boolean res = lval.compareTo(rval) >= 0;
       return new BoolValue(obj.getInfo(), res);
     } else if (areBool(left, right)) {
@@ -415,8 +421,8 @@ public class ExprEvaluator extends NullTraverser<Expression, Void> {
     Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((Number) left).value;
-      BigInteger rval = ((Number) right).value;
+      BigInteger lval = ((NumberValue) left).value;
+      BigInteger rval = ((NumberValue) right).value;
       boolean res = lval.compareTo(rval) < 0;
       return new BoolValue(obj.getInfo(), res);
     } else if (areBool(left, right)) {
@@ -433,8 +439,8 @@ public class ExprEvaluator extends NullTraverser<Expression, Void> {
     Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((Number) left).value;
-      BigInteger rval = ((Number) right).value;
+      BigInteger lval = ((NumberValue) left).value;
+      BigInteger rval = ((NumberValue) right).value;
       boolean res = lval.compareTo(rval) <= 0;
       return new BoolValue(obj.getInfo(), res);
     } else if (areBool(left, right)) {
@@ -451,8 +457,8 @@ public class ExprEvaluator extends NullTraverser<Expression, Void> {
     Expression right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
-      BigInteger lval = ((Number) left).value;
-      BigInteger rval = ((Number) right).value;
+      BigInteger lval = ((NumberValue) left).value;
+      BigInteger rval = ((NumberValue) right).value;
       boolean res = lval.compareTo(rval) != 0;
       return new BoolValue(obj.getInfo(), res);
     } else if (areBool(left, right)) {
@@ -474,12 +480,12 @@ public class ExprEvaluator extends NullTraverser<Expression, Void> {
   protected Expression visitUminus(Uminus obj, Void param) {
     Expression expr = visit(obj.expr, param);
 
-    if ((expr instanceof Number)) {
-      BigInteger eval = ((Number) expr).value;
+    if ((expr instanceof NumberValue)) {
+      BigInteger eval = ((NumberValue) expr).value;
       BigInteger res;
 
       res = eval.negate();
-      return new Number(obj.getInfo(), res);
+      return new NumberValue(obj.getInfo(), res);
     } else {
       RError.err(ErrorType.Fatal, obj.getInfo(), "Can not evaluate unary minus on " + expr.getClass().getName());
       return obj;

@@ -12,15 +12,15 @@ import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.component.Component;
 import ast.data.component.composition.CompUse;
+import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.Connection;
 import ast.data.component.composition.Direction;
 import ast.data.component.composition.Endpoint;
 import ast.data.component.composition.EndpointRaw;
 import ast.data.component.composition.EndpointSelf;
 import ast.data.component.composition.EndpointSub;
-import ast.data.expression.reference.RefName;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.SimpleRef;
+import ast.data.component.elementary.ImplElementary;
+import ast.data.function.FuncRefFactory;
 import ast.data.function.Function;
 import ast.data.function.InterfaceFunction;
 import ast.data.function.header.FuncProcedure;
@@ -28,6 +28,9 @@ import ast.data.function.ret.FuncReturnNone;
 import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
+import ast.data.reference.RefFactory;
+import ast.data.reference.RefName;
+import ast.data.reference.Reference;
 import ast.data.type.Type;
 import ast.data.variable.Constant;
 import ast.data.variable.FuncVariable;
@@ -73,7 +76,7 @@ class ReduceRawCompWorker extends DefTraverser<Component, Void> {
     // if this makes problems like loops, convert the body of the functions
     // after the component
 
-    ast.data.component.elementary.ImplElementary comp = new ast.data.component.elementary.ImplElementary(obj.getInfo(), obj.name, new SimpleRef<FuncProcedure>(info, entryFunc), new SimpleRef<FuncProcedure>(info, exitFunc));
+    ImplElementary comp = new ImplElementary(obj.getInfo(), obj.name, FuncRefFactory.create(info, entryFunc), FuncRefFactory.create(info, exitFunc));
     getMap().put(obj, comp);
 
     comp.function.add(entryFunc);
@@ -170,13 +173,13 @@ class ReduceEndpoint extends NullTraverser<Endpoint, Void> {
       case 0: {
         Named link = ref.link;
         RError.ass(link instanceof Function, ref.getInfo(), "expected function for: " + link.name);
-        return new EndpointSelf(ref.getInfo(), new SimpleRef<Function>(ref.getInfo(), (Function) link));
+        return new EndpointSelf(ref.getInfo(), FuncRefFactory.create(ref.getInfo(), (Function) link));
       }
       case 1: {
         Named link = ref.link;
         RError.ass(link instanceof CompUse, ref.getInfo(), "expected compuse for: " + link.name);
         String name = ((RefName) ref.offset.get(0)).name;
-        return new EndpointSub(ref.getInfo(), new SimpleRef<CompUse>(obj.getInfo(), (CompUse) link), name);
+        return new EndpointSub(ref.getInfo(), new CompUseRef(obj.getInfo(), RefFactory.create(obj.getInfo(), link)), name);
       }
       default: {
         RError.err(ErrorType.Fatal, ref.getInfo(), "Unknown connection endpoint");

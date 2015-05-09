@@ -15,9 +15,21 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.expression.reference;
+package ast.data.expression.value;
 
-import ast.data.Ast;
+import ast.ElementInfo;
+import ast.data.expression.Expression;
+import ast.data.type.TypeRef;
 
-public interface TypeRef extends Ast {
+public class UnionValue extends Expression {
+  public NamedValue tagValue;
+  public NamedValue contentValue;
+  public TypeRef type;
+
+  public UnionValue(ElementInfo info, NamedValue tagValue, NamedValue contentValue, TypeRef type) {
+    super(info);
+    this.tagValue = tagValue;
+    this.contentValue = contentValue;
+    this.type = type;
+  }
 }

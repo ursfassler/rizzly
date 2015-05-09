@@ -19,7 +19,7 @@ package ast.data.variable;
 
 import ast.ElementInfo;
 import ast.data.expression.Expression;
-import ast.data.expression.reference.TypeRef;
+import ast.data.type.TypeRef;
 
 abstract public class DefVariable extends Variable {
   public Expression def;

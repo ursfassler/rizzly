@@ -19,7 +19,7 @@ package ast.data.component.composition;
 
 import ast.ElementInfo;
 import ast.data.Named;
-import ast.data.expression.reference.CompRef;
+import ast.data.component.CompRef;
 
 public class CompUse extends Named {
   public CompRef compRef;

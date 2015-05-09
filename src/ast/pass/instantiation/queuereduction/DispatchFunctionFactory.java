@@ -20,20 +20,22 @@ package ast.pass.instantiation.queuereduction;
 import java.math.BigInteger;
 
 import ast.ElementInfo;
+import ast.copy.Copy;
 import ast.data.AstList;
-import ast.data.expression.Number;
-import ast.data.expression.TupleValue;
+import ast.data.expression.Expression;
+import ast.data.expression.RefExp;
 import ast.data.expression.binop.Greater;
 import ast.data.expression.binop.Minus;
 import ast.data.expression.binop.Plus;
-import ast.data.expression.reference.RefCall;
-import ast.data.expression.reference.RefIndex;
-import ast.data.expression.reference.RefName;
-import ast.data.expression.reference.Reference;
+import ast.data.expression.value.NumberValue;
 import ast.data.function.Function;
 import ast.data.function.FunctionProperty;
 import ast.data.function.header.FuncSlot;
 import ast.data.function.ret.FuncReturnNone;
+import ast.data.reference.RefFactory;
+import ast.data.reference.RefIndex;
+import ast.data.reference.RefName;
+import ast.data.reference.Reference;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
@@ -75,39 +77,35 @@ class DispatchFunctionFactory {
     UnionType ut = (UnionType) kt.get(dt.type);
 
     AstList<CaseOpt> opt = new AstList<CaseOpt>();
-    Reference ref = new Reference(info, queueVariables.getQueue());
-    ref.offset.add(new RefIndex(info, new Reference(info, queueVariables.getHead())));
-    ref.offset.add(new RefName(info, ut.tag.name));
-    CaseStmt caseStmt = new CaseStmt(info, ref, opt, new Block(info));
+    RefIndex idx = new RefIndex(info, new RefExp(info, RefFactory.full(info, queueVariables.getHead())));
+    RefName tag = new RefName(info, ut.tag.name);
+    Reference ref = RefFactory.create(info, queueVariables.getQueue(), idx, tag);
+    CaseStmt caseStmt = new CaseStmt(info, new RefExp(info, ref), opt, new Block(info));
 
     for (Function func : queueTypes.getFuncToMsgType().keySet()) {
       AstList<CaseOptEntry> value = new AstList<CaseOptEntry>();
-      value.add(new CaseOptValue(info, new Reference(info, queueTypes.getFuncToMsgType().get(func))));
+      value.add(new CaseOptValue(info, new RefExp(info, RefFactory.full(info, queueTypes.getFuncToMsgType().get(func)))));
       CaseOpt copt = new CaseOpt(info, value, new Block(info));
 
       NamedElement un = queueTypes.getFuncToElem().get(func);
       RecordType rec = queueTypes.getFuncToRecord().get(func);
-      TupleValue acarg = new TupleValue(info);
+      AstList<Expression> acarg = new AstList<Expression>();
       for (NamedElement elem : rec.element) {
-        Reference vref = new Reference(info, queueVariables.getQueue());
-        vref.offset.add(new RefIndex(info, new Reference(info, queueVariables.getHead())));
-        vref.offset.add(new RefName(info, un.name));
-        vref.offset.add(new RefName(info, elem.name));
-        acarg.value.add(vref);
+        Reference vref = RefFactory.create(info, queueVariables.getQueue(), Copy.copy(idx), new RefName(info, un.name), new RefName(info, elem.name));
+        acarg.add(new RefExp(info, vref));
       }
 
-      Reference call = new Reference(info, func);
-      call.offset.add(new RefCall(info, acarg));
+      Reference call = RefFactory.call(info, func, acarg);
       copt.code.statements.add(new CallStmt(info, call));
 
       caseStmt.option.add(copt);
     }
 
-    AssignmentSingle add = new AssignmentSingle(info, new Reference(info, queueVariables.getHead()), new Plus(info, new Reference(info, queueVariables.getHead()), new Number(info, BigInteger.ONE)));
-    AssignmentSingle sub = new AssignmentSingle(info, new Reference(info, queueVariables.getCount()), new Minus(info, new Reference(info, queueVariables.getCount()), new Number(info, BigInteger.ONE)));
+    AssignmentSingle add = new AssignmentSingle(info, RefFactory.full(info, queueVariables.getHead()), new Plus(info, new RefExp(info, RefFactory.full(info, queueVariables.getHead())), new NumberValue(info, BigInteger.ONE)));
+    AssignmentSingle sub = new AssignmentSingle(info, RefFactory.full(info, queueVariables.getCount()), new Minus(info, new RefExp(info, RefFactory.full(info, queueVariables.getCount())), new NumberValue(info, BigInteger.ONE)));
 
     AstList<IfOption> option = new AstList<IfOption>();
-    IfOption ifOption = new IfOption(info, new Greater(info, new Reference(info, queueVariables.getCount()), new Number(info, BigInteger.ZERO)), new Block(info));
+    IfOption ifOption = new IfOption(info, new Greater(info, new RefExp(info, RefFactory.full(info, queueVariables.getCount())), new NumberValue(info, BigInteger.ZERO)), new Block(info));
     ifOption.code.statements.add(caseStmt);
     ifOption.code.statements.add(sub);
     ifOption.code.statements.add(add);

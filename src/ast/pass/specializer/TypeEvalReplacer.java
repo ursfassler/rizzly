@@ -22,10 +22,8 @@ import java.util.Collection;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
-import ast.data.expression.reference.BaseRef;
-import ast.data.expression.reference.RefTemplCall;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.SimpleRef;
+import ast.data.reference.RefTemplCall;
+import ast.data.reference.Reference;
 import ast.data.template.ActualTemplateArgument;
 import ast.data.template.Template;
 import ast.data.variable.ConstGlobal;
@@ -58,8 +56,17 @@ class TypeEvalReplacer extends DefTraverser<AstList<ActualTemplateArgument>, Voi
   }
 
   @Override
-  protected AstList<ActualTemplateArgument> visitBaseRef(BaseRef obj, Void param) {
-    AstList<ActualTemplateArgument> arg = super.visitBaseRef(obj, param);
+  protected AstList<ActualTemplateArgument> visitReference(Reference obj, Void param) {
+    super.visitReference(obj, param);
+
+    AstList<ActualTemplateArgument> arg = new AstList<ActualTemplateArgument>();
+    if (!obj.offset.isEmpty()) {
+      if (obj.offset.get(0) instanceof RefTemplCall) {
+        arg = ((RefTemplCall) obj.offset.get(0)).actualParameter;
+        obj.offset.remove(0);
+      }
+    }
+
     if (obj.link instanceof Template) {
       RError.ass(arg != null, obj.getInfo());
       Template template = (Template) obj.link;
@@ -81,22 +88,4 @@ class TypeEvalReplacer extends DefTraverser<AstList<ActualTemplateArgument>, Voi
     return null;
   }
 
-  @Override
-  protected AstList<ActualTemplateArgument> visitSimpleRef(SimpleRef obj, Void param) {
-    super.visitSimpleRef(obj, param);
-    return new AstList<ActualTemplateArgument>();
-  }
-
-  @Override
-  protected AstList<ActualTemplateArgument> visitReference(Reference obj, Void param) {
-    super.visitReference(obj, param);
-    AstList<ActualTemplateArgument> arg = new AstList<ActualTemplateArgument>();
-    if (!obj.offset.isEmpty()) {
-      if (obj.offset.get(0) instanceof RefTemplCall) {
-        arg = ((RefTemplCall) obj.offset.get(0)).actualParameter;
-        obj.offset.remove(0);
-      }
-    }
-    return arg;
-  }
 }

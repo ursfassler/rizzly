@@ -15,22 +15,28 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.expression.reference;
+package ast.data.expression.value;
+
+import java.util.Collection;
 
 import ast.ElementInfo;
+import ast.data.AstList;
 import ast.data.expression.Expression;
+import ast.data.type.TypeRef;
 
-public class RefIndex extends RefItem {
-  public Expression index;
+public class RecordValue extends Expression {
+  final public AstList<NamedValue> value = new AstList<NamedValue>();
+  public TypeRef type;
 
-  public RefIndex(ElementInfo info, Expression index) {
+  public RecordValue(ElementInfo info, Collection<NamedValue> value, TypeRef type) {
     super(info);
-    this.index = index;
+    this.value.addAll(value);
+    this.type = type;
   }
 
   @Override
   public String toString() {
-    return "[" + index + "]";
+    return value + ": " + type;
   }
 
 }

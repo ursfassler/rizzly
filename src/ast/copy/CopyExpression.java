@@ -20,19 +20,9 @@ package ast.copy;
 import java.util.ArrayList;
 
 import ast.data.Ast;
-import ast.data.expression.AnyValue;
-import ast.data.expression.ArrayValue;
-import ast.data.expression.BoolValue;
 import ast.data.expression.Expression;
-import ast.data.expression.NamedElementsValue;
-import ast.data.expression.NamedValue;
-import ast.data.expression.Number;
-import ast.data.expression.RecordValue;
-import ast.data.expression.StringValue;
-import ast.data.expression.TupleValue;
+import ast.data.expression.RefExp;
 import ast.data.expression.TypeCast;
-import ast.data.expression.UnionValue;
-import ast.data.expression.UnsafeUnionValue;
 import ast.data.expression.binop.And;
 import ast.data.expression.binop.BitAnd;
 import ast.data.expression.binop.BitOr;
@@ -54,12 +44,21 @@ import ast.data.expression.binop.Or;
 import ast.data.expression.binop.Plus;
 import ast.data.expression.binop.Shl;
 import ast.data.expression.binop.Shr;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.SimpleRef;
 import ast.data.expression.unop.BitNot;
 import ast.data.expression.unop.LogicNot;
 import ast.data.expression.unop.Not;
 import ast.data.expression.unop.Uminus;
+import ast.data.expression.value.AnyValue;
+import ast.data.expression.value.ArrayValue;
+import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.NamedElementsValue;
+import ast.data.expression.value.NamedValue;
+import ast.data.expression.value.NumberValue;
+import ast.data.expression.value.RecordValue;
+import ast.data.expression.value.StringValue;
+import ast.data.expression.value.TupleValue;
+import ast.data.expression.value.UnionValue;
+import ast.data.expression.value.UnsafeUnionValue;
 import ast.traverser.NullTraverser;
 
 public class CopyExpression extends NullTraverser<Expression, Void> {
@@ -77,18 +76,13 @@ public class CopyExpression extends NullTraverser<Expression, Void> {
   }
 
   @Override
-  protected Expression visitSimpleRef(SimpleRef obj, Void param) {
-    return new SimpleRef(obj.getInfo(), obj.link); // we keep link to old type
+  protected Expression visitRefExpr(RefExp obj, Void param) {
+    return new RefExp(obj.getInfo(), cast.copy(obj.ref));
   }
 
   @Override
   protected Expression visitTypeCast(TypeCast obj, Void param) {
     return new TypeCast(obj.getInfo(), cast.copy(obj.cast), cast.copy(obj.value));
-  }
-
-  @Override
-  protected Expression visitReference(Reference obj, Void param) {
-    return new Reference(obj.getInfo(), obj.link, cast.copy(obj.offset));
   }
 
   @Override
@@ -102,8 +96,8 @@ public class CopyExpression extends NullTraverser<Expression, Void> {
   }
 
   @Override
-  protected Expression visitNumber(Number obj, Void param) {
-    return new Number(obj.getInfo(), obj.value);
+  protected Expression visitNumber(NumberValue obj, Void param) {
+    return new NumberValue(obj.getInfo(), obj.value);
   }
 
   @Override

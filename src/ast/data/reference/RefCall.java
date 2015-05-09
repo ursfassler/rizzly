@@ -15,14 +15,23 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.expression.reference;
+package ast.data.reference;
 
 import ast.ElementInfo;
-import ast.data.Named;
+import ast.data.expression.value.TupleValue;
 
-public class DummyLinkTarget extends Named {
-  public DummyLinkTarget(ElementInfo info, String name) {
-    super(info, name);
+public class RefCall extends RefItem {
+  final public TupleValue actualParameter;
+
+  public RefCall(ElementInfo info, TupleValue actualParameter) {
+    super(info);
+    assert (actualParameter != null);
+    this.actualParameter = actualParameter;
+  }
+
+  @Override
+  public String toString() {
+    return actualParameter.toString();
   }
 
 }

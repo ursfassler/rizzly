@@ -23,12 +23,12 @@ import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.data.Ast;
 import ast.data.AstList;
-import ast.data.expression.AnyValue;
-import ast.data.expression.BoolValue;
 import ast.data.expression.Expression;
-import ast.data.expression.TupleValue;
-import ast.data.expression.reference.Reference;
+import ast.data.expression.value.AnyValue;
+import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.TupleValue;
 import ast.data.function.header.FuncFunction;
+import ast.data.reference.Reference;
 import ast.data.statement.AssignmentMulti;
 import ast.data.statement.Block;
 import ast.data.statement.IfOption;
@@ -124,7 +124,7 @@ public class StmtExecutor extends NullTraverser<Expression, Memory> {
     for (Variable var : obj.variable) {
       param.createVar(var);
       if (value instanceof AnyValue) {
-        Type type = (Type) ((Reference) var.type).link;
+        Type type = (Type) var.type.ref.getTarget();
         Expression empty = kb.getEntry(KnowEmptyValue.class).get(type);
         param.set(var, Copy.copy(empty));
       } else {

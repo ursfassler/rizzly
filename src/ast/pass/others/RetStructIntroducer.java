@@ -25,19 +25,19 @@ import java.util.Map;
 import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.Namespace;
-import ast.data.expression.Expression;
-import ast.data.expression.reference.RefName;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.SimpleRef;
+import ast.data.expression.RefExp;
 import ast.data.function.Function;
 import ast.data.function.ret.FuncReturnTuple;
 import ast.data.function.ret.FuncReturnType;
+import ast.data.reference.RefFactory;
+import ast.data.reference.RefName;
+import ast.data.reference.Reference;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.ReturnExpr;
 import ast.data.statement.ReturnVoid;
 import ast.data.statement.Statement;
 import ast.data.statement.VarDefStmt;
-import ast.data.type.Type;
+import ast.data.type.TypeRefFactory;
 import ast.data.type.composed.NamedElement;
 import ast.data.type.composed.RecordType;
 import ast.data.variable.FuncVariable;
@@ -47,7 +47,7 @@ import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.manipulator.TypeRepo;
 import ast.traverser.DefTraverser;
-import ast.traverser.other.ExprReplacer;
+import ast.traverser.other.RefReplacer;
 import ast.traverser.other.StmtReplacer;
 
 /**
@@ -91,8 +91,8 @@ class RetStructIntroducerWorker extends DefTraverser<Void, Void> {
     Map<FuncVariable, NamedElement> varMap = new HashMap<FuncVariable, NamedElement>();
     RecordType type = makeRecord(((FuncReturnTuple) func.ret), varMap);
 
-    FuncVariable retVar = new FuncVariable(func.ret.getInfo(), kun.get("ret"), new SimpleRef<Type>(func.ret.getInfo(), type));
-    func.ret = new FuncReturnType(func.ret.getInfo(), new SimpleRef<Type>(info, type));
+    FuncVariable retVar = new FuncVariable(func.ret.getInfo(), kun.get("ret"), TypeRefFactory.create(func.ret.getInfo(), type));
+    func.ret = new FuncReturnType(func.ret.getInfo(), TypeRefFactory.create(info, type));
     func.body.statements.add(0, new VarDefStmt(info, retVar));
 
     VarReplacer varRepl = new VarReplacer(retVar, varMap);
@@ -126,7 +126,7 @@ class RetStructIntroducerWorker extends DefTraverser<Void, Void> {
  *
  * @author urs
  */
-class VarReplacer extends ExprReplacer<Void> {
+class VarReplacer extends RefReplacer<Void> {
   final private FuncVariable retVar;
   final private Map<FuncVariable, NamedElement> varMap;
 
@@ -137,18 +137,7 @@ class VarReplacer extends ExprReplacer<Void> {
   }
 
   @Override
-  protected Expression visitSimpleRef(SimpleRef obj, Void param) {
-    super.visitSimpleRef(obj, param);
-    NamedElement elem = varMap.get(obj.link);
-    if (elem == null) {
-      return obj;
-    } else {
-      return new Reference(obj.getInfo(), retVar, new RefName(obj.getInfo(), elem.name));
-    }
-  }
-
-  @Override
-  protected Expression visitReference(Reference obj, Void param) {
+  protected Reference visitReference(Reference obj, Void param) {
     super.visitReference(obj, param);
     NamedElement elem = varMap.get(obj.link);
     if (elem != null) {
@@ -176,14 +165,18 @@ class RetReplacer extends StmtReplacer<Void> {
   @Override
   protected List<Statement> visitReturnExpr(ReturnExpr obj, Void param) {
     List<Statement> ret = new ArrayList<Statement>();
-    ret.add(new AssignmentSingle(obj.expr.getInfo(), new Reference(obj.getInfo(), retVar), obj.expr));
-    ret.add(new ReturnExpr(obj.getInfo(), new SimpleRef<FuncVariable>(obj.getInfo(), retVar)));
+    ret.add(new AssignmentSingle(obj.expr.getInfo(), RefFactory.full(obj.getInfo(), retVar), obj.expr));
+    ret.add(makeRet(obj.getInfo()));
     return ret;
   }
 
   @Override
   protected List<Statement> visitReturnVoid(ReturnVoid obj, Void param) {
-    return list(new ReturnExpr(obj.getInfo(), new SimpleRef<FuncVariable>(obj.getInfo(), retVar)));
+    return list(makeRet(obj.getInfo()));
+  }
+
+  private ReturnExpr makeRet(ElementInfo info) {
+    return new ReturnExpr(info, new RefExp(info, RefFactory.create(info, retVar)));
   }
 
 }

@@ -22,7 +22,7 @@ import java.util.List;
 
 import ast.data.Ast;
 import ast.data.Range;
-import ast.data.expression.Number;
+import ast.data.expression.value.NumberValue;
 import ast.data.template.ActualTemplateArgument;
 import ast.data.type.Type;
 import ast.data.type.template.ArrayTemplate;
@@ -46,28 +46,28 @@ public class TypeTemplateSpecializer extends NullTraverser<Type, List<ActualTemp
   }
 
   @Override
-  protected ast.data.type.Type visitDefault(Ast obj, List<ActualTemplateArgument> param) {
+  protected Type visitDefault(Ast obj, List<ActualTemplateArgument> param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
   @Override
   protected ast.data.type.Type visitRangeTemplate(RangeTemplate obj, List<ActualTemplateArgument> param) {
     assert (param.size() == 2);
-    assert (param.get(0) instanceof Number);
-    assert (param.get(1) instanceof Number);
+    assert (param.get(0) instanceof NumberValue);
+    assert (param.get(1) instanceof NumberValue);
 
-    Number low = (Number) param.get(0);
-    Number high = (Number) param.get(1);
+    NumberValue low = (NumberValue) param.get(0);
+    NumberValue high = (NumberValue) param.get(1);
     return kbi.getRangeType(new Range(low.value, high.value));
   }
 
   @Override
   protected ast.data.type.Type visitArrayTemplate(ArrayTemplate obj, List<ActualTemplateArgument> param) {
     assert (param.size() == 2);
-    assert (param.get(0) instanceof Number);
+    assert (param.get(0) instanceof NumberValue);
     assert (param.get(1) instanceof Type);
 
-    Number size = (Number) param.get(0);
+    NumberValue size = (NumberValue) param.get(0);
     Type type = (Type) param.get(1);
     BigInteger count = size.value;
     return kbi.getArray(count, type);

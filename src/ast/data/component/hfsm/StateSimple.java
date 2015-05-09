@@ -18,12 +18,11 @@
 package ast.data.component.hfsm;
 
 import ast.ElementInfo;
-import ast.data.expression.reference.SimpleRef;
-import ast.data.function.header.FuncProcedure;
+import ast.data.function.FuncRef;
 
 public class StateSimple extends State {
 
-  public StateSimple(ElementInfo info, String name, SimpleRef<FuncProcedure> entryFunc, SimpleRef<FuncProcedure> exitFunc) {
+  public StateSimple(ElementInfo info, String name, FuncRef entryFunc, FuncRef exitFunc) {
     super(info, name, entryFunc, exitFunc);
   }
 

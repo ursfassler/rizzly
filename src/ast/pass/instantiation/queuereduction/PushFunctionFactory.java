@@ -23,16 +23,19 @@ import ast.Designator;
 import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.data.AstList;
-import ast.data.expression.Number;
+import ast.data.Named;
+import ast.data.expression.RefExp;
 import ast.data.expression.binop.Less;
 import ast.data.expression.binop.Mod;
 import ast.data.expression.binop.Plus;
-import ast.data.expression.reference.RefIndex;
-import ast.data.expression.reference.RefName;
-import ast.data.expression.reference.Reference;
+import ast.data.expression.value.NumberValue;
 import ast.data.function.Function;
 import ast.data.function.header.FuncProcedure;
 import ast.data.function.ret.FuncReturnNone;
+import ast.data.reference.RefIndex;
+import ast.data.reference.RefItem;
+import ast.data.reference.RefName;
+import ast.data.reference.Reference;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.IfOption;
@@ -66,25 +69,25 @@ class PushFunctionFactory {
 
     FuncVariable idx = new FuncVariable(info, "wridx", Copy.copy(queueVariables.getHead().type));
     pushbody.statements.add(new VarDefStmt(info, idx));
-    pushbody.statements.add(new AssignmentSingle(info, new Reference(info, idx), new Mod(info, new Plus(info, new Reference(info, queueVariables.getHead()), new Reference(info, queueVariables.getCount())), new Number(info, BigInteger.valueOf(queueTypes.queueLength())))));
+    pushbody.statements.add(new AssignmentSingle(info, ref(idx), new Mod(info, new Plus(info, refexpr(queueVariables.getHead()), refexpr(queueVariables.getCount())), new NumberValue(info, BigInteger.valueOf(queueTypes.queueLength())))));
 
-    Reference qir = new Reference(info, queueVariables.getQueue());
-    qir.offset.add(new RefIndex(info, new Reference(info, idx)));
+    Reference qir = ref(queueVariables.getQueue());
+    qir.offset.add(new RefIndex(info, refexpr(idx)));
     qir.offset.add(new RefName(info, queueTypes.getMessage().tag.name));
-    pushbody.statements.add(new AssignmentSingle(info, qir, new Reference(info, enumElement)));
+    pushbody.statements.add(new AssignmentSingle(info, qir, refexpr(enumElement)));
 
     for (FuncVariable arg : param) {
-      Reference elem = new Reference(info, queueVariables.getQueue());
-      elem.offset.add(new RefIndex(info, new Reference(info, idx)));
+      Reference elem = ref(queueVariables.getQueue());
+      elem.offset.add(new RefIndex(info, refexpr(idx)));
       elem.offset.add(new RefName(info, namedElement.name));
       elem.offset.add(new RefName(info, arg.name));
 
-      pushbody.statements.add(new AssignmentSingle(info, elem, new Reference(info, arg)));
+      pushbody.statements.add(new AssignmentSingle(info, elem, refexpr(arg)));
     }
 
-    pushbody.statements.add(new AssignmentSingle(info, new Reference(info, queueVariables.getCount()), new Plus(info, new Reference(info, queueVariables.getCount()), new Number(info, BigInteger.ONE))));
+    pushbody.statements.add(new AssignmentSingle(info, ref(queueVariables.getCount()), new Plus(info, refexpr(queueVariables.getCount()), new NumberValue(info, BigInteger.ONE))));
 
-    IfOption ifok = new IfOption(info, new Less(info, new Reference(info, queueVariables.getCount()), new Number(info, BigInteger.valueOf(queueTypes.queueLength()))), pushbody);
+    IfOption ifok = new IfOption(info, new Less(info, refexpr(queueVariables.getCount()), new NumberValue(info, BigInteger.valueOf(queueTypes.queueLength()))), pushbody);
     option.add(ifok);
 
     Block body = new Block(info);
@@ -94,4 +97,11 @@ class PushFunctionFactory {
     return body;
   }
 
+  private static RefExp refexpr(Named idx) {
+    return new RefExp(ElementInfo.NO, ref(idx));
+  }
+
+  private static Reference ref(Named idx) {
+    return new Reference(ElementInfo.NO, idx, new AstList<RefItem>());
+  }
 }

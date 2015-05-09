@@ -24,8 +24,7 @@ import ast.Designator;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
-import ast.data.expression.Number;
-import ast.data.expression.reference.SimpleRef;
+import ast.data.expression.value.NumberValue;
 import ast.data.function.Function;
 import ast.data.function.header.FuncQuery;
 import ast.data.function.header.FuncResponse;
@@ -35,6 +34,8 @@ import ast.data.function.header.FuncSubHandlerEvent;
 import ast.data.function.header.FuncSubHandlerQuery;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FuncReturnType;
+import ast.data.reference.Reference;
+import ast.data.type.TypeRef;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumElement;
@@ -153,14 +154,21 @@ public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitNumber(Number obj, StreamWriter param) {
+  protected Void visitNumber(NumberValue obj, StreamWriter param) {
     param.wr(obj.value.toString());
     return null;
   }
 
   @Override
-  protected Void visitSimpleRef(SimpleRef obj, StreamWriter param) {
+  protected Void visitReference(Reference obj, StreamWriter param) {
+    assert (obj.offset.isEmpty());
     param.wr(obj.link.name);
+    return null;
+  }
+
+  @Override
+  protected Void visitTypeRef(TypeRef obj, StreamWriter param) {
+    visit(obj.ref, param);
     return null;
   }
 

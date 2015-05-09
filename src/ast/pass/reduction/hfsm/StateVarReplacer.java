@@ -25,13 +25,16 @@ import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.component.hfsm.ImplHfsm;
 import ast.data.component.hfsm.State;
+import ast.data.component.hfsm.StateRefFactory;
 import ast.data.component.hfsm.Transition;
-import ast.data.expression.reference.RefName;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.SimpleRef;
+import ast.data.expression.RefExp;
 import ast.data.function.header.FuncFunction;
 import ast.data.function.header.FuncProcedure;
+import ast.data.reference.RefFactory;
+import ast.data.reference.RefName;
+import ast.data.reference.Reference;
 import ast.data.type.Type;
+import ast.data.type.TypeRefFactory;
 import ast.data.type.composed.NamedElement;
 import ast.data.variable.Constant;
 import ast.data.variable.StateVariable;
@@ -69,12 +72,12 @@ public class StateVarReplacer extends AstPass {
     NamedElement elem = stb.traverse(obj.topstate, new AstList<NamedElement>());
     Type stateType = kt.get(elem.typeref);
 
-    obj.topstate.initial = new SimpleRef<State>(ElementInfo.NO, InitStateGetter.get(obj.topstate));
+    obj.topstate.initial = StateRefFactory.create(ElementInfo.NO, InitStateGetter.get(obj.topstate));
 
     Constant def = stb.getInitVar().get(stateType);
 
     // TODO set correct values when switching states
-    StateVariable var = new StateVariable(ElementInfo.NO, "data", new SimpleRef<Type>(ElementInfo.NO, stateType), new Reference(ElementInfo.NO, def));
+    StateVariable var = new StateVariable(ElementInfo.NO, "data", TypeRefFactory.create(ElementInfo.NO, stateType), new RefExp(ElementInfo.NO, RefFactory.full(ElementInfo.NO, def)));
     obj.topstate.item.add(var);
 
     Map<StateVariable, AstList<NamedElement>> epath = new HashMap<StateVariable, AstList<NamedElement>>(stb.getEpath());

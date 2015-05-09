@@ -22,8 +22,7 @@ import ast.data.AstList;
 import ast.data.component.Component;
 import ast.data.component.composition.CompUse;
 import ast.data.component.composition.SubCallbacks;
-import ast.data.expression.reference.SimpleRef;
-import ast.data.function.header.FuncProcedure;
+import ast.data.function.FuncRef;
 import ast.data.type.Type;
 import ast.data.variable.Constant;
 import ast.data.variable.Variable;
@@ -34,10 +33,10 @@ final public class ImplElementary extends Component {
   final public AstList<Constant> constant = new AstList<Constant>();
   final public AstList<CompUse> component = new AstList<CompUse>();
   final public AstList<SubCallbacks> subCallback = new AstList<SubCallbacks>();
-  final public SimpleRef<FuncProcedure> entryFunc;
-  final public SimpleRef<FuncProcedure> exitFunc;
+  public FuncRef entryFunc;
+  public FuncRef exitFunc;
 
-  public ImplElementary(ElementInfo info, String name, SimpleRef<FuncProcedure> entryFunc, SimpleRef<FuncProcedure> exitFunc) {
+  public ImplElementary(ElementInfo info, String name, FuncRef entryFunc, FuncRef exitFunc) {
     super(info, name);
     this.entryFunc = entryFunc;
     this.exitFunc = exitFunc;
@@ -46,7 +45,7 @@ final public class ImplElementary extends Component {
   @Deprecated
   public SubCallbacks getSubCallback(CompUse use) {
     for (SubCallbacks itr : subCallback) {
-      if (itr.compUse.link == use) {
+      if (itr.compUse.getTarget() == use) {
         return itr;
       }
     }

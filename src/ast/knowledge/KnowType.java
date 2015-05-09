@@ -27,20 +27,14 @@ import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Range;
+import ast.data.component.CompRef;
 import ast.data.component.Component;
 import ast.data.component.composition.CompUse;
 import ast.data.component.composition.Direction;
-import ast.data.expression.AnyValue;
-import ast.data.expression.ArrayValue;
-import ast.data.expression.BoolValue;
+import ast.data.component.hfsm.StateRef;
 import ast.data.expression.Expression;
-import ast.data.expression.Number;
-import ast.data.expression.RecordValue;
-import ast.data.expression.StringValue;
-import ast.data.expression.TupleValue;
+import ast.data.expression.RefExp;
 import ast.data.expression.TypeCast;
-import ast.data.expression.UnionValue;
-import ast.data.expression.UnsafeUnionValue;
 import ast.data.expression.binop.And;
 import ast.data.expression.binop.BitAnd;
 import ast.data.expression.binop.BitOr;
@@ -56,19 +50,29 @@ import ast.data.expression.binop.Plus;
 import ast.data.expression.binop.Relation;
 import ast.data.expression.binop.Shl;
 import ast.data.expression.binop.Shr;
-import ast.data.expression.reference.RefItem;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.SimpleRef;
-import ast.data.expression.reference.TypeRef;
 import ast.data.expression.unop.BitNot;
 import ast.data.expression.unop.LogicNot;
 import ast.data.expression.unop.Uminus;
+import ast.data.expression.value.AnyValue;
+import ast.data.expression.value.ArrayValue;
+import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.NumberValue;
+import ast.data.expression.value.RecordValue;
+import ast.data.expression.value.StringValue;
+import ast.data.expression.value.TupleValue;
+import ast.data.expression.value.UnionValue;
+import ast.data.expression.value.UnsafeUnionValue;
+import ast.data.function.FuncRef;
 import ast.data.function.Function;
 import ast.data.function.InterfaceFunction;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FuncReturnTuple;
 import ast.data.function.ret.FuncReturnType;
+import ast.data.reference.RefItem;
+import ast.data.reference.Reference;
 import ast.data.type.Type;
+import ast.data.type.TypeRef;
+import ast.data.type.TypeRefFactory;
 import ast.data.type.base.ArrayTypeFactory;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumElement;
@@ -143,6 +147,26 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
   }
 
   @Override
+  protected Type visitTypeRef(TypeRef obj, Void param) {
+    return visit(obj.ref, param);
+  }
+
+  @Override
+  protected Type visitStateRef(StateRef obj, Void param) {
+    return visit(obj.ref, param);
+  }
+
+  @Override
+  protected Type visitCompRef(CompRef obj, Void param) {
+    return visit(obj.ref, param);
+  }
+
+  @Override
+  protected Type visitFuncRef(FuncRef obj, Void param) {
+    return visit(obj.ref, param);
+  }
+
+  @Override
   protected Type visitNamedElement(NamedElement obj, Void param) {
     return visit(obj.typeref, param);
   }
@@ -156,9 +180,9 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
   protected Type visitFunction(Function obj, Void param) {
     AstList<TypeRef> arg = new AstList<TypeRef>();
     for (FuncVariable var : obj.param) {
-      arg.add(new SimpleRef<Type>(ElementInfo.NO, visit(var.type, null)));
+      arg.add(TypeRefFactory.create(ElementInfo.NO, visit(var.type, null)));
     }
-    return new FunctionType(obj.getInfo(), obj.name, arg, new SimpleRef<Type>(ElementInfo.NO, visit(obj.ret, param)));
+    return new FunctionType(obj.getInfo(), obj.name, arg, TypeRefFactory.create(ElementInfo.NO, visit(obj.ret, param)));
   }
 
   @Override
@@ -171,7 +195,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
 
   private void makeFuncTypes(AstList<NamedElement> flist, AstList<InterfaceFunction> astList) {
     for (InterfaceFunction itr : astList) {
-      NamedElement ne = new NamedElement(itr.getInfo(), itr.name, new SimpleRef<Type>(itr.getInfo(), visit(itr, null)));
+      NamedElement ne = new NamedElement(itr.getInfo(), itr.name, TypeRefFactory.create(itr.getInfo(), visit(itr, null)));
       flist.add(ne);
     }
   }
@@ -187,7 +211,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
   }
 
   @Override
-  protected Type visitNumber(Number obj, Void param) {
+  protected Type visitNumber(NumberValue obj, Void param) {
     return kbi.getRangeType(new Range(obj.value, obj.value));
   }
 
@@ -208,7 +232,7 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
     } else {
       AstList<TypeRef> elem = new AstList<TypeRef>();
       for (Expression expr : obj.value) {
-        TypeRef ref = new SimpleRef<Type>(expr.getInfo(), visit(expr, null));
+        TypeRef ref = TypeRefFactory.create(expr.getInfo(), visit(expr, null));
         elem.add(ref);
       }
       return new TupleType(obj.getInfo(), "", elem);
@@ -228,6 +252,11 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
   }
 
   @Override
+  protected Type visitRefExpr(RefExp obj, Void param) {
+    return visit(obj.ref, param);
+  }
+
+  @Override
   protected Type visitReference(Reference obj, Void param) {
     Type base = visit(obj.link, param);
     for (RefItem itm : obj.offset) {
@@ -239,11 +268,6 @@ class KnowTypeTraverser extends NullTraverser<Type, Void> {
   @Override
   protected Type visitVariable(Variable obj, Void param) {
     return visit(obj.type, param);
-  }
-
-  @Override
-  protected Type visitSimpleRef(SimpleRef obj, Void param) {
-    return visit(obj.link, param);
   }
 
   @Override

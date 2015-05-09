@@ -30,6 +30,7 @@ import error.RError;
 /**
  * Tries to remove all templates. Detects missed ones.
  */
+@Deprecated
 public class TemplDel extends DefTraverser<Void, Void> {
   static private final TemplDel INSTANCE = new TemplDel();
 

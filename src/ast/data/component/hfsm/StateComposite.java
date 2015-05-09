@@ -18,14 +18,12 @@
 package ast.data.component.hfsm;
 
 import ast.ElementInfo;
-import ast.data.expression.reference.SimpleRef;
-import ast.data.expression.reference.StateRef;
-import ast.data.function.header.FuncProcedure;
+import ast.data.function.FuncRef;
 
 public class StateComposite extends State {
   public StateRef initial;
 
-  public StateComposite(ElementInfo info, String name, SimpleRef<FuncProcedure> entryFunc, SimpleRef<FuncProcedure> exitFunc, StateRef initial) {
+  public StateComposite(ElementInfo info, String name, FuncRef entryFunc, FuncRef exitFunc, StateRef initial) {
     super(info, name, entryFunc, exitFunc);
     this.initial = initial;
   }

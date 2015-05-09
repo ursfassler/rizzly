@@ -15,17 +15,16 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.expression;
+package ast.data.type;
 
 import ast.ElementInfo;
-import ast.data.AstList;
+import ast.data.reference.Reference;
+import ast.data.reference.TypedRef;
 
-public class ArrayValue extends Expression {
-  final public AstList<Expression> value;
+public class TypeRef extends TypedRef<Type> {
 
-  public ArrayValue(ElementInfo info, AstList<Expression> value) {
-    super(info);
-    this.value = value;
+  public TypeRef(ElementInfo info, Reference ref) {
+    super(info, ref);
   }
 
 }

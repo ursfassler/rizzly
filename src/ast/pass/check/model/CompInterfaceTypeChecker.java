@@ -156,7 +156,7 @@ class CompInterfaceTypeCheckerWorker extends NullTraverser<Void, Void> {
   }
 
   private Component checkIface(ImplComposition obj, CompUse use, Direction dir) {
-    Component type = (Component) use.compRef.getTarget();
+    Component type = use.compRef.getTarget();
     for (InterfaceFunction ifaceuse : type.getIface(dir)) {
       if (!ifaceIsConnected(use, ifaceuse, dir.other(), obj.connection)) {
         ErrorType etype;
@@ -176,7 +176,7 @@ class CompInterfaceTypeCheckerWorker extends NullTraverser<Void, Void> {
     for (Connection itr : connection) {
       if (itr.endpoint.get(dir) instanceof EndpointSub) {
         EndpointSub ep = (EndpointSub) itr.endpoint.get(dir);
-        if ((ep.component.link == use) && (ep.getFunc() == ifaceuse)) {
+        if ((ep.component.getTarget() == use) && (ep.getFunc() == ifaceuse)) {
           return true;
         }
       }

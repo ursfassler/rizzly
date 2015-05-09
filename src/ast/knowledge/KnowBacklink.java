@@ -23,28 +23,27 @@ import java.util.Map;
 import java.util.Set;
 
 import ast.data.Ast;
-import ast.data.Named;
-import ast.data.expression.reference.BaseRef;
+import ast.data.reference.Reference;
 import ast.traverser.DefTraverser;
 import error.ErrorType;
 import error.RError;
 
 public class KnowBacklink extends KnowledgeEntry {
   private KnowledgeBase kb;
-  final private Map<Ast, Set<BaseRef<Named>>> cache = new HashMap<Ast, Set<BaseRef<Named>>>();
+  final private Map<Ast, Set<Reference>> cache = new HashMap<Ast, Set<Reference>>();
 
   @Override
   public void init(KnowledgeBase base) {
     kb = base;
   }
 
-  public Set<BaseRef<Named>> get(Ast target) {
-    Set<BaseRef<Named>> set = cache.get(target);
+  public Set<Reference> get(Ast target) {
+    Set<Reference> set = cache.get(target);
     if (set == null) {
       cache.clear();
       BacklinkTraverser traverser = new BacklinkTraverser();
       traverser.traverse(kb.getRoot(), cache);
-      set = new HashSet<BaseRef<Named>>();
+      set = new HashSet<Reference>();
       if (set == null) {
         RError.err(ErrorType.Fatal, target.getInfo(), "Object not reachable:" + target);
       }
@@ -54,25 +53,25 @@ public class KnowBacklink extends KnowledgeEntry {
 
 }
 
-class BacklinkTraverser extends DefTraverser<Void, Map<Ast, Set<BaseRef<Named>>>> {
+class BacklinkTraverser extends DefTraverser<Void, Map<Ast, Set<Reference>>> {
 
   @Override
-  protected Void visit(Ast obj, Map<Ast, Set<BaseRef<Named>>> param) {
+  protected Void visit(Ast obj, Map<Ast, Set<Reference>> param) {
     if (!param.containsKey(obj)) {
-      param.put(obj, new HashSet<BaseRef<Named>>());
+      param.put(obj, new HashSet<Reference>());
     }
     return super.visit(obj, param);
   }
 
   @Override
-  protected Void visitBaseRef(BaseRef obj, Map<Ast, Set<BaseRef<Named>>> param) {
-    Set<BaseRef<Named>> set = param.get(obj.link);
+  protected Void visitReference(Reference obj, Map<Ast, Set<Reference>> param) {
+    Set<Reference> set = param.get(obj.link);
     if (set == null) {
-      set = new HashSet<BaseRef<Named>>();
+      set = new HashSet<Reference>();
       param.put(obj.link, set);
     }
     set.add(obj);
-    return super.visitBaseRef(obj, param);
+    return super.visitReference(obj, param);
   }
 
 }

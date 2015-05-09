@@ -21,12 +21,11 @@ import java.util.Collection;
 
 import ast.data.Ast;
 import ast.data.AstList;
-import ast.data.Named;
 import ast.data.Namespace;
-import ast.data.expression.reference.SimpleRef;
 import ast.data.file.RizzlyFile;
 import ast.data.template.Template;
 import ast.data.type.Type;
+import ast.data.type.TypeRefFactory;
 import ast.data.variable.TemplateParameter;
 import ast.interpreter.Memory;
 import ast.knowledge.KnowledgeBase;
@@ -48,9 +47,8 @@ public class TemplateArgEval extends AstPass {
     InstanceRepo ir = new InstanceRepo();
     for (Template tmpl : templates) {
       for (TemplateParameter param : tmpl.getTempl()) {
-        Type type = TypeEvaluator.evaluate(param.type, new Memory(), ir, kb);
-        SimpleRef<Named> typeRef = new SimpleRef<Named>(param.type.getInfo(), type);
-        param.type = typeRef;
+        Type type = TypeEvaluator.evaluate(param.type.ref, new Memory(), ir, kb);
+        param.type = TypeRefFactory.create(param.type.getInfo(), type);
       }
     }
   }

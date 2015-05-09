@@ -27,7 +27,7 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
 
 import util.Pair;
 import ast.data.Namespace;
-import ast.data.expression.reference.BaseRef;
+import ast.data.reference.Reference;
 import ast.data.variable.Variable;
 import ast.doc.SimpleGraph;
 import ast.knowledge.KnowledgeBase;
@@ -80,11 +80,11 @@ public class VarSort extends AstPass {
     DefTraverser<Void, Set<Variable>> getter = new DefTraverser<Void, Set<Variable>>() {
 
       @Override
-      protected Void visitBaseRef(BaseRef obj, Set<Variable> param) {
+      protected Void visitReference(Reference obj, Set<Variable> param) {
         if (obj.link instanceof Variable) {
           param.add((Variable) obj.link);
         }
-        return super.visitBaseRef(obj, param);
+        return super.visitReference(obj, param);
       }
     };
     Set<Variable> vs = new HashSet<Variable>();

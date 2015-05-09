@@ -30,19 +30,17 @@ import ast.data.component.composition.CompUse;
 import ast.data.component.composition.ImplComposition;
 import ast.data.component.elementary.ImplElementary;
 import ast.data.expression.Expression;
-import ast.data.expression.Number;
-import ast.data.expression.TupleValue;
+import ast.data.expression.RefExp;
 import ast.data.expression.TypeCast;
 import ast.data.expression.binop.Plus;
-import ast.data.expression.reference.RefCall;
-import ast.data.expression.reference.RefIndex;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.SimpleRef;
-import ast.data.expression.reference.TypeRef;
+import ast.data.expression.value.NumberValue;
 import ast.data.function.header.FuncProcedure;
 import ast.data.function.header.FuncSignal;
 import ast.data.function.header.FuncSubHandlerEvent;
 import ast.data.function.ret.FuncReturnNone;
+import ast.data.reference.RefFactory;
+import ast.data.reference.RefIndex;
+import ast.data.reference.Reference;
 import ast.data.statement.Assignment;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
@@ -50,9 +48,10 @@ import ast.data.statement.CallStmt;
 import ast.data.statement.Statement;
 import ast.data.statement.VarDefStmt;
 import ast.data.type.Type;
+import ast.data.type.TypeRef;
+import ast.data.type.TypeRefFactory;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.RangeType;
-import ast.data.type.special.VoidType;
 import ast.data.variable.FuncVariable;
 import ast.traverser.NullTraverser;
 import ast.traverser.debug.EventRecvDebugCallAdder;
@@ -62,17 +61,15 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
   final private ArrayType arrayType;
   final private RangeType sizeType;
   final private RangeType nameNumType;
-  final private VoidType voidType;
   final private ArrayList<String> names;
   final static private ElementInfo info = ElementInfo.NO;
 
-  public DebugIfaceAdder(ArrayType arrayType, RangeType sizeType, RangeType nameNumType, VoidType voidType, ArrayList<String> names) {
+  public DebugIfaceAdder(ArrayType arrayType, RangeType sizeType, RangeType nameNumType, ArrayList<String> names) {
     super();
     this.names = names;
     this.arrayType = arrayType;
     this.sizeType = sizeType;
     this.nameNumType = nameNumType;
-    this.voidType = voidType;
   }
 
   private FuncSubHandlerEvent makeRecvProto(RangeType sizeType) {
@@ -88,7 +85,7 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
   }
 
   private TypeRef tr(Type type) {
-    return new SimpleRef<Type>(info, type);
+    return TypeRefFactory.create(info, type);
   }
 
   private FuncSubHandlerEvent makeSendProto(RangeType sizeType) {
@@ -115,20 +112,17 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
 
     { // path[0] := func;
 
-      Reference left = new Reference(info, path, new RefIndex(info, new Number(info, BigInteger.ZERO)));
-      Reference right = new Reference(info, func);
-      Assignment ass = new AssignmentSingle(info, left, right);
+      Reference left = RefFactory.create(info, path, new RefIndex(info, new NumberValue(info, BigInteger.ZERO)));
+      Reference right = RefFactory.full(info, func);
+      Assignment ass = new AssignmentSingle(info, left, new RefExp(info, right));
       body.statements.add(ass);
     }
 
     { // _debug.msgSend( path, 1 );
-      TupleValue actParam = new TupleValue(info);
-      actParam.value.add(new Reference(info, path));
-      actParam.value.add(new Number(info, BigInteger.valueOf(1)));
+      RefExp pathArg = new RefExp(info, RefFactory.full(info, path));
+      NumberValue idxArg = new NumberValue(info, BigInteger.valueOf(1));
 
-      Reference call = new Reference(info, sendProto);
-      call.offset.add(new RefCall(info, actParam));
-
+      Reference call = RefFactory.call(info, sendProto, pathArg, idxArg);
       body.statements.add(new CallStmt(info, call));
     }
 
@@ -160,8 +154,8 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
     assert (x >= 0);
 
     { // sender[size] := x;
-      Reference left = new Reference(info, pArray, new RefIndex(info, new Reference(info, argSize)));
-      Number right = new Number(info, BigInteger.valueOf(x));
+      Reference left = RefFactory.create(info, pArray, new RefIndex(info, new RefExp(info, RefFactory.full(info, argSize))));
+      NumberValue right = new NumberValue(info, BigInteger.valueOf(x));
       Assignment ass = new AssignmentSingle(info, left, right);
       code.add(ass);
     }
@@ -172,20 +166,17 @@ public class DebugIfaceAdder extends NullTraverser<Void, Void> {
       VarDefStmt def = new VarDefStmt(info, sizeP1);
       code.add(def);
 
-      Expression expr = new Plus(info, new Reference(info, argSize), new Number(info, BigInteger.ONE));
-      expr = new TypeCast(info, new SimpleRef<Type>(info, sizeType), expr);
-      Assignment ass = new AssignmentSingle(info, new Reference(info, sizeP1), expr);
+      Expression expr = new Plus(info, new RefExp(info, RefFactory.full(info, argSize)), new NumberValue(info, BigInteger.ONE));
+      expr = new TypeCast(info, TypeRefFactory.create(info, sizeType), expr);
+      Assignment ass = new AssignmentSingle(info, RefFactory.full(info, sizeP1), expr);
       code.add(ass);
     }
 
     { // Self._debug.sendMsg( sender, sizeP1 );
-      TupleValue actParam = new TupleValue(info);
-      actParam.value.add(new Reference(info, pArray));
-      actParam.value.add(new Reference(info, sizeP1));
+      RefExp arrayArg = new RefExp(info, RefFactory.full(info, pArray));
+      RefExp sizeArg = new RefExp(info, RefFactory.full(info, sizeP1));
 
-      Reference call = new Reference(info, proto);
-      call.offset.add(new RefCall(info, actParam));
-
+      Reference call = RefFactory.call(info, proto, arrayArg, sizeArg);
       code.add(new CallStmt(info, call));
     }
 

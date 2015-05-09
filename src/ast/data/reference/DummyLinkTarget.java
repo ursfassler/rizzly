@@ -15,21 +15,14 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.expression;
+package ast.data.reference;
 
 import ast.ElementInfo;
-import ast.data.expression.reference.SimpleRef;
-import ast.data.type.Type;
+import ast.data.Named;
 
-public class UnionValue extends Expression {
-  public NamedValue tagValue;
-  public NamedValue contentValue;
-  public SimpleRef<Type> type;
-
-  public UnionValue(ElementInfo info, NamedValue tagValue, NamedValue contentValue, SimpleRef<Type> type) {
-    super(info);
-    this.tagValue = tagValue;
-    this.contentValue = contentValue;
-    this.type = type;
+public class DummyLinkTarget extends Named {
+  public DummyLinkTarget(ElementInfo info, String name) {
+    super(info, name);
   }
+
 }

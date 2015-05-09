@@ -15,26 +15,13 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.expression;
+package ast.data.component;
 
 import ast.ElementInfo;
+import ast.data.reference.RefFactory;
 
-/**
- *
- * @author urs
- */
-public class StringValue extends Expression {
-
-  final public String value;
-
-  public StringValue(ElementInfo info, String value) {
-    super(info);
-    this.value = value;
+public class CompRefFactory {
+  public static CompRef create(ElementInfo info, Component comp) {
+    return new CompRef(info, RefFactory.create(info, comp));
   }
-
-  @Override
-  public String toString() {
-    return "'" + value + "'";
-  }
-
 }

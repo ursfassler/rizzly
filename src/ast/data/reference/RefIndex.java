@@ -15,23 +15,22 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.expression.reference;
+package ast.data.reference;
 
 import ast.ElementInfo;
-import ast.data.expression.TupleValue;
+import ast.data.expression.Expression;
 
-public class RefCall extends RefItem {
-  final public TupleValue actualParameter;
+public class RefIndex extends RefItem {
+  public Expression index;
 
-  public RefCall(ElementInfo info, TupleValue actualParameter) {
+  public RefIndex(ElementInfo info, Expression index) {
     super(info);
-    assert (actualParameter != null);
-    this.actualParameter = actualParameter;
+    this.index = index;
   }
 
   @Override
   public String toString() {
-    return actualParameter.toString();
+    return "[" + index + "]";
   }
 
 }

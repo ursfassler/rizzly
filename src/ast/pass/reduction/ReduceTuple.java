@@ -19,7 +19,7 @@ package ast.pass.reduction;
 
 import ast.data.Namespace;
 import ast.data.expression.Expression;
-import ast.data.expression.TupleValue;
+import ast.data.expression.value.TupleValue;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.traverser.other.ExprReplacer;

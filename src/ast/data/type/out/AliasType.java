@@ -18,14 +18,13 @@
 package ast.data.type.out;
 
 import ast.ElementInfo;
-import ast.data.expression.reference.SimpleRef;
-import ast.data.type.Type;
+import ast.data.type.TypeRef;
 import ast.data.type.base.BaseType;
 
 public class AliasType extends BaseType {
-  public SimpleRef<Type> ref;
+  public TypeRef ref;
 
-  public AliasType(ElementInfo info, String name, SimpleRef<Type> ref) {
+  public AliasType(ElementInfo info, String name, TypeRef ref) {
     super(info, name);
     this.ref = ref;
   }

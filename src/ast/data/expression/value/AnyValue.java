@@ -15,24 +15,21 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.expression;
+package ast.data.expression.value;
 
 import ast.ElementInfo;
-import ast.data.AstBase;
+import ast.data.expression.Expression;
 
-public class NamedValue extends AstBase {
-  public final String name;
-  public Expression value;
+public class AnyValue extends Expression {
+  static final public String NAME = "?";
 
-  public NamedValue(ElementInfo info, String name, Expression value) {
+  public AnyValue(ElementInfo info) {
     super(info);
-    this.name = name;
-    this.value = value;
   }
 
   @Override
   public String toString() {
-    return name + ":=" + value;
+    return NAME;
   }
 
 }

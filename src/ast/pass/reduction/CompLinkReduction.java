@@ -20,11 +20,11 @@ package ast.pass.reduction;
 import ast.data.Ast;
 import ast.data.Named;
 import ast.data.Namespace;
-import ast.data.expression.reference.RefTemplCall;
-import ast.data.expression.reference.Reference;
 import ast.data.file.RizzlyFile;
 import ast.data.raw.RawComponent;
 import ast.data.raw.RawComposition;
+import ast.data.reference.RefTemplCall;
+import ast.data.reference.Reference;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.NameFilter;
@@ -70,14 +70,14 @@ class CompLinkReductionWorker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitCompUse(ast.data.component.composition.CompUse obj, Void param) {
-    Reference compRef = (Reference) obj.compRef;
+    Reference compRef = (Reference) obj.compRef.ref;
     Named item = compRef.link;
 
     while (!compRef.offset.isEmpty()) {
       if (compRef.offset.get(0) instanceof RefTemplCall) {
         break;
       }
-      ast.data.expression.reference.RefName rn = (ast.data.expression.reference.RefName) compRef.offset.get(0);
+      ast.data.reference.RefName rn = (ast.data.reference.RefName) compRef.offset.get(0);
       compRef.offset.remove(0);
       if (item instanceof RizzlyFile) {
         item = NameFilter.select(TypeFilter.select(((RizzlyFile) item).objects, RawComponent.class), rn.name);

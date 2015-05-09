@@ -23,11 +23,11 @@ import java.util.Map;
 import java.util.Set;
 
 import ast.data.component.hfsm.State;
+import ast.data.component.hfsm.StateRef;
 import ast.data.component.hfsm.Transition;
-import ast.data.expression.reference.DummyLinkTarget;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.StateRef;
 import ast.data.raw.RawHfsm;
+import ast.data.reference.DummyLinkTarget;
+import ast.data.reference.Reference;
 import ast.repository.query.TypeFilter;
 import error.ErrorType;
 import error.RError;
@@ -65,7 +65,7 @@ public class TransitionStateLinker {
   }
 
   private static void link(StateRef sref, Map<String, State> sym, Set<String> amb) {
-    Reference ref = (Reference) sref;
+    Reference ref = (Reference) sref.ref;
 
     if (ref.link instanceof DummyLinkTarget) {
       String target = ((DummyLinkTarget) ref.link).name;

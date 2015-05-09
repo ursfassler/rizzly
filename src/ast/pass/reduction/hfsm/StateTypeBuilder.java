@@ -29,12 +29,12 @@ import ast.data.Named;
 import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateSimple;
-import ast.data.expression.NamedValue;
-import ast.data.expression.RecordValue;
-import ast.data.expression.UnsafeUnionValue;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.SimpleRef;
-import ast.data.type.Type;
+import ast.data.expression.RefExp;
+import ast.data.expression.value.NamedValue;
+import ast.data.expression.value.RecordValue;
+import ast.data.expression.value.UnsafeUnionValue;
+import ast.data.reference.RefFactory;
+import ast.data.type.TypeRefFactory;
 import ast.data.type.composed.NamedElement;
 import ast.data.type.composed.RecordType;
 import ast.data.type.composed.UnsafeUnionType;
@@ -89,7 +89,7 @@ public class StateTypeBuilder extends NullTraverser<NamedElement, AstList<NamedE
   protected NamedElement visitStateSimple(StateSimple obj, AstList<NamedElement> param) {
     RecordType record = makeRecord(obj);
 
-    NamedElement dataElem = new NamedElement(obj.getInfo(), obj.name, new SimpleRef<Type>(ElementInfo.NO, record));
+    NamedElement dataElem = new NamedElement(obj.getInfo(), obj.name, TypeRefFactory.create(ElementInfo.NO, record));
 
     param = new AstList<NamedElement>(param);
     param.add(dataElem);
@@ -105,7 +105,7 @@ public class StateTypeBuilder extends NullTraverser<NamedElement, AstList<NamedE
 
     obj.item.add(record);
     stateType.put(obj, record);
-    initValues.put(record, new RecordValue(obj.getInfo(), new AstList<NamedValue>(), new SimpleRef<Type>(obj.getInfo(), record)));
+    initValues.put(record, new RecordValue(obj.getInfo(), new AstList<NamedValue>(), TypeRefFactory.create(obj.getInfo(), record)));
 
     return record;
   }
@@ -123,7 +123,7 @@ public class StateTypeBuilder extends NullTraverser<NamedElement, AstList<NamedE
 
     RecordType record = makeRecord(obj);
 
-    NamedElement dataElem = new NamedElement(obj.getInfo(), Designator.NAME_SEP + getName(obj), new SimpleRef<Type>(ElementInfo.NO, record));
+    NamedElement dataElem = new NamedElement(obj.getInfo(), Designator.NAME_SEP + getName(obj), TypeRefFactory.create(ElementInfo.NO, record));
 
     param = new AstList<NamedElement>(param);
     param.add(dataElem);
@@ -133,7 +133,7 @@ public class StateTypeBuilder extends NullTraverser<NamedElement, AstList<NamedE
     // add substates
 
     UnsafeUnionType union = makeUnion(obj);
-    NamedElement subElem = new NamedElement(obj.getInfo(), Designator.NAME_SEP + "sub", new SimpleRef<Type>(ElementInfo.NO, union));
+    NamedElement subElem = new NamedElement(obj.getInfo(), Designator.NAME_SEP + "sub", TypeRefFactory.create(ElementInfo.NO, union));
     record.element.add(subElem);
 
     param.add(subElem);
@@ -154,8 +154,8 @@ public class StateTypeBuilder extends NullTraverser<NamedElement, AstList<NamedE
 
     Constant initvalue = initVar.get(kt.get(initStateElem.typeref));
     assert (initvalue != null);
-    NamedValue cont = new NamedValue(obj.getInfo(), getName((Named) obj.initial.getTarget()), new Reference(obj.getInfo(), initvalue));
-    UnsafeUnionValue uninit = new UnsafeUnionValue(obj.getInfo(), cont, new SimpleRef<Type>(obj.getInfo(), union));
+    NamedValue cont = new NamedValue(obj.getInfo(), getName(obj.initial.getTarget()), new RefExp(obj.getInfo(), RefFactory.full(obj.getInfo(), initvalue)));
+    UnsafeUnionValue uninit = new UnsafeUnionValue(obj.getInfo(), cont, TypeRefFactory.create(obj.getInfo(), union));
 
     RecordValue value = initValues.get(record);
     assert (value != null);
@@ -178,7 +178,7 @@ public class StateTypeBuilder extends NullTraverser<NamedElement, AstList<NamedE
       epath.put(var, path);
     }
 
-    ConstPrivate init = new ConstPrivate(state.getInfo(), CONST_PREFIX + getName(type), new SimpleRef<Type>(state.getInfo(), type), value);
+    ConstPrivate init = new ConstPrivate(state.getInfo(), CONST_PREFIX + getName(type), TypeRefFactory.create(state.getInfo(), type), value);
     initVar.put(type, init);
     state.item.add(init);
   }

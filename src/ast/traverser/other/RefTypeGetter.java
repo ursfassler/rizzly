@@ -17,12 +17,13 @@
 
 package ast.traverser.other;
 
+import java.util.Collection;
+
 import ast.data.Ast;
-import ast.data.expression.reference.RefCall;
-import ast.data.expression.reference.RefIndex;
-import ast.data.expression.reference.RefName;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.SimpleRef;
+import ast.data.reference.RefCall;
+import ast.data.reference.RefIndex;
+import ast.data.reference.RefName;
+import ast.data.reference.Reference;
 import ast.data.type.Type;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.EnumType;
@@ -44,24 +45,23 @@ public class RefTypeGetter extends NullTraverser<Type, Type> {
   }
 
   @Override
+  public Type traverse(Collection<? extends Ast> list, Type param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  public Type traverse(Ast obj, Type param) {
+    return super.traverse(obj, param);
+  }
+
+  @Override
   protected Type visitDefault(Ast obj, Type param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
   @Override
-  protected Type visitSimpleRef(SimpleRef obj, Type param) {
-    return (Type) obj.link;
-  }
-
-  @Override
   protected Type visitReference(Reference obj, Type param) {
-    throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
-    // Type ret = kt.traverse(obj.getLink(), null);
-    // for (RefItem ref : obj.getOffset()) {
-    // ret = visit(ref, ret);
-    // assert (ret != null);
-    // }
-    // return ret;
+    return (Type) obj.getTarget();
   }
 
   @Override
@@ -91,7 +91,7 @@ public class RefTypeGetter extends NullTraverser<Type, Type> {
   @Override
   protected Type visitRefIndex(RefIndex obj, Type sub) {
     if (sub instanceof ArrayType) {
-      return visit(((ArrayType) sub).type, null);
+      return visit(((ArrayType) sub).type.ref, null);
     } else {
       RError.err(ErrorType.Error, obj.getInfo(), "need array to index, got type: " + sub.name);
       return null;

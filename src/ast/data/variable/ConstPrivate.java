@@ -20,7 +20,7 @@ package ast.data.variable;
 import ast.ElementInfo;
 import ast.data.component.hfsm.StateContent;
 import ast.data.expression.Expression;
-import ast.data.expression.reference.TypeRef;
+import ast.data.type.TypeRef;
 
 public class ConstPrivate extends Constant implements StateContent {
   public ConstPrivate(ElementInfo info, String name, TypeRef type, Expression def) {

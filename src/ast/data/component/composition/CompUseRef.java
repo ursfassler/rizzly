@@ -15,35 +15,16 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.expression.reference;
+package ast.data.component.composition;
 
 import ast.ElementInfo;
-import ast.data.AstList;
-import ast.data.template.ActualTemplateArgument;
+import ast.data.reference.Reference;
+import ast.data.reference.TypedRef;
 
-final public class RefTemplCall extends RefItem {
-  final public AstList<ActualTemplateArgument> actualParameter;
+public class CompUseRef extends TypedRef<CompUse> {
 
-  public RefTemplCall(ElementInfo info, AstList<ActualTemplateArgument> expr) {
-    super(info);
-    this.actualParameter = expr;
-  }
-
-  @Override
-  public String toString() {
-    String ret = "";
-    ret += "{";
-    boolean first = true;
-    for (ActualTemplateArgument gen : actualParameter) {
-      if (first) {
-        first = false;
-      } else {
-        ret += ",";
-      }
-      ret += gen.toString();
-    }
-    ret += "}";
-    return ret;
+  public CompUseRef(ElementInfo info, Reference ref) {
+    super(info, ref);
   }
 
 }

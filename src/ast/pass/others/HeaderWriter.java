@@ -33,11 +33,11 @@ import ast.copy.Copy;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
-import ast.data.expression.reference.BaseRef;
-import ast.data.expression.reference.SimpleRef;
 import ast.data.function.Function;
 import ast.data.function.ret.FuncReturn;
+import ast.data.reference.Reference;
 import ast.data.type.Type;
+import ast.data.type.TypeRef;
 import ast.data.type.base.EnumElement;
 import ast.data.type.composed.NamedElement;
 import ast.data.variable.FuncVariable;
@@ -90,7 +90,7 @@ public class HeaderWriter extends AstPass {
     AstList<Function> functions = ast.repository.query.List.select(prg.children, new OrSpec(new PublicFunction(), new ExternalFunction())).castTo(Function.class);
     for (Function func : functions) {
       for (FuncVariable arg : func.param) {
-        anchor.add(((SimpleRef<Type>) arg.type).link);
+        anchor.add(arg.type.ref);
       }
       anchor.add(func.ret);
     }
@@ -99,15 +99,15 @@ public class HeaderWriter extends AstPass {
     Set<Ast> dep = DepCollector.process(anchor);
 
     for (Ast itr : dep) {
-      if (itr instanceof ast.data.type.Type) {
+      if (itr instanceof Type) {
         ret.children.add(itr);
-      } else if (itr instanceof SimpleRef) {
-        // element of record type
       } else if (itr instanceof NamedElement) {
         // element of record type
       } else if (itr instanceof EnumElement) {
         // element of enumerator type
       } else if (itr instanceof FuncReturn) {
+      } else if (itr instanceof TypeRef) {
+      } else if (itr instanceof Reference) {
       } else {
         RError.err(ErrorType.Fatal, itr.getInfo(), "Object should not be used in header file: " + itr.getClass().getCanonicalName());
       }
@@ -146,8 +146,8 @@ public class HeaderWriter extends AstPass {
   private static void toposort(AstList<Ast> list) {
     SimpleGraph<Ast> g = new SimpleGraph<Ast>(list);
     for (Ast u : list) {
-      Set<ast.data.type.Type> vs = getDirectUsedTypes(u);
-      for (ast.data.type.Type v : vs) {
+      Set<Type> vs = getDirectUsedTypes(u);
+      for (Type v : vs) {
         g.addEdge(u, v);
       }
     }
@@ -168,18 +168,18 @@ public class HeaderWriter extends AstPass {
     assert (size == list.size());
   }
 
-  private static Set<ast.data.type.Type> getDirectUsedTypes(Ast u) {
-    DefTraverser<Void, Set<ast.data.type.Type>> getter = new DefTraverser<Void, Set<ast.data.type.Type>>() {
+  private static Set<Type> getDirectUsedTypes(Ast u) {
+    DefTraverser<Void, Set<Type>> getter = new DefTraverser<Void, Set<Type>>() {
 
       @Override
-      protected Void visitBaseRef(BaseRef obj, Set<Type> param) {
+      protected Void visitReference(Reference obj, Set<Type> param) {
         if (obj.link instanceof Type) {
           param.add((Type) obj.link);
         }
-        return super.visitBaseRef(obj, param);
+        return super.visitReference(obj, param);
       }
     };
-    Set<ast.data.type.Type> vs = new HashSet<ast.data.type.Type>();
+    Set<Type> vs = new HashSet<Type>();
     getter.traverse(u, vs);
     return vs;
   }

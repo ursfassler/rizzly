@@ -18,14 +18,13 @@
 package ast.data.expression;
 
 import ast.ElementInfo;
-import ast.data.expression.reference.SimpleRef;
-import ast.data.type.Type;
+import ast.data.type.TypeRef;
 
 public class TypeCast extends Expression {
   public Expression value;
-  public SimpleRef<Type> cast;
+  public TypeRef cast;
 
-  public TypeCast(ElementInfo info, SimpleRef<Type> cast, Expression value) {
+  public TypeCast(ElementInfo info, TypeRef cast, Expression value) {
     super(info);
     this.value = value;
     this.cast = cast;

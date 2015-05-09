@@ -15,20 +15,22 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.expression.reference;
+package ast.data.reference;
 
 import ast.ElementInfo;
 import ast.data.Ast;
-import ast.data.Named;
+import ast.data.AstBase;
 
-public class SimpleRef<T extends Named> extends BaseRef<T> {
+public abstract class TypedRef<T extends Ast> extends AstBase {
+  public Reference ref;
 
-  public SimpleRef(ElementInfo info, T link) {
-    super(info, link);
+  public TypedRef(ElementInfo info, Reference ref) {
+    super(info);
+    this.ref = ref;
   }
 
-  @Override
-  public Ast getTarget() {
-    return link;
+  public T getTarget() {
+    return (T) ref.getTarget();
   }
+
 }

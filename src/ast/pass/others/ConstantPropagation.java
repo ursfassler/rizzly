@@ -20,7 +20,8 @@ package ast.pass.others;
 import ast.copy.Copy;
 import ast.data.Namespace;
 import ast.data.expression.Expression;
-import ast.data.expression.reference.Reference;
+import ast.data.expression.RefExp;
+import ast.data.reference.Reference;
 import ast.data.type.Type;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.EnumType;
@@ -70,16 +71,17 @@ class ConstantPropagationWorker extends ExprReplacer<Void> {
   }
 
   @Override
-  protected Expression visitReference(Reference obj, Void param) {
-    if (obj.link instanceof Constant) {
-      Constant constant = (Constant) obj.link;
+  protected Expression visitRefExpr(RefExp obj, Void param) {
+    if (obj.ref.link instanceof Constant) {
+      Reference ref = (Reference) obj.ref;
+      Constant constant = (Constant) ref.link;
       Type type = kt.get(constant.type);
       if (doReduce(type)) {
-        assert (obj.offset.isEmpty());
+        assert (ref.offset.isEmpty());
         return Copy.copy(visit(constant.def, null));
       }
     }
-    return super.visitReference(obj, param);
+    return super.visitRefExpr(obj, param);
   }
 
 }

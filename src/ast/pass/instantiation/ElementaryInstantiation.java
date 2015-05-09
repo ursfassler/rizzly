@@ -29,17 +29,20 @@ import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
 import ast.data.Namespace;
+import ast.data.component.CompRefFactory;
 import ast.data.component.Component;
 import ast.data.component.composition.CompUse;
+import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.Direction;
 import ast.data.component.composition.SubCallbacks;
 import ast.data.component.elementary.ImplElementary;
-import ast.data.expression.reference.SimpleRef;
+import ast.data.function.FuncRefFactory;
 import ast.data.function.Function;
 import ast.data.function.FunctionProperty;
 import ast.data.function.InterfaceFunction;
 import ast.data.function.header.FuncProcedure;
 import ast.data.function.ret.FuncReturnNone;
+import ast.data.reference.RefFactory;
 import ast.data.statement.Block;
 import ast.data.variable.FuncVariable;
 import ast.knowledge.KnowledgeBase;
@@ -58,7 +61,7 @@ public class ElementaryInstantiation extends AstPass {
     CompUse instComp = kb.getRootComp();
     ast.children.remove(instComp);
 
-    ImplElementary env = makeEnv((Component) instComp.compRef.getTarget(), kb);
+    ImplElementary env = makeEnv(instComp.compRef.getTarget(), kb);
     ast.children.add(env);
 
     CompInstantiatorWorker instantiator = new CompInstantiatorWorker();
@@ -72,7 +75,7 @@ public class ElementaryInstantiation extends AstPass {
     Set<Function> pubfunc = new HashSet<Function>();
     pubfunc.addAll(Collector.select(inst.subCallback, new IsClass(Function.class)).castTo(Function.class));
     RError.ass(inst.component.size() == 1, inst.getInfo(), "Only expected one instance");
-    Component targetComp = (Component) inst.component.get(0).compRef.getTarget();
+    Component targetComp = inst.component.get(0).compRef.getTarget();
     pubfunc.addAll(targetComp.iface);
 
     for (Function nam : pubfunc) {
@@ -86,17 +89,17 @@ public class ElementaryInstantiation extends AstPass {
     ElementInfo info = ElementInfo.NO;
     FuncProcedure entry = new FuncProcedure(info, "entry", new AstList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
     FuncProcedure exit = new FuncProcedure(info, "exit", new AstList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
-    ImplElementary env = new ImplElementary(ElementInfo.NO, "", new SimpleRef<FuncProcedure>(info, entry), new SimpleRef<FuncProcedure>(info, exit));
+    ImplElementary env = new ImplElementary(ElementInfo.NO, "", FuncRefFactory.create(info, entry), FuncRefFactory.create(info, exit));
     env.function.add(entry);
     env.function.add(exit);
 
-    CompUse item = new CompUse(ElementInfo.NO, "!inst", new SimpleRef<Component>(ElementInfo.NO, top));
+    CompUse item = new CompUse(ElementInfo.NO, "!inst", CompRefFactory.create(ElementInfo.NO, top));
     env.component.add(item);
 
     for (CompUse compu : env.component) {
-      SubCallbacks suc = new SubCallbacks(compu.getInfo(), new SimpleRef<CompUse>(ElementInfo.NO, compu));
+      SubCallbacks suc = new SubCallbacks(compu.getInfo(), new CompUseRef(ElementInfo.NO, RefFactory.create(ElementInfo.NO, compu)));
       env.subCallback.add(suc);
-      Component refComp = (Component) compu.compRef.getTarget();
+      Component refComp = compu.compRef.getTarget();
       for (InterfaceFunction out : refComp.getIface(Direction.out)) {
         Function suha = CompositionReduction.makeHandler(out);
         suha.property = FunctionProperty.External;
@@ -106,7 +109,6 @@ public class ElementaryInstantiation extends AstPass {
 
     return env;
   }
-
 }
 
 class CompInstantiatorWorker extends NullTraverser<ImplElementary, Namespace> {
@@ -136,12 +138,12 @@ class CompInstantiatorWorker extends NullTraverser<ImplElementary, Namespace> {
     // ns.getChildren().removeAll(ns.getChildren().getItems(FuncCtrlOutDataOut.class));
 
     for (CompUse compUse : inst.component) {
-      Component comp = (Component) compUse.compRef.getTarget();
+      Component comp = compUse.compRef.getTarget();
 
       // copy / instantiate used component
       Namespace usens = new Namespace(compUse.getInfo(), compUse.name);
       ImplElementary cpy = visit(comp, usens);
-      compUse.compRef = new SimpleRef<Component>(compUse.getInfo(), cpy);
+      compUse.compRef = CompRefFactory.create(compUse.getInfo(), cpy);
       ns.children.add(usens);
       linkmap.put(compUse, usens);
 
@@ -167,7 +169,7 @@ class CompInstantiatorWorker extends NullTraverser<ImplElementary, Namespace> {
 
   private SubCallbacks getSubCallback(AstList<SubCallbacks> subCallback, CompUse compUse) {
     for (SubCallbacks suc : subCallback) {
-      if (suc.compUse.link == compUse) {
+      if (suc.compUse.getTarget() == compUse) {
         return suc;
       }
     }

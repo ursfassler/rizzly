@@ -22,7 +22,7 @@ import java.lang.reflect.InvocationTargetException;
 
 import ast.ElementInfo;
 import ast.data.expression.Expression;
-import ast.data.expression.reference.TypeRef;
+import ast.data.type.TypeRef;
 
 public class VariableFactory {
   static public <T extends Variable> T create(Class<T> kind, ElementInfo info, String name, TypeRef type, Expression def) {

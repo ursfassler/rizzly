@@ -4,7 +4,7 @@ import java.util.List;
 
 import ast.data.AstList;
 import ast.data.Namespace;
-import ast.data.expression.BoolValue;
+import ast.data.expression.value.BoolValue;
 import ast.data.statement.IfOption;
 import ast.data.statement.IfStmt;
 import ast.data.statement.Statement;

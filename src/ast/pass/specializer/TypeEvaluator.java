@@ -17,10 +17,8 @@
 
 package ast.pass.specializer;
 
-import ast.data.expression.reference.RefTemplCall;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.SimpleRef;
-import ast.data.expression.reference.TypeRef;
+import ast.data.reference.RefTemplCall;
+import ast.data.reference.Reference;
 import ast.data.template.Template;
 import ast.data.type.Type;
 import ast.interpreter.Memory;
@@ -28,26 +26,21 @@ import ast.knowledge.KnowledgeBase;
 
 public class TypeEvaluator {
 
-  public static Type evaluate(TypeRef obj, Memory memory, InstanceRepo ir, KnowledgeBase kb) {
-    if (obj instanceof Reference) {
-      Reference ref = (Reference) obj;
+  public static Type evaluate(Reference obj, Memory memory, InstanceRepo ir, KnowledgeBase kb) {
+    Reference ref = (Reference) obj;
 
-      if (ref.link instanceof Template) {
-        Template template = (Template) ref.link;
-        assert (ref.offset.size() == 1);
-        assert (ref.offset.get(0) instanceof RefTemplCall);
-        RefTemplCall call = (RefTemplCall) ref.offset.get(0);
+    if (ref.link instanceof Template) {
+      Template template = (Template) ref.link;
+      assert (ref.offset.size() == 1);
+      assert (ref.offset.get(0) instanceof RefTemplCall);
+      RefTemplCall call = (RefTemplCall) ref.offset.get(0);
 
-        return (Type) Specializer.process(template, call.actualParameter, ir, kb);
-      } else if (ref.link instanceof Type) {
-        assert (ref.offset.size() == 0);
-        return (Type) ref.link;
-      } else {
-        throw new RuntimeException("bo");
-      }
+      return (Type) Specializer.process(template, call.actualParameter, ir, kb);
+    } else if (ref.link instanceof Type) {
+      assert (ref.offset.size() == 0);
+      return (Type) ref.link;
     } else {
-      assert (obj instanceof SimpleRef);
-      return ((SimpleRef<Type>) obj).link;
+      throw new RuntimeException("bo");
     }
   }
 

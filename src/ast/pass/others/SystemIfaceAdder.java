@@ -32,13 +32,14 @@ import ast.data.component.composition.ImplComposition;
 import ast.data.component.elementary.ImplElementary;
 import ast.data.component.hfsm.ImplHfsm;
 import ast.data.expression.Expression;
-import ast.data.expression.TupleValue;
-import ast.data.expression.reference.RefCall;
-import ast.data.expression.reference.RefName;
-import ast.data.expression.reference.Reference;
+import ast.data.expression.value.TupleValue;
 import ast.data.function.Function;
 import ast.data.function.header.FuncSlot;
 import ast.data.function.ret.FuncReturnNone;
+import ast.data.reference.RefCall;
+import ast.data.reference.RefFactory;
+import ast.data.reference.RefName;
+import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.Statement;
@@ -160,21 +161,21 @@ class SystemIfaceCaller extends NullTraverser<Void, Void> {
     {
       ArrayList<Statement> code = new ArrayList<Statement>();
       for (CompUse cuse : compList) {
-        Function sctor = getCtor((Component) cuse.compRef.getTarget());
+        Function sctor = getCtor(cuse.compRef.getTarget());
         CallStmt call = makeCall(cuse, sctor);
         code.add(call);
       }
-      code.add(makeCall(obj.entryFunc.link));
+      code.add(makeCall(obj.entryFunc.getTarget()));
 
       ctor.body.statements.addAll(code);
     }
 
     {
       ArrayList<Statement> code = new ArrayList<Statement>();
-      code.add(makeCall(obj.exitFunc.link));
+      code.add(makeCall(obj.exitFunc.getTarget()));
       Collections.reverse(compList);
       for (CompUse cuse : compList) {
-        Function sdtor = getDtor((Component) cuse.compRef.getTarget());
+        Function sdtor = getDtor(cuse.compRef.getTarget());
         CallStmt call = makeCall(cuse, sdtor);
         code.add(call);
       }
@@ -200,8 +201,7 @@ class SystemIfaceCaller extends NullTraverser<Void, Void> {
   private CallStmt makeCall(Function ref) {
     ElementInfo info = ElementInfo.NO;
     assert (ref.param.isEmpty());
-    Reference call = new Reference(ref.getInfo(), ref);
-    call.offset.add(new RefCall(info, new TupleValue(info, new AstList<Expression>())));
+    Reference call = RefFactory.call(ref.getInfo(), ref);
     return new CallStmt(info, call);
   }
 
@@ -209,7 +209,7 @@ class SystemIfaceCaller extends NullTraverser<Void, Void> {
   private CallStmt makeCall(CompUse self, Function func) {
     ElementInfo info = ElementInfo.NO;
     RError.ass(func.param.isEmpty(), func.getInfo(), "expected (de)constructor to have no parameter");
-    Reference fref = new Reference(info, self);
+    Reference fref = RefFactory.full(info, self);
     fref.offset.add(new RefName(info, func.name));
     fref.offset.add(new RefCall(info, new TupleValue(info, new AstList<Expression>())));
     return new CallStmt(info, fref);

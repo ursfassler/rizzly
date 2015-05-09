@@ -23,9 +23,9 @@ import parser.scanner.TokenType;
 import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.data.AstList;
-import ast.data.expression.AnyValue;
 import ast.data.expression.Expression;
-import ast.data.expression.reference.Reference;
+import ast.data.expression.value.AnyValue;
+import ast.data.reference.Reference;
 import ast.data.statement.AssignmentMulti;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
@@ -42,6 +42,7 @@ import ast.data.statement.ReturnVoid;
 import ast.data.statement.Statement;
 import ast.data.statement.VarDefInitStmt;
 import ast.data.statement.WhileStmt;
+import ast.data.type.TypeRef;
 import ast.data.variable.FuncVariable;
 import error.ErrorType;
 import error.RError;
@@ -85,7 +86,7 @@ public class StatementParser extends BaseParser {
   // EBNF vardefstmt: lhs ":" ref [ "=" expr ] ";"
   private VarDefInitStmt parseVarDefStmt(AstList<Reference> lhs) {
     ElementInfo info = expect(TokenType.COLON).getInfo();
-    Reference type = expr().parseRef();
+    TypeRef type = expr().parseRefType();
 
     Expression initial;
     if (consumeIfEqual(TokenType.EQUAL)) {
@@ -102,7 +103,7 @@ public class StatementParser extends BaseParser {
         RError.err(ErrorType.Error, ref.getInfo(), "expected identifier");
       }
 
-      Reference ntype = Copy.copy(type);
+      TypeRef ntype = Copy.copy(type);
       ast.data.variable.FuncVariable var = new FuncVariable(ref.getInfo(), ref.link.name, ntype);
       variables.add(var);
     }
@@ -179,7 +180,7 @@ public class StatementParser extends BaseParser {
 
     String name = expect(TokenType.IDENTIFIER).getData();
     expect(TokenType.IN);
-    Reference type = expr().parseRef();
+    TypeRef type = expr().parseRefType();
     expect(TokenType.DO);
     Block block = parseBlock();
     expect(TokenType.END);

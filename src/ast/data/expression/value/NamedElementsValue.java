@@ -15,40 +15,18 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.expression;
+package ast.data.expression.value;
 
 import ast.ElementInfo;
 import ast.data.AstList;
+import ast.data.expression.Expression;
 
-public class TupleValue extends Expression {
-  final public AstList<Expression> value;
+public class NamedElementsValue extends Expression {
+  final public AstList<NamedValue> value;
 
-  public TupleValue(ElementInfo info, AstList<Expression> value) {
+  public NamedElementsValue(ElementInfo info, AstList<NamedValue> value) {
     super(info);
-    assert (value != null);
     this.value = value;
-  }
-
-  public TupleValue(ElementInfo info) {
-    super(info);
-    this.value = new AstList<Expression>();
-  }
-
-  @Override
-  public String toString() {
-    String ret = "";
-    ret += "(";
-    boolean first = true;
-    for (Expression gen : value) {
-      if (first) {
-        first = false;
-      } else {
-        ret += ",";
-      }
-      ret += gen.toString();
-    }
-    ret += ")";
-    return ret;
   }
 
 }

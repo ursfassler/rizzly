@@ -21,7 +21,7 @@ import ast.Designator;
 import ast.data.Ast;
 import ast.data.Named;
 import ast.data.Namespace;
-import ast.data.expression.reference.RefName;
+import ast.data.reference.RefName;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.traverser.DefTraverser;

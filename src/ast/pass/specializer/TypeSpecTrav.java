@@ -19,39 +19,33 @@ package ast.pass.specializer;
 
 import java.util.Map;
 
-import ast.copy.Copy;
-import ast.data.expression.Expression;
-import ast.data.expression.reference.DummyLinkTarget;
-import ast.data.expression.reference.Reference;
-import ast.data.template.ActualTemplateArgument;
+import ast.data.reference.DummyLinkTarget;
+import ast.data.reference.RefFactory;
+import ast.data.reference.Reference;
 import ast.data.type.Type;
 import ast.data.variable.TemplateParameter;
-import ast.traverser.other.ExprReplacer;
+import ast.traverser.other.RefReplacer;
 
-/**
- * Replaces a reference to a CompfuncParameter with the value of it
- *
- * @author urs
- *
- */
-public class TypeSpecTrav extends ExprReplacer<Map<TemplateParameter, ActualTemplateArgument>> {
+public class TypeSpecTrav extends RefReplacer<Void> {
+  final private Map<TemplateParameter, Type> types;
+
+  public TypeSpecTrav(Map<TemplateParameter, Type> types) {
+    super();
+    this.types = types;
+  }
 
   @Override
-  protected ast.data.expression.Expression visitReference(Reference obj, Map<TemplateParameter, ActualTemplateArgument> param) {
+  protected Reference visitReference(Reference obj, Void param) {
     assert (!(obj.link instanceof DummyLinkTarget));
     super.visitReference(obj, param);
 
-    if (param.containsKey(obj.link)) {
-      ActualTemplateArgument repl = param.get(obj.link);
-      if (repl instanceof Type) {
-        return new Reference(obj.getInfo(), (ast.data.type.Type) repl);
-      } else {
-        return Copy.copy((Expression) repl);
-      }
-    } else {
-      assert (!(obj.link instanceof TemplateParameter));
-      return obj;
+    if (types.containsKey(obj.link)) {
+      assert (obj.offset.isEmpty());
+      Type repl = types.get(obj.link);
+      return RefFactory.full(obj.getInfo(), repl);
     }
+
+    return obj;
   }
 
 }

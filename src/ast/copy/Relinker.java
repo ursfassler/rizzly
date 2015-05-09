@@ -22,7 +22,7 @@ import java.util.Map;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
-import ast.data.expression.reference.BaseRef;
+import ast.data.reference.Reference;
 import ast.traverser.DefTraverser;
 
 public class Relinker extends DefTraverser<Void, Map<? extends Named, ? extends Named>> {
@@ -37,10 +37,10 @@ public class Relinker extends DefTraverser<Void, Map<? extends Named, ? extends 
   }
 
   @Override
-  protected Void visitBaseRef(BaseRef obj, Map<? extends Named, ? extends Named> param) {
+  protected Void visitReference(Reference obj, Map<? extends Named, ? extends Named> param) {
     if (param.containsKey(obj.link)) {
       obj.link = param.get(obj.link);
     }
-    return super.visitBaseRef(obj, param);
+    return super.visitReference(obj, param);
   }
 }

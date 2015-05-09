@@ -24,8 +24,8 @@ import ast.data.expression.Expression;
 import ast.data.expression.TypeCast;
 import ast.data.expression.binop.ArithmeticOp;
 import ast.data.expression.binop.Relation;
-import ast.data.expression.reference.SimpleRef;
 import ast.data.type.Type;
+import ast.data.type.TypeRefFactory;
 import ast.data.type.base.RangeType;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
@@ -73,7 +73,7 @@ class RangeConverterWorker extends ExprReplacer<Void> {
 
   private Expression replaceIfNeeded(Expression val, RangeType valType, RangeType commonType) {
     if (Range.leftIsSmallerEqual(valType.range, commonType.range)) {
-      val = new TypeCast(info, new SimpleRef<Type>(info, commonType), val);
+      val = new TypeCast(info, TypeRefFactory.create(info, commonType), val);
     }
     return val;
   }

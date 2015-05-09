@@ -19,7 +19,7 @@ package ast.data.type.composed;
 
 import ast.ElementInfo;
 import ast.data.Named;
-import ast.data.expression.reference.TypeRef;
+import ast.data.type.TypeRef;
 
 final public class NamedElement extends Named {
   public TypeRef typeref;

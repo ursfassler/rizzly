@@ -24,15 +24,13 @@ import java.util.List;
 import ast.Designator;
 import ast.ElementInfo;
 import ast.data.Ast;
-import ast.data.expression.Number;
-import ast.data.expression.TupleValue;
-import ast.data.expression.reference.BaseRef;
-import ast.data.expression.reference.RefCall;
-import ast.data.expression.reference.Reference;
+import ast.data.expression.value.NumberValue;
 import ast.data.function.Function;
 import ast.data.function.header.FuncProcedure;
 import ast.data.function.header.FuncQuery;
 import ast.data.function.header.FuncSignal;
+import ast.data.reference.RefFactory;
+import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.MsgPush;
@@ -99,8 +97,8 @@ class StmtTraverser extends DefTraverser<Void, List<Statement>> {
   }
 
   @Override
-  protected Void visitBaseRef(BaseRef obj, List<Statement> param) {
-    super.visitBaseRef(obj, param);
+  protected Void visitReference(Reference obj, List<Statement> param) {
+    super.visitReference(obj, param);
 
     boolean isOut = (obj.link instanceof FuncQuery) || (obj.link instanceof FuncSignal);
 
@@ -121,12 +119,8 @@ class StmtTraverser extends DefTraverser<Void, List<Statement>> {
 
   private CallStmt makeCall(FuncProcedure func, int numFunc) {
     // Self._sendMsg( numFunc );
-    TupleValue actParam = new TupleValue(info);
-    actParam.value.add(new Number(info, BigInteger.valueOf(numFunc)));
-
-    Reference call = new Reference(info, func);
-    call.offset.add(new RefCall(info, actParam));
-
+    NumberValue arg = new NumberValue(info, BigInteger.valueOf(numFunc));
+    Reference call = RefFactory.call(info, func, arg);
     return new CallStmt(info, call);
   }
 }

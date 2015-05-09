@@ -22,7 +22,7 @@ import java.util.Set;
 
 import ast.data.Ast;
 import ast.data.Namespace;
-import ast.data.expression.reference.BaseRef;
+import ast.data.reference.Reference;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.traverser.DefTraverser;
@@ -63,9 +63,9 @@ class LinkOkWorker extends DefTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitBaseRef(BaseRef obj, Void param) {
+  protected Void visitReference(Reference obj, Void param) {
     target.add(obj.link);
-    return super.visitBaseRef(obj, param);
+    return super.visitReference(obj, param);
   }
 
 }

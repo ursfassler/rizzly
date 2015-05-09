@@ -19,8 +19,10 @@ package ast.pass.others;
 
 import ast.ElementInfo;
 import ast.data.AstList;
-import ast.data.expression.AnyValue;
-import ast.data.expression.reference.Reference;
+import ast.data.expression.RefExp;
+import ast.data.expression.value.AnyValue;
+import ast.data.reference.RefFactory;
+import ast.data.reference.Reference;
 import ast.data.statement.AssignmentMulti;
 import ast.data.statement.Block;
 import ast.data.statement.Statement;
@@ -83,13 +85,13 @@ class VarDefSplitterWorker extends DefTraverser<AstList<Statement>, Void> {
       if (!(obj.initial instanceof AnyValue)) {
         if (firstVar == null) {
           AstList<Reference> al = new AstList<Reference>();
-          al.add(new Reference(info, var));
+          al.add(RefFactory.full(info, var));
           ret.add(new AssignmentMulti(var.getInfo(), al, obj.initial));
           firstVar = var;
         } else {
           AstList<Reference> al = new AstList<Reference>();
-          al.add(new Reference(info, var));
-          ret.add(new AssignmentMulti(var.getInfo(), al, new Reference(info, firstVar)));
+          al.add(RefFactory.full(info, var));
+          ret.add(new AssignmentMulti(var.getInfo(), al, new RefExp(info, RefFactory.full(info, firstVar))));
         }
       }
     }

@@ -18,18 +18,14 @@
 package ast.data.expression;
 
 import ast.ElementInfo;
+import ast.data.reference.Reference;
 
-public class BoolValue extends Expression {
-  public final boolean value;
+public class RefExp extends Expression {
+  public Reference ref;
 
-  public BoolValue(ElementInfo info, boolean value) {
+  public RefExp(ElementInfo info, Reference ref) {
     super(info);
-    this.value = value;
-  }
-
-  @Override
-  public String toString() {
-    return Boolean.toString(value);
+    this.ref = ref;
   }
 
 }

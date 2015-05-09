@@ -47,7 +47,6 @@ import ast.pass.others.BitnotFixer;
 import ast.pass.others.CRenamer;
 import ast.pass.others.CWriter;
 import ast.pass.others.CheckNames;
-import ast.pass.others.CheckSimpleTypeRef;
 import ast.pass.others.CompareReplacer;
 import ast.pass.others.ConstTyper;
 import ast.pass.others.ConstantPropagation;
@@ -86,7 +85,6 @@ import ast.pass.reduction.ReduceRawComp;
 import ast.pass.reduction.ReduceTuple;
 import ast.pass.reduction.ReduceUnion;
 import ast.pass.reduction.ReduceVarDefInit;
-import ast.pass.reduction.SimplifyRef;
 import ast.pass.reduction.StateLinkReduction;
 import ast.pass.reduction.TupleAssignReduction;
 import ast.pass.reduction.hfsm.HfsmReduction;
@@ -205,8 +203,8 @@ public class Passes {
     // what was in FunToEvl
     passes.add(new ReduceMultiAssignment());
     passes.add(new ReduceRawComp());
-    passes.add(new SimplifyRef());
-    passes.add(new CheckSimpleTypeRef());
+    // passes.add(new SimplifyRef());
+    // passes.add(new CheckSimpleTypeRef());
     passes.add(new ReduceVarDefInit());
 
     return passes;

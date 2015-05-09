@@ -20,9 +20,9 @@ package ast.pass.eval;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.expression.Expression;
-import ast.data.expression.reference.SimpleRef;
-import ast.data.expression.reference.TypeRef;
 import ast.data.type.Type;
+import ast.data.type.TypeRef;
+import ast.data.type.TypeRefFactory;
 import ast.data.variable.ConstGlobal;
 import ast.interpreter.Memory;
 import ast.knowledge.KnowledgeBase;
@@ -47,7 +47,7 @@ public class GlobalConstEval extends AstPass {
 
   private void evaluate(ConstGlobal constant, KnowledgeBase kb) {
     constant.def = evalExpr(constant.def, kb);
-    constant.type = new SimpleRef<Type>(constant.type.getInfo(), evalType(constant.type));
+    constant.type = TypeRefFactory.create(constant.type.getInfo(), evalType(constant.type));
   }
 
   private Expression evalExpr(Expression def, KnowledgeBase kb) {

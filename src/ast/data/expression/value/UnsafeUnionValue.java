@@ -15,20 +15,19 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.expression;
+package ast.data.expression.value;
 
 import ast.ElementInfo;
+import ast.data.expression.Expression;
+import ast.data.type.TypeRef;
 
-public class AnyValue extends Expression {
-  static final public String NAME = "?";
+public class UnsafeUnionValue extends Expression {
+  public NamedValue contentValue;
+  public TypeRef type;
 
-  public AnyValue(ElementInfo info) {
+  public UnsafeUnionValue(ElementInfo info, NamedValue contentValue, TypeRef type) {
     super(info);
+    this.contentValue = contentValue;
+    this.type = type;
   }
-
-  @Override
-  public String toString() {
-    return NAME;
-  }
-
 }

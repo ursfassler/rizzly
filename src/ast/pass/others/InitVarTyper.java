@@ -24,17 +24,18 @@ import java.util.Map;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
-import ast.data.expression.ArrayValue;
 import ast.data.expression.Expression;
-import ast.data.expression.NamedElementsValue;
-import ast.data.expression.NamedValue;
-import ast.data.expression.RecordValue;
-import ast.data.expression.TupleValue;
-import ast.data.expression.UnionValue;
-import ast.data.expression.UnsafeUnionValue;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.SimpleRef;
+import ast.data.expression.RefExp;
+import ast.data.expression.value.ArrayValue;
+import ast.data.expression.value.NamedElementsValue;
+import ast.data.expression.value.NamedValue;
+import ast.data.expression.value.RecordValue;
+import ast.data.expression.value.TupleValue;
+import ast.data.expression.value.UnionValue;
+import ast.data.expression.value.UnsafeUnionValue;
+import ast.data.reference.RefFactory;
 import ast.data.type.Type;
+import ast.data.type.TypeRefFactory;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.EnumType;
@@ -139,7 +140,7 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
       EnumType et = (EnumType) kt.get(((UnionType) type).tag.typeref);
       EnumElement value = (EnumElement) getChild(obj, et);
 
-      NamedValue tag = new NamedValue(obj.getInfo(), ((UnionType) type).tag.name, new Reference(obj.getInfo(), value));
+      NamedValue tag = new NamedValue(obj.getInfo(), ((UnionType) type).tag.name, new RefExp(obj.getInfo(), RefFactory.full(obj.getInfo(), value)));
 
       Expression ov = obj.value;
       NamedElement elem = (NamedElement) getChild(obj, type);
@@ -147,7 +148,7 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
 
       NamedValue content = new NamedValue(obj.getInfo(), value.name, ov);
 
-      UnionValue uv = new UnionValue(obj.getInfo(), tag, content, new SimpleRef<Type>(obj.getInfo(), type));
+      UnionValue uv = new UnionValue(obj.getInfo(), tag, content, TypeRefFactory.create(obj.getInfo(), type));
       return uv;
     } else if (type instanceof UnsafeUnionType) {
       Expression ov = obj.value;
@@ -156,7 +157,7 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
 
       NamedValue content = new NamedValue(obj.getInfo(), elem.name, ov);
 
-      UnsafeUnionValue uv = new UnsafeUnionValue(obj.getInfo(), content, new SimpleRef<Type>(obj.getInfo(), type));
+      UnsafeUnionValue uv = new UnsafeUnionValue(obj.getInfo(), content, TypeRefFactory.create(obj.getInfo(), type));
       return uv;
     } else if (type instanceof ArrayType) {
       RError.err(ErrorType.Error, obj.getInfo(), "ArrayType only initializable by TupleValue");
@@ -173,7 +174,7 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
   @Override
   protected Expression visitRecordValue(RecordValue obj, Type param) {
     if (param instanceof RecordType) {
-      assert (obj.type.link == param);
+      assert (obj.type.getTarget() == param);
       return obj; // we assume it is right
     } else {
       throw new RuntimeException("not yet implemented: " + param.getClass().getCanonicalName());
@@ -193,7 +194,7 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
         }
         itm.value = visit(itm.value, et);
       }
-      return new RecordValue(obj.getInfo(), value, new SimpleRef<Type>(obj.getInfo(), type));
+      return new RecordValue(obj.getInfo(), value, TypeRefFactory.create(obj.getInfo(), type));
     } else if ((type instanceof UnionType) || (type instanceof UnsafeUnionType)) {
       if (value.size() != 1) {
         RError.err(ErrorType.Error, obj.getInfo(), "need exactly one entry for union type, got " + value.size());

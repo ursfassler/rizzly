@@ -15,28 +15,13 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.expression;
-
-import java.util.Collection;
+package ast.data.function;
 
 import ast.ElementInfo;
-import ast.data.AstList;
-import ast.data.expression.reference.SimpleRef;
-import ast.data.type.Type;
+import ast.data.reference.RefFactory;
 
-public class RecordValue extends Expression {
-  final public AstList<NamedValue> value = new AstList<NamedValue>();
-  public SimpleRef<Type> type;
-
-  public RecordValue(ElementInfo info, Collection<NamedValue> value, SimpleRef<Type> type) {
-    super(info);
-    this.value.addAll(value);
-    this.type = type;
+public class FuncRefFactory {
+  public static FuncRef create(ElementInfo info, Function func) {
+    return new FuncRef(info, RefFactory.create(info, func));
   }
-
-  @Override
-  public String toString() {
-    return value + ": " + type;
-  }
-
 }

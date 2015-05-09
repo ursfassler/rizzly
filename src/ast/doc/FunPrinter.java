@@ -27,8 +27,10 @@ import ast.data.AstList;
 import ast.data.Metadata;
 import ast.data.Named;
 import ast.data.Namespace;
+import ast.data.component.CompRef;
 import ast.data.component.Component;
 import ast.data.component.composition.AsynchroniusConnection;
+import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.Connection;
 import ast.data.component.composition.Direction;
 import ast.data.component.composition.EndpointRaw;
@@ -42,14 +44,11 @@ import ast.data.component.elementary.ImplElementary;
 import ast.data.component.hfsm.ImplHfsm;
 import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.StateComposite;
+import ast.data.component.hfsm.StateRef;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.component.hfsm.Transition;
-import ast.data.expression.ArrayValue;
-import ast.data.expression.BoolValue;
-import ast.data.expression.RecordValue;
+import ast.data.expression.RefExp;
 import ast.data.expression.TypeCast;
-import ast.data.expression.UnionValue;
-import ast.data.expression.UnsafeUnionValue;
 import ast.data.expression.binop.And;
 import ast.data.expression.binop.BinaryExp;
 import ast.data.expression.binop.Div;
@@ -66,18 +65,19 @@ import ast.data.expression.binop.Or;
 import ast.data.expression.binop.Plus;
 import ast.data.expression.binop.Shl;
 import ast.data.expression.binop.Shr;
-import ast.data.expression.reference.DummyLinkTarget;
-import ast.data.expression.reference.RefCall;
-import ast.data.expression.reference.RefIndex;
-import ast.data.expression.reference.RefTemplCall;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.SimpleRef;
 import ast.data.expression.unop.BitNot;
 import ast.data.expression.unop.LogicNot;
 import ast.data.expression.unop.Not;
 import ast.data.expression.unop.Uminus;
 import ast.data.expression.unop.UnaryExp;
+import ast.data.expression.value.ArrayValue;
+import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.RecordValue;
+import ast.data.expression.value.TupleValue;
+import ast.data.expression.value.UnionValue;
+import ast.data.expression.value.UnsafeUnionValue;
 import ast.data.file.RizzlyFile;
+import ast.data.function.FuncRef;
 import ast.data.function.Function;
 import ast.data.function.FunctionProperty;
 import ast.data.function.header.FuncFunction;
@@ -96,6 +96,11 @@ import ast.data.raw.RawComponent;
 import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
+import ast.data.reference.DummyLinkTarget;
+import ast.data.reference.RefCall;
+import ast.data.reference.RefIndex;
+import ast.data.reference.RefTemplCall;
+import ast.data.reference.Reference;
 import ast.data.statement.AssignmentMulti;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
@@ -105,6 +110,7 @@ import ast.data.statement.MsgPush;
 import ast.data.statement.VarDefInitStmt;
 import ast.data.statement.VarDefStmt;
 import ast.data.template.Template;
+import ast.data.type.TypeRef;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.RangeType;
 import ast.data.type.base.TupleType;
@@ -152,7 +158,7 @@ public class FunPrinter extends NullTraverser<Void, Void> {
     return "_" + Integer.toHexString(obj.hashCode());
   }
 
-  protected Designator getObjPath(ast.data.expression.reference.BaseRef<Named> obj) {
+  protected Designator getObjPath(Reference obj) {
     return new Designator();
   }
 
@@ -337,8 +343,8 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   private void printStateBody(ast.data.component.hfsm.State obj) {
     xw.incIndent();
 
-    printEntryExit("entry", obj.entryFunc.link.body);
-    printEntryExit("exit", obj.exitFunc.link.body);
+    printEntryExit("entry", obj.entryFunc.getTarget().body);
+    printEntryExit("exit", obj.exitFunc.getTarget().body);
     visitListNl(obj.item, null);
 
     xw.decIndent();
@@ -405,7 +411,7 @@ public class FunPrinter extends NullTraverser<Void, Void> {
     xw.wr("(");
     list(obj.param, "; ", null);
     xw.wr(")");
-    if (!((obj.guard instanceof BoolValue) && (((ast.data.expression.BoolValue) obj.guard).value == true))) {
+    if (!((obj.guard instanceof BoolValue) && (((ast.data.expression.value.BoolValue) obj.guard).value == true))) {
       xw.wr(" ");
       xw.kw("if");
       xw.wr(" ");
@@ -753,25 +759,25 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitAnyValue(ast.data.expression.AnyValue obj, Void param) {
+  protected Void visitAnyValue(ast.data.expression.value.AnyValue obj, Void param) {
     xw.kw("_");
     return null;
   }
 
   @Override
-  protected Void visitBoolValue(ast.data.expression.BoolValue obj, Void param) {
+  protected Void visitBoolValue(ast.data.expression.value.BoolValue obj, Void param) {
     xw.kw(obj.value ? "True" : "False");
     return null;
   }
 
   @Override
-  protected Void visitNumber(ast.data.expression.Number obj, Void param) {
+  protected Void visitNumber(ast.data.expression.value.NumberValue obj, Void param) {
     xw.wr(obj.value.toString());
     return null;
   }
 
   @Override
-  protected Void visitStringValue(ast.data.expression.StringValue obj, Void param) {
+  protected Void visitStringValue(ast.data.expression.value.StringValue obj, Void param) {
     xw.wr("'");
     xw.wr(obj.value);
     xw.wr("'");
@@ -779,7 +785,7 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitNamedValue(ast.data.expression.NamedValue obj, Void param) {
+  protected Void visitNamedValue(ast.data.expression.value.NamedValue obj, Void param) {
     xw.wr(obj.name);
     xw.wr(" := ");
     visit(obj.value, null);
@@ -787,7 +793,7 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitNamedElementsValue(ast.data.expression.NamedElementsValue obj, Void param) {
+  protected Void visitNamedElementsValue(ast.data.expression.value.NamedElementsValue obj, Void param) {
     xw.wr("[");
     list(obj.value, ", ", param);
     xw.wr("]");
@@ -795,7 +801,7 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitTupleValue(ast.data.expression.TupleValue obj, Void param) {
+  protected Void visitTupleValue(TupleValue obj, Void param) {
     xw.wr("(");
     list(obj.value, ", ", null);
     xw.wr(")");
@@ -803,8 +809,38 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitSimpleRef(SimpleRef obj, Void param) {
-    wrRef(obj);
+  protected Void visitStateRef(StateRef obj, Void param) {
+    visit(obj.ref, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitCompRef(CompRef obj, Void param) {
+    visit(obj.ref, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitFuncRef(FuncRef obj, Void param) {
+    visit(obj.ref, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitTypeRef(TypeRef obj, Void param) {
+    visit(obj.ref, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitCompUseRef(CompUseRef obj, Void param) {
+    visit(obj.ref, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitRefExpr(RefExp obj, Void param) {
+    visit(obj.ref, param);
     return null;
   }
 
@@ -815,7 +851,7 @@ public class FunPrinter extends NullTraverser<Void, Void> {
     return null;
   }
 
-  private void wrRef(ast.data.expression.reference.BaseRef<Named> obj) {
+  private void wrRef(Reference obj) {
     Designator path = getObjPath(obj);
     if (path == null) {
       path = new Designator(); // TODO: ok?
@@ -834,7 +870,7 @@ public class FunPrinter extends NullTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitRefName(ast.data.expression.reference.RefName obj, Void param) {
+  protected Void visitRefName(ast.data.reference.RefName obj, Void param) {
     xw.wr(".");
     xw.wr(obj.name);
     return null;

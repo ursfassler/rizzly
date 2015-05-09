@@ -19,8 +19,8 @@ package ast.specification;
 
 import ast.data.Ast;
 import ast.data.AstList;
-import ast.data.expression.reference.Reference;
 import ast.data.function.Function;
+import ast.data.reference.Reference;
 import ast.data.statement.AssignmentMulti;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.CallStmt;

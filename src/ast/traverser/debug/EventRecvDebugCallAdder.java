@@ -22,14 +22,13 @@ import java.util.ArrayList;
 
 import ast.ElementInfo;
 import ast.data.Ast;
-import ast.data.expression.Number;
-import ast.data.expression.TupleValue;
-import ast.data.expression.reference.RefCall;
-import ast.data.expression.reference.Reference;
+import ast.data.expression.value.NumberValue;
 import ast.data.function.Function;
 import ast.data.function.header.FuncProcedure;
 import ast.data.function.header.FuncResponse;
 import ast.data.function.header.FuncSlot;
+import ast.data.reference.RefFactory;
+import ast.data.reference.Reference;
 import ast.data.statement.CallStmt;
 import ast.traverser.DefTraverser;
 
@@ -76,12 +75,8 @@ public class EventRecvDebugCallAdder extends DefTraverser<Void, Void> {
 
   private CallStmt makeCall(Function func, int numFunc) {
     // _sendMsg( numFunc );
-    TupleValue actParam = new TupleValue(info);
-    actParam.value.add(new Number(info, BigInteger.valueOf(numFunc)));
-
-    Reference call = new Reference(info, func);
-    call.offset.add(new RefCall(info, actParam));
-
+    NumberValue arg = new NumberValue(info, BigInteger.valueOf(numFunc));
+    Reference call = RefFactory.call(info, func, arg);
     return new CallStmt(info, call);
   }
 }

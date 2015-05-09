@@ -26,9 +26,9 @@ import parser.scanner.TokenType;
 import ast.copy.Copy;
 import ast.data.Ast;
 import ast.data.AstList;
-import ast.data.expression.reference.TypeRef;
 import ast.data.function.Function;
 import ast.data.raw.RawComponent;
+import ast.data.type.TypeRef;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.EnumTypeFactory;
 import ast.data.type.composed.NamedElement;
@@ -110,8 +110,8 @@ public class TypeParser extends BaseParser {
   }
 
   // EBNF derivatetype: ref ";"
-  private ast.data.expression.reference.Reference parseDerivateType() {
-    ast.data.expression.reference.Reference ref = expr().parseRef();
+  private ast.data.reference.Reference parseDerivateType() {
+    ast.data.reference.Reference ref = expr().parseRef();
     expect(TokenType.SEMI);
     return ref;
   }
@@ -164,7 +164,7 @@ public class TypeParser extends BaseParser {
       id.add(expect(TokenType.IDENTIFIER));
     } while (consumeIfEqual(TokenType.COMMA));
     expect(TokenType.COLON);
-    TypeRef type = expr().parseRef();
+    TypeRef type = expr().parseRefType();
     expect(TokenType.SEMI);
 
     List<NamedElement> res = new ArrayList<NamedElement>(id.size());

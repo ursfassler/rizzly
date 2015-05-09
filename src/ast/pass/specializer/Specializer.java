@@ -23,16 +23,14 @@ import java.util.Map;
 
 import ast.copy.Copy;
 import ast.data.Ast;
-import ast.data.AstList;
-import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.StateContent;
 import ast.data.expression.Expression;
-import ast.data.expression.reference.BaseRef;
-import ast.data.expression.reference.Reference;
+import ast.data.expression.RefExp;
 import ast.data.function.template.FunctionTemplate;
 import ast.data.raw.RawElementary;
+import ast.data.reference.Reference;
 import ast.data.template.ActualTemplateArgument;
 import ast.data.template.Template;
 import ast.data.type.Type;
@@ -48,12 +46,21 @@ public class Specializer {
 
   public static Ast process(Template item, List<ActualTemplateArgument> genspec, InstanceRepo ki, KnowledgeBase kb) {
     assert (item.getTempl().size() == genspec.size());
+
+    Map<TemplateParameter, Type> typeMap = new HashMap<TemplateParameter, Type>();
+    Map<TemplateParameter, Expression> valueMap = new HashMap<TemplateParameter, Expression>();
+
     for (int i = 0; i < genspec.size(); i++) {
       ActualTemplateArgument itr = genspec.get(i);
-      if (isTypeTempl(item.getTempl().get(i))) {
-        itr = evalType(ki, kb, (Reference) itr);
+      TemplateParameter tmpl = item.getTempl().get(i);
+      if (isTypeTempl(tmpl)) {
+        Type type = evalType(ki, kb, ((RefExp) itr).ref);
+        typeMap.put(tmpl, type);
+        itr = type;
       } else {
-        itr = evalExpr(ki, kb, (Expression) itr);
+        Expression expr = evalExpr(ki, kb, (Expression) itr);
+        valueMap.put(tmpl, expr);
+        itr = expr;
       }
       genspec.set(i, itr);
     }
@@ -70,12 +77,17 @@ public class Specializer {
       } else {
         inst = Copy.copy(templ);
 
-        TypeSpecTrav evaluator = new TypeSpecTrav();
-        Expression ri = evaluator.traverse(inst, makeMap(genspec, item.getTempl()));
+        TypeSpecTrav typeEval = new TypeSpecTrav(typeMap);
+        Reference tr = typeEval.traverse(inst, null);
 
-        // if inst is a reference, the new one is returned
+        ExprSpecTrav exprEval = new ExprSpecTrav(valueMap);
+        Expression ri = exprEval.traverse(inst, null);
+
+        if (tr != null) {
+          inst = tr;
+        }
         if (ri != null) {
-          inst = ri;
+          assert (false);
         }
 
         KnowParent kp = kb.getEntry(KnowParent.class);
@@ -99,19 +111,18 @@ public class Specializer {
     }
 
     while (inst instanceof Reference) {
-      ast.data.expression.reference.Reference ref = (ast.data.expression.reference.Reference) inst;
+      ast.data.reference.Reference ref = (ast.data.reference.Reference) inst;
       assert (ref.offset.isEmpty());
       inst = ref.link;
     }
 
-    assert (!(inst instanceof BaseRef));
+    assert (!(inst instanceof Reference));
 
     return inst;
   }
 
   private static boolean isTypeTempl(TemplateParameter templateParameter) {
-    assert (templateParameter.type instanceof BaseRef);
-    Type type = (Type) ((BaseRef<Named>) templateParameter.type).getTarget();
+    Type type = (Type) templateParameter.type.ref.getTarget();
     return type instanceof TypeType;
   }
 
@@ -119,8 +130,8 @@ public class Specializer {
     return ExprEvaluator.evaluate(itr, new Memory(), ir, kb);
   }
 
-  private static Type evalType(InstanceRepo ir, KnowledgeBase kb, Reference itr) {
-    return TypeEvaluator.evaluate(itr, new Memory(), ir, kb);
+  private static Type evalType(InstanceRepo ir, KnowledgeBase kb, Reference ref) {
+    return TypeEvaluator.evaluate(ref, new Memory(), ir, kb);
   }
 
   private static void addChild(Ast inst, Ast parent) {
@@ -133,16 +144,6 @@ public class Specializer {
     } else {
       throw new RuntimeException("not yet implemented: " + parent.getClass().getCanonicalName());
     }
-  }
-
-  private static Map<TemplateParameter, ActualTemplateArgument> makeMap(List<ActualTemplateArgument> param, AstList<TemplateParameter> param1) {
-    Map<TemplateParameter, ActualTemplateArgument> map = new HashMap<TemplateParameter, ActualTemplateArgument>();
-    for (int i = 0; i < param.size(); i++) {
-      TemplateParameter var = param1.get(i);
-      ActualTemplateArgument val = param.get(i);
-      map.put(var, val);
-    }
-    return map;
   }
 
 }

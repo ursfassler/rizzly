@@ -21,12 +21,12 @@ import java.math.BigInteger;
 
 import ast.ElementInfo;
 import ast.data.AstList;
-import ast.data.expression.ArrayValue;
 import ast.data.expression.Expression;
-import ast.data.expression.Number;
-import ast.data.expression.reference.SimpleRef;
-import ast.data.expression.reference.TypeRef;
+import ast.data.expression.value.ArrayValue;
+import ast.data.expression.value.NumberValue;
 import ast.data.type.Type;
+import ast.data.type.TypeRef;
+import ast.data.type.TypeRefFactory;
 import ast.data.type.base.ArrayType;
 import ast.data.variable.StateVariable;
 import ast.knowledge.KnowledgeBase;
@@ -59,15 +59,15 @@ class QueueVariables {
   }
 
   private TypeRef makeRef(Type type) {
-    return new SimpleRef<Type>(info, type);
+    return TypeRefFactory.create(info, type);
   }
 
   private String makeName(String name) {
     return prefix + name;
   }
 
-  private Number makeNumberZero() {
-    return new Number(info, BigInteger.ZERO);
+  private NumberValue makeNumberZero() {
+    return new NumberValue(info, BigInteger.ZERO);
   }
 
   private int queueLength(ArrayType queueType) {

@@ -35,17 +35,16 @@ import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateContent;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.component.hfsm.Transition;
-import ast.data.expression.Expression;
-import ast.data.expression.TupleValue;
-import ast.data.expression.reference.RefCall;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.SimpleRef;
+import ast.data.expression.RefExp;
+import ast.data.function.FuncRefFactory;
 import ast.data.function.Function;
 import ast.data.function.header.FuncProcedure;
 import ast.data.function.header.FuncResponse;
 import ast.data.function.header.FuncSignal;
 import ast.data.function.header.FuncSlot;
 import ast.data.function.ret.FuncReturnNone;
+import ast.data.reference.RefFactory;
+import ast.data.reference.Reference;
 import ast.data.statement.Assignment;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
@@ -59,6 +58,7 @@ import ast.data.statement.IfStmt;
 import ast.data.statement.ReturnExpr;
 import ast.data.statement.Statement;
 import ast.data.type.Type;
+import ast.data.type.TypeRefFactory;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.EnumType;
 import ast.data.type.base.EnumTypeFactory;
@@ -141,7 +141,7 @@ class Reduction {
   }
 
   public ImplElementary reduce(ImplHfsm obj, Namespace param) {
-    ImplElementary elem = new ImplElementary(obj.getInfo(), obj.name, new SimpleRef<FuncProcedure>(info, null), new SimpleRef<FuncProcedure>(info, null));
+    ImplElementary elem = new ImplElementary(obj.getInfo(), obj.name, FuncRefFactory.create(info, null), FuncRefFactory.create(info, null));
     elem.iface.addAll(obj.iface);
     elem.function.addAll(obj.function);
     for (StateContent item : obj.topstate.item) {
@@ -166,7 +166,7 @@ class Reduction {
     // enumMap.get(obj.getTopstate().getInitial()).properties().get(Property.NAME);
     EnumElement ena = enumMap.get(obj.topstate.initial.getTarget());
     Reference initState = makeEnumElemRef(states, ena);
-    StateVariable stateVariable = new StateVariable(obj.getInfo(), "_statevar", new SimpleRef<Type>(info, states), initState);
+    StateVariable stateVariable = new StateVariable(obj.getInfo(), "_statevar", TypeRefFactory.create(info, states), new RefExp(info, initState));
     elem.variable.add(stateVariable);
 
     TransitionDict dict = new TransitionDict();
@@ -190,13 +190,13 @@ class Reduction {
     }
 
     {
-      FuncProcedure fEntry = makeEntryFunc((State) obj.topstate.initial.getTarget());
+      FuncProcedure fEntry = makeEntryFunc(obj.topstate.initial.getTarget());
       elem.function.add(fEntry);
-      elem.entryFunc.link = fEntry;
+      elem.entryFunc = FuncRefFactory.create(fEntry.getInfo(), fEntry);
 
       FuncProcedure fExit = makeExitFunc(states, enumMap, stateVariable);
       elem.function.add(fExit);
-      elem.exitFunc.link = fExit;
+      elem.exitFunc = FuncRefFactory.create(fExit.getInfo(), fExit);
     }
 
     getMap().put(obj, elem);
@@ -206,7 +206,7 @@ class Reduction {
   private FuncProcedure makeEntryFunc(State initial) {
     Block body = new Block(info);
 
-    body.statements.add(makeCall(initial.entryFunc.link));
+    body.statements.add(makeCall(initial.entryFunc.getTarget()));
 
     FuncProcedure rfunc = new FuncProcedure(info, Designator.NAME_SEP + "stateentry", new AstList<FuncVariable>(), new FuncReturnNone(ElementInfo.NO), body);
     return rfunc;
@@ -215,7 +215,7 @@ class Reduction {
   private Block makeErrorBb() {
     Block bberror = new Block(info);
     FuncSignal trap = kll.getTrap();
-    bberror.statements.add(new CallStmt(info, new Reference(info, trap, new RefCall(info, new TupleValue(info, new AstList<Expression>())))));
+    bberror.statements.add(new CallStmt(info, RefFactory.call(info, trap)));
     return bberror;
   }
 
@@ -226,11 +226,11 @@ class Reduction {
       Reference eref = makeEnumElemRef(etype, enumMap.get(src));
       Block obb = new Block(info);
       CaseOpt opt = makeCaseOption(eref, obb);
-      obb.statements.add(makeCall(src.exitFunc.link));
+      obb.statements.add(makeCall(src.exitFunc.getTarget()));
       option.add(opt);
     }
 
-    CaseStmt caseStmt = new CaseStmt(info, new Reference(info, stateVariable), option, makeErrorBb());
+    CaseStmt caseStmt = new CaseStmt(info, new RefExp(info, RefFactory.full(info, stateVariable)), option, makeErrorBb());
 
     Block body = new Block(info);
     body.statements.add(caseStmt);
@@ -243,9 +243,7 @@ class Reduction {
 
   static private CallStmt makeCall(Function func) {
     assert (func.param.isEmpty());
-    Reference call = new Reference(info, func);
-    call.offset.add(new RefCall(info, new TupleValue(info, new AstList<Expression>())));
-
+    Reference call = RefFactory.call(info, func);
     return new CallStmt(info, call);
   }
 
@@ -282,7 +280,7 @@ class Reduction {
       copt.add(opt);
     }
 
-    CaseStmt caseStmt = new CaseStmt(info, new Reference(info, stateVariable), copt, makeErrorBb());
+    CaseStmt caseStmt = new CaseStmt(info, new RefExp(info, RefFactory.full(info, stateVariable)), copt, makeErrorBb());
 
     return caseStmt;
   }
@@ -317,7 +315,7 @@ class Reduction {
 
     Block bberror = makeErrorBb();
 
-    CaseStmt caseStmt = new CaseStmt(info, new Reference(info, stateVariable), options, bberror);
+    CaseStmt caseStmt = new CaseStmt(info, new RefExp(info, RefFactory.full(info, stateVariable)), options, bberror);
 
     return caseStmt;
   }
@@ -350,13 +348,13 @@ class Reduction {
     // EnumElement elem = type.find(enumElement);
 
     assert (elem != null);
-    Reference eval = new Reference(info, elem);
+    Reference eval = RefFactory.full(info, elem);
     return eval;
   }
 
-  private static CaseOpt makeCaseOption(Expression label, Block code) {
+  private static CaseOpt makeCaseOption(Reference label, Block code) {
     AstList<CaseOptEntry> list = new AstList<CaseOptEntry>();
-    list.add(new CaseOptValue(info, label));
+    list.add(new CaseOptValue(info, new RefExp(info, label)));
     CaseOpt opt = new CaseOpt(info, list, code);
     return opt;
   }
@@ -374,7 +372,7 @@ class Reduction {
 
     EnumElement src = enumMap.get(trans.dst.getTarget());
     assert (src != null);
-    Assignment setState = new AssignmentSingle(info, new Reference(info, stateVariable), new Reference(info, src));
+    Assignment setState = new AssignmentSingle(info, RefFactory.full(info, stateVariable), new RefExp(info, RefFactory.full(info, src)));
     transCode.statements.add(setState);
 
     return transCode;

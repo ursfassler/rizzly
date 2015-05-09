@@ -21,17 +21,16 @@ import java.util.Collection;
 
 import ast.data.Ast;
 import ast.data.component.composition.CompUse;
-import ast.data.expression.BoolValue;
-import ast.data.expression.Number;
-import ast.data.expression.StringValue;
 import ast.data.expression.binop.BinaryExp;
-import ast.data.expression.reference.RefCall;
-import ast.data.expression.reference.RefIndex;
-import ast.data.expression.reference.RefName;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.SimpleRef;
 import ast.data.expression.unop.UnaryExp;
+import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.NumberValue;
+import ast.data.expression.value.StringValue;
 import ast.data.function.Function;
+import ast.data.reference.RefCall;
+import ast.data.reference.RefIndex;
+import ast.data.reference.RefName;
+import ast.data.reference.Reference;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.EnumType;
 import ast.data.type.base.RangeType;
@@ -92,11 +91,6 @@ class SimpleGetter extends NullTraverser<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitSimpleRef(SimpleRef obj, Void param) {
-    return visit(obj.link, param);
-  }
-
-  @Override
   protected Boolean visitNaturalType(NaturalType obj, Void param) {
     throw new UnsupportedOperationException("Not supported yet");
   }
@@ -152,7 +146,7 @@ class SimpleGetter extends NullTraverser<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitNumber(Number obj, Void param) {
+  protected Boolean visitNumber(NumberValue obj, Void param) {
     return true;
   }
 

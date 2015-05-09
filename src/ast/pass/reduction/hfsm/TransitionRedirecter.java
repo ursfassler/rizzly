@@ -19,13 +19,12 @@ package ast.pass.reduction.hfsm;
 
 import ast.data.Ast;
 import ast.data.AstList;
-import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.component.hfsm.ImplHfsm;
 import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.StateContent;
+import ast.data.component.hfsm.StateRefFactory;
 import ast.data.component.hfsm.Transition;
-import ast.data.expression.reference.SimpleRef;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.Collector;
@@ -74,9 +73,9 @@ class TransitionRedirecterWorker extends NullTraverser<Void, Void> {
 
   @Override
   protected Void visitTransition(Transition obj, Void param) {
-    State dst = (State) obj.dst.getTarget();
+    State dst = obj.dst.getTarget();
     dst = initStateGetter.traverse(dst, null);
-    obj.dst = new SimpleRef<Named>(obj.dst.getInfo(), dst);
+    obj.dst = StateRefFactory.create(obj.dst.getInfo(), dst);
     return null;
   }
 

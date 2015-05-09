@@ -21,7 +21,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ast.data.expression.Expression;
-import ast.data.expression.reference.Reference;
+import ast.data.expression.RefExp;
 import ast.data.variable.Variable;
 import error.ErrorType;
 import error.RError;
@@ -51,11 +51,11 @@ public class Memory {
   public void set(Variable var, Expression value) {
     assert (var != null);
     assert (values.containsKey(var));
-    assert (!(value instanceof Reference));
+    assert (!(value instanceof RefExp));
     values.put(var, value);
   }
 
-  public Expression get(ast.data.variable.Variable var) {
+  public Expression get(Variable var) {
     assert (var != null);
     assert (values.containsKey(var));
     Expression expr = values.get(var);
@@ -63,12 +63,12 @@ public class Memory {
     return expr;
   }
 
-  public boolean contains(ast.data.variable.Variable name) {
+  public boolean contains(Variable name) {
     return values.containsKey(name);
   }
 
-  public ast.data.variable.Variable find(String name) {
-    for (ast.data.variable.Variable var : values.keySet()) {
+  public Variable find(String name) {
+    for (Variable var : values.keySet()) {
       if (var.name.equals(name)) {
         return var;
       }

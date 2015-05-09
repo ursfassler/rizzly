@@ -32,11 +32,11 @@ import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateContent;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.expression.Expression;
-import ast.data.expression.TupleValue;
-import ast.data.expression.reference.RefCall;
-import ast.data.expression.reference.Reference;
+import ast.data.expression.RefExp;
 import ast.data.function.header.FuncFunction;
 import ast.data.function.header.FuncResponse;
+import ast.data.reference.RefFactory;
+import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.statement.ReturnExpr;
 import ast.data.variable.Variable;
@@ -106,13 +106,12 @@ class QueryDownPropagatorWorker extends NullTraverser<Void, QueryParam> {
     for (FuncResponse func : queries) {
       FuncResponse cfunc = new FuncResponse(info, func.name, Copy.copy(func.param), Copy.copy(func.ret), new Block(info));
 
-      TupleValue acpar = new TupleValue(info, new AstList<Expression>());
+      AstList<Expression> acpar = new AstList<Expression>();
       for (Variable par : cfunc.param) {
-        acpar.value.add(new Reference(info, par));
+        acpar.add(new RefExp(info, RefFactory.full(info, par)));
       }
-      Reference call = new Reference(info, map.get(func));
-      call.offset.add(new RefCall(info, acpar));
-      cfunc.body.statements.add(new ReturnExpr(info, call));
+      Reference call = RefFactory.call(info, map.get(func), acpar);
+      cfunc.body.statements.add(new ReturnExpr(info, new RefExp(info, call)));
 
       obj.item.add(cfunc); // TODO ok or copy?
     }

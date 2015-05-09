@@ -15,12 +15,16 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.expression.reference;
+package ast.data.component;
 
-import ast.data.Ast;
+import ast.ElementInfo;
+import ast.data.reference.Reference;
+import ast.data.reference.TypedRef;
 
-public interface StateRef extends Ast {
+public class CompRef extends TypedRef<Component> {
 
-  Ast getTarget();
+  public CompRef(ElementInfo info, Reference ref) {
+    super(info, ref);
+  }
 
 }

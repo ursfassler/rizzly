@@ -18,8 +18,10 @@
 package ast.traverser;
 
 import ast.data.Namespace;
+import ast.data.component.CompRef;
 import ast.data.component.composition.AsynchroniusConnection;
 import ast.data.component.composition.CompUse;
+import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.Direction;
 import ast.data.component.composition.EndpointRaw;
 import ast.data.component.composition.EndpointSelf;
@@ -31,20 +33,11 @@ import ast.data.component.composition.SynchroniusConnection;
 import ast.data.component.elementary.ImplElementary;
 import ast.data.component.hfsm.ImplHfsm;
 import ast.data.component.hfsm.StateComposite;
+import ast.data.component.hfsm.StateRef;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.component.hfsm.Transition;
-import ast.data.expression.AnyValue;
-import ast.data.expression.ArrayValue;
-import ast.data.expression.BoolValue;
-import ast.data.expression.NamedElementsValue;
-import ast.data.expression.NamedValue;
-import ast.data.expression.Number;
-import ast.data.expression.RecordValue;
-import ast.data.expression.StringValue;
-import ast.data.expression.TupleValue;
+import ast.data.expression.RefExp;
 import ast.data.expression.TypeCast;
-import ast.data.expression.UnionValue;
-import ast.data.expression.UnsafeUnionValue;
 import ast.data.expression.binop.And;
 import ast.data.expression.binop.BitAnd;
 import ast.data.expression.binop.BitOr;
@@ -66,18 +59,23 @@ import ast.data.expression.binop.Or;
 import ast.data.expression.binop.Plus;
 import ast.data.expression.binop.Shl;
 import ast.data.expression.binop.Shr;
-import ast.data.expression.reference.DummyLinkTarget;
-import ast.data.expression.reference.RefCall;
-import ast.data.expression.reference.RefIndex;
-import ast.data.expression.reference.RefName;
-import ast.data.expression.reference.RefTemplCall;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.SimpleRef;
 import ast.data.expression.unop.BitNot;
 import ast.data.expression.unop.LogicNot;
 import ast.data.expression.unop.Not;
 import ast.data.expression.unop.Uminus;
+import ast.data.expression.value.AnyValue;
+import ast.data.expression.value.ArrayValue;
+import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.NamedElementsValue;
+import ast.data.expression.value.NamedValue;
+import ast.data.expression.value.NumberValue;
+import ast.data.expression.value.RecordValue;
+import ast.data.expression.value.StringValue;
+import ast.data.expression.value.TupleValue;
+import ast.data.expression.value.UnionValue;
+import ast.data.expression.value.UnsafeUnionValue;
 import ast.data.file.RizzlyFile;
+import ast.data.function.FuncRef;
 import ast.data.function.Function;
 import ast.data.function.header.FuncFunction;
 import ast.data.function.header.FuncProcedure;
@@ -94,6 +92,12 @@ import ast.data.function.template.DefaultValueTemplate;
 import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
+import ast.data.reference.DummyLinkTarget;
+import ast.data.reference.RefCall;
+import ast.data.reference.RefIndex;
+import ast.data.reference.RefName;
+import ast.data.reference.RefTemplCall;
+import ast.data.reference.Reference;
 import ast.data.statement.AssignmentMulti;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
@@ -113,6 +117,7 @@ import ast.data.statement.VarDefInitStmt;
 import ast.data.statement.VarDefStmt;
 import ast.data.statement.WhileStmt;
 import ast.data.template.Template;
+import ast.data.type.TypeRef;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumElement;
@@ -209,7 +214,7 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
   }
 
   @Override
-  protected R visitNumber(Number obj, P param) {
+  protected R visitNumber(NumberValue obj, P param) {
     return null;
   }
 
@@ -439,11 +444,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
     visitList(obj.param, param);
     visit(obj.guard, param);
     visit(obj.body, param);
-    return null;
-  }
-
-  @Override
-  protected R visitSimpleRef(SimpleRef obj, P param) {
     return null;
   }
 
@@ -934,6 +934,42 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
 
   @Override
   protected R visitDummyLinkTarget(DummyLinkTarget obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitRefExpr(RefExp obj, P param) {
+    visit(obj.ref, param);
+    return null;
+  }
+
+  @Override
+  protected R visitTypeRef(TypeRef obj, P param) {
+    visit(obj.ref, param);
+    return null;
+  }
+
+  @Override
+  protected R visitFuncRef(FuncRef obj, P param) {
+    visit(obj.ref, param);
+    return null;
+  }
+
+  @Override
+  protected R visitStateRef(StateRef obj, P param) {
+    visit(obj.ref, param);
+    return null;
+  }
+
+  @Override
+  protected R visitCompRef(CompRef obj, P param) {
+    visit(obj.ref, param);
+    return null;
+  }
+
+  @Override
+  protected R visitCompUseRef(CompUseRef obj, P param) {
+    visit(obj.ref, param);
     return null;
   }
 

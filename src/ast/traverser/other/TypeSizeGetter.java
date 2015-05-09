@@ -18,7 +18,7 @@
 package ast.traverser.other;
 
 import ast.data.Ast;
-import ast.data.expression.reference.BaseRef;
+import ast.data.reference.Reference;
 import ast.data.type.Type;
 import ast.data.type.base.ArrayType;
 import ast.data.type.composed.RecordType;
@@ -30,7 +30,8 @@ import ast.traverser.NullTraverser;
 public class TypeSizeGetter extends NullTraverser<Integer, Void> {
 
   private static int ByteAlignment = 1; // TODO get this information from
-                                        // somewhere else
+
+  // somewhere else
 
   public static int get(Type type) {
     TypeSizeGetter getter = new TypeSizeGetter();
@@ -48,7 +49,7 @@ public class TypeSizeGetter extends NullTraverser<Integer, Void> {
   }
 
   @Override
-  protected Integer visitBaseRef(BaseRef obj, Void param) {
+  protected Integer visitReference(Reference obj, Void param) {
     return visit(obj.link, param);
   }
 

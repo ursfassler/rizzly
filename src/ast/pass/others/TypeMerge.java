@@ -25,8 +25,8 @@ import java.util.Set;
 import ast.copy.Relinker;
 import ast.data.AstList;
 import ast.data.Namespace;
-import ast.data.expression.reference.SimpleRef;
 import ast.data.type.Type;
+import ast.data.type.TypeRefFactory;
 import ast.data.type.out.AliasType;
 import ast.doc.SimpleGraph;
 import ast.knowledge.KnowLeftIsContainerOfRight;
@@ -69,7 +69,7 @@ public class TypeMerge extends AstPass {
 
       for (Type type : itr) {
         if (type != root) {
-          AliasType alias = new AliasType(type.getInfo(), type.name, new SimpleRef<Type>(type.getInfo(), root));
+          AliasType alias = new AliasType(type.getInfo(), type.name, TypeRefFactory.create(type.getInfo(), root));
           linkmap.put(type, alias);
 
           RError.ass(typespace.children.contains(type), type.getInfo(), "merging types in subtree not yet implemented");

@@ -15,19 +15,35 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.expression;
+package ast.data.reference;
 
 import ast.ElementInfo;
-import ast.data.expression.reference.SimpleRef;
-import ast.data.type.Type;
+import ast.data.AstList;
+import ast.data.template.ActualTemplateArgument;
 
-public class UnsafeUnionValue extends Expression {
-  public NamedValue contentValue;
-  public SimpleRef<Type> type;
+final public class RefTemplCall extends RefItem {
+  final public AstList<ActualTemplateArgument> actualParameter;
 
-  public UnsafeUnionValue(ElementInfo info, NamedValue contentValue, SimpleRef<Type> type) {
+  public RefTemplCall(ElementInfo info, AstList<ActualTemplateArgument> expr) {
     super(info);
-    this.contentValue = contentValue;
-    this.type = type;
+    this.actualParameter = expr;
   }
+
+  @Override
+  public String toString() {
+    String ret = "";
+    ret += "{";
+    boolean first = true;
+    for (ActualTemplateArgument gen : actualParameter) {
+      if (first) {
+        first = false;
+      } else {
+        ret += ",";
+      }
+      ret += gen.toString();
+    }
+    ret += "}";
+    return ret;
+  }
+
 }

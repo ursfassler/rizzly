@@ -23,7 +23,7 @@ import ast.data.component.composition.CompUse;
 import ast.data.component.composition.ImplComposition;
 import ast.data.component.elementary.ImplElementary;
 import ast.data.component.hfsm.ImplHfsm;
-import ast.data.expression.reference.Reference;
+import ast.data.reference.Reference;
 import ast.data.type.Type;
 import ast.traverser.NullTraverser;
 

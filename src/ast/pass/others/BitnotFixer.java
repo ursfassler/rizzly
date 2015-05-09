@@ -23,9 +23,9 @@ import ast.ElementInfo;
 import ast.data.Namespace;
 import ast.data.Range;
 import ast.data.expression.Expression;
-import ast.data.expression.Number;
 import ast.data.expression.binop.BitAnd;
 import ast.data.expression.unop.BitNot;
+import ast.data.expression.value.NumberValue;
 import ast.data.type.Type;
 import ast.data.type.base.RangeType;
 import ast.knowledge.KnowType;
@@ -67,7 +67,7 @@ class BitnotFixerWorker extends ExprReplacer<Void> {
     int bits = range.high.bitCount();
     BigInteger mask = BigInteger.valueOf(2).pow(bits).subtract(BigInteger.ONE);
     assert (mask.equals(range.high));
-    return new BitAnd(info, obj, new Number(info, mask));
+    return new BitAnd(info, obj, new NumberValue(info, mask));
   }
 
 }

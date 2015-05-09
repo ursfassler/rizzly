@@ -34,16 +34,16 @@ import ast.data.component.hfsm.ImplHfsm;
 import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateContent;
+import ast.data.component.hfsm.StateRefFactory;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.component.hfsm.Transition;
 import ast.data.expression.Expression;
-import ast.data.expression.TupleValue;
-import ast.data.expression.reference.RefCall;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.SimpleRef;
+import ast.data.expression.RefExp;
 import ast.data.function.Function;
 import ast.data.function.header.FuncProcedure;
 import ast.data.function.ret.FuncReturnNone;
+import ast.data.reference.RefFactory;
+import ast.data.reference.Reference;
 import ast.data.statement.Assignment;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
@@ -146,7 +146,7 @@ class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam
       addTrans(obj, trans);
     }
     for (Transition trans : transList) {
-      trans.src = new SimpleRef<State>(trans.src.getInfo(), obj);
+      trans.src = StateRefFactory.create(trans.src.getInfo(), obj);
       // obj.getItem().add(trans);
       addTrans(obj, trans);
     }
@@ -162,21 +162,20 @@ class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam
     State dst = tdst.get(otrans);
     assert (dst != null);
     Transition trans = Copy.copy(otrans);
-    trans.src = new SimpleRef<State>(trans.src.getInfo(), src);
+    trans.src = StateRefFactory.create(trans.src.getInfo(), src);
 
     makeExitCalls(src, os, trans.body.statements);
     {
       FuncProcedure func = tfunc.get(otrans);
       assert (func != null);
-      Reference ref = new Reference(info, func);
 
-      TupleValue param = new TupleValue(info, new AstList<Expression>());
+      AstList<Expression> arg = new AstList<Expression>();
       for (Variable acpar : trans.param) {
-        Reference parref = new Reference(info, acpar);
-        param.value.add(parref);
+        Reference parref = RefFactory.full(info, acpar);
+        arg.add(new RefExp(info, parref));
       }
 
-      ref.offset.add(new RefCall(info, param));
+      Reference ref = RefFactory.call(info, func, arg);
       CallStmt call = new CallStmt(info, ref);
       trans.body.statements.add(call);
     }
@@ -196,7 +195,7 @@ class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam
     makeVarInit(par, top, list);
 
     for (StateVariable var : TypeFilter.select(start.item, StateVariable.class)) {
-      Assignment init = new AssignmentSingle(var.def.getInfo(), new Reference(info, var), Copy.copy(var.def));
+      Assignment init = new AssignmentSingle(var.def.getInfo(), RefFactory.full(info, var), Copy.copy(var.def));
       list.add(init);
     }
   }
@@ -209,7 +208,7 @@ class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam
     assert (par != null);
 
     makeEntryCalls(par, top, list);
-    list.add(makeCall(start.entryFunc.link));
+    list.add(makeCall(start.entryFunc.getTarget()));
   }
 
   private StateComposite getParent(State start) {
@@ -228,13 +227,12 @@ class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam
     StateComposite par = getParent(start);
     assert (par != null);
 
-    list.add(makeCall(start.exitFunc.link));
+    list.add(makeCall(start.exitFunc.getTarget()));
     makeExitCalls(par, top, list);
   }
 
   private CallStmt makeCall(Function func) {
-    Reference ref = new Reference(info, func);
-    ref.offset.add(new RefCall(info, new TupleValue(info, new AstList<Expression>())));
+    Reference ref = RefFactory.call(info, func);
     return new CallStmt(info, ref);
   }
 
@@ -253,7 +251,7 @@ class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam
     /*
      * for all states in obj.getItem() we want to know, which transitions are before and which ones are after the
      * specific state.
-     * 
+     *
      * the map spos contains the position of the state in the transition array
      */
 
@@ -346,8 +344,8 @@ class TransitionEndpointCollector extends NullTraverser<Void, State> {
   @Override
   protected Void visitTransition(Transition obj, State param) {
     ttop.put(obj, param);
-    tsrc.put(obj, (State) obj.src.getTarget());
-    tdst.put(obj, (State) obj.dst.getTarget());
+    tsrc.put(obj, obj.src.getTarget());
+    tdst.put(obj, obj.dst.getTarget());
     return null;
   }
 

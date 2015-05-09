@@ -30,15 +30,14 @@ import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateContent;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.component.hfsm.Transition;
-import ast.data.expression.reference.BaseRef;
-import ast.data.expression.reference.DummyLinkTarget;
-import ast.data.expression.reference.Reference;
 import ast.data.file.RizzlyFile;
 import ast.data.function.Function;
 import ast.data.raw.RawComponent;
 import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
+import ast.data.reference.DummyLinkTarget;
+import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.statement.VarDefInitStmt;
 import ast.data.template.Template;
@@ -128,14 +127,14 @@ class LinkerWorker extends DefTraverser<Void, SymbolTable> {
   }
 
   @Override
-  protected Void visitRefName(ast.data.expression.reference.RefName obj, SymbolTable param) {
+  protected Void visitRefName(ast.data.reference.RefName obj, SymbolTable param) {
     // TODO: this needs special linking and may not be possible from beginning
     // (but after evaluation)
     return null;
   }
 
   @Override
-  protected Void visitBaseRef(BaseRef obj, SymbolTable param) {
+  protected Void visitReference(Reference obj, SymbolTable param) {
     if (obj.link instanceof DummyLinkTarget) {
       String name = ((DummyLinkTarget) obj.link).name;
 
@@ -147,7 +146,7 @@ class LinkerWorker extends DefTraverser<Void, SymbolTable> {
 
       obj.link = link;
     }
-    return super.visitBaseRef(obj, param);
+    return super.visitReference(obj, param);
   }
 
   @Override
@@ -201,8 +200,8 @@ class LinkerWorker extends DefTraverser<Void, SymbolTable> {
     stateNames.put(obj, param);
 
     // visitList(obj.getItemList(), param);
-    visit(obj.entryFunc.link.body, param);
-    visit(obj.exitFunc.link.body, param);
+    visit(obj.entryFunc.getTarget().body, param);
+    visit(obj.exitFunc.getTarget().body, param);
 
     super.visitState(obj, param);
 
@@ -237,7 +236,7 @@ class LinkerWorker extends DefTraverser<Void, SymbolTable> {
     param.addAll(obj.param);
 
     // get context from src state and add event arguments
-    SymbolTable srcNames = stateNames.get(((Reference) obj.src).link);
+    SymbolTable srcNames = stateNames.get(obj.src.ref.link);
     assert (srcNames != null);
     srcNames = new SymbolTable(srcNames);
     srcNames.addAll(obj.param);

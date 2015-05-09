@@ -47,7 +47,7 @@ class CreateRecordFromFunc extends DefTraverser<Void, Void> {
 
   @Override
   protected Void visitMsgPush(MsgPush obj, Void param) {
-    Function func = (Function) obj.func.link;
+    Function func = obj.func.getTarget();
     // Designator path = kp.get(func);
     // assert (path.size() > 0);
     // String name = new Designator(path,

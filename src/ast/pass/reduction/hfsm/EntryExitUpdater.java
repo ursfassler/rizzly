@@ -28,13 +28,12 @@ import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateContent;
 import ast.data.component.hfsm.StateSimple;
-import ast.data.expression.Expression;
-import ast.data.expression.TupleValue;
-import ast.data.expression.reference.RefCall;
-import ast.data.expression.reference.Reference;
+import ast.data.function.FuncRef;
 import ast.data.function.Function;
 import ast.data.function.header.FuncProcedure;
 import ast.data.function.ret.FuncReturnNone;
+import ast.data.reference.RefFactory;
+import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.Statement;
@@ -97,11 +96,15 @@ class EntryExitUpdaterWorker extends NullTraverser<Void, EePar> {
   public void changeEe(State obj, EePar param) {
     FuncProcedure entry = makeFunc(param.entry, "_centry");
     obj.item.add(entry);
-    obj.entryFunc.link = entry;
+    obj.entryFunc = makeFuncRef(entry);
 
     FuncProcedure exit = makeFunc(param.exit, "_cexit");
     obj.item.add(exit);
-    obj.exitFunc.link = exit;
+    obj.exitFunc = makeFuncRef(exit);
+  }
+
+  private FuncRef makeFuncRef(FuncProcedure entry) {
+    return new FuncRef(ElementInfo.NO, RefFactory.create(ElementInfo.NO, entry));
   }
 
   public FuncProcedure makeFunc(LinkedList<Function> list, String name) {
@@ -117,8 +120,7 @@ class EntryExitUpdaterWorker extends NullTraverser<Void, EePar> {
 
   private CallStmt makeCall(Function func) {
     assert (func.param.isEmpty());
-    Reference ref = new Reference(ElementInfo.NO, func);
-    ref.offset.add(new RefCall(ElementInfo.NO, new TupleValue(ElementInfo.NO, new AstList<Expression>())));
+    Reference ref = RefFactory.call(ElementInfo.NO, func);
     return new CallStmt(ElementInfo.NO, ref);
   }
 
@@ -132,8 +134,8 @@ class EntryExitUpdaterWorker extends NullTraverser<Void, EePar> {
   @Override
   protected Void visitState(State obj, EePar param) {
     param = new EePar(param);
-    param.entry.addLast(obj.entryFunc.link);
-    param.exit.addFirst(obj.exitFunc.link);
+    param.entry.addLast(obj.entryFunc.getTarget());
+    param.exit.addFirst(obj.exitFunc.getTarget());
     return super.visitState(obj, param);
   }
 

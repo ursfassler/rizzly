@@ -24,15 +24,17 @@ import parser.scanner.Token;
 import parser.scanner.TokenType;
 import ast.ElementInfo;
 import ast.data.Metadata;
+import ast.data.component.CompRef;
 import ast.data.component.composition.AsynchroniusConnection;
 import ast.data.component.composition.CompUse;
 import ast.data.component.composition.Endpoint;
 import ast.data.component.composition.EndpointRaw;
 import ast.data.component.composition.SynchroniusConnection;
-import ast.data.expression.reference.RefName;
-import ast.data.expression.reference.Reference;
 import ast.data.raw.RawComponent;
 import ast.data.raw.RawComposition;
+import ast.data.reference.RefFactory;
+import ast.data.reference.RefName;
+import ast.data.reference.Reference;
 import error.ErrorType;
 import error.RError;
 
@@ -72,7 +74,7 @@ public class ImplCompositionParser extends ImplBaseParser {
   private void parseInstantiation(Token id, RawComposition comp) {
     switch (peek().getType()) {
       case IDENTIFIER:
-        Reference type = expr().parseRef();
+        CompRef type = expr().parseRefComp();
         expect(TokenType.SEMI);
         ArrayList<Metadata> meta = getMetadata();
         id.getInfo().metadata.addAll(meta);
@@ -115,7 +117,7 @@ public class ImplCompositionParser extends ImplBaseParser {
       RError.err(ErrorType.Error, tok.getInfo(), "Expected IDENTIFIER, got " + tok.getType());
       return null;
     }
-    Reference ref = new Reference(tok.getInfo(), tok.getData());
+    Reference ref = RefFactory.full(tok.getInfo(), tok.getData());
     if (consumeIfEqual(TokenType.PERIOD)) {
       tok = expect(TokenType.IDENTIFIER);
       ref.offset.add(new RefName(tok.getInfo(), tok.getData()));

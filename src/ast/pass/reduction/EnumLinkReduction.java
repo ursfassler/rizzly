@@ -18,8 +18,8 @@
 package ast.pass.reduction;
 
 import ast.data.Ast;
-import ast.data.expression.reference.RefName;
-import ast.data.expression.reference.Reference;
+import ast.data.reference.RefName;
+import ast.data.reference.Reference;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.EnumType;
 import ast.knowledge.KnowledgeBase;
@@ -52,14 +52,14 @@ class EnumLinkReductionWorker extends DefTraverser<Void, Void> {
     Ast item = obj.link;
     if (item instanceof EnumType) {
       if (!obj.offset.isEmpty()) {
-        ast.data.expression.reference.RefItem next = obj.offset.get(0);
+        ast.data.reference.RefItem next = obj.offset.get(0);
         obj.offset.remove(0);
         if (!(next instanceof RefName)) {
           RError.err(ErrorType.Error, obj.getInfo(), "Expected named offset, got: " + next.getClass().getCanonicalName());
         }
-        Ast elem = ChildByName.find(item, ((ast.data.expression.reference.RefName) next).name);
+        Ast elem = ChildByName.find(item, ((ast.data.reference.RefName) next).name);
         if (elem == null) {
-          RError.err(ErrorType.Error, obj.getInfo(), "Element not found: " + ((ast.data.expression.reference.RefName) next).name);
+          RError.err(ErrorType.Error, obj.getInfo(), "Element not found: " + ((ast.data.reference.RefName) next).name);
         }
         if (elem instanceof EnumElement) {
           obj.link = (EnumElement) elem;

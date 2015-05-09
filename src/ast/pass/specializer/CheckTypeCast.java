@@ -19,8 +19,8 @@ package ast.pass.specializer;
 
 import ast.ElementInfo;
 import ast.data.Ast;
-import ast.data.expression.AnyValue;
 import ast.data.expression.Expression;
+import ast.data.expression.value.AnyValue;
 import ast.data.type.Type;
 import ast.data.type.base.RangeType;
 import ast.traverser.NullTraverser;
@@ -41,7 +41,7 @@ public class CheckTypeCast extends NullTraverser<Expression, Expression> {
 
   @Override
   protected Expression visitRangeType(RangeType obj, Expression param) {
-    ast.data.expression.Number num = (ast.data.expression.Number) param;
+    ast.data.expression.value.NumberValue num = (ast.data.expression.value.NumberValue) param;
     if ((obj.range.low.compareTo(num.value) > 0) || (obj.range.high.compareTo(num.value) < 0)) {
       RError.err(ErrorType.Error, param.getInfo(), "value " + num.toString() + " not in range " + obj.toString());
       return new AnyValue(ElementInfo.NO);

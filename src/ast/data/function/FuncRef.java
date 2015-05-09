@@ -15,28 +15,16 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.expression;
-
-import java.math.BigInteger;
+package ast.data.function;
 
 import ast.ElementInfo;
+import ast.data.reference.Reference;
+import ast.data.reference.TypedRef;
 
-/**
- *
- * @author urs
- */
-public class Number extends Expression {
+public class FuncRef extends TypedRef<Function> {
 
-  final public BigInteger value;
-
-  public Number(ElementInfo info, BigInteger value) {
-    super(info);
-    this.value = value;
-  }
-
-  @Override
-  public String toString() {
-    return value.toString();
+  public FuncRef(ElementInfo info, Reference ref) {
+    super(info, ref);
   }
 
 }

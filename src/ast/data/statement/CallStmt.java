@@ -18,7 +18,7 @@
 package ast.data.statement;
 
 import ast.ElementInfo;
-import ast.data.expression.reference.Reference;
+import ast.data.reference.Reference;
 
 public class CallStmt extends Statement {
   public Reference call;

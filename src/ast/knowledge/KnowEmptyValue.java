@@ -25,15 +25,16 @@ import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.data.Ast;
 import ast.data.AstList;
-import ast.data.expression.BoolValue;
 import ast.data.expression.Expression;
-import ast.data.expression.NamedElementsValue;
-import ast.data.expression.NamedValue;
-import ast.data.expression.Number;
-import ast.data.expression.StringValue;
-import ast.data.expression.TupleValue;
-import ast.data.expression.reference.RefName;
-import ast.data.expression.reference.Reference;
+import ast.data.expression.RefExp;
+import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.NamedElementsValue;
+import ast.data.expression.value.NamedValue;
+import ast.data.expression.value.NumberValue;
+import ast.data.expression.value.StringValue;
+import ast.data.expression.value.TupleValue;
+import ast.data.reference.RefFactory;
+import ast.data.reference.RefName;
 import ast.data.type.Type;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
@@ -90,19 +91,18 @@ class KnowEmptyValueGenerator extends NullTraverser<Expression, Void> {
 
   @Override
   protected ast.data.expression.Expression visitEnumType(EnumType obj, Void param) {
-    ast.data.expression.reference.Reference ref = new Reference(ElementInfo.NO, obj);
-    ref.offset.add(new RefName(ElementInfo.NO, obj.element.get(0).name));
-    return ref;
+    ast.data.reference.Reference ref = RefFactory.create(ElementInfo.NO, obj, new RefName(ElementInfo.NO, obj.element.get(0).name));
+    return new RefExp(ElementInfo.NO, ref);
   }
 
   @Override
   protected ast.data.expression.Expression visitIntegerType(IntegerType obj, Void param) {
-    return new Number(ElementInfo.NO, BigInteger.ZERO);
+    return new NumberValue(ElementInfo.NO, BigInteger.ZERO);
   }
 
   @Override
   protected ast.data.expression.Expression visitNaturalType(NaturalType obj, Void param) {
-    return new Number(ElementInfo.NO, BigInteger.ZERO);
+    return new NumberValue(ElementInfo.NO, BigInteger.ZERO);
   }
 
   @Override
@@ -115,7 +115,7 @@ class KnowEmptyValueGenerator extends NullTraverser<Expression, Void> {
     } else {
       val = BigInteger.ZERO;
     }
-    return new Number(ElementInfo.NO, val);
+    return new NumberValue(ElementInfo.NO, val);
   }
 
   @Override

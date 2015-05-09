@@ -22,14 +22,15 @@ import java.util.Collection;
 import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.expression.Expression;
-import ast.data.expression.reference.Reference;
+import ast.data.function.FuncRef;
+import ast.data.reference.Reference;
 
 public class MsgPush extends Statement {
   public Reference queue;
-  public Reference func;
+  public FuncRef func;
   final public AstList<Expression> data = new AstList<Expression>();
 
-  public MsgPush(ElementInfo info, Reference queue, Reference func, Collection<Expression> data) {
+  public MsgPush(ElementInfo info, Reference queue, FuncRef func, Collection<Expression> data) {
     super(info);
     this.queue = queue;
     this.func = func;

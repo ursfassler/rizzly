@@ -28,7 +28,6 @@ import ast.data.component.composition.CompUse;
 import ast.data.component.composition.Connection;
 import ast.data.component.composition.Direction;
 import ast.data.component.composition.EndpointRaw;
-import ast.data.expression.reference.Reference;
 import ast.data.function.Function;
 import ast.data.function.header.FuncQuery;
 import ast.data.function.header.FuncResponse;
@@ -36,6 +35,7 @@ import ast.data.function.header.FuncSignal;
 import ast.data.function.header.FuncSlot;
 import ast.data.raw.RawComponent;
 import ast.data.raw.RawComposition;
+import ast.data.reference.Reference;
 import ast.doc.compgraph.Component;
 import ast.doc.compgraph.Interface;
 import ast.doc.compgraph.SubComponent;
@@ -76,7 +76,7 @@ public class CompositionGraphMaker {
     }
 
     for (CompUse use : TypeFilter.select(impl.getInstantiation(), CompUse.class)) {
-      ast.data.raw.RawComponent comptype = (RawComponent) ((ast.data.template.Template) ((Reference) use.compRef).link).getObject();
+      ast.data.raw.RawComponent comptype = (RawComponent) use.compRef.ref.link;
       Designator subpath = kp.get(comptype);
       SubComponent sub = new SubComponent(use.getInfo(), use.name, subpath, comptype.name, filterMetadata(use.getInfo().metadata, METADATA_KEY));
 
@@ -119,7 +119,7 @@ public class CompositionGraphMaker {
 
     Designator name = new Designator("Self", ep.link.name);
     if (!ep.offset.isEmpty()) {
-      name = new Designator(name, ((ast.data.expression.reference.RefName) ep.offset.get(0)).name);
+      name = new Designator(name, ((ast.data.reference.RefName) ep.offset.get(0)).name);
     }
 
     Interface iface = ifacemap.get(name);

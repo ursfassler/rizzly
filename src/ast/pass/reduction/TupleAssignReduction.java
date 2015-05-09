@@ -26,17 +26,19 @@ import ast.copy.Copy;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.expression.Expression;
-import ast.data.expression.NamedElementsValue;
-import ast.data.expression.NamedValue;
-import ast.data.expression.TupleValue;
-import ast.data.expression.reference.RefName;
-import ast.data.expression.reference.Reference;
-import ast.data.expression.reference.SimpleRef;
+import ast.data.expression.RefExp;
+import ast.data.expression.value.NamedElementsValue;
+import ast.data.expression.value.NamedValue;
+import ast.data.expression.value.TupleValue;
+import ast.data.reference.RefFactory;
+import ast.data.reference.RefName;
+import ast.data.reference.Reference;
 import ast.data.statement.AssignmentMulti;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Statement;
 import ast.data.statement.VarDefStmt;
 import ast.data.type.Type;
+import ast.data.type.TypeRefFactory;
 import ast.data.type.composed.RecordType;
 import ast.data.variable.FuncVariable;
 import ast.knowledge.KnowType;
@@ -129,17 +131,17 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
     if (rt instanceof RecordType) {
       String name = Designator.NAME_SEP + "var"; // XXX add pass to make names
       // unique
-      FuncVariable var = new FuncVariable(info, name, new SimpleRef<Type>(info, rt));
+      FuncVariable var = new FuncVariable(info, name, TypeRefFactory.create(info, rt));
 
       List<Statement> ret = new ArrayList<Statement>();
       ret.add(new VarDefStmt(info, var));
-      ret.add(new AssignmentSingle(info, new Reference(info, var), right));
+      ret.add(new AssignmentSingle(info, RefFactory.full(info, var), right));
 
       for (int i = 0; i < left.size(); i++) {
         Reference lr = left.get(i);
         String elemName = ((RecordType) rt).element.get(i).name;
-        Reference rr = new Reference(info, var, new RefName(info, elemName));
-        ret.add(new AssignmentSingle(info, lr, rr));
+        Reference rr = RefFactory.create(info, var, new RefName(info, elemName));
+        ret.add(new AssignmentSingle(info, lr, new RefExp(info, rr)));
       }
 
       return ret;

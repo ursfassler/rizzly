@@ -21,7 +21,7 @@ import ast.data.Ast;
 import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateSimple;
-import ast.data.expression.reference.Reference;
+import ast.data.reference.Reference;
 import ast.traverser.NullTraverser;
 
 /**
