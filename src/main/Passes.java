@@ -89,7 +89,7 @@ import ast.pass.reduction.StateLinkReduction;
 import ast.pass.reduction.TupleAssignReduction;
 import ast.pass.reduction.hfsm.HfsmReduction;
 import ast.pass.specializer.StateVarInitExecutor;
-import ast.pass.specializer.TypeEvalReplacerPass;
+import ast.pass.specializer.TypeEvalPass;
 import error.RError;
 
 public class Passes {
@@ -193,7 +193,7 @@ public class Passes {
     passes.add(new RootInstanceAdder());
 
     passes.add(new GlobalConstEval());
-    passes.add(new TypeEvalReplacerPass());
+    passes.add(new TypeEvalPass());
 
     passes.add(new VarDefSplitter());
     passes.add(new UnusedRemover());

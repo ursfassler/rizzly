@@ -764,7 +764,7 @@ class CWriterWorker extends NullTraverser<Void, Boolean> {
         case '\t':
           ret += "\\t";
           break;
-          // TODO more symbols to escape?
+        // TODO more symbols to escape?
         default:
           ret += c;
           break;

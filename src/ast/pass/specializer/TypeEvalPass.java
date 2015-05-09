@@ -17,6 +17,7 @@
 
 package ast.pass.specializer;
 
+import ast.data.Namespace;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 
@@ -28,13 +29,12 @@ import ast.pass.AstPass;
  * @author urs
  *
  */
-public class TypeEvalReplacerPass extends AstPass {
+public class TypeEvalPass extends AstPass {
 
   @Override
-  public void process(ast.data.Namespace root, KnowledgeBase kb) {
+  public void process(Namespace root, KnowledgeBase kb) {
     kb.clear();
     InstanceRepo ir = new InstanceRepo();
-    TypeEvalReplacer replacer = new TypeEvalReplacer(ir, kb);
-    replacer.traverse(root, null);
+    TypeEvalExecutor.eval(root, ir, kb);
   }
 }

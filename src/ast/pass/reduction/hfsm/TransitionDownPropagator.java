@@ -251,7 +251,7 @@ class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam
     /*
      * for all states in obj.getItem() we want to know, which transitions are before and which ones are after the
      * specific state.
-     *
+     * 
      * the map spos contains the position of the state in the transition array
      */
 

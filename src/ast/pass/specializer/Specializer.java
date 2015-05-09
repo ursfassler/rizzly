@@ -100,9 +100,7 @@ public class Specializer {
 
       ki.add(templ, genspec, inst);
 
-      // evaluate
-      TypeEvalReplacer typeEvalReplacer = new TypeEvalReplacer(ki, kb);
-      typeEvalReplacer.traverse(inst, null);
+      TypeEvalExecutor.eval(inst, ki, kb);
 
       ConstEval.process(inst, kb);
 
@@ -111,7 +109,7 @@ public class Specializer {
     }
 
     while (inst instanceof Reference) {
-      ast.data.reference.Reference ref = (ast.data.reference.Reference) inst;
+      Reference ref = (Reference) inst;
       assert (ref.offset.isEmpty());
       inst = ref.link;
     }
