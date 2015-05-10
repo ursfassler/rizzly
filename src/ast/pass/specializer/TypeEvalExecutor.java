@@ -25,24 +25,34 @@ import ast.data.reference.Reference;
 import ast.data.template.ActualTemplateArgument;
 import ast.data.template.Template;
 import ast.knowledge.KnowledgeBase;
-import ast.repository.query.Collector;
-import ast.specification.IsClass;
+import ast.traverser.DefTraverser;
 import error.ErrorType;
 import error.RError;
 
-class TypeEvalExecutor {
+public class TypeEvalExecutor extends DefTraverser<Void, Void> {
+  final private InstanceRepo ir;
+  final private KnowledgeBase kb;
 
   public static void eval(Ast root, InstanceRepo ir, KnowledgeBase kb) {
-    AstList<Reference> list = Collector.select(root, new IsClass(Reference.class)).castTo(Reference.class);
-
-    for (Reference itr : list) {
-      if (itr.link instanceof Template) {
-        evalTemplate(itr, ir, kb);
-      }
-    }
+    TypeEvalExecutor executor = new TypeEvalExecutor(ir, kb);
+    executor.traverse(root, null);
   }
 
-  private static void evalTemplate(Reference obj, InstanceRepo ir, KnowledgeBase kb) {
+  public TypeEvalExecutor(InstanceRepo ir, KnowledgeBase kb) {
+    super();
+    this.ir = ir;
+    this.kb = kb;
+  }
+
+  @Override
+  protected Void visitTemplate(Template obj, Void param) {
+    return null;
+  }
+
+  @Override
+  protected Void visitReference(Reference obj, Void param) {
+    super.visitReference(obj, param);
+
     AstList<ActualTemplateArgument> arg = new AstList<ActualTemplateArgument>();
     if (!obj.offset.isEmpty()) {
       if (obj.offset.get(0) instanceof RefTemplCall) {
@@ -51,14 +61,17 @@ class TypeEvalExecutor {
       }
     }
 
-    Template template = (Template) obj.link;
-    if (template.getTempl().size() != arg.size()) {
-      RError.err(ErrorType.Error, obj.getInfo(), "Wrong number of parameter, expected " + template.getTempl().size() + " got " + arg.size());
-      return;
+    if (obj.link instanceof Template) {
+      RError.ass(arg != null, obj.getInfo());
+      Template template = (Template) obj.link;
+      if (template.getTempl().size() != arg.size()) {
+        RError.err(ErrorType.Error, obj.getInfo(), "Wrong number of parameter, expected " + template.getTempl().size() + " got " + arg.size());
+        return null;
+      }
+      Ast inst = Specializer.process(template, arg, ir, kb);
+      obj.link = (Named) inst;
     }
-
-    Ast inst = Specializer.process(template, arg, ir, kb);
-    obj.link = (Named) inst;
+    return null;
   }
 
 }
