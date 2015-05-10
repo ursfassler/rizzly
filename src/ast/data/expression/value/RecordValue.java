@@ -21,10 +21,9 @@ import java.util.Collection;
 
 import ast.ElementInfo;
 import ast.data.AstList;
-import ast.data.expression.Expression;
 import ast.data.type.TypeRef;
 
-public class RecordValue extends Expression {
+public class RecordValue extends ValueExpr {
   final public AstList<NamedValue> value = new AstList<NamedValue>();
   public TypeRef type;
 

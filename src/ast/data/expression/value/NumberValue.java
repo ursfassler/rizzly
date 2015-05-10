@@ -20,13 +20,12 @@ package ast.data.expression.value;
 import java.math.BigInteger;
 
 import ast.ElementInfo;
-import ast.data.expression.Expression;
 
 /**
  *
  * @author urs
  */
-public class NumberValue extends Expression {
+public class NumberValue extends ValueExpr {
 
   final public BigInteger value;
 

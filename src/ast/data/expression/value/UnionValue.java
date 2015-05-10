@@ -18,10 +18,9 @@
 package ast.data.expression.value;
 
 import ast.ElementInfo;
-import ast.data.expression.Expression;
 import ast.data.type.TypeRef;
 
-public class UnionValue extends Expression {
+public class UnionValue extends ValueExpr {
   public NamedValue tagValue;
   public NamedValue contentValue;
   public TypeRef type;

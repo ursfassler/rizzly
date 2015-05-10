@@ -18,9 +18,8 @@
 package ast.data.expression.value;
 
 import ast.ElementInfo;
-import ast.data.expression.Expression;
 
-public class BoolValue extends Expression {
+public class BoolValue extends ValueExpr {
   public final boolean value;
 
   public BoolValue(ElementInfo info, boolean value) {

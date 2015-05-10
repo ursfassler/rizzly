@@ -23,7 +23,7 @@ import ast.data.expression.Expression;
 
 public class NamedValue extends AstBase {
   public final String name;
-  public Expression value;
+  public Expression value;  // TODO change to ValueExpr
 
   public NamedValue(ElementInfo info, String name, Expression value) {
     super(info);

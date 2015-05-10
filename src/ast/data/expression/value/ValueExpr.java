@@ -18,14 +18,12 @@
 package ast.data.expression.value;
 
 import ast.ElementInfo;
-import ast.data.AstList;
+import ast.data.expression.Expression;
 
-public class NamedElementsValue extends ValueExpr {
-  final public AstList<NamedValue> value;
+abstract public class ValueExpr extends Expression {
 
-  public NamedElementsValue(ElementInfo info, AstList<NamedValue> value) {
+  public ValueExpr(ElementInfo info) {
     super(info);
-    this.value = value;
   }
 
 }

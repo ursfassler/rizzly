@@ -18,9 +18,8 @@
 package ast.data.expression.value;
 
 import ast.ElementInfo;
-import ast.data.expression.Expression;
 
-public class AnyValue extends Expression {
+public class AnyValue extends ValueExpr {
   static final public String NAME = "?";
 
   public AnyValue(ElementInfo info) {

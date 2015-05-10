@@ -89,6 +89,7 @@ import ast.data.expression.value.StringValue;
 import ast.data.expression.value.TupleValue;
 import ast.data.expression.value.UnionValue;
 import ast.data.expression.value.UnsafeUnionValue;
+import ast.data.expression.value.ValueExpr;
 import ast.data.file.RizzlyFile;
 import ast.data.function.FuncRef;
 import ast.data.function.Function;
@@ -489,6 +490,27 @@ public abstract class Traverser<R, P> {
   }
 
   protected R visitExpression(Expression obj, P param) {
+    if (obj instanceof ValueExpr) {
+      return visitValueExpr((ValueExpr) obj, param);
+    } else if (obj instanceof BinaryExp) {
+      return visitBinaryExp((BinaryExp) obj, param);
+    } else if (obj instanceof UnaryExp) {
+      return visitUnaryExp((UnaryExp) obj, param);
+    } else if (obj instanceof RefExp) {
+      return visitRefExpr((RefExp) obj, param);
+    } else if (obj instanceof TypeCast) {
+      return visitTypeCast((TypeCast) obj, param);
+    } else if (obj instanceof ArithmeticOp) {
+      return visitArithmeticOp((ArithmeticOp) obj, param);
+    } else if (obj instanceof Relation) {
+      return visitRelation((Relation) obj, param);
+    } else {
+      throwUnknownObjectError(obj);
+      return null;
+    }
+  }
+
+  protected R visitValueExpr(ValueExpr obj, P param) {
     if (obj instanceof NumberValue) {
       return visitNumber((NumberValue) obj, param);
     } else if (obj instanceof StringValue) {
@@ -499,14 +521,6 @@ public abstract class Traverser<R, P> {
       return visitTupleValue((TupleValue) obj, param);
     } else if (obj instanceof BoolValue) {
       return visitBoolValue((BoolValue) obj, param);
-    } else if (obj instanceof BinaryExp) {
-      return visitBinaryExp((BinaryExp) obj, param);
-    } else if (obj instanceof UnaryExp) {
-      return visitUnaryExp((UnaryExp) obj, param);
-    } else if (obj instanceof RefExp) {
-      return visitRefExpr((RefExp) obj, param);
-    } else if (obj instanceof TypeCast) {
-      return visitTypeCast((TypeCast) obj, param);
     } else if (obj instanceof AnyValue) {
       return visitAnyValue((AnyValue) obj, param);
     } else if (obj instanceof UnionValue) {
@@ -517,10 +531,6 @@ public abstract class Traverser<R, P> {
       return visitRecordValue((RecordValue) obj, param);
     } else if (obj instanceof NamedElementsValue) {
       return visitNamedElementsValue((NamedElementsValue) obj, param);
-    } else if (obj instanceof ArithmeticOp) {
-      return visitArithmeticOp((ArithmeticOp) obj, param);
-    } else if (obj instanceof Relation) {
-      return visitRelation((Relation) obj, param);
     } else {
       throwUnknownObjectError(obj);
       return null;

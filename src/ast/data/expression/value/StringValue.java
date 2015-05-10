@@ -18,13 +18,12 @@
 package ast.data.expression.value;
 
 import ast.ElementInfo;
-import ast.data.expression.Expression;
 
 /**
  *
  * @author urs
  */
-public class StringValue extends Expression {
+public class StringValue extends ValueExpr {
 
   final public String value;
 
