@@ -28,6 +28,7 @@ import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.StateContent;
 import ast.data.expression.Expression;
 import ast.data.expression.RefExp;
+import ast.data.expression.value.ValueExpr;
 import ast.data.function.template.FunctionTemplate;
 import ast.data.raw.RawElementary;
 import ast.data.reference.Reference;
@@ -44,17 +45,34 @@ import ast.specification.IsTypeTemplate;
 import error.ErrorType;
 import error.RError;
 
-//TODO rethink it; make it clean
 public class Specializer {
   private final Template item;
   private final AstList<ActualTemplateArgument> genspec;
   private final InstanceRepo ir;
   private final KnowledgeBase kb;
 
+  @Deprecated
+  // FIXME use process, provide evaluated
+  public static Ast evalArgAndProcess(Template item, AstList<ActualTemplateArgument> genspec, InstanceRepo ir, KnowledgeBase kb) {
+    if (!isEvaluated(genspec)) {
+      genspec = evalArg(item.getTempl(), genspec, ir, kb);
+    }
+    return process(item, genspec, ir, kb);
+  }
+
   public static Ast process(Template item, AstList<ActualTemplateArgument> genspec, InstanceRepo ir, KnowledgeBase kb) {
-    genspec = Specializer.evalArg(item.getTempl(), genspec, ir, kb);
+    assert (isEvaluated(genspec));
     Specializer specializer = new Specializer(item, genspec, ir, kb);
     return specializer.work();
+  }
+
+  private static boolean isEvaluated(AstList<ActualTemplateArgument> genspec) {
+    for (ActualTemplateArgument ta : genspec) {
+      if (!(ta instanceof Type) && !(ta instanceof ValueExpr)) {
+        return false;
+      }
+    }
+    return true;
   }
 
   public Specializer(Template item, AstList<ActualTemplateArgument> genspec, InstanceRepo ir, KnowledgeBase kb) {
@@ -82,29 +100,6 @@ public class Specializer {
     assert (!(inst instanceof Reference));
 
     return inst;
-  }
-
-  @Deprecated
-  // FIXME the provided arguments should be evaluated before calling
-  static private AstList<ActualTemplateArgument> evalArg(AstList<TemplateParameter> param, AstList<ActualTemplateArgument> arg, InstanceRepo ir, KnowledgeBase kb) {
-    assert (param.size() == arg.size());
-
-    AstList<ActualTemplateArgument> ret = new AstList<ActualTemplateArgument>();
-
-    IsTypeTemplate isType = new IsTypeTemplate();
-
-    for (int i = 0; i < arg.size(); i++) {
-      ActualTemplateArgument itr = arg.get(i);
-      TemplateParameter tmpl = param.get(i);
-      if (isType.isSatisfiedBy(tmpl)) {
-        itr = evalType(((RefExp) itr).ref, ir, kb);
-      } else {
-        itr = evalExpr((Expression) itr, ir, kb);
-      }
-      ret.add(itr);
-    }
-
-    return ret;
   }
 
   private Ast createInstance() {
@@ -150,7 +145,7 @@ public class Specializer {
     inst = Copy.copy(templ);
 
     Map<TemplateParameter, Type> typeMap = createArgMap(Type.class);
-    Map<TemplateParameter, Expression> valueMap = createArgMap(Expression.class);
+    Map<TemplateParameter, ValueExpr> valueMap = createArgMap(ValueExpr.class);
 
     if (typeMap.size() + valueMap.size() != genspec.size()) {
       RError.err(ErrorType.Fatal, templ.getInfo(), "Template argument missmatch");
@@ -185,22 +180,6 @@ public class Specializer {
     return valueMap;
   }
 
-  private Map<TemplateParameter, Expression> getValues() {
-    return createArgMap(Expression.class);
-  }
-
-  private Map<TemplateParameter, Type> getTypes() {
-    return createArgMap(Type.class);
-  }
-
-  private static Expression evalExpr(Expression itr, InstanceRepo ir, KnowledgeBase kb) {
-    return ExprEvaluator.evaluate(itr, new Memory(), ir, kb);
-  }
-
-  private static Type evalType(Reference ref, InstanceRepo ir, KnowledgeBase kb) {
-    return TypeEvaluator.evaluate(ref, new Memory(), ir, kb);
-  }
-
   private void addChild(Ast inst, Ast parent) {
     if (parent instanceof Namespace) {
       ((ast.data.Namespace) parent).children.add(inst);
@@ -211,6 +190,37 @@ public class Specializer {
     } else {
       throw new RuntimeException("not yet implemented: " + parent.getClass().getCanonicalName());
     }
+  }
+
+  @Deprecated
+  // FIXME the provided arguments should be evaluated before calling
+  static private AstList<ActualTemplateArgument> evalArg(AstList<TemplateParameter> param, AstList<ActualTemplateArgument> arg, InstanceRepo ir, KnowledgeBase kb) {
+    assert (param.size() == arg.size());
+
+    AstList<ActualTemplateArgument> ret = new AstList<ActualTemplateArgument>();
+
+    IsTypeTemplate isType = new IsTypeTemplate();
+
+    for (int i = 0; i < arg.size(); i++) {
+      ActualTemplateArgument itr = arg.get(i);
+      TemplateParameter tmpl = param.get(i);
+      if (isType.isSatisfiedBy(tmpl)) {
+        itr = evalType(((RefExp) itr).ref, ir, kb);
+      } else {
+        itr = evalExpr((Expression) itr, ir, kb);
+      }
+      ret.add(itr);
+    }
+
+    return ret;
+  }
+
+  private static Expression evalExpr(Expression itr, InstanceRepo ir, KnowledgeBase kb) {
+    return ExprEvaluator.evaluate(itr, new Memory(), ir, kb);
+  }
+
+  private static Type evalType(Reference ref, InstanceRepo ir, KnowledgeBase kb) {
+    return TypeEvaluator.evaluate(ref, new Memory(), ir, kb);
   }
 
 }

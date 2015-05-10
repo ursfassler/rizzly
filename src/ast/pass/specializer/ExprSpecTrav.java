@@ -22,15 +22,16 @@ import java.util.Map;
 import ast.copy.Copy;
 import ast.data.expression.Expression;
 import ast.data.expression.RefExp;
+import ast.data.expression.value.ValueExpr;
 import ast.data.reference.DummyLinkTarget;
 import ast.data.reference.Reference;
 import ast.data.variable.TemplateParameter;
 import ast.traverser.other.ExprReplacer;
 
 public class ExprSpecTrav extends ExprReplacer<Void> {
-  final private Map<TemplateParameter, Expression> values;
+  final private Map<TemplateParameter, ValueExpr> values;
 
-  public ExprSpecTrav(Map<TemplateParameter, Expression> values) {
+  public ExprSpecTrav(Map<TemplateParameter, ValueExpr> values) {
     super();
     this.values = values;
   }
@@ -40,7 +41,7 @@ public class ExprSpecTrav extends ExprReplacer<Void> {
     obj = (RefExp) super.visitRefExpr(obj, param);
 
     if (values.containsKey(obj.ref.link)) {
-      Reference ref = (Reference) obj.ref;
+      Reference ref = obj.ref;
 
       assert (!(ref.link instanceof DummyLinkTarget));
       assert (ref.offset.isEmpty());

@@ -68,7 +68,7 @@ public class TypeEvalExecutor extends DefTraverser<Void, Void> {
         RError.err(ErrorType.Error, obj.getInfo(), "Wrong number of parameter, expected " + template.getTempl().size() + " got " + arg.size());
         return null;
       }
-      Ast inst = Specializer.process(template, arg, ir, kb);
+      Ast inst = Specializer.evalArgAndProcess(template, arg, ir, kb);
       obj.link = (Named) inst;
     }
     return null;

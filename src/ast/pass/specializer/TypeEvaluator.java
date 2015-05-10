@@ -27,7 +27,7 @@ import ast.knowledge.KnowledgeBase;
 public class TypeEvaluator {
 
   public static Type evaluate(Reference obj, Memory memory, InstanceRepo ir, KnowledgeBase kb) {
-    Reference ref = (Reference) obj;
+    Reference ref = obj;
 
     if (ref.link instanceof Template) {
       Template template = (Template) ref.link;
@@ -35,7 +35,7 @@ public class TypeEvaluator {
       assert (ref.offset.get(0) instanceof RefTemplCall);
       RefTemplCall call = (RefTemplCall) ref.offset.get(0);
 
-      return (Type) Specializer.process(template, call.actualParameter, ir, kb);
+      return (Type) Specializer.evalArgAndProcess(template, call.actualParameter, ir, kb);
     } else if (ref.link instanceof Type) {
       assert (ref.offset.size() == 0);
       return (Type) ref.link;
