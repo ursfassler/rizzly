@@ -18,11 +18,11 @@
 package ast.pass.specializer;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import ast.copy.Copy;
 import ast.data.Ast;
+import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.StateContent;
@@ -34,80 +34,45 @@ import ast.data.reference.Reference;
 import ast.data.template.ActualTemplateArgument;
 import ast.data.template.Template;
 import ast.data.type.Type;
-import ast.data.type.special.TypeType;
 import ast.data.type.template.TypeTemplate;
 import ast.data.variable.TemplateParameter;
 import ast.interpreter.Memory;
 import ast.knowledge.KnowParent;
 import ast.knowledge.KnowledgeBase;
+import ast.specification.IsClass;
+import ast.specification.IsTypeTemplate;
+import error.ErrorType;
+import error.RError;
 
 //TODO rethink it; make it clean
 public class Specializer {
+  private final Template item;
+  private final AstList<ActualTemplateArgument> genspec;
+  private final InstanceRepo ir;
+  private final KnowledgeBase kb;
 
-  public static Ast process(Template item, List<ActualTemplateArgument> genspec, InstanceRepo ki, KnowledgeBase kb) {
-    assert (item.getTempl().size() == genspec.size());
+  public static Ast process(Template item, AstList<ActualTemplateArgument> genspec, InstanceRepo ir, KnowledgeBase kb) {
+    genspec = Specializer.evalArg(item.getTempl(), genspec, ir, kb);
+    Specializer specializer = new Specializer(item, genspec, ir, kb);
+    return specializer.work();
+  }
 
-    Map<TemplateParameter, Type> typeMap = new HashMap<TemplateParameter, Type>();
-    Map<TemplateParameter, Expression> valueMap = new HashMap<TemplateParameter, Expression>();
+  public Specializer(Template item, AstList<ActualTemplateArgument> genspec, InstanceRepo ir, KnowledgeBase kb) {
+    super();
+    this.item = item;
+    this.genspec = genspec;
+    this.ir = ir;
+    this.kb = kb;
+  }
 
-    for (int i = 0; i < genspec.size(); i++) {
-      ActualTemplateArgument itr = genspec.get(i);
-      TemplateParameter tmpl = item.getTempl().get(i);
-      if (isTypeTempl(tmpl)) {
-        Type type = evalType(ki, kb, ((RefExp) itr).ref);
-        typeMap.put(tmpl, type);
-        itr = type;
-      } else {
-        Expression expr = evalExpr(ki, kb, (Expression) itr);
-        valueMap.put(tmpl, expr);
-        itr = expr;
-      }
-      genspec.set(i, itr);
-    }
-
-    Ast templ = item.getObject();
-
-    Ast inst = ki.find(templ, genspec);
+  public Ast work() {
+    Ast inst = ir.find(item.getObject(), genspec);
 
     if (inst == null) {
-      if (templ instanceof TypeTemplate) {
-        inst = TypeTemplateSpecializer.process((TypeTemplate) templ, genspec, kb);
-      } else if (templ instanceof FunctionTemplate) {
-        inst = FunctionTemplateSpecializer.process((FunctionTemplate) templ, genspec, ki, kb);
-      } else {
-        inst = Copy.copy(templ);
-
-        TypeSpecTrav typeEval = new TypeSpecTrav(typeMap);
-        Reference tr = typeEval.traverse(inst, null);
-
-        ExprSpecTrav exprEval = new ExprSpecTrav(valueMap);
-        Expression ri = exprEval.traverse(inst, null);
-
-        if (tr != null) {
-          inst = tr;
-        }
-        if (ri != null) {
-          assert (false);
-        }
-
-        KnowParent kp = kb.getEntry(KnowParent.class);
-        Ast parent = kp.get(item);
-
-        // TODO create clean name
-
-        addChild(inst, parent);
-      }
-
-      ki.add(templ, genspec, inst);
-
-      TypeEvalExecutor.eval(inst, ki, kb);
-
-      ConstEval.process(inst, kb);
-
-      // remove templates
-      TemplDel.process(inst);
+      inst = createInstance();
     }
 
+    // XXX WTF?
     while (inst instanceof Reference) {
       Reference ref = (Reference) inst;
       assert (ref.offset.isEmpty());
@@ -119,20 +84,124 @@ public class Specializer {
     return inst;
   }
 
-  private static boolean isTypeTempl(TemplateParameter templateParameter) {
-    Type type = (Type) templateParameter.type.ref.getTarget();
-    return type instanceof TypeType;
+  @Deprecated
+  // FIXME the provided arguments should be evaluated before calling
+  static private AstList<ActualTemplateArgument> evalArg(AstList<TemplateParameter> param, AstList<ActualTemplateArgument> arg, InstanceRepo ir, KnowledgeBase kb) {
+    assert (param.size() == arg.size());
+
+    AstList<ActualTemplateArgument> ret = new AstList<ActualTemplateArgument>();
+
+    IsTypeTemplate isType = new IsTypeTemplate();
+
+    for (int i = 0; i < arg.size(); i++) {
+      ActualTemplateArgument itr = arg.get(i);
+      TemplateParameter tmpl = param.get(i);
+      if (isType.isSatisfiedBy(tmpl)) {
+        itr = evalType(((RefExp) itr).ref, ir, kb);
+      } else {
+        itr = evalExpr((Expression) itr, ir, kb);
+      }
+      ret.add(itr);
+    }
+
+    return ret;
   }
 
-  private static Expression evalExpr(InstanceRepo ir, KnowledgeBase kb, Expression itr) {
+  private Ast createInstance() {
+    Ast inst;
+    Ast templ = item.getObject();
+
+    inst = eval(templ);
+    ir.add(templ, genspec, inst);
+
+    TypeEvalExecutor.eval(inst, ir, kb);
+
+    ConstEval.process(inst, kb);
+
+    // remove templates
+    TemplDel.process(inst);
+    return inst;
+  }
+
+  private Ast eval(Ast templ) {
+    Ast inst;
+    if (templ instanceof TypeTemplate) {
+      inst = TypeTemplateSpecializer.process((TypeTemplate) templ, genspec, kb);
+    } else if (templ instanceof FunctionTemplate) {
+      inst = FunctionTemplateSpecializer.process((FunctionTemplate) templ, genspec, ir, kb);
+    } else {
+      inst = evalUser(templ);
+      append(inst);
+    }
+    return inst;
+  }
+
+  private void append(Ast inst) {
+    KnowParent kp = kb.getEntry(KnowParent.class);
+    Ast parent = kp.get(item);
+
+    // TODO create clean name
+
+    addChild(inst, parent);
+  }
+
+  private Ast evalUser(Ast templ) {
+    Ast inst;
+    inst = Copy.copy(templ);
+
+    Map<TemplateParameter, Type> typeMap = createArgMap(Type.class);
+    Map<TemplateParameter, Expression> valueMap = createArgMap(Expression.class);
+
+    if (typeMap.size() + valueMap.size() != genspec.size()) {
+      RError.err(ErrorType.Fatal, templ.getInfo(), "Template argument missmatch");
+    }
+
+    TypeSpecTrav typeEval = new TypeSpecTrav(typeMap);
+    Reference tr = typeEval.traverse(inst, null);
+
+    ExprSpecTrav exprEval = new ExprSpecTrav(valueMap);
+    Expression ri = exprEval.traverse(inst, null);
+
+    if (tr != null) {
+      inst = tr;
+    }
+    if (ri != null) {
+      assert (false);
+    }
+    return inst;
+  }
+
+  private <T extends Ast> Map<TemplateParameter, T> createArgMap(Class<T> kind) {
+    IsClass isClass = new IsClass(kind);
+
+    Map<TemplateParameter, T> valueMap = new HashMap<TemplateParameter, T>();
+    for (int i = 0; i < genspec.size(); i++) {
+      ActualTemplateArgument itr = genspec.get(i);
+      TemplateParameter tmpl = item.getTempl().get(i);
+      if (isClass.isSatisfiedBy(itr)) {
+        valueMap.put(tmpl, (T) itr);
+      }
+    }
+    return valueMap;
+  }
+
+  private Map<TemplateParameter, Expression> getValues() {
+    return createArgMap(Expression.class);
+  }
+
+  private Map<TemplateParameter, Type> getTypes() {
+    return createArgMap(Type.class);
+  }
+
+  private static Expression evalExpr(Expression itr, InstanceRepo ir, KnowledgeBase kb) {
     return ExprEvaluator.evaluate(itr, new Memory(), ir, kb);
   }
 
-  private static Type evalType(InstanceRepo ir, KnowledgeBase kb, Reference ref) {
+  private static Type evalType(Reference ref, InstanceRepo ir, KnowledgeBase kb) {
     return TypeEvaluator.evaluate(ref, new Memory(), ir, kb);
   }
 
-  private static void addChild(Ast inst, Ast parent) {
+  private void addChild(Ast inst, Ast parent) {
     if (parent instanceof Namespace) {
       ((ast.data.Namespace) parent).children.add(inst);
     } else if (parent instanceof RawElementary) {
