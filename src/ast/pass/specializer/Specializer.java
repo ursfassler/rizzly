@@ -182,11 +182,11 @@ public class Specializer {
 
   private void addChild(Ast inst, Ast parent) {
     if (parent instanceof Namespace) {
-      ((ast.data.Namespace) parent).children.add(inst);
+      ((Namespace) parent).children.add(inst);
     } else if (parent instanceof RawElementary) {
       ((RawElementary) parent).getInstantiation().add(inst);
     } else if (parent instanceof State) {
-      ((ast.data.component.hfsm.State) parent).item.add((StateContent) inst);
+      ((State) parent).item.add((StateContent) inst);
     } else {
       throw new RuntimeException("not yet implemented: " + parent.getClass().getCanonicalName());
     }
