@@ -15,14 +15,14 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.traverser.other;
+package ast.dispatcher.other;
 
 import java.util.Set;
 
 import ast.Designator;
 import ast.data.Ast;
 import ast.data.Named;
-import ast.traverser.DefTraverser;
+import ast.dispatcher.DfsTraverser;
 
 //TODO how to ensure that names are unique?
 //TODO use blacklist with keywords
@@ -33,7 +33,7 @@ import ast.traverser.DefTraverser;
  * @author urs
  *
  */
-public class Renamer extends DefTraverser<Void, Void> {
+public class Renamer extends DfsTraverser<Void, Void> {
 
   final private Set<String> blacklist;
 

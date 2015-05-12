@@ -27,10 +27,10 @@ import ast.data.function.Function;
 import ast.data.type.Type;
 import ast.data.type.base.EnumType;
 import ast.data.variable.Variable;
+import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.DefTraverser;
 
 public class Typecheck extends AstPass {
   static public void process(Ast ast, KnowledgeBase kb) {
@@ -45,7 +45,7 @@ public class Typecheck extends AstPass {
   }
 }
 
-class TypeCheckerWorker extends DefTraverser<Void, Void> {
+class TypeCheckerWorker extends DfsTraverser<Void, Void> {
   private KnowledgeBase kb;
 
   public TypeCheckerWorker(KnowledgeBase kb) {

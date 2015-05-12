@@ -20,7 +20,7 @@ package ast.pass.specializer;
 import util.Pair;
 import ast.data.Ast;
 import ast.data.expression.Expression;
-import ast.traverser.other.ExprReplacer;
+import ast.dispatcher.other.ExprReplacer;
 
 public class ValueReplacer extends ExprReplacer<Pair<Expression, Expression>> {
   static final private ValueReplacer INSTANCE = new ValueReplacer();

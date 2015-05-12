@@ -58,13 +58,13 @@ import ast.data.type.Type;
 import ast.data.variable.Constant;
 import ast.data.variable.FuncVariable;
 import ast.data.variable.TemplateParameter;
+import ast.dispatcher.NullDispatcher;
 import ast.interpreter.Memory;
 import ast.knowledge.KnowledgeBase;
-import ast.traverser.NullTraverser;
 import error.ErrorType;
 import error.RError;
 
-public class ExprEvaluator extends NullTraverser<Expression, Void> {
+public class ExprEvaluator extends NullDispatcher<Expression, Void> {
   private final Memory memory;
   private final InstanceRepo ir;
   private final KnowledgeBase kb;

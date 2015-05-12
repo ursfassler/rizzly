@@ -28,10 +28,10 @@ import ast.data.expression.unop.BitNot;
 import ast.data.expression.value.NumberValue;
 import ast.data.type.Type;
 import ast.data.type.base.RangeType;
+import ast.dispatcher.other.ExprReplacer;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.other.ExprReplacer;
 
 /**
  * Cuts back the result of bitnot operations

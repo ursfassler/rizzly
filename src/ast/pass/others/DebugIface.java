@@ -44,12 +44,12 @@ import ast.data.type.base.ArrayType;
 import ast.data.type.base.RangeType;
 import ast.data.type.base.StringType;
 import ast.data.variable.FuncVariable;
+import ast.dispatcher.debug.MsgNamesGetter;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.pass.debug.CompCascadeDepth;
 import ast.pass.debug.DebugIfaceAdder;
 import ast.repository.manipulator.TypeRepo;
-import ast.traverser.debug.MsgNamesGetter;
 
 public class DebugIface extends AstPass {
 

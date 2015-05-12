@@ -33,13 +33,13 @@ import ast.data.component.composition.Endpoint;
 import ast.data.component.composition.EndpointSub;
 import ast.data.component.composition.ImplComposition;
 import ast.data.component.elementary.ImplElementary;
+import ast.dispatcher.other.CallgraphMaker;
 import ast.doc.SimpleGraph;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.pass.helper.GraphHelper;
 import ast.repository.query.Collector;
 import ast.specification.IsClass;
-import ast.traverser.other.CallgraphMaker;
 import error.ErrorType;
 import error.RError;
 

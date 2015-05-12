@@ -24,12 +24,12 @@ import ast.data.reference.RefTemplCall;
 import ast.data.reference.Reference;
 import ast.data.template.ActualTemplateArgument;
 import ast.data.template.Template;
+import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
-import ast.traverser.DefTraverser;
 import error.ErrorType;
 import error.RError;
 
-public class TypeEvalExecutor extends DefTraverser<Void, Void> {
+public class TypeEvalExecutor extends DfsTraverser<Void, Void> {
   final private InstanceRepo ir;
   final private KnowledgeBase kb;
 

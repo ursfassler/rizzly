@@ -21,6 +21,8 @@ import ast.data.statement.Return;
 import ast.data.statement.Statement;
 import ast.data.statement.VarDefStmt;
 import ast.data.variable.FuncVariable;
+import ast.dispatcher.other.CallgraphMaker;
+import ast.dispatcher.other.StmtReplacer;
 import ast.doc.SimpleGraph;
 import ast.knowledge.KnowBacklink;
 import ast.knowledge.KnowUniqueName;
@@ -29,8 +31,6 @@ import ast.pass.AstPass;
 import ast.pass.helper.GraphHelper;
 import ast.repository.query.Match;
 import ast.specification.IsClass;
-import ast.traverser.other.CallgraphMaker;
-import ast.traverser.other.StmtReplacer;
 import error.RError;
 
 public class FuncInliner extends AstPass {

@@ -15,17 +15,17 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.traverser.other;
+package ast.dispatcher.other;
 
 import java.util.Collection;
 
 import ast.data.Ast;
 import ast.data.function.Function;
 import ast.data.reference.Reference;
+import ast.dispatcher.DfsTraverser;
 import ast.doc.SimpleGraph;
-import ast.traverser.DefTraverser;
 
-public class DepGraph extends DefTraverser<Void, Ast> {
+public class DepGraph extends DfsTraverser<Void, Ast> {
   final private SimpleGraph<Ast> g = new SimpleGraph<Ast>();
 
   static public SimpleGraph<Ast> build(Ast ast) {

@@ -22,9 +22,9 @@ import java.util.Map;
 
 import ast.data.Ast;
 import ast.data.Namespace;
+import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.DefTraverser;
 
 public class Count extends AstPass {
 
@@ -39,7 +39,7 @@ public class Count extends AstPass {
   }
 }
 
-class CountWorker extends DefTraverser<Void, Map<Class<? extends Ast>, Integer>> {
+class CountWorker extends DfsTraverser<Void, Map<Class<? extends Ast>, Integer>> {
 
   @Override
   protected Void visit(Ast obj, Map<Class<? extends Ast>, Integer> param) {

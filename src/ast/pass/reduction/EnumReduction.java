@@ -33,12 +33,12 @@ import ast.data.type.base.EnumElement;
 import ast.data.type.base.EnumType;
 import ast.data.type.base.RangeType;
 import ast.data.variable.ConstGlobal;
+import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.manipulator.TypeRepo;
 import ast.repository.query.NameFilter;
 import ast.repository.query.TypeFilter;
-import ast.traverser.DefTraverser;
 
 public class EnumReduction extends AstPass {
   @Override
@@ -72,7 +72,7 @@ public class EnumReduction extends AstPass {
 
 }
 
-class EnumReduce extends DefTraverser<Void, Void> {
+class EnumReduce extends DfsTraverser<Void, Void> {
   final private Map<EnumType, RangeType> typeMap;
   final private Map<EnumElement, ConstGlobal> elemMap;
 

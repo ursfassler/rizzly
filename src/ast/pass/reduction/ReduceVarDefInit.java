@@ -6,9 +6,9 @@ import ast.data.Namespace;
 import ast.data.statement.Statement;
 import ast.data.statement.VarDefInitStmt;
 import ast.data.variable.FuncVariable;
+import ast.dispatcher.other.StmtReplacer;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.other.StmtReplacer;
 import error.RError;
 
 public class ReduceVarDefInit extends AstPass {

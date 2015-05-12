@@ -20,9 +20,9 @@ package ast.repository.manipulator;
 import java.util.Collection;
 
 import ast.data.Ast;
+import ast.dispatcher.DfsTraverser;
 import ast.repository.query.List;
 import ast.specification.Specification;
-import ast.traverser.DefTraverser;
 
 public class Manipulate {
   static public void remove(Ast root, Specification spec) {
@@ -32,7 +32,7 @@ public class Manipulate {
 
 }
 
-class Remover extends DefTraverser<Void, Void> {
+class Remover extends DfsTraverser<Void, Void> {
   final private Specification spec;
 
   public Remover(Specification spec) {

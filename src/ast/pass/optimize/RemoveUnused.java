@@ -22,13 +22,13 @@ import java.util.Set;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
+import ast.dispatcher.other.DepGraph;
 import ast.doc.SimpleGraph;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.Collector;
 import ast.specification.ExternalFunction;
 import ast.specification.PublicFunction;
-import ast.traverser.other.DepGraph;
 
 public class RemoveUnused extends AstPass {
 

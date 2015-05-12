@@ -39,7 +39,7 @@ import ast.data.type.special.NaturalType;
 import ast.data.variable.ConstGlobal;
 import ast.data.variable.FuncVariable;
 import ast.data.variable.StateVariable;
-import ast.traverser.NullTraverser;
+import ast.dispatcher.NullDispatcher;
 
 public class SimpleExpression extends Specification {
   static public final SimpleExpression INSTANCE = new SimpleExpression();
@@ -52,7 +52,7 @@ public class SimpleExpression extends Specification {
 
 }
 
-class SimpleGetter extends NullTraverser<Boolean, Void> {
+class SimpleGetter extends NullDispatcher<Boolean, Void> {
 
   @Override
   protected Boolean visitDefault(Ast obj, Void param) {

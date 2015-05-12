@@ -41,6 +41,11 @@ import ast.data.type.TypeRef;
 import ast.data.type.base.EnumElement;
 import ast.data.type.composed.NamedElement;
 import ast.data.variable.FuncVariable;
+import ast.dispatcher.DfsTraverser;
+import ast.dispatcher.other.CHeaderWriter;
+import ast.dispatcher.other.DepCollector;
+import ast.dispatcher.other.FpcHeaderWriter;
+import ast.dispatcher.other.Renamer;
 import ast.doc.SimpleGraph;
 import ast.doc.StreamWriter;
 import ast.knowledge.KnowledgeBase;
@@ -49,11 +54,6 @@ import ast.repository.query.TypeFilter;
 import ast.specification.ExternalFunction;
 import ast.specification.OrSpec;
 import ast.specification.PublicFunction;
-import ast.traverser.DefTraverser;
-import ast.traverser.other.CHeaderWriter;
-import ast.traverser.other.DepCollector;
-import ast.traverser.other.FpcHeaderWriter;
-import ast.traverser.other.Renamer;
 import error.ErrorType;
 import error.RError;
 
@@ -169,7 +169,7 @@ public class HeaderWriter extends AstPass {
   }
 
   private static Set<Type> getDirectUsedTypes(Ast u) {
-    DefTraverser<Void, Set<Type>> getter = new DefTraverser<Void, Set<Type>>() {
+    DfsTraverser<Void, Set<Type>> getter = new DfsTraverser<Void, Set<Type>>() {
 
       @Override
       protected Void visitReference(Reference obj, Set<Type> param) {

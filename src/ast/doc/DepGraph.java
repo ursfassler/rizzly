@@ -19,9 +19,9 @@ package ast.doc;
 
 import ast.data.Ast;
 import ast.data.reference.Reference;
-import ast.traverser.DefTraverser;
+import ast.dispatcher.DfsTraverser;
 
-public class DepGraph extends DefTraverser<Void, Ast> {
+public class DepGraph extends DfsTraverser<Void, Ast> {
   final private SimpleGraph<Ast> g = new SimpleGraph<Ast>();
 
   static public SimpleGraph<Ast> build(Ast root) {

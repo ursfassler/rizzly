@@ -29,9 +29,9 @@ import ast.data.type.composed.UnionType;
 import ast.data.type.composed.UnsafeUnionType;
 import ast.data.type.out.AliasType;
 import ast.data.type.special.VoidType;
-import ast.traverser.NullTraverser;
+import ast.dispatcher.NullDispatcher;
 
-public class CopyType extends NullTraverser<Type, Void> {
+public class CopyType extends NullDispatcher<Type, Void> {
 
   private CopyAst cast;
 

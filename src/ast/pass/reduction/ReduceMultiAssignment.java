@@ -6,9 +6,9 @@ import ast.data.Namespace;
 import ast.data.statement.AssignmentMulti;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Statement;
+import ast.dispatcher.other.StmtReplacer;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.other.StmtReplacer;
 import error.ErrorType;
 import error.RError;
 

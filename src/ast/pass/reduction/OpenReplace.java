@@ -35,11 +35,11 @@ import ast.data.type.base.RangeType;
 import ast.data.type.base.RangeTypeFactory;
 import ast.data.variable.FuncVariable;
 import ast.data.variable.Variable;
+import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.manipulator.TypeRepo;
-import ast.traverser.DefTraverser;
 
 /**
  * Replaces open types (like Integer or Natural) of function arguments with appropriate range types.
@@ -54,7 +54,7 @@ public class OpenReplace extends AstPass {
   }
 }
 
-class OpenReplaceWorker extends DefTraverser<Void, Void> {
+class OpenReplaceWorker extends DfsTraverser<Void, Void> {
   private final KnowType kt;
   private final TypeRepo kbi;
   private final Map<Variable, RangeType> map = new HashMap<Variable, RangeType>();

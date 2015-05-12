@@ -27,11 +27,11 @@ import ast.data.expression.binop.Relation;
 import ast.data.type.Type;
 import ast.data.type.TypeRefFactory;
 import ast.data.type.base.RangeType;
+import ast.dispatcher.other.ExprReplacer;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.manipulator.TypeRepo;
-import ast.traverser.other.ExprReplacer;
 
 /**
  * Insert typecasts in expressions to fit the destination type

@@ -15,7 +15,7 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.traverser;
+package ast.dispatcher;
 
 import java.util.Collection;
 
@@ -181,7 +181,7 @@ import ast.data.variable.StateVariable;
 import ast.data.variable.TemplateParameter;
 import ast.data.variable.Variable;
 
-public abstract class Traverser<R, P> {
+public abstract class Dispatcher<R, P> {
 
   public R traverse(Collection<? extends Ast> list, P param) {
     return visitList(list, param);

@@ -23,9 +23,9 @@ import java.util.List;
 import ast.data.Namespace;
 import ast.data.statement.Block;
 import ast.data.statement.Statement;
+import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.DefTraverser;
 
 public class BlockReduction extends AstPass {
 
@@ -37,7 +37,7 @@ public class BlockReduction extends AstPass {
 
 }
 
-class BlockReductionWorker extends DefTraverser<Void, Void> {
+class BlockReductionWorker extends DfsTraverser<Void, Void> {
 
   @Override
   protected Void visitBlock(Block obj, Void param) {

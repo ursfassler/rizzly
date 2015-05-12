@@ -29,10 +29,10 @@ import ast.data.type.composed.UnionType;
 import ast.data.type.composed.UnsafeUnionType;
 import ast.data.type.special.NaturalType;
 import ast.data.type.special.VoidType;
+import ast.dispatcher.NullDispatcher;
 import ast.repository.manipulator.TypeRepo;
-import ast.traverser.NullTraverser;
 
-public class Supertype extends NullTraverser<Type, Void> {
+public class Supertype extends NullDispatcher<Type, Void> {
   private TypeRepo kbi;
 
   public Supertype(KnowledgeBase kb) {

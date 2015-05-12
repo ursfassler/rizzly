@@ -44,10 +44,10 @@ import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.Statement;
 import ast.data.variable.FuncVariable;
+import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.NullTraverser;
 import error.RError;
 
 public class SystemIfaceAdder extends AstPass {
@@ -62,7 +62,7 @@ public class SystemIfaceAdder extends AstPass {
   }
 }
 
-class SystemIfaceAdderWorker extends NullTraverser<Void, Void> {
+class SystemIfaceAdderWorker extends NullDispatcher<Void, Void> {
   public static final String DESTRUCT = Designator.NAME_SEP + "destruct";
   public static final String CONSTRUCT = Designator.NAME_SEP + "construct";
   final private HashMap<Component, Function> ctors = new HashMap<Component, Function>();
@@ -118,7 +118,7 @@ class SystemIfaceAdderWorker extends NullTraverser<Void, Void> {
   }
 }
 
-class SystemIfaceCaller extends NullTraverser<Void, Void> {
+class SystemIfaceCaller extends NullDispatcher<Void, Void> {
   final private HashMap<Component, Function> ctors;
   final private HashMap<Component, Function> dtors;
 

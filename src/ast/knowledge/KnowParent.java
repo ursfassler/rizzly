@@ -24,7 +24,7 @@ import java.util.Map;
 import ast.Designator;
 import ast.data.Ast;
 import ast.data.type.base.EnumElement;
-import ast.traverser.DefTraverser;
+import ast.dispatcher.DfsTraverser;
 import error.ErrorType;
 import error.RError;
 
@@ -60,7 +60,7 @@ public class KnowParent extends KnowledgeEntry {
 
 }
 
-class KnowParentTraverser extends DefTraverser<Void, Ast> {
+class KnowParentTraverser extends DfsTraverser<Void, Ast> {
   private Map<Ast, Ast> cache;
 
   public KnowParentTraverser(Map<Ast, Ast> cache) {

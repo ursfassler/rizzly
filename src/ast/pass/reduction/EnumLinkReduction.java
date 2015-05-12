@@ -22,10 +22,10 @@ import ast.data.reference.RefName;
 import ast.data.reference.Reference;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.EnumType;
+import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.ChildByName;
-import ast.traverser.DefTraverser;
 import error.ErrorType;
 import error.RError;
 
@@ -45,7 +45,7 @@ public class EnumLinkReduction extends AstPass {
 
 }
 
-class EnumLinkReductionWorker extends DefTraverser<Void, Void> {
+class EnumLinkReductionWorker extends DfsTraverser<Void, Void> {
 
   @Override
   protected Void visitReference(Reference obj, Void param) {

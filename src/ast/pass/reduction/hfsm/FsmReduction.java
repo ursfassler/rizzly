@@ -65,11 +65,11 @@ import ast.data.type.base.EnumTypeFactory;
 import ast.data.variable.FuncVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.Variable;
+import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowLlvmLibrary;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.TypeFilter;
-import ast.traverser.NullTraverser;
 import error.ErrorType;
 import error.RError;
 
@@ -96,7 +96,7 @@ public class FsmReduction extends AstPass {
 
 }
 
-class FsmReductionWorker extends NullTraverser<Ast, Namespace> {
+class FsmReductionWorker extends NullDispatcher<Ast, Namespace> {
   final private Reduction reduction;
 
   public FsmReductionWorker(KnowledgeBase kb) {

@@ -22,10 +22,10 @@ import ast.data.Named;
 import ast.data.component.hfsm.State;
 import ast.data.reference.RefName;
 import ast.data.reference.Reference;
+import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.ChildByName;
-import ast.traverser.DefTraverser;
 
 /**
  * Changes references to deepest state, e.g. _top.A.B -> B
@@ -42,7 +42,7 @@ public class StateLinkReduction extends AstPass {
   }
 }
 
-class StateLinkReductionWorker extends DefTraverser<Void, Void> {
+class StateLinkReductionWorker extends DfsTraverser<Void, Void> {
 
   @Override
   protected Void visitReference(Reference obj, Void param) {

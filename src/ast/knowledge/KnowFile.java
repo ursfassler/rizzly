@@ -24,9 +24,9 @@ import ast.Designator;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.file.RizzlyFile;
+import ast.dispatcher.DfsTraverser;
+import ast.dispatcher.NullDispatcher;
 import ast.repository.query.ChildByName;
-import ast.traverser.DefTraverser;
-import ast.traverser.NullTraverser;
 import error.ErrorType;
 import error.RError;
 
@@ -91,7 +91,7 @@ public class KnowFile extends KnowledgeEntry {
 
 }
 
-class KnowFileTraverser extends DefTraverser<Void, RizzlyFile> {
+class KnowFileTraverser extends DfsTraverser<Void, RizzlyFile> {
   private Map<Ast, RizzlyFile> cache;
 
   public KnowFileTraverser(Map<Ast, RizzlyFile> cache) {
@@ -117,7 +117,7 @@ class KnowFileTraverser extends DefTraverser<Void, RizzlyFile> {
 
 }
 
-class FileNamespace extends NullTraverser<Void, Designator> {
+class FileNamespace extends NullDispatcher<Void, Designator> {
 
   // TODO replace with KnowPath
 

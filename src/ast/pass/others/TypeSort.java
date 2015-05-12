@@ -29,12 +29,12 @@ import util.Pair;
 import ast.data.Namespace;
 import ast.data.reference.Reference;
 import ast.data.type.Type;
+import ast.dispatcher.DfsTraverser;
 import ast.doc.SimpleGraph;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.Collector;
 import ast.specification.IsClass;
-import ast.traverser.DefTraverser;
 
 public class TypeSort extends AstPass {
 
@@ -76,7 +76,7 @@ public class TypeSort extends AstPass {
   }
 
   private static Set<Type> getDirectUsedTypes(Type u) {
-    DefTraverser<Void, Set<Type>> getter = new DefTraverser<Void, Set<Type>>() {
+    DfsTraverser<Void, Set<Type>> getter = new DfsTraverser<Void, Set<Type>>() {
       @Override
       protected Void visitReference(Reference obj, Set<Type> param) {
         if (obj.link instanceof Type) {

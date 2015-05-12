@@ -27,12 +27,12 @@ import ast.data.Namespace;
 import ast.data.component.hfsm.ImplHfsm;
 import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.Transition;
+import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.Collector;
 import ast.repository.query.TypeFilter;
 import ast.specification.IsClass;
-import ast.traverser.NullTraverser;
 import error.ErrorType;
 import error.RError;
 
@@ -52,7 +52,7 @@ public class HfsmTransScopeCheck extends AstPass {
 
 }
 
-class HfsmTransScopeCheckWorker extends NullTraverser<Set<State>, Void> {
+class HfsmTransScopeCheckWorker extends NullDispatcher<Set<State>, Void> {
 
   @Override
   protected Set<State> visitDefault(Ast obj, Void param) {

@@ -41,13 +41,13 @@ import ast.data.function.header.FuncSignal;
 import ast.data.function.header.FuncSlot;
 import ast.data.type.Type;
 import ast.data.variable.Constant;
+import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowLeftIsContainerOfRight;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.Collector;
 import ast.specification.IsClass;
-import ast.traverser.NullTraverser;
 import error.ErrorType;
 import error.RError;
 
@@ -61,7 +61,7 @@ public class CompInterfaceTypeChecker extends AstPass {
 
 }
 
-class CompInterfaceTypeCheckerWorker extends NullTraverser<Void, Void> {
+class CompInterfaceTypeCheckerWorker extends NullDispatcher<Void, Void> {
 
   final private KnowType kt;
   final private KnowLeftIsContainerOfRight kc;

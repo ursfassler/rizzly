@@ -59,9 +59,9 @@ import ast.data.expression.value.StringValue;
 import ast.data.expression.value.TupleValue;
 import ast.data.expression.value.UnionValue;
 import ast.data.expression.value.UnsafeUnionValue;
-import ast.traverser.NullTraverser;
+import ast.dispatcher.NullDispatcher;
 
-public class CopyExpression extends NullTraverser<Expression, Void> {
+public class CopyExpression extends NullDispatcher<Expression, Void> {
 
   private CopyAst cast;
 

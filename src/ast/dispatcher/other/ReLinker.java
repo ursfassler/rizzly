@@ -15,16 +15,16 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.traverser.other;
+package ast.dispatcher.other;
 
 import java.util.Map;
 
 import ast.data.Ast;
 import ast.data.Named;
 import ast.data.reference.Reference;
-import ast.traverser.DefTraverser;
+import ast.dispatcher.DfsTraverser;
 
-public class ReLinker extends DefTraverser<Void, Map<Ast, Ast>> {
+public class ReLinker extends DfsTraverser<Void, Map<Ast, Ast>> {
 
   public static void process(Ast classes, Map<Ast, Ast> map) {
     ReLinker reLinker = new ReLinker();

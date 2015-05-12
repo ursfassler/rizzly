@@ -39,13 +39,13 @@ import ast.data.type.composed.NamedElement;
 import ast.data.variable.Constant;
 import ast.data.variable.StateVariable;
 import ast.data.variable.Variable;
+import ast.dispatcher.DfsTraverser;
+import ast.dispatcher.other.RefTypeGetter;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.Collector;
 import ast.specification.IsClass;
-import ast.traverser.DefTraverser;
-import ast.traverser.other.RefTypeGetter;
 
 //TODO set correct values when switching states
 
@@ -90,7 +90,7 @@ public class StateVarReplacer extends AstPass {
   }
 }
 
-class StateVarReplacerWorker extends DefTraverser<Void, Void> {
+class StateVarReplacerWorker extends DfsTraverser<Void, Void> {
   final private Variable dataVar;
   final private Map<StateVariable, AstList<NamedElement>> epath;
   final private RefTypeGetter rtg;

@@ -24,11 +24,11 @@ import ast.data.Namespace;
 import ast.data.file.RizzlyFile;
 import ast.data.template.Template;
 import ast.data.type.Type;
+import ast.dispatcher.NullDispatcher;
 import ast.doc.ComponentFilePrinter;
 import ast.doc.CompositionGraphPrinter;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.NullTraverser;
 
 public class DocWriter extends AstPass {
 
@@ -43,7 +43,7 @@ public class DocWriter extends AstPass {
 
 }
 
-class DocWriterWorker extends NullTraverser<Void, Designator> {
+class DocWriterWorker extends NullDispatcher<Void, Designator> {
   final private KnowledgeBase kb;
 
   public DocWriterWorker(KnowledgeBase kb) {

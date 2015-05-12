@@ -23,11 +23,11 @@ import ast.data.Namespace;
 import ast.data.reference.RefItem;
 import ast.data.reference.RefName;
 import ast.data.reference.Reference;
+import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.ChildByName;
 import ast.repository.query.NameFilter;
-import ast.traverser.DefTraverser;
 import error.ErrorType;
 import error.RError;
 
@@ -51,7 +51,7 @@ public class LinkReduction extends AstPass {
   }
 }
 
-class LinkReductionWorker extends DefTraverser<Void, Void> {
+class LinkReductionWorker extends DfsTraverser<Void, Void> {
 
   @Override
   protected Void visitReference(Reference obj, Void param) {

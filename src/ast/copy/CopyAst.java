@@ -64,9 +64,9 @@ import ast.data.type.TypeRef;
 import ast.data.type.base.EnumElement;
 import ast.data.type.composed.NamedElement;
 import ast.data.variable.Variable;
-import ast.traverser.NullTraverser;
+import ast.dispatcher.NullDispatcher;
 
-public class CopyAst extends NullTraverser<Ast, Void> {
+public class CopyAst extends NullDispatcher<Ast, Void> {
   // / keeps the old -> new Named objects in order to relink references
   final private Map<Named, Named> copied = new HashMap<Named, Named>();
   final private CopyFunction func = new CopyFunction(this);

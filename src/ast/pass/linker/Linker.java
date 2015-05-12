@@ -43,12 +43,12 @@ import ast.data.statement.VarDefInitStmt;
 import ast.data.template.Template;
 import ast.data.type.Type;
 import ast.data.type.base.RangeType;
+import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowFile;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.NameFilter;
 import ast.repository.query.TypeFilter;
-import ast.traverser.DefTraverser;
 import error.ErrorType;
 import error.RError;
 
@@ -62,7 +62,7 @@ public class Linker extends AstPass {
 
 }
 
-class LinkerWorker extends DefTraverser<Void, SymbolTable> {
+class LinkerWorker extends DfsTraverser<Void, SymbolTable> {
   final private KnowFile kf;
   final private HashMap<State, SymbolTable> stateNames = new HashMap<State, SymbolTable>();
 

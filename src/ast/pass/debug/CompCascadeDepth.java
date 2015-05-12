@@ -25,9 +25,9 @@ import ast.data.component.elementary.ImplElementary;
 import ast.data.component.hfsm.ImplHfsm;
 import ast.data.reference.Reference;
 import ast.data.type.Type;
-import ast.traverser.NullTraverser;
+import ast.dispatcher.NullDispatcher;
 
-public class CompCascadeDepth extends NullTraverser<Integer, Void> {
+public class CompCascadeDepth extends NullDispatcher<Integer, Void> {
 
   @Override
   protected Integer visitDefault(Ast obj, Void param) {

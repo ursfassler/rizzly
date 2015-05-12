@@ -40,12 +40,12 @@ import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.statement.ReturnExpr;
 import ast.data.variable.Variable;
+import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.Collector;
 import ast.repository.query.TypeFilter;
 import ast.specification.IsClass;
-import ast.traverser.NullTraverser;
 
 public class QueryDownPropagator extends AstPass {
 
@@ -71,7 +71,7 @@ public class QueryDownPropagator extends AstPass {
 
 }
 
-class QueryDownPropagatorWorker extends NullTraverser<Void, QueryParam> {
+class QueryDownPropagatorWorker extends NullDispatcher<Void, QueryParam> {
   private static final ElementInfo info = ElementInfo.NO;
   private final Map<FuncResponse, FuncFunction> map; // TODO do we need
 
@@ -189,7 +189,7 @@ class QueryParam {
   }
 }
 
-class QueryFuncMaker extends NullTraverser<Void, Designator> {
+class QueryFuncMaker extends NullDispatcher<Void, Designator> {
 
   private final Map<FuncResponse, FuncFunction> qfunc;
 

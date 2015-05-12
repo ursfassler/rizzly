@@ -20,7 +20,7 @@ package ast.knowledge;
 import ast.Designator;
 import ast.data.Ast;
 import ast.data.Named;
-import ast.traverser.DefTraverser;
+import ast.dispatcher.DfsTraverser;
 
 public class KnowUniqueName extends KnowledgeEntry {
   static final String START = Designator.NAME_SEP;
@@ -41,7 +41,7 @@ public class KnowUniqueName extends KnowledgeEntry {
 
 }
 
-class KnowUniqueNameGetter extends DefTraverser<Void, Void> {
+class KnowUniqueNameGetter extends DfsTraverser<Void, Void> {
   int last = -1;
 
   @Override

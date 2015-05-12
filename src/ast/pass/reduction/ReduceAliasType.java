@@ -24,9 +24,9 @@ import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.reference.Reference;
 import ast.data.type.out.AliasType;
+import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.DefTraverser;
 import error.ErrorType;
 import error.RError;
 
@@ -40,7 +40,7 @@ public class ReduceAliasType extends AstPass {
 
 }
 
-class ReduceAliasTypeWorker extends DefTraverser<Void, Void> {
+class ReduceAliasTypeWorker extends DfsTraverser<Void, Void> {
 
   @Override
   protected Void visitReference(Reference obj, Void param) {

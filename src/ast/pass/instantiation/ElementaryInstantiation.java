@@ -45,13 +45,13 @@ import ast.data.function.ret.FuncReturnNone;
 import ast.data.reference.RefFactory;
 import ast.data.statement.Block;
 import ast.data.variable.FuncVariable;
+import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.pass.reduction.CompositionReduction;
 import ast.repository.query.Collector;
 import ast.repository.query.NameFilter;
 import ast.specification.IsClass;
-import ast.traverser.NullTraverser;
 import error.RError;
 
 public class ElementaryInstantiation extends AstPass {
@@ -111,7 +111,7 @@ public class ElementaryInstantiation extends AstPass {
   }
 }
 
-class CompInstantiatorWorker extends NullTraverser<ImplElementary, Namespace> {
+class CompInstantiatorWorker extends NullDispatcher<ImplElementary, Namespace> {
   final private Map<Named, Named> linkmap = new HashMap<Named, Named>();
 
   @Override

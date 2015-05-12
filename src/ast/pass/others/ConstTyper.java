@@ -25,11 +25,11 @@ import ast.data.type.special.AnyType;
 import ast.data.type.special.IntegerType;
 import ast.data.type.special.NaturalType;
 import ast.data.variable.Constant;
+import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.manipulator.TypeRepo;
-import ast.traverser.DefTraverser;
 
 /**
  * Sets and constrains types for all constants
@@ -43,7 +43,7 @@ public class ConstTyper extends AstPass {
   }
 }
 
-class Typer extends DefTraverser<Void, Void> {
+class Typer extends DfsTraverser<Void, Void> {
   private final KnowType kt;
   private final TypeRepo kbi;
 

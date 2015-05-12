@@ -15,7 +15,7 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.traverser;
+package ast.dispatcher;
 
 import ast.data.Namespace;
 import ast.data.component.CompRef;
@@ -148,7 +148,7 @@ import ast.data.variable.FuncVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.TemplateParameter;
 
-public class DefTraverser<R, P> extends Traverser<R, P> {
+public class DfsTraverser<R, P> extends Dispatcher<R, P> {
 
   @Override
   protected R visitNamedElementsValue(NamedElementsValue obj, P param) {
@@ -847,8 +847,6 @@ public class DefTraverser<R, P> extends Traverser<R, P> {
     visit(obj.block, param);
     return null;
   }
-
-  // /////////////////////////////////////////////
 
   @Override
   protected R visitDefaultValueTemplate(DefaultValueTemplate obj, P param) {

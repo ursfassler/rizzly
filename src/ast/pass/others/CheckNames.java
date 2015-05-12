@@ -31,10 +31,10 @@ import ast.data.type.template.ArrayTemplateFactory;
 import ast.data.type.template.RangeTemplateFactory;
 import ast.data.type.template.TypeTemplate;
 import ast.data.type.template.TypeTypeTemplateFactory;
+import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.TypeFilter;
-import ast.traverser.DefTraverser;
 import error.ErrorType;
 import error.RError;
 
@@ -79,7 +79,7 @@ public class CheckNames extends AstPass {
   }
 }
 
-class CheckNamesWorker extends DefTraverser<Void, Collection<String>> {
+class CheckNamesWorker extends DfsTraverser<Void, Collection<String>> {
 
   @Override
   protected Void visit(Ast obj, Collection<String> param) {

@@ -19,11 +19,11 @@ package ast.pass.specializer;
 
 import ast.data.Ast;
 import ast.data.variable.Constant;
+import ast.dispatcher.DfsTraverser;
 import ast.interpreter.Memory;
 import ast.knowledge.KnowledgeBase;
-import ast.traverser.DefTraverser;
 
-public class ConstEval extends DefTraverser<Void, Void> {
+public class ConstEval extends DfsTraverser<Void, Void> {
   private final KnowledgeBase kb;
 
   public ConstEval(KnowledgeBase kb) {

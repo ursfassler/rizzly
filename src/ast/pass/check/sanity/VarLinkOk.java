@@ -35,11 +35,11 @@ import ast.data.type.Type;
 import ast.data.variable.ConstPrivate;
 import ast.data.variable.StateVariable;
 import ast.data.variable.Variable;
+import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowParent;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.TypeFilter;
-import ast.traverser.DefTraverser;
 import error.ErrorType;
 import error.RError;
 
@@ -59,7 +59,7 @@ public class VarLinkOk extends AstPass {
 
 }
 
-class VarLinkOkWorker extends DefTraverser<Void, Set<Ast>> {
+class VarLinkOkWorker extends DfsTraverser<Void, Set<Ast>> {
   private final KnowParent kp;
 
   public VarLinkOkWorker(KnowledgeBase kb) {

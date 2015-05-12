@@ -41,10 +41,10 @@ import ast.data.type.Type;
 import ast.data.type.TypeRefFactory;
 import ast.data.type.composed.RecordType;
 import ast.data.variable.FuncVariable;
+import ast.dispatcher.other.StmtReplacer;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.other.StmtReplacer;
 import error.RError;
 
 //TODO merge parts with InitVarTyper

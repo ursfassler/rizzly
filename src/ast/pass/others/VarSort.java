@@ -29,11 +29,11 @@ import util.Pair;
 import ast.data.Namespace;
 import ast.data.reference.Reference;
 import ast.data.variable.Variable;
+import ast.dispatcher.DfsTraverser;
 import ast.doc.SimpleGraph;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.TypeFilter;
-import ast.traverser.DefTraverser;
 
 //TODO merge with TypeSort?
 
@@ -77,7 +77,7 @@ public class VarSort extends AstPass {
   }
 
   private static Set<Variable> getDirectUsedVariables(Variable u) {
-    DefTraverser<Void, Set<Variable>> getter = new DefTraverser<Void, Set<Variable>>() {
+    DfsTraverser<Void, Set<Variable>> getter = new DfsTraverser<Void, Set<Variable>>() {
 
       @Override
       protected Void visitReference(Reference obj, Set<Variable> param) {

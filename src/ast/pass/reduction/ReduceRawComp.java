@@ -35,10 +35,10 @@ import ast.data.type.Type;
 import ast.data.variable.Constant;
 import ast.data.variable.FuncVariable;
 import ast.data.variable.Variable;
+import ast.dispatcher.DfsTraverser;
+import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.DefTraverser;
-import ast.traverser.NullTraverser;
 import error.ErrorType;
 import error.RError;
 
@@ -52,7 +52,7 @@ public class ReduceRawComp extends AstPass {
   }
 }
 
-class ReduceRawCompWorker extends DefTraverser<Component, Void> {
+class ReduceRawCompWorker extends DfsTraverser<Component, Void> {
   final private Map<Named, Named> map = new HashMap<Named, Named>();
 
   final static ReduceEndpoint endpointReduction = new ReduceEndpoint();
@@ -159,7 +159,7 @@ class ReduceRawCompWorker extends DefTraverser<Component, Void> {
   }
 }
 
-class ReduceEndpoint extends NullTraverser<Endpoint, Void> {
+class ReduceEndpoint extends NullDispatcher<Endpoint, Void> {
   @Override
   protected Endpoint visitDefault(Ast obj, Void param) {
     throw new RuntimeException("not yet implemented");

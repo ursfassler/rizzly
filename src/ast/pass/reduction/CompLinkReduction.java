@@ -25,11 +25,11 @@ import ast.data.raw.RawComponent;
 import ast.data.raw.RawComposition;
 import ast.data.reference.RefTemplCall;
 import ast.data.reference.Reference;
+import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.NameFilter;
 import ast.repository.query.TypeFilter;
-import ast.traverser.NullTraverser;
 import error.ErrorType;
 import error.RError;
 
@@ -49,7 +49,7 @@ public class CompLinkReduction extends AstPass {
 
 }
 
-class CompLinkReductionWorker extends NullTraverser<Void, Void> {
+class CompLinkReductionWorker extends NullDispatcher<Void, Void> {
 
   @Override
   protected Void visitDefault(Ast obj, Void param) {

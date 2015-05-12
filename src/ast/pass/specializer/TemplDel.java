@@ -23,7 +23,7 @@ import java.util.Set;
 
 import ast.data.Ast;
 import ast.data.template.Template;
-import ast.traverser.DefTraverser;
+import ast.dispatcher.DfsTraverser;
 import error.ErrorType;
 import error.RError;
 
@@ -31,7 +31,7 @@ import error.RError;
  * Tries to remove all templates. Detects missed ones.
  */
 @Deprecated
-public class TemplDel extends DefTraverser<Void, Void> {
+public class TemplDel extends DfsTraverser<Void, Void> {
   static private final TemplDel INSTANCE = new TemplDel();
 
   public static void process(Ast fun) {

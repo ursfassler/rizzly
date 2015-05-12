@@ -24,13 +24,13 @@ import ast.data.file.RizzlyFile;
 import ast.data.reference.DummyLinkTarget;
 import ast.data.reference.RefName;
 import ast.data.reference.Reference;
+import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.ChildCollector;
 import ast.repository.query.NameFilter;
 import ast.repository.query.Single;
 import ast.specification.HasName;
-import ast.traverser.DefTraverser;
 import error.ErrorType;
 import error.RError;
 
@@ -52,7 +52,7 @@ public class NamespaceLinkReduction extends AstPass {
 
 }
 
-class NamespaceLinkReductionWorker extends DefTraverser<Void, Void> {
+class NamespaceLinkReductionWorker extends DfsTraverser<Void, Void> {
 
   @Override
   protected Void visitReference(Reference obj, Void param) {

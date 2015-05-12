@@ -27,9 +27,9 @@ import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.StateContent;
 import ast.data.component.hfsm.Transition;
 import ast.data.function.header.FuncSlot;
-import ast.traverser.NullTraverser;
+import ast.dispatcher.NullDispatcher;
 
-public class TransitionDict extends NullTraverser<Void, Void> {
+public class TransitionDict extends NullDispatcher<Void, Void> {
   private Map<State, Map<FuncSlot, AstList<Transition>>> transition = new HashMap<State, Map<FuncSlot, AstList<Transition>>>();
 
   public AstList<Transition> get(State src, FuncSlot func) {

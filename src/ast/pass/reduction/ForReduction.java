@@ -40,12 +40,12 @@ import ast.data.statement.WhileStmt;
 import ast.data.type.TypeRefFactory;
 import ast.data.type.base.RangeType;
 import ast.data.variable.FuncVariable;
+import ast.dispatcher.other.StmtReplacer;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowUniqueName;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.manipulator.TypeRepo;
-import ast.traverser.other.StmtReplacer;
 
 /**
  * Replaces for loops with while loops

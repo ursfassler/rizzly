@@ -34,13 +34,13 @@ import ast.data.type.Type;
 import ast.data.type.base.BaseType;
 import ast.data.variable.Constant;
 import ast.data.variable.Variable;
+import ast.dispatcher.NullDispatcher;
 import ast.interpreter.Memory;
 import ast.knowledge.KnowledgeBase;
-import ast.traverser.NullTraverser;
 import error.ErrorType;
 import error.RError;
 
-public class RefEvaluator extends NullTraverser<Expression, Ast> {
+public class RefEvaluator extends NullDispatcher<Expression, Ast> {
   private final InstanceRepo ir;
   final private KnowledgeBase kb;
   final private Memory memory;

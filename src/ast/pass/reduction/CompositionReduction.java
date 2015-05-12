@@ -70,13 +70,13 @@ import ast.data.statement.MsgPush;
 import ast.data.statement.ReturnExpr;
 import ast.data.variable.FuncVariable;
 import ast.data.variable.Variable;
+import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.NameFilter;
 import ast.specification.AndSpec;
 import ast.specification.IsClass;
 import ast.specification.Specification;
-import ast.traverser.NullTraverser;
 import error.ErrorType;
 import error.RError;
 
@@ -121,7 +121,7 @@ public class CompositionReduction extends AstPass {
 }
 
 // TODO cleanup
-class CompositionReductionWorker extends NullTraverser<Ast, Void> {
+class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
 
   private static final ElementInfo info = ElementInfo.NO;
   private final Map<ImplComposition, ImplElementary> map = new HashMap<ImplComposition, ImplElementary>();

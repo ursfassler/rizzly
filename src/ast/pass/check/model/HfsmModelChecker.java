@@ -29,11 +29,11 @@ import ast.data.function.header.FuncProcedure;
 import ast.data.function.header.FuncResponse;
 import ast.data.function.header.FuncSlot;
 import ast.data.variable.StateVariable;
+import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.Collector;
 import ast.specification.IsClass;
-import ast.traverser.NullTraverser;
 import error.ErrorType;
 import error.RError;
 
@@ -51,7 +51,7 @@ public class HfsmModelChecker extends AstPass {
   }
 }
 
-class HfsmModelCheckerWorker extends NullTraverser<Void, Void> {
+class HfsmModelCheckerWorker extends NullDispatcher<Void, Void> {
 
   @Override
   protected Void visitDefault(Ast obj, Void sym) {

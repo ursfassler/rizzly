@@ -22,9 +22,9 @@ import java.util.Set;
 
 import ast.data.Ast;
 import ast.data.Namespace;
+import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.DefTraverser;
 import error.ErrorType;
 import error.RError;
 
@@ -43,7 +43,7 @@ public class SingleDefinition extends AstPass {
   }
 }
 
-class SingleDefinitionWorker extends DefTraverser<Void, Set<Ast>> {
+class SingleDefinitionWorker extends DfsTraverser<Void, Set<Ast>> {
 
   @Override
   protected Void visit(Ast obj, Set<Ast> param) {

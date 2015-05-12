@@ -17,10 +17,10 @@
 
 package ast.pass.specializer;
 
+import ast.dispatcher.DfsTraverser;
 import ast.interpreter.Memory;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.DefTraverser;
 
 /**
  * Execute initial values of state variables (for static initialization)
@@ -38,7 +38,7 @@ public class StateVarInitExecutor extends AstPass {
 
 }
 
-class StateVarInitExecutorWorker extends DefTraverser<Void, KnowledgeBase> {
+class StateVarInitExecutorWorker extends DfsTraverser<Void, KnowledgeBase> {
 
   @Override
   protected Void visitStateVariable(ast.data.variable.StateVariable obj, KnowledgeBase param) {

@@ -8,10 +8,10 @@ import ast.data.expression.value.BoolValue;
 import ast.data.statement.IfOption;
 import ast.data.statement.IfStmt;
 import ast.data.statement.Statement;
+import ast.dispatcher.other.StmtReplacer;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.specification.ConstantExpression;
-import ast.traverser.other.StmtReplacer;
 
 public class TautoStmtDel extends AstPass {
 

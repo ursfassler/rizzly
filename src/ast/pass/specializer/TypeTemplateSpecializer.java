@@ -29,11 +29,11 @@ import ast.data.type.template.ArrayTemplate;
 import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
+import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowledgeBase;
 import ast.repository.manipulator.TypeRepo;
-import ast.traverser.NullTraverser;
 
-public class TypeTemplateSpecializer extends NullTraverser<Type, List<ActualTemplateArgument>> {
+public class TypeTemplateSpecializer extends NullDispatcher<Type, List<ActualTemplateArgument>> {
   private final TypeRepo kbi;
 
   public TypeTemplateSpecializer(KnowledgeBase kb) {

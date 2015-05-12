@@ -26,7 +26,7 @@ import ast.data.expression.value.ValueExpr;
 import ast.data.reference.DummyLinkTarget;
 import ast.data.reference.Reference;
 import ast.data.variable.TemplateParameter;
-import ast.traverser.other.ExprReplacer;
+import ast.dispatcher.other.ExprReplacer;
 
 public class ExprSpecTrav extends ExprReplacer<Void> {
   final private Map<TemplateParameter, ValueExpr> values;

@@ -41,14 +41,14 @@ import ast.data.type.TypeRefFactory;
 import ast.data.type.composed.NamedElement;
 import ast.data.type.composed.RecordType;
 import ast.data.variable.FuncVariable;
+import ast.dispatcher.DfsTraverser;
+import ast.dispatcher.other.RefReplacer;
+import ast.dispatcher.other.StmtReplacer;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowUniqueName;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.manipulator.TypeRepo;
-import ast.traverser.DefTraverser;
-import ast.traverser.other.RefReplacer;
-import ast.traverser.other.StmtReplacer;
 
 /**
  * Replaces function FuncReturnTuple with introduced record and FuncReturnType
@@ -68,7 +68,7 @@ public class RetStructIntroducer extends AstPass {
 
 }
 
-class RetStructIntroducerWorker extends DefTraverser<Void, Void> {
+class RetStructIntroducerWorker extends DfsTraverser<Void, Void> {
   final private TypeRepo kbi;
   final private KnowUniqueName kun;
   final private KnowType kt;

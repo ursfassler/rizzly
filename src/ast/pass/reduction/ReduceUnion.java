@@ -39,13 +39,13 @@ import ast.data.type.base.EnumType;
 import ast.data.type.base.EnumTypeFactory;
 import ast.data.type.composed.NamedElement;
 import ast.data.type.composed.UnionType;
+import ast.dispatcher.DfsTraverser;
+import ast.dispatcher.other.ExprReplacer;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.Match;
 import ast.specification.HasName;
-import ast.traverser.DefTraverser;
-import ast.traverser.other.ExprReplacer;
 
 //TODO documentation
 // DONE introduce enum E for union U
@@ -131,7 +131,7 @@ class ReduceUnionWorker extends ExprReplacer<Void> {
 
 }
 
-class Uni2Enum extends DefTraverser<Void, Map<UnionType, EnumType>> {
+class Uni2Enum extends DfsTraverser<Void, Map<UnionType, EnumType>> {
   private final static String ENUM_PREFIX = Designator.NAME_SEP + "enum";
 
   @Override

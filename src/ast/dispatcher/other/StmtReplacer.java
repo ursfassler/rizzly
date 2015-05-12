@@ -15,7 +15,7 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.traverser.other;
+package ast.dispatcher.other;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -23,9 +23,9 @@ import java.util.List;
 import ast.data.AstList;
 import ast.data.statement.Block;
 import ast.data.statement.Statement;
-import ast.traverser.DefTraverser;
+import ast.dispatcher.DfsTraverser;
 
-public class StmtReplacer<T> extends DefTraverser<List<Statement>, T> {
+public class StmtReplacer<T> extends DfsTraverser<List<Statement>, T> {
 
   protected List<Statement> list(Statement stmt1) {
     List<Statement> ret = new ArrayList<Statement>(1);

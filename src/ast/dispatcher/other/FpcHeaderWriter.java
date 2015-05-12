@@ -15,7 +15,7 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.traverser.other;
+package ast.dispatcher.other;
 
 import java.math.BigInteger;
 import java.util.Iterator;
@@ -47,6 +47,7 @@ import ast.data.variable.ConstGlobal;
 import ast.data.variable.ConstPrivate;
 import ast.data.variable.FuncVariable;
 import ast.data.variable.Variable;
+import ast.dispatcher.NullDispatcher;
 import ast.doc.StreamWriter;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.check.type.ExpressionTypecheck;
@@ -54,11 +55,10 @@ import ast.pass.others.CWriter;
 import ast.repository.query.TypeFilter;
 import ast.specification.ExternalFunction;
 import ast.specification.PublicFunction;
-import ast.traverser.NullTraverser;
 import error.ErrorType;
 import error.RError;
 
-public class FpcHeaderWriter extends NullTraverser<Void, StreamWriter> {
+public class FpcHeaderWriter extends NullDispatcher<Void, StreamWriter> {
   private final static String LibName = "LIB_NAME";
   private final List<String> debugNames; // hacky hacky
 

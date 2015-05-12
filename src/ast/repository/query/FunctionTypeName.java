@@ -27,7 +27,7 @@ import ast.data.function.header.FuncSignal;
 import ast.data.function.header.FuncSlot;
 import ast.data.function.header.FuncSubHandlerEvent;
 import ast.data.function.header.FuncSubHandlerQuery;
-import ast.traverser.NullTraverser;
+import ast.dispatcher.NullDispatcher;
 
 public class FunctionTypeName {
   static final private FunctionTypeNameDispatcher dispatcher = new FunctionTypeNameDispatcher();
@@ -37,7 +37,7 @@ public class FunctionTypeName {
   }
 }
 
-class FunctionTypeNameDispatcher extends NullTraverser<String, Void> {
+class FunctionTypeNameDispatcher extends NullDispatcher<String, Void> {
 
   @Override
   protected String visitDefault(Ast obj, Void param) {

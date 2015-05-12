@@ -31,12 +31,12 @@ import ast.data.type.base.RangeType;
 import ast.data.type.out.IntType;
 import ast.data.type.out.SIntType;
 import ast.data.type.out.UIntType;
+import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.pass.check.type.ExpressionTypecheck;
 import ast.repository.query.Collector;
 import ast.specification.IsClass;
-import ast.traverser.NullTraverser;
 import error.ErrorType;
 import error.RError;
 
@@ -63,7 +63,7 @@ public class RangeReplacer extends AstPass {
 
 }
 
-class RangeReplacerWorker extends NullTraverser<Void, Void> {
+class RangeReplacerWorker extends NullDispatcher<Void, Void> {
   private final Map<Integer, SIntType> signed = new HashMap<Integer, SIntType>();
   private final Map<Integer, UIntType> unsigned = new HashMap<Integer, UIntType>();
   private final Map<RangeType, Type> map = new HashMap<RangeType, Type>();

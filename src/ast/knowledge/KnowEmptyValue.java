@@ -45,7 +45,7 @@ import ast.data.type.composed.NamedElement;
 import ast.data.type.composed.RecordType;
 import ast.data.type.special.IntegerType;
 import ast.data.type.special.NaturalType;
-import ast.traverser.NullTraverser;
+import ast.dispatcher.NullDispatcher;
 
 public class KnowEmptyValue extends KnowledgeEntry {
   final private Map<Type, Expression> cache = new HashMap<Type, Expression>();
@@ -66,7 +66,7 @@ public class KnowEmptyValue extends KnowledgeEntry {
 
 }
 
-class KnowEmptyValueGenerator extends NullTraverser<Expression, Void> {
+class KnowEmptyValueGenerator extends NullDispatcher<Expression, Void> {
   final private KnowType kt;
 
   public KnowEmptyValueGenerator(KnowledgeBase kb) {

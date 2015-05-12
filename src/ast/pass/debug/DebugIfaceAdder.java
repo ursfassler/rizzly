@@ -53,11 +53,11 @@ import ast.data.type.TypeRefFactory;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.RangeType;
 import ast.data.variable.FuncVariable;
-import ast.traverser.NullTraverser;
-import ast.traverser.debug.EventRecvDebugCallAdder;
-import ast.traverser.debug.EventSendDebugCallAdder;
+import ast.dispatcher.NullDispatcher;
+import ast.dispatcher.debug.EventRecvDebugCallAdder;
+import ast.dispatcher.debug.EventSendDebugCallAdder;
 
-public class DebugIfaceAdder extends NullTraverser<Void, Void> {
+public class DebugIfaceAdder extends NullDispatcher<Void, Void> {
   final private ArrayType arrayType;
   final private RangeType sizeType;
   final private RangeType nameNumType;

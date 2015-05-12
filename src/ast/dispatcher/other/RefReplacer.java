@@ -15,7 +15,7 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.traverser.other;
+package ast.dispatcher.other;
 
 import ast.data.AstList;
 import ast.data.expression.RefExp;
@@ -25,9 +25,9 @@ import ast.data.reference.TypedRef;
 import ast.data.statement.AssignmentMulti;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.MsgPush;
-import ast.traverser.DefTraverser;
+import ast.dispatcher.DfsTraverser;
 
-abstract public class RefReplacer<T> extends DefTraverser<Reference, T> {
+abstract public class RefReplacer<T> extends DfsTraverser<Reference, T> {
 
   @Override
   protected Reference visitReference(Reference obj, T param) {

@@ -32,9 +32,9 @@ import ast.data.statement.Statement;
 import ast.data.statement.VarDefInitStmt;
 import ast.data.statement.VarDefStmt;
 import ast.data.statement.WhileStmt;
-import ast.traverser.NullTraverser;
+import ast.dispatcher.NullDispatcher;
 
-public class CopyStatement extends NullTraverser<Statement, Void> {
+public class CopyStatement extends NullDispatcher<Statement, Void> {
   private CopyAst cast;
 
   public CopyStatement(CopyAst cast) {

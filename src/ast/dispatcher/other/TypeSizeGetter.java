@@ -15,7 +15,7 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.traverser.other;
+package ast.dispatcher.other;
 
 import ast.data.Ast;
 import ast.data.reference.Reference;
@@ -25,9 +25,9 @@ import ast.data.type.composed.RecordType;
 import ast.data.type.composed.UnionType;
 import ast.data.type.out.IntType;
 import ast.data.type.special.VoidType;
-import ast.traverser.NullTraverser;
+import ast.dispatcher.NullDispatcher;
 
-public class TypeSizeGetter extends NullTraverser<Integer, Void> {
+public class TypeSizeGetter extends NullDispatcher<Integer, Void> {
 
   private static int ByteAlignment = 1; // TODO get this information from
 

@@ -26,9 +26,9 @@ import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.MsgPush;
 import ast.data.statement.Statement;
-import ast.traverser.DefTraverser;
+import ast.dispatcher.DfsTraverser;
 
-class PushReplacer extends DefTraverser<Statement, Map<Function, Function>> {
+class PushReplacer extends DfsTraverser<Statement, Map<Function, Function>> {
 
   @Override
   protected Statement visitBlock(Block obj, Map<Function, Function> param) {

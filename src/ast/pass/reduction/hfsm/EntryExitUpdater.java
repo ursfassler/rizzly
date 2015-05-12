@@ -38,12 +38,12 @@ import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.Statement;
 import ast.data.variable.FuncVariable;
+import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.manipulator.TypeRepo;
 import ast.repository.query.Collector;
 import ast.specification.IsClass;
-import ast.traverser.NullTraverser;
 
 /**
  * For every state, a new entry and exit function is added. This new function contains calls to the parent entry or exit
@@ -64,7 +64,7 @@ public class EntryExitUpdater extends AstPass {
 
 }
 
-class EntryExitUpdaterWorker extends NullTraverser<Void, EePar> {
+class EntryExitUpdaterWorker extends NullDispatcher<Void, EePar> {
   private final TypeRepo kbi;
 
   public EntryExitUpdaterWorker(KnowledgeBase kb) {

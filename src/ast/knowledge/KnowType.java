@@ -85,10 +85,10 @@ import ast.data.type.composed.RecordType;
 import ast.data.type.special.ComponentType;
 import ast.data.variable.FuncVariable;
 import ast.data.variable.Variable;
+import ast.dispatcher.NullDispatcher;
+import ast.dispatcher.other.RefTypeGetter;
 import ast.pass.check.type.ExpressionTypecheck;
 import ast.repository.manipulator.TypeRepo;
-import ast.traverser.NullTraverser;
-import ast.traverser.other.RefTypeGetter;
 import error.ErrorType;
 import error.RError;
 
@@ -106,7 +106,7 @@ public class KnowType extends KnowledgeEntry {
 
 }
 
-class KnowTypeTraverser extends NullTraverser<Type, Void> {
+class KnowTypeTraverser extends NullDispatcher<Type, Void> {
   private final Map<Ast, Type> cache = new HashMap<Ast, Type>();
   final private TypeRepo kbi;
   final private RefTypeGetter rtg;

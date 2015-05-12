@@ -41,10 +41,10 @@ import ast.data.type.composed.UnsafeUnionType;
 import ast.data.variable.ConstPrivate;
 import ast.data.variable.Constant;
 import ast.data.variable.StateVariable;
+import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.repository.query.TypeFilter;
-import ast.traverser.NullTraverser;
 
 /**
  * Creates a type with data of states for whole state machine
@@ -52,7 +52,7 @@ import ast.traverser.NullTraverser;
  * @author urs
  *
  */
-public class StateTypeBuilder extends NullTraverser<NamedElement, AstList<NamedElement>> {
+public class StateTypeBuilder extends NullDispatcher<NamedElement, AstList<NamedElement>> {
   public static final String SUB_ENTRY_NAME = Designator.NAME_SEP + "sub";
   public static final String CONST_PREFIX = Designator.NAME_SEP + "INIT" + Designator.NAME_SEP;
   final private Map<RecordType, RecordValue> initValues = new HashMap<RecordType, RecordValue>();

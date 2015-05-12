@@ -15,7 +15,7 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.traverser.other;
+package ast.dispatcher.other;
 
 import java.math.BigInteger;
 import java.util.List;
@@ -47,17 +47,17 @@ import ast.data.type.composed.RecordType;
 import ast.data.type.composed.UnionType;
 import ast.data.type.special.VoidType;
 import ast.data.variable.Variable;
+import ast.dispatcher.NullDispatcher;
 import ast.doc.StreamWriter;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.check.type.ExpressionTypecheck;
 import ast.pass.others.CWriter;
-import ast.traverser.NullTraverser;
 
 /**
  *
  * @author urs
  */
-public class CHeaderWriter extends NullTraverser<Void, StreamWriter> {
+public class CHeaderWriter extends NullDispatcher<Void, StreamWriter> {
 
   private final List<String> debugNames; // hacky hacky
 

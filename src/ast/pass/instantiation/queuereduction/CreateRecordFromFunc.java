@@ -29,9 +29,9 @@ import ast.data.statement.MsgPush;
 import ast.data.type.composed.NamedElement;
 import ast.data.type.composed.RecordType;
 import ast.data.variable.FuncVariable;
-import ast.traverser.DefTraverser;
+import ast.dispatcher.DfsTraverser;
 
-class CreateRecordFromFunc extends DefTraverser<Void, Void> {
+class CreateRecordFromFunc extends DfsTraverser<Void, Void> {
   final private Map<Function, RecordType> funcToRecord = new HashMap<Function, RecordType>();
 
   final private Namespace root;

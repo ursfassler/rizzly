@@ -31,7 +31,7 @@ import ast.data.expression.value.TupleValue;
 import ast.data.expression.value.UnionValue;
 import ast.data.expression.value.UnsafeUnionValue;
 import ast.data.reference.Reference;
-import ast.traverser.NullTraverser;
+import ast.dispatcher.NullDispatcher;
 import error.ErrorType;
 import error.RError;
 
@@ -46,7 +46,7 @@ public class ConstantExpression extends Specification {
 
 }
 
-class ConstTraverser extends NullTraverser<Boolean, Void> {
+class ConstTraverser extends NullDispatcher<Boolean, Void> {
 
   @Override
   protected Boolean visitDefault(Ast obj, Void param) {

@@ -50,14 +50,14 @@ import ast.data.type.composed.NamedElement;
 import ast.data.type.composed.RecordType;
 import ast.data.type.composed.UnionType;
 import ast.data.variable.FuncVariable;
+import ast.dispatcher.NullDispatcher;
+import ast.dispatcher.other.ExprReplacer;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowUniqueName;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.manipulator.RepoAdder;
 import ast.repository.manipulator.TypeRepo;
-import ast.traverser.NullTraverser;
-import ast.traverser.other.ExprReplacer;
 
 /**
  * Introduces compare function for complex types
@@ -99,7 +99,7 @@ class CompareReplacerWorker extends ExprReplacer<Void> {
 }
 
 // TODO make this class smarter / cleaner
-class MakeCompareFunction extends NullTraverser<Expression, Pair<Expression, Expression>> {
+class MakeCompareFunction extends NullDispatcher<Expression, Pair<Expression, Expression>> {
   private static final ElementInfo info = ElementInfo.NO;
   private final KnowType kt;
   private final KnowUniqueName kun;

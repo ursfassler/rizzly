@@ -35,12 +35,12 @@ import ast.data.template.ActualTemplateArgument;
 import ast.data.type.Type;
 import ast.data.type.TypeRefFactory;
 import ast.data.variable.FuncVariable;
+import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowEmptyValue;
 import ast.knowledge.KnowledgeBase;
 import ast.repository.manipulator.RepoAdder;
-import ast.traverser.NullTraverser;
 
-public class FunctionTemplateSpecializer extends NullTraverser<Function, List<ActualTemplateArgument>> {
+public class FunctionTemplateSpecializer extends NullDispatcher<Function, List<ActualTemplateArgument>> {
   private final InstanceRepo ki;
   private final KnowEmptyValue kev;
   private final RepoAdder ra;

@@ -15,7 +15,7 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.traverser.debug;
+package ast.dispatcher.debug;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -35,7 +35,7 @@ import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.MsgPush;
 import ast.data.statement.Statement;
-import ast.traverser.DefTraverser;
+import ast.dispatcher.DfsTraverser;
 import error.ErrorType;
 import error.RError;
 
@@ -45,7 +45,7 @@ import error.RError;
  * @author urs
  *
  */
-public class EventSendDebugCallAdder extends DefTraverser<Void, Void> {
+public class EventSendDebugCallAdder extends DfsTraverser<Void, Void> {
 
   private StmtTraverser st;
 
@@ -66,7 +66,7 @@ public class EventSendDebugCallAdder extends DefTraverser<Void, Void> {
   }
 }
 
-class StmtTraverser extends DefTraverser<Void, List<Statement>> {
+class StmtTraverser extends DfsTraverser<Void, List<Statement>> {
 
   private FuncProcedure debugSend;
   private ArrayList<String> names;

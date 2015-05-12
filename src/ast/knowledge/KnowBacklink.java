@@ -24,7 +24,7 @@ import java.util.Set;
 
 import ast.data.Ast;
 import ast.data.reference.Reference;
-import ast.traverser.DefTraverser;
+import ast.dispatcher.DfsTraverser;
 import error.ErrorType;
 import error.RError;
 
@@ -53,7 +53,7 @@ public class KnowBacklink extends KnowledgeEntry {
 
 }
 
-class BacklinkTraverser extends DefTraverser<Void, Map<Ast, Set<Reference>>> {
+class BacklinkTraverser extends DfsTraverser<Void, Map<Ast, Set<Reference>>> {
 
   @Override
   protected Void visit(Ast obj, Map<Ast, Set<Reference>> param) {

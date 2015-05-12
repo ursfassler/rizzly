@@ -52,14 +52,14 @@ import ast.data.type.Type;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumType;
 import ast.data.type.base.RangeType;
+import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowComparable;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
-import ast.traverser.DefTraverser;
 import error.ErrorType;
 import error.RError;
 
-public class ExpressionTypecheck extends DefTraverser<Void, Void> {
+public class ExpressionTypecheck extends DfsTraverser<Void, Void> {
   final private KnowledgeBase kb;
   final private KnowType kt;
   final private KnowComparable kc;

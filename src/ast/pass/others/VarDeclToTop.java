@@ -23,9 +23,9 @@ import ast.data.Namespace;
 import ast.data.statement.Block;
 import ast.data.statement.Statement;
 import ast.data.statement.VarDefStmt;
+import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.DefTraverser;
 
 public class VarDeclToTop extends AstPass {
 
@@ -37,7 +37,7 @@ public class VarDeclToTop extends AstPass {
 
 }
 
-class VarDeclToTopWorker extends DefTraverser<Void, Void> {
+class VarDeclToTopWorker extends DfsTraverser<Void, Void> {
 
   @Override
   protected Void visitBlock(Block obj, Void param) {

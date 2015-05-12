@@ -31,16 +31,16 @@ import ast.data.type.base.EnumType;
 import ast.data.type.base.FunctionType;
 import ast.data.type.base.RangeType;
 import ast.data.type.base.RangeTypeFactory;
+import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowLeftIsContainerOfRight;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.repository.query.ChildByName;
-import ast.traverser.NullTraverser;
 import error.ErrorType;
 import error.RError;
 
 //TODO check if this class does not too much (i.e. check and return type)
-public class ReferenceTypecheck extends NullTraverser<Type, Type> {
+public class ReferenceTypecheck extends NullDispatcher<Type, Type> {
   final private KnowType kt;
   final private KnowLeftIsContainerOfRight kc;
 

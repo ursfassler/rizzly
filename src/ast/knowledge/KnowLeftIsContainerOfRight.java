@@ -44,7 +44,7 @@ import ast.data.type.special.AnyType;
 import ast.data.type.special.IntegerType;
 import ast.data.type.special.NaturalType;
 import ast.data.type.special.VoidType;
-import ast.traverser.NullTraverser;
+import ast.dispatcher.NullDispatcher;
 
 public class KnowLeftIsContainerOfRight extends KnowledgeEntry {
   final private HashMap<Pair<Type, Type>, Boolean> cache = new HashMap<Pair<Type, Type>, Boolean>();
@@ -73,7 +73,7 @@ public class KnowLeftIsContainerOfRight extends KnowledgeEntry {
 
 }
 
-class KnowLeftIsContainerOfRightWorker extends NullTraverser<Boolean, Type> {
+class KnowLeftIsContainerOfRightWorker extends NullDispatcher<Boolean, Type> {
   final private KnowledgeBase kb;
   final private KnowType kt;
 

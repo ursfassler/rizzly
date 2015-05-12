@@ -23,11 +23,11 @@ import ast.data.expression.Expression;
 import ast.data.expression.value.AnyValue;
 import ast.data.type.Type;
 import ast.data.type.base.RangeType;
-import ast.traverser.NullTraverser;
+import ast.dispatcher.NullDispatcher;
 import error.ErrorType;
 import error.RError;
 
-public class CheckTypeCast extends NullTraverser<Expression, Expression> {
+public class CheckTypeCast extends NullDispatcher<Expression, Expression> {
   static final private CheckTypeCast INSTANCE = new CheckTypeCast();
 
   public static ast.data.expression.Expression check(Type type, Expression value) {

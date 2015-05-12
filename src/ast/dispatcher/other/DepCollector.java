@@ -15,7 +15,7 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.traverser.other;
+package ast.dispatcher.other;
 
 import java.util.Collection;
 import java.util.HashSet;
@@ -23,9 +23,9 @@ import java.util.Set;
 
 import ast.data.Ast;
 import ast.data.reference.Reference;
-import ast.traverser.DefTraverser;
+import ast.dispatcher.DfsTraverser;
 
-public class DepCollector extends DefTraverser<Void, Void> {
+public class DepCollector extends DfsTraverser<Void, Void> {
 
   private Set<Ast> visited = new HashSet<Ast>();
 

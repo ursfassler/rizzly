@@ -15,7 +15,7 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.traverser.other;
+package ast.dispatcher.other;
 
 import java.util.Collection;
 
@@ -29,14 +29,14 @@ import ast.data.type.base.ArrayType;
 import ast.data.type.base.EnumType;
 import ast.data.type.base.FunctionType;
 import ast.data.type.composed.NamedElement;
+import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.repository.query.ChildByName;
-import ast.traverser.NullTraverser;
 import error.ErrorType;
 import error.RError;
 
-public class RefTypeGetter extends NullTraverser<Type, Type> {
+public class RefTypeGetter extends NullDispatcher<Type, Type> {
   final private KnowType kt; // FIXME remove cyclic dependency
 
   public RefTypeGetter(KnowType kt, KnowledgeBase kb) {

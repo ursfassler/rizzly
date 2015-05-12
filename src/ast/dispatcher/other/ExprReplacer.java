@@ -15,7 +15,7 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.traverser.other;
+package ast.dispatcher.other;
 
 import java.util.List;
 
@@ -76,11 +76,11 @@ import ast.data.statement.VarDefInitStmt;
 import ast.data.statement.WhileStmt;
 import ast.data.template.ActualTemplateArgument;
 import ast.data.variable.DefVariable;
-import ast.traverser.DefTraverser;
+import ast.dispatcher.DfsTraverser;
 import error.ErrorType;
 import error.RError;
 
-abstract public class ExprReplacer<T> extends DefTraverser<Expression, T> {
+abstract public class ExprReplacer<T> extends DfsTraverser<Expression, T> {
 
   protected <E extends Expression> void visitExprList(List<E> list, T param) {
     for (int i = 0; i < list.size(); i++) {

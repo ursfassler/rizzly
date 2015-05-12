@@ -6,9 +6,9 @@ import ast.data.expression.binop.LogicAnd;
 import ast.data.expression.binop.LogicOr;
 import ast.data.expression.unop.LogicNot;
 import ast.data.expression.value.BoolValue;
+import ast.dispatcher.other.ExprReplacer;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.other.ExprReplacer;
 
 public class TautoExprDel extends AstPass {
 

@@ -22,7 +22,7 @@ import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.reference.Reference;
-import ast.traverser.NullTraverser;
+import ast.dispatcher.NullDispatcher;
 
 /**
  *
@@ -31,7 +31,7 @@ import ast.traverser.NullTraverser;
  * @author urs
  *
  */
-public class InitStateGetter extends NullTraverser<StateSimple, Void> {
+public class InitStateGetter extends NullDispatcher<StateSimple, Void> {
   @Override
   protected StateSimple visitDefault(Ast obj, Void param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());

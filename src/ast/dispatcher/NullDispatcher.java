@@ -15,7 +15,7 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.traverser;
+package ast.dispatcher;
 
 import ast.data.Ast;
 import ast.data.Namespace;
@@ -146,7 +146,7 @@ import ast.data.variable.FuncVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.TemplateParameter;
 
-abstract public class NullTraverser<R, P> extends Traverser<R, P> {
+abstract public class NullDispatcher<R, P> extends Dispatcher<R, P> {
 
   abstract protected R visitDefault(Ast obj, P param);
 

@@ -24,7 +24,7 @@ import ast.data.reference.RefFactory;
 import ast.data.reference.Reference;
 import ast.data.type.Type;
 import ast.data.variable.TemplateParameter;
-import ast.traverser.other.RefReplacer;
+import ast.dispatcher.other.RefReplacer;
 
 public class TypeSpecTrav extends RefReplacer<Void> {
   final private Map<TemplateParameter, Type> types;

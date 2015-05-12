@@ -94,11 +94,11 @@ import ast.data.variable.Constant;
 import ast.data.variable.FuncVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.Variable;
+import ast.dispatcher.NullDispatcher;
 import ast.doc.StreamWriter;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.TypeFilter;
-import ast.traverser.NullTraverser;
 
 public class CWriter extends AstPass {
   public static final String ARRAY_DATA_NAME = "data";
@@ -116,7 +116,7 @@ public class CWriter extends AstPass {
 
 }
 
-class CWriterWorker extends NullTraverser<Void, Boolean> {
+class CWriterWorker extends NullDispatcher<Void, Boolean> {
   final private StreamWriter sw;
 
   public CWriterWorker(StreamWriter sw) {

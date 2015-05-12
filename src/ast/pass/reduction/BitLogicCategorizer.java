@@ -38,13 +38,13 @@ import ast.data.expression.unop.Not;
 import ast.data.type.Type;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.RangeType;
+import ast.dispatcher.other.ExprReplacer;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.specification.AndSpec;
 import ast.specification.IsClass;
 import ast.specification.Specification;
-import ast.traverser.other.ExprReplacer;
 import error.ErrorType;
 import error.RError;
 

@@ -19,8 +19,8 @@ package ast.repository.query;
 
 import ast.data.Ast;
 import ast.data.AstList;
+import ast.dispatcher.DfsTraverser;
 import ast.specification.Specification;
-import ast.traverser.DefTraverser;
 
 public class Collector {
   static public AstList<? extends Ast> select(Ast root, Specification spec) {
@@ -36,7 +36,7 @@ public class Collector {
   }
 }
 
-class CollectorTraverser extends DefTraverser<Void, Void> {
+class CollectorTraverser extends DfsTraverser<Void, Void> {
   final private AstList<Ast> matched = new AstList<Ast>();
   final private Specification spec;
 

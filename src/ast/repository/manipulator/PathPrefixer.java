@@ -22,8 +22,8 @@ import java.util.Collection;
 import ast.Designator;
 import ast.data.Ast;
 import ast.data.Named;
+import ast.dispatcher.DfsTraverser;
 import ast.specification.Specification;
-import ast.traverser.DefTraverser;
 
 public class PathPrefixer {
   static public void prefix(Ast root, Specification spec) {
@@ -37,7 +37,7 @@ public class PathPrefixer {
   }
 }
 
-class PathPrefixerTraverser extends DefTraverser<Void, Designator> {
+class PathPrefixerTraverser extends DfsTraverser<Void, Designator> {
   final private Specification spec;
 
   public PathPrefixerTraverser(Specification spec) {

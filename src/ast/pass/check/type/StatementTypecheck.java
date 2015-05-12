@@ -51,14 +51,14 @@ import ast.data.variable.Constant;
 import ast.data.variable.FuncVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.Variable;
+import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowLeftIsContainerOfRight;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
-import ast.traverser.NullTraverser;
 import error.ErrorType;
 import error.RError;
 
-public class StatementTypecheck extends NullTraverser<Void, Void> {
+public class StatementTypecheck extends NullDispatcher<Void, Void> {
   final private KnowledgeBase kb;
   final private KnowType kt;
   final private KnowLeftIsContainerOfRight kc;

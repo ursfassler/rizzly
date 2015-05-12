@@ -22,9 +22,9 @@ import ast.data.AstList;
 import ast.data.function.Function;
 import ast.data.function.FunctionFactory;
 import ast.data.variable.FuncVariable;
-import ast.traverser.NullTraverser;
+import ast.dispatcher.NullDispatcher;
 
-public class CopyFunction extends NullTraverser<Ast, Void> {
+public class CopyFunction extends NullDispatcher<Ast, Void> {
   private CopyAst cast;
 
   public CopyFunction(CopyAst cast) {

@@ -23,7 +23,7 @@ import java.util.Map;
 import ast.Designator;
 import ast.data.Ast;
 import ast.data.Named;
-import ast.traverser.DefTraverser;
+import ast.dispatcher.DfsTraverser;
 import error.ErrorType;
 import error.RError;
 
@@ -65,7 +65,7 @@ public class KnowPath extends KnowledgeEntry {
 
 }
 
-class KnowPathTraverser extends DefTraverser<Void, Designator> {
+class KnowPathTraverser extends DfsTraverser<Void, Designator> {
   private Map<Ast, Designator> cache;
 
   public KnowPathTraverser(Map<Ast, Designator> cache) {

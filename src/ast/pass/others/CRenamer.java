@@ -22,9 +22,9 @@ import ast.data.Ast;
 import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.reference.RefName;
+import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.DefTraverser;
 
 //TODO how to ensure that names are unique?
 //TODO merge with Renamer?
@@ -74,7 +74,7 @@ public class CRenamer extends AstPass {
 
 }
 
-class RenamerWorker extends DefTraverser<Void, Void> {
+class RenamerWorker extends DfsTraverser<Void, Void> {
 
   @Override
   protected Void visit(Ast obj, Void param) {

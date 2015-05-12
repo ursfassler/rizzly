@@ -12,10 +12,10 @@ import ast.data.expression.binop.Notequal;
 import ast.data.expression.value.BoolValue;
 import ast.data.type.Type;
 import ast.data.type.base.RangeType;
+import ast.dispatcher.other.ExprReplacer;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.other.ExprReplacer;
 
 public class AlwaysGreater extends AstPass {
 

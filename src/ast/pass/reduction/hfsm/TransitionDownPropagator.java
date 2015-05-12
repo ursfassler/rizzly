@@ -52,13 +52,13 @@ import ast.data.statement.Statement;
 import ast.data.variable.FuncVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.Variable;
+import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowParent;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.Collector;
 import ast.repository.query.TypeFilter;
 import ast.specification.IsClass;
-import ast.traverser.NullTraverser;
 
 /**
  * adds transitions to the children until leaf states also adds calls to exit and entry function
@@ -112,7 +112,7 @@ public class TransitionDownPropagator extends AstPass {
 
 }
 
-class TransitionDownPropagatorWorker extends NullTraverser<Void, TransitionParam> {
+class TransitionDownPropagatorWorker extends NullDispatcher<Void, TransitionParam> {
   private static final ElementInfo info = ElementInfo.NO;
   private final KnowParent kp;
   private final Map<Transition, State> tsrc;
@@ -326,7 +326,7 @@ class TransitionParam {
   }
 }
 
-class TransitionEndpointCollector extends NullTraverser<Void, State> {
+class TransitionEndpointCollector extends NullDispatcher<Void, State> {
 
   final private Map<Transition, State> tsrc = new HashMap<Transition, State>();
   final private Map<Transition, State> tdst = new HashMap<Transition, State>();

@@ -19,9 +19,9 @@ package ast.pass.reduction;
 
 import ast.data.Namespace;
 import ast.data.file.RizzlyFile;
+import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.DefTraverser;
 
 public class FileReduction extends AstPass {
 
@@ -33,7 +33,7 @@ public class FileReduction extends AstPass {
 
 }
 
-class FileReductionWorker extends DefTraverser<Void, Namespace> {
+class FileReductionWorker extends DfsTraverser<Void, Namespace> {
 
   @Override
   protected Void visitRizzlyFile(RizzlyFile obj, Namespace param) {

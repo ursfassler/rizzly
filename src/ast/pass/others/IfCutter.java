@@ -22,9 +22,9 @@ import ast.data.Namespace;
 import ast.data.statement.Block;
 import ast.data.statement.IfOption;
 import ast.data.statement.IfStmt;
+import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.DefTraverser;
 
 /**
  * Ensures that the if statement has at most one option
@@ -40,7 +40,7 @@ public class IfCutter extends AstPass {
 
 }
 
-class IfCutterWorker extends DefTraverser<Void, Void> {
+class IfCutterWorker extends DfsTraverser<Void, Void> {
 
   @Override
   protected Void visitIfStmt(IfStmt obj, Void param) {

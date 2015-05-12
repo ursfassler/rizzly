@@ -40,10 +40,10 @@ import ast.data.statement.VarDefInitStmt;
 import ast.data.statement.WhileStmt;
 import ast.data.type.Type;
 import ast.data.variable.Variable;
+import ast.dispatcher.NullDispatcher;
 import ast.interpreter.Memory;
 import ast.knowledge.KnowEmptyValue;
 import ast.knowledge.KnowledgeBase;
-import ast.traverser.NullTraverser;
 import error.RError;
 
 /**
@@ -53,7 +53,7 @@ import error.RError;
  * @author urs
  *
  */
-public class StmtExecutor extends NullTraverser<Expression, Memory> {
+public class StmtExecutor extends NullDispatcher<Expression, Memory> {
   private final InstanceRepo ir;
   private final KnowledgeBase kb;
 

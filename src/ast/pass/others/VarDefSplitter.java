@@ -28,9 +28,9 @@ import ast.data.statement.Block;
 import ast.data.statement.Statement;
 import ast.data.statement.VarDefInitStmt;
 import ast.data.variable.FuncVariable;
+import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.DefTraverser;
 
 /**
  * Splits variable definitions such that only 1 variable is defined per variable definition statement. If the variable
@@ -49,7 +49,7 @@ public class VarDefSplitter extends AstPass {
 
 }
 
-class VarDefSplitterWorker extends DefTraverser<AstList<Statement>, Void> {
+class VarDefSplitterWorker extends DfsTraverser<AstList<Statement>, Void> {
 
   @Override
   protected AstList<Statement> visitBlock(Block obj, Void param) {

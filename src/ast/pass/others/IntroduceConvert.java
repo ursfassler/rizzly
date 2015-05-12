@@ -43,12 +43,12 @@ import ast.data.type.Type;
 import ast.data.type.TypeRefFactory;
 import ast.data.type.base.RangeType;
 import ast.data.variable.FuncVariable;
+import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowLlvmLibrary;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.manipulator.RepoAdder;
 import ast.repository.manipulator.TypeRepo;
-import ast.traverser.DefTraverser;
 import error.ErrorType;
 import error.RError;
 
@@ -70,7 +70,7 @@ public class IntroduceConvert extends AstPass {
 
 }
 
-class IntroduceConvertWorker extends DefTraverser<Void, Void> {
+class IntroduceConvertWorker extends DfsTraverser<Void, Void> {
   private final TypeRepo kbi;
   private final RepoAdder ra;
   private final KnowLlvmLibrary kll;

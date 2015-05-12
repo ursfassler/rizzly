@@ -20,9 +20,9 @@ package ast.pass.reduction;
 import ast.data.Namespace;
 import ast.data.expression.Expression;
 import ast.data.expression.value.TupleValue;
+import ast.dispatcher.other.ExprReplacer;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.other.ExprReplacer;
 
 public class ReduceTuple extends AstPass {
 

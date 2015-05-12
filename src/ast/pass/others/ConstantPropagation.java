@@ -29,10 +29,10 @@ import ast.data.type.base.RangeType;
 import ast.data.type.base.StringType;
 import ast.data.type.composed.RecordType;
 import ast.data.variable.Constant;
+import ast.dispatcher.other.ExprReplacer;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.other.ExprReplacer;
 
 /**
  * Propagates (some) constant values where they are used

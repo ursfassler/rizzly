@@ -25,11 +25,11 @@ import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.StateContent;
 import ast.data.component.hfsm.StateRefFactory;
 import ast.data.component.hfsm.Transition;
+import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.Collector;
 import ast.specification.IsClass;
-import ast.traverser.NullTraverser;
 
 /**
  * Sets the destination of a transition to the initial substate if the destination is a composite state
@@ -47,7 +47,7 @@ public class TransitionRedirecter extends AstPass {
   }
 }
 
-class TransitionRedirecterWorker extends NullTraverser<Void, Void> {
+class TransitionRedirecterWorker extends NullDispatcher<Void, Void> {
   static final private InitStateGetter initStateGetter = new InitStateGetter();
 
   @Override

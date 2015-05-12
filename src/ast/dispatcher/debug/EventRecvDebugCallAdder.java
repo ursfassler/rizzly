@@ -15,7 +15,7 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.traverser.debug;
+package ast.dispatcher.debug;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
@@ -30,7 +30,7 @@ import ast.data.function.header.FuncSlot;
 import ast.data.reference.RefFactory;
 import ast.data.reference.Reference;
 import ast.data.statement.CallStmt;
-import ast.traverser.DefTraverser;
+import ast.dispatcher.DfsTraverser;
 
 /**
  * Inserts a message call whenever an event is received
@@ -38,7 +38,7 @@ import ast.traverser.DefTraverser;
  * @author urs
  *
  */
-public class EventRecvDebugCallAdder extends DefTraverser<Void, Void> {
+public class EventRecvDebugCallAdder extends DfsTraverser<Void, Void> {
 
   private ArrayList<String> names;
   private FuncProcedure msgRecvFunc;

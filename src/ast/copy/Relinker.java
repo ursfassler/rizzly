@@ -23,9 +23,9 @@ import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
 import ast.data.reference.Reference;
-import ast.traverser.DefTraverser;
+import ast.dispatcher.DfsTraverser;
 
-public class Relinker extends DefTraverser<Void, Map<? extends Named, ? extends Named>> {
+public class Relinker extends DfsTraverser<Void, Map<? extends Named, ? extends Named>> {
   static private final Relinker INSTANCE = new Relinker();
 
   static public void relink(Ast obj, Map<? extends Named, ? extends Named> map) {

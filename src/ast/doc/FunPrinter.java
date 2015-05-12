@@ -130,7 +130,7 @@ import ast.data.variable.DefVariable;
 import ast.data.variable.FuncVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.Variable;
-import ast.traverser.NullTraverser;
+import ast.dispatcher.NullDispatcher;
 
 /**
  * Prints formated FUN objects to a specific writer.
@@ -138,7 +138,7 @@ import ast.traverser.NullTraverser;
  * @author urs
  *
  */
-public class FunPrinter extends NullTraverser<Void, Void> {
+public class FunPrinter extends NullDispatcher<Void, Void> {
   private Writer xw;
 
   public FunPrinter(Writer xw) {

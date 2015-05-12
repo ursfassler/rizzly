@@ -25,7 +25,7 @@ import ast.data.statement.AssignmentMulti;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.CallStmt;
 import ast.data.variable.StateVariable;
-import ast.traverser.NullTraverser;
+import ast.dispatcher.NullDispatcher;
 
 public class StateChangeStmt extends Specification {
   static private final StateChangeDispatcher dispatcher = new StateChangeDispatcher();
@@ -37,7 +37,7 @@ public class StateChangeStmt extends Specification {
 
 }
 
-class StateChangeDispatcher extends NullTraverser<Boolean, Void> {
+class StateChangeDispatcher extends NullDispatcher<Boolean, Void> {
   static private final PureFunction pureFunc = new PureFunction();
 
   @Override

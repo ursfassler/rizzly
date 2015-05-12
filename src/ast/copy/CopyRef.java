@@ -23,9 +23,9 @@ import ast.data.reference.RefIndex;
 import ast.data.reference.RefItem;
 import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
-import ast.traverser.NullTraverser;
+import ast.dispatcher.NullDispatcher;
 
-public class CopyRef extends NullTraverser<RefItem, Void> {
+public class CopyRef extends NullDispatcher<RefItem, Void> {
   private CopyAst cast;
 
   public CopyRef(CopyAst cast) {

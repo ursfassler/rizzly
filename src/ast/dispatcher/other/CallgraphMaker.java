@@ -15,7 +15,7 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.traverser.other;
+package ast.dispatcher.other;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -33,12 +33,12 @@ import ast.data.type.TypeRef;
 import ast.data.type.base.ArrayType;
 import ast.data.type.composed.NamedElement;
 import ast.data.variable.Variable;
+import ast.dispatcher.DfsTraverser;
+import ast.dispatcher.NullDispatcher;
 import ast.doc.SimpleGraph;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.repository.query.ChildByName;
-import ast.traverser.DefTraverser;
-import ast.traverser.NullTraverser;
 
 /**
  * Returns a callgraph of the entire (sub-) tree
@@ -46,7 +46,7 @@ import ast.traverser.NullTraverser;
  * @author urs
  *
  */
-public class CallgraphMaker extends DefTraverser<Void, Ast> {
+public class CallgraphMaker extends DfsTraverser<Void, Ast> {
   private SimpleGraph<Ast> callgraph = new SimpleGraph<Ast>();
   private KnowledgeBase kb;
 
@@ -103,7 +103,7 @@ public class CallgraphMaker extends DefTraverser<Void, Ast> {
 
 // FIXME make it cleaner
 @Deprecated
-class RefGetter extends NullTraverser<Ast, Ast> {
+class RefGetter extends NullDispatcher<Ast, Ast> {
   private Set<Function> target;
   final private KnowType kt;
 

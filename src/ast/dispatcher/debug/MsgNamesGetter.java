@@ -15,7 +15,7 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.traverser.debug;
+package ast.dispatcher.debug;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -29,9 +29,9 @@ import ast.data.function.header.FuncQuery;
 import ast.data.function.header.FuncResponse;
 import ast.data.function.header.FuncSignal;
 import ast.data.function.header.FuncSlot;
-import ast.traverser.DefTraverser;
+import ast.dispatcher.DfsTraverser;
 
-public class MsgNamesGetter extends DefTraverser<Void, Set<String>> {
+public class MsgNamesGetter extends DfsTraverser<Void, Set<String>> {
 
   public static Set<String> get(Ast obj) {
     Set<String> ret = new HashSet<String>();

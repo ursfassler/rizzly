@@ -23,9 +23,9 @@ import java.util.Set;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.reference.Reference;
+import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.DefTraverser;
 import error.ErrorType;
 import error.RError;
 
@@ -46,7 +46,7 @@ public class LinkTargetExists extends AstPass {
 
 }
 
-class LinkOkWorker extends DefTraverser<Void, Void> {
+class LinkOkWorker extends DfsTraverser<Void, Void> {
   final private Set<Ast> target = new HashSet<Ast>();
   final private Set<Ast> found = new HashSet<Ast>();
 

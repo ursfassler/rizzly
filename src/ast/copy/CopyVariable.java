@@ -23,9 +23,9 @@ import ast.data.variable.ConstPrivate;
 import ast.data.variable.FuncVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.Variable;
-import ast.traverser.NullTraverser;
+import ast.dispatcher.NullDispatcher;
 
-public class CopyVariable extends NullTraverser<Variable, Void> {
+public class CopyVariable extends NullDispatcher<Variable, Void> {
   private CopyAst cast;
 
   public CopyVariable(CopyAst cast) {

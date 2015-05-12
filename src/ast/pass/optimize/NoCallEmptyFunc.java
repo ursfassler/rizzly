@@ -10,9 +10,9 @@ import ast.data.function.Function;
 import ast.data.function.FunctionProperty;
 import ast.data.statement.CallStmt;
 import ast.data.statement.Statement;
+import ast.dispatcher.other.StmtReplacer;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.traverser.other.StmtReplacer;
 import error.ErrorType;
 import error.RError;
 

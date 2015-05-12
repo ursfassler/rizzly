@@ -44,13 +44,13 @@ import ast.data.type.composed.RecordType;
 import ast.data.type.composed.UnionType;
 import ast.data.type.composed.UnsafeUnionType;
 import ast.data.variable.DefVariable;
+import ast.dispatcher.other.ExprReplacer;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.ChildCollector;
 import ast.repository.query.Single;
 import ast.specification.HasName;
-import ast.traverser.other.ExprReplacer;
 import error.ErrorType;
 import error.RError;
 
