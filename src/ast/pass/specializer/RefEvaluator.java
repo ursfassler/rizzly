@@ -21,6 +21,7 @@ import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.expression.Expression;
 import ast.data.expression.value.NumberValue;
+import ast.data.expression.value.TupleValue;
 import ast.data.function.Function;
 import ast.data.function.header.FuncFunction;
 import ast.data.reference.RefCall;
@@ -85,7 +86,7 @@ public class RefEvaluator extends NullTraverser<Expression, Ast> {
   }
 
   @Override
-  protected ast.data.expression.Expression visitDefault(Ast obj, Ast param) {
+  protected Expression visitDefault(Ast obj, Ast param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getName());
   }
 
@@ -93,12 +94,12 @@ public class RefEvaluator extends NullTraverser<Expression, Ast> {
     return ExprEvaluator.evaluate(expr, memory, ir, kb);
   }
 
-  private ast.data.expression.Expression call(FuncFunction func, AstList<Expression> value) {
+  private Expression call(FuncFunction func, AstList<Expression> value) {
     return StmtExecutor.process(func, value, new Memory(), ir, kb);
   }
 
   @Override
-  protected ast.data.expression.Expression visitRefCall(RefCall obj, Ast param) {
+  protected Expression visitRefCall(RefCall obj, Ast param) {
     if (param instanceof BaseType) {
       AstList<Expression> values = obj.actualParameter.value;
       RError.ass(values.size() == 1, obj.getInfo(), "expected exactly 1 argument, got " + values.size());
@@ -113,24 +114,24 @@ public class RefEvaluator extends NullTraverser<Expression, Ast> {
   }
 
   @Override
-  protected ast.data.expression.Expression visitRefName(ast.data.reference.RefName obj, Ast param) {
+  protected Expression visitRefName(ast.data.reference.RefName obj, Ast param) {
     throw new RuntimeException("not yet implemented");
   }
 
   @Override
-  protected ast.data.expression.Expression visitRefIndex(RefIndex obj, Ast param) {
-    ast.data.expression.value.TupleValue value = (ast.data.expression.value.TupleValue) param;
+  protected Expression visitRefIndex(RefIndex obj, Ast param) {
+    TupleValue value = (TupleValue) param;
 
-    ast.data.expression.Expression idx = eval(obj.index);
+    Expression idx = eval(obj.index);
     assert (idx instanceof NumberValue);
-    int ii = ((ast.data.expression.value.NumberValue) idx).value.intValue();
-    ast.data.expression.Expression elem = value.value.get(ii);
+    int ii = ((NumberValue) idx).value.intValue();
+    Expression elem = value.value.get(ii);
 
     return elem;
   }
 
   @Override
-  protected ast.data.expression.Expression visitRefTemplCall(RefTemplCall obj, Ast param) {
+  protected Expression visitRefTemplCall(RefTemplCall obj, Ast param) {
     RError.err(ErrorType.Fatal, obj.getInfo(), "Can not evaluate template");
     return null;
   }

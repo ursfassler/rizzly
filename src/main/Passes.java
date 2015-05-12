@@ -32,7 +32,6 @@ import ast.pass.check.model.Modelcheck;
 import ast.pass.check.sanity.Sanitycheck;
 import ast.pass.check.type.Typecheck;
 import ast.pass.eval.GlobalConstEval;
-import ast.pass.eval.TemplateArgEval;
 import ast.pass.instantiation.Instantiation;
 import ast.pass.linker.Linker;
 import ast.pass.optimize.AlwaysGreater;
@@ -182,8 +181,6 @@ public class Passes {
       passes.add(new DocWriter());
     }
     passes.add(new FileReduction());
-
-    passes.add(new TemplateArgEval());
 
     passes.add(new NamespaceLinkReduction());
     passes.add(new StateLinkReduction());

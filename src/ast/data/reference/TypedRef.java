@@ -33,4 +33,9 @@ public abstract class TypedRef<T extends Ast> extends AstBase {
     return (T) ref.getTarget();
   }
 
+  @Override
+  public String toString() {
+    return "->" + ref;
+  }
+
 }

@@ -28,4 +28,9 @@ public class RefExp extends Expression {
     this.ref = ref;
   }
 
+  @Override
+  public String toString() {
+    return "->" + ref;
+  }
+
 }

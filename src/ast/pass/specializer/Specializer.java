@@ -35,6 +35,8 @@ import ast.data.reference.Reference;
 import ast.data.template.ActualTemplateArgument;
 import ast.data.template.Template;
 import ast.data.type.Type;
+import ast.data.type.TypeRef;
+import ast.data.type.TypeRefFactory;
 import ast.data.type.template.TypeTemplate;
 import ast.data.variable.TemplateParameter;
 import ast.interpreter.Memory;
@@ -54,6 +56,8 @@ public class Specializer {
   @Deprecated
   // FIXME use process, provide evaluated
   public static Ast evalArgAndProcess(Template item, AstList<ActualTemplateArgument> genspec, InstanceRepo ir, KnowledgeBase kb) {
+    evalArgType(item.getTempl(), ir, kb);
+
     if (!isEvaluated(genspec)) {
       genspec = evalArg(item.getTempl(), genspec, ir, kb);
     }
@@ -221,6 +225,19 @@ public class Specializer {
 
   private static Type evalType(Reference ref, InstanceRepo ir, KnowledgeBase kb) {
     return TypeEvaluator.evaluate(ref, new Memory(), ir, kb);
+  }
+
+  @Deprecated
+  // FIXME do this before
+  private static void evalArgType(AstList<TemplateParameter> templ, InstanceRepo ir, KnowledgeBase kb) {
+    for (TemplateParameter param : templ) {
+      param.type = evalTypeRef(param.type, ir, kb);
+    }
+  }
+
+  private static TypeRef evalTypeRef(TypeRef tr, InstanceRepo ir, KnowledgeBase kb) {
+    Type type = TypeEvaluator.evaluate(tr.ref, new Memory(), ir, kb);
+    return TypeRefFactory.create(tr.getInfo(), type);
   }
 
 }
