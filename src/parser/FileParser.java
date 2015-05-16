@@ -27,8 +27,8 @@ import parser.scanner.TokenType;
 import util.Pair;
 import ast.Designator;
 import ast.ElementInfo;
-import ast.data.Ast;
 import ast.data.Metadata;
+import ast.data.Named;
 import ast.data.file.RizzlyFile;
 import ast.data.template.Template;
 import ast.data.variable.ConstGlobal;
@@ -68,7 +68,7 @@ public class FileParser extends BaseParser {
       Pair<Token, List<TemplateParameter>> def = parseObjDef();
 
       if (consumeIfEqual(TokenType.EQUAL)) {
-        Ast object = parseDeclaration(def.first.getData());
+        Named object = parseDeclaration(def.first.getData());
         Template decl = new Template(def.first.getInfo(), def.first.getData(), def.second, object);
         ret.objects.add(decl);
       } else if (consumeIfEqual(TokenType.COLON)) {
@@ -90,7 +90,7 @@ public class FileParser extends BaseParser {
     return ret;
   }
 
-  private Ast parseDeclaration(String name) {
+  private Named parseDeclaration(String name) {
     switch (peek().getType()) {
       case FUNCTION: {
         return parseFuncDef(TokenType.FUNCTION, name, false);

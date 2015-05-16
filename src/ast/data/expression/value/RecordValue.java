@@ -35,7 +35,7 @@ public class RecordValue extends ValueExpr {
 
   @Override
   public String toString() {
-    return value + ": " + type;
+    return value + ":" + type;
   }
 
 }

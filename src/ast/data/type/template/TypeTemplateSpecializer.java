@@ -15,34 +15,24 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.specializer;
+package ast.data.type.template;
 
-import java.math.BigInteger;
 import java.util.List;
 
 import ast.data.Ast;
-import ast.data.Range;
 import ast.data.expression.value.NumberValue;
 import ast.data.template.ActualTemplateArgument;
 import ast.data.type.Type;
-import ast.data.type.template.ArrayTemplate;
-import ast.data.type.template.RangeTemplate;
-import ast.data.type.template.TypeTemplate;
-import ast.data.type.template.TypeTypeTemplate;
+import ast.data.type.base.ArrayTypeFactory;
+import ast.data.type.base.RangeTypeFactory;
+import ast.data.type.special.TypeTypeFactory;
 import ast.dispatcher.NullDispatcher;
-import ast.knowledge.KnowledgeBase;
-import ast.repository.manipulator.TypeRepo;
 
 public class TypeTemplateSpecializer extends NullDispatcher<Type, List<ActualTemplateArgument>> {
-  private final TypeRepo kbi;
+  final static private TypeTemplateSpecializer INSTANCE = new TypeTemplateSpecializer();
 
-  public TypeTemplateSpecializer(KnowledgeBase kb) {
-    kbi = new TypeRepo(kb);
-  }
-
-  public static Type process(TypeTemplate type, List<ActualTemplateArgument> genspec, KnowledgeBase kb) {
-    TypeTemplateSpecializer specializer = new TypeTemplateSpecializer(kb);
-    return specializer.traverse(type, genspec);
+  public static Type process(TypeTemplate type, List<ActualTemplateArgument> genspec) {
+    return INSTANCE.traverse(type, genspec);
   }
 
   @Override
@@ -51,26 +41,25 @@ public class TypeTemplateSpecializer extends NullDispatcher<Type, List<ActualTem
   }
 
   @Override
-  protected ast.data.type.Type visitRangeTemplate(RangeTemplate obj, List<ActualTemplateArgument> param) {
+  protected Type visitRangeTemplate(RangeTemplate obj, List<ActualTemplateArgument> param) {
     assert (param.size() == 2);
     assert (param.get(0) instanceof NumberValue);
     assert (param.get(1) instanceof NumberValue);
 
     NumberValue low = (NumberValue) param.get(0);
     NumberValue high = (NumberValue) param.get(1);
-    return kbi.getRangeType(new Range(low.value, high.value));
+    return RangeTypeFactory.create(low.value, high.value);
   }
 
   @Override
-  protected ast.data.type.Type visitArrayTemplate(ArrayTemplate obj, List<ActualTemplateArgument> param) {
+  protected Type visitArrayTemplate(ArrayTemplate obj, List<ActualTemplateArgument> param) {
     assert (param.size() == 2);
     assert (param.get(0) instanceof NumberValue);
     assert (param.get(1) instanceof Type);
 
     NumberValue size = (NumberValue) param.get(0);
     Type type = (Type) param.get(1);
-    BigInteger count = size.value;
-    return kbi.getArray(count, type);
+    return ArrayTypeFactory.create(size.value, type);
   }
 
   @Override
@@ -79,6 +68,6 @@ public class TypeTemplateSpecializer extends NullDispatcher<Type, List<ActualTem
     assert (param.get(0) instanceof Type);
 
     Type type = (Type) param.get(0);
-    return kbi.getTypeType(type);
+    return TypeTypeFactory.create(type);
   }
 }

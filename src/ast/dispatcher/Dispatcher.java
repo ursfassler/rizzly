@@ -290,8 +290,6 @@ public abstract class Dispatcher<R, P> {
       return visitTemplate((Template) obj, param);
     } else if (obj instanceof RawComponent) {
       return visitRawComponent((RawComponent) obj, param);
-    } else if (obj instanceof TypeTemplate) {
-      return visitTypeTemplate((TypeTemplate) obj, param);
     } else if (obj instanceof FunctionTemplate) {
       return visitFunctionTemplate((FunctionTemplate) obj, param);
     } else {
@@ -656,6 +654,8 @@ public abstract class Dispatcher<R, P> {
       return visitComponentType((ComponentType) obj, param);
     } else if (obj instanceof TypeType) {
       return visitTypeType((TypeType) obj, param);
+    } else if (obj instanceof TypeTemplate) {
+      return visitTypeTemplate((TypeTemplate) obj, param);
     } else {
       throwUnknownObjectError(obj);
       return null;

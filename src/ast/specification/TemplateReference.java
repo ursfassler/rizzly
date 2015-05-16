@@ -15,32 +15,20 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.specializer;
+package ast.specification;
 
 import ast.data.Ast;
-import ast.data.variable.Constant;
-import ast.dispatcher.DfsTraverser;
-import ast.interpreter.Memory;
-import ast.knowledge.KnowledgeBase;
+import ast.data.reference.Reference;
+import ast.data.template.Template;
 
-public class ConstEval extends DfsTraverser<Void, Void> {
-  private final KnowledgeBase kb;
-
-  public ConstEval(KnowledgeBase kb) {
-    super();
-    this.kb = kb;
-  }
-
-  public static void process(Ast classes, KnowledgeBase kb) {
-    ConstEval eval = new ConstEval(kb);
-    eval.traverse(classes, null);
-  }
+public class TemplateReference extends Specification {
 
   @Override
-  protected Void visitConstant(Constant obj, Void param) {
-    InstanceRepo ir = new InstanceRepo();
-    obj.def = ExprEvaluator.evaluate(obj.def, new Memory(), ir, kb);
-    return null;
+  public boolean isSatisfiedBy(Ast candidate) {
+    if (candidate instanceof Reference) {
+      return ((Reference) candidate).link instanceof Template;
+    }
+    return false;
   }
 
 }

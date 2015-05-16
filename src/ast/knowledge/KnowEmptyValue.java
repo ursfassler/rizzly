@@ -26,15 +26,13 @@ import ast.copy.Copy;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.expression.Expression;
-import ast.data.expression.RefExp;
 import ast.data.expression.value.BoolValue;
 import ast.data.expression.value.NamedElementsValue;
 import ast.data.expression.value.NamedValue;
 import ast.data.expression.value.NumberValue;
 import ast.data.expression.value.StringValue;
 import ast.data.expression.value.TupleValue;
-import ast.data.reference.RefFactory;
-import ast.data.reference.RefName;
+import ast.data.expression.value.ValueExpr;
 import ast.data.type.Type;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
@@ -48,7 +46,7 @@ import ast.data.type.special.NaturalType;
 import ast.dispatcher.NullDispatcher;
 
 public class KnowEmptyValue extends KnowledgeEntry {
-  final private Map<Type, Expression> cache = new HashMap<Type, Expression>();
+  final private Map<Type, ValueExpr> cache = new HashMap<Type, ValueExpr>();
   private KnowledgeBase kb;
 
   @Override
@@ -56,7 +54,7 @@ public class KnowEmptyValue extends KnowledgeEntry {
     kb = base;
   }
 
-  public Expression get(Type type) {
+  public ValueExpr get(Type type) {
     if (!cache.containsKey(type)) {
       KnowEmptyValueGenerator generator = new KnowEmptyValueGenerator(kb);
       cache.put(type, generator.traverse(type, null));
@@ -66,7 +64,7 @@ public class KnowEmptyValue extends KnowledgeEntry {
 
 }
 
-class KnowEmptyValueGenerator extends NullDispatcher<Expression, Void> {
+class KnowEmptyValueGenerator extends NullDispatcher<ValueExpr, Void> {
   final private KnowType kt;
 
   public KnowEmptyValueGenerator(KnowledgeBase kb) {
@@ -75,38 +73,39 @@ class KnowEmptyValueGenerator extends NullDispatcher<Expression, Void> {
   }
 
   @Override
-  protected ast.data.expression.Expression visitDefault(Ast obj, Void param) {
+  protected ValueExpr visitDefault(Ast obj, Void param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getName());
   }
 
   @Override
-  protected ast.data.expression.Expression visitBooleanType(BooleanType obj, Void param) {
+  protected ValueExpr visitBooleanType(BooleanType obj, Void param) {
     return new BoolValue(ElementInfo.NO, false);
   }
 
   @Override
-  protected ast.data.expression.Expression visitStringType(StringType obj, Void param) {
+  protected ValueExpr visitStringType(StringType obj, Void param) {
     return new StringValue(ElementInfo.NO, "");
   }
 
   @Override
-  protected ast.data.expression.Expression visitEnumType(EnumType obj, Void param) {
-    ast.data.reference.Reference ref = RefFactory.create(ElementInfo.NO, obj, new RefName(ElementInfo.NO, obj.element.get(0).name));
-    return new RefExp(ElementInfo.NO, ref);
+  protected ValueExpr visitEnumType(EnumType obj, Void param) {
+    throw new RuntimeException("not yet implemented: " + obj.getClass().getName());
+    // Reference ref = RefFactory.create(ElementInfo.NO, obj, new RefName(ElementInfo.NO, obj.element.get(0).name));
+    // return new RefExp(ElementInfo.NO, ref);
   }
 
   @Override
-  protected ast.data.expression.Expression visitIntegerType(IntegerType obj, Void param) {
+  protected ValueExpr visitIntegerType(IntegerType obj, Void param) {
     return new NumberValue(ElementInfo.NO, BigInteger.ZERO);
   }
 
   @Override
-  protected ast.data.expression.Expression visitNaturalType(NaturalType obj, Void param) {
+  protected ValueExpr visitNaturalType(NaturalType obj, Void param) {
     return new NumberValue(ElementInfo.NO, BigInteger.ZERO);
   }
 
   @Override
-  protected ast.data.expression.Expression visitRangeType(RangeType obj, Void param) {
+  protected ValueExpr visitRangeType(RangeType obj, Void param) {
     BigInteger val;
     if (obj.range.high.compareTo(BigInteger.ZERO) < 0) {
       val = obj.range.high;
@@ -119,7 +118,7 @@ class KnowEmptyValueGenerator extends NullDispatcher<Expression, Void> {
   }
 
   @Override
-  protected ast.data.expression.Expression visitArrayType(ArrayType obj, Void param) {
+  protected ValueExpr visitArrayType(ArrayType obj, Void param) {
     AstList<Expression> tv = new AstList<Expression>();
     Expression itm = visit(kt.get(obj.type), param);
     for (int i = 0; i < obj.size.intValue(); i++) {
@@ -129,7 +128,7 @@ class KnowEmptyValueGenerator extends NullDispatcher<Expression, Void> {
   }
 
   @Override
-  protected ast.data.expression.Expression visitRecordType(RecordType obj, Void param) {
+  protected ValueExpr visitRecordType(RecordType obj, Void param) {
     AstList<NamedValue> value = new AstList<NamedValue>();
 
     for (NamedElement elem : obj.element) {

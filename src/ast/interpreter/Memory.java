@@ -20,14 +20,13 @@ package ast.interpreter;
 import java.util.HashMap;
 import java.util.Map;
 
-import ast.data.expression.Expression;
-import ast.data.expression.RefExp;
+import ast.data.expression.value.ValueExpr;
 import ast.data.variable.Variable;
 import error.ErrorType;
 import error.RError;
 
 public class Memory {
-  private Map<Variable, Expression> values = new HashMap<Variable, Expression>();
+  private Map<Variable, ValueExpr> values = new HashMap<Variable, ValueExpr>();
 
   public Memory() {
   }
@@ -48,17 +47,16 @@ public class Memory {
     values.put(var, null);
   }
 
-  public void set(Variable var, Expression value) {
+  public void set(Variable var, ValueExpr value) {
     assert (var != null);
     assert (values.containsKey(var));
-    assert (!(value instanceof RefExp));
     values.put(var, value);
   }
 
-  public Expression get(Variable var) {
+  public ValueExpr get(Variable var) {
     assert (var != null);
     assert (values.containsKey(var));
-    Expression expr = values.get(var);
+    ValueExpr expr = values.get(var);
     assert (expr != null);
     return expr;
   }

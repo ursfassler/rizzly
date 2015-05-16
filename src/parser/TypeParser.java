@@ -24,16 +24,19 @@ import parser.scanner.Scanner;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
 import ast.copy.Copy;
-import ast.data.Ast;
 import ast.data.AstList;
+import ast.data.Named;
 import ast.data.function.Function;
 import ast.data.raw.RawComponent;
+import ast.data.reference.Reference;
+import ast.data.type.Type;
 import ast.data.type.TypeRef;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.EnumTypeFactory;
 import ast.data.type.composed.NamedElement;
 import ast.data.type.composed.RecordType;
 import ast.data.type.composed.UnsafeUnionType;
+import ast.data.type.out.AliasType;
 import error.ErrorType;
 import error.RError;
 
@@ -92,7 +95,7 @@ public class TypeParser extends BaseParser {
   }
 
   // EBNF typedef: recordtype | uniontype | enumtype | arraytype | derivatetype
-  public Ast parseTypeDef(String name) {
+  public Named parseTypeDef(String name) {
     switch (peek().getType()) {
       case RECORD:
         return parseRecordType(name);
@@ -101,7 +104,7 @@ public class TypeParser extends BaseParser {
       case ENUM:
         return parseEnumType(name);
       case IDENTIFIER:
-        return parseDerivateType();
+        return parseDerivateType(name);
       default:
         RError.err(ErrorType.Fatal, peek().getInfo(), "Expected record, union or type reference");
         return null;
@@ -110,14 +113,14 @@ public class TypeParser extends BaseParser {
   }
 
   // EBNF derivatetype: ref ";"
-  private ast.data.reference.Reference parseDerivateType() {
-    ast.data.reference.Reference ref = expr().parseRef();
+  private AliasType parseDerivateType(String name) {
+    Reference ref = expr().parseRef();
     expect(TokenType.SEMI);
-    return ref;
+    return new AliasType(ref.getInfo(), name, new TypeRef(ref.getInfo(), ref));
   }
 
   // EBNF recordtype: "Record" { recordElem } "end"
-  private ast.data.type.Type parseRecordType(String name) {
+  private Type parseRecordType(String name) {
     Token tok = expect(TokenType.RECORD);
     ast.data.type.composed.RecordType ret = new RecordType(tok.getInfo(), name);
     while (peek().getType() != TokenType.END) {

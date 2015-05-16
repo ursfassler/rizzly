@@ -33,6 +33,11 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
+  public void templ1() {
+    compile("templ1", TestSteps.COMPILE_TO_LIB, false, false);
+  }
+
+  @Test
   public void for1() {
     compile("for1", TestSteps.EXECUTE, false, false);
   }

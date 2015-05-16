@@ -37,19 +37,7 @@ public class TupleValue extends ValueExpr {
 
   @Override
   public String toString() {
-    String ret = "";
-    ret += "(";
-    boolean first = true;
-    for (Expression gen : value) {
-      if (first) {
-        first = false;
-      } else {
-        ret += ",";
-      }
-      ret += gen.toString();
-    }
-    ret += ")";
-    return ret;
+    return "(" + value + ")";
   }
 
 }

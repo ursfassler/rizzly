@@ -26,6 +26,7 @@ import parser.scanner.TokenType;
 import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.Metadata;
+import ast.data.Named;
 import ast.data.raw.RawComponent;
 import ast.data.raw.RawElementary;
 import ast.data.template.Template;
@@ -66,7 +67,7 @@ public class ImplElementaryParser extends ImplBaseParser {
           } else {
             genpam = new ArrayList<TemplateParameter>();
           }
-          Ast obj = parseDeclaration(id.getData());
+          Named obj = parseDeclaration(id.getData());
           Template decl = new Template(id.getInfo(), id.getData(), genpam, obj);
           comp.getDeclaration().add(decl);
         } else if (consumeIfEqual(TokenType.COLON)) {
@@ -120,7 +121,7 @@ public class ImplElementaryParser extends ImplBaseParser {
     }
   }
 
-  private Ast parseDeclaration(String name) {
+  private Named parseDeclaration(String name) {
     switch (peek().getType()) {
       case FUNCTION:
       case PROCEDURE:

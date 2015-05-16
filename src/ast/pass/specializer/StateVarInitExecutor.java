@@ -17,6 +17,7 @@
 
 package ast.pass.specializer;
 
+import ast.data.variable.StateVariable;
 import ast.dispatcher.DfsTraverser;
 import ast.interpreter.Memory;
 import ast.knowledge.KnowledgeBase;
@@ -41,9 +42,8 @@ public class StateVarInitExecutor extends AstPass {
 class StateVarInitExecutorWorker extends DfsTraverser<Void, KnowledgeBase> {
 
   @Override
-  protected Void visitStateVariable(ast.data.variable.StateVariable obj, KnowledgeBase param) {
-    InstanceRepo ir = new InstanceRepo();
-    obj.def = ExprEvaluator.evaluate(obj.def, new Memory(), ir, param);
+  protected Void visitStateVariable(StateVariable obj, KnowledgeBase param) {
+    obj.def = ExprEvaluator.evaluate(obj.def, new Memory(), param);
     return null;
   }
 

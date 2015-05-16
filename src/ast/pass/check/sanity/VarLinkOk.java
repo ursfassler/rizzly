@@ -31,6 +31,7 @@ import ast.data.function.Function;
 import ast.data.reference.Reference;
 import ast.data.statement.ForStmt;
 import ast.data.statement.VarDefStmt;
+import ast.data.template.Template;
 import ast.data.type.Type;
 import ast.data.variable.ConstPrivate;
 import ast.data.variable.StateVariable;
@@ -78,6 +79,13 @@ class VarLinkOkWorker extends DfsTraverser<Void, Set<Ast>> {
     param = add(param, TypeFilter.select(obj.children, Variable.class));
     param = add(param, TypeFilter.select(obj.children, Type.class));
     return super.visitNamespace(obj, param);
+  }
+
+  @Override
+  protected Void visitTemplate(Template obj, Set<Ast> param) {
+    param = new HashSet<Ast>(param);
+    param.addAll(obj.getTempl());
+    return super.visitTemplate(obj, param);
   }
 
   @Override

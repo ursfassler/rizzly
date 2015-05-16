@@ -269,7 +269,8 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   }
 
   private void compHeader(RawComponent obj) {
-    xw.kw("Component");
+    xw.wa(obj.name, getId(obj));
+    xw.kw(" = Component");
     xw.nl();
     xw.incIndent();
     writeMeta(obj);

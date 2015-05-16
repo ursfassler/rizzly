@@ -20,7 +20,6 @@ package ast.data.template;
 import java.util.List;
 
 import ast.ElementInfo;
-import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
 import ast.data.component.hfsm.StateContent;
@@ -29,9 +28,9 @@ import ast.data.variable.TemplateParameter;
 //TODO do we need anonymous templates? it is easier if they are named.
 public class Template extends Named implements StateContent {
   private final AstList<TemplateParameter> templ = new AstList<TemplateParameter>();
-  private final Ast object;
+  private final Named object;
 
-  public Template(ElementInfo info, String name, List<TemplateParameter> genpam, Ast object) {
+  public Template(ElementInfo info, String name, List<TemplateParameter> genpam, Named object) {
     super(info, name);
     this.templ.addAll(genpam);
     this.object = object;
@@ -41,7 +40,7 @@ public class Template extends Named implements StateContent {
     return templ;
   }
 
-  public Ast getObject() {
+  public Named getObject() {
     return object;
   }
 

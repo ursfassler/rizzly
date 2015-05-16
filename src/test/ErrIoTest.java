@@ -57,12 +57,12 @@ public class ErrIoTest extends ErrorTest {
 
   @Test
   public void err7() {
-    testForError("err7", "Err7", "function (foo) is not allowed to change state");
+    testForError("err7", "Err7", "function (foo{}) is not allowed to change state");
   }
 
   @Test
   public void err8() {
-    testForError("err8", "Err8", "function (foo) is not allowed to change state");
+    testForError("err8", "Err8", "function (foo{}) is not allowed to change state");
   }
 
 }

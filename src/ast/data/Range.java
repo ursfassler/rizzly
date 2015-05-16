@@ -56,8 +56,8 @@ final public class Range implements Iterable<BigInteger> {
     return low && high;
   }
 
-  public static boolean isIn(BigInteger num, Range range) {
-    throw new RuntimeException("not yet implemented");
+  public boolean contains(BigInteger num) {
+    return (low.compareTo(num) <= 0) && (num.compareTo(high) <= 0);
   }
 
   @Override

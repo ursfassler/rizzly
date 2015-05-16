@@ -18,10 +18,15 @@
 package ast.data.component;
 
 import ast.ElementInfo;
+import ast.data.raw.RawComponent;
 import ast.data.reference.RefFactory;
 
 public class CompRefFactory {
   public static CompRef create(ElementInfo info, Component comp) {
+    return new CompRef(info, RefFactory.create(info, comp));
+  }
+
+  public static CompRef create(ElementInfo info, RawComponent comp) {
     return new CompRef(info, RefFactory.create(info, comp));
   }
 }

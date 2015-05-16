@@ -18,9 +18,9 @@
 package ast.data.type.template;
 
 import ast.ElementInfo;
-import ast.data.Named;
+import ast.data.type.Type;
 
-public class TypeTemplate extends Named {
+public class TypeTemplate extends Type {
 
   public TypeTemplate(ElementInfo info, String name) {
     super(info, name);

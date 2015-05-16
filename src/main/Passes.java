@@ -31,7 +31,6 @@ import ast.pass.AstPass;
 import ast.pass.check.model.Modelcheck;
 import ast.pass.check.sanity.Sanitycheck;
 import ast.pass.check.type.Typecheck;
-import ast.pass.eval.GlobalConstEval;
 import ast.pass.instantiation.Instantiation;
 import ast.pass.linker.Linker;
 import ast.pass.optimize.AlwaysGreater;
@@ -88,6 +87,8 @@ import ast.pass.reduction.StateLinkReduction;
 import ast.pass.reduction.TupleAssignReduction;
 import ast.pass.reduction.hfsm.HfsmReduction;
 import ast.pass.specializer.StateVarInitExecutor;
+import ast.pass.specializer.TemplCallAdder;
+import ast.pass.specializer.TypeCastAdder;
 import ast.pass.specializer.TypeEvalPass;
 import error.RError;
 
@@ -113,8 +114,6 @@ public class Passes {
       // TODO check that model check does not change AST
       passes.add(new Modelcheck());
     }
-
-    // FuncHeaderReplacer.process(aclasses, kb); //TODO remove if not used
 
     passes.passes.add(reduce(passes));
 
@@ -189,7 +188,9 @@ public class Passes {
 
     passes.add(new RootInstanceAdder());
 
-    passes.add(new GlobalConstEval());
+    // passes.add(new GlobalConstEval());
+    passes.add(new TemplCallAdder());
+    passes.add(new TypeCastAdder());
     passes.add(new TypeEvalPass());
 
     passes.add(new VarDefSplitter());

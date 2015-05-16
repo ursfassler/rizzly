@@ -27,6 +27,7 @@ import ast.data.expression.Expression;
 import ast.data.expression.value.AnyValue;
 import ast.data.expression.value.BoolValue;
 import ast.data.expression.value.TupleValue;
+import ast.data.expression.value.ValueExpr;
 import ast.data.function.header.FuncFunction;
 import ast.data.reference.Reference;
 import ast.data.statement.AssignmentMulti;
@@ -39,6 +40,7 @@ import ast.data.statement.Statement;
 import ast.data.statement.VarDefInitStmt;
 import ast.data.statement.WhileStmt;
 import ast.data.type.Type;
+import ast.data.variable.FuncVariable;
 import ast.data.variable.Variable;
 import ast.dispatcher.NullDispatcher;
 import ast.interpreter.Memory;
@@ -54,35 +56,33 @@ import error.RError;
  *
  */
 public class StmtExecutor extends NullDispatcher<Expression, Memory> {
-  private final InstanceRepo ir;
   private final KnowledgeBase kb;
 
-  public StmtExecutor(InstanceRepo ir, KnowledgeBase kb) {
+  public StmtExecutor(KnowledgeBase kb) {
     super();
-    this.ir = ir;
     this.kb = kb;
   }
 
-  public static Expression process(FuncFunction func, List<Expression> actparam, Memory mem, InstanceRepo ir, KnowledgeBase kb) {
+  public static Expression process(FuncFunction func, List<Expression> actparam, Memory mem, KnowledgeBase kb) {
     Memory memory = new Memory(mem);
 
     assert (func.param.size() == actparam.size());
 
     for (int i = 0; i < actparam.size(); i++) {
-      ast.data.variable.FuncVariable var = func.param.get(i);
-      Expression val = ExprEvaluator.evaluate(actparam.get(i), mem, ir, kb);
+      FuncVariable var = func.param.get(i);
+      ValueExpr val = ExprEvaluator.evaluate(actparam.get(i), mem, kb);
       memory.createVar(var);
       memory.set(var, val);
     }
 
-    StmtExecutor executor = new StmtExecutor(ir, kb);
+    StmtExecutor executor = new StmtExecutor(kb);
     Expression ret = executor.traverse(func, memory);
     assert (ret != null);
     return ret;
   }
 
-  private Expression exeval(Expression expr, Memory mem) {
-    return ExprEvaluator.evaluate(expr, mem, ir, kb);
+  private ValueExpr exeval(Expression expr, Memory mem) {
+    return ExprEvaluator.evaluate(expr, mem, kb);
   }
 
   private boolean toBool(Expression expr) {
@@ -119,13 +119,13 @@ public class StmtExecutor extends NullDispatcher<Expression, Memory> {
 
   @Override
   protected Expression visitVarDefInitStmt(VarDefInitStmt obj, Memory param) {
-    Expression value = exeval(obj.initial, param);
+    ValueExpr value = exeval(obj.initial, param);
 
     for (Variable var : obj.variable) {
       param.createVar(var);
       if (value instanceof AnyValue) {
         Type type = (Type) var.type.ref.getTarget();
-        Expression empty = kb.getEntry(KnowEmptyValue.class).get(type);
+        ValueExpr empty = kb.getEntry(KnowEmptyValue.class).get(type);
         param.set(var, Copy.copy(empty));
       } else {
         param.set(var, Copy.copy(value));
@@ -163,10 +163,10 @@ public class StmtExecutor extends NullDispatcher<Expression, Memory> {
     rhs = Copy.copy(rhs);
 
     Variable var = (Variable) lhs.link;
-    Expression root = param.get(var);
+    ValueExpr root = param.get(var);
 
-    Ast lvalue = RefEvaluator.execute(root, lhs.offset, param, ir, kb);
-    root = ValueReplacer.set(root, (Expression) lvalue, rhs);
+    Ast lvalue = RefEvaluator.execute(root, lhs.offset, param, kb);
+    root = (ValueExpr) ValueReplacer.set(root, (ValueExpr) lvalue, rhs);
     param.set(var, root);
   }
 

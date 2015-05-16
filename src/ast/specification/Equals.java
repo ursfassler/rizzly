@@ -21,6 +21,8 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import ast.data.Ast;
+import ast.data.expression.value.NumberValue;
+import ast.data.expression.value.StringValue;
 import ast.data.reference.Reference;
 import ast.data.type.TypeRef;
 import ast.data.type.base.ArrayType;
@@ -28,7 +30,9 @@ import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumType;
 import ast.data.type.base.RangeType;
 import ast.data.type.base.StringType;
+import ast.data.type.composed.NamedElement;
 import ast.data.type.composed.RecordType;
+import ast.data.type.special.AnyType;
 import ast.data.type.special.IntegerType;
 import ast.data.type.special.NaturalType;
 import ast.data.type.special.TypeType;
@@ -123,6 +127,11 @@ class EqualTraverser extends NullDispatcher<Boolean, Object> {
   }
 
   @Override
+  protected Boolean visitAnyType(AnyType obj, Object param) {
+    return param instanceof AnyType;
+  }
+
+  @Override
   protected Boolean visitArrayType(ArrayType obj, Object param) {
     if (param instanceof ArrayType) {
       ArrayType other = (ArrayType) param;
@@ -153,6 +162,16 @@ class EqualTraverser extends NullDispatcher<Boolean, Object> {
   }
 
   @Override
+  protected Boolean visitNamedElement(NamedElement obj, Object param) {
+    if (param instanceof NamedElement) {
+      NamedElement other = (NamedElement) param;
+      return obj.name.equals(other.name) && visit(obj.typeref, other.typeref);
+    } else {
+      return false;
+    }
+  }
+
+  @Override
   protected Boolean visitEnumType(EnumType obj, Object param) {
     // TODO compare strings
     throw new RuntimeException("not yet implemented");
@@ -173,6 +192,26 @@ class EqualTraverser extends NullDispatcher<Boolean, Object> {
     if (param instanceof TypeRef) {
       TypeRef other = (TypeRef) param;
       return visit(obj.ref, other.ref);
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  protected Boolean visitNumber(NumberValue obj, Object param) {
+    if (param instanceof NumberValue) {
+      NumberValue other = (NumberValue) param;
+      return obj.value.equals(other.value);
+    } else {
+      return false;
+    }
+  }
+
+  @Override
+  protected Boolean visitStringValue(StringValue obj, Object param) {
+    if (param instanceof StringValue) {
+      StringValue other = (StringValue) param;
+      return obj.value.equals(other.value);
     } else {
       return false;
     }

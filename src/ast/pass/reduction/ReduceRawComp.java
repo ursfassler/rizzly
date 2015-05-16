@@ -81,7 +81,7 @@ class ReduceRawCompWorker extends DfsTraverser<Component, Void> {
 
     comp.function.add(entryFunc);
     comp.function.add(exitFunc);
-    RError.ass(obj.getDeclaration().isEmpty(), obj.getInfo());
+    RError.ass(obj.getDeclaration().isEmpty(), obj.getInfo(), "declaration should be empty");
 
     for (Ast itr : obj.getIface()) {
       Ast ast = itr;

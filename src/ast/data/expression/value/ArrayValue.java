@@ -29,4 +29,9 @@ public class ArrayValue extends ValueExpr {
     this.value = value;
   }
 
+  @Override
+  public String toString() {
+    return "[" + value + "]";
+  }
+
 }

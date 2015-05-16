@@ -26,21 +26,17 @@ import ast.data.template.ActualTemplateArgument;
 import ast.data.template.Template;
 import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
-import error.ErrorType;
-import error.RError;
 
 public class TypeEvalExecutor extends DfsTraverser<Void, Void> {
-  final private InstanceRepo ir;
   final private KnowledgeBase kb;
 
-  public static void eval(Ast root, InstanceRepo ir, KnowledgeBase kb) {
-    TypeEvalExecutor executor = new TypeEvalExecutor(ir, kb);
+  public static void eval(Ast root, KnowledgeBase kb) {
+    TypeEvalExecutor executor = new TypeEvalExecutor(kb);
     executor.traverse(root, null);
   }
 
-  public TypeEvalExecutor(InstanceRepo ir, KnowledgeBase kb) {
+  public TypeEvalExecutor(KnowledgeBase kb) {
     super();
-    this.ir = ir;
     this.kb = kb;
   }
 
@@ -53,6 +49,20 @@ public class TypeEvalExecutor extends DfsTraverser<Void, Void> {
   protected Void visitReference(Reference obj, Void param) {
     super.visitReference(obj, param);
 
+    if (obj.link instanceof Template) {
+      evalRefToTempl(obj);
+    }
+    return null;
+  }
+
+  private void evalRefToTempl(Reference obj) {
+    Template template = (Template) obj.link;
+    AstList<ActualTemplateArgument> arg = extractArg(obj);
+    Named evaluated = Specializer.specialize(template, arg, kb);
+    obj.link = evaluated;
+  }
+
+  private static AstList<ActualTemplateArgument> extractArg(Reference obj) {
     AstList<ActualTemplateArgument> arg = new AstList<ActualTemplateArgument>();
     if (!obj.offset.isEmpty()) {
       if (obj.offset.get(0) instanceof RefTemplCall) {
@@ -60,18 +70,7 @@ public class TypeEvalExecutor extends DfsTraverser<Void, Void> {
         obj.offset.remove(0);
       }
     }
-
-    if (obj.link instanceof Template) {
-      RError.ass(arg != null, obj.getInfo());
-      Template template = (Template) obj.link;
-      if (template.getTempl().size() != arg.size()) {
-        RError.err(ErrorType.Error, obj.getInfo(), "Wrong number of parameter, expected " + template.getTempl().size() + " got " + arg.size());
-        return null;
-      }
-      Ast inst = Specializer.evalArgAndProcess(template, arg, ir, kb);
-      obj.link = (Named) inst;
-    }
-    return null;
+    return arg;
   }
 
 }

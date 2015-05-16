@@ -32,4 +32,9 @@ public class IsClass extends Specification {
     return kind.isAssignableFrom(candidate.getClass());
   }
 
+  @Override
+  public String toString() {
+    return "instanceof " + kind;
+  }
+
 }

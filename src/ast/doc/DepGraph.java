@@ -37,12 +37,14 @@ public class DepGraph extends DfsTraverser<Void, Ast> {
   @Override
   protected Void visit(Ast obj, Ast param) {
     boolean visited = g.containsVertex(obj);
-    g.addVertex(obj);
-    g.addEdge(param, obj);
-    if (visited) {
-      return null;
+    if (!visited) {
+      g.addVertex(obj);
     }
-    return super.visit(obj, obj);
+    g.addEdge(param, obj);
+    if (!visited) {
+      super.visit(obj, obj);
+    }
+    return null;
   }
 
   @Override

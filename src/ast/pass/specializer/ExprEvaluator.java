@@ -23,8 +23,10 @@ import java.util.List;
 import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
+import ast.data.Range;
 import ast.data.expression.Expression;
 import ast.data.expression.RefExp;
+import ast.data.expression.TypeCast;
 import ast.data.expression.binop.And;
 import ast.data.expression.binop.Div;
 import ast.data.expression.binop.Equal;
@@ -50,11 +52,13 @@ import ast.data.expression.value.NamedValue;
 import ast.data.expression.value.NumberValue;
 import ast.data.expression.value.StringValue;
 import ast.data.expression.value.TupleValue;
+import ast.data.expression.value.ValueExpr;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
 import ast.data.reference.Reference;
 import ast.data.type.Type;
+import ast.data.type.base.RangeType;
 import ast.data.variable.Constant;
 import ast.data.variable.FuncVariable;
 import ast.data.variable.TemplateParameter;
@@ -64,20 +68,18 @@ import ast.knowledge.KnowledgeBase;
 import error.ErrorType;
 import error.RError;
 
-public class ExprEvaluator extends NullDispatcher<Expression, Void> {
+public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
   private final Memory memory;
-  private final InstanceRepo ir;
   private final KnowledgeBase kb;
 
-  public ExprEvaluator(Memory memory, InstanceRepo ir, KnowledgeBase kb) {
+  public ExprEvaluator(Memory memory, KnowledgeBase kb) {
     super();
     this.memory = memory;
-    this.ir = ir;
     this.kb = kb;
   }
 
-  public static Expression evaluate(Expression obj, Memory memory, InstanceRepo ir, KnowledgeBase kb) {
-    ExprEvaluator evaluator = new ExprEvaluator(memory, ir, kb);
+  public static ValueExpr evaluate(Expression obj, Memory memory, KnowledgeBase kb) {
+    ExprEvaluator evaluator = new ExprEvaluator(memory, kb);
     return evaluator.traverse(obj, null);
   }
 
@@ -90,32 +92,32 @@ public class ExprEvaluator extends NullDispatcher<Expression, Void> {
   }
 
   @Override
-  protected Expression visitFuncVariable(FuncVariable obj, Void param) {
+  protected ValueExpr visitFuncVariable(FuncVariable obj, Void param) {
     assert (memory.contains(obj));
     return memory.get(obj);
   }
 
   @Override
-  protected Expression visitTemplateParameter(TemplateParameter obj, Void param) {
+  protected ValueExpr visitTemplateParameter(TemplateParameter obj, Void param) {
     assert (memory.contains(obj));
     return memory.get(obj);
   }
 
   @Override
-  protected Expression visitDefault(Ast obj, Void param) {
+  protected ValueExpr visitDefault(Ast obj, Void param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
   @Override
-  protected Expression visitType(Type obj, Void param) {
+  protected ValueExpr visitType(Type obj, Void param) {
     RError.err(ErrorType.Error, obj.getInfo(), "Expected value, got type");
     return null;
   }
 
   @Override
-  protected Expression visitNamedElementsValue(NamedElementsValue obj, Void param) {
+  protected ValueExpr visitNamedElementsValue(NamedElementsValue obj, Void param) {
     for (NamedValue itr : obj.value) {
-      Expression value = visit(itr.value, param);
+      ValueExpr value = visit(itr.value, param);
       assert (value != null);
       itr.value = value;
     }
@@ -123,37 +125,37 @@ public class ExprEvaluator extends NullDispatcher<Expression, Void> {
   }
 
   @Override
-  protected Expression visitAnyValue(AnyValue obj, Void param) {
+  protected ValueExpr visitAnyValue(AnyValue obj, Void param) {
     return obj;
   }
 
   @Override
-  protected Expression visitNumber(NumberValue obj, Void param) {
+  protected ValueExpr visitNumber(NumberValue obj, Void param) {
     return obj;
   }
 
   @Override
-  protected Expression visitStringValue(StringValue obj, Void param) {
+  protected ValueExpr visitStringValue(StringValue obj, Void param) {
     return obj;
   }
 
   @Override
-  protected Expression visitBoolValue(BoolValue obj, Void param) {
+  protected ValueExpr visitBoolValue(BoolValue obj, Void param) {
     return obj;
   }
 
   @Override
-  protected Expression visitConstGlobal(ast.data.variable.ConstGlobal obj, Void param) {
+  protected ValueExpr visitConstGlobal(ast.data.variable.ConstGlobal obj, Void param) {
     return visit(obj.def, param);
   }
 
   @Override
-  protected Expression visitConstPrivate(ast.data.variable.ConstPrivate obj, Void param) {
+  protected ValueExpr visitConstPrivate(ast.data.variable.ConstPrivate obj, Void param) {
     return visit(obj.def, param);
   }
 
   @Override
-  protected Expression visitTupleValue(TupleValue obj, Void param) {
+  protected ValueExpr visitTupleValue(TupleValue obj, Void param) {
     if (obj.value.size() == 1) {
       return visit(obj.value.get(0), param);
     } else {
@@ -166,35 +168,35 @@ public class ExprEvaluator extends NullDispatcher<Expression, Void> {
   }
 
   @Override
-  protected Expression visitRefExpr(RefExp obj, Void param) {
+  protected ValueExpr visitRefExpr(RefExp obj, Void param) {
     return visit(obj.ref, param);
   }
 
   @Override
-  protected Expression visitReference(Reference obj, Void param) {
+  protected ValueExpr visitReference(Reference obj, Void param) {
     // TODO move constant evaluation to another place
     if (obj.link instanceof Constant) {
       Constant cst = (Constant) obj.link;
       cst.def = visit(cst.def, param);
     }
-    return visit(RefEvaluator.execute(obj, memory, ir, kb), param);
+    return visit(RefEvaluator.execute(obj, memory, kb), param);
   }
 
   @Override
-  protected Expression visitRefCall(RefCall obj, Void param) {
+  protected ValueExpr visitRefCall(RefCall obj, Void param) {
     visitExpList(obj.actualParameter.value, param);
     return null;
   }
 
   @Override
-  protected Expression visitRefTemplCall(RefTemplCall obj, Void param) {
+  protected ValueExpr visitRefTemplCall(RefTemplCall obj, Void param) {
     RError.err(ErrorType.Fatal, obj.getInfo(), "reimplement");
     // visitExpList(obj.getActualParameter(), param);
     return null;
   }
 
   @Override
-  protected Expression visitRefName(RefName obj, Void param) {
+  protected ValueExpr visitRefName(RefName obj, Void param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
@@ -208,9 +210,9 @@ public class ExprEvaluator extends NullDispatcher<Expression, Void> {
   }
 
   @Override
-  protected Expression visitAnd(And obj, Void param) {
-    Expression left = visit(obj.left, param);
-    Expression right = visit(obj.right, param);
+  protected ValueExpr visitAnd(And obj, Void param) {
+    ValueExpr left = visit(obj.left, param);
+    ValueExpr right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
       BigInteger lval = ((NumberValue) left).value;
@@ -219,14 +221,15 @@ public class ExprEvaluator extends NullDispatcher<Expression, Void> {
       res = lval.and(rval);
       return new NumberValue(obj.getInfo(), res);
     } else {
-      return obj;
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      return null;
     }
   }
 
   @Override
-  protected Expression visitDiv(Div obj, Void param) {
-    Expression left = visit(obj.left, param);
-    Expression right = visit(obj.right, param);
+  protected ValueExpr visitDiv(Div obj, Void param) {
+    ValueExpr left = visit(obj.left, param);
+    ValueExpr right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
       BigInteger lval = ((NumberValue) left).value;
@@ -235,14 +238,15 @@ public class ExprEvaluator extends NullDispatcher<Expression, Void> {
       res = lval.divide(rval);
       return new NumberValue(obj.getInfo(), res);
     } else {
-      return obj;
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      return null;
     }
   }
 
   @Override
-  protected Expression visitMinus(Minus obj, Void param) {
-    Expression left = visit(obj.left, param);
-    Expression right = visit(obj.right, param);
+  protected ValueExpr visitMinus(Minus obj, Void param) {
+    ValueExpr left = visit(obj.left, param);
+    ValueExpr right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
       BigInteger lval = ((NumberValue) left).value;
@@ -251,14 +255,15 @@ public class ExprEvaluator extends NullDispatcher<Expression, Void> {
       res = lval.subtract(rval);
       return new NumberValue(obj.getInfo(), res);
     } else {
-      return obj;
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      return null;
     }
   }
 
   @Override
-  protected Expression visitMod(Mod obj, Void param) {
-    Expression left = visit(obj.left, param);
-    Expression right = visit(obj.right, param);
+  protected ValueExpr visitMod(Mod obj, Void param) {
+    ValueExpr left = visit(obj.left, param);
+    ValueExpr right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
       BigInteger lval = ((NumberValue) left).value;
@@ -267,14 +272,15 @@ public class ExprEvaluator extends NullDispatcher<Expression, Void> {
       res = lval.mod(rval);
       return new NumberValue(obj.getInfo(), res);
     } else {
-      return obj;
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      return null;
     }
   }
 
   @Override
-  protected Expression visitMul(Mul obj, Void param) {
-    Expression left = visit(obj.left, param);
-    Expression right = visit(obj.right, param);
+  protected ValueExpr visitMul(Mul obj, Void param) {
+    ValueExpr left = visit(obj.left, param);
+    ValueExpr right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
       BigInteger lval = ((NumberValue) left).value;
@@ -283,14 +289,15 @@ public class ExprEvaluator extends NullDispatcher<Expression, Void> {
       res = lval.multiply(rval);
       return new NumberValue(obj.getInfo(), res);
     } else {
-      return obj;
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      return null;
     }
   }
 
   @Override
-  protected Expression visitOr(Or obj, Void param) {
-    Expression left = visit(obj.left, param);
-    Expression right = visit(obj.right, param);
+  protected ValueExpr visitOr(Or obj, Void param) {
+    ValueExpr left = visit(obj.left, param);
+    ValueExpr right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
       BigInteger lval = ((NumberValue) left).value;
@@ -299,14 +306,15 @@ public class ExprEvaluator extends NullDispatcher<Expression, Void> {
       res = lval.or(rval);
       return new NumberValue(obj.getInfo(), res);
     } else {
-      return obj;
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      return null;
     }
   }
 
   @Override
-  protected Expression visitPlus(Plus obj, Void param) {
-    Expression left = visit(obj.left, param);
-    Expression right = visit(obj.right, param);
+  protected ValueExpr visitPlus(Plus obj, Void param) {
+    ValueExpr left = visit(obj.left, param);
+    ValueExpr right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
       BigInteger lval = ((NumberValue) left).value;
@@ -315,14 +323,15 @@ public class ExprEvaluator extends NullDispatcher<Expression, Void> {
       res = lval.add(rval);
       return new NumberValue(obj.getInfo(), res);
     } else {
-      return obj;
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      return null;
     }
   }
 
   @Override
-  protected Expression visitShl(Shl obj, Void param) {
-    Expression left = visit(obj.left, param);
-    Expression right = visit(obj.right, param);
+  protected ValueExpr visitShl(Shl obj, Void param) {
+    ValueExpr left = visit(obj.left, param);
+    ValueExpr right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
       BigInteger lval = ((NumberValue) left).value;
@@ -331,14 +340,15 @@ public class ExprEvaluator extends NullDispatcher<Expression, Void> {
       res = lval.shiftLeft(getInt(obj.getInfo(), rval));
       return new NumberValue(obj.getInfo(), res);
     } else {
-      return obj;
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      return null;
     }
   }
 
   @Override
-  protected Expression visitShr(Shr obj, Void param) {
-    Expression left = visit(obj.left, param);
-    Expression right = visit(obj.right, param);
+  protected ValueExpr visitShr(Shr obj, Void param) {
+    ValueExpr left = visit(obj.left, param);
+    ValueExpr right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
       BigInteger lval = ((NumberValue) left).value;
@@ -347,14 +357,15 @@ public class ExprEvaluator extends NullDispatcher<Expression, Void> {
       res = lval.shiftRight(getInt(obj.getInfo(), rval));
       return new NumberValue(obj.getInfo(), res);
     } else {
-      return obj;
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      return null;
     }
   }
 
   @Override
-  protected Expression visitEqual(Equal obj, Void param) {
-    Expression left = visit(obj.left, param);
-    Expression right = visit(obj.right, param);
+  protected ValueExpr visitEqual(Equal obj, Void param) {
+    ValueExpr left = visit(obj.left, param);
+    ValueExpr right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
       BigInteger lval = ((NumberValue) left).value;
@@ -367,22 +378,23 @@ public class ExprEvaluator extends NullDispatcher<Expression, Void> {
       boolean res = lval == rval;
       return new BoolValue(obj.getInfo(), res);
     } else {
-      return obj;
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      return null;
     }
   }
 
-  private boolean areBool(Expression left, Expression right) {
+  private boolean areBool(ValueExpr left, ValueExpr right) {
     return (left instanceof BoolValue) && (right instanceof BoolValue);
   }
 
-  private boolean areNumber(Expression left, Expression right) {
+  private boolean areNumber(ValueExpr left, ValueExpr right) {
     return (left instanceof NumberValue) && (right instanceof NumberValue);
   }
 
   @Override
-  protected Expression visitGreater(Greater obj, Void param) {
-    Expression left = visit(obj.left, param);
-    Expression right = visit(obj.right, param);
+  protected ValueExpr visitGreater(Greater obj, Void param) {
+    ValueExpr left = visit(obj.left, param);
+    ValueExpr right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
       BigInteger lval = ((NumberValue) left).value;
@@ -391,16 +403,17 @@ public class ExprEvaluator extends NullDispatcher<Expression, Void> {
       return new BoolValue(obj.getInfo(), res);
     } else if (areBool(left, right)) {
       RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj);
-      return obj;
+      return null;
     } else {
-      return obj;
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      return null;
     }
   }
 
   @Override
-  protected Expression visitGreaterequal(Greaterequal obj, Void param) {
-    Expression left = visit(obj.left, param);
-    Expression right = visit(obj.right, param);
+  protected ValueExpr visitGreaterequal(Greaterequal obj, Void param) {
+    ValueExpr left = visit(obj.left, param);
+    ValueExpr right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
       BigInteger lval = ((NumberValue) left).value;
@@ -409,16 +422,17 @@ public class ExprEvaluator extends NullDispatcher<Expression, Void> {
       return new BoolValue(obj.getInfo(), res);
     } else if (areBool(left, right)) {
       RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj);
-      return obj;
+      return null;
     } else {
-      return obj;
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      return null;
     }
   }
 
   @Override
-  protected Expression visitLess(Less obj, Void param) {
-    Expression left = visit(obj.left, param);
-    Expression right = visit(obj.right, param);
+  protected ValueExpr visitLess(Less obj, Void param) {
+    ValueExpr left = visit(obj.left, param);
+    ValueExpr right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
       BigInteger lval = ((NumberValue) left).value;
@@ -427,16 +441,17 @@ public class ExprEvaluator extends NullDispatcher<Expression, Void> {
       return new BoolValue(obj.getInfo(), res);
     } else if (areBool(left, right)) {
       RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj);
-      return obj;
+      return null;
     } else {
-      return obj;
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      return null;
     }
   }
 
   @Override
-  protected Expression visitLessequal(Lessequal obj, Void param) {
-    Expression left = visit(obj.left, param);
-    Expression right = visit(obj.right, param);
+  protected ValueExpr visitLessequal(Lessequal obj, Void param) {
+    ValueExpr left = visit(obj.left, param);
+    ValueExpr right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
       BigInteger lval = ((NumberValue) left).value;
@@ -445,16 +460,17 @@ public class ExprEvaluator extends NullDispatcher<Expression, Void> {
       return new BoolValue(obj.getInfo(), res);
     } else if (areBool(left, right)) {
       RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj);
-      return obj;
+      return null;
     } else {
-      return obj;
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      return null;
     }
   }
 
   @Override
-  protected Expression visitNotequal(Notequal obj, Void param) {
-    Expression left = visit(obj.left, param);
-    Expression right = visit(obj.right, param);
+  protected ValueExpr visitNotequal(Notequal obj, Void param) {
+    ValueExpr left = visit(obj.left, param);
+    ValueExpr right = visit(obj.right, param);
 
     if (areNumber(left, right)) {
       BigInteger lval = ((NumberValue) left).value;
@@ -467,18 +483,19 @@ public class ExprEvaluator extends NullDispatcher<Expression, Void> {
       boolean res = lval != rval;
       return new BoolValue(obj.getInfo(), res);
     } else {
-      return obj;
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      return null;
     }
   }
 
   @Override
-  protected Expression visitIs(Is obj, Void param) {
+  protected ValueExpr visitIs(Is obj, Void param) {
     throw new RuntimeException("not yet implemented");
   }
 
   @Override
-  protected Expression visitUminus(Uminus obj, Void param) {
-    Expression expr = visit(obj.expr, param);
+  protected ValueExpr visitUminus(Uminus obj, Void param) {
+    ValueExpr expr = visit(obj.expr, param);
 
     if ((expr instanceof NumberValue)) {
       BigInteger eval = ((NumberValue) expr).value;
@@ -488,20 +505,43 @@ public class ExprEvaluator extends NullDispatcher<Expression, Void> {
       return new NumberValue(obj.getInfo(), res);
     } else {
       RError.err(ErrorType.Fatal, obj.getInfo(), "Can not evaluate unary minus on " + expr.getClass().getName());
-      return obj;
+      return null;
     }
   }
 
   @Override
-  protected Expression visitNot(Not obj, Void param) {
-    Expression expr = visit(obj.expr, param);
+  protected ValueExpr visitNot(Not obj, Void param) {
+    ValueExpr expr = visit(obj.expr, param);
 
     if ((expr instanceof BoolValue)) {
       return new BoolValue(obj.getInfo(), !((BoolValue) expr).value);
     } else {
       RError.err(ErrorType.Fatal, obj.getInfo(), "Can not evaluate not on " + expr.getClass().getName());
-      return obj;
+      return null;
     }
   }
 
+  @Override
+  protected ValueExpr visitTypeCast(TypeCast obj, Void param) {
+    ValueExpr expr = visit(obj.value, param);
+
+    if ((expr instanceof NumberValue)) {
+      TypeEvalExecutor.eval(obj.cast.ref, kb);
+      assert (obj.cast.ref.offset.isEmpty());
+      assert (obj.cast.ref.link instanceof RangeType);
+
+      Range range = ((RangeType) obj.cast.ref.link).range;
+      BigInteger eval = ((NumberValue) expr).value;
+
+      if (!range.contains(eval)) {
+        RError.err(ErrorType.Error, obj.getInfo(), "Value not in range: " + eval + " not in " + range);
+        return null;
+      }
+
+      return expr;
+    } else {
+      RError.err(ErrorType.Fatal, obj.getInfo(), "Can not evaluate unary minus on " + expr.getClass().getName());
+      return null;
+    }
+  }
 }

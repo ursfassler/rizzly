@@ -38,4 +38,20 @@ public class AstList<T extends Ast> extends ArrayList<T> {
   public <C extends Ast> AstList<C> castTo(Class<C> kind) {
     return new AstList<C>((AstList<? extends C>) this);
   }
+
+  @Override
+  public String toString() {
+    String ret = "";
+
+    boolean first = true;
+    for (T gen : this) {
+      if (first) {
+        first = false;
+      } else {
+        ret += ",";
+      }
+      ret += gen.toString();
+    }
+    return ret;
+  }
 }

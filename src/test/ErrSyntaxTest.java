@@ -33,7 +33,7 @@ public class ErrSyntaxTest extends ErrorTest {
 
   @Test
   public void err2() {
-    testForError("err2", "Err2", "Wrong number of parameter, expected 1 got 0");
+    testForError("err2", "Err2", "Missing template argument");
   }
 
   @Test

@@ -34,7 +34,7 @@ public class StringValue extends ValueExpr {
 
   @Override
   public String toString() {
-    return "'" + value + "'";
+    return value;
   }
 
 }

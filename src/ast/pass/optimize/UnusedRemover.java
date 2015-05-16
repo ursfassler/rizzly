@@ -17,7 +17,7 @@
 
 package ast.pass.optimize;
 
-import java.util.HashSet;
+import java.util.Collection;
 import java.util.Set;
 
 import ast.data.Ast;
@@ -25,35 +25,66 @@ import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.component.composition.CompUse;
 import ast.data.type.base.BaseType;
+import ast.dispatcher.DfsTraverser;
 import ast.doc.DepGraph;
 import ast.doc.SimpleGraph;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.repository.query.List;
+import ast.repository.query.Single;
 import ast.repository.query.TypeFilter;
+import ast.specification.IsClass;
+import ast.specification.IsInstance;
+import ast.specification.Specification;
+import error.ErrorType;
+import error.RError;
 
 // FIXME if we remove everything unused, we can not typecheck that in EVL
 public class UnusedRemover extends AstPass {
 
   @Override
-  public void process(ast.data.Namespace root, KnowledgeBase kb) {
-    AstList<CompUse> list = TypeFilter.select(root.children, CompUse.class);
-    assert (list.size() == 1);
-    SimpleGraph<Ast> g = DepGraph.build(list.get(0));
+  public void process(Namespace root, KnowledgeBase kb) {
+    CompUse rootcomp = Single.force(TypeFilter.select(root.children, CompUse.class), root.getInfo());
+    SimpleGraph<Ast> g = DepGraph.build(rootcomp);
+
     Set<Ast> keep = g.vertexSet();
-    keep.addAll(TypeFilter.select(root.children, BaseType.class));
     removeUnused(root, keep);
   }
 
-  private static void removeUnused(ast.data.Namespace ns, Set<Ast> keep) {
-    Set<Ast> remove = new HashSet<Ast>();
-    for (Ast itr : ns.children) {
-      if (itr instanceof Namespace) {
-        removeUnused((ast.data.Namespace) itr, keep);
-      } else if (!keep.contains(itr)) {
-        remove.add(itr);
-      }
+  private static void removeUnused(Namespace ns, Set<Ast> keepset) {
+    Specification keep = new IsInstance(keepset);
+    keep = keep.or(new IsClass(Namespace.class));
+    keep = keep.or(new IsClass(BaseType.class));
+
+    UnusedRemoverWorker worker = new UnusedRemoverWorker(keep);
+    worker.traverse(ns, null);
+  }
+
+}
+
+class UnusedRemoverWorker extends DfsTraverser<Void, Void> {
+  final private Specification keep;
+
+  public UnusedRemoverWorker(Specification keep) {
+    super();
+    this.keep = keep;
+  }
+
+  @Override
+  protected Void visitList(Collection<? extends Ast> list, Void param) {
+    AstList<? extends Ast> keeplist = List.select(list, keep);
+    list.retainAll(keeplist);
+    return super.visitList(list, param);
+  }
+
+  @Override
+  protected Void visit(Ast obj, Void param) {
+    // TODO fix it
+    if (!keep.isSatisfiedBy(obj)) {
+      RError.err(ErrorType.Warning, obj.getInfo(), "Object not removed: " + obj);
     }
-    ns.children.removeAll(remove);
+    // RError.ass(keep.isSatisfiedBy(obj), obj.getInfo(), "Object not removed: " + obj);
+    return super.visit(obj, param);
   }
 
 }

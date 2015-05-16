@@ -48,4 +48,18 @@ public class OrSpec extends Specification {
     return false;
   }
 
+  @Override
+  public String toString() {
+    String ret = "";
+    boolean printOr = false;
+    for (Specification itr : spec) {
+      if (printOr) {
+        ret += " or ";
+      }
+      ret += "(" + itr + ")";
+      printOr = true;
+    }
+    return ret;
+  }
+
 }

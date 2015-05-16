@@ -17,12 +17,13 @@
 
 package ast.pass.specializer;
 
+import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
+import ast.data.Named;
 import ast.data.expression.Expression;
 import ast.data.expression.value.NumberValue;
 import ast.data.expression.value.TupleValue;
-import ast.data.function.Function;
 import ast.data.function.header.FuncFunction;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
@@ -30,9 +31,8 @@ import ast.data.reference.RefItem;
 import ast.data.reference.RefTemplCall;
 import ast.data.reference.Reference;
 import ast.data.template.Template;
-import ast.data.type.Type;
-import ast.data.type.base.BaseType;
 import ast.data.variable.Constant;
+import ast.data.variable.FuncVariable;
 import ast.data.variable.Variable;
 import ast.dispatcher.NullDispatcher;
 import ast.interpreter.Memory;
@@ -40,46 +40,37 @@ import ast.knowledge.KnowledgeBase;
 import error.ErrorType;
 import error.RError;
 
-public class RefEvaluator extends NullDispatcher<Expression, Ast> {
-  private final InstanceRepo ir;
+public class RefEvaluator extends NullDispatcher<Ast, Ast> {
   final private KnowledgeBase kb;
   final private Memory memory;
 
-  public RefEvaluator(Memory memory, InstanceRepo ir, KnowledgeBase kb) {
+  public RefEvaluator(Memory memory, KnowledgeBase kb) {
     super();
     this.memory = memory;
-    this.ir = ir;
     this.kb = kb;
   }
 
-  public static Ast execute(Reference ref, Memory memory, InstanceRepo ir, KnowledgeBase kb) {
-    if (ref.link instanceof Constant) {
-      Ast val = ((Constant) ref.link).def;
-      Ast item = RefEvaluator.execute(val, ref.offset, memory, ir, kb);
-      return item;
-    } else if (ref.link instanceof Variable) {
-      Expression val = memory.get((Variable) ref.link);
-      Ast item = RefEvaluator.execute(val, ref.offset, memory, ir, kb);
-      return item;
-    } else if (ref.link instanceof Function) {
-      Ast item = RefEvaluator.execute(ref.link, ref.offset, memory, ir, kb);
-      return item;
-    } else if (ref.link instanceof Type) {
-      Ast item = RefEvaluator.execute(ref.link, ref.offset, memory, ir, kb);
-      return item;
-    } else if (ref.link instanceof Template) {
-      Ast item = RefEvaluator.execute(ref.link, ref.offset, memory, ir, kb);
-      return item;
+  public static Ast execute(Reference ref, Memory memory, KnowledgeBase kb) {
+    Ast base = getBase(ref.link, memory);
+    return RefEvaluator.execute(base, ref.offset, memory, kb);
+  }
+
+  private static Ast getBase(Named link, Memory memory) {
+    if (link instanceof Constant) {
+      return ((Constant) link).def;
+    } else if (link instanceof Variable) {
+      return memory.get((Variable) link);
+    } else if (link instanceof Template) {
+      return link;
     } else {
-      assert (ref.offset.isEmpty());
-      return ref.link;
+      return link;
     }
   }
 
-  public static Ast execute(Ast root, AstList<RefItem> offset, Memory memory, InstanceRepo ir, KnowledgeBase kb) {
-    RefEvaluator evaluator = new RefEvaluator(memory, ir, kb);
+  public static Ast execute(Ast root, AstList<RefItem> offset, Memory memory, KnowledgeBase kb) {
+    RefEvaluator evaluator = new RefEvaluator(memory, kb);
 
-    for (ast.data.reference.RefItem ri : offset) {
+    for (RefItem ri : offset) {
       root = evaluator.traverse(ri, root);
     }
     return root;
@@ -91,26 +82,25 @@ public class RefEvaluator extends NullDispatcher<Expression, Ast> {
   }
 
   private Expression eval(Expression expr) {
-    return ExprEvaluator.evaluate(expr, memory, ir, kb);
+    return ExprEvaluator.evaluate(expr, memory, kb);
+  }
+
+  private void checkArguments(ElementInfo info, AstList<FuncVariable> param, AstList<Expression> actparam) {
+    if (param.size() != actparam.size()) {
+      RError.err(ErrorType.Error, info, "Number of function arguments does not match: need " + param.size() + ", got " + actparam.size());
+    }
   }
 
   private Expression call(FuncFunction func, AstList<Expression> value) {
-    return StmtExecutor.process(func, value, new Memory(), ir, kb);
+    return StmtExecutor.process(func, value, new Memory(), kb);
   }
 
   @Override
   protected Expression visitRefCall(RefCall obj, Ast param) {
-    if (param instanceof BaseType) {
-      AstList<Expression> values = obj.actualParameter.value;
-      RError.ass(values.size() == 1, obj.getInfo(), "expected exactly 1 argument, got " + values.size());
-      Expression value = eval(values.get(0));
-      return CheckTypeCast.check((Type) param, value);
-    } else {
-      // TODO add execution of type cast (see casual/ctfeCast.rzy)
-      RError.ass(param instanceof FuncFunction, param.getInfo(), "expected funtion, got " + param.getClass().getName());
-      FuncFunction func = (FuncFunction) param;
-      return call(func, obj.actualParameter.value);
-    }
+    RError.ass(param instanceof FuncFunction, param.getInfo(), "expected funtion, got " + param.getClass().getName());
+    FuncFunction func = (FuncFunction) param;
+    checkArguments(obj.getInfo(), func.param, obj.actualParameter.value);
+    return call(func, obj.actualParameter.value);
   }
 
   @Override
@@ -131,9 +121,10 @@ public class RefEvaluator extends NullDispatcher<Expression, Ast> {
   }
 
   @Override
-  protected Expression visitRefTemplCall(RefTemplCall obj, Ast param) {
-    RError.err(ErrorType.Fatal, obj.getInfo(), "Can not evaluate template");
-    return null;
+  protected Ast visitRefTemplCall(RefTemplCall obj, Ast param) {
+    Template template = (Template) param;
+
+    return Specializer.specialize(template, obj.actualParameter, kb);
   }
 
 }
