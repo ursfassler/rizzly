@@ -1,7 +1,0 @@
-// Wrong number of initializer elements
-
-Err6 = Component
-elementary
-  a : Array{8,R{0,10}} = (0,0);
-end
-

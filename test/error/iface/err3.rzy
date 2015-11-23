@@ -1,6 +1,0 @@
-
-Err3 = Component
-  funcA : response():Boolean;
-composition
-end
-

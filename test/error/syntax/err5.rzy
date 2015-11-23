@@ -1,6 +1,0 @@
-// Array arguments are in wrong order
-Err5 = Component
-elementary
-  a: Array{R{0,10}, 3} = ( 1, 2, 3 );
-end
-  
