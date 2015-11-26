@@ -50,6 +50,8 @@ import ast.doc.SimpleGraph;
 import ast.doc.StreamWriter;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.pass.others.behave.InputWriter;
+import ast.pass.others.behave.OutputWriter;
 import ast.repository.query.TypeFilter;
 import ast.specification.ExternalFunction;
 import ast.specification.OrSpec;
@@ -68,6 +70,10 @@ public class HeaderWriter extends AstPass {
     // (see MainEvl.addDebug)
     printCHeader(kb.getOutDir(), head, names, kb);
     printFpcHeader(kb.getOutDir(), head, names, kb);
+
+    printBehaveInput(kb.getOutDir(), head, names, kb);
+    printBehaveOutput(kb.getOutDir(), head, names, kb);
+    printBehaveMake(kb.getOutDir());
   }
 
   private static Set<String> makeBlacklist() {
@@ -143,6 +149,28 @@ public class HeaderWriter extends AstPass {
     }
   }
 
+  private void printBehaveInput(String outdir, Namespace head, List<String> debugNames, KnowledgeBase kb) {
+    writePyQueue(outdir);
+    String cfilename = outdir + head.name + ".py";
+    try {
+      InputWriter pywriter = new InputWriter(new StreamWriter(new PrintStream(cfilename)));
+      pywriter.traverse(head, null);
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private void printBehaveOutput(String outdir, Namespace head, List<String> debugNames, KnowledgeBase kb) {
+    writeCQueue(outdir);
+    String cfilename = outdir + head.name + "Cb.cc";
+    try {
+      OutputWriter ccwriter = new OutputWriter(new StreamWriter(new PrintStream(cfilename)));
+      ccwriter.traverse(head, null);
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+  }
+
   private static void toposort(AstList<Ast> list) {
     SimpleGraph<Ast> g = new SimpleGraph<Ast>(list);
     for (Ast u : list) {
@@ -182,6 +210,43 @@ public class HeaderWriter extends AstPass {
     Set<Type> vs = new HashSet<Type>();
     getter.traverse(u, vs);
     return vs;
+  }
+
+  private void writePyQueue(String outdir) {
+    try {
+      String filename = outdir + "queue.py";
+      PrintStream stream = new PrintStream(filename);
+      stream.print("from ctypes import *\n" + "\n" + "class Queue:\n" + "  def __init__(self):\n" + "    self._inst = CDLL('./libinst.so')\n" + "\n" + "  def _next(self):\n" + "    size = self._inst.msgSize()\n" + "    p = create_string_buffer(size)\n" + "    self._inst.next(p, sizeof(p))\n" + "    return p.value\n" + "\n" + "  def _canRead(self):\n" + "    return int(self._inst.canRead()) != 0\n");
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private void writeCQueue(String outdir) {
+    try {
+      String filename = outdir + "queue.cc";
+      PrintStream stream = new PrintStream(filename);
+      stream.print("#include \"queue.h\"\n" + "\n" + "#include <queue>\n" + "#include <string.h>\n" + "\n" + "static std::queue<std::string> queue;\n" + "\n" + "extern \"C\"\n" + "{\n" + "\n" + "int canRead()\n" + "{\n" + "  return !queue.empty();\n" + "}\n" + "\n" + "int msgSize()\n" + "{\n" + "  return queue.front().size();\n" + "}\n" + "\n" + "void next(char *msg, int size)\n" + "{\n" + "  strncpy(msg, queue.front().c_str(), size);\n" + "  queue.pop();\n" + "}\n" + "\n" + "}\n" + "\n" + "void push(const std::string &msg)\n" + "{\n" + "  queue.push(msg);\n" + "}\n");
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+    try {
+      String filename = outdir + "queue.h";
+      PrintStream stream = new PrintStream(filename);
+      stream.print("#ifndef QUEUE_H\n" + "#define QUEUE_H\n" + "\n" + "#include <string>\n" + "\n" + "void push(const std::string &msg);\n" + "\n" + "#endif\n");
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
+  }
+
+  private void printBehaveMake(String outdir) {
+    try {
+      String filename = outdir + "Makefile";
+      PrintStream stream = new PrintStream(filename);
+      stream.print("libinst.so: inst.o instCb.o queue.o\n" + "\tg++ -fPIC -shared $^ -o $@\n" + "\n" + "inst.o: inst.c\n" + "\tgcc -fPIC  -c $^ -o $@\n" + "\n" + "instCb.o: instCb.cc\n" + "\tgcc -std=c++11 -fPIC  -c $^ -o $@\n" + "\n" + "queue.o: queue.cc\n" + "\tgcc -std=c++11 -fPIC  -c $^ -o $@\n" + "\n" + "clean:\n" + "\trm -f *.so *.o *.pyc\n");
+    } catch (FileNotFoundException e) {
+      e.printStackTrace();
+    }
   }
 
 }
