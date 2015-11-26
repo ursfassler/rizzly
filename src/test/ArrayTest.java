@@ -27,11 +27,6 @@ public class ArrayTest extends BaseTest {
   }
 
   @Test
-  public void arrayInit1() {
-    compile("arrayInit1", TestSteps.COMPILE_TO_LIB, false, false);
-  }
-
-  @Test
   public void copy1() {
     compile("copy1", TestSteps.COMPILE_TO_LIB, false, false);
   }
@@ -39,16 +34,6 @@ public class ArrayTest extends BaseTest {
   @Test
   public void copy2() {
     compile("copy2", TestSteps.COMPILE_TO_LIB, false, false);
-  }
-
-  @Test
-  public void arrayTest() {
-    compile("arrayTest", TestSteps.EXECUTE, false, false);
-  }
-
-  @Test
-  public void arrayTest1() {
-    compile("arrayTest1", TestSteps.EXECUTE, false, false);
   }
 
   @Test
