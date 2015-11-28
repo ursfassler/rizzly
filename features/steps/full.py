@@ -2,7 +2,6 @@ from behave import *
 
 import subprocess
 import os
-import sys
 
 from ctypes import *
 
@@ -10,17 +9,17 @@ from ctypes import *
 def compileAll():
     subprocess.call(['make'])
 
-def createInstance():
-    sys.path.append(os.getcwd())
-    module = __import__("inst")
-    return module.Inst()
+def createInstance(library):
+    import inst
+    inst = reload(inst)
+    return inst.Inst(library)
 
 
 @when('fully compile everything')
 def fully_compile(context):
     os.chdir(context.tmpdir + '/output')
     compileAll()
-    context.testee = createInstance()
+    context.testee = createInstance(context.tmpdir + '/output/' + 'libinst.so')
 
 
 @when('I initialize it')
@@ -36,7 +35,7 @@ def send_event(context, value):
     context.testee.inst_inp(value)
 
 @when('I send an event set({value1:d}, {value2:d})')
-def step_impl(context, value1, value2):
+def set_event(context, value1, value2):
     context.testee.inst_set(value1, value2)
 
 @then('I expect an event {expectedEvent}')

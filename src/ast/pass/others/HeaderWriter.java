@@ -216,7 +216,7 @@ public class HeaderWriter extends AstPass {
     try {
       String filename = outdir + "queue.py";
       PrintStream stream = new PrintStream(filename);
-      stream.print("from ctypes import *\n" + "\n" + "class Queue:\n" + "  def __init__(self):\n" + "    self._inst = CDLL('./libinst.so')\n" + "\n" + "  def _next(self):\n" + "    size = self._inst.msgSize()\n" + "    p = create_string_buffer(size)\n" + "    self._inst.next(p, sizeof(p))\n" + "    return p.value\n" + "\n" + "  def _canRead(self):\n" + "    return int(self._inst.canRead()) != 0\n");
+      stream.print("from ctypes import *\n" + "\n" + "class Queue:\n" + "  def __init__(self, library):\n" + "    self._inst = CDLL(library)\n" + "\n" + "  def _next(self):\n" + "    size = self._inst.msgSize()\n" + "    p = create_string_buffer(size)\n" + "    self._inst.next(p, sizeof(p))\n" + "    return p.value\n" + "\n" + "  def _canRead(self):\n" + "    return int(self._inst.canRead()) != 0\n");
     } catch (FileNotFoundException e) {
       e.printStackTrace();
     }

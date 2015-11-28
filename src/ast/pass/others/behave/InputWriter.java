@@ -20,14 +20,15 @@ package ast.pass.others.behave;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
-import ast.data.function.header.FuncResponse;
-import ast.data.function.header.FuncSlot;
+import ast.data.function.Function;
+import ast.data.function.ret.FuncReturnNone;
+import ast.data.function.ret.FuncReturnType;
 import ast.data.variable.FuncVariable;
 import ast.dispatcher.NullDispatcher;
 import ast.doc.StreamWriter;
 import ast.specification.PublicFunction;
 
-public class InputWriter extends NullDispatcher<Void, Void> {
+public class InputWriter extends NullDispatcher<Void, Function> {
   final private StreamWriter sw;
 
   public InputWriter(StreamWriter sw) {
@@ -36,12 +37,12 @@ public class InputWriter extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitDefault(Ast obj, Void param) {
+  protected Void visitDefault(Ast obj, Function param) {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
   @Override
-  protected Void visitNamespace(Namespace obj, Void param) {
+  protected Void visitNamespace(Namespace obj, Function param) {
     sw.wr("from queue import Queue");
     sw.nl();
     sw.wr("from ctypes import *");
@@ -66,8 +67,14 @@ public class InputWriter extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncSlot(FuncSlot obj, Void param) {
+  protected Void visitFunction(Function obj, Function param) {
+    writeHeader(obj);
+    writeBody(obj);
 
+    return null;
+  }
+
+  private void writeHeader(Function obj) {
     sw.wr("def " + obj.name + "(self");
     for (FuncVariable var : obj.param) {
       sw.wr(", ");
@@ -75,9 +82,20 @@ public class InputWriter extends NullDispatcher<Void, Void> {
     }
     sw.wr("):");
     sw.nl();
+  }
 
+  private void writeBody(Function obj) {
     sw.incIndent();
 
+    visit(obj.ret, obj);
+
+    sw.nl();
+
+    sw.decIndent();
+    sw.nl();
+  }
+
+  private void writeCall(Function obj) {
     sw.wr("self._inst." + obj.name + "(");
     boolean first = true;
     for (FuncVariable var : obj.param) {
@@ -86,22 +104,26 @@ public class InputWriter extends NullDispatcher<Void, Void> {
       } else {
         sw.wr(", ");
       }
+      // TODO use correct type
       sw.wr("c_int(");
       sw.wr(var.name);
       sw.wr(")");
     }
     sw.wr(")");
-    sw.nl();
+  }
 
-    sw.decIndent();
-    sw.nl();
-
+  @Override
+  protected Void visitFuncReturnType(FuncReturnType obj, Function param) {
+    // TODO use correct type
+    sw.wr("return int(");
+    writeCall(param);
+    sw.wr(")");
     return null;
   }
 
   @Override
-  protected Void visitFuncResponse(FuncResponse obj, Void param) {
-    // TODO implement
+  protected Void visitFuncReturnNone(FuncReturnNone obj, Function param) {
+    writeCall(param);
     return null;
   }
 
