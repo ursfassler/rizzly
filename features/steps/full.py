@@ -26,9 +26,17 @@ def fully_compile(context):
 def initialize(context):
     context.testee.inst__construct()
 
+@when('I deinitialize it')
+def initialize(context):
+    context.testee.inst__destruct()
+
 @when('I send an event click()')
 def send_event(context):
     context.testee.inst_click()
+
+@when('I send an event tick()')
+def send_event(context):
+    context.testee.inst_tick()
 
 @when('I send an event inp({value:d})')
 def send_event(context, value):
@@ -48,6 +56,10 @@ def expect_event_0(context, expectedEvent):
 @then('I expect the request get({value1:d}) = {result:d}')
 def request(context, value1, result):
     assert context.testee.inst_get(value1) == result
+
+@then('I expect the request read() = {result:d}')
+def request(context, result):
+    assert context.testee.inst_read() == result
 
 @then('I expect no more events')
 def no_more_events(context):

@@ -34,6 +34,12 @@ def stderr_not_empty(context, text):
     assert output.find(text) != -1, 'expected to see "' + text + '", got: \n' + output
 
 
+@then('stdout should contain "{text}"')
+def stdout_not_empty(context, text):
+    output = context.proc.stdout.read()
+    assert output.find(text) != -1, 'expected to see "' + text + '", got: \n' + output
+
+
 @then('some output on stderr')
 def stderr_not_empty(context):
     output = context.proc.stderr.read()
