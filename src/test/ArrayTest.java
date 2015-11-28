@@ -27,26 +27,6 @@ public class ArrayTest extends BaseTest {
   }
 
   @Test
-  public void copy1() {
-    compile("copy1", TestSteps.COMPILE_TO_LIB, false, false);
-  }
-
-  @Test
-  public void copy2() {
-    compile("copy2", TestSteps.COMPILE_TO_LIB, false, false);
-  }
-
-  @Test
-  public void arrayTest2() {
-    compile("arrayTest2", TestSteps.EXECUTE, false, false);
-  }
-
-  @Test
-  public void arrayTest3() {
-    compile("arrayTest3", TestSteps.EXECUTE, false, false);
-  }
-
-  @Test
   public void arrayTest4() {
     compile("arrayTest4", TestSteps.EXECUTE, false, false);
   }

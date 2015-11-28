@@ -105,3 +105,68 @@ Scenario: Set array element with setter
   And I expect the request get(18) = 100
   And I expect no more events
 
+
+Scenario: Use default array initializer
+  Given we have a file "arrayTest3.rzy" with the content:
+    """
+    ArrayTest3 = Component
+      get : response( x: R{0,2} ):R{0,31};
+
+    elementary
+      a : Array{3,R{0,31}} = default{Array{3,R{0,31}}}();
+      
+      get : response( x: R{0,2} ):R{0,31}
+        return a[x];
+      end
+
+    end
+
+    """
+
+  When I succesfully compile "arrayTest3.rzy" with rizzly
+  And fully compile everything
+  And I initialize it
+  
+  Then I expect the request get(0) = 0
+  And I expect the request get(1) = 0
+  And I expect the request get(2) = 0
+
+
+Scenario: Copy array from state
+  Given we have a file "copy1.rzy" with the content:
+    """
+    Copy1 = Component
+    elementary
+      a : Array{10,R{0,200}} = (0,0,0,0,0,0,0,0,0,0);
+
+      foo = procedure()
+        b : Array{10,R{0,200}} = a;
+      end
+
+    end
+
+    """
+
+  When I start rizzly with the file "copy1.rzy"
+  
+  Then I expect no error
+
+
+Scenario: Copy variable array
+  Given we have a file "copy2.rzy" with the content:
+    """
+    Copy2 = Component
+    elementary
+      foo = procedure()
+        a, b : Array{10,R{0,200}};
+        b[0] := 1;
+        a := b;
+      end
+    end
+
+    """
+
+  When I start rizzly with the file "copy2.rzy"
+  
+  Then I expect no error
+
