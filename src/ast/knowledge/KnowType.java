@@ -332,8 +332,8 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
     Range lr = ((RangeType) lhs).range;
     Range rr = ((RangeType) rhs).range;
 
-    BigInteger high = lr.high.shiftRight(ExpressionTypecheck.getAsInt(rr.high, "shl"));
-    BigInteger low = lr.low.shiftRight(ExpressionTypecheck.getAsInt(rr.low, "shl"));
+    BigInteger high = lr.high.shiftRight(ExpressionTypecheck.getAsInt(rr.low, "shl"));
+    BigInteger low = lr.low.shiftRight(ExpressionTypecheck.getAsInt(rr.high, "shl"));
 
     return kbi.getRangeType(new Range(low, high));
   }

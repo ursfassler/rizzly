@@ -54,8 +54,32 @@ def expect_event_0(context, expectedEvent):
     assert event == expectedEvent, 'expected: ' + expectedEvent + '; got: ' + event
 
 @then('I expect the request get({value1:d}) = {result:d}')
-def request(context, value1, result):
+def step_impl(context, value1, result):
     assert context.testee.inst_get(value1) == result
+
+@then('I expect the request op({value:d}) = {result:d}')
+def step_impl(context, value, result):
+    assert context.testee.inst_op(value) == result
+
+@then('I expect the request op({value:Bool}) = {result:Bool}')
+def step_impl(context, value, result):
+    calculatedValue = context.testee.inst_op(value)
+    assert calculatedValue == result, 'expected ' + str(result) + ', got ' + str(calculatedValue)
+
+@then('I expect the request op({left:d}, {right:d}) = {result:d}')
+def step_impl(context, left, right, result):
+    calculatedValue = context.testee.inst_op(left, right)
+    assert calculatedValue == result, 'expected ' + str(result) + ', got ' + str(calculatedValue)
+
+@then('I expect the request op({left:d}, {right:d}) = {result:Bool}')
+def step_impl(context, left, right, result):
+    calculatedValue = context.testee.inst_op(left, right)
+    assert calculatedValue == result, 'expected ' + str(result) + ', got ' + str(calculatedValue)
+
+@then('I expect the request op({left:Bool}, {right:Bool}) = {result:Bool}')
+def step_impl(context, left, right, result):
+    calculatedValue = context.testee.inst_op(left, right)
+    assert calculatedValue == result, 'expected ' + str(result) + ', got ' + str(calculatedValue)
 
 @then('I expect the request read() = {result:d}')
 def request(context, result):

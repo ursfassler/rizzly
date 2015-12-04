@@ -19,10 +19,12 @@ package ast.pass.others.behave;
 
 import ast.data.Ast;
 import ast.data.AstList;
+import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.function.Function;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FuncReturnType;
+import ast.data.type.base.RangeType;
 import ast.data.variable.FuncVariable;
 import ast.dispatcher.NullDispatcher;
 import ast.doc.StreamWriter;
@@ -114,11 +116,26 @@ public class InputWriter extends NullDispatcher<Void, Function> {
 
   @Override
   protected Void visitFuncReturnType(FuncReturnType obj, Function param) {
-    // TODO use correct type
+    String c_type = getCType(obj.type.ref.link);
+    sw.wr("self._inst." + param.name + ".restype = " + c_type);
+    sw.nl();
+
     sw.wr("return int(");
     writeCall(param);
     sw.wr(")");
     return null;
+  }
+
+  private String getCType(Named type) {
+    // TODO use correct type / implement function correctly
+    String c_type = "c_int";
+    if (type instanceof RangeType) {
+      RangeType range = (RangeType) type;
+      if ((-128 <= range.range.low.intValue()) && (range.range.high.intValue() <= 127)) {
+        c_type = "c_int8";
+      }
+    }
+    return c_type;
   }
 
   @Override

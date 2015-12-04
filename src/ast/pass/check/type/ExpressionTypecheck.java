@@ -268,14 +268,23 @@ public class ExpressionTypecheck extends DfsTraverser<Void, Void> {
     }
     Range lhs = getRange(obj.left);
     Range rhs = getRange(obj.right);
-    checkPositive(obj.getInfo(), "and", lhs, rhs);
+    checkPositive(obj.getInfo(), "or", lhs, rhs);
     return null;
   }
 
   @Override
   protected Void visitLogicOr(LogicOr obj, Void param) {
     super.visitLogicOr(obj, param);
-    throw new RuntimeException("not yet implemented");
+    Type lhst = kt.get(obj.left);
+    Type rhst = kt.get(obj.right);
+
+    if (!(lhst instanceof BooleanType)) {
+      RError.err(ErrorType.Error, lhst.getInfo(), "Expected boolean type at the left side");
+    }
+    if (!(rhst instanceof BooleanType)) {
+      RError.err(ErrorType.Error, rhst.getInfo(), "Expected boolean type at the right side");
+    }
+    return null;
   }
 
   @Override
