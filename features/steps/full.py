@@ -71,6 +71,21 @@ def step_impl(context, left, right, result):
     calculatedValue = context.testee.inst_op(left, right)
     assert calculatedValue == result, 'expected ' + str(result) + ', got ' + str(calculatedValue)
 
+@then('I expect the request op({value1:d}, {value2:d}, {value3:d}) = {result:d}')
+def step_impl(context, value1, value2, value3, result):
+    calculatedValue = context.testee.inst_op(value1, value2, value3)
+    assert calculatedValue == result, 'expected ' + str(result) + ', got ' + str(calculatedValue)
+
+@then('I expect the request op({value1:Bool}, {value2:Bool}, {value3:Bool}) = {result:Bool}')
+def step_impl(context, value1, value2, value3, result):
+    calculatedValue = context.testee.inst_op(value1, value2, value3)
+    assert calculatedValue == result, 'expected ' + str(result) + ', got ' + str(calculatedValue)
+
+@then('I expect the request op({value1:d}, {value2:d}, {value3:Bool}) = {result:Bool}')
+def step_impl(context, value1, value2, value3, result):
+    calculatedValue = context.testee.inst_op(value1, value2, value3)
+    assert calculatedValue == result, 'expected ' + str(result) + ', got ' + str(calculatedValue)
+
 @then('I expect the request op({left:d}, {right:d}) = {result:Bool}')
 def step_impl(context, left, right, result):
     calculatedValue = context.testee.inst_op(left, right)
