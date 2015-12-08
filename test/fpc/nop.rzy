@@ -1,8 +1,0 @@
-Nop = Component
-  inp : slot();
-  out : signal();
-
-composition
-  inp -> out;
-end
-
