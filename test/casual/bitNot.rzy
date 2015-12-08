@@ -1,9 +1,0 @@
-BitNot = Component
-  invert : response( value: R{0,15} ):R{0,15};
-
-elementary
-  invert : response( value: R{0,15} ):R{0,15}
-    return not value;
-  end
-end
-

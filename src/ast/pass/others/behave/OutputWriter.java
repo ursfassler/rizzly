@@ -103,7 +103,13 @@ public class OutputWriter extends NullDispatcher<Void, Void> {
   }
 
   private void visitParamList(AstList<FuncVariable> param) {
+    boolean first = true;
     for (FuncVariable var : param) {
+      if (first) {
+        first = false;
+      } else {
+        sw.wr("\", \" + ");
+      }
       sw.wr("std::to_string(");
       sw.wr(var.name);
       sw.wr(")");

@@ -42,6 +42,18 @@ def send_event(context):
 def send_event(context, value):
     context.testee.inst_inp(value)
 
+@when('I send an event inp({value:Bool})')
+def send_event(context, value):
+    context.testee.inst_inp(value)
+
+@when('I send an event inp({value1:Bool}, {value2:Bool})')
+def send_event(context, value1, value2):
+    context.testee.inst_inp(value1, value2)
+
+@when('I send an event inp({value1:Bool}, {value2:Bool}, {value3:Bool})')
+def send_event(context, value1, value2, value3):
+    context.testee.inst_inp(value1, value2, value3)
+
 @when('I send an event set({value1:d}, {value2:d})')
 def set_event(context, value1, value2):
     context.testee.inst_set(value1, value2)
@@ -99,6 +111,15 @@ def step_impl(context, left, right, result):
 @then('I expect the request read() = {result:d}')
 def request(context, result):
     assert context.testee.inst_read() == result
+
+@then('I expect the request read() = {result:Bool}')
+def request(context, result):
+    assert context.testee.inst_read() == result
+
+@then(u'I expect the request read() = \'{text}\'')
+def step_impl(context, text):
+    raise NotImplementedError(u'STEP: Then I expect the request read() = \'{text}\'')
+
 
 @then('I expect no more events')
 def no_more_events(context):

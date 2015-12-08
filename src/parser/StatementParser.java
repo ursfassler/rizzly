@@ -111,7 +111,7 @@ public class StatementParser extends BaseParser {
     return new VarDefInitStmt(info, variables, initial);
   }
 
-  // EBNF casestmt: "case" expression "do" caseopt { caseopt } [ "else" block
+  // EBNF casestmt: "case" expression "of" caseopt { caseopt } [ "else" block
   // "end" ] "end"
   private Statement parseCase() {
     Token tok = expect(TokenType.CASE);

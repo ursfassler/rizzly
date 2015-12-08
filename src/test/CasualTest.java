@@ -38,21 +38,6 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
-  public void for1() {
-    compile("for1", TestSteps.EXECUTE, false, false);
-  }
-
-  @Test
-  public void xorBool() {
-    compile("xorBool", TestSteps.EXECUTE, false, false);
-  }
-
-  @Test
-  public void xor() {
-    compile("xor", TestSteps.EXECUTE, false, false);
-  }
-
-  @Test
   public void defaultInit() {
     compile("defaultInit", TestSteps.COMPILE_TO_C, false, false);
   }
@@ -99,21 +84,6 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
-  public void logicNot() {
-    compile("logicNot", TestSteps.EXECUTE, false, false);
-  }
-
-  @Test
-  public void bitNot() {
-    compile("bitNot", TestSteps.EXECUTE, false, false);
-  }
-
-  @Test
-  public void mul() {
-    compile("mul", TestSteps.EXECUTE, false, false);
-  }
-
-  @Test
   public void stateVar() {
     compile("stateVar", TestSteps.EXECUTE, false, false);
   }
@@ -154,11 +124,6 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
-  public void while_() {
-    compile("while", TestSteps.EXECUTE, false, true);
-  }
-
-  @Test
   public void range() {
     compile("range", TestSteps.EXECUTE, false, false);
   }
@@ -179,11 +144,6 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
-  public void retval() {
-    compile("retval", TestSteps.EXECUTE, false, true);
-  }
-
-  @Test
   @Ignore
   public void debugMsg() {
     compile("debugMsg", TestSteps.EXECUTE, true, false);
@@ -201,18 +161,8 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
-  public void while2() {
-    compile("while2", TestSteps.EXECUTE, false, false);
-  }
-
-  @Test
   public void typefunc() {
     compile("typefunc", TestSteps.COMPILE_TO_LIB, false, false);
-  }
-
-  @Test
-  public void calcCase() {
-    compile("calcCase", TestSteps.EXECUTE, false, false);
   }
 
   @Test
@@ -223,11 +173,6 @@ public class CasualTest extends BaseTest {
   @Test
   public void meta() {
     compile("meta", TestSteps.COMPILE_TO_AST, false, false);
-  }
-
-  @Test
-  public void case_() {
-    compile("case", TestSteps.EXECUTE, false, false);
   }
 
   @Test
@@ -426,16 +371,6 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
-  public void emptyElse() {
-    compile("emptyElse", TestSteps.COMPILE_TO_C, false, false);
-  }
-
-  @Test
-  public void saturate() {
-    compile("saturate", TestSteps.COMPILE_TO_C, false, true);
-  }
-
-  @Test
   public void range2() {
     compile("range2", TestSteps.COMPILE_TO_C, false, true);
   }
@@ -466,11 +401,6 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
-  public void boolext() {
-    compile("boolext", TestSteps.COMPILE_TO_LIB, false, false);
-  }
-
-  @Test
   public void array1() {
     compile("array1", TestSteps.COMPILE_TO_LIB, false, false);
   }
@@ -481,23 +411,8 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
-  public void bool2_Bool2() {
-    compile("bool2", TestSteps.COMPILE_TO_LIB, false, false);
-  }
-
-  @Test
   public void locvar() {
     compile("locvar", TestSteps.COMPILE_TO_LIB, false, true);
   }
 
-  @Test
-  @Ignore
-  public void expr_Expr() {
-    compile("expr", TestSteps.COMPILE_TO_LIB, false, true);
-  }
-
-  @Test
-  public void expr2_Expr2() {
-    compile("expr2", TestSteps.COMPILE_TO_LIB, false, false);
-  }
 }

@@ -1,9 +1,0 @@
-XorBool = Component
-  calc : response(a, b: Boolean):Boolean;
-  
-elementary
-  calc : response(a, b: Boolean):Boolean
-    return a xor b;
-  end
-end      
-
