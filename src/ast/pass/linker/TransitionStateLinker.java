@@ -17,20 +17,10 @@
 
 package ast.pass.linker;
 
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-
 import ast.data.component.hfsm.State;
-import ast.data.component.hfsm.StateRef;
 import ast.data.component.hfsm.Transition;
 import ast.data.raw.RawHfsm;
-import ast.data.reference.DummyLinkTarget;
-import ast.data.reference.Reference;
 import ast.repository.query.TypeFilter;
-import error.ErrorType;
-import error.RError;
 
 /**
  * Links all src/dst states of all transitions in a hfsm implementation.
@@ -44,123 +34,17 @@ import error.RError;
 public class TransitionStateLinker {
 
   public static void process(RawHfsm obj) {
-    StateCollector isc = new StateCollector();
-    isc.makeTable(obj);
-
-    visitState(obj.getTopstate(), isc);
+    visitState(obj.getTopstate());
   }
 
-  private static void visitState(ast.data.component.hfsm.State state, StateCollector isc) {
-    Map<String, State> sym = isc.getSymbols(state);
-    Set<String> amb = isc.getAmbigous(state);
-
-    for (ast.data.component.hfsm.Transition tr : TypeFilter.select(state.item, Transition.class)) {
-      link(tr.src, sym, amb);
-      link(tr.dst, sym, amb);
+  private static void visitState(State state) {
+    for (Transition tr : TypeFilter.select(state.item, Transition.class)) {
+      SubLinker.link(tr.src.ref, state);
+      SubLinker.link(tr.dst.ref, state);
     }
 
-    for (ast.data.component.hfsm.State sub : TypeFilter.select(state.item, State.class)) {
-      visitState(sub, isc);
-    }
-  }
-
-  private static void link(StateRef sref, Map<String, State> sym, Set<String> amb) {
-    Reference ref = (Reference) sref.ref;
-
-    if (ref.link instanceof DummyLinkTarget) {
-      String target = ((DummyLinkTarget) ref.link).name;
-      if (amb.contains(target)) {
-        RError.err(ErrorType.Error, ref.getInfo(), "State name is ambigous: " + target);
-      } else {
-        State st = sym.get(target);
-        if (st == null) {
-          RError.err(ErrorType.Error, ref.getInfo(), "State not found: " + target);
-        } else {
-          ref.link = st;
-        }
-      }
-    }
-  }
-
-}
-
-class StateCollector {
-  final private Map<State, Integer> deepth = new HashMap<State, Integer>();
-  final private Map<State, Map<String, State>> symbols = new HashMap<State, Map<String, State>>();
-  final private Map<State, Set<String>> ambigous = new HashMap<State, Set<String>>();
-  final private Map<State, String> names = new HashMap<State, String>();
-
-  public Map<String, State> getSymbols(ast.data.component.hfsm.State state) {
-    return symbols.get(state);
-  }
-
-  public Set<String> getAmbigous(ast.data.component.hfsm.State state) {
-    return ambigous.get(state);
-  }
-
-  public void makeTable(RawHfsm hfsm) {
-    gatherNames(hfsm.getTopstate());
-    visitState(hfsm.getTopstate(), 0);
-  }
-
-  private void gatherNames(ast.data.component.hfsm.State state) {
     for (State sub : TypeFilter.select(state.item, State.class)) {
-      getNames().put(sub, sub.name);
-      gatherNames(sub);
+      visitState(sub);
     }
   }
-
-  protected Set<State> visitState(State state, int param) {
-    deepth.put(state, param);
-    Set<State> all = new HashSet<State>();
-    all.add(state);
-    for (State sub : TypeFilter.select(state.item, State.class)) {
-      all.addAll(visitState(sub, param + 1));
-    }
-
-    Map<String, Integer> amb = new HashMap<String, Integer>();
-    Map<String, State> sym = new HashMap<String, State>();
-
-    for (State st : all) {
-      add(st, sym, amb);
-    }
-
-    symbols.put(state, sym);
-    ambigous.put(state, amb.keySet());
-
-    return all;
-  }
-
-  private void add(State st, Map<String, State> sym, Map<String, Integer> amb) {
-    Integer ad = amb.get(getNames().get(st));
-    if (ad != null) {
-      assert (!sym.containsKey(getNames().get(st)));
-      int nd = deepth.get(st);
-      if (nd < ad) {
-        amb.remove(getNames().get(st));
-        sym.put(getNames().get(st), st);
-      }
-    } else {
-      ast.data.component.hfsm.State os = sym.get(getNames().get(st));
-      if (os == null) {
-        sym.put(getNames().get(st), st);
-      } else {
-        int nd = deepth.get(st);
-        int od = deepth.get(os);
-        if (nd > od) {
-          sym.put(getNames().get(st), st);
-        } else if (nd == od) {
-          sym.remove(getNames().get(os));
-          amb.put(getNames().get(os), od);
-        } else {
-          assert (nd < od);
-        }
-      }
-    }
-  }
-
-  public Map<State, String> getNames() {
-    return names;
-  }
-
 }
