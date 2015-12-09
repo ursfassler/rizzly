@@ -4,90 +4,136 @@ Feature: Transition source and destination
   In order to handle all use cases
 
 
-#TODO this test sometimes fails
-@fixme
-Scenario: I can access states by fully specify their name
-  Given we have a file "stateNames2.rzy" with the content:
+Scenario: A transition can come and go to states on the same level
+  Given we have a file "testee.rzy" with the content:
     """
-    StateNames2 = Component
+    Testee = Component
       tick : slot();
-      evt : signal(value: R{0,255});
 
     hfsm(A)
-      A : state(A)
-        A : state(A)
-          A : state
-            entry
-              evt(1);
-            end
-          end
-        end
-        B : state(A)
-          A : state
-            entry
-              evt(2);
-            end
-          end
-        end
-      end
+      A : state;
+      B : state;
 
-      A.A to B.A by tick();
+      A to B by tick();
     end
 
     """
 
-  When I succesfully compile "stateNames2.rzy" with rizzly
-  And fully compile everything
+  When I start rizzly with the file "testee.rzy"
 
-  When I initialize it
-  Then I expect an event evt(1)
-  And I expect no more events
+  Then I expect no error
 
-  When I send an event tick()
-  Then I expect an event evt(2)
-  And I expect no more events
+
+Scenario: A transition source state has to have a full path
+  Given we have a file "testee.rzy" with the content:
+    """
+    Testee = Component
+      tick : slot();
+
+    hfsm(A)
+      A : state(AA)
+        AA: state;
+      end
+      B : state;
+
+      AA to B by tick();
+    end
+
+    """
+
+  When I start rizzly with the file "testee.rzy"
+
+  Then I expect an error code
+  And stderr should contain "testee.rzy:10:3: Fatal: Item not found"
+
+
+Scenario: A transition source state has to have a full path
+  Given we have a file "testee.rzy" with the content:
+    """
+    Testee = Component
+      tick : slot();
+
+    hfsm(A)
+      A : state(AA)
+        AA: state;
+      end
+      B : state;
+
+      B to AA by tick();
+    end
+
+    """
+
+  When I start rizzly with the file "testee.rzy"
+
+  Then I expect an error code
+  And stderr should contain "testee.rzy:10:8: Fatal: Item not found"
+
+
+Scenario: A transition can come and go to sub-states
+  Given we have a file "testee.rzy" with the content:
+    """
+    Testee = Component
+      tick : slot();
+
+    hfsm(A)
+      A : state(AA)
+        AA: state;
+      end
+      B : state(BA)
+        BA: state;
+      end
+
+      A.AA to B.BA by tick();
+    end
+
+    """
+
+  When I start rizzly with the file "testee.rzy"
+
+  Then I expect no error
 
 
 Scenario: A transition can not go to an outer state
-  Given we have a file "transDist1.rzy" with the content:
+  Given we have a file "testee.rzy" with the content:
     """
-    TransDist1 = Component
+    Testee = Component
       tick : slot();
 
     hfsm(A)
-      A : state(AA)
-        AA : state
-          AA to A by tick();
-        end
+      A : state(B)
+        B : state;
+        
+        B to A by tick();
       end
     end
 
     """
 
-  When I start rizzly with the file "transDist1.rzy"
+  When I start rizzly with the file "testee.rzy"
 
   Then I expect an error code
-  And stderr should contain "transDist1.rzy:7:13: Error: State not found: A"
+  And stderr should contain "testee.rzy:8:10: Fatal: Item not found"
 
 
 Scenario: A transition can not come from an outer state
-  Given we have a file "transDist1.rzy" with the content:
+  Given we have a file "testee.rzy" with the content:
     """
-    TransDist1 = Component
+    Testee = Component
       tick : slot();
 
     hfsm(A)
-      A : state(AA)
-        AA : state
-          A to AA by tick();
-        end
+      A : state(B)
+        B : state;
+        
+        A to B by tick();
       end
     end
 
     """
 
-  When I start rizzly with the file "transDist1.rzy"
+  When I start rizzly with the file "testee.rzy"
 
   Then I expect an error code
-  And stderr should contain "transDist1.rzy:7:7: Error: State not found: A"
+  And stderr should contain "testee.rzy:8:5: Fatal: Item not found"
 

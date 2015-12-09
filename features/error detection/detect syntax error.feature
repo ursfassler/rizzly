@@ -66,10 +66,10 @@ Scenario: use of reserved keyword (R) as template argument name
   And stderr should contain "err3.rzy:1:6: Error: Expected name, got keyword R"
 
 
-Scenario: use of reserved keyword (R) as template argument name
-  Given we have a file "err4.rzy" with the content:
+Scenario: reference non existing state
+  Given we have a file "testee.rzy" with the content:
     """
-    Err4 = Component
+    Testee = Component
       evt : signal();
     hfsm(A)
       A: state(B)
@@ -82,10 +82,10 @@ Scenario: use of reserved keyword (R) as template argument name
 
     """
 
-  When I start rizzly with the file "err4.rzy"
+  When I start rizzly with the file "testee.rzy"
   
   Then I expect an error code
-  And stderr should contain "err4.rzy:4:6: Fatal: Name not found: C"
+  And stderr should contain "testee.rzy:9:8: Fatal: Item not found"
 
 
 @fixme
