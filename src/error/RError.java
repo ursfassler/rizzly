@@ -27,7 +27,18 @@ import ast.ElementInfo;
  *
  * @author urs
  */
+// TODO do not use static methods anymore
 public class RError {
+
+  // TODO use better solution
+  public static RizzlyError instance() {
+    return new RizzlyError() {
+      @Override
+      public void err(ErrorType type, String filename, int line, int col, String msg) {
+        RError.err(type, filename, line, col, msg);
+      }
+    };
+  }
 
   public static void err(ErrorType type, String filename, int line, int col, String msg) {
     switch (type) {

@@ -18,7 +18,7 @@
 package parser.expression;
 
 import parser.Parser;
-import parser.scanner.Scanner;
+import parser.PeekNReader;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
 import ast.ElementInfo;
@@ -49,7 +49,7 @@ import error.RError;
 
 public class ExpressionParser extends Parser {
 
-  public ExpressionParser(Scanner scanner) {
+  public ExpressionParser(PeekNReader<Token> scanner) {
     super(scanner);
   }
 
@@ -100,7 +100,7 @@ public class ExpressionParser extends Parser {
         RError.err(ErrorType.Error, expr.getInfo(), "expected identifier for assignment");
         return null;
       }
-      Reference ref = (Reference) ((RefExp) expr).ref;
+      Reference ref = ((RefExp) expr).ref;
       if (!ref.offset.isEmpty()) {
         RError.err(ErrorType.Error, expr.getInfo(), "expected identifier for assignment");
         return null;

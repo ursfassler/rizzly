@@ -44,12 +44,13 @@ public class FileParser extends BaseParser {
 
   static public RizzlyFile parse(String filename, String name) {
     Scanner s = new Scanner(new FileReader(filename), filename);
-    FileParser p = new FileParser(s);
+    PeekNReader<Token> pnr = new PeekNReader<Token>(s);
+    FileParser p = new FileParser(pnr);
     RizzlyFile file = p.parseFile(filename, name);
     return file;
   }
 
-  public FileParser(Scanner scanner) {
+  public FileParser(PeekNReader<Token> scanner) {
     super(scanner);
   }
 

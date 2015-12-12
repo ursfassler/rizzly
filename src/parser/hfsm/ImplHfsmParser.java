@@ -15,12 +15,13 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package parser;
+package parser.hfsm;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import parser.scanner.Scanner;
+import parser.ImplBaseParser;
+import parser.PeekNReader;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
 import ast.ElementInfo;
@@ -42,7 +43,6 @@ import ast.data.function.ret.FuncReturnNone;
 import ast.data.raw.RawComponent;
 import ast.data.raw.RawHfsm;
 import ast.data.reference.RefFactory;
-import ast.data.reference.RefName;
 import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.template.Template;
@@ -53,11 +53,14 @@ import error.ErrorType;
 import error.RError;
 
 public class ImplHfsmParser extends ImplBaseParser {
-  public ImplHfsmParser(Scanner scanner) {
+  final private StateReferenceParser stateRef;
+
+  public ImplHfsmParser(PeekNReader<Token> scanner) {
     super(scanner);
+    stateRef = new StateReferenceParser(scanner, RError.instance());
   }
 
-  public static RawComponent parse(Scanner scanner, String name) {
+  public static RawComponent parse(PeekNReader<Token> scanner, String name) {
     ImplHfsmParser parser = new ImplHfsmParser(scanner);
     return parser.parseImplementationHfsm(name);
   }
@@ -93,29 +96,42 @@ public class ImplHfsmParser extends ImplBaseParser {
         case EXIT:
           exitBody.statements.add(parseExitCode());
           break;
+        case IDENTIFIER:
+          state.item.add(parseDeclOrInstOrTrans(state));
+          break;
         default:
-          Token id = expect(TokenType.IDENTIFIER);
-          switch (peek().getType()) {
-            case EQUAL:
-              expect(TokenType.EQUAL);
-              List<TemplateParameter> genpam;
-              if (peek().getType() == TokenType.OPENCURLY) {
-                genpam = parseGenericParam();
-              } else {
-                genpam = new ArrayList<TemplateParameter>();
-              }
-              Function obj = parseStateDeclaration(id.getData());
-              state.item.add(new Template(id.getInfo(), id.getData(), genpam, obj));
-              break;
-            case COLON:
-              expect(TokenType.COLON);
-              Ast inst = parseStateInstantiation(id.getData());
-              state.item.add((StateContent) inst);
-              break;
-            default:
-              state.item.add(parseTransition(id));
-              break;
-          }
+          wrongToken(TokenType.IDENTIFIER);
+      }
+    }
+  }
+
+  private StateContent parseDeclOrInstOrTrans(State state) {
+    if (peek(0).getType() != TokenType.IDENTIFIER) {
+      wrongToken(TokenType.IDENTIFIER);
+      return null;
+    }
+
+    switch (peek(1).getType()) {
+      case EQUAL: {
+        Token id = next();
+        expect(TokenType.EQUAL);
+        List<TemplateParameter> genpam;
+        if (peek().getType() == TokenType.OPENCURLY) {
+          genpam = parseGenericParam();
+        } else {
+          genpam = new ArrayList<TemplateParameter>();
+        }
+        Function obj = parseStateDeclaration(id.getData());
+        return new Template(id.getInfo(), id.getData(), genpam, obj);
+      }
+      case COLON: {
+        Token id = next();
+        expect(TokenType.COLON);
+        Ast inst = parseStateInstantiation(id.getData());
+        return (StateContent) inst;
+      }
+      default: {
+        return parseTransition();
       }
     }
   }
@@ -151,7 +167,7 @@ public class ImplHfsmParser extends ImplBaseParser {
   }
 
   // EBNF stateDecl: "state" ( ";" | ( [ "(" id ")" ] stateBody ) )
-  private ast.data.component.hfsm.State parseState(String name) {
+  private State parseState(String name) {
     ElementInfo info = expect(TokenType.STATE).getInfo();
 
     ast.data.component.hfsm.State state;
@@ -181,12 +197,12 @@ public class ImplHfsmParser extends ImplBaseParser {
     return new FuncProcedure(ElementInfo.NO, name, new AstList<FuncVariable>(), new FuncReturnNone(ElementInfo.NO), new Block(ElementInfo.NO));
   }
 
-  // EBNF transition: nameRef "to" nameRef "by" transitionEvent [ "if" expr ] (
+  // EBNF transition: stateRef "to" stateRef "by" transitionEvent [ "if" expr ] (
   // ";" | "do" block "end" )
-  private Transition parseTransition(Token id) {
-    StateRef src = parseNameRef(id);
+  private Transition parseTransition() {
+    StateRef src = stateRef.parse();
     ElementInfo info = expect(TokenType.TO).getInfo();
-    StateRef dst = parseNameRef();
+    StateRef dst = stateRef.parse();
 
     expect(TokenType.BY);
 
@@ -213,22 +229,6 @@ public class ImplHfsmParser extends ImplBaseParser {
     }
 
     return new Transition(info, src, dst, eventFunc, guard, param, body);
-  }
-
-  // EBNF nameRef: Designator
-  private StateRef parseNameRef() {
-    return parseNameRef(expect(TokenType.IDENTIFIER));
-  }
-
-  private StateRef parseNameRef(Token tokh) {
-    Reference ret = RefFactory.full(tokh.getInfo(), tokh.getData());
-
-    while (consumeIfEqual(TokenType.PERIOD)) {
-      Token tok = expect(TokenType.IDENTIFIER);
-      ret.offset.add(new RefName(tok.getInfo(), tok.getData()));
-    }
-
-    return new StateRef(ret.getInfo(), ret);
   }
 
 }

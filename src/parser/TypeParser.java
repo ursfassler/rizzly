@@ -20,7 +20,7 @@ package parser;
 import java.util.ArrayList;
 import java.util.List;
 
-import parser.scanner.Scanner;
+import parser.hfsm.ImplHfsmParser;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
 import ast.copy.Copy;
@@ -44,7 +44,7 @@ import error.RError;
 //TODO update EBNF
 public class TypeParser extends BaseParser {
 
-  public TypeParser(Scanner scanner) {
+  public TypeParser(PeekNReader<Token> scanner) {
     super(scanner);
   }
 

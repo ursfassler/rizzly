@@ -19,7 +19,6 @@ package parser;
 
 import java.util.ArrayList;
 
-import parser.scanner.Scanner;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
 import ast.ElementInfo;
@@ -40,11 +39,11 @@ import error.RError;
 
 public class ImplCompositionParser extends ImplBaseParser {
 
-  public ImplCompositionParser(Scanner scanner) {
+  public ImplCompositionParser(PeekNReader<Token> scanner) {
     super(scanner);
   }
 
-  public static RawComponent parse(Scanner scanner, String name) {
+  public static RawComponent parse(PeekNReader<Token> scanner, String name) {
     ImplCompositionParser parser = new ImplCompositionParser(scanner);
     return parser.parseImplementationComposition(name);
   }

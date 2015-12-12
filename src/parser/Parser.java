@@ -20,7 +20,6 @@ package parser;
 import java.util.ArrayList;
 import java.util.List;
 
-import parser.scanner.Scanner;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
 import ast.data.Metadata;
@@ -32,26 +31,26 @@ import error.RError;
  * @author urs
  */
 public abstract class Parser {
-  private Scanner scanner;
+  private PeekNReader<Token> scanner;
 
-  public Parser(Scanner scanner) {
+  public Parser(PeekNReader<Token> scanner) {
     this.scanner = scanner;
   }
 
-  protected Scanner getScanner() {
+  protected PeekNReader<Token> getScanner() {
     return scanner;
   }
 
-  protected Token peek() {
-    return scanner.peek();
+  public Token peek() {
+    return scanner.peek(0);
+  }
+
+  public Token peek(int i) {
+    return scanner.peek(i);
   }
 
   protected Token next() {
     return scanner.next();
-  }
-
-  protected boolean hasNext() {
-    return scanner.hasNext();
   }
 
   // EBNF designator: id { "." id }
@@ -64,38 +63,36 @@ public abstract class Parser {
     return name;
   }
 
-  protected boolean consumeIfEqual(TokenType tok) {
-    if (scanner.peek().getType() == tok) {
-      scanner.next();
+  // TODO move into own class
+  @Deprecated
+  public boolean consumeIfEqual(TokenType tok) {
+    if (peek().getType() == tok) {
+      next();
       return true;
     } else {
       return false;
     }
   }
 
-  protected Token expect(TokenType type) {
-    if (!scanner.hasNext()) {
-      Token tok = scanner.peek();
-      RError.err(ErrorType.Error, tok.getInfo(), "expected token not found: " + tok);
-    }
-    Token got = scanner.next();
+  // TODO move into own class
+  @Deprecated
+  public Token expect(TokenType type) {
+    Token got = next();
     if (got.getType() != type) {
       RError.err(ErrorType.Error, got.getInfo(), "expected " + type + " got " + got);
     }
     return got;
   }
 
-  protected void wrongToken(TokenType type) {
-    if (!scanner.hasNext()) {
-      Token tok = scanner.peek();
-      RError.err(ErrorType.Error, tok.getInfo(), "expected token not found: " + tok);
-    }
-    Token got = scanner.next();
-    RError.err(ErrorType.Error, got.getInfo(), "expected " + type + " got " + got);
+  protected void wrongToken(TokenType expected) {
+    Token got = next();
+    RError.err(ErrorType.Error, got.getInfo(), "expected " + expected + " got " + got);
   }
 
+  // TODO create other solution
+  @Deprecated
   protected ArrayList<Metadata> getMetadata() {
-    return scanner.getMetadata();
+    return new ArrayList<Metadata>();
   }
 
 }

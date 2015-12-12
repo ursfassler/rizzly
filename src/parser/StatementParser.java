@@ -17,7 +17,6 @@
 
 package parser;
 
-import parser.scanner.Scanner;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
 import ast.ElementInfo;
@@ -49,13 +48,13 @@ import error.RError;
 
 public class StatementParser extends BaseParser {
 
-  public StatementParser(Scanner scanner) {
+  public StatementParser(PeekNReader<Token> scanner) {
     super(scanner);
   }
 
   // EBNF block: { ( return | vardeclstmt | assignment | callstmt | ifstmt |
   // whilestmt | casestmt | forstmt ) }
-  protected Block parseBlock() {
+  public Block parseBlock() {
     Block res = new Block(peek().getInfo());
     while (true) {
       switch (peek().getType()) {

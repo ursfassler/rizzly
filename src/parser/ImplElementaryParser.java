@@ -20,7 +20,6 @@ package parser;
 import java.util.ArrayList;
 import java.util.List;
 
-import parser.scanner.Scanner;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
 import ast.ElementInfo;
@@ -37,11 +36,11 @@ import error.ErrorType;
 import error.RError;
 
 public class ImplElementaryParser extends ImplBaseParser {
-  public ImplElementaryParser(Scanner scanner) {
+  public ImplElementaryParser(PeekNReader<Token> scanner) {
     super(scanner);
   }
 
-  public static RawComponent parse(Scanner scanner, String name) {
+  public static RawComponent parse(PeekNReader<Token> scanner, String name) {
     ImplElementaryParser parser = new ImplElementaryParser(scanner);
     return parser.parseImplementationElementary(name);
   }

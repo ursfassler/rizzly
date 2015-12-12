@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.Set;
 
 import parser.expression.ExpressionParser;
-import parser.scanner.Scanner;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
 import util.Pair;
@@ -52,7 +51,7 @@ import error.RError;
 
 public class BaseParser extends Parser {
 
-  public BaseParser(Scanner scanner) {
+  public BaseParser(PeekNReader<Token> scanner) {
     super(scanner);
   }
 

@@ -17,36 +17,30 @@
 
 package parser;
 
-import parser.scanner.Token;
-import parser.scanner.TokenType;
-import ast.data.statement.Block;
+import java.util.LinkedList;
 
-abstract public class ImplBaseParser extends BaseParser {
+public class PeekNReader<T> {
+  final private PeekReader<T> scanner;
+  final private LinkedList<T> tokens = new LinkedList<T>();
 
-  public ImplBaseParser(PeekNReader<Token> scanner) {
-    super(scanner);
+  public PeekNReader(PeekReader<T> scanner) {
+    this.scanner = scanner;
   }
 
-  // EBNF entryCode: "entry" block "end"
-  // TODO move into own class
-  @Deprecated
-  public Block parseEntryCode() {
-    expect(TokenType.ENTRY);
-    Block entry;
-    entry = stmt().parseBlock();
-    expect(TokenType.END);
-    return entry;
+  public T next() {
+    fillQueueTo(1);
+    return tokens.removeFirst();
   }
 
-  // EBNF exitCode: "exit" block "end"
-  // TODO move into own class
-  @Deprecated
-  public Block parseExitCode() {
-    expect(TokenType.EXIT);
-    Block entry;
-    entry = stmt().parseBlock();
-    expect(TokenType.END);
-    return entry;
+  public T peek(int i) {
+    fillQueueTo(i + 1);
+    return tokens.get(i);
+  }
+
+  private void fillQueueTo(int n) {
+    for (int i = tokens.size(); i < n; i++) {
+      tokens.add(scanner.next());
+    }
   }
 
 }
