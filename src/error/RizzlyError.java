@@ -17,8 +17,12 @@
 
 package error;
 
+import ast.ElementInfo;
+
 public interface RizzlyError {
 
   public void err(ErrorType type, String filename, int line, int col, String msg);
+
+  public void err(ErrorType type, ElementInfo info, String msg);
 
 }

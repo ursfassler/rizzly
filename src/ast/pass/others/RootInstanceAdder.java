@@ -31,7 +31,7 @@ public class RootInstanceAdder extends AstPass {
 
   @Override
   public void process(Namespace root, KnowledgeBase kb) {
-    Template rootdecl = (Template) ChildByName.get(root, kb.getOptions().getRootComp(), root.getInfo());
+    Template rootdecl = (Template) ChildByName.staticGet(root, kb.getOptions().getRootComp(), root.getInfo());
     ast.data.component.composition.CompUse rootinst = new CompUse(ElementInfo.NO, "inst", new CompRef(ElementInfo.NO, RefFactory.full(ElementInfo.NO, rootdecl)));
     root.children.add(rootinst);
   }

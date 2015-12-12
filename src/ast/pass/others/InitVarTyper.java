@@ -168,7 +168,7 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
   }
 
   private Ast getChild(NamedValue obj, Ast et) {
-    return Single.force(ChildCollector.select(et, new HasName(obj.name)), obj.getInfo());
+    return Single.staticForce(ChildCollector.select(et, new HasName(obj.name)), obj.getInfo());
   }
 
   @Override

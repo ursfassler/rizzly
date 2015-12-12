@@ -20,7 +20,10 @@ package ast.pass.linker;
 import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.Transition;
 import ast.data.raw.RawHfsm;
+import ast.repository.query.ChildByName;
+import ast.repository.query.Single;
 import ast.repository.query.TypeFilter;
+import error.RError;
 
 /**
  * Links all src/dst states of all transitions in a hfsm implementation.
@@ -32,15 +35,18 @@ import ast.repository.query.TypeFilter;
  *
  */
 public class TransitionStateLinker {
+  final private Single single = new Single(RError.instance());
+  final private ChildByName childByName = new ChildByName(single);
+  final private SubLinker linker = new SubLinker(childByName);
 
-  public static void process(RawHfsm obj) {
+  public void process(RawHfsm obj) {
     visitState(obj.getTopstate());
   }
 
-  private static void visitState(State state) {
+  private void visitState(State state) {
     for (Transition tr : TypeFilter.select(state.item, Transition.class)) {
-      SubLinker.link(tr.src.ref, state);
-      SubLinker.link(tr.dst.ref, state);
+      linker.link(tr.src.ref, state);
+      linker.link(tr.dst.ref, state);
     }
 
     for (State sub : TypeFilter.select(state.item, State.class)) {

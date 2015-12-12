@@ -21,15 +21,30 @@ import ast.Designator;
 import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
+import ast.data.Named;
 import ast.specification.HasName;
 import error.ErrorType;
 import error.RError;
 
 public class ChildByName {
+  final private Single single;
 
-  static public Ast get(Ast root, Designator path, ElementInfo info) {
+  public ChildByName(Single single) {
+    super();
+    this.single = single;
+  }
+
+  public Named get(Named root, Designator path, ElementInfo info) {
     for (String child : path) {
-      root = Single.force(ChildCollector.select(root, new HasName(child)), info);
+      root = (Named) single.force(ChildCollector.select(root, new HasName(child)), info);
+    }
+    return root;
+  }
+
+  @Deprecated
+  static public Ast staticGet(Ast root, Designator path, ElementInfo info) {
+    for (String child : path) {
+      root = Single.staticForce(ChildCollector.select(root, new HasName(child)), info);
     }
     return root;
   }

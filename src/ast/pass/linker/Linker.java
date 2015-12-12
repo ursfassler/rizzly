@@ -65,6 +65,7 @@ public class Linker extends AstPass {
 class LinkerWorker extends DfsTraverser<Void, SymbolTable> {
   final private KnowFile kf;
   final private HashMap<State, SymbolTable> stateNames = new HashMap<State, SymbolTable>();
+  final private TransitionStateLinker transitionStateLinker = new TransitionStateLinker();
 
   public LinkerWorker(KnowledgeBase kb) {
     super();
@@ -180,7 +181,7 @@ class LinkerWorker extends DfsTraverser<Void, SymbolTable> {
   @Override
   protected Void visitRawHfsm(RawHfsm obj, SymbolTable param) {
     param = new SymbolTable(param);
-    TransitionStateLinker.process(obj);
+    transitionStateLinker.process(obj);
 
     param = new SymbolTable(param);
     visitList(obj.getIface(), param);

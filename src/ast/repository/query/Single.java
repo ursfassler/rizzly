@@ -22,20 +22,33 @@ import ast.data.Ast;
 import ast.data.AstList;
 import error.ErrorType;
 import error.RError;
+import error.RizzlyError;
 
 public class Single {
+  final private RizzlyError re;
 
-  static public <T extends Ast> T force(AstList<? extends T> list, ElementInfo info) {
+  public Single(RizzlyError re) {
+    super();
+    this.re = re;
+  }
+
+  public <T extends Ast> T force(AstList<? extends T> list, ElementInfo info) {
     switch (list.size()) {
       case 1:
         return list.get(0);
       case 0:
-        RError.err(ErrorType.Fatal, info, "Item not found");
+        re.err(ErrorType.Fatal, info, "Item not found");
         return null;
       default:
-        RError.err(ErrorType.Fatal, info, "To many items found");
+        re.err(ErrorType.Fatal, info, "To many items found");
         return null;
     }
+  }
+
+  @Deprecated
+  static public <T extends Ast> T staticForce(AstList<? extends T> list, ElementInfo info) {
+    Single single = new Single(RError.instance());
+    return single.force(list, info);
   }
 
   static public <T extends Ast> T find(AstList<? extends T> list) {

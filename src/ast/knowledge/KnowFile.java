@@ -47,7 +47,7 @@ public class KnowFile extends KnowledgeEntry {
   }
 
   public RizzlyFile get(Designator path) {
-    Ast item = ChildByName.get(base.getRoot(), path, base.getRoot().getInfo());
+    Ast item = ChildByName.staticGet(base.getRoot(), path, base.getRoot().getInfo());
     assert (item instanceof RizzlyFile);
     return (RizzlyFile) item;
   }

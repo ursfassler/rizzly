@@ -4,6 +4,35 @@ Feature: declare function variables in Rizzly
   In order to store values for further usage
 
 
+#TODO make variables by default constant
+#TODO use "var" keyword to make variable
+#TODO use constants in functions
+#TODO remove "const" keyword
+#TODO introduce "auto" keyword for automatic type declaration
+
+
+#TODO by default, values are constant
+@fixme
+Scenario: constant definition
+  Given we have a file "testee.rzy" with the content:
+    """
+    Testee = Component
+      inp: slot();
+    
+    elementary
+      inp: slot()
+        a : R{0,100};
+      end
+    end
+
+    """
+
+  When I start rizzly with the file "testee.rzy"
+
+  Then I expect an error code
+  And stderr should contain "testee.rzy:6:5: Error: constant needs initialization"
+
+
 Scenario: variable definition
   Given we have a file "testee.rzy" with the content:
     """

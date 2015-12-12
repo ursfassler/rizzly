@@ -21,7 +21,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ast.Designator;
-import ast.data.Ast;
 import ast.data.Named;
 import ast.data.reference.DummyLinkTarget;
 import ast.data.reference.RefItem;
@@ -30,18 +29,30 @@ import ast.data.reference.Reference;
 import ast.repository.query.ChildByName;
 
 public class SubLinker {
-  public static void link(Reference ref, Ast root) {
+  final private ChildByName childByName;
+
+  public SubLinker(ChildByName childByName) {
+    super();
+    this.childByName = childByName;
+  }
+
+  public void link(Reference ref, Named root) {
 
     if (ref.link instanceof DummyLinkTarget) {
       List<String> targetName = new ArrayList<String>();
 
-      targetName.add(((DummyLinkTarget) ref.link).name);
+      String rootName = ((DummyLinkTarget) ref.link).name;
+
+      if (!rootName.equals("self")) {
+        targetName.add(rootName);
+      }
+
       for (RefItem itr : ref.offset) {
         String name = ((RefName) itr).name;
         targetName.add(name);
       }
 
-      Named target = (Named) ChildByName.get(root, new Designator(targetName), ref.getInfo());
+      Named target = childByName.get(root, new Designator(targetName), ref.getInfo());
 
       ref.link = target;
       ref.offset.clear();

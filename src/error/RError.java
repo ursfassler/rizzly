@@ -37,6 +37,11 @@ public class RError {
       public void err(ErrorType type, String filename, int line, int col, String msg) {
         RError.err(type, filename, line, col, msg);
       }
+
+      @Override
+      public void err(ErrorType type, ElementInfo info, String msg) {
+        err(type, info.filename, info.line, info.row, msg);
+      }
     };
   }
 

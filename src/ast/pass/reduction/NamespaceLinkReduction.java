@@ -75,7 +75,7 @@ class NamespaceLinkReductionWorker extends DfsTraverser<Void, Void> {
         RError.err(ErrorType.Error, obj.getInfo(), "Expected named offset, got: " + next.getClass().getCanonicalName());
       }
       ast.data.reference.RefName name = (ast.data.reference.RefName) next;
-      item = Single.force(ChildCollector.select(item, new HasName(name.name)), item.getInfo());
+      item = Single.staticForce(ChildCollector.select(item, new HasName(name.name)), item.getInfo());
       assert (item != null); // type checker should find it?
     }
     obj.link = (Named) item;

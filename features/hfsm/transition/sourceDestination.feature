@@ -137,3 +137,67 @@ Scenario: A transition can not come from an outer state
   Then I expect an error code
   And stderr should contain "testee.rzy:8:5: Fatal: Item not found"
 
+
+Scenario: A transition can go to the enclosing state
+  Given we have a file "testee.rzy" with the content:
+    """
+    Testee = Component
+      tick: slot();
+      tock: signal();
+
+    hfsm(A)
+      A : state
+        entry
+          tock();
+        end
+      end
+      
+      A to self by tick();
+    end
+
+    """
+
+  When I succesfully compile "testee.rzy" with rizzly
+  And fully compile everything
+
+  When I initialize it
+  Then I expect an event tock()
+  Then I expect no more events
+
+  When I send an event tick()
+  Then I expect an event tock()
+  And I expect no more events
+
+
+Scenario: A transition can come from the enclosing state
+  Given we have a file "testee.rzy" with the content:
+    """
+    Testee = Component
+      tick: slot();
+      tock: signal();
+
+    hfsm(A)
+      A : state;
+      
+      B : state
+        entry
+          tock();
+        end
+      end
+      
+      self to B by tick();
+    end
+
+    """
+
+  When I succesfully compile "testee.rzy" with rizzly
+  And fully compile everything
+
+  When I initialize it
+  Then I expect no more events
+
+  When I send an event tick()
+  Then I expect an event tock()
+  And I expect no more events
+
+

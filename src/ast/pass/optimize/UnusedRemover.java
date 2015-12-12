@@ -44,7 +44,7 @@ public class UnusedRemover extends AstPass {
 
   @Override
   public void process(Namespace root, KnowledgeBase kb) {
-    CompUse rootcomp = Single.force(TypeFilter.select(root.children, CompUse.class), root.getInfo());
+    CompUse rootcomp = Single.staticForce(TypeFilter.select(root.children, CompUse.class), root.getInfo());
     SimpleGraph<Ast> g = DepGraph.build(rootcomp);
 
     Set<Ast> keep = g.vertexSet();
