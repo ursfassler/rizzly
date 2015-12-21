@@ -21,7 +21,6 @@ def fully_compile(context):
     compileAll()
     context.testee = createInstance(context.tmpdir + '/output/' + 'libinst.so')
 
-
 @when('I initialize it')
 def initialize(context):
     context.testee.inst__construct()
@@ -50,9 +49,17 @@ def send_event(context, value):
 def send_event(context, value1, value2):
     context.testee.inst_inp(value1, value2)
 
+@when('I send an event inp({value1:d}, {value2:d})')
+def send_event(context, value1, value2):
+    context.testee.inst_inp(value1, value2)
+
 @when('I send an event inp({value1:Bool}, {value2:Bool}, {value3:Bool})')
 def send_event(context, value1, value2, value3):
     context.testee.inst_inp(value1, value2, value3)
+
+@when(u'I send an event inp([{arr0:d}, {arr1:d}, {arr2:d}, {arr3:d}])')
+def step_impl(context, arr0, arr1, arr2, arr3):
+    context.testee.inst_inp([arr0, arr1, arr2, arr3])
 
 @when('I send an event set({value1:d}, {value2:d})')
 def set_event(context, value1, value2):
@@ -64,6 +71,10 @@ def expect_event_0(context, expectedEvent):
     expectedEvent = 'inst_' + expectedEvent
     event = context.testee._next()
     assert event == expectedEvent, 'expected: ' + expectedEvent + '; got: ' + event
+
+@then('I expect the request get() = {result:d}')
+def step_impl(context, result):
+    assert context.testee.inst_get() == result
 
 @then('I expect the request get({value1:d}) = {result:d}')
 def step_impl(context, value1, result):

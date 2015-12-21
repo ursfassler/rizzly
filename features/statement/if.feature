@@ -190,4 +190,37 @@ Scenario: a if statement can have an ef branche and an else
   When I send an event inp(True, True)
   Then I expect an event branch1()
   Then I expect no more events
-  
+
+
+Scenario: the predicate of the if can be an arbitrary expression that evaluates to a Boolean
+  Given we have a file "testee.rzy" with the content:
+    """
+    Testee = Component
+      inp: slot(a, b: R{0,100});
+      branch1 : signal();
+      branch2 : signal();
+    
+    elementary
+      inp: slot(a, b: R{0,100})
+        if a > b then
+          branch1();
+        else
+          branch2();
+        end
+      end
+    end
+
+    """
+
+  When I succesfully compile "testee.rzy" with rizzly
+  And fully compile everything
+  And I initialize it
+
+  When I send an event inp(10, 10)
+  Then I expect an event branch2()
+  And I expect no more events
+
+  When I send an event inp(11, 10)
+  Then I expect an event branch1()
+  And I expect no more events
+

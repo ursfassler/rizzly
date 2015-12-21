@@ -84,21 +84,6 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
-  public void stateVar() {
-    compile("stateVar", TestSteps.EXECUTE, false, false);
-  }
-
-  @Test
-  public void stateVar1() {
-    compile("stateVar1", TestSteps.EXECUTE, false, false);
-  }
-
-  @Test
-  public void stateVar2() {
-    compile("stateVar2", TestSteps.EXECUTE, false, false);
-  }
-
-  @Test
   public void rec() {
     compile("rec", TestSteps.EXECUTE, false, false);
   }
@@ -150,24 +135,8 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
-  public void composition2() {
-    compile("composition2", TestSteps.COMPILE_TO_LIB, false, false);
-  }
-
-  @Test
-  @Ignore
-  public void composition1() {
-    compile("composition1", TestSteps.EXECUTE, true, false);
-  }
-
-  @Test
   public void typefunc() {
     compile("typefunc", TestSteps.COMPILE_TO_LIB, false, false);
-  }
-
-  @Test
-  public void elemInit() {
-    compile("elemInit", TestSteps.EXECUTE, false, false);
   }
 
   @Test
@@ -211,43 +180,6 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
-  public void constInit() {
-    compile("constInit", TestSteps.COMPILE_TO_C, false, false);
-  }
-
-  @Test
-  public void constfunc() {
-    compile("constfunc", TestSteps.COMPILE_TO_C, false, false);
-  }
-
-  @Test
-  public void constInit2() {
-    compile("constInit2", TestSteps.COMPILE_TO_C, false, false);
-  }
-
-  @Test
-  @Ignore
-  public void constInit3() {
-    compile("constInit3", TestSteps.EXECUTE, false, false);
-  }
-
-  @Test
-  public void constInit4() {
-    compile("constInit4", TestSteps.EXECUTE, false, false);
-  }
-
-  @Test
-  public void constInit5() {
-    compile("constInit5", TestSteps.COMPILE_TO_LIB, false, false);
-  }
-
-  @Test
-  @Ignore
-  public void constInit6() {
-    compile("constInit6", TestSteps.COMPILE_TO_LIB, false, false);
-  }
-
-  @Test
   public void alarmController() {
     compile("alarmController", TestSteps.COMPILE_TO_LIB, false, false);
   }
@@ -260,16 +192,6 @@ public class CasualTest extends BaseTest {
   @Test
   public void enumTest() {
     compile("enumTest", TestSteps.COMPILE_TO_FUN, false, false);
-  }
-
-  @Test
-  public void elemComp() {
-    compile("elemComp", TestSteps.EXECUTE, false, false);
-  }
-
-  @Test
-  public void transition1() {
-    compile("transition1", TestSteps.EXECUTE, false, false);
   }
 
   @Test
@@ -310,16 +232,6 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
-  public void constdef() {
-    compile("constdef", TestSteps.COMPILE_TO_C, false, false);
-  }
-
-  @Test
-  public void constdef2() {
-    compile("constdef2", TestSteps.COMPILE_TO_C, false, false);
-  }
-
-  @Test
   public void extConst() {
     compile("extConst", TestSteps.COMPILE_TO_C, false, false);
   }
@@ -333,36 +245,6 @@ public class CasualTest extends BaseTest {
   @Ignore
   public void genericUse() {
     compile("genericUse", TestSteps.COMPILE_TO_C, false, true);
-  }
-
-  @Test
-  public void elementary1() {
-    compile("elementary1", TestSteps.COMPILE_TO_LIB, false, false);
-  }
-
-  @Test
-  public void elementary2() {
-    compile("elementary2", TestSteps.COMPILE_TESTCASE, false, false);
-  }
-
-  @Test
-  public void elementary3() {
-    compile("elementary3", TestSteps.COMPILE_TESTCASE, false, false);
-  }
-
-  @Test
-  public void elementary4() {
-    compile("elementary4", TestSteps.COMPILE_TESTCASE, false, false);
-  }
-
-  @Test
-  public void bitred() {
-    compile("bitred", TestSteps.COMPILE_TO_LIB, false, false);
-  }
-
-  @Test
-  public void compositionQuery() {
-    compile("compositionQuery", TestSteps.EXECUTE, false, true);
   }
 
   @Test
@@ -381,11 +263,6 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
-  public void iffunc() {
-    compile("iffunc", TestSteps.EXECUTE, false, true);
-  }
-
-  @Test
   public void convert1() {
     compile("convert1", TestSteps.EXECUTE, false, true);
   }
@@ -398,21 +275,6 @@ public class CasualTest extends BaseTest {
   @Test
   public void linking() {
     compile("linking", TestSteps.COMPILE_TO_LIB, false, false);
-  }
-
-  @Test
-  public void array1() {
-    compile("array1", TestSteps.COMPILE_TO_LIB, false, false);
-  }
-
-  @Test
-  public void bool_Bool() {
-    compile("bool", TestSteps.COMPILE_TO_LIB, false, false);
-  }
-
-  @Test
-  public void locvar() {
-    compile("locvar", TestSteps.COMPILE_TO_LIB, false, true);
   }
 
 }

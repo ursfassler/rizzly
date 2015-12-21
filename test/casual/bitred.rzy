@@ -1,8 +1,0 @@
-Bitred = Component
-  ind : slot( x: R{0,10} );
-
-hfsm(A)
-  A : state;
-  A to A by ind( x: R{0,10} ) if x > 0;
-end
-

@@ -152,7 +152,7 @@ Scenario: Copy array from state
   Then I expect no error
 
 
-Scenario: Copy variable array
+Scenario: Copy array variable
   Given we have a file "copy2.rzy" with the content:
     """
     Copy2 = Component
@@ -167,6 +167,27 @@ Scenario: Copy variable array
     """
 
   When I start rizzly with the file "copy2.rzy"
+  
+  Then I expect no error
+
+
+#TODO implement this
+@fixme
+Scenario: Copy an array to one with larger elements
+  Given we have a file "testee.rzy" with the content:
+    """
+    Testee = Component
+    elementary
+      smaller : Array{2,R{0,200}} = [1, 2];
+      
+      entry
+        larger  : Array{2,R{0,1000}} = smaller;
+      end
+    end
+
+    """
+
+  When I start rizzly with the file "testee.rzy"
   
   Then I expect no error
 
