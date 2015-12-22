@@ -1,9 +1,0 @@
-Convert1 = Component
-  ind : response( x: R{0,20} ):R{0,10};
-  
-elementary
-  ind : response( x: R{0,20} ):R{0,10}
-    return R{0,10}( x );
-  end
-end
-

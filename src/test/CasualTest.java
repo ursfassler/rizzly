@@ -74,11 +74,6 @@ public class CasualTest extends BaseTest {
   }
 
   @Test
-  public void ctfeCast() {
-    compile("ctfeCast", TestSteps.COMPILE_TO_C, false, false);
-  }
-
-  @Test
   public void subrespLink() {
     compile("subrespLink", TestSteps.COMPILE_TO_C, false, false);
   }
@@ -106,11 +101,6 @@ public class CasualTest extends BaseTest {
   @Test
   public void rec4() {
     compile("rec4", TestSteps.EXECUTE, false, false);
-  }
-
-  @Test
-  public void range() {
-    compile("range", TestSteps.EXECUTE, false, false);
   }
 
   @Test
@@ -142,11 +132,6 @@ public class CasualTest extends BaseTest {
   @Test
   public void meta() {
     compile("meta", TestSteps.COMPILE_TO_AST, false, false);
-  }
-
-  @Test
-  public void varInit() {
-    compile("varInit", TestSteps.COMPILE_TO_C, false, false);
   }
 
   @Test
@@ -250,21 +235,6 @@ public class CasualTest extends BaseTest {
   @Test
   public void param() {
     compile("param", TestSteps.COMPILE_TO_C, false, false);
-  }
-
-  @Test
-  public void range2() {
-    compile("range2", TestSteps.COMPILE_TO_C, false, true);
-  }
-
-  @Test
-  public void range3() {
-    compile("range3", TestSteps.COMPILE_TO_C, false, true);
-  }
-
-  @Test
-  public void convert1() {
-    compile("convert1", TestSteps.EXECUTE, false, true);
   }
 
   @Test

@@ -39,3 +39,23 @@ Scenario Outline: add 2 values
     |   -9 |    -5 |    -14 |
     |    6 |    -5 |      1 |
 
+
+Scenario: the resulting type can hold the result
+  Given we have a file "testee.rzy" with the content:
+    """
+    Testee = Component
+      op : response(left, right: R{-10,10}):R{-10,10};
+    
+    elementary
+      op : response(left, right: R{-10,10}):R{-10,10}
+        return left + right;
+      end
+    end
+
+    """
+
+  When I start rizzly with the file "testee.rzy"
+
+  Then I expect an error code
+  And stderr should contain "testee.rzy:6:5: Error: Data type to big or incompatible to return: R{-10,10} := R{-20,20}"
+
