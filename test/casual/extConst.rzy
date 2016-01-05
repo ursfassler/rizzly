@@ -1,9 +1,0 @@
-
-import iface.constdef;
-import comp.constuse;
-
-ExtConst = Component
-composition
-  comp : ConstUse;
-end
-

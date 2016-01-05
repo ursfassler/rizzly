@@ -69,26 +69,7 @@ Scenario: It is not allowed to declare a variable in a unit
 
 
 #TODO remove component
-Scenario: declare a function in a unit
-  Given we have a file "testee.rzy" with the content:
-    """
-    tuwas = function(a: R{0,100}):R{0,100}
-      return a;
-    end
-
-    Testee = Component
-    elementary
-    end
-
-    """
-
-  When I start rizzly with the file "testee.rzy"
-
-  Then I expect no error
-
-
-#TODO remove component
-Scenario: it is not allowed to declare a procedure in a unit (because it does not make nay sense)
+Scenario: it is not allowed to declare a procedure in a unit (because it does not make any sense)
   Given we have a file "testee.rzy" with the content:
     """
     tuwas = procedure(a: R{0,100})

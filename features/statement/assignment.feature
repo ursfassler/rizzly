@@ -31,7 +31,7 @@ Scenario: assign a value
 
 #TODO implement
 @fixme
-Scenario: assign a tuple
+Scenario: assign a tuple to multiple variables
   Given we have a file "testee.rzy" with the content:
     """
     Testee = Component
@@ -53,5 +53,33 @@ Scenario: assign a tuple
 
   When I send an event set(91, 76)
   Then I expect an event out(76, 91)
+  And I expect no more events
+
+
+#TODO implement
+@fixme
+Scenario: in a multi assignment, values can be ignored
+  Given we have a file "testee.rzy" with the content:
+    """
+    Testee = Component
+      set: slot(a, b: R{0,100});
+      out: signal(x: R{0,100});
+    
+    elementary
+      set: slot(a, b: R{0,100})
+        c : R{0,10};
+        c, _ := (a, b);
+        out(c);
+      end
+    end
+
+    """
+
+  When I succesfully compile "testee.rzy" with rizzly
+  And fully compile everything
+  And I initialize it
+
+  When I send an event set(91, 76)
+  Then I expect an event out(91)
   And I expect no more events
 

@@ -24,6 +24,7 @@ import ast.data.type.TypeRef;
 public class TupleType extends BaseType {
   final public AstList<TypeRef> types;
 
+  // TODO create name from types
   public TupleType(ElementInfo info, String name, AstList<TypeRef> types) {
     super(info, name);
     this.types = types;

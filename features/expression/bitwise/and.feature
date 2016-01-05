@@ -63,6 +63,25 @@ Scenario: return type has to be big enough to contain the result
   And stderr should contain "bitand.rzy:6:5: Error: Data type to big or incompatible to return: R{0,19} := R{0,20}"
 
 
+Scenario: return type is reduced according to the operation and argument types
+  Given we have a file "bitand.rzy" with the content:
+    """
+    Bitand = Component
+      op : response(left: R{0,255}; right: R{0,7}):R{0,7};
+    
+    elementary
+      op : response(left: R{0,255}; right: R{0,7}):R{0,7}
+        return left and right;
+      end
+    end
+
+    """
+
+  When I start rizzly with the file "bitand.rzy"
+  
+  Then I expect no error
+
+
 Scenario Outline: calculate the bitwise and value of 2 numbers
   Given we have a file "bitand.rzy" with the content:
     """

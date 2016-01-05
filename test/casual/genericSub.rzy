@@ -1,5 +1,0 @@
-GenericSub{T:Type{Any}} = Component
-elementary
-  sub: T = default{T}();
-end
-

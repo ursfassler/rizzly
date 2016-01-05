@@ -59,3 +59,25 @@ Scenario Outline: check if the left value is less or equal than the right value
     |    3 |    16 |   True |
     |   -4 |    -4 |   True |
 
+
+#TODO fix error message
+@fixme
+Scenario: tuples have no less or equal relation
+  Given we have a file "testee.rzy" with the content:
+    """
+    Testee = Component
+      op : response(left1, left2, right1, right2: R{0,10}):Boolean;
+    
+    elementary
+      op : response(left1, left2, right1, right2: R{0,10}):Boolean
+        return (left1, left2) <= (right1, right2);
+      end
+    end
+
+    """
+
+  When I start rizzly with the file "testee.rzy"
+  
+  Then I expect an error code
+  And stderr should contain "testee.rzy:6:12: Fatal: Expected range type, got tuple"
+
