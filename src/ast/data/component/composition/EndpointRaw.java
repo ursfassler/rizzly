@@ -20,6 +20,7 @@ package ast.data.component.composition;
 import ast.ElementInfo;
 import ast.data.function.Function;
 import ast.data.reference.Reference;
+import ast.visitor.Visitor;
 
 final public class EndpointRaw extends Endpoint {
   final public Reference ref;
@@ -33,4 +34,10 @@ final public class EndpointRaw extends Endpoint {
   public Function getFunc() {
     return (Function) ref.getTarget();
   }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
+
 }

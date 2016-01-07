@@ -28,11 +28,11 @@ import error.ErrorType;
 import error.RError;
 
 public class KnowPath extends KnowledgeEntry {
-  private ast.knowledge.KnowledgeBase base;
+  private KnowledgeBase base;
   private Map<Ast, Designator> cache = new HashMap<Ast, Designator>();
 
   @Override
-  public void init(ast.knowledge.KnowledgeBase base) {
+  public void init(KnowledgeBase base) {
     this.base = base;
   }
 

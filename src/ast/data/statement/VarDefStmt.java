@@ -19,8 +19,9 @@ package ast.data.statement;
 
 import ast.ElementInfo;
 import ast.data.variable.FuncVariable;
+import ast.visitor.Visitor;
 
-public class VarDefStmt extends Statement {
+final public class VarDefStmt extends Statement {
   final public FuncVariable variable;
 
   public VarDefStmt(ElementInfo info, FuncVariable variable) {
@@ -32,4 +33,10 @@ public class VarDefStmt extends Statement {
   public String toString() {
     return variable.toString();
   }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
+
 }

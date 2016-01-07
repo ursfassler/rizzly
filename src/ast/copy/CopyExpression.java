@@ -30,16 +30,16 @@ import ast.data.expression.binop.BitXor;
 import ast.data.expression.binop.Div;
 import ast.data.expression.binop.Equal;
 import ast.data.expression.binop.Greater;
-import ast.data.expression.binop.Greaterequal;
+import ast.data.expression.binop.GreaterEqual;
 import ast.data.expression.binop.Is;
 import ast.data.expression.binop.Less;
-import ast.data.expression.binop.Lessequal;
+import ast.data.expression.binop.LessEqual;
 import ast.data.expression.binop.LogicAnd;
 import ast.data.expression.binop.LogicOr;
 import ast.data.expression.binop.Minus;
 import ast.data.expression.binop.Mod;
 import ast.data.expression.binop.Mul;
-import ast.data.expression.binop.Notequal;
+import ast.data.expression.binop.NotEqual;
 import ast.data.expression.binop.Or;
 import ast.data.expression.binop.Plus;
 import ast.data.expression.binop.Shl;
@@ -166,13 +166,13 @@ public class CopyExpression extends NullDispatcher<Expression, Void> {
   }
 
   @Override
-  protected Expression visitGreaterequal(Greaterequal obj, Void param) {
-    return new Greaterequal(obj.getInfo(), cast.copy(obj.left), cast.copy(obj.right));
+  protected Expression visitGreaterequal(GreaterEqual obj, Void param) {
+    return new GreaterEqual(obj.getInfo(), cast.copy(obj.left), cast.copy(obj.right));
   }
 
   @Override
-  protected Expression visitLessequal(Lessequal obj, Void param) {
-    return new Lessequal(obj.getInfo(), cast.copy(obj.left), cast.copy(obj.right));
+  protected Expression visitLessequal(LessEqual obj, Void param) {
+    return new LessEqual(obj.getInfo(), cast.copy(obj.left), cast.copy(obj.right));
   }
 
   @Override
@@ -191,8 +191,8 @@ public class CopyExpression extends NullDispatcher<Expression, Void> {
   }
 
   @Override
-  protected Expression visitNotequal(Notequal obj, Void param) {
-    return new Notequal(obj.getInfo(), cast.copy(obj.left), cast.copy(obj.right));
+  protected Expression visitNotequal(NotEqual obj, Void param) {
+    return new NotEqual(obj.getInfo(), cast.copy(obj.left), cast.copy(obj.right));
   }
 
   @Override

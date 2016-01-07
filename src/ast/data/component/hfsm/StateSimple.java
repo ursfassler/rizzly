@@ -19,11 +19,16 @@ package ast.data.component.hfsm;
 
 import ast.ElementInfo;
 import ast.data.function.FuncRef;
+import ast.visitor.Visitor;
 
-public class StateSimple extends State {
+final public class StateSimple extends State {
 
   public StateSimple(ElementInfo info, String name, FuncRef entryFunc, FuncRef exitFunc) {
     super(info, name, entryFunc, exitFunc);
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

@@ -20,11 +20,17 @@ package ast.data.component.composition;
 import ast.ElementInfo;
 import ast.data.reference.Reference;
 import ast.data.reference.TypedRef;
+import ast.visitor.Visitor;
 
 public class CompUseRef extends TypedRef<CompUse> {
 
   public CompUseRef(ElementInfo info, Reference ref) {
     super(info, ref);
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
 }

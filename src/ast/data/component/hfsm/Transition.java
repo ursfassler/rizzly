@@ -24,8 +24,9 @@ import ast.data.expression.Expression;
 import ast.data.function.FuncRef;
 import ast.data.statement.Block;
 import ast.data.variable.FuncVariable;
+import ast.visitor.Visitor;
 
-public class Transition extends AstBase implements StateContent {
+final public class Transition extends AstBase implements StateContent {
   public StateRef src;
   public StateRef dst;
   public FuncRef eventFunc;
@@ -48,4 +49,8 @@ public class Transition extends AstBase implements StateContent {
     return src + " -> " + dst + " by " + eventFunc + param + " if " + guard;
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

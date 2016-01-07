@@ -19,10 +19,15 @@ package ast.data.type.base;
 
 import ast.ElementInfo;
 import ast.data.Named;
+import ast.visitor.Visitor;
 
-public class EnumElement extends Named {
+final public class EnumElement extends Named {
   public EnumElement(ElementInfo info, String name) {
     super(info, name);
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

@@ -20,8 +20,9 @@ package ast.data.statement;
 import ast.ElementInfo;
 import ast.data.AstBase;
 import ast.data.AstList;
+import ast.visitor.Visitor;
 
-public class CaseOpt extends AstBase {
+final public class CaseOpt extends AstBase {
   final public AstList<CaseOptEntry> value;
   public Block code;
 
@@ -36,4 +37,8 @@ public class CaseOpt extends AstBase {
     return value.toString();
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

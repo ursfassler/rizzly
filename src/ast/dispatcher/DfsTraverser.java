@@ -45,16 +45,16 @@ import ast.data.expression.binop.BitXor;
 import ast.data.expression.binop.Div;
 import ast.data.expression.binop.Equal;
 import ast.data.expression.binop.Greater;
-import ast.data.expression.binop.Greaterequal;
+import ast.data.expression.binop.GreaterEqual;
 import ast.data.expression.binop.Is;
 import ast.data.expression.binop.Less;
-import ast.data.expression.binop.Lessequal;
+import ast.data.expression.binop.LessEqual;
 import ast.data.expression.binop.LogicAnd;
 import ast.data.expression.binop.LogicOr;
 import ast.data.expression.binop.Minus;
 import ast.data.expression.binop.Mod;
 import ast.data.expression.binop.Mul;
-import ast.data.expression.binop.Notequal;
+import ast.data.expression.binop.NotEqual;
 import ast.data.expression.binop.Or;
 import ast.data.expression.binop.Plus;
 import ast.data.expression.binop.Shl;
@@ -535,7 +535,7 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
   }
 
   @Override
-  protected R visitGreaterequal(Greaterequal obj, P param) {
+  protected R visitGreaterequal(GreaterEqual obj, P param) {
     visit(obj.left, param);
     visit(obj.right, param);
     return null;
@@ -556,7 +556,7 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
   }
 
   @Override
-  protected R visitLessequal(Lessequal obj, P param) {
+  protected R visitLessequal(LessEqual obj, P param) {
     visit(obj.left, param);
     visit(obj.right, param);
     return null;
@@ -602,7 +602,7 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
   }
 
   @Override
-  protected R visitNotequal(Notequal obj, P param) {
+  protected R visitNotequal(NotEqual obj, P param) {
     visit(obj.left, param);
     visit(obj.right, param);
     return null;

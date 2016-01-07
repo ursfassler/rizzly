@@ -19,11 +19,16 @@ package ast.data.variable;
 
 import ast.ElementInfo;
 import ast.data.type.TypeRef;
+import ast.visitor.Visitor;
 
-public class FuncVariable extends Variable {
+final public class FuncVariable extends Variable {
 
   public FuncVariable(ElementInfo info, String name, TypeRef type) {
     super(info, name, type);
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

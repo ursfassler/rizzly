@@ -19,8 +19,9 @@ package ast.data.raw;
 
 import ast.ElementInfo;
 import ast.data.component.hfsm.StateComposite;
+import ast.visitor.Visitor;
 
-public class RawHfsm extends RawComponent {
+final public class RawHfsm extends RawComponent {
   private StateComposite topstate;
 
   public RawHfsm(ElementInfo info, String name, StateComposite topState) {
@@ -36,4 +37,8 @@ public class RawHfsm extends RawComponent {
     this.topstate = topstate;
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

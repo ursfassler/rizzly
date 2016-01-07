@@ -19,11 +19,17 @@ package ast.data.type.special;
 
 import ast.ElementInfo;
 import ast.data.type.base.BaseType;
+import ast.visitor.Visitor;
 
-public class VoidType extends BaseType {
+final public class VoidType extends BaseType {
   final static public String NAME = "Void";
 
   public VoidType() {
     super(ElementInfo.NO, NAME);
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 }

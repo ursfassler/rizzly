@@ -19,7 +19,7 @@ package ast.data;
 
 import ast.ElementInfo;
 
-public class Named extends AstBase {
+abstract public class Named extends AstBase {
   public String name;
 
   public Named(ElementInfo info, String name) {
@@ -31,4 +31,5 @@ public class Named extends AstBase {
   public String toString() {
     return name;
   }
+
 }

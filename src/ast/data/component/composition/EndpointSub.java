@@ -21,6 +21,7 @@ import ast.ElementInfo;
 import ast.data.component.Component;
 import ast.data.function.Function;
 import ast.repository.query.NameFilter;
+import ast.visitor.Visitor;
 
 final public class EndpointSub extends Endpoint {
   final public CompUseRef component;
@@ -41,6 +42,11 @@ final public class EndpointSub extends Endpoint {
   @Override
   public String toString() {
     return component.getTarget().name + "." + function;
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
 }

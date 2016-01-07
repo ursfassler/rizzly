@@ -23,11 +23,16 @@ import ast.data.function.InterfaceFunction;
 import ast.data.function.ret.FuncReturn;
 import ast.data.statement.Block;
 import ast.data.variable.FuncVariable;
+import ast.visitor.Visitor;
 
-public class FuncSlot extends InterfaceFunction {
+final public class FuncSlot extends InterfaceFunction {
 
   public FuncSlot(ElementInfo info, String name, AstList<FuncVariable> param, FuncReturn ret, Block body) {
     super(info, name, param, ret, body);
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

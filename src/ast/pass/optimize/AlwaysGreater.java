@@ -5,10 +5,10 @@ import ast.data.Range;
 import ast.data.expression.Expression;
 import ast.data.expression.binop.Equal;
 import ast.data.expression.binop.Greater;
-import ast.data.expression.binop.Greaterequal;
+import ast.data.expression.binop.GreaterEqual;
 import ast.data.expression.binop.Less;
-import ast.data.expression.binop.Lessequal;
-import ast.data.expression.binop.Notequal;
+import ast.data.expression.binop.LessEqual;
+import ast.data.expression.binop.NotEqual;
 import ast.data.expression.value.BoolValue;
 import ast.data.type.Type;
 import ast.data.type.base.RangeType;
@@ -51,7 +51,7 @@ class AlwaysGreaterWorker extends ExprReplacer<Void> {
   }
 
   @Override
-  protected Expression visitNotequal(Notequal obj, Void param) {
+  protected Expression visitNotequal(NotEqual obj, Void param) {
     // TODO implement
     return obj;
   }
@@ -63,7 +63,7 @@ class AlwaysGreaterWorker extends ExprReplacer<Void> {
   }
 
   @Override
-  protected Expression visitGreaterequal(Greaterequal obj, Void param) {
+  protected Expression visitGreaterequal(GreaterEqual obj, Void param) {
     // TODO implement
     return obj;
   }
@@ -75,7 +75,7 @@ class AlwaysGreaterWorker extends ExprReplacer<Void> {
   }
 
   @Override
-  protected Expression visitLessequal(Lessequal obj, Void param) {
+  protected Expression visitLessequal(LessEqual obj, Void param) {
     Range lr = getRange(obj.left);
     Range rr = getRange(obj.right);
 

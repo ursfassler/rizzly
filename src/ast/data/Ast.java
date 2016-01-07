@@ -18,11 +18,13 @@
 package ast.data;
 
 import ast.ElementInfo;
+import ast.visitor.VisitorAcceptor;
 
 /**
  *
  * @author urs
  */
-public interface Ast {
+public interface Ast extends VisitorAcceptor {
   public ElementInfo getInfo();
+
 }

@@ -19,13 +19,19 @@ package ast.data.component.hfsm;
 
 import ast.ElementInfo;
 import ast.data.function.FuncRef;
+import ast.visitor.Visitor;
 
-public class StateComposite extends State {
+final public class StateComposite extends State {
   public StateRef initial;
 
   public StateComposite(ElementInfo info, String name, FuncRef entryFunc, FuncRef exitFunc, StateRef initial) {
     super(info, name, entryFunc, exitFunc);
     this.initial = initial;
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
 }

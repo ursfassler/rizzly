@@ -27,7 +27,7 @@ import ast.data.expression.Expression;
 import ast.data.expression.RefExp;
 import ast.data.expression.binop.Equal;
 import ast.data.expression.binop.LogicAnd;
-import ast.data.expression.binop.Notequal;
+import ast.data.expression.binop.NotEqual;
 import ast.data.expression.unop.LogicNot;
 import ast.data.expression.value.BoolValue;
 import ast.data.expression.value.TupleValue;
@@ -91,8 +91,8 @@ class CompareReplacerWorker extends ExprReplacer<Void> {
   }
 
   @Override
-  protected Expression visitNotequal(Notequal obj, Void param) {
-    obj = (Notequal) super.visitNotequal(obj, param);
+  protected Expression visitNotequal(NotEqual obj, Void param) {
+    obj = (NotEqual) super.visitNotequal(obj, param);
     return new LogicNot(obj.getInfo(), MakeCompareFunction.makeCmpExpr(obj.left, obj.right, kb));
   }
 

@@ -20,6 +20,7 @@ package ast.data.reference;
 import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.template.ActualTemplateArgument;
+import ast.visitor.Visitor;
 
 final public class RefTemplCall extends RefItem {
   final public AstList<ActualTemplateArgument> actualParameter;
@@ -46,4 +47,8 @@ final public class RefTemplCall extends RefItem {
     return ret;
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

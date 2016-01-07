@@ -22,8 +22,9 @@ import ast.data.Ast;
 import ast.data.AstBase;
 import ast.data.AstList;
 import ast.data.Named;
+import ast.visitor.Visitor;
 
-public class Reference extends AstBase {
+final public class Reference extends AstBase {
   public Named link;
   public final AstList<RefItem> offset;
 
@@ -47,4 +48,8 @@ public class Reference extends AstBase {
     return ret;
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

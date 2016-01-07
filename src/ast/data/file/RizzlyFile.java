@@ -25,11 +25,8 @@ import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
+import ast.visitor.Visitor;
 
-/**
- *
- * @author urs
- */
 final public class RizzlyFile extends Named {
   final public List<Designator> imports = new ArrayList<Designator>();
   final public AstList<Ast> objects = new AstList<Ast>();
@@ -38,4 +35,8 @@ final public class RizzlyFile extends Named {
     super(info, name);
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

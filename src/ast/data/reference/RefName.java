@@ -18,8 +18,9 @@
 package ast.data.reference;
 
 import ast.ElementInfo;
+import ast.visitor.Visitor;
 
-public class RefName extends RefItem {
+final public class RefName extends RefItem {
   public String name;
 
   public RefName(ElementInfo info, String name) {
@@ -32,4 +33,8 @@ public class RefName extends RefItem {
     return "." + name;
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

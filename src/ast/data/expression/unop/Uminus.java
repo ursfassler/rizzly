@@ -19,6 +19,7 @@ package ast.data.expression.unop;
 
 import ast.ElementInfo;
 import ast.data.expression.Expression;
+import ast.visitor.Visitor;
 
 /**
  *
@@ -35,4 +36,8 @@ final public class Uminus extends UnaryExp {
     return "-";
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

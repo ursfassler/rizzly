@@ -21,8 +21,9 @@ import java.math.BigInteger;
 
 import ast.ElementInfo;
 import ast.data.type.TypeRef;
+import ast.visitor.Visitor;
 
-public class ArrayType extends BaseType {
+final public class ArrayType extends BaseType {
   final public TypeRef type;
   final public BigInteger size;
 
@@ -32,4 +33,8 @@ public class ArrayType extends BaseType {
     this.size = size;
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

@@ -21,8 +21,9 @@ import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.expression.Expression;
 import ast.data.variable.FuncVariable;
+import ast.visitor.Visitor;
 
-public class VarDefInitStmt extends Statement {
+final public class VarDefInitStmt extends Statement {
   final public AstList<FuncVariable> variable;
   public Expression initial;
 
@@ -36,5 +37,10 @@ public class VarDefInitStmt extends Statement {
   @Override
   public String toString() {
     return variable.toString() + " := " + initial;
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 }

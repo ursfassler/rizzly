@@ -19,6 +19,7 @@ package ast.data.expression.value;
 
 import ast.ElementInfo;
 import ast.data.type.TypeRef;
+import ast.visitor.Visitor;
 
 public class UnionValue extends ValueExpr {
   public NamedValue tagValue;
@@ -30,5 +31,10 @@ public class UnionValue extends ValueExpr {
     this.tagValue = tagValue;
     this.contentValue = contentValue;
     this.type = type;
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 }

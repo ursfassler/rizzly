@@ -23,8 +23,9 @@ import java.util.Set;
 import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.type.Type;
+import ast.visitor.Visitor;
 
-public class EnumType extends Type {
+final public class EnumType extends Type {
   final public AstList<EnumElement> element;
 
   public EnumType(ElementInfo info, String name, AstList<EnumElement> element) {
@@ -40,4 +41,8 @@ public class EnumType extends Type {
     return ret;
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

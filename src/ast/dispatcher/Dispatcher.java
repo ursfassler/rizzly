@@ -57,17 +57,17 @@ import ast.data.expression.binop.BitXor;
 import ast.data.expression.binop.Div;
 import ast.data.expression.binop.Equal;
 import ast.data.expression.binop.Greater;
-import ast.data.expression.binop.Greaterequal;
+import ast.data.expression.binop.GreaterEqual;
 import ast.data.expression.binop.Is;
 import ast.data.expression.binop.Less;
-import ast.data.expression.binop.Lessequal;
+import ast.data.expression.binop.LessEqual;
 import ast.data.expression.binop.LogicAnd;
 import ast.data.expression.binop.LogicOr;
 import ast.data.expression.binop.Logical;
 import ast.data.expression.binop.Minus;
 import ast.data.expression.binop.Mod;
 import ast.data.expression.binop.Mul;
-import ast.data.expression.binop.Notequal;
+import ast.data.expression.binop.NotEqual;
 import ast.data.expression.binop.Or;
 import ast.data.expression.binop.Plus;
 import ast.data.expression.binop.Relation;
@@ -608,16 +608,16 @@ public abstract class Dispatcher<R, P> {
   protected R visitRelation(Relation obj, P param) {
     if (obj instanceof Equal) {
       return visitEqual((Equal) obj, param);
-    } else if (obj instanceof Notequal) {
-      return visitNotequal((Notequal) obj, param);
+    } else if (obj instanceof NotEqual) {
+      return visitNotequal((NotEqual) obj, param);
     } else if (obj instanceof Greater) {
       return visitGreater((Greater) obj, param);
-    } else if (obj instanceof Greaterequal) {
-      return visitGreaterequal((Greaterequal) obj, param);
+    } else if (obj instanceof GreaterEqual) {
+      return visitGreaterequal((GreaterEqual) obj, param);
     } else if (obj instanceof Less) {
       return visitLess((Less) obj, param);
-    } else if (obj instanceof Lessequal) {
-      return visitLessequal((Lessequal) obj, param);
+    } else if (obj instanceof LessEqual) {
+      return visitLessequal((LessEqual) obj, param);
     } else if (obj instanceof Is) {
       return visitIs((Is) obj, param);
     } else {
@@ -981,15 +981,15 @@ public abstract class Dispatcher<R, P> {
 
   abstract protected R visitEqual(Equal obj, P param);
 
-  abstract protected R visitNotequal(Notequal obj, P param);
+  abstract protected R visitNotequal(NotEqual obj, P param);
 
   abstract protected R visitLess(Less obj, P param);
 
-  abstract protected R visitLessequal(Lessequal obj, P param);
+  abstract protected R visitLessequal(LessEqual obj, P param);
 
   abstract protected R visitGreater(Greater obj, P param);
 
-  abstract protected R visitGreaterequal(Greaterequal obj, P param);
+  abstract protected R visitGreaterequal(GreaterEqual obj, P param);
 
   abstract protected R visitIs(Is obj, P param);
 

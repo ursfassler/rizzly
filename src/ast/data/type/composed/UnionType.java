@@ -19,13 +19,19 @@ package ast.data.type.composed;
 
 import ast.ElementInfo;
 import ast.data.AstList;
+import ast.visitor.Visitor;
 
-public class UnionType extends NamedElementType {
+final public class UnionType extends NamedElementType {
   final public NamedElement tag;
 
   public UnionType(ElementInfo info, String name, AstList<NamedElement> element, NamedElement tag) {
     super(info, name, element);
     this.tag = tag;
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
 }

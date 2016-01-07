@@ -19,11 +19,17 @@ package ast.data.type.special;
 
 import ast.ElementInfo;
 import ast.data.type.base.BaseType;
+import ast.visitor.Visitor;
 
-public class AnyType extends BaseType {
+final public class AnyType extends BaseType {
   public static final String NAME = "Any";
 
   public AnyType() {
     super(ElementInfo.NO, NAME);
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 }

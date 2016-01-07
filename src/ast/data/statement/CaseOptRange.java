@@ -19,8 +19,9 @@ package ast.data.statement;
 
 import ast.ElementInfo;
 import ast.data.expression.Expression;
+import ast.visitor.Visitor;
 
-public class CaseOptRange extends CaseOptEntry {
+final public class CaseOptRange extends CaseOptEntry {
   public Expression start;
   public Expression end;
 
@@ -35,4 +36,8 @@ public class CaseOptRange extends CaseOptEntry {
     return start.toString() + ".." + end.toString();
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

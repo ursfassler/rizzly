@@ -21,8 +21,9 @@ import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.type.Type;
 import ast.data.type.composed.NamedElement;
+import ast.visitor.Visitor;
 
-public class ComponentType extends Type {
+final public class ComponentType extends Type {
   final public AstList<NamedElement> input = new AstList<NamedElement>();
   final public AstList<NamedElement> output = new AstList<NamedElement>();
 
@@ -30,4 +31,8 @@ public class ComponentType extends Type {
     super(info, name);
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

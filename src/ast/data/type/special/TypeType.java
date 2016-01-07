@@ -20,13 +20,19 @@ package ast.data.type.special;
 import ast.ElementInfo;
 import ast.data.type.Type;
 import ast.data.type.TypeRef;
+import ast.visitor.Visitor;
 
-public class TypeType extends Type {
+final public class TypeType extends Type {
   public TypeRef type;
 
   public TypeType(ElementInfo info, String name, TypeRef type) {
     super(info, name);
     this.type = type;
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
 }

@@ -20,8 +20,9 @@ package ast.data.type.out;
 import ast.ElementInfo;
 import ast.data.type.TypeRef;
 import ast.data.type.base.BaseType;
+import ast.visitor.Visitor;
 
-public class AliasType extends BaseType {
+final public class AliasType extends BaseType {
   public TypeRef ref;
 
   public AliasType(ElementInfo info, String name, TypeRef ref) {
@@ -29,4 +30,8 @@ public class AliasType extends BaseType {
     this.ref = ref;
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

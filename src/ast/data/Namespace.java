@@ -18,12 +18,17 @@
 package ast.data;
 
 import ast.ElementInfo;
+import ast.visitor.Visitor;
 
-public class Namespace extends Named {
+final public class Namespace extends Named {
   final public AstList<Ast> children = new AstList<Ast>();
 
   public Namespace(ElementInfo info, String name) {
     super(info, name);
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

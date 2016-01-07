@@ -18,11 +18,16 @@
 package ast.data.function.ret;
 
 import ast.ElementInfo;
+import ast.visitor.Visitor;
 
-public class FuncReturnNone extends FuncReturn {
+final public class FuncReturnNone extends FuncReturn {
 
   public FuncReturnNone(ElementInfo info) {
     super(info);
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

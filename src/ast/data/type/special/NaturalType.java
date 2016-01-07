@@ -19,18 +19,21 @@ package ast.data.type.special;
 
 import ast.ElementInfo;
 import ast.data.type.base.BaseType;
+import ast.visitor.Visitor;
 
 /**
  * Use this type only for type checking and not for code production.
- *
- * @author urs
- *
  */
-public class NaturalType extends BaseType {
+final public class NaturalType extends BaseType {
   final static public String NAME = "Natural";
 
   public NaturalType() {
     super(ElementInfo.NO, NAME);
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
 }

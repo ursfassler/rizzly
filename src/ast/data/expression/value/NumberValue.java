@@ -20,12 +20,13 @@ package ast.data.expression.value;
 import java.math.BigInteger;
 
 import ast.ElementInfo;
+import ast.visitor.Visitor;
 
 /**
  *
  * @author urs
  */
-public class NumberValue extends ValueExpr {
+final public class NumberValue extends ValueExpr {
 
   final public BigInteger value;
 
@@ -39,4 +40,8 @@ public class NumberValue extends ValueExpr {
     return value.toString();
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

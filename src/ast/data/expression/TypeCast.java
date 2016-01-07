@@ -19,8 +19,9 @@ package ast.data.expression;
 
 import ast.ElementInfo;
 import ast.data.type.TypeRef;
+import ast.visitor.Visitor;
 
-public class TypeCast extends Expression {
+final public class TypeCast extends Expression {
   public Expression value;
   public TypeRef cast;
 
@@ -33,5 +34,10 @@ public class TypeCast extends Expression {
   @Override
   public String toString() {
     return cast + "(" + value + ")";
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 }

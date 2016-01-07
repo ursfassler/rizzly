@@ -19,12 +19,13 @@ package ast.data.expression.binop;
 
 import ast.ElementInfo;
 import ast.data.expression.Expression;
+import ast.visitor.Visitor;
 
 /**
  *
  * @author urs
  */
-public class Div extends ArithmeticOp {
+final public class Div extends ArithmeticOp {
 
   public Div(ElementInfo info, Expression left, Expression right) {
     super(info, left, right);
@@ -34,4 +35,10 @@ public class Div extends ArithmeticOp {
   public String getOpName() {
     return "/";
   }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
+
 }

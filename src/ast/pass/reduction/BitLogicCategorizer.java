@@ -30,7 +30,7 @@ import ast.data.expression.binop.BitOr;
 import ast.data.expression.binop.BitXor;
 import ast.data.expression.binop.LogicAnd;
 import ast.data.expression.binop.LogicOr;
-import ast.data.expression.binop.Notequal;
+import ast.data.expression.binop.NotEqual;
 import ast.data.expression.binop.Or;
 import ast.data.expression.unop.BitNot;
 import ast.data.expression.unop.LogicNot;
@@ -83,7 +83,7 @@ class BitLogicCategorizerWorker extends ExprReplacer<KnowType> {
     Type rt = param.get(obj.right);
     assert ((lt instanceof BooleanType) == (rt instanceof BooleanType));
     if (lt instanceof BooleanType) {
-      return new Notequal(obj.getInfo(), obj.left, obj.right);
+      return new NotEqual(obj.getInfo(), obj.left, obj.right);
     } else {
       return obj;
     }

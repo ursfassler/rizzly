@@ -19,12 +19,18 @@ package ast.data.component.hfsm;
 
 import ast.ElementInfo;
 import ast.data.component.Component;
+import ast.visitor.Visitor;
 
-public class ImplHfsm extends Component {
+final public class ImplHfsm extends Component {
   public StateComposite topstate;
 
   public ImplHfsm(ElementInfo info, String name) {
     super(info, name);
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
 }

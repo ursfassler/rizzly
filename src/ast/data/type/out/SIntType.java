@@ -18,8 +18,9 @@
 package ast.data.type.out;
 
 import ast.ElementInfo;
+import ast.visitor.Visitor;
 
-public class SIntType extends IntType {
+final public class SIntType extends IntType {
 
   public SIntType(ElementInfo info, String name, int bytes) {
     super(info, name, bytes);
@@ -29,4 +30,8 @@ public class SIntType extends IntType {
     return "S" + Integer.toString(8 * bytes);
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

@@ -19,8 +19,9 @@ package ast.data.expression.value;
 
 import ast.ElementInfo;
 import ast.data.AstList;
+import ast.visitor.Visitor;
 
-public class NamedElementsValue extends ValueExpr {
+final public class NamedElementsValue extends ValueExpr {
   final public AstList<NamedValue> value;
 
   public NamedElementsValue(ElementInfo info, AstList<NamedValue> value) {
@@ -28,4 +29,8 @@ public class NamedElementsValue extends ValueExpr {
     this.value = value;
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

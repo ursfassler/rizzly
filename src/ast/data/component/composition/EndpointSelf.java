@@ -20,6 +20,7 @@ package ast.data.component.composition;
 import ast.ElementInfo;
 import ast.data.function.FuncRef;
 import ast.data.function.Function;
+import ast.visitor.Visitor;
 
 final public class EndpointSelf extends Endpoint {
   final public FuncRef funcRef;
@@ -38,4 +39,10 @@ final public class EndpointSelf extends Endpoint {
   public String toString() {
     return "self." + funcRef.getTarget().name;
   }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
+
 }

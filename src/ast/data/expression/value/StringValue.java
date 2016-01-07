@@ -18,12 +18,9 @@
 package ast.data.expression.value;
 
 import ast.ElementInfo;
+import ast.visitor.Visitor;
 
-/**
- *
- * @author urs
- */
-public class StringValue extends ValueExpr {
+final public class StringValue extends ValueExpr {
 
   final public String value;
 
@@ -37,4 +34,8 @@ public class StringValue extends ValueExpr {
     return value;
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

@@ -19,8 +19,9 @@ package ast.data.type.composed;
 
 import ast.ElementInfo;
 import ast.data.AstList;
+import ast.visitor.Visitor;
 
-public class RecordType extends NamedElementType {
+final public class RecordType extends NamedElementType {
 
   public RecordType(ElementInfo info, String name, AstList<NamedElement> element) {
     super(info, name, element);
@@ -28,6 +29,11 @@ public class RecordType extends NamedElementType {
 
   public RecordType(ElementInfo info, String name) {
     super(info, name);
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
 }

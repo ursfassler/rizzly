@@ -19,19 +19,25 @@ package ast.data.expression.binop;
 
 import ast.ElementInfo;
 import ast.data.expression.Expression;
+import ast.visitor.Visitor;
 
 /**
  *
  * @author urs
  */
-public class Notequal extends Relation {
+final public class GreaterEqual extends Relation {
 
-  public Notequal(ElementInfo info, Expression left, Expression right) {
+  public GreaterEqual(ElementInfo info, Expression left, Expression right) {
     super(info, left, right);
   }
 
   @Override
   public String getOpName() {
-    return "<>";
+    return ">=";
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 }

@@ -26,6 +26,7 @@ import ast.data.function.FuncRef;
 import ast.data.type.Type;
 import ast.data.variable.Constant;
 import ast.data.variable.Variable;
+import ast.visitor.Visitor;
 
 final public class ImplElementary extends Component {
   final public AstList<Type> type = new AstList<Type>();
@@ -50,6 +51,11 @@ final public class ImplElementary extends Component {
       }
     }
     return null;
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
 }

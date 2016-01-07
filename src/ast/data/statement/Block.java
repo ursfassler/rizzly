@@ -19,8 +19,9 @@ package ast.data.statement;
 
 import ast.ElementInfo;
 import ast.data.AstList;
+import ast.visitor.Visitor;
 
-public class Block extends Statement {
+final public class Block extends Statement {
   final public AstList<Statement> statements = new AstList<Statement>();
 
   public Block(ElementInfo info) {
@@ -30,5 +31,10 @@ public class Block extends Statement {
   @Override
   public String toString() {
     return "block" + Long.toHexString(this.hashCode());
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 }

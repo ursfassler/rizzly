@@ -20,12 +20,9 @@ package ast.data.statement;
 import ast.ElementInfo;
 import ast.data.expression.Expression;
 import ast.data.reference.Reference;
+import ast.visitor.Visitor;
 
-/**
- *
- * @author urs
- */
-public class AssignmentSingle extends Assignment {
+final public class AssignmentSingle extends Assignment {
   public Reference left;
 
   public AssignmentSingle(ElementInfo info, Reference left, Expression right) {
@@ -36,5 +33,10 @@ public class AssignmentSingle extends Assignment {
   @Override
   public String toString() {
     return left + " := " + right;
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 }

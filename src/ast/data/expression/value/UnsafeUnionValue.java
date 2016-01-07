@@ -19,8 +19,9 @@ package ast.data.expression.value;
 
 import ast.ElementInfo;
 import ast.data.type.TypeRef;
+import ast.visitor.Visitor;
 
-public class UnsafeUnionValue extends ValueExpr {
+final public class UnsafeUnionValue extends ValueExpr {
   public NamedValue contentValue;
   public TypeRef type;
 
@@ -28,5 +29,10 @@ public class UnsafeUnionValue extends ValueExpr {
     super(info);
     this.contentValue = contentValue;
     this.type = type;
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 }

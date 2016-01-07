@@ -19,8 +19,9 @@ package ast.data.statement;
 
 import ast.ElementInfo;
 import ast.data.variable.FuncVariable;
+import ast.visitor.Visitor;
 
-public class ForStmt extends Statement {
+final public class ForStmt extends Statement {
   public FuncVariable iterator;
   public Block block;
 
@@ -30,4 +31,8 @@ public class ForStmt extends Statement {
     this.block = block;
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

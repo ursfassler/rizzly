@@ -19,8 +19,9 @@ package ast.data.expression;
 
 import ast.ElementInfo;
 import ast.data.reference.Reference;
+import ast.visitor.Visitor;
 
-public class RefExp extends Expression {
+final public class RefExp extends Expression {
   public Reference ref;
 
   public RefExp(ElementInfo info, Reference ref) {
@@ -33,4 +34,8 @@ public class RefExp extends Expression {
     return "->" + ref;
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

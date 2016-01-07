@@ -20,8 +20,9 @@ package ast.data.expression.value;
 import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.expression.Expression;
+import ast.visitor.Visitor;
 
-public class TupleValue extends ValueExpr {
+final public class TupleValue extends ValueExpr {
   final public AstList<Expression> value; // TODO change to ValueExpr
 
   public TupleValue(ElementInfo info, AstList<Expression> value) {
@@ -40,4 +41,8 @@ public class TupleValue extends ValueExpr {
     return "(" + value + ")";
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

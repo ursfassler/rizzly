@@ -22,8 +22,9 @@ import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.statement.Block;
 import ast.data.template.Template;
+import ast.visitor.Visitor;
 
-public class RawElementary extends RawComponent {
+final public class RawElementary extends RawComponent {
   final private AstList<Template> declaration = new AstList<Template>();
   final private AstList<Ast> instantiation = new AstList<Ast>();
   private Block entryFunc = new Block(ElementInfo.NO);
@@ -57,4 +58,8 @@ public class RawElementary extends RawComponent {
     this.exitFunc = exitFunc;
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

@@ -24,9 +24,10 @@ import ast.data.AstList;
 import ast.data.Named;
 import ast.data.component.hfsm.StateContent;
 import ast.data.variable.TemplateParameter;
+import ast.visitor.Visitor;
 
 //TODO do we need anonymous templates? it is easier if they are named.
-public class Template extends Named implements StateContent {
+final public class Template extends Named implements StateContent {
   private final AstList<TemplateParameter> templ = new AstList<TemplateParameter>();
   private final Named object;
 
@@ -47,6 +48,11 @@ public class Template extends Named implements StateContent {
   @Override
   public String toString() {
     return name + templ.toString();
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
 }

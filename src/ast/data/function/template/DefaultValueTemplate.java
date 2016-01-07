@@ -18,10 +18,15 @@
 package ast.data.function.template;
 
 import ast.ElementInfo;
+import ast.visitor.Visitor;
 
-public class DefaultValueTemplate extends FunctionTemplate {
+final public class DefaultValueTemplate extends FunctionTemplate {
   public DefaultValueTemplate() {
     super(ElementInfo.NO, "DefaultValueTemplate");
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

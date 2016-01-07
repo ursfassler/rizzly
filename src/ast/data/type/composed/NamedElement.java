@@ -20,6 +20,7 @@ package ast.data.type.composed;
 import ast.ElementInfo;
 import ast.data.Named;
 import ast.data.type.TypeRef;
+import ast.visitor.Visitor;
 
 final public class NamedElement extends Named {
   public TypeRef typeref;
@@ -32,6 +33,11 @@ final public class NamedElement extends Named {
   @Override
   public String toString() {
     return name + typeref;
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
 }

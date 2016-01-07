@@ -19,12 +19,13 @@ package ast.data.expression.binop;
 
 import ast.ElementInfo;
 import ast.data.expression.Expression;
+import ast.visitor.Visitor;
 
 /**
  *
  * @author urs
  */
-public class BitAnd extends ArithmeticOp {
+final public class BitAnd extends ArithmeticOp {
 
   public BitAnd(ElementInfo info, Expression left, Expression right) {
     super(info, left, right);
@@ -33,5 +34,10 @@ public class BitAnd extends ArithmeticOp {
   @Override
   public String getOpName() {
     return "and";
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 }

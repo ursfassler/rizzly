@@ -19,10 +19,15 @@ package ast.data.reference;
 
 import ast.ElementInfo;
 import ast.data.Named;
+import ast.visitor.Visitor;
 
-public class DummyLinkTarget extends Named {
+final public class DummyLinkTarget extends Named {
   public DummyLinkTarget(ElementInfo info, String name) {
     super(info, name);
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

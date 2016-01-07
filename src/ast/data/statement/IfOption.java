@@ -20,8 +20,9 @@ package ast.data.statement;
 import ast.ElementInfo;
 import ast.data.AstBase;
 import ast.data.expression.Expression;
+import ast.visitor.Visitor;
 
-public class IfOption extends AstBase {
+final public class IfOption extends AstBase {
   public Expression condition;
   public Block code;
 
@@ -31,4 +32,8 @@ public class IfOption extends AstBase {
     this.code = code;
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

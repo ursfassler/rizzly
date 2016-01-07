@@ -20,8 +20,9 @@ package ast.data.expression.value;
 import ast.ElementInfo;
 import ast.data.AstBase;
 import ast.data.expression.Expression;
+import ast.visitor.Visitor;
 
-public class NamedValue extends AstBase {
+final public class NamedValue extends AstBase {
   public final String name;
   public Expression value;  // TODO change to ValueExpr
 
@@ -36,4 +37,8 @@ public class NamedValue extends AstBase {
     return name + ":=" + value;
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

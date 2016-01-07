@@ -20,8 +20,9 @@ package ast.data.function.ret;
 import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.variable.FuncVariable;
+import ast.visitor.Visitor;
 
-public class FuncReturnTuple extends FuncReturn {
+final public class FuncReturnTuple extends FuncReturn {
   final public AstList<FuncVariable> param;
 
   public FuncReturnTuple(ElementInfo info, AstList<FuncVariable> param) {
@@ -29,4 +30,8 @@ public class FuncReturnTuple extends FuncReturn {
     this.param = param;
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

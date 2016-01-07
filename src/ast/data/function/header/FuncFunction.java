@@ -24,14 +24,16 @@ import ast.data.function.Function;
 import ast.data.function.ret.FuncReturn;
 import ast.data.statement.Block;
 import ast.data.variable.FuncVariable;
+import ast.visitor.Visitor;
 
-/**
- *
- * @author urs
- */
-public class FuncFunction extends Function implements StateContent {
+final public class FuncFunction extends Function implements StateContent {
 
   public FuncFunction(ElementInfo info, String name, AstList<FuncVariable> param, FuncReturn ret, Block body) {
     super(info, name, param, ret, body);
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 }

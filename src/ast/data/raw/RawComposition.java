@@ -21,8 +21,9 @@ import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.component.composition.CompUse;
 import ast.data.component.composition.Connection;
+import ast.visitor.Visitor;
 
-public class RawComposition extends RawComponent {
+final public class RawComposition extends RawComponent {
   final private AstList<CompUse> instantiation = new AstList<CompUse>();
   final private AstList<Connection> connection = new AstList<Connection>();
 
@@ -36,6 +37,11 @@ public class RawComposition extends RawComponent {
 
   public AstList<CompUse> getInstantiation() {
     return instantiation;
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
 }

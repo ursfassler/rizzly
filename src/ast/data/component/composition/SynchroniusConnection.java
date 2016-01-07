@@ -1,6 +1,6 @@
 /**
  *  This file is part of Rizzly.
- * 
+ *
  *  Rizzly is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -18,6 +18,7 @@
 package ast.data.component.composition;
 
 import ast.ElementInfo;
+import ast.visitor.Visitor;
 
 final public class SynchroniusConnection extends Connection {
 
@@ -28,6 +29,11 @@ final public class SynchroniusConnection extends Connection {
   @Override
   public String toString() {
     return endpoint.get(Direction.in) + " -> " + endpoint.get(Direction.out);
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
 }

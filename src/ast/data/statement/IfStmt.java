@@ -19,12 +19,9 @@ package ast.data.statement;
 
 import ast.ElementInfo;
 import ast.data.AstList;
+import ast.visitor.Visitor;
 
-/**
- *
- * @author urs
- */
-public class IfStmt extends Statement {
+final public class IfStmt extends Statement {
   final public AstList<IfOption> option;
   public Block defblock;
 
@@ -38,6 +35,11 @@ public class IfStmt extends Statement {
     super(info);
     this.option = new AstList<IfOption>();
     this.defblock = new Block(info);
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
 }

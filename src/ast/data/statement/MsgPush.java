@@ -24,8 +24,9 @@ import ast.data.AstList;
 import ast.data.expression.Expression;
 import ast.data.function.FuncRef;
 import ast.data.reference.Reference;
+import ast.visitor.Visitor;
 
-public class MsgPush extends Statement {
+final public class MsgPush extends Statement {
   public Reference queue;
   public FuncRef func;
   final public AstList<Expression> data = new AstList<Expression>();
@@ -42,4 +43,8 @@ public class MsgPush extends Statement {
     return queue + ".push(" + func + "," + data + ")";
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

@@ -19,12 +19,13 @@ package ast.data.expression.binop;
 
 import ast.ElementInfo;
 import ast.data.expression.Expression;
+import ast.visitor.Visitor;
 
 /**
  *
  * @author urs
  */
-public class Equal extends Relation {
+final public class Equal extends Relation {
 
   public Equal(ElementInfo info, Expression left, Expression right) {
     super(info, left, right);
@@ -34,4 +35,10 @@ public class Equal extends Relation {
   public String getOpName() {
     return "=";
   }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
+
 }

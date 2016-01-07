@@ -21,11 +21,11 @@ import ast.ElementInfo;
 import ast.data.expression.Expression;
 import ast.data.expression.binop.Equal;
 import ast.data.expression.binop.Greater;
-import ast.data.expression.binop.Greaterequal;
+import ast.data.expression.binop.GreaterEqual;
 import ast.data.expression.binop.Is;
 import ast.data.expression.binop.Less;
-import ast.data.expression.binop.Lessequal;
-import ast.data.expression.binop.Notequal;
+import ast.data.expression.binop.LessEqual;
+import ast.data.expression.binop.NotEqual;
 import ast.data.expression.binop.Relation;
 import error.ErrorType;
 import error.RError;
@@ -36,15 +36,15 @@ class RelationFactory {
       case EQUAL:
         return new Equal(info, left, right);
       case NOT_EQUAL:
-        return new Notequal(info, left, right);
+        return new NotEqual(info, left, right);
       case GREATER:
         return new Greater(info, left, right);
       case GREATER_EQUEAL:
-        return new Greaterequal(info, left, right);
+        return new GreaterEqual(info, left, right);
       case LESS:
         return new Less(info, left, right);
       case LESS_EQUAL:
-        return new Lessequal(info, left, right);
+        return new LessEqual(info, left, right);
       case IS:
         return new Is(info, left, right);
       default:

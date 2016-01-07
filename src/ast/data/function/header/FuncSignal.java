@@ -23,10 +23,15 @@ import ast.data.function.InterfaceFunction;
 import ast.data.function.ret.FuncReturn;
 import ast.data.statement.Block;
 import ast.data.variable.FuncVariable;
+import ast.visitor.Visitor;
 
-public class FuncSignal extends InterfaceFunction {
+final public class FuncSignal extends InterfaceFunction {
   public FuncSignal(ElementInfo info, String name, AstList<FuncVariable> param, FuncReturn ret, Block body) {
     super(info, name, param, ret, body);
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

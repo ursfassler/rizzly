@@ -21,12 +21,9 @@ import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.expression.Expression;
 import ast.data.reference.Reference;
+import ast.visitor.Visitor;
 
-/**
- *
- * @author urs
- */
-public class AssignmentMulti extends Assignment {
+final public class AssignmentMulti extends Assignment {
 
   final public AstList<Reference> left;
 
@@ -38,5 +35,10 @@ public class AssignmentMulti extends Assignment {
   @Override
   public String toString() {
     return left + " := " + right;
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 }

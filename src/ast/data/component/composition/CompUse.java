@@ -20,13 +20,19 @@ package ast.data.component.composition;
 import ast.ElementInfo;
 import ast.data.Named;
 import ast.data.component.CompRef;
+import ast.visitor.Visitor;
 
-public class CompUse extends Named {
+final public class CompUse extends Named {
   public CompRef compRef;
 
   public CompUse(ElementInfo info, String name, CompRef compRef) {
     super(info, name);
     this.compRef = compRef;
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
 }

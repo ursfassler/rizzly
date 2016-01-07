@@ -18,12 +18,18 @@
 package ast.data.type.base;
 
 import ast.ElementInfo;
+import ast.visitor.Visitor;
 
-public class StringType extends BaseType {
+final public class StringType extends BaseType {
   public static final String NAME = "String";
 
   public StringType() {
     super(ElementInfo.NO, NAME);
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
 }

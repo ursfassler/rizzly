@@ -20,10 +20,15 @@ package ast.data.variable;
 import ast.ElementInfo;
 import ast.data.expression.Expression;
 import ast.data.type.TypeRef;
+import ast.visitor.Visitor;
 
-public class ConstGlobal extends Constant {
+final public class ConstGlobal extends Constant {
   public ConstGlobal(ElementInfo info, String name, TypeRef type, Expression def) {
     super(info, name, type, def);
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

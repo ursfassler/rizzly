@@ -20,8 +20,9 @@ package ast.data.statement;
 import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.expression.Expression;
+import ast.visitor.Visitor;
 
-public class CaseStmt extends Statement {
+final public class CaseStmt extends Statement {
   public Expression condition;
   final public AstList<CaseOpt> option;
   public Block otherwise;
@@ -33,4 +34,8 @@ public class CaseStmt extends Statement {
     this.otherwise = otherwise;
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

@@ -31,14 +31,14 @@ import ast.data.expression.binop.And;
 import ast.data.expression.binop.Div;
 import ast.data.expression.binop.Equal;
 import ast.data.expression.binop.Greater;
-import ast.data.expression.binop.Greaterequal;
+import ast.data.expression.binop.GreaterEqual;
 import ast.data.expression.binop.Is;
 import ast.data.expression.binop.Less;
-import ast.data.expression.binop.Lessequal;
+import ast.data.expression.binop.LessEqual;
 import ast.data.expression.binop.Minus;
 import ast.data.expression.binop.Mod;
 import ast.data.expression.binop.Mul;
-import ast.data.expression.binop.Notequal;
+import ast.data.expression.binop.NotEqual;
 import ast.data.expression.binop.Or;
 import ast.data.expression.binop.Plus;
 import ast.data.expression.binop.Shl;
@@ -411,7 +411,7 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
   }
 
   @Override
-  protected ValueExpr visitGreaterequal(Greaterequal obj, Void param) {
+  protected ValueExpr visitGreaterequal(GreaterEqual obj, Void param) {
     ValueExpr left = visit(obj.left, param);
     ValueExpr right = visit(obj.right, param);
 
@@ -449,7 +449,7 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
   }
 
   @Override
-  protected ValueExpr visitLessequal(Lessequal obj, Void param) {
+  protected ValueExpr visitLessequal(LessEqual obj, Void param) {
     ValueExpr left = visit(obj.left, param);
     ValueExpr right = visit(obj.right, param);
 
@@ -468,7 +468,7 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
   }
 
   @Override
-  protected ValueExpr visitNotequal(Notequal obj, Void param) {
+  protected ValueExpr visitNotequal(NotEqual obj, Void param) {
     ValueExpr left = visit(obj.left, param);
     ValueExpr right = visit(obj.right, param);
 

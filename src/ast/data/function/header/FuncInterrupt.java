@@ -22,11 +22,10 @@ import ast.data.AstList;
 import ast.data.function.Function;
 import ast.data.statement.Block;
 import ast.data.variable.FuncVariable;
+import ast.visitor.Visitor;
 
 /**
  * Function inside a component. It may be not pure and can therefore not be executed at compile time.
- *
- * @author urs
  */
 final public class FuncInterrupt extends Function {
 
@@ -34,4 +33,8 @@ final public class FuncInterrupt extends Function {
     super(info, name, param, ret, body);
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

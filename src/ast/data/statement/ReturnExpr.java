@@ -19,12 +19,9 @@ package ast.data.statement;
 
 import ast.ElementInfo;
 import ast.data.expression.Expression;
+import ast.visitor.Visitor;
 
-/**
- *
- * @author urs
- */
-public class ReturnExpr extends Return {
+final public class ReturnExpr extends Return {
 
   public Expression expr;
 
@@ -36,5 +33,10 @@ public class ReturnExpr extends Return {
   @Override
   public String toString() {
     return super.toString() + " " + expr;
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 }

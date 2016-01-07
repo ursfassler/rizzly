@@ -19,6 +19,7 @@ package ast.data.expression.binop;
 
 import ast.ElementInfo;
 import ast.data.expression.Expression;
+import ast.visitor.Visitor;
 
 /**
  *
@@ -33,5 +34,10 @@ final public class Plus extends ArithmeticOp {
   @Override
   public String getOpName() {
     return "+";
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 }

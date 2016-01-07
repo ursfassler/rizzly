@@ -20,8 +20,9 @@ package ast.data.type.base;
 import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.type.TypeRef;
+import ast.visitor.Visitor;
 
-public class TupleType extends BaseType {
+final public class TupleType extends BaseType {
   final public AstList<TypeRef> types;
 
   // TODO create name from types
@@ -30,4 +31,8 @@ public class TupleType extends BaseType {
     this.types = types;
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

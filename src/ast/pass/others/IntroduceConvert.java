@@ -24,7 +24,7 @@ import ast.data.Namespace;
 import ast.data.expression.Expression;
 import ast.data.expression.RefExp;
 import ast.data.expression.TypeCast;
-import ast.data.expression.binop.Lessequal;
+import ast.data.expression.binop.LessEqual;
 import ast.data.expression.binop.LogicAnd;
 import ast.data.expression.binop.Relation;
 import ast.data.expression.value.NumberValue;
@@ -127,8 +127,8 @@ class IntroduceConvertWorker extends DfsTraverser<Void, Void> {
     AstList<IfOption> option = new AstList<IfOption>();
 
     { // test
-      Relation aboveLower = new Lessequal(info, new NumberValue(info, resType.range.low), new RefExp(info, RefFactory.full(info, value)));
-      Relation belowHigher = new Lessequal(info, new RefExp(info, RefFactory.full(info, value)), new NumberValue(info, resType.range.high));
+      Relation aboveLower = new LessEqual(info, new NumberValue(info, resType.range.low), new RefExp(info, RefFactory.full(info, value)));
+      Relation belowHigher = new LessEqual(info, new RefExp(info, RefFactory.full(info, value)), new NumberValue(info, resType.range.high));
       Expression cond = new LogicAnd(info, aboveLower, belowHigher);
       IfOption opt = new IfOption(info, cond, ok);
       option.add(opt);

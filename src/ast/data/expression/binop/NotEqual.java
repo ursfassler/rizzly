@@ -19,19 +19,25 @@ package ast.data.expression.binop;
 
 import ast.ElementInfo;
 import ast.data.expression.Expression;
+import ast.visitor.Visitor;
 
 /**
  *
  * @author urs
  */
-public class Lessequal extends Relation {
+final public class NotEqual extends Relation {
 
-  public Lessequal(ElementInfo info, Expression left, Expression right) {
+  public NotEqual(ElementInfo info, Expression left, Expression right) {
     super(info, left, right);
   }
 
   @Override
   public String getOpName() {
-    return "<=";
+    return "<>";
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 }

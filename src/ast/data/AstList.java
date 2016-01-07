@@ -20,7 +20,10 @@ package ast.data;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class AstList<T extends Ast> extends ArrayList<T> {
+import ast.visitor.Visitor;
+import ast.visitor.VisitorAcceptor;
+
+public class AstList<T extends Ast> extends ArrayList<T> implements VisitorAcceptor {
   private static final long serialVersionUID = 2599344789209692487L;
 
   public AstList() {
@@ -53,5 +56,12 @@ public class AstList<T extends Ast> extends ArrayList<T> {
       ret += gen.toString();
     }
     return ret;
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    for (Ast item : this) {
+      item.accept(visitor);
+    }
   }
 }

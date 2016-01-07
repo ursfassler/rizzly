@@ -19,41 +19,50 @@ package ast.repository.query;
 
 import ast.data.Ast;
 import ast.data.AstList;
-import ast.dispatcher.DfsTraverser;
 import ast.specification.Specification;
+import ast.visitor.DefaultHandler;
+import ast.visitor.EveryVisitor;
+import ast.visitor.VisitorAcceptor;
 
-public class Collector {
-  static public AstList<? extends Ast> select(Ast root, Specification spec) {
-    CollectorTraverser traverser = new CollectorTraverser(spec);
-    traverser.traverse(root, null);
-    return traverser.getMatched();
+public class Collector extends EveryVisitor {
+  private final CollectorVisitor collector;
+
+  public Collector(Specification spec) {
+    super();
+    collector = new CollectorVisitor(spec);
+    setHandler(collector);
   }
 
-  static public AstList<? extends Ast> select(AstList<? extends Ast> roots, Specification spec) {
-    CollectorTraverser traverser = new CollectorTraverser(spec);
-    traverser.traverse(roots, null);
-    return traverser.getMatched();
+  public AstList<Ast> getMatched() {
+    return collector.getMatched();
+  }
+
+  @Deprecated
+  public static AstList<Ast> select(VisitorAcceptor ast, Specification spec) {
+    Collector visitor = new Collector(spec);
+    ast.accept(visitor);
+    return visitor.getMatched();
   }
 }
 
-class CollectorTraverser extends DfsTraverser<Void, Void> {
+class CollectorVisitor implements DefaultHandler {
   final private AstList<Ast> matched = new AstList<Ast>();
   final private Specification spec;
 
-  public CollectorTraverser(Specification spec) {
+  public CollectorVisitor(Specification spec) {
     super();
     this.spec = spec;
   }
 
   @Override
-  protected Void visit(Ast obj, Void param) {
-    if (spec.isSatisfiedBy(obj)) {
-      matched.add(obj);
+  public void visit(Ast ast) {
+    if (spec.isSatisfiedBy(ast)) {
+      matched.add(ast);
     }
-    return super.visit(obj, param);
   }
 
   public AstList<Ast> getMatched() {
     return matched;
   }
+
 }

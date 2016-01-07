@@ -19,8 +19,9 @@ package ast.data.statement;
 
 import ast.ElementInfo;
 import ast.data.reference.Reference;
+import ast.visitor.Visitor;
 
-public class CallStmt extends Statement {
+final public class CallStmt extends Statement {
   public Reference call;
 
   public CallStmt(ElementInfo info, Reference call) {
@@ -31,5 +32,10 @@ public class CallStmt extends Statement {
   @Override
   public String toString() {
     return call.toString();
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 }

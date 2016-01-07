@@ -19,8 +19,9 @@ package ast.data.reference;
 
 import ast.ElementInfo;
 import ast.data.expression.Expression;
+import ast.visitor.Visitor;
 
-public class RefIndex extends RefItem {
+final public class RefIndex extends RefItem {
   public Expression index;
 
   public RefIndex(ElementInfo info, Expression index) {
@@ -33,4 +34,8 @@ public class RefIndex extends RefItem {
     return "[" + index + "]";
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

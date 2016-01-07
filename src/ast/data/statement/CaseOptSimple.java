@@ -19,8 +19,9 @@ package ast.data.statement;
 
 import ast.ElementInfo;
 import ast.data.Range;
+import ast.visitor.Visitor;
 
-public class CaseOptSimple extends CaseOptEntry {
+final public class CaseOptSimple extends CaseOptEntry {
   public Range value;
 
   public CaseOptSimple(ElementInfo info, Range value) {
@@ -33,4 +34,8 @@ public class CaseOptSimple extends CaseOptEntry {
     return value.toString();
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

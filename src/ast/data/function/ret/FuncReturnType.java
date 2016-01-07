@@ -19,8 +19,9 @@ package ast.data.function.ret;
 
 import ast.ElementInfo;
 import ast.data.type.TypeRef;
+import ast.visitor.Visitor;
 
-public class FuncReturnType extends FuncReturn {
+final public class FuncReturnType extends FuncReturn {
   public TypeRef type;
 
   public FuncReturnType(ElementInfo info, TypeRef type) {
@@ -28,4 +29,8 @@ public class FuncReturnType extends FuncReturn {
     this.type = type;
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

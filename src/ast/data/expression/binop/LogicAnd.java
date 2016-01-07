@@ -19,6 +19,7 @@ package ast.data.expression.binop;
 
 import ast.ElementInfo;
 import ast.data.expression.Expression;
+import ast.visitor.Visitor;
 
 final public class LogicAnd extends Logical {
 
@@ -30,4 +31,10 @@ final public class LogicAnd extends Logical {
   public String getOpName() {
     return "and";
   }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
+
 }

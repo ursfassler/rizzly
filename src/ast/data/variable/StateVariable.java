@@ -21,11 +21,16 @@ import ast.ElementInfo;
 import ast.data.component.hfsm.StateContent;
 import ast.data.expression.Expression;
 import ast.data.type.TypeRef;
+import ast.visitor.Visitor;
 
-public class StateVariable extends DefVariable implements StateContent {
+final public class StateVariable extends DefVariable implements StateContent {
 
   public StateVariable(ElementInfo info, String name, TypeRef type, Expression def) {
     super(info, name, type, def);
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

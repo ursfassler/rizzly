@@ -21,6 +21,7 @@ import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.type.Type;
 import ast.data.type.TypeRef;
+import ast.visitor.Visitor;
 
 final public class FunctionType extends Type {
   final public AstList<TypeRef> arg;
@@ -35,6 +36,11 @@ final public class FunctionType extends Type {
   @Override
   public String toString() {
     return "func(" + arg + "):" + ret;
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
 }

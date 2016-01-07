@@ -19,6 +19,7 @@ package ast.data.variable;
 
 import ast.ElementInfo;
 import ast.data.type.TypeRef;
+import ast.visitor.Visitor;
 
 final public class TemplateParameter extends Variable {
 
@@ -26,4 +27,8 @@ final public class TemplateParameter extends Variable {
     super(info, name, type);
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

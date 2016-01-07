@@ -20,11 +20,16 @@ package ast.data.component.hfsm;
 import ast.ElementInfo;
 import ast.data.reference.Reference;
 import ast.data.reference.TypedRef;
+import ast.visitor.Visitor;
 
-public class StateRef extends TypedRef<State> {
+final public class StateRef extends TypedRef<State> {
 
   public StateRef(ElementInfo info, Reference ref) {
     super(info, ref);
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

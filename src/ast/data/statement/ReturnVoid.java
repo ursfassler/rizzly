@@ -18,12 +18,9 @@
 package ast.data.statement;
 
 import ast.ElementInfo;
+import ast.visitor.Visitor;
 
-/**
- *
- * @author urs
- */
-public class ReturnVoid extends Return {
+final public class ReturnVoid extends Return {
   public ReturnVoid(ElementInfo info) {
     super(info);
   }
@@ -31,5 +28,10 @@ public class ReturnVoid extends Return {
   @Override
   public String toString() {
     return "return";
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 }

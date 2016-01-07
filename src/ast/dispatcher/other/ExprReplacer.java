@@ -32,16 +32,16 @@ import ast.data.expression.binop.BitXor;
 import ast.data.expression.binop.Div;
 import ast.data.expression.binop.Equal;
 import ast.data.expression.binop.Greater;
-import ast.data.expression.binop.Greaterequal;
+import ast.data.expression.binop.GreaterEqual;
 import ast.data.expression.binop.Is;
 import ast.data.expression.binop.Less;
-import ast.data.expression.binop.Lessequal;
+import ast.data.expression.binop.LessEqual;
 import ast.data.expression.binop.LogicAnd;
 import ast.data.expression.binop.LogicOr;
 import ast.data.expression.binop.Minus;
 import ast.data.expression.binop.Mod;
 import ast.data.expression.binop.Mul;
-import ast.data.expression.binop.Notequal;
+import ast.data.expression.binop.NotEqual;
 import ast.data.expression.binop.Or;
 import ast.data.expression.binop.Plus;
 import ast.data.expression.binop.Shl;
@@ -164,7 +164,7 @@ abstract public class ExprReplacer<T> extends DfsTraverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitGreaterequal(Greaterequal obj, T param) {
+  protected Expression visitGreaterequal(GreaterEqual obj, T param) {
     return defaultBinaryOp(obj, param);
   }
 
@@ -174,7 +174,7 @@ abstract public class ExprReplacer<T> extends DfsTraverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitLessequal(Lessequal obj, T param) {
+  protected Expression visitLessequal(LessEqual obj, T param) {
     return defaultBinaryOp(obj, param);
   }
 
@@ -194,7 +194,7 @@ abstract public class ExprReplacer<T> extends DfsTraverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitNotequal(Notequal obj, T param) {
+  protected Expression visitNotequal(NotEqual obj, T param) {
     return defaultBinaryOp(obj, param);
   }
 

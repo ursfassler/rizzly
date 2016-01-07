@@ -18,8 +18,9 @@
 package ast.data.expression.value;
 
 import ast.ElementInfo;
+import ast.visitor.Visitor;
 
-public class AnyValue extends ValueExpr {
+final public class AnyValue extends ValueExpr {
   static final public String NAME = "?";
 
   public AnyValue(ElementInfo info) {
@@ -31,4 +32,8 @@ public class AnyValue extends ValueExpr {
     return NAME;
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

@@ -20,6 +20,7 @@ package ast.data.component.composition;
 import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.component.Component;
+import ast.visitor.Visitor;
 
 public class ImplComposition extends Component {
   final public AstList<CompUse> component = new AstList<CompUse>();
@@ -27,6 +28,11 @@ public class ImplComposition extends Component {
 
   public ImplComposition(ElementInfo info, String name) {
     super(info, name);
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
 }

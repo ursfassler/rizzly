@@ -19,12 +19,13 @@ package ast.data.expression.binop;
 
 import ast.ElementInfo;
 import ast.data.expression.Expression;
+import ast.visitor.Visitor;
 
 /**
  *
  * @author urs
  */
-public class Or extends BinaryExp {
+final public class Or extends BinaryExp {
 
   public Or(ElementInfo info, Expression left, Expression right) {
     super(info, left, right);
@@ -33,5 +34,10 @@ public class Or extends BinaryExp {
   @Override
   public String getOpName() {
     return "or";
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 }

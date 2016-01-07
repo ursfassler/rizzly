@@ -29,15 +29,15 @@ import ast.data.expression.binop.BitOr;
 import ast.data.expression.binop.Div;
 import ast.data.expression.binop.Equal;
 import ast.data.expression.binop.Greater;
-import ast.data.expression.binop.Greaterequal;
+import ast.data.expression.binop.GreaterEqual;
 import ast.data.expression.binop.Less;
-import ast.data.expression.binop.Lessequal;
+import ast.data.expression.binop.LessEqual;
 import ast.data.expression.binop.LogicAnd;
 import ast.data.expression.binop.LogicOr;
 import ast.data.expression.binop.Minus;
 import ast.data.expression.binop.Mod;
 import ast.data.expression.binop.Mul;
-import ast.data.expression.binop.Notequal;
+import ast.data.expression.binop.NotEqual;
 import ast.data.expression.binop.Or;
 import ast.data.expression.binop.Plus;
 import ast.data.expression.binop.Shl;
@@ -175,7 +175,7 @@ public class ExpressionTypecheck extends DfsTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitNotequal(Notequal obj, Void param) {
+  protected Void visitNotequal(NotEqual obj, Void param) {
     super.visitNotequal(obj, param);
     Type lhs = kt.get(obj.left);
     Type rhs = kt.get(obj.right);
@@ -192,7 +192,7 @@ public class ExpressionTypecheck extends DfsTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitGreaterequal(Greaterequal obj, Void param) {
+  protected Void visitGreaterequal(GreaterEqual obj, Void param) {
     super.visitGreaterequal(obj, param);
     getRange(obj.left);
     getRange(obj.right);
@@ -208,7 +208,7 @@ public class ExpressionTypecheck extends DfsTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitLessequal(Lessequal obj, Void param) {
+  protected Void visitLessequal(LessEqual obj, Void param) {
     super.visitLessequal(obj, param);
     getRange(obj.left);
     getRange(obj.right);

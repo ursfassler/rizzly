@@ -20,11 +20,17 @@ package ast.data.function;
 import ast.ElementInfo;
 import ast.data.reference.Reference;
 import ast.data.reference.TypedRef;
+import ast.visitor.Visitor;
 
-public class FuncRef extends TypedRef<Function> {
+final public class FuncRef extends TypedRef<Function> {
 
   public FuncRef(ElementInfo info, Reference ref) {
     super(info, ref);
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
 }

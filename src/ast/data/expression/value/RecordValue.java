@@ -22,8 +22,9 @@ import java.util.Collection;
 import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.type.TypeRef;
+import ast.visitor.Visitor;
 
-public class RecordValue extends ValueExpr {
+final public class RecordValue extends ValueExpr {
   final public AstList<NamedValue> value = new AstList<NamedValue>();
   public TypeRef type;
 
@@ -38,4 +39,8 @@ public class RecordValue extends ValueExpr {
     return value + ":" + type;
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

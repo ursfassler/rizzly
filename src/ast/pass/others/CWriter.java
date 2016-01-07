@@ -33,15 +33,15 @@ import ast.data.expression.binop.BitXor;
 import ast.data.expression.binop.Div;
 import ast.data.expression.binop.Equal;
 import ast.data.expression.binop.Greater;
-import ast.data.expression.binop.Greaterequal;
+import ast.data.expression.binop.GreaterEqual;
 import ast.data.expression.binop.Less;
-import ast.data.expression.binop.Lessequal;
+import ast.data.expression.binop.LessEqual;
 import ast.data.expression.binop.LogicAnd;
 import ast.data.expression.binop.LogicOr;
 import ast.data.expression.binop.Minus;
 import ast.data.expression.binop.Mod;
 import ast.data.expression.binop.Mul;
-import ast.data.expression.binop.Notequal;
+import ast.data.expression.binop.NotEqual;
 import ast.data.expression.binop.Plus;
 import ast.data.expression.binop.Relation;
 import ast.data.expression.binop.Shl;
@@ -183,7 +183,7 @@ class CWriterWorker extends NullDispatcher<Void, Boolean> {
   }
 
   @Override
-  protected Void visitGreaterequal(Greaterequal obj, Boolean param) {
+  protected Void visitGreaterequal(GreaterEqual obj, Boolean param) {
     return relation(obj, ">=", param);
   }
 
@@ -193,7 +193,7 @@ class CWriterWorker extends NullDispatcher<Void, Boolean> {
   }
 
   @Override
-  protected Void visitLessequal(Lessequal obj, Boolean param) {
+  protected Void visitLessequal(LessEqual obj, Boolean param) {
     return relation(obj, "<=", param);
   }
 
@@ -203,7 +203,7 @@ class CWriterWorker extends NullDispatcher<Void, Boolean> {
   }
 
   @Override
-  protected Void visitNotequal(Notequal obj, Boolean param) {
+  protected Void visitNotequal(NotEqual obj, Boolean param) {
     return relation(obj, "!=", param);
   }
 

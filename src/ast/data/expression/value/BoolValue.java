@@ -18,8 +18,9 @@
 package ast.data.expression.value;
 
 import ast.ElementInfo;
+import ast.visitor.Visitor;
 
-public class BoolValue extends ValueExpr {
+final public class BoolValue extends ValueExpr {
   public final boolean value;
 
   public BoolValue(ElementInfo info, boolean value) {
@@ -32,4 +33,8 @@ public class BoolValue extends ValueExpr {
     return Boolean.toString(value);
   }
 
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
 }

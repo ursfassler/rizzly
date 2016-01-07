@@ -19,12 +19,9 @@ package ast.data.statement;
 
 import ast.ElementInfo;
 import ast.data.expression.Expression;
+import ast.visitor.Visitor;
 
-/**
- *
- * @author urs
- */
-public class WhileStmt extends Statement {
+final public class WhileStmt extends Statement {
 
   public Expression condition;
   public Block body;
@@ -39,4 +36,10 @@ public class WhileStmt extends Statement {
   public String toString() {
     return "while " + condition;
   }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
+  }
+
 }

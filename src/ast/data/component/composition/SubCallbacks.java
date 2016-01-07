@@ -21,6 +21,7 @@ import ast.ElementInfo;
 import ast.data.AstBase;
 import ast.data.AstList;
 import ast.data.function.Function;
+import ast.visitor.Visitor;
 
 public class SubCallbacks extends AstBase {
   final public AstList<Function> func = new AstList<Function>();
@@ -29,6 +30,11 @@ public class SubCallbacks extends AstBase {
   public SubCallbacks(ElementInfo info, CompUseRef compUse) {
     super(info);
     this.compUse = compUse;
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
 }
