@@ -240,8 +240,6 @@ Scenario: Responses need to be connected
   And stderr should contain "testee.rzy:2:8: Error: Interface get not connected"
 
 
-#TODO fix
-@fixme
 Scenario: Responses can not have more than one destination
   Given we have a file "testee.rzy" with the content:
     """
@@ -268,7 +266,7 @@ Scenario: Responses can not have more than one destination
   When I start rizzly with the file "testee.rzy"
 
   Then I expect an error code
-  And stderr should contain "testee.rzy:16:7: Error: TODO some nice error message"
+  And stderr should contain "testee.rzy:16:7: Error: query needs exactly one connection, got more"
 
 
 Scenario: Can connect a query

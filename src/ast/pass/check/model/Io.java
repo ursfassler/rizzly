@@ -28,6 +28,7 @@ import ast.repository.query.Collector;
 import ast.repository.query.FunctionTypeName;
 import ast.specification.PureFunction;
 import ast.specification.StateChangeStmt;
+import ast.visitor.VisitorAcceptor;
 import error.ErrorType;
 import error.RError;
 
@@ -38,7 +39,7 @@ public class Io extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    AstList<Function> functions = Collector.select(ast, new PureFunction()).castTo(Function.class);
+    AstList<Function> functions = getPureFunctions(ast);
     for (Function func : functions) {
       checkFunc(func);
     }
@@ -54,8 +55,16 @@ public class Io extends AstPass {
     }
   }
 
-  private AstList<Statement> getStateModifiers(Function func) {
-    return Collector.select(func, new StateChangeStmt()).castTo(Statement.class);
+  private AstList<Statement> getStateModifiers(VisitorAcceptor ast) {
+    Collector visitor = new Collector(new StateChangeStmt());
+    ast.accept(visitor);
+    return visitor.getMatched().castTo(Statement.class);
+  }
+
+  private AstList<Function> getPureFunctions(VisitorAcceptor ast) {
+    Collector visitor = new Collector(new PureFunction());
+    ast.accept(visitor);
+    return visitor.getMatched().castTo(Function.class);
   }
 
 }

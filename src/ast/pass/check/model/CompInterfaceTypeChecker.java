@@ -46,6 +46,7 @@ import ast.knowledge.KnowLeftIsContainerOfRight;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.pass.check.model.composition.QueryIsConnectedToOneResponse;
 import ast.repository.query.Collector;
 import ast.specification.IsClass;
 import error.ErrorType;
@@ -137,6 +138,9 @@ class CompInterfaceTypeCheckerWorker extends NullDispatcher<Void, Void> {
       checkIface(obj, use, Direction.in);
       checkIface(obj, use, Direction.out);
     }
+
+    // TODO move into own pass or in a common pass
+    (new QueryIsConnectedToOneResponse(RError.instance())).check(obj.connection);
 
     return null;
   }

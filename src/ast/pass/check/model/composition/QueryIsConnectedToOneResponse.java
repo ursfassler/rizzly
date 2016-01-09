@@ -20,12 +20,19 @@ package ast.pass.check.model.composition;
 import java.util.HashMap;
 import java.util.Map;
 
+import util.Pair;
 import ast.data.AstList;
+import ast.data.component.composition.CompUse;
 import ast.data.component.composition.Connection;
 import ast.data.component.composition.Direction;
 import ast.data.component.composition.Endpoint;
+import ast.data.component.composition.EndpointRaw;
+import ast.data.component.composition.EndpointSelf;
+import ast.data.component.composition.EndpointSub;
+import ast.data.function.Function;
 import ast.data.function.ret.FuncReturn;
 import ast.data.function.ret.FuncReturnNone;
+import ast.visitor.NullVisitor;
 import error.ErrorType;
 import error.RizzlyError;
 
@@ -39,11 +46,12 @@ public class QueryIsConnectedToOneResponse {
 
   // TODO this does not work since the endpoints can not be compared with equals
   public void check(AstList<Connection> connections) {
-    Map<Endpoint, Connection> graph = new HashMap<Endpoint, Connection>();
+    Map<Pair<CompUse, Function>, Connection> graph = new HashMap<Pair<CompUse, Function>, Connection>();
 
     for (Connection connection : connections) {
       if (isQuery(connection)) {
-        Endpoint query = connection.endpoint.get(Direction.in);
+        Endpoint endpoint = connection.endpoint.get(Direction.in);
+        Pair<CompUse, Function> query = getDescriptor(endpoint);
 
         if (graph.containsKey(query)) {
           Connection oldConnection = graph.get(query);
@@ -63,4 +71,35 @@ public class QueryIsConnectedToOneResponse {
     FuncReturn ret = ep.getFunc().ret;
     return !(ret instanceof FuncReturnNone);
   }
+
+  private Pair<CompUse, Function> getDescriptor(Endpoint endpoint) {
+    DescriptorBuilder visitor = new DescriptorBuilder();
+    endpoint.accept(visitor);
+    return visitor.descriptor;
+  }
+
+}
+
+class DescriptorBuilder extends NullVisitor {
+  public Pair<CompUse, Function> descriptor = null;
+
+  @Override
+  public void visit(EndpointRaw endpointRaw) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  public void visit(EndpointSelf endpointSelf) {
+    CompUse first = null;
+    Function second = endpointSelf.getFunc();
+    descriptor = new Pair<CompUse, Function>(first, second);
+  }
+
+  @Override
+  public void visit(EndpointSub endpointSub) {
+    CompUse first = endpointSub.component.getTarget();
+    Function second = endpointSub.getFunc();
+    descriptor = new Pair<CompUse, Function>(first, second);
+  }
+
 }
