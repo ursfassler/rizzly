@@ -20,6 +20,7 @@ package ast.pass.reduction.hfsm;
 import java.util.HashMap;
 import java.util.Map;
 
+import main.Configuration;
 import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -57,6 +58,9 @@ import ast.specification.IsClass;
  *
  */
 public class StateVarReplacer extends AstPass {
+  public StateVarReplacer(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

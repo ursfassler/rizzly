@@ -17,19 +17,20 @@
 
 package ast.pass.check.model;
 
+import main.Configuration;
 import ast.pass.others.GroupPass;
 
 public class Modelcheck extends GroupPass {
 
-  public Modelcheck() {
-    super();
-    append(new Root());
-    append(new Usefullness());
-    append(new RtcViolation());
-    append(new Io());
-    append(new HfsmTransScopeCheck());
-    append(new CompInterfaceTypeChecker());
-    append(new HfsmModelChecker());
+  public Modelcheck(Configuration configuration) {
+    super(configuration);
+    append(new Root(configuration));
+    append(new Usefullness(configuration));
+    append(new RtcViolation(configuration));
+    append(new Io(configuration));
+    append(new HfsmTransScopeCheck(configuration));
+    append(new CompInterfaceTypeChecker(configuration));
+    append(new HfsmModelChecker(configuration));
   }
 
 }

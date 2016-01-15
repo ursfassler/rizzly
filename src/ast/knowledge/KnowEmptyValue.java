@@ -26,7 +26,7 @@ import ast.copy.Copy;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.expression.Expression;
-import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.BooleanValue;
 import ast.data.expression.value.NamedElementsValue;
 import ast.data.expression.value.NamedValue;
 import ast.data.expression.value.NumberValue;
@@ -79,7 +79,7 @@ class KnowEmptyValueGenerator extends NullDispatcher<ValueExpr, Void> {
 
   @Override
   protected ValueExpr visitBooleanType(BooleanType obj, Void param) {
-    return new BoolValue(ElementInfo.NO, false);
+    return new BooleanValue(ElementInfo.NO, false);
   }
 
   @Override

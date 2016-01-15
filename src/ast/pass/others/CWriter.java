@@ -20,17 +20,18 @@ package ast.pass.others;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 
+import main.Configuration;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.expression.RefExp;
 import ast.data.expression.TypeCast;
-import ast.data.expression.binop.BinaryExp;
+import ast.data.expression.binop.BinaryExpression;
 import ast.data.expression.binop.BitAnd;
 import ast.data.expression.binop.BitOr;
 import ast.data.expression.binop.BitXor;
-import ast.data.expression.binop.Div;
+import ast.data.expression.binop.Division;
 import ast.data.expression.binop.Equal;
 import ast.data.expression.binop.Greater;
 import ast.data.expression.binop.GreaterEqual;
@@ -39,8 +40,8 @@ import ast.data.expression.binop.LessEqual;
 import ast.data.expression.binop.LogicAnd;
 import ast.data.expression.binop.LogicOr;
 import ast.data.expression.binop.Minus;
-import ast.data.expression.binop.Mod;
-import ast.data.expression.binop.Mul;
+import ast.data.expression.binop.Modulo;
+import ast.data.expression.binop.Multiplication;
 import ast.data.expression.binop.NotEqual;
 import ast.data.expression.binop.Plus;
 import ast.data.expression.binop.Relation;
@@ -51,7 +52,7 @@ import ast.data.expression.unop.LogicNot;
 import ast.data.expression.unop.Uminus;
 import ast.data.expression.unop.UnaryExp;
 import ast.data.expression.value.ArrayValue;
-import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.BooleanValue;
 import ast.data.expression.value.NamedValue;
 import ast.data.expression.value.RecordValue;
 import ast.data.expression.value.StringValue;
@@ -102,6 +103,10 @@ import ast.repository.query.TypeFilter;
 
 public class CWriter extends AstPass {
   public static final String ARRAY_DATA_NAME = "data";
+
+  public CWriter(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
@@ -207,7 +212,7 @@ class CWriterWorker extends NullDispatcher<Void, Boolean> {
     return relation(obj, "!=", param);
   }
 
-  private Void binexp(BinaryExp obj, String exp, Boolean param) {
+  private Void binexp(BinaryExpression obj, String exp, Boolean param) {
     sw.wr("(");
     visit(obj.left, param);
     sw.wr(" ");
@@ -219,7 +224,7 @@ class CWriterWorker extends NullDispatcher<Void, Boolean> {
   }
 
   @Override
-  protected Void visitMod(Mod obj, Boolean param) {
+  protected Void visitMod(Modulo obj, Boolean param) {
     return binexp(obj, "%", param);
   }
 
@@ -239,12 +244,12 @@ class CWriterWorker extends NullDispatcher<Void, Boolean> {
   }
 
   @Override
-  protected Void visitDiv(Div obj, Boolean param) {
+  protected Void visitDiv(Division obj, Boolean param) {
     return binexp(obj, "/", param);
   }
 
   @Override
-  protected Void visitMul(Mul obj, Boolean param) {
+  protected Void visitMul(Multiplication obj, Boolean param) {
     return binexp(obj, "*", param);
   }
 
@@ -764,7 +769,7 @@ class CWriterWorker extends NullDispatcher<Void, Boolean> {
         case '\t':
           ret += "\\t";
           break;
-        // TODO more symbols to escape?
+          // TODO more symbols to escape?
         default:
           ret += c;
           break;
@@ -842,7 +847,7 @@ class CWriterWorker extends NullDispatcher<Void, Boolean> {
   }
 
   @Override
-  protected Void visitBoolValue(BoolValue obj, Boolean param) {
+  protected Void visitBoolValue(BooleanValue obj, Boolean param) {
     if (obj.value) {
       sw.wr("true");
     } else {

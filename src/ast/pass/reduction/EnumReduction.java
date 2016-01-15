@@ -21,6 +21,7 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
+import main.Configuration;
 import ast.Designator;
 import ast.ElementInfo;
 import ast.data.Namespace;
@@ -41,6 +42,10 @@ import ast.repository.query.NameFilter;
 import ast.repository.query.TypeFilter;
 
 public class EnumReduction extends AstPass {
+  public EnumReduction(Configuration configuration) {
+    super(configuration);
+  }
+
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
     TypeRepo kbi = new TypeRepo(kb);

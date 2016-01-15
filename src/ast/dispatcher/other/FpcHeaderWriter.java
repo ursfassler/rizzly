@@ -25,7 +25,7 @@ import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
-import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.BooleanValue;
 import ast.data.expression.value.NumberValue;
 import ast.data.function.Function;
 import ast.data.function.FunctionProperty;
@@ -385,7 +385,7 @@ public class FpcHeaderWriter extends NullDispatcher<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitBoolValue(BoolValue obj, StreamWriter param) {
+  protected Void visitBoolValue(BooleanValue obj, StreamWriter param) {
     throw new RuntimeException("not yet implemented");
   }
 

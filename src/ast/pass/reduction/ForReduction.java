@@ -20,13 +20,14 @@ package ast.pass.reduction;
 import java.math.BigInteger;
 import java.util.List;
 
+import main.Configuration;
 import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.expression.RefExp;
 import ast.data.expression.binop.Less;
 import ast.data.expression.binop.Plus;
-import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.BooleanValue;
 import ast.data.expression.value.NumberValue;
 import ast.data.reference.RefFactory;
 import ast.data.statement.AssignmentSingle;
@@ -54,6 +55,9 @@ import ast.repository.manipulator.TypeRepo;
  *
  */
 public class ForReduction extends AstPass {
+  public ForReduction(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
@@ -88,7 +92,7 @@ class ForReductionWorker extends StmtReplacer<Void> {
     FuncVariable loopCond = new FuncVariable(info, kun.get("run"), TypeRefFactory.create(info, kbi.getBooleanType()));
 
     block.statements.add(new VarDefStmt(info, loopCond));
-    block.statements.add(new AssignmentSingle(info, RefFactory.full(info, loopCond), new BoolValue(info, true)));
+    block.statements.add(new AssignmentSingle(info, RefFactory.full(info, loopCond), new BooleanValue(info, true)));
 
     block.statements.add(new VarDefStmt(info, itr));
     block.statements.add(new AssignmentSingle(info, RefFactory.full(info, itr), new NumberValue(info, rt.range.low)));
@@ -103,7 +107,7 @@ class ForReductionWorker extends StmtReplacer<Void> {
     Block inc = new Block(info);
     option.add(new IfOption(info, new Less(info, new RefExp(info, RefFactory.full(info, itr)), new NumberValue(info, rt.range.high)), inc));
     inc.statements.add(new AssignmentSingle(info, RefFactory.full(info, itr), new Plus(info, new RefExp(info, RefFactory.full(info, itr)), new NumberValue(info, BigInteger.ONE))));
-    defblock.statements.add(new AssignmentSingle(info, RefFactory.full(info, loopCond), new BoolValue(info, false)));
+    defblock.statements.add(new AssignmentSingle(info, RefFactory.full(info, loopCond), new BooleanValue(info, false)));
 
     body.statements.add(new IfStmt(info, option, defblock));
 

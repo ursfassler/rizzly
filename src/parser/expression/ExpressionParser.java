@@ -29,7 +29,7 @@ import ast.data.expression.Expression;
 import ast.data.expression.RefExp;
 import ast.data.expression.unop.Not;
 import ast.data.expression.unop.Uminus;
-import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.BooleanValue;
 import ast.data.expression.value.NamedElementsValue;
 import ast.data.expression.value.NamedValue;
 import ast.data.expression.value.StringValue;
@@ -315,10 +315,10 @@ public class ExpressionParser extends Parser {
         return new StringValue(tok.getInfo(), tok.getData());
       }
       case FALSE: {
-        return new BoolValue(next().getInfo(), false);
+        return new BooleanValue(next().getInfo(), false);
       }
       case TRUE: {
-        return new BoolValue(next().getInfo(), true);
+        return new BooleanValue(next().getInfo(), true);
       }
       case NOT: {
         return new Not(next().getInfo(), parseFactor());

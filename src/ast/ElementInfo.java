@@ -20,8 +20,10 @@ package ast;
 import java.util.ArrayList;
 
 import ast.data.Metadata;
+import ast.visitor.Visitor;
+import ast.visitor.VisitorAcceptor;
 
-public class ElementInfo {
+public class ElementInfo implements VisitorAcceptor {
   final public String filename;
   final public int line;
   final public int row;
@@ -38,6 +40,11 @@ public class ElementInfo {
   @Override
   public String toString() {
     return filename + ": " + line + "," + row;
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 
 }

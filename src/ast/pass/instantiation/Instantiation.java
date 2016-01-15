@@ -17,19 +17,19 @@
 
 package ast.pass.instantiation;
 
+import main.Configuration;
 import ast.pass.instantiation.queuereduction.QueueReduction;
 import ast.pass.optimize.RemoveUnused;
 import ast.pass.others.GroupPass;
 
 public class Instantiation extends GroupPass {
-
-  public Instantiation() {
-    super();
-    append(new ElementaryInstantiation());
-    append(new LinkReduction());
-    append(new QueueReduction());
-    append(new Flattner());
-    append(new RemoveUnused());
+  public Instantiation(Configuration configuration) {
+    super(configuration);
+    append(new ElementaryInstantiation(configuration));
+    append(new LinkReduction(configuration));
+    append(new QueueReduction(configuration));
+    append(new Flattner(configuration));
+    append(new RemoveUnused(configuration));
   }
 
 }

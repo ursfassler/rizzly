@@ -1,5 +1,6 @@
 package ast.pass.optimize;
 
+import main.Configuration;
 import ast.data.Namespace;
 import ast.data.Range;
 import ast.data.expression.Expression;
@@ -9,7 +10,7 @@ import ast.data.expression.binop.GreaterEqual;
 import ast.data.expression.binop.Less;
 import ast.data.expression.binop.LessEqual;
 import ast.data.expression.binop.NotEqual;
-import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.BooleanValue;
 import ast.data.type.Type;
 import ast.data.type.base.RangeType;
 import ast.dispatcher.other.ExprReplacer;
@@ -18,6 +19,9 @@ import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 
 public class AlwaysGreater extends AstPass {
+  public AlwaysGreater(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
@@ -82,11 +86,11 @@ class AlwaysGreaterWorker extends ExprReplacer<Void> {
     if ((lr != null) && (rr != null)) {
       if (lr.high.compareTo(rr.low) <= 0) {
         // 0,1 <= 1,257
-        return new BoolValue(obj.getInfo(), true);
+        return new BooleanValue(obj.getInfo(), true);
       }
       if (rr.high.compareTo(lr.low) < 0) {
         // 10,20 <= 0,9
-        return new BoolValue(obj.getInfo(), false);
+        return new BooleanValue(obj.getInfo(), false);
       }
     }
 

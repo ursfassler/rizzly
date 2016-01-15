@@ -21,9 +21,9 @@ import ast.data.Ast;
 import ast.data.expression.RefExp;
 import ast.data.expression.TypeCast;
 import ast.data.expression.binop.ArithmeticOp;
-import ast.data.expression.binop.BinaryExp;
+import ast.data.expression.binop.BinaryExpression;
 import ast.data.expression.value.ArrayValue;
-import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.BooleanValue;
 import ast.data.expression.value.NumberValue;
 import ast.data.expression.value.RecordValue;
 import ast.data.expression.value.StringValue;
@@ -60,7 +60,7 @@ class ConstTraverser extends NullDispatcher<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitBinaryExp(BinaryExp obj, Void param) {
+  protected Boolean visitBinaryExp(BinaryExpression obj, Void param) {
     return visit(obj.left, param) && visit(obj.right, param);
   }
 
@@ -82,7 +82,7 @@ class ConstTraverser extends NullDispatcher<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitBoolValue(BoolValue obj, Void param) {
+  protected Boolean visitBoolValue(BooleanValue obj, Void param) {
     return true;
   }
 

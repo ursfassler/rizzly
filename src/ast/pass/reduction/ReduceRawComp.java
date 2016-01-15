@@ -3,6 +3,7 @@ package ast.pass.reduction;
 import java.util.HashMap;
 import java.util.Map;
 
+import main.Configuration;
 import ast.Designator;
 import ast.ElementInfo;
 import ast.copy.Relinker;
@@ -43,6 +44,10 @@ import error.ErrorType;
 import error.RError;
 
 public class ReduceRawComp extends AstPass {
+  public ReduceRawComp(Configuration configuration) {
+    super(configuration);
+  }
+
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
     ReduceRawCompWorker worker = new ReduceRawCompWorker();

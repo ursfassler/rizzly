@@ -17,6 +17,7 @@
 
 package ast.pass.others;
 
+import main.Configuration;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -36,6 +37,9 @@ import ast.specification.Specification;
  *
  */
 public class TypeUplift extends AstPass {
+  public TypeUplift(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

@@ -21,6 +21,7 @@ import java.math.BigInteger;
 import java.util.Collection;
 import java.util.HashSet;
 
+import main.Configuration;
 import ast.data.Namespace;
 import ast.data.Range;
 import ast.data.expression.Expression;
@@ -56,6 +57,9 @@ import error.RError;
  *
  */
 public class BitLogicCategorizer extends AstPass {
+  public BitLogicCategorizer(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public Specification getPostcondition() {

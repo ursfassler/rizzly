@@ -17,6 +17,7 @@
 
 package ast.pass.others;
 
+import main.Configuration;
 import ast.copy.Copy;
 import ast.data.Namespace;
 import ast.data.expression.Expression;
@@ -39,6 +40,10 @@ import ast.pass.AstPass;
  *
  */
 public class ConstantPropagation extends AstPass {
+  public ConstantPropagation(Configuration configuration) {
+    super(configuration);
+  }
+
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
     ConstantPropagationWorker worker = new ConstantPropagationWorker(kb);
@@ -73,7 +78,7 @@ class ConstantPropagationWorker extends ExprReplacer<Void> {
   @Override
   protected Expression visitRefExpr(RefExp obj, Void param) {
     if (obj.ref.link instanceof Constant) {
-      Reference ref = (Reference) obj.ref;
+      Reference ref = obj.ref;
       Constant constant = (Constant) ref.link;
       Type type = kt.get(constant.type);
       if (doReduce(type)) {

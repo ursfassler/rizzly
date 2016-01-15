@@ -50,11 +50,11 @@ import ast.data.expression.RefExp;
 import ast.data.expression.TypeCast;
 import ast.data.expression.binop.And;
 import ast.data.expression.binop.ArithmeticOp;
-import ast.data.expression.binop.BinaryExp;
+import ast.data.expression.binop.BinaryExpression;
 import ast.data.expression.binop.BitAnd;
 import ast.data.expression.binop.BitOr;
 import ast.data.expression.binop.BitXor;
-import ast.data.expression.binop.Div;
+import ast.data.expression.binop.Division;
 import ast.data.expression.binop.Equal;
 import ast.data.expression.binop.Greater;
 import ast.data.expression.binop.GreaterEqual;
@@ -65,8 +65,8 @@ import ast.data.expression.binop.LogicAnd;
 import ast.data.expression.binop.LogicOr;
 import ast.data.expression.binop.Logical;
 import ast.data.expression.binop.Minus;
-import ast.data.expression.binop.Mod;
-import ast.data.expression.binop.Mul;
+import ast.data.expression.binop.Modulo;
+import ast.data.expression.binop.Multiplication;
 import ast.data.expression.binop.NotEqual;
 import ast.data.expression.binop.Or;
 import ast.data.expression.binop.Plus;
@@ -80,7 +80,7 @@ import ast.data.expression.unop.Uminus;
 import ast.data.expression.unop.UnaryExp;
 import ast.data.expression.value.AnyValue;
 import ast.data.expression.value.ArrayValue;
-import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.BooleanValue;
 import ast.data.expression.value.NamedElementsValue;
 import ast.data.expression.value.NamedValue;
 import ast.data.expression.value.NumberValue;
@@ -490,8 +490,8 @@ public abstract class Dispatcher<R, P> {
   protected R visitExpression(Expression obj, P param) {
     if (obj instanceof ValueExpr) {
       return visitValueExpr((ValueExpr) obj, param);
-    } else if (obj instanceof BinaryExp) {
-      return visitBinaryExp((BinaryExp) obj, param);
+    } else if (obj instanceof BinaryExpression) {
+      return visitBinaryExp((BinaryExpression) obj, param);
     } else if (obj instanceof UnaryExp) {
       return visitUnaryExp((UnaryExp) obj, param);
     } else if (obj instanceof RefExp) {
@@ -517,8 +517,8 @@ public abstract class Dispatcher<R, P> {
       return visitArrayValue((ArrayValue) obj, param);
     } else if (obj instanceof TupleValue) {
       return visitTupleValue((TupleValue) obj, param);
-    } else if (obj instanceof BoolValue) {
-      return visitBoolValue((BoolValue) obj, param);
+    } else if (obj instanceof BooleanValue) {
+      return visitBoolValue((BooleanValue) obj, param);
     } else if (obj instanceof AnyValue) {
       return visitAnyValue((AnyValue) obj, param);
     } else if (obj instanceof UnionValue) {
@@ -550,7 +550,7 @@ public abstract class Dispatcher<R, P> {
     }
   }
 
-  protected R visitBinaryExp(BinaryExp obj, P param) {
+  protected R visitBinaryExp(BinaryExpression obj, P param) {
     if (obj instanceof ArithmeticOp) {
       return visitArithmeticOp((ArithmeticOp) obj, param);
     } else if (obj instanceof Logical) {
@@ -583,12 +583,12 @@ public abstract class Dispatcher<R, P> {
       return visitPlus((Plus) obj, param);
     } else if (obj instanceof Minus) {
       return visitMinus((Minus) obj, param);
-    } else if (obj instanceof Mul) {
-      return visitMul((Mul) obj, param);
-    } else if (obj instanceof Div) {
-      return visitDiv((Div) obj, param);
-    } else if (obj instanceof Mod) {
-      return visitMod((Mod) obj, param);
+    } else if (obj instanceof Multiplication) {
+      return visitMul((Multiplication) obj, param);
+    } else if (obj instanceof Division) {
+      return visitDiv((Division) obj, param);
+    } else if (obj instanceof Modulo) {
+      return visitMod((Modulo) obj, param);
     } else if (obj instanceof Shl) {
       return visitShl((Shl) obj, param);
     } else if (obj instanceof Shr) {
@@ -917,7 +917,7 @@ public abstract class Dispatcher<R, P> {
 
   abstract protected R visitEnumElement(EnumElement obj, P param);
 
-  abstract protected R visitBoolValue(BoolValue obj, P param);
+  abstract protected R visitBoolValue(BooleanValue obj, P param);
 
   abstract protected R visitArrayValue(ArrayValue obj, P param);
 
@@ -955,11 +955,11 @@ public abstract class Dispatcher<R, P> {
 
   abstract protected R visitMinus(Minus obj, P param);
 
-  abstract protected R visitMul(Mul obj, P param);
+  abstract protected R visitMul(Multiplication obj, P param);
 
-  abstract protected R visitDiv(Div obj, P param);
+  abstract protected R visitDiv(Division obj, P param);
 
-  abstract protected R visitMod(Mod obj, P param);
+  abstract protected R visitMod(Modulo obj, P param);
 
   abstract protected R visitOr(Or obj, P param);
 

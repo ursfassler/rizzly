@@ -17,6 +17,7 @@
 
 package ast.pass.check.model;
 
+import main.Configuration;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.component.Component;
@@ -32,10 +33,13 @@ import error.RError;
  * implement correctly.
  */
 public class Root extends AstPass {
+  public Root(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    Component root = (Component) kb.getRootComp().compRef.getTarget();
+    Component root = kb.getRootComp().compRef.getTarget();
 
     AstList<FuncQuery> queries = new AstList<FuncQuery>();
     for (InterfaceFunction itr : root.iface) {

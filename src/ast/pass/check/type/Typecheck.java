@@ -17,6 +17,7 @@
 
 package ast.pass.check.type;
 
+import main.Configuration;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.component.composition.ImplComposition;
@@ -33,6 +34,10 @@ import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 
 public class Typecheck extends AstPass {
+  public Typecheck(Configuration configuration) {
+    super(configuration);
+  }
+
   static public void process(Ast ast, KnowledgeBase kb) {
     TypeCheckerWorker adder = new TypeCheckerWorker(kb);
     adder.traverse(ast, null);
@@ -97,7 +102,7 @@ class TypeCheckerWorker extends DfsTraverser<Void, Void> {
   @Override
   protected Void visitEnumType(EnumType obj, Void param) {
     return null; // we do not type check them (assignment of number does not
-                 // work)
+    // work)
   }
 
   public static void checkFunc(Function obj, KnowledgeBase kb) {

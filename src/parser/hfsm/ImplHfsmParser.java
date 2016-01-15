@@ -34,7 +34,7 @@ import ast.data.component.hfsm.StateRef;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.component.hfsm.Transition;
 import ast.data.expression.Expression;
-import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.BooleanValue;
 import ast.data.function.FuncRef;
 import ast.data.function.FuncRefFactory;
 import ast.data.function.Function;
@@ -216,7 +216,7 @@ public class ImplHfsmParser extends ImplBaseParser {
     if (consumeIfEqual(TokenType.IF)) {
       guard = expr().parse();
     } else {
-      guard = new BoolValue(info, true);
+      guard = new BooleanValue(info, true);
     }
 
     Block body;

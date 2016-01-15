@@ -24,7 +24,7 @@ import ast.data.expression.Expression;
  *
  * @author urs
  */
-abstract public class Relation extends BinaryExp {
+abstract public class Relation extends BinaryExpression {
 
   public Relation(ElementInfo info, Expression left, Expression right) {
     super(info, left, right);

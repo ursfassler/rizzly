@@ -17,6 +17,7 @@
 
 package ast.pass.others;
 
+import main.Configuration;
 import ast.Designator;
 import ast.data.Ast;
 import ast.data.Named;
@@ -35,6 +36,9 @@ import ast.pass.AstPass;
  *
  */
 public class CRenamer extends AstPass {
+  public CRenamer(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

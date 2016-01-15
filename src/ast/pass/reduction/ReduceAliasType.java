@@ -20,6 +20,7 @@ package ast.pass.reduction;
 import java.util.ArrayList;
 import java.util.List;
 
+import main.Configuration;
 import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.reference.Reference;
@@ -31,6 +32,9 @@ import error.ErrorType;
 import error.RError;
 
 public class ReduceAliasType extends AstPass {
+  public ReduceAliasType(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

@@ -50,16 +50,16 @@ import ast.data.component.hfsm.Transition;
 import ast.data.expression.RefExp;
 import ast.data.expression.TypeCast;
 import ast.data.expression.binop.And;
-import ast.data.expression.binop.BinaryExp;
-import ast.data.expression.binop.Div;
+import ast.data.expression.binop.BinaryExpression;
+import ast.data.expression.binop.Division;
 import ast.data.expression.binop.Equal;
 import ast.data.expression.binop.Greater;
 import ast.data.expression.binop.GreaterEqual;
 import ast.data.expression.binop.Less;
 import ast.data.expression.binop.LessEqual;
 import ast.data.expression.binop.Minus;
-import ast.data.expression.binop.Mod;
-import ast.data.expression.binop.Mul;
+import ast.data.expression.binop.Modulo;
+import ast.data.expression.binop.Multiplication;
 import ast.data.expression.binop.NotEqual;
 import ast.data.expression.binop.Or;
 import ast.data.expression.binop.Plus;
@@ -71,7 +71,7 @@ import ast.data.expression.unop.Not;
 import ast.data.expression.unop.Uminus;
 import ast.data.expression.unop.UnaryExp;
 import ast.data.expression.value.ArrayValue;
-import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.BooleanValue;
 import ast.data.expression.value.RecordValue;
 import ast.data.expression.value.TupleValue;
 import ast.data.expression.value.UnionValue;
@@ -412,7 +412,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
     xw.wr("(");
     list(obj.param, "; ", null);
     xw.wr(")");
-    if (!((obj.guard instanceof BoolValue) && (((ast.data.expression.value.BoolValue) obj.guard).value == true))) {
+    if (!((obj.guard instanceof BooleanValue) && (((ast.data.expression.value.BooleanValue) obj.guard).value == true))) {
       xw.wr(" ");
       xw.kw("if");
       xw.wr(" ");
@@ -766,7 +766,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitBoolValue(ast.data.expression.value.BoolValue obj, Void param) {
+  protected Void visitBoolValue(ast.data.expression.value.BooleanValue obj, Void param) {
     xw.kw(obj.value ? "True" : "False");
     return null;
   }
@@ -1229,7 +1229,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
 
   // ---- Expression ----------------------------------------------------------
   @Override
-  protected Void visitBinaryExp(BinaryExp obj, Void param) {
+  protected Void visitBinaryExp(BinaryExpression obj, Void param) {
     xw.kw("(");
     visit(obj.left, param);
     xw.kw(" ");
@@ -1303,7 +1303,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
     return null;
   }
 
-  private void visitBinop(String op, BinaryExp obj, Void param) {
+  private void visitBinop(String op, BinaryExpression obj, Void param) {
     xw.kw("(");
     visit(obj.left, param);
     xw.kw(" ");
@@ -1320,7 +1320,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitDiv(Div obj, Void param) {
+  protected Void visitDiv(Division obj, Void param) {
     visitBinop("/", obj, param);
     return null;
   }
@@ -1362,13 +1362,13 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitMod(Mod obj, Void param) {
+  protected Void visitMod(Modulo obj, Void param) {
     visitBinop("mod", obj, param);
     return null;
   }
 
   @Override
-  protected Void visitMul(Mul obj, Void param) {
+  protected Void visitMul(Multiplication obj, Void param) {
     visitBinop("*", obj, param);
     return null;
   }

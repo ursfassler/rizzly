@@ -17,6 +17,7 @@
 
 package ast.visitor;
 
+import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.component.CompRef;
@@ -42,7 +43,7 @@ import ast.data.expression.binop.And;
 import ast.data.expression.binop.BitAnd;
 import ast.data.expression.binop.BitOr;
 import ast.data.expression.binop.BitXor;
-import ast.data.expression.binop.Div;
+import ast.data.expression.binop.Division;
 import ast.data.expression.binop.Equal;
 import ast.data.expression.binop.Greater;
 import ast.data.expression.binop.GreaterEqual;
@@ -52,8 +53,8 @@ import ast.data.expression.binop.LessEqual;
 import ast.data.expression.binop.LogicAnd;
 import ast.data.expression.binop.LogicOr;
 import ast.data.expression.binop.Minus;
-import ast.data.expression.binop.Mod;
-import ast.data.expression.binop.Mul;
+import ast.data.expression.binop.Modulo;
+import ast.data.expression.binop.Multiplication;
 import ast.data.expression.binop.NotEqual;
 import ast.data.expression.binop.Or;
 import ast.data.expression.binop.Plus;
@@ -65,7 +66,7 @@ import ast.data.expression.unop.Not;
 import ast.data.expression.unop.Uminus;
 import ast.data.expression.value.AnyValue;
 import ast.data.expression.value.ArrayValue;
-import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.BooleanValue;
 import ast.data.expression.value.NamedElementsValue;
 import ast.data.expression.value.NamedValue;
 import ast.data.expression.value.NumberValue;
@@ -243,7 +244,7 @@ public class DefaultVisitor implements Visitor {
   }
 
   @Override
-  public void visit(BoolValue boolValue) {
+  public void visit(BooleanValue boolValue) {
     defaultHandler(boolValue);
   }
 
@@ -313,7 +314,7 @@ public class DefaultVisitor implements Visitor {
   }
 
   @Override
-  public void visit(Div div) {
+  public void visit(Division div) {
     defaultHandler(div);
   }
 
@@ -508,7 +509,7 @@ public class DefaultVisitor implements Visitor {
   }
 
   @Override
-  public void visit(Mod mod) {
+  public void visit(Modulo mod) {
     defaultHandler(mod);
   }
 
@@ -518,7 +519,7 @@ public class DefaultVisitor implements Visitor {
   }
 
   @Override
-  public void visit(Mul mul) {
+  public void visit(Multiplication mul) {
     defaultHandler(mul);
   }
 
@@ -810,6 +811,11 @@ public class DefaultVisitor implements Visitor {
   @Override
   public void visit(WhileStmt whileStmt) {
     defaultHandler(whileStmt);
+  }
+
+  @Override
+  public void visit(ElementInfo elementInfo) {
+    throw new RuntimeException("not yet implemented");
   }
 
 }

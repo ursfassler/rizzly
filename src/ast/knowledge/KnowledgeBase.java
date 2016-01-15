@@ -19,7 +19,7 @@ package ast.knowledge;
 
 import java.util.HashMap;
 
-import main.ClaOption;
+import main.Configuration;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.component.composition.CompUse;
@@ -30,9 +30,9 @@ public class KnowledgeBase {
   final public Namespace root;
   final public String outDir;
   final public String debugDir;
-  final public ClaOption options;
+  final public Configuration options;
 
-  public KnowledgeBase(Namespace root, String outDir, String debugDir, ClaOption options) {
+  public KnowledgeBase(Namespace root, String outDir, String debugDir, Configuration options) {
     super();
     this.root = root;
     this.debugDir = debugDir;
@@ -52,7 +52,7 @@ public class KnowledgeBase {
     return root;
   }
 
-  public ClaOption getOptions() {
+  public Configuration getOptions() {
     return options;
   }
 

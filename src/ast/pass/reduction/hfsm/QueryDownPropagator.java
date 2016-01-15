@@ -20,6 +20,7 @@ package ast.pass.reduction.hfsm;
 import java.util.HashMap;
 import java.util.Map;
 
+import main.Configuration;
 import ast.Designator;
 import ast.ElementInfo;
 import ast.copy.Copy;
@@ -48,6 +49,9 @@ import ast.repository.query.TypeFilter;
 import ast.specification.IsClass;
 
 public class QueryDownPropagator extends AstPass {
+  public QueryDownPropagator(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

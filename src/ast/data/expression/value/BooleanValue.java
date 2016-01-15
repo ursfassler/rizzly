@@ -15,25 +15,22 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.expression.binop;
+package ast.data.expression.value;
 
 import ast.ElementInfo;
-import ast.data.expression.Expression;
 import ast.visitor.Visitor;
 
-/**
- *
- * @author urs
- */
-final public class Mul extends ArithmeticOp {
+final public class BooleanValue extends ValueExpr {
+  public final boolean value;
 
-  public Mul(ElementInfo info, Expression left, Expression right) {
-    super(info, left, right);
+  public BooleanValue(ElementInfo info, boolean value) {
+    super(info);
+    this.value = value;
   }
 
   @Override
-  public String getOpName() {
-    return "*";
+  public String toString() {
+    return Boolean.toString(value);
   }
 
   @Override

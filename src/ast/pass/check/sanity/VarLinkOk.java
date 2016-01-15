@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import main.Configuration;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.component.composition.SubCallbacks;
@@ -51,6 +52,9 @@ import error.RError;
  *
  */
 public class VarLinkOk extends AstPass {
+  public VarLinkOk(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

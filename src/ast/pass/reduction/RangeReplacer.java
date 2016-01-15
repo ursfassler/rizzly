@@ -21,6 +21,7 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
+import main.Configuration;
 import ast.ElementInfo;
 import ast.copy.Relinker;
 import ast.data.Ast;
@@ -47,6 +48,9 @@ import error.RError;
  *
  */
 public class RangeReplacer extends AstPass {
+  public RangeReplacer(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

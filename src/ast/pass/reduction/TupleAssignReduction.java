@@ -20,6 +20,7 @@ package ast.pass.reduction;
 import java.util.ArrayList;
 import java.util.List;
 
+import main.Configuration;
 import ast.Designator;
 import ast.ElementInfo;
 import ast.copy.Copy;
@@ -49,6 +50,9 @@ import error.RError;
 
 //TODO merge parts with InitVarTyper
 public class TupleAssignReduction extends AstPass {
+  public TupleAssignReduction(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

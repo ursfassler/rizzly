@@ -17,6 +17,7 @@
 
 package ast.pass.others;
 
+import main.Configuration;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.type.Type;
@@ -36,6 +37,10 @@ import ast.repository.manipulator.TypeRepo;
  *
  */
 public class ConstTyper extends AstPass {
+  public ConstTyper(Configuration configuration) {
+    super(configuration);
+  }
+
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
     Typer replace = new Typer(kb);

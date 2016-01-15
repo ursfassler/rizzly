@@ -20,6 +20,7 @@ package ast.pass.reduction;
 import java.util.HashMap;
 import java.util.Map;
 
+import main.Configuration;
 import ast.Designator;
 import ast.ElementInfo;
 import ast.data.Ast;
@@ -54,6 +55,10 @@ import ast.specification.HasName;
 // TODO replace also reference to element x of U to x' in E
 // DONE replace "is" with "=="
 public class ReduceUnion extends AstPass {
+  public ReduceUnion(Configuration configuration) {
+    super(configuration);
+  }
+
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
     ReduceUnionWorker inst = new ReduceUnionWorker(kb);
@@ -86,7 +91,7 @@ class ReduceUnionWorker extends ExprReplacer<Void> {
     Type et = kt.get(obj.condition);
     if (et instanceof UnionType) {
       assert (obj.condition instanceof RefExp);
-      Reference cond = (Reference) ((RefExp) obj.condition).ref;
+      Reference cond = ((RefExp) obj.condition).ref;
       cond.offset.add(new RefName(ElementInfo.NO, ((UnionType) et).tag.name));
     }
     return super.visitCaseStmt(obj, param);
@@ -113,7 +118,7 @@ class ReduceUnionWorker extends ExprReplacer<Void> {
   @Override
   protected Expression visitIs(Is obj, Void param) {
     super.visitIs(obj, param);
-    Reference left = (Reference) ((RefExp) visit(obj.left, null)).ref;
+    Reference left = ((RefExp) visit(obj.left, null)).ref;
 
     assert (left.offset.isEmpty());
 

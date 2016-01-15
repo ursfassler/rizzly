@@ -17,6 +17,7 @@
 
 package ast.pass.check.model;
 
+import main.Configuration;
 import ast.data.Namespace;
 import ast.data.component.Component;
 import ast.data.function.header.FuncQuery;
@@ -40,6 +41,9 @@ import error.RError;
  * A component with only input or output data flow can not do a lot (or not more than a global function can do).
  */
 public class Usefullness extends AstPass {
+  public Usefullness(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

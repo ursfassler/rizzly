@@ -24,6 +24,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
+import main.Configuration;
 import util.Pair;
 import ast.ElementInfo;
 import ast.copy.Copy;
@@ -81,6 +82,9 @@ import error.ErrorType;
 import error.RError;
 
 public class CompositionReduction extends AstPass {
+  public CompositionReduction(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public Specification getPostcondition() {

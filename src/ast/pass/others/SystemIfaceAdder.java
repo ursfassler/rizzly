@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
+import main.Configuration;
 import ast.Designator;
 import ast.ElementInfo;
 import ast.data.Ast;
@@ -51,6 +52,10 @@ import ast.pass.AstPass;
 import error.RError;
 
 public class SystemIfaceAdder extends AstPass {
+  public SystemIfaceAdder(Configuration configuration) {
+    super(configuration);
+  }
+
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
     SystemIfaceAdderWorker reduction = new SystemIfaceAdderWorker();

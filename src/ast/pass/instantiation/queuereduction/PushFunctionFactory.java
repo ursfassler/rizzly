@@ -26,7 +26,7 @@ import ast.data.AstList;
 import ast.data.Named;
 import ast.data.expression.RefExp;
 import ast.data.expression.binop.Less;
-import ast.data.expression.binop.Mod;
+import ast.data.expression.binop.Modulo;
 import ast.data.expression.binop.Plus;
 import ast.data.expression.value.NumberValue;
 import ast.data.function.Function;
@@ -69,7 +69,7 @@ class PushFunctionFactory {
 
     FuncVariable idx = new FuncVariable(info, "wridx", Copy.copy(queueVariables.getHead().type));
     pushbody.statements.add(new VarDefStmt(info, idx));
-    pushbody.statements.add(new AssignmentSingle(info, ref(idx), new Mod(info, new Plus(info, refexpr(queueVariables.getHead()), refexpr(queueVariables.getCount())), new NumberValue(info, BigInteger.valueOf(queueTypes.queueLength())))));
+    pushbody.statements.add(new AssignmentSingle(info, ref(idx), new Modulo(info, new Plus(info, refexpr(queueVariables.getHead()), refexpr(queueVariables.getCount())), new NumberValue(info, BigInteger.valueOf(queueTypes.queueLength())))));
 
     Reference qir = ref(queueVariables.getQueue());
     qir.offset.add(new RefIndex(info, refexpr(idx)));

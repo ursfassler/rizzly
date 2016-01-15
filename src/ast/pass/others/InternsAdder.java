@@ -17,6 +17,7 @@
 
 package ast.pass.others;
 
+import main.Configuration;
 import ast.data.function.template.DefaultValueTemplateFactory;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.StringType;
@@ -33,6 +34,9 @@ import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 
 public class InternsAdder extends AstPass {
+  public InternsAdder(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(ast.data.Namespace root, KnowledgeBase kb) {

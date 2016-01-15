@@ -25,7 +25,7 @@ import ast.visitor.Visitor;
  *
  * @author urs
  */
-final public class Or extends BinaryExp {
+final public class Or extends BinaryExpression {
 
   public Or(ElementInfo info, Expression left, Expression right) {
     super(info, left, right);

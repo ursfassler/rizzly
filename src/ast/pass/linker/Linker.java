@@ -21,6 +21,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
+import main.Configuration;
 import ast.Designator;
 import ast.data.AstList;
 import ast.data.Named;
@@ -53,6 +54,9 @@ import error.ErrorType;
 import error.RError;
 
 public class Linker extends AstPass {
+  public Linker(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(ast.data.Namespace root, KnowledgeBase kb) {

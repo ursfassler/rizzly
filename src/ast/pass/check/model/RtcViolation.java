@@ -22,6 +22,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 
+import main.Configuration;
 import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
@@ -48,6 +49,9 @@ import error.RError;
  * Checks that Run To Completion semantic is not violated, i.e. that calls on component is a DAG
  */
 public class RtcViolation extends AstPass {
+  public RtcViolation(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

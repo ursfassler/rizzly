@@ -3,6 +3,7 @@ package ast.pass.optimize;
 import java.util.List;
 import java.util.Set;
 
+import main.Configuration;
 import util.Pair;
 import ast.ElementInfo;
 import ast.copy.Copy;
@@ -34,6 +35,9 @@ import ast.specification.IsClass;
 import error.RError;
 
 public class FuncInliner extends AstPass {
+  public FuncInliner(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

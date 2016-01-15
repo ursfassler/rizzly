@@ -25,7 +25,7 @@ import ast.visitor.Visitor;
  *
  * @author urs
  */
-final public class And extends BinaryExp {
+final public class And extends BinaryExpression {
 
   public And(ElementInfo info, Expression left, Expression right) {
     super(info, left, right);

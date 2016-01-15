@@ -42,7 +42,7 @@ import ast.data.expression.binop.And;
 import ast.data.expression.binop.BitAnd;
 import ast.data.expression.binop.BitOr;
 import ast.data.expression.binop.BitXor;
-import ast.data.expression.binop.Div;
+import ast.data.expression.binop.Division;
 import ast.data.expression.binop.Equal;
 import ast.data.expression.binop.Greater;
 import ast.data.expression.binop.GreaterEqual;
@@ -52,8 +52,8 @@ import ast.data.expression.binop.LessEqual;
 import ast.data.expression.binop.LogicAnd;
 import ast.data.expression.binop.LogicOr;
 import ast.data.expression.binop.Minus;
-import ast.data.expression.binop.Mod;
-import ast.data.expression.binop.Mul;
+import ast.data.expression.binop.Modulo;
+import ast.data.expression.binop.Multiplication;
 import ast.data.expression.binop.NotEqual;
 import ast.data.expression.binop.Or;
 import ast.data.expression.binop.Plus;
@@ -65,7 +65,7 @@ import ast.data.expression.unop.Not;
 import ast.data.expression.unop.Uminus;
 import ast.data.expression.value.AnyValue;
 import ast.data.expression.value.ArrayValue;
-import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.BooleanValue;
 import ast.data.expression.value.NamedElementsValue;
 import ast.data.expression.value.NamedValue;
 import ast.data.expression.value.NumberValue;
@@ -456,7 +456,7 @@ abstract public class NullDispatcher<R, P> extends Dispatcher<R, P> {
   }
 
   @Override
-  protected R visitBoolValue(BoolValue obj, P param) {
+  protected R visitBoolValue(BooleanValue obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -546,7 +546,7 @@ abstract public class NullDispatcher<R, P> extends Dispatcher<R, P> {
   }
 
   @Override
-  protected R visitDiv(Div obj, P param) {
+  protected R visitDiv(Division obj, P param) {
     return visitDefault(obj, param);
   }
 
@@ -581,12 +581,12 @@ abstract public class NullDispatcher<R, P> extends Dispatcher<R, P> {
   }
 
   @Override
-  protected R visitMod(Mod obj, P param) {
+  protected R visitMod(Modulo obj, P param) {
     return visitDefault(obj, param);
   }
 
   @Override
-  protected R visitMul(Mul obj, P param) {
+  protected R visitMul(Multiplication obj, P param) {
     return visitDefault(obj, param);
   }
 

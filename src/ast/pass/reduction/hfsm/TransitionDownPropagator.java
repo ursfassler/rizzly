@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import main.Configuration;
 import ast.Designator;
 import ast.ElementInfo;
 import ast.copy.Copy;
@@ -67,6 +68,9 @@ import ast.specification.IsClass;
  *
  */
 public class TransitionDownPropagator extends AstPass {
+  public TransitionDownPropagator(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
@@ -251,7 +255,7 @@ class TransitionDownPropagatorWorker extends NullDispatcher<Void, TransitionPara
     /*
      * for all states in obj.getItem() we want to know, which transitions are before and which ones are after the
      * specific state.
-     * 
+     *
      * the map spos contains the position of the state in the transition array
      */
 

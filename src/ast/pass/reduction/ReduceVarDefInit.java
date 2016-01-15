@@ -2,6 +2,7 @@ package ast.pass.reduction;
 
 import java.util.List;
 
+import main.Configuration;
 import ast.data.Namespace;
 import ast.data.statement.Statement;
 import ast.data.statement.VarDefInitStmt;
@@ -12,6 +13,9 @@ import ast.pass.AstPass;
 import error.RError;
 
 public class ReduceVarDefInit extends AstPass {
+  public ReduceVarDefInit(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

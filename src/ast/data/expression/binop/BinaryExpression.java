@@ -15,18 +15,30 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.check.sanity;
+package ast.data.expression.binop;
 
-import main.Configuration;
-import ast.pass.others.GroupPass;
+import ast.ElementInfo;
+import ast.data.expression.Expression;
 
-public class Sanitycheck extends GroupPass {
+/**
+ *
+ * @author urs
+ */
+abstract public class BinaryExpression extends Expression {
 
-  public Sanitycheck(Configuration configuration) {
-    super(configuration);
-    append(new LinkTargetExists(configuration));
-    append(new VarLinkOk(configuration));
-    append(new SingleDefinition(configuration));
+  public Expression left;
+  public Expression right;
+
+  abstract public String getOpName();
+
+  public BinaryExpression(ElementInfo info, Expression left, Expression right) {
+    super(info);
+    this.left = left;
+    this.right = right;
   }
 
+  @Override
+  public String toString() {
+    return "(" + left + " " + getOpName() + " " + right + ")";
+  }
 }

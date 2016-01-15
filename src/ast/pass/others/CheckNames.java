@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.Set;
 
+import main.Configuration;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
@@ -45,6 +46,10 @@ import error.RError;
  *
  */
 public class CheckNames extends AstPass {
+  public CheckNames(Configuration configuration) {
+    super(configuration);
+  }
+
   // TODO find more elegant way to check Template names
   @Override
   public void process(Namespace root, KnowledgeBase kb) {

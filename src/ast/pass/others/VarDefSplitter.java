@@ -17,6 +17,7 @@
 
 package ast.pass.others;
 
+import main.Configuration;
 import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.expression.RefExp;
@@ -40,6 +41,9 @@ import ast.pass.AstPass;
  *
  */
 public class VarDefSplitter extends AstPass {
+  public VarDefSplitter(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(ast.data.Namespace root, KnowledgeBase kb) {

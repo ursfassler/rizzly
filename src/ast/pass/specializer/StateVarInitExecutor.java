@@ -17,6 +17,7 @@
 
 package ast.pass.specializer;
 
+import main.Configuration;
 import ast.data.variable.StateVariable;
 import ast.dispatcher.DfsTraverser;
 import ast.interpreter.Memory;
@@ -30,6 +31,9 @@ import ast.pass.AstPass;
  *
  */
 public class StateVarInitExecutor extends AstPass {
+  public StateVarInitExecutor(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(ast.data.Namespace root, KnowledgeBase kb) {

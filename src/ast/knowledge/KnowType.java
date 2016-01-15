@@ -39,12 +39,12 @@ import ast.data.expression.binop.And;
 import ast.data.expression.binop.BitAnd;
 import ast.data.expression.binop.BitOr;
 import ast.data.expression.binop.BitXor;
-import ast.data.expression.binop.Div;
+import ast.data.expression.binop.Division;
 import ast.data.expression.binop.LogicAnd;
 import ast.data.expression.binop.LogicOr;
 import ast.data.expression.binop.Minus;
-import ast.data.expression.binop.Mod;
-import ast.data.expression.binop.Mul;
+import ast.data.expression.binop.Modulo;
+import ast.data.expression.binop.Multiplication;
 import ast.data.expression.binop.Or;
 import ast.data.expression.binop.Plus;
 import ast.data.expression.binop.Relation;
@@ -55,7 +55,7 @@ import ast.data.expression.unop.LogicNot;
 import ast.data.expression.unop.Uminus;
 import ast.data.expression.value.AnyValue;
 import ast.data.expression.value.ArrayValue;
-import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.BooleanValue;
 import ast.data.expression.value.NumberValue;
 import ast.data.expression.value.RecordValue;
 import ast.data.expression.value.StringValue;
@@ -206,7 +206,7 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
   }
 
   @Override
-  protected Type visitBoolValue(BoolValue obj, Void param) {
+  protected Type visitBoolValue(BooleanValue obj, Void param) {
     return kbi.getBooleanType();
   }
 
@@ -492,7 +492,7 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
   }
 
   @Override
-  protected Type visitMod(Mod obj, Void param) {
+  protected Type visitMod(Modulo obj, Void param) {
     Type lhs = visit(obj.left, param);
     Type rhs = visit(obj.right, param);
 
@@ -515,7 +515,7 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
   }
 
   @Override
-  protected Type visitMul(Mul obj, Void param) {
+  protected Type visitMul(Multiplication obj, Void param) {
     Type lhs = visit(obj.left, param);
     Type rhs = visit(obj.right, param);
 
@@ -534,7 +534,7 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
   }
 
   @Override
-  protected Type visitDiv(Div obj, Void param) {
+  protected Type visitDiv(Division obj, Void param) {
     Type lhs = visit(obj.left, param);
     Type rhs = visit(obj.right, param);
 

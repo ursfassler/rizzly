@@ -17,6 +17,7 @@
 
 package ast.pass.reduction;
 
+import main.Configuration;
 import ast.data.Ast;
 import ast.data.Named;
 import ast.data.Namespace;
@@ -40,6 +41,9 @@ import error.RError;
  *
  */
 public class CompLinkReduction extends AstPass {
+  public CompLinkReduction(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(ast.data.Namespace root, KnowledgeBase kb) {
@@ -70,7 +74,7 @@ class CompLinkReductionWorker extends NullDispatcher<Void, Void> {
 
   @Override
   protected Void visitCompUse(ast.data.component.composition.CompUse obj, Void param) {
-    Reference compRef = (Reference) obj.compRef.ref;
+    Reference compRef = obj.compRef.ref;
     Named item = compRef.link;
 
     while (!compRef.offset.isEmpty()) {

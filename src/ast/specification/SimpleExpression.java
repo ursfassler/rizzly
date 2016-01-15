@@ -21,9 +21,9 @@ import java.util.Collection;
 
 import ast.data.Ast;
 import ast.data.component.composition.CompUse;
-import ast.data.expression.binop.BinaryExp;
+import ast.data.expression.binop.BinaryExpression;
 import ast.data.expression.unop.UnaryExp;
-import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.BooleanValue;
 import ast.data.expression.value.NumberValue;
 import ast.data.expression.value.StringValue;
 import ast.data.function.Function;
@@ -136,12 +136,12 @@ class SimpleGetter extends NullDispatcher<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitBinaryExp(BinaryExp obj, Void param) {
+  protected Boolean visitBinaryExp(BinaryExpression obj, Void param) {
     return false;
   }
 
   @Override
-  protected Boolean visitBoolValue(BoolValue obj, Void param) {
+  protected Boolean visitBoolValue(BooleanValue obj, Void param) {
     return true;
   }
 

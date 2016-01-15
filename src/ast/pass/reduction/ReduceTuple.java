@@ -17,6 +17,7 @@
 
 package ast.pass.reduction;
 
+import main.Configuration;
 import ast.data.Namespace;
 import ast.data.expression.Expression;
 import ast.data.expression.value.TupleValue;
@@ -25,6 +26,9 @@ import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 
 public class ReduceTuple extends AstPass {
+  public ReduceTuple(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

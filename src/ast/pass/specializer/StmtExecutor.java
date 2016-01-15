@@ -25,7 +25,7 @@ import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.expression.Expression;
 import ast.data.expression.value.AnyValue;
-import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.BooleanValue;
 import ast.data.expression.value.TupleValue;
 import ast.data.expression.value.ValueExpr;
 import ast.data.function.header.FuncFunction;
@@ -86,8 +86,8 @@ public class StmtExecutor extends NullDispatcher<Expression, Memory> {
   }
 
   private boolean toBool(Expression expr) {
-    assert (expr instanceof BoolValue);
-    return ((BoolValue) expr).value;
+    assert (expr instanceof BooleanValue);
+    return ((BooleanValue) expr).value;
   }
 
   @Override

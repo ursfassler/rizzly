@@ -17,6 +17,7 @@
 
 package ast.pass.others;
 
+import main.Configuration;
 import ast.Designator;
 import ast.ElementInfo;
 import ast.data.AstList;
@@ -61,6 +62,9 @@ import error.RError;
  *
  */
 public class IntroduceConvert extends AstPass {
+  public IntroduceConvert(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

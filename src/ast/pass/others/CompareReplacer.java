@@ -17,6 +17,7 @@
 
 package ast.pass.others;
 
+import main.Configuration;
 import util.Pair;
 import ast.ElementInfo;
 import ast.copy.Copy;
@@ -29,7 +30,7 @@ import ast.data.expression.binop.Equal;
 import ast.data.expression.binop.LogicAnd;
 import ast.data.expression.binop.NotEqual;
 import ast.data.expression.unop.LogicNot;
-import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.BooleanValue;
 import ast.data.expression.value.TupleValue;
 import ast.data.function.header.FuncFunction;
 import ast.data.function.ret.FuncReturnType;
@@ -66,6 +67,10 @@ import ast.repository.manipulator.TypeRepo;
  *
  */
 public class CompareReplacer extends AstPass {
+
+  public CompareReplacer(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
@@ -183,7 +188,7 @@ class MakeCompareFunction extends NullDispatcher<Expression, Pair<Expression, Ex
     param.addAll(left);
     param.add(right);
 
-    Expression expr = new BoolValue(info, true);
+    Expression expr = new BooleanValue(info, true);
 
     for (int i = 0; i < rt.element.size(); i++) {
       Reference leftVal = RefFactory.full(info, left.get(i));
@@ -208,7 +213,7 @@ class MakeCompareFunction extends NullDispatcher<Expression, Pair<Expression, Ex
     param.addAll(left);
     param.addAll(right);
 
-    Expression expr = new BoolValue(info, true);
+    Expression expr = new BooleanValue(info, true);
 
     for (int i = 0; i < left.size(); i++) {
       Reference leftVal = RefFactory.full(info, left.get(i));
@@ -252,7 +257,7 @@ class MakeCompareFunction extends NullDispatcher<Expression, Pair<Expression, Ex
     param.add(left);
     param.addAll(right);
 
-    Expression expr = new BoolValue(info, true);
+    Expression expr = new BooleanValue(info, true);
 
     for (int i = 0; i < lt.element.size(); i++) {
       Reference leftVal = RefFactory.create(info, left, new RefName(info, lt.element.get(i).name));
@@ -271,7 +276,7 @@ class MakeCompareFunction extends NullDispatcher<Expression, Pair<Expression, Ex
     param.add(left);
     param.add(right);
 
-    Expression expr = new BoolValue(info, true);
+    Expression expr = new BooleanValue(info, true);
     for (NamedElement itr : both.element) {
       String name = itr.name;
       Reference lr = RefFactory.create(info, left, new RefName(info, name));

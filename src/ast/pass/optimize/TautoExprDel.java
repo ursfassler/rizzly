@@ -1,16 +1,20 @@
 package ast.pass.optimize;
 
+import main.Configuration;
 import ast.data.Namespace;
 import ast.data.expression.Expression;
 import ast.data.expression.binop.LogicAnd;
 import ast.data.expression.binop.LogicOr;
 import ast.data.expression.unop.LogicNot;
-import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.BooleanValue;
 import ast.dispatcher.other.ExprReplacer;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 
 public class TautoExprDel extends AstPass {
+  public TautoExprDel(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
@@ -23,11 +27,11 @@ public class TautoExprDel extends AstPass {
 class TautoExprDelWorker extends ExprReplacer<Void> {
 
   private boolean isTrue(Expression expr) {
-    return (expr instanceof BoolValue) && ((BoolValue) expr).value;
+    return (expr instanceof BooleanValue) && ((BooleanValue) expr).value;
   }
 
   private boolean isFalse(Expression expr) {
-    return (expr instanceof BoolValue) && !((BoolValue) expr).value;
+    return (expr instanceof BooleanValue) && !((BooleanValue) expr).value;
   }
 
   @Override
@@ -42,7 +46,7 @@ class TautoExprDelWorker extends ExprReplacer<Void> {
     }
     if (isTrue(obj.left) || isTrue(obj.right)) {
       // FIXME keep side effects
-      return new BoolValue(obj.getInfo(), true);
+      return new BooleanValue(obj.getInfo(), true);
     }
 
     return obj;
@@ -60,7 +64,7 @@ class TautoExprDelWorker extends ExprReplacer<Void> {
     }
     if (isFalse(obj.left) || isFalse(obj.right)) {
       // FIXME keep side effects
-      return new BoolValue(obj.getInfo(), false);
+      return new BooleanValue(obj.getInfo(), false);
     }
 
     return obj;
@@ -71,10 +75,10 @@ class TautoExprDelWorker extends ExprReplacer<Void> {
     obj = (LogicNot) super.visitLogicNot(obj, param);
 
     if (isTrue(obj.expr)) {
-      return new BoolValue(obj.getInfo(), false);
+      return new BooleanValue(obj.getInfo(), false);
     }
     if (isFalse(obj.expr)) {
-      return new BoolValue(obj.getInfo(), true);
+      return new BooleanValue(obj.getInfo(), true);
     }
 
     return obj;

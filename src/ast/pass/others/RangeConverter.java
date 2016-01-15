@@ -17,6 +17,7 @@
 
 package ast.pass.others;
 
+import main.Configuration;
 import ast.ElementInfo;
 import ast.data.Namespace;
 import ast.data.Range;
@@ -40,6 +41,9 @@ import ast.repository.manipulator.TypeRepo;
  *
  */
 public class RangeConverter extends AstPass {
+  public RangeConverter(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

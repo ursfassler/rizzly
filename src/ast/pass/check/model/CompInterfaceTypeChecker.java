@@ -19,6 +19,7 @@ package ast.pass.check.model;
 
 import java.util.List;
 
+import main.Configuration;
 import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.Namespace;
@@ -53,6 +54,9 @@ import error.ErrorType;
 import error.RError;
 
 public class CompInterfaceTypeChecker extends AstPass {
+  public CompInterfaceTypeChecker(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

@@ -25,9 +25,9 @@ import ast.visitor.Visitor;
  *
  * @author urs
  */
-final public class Div extends ArithmeticOp {
+final public class Division extends ArithmeticOp {
 
-  public Div(ElementInfo info, Expression left, Expression right) {
+  public Division(ElementInfo info, Expression left, Expression right) {
     super(info, left, right);
   }
 

@@ -20,6 +20,7 @@ package ast.pass.check.sanity;
 import java.util.HashSet;
 import java.util.Set;
 
+import main.Configuration;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.reference.Reference;
@@ -30,6 +31,9 @@ import error.ErrorType;
 import error.RError;
 
 public class LinkTargetExists extends AstPass {
+  public LinkTargetExists(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

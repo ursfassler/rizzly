@@ -21,10 +21,10 @@ import ast.ElementInfo;
 import ast.data.expression.Expression;
 import ast.data.expression.binop.And;
 import ast.data.expression.binop.BitXor;
-import ast.data.expression.binop.Div;
+import ast.data.expression.binop.Division;
 import ast.data.expression.binop.Minus;
-import ast.data.expression.binop.Mod;
-import ast.data.expression.binop.Mul;
+import ast.data.expression.binop.Modulo;
+import ast.data.expression.binop.Multiplication;
 import ast.data.expression.binop.Or;
 import ast.data.expression.binop.Plus;
 import ast.data.expression.binop.Shl;
@@ -40,11 +40,11 @@ class ArithmeticOpFactory {
       case MINUS:
         return new Minus(info, left, right);
       case MUL:
-        return new Mul(info, left, right);
+        return new Multiplication(info, left, right);
       case DIV:
-        return new Div(info, left, right);
+        return new Division(info, left, right);
       case MOD:
-        return new Mod(info, left, right);
+        return new Modulo(info, left, right);
       case AND:
         return new And(info, left, right);
       case OR:

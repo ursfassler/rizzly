@@ -20,6 +20,7 @@ package ast.pass.reduction;
 import java.util.HashMap;
 import java.util.Map;
 
+import main.Configuration;
 import ast.ElementInfo;
 import ast.copy.Relinker;
 import ast.data.AstList;
@@ -52,6 +53,9 @@ import error.RError;
  *
  */
 public class ElementaryReduction extends AstPass {
+  public ElementaryReduction(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

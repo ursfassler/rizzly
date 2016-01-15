@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import main.Configuration;
 import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.Namespace;
@@ -42,6 +43,9 @@ import error.RError;
  * @author urs
  */
 public class HfsmTransScopeCheck extends AstPass {
+  public HfsmTransScopeCheck(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
@@ -85,8 +89,8 @@ class HfsmTransScopeCheckWorker extends NullDispatcher<Set<State>, Void> {
   }
 
   private void checkTransition(Transition trans, Set<State> allowed) {
-    check((State) trans.src.getTarget(), allowed, trans.getInfo(), "source");
-    check((State) trans.dst.getTarget(), allowed, trans.getInfo(), "destination");
+    check(trans.src.getTarget(), allowed, trans.getInfo(), "source");
+    check(trans.dst.getTarget(), allowed, trans.getInfo(), "destination");
   }
 
   private void check(State state, Set<State> allowed, ElementInfo info, String end) {

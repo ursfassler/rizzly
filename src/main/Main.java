@@ -19,6 +19,7 @@ package main;
 
 import java.io.File;
 
+import error.RError;
 import error.RException;
 
 public class Main {
@@ -27,15 +28,16 @@ public class Main {
    * @param args
    */
   public static void main(String[] args) {
-    ClaOption opt = new ClaOption();
-    if (!opt.parse(args)) {
+    CommandLineParser parser = new CommandLineParser(RError.instance());
+    Configuration configuration = parser.parse(args);
+    if (configuration == null) {
       System.exit(-2);
       return;
     }
 
     // compile(opt);
     try {
-      compile(opt);
+      compile(configuration);
     } catch (RException err) {
       System.err.println(err.getMessage());
       System.exit(-1);
@@ -43,7 +45,7 @@ public class Main {
     System.exit(0);
   }
 
-  public static String compile(ClaOption opt) {
+  public static String compile(Configuration opt) {
     String debugdir;
     String outdir;
     String docdir;

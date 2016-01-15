@@ -19,6 +19,7 @@ package ast.pass.reduction.hfsm;
 
 import java.util.LinkedList;
 
+import main.Configuration;
 import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
@@ -53,6 +54,9 @@ import ast.specification.IsClass;
  *
  */
 public class EntryExitUpdater extends AstPass {
+  public EntryExitUpdater(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

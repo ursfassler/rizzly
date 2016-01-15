@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import main.Configuration;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -57,6 +58,10 @@ import error.RError;
 //TODO clean up
 // Type Inference (for union assignments)
 public class InitVarTyper extends AstPass {
+  public InitVarTyper(Configuration configuration) {
+    super(configuration);
+  }
+
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
     InitVarTyperWorker inst = new InitVarTyperWorker(kb);

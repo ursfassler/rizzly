@@ -17,19 +17,20 @@
 
 package ast.pass.reduction.hfsm;
 
+import main.Configuration;
 import ast.pass.others.GroupPass;
 
 public class HfsmReduction extends GroupPass {
 
-  public HfsmReduction() {
-    super();
-    append(new QueryDownPropagator());
-    append(new TransitionRedirecter());
-    append(new TransitionDownPropagator());
-    append(new StateVarReplacer());
-    append(new EntryExitUpdater());
-    append(new StateItemUplifter());
-    append(new FsmReduction());
+  public HfsmReduction(Configuration configuration) {
+    super(configuration);
+    append(new QueryDownPropagator(configuration));
+    append(new TransitionRedirecter(configuration));
+    append(new TransitionDownPropagator(configuration));
+    append(new StateVarReplacer(configuration));
+    append(new EntryExitUpdater(configuration));
+    append(new StateItemUplifter(configuration));
+    append(new FsmReduction(configuration));
   }
 
 }

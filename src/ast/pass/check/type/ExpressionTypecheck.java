@@ -26,7 +26,7 @@ import ast.data.expression.Expression;
 import ast.data.expression.TypeCast;
 import ast.data.expression.binop.BitAnd;
 import ast.data.expression.binop.BitOr;
-import ast.data.expression.binop.Div;
+import ast.data.expression.binop.Division;
 import ast.data.expression.binop.Equal;
 import ast.data.expression.binop.Greater;
 import ast.data.expression.binop.GreaterEqual;
@@ -35,8 +35,8 @@ import ast.data.expression.binop.LessEqual;
 import ast.data.expression.binop.LogicAnd;
 import ast.data.expression.binop.LogicOr;
 import ast.data.expression.binop.Minus;
-import ast.data.expression.binop.Mod;
-import ast.data.expression.binop.Mul;
+import ast.data.expression.binop.Modulo;
+import ast.data.expression.binop.Multiplication;
 import ast.data.expression.binop.NotEqual;
 import ast.data.expression.binop.Or;
 import ast.data.expression.binop.Plus;
@@ -44,7 +44,7 @@ import ast.data.expression.binop.Shl;
 import ast.data.expression.binop.Shr;
 import ast.data.expression.unop.Not;
 import ast.data.expression.unop.Uminus;
-import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.BooleanValue;
 import ast.data.expression.value.NumberValue;
 import ast.data.expression.value.StringValue;
 import ast.data.reference.Reference;
@@ -288,7 +288,7 @@ public class ExpressionTypecheck extends DfsTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitDiv(Div obj, Void param) {
+  protected Void visitDiv(Division obj, Void param) {
     super.visitDiv(obj, param);
     getRange(obj.left);
     Range rhs = getRange(obj.right);
@@ -307,7 +307,7 @@ public class ExpressionTypecheck extends DfsTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitMod(Mod obj, Void param) {
+  protected Void visitMod(Modulo obj, Void param) {
     super.visitMod(obj, param);
     Range lhs = getRange(obj.left);
     Range rhs = getRange(obj.right);
@@ -322,7 +322,7 @@ public class ExpressionTypecheck extends DfsTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitMul(Mul obj, Void param) {
+  protected Void visitMul(Multiplication obj, Void param) {
     super.visitMul(obj, param);
     getRange(obj.left);
     getRange(obj.right);
@@ -385,7 +385,7 @@ public class ExpressionTypecheck extends DfsTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitBoolValue(BoolValue obj, Void param) {
+  protected Void visitBoolValue(BooleanValue obj, Void param) {
     return null;
   }
 

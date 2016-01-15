@@ -17,6 +17,7 @@
 
 package ast.pass.reduction;
 
+import main.Configuration;
 import ast.data.Namespace;
 import ast.data.file.RizzlyFile;
 import ast.dispatcher.DfsTraverser;
@@ -24,6 +25,9 @@ import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 
 public class FileReduction extends AstPass {
+  public FileReduction(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(ast.data.Namespace root, KnowledgeBase kb) {

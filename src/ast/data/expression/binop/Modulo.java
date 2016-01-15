@@ -19,26 +19,25 @@ package ast.data.expression.binop;
 
 import ast.ElementInfo;
 import ast.data.expression.Expression;
+import ast.visitor.Visitor;
 
 /**
  *
  * @author urs
  */
-abstract public class BinaryExp extends Expression {
+final public class Modulo extends ArithmeticOp {
 
-  public Expression left;
-  public Expression right;
-
-  abstract public String getOpName();
-
-  public BinaryExp(ElementInfo info, Expression left, Expression right) {
-    super(info);
-    this.left = left;
-    this.right = right;
+  public Modulo(ElementInfo info, Expression left, Expression right) {
+    super(info, left, right);
   }
 
   @Override
-  public String toString() {
-    return "(" + left + " " + getOpName() + " " + right + ")";
+  public String getOpName() {
+    return "mod";
+  }
+
+  @Override
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
 }

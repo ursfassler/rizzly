@@ -20,6 +20,7 @@ package ast.pass.instantiation;
 import java.util.Collection;
 import java.util.HashSet;
 
+import main.Configuration;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -36,6 +37,9 @@ import ast.specification.OrSpec;
 import ast.specification.Specification;
 
 public class Flattner extends AstPass {
+  public Flattner(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

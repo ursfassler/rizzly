@@ -17,6 +17,7 @@
 
 package ast.pass.reduction;
 
+import main.Configuration;
 import ast.data.Ast;
 import ast.data.reference.RefName;
 import ast.data.reference.Reference;
@@ -36,6 +37,9 @@ import error.RError;
  *
  */
 public class EnumLinkReduction extends AstPass {
+  public EnumLinkReduction(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(ast.data.Namespace root, KnowledgeBase kb) {

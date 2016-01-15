@@ -23,7 +23,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 import java.util.Set;
 
-import main.ClaOption;
+import main.Configuration;
 import parser.FileParser;
 import ast.Designator;
 import ast.ElementInfo;
@@ -37,6 +37,9 @@ import ast.repository.query.List;
 import ast.specification.HasName;
 
 public class FileLoader extends AstPass {
+  public FileLoader(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace root, KnowledgeBase kb) {
@@ -76,7 +79,7 @@ public class FileLoader extends AstPass {
   }
 
   private String getFilename(KnowledgeBase kb, Designator lname) {
-    return kb.getOptions().getRootPath() + lname.toString(File.separator) + ClaOption.extension;
+    return kb.getOptions().getRootPath() + lname.toString(File.separator) + configuration.getExtension();
   }
 
   private void addItem(Namespace root, Designator path, Ast item) {

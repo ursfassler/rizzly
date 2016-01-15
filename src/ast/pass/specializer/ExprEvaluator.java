@@ -28,7 +28,7 @@ import ast.data.expression.Expression;
 import ast.data.expression.RefExp;
 import ast.data.expression.TypeCast;
 import ast.data.expression.binop.And;
-import ast.data.expression.binop.Div;
+import ast.data.expression.binop.Division;
 import ast.data.expression.binop.Equal;
 import ast.data.expression.binop.Greater;
 import ast.data.expression.binop.GreaterEqual;
@@ -36,8 +36,8 @@ import ast.data.expression.binop.Is;
 import ast.data.expression.binop.Less;
 import ast.data.expression.binop.LessEqual;
 import ast.data.expression.binop.Minus;
-import ast.data.expression.binop.Mod;
-import ast.data.expression.binop.Mul;
+import ast.data.expression.binop.Modulo;
+import ast.data.expression.binop.Multiplication;
 import ast.data.expression.binop.NotEqual;
 import ast.data.expression.binop.Or;
 import ast.data.expression.binop.Plus;
@@ -46,7 +46,7 @@ import ast.data.expression.binop.Shr;
 import ast.data.expression.unop.Not;
 import ast.data.expression.unop.Uminus;
 import ast.data.expression.value.AnyValue;
-import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.BooleanValue;
 import ast.data.expression.value.NamedElementsValue;
 import ast.data.expression.value.NamedValue;
 import ast.data.expression.value.NumberValue;
@@ -140,7 +140,7 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
   }
 
   @Override
-  protected ValueExpr visitBoolValue(BoolValue obj, Void param) {
+  protected ValueExpr visitBoolValue(BooleanValue obj, Void param) {
     return obj;
   }
 
@@ -227,7 +227,7 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
   }
 
   @Override
-  protected ValueExpr visitDiv(Div obj, Void param) {
+  protected ValueExpr visitDiv(Division obj, Void param) {
     ValueExpr left = visit(obj.left, param);
     ValueExpr right = visit(obj.right, param);
 
@@ -261,7 +261,7 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
   }
 
   @Override
-  protected ValueExpr visitMod(Mod obj, Void param) {
+  protected ValueExpr visitMod(Modulo obj, Void param) {
     ValueExpr left = visit(obj.left, param);
     ValueExpr right = visit(obj.right, param);
 
@@ -278,7 +278,7 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
   }
 
   @Override
-  protected ValueExpr visitMul(Mul obj, Void param) {
+  protected ValueExpr visitMul(Multiplication obj, Void param) {
     ValueExpr left = visit(obj.left, param);
     ValueExpr right = visit(obj.right, param);
 
@@ -371,12 +371,12 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
       BigInteger lval = ((NumberValue) left).value;
       BigInteger rval = ((NumberValue) right).value;
       boolean res = lval.compareTo(rval) == 0;
-      return new BoolValue(obj.getInfo(), res);
+      return new BooleanValue(obj.getInfo(), res);
     } else if (areBool(left, right)) {
-      boolean lval = ((BoolValue) left).value;
-      boolean rval = ((BoolValue) right).value;
+      boolean lval = ((BooleanValue) left).value;
+      boolean rval = ((BooleanValue) right).value;
       boolean res = lval == rval;
-      return new BoolValue(obj.getInfo(), res);
+      return new BooleanValue(obj.getInfo(), res);
     } else {
       RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
       return null;
@@ -384,7 +384,7 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
   }
 
   private boolean areBool(ValueExpr left, ValueExpr right) {
-    return (left instanceof BoolValue) && (right instanceof BoolValue);
+    return (left instanceof BooleanValue) && (right instanceof BooleanValue);
   }
 
   private boolean areNumber(ValueExpr left, ValueExpr right) {
@@ -400,7 +400,7 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
       BigInteger lval = ((NumberValue) left).value;
       BigInteger rval = ((NumberValue) right).value;
       boolean res = lval.compareTo(rval) > 0;
-      return new BoolValue(obj.getInfo(), res);
+      return new BooleanValue(obj.getInfo(), res);
     } else if (areBool(left, right)) {
       RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj);
       return null;
@@ -419,7 +419,7 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
       BigInteger lval = ((NumberValue) left).value;
       BigInteger rval = ((NumberValue) right).value;
       boolean res = lval.compareTo(rval) >= 0;
-      return new BoolValue(obj.getInfo(), res);
+      return new BooleanValue(obj.getInfo(), res);
     } else if (areBool(left, right)) {
       RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj);
       return null;
@@ -438,7 +438,7 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
       BigInteger lval = ((NumberValue) left).value;
       BigInteger rval = ((NumberValue) right).value;
       boolean res = lval.compareTo(rval) < 0;
-      return new BoolValue(obj.getInfo(), res);
+      return new BooleanValue(obj.getInfo(), res);
     } else if (areBool(left, right)) {
       RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj);
       return null;
@@ -457,7 +457,7 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
       BigInteger lval = ((NumberValue) left).value;
       BigInteger rval = ((NumberValue) right).value;
       boolean res = lval.compareTo(rval) <= 0;
-      return new BoolValue(obj.getInfo(), res);
+      return new BooleanValue(obj.getInfo(), res);
     } else if (areBool(left, right)) {
       RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj);
       return null;
@@ -476,12 +476,12 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
       BigInteger lval = ((NumberValue) left).value;
       BigInteger rval = ((NumberValue) right).value;
       boolean res = lval.compareTo(rval) != 0;
-      return new BoolValue(obj.getInfo(), res);
+      return new BooleanValue(obj.getInfo(), res);
     } else if (areBool(left, right)) {
-      boolean lval = ((BoolValue) left).value;
-      boolean rval = ((BoolValue) right).value;
+      boolean lval = ((BooleanValue) left).value;
+      boolean rval = ((BooleanValue) right).value;
       boolean res = lval != rval;
-      return new BoolValue(obj.getInfo(), res);
+      return new BooleanValue(obj.getInfo(), res);
     } else {
       RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
       return null;
@@ -513,8 +513,8 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
   protected ValueExpr visitNot(Not obj, Void param) {
     ValueExpr expr = visit(obj.expr, param);
 
-    if ((expr instanceof BoolValue)) {
-      return new BoolValue(obj.getInfo(), !((BoolValue) expr).value);
+    if ((expr instanceof BooleanValue)) {
+      return new BooleanValue(obj.getInfo(), !((BooleanValue) expr).value);
     } else {
       RError.err(ErrorType.Fatal, obj.getInfo(), "Can not evaluate not on " + expr.getClass().getName());
       return null;

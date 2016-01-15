@@ -24,7 +24,7 @@ import ast.data.expression.Expression;
  *
  * @author urs
  */
-abstract public class ArithmeticOp extends BinaryExp {
+abstract public class ArithmeticOp extends BinaryExpression {
 
   public ArithmeticOp(ElementInfo info, Expression left, Expression right) {
     super(info, left, right);

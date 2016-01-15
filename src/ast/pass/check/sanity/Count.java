@@ -20,6 +20,7 @@ package ast.pass.check.sanity;
 import java.util.HashMap;
 import java.util.Map;
 
+import main.Configuration;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.dispatcher.DfsTraverser;
@@ -27,6 +28,9 @@ import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 
 public class Count extends AstPass {
+  public Count(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

@@ -1,6 +1,6 @@
 /**
  *  This file is part of Rizzly.
- *
+ * 
  *  Rizzly is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -15,26 +15,22 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.expression.value;
+package main;
 
-import ast.ElementInfo;
-import ast.visitor.Visitor;
+import ast.Designator;
 
-final public class BoolValue extends ValueExpr {
-  public final boolean value;
+public interface Configuration {
 
-  public BoolValue(ElementInfo info, boolean value) {
-    super(info);
-    this.value = value;
-  }
+  public abstract String getRootPath();
 
-  @Override
-  public String toString() {
-    return Boolean.toString(value);
-  }
+  public abstract Designator getRootComp();
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
+  public abstract boolean doDebugEvent();
+
+  public abstract boolean doLazyModelCheck();
+
+  public abstract boolean doDocOutput();
+
+  public abstract String getExtension();
+
 }

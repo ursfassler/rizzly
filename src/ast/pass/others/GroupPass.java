@@ -20,11 +20,16 @@ package ast.pass.others;
 import java.util.ArrayList;
 import java.util.List;
 
+import main.Configuration;
 import ast.data.Namespace;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 
 abstract public class GroupPass extends AstPass {
+  public GroupPass(Configuration configuration) {
+    super(configuration);
+  }
+
   final private List<AstPass> passes = new ArrayList<AstPass>();
 
   protected void append(AstPass pass) {

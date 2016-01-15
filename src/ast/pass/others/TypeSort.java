@@ -23,6 +23,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
+import main.Configuration;
+
 import org.jgrapht.traverse.TopologicalOrderIterator;
 
 import util.Pair;
@@ -37,6 +39,9 @@ import ast.repository.query.Collector;
 import ast.specification.IsClass;
 
 public class TypeSort extends AstPass {
+  public TypeSort(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

@@ -17,6 +17,7 @@
 
 package ast.visitor;
 
+import ast.ElementInfo;
 import ast.data.Namespace;
 import ast.data.component.CompRef;
 import ast.data.component.composition.AsynchroniusConnection;
@@ -42,7 +43,7 @@ import ast.data.expression.binop.And;
 import ast.data.expression.binop.BitAnd;
 import ast.data.expression.binop.BitOr;
 import ast.data.expression.binop.BitXor;
-import ast.data.expression.binop.Div;
+import ast.data.expression.binop.Division;
 import ast.data.expression.binop.Equal;
 import ast.data.expression.binop.Greater;
 import ast.data.expression.binop.GreaterEqual;
@@ -52,8 +53,8 @@ import ast.data.expression.binop.LessEqual;
 import ast.data.expression.binop.LogicAnd;
 import ast.data.expression.binop.LogicOr;
 import ast.data.expression.binop.Minus;
-import ast.data.expression.binop.Mod;
-import ast.data.expression.binop.Mul;
+import ast.data.expression.binop.Modulo;
+import ast.data.expression.binop.Multiplication;
 import ast.data.expression.binop.NotEqual;
 import ast.data.expression.binop.Or;
 import ast.data.expression.binop.Plus;
@@ -65,7 +66,7 @@ import ast.data.expression.unop.Not;
 import ast.data.expression.unop.Uminus;
 import ast.data.expression.value.AnyValue;
 import ast.data.expression.value.ArrayValue;
-import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.BooleanValue;
 import ast.data.expression.value.NamedElementsValue;
 import ast.data.expression.value.NamedValue;
 import ast.data.expression.value.NumberValue;
@@ -434,7 +435,7 @@ public class DeepFirstTraverser implements Visitor {
   }
 
   @Override
-  public void visit(BoolValue obj) {
+  public void visit(BooleanValue obj) {
     obj.accept(preorderVisitor);
     obj.accept(postorderVisitor);
   }
@@ -587,7 +588,7 @@ public class DeepFirstTraverser implements Visitor {
   }
 
   @Override
-  public void visit(Div obj) {
+  public void visit(Division obj) {
     obj.accept(preorderVisitor);
     obj.left.accept(this);
     obj.right.accept(this);
@@ -651,7 +652,7 @@ public class DeepFirstTraverser implements Visitor {
   }
 
   @Override
-  public void visit(Mod obj) {
+  public void visit(Modulo obj) {
     obj.accept(preorderVisitor);
     obj.left.accept(this);
     obj.right.accept(this);
@@ -659,7 +660,7 @@ public class DeepFirstTraverser implements Visitor {
   }
 
   @Override
-  public void visit(Mul obj) {
+  public void visit(Multiplication obj) {
     obj.accept(preorderVisitor);
     obj.left.accept(this);
     obj.right.accept(this);
@@ -1112,6 +1113,12 @@ public class DeepFirstTraverser implements Visitor {
   @Override
   public void visit(PointerType pointerType) {
     throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  public void visit(ElementInfo obj) {
+    obj.accept(preorderVisitor);
+    obj.accept(postorderVisitor);
   }
 
   private void visitFunction(Function obj) {

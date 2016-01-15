@@ -25,15 +25,15 @@ import ast.visitor.Visitor;
  *
  * @author urs
  */
-final public class Mod extends ArithmeticOp {
+final public class Multiplication extends ArithmeticOp {
 
-  public Mod(ElementInfo info, Expression left, Expression right) {
+  public Multiplication(ElementInfo info, Expression left, Expression right) {
     super(info, left, right);
   }
 
   @Override
   public String getOpName() {
-    return "mod";
+    return "*";
   }
 
   @Override

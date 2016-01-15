@@ -2,9 +2,10 @@ package ast.pass.optimize;
 
 import java.util.List;
 
+import main.Configuration;
 import ast.data.AstList;
 import ast.data.Namespace;
-import ast.data.expression.value.BoolValue;
+import ast.data.expression.value.BooleanValue;
 import ast.data.statement.IfOption;
 import ast.data.statement.IfStmt;
 import ast.data.statement.Statement;
@@ -14,6 +15,9 @@ import ast.pass.AstPass;
 import ast.specification.ConstantExpression;
 
 public class TautoStmtDel extends AstPass {
+  public TautoStmtDel(Configuration configuration) {
+    super(configuration);
+  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
@@ -32,7 +36,7 @@ class TautoStmtDelWorker extends StmtReplacer<Void> {
 
     for (IfOption opt : obj.option) {
       if (ConstantExpression.INSTANCE.isSatisfiedBy(opt.condition)) {
-        BoolValue value = (BoolValue) opt.condition;
+        BooleanValue value = (BooleanValue) opt.condition;
         if (value.value) {
           obj.defblock = opt.code;
           break;
