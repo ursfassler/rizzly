@@ -5,7 +5,7 @@ import subprocess
 
 @when('I start rizzly with the file "{filename}"')
 def do_compile(context, filename):
-    context.proc = subprocess.Popen(["rizzly", "-i", filename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    context.proc = subprocess.Popen(["rizzly", filename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     context.proc.wait()
 
 @when('I succesfully compile "{filename}" with rizzly')

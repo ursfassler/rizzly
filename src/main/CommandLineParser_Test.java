@@ -61,34 +61,25 @@ public class CommandLineParser_Test {
 
     testee.parse(args);
 
-    verify(error).err(eq(ErrorType.Error), eq(ElementInfo.NO), eq("Need option 'rootcomp' or 'input'"));
+    verify(error).err(eq(ErrorType.Error), eq(ElementInfo.NO), eq("Need a file"));
   }
 
   @Test
-  public void can_not_provide_a_path_and_a_file_with_automatic_instantiation() {
-    String[] args = { "-i", "dummy", "-r", "dummy" };
+  public void automatic_instantiation_needs_file_and_component() {
+    String[] args = { "-c", "dummy" };
 
     testee.parse(args);
 
-    verify(error).err(eq(ErrorType.Error), eq(ElementInfo.NO), eq("Can not use option 'rootcomp' with option 'input'"));
-  }
-
-  @Test
-  public void automatic_instantiation_needs_path_and_component() {
-    String[] args = { "-p", "dummy" };
-
-    testee.parse(args);
-
-    verify(error).err(eq(ErrorType.Error), eq(ElementInfo.NO), eq("Option 'rootdir' needs option 'rootcomp'"));
+    verify(error).err(eq(ErrorType.Error), eq(ElementInfo.NO), eq("Option 'component' needs file"));
   }
 
   @Test
   public void provide_a_file_with_automatic_instantiation() {
-    String[] args = { "-i", "test.rzy" };
+    String[] args = { "test.rzy" };
 
     Configuration configuration = testee.parse(args);
 
-    verify(error, never()).err(eq(ErrorType.Error), any(ElementInfo.class), anyString());
+    verify(error, never()).err(any(ErrorType.class), any(ElementInfo.class), anyString());
     Assert.assertEquals(false, configuration.doDebugEvent());
     Assert.assertEquals(false, configuration.doLazyModelCheck());
     Assert.assertEquals(false, configuration.doDocOutput());
@@ -99,7 +90,7 @@ public class CommandLineParser_Test {
 
   @Test
   public void provide_a_file_in_a_relative_directory() {
-    String[] args = { "-i", "dir/test.rzy" };
+    String[] args = { "dir/test.rzy" };
 
     Configuration configuration = testee.parse(args);
 
@@ -109,27 +100,28 @@ public class CommandLineParser_Test {
 
   @Test
   public void provide_a_file_in_an_absolute_directory() {
-    String[] args = { "-i", "/dir/test.rzy" };
+    String[] args = { "/dir/test.rzy" };
 
     Configuration configuration = testee.parse(args);
 
+    verify(error, never()).err(any(ErrorType.class), any(ElementInfo.class), anyString());
     Assert.assertEquals(new Designator("test", "Test"), configuration.getRootComp());
     Assert.assertEquals("/dir/", configuration.getRootPath());
   }
 
   @Test
-  public void provide_a_root_direcotry_and_the_component_to_instantiate() {
-    String[] args = { "-p", "the/dir", "-r", "TheComponent" };
+  public void provide_the_component_to_instantiate() {
+    String[] args = { "dir/test.rzy", "-c", "TheComponent" };
 
     Configuration configuration = testee.parse(args);
 
     Assert.assertEquals(new Designator("TheComponent"), configuration.getRootComp());
-    Assert.assertEquals("the/dir/", configuration.getRootPath());
+    Assert.assertEquals("dir/", configuration.getRootPath());
   }
 
   @Test
   public void provide_documentation_flag() {
-    String[] args = { "-i", "dir/test.rzy", "--doc" };
+    String[] args = { "dir/test.rzy", "--doc" };
 
     Configuration configuration = testee.parse(args);
 
@@ -138,7 +130,7 @@ public class CommandLineParser_Test {
 
   @Test
   public void provide_debug_event_flag() {
-    String[] args = { "-i", "dir/test.rzy", "--debugEvent" };
+    String[] args = { "dir/test.rzy", "--debugEvent" };
 
     Configuration configuration = testee.parse(args);
 
@@ -147,7 +139,7 @@ public class CommandLineParser_Test {
 
   @Test
   public void provide_lazy_model_check_flag() {
-    String[] args = { "-i", "dir/test.rzy", "--lazyModelCheck" };
+    String[] args = { "dir/test.rzy", "--lazyModelCheck" };
 
     Configuration configuration = testee.parse(args);
 

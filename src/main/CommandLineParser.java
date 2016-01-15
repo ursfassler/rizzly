@@ -19,6 +19,7 @@ package main;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.List;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
@@ -49,12 +50,13 @@ public class CommandLineParser {
       return null;
     }
 
-    if (!isSane(cmd)) {
+    String inputFile = getInputFile(cmd);
+    if (!isSane(inputFile, cmd)) {
       return null;
     }
 
     WritableConfiguration configuration = new WritableConfiguration();
-    parsePathAndRoot(cmd, configuration);
+    parsePathAndRoot(inputFile, cmd, configuration);
     configuration.setDebugEvent(cmd.hasOption(options.debugEvent.getLongOpt()));
     configuration.setLazyModelCheck(cmd.hasOption(options.lazyModelCheck.getLongOpt()));
     configuration.setDocOutput(cmd.hasOption(options.documentation.getLongOpt()));
@@ -63,33 +65,40 @@ public class CommandLineParser {
     return configuration;
   }
 
-  private void parsePathAndRoot(CommandLine cmd, WritableConfiguration configuration) {
-    if (hasOption(cmd, options.component)) {
-      parsePathWithRootComponent(cmd, configuration);
-    } else if (hasOption(cmd, options.rizzlyFile)) {
-      parseFileWithAutoComponent(cmd, configuration);
-    } else {
-      error.err(ErrorType.Fatal, ElementInfo.NO, "Need option '" + options.component.getLongOpt() + "' or '" + options.rizzlyFile.getLongOpt() + "'");
+  private String getInputFile(CommandLine cmd) {
+    List<String> list = cmd.getArgList();
+
+    String inputFile = null;
+    if (list.size() > 0) {
+      inputFile = list.get(0);
     }
+    return inputFile;
   }
 
-  private boolean isSane(CommandLine cmd) {
+  private void parsePathAndRoot(String inputFile, CommandLine cmd, WritableConfiguration configuration) {
+    Designator rootComponent = getRootComponent(inputFile);
+    String rootPath = getRootPath(inputFile);
+
+    if (hasOption(cmd, options.component)) {
+      rootComponent = stringToDesignator(cmd.getOptionValue(options.component.getLongOpt()));
+    }
+
+    configuration.setRootComp(rootComponent);
+    configuration.setRootPath(rootPath);
+  }
+
+  private boolean isSane(String inputFile, CommandLine cmd) {
     boolean hasComponent = hasOption(cmd, options.component);
-    boolean hasRizzlyFile = hasOption(cmd, options.rizzlyFile);
-    boolean hasPath = hasOption(cmd, options.path);
+    boolean hasRizzlyFile = inputFile != null;  // TODO remove
 
-    if (hasComponent && hasRizzlyFile) {
-      error.err(ErrorType.Error, ElementInfo.NO, "Can not use option '" + options.component.getLongOpt() + "' with option '" + options.rizzlyFile.getLongOpt() + "'");
+    if (hasComponent && !hasRizzlyFile) {
+      error.err(ErrorType.Error, ElementInfo.NO, "Option '" + options.component.getLongOpt() + "' needs file");
       return false;
     }
 
-    if (hasPath && !hasComponent) {
-      error.err(ErrorType.Error, ElementInfo.NO, "Option '" + options.path.getLongOpt() + "' needs option '" + options.component.getLongOpt() + "'");
-      return false;
-    }
-
-    if (!hasComponent && !hasRizzlyFile) {
-      error.err(ErrorType.Error, ElementInfo.NO, "Need option '" + options.component.getLongOpt() + "' or '" + options.rizzlyFile.getLongOpt() + "'");
+    if (!hasRizzlyFile) {
+      error.err(ErrorType.Error, ElementInfo.NO, "Need a file");
+      printHelp();
       return false;
     }
 
@@ -103,62 +112,68 @@ public class CommandLineParser {
   }
 
   private CommandLine parseOptions(String[] args) {
-    PosixParser parser = new PosixParser();
+    PosixParser parser = new PosixParser(); // TODO use GNU parser?
     CommandLine cmd;
 
     try {
       cmd = parser.parse(options.all, args);
     } catch (ParseException e) {
-      printHelp(options.all);
+      printHelp();
       return null;
     }
 
     if (hasOption(cmd, options.help)) {
-      printHelp(options.all);
+      printHelp();
       return null;
     }
 
     return cmd;
   }
 
-  private void printHelp(Options opt) {
+  private void printHelp() {
     HelpFormatter formatter = new HelpFormatter();
-    formatter.printHelp("rizzly", opt);
+    formatter.printHelp("rizzly", options.all);
   }
 
-  private void parseFileWithAutoComponent(CommandLine cmd, WritableConfiguration configuration) {
-    String rootdir = cmd.getOptionValue(options.rizzlyFile.getOpt());
-    assert (rootdir.endsWith(extension));
-    rootdir = rootdir.substring(0, rootdir.length() - extension.length());
-    int idx = rootdir.lastIndexOf(File.separator);
+  private Designator getRootComponent(String inputFile) {
+    assert (inputFile.endsWith(extension));
+
+    String filename = getFilename(inputFile);
+
+    String namespace = filename.substring(0, filename.length() - extension.length());
+    String component = namespace.substring(0, 1).toUpperCase() + namespace.substring(1, namespace.length());
+
+    return new Designator(namespace, component);
+  }
+
+  private String getRootPath(String inputFile) {
+    String filename = getFilename(inputFile);
+
+    String rootPath = inputFile.substring(0, inputFile.length() - filename.length());
+    if (rootPath.equals("")) {
+      rootPath = "." + File.separator;
+    }
+
+    return rootPath;
+  }
+
+  private String getFilename(String inputFile) {
+    int idx = inputFile.lastIndexOf(File.separator);
     String filename;
     if (idx < 0) {
-      filename = rootdir;
-      rootdir = "." + File.separator;
+      filename = inputFile;
     } else {
-      idx += File.separator.length();
-      filename = rootdir.substring(idx, rootdir.length());
-      rootdir = rootdir.substring(0, rootdir.length() - filename.length());
+      filename = inputFile.substring(idx + File.separator.length(), inputFile.length());
     }
-    String compname = filename;
-    compname = compname.substring(0, 1).toUpperCase() + compname.substring(1, compname.length());
-    configuration.setRootComp(new Designator(filename, compname));
-    configuration.setRootPath(rootdir);
+    return filename;
   }
 
-  private void parsePathWithRootComponent(CommandLine cmd, WritableConfiguration configuration) {
-    String rootdir = cmd.getOptionValue(options.path.getOpt(), "." + File.separator);
-    if (!rootdir.endsWith(File.separator)) {
-      rootdir += File.separator;
-    }
-    String rootpath = cmd.getOptionValue(options.component.getOpt());
+  private Designator stringToDesignator(String value) {
     ArrayList<String> nam = new ArrayList<String>();
-    for (String p : rootpath.split("\\.")) {
+    for (String p : value.split("\\.")) {
       nam.add(p);
     }
-    assert (nam.size() > 1);
-    configuration.setRootComp(new Designator(nam));
-    configuration.setRootPath(rootdir);
+    return new Designator(nam);
   }
 }
 
@@ -166,17 +181,13 @@ class RizzlyOptions {
   public final Option lazyModelCheck = new Option(null, "lazyModelCheck", false, "Do not check constraints of model. Very insecure!");
   public final Option debugEvent = new Option(null, "debugEvent", false, "produce code to get informed whenever a event is sent or received");
   public final Option documentation = new Option(null, "doc", false, "generate documentation");
-  public final Option rizzlyFile = new Option("i", "input", true, "input file, the root component needs the same name as the file but beginning with an uppercase letter");
-  public final Option component = new Option("r", "rootcomp", true, "path of the root component");
-  public final Option path = new Option("p", "rootdir", true, "directory of the project, default is the working directory");
+  public final Option component = new Option("c", "component", true, "the component to instantiate");
   public final Option help = new Option("h", "help", false, "show help");
   public final Options all = new Options();
 
   RizzlyOptions() {
     all.addOption(help);
-    all.addOption(path);
     all.addOption(component);
-    all.addOption(rizzlyFile);
     all.addOption(documentation);
     all.addOption(debugEvent);
     all.addOption(lazyModelCheck);
