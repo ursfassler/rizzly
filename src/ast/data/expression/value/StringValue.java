@@ -17,15 +17,13 @@
 
 package ast.data.expression.value;
 
-import ast.ElementInfo;
 import ast.visitor.Visitor;
 
 final public class StringValue extends ValueExpr {
 
   final public String value;
 
-  public StringValue(ElementInfo info, String value) {
-    super(info);
+  public StringValue(String value) {
     this.value = value;
   }
 

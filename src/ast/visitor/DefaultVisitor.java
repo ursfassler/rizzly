@@ -17,7 +17,6 @@
 
 package ast.visitor;
 
-import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.component.CompRef;
@@ -37,7 +36,7 @@ import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateRef;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.component.hfsm.Transition;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.expression.TypeCast;
 import ast.data.expression.binop.And;
 import ast.data.expression.binop.BitAnd;
@@ -82,24 +81,24 @@ import ast.data.function.header.FuncInterrupt;
 import ast.data.function.header.FuncProcedure;
 import ast.data.function.header.FuncQuery;
 import ast.data.function.header.FuncResponse;
-import ast.data.function.header.FuncSignal;
-import ast.data.function.header.FuncSlot;
+import ast.data.function.header.Signal;
+import ast.data.function.header.Slot;
 import ast.data.function.header.FuncSubHandlerEvent;
 import ast.data.function.header.FuncSubHandlerQuery;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FuncReturnTuple;
-import ast.data.function.ret.FuncReturnType;
+import ast.data.function.ret.FunctionReturnType;
 import ast.data.function.template.DefaultValueTemplate;
 import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
-import ast.data.reference.DummyLinkTarget;
+import ast.data.reference.LinkTarget;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
 import ast.data.reference.Reference;
-import ast.data.statement.AssignmentMulti;
+import ast.data.statement.MultiAssignment;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
@@ -110,15 +109,15 @@ import ast.data.statement.CaseOptValue;
 import ast.data.statement.CaseStmt;
 import ast.data.statement.ForStmt;
 import ast.data.statement.IfOption;
-import ast.data.statement.IfStmt;
+import ast.data.statement.IfStatement;
 import ast.data.statement.MsgPush;
-import ast.data.statement.ReturnExpr;
-import ast.data.statement.ReturnVoid;
+import ast.data.statement.ExpressionReturn;
+import ast.data.statement.VoidReturn;
 import ast.data.statement.VarDefInitStmt;
 import ast.data.statement.VarDefStmt;
 import ast.data.statement.WhileStmt;
 import ast.data.template.Template;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumElement;
@@ -146,9 +145,10 @@ import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
 import ast.data.variable.ConstGlobal;
 import ast.data.variable.ConstPrivate;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.TemplateParameter;
+import ast.meta.SourcePosition;
 
 public class DefaultVisitor implements Visitor {
 
@@ -199,7 +199,7 @@ public class DefaultVisitor implements Visitor {
   }
 
   @Override
-  public void visit(AssignmentMulti assignmentMulti) {
+  public void visit(MultiAssignment assignmentMulti) {
     defaultHandler(assignmentMulti);
   }
 
@@ -319,7 +319,7 @@ public class DefaultVisitor implements Visitor {
   }
 
   @Override
-  public void visit(DummyLinkTarget dummyLinkTarget) {
+  public void visit(LinkTarget dummyLinkTarget) {
     defaultHandler(dummyLinkTarget);
   }
 
@@ -399,17 +399,17 @@ public class DefaultVisitor implements Visitor {
   }
 
   @Override
-  public void visit(FuncReturnType funcReturnType) {
+  public void visit(FunctionReturnType funcReturnType) {
     defaultHandler(funcReturnType);
   }
 
   @Override
-  public void visit(FuncSignal funcSignal) {
+  public void visit(Signal funcSignal) {
     defaultHandler(funcSignal);
   }
 
   @Override
-  public void visit(FuncSlot funcSlot) {
+  public void visit(Slot funcSlot) {
     defaultHandler(funcSlot);
   }
 
@@ -429,7 +429,7 @@ public class DefaultVisitor implements Visitor {
   }
 
   @Override
-  public void visit(FuncVariable funcVariable) {
+  public void visit(FunctionVariable funcVariable) {
     defaultHandler(funcVariable);
   }
 
@@ -449,7 +449,7 @@ public class DefaultVisitor implements Visitor {
   }
 
   @Override
-  public void visit(IfStmt ifStmt) {
+  public void visit(IfStatement ifStmt) {
     defaultHandler(ifStmt);
   }
 
@@ -629,7 +629,7 @@ public class DefaultVisitor implements Visitor {
   }
 
   @Override
-  public void visit(RefExp refExp) {
+  public void visit(ReferenceExpression refExp) {
     defaultHandler(refExp);
   }
 
@@ -649,12 +649,12 @@ public class DefaultVisitor implements Visitor {
   }
 
   @Override
-  public void visit(ReturnExpr returnExpr) {
+  public void visit(ExpressionReturn returnExpr) {
     defaultHandler(returnExpr);
   }
 
   @Override
-  public void visit(ReturnVoid returnVoid) {
+  public void visit(VoidReturn returnVoid) {
     defaultHandler(returnVoid);
   }
 
@@ -749,7 +749,7 @@ public class DefaultVisitor implements Visitor {
   }
 
   @Override
-  public void visit(TypeRef typeRef) {
+  public void visit(TypeReference typeRef) {
     defaultHandler(typeRef);
   }
 
@@ -814,7 +814,7 @@ public class DefaultVisitor implements Visitor {
   }
 
   @Override
-  public void visit(ElementInfo elementInfo) {
+  public void visit(SourcePosition elementInfo) {
     throw new RuntimeException("not yet implemented");
   }
 

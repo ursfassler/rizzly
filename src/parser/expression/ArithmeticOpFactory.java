@@ -17,7 +17,6 @@
 
 package parser.expression;
 
-import ast.ElementInfo;
 import ast.data.expression.Expression;
 import ast.data.expression.binop.And;
 import ast.data.expression.binop.BitXor;
@@ -33,30 +32,30 @@ import error.ErrorType;
 import error.RError;
 
 class ArithmeticOpFactory {
-  static Expression create(ElementInfo info, Expression left, Expression right, ExpOp op) {
+  static Expression create(Expression left, Expression right, ExpOp op) {
     switch (op) {
       case PLUS:
-        return new Plus(info, left, right);
+        return new Plus(left, right);
       case MINUS:
-        return new Minus(info, left, right);
+        return new Minus(left, right);
       case MUL:
-        return new Multiplication(info, left, right);
+        return new Multiplication(left, right);
       case DIV:
-        return new Division(info, left, right);
+        return new Division(left, right);
       case MOD:
-        return new Modulo(info, left, right);
+        return new Modulo(left, right);
       case AND:
-        return new And(info, left, right);
+        return new And(left, right);
       case OR:
-        return new Or(info, left, right);
+        return new Or(left, right);
       case SHL:
-        return new Shl(info, left, right);
+        return new Shl(left, right);
       case SHR:
-        return new Shr(info, left, right);
+        return new Shr(left, right);
       case XOR:
-        return new BitXor(info, left, right);
+        return new BitXor(left, right);
       default:
-        RError.err(ErrorType.Fatal, info, "Unhandled ArithmeticOp: " + op);
+        RError.err(ErrorType.Fatal, "Unhandled ArithmeticOp: " + op);
     }
     return null;
   }

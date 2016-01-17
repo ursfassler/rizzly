@@ -17,7 +17,6 @@
 
 package ast.data.expression;
 
-import ast.ElementInfo;
 import ast.data.AstBase;
 import ast.data.template.ActualTemplateArgument;
 
@@ -26,8 +25,4 @@ import ast.data.template.ActualTemplateArgument;
  * @author urs
  */
 abstract public class Expression extends AstBase implements ActualTemplateArgument {
-
-  public Expression(ElementInfo info) {
-    super(info);
-  }
 }

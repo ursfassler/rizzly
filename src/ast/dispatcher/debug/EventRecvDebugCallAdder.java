@@ -20,13 +20,12 @@ package ast.dispatcher.debug;
 import java.math.BigInteger;
 import java.util.ArrayList;
 
-import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.expression.value.NumberValue;
 import ast.data.function.Function;
 import ast.data.function.header.FuncProcedure;
 import ast.data.function.header.FuncResponse;
-import ast.data.function.header.FuncSlot;
+import ast.data.function.header.Slot;
 import ast.data.reference.RefFactory;
 import ast.data.reference.Reference;
 import ast.data.statement.CallStmt;
@@ -42,7 +41,6 @@ public class EventRecvDebugCallAdder extends DfsTraverser<Void, Void> {
 
   private ArrayList<String> names;
   private FuncProcedure msgRecvFunc;
-  static private ElementInfo info = ElementInfo.NO;
 
   public EventRecvDebugCallAdder(ArrayList<String> names, FuncProcedure msgRecvFunc) {
     super();
@@ -62,21 +60,21 @@ public class EventRecvDebugCallAdder extends DfsTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncSlot(FuncSlot obj, Void param) {
+  protected Void visitFuncSlot(Slot obj, Void param) {
     makeDebugCall(obj);
     return null;
   }
 
   public void makeDebugCall(Function obj) {
-    int numFunc = names.indexOf(obj.name);
+    int numFunc = names.indexOf(obj.getName());
     assert (numFunc >= 0);
     obj.body.statements.add(0, makeCall(msgRecvFunc, numFunc));
   }
 
   private CallStmt makeCall(Function func, int numFunc) {
     // _sendMsg( numFunc );
-    NumberValue arg = new NumberValue(info, BigInteger.valueOf(numFunc));
-    Reference call = RefFactory.call(info, func, arg);
-    return new CallStmt(info, call);
+    NumberValue arg = new NumberValue(BigInteger.valueOf(numFunc));
+    Reference call = RefFactory.call(func, arg);
+    return new CallStmt(call);
   }
 }

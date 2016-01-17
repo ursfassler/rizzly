@@ -17,13 +17,11 @@
 
 package ast.visitor;
 
-import ast.ElementInfo;
 import ast.data.Namespace;
 import ast.data.component.CompRef;
 import ast.data.component.composition.AsynchroniusConnection;
 import ast.data.component.composition.CompUse;
 import ast.data.component.composition.CompUseRef;
-import ast.data.component.composition.Direction;
 import ast.data.component.composition.EndpointRaw;
 import ast.data.component.composition.EndpointSelf;
 import ast.data.component.composition.EndpointSub;
@@ -37,7 +35,7 @@ import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateRef;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.component.hfsm.Transition;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.expression.TypeCast;
 import ast.data.expression.binop.And;
 import ast.data.expression.binop.BitAnd;
@@ -83,24 +81,23 @@ import ast.data.function.header.FuncInterrupt;
 import ast.data.function.header.FuncProcedure;
 import ast.data.function.header.FuncQuery;
 import ast.data.function.header.FuncResponse;
-import ast.data.function.header.FuncSignal;
-import ast.data.function.header.FuncSlot;
 import ast.data.function.header.FuncSubHandlerEvent;
 import ast.data.function.header.FuncSubHandlerQuery;
+import ast.data.function.header.Signal;
+import ast.data.function.header.Slot;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FuncReturnTuple;
-import ast.data.function.ret.FuncReturnType;
+import ast.data.function.ret.FunctionReturnType;
 import ast.data.function.template.DefaultValueTemplate;
 import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
-import ast.data.reference.DummyLinkTarget;
+import ast.data.reference.LinkTarget;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
 import ast.data.reference.Reference;
-import ast.data.statement.AssignmentMulti;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
@@ -109,17 +106,18 @@ import ast.data.statement.CaseOptRange;
 import ast.data.statement.CaseOptSimple;
 import ast.data.statement.CaseOptValue;
 import ast.data.statement.CaseStmt;
+import ast.data.statement.ExpressionReturn;
 import ast.data.statement.ForStmt;
 import ast.data.statement.IfOption;
-import ast.data.statement.IfStmt;
+import ast.data.statement.IfStatement;
 import ast.data.statement.MsgPush;
-import ast.data.statement.ReturnExpr;
-import ast.data.statement.ReturnVoid;
+import ast.data.statement.MultiAssignment;
 import ast.data.statement.VarDefInitStmt;
 import ast.data.statement.VarDefStmt;
+import ast.data.statement.VoidReturn;
 import ast.data.statement.WhileStmt;
 import ast.data.template.Template;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumElement;
@@ -147,9 +145,10 @@ import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
 import ast.data.variable.ConstGlobal;
 import ast.data.variable.ConstPrivate;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.TemplateParameter;
+import ast.meta.SourcePosition;
 
 public class DeepFirstTraverser implements Visitor {
   private Visitor preorderVisitor = new NullVisitor();
@@ -193,7 +192,7 @@ public class DeepFirstTraverser implements Visitor {
   }
 
   @Override
-  public void visit(FuncReturnType obj) {
+  public void visit(FunctionReturnType obj) {
     obj.accept(preorderVisitor);
     obj.type.accept(this);
     obj.accept(postorderVisitor);
@@ -263,7 +262,7 @@ public class DeepFirstTraverser implements Visitor {
   }
 
   @Override
-  public void visit(AssignmentMulti obj) {
+  public void visit(MultiAssignment obj) {
     obj.accept(preorderVisitor);
     obj.left.accept(this);
     obj.right.accept(this);
@@ -355,14 +354,14 @@ public class DeepFirstTraverser implements Visitor {
   }
 
   @Override
-  public void visit(ReturnExpr obj) {
+  public void visit(ExpressionReturn obj) {
     obj.accept(preorderVisitor);
-    obj.expr.accept(this);
+    obj.expression.accept(this);
     obj.accept(postorderVisitor);
   }
 
   @Override
-  public void visit(ReturnVoid obj) {
+  public void visit(VoidReturn obj) {
     obj.accept(preorderVisitor);
     obj.accept(postorderVisitor);
   }
@@ -374,7 +373,7 @@ public class DeepFirstTraverser implements Visitor {
   }
 
   @Override
-  public void visit(FuncVariable obj) {
+  public void visit(FunctionVariable obj) {
     obj.accept(preorderVisitor);
     obj.type.accept(this);
     obj.accept(postorderVisitor);
@@ -443,16 +442,16 @@ public class DeepFirstTraverser implements Visitor {
   @Override
   public void visit(SynchroniusConnection obj) {
     obj.accept(preorderVisitor);
-    obj.endpoint.get(Direction.in).accept(this);
-    obj.endpoint.get(Direction.out).accept(this);
+    obj.getSrc().accept(this);
+    obj.getDst().accept(this);
     obj.accept(postorderVisitor);
   }
 
   @Override
   public void visit(AsynchroniusConnection obj) {
     obj.accept(preorderVisitor);
-    obj.endpoint.get(Direction.in).accept(this);
-    obj.endpoint.get(Direction.out).accept(this);
+    obj.getSrc().accept(this);
+    obj.getDst().accept(this);
     obj.accept(postorderVisitor);
   }
 
@@ -670,21 +669,21 @@ public class DeepFirstTraverser implements Visitor {
   @Override
   public void visit(Not obj) {
     obj.accept(preorderVisitor);
-    obj.expr.accept(this);
+    obj.expression.accept(this);
     obj.accept(postorderVisitor);
   }
 
   @Override
   public void visit(LogicNot obj) {
     obj.accept(preorderVisitor);
-    obj.expr.accept(this);
+    obj.expression.accept(this);
     obj.accept(postorderVisitor);
   }
 
   @Override
   public void visit(BitNot obj) {
     obj.accept(preorderVisitor);
-    obj.expr.accept(this);
+    obj.expression.accept(this);
     obj.accept(postorderVisitor);
   }
 
@@ -731,7 +730,7 @@ public class DeepFirstTraverser implements Visitor {
   @Override
   public void visit(Uminus obj) {
     obj.accept(preorderVisitor);
-    obj.expr.accept(this);
+    obj.expression.accept(this);
     obj.accept(postorderVisitor);
   }
 
@@ -750,7 +749,7 @@ public class DeepFirstTraverser implements Visitor {
   }
 
   @Override
-  public void visit(IfStmt obj) {
+  public void visit(IfStatement obj) {
     obj.accept(preorderVisitor);
     obj.option.accept(this);
     obj.defblock.accept(this);
@@ -838,7 +837,7 @@ public class DeepFirstTraverser implements Visitor {
   }
 
   @Override
-  public void visit(FuncSignal obj) {
+  public void visit(Signal obj) {
     visitFunction(obj);
   }
 
@@ -848,7 +847,7 @@ public class DeepFirstTraverser implements Visitor {
   }
 
   @Override
-  public void visit(FuncSlot obj) {
+  public void visit(Slot obj) {
     visitFunction(obj);
   }
 
@@ -1053,20 +1052,20 @@ public class DeepFirstTraverser implements Visitor {
   }
 
   @Override
-  public void visit(DummyLinkTarget obj) {
+  public void visit(LinkTarget obj) {
     obj.accept(preorderVisitor);
     obj.accept(postorderVisitor);
   }
 
   @Override
-  public void visit(RefExp obj) {
+  public void visit(ReferenceExpression obj) {
     obj.accept(preorderVisitor);
-    obj.ref.accept(this);
+    obj.reference.accept(this);
     obj.accept(postorderVisitor);
   }
 
   @Override
-  public void visit(TypeRef obj) {
+  public void visit(TypeReference obj) {
     obj.accept(preorderVisitor);
     obj.ref.accept(this);
     obj.accept(postorderVisitor);
@@ -1116,7 +1115,7 @@ public class DeepFirstTraverser implements Visitor {
   }
 
   @Override
-  public void visit(ElementInfo obj) {
+  public void visit(SourcePosition obj) {
     obj.accept(preorderVisitor);
     obj.accept(postorderVisitor);
   }

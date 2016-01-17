@@ -23,9 +23,9 @@ import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.function.Function;
 import ast.data.function.ret.FuncReturnNone;
-import ast.data.function.ret.FuncReturnType;
+import ast.data.function.ret.FunctionReturnType;
 import ast.data.type.base.RangeType;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.dispatcher.NullDispatcher;
 import ast.doc.StreamWriter;
 import ast.specification.PublicFunction;
@@ -77,10 +77,10 @@ public class InputWriter extends NullDispatcher<Void, Function> {
   }
 
   private void writeHeader(Function obj) {
-    sw.wr("def " + obj.name + "(self");
-    for (FuncVariable var : obj.param) {
+    sw.wr("def " + obj.getName() + "(self");
+    for (FunctionVariable var : obj.param) {
       sw.wr(", ");
-      sw.wr(var.name);
+      sw.wr(var.getName());
     }
     sw.wr("):");
     sw.nl();
@@ -98,9 +98,9 @@ public class InputWriter extends NullDispatcher<Void, Function> {
   }
 
   private void writeCall(Function obj) {
-    sw.wr("self._inst." + obj.name + "(");
+    sw.wr("self._inst." + obj.getName() + "(");
     boolean first = true;
-    for (FuncVariable var : obj.param) {
+    for (FunctionVariable var : obj.param) {
       if (first) {
         first = false;
       } else {
@@ -108,16 +108,16 @@ public class InputWriter extends NullDispatcher<Void, Function> {
       }
       // TODO use correct type
       sw.wr("c_int(");
-      sw.wr(var.name);
+      sw.wr(var.getName());
       sw.wr(")");
     }
     sw.wr(")");
   }
 
   @Override
-  protected Void visitFuncReturnType(FuncReturnType obj, Function param) {
+  protected Void visitFuncReturnType(FunctionReturnType obj, Function param) {
     String c_type = getCType(obj.type.ref.link);
-    sw.wr("self._inst." + param.name + ".restype = " + c_type);
+    sw.wr("self._inst." + param.getName() + ".restype = " + c_type);
     sw.nl();
 
     sw.wr("return int(");

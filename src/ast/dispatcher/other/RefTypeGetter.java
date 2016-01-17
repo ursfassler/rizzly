@@ -69,7 +69,7 @@ public class RefTypeGetter extends NullDispatcher<Type, Type> {
     if (sub instanceof FunctionType) {
       return kt.get(((FunctionType) sub).ret);
     } else {
-      RError.err(ErrorType.Error, obj.getInfo(), "Not a function: " + obj.toString());
+      RError.err(ErrorType.Error, "Not a function: " + obj.toString(), obj.metadata());
       return null;
     }
   }
@@ -82,7 +82,7 @@ public class RefTypeGetter extends NullDispatcher<Type, Type> {
       String name = obj.name;
       NamedElement etype = (NamedElement) ChildByName.find(sub, name);
       if (etype == null) {
-        RError.err(ErrorType.Error, obj.getInfo(), "Child not found: " + obj);
+        RError.err(ErrorType.Error, "Child not found: " + obj, obj.metadata());
       }
       return kt.get(etype.typeref);
     }
@@ -93,7 +93,7 @@ public class RefTypeGetter extends NullDispatcher<Type, Type> {
     if (sub instanceof ArrayType) {
       return visit(((ArrayType) sub).type.ref, null);
     } else {
-      RError.err(ErrorType.Error, obj.getInfo(), "need array to index, got type: " + sub.name);
+      RError.err(ErrorType.Error, "need array to index, got type: " + sub.getName(), obj.metadata());
       return null;
     }
   }

@@ -15,17 +15,18 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.type;
+package ast.data.function.header;
 
-import ast.ElementInfo;
-import ast.data.reference.Reference;
-import ast.data.reference.TypedRef;
+import ast.data.AstList;
+import ast.data.function.InterfaceFunction;
+import ast.data.function.ret.FuncReturn;
+import ast.data.statement.Block;
+import ast.data.variable.FunctionVariable;
 import ast.visitor.Visitor;
 
-final public class TypeRef extends TypedRef<Type> {
-
-  public TypeRef(ElementInfo info, Reference ref) {
-    super(info, ref);
+final public class Signal extends InterfaceFunction {
+  public Signal(String name, AstList<FunctionVariable> param, FuncReturn ret, Block body) {
+    super(name, param, ret, body);
   }
 
   @Override

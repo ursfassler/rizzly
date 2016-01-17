@@ -50,11 +50,11 @@ public class NameMangler {
 
   private static String name(ActualTemplateArgument arg) {
     if (arg instanceof Type) {
-      return ((Type) arg).name;
+      return ((Type) arg).getName();
     } else if (arg instanceof ValueExpr) {
       return ((ValueExpr) arg).toString();
     } else {
-      RError.err(ErrorType.Fatal, arg.getInfo(), "unhandled class: " + arg.getClass().getName());
+      RError.err(ErrorType.Fatal, "unhandled class: " + arg.getClass().getName(), arg.metadata());
       return null;
     }
   }

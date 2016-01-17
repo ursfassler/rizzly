@@ -21,7 +21,6 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
-import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.data.Ast;
 import ast.data.AstList;
@@ -79,12 +78,12 @@ class KnowEmptyValueGenerator extends NullDispatcher<ValueExpr, Void> {
 
   @Override
   protected ValueExpr visitBooleanType(BooleanType obj, Void param) {
-    return new BooleanValue(ElementInfo.NO, false);
+    return new BooleanValue(false);
   }
 
   @Override
   protected ValueExpr visitStringType(StringType obj, Void param) {
-    return new StringValue(ElementInfo.NO, "");
+    return new StringValue("");
   }
 
   @Override
@@ -96,12 +95,12 @@ class KnowEmptyValueGenerator extends NullDispatcher<ValueExpr, Void> {
 
   @Override
   protected ValueExpr visitIntegerType(IntegerType obj, Void param) {
-    return new NumberValue(ElementInfo.NO, BigInteger.ZERO);
+    return new NumberValue(BigInteger.ZERO);
   }
 
   @Override
   protected ValueExpr visitNaturalType(NaturalType obj, Void param) {
-    return new NumberValue(ElementInfo.NO, BigInteger.ZERO);
+    return new NumberValue(BigInteger.ZERO);
   }
 
   @Override
@@ -114,7 +113,7 @@ class KnowEmptyValueGenerator extends NullDispatcher<ValueExpr, Void> {
     } else {
       val = BigInteger.ZERO;
     }
-    return new NumberValue(ElementInfo.NO, val);
+    return new NumberValue(val);
   }
 
   @Override
@@ -124,7 +123,7 @@ class KnowEmptyValueGenerator extends NullDispatcher<ValueExpr, Void> {
     for (int i = 0; i < obj.size.intValue(); i++) {
       tv.add(Copy.copy(itm));
     }
-    return new TupleValue(ElementInfo.NO, tv);
+    return new TupleValue(tv);
   }
 
   @Override
@@ -132,10 +131,10 @@ class KnowEmptyValueGenerator extends NullDispatcher<ValueExpr, Void> {
     AstList<NamedValue> value = new AstList<NamedValue>();
 
     for (NamedElement elem : obj.element) {
-      value.add(new NamedValue(ElementInfo.NO, elem.name, visit(kt.get(elem.typeref), param)));
+      value.add(new NamedValue(elem.getName(), visit(kt.get(elem.typeref), param)));
     }
 
-    return new NamedElementsValue(ElementInfo.NO, value);
+    return new NamedElementsValue(value);
   }
 
 }

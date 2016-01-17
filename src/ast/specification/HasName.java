@@ -30,7 +30,7 @@ public class HasName extends Specification {
 
   @Override
   public boolean isSatisfiedBy(Ast candidate) {
-    return (candidate instanceof Named) && (((Named) candidate).name.equals(name));
+    return (candidate instanceof Named) && (((Named) candidate).getName().equals(name));
   }
 
 }

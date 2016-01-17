@@ -17,13 +17,8 @@
 
 package ast.data.expression.value;
 
-import ast.ElementInfo;
 import ast.data.expression.Expression;
 
 abstract public class ValueExpr extends Expression {
-
-  public ValueExpr(ElementInfo info) {
-    super(info);
-  }
 
 }

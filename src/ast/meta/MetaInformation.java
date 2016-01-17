@@ -15,19 +15,10 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.reference;
+package ast.meta;
 
-import ast.ElementInfo;
-import ast.data.Named;
-import ast.visitor.Visitor;
+import ast.visitor.VisitorAcceptor;
 
-final public class DummyLinkTarget extends Named {
-  public DummyLinkTarget(ElementInfo info, String name) {
-    super(info, name);
-  }
+public interface MetaInformation extends VisitorAcceptor {
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

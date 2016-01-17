@@ -23,13 +23,11 @@ import java.util.Comparator;
 import java.util.List;
 
 import main.Configuration;
-import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.component.composition.CompUse;
 import ast.data.component.composition.Connection;
-import ast.data.component.composition.Direction;
 import ast.data.component.composition.Endpoint;
 import ast.data.component.composition.EndpointSub;
 import ast.data.component.composition.ImplComposition;
@@ -37,6 +35,7 @@ import ast.data.component.elementary.ImplElementary;
 import ast.dispatcher.other.CallgraphMaker;
 import ast.doc.SimpleGraph;
 import ast.knowledge.KnowledgeBase;
+import ast.meta.MetaList;
 import ast.pass.AstPass;
 import ast.pass.helper.GraphHelper;
 import ast.repository.query.Collector;
@@ -70,7 +69,7 @@ public class RtcViolation extends AstPass {
       List<ImplComposition> elemset = Collector.select(ast, new IsClass(ImplComposition.class)).castTo(ImplComposition.class);
       for (ImplComposition elem : elemset) {
         SimpleGraph<CompUse> cg = makeCallgraph(elem.connection);
-        checkRtcViolation(cg, 2, elem.getInfo());
+        checkRtcViolation(cg, 2, elem.metadata());
       }
     }
     // no need to check for hfsm since they can not have sub-components
@@ -79,8 +78,8 @@ public class RtcViolation extends AstPass {
   private static SimpleGraph<CompUse> makeCallgraph(List<Connection> connection) {
     SimpleGraph<CompUse> ret = new SimpleGraph<CompUse>();
     for (Connection con : connection) {
-      Endpoint src = con.endpoint.get(Direction.in);
-      Endpoint dst = con.endpoint.get(Direction.out);
+      Endpoint src = con.getSrc();
+      Endpoint dst = con.getDst();
       if ((src instanceof EndpointSub) && (dst instanceof EndpointSub)) {
         CompUse srcComp = ((EndpointSub) src).component.getTarget();
         CompUse dstComp = ((EndpointSub) dst).component.getTarget();
@@ -92,7 +91,7 @@ public class RtcViolation extends AstPass {
     return ret;
   }
 
-  private static void checkRtcViolation(SimpleGraph<CompUse> cg, int n, ElementInfo info) {
+  private static void checkRtcViolation(SimpleGraph<CompUse> cg, int n, MetaList info) {
     GraphHelper.doTransitiveClosure(cg);
     ArrayList<CompUse> vs = new ArrayList<CompUse>(cg.vertexSet());
     Collections.sort(vs, nameComparator());
@@ -105,9 +104,9 @@ public class RtcViolation extends AstPass {
     if (!erritems.isEmpty()) {
       Collections.sort(erritems, nameComparator());
       for (CompUse v : erritems) {
-        RError.err(ErrorType.Hint, v.getInfo(), "Involved component: " + v.name);
+        RError.err(ErrorType.Hint, "Involved component: " + v.getName(), v.metadata());
       }
-      RError.err(ErrorType.Error, info, "Violation of run to completion detected");
+      RError.err(ErrorType.Error, "Violation of run to completion detected", info);
     }
   }
 
@@ -115,7 +114,7 @@ public class RtcViolation extends AstPass {
     return new Comparator<CompUse>() {
       @Override
       public int compare(CompUse left, CompUse right) {
-        return left.name.compareTo(right.name);
+        return left.getName().compareTo(right.getName());
       }
     };
   }

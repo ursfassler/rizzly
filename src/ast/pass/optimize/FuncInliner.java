@@ -5,7 +5,6 @@ import java.util.Set;
 
 import main.Configuration;
 import util.Pair;
-import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.data.Ast;
 import ast.data.AstList;
@@ -21,7 +20,7 @@ import ast.data.statement.CallStmt;
 import ast.data.statement.Return;
 import ast.data.statement.Statement;
 import ast.data.statement.VarDefStmt;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.dispatcher.other.CallgraphMaker;
 import ast.dispatcher.other.StmtReplacer;
 import ast.doc.SimpleGraph;
@@ -114,13 +113,15 @@ class FuncInlinerWorker extends StmtReplacer<Void> {
     List<Statement> ret = new AstList<Statement>();
 
     for (int i = 0; i < func.param.size(); i++) {
-      FuncVariable inner = func.param.get(i);
+      FunctionVariable inner = func.param.get(i);
       Expression arg = actualParameter.value.get(i);
 
-      inner.name = kun.get(inner.name);
+      inner.setName(kun.get(inner.getName()));
 
-      VarDefStmt def = new VarDefStmt(inner.getInfo(), inner);
-      AssignmentSingle ass = new AssignmentSingle(arg.getInfo(), RefFactory.full(ElementInfo.NO, inner), arg);
+      VarDefStmt def = new VarDefStmt(inner);
+      def.metadata().add(inner.metadata());
+      AssignmentSingle ass = new AssignmentSingle(RefFactory.full(inner), arg);
+      ass.metadata().add(arg.metadata());
 
       ret.add(def);
       ret.add(ass);

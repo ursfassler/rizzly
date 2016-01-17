@@ -17,14 +17,13 @@
 
 package ast.data.variable;
 
-import ast.ElementInfo;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
 import ast.visitor.Visitor;
 
-final public class TemplateParameter extends Variable {
+public class TemplateParameter extends Variable {
 
-  public TemplateParameter(ElementInfo info, String name, TypeRef type) {
-    super(info, name, type);
+  public TemplateParameter(String name, TypeReference type) {
+    super(name, type);
   }
 
   @Override

@@ -26,7 +26,6 @@ import java.util.Set;
 import main.Configuration;
 import parser.FileParser;
 import ast.Designator;
-import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -99,7 +98,7 @@ public class FileLoader extends AstPass {
     assert (matches.size() <= 1);
 
     if (matches.isEmpty()) {
-      Namespace ret = new Namespace(ElementInfo.NO, name);
+      Namespace ret = new Namespace(name);
       ns.children.add(ret);
       return ret;
     } else {

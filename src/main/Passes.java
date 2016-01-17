@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Map;
 
 import ast.Designator;
-import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.debug.DebugPrinter;
@@ -66,6 +65,7 @@ import ast.pass.others.TypeUplift;
 import ast.pass.others.VarDeclToTop;
 import ast.pass.others.VarDefSplitter;
 import ast.pass.others.VarSort;
+import ast.pass.output.xml.XmlWriterPass;
 import ast.pass.reduction.BitLogicCategorizer;
 import ast.pass.reduction.CompLinkReduction;
 import ast.pass.reduction.CompositionReduction;
@@ -94,7 +94,7 @@ import error.RError;
 
 public class Passes {
   public static void process(Configuration opt, String outdir, String debugdir) {
-    Namespace aclasses = new Namespace(ElementInfo.NO, "!");
+    Namespace aclasses = new Namespace("!");
     KnowledgeBase kb = new KnowledgeBase(aclasses, outdir, debugdir, opt);
     PassGroup passes = makePasses(opt);
     process(passes, new Designator(), new DebugPrinter(aclasses, kb.getDebugDir()), aclasses, kb);
@@ -102,6 +102,16 @@ public class Passes {
 
   // TODO split up
   private static PassGroup makePasses(Configuration configuration) {
+    if (configuration.doXml()) {
+      PassGroup passes = new PassGroup("xml");
+      passes.add(new FileLoader(configuration));
+      passes.add(new InternsAdder(configuration));
+      passes.add(new CheckNames(configuration));
+      passes.add(new Linker(configuration));
+      passes.add(new XmlWriterPass(configuration));
+      return passes;
+    }
+
     PassGroup passes = new PassGroup("ast");
 
     passes.checks.add(new Sanitycheck(configuration));

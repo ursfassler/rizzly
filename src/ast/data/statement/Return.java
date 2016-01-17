@@ -17,16 +17,11 @@
 
 package ast.data.statement;
 
-import ast.ElementInfo;
 
 /**
  *
  * @author urs
  */
 abstract public class Return extends Statement {
-
-  public Return(ElementInfo info) {
-    super(info);
-  }
 
 }

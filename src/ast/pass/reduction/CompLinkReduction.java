@@ -88,7 +88,7 @@ class CompLinkReductionWorker extends NullDispatcher<Void, Void> {
       } else if (item instanceof Namespace) {
         item = (Named) NameFilter.select(((ast.data.Namespace) item).children, rn.name);
       } else {
-        RError.err(ErrorType.Fatal, item.getInfo(), "Unhandled type: " + item.getClass().getCanonicalName());
+        RError.err(ErrorType.Fatal, "Unhandled type: " + item.getClass().getCanonicalName(), item.metadata());
       }
       assert (item != null);
     }

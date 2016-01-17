@@ -39,7 +39,7 @@ public class KnowPath extends KnowledgeEntry {
   public Designator get(Ast obj) {
     Designator ret = find(obj);
     if (ret == null) {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Object not reachable: " + obj);
+      RError.err(ErrorType.Fatal, "Object not reachable: " + obj, obj.metadata());
     }
     return ret;
   }
@@ -78,10 +78,10 @@ class KnowPathTraverser extends DfsTraverser<Void, Designator> {
     if (obj instanceof Named) {
       if (cache.containsKey(obj)) {
         Designator oldparent = cache.get(obj);
-        RError.err(ErrorType.Fatal, obj.getInfo(), "Same object (" + obj + ") found 2 times: " + oldparent + " and " + param);
+        RError.err(ErrorType.Fatal, "Same object (" + obj + ") found 2 times: " + oldparent + " and " + param, obj.metadata());
       }
       cache.put(obj, param);
-      param = new Designator(param, ((Named) obj).name);
+      param = new Designator(param, ((Named) obj).getName());
     }
     return super.visit(obj, param);
   }

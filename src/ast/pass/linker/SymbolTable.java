@@ -64,16 +64,12 @@ public class SymbolTable {
   }
 
   public void add(Named obj) {
-    Ast old = find(obj.name, false);
+    Ast old = find(obj.getName(), false);
     if (old != null) {
-      if (old instanceof Ast) {
-        RError.err(ErrorType.Hint, old.getInfo(), "First definition was here");
-        RError.err(ErrorType.Error, obj.getInfo(), "Entry already defined: " + obj.name);
-      } else {
-        RError.err(ErrorType.Error, "Entry already defined: " + obj.name);
-      }
+      RError.err(ErrorType.Hint, "First definition was here", old.metadata());
+      RError.err(ErrorType.Error, "Entry already defined: " + obj.getName(), obj.metadata());
     }
-    entries.put(obj.name, obj);
+    entries.put(obj.getName(), obj);
   }
 
   public void add(Ast obj) {

@@ -17,15 +17,14 @@
 
 package ast.data.reference;
 
-import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstBase;
 
 public abstract class TypedRef<T extends Ast> extends AstBase {
   public Reference ref;
 
-  public TypedRef(ElementInfo info, Reference ref) {
-    super(info);
+  public TypedRef(Reference ref) {
+    super();
     this.ref = ref;
   }
 

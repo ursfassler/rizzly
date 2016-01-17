@@ -17,11 +17,7 @@
 
 package ast.data.reference;
 
-import ast.ElementInfo;
 import ast.data.AstBase;
 
 abstract public class RefItem extends AstBase {
-  public RefItem(ElementInfo info) {
-    super(info);
-  }
 }

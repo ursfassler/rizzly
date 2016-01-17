@@ -17,7 +17,6 @@
 
 package ast.data.statement;
 
-import ast.ElementInfo;
 import ast.data.expression.Expression;
 import ast.visitor.Visitor;
 
@@ -26,8 +25,7 @@ final public class WhileStmt extends Statement {
   public Expression condition;
   public Block body;
 
-  public WhileStmt(ElementInfo info, Expression condition, Block body) {
-    super(info);
+  public WhileStmt(Expression condition, Block body) {
     this.condition = condition;
     this.body = body;
   }

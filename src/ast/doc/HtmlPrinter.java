@@ -57,7 +57,7 @@ public class HtmlPrinter extends FunPrinter {
     // fullpath.size()));
     // locpath = new Designator(locpath, obj.name);
     //
-    Designator locpath = new Designator(fullpath, obj.name);
+    Designator locpath = new Designator(fullpath, obj.getName());
 
     return locpath.toString();
   }

@@ -15,37 +15,23 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data;
+package ast.data.function.header;
 
-import ast.ElementInfo;
+import ast.data.AstList;
+import ast.data.function.InterfaceFunction;
+import ast.data.function.ret.FuncReturn;
+import ast.data.statement.Block;
+import ast.data.variable.FunctionVariable;
+import ast.visitor.Visitor;
 
-public class Metadata {
-  final private ElementInfo info;
-  final private String key;
-  final private String value;
+final public class Slot extends InterfaceFunction {
 
-  public Metadata(ElementInfo info, String key, String value) {
-    super();
-    this.info = info;
-    this.key = key;
-    this.value = value;
-  }
-
-  public ElementInfo getInfo() {
-    return info;
-  }
-
-  public String getKey() {
-    return key;
-  }
-
-  public String getValue() {
-    return value;
+  public Slot(String name, AstList<FunctionVariable> param, FuncReturn ret, Block body) {
+    super(name, param, ret, body);
   }
 
   @Override
-  public String toString() {
-    return key + ":" + value;
+  public void accept(Visitor visitor) {
+    visitor.visit(this);
   }
-
 }

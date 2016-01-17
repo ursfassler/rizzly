@@ -17,15 +17,21 @@
 
 package ast.data.type.special;
 
-import ast.ElementInfo;
 import ast.data.type.Type;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
+import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
 final public class TypeType extends Type {
-  public TypeRef type;
+  public TypeReference type;
 
-  public TypeType(ElementInfo info, String name, TypeRef type) {
+  public TypeType(String name, TypeReference type) {
+    super(name);
+    this.type = type;
+  }
+
+  @Deprecated
+  public TypeType(MetaList info, String name, TypeReference type) {
     super(info, name);
     this.type = type;
   }

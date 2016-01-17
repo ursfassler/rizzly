@@ -17,15 +17,10 @@
 
 package ast.data.component.composition;
 
-import ast.ElementInfo;
 import ast.data.AstBase;
 import ast.data.function.Function;
 
 abstract public class Endpoint extends AstBase {
-
-  public Endpoint(ElementInfo info) {
-    super(info);
-  }
 
   abstract public Function getFunc();
 }

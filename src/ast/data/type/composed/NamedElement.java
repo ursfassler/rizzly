@@ -17,22 +17,29 @@
 
 package ast.data.type.composed;
 
-import ast.ElementInfo;
 import ast.data.Named;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
+import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
 final public class NamedElement extends Named {
-  public TypeRef typeref;
+  public TypeReference typeref;
 
-  public NamedElement(ElementInfo info, String name, TypeRef typeref) {
-    super(info, name);
+  public NamedElement(String name, TypeReference typeref) {
+    setName(name);
+    this.typeref = typeref;
+  }
+
+  @Deprecated
+  public NamedElement(MetaList info, String name, TypeReference typeref) {
+    metadata().add(info);
+    setName(name);
     this.typeref = typeref;
   }
 
   @Override
   public String toString() {
-    return name + typeref;
+    return getName() + typeref;
   }
 
   @Override

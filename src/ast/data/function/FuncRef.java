@@ -17,15 +17,21 @@
 
 package ast.data.function;
 
-import ast.ElementInfo;
 import ast.data.reference.Reference;
 import ast.data.reference.TypedRef;
+import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
 final public class FuncRef extends TypedRef<Function> {
 
-  public FuncRef(ElementInfo info, Reference ref) {
-    super(info, ref);
+  public FuncRef(Reference ref) {
+    super(ref);
+  }
+
+  @Deprecated
+  public FuncRef(MetaList info, Reference ref) {
+    super(ref);
+    metadata().add(info);
   }
 
   @Override

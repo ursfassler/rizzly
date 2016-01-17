@@ -18,19 +18,19 @@
 package ast.copy;
 
 import ast.data.Ast;
-import ast.data.statement.AssignmentMulti;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.CaseStmt;
+import ast.data.statement.ExpressionReturn;
 import ast.data.statement.ForStmt;
-import ast.data.statement.IfStmt;
+import ast.data.statement.IfStatement;
 import ast.data.statement.MsgPush;
-import ast.data.statement.ReturnExpr;
-import ast.data.statement.ReturnVoid;
+import ast.data.statement.MultiAssignment;
 import ast.data.statement.Statement;
 import ast.data.statement.VarDefInitStmt;
 import ast.data.statement.VarDefStmt;
+import ast.data.statement.VoidReturn;
 import ast.data.statement.WhileStmt;
 import ast.dispatcher.NullDispatcher;
 
@@ -49,68 +49,68 @@ public class CopyStatement extends NullDispatcher<Statement, Void> {
 
   @Override
   protected Statement visitBlock(Block obj, Void param) {
-    Block ret = new Block(obj.getInfo());
+    Block ret = new Block();
     ret.statements.addAll(cast.copy(obj.statements));
     return ret;
   }
 
   @Override
   protected Statement visitVarDef(VarDefStmt obj, Void param) {
-    return new VarDefStmt(obj.getInfo(), cast.copy(obj.variable));
+    return new VarDefStmt(cast.copy(obj.variable));
   }
 
   @Override
-  protected Statement visitAssignmentMulti(AssignmentMulti obj, Void param) {
-    return new AssignmentMulti(obj.getInfo(), cast.copy(obj.left), cast.copy(obj.right));
+  protected Statement visitAssignmentMulti(MultiAssignment obj, Void param) {
+    return new MultiAssignment(cast.copy(obj.left), cast.copy(obj.right));
   }
 
   @Override
   protected Statement visitAssignmentSingle(AssignmentSingle obj, Void param) {
-    return new AssignmentSingle(obj.getInfo(), cast.copy(obj.left), cast.copy(obj.right));
+    return new AssignmentSingle(cast.copy(obj.left), cast.copy(obj.right));
   }
 
   @Override
   protected Statement visitCallStmt(CallStmt obj, Void param) {
-    return new CallStmt(obj.getInfo(), cast.copy(obj.call));
+    return new CallStmt(cast.copy(obj.call));
   }
 
   @Override
-  protected Statement visitReturnExpr(ReturnExpr obj, Void param) {
-    return new ReturnExpr(obj.getInfo(), cast.copy(obj.expr));
+  protected Statement visitReturnExpr(ExpressionReturn obj, Void param) {
+    return new ExpressionReturn(cast.copy(obj.expression));
   }
 
   @Override
-  protected Statement visitReturnVoid(ReturnVoid obj, Void param) {
-    return new ReturnVoid(obj.getInfo());
+  protected Statement visitReturnVoid(VoidReturn obj, Void param) {
+    return new VoidReturn();
   }
 
   @Override
   protected Statement visitCaseStmt(CaseStmt obj, Void param) {
-    return new CaseStmt(obj.getInfo(), cast.copy(obj.condition), cast.copy(obj.option), cast.copy(obj.otherwise));
+    return new CaseStmt(cast.copy(obj.condition), cast.copy(obj.option), cast.copy(obj.otherwise));
   }
 
   @Override
-  protected Statement visitIfStmt(IfStmt obj, Void param) {
-    return new IfStmt(obj.getInfo(), cast.copy(obj.option), cast.copy(obj.defblock));
+  protected Statement visitIfStmt(IfStatement obj, Void param) {
+    return new IfStatement(cast.copy(obj.option), cast.copy(obj.defblock));
   }
 
   @Override
   protected Statement visitWhileStmt(WhileStmt obj, Void param) {
-    return new WhileStmt(obj.getInfo(), cast.copy(obj.condition), cast.copy(obj.body));
+    return new WhileStmt(cast.copy(obj.condition), cast.copy(obj.body));
   }
 
   @Override
   protected Statement visitMsgPush(MsgPush obj, Void param) {
-    return new MsgPush(obj.getInfo(), cast.copy(obj.queue), cast.copy(obj.func), cast.copy(obj.data));
+    return new MsgPush(cast.copy(obj.queue), cast.copy(obj.func), cast.copy(obj.data));
   }
 
   @Override
   protected Statement visitForStmt(ForStmt obj, Void param) {
-    return new ForStmt(obj.getInfo(), cast.copy(obj.iterator), cast.copy(obj.block));
+    return new ForStmt(cast.copy(obj.iterator), cast.copy(obj.block));
   }
 
   @Override
   protected Statement visitVarDefInitStmt(VarDefInitStmt obj, Void param) {
-    return new VarDefInitStmt(obj.getInfo(), cast.copy(obj.variable), cast.copy(obj.initial));
+    return new VarDefInitStmt(cast.copy(obj.variable), cast.copy(obj.initial));
   }
 }

@@ -23,7 +23,6 @@ import java.util.Iterator;
 import java.util.Map;
 
 import ast.Designator;
-import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Range;
@@ -33,7 +32,7 @@ import ast.data.component.composition.CompUse;
 import ast.data.component.composition.Direction;
 import ast.data.component.hfsm.StateRef;
 import ast.data.expression.Expression;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.expression.TypeCast;
 import ast.data.expression.binop.And;
 import ast.data.expression.binop.BitAnd;
@@ -67,12 +66,12 @@ import ast.data.function.Function;
 import ast.data.function.InterfaceFunction;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FuncReturnTuple;
-import ast.data.function.ret.FuncReturnType;
+import ast.data.function.ret.FunctionReturnType;
 import ast.data.reference.RefItem;
 import ast.data.reference.Reference;
 import ast.data.type.Type;
-import ast.data.type.TypeRef;
 import ast.data.type.TypeRefFactory;
+import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayTypeFactory;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumElement;
@@ -83,10 +82,11 @@ import ast.data.type.base.TupleType;
 import ast.data.type.composed.NamedElement;
 import ast.data.type.composed.RecordType;
 import ast.data.type.special.ComponentType;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.data.variable.Variable;
 import ast.dispatcher.NullDispatcher;
 import ast.dispatcher.other.RefTypeGetter;
+import ast.meta.MetaList;
 import ast.pass.check.type.ExpressionTypecheck;
 import ast.repository.manipulator.TypeRepo;
 import error.ErrorType;
@@ -119,14 +119,14 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
     rtg = new RefTypeGetter(kt, kb);
   }
 
-  private void checkPositive(ElementInfo info, String op, Range lhs, Range rhs) {
+  private void checkPositive(MetaList info, String op, Range lhs, Range rhs) {
     checkPositive(info, op, lhs);
     checkPositive(info, op, rhs);
   }
 
-  private void checkPositive(ElementInfo info, String op, Range range) {
+  private void checkPositive(MetaList info, String op, Range range) {
     if (range.low.compareTo(BigInteger.ZERO) < 0) {
-      RError.err(ErrorType.Error, info, op + " only allowed for positive types");
+      RError.err(ErrorType.Error, op + " only allowed for positive types", info);
     }
   }
 
@@ -147,7 +147,7 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
   }
 
   @Override
-  protected Type visitTypeRef(TypeRef obj, Void param) {
+  protected Type visitTypeRef(TypeReference obj, Void param) {
     return visit(obj.ref, param);
   }
 
@@ -178,16 +178,16 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
 
   @Override
   protected Type visitFunction(Function obj, Void param) {
-    AstList<TypeRef> arg = new AstList<TypeRef>();
-    for (FuncVariable var : obj.param) {
-      arg.add(TypeRefFactory.create(ElementInfo.NO, visit(var.type, null)));
+    AstList<TypeReference> arg = new AstList<TypeReference>();
+    for (FunctionVariable var : obj.param) {
+      arg.add(TypeRefFactory.create(visit(var.type, null)));
     }
-    return new FunctionType(obj.getInfo(), obj.name, arg, TypeRefFactory.create(ElementInfo.NO, visit(obj.ret, param)));
+    return new FunctionType(obj.metadata(), obj.getName(), arg, TypeRefFactory.create(visit(obj.ret, param)));
   }
 
   @Override
   protected Type visitComponent(Component obj, Void param) {
-    ComponentType ct = new ComponentType(obj.getInfo(), Designator.NAME_SEP + "T" + Designator.NAME_SEP + obj.name);
+    ComponentType ct = new ComponentType(obj.metadata(), Designator.NAME_SEP + "T" + Designator.NAME_SEP + obj.getName());
     makeFuncTypes(ct.input, obj.getIface(Direction.in));
     makeFuncTypes(ct.output, obj.getIface(Direction.out));
     return ct;
@@ -195,7 +195,7 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
 
   private void makeFuncTypes(AstList<NamedElement> flist, AstList<InterfaceFunction> astList) {
     for (InterfaceFunction itr : astList) {
-      NamedElement ne = new NamedElement(itr.getInfo(), itr.name, TypeRefFactory.create(itr.getInfo(), visit(itr, null)));
+      NamedElement ne = new NamedElement(itr.metadata(), itr.getName(), TypeRefFactory.create(itr.metadata(), visit(itr, null)));
       flist.add(ne);
     }
   }
@@ -230,12 +230,12 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
     if (obj.value.size() == 1) {
       return visit(obj.value.get(0), param);
     } else {
-      AstList<TypeRef> elem = new AstList<TypeRef>();
+      AstList<TypeReference> elem = new AstList<TypeReference>();
       for (Expression expr : obj.value) {
-        TypeRef ref = TypeRefFactory.create(expr.getInfo(), visit(expr, null));
+        TypeReference ref = TypeRefFactory.create(expr.metadata(), visit(expr, null));
         elem.add(ref);
       }
-      return new TupleType(obj.getInfo(), "", elem);
+      return new TupleType(obj.metadata(), "", elem);
     }
   }
 
@@ -252,8 +252,8 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
   }
 
   @Override
-  protected Type visitRefExpr(RefExp obj, Void param) {
-    return visit(obj.ref, param);
+  protected Type visitRefExpr(ReferenceExpression obj, Void param) {
+    return visit(obj.reference, param);
   }
 
   @Override
@@ -278,14 +278,14 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
   @Override
   protected Type visitFuncReturnTuple(FuncReturnTuple obj, Void param) {
     AstList<NamedElement> types = new AstList<NamedElement>();
-    for (FuncVariable var : obj.param) {
-      types.add(new NamedElement(ElementInfo.NO, var.name, var.type));
+    for (FunctionVariable var : obj.param) {
+      types.add(new NamedElement(var.getName(), var.type));
     }
-    return new RecordType(obj.getInfo(), "", types);
+    return new RecordType(obj.metadata(), "", types);
   }
 
   @Override
-  protected Type visitFuncReturnType(FuncReturnType obj, Void param) {
+  protected Type visitFuncReturnType(FunctionReturnType obj, Void param) {
     return visit(obj.type, param);
   }
 
@@ -386,7 +386,7 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
     assert (rhst instanceof RangeType);
     Range lhs = ((RangeType) lhst).range;
     Range rhs = ((RangeType) rhst).range;
-    return bitOr(obj.getInfo(), lhs, rhs);
+    return bitOr(obj.metadata(), lhs, rhs);
   }
 
   @Override
@@ -397,17 +397,17 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
     if (lhst instanceof RangeType) {
       Range lhs = ((RangeType) lhst).range;
       Range rhs = ((RangeType) rhst).range;
-      return bitOr(obj.getInfo(), lhs, rhs);
+      return bitOr(obj.metadata(), lhs, rhs);
     } else if (lhst instanceof BooleanType) {
       assert (rhst instanceof BooleanType);
       return lhst;
     } else {
-      RError.err(ErrorType.Error, lhst.getInfo(), "Expected range or boolean type");
+      RError.err(ErrorType.Error, "Expected range or boolean type", lhst.metadata());
       return null;
     }
   }
 
-  private Type bitOr(ElementInfo info, Range lhs, Range rhs) {
+  private Type bitOr(MetaList info, Range lhs, Range rhs) {
     checkPositive(info, "or", lhs, rhs);
 
     BigInteger bigger = lhs.high.max(rhs.high);
@@ -431,7 +431,7 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
       Range lhs = ((RangeType) lhst).range;
       Range rhs = ((RangeType) rhst).range;
 
-      checkPositive(obj.getInfo(), "xor", lhs, rhs);
+      checkPositive(obj.metadata(), "xor", lhs, rhs);
 
       BigInteger bigger = lhs.high.max(rhs.high);
 
@@ -444,7 +444,7 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
       assert (rhst instanceof BooleanType);
       return lhst;
     } else {
-      RError.err(ErrorType.Error, lhst.getInfo(), "Expected range or boolean type");
+      RError.err(ErrorType.Error, "Expected range or boolean type", lhst.metadata());
       return null;
     }
   }
@@ -463,10 +463,10 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
     assert (rhst instanceof RangeType);
     Range lhs = ((RangeType) lhst).range;
     Range rhs = ((RangeType) rhst).range;
-    return bitAnd(obj.getInfo(), lhs, rhs);
+    return bitAnd(obj.metadata(), lhs, rhs);
   }
 
-  private Type bitAnd(ElementInfo info, Range lhs, Range rhs) {
+  private Type bitAnd(MetaList info, Range lhs, Range rhs) {
     checkPositive(info, "and", lhs, rhs);
     BigInteger high = lhs.high.min(rhs.high); // TODO ok?
     return kbi.getRangeType(new Range(BigInteger.ZERO, high));
@@ -481,12 +481,12 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
       assert (rhst instanceof RangeType);
       Range lhs = ((RangeType) lhst).range;
       Range rhs = ((RangeType) rhst).range;
-      return bitAnd(obj.getInfo(), lhs, rhs);
+      return bitAnd(obj.metadata(), lhs, rhs);
     } else if (lhst instanceof BooleanType) {
       assert (rhst instanceof BooleanType);
       return lhst;
     } else {
-      RError.err(ErrorType.Error, lhst.getInfo(), "Expected range or boolean type");
+      RError.err(ErrorType.Error, "Expected range or boolean type", lhst.metadata());
       return null;
     }
   }
@@ -545,7 +545,7 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
     Range rr = ((RangeType) rhs).range;
 
     if ((lr.low.compareTo(BigInteger.ZERO) < 0) || (rr.low.compareTo(BigInteger.ZERO) < 0)) {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "sorry, I am too lazy to check for negative numbers");
+      RError.err(ErrorType.Fatal, "sorry, I am too lazy to check for negative numbers", obj.metadata());
     }
 
     BigInteger rhigh = rr.high;
@@ -574,7 +574,7 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
 
   @Override
   protected Type visitBitNot(BitNot obj, Void param) {
-    Type type = visit(obj.expr, param);
+    Type type = visit(obj.expression, param);
     assert (type instanceof RangeType);
 
     Range range = ((RangeType) type).range;
@@ -588,7 +588,7 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
 
   @Override
   protected Type visitUminus(Uminus obj, Void param) {
-    Type lhs = visit(obj.expr, param);
+    Type lhs = visit(obj.expression, param);
     assert (lhs instanceof RangeType);
     Range lr = ((RangeType) lhs).range;
     BigInteger low = BigInteger.ZERO.subtract(lr.high);

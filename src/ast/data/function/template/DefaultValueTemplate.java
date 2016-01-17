@@ -17,12 +17,11 @@
 
 package ast.data.function.template;
 
-import ast.ElementInfo;
 import ast.visitor.Visitor;
 
 final public class DefaultValueTemplate extends FunctionTemplate {
   public DefaultValueTemplate() {
-    super(ElementInfo.NO, "DefaultValueTemplate");
+    super("DefaultValueTemplate");
   }
 
   @Override

@@ -18,7 +18,6 @@
 package ast.pass.others;
 
 import main.Configuration;
-import ast.ElementInfo;
 import ast.data.Namespace;
 import ast.data.Range;
 import ast.data.expression.Expression;
@@ -54,7 +53,6 @@ public class RangeConverter extends AstPass {
 }
 
 class RangeConverterWorker extends ExprReplacer<Void> {
-  private static final ElementInfo info = ElementInfo.NO;
   private TypeRepo kbi;
   private KnowType kt;
 
@@ -77,7 +75,7 @@ class RangeConverterWorker extends ExprReplacer<Void> {
 
   private Expression replaceIfNeeded(Expression val, RangeType valType, RangeType commonType) {
     if (Range.leftIsSmallerEqual(valType.range, commonType.range)) {
-      val = new TypeCast(info, TypeRefFactory.create(info, commonType), val);
+      val = new TypeCast(TypeRefFactory.create(commonType), val);
     }
     return val;
   }

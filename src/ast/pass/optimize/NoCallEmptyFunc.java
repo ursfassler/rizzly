@@ -50,7 +50,7 @@ class NoCallEmptyFuncWorker extends StmtReplacer<Function> {
         return new AstList<Statement>();
       }
 
-      RError.err(ErrorType.Fatal, obj.getInfo(), "reached unreachable code");
+      RError.err(ErrorType.Fatal, "reached unreachable code", obj.metadata());
     }
 
     return null;

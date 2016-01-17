@@ -17,7 +17,6 @@
 
 package ast.data.component.composition;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.component.Component;
 import ast.visitor.Visitor;
@@ -26,8 +25,8 @@ public class ImplComposition extends Component {
   final public AstList<CompUse> component = new AstList<CompUse>();
   final public AstList<Connection> connection = new AstList<Connection>();
 
-  public ImplComposition(ElementInfo info, String name) {
-    super(info, name);
+  public ImplComposition(String name) {
+    super(name);
   }
 
   @Override

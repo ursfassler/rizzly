@@ -26,7 +26,6 @@ import java.util.Set;
 
 import main.Configuration;
 import ast.Designator;
-import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.data.Ast;
 import ast.data.AstList;
@@ -39,7 +38,7 @@ import ast.data.component.hfsm.StateRefFactory;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.component.hfsm.Transition;
 import ast.data.expression.Expression;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.function.Function;
 import ast.data.function.header.FuncProcedure;
 import ast.data.function.ret.FuncReturnNone;
@@ -50,7 +49,7 @@ import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.Statement;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.Variable;
 import ast.dispatcher.NullDispatcher;
@@ -105,9 +104,9 @@ public class TransitionDownPropagator extends AstPass {
    * @param name
    */
   private static FuncProcedure makeTransBodyFunc(Transition trans, String name) {
-    AstList<FuncVariable> params = Copy.copy(trans.param);
-    FuncProcedure func = new FuncProcedure(ElementInfo.NO, name, params, new FuncReturnNone(ElementInfo.NO), trans.body);
-    trans.body = new Block(ElementInfo.NO);
+    AstList<FunctionVariable> params = Copy.copy(trans.param);
+    FuncProcedure func = new FuncProcedure(name, params, new FuncReturnNone(), trans.body);
+    trans.body = new Block();
 
     FsmReduction.relinkActualParameterRef(trans.param, func.param, func.body);
 
@@ -117,7 +116,6 @@ public class TransitionDownPropagator extends AstPass {
 }
 
 class TransitionDownPropagatorWorker extends NullDispatcher<Void, TransitionParam> {
-  private static final ElementInfo info = ElementInfo.NO;
   private final KnowParent kp;
   private final Map<Transition, State> tsrc;
   private final Map<Transition, State> tdst;
@@ -150,7 +148,7 @@ class TransitionDownPropagatorWorker extends NullDispatcher<Void, TransitionPara
       addTrans(obj, trans);
     }
     for (Transition trans : transList) {
-      trans.src = StateRefFactory.create(trans.src.getInfo(), obj);
+      trans.src = StateRefFactory.create(trans.src.metadata(), obj);
       // obj.getItem().add(trans);
       addTrans(obj, trans);
     }
@@ -166,7 +164,7 @@ class TransitionDownPropagatorWorker extends NullDispatcher<Void, TransitionPara
     State dst = tdst.get(otrans);
     assert (dst != null);
     Transition trans = Copy.copy(otrans);
-    trans.src = StateRefFactory.create(trans.src.getInfo(), src);
+    trans.src = StateRefFactory.create(trans.src.metadata(), src);
 
     makeExitCalls(src, os, trans.body.statements);
     {
@@ -175,12 +173,12 @@ class TransitionDownPropagatorWorker extends NullDispatcher<Void, TransitionPara
 
       AstList<Expression> arg = new AstList<Expression>();
       for (Variable acpar : trans.param) {
-        Reference parref = RefFactory.full(info, acpar);
-        arg.add(new RefExp(info, parref));
+        Reference parref = RefFactory.full(acpar);
+        arg.add(new ReferenceExpression(parref));
       }
 
-      Reference ref = RefFactory.call(info, func, arg);
-      CallStmt call = new CallStmt(info, ref);
+      Reference ref = RefFactory.call(func, arg);
+      CallStmt call = new CallStmt(ref);
       trans.body.statements.add(call);
     }
     makeVarInit(dst, os, trans.body.statements);
@@ -199,7 +197,8 @@ class TransitionDownPropagatorWorker extends NullDispatcher<Void, TransitionPara
     makeVarInit(par, top, list);
 
     for (StateVariable var : TypeFilter.select(start.item, StateVariable.class)) {
-      Assignment init = new AssignmentSingle(var.def.getInfo(), RefFactory.full(info, var), Copy.copy(var.def));
+      Assignment init = new AssignmentSingle(RefFactory.full(var), Copy.copy(var.def));
+      init.metadata().add(var.def.metadata());
       list.add(init);
     }
   }
@@ -236,8 +235,8 @@ class TransitionDownPropagatorWorker extends NullDispatcher<Void, TransitionPara
   }
 
   private CallStmt makeCall(Function func) {
-    Reference ref = RefFactory.call(info, func);
-    return new CallStmt(info, ref);
+    Reference ref = RefFactory.call(func);
+    return new CallStmt(ref);
   }
 
   private boolean isChildState(State test, State root) {
@@ -255,7 +254,7 @@ class TransitionDownPropagatorWorker extends NullDispatcher<Void, TransitionPara
     /*
      * for all states in obj.getItem() we want to know, which transitions are before and which ones are after the
      * specific state.
-     *
+     * 
      * the map spos contains the position of the state in the transition array
      */
 

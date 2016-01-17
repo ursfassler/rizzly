@@ -20,12 +20,11 @@ package ast.repository.manipulator;
 import java.math.BigInteger;
 import java.util.Set;
 
-import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.data.AstList;
 import ast.data.Range;
 import ast.data.type.Type;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.ArrayTypeFactory;
 import ast.data.type.base.BooleanType;
@@ -59,8 +58,8 @@ public class TypeRepo {
     return getType(EnumTypeFactory.create(kun.get("enum"), elements));
   }
 
-  public TupleType getTupleType(AstList<TypeRef> types) {
-    return getType(new TupleType(ElementInfo.NO, kun.get("tupleType"), Copy.copy(types)));
+  public TupleType getTupleType(AstList<TypeReference> types) {
+    return getType(new TupleType(kun.get("tupleType"), Copy.copy(types)));
   }
 
   public TypeType getTypeType(Type type) {
@@ -68,7 +67,7 @@ public class TypeRepo {
   }
 
   public RecordType getRecord(AstList<NamedElement> element) {
-    return getType(new RecordType(ElementInfo.NO, kun.get("record"), Copy.copy(element)));
+    return getType(new RecordType(kun.get("record"), Copy.copy(element)));
   }
 
   public ArrayType getArray(BigInteger size, Type type) {

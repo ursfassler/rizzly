@@ -15,36 +15,26 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast;
+package ast.data.statement;
 
-import java.util.ArrayList;
-
-import ast.data.Metadata;
+import ast.data.expression.Expression;
 import ast.visitor.Visitor;
-import ast.visitor.VisitorAcceptor;
 
-public class ElementInfo implements VisitorAcceptor {
-  final public String filename;
-  final public int line;
-  final public int row;
-  final public ArrayList<Metadata> metadata = new ArrayList<Metadata>();
-  static final public ElementInfo NO = new ElementInfo("", 0, 0);
+final public class ExpressionReturn extends Return {
 
-  public ElementInfo(String filename, int line, int row) {
-    super();
-    this.filename = filename;
-    this.line = line;
-    this.row = row;
+  public Expression expression;
+
+  public ExpressionReturn(Expression expr) {
+    this.expression = expr;
   }
 
   @Override
   public String toString() {
-    return filename + ": " + line + "," + row;
+    return super.toString() + " " + expression;
   }
 
   @Override
   public void accept(Visitor visitor) {
     visitor.visit(this);
   }
-
 }

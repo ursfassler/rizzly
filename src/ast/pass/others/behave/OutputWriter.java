@@ -22,8 +22,8 @@ import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.function.Function;
 import ast.data.function.ret.FuncReturnNone;
-import ast.data.function.ret.FuncReturnType;
-import ast.data.variable.FuncVariable;
+import ast.data.function.ret.FunctionReturnType;
+import ast.data.variable.FunctionVariable;
 import ast.dispatcher.NullDispatcher;
 import ast.doc.StreamWriter;
 import ast.specification.ExternalFunction;
@@ -71,7 +71,7 @@ public class OutputWriter extends NullDispatcher<Void, Void> {
   protected Void visitFunction(Function obj, Void param) {
     visit(obj.ret, param);
     sw.wr(" ");
-    sw.wr(obj.name);
+    sw.wr(obj.getName());
     sw.wr("(");
     visitArgList(obj.param);
     sw.wr(")");
@@ -82,7 +82,7 @@ public class OutputWriter extends NullDispatcher<Void, Void> {
     sw.incIndent();
 
     sw.wr("push(\"");
-    sw.wr(obj.name);
+    sw.wr(obj.getName());
     sw.wr("(");
 
     if (!obj.param.isEmpty()) {
@@ -102,24 +102,24 @@ public class OutputWriter extends NullDispatcher<Void, Void> {
     return null;
   }
 
-  private void visitParamList(AstList<FuncVariable> param) {
+  private void visitParamList(AstList<FunctionVariable> param) {
     boolean first = true;
-    for (FuncVariable var : param) {
+    for (FunctionVariable var : param) {
       if (first) {
         first = false;
       } else {
         sw.wr("\", \" + ");
       }
       sw.wr("std::to_string(");
-      sw.wr(var.name);
+      sw.wr(var.getName());
       sw.wr(")");
       sw.wr(" + ");
     }
   }
 
-  private void visitArgList(AstList<FuncVariable> param) {
+  private void visitArgList(AstList<FunctionVariable> param) {
     boolean first = true;
-    for (FuncVariable var : param) {
+    for (FunctionVariable var : param) {
       if (first) {
         first = false;
       } else {
@@ -130,10 +130,10 @@ public class OutputWriter extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncVariable(FuncVariable obj, Void param) {
+  protected Void visitFuncVariable(FunctionVariable obj, Void param) {
     // TODO use correct type
     sw.wr("int ");
-    sw.wr(obj.name);
+    sw.wr(obj.getName());
 
     return null;
   }
@@ -145,7 +145,7 @@ public class OutputWriter extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncReturnType(FuncReturnType obj, Void param) {
+  protected Void visitFuncReturnType(FunctionReturnType obj, Void param) {
     // TODO implement
     return null;
   }

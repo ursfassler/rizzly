@@ -21,15 +21,15 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ast.Designator;
-import ast.ElementInfo;
-import ast.data.Metadata;
+import ast.meta.MetaList;
+import ast.meta.Metadata;
 
 final public class SubComponent extends Component {
   private static final PointF ErrorPoint = new PointF(Double.NaN, Double.NaN);
   final private String instname;
   final private PointF pos = new PointF();
 
-  public SubComponent(ElementInfo info, String instname, Designator path, String classname, List<Metadata> metadata) {
+  public SubComponent(MetaList info, String instname, Designator path, String classname, List<Metadata> metadata) {
     super(info, path, classname, metadata);
     this.instname = instname;
   }

@@ -17,17 +17,22 @@
 
 package ast.data.raw;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.component.composition.CompUse;
 import ast.data.component.composition.Connection;
+import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
 final public class RawComposition extends RawComponent {
   final private AstList<CompUse> instantiation = new AstList<CompUse>();
   final private AstList<Connection> connection = new AstList<Connection>();
 
-  public RawComposition(ElementInfo info, String name) {
+  public RawComposition(String name) {
+    super(name);
+  }
+
+  @Deprecated
+  public RawComposition(MetaList info, String name) {
     super(info, name);
   }
 

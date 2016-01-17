@@ -17,7 +17,6 @@
 
 package parser.expression;
 
-import ast.ElementInfo;
 import ast.data.expression.Expression;
 import ast.data.expression.binop.Equal;
 import ast.data.expression.binop.Greater;
@@ -31,24 +30,24 @@ import error.ErrorType;
 import error.RError;
 
 class RelationFactory {
-  static Relation create(ElementInfo info, Expression left, Expression right, RelOp op) {
+  static Relation create(Expression left, Expression right, RelOp op) {
     switch (op) {
       case EQUAL:
-        return new Equal(info, left, right);
+        return new Equal(left, right);
       case NOT_EQUAL:
-        return new NotEqual(info, left, right);
+        return new NotEqual(left, right);
       case GREATER:
-        return new Greater(info, left, right);
+        return new Greater(left, right);
       case GREATER_EQUEAL:
-        return new GreaterEqual(info, left, right);
+        return new GreaterEqual(left, right);
       case LESS:
-        return new Less(info, left, right);
+        return new Less(left, right);
       case LESS_EQUAL:
-        return new LessEqual(info, left, right);
+        return new LessEqual(left, right);
       case IS:
-        return new Is(info, left, right);
+        return new Is(left, right);
       default:
-        RError.err(ErrorType.Fatal, info, "Unhandled relation: " + op);
+        RError.err(ErrorType.Fatal, "Unhandled relation: " + op);
     }
     return null;
   }

@@ -53,9 +53,9 @@ public class Io extends AstPass {
     AstList<Statement> modifiers = getStateModifiers(func);
     if (!modifiers.isEmpty()) {
       for (Ast modifier : modifiers) {
-        RError.err(ErrorType.Hint, modifier.getInfo(), "here");
+        RError.err(ErrorType.Hint, "here", modifier.metadata());
       }
-      RError.err(ErrorType.Error, func.getInfo(), FunctionTypeName.get(func) + " (" + func.name + ") is not allowed to change state");
+      RError.err(ErrorType.Error, FunctionTypeName.get(func) + " (" + func.getName() + ") is not allowed to change state", func.metadata());
     }
   }
 

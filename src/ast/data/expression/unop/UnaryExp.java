@@ -17,21 +17,19 @@
 
 package ast.data.expression.unop;
 
-import ast.ElementInfo;
 import ast.data.expression.Expression;
 
 abstract public class UnaryExp extends Expression {
-  public Expression expr;
+  public Expression expression;
 
   abstract public String getOpName();
 
-  public UnaryExp(ElementInfo info, Expression expr) {
-    super(info);
-    this.expr = expr;
+  public UnaryExp(Expression expr) {
+    this.expression = expr;
   }
 
   @Override
   public String toString() {
-    return getOpName() + "(" + expr + ")";
+    return getOpName() + "(" + expression + ")";
   }
 }

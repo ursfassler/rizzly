@@ -17,7 +17,6 @@
 
 package ast.data.type.special;
 
-import ast.ElementInfo;
 import ast.data.type.Type;
 import ast.data.type.TypeRefFactory;
 import ast.data.type.template.TypeTypeTemplateFactory;
@@ -25,7 +24,7 @@ import ast.data.type.template.TypeTypeTemplateFactory;
 public class TypeTypeFactory {
 
   static public TypeType create(Type type) {
-    String name = TypeTypeTemplateFactory.NAME + "{" + type.name + "}";
-    return new TypeType(ElementInfo.NO, name, TypeRefFactory.create(ElementInfo.NO, type));
+    String name = TypeTypeTemplateFactory.NAME + "{" + type.getName() + "}";
+    return new TypeType(name, TypeRefFactory.create(type));
   }
 }

@@ -17,14 +17,13 @@
 
 package ast.data.type.base;
 
-import ast.ElementInfo;
 import ast.visitor.Visitor;
 
 final public class BooleanType extends BaseType {
   public static final String NAME = "Boolean";
 
   public BooleanType() {
-    super(ElementInfo.NO, NAME);
+    super(NAME);
   }
 
   @Override

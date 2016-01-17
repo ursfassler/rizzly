@@ -17,15 +17,20 @@
 
 package ast.data.statement;
 
-import ast.ElementInfo;
 import ast.data.expression.Expression;
+import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
 final public class CaseOptValue extends CaseOptEntry {
   public Expression value;
 
-  public CaseOptValue(ElementInfo info, Expression value) {
-    super(info);
+  public CaseOptValue(Expression value) {
+    this.value = value;
+  }
+
+  @Deprecated
+  public CaseOptValue(MetaList info, Expression value) {
+    metadata().add(info);
     this.value = value;
   }
 

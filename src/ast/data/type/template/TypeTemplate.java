@@ -17,12 +17,17 @@
 
 package ast.data.type.template;
 
-import ast.ElementInfo;
 import ast.data.type.Type;
+import ast.meta.MetaList;
 
 abstract public class TypeTemplate extends Type {
 
-  public TypeTemplate(ElementInfo info, String name) {
+  public TypeTemplate(String name) {
+    super(name);
+  }
+
+  @Deprecated
+  public TypeTemplate(MetaList info, String name) {
     super(info, name);
   }
 

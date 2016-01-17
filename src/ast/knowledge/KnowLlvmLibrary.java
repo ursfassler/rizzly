@@ -18,15 +18,15 @@
 package ast.knowledge;
 
 import ast.Designator;
-import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
 import ast.data.function.FunctionProperty;
-import ast.data.function.header.FuncSignal;
+import ast.data.function.header.Signal;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.statement.Block;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
+import ast.meta.SourcePosition;
 import ast.repository.query.NameFilter;
 
 //TODO rename
@@ -47,14 +47,14 @@ public class KnowLlvmLibrary extends KnowledgeEntry {
     kb.getRoot().children.add(item);
   }
 
-  public FuncSignal getTrap() {
+  public Signal getTrap() {
     final String NAME = Designator.NAME_SEP + "trap";
-    final ElementInfo info = new ElementInfo(NAME, 0, 0);
+    final SourcePosition info = new SourcePosition(NAME, 0, 0); // TODO use info for everything
 
-    FuncSignal ret = (FuncSignal) findItem(NAME);
+    Signal ret = (Signal) findItem(NAME);
 
     if (ret == null) {
-      ret = new FuncSignal(info, NAME, new AstList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
+      ret = new Signal(NAME, new AstList<FunctionVariable>(), new FuncReturnNone(), new Block());
       ret.property = FunctionProperty.External;
       addItem(ret);
     }

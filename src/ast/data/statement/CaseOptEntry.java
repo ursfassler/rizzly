@@ -17,12 +17,8 @@
 
 package ast.data.statement;
 
-import ast.ElementInfo;
 import ast.data.AstBase;
 
 abstract public class CaseOptEntry extends AstBase {
 
-  public CaseOptEntry(ElementInfo info) {
-    super(info);
-  }
 }

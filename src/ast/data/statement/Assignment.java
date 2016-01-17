@@ -17,7 +17,6 @@
 
 package ast.data.statement;
 
-import ast.ElementInfo;
 import ast.data.expression.Expression;
 
 /**
@@ -27,8 +26,7 @@ import ast.data.expression.Expression;
 public abstract class Assignment extends Statement {
   public Expression right;
 
-  public Assignment(ElementInfo info, Expression right) {
-    super(info);
+  public Assignment(Expression right) {
     this.right = right;
   }
 

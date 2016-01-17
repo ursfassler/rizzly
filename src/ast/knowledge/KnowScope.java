@@ -30,12 +30,12 @@ import ast.data.function.header.FuncFunction;
 import ast.data.function.header.FuncProcedure;
 import ast.data.function.header.FuncQuery;
 import ast.data.function.header.FuncResponse;
-import ast.data.function.header.FuncSignal;
-import ast.data.function.header.FuncSlot;
+import ast.data.function.header.Signal;
+import ast.data.function.header.Slot;
 import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
-import ast.data.reference.DummyLinkTarget;
+import ast.data.reference.LinkTarget;
 import ast.data.template.Template;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
@@ -55,7 +55,7 @@ import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
 import ast.data.variable.ConstGlobal;
 import ast.data.variable.ConstPrivate;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.TemplateParameter;
 import error.ErrorType;
@@ -91,11 +91,11 @@ public class KnowScope extends KnowledgeEntry {
     global.add(RawElementary.class);
     global.add(RawComposition.class);
     global.add(RawHfsm.class);
-    global.add(DummyLinkTarget.class);
+    global.add(LinkTarget.class);
     global.add(RizzlyFile.class);
     global.add(FuncFunction.class); // FIXME: can also be private
 
-    local.add(FuncVariable.class);
+    local.add(FunctionVariable.class);
     local.add(TemplateParameter.class);
 
     priv.add(CompUse.class);
@@ -106,8 +106,8 @@ public class KnowScope extends KnowledgeEntry {
     priv.add(Transition.class);
     priv.add(FuncResponse.class); // TODO: sure?
     priv.add(FuncQuery.class); // TODO: sure?
-    priv.add(FuncSignal.class); // TODO: sure?
-    priv.add(FuncSlot.class); // TODO: sure?
+    priv.add(Signal.class); // TODO: sure?
+    priv.add(Slot.class); // TODO: sure?
     priv.add(FuncProcedure.class); // FIXME: can also be private
 
     {
@@ -134,7 +134,7 @@ public class KnowScope extends KnowledgeEntry {
     } else if (obj instanceof Template) {
       return get(((Template) obj).getObject());
     } else {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Unhandled class: " + obj.getClass().getCanonicalName());
+      RError.err(ErrorType.Fatal, "Unhandled class: " + obj.getClass().getCanonicalName(), obj.metadata());
       return null;
     }
   }

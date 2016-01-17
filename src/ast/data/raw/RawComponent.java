@@ -17,16 +17,22 @@
 
 package ast.data.raw;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.Named;
 import ast.data.function.Function;
+import ast.meta.MetaList;
 
 abstract public class RawComponent extends Named {
   private final AstList<Function> iface = new AstList<Function>();
 
-  public RawComponent(ElementInfo info, String name) {
-    super(info, name);
+  public RawComponent(String name) {
+    setName(name);
+  }
+
+  @Deprecated
+  public RawComponent(MetaList info, String name) {
+    metadata().add(info);
+    setName(name);
   }
 
   public AstList<Function> getIface() {

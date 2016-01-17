@@ -17,15 +17,13 @@
 
 package ast.data.statement;
 
-import ast.ElementInfo;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.visitor.Visitor;
 
 final public class VarDefStmt extends Statement {
-  final public FuncVariable variable;
+  final public FunctionVariable variable;
 
-  public VarDefStmt(ElementInfo info, FuncVariable variable) {
-    super(info);
+  public VarDefStmt(FunctionVariable variable) {
     this.variable = variable;
   }
 

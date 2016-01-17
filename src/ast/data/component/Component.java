@@ -17,7 +17,6 @@
 
 package ast.data.component;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.Named;
 import ast.data.component.composition.Direction;
@@ -26,8 +25,8 @@ import ast.data.function.Function;
 import ast.data.function.InterfaceFunction;
 import ast.data.function.header.FuncQuery;
 import ast.data.function.header.FuncResponse;
-import ast.data.function.header.FuncSignal;
-import ast.data.function.header.FuncSlot;
+import ast.data.function.header.Signal;
+import ast.data.function.header.Slot;
 import ast.repository.query.TypeFilter;
 
 abstract public class Component extends Named {
@@ -35,8 +34,8 @@ abstract public class Component extends Named {
   final public AstList<InterfaceFunction> iface = new AstList<InterfaceFunction>();
   final public AstList<Function> function = new AstList<Function>();
 
-  public Component(ElementInfo info, String name) {
-    super(info, name);
+  public Component(String name) {
+    setName(name);
     queue = new Queue();
   }
 
@@ -45,12 +44,12 @@ abstract public class Component extends Named {
     switch (dir) {
       case in: {
         ret.addAll(TypeFilter.select(iface, FuncResponse.class));
-        ret.addAll(TypeFilter.select(iface, FuncSlot.class));
+        ret.addAll(TypeFilter.select(iface, Slot.class));
         break;
       }
       case out: {
         ret.addAll(TypeFilter.select(iface, FuncQuery.class));
-        ret.addAll(TypeFilter.select(iface, FuncSignal.class));
+        ret.addAll(TypeFilter.select(iface, Signal.class));
         break;
       }
       default:

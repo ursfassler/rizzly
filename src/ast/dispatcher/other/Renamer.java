@@ -61,8 +61,8 @@ public class Renamer extends DfsTraverser<Void, Void> {
   protected Void visit(Ast obj, Void param) {
     if (obj instanceof Named) {
       Named item = (Named) obj;
-      String name = cleanName(item.name);
-      item.name = name;
+      String name = cleanName(item.getName());
+      item.setName(name);
     }
     return super.visit(obj, param);
   }

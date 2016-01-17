@@ -15,18 +15,16 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.function.ret;
+package ast.data.type;
 
-import ast.ElementInfo;
-import ast.data.type.TypeRef;
+import ast.data.reference.Reference;
+import ast.data.reference.TypedRef;
 import ast.visitor.Visitor;
 
-final public class FuncReturnType extends FuncReturn {
-  public TypeRef type;
+public class TypeReference extends TypedRef<Type> {
 
-  public FuncReturnType(ElementInfo info, TypeRef type) {
-    super(info);
-    this.type = type;
+  public TypeReference(Reference ref) {
+    super(ref);
   }
 
   @Override

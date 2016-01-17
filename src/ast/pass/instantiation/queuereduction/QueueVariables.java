@@ -19,17 +19,17 @@ package ast.pass.instantiation.queuereduction;
 
 import java.math.BigInteger;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.expression.Expression;
 import ast.data.expression.value.ArrayValue;
 import ast.data.expression.value.NumberValue;
 import ast.data.type.Type;
-import ast.data.type.TypeRef;
 import ast.data.type.TypeRefFactory;
+import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
 import ast.data.variable.StateVariable;
 import ast.knowledge.KnowledgeBase;
+import ast.meta.MetaList;
 import ast.repository.manipulator.TypeRepo;
 
 class QueueVariables {
@@ -38,10 +38,10 @@ class QueueVariables {
   private StateVariable count;
 
   final private String prefix;
-  final private ElementInfo info;
+  final private MetaList info;
   final private TypeRepo kbi;
 
-  public QueueVariables(String prefix, ElementInfo info, KnowledgeBase kb) {
+  public QueueVariables(String prefix, MetaList info, KnowledgeBase kb) {
     super();
     this.prefix = prefix;
     this.info = info;
@@ -49,16 +49,16 @@ class QueueVariables {
   }
 
   void create(ArrayType queueType) {
-    queue = new StateVariable(info, makeName("vdata"), makeRef(queueType), makeQueueDefaultValue());
-    head = new StateVariable(info, makeName("vhead"), makeRef(kbi.getRangeType(queueLength(queueType))), makeNumberZero());
-    count = new StateVariable(info, makeName("vcount"), makeRef(kbi.getRangeType(queueLength(queueType) + 1)), makeNumberZero());
+    queue = new StateVariable(makeName("vdata"), makeRef(queueType), makeQueueDefaultValue());
+    head = new StateVariable(makeName("vhead"), makeRef(kbi.getRangeType(queueLength(queueType))), makeNumberZero());
+    count = new StateVariable(makeName("vcount"), makeRef(kbi.getRangeType(queueLength(queueType) + 1)), makeNumberZero());
   }
 
   private ArrayValue makeQueueDefaultValue() {
-    return new ArrayValue(info, new AstList<Expression>());
+    return new ArrayValue(new AstList<Expression>());
   }
 
-  private TypeRef makeRef(Type type) {
+  private TypeReference makeRef(Type type) {
     return TypeRefFactory.create(info, type);
   }
 
@@ -67,7 +67,7 @@ class QueueVariables {
   }
 
   private NumberValue makeNumberZero() {
-    return new NumberValue(info, BigInteger.ZERO);
+    return new NumberValue(BigInteger.ZERO);
   }
 
   private int queueLength(ArrayType queueType) {

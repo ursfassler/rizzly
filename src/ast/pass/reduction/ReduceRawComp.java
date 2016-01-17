@@ -5,7 +5,6 @@ import java.util.Map;
 
 import main.Configuration;
 import ast.Designator;
-import ast.ElementInfo;
 import ast.copy.Relinker;
 import ast.data.Ast;
 import ast.data.AstList;
@@ -15,12 +14,13 @@ import ast.data.component.Component;
 import ast.data.component.composition.CompUse;
 import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.Connection;
-import ast.data.component.composition.Direction;
 import ast.data.component.composition.Endpoint;
 import ast.data.component.composition.EndpointRaw;
 import ast.data.component.composition.EndpointSelf;
 import ast.data.component.composition.EndpointSub;
+import ast.data.component.composition.ImplComposition;
 import ast.data.component.elementary.ImplElementary;
+import ast.data.component.hfsm.ImplHfsm;
 import ast.data.function.FuncRefFactory;
 import ast.data.function.Function;
 import ast.data.function.InterfaceFunction;
@@ -34,11 +34,12 @@ import ast.data.reference.RefName;
 import ast.data.reference.Reference;
 import ast.data.type.Type;
 import ast.data.variable.Constant;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.data.variable.Variable;
 import ast.dispatcher.DfsTraverser;
 import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowledgeBase;
+import ast.meta.MetaList;
 import ast.pass.AstPass;
 import error.ErrorType;
 import error.RError;
@@ -75,18 +76,19 @@ class ReduceRawCompWorker extends DfsTraverser<Component, Void> {
 
   @Override
   protected Component visitRawElementary(RawElementary obj, Void param) {
-    ElementInfo info = obj.getInfo();
-    FuncProcedure entryFunc = new FuncProcedure(info, "_entry", new AstList<FuncVariable>(), new FuncReturnNone(info), obj.getEntryFunc());
-    FuncProcedure exitFunc = new FuncProcedure(info, "_exit", new AstList<FuncVariable>(), new FuncReturnNone(info), obj.getExitFunc());
+    MetaList info = obj.metadata();// TODO use info for everything
+    FuncProcedure entryFunc = new FuncProcedure("_entry", new AstList<FunctionVariable>(), new FuncReturnNone(), obj.getEntryFunc());
+    FuncProcedure exitFunc = new FuncProcedure("_exit", new AstList<FunctionVariable>(), new FuncReturnNone(), obj.getExitFunc());
     // if this makes problems like loops, convert the body of the functions
     // after the component
 
-    ImplElementary comp = new ImplElementary(obj.getInfo(), obj.name, FuncRefFactory.create(info, entryFunc), FuncRefFactory.create(info, exitFunc));
+    ImplElementary comp = new ImplElementary(obj.getName(), FuncRefFactory.create(entryFunc), FuncRefFactory.create(exitFunc));
+    comp.metadata().add(obj.metadata());
     getMap().put(obj, comp);
 
     comp.function.add(entryFunc);
     comp.function.add(exitFunc);
-    RError.ass(obj.getDeclaration().isEmpty(), obj.getInfo(), "declaration should be empty");
+    RError.ass(obj.getDeclaration().isEmpty(), obj.metadata(), "declaration should be empty");
 
     for (Ast itr : obj.getIface()) {
       Ast ast = itr;
@@ -113,7 +115,8 @@ class ReduceRawCompWorker extends DfsTraverser<Component, Void> {
 
   @Override
   protected Component visitRawHfsm(RawHfsm obj, Void param) {
-    ast.data.component.hfsm.ImplHfsm comp = new ast.data.component.hfsm.ImplHfsm(obj.getInfo(), obj.name);
+    ImplHfsm comp = new ImplHfsm(obj.getName());
+    comp.metadata().add(obj.metadata());
     getMap().put(obj, comp);
 
     for (Ast itr : obj.getIface()) {
@@ -122,13 +125,14 @@ class ReduceRawCompWorker extends DfsTraverser<Component, Void> {
     }
 
     comp.topstate = obj.getTopstate();
-    comp.topstate.name = Designator.NAME_SEP + "top";
+    comp.topstate.setName(Designator.NAME_SEP + "top");
     return comp;
   }
 
   @Override
   protected Component visitRawComposition(RawComposition obj, Void param) {
-    ast.data.component.composition.ImplComposition comp = new ast.data.component.composition.ImplComposition(obj.getInfo(), obj.name);
+    ImplComposition comp = new ImplComposition(obj.getName());
+    comp.metadata().add(obj.metadata());
     getMap().put(obj, comp);
 
     for (Ast itr : obj.getIface()) {
@@ -148,8 +152,8 @@ class ReduceRawCompWorker extends DfsTraverser<Component, Void> {
     }
 
     for (Connection con : obj.getConnection()) {
-      con.endpoint.put(Direction.in, convertEp(con.endpoint.get(Direction.in)));
-      con.endpoint.put(Direction.out, convertEp(con.endpoint.get(Direction.out)));
+      con.setSrc(convertEp(con.getSrc()));
+      con.setDst(convertEp(con.getDst()));
       comp.connection.add(con);
     }
     return comp;
@@ -177,17 +181,17 @@ class ReduceEndpoint extends NullDispatcher<Endpoint, Void> {
     switch (ref.offset.size()) {
       case 0: {
         Named link = ref.link;
-        RError.ass(link instanceof Function, ref.getInfo(), "expected function for: " + link.name);
-        return new EndpointSelf(ref.getInfo(), FuncRefFactory.create(ref.getInfo(), (Function) link));
+        RError.ass(link instanceof Function, ref.metadata(), "expected function for: " + link.getName());
+        return new EndpointSelf(ref.metadata(), FuncRefFactory.create(ref.metadata(), (Function) link));
       }
       case 1: {
         Named link = ref.link;
-        RError.ass(link instanceof CompUse, ref.getInfo(), "expected compuse for: " + link.name);
+        RError.ass(link instanceof CompUse, ref.metadata(), "expected compuse for: " + link.getName());
         String name = ((RefName) ref.offset.get(0)).name;
-        return new EndpointSub(ref.getInfo(), new CompUseRef(obj.getInfo(), RefFactory.create(obj.getInfo(), link)), name);
+        return new EndpointSub(ref.metadata(), new CompUseRef(obj.metadata(), RefFactory.create(obj.metadata(), link)), name);
       }
       default: {
-        RError.err(ErrorType.Fatal, ref.getInfo(), "Unknown connection endpoint");
+        RError.err(ErrorType.Fatal, "Unknown connection endpoint", ref.metadata());
         return null;
       }
     }

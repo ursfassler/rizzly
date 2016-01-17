@@ -22,8 +22,8 @@ import ast.data.Namespace;
 import ast.data.component.Component;
 import ast.data.function.header.FuncQuery;
 import ast.data.function.header.FuncResponse;
-import ast.data.function.header.FuncSignal;
-import ast.data.function.header.FuncSlot;
+import ast.data.function.header.Signal;
+import ast.data.function.header.Slot;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.Collector;
@@ -48,15 +48,15 @@ public class Usefullness extends AstPass {
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
     for (Component comp : Collector.select(ast, new IsClass(Component.class)).castTo(Component.class)) {
-      boolean inEmpty = List.contains(comp.iface, new NotSpec(new IsClass(FuncSlot.class).or(new IsClass(FuncQuery.class))));
-      boolean outEmpty = List.contains(comp.iface, new NotSpec(new IsClass(FuncSignal.class).or(new IsClass(FuncResponse.class))));
-      String name = comp.name;
+      boolean inEmpty = List.contains(comp.iface, new NotSpec(new IsClass(Slot.class).or(new IsClass(FuncQuery.class))));
+      boolean outEmpty = List.contains(comp.iface, new NotSpec(new IsClass(Signal.class).or(new IsClass(FuncResponse.class))));
+      String name = comp.getName();
       if (inEmpty && outEmpty) {
-        RError.err(ErrorType.Warning, comp.getInfo(), "Component " + name + " has no input and no output data flow");
+        RError.err(ErrorType.Warning, "Component " + name + " has no input and no output data flow", comp.metadata());
       } else if (outEmpty) {
-        RError.err(ErrorType.Warning, comp.getInfo(), "Component " + name + " has no output data flow");
+        RError.err(ErrorType.Warning, "Component " + name + " has no output data flow", comp.metadata());
       } else if (inEmpty) {
-        RError.err(ErrorType.Warning, comp.getInfo(), "Component " + name + " has no input data flow");
+        RError.err(ErrorType.Warning, "Component " + name + " has no input data flow", comp.metadata());
       }
     }
   }

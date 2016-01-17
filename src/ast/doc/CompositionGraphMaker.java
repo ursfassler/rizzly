@@ -23,16 +23,14 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import ast.Designator;
-import ast.data.Metadata;
 import ast.data.component.composition.CompUse;
 import ast.data.component.composition.Connection;
-import ast.data.component.composition.Direction;
 import ast.data.component.composition.EndpointRaw;
 import ast.data.function.Function;
 import ast.data.function.header.FuncQuery;
 import ast.data.function.header.FuncResponse;
-import ast.data.function.header.FuncSignal;
-import ast.data.function.header.FuncSlot;
+import ast.data.function.header.Signal;
+import ast.data.function.header.Slot;
 import ast.data.raw.RawComponent;
 import ast.data.raw.RawComposition;
 import ast.data.reference.Reference;
@@ -42,6 +40,8 @@ import ast.doc.compgraph.SubComponent;
 import ast.doc.compgraph.WorldComp;
 import ast.knowledge.KnowPath;
 import ast.knowledge.KnowledgeBase;
+import ast.meta.MetaList;
+import ast.meta.Metadata;
 import ast.repository.query.TypeFilter;
 import error.ErrorType;
 import error.RError;
@@ -52,7 +52,7 @@ public class CompositionGraphMaker {
 
   public static WorldComp make(Designator path, String name, RawComposition impl, KnowledgeBase kb) {
     KnowPath kp = kb.getEntry(KnowPath.class);
-    WorldComp comp = new WorldComp(impl.getInfo(), path, name, filterMetadata(impl.getInfo().metadata, METADATA_KEY));
+    WorldComp comp = new WorldComp(impl.metadata(), path, name, filterMetadata(impl.metadata(), METADATA_KEY));
 
     Map<CompUse, SubComponent> compmap = new HashMap<CompUse, SubComponent>();
     Map<Designator, Interface> ifacemap = new HashMap<Designator, Interface>();
@@ -62,7 +62,7 @@ public class CompositionGraphMaker {
       Interface niface = makeIface(new Designator("Self"), comp, iface, ifacemap, kb);
       comp.getInput().add(niface);
     }
-    for (FuncSlot iface : TypeFilter.select(impl.getIface(), FuncSlot.class)) {
+    for (Slot iface : TypeFilter.select(impl.getIface(), Slot.class)) {
       Interface niface = makeIface(new Designator("Self"), comp, iface, ifacemap, kb);
       comp.getInput().add(niface);
     }
@@ -70,7 +70,7 @@ public class CompositionGraphMaker {
       Interface niface = makeIface(new Designator("Self"), comp, iface, ifacemap, kb);
       comp.getOutput().add(niface);
     }
-    for (FuncSignal iface : TypeFilter.select(impl.getIface(), FuncSignal.class)) {
+    for (Signal iface : TypeFilter.select(impl.getIface(), Signal.class)) {
       Interface niface = makeIface(new Designator("Self"), comp, iface, ifacemap, kb);
       comp.getOutput().add(niface);
     }
@@ -78,23 +78,23 @@ public class CompositionGraphMaker {
     for (CompUse use : TypeFilter.select(impl.getInstantiation(), CompUse.class)) {
       ast.data.raw.RawComponent comptype = (RawComponent) use.compRef.ref.link;
       Designator subpath = kp.get(comptype);
-      SubComponent sub = new SubComponent(use.getInfo(), use.name, subpath, comptype.name, filterMetadata(use.getInfo().metadata, METADATA_KEY));
+      SubComponent sub = new SubComponent(use.metadata(), use.getName(), subpath, comptype.getName(), filterMetadata(use.metadata(), METADATA_KEY));
 
       // TODO cleanup
       for (FuncResponse iface : TypeFilter.select(comptype.getIface(), FuncResponse.class)) {
-        Interface niface = makeIface(new Designator("Self", use.name), sub, iface, ifacemap, kb);
+        Interface niface = makeIface(new Designator("Self", use.getName()), sub, iface, ifacemap, kb);
         sub.getInput().add(niface);
       }
-      for (FuncSlot iface : TypeFilter.select(comptype.getIface(), FuncSlot.class)) {
-        Interface niface = makeIface(new Designator("Self", use.name), sub, iface, ifacemap, kb);
+      for (Slot iface : TypeFilter.select(comptype.getIface(), Slot.class)) {
+        Interface niface = makeIface(new Designator("Self", use.getName()), sub, iface, ifacemap, kb);
         sub.getInput().add(niface);
       }
       for (FuncQuery iface : TypeFilter.select(comptype.getIface(), FuncQuery.class)) {
-        Interface niface = makeIface(new Designator("Self", use.name), sub, iface, ifacemap, kb);
+        Interface niface = makeIface(new Designator("Self", use.getName()), sub, iface, ifacemap, kb);
         sub.getOutput().add(niface);
       }
-      for (FuncSignal iface : TypeFilter.select(comptype.getIface(), FuncSignal.class)) {
-        Interface niface = makeIface(new Designator("Self", use.name), sub, iface, ifacemap, kb);
+      for (Signal iface : TypeFilter.select(comptype.getIface(), Signal.class)) {
+        Interface niface = makeIface(new Designator("Self", use.getName()), sub, iface, ifacemap, kb);
         sub.getOutput().add(niface);
       }
 
@@ -103,9 +103,9 @@ public class CompositionGraphMaker {
     }
 
     for (Connection con : impl.getConnection()) {
-      Interface src = getIface(((EndpointRaw) con.endpoint.get(Direction.in)).ref, ifacemap, kb);
-      Interface dst = getIface(((EndpointRaw) con.endpoint.get(Direction.out)).ref, ifacemap, kb);
-      ast.doc.compgraph.Connection ncon = new ast.doc.compgraph.Connection(src, dst, filterMetadata(con.getInfo().metadata, METADATA_KEY));
+      Interface src = getIface(((EndpointRaw) (con.getSrc())).ref, ifacemap, kb);
+      Interface dst = getIface(((EndpointRaw) (con.getDst())).ref, ifacemap, kb);
+      ast.doc.compgraph.Connection ncon = new ast.doc.compgraph.Connection(src, dst, filterMetadata(con.metadata(), METADATA_KEY));
       src.getConnection().add(ncon);
       dst.getConnection().add(ncon);
       comp.getConn().add(ncon);
@@ -117,7 +117,7 @@ public class CompositionGraphMaker {
   private static Interface getIface(Reference ep, Map<Designator, Interface> ifacemap, ast.knowledge.KnowledgeBase kb) {
     assert (ep.offset.size() <= 1);
 
-    Designator name = new Designator("Self", ep.link.name);
+    Designator name = new Designator("Self", ep.link.getName());
     if (!ep.offset.isEmpty()) {
       name = new Designator(name, ((ast.data.reference.RefName) ep.offset.get(0)).name);
     }
@@ -126,27 +126,29 @@ public class CompositionGraphMaker {
     if (iface == null) {
       LinkedList<String> dname = new LinkedList<String>(name.toList());
       dname.pop();
-      RError.err(ErrorType.Error, ep.getInfo(), "Interface not found: " + new Designator(dname));
+      RError.err(ErrorType.Error, "Interface not found: " + new Designator(dname), ep.metadata());
     }
     return iface;
   }
 
   private static Interface makeIface(Designator name, Component sub, Function iface, Map<Designator, Interface> ifacemap, ast.knowledge.KnowledgeBase kb) {
-    Interface niface = new Interface(sub, iface.name);
-    name = new Designator(name, iface.name);
+    Interface niface = new Interface(sub, iface.getName());
+    name = new Designator(name, iface.getName());
     assert (!ifacemap.containsKey(name));
     ifacemap.put(name, niface);
     return niface;
   }
 
-  private static ArrayList<Metadata> filterMetadata(ArrayList<Metadata> metadata, String filterKey) {
-    ArrayList<Metadata> ret = new ArrayList<Metadata>();
-    for (Metadata itr : metadata) {
-      if (itr.getKey().equals(filterKey)) {
-        ret.add(itr);
-      }
-    }
-    return ret;
+  private static ArrayList<Metadata> filterMetadata(MetaList metadata, String filterKey) {
+    // ArrayList<Metadata> ret = new ArrayList<Metadata>();
+    // for (Metadata itr : metadata) {
+    // if (itr.getKey().equals(filterKey)) {
+    // ret.add(itr);
+    // }
+    // }
+    // return ret;
+    RError.err(ErrorType.Fatal, "fixme");
+    throw new RuntimeException();
   }
 
 }

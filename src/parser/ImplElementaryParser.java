@@ -22,9 +22,7 @@ import java.util.List;
 
 import parser.scanner.Token;
 import parser.scanner.TokenType;
-import ast.ElementInfo;
 import ast.data.Ast;
-import ast.data.Metadata;
 import ast.data.Named;
 import ast.data.raw.RawComponent;
 import ast.data.raw.RawElementary;
@@ -32,6 +30,7 @@ import ast.data.template.Template;
 import ast.data.variable.ConstPrivate;
 import ast.data.variable.StateVariable;
 import ast.data.variable.TemplateParameter;
+import ast.meta.MetaList;
 import error.ErrorType;
 import error.RError;
 
@@ -50,9 +49,7 @@ public class ImplElementaryParser extends ImplBaseParser {
   // | privateFunction | responseFunction | slotFunction | interruptFunction |
   // entry | exit }
   private RawElementary parseImplementationElementary(String name) {
-    ElementInfo info = expect(TokenType.ELEMENTARY).getInfo();
-    ArrayList<Metadata> meta = getMetadata();
-    info.metadata.addAll(meta);
+    MetaList info = expect(TokenType.ELEMENTARY).getMetadata();
     RawElementary comp = new RawElementary(info, name);
 
     while (!consumeIfEqual(TokenType.END)) {
@@ -67,14 +64,14 @@ public class ImplElementaryParser extends ImplBaseParser {
             genpam = new ArrayList<TemplateParameter>();
           }
           Named obj = parseDeclaration(id.getData());
-          Template decl = new Template(id.getInfo(), id.getData(), genpam, obj);
+          Template decl = new Template(id.getMetadata(), id.getData(), genpam, obj);
           comp.getDeclaration().add(decl);
         } else if (consumeIfEqual(TokenType.COLON)) {
           Ast var = parseInstantiation(id.getData());
           comp.getInstantiation().add(var);
         } else {
           Token got = peek();
-          RError.err(ErrorType.Error, got.getInfo(), "got unexpected token: " + got);
+          RError.err(ErrorType.Error, "got unexpected token: " + got, got.getMetadata());
           break;
         }
       } else {
@@ -96,7 +93,7 @@ public class ImplElementaryParser extends ImplBaseParser {
       case INTERRUPT:
         throw new RuntimeException("not yet implemented");
       default:
-        RError.err(ErrorType.Fatal, peek().getInfo(), "not yet implemented: " + peek().getType());
+        RError.err(ErrorType.Fatal, "not yet implemented: " + peek().getType(), peek().getMetadata());
         throw new RuntimeException("not yet implemented: " + peek().getType());
     }
   }

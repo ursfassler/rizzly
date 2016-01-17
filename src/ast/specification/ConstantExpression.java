@@ -18,7 +18,7 @@
 package ast.specification;
 
 import ast.data.Ast;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.expression.TypeCast;
 import ast.data.expression.binop.ArithmeticOp;
 import ast.data.expression.binop.BinaryExpression;
@@ -50,13 +50,13 @@ class ConstTraverser extends NullDispatcher<Boolean, Void> {
 
   @Override
   protected Boolean visitDefault(Ast obj, Void param) {
-    RError.err(ErrorType.Fatal, obj.getInfo(), "KnowConst not implemented for " + obj.getClass().getCanonicalName());
+    RError.err(ErrorType.Fatal, "KnowConst not implemented for " + obj.getClass().getCanonicalName(), obj.metadata());
     return null;
   }
 
   @Override
-  protected Boolean visitRefExpr(RefExp obj, Void param) {
-    return visit(obj.ref, param);
+  protected Boolean visitRefExpr(ReferenceExpression obj, Void param) {
+    return visit(obj.reference, param);
   }
 
   @Override
@@ -76,7 +76,7 @@ class ConstTraverser extends NullDispatcher<Boolean, Void> {
 
   @Override
   protected Boolean visitReference(Reference obj, Void param) {
-    RError.err(ErrorType.Warning, obj.getInfo(), "fix me"); // TODO follow
+    RError.err(ErrorType.Warning, "fix me", obj.metadata()); // TODO follow
     // reference
     return false;
   }

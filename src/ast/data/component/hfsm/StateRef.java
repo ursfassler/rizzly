@@ -17,15 +17,21 @@
 
 package ast.data.component.hfsm;
 
-import ast.ElementInfo;
 import ast.data.reference.Reference;
 import ast.data.reference.TypedRef;
+import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
 final public class StateRef extends TypedRef<State> {
 
-  public StateRef(ElementInfo info, Reference ref) {
-    super(info, ref);
+  public StateRef(Reference ref) {
+    super(ref);
+  }
+
+  @Deprecated
+  public StateRef(MetaList info, Reference ref) {
+    super(ref);
+    metadata().add(info);
   }
 
   @Override

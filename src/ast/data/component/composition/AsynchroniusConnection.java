@@ -17,18 +17,17 @@
 
 package ast.data.component.composition;
 
-import ast.ElementInfo;
 import ast.visitor.Visitor;
 
 final public class AsynchroniusConnection extends Connection {
 
-  public AsynchroniusConnection(ElementInfo info, Endpoint src, Endpoint dst) {
-    super(info, src, dst);
+  public AsynchroniusConnection(Endpoint src, Endpoint dst) {
+    super(src, dst);
   }
 
   @Override
   public String toString() {
-    return endpoint.get(Direction.in) + " >> " + endpoint.get(Direction.out);
+    return getSrc() + " >> " + getDst();
   }
 
   @Override

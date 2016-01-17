@@ -17,15 +17,14 @@
 
 package ast.data.type.composed;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.visitor.Visitor;
 
 final public class UnionType extends NamedElementType {
   final public NamedElement tag;
 
-  public UnionType(ElementInfo info, String name, AstList<NamedElement> element, NamedElement tag) {
-    super(info, name, element);
+  public UnionType(String name, AstList<NamedElement> element, NamedElement tag) {
+    super(name, element);
     this.tag = tag;
   }
 

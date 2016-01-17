@@ -65,7 +65,7 @@ class LinkReductionWorker extends DfsTraverser<Void, Void> {
       obj.offset.remove(0);
       if (!(next instanceof RefName)) {
         // TODO check it with typechecker
-        RError.err(ErrorType.Fatal, obj.getInfo(), "Expected named offset, got: " + next.getClass().getCanonicalName() + " (and why did the typechecker not find it?)");
+        RError.err(ErrorType.Fatal, "Expected named offset, got: " + next.getClass().getCanonicalName() + " (and why did the typechecker not find it?)", obj.metadata());
       }
       RefName name = (RefName) next;
       item = NameFilter.select(((Namespace) item).children, name.name);

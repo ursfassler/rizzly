@@ -73,10 +73,10 @@ public class TypeMerge extends AstPass {
 
       for (Type type : itr) {
         if (type != root) {
-          AliasType alias = new AliasType(type.getInfo(), type.name, TypeRefFactory.create(type.getInfo(), root));
+          AliasType alias = new AliasType(type.metadata(), type.getName(), TypeRefFactory.create(type.metadata(), root));
           linkmap.put(type, alias);
 
-          RError.ass(typespace.children.contains(type), type.getInfo(), "merging types in subtree not yet implemented");
+          RError.ass(typespace.children.contains(type), type.metadata(), "merging types in subtree not yet implemented");
           typespace.children.remove(type);
           typespace.children.add(alias);
         }
@@ -88,7 +88,7 @@ public class TypeMerge extends AstPass {
   private Type getRoot(Set<Type> itr) {
     Type root = null;
     for (Type type : itr) {
-      if ((root == null) || (type.name.compareTo(root.name) < 0)) {
+      if ((root == null) || (type.getName().compareTo(root.getName()) < 0)) {
         root = type;
       }
     }

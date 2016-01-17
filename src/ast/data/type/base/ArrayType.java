@@ -19,16 +19,15 @@ package ast.data.type.base;
 
 import java.math.BigInteger;
 
-import ast.ElementInfo;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
 import ast.visitor.Visitor;
 
 final public class ArrayType extends BaseType {
-  final public TypeRef type;
+  final public TypeReference type;
   final public BigInteger size;
 
-  public ArrayType(ElementInfo info, String name, BigInteger size, TypeRef type) {
-    super(info, name);
+  public ArrayType(String name, BigInteger size, TypeReference type) {
+    super(name);
     this.type = type;
     this.size = size;
   }

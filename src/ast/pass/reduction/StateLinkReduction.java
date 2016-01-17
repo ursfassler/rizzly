@@ -55,7 +55,7 @@ class StateLinkReductionWorker extends DfsTraverser<Void, Void> {
       while (!obj.offset.isEmpty()) {
         ast.data.reference.RefItem next = obj.offset.get(0);
         obj.offset.remove(0);
-        item = ChildByName.get(item, ((RefName) next).name, item.getInfo());
+        item = ChildByName.get(item, ((RefName) next).name, item.metadata());
         assert (item != null);
         if (!(item instanceof State)) {
           break;

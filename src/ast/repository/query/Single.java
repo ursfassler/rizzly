@@ -17,9 +17,9 @@
 
 package ast.repository.query;
 
-import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
+import ast.meta.MetaList;
 import error.ErrorType;
 import error.RError;
 import error.RizzlyError;
@@ -32,21 +32,21 @@ public class Single {
     this.re = re;
   }
 
-  public <T extends Ast> T force(AstList<? extends T> list, ElementInfo info) {
+  public <T extends Ast> T force(AstList<? extends T> list, MetaList info) {
     switch (list.size()) {
       case 1:
         return list.get(0);
       case 0:
-        re.err(ErrorType.Fatal, info, "Item not found");
+        re.err(ErrorType.Fatal, "Item not found", info);
         return null;
       default:
-        re.err(ErrorType.Fatal, info, "To many items found");
+        re.err(ErrorType.Fatal, "To many items found", info);
         return null;
     }
   }
 
   @Deprecated
-  static public <T extends Ast> T staticForce(AstList<? extends T> list, ElementInfo info) {
+  static public <T extends Ast> T staticForce(AstList<? extends T> list, MetaList info) {
     Single single = new Single(RError.instance());
     return single.force(list, info);
   }

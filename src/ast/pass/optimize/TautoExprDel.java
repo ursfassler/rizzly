@@ -46,7 +46,9 @@ class TautoExprDelWorker extends ExprReplacer<Void> {
     }
     if (isTrue(obj.left) || isTrue(obj.right)) {
       // FIXME keep side effects
-      return new BooleanValue(obj.getInfo(), true);
+      BooleanValue ret = new BooleanValue(true);
+      ret.metadata().add(obj.metadata());
+      return ret;
     }
 
     return obj;
@@ -64,7 +66,9 @@ class TautoExprDelWorker extends ExprReplacer<Void> {
     }
     if (isFalse(obj.left) || isFalse(obj.right)) {
       // FIXME keep side effects
-      return new BooleanValue(obj.getInfo(), false);
+      BooleanValue ret = new BooleanValue(false);
+      ret.metadata().add(obj.metadata());
+      return ret;
     }
 
     return obj;
@@ -74,11 +78,15 @@ class TautoExprDelWorker extends ExprReplacer<Void> {
   protected Expression visitLogicNot(LogicNot obj, Void param) {
     obj = (LogicNot) super.visitLogicNot(obj, param);
 
-    if (isTrue(obj.expr)) {
-      return new BooleanValue(obj.getInfo(), false);
+    if (isTrue(obj.expression)) {
+      BooleanValue ret = new BooleanValue(false);
+      ret.metadata().add(obj.metadata());
+      return ret;
     }
-    if (isFalse(obj.expr)) {
-      return new BooleanValue(obj.getInfo(), true);
+    if (isFalse(obj.expression)) {
+      BooleanValue ret = new BooleanValue(true);
+      ret.metadata().add(obj.metadata());
+      return ret;
     }
 
     return obj;

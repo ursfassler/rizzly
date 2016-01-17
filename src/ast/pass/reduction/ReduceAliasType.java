@@ -56,9 +56,9 @@ class ReduceAliasTypeWorker extends DfsTraverser<Void, Void> {
       link = ((AliasType) link).ref.getTarget();
       if (checked.contains(link)) {
         for (Named itr : checked) {
-          RError.err(ErrorType.Hint, itr.getInfo(), "part of recursive type alias: " + itr.name);
+          RError.err(ErrorType.Hint, "part of recursive type alias: " + itr.getName(), itr.metadata());
         }
-        RError.err(ErrorType.Error, obj.getInfo(), "recursive type alias found: " + obj.link.name);
+        RError.err(ErrorType.Error, "recursive type alias found: " + obj.link.getName(), obj.metadata());
       }
     }
     obj.link = link;

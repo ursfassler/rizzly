@@ -17,14 +17,12 @@
 
 package ast.doc;
 
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 import ast.Designator;
 import ast.data.Ast;
 import ast.data.AstList;
-import ast.data.Metadata;
 import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.component.CompRef;
@@ -32,7 +30,6 @@ import ast.data.component.Component;
 import ast.data.component.composition.AsynchroniusConnection;
 import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.Connection;
-import ast.data.component.composition.Direction;
 import ast.data.component.composition.EndpointRaw;
 import ast.data.component.composition.EndpointSelf;
 import ast.data.component.composition.EndpointSub;
@@ -47,7 +44,7 @@ import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateRef;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.component.hfsm.Transition;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.expression.TypeCast;
 import ast.data.expression.binop.And;
 import ast.data.expression.binop.BinaryExpression;
@@ -84,33 +81,33 @@ import ast.data.function.header.FuncFunction;
 import ast.data.function.header.FuncProcedure;
 import ast.data.function.header.FuncQuery;
 import ast.data.function.header.FuncResponse;
-import ast.data.function.header.FuncSignal;
-import ast.data.function.header.FuncSlot;
 import ast.data.function.header.FuncSubHandlerEvent;
 import ast.data.function.header.FuncSubHandlerQuery;
+import ast.data.function.header.Signal;
+import ast.data.function.header.Slot;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FuncReturnTuple;
-import ast.data.function.ret.FuncReturnType;
+import ast.data.function.ret.FunctionReturnType;
 import ast.data.function.template.DefaultValueTemplate;
 import ast.data.raw.RawComponent;
 import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
-import ast.data.reference.DummyLinkTarget;
+import ast.data.reference.LinkTarget;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefTemplCall;
 import ast.data.reference.Reference;
-import ast.data.statement.AssignmentMulti;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.CaseOpt;
 import ast.data.statement.IfOption;
 import ast.data.statement.MsgPush;
+import ast.data.statement.MultiAssignment;
 import ast.data.statement.VarDefInitStmt;
 import ast.data.statement.VarDefStmt;
 import ast.data.template.Template;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.RangeType;
 import ast.data.type.base.TupleType;
@@ -127,7 +124,7 @@ import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
 import ast.data.variable.Constant;
 import ast.data.variable.DefVariable;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.Variable;
 import ast.dispatcher.NullDispatcher;
@@ -200,11 +197,12 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   }
 
   private void writeMeta(Ast obj) {
-    ArrayList<Metadata> metadata = obj.getInfo().metadata;
-    for (Metadata meta : metadata) {
-      xw.wc("//" + meta.getKey() + " " + meta.getValue());
-      xw.nl();
-    }
+    // TODO reimplement
+    // ArrayList<Metadata> metadata = obj.getInfo().metadata;
+    // for (Metadata meta : metadata) {
+    // xw.wc("//" + meta.getKey() + " " + meta.getValue());
+    // xw.nl();
+    // }
   }
 
   private void visitImports(List<Designator> imports, Void param) {
@@ -244,7 +242,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
 
   @Override
   protected Void visitNamespace(Namespace obj, Void param) {
-    xw.wa(obj.name, getId(obj));
+    xw.wa(obj.getName(), getId(obj));
     xw.nl();
     xw.incIndent();
     for (Ast itr : obj.children) {
@@ -259,7 +257,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
 
   @Override
   protected Void visitCompUse(ast.data.component.composition.CompUse obj, Void param) {
-    xw.wa(obj.name, getId(obj));
+    xw.wa(obj.getName(), getId(obj));
     xw.wr(": ");
     visit(obj.compRef, null);
     xw.wr(";");
@@ -269,7 +267,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   }
 
   private void compHeader(RawComponent obj) {
-    xw.wa(obj.name, getId(obj));
+    xw.wa(obj.getName(), getId(obj));
     xw.kw(" = Component");
     xw.nl();
     xw.incIndent();
@@ -314,13 +312,13 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
 
   @Override
   protected Void visitConnection(Connection obj, Void param) {
-    visit(obj.endpoint.get(Direction.in), null);
+    visit(obj.getSrc(), null);
     if (obj instanceof SynchroniusConnection) {
       xw.wr(" -> ");
     } else {
       xw.wr(" >> ");
     }
-    visit(obj.endpoint.get(Direction.out), null);
+    visit(obj.getDst(), null);
     xw.wr(";");
     xw.nl();
     writeMeta(obj);
@@ -332,7 +330,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   @Override
   protected Void visitTemplate(Template obj, Void param) {
     String id = getId(obj, param);
-    xw.wa(obj.name, id);
+    xw.wa(obj.getName(), id);
     xw.wr("{");
     list(obj.getTempl(), "; ", param);
     xw.wr("}");
@@ -371,7 +369,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
 
   @Override
   protected Void visitStateComposite(StateComposite obj, Void param) {
-    xw.wa(obj.name, getId(obj));
+    xw.wa(obj.getName(), getId(obj));
     xw.kw(" ");
     xw.kw("state");
     xw.wr("(");
@@ -385,7 +383,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
 
   @Override
   protected Void visitStateSimple(StateSimple obj, Void param) {
-    xw.wa(obj.name, getId(obj));
+    xw.wa(obj.getName(), getId(obj));
     xw.kw(" ");
     xw.kw("state");
     xw.nl();
@@ -487,7 +485,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
 
   @Override
   protected Void visitNamedElement(NamedElement obj, Void param) {
-    xw.wa(obj.name, getId(obj));
+    xw.wa(obj.getName(), getId(obj));
     xw.wr(" : ");
     visit(obj.typeref, null);
     xw.wr(";");
@@ -507,7 +505,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
 
   @Override
   protected Void visitTupleType(TupleType obj, Void param) {
-    xw.wa(obj.name, getId(obj, param));
+    xw.wa(obj.getName(), getId(obj, param));
     xw.nl();
     xw.incIndent();
     visitList(obj.types, null);
@@ -525,19 +523,19 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
 
   @Override
   protected Void visitArrayType(ast.data.type.base.ArrayType obj, Void param) {
-    xw.wa(obj.name, getId(obj, param));
+    xw.wa(obj.getName(), getId(obj, param));
     return null;
   }
 
   @Override
   protected Void visitBooleanType(ast.data.type.base.BooleanType obj, Void param) {
-    xw.wa(obj.name, getId(obj, param));
+    xw.wa(obj.getName(), getId(obj, param));
     return null;
   }
 
   @Override
   protected Void visitArrayTemplate(ArrayTemplate obj, Void param) {
-    xw.wa(obj.name, getId(obj, param));
+    xw.wa(obj.getName(), getId(obj, param));
     return null;
   }
 
@@ -561,7 +559,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
 
   @Override
   protected Void visitTypeType(TypeType obj, Void param) {
-    xw.wr(obj.name);
+    xw.wr(obj.getName());
     xw.wr("(");
     visit(obj.type, null);
     xw.wr(")");
@@ -583,7 +581,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitAssignmentMulti(AssignmentMulti obj, Void param) {
+  protected Void visitAssignmentMulti(MultiAssignment obj, Void param) {
     visitList(obj.left, null);
     xw.wr(" := ");
     visit(obj.right, null);
@@ -610,17 +608,17 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitReturnExpr(ast.data.statement.ReturnExpr obj, Void param) {
+  protected Void visitReturnExpr(ast.data.statement.ExpressionReturn obj, Void param) {
     xw.kw("return");
     xw.wr(" ");
-    visit(obj.expr, null);
+    visit(obj.expression, null);
     xw.wr(";");
     xw.nl();
     return null;
   }
 
   @Override
-  protected Void visitReturnVoid(ast.data.statement.ReturnVoid obj, Void param) {
+  protected Void visitReturnVoid(ast.data.statement.VoidReturn obj, Void param) {
     xw.kw("return");
     xw.wr(";");
     xw.nl();
@@ -646,7 +644,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   protected Void visitForStmt(ast.data.statement.ForStmt obj, Void param) {
     xw.kw("for");
     xw.wr(" ");
-    xw.wa(obj.iterator.name, getId(obj.iterator));
+    xw.wa(obj.iterator.getName(), getId(obj.iterator));
     xw.kw(" in ");
     visit(obj.iterator.type, param);
     xw.kw(" do");
@@ -660,7 +658,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitIfStmt(ast.data.statement.IfStmt obj, Void param) {
+  protected Void visitIfStmt(ast.data.statement.IfStatement obj, Void param) {
     assert (!obj.option.isEmpty());
 
     boolean first = true;
@@ -754,7 +752,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
     xw.wr("(");
     xw.kw(obj.getOpName());
     xw.wr(" ");
-    visit(obj.expr, null);
+    visit(obj.expression, null);
     xw.wr(")");
     return null;
   }
@@ -828,7 +826,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitTypeRef(TypeRef obj, Void param) {
+  protected Void visitTypeRef(TypeReference obj, Void param) {
     visit(obj.ref, param);
     return null;
   }
@@ -840,8 +838,8 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitRefExpr(RefExp obj, Void param) {
-    visit(obj.ref, param);
+  protected Void visitRefExpr(ReferenceExpression obj, Void param) {
+    visit(obj.reference, param);
     return null;
   }
 
@@ -860,11 +858,11 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
     String hint = obj.link.toString();
     String name;
     if (obj.link instanceof Named) {
-      name = obj.link.name;
+      name = obj.link.getName();
     } else {
       name = "???";
     }
-    if (obj.link instanceof DummyLinkTarget) {
+    if (obj.link instanceof LinkTarget) {
       name = "\"" + name + "\"";
     }
     xw.wl(name, hint, path.toString(), getId(obj.link, null));
@@ -899,7 +897,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
 
   @Override
   protected Void visitVariable(Variable obj, Void param) {
-    xw.wa(obj.name, getId(obj));
+    xw.wa(obj.getName(), getId(obj));
     xw.wr(" : ");
     if (obj instanceof Constant) {
       xw.kw("const ");
@@ -939,7 +937,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncReturnType(FuncReturnType obj, Void param) {
+  protected Void visitFuncReturnType(FunctionReturnType obj, Void param) {
     xw.wr(":");
     visit(obj.type, param);
     return null;
@@ -977,7 +975,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncSlot(FuncSlot obj, Void param) {
+  protected Void visitFuncSlot(Slot obj, Void param) {
     xw.wr("slot");
     printFunctionHeader(obj);
     printFuncImpl(obj);
@@ -985,7 +983,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncSignal(FuncSignal obj, Void param) {
+  protected Void visitFuncSignal(Signal obj, Void param) {
     xw.wr("signal");
     printFunctionHeader(obj);
     xw.wr(";");
@@ -1012,7 +1010,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
 
   @Override
   protected Void visitDefaultValueTemplate(DefaultValueTemplate obj, Void param) {
-    xw.wa(obj.name, getId(obj, param));
+    xw.wa(obj.getName(), getId(obj, param));
     return null;
   }
 
@@ -1065,7 +1063,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   @Override
   protected Void visitImplElementary(ImplElementary obj, Void param) {
     xw.kw("elementary ");
-    xw.wa(obj.name, getId(obj));
+    xw.wa(obj.getName(), getId(obj));
     xw.nl();
     xw.nl();
     xw.incIndent();
@@ -1092,7 +1090,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   @Override
   protected Void visitImplComposition(ImplComposition obj, Void param) {
     xw.kw("implementation composition ");
-    xw.wa(obj.name, getId(obj));
+    xw.wa(obj.getName(), getId(obj));
     xw.nl();
     xw.nl();
     xw.incIndent();
@@ -1104,9 +1102,9 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   }
 
   private void writeConnection(Connection obj, String connector, Void param) {
-    visit(obj.endpoint.get(Direction.in), param);
+    visit(obj.getSrc(), param);
     xw.wr(connector);
-    visit(obj.endpoint.get(Direction.out), param);
+    visit(obj.getDst(), param);
     xw.kw(";");
     xw.nl();
   }
@@ -1125,7 +1123,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
 
   @Override
   protected Void visitFunction(Function obj, Void param) {
-    xw.wa(obj.name, getId(obj));
+    xw.wa(obj.getName(), getId(obj));
     xw.kw(" ");
     super.visitFunction(obj, param);
     xw.kw("(");
@@ -1164,11 +1162,11 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   @Override
   protected Void visitUnionType(UnionType obj, Void param) {
     xw.kw("Union ");
-    xw.wr(obj.name);
+    xw.wr(obj.getName());
     xw.kw("(");
     visit(obj.tag, param);
     xw.kw(")");
-    xw.wa(obj.name, getId(obj));
+    xw.wa(obj.getName(), getId(obj));
     xw.nl();
     xw.incIndent();
     visitListNl(obj.element, param);
@@ -1181,8 +1179,8 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
 
   @Override
   protected Void visitAliasType(AliasType obj, Void param) {
-    xw.wr(obj.name);
-    xw.wa(obj.name, getId(obj));
+    xw.wr(obj.getName());
+    xw.wa(obj.getName(), getId(obj));
     xw.kw(" = ");
     visit(obj.ref, param);
     xw.nl();
@@ -1192,7 +1190,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   @Override
   protected Void visitSIntType(SIntType obj, Void param) {
     xw.kw("sint" + obj.bytes * 8);
-    xw.wa(obj.name, getId(obj));
+    xw.wa(obj.getName(), getId(obj));
     xw.kw(";");
     xw.nl();
     return null;
@@ -1201,7 +1199,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   @Override
   protected Void visitUIntType(UIntType obj, Void param) {
     xw.kw("uint" + obj.bytes * 8);
-    xw.wa(obj.name, getId(obj));
+    xw.wa(obj.getName(), getId(obj));
     xw.kw(";");
     xw.nl();
     return null;
@@ -1278,28 +1276,28 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   @Override
   protected Void visitNot(Not obj, Void param) {
     xw.kw("not ");
-    visit(obj.expr, param);
+    visit(obj.expression, param);
     return null;
   }
 
   @Override
   protected Void visitLogicNot(LogicNot obj, Void param) {
     xw.kw("lnot ");
-    visit(obj.expr, param);
+    visit(obj.expression, param);
     return null;
   }
 
   @Override
   protected Void visitBitNot(BitNot obj, Void param) {
     xw.kw("bnot ");
-    visit(obj.expr, param);
+    visit(obj.expression, param);
     return null;
   }
 
   @Override
   protected Void visitUminus(Uminus obj, Void param) {
     xw.kw("- ");
-    visit(obj.expr, param);
+    visit(obj.expression, param);
     return null;
   }
 
@@ -1412,7 +1410,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncVariable(FuncVariable obj, Void param) {
+  protected Void visitFuncVariable(FunctionVariable obj, Void param) {
     return null;
   }
 
@@ -1426,7 +1424,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   @Override
   protected Void visitImplHfsm(ImplHfsm obj, Void param) {
     xw.kw("implementation hfsm ");
-    xw.wa(obj.name, getId(obj));
+    xw.wa(obj.getName(), getId(obj));
     xw.nl();
     xw.nl();
 
@@ -1493,7 +1491,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
 
   @Override
   protected Void visitQueue(Queue obj, Void param) {
-    xw.wa(obj.name, getId(obj));
+    xw.wa(obj.getName(), getId(obj));
     xw.nl();
     return null;
   }

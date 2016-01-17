@@ -22,7 +22,6 @@ import ast.data.component.CompRef;
 import ast.data.component.composition.AsynchroniusConnection;
 import ast.data.component.composition.CompUse;
 import ast.data.component.composition.CompUseRef;
-import ast.data.component.composition.Direction;
 import ast.data.component.composition.EndpointRaw;
 import ast.data.component.composition.EndpointSelf;
 import ast.data.component.composition.EndpointSub;
@@ -36,7 +35,7 @@ import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateRef;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.component.hfsm.Transition;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.expression.TypeCast;
 import ast.data.expression.binop.And;
 import ast.data.expression.binop.BitAnd;
@@ -81,24 +80,23 @@ import ast.data.function.header.FuncFunction;
 import ast.data.function.header.FuncProcedure;
 import ast.data.function.header.FuncQuery;
 import ast.data.function.header.FuncResponse;
-import ast.data.function.header.FuncSignal;
-import ast.data.function.header.FuncSlot;
 import ast.data.function.header.FuncSubHandlerEvent;
 import ast.data.function.header.FuncSubHandlerQuery;
+import ast.data.function.header.Signal;
+import ast.data.function.header.Slot;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FuncReturnTuple;
-import ast.data.function.ret.FuncReturnType;
+import ast.data.function.ret.FunctionReturnType;
 import ast.data.function.template.DefaultValueTemplate;
 import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
-import ast.data.reference.DummyLinkTarget;
+import ast.data.reference.LinkTarget;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
 import ast.data.reference.Reference;
-import ast.data.statement.AssignmentMulti;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
@@ -106,18 +104,19 @@ import ast.data.statement.CaseOpt;
 import ast.data.statement.CaseOptRange;
 import ast.data.statement.CaseOptValue;
 import ast.data.statement.CaseStmt;
+import ast.data.statement.ExpressionReturn;
 import ast.data.statement.ForStmt;
 import ast.data.statement.IfOption;
-import ast.data.statement.IfStmt;
+import ast.data.statement.IfStatement;
 import ast.data.statement.MsgPush;
-import ast.data.statement.ReturnExpr;
-import ast.data.statement.ReturnVoid;
+import ast.data.statement.MultiAssignment;
 import ast.data.statement.Statement;
 import ast.data.statement.VarDefInitStmt;
 import ast.data.statement.VarDefStmt;
+import ast.data.statement.VoidReturn;
 import ast.data.statement.WhileStmt;
 import ast.data.template.Template;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumElement;
@@ -144,7 +143,7 @@ import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
 import ast.data.variable.ConstGlobal;
 import ast.data.variable.ConstPrivate;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.TemplateParameter;
 
@@ -169,7 +168,7 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
   }
 
   @Override
-  protected R visitFuncReturnType(FuncReturnType obj, P param) {
+  protected R visitFuncReturnType(FunctionReturnType obj, P param) {
     visit(obj.type, param);
     return null;
   }
@@ -231,7 +230,7 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
   }
 
   @Override
-  protected R visitAssignmentMulti(AssignmentMulti obj, P param) {
+  protected R visitAssignmentMulti(MultiAssignment obj, P param) {
     visitList(obj.left, param);
     visit(obj.right, param);
     return null;
@@ -310,13 +309,13 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
   }
 
   @Override
-  protected R visitReturnExpr(ReturnExpr obj, P param) {
-    visit(obj.expr, param);
+  protected R visitReturnExpr(ExpressionReturn obj, P param) {
+    visit(obj.expression, param);
     return null;
   }
 
   @Override
-  protected R visitReturnVoid(ReturnVoid obj, P param) {
+  protected R visitReturnVoid(VoidReturn obj, P param) {
     return null;
   }
 
@@ -326,7 +325,7 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
   }
 
   @Override
-  protected R visitFuncVariable(FuncVariable obj, P param) {
+  protected R visitFuncVariable(FunctionVariable obj, P param) {
     visit(obj.type, param);
     return null;
   }
@@ -385,15 +384,15 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
 
   @Override
   protected R visitSynchroniusConnection(SynchroniusConnection obj, P param) {
-    visit(obj.endpoint.get(Direction.in), param);
-    visit(obj.endpoint.get(Direction.out), param);
+    visit(obj.getSrc(), param);
+    visit(obj.getDst(), param);
     return null;
   }
 
   @Override
   protected R visitAsynchroniusConnection(AsynchroniusConnection obj, P param) {
-    visit(obj.endpoint.get(Direction.in), param);
-    visit(obj.endpoint.get(Direction.out), param);
+    visit(obj.getSrc(), param);
+    visit(obj.getDst(), param);
     return null;
   }
 
@@ -585,19 +584,19 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
 
   @Override
   protected R visitNot(Not obj, P param) {
-    visit(obj.expr, param);
+    visit(obj.expression, param);
     return null;
   }
 
   @Override
   protected R visitLogicNot(LogicNot obj, P param) {
-    visit(obj.expr, param);
+    visit(obj.expression, param);
     return null;
   }
 
   @Override
   protected R visitBitNot(BitNot obj, P param) {
-    visit(obj.expr, param);
+    visit(obj.expression, param);
     return null;
   }
 
@@ -638,7 +637,7 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
 
   @Override
   protected R visitUminus(Uminus obj, P param) {
-    visit(obj.expr, param);
+    visit(obj.expression, param);
     return null;
   }
 
@@ -655,7 +654,7 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
   }
 
   @Override
-  protected R visitIfStmt(IfStmt obj, P param) {
+  protected R visitIfStmt(IfStatement obj, P param) {
     visitList(obj.option, param);
     visit(obj.defblock, param);
     return null;
@@ -734,7 +733,7 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
   }
 
   @Override
-  protected R visitFuncSignal(FuncSignal obj, P param) {
+  protected R visitFuncSignal(Signal obj, P param) {
     return null;
   }
 
@@ -744,7 +743,7 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
   }
 
   @Override
-  protected R visitFuncSlot(FuncSlot obj, P param) {
+  protected R visitFuncSlot(Slot obj, P param) {
     return null;
   }
 
@@ -931,18 +930,18 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
   }
 
   @Override
-  protected R visitDummyLinkTarget(DummyLinkTarget obj, P param) {
+  protected R visitDummyLinkTarget(LinkTarget obj, P param) {
     return null;
   }
 
   @Override
-  protected R visitRefExpr(RefExp obj, P param) {
-    visit(obj.ref, param);
+  protected R visitRefExpr(ReferenceExpression obj, P param) {
+    visit(obj.reference, param);
     return null;
   }
 
   @Override
-  protected R visitTypeRef(TypeRef obj, P param) {
+  protected R visitTypeRef(TypeReference obj, P param) {
     visit(obj.ref, param);
     return null;
   }

@@ -20,7 +20,6 @@ package ast.pass.check.type;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.reference.Reference;
-import ast.data.statement.AssignmentMulti;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
@@ -28,18 +27,19 @@ import ast.data.statement.CaseOpt;
 import ast.data.statement.CaseOptRange;
 import ast.data.statement.CaseOptValue;
 import ast.data.statement.CaseStmt;
+import ast.data.statement.ExpressionReturn;
 import ast.data.statement.ForStmt;
 import ast.data.statement.IfOption;
-import ast.data.statement.IfStmt;
+import ast.data.statement.IfStatement;
 import ast.data.statement.MsgPush;
-import ast.data.statement.ReturnExpr;
-import ast.data.statement.ReturnVoid;
+import ast.data.statement.MultiAssignment;
 import ast.data.statement.Statement;
 import ast.data.statement.VarDefStmt;
+import ast.data.statement.VoidReturn;
 import ast.data.statement.WhileStmt;
 import ast.data.type.Type;
-import ast.data.type.TypeRef;
 import ast.data.type.TypeRefFactory;
+import ast.data.type.TypeReference;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.RangeType;
@@ -48,7 +48,7 @@ import ast.data.type.special.IntegerType;
 import ast.data.variable.ConstGlobal;
 import ast.data.variable.ConstPrivate;
 import ast.data.variable.Constant;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.Variable;
 import ast.dispatcher.NullDispatcher;
@@ -114,7 +114,7 @@ public class StatementTypecheck extends NullDispatcher<Void, Void> {
     Type ret = kt.get(obj.type);
     Type defType = checkGetExpr(obj.def);
     if (!kc.get(ret, defType)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "Data type to big or incompatible in assignment: " + ret.name + " := " + defType.name);
+      RError.err(ErrorType.Error, "Data type to big or incompatible in assignment: " + ret.getName() + " := " + defType.getName(), obj.metadata());
     }
   }
 
@@ -131,7 +131,7 @@ public class StatementTypecheck extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncVariable(FuncVariable obj, Void map) {
+  protected Void visitFuncVariable(FunctionVariable obj, Void map) {
     return null;
   }
 
@@ -139,7 +139,7 @@ public class StatementTypecheck extends NullDispatcher<Void, Void> {
   protected Void visitForStmt(ForStmt obj, Void param) {
     Type cond = kt.get(obj.iterator.type);
     if (!(cond instanceof RangeType)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "For loop only supports range type (at the moment), got: " + cond.name);
+      RError.err(ErrorType.Error, "For loop only supports range type (at the moment), got: " + cond.getName(), obj.metadata());
     }
     visit(obj.block, param);
     return null;
@@ -149,18 +149,18 @@ public class StatementTypecheck extends NullDispatcher<Void, Void> {
   protected Void visitWhileStmt(WhileStmt obj, Void param) {
     Type cond = checkGetExpr(obj.condition);
     if (!(cond instanceof BooleanType)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "Need boolean type, got: " + cond.name);
+      RError.err(ErrorType.Error, "Need boolean type, got: " + cond.getName(), obj.metadata());
     }
     visit(obj.body, param);
     return null;
   }
 
   @Override
-  protected Void visitIfStmt(IfStmt obj, Void param) {
+  protected Void visitIfStmt(IfStatement obj, Void param) {
     for (IfOption opt : obj.option) {
       Type cond = checkGetExpr(opt.condition);
       if (!(cond instanceof BooleanType)) {
-        RError.err(ErrorType.Error, opt.getInfo(), "Need boolean type, got: " + cond.name);
+        RError.err(ErrorType.Error, "Need boolean type, got: " + cond.getName(), opt.metadata());
       }
       visit(opt.code, param);
     }
@@ -173,7 +173,7 @@ public class StatementTypecheck extends NullDispatcher<Void, Void> {
     Type cond = checkGetExpr(obj.condition);
     // TODO enumerator, union and boolean should also be allowed
     if (!kc.get(intType, cond)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "Condition variable has to be an integer, got: " + cond.name);
+      RError.err(ErrorType.Error, "Condition variable has to be an integer, got: " + cond.getName(), obj.metadata());
     }
     // TODO check somewhere if case values are disjunct
     visitList(obj.option, map);
@@ -193,10 +193,10 @@ public class StatementTypecheck extends NullDispatcher<Void, Void> {
     Type start = checkGetExpr(obj.start);
     Type end = checkGetExpr(obj.end);
     if (!kc.get(intType, start)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "Case value has to be an integer (start), got: " + start.name);
+      RError.err(ErrorType.Error, "Case value has to be an integer (start), got: " + start.getName(), obj.metadata());
     }
     if (!kc.get(intType, end)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "Case value has to be an integer (end), got: " + end.name);
+      RError.err(ErrorType.Error, "Case value has to be an integer (end), got: " + end.getName(), obj.metadata());
     }
     return null;
   }
@@ -205,7 +205,7 @@ public class StatementTypecheck extends NullDispatcher<Void, Void> {
   protected Void visitCaseOptValue(CaseOptValue obj, Void map) {
     Type value = checkGetExpr(obj.value);
     if (!kc.get(intType, value)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "Case value has to be an integer, got: " + value.name);
+      RError.err(ErrorType.Error, "Case value has to be an integer, got: " + value.getName(), obj.metadata());
     }
     return null;
   }
@@ -221,13 +221,13 @@ public class StatementTypecheck extends NullDispatcher<Void, Void> {
     Type lhs = checkGetExpr(obj.left);
     Type rhs = checkGetExpr(obj.right);
     if (!kc.get(lhs, rhs)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "Data type to big or incompatible in assignment: " + lhs.name + " := " + rhs.name);
+      RError.err(ErrorType.Error, "Data type to big or incompatible in assignment: " + lhs.getName() + " := " + rhs.getName(), obj.metadata());
     }
     return null;
   }
 
   @Override
-  protected Void visitAssignmentMulti(AssignmentMulti obj, Void param) {
+  protected Void visitAssignmentMulti(MultiAssignment obj, Void param) {
     AstList<Type> ll = new AstList<Type>();
     for (Reference ref : obj.left) {
       ll.add(checkGetExpr(ref));
@@ -236,15 +236,16 @@ public class StatementTypecheck extends NullDispatcher<Void, Void> {
     if (ll.size() == 1) {
       lhs = ll.get(0);
     } else {
-      AstList<TypeRef> tl = new AstList<TypeRef>();
+      AstList<TypeReference> tl = new AstList<TypeReference>();
       for (Type lt : ll) {
-        tl.add(TypeRefFactory.create(lt.getInfo(), lt));
+        tl.add(TypeRefFactory.create(lt.metadata(), lt));
       }
-      lhs = new TupleType(obj.getInfo(), "", tl);
+      lhs = new TupleType("", tl);
+      lhs.metadata().add(obj.metadata());
     }
     Type rhs = checkGetExpr(obj.right);
     if (!kc.get(lhs, rhs)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "Data type to big or incompatible in assignment: " + lhs.name + " := " + rhs.name);
+      RError.err(ErrorType.Error, "Data type to big or incompatible in assignment: " + lhs.getName() + " := " + rhs.getName(), obj.metadata());
     }
     return null;
   }
@@ -256,16 +257,16 @@ public class StatementTypecheck extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitReturnExpr(ReturnExpr obj, Void map) {
-    Type ret = checkGetExpr(obj.expr);
+  protected Void visitReturnExpr(ExpressionReturn obj, Void map) {
+    Type ret = checkGetExpr(obj.expression);
     if (!kc.get(funcReturn, ret)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "Data type to big or incompatible to return: " + funcReturn.name + " := " + ret.name);
+      RError.err(ErrorType.Error, "Data type to big or incompatible to return: " + funcReturn.getName() + " := " + ret.getName(), obj.metadata());
     }
     return null;
   }
 
   @Override
-  protected Void visitReturnVoid(ReturnVoid obj, Void map) {
+  protected Void visitReturnVoid(VoidReturn obj, Void map) {
     return null;
   }
 
@@ -273,7 +274,7 @@ public class StatementTypecheck extends NullDispatcher<Void, Void> {
   protected Void visitMsgPush(MsgPush obj, Void param) {
     Type func = checkGetExpr(obj.func);
     // TODO implement check
-    RError.err(ErrorType.Warning, obj.getInfo(), "Type check for push function not yet implemented");
+    RError.err(ErrorType.Warning, "Type check for push function not yet implemented", obj.metadata());
     return null;
   }
 

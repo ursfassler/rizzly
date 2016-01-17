@@ -24,7 +24,6 @@ import util.Pair;
 import ast.data.AstList;
 import ast.data.component.composition.CompUse;
 import ast.data.component.composition.Connection;
-import ast.data.component.composition.Direction;
 import ast.data.component.composition.Endpoint;
 import ast.data.component.composition.EndpointRaw;
 import ast.data.component.composition.EndpointSelf;
@@ -50,13 +49,13 @@ public class QueryIsConnectedToOneResponse {
 
     for (Connection connection : connections) {
       if (isQuery(connection)) {
-        Endpoint endpoint = connection.endpoint.get(Direction.in);
+        Endpoint endpoint = connection.getSrc();
         Pair<CompUse, Function> query = getDescriptor(endpoint);
 
         if (graph.containsKey(query)) {
           Connection oldConnection = graph.get(query);
-          error.err(ErrorType.Hint, oldConnection.getInfo(), "previous connection was here");
-          error.err(ErrorType.Error, connection.getInfo(), "query needs exactly one connection, got more");
+          error.err(ErrorType.Hint, "previous connection was here", oldConnection.metadata());
+          error.err(ErrorType.Error, "query needs exactly one connection, got more", connection.metadata());
 
         } else {
           graph.put(query, connection);
@@ -67,7 +66,7 @@ public class QueryIsConnectedToOneResponse {
   }
 
   private boolean isQuery(Connection connection) {
-    Endpoint ep = connection.endpoint.get(Direction.in);
+    Endpoint ep = connection.getSrc();
     FuncReturn ret = ep.getFunc().ret;
     return !(ret instanceof FuncReturnNone);
   }

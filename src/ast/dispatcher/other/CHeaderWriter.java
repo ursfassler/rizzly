@@ -28,14 +28,14 @@ import ast.data.expression.value.NumberValue;
 import ast.data.function.Function;
 import ast.data.function.header.FuncQuery;
 import ast.data.function.header.FuncResponse;
-import ast.data.function.header.FuncSignal;
-import ast.data.function.header.FuncSlot;
+import ast.data.function.header.Signal;
+import ast.data.function.header.Slot;
 import ast.data.function.header.FuncSubHandlerEvent;
 import ast.data.function.header.FuncSubHandlerQuery;
 import ast.data.function.ret.FuncReturnNone;
-import ast.data.function.ret.FuncReturnType;
+import ast.data.function.ret.FunctionReturnType;
 import ast.data.reference.Reference;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumElement;
@@ -72,7 +72,7 @@ public class CHeaderWriter extends NullDispatcher<Void, StreamWriter> {
 
   @Override
   protected Void visitNamespace(Namespace obj, StreamWriter param) {
-    String protname = obj.name.toUpperCase() + "_" + "H";
+    String protname = obj.getName().toUpperCase() + "_" + "H";
 
     param.wr("#ifndef " + protname);
     param.nl();
@@ -119,7 +119,7 @@ public class CHeaderWriter extends NullDispatcher<Void, StreamWriter> {
     visitList(obj.element, param);
     param.decIndent();
     param.wr("} ");
-    param.wr(obj.name);
+    param.wr(obj.getName());
     param.wr(";");
     param.nl();
     return null;
@@ -129,7 +129,7 @@ public class CHeaderWriter extends NullDispatcher<Void, StreamWriter> {
   protected Void visitNamedElement(NamedElement obj, StreamWriter param) {
     visit(obj.typeref, param);
     param.wr(" ");
-    param.wr(obj.name);
+    param.wr(obj.getName());
     param.wr(";");
     param.nl();
     return null;
@@ -141,13 +141,13 @@ public class CHeaderWriter extends NullDispatcher<Void, StreamWriter> {
     param.nl();
     param.incIndent();
     for (EnumElement elem : obj.element) {
-      param.wr(obj.name + Designator.NAME_SEP + elem.name);
+      param.wr(obj.getName() + Designator.NAME_SEP + elem.getName());
       param.wr(",");
       param.nl();
     }
     param.decIndent();
     param.wr("} ");
-    param.wr(obj.name);
+    param.wr(obj.getName());
     param.wr(";");
     param.nl();
     return null;
@@ -162,12 +162,12 @@ public class CHeaderWriter extends NullDispatcher<Void, StreamWriter> {
   @Override
   protected Void visitReference(Reference obj, StreamWriter param) {
     assert (obj.offset.isEmpty());
-    param.wr(obj.link.name);
+    param.wr(obj.link.getName());
     return null;
   }
 
   @Override
-  protected Void visitTypeRef(TypeRef obj, StreamWriter param) {
+  protected Void visitTypeRef(TypeReference obj, StreamWriter param) {
     visit(obj.ref, param);
     return null;
   }
@@ -185,7 +185,7 @@ public class CHeaderWriter extends NullDispatcher<Void, StreamWriter> {
     param.wr("typedef ");
     param.wr("bool");
     param.wr(" ");
-    param.wr(obj.name);
+    param.wr(obj.getName());
     param.wr(";");
     param.nl();
     return null;
@@ -210,7 +210,7 @@ public class CHeaderWriter extends NullDispatcher<Void, StreamWriter> {
     param.wr("typedef ");
     param.wr((isNeg ? "" : "u") + "int" + bits + "_t");
     param.wr(" ");
-    param.wr(obj.name);
+    param.wr(obj.getName());
     param.wr(";");
     param.nl();
 
@@ -232,7 +232,7 @@ public class CHeaderWriter extends NullDispatcher<Void, StreamWriter> {
     param.decIndent();
     param.nl();
     param.wr("} ");
-    param.wr(obj.name);
+    param.wr(obj.getName());
     param.wr(";");
     param.nl();
     return null;
@@ -243,7 +243,7 @@ public class CHeaderWriter extends NullDispatcher<Void, StreamWriter> {
     param.wr("typedef ");
     param.wr("char*");
     param.wr(" ");
-    param.wr(obj.name);
+    param.wr(obj.getName());
     param.wr(";");
     param.nl();
     return null;
@@ -254,7 +254,7 @@ public class CHeaderWriter extends NullDispatcher<Void, StreamWriter> {
     param.wr("typedef ");
     param.wr("void");
     param.wr(" ");
-    param.wr(obj.name);
+    param.wr(obj.getName());
     param.wr(";");
     param.nl();
     return null;
@@ -269,7 +269,7 @@ public class CHeaderWriter extends NullDispatcher<Void, StreamWriter> {
   protected Void visitVariable(Variable obj, StreamWriter param) {
     visit(obj.type, param);
     param.wr(" ");
-    param.wr(obj.name);
+    param.wr(obj.getName());
     return null;
   }
 
@@ -286,7 +286,7 @@ public class CHeaderWriter extends NullDispatcher<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitFuncReturnType(FuncReturnType obj, StreamWriter param) {
+  protected Void visitFuncReturnType(FunctionReturnType obj, StreamWriter param) {
     visit(obj.type, param);
     return null;
   }
@@ -300,7 +300,7 @@ public class CHeaderWriter extends NullDispatcher<Void, StreamWriter> {
   private void wrPrototype(Function obj, StreamWriter param) {
     visit(obj.ret, param);
     param.wr(" ");
-    param.wr(obj.name);
+    param.wr(obj.getName());
     param.wr("(");
     wrList(obj.param, ", ", param);
     param.wr(");");
@@ -308,7 +308,7 @@ public class CHeaderWriter extends NullDispatcher<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitFuncSignal(FuncSignal obj, StreamWriter param) {
+  protected Void visitFuncSignal(Signal obj, StreamWriter param) {
     param.wr("// ");
     wrPrototype(obj, param);
     return null;
@@ -322,7 +322,7 @@ public class CHeaderWriter extends NullDispatcher<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitFuncSlot(FuncSlot obj, StreamWriter param) {
+  protected Void visitFuncSlot(Slot obj, StreamWriter param) {
     param.wr("extern ");
     wrPrototype(obj, param);
     return null;

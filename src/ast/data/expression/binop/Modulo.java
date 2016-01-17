@@ -17,7 +17,6 @@
 
 package ast.data.expression.binop;
 
-import ast.ElementInfo;
 import ast.data.expression.Expression;
 import ast.visitor.Visitor;
 
@@ -27,8 +26,8 @@ import ast.visitor.Visitor;
  */
 final public class Modulo extends ArithmeticOp {
 
-  public Modulo(ElementInfo info, Expression left, Expression right) {
-    super(info, left, right);
+  public Modulo(Expression left, Expression right) {
+    super(left, right);
   }
 
   @Override

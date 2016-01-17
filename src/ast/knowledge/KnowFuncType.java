@@ -27,8 +27,8 @@ import ast.data.function.header.FuncInterrupt;
 import ast.data.function.header.FuncProcedure;
 import ast.data.function.header.FuncQuery;
 import ast.data.function.header.FuncResponse;
-import ast.data.function.header.FuncSignal;
-import ast.data.function.header.FuncSlot;
+import ast.data.function.header.Signal;
+import ast.data.function.header.Slot;
 
 public class KnowFuncType extends KnowledgeEntry {
   static private final KnowFuncType INSTANCE = new KnowFuncType();
@@ -45,13 +45,13 @@ public class KnowFuncType extends KnowledgeEntry {
     withRetval.put(FuncResponse.class, true);
     withBody.put(FuncResponse.class, true);
 
-    classes.put(TokenType.SIGNAL, FuncSignal.class);
-    withRetval.put(FuncSignal.class, false);
-    withBody.put(FuncSignal.class, false);
+    classes.put(TokenType.SIGNAL, Signal.class);
+    withRetval.put(Signal.class, false);
+    withBody.put(Signal.class, false);
 
-    classes.put(TokenType.SLOT, FuncSlot.class);
-    withRetval.put(FuncSlot.class, false);
-    withBody.put(FuncSlot.class, true);
+    classes.put(TokenType.SLOT, Slot.class);
+    withRetval.put(Slot.class, false);
+    withBody.put(Slot.class, true);
 
     classes.put(TokenType.PROCEDURE, FuncProcedure.class);
     withRetval.put(FuncProcedure.class, false);

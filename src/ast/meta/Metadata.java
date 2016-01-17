@@ -15,27 +15,36 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.expression;
+package ast.meta;
 
-import ast.ElementInfo;
-import ast.data.reference.Reference;
-import ast.visitor.Visitor;
+//TODO remove / merge with MetaInformation
+public class Metadata {
+  final private SourcePosition info;
+  final private String key;
+  final private String value;
 
-final public class RefExp extends Expression {
-  public Reference ref;
+  public Metadata(SourcePosition info, String key, String value) {
+    super();
+    this.info = info;
+    this.key = key;
+    this.value = value;
+  }
 
-  public RefExp(ElementInfo info, Reference ref) {
-    super(info);
-    this.ref = ref;
+  public SourcePosition getInfo() {
+    return info;
+  }
+
+  public String getKey() {
+    return key;
+  }
+
+  public String getValue() {
+    return value;
   }
 
   @Override
   public String toString() {
-    return "->" + ref;
+    return key + ":" + value;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

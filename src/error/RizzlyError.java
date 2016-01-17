@@ -17,12 +17,17 @@
 
 package error;
 
-import ast.ElementInfo;
+import ast.meta.MetaList;
+import ast.meta.SourcePosition;
 
 public interface RizzlyError {
 
+  @Deprecated
   public void err(ErrorType type, String filename, int line, int col, String msg);
 
-  public void err(ErrorType type, ElementInfo info, String msg);
+  @Deprecated
+  public void err(ErrorType type, SourcePosition info, String msg);
+
+  public void err(ErrorType type, String msg, MetaList metadata);
 
 }

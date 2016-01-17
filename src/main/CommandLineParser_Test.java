@@ -28,7 +28,7 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import ast.Designator;
-import ast.ElementInfo;
+import ast.meta.MetaList;
 import error.ErrorType;
 import error.RizzlyError;
 
@@ -43,7 +43,7 @@ public class CommandLineParser_Test {
     Configuration configuration = testee.parse(args);
 
     Assert.assertNull(configuration);
-    verify(error, never()).err(any(ErrorType.class), any(ElementInfo.class), anyString());
+    verify(error, never()).err(any(ErrorType.class), anyString(), any(MetaList.class));
   }
 
   @Test
@@ -61,7 +61,7 @@ public class CommandLineParser_Test {
 
     testee.parse(args);
 
-    verify(error).err(eq(ErrorType.Error), eq(ElementInfo.NO), eq("Need a file"));
+    verify(error).err(eq(ErrorType.Error), eq("Need a file"), any(MetaList.class));
   }
 
   @Test
@@ -70,7 +70,7 @@ public class CommandLineParser_Test {
 
     testee.parse(args);
 
-    verify(error).err(eq(ErrorType.Error), eq(ElementInfo.NO), eq("Option 'component' needs file"));
+    verify(error).err(eq(ErrorType.Error), eq("Option 'component' needs file"), any(MetaList.class));
   }
 
   @Test
@@ -79,10 +79,12 @@ public class CommandLineParser_Test {
 
     Configuration configuration = testee.parse(args);
 
-    verify(error, never()).err(any(ErrorType.class), any(ElementInfo.class), anyString());
+    verify(error, never()).err(any(ErrorType.class), anyString(), any(MetaList.class));
     Assert.assertEquals(false, configuration.doDebugEvent());
     Assert.assertEquals(false, configuration.doLazyModelCheck());
     Assert.assertEquals(false, configuration.doDocOutput());
+    Assert.assertEquals(false, configuration.doXml());
+    Assert.assertEquals("test", configuration.getNamespace());
     Assert.assertEquals(new Designator("test", "Test"), configuration.getRootComp());
     Assert.assertEquals("./", configuration.getRootPath());
     Assert.assertEquals(".rzy", configuration.getExtension());
@@ -104,7 +106,7 @@ public class CommandLineParser_Test {
 
     Configuration configuration = testee.parse(args);
 
-    verify(error, never()).err(any(ErrorType.class), any(ElementInfo.class), anyString());
+    verify(error, never()).err(any(ErrorType.class), anyString(), any(MetaList.class));
     Assert.assertEquals(new Designator("test", "Test"), configuration.getRootComp());
     Assert.assertEquals("/dir/", configuration.getRootPath());
   }
@@ -144,5 +146,14 @@ public class CommandLineParser_Test {
     Configuration configuration = testee.parse(args);
 
     Assert.assertTrue(configuration.doLazyModelCheck());
+  }
+
+  @Test
+  public void specify_xml_backend() {
+    String[] args = { "dir/test.rzy", "--xml" };
+
+    Configuration configuration = testee.parse(args);
+
+    Assert.assertTrue(configuration.doXml());
   }
 }

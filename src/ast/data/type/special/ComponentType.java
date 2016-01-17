@@ -17,17 +17,22 @@
 
 package ast.data.type.special;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.type.Type;
 import ast.data.type.composed.NamedElement;
+import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
 final public class ComponentType extends Type {
   final public AstList<NamedElement> input = new AstList<NamedElement>();
   final public AstList<NamedElement> output = new AstList<NamedElement>();
 
-  public ComponentType(ElementInfo info, String name) {
+  public ComponentType(String name) {
+    super(name);
+  }
+
+  @Deprecated
+  public ComponentType(MetaList info, String name) {
     super(info, name);
   }
 

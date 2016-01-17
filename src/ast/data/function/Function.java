@@ -17,7 +17,6 @@
 
 package ast.data.function;
 
-import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
@@ -25,16 +24,16 @@ import ast.data.component.hfsm.StateContent;
 import ast.data.function.ret.FuncReturn;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.statement.Block;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 
 abstract public class Function extends Named implements StateContent {
-  final public AstList<FuncVariable> param = new AstList<FuncVariable>();
-  public FuncReturn ret = new FuncReturnNone(ElementInfo.NO);
-  public Block body = new Block(ElementInfo.NO);
+  final public AstList<FunctionVariable> param = new AstList<FunctionVariable>();
+  public FuncReturn ret = new FuncReturnNone();
+  public Block body = new Block();
   public FunctionProperty property = FunctionProperty.Private;
 
-  public Function(ElementInfo info, String name, AstList<FuncVariable> param, FuncReturn ret, Block body) {
-    super(info, name);
+  public Function(String name, AstList<FunctionVariable> param, FuncReturn ret, Block body) {
+    setName(name);
     this.param.addAll(param);
     this.ret = ret;
     this.body = body;
@@ -42,7 +41,7 @@ abstract public class Function extends Named implements StateContent {
 
   @Override
   public String toString() {
-    String ret = name;
+    String ret = getName();
 
     ret += "(";
     ret += l2s(param);
@@ -51,7 +50,7 @@ abstract public class Function extends Named implements StateContent {
     return ret;
   }
 
-  static private String l2s(AstList<FuncVariable> param) {
+  static private String l2s(AstList<FunctionVariable> param) {
     String ret = "";
     boolean first = true;
     for (Ast tp : param) {

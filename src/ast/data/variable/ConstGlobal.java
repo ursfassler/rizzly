@@ -17,14 +17,13 @@
 
 package ast.data.variable;
 
-import ast.ElementInfo;
 import ast.data.expression.Expression;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
 import ast.visitor.Visitor;
 
 final public class ConstGlobal extends Constant {
-  public ConstGlobal(ElementInfo info, String name, TypeRef type, Expression def) {
-    super(info, name, type, def);
+  public ConstGlobal(String name, TypeReference type, Expression def) {
+    super(name, type, def);
   }
 
   @Override

@@ -18,19 +18,19 @@
 package ast.pass.others;
 
 import main.Configuration;
-import ast.ElementInfo;
 import ast.data.AstList;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.expression.value.AnyValue;
 import ast.data.reference.RefFactory;
 import ast.data.reference.Reference;
-import ast.data.statement.AssignmentMulti;
 import ast.data.statement.Block;
+import ast.data.statement.MultiAssignment;
 import ast.data.statement.Statement;
 import ast.data.statement.VarDefInitStmt;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
+import ast.meta.MetaList;
 import ast.pass.AstPass;
 
 /**
@@ -75,27 +75,37 @@ class VarDefSplitterWorker extends DfsTraverser<AstList<Statement>, Void> {
   protected AstList<Statement> visitVarDefInitStmt(VarDefInitStmt obj, Void param) {
     AstList<Statement> ret = new AstList<Statement>();
 
-    ast.data.variable.FuncVariable firstVar = null;
+    ast.data.variable.FunctionVariable firstVar = null;
 
-    for (FuncVariable var : obj.variable) {
-      ElementInfo info = var.getInfo();
+    for (FunctionVariable var : obj.variable) {
+      MetaList info = var.metadata();
 
       // variable definition
-      AstList<FuncVariable> sl = new AstList<FuncVariable>();
+      AstList<FunctionVariable> sl = new AstList<FunctionVariable>();
       sl.add(var);
-      ret.add(new VarDefInitStmt(info, sl, new AnyValue(info)));
+      AnyValue initial = new AnyValue();
+      initial.metadata().add(info);
+      VarDefInitStmt item = new VarDefInitStmt(sl, initial);
+      item.metadata().add(info);
+      ret.add(item);
 
       // assign initial value
       if (!(obj.initial instanceof AnyValue)) {
         if (firstVar == null) {
           AstList<Reference> al = new AstList<Reference>();
           al.add(RefFactory.full(info, var));
-          ret.add(new AssignmentMulti(var.getInfo(), al, obj.initial));
+          MultiAssignment ass = new MultiAssignment(al, obj.initial);
+          ass.metadata().add(var.metadata());
+          ret.add(ass);
           firstVar = var;
         } else {
           AstList<Reference> al = new AstList<Reference>();
           al.add(RefFactory.full(info, var));
-          ret.add(new AssignmentMulti(var.getInfo(), al, new RefExp(info, RefFactory.full(info, firstVar))));
+          ReferenceExpression right = new ReferenceExpression(RefFactory.full(info, firstVar));
+          right.metadata().add(info);
+          MultiAssignment ass = new MultiAssignment(al, right);
+          ass.metadata().add(var.metadata());
+          ret.add(ass);
         }
       }
     }

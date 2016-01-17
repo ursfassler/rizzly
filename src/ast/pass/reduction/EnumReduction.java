@@ -23,7 +23,6 @@ import java.util.Map;
 
 import main.Configuration;
 import ast.Designator;
-import ast.ElementInfo;
 import ast.data.Namespace;
 import ast.data.Range;
 import ast.data.expression.value.NumberValue;
@@ -59,8 +58,9 @@ public class EnumReduction extends AstPass {
       for (EnumElement elem : et.element) {
         RangeType rt = kbi.getRangeType(new Range(idx, idx));
 
-        String name = et.name + Designator.NAME_SEP + elem.name;
-        ConstGlobal val = new ConstGlobal(elem.getInfo(), name, TypeRefFactory.create(ElementInfo.NO, rt), new NumberValue(ElementInfo.NO, idx));
+        String name = et.getName() + Designator.NAME_SEP + elem.getName();
+        ConstGlobal val = new ConstGlobal(name, TypeRefFactory.create(rt), new NumberValue(idx));
+        val.metadata().add(elem.metadata());
         ast.children.add(val);
         elemMap.put(elem, val);
 

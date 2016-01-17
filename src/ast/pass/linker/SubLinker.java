@@ -22,7 +22,7 @@ import java.util.List;
 
 import ast.Designator;
 import ast.data.Named;
-import ast.data.reference.DummyLinkTarget;
+import ast.data.reference.LinkTarget;
 import ast.data.reference.RefItem;
 import ast.data.reference.RefName;
 import ast.data.reference.Reference;
@@ -38,10 +38,10 @@ public class SubLinker {
 
   public void link(Reference ref, Named root) {
 
-    if (ref.link instanceof DummyLinkTarget) {
+    if (ref.link instanceof LinkTarget) {
       List<String> targetName = new ArrayList<String>();
 
-      String rootName = ((DummyLinkTarget) ref.link).name;
+      String rootName = ((LinkTarget) ref.link).getName();
 
       if (!rootName.equals("self")) {
         targetName.add(rootName);
@@ -52,7 +52,7 @@ public class SubLinker {
         targetName.add(name);
       }
 
-      Named target = childByName.get(root, new Designator(targetName), ref.getInfo());
+      Named target = childByName.get(root, new Designator(targetName), ref.metadata());
 
       ref.link = target;
       ref.offset.clear();

@@ -17,17 +17,25 @@
 
 package ast.data.expression.value;
 
-import ast.ElementInfo;
 import ast.data.AstBase;
 import ast.data.expression.Expression;
+import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
 final public class NamedValue extends AstBase {
   public final String name;
   public Expression value;  // TODO change to ValueExpr
 
-  public NamedValue(ElementInfo info, String name, Expression value) {
-    super(info);
+  public NamedValue(String name, Expression value) {
+    super();
+    this.name = name;
+    this.value = value;
+  }
+
+  @Deprecated
+  public NamedValue(MetaList info, String name, Expression value) {
+    super();
+    metadata().add(info);
     this.name = name;
     this.value = value;
   }

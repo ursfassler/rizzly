@@ -19,14 +19,14 @@ package ast.pass.specializer;
 
 import ast.data.AstList;
 import ast.data.expression.Expression;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.expression.value.ValueExpr;
 import ast.data.reference.Reference;
 import ast.data.template.ActualTemplateArgument;
 import ast.data.template.Template;
 import ast.data.type.Type;
-import ast.data.type.TypeRef;
 import ast.data.type.TypeRefFactory;
+import ast.data.type.TypeReference;
 import ast.data.variable.TemplateParameter;
 import ast.interpreter.Memory;
 import ast.knowledge.KnowledgeBase;
@@ -56,7 +56,7 @@ public class Util {
       ActualTemplateArgument itr = arg.get(i);
       TemplateParameter tmpl = param.get(i);
       if (isType.isSatisfiedBy(tmpl)) {
-        itr = evalType(((RefExp) itr).ref, kb);
+        itr = evalType(((ReferenceExpression) itr).reference, kb);
       } else {
         itr = evalExpr((Expression) itr, kb);
       }
@@ -68,7 +68,7 @@ public class Util {
 
   public static void checkArgCount(Template item, AstList<ActualTemplateArgument> genspec) {
     if (item.getTempl().size() != genspec.size()) {
-      RError.err(ErrorType.Error, item.getInfo(), "Wrong number of parameter, expected " + item.getTempl().size() + " got " + genspec.size());
+      RError.err(ErrorType.Error, "Wrong number of parameter, expected " + item.getTempl().size() + " got " + genspec.size(), item.metadata());
     }
   }
 
@@ -86,9 +86,9 @@ public class Util {
     }
   }
 
-  private static TypeRef evalTypeRef(TypeRef tr, KnowledgeBase kb) {
+  private static TypeReference evalTypeRef(TypeReference tr, KnowledgeBase kb) {
     Type type = evalType(tr.ref, kb);
-    return TypeRefFactory.create(tr.getInfo(), type);
+    return TypeRefFactory.create(tr.metadata(), type);
   }
 
 }

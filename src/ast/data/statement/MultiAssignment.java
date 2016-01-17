@@ -15,16 +15,25 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.variable;
+package ast.data.statement;
 
-import ast.ElementInfo;
-import ast.data.type.TypeRef;
+import ast.data.AstList;
+import ast.data.expression.Expression;
+import ast.data.reference.Reference;
 import ast.visitor.Visitor;
 
-final public class FuncVariable extends Variable {
+final public class MultiAssignment extends Assignment {
 
-  public FuncVariable(ElementInfo info, String name, TypeRef type) {
-    super(info, name, type);
+  final public AstList<Reference> left;
+
+  public MultiAssignment(AstList<Reference> left, Expression right) {
+    super(right);
+    this.left = left;
+  }
+
+  @Override
+  public String toString() {
+    return left + " := " + right;
   }
 
   @Override

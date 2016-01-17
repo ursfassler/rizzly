@@ -17,19 +17,15 @@
 
 package ast.data;
 
-import ast.ElementInfo;
+import ast.meta.MetaList;
+import ast.meta.MetaListImplementation;
 
 public abstract class AstBase implements Ast {
-  private ElementInfo info;
-
-  public AstBase(ElementInfo info) {
-    super();
-    this.info = info;
-  }
+  private final MetaList metadata = new MetaListImplementation();
 
   @Override
-  public ElementInfo getInfo() {
-    return info;
+  public MetaList metadata() {
+    return metadata;
   }
 
 }

@@ -21,10 +21,9 @@ import java.math.BigInteger;
 import java.util.List;
 
 import main.Configuration;
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.Namespace;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.expression.binop.Less;
 import ast.data.expression.binop.Plus;
 import ast.data.expression.value.BooleanValue;
@@ -34,17 +33,18 @@ import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.ForStmt;
 import ast.data.statement.IfOption;
-import ast.data.statement.IfStmt;
+import ast.data.statement.IfStatement;
 import ast.data.statement.Statement;
 import ast.data.statement.VarDefStmt;
 import ast.data.statement.WhileStmt;
 import ast.data.type.TypeRefFactory;
 import ast.data.type.base.RangeType;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.dispatcher.other.StmtReplacer;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowUniqueName;
 import ast.knowledge.KnowledgeBase;
+import ast.meta.MetaList;
 import ast.pass.AstPass;
 import ast.repository.manipulator.TypeRepo;
 
@@ -82,34 +82,34 @@ class ForReductionWorker extends StmtReplacer<Void> {
   @Override
   protected List<Statement> visitForStmt(ForStmt obj, Void param) {
     // TODO implement for other types than range types
-    ElementInfo info = obj.getInfo();
+    MetaList info = obj.metadata(); // TODO use this info for everything
 
-    FuncVariable itr = obj.iterator;
+    FunctionVariable itr = obj.iterator;
     RangeType rt = (RangeType) kt.get(itr.type);
 
-    Block block = new Block(obj.getInfo());
+    Block block = new Block();
 
-    FuncVariable loopCond = new FuncVariable(info, kun.get("run"), TypeRefFactory.create(info, kbi.getBooleanType()));
+    FunctionVariable loopCond = new FunctionVariable(kun.get("run"), TypeRefFactory.create(kbi.getBooleanType()));
 
-    block.statements.add(new VarDefStmt(info, loopCond));
-    block.statements.add(new AssignmentSingle(info, RefFactory.full(info, loopCond), new BooleanValue(info, true)));
+    block.statements.add(new VarDefStmt(loopCond));
+    block.statements.add(new AssignmentSingle(RefFactory.full(loopCond), new BooleanValue(true)));
 
-    block.statements.add(new VarDefStmt(info, itr));
-    block.statements.add(new AssignmentSingle(info, RefFactory.full(info, itr), new NumberValue(info, rt.range.low)));
+    block.statements.add(new VarDefStmt(itr));
+    block.statements.add(new AssignmentSingle(RefFactory.full(itr), new NumberValue(rt.range.low)));
 
-    Block body = new Block(info);
-    block.statements.add(new WhileStmt(info, new RefExp(info, RefFactory.full(info, loopCond)), body));
+    Block body = new Block();
+    block.statements.add(new WhileStmt(new ReferenceExpression(RefFactory.full(loopCond)), body));
 
     body.statements.add(obj.block);
     AstList<IfOption> option = new AstList<IfOption>();
-    Block defblock = new Block(info);
+    Block defblock = new Block();
 
-    Block inc = new Block(info);
-    option.add(new IfOption(info, new Less(info, new RefExp(info, RefFactory.full(info, itr)), new NumberValue(info, rt.range.high)), inc));
-    inc.statements.add(new AssignmentSingle(info, RefFactory.full(info, itr), new Plus(info, new RefExp(info, RefFactory.full(info, itr)), new NumberValue(info, BigInteger.ONE))));
-    defblock.statements.add(new AssignmentSingle(info, RefFactory.full(info, loopCond), new BooleanValue(info, false)));
+    Block inc = new Block();
+    option.add(new IfOption(new Less(new ReferenceExpression(RefFactory.full(itr)), new NumberValue(rt.range.high)), inc));
+    inc.statements.add(new AssignmentSingle(RefFactory.full(itr), new Plus(new ReferenceExpression(RefFactory.full(itr)), new NumberValue(BigInteger.ONE))));
+    defblock.statements.add(new AssignmentSingle(RefFactory.full(loopCond), new BooleanValue(false)));
 
-    body.statements.add(new IfStmt(info, option, defblock));
+    body.statements.add(new IfStatement(option, defblock));
 
     return list(block);
   }

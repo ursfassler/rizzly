@@ -22,7 +22,6 @@ import java.util.List;
 
 import parser.scanner.Token;
 import parser.scanner.TokenType;
-import ast.data.Metadata;
 import error.ErrorType;
 import error.RError;
 
@@ -79,20 +78,14 @@ public abstract class Parser {
   public Token expect(TokenType type) {
     Token got = next();
     if (got.getType() != type) {
-      RError.err(ErrorType.Error, got.getInfo(), "expected " + type + " got " + got);
+      RError.err(ErrorType.Error, "expected " + type + " got " + got, got.getMetadata());
     }
     return got;
   }
 
   protected void wrongToken(TokenType expected) {
     Token got = next();
-    RError.err(ErrorType.Error, got.getInfo(), "expected " + expected + " got " + got);
-  }
-
-  // TODO create other solution
-  @Deprecated
-  protected ArrayList<Metadata> getMetadata() {
-    return new ArrayList<Metadata>();
+    RError.err(ErrorType.Error, "expected " + expected + " got " + got, got.getMetadata());
   }
 
 }

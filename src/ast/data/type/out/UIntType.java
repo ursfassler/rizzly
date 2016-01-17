@@ -17,13 +17,12 @@
 
 package ast.data.type.out;
 
-import ast.ElementInfo;
 import ast.visitor.Visitor;
 
 final public class UIntType extends IntType {
 
-  public UIntType(ElementInfo info, String name, int bytes) {
-    super(info, name, bytes);
+  public UIntType(String name, int bytes) {
+    super(name, bytes);
   }
 
   static public String makeName(int bytes) {

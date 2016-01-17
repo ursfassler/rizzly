@@ -20,18 +20,17 @@ package ast.data.function;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.function.ret.FuncReturn;
 import ast.data.statement.Block;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 
 public class FunctionFactory {
-  static public <T extends Function> T create(Class<T> type, ElementInfo info, String name, AstList<FuncVariable> param, FuncReturn retType, Block body) {
+  static public <T extends Function> T create(Class<T> type, String name, AstList<FunctionVariable> param, FuncReturn retType, Block body) {
     T ret = null;
     try {
-      Constructor<T> c = type.getDeclaredConstructor(ElementInfo.class, String.class, AstList.class, FuncReturn.class, Block.class);
-      ret = c.newInstance(info, name, param, retType, body);
+      Constructor<T> c = type.getDeclaredConstructor(String.class, AstList.class, FuncReturn.class, Block.class);
+      ret = c.newInstance(name, param, retType, body);
     } catch (InstantiationException e) {
       e.printStackTrace();
     } catch (IllegalAccessException e) {

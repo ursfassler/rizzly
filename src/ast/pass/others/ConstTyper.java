@@ -72,7 +72,7 @@ class Typer extends DfsTraverser<Void, Void> {
 
       ct = kbi.getType(ct);
 
-      obj.type = TypeRefFactory.create(obj.getInfo(), ct);
+      obj.type = TypeRefFactory.create(obj.metadata(), ct);
     }
     super.visitConstant(obj, param);
     return null;

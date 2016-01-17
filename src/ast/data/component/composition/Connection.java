@@ -17,20 +17,31 @@
 
 package ast.data.component.composition;
 
-import java.util.HashMap;
-import java.util.Map;
-
-import ast.ElementInfo;
 import ast.data.AstBase;
 
 abstract public class Connection extends AstBase {
-  final public Map<Direction, Endpoint> endpoint;
+  private Endpoint src;
+  private Endpoint dst;
 
-  public Connection(ElementInfo info, Endpoint src, Endpoint dst) {
-    super(info);
-    endpoint = new HashMap<Direction, Endpoint>();
-    endpoint.put(Direction.in, src);
-    endpoint.put(Direction.out, dst);
+  public Connection(Endpoint src, Endpoint dst) {
+    this.src = src;
+    this.dst = dst;
+  }
+
+  public Endpoint getSrc() {
+    return src;
+  }
+
+  public void setSrc(Endpoint value) {
+    src = value;
+  }
+
+  public Endpoint getDst() {
+    return dst;
+  }
+
+  public void setDst(Endpoint value) {
+    dst = value;
   }
 
 }

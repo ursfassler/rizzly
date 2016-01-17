@@ -22,7 +22,6 @@ import java.util.Map;
 
 import main.Configuration;
 import ast.Designator;
-import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.data.Ast;
 import ast.data.AstList;
@@ -33,13 +32,13 @@ import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateContent;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.expression.Expression;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.function.header.FuncFunction;
 import ast.data.function.header.FuncResponse;
 import ast.data.reference.RefFactory;
 import ast.data.reference.Reference;
 import ast.data.statement.Block;
-import ast.data.statement.ReturnExpr;
+import ast.data.statement.ExpressionReturn;
 import ast.data.variable.Variable;
 import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowledgeBase;
@@ -76,7 +75,6 @@ public class QueryDownPropagator extends AstPass {
 }
 
 class QueryDownPropagatorWorker extends NullDispatcher<Void, QueryParam> {
-  private static final ElementInfo info = ElementInfo.NO;
   private final Map<FuncResponse, FuncFunction> map; // TODO do we need
 
   // that?
@@ -108,14 +106,14 @@ class QueryDownPropagatorWorker extends NullDispatcher<Void, QueryParam> {
     }
 
     for (FuncResponse func : queries) {
-      FuncResponse cfunc = new FuncResponse(info, func.name, Copy.copy(func.param), Copy.copy(func.ret), new Block(info));
+      FuncResponse cfunc = new FuncResponse(func.getName(), Copy.copy(func.param), Copy.copy(func.ret), new Block());
 
       AstList<Expression> acpar = new AstList<Expression>();
       for (Variable par : cfunc.param) {
-        acpar.add(new RefExp(info, RefFactory.full(info, par)));
+        acpar.add(new ReferenceExpression(RefFactory.full(par)));
       }
-      Reference call = RefFactory.call(info, map.get(func), acpar);
-      cfunc.body.statements.add(new ReturnExpr(info, new RefExp(info, call)));
+      Reference call = RefFactory.call(map.get(func), acpar);
+      cfunc.body.statements.add(new ExpressionReturn(new ReferenceExpression(call)));
 
       obj.item.add(cfunc); // TODO ok or copy?
     }
@@ -212,9 +210,9 @@ class QueryFuncMaker extends NullDispatcher<Void, Designator> {
 
   @Override
   protected Void visitFuncResponse(FuncResponse obj, Designator param) {
-    param = new Designator(param, obj.name);
-    FuncFunction func = new FuncFunction(ElementInfo.NO, param.toString(), Copy.copy(obj.param), Copy.copy(obj.ret), obj.body);
-    obj.body = new Block(ElementInfo.NO);
+    param = new Designator(param, obj.getName());
+    FuncFunction func = new FuncFunction(param.toString(), Copy.copy(obj.param), Copy.copy(obj.ret), obj.body);
+    obj.body = new Block();
 
     FsmReduction.relinkActualParameterRef(obj.param, func.param, func.body);
 
@@ -225,7 +223,7 @@ class QueryFuncMaker extends NullDispatcher<Void, Designator> {
 
   @Override
   protected Void visitState(State obj, Designator param) {
-    param = new Designator(param, obj.name);
+    param = new Designator(param, obj.getName());
     visitList(obj.item, param);
     return null;
   }

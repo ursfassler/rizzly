@@ -54,7 +54,7 @@ class SingleDefinitionWorker extends DfsTraverser<Void, Set<Ast>> {
     if (param.contains(obj)) {
       for (Object itr : param.toArray()) {
         if (obj == itr) {
-          RError.err(ErrorType.Fatal, obj.getInfo(), "object defined at 2 places: " + obj);
+          RError.err(ErrorType.Fatal, "object defined at 2 places: " + obj, obj.metadata());
         }
       }
     }

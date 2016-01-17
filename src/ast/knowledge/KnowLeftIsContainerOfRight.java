@@ -25,7 +25,7 @@ import util.Pair;
 import ast.data.Ast;
 import ast.data.Range;
 import ast.data.type.Type;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumElement;
@@ -108,7 +108,7 @@ class KnowLeftIsContainerOfRightWorker extends NullDispatcher<Boolean, Type> {
     return Supertype.get(right, kb);
   }
 
-  private boolean process(List<TypeRef> left, List<TypeRef> right) {
+  private boolean process(List<TypeReference> left, List<TypeReference> right) {
     if (left.size() != right.size()) {
       return false;
     }
@@ -189,7 +189,7 @@ class KnowLeftIsContainerOfRightWorker extends NullDispatcher<Boolean, Type> {
     if (right instanceof TupleType) {
       return process(obj.types, ((TupleType) right).types);
     } else if (right instanceof RecordType) {
-      List<TypeRef> rtypes = new ArrayList<TypeRef>();
+      List<TypeReference> rtypes = new ArrayList<TypeReference>();
       for (NamedElement elem : ((RecordType) right).element) {
         rtypes.add(elem.typeref);
       }
@@ -204,7 +204,7 @@ class KnowLeftIsContainerOfRightWorker extends NullDispatcher<Boolean, Type> {
     if (left.equals(right)) {
       return true;
     } else if (right instanceof TupleType) {
-      List<TypeRef> lt = new ArrayList<TypeRef>();
+      List<TypeReference> lt = new ArrayList<TypeReference>();
       for (NamedElement elem : left.element) {
         lt.add(elem.typeref);
       }

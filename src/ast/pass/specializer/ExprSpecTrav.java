@@ -21,9 +21,9 @@ import java.util.Map;
 
 import ast.copy.Copy;
 import ast.data.expression.Expression;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.expression.value.ValueExpr;
-import ast.data.reference.DummyLinkTarget;
+import ast.data.reference.LinkTarget;
 import ast.data.reference.Reference;
 import ast.data.variable.TemplateParameter;
 import ast.dispatcher.other.ExprReplacer;
@@ -37,13 +37,13 @@ public class ExprSpecTrav extends ExprReplacer<Void> {
   }
 
   @Override
-  protected Expression visitRefExpr(RefExp obj, Void param) {
-    obj = (RefExp) super.visitRefExpr(obj, param);
+  protected Expression visitRefExpr(ReferenceExpression obj, Void param) {
+    obj = (ReferenceExpression) super.visitRefExpr(obj, param);
 
-    if (values.containsKey(obj.ref.link)) {
-      Reference ref = obj.ref;
+    if (values.containsKey(obj.reference.link)) {
+      Reference ref = obj.reference;
 
-      assert (!(ref.link instanceof DummyLinkTarget));
+      assert (!(ref.link instanceof LinkTarget));
       assert (ref.offset.isEmpty());
 
       Expression repl = values.get(ref.link);

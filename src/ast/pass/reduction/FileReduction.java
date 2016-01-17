@@ -43,7 +43,8 @@ class FileReductionWorker extends DfsTraverser<Void, Namespace> {
   protected Void visitRizzlyFile(RizzlyFile obj, Namespace param) {
     assert (param.children.contains(obj));
     int idx = param.children.indexOf(obj);
-    ast.data.Namespace space = new Namespace(obj.getInfo(), obj.name);
+    Namespace space = new Namespace(obj.getName());
+    space.metadata().add(obj.metadata());
     space.children.addAll(obj.objects);
     param.children.set(idx, space);
     return null;

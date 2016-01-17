@@ -17,11 +17,16 @@
 
 package ast.data.component.hfsm;
 
-import ast.ElementInfo;
 import ast.data.reference.RefFactory;
+import ast.meta.MetaList;
 
 public class StateRefFactory {
-  public static StateRef create(ElementInfo info, State comp) {
+  public static StateRef create(State comp) {
+    return new StateRef(RefFactory.create(comp));
+  }
+
+  @Deprecated
+  public static StateRef create(MetaList info, State comp) {
     return new StateRef(info, RefFactory.create(info, comp));
   }
 }

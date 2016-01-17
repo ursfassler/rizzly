@@ -48,11 +48,11 @@ class PathPrefixerTraverser extends DfsTraverser<Void, Designator> {
   @Override
   protected Void visit(Ast obj, Designator param) {
     if (obj instanceof Named) {
-      param = new Designator(param, ((Named) obj).name);
+      param = new Designator(param, ((Named) obj).getName());
     }
     if (spec.isSatisfiedBy(obj)) {
       assert (obj instanceof Named);
-      ((Named) obj).name = param.toString(Designator.NAME_SEP);
+      ((Named) obj).setName(param.toString(Designator.NAME_SEP));
     }
     return super.visit(obj, param);
   }

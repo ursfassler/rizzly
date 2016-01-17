@@ -21,7 +21,7 @@ import main.Configuration;
 import ast.copy.Copy;
 import ast.data.Namespace;
 import ast.data.expression.Expression;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.reference.Reference;
 import ast.data.type.Type;
 import ast.data.type.base.ArrayType;
@@ -76,9 +76,9 @@ class ConstantPropagationWorker extends ExprReplacer<Void> {
   }
 
   @Override
-  protected Expression visitRefExpr(RefExp obj, Void param) {
-    if (obj.ref.link instanceof Constant) {
-      Reference ref = obj.ref;
+  protected Expression visitRefExpr(ReferenceExpression obj, Void param) {
+    if (obj.reference.link instanceof Constant) {
+      Reference ref = obj.reference;
       Constant constant = (Constant) ref.link;
       Type type = kt.get(constant.type);
       if (doReduce(type)) {

@@ -21,8 +21,10 @@ import java.util.LinkedList;
 import java.util.List;
 
 import parser.PeekReader;
-import ast.ElementInfo;
-import ast.data.Metadata;
+import ast.meta.MetaList;
+import ast.meta.MetaListImplementation;
+import ast.meta.Metadata;
+import ast.meta.SourcePosition;
 
 /**
  *
@@ -79,11 +81,13 @@ public class MetadataReader implements PeekReader<Character> {
     return sym;
   }
 
-  public ElementInfo getInfo() {
-    ElementInfo metaInfo = getActualMeta().getInfo();
+  public MetaList getInfo() {
+    SourcePosition metaInfo = getActualMeta().getInfo();
     int keySize = getActualMeta().getKey().length() + 1;
-    ElementInfo info = new ElementInfo(metaInfo.filename, metaInfo.line, metaInfo.row + pos + keySize);
-    return info;
+    SourcePosition info = new SourcePosition(metaInfo.filename, metaInfo.line, metaInfo.row + pos + keySize);
+    MetaList meta = new MetaListImplementation();
+    meta.add(info);
+    return meta;
   }
 
   private Metadata getActualMeta() {

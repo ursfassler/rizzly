@@ -23,8 +23,8 @@ import java.util.List;
 import java.util.Set;
 
 import ast.Designator;
-import ast.ElementInfo;
-import ast.data.Metadata;
+import ast.meta.MetaList;
+import ast.meta.Metadata;
 
 public class WorldComp extends Component {
   final private PointF size = new PointF(140, 35);
@@ -32,7 +32,7 @@ public class WorldComp extends Component {
   final private List<SubComponent> comp = new ArrayList<SubComponent>();
   final private Set<Connection> conn = new HashSet<Connection>();
 
-  public WorldComp(ElementInfo info, Designator path, String classname, List<Metadata> metadata) {
+  public WorldComp(MetaList info, Designator path, String classname, List<Metadata> metadata) {
     super(info, path, classname, metadata);
   }
 

@@ -15,19 +15,15 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.function.header;
+package ast.data.statement;
 
-import ast.ElementInfo;
-import ast.data.AstList;
-import ast.data.function.InterfaceFunction;
-import ast.data.function.ret.FuncReturn;
-import ast.data.statement.Block;
-import ast.data.variable.FuncVariable;
 import ast.visitor.Visitor;
 
-final public class FuncSignal extends InterfaceFunction {
-  public FuncSignal(ElementInfo info, String name, AstList<FuncVariable> param, FuncReturn ret, Block body) {
-    super(info, name, param, ret, body);
+final public class VoidReturn extends Return {
+
+  @Override
+  public String toString() {
+    return "return";
   }
 
   @Override

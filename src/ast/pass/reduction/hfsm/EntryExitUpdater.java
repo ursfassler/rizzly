@@ -20,7 +20,6 @@ package ast.pass.reduction.hfsm;
 import java.util.LinkedList;
 
 import main.Configuration;
-import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -38,7 +37,7 @@ import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.Statement;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
@@ -108,11 +107,11 @@ class EntryExitUpdaterWorker extends NullDispatcher<Void, EePar> {
   }
 
   private FuncRef makeFuncRef(FuncProcedure entry) {
-    return new FuncRef(ElementInfo.NO, RefFactory.create(ElementInfo.NO, entry));
+    return new FuncRef(RefFactory.create(entry));
   }
 
   public FuncProcedure makeFunc(LinkedList<Function> list, String name) {
-    FuncProcedure func = new FuncProcedure(ElementInfo.NO, name, new AstList<FuncVariable>(), new FuncReturnNone(ElementInfo.NO), new Block(ElementInfo.NO));
+    FuncProcedure func = new FuncProcedure(name, new AstList<FunctionVariable>(), new FuncReturnNone(), new Block());
 
     for (Function cf : list) {
       Statement stmt = makeCall(cf);
@@ -124,8 +123,8 @@ class EntryExitUpdaterWorker extends NullDispatcher<Void, EePar> {
 
   private CallStmt makeCall(Function func) {
     assert (func.param.isEmpty());
-    Reference ref = RefFactory.call(ElementInfo.NO, func);
-    return new CallStmt(ElementInfo.NO, ref);
+    Reference ref = RefFactory.call(func);
+    return new CallStmt(ref);
   }
 
   @Override

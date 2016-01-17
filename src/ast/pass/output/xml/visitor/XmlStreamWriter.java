@@ -15,28 +15,13 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.statement;
+package ast.pass.output.xml.visitor;
 
-import ast.ElementInfo;
-import ast.data.expression.Expression;
-import ast.visitor.Visitor;
+public interface XmlStreamWriter {
+  public void beginNode(String name);
 
-final public class ReturnExpr extends Return {
+  public void endNode();
 
-  public Expression expr;
+  public void attribute(String name, String value);
 
-  public ReturnExpr(ElementInfo info, Expression expr) {
-    super(info);
-    this.expr = expr;
-  }
-
-  @Override
-  public String toString() {
-    return super.toString() + " " + expr;
-  }
-
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

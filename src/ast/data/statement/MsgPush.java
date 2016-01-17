@@ -19,7 +19,6 @@ package ast.data.statement;
 
 import java.util.Collection;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.expression.Expression;
 import ast.data.function.FuncRef;
@@ -31,8 +30,7 @@ final public class MsgPush extends Statement {
   public FuncRef func;
   final public AstList<Expression> data = new AstList<Expression>();
 
-  public MsgPush(ElementInfo info, Reference queue, FuncRef func, Collection<Expression> data) {
-    super(info);
+  public MsgPush(Reference queue, FuncRef func, Collection<Expression> data) {
     this.queue = queue;
     this.func = func;
     this.data.addAll(data);

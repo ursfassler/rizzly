@@ -17,16 +17,15 @@
 
 package ast.data.type.out;
 
-import ast.ElementInfo;
 import ast.data.type.Type;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
 import ast.visitor.Visitor;
 
 final public class PointerType extends Type {
-  public TypeRef type;
+  public TypeReference type;
 
-  public PointerType(ElementInfo info, String name, TypeRef type) {
-    super(info, name);
+  public PointerType(String name, TypeReference type) {
+    super(name);
     this.type = type;
   }
 

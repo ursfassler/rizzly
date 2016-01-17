@@ -15,31 +15,11 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.statement;
+package ast.meta;
 
-import ast.ElementInfo;
-import ast.data.AstList;
-import ast.visitor.Visitor;
-
-final public class IfStmt extends Statement {
-  final public AstList<IfOption> option;
-  public Block defblock;
-
-  public IfStmt(ElementInfo info, AstList<IfOption> option, Block defblock) {
-    super(info);
-    this.option = option;
-    this.defblock = defblock;
-  }
-
-  public IfStmt(ElementInfo info) {
-    super(info);
-    this.option = new AstList<IfOption>();
-    this.defblock = new Block(info);
-  }
-
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
+public class Meta {
+  public static MetaList empty() {
+    return new MetaListImplementation();
   }
 
 }

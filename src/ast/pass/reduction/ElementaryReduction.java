@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import main.Configuration;
-import ast.ElementInfo;
 import ast.copy.Relinker;
 import ast.data.AstList;
 import ast.data.Named;
@@ -29,12 +28,12 @@ import ast.data.Namespace;
 import ast.data.component.elementary.ImplElementary;
 import ast.data.function.Function;
 import ast.data.function.header.FuncResponse;
-import ast.data.function.header.FuncSlot;
+import ast.data.function.header.Slot;
 import ast.data.type.Type;
-import ast.data.type.TypeRef;
 import ast.data.type.TypeRefFactory;
+import ast.data.type.TypeReference;
 import ast.data.type.base.TupleType;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.knowledge.KnowLeftIsContainerOfRight;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
@@ -63,9 +62,9 @@ public class ElementaryReduction extends AstPass {
 
     for (ImplElementary impl : Collector.select(ast, new IsClass(ImplElementary.class)).castTo(ImplElementary.class)) {
 
-      AstList<FuncSlot> slotImpl = TypeFilter.select(impl.function, FuncSlot.class);
+      AstList<Slot> slotImpl = TypeFilter.select(impl.function, Slot.class);
       AstList<FuncResponse> responseImpl = TypeFilter.select(impl.function, FuncResponse.class);
-      AstList<FuncSlot> slotProto = TypeFilter.select(impl.iface, FuncSlot.class);
+      AstList<Slot> slotProto = TypeFilter.select(impl.iface, Slot.class);
       AstList<FuncResponse> responseProto = TypeFilter.select(impl.iface, FuncResponse.class);
 
       if (!checkForAll(slotImpl, slotProto, "interface declaration") | !checkForAll(responseImpl, responseProto, "interface declaration") | !checkForAll(responseProto, responseImpl, "implementation")) {
@@ -85,9 +84,9 @@ public class ElementaryReduction extends AstPass {
   private boolean checkForAll(AstList<? extends Function> test, AstList<? extends Function> set, String what) {
     boolean ret = true;
     for (Function func : test) {
-      Function proto = NameFilter.select(set, func.name);
+      Function proto = NameFilter.select(set, func.getName());
       if (proto == null) {
-        RError.err(ErrorType.Error, func.getInfo(), what + " not found for " + func.name);
+        RError.err(ErrorType.Error, what + " not found for " + func.getName(), func.metadata());
         ret = false;
       }
     }
@@ -96,7 +95,7 @@ public class ElementaryReduction extends AstPass {
 
   private void merge(AstList<? extends Function> test, AstList<? extends Function> set, Map<Named, Named> map, KnowledgeBase kb) {
     for (Function func : test) {
-      merge(func, NameFilter.select(set, func.name), map, kb);
+      merge(func, NameFilter.select(set, func.getName()), map, kb);
     }
   }
 
@@ -109,15 +108,15 @@ public class ElementaryReduction extends AstPass {
     Type ft = getType(func.param, kt);
     Type pt = getType(proto.param, kt);
     if (!kc.get(ft, pt)) {
-      RError.err(ErrorType.Hint, proto.getInfo(), "Prototype is here");
-      RError.err(ErrorType.Error, func.getInfo(), "Implementation (argument) is not compatible with prototype");
+      RError.err(ErrorType.Hint, "Prototype is here", proto.metadata());
+      RError.err(ErrorType.Error, "Implementation (argument) is not compatible with prototype", func.metadata());
     }
 
     Type fr = kt.get(func.ret);
     Type pr = kt.get(proto.ret);
     if (!kc.get(pr, fr)) {
-      RError.err(ErrorType.Hint, proto.ret.getInfo(), "Prototype is here");
-      RError.err(ErrorType.Error, func.ret.getInfo(), "Implementation (return) is not compatible with prototype");
+      RError.err(ErrorType.Hint, "Prototype is here", proto.ret.metadata());
+      RError.err(ErrorType.Error, "Implementation (return) is not compatible with prototype", func.ret.metadata());
     }
 
     proto.body.statements.addAll(func.body.statements);
@@ -129,12 +128,12 @@ public class ElementaryReduction extends AstPass {
     map.put(func, proto);
   }
 
-  private Type getType(AstList<FuncVariable> param, KnowType kt) {
-    AstList<TypeRef> types = new AstList<TypeRef>();
-    for (FuncVariable var : param) {
-      types.add(TypeRefFactory.create(ElementInfo.NO, kt.get(var.type)));
+  private Type getType(AstList<FunctionVariable> param, KnowType kt) {
+    AstList<TypeReference> types = new AstList<TypeReference>();
+    for (FunctionVariable var : param) {
+      types.add(TypeRefFactory.create(kt.get(var.type)));
     }
-    TupleType tt = new TupleType(ElementInfo.NO, "", types);
+    TupleType tt = new TupleType("", types);
     return tt;
   }
 }

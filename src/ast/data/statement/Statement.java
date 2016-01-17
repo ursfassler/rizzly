@@ -17,7 +17,6 @@
 
 package ast.data.statement;
 
-import ast.ElementInfo;
 import ast.data.AstBase;
 
 /**
@@ -26,7 +25,4 @@ import ast.data.AstBase;
  */
 abstract public class Statement extends AstBase {
 
-  public Statement(ElementInfo info) {
-    super(info);
-  }
 }

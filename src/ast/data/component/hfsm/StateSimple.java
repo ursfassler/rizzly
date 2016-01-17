@@ -17,14 +17,13 @@
 
 package ast.data.component.hfsm;
 
-import ast.ElementInfo;
 import ast.data.function.FuncRef;
 import ast.visitor.Visitor;
 
 final public class StateSimple extends State {
 
-  public StateSimple(ElementInfo info, String name, FuncRef entryFunc, FuncRef exitFunc) {
-    super(info, name, entryFunc, exitFunc);
+  public StateSimple(String name, FuncRef entryFunc, FuncRef exitFunc) {
+    super(name, entryFunc, exitFunc);
   }
 
   @Override

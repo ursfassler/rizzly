@@ -83,8 +83,8 @@ class RenamerWorker extends DfsTraverser<Void, Void> {
   @Override
   protected Void visit(Ast obj, Void param) {
     if (obj instanceof Named) {
-      String name = CRenamer.cleanName(((Named) obj).name);
-      ((Named) obj).name = name;
+      String name = CRenamer.cleanName(((Named) obj).getName());
+      ((Named) obj).setName(name);
     }
     return super.visit(obj, param);
   }

@@ -69,7 +69,7 @@ public class CheckNames extends AstPass {
     Set<String> names = new HashSet<String>();
 
     for (Named itr : list) {
-      names.add(itr.name);
+      names.add(itr.getName());
     }
 
     return names;
@@ -89,8 +89,8 @@ class CheckNamesWorker extends DfsTraverser<Void, Collection<String>> {
   @Override
   protected Void visit(Ast obj, Collection<String> param) {
     if (obj instanceof Named) {
-      if (param.contains(((Named) obj).name) && !(obj instanceof Template) && !(obj instanceof TypeTemplate)) {
-        RError.err(ErrorType.Error, obj.getInfo(), "Expected name, got keyword " + ((Named) obj).name);
+      if (param.contains(((Named) obj).getName()) && !(obj instanceof Template) && !(obj instanceof TypeTemplate)) {
+        RError.err(ErrorType.Error, "Expected name, got keyword " + ((Named) obj).getName(), obj.metadata());
       }
     }
     return super.visit(obj, param);

@@ -21,18 +21,24 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ast.Designator;
-import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
+import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
 final public class RizzlyFile extends Named {
   final public List<Designator> imports = new ArrayList<Designator>();
   final public AstList<Ast> objects = new AstList<Ast>();
 
-  public RizzlyFile(ElementInfo info, String name) {
-    super(info, name);
+  public RizzlyFile(String name) {
+    setName(name);
+  }
+
+  @Deprecated
+  public RizzlyFile(MetaList info, String name) {
+    metadata().add(info);
+    setName(name);
   }
 
   @Override

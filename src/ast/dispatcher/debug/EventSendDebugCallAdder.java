@@ -22,13 +22,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ast.Designator;
-import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.expression.value.NumberValue;
 import ast.data.function.Function;
 import ast.data.function.header.FuncProcedure;
 import ast.data.function.header.FuncQuery;
-import ast.data.function.header.FuncSignal;
+import ast.data.function.header.Signal;
 import ast.data.reference.RefFactory;
 import ast.data.reference.Reference;
 import ast.data.statement.Block;
@@ -70,7 +69,6 @@ class StmtTraverser extends DfsTraverser<Void, List<Statement>> {
 
   private FuncProcedure debugSend;
   private ArrayList<String> names;
-  static private ElementInfo info = ElementInfo.NO;
 
   public StmtTraverser(FuncProcedure debugSend, ArrayList<String> names) {
     super();
@@ -92,7 +90,7 @@ class StmtTraverser extends DfsTraverser<Void, List<Statement>> {
 
   @Override
   protected Void visitMsgPush(MsgPush obj, List<Statement> param) {
-    RError.err(ErrorType.Fatal, obj.getInfo(), "Debug events not yet implemented for queued connections");
+    RError.err(ErrorType.Fatal, "Debug events not yet implemented for queued connections", obj.metadata());
     return null;
   }
 
@@ -100,10 +98,10 @@ class StmtTraverser extends DfsTraverser<Void, List<Statement>> {
   protected Void visitReference(Reference obj, List<Statement> param) {
     super.visitReference(obj, param);
 
-    boolean isOut = (obj.link instanceof FuncQuery) || (obj.link instanceof FuncSignal);
+    boolean isOut = (obj.link instanceof FuncQuery) || (obj.link instanceof Signal);
 
     if (isOut) {
-      String funcName = obj.link.name;
+      String funcName = obj.link.getName();
 
       int numFunc = names.indexOf(funcName);
       if (numFunc >= 0) {
@@ -119,8 +117,8 @@ class StmtTraverser extends DfsTraverser<Void, List<Statement>> {
 
   private CallStmt makeCall(FuncProcedure func, int numFunc) {
     // Self._sendMsg( numFunc );
-    NumberValue arg = new NumberValue(info, BigInteger.valueOf(numFunc));
-    Reference call = RefFactory.call(info, func, arg);
-    return new CallStmt(info, call);
+    NumberValue arg = new NumberValue(BigInteger.valueOf(numFunc));
+    Reference call = RefFactory.call(func, arg);
+    return new CallStmt(call);
   }
 }

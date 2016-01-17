@@ -17,22 +17,19 @@
 
 package ast.data.expression.value;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.expression.Expression;
 import ast.visitor.Visitor;
 
-final public class TupleValue extends ValueExpr {
+public class TupleValue extends ValueExpr {
   final public AstList<Expression> value; // TODO change to ValueExpr
 
-  public TupleValue(ElementInfo info, AstList<Expression> value) {
-    super(info);
+  public TupleValue(AstList<Expression> value) {
     assert (value != null);
     this.value = value;
   }
 
-  public TupleValue(ElementInfo info) {
-    super(info);
+  public TupleValue() {
     this.value = new AstList<Expression>();
   }
 

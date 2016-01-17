@@ -28,7 +28,7 @@ import ast.data.component.hfsm.Transition;
 import ast.data.function.header.FuncFunction;
 import ast.data.function.header.FuncProcedure;
 import ast.data.function.header.FuncResponse;
-import ast.data.function.header.FuncSlot;
+import ast.data.function.header.Slot;
 import ast.data.variable.StateVariable;
 import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowledgeBase;
@@ -83,8 +83,8 @@ class HfsmModelCheckerWorker extends NullDispatcher<Void, Void> {
   @Override
   protected Void visitTransition(Transition obj, Void param) {
     // TODO check that guard does not write state
-    if (!(obj.eventFunc.getTarget() instanceof FuncSlot)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "transition can only be triggered by slot");
+    if (!(obj.eventFunc.getTarget() instanceof Slot)) {
+      RError.err(ErrorType.Error, "transition can only be triggered by slot", obj.metadata());
     }
     return null;
   }

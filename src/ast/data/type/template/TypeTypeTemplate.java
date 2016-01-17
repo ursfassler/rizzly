@@ -17,13 +17,12 @@
 
 package ast.data.type.template;
 
-import ast.ElementInfo;
 import ast.visitor.Visitor;
 
 final public class TypeTypeTemplate extends TypeTemplate {
 
   public TypeTypeTemplate() {
-    super(ElementInfo.NO, "TypeTypeTemplate");
+    super("TypeTypeTemplate");
   }
 
   @Override

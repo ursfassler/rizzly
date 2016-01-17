@@ -17,15 +17,20 @@
 
 package ast.data.statement;
 
-import ast.ElementInfo;
 import ast.data.Range;
+import ast.meta.SourcePosition;
 import ast.visitor.Visitor;
 
 final public class CaseOptSimple extends CaseOptEntry {
   public Range value;
 
-  public CaseOptSimple(ElementInfo info, Range value) {
-    super(info);
+  public CaseOptSimple(Range value) {
+    this.value = value;
+  }
+
+  @Deprecated
+  public CaseOptSimple(SourcePosition info, Range value) {
+    metadata().add(info);
     this.value = value;
   }
 

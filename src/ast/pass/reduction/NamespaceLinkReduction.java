@@ -22,7 +22,7 @@ import ast.data.Ast;
 import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.file.RizzlyFile;
-import ast.data.reference.DummyLinkTarget;
+import ast.data.reference.LinkTarget;
 import ast.data.reference.RefName;
 import ast.data.reference.Reference;
 import ast.dispatcher.DfsTraverser;
@@ -61,12 +61,12 @@ class NamespaceLinkReductionWorker extends DfsTraverser<Void, Void> {
   @Override
   protected Void visitReference(Reference obj, Void param) {
     Ast item = obj.link;
-    assert (!(item instanceof DummyLinkTarget));
+    assert (!(item instanceof LinkTarget));
     while (item instanceof Namespace) {
       ast.data.reference.RefItem next = obj.offset.get(0);
       obj.offset.remove(0);
       if (!(next instanceof RefName)) {
-        RError.err(ErrorType.Error, obj.getInfo(), "Expected named offset, got: " + next.getClass().getCanonicalName());
+        RError.err(ErrorType.Error, "Expected named offset, got: " + next.getClass().getCanonicalName(), obj.metadata());
       }
       ast.data.reference.RefName name = (ast.data.reference.RefName) next;
       Ast find = NameFilter.select(((ast.data.Namespace) item).children, name.name);
@@ -76,10 +76,10 @@ class NamespaceLinkReductionWorker extends DfsTraverser<Void, Void> {
       ast.data.reference.RefItem next = obj.offset.get(0);
       obj.offset.remove(0);
       if (!(next instanceof RefName)) {
-        RError.err(ErrorType.Error, obj.getInfo(), "Expected named offset, got: " + next.getClass().getCanonicalName());
+        RError.err(ErrorType.Error, "Expected named offset, got: " + next.getClass().getCanonicalName(), obj.metadata());
       }
       ast.data.reference.RefName name = (ast.data.reference.RefName) next;
-      item = Single.staticForce(ChildCollector.select(item, new HasName(name.name)), item.getInfo());
+      item = Single.staticForce(ChildCollector.select(item, new HasName(name.name)), item.metadata());
       assert (item != null); // type checker should find it?
     }
     obj.link = (Named) item;

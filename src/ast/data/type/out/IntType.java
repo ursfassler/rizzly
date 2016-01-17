@@ -17,14 +17,13 @@
 
 package ast.data.type.out;
 
-import ast.ElementInfo;
 import ast.data.type.base.BaseType;
 
 abstract public class IntType extends BaseType {
   final public int bytes;
 
-  public IntType(ElementInfo info, String name, int bytes) {
-    super(info, name);
+  public IntType(String name, int bytes) {
+    super(name);
     this.bytes = bytes;
   }
 

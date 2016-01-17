@@ -19,11 +19,10 @@ package ast.pass.others;
 
 import main.Configuration;
 import ast.Designator;
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.expression.Expression;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.expression.TypeCast;
 import ast.data.expression.binop.LessEqual;
 import ast.data.expression.binop.LogicAnd;
@@ -31,22 +30,23 @@ import ast.data.expression.binop.Relation;
 import ast.data.expression.value.NumberValue;
 import ast.data.function.Function;
 import ast.data.function.header.FuncFunction;
-import ast.data.function.ret.FuncReturnType;
+import ast.data.function.ret.FunctionReturnType;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefFactory;
 import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
+import ast.data.statement.ExpressionReturn;
 import ast.data.statement.IfOption;
-import ast.data.statement.IfStmt;
-import ast.data.statement.ReturnExpr;
+import ast.data.statement.IfStatement;
 import ast.data.type.Type;
 import ast.data.type.TypeRefFactory;
 import ast.data.type.base.RangeType;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowLlvmLibrary;
 import ast.knowledge.KnowledgeBase;
+import ast.meta.SourcePosition;
 import ast.pass.AstPass;
 import ast.repository.manipulator.RepoAdder;
 import ast.repository.manipulator.TypeRepo;
@@ -98,18 +98,18 @@ class IntroduceConvertWorker extends DfsTraverser<Void, Void> {
   }
 
   private Function getConvertFunc(Type resType) {
-    String name = CONVERT_PREFIX + resType.name;
+    String name = CONVERT_PREFIX + resType.getName();
 
     Function ret = (Function) ra.find(name);
     if (ret == null) {
       if (resType instanceof RangeType) {
         ret = makeConvertRange((RangeType) resType);
       } else {
-        RError.err(ErrorType.Fatal, "Unknown convert target: " + resType.name);
+        RError.err(ErrorType.Fatal, "Unknown convert target: " + resType.getName());
         return null;
       }
       assert (ret != null);
-      assert (name.equals(ret.name));
+      assert (name.equals(ret.getName()));
       ra.add(ret);
     }
 
@@ -120,27 +120,27 @@ class IntroduceConvertWorker extends DfsTraverser<Void, Void> {
   }
 
   private FuncFunction makeConvertRange(RangeType resType) {
-    String name = CONVERT_PREFIX + resType.name;
-    ElementInfo info = new ElementInfo(name, 0, 0);
+    String name = CONVERT_PREFIX + resType.getName();
+    SourcePosition info = new SourcePosition(name, 0, 0); // TODO use for everything
 
-    Block body = new Block(info);
-    FuncVariable value = new FuncVariable(info, "value", TypeRefFactory.create(info, kbi.getIntegerType()));
+    Block body = new Block();
+    FunctionVariable value = new FunctionVariable("value", TypeRefFactory.create(kbi.getIntegerType()));
 
-    Block ok = new Block(info);
-    Block error = new Block(info);
+    Block ok = new Block();
+    Block error = new Block();
     AstList<IfOption> option = new AstList<IfOption>();
 
     { // test
-      Relation aboveLower = new LessEqual(info, new NumberValue(info, resType.range.low), new RefExp(info, RefFactory.full(info, value)));
-      Relation belowHigher = new LessEqual(info, new RefExp(info, RefFactory.full(info, value)), new NumberValue(info, resType.range.high));
-      Expression cond = new LogicAnd(info, aboveLower, belowHigher);
-      IfOption opt = new IfOption(info, cond, ok);
+      Relation aboveLower = new LessEqual(new NumberValue(resType.range.low), new ReferenceExpression(RefFactory.full(value)));
+      Relation belowHigher = new LessEqual(new ReferenceExpression(RefFactory.full(value)), new NumberValue(resType.range.high));
+      Expression cond = new LogicAnd(aboveLower, belowHigher);
+      IfOption opt = new IfOption(cond, ok);
       option.add(opt);
     }
 
     { // ok, cast
-      TypeCast cast = new TypeCast(info, TypeRefFactory.create(info, resType), new RefExp(info, RefFactory.full(info, value)));
-      ReturnExpr ret = new ReturnExpr(info, cast);
+      TypeCast cast = new TypeCast(TypeRefFactory.create(resType), new ReferenceExpression(RefFactory.full(value)));
+      ExpressionReturn ret = new ExpressionReturn(cast);
       ok.statements.add(ret);
     }
 
@@ -148,19 +148,19 @@ class IntroduceConvertWorker extends DfsTraverser<Void, Void> {
       // TODO how to trap or exception throwing?
       // TODO insert call to debug output with error message
       // TODO throw exception
-      Reference call = RefFactory.call(info, kll.getTrap());
-      ReturnExpr trap = new ReturnExpr(info, new NumberValue(info, resType.range.low));
+      Reference call = RefFactory.call(kll.getTrap());
+      ExpressionReturn trap = new ExpressionReturn(new NumberValue(resType.range.low));
 
-      error.statements.add(new CallStmt(info, call));
+      error.statements.add(new CallStmt(call));
       error.statements.add(trap);
     }
 
-    IfStmt ifstmt = new IfStmt(info, option, error);
+    IfStatement ifstmt = new IfStatement(option, error);
     body.statements.add(ifstmt);
 
-    AstList<FuncVariable> param = new AstList<FuncVariable>();
+    AstList<FunctionVariable> param = new AstList<FunctionVariable>();
     param.add(value);
-    FuncFunction ret = new FuncFunction(info, name, param, new FuncReturnType(info, TypeRefFactory.create(info, resType)), body);
+    FuncFunction ret = new FuncFunction(name, param, new FunctionReturnType(TypeRefFactory.create(resType)), body);
 
     return ret;
   }

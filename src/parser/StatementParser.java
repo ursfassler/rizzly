@@ -19,13 +19,11 @@ package parser;
 
 import parser.scanner.Token;
 import parser.scanner.TokenType;
-import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.data.AstList;
 import ast.data.expression.Expression;
 import ast.data.expression.value.AnyValue;
 import ast.data.reference.Reference;
-import ast.data.statement.AssignmentMulti;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.CaseOpt;
@@ -33,16 +31,18 @@ import ast.data.statement.CaseOptEntry;
 import ast.data.statement.CaseOptRange;
 import ast.data.statement.CaseOptValue;
 import ast.data.statement.CaseStmt;
+import ast.data.statement.ExpressionReturn;
 import ast.data.statement.ForStmt;
 import ast.data.statement.IfOption;
-import ast.data.statement.IfStmt;
-import ast.data.statement.ReturnExpr;
-import ast.data.statement.ReturnVoid;
+import ast.data.statement.IfStatement;
+import ast.data.statement.MultiAssignment;
 import ast.data.statement.Statement;
 import ast.data.statement.VarDefInitStmt;
+import ast.data.statement.VoidReturn;
 import ast.data.statement.WhileStmt;
-import ast.data.type.TypeRef;
-import ast.data.variable.FuncVariable;
+import ast.data.type.TypeReference;
+import ast.data.variable.FunctionVariable;
+import ast.meta.MetaList;
 import error.ErrorType;
 import error.RError;
 
@@ -55,7 +55,8 @@ public class StatementParser extends BaseParser {
   // EBNF block: { ( return | vardeclstmt | assignment | callstmt | ifstmt |
   // whilestmt | casestmt | forstmt ) }
   public Block parseBlock() {
-    Block res = new Block(peek().getInfo());
+    Block res = new Block();
+    res.metadata().add(peek().getMetadata());
     while (true) {
       switch (peek().getType()) {
         case RETURN:
@@ -84,30 +85,34 @@ public class StatementParser extends BaseParser {
 
   // EBNF vardefstmt: lhs ":" ref [ "=" expr ] ";"
   private VarDefInitStmt parseVarDefStmt(AstList<Reference> lhs) {
-    ElementInfo info = expect(TokenType.COLON).getInfo();
-    TypeRef type = expr().parseRefType();
+    MetaList info = expect(TokenType.COLON).getMetadata();
+    TypeReference type = expr().parseRefType();
 
     Expression initial;
     if (consumeIfEqual(TokenType.EQUAL)) {
       initial = expr().parse();
     } else {
-      initial = new AnyValue(info);
+      initial = new AnyValue();
+      initial.metadata().add(info);
     }
 
     expect(TokenType.SEMI);
 
-    AstList<FuncVariable> variables = new AstList<FuncVariable>();
+    AstList<FunctionVariable> variables = new AstList<FunctionVariable>();
     for (Reference ref : lhs) {
       if (!ref.offset.isEmpty()) {
-        RError.err(ErrorType.Error, ref.getInfo(), "expected identifier");
+        RError.err(ErrorType.Error, "expected identifier", ref.metadata());
       }
 
-      TypeRef ntype = Copy.copy(type);
-      ast.data.variable.FuncVariable var = new FuncVariable(ref.getInfo(), ref.link.name, ntype);
+      TypeReference ntype = Copy.copy(type);
+      FunctionVariable var = new FunctionVariable(ref.link.getName(), ntype);
+      var.metadata().add(ref.metadata());
       variables.add(var);
     }
 
-    return new VarDefInitStmt(info, variables, initial);
+    VarDefInitStmt stmt = new VarDefInitStmt(variables, initial);
+    stmt.metadata().add(info);
+    return stmt;
   }
 
   // EBNF casestmt: "case" expression "of" caseopt { caseopt } [ "else" block
@@ -129,11 +134,13 @@ public class StatementParser extends BaseParser {
       block = parseBlock();
       expect(TokenType.END);
     } else {
-      block = new Block(tok.getInfo());
+      block = new Block();
+      block.metadata().add(tok.getMetadata());
     }
     expect(TokenType.END);
 
-    CaseStmt stmt = new CaseStmt(tok.getInfo(), cond, optlist, block);
+    CaseStmt stmt = new CaseStmt(cond, optlist, block);
+    stmt.metadata().add(tok.getMetadata());
     return stmt;
   }
 
@@ -143,10 +150,12 @@ public class StatementParser extends BaseParser {
     do {
       optval.add(parseCaseoptval());
     } while (consumeIfEqual(TokenType.COMMA));
-    ElementInfo info = expect(TokenType.COLON).getInfo();
+    MetaList info = expect(TokenType.COLON).getMetadata();
     Block block = parseBlock();
     expect(TokenType.END);
-    return new CaseOpt(info, optval, block);
+    CaseOpt caseOpt = new CaseOpt(optval, block);
+    caseOpt.metadata().add(info);
+    return caseOpt;
   }
 
   // EBNF caseoptval: expr | expr ".." expr
@@ -154,9 +163,9 @@ public class StatementParser extends BaseParser {
     Expression start = expr().parse();
     if (consumeIfEqual(TokenType.RANGE)) {
       Expression end = expr().parse();
-      return new CaseOptRange(start.getInfo(), start, end);
+      return new CaseOptRange(start.metadata(), start, end);
     } else {
-      return new CaseOptValue(start.getInfo(), start);
+      return new CaseOptValue(start.metadata(), start);
     }
   }
 
@@ -169,7 +178,8 @@ public class StatementParser extends BaseParser {
     Block block = parseBlock();
     expect(TokenType.END);
 
-    ast.data.statement.WhileStmt stmt = new WhileStmt(tok.getInfo(), cond, block);
+    WhileStmt stmt = new WhileStmt(cond, block);
+    stmt.metadata().add(tok.getMetadata());
     return stmt;
   }
 
@@ -179,16 +189,19 @@ public class StatementParser extends BaseParser {
 
     String name = expect(TokenType.IDENTIFIER).getData();
     expect(TokenType.IN);
-    TypeRef type = expr().parseRefType();
+    TypeReference type = expr().parseRefType();
     expect(TokenType.DO);
     Block block = parseBlock();
     expect(TokenType.END);
 
-    FuncVariable var = new FuncVariable(tok.getInfo(), name, type);
+    FunctionVariable var = new FunctionVariable(name, type);
+    var.metadata().add(tok.getMetadata());
 
-    RError.err(ErrorType.Warning, tok.getInfo(), "for loop is very experimental");
+    RError.err(ErrorType.Warning, "for loop is very experimental", tok.getMetadata());
 
-    return new ForStmt(tok.getInfo(), var, block);
+    ForStmt stmt = new ForStmt(var, block);
+    stmt.metadata().add(tok.getMetadata());
+    return stmt;
   }
 
   // EBNF ifstmt: "if" expression "then" block { "ef" expression "then" block }
@@ -196,20 +209,25 @@ public class StatementParser extends BaseParser {
   private Statement parseIf() {
     Token tok = expect(TokenType.IF);
 
-    ast.data.statement.IfStmt stmt = new IfStmt(tok.getInfo());
+    IfStatement stmt = new IfStatement();
+    stmt.metadata().add(tok.getMetadata());
 
     {
       Expression expr = expr().parse();
       expect(TokenType.THEN);
       Block block = parseBlock();
-      stmt.option.add(new IfOption(expr.getInfo(), expr, block));
+      IfOption ifopt = new IfOption(expr, block);
+      ifopt.metadata().add(expr.metadata());
+      stmt.option.add(ifopt);
     }
 
     while (consumeIfEqual(TokenType.EF)) {
       Expression expr = expr().parse();
       expect(TokenType.THEN);
       Block block = parseBlock();
-      stmt.option.add(new IfOption(expr.getInfo(), expr, block));
+      IfOption ifopt = new IfOption(expr, block);
+      ifopt.metadata().add(expr.metadata());
+      stmt.option.add(ifopt);
     }
 
     while (consumeIfEqual(TokenType.ELSE)) {
@@ -227,10 +245,11 @@ public class StatementParser extends BaseParser {
     Token tok = expect(TokenType.RETURN);
     ast.data.statement.Return ret;
     if (peek().getType() != TokenType.SEMI) {
-      ret = new ReturnExpr(tok.getInfo(), expr().parse());
+      ret = new ExpressionReturn(expr().parse());
     } else {
-      ret = new ReturnVoid(tok.getInfo());
+      ret = new VoidReturn();
     }
+    ret.metadata().add(tok.getMetadata());
     expect(TokenType.SEMI);
     return ret;
   }
@@ -248,10 +267,12 @@ public class StatementParser extends BaseParser {
       case SEMI: {
         assert (lhs.size() == 1);
         tok = next();
-        return new CallStmt(tok.getInfo(), lhs.get(0));
+        CallStmt stmt = new CallStmt(lhs.get(0));
+        stmt.metadata().add(tok.getMetadata());
+        return stmt;
       }
       default: {
-        error.RError.err(ErrorType.Fatal, peek().getInfo(), "Unexpected token: " + tok.getType());
+        error.RError.err(ErrorType.Fatal, "Unexpected token: " + tok.getType(), peek().getMetadata());
         return null;
       }
     }
@@ -267,11 +288,13 @@ public class StatementParser extends BaseParser {
   }
 
   // EBNF assignment: lhs ":=" expr ";"
-  private AssignmentMulti parseAssignment(AstList<Reference> ref) {
+  private MultiAssignment parseAssignment(AstList<Reference> ref) {
     Token tok = expect(TokenType.BECOMES);
     Expression rhs = expr().parse();
     expect(TokenType.SEMI);
-    return new AssignmentMulti(tok.getInfo(), ref, rhs);
+    MultiAssignment stmt = new MultiAssignment(ref, rhs);
+    stmt.metadata().add(tok.getMetadata());
+    return stmt;
   }
 
 }

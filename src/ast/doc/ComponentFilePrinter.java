@@ -148,7 +148,7 @@ public class ComponentFilePrinter {
         body.appendChild(title);
 
         Designator path = kp.get(decl);
-        WorldComp g = CompositionGraphMaker.make(path, decl.name, comp, kb);
+        WorldComp g = CompositionGraphMaker.make(path, decl.getName(), comp, kb);
         Positioning.doPositioning(g);
         CompositionGraphPrinter pr = new CompositionGraphPrinter(doc);
         body.appendChild(pr.makeSvg(g));

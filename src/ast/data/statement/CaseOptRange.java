@@ -17,16 +17,22 @@
 
 package ast.data.statement;
 
-import ast.ElementInfo;
 import ast.data.expression.Expression;
+import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
 final public class CaseOptRange extends CaseOptEntry {
   public Expression start;
   public Expression end;
 
-  public CaseOptRange(ElementInfo info, Expression start, Expression end) {
-    super(info);
+  public CaseOptRange(Expression start, Expression end) {
+    this.start = start;
+    this.end = end;
+  }
+
+  @Deprecated
+  public CaseOptRange(MetaList info, Expression start, Expression end) {
+    metadata().add(info);
     this.start = start;
     this.end = end;
   }

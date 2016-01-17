@@ -47,7 +47,7 @@ class KnowUniqueNameGetter extends DfsTraverser<Void, Void> {
   @Override
   protected Void visit(Ast obj, Void param) {
     if (obj instanceof Named) {
-      String name = ((Named) obj).name;
+      String name = ((Named) obj).getName();
       if (name.startsWith(KnowUniqueName.START) && name.contains(KnowUniqueName.SEP)) {
         String numstr = name.substring(name.indexOf(KnowUniqueName.SEP) + KnowUniqueName.SEP.length());
         int num = Integer.parseInt(numstr);

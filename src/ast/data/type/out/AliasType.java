@@ -17,15 +17,21 @@
 
 package ast.data.type.out;
 
-import ast.ElementInfo;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
 import ast.data.type.base.BaseType;
+import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
 final public class AliasType extends BaseType {
-  public TypeRef ref;
+  public TypeReference ref;
 
-  public AliasType(ElementInfo info, String name, TypeRef ref) {
+  public AliasType(String name, TypeReference ref) {
+    super(name);
+    this.ref = ref;
+  }
+
+  @Deprecated
+  public AliasType(MetaList info, String name, TypeReference ref) {
     super(info, name);
     this.ref = ref;
   }

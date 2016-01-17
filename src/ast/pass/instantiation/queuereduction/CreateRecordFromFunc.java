@@ -28,7 +28,7 @@ import ast.data.function.Function;
 import ast.data.statement.MsgPush;
 import ast.data.type.composed.NamedElement;
 import ast.data.type.composed.RecordType;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.dispatcher.DfsTraverser;
 
 class CreateRecordFromFunc extends DfsTraverser<Void, Void> {
@@ -55,11 +55,11 @@ class CreateRecordFromFunc extends DfsTraverser<Void, Void> {
     String name = Integer.toString(func.hashCode());
 
     AstList<NamedElement> elements = new AstList<NamedElement>();
-    for (FuncVariable arg : func.param) {
-      NamedElement elem = new NamedElement(arg.getInfo(), arg.name, Copy.copy(arg.type));
+    for (FunctionVariable arg : func.param) {
+      NamedElement elem = new NamedElement(arg.metadata(), arg.getName(), Copy.copy(arg.type));
       elements.add(elem);
     }
-    RecordType rec = new RecordType(func.getInfo(), Designator.NAME_SEP + "msg" + Designator.NAME_SEP + name, elements);
+    RecordType rec = new RecordType(func.metadata(), Designator.NAME_SEP + "msg" + Designator.NAME_SEP + name, elements);
 
     getMapping().put(func, rec);
     root.children.add(rec);

@@ -20,12 +20,11 @@ package ast.pass.specializer;
 import java.math.BigInteger;
 import java.util.List;
 
-import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Range;
 import ast.data.expression.Expression;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.expression.TypeCast;
 import ast.data.expression.binop.And;
 import ast.data.expression.binop.Division;
@@ -60,11 +59,12 @@ import ast.data.reference.Reference;
 import ast.data.type.Type;
 import ast.data.type.base.RangeType;
 import ast.data.variable.Constant;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.data.variable.TemplateParameter;
 import ast.dispatcher.NullDispatcher;
 import ast.interpreter.Memory;
 import ast.knowledge.KnowledgeBase;
+import ast.meta.MetaList;
 import error.ErrorType;
 import error.RError;
 
@@ -92,7 +92,7 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
   }
 
   @Override
-  protected ValueExpr visitFuncVariable(FuncVariable obj, Void param) {
+  protected ValueExpr visitFuncVariable(FunctionVariable obj, Void param) {
     assert (memory.contains(obj));
     return memory.get(obj);
   }
@@ -110,7 +110,7 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
 
   @Override
   protected ValueExpr visitType(Type obj, Void param) {
-    RError.err(ErrorType.Error, obj.getInfo(), "Expected value, got type");
+    RError.err(ErrorType.Error, "Expected value, got type", obj.metadata());
     return null;
   }
 
@@ -163,13 +163,15 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
       for (Expression expr : obj.value) {
         list.add(visit(expr, param));
       }
-      return new TupleValue(obj.getInfo(), list);
+      TupleValue ret = new TupleValue(list);
+      ret.metadata().add(obj.metadata());
+      return ret;
     }
   }
 
   @Override
-  protected ValueExpr visitRefExpr(RefExp obj, Void param) {
-    return visit(obj.ref, param);
+  protected ValueExpr visitRefExpr(ReferenceExpression obj, Void param) {
+    return visit(obj.reference, param);
   }
 
   @Override
@@ -190,7 +192,7 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
 
   @Override
   protected ValueExpr visitRefTemplCall(RefTemplCall obj, Void param) {
-    RError.err(ErrorType.Fatal, obj.getInfo(), "reimplement");
+    RError.err(ErrorType.Fatal, "reimplement", obj.metadata());
     // visitExpList(obj.getActualParameter(), param);
     return null;
   }
@@ -200,11 +202,11 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
     throw new RuntimeException("not yet implemented: " + obj.getClass().getCanonicalName());
   }
 
-  private int getInt(ElementInfo info, BigInteger rval) {
+  private int getInt(MetaList info, BigInteger rval) {
     if (rval.compareTo(BigInteger.valueOf(Integer.MAX_VALUE)) > 0) {
-      RError.err(ErrorType.Error, info, "value to big: " + rval.toString());
+      RError.err(ErrorType.Error, "value to big: " + rval.toString(), info);
     } else if (rval.compareTo(BigInteger.valueOf(Integer.MIN_VALUE)) < 0) {
-      RError.err(ErrorType.Error, info, "value to small: " + rval.toString());
+      RError.err(ErrorType.Error, "value to small: " + rval.toString(), info);
     }
     return rval.intValue();
   }
@@ -219,9 +221,11 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
       BigInteger rval = ((NumberValue) right).value;
       BigInteger res;
       res = lval.and(rval);
-      return new NumberValue(obj.getInfo(), res);
+      NumberValue ret = new NumberValue(res);
+      ret.metadata().add(obj.metadata());
+      return ret;
     } else {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      RError.err(ErrorType.Fatal, "Operator for type not yet implemented: " + obj, obj.metadata());
       return null;
     }
   }
@@ -236,9 +240,11 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
       BigInteger rval = ((NumberValue) right).value;
       BigInteger res;
       res = lval.divide(rval);
-      return new NumberValue(obj.getInfo(), res);
+      NumberValue ret = new NumberValue(res);
+      ret.metadata().add(obj.metadata());
+      return ret;
     } else {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      RError.err(ErrorType.Fatal, "Operator for type not yet implemented: " + obj, obj.metadata());
       return null;
     }
   }
@@ -253,9 +259,11 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
       BigInteger rval = ((NumberValue) right).value;
       BigInteger res;
       res = lval.subtract(rval);
-      return new NumberValue(obj.getInfo(), res);
+      NumberValue ret = new NumberValue(res);
+      ret.metadata().add(obj.metadata());
+      return ret;
     } else {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      RError.err(ErrorType.Fatal, "Operator for type not yet implemented: " + obj, obj.metadata());
       return null;
     }
   }
@@ -270,9 +278,11 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
       BigInteger rval = ((NumberValue) right).value;
       BigInteger res;
       res = lval.mod(rval);
-      return new NumberValue(obj.getInfo(), res);
+      NumberValue ret = new NumberValue(res);
+      ret.metadata().add(obj.metadata());
+      return ret;
     } else {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      RError.err(ErrorType.Fatal, "Operator for type not yet implemented: " + obj, obj.metadata());
       return null;
     }
   }
@@ -287,9 +297,11 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
       BigInteger rval = ((NumberValue) right).value;
       BigInteger res;
       res = lval.multiply(rval);
-      return new NumberValue(obj.getInfo(), res);
+      NumberValue ret = new NumberValue(res);
+      ret.metadata().add(obj.metadata());
+      return ret;
     } else {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      RError.err(ErrorType.Fatal, "Operator for type not yet implemented: " + obj, obj.metadata());
       return null;
     }
   }
@@ -304,9 +316,11 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
       BigInteger rval = ((NumberValue) right).value;
       BigInteger res;
       res = lval.or(rval);
-      return new NumberValue(obj.getInfo(), res);
+      NumberValue ret = new NumberValue(res);
+      ret.metadata().add(obj.metadata());
+      return ret;
     } else {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      RError.err(ErrorType.Fatal, "Operator for type not yet implemented: " + obj, obj.metadata());
       return null;
     }
   }
@@ -321,9 +335,11 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
       BigInteger rval = ((NumberValue) right).value;
       BigInteger res;
       res = lval.add(rval);
-      return new NumberValue(obj.getInfo(), res);
+      NumberValue ret = new NumberValue(res);
+      ret.metadata().add(obj.metadata());
+      return ret;
     } else {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      RError.err(ErrorType.Fatal, "Operator for type not yet implemented: " + obj, obj.metadata());
       return null;
     }
   }
@@ -337,10 +353,12 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
       BigInteger lval = ((NumberValue) left).value;
       BigInteger rval = ((NumberValue) right).value;
       BigInteger res;
-      res = lval.shiftLeft(getInt(obj.getInfo(), rval));
-      return new NumberValue(obj.getInfo(), res);
+      res = lval.shiftLeft(getInt(obj.metadata(), rval));
+      NumberValue ret = new NumberValue(res);
+      ret.metadata().add(obj.metadata());
+      return ret;
     } else {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      RError.err(ErrorType.Fatal, "Operator for type not yet implemented: " + obj, obj.metadata());
       return null;
     }
   }
@@ -354,10 +372,12 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
       BigInteger lval = ((NumberValue) left).value;
       BigInteger rval = ((NumberValue) right).value;
       BigInteger res;
-      res = lval.shiftRight(getInt(obj.getInfo(), rval));
-      return new NumberValue(obj.getInfo(), res);
+      res = lval.shiftRight(getInt(obj.metadata(), rval));
+      NumberValue ret = new NumberValue(res);
+      ret.metadata().add(obj.metadata());
+      return ret;
     } else {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      RError.err(ErrorType.Fatal, "Operator for type not yet implemented: " + obj, obj.metadata());
       return null;
     }
   }
@@ -371,14 +391,18 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
       BigInteger lval = ((NumberValue) left).value;
       BigInteger rval = ((NumberValue) right).value;
       boolean res = lval.compareTo(rval) == 0;
-      return new BooleanValue(obj.getInfo(), res);
+      BooleanValue ret = new BooleanValue(res);
+      ret.metadata().add(obj.metadata());
+      return ret;
     } else if (areBool(left, right)) {
       boolean lval = ((BooleanValue) left).value;
       boolean rval = ((BooleanValue) right).value;
       boolean res = lval == rval;
-      return new BooleanValue(obj.getInfo(), res);
+      BooleanValue ret = new BooleanValue(res);
+      ret.metadata().add(obj.metadata());
+      return ret;
     } else {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      RError.err(ErrorType.Fatal, "Operator for type not yet implemented: " + obj, obj.metadata());
       return null;
     }
   }
@@ -400,12 +424,14 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
       BigInteger lval = ((NumberValue) left).value;
       BigInteger rval = ((NumberValue) right).value;
       boolean res = lval.compareTo(rval) > 0;
-      return new BooleanValue(obj.getInfo(), res);
+      BooleanValue ret = new BooleanValue(res);
+      ret.metadata().add(obj.metadata());
+      return ret;
     } else if (areBool(left, right)) {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj);
+      RError.err(ErrorType.Fatal, "Operator not yet implemented: " + obj, obj.metadata());
       return null;
     } else {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      RError.err(ErrorType.Fatal, "Operator for type not yet implemented: " + obj, obj.metadata());
       return null;
     }
   }
@@ -419,12 +445,14 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
       BigInteger lval = ((NumberValue) left).value;
       BigInteger rval = ((NumberValue) right).value;
       boolean res = lval.compareTo(rval) >= 0;
-      return new BooleanValue(obj.getInfo(), res);
+      BooleanValue ret = new BooleanValue(res);
+      ret.metadata().add(obj.metadata());
+      return ret;
     } else if (areBool(left, right)) {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj);
+      RError.err(ErrorType.Fatal, "Operator not yet implemented: " + obj, obj.metadata());
       return null;
     } else {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      RError.err(ErrorType.Fatal, "Operator for type not yet implemented: " + obj, obj.metadata());
       return null;
     }
   }
@@ -438,12 +466,14 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
       BigInteger lval = ((NumberValue) left).value;
       BigInteger rval = ((NumberValue) right).value;
       boolean res = lval.compareTo(rval) < 0;
-      return new BooleanValue(obj.getInfo(), res);
+      BooleanValue ret = new BooleanValue(res);
+      ret.metadata().add(obj.metadata());
+      return ret;
     } else if (areBool(left, right)) {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj);
+      RError.err(ErrorType.Fatal, "Operator not yet implemented: " + obj, obj.metadata());
       return null;
     } else {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      RError.err(ErrorType.Fatal, "Operator for type not yet implemented: " + obj, obj.metadata());
       return null;
     }
   }
@@ -457,12 +487,14 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
       BigInteger lval = ((NumberValue) left).value;
       BigInteger rval = ((NumberValue) right).value;
       boolean res = lval.compareTo(rval) <= 0;
-      return new BooleanValue(obj.getInfo(), res);
+      BooleanValue ret = new BooleanValue(res);
+      ret.metadata().add(obj.metadata());
+      return ret;
     } else if (areBool(left, right)) {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator not yet implemented: " + obj);
+      RError.err(ErrorType.Fatal, "Operator not yet implemented: " + obj, obj.metadata());
       return null;
     } else {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      RError.err(ErrorType.Fatal, "Operator for type not yet implemented: " + obj, obj.metadata());
       return null;
     }
   }
@@ -476,14 +508,18 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
       BigInteger lval = ((NumberValue) left).value;
       BigInteger rval = ((NumberValue) right).value;
       boolean res = lval.compareTo(rval) != 0;
-      return new BooleanValue(obj.getInfo(), res);
+      BooleanValue ret = new BooleanValue(res);
+      ret.metadata().add(obj.metadata());
+      return ret;
     } else if (areBool(left, right)) {
       boolean lval = ((BooleanValue) left).value;
       boolean rval = ((BooleanValue) right).value;
       boolean res = lval != rval;
-      return new BooleanValue(obj.getInfo(), res);
+      BooleanValue ret = new BooleanValue(res);
+      ret.metadata().add(obj.metadata());
+      return ret;
     } else {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Operator for type not yet implemented: " + obj);
+      RError.err(ErrorType.Fatal, "Operator for type not yet implemented: " + obj, obj.metadata());
       return null;
     }
   }
@@ -495,28 +531,32 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
 
   @Override
   protected ValueExpr visitUminus(Uminus obj, Void param) {
-    ValueExpr expr = visit(obj.expr, param);
+    ValueExpr expr = visit(obj.expression, param);
 
     if ((expr instanceof NumberValue)) {
       BigInteger eval = ((NumberValue) expr).value;
       BigInteger res;
 
       res = eval.negate();
-      return new NumberValue(obj.getInfo(), res);
+      NumberValue ret = new NumberValue(res);
+      ret.metadata().add(obj.metadata());
+      return ret;
     } else {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Can not evaluate unary minus on " + expr.getClass().getName());
+      RError.err(ErrorType.Fatal, "Can not evaluate unary minus on " + expr.getClass().getName(), obj.metadata());
       return null;
     }
   }
 
   @Override
   protected ValueExpr visitNot(Not obj, Void param) {
-    ValueExpr expr = visit(obj.expr, param);
+    ValueExpr expr = visit(obj.expression, param);
 
     if ((expr instanceof BooleanValue)) {
-      return new BooleanValue(obj.getInfo(), !((BooleanValue) expr).value);
+      BooleanValue ret = new BooleanValue(!((BooleanValue) expr).value);
+      ret.metadata().add(obj.metadata());
+      return ret;
     } else {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Can not evaluate not on " + expr.getClass().getName());
+      RError.err(ErrorType.Fatal, "Can not evaluate not on " + expr.getClass().getName(), obj.metadata());
       return null;
     }
   }
@@ -534,13 +574,13 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
       BigInteger eval = ((NumberValue) expr).value;
 
       if (!range.contains(eval)) {
-        RError.err(ErrorType.Error, obj.getInfo(), "Value not in range: " + eval + " not in " + range);
+        RError.err(ErrorType.Error, "Value not in range: " + eval + " not in " + range, obj.metadata());
         return null;
       }
 
       return expr;
     } else {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Can not evaluate unary minus on " + expr.getClass().getName());
+      RError.err(ErrorType.Fatal, "Can not evaluate unary minus on " + expr.getClass().getName(), obj.metadata());
       return null;
     }
   }

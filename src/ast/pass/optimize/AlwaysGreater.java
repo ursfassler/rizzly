@@ -86,11 +86,15 @@ class AlwaysGreaterWorker extends ExprReplacer<Void> {
     if ((lr != null) && (rr != null)) {
       if (lr.high.compareTo(rr.low) <= 0) {
         // 0,1 <= 1,257
-        return new BooleanValue(obj.getInfo(), true);
+        BooleanValue ret = new BooleanValue(true);
+        ret.metadata().add(obj.metadata());
+        return ret;
       }
       if (rr.high.compareTo(lr.low) < 0) {
         // 10,20 <= 0,9
-        return new BooleanValue(obj.getInfo(), false);
+        BooleanValue ret = new BooleanValue(false);
+        ret.metadata().add(obj.metadata());
+        return ret;
       }
     }
 

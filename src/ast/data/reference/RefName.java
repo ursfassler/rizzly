@@ -17,14 +17,19 @@
 
 package ast.data.reference;
 
-import ast.ElementInfo;
+import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
 final public class RefName extends RefItem {
   public String name;
 
-  public RefName(ElementInfo info, String name) {
-    super(info);
+  public RefName(String name) {
+    this.name = name;
+  }
+
+  @Deprecated
+  public RefName(MetaList info, String name) {
+    metadata().add(info);
     this.name = name;
   }
 

@@ -22,7 +22,6 @@ import java.util.List;
 import java.util.Set;
 
 import main.Configuration;
-import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.component.hfsm.ImplHfsm;
@@ -30,6 +29,7 @@ import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.Transition;
 import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowledgeBase;
+import ast.meta.MetaList;
 import ast.pass.AstPass;
 import ast.repository.query.Collector;
 import ast.repository.query.TypeFilter;
@@ -89,13 +89,13 @@ class HfsmTransScopeCheckWorker extends NullDispatcher<Set<State>, Void> {
   }
 
   private void checkTransition(Transition trans, Set<State> allowed) {
-    check(trans.src.getTarget(), allowed, trans.getInfo(), "source");
-    check(trans.dst.getTarget(), allowed, trans.getInfo(), "destination");
+    check(trans.src.getTarget(), allowed, trans.metadata(), "source");
+    check(trans.dst.getTarget(), allowed, trans.metadata(), "destination");
   }
 
-  private void check(State state, Set<State> allowed, ElementInfo info, String end) {
+  private void check(State state, Set<State> allowed, MetaList info, String end) {
     if (!allowed.contains(state)) {
-      RError.err(ErrorType.Error, info, "Connection to state which is in outer scope for " + end + " (" + state.name + ")");
+      RError.err(ErrorType.Error, "Connection to state which is in outer scope for " + end + " (" + state.getName() + ")", info);
     }
   }
 }

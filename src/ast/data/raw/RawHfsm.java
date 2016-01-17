@@ -17,14 +17,20 @@
 
 package ast.data.raw;
 
-import ast.ElementInfo;
 import ast.data.component.hfsm.StateComposite;
+import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
 final public class RawHfsm extends RawComponent {
   private StateComposite topstate;
 
-  public RawHfsm(ElementInfo info, String name, StateComposite topState) {
+  public RawHfsm(String name, StateComposite topState) {
+    super(name);
+    topstate = topState;
+  }
+
+  @Deprecated
+  public RawHfsm(MetaList info, String name, StateComposite topState) {
     super(info, name);
     topstate = topState;
   }

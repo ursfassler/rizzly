@@ -17,7 +17,6 @@
 
 package ast.data.expression.binop;
 
-import ast.ElementInfo;
 import ast.data.expression.Expression;
 
 /**
@@ -26,7 +25,7 @@ import ast.data.expression.Expression;
  */
 abstract public class Relation extends BinaryExpression {
 
-  public Relation(ElementInfo info, Expression left, Expression right) {
-    super(info, left, right);
+  public Relation(Expression left, Expression right) {
+    super(left, right);
   }
 }

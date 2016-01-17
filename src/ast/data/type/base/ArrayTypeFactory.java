@@ -19,18 +19,17 @@ package ast.data.type.base;
 
 import java.math.BigInteger;
 
-import ast.ElementInfo;
 import ast.data.reference.RefFactory;
 import ast.data.type.Type;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
 
 public class ArrayTypeFactory {
   static public ArrayType create(BigInteger size, Type type) {
-    return new ArrayType(ElementInfo.NO, makeName(size, type), size, createRef(type));
+    return new ArrayType(makeName(size, type), size, createRef(type));
   }
 
-  private static TypeRef createRef(Type type) {
-    return new TypeRef(ElementInfo.NO, RefFactory.create(ElementInfo.NO, type));
+  private static TypeReference createRef(Type type) {
+    return new TypeReference(RefFactory.create(type));
   }
 
   static public ArrayType create(int size, Type type) {
@@ -38,7 +37,7 @@ public class ArrayTypeFactory {
   }
 
   static public String makeName(BigInteger size, Type type) {
-    return "Array{" + size + "," + type.name + "}";
+    return "Array{" + size + "," + type.getName() + "}";
   }
 
 }

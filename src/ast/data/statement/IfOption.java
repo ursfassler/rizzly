@@ -17,17 +17,15 @@
 
 package ast.data.statement;
 
-import ast.ElementInfo;
 import ast.data.AstBase;
 import ast.data.expression.Expression;
 import ast.visitor.Visitor;
 
-final public class IfOption extends AstBase {
+public class IfOption extends AstBase {
   public Expression condition;
   public Block code;
 
-  public IfOption(ElementInfo info, Expression condition, Block code) {
-    super(info);
+  public IfOption(Expression condition, Block code) {
     this.condition = condition;
     this.code = code;
   }

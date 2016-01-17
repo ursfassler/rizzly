@@ -21,14 +21,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import main.Configuration;
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.component.hfsm.ImplHfsm;
 import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.StateRefFactory;
 import ast.data.component.hfsm.Transition;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.function.header.FuncFunction;
 import ast.data.function.header.FuncProcedure;
 import ast.data.reference.RefFactory;
@@ -76,12 +75,12 @@ public class StateVarReplacer extends AstPass {
     NamedElement elem = stb.traverse(obj.topstate, new AstList<NamedElement>());
     Type stateType = kt.get(elem.typeref);
 
-    obj.topstate.initial = StateRefFactory.create(ElementInfo.NO, InitStateGetter.get(obj.topstate));
+    obj.topstate.initial = StateRefFactory.create(InitStateGetter.get(obj.topstate));
 
     Constant def = stb.getInitVar().get(stateType);
 
     // TODO set correct values when switching states
-    StateVariable var = new StateVariable(ElementInfo.NO, "data", TypeRefFactory.create(ElementInfo.NO, stateType), new RefExp(ElementInfo.NO, RefFactory.full(ElementInfo.NO, def)));
+    StateVariable var = new StateVariable("data", TypeRefFactory.create(stateType), new ReferenceExpression(RefFactory.full(def)));
     obj.topstate.item.add(var);
 
     Map<StateVariable, AstList<NamedElement>> epath = new HashMap<StateVariable, AstList<NamedElement>>(stb.getEpath());
@@ -157,7 +156,7 @@ class StateVarReplacerWorker extends DfsTraverser<Void, Void> {
 
       obj.link = dataVar;
       for (NamedElement itr : eofs) {
-        RefName ref = new RefName(ElementInfo.NO, itr.name);
+        RefName ref = new RefName(itr.getName());
 
         type = rtg.traverse(ref, type); // sanity check
 

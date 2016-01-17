@@ -7,7 +7,7 @@ import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.expression.value.BooleanValue;
 import ast.data.statement.IfOption;
-import ast.data.statement.IfStmt;
+import ast.data.statement.IfStatement;
 import ast.data.statement.Statement;
 import ast.dispatcher.other.StmtReplacer;
 import ast.knowledge.KnowledgeBase;
@@ -29,7 +29,7 @@ public class TautoStmtDel extends AstPass {
 
 class TautoStmtDelWorker extends StmtReplacer<Void> {
   @Override
-  protected List<Statement> visitIfStmt(IfStmt obj, Void param) {
+  protected List<Statement> visitIfStmt(IfStatement obj, Void param) {
     super.visitIfStmt(obj, param);
 
     AstList<IfOption> keep = new AstList<IfOption>();

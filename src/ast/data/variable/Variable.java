@@ -17,21 +17,20 @@
 
 package ast.data.variable;
 
-import ast.ElementInfo;
 import ast.data.Named;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
 
 abstract public class Variable extends Named {
-  public TypeRef type;
+  public TypeReference type;
 
-  public Variable(ElementInfo info, String name, TypeRef type) {
-    super(info, name);
+  public Variable(String name, TypeReference type) {
+    setName(name);
     this.type = type;
   }
 
   @Override
   public String toString() {
-    return name + ":" + type;
+    return getName() + ":" + type;
   }
 
 }

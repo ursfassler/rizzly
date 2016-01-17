@@ -25,7 +25,7 @@ import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
 import ast.data.Namespace;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.expression.TypeCast;
 import ast.data.expression.binop.BinaryExpression;
 import ast.data.expression.binop.BitAnd;
@@ -60,7 +60,7 @@ import ast.data.expression.value.UnionValue;
 import ast.data.expression.value.UnsafeUnionValue;
 import ast.data.function.Function;
 import ast.data.function.ret.FuncReturnNone;
-import ast.data.function.ret.FuncReturnType;
+import ast.data.function.ret.FunctionReturnType;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefName;
@@ -73,13 +73,13 @@ import ast.data.statement.CaseOptRange;
 import ast.data.statement.CaseOptValue;
 import ast.data.statement.CaseStmt;
 import ast.data.statement.IfOption;
-import ast.data.statement.IfStmt;
-import ast.data.statement.ReturnExpr;
-import ast.data.statement.ReturnVoid;
+import ast.data.statement.IfStatement;
+import ast.data.statement.ExpressionReturn;
+import ast.data.statement.VoidReturn;
 import ast.data.statement.VarDefStmt;
 import ast.data.statement.WhileStmt;
 import ast.data.type.Type;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.StringType;
@@ -92,7 +92,7 @@ import ast.data.type.out.SIntType;
 import ast.data.type.out.UIntType;
 import ast.data.type.special.VoidType;
 import ast.data.variable.Constant;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.Variable;
 import ast.dispatcher.NullDispatcher;
@@ -110,7 +110,7 @@ public class CWriter extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    String cfile = kb.getOutDir() + ast.name + ".c";
+    String cfile = kb.getOutDir() + ast.getName() + ".c";
     try {
       CWriterWorker printer = new CWriterWorker(new StreamWriter(new PrintStream(cfile)));
       printer.traverse(ast, null);
@@ -131,7 +131,7 @@ class CWriterWorker extends NullDispatcher<Void, Boolean> {
 
   @Deprecated
   private String name(Named obj) {
-    return obj.name;
+    return obj.getName();
   }
 
   @Override
@@ -287,7 +287,7 @@ class CWriterWorker extends NullDispatcher<Void, Boolean> {
     sw.wr("(");
     sw.wr(exp);
     sw.wr(" ");
-    visit(obj.expr, param);
+    visit(obj.expression, param);
     sw.wr(")");
     return null;
   }
@@ -308,8 +308,8 @@ class CWriterWorker extends NullDispatcher<Void, Boolean> {
   }
 
   @Override
-  protected Void visitRefExpr(RefExp obj, Boolean param) {
-    visit(obj.ref, param);
+  protected Void visitRefExpr(ReferenceExpression obj, Boolean param) {
+    visit(obj.reference, param);
     return null;
   }
 
@@ -351,7 +351,7 @@ class CWriterWorker extends NullDispatcher<Void, Boolean> {
   }
 
   @Override
-  protected Void visitFuncReturnType(FuncReturnType obj, Boolean param) {
+  protected Void visitFuncReturnType(FunctionReturnType obj, Boolean param) {
     visit(obj.type, param);
     return null;
   }
@@ -444,7 +444,7 @@ class CWriterWorker extends NullDispatcher<Void, Boolean> {
   }
 
   @Override
-  protected Void visitFuncVariable(FuncVariable obj, Boolean param) {
+  protected Void visitFuncVariable(FunctionVariable obj, Boolean param) {
     visit(obj.type, param);
     sw.wr(" ");
     sw.wr(name(obj));
@@ -621,30 +621,30 @@ class CWriterWorker extends NullDispatcher<Void, Boolean> {
   protected Void visitNamedElement(NamedElement obj, Boolean param) {
     visit(obj.typeref, param);
     sw.wr(" ");
-    sw.wr(obj.name);
+    sw.wr(obj.getName());
     sw.wr(";");
     sw.nl();
     return null;
   }
 
   @Override
-  protected Void visitReturnVoid(ReturnVoid obj, Boolean param) {
+  protected Void visitReturnVoid(VoidReturn obj, Boolean param) {
     sw.wr("return;");
     sw.nl();
     return null;
   }
 
   @Override
-  protected Void visitReturnExpr(ReturnExpr obj, Boolean param) {
+  protected Void visitReturnExpr(ExpressionReturn obj, Boolean param) {
     sw.wr("return ");
-    visit(obj.expr, param);
+    visit(obj.expression, param);
     sw.wr(";");
     sw.nl();
     return null;
   }
 
   @Override
-  protected Void visitIfStmt(IfStmt obj, Boolean param) {
+  protected Void visitIfStmt(IfStatement obj, Boolean param) {
     boolean first = true;
 
     for (IfOption opt : obj.option) {
@@ -831,7 +831,7 @@ class CWriterWorker extends NullDispatcher<Void, Boolean> {
   }
 
   @Override
-  protected Void visitTypeRef(TypeRef obj, Boolean param) {
+  protected Void visitTypeRef(TypeReference obj, Boolean param) {
     visit(obj.ref, param);
     return null;
   }

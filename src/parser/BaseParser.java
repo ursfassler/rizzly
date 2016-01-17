@@ -26,7 +26,6 @@ import parser.expression.ExpressionParser;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
 import util.Pair;
-import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.data.AstList;
 import ast.data.expression.Expression;
@@ -34,18 +33,20 @@ import ast.data.function.Function;
 import ast.data.function.FunctionFactory;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FuncReturnTuple;
-import ast.data.function.ret.FuncReturnType;
+import ast.data.function.ret.FunctionReturnType;
 import ast.data.reference.RefFactory;
+import ast.data.reference.Reference;
 import ast.data.statement.Block;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
 import ast.data.type.special.AnyType;
 import ast.data.variable.Constant;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.TemplateParameter;
 import ast.data.variable.Variable;
 import ast.data.variable.VariableFactory;
 import ast.knowledge.KnowFuncType;
+import ast.meta.MetaList;
 import error.ErrorType;
 import error.RError;
 
@@ -79,18 +80,18 @@ public class BaseParser extends Parser {
   protected Function parseFuncDef(TokenType type, String name, boolean neverHasBody) {
     Token next = next();
     if (!type.equals(next.getType())) {
-      RError.err(ErrorType.Error, next.getInfo(), "Found " + next.getType() + ", extected " + type);
+      RError.err(ErrorType.Error, "Found " + next.getType() + ", extected " + type, next.getMetadata());
     }
 
     Class<? extends Function> cl = KnowFuncType.getClassOf(next.getType());
 
-    AstList<FuncVariable> varlist = parseVardefList();
+    AstList<FunctionVariable> varlist = parseVardefList();
 
     ast.data.function.ret.FuncReturn retType;
     if (KnowFuncType.getWithRetval(cl)) {
       retType = parseFuncReturn();
     } else {
-      retType = new FuncReturnNone(ElementInfo.NO);
+      retType = new FuncReturnNone();
     }
 
     Block body;
@@ -99,23 +100,26 @@ public class BaseParser extends Parser {
       expect(TokenType.END);
     } else {
       expect(TokenType.SEMI);
-      body = new Block(peek().getInfo());
+      body = new Block();
+      body.metadata().add(peek().getMetadata());
     }
 
-    return FunctionFactory.create(cl, next.getInfo(), name, varlist, retType, body);
+    Function function = FunctionFactory.create(cl, name, varlist, retType, body);
+    function.metadata().add(next.getMetadata());
+    return function;
   }
 
   // EBNF: funcReturn: [ ":" ( typeref | vardeflist ) ]
   protected ast.data.function.ret.FuncReturn parseFuncReturn() {
-    ElementInfo info = peek().getInfo();
+    MetaList info = peek().getMetadata();
     if (consumeIfEqual(TokenType.COLON)) {
       if (peek().getType() == TokenType.OPENPAREN) {
         return new FuncReturnTuple(info, parseVardefList());
       } else {
-        return new FuncReturnType(info, expr().parseRefType());
+        return new FunctionReturnType(info, expr().parseRefType());
       }
     } else {
-      return new FuncReturnNone(ElementInfo.NO);
+      return new FuncReturnNone();
     }
   }
 
@@ -129,12 +133,14 @@ public class BaseParser extends Parser {
 
     expect(TokenType.COLON);
 
-    TypeRef type = expr().parseRefType();
+    TypeReference type = expr().parseRefType();
 
     AstList<T> ret = new AstList<T>();
     for (int i = 0; i < names.size(); i++) {
-      TypeRef ntype = Copy.copy(type);
-      ret.add(VariableFactory.create(kind, names.get(i).getInfo(), names.get(i).getData(), ntype));
+      TypeReference ntype = Copy.copy(type);
+      T variable = VariableFactory.create(kind, names.get(i).getData(), ntype);
+      variable.metadata().add(names.get(i).getMetadata());
+      ret.add(variable);
     }
 
     return ret;
@@ -142,10 +148,12 @@ public class BaseParser extends Parser {
 
   // EBNF stateVardef: typeref "=" expr
   public StateVariable parseStateVardef(String name) {
-    TypeRef type = expr().parseRefType();
+    TypeReference type = expr().parseRefType();
     expect(TokenType.EQUAL);
     Expression init = expr().parse();
-    return new StateVariable(type.getInfo(), name, type, init);
+    StateVariable stateVariable = new StateVariable(name, type, init);
+    stateVariable.metadata().add(type.metadata());
+    return stateVariable;
   }
 
   // EBNF objDef: id [ "{" vardef { ";" vardef } "}" ]
@@ -174,12 +182,12 @@ public class BaseParser extends Parser {
   }
 
   // EBNF vardeflist: "(" [ vardef { ";" vardef } ] ")"
-  protected AstList<FuncVariable> parseVardefList() {
-    AstList<FuncVariable> res = new AstList<FuncVariable>();
+  protected AstList<FunctionVariable> parseVardefList() {
+    AstList<FunctionVariable> res = new AstList<FunctionVariable>();
     expect(TokenType.OPENPAREN);
     if (peek().getType() == TokenType.IDENTIFIER) {
       do {
-        List<FuncVariable> list = stmt().parseVarDef(FuncVariable.class);
+        List<FunctionVariable> list = stmt().parseVarDef(FunctionVariable.class);
         res.addAll(list);
       } while (consumeIfEqual(TokenType.SEMI));
     }
@@ -189,17 +197,22 @@ public class BaseParser extends Parser {
 
   // EBNF constdef: "const" [ typeref ] "=" expr
   public <T extends Constant> T parseConstDef(Class<T> kind, String name) {
-    ElementInfo info = expect(TokenType.CONST).getInfo();
-    TypeRef type;
+    MetaList info = expect(TokenType.CONST).getMetadata();
+    TypeReference type;
     if (peek().getType() != TokenType.EQUAL) {
       type = expr().parseRefType();
     } else {
-      type = new TypeRef(info, RefFactory.create(info, AnyType.NAME));
+      Reference ref = RefFactory.create(AnyType.NAME);
+      ref.metadata().add(info);
+      type = new TypeReference(ref);
+      type.metadata().add(info);
     }
     expect(TokenType.EQUAL);
     ast.data.expression.Expression value = expr().parse();
 
-    return VariableFactory.create(kind, info, name, type, value);
+    T variable = VariableFactory.create(kind, name, type, value);
+    variable.metadata().add(info);
+    return variable;
   }
 
 }

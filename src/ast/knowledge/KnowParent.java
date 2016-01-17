@@ -47,7 +47,7 @@ public class KnowParent extends KnowledgeEntry {
       ret = cache.get(obj);
     }
     if (ret == null) {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Object not reachable: " + obj);
+      RError.err(ErrorType.Fatal, "Object not reachable: " + obj, obj.metadata());
     }
     return ret;
   }
@@ -83,9 +83,9 @@ class KnowParentTraverser extends DfsTraverser<Void, Ast> {
     if (cache.containsKey(obj)) {
       if (!(obj instanceof EnumElement)) { // FIXME remove this hack (new enum type system?)
         Ast oldparent = cache.get(obj);
-        RError.err(ErrorType.Hint, "First time was here:  " + getPath(oldparent));
-        RError.err(ErrorType.Hint, "Second time was here: " + getPath(param));
-        RError.err(ErrorType.Fatal, obj.getInfo(), "Same object (" + obj + ") found 2 times");
+        RError.err(ErrorType.Hint, "First time was here:  " + getPath(oldparent), oldparent.metadata());
+        RError.err(ErrorType.Hint, "Second time was here: " + getPath(param), param.metadata());
+        RError.err(ErrorType.Fatal, "Same object (" + obj + ") found 2 times", obj.metadata());
       }
     }
     cache.put(obj, param);

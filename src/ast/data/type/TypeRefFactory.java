@@ -17,11 +17,19 @@
 
 package ast.data.type;
 
-import ast.ElementInfo;
 import ast.data.reference.RefFactory;
+import ast.meta.MetaList;
 
 public class TypeRefFactory {
-  public static TypeRef create(ElementInfo info, Type type) {
-    return new TypeRef(info, RefFactory.create(info, type));
+  @Deprecated
+  public static TypeReference create(MetaList info, Type type) {
+    TypeReference reference = new TypeReference(RefFactory.create(info, type));
+    reference.metadata().add(info);
+    return reference;
+  }
+
+  public static TypeReference create(Type type) {
+    TypeReference reference = new TypeReference(RefFactory.create(type));
+    return reference;
   }
 }

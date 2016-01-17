@@ -17,7 +17,6 @@
 
 package ast.data.expression.binop;
 
-import ast.ElementInfo;
 import ast.data.expression.Expression;
 
 /**
@@ -31,8 +30,7 @@ abstract public class BinaryExpression extends Expression {
 
   abstract public String getOpName();
 
-  public BinaryExpression(ElementInfo info, Expression left, Expression right) {
-    super(info);
+  public BinaryExpression(Expression left, Expression right) {
     this.left = left;
     this.right = right;
   }

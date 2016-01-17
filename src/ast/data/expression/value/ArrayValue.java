@@ -17,7 +17,6 @@
 
 package ast.data.expression.value;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.expression.Expression;
 import ast.visitor.Visitor;
@@ -25,8 +24,7 @@ import ast.visitor.Visitor;
 final public class ArrayValue extends ValueExpr {
   final public AstList<Expression> value;   // TODO change to ValueExpr
 
-  public ArrayValue(ElementInfo info, AstList<Expression> value) {
-    super(info);
+  public ArrayValue(AstList<Expression> value) {
     this.value = value;
   }
 

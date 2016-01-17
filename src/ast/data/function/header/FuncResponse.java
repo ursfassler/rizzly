@@ -17,18 +17,17 @@
 
 package ast.data.function.header;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.component.hfsm.StateContent;
 import ast.data.function.InterfaceFunction;
 import ast.data.function.ret.FuncReturn;
 import ast.data.statement.Block;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.visitor.Visitor;
 
 final public class FuncResponse extends InterfaceFunction implements StateContent {
-  public FuncResponse(ElementInfo info, String name, AstList<FuncVariable> param, FuncReturn ret, Block body) {
-    super(info, name, param, ret, body);
+  public FuncResponse(String name, AstList<FunctionVariable> param, FuncReturn ret, Block body) {
+    super(name, param, ret, body);
   }
 
   @Override

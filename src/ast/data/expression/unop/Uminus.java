@@ -17,7 +17,6 @@
 
 package ast.data.expression.unop;
 
-import ast.ElementInfo;
 import ast.data.expression.Expression;
 import ast.visitor.Visitor;
 
@@ -27,8 +26,8 @@ import ast.visitor.Visitor;
  */
 final public class Uminus extends UnaryExp {
 
-  public Uminus(ElementInfo info, Expression expr) {
-    super(info, expr);
+  public Uminus(Expression expr) {
+    super(expr);
   }
 
   @Override

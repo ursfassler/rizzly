@@ -19,20 +19,28 @@ package ast.data.template;
 
 import java.util.List;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.Named;
 import ast.data.component.hfsm.StateContent;
 import ast.data.variable.TemplateParameter;
+import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
 //TODO do we need anonymous templates? it is easier if they are named.
-final public class Template extends Named implements StateContent {
+public class Template extends Named implements StateContent {
   private final AstList<TemplateParameter> templ = new AstList<TemplateParameter>();
   private final Named object;
 
-  public Template(ElementInfo info, String name, List<TemplateParameter> genpam, Named object) {
-    super(info, name);
+  public Template(String name, List<TemplateParameter> genpam, Named object) {
+    setName(name);
+    this.templ.addAll(genpam);
+    this.object = object;
+  }
+
+  @Deprecated
+  public Template(MetaList info, String name, List<TemplateParameter> genpam, Named object) {
+    metadata().add(info);
+    setName(name);
     this.templ.addAll(genpam);
     this.object = object;
   }
@@ -47,7 +55,7 @@ final public class Template extends Named implements StateContent {
 
   @Override
   public String toString() {
-    return name + templ.toString();
+    return getName() + templ.toString();
   }
 
   @Override

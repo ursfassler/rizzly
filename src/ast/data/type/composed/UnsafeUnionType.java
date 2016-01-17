@@ -17,18 +17,17 @@
 
 package ast.data.type.composed;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.visitor.Visitor;
 
 final public class UnsafeUnionType extends NamedElementType {
 
-  public UnsafeUnionType(ElementInfo info, String name, AstList<NamedElement> element) {
-    super(info, name, element);
+  public UnsafeUnionType(String name, AstList<NamedElement> element) {
+    super(name, element);
   }
 
-  public UnsafeUnionType(ElementInfo info, String name) {
-    super(info, name);
+  public UnsafeUnionType(String name) {
+    super(name);
   }
 
   @Override

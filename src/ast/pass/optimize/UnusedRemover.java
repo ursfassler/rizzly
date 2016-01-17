@@ -48,7 +48,7 @@ public class UnusedRemover extends AstPass {
 
   @Override
   public void process(Namespace root, KnowledgeBase kb) {
-    CompUse rootcomp = Single.staticForce(TypeFilter.select(root.children, CompUse.class), root.getInfo());
+    CompUse rootcomp = Single.staticForce(TypeFilter.select(root.children, CompUse.class), root.metadata());
     SimpleGraph<Ast> g = DepGraph.build(rootcomp);
 
     Set<Ast> keep = g.vertexSet();
@@ -85,7 +85,7 @@ class UnusedRemoverWorker extends DfsTraverser<Void, Void> {
   protected Void visit(Ast obj, Void param) {
     // TODO fix it
     if (!keep.isSatisfiedBy(obj)) {
-      RError.err(ErrorType.Warning, obj.getInfo(), "Object not removed: " + obj);
+      RError.err(ErrorType.Warning, "Object not removed: " + obj, obj.metadata());
     }
     // RError.ass(keep.isSatisfiedBy(obj), obj.getInfo(), "Object not removed: " + obj);
     return super.visit(obj, param);

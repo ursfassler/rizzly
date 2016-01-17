@@ -19,13 +19,12 @@ package ast.pass.others;
 
 import main.Configuration;
 import util.Pair;
-import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.expression.Expression;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.expression.binop.Equal;
 import ast.data.expression.binop.LogicAnd;
 import ast.data.expression.binop.NotEqual;
@@ -33,15 +32,15 @@ import ast.data.expression.unop.LogicNot;
 import ast.data.expression.value.BooleanValue;
 import ast.data.expression.value.TupleValue;
 import ast.data.function.header.FuncFunction;
-import ast.data.function.ret.FuncReturnType;
+import ast.data.function.ret.FunctionReturnType;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefName;
 import ast.data.reference.Reference;
 import ast.data.statement.Block;
-import ast.data.statement.ReturnExpr;
+import ast.data.statement.ExpressionReturn;
 import ast.data.type.Type;
-import ast.data.type.TypeRef;
 import ast.data.type.TypeRefFactory;
+import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumType;
@@ -50,7 +49,7 @@ import ast.data.type.base.TupleType;
 import ast.data.type.composed.NamedElement;
 import ast.data.type.composed.RecordType;
 import ast.data.type.composed.UnionType;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.dispatcher.NullDispatcher;
 import ast.dispatcher.other.ExprReplacer;
 import ast.knowledge.KnowType;
@@ -98,14 +97,15 @@ class CompareReplacerWorker extends ExprReplacer<Void> {
   @Override
   protected Expression visitNotequal(NotEqual obj, Void param) {
     obj = (NotEqual) super.visitNotequal(obj, param);
-    return new LogicNot(obj.getInfo(), MakeCompareFunction.makeCmpExpr(obj.left, obj.right, kb));
+    LogicNot logicNot = new LogicNot(MakeCompareFunction.makeCmpExpr(obj.left, obj.right, kb));
+    logicNot.metadata().add(obj.metadata());
+    return logicNot;
   }
 
 }
 
 // TODO make this class smarter / cleaner
 class MakeCompareFunction extends NullDispatcher<Expression, Pair<Expression, Expression>> {
-  private static final ElementInfo info = ElementInfo.NO;
   private final KnowType kt;
   private final KnowUniqueName kun;
   private final TypeRepo kbi;
@@ -130,7 +130,7 @@ class MakeCompareFunction extends NullDispatcher<Expression, Pair<Expression, Ex
   }
 
   private Expression make(Reference left, Reference right) {
-    return make(new RefExp(info, left), new RefExp(info, right));
+    return make(new ReferenceExpression(left), new ReferenceExpression(right));
   }
 
   @Override
@@ -140,17 +140,17 @@ class MakeCompareFunction extends NullDispatcher<Expression, Pair<Expression, Ex
 
   @Override
   protected Expression visitEnumType(EnumType obj, Pair<Expression, Expression> param) {
-    return new Equal(info, param.first, param.second);
+    return new Equal(param.first, param.second);
   }
 
   @Override
   protected Expression visitBooleanType(BooleanType obj, Pair<Expression, Expression> param) {
-    return new Equal(info, param.first, param.second);
+    return new Equal(param.first, param.second);
   }
 
   @Override
   protected Expression visitRangeType(RangeType obj, Pair<Expression, Expression> param) {
-    return new Equal(info, param.first, param.second);
+    return new Equal(param.first, param.second);
   }
 
   @Override
@@ -164,62 +164,62 @@ class MakeCompareFunction extends NullDispatcher<Expression, Pair<Expression, Ex
       AstList<Expression> acpar = new AstList<Expression>();
       acpar.addAll(((TupleValue) param.first).value);
       acpar.addAll(((TupleValue) param.second).value);
-      Reference call = RefFactory.call(info, func, acpar);
-      return new RefExp(info, call);
+      Reference call = RefFactory.call(func, acpar);
+      return new ReferenceExpression(call);
     } else if (rt instanceof RecordType) {
       FuncFunction func = makeCompare(lt.types, (RecordType) rt);
       AstList<Expression> acpar = new AstList<Expression>();
       acpar.addAll(((TupleValue) param.first).value);
       acpar.add(param.second);
-      Reference call = RefFactory.call(info, func, acpar);
-      return new RefExp(info, call);
+      Reference call = RefFactory.call(func, acpar);
+      return new ReferenceExpression(call);
     } else {
       throw new RuntimeException("not yet implemented: " + rt.getClass().getCanonicalName());
     }
   }
 
-  private FuncFunction makeCompare(AstList<TypeRef> lt, RecordType rt) {
-    AstList<FuncVariable> param = new AstList<FuncVariable>();
-    AstList<FuncVariable> left = new AstList<FuncVariable>();
-    for (TypeRef rtr : lt) {
+  private FuncFunction makeCompare(AstList<TypeReference> lt, RecordType rt) {
+    AstList<FunctionVariable> param = new AstList<FunctionVariable>();
+    AstList<FunctionVariable> left = new AstList<FunctionVariable>();
+    for (TypeReference rtr : lt) {
       left.add(funcVar("left" + left.size(), Copy.copy(rtr)));
     }
-    FuncVariable right = funcVar("right", rt);
+    FunctionVariable right = funcVar("right", rt);
     param.addAll(left);
     param.add(right);
 
-    Expression expr = new BooleanValue(info, true);
+    Expression expr = new BooleanValue(true);
 
     for (int i = 0; i < rt.element.size(); i++) {
-      Reference leftVal = RefFactory.full(info, left.get(i));
-      Reference rightVal = RefFactory.create(info, right, new RefName(info, rt.element.get(i).name));
+      Reference leftVal = RefFactory.full(left.get(i));
+      Reference rightVal = RefFactory.create(right, new RefName(rt.element.get(i).getName()));
       Expression ac = make(leftVal, rightVal);
-      expr = new LogicAnd(info, expr, ac);
+      expr = new LogicAnd(expr, ac);
     }
 
     return makeFunc(param, expr);
   }
 
-  private FuncFunction makeCompare(AstList<TypeRef> lt, AstList<TypeRef> rt) {
-    AstList<FuncVariable> param = new AstList<FuncVariable>();
-    AstList<FuncVariable> left = new AstList<FuncVariable>();
-    for (TypeRef ltr : lt) {
+  private FuncFunction makeCompare(AstList<TypeReference> lt, AstList<TypeReference> rt) {
+    AstList<FunctionVariable> param = new AstList<FunctionVariable>();
+    AstList<FunctionVariable> left = new AstList<FunctionVariable>();
+    for (TypeReference ltr : lt) {
       left.add(funcVar("left" + left.size(), Copy.copy(ltr)));
     }
-    AstList<FuncVariable> right = new AstList<FuncVariable>();
-    for (TypeRef rtr : rt) {
+    AstList<FunctionVariable> right = new AstList<FunctionVariable>();
+    for (TypeReference rtr : rt) {
       right.add(funcVar("right" + right.size(), Copy.copy(rtr)));
     }
     param.addAll(left);
     param.addAll(right);
 
-    Expression expr = new BooleanValue(info, true);
+    Expression expr = new BooleanValue(true);
 
     for (int i = 0; i < left.size(); i++) {
-      Reference leftVal = RefFactory.full(info, left.get(i));
-      Reference rightVal = RefFactory.full(info, right.get(i));
+      Reference leftVal = RefFactory.full(left.get(i));
+      Reference rightVal = RefFactory.full(right.get(i));
       Expression ac = make(leftVal, rightVal);
-      expr = new LogicAnd(info, expr, ac);
+      expr = new LogicAnd(expr, ac);
     }
 
     return makeFunc(param, expr);
@@ -232,74 +232,74 @@ class MakeCompareFunction extends NullDispatcher<Expression, Pair<Expression, Ex
     if (rt instanceof RecordType) {
       assert (lt == rt);
       FuncFunction func = makeCompare(lt);
-      Reference call = RefFactory.call(info, func, param.first, param.second);
-      return new RefExp(info, call);
+      Reference call = RefFactory.call(func, param.first, param.second);
+      return new ReferenceExpression(call);
     } else if (rt instanceof TupleType) {
       assert (param.second instanceof TupleValue);
       FuncFunction func = makeCompare(lt, ((TupleType) rt).types);
       AstList<Expression> acpar = new AstList<Expression>();
       acpar.add(param.first);
       acpar.addAll(((TupleValue) param.second).value);
-      Reference call = RefFactory.call(info, func, acpar);
-      return new RefExp(info, call);
+      Reference call = RefFactory.call(func, acpar);
+      return new ReferenceExpression(call);
     } else {
       throw new RuntimeException("not yet implemented: " + rt.getClass().getCanonicalName());
     }
   }
 
-  private FuncFunction makeCompare(RecordType lt, AstList<TypeRef> rt) {
-    AstList<FuncVariable> param = new AstList<FuncVariable>();
-    FuncVariable left = funcVar("left", lt);
-    AstList<FuncVariable> right = new AstList<FuncVariable>();
-    for (TypeRef rtr : rt) {
+  private FuncFunction makeCompare(RecordType lt, AstList<TypeReference> rt) {
+    AstList<FunctionVariable> param = new AstList<FunctionVariable>();
+    FunctionVariable left = funcVar("left", lt);
+    AstList<FunctionVariable> right = new AstList<FunctionVariable>();
+    for (TypeReference rtr : rt) {
       right.add(funcVar("right" + right.size(), Copy.copy(rtr)));
     }
     param.add(left);
     param.addAll(right);
 
-    Expression expr = new BooleanValue(info, true);
+    Expression expr = new BooleanValue(true);
 
     for (int i = 0; i < lt.element.size(); i++) {
-      Reference leftVal = RefFactory.create(info, left, new RefName(info, lt.element.get(i).name));
-      Reference rightVal = RefFactory.full(info, right.get(i));
+      Reference leftVal = RefFactory.create(left, new RefName(lt.element.get(i).getName()));
+      Reference rightVal = RefFactory.full(right.get(i));
       Expression ac = make(leftVal, rightVal);
-      expr = new LogicAnd(info, expr, ac);
+      expr = new LogicAnd(expr, ac);
     }
 
     return makeFunc(param, expr);
   }
 
   private FuncFunction makeCompare(RecordType both) {
-    AstList<FuncVariable> param = new AstList<FuncVariable>();
-    FuncVariable left = funcVar("left", both);
-    FuncVariable right = funcVar("right", both);
+    AstList<FunctionVariable> param = new AstList<FunctionVariable>();
+    FunctionVariable left = funcVar("left", both);
+    FunctionVariable right = funcVar("right", both);
     param.add(left);
     param.add(right);
 
-    Expression expr = new BooleanValue(info, true);
+    Expression expr = new BooleanValue(true);
     for (NamedElement itr : both.element) {
-      String name = itr.name;
-      Reference lr = RefFactory.create(info, left, new RefName(info, name));
-      Reference rr = RefFactory.create(info, right, new RefName(info, name));
+      String name = itr.getName();
+      Reference lr = RefFactory.create(left, new RefName(name));
+      Reference rr = RefFactory.create(right, new RefName(name));
       Expression ac = make(lr, rr);
-      expr = new LogicAnd(info, expr, ac);
+      expr = new LogicAnd(expr, ac);
     }
 
     return makeFunc(param, expr);
   }
 
-  private FuncVariable funcVar(String name, RecordType type) {
-    return new FuncVariable(info, name, TypeRefFactory.create(info, type));
+  private FunctionVariable funcVar(String name, RecordType type) {
+    return new FunctionVariable(name, TypeRefFactory.create(type));
   }
 
-  private FuncVariable funcVar(String name, TypeRef type) {
-    return new FuncVariable(info, name, type);
+  private FunctionVariable funcVar(String name, TypeReference type) {
+    return new FunctionVariable(name, type);
   }
 
-  private FuncFunction makeFunc(AstList<FuncVariable> param, Expression expr) {
-    Block body = new Block(info);
-    body.statements.add(new ReturnExpr(info, expr));
-    FuncFunction func = new FuncFunction(info, kun.get("cmp"), param, new FuncReturnType(info, TypeRefFactory.create(info, kbi.getBooleanType())), body);
+  private FuncFunction makeFunc(AstList<FunctionVariable> param, Expression expr) {
+    Block body = new Block();
+    body.statements.add(new ExpressionReturn(expr));
+    FuncFunction func = new FuncFunction(kun.get("cmp"), param, new FunctionReturnType(TypeRefFactory.create(kbi.getBooleanType())), body);
     ra.add(func);
     return func;
   }

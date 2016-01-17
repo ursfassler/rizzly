@@ -20,7 +20,6 @@ package ast.data.type.base;
 import java.util.HashSet;
 import java.util.Set;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.type.Type;
 import ast.visitor.Visitor;
@@ -28,15 +27,15 @@ import ast.visitor.Visitor;
 final public class EnumType extends Type {
   final public AstList<EnumElement> element;
 
-  public EnumType(ElementInfo info, String name, AstList<EnumElement> element) {
-    super(info, name);
+  public EnumType(String name, AstList<EnumElement> element) {
+    super(name);
     this.element = element;
   }
 
   public Set<String> getNames() {
     Set<String> ret = new HashSet<String>();
     for (EnumElement elem : element) {
-      ret.add(elem.name);
+      ret.add(elem.getName());
     }
     return ret;
   }

@@ -17,14 +17,13 @@
 
 package ast.data.expression.unop;
 
-import ast.ElementInfo;
 import ast.data.expression.Expression;
 import ast.visitor.Visitor;
 
 final public class LogicNot extends UnaryExp {
 
-  public LogicNot(ElementInfo info, Expression expr) {
-    super(info, expr);
+  public LogicNot(Expression expr) {
+    super(expr);
   }
 
   @Override

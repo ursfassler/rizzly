@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import main.Configuration;
-import ast.ElementInfo;
 import ast.copy.Relinker;
 import ast.data.Ast;
 import ast.data.AstList;
@@ -146,7 +145,7 @@ class RangeReplacerWorker extends NullDispatcher<Void, Void> {
   private UIntType getUint(int bytes) {
     UIntType ret = unsigned.get(bytes);
     if (ret == null) {
-      ret = new UIntType(ElementInfo.NO, UIntType.makeName(bytes), bytes);
+      ret = new UIntType(UIntType.makeName(bytes), bytes);
       unsigned.put(bytes, ret);
     }
     assert (ret != null);
@@ -156,7 +155,7 @@ class RangeReplacerWorker extends NullDispatcher<Void, Void> {
   private SIntType getSint(int bytes) {
     SIntType ret = signed.get(bytes);
     if (ret == null) {
-      ret = new SIntType(ElementInfo.NO, SIntType.makeName(bytes), bytes);
+      ret = new SIntType(SIntType.makeName(bytes), bytes);
       signed.put(bytes, ret);
     }
     assert (ret != null);

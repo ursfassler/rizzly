@@ -22,7 +22,7 @@ import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.statement.Block;
 import ast.data.statement.IfOption;
-import ast.data.statement.IfStmt;
+import ast.data.statement.IfStatement;
 import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
@@ -48,7 +48,7 @@ public class IfCutter extends AstPass {
 class IfCutterWorker extends DfsTraverser<Void, Void> {
 
   @Override
-  protected Void visitIfStmt(IfStmt obj, Void param) {
+  protected Void visitIfStmt(IfStatement obj, Void param) {
     if (obj.option.size() > 1) {
       int optcount = obj.option.size();
       IfOption first = obj.option.get(0);
@@ -58,8 +58,10 @@ class IfCutterWorker extends DfsTraverser<Void, Void> {
       opt.remove(0);
       assert (obj.option.size() + opt.size() == optcount);
 
-      IfStmt nif = new IfStmt(opt.get(0).getInfo(), opt, obj.defblock);
-      Block newElse = new Block(obj.getInfo());
+      IfStatement nif = new IfStatement(opt, obj.defblock);
+      nif.metadata().add(opt.get(0).metadata());
+      Block newElse = new Block();
+      newElse.metadata().add(obj.metadata());
       newElse.statements.add(nif);
       obj.defblock = newElse;
     }

@@ -22,7 +22,7 @@ import java.math.BigInteger;
 import parser.scanner.Symbol;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
-import ast.ElementInfo;
+import ast.meta.SourcePosition;
 
 /**
  *
@@ -30,21 +30,21 @@ import ast.ElementInfo;
  */
 public class Helper {
   static public Token token(TokenType value, Symbol sym) {
-    return new Token(value, new ElementInfo(sym.filename, sym.line, sym.row));
+    return new Token(value, new SourcePosition(sym.filename, sym.line, sym.row));
   }
 
   static public Token token(TokenType value, String id, Symbol sym) {
-    ElementInfo info = new ElementInfo(sym.filename, sym.line, sym.row);
+    SourcePosition info = new SourcePosition(sym.filename, sym.line, sym.row);
     return new Token(value, id, info);
   }
 
   static public Token token(TokenType value, BigInteger num, Symbol sym) {
-    ElementInfo info = new ElementInfo(sym.filename, sym.line, sym.row);
+    SourcePosition info = new SourcePosition(sym.filename, sym.line, sym.row);
     return new Token(value, num, info);
   }
 
   static public Token specialToken(TokenType value) {
-    return new Token(value, ElementInfo.NO);
+    return new Token(value);
   }
 
   static public boolean isAlphaNummeric(char sym) {

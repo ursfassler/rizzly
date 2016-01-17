@@ -30,7 +30,7 @@ import ast.data.function.Function;
 import ast.data.raw.RawComponent;
 import ast.data.reference.Reference;
 import ast.data.type.Type;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.EnumTypeFactory;
 import ast.data.type.composed.NamedElement;
@@ -87,7 +87,7 @@ public class TypeParser extends BaseParser {
           break;
         }
         default: {
-          RError.err(ErrorType.Error, peek().getInfo(), "expected slot, signal, query or response");
+          RError.err(ErrorType.Error, "expected slot, signal, query or response", peek().getMetadata());
         }
       }
     }
@@ -106,7 +106,7 @@ public class TypeParser extends BaseParser {
       case IDENTIFIER:
         return parseDerivateType(name);
       default:
-        RError.err(ErrorType.Fatal, peek().getInfo(), "Expected record, union or type reference");
+        RError.err(ErrorType.Fatal, "Expected record, union or type reference", peek().getMetadata());
         return null;
     }
 
@@ -116,18 +116,21 @@ public class TypeParser extends BaseParser {
   private AliasType parseDerivateType(String name) {
     Reference ref = expr().parseRef();
     expect(TokenType.SEMI);
-    return new AliasType(ref.getInfo(), name, new TypeRef(ref.getInfo(), ref));
+    TypeReference typeref = new TypeReference(ref);
+    typeref.metadata().add(ref.metadata());
+    return new AliasType(ref.metadata(), name, typeref);
   }
 
   // EBNF recordtype: "Record" { recordElem } "end"
   private Type parseRecordType(String name) {
     Token tok = expect(TokenType.RECORD);
-    ast.data.type.composed.RecordType ret = new RecordType(tok.getInfo(), name);
+    RecordType ret = new RecordType(name);
+    ret.metadata().add(tok.getMetadata());
     while (peek().getType() != TokenType.END) {
       ret.element.addAll(parseRecordElem());
     }
     expect(TokenType.END);
-    RError.err(ErrorType.Warning, tok.getInfo(), "Type checking of records is not yet fully implemented");
+    RError.err(ErrorType.Warning, "Type checking of records is not yet fully implemented", tok.getMetadata());
     return ret;
   }
 
@@ -135,13 +138,14 @@ public class TypeParser extends BaseParser {
   private ast.data.type.Type parseUnionType(String name) {
     Token tok = expect(TokenType.UNION);
 
-    UnsafeUnionType ret = new UnsafeUnionType(tok.getInfo(), name);
+    UnsafeUnionType ret = new UnsafeUnionType(name);
+    ret.metadata().add(tok.getMetadata());
 
     while (peek().getType() != TokenType.END) {
       ret.element.addAll(parseRecordElem());
     }
     expect(TokenType.END);
-    RError.err(ErrorType.Warning, tok.getInfo(), "Unions are probably broken and do not work as intended");
+    RError.err(ErrorType.Warning, "Unions are probably broken and do not work as intended", tok.getMetadata());
     return ret;
   }
 
@@ -149,11 +153,11 @@ public class TypeParser extends BaseParser {
   private ast.data.type.Type parseEnumType(String name) {
     Token tok = expect(TokenType.ENUM);
 
-    ast.data.type.base.EnumType type = EnumTypeFactory.create(tok.getInfo(), name);
+    ast.data.type.base.EnumType type = EnumTypeFactory.create(tok.getMetadata(), name);
 
     while (peek().getType() != TokenType.END) {
       Token elemTok = parseEnumElem();
-      type.element.add(new EnumElement(elemTok.getInfo(), elemTok.getData()));
+      type.element.add(new EnumElement(elemTok.getMetadata(), elemTok.getData()));
     }
 
     expect(TokenType.END);
@@ -167,13 +171,13 @@ public class TypeParser extends BaseParser {
       id.add(expect(TokenType.IDENTIFIER));
     } while (consumeIfEqual(TokenType.COMMA));
     expect(TokenType.COLON);
-    TypeRef type = expr().parseRefType();
+    TypeReference type = expr().parseRefType();
     expect(TokenType.SEMI);
 
     List<NamedElement> res = new ArrayList<NamedElement>(id.size());
     for (Token name : id) {
-      TypeRef ctype = Copy.copy(type);
-      res.add(new NamedElement(name.getInfo(), name.getData(), ctype));
+      TypeReference ctype = Copy.copy(type);
+      res.add(new NamedElement(name.getMetadata(), name.getData(), ctype));
     }
 
     return res;

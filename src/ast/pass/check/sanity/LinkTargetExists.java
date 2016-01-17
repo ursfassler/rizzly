@@ -42,7 +42,7 @@ public class LinkTargetExists extends AstPass {
     Set<Ast> problem = worker.getLonelyTargets();
     if (!problem.isEmpty()) {
       for (Ast itr : problem) {
-        RError.err(ErrorType.Hint, itr.getInfo(), "missing " + itr);
+        RError.err(ErrorType.Hint, "missing " + itr, itr.metadata());
       }
       RError.err(ErrorType.Fatal, "missing link targets found");
     }

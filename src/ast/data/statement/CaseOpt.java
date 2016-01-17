@@ -17,17 +17,23 @@
 
 package ast.data.statement;
 
-import ast.ElementInfo;
 import ast.data.AstBase;
 import ast.data.AstList;
+import ast.meta.SourcePosition;
 import ast.visitor.Visitor;
 
 final public class CaseOpt extends AstBase {
   final public AstList<CaseOptEntry> value;
   public Block code;
 
-  public CaseOpt(ElementInfo info, AstList<CaseOptEntry> value, Block code) {
-    super(info);
+  public CaseOpt(AstList<CaseOptEntry> value, Block code) {
+    this.value = value;
+    this.code = code;
+  }
+
+  @Deprecated
+  public CaseOpt(SourcePosition info, AstList<CaseOptEntry> value, Block code) {
+    metadata().add(info);
     this.value = value;
     this.code = code;
   }

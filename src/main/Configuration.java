@@ -1,6 +1,6 @@
 /**
  *  This file is part of Rizzly.
- * 
+ *
  *  Rizzly is free software: you can redistribute it and/or modify
  *  it under the terms of the GNU General Public License as published by
  *  the Free Software Foundation, either version 3 of the License, or
@@ -23,6 +23,8 @@ public interface Configuration {
 
   public abstract String getRootPath();
 
+  public abstract String getNamespace();
+
   public abstract Designator getRootComp();
 
   public abstract boolean doDebugEvent();
@@ -32,5 +34,7 @@ public interface Configuration {
   public abstract boolean doDocOutput();
 
   public abstract String getExtension();
+
+  public abstract boolean doXml();
 
 }

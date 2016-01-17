@@ -19,25 +19,28 @@ package ast.data.type.base;
 
 import java.util.Set;
 
-import ast.ElementInfo;
 import ast.data.AstList;
+import ast.meta.MetaList;
 
 public class EnumTypeFactory {
 
   static public EnumType create(String name, Set<String> items) {
     EnumType ret = create(name);
     for (String item : items) {
-      ret.element.add(new EnumElement(ElementInfo.NO, item));
+      ret.element.add(new EnumElement(item));
     }
     return ret;
   }
 
-  static public EnumType create(ElementInfo info, String name) {
-    return new EnumType(info, name, new AstList<EnumElement>());
+  @Deprecated
+  static public EnumType create(MetaList info, String name) {
+    EnumType enumType = create(name);
+    enumType.metadata().add(info);
+    return enumType;
   }
 
   public static EnumType create(String name) {
-    return create(ElementInfo.NO, name);
+    return new EnumType(name, new AstList<EnumElement>());
   }
 
 }

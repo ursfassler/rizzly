@@ -26,7 +26,7 @@ import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.expression.Expression;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.expression.value.ArrayValue;
 import ast.data.expression.value.NamedElementsValue;
 import ast.data.expression.value.NamedValue;
@@ -107,10 +107,12 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
         }
       }
       if (!missing.isEmpty()) {
-        RError.err(ErrorType.Error, obj.getInfo(), "Elements not initialized: " + missing);
+        RError.err(ErrorType.Error, "Elements not initialized: " + missing, obj.metadata());
       }
 
-      return new ArrayValue(obj.getInfo(), init);
+      ArrayValue value = new ArrayValue(init);
+      value.metadata().add(obj.metadata());
+      return value;
     } else {
       throw new RuntimeException("not yet implemented: " + param.getClass().getCanonicalName());
     }
@@ -131,9 +133,11 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
     } else if (param instanceof ArrayType) {
       ArrayType at = (ArrayType) param;
       if (obj.value.size() != at.size.intValue()) {
-        RError.err(ErrorType.Error, obj.getInfo(), "Expected " + at.size.toString() + " elements, got " + obj.value.size());
+        RError.err(ErrorType.Error, "Expected " + at.size.toString() + " elements, got " + obj.value.size(), obj.metadata());
       }
-      return new ArrayValue(obj.getInfo(), obj.value);
+      ArrayValue value = new ArrayValue(obj.value);
+      value.metadata().add(obj.metadata());
+      return value;
     } else {
       throw new RuntimeException("not yet implemented: " + param.getClass().getCanonicalName());
     }
@@ -145,27 +149,31 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
       EnumType et = (EnumType) kt.get(((UnionType) type).tag.typeref);
       EnumElement value = (EnumElement) getChild(obj, et);
 
-      NamedValue tag = new NamedValue(obj.getInfo(), ((UnionType) type).tag.name, new RefExp(obj.getInfo(), RefFactory.full(obj.getInfo(), value)));
+      ReferenceExpression ref = new ReferenceExpression(RefFactory.full(obj.metadata(), value));
+      ref.metadata().add(obj.metadata());
+      NamedValue tag = new NamedValue(obj.metadata(), ((UnionType) type).tag.getName(), ref);
 
       Expression ov = obj.value;
       NamedElement elem = (NamedElement) getChild(obj, type);
       ov = visit(ov, kt.get(elem.typeref));
 
-      NamedValue content = new NamedValue(obj.getInfo(), value.name, ov);
+      NamedValue content = new NamedValue(obj.metadata(), value.getName(), ov);
 
-      UnionValue uv = new UnionValue(obj.getInfo(), tag, content, TypeRefFactory.create(obj.getInfo(), type));
+      UnionValue uv = new UnionValue(tag, content, TypeRefFactory.create(obj.metadata(), type));
+      uv.metadata().add(obj.metadata());
       return uv;
     } else if (type instanceof UnsafeUnionType) {
       Expression ov = obj.value;
       NamedElement elem = (NamedElement) getChild(obj, type);
       ov = visit(ov, kt.get(elem.typeref));
 
-      NamedValue content = new NamedValue(obj.getInfo(), elem.name, ov);
+      NamedValue content = new NamedValue(obj.metadata(), elem.getName(), ov);
 
-      UnsafeUnionValue uv = new UnsafeUnionValue(obj.getInfo(), content, TypeRefFactory.create(obj.getInfo(), type));
+      UnsafeUnionValue uv = new UnsafeUnionValue(content, TypeRefFactory.create(obj.metadata(), type));
+      uv.metadata().add(obj.metadata());
       return uv;
     } else if (type instanceof ArrayType) {
-      RError.err(ErrorType.Error, obj.getInfo(), "ArrayType only initializable by TupleValue");
+      RError.err(ErrorType.Error, "ArrayType only initializable by TupleValue", obj.metadata());
       return null;
     } else {
       throw new RuntimeException("not yet implemented: " + type.getClass().getCanonicalName());
@@ -173,7 +181,7 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
   }
 
   private Ast getChild(NamedValue obj, Ast et) {
-    return Single.staticForce(ChildCollector.select(et, new HasName(obj.name)), obj.getInfo());
+    return Single.staticForce(ChildCollector.select(et, new HasName(obj.name)), obj.metadata());
   }
 
   @Override
@@ -194,15 +202,17 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
       for (NamedValue itm : value) {
         Type et = eletype.get(itm.name);
         if (et == null) {
-          RError.err(ErrorType.Error, obj.getInfo(), "Record have no element named " + itm.name);
+          RError.err(ErrorType.Error, "Record have no element named " + itm.name, obj.metadata());
           return null;
         }
         itm.value = visit(itm.value, et);
       }
-      return new RecordValue(obj.getInfo(), value, TypeRefFactory.create(obj.getInfo(), type));
+      RecordValue record = new RecordValue(value, TypeRefFactory.create(obj.metadata(), type));
+      record.metadata().add(obj.metadata());
+      return record;
     } else if ((type instanceof UnionType) || (type instanceof UnsafeUnionType)) {
       if (value.size() != 1) {
-        RError.err(ErrorType.Error, obj.getInfo(), "need exactly one entry for union type, got " + value.size());
+        RError.err(ErrorType.Error, "need exactly one entry for union type, got " + value.size(), obj.metadata());
         return null;
       }
       return visit(value.get(0), type);
@@ -214,8 +224,8 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
   private Map<String, Type> getTypes(AstList<NamedElement> element) {
     Map<String, Type> ret = new HashMap<String, Type>();
     for (NamedElement elem : element) {
-      RError.ass(!ret.containsKey(elem.name), elem.getInfo(), "Entry with name " + elem.name + " already defined");
-      ret.put(elem.name, kt.get(elem.typeref));
+      RError.ass(!ret.containsKey(elem.getName()), elem.metadata(), "Entry with name " + elem.getName() + " already defined");
+      ret.put(elem.getName(), kt.get(elem.typeref));
     }
     return ret;
   }

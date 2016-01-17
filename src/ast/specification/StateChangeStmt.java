@@ -21,7 +21,7 @@ import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.function.Function;
 import ast.data.reference.Reference;
-import ast.data.statement.AssignmentMulti;
+import ast.data.statement.MultiAssignment;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.CallStmt;
 import ast.data.variable.StateVariable;
@@ -51,7 +51,7 @@ class StateChangeDispatcher extends NullDispatcher<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitAssignmentMulti(AssignmentMulti obj, Void param) {
+  protected Boolean visitAssignmentMulti(MultiAssignment obj, Void param) {
     return containsStateVar(obj.left);
   }
 

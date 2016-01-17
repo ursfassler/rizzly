@@ -20,11 +20,10 @@ package ast.pass.instantiation.queuereduction;
 import java.math.BigInteger;
 
 import ast.Designator;
-import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.data.AstList;
 import ast.data.Named;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.expression.binop.Less;
 import ast.data.expression.binop.Modulo;
 import ast.data.expression.binop.Plus;
@@ -39,69 +38,69 @@ import ast.data.reference.Reference;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.IfOption;
-import ast.data.statement.IfStmt;
+import ast.data.statement.IfStatement;
 import ast.data.statement.VarDefStmt;
 import ast.data.type.base.EnumElement;
 import ast.data.type.composed.NamedElement;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
+import ast.meta.MetaList;
 
 class PushFunctionFactory {
-  static public Function create(ElementInfo info, QueueVariables queueVariables, QueueTypes queueTypes, Function func) {
+  static public Function create(MetaList info, QueueVariables queueVariables, QueueTypes queueTypes, Function func) {
     // Designator path = kp.get(func);
     // assert (path.size() > 0);
     // String name = new Designator(path,
     // func.getName()).toString(Designator.NAME_SEP);
-    String name = func.name;
+    String name = func.getName();
 
-    AstList<FuncVariable> param = Copy.copy(func.param);
-    Function impl = new FuncProcedure(info, Designator.NAME_SEP + "push" + Designator.NAME_SEP + name, param, new FuncReturnNone(info), createPushBody(param, queueVariables, queueTypes, queueTypes.getFuncToMsgType().get(func), queueTypes.getFuncToElem().get(func)));
+    AstList<FunctionVariable> param = Copy.copy(func.param);
+    Function impl = new FuncProcedure(Designator.NAME_SEP + "push" + Designator.NAME_SEP + name, param, new FuncReturnNone(info), createPushBody(param, queueVariables, queueTypes, queueTypes.getFuncToMsgType().get(func), queueTypes.getFuncToElem().get(func)));
+    impl.metadata().add(info);
     // impl.properties().put(Property.NAME, Designator.NAME_SEP + "push" +
     // Designator.NAME_SEP + name);
     return impl;
   }
 
-  private static Block createPushBody(AstList<FuncVariable> param, QueueVariables queueVariables, QueueTypes queueTypes, EnumElement enumElement, NamedElement namedElement) {
-    ElementInfo info = ElementInfo.NO;
-
+  private static Block createPushBody(AstList<FunctionVariable> param, QueueVariables queueVariables, QueueTypes queueTypes, EnumElement enumElement, NamedElement namedElement) {
     AstList<IfOption> option = new AstList<IfOption>();
 
-    Block pushbody = new Block(info);
+    Block pushbody = new Block();
 
-    FuncVariable idx = new FuncVariable(info, "wridx", Copy.copy(queueVariables.getHead().type));
-    pushbody.statements.add(new VarDefStmt(info, idx));
-    pushbody.statements.add(new AssignmentSingle(info, ref(idx), new Modulo(info, new Plus(info, refexpr(queueVariables.getHead()), refexpr(queueVariables.getCount())), new NumberValue(info, BigInteger.valueOf(queueTypes.queueLength())))));
+    FunctionVariable idx = new FunctionVariable("wridx", Copy.copy(queueVariables.getHead().type));
+    pushbody.statements.add(new VarDefStmt(idx));
+    pushbody.statements.add(new AssignmentSingle(ref(idx), new Modulo(new Plus(refexpr(queueVariables.getHead()), refexpr(queueVariables.getCount())), new NumberValue(BigInteger.valueOf(queueTypes.queueLength())))));
 
     Reference qir = ref(queueVariables.getQueue());
-    qir.offset.add(new RefIndex(info, refexpr(idx)));
-    qir.offset.add(new RefName(info, queueTypes.getMessage().tag.name));
-    pushbody.statements.add(new AssignmentSingle(info, qir, refexpr(enumElement)));
+    qir.offset.add(new RefIndex(refexpr(idx)));
+    qir.offset.add(new RefName(queueTypes.getMessage().tag.getName()));
+    pushbody.statements.add(new AssignmentSingle(qir, refexpr(enumElement)));
 
-    for (FuncVariable arg : param) {
+    for (FunctionVariable arg : param) {
       Reference elem = ref(queueVariables.getQueue());
-      elem.offset.add(new RefIndex(info, refexpr(idx)));
-      elem.offset.add(new RefName(info, namedElement.name));
-      elem.offset.add(new RefName(info, arg.name));
+      elem.offset.add(new RefIndex(refexpr(idx)));
+      elem.offset.add(new RefName(namedElement.getName()));
+      elem.offset.add(new RefName(arg.getName()));
 
-      pushbody.statements.add(new AssignmentSingle(info, elem, refexpr(arg)));
+      pushbody.statements.add(new AssignmentSingle(elem, refexpr(arg)));
     }
 
-    pushbody.statements.add(new AssignmentSingle(info, ref(queueVariables.getCount()), new Plus(info, refexpr(queueVariables.getCount()), new NumberValue(info, BigInteger.ONE))));
+    pushbody.statements.add(new AssignmentSingle(ref(queueVariables.getCount()), new Plus(refexpr(queueVariables.getCount()), new NumberValue(BigInteger.ONE))));
 
-    IfOption ifok = new IfOption(info, new Less(info, refexpr(queueVariables.getCount()), new NumberValue(info, BigInteger.valueOf(queueTypes.queueLength()))), pushbody);
+    IfOption ifok = new IfOption(new Less(refexpr(queueVariables.getCount()), new NumberValue(BigInteger.valueOf(queueTypes.queueLength()))), pushbody);
     option.add(ifok);
 
-    Block body = new Block(info);
-    body.statements.add(new IfStmt(info, option, new Block(info))); // TODO add
+    Block body = new Block();
+    body.statements.add(new IfStatement(option, new Block())); // TODO add
     // error
     // code
     return body;
   }
 
-  private static RefExp refexpr(Named idx) {
-    return new RefExp(ElementInfo.NO, ref(idx));
+  private static ReferenceExpression refexpr(Named idx) {
+    return new ReferenceExpression(ref(idx));
   }
 
   private static Reference ref(Named idx) {
-    return new Reference(ElementInfo.NO, idx, new AstList<RefItem>());
+    return new Reference(idx, new AstList<RefItem>());
   }
 }

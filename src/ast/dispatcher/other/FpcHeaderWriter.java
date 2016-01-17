@@ -21,7 +21,6 @@ import java.math.BigInteger;
 import java.util.Iterator;
 import java.util.List;
 
-import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -30,10 +29,10 @@ import ast.data.expression.value.NumberValue;
 import ast.data.function.Function;
 import ast.data.function.FunctionProperty;
 import ast.data.function.ret.FuncReturnNone;
-import ast.data.function.ret.FuncReturnType;
+import ast.data.function.ret.FunctionReturnType;
 import ast.data.reference.Reference;
 import ast.data.type.Type;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumElement;
@@ -45,11 +44,12 @@ import ast.data.type.composed.RecordType;
 import ast.data.type.special.VoidType;
 import ast.data.variable.ConstGlobal;
 import ast.data.variable.ConstPrivate;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.data.variable.Variable;
 import ast.dispatcher.NullDispatcher;
 import ast.doc.StreamWriter;
 import ast.knowledge.KnowledgeBase;
+import ast.meta.MetaList;
 import ast.pass.check.type.ExpressionTypecheck;
 import ast.pass.others.CWriter;
 import ast.repository.query.TypeFilter;
@@ -74,7 +74,7 @@ public class FpcHeaderWriter extends NullDispatcher<Void, StreamWriter> {
   @Override
   protected Void visitNamespace(Namespace obj, StreamWriter param) {
     param.wr("unit ");
-    param.wr(obj.name);
+    param.wr(obj.getName());
     param.wr(";");
     param.nl();
     param.nl();
@@ -103,7 +103,7 @@ public class FpcHeaderWriter extends NullDispatcher<Void, StreamWriter> {
     param.incIndent();
     param.wr(LibName);
     param.wr(" = '");
-    param.wr(obj.name);
+    param.wr(obj.getName());
     param.wr("';");
     param.decIndent();
     param.nl();
@@ -165,7 +165,7 @@ public class FpcHeaderWriter extends NullDispatcher<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitFuncReturnType(FuncReturnType obj, StreamWriter param) {
+  protected Void visitFuncReturnType(FunctionReturnType obj, StreamWriter param) {
     param.wr(":");
     visit(obj.type, param);
     return null;
@@ -183,7 +183,7 @@ public class FpcHeaderWriter extends NullDispatcher<Void, StreamWriter> {
       param.wr("function");
     }
     param.wr(" ");
-    param.wr(obj.name);
+    param.wr(obj.getName());
     param.wr("(");
     for (int i = 0; i < obj.param.size(); i++) {
       if (i > 0) {
@@ -228,7 +228,7 @@ public class FpcHeaderWriter extends NullDispatcher<Void, StreamWriter> {
     }
   }
 
-  private String getName(boolean isNeg, int bytes, ElementInfo info) {
+  private String getName(boolean isNeg, int bytes, MetaList info) {
     switch (bytes) {
       case 1:
         return isNeg ? "Shortint" : "Byte";
@@ -239,7 +239,7 @@ public class FpcHeaderWriter extends NullDispatcher<Void, StreamWriter> {
       case 8:
         return isNeg ? "Int64" : "QWord";
       default:
-        RError.err(ErrorType.Error, info, "Too many bytes for fpc backend: " + bytes);
+        RError.err(ErrorType.Error, "Too many bytes for fpc backend: " + bytes, info);
         return null;
     }
   }
@@ -259,9 +259,9 @@ public class FpcHeaderWriter extends NullDispatcher<Void, StreamWriter> {
       bits = Integer.highestOneBit(bits) * 2;
     }
 
-    String tname = getName(isNeg, bits, obj.getInfo());
+    String tname = getName(isNeg, bits, obj.metadata());
 
-    param.wr(obj.name);
+    param.wr(obj.getName());
     param.wr(" = ");
     param.wr(tname);
     param.wr(";");
@@ -273,12 +273,12 @@ public class FpcHeaderWriter extends NullDispatcher<Void, StreamWriter> {
   @Override
   protected Void visitReference(Reference obj, StreamWriter param) {
     assert (obj.offset.isEmpty());
-    param.wr(obj.link.name);
+    param.wr(obj.link.getName());
     return null;
   }
 
   @Override
-  protected Void visitTypeRef(TypeRef obj, StreamWriter param) {
+  protected Void visitTypeRef(TypeReference obj, StreamWriter param) {
     visit(obj.ref, param);
     return null;
   }
@@ -294,7 +294,7 @@ public class FpcHeaderWriter extends NullDispatcher<Void, StreamWriter> {
     param.wr("static const ");
     visit(obj.type, param);
     param.wr(" ");
-    param.wr(obj.name);
+    param.wr(obj.getName());
     param.wr(" = ");
     visit(obj.def, param);
     param.wr(";");
@@ -303,8 +303,8 @@ public class FpcHeaderWriter extends NullDispatcher<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitFuncVariable(FuncVariable obj, StreamWriter param) {
-    param.wr(obj.name);
+  protected Void visitFuncVariable(FunctionVariable obj, StreamWriter param) {
+    param.wr(obj.getName());
     param.wr(": ");
     visit(obj.type, param);
     return null;
@@ -312,7 +312,7 @@ public class FpcHeaderWriter extends NullDispatcher<Void, StreamWriter> {
 
   @Override
   protected Void visitStringType(StringType obj, StreamWriter param) {
-    param.wr(obj.name);
+    param.wr(obj.getName());
     param.wr(" = ");
     param.wr("PChar");
     param.wr(";");
@@ -322,7 +322,7 @@ public class FpcHeaderWriter extends NullDispatcher<Void, StreamWriter> {
 
   @Override
   protected Void visitArrayType(ArrayType obj, StreamWriter param) {
-    param.wr(obj.name);
+    param.wr(obj.getName());
     param.wr(" = Record");
     param.nl();
     param.incIndent();
@@ -341,7 +341,7 @@ public class FpcHeaderWriter extends NullDispatcher<Void, StreamWriter> {
 
   @Override
   protected Void visitRecordType(RecordType obj, StreamWriter param) {
-    param.wr(obj.name);
+    param.wr(obj.getName());
     param.wr(" = Record");
     param.nl();
     param.incIndent();
@@ -354,14 +354,14 @@ public class FpcHeaderWriter extends NullDispatcher<Void, StreamWriter> {
 
   @Override
   protected Void visitEnumType(EnumType obj, StreamWriter param) {
-    param.wr(obj.name);
+    param.wr(obj.getName());
     param.wr(" = (");
     param.nl();
     param.incIndent();
 
     Iterator<EnumElement> itr = obj.element.iterator();
     while (itr.hasNext()) {
-      param.wr(itr.next().name);
+      param.wr(itr.next().getName());
       if (itr.hasNext()) {
         param.wr(",");
       }
@@ -376,7 +376,7 @@ public class FpcHeaderWriter extends NullDispatcher<Void, StreamWriter> {
 
   @Override
   protected Void visitNamedElement(NamedElement obj, StreamWriter param) {
-    param.wr(obj.name);
+    param.wr(obj.getName());
     param.wr(": ");
     visit(obj.typeref, param);
     param.wr(";");
@@ -391,7 +391,7 @@ public class FpcHeaderWriter extends NullDispatcher<Void, StreamWriter> {
 
   @Override
   protected Void visitVoidType(VoidType obj, StreamWriter param) {
-    param.wr("{" + obj.name + "}");
+    param.wr("{" + obj.getName() + "}");
     param.nl();
     return null;
   }

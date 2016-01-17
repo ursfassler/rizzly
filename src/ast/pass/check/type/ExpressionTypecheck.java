@@ -19,7 +19,6 @@ package ast.pass.check.type;
 
 import java.math.BigInteger;
 
-import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.Range;
 import ast.data.expression.Expression;
@@ -56,6 +55,7 @@ import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowComparable;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
+import ast.meta.MetaList;
 import error.ErrorType;
 import error.RError;
 
@@ -76,21 +76,21 @@ public class ExpressionTypecheck extends DfsTraverser<Void, Void> {
     adder.traverse(ast, null);
   }
 
-  private void checkPositive(ElementInfo info, String op, Range lhs, Range rhs) {
+  private void checkPositive(MetaList info, String op, Range lhs, Range rhs) {
     checkPositive(info, op, lhs);
     checkPositive(info, op, rhs);
   }
 
-  private void checkPositive(ElementInfo info, String op, Range range) {
+  private void checkPositive(MetaList info, String op, Range range) {
     if (range.low.compareTo(BigInteger.ZERO) < 0) {
-      RError.err(ErrorType.Error, info, op + " only allowed for positive types");
+      RError.err(ErrorType.Error, op + " only allowed for positive types", info);
     }
   }
 
   private Range getRange(Expression expr) {
     Type lhs = kt.get(expr);
     if (!(lhs instanceof RangeType)) {
-      RError.err(ErrorType.Fatal, expr.getInfo(), "Expected range type, got " + lhs.name);
+      RError.err(ErrorType.Fatal, "Expected range type, got " + lhs.getName(), expr.metadata());
       return null;
     } else {
       return ((RangeType) lhs).range;
@@ -134,14 +134,14 @@ public class ExpressionTypecheck extends DfsTraverser<Void, Void> {
 
   @Override
   protected Void visitNot(Not obj, Void param) {
-    Type type = kt.get(obj.expr);
+    Type type = kt.get(obj.expression);
     if (type instanceof EnumType) {
-      RError.err(ErrorType.Error, obj.getInfo(), "operation not possible on enumerator");
+      RError.err(ErrorType.Error, "operation not possible on enumerator", obj.metadata());
       return null;
     }
 
     if (!(type instanceof BooleanType)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "Need boolean type for not, got: " + type.name); // TODO
+      RError.err(ErrorType.Error, "Need boolean type for not, got: " + type.getName(), obj.metadata()); // TODO
       // otherwise
       // it is a bit
       // not
@@ -152,16 +152,16 @@ public class ExpressionTypecheck extends DfsTraverser<Void, Void> {
 
   @Override
   protected Void visitUminus(Uminus obj, Void param) {
-    Type type = kt.get(obj.expr);
+    Type type = kt.get(obj.expression);
     if (!(type instanceof RangeType)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "Need ordinal type for minus, got: " + type.name);
+      RError.err(ErrorType.Error, "Need ordinal type for minus, got: " + type.getName(), obj.metadata());
     }
     return null;
   }
 
-  private void testForEqualComparable(Type lhs, Type rhs, ElementInfo info) {
+  private void testForEqualComparable(Type lhs, Type rhs, MetaList info) {
     if (!kc.get(lhs, rhs)) {
-      RError.err(ErrorType.Error, info, "Incompatible types: " + lhs.name + " <-> " + rhs.name);
+      RError.err(ErrorType.Error, "Incompatible types: " + lhs.getName() + " <-> " + rhs.getName(), info);
     }
   }
 
@@ -170,7 +170,7 @@ public class ExpressionTypecheck extends DfsTraverser<Void, Void> {
     super.visitEqual(obj, param);
     Type lhs = kt.get(obj.left);
     Type rhs = kt.get(obj.right);
-    testForEqualComparable(lhs, rhs, obj.getInfo());
+    testForEqualComparable(lhs, rhs, obj.metadata());
     return null;
   }
 
@@ -179,7 +179,7 @@ public class ExpressionTypecheck extends DfsTraverser<Void, Void> {
     super.visitNotequal(obj, param);
     Type lhs = kt.get(obj.left);
     Type rhs = kt.get(obj.right);
-    testForEqualComparable(lhs, rhs, obj.getInfo());
+    testForEqualComparable(lhs, rhs, obj.metadata());
     return null;
   }
 
@@ -223,18 +223,18 @@ public class ExpressionTypecheck extends DfsTraverser<Void, Void> {
 
     if (lhst instanceof RangeType) {
       if (!(rhst instanceof RangeType)) {
-        RError.err(ErrorType.Fatal, rhst.getInfo(), "Expected range type");
+        RError.err(ErrorType.Fatal, "Expected range type", rhst.metadata());
       }
       Range lhs = getRange(obj.left);
       Range rhs = getRange(obj.right);
-      checkPositive(obj.getInfo(), "and", lhs, rhs);
+      checkPositive(obj.metadata(), "and", lhs, rhs);
     } else if (lhst instanceof BooleanType) {
       // TODO we should not get here
       if (!(rhst instanceof BooleanType)) {
-        RError.err(ErrorType.Fatal, rhst.getInfo(), "Expected boolean type");
+        RError.err(ErrorType.Fatal, "Expected boolean type", rhst.metadata());
       }
     } else {
-      RError.err(ErrorType.Error, lhst.getInfo(), "Expected range or boolean type");
+      RError.err(ErrorType.Error, "Expected range or boolean type", lhst.metadata());
     }
     return null;
   }
@@ -246,10 +246,10 @@ public class ExpressionTypecheck extends DfsTraverser<Void, Void> {
     Type rhst = kt.get(obj.right);
 
     if (!(lhst instanceof BooleanType)) {
-      RError.err(ErrorType.Error, lhst.getInfo(), "Expected boolean type at the left side");
+      RError.err(ErrorType.Error, "Expected boolean type at the left side", lhst.metadata());
     }
     if (!(rhst instanceof BooleanType)) {
-      RError.err(ErrorType.Error, rhst.getInfo(), "Expected boolean type at the right side");
+      RError.err(ErrorType.Error, "Expected boolean type at the right side", rhst.metadata());
     }
     return null;
   }
@@ -261,14 +261,14 @@ public class ExpressionTypecheck extends DfsTraverser<Void, Void> {
     Type rhst = kt.get(obj.right);
 
     if (!(lhst instanceof RangeType)) {
-      RError.err(ErrorType.Fatal, lhst.getInfo(), "Expected range type");
+      RError.err(ErrorType.Fatal, "Expected range type", lhst.metadata());
     }
     if (!(rhst instanceof RangeType)) {
-      RError.err(ErrorType.Fatal, rhst.getInfo(), "Expected range type");
+      RError.err(ErrorType.Fatal, "Expected range type", rhst.metadata());
     }
     Range lhs = getRange(obj.left);
     Range rhs = getRange(obj.right);
-    checkPositive(obj.getInfo(), "or", lhs, rhs);
+    checkPositive(obj.metadata(), "or", lhs, rhs);
     return null;
   }
 
@@ -279,10 +279,10 @@ public class ExpressionTypecheck extends DfsTraverser<Void, Void> {
     Type rhst = kt.get(obj.right);
 
     if (!(lhst instanceof BooleanType)) {
-      RError.err(ErrorType.Error, lhst.getInfo(), "Expected boolean type at the left side");
+      RError.err(ErrorType.Error, "Expected boolean type at the left side", lhst.metadata());
     }
     if (!(rhst instanceof BooleanType)) {
-      RError.err(ErrorType.Error, rhst.getInfo(), "Expected boolean type at the right side");
+      RError.err(ErrorType.Error, "Expected boolean type at the right side", rhst.metadata());
     }
     return null;
   }
@@ -293,7 +293,7 @@ public class ExpressionTypecheck extends DfsTraverser<Void, Void> {
     getRange(obj.left);
     Range rhs = getRange(obj.right);
     if ((rhs.low.compareTo(BigInteger.ZERO) == 0) && (rhs.high.compareTo(BigInteger.ZERO) == 0)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "division by zero");
+      RError.err(ErrorType.Error, "division by zero", obj.metadata());
     }
     return null;
   }
@@ -311,12 +311,12 @@ public class ExpressionTypecheck extends DfsTraverser<Void, Void> {
     super.visitMod(obj, param);
     Range lhs = getRange(obj.left);
     Range rhs = getRange(obj.right);
-    checkPositive(obj.getInfo(), "mod", lhs); // TODO implement mod correctly
+    checkPositive(obj.metadata(), "mod", lhs); // TODO implement mod correctly
     // (and not with 'urem'
     // instruction) and
     // remove this check
     if (rhs.low.compareTo(BigInteger.ZERO) <= 0) {
-      RError.err(ErrorType.Error, obj.getInfo(), "right side of mod has to be greater than 0");
+      RError.err(ErrorType.Error, "right side of mod has to be greater than 0", obj.metadata());
     }
     return null;
   }
@@ -334,7 +334,7 @@ public class ExpressionTypecheck extends DfsTraverser<Void, Void> {
     super.visitOr(obj, param);
     Range lhs = getRange(obj.left);
     Range rhs = getRange(obj.right);
-    checkPositive(obj.getInfo(), "or", lhs, rhs);
+    checkPositive(obj.metadata(), "or", lhs, rhs);
     return null;
   }
 
@@ -351,7 +351,7 @@ public class ExpressionTypecheck extends DfsTraverser<Void, Void> {
     super.visitShl(obj, param);
     Range lhs = getRange(obj.left);
     Range rhs = getRange(obj.right);
-    checkPositive(obj.getInfo(), "shl", lhs, rhs);
+    checkPositive(obj.metadata(), "shl", lhs, rhs);
     return null;
   }
 
@@ -360,7 +360,7 @@ public class ExpressionTypecheck extends DfsTraverser<Void, Void> {
     super.visitShr(obj, param);
     Range lhs = getRange(obj.left);
     Range rhs = getRange(obj.right);
-    checkPositive(obj.getInfo(), "shr", lhs, rhs);
+    checkPositive(obj.metadata(), "shr", lhs, rhs);
     return null;
   }
 
@@ -369,7 +369,7 @@ public class ExpressionTypecheck extends DfsTraverser<Void, Void> {
     super.visitTypeCast(obj, param);
     getRange(obj.value);
     if (!(kt.get(obj.cast) instanceof RangeType)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "can only cast to range type");
+      RError.err(ErrorType.Error, "can only cast to range type", obj.metadata());
     }
     return null;
   }

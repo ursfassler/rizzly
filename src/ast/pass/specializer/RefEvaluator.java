@@ -17,7 +17,6 @@
 
 package ast.pass.specializer;
 
-import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
@@ -32,11 +31,12 @@ import ast.data.reference.RefTemplCall;
 import ast.data.reference.Reference;
 import ast.data.template.Template;
 import ast.data.variable.Constant;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.data.variable.Variable;
 import ast.dispatcher.NullDispatcher;
 import ast.interpreter.Memory;
 import ast.knowledge.KnowledgeBase;
+import ast.meta.MetaList;
 import error.ErrorType;
 import error.RError;
 
@@ -85,9 +85,9 @@ public class RefEvaluator extends NullDispatcher<Ast, Ast> {
     return ExprEvaluator.evaluate(expr, memory, kb);
   }
 
-  private void checkArguments(ElementInfo info, AstList<FuncVariable> param, AstList<Expression> actparam) {
+  private void checkArguments(MetaList info, AstList<FunctionVariable> param, AstList<Expression> actparam) {
     if (param.size() != actparam.size()) {
-      RError.err(ErrorType.Error, info, "Number of function arguments does not match: need " + param.size() + ", got " + actparam.size());
+      RError.err(ErrorType.Error, "Number of function arguments does not match: need " + param.size() + ", got " + actparam.size(), info);
     }
   }
 
@@ -97,9 +97,9 @@ public class RefEvaluator extends NullDispatcher<Ast, Ast> {
 
   @Override
   protected Expression visitRefCall(RefCall obj, Ast param) {
-    RError.ass(param instanceof FuncFunction, param.getInfo(), "expected funtion, got " + param.getClass().getName());
+    RError.ass(param instanceof FuncFunction, param.metadata(), "expected funtion, got " + param.getClass().getName());
     FuncFunction func = (FuncFunction) param;
-    checkArguments(obj.getInfo(), func.param, obj.actualParameter.value);
+    checkArguments(obj.metadata(), func.param, obj.actualParameter.value);
     return call(func, obj.actualParameter.value);
   }
 

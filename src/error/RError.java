@@ -17,7 +17,9 @@
 
 package error;
 
-import ast.ElementInfo;
+import ast.meta.MetaInformation;
+import ast.meta.MetaList;
+import ast.meta.SourcePosition;
 
 //TODO introduce enum with entry for every error
 //TODO make errors language independent (see above)
@@ -39,8 +41,13 @@ public class RError {
       }
 
       @Override
-      public void err(ErrorType type, ElementInfo info, String msg) {
+      public void err(ErrorType type, SourcePosition info, String msg) {
         err(type, info.filename, info.line, info.row, msg);
+      }
+
+      @Override
+      public void err(ErrorType type, String msg, MetaList metadata) {
+        RError.err(type, msg, metadata);
       }
     };
   }
@@ -60,29 +67,41 @@ public class RError {
     }
   }
 
-  public static void err(ErrorType error, ElementInfo info, String string) {
-    err(error, info.filename, info.line, info.row, string);
+  public static void err(ErrorType type, String msg, MetaList metadata) {
+    SourcePosition pos = findSourcePos(metadata);
+    err(type, pos.filename, pos.line, pos.row, msg);
   }
 
+  private static SourcePosition findSourcePos(MetaList metadata) {
+    for (MetaInformation itr : metadata) {
+      if (itr instanceof SourcePosition) {
+        return (SourcePosition) itr;
+      }
+    }
+    return new SourcePosition("", 0, 0);
+  }
+
+  @Deprecated
   public static void err(ErrorType error, String string) {
     err(error, "", -1, -1, string);
   }
 
-  public static void ass(boolean condition, ElementInfo info, String msg) {
+  public static void ass(boolean condition, MetaList info, String msg) {
     if (!condition) {
-      err(ErrorType.Assertion, info, msg);
+      err(ErrorType.Assertion, msg, info);
     }
   }
 
-  public static void ass(boolean condition, ElementInfo info) {
+  public static void ass(boolean condition, MetaList info) {
     if (!condition) {
-      err(ErrorType.Assertion, info, "");
+      err(ErrorType.Assertion, "", info);
     }
   }
 
   public static void ass(boolean condition, String msg) {
     if (!condition) {
-      err(ErrorType.Assertion, ElementInfo.NO, msg);
+      err(ErrorType.Assertion, msg);
     }
   }
+
 }

@@ -17,7 +17,6 @@
 
 package ast.data.type.special;
 
-import ast.ElementInfo;
 import ast.data.type.base.BaseType;
 import ast.visitor.Visitor;
 
@@ -28,7 +27,7 @@ final public class NaturalType extends BaseType {
   final static public String NAME = "Natural";
 
   public NaturalType() {
-    super(ElementInfo.NO, NAME);
+    super(NAME);
   }
 
   @Override

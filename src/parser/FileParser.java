@@ -26,13 +26,12 @@ import parser.scanner.Token;
 import parser.scanner.TokenType;
 import util.Pair;
 import ast.Designator;
-import ast.ElementInfo;
-import ast.data.Metadata;
 import ast.data.Named;
 import ast.data.file.RizzlyFile;
 import ast.data.template.Template;
 import ast.data.variable.ConstGlobal;
 import ast.data.variable.TemplateParameter;
+import ast.meta.MetaList;
 import error.ErrorType;
 import error.RError;
 
@@ -59,9 +58,7 @@ public class FileParser extends BaseParser {
   // EBNF file: import { ifacedefsec | compdefsec | typesec | constDeclBlock |
   // globalFunction }
   private RizzlyFile parseFile(String filename, String name) {
-    ElementInfo info = peek().getInfo();
-    ArrayList<Metadata> meta = getMetadata();
-    info.metadata.addAll(meta);
+    MetaList info = peek().getMetadata();
     RizzlyFile ret = new RizzlyFile(info, name);
     ret.imports.addAll(parseImport());
 
@@ -70,11 +67,11 @@ public class FileParser extends BaseParser {
 
       if (consumeIfEqual(TokenType.EQUAL)) {
         Named object = parseDeclaration(def.first.getData());
-        Template decl = new Template(def.first.getInfo(), def.first.getData(), def.second, object);
+        Template decl = new Template(def.first.getMetadata(), def.first.getData(), def.second, object);
         ret.objects.add(decl);
       } else if (consumeIfEqual(TokenType.COLON)) {
         if (!def.second.isEmpty()) {
-          RError.err(ErrorType.Error, def.second.get(0).getInfo(), "no generic arguments allowed for instantiations");
+          RError.err(ErrorType.Error, "no generic arguments allowed for instantiations", def.second.get(0).metadata());
         }
         ConstGlobal object = type().parseConstDef(ConstGlobal.class, def.first.getData());
         expect(TokenType.SEMI);
@@ -82,7 +79,7 @@ public class FileParser extends BaseParser {
         ret.objects.add(object);
       } else {
         Token got = peek();
-        RError.err(ErrorType.Error, got.getInfo(), "got unexpected token: " + got);
+        RError.err(ErrorType.Error, "got unexpected token: " + got, got.getMetadata());
         ret = null;
         break;
       }

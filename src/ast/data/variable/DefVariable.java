@@ -17,15 +17,14 @@
 
 package ast.data.variable;
 
-import ast.ElementInfo;
 import ast.data.expression.Expression;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
 
 abstract public class DefVariable extends Variable {
   public Expression def;
 
-  public DefVariable(ElementInfo info, String name, TypeRef type, Expression def) {
-    super(info, name, type);
+  public DefVariable(String name, TypeReference type, Expression def) {
+    super(name, type);
     this.def = def;
   }
 

@@ -17,11 +17,16 @@
 
 package ast.data.type.base;
 
-import ast.ElementInfo;
 import ast.data.type.Type;
+import ast.meta.MetaList;
 
 abstract public class BaseType extends Type {
-  public BaseType(ElementInfo info, String name) {
+  public BaseType(String name) {
+    super(name);
+  }
+
+  @Deprecated
+  public BaseType(MetaList info, String name) {
     super(info, name);
   }
 

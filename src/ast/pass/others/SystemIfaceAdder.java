@@ -23,7 +23,6 @@ import java.util.HashMap;
 
 import main.Configuration;
 import ast.Designator;
-import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -35,7 +34,7 @@ import ast.data.component.hfsm.ImplHfsm;
 import ast.data.expression.Expression;
 import ast.data.expression.value.TupleValue;
 import ast.data.function.Function;
-import ast.data.function.header.FuncSlot;
+import ast.data.function.header.Slot;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefFactory;
@@ -44,7 +43,7 @@ import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.Statement;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
@@ -108,8 +107,7 @@ class SystemIfaceAdderWorker extends NullDispatcher<Void, Void> {
   }
 
   private Function makeFunc(ImplElementary obj, String name) {
-    ElementInfo info = ElementInfo.NO;
-    FuncSlot rfunc = new FuncSlot(info, name, new AstList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
+    Slot rfunc = new Slot(name, new AstList<FunctionVariable>(), new FuncReturnNone(), new Block());
     obj.iface.add(rfunc);
     return rfunc;
   }
@@ -193,30 +191,28 @@ class SystemIfaceCaller extends NullDispatcher<Void, Void> {
 
   private Function getDtor(Component obj) {
     Function dtor = dtors.get(obj);
-    RError.ass(dtor != null, obj.getInfo(), "dtor is null");
+    RError.ass(dtor != null, obj.metadata(), "dtor is null");
     return dtor;
   }
 
   private Function getCtor(Component obj) {
     Function ctor = ctors.get(obj);
-    RError.ass(ctor != null, obj.getInfo(), "ctor is null");
+    RError.ass(ctor != null, obj.metadata(), "ctor is null");
     return ctor;
   }
 
   private CallStmt makeCall(Function ref) {
-    ElementInfo info = ElementInfo.NO;
     assert (ref.param.isEmpty());
-    Reference call = RefFactory.call(ref.getInfo(), ref);
-    return new CallStmt(info, call);
+    Reference call = RefFactory.call(ref.metadata(), ref);
+    return new CallStmt(call);
   }
 
   @Deprecated
   private CallStmt makeCall(CompUse self, Function func) {
-    ElementInfo info = ElementInfo.NO;
-    RError.ass(func.param.isEmpty(), func.getInfo(), "expected (de)constructor to have no parameter");
-    Reference fref = RefFactory.full(info, self);
-    fref.offset.add(new RefName(info, func.name));
-    fref.offset.add(new RefCall(info, new TupleValue(info, new AstList<Expression>())));
-    return new CallStmt(info, fref);
+    RError.ass(func.param.isEmpty(), func.metadata(), "expected (de)constructor to have no parameter");
+    Reference fref = RefFactory.full(self);
+    fref.offset.add(new RefName(func.getName()));
+    fref.offset.add(new RefCall(new TupleValue(new AstList<Expression>())));
+    return new CallStmt(fref);
   }
 }

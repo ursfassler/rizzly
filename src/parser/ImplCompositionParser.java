@@ -17,15 +17,12 @@
 
 package parser;
 
-import java.util.ArrayList;
-
 import parser.scanner.Token;
 import parser.scanner.TokenType;
-import ast.ElementInfo;
-import ast.data.Metadata;
 import ast.data.component.CompRef;
 import ast.data.component.composition.AsynchroniusConnection;
 import ast.data.component.composition.CompUse;
+import ast.data.component.composition.Connection;
 import ast.data.component.composition.Endpoint;
 import ast.data.component.composition.EndpointRaw;
 import ast.data.component.composition.SynchroniusConnection;
@@ -34,6 +31,7 @@ import ast.data.raw.RawComposition;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefName;
 import ast.data.reference.Reference;
+import ast.meta.MetaList;
 import error.ErrorType;
 import error.RError;
 
@@ -51,9 +49,7 @@ public class ImplCompositionParser extends ImplBaseParser {
   // EBNF implementationComposition: "composition" { compDeclBlock |
   // connectionDeclBlock }
   private RawComposition parseImplementationComposition(String name) {
-    ElementInfo info = expect(TokenType.COMPOSITION).getInfo();
-    ArrayList<Metadata> meta = getMetadata();
-    info.metadata.addAll(meta);
+    MetaList info = expect(TokenType.COMPOSITION).getMetadata();
     RawComposition comp = new RawComposition(info, name);
 
     while (!consumeIfEqual(TokenType.END)) {
@@ -75,53 +71,54 @@ public class ImplCompositionParser extends ImplBaseParser {
       case IDENTIFIER:
         CompRef type = expr().parseRefComp();
         expect(TokenType.SEMI);
-        ArrayList<Metadata> meta = getMetadata();
-        id.getInfo().metadata.addAll(meta);
-        ast.data.component.composition.CompUse compUse = new CompUse(id.getInfo(), id.getData(), type);
+        ast.data.component.composition.CompUse compUse = new CompUse(id.getMetadata(), id.getData(), type);
         comp.getInstantiation().add(compUse);
         break;
       default: {
-        RError.err(ErrorType.Error, peek().getInfo(), "Expected interface function or reference");
+        RError.err(ErrorType.Error, "Expected interface function or reference", peek().getMetadata());
         break;
       }
     }
   }
 
   // EBNF connection: endpoint msgType endpoint ";"
-  private ast.data.component.composition.Connection parseConnection(Token id) {
+  private Connection parseConnection(Token id) {
     Endpoint src = parseEndpoint(id);
-    ElementInfo info = peek().getInfo();
+    MetaList info = peek().getMetadata();
     MessageType type = parseMsgType();
     Endpoint dst = parseEndpoint(next());
     expect(TokenType.SEMI);
 
-    ArrayList<Metadata> meta = getMetadata();
-    info.metadata.addAll(meta);
+    Connection connection;
 
     switch (type) {
       case sync:
-        return new SynchroniusConnection(info, src, dst);
+        connection = new SynchroniusConnection(src, dst);
+        break;
       case async:
-        return new AsynchroniusConnection(info, src, dst);
+        connection = new AsynchroniusConnection(src, dst);
+        break;
       default:
-        RError.err(ErrorType.Fatal, info, "Unknown connection type: " + type);
+        RError.err(ErrorType.Fatal, "Unknown connection type: " + type, info);
         return null;
-
     }
+
+    connection.metadata().add(info);
+    return connection;
   }
 
   // EBNF endpoint: id [ "." id ]
   private Endpoint parseEndpoint(Token tok) {
     if (tok.getType() != TokenType.IDENTIFIER) {
-      RError.err(ErrorType.Error, tok.getInfo(), "Expected IDENTIFIER, got " + tok.getType());
+      RError.err(ErrorType.Error, "Expected IDENTIFIER, got " + tok.getType(), tok.getMetadata());
       return null;
     }
-    Reference ref = RefFactory.full(tok.getInfo(), tok.getData());
+    Reference ref = RefFactory.full(tok.getMetadata(), tok.getData());
     if (consumeIfEqual(TokenType.PERIOD)) {
       tok = expect(TokenType.IDENTIFIER);
-      ref.offset.add(new RefName(tok.getInfo(), tok.getData()));
+      ref.offset.add(new RefName(tok.getMetadata(), tok.getData()));
     }
-    return new EndpointRaw(tok.getInfo(), ref);
+    return new EndpointRaw(tok.getMetadata(), ref);
   }
 
   // EBNF msgType: "->" | ">>"
@@ -135,7 +132,7 @@ public class ImplCompositionParser extends ImplBaseParser {
         return MessageType.async;
       }
       default: {
-        RError.err(ErrorType.Error, tok.getInfo(), "Expected synchron or asynchron connection");
+        RError.err(ErrorType.Error, "Expected synchron or asynchron connection", tok.getMetadata());
         return null;
       }
     }

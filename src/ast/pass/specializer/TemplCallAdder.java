@@ -18,7 +18,6 @@
 package ast.pass.specializer;
 
 import main.Configuration;
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.reference.RefTemplCall;
@@ -57,9 +56,9 @@ public class TemplCallAdder extends AstPass {
 
   private void insertTemplateCall(Reference ref) {
     if (!((Template) ref.link).getTempl().isEmpty()) {
-      RError.err(ErrorType.Error, ref.getInfo(), "Missing template argument");
+      RError.err(ErrorType.Error, "Missing template argument", ref.metadata());
     }
-    ref.offset.add(0, new RefTemplCall(ElementInfo.NO, new AstList<ActualTemplateArgument>()));
+    ref.offset.add(0, new RefTemplCall(new AstList<ActualTemplateArgument>()));
   }
 
   private AstList<Reference> listOfReferences(Namespace ast) {

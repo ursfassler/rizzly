@@ -17,16 +17,21 @@
 
 package ast.data.component.composition;
 
-import ast.ElementInfo;
 import ast.data.function.Function;
 import ast.data.reference.Reference;
+import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
 final public class EndpointRaw extends Endpoint {
   final public Reference ref;
 
-  public EndpointRaw(ElementInfo info, Reference ref) {
-    super(info);
+  public EndpointRaw(Reference ref) {
+    this.ref = ref;
+  }
+
+  @Deprecated
+  public EndpointRaw(MetaList info, Reference ref) {
+    metadata().add(info);
     this.ref = ref;
   }
 

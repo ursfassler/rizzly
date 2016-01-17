@@ -19,36 +19,61 @@ package parser.scanner;
 
 import java.math.BigInteger;
 
-import ast.ElementInfo;
+import ast.meta.MetaList;
+import ast.meta.MetaListImplementation;
+import ast.meta.SourcePosition;
 
 /**
  *
  * @author urs
  */
 public class Token {
-  private TokenType type;
-  private String data;
-  private BigInteger num;
-  private ElementInfo info;
+  private TokenType type = null;
+  private String data = null;
+  private BigInteger num = null;
+  final private MetaList metadata;
 
-  public Token(TokenType type, ElementInfo info) {
-    super();
+  public Token(TokenType type, MetaList info) {
     this.type = type;
-    this.info = info;
+    this.metadata = info;
   }
 
-  public Token(TokenType type, BigInteger num, ElementInfo info) {
-    super();
+  public Token(TokenType type) {
     this.type = type;
-    this.num = num;
-    this.info = info;
+    metadata = new MetaListImplementation(); // TODO use dependency injection
   }
 
-  public Token(TokenType type, String data, ElementInfo info) {
+  public Token(TokenType type, String data) {
     super();
     this.type = type;
     this.data = data;
-    this.info = info;
+    metadata = new MetaListImplementation(); // TODO use dependency injection
+  }
+
+  @Deprecated
+  public Token(TokenType type, SourcePosition info) {
+    super();
+    this.type = type;
+    metadata = new MetaListImplementation(); // TODO use dependency injection
+    metadata.add(info);
+  }
+
+  @Deprecated
+  public Token(TokenType type, BigInteger num, SourcePosition info) {
+    super();
+    this.type = type;
+    this.num = num;
+    metadata = new MetaListImplementation(); // TODO use dependency injection
+    metadata.add(info);
+  }
+
+  @Deprecated
+  public Token(TokenType type, String data, SourcePosition info) {
+    super();
+    this.type = type;
+    this.data = data;
+    metadata = new MetaListImplementation(); // TODO use dependency injection
+    metadata.add(info);
   }
 
   public TokenType getType() {
@@ -65,8 +90,8 @@ public class Token {
     return num;
   }
 
-  public ElementInfo getInfo() {
-    return info;
+  public MetaList getMetadata() {
+    return metadata;
   }
 
   @Override

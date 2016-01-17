@@ -19,17 +19,15 @@ package ast.data.expression.value;
 
 import java.util.Collection;
 
-import ast.ElementInfo;
 import ast.data.AstList;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
 import ast.visitor.Visitor;
 
 final public class RecordValue extends ValueExpr {
   final public AstList<NamedValue> value = new AstList<NamedValue>();
-  public TypeRef type;
+  public TypeReference type;
 
-  public RecordValue(ElementInfo info, Collection<NamedValue> value, TypeRef type) {
-    super(info);
+  public RecordValue(Collection<NamedValue> value, TypeReference type) {
     this.value.addAll(value);
     this.type = type;
   }

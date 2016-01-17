@@ -17,14 +17,20 @@
 
 package ast.data;
 
-import ast.ElementInfo;
+import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
 final public class Namespace extends Named {
   final public AstList<Ast> children = new AstList<Ast>();
 
-  public Namespace(ElementInfo info, String name) {
-    super(info, name);
+  public Namespace(String name) {
+    setName(name);
+  }
+
+  @Deprecated
+  public Namespace(MetaList info, String name) {
+    metadata().add(info);
+    setName(name);
   }
 
   @Override

@@ -17,7 +17,6 @@
 
 package ast.data.function.template;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.template.Template;
 import ast.data.template.TemplateFactory;
@@ -29,7 +28,7 @@ public class DefaultValueTemplateFactory extends TemplateFactory {
   public static final String[] PARAM = { "type" };
 
   public static Template create(TypeType typeTypeAny) {
-    return new Template(ElementInfo.NO, NAME, getParameter(typeTypeAny), new DefaultValueTemplate());
+    return new Template(NAME, getParameter(typeTypeAny), new DefaultValueTemplate());
   }
 
   private static AstList<TemplateParameter> getParameter(TypeType typeTypeAny) {

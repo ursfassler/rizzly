@@ -22,13 +22,13 @@ import java.util.Map;
 
 import main.Configuration;
 import ast.Designator;
-import ast.ElementInfo;
 import ast.copy.Relinker;
 import ast.data.Namespace;
 import ast.data.component.composition.Queue;
 import ast.data.function.Function;
 import ast.data.type.composed.RecordType;
 import ast.knowledge.KnowledgeBase;
+import ast.meta.MetaList;
 import ast.pass.AstPass;
 import ast.repository.query.ChildByName;
 import ast.repository.query.Collector;
@@ -76,9 +76,9 @@ class QueueReductionWorker {
       return;
     }
 
-    String prefix = queue.name + Designator.NAME_SEP;
+    String prefix = queue.getName() + Designator.NAME_SEP;
 
-    Map<Function, Function> pushfunc = createQueue(prefix, funcToRecord, queue.getInfo());
+    Map<Function, Function> pushfunc = createQueue(prefix, funcToRecord, queue.metadata());
 
     PushReplacer pr = new PushReplacer();
     pr.traverse(root, pushfunc);
@@ -100,7 +100,7 @@ class QueueReductionWorker {
     return map;
   }
 
-  private Map<Function, Function> createQueue(String prefix, Map<Function, RecordType> funcToRecord, ElementInfo info) {
+  private Map<Function, Function> createQueue(String prefix, Map<Function, RecordType> funcToRecord, MetaList info) {
     QueueTypes queueTypes = new QueueTypes(prefix, funcToRecord, info, kb);
     queueTypes.create(queueLength);
     root.children.add(queueTypes.getMsgType());
@@ -111,7 +111,7 @@ class QueueReductionWorker {
     return createPushFunctions(info, queueVariables, queueTypes);
   }
 
-  private QueueVariables createQueue(String prefix, ElementInfo info, QueueTypes queueTypes) {
+  private QueueVariables createQueue(String prefix, MetaList info, QueueTypes queueTypes) {
     QueueVariables queueVariables = new QueueVariables(prefix, info, kb);
     queueVariables.create(queueTypes.getQueue());
     root.children.add(queueVariables.getQueue());
@@ -126,7 +126,7 @@ class QueueReductionWorker {
     return queueVariables;
   }
 
-  private Map<Function, Function> createPushFunctions(ElementInfo info, QueueVariables queueVariables, QueueTypes queueTypes) {
+  private Map<Function, Function> createPushFunctions(MetaList info, QueueVariables queueVariables, QueueTypes queueTypes) {
     Map<Function, Function> pushfunc = new HashMap<Function, Function>();
     for (Function func : queueTypes.getQueuedFunctions()) {
       Function impl = PushFunctionFactory.create(info, queueVariables, queueTypes, func);

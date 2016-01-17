@@ -24,8 +24,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
 import org.junit.Test;
+import org.mockito.Mockito;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.component.composition.Connection;
 import ast.data.component.composition.EndpointSelf;
@@ -34,7 +34,8 @@ import ast.data.function.FuncRef;
 import ast.data.function.header.FuncFunction;
 import ast.data.reference.RefItem;
 import ast.data.reference.Reference;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
+import ast.meta.MetaList;
 import error.ErrorType;
 import error.RizzlyError;
 
@@ -48,7 +49,7 @@ public class QueryIsConnectedToOneResponse_Test {
 
     testee.check(connections);
 
-    verify(error, never()).err(any(ErrorType.class), any(ElementInfo.class), anyString());
+    verify(error, never()).err(any(ErrorType.class), anyString(), any(MetaList.class));
   }
 
   // TODO extend to EndpointSub or unify EndpointSub and EndpointSelf
@@ -58,29 +59,30 @@ public class QueryIsConnectedToOneResponse_Test {
     EndpointSelf src = selfEp();
     EndpointSelf dst = selfEp();
 
-    SynchroniusConnection connection = new SynchroniusConnection(ElementInfo.NO, src, dst);
+    SynchroniusConnection connection = new SynchroniusConnection(src, dst);
     AstList<Connection> connections = new AstList<Connection>();
     connections.add(connection);
 
     testee.check(connections);
 
-    verify(error, never()).err(any(ErrorType.class), any(ElementInfo.class), anyString());
+    verify(error, never()).err(any(ErrorType.class), anyString(), any(MetaList.class));
   }
 
   @Test
   public void reports_an_error_when_a_query_is_connected_to_more_than_one_response() {
-    FuncFunction srcFunc = new FuncFunction(ElementInfo.NO, "", new AstList<FuncVariable>(), null, null);
+    FuncFunction srcFunc = new FuncFunction("", new AstList<FunctionVariable>(), null, null);
 
+    Connection connection1 = mock(Connection.class);
     EndpointSelf src1 = selfEp(srcFunc);
+    Mockito.when(connection1.getSrc()).thenReturn(src1);
+    MetaList info1 = mock(MetaList.class);
+    Mockito.when(connection1.metadata()).thenReturn(info1);
+
+    Connection connection2 = mock(Connection.class);
     EndpointSelf src2 = selfEp(srcFunc);
-    EndpointSelf dst1 = selfEp();
-    EndpointSelf dst2 = selfEp();
-
-    ElementInfo info1 = mock(ElementInfo.class);
-    Connection connection1 = new SynchroniusConnection(info1, src1, dst1);
-
-    ElementInfo info2 = mock(ElementInfo.class);
-    Connection connection2 = new SynchroniusConnection(info2, src2, dst2);
+    Mockito.when(connection2.getSrc()).thenReturn(src2);
+    MetaList info2 = mock(MetaList.class);
+    Mockito.when(connection2.metadata()).thenReturn(info2);
 
     AstList<Connection> connections = new AstList<Connection>();
     connections.add(connection1);
@@ -88,8 +90,8 @@ public class QueryIsConnectedToOneResponse_Test {
 
     testee.check(connections);
 
-    verify(error).err(ErrorType.Hint, info1, "previous connection was here");
-    verify(error).err(ErrorType.Error, info2, "query needs exactly one connection, got more");
+    verify(error).err(ErrorType.Hint, "previous connection was here", info1);
+    verify(error).err(ErrorType.Error, "query needs exactly one connection, got more", info2);
   }
 
   @Test
@@ -99,11 +101,8 @@ public class QueryIsConnectedToOneResponse_Test {
     EndpointSelf dst1 = selfEp();
     EndpointSelf dst2 = selfEp();
 
-    ElementInfo info1 = mock(ElementInfo.class);
-    Connection connection1 = new SynchroniusConnection(info1, src1, dst1);
-
-    ElementInfo info2 = mock(ElementInfo.class);
-    Connection connection2 = new SynchroniusConnection(info2, src2, dst2);
+    Connection connection1 = new SynchroniusConnection(src1, dst1);
+    Connection connection2 = new SynchroniusConnection(src2, dst2);
 
     AstList<Connection> connections = new AstList<Connection>();
     connections.add(connection1);
@@ -111,16 +110,16 @@ public class QueryIsConnectedToOneResponse_Test {
 
     testee.check(connections);
 
-    verify(error, never()).err(any(ErrorType.class), any(ElementInfo.class), anyString());
+    verify(error, never()).err(any(ErrorType.class), anyString(), any(MetaList.class));
   }
 
   private EndpointSelf selfEp() {
-    FuncFunction function = new FuncFunction(ElementInfo.NO, "", new AstList<FuncVariable>(), null, null);
+    FuncFunction function = new FuncFunction("", new AstList<FunctionVariable>(), null, null);
     return selfEp(function);
   }
 
   private EndpointSelf selfEp(FuncFunction function) {
-    return new EndpointSelf(null, new FuncRef(null, new Reference(null, function, new AstList<RefItem>())));
+    return new EndpointSelf(new FuncRef(new Reference(function, new AstList<RefItem>())));
   }
 
 }

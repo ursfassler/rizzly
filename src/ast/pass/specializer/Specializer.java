@@ -69,7 +69,7 @@ public class Specializer {
   }
 
   private Named work() {
-    String name = NameMangler.name(template.name, actualArguments);
+    String name = NameMangler.name(template.getName(), actualArguments);
 
     KnowParent kp = kb.getEntry(KnowParent.class);
     Ast parent = kp.get(template);
@@ -78,7 +78,7 @@ public class Specializer {
 
     if (inst == null) {
       inst = eval(template.getObject());
-      inst.name = name;
+      inst.setName(name);
 
       AddChild.add(parent, inst);
       TypeEvalPass.instantiateTemplateReferences(inst, kb);
@@ -105,7 +105,7 @@ public class Specializer {
     Map<TemplateParameter, ValueExpr> valueMap = createArgMap(ValueExpr.class);
 
     if (typeMap.size() + valueMap.size() != actualArguments.size()) {
-      RError.err(ErrorType.Fatal, templ.getInfo(), "Template argument missmatch");
+      RError.err(ErrorType.Fatal, "Template argument missmatch", templ.metadata());
     }
 
     TypeSpecTrav typeEval = new TypeSpecTrav(typeMap);

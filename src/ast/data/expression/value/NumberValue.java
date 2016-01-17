@@ -19,7 +19,6 @@ package ast.data.expression.value;
 
 import java.math.BigInteger;
 
-import ast.ElementInfo;
 import ast.visitor.Visitor;
 
 /**
@@ -30,8 +29,7 @@ final public class NumberValue extends ValueExpr {
 
   final public BigInteger value;
 
-  public NumberValue(ElementInfo info, BigInteger value) {
-    super(info);
+  public NumberValue(BigInteger value) {
     this.value = value;
   }
 

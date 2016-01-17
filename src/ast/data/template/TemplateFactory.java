@@ -17,15 +17,14 @@
 
 package ast.data.template;
 
-import ast.ElementInfo;
 import ast.data.reference.RefFactory;
 import ast.data.type.Type;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
 import ast.data.variable.TemplateParameter;
 
 public abstract class TemplateFactory {
 
   static protected TemplateParameter makeParam(String name, Type type) {
-    return new TemplateParameter(ElementInfo.NO, name, new TypeRef(ElementInfo.NO, RefFactory.create(ElementInfo.NO, type)));
+    return new TemplateParameter(name, new TypeReference(RefFactory.create(type)));
   }
 }

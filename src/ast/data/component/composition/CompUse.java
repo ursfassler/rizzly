@@ -17,16 +17,23 @@
 
 package ast.data.component.composition;
 
-import ast.ElementInfo;
 import ast.data.Named;
 import ast.data.component.CompRef;
+import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
 final public class CompUse extends Named {
   public CompRef compRef;
 
-  public CompUse(ElementInfo info, String name, CompRef compRef) {
-    super(info, name);
+  public CompUse(String name, CompRef compRef) {
+    setName(name);
+    this.compRef = compRef;
+  }
+
+  @Deprecated
+  public CompUse(MetaList info, String name, CompRef compRef) {
+    metadata().add(info);
+    setName(name);
     this.compRef = compRef;
   }
 

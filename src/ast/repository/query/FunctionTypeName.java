@@ -23,8 +23,8 @@ import ast.data.function.header.FuncFunction;
 import ast.data.function.header.FuncProcedure;
 import ast.data.function.header.FuncQuery;
 import ast.data.function.header.FuncResponse;
-import ast.data.function.header.FuncSignal;
-import ast.data.function.header.FuncSlot;
+import ast.data.function.header.Signal;
+import ast.data.function.header.Slot;
 import ast.data.function.header.FuncSubHandlerEvent;
 import ast.data.function.header.FuncSubHandlerQuery;
 import ast.dispatcher.NullDispatcher;
@@ -45,7 +45,7 @@ class FunctionTypeNameDispatcher extends NullDispatcher<String, Void> {
   }
 
   @Override
-  protected String visitFuncSignal(FuncSignal obj, Void param) {
+  protected String visitFuncSignal(Signal obj, Void param) {
     return "signal";
   }
 
@@ -55,7 +55,7 @@ class FunctionTypeNameDispatcher extends NullDispatcher<String, Void> {
   }
 
   @Override
-  protected String visitFuncSlot(FuncSlot obj, Void param) {
+  protected String visitFuncSlot(Slot obj, Void param) {
     return "slot";
   }
 

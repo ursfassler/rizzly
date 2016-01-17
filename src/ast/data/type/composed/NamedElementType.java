@@ -17,19 +17,31 @@
 
 package ast.data.type.composed;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.type.Type;
+import ast.meta.MetaList;
 
 abstract public class NamedElementType extends Type {
   final public AstList<NamedElement> element;
 
-  public NamedElementType(ElementInfo info, String name, AstList<NamedElement> element) {
+  public NamedElementType(String name, AstList<NamedElement> element) {
+    super(name);
+    this.element = element;
+  }
+
+  @Deprecated
+  public NamedElementType(MetaList info, String name, AstList<NamedElement> element) {
     super(info, name);
     this.element = element;
   }
 
-  public NamedElementType(ElementInfo info, String name) {
+  public NamedElementType(String name) {
+    super(name);
+    this.element = new AstList<NamedElement>();
+  }
+
+  @Deprecated
+  public NamedElementType(MetaList info, String name) {
     super(info, name);
     this.element = new AstList<NamedElement>();
   }

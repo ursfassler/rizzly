@@ -87,7 +87,9 @@ class BitLogicCategorizerWorker extends ExprReplacer<KnowType> {
     Type rt = param.get(obj.right);
     assert ((lt instanceof BooleanType) == (rt instanceof BooleanType));
     if (lt instanceof BooleanType) {
-      return new NotEqual(obj.getInfo(), obj.left, obj.right);
+      NotEqual ret = new NotEqual(obj.left, obj.right);
+      ret.metadata().add(obj.metadata());
+      return ret;
     } else {
       return obj;
     }
@@ -99,11 +101,14 @@ class BitLogicCategorizerWorker extends ExprReplacer<KnowType> {
     Type lt = param.get(obj.left);
     Type rt = param.get(obj.right);
     assert ((lt instanceof BooleanType) == (rt instanceof BooleanType));
+    Expression ret;
     if (lt instanceof BooleanType) {
-      return new LogicAnd(obj.getInfo(), obj.left, obj.right);
+      ret = new LogicAnd(obj.left, obj.right);
     } else {
-      return new BitAnd(obj.getInfo(), obj.left, obj.right);
+      ret = new BitAnd(obj.left, obj.right);
     }
+    ret.metadata().add(obj.metadata());
+    return ret;
   }
 
   @Override
@@ -112,30 +117,37 @@ class BitLogicCategorizerWorker extends ExprReplacer<KnowType> {
     Type lt = param.get(obj.left);
     Type rt = param.get(obj.right);
     assert ((lt instanceof BooleanType) == (rt instanceof BooleanType));
+    Expression ret;
     if (lt instanceof BooleanType) {
-      return new LogicOr(obj.getInfo(), obj.left, obj.right);
+      ret = new LogicOr(obj.left, obj.right);
     } else {
-      return new BitOr(obj.getInfo(), obj.left, obj.right);
+      ret = new BitOr(obj.left, obj.right);
     }
+    ret.metadata().add(obj.metadata());
+    return ret;
   }
 
   @Override
   protected Expression visitNot(Not obj, KnowType param) {
     super.visitNot(obj, param);
-    Type type = param.get(obj.expr);
+    Type type = param.get(obj.expression);
     if (type instanceof BooleanType) {
-      return new LogicNot(obj.getInfo(), obj.expr);
+      LogicNot ret = new LogicNot(obj.expression);
+      ret.metadata().add(obj.metadata());
+      return ret;
     } else if (type instanceof RangeType) {
       Range range = ((RangeType) type).range;
       int bits = range.high.bitCount();
       BigInteger exp = BigInteger.valueOf(2).pow(bits).subtract(BigInteger.ONE);
       if (!range.low.equals(BigInteger.ZERO) || !exp.equals(range.high)) {
-        RError.err(ErrorType.Error, obj.getInfo(), "not only allowed for R{0,2^n-1}");
+        RError.err(ErrorType.Error, "not only allowed for R{0,2^n-1}", obj.metadata());
         return null;
       }
-      return new BitNot(obj.getInfo(), obj.expr);
+      BitNot ret = new BitNot(obj.expression);
+      ret.metadata().add(obj.metadata());
+      return ret;
     } else {
-      RError.err(ErrorType.Error, obj.getInfo(), "not only implemented for boolean and range types");
+      RError.err(ErrorType.Error, "not only implemented for boolean and range types", obj.metadata());
       return null;
     }
   }

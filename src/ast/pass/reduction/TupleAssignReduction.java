@@ -22,26 +22,25 @@ import java.util.List;
 
 import main.Configuration;
 import ast.Designator;
-import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.expression.Expression;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.expression.value.NamedElementsValue;
 import ast.data.expression.value.NamedValue;
 import ast.data.expression.value.TupleValue;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefName;
 import ast.data.reference.Reference;
-import ast.data.statement.AssignmentMulti;
 import ast.data.statement.AssignmentSingle;
+import ast.data.statement.MultiAssignment;
 import ast.data.statement.Statement;
 import ast.data.statement.VarDefStmt;
 import ast.data.type.Type;
 import ast.data.type.TypeRefFactory;
 import ast.data.type.composed.RecordType;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.dispatcher.other.StmtReplacer;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
@@ -90,7 +89,7 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
   }
 
   @Override
-  protected List<Statement> visitAssignmentMulti(AssignmentMulti obj, Void param) {
+  protected List<Statement> visitAssignmentMulti(MultiAssignment obj, Void param) {
     int leftCount, rightCount;
 
     leftCount = obj.left.size();
@@ -129,23 +128,21 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
   }
 
   private List<Statement> assignMulOne(AstList<Reference> left, Expression right) {
-    ElementInfo info = ElementInfo.NO;
-
     Type rt = kt.get(right);
     if (rt instanceof RecordType) {
       String name = Designator.NAME_SEP + "var"; // XXX add pass to make names
       // unique
-      FuncVariable var = new FuncVariable(info, name, TypeRefFactory.create(info, rt));
+      FunctionVariable var = new FunctionVariable(name, TypeRefFactory.create(rt));
 
       List<Statement> ret = new ArrayList<Statement>();
-      ret.add(new VarDefStmt(info, var));
-      ret.add(new AssignmentSingle(info, RefFactory.full(info, var), right));
+      ret.add(new VarDefStmt(var));
+      ret.add(new AssignmentSingle(RefFactory.full(var), right));
 
       for (int i = 0; i < left.size(); i++) {
         Reference lr = left.get(i);
-        String elemName = ((RecordType) rt).element.get(i).name;
-        Reference rr = RefFactory.create(info, var, new RefName(info, elemName));
-        ret.add(new AssignmentSingle(info, lr, new RefExp(info, rr)));
+        String elemName = ((RecordType) rt).element.get(i).getName();
+        Reference rr = RefFactory.create(var, new RefName(elemName));
+        ret.add(new AssignmentSingle(lr, new ReferenceExpression(rr)));
       }
 
       return ret;
@@ -168,15 +165,16 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
   }
 
   private List<Statement> assignOneRecord(Reference left, RecordType rt, AstList<Expression> value) {
-    RError.ass(rt.element.size() == value.size(), left.getInfo(), "expected same number of elementds, got: " + rt.element.size() + " <-> " + value.size());
+    RError.ass(rt.element.size() == value.size(), left.metadata(), "expected same number of elementds, got: " + rt.element.size() + " <-> " + value.size());
     List<Statement> ret = new ArrayList<Statement>(value.size());
 
     for (int i = 0; i < value.size(); i++) {
       Reference subref = Copy.copy(left);
-      subref.offset.add(new RefName(ElementInfo.NO, rt.element.get(i).name));
+      subref.offset.add(new RefName(rt.element.get(i).getName()));
       Expression subVal = value.get(i);
-      RError.ass(!(subVal instanceof NamedElementsValue), subVal.getInfo(), "Named element values for tuple not yet supported: " + subVal.toString());
-      AssignmentSingle ass = new AssignmentSingle(left.getInfo(), subref, subVal);
+      RError.ass(!(subVal instanceof NamedElementsValue), subVal.metadata(), "Named element values for tuple not yet supported: " + subVal.toString());
+      AssignmentSingle ass = new AssignmentSingle(subref, subVal);
+      ass.metadata().add(left.metadata());
       ret.add(ass);
     }
 

@@ -18,10 +18,10 @@
 package ast.repository.query;
 
 import ast.Designator;
-import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
+import ast.meta.MetaList;
 import ast.specification.HasName;
 import error.ErrorType;
 import error.RError;
@@ -34,7 +34,7 @@ public class ChildByName {
     this.single = single;
   }
 
-  public Named get(Named root, Designator path, ElementInfo info) {
+  public Named get(Named root, Designator path, MetaList info) {
     for (String child : path) {
       root = (Named) single.force(ChildCollector.select(root, new HasName(child)), info);
     }
@@ -42,7 +42,7 @@ public class ChildByName {
   }
 
   @Deprecated
-  static public Ast staticGet(Ast root, Designator path, ElementInfo info) {
+  static public Ast staticGet(Ast root, Designator path, MetaList info) {
     for (String child : path) {
       root = Single.staticForce(ChildCollector.select(root, new HasName(child)), info);
     }
@@ -53,16 +53,16 @@ public class ChildByName {
     return Single.find(ChildCollector.select(parent, new HasName(name)));
   }
 
-  public static Ast get(Ast parent, String name, ElementInfo info) {
+  public static Ast get(Ast parent, String name, MetaList info) {
     AstList<Ast> list = ChildCollector.select(parent, new HasName(name));
     switch (list.size()) {
       case 1:
         return list.get(0);
       case 0:
-        RError.err(ErrorType.Fatal, info, "Name not found: " + name);
+        RError.err(ErrorType.Fatal, "Name not found: " + name, info);
         return null;
       default:
-        RError.err(ErrorType.Fatal, info, "To many items found");
+        RError.err(ErrorType.Fatal, "To many items found", info);
         return null;
     }
   }

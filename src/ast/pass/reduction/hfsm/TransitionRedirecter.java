@@ -79,7 +79,7 @@ class TransitionRedirecterWorker extends NullDispatcher<Void, Void> {
   protected Void visitTransition(Transition obj, Void param) {
     State dst = obj.dst.getTarget();
     dst = initStateGetter.traverse(dst, null);
-    obj.dst = StateRefFactory.create(obj.dst.getInfo(), dst);
+    obj.dst = StateRefFactory.create(obj.dst.metadata(), dst);
     return null;
   }
 

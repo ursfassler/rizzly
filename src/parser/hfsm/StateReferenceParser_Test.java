@@ -18,7 +18,6 @@
 package parser.hfsm;
 
 import static org.mockito.Matchers.any;
-import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -30,38 +29,37 @@ import org.junit.Test;
 import parser.PeekNReader;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
-import ast.ElementInfo;
 import ast.data.component.hfsm.StateRef;
 import ast.data.reference.RefName;
+import ast.meta.MetaList;
 import error.ErrorType;
 import error.RizzlyError;
 
 public class StateReferenceParser_Test {
 
-  private static final ElementInfo info = ElementInfo.NO;
   private final RizzlyError error = mock(RizzlyError.class);
-  private final Scanner_Dummy<Token> scanner = new Scanner_Dummy<Token>(new Token(TokenType.EOF, info));
+  private final Scanner_Dummy<Token> scanner = new Scanner_Dummy<Token>(new Token(TokenType.EOF));
   private final StateReferenceParser testee = new StateReferenceParser(new PeekNReader<Token>(scanner), error);
 
   @Test
   public void can_be_one_identifier() {
-    scanner.add(new Token(TokenType.IDENTIFIER, "xyz", info));
+    scanner.add(new Token(TokenType.IDENTIFIER, "xyz"));
 
     StateRef stateRef = testee.parse();
 
-    Assert.assertEquals("xyz", stateRef.ref.link.name);
+    Assert.assertEquals("xyz", stateRef.ref.link.getName());
     Assert.assertEquals(0, stateRef.ref.offset.size());
   }
 
   @Test
   public void can_be_2_identifiers_with_a_dot_between() {
-    scanner.add(new Token(TokenType.IDENTIFIER, "x", info));
-    scanner.add(new Token(TokenType.PERIOD, info));
-    scanner.add(new Token(TokenType.IDENTIFIER, "y", info));
+    scanner.add(new Token(TokenType.IDENTIFIER, "x"));
+    scanner.add(new Token(TokenType.PERIOD));
+    scanner.add(new Token(TokenType.IDENTIFIER, "y"));
 
     StateRef stateRef = testee.parse();
 
-    Assert.assertEquals("x", stateRef.ref.link.name);
+    Assert.assertEquals("x", stateRef.ref.link.getName());
     Assert.assertEquals(1, stateRef.ref.offset.size());
 
     Assert.assertTrue(stateRef.ref.offset.get(0) instanceof RefName);
@@ -70,15 +68,15 @@ public class StateReferenceParser_Test {
 
   @Test
   public void can_be_multiple_identifiers_with_a_dot_between() {
-    scanner.add(new Token(TokenType.IDENTIFIER, "x", info));
-    scanner.add(new Token(TokenType.PERIOD, info));
-    scanner.add(new Token(TokenType.IDENTIFIER, "y", info));
-    scanner.add(new Token(TokenType.PERIOD, info));
-    scanner.add(new Token(TokenType.IDENTIFIER, "z", info));
+    scanner.add(new Token(TokenType.IDENTIFIER, "x"));
+    scanner.add(new Token(TokenType.PERIOD));
+    scanner.add(new Token(TokenType.IDENTIFIER, "y"));
+    scanner.add(new Token(TokenType.PERIOD));
+    scanner.add(new Token(TokenType.IDENTIFIER, "z"));
 
     StateRef stateRef = testee.parse();
 
-    Assert.assertEquals("x", stateRef.ref.link.name);
+    Assert.assertEquals("x", stateRef.ref.link.getName());
     Assert.assertEquals(2, stateRef.ref.offset.size());
 
     Assert.assertTrue(stateRef.ref.offset.get(0) instanceof RefName);
@@ -89,45 +87,45 @@ public class StateReferenceParser_Test {
 
   @Test
   public void can_be_self() {
-    scanner.add(new Token(TokenType.IDENTIFIER, "self", info));
+    scanner.add(new Token(TokenType.IDENTIFIER, "self"));
 
     StateRef stateRef = testee.parse();
 
-    Assert.assertEquals("self", stateRef.ref.link.name);
+    Assert.assertEquals("self", stateRef.ref.link.getName());
     Assert.assertEquals(0, stateRef.ref.offset.size());
   }
 
   @Test
   public void emits_error_for_unexpected_token() {
-    scanner.add(new Token(TokenType.SEMI, info));
+    scanner.add(new Token(TokenType.SEMI));
 
     testee.parse();
 
-    verify(error).err(eq(ErrorType.Error), anyString(), anyInt(), anyInt(), anyString());
+    verify(error).err(eq(ErrorType.Error), anyString(), any(MetaList.class));
   }
 
   @Test
   public void uses_info_from_token_for_error_message_for_unexpected_token() {
-    ElementInfo info = new ElementInfo("theFile", 42, 57);
-    scanner.add(new Token(TokenType.SEMI, info));
+    MetaList meta = mock(MetaList.class);
+    scanner.add(new Token(TokenType.SEMI, meta));
 
     testee.parse();
 
-    verify(error).err(any(ErrorType.class), eq("theFile"), eq(42), eq(57), anyString());
+    verify(error).err(any(ErrorType.class), anyString(), eq(meta));
   }
 
   @Test
   public void has_meaningfull_error_message_for_unexpected_token() {
-    scanner.add(new Token(TokenType.SEMI, info));
+    scanner.add(new Token(TokenType.SEMI));
 
     testee.parse();
 
-    verify(error).err(any(ErrorType.class), anyString(), anyInt(), anyInt(), eq("expected IDENTIFIER, got SEMI"));
+    verify(error).err(any(ErrorType.class), eq("expected IDENTIFIER, got SEMI"), any(MetaList.class));
   }
 
   @Test
   public void returns_null_for_unexpected_token() {
-    scanner.add(new Token(TokenType.SEMI, info));
+    scanner.add(new Token(TokenType.SEMI));
 
     StateRef stateRef = testee.parse();
 

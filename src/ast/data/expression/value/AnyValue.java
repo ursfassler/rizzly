@@ -17,15 +17,10 @@
 
 package ast.data.expression.value;
 
-import ast.ElementInfo;
 import ast.visitor.Visitor;
 
 final public class AnyValue extends ValueExpr {
   static final public String NAME = "?";
-
-  public AnyValue(ElementInfo info) {
-    super(info);
-  }
 
   @Override
   public String toString() {

@@ -133,7 +133,7 @@ class VarLinkOkWorker extends DfsTraverser<Void, Set<Ast>> {
   protected Void visitReference(Reference obj, Set<Ast> param) {
     if ((obj.link instanceof Variable) || (obj.link instanceof Type)) {
       if (!param.contains(obj.link)) {
-        RError.err(ErrorType.Fatal, obj.getInfo(), "object " + obj.link.toString() + " not visible from here");
+        RError.err(ErrorType.Fatal, "object " + obj.link.toString() + " not visible from here", obj.metadata());
       }
     }
     return super.visitReference(obj, param);

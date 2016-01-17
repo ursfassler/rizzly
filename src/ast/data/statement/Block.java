@@ -17,16 +17,11 @@
 
 package ast.data.statement;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.visitor.Visitor;
 
-final public class Block extends Statement {
+public class Block extends Statement {
   final public AstList<Statement> statements = new AstList<Statement>();
-
-  public Block(ElementInfo info) {
-    super(info);
-  }
 
   @Override
   public String toString() {

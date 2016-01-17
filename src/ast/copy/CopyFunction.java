@@ -21,7 +21,7 @@ import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.function.Function;
 import ast.data.function.FunctionFactory;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.dispatcher.NullDispatcher;
 
 public class CopyFunction extends NullDispatcher<Ast, Void> {
@@ -39,8 +39,8 @@ public class CopyFunction extends NullDispatcher<Ast, Void> {
 
   @Override
   protected Function visitFunction(Function obj, Void param) {
-    AstList<FuncVariable> arg = cast.copy(obj.param);
-    Function ret = FunctionFactory.create(obj.getClass(), obj.getInfo(), obj.name, arg, cast.copy(obj.ret), cast.copy(obj.body));
+    AstList<FunctionVariable> arg = cast.copy(obj.param);
+    Function ret = FunctionFactory.create(obj.getClass(), obj.getName(), arg, cast.copy(obj.ret), cast.copy(obj.body));
     cast.getCopied().put(obj, ret);
     ret.property = obj.property;
     return ret;

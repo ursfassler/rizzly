@@ -17,7 +17,6 @@
 
 package ast.data.statement;
 
-import ast.ElementInfo;
 import ast.data.expression.Expression;
 import ast.data.reference.Reference;
 import ast.visitor.Visitor;
@@ -25,8 +24,8 @@ import ast.visitor.Visitor;
 final public class AssignmentSingle extends Assignment {
   public Reference left;
 
-  public AssignmentSingle(ElementInfo info, Reference left, Expression right) {
-    super(info, right);
+  public AssignmentSingle(Reference left, Expression right) {
+    super(right);
     this.left = left;
   }
 

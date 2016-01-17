@@ -29,7 +29,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.commons.cli.PosixParser;
 
 import ast.Designator;
-import ast.ElementInfo;
+import ast.meta.Meta;
 import error.ErrorType;
 import error.RizzlyError;
 
@@ -60,6 +60,7 @@ public class CommandLineParser {
     configuration.setDebugEvent(cmd.hasOption(options.debugEvent.getLongOpt()));
     configuration.setLazyModelCheck(cmd.hasOption(options.lazyModelCheck.getLongOpt()));
     configuration.setDocOutput(cmd.hasOption(options.documentation.getLongOpt()));
+    configuration.setXml(cmd.hasOption(options.xml.getLongOpt()));
     configuration.setExtension(extension);
 
     return configuration;
@@ -85,6 +86,7 @@ public class CommandLineParser {
 
     configuration.setRootComp(rootComponent);
     configuration.setRootPath(rootPath);
+    configuration.setNamespace(getNamespace(inputFile));
   }
 
   private boolean isSane(String inputFile, CommandLine cmd) {
@@ -92,12 +94,12 @@ public class CommandLineParser {
     boolean hasRizzlyFile = inputFile != null;  // TODO remove
 
     if (hasComponent && !hasRizzlyFile) {
-      error.err(ErrorType.Error, ElementInfo.NO, "Option '" + options.component.getLongOpt() + "' needs file");
+      error.err(ErrorType.Error, "Option '" + options.component.getLongOpt() + "' needs file", Meta.empty());
       return false;
     }
 
     if (!hasRizzlyFile) {
-      error.err(ErrorType.Error, ElementInfo.NO, "Need a file");
+      error.err(ErrorType.Error, "Need a file", Meta.empty());
       printHelp();
       return false;
     }
@@ -136,14 +138,19 @@ public class CommandLineParser {
   }
 
   private Designator getRootComponent(String inputFile) {
+    String namespace = getNamespace(inputFile);
+    String component = namespace.substring(0, 1).toUpperCase() + namespace.substring(1, namespace.length());
+
+    return new Designator(namespace, component);
+  }
+
+  private String getNamespace(String inputFile) {
     assert (inputFile.endsWith(extension));
 
     String filename = getFilename(inputFile);
 
     String namespace = filename.substring(0, filename.length() - extension.length());
-    String component = namespace.substring(0, 1).toUpperCase() + namespace.substring(1, namespace.length());
-
-    return new Designator(namespace, component);
+    return namespace;
   }
 
   private String getRootPath(String inputFile) {
@@ -181,6 +188,7 @@ class RizzlyOptions {
   public final Option lazyModelCheck = new Option(null, "lazyModelCheck", false, "Do not check constraints of model. Very insecure!");
   public final Option debugEvent = new Option(null, "debugEvent", false, "produce code to get informed whenever a event is sent or received");
   public final Option documentation = new Option(null, "doc", false, "generate documentation");
+  public final Option xml = new Option(null, "xml", false, "write AST to an xml file");
   public final Option component = new Option("c", "component", true, "the component to instantiate");
   public final Option help = new Option("h", "help", false, "show help");
   public final Options all = new Options();
@@ -191,6 +199,7 @@ class RizzlyOptions {
     all.addOption(documentation);
     all.addOption(debugEvent);
     all.addOption(lazyModelCheck);
+    all.addOption(xml);
   }
 
 }

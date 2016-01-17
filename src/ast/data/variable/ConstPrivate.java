@@ -17,15 +17,14 @@
 
 package ast.data.variable;
 
-import ast.ElementInfo;
 import ast.data.component.hfsm.StateContent;
 import ast.data.expression.Expression;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
 import ast.visitor.Visitor;
 
 final public class ConstPrivate extends Constant implements StateContent {
-  public ConstPrivate(ElementInfo info, String name, TypeRef type, Expression def) {
-    super(info, name, type, def);
+  public ConstPrivate(String name, TypeReference type, Expression def) {
+    super(name, type, def);
   }
 
   @Override

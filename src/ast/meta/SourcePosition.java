@@ -15,24 +15,31 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.function.header;
+package ast.meta;
 
-import ast.ElementInfo;
-import ast.data.AstList;
-import ast.data.function.InterfaceFunction;
-import ast.data.function.ret.FuncReturn;
-import ast.data.statement.Block;
-import ast.data.variable.FuncVariable;
 import ast.visitor.Visitor;
+import ast.visitor.VisitorAcceptor;
 
-final public class FuncSlot extends InterfaceFunction {
+public class SourcePosition implements VisitorAcceptor, MetaInformation {
+  final public String filename;
+  final public int line;
+  final public int row;
 
-  public FuncSlot(ElementInfo info, String name, AstList<FuncVariable> param, FuncReturn ret, Block body) {
-    super(info, name, param, ret, body);
+  public SourcePosition(String filename, int line, int row) {
+    super();
+    this.filename = filename;
+    this.line = line;
+    this.row = row;
+  }
+
+  @Override
+  public String toString() {
+    return filename + ": " + line + "," + row;
   }
 
   @Override
   public void accept(Visitor visitor) {
     visitor.visit(this);
   }
+
 }

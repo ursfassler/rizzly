@@ -17,7 +17,6 @@
 
 package ast.data.type.template;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.template.Template;
 import ast.data.template.TemplateFactory;
@@ -30,7 +29,7 @@ public class ArrayTemplateFactory extends TemplateFactory {
   public static final String[] PARAM = { "S", "T" };
 
   public static Template create(IntegerType intType, TypeType typeTypeAny) {
-    return new Template(ElementInfo.NO, NAME, getParameter(intType, typeTypeAny), new ArrayTemplate());
+    return new Template(NAME, getParameter(intType, typeTypeAny), new ArrayTemplate());
   }
 
   private static AstList<TemplateParameter> getParameter(IntegerType intType, TypeType typeTypeAny) {

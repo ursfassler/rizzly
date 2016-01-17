@@ -17,7 +17,7 @@
 
 package metadata.parser;
 
-import ast.ElementInfo;
+import ast.meta.MetaList;
 
 /**
  *
@@ -26,15 +26,15 @@ import ast.ElementInfo;
 public class Token {
   private TokenType type;
   private String data;
-  private ElementInfo info;
+  private MetaList info;
 
-  public Token(TokenType type, ElementInfo info) {
+  public Token(TokenType type, MetaList info) {
     super();
     this.type = type;
     this.info = info;
   }
 
-  public Token(TokenType type, String data, ElementInfo info) {
+  public Token(TokenType type, String data, MetaList info) {
     super();
     this.type = type;
     this.data = data;
@@ -50,7 +50,8 @@ public class Token {
     return data;
   }
 
-  public ElementInfo getInfo() {
+  // TODO rename to getMetadata
+  public MetaList getInfo() {
     return info;
   }
 

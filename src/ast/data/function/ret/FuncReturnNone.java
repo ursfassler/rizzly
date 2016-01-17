@@ -17,13 +17,17 @@
 
 package ast.data.function.ret;
 
-import ast.ElementInfo;
+import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
 final public class FuncReturnNone extends FuncReturn {
 
-  public FuncReturnNone(ElementInfo info) {
-    super(info);
+  public FuncReturnNone() {
+  }
+
+  @Deprecated
+  public FuncReturnNone(MetaList info) {
+    metadata().add(info);
   }
 
   @Override

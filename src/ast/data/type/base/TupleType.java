@@ -17,16 +17,22 @@
 
 package ast.data.type.base;
 
-import ast.ElementInfo;
 import ast.data.AstList;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
+import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
 final public class TupleType extends BaseType {
-  final public AstList<TypeRef> types;
+  final public AstList<TypeReference> types;
 
   // TODO create name from types
-  public TupleType(ElementInfo info, String name, AstList<TypeRef> types) {
+  public TupleType(String name, AstList<TypeReference> types) {
+    super(name);
+    this.types = types;
+  }
+
+  @Deprecated
+  public TupleType(MetaList info, String name, AstList<TypeReference> types) {
     super(info, name);
     this.types = types;
   }

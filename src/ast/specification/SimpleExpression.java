@@ -37,7 +37,7 @@ import ast.data.type.base.RangeType;
 import ast.data.type.composed.RecordType;
 import ast.data.type.special.NaturalType;
 import ast.data.variable.ConstGlobal;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.data.variable.StateVariable;
 import ast.dispatcher.NullDispatcher;
 
@@ -126,7 +126,7 @@ class SimpleGetter extends NullDispatcher<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitFuncVariable(FuncVariable obj, Void param) {
+  protected Boolean visitFuncVariable(FunctionVariable obj, Void param) {
     return true;
   }
 

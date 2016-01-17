@@ -18,7 +18,9 @@
 package metadata.parser;
 
 import parser.PeekReader;
-import ast.ElementInfo;
+import ast.meta.MetaList;
+import ast.meta.MetaListImplementation;
+import ast.meta.SourcePosition;
 import error.ErrorType;
 import error.RError;
 
@@ -35,11 +37,11 @@ public class Scanner implements PeekReader<Token> {
     next();
   }
 
-  private Token token(TokenType value, ElementInfo info) {
+  private Token token(TokenType value, MetaList info) {
     return new Token(value, info);
   }
 
-  private Token token(TokenType value, String id, ElementInfo info) {
+  private Token token(TokenType value, String id, MetaList info) {
     return new Token(value, id, info);
   }
 
@@ -54,9 +56,9 @@ public class Scanner implements PeekReader<Token> {
   }
 
   private Token specialToken(TokenType value) {
-    ElementInfo info;
-    info = new ElementInfo("", 0, 0); // FIXME use correct filename
-    return new Token(value, info);
+    MetaList meta = new MetaListImplementation();
+    meta.add(new SourcePosition("", 0, 0)); // FIXME use correct filename
+    return new Token(value, meta);
   }
 
   @Override
@@ -77,7 +79,7 @@ public class Scanner implements PeekReader<Token> {
     if (!reader.hasNext()) {
       return specialToken(TokenType.EOF);
     }
-    ElementInfo info = reader.getInfo();
+    MetaList info = reader.getInfo();
     Character sym = reader.next();
     switch (sym) {
       case ' ':
@@ -97,7 +99,7 @@ public class Scanner implements PeekReader<Token> {
           Token toc = token(type, id, info);
           return toc;
         } else {
-          RError.err(ErrorType.Error, info, "Unexpected character: #" + Integer.toHexString(sym) + " (" + sym + ")");
+          RError.err(ErrorType.Error, "Unexpected character: #" + Integer.toHexString(sym) + " (" + sym + ")", info);
           return specialToken(TokenType.IGNORE);
         }
     }
@@ -127,7 +129,7 @@ public class Scanner implements PeekReader<Token> {
   }
 
   // "
-  private Token read_22(ElementInfo sym) {
+  private Token read_22(MetaList sym) {
     String value = readTilEndString();
     return token(TokenType.STRING, value, sym);
   }
@@ -143,7 +145,7 @@ public class Scanner implements PeekReader<Token> {
         ret += sym;
       }
     }
-    RError.err(ErrorType.Error, reader.getInfo(), "String over end of file");
+    RError.err(ErrorType.Error, "String over end of file", reader.getInfo());
     return null;
   }
 

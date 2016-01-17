@@ -20,7 +20,6 @@ package ast.pass.check.model;
 import java.util.List;
 
 import main.Configuration;
-import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.component.Component;
@@ -38,14 +37,15 @@ import ast.data.function.Function;
 import ast.data.function.InterfaceFunction;
 import ast.data.function.header.FuncQuery;
 import ast.data.function.header.FuncResponse;
-import ast.data.function.header.FuncSignal;
-import ast.data.function.header.FuncSlot;
+import ast.data.function.header.Signal;
+import ast.data.function.header.Slot;
 import ast.data.type.Type;
 import ast.data.variable.Constant;
 import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowLeftIsContainerOfRight;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
+import ast.meta.MetaList;
 import ast.pass.AstPass;
 import ast.pass.check.model.composition.QueryIsConnectedToOneResponse;
 import ast.repository.query.Collector;
@@ -158,7 +158,7 @@ class CompInterfaceTypeCheckerWorker extends NullDispatcher<Void, Void> {
         } else {
           etype = ErrorType.Hint;
         }
-        RError.err(etype, ifaceuse.getInfo(), "Interface " + ifaceuse.name + " not connected");
+        RError.err(etype, "Interface " + ifaceuse.getName() + " not connected", ifaceuse.metadata());
       }
     }
   }
@@ -173,8 +173,8 @@ class CompInterfaceTypeCheckerWorker extends NullDispatcher<Void, Void> {
         } else {
           etype = ErrorType.Hint;
         }
-        RError.err(ErrorType.Hint, ifaceuse.getInfo(), "Interface " + ifaceuse.name + " declared here");
-        RError.err(etype, use.getInfo(), "Interface " + use.name + "." + ifaceuse.name + " not connected");
+        RError.err(ErrorType.Hint, "Interface " + ifaceuse.getName() + " declared here", ifaceuse.metadata());
+        RError.err(etype, "Interface " + use.getName() + "." + ifaceuse.getName() + " not connected", use.metadata());
       }
     }
     return type;
@@ -182,8 +182,8 @@ class CompInterfaceTypeCheckerWorker extends NullDispatcher<Void, Void> {
 
   private boolean ifaceIsConnected(CompUse use, InterfaceFunction ifaceuse, Direction dir, List<Connection> connection) {
     for (Connection itr : connection) {
-      if (itr.endpoint.get(dir) instanceof EndpointSub) {
-        EndpointSub ep = (EndpointSub) itr.endpoint.get(dir);
+      if (getEndpoint(itr, dir) instanceof EndpointSub) {
+        EndpointSub ep = (EndpointSub) getEndpoint(itr, dir);
         if ((ep.component.getTarget() == use) && (ep.getFunc() == ifaceuse)) {
           return true;
         }
@@ -194,8 +194,8 @@ class CompInterfaceTypeCheckerWorker extends NullDispatcher<Void, Void> {
 
   private boolean ifaceIsConnected(InterfaceFunction ifaceuse, Direction dir, List<Connection> connection) {
     for (Connection itr : connection) {
-      if (itr.endpoint.get(dir) instanceof EndpointSelf) {
-        Endpoint ep = itr.endpoint.get(dir);
+      if (getEndpoint(itr, dir) instanceof EndpointSelf) {
+        Endpoint ep = getEndpoint(itr, dir);
         if (ep.getFunc() == ifaceuse) {
           return true;
         }
@@ -204,10 +204,18 @@ class CompInterfaceTypeCheckerWorker extends NullDispatcher<Void, Void> {
     return false;
   }
 
+  private Endpoint getEndpoint(Connection connection, Direction dir) {
+    if (dir == Direction.in) {
+      return connection.getSrc();
+    } else {
+      return connection.getDst();
+    }
+  }
+
   @Override
   protected Void visitConnection(Connection obj, Void param) {
-    Endpoint srcEp = obj.endpoint.get(Direction.in);
-    Endpoint dstEp = obj.endpoint.get(Direction.out);
+    Endpoint srcEp = obj.getSrc();
+    Endpoint dstEp = obj.getDst();
     Function srcType = getIfaceFunc(srcEp);
     Function dstType = getIfaceFunc(dstEp);
 
@@ -215,7 +223,7 @@ class CompInterfaceTypeCheckerWorker extends NullDispatcher<Void, Void> {
     Type dt = kt.get(dstType);
 
     if (!kc.get(dt, st)) {
-      RError.err(ErrorType.Error, obj.getInfo(), "Invalid connection: " + st + " -> " + dt);
+      RError.err(ErrorType.Error, "Invalid connection: " + st + " -> " + dt, obj.metadata());
     }
 
     boolean srcSelf = srcEp instanceof EndpointSelf;
@@ -224,18 +232,18 @@ class CompInterfaceTypeCheckerWorker extends NullDispatcher<Void, Void> {
     Direction dstDir = getDir(dstType);
 
     if (srcSelf && dstSelf) {
-      checkDir(srcDir, Direction.in, Direction.in, srcEp.getInfo());
-      checkDir(dstDir, Direction.out, Direction.out, dstEp.getInfo());
+      checkDir(srcDir, Direction.in, Direction.in, srcEp.metadata());
+      checkDir(dstDir, Direction.out, Direction.out, dstEp.metadata());
     } else if (!srcSelf && dstSelf) {
-      checkDir(srcDir, Direction.out, Direction.in, srcEp.getInfo());
-      checkDir(dstDir, Direction.out, Direction.out, dstEp.getInfo());
+      checkDir(srcDir, Direction.out, Direction.in, srcEp.metadata());
+      checkDir(dstDir, Direction.out, Direction.out, dstEp.metadata());
     } else if (srcSelf && !dstSelf) {
-      checkDir(srcDir, Direction.in, Direction.in, srcEp.getInfo());
-      checkDir(dstDir, Direction.in, Direction.out, dstEp.getInfo());
+      checkDir(srcDir, Direction.in, Direction.in, srcEp.metadata());
+      checkDir(dstDir, Direction.in, Direction.out, dstEp.metadata());
     } else {
       assert (!srcSelf && !dstSelf);
-      checkDir(srcDir, Direction.out, Direction.in, srcEp.getInfo());
-      checkDir(dstDir, Direction.in, Direction.out, dstEp.getInfo());
+      checkDir(srcDir, Direction.out, Direction.in, srcEp.metadata());
+      checkDir(dstDir, Direction.in, Direction.out, dstEp.metadata());
     }
 
     return null;
@@ -244,31 +252,31 @@ class CompInterfaceTypeCheckerWorker extends NullDispatcher<Void, Void> {
   private Function getIfaceFunc(Endpoint ep) {
     Function func = ep.getFunc();
     if (func == null) {
-      RError.err(ErrorType.Error, ep.getInfo(), "Interface not found: " + ep.toString());
+      RError.err(ErrorType.Error, "Interface not found: " + ep.toString(), ep.metadata());
     }
     return func;
   }
 
   private Direction getDir(Function func) {
-    if (func instanceof FuncSlot) {
+    if (func instanceof Slot) {
       return Direction.in;
     } else if (func instanceof FuncResponse) {
       return Direction.in;
     } else if (func instanceof FuncQuery) {
       return Direction.out;
-    } else if (func instanceof FuncSignal) {
+    } else if (func instanceof Signal) {
       return Direction.out;
     } else {
-      RError.err(ErrorType.Fatal, func.getInfo(), "Unexpected function type: " + func.getClass().getCanonicalName());
+      RError.err(ErrorType.Fatal, "Unexpected function type: " + func.getClass().getCanonicalName(), func.metadata());
       return null;
     }
   }
 
-  private void checkDir(Direction is, Direction should, Direction ep, ElementInfo info) {
+  private void checkDir(Direction is, Direction should, Direction ep, MetaList info) {
     if (is != should) {
       String eps = ep == Direction.in ? "from" : "to";
       String iss = is == Direction.in ? "input" : "output";
-      RError.err(ErrorType.Error, info, "can not connect " + eps + " " + iss);
+      RError.err(ErrorType.Error, "can not connect " + eps + " " + iss, info);
     }
   }
 

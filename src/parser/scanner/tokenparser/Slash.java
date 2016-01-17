@@ -23,8 +23,8 @@ import parser.PeekReader;
 import parser.scanner.Symbol;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
-import ast.ElementInfo;
-import ast.data.Metadata;
+import ast.meta.Metadata;
+import ast.meta.SourcePosition;
 import error.ErrorType;
 import error.RError;
 
@@ -69,7 +69,7 @@ public class Slash extends TokenParser implements MetadataReader {
 
   private void parseMetadata(Symbol start) {
     Symbol sym = reader.peek();
-    ElementInfo info = new ElementInfo(sym.filename, sym.line, sym.row);
+    SourcePosition info = new SourcePosition(sym.filename, sym.line, sym.row);
 
     String key = readMetaKey();
     String data = seekTilNewline();

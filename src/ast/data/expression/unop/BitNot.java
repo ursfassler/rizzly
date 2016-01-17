@@ -17,14 +17,13 @@
 
 package ast.data.expression.unop;
 
-import ast.ElementInfo;
 import ast.data.expression.Expression;
 import ast.visitor.Visitor;
 
 final public class BitNot extends UnaryExp {
 
-  public BitNot(ElementInfo info, Expression expr) {
-    super(info, expr);
+  public BitNot(Expression expr) {
+    super(expr);
   }
 
   @Override

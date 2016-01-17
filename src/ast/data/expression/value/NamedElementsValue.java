@@ -17,15 +17,13 @@
 
 package ast.data.expression.value;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.visitor.Visitor;
 
 final public class NamedElementsValue extends ValueExpr {
   final public AstList<NamedValue> value;
 
-  public NamedElementsValue(ElementInfo info, AstList<NamedValue> value) {
-    super(info);
+  public NamedElementsValue(AstList<NamedValue> value) {
     this.value = value;
   }
 

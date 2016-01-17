@@ -17,13 +17,19 @@
 
 package ast.data.type.base;
 
-import ast.ElementInfo;
 import ast.data.Named;
+import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
 final public class EnumElement extends Named {
-  public EnumElement(ElementInfo info, String name) {
-    super(info, name);
+  public EnumElement(String name) {
+    setName(name);
+  }
+
+  @Deprecated
+  public EnumElement(MetaList info, String name) {
+    metadata().add(info);
+    setName(name);
   }
 
   @Override

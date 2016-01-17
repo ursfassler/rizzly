@@ -29,8 +29,8 @@ import java.util.StringTokenizer;
 
 import metadata.parser.SimpleMetaParser;
 import util.Pair;
-import ast.ElementInfo;
 import ast.doc.SimpleGraph;
+import ast.meta.MetaList;
 import error.ErrorType;
 import error.RError;
 
@@ -140,10 +140,10 @@ public class Positioning {
     g.getSize().y = getDouble(data, "height", g.getInfo());
   }
 
-  private static double getDouble(Map<String, String> data, String key, ElementInfo info) {
+  private static double getDouble(Map<String, String> data, String key, MetaList info) {
 
     if (!data.containsKey(key)) {
-      RError.err(ErrorType.Error, info, "expected metadata: " + key);
+      RError.err(ErrorType.Error, "expected metadata: " + key, info);
     }
     return Double.parseDouble(data.get(key));
   }
@@ -163,7 +163,7 @@ public class Positioning {
       Integer u = map.get(e.getSrc().getOwner());
       Integer v = map.get(e.getDst().getOwner());
       if ((u != null) && (v != null)) { // otherwise one end is at the owner
-                                        // component -> not relevant
+        // component -> not relevant
         g.addEdge(u, v);
         start.remove(v);
       }

@@ -17,16 +17,14 @@
 
 package ast.data.statement;
 
-import ast.ElementInfo;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.visitor.Visitor;
 
 final public class ForStmt extends Statement {
-  public FuncVariable iterator;
+  public FunctionVariable iterator;
   public Block block;
 
-  public ForStmt(ElementInfo info, FuncVariable iterator, Block block) {
-    super(info);
+  public ForStmt(FunctionVariable iterator, Block block) {
     this.iterator = iterator;
     this.block = block;
   }

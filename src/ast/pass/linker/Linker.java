@@ -37,7 +37,7 @@ import ast.data.raw.RawComponent;
 import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
-import ast.data.reference.DummyLinkTarget;
+import ast.data.reference.LinkTarget;
 import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.statement.VarDefInitStmt;
@@ -110,10 +110,10 @@ class LinkerWorker extends DfsTraverser<Void, SymbolTable> {
     Set<String> ambigous = new HashSet<String>();
     AstList<Named> map = new AstList<Named>();
     for (Named itr : objs) {
-      if (!ambigous.contains(itr.name)) {
-        if (NameFilter.select(map, itr.name) != null) {
-          map.remove(itr.name);
-          ambigous.add(itr.name);
+      if (!ambigous.contains(itr.getName())) {
+        if (NameFilter.select(map, itr.getName()) != null) {
+          map.remove(itr.getName());
+          ambigous.add(itr.getName());
         } else {
           map.add(itr);
         }
@@ -140,14 +140,14 @@ class LinkerWorker extends DfsTraverser<Void, SymbolTable> {
 
   @Override
   protected Void visitReference(Reference obj, SymbolTable param) {
-    if (obj.link instanceof DummyLinkTarget) {
-      String name = ((DummyLinkTarget) obj.link).name;
+    if (obj.link instanceof LinkTarget) {
+      String name = ((LinkTarget) obj.link).getName();
 
       Named link = param.find(name);
       if (link == null) {
-        RError.err(ErrorType.Error, obj.getInfo(), "Name not found: " + name);
+        RError.err(ErrorType.Error, "Name not found: " + name, obj.metadata());
       }
-      assert (!(link instanceof DummyLinkTarget));
+      assert (!(link instanceof LinkTarget));
 
       obj.link = link;
     }

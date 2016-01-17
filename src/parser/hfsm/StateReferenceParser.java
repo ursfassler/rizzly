@@ -20,7 +20,6 @@ package parser.hfsm;
 import parser.PeekNReader;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
-import ast.ElementInfo;
 import ast.data.component.hfsm.StateRef;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefName;
@@ -51,23 +50,27 @@ public class StateReferenceParser {
       case IDENTIFIER:
         return identifier();
       default:
-        ElementInfo info = token.getInfo();
         String message = "expected " + TokenType.IDENTIFIER + ", got " + token.getType();
-        error.err(ErrorType.Error, info.filename, info.line, info.row, message);
+        error.err(ErrorType.Error, message, token.getMetadata());
         return null;
     }
   }
 
   private StateRef identifier() {
     Token token = scanner.next();
-    Reference ref = RefFactory.create(token.getInfo(), token.getData());
+    Reference ref = RefFactory.create(token.getData());
+    ref.metadata().add(token.getMetadata());
 
     while (scanner.peek(0).getType() == TokenType.PERIOD) {
       scanner.next();
       Token sub = scanner.next();
-      ref.offset.add(new RefName(sub.getInfo(), sub.getData()));
+      RefName item = new RefName(sub.getData());
+      item.metadata().add(sub.getMetadata());
+      ref.offset.add(item);
     }
 
-    return new StateRef(token.getInfo(), ref);
+    StateRef stateRef = new StateRef(ref);
+    stateRef.metadata().add(token.getMetadata());
+    return stateRef;
   }
 }

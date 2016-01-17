@@ -17,14 +17,12 @@
 
 package ast.data.expression.value;
 
-import ast.ElementInfo;
 import ast.visitor.Visitor;
 
 final public class BooleanValue extends ValueExpr {
   public final boolean value;
 
-  public BooleanValue(ElementInfo info, boolean value) {
-    super(info);
+  public BooleanValue(boolean value) {
     this.value = value;
   }
 

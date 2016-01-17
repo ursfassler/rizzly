@@ -20,7 +20,6 @@ package ast.pass.others;
 import java.math.BigInteger;
 
 import main.Configuration;
-import ast.ElementInfo;
 import ast.data.Namespace;
 import ast.data.Range;
 import ast.data.expression.Expression;
@@ -55,7 +54,6 @@ public class BitnotFixer extends AstPass {
 }
 
 class BitnotFixerWorker extends ExprReplacer<Void> {
-  private final static ElementInfo info = ElementInfo.NO;
   private final KnowType kt;
 
   public BitnotFixerWorker(KnowledgeBase kb) {
@@ -72,7 +70,7 @@ class BitnotFixerWorker extends ExprReplacer<Void> {
     int bits = range.high.bitCount();
     BigInteger mask = BigInteger.valueOf(2).pow(bits).subtract(BigInteger.ONE);
     assert (mask.equals(range.high));
-    return new BitAnd(info, obj, new NumberValue(info, mask));
+    return new BitAnd(obj, new NumberValue(mask));
   }
 
 }

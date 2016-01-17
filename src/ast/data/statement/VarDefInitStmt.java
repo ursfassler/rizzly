@@ -17,18 +17,16 @@
 
 package ast.data.statement;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.expression.Expression;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.visitor.Visitor;
 
 final public class VarDefInitStmt extends Statement {
-  final public AstList<FuncVariable> variable;
+  final public AstList<FunctionVariable> variable;
   public Expression initial;
 
-  public VarDefInitStmt(ElementInfo info, AstList<FuncVariable> variable, Expression initial) {
-    super(info);
+  public VarDefInitStmt(AstList<FunctionVariable> variable, Expression initial) {
     assert (initial != null);
     this.variable = variable;
     this.initial = initial;

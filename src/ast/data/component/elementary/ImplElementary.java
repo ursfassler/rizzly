@@ -17,7 +17,6 @@
 
 package ast.data.component.elementary;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.component.Component;
 import ast.data.component.composition.CompUse;
@@ -37,8 +36,8 @@ final public class ImplElementary extends Component {
   public FuncRef entryFunc;
   public FuncRef exitFunc;
 
-  public ImplElementary(ElementInfo info, String name, FuncRef entryFunc, FuncRef exitFunc) {
-    super(info, name);
+  public ImplElementary(String name, FuncRef entryFunc, FuncRef exitFunc) {
+    super(name);
     this.entryFunc = entryFunc;
     this.exitFunc = exitFunc;
   }

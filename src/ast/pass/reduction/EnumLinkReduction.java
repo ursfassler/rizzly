@@ -59,16 +59,16 @@ class EnumLinkReductionWorker extends DfsTraverser<Void, Void> {
         ast.data.reference.RefItem next = obj.offset.get(0);
         obj.offset.remove(0);
         if (!(next instanceof RefName)) {
-          RError.err(ErrorType.Error, obj.getInfo(), "Expected named offset, got: " + next.getClass().getCanonicalName());
+          RError.err(ErrorType.Error, "Expected named offset, got: " + next.getClass().getCanonicalName(), obj.metadata());
         }
         Ast elem = ChildByName.find(item, ((ast.data.reference.RefName) next).name);
         if (elem == null) {
-          RError.err(ErrorType.Error, obj.getInfo(), "Element not found: " + ((ast.data.reference.RefName) next).name);
+          RError.err(ErrorType.Error, "Element not found: " + ((ast.data.reference.RefName) next).name, obj.metadata());
         }
         if (elem instanceof EnumElement) {
           obj.link = (EnumElement) elem;
         } else {
-          RError.err(ErrorType.Error, obj.getInfo(), "Expected enumerator element, got: " + elem.getClass().getCanonicalName());
+          RError.err(ErrorType.Error, "Expected enumerator element, got: " + elem.getClass().getCanonicalName(), obj.metadata());
         }
       }
     }

@@ -17,13 +17,19 @@
 
 package ast.data.function.template;
 
-import ast.ElementInfo;
 import ast.data.Named;
+import ast.meta.SourcePosition;
 
 public abstract class FunctionTemplate extends Named {
 
-  public FunctionTemplate(ElementInfo info, String name) {
-    super(info, name);
+  public FunctionTemplate(String name) {
+    setName(name);
+  }
+
+  @Deprecated
+  public FunctionTemplate(SourcePosition info, String name) {
+    metadata().add(info);
+    setName(name);
   }
 
 }

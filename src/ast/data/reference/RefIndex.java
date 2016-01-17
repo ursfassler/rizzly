@@ -17,15 +17,20 @@
 
 package ast.data.reference;
 
-import ast.ElementInfo;
 import ast.data.expression.Expression;
+import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
 final public class RefIndex extends RefItem {
   public Expression index;
 
-  public RefIndex(ElementInfo info, Expression index) {
-    super(info);
+  public RefIndex(Expression index) {
+    this.index = index;
+  }
+
+  @Deprecated
+  public RefIndex(MetaList info, Expression index) {
+    metadata().add(info);
     this.index = index;
   }
 

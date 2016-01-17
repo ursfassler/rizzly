@@ -23,31 +23,31 @@ import java.util.List;
 import java.util.Map;
 
 import main.Configuration;
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.Namespace;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.function.Function;
 import ast.data.function.ret.FuncReturnTuple;
-import ast.data.function.ret.FuncReturnType;
+import ast.data.function.ret.FunctionReturnType;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefName;
 import ast.data.reference.Reference;
 import ast.data.statement.AssignmentSingle;
-import ast.data.statement.ReturnExpr;
-import ast.data.statement.ReturnVoid;
+import ast.data.statement.ExpressionReturn;
 import ast.data.statement.Statement;
 import ast.data.statement.VarDefStmt;
+import ast.data.statement.VoidReturn;
 import ast.data.type.TypeRefFactory;
 import ast.data.type.composed.NamedElement;
 import ast.data.type.composed.RecordType;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.dispatcher.DfsTraverser;
 import ast.dispatcher.other.RefReplacer;
 import ast.dispatcher.other.StmtReplacer;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowUniqueName;
 import ast.knowledge.KnowledgeBase;
+import ast.meta.MetaList;
 import ast.pass.AstPass;
 import ast.repository.manipulator.TypeRepo;
 
@@ -90,14 +90,13 @@ class RetStructIntroducerWorker extends DfsTraverser<Void, Void> {
       return null;
     }
 
-    ElementInfo info = ElementInfo.NO;
-
-    Map<FuncVariable, NamedElement> varMap = new HashMap<FuncVariable, NamedElement>();
+    Map<FunctionVariable, NamedElement> varMap = new HashMap<FunctionVariable, NamedElement>();
     RecordType type = makeRecord(((FuncReturnTuple) func.ret), varMap);
 
-    FuncVariable retVar = new FuncVariable(func.ret.getInfo(), kun.get("ret"), TypeRefFactory.create(func.ret.getInfo(), type));
-    func.ret = new FuncReturnType(func.ret.getInfo(), TypeRefFactory.create(info, type));
-    func.body.statements.add(0, new VarDefStmt(info, retVar));
+    FunctionVariable retVar = new FunctionVariable(kun.get("ret"), TypeRefFactory.create(func.ret.metadata(), type));
+    retVar.metadata().add(func.ret.metadata());
+    func.ret = new FunctionReturnType(func.ret.metadata(), TypeRefFactory.create(type));
+    func.body.statements.add(0, new VarDefStmt(retVar));
 
     VarReplacer varRepl = new VarReplacer(retVar, varMap);
     varRepl.traverse(func, null);
@@ -108,17 +107,17 @@ class RetStructIntroducerWorker extends DfsTraverser<Void, Void> {
     return null;
   }
 
-  private RecordType makeRecord(FuncReturnTuple furet, Map<FuncVariable, NamedElement> varMap) {
+  private RecordType makeRecord(FuncReturnTuple furet, Map<FunctionVariable, NamedElement> varMap) {
     AstList<NamedElement> element = new AstList<NamedElement>();
-    for (FuncVariable var : furet.param) {
-      NamedElement elem = new NamedElement(var.getInfo(), var.name, var.type);
+    for (FunctionVariable var : furet.param) {
+      NamedElement elem = new NamedElement(var.metadata(), var.getName(), var.type);
       element.add(elem);
     }
     RecordType type = kbi.getRecord(element);
     for (int i = 0; i < type.element.size(); i++) {
-      FuncVariable var = furet.param.get(i);
+      FunctionVariable var = furet.param.get(i);
       NamedElement elem = type.element.get(i);
-      assert (var.name.equals(elem.name));
+      assert (var.getName().equals(elem.getName()));
       varMap.put(var, elem);
     }
     return type;
@@ -131,10 +130,10 @@ class RetStructIntroducerWorker extends DfsTraverser<Void, Void> {
  * @author urs
  */
 class VarReplacer extends RefReplacer<Void> {
-  final private FuncVariable retVar;
-  final private Map<FuncVariable, NamedElement> varMap;
+  final private FunctionVariable retVar;
+  final private Map<FunctionVariable, NamedElement> varMap;
 
-  public VarReplacer(FuncVariable retVar, Map<FuncVariable, NamedElement> varMap) {
+  public VarReplacer(FunctionVariable retVar, Map<FunctionVariable, NamedElement> varMap) {
     super();
     this.retVar = retVar;
     this.varMap = varMap;
@@ -146,7 +145,7 @@ class VarReplacer extends RefReplacer<Void> {
     NamedElement elem = varMap.get(obj.link);
     if (elem != null) {
       obj.link = retVar;
-      obj.offset.add(0, new RefName(obj.getInfo(), elem.name));
+      obj.offset.add(0, new RefName(obj.metadata(), elem.getName()));
     }
     return obj;
   }
@@ -159,28 +158,34 @@ class VarReplacer extends RefReplacer<Void> {
  * @author urs
  */
 class RetReplacer extends StmtReplacer<Void> {
-  final private FuncVariable retVar;
+  final private FunctionVariable retVar;
 
-  public RetReplacer(FuncVariable retVar) {
+  public RetReplacer(FunctionVariable retVar) {
     super();
     this.retVar = retVar;
   }
 
   @Override
-  protected List<Statement> visitReturnExpr(ReturnExpr obj, Void param) {
+  protected List<Statement> visitReturnExpr(ExpressionReturn obj, Void param) {
     List<Statement> ret = new ArrayList<Statement>();
-    ret.add(new AssignmentSingle(obj.expr.getInfo(), RefFactory.full(obj.getInfo(), retVar), obj.expr));
-    ret.add(makeRet(obj.getInfo()));
+    AssignmentSingle assignment = new AssignmentSingle(RefFactory.full(obj.metadata(), retVar), obj.expression);
+    assignment.metadata().add(obj.expression.metadata());
+    ret.add(assignment);
+    ret.add(makeRet(obj.metadata()));
     return ret;
   }
 
   @Override
-  protected List<Statement> visitReturnVoid(ReturnVoid obj, Void param) {
-    return list(makeRet(obj.getInfo()));
+  protected List<Statement> visitReturnVoid(VoidReturn obj, Void param) {
+    return list(makeRet(obj.metadata()));
   }
 
-  private ReturnExpr makeRet(ElementInfo info) {
-    return new ReturnExpr(info, new RefExp(info, RefFactory.create(info, retVar)));
+  private ExpressionReturn makeRet(MetaList info) {
+    ReferenceExpression expr = new ReferenceExpression(RefFactory.create(info, retVar));
+    expr.metadata().add(info);
+    ExpressionReturn ret = new ExpressionReturn(expr);
+    ret.metadata().add(info);
+    return ret;
   }
 
 }

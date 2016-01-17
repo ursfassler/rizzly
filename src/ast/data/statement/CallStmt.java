@@ -17,15 +17,13 @@
 
 package ast.data.statement;
 
-import ast.ElementInfo;
 import ast.data.reference.Reference;
 import ast.visitor.Visitor;
 
 final public class CallStmt extends Statement {
   public Reference call;
 
-  public CallStmt(ElementInfo info, Reference call) {
-    super(info);
+  public CallStmt(Reference call) {
     this.call = call;
   }
 

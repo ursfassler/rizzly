@@ -17,13 +17,12 @@
 
 package ast.data.type.template;
 
-import ast.ElementInfo;
 import ast.visitor.Visitor;
 
 final public class RangeTemplate extends TypeTemplate {
 
   public RangeTemplate() {
-    super(ElementInfo.NO, "RangeTemplate");
+    super("RangeTemplate");
   }
 
   @Override

@@ -19,19 +19,18 @@ package ast.data.function.template;
 
 import java.util.List;
 
-import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.expression.value.ValueExpr;
 import ast.data.function.Function;
 import ast.data.function.header.FuncFunction;
-import ast.data.function.ret.FuncReturnType;
+import ast.data.function.ret.FunctionReturnType;
 import ast.data.statement.Block;
-import ast.data.statement.ReturnExpr;
+import ast.data.statement.ExpressionReturn;
 import ast.data.template.ActualTemplateArgument;
 import ast.data.type.Type;
 import ast.data.type.TypeRefFactory;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowEmptyValue;
 import ast.knowledge.KnowledgeBase;
@@ -59,16 +58,15 @@ public class FunctionTemplateSpecializer extends NullDispatcher<Function, List<A
     assert (param.get(0) instanceof Type);
 
     Type type = (Type) param.get(0);
-    Function ret = makeFunc(obj.name, type);
+    Function ret = makeFunc(obj.getName(), type);
 
     return ret;
   }
 
   private Function makeFunc(String name, Type type) {
-    ElementInfo info = ElementInfo.NO;
-    Block body = new Block(info);
+    Block body = new Block();
     ValueExpr empty = kev.get(type);
-    body.statements.add(new ReturnExpr(info, empty));
-    return new FuncFunction(info, name, new AstList<FuncVariable>(), new FuncReturnType(info, TypeRefFactory.create(info, type)), body);
+    body.statements.add(new ExpressionReturn(empty));
+    return new FuncFunction(name, new AstList<FunctionVariable>(), new FunctionReturnType(TypeRefFactory.create(type)), body);
   }
 }

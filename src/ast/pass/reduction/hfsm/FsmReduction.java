@@ -23,7 +23,6 @@ import java.util.Map;
 
 import main.Configuration;
 import ast.Designator;
-import ast.ElementInfo;
 import ast.copy.Relinker;
 import ast.data.Ast;
 import ast.data.AstList;
@@ -36,13 +35,13 @@ import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateContent;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.component.hfsm.Transition;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.function.FuncRefFactory;
 import ast.data.function.Function;
 import ast.data.function.header.FuncProcedure;
 import ast.data.function.header.FuncResponse;
-import ast.data.function.header.FuncSignal;
-import ast.data.function.header.FuncSlot;
+import ast.data.function.header.Signal;
+import ast.data.function.header.Slot;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.reference.RefFactory;
 import ast.data.reference.Reference;
@@ -54,16 +53,16 @@ import ast.data.statement.CaseOpt;
 import ast.data.statement.CaseOptEntry;
 import ast.data.statement.CaseOptValue;
 import ast.data.statement.CaseStmt;
+import ast.data.statement.ExpressionReturn;
 import ast.data.statement.IfOption;
-import ast.data.statement.IfStmt;
-import ast.data.statement.ReturnExpr;
+import ast.data.statement.IfStatement;
 import ast.data.statement.Statement;
 import ast.data.type.Type;
 import ast.data.type.TypeRefFactory;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.EnumType;
 import ast.data.type.base.EnumTypeFactory;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.Variable;
 import ast.dispatcher.NullDispatcher;
@@ -89,7 +88,7 @@ public class FsmReduction extends AstPass {
   /**
    * relinking parameter references to new parameter
    */
-  public static void relinkActualParameterRef(AstList<FuncVariable> oldParam, AstList<FuncVariable> newParam, Ast body) {
+  public static void relinkActualParameterRef(AstList<FunctionVariable> oldParam, AstList<FunctionVariable> newParam, Ast body) {
     assert (newParam.size() == oldParam.size());
     Map<Variable, Variable> map = new HashMap<Variable, Variable>();
     for (int i = 0; i < newParam.size(); i++) {
@@ -136,7 +135,6 @@ class FsmReductionWorker extends NullDispatcher<Ast, Namespace> {
 }
 
 class Reduction {
-  static final private ElementInfo info = ElementInfo.NO;
   final private KnowLlvmLibrary kll;
   final private Map<ImplHfsm, ImplElementary> map = new HashMap<ImplHfsm, ImplElementary>();
 
@@ -145,7 +143,8 @@ class Reduction {
   }
 
   public ImplElementary reduce(ImplHfsm obj, Namespace param) {
-    ImplElementary elem = new ImplElementary(obj.getInfo(), obj.name, FuncRefFactory.create(info, null), FuncRefFactory.create(info, null));
+    ImplElementary elem = new ImplElementary(obj.getName(), FuncRefFactory.create(null), FuncRefFactory.create(null));
+    elem.metadata().add(obj.metadata());
     elem.iface.addAll(obj.iface);
     elem.function.addAll(obj.function);
     for (StateContent item : obj.topstate.item) {
@@ -158,11 +157,11 @@ class Reduction {
       } else if (item instanceof Transition) {
       } else if (item instanceof StateSimple) {
       } else {
-        RError.err(ErrorType.Fatal, item.getInfo(), "Unhandled StateItem: " + item.getClass().getCanonicalName());
+        RError.err(ErrorType.Fatal, "Unhandled StateItem: " + item.getClass().getCanonicalName(), item.metadata());
       }
     }
 
-    EnumType states = EnumTypeFactory.create(obj.topstate.getInfo(), obj.name + Designator.NAME_SEP + "State");
+    EnumType states = EnumTypeFactory.create(obj.topstate.metadata(), obj.getName() + Designator.NAME_SEP + "State");
     HashMap<StateSimple, EnumElement> enumMap = makeEnumElem(obj.topstate, states);
 
     param.children.add(states);
@@ -170,7 +169,8 @@ class Reduction {
     // enumMap.get(obj.getTopstate().getInitial()).properties().get(Property.NAME);
     EnumElement ena = enumMap.get(obj.topstate.initial.getTarget());
     Reference initState = makeEnumElemRef(states, ena);
-    StateVariable stateVariable = new StateVariable(obj.getInfo(), "_statevar", TypeRefFactory.create(info, states), new RefExp(info, initState));
+    StateVariable stateVariable = new StateVariable("_statevar", TypeRefFactory.create(states), new ReferenceExpression(initState));
+    stateVariable.metadata().add(obj.metadata());
     elem.variable.add(stateVariable);
 
     TransitionDict dict = new TransitionDict();
@@ -180,15 +180,15 @@ class Reduction {
     for (FuncResponse func : TypeFilter.select(elem.iface, FuncResponse.class)) {
       assert (func.body.statements.isEmpty());
       Statement code = addQueryCode(enumMap.keySet(), enumMap, states, stateVariable, func, func.param);
-      Block bbl = new Block(info);
+      Block bbl = new Block();
       bbl.statements.add(code);
       func.body = bbl;
     }
 
-    for (FuncSlot func : TypeFilter.select(elem.iface, FuncSlot.class)) {
+    for (Slot func : TypeFilter.select(elem.iface, Slot.class)) {
       assert (func.body.statements.isEmpty());
       Statement code = addTransitionCode(enumMap.keySet(), enumMap, states, stateVariable, func, dict, func.param);
-      Block bbl = new Block(info);
+      Block bbl = new Block();
       bbl.statements.add(code);
       func.body = bbl;
     }
@@ -196,11 +196,11 @@ class Reduction {
     {
       FuncProcedure fEntry = makeEntryFunc(obj.topstate.initial.getTarget());
       elem.function.add(fEntry);
-      elem.entryFunc = FuncRefFactory.create(fEntry.getInfo(), fEntry);
+      elem.entryFunc = FuncRefFactory.create(fEntry.metadata(), fEntry);
 
       FuncProcedure fExit = makeExitFunc(states, enumMap, stateVariable);
       elem.function.add(fExit);
-      elem.exitFunc = FuncRefFactory.create(fExit.getInfo(), fExit);
+      elem.exitFunc = FuncRefFactory.create(fExit.metadata(), fExit);
     }
 
     getMap().put(obj, elem);
@@ -208,18 +208,18 @@ class Reduction {
   }
 
   private FuncProcedure makeEntryFunc(State initial) {
-    Block body = new Block(info);
+    Block body = new Block();
 
     body.statements.add(makeCall(initial.entryFunc.getTarget()));
 
-    FuncProcedure rfunc = new FuncProcedure(info, Designator.NAME_SEP + "stateentry", new AstList<FuncVariable>(), new FuncReturnNone(ElementInfo.NO), body);
+    FuncProcedure rfunc = new FuncProcedure(Designator.NAME_SEP + "stateentry", new AstList<FunctionVariable>(), new FuncReturnNone(), body);
     return rfunc;
   }
 
   private Block makeErrorBb() {
-    Block bberror = new Block(info);
-    FuncSignal trap = kll.getTrap();
-    bberror.statements.add(new CallStmt(info, RefFactory.call(info, trap)));
+    Block bberror = new Block();
+    Signal trap = kll.getTrap();
+    bberror.statements.add(new CallStmt(RefFactory.call(trap)));
     return bberror;
   }
 
@@ -228,18 +228,18 @@ class Reduction {
     AstList<CaseOpt> option = new AstList<CaseOpt>();
     for (State src : enumMap.keySet()) {
       Reference eref = makeEnumElemRef(etype, enumMap.get(src));
-      Block obb = new Block(info);
+      Block obb = new Block();
       CaseOpt opt = makeCaseOption(eref, obb);
       obb.statements.add(makeCall(src.exitFunc.getTarget()));
       option.add(opt);
     }
 
-    CaseStmt caseStmt = new CaseStmt(info, new RefExp(info, RefFactory.full(info, stateVariable)), option, makeErrorBb());
+    CaseStmt caseStmt = new CaseStmt(new ReferenceExpression(RefFactory.full(stateVariable)), option, makeErrorBb());
 
-    Block body = new Block(info);
+    Block body = new Block();
     body.statements.add(caseStmt);
 
-    FuncProcedure rfunc = new FuncProcedure(info, "_exit", new AstList<FuncVariable>(), new FuncReturnNone(ElementInfo.NO), body);
+    FuncProcedure rfunc = new FuncProcedure("_exit", new AstList<FunctionVariable>(), new FuncReturnNone(), body);
     rfunc.body = body;
 
     return rfunc;
@@ -247,8 +247,8 @@ class Reduction {
 
   static private CallStmt makeCall(Function func) {
     assert (func.param.isEmpty());
-    Reference call = RefFactory.call(info, func);
-    return new CallStmt(info, call);
+    Reference call = RefFactory.call(func);
+    return new CallStmt(call);
   }
 
   static private HashMap<StateSimple, EnumElement> makeEnumElem(StateComposite topstate, EnumType stateEnum) {
@@ -256,7 +256,7 @@ class Reduction {
     for (State state : TypeFilter.select(topstate.item, State.class)) {
       assert (state instanceof StateSimple);
 
-      EnumElement element = new EnumElement(info, state.name);
+      EnumElement element = new EnumElement(state.getName());
       stateEnum.element.add(element);
 
       ret.put((StateSimple) state, element);
@@ -264,27 +264,27 @@ class Reduction {
     return ret;
   }
 
-  private CaseStmt addQueryCode(Collection<StateSimple> leafes, HashMap<StateSimple, EnumElement> enumMap, EnumType enumType, StateVariable stateVariable, FuncResponse func, AstList<FuncVariable> param) {
+  private CaseStmt addQueryCode(Collection<StateSimple> leafes, HashMap<StateSimple, EnumElement> enumMap, EnumType enumType, StateVariable stateVariable, FuncResponse func, AstList<FunctionVariable> param) {
     AstList<CaseOpt> copt = new AstList<CaseOpt>();
 
     for (State state : leafes) {
 
-      FuncResponse query = getQuery(state, func.name);
+      FuncResponse query = getQuery(state, func.getName());
 
       // from QueryDownPropagator
       assert (query.body.statements.size() == 1);
-      ReturnExpr retcall = (ReturnExpr) query.body.statements.get(0);
+      ExpressionReturn retcall = (ExpressionReturn) query.body.statements.get(0);
 
-      FsmReduction.relinkActualParameterRef(query.param, param, retcall.expr);
+      FsmReduction.relinkActualParameterRef(query.param, param, retcall.expression);
 
-      Block stateBb = new Block(info);
+      Block stateBb = new Block();
       stateBb.statements.add(retcall);
       CaseOpt opt = makeCaseOption(makeEnumElemRef(enumType, enumMap.get(state)), stateBb);
 
       copt.add(opt);
     }
 
-    CaseStmt caseStmt = new CaseStmt(info, new RefExp(info, RefFactory.full(info, stateVariable)), copt, makeErrorBb());
+    CaseStmt caseStmt = new CaseStmt(new ReferenceExpression(RefFactory.full(stateVariable)), copt, makeErrorBb());
 
     return caseStmt;
   }
@@ -292,20 +292,20 @@ class Reduction {
   static private FuncResponse getQuery(State state, String funcName) {
     assert (funcName != null);
     for (FuncResponse itr : TypeFilter.select(state.item, FuncResponse.class)) {
-      if (funcName.equals(itr.name)) {
+      if (funcName.equals(itr.getName())) {
         return itr;
       }
     }
-    RError.err(ErrorType.Fatal, state.getInfo(), "Response not found: " + funcName);
+    RError.err(ErrorType.Fatal, "Response not found: " + funcName, state.metadata());
     return null;
   }
 
-  private CaseStmt addTransitionCode(Collection<StateSimple> leafes, HashMap<StateSimple, EnumElement> enumMap, EnumType enumType, StateVariable stateVariable, FuncSlot funcName, TransitionDict getter, AstList<FuncVariable> param) {
+  private CaseStmt addTransitionCode(Collection<StateSimple> leafes, HashMap<StateSimple, EnumElement> enumMap, EnumType enumType, StateVariable stateVariable, Slot funcName, TransitionDict getter, AstList<FunctionVariable> param) {
 
     AstList<CaseOpt> options = new AstList<CaseOpt>();
 
     for (State src : leafes) {
-      Block body = new Block(info);
+      Block body = new Block();
       Reference label = makeEnumElemRef(enumType, enumMap.get(src));
       CaseOpt opt = makeCaseOption(label, body);
 
@@ -319,13 +319,13 @@ class Reduction {
 
     Block bberror = makeErrorBb();
 
-    CaseStmt caseStmt = new CaseStmt(info, new RefExp(info, RefFactory.full(info, stateVariable)), options, bberror);
+    CaseStmt caseStmt = new CaseStmt(new ReferenceExpression(RefFactory.full(stateVariable)), options, bberror);
 
     return caseStmt;
   }
 
-  static private IfStmt makeGuardedTrans(AstList<Transition> transList, AstList<FuncVariable> newparam, StateVariable stateVariable, HashMap<StateSimple, EnumElement> enumMap) {
-    Block def = new Block(info);
+  static private IfStatement makeGuardedTrans(AstList<Transition> transList, AstList<FunctionVariable> newparam, StateVariable stateVariable, HashMap<StateSimple, EnumElement> enumMap) {
+    Block def = new Block();
 
     AstList<IfOption> option = new AstList<IfOption>();
 
@@ -338,11 +338,12 @@ class Reduction {
       // arguments to the
       // new ones
 
-      IfOption ifo = new IfOption(trans.getInfo(), trans.guard, blockThen);
+      IfOption ifo = new IfOption(trans.guard, blockThen);
+      ifo.metadata().add(trans.metadata());
       option.add(ifo);
     }
 
-    IfStmt entry = new IfStmt(info, option, def);
+    IfStatement entry = new IfStatement(option, def);
     return entry;
   }
 
@@ -352,22 +353,22 @@ class Reduction {
     // EnumElement elem = type.find(enumElement);
 
     assert (elem != null);
-    Reference eval = RefFactory.full(info, elem);
+    Reference eval = RefFactory.full(elem);
     return eval;
   }
 
   private static CaseOpt makeCaseOption(Reference label, Block code) {
     AstList<CaseOptEntry> list = new AstList<CaseOptEntry>();
-    list.add(new CaseOptValue(info, new RefExp(info, label)));
-    CaseOpt opt = new CaseOpt(info, list, code);
+    list.add(new CaseOptValue(new ReferenceExpression(label)));
+    CaseOpt opt = new CaseOpt(list, code);
     return opt;
   }
 
   /**
    * Checks if transition is built like we expect and makes a transition bb out of it.
    */
-  static private Block makeTransition(Transition trans, AstList<FuncVariable> param, StateVariable stateVariable, HashMap<StateSimple, EnumElement> enumMap) {
-    Block transCode = new Block(info);
+  static private Block makeTransition(Transition trans, AstList<FunctionVariable> param, StateVariable stateVariable, HashMap<StateSimple, EnumElement> enumMap) {
+    Block transCode = new Block();
 
     Block body = trans.body;
     FsmReduction.relinkActualParameterRef(trans.param, param, body);
@@ -376,7 +377,7 @@ class Reduction {
 
     EnumElement src = enumMap.get(trans.dst.getTarget());
     assert (src != null);
-    Assignment setState = new AssignmentSingle(info, RefFactory.full(info, stateVariable), new RefExp(info, RefFactory.full(info, src)));
+    Assignment setState = new AssignmentSingle(RefFactory.full(stateVariable), new ReferenceExpression(RefFactory.full(src)));
     transCode.statements.add(setState);
 
     return transCode;

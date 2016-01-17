@@ -17,7 +17,6 @@
 
 package ast.data.type.template;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.template.Template;
 import ast.data.template.TemplateFactory;
@@ -29,7 +28,7 @@ public class RangeTemplateFactory extends TemplateFactory {
   public static final String[] PARAM = { "low", "high" };
 
   public static Template create(IntegerType intType) {
-    return new Template(ElementInfo.NO, NAME, getParameter(intType), new RangeTemplate());
+    return new Template(NAME, getParameter(intType), new RangeTemplate());
   }
 
   static private AstList<TemplateParameter> getParameter(IntegerType intType) {

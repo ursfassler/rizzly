@@ -30,7 +30,6 @@ import main.Configuration;
 import org.jgrapht.traverse.TopologicalOrderIterator;
 
 import util.Pair;
-import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.data.Ast;
 import ast.data.AstList;
@@ -39,10 +38,10 @@ import ast.data.function.Function;
 import ast.data.function.ret.FuncReturn;
 import ast.data.reference.Reference;
 import ast.data.type.Type;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
 import ast.data.type.base.EnumElement;
 import ast.data.type.composed.NamedElement;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.dispatcher.DfsTraverser;
 import ast.dispatcher.other.CHeaderWriter;
 import ast.dispatcher.other.DepCollector;
@@ -95,12 +94,12 @@ public class HeaderWriter extends AstPass {
   }
 
   private static Namespace makeHeader(Namespace prg, String debugdir) {
-    Namespace ret = new Namespace(ElementInfo.NO, prg.name);
+    Namespace ret = new Namespace(prg.getName());
     Set<Ast> anchor = new HashSet<Ast>();
 
     AstList<Function> functions = ast.repository.query.List.select(prg.children, new OrSpec(new PublicFunction(), new ExternalFunction())).castTo(Function.class);
     for (Function func : functions) {
-      for (FuncVariable arg : func.param) {
+      for (FunctionVariable arg : func.param) {
         anchor.add(arg.type.ref);
       }
       anchor.add(func.ret);
@@ -117,10 +116,10 @@ public class HeaderWriter extends AstPass {
       } else if (itr instanceof EnumElement) {
         // element of enumerator type
       } else if (itr instanceof FuncReturn) {
-      } else if (itr instanceof TypeRef) {
+      } else if (itr instanceof TypeReference) {
       } else if (itr instanceof Reference) {
       } else {
-        RError.err(ErrorType.Fatal, itr.getInfo(), "Object should not be used in header file: " + itr.getClass().getCanonicalName());
+        RError.err(ErrorType.Fatal, "Object should not be used in header file: " + itr.getClass().getCanonicalName(), itr.metadata());
       }
     }
 
@@ -135,7 +134,7 @@ public class HeaderWriter extends AstPass {
   }
 
   private static void printCHeader(String outdir, Namespace cprog, List<String> debugNames, KnowledgeBase kb) {
-    String cfilename = outdir + cprog.name + ".h";
+    String cfilename = outdir + cprog.getName() + ".h";
     CHeaderWriter cwriter = new CHeaderWriter(debugNames, kb);
     try {
       cwriter.traverse(cprog, new StreamWriter(new PrintStream(cfilename)));
@@ -145,7 +144,7 @@ public class HeaderWriter extends AstPass {
   }
 
   private static void printFpcHeader(String outdir, Namespace cprog, List<String> debugNames, KnowledgeBase kb) {
-    String cfilename = outdir + cprog.name + ".pas";
+    String cfilename = outdir + cprog.getName() + ".pas";
     FpcHeaderWriter cwriter = new FpcHeaderWriter(debugNames, kb);
     try {
       cwriter.traverse(cprog, new StreamWriter(new PrintStream(cfilename)));
@@ -156,7 +155,7 @@ public class HeaderWriter extends AstPass {
 
   private void printBehaveInput(String outdir, Namespace head, List<String> debugNames, KnowledgeBase kb) {
     writePyQueue(outdir);
-    String cfilename = outdir + head.name + ".py";
+    String cfilename = outdir + head.getName() + ".py";
     try {
       InputWriter pywriter = new InputWriter(new StreamWriter(new PrintStream(cfilename)));
       pywriter.traverse(head, null);
@@ -167,7 +166,7 @@ public class HeaderWriter extends AstPass {
 
   private void printBehaveOutput(String outdir, Namespace head, List<String> debugNames, KnowledgeBase kb) {
     writeCQueue(outdir);
-    String cfilename = outdir + head.name + "Cb.cc";
+    String cfilename = outdir + head.getName() + "Cb.cc";
     try {
       OutputWriter ccwriter = new OutputWriter(new StreamWriter(new PrintStream(cfilename)));
       ccwriter.traverse(head, null);

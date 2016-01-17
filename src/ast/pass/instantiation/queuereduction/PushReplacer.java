@@ -46,7 +46,9 @@ class PushReplacer extends DfsTraverser<Statement, Map<Function, Function>> {
     Function func = param.get(obj.func.getTarget());
     assert (func != null);
 
-    Reference call = RefFactory.call(obj.getInfo(), func, obj.data);
-    return new CallStmt(obj.getInfo(), call);
+    Reference call = RefFactory.call(obj.metadata(), func, obj.data);
+    CallStmt stmt = new CallStmt(call);
+    stmt.metadata().add(obj.metadata());
+    return stmt;
   }
 }

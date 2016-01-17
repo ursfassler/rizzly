@@ -19,13 +19,12 @@ package ast.data.type.base;
 
 import java.math.BigInteger;
 
-import ast.ElementInfo;
 import ast.data.Range;
 
 public class RangeTypeFactory {
 
   static public RangeType create(Range range) {
-    return new RangeType(ElementInfo.NO, makeName(range), range);
+    return new RangeType(makeName(range), range);
   }
 
   static public RangeType create(BigInteger low, BigInteger high) {

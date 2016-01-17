@@ -17,15 +17,14 @@
 
 package ast.data.type.base;
 
-import ast.ElementInfo;
 import ast.data.Range;
 import ast.visitor.Visitor;
 
 public class RangeType extends BaseType {
   final public Range range;
 
-  public RangeType(ElementInfo info, String name, Range range) {
-    super(info, name);
+  public RangeType(String name, Range range) {
+    super(name);
     this.range = range;
   }
 

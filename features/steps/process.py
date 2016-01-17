@@ -13,6 +13,11 @@ def compile_ok(context, filename):
     do_compile(context, filename)
     no_error_code(context)
 
+@when(u'I start rizzly with the file "{filename}" and the xml backend')
+def step_impl(context, filename):
+    context.proc = subprocess.Popen(["rizzly", "--xml", filename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    context.proc.wait()
+
 @then('I expect the exit code {code:d}')
 def exit_code(context, code):
     assert context.proc.returncode == code

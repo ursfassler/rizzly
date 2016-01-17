@@ -25,7 +25,7 @@ import ast.data.reference.RefItem;
 import ast.data.reference.RefName;
 import ast.data.reference.Reference;
 import ast.data.type.Type;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.EnumType;
 import ast.data.type.base.FunctionType;
@@ -73,22 +73,22 @@ public class ReferenceTypecheck extends NullDispatcher<Type, Type> {
   @Override
   protected Type visitRefCall(RefCall obj, Type sub) {
     if (sub instanceof FunctionType) {
-      AstList<TypeRef> arg = ((FunctionType) sub).arg;
+      AstList<TypeReference> arg = ((FunctionType) sub).arg;
       AstList<Expression> argval = obj.actualParameter.value;
       if (arg.size() != argval.size()) {
-        RError.err(ErrorType.Error, obj.getInfo(), "Need " + arg.size() + " arguments, got " + argval.size());
+        RError.err(ErrorType.Error, "Need " + arg.size() + " arguments, got " + argval.size(), obj.metadata());
         return null;
       }
       for (int i = 0; i < arg.size(); i++) {
         Type partype = kt.get(arg.get(i));
         Type valtype = kt.get(argval.get(i));
         if (!kc.get(partype, valtype)) {
-          RError.err(ErrorType.Error, argval.get(i).getInfo(), "Data type to big or incompatible (argument " + (i + 1) + ", " + partype.name + " := " + valtype.name + ")");
+          RError.err(ErrorType.Error, "Data type to big or incompatible (argument " + (i + 1) + ", " + partype.getName() + " := " + valtype.getName() + ")", argval.get(i).metadata());
         }
       }
       return kt.get(((FunctionType) sub).ret);
     } else {
-      RError.err(ErrorType.Error, obj.getInfo(), "Not a function: " + obj.toString());
+      RError.err(ErrorType.Error, "Not a function: " + obj.toString(), obj.metadata());
       return null;
     }
   }
@@ -101,7 +101,7 @@ public class ReferenceTypecheck extends NullDispatcher<Type, Type> {
       String name = obj.name;
       Ast etype = ChildByName.find(sub, name);
       if (etype == null) {
-        RError.err(ErrorType.Error, obj.getInfo(), "Child not found: " + name);
+        RError.err(ErrorType.Error, "Child not found: " + name, obj.metadata());
       }
       return kt.get(etype);
     }
@@ -113,11 +113,11 @@ public class ReferenceTypecheck extends NullDispatcher<Type, Type> {
     if (sub instanceof ArrayType) {
       RangeType ait = RangeTypeFactory.create(((ArrayType) sub).size.intValue());
       if (!kc.get(ait, index)) {
-        RError.err(ErrorType.Error, obj.getInfo(), "array index type is " + ait.name + ", got " + index.name);
+        RError.err(ErrorType.Error, "array index type is " + ait.getName() + ", got " + index.getName(), obj.metadata());
       }
       return kt.get(((ArrayType) sub).type);
     } else {
-      RError.err(ErrorType.Error, obj.getInfo(), "need array to index, got type: " + sub.name);
+      RError.err(ErrorType.Error, "need array to index, got type: " + sub.getName(), obj.metadata());
       return null;
     }
   }

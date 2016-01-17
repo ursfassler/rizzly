@@ -17,14 +17,13 @@
 
 package ast.data.type.base;
 
-import ast.ElementInfo;
 import ast.visitor.Visitor;
 
 final public class StringType extends BaseType {
   public static final String NAME = "String";
 
   public StringType() {
-    super(ElementInfo.NO, NAME);
+    super(NAME);
   }
 
   @Override

@@ -22,7 +22,7 @@ import java.util.List;
 import ast.data.AstList;
 import ast.data.component.hfsm.Transition;
 import ast.data.expression.Expression;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.expression.TypeCast;
 import ast.data.expression.binop.And;
 import ast.data.expression.binop.BinaryExpression;
@@ -64,14 +64,14 @@ import ast.data.expression.value.UnionValue;
 import ast.data.expression.value.UnsafeUnionValue;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefTemplCall;
-import ast.data.statement.AssignmentMulti;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.CaseOptRange;
 import ast.data.statement.CaseOptValue;
 import ast.data.statement.CaseStmt;
+import ast.data.statement.ExpressionReturn;
 import ast.data.statement.IfOption;
 import ast.data.statement.MsgPush;
-import ast.data.statement.ReturnExpr;
+import ast.data.statement.MultiAssignment;
 import ast.data.statement.VarDefInitStmt;
 import ast.data.statement.WhileStmt;
 import ast.data.template.ActualTemplateArgument;
@@ -87,7 +87,7 @@ abstract public class ExprReplacer<T> extends DfsTraverser<Expression, T> {
       Expression old = list.get(i);
       Expression expr = visit(old, param);
       if (expr == null) {
-        RError.err(ErrorType.Fatal, old.getInfo(), "not handled class: " + old.getClass().getCanonicalName());
+        RError.err(ErrorType.Fatal, "not handled class: " + old.getClass().getCanonicalName(), old.metadata());
       }
       list.set(i, (E) expr);
     }
@@ -97,13 +97,13 @@ abstract public class ExprReplacer<T> extends DfsTraverser<Expression, T> {
   protected Expression visitExpression(Expression obj, T param) {
     Expression ret = super.visitExpression(obj, param);
     if (ret == null) {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "not handled class: " + obj.getClass().getCanonicalName());
+      RError.err(ErrorType.Fatal, "not handled class: " + obj.getClass().getCanonicalName(), obj.metadata());
     }
     return ret;
   }
 
   @Override
-  protected Expression visitRefExpr(RefExp obj, T param) {
+  protected Expression visitRefExpr(ReferenceExpression obj, T param) {
     super.visitRefExpr(obj, param);
     return obj;
   }
@@ -134,7 +134,7 @@ abstract public class ExprReplacer<T> extends DfsTraverser<Expression, T> {
   }
 
   private Expression defaultUnaryOp(UnaryExp obj, T param) {
-    obj.expr = visit(obj.expr, param);
+    obj.expression = visit(obj.expression, param);
     return obj;
   }
 
@@ -323,8 +323,8 @@ abstract public class ExprReplacer<T> extends DfsTraverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitReturnExpr(ReturnExpr obj, T param) {
-    obj.expr = visit(obj.expr, param);
+  protected Expression visitReturnExpr(ExpressionReturn obj, T param) {
+    obj.expression = visit(obj.expression, param);
     return null;
   }
 
@@ -349,7 +349,7 @@ abstract public class ExprReplacer<T> extends DfsTraverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitAssignmentMulti(AssignmentMulti obj, T param) {
+  protected Expression visitAssignmentMulti(MultiAssignment obj, T param) {
     visitList(obj.left, param);
     obj.right = visit(obj.right, param);
     return null;

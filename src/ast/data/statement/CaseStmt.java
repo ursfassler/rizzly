@@ -17,7 +17,6 @@
 
 package ast.data.statement;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.expression.Expression;
 import ast.visitor.Visitor;
@@ -27,8 +26,7 @@ final public class CaseStmt extends Statement {
   final public AstList<CaseOpt> option;
   public Block otherwise;
 
-  public CaseStmt(ElementInfo info, Expression condition, AstList<CaseOpt> option, Block otherwise) {
-    super(info);
+  public CaseStmt(Expression condition, AstList<CaseOpt> option, Block otherwise) {
     this.condition = condition;
     this.option = option;
     this.otherwise = otherwise;

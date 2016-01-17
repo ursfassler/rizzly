@@ -22,10 +22,12 @@ import ast.Designator;
 public class WritableConfiguration implements Configuration {
   private String extension;
   private String rootPath;
+  private String namespace;
   private Designator rootComp;
   private boolean debugEvent;
   private boolean docOutput;
   private boolean lazyModelCheck;
+  private boolean xml;
 
   @Override
   public String getRootPath() {
@@ -91,6 +93,24 @@ public class WritableConfiguration implements Configuration {
 
   public void setExtension(String extension) {
     this.extension = extension;
+  }
+
+  @Override
+  public boolean doXml() {
+    return xml;
+  }
+
+  public void setXml(boolean xml) {
+    this.xml = xml;
+  }
+
+  @Override
+  public String getNamespace() {
+    return namespace;
+  }
+
+  public void setNamespace(String value) {
+    namespace = value;
   }
 
 }

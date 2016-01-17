@@ -15,23 +15,13 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.statement;
+package ast.meta;
 
-import ast.ElementInfo;
-import ast.visitor.Visitor;
+import ast.visitor.VisitorAcceptor;
 
-final public class ReturnVoid extends Return {
-  public ReturnVoid(ElementInfo info) {
-    super(info);
-  }
+public interface MetaList extends VisitorAcceptor, Iterable<MetaInformation> {
+  public void add(MetaInformation item);
 
-  @Override
-  public String toString() {
-    return "return";
-  }
+  public void add(MetaList items);
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

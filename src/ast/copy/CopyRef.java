@@ -40,22 +40,23 @@ public class CopyRef extends NullDispatcher<RefItem, Void> {
 
   @Override
   protected RefItem visitRefTemplCall(RefTemplCall obj, Void param) {
-    return new RefTemplCall(obj.getInfo(), cast.copy(obj.actualParameter));
+    return new RefTemplCall(cast.copy(obj.actualParameter));
   }
 
   @Override
   protected RefItem visitRefCall(RefCall obj, Void param) {
-    return new RefCall(obj.getInfo(), cast.copy(obj.actualParameter));
+    RefCall copy = new RefCall(cast.copy(obj.actualParameter));
+    return copy;
   }
 
   @Override
   protected RefItem visitRefName(RefName obj, Void param) {
-    return new RefName(obj.getInfo(), obj.name);
+    return new RefName(obj.name);
   }
 
   @Override
   protected RefItem visitRefIndex(RefIndex obj, Void param) {
-    return new RefIndex(obj.getInfo(), cast.copy(obj.index));
+    return new RefIndex(cast.copy(obj.index));
   }
 
 }

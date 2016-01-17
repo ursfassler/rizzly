@@ -17,13 +17,12 @@
 
 package ast.data.expression.binop;
 
-import ast.ElementInfo;
 import ast.data.expression.Expression;
 
 public abstract class Logical extends BinaryExpression {
 
-  public Logical(ElementInfo info, Expression left, Expression right) {
-    super(info, left, right);
+  public Logical(Expression left, Expression right) {
+    super(left, right);
   }
 
 }

@@ -17,16 +17,21 @@
 
 package ast.data.function.ret;
 
-import ast.ElementInfo;
 import ast.data.AstList;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
+import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
 final public class FuncReturnTuple extends FuncReturn {
-  final public AstList<FuncVariable> param;
+  final public AstList<FunctionVariable> param;
 
-  public FuncReturnTuple(ElementInfo info, AstList<FuncVariable> param) {
-    super(info);
+  public FuncReturnTuple(AstList<FunctionVariable> param) {
+    this.param = param;
+  }
+
+  @Deprecated
+  public FuncReturnTuple(MetaList info, AstList<FunctionVariable> param) {
+    metadata().add(info);
     this.param = param;
   }
 

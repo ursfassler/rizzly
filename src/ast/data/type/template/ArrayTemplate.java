@@ -17,13 +17,12 @@
 
 package ast.data.type.template;
 
-import ast.ElementInfo;
 import ast.visitor.Visitor;
 
 final public class ArrayTemplate extends TypeTemplate {
 
   public ArrayTemplate() {
-    super(ElementInfo.NO, "ArrayTemplate");
+    super("ArrayTemplate");
   }
 
   @Override

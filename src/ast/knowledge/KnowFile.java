@@ -47,7 +47,7 @@ public class KnowFile extends KnowledgeEntry {
   }
 
   public RizzlyFile get(Designator path) {
-    Ast item = ChildByName.staticGet(base.getRoot(), path, base.getRoot().getInfo());
+    Ast item = ChildByName.staticGet(base.getRoot(), path, base.getRoot().metadata());
     assert (item instanceof RizzlyFile);
     return (RizzlyFile) item;
   }
@@ -55,7 +55,7 @@ public class KnowFile extends KnowledgeEntry {
   public RizzlyFile get(Ast obj) {
     RizzlyFile ret = find(obj);
     if (ret == null) {
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Object not reachable: " + obj);
+      RError.err(ErrorType.Fatal, "Object not reachable: " + obj, obj.metadata());
     }
     return ret;
   }
@@ -109,7 +109,7 @@ class KnowFileTraverser extends DfsTraverser<Void, RizzlyFile> {
   protected Void visit(Ast obj, RizzlyFile param) {
     if (cache.containsKey(obj)) {
       RizzlyFile oldparent = cache.get(obj);
-      RError.err(ErrorType.Fatal, obj.getInfo(), "Same object (" + obj + ") found 2 times: " + oldparent + " and " + param);
+      RError.err(ErrorType.Fatal, "Same object (" + obj + ") found 2 times: " + oldparent + " and " + param, obj.metadata());
     }
     cache.put(obj, param);
     return super.visit(obj, param);
@@ -142,7 +142,7 @@ class FileNamespace extends NullDispatcher<Void, Designator> {
 
   @Override
   protected Void visitNamespace(Namespace obj, Designator param) {
-    param = new Designator(param, obj.name);
+    param = new Designator(param, obj.getName());
     for (Ast itr : obj.children) {
       visit(itr, param);
     }

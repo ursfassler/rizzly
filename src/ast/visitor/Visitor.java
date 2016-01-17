@@ -17,7 +17,6 @@
 
 package ast.visitor;
 
-import ast.ElementInfo;
 import ast.data.Namespace;
 import ast.data.component.CompRef;
 import ast.data.component.composition.AsynchroniusConnection;
@@ -36,7 +35,7 @@ import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateRef;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.component.hfsm.Transition;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.expression.TypeCast;
 import ast.data.expression.binop.And;
 import ast.data.expression.binop.BitAnd;
@@ -81,24 +80,23 @@ import ast.data.function.header.FuncInterrupt;
 import ast.data.function.header.FuncProcedure;
 import ast.data.function.header.FuncQuery;
 import ast.data.function.header.FuncResponse;
-import ast.data.function.header.FuncSignal;
-import ast.data.function.header.FuncSlot;
 import ast.data.function.header.FuncSubHandlerEvent;
 import ast.data.function.header.FuncSubHandlerQuery;
+import ast.data.function.header.Signal;
+import ast.data.function.header.Slot;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FuncReturnTuple;
-import ast.data.function.ret.FuncReturnType;
+import ast.data.function.ret.FunctionReturnType;
 import ast.data.function.template.DefaultValueTemplate;
 import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
-import ast.data.reference.DummyLinkTarget;
+import ast.data.reference.LinkTarget;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
 import ast.data.reference.Reference;
-import ast.data.statement.AssignmentMulti;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
@@ -109,15 +107,16 @@ import ast.data.statement.CaseOptValue;
 import ast.data.statement.CaseStmt;
 import ast.data.statement.ForStmt;
 import ast.data.statement.IfOption;
-import ast.data.statement.IfStmt;
+import ast.data.statement.IfStatement;
 import ast.data.statement.MsgPush;
-import ast.data.statement.ReturnExpr;
-import ast.data.statement.ReturnVoid;
+import ast.data.statement.MultiAssignment;
+import ast.data.statement.ExpressionReturn;
+import ast.data.statement.VoidReturn;
 import ast.data.statement.VarDefInitStmt;
 import ast.data.statement.VarDefStmt;
 import ast.data.statement.WhileStmt;
 import ast.data.template.Template;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumElement;
@@ -145,272 +144,273 @@ import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
 import ast.data.variable.ConstGlobal;
 import ast.data.variable.ConstPrivate;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.TemplateParameter;
+import ast.meta.SourcePosition;
 
 public interface Visitor {
 
-  void visit(AliasType aliasType);
+  void visit(AliasType object);
 
-  void visit(And and);
+  void visit(And object);
 
-  void visit(AnyType anyType);
+  void visit(AnyType object);
 
-  void visit(AnyValue anyValue);
+  void visit(AnyValue object);
 
-  void visit(ArrayTemplate arrayTemplate);
+  void visit(ArrayTemplate object);
 
-  void visit(ArrayType arrayType);
+  void visit(ArrayType object);
 
-  void visit(ArrayValue arrayValue);
+  void visit(ArrayValue object);
 
-  void visit(AssignmentMulti assignmentMulti);
+  void visit(MultiAssignment object);
 
-  void visit(AssignmentSingle assignmentSingle);
+  void visit(AssignmentSingle object);
 
-  void visit(AsynchroniusConnection asynchroniusConnection);
+  void visit(AsynchroniusConnection object);
 
-  void visit(BitAnd bitAnd);
+  void visit(BitAnd object);
 
-  void visit(BitNot bitNot);
+  void visit(BitNot object);
 
-  void visit(BitOr bitOr);
+  void visit(BitOr object);
 
-  void visit(BitXor bitXor);
+  void visit(BitXor object);
 
-  void visit(Block block);
+  void visit(Block object);
 
-  void visit(BooleanType booleanType);
+  void visit(BooleanType object);
 
-  void visit(BooleanValue boolValue);
+  void visit(BooleanValue object);
 
-  void visit(CallStmt callStmt);
+  void visit(CallStmt object);
 
-  void visit(CaseOpt caseOpt);
+  void visit(CaseOpt object);
 
-  void visit(CaseOptRange caseOptRange);
+  void visit(CaseOptRange object);
 
-  void visit(CaseOptSimple caseOptSimple);
+  void visit(CaseOptSimple object);
 
-  void visit(CaseOptValue caseOptValue);
+  void visit(CaseOptValue object);
 
-  void visit(CaseStmt caseStmt);
+  void visit(CaseStmt object);
 
-  void visit(ComponentType componentType);
+  void visit(ComponentType object);
 
-  void visit(CompRef compRef);
+  void visit(CompRef object);
 
-  void visit(CompUse compUse);
+  void visit(CompUse object);
 
-  void visit(CompUseRef compUseRef);
+  void visit(CompUseRef object);
 
-  void visit(ConstGlobal constGlobal);
+  void visit(ConstGlobal object);
 
-  void visit(ConstPrivate constPrivate);
+  void visit(ConstPrivate object);
 
-  void visit(DefaultValueTemplate defaultValueTemplate);
+  void visit(DefaultValueTemplate object);
 
-  void visit(Division div);
+  void visit(Division object);
 
-  void visit(DummyLinkTarget dummyLinkTarget);
+  void visit(LinkTarget object);
 
-  void visit(EndpointRaw endpointRaw);
+  void visit(EndpointRaw object);
 
-  void visit(EndpointSelf endpointSelf);
+  void visit(EndpointSelf object);
 
-  void visit(EndpointSub endpointSub);
+  void visit(EndpointSub object);
 
-  void visit(EnumElement enumElement);
+  void visit(EnumElement object);
 
-  void visit(EnumType enumType);
+  void visit(EnumType object);
 
-  void visit(Equal equal);
+  void visit(Equal object);
 
-  void visit(ForStmt forStmt);
+  void visit(ForStmt object);
 
-  void visit(FuncFunction funcFunction);
+  void visit(FuncFunction object);
 
-  void visit(FuncInterrupt funcInterrupt);
+  void visit(FuncInterrupt object);
 
-  void visit(FuncProcedure funcProcedure);
+  void visit(FuncProcedure object);
 
-  void visit(FuncQuery funcQuery);
+  void visit(FuncQuery object);
 
-  void visit(FuncRef funcRef);
+  void visit(FuncRef object);
 
-  void visit(FuncResponse funcResponse);
+  void visit(FuncResponse object);
 
-  void visit(FuncReturnNone funcReturnNone);
+  void visit(FuncReturnNone object);
 
-  void visit(FuncReturnTuple funcReturnTuple);
+  void visit(FuncReturnTuple object);
 
-  void visit(FuncReturnType funcReturnType);
+  void visit(FunctionReturnType object);
 
-  void visit(FuncSignal funcSignal);
+  void visit(Signal object);
 
-  void visit(FuncSlot funcSlot);
+  void visit(Slot object);
 
-  void visit(FuncSubHandlerEvent funcSubHandlerEvent);
+  void visit(FuncSubHandlerEvent object);
 
-  void visit(FuncSubHandlerQuery funcSubHandlerQuery);
+  void visit(FuncSubHandlerQuery object);
 
-  void visit(FunctionType functionType);
+  void visit(FunctionType object);
 
-  void visit(FuncVariable funcVariable);
+  void visit(FunctionVariable object);
 
-  void visit(Greater greater);
+  void visit(Greater object);
 
-  void visit(GreaterEqual greaterequal);
+  void visit(GreaterEqual object);
 
-  void visit(IfOption ifOption);
+  void visit(IfOption object);
 
-  void visit(IfStmt ifStmt);
+  void visit(IfStatement object);
 
-  void visit(ImplComposition implComposition);
+  void visit(ImplComposition object);
 
-  void visit(ImplElementary implElementary);
+  void visit(ImplElementary object);
 
-  void visit(ImplHfsm implHfsm);
+  void visit(ImplHfsm object);
 
-  void visit(IntegerType integerType);
+  void visit(IntegerType object);
 
-  void visit(Is is);
+  void visit(Is object);
 
-  void visit(Less less);
+  void visit(Less object);
 
-  void visit(LessEqual lessequal);
+  void visit(LessEqual object);
 
-  void visit(LogicAnd logicAnd);
+  void visit(LogicAnd object);
 
-  void visit(LogicNot logicNot);
+  void visit(LogicNot object);
 
-  void visit(LogicOr logicOr);
+  void visit(LogicOr object);
 
   void visit(Minus minus);
 
   void visit(Modulo mod);
 
-  void visit(MsgPush msgPush);
+  void visit(MsgPush object);
 
-  void visit(Multiplication mul);
+  void visit(Multiplication object);
 
-  void visit(NamedElement namedElement);
+  void visit(NamedElement object);
 
-  void visit(NamedElementsValue namedElementsValue);
+  void visit(NamedElementsValue object);
 
-  void visit(NamedValue namedValue);
+  void visit(NamedValue object);
 
-  void visit(Namespace namespace);
+  void visit(Namespace object);
 
-  void visit(NaturalType naturalType);
+  void visit(NaturalType object);
 
-  void visit(Not not);
+  void visit(Not object);
 
-  void visit(NotEqual notequal);
+  void visit(NotEqual object);
 
-  void visit(NumberValue numberValue);
+  void visit(NumberValue object);
 
-  void visit(Or or);
+  void visit(Or object);
 
-  void visit(Plus plus);
+  void visit(Plus object);
 
-  void visit(PointerType pointerType);
+  void visit(PointerType object);
 
-  void visit(Queue queue);
+  void visit(Queue object);
 
-  void visit(RangeTemplate rangeTemplate);
+  void visit(RangeTemplate object);
 
-  void visit(RangeType rangeType);
+  void visit(RangeType object);
 
-  void visit(RawComposition rawComposition);
+  void visit(RawComposition object);
 
-  void visit(RawElementary rawElementary);
+  void visit(RawElementary object);
 
-  void visit(RawHfsm rawHfsm);
+  void visit(RawHfsm object);
 
-  void visit(RecordType recordType);
+  void visit(RecordType object);
 
-  void visit(RecordValue recordValue);
+  void visit(RecordValue object);
 
-  void visit(RefCall refCall);
+  void visit(RefCall object);
 
-  void visit(Reference reference);
+  void visit(Reference object);
 
-  void visit(RefExp refExp);
+  void visit(ReferenceExpression object);
 
-  void visit(RefIndex refIndex);
+  void visit(RefIndex object);
 
-  void visit(RefName refName);
+  void visit(RefName object);
 
-  void visit(RefTemplCall refTemplCall);
+  void visit(RefTemplCall object);
 
-  void visit(ReturnExpr returnExpr);
+  void visit(ExpressionReturn object);
 
-  void visit(ReturnVoid returnVoid);
+  void visit(VoidReturn object);
 
   void visit(RizzlyFile rizzlyFile);
 
   void visit(Shl shl);
 
-  void visit(Shr shr);
+  void visit(Shr object);
 
-  void visit(SIntType sIntType);
+  void visit(SIntType object);
 
-  void visit(StateComposite stateComposite);
+  void visit(StateComposite object);
 
-  void visit(StateRef stateRef);
+  void visit(StateRef object);
 
-  void visit(StateSimple stateSimple);
+  void visit(StateSimple object);
 
-  void visit(StateVariable stateVariable);
+  void visit(StateVariable object);
 
-  void visit(StringType stringType);
+  void visit(StringType object);
 
-  void visit(StringValue stringValue);
+  void visit(StringValue object);
 
-  void visit(SubCallbacks subCallbacks);
+  void visit(SubCallbacks object);
 
-  void visit(SynchroniusConnection synchroniusConnection);
+  void visit(SynchroniusConnection object);
 
-  void visit(Template template);
+  void visit(Template object);
 
-  void visit(TemplateParameter templateParameter);
+  void visit(TemplateParameter object);
 
-  void visit(Transition transition);
+  void visit(Transition object);
 
-  void visit(TupleType tupleType);
+  void visit(TupleType object);
 
-  void visit(TupleValue tupleValue);
+  void visit(TupleValue object);
 
-  void visit(TypeCast typeCast);
+  void visit(TypeCast object);
 
-  void visit(TypeRef typeRef);
+  void visit(TypeReference object);
 
-  void visit(TypeType typeType);
+  void visit(TypeType object);
 
-  void visit(TypeTypeTemplate typeTypeTemplate);
+  void visit(TypeTypeTemplate object);
 
-  void visit(UIntType uIntType);
+  void visit(UIntType object);
 
-  void visit(Uminus uminus);
+  void visit(Uminus object);
 
-  void visit(UnionType unionType);
+  void visit(UnionType object);
 
-  void visit(UnionValue unionValue);
+  void visit(UnionValue object);
 
-  void visit(UnsafeUnionType unsafeUnionType);
+  void visit(UnsafeUnionType object);
 
-  void visit(UnsafeUnionValue unsafeUnionValue);
+  void visit(UnsafeUnionValue object);
 
-  void visit(VarDefInitStmt varDefInitStmt);
+  void visit(VarDefInitStmt object);
 
-  void visit(VarDefStmt varDefStmt);
+  void visit(VarDefStmt object);
 
-  void visit(VoidType voidType);
+  void visit(VoidType object);
 
-  void visit(WhileStmt whileStmt);
+  void visit(WhileStmt object);
 
-  void visit(ElementInfo elementInfo);
+  void visit(SourcePosition object);
 
 }

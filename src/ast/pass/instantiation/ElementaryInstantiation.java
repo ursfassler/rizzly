@@ -23,7 +23,6 @@ import java.util.Map;
 import java.util.Set;
 
 import main.Configuration;
-import ast.ElementInfo;
 import ast.copy.CopyAst;
 import ast.copy.Relinker;
 import ast.data.Ast;
@@ -45,7 +44,7 @@ import ast.data.function.header.FuncProcedure;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.reference.RefFactory;
 import ast.data.statement.Block;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
@@ -72,13 +71,13 @@ public class ElementaryInstantiation extends AstPass {
     ImplElementary inst = instantiator.traverse(env, ast);
     Relinker.relink(ast, instantiator.getLinkmap());
 
-    ast.name = instComp.name;
+    ast.setName(instComp.getName());
 
     assert (inst.iface.isEmpty());
 
     Set<Function> pubfunc = new HashSet<Function>();
     pubfunc.addAll(Collector.select(inst.subCallback, new IsClass(Function.class)).castTo(Function.class));
-    RError.ass(inst.component.size() == 1, inst.getInfo(), "Only expected one instance");
+    RError.ass(inst.component.size() == 1, inst.metadata(), "Only expected one instance");
     Component targetComp = inst.component.get(0).compRef.getTarget();
     pubfunc.addAll(targetComp.iface);
 
@@ -90,18 +89,17 @@ public class ElementaryInstantiation extends AstPass {
   }
 
   private static ImplElementary makeEnv(Component top, KnowledgeBase kb) {
-    ElementInfo info = ElementInfo.NO;
-    FuncProcedure entry = new FuncProcedure(info, "entry", new AstList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
-    FuncProcedure exit = new FuncProcedure(info, "exit", new AstList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
-    ImplElementary env = new ImplElementary(ElementInfo.NO, "", FuncRefFactory.create(info, entry), FuncRefFactory.create(info, exit));
+    FuncProcedure entry = new FuncProcedure("entry", new AstList<FunctionVariable>(), new FuncReturnNone(), new Block());
+    FuncProcedure exit = new FuncProcedure("exit", new AstList<FunctionVariable>(), new FuncReturnNone(), new Block());
+    ImplElementary env = new ImplElementary("", FuncRefFactory.create(entry), FuncRefFactory.create(exit));
     env.function.add(entry);
     env.function.add(exit);
 
-    CompUse item = new CompUse(ElementInfo.NO, "!inst", CompRefFactory.create(ElementInfo.NO, top));
+    CompUse item = new CompUse("!inst", CompRefFactory.create(top));
     env.component.add(item);
 
     for (CompUse compu : env.component) {
-      SubCallbacks suc = new SubCallbacks(compu.getInfo(), new CompUseRef(ElementInfo.NO, RefFactory.create(ElementInfo.NO, compu)));
+      SubCallbacks suc = new SubCallbacks(compu.metadata(), new CompUseRef(RefFactory.create(compu)));
       env.subCallback.add(suc);
       Component refComp = compu.compRef.getTarget();
       for (InterfaceFunction out : refComp.getIface(Direction.out)) {
@@ -145,16 +143,16 @@ class CompInstantiatorWorker extends NullDispatcher<ImplElementary, Namespace> {
       Component comp = compUse.compRef.getTarget();
 
       // copy / instantiate used component
-      Namespace usens = new Namespace(compUse.getInfo(), compUse.name);
+      Namespace usens = new Namespace(compUse.metadata(), compUse.getName());
       ImplElementary cpy = visit(comp, usens);
-      compUse.compRef = CompRefFactory.create(compUse.getInfo(), cpy);
+      compUse.compRef = CompRefFactory.create(compUse.metadata(), cpy);
       ns.children.add(usens);
       linkmap.put(compUse, usens);
 
       // route output interface to sub-callback implementation
       for (Function impl : getSubCallback(inst.subCallback, compUse).func) {
         // get output declaration of instantiated sub-component
-        Function outdecl = NameFilter.select(cpy.iface, impl.name);
+        Function outdecl = NameFilter.select(cpy.iface, impl.getName());
 
         assert (outdecl != null);
         assert (usens.children.contains(outdecl));

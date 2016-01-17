@@ -17,11 +17,10 @@
 
 package ast.data.function.header;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.function.Function;
 import ast.data.statement.Block;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.visitor.Visitor;
 
 /**
@@ -29,8 +28,8 @@ import ast.visitor.Visitor;
  */
 final public class FuncInterrupt extends Function {
 
-  public FuncInterrupt(ElementInfo info, String name, AstList<FuncVariable> param, ast.data.function.ret.FuncReturn ret, Block body) {
-    super(info, name, param, ret, body);
+  public FuncInterrupt(String name, AstList<FunctionVariable> param, ast.data.function.ret.FuncReturn ret, Block body) {
+    super(name, param, ret, body);
   }
 
   @Override

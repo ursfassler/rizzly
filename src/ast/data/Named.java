@@ -17,19 +17,21 @@
 
 package ast.data;
 
-import ast.ElementInfo;
 
 abstract public class Named extends AstBase {
-  public String name;
-
-  public Named(ElementInfo info, String name) {
-    super(info);
-    this.name = name;
-  }
+  private String name;
 
   @Override
   public String toString() {
+    return getName();
+  }
+
+  public String getName() {
     return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
   }
 
 }

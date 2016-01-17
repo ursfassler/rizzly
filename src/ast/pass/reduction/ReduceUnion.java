@@ -22,11 +22,10 @@ import java.util.Map;
 
 import main.Configuration;
 import ast.Designator;
-import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.expression.Expression;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.expression.binop.Equal;
 import ast.data.expression.binop.Is;
 import ast.data.reference.RefFactory;
@@ -44,6 +43,7 @@ import ast.dispatcher.DfsTraverser;
 import ast.dispatcher.other.ExprReplacer;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
+import ast.meta.MetaList;
 import ast.pass.AstPass;
 import ast.repository.query.Match;
 import ast.specification.HasName;
@@ -90,9 +90,9 @@ class ReduceUnionWorker extends ExprReplacer<Void> {
   protected Expression visitCaseStmt(CaseStmt obj, Void param) {
     Type et = kt.get(obj.condition);
     if (et instanceof UnionType) {
-      assert (obj.condition instanceof RefExp);
-      Reference cond = ((RefExp) obj.condition).ref;
-      cond.offset.add(new RefName(ElementInfo.NO, ((UnionType) et).tag.name));
+      assert (obj.condition instanceof ReferenceExpression);
+      Reference cond = ((ReferenceExpression) obj.condition).reference;
+      cond.offset.add(new RefName(((UnionType) et).tag.getName()));
     }
     return super.visitCaseStmt(obj, param);
   }
@@ -110,7 +110,7 @@ class ReduceUnionWorker extends ExprReplacer<Void> {
       assert (Match.hasItem(et, new HasName(ev)));
       obj.link = et;
       obj.offset.clear();
-      obj.offset.add(new RefName(ElementInfo.NO, ev));
+      obj.offset.add(new RefName(ev));
     }
     return null;
   }
@@ -118,16 +118,22 @@ class ReduceUnionWorker extends ExprReplacer<Void> {
   @Override
   protected Expression visitIs(Is obj, Void param) {
     super.visitIs(obj, param);
-    Reference left = ((RefExp) visit(obj.left, null)).ref;
+    Reference left = ((ReferenceExpression) visit(obj.left, null)).reference;
 
     assert (left.offset.isEmpty());
 
     Type ut = kt.get(left);
     assert (ut instanceof UnionType);
 
-    left = RefFactory.create(left.getInfo(), left.link, new RefName(ElementInfo.NO, ((UnionType) ut).tag.name));
+    MetaList meta = left.metadata();
+    left = RefFactory.create(left.link, new RefName(((UnionType) ut).tag.getName()));
+    left.metadata().add(meta);
 
-    return new Equal(obj.getInfo(), new RefExp(left.getInfo(), left), obj.right);
+    ReferenceExpression leftRef = new ReferenceExpression(left);
+    leftRef.metadata().add(meta);
+    Equal equal = new Equal(leftRef, obj.right);
+    equal.metadata().add(obj.metadata());
+    return equal;
   }
 
   public Map<UnionType, EnumType> getUnion2enum() {
@@ -143,14 +149,14 @@ class Uni2Enum extends DfsTraverser<Void, Map<UnionType, EnumType>> {
   protected Void visitUnionType(UnionType obj, Map<UnionType, EnumType> param) {
     assert (!param.containsKey(obj));
 
-    EnumType et = EnumTypeFactory.create(ENUM_PREFIX + Designator.NAME_SEP + obj.name);
+    EnumType et = EnumTypeFactory.create(ENUM_PREFIX + Designator.NAME_SEP + obj.getName());
 
     for (NamedElement elem : obj.element) {
-      EnumElement ee = new EnumElement(ElementInfo.NO, elem.name);
+      EnumElement ee = new EnumElement(elem.getName());
       et.element.add(ee);
     }
 
-    obj.tag.typeref = TypeRefFactory.create(ElementInfo.NO, et);
+    obj.tag.typeref = TypeRefFactory.create(et);
 
     param.put(obj, et);
     return null;

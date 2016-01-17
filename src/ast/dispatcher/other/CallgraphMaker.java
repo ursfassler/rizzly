@@ -29,7 +29,7 @@ import ast.data.reference.RefItem;
 import ast.data.reference.RefName;
 import ast.data.reference.Reference;
 import ast.data.type.Type;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
 import ast.data.type.composed.NamedElement;
 import ast.data.variable.Variable;
@@ -145,11 +145,11 @@ class RefGetter extends NullDispatcher<Ast, Ast> {
     } else if (param instanceof Reference) {
       param = ((Reference) param).getTarget();
     }
-    if (param instanceof TypeRef) {
-      param = ((TypeRef) param).ref.getTarget();
+    if (param instanceof TypeReference) {
+      param = ((TypeReference) param).ref.getTarget();
     }
 
-    return ChildByName.get(param, obj.name, obj.getInfo());
+    return ChildByName.get(param, obj.name, obj.metadata());
   }
 
   @Override

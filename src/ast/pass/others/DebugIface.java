@@ -23,28 +23,27 @@ import java.util.Collections;
 
 import main.Configuration;
 import ast.Designator;
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.component.Component;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.expression.value.NumberValue;
 import ast.data.expression.value.StringValue;
 import ast.data.function.FunctionProperty;
 import ast.data.function.header.FuncResponse;
-import ast.data.function.ret.FuncReturnType;
+import ast.data.function.ret.FunctionReturnType;
 import ast.data.reference.RefFactory;
 import ast.data.statement.Block;
 import ast.data.statement.CaseOpt;
 import ast.data.statement.CaseOptEntry;
 import ast.data.statement.CaseOptValue;
 import ast.data.statement.CaseStmt;
-import ast.data.statement.ReturnExpr;
+import ast.data.statement.ExpressionReturn;
 import ast.data.type.TypeRefFactory;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.RangeType;
 import ast.data.type.base.StringType;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.dispatcher.debug.MsgNamesGetter;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
@@ -84,27 +83,26 @@ public class DebugIface extends AstPass {
   }
 
   private static FuncResponse makeNameGetter(String funcName, RangeType nameSizeType, ArrayList<String> names, StringType stringType) {
-    ElementInfo info = ElementInfo.NO;
-    FuncVariable arg = new FuncVariable(info, "idx", TypeRefFactory.create(info, nameSizeType));
-    AstList<FuncVariable> args = new AstList<FuncVariable>();
+    FunctionVariable arg = new FunctionVariable("idx", TypeRefFactory.create(nameSizeType));
+    AstList<FunctionVariable> args = new AstList<FunctionVariable>();
     args.add(arg);
-    Block body = new Block(info);
-    FuncResponse func = new FuncResponse(info, Designator.NAME_SEP + funcName, args, new FuncReturnType(info, TypeRefFactory.create(info, stringType)), body);
+    Block body = new Block();
+    FuncResponse func = new FuncResponse(Designator.NAME_SEP + funcName, args, new FunctionReturnType(TypeRefFactory.create(stringType)), body);
 
     AstList<CaseOpt> option = new AstList<CaseOpt>();
-    Block otherwise = new Block(info);
-    CaseStmt cs = new CaseStmt(info, new RefExp(info, RefFactory.create(info, arg)), option, otherwise);
+    Block otherwise = new Block();
+    CaseStmt cs = new CaseStmt(new ReferenceExpression(RefFactory.create(arg)), option, otherwise);
     body.statements.add(cs);
 
     for (int i = 0; i < names.size(); i++) {
       AstList<CaseOptEntry> values = new AstList<CaseOptEntry>();
-      values.add(new CaseOptValue(info, new NumberValue(info, BigInteger.valueOf(i))));
-      Block code = new Block(info);
-      code.statements.add(new ReturnExpr(info, new StringValue(info, names.get(i))));
-      option.add(new CaseOpt(info, values, code));
+      values.add(new CaseOptValue(new NumberValue(BigInteger.valueOf(i))));
+      Block code = new Block();
+      code.statements.add(new ExpressionReturn(new StringValue(names.get(i))));
+      option.add(new CaseOpt(values, code));
     }
 
-    otherwise.statements.add(new ReturnExpr(info, new StringValue(info, "")));
+    otherwise.statements.add(new ExpressionReturn(new StringValue("")));
 
     return func;
   }

@@ -24,7 +24,6 @@ import parser.ImplBaseParser;
 import parser.PeekNReader;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
-import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.component.hfsm.State;
@@ -47,8 +46,9 @@ import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.template.Template;
 import ast.data.variable.ConstPrivate;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.data.variable.TemplateParameter;
+import ast.meta.MetaList;
 import error.ErrorType;
 import error.RError;
 
@@ -67,13 +67,14 @@ public class ImplHfsmParser extends ImplBaseParser {
 
   // EBNF implementationComposition: "hfsm" "(" id ")" stateBody "end"
   private RawComponent parseImplementationHfsm(String name) {
-    ElementInfo info = expect(TokenType.HFSM).getInfo();
+    MetaList info = expect(TokenType.HFSM).getMetadata();
     expect(TokenType.OPENPAREN);
     String initial = expect(TokenType.IDENTIFIER).getData();
     expect(TokenType.CLOSEPAREN);
     FuncProcedure entry = makeProc("_entry"); // FIXME get names from outside
     FuncProcedure exit = makeProc("_exit");// FIXME get names from outside
-    StateComposite top = new StateComposite(info, "!top", FuncRefFactory.create(info, entry), FuncRefFactory.create(info, exit), new StateRef(info, RefFactory.create(info, initial)));
+    StateComposite top = new StateComposite("!top", FuncRefFactory.create(info, entry), FuncRefFactory.create(info, exit), new StateRef(info, RefFactory.create(info, initial)));
+    top.metadata().add(info);
     top.item.add(entry);
     top.item.add(exit);
     parseStateBody(top);
@@ -122,7 +123,9 @@ public class ImplHfsmParser extends ImplBaseParser {
           genpam = new ArrayList<TemplateParameter>();
         }
         Function obj = parseStateDeclaration(id.getData());
-        return new Template(id.getInfo(), id.getData(), genpam, obj);
+        Template template = new Template(id.getData(), genpam, obj);
+        template.metadata().add(id.getMetadata());
+        return template;
       }
       case COLON: {
         Token id = next();
@@ -160,7 +163,7 @@ public class ImplHfsmParser extends ImplBaseParser {
         return parseFuncDef(peek().getType(), name, false);
       default: {
         // return type().parseTypedecl();
-        RError.err(ErrorType.Error, peek().getInfo(), "Expected function");
+        RError.err(ErrorType.Error, "Expected function", peek().getMetadata());
         return null;
       }
     }
@@ -168,23 +171,36 @@ public class ImplHfsmParser extends ImplBaseParser {
 
   // EBNF stateDecl: "state" ( ";" | ( [ "(" id ")" ] stateBody ) )
   private State parseState(String name) {
-    ElementInfo info = expect(TokenType.STATE).getInfo();
+    MetaList info = expect(TokenType.STATE).getMetadata();
 
-    ast.data.component.hfsm.State state;
+    State state;
+
     FuncProcedure entry = makeProc("_entry"); // FIXME get names from outside
+    FuncRef entryRef = FuncRefFactory.create(entry);
+    entryRef.metadata().add(info);
+
     FuncProcedure exit = makeProc("_exit");// FIXME get names from outside
+    FuncRef exitRef = FuncRefFactory.create(exit);
+    exitRef.metadata().add(info);
+
     if (consumeIfEqual(TokenType.SEMI)) {
-      state = new StateSimple(info, name, FuncRefFactory.create(info, entry), FuncRefFactory.create(info, exit));
+      state = new StateSimple(name, entryRef, exitRef);
+      state.metadata().add(info);
       state.item.add(entry);
       state.item.add(exit);
     } else {
       if (consumeIfEqual(TokenType.OPENPAREN)) {
         String initial = expect(TokenType.IDENTIFIER).getData();
         expect(TokenType.CLOSEPAREN);
-        state = new StateComposite(info, name, FuncRefFactory.create(info, entry), FuncRefFactory.create(info, exit), new StateRef(info, RefFactory.create(info, initial)));
+        Reference initialRef = RefFactory.create(initial);
+        initialRef.metadata().add(info);
+        StateRef initialState = new StateRef(initialRef);
+        initialState.metadata().add(info);
+        state = new StateComposite(name, entryRef, exitRef, initialState);
       } else {
-        state = new StateSimple(info, name, FuncRefFactory.create(info, entry), FuncRefFactory.create(info, exit));
+        state = new StateSimple(name, entryRef, exitRef);
       }
+      state.metadata().add(info);
       state.item.add(entry);
       state.item.add(exit);
 
@@ -194,41 +210,45 @@ public class ImplHfsmParser extends ImplBaseParser {
   }
 
   static private FuncProcedure makeProc(String name) {
-    return new FuncProcedure(ElementInfo.NO, name, new AstList<FuncVariable>(), new FuncReturnNone(ElementInfo.NO), new Block(ElementInfo.NO));
+    return new FuncProcedure(name, new AstList<FunctionVariable>(), new FuncReturnNone(), new Block());
   }
 
   // EBNF transition: stateRef "to" stateRef "by" transitionEvent [ "if" expr ] (
   // ";" | "do" block "end" )
   private Transition parseTransition() {
     StateRef src = stateRef.parse();
-    ElementInfo info = expect(TokenType.TO).getInfo();
+    MetaList info = expect(TokenType.TO).getMetadata();
     StateRef dst = stateRef.parse();
 
     expect(TokenType.BY);
 
     Token tok = expect(TokenType.IDENTIFIER);
-    Reference name = RefFactory.full(tok.getInfo(), tok.getData());
-    FuncRef eventFunc = new FuncRef(name.getInfo(), name);
+    Reference name = RefFactory.full(tok.getMetadata(), tok.getData());
+    FuncRef eventFunc = new FuncRef(name.metadata(), name);
 
-    AstList<FuncVariable> param = parseVardefList();
+    AstList<FunctionVariable> param = parseVardefList();
 
     Expression guard;
     if (consumeIfEqual(TokenType.IF)) {
       guard = expr().parse();
     } else {
-      guard = new BooleanValue(info, true);
+      guard = new BooleanValue(true);
+      guard.metadata().add(info);
     }
 
     Block body;
     if (consumeIfEqual(TokenType.SEMI)) {
-      body = new Block(info);
+      body = new Block();
+      body.metadata().add(info);
     } else {
       expect(TokenType.DO);
       body = stmt().parseBlock();
       expect(TokenType.END);
     }
 
-    return new Transition(info, src, dst, eventFunc, guard, param, body);
+    Transition transition = new Transition(src, dst, eventFunc, guard, param, body);
+    transition.metadata().add(info);
+    return transition;
   }
 
 }

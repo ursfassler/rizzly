@@ -45,7 +45,7 @@ public class KnowBacklink extends KnowledgeEntry {
       traverser.traverse(kb.getRoot(), cache);
       set = new HashSet<Reference>();
       if (set == null) {
-        RError.err(ErrorType.Fatal, target.getInfo(), "Object not reachable:" + target);
+        RError.err(ErrorType.Fatal, "Object not reachable:" + target, target.metadata());
       }
     }
     return set;

@@ -17,20 +17,25 @@
 
 package ast.data.raw;
 
-import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.statement.Block;
 import ast.data.template.Template;
+import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
 final public class RawElementary extends RawComponent {
   final private AstList<Template> declaration = new AstList<Template>();
   final private AstList<Ast> instantiation = new AstList<Ast>();
-  private Block entryFunc = new Block(ElementInfo.NO);
-  private Block exitFunc = new Block(ElementInfo.NO);
+  private Block entryFunc = new Block();
+  private Block exitFunc = new Block();
 
-  public RawElementary(ElementInfo info, String name) {
+  public RawElementary(String name) {
+    super(name);
+  }
+
+  @Deprecated
+  public RawElementary(MetaList info, String name) {
     super(info, name);
   }
 

@@ -26,7 +26,6 @@ import java.util.Map;
 
 import main.Configuration;
 import util.Pair;
-import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.copy.Relinker;
 import ast.data.Ast;
@@ -47,7 +46,7 @@ import ast.data.component.composition.SubCallbacks;
 import ast.data.component.composition.SynchroniusConnection;
 import ast.data.component.elementary.ImplElementary;
 import ast.data.expression.Expression;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.expression.value.TupleValue;
 import ast.data.function.FuncRef;
 import ast.data.function.FuncRefFactory;
@@ -56,10 +55,10 @@ import ast.data.function.InterfaceFunction;
 import ast.data.function.header.FuncProcedure;
 import ast.data.function.header.FuncQuery;
 import ast.data.function.header.FuncResponse;
-import ast.data.function.header.FuncSignal;
-import ast.data.function.header.FuncSlot;
 import ast.data.function.header.FuncSubHandlerEvent;
 import ast.data.function.header.FuncSubHandlerQuery;
+import ast.data.function.header.Signal;
+import ast.data.function.header.Slot;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefFactory;
@@ -67,12 +66,13 @@ import ast.data.reference.RefName;
 import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
+import ast.data.statement.ExpressionReturn;
 import ast.data.statement.MsgPush;
-import ast.data.statement.ReturnExpr;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.data.variable.Variable;
 import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowledgeBase;
+import ast.meta.MetaList;
 import ast.pass.AstPass;
 import ast.repository.query.NameFilter;
 import ast.specification.AndSpec;
@@ -112,13 +112,14 @@ public class CompositionReduction extends AstPass {
     assert (out.body.statements.isEmpty());
 
     Function func;
-    if (out instanceof FuncSignal) {
-      func = new FuncSubHandlerEvent(out.getInfo(), out.name, Copy.copy(out.param), Copy.copy(out.ret), new Block(ElementInfo.NO));
+    if (out instanceof Signal) {
+      func = new FuncSubHandlerEvent(out.getName(), Copy.copy(out.param), Copy.copy(out.ret), new Block());
     } else if (out instanceof FuncQuery) {
-      func = new FuncSubHandlerQuery(out.getInfo(), out.name, Copy.copy(out.param), Copy.copy(out.ret), new Block(ElementInfo.NO));
+      func = new FuncSubHandlerQuery(out.getName(), Copy.copy(out.param), Copy.copy(out.ret), new Block());
     } else {
       throw new RuntimeException("not yet implemented");
     }
+    func.metadata().add(out.metadata());
     return func;
   }
 
@@ -127,7 +128,6 @@ public class CompositionReduction extends AstPass {
 // TODO cleanup
 class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
 
-  private static final ElementInfo info = ElementInfo.NO;
   private final Map<ImplComposition, ImplElementary> map = new HashMap<ImplComposition, ImplElementary>();
 
   @Override
@@ -148,12 +148,12 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
 
   @Override
   protected Ast visitImplComposition(ImplComposition obj, Void param) {
-    ElementInfo info = obj.getInfo();
+    MetaList info = obj.metadata();  // TODO use this info for everything in this function
 
-    FuncProcedure entry = new FuncProcedure(info, "_entry", new AstList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
-    FuncProcedure exit = new FuncProcedure(info, "_exit", new AstList<FuncVariable>(), new FuncReturnNone(info), new Block(info));
+    FuncProcedure entry = new FuncProcedure("_entry", new AstList<FunctionVariable>(), new FuncReturnNone(), new Block());
+    FuncProcedure exit = new FuncProcedure("_exit", new AstList<FunctionVariable>(), new FuncReturnNone(), new Block());
 
-    ImplElementary elem = new ImplElementary(obj.getInfo(), obj.name, FuncRefFactory.create(info, entry), FuncRefFactory.create(info, exit));
+    ImplElementary elem = new ImplElementary(obj.getName(), FuncRefFactory.create(entry), FuncRefFactory.create(exit));
     elem.function.add(entry);
     elem.function.add(exit);
 
@@ -165,7 +165,8 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
     Map<Pair<CompUse, Function>, Function> coca = new HashMap<Pair<CompUse, Function>, Function>();
 
     for (CompUse compu : obj.component) {
-      SubCallbacks suc = new SubCallbacks(compu.getInfo(), new CompUseRef(info, RefFactory.create(info, compu)));
+      SubCallbacks suc = new SubCallbacks(new CompUseRef(info, RefFactory.create(info, compu)));
+      suc.metadata().add(compu.metadata());
       elem.subCallback.add(suc);
       Component usedComp = compu.compRef.getTarget();
       for (InterfaceFunction out : usedComp.getIface(Direction.out)) {
@@ -176,7 +177,7 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
     }
 
     for (Connection con : obj.connection) {
-      Endpoint src = con.endpoint.get(Direction.in);
+      Endpoint src = con.getSrc();
 
       if (src instanceof EndpointSelf) {
         Function coniface = src.getFunc();
@@ -186,13 +187,13 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
           assert (coniface.body.statements.isEmpty());
           assert (con instanceof SynchroniusConnection);
 
-          ReturnExpr call = makeQueryCall(con.endpoint.get(Direction.out), coniface);
+          ExpressionReturn call = makeQueryCall(con.getDst(), coniface);
           coniface.body.statements.add(call);
-        } else if (coniface instanceof FuncSlot) {
+        } else if (coniface instanceof Slot) {
           // assert (elem.getSlot().contains(coniface));
           genSlotCall(elem, con, coniface);
         } else {
-          RError.err(ErrorType.Fatal, coniface.getInfo(), "Unexpected function type: " + coniface.getClass().getSimpleName());
+          RError.err(ErrorType.Fatal, "Unexpected function type: " + coniface.getClass().getSimpleName(), coniface.metadata());
         }
       } else {
         CompUse srcCompRef = ((EndpointSub) src).component.getTarget();
@@ -207,12 +208,12 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
           assert (suha.body.statements.isEmpty());
           assert (con instanceof SynchroniusConnection);
 
-          ReturnExpr call = makeQueryCall(con.endpoint.get(Direction.out), suha);
+          ExpressionReturn call = makeQueryCall(con.getDst(), suha);
           suha.body.statements.add(call);
-        } else if (coniface instanceof FuncSignal) {
+        } else if (coniface instanceof Signal) {
           genSlotCall(elem, con, suha);
         } else {
-          RError.err(ErrorType.Fatal, coniface.getInfo(), "Unexpected function type: " + coniface.getClass().getSimpleName());
+          RError.err(ErrorType.Fatal, "Unexpected function type: " + coniface.getClass().getSimpleName(), coniface.metadata());
         }
       }
     }
@@ -223,26 +224,27 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
 
   private void genSlotCall(ImplElementary elem, Connection con, Function coniface) {
     if (con instanceof SynchroniusConnection) {
-      coniface.body.statements.add(makeEventCall(con.endpoint.get(Direction.out), coniface));
+      coniface.body.statements.add(makeEventCall(con.getDst(), coniface));
     } else if (con instanceof AsynchroniusConnection) {
-      coniface.body.statements.add(makePostQueueCall(con.endpoint.get(Direction.out), coniface, elem));
+      coniface.body.statements.add(makePostQueueCall(con.getDst(), coniface, elem));
     } else {
-      RError.err(ErrorType.Error, con.getInfo(), "Unknown connection type: " + con.getClass().getCanonicalName());
+      RError.err(ErrorType.Error, "Unknown connection type: " + con.getClass().getCanonicalName(), con.metadata());
     }
   }
 
-  static private ReturnExpr makeQueryCall(Endpoint ep, Function func) {
+  static private ExpressionReturn makeQueryCall(Endpoint ep, Function func) {
     Reference ref = epToRef(ep);
 
-    TupleValue actparam = new TupleValue(info, new AstList<Expression>());
+    TupleValue actparam = new TupleValue(new AstList<Expression>());
     for (Variable var : func.param) {
-      actparam.value.add(new RefExp(info, RefFactory.full(func.getInfo(), var)));
+      actparam.value.add(new ReferenceExpression(RefFactory.full(func.metadata(), var)));
     }
 
-    RefCall call = new RefCall(func.getInfo(), actparam);
+    RefCall call = new RefCall(actparam);
+    call.metadata().add(func.metadata());
     ref.offset.add(call);
 
-    return new ReturnExpr(info, new RefExp(info, ref));
+    return new ExpressionReturn(new ReferenceExpression(ref));
   }
 
   private MsgPush makePostQueueCall(Endpoint ep, Function func, Component comp) {
@@ -250,35 +252,40 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
 
     List<Expression> actparam = new ArrayList<Expression>();
     for (Variable var : func.param) {
-      actparam.add(new RefExp(info, RefFactory.full(func.getInfo(), var)));
+      actparam.add(new ReferenceExpression(RefFactory.full(func.metadata(), var)));
     }
 
     Reference queue = getQueue(ep, comp);
-    return new MsgPush(func.getInfo(), queue, new FuncRef(info, ref), actparam);
+    MsgPush push = new MsgPush(queue, new FuncRef(ref), actparam);
+    push.metadata().add(func.metadata());
+    return push;
   }
 
   static private CallStmt makeEventCall(Endpoint ep, Function func) {
 
     Reference ref = epToRef(ep);
 
-    TupleValue actparam = new TupleValue(info, new AstList<Expression>());
+    TupleValue actparam = new TupleValue(new AstList<Expression>());
     for (Variable var : func.param) {
-      actparam.value.add(new RefExp(info, RefFactory.full(func.getInfo(), var)));
+      actparam.value.add(new ReferenceExpression(RefFactory.full(func.metadata(), var)));
     }
 
-    RefCall call = new RefCall(func.getInfo(), actparam);
+    RefCall call = new RefCall(actparam);
+    call.metadata().add(func.metadata());
     ref.offset.add(call);
 
-    return new CallStmt(func.getInfo(), ref);
+    CallStmt callStmt = new CallStmt(ref);
+    callStmt.metadata().add(func.metadata());
+    return callStmt;
   }
 
   static private Reference epToRef(Endpoint ep) {
     if (ep instanceof EndpointSelf) {
-      return RefFactory.full(ep.getInfo(), ((EndpointSelf) ep).getFunc());
+      return RefFactory.full(ep.metadata(), ((EndpointSelf) ep).getFunc());
     } else {
       EndpointSub eps = (EndpointSub) ep;
-      Reference ref = RefFactory.full(eps.getInfo(), eps.component.getTarget());
-      ref.offset.add(new RefName(eps.getInfo(), eps.function));
+      Reference ref = RefFactory.full(eps.metadata(), eps.component.getTarget());
+      ref.offset.add(new RefName(eps.metadata(), eps.function));
       return ref;
     }
   }
@@ -286,12 +293,12 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
   private Reference getQueue(Endpoint ep, Component comp) {
     Reference ref;
     if (ep instanceof EndpointSub) {
-      ref = RefFactory.full(ep.getInfo(), ((EndpointSub) ep).component.getTarget());
+      ref = RefFactory.full(ep.metadata(), ((EndpointSub) ep).component.getTarget());
       Component refComp = ((EndpointSub) ep).component.getTarget().compRef.getTarget();
       Queue queue = refComp.queue;
-      ref.offset.add(new RefName(info, queue.name));
+      ref.offset.add(new RefName(queue.getName()));
     } else {
-      ref = RefFactory.full(ep.getInfo(), comp.queue);
+      ref = RefFactory.full(ep.metadata(), comp.queue);
     }
     return ref;
   }

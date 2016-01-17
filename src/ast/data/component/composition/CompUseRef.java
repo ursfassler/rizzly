@@ -17,15 +17,21 @@
 
 package ast.data.component.composition;
 
-import ast.ElementInfo;
 import ast.data.reference.Reference;
 import ast.data.reference.TypedRef;
+import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
 public class CompUseRef extends TypedRef<CompUse> {
 
-  public CompUseRef(ElementInfo info, Reference ref) {
-    super(info, ref);
+  public CompUseRef(Reference ref) {
+    super(ref);
+  }
+
+  @Deprecated
+  public CompUseRef(MetaList info, Reference ref) {
+    super(ref);
+    metadata().add(info);
   }
 
   @Override

@@ -15,26 +15,14 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.statement;
+package ast.data.reference;
 
-import ast.ElementInfo;
-import ast.data.AstList;
-import ast.data.expression.Expression;
-import ast.data.reference.Reference;
+import ast.data.Named;
 import ast.visitor.Visitor;
 
-final public class AssignmentMulti extends Assignment {
-
-  final public AstList<Reference> left;
-
-  public AssignmentMulti(ElementInfo info, AstList<Reference> left, Expression right) {
-    super(info, right);
-    this.left = left;
-  }
-
-  @Override
-  public String toString() {
-    return left + " := " + right;
+final public class LinkTarget extends Named {
+  public LinkTarget(String name) {
+    setName(name);
   }
 
   @Override

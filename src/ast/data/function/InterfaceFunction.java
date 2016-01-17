@@ -17,16 +17,15 @@
 
 package ast.data.function;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.function.ret.FuncReturn;
 import ast.data.statement.Block;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 
 abstract public class InterfaceFunction extends Function {
 
-  public InterfaceFunction(ElementInfo info, String name, AstList<FuncVariable> param, FuncReturn ret, Block body) {
-    super(info, name, param, ret, body);
+  public InterfaceFunction(String name, AstList<FunctionVariable> param, FuncReturn ret, Block body) {
+    super(name, param, ret, body);
   }
 
 }

@@ -48,10 +48,10 @@ public class Root extends AstPass {
       }
     }
     for (FuncQuery func : queries) {
-      RError.err(ErrorType.Hint, func.getInfo(), func.name);
+      RError.err(ErrorType.Hint, func.getName(), func.metadata());
     }
     if (!queries.isEmpty()) {
-      RError.err(ErrorType.Error, root.getInfo(), "Top component is not allowed to have queries in output");
+      RError.err(ErrorType.Error, "Top component is not allowed to have queries in output", root.metadata());
     }
   }
 

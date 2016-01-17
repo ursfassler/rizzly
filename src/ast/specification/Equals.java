@@ -24,7 +24,7 @@ import ast.data.Ast;
 import ast.data.expression.value.NumberValue;
 import ast.data.expression.value.StringValue;
 import ast.data.reference.Reference;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumType;
@@ -165,7 +165,7 @@ class EqualTraverser extends NullDispatcher<Boolean, Object> {
   protected Boolean visitNamedElement(NamedElement obj, Object param) {
     if (param instanceof NamedElement) {
       NamedElement other = (NamedElement) param;
-      return obj.name.equals(other.name) && visit(obj.typeref, other.typeref);
+      return obj.getName().equals(other.getName()) && visit(obj.typeref, other.typeref);
     } else {
       return false;
     }
@@ -188,9 +188,9 @@ class EqualTraverser extends NullDispatcher<Boolean, Object> {
   }
 
   @Override
-  protected Boolean visitTypeRef(TypeRef obj, Object param) {
-    if (param instanceof TypeRef) {
-      TypeRef other = (TypeRef) param;
+  protected Boolean visitTypeRef(TypeReference obj, Object param) {
+    if (param instanceof TypeReference) {
+      TypeReference other = (TypeReference) param;
       return visit(obj.ref, other.ref);
     } else {
       return false;

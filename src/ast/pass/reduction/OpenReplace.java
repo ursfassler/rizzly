@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import main.Configuration;
-import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -34,7 +33,7 @@ import ast.data.type.Type;
 import ast.data.type.TypeRefFactory;
 import ast.data.type.base.RangeType;
 import ast.data.type.base.RangeTypeFactory;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.data.variable.Variable;
 import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowType;
@@ -78,7 +77,7 @@ class OpenReplaceWorker extends DfsTraverser<Void, Void> {
     for (Variable var : map.keySet()) {
       RangeType range = map.get(var);
       range = kbi.getRangeType(range.range);
-      var.type = TypeRefFactory.create(ElementInfo.NO, range);
+      var.type = TypeRefFactory.create(range);
     }
 
     return null;
@@ -90,7 +89,7 @@ class OpenReplaceWorker extends DfsTraverser<Void, Void> {
       Function func = (Function) obj.link;
       RefCall call = (RefCall) obj.offset.get(0);
 
-      AstList<FuncVariable> arg = func.param;
+      AstList<FunctionVariable> arg = func.param;
       AstList<Expression> acarg = call.actualParameter.value;
 
       assert (arg.size() == acarg.size());

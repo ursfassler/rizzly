@@ -29,61 +29,64 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import ast.Designator;
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.Named;
 import ast.data.Namespace;
-import ast.data.reference.DummyLinkTarget;
+import ast.data.reference.LinkTarget;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefItem;
 import ast.data.reference.RefName;
 import ast.data.reference.Reference;
+import ast.meta.MetaList;
+import ast.meta.MetaListImplementation;
+import ast.meta.SourcePosition;
 import ast.repository.query.ChildByName;
 
 public class SubLinker_Test {
-
-  final static private ElementInfo info = ElementInfo.NO;
   final private ChildByName childByName = mock(ChildByName.class);
   final private SubLinker testee = new SubLinker(childByName);
 
   @Test
   public void start_search_from_enclosing_object() {
-    Namespace root = new Namespace(info, "");
-    Reference ref = RefFactory.create(info, "a");
+    Namespace root = new Namespace("");
+    Reference ref = RefFactory.create("a");
 
     testee.link(ref, root);
 
-    verify(childByName).get(eq(root), any(Designator.class), any(ElementInfo.class));
+    verify(childByName).get(eq(root), any(Designator.class), any(MetaList.class));
   }
 
   @Test
   public void uses_reference_for_child_search() {
-    Namespace root = new Namespace(info, "");
-    Reference ref = reference(info, new Designator("a", "b"));
+    Namespace root = new Namespace("");
+    Reference ref = reference(new Designator("a", "b"));
 
     testee.link(ref, root);
 
-    verify(childByName).get(any(Named.class), eq(new Designator("a", "b")), any(ElementInfo.class));
+    verify(childByName).get(any(Named.class), eq(new Designator("a", "b")), any(MetaList.class));
   }
 
   @Test
   public void use_info_from_reference_for_child_search() {
-    Namespace root = new Namespace(info, "");
+    Namespace root = new Namespace("");
 
-    ElementInfo info = new ElementInfo("", 42, 57);
-    Reference ref = RefFactory.create(info, "a");
+    Reference ref = RefFactory.create("a");
+    SourcePosition info = new SourcePosition("", 42, 57);
+    MetaList meta = new MetaListImplementation();   // TODO use mock
+    meta.add(info);
+    ref.metadata().add(meta);
 
     testee.link(ref, root);
 
-    verify(childByName).get(any(Named.class), any(Designator.class), eq(info));
+    verify(childByName).get(any(Named.class), any(Designator.class), eq(meta));
   }
 
   @Test
   public void uses_target_from_search() {
-    Namespace root = new Namespace(info, "");
-    Reference ref = RefFactory.create(info, "a");
+    Namespace root = new Namespace("");
+    Reference ref = RefFactory.create("a");
     Named result = mock(Named.class);
-    when(childByName.get(any(Named.class), any(Designator.class), any(ElementInfo.class))).thenReturn(result);
+    when(childByName.get(any(Named.class), any(Designator.class), any(MetaList.class))).thenReturn(result);
 
     testee.link(ref, root);
 
@@ -92,8 +95,8 @@ public class SubLinker_Test {
 
   @Test
   public void removes_reference_offset() {
-    Namespace root = new Namespace(info, "");
-    Reference ref = reference(info, new Designator("a", "b"));
+    Namespace root = new Namespace("");
+    Reference ref = reference(new Designator("a", "b"));
 
     testee.link(ref, root);
 
@@ -102,35 +105,35 @@ public class SubLinker_Test {
 
   @Test
   public void removes_self_bevore_searching_for_children() {
-    Namespace root = new Namespace(info, "me");
-    Reference ref = RefFactory.create(info, "self");
+    Namespace root = new Namespace("me");
+    Reference ref = RefFactory.create("self");
 
     testee.link(ref, root);
 
-    verify(childByName).get(any(Named.class), eq(new Designator()), any(ElementInfo.class));
+    verify(childByName).get(any(Named.class), eq(new Designator()), any(MetaList.class));
   }
 
   @Test
   public void searches_for_child_when_taget_starts_with_self_and_has_more_elements() {
-    Namespace root = new Namespace(info, "me");
-    Reference ref = reference(info, new Designator("self", "a"));
+    Namespace root = new Namespace("me");
+    Reference ref = reference(new Designator("self", "a"));
 
     testee.link(ref, root);
 
-    verify(childByName).get(any(Named.class), eq(new Designator("a")), any(ElementInfo.class));
+    verify(childByName).get(any(Named.class), eq(new Designator("a")), any(MetaList.class));
   }
 
-  private Reference reference(ElementInfo info, Designator name) {
+  private Reference reference(Designator name) {
     ArrayList<String> list = name.toList();
 
-    DummyLinkTarget target = new DummyLinkTarget(null, list.get(0));
+    LinkTarget target = new LinkTarget(list.get(0));
     list.remove(0);
 
     AstList<RefItem> offset = new AstList<RefItem>();
     for (String itr : list) {
-      offset.add(new RefName(null, itr));
+      offset.add(new RefName(itr));
     }
 
-    return new Reference(info, target, offset);
+    return new Reference(target, offset);
   }
 }

@@ -21,8 +21,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import ast.ElementInfo;
-import ast.data.Metadata;
+import ast.meta.MetaList;
+import ast.meta.Metadata;
 import error.ErrorType;
 import error.RError;
 
@@ -50,13 +50,13 @@ public class SimpleMetaParser {
 
   // entry: id "=" "\"" text "\""
   private void parseEntry() {
-    ElementInfo info = scanner.peek().getInfo();
+    MetaList info = scanner.peek().getInfo();
     String id = expect(TokenType.IDENTIFIER).getData();
     expect(TokenType.EQUAL);
     String text = expect(TokenType.STRING).getData();
 
     if (data.containsKey(id)) {
-      RError.err(ErrorType.Warning, info, "double key in meta data");
+      RError.err(ErrorType.Warning, "double key in meta data", info);
     }
 
     data.put(id, text);
@@ -65,11 +65,11 @@ public class SimpleMetaParser {
   protected Token expect(TokenType type) {
     if (!scanner.hasNext()) {
       Token tok = scanner.peek();
-      RError.err(ErrorType.Error, tok.getInfo(), "expected token not found: " + tok);
+      RError.err(ErrorType.Error, "expected token not found: " + tok, tok.getInfo());
     }
     Token got = scanner.next();
     if (got.getType() != type) {
-      RError.err(ErrorType.Error, got.getInfo(), "expected " + type + " got " + got);
+      RError.err(ErrorType.Error, "expected " + type + " got " + got, got.getInfo());
     }
     return got;
   }

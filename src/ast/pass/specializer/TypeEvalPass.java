@@ -60,7 +60,7 @@ public class TypeEvalPass extends AstPass {
   }
 
   private static String full(Named obj) {
-    return obj.name + "[" + Integer.toHexString(obj.hashCode()) + "]";
+    return obj.getName() + "[" + Integer.toHexString(obj.hashCode()) + "]";
   }
 }
 

@@ -17,7 +17,6 @@
 
 package ast.data.type.special;
 
-import ast.ElementInfo;
 import ast.data.type.base.BaseType;
 import ast.visitor.Visitor;
 
@@ -28,7 +27,7 @@ final public class IntegerType extends BaseType {
   final static public String NAME = "Integer";
 
   public IntegerType() {
-    super(ElementInfo.NO, NAME);
+    super(NAME);
   }
 
   @Override

@@ -17,7 +17,7 @@
 
 package ast.data;
 
-import ast.ElementInfo;
+import ast.meta.MetaList;
 import ast.visitor.VisitorAcceptor;
 
 /**
@@ -25,6 +25,7 @@ import ast.visitor.VisitorAcceptor;
  * @author urs
  */
 public interface Ast extends VisitorAcceptor {
-  public ElementInfo getInfo();
+
+  public MetaList metadata();
 
 }

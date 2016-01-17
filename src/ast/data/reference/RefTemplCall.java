@@ -17,16 +17,21 @@
 
 package ast.data.reference;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.template.ActualTemplateArgument;
+import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
 final public class RefTemplCall extends RefItem {
   final public AstList<ActualTemplateArgument> actualParameter;
 
-  public RefTemplCall(ElementInfo info, AstList<ActualTemplateArgument> expr) {
-    super(info);
+  public RefTemplCall(AstList<ActualTemplateArgument> expr) {
+    this.actualParameter = expr;
+  }
+
+  @Deprecated
+  public RefTemplCall(MetaList info, AstList<ActualTemplateArgument> expr) {
+    metadata().add(info);
     this.actualParameter = expr;
   }
 

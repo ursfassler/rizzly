@@ -17,15 +17,13 @@
 
 package ast.data.reference;
 
-import ast.ElementInfo;
 import ast.data.expression.value.TupleValue;
 import ast.visitor.Visitor;
 
 final public class RefCall extends RefItem {
   final public TupleValue actualParameter;
 
-  public RefCall(ElementInfo info, TupleValue actualParameter) {
-    super(info);
+  public RefCall(TupleValue actualParameter) {
     assert (actualParameter != null);
     this.actualParameter = actualParameter;
   }

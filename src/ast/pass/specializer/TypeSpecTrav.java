@@ -19,7 +19,7 @@ package ast.pass.specializer;
 
 import java.util.Map;
 
-import ast.data.reference.DummyLinkTarget;
+import ast.data.reference.LinkTarget;
 import ast.data.reference.RefFactory;
 import ast.data.reference.Reference;
 import ast.data.type.Type;
@@ -36,13 +36,13 @@ public class TypeSpecTrav extends RefReplacer<Void> {
 
   @Override
   protected Reference visitReference(Reference obj, Void param) {
-    assert (!(obj.link instanceof DummyLinkTarget));
+    assert (!(obj.link instanceof LinkTarget));
     super.visitReference(obj, param);
 
     if (types.containsKey(obj.link)) {
       assert (obj.offset.isEmpty());
       Type repl = types.get(obj.link);
-      return RefFactory.full(obj.getInfo(), repl);
+      return RefFactory.full(obj.metadata(), repl);
     }
 
     return obj;

@@ -18,11 +18,11 @@
 package ast.dispatcher.other;
 
 import ast.data.AstList;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.reference.RefItem;
 import ast.data.reference.Reference;
 import ast.data.reference.TypedRef;
-import ast.data.statement.AssignmentMulti;
+import ast.data.statement.MultiAssignment;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.MsgPush;
 import ast.dispatcher.DfsTraverser;
@@ -44,13 +44,13 @@ abstract public class RefReplacer<T> extends DfsTraverser<Reference, T> {
   }
 
   @Override
-  protected Reference visitRefExpr(RefExp obj, T param) {
-    obj.ref = visit(obj.ref, param);
+  protected Reference visitRefExpr(ReferenceExpression obj, T param) {
+    obj.reference = visit(obj.reference, param);
     return null;
   }
 
   @Override
-  protected Reference visitAssignmentMulti(AssignmentMulti obj, T param) {
+  protected Reference visitAssignmentMulti(MultiAssignment obj, T param) {
     visitRefList(obj.left, param);
     visit(obj.right, param);
     return null;

@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ast.Designator;
-import ast.ElementInfo;
 import ast.copy.Copy;
 import ast.data.Ast;
 import ast.data.AstList;
@@ -29,7 +28,7 @@ import ast.data.Named;
 import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateSimple;
-import ast.data.expression.RefExp;
+import ast.data.expression.ReferenceExpression;
 import ast.data.expression.value.NamedValue;
 import ast.data.expression.value.RecordValue;
 import ast.data.expression.value.UnsafeUnionValue;
@@ -76,8 +75,8 @@ public class StateTypeBuilder extends NullDispatcher<NamedElement, AstList<Named
   }
 
   private String getName(Named obj) {
-    assert (obj.name.length() > 0);
-    return obj.name;
+    assert (obj.getName().length() > 0);
+    return obj.getName();
   }
 
   @Override
@@ -89,7 +88,7 @@ public class StateTypeBuilder extends NullDispatcher<NamedElement, AstList<Named
   protected NamedElement visitStateSimple(StateSimple obj, AstList<NamedElement> param) {
     RecordType record = makeRecord(obj);
 
-    NamedElement dataElem = new NamedElement(obj.getInfo(), obj.name, TypeRefFactory.create(ElementInfo.NO, record));
+    NamedElement dataElem = new NamedElement(obj.metadata(), obj.getName(), TypeRefFactory.create(record));
 
     param = new AstList<NamedElement>(param);
     param.add(dataElem);
@@ -101,18 +100,21 @@ public class StateTypeBuilder extends NullDispatcher<NamedElement, AstList<Named
 
   public RecordType makeRecord(State obj) {
     String name = Designator.NAME_SEP + "Data";
-    RecordType record = new RecordType(obj.getInfo(), name, new AstList<NamedElement>());
+    RecordType record = new RecordType(obj.metadata(), name, new AstList<NamedElement>());
 
     obj.item.add(record);
     stateType.put(obj, record);
-    initValues.put(record, new RecordValue(obj.getInfo(), new AstList<NamedValue>(), TypeRefFactory.create(obj.getInfo(), record)));
+    RecordValue value = new RecordValue(new AstList<NamedValue>(), TypeRefFactory.create(obj.metadata(), record));
+    value.metadata().add(obj.metadata());
+    initValues.put(record, value);
 
     return record;
   }
 
   public UnsafeUnionType makeUnion(State obj) {
     String name = Designator.NAME_SEP + "Sub";
-    UnsafeUnionType union = new UnsafeUnionType(obj.getInfo(), name, new AstList<NamedElement>());
+    UnsafeUnionType union = new UnsafeUnionType(name, new AstList<NamedElement>());
+    union.metadata().add(obj.metadata());
     obj.item.add(union);
     return union;
   }
@@ -123,7 +125,7 @@ public class StateTypeBuilder extends NullDispatcher<NamedElement, AstList<Named
 
     RecordType record = makeRecord(obj);
 
-    NamedElement dataElem = new NamedElement(obj.getInfo(), Designator.NAME_SEP + getName(obj), TypeRefFactory.create(ElementInfo.NO, record));
+    NamedElement dataElem = new NamedElement(obj.metadata(), Designator.NAME_SEP + getName(obj), TypeRefFactory.create(record));
 
     param = new AstList<NamedElement>(param);
     param.add(dataElem);
@@ -133,7 +135,7 @@ public class StateTypeBuilder extends NullDispatcher<NamedElement, AstList<Named
     // add substates
 
     UnsafeUnionType union = makeUnion(obj);
-    NamedElement subElem = new NamedElement(obj.getInfo(), Designator.NAME_SEP + "sub", TypeRefFactory.create(ElementInfo.NO, union));
+    NamedElement subElem = new NamedElement(obj.metadata(), Designator.NAME_SEP + "sub", TypeRefFactory.create(union));
     record.element.add(subElem);
 
     param.add(subElem);
@@ -154,12 +156,15 @@ public class StateTypeBuilder extends NullDispatcher<NamedElement, AstList<Named
 
     Constant initvalue = initVar.get(kt.get(initStateElem.typeref));
     assert (initvalue != null);
-    NamedValue cont = new NamedValue(obj.getInfo(), getName(obj.initial.getTarget()), new RefExp(obj.getInfo(), RefFactory.full(obj.getInfo(), initvalue)));
-    UnsafeUnionValue uninit = new UnsafeUnionValue(obj.getInfo(), cont, TypeRefFactory.create(obj.getInfo(), union));
+    ReferenceExpression value2 = new ReferenceExpression(RefFactory.full(obj.metadata(), initvalue));
+    value2.metadata().add(obj.metadata());
+    NamedValue cont = new NamedValue(obj.metadata(), getName(obj.initial.getTarget()), value2);
+    UnsafeUnionValue uninit = new UnsafeUnionValue(cont, TypeRefFactory.create(obj.metadata(), union));
+    uninit.metadata().add(obj.metadata());
 
     RecordValue value = initValues.get(record);
     assert (value != null);
-    value.value.add(new NamedValue(obj.getInfo(), SUB_ENTRY_NAME, uninit));
+    value.value.add(new NamedValue(obj.metadata(), SUB_ENTRY_NAME, uninit));
 
     return dataElem;
   }
@@ -169,16 +174,17 @@ public class StateTypeBuilder extends NullDispatcher<NamedElement, AstList<Named
     assert (value != null);
 
     for (StateVariable var : TypeFilter.select(state.item, StateVariable.class)) {
-      NamedElement item = new NamedElement(var.getInfo(), getName(var), Copy.copy(var.type));
+      NamedElement item = new NamedElement(var.metadata(), getName(var), Copy.copy(var.type));
       type.element.add(item);
-      value.value.add(new NamedValue(var.getInfo(), getName(var), Copy.copy(var.def)));
+      value.value.add(new NamedValue(var.metadata(), getName(var), Copy.copy(var.def)));
 
       AstList<NamedElement> path = new AstList<NamedElement>(param);
       path.add(item);
       epath.put(var, path);
     }
 
-    ConstPrivate init = new ConstPrivate(state.getInfo(), CONST_PREFIX + getName(type), TypeRefFactory.create(state.getInfo(), type), value);
+    ConstPrivate init = new ConstPrivate(CONST_PREFIX + getName(type), TypeRefFactory.create(state.metadata(), type), value);
+    init.metadata().add(state.metadata());
     initVar.put(type, init);
     state.item.add(init);
   }

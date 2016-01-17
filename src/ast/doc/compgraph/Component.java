@@ -21,8 +21,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import ast.Designator;
-import ast.ElementInfo;
-import ast.data.Metadata;
+import ast.meta.MetaList;
+import ast.meta.Metadata;
 
 public abstract class Component implements Vertex {
   public static final double Y_IFACE_DIST = 15;
@@ -36,9 +36,9 @@ public abstract class Component implements Vertex {
   final protected ArrayList<Interface> input = new ArrayList<Interface>();
   final protected ArrayList<Interface> output = new ArrayList<Interface>();
 
-  final private ElementInfo info;
+  final private MetaList info;
 
-  public Component(ElementInfo info, Designator path, String classname, List<Metadata> metadata) {
+  public Component(MetaList info, Designator path, String classname, List<Metadata> metadata) {
     super();
     this.path = path;
     this.classname = classname;
@@ -46,7 +46,8 @@ public abstract class Component implements Vertex {
     this.info = info;
   }
 
-  public ElementInfo getInfo() {
+  // TODO rename
+  public MetaList getInfo() {
     return info;
   }
 

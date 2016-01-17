@@ -17,18 +17,23 @@
 
 package ast.data.type.composed;
 
-import ast.ElementInfo;
 import ast.data.AstList;
+import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
 final public class RecordType extends NamedElementType {
 
-  public RecordType(ElementInfo info, String name, AstList<NamedElement> element) {
+  public RecordType(String name, AstList<NamedElement> element) {
+    super(name, element);
+  }
+
+  @Deprecated
+  public RecordType(MetaList info, String name, AstList<NamedElement> element) {
     super(info, name, element);
   }
 
-  public RecordType(ElementInfo info, String name) {
-    super(info, name);
+  public RecordType(String name) {
+    super(name);
   }
 
   @Override

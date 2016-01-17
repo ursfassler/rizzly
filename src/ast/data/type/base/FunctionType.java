@@ -17,17 +17,18 @@
 
 package ast.data.type.base;
 
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.type.Type;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
+import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
 final public class FunctionType extends Type {
-  final public AstList<TypeRef> arg;
-  final public TypeRef ret;
+  final public AstList<TypeReference> arg;
+  final public TypeReference ret;
 
-  public FunctionType(ElementInfo info, String name, AstList<TypeRef> arg, TypeRef ret) {
+  @Deprecated
+  public FunctionType(MetaList info, String name, AstList<TypeReference> arg, TypeReference ret) {
     super(info, name);
     this.arg = arg;
     this.ret = ret;

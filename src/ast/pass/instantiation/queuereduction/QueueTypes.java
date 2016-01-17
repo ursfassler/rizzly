@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 import ast.Designator;
-import ast.ElementInfo;
 import ast.data.AstList;
 import ast.data.function.Function;
 import ast.data.type.TypeRefFactory;
@@ -36,6 +35,7 @@ import ast.data.type.composed.RecordType;
 import ast.data.type.composed.UnionType;
 import ast.knowledge.KnowPath;
 import ast.knowledge.KnowledgeBase;
+import ast.meta.MetaList;
 
 class QueueTypes {
   private ArrayType queue;
@@ -47,10 +47,10 @@ class QueueTypes {
   final private Map<Function, RecordType> funcToRecord;
 
   final private String prefix;
-  final private ElementInfo info;
+  final private MetaList info;
   final private KnowPath kpath;
 
-  public QueueTypes(String prefix, Map<Function, RecordType> funcToRecord, ElementInfo info, KnowledgeBase kb) {
+  public QueueTypes(String prefix, Map<Function, RecordType> funcToRecord, MetaList info, KnowledgeBase kb) {
     super();
     this.prefix = prefix;
     this.funcToRecord = funcToRecord;
@@ -71,7 +71,8 @@ class QueueTypes {
     }
 
     NamedElement tag = new NamedElement(info, "_tag", TypeRefFactory.create(info, msgType));
-    message = new UnionType(info, prefix + "queue", unielem, tag);
+    message = new UnionType(prefix + "queue", unielem, tag);
+    message.metadata().add(info);
 
     queue = createQueueType(queueLength, message);
   }
@@ -83,7 +84,7 @@ class QueueTypes {
   private EnumElement createElemFromFunc(AstList<NamedElement> unielem, Function func) {
     Designator path = kpath.get(func);
     assert (path.size() > 0);
-    String name = new Designator(path, func.name).toString(Designator.NAME_SEP);
+    String name = new Designator(path, func.getName()).toString(Designator.NAME_SEP);
 
     NamedElement elem = new NamedElement(info, name, TypeRefFactory.create(info, funcToRecord.get(func)));
     funcToElem.put(func, elem);

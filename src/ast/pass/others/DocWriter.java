@@ -69,7 +69,7 @@ class DocWriterWorker extends NullDispatcher<Void, Designator> {
   @Override
   protected Void visit(Ast obj, Designator param) {
     if (obj instanceof Named) {
-      param = new Designator(param, ((Named) obj).name);
+      param = new Designator(param, ((Named) obj).getName());
     }
     return super.visit(obj, param);
   }

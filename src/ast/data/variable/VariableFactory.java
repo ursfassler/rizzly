@@ -20,16 +20,15 @@ package ast.data.variable;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
-import ast.ElementInfo;
 import ast.data.expression.Expression;
-import ast.data.type.TypeRef;
+import ast.data.type.TypeReference;
 
 public class VariableFactory {
-  static public <T extends Variable> T create(Class<T> kind, ElementInfo info, String name, TypeRef type, Expression def) {
+  static public <T extends Variable> T create(Class<T> kind, String name, TypeReference type, Expression def) {
     T ret = null;
     try {
-      Constructor<T> c = kind.getDeclaredConstructor(ElementInfo.class, String.class, TypeRef.class, Expression.class);
-      ret = c.newInstance(info, name, type, def);
+      Constructor<T> c = kind.getDeclaredConstructor(String.class, TypeReference.class, Expression.class);
+      ret = c.newInstance(name, type, def);
     } catch (InstantiationException e) {
       e.printStackTrace();
     } catch (IllegalAccessException e) {
@@ -46,11 +45,11 @@ public class VariableFactory {
     return ret;
   }
 
-  static public <T extends Variable> T create(Class<T> kind, ElementInfo info, String name, TypeRef type) {
+  static public <T extends Variable> T create(Class<T> kind, String name, TypeReference type) {
     T ret = null;
     try {
-      Constructor<T> c = kind.getDeclaredConstructor(ElementInfo.class, String.class, TypeRef.class);
-      ret = c.newInstance(info, name, type);
+      Constructor<T> c = kind.getDeclaredConstructor(String.class, TypeReference.class);
+      ret = c.newInstance(name, type);
     } catch (InstantiationException e) {
       e.printStackTrace();
     } catch (IllegalAccessException e) {

@@ -26,16 +26,16 @@ import ast.data.AstList;
 import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.StateContent;
 import ast.data.component.hfsm.Transition;
-import ast.data.function.header.FuncSlot;
+import ast.data.function.header.Slot;
 import ast.dispatcher.NullDispatcher;
 
 public class TransitionDict extends NullDispatcher<Void, Void> {
-  private Map<State, Map<FuncSlot, AstList<Transition>>> transition = new HashMap<State, Map<FuncSlot, AstList<Transition>>>();
+  private Map<State, Map<Slot, AstList<Transition>>> transition = new HashMap<State, Map<Slot, AstList<Transition>>>();
 
-  public AstList<Transition> get(State src, FuncSlot func) {
-    Map<FuncSlot, AstList<Transition>> smap = transition.get(src);
+  public AstList<Transition> get(State src, Slot func) {
+    Map<Slot, AstList<Transition>> smap = transition.get(src);
     if (smap == null) {
-      smap = new HashMap<FuncSlot, AstList<Transition>>();
+      smap = new HashMap<Slot, AstList<Transition>>();
       transition.put(src, smap);
     }
     AstList<Transition> fmap = smap.get(func);
@@ -64,7 +64,7 @@ public class TransitionDict extends NullDispatcher<Void, Void> {
   @Override
   protected Void visitTransition(Transition obj, Void param) {
     State src = (State) obj.src.getTarget();
-    FuncSlot func = (FuncSlot) obj.eventFunc.getTarget();
+    Slot func = (Slot) obj.eventFunc.getTarget();
     List<Transition> list = get(src, func);
     list.add(obj);
 

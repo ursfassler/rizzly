@@ -20,7 +20,7 @@ package ast.copy;
 import ast.data.Ast;
 import ast.data.variable.ConstGlobal;
 import ast.data.variable.ConstPrivate;
-import ast.data.variable.FuncVariable;
+import ast.data.variable.FunctionVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.Variable;
 import ast.dispatcher.NullDispatcher;
@@ -39,23 +39,23 @@ public class CopyVariable extends NullDispatcher<Variable, Void> {
   }
 
   @Override
-  protected Variable visitFuncVariable(FuncVariable obj, Void param) {
-    return new FuncVariable(obj.getInfo(), obj.name, cast.copy(obj.type));
+  protected Variable visitFuncVariable(FunctionVariable obj, Void param) {
+    return new FunctionVariable(obj.getName(), cast.copy(obj.type));
   }
 
   @Override
   protected Variable visitStateVariable(StateVariable obj, Void param) {
-    return new StateVariable(obj.getInfo(), obj.name, cast.copy(obj.type), cast.copy(obj.def));
+    return new StateVariable(obj.getName(), cast.copy(obj.type), cast.copy(obj.def));
   }
 
   @Override
   protected Variable visitConstPrivate(ConstPrivate obj, Void param) {
-    return new ConstPrivate(obj.getInfo(), obj.name, cast.copy(obj.type), cast.copy(obj.def));
+    return new ConstPrivate(obj.getName(), cast.copy(obj.type), cast.copy(obj.def));
   }
 
   @Override
   protected Variable visitConstGlobal(ConstGlobal obj, Void param) {
-    return new ConstGlobal(obj.getInfo(), obj.name, cast.copy(obj.type), cast.copy(obj.def));
+    return new ConstGlobal(obj.getName(), cast.copy(obj.type), cast.copy(obj.def));
   }
 
 }

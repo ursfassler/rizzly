@@ -38,7 +38,7 @@ public class Memory {
   public void createVar(Variable var) {
     assert (var != null);
     if (values.containsKey(var)) {
-      RError.err(ErrorType.Fatal, var.getInfo(), "Variable exists: " + var);
+      RError.err(ErrorType.Fatal, "Variable exists: " + var, var.metadata());
     }
 
     // assert( var.getType().getOffset().isEmpty() );
@@ -67,7 +67,7 @@ public class Memory {
 
   public Variable find(String name) {
     for (Variable var : values.keySet()) {
-      if (var.name.equals(name)) {
+      if (var.getName().equals(name)) {
         return var;
       }
     }

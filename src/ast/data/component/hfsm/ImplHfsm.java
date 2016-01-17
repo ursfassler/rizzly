@@ -17,15 +17,14 @@
 
 package ast.data.component.hfsm;
 
-import ast.ElementInfo;
 import ast.data.component.Component;
 import ast.visitor.Visitor;
 
 final public class ImplHfsm extends Component {
   public StateComposite topstate;
 
-  public ImplHfsm(ElementInfo info, String name) {
-    super(info, name);
+  public ImplHfsm(String name) {
+    super(name);
   }
 
   @Override

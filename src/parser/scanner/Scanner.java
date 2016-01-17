@@ -24,7 +24,7 @@ import parser.PeekReader;
 import parser.scanner.tokenparser.Helper;
 import parser.scanner.tokenparser.MetadataReader;
 import parser.scanner.tokenparser.TokenParser;
-import ast.data.Metadata;
+import ast.meta.Metadata;
 import error.ErrorType;
 import error.RError;
 

@@ -17,19 +17,18 @@
 
 package ast.data.reference;
 
-import ast.ElementInfo;
 import ast.data.Ast;
 import ast.data.AstBase;
 import ast.data.AstList;
 import ast.data.Named;
 import ast.visitor.Visitor;
 
-final public class Reference extends AstBase {
+public class Reference extends AstBase {
   public Named link;
   public final AstList<RefItem> offset;
 
-  public Reference(ElementInfo info, Named link, AstList<RefItem> offset) {
-    super(info);
+  public Reference(Named link, AstList<RefItem> offset) {
+    super();
     this.link = link;
     this.offset = offset;
   }

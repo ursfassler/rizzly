@@ -17,13 +17,8 @@
 
 package ast.data.function.ret;
 
-import ast.ElementInfo;
 import ast.data.AstBase;
 
 abstract public class FuncReturn extends AstBase {
-
-  public FuncReturn(ElementInfo info) {
-    super(info);
-  }
 
 }
