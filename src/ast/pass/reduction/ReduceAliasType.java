@@ -23,7 +23,7 @@ import java.util.List;
 import main.Configuration;
 import ast.data.Named;
 import ast.data.Namespace;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.type.out.AliasType;
 import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
@@ -47,9 +47,9 @@ public class ReduceAliasType extends AstPass {
 class ReduceAliasTypeWorker extends DfsTraverser<Void, Void> {
 
   @Override
-  protected Void visitReference(Reference obj, Void param) {
+  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
     super.visitReference(obj, param);
-    Named link = obj.link;
+    Named link = obj.getLink();
     List<Named> checked = new ArrayList<Named>();
     while (link instanceof AliasType) {
       checked.add(link);
@@ -58,10 +58,10 @@ class ReduceAliasTypeWorker extends DfsTraverser<Void, Void> {
         for (Named itr : checked) {
           RError.err(ErrorType.Hint, "part of recursive type alias: " + itr.getName(), itr.metadata());
         }
-        RError.err(ErrorType.Error, "recursive type alias found: " + obj.link.getName(), obj.metadata());
+        RError.err(ErrorType.Error, "recursive type alias found: " + obj.getLink().getName(), obj.metadata());
       }
     }
-    obj.link = link;
+    obj.setLink(link);
     return null;
   }
 }

@@ -30,7 +30,7 @@ import ast.data.expression.ReferenceExpression;
 import ast.data.expression.value.NumberValue;
 import ast.data.expression.value.StringValue;
 import ast.data.function.FunctionProperty;
-import ast.data.function.header.FuncResponse;
+import ast.data.function.header.Response;
 import ast.data.function.ret.FunctionReturnType;
 import ast.data.reference.RefFactory;
 import ast.data.statement.Block;
@@ -76,18 +76,18 @@ public class DebugIface extends AstPass {
     DebugIfaceAdder reduction = new DebugIfaceAdder(arrayType, sizeType, symNameSizeType, names);
     reduction.traverse(ast, null);
 
-    FuncResponse func = makeNameGetter("DebugName", symNameSizeType, names, stringType);
+    Response func = makeNameGetter("DebugName", symNameSizeType, names, stringType);
     func.property = FunctionProperty.Public;
     Component rootComp = kb.getRootComp().compRef.getTarget();
     rootComp.function.add(func);
   }
 
-  private static FuncResponse makeNameGetter(String funcName, RangeType nameSizeType, ArrayList<String> names, StringType stringType) {
+  private static Response makeNameGetter(String funcName, RangeType nameSizeType, ArrayList<String> names, StringType stringType) {
     FunctionVariable arg = new FunctionVariable("idx", TypeRefFactory.create(nameSizeType));
     AstList<FunctionVariable> args = new AstList<FunctionVariable>();
     args.add(arg);
     Block body = new Block();
-    FuncResponse func = new FuncResponse(Designator.NAME_SEP + funcName, args, new FunctionReturnType(TypeRefFactory.create(stringType)), body);
+    Response func = new Response(Designator.NAME_SEP + funcName, args, new FunctionReturnType(TypeRefFactory.create(stringType)), body);
 
     AstList<CaseOpt> option = new AstList<CaseOpt>();
     Block otherwise = new Block();

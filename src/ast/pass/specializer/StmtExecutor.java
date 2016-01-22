@@ -28,7 +28,7 @@ import ast.data.expression.value.BooleanValue;
 import ast.data.expression.value.TupleValue;
 import ast.data.expression.value.ValueExpr;
 import ast.data.function.header.FuncFunction;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset;
 import ast.data.statement.Block;
 import ast.data.statement.ExpressionReturn;
 import ast.data.statement.IfOption;
@@ -158,13 +158,13 @@ public class StmtExecutor extends NullDispatcher<Expression, Memory> {
     return null;
   }
 
-  private void assign(Reference lhs, Expression rhs, Memory param) {
+  private void assign(LinkedReferenceWithOffset lhs, Expression rhs, Memory param) {
     rhs = Copy.copy(rhs);
 
-    Variable var = (Variable) lhs.link;
+    Variable var = (Variable) lhs.getLink();
     ValueExpr root = param.get(var);
 
-    Ast lvalue = RefEvaluator.execute(root, lhs.offset, param, kb);
+    Ast lvalue = RefEvaluator.execute(root, lhs.getOffset(), param, kb);
     root = (ValueExpr) ValueReplacer.set(root, (ValueExpr) lvalue, rhs);
     param.set(var, root);
   }

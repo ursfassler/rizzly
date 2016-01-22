@@ -21,7 +21,7 @@ import main.Configuration;
 import ast.data.Namespace;
 import ast.data.component.Component;
 import ast.data.function.header.FuncQuery;
-import ast.data.function.header.FuncResponse;
+import ast.data.function.header.Response;
 import ast.data.function.header.Signal;
 import ast.data.function.header.Slot;
 import ast.knowledge.KnowledgeBase;
@@ -49,7 +49,7 @@ public class Usefullness extends AstPass {
   public void process(Namespace ast, KnowledgeBase kb) {
     for (Component comp : Collector.select(ast, new IsClass(Component.class)).castTo(Component.class)) {
       boolean inEmpty = List.contains(comp.iface, new NotSpec(new IsClass(Slot.class).or(new IsClass(FuncQuery.class))));
-      boolean outEmpty = List.contains(comp.iface, new NotSpec(new IsClass(Signal.class).or(new IsClass(FuncResponse.class))));
+      boolean outEmpty = List.contains(comp.iface, new NotSpec(new IsClass(Signal.class).or(new IsClass(Response.class))));
       String name = comp.getName();
       if (inEmpty && outEmpty) {
         RError.err(ErrorType.Warning, "Component " + name + " has no input and no output data flow", comp.metadata());

@@ -23,11 +23,11 @@ import java.util.ArrayList;
 import ast.data.Ast;
 import ast.data.expression.value.NumberValue;
 import ast.data.function.Function;
-import ast.data.function.header.FuncProcedure;
-import ast.data.function.header.FuncResponse;
+import ast.data.function.header.Procedure;
+import ast.data.function.header.Response;
 import ast.data.function.header.Slot;
 import ast.data.reference.RefFactory;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.CallStmt;
 import ast.dispatcher.DfsTraverser;
 
@@ -40,21 +40,21 @@ import ast.dispatcher.DfsTraverser;
 public class EventRecvDebugCallAdder extends DfsTraverser<Void, Void> {
 
   private ArrayList<String> names;
-  private FuncProcedure msgRecvFunc;
+  private Procedure msgRecvFunc;
 
-  public EventRecvDebugCallAdder(ArrayList<String> names, FuncProcedure msgRecvFunc) {
+  public EventRecvDebugCallAdder(ArrayList<String> names, Procedure msgRecvFunc) {
     super();
     this.names = names;
     this.msgRecvFunc = msgRecvFunc;
   }
 
-  public static void process(Ast obj, ArrayList<String> names, FuncProcedure msgRecvFunc) {
+  public static void process(Ast obj, ArrayList<String> names, Procedure msgRecvFunc) {
     EventRecvDebugCallAdder reduction = new EventRecvDebugCallAdder(names, msgRecvFunc);
     reduction.traverse(obj, null);
   }
 
   @Override
-  protected Void visitFuncResponse(FuncResponse obj, Void param) {
+  protected Void visitFuncResponse(Response obj, Void param) {
     makeDebugCall(obj);
     return null;
   }
@@ -74,7 +74,7 @@ public class EventRecvDebugCallAdder extends DfsTraverser<Void, Void> {
   private CallStmt makeCall(Function func, int numFunc) {
     // _sendMsg( numFunc );
     NumberValue arg = new NumberValue(BigInteger.valueOf(numFunc));
-    Reference call = RefFactory.call(func, arg);
+    LinkedReferenceWithOffset_Implementation call = RefFactory.call(func, arg);
     return new CallStmt(call);
   }
 }

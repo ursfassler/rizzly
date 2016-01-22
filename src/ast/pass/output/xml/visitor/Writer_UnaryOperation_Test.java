@@ -27,13 +27,17 @@ import org.mockito.Mockito;
 import ast.data.expression.Expression;
 import ast.data.expression.unop.Not;
 import ast.meta.MetaInformation;
+import ast.pass.output.xml.IdReader;
+import ast.visitor.Visitor;
 
 public class Writer_UnaryOperation_Test {
   final private XmlStreamWriter stream = mock(XmlStreamWriter.class);
-  final private Write testee = new Write(stream);
+  final private IdReader astId = mock(IdReader.class);
+  final private Visitor idWriter = mock(Visitor.class);
+  final private Write testee = new Write(stream, astId, idWriter);
   final private MetaInformation info = mock(MetaInformation.class);
   final private Expression expression = mock(Expression.class);
-  final private InOrder order = Mockito.inOrder(stream, info, expression);
+  final private InOrder order = Mockito.inOrder(stream, info, expression, idWriter);
 
   @Test
   public void write_Not() {
@@ -43,6 +47,7 @@ public class Writer_UnaryOperation_Test {
     testee.visit(operation);
 
     order.verify(stream).beginNode(eq("Not"));
+    order.verify(idWriter).visit(operation);
     order.verify(info).accept(eq(testee));
     order.verify(expression).accept(eq(testee));
     order.verify(stream).endNode();

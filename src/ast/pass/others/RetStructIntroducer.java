@@ -29,9 +29,9 @@ import ast.data.expression.ReferenceExpression;
 import ast.data.function.Function;
 import ast.data.function.ret.FuncReturnTuple;
 import ast.data.function.ret.FunctionReturnType;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefName;
-import ast.data.reference.Reference;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.ExpressionReturn;
 import ast.data.statement.Statement;
@@ -140,12 +140,12 @@ class VarReplacer extends RefReplacer<Void> {
   }
 
   @Override
-  protected Reference visitReference(Reference obj, Void param) {
+  protected LinkedReferenceWithOffset_Implementation visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
     super.visitReference(obj, param);
-    NamedElement elem = varMap.get(obj.link);
+    NamedElement elem = varMap.get(obj.getLink());
     if (elem != null) {
-      obj.link = retVar;
-      obj.offset.add(0, new RefName(obj.metadata(), elem.getName()));
+      obj.setLink(retVar);
+      obj.getOffset().add(0, new RefName(obj.metadata(), elem.getName()));
     }
     return obj;
   }

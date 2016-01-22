@@ -17,13 +17,13 @@
 
 package ast.data.type;
 
-import ast.data.reference.Reference;
-import ast.data.reference.TypedRef;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.TypedReference;
 import ast.visitor.Visitor;
 
-public class TypeReference extends TypedRef<Type> {
+public class TypeReference extends TypedReference<Type> {
 
-  public TypeReference(Reference ref) {
+  public TypeReference(LinkedReferenceWithOffset_Implementation ref) {
     super(ref);
   }
 

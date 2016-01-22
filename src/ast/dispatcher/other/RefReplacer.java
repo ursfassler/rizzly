@@ -19,62 +19,63 @@ package ast.dispatcher.other;
 
 import ast.data.AstList;
 import ast.data.expression.ReferenceExpression;
+import ast.data.reference.LinkedReference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.reference.RefItem;
-import ast.data.reference.Reference;
-import ast.data.reference.TypedRef;
-import ast.data.statement.MultiAssignment;
+import ast.data.reference.TypedReference;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.MsgPush;
+import ast.data.statement.MultiAssignment;
 import ast.dispatcher.DfsTraverser;
 
-abstract public class RefReplacer<T> extends DfsTraverser<Reference, T> {
+abstract public class RefReplacer<T> extends DfsTraverser<LinkedReferenceWithOffset_Implementation, T> {
 
   @Override
-  protected Reference visitReference(Reference obj, T param) {
-    for (RefItem item : obj.offset) {
+  protected LinkedReferenceWithOffset_Implementation visitReference(LinkedReferenceWithOffset_Implementation obj, T param) {
+    for (RefItem item : obj.getOffset()) {
       visit(item, param);
     }
     return obj;
   }
 
   @Override
-  protected Reference visitTypedRef(TypedRef obj, T param) {
+  protected LinkedReferenceWithOffset_Implementation visitTypedRef(TypedReference obj, T param) {
     obj.ref = visit(obj.ref, param);
     return null;
   }
 
   @Override
-  protected Reference visitRefExpr(ReferenceExpression obj, T param) {
+  protected LinkedReferenceWithOffset_Implementation visitRefExpr(ReferenceExpression obj, T param) {
     obj.reference = visit(obj.reference, param);
     return null;
   }
 
   @Override
-  protected Reference visitAssignmentMulti(MultiAssignment obj, T param) {
+  protected LinkedReferenceWithOffset_Implementation visitAssignmentMulti(MultiAssignment obj, T param) {
     visitRefList(obj.left, param);
     visit(obj.right, param);
     return null;
   }
 
   @Override
-  protected Reference visitAssignmentSingle(AssignmentSingle obj, T param) {
+  protected LinkedReferenceWithOffset_Implementation visitAssignmentSingle(AssignmentSingle obj, T param) {
     obj.left = visit(obj.left, param);
     visit(obj.right, param);
     return null;
   }
 
   @Override
-  protected Reference visitMsgPush(MsgPush obj, T param) {
+  protected LinkedReferenceWithOffset_Implementation visitMsgPush(MsgPush obj, T param) {
     obj.queue = visit(obj.queue, param);
     visit(obj.func, param);
     visitList(obj.data, param);
     return null;
   }
 
-  private <R extends Reference> void visitRefList(AstList<R> list, T param) {
+  private <R extends LinkedReferenceWithOffset_Implementation> void visitRefList(AstList<R> list, T param) {
     for (int i = 0; i < list.size(); i++) {
-      Reference old = list.get(i);
-      Reference expr = visit(old, param);
+      LinkedReferenceWithOffset_Implementation old = list.get(i);
+      LinkedReference expr = visit(old, param);
       list.set(i, (R) expr);
     }
   }

@@ -64,7 +64,7 @@ import ast.data.function.ret.FunctionReturnType;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefName;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
@@ -314,9 +314,9 @@ class CWriterWorker extends NullDispatcher<Void, Boolean> {
   }
 
   @Override
-  protected Void visitReference(Reference obj, Boolean param) {
-    sw.wr(name(obj.link));
-    visitList(obj.offset, param);
+  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Boolean param) {
+    sw.wr(name(obj.getLink()));
+    visitList(obj.getOffset(), param);
     return null;
   }
 

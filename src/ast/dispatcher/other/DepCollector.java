@@ -22,7 +22,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import ast.data.Ast;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.dispatcher.DfsTraverser;
 
 public class DepCollector extends DfsTraverser<Void, Void> {
@@ -51,9 +51,9 @@ public class DepCollector extends DfsTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitReference(Reference obj, Void param) {
+  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
     super.visitReference(obj, param);
-    visit(obj.link, param);
+    visit(obj.getLink(), param);
     return null;
   }
 

@@ -35,7 +35,7 @@ import ast.data.function.header.FuncFunction;
 import ast.data.function.ret.FunctionReturnType;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefName;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.Block;
 import ast.data.statement.ExpressionReturn;
 import ast.data.type.Type;
@@ -129,7 +129,7 @@ class MakeCompareFunction extends NullDispatcher<Expression, Pair<Expression, Ex
     return visit(lt, new Pair<Expression, Expression>(left, right));
   }
 
-  private Expression make(Reference left, Reference right) {
+  private Expression make(LinkedReferenceWithOffset_Implementation left, LinkedReferenceWithOffset_Implementation right) {
     return make(new ReferenceExpression(left), new ReferenceExpression(right));
   }
 
@@ -164,14 +164,14 @@ class MakeCompareFunction extends NullDispatcher<Expression, Pair<Expression, Ex
       AstList<Expression> acpar = new AstList<Expression>();
       acpar.addAll(((TupleValue) param.first).value);
       acpar.addAll(((TupleValue) param.second).value);
-      Reference call = RefFactory.call(func, acpar);
+      LinkedReferenceWithOffset_Implementation call = RefFactory.call(func, acpar);
       return new ReferenceExpression(call);
     } else if (rt instanceof RecordType) {
       FuncFunction func = makeCompare(lt.types, (RecordType) rt);
       AstList<Expression> acpar = new AstList<Expression>();
       acpar.addAll(((TupleValue) param.first).value);
       acpar.add(param.second);
-      Reference call = RefFactory.call(func, acpar);
+      LinkedReferenceWithOffset_Implementation call = RefFactory.call(func, acpar);
       return new ReferenceExpression(call);
     } else {
       throw new RuntimeException("not yet implemented: " + rt.getClass().getCanonicalName());
@@ -191,8 +191,8 @@ class MakeCompareFunction extends NullDispatcher<Expression, Pair<Expression, Ex
     Expression expr = new BooleanValue(true);
 
     for (int i = 0; i < rt.element.size(); i++) {
-      Reference leftVal = RefFactory.full(left.get(i));
-      Reference rightVal = RefFactory.create(right, new RefName(rt.element.get(i).getName()));
+      LinkedReferenceWithOffset_Implementation leftVal = RefFactory.full(left.get(i));
+      LinkedReferenceWithOffset_Implementation rightVal = RefFactory.create(right, new RefName(rt.element.get(i).getName()));
       Expression ac = make(leftVal, rightVal);
       expr = new LogicAnd(expr, ac);
     }
@@ -216,8 +216,8 @@ class MakeCompareFunction extends NullDispatcher<Expression, Pair<Expression, Ex
     Expression expr = new BooleanValue(true);
 
     for (int i = 0; i < left.size(); i++) {
-      Reference leftVal = RefFactory.full(left.get(i));
-      Reference rightVal = RefFactory.full(right.get(i));
+      LinkedReferenceWithOffset_Implementation leftVal = RefFactory.full(left.get(i));
+      LinkedReferenceWithOffset_Implementation rightVal = RefFactory.full(right.get(i));
       Expression ac = make(leftVal, rightVal);
       expr = new LogicAnd(expr, ac);
     }
@@ -232,7 +232,7 @@ class MakeCompareFunction extends NullDispatcher<Expression, Pair<Expression, Ex
     if (rt instanceof RecordType) {
       assert (lt == rt);
       FuncFunction func = makeCompare(lt);
-      Reference call = RefFactory.call(func, param.first, param.second);
+      LinkedReferenceWithOffset_Implementation call = RefFactory.call(func, param.first, param.second);
       return new ReferenceExpression(call);
     } else if (rt instanceof TupleType) {
       assert (param.second instanceof TupleValue);
@@ -240,7 +240,7 @@ class MakeCompareFunction extends NullDispatcher<Expression, Pair<Expression, Ex
       AstList<Expression> acpar = new AstList<Expression>();
       acpar.add(param.first);
       acpar.addAll(((TupleValue) param.second).value);
-      Reference call = RefFactory.call(func, acpar);
+      LinkedReferenceWithOffset_Implementation call = RefFactory.call(func, acpar);
       return new ReferenceExpression(call);
     } else {
       throw new RuntimeException("not yet implemented: " + rt.getClass().getCanonicalName());
@@ -260,8 +260,8 @@ class MakeCompareFunction extends NullDispatcher<Expression, Pair<Expression, Ex
     Expression expr = new BooleanValue(true);
 
     for (int i = 0; i < lt.element.size(); i++) {
-      Reference leftVal = RefFactory.create(left, new RefName(lt.element.get(i).getName()));
-      Reference rightVal = RefFactory.full(right.get(i));
+      LinkedReferenceWithOffset_Implementation leftVal = RefFactory.create(left, new RefName(lt.element.get(i).getName()));
+      LinkedReferenceWithOffset_Implementation rightVal = RefFactory.full(right.get(i));
       Expression ac = make(leftVal, rightVal);
       expr = new LogicAnd(expr, ac);
     }
@@ -279,8 +279,8 @@ class MakeCompareFunction extends NullDispatcher<Expression, Pair<Expression, Ex
     Expression expr = new BooleanValue(true);
     for (NamedElement itr : both.element) {
       String name = itr.getName();
-      Reference lr = RefFactory.create(left, new RefName(name));
-      Reference rr = RefFactory.create(right, new RefName(name));
+      LinkedReferenceWithOffset_Implementation lr = RefFactory.create(left, new RefName(name));
+      LinkedReferenceWithOffset_Implementation rr = RefFactory.create(right, new RefName(name));
       Expression ac = make(lr, rr);
       expr = new LogicAnd(expr, ac);
     }

@@ -34,9 +34,9 @@ import ast.data.component.hfsm.StateSimple;
 import ast.data.expression.Expression;
 import ast.data.expression.ReferenceExpression;
 import ast.data.function.header.FuncFunction;
-import ast.data.function.header.FuncResponse;
+import ast.data.function.header.Response;
 import ast.data.reference.RefFactory;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.Block;
 import ast.data.statement.ExpressionReturn;
 import ast.data.variable.Variable;
@@ -60,7 +60,7 @@ public class QueryDownPropagator extends AstPass {
   }
 
   private static void process(ImplHfsm hfsm, KnowledgeBase kb) {
-    Map<FuncResponse, FuncFunction> qfunc = new HashMap<FuncResponse, FuncFunction>();
+    Map<Response, FuncFunction> qfunc = new HashMap<Response, FuncFunction>();
     QueryFuncMaker qfmaker = new QueryFuncMaker(qfunc);
     qfmaker.traverse(hfsm.topstate, new Designator());
 
@@ -75,11 +75,11 @@ public class QueryDownPropagator extends AstPass {
 }
 
 class QueryDownPropagatorWorker extends NullDispatcher<Void, QueryParam> {
-  private final Map<FuncResponse, FuncFunction> map; // TODO do we need
+  private final Map<Response, FuncFunction> map; // TODO do we need
 
   // that?
 
-  public QueryDownPropagatorWorker(Map<FuncResponse, FuncFunction> map) {
+  public QueryDownPropagatorWorker(Map<Response, FuncFunction> map) {
     this.map = map;
   }
 
@@ -90,29 +90,29 @@ class QueryDownPropagatorWorker extends NullDispatcher<Void, QueryParam> {
 
   @Override
   protected Void visitStateSimple(StateSimple obj, QueryParam param) {
-    AstList<FuncResponse> queryList = TypeFilter.select(obj.item, FuncResponse.class);
+    AstList<Response> queryList = TypeFilter.select(obj.item, Response.class);
     obj.item.removeAll(queryList);
 
-    AstList<FuncResponse> queries = new AstList<FuncResponse>();
+    AstList<Response> queries = new AstList<Response>();
 
-    for (FuncResponse query : param.before) {
+    for (Response query : param.before) {
       addQuery(queries, query);
     }
-    for (FuncResponse query : queryList) {
+    for (Response query : queryList) {
       addQuery(queries, query);
     }
-    for (FuncResponse query : param.after) {
+    for (Response query : param.after) {
       addQuery(queries, query);
     }
 
-    for (FuncResponse func : queries) {
-      FuncResponse cfunc = new FuncResponse(func.getName(), Copy.copy(func.param), Copy.copy(func.ret), new Block());
+    for (Response func : queries) {
+      Response cfunc = new Response(func.getName(), Copy.copy(func.param), Copy.copy(func.ret), new Block());
 
       AstList<Expression> acpar = new AstList<Expression>();
       for (Variable par : cfunc.param) {
         acpar.add(new ReferenceExpression(RefFactory.full(par)));
       }
-      Reference call = RefFactory.call(map.get(func), acpar);
+      LinkedReferenceWithOffset_Implementation call = RefFactory.call(map.get(func), acpar);
       cfunc.body.statements.add(new ExpressionReturn(new ReferenceExpression(call)));
 
       obj.item.add(cfunc); // TODO ok or copy?
@@ -121,7 +121,7 @@ class QueryDownPropagatorWorker extends NullDispatcher<Void, QueryParam> {
     return null;
   }
 
-  static private void addQuery(AstList<FuncResponse> queries, FuncResponse query) {
+  static private void addQuery(AstList<Response> queries, Response query) {
     if (!queries.contains(query)) {
       queries.add(query);
     } else {
@@ -133,12 +133,12 @@ class QueryDownPropagatorWorker extends NullDispatcher<Void, QueryParam> {
   @Override
   protected Void visitStateComposite(StateComposite obj, QueryParam param) {
     Map<State, Integer> spos = new HashMap<State, Integer>();
-    AstList<FuncResponse> queryList = new AstList<FuncResponse>();
+    AstList<Response> queryList = new AstList<Response>();
     AstList<State> stateList = new AstList<State>();
 
     for (StateContent itr : obj.item) {
-      if (itr instanceof FuncResponse) {
-        queryList.add((FuncResponse) itr);
+      if (itr instanceof Response) {
+        queryList.add((Response) itr);
       } else if (itr instanceof State) {
         spos.put((State) itr, queryList.size());
         stateList.add((State) itr);
@@ -169,33 +169,33 @@ class QueryDownPropagatorWorker extends NullDispatcher<Void, QueryParam> {
 
 class QueryParam {
 
-  final public AstList<FuncResponse> before;
-  final public AstList<FuncResponse> after;
+  final public AstList<Response> before;
+  final public AstList<Response> after;
 
-  public QueryParam(AstList<FuncResponse> before, AstList<FuncResponse> after) {
+  public QueryParam(AstList<Response> before, AstList<Response> after) {
     super();
-    this.before = new AstList<FuncResponse>(before);
-    this.after = new AstList<FuncResponse>(after);
+    this.before = new AstList<Response>(before);
+    this.after = new AstList<Response>(after);
   }
 
   public QueryParam() {
     super();
-    this.before = new AstList<FuncResponse>();
-    this.after = new AstList<FuncResponse>();
+    this.before = new AstList<Response>();
+    this.after = new AstList<Response>();
   }
 
   public QueryParam(QueryParam parent) {
     super();
-    this.before = new AstList<FuncResponse>(parent.before);
-    this.after = new AstList<FuncResponse>(parent.after);
+    this.before = new AstList<Response>(parent.before);
+    this.after = new AstList<Response>(parent.after);
   }
 }
 
 class QueryFuncMaker extends NullDispatcher<Void, Designator> {
 
-  private final Map<FuncResponse, FuncFunction> qfunc;
+  private final Map<Response, FuncFunction> qfunc;
 
-  public QueryFuncMaker(Map<FuncResponse, FuncFunction> qfunc) {
+  public QueryFuncMaker(Map<Response, FuncFunction> qfunc) {
     this.qfunc = qfunc;
   }
 
@@ -209,7 +209,7 @@ class QueryFuncMaker extends NullDispatcher<Void, Designator> {
   }
 
   @Override
-  protected Void visitFuncResponse(FuncResponse obj, Designator param) {
+  protected Void visitFuncResponse(Response obj, Designator param) {
     param = new Designator(param, obj.getName());
     FuncFunction func = new FuncFunction(param.toString(), Copy.copy(obj.param), Copy.copy(obj.ret), obj.body);
     obj.body = new Block();

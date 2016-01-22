@@ -20,12 +20,16 @@ package ast.pass.output.xml.visitor;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 
+import java.math.BigInteger;
+
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
+import ast.data.Range;
 import ast.data.type.TypeReference;
 import ast.data.type.base.BooleanType;
+import ast.data.type.base.RangeType;
 import ast.data.type.base.StringType;
 import ast.data.type.special.AnyType;
 import ast.data.type.special.IntegerType;
@@ -33,13 +37,17 @@ import ast.data.type.special.NaturalType;
 import ast.data.type.special.TypeType;
 import ast.data.type.special.VoidType;
 import ast.meta.MetaInformation;
+import ast.pass.output.xml.IdReader;
+import ast.visitor.Visitor;
 
 public class Writer_Type_Test {
   final private XmlStreamWriter stream = mock(XmlStreamWriter.class);
-  final private Write testee = new Write(stream);
+  final private IdReader astId = mock(IdReader.class);
+  final private Visitor idWriter = mock(Visitor.class);
+  final private Write testee = new Write(stream, astId, idWriter);
   final private MetaInformation info = mock(MetaInformation.class);
   final private TypeReference typeReference = mock(TypeReference.class);
-  final private InOrder order = Mockito.inOrder(stream, info, typeReference);
+  final private InOrder order = Mockito.inOrder(stream, info, typeReference, idWriter);
 
   @Test
   public void write_BooleanType() {
@@ -48,6 +56,7 @@ public class Writer_Type_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("Boolean"));
+    order.verify(idWriter).visit(item);
     order.verify(stream).endNode();
   }
 
@@ -58,6 +67,7 @@ public class Writer_Type_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("Integer"));
+    order.verify(idWriter).visit(item);
     order.verify(stream).endNode();
   }
 
@@ -68,6 +78,7 @@ public class Writer_Type_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("Natural"));
+    order.verify(idWriter).visit(item);
     order.verify(stream).endNode();
   }
 
@@ -78,6 +89,7 @@ public class Writer_Type_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("AnyType"));
+    order.verify(idWriter).visit(item);
     order.verify(stream).endNode();
   }
 
@@ -90,6 +102,7 @@ public class Writer_Type_Test {
 
     order.verify(stream).beginNode(eq("TypeType"));
     order.verify(stream).attribute("name", "the name");
+    order.verify(idWriter).visit(item);
     order.verify(info).accept(testee);
     order.verify(typeReference).accept(testee);
     order.verify(stream).endNode();
@@ -102,6 +115,7 @@ public class Writer_Type_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("Void"));
+    order.verify(idWriter).visit(item);
     order.verify(stream).endNode();
   }
 
@@ -112,6 +126,21 @@ public class Writer_Type_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("String"));
+    order.verify(idWriter).visit(item);
+    order.verify(stream).endNode();
+  }
+
+  @Test
+  public void write_RangeType() {
+    RangeType item = new RangeType("the name", new Range(BigInteger.valueOf(-3), BigInteger.valueOf(57)));
+
+    testee.visit(item);
+
+    order.verify(stream).beginNode(eq("RangeType"));
+    order.verify(stream).attribute("low", "-3");
+    order.verify(stream).attribute("high", "57");
+    order.verify(stream).attribute("name", "the name");
+    order.verify(idWriter).visit(item);
     order.verify(stream).endNode();
   }
 

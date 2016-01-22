@@ -55,7 +55,7 @@ import ast.data.expression.value.ValueExpr;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.type.Type;
 import ast.data.type.base.RangeType;
 import ast.data.variable.Constant;
@@ -145,7 +145,7 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
   }
 
   @Override
-  protected ValueExpr visitConstGlobal(ast.data.variable.ConstGlobal obj, Void param) {
+  protected ValueExpr visitConstGlobal(ast.data.variable.GlobalConstant obj, Void param) {
     return visit(obj.def, param);
   }
 
@@ -175,10 +175,10 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
   }
 
   @Override
-  protected ValueExpr visitReference(Reference obj, Void param) {
+  protected ValueExpr visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
     // TODO move constant evaluation to another place
-    if (obj.link instanceof Constant) {
-      Constant cst = (Constant) obj.link;
+    if (obj.getLink() instanceof Constant) {
+      Constant cst = (Constant) obj.getLink();
       cst.def = visit(cst.def, param);
     }
     return visit(RefEvaluator.execute(obj, memory, kb), param);
@@ -567,10 +567,10 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
 
     if ((expr instanceof NumberValue)) {
       TypeEvalExecutor.eval(obj.cast.ref, kb);
-      assert (obj.cast.ref.offset.isEmpty());
-      assert (obj.cast.ref.link instanceof RangeType);
+      assert (obj.cast.ref.getOffset().isEmpty());
+      assert (obj.cast.ref.getLink() instanceof RangeType);
 
-      Range range = ((RangeType) obj.cast.ref.link).range;
+      Range range = ((RangeType) obj.cast.ref.getLink()).range;
       BigInteger eval = ((NumberValue) expr).value;
 
       if (!range.contains(eval)) {

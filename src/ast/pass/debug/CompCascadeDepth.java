@@ -19,11 +19,11 @@ package ast.pass.debug;
 
 import ast.data.Ast;
 import ast.data.Namespace;
-import ast.data.component.composition.CompUse;
+import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.ImplComposition;
 import ast.data.component.elementary.ImplElementary;
 import ast.data.component.hfsm.ImplHfsm;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.type.Type;
 import ast.dispatcher.NullDispatcher;
 
@@ -49,14 +49,14 @@ public class CompCascadeDepth extends NullDispatcher<Integer, Void> {
   }
 
   @Override
-  protected Integer visitCompUse(CompUse obj, Void param) {
+  protected Integer visitCompUse(ComponentUse obj, Void param) {
     return 0;
   }
 
   @Override
   protected Integer visitImplElementary(ImplElementary obj, Void param) {
     int max = 0;
-    for (CompUse itr : obj.component) {
+    for (ComponentUse itr : obj.component) {
       max = Math.max(max, visit(itr.compRef.getTarget(), param));
     }
     return max + 1;
@@ -65,7 +65,7 @@ public class CompCascadeDepth extends NullDispatcher<Integer, Void> {
   @Override
   protected Integer visitImplComposition(ImplComposition obj, Void param) {
     int max = 0;
-    for (CompUse itr : obj.component) {
+    for (ComponentUse itr : obj.component) {
       max = Math.max(max, visit(itr.compRef.getTarget(), param));
     }
     return max + 1;
@@ -77,9 +77,9 @@ public class CompCascadeDepth extends NullDispatcher<Integer, Void> {
   }
 
   @Override
-  protected Integer visitReference(Reference obj, Void param) {
-    assert (obj.offset.isEmpty());
-    return visit(obj.link, param);
+  protected Integer visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
+    assert (obj.getOffset().isEmpty());
+    return visit(obj.getLink(), param);
   }
 
 }

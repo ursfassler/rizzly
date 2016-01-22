@@ -27,7 +27,7 @@ import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.component.Component;
-import ast.data.component.composition.CompUse;
+import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.ImplComposition;
 import ast.data.component.elementary.ImplElementary;
 import ast.data.component.hfsm.ImplHfsm;
@@ -39,7 +39,7 @@ import ast.data.function.ret.FuncReturnNone;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefName;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.Statement;
@@ -154,7 +154,7 @@ class SystemIfaceCaller extends NullDispatcher<Void, Void> {
 
   @Override
   protected Void visitImplElementary(ImplElementary obj, Void param) {
-    AstList<CompUse> compList = new AstList<CompUse>(obj.component);
+    AstList<ComponentUse> compList = new AstList<ComponentUse>(obj.component);
     // FIXME this order may cause errors as it is not granted to be topological
     // order
 
@@ -163,7 +163,7 @@ class SystemIfaceCaller extends NullDispatcher<Void, Void> {
 
     {
       ArrayList<Statement> code = new ArrayList<Statement>();
-      for (CompUse cuse : compList) {
+      for (ComponentUse cuse : compList) {
         Function sctor = getCtor(cuse.compRef.getTarget());
         CallStmt call = makeCall(cuse, sctor);
         code.add(call);
@@ -177,7 +177,7 @@ class SystemIfaceCaller extends NullDispatcher<Void, Void> {
       ArrayList<Statement> code = new ArrayList<Statement>();
       code.add(makeCall(obj.exitFunc.getTarget()));
       Collections.reverse(compList);
-      for (CompUse cuse : compList) {
+      for (ComponentUse cuse : compList) {
         Function sdtor = getDtor(cuse.compRef.getTarget());
         CallStmt call = makeCall(cuse, sdtor);
         code.add(call);
@@ -203,16 +203,16 @@ class SystemIfaceCaller extends NullDispatcher<Void, Void> {
 
   private CallStmt makeCall(Function ref) {
     assert (ref.param.isEmpty());
-    Reference call = RefFactory.call(ref.metadata(), ref);
+    LinkedReferenceWithOffset_Implementation call = RefFactory.call(ref.metadata(), ref);
     return new CallStmt(call);
   }
 
   @Deprecated
-  private CallStmt makeCall(CompUse self, Function func) {
+  private CallStmt makeCall(ComponentUse self, Function func) {
     RError.ass(func.param.isEmpty(), func.metadata(), "expected (de)constructor to have no parameter");
-    Reference fref = RefFactory.full(self);
-    fref.offset.add(new RefName(func.getName()));
-    fref.offset.add(new RefCall(new TupleValue(new AstList<Expression>())));
+    LinkedReferenceWithOffset_Implementation fref = RefFactory.full(self);
+    fref.getOffset().add(new RefName(func.getName()));
+    fref.getOffset().add(new RefCall(new TupleValue(new AstList<Expression>())));
     return new CallStmt(fref);
   }
 }

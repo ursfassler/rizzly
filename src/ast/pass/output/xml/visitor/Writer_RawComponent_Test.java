@@ -31,17 +31,21 @@ import ast.data.raw.RawElementary;
 import ast.data.statement.Block;
 import ast.data.template.Template;
 import ast.meta.MetaInformation;
+import ast.pass.output.xml.IdReader;
+import ast.visitor.Visitor;
 
 public class Writer_RawComponent_Test {
   final private XmlStreamWriter stream = mock(XmlStreamWriter.class);
-  final private Write testee = new Write(stream);
+  final private IdReader astId = mock(IdReader.class);
+  final private Visitor idWriter = mock(Visitor.class);
+  final private Write testee = new Write(stream, astId, idWriter);
   final private MetaInformation info = mock(MetaInformation.class);
   final private Function interfaceFunction = mock(Function.class);
   final private Block entry = mock(Block.class);
   final private Block exit = mock(Block.class);
   final private Template declaration = mock(Template.class);
   final private Ast instantiation = mock(Ast.class);
-  final private InOrder order = Mockito.inOrder(stream, info, interfaceFunction, entry, exit, declaration, instantiation);
+  final private InOrder order = Mockito.inOrder(stream, info, interfaceFunction, entry, exit, declaration, instantiation, idWriter);
 
   @Test
   public void write_RawElementary() {
@@ -57,6 +61,7 @@ public class Writer_RawComponent_Test {
 
     order.verify(stream).beginNode(eq("RawElementary"));
     order.verify(stream).attribute("name", "theName");
+    order.verify(idWriter).visit(item);
     order.verify(info).accept(eq(testee));
 
     order.verify(stream).beginNode(eq("interface"));

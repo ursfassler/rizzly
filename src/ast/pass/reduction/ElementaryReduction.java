@@ -27,7 +27,7 @@ import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.component.elementary.ImplElementary;
 import ast.data.function.Function;
-import ast.data.function.header.FuncResponse;
+import ast.data.function.header.Response;
 import ast.data.function.header.Slot;
 import ast.data.type.Type;
 import ast.data.type.TypeRefFactory;
@@ -63,9 +63,9 @@ public class ElementaryReduction extends AstPass {
     for (ImplElementary impl : Collector.select(ast, new IsClass(ImplElementary.class)).castTo(ImplElementary.class)) {
 
       AstList<Slot> slotImpl = TypeFilter.select(impl.function, Slot.class);
-      AstList<FuncResponse> responseImpl = TypeFilter.select(impl.function, FuncResponse.class);
+      AstList<Response> responseImpl = TypeFilter.select(impl.function, Response.class);
       AstList<Slot> slotProto = TypeFilter.select(impl.iface, Slot.class);
-      AstList<FuncResponse> responseProto = TypeFilter.select(impl.iface, FuncResponse.class);
+      AstList<Response> responseProto = TypeFilter.select(impl.iface, Response.class);
 
       if (!checkForAll(slotImpl, slotProto, "interface declaration") | !checkForAll(responseImpl, responseProto, "interface declaration") | !checkForAll(responseProto, responseImpl, "implementation")) {
         return;

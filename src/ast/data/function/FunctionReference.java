@@ -15,19 +15,28 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.variable;
+package ast.data.function;
 
-import ast.data.expression.Expression;
-import ast.data.type.TypeReference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.TypedReference;
+import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
-final public class ConstGlobal extends Constant {
-  public ConstGlobal(String name, TypeReference type, Expression def) {
-    super(name, type, def);
+public class FunctionReference extends TypedReference<Function> {
+
+  public FunctionReference(LinkedReferenceWithOffset_Implementation ref) {
+    super(ref);
+  }
+
+  @Deprecated
+  public FunctionReference(MetaList info, LinkedReferenceWithOffset_Implementation ref) {
+    super(ref);
+    metadata().add(info);
   }
 
   @Override
   public void accept(Visitor visitor) {
     visitor.visit(this);
   }
+
 }

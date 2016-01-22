@@ -21,12 +21,12 @@ import java.util.HashSet;
 import java.util.Set;
 
 import ast.data.Ast;
-import ast.data.component.composition.CompUse;
+import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.Direction;
 import ast.data.component.composition.ImplComposition;
 import ast.data.component.elementary.ImplElementary;
 import ast.data.function.header.FuncQuery;
-import ast.data.function.header.FuncResponse;
+import ast.data.function.header.Response;
 import ast.data.function.header.Signal;
 import ast.data.function.header.Slot;
 import ast.dispatcher.DfsTraverser;
@@ -57,7 +57,7 @@ public class MsgNamesGetter extends DfsTraverser<Void, Set<String>> {
   }
 
   @Override
-  protected Void visitCompUse(CompUse obj, Set<String> param) {
+  protected Void visitCompUse(ComponentUse obj, Set<String> param) {
     param.add(obj.getName());
     return null;
   }
@@ -81,7 +81,7 @@ public class MsgNamesGetter extends DfsTraverser<Void, Set<String>> {
   }
 
   @Override
-  protected Void visitFuncResponse(FuncResponse obj, Set<String> param) {
+  protected Void visitFuncResponse(Response obj, Set<String> param) {
     param.add(obj.getName());
     return null;
   }

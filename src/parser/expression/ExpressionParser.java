@@ -22,7 +22,7 @@ import parser.PeekNReader;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
 import ast.data.AstList;
-import ast.data.component.CompRef;
+import ast.data.component.ComponentReference;
 import ast.data.component.hfsm.StateRef;
 import ast.data.expression.Expression;
 import ast.data.expression.ReferenceExpression;
@@ -35,14 +35,15 @@ import ast.data.expression.value.NamedValue;
 import ast.data.expression.value.NumberValue;
 import ast.data.expression.value.StringValue;
 import ast.data.expression.value.TupleValue;
-import ast.data.function.FuncRef;
+import ast.data.function.FunctionReference;
 import ast.data.reference.LinkTarget;
+import ast.data.reference.LinkedReferenceWithOffset;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.template.ActualTemplateArgument;
 import ast.data.type.TypeReference;
 import ast.meta.MetaList;
@@ -106,13 +107,13 @@ public class ExpressionParser extends Parser {
         RError.err(ErrorType.Error, "expected identifier for assignment", expr.metadata());
         return null;
       }
-      Reference ref = ((ReferenceExpression) expr).reference;
-      if (!ref.offset.isEmpty()) {
+      LinkedReferenceWithOffset ref = ((ReferenceExpression) expr).reference;
+      if (!ref.getOffset().isEmpty()) {
         RError.err(ErrorType.Error, "expected identifier for assignment", expr.metadata());
         return null;
       }
       Expression value = parseRelExpr();
-      return new NamedValue(expr.metadata(), ((LinkTarget) ref.link).getName(), value);
+      return new NamedValue(expr.metadata(), ((LinkTarget) ref.getLink()).getName(), value);
     } else {
       return new NamedValue(expr.metadata(), null, expr);
     }
@@ -141,23 +142,23 @@ public class ExpressionParser extends Parser {
   // actually it has to be: ref: id { refName } [ refGeneric ] { refName |
   // refCall }
   // EBNF ref: id { refName | refCall | refIndex | refGeneric }
-  public Reference parseRef() {
+  public LinkedReferenceWithOffset_Implementation parseRef() {
     Token head = expect(TokenType.IDENTIFIER);
-    Reference res = RefFactory.full(head.getMetadata(), head.getData());
+    LinkedReferenceWithOffset_Implementation res = RefFactory.full(head.getMetadata(), head.getData());
 
     while (true) {
       switch (peek().getType()) {
         case PERIOD:
-          res.offset.add(parseRefName());
+          res.getOffset().add(parseRefName());
           break;
         case OPENPAREN:
-          res.offset.add(parseRefCall());
+          res.getOffset().add(parseRefCall());
           break;
         case OPENCURLY:
-          res.offset.add(parseRefGeneric());
+          res.getOffset().add(parseRefGeneric());
           break;
         case OPENBRACKETS:
-          res.offset.add(parseRefIndex());
+          res.getOffset().add(parseRefIndex());
           break;
         default:
           return res;
@@ -166,32 +167,32 @@ public class ExpressionParser extends Parser {
   }
 
   public ReferenceExpression parseRefExpr() {
-    Reference ref = parseRef();
+    LinkedReferenceWithOffset_Implementation ref = parseRef();
     ReferenceExpression ret = new ReferenceExpression(ref);
     ret.metadata().add(ref.metadata());
     return ret;
   }
 
   public TypeReference parseRefType() {
-    Reference ref = parseRef();
+    LinkedReferenceWithOffset_Implementation ref = parseRef();
     TypeReference typeReference = new TypeReference(ref);
     typeReference.metadata().add(ref.metadata());
     return typeReference;
   }
 
-  public FuncRef parseRefFunc() {
-    Reference ref = parseRef();
-    return new FuncRef(ref.metadata(), ref);
+  public FunctionReference parseRefFunc() {
+    LinkedReferenceWithOffset_Implementation ref = parseRef();
+    return new FunctionReference(ref.metadata(), ref);
   }
 
   public StateRef parseRefState() {
-    Reference ref = parseRef();
+    LinkedReferenceWithOffset_Implementation ref = parseRef();
     return new StateRef(ref.metadata(), ref);
   }
 
-  public CompRef parseRefComp() {
-    Reference ref = parseRef();
-    return new CompRef(ref.metadata(), ref);
+  public ComponentReference parseRefComp() {
+    LinkedReferenceWithOffset_Implementation ref = parseRef();
+    return new ComponentReference(ref.metadata(), ref);
   }
 
   // EBNF shiftOp: "shr" | "shl"

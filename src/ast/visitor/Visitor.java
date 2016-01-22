@@ -18,10 +18,10 @@
 package ast.visitor;
 
 import ast.data.Namespace;
-import ast.data.component.CompRef;
+import ast.data.component.ComponentReference;
 import ast.data.component.composition.AsynchroniusConnection;
-import ast.data.component.composition.CompUse;
 import ast.data.component.composition.CompUseRef;
+import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.EndpointRaw;
 import ast.data.component.composition.EndpointSelf;
 import ast.data.component.composition.EndpointSub;
@@ -74,14 +74,14 @@ import ast.data.expression.value.TupleValue;
 import ast.data.expression.value.UnionValue;
 import ast.data.expression.value.UnsafeUnionValue;
 import ast.data.file.RizzlyFile;
-import ast.data.function.FuncRef;
+import ast.data.function.FunctionReference;
 import ast.data.function.header.FuncFunction;
 import ast.data.function.header.FuncInterrupt;
-import ast.data.function.header.FuncProcedure;
 import ast.data.function.header.FuncQuery;
-import ast.data.function.header.FuncResponse;
 import ast.data.function.header.FuncSubHandlerEvent;
 import ast.data.function.header.FuncSubHandlerQuery;
+import ast.data.function.header.Procedure;
+import ast.data.function.header.Response;
 import ast.data.function.header.Signal;
 import ast.data.function.header.Slot;
 import ast.data.function.ret.FuncReturnNone;
@@ -92,11 +92,12 @@ import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
 import ast.data.reference.LinkTarget;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
-import ast.data.reference.Reference;
+import ast.data.reference.UnlinkedReferenceWithOffset_Implementation;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
@@ -105,15 +106,15 @@ import ast.data.statement.CaseOptRange;
 import ast.data.statement.CaseOptSimple;
 import ast.data.statement.CaseOptValue;
 import ast.data.statement.CaseStmt;
+import ast.data.statement.ExpressionReturn;
 import ast.data.statement.ForStmt;
 import ast.data.statement.IfOption;
 import ast.data.statement.IfStatement;
 import ast.data.statement.MsgPush;
 import ast.data.statement.MultiAssignment;
-import ast.data.statement.ExpressionReturn;
-import ast.data.statement.VoidReturn;
 import ast.data.statement.VarDefInitStmt;
 import ast.data.statement.VarDefStmt;
+import ast.data.statement.VoidReturn;
 import ast.data.statement.WhileStmt;
 import ast.data.template.Template;
 import ast.data.type.TypeReference;
@@ -142,9 +143,9 @@ import ast.data.type.special.VoidType;
 import ast.data.type.template.ArrayTemplate;
 import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
-import ast.data.variable.ConstGlobal;
 import ast.data.variable.ConstPrivate;
 import ast.data.variable.FunctionVariable;
+import ast.data.variable.GlobalConstant;
 import ast.data.variable.StateVariable;
 import ast.data.variable.TemplateParameter;
 import ast.meta.SourcePosition;
@@ -164,8 +165,6 @@ public interface Visitor {
   void visit(ArrayType object);
 
   void visit(ArrayValue object);
-
-  void visit(MultiAssignment object);
 
   void visit(AssignmentSingle object);
 
@@ -197,23 +196,19 @@ public interface Visitor {
 
   void visit(CaseStmt object);
 
+  void visit(ComponentReference object);
+
   void visit(ComponentType object);
 
-  void visit(CompRef object);
-
-  void visit(CompUse object);
+  void visit(ComponentUse object);
 
   void visit(CompUseRef object);
-
-  void visit(ConstGlobal object);
 
   void visit(ConstPrivate object);
 
   void visit(DefaultValueTemplate object);
 
   void visit(Division object);
-
-  void visit(LinkTarget object);
 
   void visit(EndpointRaw object);
 
@@ -227,37 +222,33 @@ public interface Visitor {
 
   void visit(Equal object);
 
+  void visit(ExpressionReturn object);
+
   void visit(ForStmt object);
 
   void visit(FuncFunction object);
 
   void visit(FuncInterrupt object);
 
-  void visit(FuncProcedure object);
-
   void visit(FuncQuery object);
-
-  void visit(FuncRef object);
-
-  void visit(FuncResponse object);
 
   void visit(FuncReturnNone object);
 
   void visit(FuncReturnTuple object);
 
-  void visit(FunctionReturnType object);
-
-  void visit(Signal object);
-
-  void visit(Slot object);
-
   void visit(FuncSubHandlerEvent object);
 
   void visit(FuncSubHandlerQuery object);
 
+  void visit(FunctionReference object);
+
+  void visit(FunctionReturnType object);
+
   void visit(FunctionType object);
 
   void visit(FunctionVariable object);
+
+  void visit(GlobalConstant object);
 
   void visit(Greater object);
 
@@ -281,6 +272,10 @@ public interface Visitor {
 
   void visit(LessEqual object);
 
+  void visit(LinkedReferenceWithOffset_Implementation object);
+
+  void visit(LinkTarget object);
+
   void visit(LogicAnd object);
 
   void visit(LogicNot object);
@@ -292,6 +287,8 @@ public interface Visitor {
   void visit(Modulo mod);
 
   void visit(MsgPush object);
+
+  void visit(MultiAssignment object);
 
   void visit(Multiplication object);
 
@@ -317,6 +314,8 @@ public interface Visitor {
 
   void visit(PointerType object);
 
+  void visit(Procedure object);
+
   void visit(Queue object);
 
   void visit(RangeTemplate object);
@@ -335,8 +334,6 @@ public interface Visitor {
 
   void visit(RefCall object);
 
-  void visit(Reference object);
-
   void visit(ReferenceExpression object);
 
   void visit(RefIndex object);
@@ -345,17 +342,21 @@ public interface Visitor {
 
   void visit(RefTemplCall object);
 
-  void visit(ExpressionReturn object);
+  void visit(Response object);
 
-  void visit(VoidReturn object);
+  void visit(RizzlyFile object);
 
-  void visit(RizzlyFile rizzlyFile);
-
-  void visit(Shl shl);
+  void visit(Shl object);
 
   void visit(Shr object);
 
+  void visit(Signal object);
+
   void visit(SIntType object);
+
+  void visit(Slot object);
+
+  void visit(SourcePosition object);
 
   void visit(StateComposite object);
 
@@ -399,6 +400,8 @@ public interface Visitor {
 
   void visit(UnionValue object);
 
+  void visit(UnlinkedReferenceWithOffset_Implementation object);
+
   void visit(UnsafeUnionType object);
 
   void visit(UnsafeUnionValue object);
@@ -407,10 +410,10 @@ public interface Visitor {
 
   void visit(VarDefStmt object);
 
+  void visit(VoidReturn object);
+
   void visit(VoidType object);
 
   void visit(WhileStmt object);
-
-  void visit(SourcePosition object);
 
 }

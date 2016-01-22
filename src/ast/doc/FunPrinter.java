@@ -25,7 +25,7 @@ import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
 import ast.data.Namespace;
-import ast.data.component.CompRef;
+import ast.data.component.ComponentReference;
 import ast.data.component.Component;
 import ast.data.component.composition.AsynchroniusConnection;
 import ast.data.component.composition.CompUseRef;
@@ -74,13 +74,13 @@ import ast.data.expression.value.TupleValue;
 import ast.data.expression.value.UnionValue;
 import ast.data.expression.value.UnsafeUnionValue;
 import ast.data.file.RizzlyFile;
-import ast.data.function.FuncRef;
+import ast.data.function.FunctionReference;
 import ast.data.function.Function;
 import ast.data.function.FunctionProperty;
 import ast.data.function.header.FuncFunction;
-import ast.data.function.header.FuncProcedure;
+import ast.data.function.header.Procedure;
 import ast.data.function.header.FuncQuery;
-import ast.data.function.header.FuncResponse;
+import ast.data.function.header.Response;
 import ast.data.function.header.FuncSubHandlerEvent;
 import ast.data.function.header.FuncSubHandlerQuery;
 import ast.data.function.header.Signal;
@@ -94,10 +94,11 @@ import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
 import ast.data.reference.LinkTarget;
+import ast.data.reference.LinkedReference;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefTemplCall;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.CaseOpt;
@@ -123,7 +124,7 @@ import ast.data.type.template.ArrayTemplate;
 import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
 import ast.data.variable.Constant;
-import ast.data.variable.DefVariable;
+import ast.data.variable.DefaultVariable;
 import ast.data.variable.FunctionVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.Variable;
@@ -155,7 +156,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
     return "_" + Integer.toHexString(obj.hashCode());
   }
 
-  protected Designator getObjPath(Reference obj) {
+  protected Designator getObjPath(LinkedReference obj) {
     return new Designator();
   }
 
@@ -256,7 +257,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitCompUse(ast.data.component.composition.CompUse obj, Void param) {
+  protected Void visitCompUse(ast.data.component.composition.ComponentUse obj, Void param) {
     xw.wa(obj.getName(), getId(obj));
     xw.wr(": ");
     visit(obj.compRef, null);
@@ -814,13 +815,13 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitCompRef(CompRef obj, Void param) {
+  protected Void visitCompRef(ComponentReference obj, Void param) {
     visit(obj.ref, param);
     return null;
   }
 
   @Override
-  protected Void visitFuncRef(FuncRef obj, Void param) {
+  protected Void visitFuncRef(FunctionReference obj, Void param) {
     visit(obj.ref, param);
     return null;
   }
@@ -844,28 +845,28 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitReference(Reference obj, Void param) {
+  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
     wrRef(obj);
-    visitList(obj.offset, null);
+    visitList(obj.getOffset(), null);
     return null;
   }
 
-  private void wrRef(Reference obj) {
+  private void wrRef(LinkedReference obj) {
     Designator path = getObjPath(obj);
     if (path == null) {
       path = new Designator(); // TODO: ok?
     }
-    String hint = obj.link.toString();
+    String hint = obj.getLink().toString();
     String name;
-    if (obj.link instanceof Named) {
-      name = obj.link.getName();
+    if (obj.getLink() instanceof Named) {
+      name = obj.getLink().getName();
     } else {
       name = "???";
     }
-    if (obj.link instanceof LinkTarget) {
+    if (obj.getLink() instanceof LinkTarget) {
       name = "\"" + name + "\"";
     }
-    xw.wl(name, hint, path.toString(), getId(obj.link, null));
+    xw.wl(name, hint, path.toString(), getId(obj.getLink(), null));
   }
 
   @Override
@@ -903,9 +904,9 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
       xw.kw("const ");
     }
     visit(obj.type, param);
-    if (obj instanceof DefVariable) {
+    if (obj instanceof DefaultVariable) {
       xw.wr(" = ");
-      visit(((ast.data.variable.DefVariable) obj).def, param);
+      visit(((ast.data.variable.DefaultVariable) obj).def, param);
     }
     return null;
   }
@@ -967,7 +968,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncProcedure(FuncProcedure obj, Void param) {
+  protected Void visitFuncProcedure(Procedure obj, Void param) {
     xw.wr("procedure");
     printFunctionHeader(obj);
     printFuncImpl(obj);
@@ -1001,7 +1002,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncResponse(FuncResponse obj, Void param) {
+  protected Void visitFuncResponse(Response obj, Void param) {
     xw.wr("response");
     printFunctionHeader(obj);
     printFuncImpl(obj);
@@ -1402,7 +1403,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitDefVariable(DefVariable obj, Void param) {
+  protected Void visitDefVariable(DefaultVariable obj, Void param) {
     xw.kw(" = ");
     visit(obj.def, param);
     super.visitDefVariable(obj, param);

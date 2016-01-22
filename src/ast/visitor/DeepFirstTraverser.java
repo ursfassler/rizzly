@@ -17,11 +17,14 @@
 
 package ast.visitor;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import ast.data.Namespace;
-import ast.data.component.CompRef;
+import ast.data.component.ComponentReference;
 import ast.data.component.composition.AsynchroniusConnection;
-import ast.data.component.composition.CompUse;
 import ast.data.component.composition.CompUseRef;
+import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.EndpointRaw;
 import ast.data.component.composition.EndpointSelf;
 import ast.data.component.composition.EndpointSub;
@@ -74,15 +77,15 @@ import ast.data.expression.value.TupleValue;
 import ast.data.expression.value.UnionValue;
 import ast.data.expression.value.UnsafeUnionValue;
 import ast.data.file.RizzlyFile;
-import ast.data.function.FuncRef;
 import ast.data.function.Function;
+import ast.data.function.FunctionReference;
 import ast.data.function.header.FuncFunction;
 import ast.data.function.header.FuncInterrupt;
-import ast.data.function.header.FuncProcedure;
 import ast.data.function.header.FuncQuery;
-import ast.data.function.header.FuncResponse;
 import ast.data.function.header.FuncSubHandlerEvent;
 import ast.data.function.header.FuncSubHandlerQuery;
+import ast.data.function.header.Procedure;
+import ast.data.function.header.Response;
 import ast.data.function.header.Signal;
 import ast.data.function.header.Slot;
 import ast.data.function.ret.FuncReturnNone;
@@ -93,11 +96,12 @@ import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
 import ast.data.reference.LinkTarget;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
-import ast.data.reference.Reference;
+import ast.data.reference.UnlinkedReferenceWithOffset_Implementation;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
@@ -143,960 +147,953 @@ import ast.data.type.special.VoidType;
 import ast.data.type.template.ArrayTemplate;
 import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
-import ast.data.variable.ConstGlobal;
 import ast.data.variable.ConstPrivate;
 import ast.data.variable.FunctionVariable;
+import ast.data.variable.GlobalConstant;
 import ast.data.variable.StateVariable;
 import ast.data.variable.TemplateParameter;
 import ast.meta.SourcePosition;
 
 public class DeepFirstTraverser implements Visitor {
-  private Visitor preorderVisitor = new NullVisitor();
-  private Visitor postorderVisitor = new NullVisitor();
+  final private Collection<Visitor> preorderVisitor = new ArrayList<Visitor>();
+  final private Collection<Visitor> postorderVisitor = new ArrayList<Visitor>();
 
-  public Visitor getPreorderVisitor() {
-    return preorderVisitor;
+  public void addPreorderVisitor(Visitor visitor) {
+    preorderVisitor.add(visitor);
   }
 
-  public void setPreorderVisitor(Visitor preorderVisitor) {
-    this.preorderVisitor = preorderVisitor;
-  }
-
-  public Visitor getPostorderVisitor() {
-    return postorderVisitor;
-  }
-
-  public void setPostorderVisitor(Visitor postorderVisitor) {
-    this.postorderVisitor = postorderVisitor;
+  public void addPostorderVisitor(Visitor visitor) {
+    postorderVisitor.add(visitor);
   }
 
   @Override
-  public void visit(NamedElementsValue obj) {
-    obj.accept(preorderVisitor);
-    obj.value.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(NamedElementsValue object) {
+    preorderVisit(object);
+    object.value.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(TupleType obj) {
-    obj.accept(preorderVisitor);
-    obj.types.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(TupleType object) {
+    preorderVisit(object);
+    object.types.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(FuncReturnTuple obj) {
-    obj.accept(preorderVisitor);
-    obj.param.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(FuncReturnTuple object) {
+    preorderVisit(object);
+    object.param.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(FunctionReturnType obj) {
-    obj.accept(preorderVisitor);
-    obj.type.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(FunctionReturnType object) {
+    preorderVisit(object);
+    object.type.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(FuncReturnNone obj) {
-    obj.accept(preorderVisitor);
-    obj.accept(postorderVisitor);
+  public void visit(FuncReturnNone object) {
+    preorderVisit(object);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(ImplElementary obj) {
-    obj.accept(preorderVisitor);
-    obj.function.accept(this);
-    obj.iface.accept(this);
-    obj.queue.accept(this);
-    obj.type.accept(this);
-    obj.constant.accept(this);
-    obj.variable.accept(this);
-    obj.component.accept(this);
-    obj.subCallback.accept(this);
-    obj.entryFunc.accept(this);
-    obj.exitFunc.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(ImplElementary object) {
+    preorderVisit(object);
+    object.function.accept(this);
+    object.iface.accept(this);
+    object.queue.accept(this);
+    object.type.accept(this);
+    object.constant.accept(this);
+    object.variable.accept(this);
+    object.component.accept(this);
+    object.subCallback.accept(this);
+    object.entryFunc.accept(this);
+    object.exitFunc.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(ImplComposition obj) {
-    obj.accept(preorderVisitor);
-    obj.function.accept(this);
-    obj.iface.accept(this);
-    obj.queue.accept(this);
-    obj.component.accept(this);
-    obj.connection.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(ImplComposition object) {
+    preorderVisit(object);
+    object.function.accept(this);
+    object.iface.accept(this);
+    object.queue.accept(this);
+    object.component.accept(this);
+    object.connection.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(ImplHfsm obj) {
-    obj.accept(preorderVisitor);
-    obj.function.accept(this);
-    obj.iface.accept(this);
-    obj.queue.accept(this);
-    obj.topstate.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(ImplHfsm object) {
+    preorderVisit(object);
+    object.function.accept(this);
+    object.iface.accept(this);
+    object.queue.accept(this);
+    object.topstate.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(NumberValue obj) {
-    obj.accept(preorderVisitor);
-    obj.accept(postorderVisitor);
+  public void visit(NumberValue object) {
+    preorderVisit(object);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(VarDefStmt obj) {
-    obj.accept(preorderVisitor);
-    obj.variable.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(VarDefStmt object) {
+    preorderVisit(object);
+    object.variable.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(CallStmt obj) {
-    obj.accept(preorderVisitor);
-    obj.call.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(CallStmt object) {
+    preorderVisit(object);
+    object.call.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(MultiAssignment obj) {
-    obj.accept(preorderVisitor);
-    obj.left.accept(this);
-    obj.right.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(MultiAssignment object) {
+    preorderVisit(object);
+    object.left.accept(this);
+    object.right.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(AssignmentSingle obj) {
-    obj.accept(preorderVisitor);
-    obj.left.accept(this);
-    obj.right.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(AssignmentSingle object) {
+    preorderVisit(object);
+    object.left.accept(this);
+    object.right.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(UnionType obj) {
-    obj.accept(preorderVisitor);
-    obj.tag.accept(this);
-    obj.element.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(UnionType object) {
+    preorderVisit(object);
+    object.tag.accept(this);
+    object.element.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(UnsafeUnionType obj) {
-    obj.accept(preorderVisitor);
-    obj.element.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(UnsafeUnionType object) {
+    preorderVisit(object);
+    object.element.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(RecordType obj) {
-    obj.accept(preorderVisitor);
-    obj.element.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(RecordType object) {
+    preorderVisit(object);
+    object.element.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(ComponentType obj) {
-    obj.accept(preorderVisitor);
-    obj.input.accept(this);
-    obj.output.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(ComponentType object) {
+    preorderVisit(object);
+    object.input.accept(this);
+    object.output.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(RefName obj) {
-    obj.accept(preorderVisitor);
-    obj.accept(postorderVisitor);
+  public void visit(RefName object) {
+    preorderVisit(object);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(RefIndex obj) {
-    obj.accept(preorderVisitor);
-    obj.index.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(RefIndex object) {
+    preorderVisit(object);
+    object.index.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(RefCall obj) {
-    obj.accept(preorderVisitor);
-    obj.actualParameter.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(RefCall object) {
+    preorderVisit(object);
+    object.actualParameter.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(ArrayType obj) {
-    obj.accept(preorderVisitor);
-    obj.type.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(ArrayType object) {
+    preorderVisit(object);
+    object.type.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(BooleanType obj) {
-    obj.accept(preorderVisitor);
-    obj.accept(postorderVisitor);
+  public void visit(BooleanType object) {
+    preorderVisit(object);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(EnumType obj) {
-    obj.accept(preorderVisitor);
-    obj.element.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(EnumType object) {
+    preorderVisit(object);
+    object.element.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(EnumElement obj) {
-    obj.accept(preorderVisitor);
-    obj.accept(postorderVisitor);
+  public void visit(EnumElement object) {
+    preorderVisit(object);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(ExpressionReturn obj) {
-    obj.accept(preorderVisitor);
-    obj.expression.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(ExpressionReturn object) {
+    preorderVisit(object);
+    object.expression.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(VoidReturn obj) {
-    obj.accept(preorderVisitor);
-    obj.accept(postorderVisitor);
+  public void visit(VoidReturn object) {
+    preorderVisit(object);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(VoidType obj) {
-    obj.accept(preorderVisitor);
-    obj.accept(postorderVisitor);
+  public void visit(VoidType object) {
+    preorderVisit(object);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(FunctionVariable obj) {
-    obj.accept(preorderVisitor);
-    obj.type.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(FunctionVariable object) {
+    preorderVisit(object);
+    object.type.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(StateVariable obj) {
-    obj.accept(preorderVisitor);
-    obj.type.accept(this);
-    obj.def.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(StateVariable object) {
+    preorderVisit(object);
+    object.type.accept(this);
+    object.def.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(ConstPrivate obj) {
-    obj.accept(preorderVisitor);
-    obj.type.accept(this);
-    obj.def.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(ConstPrivate object) {
+    preorderVisit(object);
+    object.type.accept(this);
+    object.def.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(ConstGlobal obj) {
-    obj.accept(preorderVisitor);
-    obj.type.accept(this);
-    obj.def.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(GlobalConstant object) {
+    preorderVisit(object);
+    object.type.accept(this);
+    object.def.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(SubCallbacks obj) {
-    obj.accept(preorderVisitor);
-    obj.compUse.accept(this);
-    obj.func.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(SubCallbacks object) {
+    preorderVisit(object);
+    object.compUse.accept(this);
+    object.func.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(Namespace obj) {
-    obj.accept(preorderVisitor);
-    obj.children.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(Namespace object) {
+    preorderVisit(object);
+    object.children.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(CaseOptRange obj) {
-    obj.accept(preorderVisitor);
-    obj.start.accept(this);
-    obj.end.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(CaseOptRange object) {
+    preorderVisit(object);
+    object.start.accept(this);
+    object.end.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(CaseOptValue obj) {
-    obj.accept(preorderVisitor);
-    obj.value.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(CaseOptValue object) {
+    preorderVisit(object);
+    object.value.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(BooleanValue obj) {
-    obj.accept(preorderVisitor);
-    obj.accept(postorderVisitor);
+  public void visit(BooleanValue object) {
+    preorderVisit(object);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(SynchroniusConnection obj) {
-    obj.accept(preorderVisitor);
-    obj.getSrc().accept(this);
-    obj.getDst().accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(SynchroniusConnection object) {
+    preorderVisit(object);
+    object.getSrc().accept(this);
+    object.getDst().accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(AsynchroniusConnection obj) {
-    obj.accept(preorderVisitor);
-    obj.getSrc().accept(this);
-    obj.getDst().accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(AsynchroniusConnection object) {
+    preorderVisit(object);
+    object.getSrc().accept(this);
+    object.getDst().accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(StringValue obj) {
-    obj.accept(preorderVisitor);
-    obj.accept(postorderVisitor);
+  public void visit(StringValue object) {
+    preorderVisit(object);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(StringType obj) {
-    obj.accept(preorderVisitor);
-    obj.accept(postorderVisitor);
+  public void visit(StringType object) {
+    preorderVisit(object);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(ArrayValue obj) {
-    obj.accept(preorderVisitor);
-    obj.value.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(ArrayValue object) {
+    preorderVisit(object);
+    object.value.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(TupleValue obj) {
-    obj.accept(preorderVisitor);
-    obj.value.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(TupleValue object) {
+    preorderVisit(object);
+    object.value.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(StateSimple obj) {
-    obj.accept(preorderVisitor);
-    obj.entryFunc.accept(this);
-    obj.exitFunc.accept(this);
-    obj.item.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(StateSimple object) {
+    preorderVisit(object);
+    object.entryFunc.accept(this);
+    object.exitFunc.accept(this);
+    object.item.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(StateComposite obj) {
-    obj.accept(preorderVisitor);
-    obj.entryFunc.accept(this);
-    obj.exitFunc.accept(this);
-    obj.item.accept(this);
-    obj.initial.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(StateComposite object) {
+    preorderVisit(object);
+    object.entryFunc.accept(this);
+    object.exitFunc.accept(this);
+    object.item.accept(this);
+    object.initial.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(Transition obj) {
-    obj.accept(preorderVisitor);
-    obj.src.accept(this);
-    obj.dst.accept(this);
-    obj.eventFunc.accept(this);
-    obj.param.accept(this);
-    obj.guard.accept(this);
-    obj.body.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(Transition object) {
+    preorderVisit(object);
+    object.src.accept(this);
+    object.dst.accept(this);
+    object.eventFunc.accept(this);
+    object.param.accept(this);
+    object.guard.accept(this);
+    object.body.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(Reference obj) {
-    obj.accept(preorderVisitor);
-    obj.offset.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(LinkedReferenceWithOffset_Implementation object) {
+    preorderVisit(object);
+    object.getOffset().accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(NaturalType obj) {
-    obj.accept(preorderVisitor);
-    obj.accept(postorderVisitor);
+  public void visit(NaturalType object) {
+    preorderVisit(object);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(IntegerType obj) {
-    obj.accept(preorderVisitor);
-    obj.accept(postorderVisitor);
+  public void visit(IntegerType object) {
+    preorderVisit(object);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(FuncProcedure obj) {
-    visitFunction(obj);
+  public void visit(Procedure object) {
+    visitFunction(object);
   }
 
   @Override
-  public void visit(FuncFunction obj) {
-    visitFunction(obj);
+  public void visit(FuncFunction object) {
+    visitFunction(object);
   }
 
   @Override
-  public void visit(FuncSubHandlerQuery obj) {
-    visitFunction(obj);
+  public void visit(FuncSubHandlerQuery object) {
+    visitFunction(object);
   }
 
   @Override
-  public void visit(FuncSubHandlerEvent obj) {
-    visitFunction(obj);
+  public void visit(FuncSubHandlerEvent object) {
+    visitFunction(object);
   }
 
   @Override
-  public void visit(FunctionType obj) {
-    obj.accept(preorderVisitor);
+  public void visit(FunctionType object) {
+    preorderVisit(object);
     throw new RuntimeException("not yet implemented");
   }
 
   @Override
-  public void visit(EndpointSelf obj) {
-    obj.accept(preorderVisitor);
-    obj.funcRef.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(EndpointSelf object) {
+    preorderVisit(object);
+    object.funcRef.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(EndpointSub obj) {
-    obj.accept(preorderVisitor);
-    obj.component.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(EndpointSub object) {
+    preorderVisit(object);
+    object.component.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(EndpointRaw obj) {
-    obj.accept(preorderVisitor);
-    obj.ref.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(EndpointRaw object) {
+    preorderVisit(object);
+    object.ref.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(And obj) {
-    obj.accept(preorderVisitor);
-    obj.left.accept(this);
-    obj.right.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(And object) {
+    preorderVisit(object);
+    object.left.accept(this);
+    object.right.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(Division obj) {
-    obj.accept(preorderVisitor);
-    obj.left.accept(this);
-    obj.right.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(Division object) {
+    preorderVisit(object);
+    object.left.accept(this);
+    object.right.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(Equal obj) {
-    obj.accept(preorderVisitor);
-    obj.left.accept(this);
-    obj.right.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(Equal object) {
+    preorderVisit(object);
+    object.left.accept(this);
+    object.right.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(Greater obj) {
-    obj.accept(preorderVisitor);
-    obj.left.accept(this);
-    obj.right.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(Greater object) {
+    preorderVisit(object);
+    object.left.accept(this);
+    object.right.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(GreaterEqual obj) {
-    obj.accept(preorderVisitor);
-    obj.left.accept(this);
-    obj.right.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(GreaterEqual object) {
+    preorderVisit(object);
+    object.left.accept(this);
+    object.right.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(Less obj) {
-    obj.accept(preorderVisitor);
-    obj.left.accept(this);
-    obj.right.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(Less object) {
+    preorderVisit(object);
+    object.left.accept(this);
+    object.right.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(Is obj) {
-    obj.accept(preorderVisitor);
-    obj.left.accept(this);
-    obj.right.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(Is object) {
+    preorderVisit(object);
+    object.left.accept(this);
+    object.right.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(LessEqual obj) {
-    obj.accept(preorderVisitor);
-    obj.left.accept(this);
-    obj.right.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(LessEqual object) {
+    preorderVisit(object);
+    object.left.accept(this);
+    object.right.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(Minus obj) {
-    obj.accept(preorderVisitor);
-    obj.left.accept(this);
-    obj.right.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(Minus object) {
+    preorderVisit(object);
+    object.left.accept(this);
+    object.right.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(Modulo obj) {
-    obj.accept(preorderVisitor);
-    obj.left.accept(this);
-    obj.right.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(Modulo object) {
+    preorderVisit(object);
+    object.left.accept(this);
+    object.right.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(Multiplication obj) {
-    obj.accept(preorderVisitor);
-    obj.left.accept(this);
-    obj.right.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(Multiplication object) {
+    preorderVisit(object);
+    object.left.accept(this);
+    object.right.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(Not obj) {
-    obj.accept(preorderVisitor);
-    obj.expression.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(Not object) {
+    preorderVisit(object);
+    object.expression.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(LogicNot obj) {
-    obj.accept(preorderVisitor);
-    obj.expression.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(LogicNot object) {
+    preorderVisit(object);
+    object.expression.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(BitNot obj) {
-    obj.accept(preorderVisitor);
-    obj.expression.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(BitNot object) {
+    preorderVisit(object);
+    object.expression.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(NotEqual obj) {
-    obj.accept(preorderVisitor);
-    obj.left.accept(this);
-    obj.right.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(NotEqual object) {
+    preorderVisit(object);
+    object.left.accept(this);
+    object.right.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(Or obj) {
-    obj.accept(preorderVisitor);
-    obj.left.accept(this);
-    obj.right.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(Or object) {
+    preorderVisit(object);
+    object.left.accept(this);
+    object.right.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(Plus obj) {
-    obj.accept(preorderVisitor);
-    obj.left.accept(this);
-    obj.right.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(Plus object) {
+    preorderVisit(object);
+    object.left.accept(this);
+    object.right.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(Shl obj) {
-    obj.accept(preorderVisitor);
-    obj.left.accept(this);
-    obj.right.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(Shl object) {
+    preorderVisit(object);
+    object.left.accept(this);
+    object.right.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(Shr obj) {
-    obj.accept(preorderVisitor);
-    obj.left.accept(this);
-    obj.right.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(Shr object) {
+    preorderVisit(object);
+    object.left.accept(this);
+    object.right.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(Uminus obj) {
-    obj.accept(preorderVisitor);
-    obj.expression.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(Uminus object) {
+    preorderVisit(object);
+    object.expression.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(RangeType obj) {
-    obj.accept(preorderVisitor);
-    obj.accept(postorderVisitor);
+  public void visit(RangeType object) {
+    preorderVisit(object);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(WhileStmt obj) {
-    obj.accept(preorderVisitor);
-    obj.condition.accept(this);
-    obj.body.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(WhileStmt object) {
+    preorderVisit(object);
+    object.condition.accept(this);
+    object.body.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(IfStatement obj) {
-    obj.accept(preorderVisitor);
-    obj.option.accept(this);
-    obj.defblock.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(IfStatement object) {
+    preorderVisit(object);
+    object.option.accept(this);
+    object.defblock.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(IfOption obj) {
-    obj.accept(preorderVisitor);
-    obj.condition.accept(this);
-    obj.code.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(IfOption object) {
+    preorderVisit(object);
+    object.condition.accept(this);
+    object.code.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(Block obj) {
-    obj.accept(preorderVisitor);
-    obj.statements.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(Block object) {
+    preorderVisit(object);
+    object.statements.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(CaseStmt obj) {
-    obj.accept(preorderVisitor);
-    obj.condition.accept(this);
-    obj.option.accept(this);
-    obj.otherwise.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(CaseStmt object) {
+    preorderVisit(object);
+    object.condition.accept(this);
+    object.option.accept(this);
+    object.otherwise.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(CaseOpt obj) {
-    obj.accept(preorderVisitor);
-    obj.value.accept(this);
-    obj.code.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(CaseOpt object) {
+    preorderVisit(object);
+    object.value.accept(this);
+    object.code.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(TypeCast obj) {
-    obj.accept(preorderVisitor);
-    obj.cast.accept(this);
-    obj.value.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(TypeCast object) {
+    preorderVisit(object);
+    object.cast.accept(this);
+    object.value.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(BitAnd obj) {
-    obj.accept(preorderVisitor);
-    obj.left.accept(this);
-    obj.right.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(BitAnd object) {
+    preorderVisit(object);
+    object.left.accept(this);
+    object.right.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(BitOr obj) {
-    obj.accept(preorderVisitor);
-    obj.left.accept(this);
-    obj.right.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(BitOr object) {
+    preorderVisit(object);
+    object.left.accept(this);
+    object.right.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(BitXor obj) {
-    obj.accept(preorderVisitor);
-    obj.left.accept(this);
-    obj.right.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(BitXor object) {
+    preorderVisit(object);
+    object.left.accept(this);
+    object.right.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(LogicOr obj) {
-    obj.accept(preorderVisitor);
-    obj.left.accept(this);
-    obj.right.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(LogicOr object) {
+    preorderVisit(object);
+    object.left.accept(this);
+    object.right.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(LogicAnd obj) {
-    obj.accept(preorderVisitor);
-    obj.left.accept(this);
-    obj.right.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(LogicAnd object) {
+    preorderVisit(object);
+    object.left.accept(this);
+    object.right.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(Signal obj) {
-    visitFunction(obj);
+  public void visit(Signal object) {
+    visitFunction(object);
   }
 
   @Override
-  public void visit(FuncQuery obj) {
-    visitFunction(obj);
+  public void visit(FuncQuery object) {
+    visitFunction(object);
   }
 
   @Override
-  public void visit(Slot obj) {
-    visitFunction(obj);
+  public void visit(Slot object) {
+    visitFunction(object);
   }
 
   @Override
-  public void visit(FuncResponse obj) {
-    visitFunction(obj);
+  public void visit(Response object) {
+    visitFunction(object);
   }
 
   @Override
-  public void visit(AnyType obj) {
-    obj.accept(preorderVisitor);
-    obj.accept(postorderVisitor);
+  public void visit(AnyType object) {
+    preorderVisit(object);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(AnyValue obj) {
-    obj.accept(preorderVisitor);
-    obj.accept(postorderVisitor);
+  public void visit(AnyValue object) {
+    preorderVisit(object);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(NamedValue obj) {
-    obj.accept(preorderVisitor);
-    obj.value.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(NamedValue object) {
+    preorderVisit(object);
+    object.value.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(UnionValue obj) {
-    obj.accept(preorderVisitor);
-    obj.tagValue.accept(this);
-    obj.contentValue.accept(this);
-    obj.type.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(UnionValue object) {
+    preorderVisit(object);
+    object.tagValue.accept(this);
+    object.contentValue.accept(this);
+    object.type.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(UnsafeUnionValue obj) {
-    obj.accept(preorderVisitor);
-    obj.contentValue.accept(this);
-    obj.type.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(UnsafeUnionValue object) {
+    preorderVisit(object);
+    object.contentValue.accept(this);
+    object.type.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(RecordValue obj) {
-    obj.accept(preorderVisitor);
-    obj.value.accept(this);
-    obj.type.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(RecordValue object) {
+    preorderVisit(object);
+    object.value.accept(this);
+    object.type.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(MsgPush obj) {
-    obj.accept(preorderVisitor);
-    obj.queue.accept(this);
-    obj.func.accept(this);
-    obj.data.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(MsgPush object) {
+    preorderVisit(object);
+    object.queue.accept(this);
+    object.func.accept(this);
+    object.data.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(Queue obj) {
-    obj.accept(preorderVisitor);
-    obj.accept(postorderVisitor);
+  public void visit(Queue object) {
+    preorderVisit(object);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(NamedElement obj) {
-    obj.accept(preorderVisitor);
-    obj.typeref.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(NamedElement object) {
+    preorderVisit(object);
+    object.typeref.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(CompUse obj) {
-    obj.accept(preorderVisitor);
-    obj.compRef.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(ComponentUse object) {
+    preorderVisit(object);
+    object.compRef.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(UIntType obj) {
-    obj.accept(preorderVisitor);
-    obj.accept(postorderVisitor);
+  public void visit(UIntType object) {
+    preorderVisit(object);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(SIntType obj) {
-    obj.accept(preorderVisitor);
-    obj.accept(postorderVisitor);
+  public void visit(SIntType object) {
+    preorderVisit(object);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(AliasType obj) {
-    obj.accept(preorderVisitor);
-    obj.ref.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(AliasType object) {
+    preorderVisit(object);
+    object.ref.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(ForStmt obj) {
-    obj.accept(preorderVisitor);
-    obj.iterator.accept(this);
-    obj.block.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(ForStmt object) {
+    preorderVisit(object);
+    object.iterator.accept(this);
+    object.block.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(DefaultValueTemplate obj) {
-    obj.accept(preorderVisitor);
-    obj.accept(postorderVisitor);
+  public void visit(DefaultValueTemplate object) {
+    preorderVisit(object);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(RizzlyFile obj) {
-    obj.accept(preorderVisitor);
-    obj.objects.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(RizzlyFile object) {
+    preorderVisit(object);
+    object.objects.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(RawElementary obj) {
-    obj.accept(preorderVisitor);
-    obj.getEntryFunc().accept(this);
-    obj.getExitFunc().accept(this);
-    obj.getIface().accept(this);
-    obj.getDeclaration().accept(this);
-    obj.getInstantiation().accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(RawElementary object) {
+    preorderVisit(object);
+    object.getEntryFunc().accept(this);
+    object.getExitFunc().accept(this);
+    object.getIface().accept(this);
+    object.getDeclaration().accept(this);
+    object.getInstantiation().accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(RawComposition obj) {
-    obj.accept(preorderVisitor);
-    obj.getIface().accept(this);
-    obj.getInstantiation().accept(this);
-    obj.getConnection().accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(RawComposition object) {
+    preorderVisit(object);
+    object.getIface().accept(this);
+    object.getInstantiation().accept(this);
+    object.getConnection().accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(RawHfsm obj) {
-    obj.accept(preorderVisitor);
-    obj.getIface().accept(this);
-    obj.getTopstate().accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(RawHfsm object) {
+    preorderVisit(object);
+    object.getIface().accept(this);
+    object.getTopstate().accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(VarDefInitStmt obj) {
-    obj.accept(preorderVisitor);
-    obj.variable.accept(this);
-    obj.initial.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(VarDefInitStmt object) {
+    preorderVisit(object);
+    object.variable.accept(this);
+    object.initial.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(RefTemplCall obj) {
-    obj.accept(preorderVisitor);
-    obj.actualParameter.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(RefTemplCall object) {
+    preorderVisit(object);
+    object.actualParameter.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(TemplateParameter obj) {
-    obj.accept(preorderVisitor);
-    obj.type.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(TemplateParameter object) {
+    preorderVisit(object);
+    object.type.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(TypeTypeTemplate obj) {
-    obj.accept(preorderVisitor);
-    obj.accept(postorderVisitor);
+  public void visit(TypeTypeTemplate object) {
+    preorderVisit(object);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(TypeType obj) {
-    obj.accept(preorderVisitor);
-    obj.accept(postorderVisitor);
+  public void visit(TypeType object) {
+    preorderVisit(object);
+    object.type.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(RangeTemplate obj) {
-    obj.accept(preorderVisitor);
-    obj.accept(postorderVisitor);
+  public void visit(RangeTemplate object) {
+    preorderVisit(object);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(Template obj) {
-    obj.accept(preorderVisitor);
-    obj.getTempl().accept(this);
-    obj.getObject().accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(Template object) {
+    preorderVisit(object);
+    object.getTempl().accept(this);
+    object.getObject().accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(ArrayTemplate obj) {
-    obj.accept(preorderVisitor);
-    obj.accept(postorderVisitor);
+  public void visit(ArrayTemplate object) {
+    preorderVisit(object);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(LinkTarget obj) {
-    obj.accept(preorderVisitor);
-    obj.accept(postorderVisitor);
+  public void visit(LinkTarget object) {
+    preorderVisit(object);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(ReferenceExpression obj) {
-    obj.accept(preorderVisitor);
-    obj.reference.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(ReferenceExpression object) {
+    preorderVisit(object);
+    object.reference.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(TypeReference obj) {
-    obj.accept(preorderVisitor);
-    obj.ref.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(TypeReference object) {
+    preorderVisit(object);
+    object.ref.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(FuncRef obj) {
-    obj.accept(preorderVisitor);
-    obj.ref.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(FunctionReference object) {
+    preorderVisit(object);
+    object.ref.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(StateRef obj) {
-    obj.accept(preorderVisitor);
-    obj.ref.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(StateRef object) {
+    preorderVisit(object);
+    object.ref.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(CompRef obj) {
-    obj.accept(preorderVisitor);
-    obj.ref.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(ComponentReference object) {
+    preorderVisit(object);
+    object.ref.accept(this);
+    postorderVisit(object);
   }
 
   @Override
-  public void visit(CompUseRef obj) {
-    obj.accept(preorderVisitor);
-    obj.ref.accept(this);
-    obj.accept(postorderVisitor);
+  public void visit(CompUseRef object) {
+    preorderVisit(object);
+    object.ref.accept(this);
+    postorderVisit(object);
   }
 
   @Override
@@ -1105,8 +1102,8 @@ public class DeepFirstTraverser implements Visitor {
   }
 
   @Override
-  public void visit(FuncInterrupt obj) {
-    visitFunction(obj);
+  public void visit(FuncInterrupt object) {
+    visitFunction(object);
   }
 
   @Override
@@ -1115,17 +1112,36 @@ public class DeepFirstTraverser implements Visitor {
   }
 
   @Override
-  public void visit(SourcePosition obj) {
-    obj.accept(preorderVisitor);
-    obj.accept(postorderVisitor);
+  public void visit(SourcePosition object) {
+    preorderVisit(object);
+    postorderVisit(object);
   }
 
-  private void visitFunction(Function obj) {
-    obj.accept(preorderVisitor);
-    obj.param.accept(this);
-    obj.ret.accept(this);
-    obj.body.accept(this);
-    obj.accept(postorderVisitor);
+  private void visitFunction(Function object) {
+    preorderVisit(object);
+    object.param.accept(this);
+    object.ret.accept(this);
+    object.body.accept(this);
+    postorderVisit(object);
+  }
+
+  private void preorderVisit(VisitorAcceptor object) {
+    visitByAll(object, preorderVisitor);
+  }
+
+  private void postorderVisit(VisitorAcceptor object) {
+    visitByAll(object, postorderVisitor);
+  }
+
+  private void visitByAll(VisitorAcceptor object, Collection<Visitor> visitors) {
+    for (Visitor visitor : visitors) {
+      object.accept(visitor);
+    }
+  }
+
+  @Override
+  public void visit(UnlinkedReferenceWithOffset_Implementation object) {
+    throw new RuntimeException("not yet implemented");
   }
 
 }

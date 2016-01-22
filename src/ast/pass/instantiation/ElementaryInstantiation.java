@@ -31,7 +31,7 @@ import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.component.CompRefFactory;
 import ast.data.component.Component;
-import ast.data.component.composition.CompUse;
+import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.Direction;
 import ast.data.component.composition.SubCallbacks;
@@ -40,7 +40,7 @@ import ast.data.function.FuncRefFactory;
 import ast.data.function.Function;
 import ast.data.function.FunctionProperty;
 import ast.data.function.InterfaceFunction;
-import ast.data.function.header.FuncProcedure;
+import ast.data.function.header.Procedure;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.reference.RefFactory;
 import ast.data.statement.Block;
@@ -61,7 +61,7 @@ public class ElementaryInstantiation extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    CompUse instComp = kb.getRootComp();
+    ComponentUse instComp = kb.getRootComp();
     ast.children.remove(instComp);
 
     ImplElementary env = makeEnv(instComp.compRef.getTarget(), kb);
@@ -89,16 +89,16 @@ public class ElementaryInstantiation extends AstPass {
   }
 
   private static ImplElementary makeEnv(Component top, KnowledgeBase kb) {
-    FuncProcedure entry = new FuncProcedure("entry", new AstList<FunctionVariable>(), new FuncReturnNone(), new Block());
-    FuncProcedure exit = new FuncProcedure("exit", new AstList<FunctionVariable>(), new FuncReturnNone(), new Block());
+    Procedure entry = new Procedure("entry", new AstList<FunctionVariable>(), new FuncReturnNone(), new Block());
+    Procedure exit = new Procedure("exit", new AstList<FunctionVariable>(), new FuncReturnNone(), new Block());
     ImplElementary env = new ImplElementary("", FuncRefFactory.create(entry), FuncRefFactory.create(exit));
     env.function.add(entry);
     env.function.add(exit);
 
-    CompUse item = new CompUse("!inst", CompRefFactory.create(top));
+    ComponentUse item = new ComponentUse("!inst", CompRefFactory.create(top));
     env.component.add(item);
 
-    for (CompUse compu : env.component) {
+    for (ComponentUse compu : env.component) {
       SubCallbacks suc = new SubCallbacks(compu.metadata(), new CompUseRef(RefFactory.create(compu)));
       env.subCallback.add(suc);
       Component refComp = compu.compRef.getTarget();
@@ -139,7 +139,7 @@ class CompInstantiatorWorker extends NullDispatcher<ImplElementary, Namespace> {
     // ns.getChildren().removeAll(ns.getChildren().getItems(FuncCtrlOutDataIn.class));
     // ns.getChildren().removeAll(ns.getChildren().getItems(FuncCtrlOutDataOut.class));
 
-    for (CompUse compUse : inst.component) {
+    for (ComponentUse compUse : inst.component) {
       Component comp = compUse.compRef.getTarget();
 
       // copy / instantiate used component
@@ -169,7 +169,7 @@ class CompInstantiatorWorker extends NullDispatcher<ImplElementary, Namespace> {
     return inst;
   }
 
-  private SubCallbacks getSubCallback(AstList<SubCallbacks> subCallback, CompUse compUse) {
+  private SubCallbacks getSubCallback(AstList<SubCallbacks> subCallback, ComponentUse compUse) {
     for (SubCallbacks suc : subCallback) {
       if (suc.compUse.getTarget() == compUse) {
         return suc;

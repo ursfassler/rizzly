@@ -24,4 +24,6 @@ public interface MetaList extends VisitorAcceptor, Iterable<MetaInformation> {
 
   public void add(MetaList items);
 
+  public void clear();
+
 }

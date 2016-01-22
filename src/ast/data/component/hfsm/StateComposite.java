@@ -17,13 +17,13 @@
 
 package ast.data.component.hfsm;
 
-import ast.data.function.FuncRef;
+import ast.data.function.FunctionReference;
 import ast.visitor.Visitor;
 
 final public class StateComposite extends State {
   public StateRef initial;
 
-  public StateComposite(String name, FuncRef entryFunc, FuncRef exitFunc, StateRef initial) {
+  public StateComposite(String name, FunctionReference entryFunc, FunctionReference exitFunc, StateRef initial) {
     super(name, entryFunc, exitFunc);
     this.initial = initial;
   }

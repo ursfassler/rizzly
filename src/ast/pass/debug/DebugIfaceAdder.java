@@ -25,7 +25,7 @@ import ast.Designator;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
-import ast.data.component.composition.CompUse;
+import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.ImplComposition;
 import ast.data.component.elementary.ImplElementary;
 import ast.data.expression.Expression;
@@ -33,13 +33,13 @@ import ast.data.expression.ReferenceExpression;
 import ast.data.expression.TypeCast;
 import ast.data.expression.binop.Plus;
 import ast.data.expression.value.NumberValue;
-import ast.data.function.header.FuncProcedure;
+import ast.data.function.header.Procedure;
 import ast.data.function.header.FuncSubHandlerEvent;
 import ast.data.function.header.Signal;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefIndex;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.Assignment;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
@@ -97,7 +97,7 @@ public class DebugIfaceAdder extends NullDispatcher<Void, Void> {
     return func;
   }
 
-  private FuncProcedure makeDebugSend(String callname, Signal sendProto) {
+  private Procedure makeDebugSend(String callname, Signal sendProto) {
     Block body = new Block();
 
     FunctionVariable func = new FunctionVariable("func", tr(nameNumType));
@@ -110,8 +110,8 @@ public class DebugIfaceAdder extends NullDispatcher<Void, Void> {
 
     { // path[0] := func;
 
-      Reference left = RefFactory.create(path, new RefIndex(new NumberValue(BigInteger.ZERO)));
-      Reference right = RefFactory.full(func);
+      LinkedReferenceWithOffset_Implementation left = RefFactory.create(path, new RefIndex(new NumberValue(BigInteger.ZERO)));
+      LinkedReferenceWithOffset_Implementation right = RefFactory.full(func);
       Assignment ass = new AssignmentSingle(left, new ReferenceExpression(right));
       body.statements.add(ass);
     }
@@ -120,13 +120,13 @@ public class DebugIfaceAdder extends NullDispatcher<Void, Void> {
       ReferenceExpression pathArg = new ReferenceExpression(RefFactory.full(path));
       NumberValue idxArg = new NumberValue(BigInteger.valueOf(1));
 
-      Reference call = RefFactory.call(sendProto, pathArg, idxArg);
+      LinkedReferenceWithOffset_Implementation call = RefFactory.call(sendProto, pathArg, idxArg);
       body.statements.add(new CallStmt(call));
     }
 
     AstList<FunctionVariable> param = new AstList<FunctionVariable>();
     param.add(func);
-    FuncProcedure rfunc = new FuncProcedure("_" + callname, param, new FuncReturnNone(), body);
+    Procedure rfunc = new Procedure("_" + callname, param, new FuncReturnNone(), body);
 
     return rfunc;
   }
@@ -152,7 +152,7 @@ public class DebugIfaceAdder extends NullDispatcher<Void, Void> {
     assert (x >= 0);
 
     { // sender[size] := x;
-      Reference left = RefFactory.create(pArray, new RefIndex(new ReferenceExpression(RefFactory.full(argSize))));
+      LinkedReferenceWithOffset_Implementation left = RefFactory.create(pArray, new RefIndex(new ReferenceExpression(RefFactory.full(argSize))));
       NumberValue right = new NumberValue(BigInteger.valueOf(x));
       Assignment ass = new AssignmentSingle(left, right);
       code.add(ass);
@@ -174,7 +174,7 @@ public class DebugIfaceAdder extends NullDispatcher<Void, Void> {
       ReferenceExpression arrayArg = new ReferenceExpression(RefFactory.full(pArray));
       ReferenceExpression sizeArg = new ReferenceExpression(RefFactory.full(sizeP1));
 
-      Reference call = RefFactory.call(proto, arrayArg, sizeArg);
+      LinkedReferenceWithOffset_Implementation call = RefFactory.call(proto, arrayArg, sizeArg);
       code.add(new CallStmt(call));
     }
 
@@ -189,8 +189,8 @@ public class DebugIfaceAdder extends NullDispatcher<Void, Void> {
     Signal recvProto = makeMsg(Designator.NAME_SEP + "msgRecv", "receiver");
     obj.iface.add(recvProto);
 
-    FuncProcedure debugSend = makeDebugSend("iMsgSend", sendProto);
-    FuncProcedure debugRecv = makeDebugSend("iMsgRecv", recvProto);
+    Procedure debugSend = makeDebugSend("iMsgSend", sendProto);
+    Procedure debugRecv = makeDebugSend("iMsgRecv", recvProto);
     obj.function.add(debugSend);
     obj.function.add(debugRecv);
 
@@ -199,7 +199,7 @@ public class DebugIfaceAdder extends NullDispatcher<Void, Void> {
 
     {// add callback
 
-      for (CompUse use : obj.component) {
+      for (ComponentUse use : obj.component) {
 
         {
           FuncSubHandlerEvent recv = makeRecvProto(sizeType);

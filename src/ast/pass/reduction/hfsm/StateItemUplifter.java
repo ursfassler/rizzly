@@ -28,7 +28,7 @@ import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateContent;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.function.header.FuncFunction;
-import ast.data.function.header.FuncProcedure;
+import ast.data.function.header.Procedure;
 import ast.data.type.Type;
 import ast.data.variable.ConstPrivate;
 import ast.knowledge.KnowledgeBase;
@@ -58,7 +58,7 @@ public class StateItemUplifter extends AstPass {
 
   static private Specification makeContentSpec() {
     Collection<Specification> orSpecs = new HashSet<Specification>();
-    orSpecs.add(new IsClass(FuncProcedure.class));
+    orSpecs.add(new IsClass(Procedure.class));
     orSpecs.add(new IsClass(FuncFunction.class));
     orSpecs.add(new IsClass(Type.class));
     orSpecs.add(new IsClass(ConstPrivate.class));

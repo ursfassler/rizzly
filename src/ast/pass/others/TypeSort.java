@@ -29,7 +29,7 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
 
 import util.Pair;
 import ast.data.Namespace;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.type.Type;
 import ast.dispatcher.DfsTraverser;
 import ast.doc.SimpleGraph;
@@ -83,9 +83,9 @@ public class TypeSort extends AstPass {
   private static Set<Type> getDirectUsedTypes(Type u) {
     DfsTraverser<Void, Set<Type>> getter = new DfsTraverser<Void, Set<Type>>() {
       @Override
-      protected Void visitReference(Reference obj, Set<Type> param) {
-        if (obj.link instanceof Type) {
-          param.add((Type) obj.link);
+      protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Set<Type> param) {
+        if (obj.getLink() instanceof Type) {
+          param.add((Type) obj.getLink());
         }
         return null;
       }

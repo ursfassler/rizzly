@@ -26,8 +26,8 @@ import ast.data.component.hfsm.ImplHfsm;
 import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.Transition;
 import ast.data.function.header.FuncFunction;
-import ast.data.function.header.FuncProcedure;
-import ast.data.function.header.FuncResponse;
+import ast.data.function.header.Procedure;
+import ast.data.function.header.Response;
 import ast.data.function.header.Slot;
 import ast.data.variable.StateVariable;
 import ast.dispatcher.NullDispatcher;
@@ -90,13 +90,13 @@ class HfsmModelCheckerWorker extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncResponse(FuncResponse obj, Void param) {
+  protected Void visitFuncResponse(Response obj, Void param) {
     // TODO check that state is not written
     return null;
   }
 
   @Override
-  protected Void visitFuncProcedure(FuncProcedure obj, Void param) {
+  protected Void visitFuncProcedure(Procedure obj, Void param) {
     return null;
   }
 

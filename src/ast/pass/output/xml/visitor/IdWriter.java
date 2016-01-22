@@ -15,31 +15,26 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.component.composition;
+package ast.pass.output.xml.visitor;
 
-import ast.data.Named;
-import ast.data.component.CompRef;
-import ast.meta.MetaList;
-import ast.visitor.Visitor;
+import ast.data.Ast;
+import ast.pass.output.xml.IdReader;
+import ast.visitor.DefaultHandler;
 
-final public class CompUse extends Named {
-  public CompRef compRef;
+public class IdWriter implements DefaultHandler {
+  private final XmlStreamWriter stream;
+  private final IdReader astId;
 
-  public CompUse(String name, CompRef compRef) {
-    setName(name);
-    this.compRef = compRef;
-  }
-
-  @Deprecated
-  public CompUse(MetaList info, String name, CompRef compRef) {
-    metadata().add(info);
-    setName(name);
-    this.compRef = compRef;
+  public IdWriter(XmlStreamWriter stream, IdReader astId) {
+    this.stream = stream;
+    this.astId = astId;
   }
 
   @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
+  public void visit(Ast ast) {
+    if (astId.hasId(ast)) {
+      stream.attribute("id", astId.getId(ast));
+    }
   }
 
 }

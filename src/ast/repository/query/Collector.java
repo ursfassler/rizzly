@@ -30,7 +30,7 @@ public class Collector extends EveryVisitor {
   public Collector(Specification spec) {
     super();
     collector = new CollectorVisitor(spec);
-    setHandler(collector);
+    addDefaultHandler(collector);
   }
 
   public AstList<Ast> getMatched() {

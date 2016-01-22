@@ -29,10 +29,10 @@ import ast.data.component.hfsm.StateRefFactory;
 import ast.data.component.hfsm.Transition;
 import ast.data.expression.ReferenceExpression;
 import ast.data.function.header.FuncFunction;
-import ast.data.function.header.FuncProcedure;
+import ast.data.function.header.Procedure;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefName;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.type.Type;
 import ast.data.type.TypeRefFactory;
 import ast.data.type.composed.NamedElement;
@@ -127,7 +127,7 @@ class StateVarReplacerWorker extends DfsTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncProcedure(FuncProcedure obj, Void param) {
+  protected Void visitFuncProcedure(Procedure obj, Void param) {
     visit(obj.body, param);
     return null;
   }
@@ -139,28 +139,28 @@ class StateVarReplacerWorker extends DfsTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitReference(Reference obj, Void param) {
-    if (obj.link == dataVar) {
-      visitList(obj.offset, param);
+  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
+    if (obj.getLink() == dataVar) {
+      visitList(obj.getOffset(), param);
       return null;
     }
     super.visitReference(obj, param);
-    if (obj.link instanceof StateVariable) {
-      AstList<NamedElement> eofs = epath.get(obj.link);
+    if (obj.getLink() instanceof StateVariable) {
+      AstList<NamedElement> eofs = epath.get(obj.getLink());
       assert (eofs != null);
 
-      assert (obj.offset.isEmpty()); // FIXME not always true (e.g. for access
+      assert (obj.getOffset().isEmpty()); // FIXME not always true (e.g. for access
       // to struct)
 
       Type type = kt.get(dataVar.type);
 
-      obj.link = dataVar;
+      obj.setLink(dataVar);
       for (NamedElement itr : eofs) {
         RefName ref = new RefName(itr.getName());
 
         type = rtg.traverse(ref, type); // sanity check
 
-        obj.offset.add(ref);
+        obj.getOffset().add(ref);
       }
 
     }

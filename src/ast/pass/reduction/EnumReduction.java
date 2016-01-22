@@ -27,12 +27,12 @@ import ast.data.Namespace;
 import ast.data.Range;
 import ast.data.expression.value.NumberValue;
 import ast.data.reference.RefName;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.type.TypeRefFactory;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.EnumType;
 import ast.data.type.base.RangeType;
-import ast.data.variable.ConstGlobal;
+import ast.data.variable.GlobalConstant;
 import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
@@ -50,7 +50,7 @@ public class EnumReduction extends AstPass {
     TypeRepo kbi = new TypeRepo(kb);
 
     Map<EnumType, RangeType> typeMap = new HashMap<EnumType, RangeType>();
-    Map<EnumElement, ConstGlobal> elemMap = new HashMap<EnumElement, ConstGlobal>();
+    Map<EnumElement, GlobalConstant> elemMap = new HashMap<EnumElement, GlobalConstant>();
 
     for (EnumType et : TypeFilter.select(ast.children, EnumType.class)) {
 
@@ -59,7 +59,7 @@ public class EnumReduction extends AstPass {
         RangeType rt = kbi.getRangeType(new Range(idx, idx));
 
         String name = et.getName() + Designator.NAME_SEP + elem.getName();
-        ConstGlobal val = new ConstGlobal(name, TypeRefFactory.create(rt), new NumberValue(idx));
+        GlobalConstant val = new GlobalConstant(name, TypeRefFactory.create(rt), new NumberValue(idx));
         val.metadata().add(elem.metadata());
         ast.children.add(val);
         elemMap.put(elem, val);
@@ -79,40 +79,40 @@ public class EnumReduction extends AstPass {
 
 class EnumReduce extends DfsTraverser<Void, Void> {
   final private Map<EnumType, RangeType> typeMap;
-  final private Map<EnumElement, ConstGlobal> elemMap;
+  final private Map<EnumElement, GlobalConstant> elemMap;
 
-  public EnumReduce(Map<EnumType, RangeType> typeMap, Map<EnumElement, ConstGlobal> elemMap) {
+  public EnumReduce(Map<EnumType, RangeType> typeMap, Map<EnumElement, GlobalConstant> elemMap) {
     super();
     this.typeMap = typeMap;
     this.elemMap = elemMap;
   }
 
   @Override
-  protected Void visitReference(Reference obj, Void param) {
-    if (typeMap.containsKey(obj.link)) {
-      if (!obj.offset.isEmpty() && (obj.offset.get(0) instanceof RefName)) {
+  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
+    if (typeMap.containsKey(obj.getLink())) {
+      if (!obj.getOffset().isEmpty() && (obj.getOffset().get(0) instanceof RefName)) {
         // replace a link to EnumType.EnumName with a link to the corresponding
         // constant
-        assert (obj.offset.size() == 1);
-        String elemName = ((RefName) obj.offset.get(0)).name;
-        EnumType ent = (EnumType) obj.link;
+        assert (obj.getOffset().size() == 1);
+        String elemName = ((RefName) obj.getOffset().get(0)).name;
+        EnumType ent = (EnumType) obj.getLink();
         EnumElement elem = NameFilter.select(ent.element, elemName);
         assert (elem != null);
         assert (elemMap.containsKey(elem));
-        obj.offset.clear();
-        obj.link = elemMap.get(elem);
+        obj.getOffset().clear();
+        obj.setLink(elemMap.get(elem));
       }
     }
 
     super.visitReference(obj, param);
 
     // link to type
-    if (typeMap.containsKey(obj.link)) {
-      obj.link = typeMap.get(obj.link);
+    if (typeMap.containsKey(obj.getLink())) {
+      obj.setLink(typeMap.get(obj.getLink()));
     }
     // direct link to enum element (internal reduction)
-    if (elemMap.containsKey(obj.link)) {
-      obj.link = elemMap.get(obj.link);
+    if (elemMap.containsKey(obj.getLink())) {
+      obj.setLink(elemMap.get(obj.getLink()));
     }
 
     return null;

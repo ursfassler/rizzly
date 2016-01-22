@@ -24,8 +24,8 @@ import ast.data.Namespace;
 import ast.data.file.RizzlyFile;
 import ast.data.raw.RawComponent;
 import ast.data.raw.RawComposition;
+import ast.data.reference.LinkedReferenceWithOffset;
 import ast.data.reference.RefTemplCall;
-import ast.data.reference.Reference;
 import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
@@ -73,16 +73,16 @@ class CompLinkReductionWorker extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitCompUse(ast.data.component.composition.CompUse obj, Void param) {
-    Reference compRef = obj.compRef.ref;
-    Named item = compRef.link;
+  protected Void visitCompUse(ast.data.component.composition.ComponentUse obj, Void param) {
+    LinkedReferenceWithOffset compRef = obj.compRef.ref;
+    Named item = compRef.getLink();
 
-    while (!compRef.offset.isEmpty()) {
-      if (compRef.offset.get(0) instanceof RefTemplCall) {
+    while (!compRef.getOffset().isEmpty()) {
+      if (compRef.getOffset().get(0) instanceof RefTemplCall) {
         break;
       }
-      ast.data.reference.RefName rn = (ast.data.reference.RefName) compRef.offset.get(0);
-      compRef.offset.remove(0);
+      ast.data.reference.RefName rn = (ast.data.reference.RefName) compRef.getOffset().get(0);
+      compRef.getOffset().remove(0);
       if (item instanceof RizzlyFile) {
         item = NameFilter.select(TypeFilter.select(((RizzlyFile) item).objects, RawComponent.class), rn.name);
       } else if (item instanceof Namespace) {
@@ -94,7 +94,7 @@ class CompLinkReductionWorker extends NullDispatcher<Void, Void> {
     }
 
     assert (item instanceof RawComponent);
-    compRef.link = item;
+    compRef.setLink(item);
 
     return null;
   }

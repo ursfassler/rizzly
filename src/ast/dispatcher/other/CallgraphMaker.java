@@ -27,7 +27,7 @@ import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefItem;
 import ast.data.reference.RefName;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.type.Type;
 import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
@@ -81,14 +81,14 @@ public class CallgraphMaker extends DfsTraverser<Void, Ast> {
   }
 
   @Override
-  protected Void visitReference(Reference obj, Ast param) {
+  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Ast param) {
     super.visitReference(obj, param);
 
     if (param != null) {
       Set<Function> target = new HashSet<Function>();
 
-      Ast item = obj.link;
-      for (RefItem itr : obj.offset) {
+      Ast item = obj.getLink();
+      for (RefItem itr : obj.getOffset()) {
         item = RefGetter.process(itr, item, target, kb);
       }
 
@@ -142,8 +142,8 @@ class RefGetter extends NullDispatcher<Ast, Ast> {
       param = (((Variable) param).type).ref.getTarget();
     } else if (param instanceof NamedElement) {
       param = (((NamedElement) param).typeref).ref.getTarget();
-    } else if (param instanceof Reference) {
-      param = ((Reference) param).getTarget();
+    } else if (param instanceof LinkedReferenceWithOffset_Implementation) {
+      param = ((LinkedReferenceWithOffset_Implementation) param).getTarget();
     }
     if (param instanceof TypeReference) {
       param = ((TypeReference) param).ref.getTarget();

@@ -23,7 +23,8 @@ import java.util.Iterator;
 import ast.data.Ast;
 import ast.data.expression.value.NumberValue;
 import ast.data.expression.value.StringValue;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
@@ -117,10 +118,10 @@ class EqualTraverser extends NullDispatcher<Boolean, Object> {
   }
 
   @Override
-  protected Boolean visitReference(Reference obj, Object param) {
-    if (param instanceof Reference) {
-      Reference other = (Reference) param;
-      return (obj.link == other.link) && visitList(obj.offset, other.offset);
+  protected Boolean visitReference(LinkedReferenceWithOffset_Implementation obj, Object param) {
+    if (param instanceof LinkedReferenceWithOffset_Implementation) {
+      LinkedReferenceWithOffset other = (LinkedReferenceWithOffset) param;
+      return (obj.getLink() == other.getLink()) && visitList(obj.getOffset(), other.getOffset());
     } else {
       return false;
     }

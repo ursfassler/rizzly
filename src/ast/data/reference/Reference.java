@@ -18,37 +18,7 @@
 package ast.data.reference;
 
 import ast.data.Ast;
-import ast.data.AstBase;
-import ast.data.AstList;
-import ast.data.Named;
-import ast.visitor.Visitor;
 
-public class Reference extends AstBase {
-  public Named link;
-  public final AstList<RefItem> offset;
+public interface Reference extends Ast {
 
-  public Reference(Named link, AstList<RefItem> offset) {
-    super();
-    this.link = link;
-    this.offset = offset;
-  }
-
-  public Ast getTarget() {
-    assert (offset.isEmpty()); // FIXME make it correct or remove function
-    return link;
-  }
-
-  @Override
-  public String toString() {
-    String ret = "->" + link;
-    for (RefItem item : offset) {
-      ret += item.toString();
-    }
-    return ret;
-  }
-
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

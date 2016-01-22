@@ -15,22 +15,26 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.variable;
+package ast.repository.query.Referencees;
 
-import ast.data.expression.Expression;
-import ast.data.type.TypeReference;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
-abstract public class DefVariable extends Variable {
-  public Expression def;
+import org.junit.Test;
 
-  public DefVariable(String name, TypeReference type, Expression def) {
-    super(name, type);
-    this.def = def;
-  }
+import ast.data.Ast;
 
-  @Override
-  public String toString() {
-    return super.toString() + "=" + def;
+public class PossibleTargetAdder_Test {
+  final private ReferenceesWriter referencees = mock(ReferenceesWriter.class);
+  final private PossibleTargetAdder testee = new PossibleTargetAdder(referencees);
+
+  @Test
+  public void adds_visited_item() {
+    Ast item = mock(Ast.class);
+
+    testee.visit(item);
+
+    verify(referencees).addTarget(item);
   }
 
 }

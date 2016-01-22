@@ -47,8 +47,8 @@ public class StateReferenceParser_Test {
 
     StateRef stateRef = testee.parse();
 
-    Assert.assertEquals("xyz", stateRef.ref.link.getName());
-    Assert.assertEquals(0, stateRef.ref.offset.size());
+    Assert.assertEquals("xyz", stateRef.ref.getLink().getName());
+    Assert.assertEquals(0, stateRef.ref.getOffset().size());
   }
 
   @Test
@@ -59,11 +59,11 @@ public class StateReferenceParser_Test {
 
     StateRef stateRef = testee.parse();
 
-    Assert.assertEquals("x", stateRef.ref.link.getName());
-    Assert.assertEquals(1, stateRef.ref.offset.size());
+    Assert.assertEquals("x", stateRef.ref.getLink().getName());
+    Assert.assertEquals(1, stateRef.ref.getOffset().size());
 
-    Assert.assertTrue(stateRef.ref.offset.get(0) instanceof RefName);
-    Assert.assertEquals("y", ((RefName) stateRef.ref.offset.get(0)).name);
+    Assert.assertTrue(stateRef.ref.getOffset().get(0) instanceof RefName);
+    Assert.assertEquals("y", ((RefName) stateRef.ref.getOffset().get(0)).name);
   }
 
   @Test
@@ -76,13 +76,13 @@ public class StateReferenceParser_Test {
 
     StateRef stateRef = testee.parse();
 
-    Assert.assertEquals("x", stateRef.ref.link.getName());
-    Assert.assertEquals(2, stateRef.ref.offset.size());
+    Assert.assertEquals("x", stateRef.ref.getLink().getName());
+    Assert.assertEquals(2, stateRef.ref.getOffset().size());
 
-    Assert.assertTrue(stateRef.ref.offset.get(0) instanceof RefName);
-    Assert.assertEquals("y", ((RefName) stateRef.ref.offset.get(0)).name);
-    Assert.assertTrue(stateRef.ref.offset.get(1) instanceof RefName);
-    Assert.assertEquals("z", ((RefName) stateRef.ref.offset.get(1)).name);
+    Assert.assertTrue(stateRef.ref.getOffset().get(0) instanceof RefName);
+    Assert.assertEquals("y", ((RefName) stateRef.ref.getOffset().get(0)).name);
+    Assert.assertTrue(stateRef.ref.getOffset().get(1) instanceof RefName);
+    Assert.assertEquals("z", ((RefName) stateRef.ref.getOffset().get(1)).name);
   }
 
   @Test
@@ -91,8 +91,8 @@ public class StateReferenceParser_Test {
 
     StateRef stateRef = testee.parse();
 
-    Assert.assertEquals("self", stateRef.ref.link.getName());
-    Assert.assertEquals(0, stateRef.ref.offset.size());
+    Assert.assertEquals("self", stateRef.ref.getLink().getName());
+    Assert.assertEquals(0, stateRef.ref.getOffset().size());
   }
 
   @Test

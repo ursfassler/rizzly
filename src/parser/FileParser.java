@@ -29,7 +29,7 @@ import ast.Designator;
 import ast.data.Named;
 import ast.data.file.RizzlyFile;
 import ast.data.template.Template;
-import ast.data.variable.ConstGlobal;
+import ast.data.variable.GlobalConstant;
 import ast.data.variable.TemplateParameter;
 import ast.meta.MetaList;
 import error.ErrorType;
@@ -73,7 +73,7 @@ public class FileParser extends BaseParser {
         if (!def.second.isEmpty()) {
           RError.err(ErrorType.Error, "no generic arguments allowed for instantiations", def.second.get(0).metadata());
         }
-        ConstGlobal object = type().parseConstDef(ConstGlobal.class, def.first.getData());
+        GlobalConstant object = type().parseConstDef(GlobalConstant.class, def.first.getData());
         expect(TokenType.SEMI);
 
         ret.objects.add(object);

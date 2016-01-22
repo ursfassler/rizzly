@@ -35,7 +35,7 @@ import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FuncReturnTuple;
 import ast.data.function.ret.FunctionReturnType;
 import ast.data.reference.RefFactory;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.Block;
 import ast.data.type.TypeReference;
 import ast.data.type.special.AnyType;
@@ -202,7 +202,7 @@ public class BaseParser extends Parser {
     if (peek().getType() != TokenType.EQUAL) {
       type = expr().parseRefType();
     } else {
-      Reference ref = RefFactory.create(AnyType.NAME);
+      LinkedReferenceWithOffset_Implementation ref = RefFactory.create(AnyType.NAME);
       ref.metadata().add(info);
       type = new TypeReference(ref);
       type.metadata().add(info);

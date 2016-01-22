@@ -40,10 +40,10 @@ import ast.data.component.hfsm.Transition;
 import ast.data.expression.Expression;
 import ast.data.expression.ReferenceExpression;
 import ast.data.function.Function;
-import ast.data.function.header.FuncProcedure;
+import ast.data.function.header.Procedure;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.reference.RefFactory;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.Assignment;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
@@ -84,12 +84,12 @@ public class TransitionDownPropagator extends AstPass {
 
     assert (tec.getTdst().size() == tec.getTsrc().size());
     assert (tec.getTdst().size() == tec.getTtop().size());
-    Map<Transition, FuncProcedure> tfunc = new HashMap<Transition, FuncProcedure>();
+    Map<Transition, Procedure> tfunc = new HashMap<Transition, Procedure>();
     int nr = 0;
     for (Transition trans : tec.getTdst().keySet()) {
       String name = Designator.NAME_SEP + "trans" + nr;
       nr++;
-      FuncProcedure func = makeTransBodyFunc(trans, name);
+      Procedure func = makeTransBodyFunc(trans, name);
       hfsm.topstate.item.add(func);
       tfunc.put(trans, func);
     }
@@ -103,9 +103,9 @@ public class TransitionDownPropagator extends AstPass {
    *
    * @param name
    */
-  private static FuncProcedure makeTransBodyFunc(Transition trans, String name) {
+  private static Procedure makeTransBodyFunc(Transition trans, String name) {
     AstList<FunctionVariable> params = Copy.copy(trans.param);
-    FuncProcedure func = new FuncProcedure(name, params, new FuncReturnNone(), trans.body);
+    Procedure func = new Procedure(name, params, new FuncReturnNone(), trans.body);
     trans.body = new Block();
 
     FsmReduction.relinkActualParameterRef(trans.param, func.param, func.body);
@@ -120,9 +120,9 @@ class TransitionDownPropagatorWorker extends NullDispatcher<Void, TransitionPara
   private final Map<Transition, State> tsrc;
   private final Map<Transition, State> tdst;
   private final Map<Transition, State> ttop;
-  private final Map<Transition, FuncProcedure> tfunc;
+  private final Map<Transition, Procedure> tfunc;
 
-  public TransitionDownPropagatorWorker(KnowledgeBase kb, Map<Transition, State> tsrc, Map<Transition, State> tdst, Map<Transition, State> ttop, Map<Transition, FuncProcedure> tfunc) {
+  public TransitionDownPropagatorWorker(KnowledgeBase kb, Map<Transition, State> tsrc, Map<Transition, State> tdst, Map<Transition, State> ttop, Map<Transition, Procedure> tfunc) {
     super();
     this.tsrc = tsrc;
     this.tdst = tdst;
@@ -168,16 +168,16 @@ class TransitionDownPropagatorWorker extends NullDispatcher<Void, TransitionPara
 
     makeExitCalls(src, os, trans.body.statements);
     {
-      FuncProcedure func = tfunc.get(otrans);
+      Procedure func = tfunc.get(otrans);
       assert (func != null);
 
       AstList<Expression> arg = new AstList<Expression>();
       for (Variable acpar : trans.param) {
-        Reference parref = RefFactory.full(acpar);
+        LinkedReferenceWithOffset_Implementation parref = RefFactory.full(acpar);
         arg.add(new ReferenceExpression(parref));
       }
 
-      Reference ref = RefFactory.call(func, arg);
+      LinkedReferenceWithOffset_Implementation ref = RefFactory.call(func, arg);
       CallStmt call = new CallStmt(ref);
       trans.body.statements.add(call);
     }
@@ -235,7 +235,7 @@ class TransitionDownPropagatorWorker extends NullDispatcher<Void, TransitionPara
   }
 
   private CallStmt makeCall(Function func) {
-    Reference ref = RefFactory.call(func);
+    LinkedReferenceWithOffset_Implementation ref = RefFactory.call(func);
     return new CallStmt(ref);
   }
 

@@ -20,7 +20,7 @@ package ast.data.variable;
 import ast.data.expression.Expression;
 import ast.data.type.TypeReference;
 
-abstract public class Constant extends DefVariable {
+abstract public class Constant extends DefaultVariable {
 
   public Constant(String name, TypeReference type, Expression def) {
     super(name, type, def);

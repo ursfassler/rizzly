@@ -33,7 +33,7 @@ import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.component.Component;
 import ast.data.component.composition.AsynchroniusConnection;
-import ast.data.component.composition.CompUse;
+import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.Connection;
 import ast.data.component.composition.Direction;
@@ -48,13 +48,13 @@ import ast.data.component.elementary.ImplElementary;
 import ast.data.expression.Expression;
 import ast.data.expression.ReferenceExpression;
 import ast.data.expression.value.TupleValue;
-import ast.data.function.FuncRef;
+import ast.data.function.FunctionReference;
 import ast.data.function.FuncRefFactory;
 import ast.data.function.Function;
 import ast.data.function.InterfaceFunction;
-import ast.data.function.header.FuncProcedure;
+import ast.data.function.header.Procedure;
 import ast.data.function.header.FuncQuery;
-import ast.data.function.header.FuncResponse;
+import ast.data.function.header.Response;
 import ast.data.function.header.FuncSubHandlerEvent;
 import ast.data.function.header.FuncSubHandlerQuery;
 import ast.data.function.header.Signal;
@@ -63,7 +63,7 @@ import ast.data.function.ret.FuncReturnNone;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefName;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.ExpressionReturn;
@@ -150,8 +150,8 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
   protected Ast visitImplComposition(ImplComposition obj, Void param) {
     MetaList info = obj.metadata();  // TODO use this info for everything in this function
 
-    FuncProcedure entry = new FuncProcedure("_entry", new AstList<FunctionVariable>(), new FuncReturnNone(), new Block());
-    FuncProcedure exit = new FuncProcedure("_exit", new AstList<FunctionVariable>(), new FuncReturnNone(), new Block());
+    Procedure entry = new Procedure("_entry", new AstList<FunctionVariable>(), new FuncReturnNone(), new Block());
+    Procedure exit = new Procedure("_exit", new AstList<FunctionVariable>(), new FuncReturnNone(), new Block());
 
     ImplElementary elem = new ImplElementary(obj.getName(), FuncRefFactory.create(entry), FuncRefFactory.create(exit));
     elem.function.add(entry);
@@ -162,9 +162,9 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
     elem.function.addAll(obj.function);
     elem.queue = obj.queue;
 
-    Map<Pair<CompUse, Function>, Function> coca = new HashMap<Pair<CompUse, Function>, Function>();
+    Map<Pair<ComponentUse, Function>, Function> coca = new HashMap<Pair<ComponentUse, Function>, Function>();
 
-    for (CompUse compu : obj.component) {
+    for (ComponentUse compu : obj.component) {
       SubCallbacks suc = new SubCallbacks(new CompUseRef(info, RefFactory.create(info, compu)));
       suc.metadata().add(compu.metadata());
       elem.subCallback.add(suc);
@@ -172,7 +172,7 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
       for (InterfaceFunction out : usedComp.getIface(Direction.out)) {
         Function suha = CompositionReduction.makeHandler(out);
         suc.func.add(suha);
-        coca.put(new Pair<CompUse, Function>(compu, out), suha);
+        coca.put(new Pair<ComponentUse, Function>(compu, out), suha);
       }
     }
 
@@ -182,7 +182,7 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
       if (src instanceof EndpointSelf) {
         Function coniface = src.getFunc();
 
-        if (coniface instanceof FuncResponse) {
+        if (coniface instanceof Response) {
           // assert (elem.getResponse().contains(coniface));
           assert (coniface.body.statements.isEmpty());
           assert (con instanceof SynchroniusConnection);
@@ -196,12 +196,12 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
           RError.err(ErrorType.Fatal, "Unexpected function type: " + coniface.getClass().getSimpleName(), coniface.metadata());
         }
       } else {
-        CompUse srcCompRef = ((EndpointSub) src).component.getTarget();
+        ComponentUse srcCompRef = ((EndpointSub) src).component.getTarget();
         Component srcComp = srcCompRef.compRef.getTarget();
         InterfaceFunction funa = NameFilter.select(srcComp.iface, ((EndpointSub) src).function);
         Function coniface = funa;
 
-        Function suha = coca.get(new Pair<CompUse, Function>(srcCompRef, coniface));
+        Function suha = coca.get(new Pair<ComponentUse, Function>(srcCompRef, coniface));
 
         if (coniface instanceof FuncQuery) {
           // assert (srcComp.getLink().getQuery().contains(coniface));
@@ -233,7 +233,7 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
   }
 
   static private ExpressionReturn makeQueryCall(Endpoint ep, Function func) {
-    Reference ref = epToRef(ep);
+    LinkedReferenceWithOffset_Implementation ref = epToRef(ep);
 
     TupleValue actparam = new TupleValue(new AstList<Expression>());
     for (Variable var : func.param) {
@@ -242,28 +242,28 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
 
     RefCall call = new RefCall(actparam);
     call.metadata().add(func.metadata());
-    ref.offset.add(call);
+    ref.getOffset().add(call);
 
     return new ExpressionReturn(new ReferenceExpression(ref));
   }
 
   private MsgPush makePostQueueCall(Endpoint ep, Function func, Component comp) {
-    Reference ref = epToRef(ep);
+    LinkedReferenceWithOffset_Implementation ref = epToRef(ep);
 
     List<Expression> actparam = new ArrayList<Expression>();
     for (Variable var : func.param) {
       actparam.add(new ReferenceExpression(RefFactory.full(func.metadata(), var)));
     }
 
-    Reference queue = getQueue(ep, comp);
-    MsgPush push = new MsgPush(queue, new FuncRef(ref), actparam);
+    LinkedReferenceWithOffset_Implementation queue = getQueue(ep, comp);
+    MsgPush push = new MsgPush(queue, new FunctionReference(ref), actparam);
     push.metadata().add(func.metadata());
     return push;
   }
 
   static private CallStmt makeEventCall(Endpoint ep, Function func) {
 
-    Reference ref = epToRef(ep);
+    LinkedReferenceWithOffset_Implementation ref = epToRef(ep);
 
     TupleValue actparam = new TupleValue(new AstList<Expression>());
     for (Variable var : func.param) {
@@ -272,31 +272,31 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
 
     RefCall call = new RefCall(actparam);
     call.metadata().add(func.metadata());
-    ref.offset.add(call);
+    ref.getOffset().add(call);
 
     CallStmt callStmt = new CallStmt(ref);
     callStmt.metadata().add(func.metadata());
     return callStmt;
   }
 
-  static private Reference epToRef(Endpoint ep) {
+  static private LinkedReferenceWithOffset_Implementation epToRef(Endpoint ep) {
     if (ep instanceof EndpointSelf) {
       return RefFactory.full(ep.metadata(), ((EndpointSelf) ep).getFunc());
     } else {
       EndpointSub eps = (EndpointSub) ep;
-      Reference ref = RefFactory.full(eps.metadata(), eps.component.getTarget());
-      ref.offset.add(new RefName(eps.metadata(), eps.function));
+      LinkedReferenceWithOffset_Implementation ref = RefFactory.full(eps.metadata(), eps.component.getTarget());
+      ref.getOffset().add(new RefName(eps.metadata(), eps.function));
       return ref;
     }
   }
 
-  private Reference getQueue(Endpoint ep, Component comp) {
-    Reference ref;
+  private LinkedReferenceWithOffset_Implementation getQueue(Endpoint ep, Component comp) {
+    LinkedReferenceWithOffset_Implementation ref;
     if (ep instanceof EndpointSub) {
       ref = RefFactory.full(ep.metadata(), ((EndpointSub) ep).component.getTarget());
       Component refComp = ((EndpointSub) ep).component.getTarget().compRef.getTarget();
       Queue queue = refComp.queue;
-      ref.offset.add(new RefName(queue.getName()));
+      ref.getOffset().add(new RefName(queue.getName()));
     } else {
       ref = RefFactory.full(ep.metadata(), comp.queue);
     }

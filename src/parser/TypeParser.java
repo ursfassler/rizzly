@@ -28,7 +28,7 @@ import ast.data.AstList;
 import ast.data.Named;
 import ast.data.function.Function;
 import ast.data.raw.RawComponent;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.type.Type;
 import ast.data.type.TypeReference;
 import ast.data.type.base.EnumElement;
@@ -114,7 +114,7 @@ public class TypeParser extends BaseParser {
 
   // EBNF derivatetype: ref ";"
   private AliasType parseDerivateType(String name) {
-    Reference ref = expr().parseRef();
+    LinkedReferenceWithOffset_Implementation ref = expr().parseRef();
     expect(TokenType.SEMI);
     TypeReference typeref = new TypeReference(ref);
     typeref.metadata().add(ref.metadata());

@@ -23,7 +23,7 @@ import ast.copy.Copy;
 import ast.data.AstList;
 import ast.data.expression.Expression;
 import ast.data.expression.value.AnyValue;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.CaseOpt;
@@ -84,7 +84,7 @@ public class StatementParser extends BaseParser {
   }
 
   // EBNF vardefstmt: lhs ":" ref [ "=" expr ] ";"
-  private VarDefInitStmt parseVarDefStmt(AstList<Reference> lhs) {
+  private VarDefInitStmt parseVarDefStmt(AstList<LinkedReferenceWithOffset_Implementation> lhs) {
     MetaList info = expect(TokenType.COLON).getMetadata();
     TypeReference type = expr().parseRefType();
 
@@ -99,13 +99,13 @@ public class StatementParser extends BaseParser {
     expect(TokenType.SEMI);
 
     AstList<FunctionVariable> variables = new AstList<FunctionVariable>();
-    for (Reference ref : lhs) {
-      if (!ref.offset.isEmpty()) {
+    for (LinkedReferenceWithOffset_Implementation ref : lhs) {
+      if (!ref.getOffset().isEmpty()) {
         RError.err(ErrorType.Error, "expected identifier", ref.metadata());
       }
 
       TypeReference ntype = Copy.copy(type);
-      FunctionVariable var = new FunctionVariable(ref.link.getName(), ntype);
+      FunctionVariable var = new FunctionVariable(ref.getLink().getName(), ntype);
       var.metadata().add(ref.metadata());
       variables.add(var);
     }
@@ -255,7 +255,7 @@ public class StatementParser extends BaseParser {
   }
 
   private Statement parseVardefOrAssignmentOrCallstmt() {
-    AstList<Reference> lhs = parseLhs();
+    AstList<LinkedReferenceWithOffset_Implementation> lhs = parseLhs();
     Token tok = peek();
     switch (tok.getType()) {
       case COLON: {
@@ -279,8 +279,8 @@ public class StatementParser extends BaseParser {
   }
 
   // EBNF lhs: varref { "," varref }
-  private AstList<Reference> parseLhs() {
-    AstList<Reference> lhs = new AstList<Reference>();
+  private AstList<LinkedReferenceWithOffset_Implementation> parseLhs() {
+    AstList<LinkedReferenceWithOffset_Implementation> lhs = new AstList<LinkedReferenceWithOffset_Implementation>();
     do {
       lhs.add(expr().parseRef());
     } while (consumeIfEqual(TokenType.COMMA));
@@ -288,7 +288,7 @@ public class StatementParser extends BaseParser {
   }
 
   // EBNF assignment: lhs ":=" expr ";"
-  private MultiAssignment parseAssignment(AstList<Reference> ref) {
+  private MultiAssignment parseAssignment(AstList<LinkedReferenceWithOffset_Implementation> ref) {
     Token tok = expect(TokenType.BECOMES);
     Expression rhs = expr().parse();
     expect(TokenType.SEMI);

@@ -19,9 +19,9 @@ package parser;
 
 import parser.scanner.Token;
 import parser.scanner.TokenType;
-import ast.data.component.CompRef;
+import ast.data.component.ComponentReference;
 import ast.data.component.composition.AsynchroniusConnection;
-import ast.data.component.composition.CompUse;
+import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.Connection;
 import ast.data.component.composition.Endpoint;
 import ast.data.component.composition.EndpointRaw;
@@ -30,7 +30,7 @@ import ast.data.raw.RawComponent;
 import ast.data.raw.RawComposition;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefName;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.meta.MetaList;
 import error.ErrorType;
 import error.RError;
@@ -69,9 +69,9 @@ public class ImplCompositionParser extends ImplBaseParser {
   private void parseInstantiation(Token id, RawComposition comp) {
     switch (peek().getType()) {
       case IDENTIFIER:
-        CompRef type = expr().parseRefComp();
+        ComponentReference type = expr().parseRefComp();
         expect(TokenType.SEMI);
-        ast.data.component.composition.CompUse compUse = new CompUse(id.getMetadata(), id.getData(), type);
+        ast.data.component.composition.ComponentUse compUse = new ComponentUse(id.getMetadata(), id.getData(), type);
         comp.getInstantiation().add(compUse);
         break;
       default: {
@@ -113,10 +113,10 @@ public class ImplCompositionParser extends ImplBaseParser {
       RError.err(ErrorType.Error, "Expected IDENTIFIER, got " + tok.getType(), tok.getMetadata());
       return null;
     }
-    Reference ref = RefFactory.full(tok.getMetadata(), tok.getData());
+    LinkedReferenceWithOffset_Implementation ref = RefFactory.full(tok.getMetadata(), tok.getData());
     if (consumeIfEqual(TokenType.PERIOD)) {
       tok = expect(TokenType.IDENTIFIER);
-      ref.offset.add(new RefName(tok.getMetadata(), tok.getData()));
+      ref.getOffset().add(new RefName(tok.getMetadata(), tok.getData()));
     }
     return new EndpointRaw(tok.getMetadata(), ref);
   }

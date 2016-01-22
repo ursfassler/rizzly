@@ -21,7 +21,7 @@ import ast.data.AstList;
 import ast.data.expression.Expression;
 import ast.data.expression.ReferenceExpression;
 import ast.data.expression.value.ValueExpr;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset;
 import ast.data.template.ActualTemplateArgument;
 import ast.data.template.Template;
 import ast.data.type.Type;
@@ -76,7 +76,7 @@ public class Util {
     return ExprEvaluator.evaluate(itr, new Memory(), kb);
   }
 
-  private static Type evalType(Reference ref, KnowledgeBase kb) {
+  private static Type evalType(LinkedReferenceWithOffset ref, KnowledgeBase kb) {
     return (Type) RefEvaluator.execute(ref, new Memory(), kb);
   }
 

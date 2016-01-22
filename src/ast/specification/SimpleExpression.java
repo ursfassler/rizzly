@@ -20,7 +20,7 @@ package ast.specification;
 import java.util.Collection;
 
 import ast.data.Ast;
-import ast.data.component.composition.CompUse;
+import ast.data.component.composition.ComponentUse;
 import ast.data.expression.binop.BinaryExpression;
 import ast.data.expression.unop.UnaryExp;
 import ast.data.expression.value.BooleanValue;
@@ -30,13 +30,13 @@ import ast.data.function.Function;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefName;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.EnumType;
 import ast.data.type.base.RangeType;
 import ast.data.type.composed.RecordType;
 import ast.data.type.special.NaturalType;
-import ast.data.variable.ConstGlobal;
+import ast.data.variable.GlobalConstant;
 import ast.data.variable.FunctionVariable;
 import ast.data.variable.StateVariable;
 import ast.dispatcher.NullDispatcher;
@@ -70,8 +70,8 @@ class SimpleGetter extends NullDispatcher<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitReference(Reference obj, Void param) {
-    boolean ret = visit(obj.link, param) & visitList(obj.offset, param);
+  protected Boolean visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
+    boolean ret = visit(obj.getLink(), param) & visitList(obj.getOffset(), param);
     return ret;
   }
 
@@ -116,12 +116,12 @@ class SimpleGetter extends NullDispatcher<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitCompUse(CompUse obj, Void param) {
+  protected Boolean visitCompUse(ComponentUse obj, Void param) {
     return false;
   }
 
   @Override
-  protected Boolean visitConstGlobal(ConstGlobal obj, Void param) {
+  protected Boolean visitConstGlobal(GlobalConstant obj, Void param) {
     return visit(obj.type, param);
   }
 

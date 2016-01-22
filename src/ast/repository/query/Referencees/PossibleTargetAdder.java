@@ -15,24 +15,21 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.function.header;
+package ast.repository.query.Referencees;
 
-import ast.data.AstList;
-import ast.data.component.hfsm.StateContent;
-import ast.data.function.Function;
-import ast.data.function.ret.FuncReturn;
-import ast.data.statement.Block;
-import ast.data.variable.FunctionVariable;
-import ast.visitor.Visitor;
+import ast.data.Ast;
+import ast.visitor.DefaultHandler;
 
-final public class FuncProcedure extends Function implements StateContent {
+public class PossibleTargetAdder implements DefaultHandler {
+  final private ReferenceesWriter referencees;
 
-  public FuncProcedure(String name, AstList<FunctionVariable> param, FuncReturn ret, Block body) {
-    super(name, param, ret, body);
+  public PossibleTargetAdder(ReferenceesWriter referencees) {
+    this.referencees = referencees;
   }
 
   @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
+  public void visit(Ast ast) {
+    referencees.addTarget(ast);
   }
+
 }

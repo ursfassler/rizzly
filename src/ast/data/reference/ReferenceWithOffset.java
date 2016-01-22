@@ -15,28 +15,13 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.function;
+package ast.data.reference;
 
-import ast.data.reference.Reference;
-import ast.data.reference.TypedRef;
-import ast.meta.MetaList;
-import ast.visitor.Visitor;
+import ast.data.Ast;
+import ast.data.AstList;
 
-final public class FuncRef extends TypedRef<Function> {
+public interface ReferenceWithOffset extends Ast {
 
-  public FuncRef(Reference ref) {
-    super(ref);
-  }
-
-  @Deprecated
-  public FuncRef(MetaList info, Reference ref) {
-    super(ref);
-    metadata().add(info);
-  }
-
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
+  public abstract AstList<RefItem> getOffset();
 
 }

@@ -15,26 +15,15 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.reference;
+package ast.repository.query.Referencees;
 
 import ast.data.Ast;
-import ast.data.AstBase;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 
-public abstract class TypedRef<T extends Ast> extends AstBase {
-  public Reference ref;
+public interface ReferenceesWriter {
 
-  public TypedRef(Reference ref) {
-    super();
-    this.ref = ref;
-  }
+  public void addTarget(Ast target);
 
-  public T getTarget() {
-    return (T) ref.getTarget();
-  }
-
-  @Override
-  public String toString() {
-    return "->" + ref;
-  }
+  public void addReferencee(LinkedReferenceWithOffset_Implementation referencee);
 
 }

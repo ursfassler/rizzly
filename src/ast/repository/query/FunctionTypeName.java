@@ -20,9 +20,9 @@ package ast.repository.query;
 import ast.data.Ast;
 import ast.data.function.Function;
 import ast.data.function.header.FuncFunction;
-import ast.data.function.header.FuncProcedure;
+import ast.data.function.header.Procedure;
 import ast.data.function.header.FuncQuery;
-import ast.data.function.header.FuncResponse;
+import ast.data.function.header.Response;
 import ast.data.function.header.Signal;
 import ast.data.function.header.Slot;
 import ast.data.function.header.FuncSubHandlerEvent;
@@ -60,12 +60,12 @@ class FunctionTypeNameDispatcher extends NullDispatcher<String, Void> {
   }
 
   @Override
-  protected String visitFuncResponse(FuncResponse obj, Void param) {
+  protected String visitFuncResponse(Response obj, Void param) {
     return "response";
   }
 
   @Override
-  protected String visitFuncProcedure(FuncProcedure obj, Void param) {
+  protected String visitFuncProcedure(Procedure obj, Void param) {
     return "procedure";
   }
 

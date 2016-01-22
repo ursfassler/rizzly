@@ -31,13 +31,17 @@ import ast.data.expression.value.BooleanValue;
 import ast.data.expression.value.NumberValue;
 import ast.data.expression.value.TupleValue;
 import ast.meta.MetaInformation;
+import ast.pass.output.xml.IdReader;
+import ast.visitor.Visitor;
 
 public class Writer_ValueExpression_Test {
   final private XmlStreamWriter stream = mock(XmlStreamWriter.class);
-  final private Write testee = new Write(stream);
+  final private IdReader astId = mock(IdReader.class);
+  final private Visitor idWriter = mock(Visitor.class);
+  final private Write testee = new Write(stream, astId, idWriter);
   final private MetaInformation info = mock(MetaInformation.class);
   final private Expression child = mock(Expression.class);
-  final private InOrder order = Mockito.inOrder(stream, info, child);
+  final private InOrder order = Mockito.inOrder(stream, info, child, idWriter);
 
   @Test
   public void write_boolean_false() {
@@ -48,6 +52,7 @@ public class Writer_ValueExpression_Test {
 
     order.verify(stream).beginNode(eq("BooleanValue"));
     order.verify(stream).attribute(eq("value"), eq("False"));
+    order.verify(idWriter).visit(value);
     order.verify(info).accept(eq(testee));
     order.verify(stream).endNode();
   }
@@ -61,6 +66,7 @@ public class Writer_ValueExpression_Test {
 
     order.verify(stream).beginNode(eq("BooleanValue"));
     order.verify(stream).attribute(eq("value"), eq("True"));
+    order.verify(idWriter).visit(value);
     order.verify(info).accept(eq(testee));
     order.verify(stream).endNode();
   }
@@ -74,6 +80,7 @@ public class Writer_ValueExpression_Test {
 
     order.verify(stream).beginNode(eq("NumberValue"));
     order.verify(stream).attribute(eq("value"), eq("0"));
+    order.verify(idWriter).visit(value);
     order.verify(info).accept(eq(testee));
     order.verify(stream).endNode();
   }
@@ -87,6 +94,7 @@ public class Writer_ValueExpression_Test {
 
     order.verify(stream).beginNode(eq("NumberValue"));
     order.verify(stream).attribute(eq("value"), eq("42"));
+    order.verify(idWriter).visit(value);
     order.verify(info).accept(eq(testee));
     order.verify(stream).endNode();
   }
@@ -100,6 +108,7 @@ public class Writer_ValueExpression_Test {
 
     order.verify(stream).beginNode(eq("NumberValue"));
     order.verify(stream).attribute(eq("value"), eq("-1000"));
+    order.verify(idWriter).visit(value);
     order.verify(info).accept(eq(testee));
     order.verify(stream).endNode();
   }
@@ -113,6 +122,7 @@ public class Writer_ValueExpression_Test {
     testee.visit(value);
 
     order.verify(stream).beginNode(eq("TupleValue"));
+    order.verify(idWriter).visit(value);
     order.verify(info).accept(eq(testee));
     order.verify(child).accept(eq(testee));
     order.verify(stream).endNode();

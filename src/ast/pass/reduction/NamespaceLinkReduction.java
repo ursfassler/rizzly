@@ -24,7 +24,7 @@ import ast.data.Namespace;
 import ast.data.file.RizzlyFile;
 import ast.data.reference.LinkTarget;
 import ast.data.reference.RefName;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
@@ -59,12 +59,12 @@ public class NamespaceLinkReduction extends AstPass {
 class NamespaceLinkReductionWorker extends DfsTraverser<Void, Void> {
 
   @Override
-  protected Void visitReference(Reference obj, Void param) {
-    Ast item = obj.link;
+  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
+    Ast item = obj.getLink();
     assert (!(item instanceof LinkTarget));
     while (item instanceof Namespace) {
-      ast.data.reference.RefItem next = obj.offset.get(0);
-      obj.offset.remove(0);
+      ast.data.reference.RefItem next = obj.getOffset().get(0);
+      obj.getOffset().remove(0);
       if (!(next instanceof RefName)) {
         RError.err(ErrorType.Error, "Expected named offset, got: " + next.getClass().getCanonicalName(), obj.metadata());
       }
@@ -73,8 +73,8 @@ class NamespaceLinkReductionWorker extends DfsTraverser<Void, Void> {
       assert (item != null); // type checker should find it?
     }
     if (item instanceof RizzlyFile) {
-      ast.data.reference.RefItem next = obj.offset.get(0);
-      obj.offset.remove(0);
+      ast.data.reference.RefItem next = obj.getOffset().get(0);
+      obj.getOffset().remove(0);
       if (!(next instanceof RefName)) {
         RError.err(ErrorType.Error, "Expected named offset, got: " + next.getClass().getCanonicalName(), obj.metadata());
       }
@@ -82,7 +82,7 @@ class NamespaceLinkReductionWorker extends DfsTraverser<Void, Void> {
       item = Single.staticForce(ChildCollector.select(item, new HasName(name.name)), item.metadata());
       assert (item != null); // type checker should find it?
     }
-    obj.link = (Named) item;
+    obj.setLink((Named) item);
     return super.visitReference(obj, param);
   }
 

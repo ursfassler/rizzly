@@ -17,13 +17,13 @@
 
 package ast.data.expression;
 
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.visitor.Visitor;
 
 final public class ReferenceExpression extends Expression {
-  public Reference reference;
+  public LinkedReferenceWithOffset_Implementation reference;
 
-  public ReferenceExpression(Reference ref) {
+  public ReferenceExpression(LinkedReferenceWithOffset_Implementation ref) {
     this.reference = ref;
   }
 

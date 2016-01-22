@@ -38,7 +38,7 @@ import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
 import ast.data.reference.LinkTarget;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.Block;
 import ast.data.statement.VarDefInitStmt;
 import ast.data.template.Template;
@@ -139,9 +139,9 @@ class LinkerWorker extends DfsTraverser<Void, SymbolTable> {
   }
 
   @Override
-  protected Void visitReference(Reference obj, SymbolTable param) {
-    if (obj.link instanceof LinkTarget) {
-      String name = ((LinkTarget) obj.link).getName();
+  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, SymbolTable param) {
+    if (obj.getLink() instanceof LinkTarget) {
+      String name = ((LinkTarget) obj.getLink()).getName();
 
       Named link = param.find(name);
       if (link == null) {
@@ -149,7 +149,7 @@ class LinkerWorker extends DfsTraverser<Void, SymbolTable> {
       }
       assert (!(link instanceof LinkTarget));
 
-      obj.link = link;
+      obj.setLink(link);
     }
     return super.visitReference(obj, param);
   }
@@ -241,7 +241,7 @@ class LinkerWorker extends DfsTraverser<Void, SymbolTable> {
     param.addAll(obj.param);
 
     // get context from src state and add event arguments
-    SymbolTable srcNames = stateNames.get(obj.src.ref.link);
+    SymbolTable srcNames = stateNames.get(obj.src.ref.getLink());
     assert (srcNames != null);
     srcNames = new SymbolTable(srcNames);
     srcNames.addAll(obj.param);

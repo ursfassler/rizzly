@@ -24,7 +24,7 @@ import ast.data.component.composition.Queue;
 import ast.data.function.Function;
 import ast.data.function.InterfaceFunction;
 import ast.data.function.header.FuncQuery;
-import ast.data.function.header.FuncResponse;
+import ast.data.function.header.Response;
 import ast.data.function.header.Signal;
 import ast.data.function.header.Slot;
 import ast.repository.query.TypeFilter;
@@ -43,7 +43,7 @@ abstract public class Component extends Named {
     AstList<InterfaceFunction> ret = new AstList<InterfaceFunction>();
     switch (dir) {
       case in: {
-        ret.addAll(TypeFilter.select(iface, FuncResponse.class));
+        ret.addAll(TypeFilter.select(iface, Response.class));
         ret.addAll(TypeFilter.select(iface, Slot.class));
         break;
       }

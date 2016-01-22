@@ -36,7 +36,7 @@ import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.function.Function;
 import ast.data.function.ret.FuncReturn;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.type.Type;
 import ast.data.type.TypeReference;
 import ast.data.type.base.EnumElement;
@@ -117,7 +117,7 @@ public class HeaderWriter extends AstPass {
         // element of enumerator type
       } else if (itr instanceof FuncReturn) {
       } else if (itr instanceof TypeReference) {
-      } else if (itr instanceof Reference) {
+      } else if (itr instanceof LinkedReferenceWithOffset_Implementation) {
       } else {
         RError.err(ErrorType.Fatal, "Object should not be used in header file: " + itr.getClass().getCanonicalName(), itr.metadata());
       }
@@ -204,9 +204,9 @@ public class HeaderWriter extends AstPass {
     DfsTraverser<Void, Set<Type>> getter = new DfsTraverser<Void, Set<Type>>() {
 
       @Override
-      protected Void visitReference(Reference obj, Set<Type> param) {
-        if (obj.link instanceof Type) {
-          param.add((Type) obj.link);
+      protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Set<Type> param) {
+        if (obj.getLink() instanceof Type) {
+          param.add((Type) obj.getLink());
         }
         return super.visitReference(obj, param);
       }

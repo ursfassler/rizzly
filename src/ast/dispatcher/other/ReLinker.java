@@ -21,7 +21,7 @@ import java.util.Map;
 
 import ast.data.Ast;
 import ast.data.Named;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.dispatcher.DfsTraverser;
 
 public class ReLinker extends DfsTraverser<Void, Map<Ast, Ast>> {
@@ -32,10 +32,10 @@ public class ReLinker extends DfsTraverser<Void, Map<Ast, Ast>> {
   }
 
   @Override
-  protected Void visitReference(Reference obj, Map<Ast, Ast> param) {
-    Ast target = param.get(obj.link);
+  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Map<Ast, Ast> param) {
+    Ast target = param.get(obj.getLink());
     if (target != null) {
-      obj.link = (Named) target;
+      obj.setLink((Named) target);
     }
     return super.visitReference(obj, param);
   }

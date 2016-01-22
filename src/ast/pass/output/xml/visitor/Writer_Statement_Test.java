@@ -26,7 +26,7 @@ import org.mockito.Mockito;
 
 import ast.data.AstList;
 import ast.data.expression.Expression;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.ExpressionReturn;
@@ -34,16 +34,20 @@ import ast.data.statement.IfOption;
 import ast.data.statement.IfStatement;
 import ast.data.statement.MultiAssignment;
 import ast.meta.MetaInformation;
+import ast.pass.output.xml.IdReader;
+import ast.visitor.Visitor;
 
 public class Writer_Statement_Test {
   final private XmlStreamWriter stream = mock(XmlStreamWriter.class);
-  final private Write testee = new Write(stream);
+  final private IdReader astId = mock(IdReader.class);
+  final private Visitor idWriter = mock(Visitor.class);
+  final private Write testee = new Write(stream, astId, idWriter);
   final private MetaInformation info = mock(MetaInformation.class);
   final private Block child = mock(Block.class);
-  final private Reference reference = mock(Reference.class);
+  final private LinkedReferenceWithOffset_Implementation reference = mock(LinkedReferenceWithOffset_Implementation.class);
   final private Expression expression = mock(Expression.class);
   final private IfOption ifOption = mock(IfOption.class);
-  final private InOrder order = Mockito.inOrder(stream, info, child, reference, expression, ifOption);
+  final private InOrder order = Mockito.inOrder(stream, info, child, reference, expression, ifOption, idWriter);
 
   @Test
   public void write_Block() {
@@ -54,6 +58,7 @@ public class Writer_Statement_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("Block"));
+    order.verify(idWriter).visit(item);
     order.verify(info).accept(eq(testee));
     order.verify(child).accept(eq(testee));
     order.verify(stream).endNode();
@@ -67,6 +72,7 @@ public class Writer_Statement_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("CallStatement"));
+    order.verify(idWriter).visit(item);
     order.verify(info).accept(eq(testee));
     order.verify(reference).accept(eq(testee));
     order.verify(stream).endNode();
@@ -74,7 +80,7 @@ public class Writer_Statement_Test {
 
   @Test
   public void write_MultiAssignment() {
-    AstList<Reference> left = new AstList<Reference>();
+    AstList<LinkedReferenceWithOffset_Implementation> left = new AstList<LinkedReferenceWithOffset_Implementation>();
     left.add(reference);
     MultiAssignment item = new MultiAssignment(left, expression);
     item.metadata().add(info);
@@ -82,6 +88,7 @@ public class Writer_Statement_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("MultiAssignment"));
+    order.verify(idWriter).visit(item);
     order.verify(info).accept(eq(testee));
     order.verify(reference).accept(eq(testee));
     order.verify(expression).accept(eq(testee));
@@ -98,6 +105,7 @@ public class Writer_Statement_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("IfStatement"));
+    order.verify(idWriter).visit(item);
     order.verify(info).accept(eq(testee));
     order.verify(ifOption).accept(eq(testee));
     order.verify(child).accept(eq(testee));
@@ -112,6 +120,7 @@ public class Writer_Statement_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("IfOption"));
+    order.verify(idWriter).visit(item);
     order.verify(info).accept(eq(testee));
     order.verify(expression).accept(eq(testee));
     order.verify(child).accept(eq(testee));
@@ -126,6 +135,7 @@ public class Writer_Statement_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("ExpressionReturn"));
+    order.verify(idWriter).visit(item);
     order.verify(info).accept(eq(testee));
     order.verify(expression).accept(eq(testee));
     order.verify(stream).endNode();

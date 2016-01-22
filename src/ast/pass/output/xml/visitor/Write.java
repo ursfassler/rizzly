@@ -18,11 +18,12 @@
 package ast.pass.output.xml.visitor;
 
 import ast.Designator;
+import ast.data.Ast;
 import ast.data.Namespace;
-import ast.data.component.CompRef;
+import ast.data.component.ComponentReference;
 import ast.data.component.composition.AsynchroniusConnection;
-import ast.data.component.composition.CompUse;
 import ast.data.component.composition.CompUseRef;
+import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.EndpointRaw;
 import ast.data.component.composition.EndpointSelf;
 import ast.data.component.composition.EndpointSub;
@@ -76,14 +77,16 @@ import ast.data.expression.value.TupleValue;
 import ast.data.expression.value.UnionValue;
 import ast.data.expression.value.UnsafeUnionValue;
 import ast.data.file.RizzlyFile;
-import ast.data.function.FuncRef;
+import ast.data.function.Function;
+import ast.data.function.FunctionProperty;
+import ast.data.function.FunctionReference;
 import ast.data.function.header.FuncFunction;
 import ast.data.function.header.FuncInterrupt;
-import ast.data.function.header.FuncProcedure;
 import ast.data.function.header.FuncQuery;
-import ast.data.function.header.FuncResponse;
 import ast.data.function.header.FuncSubHandlerEvent;
 import ast.data.function.header.FuncSubHandlerQuery;
+import ast.data.function.header.Procedure;
+import ast.data.function.header.Response;
 import ast.data.function.header.Signal;
 import ast.data.function.header.Slot;
 import ast.data.function.ret.FuncReturnNone;
@@ -98,7 +101,8 @@ import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.TypedReference;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
@@ -144,21 +148,27 @@ import ast.data.type.special.VoidType;
 import ast.data.type.template.ArrayTemplate;
 import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
-import ast.data.variable.ConstGlobal;
 import ast.data.variable.ConstPrivate;
+import ast.data.variable.DefaultVariable;
 import ast.data.variable.FunctionVariable;
+import ast.data.variable.GlobalConstant;
 import ast.data.variable.StateVariable;
 import ast.data.variable.TemplateParameter;
-import ast.meta.MetaList;
 import ast.meta.SourcePosition;
+import ast.pass.output.xml.IdReader;
 import ast.visitor.Visitor;
+import ast.visitor.VisitorAcceptor;
 
 public class Write implements Visitor {
 
   private final XmlStreamWriter writer;
+  private final IdReader astId;
+  private final Visitor idWriter;
 
-  public Write(XmlStreamWriter writer) {
+  public Write(XmlStreamWriter writer, IdReader astId, Visitor idWriter) {
     this.writer = writer;
+    this.astId = astId;
+    this.idWriter = idWriter;
   }
 
   @Override
@@ -173,7 +183,7 @@ public class Write implements Visitor {
 
   @Override
   public void visit(AnyType object) {
-    node("AnyType");
+    node("AnyType", object);
   }
 
   @Override
@@ -183,7 +193,7 @@ public class Write implements Visitor {
 
   @Override
   public void visit(ArrayTemplate object) {
-    node("ArrayTemplate");
+    node("ArrayTemplate", object);
   }
 
   @Override
@@ -199,6 +209,7 @@ public class Write implements Visitor {
   @Override
   public void visit(MultiAssignment object) {
     writer.beginNode("MultiAssignment");
+    object.accept(idWriter);
     object.metadata().accept(this);
     object.left.accept(this);
     object.right.accept(this);
@@ -238,6 +249,7 @@ public class Write implements Visitor {
   @Override
   public void visit(Block object) {
     writer.beginNode("Block");
+    object.accept(idWriter);
     object.metadata().accept(this);
     object.statements.accept(this);
     writer.endNode();
@@ -245,17 +257,18 @@ public class Write implements Visitor {
 
   @Override
   public void visit(BooleanType object) {
-    node("Boolean");
+    node("Boolean", object);
   }
 
   @Override
   public void visit(BooleanValue object) {
-    writeValueNode(object.metadata(), "BooleanValue", object.value ? "True" : "False");
+    writeValueNode(object, "BooleanValue", object.value ? "True" : "False");
   }
 
   @Override
   public void visit(CallStmt object) {
     writer.beginNode("CallStatement");
+    object.accept(idWriter);
     object.metadata().accept(this);
     object.call.accept(this);
     writer.endNode();
@@ -292,13 +305,18 @@ public class Write implements Visitor {
   }
 
   @Override
-  public void visit(CompRef object) {
-    throw new RuntimeException("not yet implemented");
+  public void visit(ComponentReference object) {
+    visitTypedReference("ComponentReference", object);
   }
 
   @Override
-  public void visit(CompUse object) {
-    throw new RuntimeException("not yet implemented");
+  public void visit(ComponentUse object) {
+    writer.beginNode("ComponentUse");
+    writer.attribute("name", object.getName());
+    object.accept(idWriter);
+    object.metadata().accept(this);
+    object.compRef.accept(this);
+    writer.endNode();
   }
 
   @Override
@@ -307,8 +325,8 @@ public class Write implements Visitor {
   }
 
   @Override
-  public void visit(ConstGlobal object) {
-    throw new RuntimeException("not yet implemented");
+  public void visit(GlobalConstant object) {
+    visitDefaultVariable("GlobalConstant", object);
   }
 
   @Override
@@ -318,7 +336,7 @@ public class Write implements Visitor {
 
   @Override
   public void visit(DefaultValueTemplate object) {
-    node("DefaultValueTemplate");
+    node("DefaultValueTemplate", object);
   }
 
   @Override
@@ -330,6 +348,7 @@ public class Write implements Visitor {
   public void visit(LinkTarget object) {
     writer.beginNode("LinkTarget");
     writer.attribute("name", object.getName());
+    object.accept(idWriter);
     object.metadata().accept(this);
     writer.endNode();
   }
@@ -371,13 +390,7 @@ public class Write implements Visitor {
 
   @Override
   public void visit(FuncFunction object) {
-    writer.beginNode("Function");
-    writer.attribute("name", object.getName());
-    object.metadata().accept(this);
-    object.param.accept(this);
-    object.ret.accept(this);
-    object.body.accept(this);
-    writer.endNode();
+    visitFunction("Function", object);
   }
 
   @Override
@@ -386,8 +399,8 @@ public class Write implements Visitor {
   }
 
   @Override
-  public void visit(FuncProcedure object) {
-    throw new RuntimeException("not yet implemented");
+  public void visit(Procedure object) {
+    visitProcedure("Procedure", object);
   }
 
   @Override
@@ -396,13 +409,13 @@ public class Write implements Visitor {
   }
 
   @Override
-  public void visit(FuncRef object) {
-    throw new RuntimeException("not yet implemented");
+  public void visit(FunctionReference object) {
+    visitTypedReference("FunctionReference", object);
   }
 
   @Override
-  public void visit(FuncResponse object) {
-    throw new RuntimeException("not yet implemented");
+  public void visit(Response object) {
+    visitFunction("Response", object);
   }
 
   @Override
@@ -418,6 +431,7 @@ public class Write implements Visitor {
   @Override
   public void visit(FunctionReturnType object) {
     writer.beginNode("ReturnType");
+    object.accept(idWriter);
     object.metadata().accept(this);
     object.type.accept(this);
     writer.endNode();
@@ -425,22 +439,12 @@ public class Write implements Visitor {
 
   @Override
   public void visit(Signal object) {
-    writer.beginNode("Signal");
-    writer.attribute("name", object.getName());
-    object.metadata().accept(this);
-    object.param.accept(this);
-    object.body.accept(this);
-    writer.endNode();
+    visitProcedure("Signal", object);
   }
 
   @Override
   public void visit(Slot object) {
-    writer.beginNode("Slot");
-    writer.attribute("name", object.getName());
-    object.metadata().accept(this);
-    object.param.accept(this);
-    object.body.accept(this);
-    writer.endNode();
+    visitProcedure("Slot", object);
   }
 
   @Override
@@ -462,6 +466,7 @@ public class Write implements Visitor {
   public void visit(FunctionVariable object) {
     writer.beginNode("FunctionVariable");
     writer.attribute("name", object.getName());
+    object.accept(idWriter);
     object.metadata().accept(this);
     object.type.accept(this);
     writer.endNode();
@@ -480,6 +485,7 @@ public class Write implements Visitor {
   @Override
   public void visit(IfOption object) {
     writer.beginNode("IfOption");
+    object.accept(idWriter);
     object.metadata().accept(this);
     object.condition.accept(this);
     object.code.accept(this);
@@ -489,6 +495,7 @@ public class Write implements Visitor {
   @Override
   public void visit(IfStatement object) {
     writer.beginNode("IfStatement");
+    object.accept(idWriter);
     object.metadata().accept(this);
     object.option.accept(this);
     object.defblock.accept(this);
@@ -496,77 +503,91 @@ public class Write implements Visitor {
   }
 
   @Override
-  public void visit(ImplComposition implComposition) {
+  public void visit(ImplComposition object) {
     throw new RuntimeException("not yet implemented");
   }
 
   @Override
-  public void visit(ImplElementary implElementary) {
-    throw new RuntimeException("not yet implemented");
+  public void visit(ImplElementary object) {
+    writer.beginNode("Elementary");
+    writer.attribute("name", object.getName());
+    object.accept(idWriter);
+    object.metadata().accept(this);
+    object.queue.accept(this);
+    encapsulate("interface", object.iface);
+    encapsulate("function", object.function);
+    encapsulate("entry", object.entryFunc);
+    encapsulate("exit", object.exitFunc);
+    encapsulate("type", object.type);
+    encapsulate("variable", object.variable);
+    encapsulate("constant", object.constant);
+    encapsulate("component", object.component);
+    encapsulate("subCallback", object.subCallback);
+    writer.endNode();
   }
 
   @Override
-  public void visit(ImplHfsm implHfsm) {
+  public void visit(ImplHfsm object) {
     throw new RuntimeException("not yet implemented");
   }
 
   @Override
   public void visit(IntegerType object) {
-    node("Integer");
+    node("Integer", object);
   }
 
   @Override
-  public void visit(Is is) {
+  public void visit(Is object) {
     throw new RuntimeException("not yet implemented");
   }
 
   @Override
-  public void visit(Less less) {
+  public void visit(Less object) {
     throw new RuntimeException("not yet implemented");
   }
 
   @Override
-  public void visit(LessEqual lessequal) {
+  public void visit(LessEqual object) {
     throw new RuntimeException("not yet implemented");
   }
 
   @Override
-  public void visit(LogicAnd logicAnd) {
+  public void visit(LogicAnd object) {
     throw new RuntimeException("not yet implemented");
   }
 
   @Override
-  public void visit(LogicNot logicNot) {
+  public void visit(LogicNot object) {
     throw new RuntimeException("not yet implemented");
   }
 
   @Override
-  public void visit(LogicOr logicOr) {
+  public void visit(LogicOr object) {
     throw new RuntimeException("not yet implemented");
   }
 
   @Override
-  public void visit(Minus minus) {
-    writeBinaryExpression("Minus", minus);
+  public void visit(Minus object) {
+    writeBinaryExpression("Minus", object);
   }
 
   @Override
-  public void visit(Modulo mod) {
-    writeBinaryExpression("Modulo", mod);
+  public void visit(Modulo object) {
+    writeBinaryExpression("Modulo", object);
   }
 
   @Override
-  public void visit(MsgPush msgPush) {
+  public void visit(MsgPush object) {
     throw new RuntimeException("not yet implemented");
   }
 
   @Override
-  public void visit(Multiplication mul) {
-    writeBinaryExpression("Multiplication", mul);
+  public void visit(Multiplication object) {
+    writeBinaryExpression("Multiplication", object);
   }
 
   @Override
-  public void visit(NamedElement namedElement) {
+  public void visit(NamedElement object) {
     throw new RuntimeException("not yet implemented");
   }
 
@@ -584,6 +605,7 @@ public class Write implements Visitor {
   public void visit(Namespace object) {
     writer.beginNode("Namespace");
     writer.attribute("name", object.getName());
+    object.accept(idWriter);
     object.metadata().accept(this);
     object.children.accept(this);
     writer.endNode();
@@ -591,12 +613,13 @@ public class Write implements Visitor {
 
   @Override
   public void visit(NaturalType object) {
-    node("Natural");
+    node("Natural", object);
   }
 
   @Override
   public void visit(Not object) {
     writer.beginNode("Not");
+    object.accept(idWriter);
     object.metadata().accept(this);
     object.expression.accept(this);
     writer.endNode();
@@ -609,7 +632,7 @@ public class Write implements Visitor {
 
   @Override
   public void visit(NumberValue object) {
-    writeValueNode(object.metadata(), "NumberValue", object.toString());
+    writeValueNode(object, "NumberValue", object.toString());
   }
 
   @Override
@@ -629,17 +652,27 @@ public class Write implements Visitor {
 
   @Override
   public void visit(Queue object) {
-    throw new RuntimeException("not yet implemented");
+    writer.beginNode("Queue");
+    writer.attribute("name", object.getName());
+    object.accept(idWriter);
+    object.metadata().accept(this);
+    writer.endNode();
   }
 
   @Override
   public void visit(RangeTemplate object) {
-    node("RangeTemplate");
+    node("RangeTemplate", object);
   }
 
   @Override
   public void visit(RangeType object) {
-    throw new RuntimeException("not yet implemented");
+    writer.beginNode("RangeType");
+    writer.attribute("low", object.range.low.toString());
+    writer.attribute("high", object.range.high.toString());
+    writer.attribute("name", object.getName());
+    object.accept(idWriter);
+    object.metadata().accept(this);
+    writer.endNode();
   }
 
   @Override
@@ -651,28 +684,13 @@ public class Write implements Visitor {
   public void visit(RawElementary object) {
     writer.beginNode("RawElementary");
     writer.attribute("name", object.getName());
+    object.accept(idWriter);
     object.metadata().accept(this);
-
-    writer.beginNode("interface");
-    object.getIface().accept(this);
-    writer.endNode();
-
-    writer.beginNode("entry");
-    object.getEntryFunc().accept(this);
-    writer.endNode();
-
-    writer.beginNode("exit");
-    object.getExitFunc().accept(this);
-    writer.endNode();
-
-    writer.beginNode("declaration");
-    object.getDeclaration().accept(this);
-    writer.endNode();
-
-    writer.beginNode("instantiation");
-    object.getInstantiation().accept(this);
-    writer.endNode();
-
+    encapsulate("interface", object.getIface());
+    encapsulate("entry", object.getEntryFunc());
+    encapsulate("exit", object.getExitFunc());
+    encapsulate("declaration", object.getDeclaration());
+    encapsulate("instantiation", object.getInstantiation());
     writer.endNode();
   }
 
@@ -694,23 +712,33 @@ public class Write implements Visitor {
   @Override
   public void visit(RefCall object) {
     writer.beginNode("ReferenceCall");
+    object.accept(idWriter);
     object.metadata().accept(this);
     object.actualParameter.accept(this);
     writer.endNode();
   }
 
   @Override
-  public void visit(Reference object) {
+  public void visit(LinkedReferenceWithOffset_Implementation object) {
     writer.beginNode("Reference");
-    writer.attribute("link", object.link.getName()); // TODO use unique id
+    object.accept(idWriter);
+
+    // FIXME That is a bit hacky. Split Reference to a linked and a unlinked implementation.
+    if (astId.hasId(object.getLink())) {
+      writer.attribute("link", astId.getId(object.getLink()));
+    } else {
+      object.getLink().accept(this);
+    }
+
     object.metadata().accept(this);
-    object.offset.accept(this);
+    object.getOffset().accept(this);
     writer.endNode();
   }
 
   @Override
   public void visit(ReferenceExpression object) {
     writer.beginNode("ReferenceExpression");
+    object.accept(idWriter);
     object.metadata().accept(this);
     object.reference.accept(this);
     writer.endNode();
@@ -734,6 +762,7 @@ public class Write implements Visitor {
   @Override
   public void visit(ExpressionReturn object) {
     writer.beginNode("ExpressionReturn");
+    object.accept(idWriter);
     object.metadata().accept(this);
     object.expression.accept(this);
     writer.endNode();
@@ -748,6 +777,7 @@ public class Write implements Visitor {
   public void visit(RizzlyFile object) {
     writer.beginNode("RizzlyFile");
     writer.attribute("name", object.getName());
+    object.accept(idWriter);
     object.metadata().accept(this);
 
     for (Designator itr : object.imports) {
@@ -793,17 +823,12 @@ public class Write implements Visitor {
 
   @Override
   public void visit(StateVariable object) {
-    writer.beginNode("StateVariable");
-    writer.attribute("name", object.getName());
-    object.metadata().accept(this);
-    object.type.accept(this);
-    object.def.accept(this);
-    writer.endNode();
+    visitDefaultVariable("StateVariable", object);
   }
 
   @Override
   public void visit(StringType object) {
-    node("String");
+    node("String", object);
   }
 
   @Override
@@ -825,6 +850,7 @@ public class Write implements Visitor {
   public void visit(Template object) {
     writer.beginNode("Template");
     writer.attribute("name", object.getName());
+    object.accept(idWriter);
     object.metadata().accept(this);
     object.getTempl().accept(this);
     object.getObject().accept(this);
@@ -835,6 +861,7 @@ public class Write implements Visitor {
   public void visit(TemplateParameter object) {
     writer.beginNode("TemplateParameter");
     writer.attribute("name", object.getName());
+    object.accept(idWriter);
     object.metadata().accept(this);
     object.type.accept(this);
     writer.endNode();
@@ -853,6 +880,7 @@ public class Write implements Visitor {
   @Override
   public void visit(TupleValue object) {
     writer.beginNode("TupleValue");
+    object.accept(idWriter);
     object.metadata().accept(this);
     object.value.accept(this);
     writer.endNode();
@@ -865,16 +893,14 @@ public class Write implements Visitor {
 
   @Override
   public void visit(TypeReference object) {
-    writer.beginNode("TypeReference");
-    object.metadata().accept(this);
-    object.ref.accept(this);
-    writer.endNode();
+    visitTypedReference("TypeReference", object);
   }
 
   @Override
   public void visit(TypeType object) {
     writer.beginNode("TypeType");
     writer.attribute("name", object.getName());
+    object.accept(idWriter);
     object.metadata().accept(this);
     object.type.accept(this);
     writer.endNode();
@@ -882,7 +908,7 @@ public class Write implements Visitor {
 
   @Override
   public void visit(TypeTypeTemplate object) {
-    node("TypeTypeTemplate");
+    node("TypeTypeTemplate", object);
   }
 
   @Override
@@ -927,7 +953,7 @@ public class Write implements Visitor {
 
   @Override
   public void visit(VoidType object) {
-    node("Void");
+    node("Void", object);
   }
 
   @Override
@@ -944,23 +970,89 @@ public class Write implements Visitor {
     writer.endNode();
   }
 
-  private void writeValueNode(MetaList meta, String name, String value) {
+  private void writeValueNode(Ast object, String name, String value) {
     writer.beginNode(name);
     writer.attribute("value", value);
-    meta.accept(this);
+    object.accept(idWriter);
+    object.metadata().accept(this);
     writer.endNode();
   }
 
   private void writeBinaryExpression(String name, BinaryExpression expression) {
     writer.beginNode(name);
+    expression.accept(idWriter);
     expression.metadata().accept(this);
     expression.left.accept(this);
     expression.right.accept(this);
     writer.endNode();
   }
 
-  private void node(String name) {
+  private void node(String name, Ast object) {
     writer.beginNode(name);
+    object.accept(idWriter);
+    writer.endNode();
+  }
+
+  private void encapsulate(String nodeName, VisitorAcceptor object) {
+    writer.beginNode(nodeName);
+    object.accept(this);
+    writer.endNode();
+  }
+
+  private void visit(FunctionProperty property) {
+    String text = "";
+    switch (property) {
+      case External:
+        text = "extern";
+        break;
+      case Private:
+        text = "private";
+        break;
+      case Public:
+        text = "public";
+        break;
+    }
+    writer.attribute("scope", text);
+  }
+
+  private void visitFunction(String typeName, Function object) {
+    writer.beginNode(typeName);
+    visit(object.property);
+    writer.attribute("name", object.getName());
+    object.accept(idWriter);
+    object.metadata().accept(this);
+    object.param.accept(this);
+    object.ret.accept(this);
+    object.body.accept(this);
+    writer.endNode();
+  }
+
+  private void visitProcedure(String typeName, Function object) {
+    writer.beginNode(typeName);
+    visit(object.property);
+    writer.attribute("name", object.getName());
+    object.accept(idWriter);
+    object.metadata().accept(this);
+    object.param.accept(this);
+    object.body.accept(this);
+    writer.endNode();
+  }
+
+  private <T extends Ast> void visitTypedReference(String typeName, TypedReference<T> object) {
+    writer.beginNode(typeName);
+    object.accept(idWriter);
+    object.metadata().accept(this);
+    object.ref.accept(this);
+    writer.endNode();
+  }
+
+  private void visitDefaultVariable(String typeName, DefaultVariable object) {
+    writer.beginNode(typeName);
+    writer.attribute("name", object.getName());
+    object.accept(idWriter);
+    object.metadata().accept(this);
+    object.type.accept(this);
+    object.def.accept(this);
     writer.endNode();
   }
 

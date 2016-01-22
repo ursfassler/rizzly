@@ -23,7 +23,7 @@ import ast.data.Ast;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefName;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.type.Type;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.EnumType;
@@ -60,7 +60,7 @@ public class RefTypeGetter extends NullDispatcher<Type, Type> {
   }
 
   @Override
-  protected Type visitReference(Reference obj, Type param) {
+  protected Type visitReference(LinkedReferenceWithOffset_Implementation obj, Type param) {
     return (Type) obj.getTarget();
   }
 

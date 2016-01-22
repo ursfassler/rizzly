@@ -24,7 +24,7 @@ import main.Configuration;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
-import ast.data.component.composition.CompUse;
+import ast.data.component.composition.ComponentUse;
 import ast.data.type.base.BaseType;
 import ast.dispatcher.DfsTraverser;
 import ast.doc.DepGraph;
@@ -48,7 +48,7 @@ public class UnusedRemover extends AstPass {
 
   @Override
   public void process(Namespace root, KnowledgeBase kb) {
-    CompUse rootcomp = Single.staticForce(TypeFilter.select(root.children, CompUse.class), root.metadata());
+    ComponentUse rootcomp = Single.staticForce(TypeFilter.select(root.children, ComponentUse.class), root.metadata());
     SimpleGraph<Ast> g = DepGraph.build(rootcomp);
 
     Set<Ast> keep = g.vertexSet();

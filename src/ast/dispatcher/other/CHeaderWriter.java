@@ -27,14 +27,14 @@ import ast.data.Namespace;
 import ast.data.expression.value.NumberValue;
 import ast.data.function.Function;
 import ast.data.function.header.FuncQuery;
-import ast.data.function.header.FuncResponse;
+import ast.data.function.header.Response;
 import ast.data.function.header.Signal;
 import ast.data.function.header.Slot;
 import ast.data.function.header.FuncSubHandlerEvent;
 import ast.data.function.header.FuncSubHandlerQuery;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FunctionReturnType;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
@@ -160,9 +160,9 @@ public class CHeaderWriter extends NullDispatcher<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitReference(Reference obj, StreamWriter param) {
-    assert (obj.offset.isEmpty());
-    param.wr(obj.link.getName());
+  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, StreamWriter param) {
+    assert (obj.getOffset().isEmpty());
+    param.wr(obj.getLink().getName());
     return null;
   }
 
@@ -329,7 +329,7 @@ public class CHeaderWriter extends NullDispatcher<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitFuncResponse(FuncResponse obj, StreamWriter param) {
+  protected Void visitFuncResponse(Response obj, StreamWriter param) {
     param.wr("extern ");
     wrPrototype(obj, param);
     return null;

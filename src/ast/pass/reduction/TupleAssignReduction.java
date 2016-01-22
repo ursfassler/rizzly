@@ -30,9 +30,10 @@ import ast.data.expression.ReferenceExpression;
 import ast.data.expression.value.NamedElementsValue;
 import ast.data.expression.value.NamedValue;
 import ast.data.expression.value.TupleValue;
+import ast.data.reference.LinkedReference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefName;
-import ast.data.reference.Reference;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.MultiAssignment;
 import ast.data.statement.Statement;
@@ -117,7 +118,7 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
     }
   }
 
-  private List<Statement> assignOneOne(Reference left, Expression right) {
+  private List<Statement> assignOneOne(LinkedReference left, Expression right) {
     if (right instanceof TupleValue) {
       TupleValue gen = (TupleValue) right;
       return assignOne(left, gen.value);
@@ -127,7 +128,7 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
     }
   }
 
-  private List<Statement> assignMulOne(AstList<Reference> left, Expression right) {
+  private List<Statement> assignMulOne(AstList<LinkedReferenceWithOffset_Implementation> left, Expression right) {
     Type rt = kt.get(right);
     if (rt instanceof RecordType) {
       String name = Designator.NAME_SEP + "var"; // XXX add pass to make names
@@ -139,9 +140,9 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
       ret.add(new AssignmentSingle(RefFactory.full(var), right));
 
       for (int i = 0; i < left.size(); i++) {
-        Reference lr = left.get(i);
+        LinkedReferenceWithOffset_Implementation lr = left.get(i);
         String elemName = ((RecordType) rt).element.get(i).getName();
-        Reference rr = RefFactory.create(var, new RefName(elemName));
+        LinkedReferenceWithOffset_Implementation rr = RefFactory.create(var, new RefName(elemName));
         ret.add(new AssignmentSingle(lr, new ReferenceExpression(rr)));
       }
 
@@ -151,11 +152,11 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
     }
   }
 
-  private List<Statement> assignOneNamed(Reference left, AstList<NamedValue> value) {
+  private List<Statement> assignOneNamed(LinkedReference left, AstList<NamedValue> value) {
     throw new RuntimeException("not yet implemented");
   }
 
-  private List<Statement> assignOne(Reference left, AstList<Expression> value) {
+  private List<Statement> assignOne(LinkedReference left, AstList<Expression> value) {
     Type rt = kt.get(left);
     if (rt instanceof RecordType) {
       return assignOneRecord(left, (RecordType) rt, value);
@@ -164,13 +165,13 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
     }
   }
 
-  private List<Statement> assignOneRecord(Reference left, RecordType rt, AstList<Expression> value) {
+  private List<Statement> assignOneRecord(LinkedReferenceWithOffset_Implementation left, RecordType rt, AstList<Expression> value) {
     RError.ass(rt.element.size() == value.size(), left.metadata(), "expected same number of elementds, got: " + rt.element.size() + " <-> " + value.size());
     List<Statement> ret = new ArrayList<Statement>(value.size());
 
     for (int i = 0; i < value.size(); i++) {
-      Reference subref = Copy.copy(left);
-      subref.offset.add(new RefName(rt.element.get(i).getName()));
+      LinkedReferenceWithOffset_Implementation subref = Copy.copy(left);
+      subref.getOffset().add(new RefName(rt.element.get(i).getName()));
       Expression subVal = value.get(i);
       RError.ass(!(subVal instanceof NamedElementsValue), subVal.metadata(), "Named element values for tuple not yet supported: " + subVal.toString());
       AssignmentSingle ass = new AssignmentSingle(subref, subVal);

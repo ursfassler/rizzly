@@ -28,12 +28,12 @@ import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateContent;
 import ast.data.component.hfsm.StateSimple;
-import ast.data.function.FuncRef;
+import ast.data.function.FunctionReference;
 import ast.data.function.Function;
-import ast.data.function.header.FuncProcedure;
+import ast.data.function.header.Procedure;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.reference.RefFactory;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.Statement;
@@ -97,21 +97,21 @@ class EntryExitUpdaterWorker extends NullDispatcher<Void, EePar> {
   }
 
   public void changeEe(State obj, EePar param) {
-    FuncProcedure entry = makeFunc(param.entry, "_centry");
+    Procedure entry = makeFunc(param.entry, "_centry");
     obj.item.add(entry);
     obj.entryFunc = makeFuncRef(entry);
 
-    FuncProcedure exit = makeFunc(param.exit, "_cexit");
+    Procedure exit = makeFunc(param.exit, "_cexit");
     obj.item.add(exit);
     obj.exitFunc = makeFuncRef(exit);
   }
 
-  private FuncRef makeFuncRef(FuncProcedure entry) {
-    return new FuncRef(RefFactory.create(entry));
+  private FunctionReference makeFuncRef(Procedure entry) {
+    return new FunctionReference(RefFactory.create(entry));
   }
 
-  public FuncProcedure makeFunc(LinkedList<Function> list, String name) {
-    FuncProcedure func = new FuncProcedure(name, new AstList<FunctionVariable>(), new FuncReturnNone(), new Block());
+  public Procedure makeFunc(LinkedList<Function> list, String name) {
+    Procedure func = new Procedure(name, new AstList<FunctionVariable>(), new FuncReturnNone(), new Block());
 
     for (Function cf : list) {
       Statement stmt = makeCall(cf);
@@ -123,7 +123,7 @@ class EntryExitUpdaterWorker extends NullDispatcher<Void, EePar> {
 
   private CallStmt makeCall(Function func) {
     assert (func.param.isEmpty());
-    Reference ref = RefFactory.call(func);
+    LinkedReferenceWithOffset_Implementation ref = RefFactory.call(func);
     return new CallStmt(ref);
   }
 

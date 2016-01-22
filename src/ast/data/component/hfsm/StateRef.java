@@ -17,19 +17,19 @@
 
 package ast.data.component.hfsm;
 
-import ast.data.reference.Reference;
-import ast.data.reference.TypedRef;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.TypedReference;
 import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
-final public class StateRef extends TypedRef<State> {
+final public class StateRef extends TypedReference<State> {
 
-  public StateRef(Reference ref) {
+  public StateRef(LinkedReferenceWithOffset_Implementation ref) {
     super(ref);
   }
 
   @Deprecated
-  public StateRef(MetaList info, Reference ref) {
+  public StateRef(MetaList info, LinkedReferenceWithOffset_Implementation ref) {
     super(ref);
     metadata().add(info);
   }

@@ -33,7 +33,7 @@ import ast.data.function.header.FuncFunction;
 import ast.data.function.ret.FunctionReturnType;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefFactory;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.ExpressionReturn;
@@ -88,11 +88,11 @@ class IntroduceConvertWorker extends DfsTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitReference(Reference obj, Void param) {
-    if ((obj.link instanceof Type) && !obj.offset.isEmpty() && (obj.offset.get(0) instanceof RefCall)) {
-      Type resType = (Type) obj.link;
+  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
+    if ((obj.getLink() instanceof Type) && !obj.getOffset().isEmpty() && (obj.getOffset().get(0) instanceof RefCall)) {
+      Type resType = (Type) obj.getLink();
       Function convertFunc = getConvertFunc(resType);
-      obj.link = convertFunc;
+      obj.setLink(convertFunc);
     }
     return super.visitReference(obj, param);
   }
@@ -148,7 +148,7 @@ class IntroduceConvertWorker extends DfsTraverser<Void, Void> {
       // TODO how to trap or exception throwing?
       // TODO insert call to debug output with error message
       // TODO throw exception
-      Reference call = RefFactory.call(kll.getTrap());
+      LinkedReferenceWithOffset_Implementation call = RefFactory.call(kll.getTrap());
       ExpressionReturn trap = new ExpressionReturn(new NumberValue(resType.range.low));
 
       error.statements.add(new CallStmt(call));

@@ -38,13 +38,13 @@ import ast.data.component.hfsm.Transition;
 import ast.data.expression.ReferenceExpression;
 import ast.data.function.FuncRefFactory;
 import ast.data.function.Function;
-import ast.data.function.header.FuncProcedure;
-import ast.data.function.header.FuncResponse;
+import ast.data.function.header.Procedure;
+import ast.data.function.header.Response;
 import ast.data.function.header.Signal;
 import ast.data.function.header.Slot;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.reference.RefFactory;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.Assignment;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
@@ -168,7 +168,7 @@ class Reduction {
     // String ena = (String)
     // enumMap.get(obj.getTopstate().getInitial()).properties().get(Property.NAME);
     EnumElement ena = enumMap.get(obj.topstate.initial.getTarget());
-    Reference initState = makeEnumElemRef(states, ena);
+    LinkedReferenceWithOffset_Implementation initState = makeEnumElemRef(states, ena);
     StateVariable stateVariable = new StateVariable("_statevar", TypeRefFactory.create(states), new ReferenceExpression(initState));
     stateVariable.metadata().add(obj.metadata());
     elem.variable.add(stateVariable);
@@ -177,7 +177,7 @@ class Reduction {
     dict.traverse(obj.topstate, null);
 
     // create event handler
-    for (FuncResponse func : TypeFilter.select(elem.iface, FuncResponse.class)) {
+    for (Response func : TypeFilter.select(elem.iface, Response.class)) {
       assert (func.body.statements.isEmpty());
       Statement code = addQueryCode(enumMap.keySet(), enumMap, states, stateVariable, func, func.param);
       Block bbl = new Block();
@@ -194,11 +194,11 @@ class Reduction {
     }
 
     {
-      FuncProcedure fEntry = makeEntryFunc(obj.topstate.initial.getTarget());
+      Procedure fEntry = makeEntryFunc(obj.topstate.initial.getTarget());
       elem.function.add(fEntry);
       elem.entryFunc = FuncRefFactory.create(fEntry.metadata(), fEntry);
 
-      FuncProcedure fExit = makeExitFunc(states, enumMap, stateVariable);
+      Procedure fExit = makeExitFunc(states, enumMap, stateVariable);
       elem.function.add(fExit);
       elem.exitFunc = FuncRefFactory.create(fExit.metadata(), fExit);
     }
@@ -207,12 +207,12 @@ class Reduction {
     return elem;
   }
 
-  private FuncProcedure makeEntryFunc(State initial) {
+  private Procedure makeEntryFunc(State initial) {
     Block body = new Block();
 
     body.statements.add(makeCall(initial.entryFunc.getTarget()));
 
-    FuncProcedure rfunc = new FuncProcedure(Designator.NAME_SEP + "stateentry", new AstList<FunctionVariable>(), new FuncReturnNone(), body);
+    Procedure rfunc = new Procedure(Designator.NAME_SEP + "stateentry", new AstList<FunctionVariable>(), new FuncReturnNone(), body);
     return rfunc;
   }
 
@@ -223,11 +223,11 @@ class Reduction {
     return bberror;
   }
 
-  private FuncProcedure makeExitFunc(EnumType etype, HashMap<StateSimple, EnumElement> enumMap, StateVariable stateVariable) {
+  private Procedure makeExitFunc(EnumType etype, HashMap<StateSimple, EnumElement> enumMap, StateVariable stateVariable) {
 
     AstList<CaseOpt> option = new AstList<CaseOpt>();
     for (State src : enumMap.keySet()) {
-      Reference eref = makeEnumElemRef(etype, enumMap.get(src));
+      LinkedReferenceWithOffset_Implementation eref = makeEnumElemRef(etype, enumMap.get(src));
       Block obb = new Block();
       CaseOpt opt = makeCaseOption(eref, obb);
       obb.statements.add(makeCall(src.exitFunc.getTarget()));
@@ -239,7 +239,7 @@ class Reduction {
     Block body = new Block();
     body.statements.add(caseStmt);
 
-    FuncProcedure rfunc = new FuncProcedure("_exit", new AstList<FunctionVariable>(), new FuncReturnNone(), body);
+    Procedure rfunc = new Procedure("_exit", new AstList<FunctionVariable>(), new FuncReturnNone(), body);
     rfunc.body = body;
 
     return rfunc;
@@ -247,7 +247,7 @@ class Reduction {
 
   static private CallStmt makeCall(Function func) {
     assert (func.param.isEmpty());
-    Reference call = RefFactory.call(func);
+    LinkedReferenceWithOffset_Implementation call = RefFactory.call(func);
     return new CallStmt(call);
   }
 
@@ -264,12 +264,12 @@ class Reduction {
     return ret;
   }
 
-  private CaseStmt addQueryCode(Collection<StateSimple> leafes, HashMap<StateSimple, EnumElement> enumMap, EnumType enumType, StateVariable stateVariable, FuncResponse func, AstList<FunctionVariable> param) {
+  private CaseStmt addQueryCode(Collection<StateSimple> leafes, HashMap<StateSimple, EnumElement> enumMap, EnumType enumType, StateVariable stateVariable, Response func, AstList<FunctionVariable> param) {
     AstList<CaseOpt> copt = new AstList<CaseOpt>();
 
     for (State state : leafes) {
 
-      FuncResponse query = getQuery(state, func.getName());
+      Response query = getQuery(state, func.getName());
 
       // from QueryDownPropagator
       assert (query.body.statements.size() == 1);
@@ -289,9 +289,9 @@ class Reduction {
     return caseStmt;
   }
 
-  static private FuncResponse getQuery(State state, String funcName) {
+  static private Response getQuery(State state, String funcName) {
     assert (funcName != null);
-    for (FuncResponse itr : TypeFilter.select(state.item, FuncResponse.class)) {
+    for (Response itr : TypeFilter.select(state.item, Response.class)) {
       if (funcName.equals(itr.getName())) {
         return itr;
       }
@@ -306,7 +306,7 @@ class Reduction {
 
     for (State src : leafes) {
       Block body = new Block();
-      Reference label = makeEnumElemRef(enumType, enumMap.get(src));
+      LinkedReferenceWithOffset_Implementation label = makeEnumElemRef(enumType, enumMap.get(src));
       CaseOpt opt = makeCaseOption(label, body);
 
       AstList<Transition> transList = getter.get(src, funcName);
@@ -347,17 +347,17 @@ class Reduction {
     return entry;
   }
 
-  private static Reference makeEnumElemRef(EnumType type, EnumElement enumElement) {
+  private static LinkedReferenceWithOffset_Implementation makeEnumElemRef(EnumType type, EnumElement enumElement) {
     assert (type.element.contains(enumElement));
     EnumElement elem = enumElement;
     // EnumElement elem = type.find(enumElement);
 
     assert (elem != null);
-    Reference eval = RefFactory.full(elem);
+    LinkedReferenceWithOffset_Implementation eval = RefFactory.full(elem);
     return eval;
   }
 
-  private static CaseOpt makeCaseOption(Reference label, Block code) {
+  private static CaseOpt makeCaseOption(LinkedReferenceWithOffset_Implementation label, Block code) {
     AstList<CaseOptEntry> list = new AstList<CaseOptEntry>();
     list.add(new CaseOptValue(new ReferenceExpression(label)));
     CaseOpt opt = new CaseOpt(list, code);

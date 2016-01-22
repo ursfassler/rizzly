@@ -22,7 +22,7 @@ import ast.copy.Copy;
 import ast.data.Namespace;
 import ast.data.expression.Expression;
 import ast.data.expression.ReferenceExpression;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset;
 import ast.data.type.Type;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.EnumType;
@@ -77,12 +77,12 @@ class ConstantPropagationWorker extends ExprReplacer<Void> {
 
   @Override
   protected Expression visitRefExpr(ReferenceExpression obj, Void param) {
-    if (obj.reference.link instanceof Constant) {
-      Reference ref = obj.reference;
-      Constant constant = (Constant) ref.link;
+    if (obj.reference.getLink() instanceof Constant) {
+      LinkedReferenceWithOffset ref = obj.reference;
+      Constant constant = (Constant) ref.getLink();
       Type type = kt.get(constant.type);
       if (doReduce(type)) {
-        assert (ref.offset.isEmpty());
+        assert (ref.getOffset().isEmpty());
         return Copy.copy(visit(constant.def, null));
       }
     }

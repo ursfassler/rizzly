@@ -19,10 +19,10 @@ package ast.visitor;
 
 import ast.data.Ast;
 import ast.data.Namespace;
-import ast.data.component.CompRef;
+import ast.data.component.ComponentReference;
 import ast.data.component.composition.AsynchroniusConnection;
-import ast.data.component.composition.CompUse;
 import ast.data.component.composition.CompUseRef;
+import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.EndpointRaw;
 import ast.data.component.composition.EndpointSelf;
 import ast.data.component.composition.EndpointSub;
@@ -75,16 +75,16 @@ import ast.data.expression.value.TupleValue;
 import ast.data.expression.value.UnionValue;
 import ast.data.expression.value.UnsafeUnionValue;
 import ast.data.file.RizzlyFile;
-import ast.data.function.FuncRef;
+import ast.data.function.FunctionReference;
 import ast.data.function.header.FuncFunction;
 import ast.data.function.header.FuncInterrupt;
-import ast.data.function.header.FuncProcedure;
 import ast.data.function.header.FuncQuery;
-import ast.data.function.header.FuncResponse;
-import ast.data.function.header.Signal;
-import ast.data.function.header.Slot;
 import ast.data.function.header.FuncSubHandlerEvent;
 import ast.data.function.header.FuncSubHandlerQuery;
+import ast.data.function.header.Procedure;
+import ast.data.function.header.Response;
+import ast.data.function.header.Signal;
+import ast.data.function.header.Slot;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FuncReturnTuple;
 import ast.data.function.ret.FunctionReturnType;
@@ -93,12 +93,12 @@ import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
 import ast.data.reference.LinkTarget;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
-import ast.data.reference.Reference;
-import ast.data.statement.MultiAssignment;
+import ast.data.reference.UnlinkedReferenceWithOffset_Implementation;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
@@ -107,14 +107,15 @@ import ast.data.statement.CaseOptRange;
 import ast.data.statement.CaseOptSimple;
 import ast.data.statement.CaseOptValue;
 import ast.data.statement.CaseStmt;
+import ast.data.statement.ExpressionReturn;
 import ast.data.statement.ForStmt;
 import ast.data.statement.IfOption;
 import ast.data.statement.IfStatement;
 import ast.data.statement.MsgPush;
-import ast.data.statement.ExpressionReturn;
-import ast.data.statement.VoidReturn;
+import ast.data.statement.MultiAssignment;
 import ast.data.statement.VarDefInitStmt;
 import ast.data.statement.VarDefStmt;
+import ast.data.statement.VoidReturn;
 import ast.data.statement.WhileStmt;
 import ast.data.template.Template;
 import ast.data.type.TypeReference;
@@ -143,9 +144,9 @@ import ast.data.type.special.VoidType;
 import ast.data.type.template.ArrayTemplate;
 import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
-import ast.data.variable.ConstGlobal;
 import ast.data.variable.ConstPrivate;
 import ast.data.variable.FunctionVariable;
+import ast.data.variable.GlobalConstant;
 import ast.data.variable.StateVariable;
 import ast.data.variable.TemplateParameter;
 import ast.meta.SourcePosition;
@@ -284,12 +285,12 @@ public class DefaultVisitor implements Visitor {
   }
 
   @Override
-  public void visit(CompRef compRef) {
+  public void visit(ComponentReference compRef) {
     defaultHandler(compRef);
   }
 
   @Override
-  public void visit(CompUse compUse) {
+  public void visit(ComponentUse compUse) {
     defaultHandler(compUse);
   }
 
@@ -299,7 +300,7 @@ public class DefaultVisitor implements Visitor {
   }
 
   @Override
-  public void visit(ConstGlobal constGlobal) {
+  public void visit(GlobalConstant constGlobal) {
     defaultHandler(constGlobal);
   }
 
@@ -369,7 +370,7 @@ public class DefaultVisitor implements Visitor {
   }
 
   @Override
-  public void visit(FuncProcedure funcProcedure) {
+  public void visit(Procedure funcProcedure) {
     defaultHandler(funcProcedure);
   }
 
@@ -379,12 +380,12 @@ public class DefaultVisitor implements Visitor {
   }
 
   @Override
-  public void visit(FuncRef funcRef) {
+  public void visit(FunctionReference funcRef) {
     defaultHandler(funcRef);
   }
 
   @Override
-  public void visit(FuncResponse funcResponse) {
+  public void visit(Response funcResponse) {
     defaultHandler(funcResponse);
   }
 
@@ -624,7 +625,7 @@ public class DefaultVisitor implements Visitor {
   }
 
   @Override
-  public void visit(Reference reference) {
+  public void visit(LinkedReferenceWithOffset_Implementation reference) {
     defaultHandler(reference);
   }
 
@@ -799,23 +800,28 @@ public class DefaultVisitor implements Visitor {
   }
 
   @Override
-  public void visit(VarDefStmt varDefStmt) {
-    defaultHandler(varDefStmt);
+  public void visit(VarDefStmt object) {
+    defaultHandler(object);
   }
 
   @Override
-  public void visit(VoidType voidType) {
-    defaultHandler(voidType);
+  public void visit(VoidType object) {
+    defaultHandler(object);
   }
 
   @Override
-  public void visit(WhileStmt whileStmt) {
-    defaultHandler(whileStmt);
+  public void visit(WhileStmt object) {
+    defaultHandler(object);
   }
 
   @Override
-  public void visit(SourcePosition elementInfo) {
+  public void visit(SourcePosition object) {
     throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  public void visit(UnlinkedReferenceWithOffset_Implementation object) {
+    defaultHandler(object);
   }
 
 }

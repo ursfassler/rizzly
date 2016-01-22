@@ -18,15 +18,16 @@
 package ast.specification;
 
 import ast.data.Ast;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.template.Template;
 
 public class TemplateReference extends Specification {
 
   @Override
   public boolean isSatisfiedBy(Ast candidate) {
-    if (candidate instanceof Reference) {
-      return ((Reference) candidate).link instanceof Template;
+    if (candidate instanceof LinkedReferenceWithOffset_Implementation) {
+      return ((LinkedReference) candidate).getLink() instanceof Template;
     }
     return false;
   }

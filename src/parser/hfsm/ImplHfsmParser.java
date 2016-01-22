@@ -34,15 +34,15 @@ import ast.data.component.hfsm.StateSimple;
 import ast.data.component.hfsm.Transition;
 import ast.data.expression.Expression;
 import ast.data.expression.value.BooleanValue;
-import ast.data.function.FuncRef;
+import ast.data.function.FunctionReference;
 import ast.data.function.FuncRefFactory;
 import ast.data.function.Function;
-import ast.data.function.header.FuncProcedure;
+import ast.data.function.header.Procedure;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.raw.RawComponent;
 import ast.data.raw.RawHfsm;
 import ast.data.reference.RefFactory;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.Block;
 import ast.data.template.Template;
 import ast.data.variable.ConstPrivate;
@@ -71,8 +71,8 @@ public class ImplHfsmParser extends ImplBaseParser {
     expect(TokenType.OPENPAREN);
     String initial = expect(TokenType.IDENTIFIER).getData();
     expect(TokenType.CLOSEPAREN);
-    FuncProcedure entry = makeProc("_entry"); // FIXME get names from outside
-    FuncProcedure exit = makeProc("_exit");// FIXME get names from outside
+    Procedure entry = makeProc("_entry"); // FIXME get names from outside
+    Procedure exit = makeProc("_exit");// FIXME get names from outside
     StateComposite top = new StateComposite("!top", FuncRefFactory.create(info, entry), FuncRefFactory.create(info, exit), new StateRef(info, RefFactory.create(info, initial)));
     top.metadata().add(info);
     top.item.add(entry);
@@ -175,12 +175,12 @@ public class ImplHfsmParser extends ImplBaseParser {
 
     State state;
 
-    FuncProcedure entry = makeProc("_entry"); // FIXME get names from outside
-    FuncRef entryRef = FuncRefFactory.create(entry);
+    Procedure entry = makeProc("_entry"); // FIXME get names from outside
+    FunctionReference entryRef = FuncRefFactory.create(entry);
     entryRef.metadata().add(info);
 
-    FuncProcedure exit = makeProc("_exit");// FIXME get names from outside
-    FuncRef exitRef = FuncRefFactory.create(exit);
+    Procedure exit = makeProc("_exit");// FIXME get names from outside
+    FunctionReference exitRef = FuncRefFactory.create(exit);
     exitRef.metadata().add(info);
 
     if (consumeIfEqual(TokenType.SEMI)) {
@@ -192,7 +192,7 @@ public class ImplHfsmParser extends ImplBaseParser {
       if (consumeIfEqual(TokenType.OPENPAREN)) {
         String initial = expect(TokenType.IDENTIFIER).getData();
         expect(TokenType.CLOSEPAREN);
-        Reference initialRef = RefFactory.create(initial);
+        LinkedReferenceWithOffset_Implementation initialRef = RefFactory.create(initial);
         initialRef.metadata().add(info);
         StateRef initialState = new StateRef(initialRef);
         initialState.metadata().add(info);
@@ -209,8 +209,8 @@ public class ImplHfsmParser extends ImplBaseParser {
     return state;
   }
 
-  static private FuncProcedure makeProc(String name) {
-    return new FuncProcedure(name, new AstList<FunctionVariable>(), new FuncReturnNone(), new Block());
+  static private Procedure makeProc(String name) {
+    return new Procedure(name, new AstList<FunctionVariable>(), new FuncReturnNone(), new Block());
   }
 
   // EBNF transition: stateRef "to" stateRef "by" transitionEvent [ "if" expr ] (
@@ -223,8 +223,8 @@ public class ImplHfsmParser extends ImplBaseParser {
     expect(TokenType.BY);
 
     Token tok = expect(TokenType.IDENTIFIER);
-    Reference name = RefFactory.full(tok.getMetadata(), tok.getData());
-    FuncRef eventFunc = new FuncRef(name.metadata(), name);
+    LinkedReferenceWithOffset_Implementation name = RefFactory.full(tok.getMetadata(), tok.getData());
+    FunctionReference eventFunc = new FunctionReference(name.metadata(), name);
 
     AstList<FunctionVariable> param = parseVardefList();
 

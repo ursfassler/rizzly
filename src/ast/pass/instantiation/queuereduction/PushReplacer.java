@@ -21,7 +21,7 @@ import java.util.Map;
 
 import ast.data.function.Function;
 import ast.data.reference.RefFactory;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.MsgPush;
@@ -46,7 +46,7 @@ class PushReplacer extends DfsTraverser<Statement, Map<Function, Function>> {
     Function func = param.get(obj.func.getTarget());
     assert (func != null);
 
-    Reference call = RefFactory.call(obj.metadata(), func, obj.data);
+    LinkedReferenceWithOffset_Implementation call = RefFactory.call(obj.metadata(), func, obj.data);
     CallStmt stmt = new CallStmt(call);
     stmt.metadata().add(obj.metadata());
     return stmt;

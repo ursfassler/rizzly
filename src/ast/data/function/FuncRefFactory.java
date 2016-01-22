@@ -21,12 +21,12 @@ import ast.data.reference.RefFactory;
 import ast.meta.MetaList;
 
 public class FuncRefFactory {
-  public static FuncRef create(Function func) {
-    return new FuncRef(RefFactory.create(func));
+  public static FunctionReference create(Function func) {
+    return new FunctionReference(RefFactory.create(func));
   }
 
   @Deprecated
-  public static FuncRef create(MetaList info, Function func) {
-    return new FuncRef(info, RefFactory.create(info, func));
+  public static FunctionReference create(MetaList info, Function func) {
+    return new FunctionReference(info, RefFactory.create(info, func));
   }
 }

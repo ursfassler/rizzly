@@ -25,7 +25,7 @@ import ast.data.Named;
 import ast.data.reference.LinkTarget;
 import ast.data.reference.RefItem;
 import ast.data.reference.RefName;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.repository.query.ChildByName;
 
 public class SubLinker {
@@ -36,26 +36,26 @@ public class SubLinker {
     this.childByName = childByName;
   }
 
-  public void link(Reference ref, Named root) {
+  public void link(LinkedReferenceWithOffset_Implementation ref, Named root) {
 
-    if (ref.link instanceof LinkTarget) {
+    if (ref.getLink() instanceof LinkTarget) {
       List<String> targetName = new ArrayList<String>();
 
-      String rootName = ((LinkTarget) ref.link).getName();
+      String rootName = ((LinkTarget) ref.getLink()).getName();
 
       if (!rootName.equals("self")) {
         targetName.add(rootName);
       }
 
-      for (RefItem itr : ref.offset) {
+      for (RefItem itr : ref.getOffset()) {
         String name = ((RefName) itr).name;
         targetName.add(name);
       }
 
       Named target = childByName.get(root, new Designator(targetName), ref.metadata());
 
-      ref.link = target;
-      ref.offset.clear();
+      ref.setLink(target);
+      ref.getOffset().clear();
     }
 
   }

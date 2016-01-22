@@ -29,12 +29,12 @@ import ast.data.expression.binop.Modulo;
 import ast.data.expression.binop.Plus;
 import ast.data.expression.value.NumberValue;
 import ast.data.function.Function;
-import ast.data.function.header.FuncProcedure;
+import ast.data.function.header.Procedure;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefItem;
 import ast.data.reference.RefName;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.IfOption;
@@ -54,7 +54,7 @@ class PushFunctionFactory {
     String name = func.getName();
 
     AstList<FunctionVariable> param = Copy.copy(func.param);
-    Function impl = new FuncProcedure(Designator.NAME_SEP + "push" + Designator.NAME_SEP + name, param, new FuncReturnNone(info), createPushBody(param, queueVariables, queueTypes, queueTypes.getFuncToMsgType().get(func), queueTypes.getFuncToElem().get(func)));
+    Function impl = new Procedure(Designator.NAME_SEP + "push" + Designator.NAME_SEP + name, param, new FuncReturnNone(info), createPushBody(param, queueVariables, queueTypes, queueTypes.getFuncToMsgType().get(func), queueTypes.getFuncToElem().get(func)));
     impl.metadata().add(info);
     // impl.properties().put(Property.NAME, Designator.NAME_SEP + "push" +
     // Designator.NAME_SEP + name);
@@ -70,16 +70,16 @@ class PushFunctionFactory {
     pushbody.statements.add(new VarDefStmt(idx));
     pushbody.statements.add(new AssignmentSingle(ref(idx), new Modulo(new Plus(refexpr(queueVariables.getHead()), refexpr(queueVariables.getCount())), new NumberValue(BigInteger.valueOf(queueTypes.queueLength())))));
 
-    Reference qir = ref(queueVariables.getQueue());
-    qir.offset.add(new RefIndex(refexpr(idx)));
-    qir.offset.add(new RefName(queueTypes.getMessage().tag.getName()));
+    LinkedReferenceWithOffset_Implementation qir = ref(queueVariables.getQueue());
+    qir.getOffset().add(new RefIndex(refexpr(idx)));
+    qir.getOffset().add(new RefName(queueTypes.getMessage().tag.getName()));
     pushbody.statements.add(new AssignmentSingle(qir, refexpr(enumElement)));
 
     for (FunctionVariable arg : param) {
-      Reference elem = ref(queueVariables.getQueue());
-      elem.offset.add(new RefIndex(refexpr(idx)));
-      elem.offset.add(new RefName(namedElement.getName()));
-      elem.offset.add(new RefName(arg.getName()));
+      LinkedReferenceWithOffset_Implementation elem = ref(queueVariables.getQueue());
+      elem.getOffset().add(new RefIndex(refexpr(idx)));
+      elem.getOffset().add(new RefName(namedElement.getName()));
+      elem.getOffset().add(new RefName(arg.getName()));
 
       pushbody.statements.add(new AssignmentSingle(elem, refexpr(arg)));
     }
@@ -100,7 +100,7 @@ class PushFunctionFactory {
     return new ReferenceExpression(ref(idx));
   }
 
-  private static Reference ref(Named idx) {
-    return new Reference(idx, new AstList<RefItem>());
+  private static LinkedReferenceWithOffset_Implementation ref(Named idx) {
+    return new LinkedReferenceWithOffset_Implementation(idx, new AstList<RefItem>());
   }
 }

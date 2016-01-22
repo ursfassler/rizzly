@@ -24,11 +24,11 @@ import ast.data.expression.Expression;
 import ast.data.expression.value.NumberValue;
 import ast.data.expression.value.TupleValue;
 import ast.data.function.header.FuncFunction;
+import ast.data.reference.LinkedReferenceWithOffset;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefItem;
 import ast.data.reference.RefTemplCall;
-import ast.data.reference.Reference;
 import ast.data.template.Template;
 import ast.data.variable.Constant;
 import ast.data.variable.FunctionVariable;
@@ -50,9 +50,9 @@ public class RefEvaluator extends NullDispatcher<Ast, Ast> {
     this.kb = kb;
   }
 
-  public static Ast execute(Reference ref, Memory memory, KnowledgeBase kb) {
-    Ast base = getBase(ref.link, memory);
-    return RefEvaluator.execute(base, ref.offset, memory, kb);
+  public static Ast execute(LinkedReferenceWithOffset ref, Memory memory, KnowledgeBase kb) {
+    Ast base = getBase(ref.getLink(), memory);
+    return RefEvaluator.execute(base, ref.getOffset(), memory, kb);
   }
 
   private static Ast getBase(Named link, Memory memory) {

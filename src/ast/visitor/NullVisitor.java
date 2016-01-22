@@ -18,10 +18,10 @@
 package ast.visitor;
 
 import ast.data.Namespace;
-import ast.data.component.CompRef;
+import ast.data.component.ComponentReference;
 import ast.data.component.composition.AsynchroniusConnection;
-import ast.data.component.composition.CompUse;
 import ast.data.component.composition.CompUseRef;
+import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.EndpointRaw;
 import ast.data.component.composition.EndpointSelf;
 import ast.data.component.composition.EndpointSub;
@@ -74,16 +74,16 @@ import ast.data.expression.value.TupleValue;
 import ast.data.expression.value.UnionValue;
 import ast.data.expression.value.UnsafeUnionValue;
 import ast.data.file.RizzlyFile;
-import ast.data.function.FuncRef;
+import ast.data.function.FunctionReference;
 import ast.data.function.header.FuncFunction;
 import ast.data.function.header.FuncInterrupt;
-import ast.data.function.header.FuncProcedure;
 import ast.data.function.header.FuncQuery;
-import ast.data.function.header.FuncResponse;
-import ast.data.function.header.Signal;
-import ast.data.function.header.Slot;
 import ast.data.function.header.FuncSubHandlerEvent;
 import ast.data.function.header.FuncSubHandlerQuery;
+import ast.data.function.header.Procedure;
+import ast.data.function.header.Response;
+import ast.data.function.header.Signal;
+import ast.data.function.header.Slot;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FuncReturnTuple;
 import ast.data.function.ret.FunctionReturnType;
@@ -92,12 +92,12 @@ import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
 import ast.data.reference.LinkTarget;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
-import ast.data.reference.Reference;
-import ast.data.statement.MultiAssignment;
+import ast.data.reference.UnlinkedReferenceWithOffset_Implementation;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
@@ -106,14 +106,15 @@ import ast.data.statement.CaseOptRange;
 import ast.data.statement.CaseOptSimple;
 import ast.data.statement.CaseOptValue;
 import ast.data.statement.CaseStmt;
+import ast.data.statement.ExpressionReturn;
 import ast.data.statement.ForStmt;
 import ast.data.statement.IfOption;
 import ast.data.statement.IfStatement;
 import ast.data.statement.MsgPush;
-import ast.data.statement.ExpressionReturn;
-import ast.data.statement.VoidReturn;
+import ast.data.statement.MultiAssignment;
 import ast.data.statement.VarDefInitStmt;
 import ast.data.statement.VarDefStmt;
+import ast.data.statement.VoidReturn;
 import ast.data.statement.WhileStmt;
 import ast.data.template.Template;
 import ast.data.type.TypeReference;
@@ -142,9 +143,9 @@ import ast.data.type.special.VoidType;
 import ast.data.type.template.ArrayTemplate;
 import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
-import ast.data.variable.ConstGlobal;
 import ast.data.variable.ConstPrivate;
 import ast.data.variable.FunctionVariable;
+import ast.data.variable.GlobalConstant;
 import ast.data.variable.StateVariable;
 import ast.data.variable.TemplateParameter;
 import ast.meta.SourcePosition;
@@ -152,657 +153,661 @@ import ast.meta.SourcePosition;
 public class NullVisitor implements Visitor {
 
   @Override
-  public void visit(AliasType aliasType) {
+  public void visit(AliasType object) {
 
   }
 
   @Override
-  public void visit(And and) {
+  public void visit(And object) {
 
   }
 
   @Override
-  public void visit(AnyType anyType) {
+  public void visit(AnyType object) {
 
   }
 
   @Override
-  public void visit(AnyValue anyValue) {
+  public void visit(AnyValue object) {
 
   }
 
   @Override
-  public void visit(ArrayTemplate arrayTemplate) {
+  public void visit(ArrayTemplate object) {
 
   }
 
   @Override
-  public void visit(ArrayType arrayType) {
+  public void visit(ArrayType object) {
 
   }
 
   @Override
-  public void visit(ArrayValue arrayValue) {
+  public void visit(ArrayValue object) {
 
   }
 
   @Override
-  public void visit(MultiAssignment assignmentMulti) {
+  public void visit(AssignmentSingle object) {
 
   }
 
   @Override
-  public void visit(AssignmentSingle assignmentSingle) {
+  public void visit(AsynchroniusConnection object) {
 
   }
 
   @Override
-  public void visit(AsynchroniusConnection asynchroniusConnection) {
+  public void visit(BitAnd object) {
 
   }
 
   @Override
-  public void visit(BitAnd bitAnd) {
+  public void visit(BitNot object) {
 
   }
 
   @Override
-  public void visit(BitNot bitNot) {
+  public void visit(BitOr object) {
 
   }
 
   @Override
-  public void visit(BitOr bitOr) {
+  public void visit(BitXor object) {
 
   }
 
   @Override
-  public void visit(BitXor bitXor) {
+  public void visit(Block object) {
 
   }
 
   @Override
-  public void visit(Block block) {
+  public void visit(BooleanType object) {
 
   }
 
   @Override
-  public void visit(BooleanType booleanType) {
+  public void visit(BooleanValue object) {
 
   }
 
   @Override
-  public void visit(BooleanValue boolValue) {
+  public void visit(CallStmt object) {
 
   }
 
   @Override
-  public void visit(CallStmt callStmt) {
+  public void visit(CaseOpt object) {
 
   }
 
   @Override
-  public void visit(CaseOpt caseOpt) {
+  public void visit(CaseOptRange object) {
 
   }
 
   @Override
-  public void visit(CaseOptRange caseOptRange) {
+  public void visit(CaseOptSimple object) {
 
   }
 
   @Override
-  public void visit(CaseOptSimple caseOptSimple) {
+  public void visit(CaseOptValue object) {
 
   }
 
   @Override
-  public void visit(CaseOptValue caseOptValue) {
+  public void visit(CaseStmt object) {
 
   }
 
   @Override
-  public void visit(CaseStmt caseStmt) {
+  public void visit(ComponentReference object) {
 
   }
 
   @Override
-  public void visit(ComponentType componentType) {
+  public void visit(ComponentType object) {
 
   }
 
   @Override
-  public void visit(CompRef compRef) {
+  public void visit(ComponentUse object) {
 
   }
 
   @Override
-  public void visit(CompUse compUse) {
+  public void visit(CompUseRef object) {
 
   }
 
   @Override
-  public void visit(CompUseRef compUseRef) {
+  public void visit(ConstPrivate object) {
 
   }
 
   @Override
-  public void visit(ConstGlobal constGlobal) {
+  public void visit(DefaultValueTemplate object) {
 
   }
 
   @Override
-  public void visit(ConstPrivate constPrivate) {
+  public void visit(Division object) {
 
   }
 
   @Override
-  public void visit(DefaultValueTemplate defaultValueTemplate) {
+  public void visit(EndpointRaw object) {
 
   }
 
   @Override
-  public void visit(Division div) {
+  public void visit(EndpointSelf object) {
 
   }
 
   @Override
-  public void visit(LinkTarget dummyLinkTarget) {
+  public void visit(EndpointSub object) {
 
   }
 
   @Override
-  public void visit(EndpointRaw endpointRaw) {
+  public void visit(EnumElement object) {
 
   }
 
   @Override
-  public void visit(EndpointSelf endpointSelf) {
+  public void visit(EnumType object) {
 
   }
 
   @Override
-  public void visit(EndpointSub endpointSub) {
+  public void visit(Equal object) {
 
   }
 
   @Override
-  public void visit(EnumElement enumElement) {
+  public void visit(ExpressionReturn object) {
 
   }
 
   @Override
-  public void visit(EnumType enumType) {
+  public void visit(ForStmt object) {
 
   }
 
   @Override
-  public void visit(Equal equal) {
+  public void visit(FuncFunction object) {
 
   }
 
   @Override
-  public void visit(ForStmt forStmt) {
+  public void visit(FuncInterrupt object) {
 
   }
 
   @Override
-  public void visit(FuncFunction funcFunction) {
+  public void visit(FuncQuery object) {
 
   }
 
   @Override
-  public void visit(FuncInterrupt funcInterrupt) {
+  public void visit(FuncReturnNone object) {
 
   }
 
   @Override
-  public void visit(FuncProcedure funcProcedure) {
+  public void visit(FuncReturnTuple object) {
 
   }
 
   @Override
-  public void visit(FuncQuery funcQuery) {
+  public void visit(FuncSubHandlerEvent object) {
 
   }
 
   @Override
-  public void visit(FuncRef funcRef) {
+  public void visit(FuncSubHandlerQuery object) {
 
   }
 
   @Override
-  public void visit(FuncResponse funcResponse) {
+  public void visit(FunctionReference object) {
 
   }
 
   @Override
-  public void visit(FuncReturnNone funcReturnNone) {
+  public void visit(FunctionReturnType object) {
 
   }
 
   @Override
-  public void visit(FuncReturnTuple funcReturnTuple) {
+  public void visit(FunctionType object) {
 
   }
 
   @Override
-  public void visit(FunctionReturnType funcReturnType) {
+  public void visit(FunctionVariable object) {
 
   }
 
   @Override
-  public void visit(Signal funcSignal) {
+  public void visit(GlobalConstant object) {
 
   }
 
   @Override
-  public void visit(Slot funcSlot) {
+  public void visit(Greater object) {
 
   }
 
   @Override
-  public void visit(FuncSubHandlerEvent funcSubHandlerEvent) {
+  public void visit(GreaterEqual object) {
 
   }
 
   @Override
-  public void visit(FuncSubHandlerQuery funcSubHandlerQuery) {
+  public void visit(IfOption object) {
 
   }
 
   @Override
-  public void visit(FunctionType functionType) {
+  public void visit(IfStatement object) {
 
   }
 
   @Override
-  public void visit(FunctionVariable funcVariable) {
+  public void visit(ImplComposition object) {
 
   }
 
   @Override
-  public void visit(Greater greater) {
+  public void visit(ImplElementary object) {
 
   }
 
   @Override
-  public void visit(GreaterEqual greaterequal) {
+  public void visit(ImplHfsm object) {
 
   }
 
   @Override
-  public void visit(IfOption ifOption) {
+  public void visit(IntegerType object) {
 
   }
 
   @Override
-  public void visit(IfStatement ifStmt) {
+  public void visit(Is object) {
 
   }
 
   @Override
-  public void visit(ImplComposition implComposition) {
+  public void visit(Less object) {
 
   }
 
   @Override
-  public void visit(ImplElementary implElementary) {
+  public void visit(LessEqual object) {
 
   }
 
   @Override
-  public void visit(ImplHfsm implHfsm) {
+  public void visit(LinkedReferenceWithOffset_Implementation object) {
 
   }
 
   @Override
-  public void visit(IntegerType integerType) {
+  public void visit(LinkTarget object) {
 
   }
 
   @Override
-  public void visit(Is is) {
+  public void visit(LogicAnd object) {
 
   }
 
   @Override
-  public void visit(Less less) {
+  public void visit(LogicNot object) {
 
   }
 
   @Override
-  public void visit(LessEqual lessequal) {
+  public void visit(LogicOr object) {
 
   }
 
   @Override
-  public void visit(LogicAnd logicAnd) {
+  public void visit(Minus object) {
 
   }
 
   @Override
-  public void visit(LogicNot logicNot) {
+  public void visit(Modulo object) {
 
   }
 
   @Override
-  public void visit(LogicOr logicOr) {
+  public void visit(MsgPush object) {
 
   }
 
   @Override
-  public void visit(Minus minus) {
+  public void visit(MultiAssignment object) {
 
   }
 
   @Override
-  public void visit(Modulo mod) {
+  public void visit(Multiplication object) {
 
   }
 
   @Override
-  public void visit(MsgPush msgPush) {
+  public void visit(NamedElement object) {
 
   }
 
   @Override
-  public void visit(Multiplication mul) {
+  public void visit(NamedElementsValue object) {
 
   }
 
   @Override
-  public void visit(NamedElement namedElement) {
+  public void visit(NamedValue object) {
 
   }
 
   @Override
-  public void visit(NamedElementsValue namedElementsValue) {
+  public void visit(Namespace object) {
 
   }
 
   @Override
-  public void visit(NamedValue namedValue) {
+  public void visit(NaturalType object) {
 
   }
 
   @Override
-  public void visit(Namespace namespace) {
+  public void visit(Not object) {
 
   }
 
   @Override
-  public void visit(NaturalType naturalType) {
+  public void visit(NotEqual object) {
 
   }
 
   @Override
-  public void visit(Not not) {
+  public void visit(NumberValue object) {
 
   }
 
   @Override
-  public void visit(NotEqual notequal) {
+  public void visit(Or object) {
 
   }
 
   @Override
-  public void visit(NumberValue numberValue) {
+  public void visit(Plus object) {
 
   }
 
   @Override
-  public void visit(Or or) {
+  public void visit(PointerType object) {
 
   }
 
   @Override
-  public void visit(Plus plus) {
+  public void visit(Procedure object) {
 
   }
 
   @Override
-  public void visit(PointerType pointerType) {
+  public void visit(Queue object) {
 
   }
 
   @Override
-  public void visit(Queue queue) {
+  public void visit(RangeTemplate object) {
 
   }
 
   @Override
-  public void visit(RangeTemplate rangeTemplate) {
+  public void visit(RangeType object) {
 
   }
 
   @Override
-  public void visit(RangeType rangeType) {
+  public void visit(RawComposition object) {
 
   }
 
   @Override
-  public void visit(RawComposition rawComposition) {
+  public void visit(RawElementary object) {
 
   }
 
   @Override
-  public void visit(RawElementary rawElementary) {
+  public void visit(RawHfsm object) {
 
   }
 
   @Override
-  public void visit(RawHfsm rawHfsm) {
+  public void visit(RecordType object) {
 
   }
 
   @Override
-  public void visit(RecordType recordType) {
+  public void visit(RecordValue object) {
 
   }
 
   @Override
-  public void visit(RecordValue recordValue) {
+  public void visit(RefCall object) {
 
   }
 
   @Override
-  public void visit(RefCall refCall) {
+  public void visit(ReferenceExpression object) {
 
   }
 
   @Override
-  public void visit(Reference reference) {
+  public void visit(RefIndex object) {
 
   }
 
   @Override
-  public void visit(ReferenceExpression refExp) {
+  public void visit(RefName object) {
 
   }
 
   @Override
-  public void visit(RefIndex refIndex) {
+  public void visit(RefTemplCall object) {
 
   }
 
   @Override
-  public void visit(RefName refName) {
+  public void visit(Response object) {
 
   }
 
   @Override
-  public void visit(RefTemplCall refTemplCall) {
+  public void visit(RizzlyFile object) {
 
   }
 
   @Override
-  public void visit(ExpressionReturn returnExpr) {
+  public void visit(Shl object) {
 
   }
 
   @Override
-  public void visit(VoidReturn returnVoid) {
+  public void visit(Shr object) {
 
   }
 
   @Override
-  public void visit(RizzlyFile rizzlyFile) {
+  public void visit(Signal object) {
 
   }
 
   @Override
-  public void visit(Shl shl) {
+  public void visit(SIntType object) {
 
   }
 
   @Override
-  public void visit(Shr shr) {
+  public void visit(Slot object) {
 
   }
 
   @Override
-  public void visit(SIntType sIntType) {
-
+  public void visit(SourcePosition object) {
   }
 
   @Override
-  public void visit(StateComposite stateComposite) {
+  public void visit(StateComposite object) {
 
   }
 
   @Override
-  public void visit(StateRef stateRef) {
+  public void visit(StateRef object) {
 
   }
 
   @Override
-  public void visit(StateSimple stateSimple) {
+  public void visit(StateSimple object) {
 
   }
 
   @Override
-  public void visit(StateVariable stateVariable) {
+  public void visit(StateVariable object) {
 
   }
 
   @Override
-  public void visit(StringType stringType) {
+  public void visit(StringType object) {
 
   }
 
   @Override
-  public void visit(StringValue stringValue) {
+  public void visit(StringValue object) {
 
   }
 
   @Override
-  public void visit(SubCallbacks subCallbacks) {
+  public void visit(SubCallbacks object) {
 
   }
 
   @Override
-  public void visit(SynchroniusConnection synchroniusConnection) {
+  public void visit(SynchroniusConnection object) {
 
   }
 
   @Override
-  public void visit(Template template) {
+  public void visit(Template object) {
 
   }
 
   @Override
-  public void visit(TemplateParameter templateParameter) {
+  public void visit(TemplateParameter object) {
 
   }
 
   @Override
-  public void visit(Transition transition) {
+  public void visit(Transition object) {
 
   }
 
   @Override
-  public void visit(TupleType tupleType) {
+  public void visit(TupleType object) {
 
   }
 
   @Override
-  public void visit(TupleValue tupleValue) {
+  public void visit(TupleValue object) {
 
   }
 
   @Override
-  public void visit(TypeCast typeCast) {
+  public void visit(TypeCast object) {
 
   }
 
   @Override
-  public void visit(TypeReference typeRef) {
+  public void visit(TypeReference object) {
 
   }
 
   @Override
-  public void visit(TypeType typeType) {
+  public void visit(TypeType object) {
 
   }
 
   @Override
-  public void visit(TypeTypeTemplate typeTypeTemplate) {
+  public void visit(TypeTypeTemplate object) {
 
   }
 
   @Override
-  public void visit(UIntType uIntType) {
+  public void visit(UIntType object) {
 
   }
 
   @Override
-  public void visit(Uminus uminus) {
+  public void visit(Uminus object) {
 
   }
 
   @Override
-  public void visit(UnionType unionType) {
+  public void visit(UnionType object) {
 
   }
 
   @Override
-  public void visit(UnionValue unionValue) {
+  public void visit(UnionValue object) {
+
+  }
 
+  @Override
+  public void visit(UnlinkedReferenceWithOffset_Implementation object) {
   }
 
   @Override
-  public void visit(UnsafeUnionType unsafeUnionType) {
+  public void visit(UnsafeUnionType object) {
 
   }
 
   @Override
-  public void visit(UnsafeUnionValue unsafeUnionValue) {
+  public void visit(UnsafeUnionValue object) {
 
   }
 
   @Override
-  public void visit(VarDefInitStmt varDefInitStmt) {
+  public void visit(VarDefInitStmt object) {
 
   }
 
   @Override
-  public void visit(VarDefStmt varDefStmt) {
+  public void visit(VarDefStmt object) {
 
   }
 
   @Override
-  public void visit(VoidType voidType) {
+  public void visit(VoidReturn object) {
 
   }
 
   @Override
-  public void visit(WhileStmt whileStmt) {
+  public void visit(VoidType object) {
 
   }
 
   @Override
-  public void visit(SourcePosition elementInfo) {
+  public void visit(WhileStmt object) {
+
   }
 
 }

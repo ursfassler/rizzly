@@ -48,6 +48,7 @@ import ast.pass.others.CompareReplacer;
 import ast.pass.others.ConstTyper;
 import ast.pass.others.ConstantPropagation;
 import ast.pass.others.DebugIface;
+import ast.pass.others.DefaultVisitorPass;
 import ast.pass.others.DocWriter;
 import ast.pass.others.FileLoader;
 import ast.pass.others.HeaderWriter;
@@ -74,6 +75,7 @@ import ast.pass.reduction.EnumLinkReduction;
 import ast.pass.reduction.EnumReduction;
 import ast.pass.reduction.FileReduction;
 import ast.pass.reduction.ForReduction;
+import ast.pass.reduction.MetadataRemover;
 import ast.pass.reduction.NamespaceLinkReduction;
 import ast.pass.reduction.OpenReplace;
 import ast.pass.reduction.RangeReplacer;
@@ -102,17 +104,14 @@ public class Passes {
 
   // TODO split up
   private static PassGroup makePasses(Configuration configuration) {
+    PassGroup passes = new PassGroup("ast");
+
     if (configuration.doXml()) {
-      PassGroup passes = new PassGroup("xml");
       passes.add(new FileLoader(configuration));
-      passes.add(new InternsAdder(configuration));
-      passes.add(new CheckNames(configuration));
-      passes.add(new Linker(configuration));
+      passes.add(new DefaultVisitorPass(new MetadataRemover(), configuration));
       passes.add(new XmlWriterPass(configuration));
       return passes;
     }
-
-    PassGroup passes = new PassGroup("ast");
 
     passes.checks.add(new Sanitycheck(configuration));
 

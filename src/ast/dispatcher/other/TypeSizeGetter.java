@@ -18,7 +18,7 @@
 package ast.dispatcher.other;
 
 import ast.data.Ast;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.type.Type;
 import ast.data.type.base.ArrayType;
 import ast.data.type.composed.RecordType;
@@ -49,8 +49,8 @@ public class TypeSizeGetter extends NullDispatcher<Integer, Void> {
   }
 
   @Override
-  protected Integer visitReference(Reference obj, Void param) {
-    return visit(obj.link, param);
+  protected Integer visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
+    return visit(obj.getLink(), param);
   }
 
   @Override

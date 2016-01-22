@@ -19,8 +19,8 @@ package ast.pass.others;
 
 import main.Configuration;
 import ast.data.Namespace;
-import ast.data.component.CompRef;
-import ast.data.component.composition.CompUse;
+import ast.data.component.ComponentReference;
+import ast.data.component.composition.ComponentUse;
 import ast.data.reference.RefFactory;
 import ast.data.template.Template;
 import ast.knowledge.KnowledgeBase;
@@ -35,7 +35,7 @@ public class RootInstanceAdder extends AstPass {
   @Override
   public void process(Namespace root, KnowledgeBase kb) {
     Template rootdecl = (Template) ChildByName.staticGet(root, kb.getOptions().getRootComp(), root.metadata());
-    ast.data.component.composition.CompUse rootinst = new CompUse("inst", new CompRef(RefFactory.full(rootdecl)));
+    ast.data.component.composition.ComponentUse rootinst = new ComponentUse("inst", new ComponentReference(RefFactory.full(rootdecl)));
     root.children.add(rootinst);
   }
 

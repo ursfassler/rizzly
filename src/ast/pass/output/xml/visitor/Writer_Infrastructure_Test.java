@@ -30,15 +30,19 @@ import ast.data.Namespace;
 import ast.data.file.RizzlyFile;
 import ast.meta.MetaInformation;
 import ast.meta.SourcePosition;
+import ast.pass.output.xml.IdReader;
+import ast.visitor.Visitor;
 
 public class Writer_Infrastructure_Test {
   final private XmlStreamWriter stream = mock(XmlStreamWriter.class);
-  final private Write testee = new Write(stream);
+  final private IdReader astId = mock(IdReader.class);
+  final private Visitor idWriter = mock(Visitor.class);
+  final private Write testee = new Write(stream, astId, idWriter);
   final private MetaInformation info = mock(MetaInformation.class);
   final private Named child1 = mock(Named.class);
   final private Named child2 = mock(Named.class);
   final private Named child3 = mock(Named.class);
-  final private InOrder order = Mockito.inOrder(stream, info, child1, child2, child3);
+  final private InOrder order = Mockito.inOrder(stream, info, child1, child2, child3, idWriter);
 
   @Test
   public void write_namespace() {
@@ -52,6 +56,7 @@ public class Writer_Infrastructure_Test {
 
     order.verify(stream).beginNode(eq("Namespace"));
     order.verify(stream).attribute("name", "ns");
+    order.verify(idWriter).visit(item);
     order.verify(info).accept(eq(testee));
     order.verify(child1).accept(eq(testee));
     order.verify(child2).accept(eq(testee));
@@ -85,6 +90,7 @@ public class Writer_Infrastructure_Test {
 
     order.verify(stream).beginNode(eq("RizzlyFile"));
     order.verify(stream).attribute("name", "the file name");
+    order.verify(idWriter).visit(item);
     order.verify(info).accept(eq(testee));
 
     order.verify(stream).beginNode(eq("import"));

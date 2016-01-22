@@ -30,16 +30,20 @@ import ast.data.template.Template;
 import ast.data.type.TypeReference;
 import ast.data.variable.TemplateParameter;
 import ast.meta.MetaInformation;
+import ast.pass.output.xml.IdReader;
+import ast.visitor.Visitor;
 
 public class Writer_Template_Test {
   final private XmlStreamWriter stream = mock(XmlStreamWriter.class);
-  final private Write testee = new Write(stream);
+  final private IdReader astId = mock(IdReader.class);
+  final private Visitor idWriter = mock(Visitor.class);
+  final private Write testee = new Write(stream, astId, idWriter);
   final private MetaInformation info = mock(MetaInformation.class);
   final private TemplateParameter parameter1 = mock(TemplateParameter.class);
   final private TemplateParameter parameter2 = mock(TemplateParameter.class);
   final private Named object = mock(Named.class);
   final private TypeReference typeReference = mock(TypeReference.class);
-  final private InOrder order = Mockito.inOrder(stream, info, parameter1, parameter2, typeReference, object);
+  final private InOrder order = Mockito.inOrder(stream, info, parameter1, parameter2, typeReference, object, idWriter);
   final private AstList<TemplateParameter> parameter;
 
   public Writer_Template_Test() {
@@ -58,6 +62,7 @@ public class Writer_Template_Test {
 
     order.verify(stream).beginNode(eq("Template"));
     order.verify(stream).attribute("name", "the Template");
+    order.verify(idWriter).visit(item);
     order.verify(info).accept(eq(testee));
     order.verify(parameter1).accept(eq(testee));
     order.verify(parameter2).accept(eq(testee));
@@ -74,6 +79,7 @@ public class Writer_Template_Test {
 
     order.verify(stream).beginNode(eq("TemplateParameter"));
     order.verify(stream).attribute("name", "the param");
+    order.verify(idWriter).visit(item);
     order.verify(info).accept(eq(testee));
     order.verify(typeReference).accept(eq(testee));
     order.verify(stream).endNode();

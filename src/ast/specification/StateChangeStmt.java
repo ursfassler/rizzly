@@ -20,12 +20,14 @@ package ast.specification;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.function.Function;
-import ast.data.reference.Reference;
-import ast.data.statement.MultiAssignment;
+import ast.data.reference.LinkedReference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.CallStmt;
-import ast.data.variable.StateVariable;
+import ast.data.statement.MultiAssignment;
 import ast.dispatcher.NullDispatcher;
+import ast.specification.visitor.IsStateVariable;
+import error.RError;
 
 public class StateChangeStmt extends Specification {
   static private final StateChangeDispatcher dispatcher = new StateChangeDispatcher();
@@ -47,7 +49,7 @@ class StateChangeDispatcher extends NullDispatcher<Boolean, Void> {
 
   @Override
   protected Boolean visitAssignmentSingle(AssignmentSingle obj, Void param) {
-    return isStateVar(obj.left.link);
+    return isStateVar(obj.left);
   }
 
   @Override
@@ -60,18 +62,22 @@ class StateChangeDispatcher extends NullDispatcher<Boolean, Void> {
     return isImpure(obj.call);
   }
 
-  private boolean isImpure(Reference call) {
-    Function target = (Function) call.link;
+  private boolean isImpure(LinkedReference call) {
+    Function target = (Function) call.getLink();
     return !pureFunc.isSatisfiedBy(target);
   }
 
   private boolean isStateVar(Ast var) {
-    return var instanceof StateVariable;
+    IsStateVariable isStateVariable = new IsStateVariable(RError.instance());
+
+    var.accept(isStateVariable);
+
+    return isStateVariable.isState();
   }
 
-  private boolean containsStateVar(AstList<Reference> vars) {
-    for (Reference left : vars) {
-      if (isStateVar(left.link)) {
+  private boolean containsStateVar(AstList<LinkedReferenceWithOffset_Implementation> vars) {
+    for (LinkedReference left : vars) {
+      if (isStateVar(left.getLink())) {
         return true;
       }
     }

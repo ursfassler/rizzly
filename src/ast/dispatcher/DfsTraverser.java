@@ -18,9 +18,9 @@
 package ast.dispatcher;
 
 import ast.data.Namespace;
-import ast.data.component.CompRef;
+import ast.data.component.ComponentReference;
 import ast.data.component.composition.AsynchroniusConnection;
-import ast.data.component.composition.CompUse;
+import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.EndpointRaw;
 import ast.data.component.composition.EndpointSelf;
@@ -74,12 +74,12 @@ import ast.data.expression.value.TupleValue;
 import ast.data.expression.value.UnionValue;
 import ast.data.expression.value.UnsafeUnionValue;
 import ast.data.file.RizzlyFile;
-import ast.data.function.FuncRef;
+import ast.data.function.FunctionReference;
 import ast.data.function.Function;
 import ast.data.function.header.FuncFunction;
-import ast.data.function.header.FuncProcedure;
+import ast.data.function.header.Procedure;
 import ast.data.function.header.FuncQuery;
-import ast.data.function.header.FuncResponse;
+import ast.data.function.header.Response;
 import ast.data.function.header.FuncSubHandlerEvent;
 import ast.data.function.header.FuncSubHandlerQuery;
 import ast.data.function.header.Signal;
@@ -96,7 +96,7 @@ import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
@@ -141,7 +141,7 @@ import ast.data.type.special.VoidType;
 import ast.data.type.template.ArrayTemplate;
 import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
-import ast.data.variable.ConstGlobal;
+import ast.data.variable.GlobalConstant;
 import ast.data.variable.ConstPrivate;
 import ast.data.variable.FunctionVariable;
 import ast.data.variable.StateVariable;
@@ -345,7 +345,7 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
   }
 
   @Override
-  protected R visitConstGlobal(ConstGlobal obj, P param) {
+  protected R visitConstGlobal(GlobalConstant obj, P param) {
     visit(obj.type, param);
     visit(obj.def, param);
     return null;
@@ -447,8 +447,8 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
   }
 
   @Override
-  protected R visitReference(Reference obj, P param) {
-    visitList(obj.offset, param);
+  protected R visitReference(LinkedReferenceWithOffset_Implementation obj, P param) {
+    visitList(obj.getOffset(), param);
     return null;
   }
 
@@ -463,7 +463,7 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
   }
 
   @Override
-  protected R visitFuncProcedure(FuncProcedure obj, P param) {
+  protected R visitFuncProcedure(Procedure obj, P param) {
     return null;
   }
 
@@ -748,7 +748,7 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
   }
 
   @Override
-  protected R visitFuncResponse(FuncResponse obj, P param) {
+  protected R visitFuncResponse(Response obj, P param) {
     return null;
   }
 
@@ -819,7 +819,7 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
   }
 
   @Override
-  protected R visitCompUse(CompUse obj, P param) {
+  protected R visitCompUse(ComponentUse obj, P param) {
     visit(obj.compRef, param);
     return null;
   }
@@ -947,7 +947,7 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
   }
 
   @Override
-  protected R visitFuncRef(FuncRef obj, P param) {
+  protected R visitFuncRef(FunctionReference obj, P param) {
     visit(obj.ref, param);
     return null;
   }
@@ -959,7 +959,7 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
   }
 
   @Override
-  protected R visitCompRef(CompRef obj, P param) {
+  protected R visitCompRef(ComponentReference obj, P param) {
     visit(obj.ref, param);
     return null;
   }

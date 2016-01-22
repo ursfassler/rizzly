@@ -11,7 +11,7 @@ import ast.data.AstList;
 import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.component.Component;
-import ast.data.component.composition.CompUse;
+import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.Connection;
 import ast.data.component.composition.Endpoint;
@@ -24,14 +24,14 @@ import ast.data.component.hfsm.ImplHfsm;
 import ast.data.function.FuncRefFactory;
 import ast.data.function.Function;
 import ast.data.function.InterfaceFunction;
-import ast.data.function.header.FuncProcedure;
+import ast.data.function.header.Procedure;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefName;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.type.Type;
 import ast.data.variable.Constant;
 import ast.data.variable.FunctionVariable;
@@ -77,8 +77,8 @@ class ReduceRawCompWorker extends DfsTraverser<Component, Void> {
   @Override
   protected Component visitRawElementary(RawElementary obj, Void param) {
     MetaList info = obj.metadata();// TODO use info for everything
-    FuncProcedure entryFunc = new FuncProcedure("_entry", new AstList<FunctionVariable>(), new FuncReturnNone(), obj.getEntryFunc());
-    FuncProcedure exitFunc = new FuncProcedure("_exit", new AstList<FunctionVariable>(), new FuncReturnNone(), obj.getExitFunc());
+    Procedure entryFunc = new Procedure("_entry", new AstList<FunctionVariable>(), new FuncReturnNone(), obj.getEntryFunc());
+    Procedure exitFunc = new Procedure("_exit", new AstList<FunctionVariable>(), new FuncReturnNone(), obj.getExitFunc());
     // if this makes problems like loops, convert the body of the functions
     // after the component
 
@@ -142,8 +142,8 @@ class ReduceRawCompWorker extends DfsTraverser<Component, Void> {
 
     for (Ast itr : obj.getInstantiation()) {
       Ast ni = itr;
-      if (ni instanceof CompUse) {
-        comp.component.add((CompUse) ni);
+      if (ni instanceof ComponentUse) {
+        comp.component.add((ComponentUse) ni);
       } else if (ni instanceof InterfaceFunction) {
         comp.iface.add((InterfaceFunction) ni);
       } else {
@@ -176,18 +176,18 @@ class ReduceEndpoint extends NullDispatcher<Endpoint, Void> {
 
   @Override
   protected Endpoint visitEndpointRaw(EndpointRaw obj, Void param) {
-    Reference ref = obj.ref;
+    LinkedReferenceWithOffset_Implementation ref = obj.ref;
 
-    switch (ref.offset.size()) {
+    switch (ref.getOffset().size()) {
       case 0: {
-        Named link = ref.link;
+        Named link = ref.getLink();
         RError.ass(link instanceof Function, ref.metadata(), "expected function for: " + link.getName());
         return new EndpointSelf(ref.metadata(), FuncRefFactory.create(ref.metadata(), (Function) link));
       }
       case 1: {
-        Named link = ref.link;
-        RError.ass(link instanceof CompUse, ref.metadata(), "expected compuse for: " + link.getName());
-        String name = ((RefName) ref.offset.get(0)).name;
+        Named link = ref.getLink();
+        RError.ass(link instanceof ComponentUse, ref.metadata(), "expected compuse for: " + link.getName());
+        String name = ((RefName) ref.getOffset().get(0)).name;
         return new EndpointSub(ref.metadata(), new CompUseRef(obj.metadata(), RefFactory.create(obj.metadata(), link)), name);
       }
       default: {

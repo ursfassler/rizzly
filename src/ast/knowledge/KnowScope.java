@@ -21,15 +21,15 @@ import java.util.HashSet;
 import java.util.Set;
 
 import ast.data.Ast;
-import ast.data.component.composition.CompUse;
+import ast.data.component.composition.ComponentUse;
 import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.component.hfsm.Transition;
 import ast.data.file.RizzlyFile;
 import ast.data.function.header.FuncFunction;
-import ast.data.function.header.FuncProcedure;
+import ast.data.function.header.Procedure;
 import ast.data.function.header.FuncQuery;
-import ast.data.function.header.FuncResponse;
+import ast.data.function.header.Response;
 import ast.data.function.header.Signal;
 import ast.data.function.header.Slot;
 import ast.data.raw.RawComposition;
@@ -53,7 +53,7 @@ import ast.data.type.special.VoidType;
 import ast.data.type.template.ArrayTemplate;
 import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
-import ast.data.variable.ConstGlobal;
+import ast.data.variable.GlobalConstant;
 import ast.data.variable.ConstPrivate;
 import ast.data.variable.FunctionVariable;
 import ast.data.variable.StateVariable;
@@ -70,7 +70,7 @@ public class KnowScope extends KnowledgeEntry {
   static final private Set<Class> priv = new HashSet<Class>();
 
   static {
-    global.add(ConstGlobal.class);
+    global.add(GlobalConstant.class);
 
     global.add(IntegerType.class);
     global.add(ArrayTemplate.class);
@@ -98,17 +98,17 @@ public class KnowScope extends KnowledgeEntry {
     local.add(FunctionVariable.class);
     local.add(TemplateParameter.class);
 
-    priv.add(CompUse.class);
+    priv.add(ComponentUse.class);
     priv.add(StateVariable.class);
     priv.add(ConstPrivate.class);
     priv.add(StateComposite.class);
     priv.add(StateSimple.class);
     priv.add(Transition.class);
-    priv.add(FuncResponse.class); // TODO: sure?
+    priv.add(Response.class); // TODO: sure?
     priv.add(FuncQuery.class); // TODO: sure?
     priv.add(Signal.class); // TODO: sure?
     priv.add(Slot.class); // TODO: sure?
-    priv.add(FuncProcedure.class); // FIXME: can also be private
+    priv.add(Procedure.class); // FIXME: can also be private
 
     {
       @SuppressWarnings("rawtypes")

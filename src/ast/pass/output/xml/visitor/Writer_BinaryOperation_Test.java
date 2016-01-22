@@ -31,14 +31,18 @@ import ast.data.expression.binop.Modulo;
 import ast.data.expression.binop.Multiplication;
 import ast.data.expression.binop.Plus;
 import ast.meta.MetaInformation;
+import ast.pass.output.xml.IdReader;
+import ast.visitor.Visitor;
 
 public class Writer_BinaryOperation_Test {
   final private XmlStreamWriter stream = mock(XmlStreamWriter.class);
-  final private Write testee = new Write(stream);
+  final private IdReader astId = mock(IdReader.class);
+  final private Visitor idWriter = mock(Visitor.class);
+  final private Write testee = new Write(stream, astId, idWriter);
   final private MetaInformation info = mock(MetaInformation.class);
   final private Expression left = mock(Expression.class);
   final private Expression right = mock(Expression.class);
-  final private InOrder order = Mockito.inOrder(stream, info, left, right);
+  InOrder order = Mockito.inOrder(stream, info, left, right, idWriter);
 
   @Test
   public void write_plus() {
@@ -48,6 +52,7 @@ public class Writer_BinaryOperation_Test {
     testee.visit(operation);
 
     order.verify(stream).beginNode(eq("Plus"));
+    order.verify(idWriter).visit(eq(operation));
     order.verify(info).accept(eq(testee));
     order.verify(left).accept(eq(testee));
     order.verify(right).accept(eq(testee));

@@ -23,7 +23,7 @@ import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.reference.RefItem;
 import ast.data.reference.RefName;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
@@ -58,11 +58,11 @@ public class LinkReduction extends AstPass {
 class LinkReductionWorker extends DfsTraverser<Void, Void> {
 
   @Override
-  protected Void visitReference(Reference obj, Void param) {
-    Ast item = obj.link;
+  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
+    Ast item = obj.getLink();
     while (item instanceof Namespace) {
-      RefItem next = obj.offset.get(0);
-      obj.offset.remove(0);
+      RefItem next = obj.getOffset().get(0);
+      obj.getOffset().remove(0);
       if (!(next instanceof RefName)) {
         // TODO check it with typechecker
         RError.err(ErrorType.Fatal, "Expected named offset, got: " + next.getClass().getCanonicalName() + " (and why did the typechecker not find it?)", obj.metadata());
@@ -71,7 +71,7 @@ class LinkReductionWorker extends DfsTraverser<Void, Void> {
       item = NameFilter.select(((Namespace) item).children, name.name);
       assert (item != null); // type checker should find it?
     }
-    obj.link = (Named) item;
+    obj.setLink((Named) item);
     return super.visitReference(obj, param);
   }
 

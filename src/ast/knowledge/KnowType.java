@@ -26,9 +26,9 @@ import ast.Designator;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Range;
-import ast.data.component.CompRef;
+import ast.data.component.ComponentReference;
 import ast.data.component.Component;
-import ast.data.component.composition.CompUse;
+import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.Direction;
 import ast.data.component.hfsm.StateRef;
 import ast.data.expression.Expression;
@@ -61,14 +61,14 @@ import ast.data.expression.value.StringValue;
 import ast.data.expression.value.TupleValue;
 import ast.data.expression.value.UnionValue;
 import ast.data.expression.value.UnsafeUnionValue;
-import ast.data.function.FuncRef;
+import ast.data.function.FunctionReference;
 import ast.data.function.Function;
 import ast.data.function.InterfaceFunction;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FuncReturnTuple;
 import ast.data.function.ret.FunctionReturnType;
 import ast.data.reference.RefItem;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.type.Type;
 import ast.data.type.TypeRefFactory;
 import ast.data.type.TypeReference;
@@ -157,12 +157,12 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
   }
 
   @Override
-  protected Type visitCompRef(CompRef obj, Void param) {
+  protected Type visitCompRef(ComponentReference obj, Void param) {
     return visit(obj.ref, param);
   }
 
   @Override
-  protected Type visitFuncRef(FuncRef obj, Void param) {
+  protected Type visitFuncRef(FunctionReference obj, Void param) {
     return visit(obj.ref, param);
   }
 
@@ -257,9 +257,9 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
   }
 
   @Override
-  protected Type visitReference(Reference obj, Void param) {
-    Type base = visit(obj.link, param);
-    for (RefItem itm : obj.offset) {
+  protected Type visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
+    Type base = visit(obj.getLink(), param);
+    for (RefItem itm : obj.getOffset()) {
       base = rtg.traverse(itm, base);
     }
     return base;
@@ -271,7 +271,7 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
   }
 
   @Override
-  protected Type visitCompUse(CompUse obj, Void param) {
+  protected Type visitCompUse(ComponentUse obj, Void param) {
     return visit(obj.compRef, param);
   }
 

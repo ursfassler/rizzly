@@ -75,7 +75,7 @@ import ast.data.statement.MultiAssignment;
 import ast.data.statement.VarDefInitStmt;
 import ast.data.statement.WhileStmt;
 import ast.data.template.ActualTemplateArgument;
-import ast.data.variable.DefVariable;
+import ast.data.variable.DefaultVariable;
 import ast.dispatcher.DfsTraverser;
 import error.ErrorType;
 import error.RError;
@@ -342,7 +342,7 @@ abstract public class ExprReplacer<T> extends DfsTraverser<Expression, T> {
   }
 
   @Override
-  protected Expression visitDefVariable(DefVariable obj, T param) {
+  protected Expression visitDefVariable(DefaultVariable obj, T param) {
     obj.def = visit(obj.def, param);
     visit(obj.type, param);
     return null;

@@ -23,7 +23,7 @@ import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefItem;
 import ast.data.reference.RefName;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.type.Type;
 import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
@@ -50,7 +50,7 @@ public class ReferenceTypecheck extends NullDispatcher<Type, Type> {
     kc = kb.getEntry(KnowLeftIsContainerOfRight.class);
   }
 
-  static public void process(Reference ast, KnowledgeBase kb) {
+  static public void process(LinkedReferenceWithOffset_Implementation ast, KnowledgeBase kb) {
     ReferenceTypecheck adder = new ReferenceTypecheck(kb);
     adder.traverse(ast, null);
   }
@@ -61,9 +61,9 @@ public class ReferenceTypecheck extends NullDispatcher<Type, Type> {
   }
 
   @Override
-  protected Type visitReference(Reference obj, Type param) {
-    Type ret = kt.get(obj.link);
-    for (RefItem ref : obj.offset) {
+  protected Type visitReference(LinkedReferenceWithOffset_Implementation obj, Type param) {
+    Type ret = kt.get(obj.getLink());
+    for (RefItem ref : obj.getOffset()) {
       ret = visit(ref, ret);
       assert (ret != null);
     }

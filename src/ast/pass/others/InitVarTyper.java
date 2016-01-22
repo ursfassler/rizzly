@@ -44,7 +44,7 @@ import ast.data.type.composed.NamedElement;
 import ast.data.type.composed.RecordType;
 import ast.data.type.composed.UnionType;
 import ast.data.type.composed.UnsafeUnionType;
-import ast.data.variable.DefVariable;
+import ast.data.variable.DefaultVariable;
 import ast.dispatcher.other.ExprReplacer;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
@@ -78,7 +78,7 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
   }
 
   @Override
-  protected Expression visitDefVariable(DefVariable obj, Type param) {
+  protected Expression visitDefVariable(DefaultVariable obj, Type param) {
     assert (param == null);
     Type type = kt.get(obj.type);
     obj.def = visit(obj.def, type);

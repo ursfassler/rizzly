@@ -20,8 +20,10 @@ package ast.pass.specializer;
 import main.Configuration;
 import ast.data.AstList;
 import ast.data.Namespace;
+import ast.data.reference.LinkedReference;
 import ast.data.reference.RefTemplCall;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.ReferenceWithOffset;
 import ast.data.template.ActualTemplateArgument;
 import ast.data.template.Template;
 import ast.knowledge.KnowledgeBase;
@@ -38,31 +40,31 @@ public class TemplCallAdder extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    AstList<Reference> refList = listOfReferences(ast);
-    for (Reference ref : refList) {
+    AstList<LinkedReferenceWithOffset_Implementation> refList = listOfReferences(ast);
+    for (LinkedReferenceWithOffset_Implementation ref : refList) {
       if (isTemplateCall(ref) && missingCall(ref)) {
         insertTemplateCall(ref);
       }
     }
   }
 
-  private boolean isTemplateCall(Reference ref) {
-    return ref.link instanceof Template;
+  private boolean isTemplateCall(LinkedReference ref) {
+    return ref.getLink() instanceof Template;
   }
 
-  private boolean missingCall(Reference ref) {
-    return ref.offset.isEmpty() || !(ref.offset.get(0) instanceof RefTemplCall);
+  private boolean missingCall(ReferenceWithOffset ref) {
+    return ref.getOffset().isEmpty() || !(ref.getOffset().get(0) instanceof RefTemplCall);
   }
 
-  private void insertTemplateCall(Reference ref) {
-    if (!((Template) ref.link).getTempl().isEmpty()) {
+  private void insertTemplateCall(LinkedReferenceWithOffset_Implementation ref) {
+    if (!((Template) ref.getLink()).getTempl().isEmpty()) {
       RError.err(ErrorType.Error, "Missing template argument", ref.metadata());
     }
-    ref.offset.add(0, new RefTemplCall(new AstList<ActualTemplateArgument>()));
+    ref.getOffset().add(0, new RefTemplCall(new AstList<ActualTemplateArgument>()));
   }
 
-  private AstList<Reference> listOfReferences(Namespace ast) {
-    AstList<Reference> refList = Collector.select(ast, new IsClass(Reference.class)).castTo(Reference.class);
+  private AstList<LinkedReferenceWithOffset_Implementation> listOfReferences(Namespace ast) {
+    AstList<LinkedReferenceWithOffset_Implementation> refList = Collector.select(ast, new IsClass(LinkedReferenceWithOffset_Implementation.class)).castTo(LinkedReferenceWithOffset_Implementation.class);
     return refList;
   }
 

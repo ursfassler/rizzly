@@ -24,12 +24,13 @@ import ast.data.variable.FunctionVariable;
 import ast.dispatcher.other.CallgraphMaker;
 import ast.dispatcher.other.StmtReplacer;
 import ast.doc.SimpleGraph;
-import ast.knowledge.KnowBacklink;
 import ast.knowledge.KnowUniqueName;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.pass.helper.GraphHelper;
 import ast.repository.query.Match;
+import ast.repository.query.Referencees.ReferenceesFactory;
+import ast.repository.query.Referencees.ReferenceesReader;
 import ast.specification.IsClass;
 import error.RError;
 
@@ -44,34 +45,35 @@ public class FuncInliner extends AstPass {
     GraphHelper.doTransitiveClosure(callGraph);
     Set<Pair<Ast, Ast>> callset = callGraph.edgeSet();
 
-    FuncInlinerWorker worker = new FuncInlinerWorker(callset, kb);
+    ReferenceesReader referencees = (new ReferenceesFactory()).produce(ast);
+
+    FuncInlinerWorker worker = new FuncInlinerWorker(callset, referencees, kb);
     worker.traverse(ast, null);
   }
 }
 
 class FuncInlinerWorker extends StmtReplacer<Void> {
-  private final KnowBacklink kbl;
+  private final ReferenceesReader referencees;
   private final KnowUniqueName kun;
   private final Set<Pair<Ast, Ast>> callset;
 
-  public FuncInlinerWorker(Set<Pair<Ast, Ast>> callset, KnowledgeBase kb) {
-    super();
-    kbl = kb.getEntry(KnowBacklink.class);
+  public FuncInlinerWorker(Set<Pair<Ast, Ast>> callset, ReferenceesReader referencees, KnowledgeBase kb) {
     kun = kb.getEntry(KnowUniqueName.class);
     this.callset = callset;
+    this.referencees = referencees;
   }
 
   @Override
   protected List<Statement> visitCallStmt(CallStmt obj, Void param) {
-    if (obj.call.link instanceof Function) {
-      Function func = (Function) obj.call.link;
+    if (obj.call.getLink() instanceof Function) {
+      Function func = (Function) obj.call.getLink();
 
       List<Statement> fr = visit(func, param);
       assert (fr == null);
 
       if (canInline(func)) {
-        assert (obj.call.offset.size() == 1);
-        RefCall call = (RefCall) obj.call.offset.get(0);
+        assert (obj.call.getOffset().size() == 1);
+        RefCall call = (RefCall) obj.call.getOffset().get(0);
         return inline(func, call.actualParameter);
       }
     }
@@ -89,7 +91,7 @@ class FuncInlinerWorker extends StmtReplacer<Void> {
   }
 
   private boolean onlyOnceUsed(Function func) {
-    int refCount = kbl.get(func).size();
+    int refCount = referencees.getReferencees(func).size();
     return refCount <= 1;
   }
 

@@ -26,9 +26,9 @@ import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
 import ast.data.Namespace;
-import ast.data.component.CompRef;
+import ast.data.component.ComponentReference;
 import ast.data.component.composition.AsynchroniusConnection;
-import ast.data.component.composition.CompUse;
+import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.EndpointRaw;
 import ast.data.component.composition.Queue;
@@ -42,7 +42,7 @@ import ast.data.component.hfsm.Transition;
 import ast.data.expression.Expression;
 import ast.data.expression.ReferenceExpression;
 import ast.data.expression.value.NamedValue;
-import ast.data.function.FuncRef;
+import ast.data.function.FunctionReference;
 import ast.data.function.Function;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FuncReturnTuple;
@@ -51,7 +51,7 @@ import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
 import ast.data.reference.RefItem;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.CaseOpt;
 import ast.data.statement.CaseOptRange;
 import ast.data.statement.CaseOptValue;
@@ -133,13 +133,13 @@ public class CopyAst extends NullDispatcher<Ast, Void> {
   }
 
   @Override
-  protected Ast visitCompRef(CompRef obj, Void param) {
-    return new CompRef(copy(obj.ref));
+  protected Ast visitCompRef(ComponentReference obj, Void param) {
+    return new ComponentReference(copy(obj.ref));
   }
 
   @Override
-  protected Ast visitFuncRef(FuncRef obj, Void param) {
-    return new FuncRef(copy(obj.ref));
+  protected Ast visitFuncRef(FunctionReference obj, Void param) {
+    return new FunctionReference(copy(obj.ref));
   }
 
   @Override
@@ -148,8 +148,8 @@ public class CopyAst extends NullDispatcher<Ast, Void> {
   }
 
   @Override
-  protected Ast visitReference(Reference obj, Void param) {
-    return new Reference(obj.link, copy(obj.offset));
+  protected Ast visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
+    return new LinkedReferenceWithOffset_Implementation(obj.getLink(), copy(obj.getOffset()));
   }
 
   @Override
@@ -274,8 +274,8 @@ public class CopyAst extends NullDispatcher<Ast, Void> {
   }
 
   @Override
-  protected Ast visitCompUse(CompUse obj, Void param) {
-    return new CompUse(obj.getName(), copy(obj.compRef)); // we keep
+  protected Ast visitCompUse(ComponentUse obj, Void param) {
+    return new ComponentUse(obj.getName(), copy(obj.compRef)); // we keep
     // link to
     // old type
   }

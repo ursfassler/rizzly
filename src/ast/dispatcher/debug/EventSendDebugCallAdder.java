@@ -25,11 +25,11 @@ import ast.Designator;
 import ast.data.Ast;
 import ast.data.expression.value.NumberValue;
 import ast.data.function.Function;
-import ast.data.function.header.FuncProcedure;
+import ast.data.function.header.Procedure;
 import ast.data.function.header.FuncQuery;
 import ast.data.function.header.Signal;
 import ast.data.reference.RefFactory;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.MsgPush;
@@ -48,12 +48,12 @@ public class EventSendDebugCallAdder extends DfsTraverser<Void, Void> {
 
   private StmtTraverser st;
 
-  public EventSendDebugCallAdder(FuncProcedure debugSend, ArrayList<String> names) {
+  public EventSendDebugCallAdder(Procedure debugSend, ArrayList<String> names) {
     super();
     st = new StmtTraverser(debugSend, names);
   }
 
-  public static void process(Ast obj, ArrayList<String> names, FuncProcedure debugSend) {
+  public static void process(Ast obj, ArrayList<String> names, Procedure debugSend) {
     EventSendDebugCallAdder reduction = new EventSendDebugCallAdder(debugSend, names);
     reduction.traverse(obj, null);
   }
@@ -67,10 +67,10 @@ public class EventSendDebugCallAdder extends DfsTraverser<Void, Void> {
 
 class StmtTraverser extends DfsTraverser<Void, List<Statement>> {
 
-  private FuncProcedure debugSend;
+  private Procedure debugSend;
   private ArrayList<String> names;
 
-  public StmtTraverser(FuncProcedure debugSend, ArrayList<String> names) {
+  public StmtTraverser(Procedure debugSend, ArrayList<String> names) {
     super();
     this.debugSend = debugSend;
     this.names = names;
@@ -95,13 +95,13 @@ class StmtTraverser extends DfsTraverser<Void, List<Statement>> {
   }
 
   @Override
-  protected Void visitReference(Reference obj, List<Statement> param) {
+  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, List<Statement> param) {
     super.visitReference(obj, param);
 
-    boolean isOut = (obj.link instanceof FuncQuery) || (obj.link instanceof Signal);
+    boolean isOut = (obj.getLink() instanceof FuncQuery) || (obj.getLink() instanceof Signal);
 
     if (isOut) {
-      String funcName = obj.link.getName();
+      String funcName = obj.getLink().getName();
 
       int numFunc = names.indexOf(funcName);
       if (numFunc >= 0) {
@@ -115,10 +115,10 @@ class StmtTraverser extends DfsTraverser<Void, List<Statement>> {
     return null;
   }
 
-  private CallStmt makeCall(FuncProcedure func, int numFunc) {
+  private CallStmt makeCall(Procedure func, int numFunc) {
     // Self._sendMsg( numFunc );
     NumberValue arg = new NumberValue(BigInteger.valueOf(numFunc));
-    Reference call = RefFactory.call(func, arg);
+    LinkedReferenceWithOffset_Implementation call = RefFactory.call(func, arg);
     return new CallStmt(call);
   }
 }

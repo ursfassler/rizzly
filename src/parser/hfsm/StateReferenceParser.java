@@ -23,7 +23,7 @@ import parser.scanner.TokenType;
 import ast.data.component.hfsm.StateRef;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefName;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import error.ErrorType;
 import error.RizzlyError;
 
@@ -58,7 +58,7 @@ public class StateReferenceParser {
 
   private StateRef identifier() {
     Token token = scanner.next();
-    Reference ref = RefFactory.create(token.getData());
+    LinkedReferenceWithOffset_Implementation ref = RefFactory.create(token.getData());
     ref.metadata().add(token.getMetadata());
 
     while (scanner.peek(0).getType() == TokenType.PERIOD) {
@@ -66,7 +66,7 @@ public class StateReferenceParser {
       Token sub = scanner.next();
       RefName item = new RefName(sub.getData());
       item.metadata().add(sub.getMetadata());
-      ref.offset.add(item);
+      ref.getOffset().add(item);
     }
 
     StateRef stateRef = new StateRef(ref);

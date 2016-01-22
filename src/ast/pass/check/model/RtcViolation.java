@@ -26,7 +26,7 @@ import main.Configuration;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
-import ast.data.component.composition.CompUse;
+import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.Connection;
 import ast.data.component.composition.Endpoint;
 import ast.data.component.composition.EndpointSub;
@@ -68,21 +68,21 @@ public class RtcViolation extends AstPass {
     {
       List<ImplComposition> elemset = Collector.select(ast, new IsClass(ImplComposition.class)).castTo(ImplComposition.class);
       for (ImplComposition elem : elemset) {
-        SimpleGraph<CompUse> cg = makeCallgraph(elem.connection);
+        SimpleGraph<ComponentUse> cg = makeCallgraph(elem.connection);
         checkRtcViolation(cg, 2, elem.metadata());
       }
     }
     // no need to check for hfsm since they can not have sub-components
   }
 
-  private static SimpleGraph<CompUse> makeCallgraph(List<Connection> connection) {
-    SimpleGraph<CompUse> ret = new SimpleGraph<CompUse>();
+  private static SimpleGraph<ComponentUse> makeCallgraph(List<Connection> connection) {
+    SimpleGraph<ComponentUse> ret = new SimpleGraph<ComponentUse>();
     for (Connection con : connection) {
       Endpoint src = con.getSrc();
       Endpoint dst = con.getDst();
       if ((src instanceof EndpointSub) && (dst instanceof EndpointSub)) {
-        CompUse srcComp = ((EndpointSub) src).component.getTarget();
-        CompUse dstComp = ((EndpointSub) dst).component.getTarget();
+        ComponentUse srcComp = ((EndpointSub) src).component.getTarget();
+        ComponentUse dstComp = ((EndpointSub) dst).component.getTarget();
         ret.addVertex(srcComp);
         ret.addVertex(dstComp);
         ret.addEdge(srcComp, dstComp);
@@ -91,29 +91,29 @@ public class RtcViolation extends AstPass {
     return ret;
   }
 
-  private static void checkRtcViolation(SimpleGraph<CompUse> cg, int n, MetaList info) {
+  private static void checkRtcViolation(SimpleGraph<ComponentUse> cg, int n, MetaList info) {
     GraphHelper.doTransitiveClosure(cg);
-    ArrayList<CompUse> vs = new ArrayList<CompUse>(cg.vertexSet());
+    ArrayList<ComponentUse> vs = new ArrayList<ComponentUse>(cg.vertexSet());
     Collections.sort(vs, nameComparator());
-    AstList<CompUse> erritems = new AstList<CompUse>();
-    for (CompUse v : cg.vertexSet()) {
+    AstList<ComponentUse> erritems = new AstList<ComponentUse>();
+    for (ComponentUse v : cg.vertexSet()) {
       if (cg.containsEdge(v, v)) {
         erritems.add(v);
       }
     }
     if (!erritems.isEmpty()) {
       Collections.sort(erritems, nameComparator());
-      for (CompUse v : erritems) {
+      for (ComponentUse v : erritems) {
         RError.err(ErrorType.Hint, "Involved component: " + v.getName(), v.metadata());
       }
       RError.err(ErrorType.Error, "Violation of run to completion detected", info);
     }
   }
 
-  private static Comparator<CompUse> nameComparator() {
-    return new Comparator<CompUse>() {
+  private static Comparator<ComponentUse> nameComparator() {
+    return new Comparator<ComponentUse>() {
       @Override
-      public int compare(CompUse left, CompUse right) {
+      public int compare(ComponentUse left, ComponentUse right) {
         return left.getName().compareTo(right.getName());
       }
     };

@@ -23,10 +23,10 @@ import ast.data.AstList;
 import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.reference.RefTemplCall;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.template.ActualTemplateArgument;
 import ast.data.template.Template;
-import ast.data.variable.DefVariable;
+import ast.data.variable.DefaultVariable;
 import ast.dispatcher.DfsTraverser;
 import ast.interpreter.Memory;
 import ast.knowledge.KnowledgeBase;
@@ -78,23 +78,23 @@ class Evaluator extends DfsTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitReference(Reference obj, Void param) {
+  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
     // TODO can we all (following) instantiate like this?
 
-    if (obj.link instanceof Template) {
-      assert (!obj.offset.isEmpty() && (obj.offset.get(0) instanceof RefTemplCall));
+    if (obj.getLink() instanceof Template) {
+      assert (!obj.getOffset().isEmpty() && (obj.getOffset().get(0) instanceof RefTemplCall));
 
-      Template template = (Template) obj.link;
-      AstList<ActualTemplateArgument> acarg = ((RefTemplCall) obj.offset.get(0)).actualParameter;
-      obj.offset.remove(0);
-      obj.link = Specializer.specialize(template, acarg, kb);
+      Template template = (Template) obj.getLink();
+      AstList<ActualTemplateArgument> acarg = ((RefTemplCall) obj.getOffset().get(0)).actualParameter;
+      obj.getOffset().remove(0);
+      obj.setLink(Specializer.specialize(template, acarg, kb));
     }
 
     return super.visitReference(obj, param);
   }
 
   @Override
-  protected Void visitDefVariable(DefVariable obj, Void param) {
+  protected Void visitDefVariable(DefaultVariable obj, Void param) {
     visit(obj.type, param);
     obj.def = ExprEvaluator.evaluate(obj.def, new Memory(), kb);
     return null;

@@ -22,7 +22,7 @@ import ast.data.expression.Expression;
 import ast.data.type.TypeReference;
 import ast.visitor.Visitor;
 
-final public class StateVariable extends DefVariable implements StateContent {
+public class StateVariable extends DefaultVariable implements StateContent {
 
   public StateVariable(String name, TypeReference type, Expression def) {
     super(name, type, def);

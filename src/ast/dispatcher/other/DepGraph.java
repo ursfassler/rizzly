@@ -21,7 +21,7 @@ import java.util.Collection;
 
 import ast.data.Ast;
 import ast.data.function.Function;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.dispatcher.DfsTraverser;
 import ast.doc.SimpleGraph;
 
@@ -54,9 +54,9 @@ public class DepGraph extends DfsTraverser<Void, Ast> {
   }
 
   @Override
-  protected Void visitReference(Reference obj, Ast param) {
+  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Ast param) {
     super.visitReference(obj, param);
-    visit(obj.link, obj);
+    visit(obj.getLink(), obj);
     return null;
   }
 

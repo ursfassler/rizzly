@@ -25,15 +25,19 @@ import org.mockito.InOrder;
 import org.mockito.Mockito;
 
 import ast.data.expression.ReferenceExpression;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.meta.MetaInformation;
+import ast.pass.output.xml.IdReader;
+import ast.visitor.Visitor;
 
 public class Writer_Expression_Test {
   final private XmlStreamWriter stream = mock(XmlStreamWriter.class);
-  final private Write testee = new Write(stream);
+  final private IdReader astId = mock(IdReader.class);
+  final private Visitor idWriter = mock(Visitor.class);
+  final private Write testee = new Write(stream, astId, idWriter);
   final private MetaInformation info = mock(MetaInformation.class);
-  final private Reference reference = mock(Reference.class);
-  final private InOrder order = Mockito.inOrder(stream, info, reference);
+  final private LinkedReferenceWithOffset_Implementation reference = mock(LinkedReferenceWithOffset_Implementation.class);
+  final private InOrder order = Mockito.inOrder(stream, info, reference, idWriter);
 
   @Test
   public void write_ReferenceExpression() {
@@ -43,6 +47,7 @@ public class Writer_Expression_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("ReferenceExpression"));
+    order.verify(idWriter).visit(eq(item));
     order.verify(info).accept(eq(testee));
     order.verify(reference).accept(eq(testee));
     order.verify(stream).endNode();

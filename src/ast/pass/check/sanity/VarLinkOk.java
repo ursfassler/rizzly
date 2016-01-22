@@ -29,7 +29,7 @@ import ast.data.component.elementary.ImplElementary;
 import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.Transition;
 import ast.data.function.Function;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.ForStmt;
 import ast.data.statement.VarDefStmt;
 import ast.data.template.Template;
@@ -130,10 +130,10 @@ class VarLinkOkWorker extends DfsTraverser<Void, Set<Ast>> {
   }
 
   @Override
-  protected Void visitReference(Reference obj, Set<Ast> param) {
-    if ((obj.link instanceof Variable) || (obj.link instanceof Type)) {
-      if (!param.contains(obj.link)) {
-        RError.err(ErrorType.Fatal, "object " + obj.link.toString() + " not visible from here", obj.metadata());
+  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Set<Ast> param) {
+    if ((obj.getLink() instanceof Variable) || (obj.getLink() instanceof Type)) {
+      if (!param.contains(obj.getLink())) {
+        RError.err(ErrorType.Fatal, "object " + obj.getLink().toString() + " not visible from here", obj.metadata());
       }
     }
     return super.visitReference(obj, param);

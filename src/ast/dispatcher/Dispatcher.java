@@ -24,10 +24,10 @@ import ast.data.AstBase;
 import ast.data.AstList;
 import ast.data.Named;
 import ast.data.Namespace;
-import ast.data.component.CompRef;
+import ast.data.component.ComponentReference;
 import ast.data.component.Component;
 import ast.data.component.composition.AsynchroniusConnection;
-import ast.data.component.composition.CompUse;
+import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.Connection;
 import ast.data.component.composition.Endpoint;
@@ -91,13 +91,13 @@ import ast.data.expression.value.UnionValue;
 import ast.data.expression.value.UnsafeUnionValue;
 import ast.data.expression.value.ValueExpr;
 import ast.data.file.RizzlyFile;
-import ast.data.function.FuncRef;
+import ast.data.function.FunctionReference;
 import ast.data.function.Function;
 import ast.data.function.InterfaceFunction;
 import ast.data.function.header.FuncFunction;
-import ast.data.function.header.FuncProcedure;
+import ast.data.function.header.Procedure;
 import ast.data.function.header.FuncQuery;
-import ast.data.function.header.FuncResponse;
+import ast.data.function.header.Response;
 import ast.data.function.header.Signal;
 import ast.data.function.header.Slot;
 import ast.data.function.header.FuncSubHandlerEvent;
@@ -118,8 +118,8 @@ import ast.data.reference.RefIndex;
 import ast.data.reference.RefItem;
 import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
-import ast.data.reference.Reference;
-import ast.data.reference.TypedRef;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.TypedReference;
 import ast.data.statement.Assignment;
 import ast.data.statement.MultiAssignment;
 import ast.data.statement.AssignmentSingle;
@@ -172,10 +172,10 @@ import ast.data.type.template.ArrayTemplate;
 import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
-import ast.data.variable.ConstGlobal;
+import ast.data.variable.GlobalConstant;
 import ast.data.variable.ConstPrivate;
 import ast.data.variable.Constant;
-import ast.data.variable.DefVariable;
+import ast.data.variable.DefaultVariable;
 import ast.data.variable.FunctionVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.TemplateParameter;
@@ -236,23 +236,23 @@ public abstract class Dispatcher<R, P> {
       return visitNamedValue((NamedValue) obj, param);
     } else if (obj instanceof Endpoint) {
       return visitEndpoint((Endpoint) obj, param);
-    } else if (obj instanceof TypedRef) {
-      return visitTypedRef((TypedRef) obj, param);
-    } else if (obj instanceof Reference) {
-      return visitReference((Reference) obj, param);
+    } else if (obj instanceof TypedReference) {
+      return visitTypedRef((TypedReference) obj, param);
+    } else if (obj instanceof LinkedReferenceWithOffset_Implementation) {
+      return visitReference((LinkedReferenceWithOffset_Implementation) obj, param);
     } else {
       throwUnknownObjectError(obj);
       return null;
     }
   }
 
-  protected R visitTypedRef(TypedRef obj, P param) {
+  protected R visitTypedRef(TypedReference obj, P param) {
     if (obj instanceof TypeReference) {
       return visitTypeRef((TypeReference) obj, param);
-    } else if (obj instanceof FuncRef) {
-      return visitFuncRef((FuncRef) obj, param);
-    } else if (obj instanceof CompRef) {
-      return visitCompRef((CompRef) obj, param);
+    } else if (obj instanceof FunctionReference) {
+      return visitFuncRef((FunctionReference) obj, param);
+    } else if (obj instanceof ComponentReference) {
+      return visitCompRef((ComponentReference) obj, param);
     } else if (obj instanceof StateRef) {
       return visitStateRef((StateRef) obj, param);
     } else if (obj instanceof CompUseRef) {
@@ -282,8 +282,8 @@ public abstract class Dispatcher<R, P> {
       return visitComponent((Component) obj, param);
     } else if (obj instanceof NamedElement) {
       return visitNamedElement((NamedElement) obj, param);
-    } else if (obj instanceof CompUse) {
-      return visitCompUse((CompUse) obj, param);
+    } else if (obj instanceof ComponentUse) {
+      return visitCompUse((ComponentUse) obj, param);
     } else if (obj instanceof RizzlyFile) {
       return visitRizzlyFile((RizzlyFile) obj, param);
     } else if (obj instanceof Template) {
@@ -409,8 +409,8 @@ public abstract class Dispatcher<R, P> {
   }
 
   protected R visitVariable(Variable obj, P param) {
-    if (obj instanceof DefVariable) {
-      return visitDefVariable((DefVariable) obj, param);
+    if (obj instanceof DefaultVariable) {
+      return visitDefVariable((DefaultVariable) obj, param);
     } else if (obj instanceof FunctionVariable) {
       return visitFuncVariable((FunctionVariable) obj, param);
     } else if (obj instanceof TemplateParameter) {
@@ -421,7 +421,7 @@ public abstract class Dispatcher<R, P> {
     }
   }
 
-  protected R visitDefVariable(DefVariable obj, P param) {
+  protected R visitDefVariable(DefaultVariable obj, P param) {
     if (obj instanceof StateVariable) {
       return visitStateVariable((StateVariable) obj, param);
     } else if (obj instanceof Constant) {
@@ -435,8 +435,8 @@ public abstract class Dispatcher<R, P> {
   protected R visitConstant(Constant obj, P param) {
     if (obj instanceof ConstPrivate) {
       return visitConstPrivate((ConstPrivate) obj, param);
-    } else if (obj instanceof ConstGlobal) {
-      return visitConstGlobal((ConstGlobal) obj, param);
+    } else if (obj instanceof GlobalConstant) {
+      return visitConstGlobal((GlobalConstant) obj, param);
     } else {
       throwUnknownObjectError(obj);
       return null;
@@ -446,8 +446,8 @@ public abstract class Dispatcher<R, P> {
   protected R visitFunction(Function obj, P param) {
     if (obj instanceof InterfaceFunction) {
       return visitInterfaceFunction((InterfaceFunction) obj, param);
-    } else if (obj instanceof FuncProcedure) {
-      return visitFuncProcedure((FuncProcedure) obj, param);
+    } else if (obj instanceof Procedure) {
+      return visitFuncProcedure((Procedure) obj, param);
     } else if (obj instanceof FuncFunction) {
       return visitFuncFunction((FuncFunction) obj, param);
     } else if (obj instanceof FuncSubHandlerEvent) {
@@ -458,12 +458,12 @@ public abstract class Dispatcher<R, P> {
       return visitFuncQuery((FuncQuery) obj, param);
     } else if (obj instanceof Signal) {
       return visitFuncSignal((Signal) obj, param);
-    } else if (obj instanceof FuncProcedure) {
-      return visitFuncProcedure((FuncProcedure) obj, param);
+    } else if (obj instanceof Procedure) {
+      return visitFuncProcedure((Procedure) obj, param);
     } else if (obj instanceof FuncFunction) {
       return visitFuncFunction((FuncFunction) obj, param);
-    } else if (obj instanceof FuncResponse) {
-      return visitFuncResponse((FuncResponse) obj, param);
+    } else if (obj instanceof Response) {
+      return visitFuncResponse((Response) obj, param);
     } else if (obj instanceof Slot) {
       return visitFuncSlot((Slot) obj, param);
     } else {
@@ -475,8 +475,8 @@ public abstract class Dispatcher<R, P> {
   protected R visitInterfaceFunction(InterfaceFunction obj, P param) {
     if (obj instanceof Slot) {
       return visitFuncSlot((Slot) obj, param);
-    } else if (obj instanceof FuncResponse) {
-      return visitFuncResponse((FuncResponse) obj, param);
+    } else if (obj instanceof Response) {
+      return visitFuncResponse((Response) obj, param);
     } else if (obj instanceof FuncQuery) {
       return visitFuncQuery((FuncQuery) obj, param);
     } else if (obj instanceof Signal) {
@@ -771,9 +771,9 @@ public abstract class Dispatcher<R, P> {
 
   abstract protected R visitStateRef(StateRef obj, P param);
 
-  abstract protected R visitCompRef(CompRef obj, P param);
+  abstract protected R visitCompRef(ComponentReference obj, P param);
 
-  abstract protected R visitFuncRef(FuncRef obj, P param);
+  abstract protected R visitFuncRef(FunctionReference obj, P param);
 
   abstract protected R visitTypeRef(TypeReference obj, P param);
 
@@ -799,7 +799,7 @@ public abstract class Dispatcher<R, P> {
 
   abstract protected R visitSIntType(SIntType obj, P param);
 
-  abstract protected R visitCompUse(CompUse obj, P param);
+  abstract protected R visitCompUse(ComponentUse obj, P param);
 
   abstract protected R visitQueue(Queue obj, P param);
 
@@ -843,7 +843,7 @@ public abstract class Dispatcher<R, P> {
 
   abstract protected R visitEndpointRaw(EndpointRaw obj, P param);
 
-  abstract protected R visitReference(Reference obj, P param);
+  abstract protected R visitReference(LinkedReferenceWithOffset_Implementation obj, P param);
 
   abstract protected R visitStateSimple(StateSimple obj, P param);
 
@@ -855,7 +855,7 @@ public abstract class Dispatcher<R, P> {
 
   abstract protected R visitConstPrivate(ConstPrivate obj, P param);
 
-  abstract protected R visitConstGlobal(ConstGlobal obj, P param);
+  abstract protected R visitConstGlobal(GlobalConstant obj, P param);
 
   abstract protected R visitFuncVariable(FunctionVariable obj, P param);
 
@@ -895,7 +895,7 @@ public abstract class Dispatcher<R, P> {
 
   abstract protected R visitFuncSubHandlerEvent(FuncSubHandlerEvent obj, P param);
 
-  abstract protected R visitFuncProcedure(FuncProcedure obj, P param);
+  abstract protected R visitFuncProcedure(Procedure obj, P param);
 
   abstract protected R visitFuncFunction(FuncFunction obj, P param);
 
@@ -905,7 +905,7 @@ public abstract class Dispatcher<R, P> {
 
   abstract protected R visitFuncSlot(Slot obj, P param);
 
-  abstract protected R visitFuncResponse(FuncResponse obj, P param);
+  abstract protected R visitFuncResponse(Response obj, P param);
 
   abstract protected R visitRecordType(RecordType obj, P param);
 

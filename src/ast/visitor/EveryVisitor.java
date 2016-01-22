@@ -19,9 +19,9 @@ package ast.visitor;
 
 public class EveryVisitor extends DeepFirstTraverser {
 
-  public void setHandler(DefaultHandler handler) {
+  public void addDefaultHandler(DefaultHandler handler) {
     DefaultVisitor defaultVisitor = new DefaultVisitor(handler);
-    setPreorderVisitor(defaultVisitor);
+    addPreorderVisitor(defaultVisitor);
   }
 
 }

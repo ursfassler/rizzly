@@ -24,9 +24,9 @@ import parser.scanner.TokenType;
 import ast.data.function.Function;
 import ast.data.function.header.FuncFunction;
 import ast.data.function.header.FuncInterrupt;
-import ast.data.function.header.FuncProcedure;
+import ast.data.function.header.Procedure;
 import ast.data.function.header.FuncQuery;
-import ast.data.function.header.FuncResponse;
+import ast.data.function.header.Response;
 import ast.data.function.header.Signal;
 import ast.data.function.header.Slot;
 
@@ -41,9 +41,9 @@ public class KnowFuncType extends KnowledgeEntry {
     withRetval.put(FuncQuery.class, true);
     withBody.put(FuncQuery.class, false);
 
-    classes.put(TokenType.RESPONSE, FuncResponse.class);
-    withRetval.put(FuncResponse.class, true);
-    withBody.put(FuncResponse.class, true);
+    classes.put(TokenType.RESPONSE, Response.class);
+    withRetval.put(Response.class, true);
+    withBody.put(Response.class, true);
 
     classes.put(TokenType.SIGNAL, Signal.class);
     withRetval.put(Signal.class, false);
@@ -53,9 +53,9 @@ public class KnowFuncType extends KnowledgeEntry {
     withRetval.put(Slot.class, false);
     withBody.put(Slot.class, true);
 
-    classes.put(TokenType.PROCEDURE, FuncProcedure.class);
-    withRetval.put(FuncProcedure.class, false);
-    withBody.put(FuncProcedure.class, true);
+    classes.put(TokenType.PROCEDURE, Procedure.class);
+    withRetval.put(Procedure.class, false);
+    withBody.put(Procedure.class, true);
 
     classes.put(TokenType.FUNCTION, FuncFunction.class);
     withRetval.put(FuncFunction.class, true);

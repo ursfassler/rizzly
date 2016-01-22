@@ -15,23 +15,19 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.component;
+package ast.data.function.header;
 
-import ast.data.reference.Reference;
-import ast.data.reference.TypedRef;
-import ast.meta.MetaList;
+import ast.data.AstList;
+import ast.data.component.hfsm.StateContent;
+import ast.data.function.InterfaceFunction;
+import ast.data.function.ret.FuncReturn;
+import ast.data.statement.Block;
+import ast.data.variable.FunctionVariable;
 import ast.visitor.Visitor;
 
-final public class CompRef extends TypedRef<Component> {
-
-  public CompRef(Reference ref) {
-    super(ref);
-  }
-
-  @Deprecated
-  public CompRef(MetaList info, Reference ref) {
-    super(ref);
-    metadata().add(info);
+final public class Response extends InterfaceFunction implements StateContent {
+  public Response(String name, AstList<FunctionVariable> param, FuncReturn ret, Block body) {
+    super(name, param, ret, body);
   }
 
   @Override

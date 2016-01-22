@@ -34,7 +34,7 @@ import ast.data.function.ret.FuncReturnNone;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefName;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
@@ -78,7 +78,7 @@ class DispatchFunctionFactory {
     AstList<CaseOpt> opt = new AstList<CaseOpt>();
     RefIndex idx = new RefIndex(new ReferenceExpression(RefFactory.full(queueVariables.getHead())));
     RefName tag = new RefName(ut.tag.getName());
-    Reference ref = RefFactory.create(queueVariables.getQueue(), idx, tag);
+    LinkedReferenceWithOffset_Implementation ref = RefFactory.create(queueVariables.getQueue(), idx, tag);
     CaseStmt caseStmt = new CaseStmt(new ReferenceExpression(ref), opt, new Block());
 
     for (Function func : queueTypes.getFuncToMsgType().keySet()) {
@@ -90,12 +90,12 @@ class DispatchFunctionFactory {
       RecordType rec = queueTypes.getFuncToRecord().get(func);
       AstList<Expression> acarg = new AstList<Expression>();
       for (NamedElement elem : rec.element) {
-        Reference vref = RefFactory.create(queueVariables.getQueue(), Copy.copy(idx), new RefName(un.getName()), new RefName(elem.getName()));
+        LinkedReferenceWithOffset_Implementation vref = RefFactory.create(queueVariables.getQueue(), Copy.copy(idx), new RefName(un.getName()), new RefName(elem.getName()));
 
         acarg.add(new ReferenceExpression(vref));
       }
 
-      Reference call = RefFactory.call(func, acarg);
+      LinkedReferenceWithOffset_Implementation call = RefFactory.call(func, acarg);
       copt.code.statements.add(new CallStmt(call));
 
       caseStmt.option.add(copt);

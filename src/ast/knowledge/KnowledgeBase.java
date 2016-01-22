@@ -22,7 +22,7 @@ import java.util.HashMap;
 import main.Configuration;
 import ast.data.AstList;
 import ast.data.Namespace;
-import ast.data.component.composition.CompUse;
+import ast.data.component.composition.ComponentUse;
 import ast.repository.query.TypeFilter;
 
 public class KnowledgeBase {
@@ -56,8 +56,8 @@ public class KnowledgeBase {
     return options;
   }
 
-  public CompUse getRootComp() {
-    AstList<CompUse> list = TypeFilter.select(root.children, CompUse.class);
+  public ComponentUse getRootComp() {
+    AstList<ComponentUse> list = TypeFilter.select(root.children, ComponentUse.class);
     assert (list.size() == 1);
     return list.get(0);
   }

@@ -22,7 +22,7 @@ import ast.data.Ast;
 import ast.data.Named;
 import ast.data.component.hfsm.State;
 import ast.data.reference.RefName;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
@@ -49,20 +49,20 @@ public class StateLinkReduction extends AstPass {
 class StateLinkReductionWorker extends DfsTraverser<Void, Void> {
 
   @Override
-  protected Void visitReference(Reference obj, Void param) {
-    Ast item = obj.link;
+  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
+    Ast item = obj.getLink();
     if (item instanceof State) {
-      while (!obj.offset.isEmpty()) {
-        ast.data.reference.RefItem next = obj.offset.get(0);
-        obj.offset.remove(0);
+      while (!obj.getOffset().isEmpty()) {
+        ast.data.reference.RefItem next = obj.getOffset().get(0);
+        obj.getOffset().remove(0);
         item = ChildByName.get(item, ((RefName) next).name, item.metadata());
         assert (item != null);
         if (!(item instanceof State)) {
           break;
         }
       }
-      obj.link = (Named) item;
-      obj.offset.clear();
+      obj.setLink((Named) item);
+      obj.getOffset().clear();
     }
     return super.visitReference(obj, param);
   }

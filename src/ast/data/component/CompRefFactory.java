@@ -22,17 +22,17 @@ import ast.data.reference.RefFactory;
 import ast.meta.MetaList;
 
 public class CompRefFactory {
-  public static CompRef create(Component comp) {
-    return new CompRef(RefFactory.create(comp));
+  public static ComponentReference create(Component comp) {
+    return new ComponentReference(RefFactory.create(comp));
   }
 
   @Deprecated
-  public static CompRef create(MetaList info, Component comp) {
-    return new CompRef(info, RefFactory.create(info, comp));
+  public static ComponentReference create(MetaList info, Component comp) {
+    return new ComponentReference(info, RefFactory.create(info, comp));
   }
 
-  public static CompRef create(RawComponent comp) {
-    return new CompRef(RefFactory.create(comp));
+  public static ComponentReference create(RawComponent comp) {
+    return new ComponentReference(RefFactory.create(comp));
   }
 
 }

@@ -17,19 +17,19 @@
 
 package ast.data.component.composition;
 
-import ast.data.reference.Reference;
-import ast.data.reference.TypedRef;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.TypedReference;
 import ast.meta.MetaList;
 import ast.visitor.Visitor;
 
-public class CompUseRef extends TypedRef<CompUse> {
+public class CompUseRef extends TypedReference<ComponentUse> {
 
-  public CompUseRef(Reference ref) {
+  public CompUseRef(LinkedReferenceWithOffset_Implementation ref) {
     super(ref);
   }
 
   @Deprecated
-  public CompUseRef(MetaList info, Reference ref) {
+  public CompUseRef(MetaList info, LinkedReferenceWithOffset_Implementation ref) {
     super(ref);
     metadata().add(info);
   }

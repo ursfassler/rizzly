@@ -19,7 +19,7 @@ package ast.pass.check.type;
 
 import ast.data.Ast;
 import ast.data.AstList;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
@@ -45,7 +45,7 @@ import ast.data.type.base.EnumElement;
 import ast.data.type.base.RangeType;
 import ast.data.type.base.TupleType;
 import ast.data.type.special.IntegerType;
-import ast.data.variable.ConstGlobal;
+import ast.data.variable.GlobalConstant;
 import ast.data.variable.ConstPrivate;
 import ast.data.variable.Constant;
 import ast.data.variable.FunctionVariable;
@@ -125,7 +125,7 @@ public class StatementTypecheck extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitConstGlobal(ConstGlobal obj, Void param) {
+  protected Void visitConstGlobal(GlobalConstant obj, Void param) {
     checkConstant(obj);
     return null;
   }
@@ -229,7 +229,7 @@ public class StatementTypecheck extends NullDispatcher<Void, Void> {
   @Override
   protected Void visitAssignmentMulti(MultiAssignment obj, Void param) {
     AstList<Type> ll = new AstList<Type>();
-    for (Reference ref : obj.left) {
+    for (LinkedReferenceWithOffset_Implementation ref : obj.left) {
       ll.add(checkGetExpr(ref));
     }
     Type lhs;

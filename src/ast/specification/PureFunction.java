@@ -21,7 +21,7 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import ast.data.function.header.FuncFunction;
-import ast.data.function.header.FuncResponse;
+import ast.data.function.header.Response;
 import ast.data.function.header.FuncSubHandlerQuery;
 
 public class PureFunction extends OrSpec {
@@ -34,7 +34,7 @@ public class PureFunction extends OrSpec {
     Collection<Specification> spec = new HashSet<Specification>();
     spec.add(new IsClass(FuncFunction.class));
     spec.add(new IsClass(FuncSubHandlerQuery.class));
-    spec.add(new IsClass(FuncResponse.class));
+    spec.add(new IsClass(Response.class));
     return spec;
   }
 

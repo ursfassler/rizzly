@@ -29,12 +29,16 @@ import ast.data.type.template.ArrayTemplate;
 import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
 import ast.meta.MetaInformation;
+import ast.pass.output.xml.IdReader;
+import ast.visitor.Visitor;
 
 public class Writer_BuiltinTemplate_Test {
   final private XmlStreamWriter stream = mock(XmlStreamWriter.class);
-  final private Write testee = new Write(stream);
+  final private IdReader astId = mock(IdReader.class);
+  final private Visitor idWriter = mock(Visitor.class);
+  final private Write testee = new Write(stream, astId, idWriter);
   final private MetaInformation info = mock(MetaInformation.class);
-  final private InOrder order = Mockito.inOrder(stream, info);
+  final private InOrder order = Mockito.inOrder(stream, info, idWriter);
 
   @Test
   public void write_RangeTemplate() {
@@ -43,6 +47,7 @@ public class Writer_BuiltinTemplate_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("RangeTemplate"));
+    order.verify(idWriter).visit(item);
     order.verify(stream).endNode();
   }
 
@@ -53,6 +58,7 @@ public class Writer_BuiltinTemplate_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("ArrayTemplate"));
+    order.verify(idWriter).visit(item);
     order.verify(stream).endNode();
   }
 
@@ -63,6 +69,7 @@ public class Writer_BuiltinTemplate_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("TypeTypeTemplate"));
+    order.verify(idWriter).visit(item);
     order.verify(stream).endNode();
   }
 
@@ -73,6 +80,7 @@ public class Writer_BuiltinTemplate_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("DefaultValueTemplate"));
+    order.verify(idWriter).visit(item);
     order.verify(stream).endNode();
   }
 }

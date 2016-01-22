@@ -46,6 +46,11 @@ public class MetaListImplementation implements MetaList {
   }
 
   @Override
+  public void clear() {
+    items.clear();
+  }
+
+  @Override
   public void accept(Visitor visitor) {
     for (MetaInformation item : items) {
       item.accept(visitor);

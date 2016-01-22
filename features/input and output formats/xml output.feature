@@ -20,6 +20,8 @@ Scenario: write the AST of the simplest rizzly file to an xml file
     
     """
 
+#TODO do not start separate block for entry and exit
+#TODO do not write empty sub-items (interface, ...)
 Scenario: write the AST of a elementary component to an xml file
   Given we have a file "testee.rzy" with the content:
     """
@@ -36,11 +38,8 @@ Scenario: write the AST of a elementary component to an xml file
     """
     <rizzly>
       <RizzlyFile name="testee">
-        <Position filename="./testee.rzy" line="1" row="2"/>
         <Template name="Testee">
-          <Position filename="./testee.rzy" line="1" row="2"/>
           <RawElementary name="Testee">
-            <Position filename="./testee.rzy" line="2" row="1"/>
             <interface/>
             <entry>
               <Block/>
@@ -57,6 +56,7 @@ Scenario: write the AST of a elementary component to an xml file
 
     """
 
+#TODO read in xml, run link pass and test it then
 #TODO make sure x has an unique id and the id is referenced
 @fixme
 Scenario: references are unique

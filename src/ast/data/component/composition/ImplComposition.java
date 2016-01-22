@@ -22,7 +22,7 @@ import ast.data.component.Component;
 import ast.visitor.Visitor;
 
 public class ImplComposition extends Component {
-  final public AstList<CompUse> component = new AstList<CompUse>();
+  final public AstList<ComponentUse> component = new AstList<ComponentUse>();
   final public AstList<Connection> connection = new AstList<Connection>();
 
   public ImplComposition(String name) {

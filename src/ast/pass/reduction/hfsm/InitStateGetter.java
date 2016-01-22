@@ -21,7 +21,7 @@ import ast.data.Ast;
 import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateSimple;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.dispatcher.NullDispatcher;
 
 /**
@@ -53,10 +53,10 @@ public class InitStateGetter extends NullDispatcher<StateSimple, Void> {
   }
 
   @Override
-  protected StateSimple visitReference(Reference obj, Void param) {
+  protected StateSimple visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
     assert (false);
-    assert (obj.offset.isEmpty());
-    return visit(obj.link, param);
+    assert (obj.getOffset().isEmpty());
+    return visit(obj.getLink(), param);
   }
 
 }

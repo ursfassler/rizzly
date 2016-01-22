@@ -18,7 +18,7 @@
 package ast.copy;
 
 import ast.data.Ast;
-import ast.data.variable.ConstGlobal;
+import ast.data.variable.GlobalConstant;
 import ast.data.variable.ConstPrivate;
 import ast.data.variable.FunctionVariable;
 import ast.data.variable.StateVariable;
@@ -54,8 +54,8 @@ public class CopyVariable extends NullDispatcher<Variable, Void> {
   }
 
   @Override
-  protected Variable visitConstGlobal(ConstGlobal obj, Void param) {
-    return new ConstGlobal(obj.getName(), cast.copy(obj.type), cast.copy(obj.def));
+  protected Variable visitConstGlobal(GlobalConstant obj, Void param) {
+    return new GlobalConstant(obj.getName(), cast.copy(obj.type), cast.copy(obj.def));
   }
 
 }

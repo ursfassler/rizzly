@@ -116,7 +116,7 @@ public class InputWriter extends NullDispatcher<Void, Function> {
 
   @Override
   protected Void visitFuncReturnType(FunctionReturnType obj, Function param) {
-    String c_type = getCType(obj.type.ref.link);
+    String c_type = getCType(obj.type.ref.getLink());
     sw.wr("self._inst." + param.getName() + ".restype = " + c_type);
     sw.nl();
 

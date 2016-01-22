@@ -23,7 +23,7 @@ import main.Configuration;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.component.Component;
-import ast.data.component.composition.CompUse;
+import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.Connection;
 import ast.data.component.composition.Direction;
 import ast.data.component.composition.Endpoint;
@@ -36,7 +36,7 @@ import ast.data.component.hfsm.Transition;
 import ast.data.function.Function;
 import ast.data.function.InterfaceFunction;
 import ast.data.function.header.FuncQuery;
-import ast.data.function.header.FuncResponse;
+import ast.data.function.header.Response;
 import ast.data.function.header.Signal;
 import ast.data.function.header.Slot;
 import ast.data.type.Type;
@@ -83,7 +83,7 @@ class CompInterfaceTypeCheckerWorker extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitCompUse(CompUse obj, Void param) {
+  protected Void visitCompUse(ComponentUse obj, Void param) {
     return null;
   }
 
@@ -138,7 +138,7 @@ class CompInterfaceTypeCheckerWorker extends NullDispatcher<Void, Void> {
     checkSelfIface(obj, Direction.out);
     checkSelfIface(obj, Direction.in);
 
-    for (CompUse use : obj.component) {
+    for (ComponentUse use : obj.component) {
       checkIface(obj, use, Direction.in);
       checkIface(obj, use, Direction.out);
     }
@@ -153,7 +153,7 @@ class CompInterfaceTypeCheckerWorker extends NullDispatcher<Void, Void> {
     for (InterfaceFunction ifaceuse : obj.getIface(dir)) {
       if (!ifaceIsConnected(ifaceuse, dir, obj.connection)) {
         ErrorType etype;
-        if (ifaceuse instanceof FuncResponse) {
+        if (ifaceuse instanceof Response) {
           etype = ErrorType.Error;
         } else {
           etype = ErrorType.Hint;
@@ -163,7 +163,7 @@ class CompInterfaceTypeCheckerWorker extends NullDispatcher<Void, Void> {
     }
   }
 
-  private Component checkIface(ImplComposition obj, CompUse use, Direction dir) {
+  private Component checkIface(ImplComposition obj, ComponentUse use, Direction dir) {
     Component type = use.compRef.getTarget();
     for (InterfaceFunction ifaceuse : type.getIface(dir)) {
       if (!ifaceIsConnected(use, ifaceuse, dir.other(), obj.connection)) {
@@ -180,7 +180,7 @@ class CompInterfaceTypeCheckerWorker extends NullDispatcher<Void, Void> {
     return type;
   }
 
-  private boolean ifaceIsConnected(CompUse use, InterfaceFunction ifaceuse, Direction dir, List<Connection> connection) {
+  private boolean ifaceIsConnected(ComponentUse use, InterfaceFunction ifaceuse, Direction dir, List<Connection> connection) {
     for (Connection itr : connection) {
       if (getEndpoint(itr, dir) instanceof EndpointSub) {
         EndpointSub ep = (EndpointSub) getEndpoint(itr, dir);
@@ -260,7 +260,7 @@ class CompInterfaceTypeCheckerWorker extends NullDispatcher<Void, Void> {
   private Direction getDir(Function func) {
     if (func instanceof Slot) {
       return Direction.in;
-    } else if (func instanceof FuncResponse) {
+    } else if (func instanceof Response) {
       return Direction.in;
     } else if (func instanceof FuncQuery) {
       return Direction.out;
