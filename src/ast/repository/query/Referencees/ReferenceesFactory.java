@@ -19,21 +19,19 @@ package ast.repository.query.Referencees;
 
 import ast.data.Ast;
 import ast.visitor.DeepFirstTraverser;
-import ast.visitor.DefaultVisitor;
+import ast.visitor.VisitExecutorImplementation;
 
 public class ReferenceesFactory {
 
   public ReferenceesReader produce(Ast root) {
     Referencees referencees = new Referencees();
 
-    DefaultVisitor allAdder = new DefaultVisitor(new PossibleTargetAdder(referencees));
-    ReferenceesAdder refAdder = new ReferenceesAdder(referencees);
-
     DeepFirstTraverser referenceCollector = new DeepFirstTraverser();
-    referenceCollector.addPreorderVisitor(refAdder);
-    referenceCollector.addPreorderVisitor(allAdder);
+    referenceCollector.addPreorderVisitor(new ReferenceesAdder(referencees));
+    referenceCollector.addPreorderVisitor(new PossibleTargetAdder(referencees));
 
-    root.accept(referenceCollector);
+    VisitExecutorImplementation executor = new VisitExecutorImplementation();
+    executor.visit(referenceCollector, root);
 
     return referencees;
   }

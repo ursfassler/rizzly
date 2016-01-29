@@ -18,17 +18,15 @@
 package ast.repository.query.Referencees;
 
 import ast.data.reference.LinkedReferenceWithOffset_Implementation;
-import ast.visitor.NullVisitor;
+import ast.visitor.Visitor;
 
-public class ReferenceesAdder extends NullVisitor {
+public class ReferenceesAdder implements Visitor {
   final private ReferenceesWriter referencees;
 
   public ReferenceesAdder(ReferenceesWriter referencees) {
-    super();
     this.referencees = referencees;
   }
 
-  @Override
   public void visit(LinkedReferenceWithOffset_Implementation reference) {
     referencees.addReferencee(reference);
   }

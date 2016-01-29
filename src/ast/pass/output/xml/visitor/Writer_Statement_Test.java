@@ -33,111 +33,101 @@ import ast.data.statement.ExpressionReturn;
 import ast.data.statement.IfOption;
 import ast.data.statement.IfStatement;
 import ast.data.statement.MultiAssignment;
-import ast.meta.MetaInformation;
 import ast.pass.output.xml.IdReader;
+import ast.visitor.VisitExecutor;
 import ast.visitor.Visitor;
 
 public class Writer_Statement_Test {
   final private XmlStreamWriter stream = mock(XmlStreamWriter.class);
   final private IdReader astId = mock(IdReader.class);
   final private Visitor idWriter = mock(Visitor.class);
-  final private Write testee = new Write(stream, astId, idWriter);
-  final private MetaInformation info = mock(MetaInformation.class);
+  final private VisitExecutor executor = mock(VisitExecutor.class);
+  final private Write testee = new Write(stream, astId, idWriter, executor);
   final private Block child = mock(Block.class);
-  final private LinkedReferenceWithOffset_Implementation reference = mock(LinkedReferenceWithOffset_Implementation.class);
   final private Expression expression = mock(Expression.class);
-  final private IfOption ifOption = mock(IfOption.class);
-  final private InOrder order = Mockito.inOrder(stream, info, child, reference, expression, ifOption, idWriter);
+  final private InOrder order = Mockito.inOrder(stream, idWriter, executor);
 
   @Test
   public void write_Block() {
     Block item = new Block();
-    item.metadata().add(info);
-    item.statements.add(child);
 
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("Block"));
-    order.verify(idWriter).visit(item);
-    order.verify(info).accept(eq(testee));
-    order.verify(child).accept(eq(testee));
+    order.verify(executor).visit(eq(idWriter), eq(item));
+    order.verify(executor).visit(eq(testee), eq(item.metadata()));
+    order.verify(executor).visit(eq(testee), eq(item.statements));
     order.verify(stream).endNode();
   }
 
   @Test
   public void write_CallStatement() {
+    LinkedReferenceWithOffset_Implementation reference = mock(LinkedReferenceWithOffset_Implementation.class);
     CallStmt item = new CallStmt(reference);
-    item.metadata().add(info);
 
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("CallStatement"));
-    order.verify(idWriter).visit(item);
-    order.verify(info).accept(eq(testee));
-    order.verify(reference).accept(eq(testee));
+    order.verify(executor).visit(eq(idWriter), eq(item));
+    order.verify(executor).visit(eq(testee), eq(item.metadata()));
+    order.verify(executor).visit(eq(testee), eq(item.call));
     order.verify(stream).endNode();
   }
 
   @Test
   public void write_MultiAssignment() {
     AstList<LinkedReferenceWithOffset_Implementation> left = new AstList<LinkedReferenceWithOffset_Implementation>();
-    left.add(reference);
     MultiAssignment item = new MultiAssignment(left, expression);
-    item.metadata().add(info);
 
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("MultiAssignment"));
-    order.verify(idWriter).visit(item);
-    order.verify(info).accept(eq(testee));
-    order.verify(reference).accept(eq(testee));
-    order.verify(expression).accept(eq(testee));
+    order.verify(executor).visit(eq(idWriter), eq(item));
+    order.verify(executor).visit(eq(testee), eq(item.metadata()));
+    order.verify(executor).visit(eq(testee), eq(item.left));
+    order.verify(executor).visit(eq(testee), eq(item.right));
     order.verify(stream).endNode();
   }
 
   @Test
   public void write_IfStatement() {
     AstList<IfOption> options = new AstList<IfOption>();
-    options.add(ifOption);
     IfStatement item = new IfStatement(options, child);
-    item.metadata().add(info);
 
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("IfStatement"));
-    order.verify(idWriter).visit(item);
-    order.verify(info).accept(eq(testee));
-    order.verify(ifOption).accept(eq(testee));
-    order.verify(child).accept(eq(testee));
+    order.verify(executor).visit(eq(idWriter), eq(item));
+    order.verify(executor).visit(eq(testee), eq(item.metadata()));
+    order.verify(executor).visit(eq(testee), eq(item.option));
+    order.verify(executor).visit(eq(testee), eq(item.defblock));
     order.verify(stream).endNode();
   }
 
   @Test
   public void write_IfOption() {
     IfOption item = new IfOption(expression, child);
-    item.metadata().add(info);
 
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("IfOption"));
-    order.verify(idWriter).visit(item);
-    order.verify(info).accept(eq(testee));
-    order.verify(expression).accept(eq(testee));
-    order.verify(child).accept(eq(testee));
+    order.verify(executor).visit(eq(idWriter), eq(item));
+    order.verify(executor).visit(eq(testee), eq(item.metadata()));
+    order.verify(executor).visit(eq(testee), eq(item.condition));
+    order.verify(executor).visit(eq(testee), eq(item.code));
     order.verify(stream).endNode();
   }
 
   @Test
   public void write_ExpressionReturn() {
     ExpressionReturn item = new ExpressionReturn(expression);
-    item.metadata().add(info);
 
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("ExpressionReturn"));
-    order.verify(idWriter).visit(item);
-    order.verify(info).accept(eq(testee));
-    order.verify(expression).accept(eq(testee));
+    order.verify(executor).visit(eq(idWriter), eq(item));
+    order.verify(executor).visit(eq(testee), eq(item.metadata()));
+    order.verify(executor).visit(eq(testee), eq(item.expression));
     order.verify(stream).endNode();
   }
 }

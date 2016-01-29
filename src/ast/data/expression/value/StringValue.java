@@ -32,8 +32,4 @@ final public class StringValue extends ValueExpr {
     return value;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

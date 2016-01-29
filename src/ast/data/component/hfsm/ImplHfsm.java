@@ -27,9 +27,5 @@ final public class ImplHfsm extends Component {
     super(name);
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

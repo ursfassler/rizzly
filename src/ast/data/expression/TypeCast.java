@@ -34,8 +34,4 @@ final public class TypeCast extends Expression {
     return cast + "(" + value + ")";
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

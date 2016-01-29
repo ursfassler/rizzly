@@ -25,9 +25,5 @@ final public class TypeTypeTemplate extends TypeTemplate {
     super("TypeTypeTemplate");
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

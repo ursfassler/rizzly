@@ -20,49 +20,22 @@ package ast.repository.query;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.specification.Specification;
-import ast.visitor.DefaultHandler;
 import ast.visitor.EveryVisitor;
-import ast.visitor.VisitorAcceptor;
+import ast.visitor.Visitee;
 
-public class Collector extends EveryVisitor {
-  private final CollectorVisitor collector;
-
-  public Collector(Specification spec) {
-    super();
-    collector = new CollectorVisitor(spec);
-    addDefaultHandler(collector);
-  }
-
-  public AstList<Ast> getMatched() {
+public class Collector {
+  @Deprecated
+  public static AstList<Ast> select(Visitee visitee, Specification spec) {
+    CollectorVisitor collector = new CollectorVisitor(spec);
+    EveryVisitor.visitEverything(collector, visitee);
     return collector.getMatched();
   }
 
   @Deprecated
-  public static AstList<Ast> select(VisitorAcceptor ast, Specification spec) {
-    Collector visitor = new Collector(spec);
-    ast.accept(visitor);
-    return visitor.getMatched();
-  }
-}
-
-class CollectorVisitor implements DefaultHandler {
-  final private AstList<Ast> matched = new AstList<Ast>();
-  final private Specification spec;
-
-  public CollectorVisitor(Specification spec) {
-    super();
-    this.spec = spec;
-  }
-
-  @Override
-  public void visit(Ast ast) {
-    if (spec.isSatisfiedBy(ast)) {
-      matched.add(ast);
-    }
-  }
-
-  public AstList<Ast> getMatched() {
-    return matched;
+  public static AstList<Ast> select(AstList<? extends Ast> visitee, Specification spec) {
+    CollectorVisitor collector = new CollectorVisitor(spec);
+    EveryVisitor.visitEverything(collector, visitee);
+    return collector.getMatched();
   }
 
 }

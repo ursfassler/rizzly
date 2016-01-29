@@ -25,63 +25,48 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
-import ast.data.Ast;
-import ast.data.function.Function;
 import ast.data.raw.RawElementary;
-import ast.data.statement.Block;
-import ast.data.template.Template;
-import ast.meta.MetaInformation;
 import ast.pass.output.xml.IdReader;
+import ast.visitor.VisitExecutor;
 import ast.visitor.Visitor;
 
 public class Writer_RawComponent_Test {
   final private XmlStreamWriter stream = mock(XmlStreamWriter.class);
   final private IdReader astId = mock(IdReader.class);
   final private Visitor idWriter = mock(Visitor.class);
-  final private Write testee = new Write(stream, astId, idWriter);
-  final private MetaInformation info = mock(MetaInformation.class);
-  final private Function interfaceFunction = mock(Function.class);
-  final private Block entry = mock(Block.class);
-  final private Block exit = mock(Block.class);
-  final private Template declaration = mock(Template.class);
-  final private Ast instantiation = mock(Ast.class);
-  final private InOrder order = Mockito.inOrder(stream, info, interfaceFunction, entry, exit, declaration, instantiation, idWriter);
+  final private VisitExecutor executor = mock(VisitExecutor.class);
+  final private Write testee = new Write(stream, astId, idWriter, executor);
+  final private InOrder order = Mockito.inOrder(stream, idWriter, executor);
 
   @Test
   public void write_RawElementary() {
     RawElementary item = new RawElementary("theName");
-    item.metadata().add(info);
-    item.getIface().add(interfaceFunction);
-    item.setEntryFunc(entry);
-    item.setExitFunc(exit);
-    item.getDeclaration().add(declaration);
-    item.getInstantiation().add(instantiation);
 
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("RawElementary"));
     order.verify(stream).attribute("name", "theName");
-    order.verify(idWriter).visit(item);
-    order.verify(info).accept(eq(testee));
+    order.verify(executor).visit(idWriter, item);
+    order.verify(executor).visit(testee, item.metadata());
 
     order.verify(stream).beginNode(eq("interface"));
-    order.verify(interfaceFunction).accept(eq(testee));
+    order.verify(executor).visit(eq(testee), eq(item.getIface()));
     order.verify(stream).endNode();
 
     order.verify(stream).beginNode(eq("entry"));
-    order.verify(entry).accept(eq(testee));
+    order.verify(executor).visit(eq(testee), eq(item.getEntryFunc()));
     order.verify(stream).endNode();
 
     order.verify(stream).beginNode(eq("exit"));
-    order.verify(exit).accept(eq(testee));
+    order.verify(executor).visit(eq(testee), eq(item.getExitFunc()));
     order.verify(stream).endNode();
 
     order.verify(stream).beginNode(eq("declaration"));
-    order.verify(declaration).accept(eq(testee));
+    order.verify(executor).visit(eq(testee), eq(item.getDeclaration()));
     order.verify(stream).endNode();
 
     order.verify(stream).beginNode(eq("instantiation"));
-    order.verify(instantiation).accept(eq(testee));
+    order.verify(executor).visit(eq(testee), eq(item.getInstantiation()));
     order.verify(stream, times(2)).endNode();
   }
 }

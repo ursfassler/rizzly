@@ -35,8 +35,4 @@ final public class And extends BinaryExpression {
     return "and";
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

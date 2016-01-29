@@ -26,8 +26,4 @@ final public class StateSimple extends State {
     super(name, entryFunc, exitFunc);
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

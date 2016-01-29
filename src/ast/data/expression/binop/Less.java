@@ -35,8 +35,4 @@ final public class Less extends Relation {
     return "<";
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

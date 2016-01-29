@@ -32,85 +32,75 @@ import ast.data.component.ComponentReference;
 import ast.data.expression.value.TupleValue;
 import ast.data.function.FunctionReference;
 import ast.data.reference.LinkTarget;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefItem;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.type.TypeReference;
-import ast.meta.MetaInformation;
 import ast.pass.output.xml.IdReader;
+import ast.visitor.VisitExecutor;
 import ast.visitor.Visitor;
 
 public class Writer_Reference_Test {
   final private XmlStreamWriter stream = mock(XmlStreamWriter.class);
   final private IdReader astId = mock(IdReader.class);
   final private Visitor idWriter = mock(Visitor.class);
-  final private Write testee = new Write(stream, astId, idWriter);
-  final private MetaInformation meta = mock(MetaInformation.class);
+  final private VisitExecutor executor = mock(VisitExecutor.class);
+  final private Write testee = new Write(stream, astId, idWriter, executor);
   final private Named link = mock(Named.class);
-  final private RefItem offset1 = mock(RefItem.class);
   final private TupleValue tuple = mock(TupleValue.class);
   final private LinkedReferenceWithOffset_Implementation reference = mock(LinkedReferenceWithOffset_Implementation.class);
-  final private InOrder order = Mockito.inOrder(stream, meta, link, offset1, tuple, reference, astId, idWriter);
-  final private AstList<RefItem> offset;
-
-  public Writer_Reference_Test() {
-    offset = new AstList<RefItem>();
-    offset.add(offset1);
-  }
+  final private InOrder order = Mockito.inOrder(stream, link, tuple, reference, astId, idWriter, executor);
+  final private AstList<RefItem> offset = mock(AstList.class);
 
   @Test
   public void write_link_target() {
     LinkTarget item = new LinkTarget("the target");
-    item.metadata().add(meta);
 
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("LinkTarget"));
     order.verify(stream).attribute("name", "the target");
-    order.verify(idWriter).visit(item);
-    order.verify(meta).accept(eq(testee));
+    order.verify(executor).visit(idWriter, item);
+    order.verify(executor).visit(testee, item.metadata());
     order.verify(stream).endNode();
   }
 
   @Test
   public void write_TypeReference() {
     TypeReference item = new TypeReference(reference);
-    item.metadata().add(meta);
 
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("TypeReference"));
-    order.verify(idWriter).visit(item);
-    order.verify(meta).accept(eq(testee));
-    order.verify(reference).accept(eq(testee));
+    order.verify(executor).visit(idWriter, item);
+    order.verify(executor).visit(testee, item.metadata());
+    order.verify(executor).visit(eq(testee), eq(item.ref));
     order.verify(stream).endNode();
   }
 
   @Test
   public void write_FunctionReference() {
     FunctionReference item = new FunctionReference(reference);
-    item.metadata().add(meta);
 
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("FunctionReference"));
-    order.verify(idWriter).visit(item);
-    order.verify(meta).accept(eq(testee));
-    order.verify(reference).accept(eq(testee));
+    order.verify(executor).visit(idWriter, item);
+    order.verify(executor).visit(testee, item.metadata());
+    order.verify(executor).visit(eq(testee), eq(item.ref));
     order.verify(stream).endNode();
   }
 
   @Test
   public void write_ComponentReference() {
     ComponentReference item = new ComponentReference(reference);
-    item.metadata().add(meta);
 
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("ComponentReference"));
-    order.verify(idWriter).visit(item);
-    order.verify(meta).accept(eq(testee));
-    order.verify(reference).accept(eq(testee));
+    order.verify(executor).visit(idWriter, item);
+    order.verify(executor).visit(testee, item.metadata());
+    order.verify(executor).visit(eq(testee), eq(item.ref));
     order.verify(stream).endNode();
   }
 
@@ -119,16 +109,15 @@ public class Writer_Reference_Test {
     Mockito.when(astId.hasId(link)).thenReturn(true);
     Mockito.when(astId.getId(link)).thenReturn("the link id");
     LinkedReferenceWithOffset_Implementation item = new LinkedReferenceWithOffset_Implementation(link, offset);
-    item.metadata().add(meta);
 
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("Reference"));
-    order.verify(idWriter).visit(item);
+    order.verify(executor).visit(idWriter, item);
     order.verify(stream).attribute("link", "the link id");
-    order.verify(link, never()).accept(testee);
-    order.verify(meta).accept(eq(testee));
-    order.verify(offset1).accept(eq(testee));
+    order.verify(executor, never()).visit(eq(testee), eq(item.getLink()));
+    order.verify(executor).visit(testee, item.metadata());
+    order.verify(executor).visit(eq(testee), eq(item.getOffset()));
     order.verify(stream).endNode();
   }
 
@@ -136,30 +125,28 @@ public class Writer_Reference_Test {
   public void Reference_link_is_written_out_instead_of_id_when_no_id_is_available() {
     Mockito.when(astId.hasId(link)).thenReturn(false);
     LinkedReferenceWithOffset_Implementation item = new LinkedReferenceWithOffset_Implementation(link, offset);
-    item.metadata().add(meta);
 
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("Reference"));
-    order.verify(idWriter).visit(item);
+    order.verify(executor).visit(idWriter, item);
     order.verify(stream, never()).attribute(eq("link"), anyString());
-    order.verify(link).accept(testee);
-    order.verify(meta).accept(eq(testee));
-    order.verify(offset1).accept(eq(testee));
+    order.verify(executor).visit(eq(testee), eq(item.getLink()));
+    order.verify(executor).visit(testee, item.metadata());
+    order.verify(executor).visit(eq(testee), eq(item.getOffset()));
     order.verify(stream).endNode();
   }
 
   @Test
   public void write_ReferenceItemCall() {
     RefCall item = new RefCall(tuple);
-    item.metadata().add(meta);
 
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("ReferenceCall"));
-    order.verify(idWriter).visit(item);
-    order.verify(meta).accept(eq(testee));
-    order.verify(tuple).accept(eq(testee));
+    order.verify(executor).visit(idWriter, item);
+    order.verify(executor).visit(testee, item.metadata());
+    order.verify(executor).visit(eq(testee), eq(item.actualParameter));
     order.verify(stream).endNode();
   }
 }

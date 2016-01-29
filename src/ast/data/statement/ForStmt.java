@@ -29,8 +29,4 @@ final public class ForStmt extends Statement {
     this.block = block;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

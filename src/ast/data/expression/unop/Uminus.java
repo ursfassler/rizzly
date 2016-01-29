@@ -35,8 +35,4 @@ final public class Uminus extends UnaryExp {
     return "-";
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

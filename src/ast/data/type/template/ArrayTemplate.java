@@ -25,9 +25,5 @@ final public class ArrayTemplate extends TypeTemplate {
     super("ArrayTemplate");
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

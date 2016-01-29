@@ -36,8 +36,4 @@ final public class ComponentType extends Type {
     super(info, name);
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

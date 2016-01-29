@@ -44,9 +44,5 @@ final public class RawComposition extends RawComponent {
     return instantiation;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

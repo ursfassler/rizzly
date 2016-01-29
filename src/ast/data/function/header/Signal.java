@@ -29,8 +29,4 @@ final public class Signal extends InterfaceFunction {
     super(name, param, ret, body);
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

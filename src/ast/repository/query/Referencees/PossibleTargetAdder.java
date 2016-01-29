@@ -18,16 +18,15 @@
 package ast.repository.query.Referencees;
 
 import ast.data.Ast;
-import ast.visitor.DefaultHandler;
+import ast.visitor.Visitor;
 
-public class PossibleTargetAdder implements DefaultHandler {
+public class PossibleTargetAdder implements Visitor {
   final private ReferenceesWriter referencees;
 
   public PossibleTargetAdder(ReferenceesWriter referencees) {
     this.referencees = referencees;
   }
 
-  @Override
   public void visit(Ast ast) {
     referencees.addTarget(ast);
   }

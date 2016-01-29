@@ -30,8 +30,4 @@ final public class FuncSubHandlerEvent extends Function {
     super(name, param, ret, body);
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

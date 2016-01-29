@@ -34,9 +34,5 @@ final public class IfStatement extends Statement {
     this.defblock = new Block();
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

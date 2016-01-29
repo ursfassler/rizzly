@@ -30,7 +30,7 @@ import ast.pass.AstPass;
 import ast.pass.output.xml.visitor.IdWriter;
 import ast.pass.output.xml.visitor.Write;
 import ast.repository.query.IdForReferenced.IdReaderFactory;
-import ast.visitor.DefaultVisitor;
+import ast.visitor.VisitExecutorImplementation;
 
 public class XmlWriterPass extends AstPass {
 
@@ -53,11 +53,12 @@ public class XmlWriterPass extends AstPass {
   }
 
   private void write(Namespace ast, XmlFileWriter writer) {
+    VisitExecutorImplementation executor = VisitExecutorImplementation.instance();
     IdReader astId = (new IdReaderFactory()).produce(ast);
 
     writer.beginNode("rizzly");
-    Write visitor = new Write(writer, astId, new DefaultVisitor(new IdWriter(writer, astId)));
-    ast.children.accept(visitor);
+    Write visitor = new Write(writer, astId, new IdWriter(writer, astId), executor);
+    executor.visit(visitor, ast.children);
     writer.endNode();
   }
 }

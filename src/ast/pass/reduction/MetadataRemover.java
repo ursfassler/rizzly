@@ -18,11 +18,10 @@
 package ast.pass.reduction;
 
 import ast.data.Ast;
-import ast.visitor.DefaultHandler;
+import ast.visitor.Visitor;
 
-public class MetadataRemover implements DefaultHandler {
+public class MetadataRemover implements Visitor {
 
-  @Override
   public void visit(Ast ast) {
     ast.metadata().clear();
   }

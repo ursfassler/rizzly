@@ -32,8 +32,4 @@ final public class CaseStmt extends Statement {
     this.otherwise = otherwise;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

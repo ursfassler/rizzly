@@ -25,42 +25,34 @@ import org.mockito.InOrder;
 import org.mockito.Mockito;
 
 import ast.Designator;
-import ast.data.Named;
+import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.file.RizzlyFile;
-import ast.meta.MetaInformation;
 import ast.meta.SourcePosition;
 import ast.pass.output.xml.IdReader;
+import ast.visitor.VisitExecutor;
 import ast.visitor.Visitor;
 
 public class Writer_Infrastructure_Test {
   final private XmlStreamWriter stream = mock(XmlStreamWriter.class);
   final private IdReader astId = mock(IdReader.class);
   final private Visitor idWriter = mock(Visitor.class);
-  final private Write testee = new Write(stream, astId, idWriter);
-  final private MetaInformation info = mock(MetaInformation.class);
-  final private Named child1 = mock(Named.class);
-  final private Named child2 = mock(Named.class);
-  final private Named child3 = mock(Named.class);
-  final private InOrder order = Mockito.inOrder(stream, info, child1, child2, child3, idWriter);
+  final private VisitExecutor executor = mock(VisitExecutor.class);
+  final private Write testee = new Write(stream, astId, idWriter, executor);
+  final private Ast child = mock(Ast.class);
+  final private InOrder order = Mockito.inOrder(stream, idWriter, child, executor);
 
   @Test
   public void write_namespace() {
     Namespace item = new Namespace("ns");
-    item.metadata().add(info);
-    item.children.add(child1);
-    item.children.add(child2);
-    item.children.add(child3);
 
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("Namespace"));
     order.verify(stream).attribute("name", "ns");
-    order.verify(idWriter).visit(item);
-    order.verify(info).accept(eq(testee));
-    order.verify(child1).accept(eq(testee));
-    order.verify(child2).accept(eq(testee));
-    order.verify(child3).accept(eq(testee));
+    order.verify(executor).visit(idWriter, item);
+    order.verify(executor).visit(testee, item.metadata());
+    order.verify(executor).visit(testee, item.children);
     order.verify(stream).endNode();
   }
 
@@ -80,26 +72,20 @@ public class Writer_Infrastructure_Test {
   @Test
   public void write_RizzlyFile() {
     RizzlyFile item = new RizzlyFile("the file name");
-    item.metadata().add(info);
     item.imports.add(new Designator("first", "second"));
-    item.objects.add(child1);
-    item.objects.add(child2);
-    item.objects.add(child3);
 
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("RizzlyFile"));
     order.verify(stream).attribute("name", "the file name");
-    order.verify(idWriter).visit(item);
-    order.verify(info).accept(eq(testee));
+    order.verify(executor).visit(idWriter, item);
+    order.verify(executor).visit(testee, item.metadata());
 
     order.verify(stream).beginNode(eq("import"));
     order.verify(stream).attribute("file", "first.second");
     order.verify(stream).endNode();
 
-    order.verify(child1).accept(eq(testee));
-    order.verify(child2).accept(eq(testee));
-    order.verify(child3).accept(eq(testee));
+    order.verify(executor).visit(testee, item.objects);
 
     order.verify(stream).endNode();
   }

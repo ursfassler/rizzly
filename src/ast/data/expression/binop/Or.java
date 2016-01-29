@@ -35,8 +35,4 @@ final public class Or extends BinaryExpression {
     return "or";
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

@@ -45,8 +45,4 @@ final public class NamedValue extends AstBase {
     return name + ":=" + value;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

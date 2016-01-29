@@ -17,20 +17,22 @@
 
 package ast.specification.visitor;
 
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
-import ast.data.reference.UnlinkedReferenceWithOffset_Implementation;
+import ast.data.reference.LinkedReference;
+import ast.data.reference.UnlinkedReference;
 import ast.data.variable.StateVariable;
-import ast.visitor.NullVisitor;
+import ast.visitor.VisitExecutor;
+import ast.visitor.Visitor;
 import error.ErrorType;
 import error.RizzlyError;
 
-public class IsStateVariable extends NullVisitor {
+public class IsStateVariable implements Visitor {
+  private final VisitExecutor executor;
   private final RizzlyError error;
 
   private boolean isState = false;
 
-  public IsStateVariable(RizzlyError error) {
-    super();
+  public IsStateVariable(VisitExecutor executor, RizzlyError error) {
+    this.executor = executor;
     this.error = error;
   }
 
@@ -38,18 +40,15 @@ public class IsStateVariable extends NullVisitor {
     return isState;
   }
 
-  @Override
   public void visit(StateVariable object) {
     isState = true;
   }
 
-  @Override
-  public void visit(LinkedReferenceWithOffset_Implementation object) {
-    object.getLink().accept(this);
+  public void visit(LinkedReference object) {
+    executor.visit(this, object.getLink());
   }
 
-  @Override
-  public void visit(UnlinkedReferenceWithOffset_Implementation object) {
+  public void visit(UnlinkedReference object) {
     error.err(ErrorType.Fatal, "can not decide for unlinked reference", object.metadata());
   }
 

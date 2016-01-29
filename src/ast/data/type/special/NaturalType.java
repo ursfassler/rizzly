@@ -30,9 +30,5 @@ final public class NaturalType extends BaseType {
     super(NAME);
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

@@ -37,8 +37,4 @@ final public class RecordValue extends ValueExpr {
     return value + ":" + type;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

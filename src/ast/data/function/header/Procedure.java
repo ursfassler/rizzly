@@ -31,8 +31,4 @@ final public class Procedure extends Function implements StateContent {
     super(name, param, ret, body);
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

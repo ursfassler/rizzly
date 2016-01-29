@@ -35,8 +35,4 @@ final public class Not extends UnaryExp {
     return "not";
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

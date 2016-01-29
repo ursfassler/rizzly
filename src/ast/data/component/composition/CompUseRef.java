@@ -34,9 +34,5 @@ public class CompUseRef extends TypedReference<ComponentUse> {
     metadata().add(info);
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

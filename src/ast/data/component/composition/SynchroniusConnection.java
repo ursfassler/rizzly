@@ -30,9 +30,5 @@ final public class SynchroniusConnection extends Connection {
     return getSrc() + " -> " + getDst();
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

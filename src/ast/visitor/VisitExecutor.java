@@ -15,27 +15,15 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.reduction;
+package ast.visitor;
 
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
+import ast.data.Ast;
+import ast.data.AstList;
 
-import org.junit.Test;
+public interface VisitExecutor {
 
-import ast.data.function.Function;
-import ast.data.function.FunctionProperty;
+  public void visit(Visitor visitor, Visitee visitee);
 
-public class FunctionPublisher_Test {
-  final private FunctionPublisher testee = new FunctionPublisher();
-
-  @Test
-  public void changes_the_visibility_to_public() {
-    Function function = mock(Function.class);
-    function.property = FunctionProperty.Private;
-
-    testee.visit(function);
-
-    assertEquals(FunctionProperty.Public, function.property);
-  }
+  public void visit(Visitor visitor, AstList<? extends Ast> vistee);
 
 }

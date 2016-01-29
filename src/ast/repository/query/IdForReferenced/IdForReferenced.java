@@ -23,9 +23,9 @@ import java.util.Map;
 import ast.data.Ast;
 import ast.pass.output.xml.IdReader;
 import ast.repository.query.Referencees.ReferenceesReader;
-import ast.visitor.DefaultHandler;
+import ast.visitor.Visitor;
 
-public class IdForReferenced implements DefaultHandler, IdReader {
+public class IdForReferenced implements IdReader, Visitor {
   final private ReferenceesReader referenceesReader;
   final private IdGenerator idGenerator;
   final private Map<Ast, String> ids = new HashMap<Ast, String>();
@@ -35,7 +35,6 @@ public class IdForReferenced implements DefaultHandler, IdReader {
     this.idGenerator = idGenerator;
   }
 
-  @Override
   public void visit(Ast item) {
     assert (!hasId(item));
 

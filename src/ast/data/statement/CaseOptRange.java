@@ -42,8 +42,4 @@ final public class CaseOptRange extends CaseOptEntry {
     return start.toString() + ".." + end.toString();
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

@@ -17,8 +17,6 @@
 
 package ast.visitor;
 
-import ast.data.Ast;
+public interface Visitee {
 
-public interface DefaultHandler {
-  public void visit(Ast ast);
 }

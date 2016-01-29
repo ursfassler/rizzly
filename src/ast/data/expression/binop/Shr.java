@@ -35,8 +35,4 @@ public class Shr extends ArithmeticOp {
     return "shr";
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

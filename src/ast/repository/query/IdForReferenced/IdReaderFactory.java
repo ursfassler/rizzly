@@ -30,9 +30,7 @@ public class IdReaderFactory {
     IdGenerator idGenerator = new IncreasingIdGenerator();
 
     IdForReferenced idCollector = new IdForReferenced(referenceesReader, idGenerator);
-    EveryVisitor visitor = new EveryVisitor();
-    visitor.addDefaultHandler(idCollector);
-    root.accept(visitor);
+    EveryVisitor.visitEverything(idCollector, root);
 
     return idCollector;
   }

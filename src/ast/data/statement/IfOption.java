@@ -30,8 +30,4 @@ public class IfOption extends AstBase {
     this.code = code;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

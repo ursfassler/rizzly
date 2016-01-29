@@ -37,8 +37,4 @@ final public class VarDefInitStmt extends Statement {
     return variable.toString() + " := " + initial;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

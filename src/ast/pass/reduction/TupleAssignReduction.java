@@ -83,7 +83,9 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
     }
 
     if (rightCount > 1) {
-      return assignOneOne(obj.left, obj.right);
+      // FIXME do not use cast
+      LinkedReferenceWithOffset_Implementation left = (LinkedReferenceWithOffset_Implementation) obj.left;
+      return assignOneOne(left, obj.right);
     } else {
       return null;
     }
@@ -118,7 +120,7 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
     }
   }
 
-  private List<Statement> assignOneOne(LinkedReference left, Expression right) {
+  private List<Statement> assignOneOne(LinkedReferenceWithOffset_Implementation left, Expression right) {
     if (right instanceof TupleValue) {
       TupleValue gen = (TupleValue) right;
       return assignOne(left, gen.value);
@@ -156,7 +158,7 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
     throw new RuntimeException("not yet implemented");
   }
 
-  private List<Statement> assignOne(LinkedReference left, AstList<Expression> value) {
+  private List<Statement> assignOne(LinkedReferenceWithOffset_Implementation left, AstList<Expression> value) {
     Type rt = kt.get(left);
     if (rt instanceof RecordType) {
       return assignOneRecord(left, (RecordType) rt, value);

@@ -33,8 +33,4 @@ final public class RefCall extends RefItem {
     return actualParameter.toString();
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

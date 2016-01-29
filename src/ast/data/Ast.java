@@ -18,13 +18,13 @@
 package ast.data;
 
 import ast.meta.MetaList;
-import ast.visitor.VisitorAcceptor;
+import ast.visitor.Visitee;
 
 /**
  *
  * @author urs
  */
-public interface Ast extends VisitorAcceptor {
+public interface Ast extends Visitee {
 
   public MetaList metadata();
 

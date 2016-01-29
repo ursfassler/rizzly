@@ -39,8 +39,4 @@ final public class RefIndex extends RefItem {
     return "[" + index + "]";
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

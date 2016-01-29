@@ -35,8 +35,4 @@ final public class FuncReturnTuple extends FuncReturn {
     this.param = param;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

@@ -43,8 +43,4 @@ final public class CaseOpt extends AstBase {
     return value.toString();
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

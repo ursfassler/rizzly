@@ -25,9 +25,5 @@ final public class RangeTemplate extends TypeTemplate {
     super("RangeTemplate");
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

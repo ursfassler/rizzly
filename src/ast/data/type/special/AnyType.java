@@ -27,8 +27,4 @@ final public class AnyType extends BaseType {
     super(NAME);
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

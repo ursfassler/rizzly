@@ -31,8 +31,4 @@ final public class LogicNot extends UnaryExp {
     return "not";
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

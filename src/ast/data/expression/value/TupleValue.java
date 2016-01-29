@@ -38,8 +38,4 @@ public class TupleValue extends ValueExpr {
     return "(" + value + ")";
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

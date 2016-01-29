@@ -39,9 +39,5 @@ final public class FunctionType extends Type {
     return "func(" + arg + "):" + ret;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

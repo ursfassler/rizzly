@@ -39,8 +39,4 @@ final public class CaseOptValue extends CaseOptEntry {
     return value.toString();
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

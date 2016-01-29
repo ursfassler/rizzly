@@ -36,8 +36,4 @@ final public class AliasType extends BaseType {
     this.ref = ref;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

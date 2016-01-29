@@ -35,8 +35,4 @@ final public class Modulo extends ArithmeticOp {
     return "mod";
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

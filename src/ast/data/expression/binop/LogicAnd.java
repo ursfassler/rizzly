@@ -31,9 +31,5 @@ final public class LogicAnd extends Logical {
     return "and";
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

@@ -21,8 +21,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 
-import ast.visitor.Visitor;
-
 public class MetaListImplementation implements MetaList {
   final private ArrayList<MetaInformation> items = new ArrayList<MetaInformation>();
 
@@ -48,13 +46,6 @@ public class MetaListImplementation implements MetaList {
   @Override
   public void clear() {
     items.clear();
-  }
-
-  @Override
-  public void accept(Visitor visitor) {
-    for (MetaInformation item : items) {
-      item.accept(visitor);
-    }
   }
 
   @Override

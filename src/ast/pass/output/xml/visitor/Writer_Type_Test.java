@@ -36,18 +36,17 @@ import ast.data.type.special.IntegerType;
 import ast.data.type.special.NaturalType;
 import ast.data.type.special.TypeType;
 import ast.data.type.special.VoidType;
-import ast.meta.MetaInformation;
 import ast.pass.output.xml.IdReader;
+import ast.visitor.VisitExecutor;
 import ast.visitor.Visitor;
 
 public class Writer_Type_Test {
   final private XmlStreamWriter stream = mock(XmlStreamWriter.class);
   final private IdReader astId = mock(IdReader.class);
   final private Visitor idWriter = mock(Visitor.class);
-  final private Write testee = new Write(stream, astId, idWriter);
-  final private MetaInformation info = mock(MetaInformation.class);
-  final private TypeReference typeReference = mock(TypeReference.class);
-  final private InOrder order = Mockito.inOrder(stream, info, typeReference, idWriter);
+  final private VisitExecutor executor = mock(VisitExecutor.class);
+  final private Write testee = new Write(stream, astId, idWriter, executor);
+  final private InOrder order = Mockito.inOrder(stream, idWriter, executor);
 
   @Test
   public void write_BooleanType() {
@@ -56,7 +55,7 @@ public class Writer_Type_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("Boolean"));
-    order.verify(idWriter).visit(item);
+    order.verify(executor).visit(eq(idWriter), eq(item));
     order.verify(stream).endNode();
   }
 
@@ -67,7 +66,7 @@ public class Writer_Type_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("Integer"));
-    order.verify(idWriter).visit(item);
+    order.verify(executor).visit(eq(idWriter), eq(item));
     order.verify(stream).endNode();
   }
 
@@ -78,7 +77,7 @@ public class Writer_Type_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("Natural"));
-    order.verify(idWriter).visit(item);
+    order.verify(executor).visit(eq(idWriter), eq(item));
     order.verify(stream).endNode();
   }
 
@@ -89,22 +88,22 @@ public class Writer_Type_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("AnyType"));
-    order.verify(idWriter).visit(item);
+    order.verify(executor).visit(eq(idWriter), eq(item));
     order.verify(stream).endNode();
   }
 
   @Test
   public void write_TypeType() {
+    TypeReference typeReference = mock(TypeReference.class);
     TypeType item = new TypeType("the name", typeReference);
-    item.metadata().add(info);
 
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("TypeType"));
     order.verify(stream).attribute("name", "the name");
-    order.verify(idWriter).visit(item);
-    order.verify(info).accept(testee);
-    order.verify(typeReference).accept(testee);
+    order.verify(executor).visit(eq(idWriter), eq(item));
+    order.verify(executor).visit(eq(testee), eq(item.metadata()));
+    order.verify(executor).visit(eq(testee), eq(item.type));
     order.verify(stream).endNode();
   }
 
@@ -115,7 +114,7 @@ public class Writer_Type_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("Void"));
-    order.verify(idWriter).visit(item);
+    order.verify(executor).visit(eq(idWriter), eq(item));
     order.verify(stream).endNode();
   }
 
@@ -126,7 +125,7 @@ public class Writer_Type_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("String"));
-    order.verify(idWriter).visit(item);
+    order.verify(executor).visit(eq(idWriter), eq(item));
     order.verify(stream).endNode();
   }
 
@@ -140,7 +139,7 @@ public class Writer_Type_Test {
     order.verify(stream).attribute("low", "-3");
     order.verify(stream).attribute("high", "57");
     order.verify(stream).attribute("name", "the name");
-    order.verify(idWriter).visit(item);
+    order.verify(executor).visit(eq(idWriter), eq(item));
     order.verify(stream).endNode();
   }
 

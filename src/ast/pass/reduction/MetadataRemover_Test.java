@@ -25,11 +25,13 @@ import org.mockito.Mockito;
 
 import ast.data.Ast;
 import ast.meta.MetaList;
+import ast.visitor.VisitExecutorImplementation;
 
 public class MetadataRemover_Test {
   final private MetadataRemover testee = new MetadataRemover();
   final private Ast item = Mockito.mock(Ast.class);
   final private MetaList metadata = Mockito.mock(MetaList.class);
+  final private VisitExecutorImplementation executor = new VisitExecutorImplementation();
 
   @Test
   public void clears_the_metadata() {
@@ -40,4 +42,12 @@ public class MetadataRemover_Test {
     verify(metadata).clear();
   }
 
+  @Test
+  public void is_a_visitor() {
+    when(item.metadata()).thenReturn(metadata);
+
+    executor.visit(testee, item);
+
+    verify(metadata).clear();
+  }
 }

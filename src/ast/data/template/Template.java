@@ -58,9 +58,5 @@ public class Template extends Named implements StateContent {
     return getName() + templ.toString();
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

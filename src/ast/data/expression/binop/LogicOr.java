@@ -35,8 +35,4 @@ final public class LogicOr extends Logical {
     return "or";
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

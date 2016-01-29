@@ -63,8 +63,4 @@ final public class RawElementary extends RawComponent {
     this.exitFunc = exitFunc;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

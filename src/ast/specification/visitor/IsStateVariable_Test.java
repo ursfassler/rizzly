@@ -35,12 +35,14 @@ import ast.data.statement.Block;
 import ast.data.variable.FunctionVariable;
 import ast.data.variable.StateVariable;
 import ast.meta.MetaList;
+import ast.visitor.VisitExecutor;
 import error.ErrorType;
 import error.RizzlyError;
 
 public class IsStateVariable_Test {
+  final private VisitExecutor executor = mock(VisitExecutor.class);
   final private RizzlyError error = mock(RizzlyError.class);
-  final private IsStateVariable testee = new IsStateVariable(error);
+  final private IsStateVariable testee = new IsStateVariable(executor, error);
 
   final private StateVariable stateVariable = mock(StateVariable.class);
   final private FunctionVariable functionVariable = mock(FunctionVariable.class);
@@ -50,20 +52,6 @@ public class IsStateVariable_Test {
 
   @Test
   public void is_false_by_default() {
-    assertFalse(testee.isState());
-  }
-
-  @Test
-  public void returns_false_for_function_variable() {
-    testee.visit(functionVariable);
-
-    assertFalse(testee.isState());
-  }
-
-  @Test
-  public void returns_false_for_statements() {
-    testee.visit(block);
-
     assertFalse(testee.isState());
   }
 
@@ -81,7 +69,7 @@ public class IsStateVariable_Test {
 
     testee.visit(linkedReference);
 
-    verify(link).accept(testee);
+    verify(executor).visit(testee, link);
   }
 
   @Test

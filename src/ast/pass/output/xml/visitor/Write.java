@@ -19,6 +19,7 @@ package ast.pass.output.xml.visitor;
 
 import ast.Designator;
 import ast.data.Ast;
+import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.component.ComponentReference;
 import ast.data.component.composition.AsynchroniusConnection;
@@ -97,12 +98,13 @@ import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
 import ast.data.reference.LinkTarget;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.reference.TypedReference;
+import ast.data.reference.UnlinkedReferenceWithOffset_Implementation;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
@@ -156,364 +158,306 @@ import ast.data.variable.StateVariable;
 import ast.data.variable.TemplateParameter;
 import ast.meta.SourcePosition;
 import ast.pass.output.xml.IdReader;
+import ast.visitor.VisitExecutor;
+import ast.visitor.Visitee;
 import ast.visitor.Visitor;
-import ast.visitor.VisitorAcceptor;
 
 public class Write implements Visitor {
-
   private final XmlStreamWriter writer;
   private final IdReader astId;
   private final Visitor idWriter;
+  private final VisitExecutor executor;
 
-  public Write(XmlStreamWriter writer, IdReader astId, Visitor idWriter) {
+  public Write(XmlStreamWriter writer, IdReader astId, Visitor idWriter, VisitExecutor executor) {
     this.writer = writer;
     this.astId = astId;
     this.idWriter = idWriter;
+    this.executor = executor;
   }
 
-  @Override
   public void visit(AliasType object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(And object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(AnyType object) {
     node("AnyType", object);
   }
 
-  @Override
   public void visit(AnyValue object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(ArrayTemplate object) {
     node("ArrayTemplate", object);
   }
 
-  @Override
   public void visit(ArrayType object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(ArrayValue object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(MultiAssignment object) {
     writer.beginNode("MultiAssignment");
-    object.accept(idWriter);
-    object.metadata().accept(this);
-    object.left.accept(this);
-    object.right.accept(this);
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
+    executor.visit(this, object.left);
+    executor.visit(this, object.right);
     writer.endNode();
   }
 
-  @Override
   public void visit(AssignmentSingle object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(AsynchroniusConnection object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(BitAnd object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(BitNot object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(BitOr object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(BitXor object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(Block object) {
     writer.beginNode("Block");
-    object.accept(idWriter);
-    object.metadata().accept(this);
-    object.statements.accept(this);
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
+    executor.visit(this, object.statements);
     writer.endNode();
   }
 
-  @Override
   public void visit(BooleanType object) {
     node("Boolean", object);
   }
 
-  @Override
   public void visit(BooleanValue object) {
     writeValueNode(object, "BooleanValue", object.value ? "True" : "False");
   }
 
-  @Override
   public void visit(CallStmt object) {
     writer.beginNode("CallStatement");
-    object.accept(idWriter);
-    object.metadata().accept(this);
-    object.call.accept(this);
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
+    executor.visit(this, object.call);
     writer.endNode();
   }
 
-  @Override
   public void visit(CaseOpt object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(CaseOptRange object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(CaseOptSimple object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(CaseOptValue object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(CaseStmt object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(ComponentType object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(ComponentReference object) {
     visitTypedReference("ComponentReference", object);
   }
 
-  @Override
   public void visit(ComponentUse object) {
     writer.beginNode("ComponentUse");
     writer.attribute("name", object.getName());
-    object.accept(idWriter);
-    object.metadata().accept(this);
-    object.compRef.accept(this);
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
+    executor.visit(this, object.compRef);
     writer.endNode();
   }
 
-  @Override
   public void visit(CompUseRef object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(GlobalConstant object) {
     visitDefaultVariable("GlobalConstant", object);
   }
 
-  @Override
   public void visit(ConstPrivate object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(DefaultValueTemplate object) {
     node("DefaultValueTemplate", object);
   }
 
-  @Override
   public void visit(Division object) {
     writeBinaryExpression("Division", object);
   }
 
-  @Override
   public void visit(LinkTarget object) {
     writer.beginNode("LinkTarget");
     writer.attribute("name", object.getName());
-    object.accept(idWriter);
-    object.metadata().accept(this);
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
     writer.endNode();
   }
 
-  @Override
   public void visit(EndpointRaw object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(EndpointSelf object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(EndpointSub object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(EnumElement enumElement) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(EnumType enumType) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(Equal object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(ForStmt object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(FuncFunction object) {
     visitFunction("Function", object);
   }
 
-  @Override
   public void visit(FuncInterrupt object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(Procedure object) {
     visitProcedure("Procedure", object);
   }
 
-  @Override
   public void visit(FuncQuery object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(FunctionReference object) {
     visitTypedReference("FunctionReference", object);
   }
 
-  @Override
   public void visit(Response object) {
     visitFunction("Response", object);
   }
 
-  @Override
   public void visit(FuncReturnNone object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(FuncReturnTuple object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(FunctionReturnType object) {
     writer.beginNode("ReturnType");
-    object.accept(idWriter);
-    object.metadata().accept(this);
-    object.type.accept(this);
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
+    executor.visit(this, object.type);
     writer.endNode();
   }
 
-  @Override
   public void visit(Signal object) {
     visitProcedure("Signal", object);
   }
 
-  @Override
   public void visit(Slot object) {
     visitProcedure("Slot", object);
   }
 
-  @Override
   public void visit(FuncSubHandlerEvent object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(FuncSubHandlerQuery object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(FunctionType object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(FunctionVariable object) {
     writer.beginNode("FunctionVariable");
     writer.attribute("name", object.getName());
-    object.accept(idWriter);
-    object.metadata().accept(this);
-    object.type.accept(this);
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
+    executor.visit(this, object.type);
     writer.endNode();
   }
 
-  @Override
   public void visit(Greater object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(GreaterEqual object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(IfOption object) {
     writer.beginNode("IfOption");
-    object.accept(idWriter);
-    object.metadata().accept(this);
-    object.condition.accept(this);
-    object.code.accept(this);
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
+    executor.visit(this, object.condition);
+    executor.visit(this, object.code);
     writer.endNode();
   }
 
-  @Override
   public void visit(IfStatement object) {
     writer.beginNode("IfStatement");
-    object.accept(idWriter);
-    object.metadata().accept(this);
-    object.option.accept(this);
-    object.defblock.accept(this);
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
+    executor.visit(this, object.option);
+    executor.visit(this, object.defblock);
     writer.endNode();
   }
 
-  @Override
   public void visit(ImplComposition object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(ImplElementary object) {
     writer.beginNode("Elementary");
     writer.attribute("name", object.getName());
-    object.accept(idWriter);
-    object.metadata().accept(this);
-    object.queue.accept(this);
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
+    executor.visit(this, object.queue);
     encapsulate("interface", object.iface);
     encapsulate("function", object.function);
     encapsulate("entry", object.entryFunc);
@@ -526,166 +470,138 @@ public class Write implements Visitor {
     writer.endNode();
   }
 
-  @Override
   public void visit(ImplHfsm object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(IntegerType object) {
     node("Integer", object);
   }
 
-  @Override
   public void visit(Is object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(Less object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(LessEqual object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(LogicAnd object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(LogicNot object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(LogicOr object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(Minus object) {
     writeBinaryExpression("Minus", object);
   }
 
-  @Override
   public void visit(Modulo object) {
     writeBinaryExpression("Modulo", object);
   }
 
-  @Override
   public void visit(MsgPush object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(Multiplication object) {
     writeBinaryExpression("Multiplication", object);
   }
 
-  @Override
   public void visit(NamedElement object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(NamedElementsValue namedElementsValue) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(NamedValue namedValue) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(Namespace object) {
     writer.beginNode("Namespace");
     writer.attribute("name", object.getName());
-    object.accept(idWriter);
-    object.metadata().accept(this);
-    object.children.accept(this);
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
+    executor.visit(this, object.children);
     writer.endNode();
   }
 
-  @Override
   public void visit(NaturalType object) {
     node("Natural", object);
   }
 
-  @Override
   public void visit(Not object) {
     writer.beginNode("Not");
-    object.accept(idWriter);
-    object.metadata().accept(this);
-    object.expression.accept(this);
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
+    executor.visit(this, object.expression);
     writer.endNode();
   }
 
-  @Override
   public void visit(NotEqual object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(NumberValue object) {
     writeValueNode(object, "NumberValue", object.toString());
   }
 
-  @Override
   public void visit(Or object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(Plus object) {
     writeBinaryExpression("Plus", object);
   }
 
-  @Override
   public void visit(PointerType object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(Queue object) {
     writer.beginNode("Queue");
     writer.attribute("name", object.getName());
-    object.accept(idWriter);
-    object.metadata().accept(this);
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
     writer.endNode();
   }
 
-  @Override
   public void visit(RangeTemplate object) {
     node("RangeTemplate", object);
   }
 
-  @Override
   public void visit(RangeType object) {
     writer.beginNode("RangeType");
     writer.attribute("low", object.range.low.toString());
     writer.attribute("high", object.range.high.toString());
     writer.attribute("name", object.getName());
-    object.accept(idWriter);
-    object.metadata().accept(this);
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
     writer.endNode();
   }
 
-  @Override
   public void visit(RawComposition object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(RawElementary object) {
     writer.beginNode("RawElementary");
     writer.attribute("name", object.getName());
-    object.accept(idWriter);
-    object.metadata().accept(this);
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
     encapsulate("interface", object.getIface());
     encapsulate("entry", object.getEntryFunc());
     encapsulate("exit", object.getExitFunc());
@@ -694,91 +610,79 @@ public class Write implements Visitor {
     writer.endNode();
   }
 
-  @Override
   public void visit(RawHfsm rawHfsm) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(RecordType recordType) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(RecordValue recordValue) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(RefCall object) {
     writer.beginNode("ReferenceCall");
-    object.accept(idWriter);
-    object.metadata().accept(this);
-    object.actualParameter.accept(this);
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
+    executor.visit(this, object.actualParameter);
     writer.endNode();
   }
 
-  @Override
   public void visit(LinkedReferenceWithOffset_Implementation object) {
     writer.beginNode("Reference");
-    object.accept(idWriter);
+    executor.visit(idWriter, object);
 
     // FIXME That is a bit hacky. Split Reference to a linked and a unlinked implementation.
     if (astId.hasId(object.getLink())) {
       writer.attribute("link", astId.getId(object.getLink()));
     } else {
-      object.getLink().accept(this);
+      executor.visit(this, object.getLink());
     }
 
-    object.metadata().accept(this);
-    object.getOffset().accept(this);
+    executor.visit(this, object.metadata());
+    executor.visit(this, object.getOffset());
     writer.endNode();
   }
 
-  @Override
   public void visit(ReferenceExpression object) {
     writer.beginNode("ReferenceExpression");
-    object.accept(idWriter);
-    object.metadata().accept(this);
-    object.reference.accept(this);
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
+    executor.visit(this, object.reference);
     writer.endNode();
   }
 
-  @Override
   public void visit(RefIndex refIndex) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(RefName object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(RefTemplCall object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(ExpressionReturn object) {
     writer.beginNode("ExpressionReturn");
-    object.accept(idWriter);
-    object.metadata().accept(this);
-    object.expression.accept(this);
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
+    executor.visit(this, object.expression);
     writer.endNode();
   }
 
-  @Override
   public void visit(VoidReturn object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(RizzlyFile object) {
     writer.beginNode("RizzlyFile");
     writer.attribute("name", object.getName());
-    object.accept(idWriter);
-    object.metadata().accept(this);
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
 
     for (Designator itr : object.imports) {
       writer.beginNode("import");
@@ -786,182 +690,155 @@ public class Write implements Visitor {
       writer.endNode();
     }
 
-    object.objects.accept(this);
+    executor.visit(this, object.objects);
 
     writer.endNode();
   }
 
-  @Override
   public void visit(Shl object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(Shr shr) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(SIntType sIntType) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(StateComposite stateComposite) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(StateRef object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(StateSimple object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(StateVariable object) {
     visitDefaultVariable("StateVariable", object);
   }
 
-  @Override
   public void visit(StringType object) {
     node("String", object);
   }
 
-  @Override
   public void visit(StringValue object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(SubCallbacks object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(SynchroniusConnection object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(Template object) {
     writer.beginNode("Template");
     writer.attribute("name", object.getName());
-    object.accept(idWriter);
-    object.metadata().accept(this);
-    object.getTempl().accept(this);
-    object.getObject().accept(this);
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
+    executor.visit(this, object.getTempl());
+    executor.visit(this, object.getObject());
     writer.endNode();
   }
 
-  @Override
   public void visit(TemplateParameter object) {
     writer.beginNode("TemplateParameter");
     writer.attribute("name", object.getName());
-    object.accept(idWriter);
-    object.metadata().accept(this);
-    object.type.accept(this);
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
+    executor.visit(this, object.type);
     writer.endNode();
   }
 
-  @Override
   public void visit(Transition object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(TupleType object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(TupleValue object) {
     writer.beginNode("TupleValue");
-    object.accept(idWriter);
-    object.metadata().accept(this);
-    object.value.accept(this);
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
+    executor.visit(this, object.value);
     writer.endNode();
   }
 
-  @Override
   public void visit(TypeCast object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(TypeReference object) {
     visitTypedReference("TypeReference", object);
   }
 
-  @Override
   public void visit(TypeType object) {
     writer.beginNode("TypeType");
     writer.attribute("name", object.getName());
-    object.accept(idWriter);
-    object.metadata().accept(this);
-    object.type.accept(this);
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
+    executor.visit(this, object.type);
     writer.endNode();
   }
 
-  @Override
   public void visit(TypeTypeTemplate object) {
     node("TypeTypeTemplate", object);
   }
 
-  @Override
   public void visit(UIntType object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(Uminus object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(UnionType object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(UnionValue object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(UnsafeUnionType object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
-  public void visit(UnsafeUnionValue unsafeUnionValue) {
+  public void visit(UnsafeUnionValue object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
-  public void visit(VarDefInitStmt varDefInitStmt) {
+  public void visit(VarDefInitStmt object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
-  public void visit(VarDefStmt varDefStmt) {
+  public void visit(VarDefStmt object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
   public void visit(VoidType object) {
     node("Void", object);
   }
 
-  @Override
-  public void visit(WhileStmt whileStmt) {
+  public void visit(WhileStmt object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  @Override
+  public void visit(UnlinkedReferenceWithOffset_Implementation object) {
+    throw new RuntimeException("not yet implemented");
+  }
+
   public void visit(SourcePosition elementInfo) {
     writer.beginNode("SourcePosition");
     writer.attribute("filename", elementInfo.filename);
@@ -973,29 +850,35 @@ public class Write implements Visitor {
   private void writeValueNode(Ast object, String name, String value) {
     writer.beginNode(name);
     writer.attribute("value", value);
-    object.accept(idWriter);
-    object.metadata().accept(this);
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
     writer.endNode();
   }
 
   private void writeBinaryExpression(String name, BinaryExpression expression) {
     writer.beginNode(name);
-    expression.accept(idWriter);
-    expression.metadata().accept(this);
-    expression.left.accept(this);
-    expression.right.accept(this);
+    executor.visit(idWriter, expression);
+    executor.visit(this, expression.metadata());
+    executor.visit(this, expression.left);
+    executor.visit(this, expression.right);
     writer.endNode();
   }
 
   private void node(String name, Ast object) {
     writer.beginNode(name);
-    object.accept(idWriter);
+    executor.visit(idWriter, object);
     writer.endNode();
   }
 
-  private void encapsulate(String nodeName, VisitorAcceptor object) {
+  private void encapsulate(String nodeName, Visitee object) {
     writer.beginNode(nodeName);
-    object.accept(this);
+    executor.visit(this, object);
+    writer.endNode();
+  }
+
+  private void encapsulate(String nodeName, AstList<? extends Ast> object) {
+    writer.beginNode(nodeName);
+    executor.visit(this, object);
     writer.endNode();
   }
 
@@ -1019,11 +902,11 @@ public class Write implements Visitor {
     writer.beginNode(typeName);
     visit(object.property);
     writer.attribute("name", object.getName());
-    object.accept(idWriter);
-    object.metadata().accept(this);
-    object.param.accept(this);
-    object.ret.accept(this);
-    object.body.accept(this);
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
+    executor.visit(this, object.param);
+    executor.visit(this, object.ret);
+    executor.visit(this, object.body);
     writer.endNode();
   }
 
@@ -1031,28 +914,28 @@ public class Write implements Visitor {
     writer.beginNode(typeName);
     visit(object.property);
     writer.attribute("name", object.getName());
-    object.accept(idWriter);
-    object.metadata().accept(this);
-    object.param.accept(this);
-    object.body.accept(this);
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
+    executor.visit(this, object.param);
+    executor.visit(this, object.body);
     writer.endNode();
   }
 
   private <T extends Ast> void visitTypedReference(String typeName, TypedReference<T> object) {
     writer.beginNode(typeName);
-    object.accept(idWriter);
-    object.metadata().accept(this);
-    object.ref.accept(this);
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
+    executor.visit(this, object.ref);
     writer.endNode();
   }
 
   private void visitDefaultVariable(String typeName, DefaultVariable object) {
     writer.beginNode(typeName);
     writer.attribute("name", object.getName());
-    object.accept(idWriter);
-    object.metadata().accept(this);
-    object.type.accept(this);
-    object.def.accept(this);
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
+    executor.visit(this, object.type);
+    executor.visit(this, object.def);
     writer.endNode();
   }
 

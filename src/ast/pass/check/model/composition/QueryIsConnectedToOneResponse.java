@@ -25,13 +25,10 @@ import ast.data.AstList;
 import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.Connection;
 import ast.data.component.composition.Endpoint;
-import ast.data.component.composition.EndpointRaw;
-import ast.data.component.composition.EndpointSelf;
-import ast.data.component.composition.EndpointSub;
 import ast.data.function.Function;
 import ast.data.function.ret.FuncReturn;
 import ast.data.function.ret.FuncReturnNone;
-import ast.visitor.NullVisitor;
+import ast.visitor.VisitExecutorImplementation;
 import error.ErrorType;
 import error.RizzlyError;
 
@@ -72,33 +69,9 @@ public class QueryIsConnectedToOneResponse {
   }
 
   private Pair<ComponentUse, Function> getDescriptor(Endpoint endpoint) {
-    DescriptorBuilder visitor = new DescriptorBuilder();
-    endpoint.accept(visitor);
+    EndpointDescriptorBuilder visitor = new EndpointDescriptorBuilder();
+    (new VisitExecutorImplementation()).visit(visitor, endpoint);
     return visitor.descriptor;
-  }
-
-}
-
-class DescriptorBuilder extends NullVisitor {
-  public Pair<ComponentUse, Function> descriptor = null;
-
-  @Override
-  public void visit(EndpointRaw endpointRaw) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  public void visit(EndpointSelf endpointSelf) {
-    ComponentUse first = null;
-    Function second = endpointSelf.getFunc();
-    descriptor = new Pair<ComponentUse, Function>(first, second);
-  }
-
-  @Override
-  public void visit(EndpointSub endpointSub) {
-    ComponentUse first = endpointSub.component.getTarget();
-    Function second = endpointSub.getFunc();
-    descriptor = new Pair<ComponentUse, Function>(first, second);
   }
 
 }

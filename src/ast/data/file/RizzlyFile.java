@@ -41,8 +41,4 @@ final public class RizzlyFile extends Named {
     setName(name);
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

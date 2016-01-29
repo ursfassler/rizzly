@@ -27,8 +27,4 @@ final public class NamedElementsValue extends ValueExpr {
     this.value = value;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

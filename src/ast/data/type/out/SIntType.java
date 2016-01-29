@@ -29,8 +29,4 @@ final public class SIntType extends IntType {
     return "S" + Integer.toString(8 * bytes);
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

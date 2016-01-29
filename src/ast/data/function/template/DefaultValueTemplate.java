@@ -24,8 +24,4 @@ final public class DefaultValueTemplate extends FunctionTemplate {
     super("DefaultValueTemplate");
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

@@ -34,9 +34,5 @@ public class FunctionReference extends TypedReference<Function> {
     metadata().add(info);
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

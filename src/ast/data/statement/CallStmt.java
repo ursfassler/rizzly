@@ -32,8 +32,4 @@ final public class CallStmt extends Statement {
     return call.toString();
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

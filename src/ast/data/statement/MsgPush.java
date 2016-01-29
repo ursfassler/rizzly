@@ -41,8 +41,4 @@ final public class MsgPush extends Statement {
     return queue + ".push(" + func + "," + data + ")";
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

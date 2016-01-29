@@ -45,9 +45,5 @@ final public class EndpointSelf extends Endpoint {
     return "self." + funcRef.getTarget().getName();
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

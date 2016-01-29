@@ -32,8 +32,4 @@ final public class ArrayType extends BaseType {
     this.size = size;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

@@ -29,8 +29,4 @@ final public class UnsafeUnionValue extends ValueExpr {
     this.type = type;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

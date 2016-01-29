@@ -28,8 +28,4 @@ public class Block extends Statement {
     return "block" + Long.toHexString(this.hashCode());
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

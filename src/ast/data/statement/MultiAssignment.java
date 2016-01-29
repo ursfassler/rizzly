@@ -36,8 +36,4 @@ final public class MultiAssignment extends Assignment {
     return left + " := " + right;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

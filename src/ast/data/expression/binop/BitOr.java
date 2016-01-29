@@ -35,8 +35,4 @@ final public class BitOr extends ArithmeticOp {
     return "or";
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

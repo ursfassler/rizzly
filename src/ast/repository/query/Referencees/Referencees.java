@@ -25,24 +25,26 @@ import java.util.Set;
 import ast.data.Ast;
 import ast.data.Named;
 import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.Reference;
 
 public class Referencees implements ReferenceesWriter, ReferenceesReader {
-  final private Map<Ast, Set<LinkedReferenceWithOffset_Implementation>> referencees = new HashMap<Ast, Set<LinkedReferenceWithOffset_Implementation>>();
+  final private Map<Ast, Set<Reference>> referencees = new HashMap<Ast, Set<Reference>>();
 
   @Override
-  public Set<LinkedReferenceWithOffset_Implementation> getReferencees(Ast target) {
+  public Set<Reference> getReferencees(Ast target) {
     return referencees.get(target);
   }
 
   @Override
   public void addTarget(Ast target) {
     if (!referencees.containsKey(target)) {
-      referencees.put(target, new HashSet<LinkedReferenceWithOffset_Implementation>());
+      referencees.put(target, new HashSet<Reference>());
     }
   }
 
   @Override
   public void addReferencee(LinkedReferenceWithOffset_Implementation referencee) {
+    // TODO only add referencee and not the target
     Named target = referencee.getLink();
     addTarget(target);
     referencees.get(target).add(referencee);

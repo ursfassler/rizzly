@@ -42,9 +42,5 @@ final public class NamedElement extends Named {
     return getName() + typeref;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

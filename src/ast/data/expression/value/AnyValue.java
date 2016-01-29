@@ -27,8 +27,4 @@ final public class AnyValue extends ValueExpr {
     return NAME;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

@@ -37,9 +37,5 @@ public class SubCallbacks extends AstBase {
     this.compUse = compUse;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

@@ -27,8 +27,4 @@ public class TypeReference extends TypedReference<Type> {
     super(ref);
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

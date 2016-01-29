@@ -50,9 +50,5 @@ final public class EndpointSub extends Endpoint {
     return component.getTarget().getName() + "." + function;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

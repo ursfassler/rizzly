@@ -28,9 +28,5 @@ final public class StateComposite extends State {
     this.initial = initial;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

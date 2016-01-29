@@ -29,59 +29,47 @@ import ast.data.Named;
 import ast.data.template.Template;
 import ast.data.type.TypeReference;
 import ast.data.variable.TemplateParameter;
-import ast.meta.MetaInformation;
 import ast.pass.output.xml.IdReader;
+import ast.visitor.VisitExecutor;
 import ast.visitor.Visitor;
 
 public class Writer_Template_Test {
   final private XmlStreamWriter stream = mock(XmlStreamWriter.class);
   final private IdReader astId = mock(IdReader.class);
   final private Visitor idWriter = mock(Visitor.class);
-  final private Write testee = new Write(stream, astId, idWriter);
-  final private MetaInformation info = mock(MetaInformation.class);
-  final private TemplateParameter parameter1 = mock(TemplateParameter.class);
-  final private TemplateParameter parameter2 = mock(TemplateParameter.class);
-  final private Named object = mock(Named.class);
-  final private TypeReference typeReference = mock(TypeReference.class);
-  final private InOrder order = Mockito.inOrder(stream, info, parameter1, parameter2, typeReference, object, idWriter);
-  final private AstList<TemplateParameter> parameter;
-
-  public Writer_Template_Test() {
-    super();
-    parameter = new AstList<TemplateParameter>();
-    parameter.add(parameter1);
-    parameter.add(parameter2);
-  }
+  final private VisitExecutor executor = mock(VisitExecutor.class);
+  final private Write testee = new Write(stream, astId, idWriter, executor);
+  final private InOrder order = Mockito.inOrder(stream, idWriter, executor);
 
   @Test
   public void write_Template() {
+    AstList<TemplateParameter> parameter = new AstList<TemplateParameter>();
+    Named object = mock(Named.class);
     Template item = new Template("the Template", parameter, object);
-    item.metadata().add(info);
 
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("Template"));
     order.verify(stream).attribute("name", "the Template");
-    order.verify(idWriter).visit(item);
-    order.verify(info).accept(eq(testee));
-    order.verify(parameter1).accept(eq(testee));
-    order.verify(parameter2).accept(eq(testee));
-    order.verify(object).accept(eq(testee));
+    order.verify(executor).visit(eq(idWriter), eq(item));
+    order.verify(executor).visit(eq(testee), eq(item.metadata()));
+    order.verify(executor).visit(eq(testee), eq(item.getTempl()));
+    order.verify(executor).visit(eq(testee), eq(item.getObject()));
     order.verify(stream).endNode();
   }
 
   @Test
   public void write_TemplateParameter() {
+    TypeReference typeReference = mock(TypeReference.class);
     TemplateParameter item = new TemplateParameter("the param", typeReference);
-    item.metadata().add(info);
 
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("TemplateParameter"));
     order.verify(stream).attribute("name", "the param");
-    order.verify(idWriter).visit(item);
-    order.verify(info).accept(eq(testee));
-    order.verify(typeReference).accept(eq(testee));
+    order.verify(executor).visit(eq(idWriter), eq(item));
+    order.verify(executor).visit(eq(testee), eq(item.metadata()));
+    order.verify(executor).visit(eq(testee), eq(item.type));
     order.verify(stream).endNode();
   }
 

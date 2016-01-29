@@ -38,8 +38,4 @@ final public class RefName extends RefItem {
     return "." + name;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

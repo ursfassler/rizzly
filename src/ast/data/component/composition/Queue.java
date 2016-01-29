@@ -28,9 +28,5 @@ public class Queue extends Named {
     setName(DEFAULT_NAME);
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

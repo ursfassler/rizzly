@@ -31,8 +31,4 @@ public class UnionValue extends ValueExpr {
     this.type = type;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

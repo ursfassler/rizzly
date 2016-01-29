@@ -36,9 +36,5 @@ final public class RecordType extends NamedElementType {
     super(name);
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

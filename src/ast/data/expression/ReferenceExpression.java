@@ -32,8 +32,4 @@ final public class ReferenceExpression extends Expression {
     return "->" + reference;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

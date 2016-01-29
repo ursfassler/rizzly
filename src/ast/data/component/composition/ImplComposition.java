@@ -29,9 +29,5 @@ public class ImplComposition extends Component {
     super(name);
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

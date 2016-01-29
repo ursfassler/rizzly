@@ -17,11 +17,25 @@
 
 package ast.visitor;
 
+import ast.data.Ast;
+import ast.data.AstList;
+
 public class EveryVisitor extends DeepFirstTraverser {
 
-  public void addDefaultHandler(DefaultHandler handler) {
-    DefaultVisitor defaultVisitor = new DefaultVisitor(handler);
-    addPreorderVisitor(defaultVisitor);
+  public static void visitEverything(Visitor visitor, Visitee visitee) {
+    DeepFirstTraverser allTraverser = new DeepFirstTraverser();
+    allTraverser.addPreorderVisitor(visitor);
+
+    VisitExecutorImplementation executer = new VisitExecutorImplementation();
+    executer.visit(allTraverser, visitee);
   }
 
+  @Deprecated
+  public static void visitEverything(Visitor visitor, AstList<? extends Ast> visitee) {
+    DeepFirstTraverser allTraverser = new DeepFirstTraverser();
+    allTraverser.addPreorderVisitor(visitor);
+
+    VisitExecutorImplementation executer = new VisitExecutorImplementation();
+    executer.visit(allTraverser, visitee);
+  }
 }

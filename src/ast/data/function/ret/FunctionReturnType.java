@@ -34,8 +34,4 @@ final public class FunctionReturnType extends FuncReturn {
     this.type = type;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

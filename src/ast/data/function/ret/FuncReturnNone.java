@@ -30,8 +30,4 @@ final public class FuncReturnNone extends FuncReturn {
     metadata().add(info);
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

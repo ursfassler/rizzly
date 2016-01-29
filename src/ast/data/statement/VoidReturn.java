@@ -26,8 +26,4 @@ final public class VoidReturn extends Return {
     return "return";
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

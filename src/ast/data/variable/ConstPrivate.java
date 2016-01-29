@@ -27,8 +27,4 @@ final public class ConstPrivate extends Constant implements StateContent {
     super(name, type, def);
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

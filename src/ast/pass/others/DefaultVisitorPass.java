@@ -21,22 +21,23 @@ import main.Configuration;
 import ast.data.Namespace;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.visitor.DefaultHandler;
-import ast.visitor.EveryVisitor;
+import ast.visitor.DeepFirstTraverser;
+import ast.visitor.VisitExecutorImplementation;
+import ast.visitor.Visitor;
 
 public class DefaultVisitorPass extends AstPass {
-  final private DefaultHandler handler;
+  final private Visitor visitor;
 
-  public DefaultVisitorPass(DefaultHandler handler, Configuration configuration) {
+  public DefaultVisitorPass(Visitor visitor, Configuration configuration) {
     super(configuration);
-    this.handler = handler;
+    this.visitor = visitor;
   }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    EveryVisitor visitor = new EveryVisitor();
-    visitor.addDefaultHandler(handler);
-    ast.accept(visitor);
+    DeepFirstTraverser allVisitor = new DeepFirstTraverser();
+    allVisitor.addPreorderVisitor(visitor);
+    (new VisitExecutorImplementation()).visit(allVisitor, ast);
   }
 
 }

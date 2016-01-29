@@ -34,8 +34,4 @@ public class ComponentReference extends TypedReference<Component> {
     metadata().add(info);
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

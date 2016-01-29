@@ -18,17 +18,11 @@
 package ast.data.reference;
 
 import ast.meta.MetaList;
-import ast.visitor.Visitor;
 
-public class UnlinkedReferenceWithOffset_Implementation implements Reference {
+public class UnlinkedReferenceWithOffset_Implementation implements UnlinkedReference {
 
   @Override
   public MetaList metadata() {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  @Override
-  public void accept(Visitor visitor) {
     throw new RuntimeException("not yet implemented");
   }
 

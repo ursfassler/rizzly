@@ -37,8 +37,4 @@ final public class TupleType extends BaseType {
     this.types = types;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

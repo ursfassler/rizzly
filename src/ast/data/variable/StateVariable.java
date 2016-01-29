@@ -28,8 +28,4 @@ public class StateVariable extends DefaultVariable implements StateContent {
     super(name, type, def);
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

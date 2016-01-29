@@ -31,8 +31,4 @@ final public class BooleanValue extends ValueExpr {
     return Boolean.toString(value);
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

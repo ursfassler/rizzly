@@ -15,9 +15,29 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.visitor;
+package ast.repository.query;
 
-public interface VisitorAcceptor {
-  public void accept(Visitor visitor);
+import ast.data.Ast;
+import ast.data.AstList;
+import ast.specification.Specification;
+import ast.visitor.Visitor;
+
+public class CollectorVisitor implements Visitor {
+  final private AstList<Ast> matched = new AstList<Ast>();
+  final private Specification spec;
+
+  public CollectorVisitor(Specification spec) {
+    this.spec = spec;
+  }
+
+  public void visit(Ast ast) {
+    if (spec.isSatisfiedBy(ast)) {
+      matched.add(ast);
+    }
+  }
+
+  public AstList<Ast> getMatched() {
+    return matched;
+  }
 
 }

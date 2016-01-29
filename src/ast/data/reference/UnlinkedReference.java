@@ -15,20 +15,8 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.reduction;
+package ast.data.reference;
 
-import ast.data.Ast;
-import ast.data.function.Function;
-import ast.data.function.FunctionProperty;
-import ast.visitor.DefaultHandler;
-
-public class FunctionPublisher implements DefaultHandler {
-
-  @Override
-  public void visit(Ast ast) {
-    if (ast instanceof Function) {  // FIXME That is exactly _not_ the use case of a visitor
-      ((Function) ast).property = FunctionProperty.Public;
-    }
-  }
+public interface UnlinkedReference extends Reference {
 
 }

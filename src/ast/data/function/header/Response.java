@@ -30,8 +30,4 @@ final public class Response extends InterfaceFunction implements StateContent {
     super(name, param, ret, body);
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

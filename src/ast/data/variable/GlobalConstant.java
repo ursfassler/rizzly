@@ -26,8 +26,4 @@ final public class GlobalConstant extends Constant {
     super(name, type, def);
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

@@ -52,8 +52,4 @@ final public class RefTemplCall extends RefItem {
     return ret;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

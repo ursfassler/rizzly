@@ -32,9 +32,5 @@ final public class VarDefStmt extends Statement {
     return variable.toString();
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

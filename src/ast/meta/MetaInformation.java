@@ -17,8 +17,8 @@
 
 package ast.meta;
 
-import ast.visitor.VisitorAcceptor;
+import ast.visitor.Visitee;
 
-public interface MetaInformation extends VisitorAcceptor {
+public interface MetaInformation extends Visitee {
 
 }

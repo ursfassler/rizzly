@@ -29,8 +29,4 @@ final public class UIntType extends IntType {
     return "U" + Integer.toString(8 * bytes);
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

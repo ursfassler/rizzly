@@ -30,32 +30,31 @@ import ast.data.expression.binop.Minus;
 import ast.data.expression.binop.Modulo;
 import ast.data.expression.binop.Multiplication;
 import ast.data.expression.binop.Plus;
-import ast.meta.MetaInformation;
 import ast.pass.output.xml.IdReader;
+import ast.visitor.VisitExecutor;
 import ast.visitor.Visitor;
 
 public class Writer_BinaryOperation_Test {
   final private XmlStreamWriter stream = mock(XmlStreamWriter.class);
   final private IdReader astId = mock(IdReader.class);
   final private Visitor idWriter = mock(Visitor.class);
-  final private Write testee = new Write(stream, astId, idWriter);
-  final private MetaInformation info = mock(MetaInformation.class);
+  final private VisitExecutor executor = mock(VisitExecutor.class);
+  final private Write testee = new Write(stream, astId, idWriter, executor);
   final private Expression left = mock(Expression.class);
   final private Expression right = mock(Expression.class);
-  InOrder order = Mockito.inOrder(stream, info, left, right, idWriter);
+  InOrder order = Mockito.inOrder(stream, executor);
 
   @Test
   public void write_plus() {
     Plus operation = new Plus(left, right);
-    operation.metadata().add(info);
 
     testee.visit(operation);
 
     order.verify(stream).beginNode(eq("Plus"));
-    order.verify(idWriter).visit(eq(operation));
-    order.verify(info).accept(eq(testee));
-    order.verify(left).accept(eq(testee));
-    order.verify(right).accept(eq(testee));
+    order.verify(executor).visit(eq(idWriter), eq(operation));
+    order.verify(executor).visit(eq(testee), eq(operation.metadata()));
+    order.verify(executor).visit(eq(testee), eq(left));
+    order.verify(executor).visit(eq(testee), eq(right));
     order.verify(stream).endNode();
   }
 

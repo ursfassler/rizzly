@@ -34,8 +34,4 @@ final public class AssignmentSingle extends Assignment {
     return left + " := " + right;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

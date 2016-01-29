@@ -47,8 +47,4 @@ final public class Transition extends AstBase implements StateContent {
     return src + " -> " + dst + " by " + eventFunc + param + " if " + guard;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

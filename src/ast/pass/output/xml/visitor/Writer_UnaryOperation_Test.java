@@ -26,30 +26,29 @@ import org.mockito.Mockito;
 
 import ast.data.expression.Expression;
 import ast.data.expression.unop.Not;
-import ast.meta.MetaInformation;
 import ast.pass.output.xml.IdReader;
+import ast.visitor.VisitExecutor;
 import ast.visitor.Visitor;
 
 public class Writer_UnaryOperation_Test {
   final private XmlStreamWriter stream = mock(XmlStreamWriter.class);
   final private IdReader astId = mock(IdReader.class);
   final private Visitor idWriter = mock(Visitor.class);
-  final private Write testee = new Write(stream, astId, idWriter);
-  final private MetaInformation info = mock(MetaInformation.class);
-  final private Expression expression = mock(Expression.class);
-  final private InOrder order = Mockito.inOrder(stream, info, expression, idWriter);
+  final private VisitExecutor executor = mock(VisitExecutor.class);
+  final private Write testee = new Write(stream, astId, idWriter, executor);
+  final private InOrder order = Mockito.inOrder(stream, idWriter, executor);
 
   @Test
   public void write_Not() {
-    Not operation = new Not(expression);
-    operation.metadata().add(info);
+    Expression expression = mock(Expression.class);
+    Not item = new Not(expression);
 
-    testee.visit(operation);
+    testee.visit(item);
 
     order.verify(stream).beginNode(eq("Not"));
-    order.verify(idWriter).visit(operation);
-    order.verify(info).accept(eq(testee));
-    order.verify(expression).accept(eq(testee));
+    order.verify(executor).visit(eq(idWriter), eq(item));
+    order.verify(executor).visit(eq(testee), eq(item.metadata()));
+    order.verify(executor).visit(eq(testee), eq(item.expression));
     order.verify(stream).endNode();
   }
 }

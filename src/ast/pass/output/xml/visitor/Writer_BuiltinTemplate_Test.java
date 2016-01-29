@@ -30,15 +30,17 @@ import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
 import ast.meta.MetaInformation;
 import ast.pass.output.xml.IdReader;
+import ast.visitor.VisitExecutor;
 import ast.visitor.Visitor;
 
 public class Writer_BuiltinTemplate_Test {
   final private XmlStreamWriter stream = mock(XmlStreamWriter.class);
   final private IdReader astId = mock(IdReader.class);
   final private Visitor idWriter = mock(Visitor.class);
-  final private Write testee = new Write(stream, astId, idWriter);
+  final private VisitExecutor executor = mock(VisitExecutor.class);
+  final private Write testee = new Write(stream, astId, idWriter, executor);
   final private MetaInformation info = mock(MetaInformation.class);
-  final private InOrder order = Mockito.inOrder(stream, info, idWriter);
+  final private InOrder order = Mockito.inOrder(stream, info, idWriter, executor);
 
   @Test
   public void write_RangeTemplate() {
@@ -47,7 +49,7 @@ public class Writer_BuiltinTemplate_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("RangeTemplate"));
-    order.verify(idWriter).visit(item);
+    order.verify(executor).visit(idWriter, item);
     order.verify(stream).endNode();
   }
 
@@ -58,7 +60,7 @@ public class Writer_BuiltinTemplate_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("ArrayTemplate"));
-    order.verify(idWriter).visit(item);
+    order.verify(executor).visit(idWriter, item);
     order.verify(stream).endNode();
   }
 
@@ -69,7 +71,7 @@ public class Writer_BuiltinTemplate_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("TypeTypeTemplate"));
-    order.verify(idWriter).visit(item);
+    order.verify(executor).visit(idWriter, item);
     order.verify(stream).endNode();
   }
 
@@ -80,7 +82,7 @@ public class Writer_BuiltinTemplate_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("DefaultValueTemplate"));
-    order.verify(idWriter).visit(item);
+    order.verify(executor).visit(idWriter, item);
     order.verify(stream).endNode();
   }
 }

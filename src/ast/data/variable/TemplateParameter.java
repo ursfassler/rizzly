@@ -26,8 +26,4 @@ public class TemplateParameter extends Variable {
     super(name, type);
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

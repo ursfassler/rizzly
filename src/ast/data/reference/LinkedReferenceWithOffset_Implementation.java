@@ -63,8 +63,4 @@ public class LinkedReferenceWithOffset_Implementation extends AstBase implements
     return ret;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

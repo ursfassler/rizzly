@@ -35,8 +35,4 @@ final public class Is extends Relation {
     return "is";
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

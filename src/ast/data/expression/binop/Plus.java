@@ -35,8 +35,4 @@ final public class Plus extends ArithmeticOp {
     return "+";
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

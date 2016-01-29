@@ -18,9 +18,9 @@
 package ast.meta;
 
 import ast.visitor.Visitor;
-import ast.visitor.VisitorAcceptor;
+import ast.visitor.Visitee;
 
-public class SourcePosition implements VisitorAcceptor, MetaInformation {
+public class SourcePosition implements Visitee, MetaInformation {
   final public String filename;
   final public int line;
   final public int row;
@@ -37,9 +37,5 @@ public class SourcePosition implements VisitorAcceptor, MetaInformation {
     return filename + ": " + line + "," + row;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

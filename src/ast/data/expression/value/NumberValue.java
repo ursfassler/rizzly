@@ -38,8 +38,4 @@ final public class NumberValue extends ValueExpr {
     return value.toString();
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

@@ -37,9 +37,5 @@ public class ComponentUse extends Named {
     this.compRef = compRef;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

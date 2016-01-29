@@ -35,9 +35,5 @@ final public class WhileStmt extends Statement {
     return "while " + condition;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

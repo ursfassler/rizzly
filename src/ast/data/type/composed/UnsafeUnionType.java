@@ -30,9 +30,5 @@ final public class UnsafeUnionType extends NamedElementType {
     super(name);
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

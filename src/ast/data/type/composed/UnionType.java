@@ -28,9 +28,5 @@ final public class UnionType extends NamedElementType {
     this.tag = tag;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

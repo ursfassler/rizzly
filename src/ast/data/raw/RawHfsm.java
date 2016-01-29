@@ -43,8 +43,4 @@ final public class RawHfsm extends RawComponent {
     this.topstate = topstate;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

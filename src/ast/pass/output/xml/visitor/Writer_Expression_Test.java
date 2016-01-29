@@ -26,30 +26,29 @@ import org.mockito.Mockito;
 
 import ast.data.expression.ReferenceExpression;
 import ast.data.reference.LinkedReferenceWithOffset_Implementation;
-import ast.meta.MetaInformation;
 import ast.pass.output.xml.IdReader;
+import ast.visitor.VisitExecutor;
 import ast.visitor.Visitor;
 
 public class Writer_Expression_Test {
   final private XmlStreamWriter stream = mock(XmlStreamWriter.class);
   final private IdReader astId = mock(IdReader.class);
   final private Visitor idWriter = mock(Visitor.class);
-  final private Write testee = new Write(stream, astId, idWriter);
-  final private MetaInformation info = mock(MetaInformation.class);
+  final private VisitExecutor executor = mock(VisitExecutor.class);
+  final private Write testee = new Write(stream, astId, idWriter, executor);
   final private LinkedReferenceWithOffset_Implementation reference = mock(LinkedReferenceWithOffset_Implementation.class);
-  final private InOrder order = Mockito.inOrder(stream, info, reference, idWriter);
+  final private InOrder order = Mockito.inOrder(stream, idWriter, executor);
 
   @Test
   public void write_ReferenceExpression() {
     ReferenceExpression item = new ReferenceExpression(reference);
-    item.metadata().add(info);
 
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("ReferenceExpression"));
-    order.verify(idWriter).visit(eq(item));
-    order.verify(info).accept(eq(testee));
-    order.verify(reference).accept(eq(testee));
+    order.verify(executor).visit(idWriter, item);
+    order.verify(executor).visit(testee, item.metadata());
+    order.verify(executor).visit(testee, item.reference);
     order.verify(stream).endNode();
   }
 }

@@ -27,14 +27,14 @@ import ast.data.statement.Block;
 import ast.data.variable.FunctionVariable;
 
 abstract public class Function extends Named implements StateContent {
-  final public AstList<FunctionVariable> param = new AstList<FunctionVariable>();
+  final public AstList<FunctionVariable> param;
   public FuncReturn ret = new FuncReturnNone();
   public Block body = new Block();
   public FunctionProperty property = FunctionProperty.Private;
 
   public Function(String name, AstList<FunctionVariable> param, FuncReturn ret, Block body) {
     setName(name);
-    this.param.addAll(param);
+    this.param = param;
     this.ret = ret;
     this.body = body;
   }

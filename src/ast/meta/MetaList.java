@@ -17,9 +17,10 @@
 
 package ast.meta;
 
-import ast.visitor.VisitorAcceptor;
+import ast.visitor.Visitee;
 
-public interface MetaList extends VisitorAcceptor, Iterable<MetaInformation> {
+//TODO remove visitee
+public interface MetaList extends Visitee, Iterable<MetaInformation> {
   public void add(MetaInformation item);
 
   public void add(MetaList items);

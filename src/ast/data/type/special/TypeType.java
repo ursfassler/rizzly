@@ -36,9 +36,5 @@ final public class TypeType extends Type {
     this.type = type;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

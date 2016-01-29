@@ -28,9 +28,5 @@ public class RangeType extends BaseType {
     this.range = range;
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

@@ -26,105 +26,96 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
-import ast.data.expression.Expression;
 import ast.data.expression.value.BooleanValue;
 import ast.data.expression.value.NumberValue;
 import ast.data.expression.value.TupleValue;
-import ast.meta.MetaInformation;
 import ast.pass.output.xml.IdReader;
+import ast.visitor.VisitExecutor;
 import ast.visitor.Visitor;
 
 public class Writer_ValueExpression_Test {
   final private XmlStreamWriter stream = mock(XmlStreamWriter.class);
   final private IdReader astId = mock(IdReader.class);
   final private Visitor idWriter = mock(Visitor.class);
-  final private Write testee = new Write(stream, astId, idWriter);
-  final private MetaInformation info = mock(MetaInformation.class);
-  final private Expression child = mock(Expression.class);
-  final private InOrder order = Mockito.inOrder(stream, info, child, idWriter);
+  final private VisitExecutor executor = mock(VisitExecutor.class);
+  final private Write testee = new Write(stream, astId, idWriter, executor);
+  final private InOrder order = Mockito.inOrder(stream, idWriter, executor);
 
   @Test
   public void write_boolean_false() {
-    BooleanValue value = new BooleanValue(false);
-    value.metadata().add(info);
+    BooleanValue item = new BooleanValue(false);
 
-    testee.visit(value);
+    testee.visit(item);
 
     order.verify(stream).beginNode(eq("BooleanValue"));
     order.verify(stream).attribute(eq("value"), eq("False"));
-    order.verify(idWriter).visit(value);
-    order.verify(info).accept(eq(testee));
+    order.verify(executor).visit(eq(idWriter), eq(item));
+    order.verify(executor).visit(eq(testee), eq(item.metadata()));
     order.verify(stream).endNode();
   }
 
   @Test
   public void write_boolean_true() {
-    BooleanValue value = new BooleanValue(true);
-    value.metadata().add(info);
+    BooleanValue item = new BooleanValue(true);
 
-    testee.visit(value);
+    testee.visit(item);
 
     order.verify(stream).beginNode(eq("BooleanValue"));
     order.verify(stream).attribute(eq("value"), eq("True"));
-    order.verify(idWriter).visit(value);
-    order.verify(info).accept(eq(testee));
+    order.verify(executor).visit(eq(idWriter), eq(item));
+    order.verify(executor).visit(eq(testee), eq(item.metadata()));
     order.verify(stream).endNode();
   }
 
   @Test
   public void write_numberic_0() {
-    NumberValue value = new NumberValue(BigInteger.valueOf(0));
-    value.metadata().add(info);
+    NumberValue item = new NumberValue(BigInteger.valueOf(0));
 
-    testee.visit(value);
+    testee.visit(item);
 
     order.verify(stream).beginNode(eq("NumberValue"));
     order.verify(stream).attribute(eq("value"), eq("0"));
-    order.verify(idWriter).visit(value);
-    order.verify(info).accept(eq(testee));
+    order.verify(executor).visit(eq(idWriter), eq(item));
+    order.verify(executor).visit(eq(testee), eq(item.metadata()));
     order.verify(stream).endNode();
   }
 
   @Test
   public void write_numberic_42() {
-    NumberValue value = new NumberValue(BigInteger.valueOf(42));
-    value.metadata().add(info);
+    NumberValue item = new NumberValue(BigInteger.valueOf(42));
 
-    testee.visit(value);
+    testee.visit(item);
 
     order.verify(stream).beginNode(eq("NumberValue"));
     order.verify(stream).attribute(eq("value"), eq("42"));
-    order.verify(idWriter).visit(value);
-    order.verify(info).accept(eq(testee));
+    order.verify(executor).visit(eq(idWriter), eq(item));
+    order.verify(executor).visit(eq(testee), eq(item.metadata()));
     order.verify(stream).endNode();
   }
 
   @Test
   public void write_numberic_minus_1000() {
-    NumberValue value = new NumberValue(BigInteger.valueOf(-1000));
-    value.metadata().add(info);
+    NumberValue item = new NumberValue(BigInteger.valueOf(-1000));
 
-    testee.visit(value);
+    testee.visit(item);
 
     order.verify(stream).beginNode(eq("NumberValue"));
     order.verify(stream).attribute(eq("value"), eq("-1000"));
-    order.verify(idWriter).visit(value);
-    order.verify(info).accept(eq(testee));
+    order.verify(executor).visit(eq(idWriter), eq(item));
+    order.verify(executor).visit(eq(testee), eq(item.metadata()));
     order.verify(stream).endNode();
   }
 
   @Test
   public void write_Tuple() {
-    TupleValue value = new TupleValue();
-    value.metadata().add(info);
-    value.value.add(child);
+    TupleValue item = new TupleValue();
 
-    testee.visit(value);
+    testee.visit(item);
 
     order.verify(stream).beginNode(eq("TupleValue"));
-    order.verify(idWriter).visit(value);
-    order.verify(info).accept(eq(testee));
-    order.verify(child).accept(eq(testee));
+    order.verify(executor).visit(eq(idWriter), eq(item));
+    order.verify(executor).visit(eq(testee), eq(item.metadata()));
+    order.verify(executor).visit(eq(testee), eq(item.value));
     order.verify(stream).endNode();
   }
 

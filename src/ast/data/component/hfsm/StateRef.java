@@ -34,8 +34,4 @@ final public class StateRef extends TypedReference<State> {
     metadata().add(info);
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 }

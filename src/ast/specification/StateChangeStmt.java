@@ -27,6 +27,7 @@ import ast.data.statement.CallStmt;
 import ast.data.statement.MultiAssignment;
 import ast.dispatcher.NullDispatcher;
 import ast.specification.visitor.IsStateVariable;
+import ast.visitor.VisitExecutorImplementation;
 import error.RError;
 
 public class StateChangeStmt extends Specification {
@@ -68,9 +69,9 @@ class StateChangeDispatcher extends NullDispatcher<Boolean, Void> {
   }
 
   private boolean isStateVar(Ast var) {
-    IsStateVariable isStateVariable = new IsStateVariable(RError.instance());
+    IsStateVariable isStateVariable = new IsStateVariable(VisitExecutorImplementation.instance(), RError.instance());
 
-    var.accept(isStateVariable);
+    VisitExecutorImplementation.instance().visit(isStateVariable, var);
 
     return isStateVariable.isState();
   }

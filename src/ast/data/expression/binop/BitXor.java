@@ -35,9 +35,5 @@ final public class BitXor extends ArithmeticOp {
     return "xor";
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

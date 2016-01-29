@@ -40,9 +40,5 @@ final public class EndpointRaw extends Endpoint {
     return (Function) ref.getTarget();
   }
 
-  @Override
-  public void accept(Visitor visitor) {
-    visitor.visit(this);
-  }
 
 }

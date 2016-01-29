@@ -19,9 +19,9 @@ package ast.pass.output.xml.visitor;
 
 import ast.data.Ast;
 import ast.pass.output.xml.IdReader;
-import ast.visitor.DefaultHandler;
+import ast.visitor.Visitor;
 
-public class IdWriter implements DefaultHandler {
+public class IdWriter implements Visitor {
   private final XmlStreamWriter stream;
   private final IdReader astId;
 
@@ -30,7 +30,6 @@ public class IdWriter implements DefaultHandler {
     this.astId = astId;
   }
 
-  @Override
   public void visit(Ast ast) {
     if (astId.hasId(ast)) {
       stream.attribute("id", astId.getId(ast));
