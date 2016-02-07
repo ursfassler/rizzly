@@ -50,6 +50,19 @@ public class MethodExecutor_Test {
     Assert.assertEquals(3, methods.size());
     Assert.assertEquals("123", dummy.calls);
   }
+
+  @Test(expected = RuntimeException.class)
+  public void an_exception_from_the_method_is_thrown_to_the_execute_method() {
+    ArrayList<Method> methods = new ArrayList<Method>();
+    try {
+      methods.add(Problems.class.getMethod("methodThrowsException", Object.class));
+    } catch (NoSuchMethodException e) {
+    } catch (SecurityException e) {
+    }
+    Problems dummy = new Problems();
+
+    testee.executeAll(dummy, methods, null);
+  }
 }
 
 class Dummy implements Visitor {
@@ -66,4 +79,12 @@ class Dummy implements Visitor {
   public void method3(Object object) {
     calls += "3";
   }
+
+}
+
+class Problems implements Visitor {
+  public void methodThrowsException(Object object) {
+    throw new RuntimeException("the exception message");
+  }
+
 }

@@ -28,8 +28,13 @@ public class MethodExecutor {
     } catch (IllegalArgumentException e) {
       e.printStackTrace();
     } catch (InvocationTargetException e) {
+      if (e.getCause() instanceof RuntimeException) {
+        throw (RuntimeException) e.getCause();
+      } else {
+        e.printStackTrace();
+      }
+    } catch (Exception e) {
       e.printStackTrace();
     }
   }
-
 }
