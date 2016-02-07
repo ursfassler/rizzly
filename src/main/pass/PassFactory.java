@@ -15,18 +15,9 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package main;
+package main.pass;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-
-import ast.Designator;
-import ast.data.Ast;
-import ast.data.Namespace;
-import ast.debug.DebugPrinter;
-import ast.knowledge.KnowledgeBase;
-import ast.pass.AstPass;
+import main.Configuration;
 import ast.pass.check.model.Modelcheck;
 import ast.pass.check.sanity.Sanitycheck;
 import ast.pass.check.type.Typecheck;
@@ -92,27 +83,20 @@ import ast.pass.specializer.StateVarInitExecutor;
 import ast.pass.specializer.TemplCallAdder;
 import ast.pass.specializer.TypeCastAdder;
 import ast.pass.specializer.TypeEvalPass;
-import error.RError;
 
-public class Passes {
-  public static void process(Configuration opt, String outdir, String debugdir) {
-    Namespace aclasses = new Namespace("!");
-    KnowledgeBase kb = new KnowledgeBase(aclasses, outdir, debugdir, opt);
-    PassGroup passes = makePasses(opt);
-    process(passes, new Designator(), new DebugPrinter(aclasses, kb.getDebugDir()), aclasses, kb);
+public class PassFactory {
+  public static PassGroup makePasses(Configuration configuration) {
+    if (configuration.doXml()) {
+      return produceXmlPass(configuration);
+    } else {
+      return produceFullRizzlyPass(configuration);
+    }
   }
 
-  // TODO split up
-  private static PassGroup makePasses(Configuration configuration) {
+  private static PassGroup produceFullRizzlyPass(Configuration configuration) {
+    // TODO split up
+
     PassGroup passes = new PassGroup("ast");
-
-    if (configuration.doXml()) {
-      passes.add(new FileLoader(configuration));
-      passes.add(new DefaultVisitorPass(new MetadataRemover(), configuration));
-      passes.add(new XmlWriterPass(configuration));
-      return passes;
-    }
-
     passes.checks.add(new Sanitycheck(configuration));
 
     passes.passes.add(funPasses(configuration));
@@ -173,6 +157,14 @@ public class Passes {
     passes.passes.add(prepareForC(passes, configuration));
 
     passes.add(new CWriter(configuration));
+    return passes;
+  }
+
+  private static PassGroup produceXmlPass(Configuration configuration) {
+    PassGroup passes = new PassGroup("ast");
+    passes.add(new FileLoader(configuration));
+    passes.add(new DefaultVisitorPass(new MetadataRemover(), configuration));
+    passes.add(new XmlWriterPass(configuration));
     return passes;
   }
 
@@ -257,88 +249,6 @@ public class Passes {
     reduction.add(new ReduceUnion(configuration));
     reduction.add(new ReduceTuple(configuration));
     return reduction;
-  }
-
-  public static void process(PassGroup group, Designator prefix, DebugPrinter dp, Namespace ast, KnowledgeBase kb) {
-    prefix = new Designator(prefix, group.getName());
-    for (Pass pass : group.passes) {
-      if (pass instanceof PassGroup) {
-        process((PassGroup) pass, prefix, dp, ast, kb);
-      } else if (pass instanceof PassItem) {
-        process((PassItem) pass, prefix, dp, ast, kb);
-      } else {
-        throw new RuntimeException("not yet implemented: " + pass.getClass().getCanonicalName());
-      }
-      for (AstPass check : group.checks) {
-        check.process(ast, kb);
-      }
-    }
-  }
-
-  public static void process(PassItem item, Designator prefix, DebugPrinter dp, Namespace ast, KnowledgeBase kb) {
-    RError.ass(item.pass.getPrecondition().isSatisfiedBy(ast), item.getName() + ": precondition does not hold");
-
-    prefix = new Designator(prefix, item.getName());
-    item.pass.process(ast, kb);
-    dp.print(prefix.toString("."));
-
-    RError.ass(item.pass.getPostcondition().isSatisfiedBy(ast), item.getName() + ": postcondition does not hold");
-  }
-
-  @SuppressWarnings("unused")
-  private static void print(Map<Ast, Boolean> writes, Map<Ast, Boolean> reads, Map<Ast, Boolean> outputs, Map<Ast, Boolean> inputs) {
-    for (Ast header : writes.keySet()) {
-      String rwio = "";
-      rwio += reads.get(header) ? "r" : " ";
-      rwio += writes.get(header) ? "w" : " ";
-      rwio += inputs.get(header) ? "i" : " ";
-      rwio += outputs.get(header) ? "o" : " ";
-      System.out.print(rwio);
-      System.out.print("\t");
-      System.out.print(header);
-      System.out.println();
-    }
-  }
-
-}
-
-class Pass {
-  final private String name;
-
-  Pass(String name) {
-    super();
-    this.name = name;
-  }
-
-  public String getName() {
-    return name;
-  }
-
-}
-
-class PassItem extends Pass {
-  AstPass pass;
-
-  public PassItem(AstPass pass, String name) {
-    super(name);
-    this.pass = pass;
-  }
-}
-
-class PassGroup extends Pass {
-  final public List<Pass> passes = new ArrayList<Pass>();
-  final public List<AstPass> checks = new ArrayList<AstPass>();
-
-  PassGroup(String name) {
-    super(name);
-  }
-
-  public void add(AstPass pass, String name) {
-    passes.add(new PassItem(pass, name));
-  }
-
-  public void add(AstPass pass) {
-    passes.add(new PassItem(pass, pass.getClass().getSimpleName()));
   }
 
 }

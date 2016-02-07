@@ -19,6 +19,7 @@ package main;
 
 import java.io.File;
 
+import main.pass.PassRunner;
 import error.RError;
 import error.RException;
 
@@ -58,7 +59,7 @@ public class Main {
       (new File(docdir)).mkdirs();
     }
 
-    Passes.process(opt, outdir, debugdir);
+    PassRunner.process(opt, outdir, debugdir);
 
     return outdir;
   }
