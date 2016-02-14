@@ -15,21 +15,10 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data;
+package parser;
 
-import ast.meta.MetaList;
+public interface TokenReader<T> {
 
-final public class Namespace extends Named {
-  final public AstList<Ast> children = new AstList<Ast>();
-
-  public Namespace(String name) {
-    setName(name);
-  }
-
-  @Deprecated
-  public Namespace(MetaList info, String name) {
-    metadata().add(info);
-    setName(name);
-  }
+  public T next();
 
 }

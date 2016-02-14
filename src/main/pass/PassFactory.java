@@ -21,6 +21,7 @@ import main.Configuration;
 import ast.pass.check.model.Modelcheck;
 import ast.pass.check.sanity.Sanitycheck;
 import ast.pass.check.type.Typecheck;
+import ast.pass.input.xml.XmlParserPass;
 import ast.pass.instantiation.Instantiation;
 import ast.pass.linker.Linker;
 import ast.pass.optimize.AlwaysGreater;
@@ -86,11 +87,24 @@ import ast.pass.specializer.TypeEvalPass;
 
 public class PassFactory {
   public static PassGroup makePasses(Configuration configuration) {
-    if (configuration.doXml()) {
-      return produceXmlPass(configuration);
-    } else {
-      return produceFullRizzlyPass(configuration);
+    switch (configuration.parseAs()) {
+      case Rizzly:
+        if (configuration.doXml()) {
+          return produceXmlPass(configuration);
+        } else {
+          return produceFullRizzlyPass(configuration);
+        }
+      case Xml:
+        return produceXml2xml(configuration);
     }
+    return null;
+  }
+
+  private static PassGroup produceXml2xml(Configuration configuration) {
+    PassGroup passes = new PassGroup("xml2xml");
+    passes.add(new XmlParserPass(configuration));
+    passes.add(new XmlWriterPass(configuration));
+    return passes;
   }
 
   private static PassGroup produceFullRizzlyPass(Configuration configuration) {

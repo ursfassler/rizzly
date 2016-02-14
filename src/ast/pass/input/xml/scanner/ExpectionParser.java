@@ -15,47 +15,18 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package parser.hfsm;
+package ast.pass.input.xml.scanner;
 
-import java.util.LinkedList;
+public interface ExpectionParser {
 
-import parser.PeekReader;
+  public boolean hasElement();
 
-public class Scanner_Dummy<T> implements PeekReader<T> {
+  public String peekElement();
 
-  final private LinkedList<T> queue = new LinkedList<T>();
-  final private T endElement;
+  public void elementStart(String value);
 
-  public Scanner_Dummy(T endElement) {
-    super();
-    this.endElement = endElement;
-  }
+  public void elementEnd();
 
-  public void add(T token) {
-    queue.add(token);
-  }
-
-  @Override
-  public T peek() {
-    if (queue.isEmpty()) {
-      return endElement;
-    }
-
-    return queue.peek();
-  }
-
-  @Override
-  public T next() {
-    if (queue.isEmpty()) {
-      return endElement;
-    }
-
-    return queue.removeFirst();
-  }
-
-  @Override
-  public boolean hasNext() {
-    return queue.isEmpty();
-  }
+  public String attribute(String name);
 
 }

@@ -42,7 +42,7 @@ public class Writer_BinaryOperation_Test {
   final private Write testee = new Write(stream, astId, idWriter, executor);
   final private Expression left = mock(Expression.class);
   final private Expression right = mock(Expression.class);
-  InOrder order = Mockito.inOrder(stream, executor);
+  final private InOrder order = Mockito.inOrder(stream, executor);
 
   @Test
   public void write_plus() {

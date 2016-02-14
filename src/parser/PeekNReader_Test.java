@@ -19,50 +19,49 @@ package parser;
 
 import org.junit.Assert;
 import org.junit.Test;
-
-import parser.hfsm.Scanner_Dummy;
+import org.mockito.Mockito;
 
 public class PeekNReader_Test {
-  private final Scanner_Dummy<String> scanner = new Scanner_Dummy<String>("");
+  private final TokenReader<String> scanner = Mockito.mock(TokenReader.class);
   final private PeekNReader<String> testee = new PeekNReader<String>(scanner);
 
   @Test
   public void can_consume_next_token() {
-    scanner.add("hello");
+    Mockito.when(scanner.next()).thenReturn("hello");
 
     Assert.assertEquals("hello", testee.next());
   }
 
   @Test
   public void can_peek_next_token() {
-    scanner.add("world");
+    Mockito.when(scanner.next()).thenReturn("world");
 
     Assert.assertEquals("world", testee.peek(0));
   }
 
   @Test
   public void peek_returns_the_same_token_as_the_next_next() {
-    scanner.add("test");
+    Mockito.when(scanner.next()).thenReturn("test");
 
     String peek = testee.peek(0);
     String next = testee.next();
 
     Assert.assertEquals(peek, next);
+    Mockito.verify(scanner).next();
   }
 
   @Test
   public void can_peek_2_token() {
-    scanner.add("hello");
-    scanner.add("world");
+    Mockito.when(scanner.next()).thenReturn("hello").thenReturn("world");
 
     Assert.assertEquals("hello", testee.peek(0));
     Assert.assertEquals("world", testee.peek(1));
+    Mockito.verify(scanner, Mockito.times(2)).next();
   }
 
   @Test
   public void peeking_2_tokens_does_not_remove_them() {
-    scanner.add("hello");
-    scanner.add("world");
+    Mockito.when(scanner.next()).thenReturn("hello").thenReturn("world");
 
     String peek0 = testee.peek(0);
     String peek1 = testee.peek(1);
@@ -71,21 +70,17 @@ public class PeekNReader_Test {
 
     Assert.assertEquals(next0, peek0);
     Assert.assertEquals(next1, peek1);
+    Mockito.verify(scanner, Mockito.times(2)).next();
   }
 
   @Test
-  public void can_peek_5_tokens() {
-    scanner.add("0");
-    scanner.add("1");
-    scanner.add("2");
-    scanner.add("3");
-    scanner.add("4");
+  public void can_peek_3_tokens() {
+    Mockito.when(scanner.next()).thenReturn("0").thenReturn("1").thenReturn("2");
 
     Assert.assertEquals("0", testee.peek(0));
     Assert.assertEquals("1", testee.peek(1));
     Assert.assertEquals("2", testee.peek(2));
-    Assert.assertEquals("3", testee.peek(3));
-    Assert.assertEquals("4", testee.peek(4));
+    Mockito.verify(scanner, Mockito.times(3)).next();
   }
 
 }

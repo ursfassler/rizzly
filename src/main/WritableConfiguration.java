@@ -28,6 +28,7 @@ public class WritableConfiguration implements Configuration {
   private boolean docOutput;
   private boolean lazyModelCheck;
   private boolean xml;
+  private FileType fileType;
 
   @Override
   public String getRootPath() {
@@ -111,6 +112,15 @@ public class WritableConfiguration implements Configuration {
 
   public void setNamespace(String value) {
     namespace = value;
+  }
+
+  @Override
+  public FileType parseAs() {
+    return fileType;
+  }
+
+  public void setFileType(FileType value) {
+    fileType = value;
   }
 
 }

@@ -19,7 +19,9 @@ package main;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
@@ -30,13 +32,21 @@ import org.apache.commons.cli.PosixParser;
 
 import ast.Designator;
 import ast.meta.Meta;
+import ast.meta.MetaListImplementation;
 import error.ErrorType;
 import error.RizzlyError;
 
 public class CommandLineParser {
   private final RizzlyOptions options = new RizzlyOptions();
   private final RizzlyError error;
-  private static final String extension = ".rzy";
+  private static final String RizzlyExtension = ".rzy";
+  private static final String XmlExtension = ".xml";
+  private static final Map<String, FileType> extensionToType = new HashMap<String, FileType>();
+
+  {
+    extensionToType.put(RizzlyExtension, FileType.Rizzly);
+    extensionToType.put(XmlExtension, FileType.Xml);
+  }
 
   public CommandLineParser(RizzlyError error) {
     super();
@@ -55,6 +65,12 @@ public class CommandLineParser {
       return null;
     }
 
+    String extension = getFileExtension(inputFile);
+    if (!knownFileType(extension)) {
+      error.err(ErrorType.Error, "Unknown file type: " + inputFile, new MetaListImplementation());
+      return null;
+    }
+
     WritableConfiguration configuration = new WritableConfiguration();
     parsePathAndRoot(inputFile, cmd, configuration);
     configuration.setDebugEvent(cmd.hasOption(options.debugEvent.getLongOpt()));
@@ -62,8 +78,26 @@ public class CommandLineParser {
     configuration.setDocOutput(cmd.hasOption(options.documentation.getLongOpt()));
     configuration.setXml(cmd.hasOption(options.xml.getLongOpt()));
     configuration.setExtension(extension);
+    configuration.setFileType(getFileType(extension));
 
     return configuration;
+  }
+
+  private boolean knownFileType(String extension) {
+    return extensionToType.containsKey(extension);
+  }
+
+  private FileType getFileType(String extension) {
+    return extensionToType.get(extension);
+  }
+
+  private String getFileExtension(String file) {
+    int index = file.lastIndexOf('.');
+    if (index >= 0) {
+      return file.substring(index);
+    } else {
+      return "";
+    }
   }
 
   private String getInputFile(CommandLine cmd) {
@@ -145,11 +179,9 @@ public class CommandLineParser {
   }
 
   private String getNamespace(String inputFile) {
-    assert (inputFile.endsWith(extension));
-
     String filename = getFilename(inputFile);
 
-    String namespace = filename.substring(0, filename.length() - extension.length());
+    String namespace = filename.substring(0, filename.length() - RizzlyExtension.length());
     return namespace;
   }
 

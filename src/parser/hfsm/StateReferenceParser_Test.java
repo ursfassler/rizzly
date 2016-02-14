@@ -21,12 +21,15 @@ import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 import org.junit.Assert;
 import org.junit.Test;
 
 import parser.PeekNReader;
+import parser.TokenReader;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
 import ast.data.component.hfsm.StateRef;
@@ -37,25 +40,25 @@ import error.RizzlyError;
 
 public class StateReferenceParser_Test {
 
+  private static final Token Eof = new Token(TokenType.EOF);
   private final RizzlyError error = mock(RizzlyError.class);
-  private final Scanner_Dummy<Token> scanner = new Scanner_Dummy<Token>(new Token(TokenType.EOF));
+  private final TokenReader<Token> scanner = mock(TokenReader.class);
   private final StateReferenceParser testee = new StateReferenceParser(new PeekNReader<Token>(scanner), error);
 
   @Test
   public void can_be_one_identifier() {
-    scanner.add(new Token(TokenType.IDENTIFIER, "xyz"));
+    when(scanner.next()).thenReturn(new Token(TokenType.IDENTIFIER, "xyz")).thenReturn(Eof);
 
     StateRef stateRef = testee.parse();
 
     Assert.assertEquals("xyz", stateRef.ref.getLink().getName());
     Assert.assertEquals(0, stateRef.ref.getOffset().size());
+    verify(scanner, times(2)).next();
   }
 
   @Test
   public void can_be_2_identifiers_with_a_dot_between() {
-    scanner.add(new Token(TokenType.IDENTIFIER, "x"));
-    scanner.add(new Token(TokenType.PERIOD));
-    scanner.add(new Token(TokenType.IDENTIFIER, "y"));
+    when(scanner.next()).thenReturn(new Token(TokenType.IDENTIFIER, "x")).thenReturn(new Token(TokenType.PERIOD)).thenReturn(new Token(TokenType.IDENTIFIER, "y")).thenReturn(Eof);
 
     StateRef stateRef = testee.parse();
 
@@ -68,11 +71,7 @@ public class StateReferenceParser_Test {
 
   @Test
   public void can_be_multiple_identifiers_with_a_dot_between() {
-    scanner.add(new Token(TokenType.IDENTIFIER, "x"));
-    scanner.add(new Token(TokenType.PERIOD));
-    scanner.add(new Token(TokenType.IDENTIFIER, "y"));
-    scanner.add(new Token(TokenType.PERIOD));
-    scanner.add(new Token(TokenType.IDENTIFIER, "z"));
+    when(scanner.next()).thenReturn(new Token(TokenType.IDENTIFIER, "x")).thenReturn(new Token(TokenType.PERIOD)).thenReturn(new Token(TokenType.IDENTIFIER, "y")).thenReturn(new Token(TokenType.PERIOD)).thenReturn(new Token(TokenType.IDENTIFIER, "z")).thenReturn(Eof);
 
     StateRef stateRef = testee.parse();
 
@@ -87,7 +86,7 @@ public class StateReferenceParser_Test {
 
   @Test
   public void can_be_self() {
-    scanner.add(new Token(TokenType.IDENTIFIER, "self"));
+    when(scanner.next()).thenReturn(new Token(TokenType.IDENTIFIER, "self")).thenReturn(Eof);
 
     StateRef stateRef = testee.parse();
 
@@ -97,7 +96,7 @@ public class StateReferenceParser_Test {
 
   @Test
   public void emits_error_for_unexpected_token() {
-    scanner.add(new Token(TokenType.SEMI));
+    when(scanner.next()).thenReturn(new Token(TokenType.SEMI));
 
     testee.parse();
 
@@ -107,7 +106,7 @@ public class StateReferenceParser_Test {
   @Test
   public void uses_info_from_token_for_error_message_for_unexpected_token() {
     MetaList meta = mock(MetaList.class);
-    scanner.add(new Token(TokenType.SEMI, meta));
+    when(scanner.next()).thenReturn(new Token(TokenType.SEMI, meta));
 
     testee.parse();
 
@@ -116,7 +115,7 @@ public class StateReferenceParser_Test {
 
   @Test
   public void has_meaningfull_error_message_for_unexpected_token() {
-    scanner.add(new Token(TokenType.SEMI));
+    when(scanner.next()).thenReturn(new Token(TokenType.SEMI));
 
     testee.parse();
 
@@ -125,7 +124,7 @@ public class StateReferenceParser_Test {
 
   @Test
   public void returns_null_for_unexpected_token() {
-    scanner.add(new Token(TokenType.SEMI));
+    when(scanner.next()).thenReturn(new Token(TokenType.SEMI));
 
     StateRef stateRef = testee.parse();
 

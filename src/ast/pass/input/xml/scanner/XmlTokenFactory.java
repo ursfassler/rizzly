@@ -15,21 +15,31 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data;
+package ast.pass.input.xml.scanner;
 
-import ast.meta.MetaList;
+import java.util.HashMap;
+import java.util.Map;
 
-final public class Namespace extends Named {
-  final public AstList<Ast> children = new AstList<Ast>();
+public class XmlTokenFactory {
 
-  public Namespace(String name) {
-    setName(name);
+  public static XmlToken elementStart(String name) {
+    return new XmlToken(XmlType.ElementStart, name, new HashMap<String, String>());
   }
 
-  @Deprecated
-  public Namespace(MetaList info, String name) {
-    metadata().add(info);
-    setName(name);
+  public static XmlToken elementStart(String name, Map<String, String> attribute) {
+    return new XmlToken(XmlType.ElementStart, name, attribute);
+  }
+
+  public static XmlToken elementEnd() {
+    return new XmlToken(XmlType.ElementEnd);
+  }
+
+  public static XmlToken documentStart() {
+    return new XmlToken(XmlType.DocumentStart);
+  }
+
+  public static XmlToken documentEnd() {
+    return new XmlToken(XmlType.DocumentEnd);
   }
 
 }

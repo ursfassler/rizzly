@@ -15,21 +15,9 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data;
+package ast.pass.input.xml.scanner;
 
-import ast.meta.MetaList;
-
-final public class Namespace extends Named {
-  final public AstList<Ast> children = new AstList<Ast>();
-
-  public Namespace(String name) {
-    setName(name);
-  }
-
-  @Deprecated
-  public Namespace(MetaList info, String name) {
-    metadata().add(info);
-    setName(name);
-  }
+public enum XmlType {
+  ElementStart, ElementEnd, DocumentStart, DocumentEnd, EndOfFile
 
 }

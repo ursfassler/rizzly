@@ -21,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Map;
 
 import parser.PeekReader;
+import parser.TokenReader;
 import parser.scanner.tokenparser.Helper;
 import parser.scanner.tokenparser.MetadataReader;
 import parser.scanner.tokenparser.TokenParser;
@@ -32,7 +33,7 @@ import error.RError;
  *
  * @author urs
  */
-public class Scanner implements PeekReader<Token> {
+public class Scanner implements TokenReader<Token> {
   private final Map<Character, TokenParser> parseTable;
   private MetadataReader meta;
   private PeekReader<Symbol> reader;
@@ -54,16 +55,6 @@ public class Scanner implements PeekReader<Token> {
 
   public ArrayList<Metadata> getMetadata() {
     return new ArrayList<Metadata>(meta.getMetadata());
-  }
-
-  @Override
-  public boolean hasNext() {
-    return peek() != null;
-  }
-
-  @Override
-  public Token peek() {
-    return next;
   }
 
   @Override

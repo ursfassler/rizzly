@@ -20,10 +20,10 @@ package parser;
 import java.util.LinkedList;
 
 public class PeekNReader<T> {
-  final private PeekReader<T> scanner;
+  final private TokenReader<T> scanner;
   final private LinkedList<T> tokens = new LinkedList<T>();
 
-  public PeekNReader(PeekReader<T> scanner) {
+  public PeekNReader(TokenReader<T> scanner) {
     this.scanner = scanner;
   }
 

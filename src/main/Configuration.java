@@ -37,4 +37,6 @@ public interface Configuration {
 
   public abstract boolean doXml();
 
+  public abstract FileType parseAs();
+
 }

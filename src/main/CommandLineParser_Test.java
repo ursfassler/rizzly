@@ -91,6 +91,35 @@ public class CommandLineParser_Test {
   }
 
   @Test
+  public void provide_a_rizzly_file_as_input() {
+    String[] args = { "test.rzy" };
+
+    Configuration configuration = testee.parse(args);
+
+    Assert.assertEquals(FileType.Rizzly, configuration.parseAs());
+    Assert.assertEquals(".rzy", configuration.getExtension());
+  }
+
+  @Test
+  public void provide_a_xml_file_as_input() {
+    String[] args = { "test.xml" };
+
+    Configuration configuration = testee.parse(args);
+
+    Assert.assertEquals(FileType.Xml, configuration.parseAs());
+    Assert.assertEquals(".xml", configuration.getExtension());
+  }
+
+  @Test
+  public void raise_an_error_for_unknown_file_types() {
+    String[] args = { "test.bla" };
+
+    testee.parse(args);
+
+    verify(error).err(eq(ErrorType.Error), eq("Unknown file type: test.bla"), any(MetaList.class));
+  }
+
+  @Test
   public void provide_a_file_in_a_relative_directory() {
     String[] args = { "dir/test.rzy" };
 
