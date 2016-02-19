@@ -17,35 +17,40 @@
 
 package ast.pass.input.xml.parser;
 
-import ast.data.Ast;
-import ast.data.AstList;
+import ast.data.reference.UnlinkedAnchor;
 import ast.pass.input.xml.infrastructure.Parser;
-import ast.pass.input.xml.infrastructure.Parsers;
+import ast.pass.input.xml.infrastructure.XmlParser;
 import ast.pass.input.xml.scanner.ExpectionParser;
+import error.RizzlyError;
 
-public class XmlParserImplementation implements XmlParser {
-  final private ExpectionParser stream;
-  final private Parsers parsers;
+public class UnlinkedAnchorParser implements Parser {
+  private final ExpectionParser stream;
+  private final XmlParser parser;
+  private final RizzlyError error;
 
-  public XmlParserImplementation(ExpectionParser stream, Parsers parsers) {
+  public UnlinkedAnchorParser(ExpectionParser stream, XmlParser parser, RizzlyError error) {
     this.stream = stream;
-    this.parsers = parsers;
+    this.parser = parser;
+    this.error = error;
   }
 
   @Override
-  public AstList<Ast> astItems() {
-    AstList<Ast> items = new AstList<Ast>();
-    while (stream.hasElement()) {
-      items.add(astItem());
-    }
-    return items;
+  public String name() {
+    return "UnlinkedAnchor";
   }
 
   @Override
-  public Ast astItem() {
-    String name = stream.peekElement();
-    Parser parser = parsers.parserFor(name);
-    return parser.parse();
+  public Class<UnlinkedAnchor> type() {
+    return UnlinkedAnchor.class;
+  }
+
+  @Override
+  public UnlinkedAnchor parse() {
+    stream.elementStart(name());
+    String link = stream.attribute("target");
+    stream.elementEnd();
+
+    return new UnlinkedAnchor(link);
   }
 
 }

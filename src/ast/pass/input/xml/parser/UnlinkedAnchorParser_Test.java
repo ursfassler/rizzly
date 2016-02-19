@@ -26,36 +26,38 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
-import ast.data.file.RizzlyFile;
+import ast.data.reference.UnlinkedAnchor;
+import ast.pass.input.xml.infrastructure.XmlParser;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
-public class RizzlyFileParser_Test {
+public class UnlinkedAnchorParser_Test {
   final private ExpectionParser stream = mock(ExpectionParser.class);
+  final private XmlParser parser = mock(XmlParser.class);
   final private RizzlyError error = mock(RizzlyError.class);
-  final private RizzlyFileParser testee = new RizzlyFileParser(stream, error);
-  final private InOrder order = Mockito.inOrder(stream);
+  final private UnlinkedAnchorParser testee = new UnlinkedAnchorParser(stream, parser, error);
+  final private InOrder order = Mockito.inOrder(stream, parser);
 
   @Test
   public void has_correct_name() {
-    assertEquals("RizzlyFile", testee.name());
+    assertEquals("UnlinkedAnchor", testee.name());
   }
 
   @Test
   public void has_correct_type() {
-    assertEquals(RizzlyFile.class, testee.type());
+    assertEquals(UnlinkedAnchor.class, testee.type());
   }
 
   @Test
-  public void parse_rizzly_file_node() {
-    when(stream.attribute(eq("name"))).thenReturn("the file name");
+  public void parse_UnlinkedAnchor() {
+    when(stream.attribute(eq("target"))).thenReturn("the target");
 
-    RizzlyFile file = testee.parse();
+    UnlinkedAnchor anchor = testee.parse();
 
-    assertEquals("the file name", file.getName());
+    assertEquals("the target", anchor.targetName());
 
-    order.verify(stream).elementStart(eq("RizzlyFile"));
-    order.verify(stream).attribute(eq("name"));
+    order.verify(stream).elementStart(eq("UnlinkedAnchor"));
+    order.verify(stream).attribute(eq("target"));
     order.verify(stream).elementEnd();
   }
 

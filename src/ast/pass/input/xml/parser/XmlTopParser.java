@@ -21,6 +21,7 @@ import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.pass.input.xml.infrastructure.Parser;
+import ast.pass.input.xml.infrastructure.XmlParser;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
@@ -41,9 +42,14 @@ public class XmlTopParser implements Parser {
   }
 
   @Override
+  public Class type() {
+    return Namespace.class;
+  }
+
+  @Override
   public Namespace parse() {
     expect.elementStart(name());
-    AstList<Ast> children = parser.astItems();
+    AstList<Ast> children = parser.anyItems();
     expect.elementEnd();
 
     Namespace namespace = new Namespace("!");

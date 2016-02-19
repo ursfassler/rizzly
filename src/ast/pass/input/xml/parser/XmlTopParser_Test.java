@@ -29,6 +29,7 @@ import org.mockito.Mockito;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
+import ast.pass.input.xml.infrastructure.XmlParser;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
@@ -45,11 +46,16 @@ public class XmlTopParser_Test {
   }
 
   @Test
+  public void has_correct_type() {
+    assertEquals(Namespace.class, testee.type());
+  }
+
+  @Test
   public void parse_xml_file() {
     Ast child = mock(Ast.class);
     AstList<Ast> children = new AstList<Ast>();
     children.add(child);
-    when(parser.astItems()).thenReturn(children);
+    when(parser.anyItems()).thenReturn(children);
 
     Namespace namespace = testee.parse();
 
@@ -57,7 +63,7 @@ public class XmlTopParser_Test {
     assertEquals("!", namespace.getName());
 
     order.verify(expected).elementStart(eq("rizzly"));
-    order.verify(parser).astItems();
+    order.verify(parser).anyItems();
     order.verify(expected).elementEnd();
   }
 

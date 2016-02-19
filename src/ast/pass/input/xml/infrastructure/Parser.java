@@ -25,4 +25,6 @@ public interface Parser {
 
   public String name();
 
+  public <T extends Ast> Class<T> type();
+
 }

@@ -17,8 +17,14 @@
 
 package ast.pass.input.xml.infrastructure;
 
+import ast.data.Ast;
+
 public interface Parsers {
 
+  void add(Parser parser);
+
   public Parser parserFor(String elementName);
+
+  public Parser parserFor(Class<? extends Ast> elementType);
 
 }

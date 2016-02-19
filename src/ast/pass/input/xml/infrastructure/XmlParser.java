@@ -15,15 +15,19 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.input.xml.parser;
+package ast.pass.input.xml.infrastructure;
 
 import ast.data.Ast;
 import ast.data.AstList;
 
 public interface XmlParser {
 
-  public AstList<Ast> astItems();
+  public Ast anyItem();
 
-  public Ast astItem();
+  public AstList<Ast> anyItems();
+
+  public <T extends Ast> T itemOf(Class<T> itemClass);
+
+  public <T extends Ast> AstList<T> itemsOf(Class<T> itemClass);
 
 }

@@ -15,12 +15,13 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.input.xml.parser;
+package ast.pass.input.xml.infrastructure;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.Test;
@@ -28,8 +29,8 @@ import org.mockito.InOrder;
 import org.mockito.Mockito;
 
 import ast.data.Ast;
-import ast.pass.input.xml.infrastructure.Parser;
-import ast.pass.input.xml.infrastructure.Parsers;
+import ast.data.reference.Reference;
+import ast.data.statement.Block;
 import ast.pass.input.xml.scanner.ExpectionParser;
 
 public class XmlParserImplementation_Test {
@@ -41,12 +42,21 @@ public class XmlParserImplementation_Test {
   final private InOrder order = Mockito.inOrder(stream, parsers, parser);
 
   @Test
+  public void can_add_parser() {
+    Parser parser = mock(Parser.class);
+
+    testee.add(parser);
+
+    verify(parsers).add(eq(parser));
+  }
+
+  @Test
   public void parse_ast_item_dispatches_to_the_correct_parser() {
     when(stream.peekElement()).thenReturn("the next element");
     when(parsers.parserFor(eq("the next element"))).thenReturn(parser);
     when(parser.parse()).thenReturn(ast);
 
-    Ast item = testee.astItem();
+    Ast item = testee.anyItem();
 
     assertEquals(ast, item);
 
@@ -59,7 +69,7 @@ public class XmlParserImplementation_Test {
   public void parsing_ast_items_return_zero_if_there_are_no_more_elements() {
     when(stream.hasElement()).thenReturn(false);
 
-    assertEquals(0, testee.astItems().size());
+    assertEquals(0, testee.anyItems().size());
   }
 
   @Test
@@ -68,7 +78,49 @@ public class XmlParserImplementation_Test {
     when(parsers.parserFor(anyString())).thenReturn(parser);
     when(parser.parse()).thenReturn(ast);
 
-    assertEquals(2, testee.astItems().size());
+    assertEquals(2, testee.anyItems().size());
+  }
+
+  @Test
+  public void parse_for_a_specific_type() {
+    Reference reference = mock(Reference.class);
+    when(parsers.parserFor(Reference.class)).thenReturn(parser);
+    when(parser.parse()).thenReturn(reference);
+
+    Reference item = testee.itemOf(Reference.class);
+
+    assertEquals(reference, item);
+  }
+
+  @Test
+  public void parsing_for_specific_items_return_zero_if_there_are_no_more_elements() {
+    when(stream.hasElement()).thenReturn(false);
+
+    assertEquals(0, testee.itemsOf(Block.class).size());
+  }
+
+  @Test
+  public void parsing_for_specific_items_returns_all_until_the_first_non_matching_element() {
+    Block block = mock(Block.class);
+    when(stream.hasElement()).thenReturn(true);
+    when(stream.peekElement()).thenReturn("next element");
+    when(parsers.parserFor(Block.class)).thenReturn(parser);
+    when(parser.name()).thenReturn("next element").thenReturn("quixli");
+    when(parser.parse()).thenReturn(block);
+
+    assertEquals(1, testee.itemsOf(Block.class).size());
+  }
+
+  @Test
+  public void parsing_for_specific_items_returns_all_elements() {
+    Block block = mock(Block.class);
+    when(stream.hasElement()).thenReturn(true).thenReturn(true).thenReturn(false);
+    when(stream.peekElement()).thenReturn("next element");
+    when(parsers.parserFor(Block.class)).thenReturn(parser);
+    when(parser.name()).thenReturn("next element");
+    when(parser.parse()).thenReturn(block);
+
+    assertEquals(2, testee.itemsOf(Block.class).size());
   }
 
 }

@@ -30,11 +30,12 @@ import parser.TokenReader;
 import ast.data.Namespace;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.pass.input.xml.infrastructure.Parsers;
 import ast.pass.input.xml.infrastructure.ParsersImplementation;
+import ast.pass.input.xml.infrastructure.XmlParserImplementation;
+import ast.pass.input.xml.parser.GlobalConstantParser;
+import ast.pass.input.xml.parser.ReferenceParser;
 import ast.pass.input.xml.parser.RizzlyFileParser;
-import ast.pass.input.xml.parser.XmlParser;
-import ast.pass.input.xml.parser.XmlParserImplementation;
+import ast.pass.input.xml.parser.UnlinkedAnchorParser;
 import ast.pass.input.xml.parser.XmlTopParser;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import ast.pass.input.xml.scanner.ExpectionParserImplementation;
@@ -55,8 +56,8 @@ public class XmlParserPass extends AstPass {
     TokenReader<XmlToken> stream = xmlReader(configuration.getRootPath() + configuration.getNamespace() + configuration.getExtension());
     PeekNReader<XmlToken> peekReader = new PeekNReader<XmlToken>(stream);
     ExpectionParser expect = new ExpectionParserImplementation(peekReader, error);
-    Parsers parsers = getParsers(expect);
-    XmlParser parser = new XmlParserImplementation(expect, parsers);
+    XmlParserImplementation parser = new XmlParserImplementation(expect, new ParsersImplementation(error));
+    addParsers(parser, expect);
     XmlTopParser topParser = new XmlTopParser(expect, parser, error);
 
     ast.children.clear();
@@ -64,10 +65,11 @@ public class XmlParserPass extends AstPass {
     ast.children.addAll(ns.children);
   }
 
-  private ParsersImplementation getParsers(ExpectionParser stream) {
-    ParsersImplementation parsers = new ParsersImplementation(error);
-    parsers.add(new RizzlyFileParser(stream, error));
-    return parsers;
+  private void addParsers(XmlParserImplementation xmlParser, ExpectionParser stream) {
+    xmlParser.add(new RizzlyFileParser(stream, error));
+    xmlParser.add(new GlobalConstantParser(stream, xmlParser, error));
+    xmlParser.add(new ReferenceParser(stream, xmlParser, error));
+    xmlParser.add(new UnlinkedAnchorParser(stream, xmlParser, error));
   }
 
   private TokenReader<XmlToken> xmlReader(String filename) {

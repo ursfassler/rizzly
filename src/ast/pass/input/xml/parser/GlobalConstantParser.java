@@ -17,37 +17,47 @@
 
 package ast.pass.input.xml.parser;
 
-import ast.data.file.RizzlyFile;
+import ast.data.Ast;
+import ast.data.expression.Expression;
+import ast.data.reference.Reference;
+import ast.data.variable.GlobalConstant;
 import ast.pass.input.xml.infrastructure.Parser;
+import ast.pass.input.xml.infrastructure.XmlParser;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
-public class RizzlyFileParser implements Parser {
+public class GlobalConstantParser implements Parser {
   private final ExpectionParser stream;
+  private final XmlParser parser;
   private final RizzlyError error;
 
-  public RizzlyFileParser(ExpectionParser stream, RizzlyError error) {
+  public GlobalConstantParser(ExpectionParser stream, XmlParser parser, RizzlyError error) {
     this.stream = stream;
+    this.parser = parser;
     this.error = error;
   }
 
   @Override
   public String name() {
-    return "RizzlyFile";
+    return "GlobalConstant";
   }
 
   @Override
-  public Class type() {
-    return RizzlyFile.class;
+  public Class<? extends Ast> type() {
+    return GlobalConstant.class;
   }
 
   @Override
-  public RizzlyFile parse() {
+  public GlobalConstant parse() {
     expectElementStart(name());
     String name = expectAttribute("name");
+
+    Reference type = parser.itemOf(Reference.class);
+    Expression value = parser.itemOf(Expression.class);
+
     expectElementEnd();
 
-    return new RizzlyFile(name);
+    return new GlobalConstant(name, type, value);
   }
 
   private void expectElementEnd() {

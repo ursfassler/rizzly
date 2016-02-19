@@ -26,6 +26,9 @@ import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 
+import ast.data.statement.Block;
+import ast.data.statement.IfStatement;
+import ast.data.variable.StateVariable;
 import ast.meta.MetaList;
 import error.ErrorType;
 import error.RizzlyError;
@@ -40,13 +43,28 @@ public class ParsersImplementation_Test {
   }
 
   @Test
-  public void log_error_for_unknown_element() {
+  public void log_error_for_unknown_name() {
     try {
       testee.parserFor("quixli quaxli");
     } catch (XmlParseError e) {
     }
 
     verify(error).err(eq(ErrorType.Error), eq("unknown element \"quixli quaxli\""), any(MetaList.class));
+  }
+
+  @Test(expected = XmlParseError.class)
+  public void throws_exception_for_unknown_type() {
+    testee.parserFor(IfStatement.class);
+  }
+
+  @Test
+  public void log_error_for_unknown_type() {
+    try {
+      testee.parserFor(IfStatement.class);
+    } catch (XmlParseError e) {
+    }
+
+    verify(error).err(eq(ErrorType.Error), eq("unknown type \"IfStatement\""), any(MetaList.class));
   }
 
   @Test
@@ -61,14 +79,46 @@ public class ParsersImplementation_Test {
   }
 
   @Test
-  public void can_not_add_parser_with_same_name_twice() {
-    Parser parser = mock(Parser.class);
-    when(parser.name()).thenReturn("the parser name");
-    testee.add(parser);
+  public void return_parser_with_matching_parse_return_type() {
+    Parser stateVariableParser = mock(Parser.class);
+    when(stateVariableParser.type()).thenReturn((Class) StateVariable.class);
+    testee.add(stateVariableParser);
 
-    testee.add(parser);
+    Parser blockParser = mock(Parser.class);
+    when(blockParser.type()).thenReturn((Class) Block.class);
+    testee.add(blockParser);
+
+    assertEquals(stateVariableParser, testee.parserFor(StateVariable.class));
+    assertEquals(blockParser, testee.parserFor(Block.class));
+  }
+
+  @Test
+  public void can_not_add_parser_with_same_name_twice() {
+    Parser parser1 = mock(Parser.class);
+    when(parser1.name()).thenReturn("the parser name");
+    when(parser1.type()).thenReturn((Class) Block.class);
+    testee.add(parser1);
+    Parser parser2 = mock(Parser.class);
+    when(parser2.name()).thenReturn("the parser name");
+    when(parser2.type()).thenReturn((Class) StateVariable.class);
+
+    testee.add(parser2);
 
     verify(error).err(eq(ErrorType.Fatal), eq("parser with name \"the parser name\" already registered"), any(MetaList.class));
   }
 
+  @Test
+  public void can_not_add_parser_with_same_type_twice() {
+    Parser parser1 = mock(Parser.class);
+    when(parser1.name()).thenReturn("the parser name 1");
+    when(parser1.type()).thenReturn((Class) Block.class);
+    testee.add(parser1);
+    Parser parser2 = mock(Parser.class);
+    when(parser2.name()).thenReturn("the parser name 2");
+    when(parser2.type()).thenReturn((Class) Block.class);
+
+    testee.add(parser2);
+
+    verify(error).err(eq(ErrorType.Fatal), eq("parser with type \"Block\" already registered"), any(MetaList.class));
+  }
 }

@@ -20,13 +20,16 @@ package ast.pass.input.xml.infrastructure;
 import java.util.HashMap;
 import java.util.Map;
 
+import ast.data.Ast;
 import ast.meta.MetaListImplementation;
 import error.ErrorType;
 import error.RizzlyError;
 
 public class ParsersImplementation implements Parsers {
+  // TODO is parser by name and type needed?
   final private RizzlyError error;
-  final private Map<String, Parser> parsers = new HashMap<String, Parser>();
+  final private Map<String, Parser> parsersByName = new HashMap<String, Parser>();
+  final private Map<Class<? extends Ast>, Parser> parsersByType = new HashMap<Class<? extends Ast>, Parser>();
 
   public ParsersImplementation(RizzlyError error) {
     this.error = error;
@@ -34,7 +37,7 @@ public class ParsersImplementation implements Parsers {
 
   @Override
   public Parser parserFor(String elementName) {
-    Parser parser = parsers.get(elementName);
+    Parser parser = parsersByName.get(elementName);
 
     if (parser == null) {
       error.err(ErrorType.Error, "unknown element \"" + elementName + "\"", new MetaListImplementation());
@@ -44,13 +47,33 @@ public class ParsersImplementation implements Parsers {
     return parser;
   }
 
-  public void add(Parser parser) {
-    String name = parser.name();
+  @Override
+  public Parser parserFor(Class<? extends Ast> itemType) {
+    Parser parser = parsersByType.get(itemType);
 
-    if (parsers.containsKey(name)) {
+    if (parser == null) {
+      error.err(ErrorType.Error, "unknown type \"" + itemType.getSimpleName() + "\"", new MetaListImplementation());
+      throw new XmlParseError();
+    }
+
+    return parser;
+  }
+
+  @Override
+  public void add(Parser parser) {
+    // TODO simplify
+    String name = parser.name();
+    if (parsersByName.containsKey(name)) {
       error.err(ErrorType.Fatal, "parser with name \"" + name + "\" already registered", new MetaListImplementation());
     } else {
-      parsers.put(name, parser);
+      parsersByName.put(name, parser);
+    }
+
+    Class type = parser.type();
+    if (parsersByType.containsKey(type)) {
+      error.err(ErrorType.Fatal, "parser with type \"" + type.getSimpleName() + "\" already registered", new MetaListImplementation());
+    } else {
+      parsersByType.put(type, parser);
     }
   }
 
