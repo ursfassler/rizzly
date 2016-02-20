@@ -29,7 +29,7 @@ import org.jgrapht.traverse.TopologicalOrderIterator;
 
 import util.Pair;
 import ast.data.Namespace;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.LinkedAnchor;
 import ast.data.variable.Variable;
 import ast.dispatcher.DfsTraverser;
 import ast.doc.SimpleGraph;
@@ -85,11 +85,11 @@ public class VarSort extends AstPass {
     DfsTraverser<Void, Set<Variable>> getter = new DfsTraverser<Void, Set<Variable>>() {
 
       @Override
-      protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Set<Variable> param) {
+      protected Void visitLinkedAnchor(LinkedAnchor obj, Set<Variable> param) {
         if (obj.getLink() instanceof Variable) {
           param.add((Variable) obj.getLink());
         }
-        return super.visitReference(obj, param);
+        return super.visitLinkedAnchor(obj, param);
       }
     };
     Set<Variable> vs = new HashSet<Variable>();

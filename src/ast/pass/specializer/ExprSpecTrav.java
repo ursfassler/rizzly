@@ -23,8 +23,7 @@ import ast.copy.Copy;
 import ast.data.expression.Expression;
 import ast.data.expression.ReferenceExpression;
 import ast.data.expression.value.ValueExpr;
-import ast.data.reference.LinkTarget;
-import ast.data.reference.LinkedReferenceWithOffset;
+import ast.data.reference.LinkedAnchor;
 import ast.data.variable.TemplateParameter;
 import ast.dispatcher.other.ExprReplacer;
 
@@ -40,13 +39,10 @@ public class ExprSpecTrav extends ExprReplacer<Void> {
   protected Expression visitRefExpr(ReferenceExpression obj, Void param) {
     obj = (ReferenceExpression) super.visitRefExpr(obj, param);
 
-    if (values.containsKey(obj.reference.getLink())) {
-      LinkedReferenceWithOffset ref = obj.reference;
+    LinkedAnchor anchor = (LinkedAnchor) obj.reference.getAnchor();
 
-      assert (!(ref.getLink() instanceof LinkTarget));
-      assert (ref.getOffset().isEmpty());
-
-      Expression repl = values.get(ref.getLink());
+    if (values.containsKey(anchor.getLink())) {
+      Expression repl = values.get(anchor.getLink());
       return Copy.copy(repl);
     }
 

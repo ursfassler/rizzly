@@ -30,10 +30,9 @@ import ast.data.AstList;
 import ast.data.component.composition.Connection;
 import ast.data.component.composition.EndpointSelf;
 import ast.data.component.composition.SynchroniusConnection;
-import ast.data.function.FunctionReference;
 import ast.data.function.header.FuncFunction;
+import ast.data.reference.RefFactory;
 import ast.data.reference.RefItem;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.variable.FunctionVariable;
 import ast.meta.MetaList;
 import error.ErrorType;
@@ -119,7 +118,7 @@ public class QueryIsConnectedToOneResponse_Test {
   }
 
   private EndpointSelf selfEp(FuncFunction function) {
-    return new EndpointSelf(new FunctionReference(new LinkedReferenceWithOffset_Implementation(function, new AstList<RefItem>())));
+    return new EndpointSelf(RefFactory.create(function, new AstList<RefItem>()));
   }
 
 }

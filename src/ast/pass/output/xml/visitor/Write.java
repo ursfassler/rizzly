@@ -77,7 +77,6 @@ import ast.data.expression.value.UnsafeUnionValue;
 import ast.data.file.RizzlyFile;
 import ast.data.function.Function;
 import ast.data.function.FunctionProperty;
-import ast.data.function.FunctionReference;
 import ast.data.function.header.FuncFunction;
 import ast.data.function.header.FuncInterrupt;
 import ast.data.function.header.FuncQuery;
@@ -94,14 +93,12 @@ import ast.data.function.template.DefaultValueTemplate;
 import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
-import ast.data.reference.LinkTarget;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.LinkedAnchor;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
-import ast.data.reference.TypedReference;
-import ast.data.reference.UnlinkedReferenceWithOffset_Implementation;
+import ast.data.reference.UnlinkedAnchor;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
@@ -121,7 +118,6 @@ import ast.data.statement.VarDefStmt;
 import ast.data.statement.VoidReturn;
 import ast.data.statement.WhileStmt;
 import ast.data.template.Template;
-import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumElement;
@@ -306,14 +302,6 @@ public class Write implements Visitor {
     writeBinaryExpression("Division", object);
   }
 
-  public void visit(LinkTarget object) {
-    writer.beginNode("LinkTarget");
-    writer.attribute("name", object.getName());
-    executor.visit(idWriter, object);
-    executor.visit(this, object.metadata());
-    writer.endNode();
-  }
-
   public void visit(EndpointRaw object) {
     throw new RuntimeException("not yet implemented");
   }
@@ -356,10 +344,6 @@ public class Write implements Visitor {
 
   public void visit(FuncQuery object) {
     throw new RuntimeException("not yet implemented");
-  }
-
-  public void visit(FunctionReference object) {
-    visitTypedReference("FunctionReference", object);
   }
 
   public void visit(Response object) {
@@ -619,19 +603,24 @@ public class Write implements Visitor {
     writer.endNode();
   }
 
-  public void visit(LinkedReferenceWithOffset_Implementation object) {
-    writer.beginNode("Reference");
+  public void visit(LinkedAnchor object) {
+    writer.beginNode("LinkedAnchor");
     executor.visit(idWriter, object);
 
-    // FIXME That is a bit hacky. Split Reference to a linked and a unlinked implementation.
-    if (astId.hasId(object.getLink())) {
-      writer.attribute("link", astId.getId(object.getLink()));
-    } else {
-      executor.visit(this, object.getLink());
-    }
+    assert (astId.hasId(object.getLink()));
+    writer.attribute("link", astId.getId(object.getLink()));
 
     executor.visit(this, object.metadata());
-    executor.visit(this, object.getOffset());
+    writer.endNode();
+  }
+
+  public void visit(UnlinkedAnchor object) {
+    writer.beginNode("UnlinkedAnchor");
+    executor.visit(idWriter, object);
+
+    writer.attribute("link", object.getLinkName());
+
+    executor.visit(this, object.metadata());
     writer.endNode();
   }
 
@@ -763,10 +752,6 @@ public class Write implements Visitor {
     throw new RuntimeException("not yet implemented");
   }
 
-  public void visit(TypeReference object) {
-    visitTypedReference("TypeReference", object);
-  }
-
   public void visit(TypeType object) {
     writer.beginNode("TypeType");
     writer.attribute("name", object.getName());
@@ -817,10 +802,6 @@ public class Write implements Visitor {
   }
 
   public void visit(WhileStmt object) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  public void visit(UnlinkedReferenceWithOffset_Implementation object) {
     throw new RuntimeException("not yet implemented");
   }
 
@@ -903,14 +884,6 @@ public class Write implements Visitor {
     executor.visit(this, object.metadata());
     executor.visit(this, object.param);
     executor.visit(this, object.body);
-    writer.endNode();
-  }
-
-  private <T extends Ast> void visitTypedReference(String typeName, TypedReference<T> object) {
-    writer.beginNode(typeName);
-    executor.visit(idWriter, object);
-    executor.visit(this, object.metadata());
-    executor.visit(this, object.ref);
     writer.endNode();
   }
 

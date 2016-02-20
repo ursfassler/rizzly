@@ -40,7 +40,6 @@ import ast.data.expression.Expression;
 import ast.data.expression.ReferenceExpression;
 import ast.data.expression.value.NamedValue;
 import ast.data.function.Function;
-import ast.data.function.FunctionReference;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FuncReturnTuple;
 import ast.data.function.ret.FunctionReturnType;
@@ -48,10 +47,8 @@ import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
 import ast.data.reference.LinkedAnchor;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.reference.OffsetReference;
 import ast.data.reference.RefItem;
-import ast.data.reference.SimpleReference;
 import ast.data.reference.UnlinkedAnchor;
 import ast.data.statement.CaseOpt;
 import ast.data.statement.CaseOptRange;
@@ -60,7 +57,6 @@ import ast.data.statement.IfOption;
 import ast.data.statement.Statement;
 import ast.data.template.Template;
 import ast.data.type.Type;
-import ast.data.type.TypeReference;
 import ast.data.type.base.EnumElement;
 import ast.data.type.composed.NamedElement;
 import ast.data.variable.Variable;
@@ -120,22 +116,6 @@ public class CopyAst extends NullDispatcher<Ast, Void> {
       }
       return nobj;
     }
-  }
-
-  @Override
-  protected Ast visitTypeRef(TypeReference obj, Void param) {
-    TypeReference copy = new TypeReference(copy(obj.ref));
-    return copy;
-  }
-
-  @Override
-  protected Ast visitFuncRef(FunctionReference obj, Void param) {
-    return new FunctionReference(copy(obj.ref));
-  }
-
-  @Override
-  protected Ast visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
-    return new LinkedReferenceWithOffset_Implementation(obj.getLink(), copy(obj.getOffset()));
   }
 
   @Override
@@ -301,7 +281,7 @@ public class CopyAst extends NullDispatcher<Ast, Void> {
 
   @Override
   protected Ast visitStateSimple(StateSimple obj, Void param) {
-    ast.data.component.hfsm.StateSimple ret = new StateSimple(obj.getName(), copy(obj.entryFunc), copy(obj.exitFunc));
+    StateSimple ret = new StateSimple(obj.getName(), copy(obj.entryFunc), copy(obj.exitFunc));
 
     ret.item.addAll(copy(obj.item));
 
@@ -345,11 +325,6 @@ public class CopyAst extends NullDispatcher<Ast, Void> {
   @Override
   protected Ast visitOffsetReference(OffsetReference obj, Void param) {
     return new OffsetReference(copy(obj.getAnchor()), copy(obj.getOffset()));
-  }
-
-  @Override
-  protected Ast visitSimpleReference(SimpleReference obj, Void param) {
-    return new SimpleReference(copy(obj.getAnchor()));
   }
 
   @Override

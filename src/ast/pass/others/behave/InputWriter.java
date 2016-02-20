@@ -24,6 +24,7 @@ import ast.data.Namespace;
 import ast.data.function.Function;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FunctionReturnType;
+import ast.data.reference.LinkedAnchor;
 import ast.data.type.base.RangeType;
 import ast.data.variable.FunctionVariable;
 import ast.dispatcher.NullDispatcher;
@@ -116,7 +117,7 @@ public class InputWriter extends NullDispatcher<Void, Function> {
 
   @Override
   protected Void visitFuncReturnType(FunctionReturnType obj, Function param) {
-    String c_type = getCType(obj.type.ref.getLink());
+    String c_type = getCType(((LinkedAnchor) obj.type.getAnchor()).getLink());
     sw.wr("self._inst." + param.getName() + ".restype = " + c_type);
     sw.nl();
 

@@ -61,10 +61,11 @@ import ast.data.expression.value.UnsafeUnionValue;
 import ast.data.function.Function;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FunctionReturnType;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefName;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
@@ -72,14 +73,13 @@ import ast.data.statement.CaseOpt;
 import ast.data.statement.CaseOptRange;
 import ast.data.statement.CaseOptValue;
 import ast.data.statement.CaseStmt;
+import ast.data.statement.ExpressionReturn;
 import ast.data.statement.IfOption;
 import ast.data.statement.IfStatement;
-import ast.data.statement.ExpressionReturn;
-import ast.data.statement.VoidReturn;
 import ast.data.statement.VarDefStmt;
+import ast.data.statement.VoidReturn;
 import ast.data.statement.WhileStmt;
 import ast.data.type.Type;
-import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.StringType;
@@ -314,9 +314,15 @@ class CWriterWorker extends NullDispatcher<Void, Boolean> {
   }
 
   @Override
-  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Boolean param) {
-    sw.wr(name(obj.getLink()));
+  protected Void visitOffsetReference(OffsetReference obj, Boolean param) {
+    visit(obj.getAnchor(), param);
     visitList(obj.getOffset(), param);
+    return null;
+  }
+
+  @Override
+  protected Void visitLinkedAnchor(LinkedAnchor obj, Boolean param) {
+    sw.wr(name(obj.getLink()));
     return null;
   }
 
@@ -769,7 +775,7 @@ class CWriterWorker extends NullDispatcher<Void, Boolean> {
         case '\t':
           ret += "\\t";
           break;
-          // TODO more symbols to escape?
+        // TODO more symbols to escape?
         default:
           ret += c;
           break;
@@ -827,12 +833,6 @@ class CWriterWorker extends NullDispatcher<Void, Boolean> {
     sw.wr("{");
     visitList(obj.value, param);
     sw.wr("}");
-    return null;
-  }
-
-  @Override
-  protected Void visitTypeRef(TypeReference obj, Boolean param) {
-    visit(obj.ref, param);
     return null;
   }
 

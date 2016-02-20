@@ -21,12 +21,11 @@ import ast.data.AstList;
 import ast.data.expression.Expression;
 import ast.data.expression.ReferenceExpression;
 import ast.data.expression.value.ValueExpr;
-import ast.data.reference.LinkedReferenceWithOffset;
+import ast.data.reference.Reference;
 import ast.data.template.ActualTemplateArgument;
 import ast.data.template.Template;
 import ast.data.type.Type;
 import ast.data.type.TypeRefFactory;
-import ast.data.type.TypeReference;
 import ast.data.variable.TemplateParameter;
 import ast.interpreter.Memory;
 import ast.knowledge.KnowledgeBase;
@@ -76,7 +75,7 @@ public class Util {
     return ExprEvaluator.evaluate(itr, new Memory(), kb);
   }
 
-  private static Type evalType(LinkedReferenceWithOffset ref, KnowledgeBase kb) {
+  private static Type evalType(Reference ref, KnowledgeBase kb) {
     return (Type) RefEvaluator.execute(ref, new Memory(), kb);
   }
 
@@ -86,8 +85,8 @@ public class Util {
     }
   }
 
-  private static TypeReference evalTypeRef(TypeReference tr, KnowledgeBase kb) {
-    Type type = evalType(tr.ref, kb);
+  private static Reference evalTypeRef(Reference tr, KnowledgeBase kb) {
+    Type type = evalType(tr, kb);
     return TypeRefFactory.create(tr.metadata(), type);
   }
 

@@ -17,14 +17,13 @@
 
 package ast.data.expression;
 
-import ast.data.type.TypeReference;
-import ast.visitor.Visitor;
+import ast.data.reference.Reference;
 
 final public class TypeCast extends Expression {
   public Expression value;
-  public TypeReference cast;
+  public Reference cast;
 
-  public TypeCast(TypeReference cast, Expression value) {
+  public TypeCast(Reference cast, Expression value) {
     this.value = value;
     this.cast = cast;
   }

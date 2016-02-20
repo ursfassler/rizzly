@@ -28,7 +28,8 @@ import ast.data.expression.value.BooleanValue;
 import ast.data.expression.value.TupleValue;
 import ast.data.expression.value.ValueExpr;
 import ast.data.function.header.FuncFunction;
-import ast.data.reference.LinkedReferenceWithOffset;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.OffsetReference;
 import ast.data.statement.Block;
 import ast.data.statement.ExpressionReturn;
 import ast.data.statement.IfOption;
@@ -123,7 +124,7 @@ public class StmtExecutor extends NullDispatcher<Expression, Memory> {
     for (Variable var : obj.variable) {
       param.createVar(var);
       if (value instanceof AnyValue) {
-        Type type = (Type) var.type.ref.getTarget();
+        Type type = (Type) var.type.getTarget();
         ValueExpr empty = kb.getEntry(KnowEmptyValue.class).get(type);
         param.set(var, Copy.copy(empty));
       } else {
@@ -152,21 +153,26 @@ public class StmtExecutor extends NullDispatcher<Expression, Memory> {
     RError.ass(obj.left.size() == value.size(), obj.metadata(), "expect same number of elemnts on both sides, got " + obj.left.size() + " <-> " + value.size());
 
     for (int i = 0; i < value.size(); i++) {
-      assign(obj.left.get(i), value.get(i), param);
+      assign((OffsetReference) obj.left.get(i), value.get(i), param);
     }
 
     return null;
   }
 
-  private void assign(LinkedReferenceWithOffset lhs, Expression rhs, Memory param) {
+  private void assign(OffsetReference lhs, Expression rhs, Memory param) {
     rhs = Copy.copy(rhs);
 
-    Variable var = (Variable) lhs.getLink();
+    Variable var = (Variable) ((LinkedAnchor) lhs.getAnchor()).getLink();
     ValueExpr root = param.get(var);
 
     Ast lvalue = RefEvaluator.execute(root, lhs.getOffset(), param, kb);
     root = (ValueExpr) ValueReplacer.set(root, (ValueExpr) lvalue, rhs);
     param.set(var, root);
+  }
+
+  @Override
+  protected Expression visitOffsetReference(OffsetReference obj, Memory param) {
+    throw new RuntimeException("not yet implemented");
   }
 
   @Override

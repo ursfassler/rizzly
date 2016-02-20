@@ -18,16 +18,18 @@
 package ast.pass.specializer;
 
 import main.Configuration;
+import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.expression.Expression;
 import ast.data.expression.ReferenceExpression;
 import ast.data.expression.TypeCast;
-import ast.data.reference.LinkedReferenceWithOffset;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefTemplCall;
+import ast.data.reference.Reference;
 import ast.data.template.Template;
 import ast.data.type.Type;
-import ast.data.type.TypeReference;
 import ast.dispatcher.other.ExprReplacer;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
@@ -49,18 +51,19 @@ class TypeCastAdderWorker extends ExprReplacer<Void> {
 
   @Override
   protected Expression visitRefExpr(ReferenceExpression obj, Void param) {
-    visit(obj.reference, param);
+    OffsetReference reference = (OffsetReference) obj.reference;
+    visit(reference, param);
 
-    if (isTypeCast(obj.reference)) {
-      assert (obj.reference.getOffset().size() == 2);
-      assert (obj.reference.getOffset().get(0) instanceof RefTemplCall);
-      assert (obj.reference.getOffset().get(1) instanceof RefCall);
-      assert (((RefCall) obj.reference.getOffset().get(1)).actualParameter.value.size() == 1);
+    if (isTypeCast(reference)) {
+      assert (reference.getOffset().size() == 2);
+      assert (reference.getOffset().get(0) instanceof RefTemplCall);
+      assert (reference.getOffset().get(1) instanceof RefCall);
+      assert (((RefCall) reference.getOffset().get(1)).actualParameter.value.size() == 1);
 
-      Expression value = ((RefCall) obj.reference.getOffset().get(1)).actualParameter.value.get(0);
-      obj.reference.getOffset().remove(1);
+      Expression value = ((RefCall) reference.getOffset().get(1)).actualParameter.value.get(0);
+      reference.getOffset().remove(1);
 
-      TypeReference typeRef = new TypeReference(obj.reference);
+      Reference typeRef = reference;
       typeRef.metadata().add(obj.metadata());
       TypeCast typeCast = new TypeCast(typeRef, value);
       typeCast.metadata().add(obj.metadata());
@@ -70,12 +73,13 @@ class TypeCastAdderWorker extends ExprReplacer<Void> {
     return obj;
   }
 
-  private boolean isTypeCast(LinkedReferenceWithOffset ref) {
-    if ((ref.getLink() instanceof Type) && (ref.getOffset().size() >= 1)) {
+  private boolean isTypeCast(OffsetReference ref) {
+    Named link = ((LinkedAnchor) ref.getAnchor()).getLink();
+    if ((link instanceof Type) && (ref.getOffset().size() >= 1)) {
       return true;
     }
-    if ((ref.getLink() instanceof Template) && (ref.getOffset().size() >= 2) && (ref.getOffset().get(1) instanceof RefCall)) {
-      Template template = (Template) ref.getLink();
+    if ((link instanceof Template) && (ref.getOffset().size() >= 2) && (ref.getOffset().get(1) instanceof RefCall)) {
+      Template template = (Template) link;
       if (template.getObject() instanceof Type) {
         return true;
       }

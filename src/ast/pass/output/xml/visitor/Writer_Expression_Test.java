@@ -25,7 +25,7 @@ import org.mockito.InOrder;
 import org.mockito.Mockito;
 
 import ast.data.expression.ReferenceExpression;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.Reference;
 import ast.pass.output.xml.IdReader;
 import ast.visitor.VisitExecutor;
 import ast.visitor.Visitor;
@@ -36,7 +36,7 @@ public class Writer_Expression_Test {
   final private Visitor idWriter = mock(Visitor.class);
   final private VisitExecutor executor = mock(VisitExecutor.class);
   final private Write testee = new Write(stream, astId, idWriter, executor);
-  final private LinkedReferenceWithOffset_Implementation reference = mock(LinkedReferenceWithOffset_Implementation.class);
+  final private Reference reference = mock(Reference.class);
   final private InOrder order = Mockito.inOrder(stream, idWriter, executor);
 
   @Test

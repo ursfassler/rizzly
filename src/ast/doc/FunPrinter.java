@@ -73,7 +73,6 @@ import ast.data.expression.value.UnsafeUnionValue;
 import ast.data.file.RizzlyFile;
 import ast.data.function.Function;
 import ast.data.function.FunctionProperty;
-import ast.data.function.FunctionReference;
 import ast.data.function.header.FuncFunction;
 import ast.data.function.header.FuncQuery;
 import ast.data.function.header.FuncSubHandlerEvent;
@@ -90,15 +89,12 @@ import ast.data.raw.RawComponent;
 import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
-import ast.data.reference.LinkTarget;
 import ast.data.reference.LinkedAnchor;
-import ast.data.reference.LinkedReference;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.reference.OffsetReference;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
+import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
-import ast.data.reference.SimpleReference;
 import ast.data.reference.UnlinkedAnchor;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
@@ -109,7 +105,6 @@ import ast.data.statement.MultiAssignment;
 import ast.data.statement.VarDefInitStmt;
 import ast.data.statement.VarDefStmt;
 import ast.data.template.Template;
-import ast.data.type.TypeReference;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.RangeType;
 import ast.data.type.base.TupleType;
@@ -155,10 +150,6 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
 
   protected String getId(Ast obj, Void name) {
     return "_" + Integer.toHexString(obj.hashCode());
-  }
-
-  protected Designator getObjPath(LinkedReference obj) {
-    return new Designator();
   }
 
   private void list(Iterable<? extends Ast> list, String sep, Void param) {
@@ -344,8 +335,11 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   private void printStateBody(ast.data.component.hfsm.State obj) {
     xw.incIndent();
 
-    printEntryExit("entry", obj.entryFunc.getTarget().body);
-    printEntryExit("exit", obj.exitFunc.getTarget().body);
+    Function entry = (Function) obj.entryFunc.getTarget();
+    printEntryExit("entry", entry.body);
+    Function exit = (Function) obj.exitFunc.getTarget();
+    printEntryExit("exit", exit.body);
+
     visitListNl(obj.item, null);
 
     xw.decIndent();
@@ -810,58 +804,15 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitFuncRef(FunctionReference obj, Void param) {
-    visit(obj.ref, param);
-    return null;
-  }
-
-  @Override
-  protected Void visitTypeRef(TypeReference obj, Void param) {
-    visit(obj.ref, param);
-    return null;
-  }
-
-  @Override
   protected Void visitRefExpr(ReferenceExpression obj, Void param) {
     visit(obj.reference, param);
     return null;
   }
 
   @Override
-  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
-    wrRef(obj);
-    visitList(obj.getOffset(), null);
-    return null;
-  }
-
-  private void wrRef(LinkedReference obj) {
-    Designator path = getObjPath(obj);
-    if (path == null) {
-      path = new Designator(); // TODO: ok?
-    }
-    String hint = obj.getLink().toString();
-    String name;
-    if (obj.getLink() instanceof Named) {
-      name = obj.getLink().getName();
-    } else {
-      name = "???";
-    }
-    if (obj.getLink() instanceof LinkTarget) {
-      name = "\"" + name + "\"";
-    }
-    xw.wl(name, hint, path.toString(), getId(obj.getLink(), null));
-  }
-
-  @Override
   protected Void visitOffsetReference(OffsetReference obj, Void param) {
     visit(obj.getAnchor(), param);
     visitList(obj.getOffset(), param);
-    return null;
-  }
-
-  @Override
-  protected Void visitSimpleReference(SimpleReference obj, Void param) {
-    visit(obj.getAnchor(), param);
     return null;
   }
 
@@ -875,12 +826,12 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
 
   @Override
   protected Void visitLinkedAnchor(LinkedAnchor obj, Void param) {
-    xw.wr(obj.getLink().getName()); // TODO write as anchor
+    xw.wa(obj.getLink().getName(), getId(obj.getLink()));
     return null;
   }
 
   @Override
-  protected Void visitRefName(ast.data.reference.RefName obj, Void param) {
+  protected Void visitRefName(RefName obj, Void param) {
     xw.wr(".");
     xw.wr(obj.name);
     return null;
@@ -916,13 +867,13 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
     visit(obj.type, param);
     if (obj instanceof DefaultVariable) {
       xw.wr(" = ");
-      visit(((ast.data.variable.DefaultVariable) obj).def, param);
+      visit(((DefaultVariable) obj).def, param);
     }
     return null;
   }
 
   @Override
-  protected Void visitConstant(ast.data.variable.Constant obj, Void param) {
+  protected Void visitConstant(Constant obj, Void param) {
     super.visitConstant(obj, param);
     xw.wr(";");
     xw.nl();

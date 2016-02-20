@@ -19,13 +19,14 @@ package ast.pass.check.type;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.expression.Expression;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefItem;
 import ast.data.reference.RefName;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.Reference;
 import ast.data.type.Type;
-import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.EnumType;
 import ast.data.type.base.FunctionType;
@@ -50,7 +51,7 @@ public class ReferenceTypecheck extends NullDispatcher<Type, Type> {
     kc = kb.getEntry(KnowLeftIsContainerOfRight.class);
   }
 
-  static public void process(LinkedReferenceWithOffset_Implementation ast, KnowledgeBase kb) {
+  static public void process(Reference ast, KnowledgeBase kb) {
     ReferenceTypecheck adder = new ReferenceTypecheck(kb);
     adder.traverse(ast, null);
   }
@@ -61,8 +62,8 @@ public class ReferenceTypecheck extends NullDispatcher<Type, Type> {
   }
 
   @Override
-  protected Type visitReference(LinkedReferenceWithOffset_Implementation obj, Type param) {
-    Type ret = kt.get(obj.getLink());
+  protected Type visitOffsetReference(OffsetReference obj, Type param) {
+    Type ret = visit(obj.getAnchor(), param);
     for (RefItem ref : obj.getOffset()) {
       ret = visit(ref, ret);
       assert (ret != null);
@@ -71,9 +72,14 @@ public class ReferenceTypecheck extends NullDispatcher<Type, Type> {
   }
 
   @Override
+  protected Type visitLinkedAnchor(LinkedAnchor obj, Type param) {
+    return kt.get(obj.getLink());
+  }
+
+  @Override
   protected Type visitRefCall(RefCall obj, Type sub) {
     if (sub instanceof FunctionType) {
-      AstList<TypeReference> arg = ((FunctionType) sub).arg;
+      AstList<Reference> arg = ((FunctionType) sub).arg;
       AstList<Expression> argval = obj.actualParameter.value;
       if (arg.size() != argval.size()) {
         RError.err(ErrorType.Error, "Need " + arg.size() + " arguments, got " + argval.size(), obj.metadata());

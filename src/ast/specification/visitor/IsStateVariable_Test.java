@@ -29,10 +29,8 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ast.data.Named;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
-import ast.data.reference.UnlinkedReferenceWithOffset_Implementation;
-import ast.data.statement.Block;
-import ast.data.variable.FunctionVariable;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.UnlinkedAnchor;
 import ast.data.variable.StateVariable;
 import ast.meta.MetaList;
 import ast.visitor.VisitExecutor;
@@ -44,12 +42,6 @@ public class IsStateVariable_Test {
   final private RizzlyError error = mock(RizzlyError.class);
   final private IsStateVariable testee = new IsStateVariable(executor, error);
 
-  final private StateVariable stateVariable = mock(StateVariable.class);
-  final private FunctionVariable functionVariable = mock(FunctionVariable.class);
-  final private Block block = mock(Block.class);
-  final private LinkedReferenceWithOffset_Implementation linkedReference = mock(LinkedReferenceWithOffset_Implementation.class);
-  final private UnlinkedReferenceWithOffset_Implementation unlinkedReference = mock(UnlinkedReferenceWithOffset_Implementation.class);
-
   @Test
   public void is_false_by_default() {
     assertFalse(testee.isState());
@@ -57,13 +49,15 @@ public class IsStateVariable_Test {
 
   @Test
   public void returns_true_for_state_variables() {
+    StateVariable stateVariable = mock(StateVariable.class);
     testee.visit(stateVariable);
 
     assertTrue(testee.isState());
   }
 
   @Test
-  public void forwards_the_request_to_linked_for_linked_references() {
+  public void forwards_the_request_to_linked_for_linked_anchors() {
+    LinkedAnchor linkedReference = mock(LinkedAnchor.class);
     Named link = mock(Named.class);
     Mockito.when(linkedReference.getLink()).thenReturn(link);
 
@@ -73,7 +67,8 @@ public class IsStateVariable_Test {
   }
 
   @Test
-  public void does_not_support_unlinked_references() {
+  public void does_not_support_unlinked_anchor() {
+    UnlinkedAnchor unlinkedReference = mock(UnlinkedAnchor.class);
     testee.visit(unlinkedReference);
 
     verify(error).err(eq(ErrorType.Fatal), anyString(), any(MetaList.class));

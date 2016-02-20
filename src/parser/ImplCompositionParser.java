@@ -19,6 +19,7 @@ package parser;
 
 import parser.scanner.Token;
 import parser.scanner.TokenType;
+import ast.data.AstList;
 import ast.data.component.composition.AsynchroniusConnection;
 import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.Connection;
@@ -27,8 +28,9 @@ import ast.data.component.composition.EndpointRaw;
 import ast.data.component.composition.SynchroniusConnection;
 import ast.data.raw.RawComponent;
 import ast.data.raw.RawComposition;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefFactory;
+import ast.data.reference.RefItem;
 import ast.data.reference.RefName;
 import ast.data.reference.Reference;
 import ast.meta.MetaList;
@@ -113,7 +115,7 @@ public class ImplCompositionParser extends ImplBaseParser {
       RError.err(ErrorType.Error, "Expected IDENTIFIER, got " + tok.getType(), tok.getMetadata());
       return null;
     }
-    LinkedReferenceWithOffset_Implementation ref = RefFactory.oldFull(tok.getMetadata(), tok.getData());
+    OffsetReference ref = RefFactory.create(tok.getMetadata(), tok.getData(), new AstList<RefItem>());
     if (consumeIfEqual(TokenType.PERIOD)) {
       tok = expect(TokenType.IDENTIFIER);
       ref.getOffset().add(new RefName(tok.getMetadata(), tok.getData()));

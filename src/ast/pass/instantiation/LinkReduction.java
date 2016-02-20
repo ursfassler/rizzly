@@ -21,9 +21,10 @@ import main.Configuration;
 import ast.data.Ast;
 import ast.data.Named;
 import ast.data.Namespace;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefItem;
 import ast.data.reference.RefName;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
@@ -58,8 +59,9 @@ public class LinkReduction extends AstPass {
 class LinkReductionWorker extends DfsTraverser<Void, Void> {
 
   @Override
-  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
-    Ast item = obj.getLink();
+  protected Void visitOffsetReference(OffsetReference obj, Void param) {
+    LinkedAnchor anchor = (LinkedAnchor) obj.getAnchor();
+    Ast item = anchor.getLink();
     while (item instanceof Namespace) {
       RefItem next = obj.getOffset().get(0);
       obj.getOffset().remove(0);
@@ -71,8 +73,8 @@ class LinkReductionWorker extends DfsTraverser<Void, Void> {
       item = NameFilter.select(((Namespace) item).children, name.name);
       assert (item != null); // type checker should find it?
     }
-    obj.setLink((Named) item);
-    return super.visitReference(obj, param);
+    anchor.setLink((Named) item);
+    return super.visitOffsetReference(obj, param);
   }
 
 }

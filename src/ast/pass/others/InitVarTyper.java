@@ -35,6 +35,7 @@ import ast.data.expression.value.TupleValue;
 import ast.data.expression.value.UnionValue;
 import ast.data.expression.value.UnsafeUnionValue;
 import ast.data.reference.RefFactory;
+import ast.data.reference.Reference;
 import ast.data.type.Type;
 import ast.data.type.TypeRefFactory;
 import ast.data.type.base.ArrayType;
@@ -149,9 +150,11 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
       EnumType et = (EnumType) kt.get(((UnionType) type).tag.typeref);
       EnumElement value = (EnumElement) getChild(obj, et);
 
-      ReferenceExpression ref = new ReferenceExpression(RefFactory.oldFull(obj.metadata(), value));
+      Reference ref = RefFactory.withOffset(value);
       ref.metadata().add(obj.metadata());
-      NamedValue tag = new NamedValue(obj.metadata(), ((UnionType) type).tag.getName(), ref);
+      ReferenceExpression refexpr = new ReferenceExpression(ref);
+      refexpr.metadata().add(obj.metadata());
+      NamedValue tag = new NamedValue(obj.metadata(), ((UnionType) type).tag.getName(), refexpr);
 
       Expression ov = obj.value;
       NamedElement elem = (NamedElement) getChild(obj, type);

@@ -18,12 +18,12 @@
 package ast.data.variable;
 
 import ast.data.expression.Expression;
-import ast.data.type.TypeReference;
+import ast.data.reference.Reference;
 
 abstract public class DefaultVariable extends Variable {
   public Expression def;
 
-  public DefaultVariable(String name, TypeReference type, Expression def) {
+  public DefaultVariable(String name, Reference type, Expression def) {
     super(name, type);
     this.def = def;
   }

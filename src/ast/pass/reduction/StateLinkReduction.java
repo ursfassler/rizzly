@@ -21,8 +21,9 @@ import main.Configuration;
 import ast.data.Ast;
 import ast.data.Named;
 import ast.data.component.hfsm.State;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefName;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
@@ -49,8 +50,9 @@ public class StateLinkReduction extends AstPass {
 class StateLinkReductionWorker extends DfsTraverser<Void, Void> {
 
   @Override
-  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
-    Ast item = obj.getLink();
+  protected Void visitOffsetReference(OffsetReference obj, Void param) {
+    LinkedAnchor anchor = (LinkedAnchor) obj.getAnchor();
+    Ast item = anchor.getLink();
     if (item instanceof State) {
       while (!obj.getOffset().isEmpty()) {
         ast.data.reference.RefItem next = obj.getOffset().get(0);
@@ -61,9 +63,10 @@ class StateLinkReductionWorker extends DfsTraverser<Void, Void> {
           break;
         }
       }
-      obj.setLink((Named) item);
+      anchor.setLink((Named) item);
       obj.getOffset().clear();
     }
-    return super.visitReference(obj, param);
+    return super.visitOffsetReference(obj, param);
   }
+
 }

@@ -17,14 +17,13 @@
 
 package ast.data.expression.value;
 
-import ast.data.type.TypeReference;
-import ast.visitor.Visitor;
+import ast.data.reference.Reference;
 
 final public class UnsafeUnionValue extends ValueExpr {
   public NamedValue contentValue;
-  public TypeReference type;
+  public Reference type;
 
-  public UnsafeUnionValue(NamedValue contentValue, TypeReference type) {
+  public UnsafeUnionValue(NamedValue contentValue, Reference type) {
     this.contentValue = contentValue;
     this.type = type;
   }

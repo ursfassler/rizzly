@@ -18,19 +18,18 @@
 package ast.data.component.composition;
 
 import ast.data.function.Function;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.Reference;
 import ast.meta.MetaList;
-import ast.visitor.Visitor;
 
 final public class EndpointRaw extends Endpoint {
-  final public LinkedReferenceWithOffset_Implementation ref;
+  public Reference ref;
 
-  public EndpointRaw(LinkedReferenceWithOffset_Implementation ref) {
+  public EndpointRaw(Reference ref) {
     this.ref = ref;
   }
 
   @Deprecated
-  public EndpointRaw(MetaList info, LinkedReferenceWithOffset_Implementation ref) {
+  public EndpointRaw(MetaList info, Reference ref) {
     metadata().add(info);
     this.ref = ref;
   }
@@ -39,6 +38,5 @@ final public class EndpointRaw extends Endpoint {
   public Function getFunc() {
     return (Function) ref.getTarget();
   }
-
 
 }

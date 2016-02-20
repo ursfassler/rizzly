@@ -23,6 +23,7 @@ import java.util.LinkedList;
 import java.util.Map;
 
 import ast.Designator;
+import ast.data.AstList;
 import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.Connection;
 import ast.data.component.composition.EndpointRaw;
@@ -34,7 +35,9 @@ import ast.data.function.header.Slot;
 import ast.data.raw.RawComponent;
 import ast.data.raw.RawComposition;
 import ast.data.reference.LinkedAnchor;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.RefItem;
+import ast.data.reference.Reference;
+import ast.data.reference.ReferenceOffset;
 import ast.doc.compgraph.Component;
 import ast.doc.compgraph.Interface;
 import ast.doc.compgraph.SubComponent;
@@ -115,12 +118,14 @@ public class CompositionGraphMaker {
     return comp;
   }
 
-  private static Interface getIface(LinkedReferenceWithOffset_Implementation ep, Map<Designator, Interface> ifacemap, ast.knowledge.KnowledgeBase kb) {
-    assert (ep.getOffset().size() <= 1);
+  private static Interface getIface(Reference ep, Map<Designator, Interface> ifacemap, ast.knowledge.KnowledgeBase kb) {
+    AstList<RefItem> offset = ((ReferenceOffset) ep).getOffset();
 
-    Designator name = new Designator("Self", ep.getLink().getName());
-    if (!ep.getOffset().isEmpty()) {
-      name = new Designator(name, ((ast.data.reference.RefName) ep.getOffset().get(0)).name);
+    assert (offset.size() <= 1);
+
+    Designator name = new Designator("Self", ((LinkedAnchor) ep.getAnchor()).getLink().getName());
+    if (!offset.isEmpty()) {
+      name = new Designator(name, ((ast.data.reference.RefName) offset.get(0)).name);
     }
 
     Interface iface = ifacemap.get(name);

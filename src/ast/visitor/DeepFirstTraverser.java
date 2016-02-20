@@ -77,7 +77,6 @@ import ast.data.expression.value.UnionValue;
 import ast.data.expression.value.UnsafeUnionValue;
 import ast.data.file.RizzlyFile;
 import ast.data.function.Function;
-import ast.data.function.FunctionReference;
 import ast.data.function.header.FuncFunction;
 import ast.data.function.header.FuncInterrupt;
 import ast.data.function.header.FuncQuery;
@@ -94,17 +93,14 @@ import ast.data.function.template.DefaultValueTemplate;
 import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
-import ast.data.reference.LinkTarget;
 import ast.data.reference.LinkedAnchor;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.reference.OffsetReference;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
-import ast.data.reference.SimpleReference;
+import ast.data.reference.Reference;
 import ast.data.reference.UnlinkedAnchor;
-import ast.data.reference.UnlinkedReferenceWithOffset_Implementation;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
@@ -124,7 +120,6 @@ import ast.data.statement.VarDefStmt;
 import ast.data.statement.VoidReturn;
 import ast.data.statement.WhileStmt;
 import ast.data.template.Template;
-import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumElement;
@@ -464,12 +459,6 @@ public class DeepFirstTraverser implements Visitor {
     executeVisit(object.param);
     executeVisit(object.guard);
     executeVisit(object.body);
-    postorderVisit(object);
-  }
-
-  public void visit(LinkedReferenceWithOffset_Implementation object) {
-    preorderVisit(object);
-    executeVisit(object.getOffset());
     postorderVisit(object);
   }
 
@@ -932,26 +921,9 @@ public class DeepFirstTraverser implements Visitor {
     postorderVisit(object);
   }
 
-  public void visit(LinkTarget object) {
-    preorderVisit(object);
-    postorderVisit(object);
-  }
-
   public void visit(ReferenceExpression object) {
     preorderVisit(object);
     executeVisit(object.reference);
-    postorderVisit(object);
-  }
-
-  public void visit(TypeReference object) {
-    preorderVisit(object);
-    executeVisit(object.ref);
-    postorderVisit(object);
-  }
-
-  public void visit(FunctionReference object) {
-    preorderVisit(object);
-    executeVisit(object.ref);
     postorderVisit(object);
   }
 
@@ -972,16 +944,6 @@ public class DeepFirstTraverser implements Visitor {
     postorderVisit(object);
   }
 
-  public void visit(UnlinkedReferenceWithOffset_Implementation object) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  public void visit(SimpleReference object) {
-    preorderVisit(object);
-    executeVisit(object.getAnchor());
-    postorderVisit(object);
-  }
-
   public void visit(OffsetReference object) {
     preorderVisit(object);
     executeVisit(object.getAnchor());
@@ -995,6 +957,13 @@ public class DeepFirstTraverser implements Visitor {
   }
 
   public void visit(LinkedAnchor object) {
+    preorderVisit(object);
+    postorderVisit(object);
+  }
+
+  // FIXME this is an interface. Maybe we need a traversal also by reflection
+  @Deprecated
+  public void visit(Reference object) {
     preorderVisit(object);
     postorderVisit(object);
   }

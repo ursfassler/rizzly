@@ -20,9 +20,9 @@ package ast.repository.query.Referencees;
 import java.util.Set;
 
 import ast.data.Ast;
-import ast.data.reference.OldReference;
+import ast.data.reference.Reference;
 
 public interface ReferenceesReader {
-  public Set<OldReference> getReferencees(Ast target);
+  public Set<Reference> getReferencees(Ast target);
 
 }

@@ -18,18 +18,16 @@
 package ast.data.type;
 
 import ast.data.reference.RefFactory;
+import ast.data.reference.Reference;
 import ast.meta.MetaList;
 
 public class TypeRefFactory {
   @Deprecated
-  public static TypeReference create(MetaList info, Type type) {
-    TypeReference reference = new TypeReference(RefFactory.oldCreate(info, type));
-    reference.metadata().add(info);
-    return reference;
+  public static Reference create(MetaList info, Type type) {
+    return RefFactory.withOffset(info, type);
   }
 
-  public static TypeReference create(Type type) {
-    TypeReference reference = new TypeReference(RefFactory.oldCreate(type));
-    return reference;
+  public static Reference create(Type type) {
+    return RefFactory.withOffset(type);
   }
 }

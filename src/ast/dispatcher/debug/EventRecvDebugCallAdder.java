@@ -27,7 +27,7 @@ import ast.data.function.header.Procedure;
 import ast.data.function.header.Response;
 import ast.data.function.header.Slot;
 import ast.data.reference.RefFactory;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.Reference;
 import ast.data.statement.CallStmt;
 import ast.dispatcher.DfsTraverser;
 
@@ -74,7 +74,7 @@ public class EventRecvDebugCallAdder extends DfsTraverser<Void, Void> {
   private CallStmt makeCall(Function func, int numFunc) {
     // _sendMsg( numFunc );
     NumberValue arg = new NumberValue(BigInteger.valueOf(numFunc));
-    LinkedReferenceWithOffset_Implementation call = RefFactory.oldCall(func, arg);
+    Reference call = RefFactory.call(func, arg);
     return new CallStmt(call);
   }
 }

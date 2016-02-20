@@ -23,9 +23,9 @@ import ast.data.AstList;
 import ast.data.expression.Expression;
 import ast.data.expression.value.ArrayValue;
 import ast.data.expression.value.NumberValue;
+import ast.data.reference.Reference;
 import ast.data.type.Type;
 import ast.data.type.TypeRefFactory;
-import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
 import ast.data.variable.StateVariable;
 import ast.knowledge.KnowledgeBase;
@@ -58,7 +58,7 @@ class QueueVariables {
     return new ArrayValue(new AstList<Expression>());
   }
 
-  private TypeReference makeRef(Type type) {
+  private Reference makeRef(Type type) {
     return TypeRefFactory.create(info, type);
   }
 

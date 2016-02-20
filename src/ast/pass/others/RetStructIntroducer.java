@@ -29,9 +29,11 @@ import ast.data.expression.ReferenceExpression;
 import ast.data.function.Function;
 import ast.data.function.ret.FuncReturnTuple;
 import ast.data.function.ret.FunctionReturnType;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefName;
+import ast.data.reference.Reference;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.ExpressionReturn;
 import ast.data.statement.Statement;
@@ -140,11 +142,12 @@ class VarReplacer extends RefReplacer<Void> {
   }
 
   @Override
-  protected LinkedReferenceWithOffset_Implementation visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
-    super.visitReference(obj, param);
-    NamedElement elem = varMap.get(obj.getLink());
+  protected Reference visitOffsetReference(OffsetReference obj, Void param) {
+    super.visitOffsetReference(obj, param);
+    LinkedAnchor anchor = (LinkedAnchor) obj.getAnchor();
+    NamedElement elem = varMap.get(anchor.getLink());
     if (elem != null) {
-      obj.setLink(retVar);
+      anchor.setLink(retVar);
       obj.getOffset().add(0, new RefName(obj.metadata(), elem.getName()));
     }
     return obj;
@@ -168,7 +171,9 @@ class RetReplacer extends StmtReplacer<Void> {
   @Override
   protected List<Statement> visitReturnExpr(ExpressionReturn obj, Void param) {
     List<Statement> ret = new ArrayList<Statement>();
-    AssignmentSingle assignment = new AssignmentSingle(RefFactory.oldFull(obj.metadata(), retVar), obj.expression);
+    Reference ref = RefFactory.withOffset(retVar);
+    ref.metadata().add(obj.metadata());
+    AssignmentSingle assignment = new AssignmentSingle(ref, obj.expression);
     assignment.metadata().add(obj.expression.metadata());
     ret.add(assignment);
     ret.add(makeRet(obj.metadata()));
@@ -181,7 +186,7 @@ class RetReplacer extends StmtReplacer<Void> {
   }
 
   private ExpressionReturn makeRet(MetaList info) {
-    ReferenceExpression expr = new ReferenceExpression(RefFactory.oldCreate(info, retVar));
+    ReferenceExpression expr = new ReferenceExpression(RefFactory.create(info, retVar));
     expr.metadata().add(info);
     ExpressionReturn ret = new ExpressionReturn(expr);
     ret.metadata().add(info);

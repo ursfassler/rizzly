@@ -19,8 +19,9 @@ package ast.pass.reduction;
 
 import main.Configuration;
 import ast.data.Ast;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefName;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.EnumType;
 import ast.dispatcher.DfsTraverser;
@@ -52,8 +53,9 @@ public class EnumLinkReduction extends AstPass {
 class EnumLinkReductionWorker extends DfsTraverser<Void, Void> {
 
   @Override
-  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
-    Ast item = obj.getLink();
+  protected Void visitOffsetReference(OffsetReference obj, Void param) {
+    LinkedAnchor anchor = (LinkedAnchor) obj.getAnchor();
+    Ast item = anchor.getLink();
     if (item instanceof EnumType) {
       if (!obj.getOffset().isEmpty()) {
         ast.data.reference.RefItem next = obj.getOffset().get(0);
@@ -66,12 +68,13 @@ class EnumLinkReductionWorker extends DfsTraverser<Void, Void> {
           RError.err(ErrorType.Error, "Element not found: " + ((ast.data.reference.RefName) next).name, obj.metadata());
         }
         if (elem instanceof EnumElement) {
-          obj.setLink((EnumElement) elem);
+          anchor.setLink((EnumElement) elem);
         } else {
           RError.err(ErrorType.Error, "Expected enumerator element, got: " + elem.getClass().getCanonicalName(), obj.metadata());
         }
       }
     }
-    return super.visitReference(obj, param);
+    return super.visitOffsetReference(obj, param);
   }
+
 }

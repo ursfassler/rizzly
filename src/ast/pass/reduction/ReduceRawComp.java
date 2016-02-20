@@ -28,7 +28,8 @@ import ast.data.function.ret.FuncReturnNone;
 import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefName;
 import ast.data.type.Type;
@@ -175,16 +176,16 @@ class ReduceEndpoint extends NullDispatcher<Endpoint, Void> {
 
   @Override
   protected Endpoint visitEndpointRaw(EndpointRaw obj, Void param) {
-    LinkedReferenceWithOffset_Implementation ref = obj.ref;
+    OffsetReference ref = (OffsetReference) obj.ref;
 
     switch (ref.getOffset().size()) {
       case 0: {
-        Named link = ref.getLink();
+        Named link = ((LinkedAnchor) ref.getAnchor()).getLink();
         RError.ass(link instanceof Function, ref.metadata(), "expected function for: " + link.getName());
         return new EndpointSelf(ref.metadata(), FuncRefFactory.create(ref.metadata(), (Function) link));
       }
       case 1: {
-        Named link = ref.getLink();
+        Named link = ((LinkedAnchor) ref.getAnchor()).getLink();
         RError.ass(link instanceof ComponentUse, ref.metadata(), "expected compuse for: " + link.getName());
         String name = ((RefName) ref.getOffset().get(0)).name;
         return new EndpointSub(ref.metadata(), RefFactory.create(obj.metadata(), link), name);

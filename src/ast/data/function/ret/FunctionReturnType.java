@@ -17,19 +17,18 @@
 
 package ast.data.function.ret;
 
-import ast.data.type.TypeReference;
+import ast.data.reference.Reference;
 import ast.meta.MetaList;
-import ast.visitor.Visitor;
 
 final public class FunctionReturnType extends FuncReturn {
-  public TypeReference type;
+  public Reference type;
 
-  public FunctionReturnType(TypeReference type) {
+  public FunctionReturnType(Reference type) {
     this.type = type;
   }
 
   @Deprecated
-  public FunctionReturnType(MetaList info, TypeReference type) {
+  public FunctionReturnType(MetaList info, Reference type) {
     metadata().add(info);
     this.type = type;
   }

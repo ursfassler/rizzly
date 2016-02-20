@@ -18,12 +18,12 @@
 package ast.data.variable;
 
 import ast.data.Named;
-import ast.data.type.TypeReference;
+import ast.data.reference.Reference;
 
 abstract public class Variable extends Named {
-  public TypeReference type;
+  public Reference type;
 
-  public Variable(String name, TypeReference type) {
+  public Variable(String name, Reference type) {
     setName(name);
     this.type = type;
   }

@@ -37,12 +37,9 @@ import ast.data.raw.RawComponent;
 import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
-import ast.data.reference.LinkTarget;
 import ast.data.reference.LinkedAnchor;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.reference.OffsetReference;
 import ast.data.reference.Reference;
-import ast.data.reference.SimpleReference;
 import ast.data.reference.UnlinkedAnchor;
 import ast.data.statement.Block;
 import ast.data.statement.VarDefInitStmt;
@@ -144,31 +141,18 @@ class LinkerWorker extends DfsTraverser<Void, SymbolTable> {
   }
 
   @Override
-  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, SymbolTable param) {
-    if (obj.getLink() instanceof LinkTarget) {
-      String name = ((LinkTarget) obj.getLink()).getName();
-
+  protected Void visitOffsetReference(OffsetReference obj, SymbolTable param) {
+    if (obj.getAnchor() instanceof UnlinkedAnchor) {
+      String name = ((UnlinkedAnchor) obj.getAnchor()).getLinkName();
+    
       Named link = param.find(name);
       if (link == null) {
         RError.err(ErrorType.Error, "Name not found: " + name, obj.metadata());
       }
-      assert (!(link instanceof LinkTarget));
-
-      obj.setLink(link);
+    
+      obj.setAnchor(new LinkedAnchor(link));
     }
-    return super.visitReference(obj, param);
-  }
-
-  @Override
-  protected Void visitOffsetReference(OffsetReference obj, SymbolTable param) {
-    handleReference(obj, param);
     return super.visitOffsetReference(obj, param);
-  }
-
-  @Override
-  protected Void visitSimpleReference(SimpleReference obj, SymbolTable param) {
-    handleReference(obj, param);
-    return super.visitSimpleReference(obj, param);
   }
 
   private void handleReference(Reference obj, SymbolTable param) {
@@ -179,7 +163,6 @@ class LinkerWorker extends DfsTraverser<Void, SymbolTable> {
       if (link == null) {
         RError.err(ErrorType.Error, "Name not found: " + name, obj.metadata());
       }
-      assert (!(link instanceof LinkTarget));
 
       obj.setAnchor(new LinkedAnchor(link));
     }
@@ -241,8 +224,10 @@ class LinkerWorker extends DfsTraverser<Void, SymbolTable> {
     stateNames.put(obj, param);
 
     // visitList(obj.getItemList(), param);
-    visit(obj.entryFunc.getTarget().body, param);
-    visit(obj.exitFunc.getTarget().body, param);
+    Function entry = (Function) obj.entryFunc.getTarget();
+    visit(entry.body, param);
+    Function exit = (Function) obj.exitFunc.getTarget();
+    visit(exit.body, param);
 
     super.visitState(obj, param);
 

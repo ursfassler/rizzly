@@ -18,12 +18,12 @@
 package ast.repository.query.Referencees;
 
 import ast.data.Ast;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.Reference;
 
 public interface ReferenceesWriter {
 
   public void addTarget(Ast target);
 
-  public void addReferencee(LinkedReferenceWithOffset_Implementation referencee);
+  public void addReferencee(Reference referencee);
 
 }

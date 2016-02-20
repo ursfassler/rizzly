@@ -18,6 +18,7 @@
 package ast.repository.query.Referencees;
 
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -26,14 +27,24 @@ import org.junit.Assert;
 import org.junit.Test;
 
 import ast.data.Ast;
-import ast.data.AstList;
 import ast.data.Named;
-import ast.data.reference.RefItem;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.Reference;
 
 public class Referencees_Test {
   final private Referencees testee = new Referencees();
   private static final Set<Ast> EmptySet = new HashSet<Ast>();
+
+  final private Named target = mock(Named.class);
+  final private LinkedAnchor anchor = mock(LinkedAnchor.class);
+  final private Reference referencee1 = mock(Reference.class);
+  final private Reference referencee2 = mock(Reference.class);
+
+  {
+    when(anchor.getLink()).thenReturn(target);
+    when(referencee1.getAnchor()).thenReturn(anchor);
+    when(referencee2.getAnchor()).thenReturn(anchor);
+  }
 
   @Test
   public void returns_nothing_if_object_is_not_in_container() {
@@ -53,20 +64,13 @@ public class Referencees_Test {
 
   @Test
   public void returns_added_reference() {
-    Named target = mock(Named.class);
-    LinkedReferenceWithOffset_Implementation referencee = new LinkedReferenceWithOffset_Implementation(target, new AstList<RefItem>());
+    testee.addReferencee(referencee1);
 
-    testee.addReferencee(referencee);
-
-    Assert.assertEquals(set(referencee), testee.getReferencees(target));
+    Assert.assertEquals(set(referencee1), testee.getReferencees(target));
   }
 
   @Test
   public void returns_multiple_added_reference() {
-    Named target = mock(Named.class);
-    LinkedReferenceWithOffset_Implementation referencee1 = new LinkedReferenceWithOffset_Implementation(target, new AstList<RefItem>());
-    LinkedReferenceWithOffset_Implementation referencee2 = new LinkedReferenceWithOffset_Implementation(target, new AstList<RefItem>());
-
     testee.addReferencee(referencee1);
     testee.addReferencee(referencee2);
 
@@ -74,24 +78,22 @@ public class Referencees_Test {
   }
 
   @Test
-  public void adding_a_target_does_not_clear_refrencees_for_this_target() {
-    Named target = mock(Named.class);
-    LinkedReferenceWithOffset_Implementation referencee = new LinkedReferenceWithOffset_Implementation(target, new AstList<RefItem>());
-    testee.addReferencee(referencee);
+  public void adding_a_target_does_not_clear_referencees_for_this_target() {
+    testee.addReferencee(referencee1);
 
     testee.addTarget(target);
 
-    Assert.assertEquals(set(referencee), testee.getReferencees(target));
+    Assert.assertEquals(set(referencee1), testee.getReferencees(target));
   }
 
-  private Set<LinkedReferenceWithOffset_Implementation> set(LinkedReferenceWithOffset_Implementation referencee1, LinkedReferenceWithOffset_Implementation referencee2) {
-    Set<LinkedReferenceWithOffset_Implementation> ret = set(referencee1);
+  private Set<Reference> set(Reference referencee1, Reference referencee2) {
+    Set<Reference> ret = set(referencee1);
     ret.add(referencee2);
     return ret;
   }
 
-  private Set<LinkedReferenceWithOffset_Implementation> set(LinkedReferenceWithOffset_Implementation reference) {
-    Set<LinkedReferenceWithOffset_Implementation> ret = new HashSet<LinkedReferenceWithOffset_Implementation>();
+  private Set<Reference> set(Reference reference) {
+    Set<Reference> ret = new HashSet<Reference>();
     ret.add(reference);
     return ret;
   }

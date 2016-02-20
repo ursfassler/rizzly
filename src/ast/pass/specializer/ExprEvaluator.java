@@ -52,10 +52,11 @@ import ast.data.expression.value.NumberValue;
 import ast.data.expression.value.StringValue;
 import ast.data.expression.value.TupleValue;
 import ast.data.expression.value.ValueExpr;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.type.Type;
 import ast.data.type.base.RangeType;
 import ast.data.variable.Constant;
@@ -175,10 +176,10 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
   }
 
   @Override
-  protected ValueExpr visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
-    // TODO move constant evaluation to another place
-    if (obj.getLink() instanceof Constant) {
-      Constant cst = (Constant) obj.getLink();
+  protected ValueExpr visitOffsetReference(OffsetReference obj, Void param) {
+    LinkedAnchor anchor = (LinkedAnchor) obj.getAnchor();
+    if (anchor.getLink() instanceof Constant) {
+      Constant cst = (Constant) anchor.getLink();
       cst.def = visit(cst.def, param);
     }
     return visit(RefEvaluator.execute(obj, memory, kb), param);
@@ -566,11 +567,12 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
     ValueExpr expr = visit(obj.value, param);
 
     if ((expr instanceof NumberValue)) {
-      TypeEvalExecutor.eval(obj.cast.ref, kb);
-      assert (obj.cast.ref.getOffset().isEmpty());
-      assert (obj.cast.ref.getLink() instanceof RangeType);
+      TypeEvalExecutor.eval(obj.cast, kb);
+      LinkedAnchor anchor = (LinkedAnchor) obj.cast.getAnchor();
+      // assert (obj.cast.getOffset().isEmpty());
+      assert (anchor.getLink() instanceof RangeType);
 
-      Range range = ((RangeType) obj.cast.ref.getLink()).range;
+      Range range = ((RangeType) anchor.getLink()).range;
       BigInteger eval = ((NumberValue) expr).value;
 
       if (!range.contains(eval)) {

@@ -21,7 +21,8 @@ import java.util.Collection;
 
 import ast.data.Ast;
 import ast.data.function.Function;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.UnlinkedAnchor;
 import ast.dispatcher.DfsTraverser;
 import ast.doc.SimpleGraph;
 
@@ -54,15 +55,20 @@ public class DepGraph extends DfsTraverser<Void, Ast> {
   }
 
   @Override
-  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Ast param) {
-    super.visitReference(obj, param);
-    visit(obj.getLink(), obj);
+  protected Void visitFunction(Function obj, Ast param) {
+    return super.visitFunction(obj, param);
+  }
+
+  @Override
+  protected Void visitLinkedAnchor(LinkedAnchor obj, Ast param) {
+    super.visitLinkedAnchor(obj, param);
+    visit(obj.getLink(), param);
     return null;
   }
 
   @Override
-  protected Void visitFunction(Function obj, Ast param) {
-    return super.visitFunction(obj, param);
+  protected Void visitUnlinkedAnchor(UnlinkedAnchor obj, Ast param) {
+    throw new RuntimeException("not yet implemented");
   }
 
 }

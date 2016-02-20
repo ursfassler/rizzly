@@ -46,7 +46,7 @@ import ast.data.expression.unop.Uminus;
 import ast.data.expression.value.BooleanValue;
 import ast.data.expression.value.NumberValue;
 import ast.data.expression.value.StringValue;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.OffsetReference;
 import ast.data.type.Type;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumType;
@@ -127,7 +127,7 @@ public class ExpressionTypecheck extends DfsTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
+  protected Void visitOffsetReference(OffsetReference obj, Void param) {
     ReferenceTypecheck.process(obj, kb);
     return null;
   }

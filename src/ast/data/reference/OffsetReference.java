@@ -57,6 +57,9 @@ public class OffsetReference extends AstBase implements Reference, ReferenceOffs
   @Override
   @Deprecated
   public Named getTarget() {
+    if (!getOffset().isEmpty()) {
+      assert (false);
+    }
     assert (getOffset().isEmpty()); // FIXME make it correct or remove function
     return anchor.getTarget();
   }

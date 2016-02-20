@@ -20,10 +20,9 @@ package ast.pass.specializer;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
-import ast.data.reference.LinkedReferenceWithOffset;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefTemplCall;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
-import ast.data.reference.ReferenceWithOffset;
 import ast.data.template.ActualTemplateArgument;
 import ast.data.template.Template;
 import ast.dispatcher.DfsTraverser;
@@ -48,23 +47,24 @@ public class TypeEvalExecutor extends DfsTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
-    super.visitReference(obj, param);
+  protected Void visitOffsetReference(OffsetReference obj, Void param) {
+    super.visitOffsetReference(obj, param);
 
-    if (obj.getLink() instanceof Template) {
+    if (((LinkedAnchor) obj.getAnchor()).getLink() instanceof Template) {
       evalRefToTempl(obj);
     }
     return null;
   }
 
-  private void evalRefToTempl(LinkedReferenceWithOffset obj) {
-    Template template = (Template) obj.getLink();
+  private void evalRefToTempl(OffsetReference obj) {
+    LinkedAnchor anchor = (LinkedAnchor) obj.getAnchor();
+    Template template = (Template) anchor.getLink();
     AstList<ActualTemplateArgument> arg = extractArg(obj);
     Named evaluated = Specializer.specialize(template, arg, kb);
-    obj.setLink(evaluated);
+    anchor.setLink(evaluated);
   }
 
-  private static AstList<ActualTemplateArgument> extractArg(ReferenceWithOffset obj) {
+  private static AstList<ActualTemplateArgument> extractArg(OffsetReference obj) {
     AstList<ActualTemplateArgument> arg = new AstList<ActualTemplateArgument>();
     if (!obj.getOffset().isEmpty()) {
       if (obj.getOffset().get(0) instanceof RefTemplCall) {

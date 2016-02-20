@@ -21,13 +21,13 @@ import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 
 import ast.data.expression.Expression;
-import ast.data.type.TypeReference;
+import ast.data.reference.Reference;
 
 public class VariableFactory {
-  static public <T extends Variable> T create(Class<T> kind, String name, TypeReference type, Expression def) {
+  static public <T extends Variable> T create(Class<T> kind, String name, Reference type, Expression def) {
     T ret = null;
     try {
-      Constructor<T> c = kind.getDeclaredConstructor(String.class, TypeReference.class, Expression.class);
+      Constructor<T> c = kind.getDeclaredConstructor(String.class, Reference.class, Expression.class);
       ret = c.newInstance(name, type, def);
     } catch (InstantiationException e) {
       e.printStackTrace();
@@ -45,10 +45,10 @@ public class VariableFactory {
     return ret;
   }
 
-  static public <T extends Variable> T create(Class<T> kind, String name, TypeReference type) {
+  static public <T extends Variable> T create(Class<T> kind, String name, Reference type) {
     T ret = null;
     try {
-      Constructor<T> c = kind.getDeclaredConstructor(String.class, TypeReference.class);
+      Constructor<T> c = kind.getDeclaredConstructor(String.class, Reference.class);
       ret = c.newInstance(name, type);
     } catch (InstantiationException e) {
       e.printStackTrace();

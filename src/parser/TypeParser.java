@@ -28,9 +28,8 @@ import ast.data.AstList;
 import ast.data.Named;
 import ast.data.function.Function;
 import ast.data.raw.RawComponent;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.Reference;
 import ast.data.type.Type;
-import ast.data.type.TypeReference;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.EnumTypeFactory;
 import ast.data.type.composed.NamedElement;
@@ -114,11 +113,9 @@ public class TypeParser extends BaseParser {
 
   // EBNF derivatetype: ref ";"
   private AliasType parseDerivateType(String name) {
-    LinkedReferenceWithOffset_Implementation ref = expr().oldParseRef();
+    Reference typeref = expr().parseRef();
     expect(TokenType.SEMI);
-    TypeReference typeref = new TypeReference(ref);
-    typeref.metadata().add(ref.metadata());
-    return new AliasType(ref.metadata(), name, typeref);
+    return new AliasType(typeref.metadata(), name, typeref);
   }
 
   // EBNF recordtype: "Record" { recordElem } "end"
@@ -171,12 +168,12 @@ public class TypeParser extends BaseParser {
       id.add(expect(TokenType.IDENTIFIER));
     } while (consumeIfEqual(TokenType.COMMA));
     expect(TokenType.COLON);
-    TypeReference type = expr().parseRefType();
+    Reference type = expr().parseRefType();
     expect(TokenType.SEMI);
 
     List<NamedElement> res = new ArrayList<NamedElement>(id.size());
     for (Token name : id) {
-      TypeReference ctype = Copy.copy(type);
+      Reference ctype = Copy.copy(type);
       res.add(new NamedElement(name.getMetadata(), name.getData(), ctype));
     }
 

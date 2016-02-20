@@ -41,8 +41,8 @@ import ast.data.expression.ReferenceExpression;
 import ast.data.function.Function;
 import ast.data.function.header.Procedure;
 import ast.data.function.ret.FuncReturnNone;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.reference.RefFactory;
+import ast.data.reference.Reference;
 import ast.data.statement.Assignment;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
@@ -172,11 +172,11 @@ class TransitionDownPropagatorWorker extends NullDispatcher<Void, TransitionPara
 
       AstList<Expression> arg = new AstList<Expression>();
       for (Variable acpar : trans.param) {
-        LinkedReferenceWithOffset_Implementation parref = RefFactory.oldFull(acpar);
+        Reference parref = RefFactory.withOffset(acpar);
         arg.add(new ReferenceExpression(parref));
       }
 
-      LinkedReferenceWithOffset_Implementation ref = RefFactory.oldCall(func, arg);
+      Reference ref = RefFactory.call(func, arg);
       CallStmt call = new CallStmt(ref);
       trans.body.statements.add(call);
     }
@@ -196,7 +196,7 @@ class TransitionDownPropagatorWorker extends NullDispatcher<Void, TransitionPara
     makeVarInit(par, top, list);
 
     for (StateVariable var : TypeFilter.select(start.item, StateVariable.class)) {
-      Assignment init = new AssignmentSingle(RefFactory.oldFull(var), Copy.copy(var.def));
+      Assignment init = new AssignmentSingle(RefFactory.withOffset(var), Copy.copy(var.def));
       init.metadata().add(var.def.metadata());
       list.add(init);
     }
@@ -210,7 +210,7 @@ class TransitionDownPropagatorWorker extends NullDispatcher<Void, TransitionPara
     assert (par != null);
 
     makeEntryCalls(par, top, list);
-    list.add(makeCall(start.entryFunc.getTarget()));
+    list.add(makeCall((Function) start.entryFunc.getTarget()));
   }
 
   private StateComposite getParent(State start) {
@@ -229,12 +229,12 @@ class TransitionDownPropagatorWorker extends NullDispatcher<Void, TransitionPara
     StateComposite par = getParent(start);
     assert (par != null);
 
-    list.add(makeCall(start.exitFunc.getTarget()));
+    list.add(makeCall((Function) start.exitFunc.getTarget()));
     makeExitCalls(par, top, list);
   }
 
   private CallStmt makeCall(Function func) {
-    LinkedReferenceWithOffset_Implementation ref = RefFactory.oldCall(func);
+    Reference ref = RefFactory.call(func);
     return new CallStmt(ref);
   }
 

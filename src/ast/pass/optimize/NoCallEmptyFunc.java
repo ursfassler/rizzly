@@ -9,6 +9,7 @@ import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.function.Function;
 import ast.data.function.FunctionProperty;
+import ast.data.reference.LinkedAnchor;
 import ast.data.statement.CallStmt;
 import ast.data.statement.Statement;
 import ast.dispatcher.other.StmtReplacer;
@@ -36,8 +37,10 @@ class NoCallEmptyFuncWorker extends StmtReplacer<Function> {
 
   @Override
   protected List<Statement> visitCallStmt(CallStmt obj, Function param) {
-    if (obj.call.getLink() instanceof Function) {
-      Function func = (Function) obj.call.getLink();
+    LinkedAnchor anchor = (LinkedAnchor) obj.call.getAnchor();
+
+    if (anchor.getLink() instanceof Function) {
+      Function func = (Function) anchor.getLink();
 
       if (!keep.contains(func) && !remove.contains(func)) {
         check(func, param);

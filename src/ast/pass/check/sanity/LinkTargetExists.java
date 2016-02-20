@@ -23,7 +23,7 @@ import java.util.Set;
 import main.Configuration;
 import ast.data.Ast;
 import ast.data.Namespace;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.LinkedAnchor;
 import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
@@ -67,9 +67,9 @@ class LinkOkWorker extends DfsTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
+  protected Void visitLinkedAnchor(LinkedAnchor obj, Void param) {
     target.add(obj.getLink());
-    return super.visitReference(obj, param);
+    return super.visitLinkedAnchor(obj, param);
   }
 
 }

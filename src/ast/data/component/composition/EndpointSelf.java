@@ -17,33 +17,31 @@
 
 package ast.data.component.composition;
 
-import ast.data.function.FunctionReference;
 import ast.data.function.Function;
+import ast.data.reference.Reference;
 import ast.meta.MetaList;
-import ast.visitor.Visitor;
 
 final public class EndpointSelf extends Endpoint {
-  final public FunctionReference funcRef;
+  final public Reference funcRef;
 
-  public EndpointSelf(FunctionReference funcRef) {
+  public EndpointSelf(Reference funcRef) {
     this.funcRef = funcRef;
   }
 
   @Deprecated
-  public EndpointSelf(MetaList info, FunctionReference funcRef) {
+  public EndpointSelf(MetaList info, Reference funcRef) {
     metadata().add(info);
     this.funcRef = funcRef;
   }
 
   @Override
   public Function getFunc() {
-    return funcRef.getTarget();
+    return (Function) funcRef.getTarget();
   }
 
   @Override
   public String toString() {
     return "self." + funcRef.getTarget().getName();
   }
-
 
 }

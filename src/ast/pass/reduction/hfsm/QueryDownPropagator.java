@@ -36,7 +36,7 @@ import ast.data.expression.ReferenceExpression;
 import ast.data.function.header.FuncFunction;
 import ast.data.function.header.Response;
 import ast.data.reference.RefFactory;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.statement.ExpressionReturn;
 import ast.data.variable.Variable;
@@ -110,9 +110,9 @@ class QueryDownPropagatorWorker extends NullDispatcher<Void, QueryParam> {
 
       AstList<Expression> acpar = new AstList<Expression>();
       for (Variable par : cfunc.param) {
-        acpar.add(new ReferenceExpression(RefFactory.oldFull(par)));
+        acpar.add(new ReferenceExpression(RefFactory.withOffset(par)));
       }
-      LinkedReferenceWithOffset_Implementation call = RefFactory.oldCall(map.get(func), acpar);
+      Reference call = RefFactory.call(map.get(func), acpar);
       cfunc.body.statements.add(new ExpressionReturn(new ReferenceExpression(call)));
 
       obj.item.add(cfunc); // TODO ok or copy?

@@ -18,20 +18,19 @@
 package ast.data.type.composed;
 
 import ast.data.Named;
-import ast.data.type.TypeReference;
+import ast.data.reference.Reference;
 import ast.meta.MetaList;
-import ast.visitor.Visitor;
 
 final public class NamedElement extends Named {
-  public TypeReference typeref;
+  public Reference typeref;
 
-  public NamedElement(String name, TypeReference typeref) {
+  public NamedElement(String name, Reference typeref) {
     setName(name);
     this.typeref = typeref;
   }
 
   @Deprecated
-  public NamedElement(MetaList info, String name, TypeReference typeref) {
+  public NamedElement(MetaList info, String name, Reference typeref) {
     metadata().add(info);
     setName(name);
     this.typeref = typeref;
@@ -41,6 +40,5 @@ final public class NamedElement extends Named {
   public String toString() {
     return getName() + typeref;
   }
-
 
 }

@@ -19,13 +19,16 @@ package ast.pass.specializer;
 
 import java.util.Map;
 
-import ast.data.reference.LinkTarget;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.Named;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefFactory;
+import ast.data.reference.Reference;
 import ast.data.type.Type;
 import ast.data.variable.TemplateParameter;
 import ast.dispatcher.other.RefReplacer;
 
+//TODO do not inherit from RefReplacer; change reference direct
 public class TypeSpecTrav extends RefReplacer<Void> {
   final private Map<TemplateParameter, Type> types;
 
@@ -35,14 +38,14 @@ public class TypeSpecTrav extends RefReplacer<Void> {
   }
 
   @Override
-  protected LinkedReferenceWithOffset_Implementation visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
-    assert (!(obj.getLink() instanceof LinkTarget));
-    super.visitReference(obj, param);
+  protected Reference visitOffsetReference(OffsetReference obj, Void param) {
+    Named link = ((LinkedAnchor) obj.getAnchor()).getLink();
+    super.visitOffsetReference(obj, param);
 
-    if (types.containsKey(obj.getLink())) {
+    if (types.containsKey(link)) {
       assert (obj.getOffset().isEmpty());
-      Type repl = types.get(obj.getLink());
-      return RefFactory.oldFull(obj.metadata(), repl);
+      Type repl = types.get(link);
+      return RefFactory.withOffset(obj.metadata(), repl);
     }
 
     return obj;

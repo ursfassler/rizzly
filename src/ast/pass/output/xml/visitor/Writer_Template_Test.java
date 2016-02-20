@@ -26,8 +26,8 @@ import org.mockito.Mockito;
 
 import ast.data.AstList;
 import ast.data.Named;
+import ast.data.reference.Reference;
 import ast.data.template.Template;
-import ast.data.type.TypeReference;
 import ast.data.variable.TemplateParameter;
 import ast.pass.output.xml.IdReader;
 import ast.visitor.VisitExecutor;
@@ -60,7 +60,7 @@ public class Writer_Template_Test {
 
   @Test
   public void write_TemplateParameter() {
-    TypeReference typeReference = mock(TypeReference.class);
+    Reference typeReference = mock(Reference.class);
     TemplateParameter item = new TemplateParameter("the param", typeReference);
 
     testee.visit(item);

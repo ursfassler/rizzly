@@ -19,7 +19,7 @@ package ast.pass.check.type;
 
 import ast.data.Ast;
 import ast.data.AstList;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.Reference;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
@@ -39,16 +39,15 @@ import ast.data.statement.VoidReturn;
 import ast.data.statement.WhileStmt;
 import ast.data.type.Type;
 import ast.data.type.TypeRefFactory;
-import ast.data.type.TypeReference;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.RangeType;
 import ast.data.type.base.TupleType;
 import ast.data.type.special.IntegerType;
-import ast.data.variable.GlobalConstant;
 import ast.data.variable.ConstPrivate;
 import ast.data.variable.Constant;
 import ast.data.variable.FunctionVariable;
+import ast.data.variable.GlobalConstant;
 import ast.data.variable.StateVariable;
 import ast.data.variable.Variable;
 import ast.dispatcher.NullDispatcher;
@@ -229,14 +228,14 @@ public class StatementTypecheck extends NullDispatcher<Void, Void> {
   @Override
   protected Void visitAssignmentMulti(MultiAssignment obj, Void param) {
     AstList<Type> ll = new AstList<Type>();
-    for (LinkedReferenceWithOffset_Implementation ref : obj.left) {
+    for (Reference ref : obj.left) {
       ll.add(checkGetExpr(ref));
     }
     Type lhs;
     if (ll.size() == 1) {
       lhs = ll.get(0);
     } else {
-      AstList<TypeReference> tl = new AstList<TypeReference>();
+      AstList<Reference> tl = new AstList<Reference>();
       for (Type lt : ll) {
         tl.add(TypeRefFactory.create(lt.metadata(), lt));
       }

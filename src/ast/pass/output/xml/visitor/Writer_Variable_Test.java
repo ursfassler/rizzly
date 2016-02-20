@@ -25,7 +25,7 @@ import org.mockito.InOrder;
 import org.mockito.Mockito;
 
 import ast.data.expression.Expression;
-import ast.data.type.TypeReference;
+import ast.data.reference.Reference;
 import ast.data.variable.FunctionVariable;
 import ast.data.variable.GlobalConstant;
 import ast.data.variable.StateVariable;
@@ -39,7 +39,7 @@ public class Writer_Variable_Test {
   final private Visitor idWriter = mock(Visitor.class);
   final private VisitExecutor executor = mock(VisitExecutor.class);
   final private Write testee = new Write(stream, astId, idWriter, executor);
-  final private TypeReference type = mock(TypeReference.class);
+  final private Reference type = mock(Reference.class);
   final private Expression defaultValue = mock(Expression.class);
   final private InOrder order = Mockito.inOrder(stream, idWriter, executor);
 

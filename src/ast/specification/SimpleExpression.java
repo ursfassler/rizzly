@@ -27,17 +27,17 @@ import ast.data.expression.value.BooleanValue;
 import ast.data.expression.value.NumberValue;
 import ast.data.expression.value.StringValue;
 import ast.data.function.Function;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefName;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.EnumType;
 import ast.data.type.base.RangeType;
 import ast.data.type.composed.RecordType;
 import ast.data.type.special.NaturalType;
-import ast.data.variable.GlobalConstant;
 import ast.data.variable.FunctionVariable;
+import ast.data.variable.GlobalConstant;
 import ast.data.variable.StateVariable;
 import ast.dispatcher.NullDispatcher;
 
@@ -70,8 +70,8 @@ class SimpleGetter extends NullDispatcher<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
-    boolean ret = visit(obj.getLink(), param) & visitList(obj.getOffset(), param);
+  protected Boolean visitOffsetReference(OffsetReference obj, Void param) {
+    boolean ret = visit(obj.getAnchor(), param) & visitList(obj.getOffset(), param);
     return ret;
   }
 

@@ -20,8 +20,8 @@ package ast.specification;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.function.Function;
-import ast.data.reference.LinkedReference;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.Reference;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.CallStmt;
 import ast.data.statement.MultiAssignment;
@@ -63,8 +63,8 @@ class StateChangeDispatcher extends NullDispatcher<Boolean, Void> {
     return isImpure(obj.call);
   }
 
-  private boolean isImpure(LinkedReference call) {
-    Function target = (Function) call.getLink();
+  private boolean isImpure(Reference call) {
+    Function target = (Function) ((LinkedAnchor) call.getAnchor()).getLink();
     return !pureFunc.isSatisfiedBy(target);
   }
 
@@ -76,9 +76,9 @@ class StateChangeDispatcher extends NullDispatcher<Boolean, Void> {
     return isStateVariable.isState();
   }
 
-  private boolean containsStateVar(AstList<LinkedReferenceWithOffset_Implementation> vars) {
-    for (LinkedReference left : vars) {
-      if (isStateVar(left.getLink())) {
+  private boolean containsStateVar(AstList<Reference> vars) {
+    for (Reference left : vars) {
+      if (isStateVar(((LinkedAnchor) left.getAnchor()).getLink())) {
         return true;
       }
     }

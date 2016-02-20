@@ -13,6 +13,8 @@ import ast.data.expression.Expression;
 import ast.data.expression.value.TupleValue;
 import ast.data.function.Function;
 import ast.data.function.FunctionProperty;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefFactory;
 import ast.data.statement.AssignmentSingle;
@@ -65,15 +67,18 @@ class FuncInlinerWorker extends StmtReplacer<Void> {
 
   @Override
   protected List<Statement> visitCallStmt(CallStmt obj, Void param) {
-    if (obj.call.getLink() instanceof Function) {
-      Function func = (Function) obj.call.getLink();
+    OffsetReference callref = (OffsetReference) obj.call;
+    LinkedAnchor anchor = (LinkedAnchor) callref.getAnchor();
+
+    if (anchor.getLink() instanceof Function) {
+      Function func = (Function) anchor.getLink();
 
       List<Statement> fr = visit(func, param);
       assert (fr == null);
 
       if (canInline(func)) {
-        assert (obj.call.getOffset().size() == 1);
-        RefCall call = (RefCall) obj.call.getOffset().get(0);
+        assert (callref.getOffset().size() == 1);
+        RefCall call = (RefCall) callref.getOffset().get(0);
         return inline(func, call.actualParameter);
       }
     }
@@ -122,7 +127,7 @@ class FuncInlinerWorker extends StmtReplacer<Void> {
 
       VarDefStmt def = new VarDefStmt(inner);
       def.metadata().add(inner.metadata());
-      AssignmentSingle ass = new AssignmentSingle(RefFactory.oldFull(inner), arg);
+      AssignmentSingle ass = new AssignmentSingle(RefFactory.withOffset(inner), arg);
       ass.metadata().add(arg.metadata());
 
       ret.add(def);

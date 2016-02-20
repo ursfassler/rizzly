@@ -23,13 +23,14 @@ import java.util.Set;
 import ast.data.Ast;
 import ast.data.component.hfsm.Transition;
 import ast.data.function.Function;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefItem;
 import ast.data.reference.RefName;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.Reference;
 import ast.data.type.Type;
-import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
 import ast.data.type.composed.NamedElement;
 import ast.data.variable.Variable;
@@ -81,13 +82,13 @@ public class CallgraphMaker extends DfsTraverser<Void, Ast> {
   }
 
   @Override
-  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Ast param) {
-    super.visitReference(obj, param);
+  protected Void visitOffsetReference(OffsetReference obj, Ast param) {
+    super.visitOffsetReference(obj, param);
 
     if (param != null) {
       Set<Function> target = new HashSet<Function>();
 
-      Ast item = obj.getLink();
+      Ast item = ((LinkedAnchor) obj.getAnchor()).getLink();
       for (RefItem itr : obj.getOffset()) {
         item = RefGetter.process(itr, item, target, kb);
       }
@@ -99,6 +100,7 @@ public class CallgraphMaker extends DfsTraverser<Void, Ast> {
     }
     return null;
   }
+
 }
 
 // FIXME make it cleaner
@@ -139,14 +141,14 @@ class RefGetter extends NullDispatcher<Ast, Ast> {
 
     // FIXME remove this hack
     if (param instanceof Variable) {
-      param = (((Variable) param).type).ref.getTarget();
+      param = (((Variable) param).type).getTarget();
     } else if (param instanceof NamedElement) {
-      param = (((NamedElement) param).typeref).ref.getTarget();
-    } else if (param instanceof LinkedReferenceWithOffset_Implementation) {
-      param = ((LinkedReferenceWithOffset_Implementation) param).getTarget();
+      param = (((NamedElement) param).typeref).getTarget();
+    } else if (param instanceof Reference) {
+      param = ((Reference) param).getTarget();
     }
-    if (param instanceof TypeReference) {
-      param = ((TypeReference) param).ref.getTarget();
+    if (param instanceof Reference) {
+      param = ((Reference) param).getTarget();  // TODO needed?
     }
 
     return ChildByName.get(param, obj.name, obj.metadata());

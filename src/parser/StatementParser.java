@@ -23,7 +23,8 @@ import ast.copy.Copy;
 import ast.data.AstList;
 import ast.data.expression.Expression;
 import ast.data.expression.value.AnyValue;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.Reference;
+import ast.data.reference.ReferenceOffset;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.CaseOpt;
@@ -40,7 +41,6 @@ import ast.data.statement.Statement;
 import ast.data.statement.VarDefInitStmt;
 import ast.data.statement.VoidReturn;
 import ast.data.statement.WhileStmt;
-import ast.data.type.TypeReference;
 import ast.data.variable.FunctionVariable;
 import ast.meta.MetaList;
 import error.ErrorType;
@@ -84,9 +84,9 @@ public class StatementParser extends BaseParser {
   }
 
   // EBNF vardefstmt: lhs ":" ref [ "=" expr ] ";"
-  private VarDefInitStmt parseVarDefStmt(AstList<LinkedReferenceWithOffset_Implementation> lhs) {
+  private VarDefInitStmt parseVarDefStmt(AstList<Reference> lhs) {
     MetaList info = expect(TokenType.COLON).getMetadata();
-    TypeReference type = expr().parseRefType();
+    Reference type = expr().parseRefType();
 
     Expression initial;
     if (consumeIfEqual(TokenType.EQUAL)) {
@@ -99,13 +99,13 @@ public class StatementParser extends BaseParser {
     expect(TokenType.SEMI);
 
     AstList<FunctionVariable> variables = new AstList<FunctionVariable>();
-    for (LinkedReferenceWithOffset_Implementation ref : lhs) {
-      if (!ref.getOffset().isEmpty()) {
+    for (Reference ref : lhs) {
+      if (!((ReferenceOffset) ref).getOffset().isEmpty()) {
         RError.err(ErrorType.Error, "expected identifier", ref.metadata());
       }
 
-      TypeReference ntype = Copy.copy(type);
-      FunctionVariable var = new FunctionVariable(ref.getLink().getName(), ntype);
+      Reference ntype = Copy.copy(type);
+      FunctionVariable var = new FunctionVariable(ref.getAnchor().targetName(), ntype);
       var.metadata().add(ref.metadata());
       variables.add(var);
     }
@@ -189,7 +189,7 @@ public class StatementParser extends BaseParser {
 
     String name = expect(TokenType.IDENTIFIER).getData();
     expect(TokenType.IN);
-    TypeReference type = expr().parseRefType();
+    Reference type = expr().parseRefType();
     expect(TokenType.DO);
     Block block = parseBlock();
     expect(TokenType.END);
@@ -255,7 +255,7 @@ public class StatementParser extends BaseParser {
   }
 
   private Statement parseVardefOrAssignmentOrCallstmt() {
-    AstList<LinkedReferenceWithOffset_Implementation> lhs = parseLhs();
+    AstList<Reference> lhs = parseLhs();
     Token tok = peek();
     switch (tok.getType()) {
       case COLON: {
@@ -279,16 +279,16 @@ public class StatementParser extends BaseParser {
   }
 
   // EBNF lhs: varref { "," varref }
-  private AstList<LinkedReferenceWithOffset_Implementation> parseLhs() {
-    AstList<LinkedReferenceWithOffset_Implementation> lhs = new AstList<LinkedReferenceWithOffset_Implementation>();
+  private AstList<Reference> parseLhs() {
+    AstList<Reference> lhs = new AstList<Reference>();
     do {
-      lhs.add(expr().oldParseRef());
+      lhs.add(expr().parseRef());
     } while (consumeIfEqual(TokenType.COMMA));
     return lhs;
   }
 
   // EBNF assignment: lhs ":=" expr ";"
-  private MultiAssignment parseAssignment(AstList<LinkedReferenceWithOffset_Implementation> ref) {
+  private MultiAssignment parseAssignment(AstList<Reference> ref) {
     Token tok = expect(TokenType.BECOMES);
     Expression rhs = expr().parse();
     expect(TokenType.SEMI);

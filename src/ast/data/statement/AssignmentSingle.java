@@ -18,13 +18,12 @@
 package ast.data.statement;
 
 import ast.data.expression.Expression;
-import ast.data.reference.OldReference;
-import ast.visitor.Visitor;
+import ast.data.reference.Reference;
 
 final public class AssignmentSingle extends Assignment {
-  public OldReference left;
+  public Reference left;
 
-  public AssignmentSingle(OldReference left, Expression right) {
+  public AssignmentSingle(Reference left, Expression right) {
     super(right);
     this.left = left;
   }

@@ -21,11 +21,10 @@ import ast.data.AstList;
 import ast.data.component.Component;
 import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.SubCallbacks;
-import ast.data.function.FunctionReference;
+import ast.data.reference.Reference;
 import ast.data.type.Type;
 import ast.data.variable.Constant;
 import ast.data.variable.Variable;
-import ast.visitor.Visitor;
 
 final public class ImplElementary extends Component {
   final public AstList<Type> type = new AstList<Type>();
@@ -33,10 +32,10 @@ final public class ImplElementary extends Component {
   final public AstList<Constant> constant = new AstList<Constant>();
   final public AstList<ComponentUse> component = new AstList<ComponentUse>();
   final public AstList<SubCallbacks> subCallback = new AstList<SubCallbacks>();
-  public FunctionReference entryFunc;
-  public FunctionReference exitFunc;
+  public Reference entryFunc;
+  public Reference exitFunc;
 
-  public ImplElementary(String name, FunctionReference entryFunc, FunctionReference exitFunc) {
+  public ImplElementary(String name, Reference entryFunc, Reference exitFunc) {
     super(name);
     this.entryFunc = entryFunc;
     this.exitFunc = exitFunc;
@@ -51,6 +50,5 @@ final public class ImplElementary extends Component {
     }
     return null;
   }
-
 
 }

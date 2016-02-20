@@ -60,20 +60,17 @@ import ast.data.expression.value.TupleValue;
 import ast.data.expression.value.UnionValue;
 import ast.data.expression.value.UnsafeUnionValue;
 import ast.data.function.Function;
-import ast.data.function.FunctionReference;
 import ast.data.function.InterfaceFunction;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FuncReturnTuple;
 import ast.data.function.ret.FunctionReturnType;
 import ast.data.reference.LinkedAnchor;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.reference.OffsetReference;
 import ast.data.reference.RefItem;
-import ast.data.reference.SimpleReference;
+import ast.data.reference.Reference;
 import ast.data.reference.UnlinkedAnchor;
 import ast.data.type.Type;
 import ast.data.type.TypeRefFactory;
-import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayTypeFactory;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumElement;
@@ -149,16 +146,6 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
   }
 
   @Override
-  protected Type visitTypeRef(TypeReference obj, Void param) {
-    return visit(obj.ref, param);
-  }
-
-  @Override
-  protected Type visitFuncRef(FunctionReference obj, Void param) {
-    return visit(obj.ref, param);
-  }
-
-  @Override
   protected Type visitNamedElement(NamedElement obj, Void param) {
     return visit(obj.typeref, param);
   }
@@ -170,7 +157,7 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
 
   @Override
   protected Type visitFunction(Function obj, Void param) {
-    AstList<TypeReference> arg = new AstList<TypeReference>();
+    AstList<Reference> arg = new AstList<Reference>();
     for (FunctionVariable var : obj.param) {
       arg.add(TypeRefFactory.create(visit(var.type, null)));
     }
@@ -222,9 +209,9 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
     if (obj.value.size() == 1) {
       return visit(obj.value.get(0), param);
     } else {
-      AstList<TypeReference> elem = new AstList<TypeReference>();
+      AstList<Reference> elem = new AstList<Reference>();
       for (Expression expr : obj.value) {
-        TypeReference ref = TypeRefFactory.create(expr.metadata(), visit(expr, null));
+        Reference ref = TypeRefFactory.create(expr.metadata(), visit(expr, null));
         elem.add(ref);
       }
       return new TupleType(obj.metadata(), "", elem);
@@ -249,26 +236,12 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
   }
 
   @Override
-  protected Type visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
-    Type base = visit(obj.getLink(), param);
-    for (RefItem itm : obj.getOffset()) {
-      base = rtg.traverse(itm, base);
-    }
-    return base;
-  }
-
-  @Override
   protected Type visitOffsetReference(OffsetReference obj, Void param) {
     Type base = visit(obj.getAnchor(), param);
     for (RefItem itm : obj.getOffset()) {
       base = rtg.traverse(itm, base);
     }
     return base;
-  }
-
-  @Override
-  protected Type visitSimpleReference(SimpleReference obj, Void param) {
-    return visit(obj.getAnchor(), param);
   }
 
   @Override

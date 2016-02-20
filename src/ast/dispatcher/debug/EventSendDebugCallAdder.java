@@ -25,11 +25,12 @@ import ast.Designator;
 import ast.data.Ast;
 import ast.data.expression.value.NumberValue;
 import ast.data.function.Function;
-import ast.data.function.header.Procedure;
 import ast.data.function.header.FuncQuery;
+import ast.data.function.header.Procedure;
 import ast.data.function.header.Signal;
+import ast.data.reference.LinkedAnchor;
 import ast.data.reference.RefFactory;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.MsgPush;
@@ -95,8 +96,8 @@ class StmtTraverser extends DfsTraverser<Void, List<Statement>> {
   }
 
   @Override
-  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, List<Statement> param) {
-    super.visitReference(obj, param);
+  protected Void visitLinkedAnchor(LinkedAnchor obj, List<Statement> param) {
+    super.visitLinkedAnchor(obj, param);
 
     boolean isOut = (obj.getLink() instanceof FuncQuery) || (obj.getLink() instanceof Signal);
 
@@ -118,7 +119,7 @@ class StmtTraverser extends DfsTraverser<Void, List<Statement>> {
   private CallStmt makeCall(Procedure func, int numFunc) {
     // Self._sendMsg( numFunc );
     NumberValue arg = new NumberValue(BigInteger.valueOf(numFunc));
-    LinkedReferenceWithOffset_Implementation call = RefFactory.oldCall(func, arg);
+    Reference call = RefFactory.call(func, arg);
     return new CallStmt(call);
   }
 }

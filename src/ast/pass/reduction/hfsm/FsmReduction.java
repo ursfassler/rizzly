@@ -43,8 +43,8 @@ import ast.data.function.header.Response;
 import ast.data.function.header.Signal;
 import ast.data.function.header.Slot;
 import ast.data.function.ret.FuncReturnNone;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.reference.RefFactory;
+import ast.data.reference.Reference;
 import ast.data.statement.Assignment;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
@@ -168,7 +168,7 @@ class Reduction {
     // String ena = (String)
     // enumMap.get(obj.getTopstate().getInitial()).properties().get(Property.NAME);
     EnumElement ena = enumMap.get(obj.topstate.initial.getTarget());
-    LinkedReferenceWithOffset_Implementation initState = makeEnumElemRef(states, ena);
+    Reference initState = makeEnumElemRef(states, ena);
     StateVariable stateVariable = new StateVariable("_statevar", TypeRefFactory.create(states), new ReferenceExpression(initState));
     stateVariable.metadata().add(obj.metadata());
     elem.variable.add(stateVariable);
@@ -210,7 +210,7 @@ class Reduction {
   private Procedure makeEntryFunc(State initial) {
     Block body = new Block();
 
-    body.statements.add(makeCall(initial.entryFunc.getTarget()));
+    body.statements.add(makeCall((Function) initial.entryFunc.getTarget()));
 
     Procedure rfunc = new Procedure(Designator.NAME_SEP + "stateentry", new AstList<FunctionVariable>(), new FuncReturnNone(), body);
     return rfunc;
@@ -219,7 +219,7 @@ class Reduction {
   private Block makeErrorBb() {
     Block bberror = new Block();
     Signal trap = kll.getTrap();
-    bberror.statements.add(new CallStmt(RefFactory.oldCall(trap)));
+    bberror.statements.add(new CallStmt(RefFactory.call(trap)));
     return bberror;
   }
 
@@ -227,14 +227,14 @@ class Reduction {
 
     AstList<CaseOpt> option = new AstList<CaseOpt>();
     for (State src : enumMap.keySet()) {
-      LinkedReferenceWithOffset_Implementation eref = makeEnumElemRef(etype, enumMap.get(src));
+      Reference eref = makeEnumElemRef(etype, enumMap.get(src));
       Block obb = new Block();
       CaseOpt opt = makeCaseOption(eref, obb);
-      obb.statements.add(makeCall(src.exitFunc.getTarget()));
+      obb.statements.add(makeCall((Function) src.exitFunc.getTarget()));
       option.add(opt);
     }
 
-    CaseStmt caseStmt = new CaseStmt(new ReferenceExpression(RefFactory.oldFull(stateVariable)), option, makeErrorBb());
+    CaseStmt caseStmt = new CaseStmt(new ReferenceExpression(RefFactory.withOffset(stateVariable)), option, makeErrorBb());
 
     Block body = new Block();
     body.statements.add(caseStmt);
@@ -247,7 +247,7 @@ class Reduction {
 
   static private CallStmt makeCall(Function func) {
     assert (func.param.isEmpty());
-    LinkedReferenceWithOffset_Implementation call = RefFactory.oldCall(func);
+    Reference call = RefFactory.call(func);
     return new CallStmt(call);
   }
 
@@ -284,7 +284,7 @@ class Reduction {
       copt.add(opt);
     }
 
-    CaseStmt caseStmt = new CaseStmt(new ReferenceExpression(RefFactory.oldFull(stateVariable)), copt, makeErrorBb());
+    CaseStmt caseStmt = new CaseStmt(new ReferenceExpression(RefFactory.withOffset(stateVariable)), copt, makeErrorBb());
 
     return caseStmt;
   }
@@ -306,7 +306,7 @@ class Reduction {
 
     for (State src : leafes) {
       Block body = new Block();
-      LinkedReferenceWithOffset_Implementation label = makeEnumElemRef(enumType, enumMap.get(src));
+      Reference label = makeEnumElemRef(enumType, enumMap.get(src));
       CaseOpt opt = makeCaseOption(label, body);
 
       AstList<Transition> transList = getter.get(src, funcName);
@@ -319,7 +319,7 @@ class Reduction {
 
     Block bberror = makeErrorBb();
 
-    CaseStmt caseStmt = new CaseStmt(new ReferenceExpression(RefFactory.oldFull(stateVariable)), options, bberror);
+    CaseStmt caseStmt = new CaseStmt(new ReferenceExpression(RefFactory.withOffset(stateVariable)), options, bberror);
 
     return caseStmt;
   }
@@ -347,17 +347,17 @@ class Reduction {
     return entry;
   }
 
-  private static LinkedReferenceWithOffset_Implementation makeEnumElemRef(EnumType type, EnumElement enumElement) {
+  private static Reference makeEnumElemRef(EnumType type, EnumElement enumElement) {
     assert (type.element.contains(enumElement));
     EnumElement elem = enumElement;
     // EnumElement elem = type.find(enumElement);
 
     assert (elem != null);
-    LinkedReferenceWithOffset_Implementation eval = RefFactory.oldFull(elem);
+    Reference eval = RefFactory.withOffset(elem);
     return eval;
   }
 
-  private static CaseOpt makeCaseOption(LinkedReferenceWithOffset_Implementation label, Block code) {
+  private static CaseOpt makeCaseOption(Reference label, Block code) {
     AstList<CaseOptEntry> list = new AstList<CaseOptEntry>();
     list.add(new CaseOptValue(new ReferenceExpression(label)));
     CaseOpt opt = new CaseOpt(list, code);
@@ -377,7 +377,7 @@ class Reduction {
 
     EnumElement src = enumMap.get(trans.dst.getTarget());
     assert (src != null);
-    Assignment setState = new AssignmentSingle(RefFactory.oldFull(stateVariable), new ReferenceExpression(RefFactory.oldFull(src)));
+    Assignment setState = new AssignmentSingle(RefFactory.withOffset(stateVariable), new ReferenceExpression(RefFactory.withOffset(src)));
     transCode.statements.add(setState);
 
     return transCode;

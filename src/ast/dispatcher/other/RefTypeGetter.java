@@ -20,10 +20,10 @@ package ast.dispatcher.other;
 import java.util.Collection;
 
 import ast.data.Ast;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefName;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.type.Type;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.EnumType;
@@ -60,7 +60,7 @@ public class RefTypeGetter extends NullDispatcher<Type, Type> {
   }
 
   @Override
-  protected Type visitReference(LinkedReferenceWithOffset_Implementation obj, Type param) {
+  protected Type visitOffsetReference(OffsetReference obj, Type param) {
     return (Type) obj.getTarget();
   }
 
@@ -91,7 +91,8 @@ public class RefTypeGetter extends NullDispatcher<Type, Type> {
   @Override
   protected Type visitRefIndex(RefIndex obj, Type sub) {
     if (sub instanceof ArrayType) {
-      return visit(((ArrayType) sub).type.ref, null);
+      return visit(((ArrayType) sub).type, null);
+      // return visit(((ArrayType) sub).type.getTarget(), null);
     } else {
       RError.err(ErrorType.Error, "need array to index, got type: " + sub.getName(), obj.metadata());
       return null;

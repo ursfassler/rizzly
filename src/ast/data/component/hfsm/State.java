@@ -19,14 +19,14 @@ package ast.data.component.hfsm;
 
 import ast.data.AstList;
 import ast.data.Named;
-import ast.data.function.FunctionReference;
+import ast.data.reference.Reference;
 
 abstract public class State extends Named implements StateContent {
-  public FunctionReference entryFunc;
-  public FunctionReference exitFunc;
+  public Reference entryFunc;
+  public Reference exitFunc;
   final public AstList<StateContent> item = new AstList<StateContent>();
 
-  public State(String name, FunctionReference entryFunc, FunctionReference exitFunc) {
+  public State(String name, Reference entryFunc, Reference exitFunc) {
     setName(name);
     this.entryFunc = entryFunc;
     this.exitFunc = exitFunc;

@@ -22,19 +22,39 @@ import static org.mockito.Mockito.verify;
 
 import org.junit.Test;
 
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.OffsetReference;
+import ast.data.reference.Reference;
+import ast.visitor.VisitExecutorImplementation;
 
 public class ReferenceesAdder_Test {
   final private ReferenceesWriter referencees = mock(ReferenceesWriter.class);
   final private ReferenceesAdder testee = new ReferenceesAdder(referencees);
 
   @Test
-  public void adds_visited_referencess() {
-    LinkedReferenceWithOffset_Implementation reference = mock(LinkedReferenceWithOffset_Implementation.class);
+  public void adds_visited_OffsetReference() {
+    OffsetReference reference = mock(OffsetReference.class);
 
     testee.visit(reference);
 
     verify(referencees).addReferencee(reference);
   }
 
+  @Test
+  public void adds_visited_Reference() {
+    Reference reference = mock(Reference.class);
+
+    testee.visit(reference);
+
+    verify(referencees).addReferencee(reference);
+  }
+
+  @Test
+  public void works_with_a_visitor() {
+    VisitExecutorImplementation executor = new VisitExecutorImplementation();
+    Reference reference = mock(Reference.class);
+
+    executor.visit(testee, reference);
+
+    verify(referencees).addReferencee(reference);
+  }
 }

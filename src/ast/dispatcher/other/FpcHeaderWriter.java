@@ -30,9 +30,9 @@ import ast.data.function.Function;
 import ast.data.function.FunctionProperty;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FunctionReturnType;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.OffsetReference;
 import ast.data.type.Type;
-import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumElement;
@@ -42,9 +42,9 @@ import ast.data.type.base.StringType;
 import ast.data.type.composed.NamedElement;
 import ast.data.type.composed.RecordType;
 import ast.data.type.special.VoidType;
-import ast.data.variable.GlobalConstant;
 import ast.data.variable.ConstPrivate;
 import ast.data.variable.FunctionVariable;
+import ast.data.variable.GlobalConstant;
 import ast.data.variable.Variable;
 import ast.dispatcher.NullDispatcher;
 import ast.doc.StreamWriter;
@@ -271,15 +271,15 @@ public class FpcHeaderWriter extends NullDispatcher<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, StreamWriter param) {
+  protected Void visitOffsetReference(OffsetReference obj, StreamWriter param) {
     assert (obj.getOffset().isEmpty());
-    param.wr(obj.getLink().getName());
+    visit(obj.getAnchor(), param);
     return null;
   }
 
   @Override
-  protected Void visitTypeRef(TypeReference obj, StreamWriter param) {
-    visit(obj.ref, param);
+  protected Void visitLinkedAnchor(LinkedAnchor obj, StreamWriter param) {
+    param.wr(obj.getLink().getName());
     return null;
   }
 

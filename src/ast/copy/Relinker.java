@@ -23,7 +23,6 @@ import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
 import ast.data.reference.LinkedAnchor;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.dispatcher.DfsTraverser;
 
 public class Relinker extends DfsTraverser<Void, Map<? extends Named, ? extends Named>> {
@@ -35,14 +34,6 @@ public class Relinker extends DfsTraverser<Void, Map<? extends Named, ? extends 
 
   static public void relink(AstList<? extends Ast> obj, Map<? extends Named, ? extends Named> map) {
     INSTANCE.traverse(obj, map);
-  }
-
-  @Override
-  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Map<? extends Named, ? extends Named> param) {
-    if (param.containsKey(obj.getLink())) {
-      obj.setLink(param.get(obj.getLink()));
-    }
-    return super.visitReference(obj, param);
   }
 
   @Override

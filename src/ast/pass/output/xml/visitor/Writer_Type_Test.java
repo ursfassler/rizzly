@@ -27,7 +27,7 @@ import org.mockito.InOrder;
 import org.mockito.Mockito;
 
 import ast.data.Range;
-import ast.data.type.TypeReference;
+import ast.data.reference.Reference;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.RangeType;
 import ast.data.type.base.StringType;
@@ -94,7 +94,7 @@ public class Writer_Type_Test {
 
   @Test
   public void write_TypeType() {
-    TypeReference typeReference = mock(TypeReference.class);
+    Reference typeReference = mock(Reference.class);
     TypeType item = new TypeType("the name", typeReference);
 
     testee.visit(item);

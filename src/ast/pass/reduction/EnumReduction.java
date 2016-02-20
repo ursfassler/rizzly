@@ -26,8 +26,9 @@ import ast.Designator;
 import ast.data.Namespace;
 import ast.data.Range;
 import ast.data.expression.value.NumberValue;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefName;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.type.TypeRefFactory;
 import ast.data.type.base.EnumElement;
 import ast.data.type.base.EnumType;
@@ -88,31 +89,33 @@ class EnumReduce extends DfsTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
-    if (typeMap.containsKey(obj.getLink())) {
+  protected Void visitOffsetReference(OffsetReference obj, Void param) {
+    LinkedAnchor anchor = (LinkedAnchor) obj.getAnchor();
+
+    if (typeMap.containsKey(anchor.getLink())) {
       if (!obj.getOffset().isEmpty() && (obj.getOffset().get(0) instanceof RefName)) {
         // replace a link to EnumType.EnumName with a link to the corresponding
         // constant
         assert (obj.getOffset().size() == 1);
         String elemName = ((RefName) obj.getOffset().get(0)).name;
-        EnumType ent = (EnumType) obj.getLink();
+        EnumType ent = (EnumType) anchor.getLink();
         EnumElement elem = NameFilter.select(ent.element, elemName);
         assert (elem != null);
         assert (elemMap.containsKey(elem));
         obj.getOffset().clear();
-        obj.setLink(elemMap.get(elem));
+        anchor.setLink(elemMap.get(elem));
       }
     }
 
-    super.visitReference(obj, param);
+    super.visitOffsetReference(obj, param);
 
     // link to type
-    if (typeMap.containsKey(obj.getLink())) {
-      obj.setLink(typeMap.get(obj.getLink()));
+    if (typeMap.containsKey(anchor.getLink())) {
+      anchor.setLink(typeMap.get(anchor.getLink()));
     }
     // direct link to enum element (internal reduction)
-    if (elemMap.containsKey(obj.getLink())) {
-      obj.setLink(elemMap.get(obj.getLink()));
+    if (elemMap.containsKey(anchor.getLink())) {
+      anchor.setLink(elemMap.get(anchor.getLink()));
     }
 
     return null;

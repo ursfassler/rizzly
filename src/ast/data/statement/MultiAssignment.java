@@ -19,14 +19,13 @@ package ast.data.statement;
 
 import ast.data.AstList;
 import ast.data.expression.Expression;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
-import ast.visitor.Visitor;
+import ast.data.reference.Reference;
 
 final public class MultiAssignment extends Assignment {
 
-  final public AstList<LinkedReferenceWithOffset_Implementation> left;
+  final public AstList<Reference> left;
 
-  public MultiAssignment(AstList<LinkedReferenceWithOffset_Implementation> left, Expression right) {
+  public MultiAssignment(AstList<Reference> left, Expression right) {
     super(right);
     this.left = left;
   }

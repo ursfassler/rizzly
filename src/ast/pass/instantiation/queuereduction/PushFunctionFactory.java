@@ -31,10 +31,10 @@ import ast.data.expression.value.NumberValue;
 import ast.data.function.Function;
 import ast.data.function.header.Procedure;
 import ast.data.function.ret.FuncReturnNone;
+import ast.data.reference.OffsetReference;
+import ast.data.reference.RefFactory;
 import ast.data.reference.RefIndex;
-import ast.data.reference.RefItem;
 import ast.data.reference.RefName;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.IfOption;
@@ -70,13 +70,13 @@ class PushFunctionFactory {
     pushbody.statements.add(new VarDefStmt(idx));
     pushbody.statements.add(new AssignmentSingle(ref(idx), new Modulo(new Plus(refexpr(queueVariables.getHead()), refexpr(queueVariables.getCount())), new NumberValue(BigInteger.valueOf(queueTypes.queueLength())))));
 
-    LinkedReferenceWithOffset_Implementation qir = ref(queueVariables.getQueue());
+    OffsetReference qir = ref(queueVariables.getQueue());
     qir.getOffset().add(new RefIndex(refexpr(idx)));
     qir.getOffset().add(new RefName(queueTypes.getMessage().tag.getName()));
     pushbody.statements.add(new AssignmentSingle(qir, refexpr(enumElement)));
 
     for (FunctionVariable arg : param) {
-      LinkedReferenceWithOffset_Implementation elem = ref(queueVariables.getQueue());
+      OffsetReference elem = ref(queueVariables.getQueue());
       elem.getOffset().add(new RefIndex(refexpr(idx)));
       elem.getOffset().add(new RefName(namedElement.getName()));
       elem.getOffset().add(new RefName(arg.getName()));
@@ -100,7 +100,7 @@ class PushFunctionFactory {
     return new ReferenceExpression(ref(idx));
   }
 
-  private static LinkedReferenceWithOffset_Implementation ref(Named idx) {
-    return new LinkedReferenceWithOffset_Implementation(idx, new AstList<RefItem>());
+  private static OffsetReference ref(Named idx) {
+    return RefFactory.withOffset(idx);
   }
 }

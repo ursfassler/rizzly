@@ -17,15 +17,14 @@
 
 package ast.data.expression.value;
 
-import ast.data.type.TypeReference;
-import ast.visitor.Visitor;
+import ast.data.reference.Reference;
 
 public class UnionValue extends ValueExpr {
   public NamedValue tagValue;
   public NamedValue contentValue;
-  public TypeReference type;
+  public Reference type;
 
-  public UnionValue(NamedValue tagValue, NamedValue contentValue, TypeReference type) {
+  public UnionValue(NamedValue tagValue, NamedValue contentValue, Reference type) {
     this.tagValue = tagValue;
     this.contentValue = contentValue;
     this.type = type;

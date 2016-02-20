@@ -17,12 +17,11 @@
 
 package ast.data.variable;
 
-import ast.data.type.TypeReference;
-import ast.visitor.Visitor;
+import ast.data.reference.Reference;
 
 public class FunctionVariable extends Variable {
 
-  public FunctionVariable(String name, TypeReference type) {
+  public FunctionVariable(String name, Reference type) {
     super(name, type);
   }
 

@@ -19,12 +19,11 @@ package ast.data.variable;
 
 import ast.data.component.hfsm.StateContent;
 import ast.data.expression.Expression;
-import ast.data.type.TypeReference;
-import ast.visitor.Visitor;
+import ast.data.reference.Reference;
 
 public class StateVariable extends DefaultVariable implements StateContent {
 
-  public StateVariable(String name, TypeReference type, Expression def) {
+  public StateVariable(String name, Reference type, Expression def) {
     super(name, type, def);
   }
 

@@ -28,11 +28,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ast.data.Ast;
-import ast.data.AstList;
-import ast.data.reference.LinkTarget;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
-import ast.data.reference.RefItem;
-import ast.data.reference.OldReference;
+import ast.data.reference.Reference;
 import ast.repository.query.Referencees.ReferenceesReader;
 
 public class IdForReferenced_Test {
@@ -40,10 +36,10 @@ public class IdForReferenced_Test {
   final private IdGenerator idGenerator = mock(IdGenerator.class);
   final private IdForReferenced testee = new IdForReferenced(referenceesReader, idGenerator);
   final private Ast item = Mockito.mock(Ast.class);
-  final private static Set<OldReference> SomeReference = new HashSet<OldReference>();
+  final private static Set<Reference> SomeReference = new HashSet<Reference>();
 
   {
-    SomeReference.add(new LinkedReferenceWithOffset_Implementation(new LinkTarget(""), new AstList<RefItem>()));
+    SomeReference.add(mock(Reference.class));
   }
 
   @Test

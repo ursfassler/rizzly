@@ -27,15 +27,15 @@ import ast.data.Namespace;
 import ast.data.expression.value.NumberValue;
 import ast.data.function.Function;
 import ast.data.function.header.FuncQuery;
+import ast.data.function.header.FuncSubHandlerEvent;
+import ast.data.function.header.FuncSubHandlerQuery;
 import ast.data.function.header.Response;
 import ast.data.function.header.Signal;
 import ast.data.function.header.Slot;
-import ast.data.function.header.FuncSubHandlerEvent;
-import ast.data.function.header.FuncSubHandlerQuery;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FunctionReturnType;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
-import ast.data.type.TypeReference;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.OffsetReference;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumElement;
@@ -156,19 +156,6 @@ public class CHeaderWriter extends NullDispatcher<Void, StreamWriter> {
   @Override
   protected Void visitNumber(NumberValue obj, StreamWriter param) {
     param.wr(obj.value.toString());
-    return null;
-  }
-
-  @Override
-  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, StreamWriter param) {
-    assert (obj.getOffset().isEmpty());
-    param.wr(obj.getLink().getName());
-    return null;
-  }
-
-  @Override
-  protected Void visitTypeRef(TypeReference obj, StreamWriter param) {
-    visit(obj.ref, param);
     return null;
   }
 
@@ -346,6 +333,19 @@ public class CHeaderWriter extends NullDispatcher<Void, StreamWriter> {
   protected Void visitFuncSubHandlerEvent(FuncSubHandlerEvent obj, StreamWriter param) {
     param.wr("// ");
     wrPrototype(obj, param);
+    return null;
+  }
+
+  @Override
+  protected Void visitOffsetReference(OffsetReference obj, StreamWriter param) {
+    assert (obj.getOffset().isEmpty());
+    visit(obj.getAnchor(), param);
+    return null;
+  }
+
+  @Override
+  protected Void visitLinkedAnchor(LinkedAnchor obj, StreamWriter param) {
+    param.wr(obj.targetName());
     return null;
   }
 

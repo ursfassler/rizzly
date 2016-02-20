@@ -33,10 +33,7 @@ import ast.data.expression.value.NamedValue;
 import ast.data.expression.value.NumberValue;
 import ast.data.expression.value.StringValue;
 import ast.data.expression.value.TupleValue;
-import ast.data.function.FunctionReference;
-import ast.data.reference.LinkTarget;
-import ast.data.reference.LinkedReferenceWithOffset;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefIndex;
@@ -45,7 +42,6 @@ import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
 import ast.data.reference.Reference;
 import ast.data.template.ActualTemplateArgument;
-import ast.data.type.TypeReference;
 import ast.meta.MetaList;
 import error.ErrorType;
 import error.RError;
@@ -107,13 +103,13 @@ public class ExpressionParser extends Parser {
         RError.err(ErrorType.Error, "expected identifier for assignment", expr.metadata());
         return null;
       }
-      LinkedReferenceWithOffset ref = ((ReferenceExpression) expr).reference;
+      OffsetReference ref = (OffsetReference) ((ReferenceExpression) expr).reference;
       if (!ref.getOffset().isEmpty()) {
         RError.err(ErrorType.Error, "expected identifier for assignment", expr.metadata());
         return null;
       }
       Expression value = parseRelExpr();
-      return new NamedValue(expr.metadata(), ((LinkTarget) ref.getLink()).getName(), value);
+      return new NamedValue(expr.metadata(), ref.getAnchor().targetName(), value);
     } else {
       return new NamedValue(expr.metadata(), null, expr);
     }
@@ -137,33 +133,6 @@ public class ExpressionParser extends Parser {
   // EBNF expr: relExpr
   public Expression parse() {
     return parseRelExpr();
-  }
-
-  // actually it has to be: ref: id { refName } [ refGeneric ] { refName |
-  // refCall }
-  // EBNF ref: id { refName | refCall | refIndex | refGeneric }
-  public LinkedReferenceWithOffset_Implementation oldParseRef() {
-    Token head = expect(TokenType.IDENTIFIER);
-    LinkedReferenceWithOffset_Implementation res = RefFactory.oldFull(head.getMetadata(), head.getData());
-
-    while (true) {
-      switch (peek().getType()) {
-        case PERIOD:
-          res.getOffset().add(parseRefName());
-          break;
-        case OPENPAREN:
-          res.getOffset().add(parseRefCall());
-          break;
-        case OPENCURLY:
-          res.getOffset().add(parseRefGeneric());
-          break;
-        case OPENBRACKETS:
-          res.getOffset().add(parseRefIndex());
-          break;
-        default:
-          return res;
-      }
-    }
   }
 
   // actually it has to be: ref: id { refName } [ refGeneric ] { refName |
@@ -194,22 +163,14 @@ public class ExpressionParser extends Parser {
   }
 
   public ReferenceExpression parseRefExpr() {
-    LinkedReferenceWithOffset_Implementation ref = oldParseRef();
+    Reference ref = parseRef();
     ReferenceExpression ret = new ReferenceExpression(ref);
     ret.metadata().add(ref.metadata());
     return ret;
   }
 
-  public TypeReference parseRefType() {
-    LinkedReferenceWithOffset_Implementation ref = oldParseRef();
-    TypeReference typeReference = new TypeReference(ref);
-    typeReference.metadata().add(ref.metadata());
-    return typeReference;
-  }
-
-  public FunctionReference parseRefFunc() {
-    LinkedReferenceWithOffset_Implementation ref = oldParseRef();
-    return new FunctionReference(ref.metadata(), ref);
+  public Reference parseRefType() {
+    return parseRef();
   }
 
   // EBNF shiftOp: "shr" | "shl"

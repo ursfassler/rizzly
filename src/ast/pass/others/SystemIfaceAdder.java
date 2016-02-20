@@ -36,10 +36,11 @@ import ast.data.expression.value.TupleValue;
 import ast.data.function.Function;
 import ast.data.function.header.Slot;
 import ast.data.function.ret.FuncReturnNone;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefName;
+import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.Statement;
@@ -168,14 +169,14 @@ class SystemIfaceCaller extends NullDispatcher<Void, Void> {
         CallStmt call = makeCall(cuse, sctor);
         code.add(call);
       }
-      code.add(makeCall(obj.entryFunc.getTarget()));
+      code.add(makeCall((Function) obj.entryFunc.getTarget()));
 
       ctor.body.statements.addAll(code);
     }
 
     {
       ArrayList<Statement> code = new ArrayList<Statement>();
-      code.add(makeCall(obj.exitFunc.getTarget()));
+      code.add(makeCall((Function) obj.exitFunc.getTarget()));
       Collections.reverse(compList);
       for (ComponentUse cuse : compList) {
         Function sdtor = getDtor((Component) cuse.compRef.getTarget());
@@ -203,14 +204,15 @@ class SystemIfaceCaller extends NullDispatcher<Void, Void> {
 
   private CallStmt makeCall(Function ref) {
     assert (ref.param.isEmpty());
-    LinkedReferenceWithOffset_Implementation call = RefFactory.oldCall(ref.metadata(), ref);
+    Reference call = RefFactory.call(ref);
+    call.metadata().add(ref.metadata());
     return new CallStmt(call);
   }
 
   @Deprecated
   private CallStmt makeCall(ComponentUse self, Function func) {
     RError.ass(func.param.isEmpty(), func.metadata(), "expected (de)constructor to have no parameter");
-    LinkedReferenceWithOffset_Implementation fref = RefFactory.oldFull(self);
+    OffsetReference fref = RefFactory.withOffset(self);
     fref.getOffset().add(new RefName(func.getName()));
     fref.getOffset().add(new RefCall(new TupleValue(new AstList<Expression>())));
     return new CallStmt(fref);

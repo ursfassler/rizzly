@@ -18,11 +18,11 @@
 package ast.data.variable;
 
 import ast.data.expression.Expression;
-import ast.data.type.TypeReference;
+import ast.data.reference.Reference;
 
 abstract public class Constant extends DefaultVariable {
 
-  public Constant(String name, TypeReference type, Expression def) {
+  public Constant(String name, Reference type, Expression def) {
     super(name, type, def);
   }
 

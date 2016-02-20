@@ -22,9 +22,9 @@ import ast.data.Ast;
 import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.file.RizzlyFile;
-import ast.data.reference.LinkTarget;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefName;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
@@ -59,9 +59,9 @@ public class NamespaceLinkReduction extends AstPass {
 class NamespaceLinkReductionWorker extends DfsTraverser<Void, Void> {
 
   @Override
-  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
-    Ast item = obj.getLink();
-    assert (!(item instanceof LinkTarget));
+  protected Void visitOffsetReference(OffsetReference obj, Void param) {
+    LinkedAnchor anchor = (LinkedAnchor) obj.getAnchor();
+    Ast item = anchor.getLink();
     while (item instanceof Namespace) {
       ast.data.reference.RefItem next = obj.getOffset().get(0);
       obj.getOffset().remove(0);
@@ -82,8 +82,8 @@ class NamespaceLinkReductionWorker extends DfsTraverser<Void, Void> {
       item = Single.staticForce(ChildCollector.select(item, new HasName(name.name)), item.metadata());
       assert (item != null); // type checker should find it?
     }
-    obj.setLink((Named) item);
-    return super.visitReference(obj, param);
+    anchor.setLink((Named) item);
+    return super.visitOffsetReference(obj, param);
   }
 
 }

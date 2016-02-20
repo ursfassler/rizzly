@@ -29,7 +29,8 @@ import ast.data.component.hfsm.Transition;
 import ast.data.expression.ReferenceExpression;
 import ast.data.function.header.FuncFunction;
 import ast.data.function.header.Procedure;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefName;
 import ast.data.type.Type;
@@ -79,7 +80,7 @@ public class StateVarReplacer extends AstPass {
     Constant def = stb.getInitVar().get(stateType);
 
     // TODO set correct values when switching states
-    StateVariable var = new StateVariable("data", TypeRefFactory.create(stateType), new ReferenceExpression(RefFactory.oldFull(def)));
+    StateVariable var = new StateVariable("data", TypeRefFactory.create(stateType), new ReferenceExpression(RefFactory.withOffset(def)));
     obj.topstate.item.add(var);
 
     Map<StateVariable, AstList<NamedElement>> epath = new HashMap<StateVariable, AstList<NamedElement>>(stb.getEpath());
@@ -138,14 +139,16 @@ class StateVarReplacerWorker extends DfsTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
-    if (obj.getLink() == dataVar) {
+  protected Void visitOffsetReference(OffsetReference obj, Void param) {
+    LinkedAnchor anchor = (LinkedAnchor) obj.getAnchor();
+
+    if (anchor.getLink() == dataVar) {
       visitList(obj.getOffset(), param);
       return null;
     }
-    super.visitReference(obj, param);
-    if (obj.getLink() instanceof StateVariable) {
-      AstList<NamedElement> eofs = epath.get(obj.getLink());
+    super.visitOffsetReference(obj, param);
+    if (anchor.getLink() instanceof StateVariable) {
+      AstList<NamedElement> eofs = epath.get(anchor.getLink());
       assert (eofs != null);
 
       assert (obj.getOffset().isEmpty()); // FIXME not always true (e.g. for access
@@ -153,7 +156,7 @@ class StateVarReplacerWorker extends DfsTraverser<Void, Void> {
 
       Type type = kt.get(dataVar.type);
 
-      obj.setLink(dataVar);
+      anchor.setLink(dataVar);
       for (NamedElement itr : eofs) {
         RefName ref = new RefName(itr.getName());
 

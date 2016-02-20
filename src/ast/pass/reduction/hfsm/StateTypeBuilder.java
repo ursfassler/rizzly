@@ -157,7 +157,7 @@ public class StateTypeBuilder extends NullDispatcher<NamedElement, AstList<Named
 
     Constant initvalue = initVar.get(kt.get(initStateElem.typeref));
     assert (initvalue != null);
-    ReferenceExpression value2 = new ReferenceExpression(RefFactory.oldFull(obj.metadata(), initvalue));
+    ReferenceExpression value2 = new ReferenceExpression(RefFactory.withOffset(obj.metadata(), initvalue));
     value2.metadata().add(obj.metadata());
     NamedValue cont = new NamedValue(obj.metadata(), getName(initialTarget), value2);
     UnsafeUnionValue uninit = new UnsafeUnionValue(cont, TypeRefFactory.create(obj.metadata(), union));

@@ -30,7 +30,7 @@ import ast.data.expression.value.StringValue;
 import ast.data.expression.value.TupleValue;
 import ast.data.expression.value.UnionValue;
 import ast.data.expression.value.UnsafeUnionValue;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.OffsetReference;
 import ast.dispatcher.NullDispatcher;
 import error.ErrorType;
 import error.RError;
@@ -75,9 +75,8 @@ class ConstTraverser extends NullDispatcher<Boolean, Void> {
   }
 
   @Override
-  protected Boolean visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
-    RError.err(ErrorType.Warning, "fix me", obj.metadata()); // TODO follow
-    // reference
+  protected Boolean visitOffsetReference(OffsetReference obj, Void param) {
+    RError.err(ErrorType.Warning, "fix me", obj.metadata()); // TODO follow reference
     return false;
   }
 

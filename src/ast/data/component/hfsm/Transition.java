@@ -20,7 +20,6 @@ package ast.data.component.hfsm;
 import ast.data.AstBase;
 import ast.data.AstList;
 import ast.data.expression.Expression;
-import ast.data.function.FunctionReference;
 import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.variable.FunctionVariable;
@@ -28,12 +27,12 @@ import ast.data.variable.FunctionVariable;
 final public class Transition extends AstBase implements StateContent {
   public Reference src;
   public Reference dst;
-  public FunctionReference eventFunc;
+  public Reference eventFunc;
   final public AstList<FunctionVariable> param = new AstList<FunctionVariable>();
   public Expression guard;
   public Block body;
 
-  public Transition(Reference src, Reference dst, FunctionReference eventFunc, Expression guard, AstList<FunctionVariable> param, Block body) {
+  public Transition(Reference src, Reference dst, Reference eventFunc, Expression guard, AstList<FunctionVariable> param, Block body) {
     this.src = src;
     this.dst = dst;
     this.eventFunc = eventFunc;

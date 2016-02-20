@@ -27,8 +27,9 @@ import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.expression.Expression;
 import ast.data.function.Function;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefCall;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.type.Type;
 import ast.data.type.TypeRefFactory;
 import ast.data.type.base.RangeType;
@@ -84,9 +85,10 @@ class OpenReplaceWorker extends DfsTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
-    if ((obj.getLink() instanceof Function) && !obj.getOffset().isEmpty()) {
-      Function func = (Function) obj.getLink();
+  protected Void visitOffsetReference(OffsetReference obj, Void param) {
+    LinkedAnchor anchor = (LinkedAnchor) obj.getAnchor();
+    if ((anchor.getLink() instanceof Function) && !obj.getOffset().isEmpty()) {
+      Function func = (Function) anchor.getLink();
       RefCall call = (RefCall) obj.getOffset().get(0);
 
       AstList<FunctionVariable> arg = func.param;
@@ -102,7 +104,7 @@ class OpenReplaceWorker extends DfsTraverser<Void, Void> {
         updateVar(iarg, provtype);
       }
     }
-    return super.visitReference(obj, param);
+    return super.visitOffsetReference(obj, param);
   }
 
   private void updateVar(Variable var, Type type) {

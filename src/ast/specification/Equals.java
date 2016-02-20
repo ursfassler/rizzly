@@ -23,9 +23,7 @@ import java.util.Iterator;
 import ast.data.Ast;
 import ast.data.expression.value.NumberValue;
 import ast.data.expression.value.StringValue;
-import ast.data.reference.LinkedReferenceWithOffset;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
-import ast.data.type.TypeReference;
+import ast.data.reference.OffsetReference;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumType;
@@ -118,10 +116,10 @@ class EqualTraverser extends NullDispatcher<Boolean, Object> {
   }
 
   @Override
-  protected Boolean visitReference(LinkedReferenceWithOffset_Implementation obj, Object param) {
-    if (param instanceof LinkedReferenceWithOffset_Implementation) {
-      LinkedReferenceWithOffset other = (LinkedReferenceWithOffset) param;
-      return (obj.getLink() == other.getLink()) && visitList(obj.getOffset(), other.getOffset());
+  protected Boolean visitOffsetReference(OffsetReference obj, Object param) {
+    if (param instanceof OffsetReference) {
+      OffsetReference other = (OffsetReference) param;
+      return visit(obj.getAnchor(), other.getAnchor()) && visitList(obj.getOffset(), other.getOffset());
     } else {
       return false;
     }
@@ -183,16 +181,6 @@ class EqualTraverser extends NullDispatcher<Boolean, Object> {
     if (param instanceof TypeType) {
       TypeType other = (TypeType) param;
       return obj.type.equals(other.type);
-    } else {
-      return false;
-    }
-  }
-
-  @Override
-  protected Boolean visitTypeRef(TypeReference obj, Object param) {
-    if (param instanceof TypeReference) {
-      TypeReference other = (TypeReference) param;
-      return visit(obj.ref, other.ref);
     } else {
       return false;
     }

@@ -19,12 +19,11 @@ package ast.data.template;
 
 import ast.data.reference.RefFactory;
 import ast.data.type.Type;
-import ast.data.type.TypeReference;
 import ast.data.variable.TemplateParameter;
 
 public abstract class TemplateFactory {
 
   static protected TemplateParameter makeParam(String name, Type type) {
-    return new TemplateParameter(name, new TypeReference(RefFactory.oldCreate(type)));
+    return new TemplateParameter(name, RefFactory.create(type));
   }
 }

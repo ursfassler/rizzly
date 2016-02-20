@@ -28,7 +28,7 @@ public class IsTypeTemplate extends Specification {
   public boolean isSatisfiedBy(Ast candidate) {
     if (candidate instanceof TemplateParameter) {
       TemplateParameter tmpl = (TemplateParameter) candidate;
-      Type type = (Type) tmpl.type.ref.getTarget();
+      Type type = (Type) tmpl.type.getTarget();
       return type instanceof TypeType;
     } else {
       return false;

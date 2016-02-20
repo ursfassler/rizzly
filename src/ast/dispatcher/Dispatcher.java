@@ -89,7 +89,6 @@ import ast.data.expression.value.UnsafeUnionValue;
 import ast.data.expression.value.ValueExpr;
 import ast.data.file.RizzlyFile;
 import ast.data.function.Function;
-import ast.data.function.FunctionReference;
 import ast.data.function.InterfaceFunction;
 import ast.data.function.header.FuncFunction;
 import ast.data.function.header.FuncQuery;
@@ -109,17 +108,13 @@ import ast.data.raw.RawComponent;
 import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
-import ast.data.reference.LinkTarget;
 import ast.data.reference.LinkedAnchor;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.reference.OffsetReference;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefItem;
 import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
-import ast.data.reference.SimpleReference;
-import ast.data.reference.TypedReference;
 import ast.data.reference.UnlinkedAnchor;
 import ast.data.statement.Assignment;
 import ast.data.statement.AssignmentSingle;
@@ -144,7 +139,6 @@ import ast.data.statement.VoidReturn;
 import ast.data.statement.WhileStmt;
 import ast.data.template.Template;
 import ast.data.type.Type;
-import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BaseType;
 import ast.data.type.base.BooleanType;
@@ -237,29 +231,12 @@ public abstract class Dispatcher<R, P> {
       return visitNamedValue((NamedValue) obj, param);
     } else if (obj instanceof Endpoint) {
       return visitEndpoint((Endpoint) obj, param);
-    } else if (obj instanceof TypedReference) {
-      return visitTypedRef((TypedReference) obj, param);
-    } else if (obj instanceof LinkedReferenceWithOffset_Implementation) {
-      return visitReference((LinkedReferenceWithOffset_Implementation) obj, param);
-    } else if (obj instanceof SimpleReference) {
-      return visitSimpleReference((SimpleReference) obj, param);
     } else if (obj instanceof OffsetReference) {
       return visitOffsetReference((OffsetReference) obj, param);
     } else if (obj instanceof LinkedAnchor) {
       return visitLinkedAnchor((LinkedAnchor) obj, param);
     } else if (obj instanceof UnlinkedAnchor) {
       return visitUnlinkedAnchor((UnlinkedAnchor) obj, param);
-    } else {
-      throwUnknownObjectError(obj);
-      return null;
-    }
-  }
-
-  protected R visitTypedRef(TypedReference obj, P param) {
-    if (obj instanceof TypeReference) {
-      return visitTypeRef((TypeReference) obj, param);
-    } else if (obj instanceof FunctionReference) {
-      return visitFuncRef((FunctionReference) obj, param);
     } else {
       throwUnknownObjectError(obj);
       return null;
@@ -770,10 +747,6 @@ public abstract class Dispatcher<R, P> {
     throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
 
-  abstract protected R visitFuncRef(FunctionReference obj, P param);
-
-  abstract protected R visitTypeRef(TypeReference obj, P param);
-
   abstract protected R visitRefExpr(ReferenceExpression obj, P param);
 
   abstract protected R visitNamedElement(NamedElement obj, P param);
@@ -839,8 +812,6 @@ public abstract class Dispatcher<R, P> {
   abstract protected R visitEndpointSub(EndpointSub obj, P param);
 
   abstract protected R visitEndpointRaw(EndpointRaw obj, P param);
-
-  abstract protected R visitReference(LinkedReferenceWithOffset_Implementation obj, P param);
 
   abstract protected R visitStateSimple(StateSimple obj, P param);
 
@@ -1016,11 +987,7 @@ public abstract class Dispatcher<R, P> {
 
   abstract protected R visitVarDefInitStmt(VarDefInitStmt obj, P param);
 
-  abstract protected R visitDummyLinkTarget(LinkTarget obj, P param);
-
   abstract protected R visitOffsetReference(OffsetReference obj, P param);
-
-  abstract protected R visitSimpleReference(SimpleReference obj, P param);
 
   abstract protected R visitUnlinkedAnchor(UnlinkedAnchor obj, P param);
 

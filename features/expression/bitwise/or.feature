@@ -4,6 +4,8 @@ Feature: Use bitwise or operation in Rizzly
   In order to have it
 
 
+#TODO fix this
+@fixme
 Scenario: arguments have to be positive
   Given we have a file "bitor.rzy" with the content:
     """

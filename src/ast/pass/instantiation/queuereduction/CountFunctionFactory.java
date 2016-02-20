@@ -25,6 +25,7 @@ import ast.data.function.FunctionProperty;
 import ast.data.function.header.Response;
 import ast.data.function.ret.FunctionReturnType;
 import ast.data.reference.RefFactory;
+import ast.data.reference.RefItem;
 import ast.data.statement.Block;
 import ast.data.statement.ExpressionReturn;
 import ast.data.variable.FunctionVariable;
@@ -33,7 +34,7 @@ import ast.meta.MetaList;
 class CountFunctionFactory {
   static public Function create(String prefix, MetaList info, QueueVariables queueVariables) {
     Block sfb = new Block();
-    sfb.statements.add(new ExpressionReturn(new ReferenceExpression(RefFactory.oldFull(info, queueVariables.getCount()))));
+    sfb.statements.add(new ExpressionReturn(new ReferenceExpression(RefFactory.create(info, queueVariables.getCount(), new AstList<RefItem>()))));
     Function sizefunc = new Response(prefix + "count", new AstList<FunctionVariable>(), new FunctionReturnType(info, Copy.copy(queueVariables.getCount().type)), sfb);
     sizefunc.metadata().add(info);
     sizefunc.property = FunctionProperty.Public;

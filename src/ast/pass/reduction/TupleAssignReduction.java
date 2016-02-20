@@ -30,10 +30,10 @@ import ast.data.expression.ReferenceExpression;
 import ast.data.expression.value.NamedElementsValue;
 import ast.data.expression.value.NamedValue;
 import ast.data.expression.value.TupleValue;
-import ast.data.reference.LinkedReference;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefName;
+import ast.data.reference.Reference;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.MultiAssignment;
 import ast.data.statement.Statement;
@@ -84,7 +84,7 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
 
     if (rightCount > 1) {
       // FIXME do not use cast
-      LinkedReferenceWithOffset_Implementation left = (LinkedReferenceWithOffset_Implementation) obj.left;
+      OffsetReference left = (OffsetReference) obj.left;
       return assignOneOne(left, obj.right);
     } else {
       return null;
@@ -114,13 +114,13 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
     } else if (leftCount > 1) {
       return assignMulOne(obj.left, obj.right);
     } else if (rightCount > 1) {
-      return assignOneOne(obj.left.get(0), obj.right);
+      return assignOneOne((OffsetReference) obj.left.get(0), obj.right);
     } else {
       return null;
     }
   }
 
-  private List<Statement> assignOneOne(LinkedReferenceWithOffset_Implementation left, Expression right) {
+  private List<Statement> assignOneOne(OffsetReference left, Expression right) {
     if (right instanceof TupleValue) {
       TupleValue gen = (TupleValue) right;
       return assignOne(left, gen.value);
@@ -130,7 +130,7 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
     }
   }
 
-  private List<Statement> assignMulOne(AstList<LinkedReferenceWithOffset_Implementation> left, Expression right) {
+  private List<Statement> assignMulOne(AstList<Reference> left, Expression right) {
     Type rt = kt.get(right);
     if (rt instanceof RecordType) {
       String name = Designator.NAME_SEP + "var"; // XXX add pass to make names
@@ -139,12 +139,12 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
 
       List<Statement> ret = new ArrayList<Statement>();
       ret.add(new VarDefStmt(var));
-      ret.add(new AssignmentSingle(RefFactory.oldFull(var), right));
+      ret.add(new AssignmentSingle(RefFactory.withOffset(var), right));
 
       for (int i = 0; i < left.size(); i++) {
-        LinkedReferenceWithOffset_Implementation lr = left.get(i);
+        Reference lr = left.get(i);
         String elemName = ((RecordType) rt).element.get(i).getName();
-        LinkedReferenceWithOffset_Implementation rr = RefFactory.oldCreate(var, new RefName(elemName));
+        Reference rr = RefFactory.create(var, new RefName(elemName));
         ret.add(new AssignmentSingle(lr, new ReferenceExpression(rr)));
       }
 
@@ -154,11 +154,11 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
     }
   }
 
-  private List<Statement> assignOneNamed(LinkedReference left, AstList<NamedValue> value) {
+  private List<Statement> assignOneNamed(OffsetReference left, AstList<NamedValue> value) {
     throw new RuntimeException("not yet implemented");
   }
 
-  private List<Statement> assignOne(LinkedReferenceWithOffset_Implementation left, AstList<Expression> value) {
+  private List<Statement> assignOne(OffsetReference left, AstList<Expression> value) {
     Type rt = kt.get(left);
     if (rt instanceof RecordType) {
       return assignOneRecord(left, (RecordType) rt, value);
@@ -167,12 +167,12 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
     }
   }
 
-  private List<Statement> assignOneRecord(LinkedReferenceWithOffset_Implementation left, RecordType rt, AstList<Expression> value) {
+  private List<Statement> assignOneRecord(OffsetReference left, RecordType rt, AstList<Expression> value) {
     RError.ass(rt.element.size() == value.size(), left.metadata(), "expected same number of elementds, got: " + rt.element.size() + " <-> " + value.size());
     List<Statement> ret = new ArrayList<Statement>(value.size());
 
     for (int i = 0; i < value.size(); i++) {
-      LinkedReferenceWithOffset_Implementation subref = Copy.copy(left);
+      OffsetReference subref = Copy.copy(left);
       subref.getOffset().add(new RefName(rt.element.get(i).getName()));
       Expression subVal = value.get(i);
       RError.ass(!(subVal instanceof NamedElementsValue), subVal.metadata(), "Named element values for tuple not yet supported: " + subVal.toString());

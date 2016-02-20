@@ -17,8 +17,9 @@
 
 package ast.specification.visitor;
 
-import ast.data.reference.LinkedReference;
-import ast.data.reference.UnlinkedReference;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.Reference;
+import ast.data.reference.UnlinkedAnchor;
 import ast.data.variable.StateVariable;
 import ast.visitor.VisitExecutor;
 import ast.visitor.Visitor;
@@ -44,12 +45,16 @@ public class IsStateVariable implements Visitor {
     isState = true;
   }
 
-  public void visit(LinkedReference object) {
+  public void visit(Reference object) {
+    executor.visit(this, object.getAnchor());
+  }
+
+  public void visit(LinkedAnchor object) {
     executor.visit(this, object.getLink());
   }
 
-  public void visit(UnlinkedReference object) {
+  public void visit(UnlinkedAnchor object) {
     error.err(ErrorType.Fatal, "can not decide for unlinked reference", object.metadata());
-  }
 
+  }
 }

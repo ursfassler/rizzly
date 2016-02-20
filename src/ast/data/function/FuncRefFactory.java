@@ -18,15 +18,16 @@
 package ast.data.function;
 
 import ast.data.reference.RefFactory;
+import ast.data.reference.Reference;
 import ast.meta.MetaList;
 
 public class FuncRefFactory {
-  public static FunctionReference create(Function func) {
-    return new FunctionReference(RefFactory.oldCreate(func));
+  public static Reference create(Function func) {
+    return RefFactory.create(func);
   }
 
   @Deprecated
-  public static FunctionReference create(MetaList info, Function func) {
-    return new FunctionReference(info, RefFactory.oldCreate(info, func));
+  public static Reference create(MetaList info, Function func) {
+    return RefFactory.create(info, func);
   }
 }

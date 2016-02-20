@@ -72,7 +72,6 @@ import ast.data.expression.value.TupleValue;
 import ast.data.expression.value.UnionValue;
 import ast.data.expression.value.UnsafeUnionValue;
 import ast.data.file.RizzlyFile;
-import ast.data.function.FunctionReference;
 import ast.data.function.header.FuncFunction;
 import ast.data.function.header.FuncQuery;
 import ast.data.function.header.FuncSubHandlerEvent;
@@ -88,15 +87,12 @@ import ast.data.function.template.DefaultValueTemplate;
 import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
-import ast.data.reference.LinkTarget;
 import ast.data.reference.LinkedAnchor;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.reference.OffsetReference;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
-import ast.data.reference.SimpleReference;
 import ast.data.reference.UnlinkedAnchor;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
@@ -116,7 +112,6 @@ import ast.data.statement.VarDefStmt;
 import ast.data.statement.VoidReturn;
 import ast.data.statement.WhileStmt;
 import ast.data.template.Template;
-import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumElement;
@@ -150,16 +145,6 @@ import ast.data.variable.TemplateParameter;
 abstract public class NullDispatcher<R, P> extends Dispatcher<R, P> {
 
   abstract protected R visitDefault(Ast obj, P param);
-
-  @Override
-  protected R visitFuncRef(FunctionReference obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitTypeRef(TypeReference obj, P param) {
-    return visitDefault(obj, param);
-  }
 
   @Override
   protected R visitRefExpr(ReferenceExpression obj, P param) {
@@ -472,11 +457,6 @@ abstract public class NullDispatcher<R, P> extends Dispatcher<R, P> {
   }
 
   @Override
-  protected R visitReference(LinkedReferenceWithOffset_Implementation obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
   protected R visitNaturalType(NaturalType obj, P param) {
     return visitDefault(obj, param);
   }
@@ -707,11 +687,6 @@ abstract public class NullDispatcher<R, P> extends Dispatcher<R, P> {
   }
 
   @Override
-  protected R visitDummyLinkTarget(LinkTarget obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
   protected R visitRawElementary(RawElementary obj, P param) {
     return visitDefault(obj, param);
   }
@@ -773,11 +748,6 @@ abstract public class NullDispatcher<R, P> extends Dispatcher<R, P> {
 
   @Override
   protected R visitOffsetReference(OffsetReference obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitSimpleReference(SimpleReference obj, P param) {
     return visitDefault(obj, param);
   }
 

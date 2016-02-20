@@ -5,6 +5,9 @@ import java.util.Collection;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.mockito.Mockito;
+
+import ast.data.reference.Reference;
 
 public class VisitMethodCollector_Test {
   final private VisitMethodCollector testee = new VisitMethodCollector();
@@ -194,5 +197,21 @@ public class VisitMethodCollector_Test {
     Assert.assertNotNull(methods);
     Assert.assertEquals(1, methods.size());
     Assert.assertEquals(expected(VisitorVisitsInterface.class, VisiteeInterface.class), methods.toArray()[0]);
+  }
+
+  class ReferenceVisitor implements Visitor {
+    public void visit(Reference object) {
+    }
+  }
+
+  @Test
+  public void visits_Reference() {
+    Object visitor = new ReferenceVisitor();
+    testee.collectMethods(visitor.getClass(), Mockito.mock(Reference.class).getClass());
+    Collection<Method> methods = testee.getMethods();
+
+    Assert.assertNotNull(methods);
+    Assert.assertEquals(1, methods.size());
+    Assert.assertEquals(expected(ReferenceVisitor.class, Reference.class), methods.toArray()[0]);
   }
 }

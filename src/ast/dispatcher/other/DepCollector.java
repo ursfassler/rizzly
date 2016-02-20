@@ -22,7 +22,8 @@ import java.util.HashSet;
 import java.util.Set;
 
 import ast.data.Ast;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.UnlinkedAnchor;
 import ast.dispatcher.DfsTraverser;
 
 public class DepCollector extends DfsTraverser<Void, Void> {
@@ -51,10 +52,15 @@ public class DepCollector extends DfsTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
-    super.visitReference(obj, param);
+  protected Void visitLinkedAnchor(LinkedAnchor obj, Void param) {
+    super.visitLinkedAnchor(obj, param);
     visit(obj.getLink(), param);
     return null;
+  }
+
+  @Override
+  protected Void visitUnlinkedAnchor(UnlinkedAnchor obj, Void param) {
+    throw new RuntimeException("not yet implemented");
   }
 
 }

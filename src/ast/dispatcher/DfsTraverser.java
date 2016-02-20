@@ -72,7 +72,6 @@ import ast.data.expression.value.UnionValue;
 import ast.data.expression.value.UnsafeUnionValue;
 import ast.data.file.RizzlyFile;
 import ast.data.function.Function;
-import ast.data.function.FunctionReference;
 import ast.data.function.header.FuncFunction;
 import ast.data.function.header.FuncQuery;
 import ast.data.function.header.FuncSubHandlerEvent;
@@ -88,15 +87,12 @@ import ast.data.function.template.DefaultValueTemplate;
 import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
-import ast.data.reference.LinkTarget;
 import ast.data.reference.LinkedAnchor;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.reference.OffsetReference;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
-import ast.data.reference.SimpleReference;
 import ast.data.reference.UnlinkedAnchor;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
@@ -117,7 +113,6 @@ import ast.data.statement.VarDefStmt;
 import ast.data.statement.VoidReturn;
 import ast.data.statement.WhileStmt;
 import ast.data.template.Template;
-import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
 import ast.data.type.base.EnumElement;
@@ -444,12 +439,6 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
     visitList(obj.param, param);
     visit(obj.guard, param);
     visit(obj.body, param);
-    return null;
-  }
-
-  @Override
-  protected R visitReference(LinkedReferenceWithOffset_Implementation obj, P param) {
-    visitList(obj.getOffset(), param);
     return null;
   }
 
@@ -931,25 +920,8 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
   }
 
   @Override
-  protected R visitDummyLinkTarget(LinkTarget obj, P param) {
-    return null;
-  }
-
-  @Override
   protected R visitRefExpr(ReferenceExpression obj, P param) {
     visit(obj.reference, param);
-    return null;
-  }
-
-  @Override
-  protected R visitTypeRef(TypeReference obj, P param) {
-    visit(obj.ref, param);
-    return null;
-  }
-
-  @Override
-  protected R visitFuncRef(FunctionReference obj, P param) {
-    visit(obj.ref, param);
     return null;
   }
 
@@ -957,12 +929,6 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
   protected R visitOffsetReference(OffsetReference obj, P param) {
     visit(obj.getAnchor(), param);
     visitList(obj.getOffset(), param);
-    return null;
-  }
-
-  @Override
-  protected R visitSimpleReference(SimpleReference obj, P param) {
-    visit(obj.getAnchor(), param);
     return null;
   }
 

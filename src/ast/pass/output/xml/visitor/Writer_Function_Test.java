@@ -33,8 +33,8 @@ import ast.data.function.header.Signal;
 import ast.data.function.header.Slot;
 import ast.data.function.ret.FuncReturn;
 import ast.data.function.ret.FunctionReturnType;
+import ast.data.reference.Reference;
 import ast.data.statement.Block;
-import ast.data.type.TypeReference;
 import ast.data.variable.FunctionVariable;
 import ast.pass.output.xml.IdReader;
 import ast.visitor.VisitExecutor;
@@ -51,7 +51,7 @@ public class Writer_Function_Test {
   final private AstList<FunctionVariable> parameter = mock(AstList.class);
   final private FuncReturn ret = mock(FuncReturn.class);
   final private Block body = mock(Block.class);
-  final private TypeReference typeReference = mock(TypeReference.class);
+  final private Reference typeReference = mock(Reference.class);
 
   @Test
   public void write_Slot() {

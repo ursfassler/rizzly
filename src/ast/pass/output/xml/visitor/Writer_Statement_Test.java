@@ -26,7 +26,7 @@ import org.mockito.Mockito;
 
 import ast.data.AstList;
 import ast.data.expression.Expression;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.ExpressionReturn;
@@ -62,7 +62,7 @@ public class Writer_Statement_Test {
 
   @Test
   public void write_CallStatement() {
-    LinkedReferenceWithOffset_Implementation reference = mock(LinkedReferenceWithOffset_Implementation.class);
+    Reference reference = mock(Reference.class);
     CallStmt item = new CallStmt(reference);
 
     testee.visit(item);
@@ -76,7 +76,7 @@ public class Writer_Statement_Test {
 
   @Test
   public void write_MultiAssignment() {
-    AstList<LinkedReferenceWithOffset_Implementation> left = new AstList<LinkedReferenceWithOffset_Implementation>();
+    AstList<Reference> left = new AstList<Reference>();
     MultiAssignment item = new MultiAssignment(left, expression);
 
     testee.visit(item);

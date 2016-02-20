@@ -28,7 +28,6 @@ import org.mockito.Mockito;
 import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.Queue;
 import ast.data.component.elementary.ImplElementary;
-import ast.data.function.FunctionReference;
 import ast.data.reference.Reference;
 import ast.pass.output.xml.IdReader;
 import ast.visitor.VisitExecutor;
@@ -40,8 +39,8 @@ public class Writer_Component_Test {
   final private Visitor idWriter = mock(Visitor.class);
   final private VisitExecutor executor = mock(VisitExecutor.class);
   final private Write testee = new Write(stream, astId, idWriter, executor);
-  final private FunctionReference entry = mock(FunctionReference.class);
-  final private FunctionReference exit = mock(FunctionReference.class);
+  final private Reference entry = mock(Reference.class);
+  final private Reference exit = mock(Reference.class);
   final private Reference componentReference = mock(Reference.class);
   final private InOrder order = Mockito.inOrder(stream, entry, exit, idWriter, componentReference, executor);
 

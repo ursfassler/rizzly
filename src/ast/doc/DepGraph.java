@@ -19,7 +19,6 @@ package ast.doc;
 
 import ast.data.Ast;
 import ast.data.reference.LinkedAnchor;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.dispatcher.DfsTraverser;
 
 public class DepGraph extends DfsTraverser<Void, Ast> {
@@ -46,13 +45,6 @@ public class DepGraph extends DfsTraverser<Void, Ast> {
       checkReference(obj);
       super.visit(obj, obj);
     }
-    return null;
-  }
-
-  @Override
-  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Ast param) {
-    super.visitReference(obj, param);
-    visit(obj.getLink(), obj);
     return null;
   }
 

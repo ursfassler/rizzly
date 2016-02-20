@@ -23,7 +23,8 @@ import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.ImplComposition;
 import ast.data.component.elementary.ImplElementary;
 import ast.data.component.hfsm.ImplHfsm;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.OffsetReference;
 import ast.data.type.Type;
 import ast.dispatcher.NullDispatcher;
 
@@ -77,8 +78,13 @@ public class CompCascadeDepth extends NullDispatcher<Integer, Void> {
   }
 
   @Override
-  protected Integer visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
+  protected Integer visitOffsetReference(OffsetReference obj, Void param) {
     assert (obj.getOffset().isEmpty());
+    return visit(obj.getAnchor(), param);
+  }
+
+  @Override
+  protected Integer visitLinkedAnchor(LinkedAnchor obj, Void param) {
     return visit(obj.getLink(), param);
   }
 

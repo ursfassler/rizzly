@@ -18,17 +18,16 @@
 package ast.data.type.base;
 
 import ast.data.AstList;
+import ast.data.reference.Reference;
 import ast.data.type.Type;
-import ast.data.type.TypeReference;
 import ast.meta.MetaList;
-import ast.visitor.Visitor;
 
 final public class FunctionType extends Type {
-  final public AstList<TypeReference> arg;
-  final public TypeReference ret;
+  final public AstList<Reference> arg;
+  final public Reference ret;
 
   @Deprecated
-  public FunctionType(MetaList info, String name, AstList<TypeReference> arg, TypeReference ret) {
+  public FunctionType(MetaList info, String name, AstList<Reference> arg, Reference ret) {
     super(info, name);
     this.arg = arg;
     this.ret = ret;
@@ -38,6 +37,5 @@ final public class FunctionType extends Type {
   public String toString() {
     return "func(" + arg + "):" + ret;
   }
-
 
 }

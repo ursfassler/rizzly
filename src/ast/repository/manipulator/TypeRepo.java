@@ -23,8 +23,8 @@ import java.util.Set;
 import ast.copy.Copy;
 import ast.data.AstList;
 import ast.data.Range;
+import ast.data.reference.Reference;
 import ast.data.type.Type;
-import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.ArrayTypeFactory;
 import ast.data.type.base.BooleanType;
@@ -58,7 +58,7 @@ public class TypeRepo {
     return getType(EnumTypeFactory.create(kun.get("enum"), elements));
   }
 
-  public TupleType getTupleType(AstList<TypeReference> types) {
+  public TupleType getTupleType(AstList<Reference> types) {
     return getType(new TupleType(kun.get("tupleType"), Copy.copy(types)));
   }
 

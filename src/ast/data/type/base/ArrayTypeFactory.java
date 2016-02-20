@@ -20,16 +20,16 @@ package ast.data.type.base;
 import java.math.BigInteger;
 
 import ast.data.reference.RefFactory;
+import ast.data.reference.Reference;
 import ast.data.type.Type;
-import ast.data.type.TypeReference;
 
 public class ArrayTypeFactory {
   static public ArrayType create(BigInteger size, Type type) {
     return new ArrayType(makeName(size, type), size, createRef(type));
   }
 
-  private static TypeReference createRef(Type type) {
-    return new TypeReference(RefFactory.oldCreate(type));
+  private static Reference createRef(Type type) {
+    return RefFactory.create(type);
   }
 
   static public ArrayType create(int size, Type type) {

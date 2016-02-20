@@ -18,11 +18,10 @@
 package ast.data.variable;
 
 import ast.data.expression.Expression;
-import ast.data.type.TypeReference;
-import ast.visitor.Visitor;
+import ast.data.reference.Reference;
 
 final public class GlobalConstant extends Constant {
-  public GlobalConstant(String name, TypeReference type, Expression def) {
+  public GlobalConstant(String name, Reference type, Expression def) {
     super(name, type, def);
   }
 

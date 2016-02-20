@@ -17,13 +17,12 @@
 
 package ast.data.statement;
 
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
-import ast.visitor.Visitor;
+import ast.data.reference.Reference;
 
 final public class CallStmt extends Statement {
-  public LinkedReferenceWithOffset_Implementation call;
+  public Reference call;
 
-  public CallStmt(LinkedReferenceWithOffset_Implementation call) {
+  public CallStmt(Reference call) {
     this.call = call;
   }
 

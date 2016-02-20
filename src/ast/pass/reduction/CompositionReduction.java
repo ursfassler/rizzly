@@ -49,7 +49,6 @@ import ast.data.expression.ReferenceExpression;
 import ast.data.expression.value.TupleValue;
 import ast.data.function.FuncRefFactory;
 import ast.data.function.Function;
-import ast.data.function.FunctionReference;
 import ast.data.function.InterfaceFunction;
 import ast.data.function.header.FuncQuery;
 import ast.data.function.header.FuncSubHandlerEvent;
@@ -59,10 +58,12 @@ import ast.data.function.header.Response;
 import ast.data.function.header.Signal;
 import ast.data.function.header.Slot;
 import ast.data.function.ret.FuncReturnNone;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefFactory;
+import ast.data.reference.RefItem;
 import ast.data.reference.RefName;
+import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.ExpressionReturn;
@@ -232,11 +233,11 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
   }
 
   static private ExpressionReturn makeQueryCall(Endpoint ep, Function func) {
-    LinkedReferenceWithOffset_Implementation ref = epToRef(ep);
+    OffsetReference ref = oldEpToRef(ep);
 
     TupleValue actparam = new TupleValue(new AstList<Expression>());
     for (Variable var : func.param) {
-      actparam.value.add(new ReferenceExpression(RefFactory.oldFull(func.metadata(), var)));
+      actparam.value.add(new ReferenceExpression(RefFactory.withOffset(func.metadata(), var)));
     }
 
     RefCall call = new RefCall(actparam);
@@ -247,26 +248,26 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
   }
 
   private MsgPush makePostQueueCall(Endpoint ep, Function func, Component comp) {
-    LinkedReferenceWithOffset_Implementation ref = epToRef(ep);
+    Reference ref = epToRef(ep);
 
     List<Expression> actparam = new ArrayList<Expression>();
     for (Variable var : func.param) {
-      actparam.add(new ReferenceExpression(RefFactory.oldFull(func.metadata(), var)));
+      actparam.add(new ReferenceExpression(RefFactory.withOffset(func.metadata(), var)));
     }
 
-    LinkedReferenceWithOffset_Implementation queue = getQueue(ep, comp);
-    MsgPush push = new MsgPush(queue, new FunctionReference(ref), actparam);
+    Reference queue = getQueue(ep, comp);
+    MsgPush push = new MsgPush(queue, ref, actparam);
     push.metadata().add(func.metadata());
     return push;
   }
 
   static private CallStmt makeEventCall(Endpoint ep, Function func) {
 
-    LinkedReferenceWithOffset_Implementation ref = epToRef(ep);
+    OffsetReference ref = oldEpToRef(ep);
 
     TupleValue actparam = new TupleValue(new AstList<Expression>());
     for (Variable var : func.param) {
-      actparam.value.add(new ReferenceExpression(RefFactory.oldFull(func.metadata(), var)));
+      actparam.value.add(new ReferenceExpression(RefFactory.withOffset(func.metadata(), var)));
     }
 
     RefCall call = new RefCall(actparam);
@@ -278,27 +279,38 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
     return callStmt;
   }
 
-  static private LinkedReferenceWithOffset_Implementation epToRef(Endpoint ep) {
+  static private Reference epToRef(Endpoint ep) {
     if (ep instanceof EndpointSelf) {
-      return RefFactory.oldFull(ep.metadata(), ((EndpointSelf) ep).getFunc());
+      return RefFactory.create(ep.metadata(), ((EndpointSelf) ep).getFunc());
     } else {
       EndpointSub eps = (EndpointSub) ep;
-      LinkedReferenceWithOffset_Implementation ref = RefFactory.oldFull(eps.metadata(), eps.component.getTarget());
+      OffsetReference ref = RefFactory.create(eps.metadata(), eps.component.getTarget(), new AstList<RefItem>());
       ref.getOffset().add(new RefName(eps.metadata(), eps.function));
       return ref;
     }
   }
 
-  private LinkedReferenceWithOffset_Implementation getQueue(Endpoint ep, Component comp) {
-    LinkedReferenceWithOffset_Implementation ref;
+  static private OffsetReference oldEpToRef(Endpoint ep) {
+    if (ep instanceof EndpointSelf) {
+      return RefFactory.withOffset(ep.metadata(), ((EndpointSelf) ep).getFunc());
+    } else {
+      EndpointSub eps = (EndpointSub) ep;
+      OffsetReference ref = RefFactory.withOffset(eps.metadata(), eps.component.getTarget());
+      ref.getOffset().add(new RefName(eps.metadata(), eps.function));
+      return ref;
+    }
+  }
+
+  private Reference getQueue(Endpoint ep, Component comp) {
+    OffsetReference ref;
     if (ep instanceof EndpointSub) {
       ComponentUse compUse = (ComponentUse) ((EndpointSub) ep).component.getTarget();
-      ref = RefFactory.oldFull(ep.metadata(), compUse);
+      ref = RefFactory.withOffset(ep.metadata(), compUse);
       Component refComp = (Component) compUse.compRef.getTarget();
       Queue queue = refComp.queue;
       ref.getOffset().add(new RefName(queue.getName()));
     } else {
-      ref = RefFactory.oldFull(ep.metadata(), comp.queue);
+      ref = RefFactory.withOffset(ep.metadata(), comp.queue);
     }
     return ref;
   }

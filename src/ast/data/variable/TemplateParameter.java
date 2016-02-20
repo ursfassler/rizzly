@@ -17,12 +17,11 @@
 
 package ast.data.variable;
 
-import ast.data.type.TypeReference;
-import ast.visitor.Visitor;
+import ast.data.reference.Reference;
 
 public class TemplateParameter extends Variable {
 
-  public TemplateParameter(String name, TypeReference type) {
+  public TemplateParameter(String name, Reference type) {
     super(name, type);
   }
 

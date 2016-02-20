@@ -33,13 +33,14 @@ import ast.data.expression.ReferenceExpression;
 import ast.data.expression.TypeCast;
 import ast.data.expression.binop.Plus;
 import ast.data.expression.value.NumberValue;
-import ast.data.function.header.Procedure;
 import ast.data.function.header.FuncSubHandlerEvent;
+import ast.data.function.header.Procedure;
 import ast.data.function.header.Signal;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefIndex;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.RefItem;
+import ast.data.reference.Reference;
 import ast.data.statement.Assignment;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
@@ -48,7 +49,6 @@ import ast.data.statement.Statement;
 import ast.data.statement.VarDefStmt;
 import ast.data.type.Type;
 import ast.data.type.TypeRefFactory;
-import ast.data.type.TypeReference;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.RangeType;
 import ast.data.variable.FunctionVariable;
@@ -82,7 +82,7 @@ public class DebugIfaceAdder extends NullDispatcher<Void, Void> {
     return func;
   }
 
-  private TypeReference tr(Type type) {
+  private Reference tr(Type type) {
     return TypeRefFactory.create(type);
   }
 
@@ -110,17 +110,17 @@ public class DebugIfaceAdder extends NullDispatcher<Void, Void> {
 
     { // path[0] := func;
 
-      LinkedReferenceWithOffset_Implementation left = RefFactory.oldCreate(path, new RefIndex(new NumberValue(BigInteger.ZERO)));
-      LinkedReferenceWithOffset_Implementation right = RefFactory.oldFull(func);
+      Reference left = RefFactory.create(path, new RefIndex(new NumberValue(BigInteger.ZERO)));
+      Reference right = RefFactory.create(func, new AstList<RefItem>());
       Assignment ass = new AssignmentSingle(left, new ReferenceExpression(right));
       body.statements.add(ass);
     }
 
     { // _debug.msgSend( path, 1 );
-      ReferenceExpression pathArg = new ReferenceExpression(RefFactory.oldFull(path));
+      ReferenceExpression pathArg = new ReferenceExpression(RefFactory.create(path, new AstList<RefItem>()));
       NumberValue idxArg = new NumberValue(BigInteger.valueOf(1));
 
-      LinkedReferenceWithOffset_Implementation call = RefFactory.oldCall(sendProto, pathArg, idxArg);
+      Reference call = RefFactory.call(sendProto, pathArg, idxArg);
       body.statements.add(new CallStmt(call));
     }
 
@@ -152,7 +152,7 @@ public class DebugIfaceAdder extends NullDispatcher<Void, Void> {
     assert (x >= 0);
 
     { // sender[size] := x;
-      LinkedReferenceWithOffset_Implementation left = RefFactory.oldCreate(pArray, new RefIndex(new ReferenceExpression(RefFactory.oldFull(argSize))));
+      Reference left = RefFactory.create(pArray, new RefIndex(new ReferenceExpression(RefFactory.create(argSize, new AstList<RefItem>()))));
       NumberValue right = new NumberValue(BigInteger.valueOf(x));
       Assignment ass = new AssignmentSingle(left, right);
       code.add(ass);
@@ -164,17 +164,17 @@ public class DebugIfaceAdder extends NullDispatcher<Void, Void> {
       VarDefStmt def = new VarDefStmt(sizeP1);
       code.add(def);
 
-      Expression expr = new Plus(new ReferenceExpression(RefFactory.oldFull(argSize)), new NumberValue(BigInteger.ONE));
+      Expression expr = new Plus(new ReferenceExpression(RefFactory.create(argSize, new AstList<RefItem>())), new NumberValue(BigInteger.ONE));
       expr = new TypeCast(TypeRefFactory.create(sizeType), expr);
-      Assignment ass = new AssignmentSingle(RefFactory.oldFull(sizeP1), expr);
+      Assignment ass = new AssignmentSingle(RefFactory.create(sizeP1, new AstList<RefItem>()), expr);
       code.add(ass);
     }
 
     { // Self._debug.sendMsg( sender, sizeP1 );
-      ReferenceExpression arrayArg = new ReferenceExpression(RefFactory.oldFull(pArray));
-      ReferenceExpression sizeArg = new ReferenceExpression(RefFactory.oldFull(sizeP1));
+      ReferenceExpression arrayArg = new ReferenceExpression(RefFactory.create(pArray, new AstList<RefItem>()));
+      ReferenceExpression sizeArg = new ReferenceExpression(RefFactory.create(sizeP1, new AstList<RefItem>()));
 
-      LinkedReferenceWithOffset_Implementation call = RefFactory.oldCall(proto, arrayArg, sizeArg);
+      Reference call = RefFactory.call(proto, arrayArg, sizeArg);
       code.add(new CallStmt(call));
     }
 

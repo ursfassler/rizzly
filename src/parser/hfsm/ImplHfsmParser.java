@@ -35,13 +35,12 @@ import ast.data.expression.Expression;
 import ast.data.expression.value.BooleanValue;
 import ast.data.function.FuncRefFactory;
 import ast.data.function.Function;
-import ast.data.function.FunctionReference;
 import ast.data.function.header.Procedure;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.raw.RawComponent;
 import ast.data.raw.RawHfsm;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.reference.RefFactory;
+import ast.data.reference.RefItem;
 import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.template.Template;
@@ -86,8 +85,8 @@ public class ImplHfsmParser extends ImplBaseParser {
   // EBNF stateBody: { entryCode | exitCode | varDeclBlock | funcDecl |
   // transitionDecl | state }
   private <T extends State> void parseStateBody(State state) {
-    Block entryBody = state.entryFunc.getTarget().body;
-    Block exitBody = state.exitFunc.getTarget().body;
+    Block entryBody = ((Function) state.entryFunc.getTarget()).body;
+    Block exitBody = ((Function) state.exitFunc.getTarget()).body;
 
     while (!consumeIfEqual(TokenType.END)) {
       switch (peek().getType()) {
@@ -176,11 +175,11 @@ public class ImplHfsmParser extends ImplBaseParser {
     State state;
 
     Procedure entry = makeProc("_entry"); // FIXME get names from outside
-    FunctionReference entryRef = FuncRefFactory.create(entry);
+    Reference entryRef = FuncRefFactory.create(entry);
     entryRef.metadata().add(info);
 
     Procedure exit = makeProc("_exit");// FIXME get names from outside
-    FunctionReference exitRef = FuncRefFactory.create(exit);
+    Reference exitRef = FuncRefFactory.create(exit);
     exitRef.metadata().add(info);
 
     if (consumeIfEqual(TokenType.SEMI)) {
@@ -220,8 +219,7 @@ public class ImplHfsmParser extends ImplBaseParser {
     expect(TokenType.BY);
 
     Token tok = expect(TokenType.IDENTIFIER);
-    LinkedReferenceWithOffset_Implementation name = RefFactory.oldFull(tok.getMetadata(), tok.getData());
-    FunctionReference eventFunc = new FunctionReference(name.metadata(), name);
+    Reference eventFunc = RefFactory.create(tok.getMetadata(), tok.getData(), new AstList<RefItem>());
 
     AstList<FunctionVariable> param = parseVardefList();
 

@@ -17,12 +17,11 @@
 
 package ast.data.component.hfsm;
 
-import ast.data.function.FunctionReference;
-import ast.visitor.Visitor;
+import ast.data.reference.Reference;
 
 final public class StateSimple extends State {
 
-  public StateSimple(String name, FunctionReference entryFunc, FunctionReference exitFunc) {
+  public StateSimple(String name, Reference entryFunc, Reference exitFunc) {
     super(name, entryFunc, exitFunc);
   }
 

@@ -31,9 +31,11 @@ import ast.data.expression.value.NumberValue;
 import ast.data.function.Function;
 import ast.data.function.header.FuncFunction;
 import ast.data.function.ret.FunctionReturnType;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefFactory;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.ExpressionReturn;
@@ -88,13 +90,14 @@ class IntroduceConvertWorker extends DfsTraverser<Void, Void> {
   }
 
   @Override
-  protected Void visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
-    if ((obj.getLink() instanceof Type) && !obj.getOffset().isEmpty() && (obj.getOffset().get(0) instanceof RefCall)) {
-      Type resType = (Type) obj.getLink();
+  protected Void visitOffsetReference(OffsetReference obj, Void param) {
+    LinkedAnchor anchor = (LinkedAnchor) obj.getAnchor();
+    if ((anchor.getLink() instanceof Type) && !obj.getOffset().isEmpty() && (obj.getOffset().get(0) instanceof RefCall)) {
+      Type resType = (Type) anchor.getLink();
       Function convertFunc = getConvertFunc(resType);
-      obj.setLink(convertFunc);
+      anchor.setLink(convertFunc);
     }
-    return super.visitReference(obj, param);
+    return super.visitOffsetReference(obj, param);
   }
 
   private Function getConvertFunc(Type resType) {
@@ -131,15 +134,15 @@ class IntroduceConvertWorker extends DfsTraverser<Void, Void> {
     AstList<IfOption> option = new AstList<IfOption>();
 
     { // test
-      Relation aboveLower = new LessEqual(new NumberValue(resType.range.low), new ReferenceExpression(RefFactory.oldFull(value)));
-      Relation belowHigher = new LessEqual(new ReferenceExpression(RefFactory.oldFull(value)), new NumberValue(resType.range.high));
+      Relation aboveLower = new LessEqual(new NumberValue(resType.range.low), new ReferenceExpression(RefFactory.withOffset(value)));
+      Relation belowHigher = new LessEqual(new ReferenceExpression(RefFactory.withOffset(value)), new NumberValue(resType.range.high));
       Expression cond = new LogicAnd(aboveLower, belowHigher);
       IfOption opt = new IfOption(cond, ok);
       option.add(opt);
     }
 
     { // ok, cast
-      TypeCast cast = new TypeCast(TypeRefFactory.create(resType), new ReferenceExpression(RefFactory.oldFull(value)));
+      TypeCast cast = new TypeCast(TypeRefFactory.create(resType), new ReferenceExpression(RefFactory.withOffset(value)));
       ExpressionReturn ret = new ExpressionReturn(cast);
       ok.statements.add(ret);
     }
@@ -148,7 +151,7 @@ class IntroduceConvertWorker extends DfsTraverser<Void, Void> {
       // TODO how to trap or exception throwing?
       // TODO insert call to debug output with error message
       // TODO throw exception
-      LinkedReferenceWithOffset_Implementation call = RefFactory.oldCall(kll.getTrap());
+      Reference call = RefFactory.call(kll.getTrap());
       ExpressionReturn trap = new ExpressionReturn(new NumberValue(resType.range.low));
 
       error.statements.add(new CallStmt(call));

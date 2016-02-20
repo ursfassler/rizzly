@@ -28,10 +28,10 @@ import ast.data.expression.Expression;
 import ast.data.expression.ReferenceExpression;
 import ast.data.expression.binop.Equal;
 import ast.data.expression.binop.Is;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefName;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
-import ast.data.reference.ReferenceWithOffset;
 import ast.data.statement.CaseStmt;
 import ast.data.type.Type;
 import ast.data.type.TypeRefFactory;
@@ -92,24 +92,25 @@ class ReduceUnionWorker extends ExprReplacer<Void> {
     Type et = kt.get(obj.condition);
     if (et instanceof UnionType) {
       assert (obj.condition instanceof ReferenceExpression);
-      ReferenceWithOffset cond = ((ReferenceExpression) obj.condition).reference;
+      OffsetReference cond = (OffsetReference) ((ReferenceExpression) obj.condition).reference;
       cond.getOffset().add(new RefName(((UnionType) et).tag.getName()));
     }
     return super.visitCaseStmt(obj, param);
   }
 
   @Override
-  protected Expression visitReference(LinkedReferenceWithOffset_Implementation obj, Void param) {
-    super.visitReference(obj, param);
-    if (obj.getLink() instanceof UnionType) {
-      UnionType ut = (UnionType) obj.getLink();
+  protected Expression visitOffsetReference(OffsetReference obj, Void param) {
+    super.visitOffsetReference(obj, param);
+    LinkedAnchor anchor = (LinkedAnchor) obj.getAnchor();
+    if (anchor.getLink() instanceof UnionType) {
+      UnionType ut = (UnionType) anchor.getLink();
       assert (getUnion2enum().containsKey(ut));
       assert (obj.getOffset().size() == 1);
       assert (obj.getOffset().get(0) instanceof RefName);
       EnumType et = getUnion2enum().get(ut);
       String ev = ((RefName) obj.getOffset().get(0)).name;
       assert (Match.hasItem(et, new HasName(ev)));
-      obj.setLink(et);
+      anchor.setLink(et);
       obj.getOffset().clear();
       obj.getOffset().add(new RefName(ev));
     }
@@ -119,7 +120,7 @@ class ReduceUnionWorker extends ExprReplacer<Void> {
   @Override
   protected Expression visitIs(Is obj, Void param) {
     super.visitIs(obj, param);
-    LinkedReferenceWithOffset_Implementation left = ((ReferenceExpression) visit(obj.left, null)).reference;
+    OffsetReference left = (OffsetReference) ((ReferenceExpression) visit(obj.left, null)).reference;
 
     assert (left.getOffset().isEmpty());
 
@@ -127,7 +128,7 @@ class ReduceUnionWorker extends ExprReplacer<Void> {
     assert (ut instanceof UnionType);
 
     MetaList meta = left.metadata();
-    left = RefFactory.oldCreate(left.getLink(), new RefName(((UnionType) ut).tag.getName()));
+    left = RefFactory.create(left.getTarget(), new RefName(((UnionType) ut).tag.getName()));
     left.metadata().add(meta);
 
     ReferenceExpression leftRef = new ReferenceExpression(left);

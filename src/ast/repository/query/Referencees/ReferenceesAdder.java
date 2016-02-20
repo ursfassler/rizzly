@@ -17,7 +17,7 @@
 
 package ast.repository.query.Referencees;
 
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.Reference;
 import ast.visitor.Visitor;
 
 public class ReferenceesAdder implements Visitor {
@@ -27,8 +27,7 @@ public class ReferenceesAdder implements Visitor {
     this.referencees = referencees;
   }
 
-  public void visit(LinkedReferenceWithOffset_Implementation reference) {
-    referencees.addReferencee(reference);
+  public void visit(Reference object) {
+    referencees.addReferencee(object);
   }
-
 }

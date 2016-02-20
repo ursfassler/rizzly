@@ -21,16 +21,14 @@ import java.util.Collection;
 
 import ast.data.AstList;
 import ast.data.expression.Expression;
-import ast.data.function.FunctionReference;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
-import ast.visitor.Visitor;
+import ast.data.reference.Reference;
 
 final public class MsgPush extends Statement {
-  public LinkedReferenceWithOffset_Implementation queue;
-  public FunctionReference func;
+  public Reference queue;
+  public Reference func;
   final public AstList<Expression> data = new AstList<Expression>();
 
-  public MsgPush(LinkedReferenceWithOffset_Implementation queue, FunctionReference func, Collection<Expression> data) {
+  public MsgPush(Reference queue, Reference func, Collection<Expression> data) {
     this.queue = queue;
     this.func = func;
     this.data.addAll(data);

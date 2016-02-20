@@ -17,19 +17,21 @@
 
 package ast.repository.query.Referencees;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import java.util.HashSet;
 import java.util.Set;
 
 import org.junit.Assert;
 import org.junit.Test;
 
-import ast.data.AstList;
 import ast.data.Namespace;
-import ast.data.reference.RefItem;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.Reference;
 
 public class ReferenceesFactory_Tests {
-  private static final Set<LinkedReferenceWithOffset_Implementation> EmptySet = new HashSet<LinkedReferenceWithOffset_Implementation>();
+  private static final Set<Reference> EmptySet = new HashSet<Reference>();
 
   final private ReferenceesFactory testee = new ReferenceesFactory();
 
@@ -37,10 +39,17 @@ public class ReferenceesFactory_Tests {
   final private Namespace item1 = new Namespace("item1");
   final private Namespace item2 = new Namespace("item2");
   final private Namespace item3 = new Namespace("item3");
-  final private LinkedReferenceWithOffset_Implementation reference1 = new LinkedReferenceWithOffset_Implementation(item1, new AstList<RefItem>());
-  final private LinkedReferenceWithOffset_Implementation reference2 = new LinkedReferenceWithOffset_Implementation(item3, new AstList<RefItem>());
+  final private LinkedAnchor anchor1 = mock(LinkedAnchor.class);
+  final private Reference reference1 = mock(Reference.class);
+  final private LinkedAnchor anchor2 = mock(LinkedAnchor.class);
+  final private Reference reference2 = mock(Reference.class);
 
   {
+    when(anchor1.getLink()).thenReturn(item1);
+    when(reference1.getAnchor()).thenReturn(anchor1);
+    when(anchor2.getLink()).thenReturn(item3);
+    when(reference2.getAnchor()).thenReturn(anchor2);
+
     root.children.add(item1);
     root.children.add(reference1);
     root.children.add(reference2);
@@ -85,8 +94,8 @@ public class ReferenceesFactory_Tests {
     Assert.assertEquals(EmptySet, reader.getReferencees(reference2));
   }
 
-  private Set<LinkedReferenceWithOffset_Implementation> set(LinkedReferenceWithOffset_Implementation reference) {
-    Set<LinkedReferenceWithOffset_Implementation> ret = new HashSet<LinkedReferenceWithOffset_Implementation>();
+  private Set<Reference> set(Reference reference) {
+    Set<Reference> ret = new HashSet<Reference>();
     ret.add(reference);
     return ret;
   }

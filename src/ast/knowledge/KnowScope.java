@@ -27,15 +27,14 @@ import ast.data.component.hfsm.StateSimple;
 import ast.data.component.hfsm.Transition;
 import ast.data.file.RizzlyFile;
 import ast.data.function.header.FuncFunction;
-import ast.data.function.header.Procedure;
 import ast.data.function.header.FuncQuery;
+import ast.data.function.header.Procedure;
 import ast.data.function.header.Response;
 import ast.data.function.header.Signal;
 import ast.data.function.header.Slot;
 import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
-import ast.data.reference.LinkTarget;
 import ast.data.template.Template;
 import ast.data.type.base.ArrayType;
 import ast.data.type.base.BooleanType;
@@ -53,9 +52,9 @@ import ast.data.type.special.VoidType;
 import ast.data.type.template.ArrayTemplate;
 import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
-import ast.data.variable.GlobalConstant;
 import ast.data.variable.ConstPrivate;
 import ast.data.variable.FunctionVariable;
+import ast.data.variable.GlobalConstant;
 import ast.data.variable.StateVariable;
 import ast.data.variable.TemplateParameter;
 import error.ErrorType;
@@ -91,7 +90,6 @@ public class KnowScope extends KnowledgeEntry {
     global.add(RawElementary.class);
     global.add(RawComposition.class);
     global.add(RawHfsm.class);
-    global.add(LinkTarget.class);
     global.add(RizzlyFile.class);
     global.add(FuncFunction.class); // FIXME: can also be private
 

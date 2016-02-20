@@ -19,11 +19,10 @@ package ast.data.variable;
 
 import ast.data.component.hfsm.StateContent;
 import ast.data.expression.Expression;
-import ast.data.type.TypeReference;
-import ast.visitor.Visitor;
+import ast.data.reference.Reference;
 
 final public class ConstPrivate extends Constant implements StateContent {
-  public ConstPrivate(String name, TypeReference type, Expression def) {
+  public ConstPrivate(String name, Reference type, Expression def) {
     super(name, type, def);
   }
 

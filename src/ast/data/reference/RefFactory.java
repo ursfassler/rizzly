@@ -26,26 +26,29 @@ import ast.meta.MetaList;
 
 public class RefFactory {
 
-  public static SimpleReference create(String name) {
+  public static Reference create(String name) {
     Anchor anchor = new UnlinkedAnchor(name);
-    return new SimpleReference(anchor);
+    // return new SimpleReference(anchor);
+    return new OffsetReference(anchor, new AstList<RefItem>());
   }
 
-  public static SimpleReference create(MetaList info, String name) {
-    SimpleReference reference = create(name);
+  public static Reference create(MetaList info, String name) {
+    Reference reference = create(name);
     reference.metadata().add(info);
     return reference;
   }
 
-  public static SimpleReference create(Named link) {
-    Anchor anchor = new LinkedAnchor(link);
-    return new SimpleReference(anchor);
+  public static Reference create(Named link) {
+    return withOffset(link);
+    // Anchor anchor = new LinkedAnchor(link);
+    // return new SimpleReference(anchor);
   }
 
-  public static SimpleReference create(MetaList info, Named link) {
-    SimpleReference reference = create(link);
-    reference.metadata().add(info);
-    return reference;
+  public static Reference create(MetaList info, Named link) {
+    return withOffset(info, link);
+    // SimpleReference reference = create(link);
+    // reference.metadata().add(info);
+    // return reference;
   }
 
   public static OffsetReference create(MetaList info, String name, AstList<RefItem> offset) {
@@ -68,122 +71,59 @@ public class RefFactory {
     return reference;
   }
 
-  public static LinkedReferenceWithOffset_Implementation oldCreate(Named link, RefItem item1, RefItem item2, RefItem item3) {
-    AstList<RefItem> items = new AstList<RefItem>();
-    items.add(item1);
-    items.add(item2);
-    items.add(item3);
-    return new LinkedReferenceWithOffset_Implementation(link, items);
+  public static OffsetReference withOffset(Named link) {
+    return create(link, new AstList<RefItem>());
   }
 
-  public static LinkedReferenceWithOffset_Implementation oldCreate(Named link, RefItem item1, RefItem item2) {
-    AstList<RefItem> items = new AstList<RefItem>();
-    items.add(item1);
-    items.add(item2);
-    return new LinkedReferenceWithOffset_Implementation(link, items);
-  }
-
-  public static LinkedReferenceWithOffset_Implementation oldCreate(Named link, RefItem item) {
-    AstList<RefItem> items = new AstList<RefItem>();
-    items.add(item);
-    return new LinkedReferenceWithOffset_Implementation(link, items);
-  }
-
-  public static LinkedReferenceWithOffset_Implementation oldCreate(String name) {
-    return oldFull(name);
-  }
-
-  @Deprecated
-  public static LinkedReferenceWithOffset_Implementation oldCreate(MetaList info, String name) {
-    return oldFull(info, name);
-  }
-
-  public static LinkedReferenceWithOffset_Implementation oldCreate(Named link) {
-    return oldFull(link);
-  }
-
-  @Deprecated
-  public static LinkedReferenceWithOffset_Implementation oldCreate(MetaList info, Named link) {
-    return oldFull(info, link);
-  }
-
-  public static LinkedReferenceWithOffset_Implementation oldFull(Named link) {
-    LinkedReferenceWithOffset_Implementation reference = new LinkedReferenceWithOffset_Implementation(link, new AstList<RefItem>());
-    return reference;
-  }
-
-  @Deprecated
-  public static LinkedReferenceWithOffset_Implementation oldFull(MetaList info, Named link) {
-    LinkedReferenceWithOffset_Implementation reference = new LinkedReferenceWithOffset_Implementation(link, new AstList<RefItem>());
+  public static OffsetReference withOffset(MetaList info, Named link) {
+    OffsetReference reference = withOffset(link);
     reference.metadata().add(info);
     return reference;
   }
 
-  public static LinkedReferenceWithOffset_Implementation oldFull(String name) {
-    LinkTarget target = new LinkTarget(name);
-    return oldFull(target);
+  public static OffsetReference call(Function func, Expression arg1) {
+    AstList<Expression> arg = new AstList<Expression>();
+    arg.add(arg1);
+    return call(func, arg);
   }
 
-  @Deprecated
-  public static LinkedReferenceWithOffset_Implementation oldFull(MetaList info, String name) {
-    LinkTarget target = new LinkTarget(name);
-    target.metadata().add(info);
-    return oldFull(info, target);
-  }
-
-  public static LinkedReferenceWithOffset_Implementation oldCall(Function func, Expression arg1, Expression arg2) {
+  public static OffsetReference call(Function func, Expression arg1, Expression arg2) {
     AstList<Expression> arg = new AstList<Expression>();
     arg.add(arg1);
     arg.add(arg2);
-    return oldCall(func, arg);
+    return call(func, arg);
   }
 
-  @Deprecated
-  public static LinkedReference oldCall(MetaList info, Function func, Expression arg1, Expression arg2) {
-    AstList<Expression> arg = new AstList<Expression>();
-    arg.add(arg1);
-    arg.add(arg2);
-    return oldCall(info, func, arg);
-  }
-
-  public static LinkedReferenceWithOffset_Implementation oldCall(Function func, Expression arg1) {
-    AstList<Expression> arg = new AstList<Expression>();
-    arg.add(arg1);
-    return oldCall(func, arg);
-  }
-
-  @Deprecated
-  public static LinkedReference oldCall(MetaList info, Function func, Expression arg1) {
-    AstList<Expression> arg = new AstList<Expression>();
-    arg.add(arg1);
-    return oldCall(info, func, arg);
-  }
-
-  public static LinkedReferenceWithOffset_Implementation oldCall(Function func) {
-    return oldCall(func, new AstList<Expression>());
-  }
-
-  @Deprecated
-  public static LinkedReferenceWithOffset_Implementation oldCall(MetaList info, Function func) {
-    return oldCall(info, func, new AstList<Expression>());
-  }
-
-  public static LinkedReferenceWithOffset_Implementation oldCall(Function func, AstList<Expression> arg) {
+  public static OffsetReference call(Function func, AstList<Expression> arg) {
     TupleValue actualParameter = new TupleValue(arg);
     RefCall call = new RefCall(actualParameter);
-    LinkedReferenceWithOffset_Implementation ref = oldCreate(func, call);
+    OffsetReference ref = create(func, call);
     return ref;
   }
 
-  @Deprecated
-  public static LinkedReferenceWithOffset_Implementation oldCall(MetaList info, Function func, AstList<Expression> arg) {
-    TupleValue actualParameter = new TupleValue(arg);
-    actualParameter.metadata().add(info);
-    RefCall call = new RefCall(actualParameter);
-    call.metadata().add(info);
-    LinkedReferenceWithOffset_Implementation ref = oldCreate(func, call);
-    ref.metadata().add(info);
-    return ref;
+  public static Reference call(Function func) {
+    return call(func, new AstList<Expression>());
+  }
+
+  public static OffsetReference create(Named link, RefItem item) {
+    AstList<RefItem> items = new AstList<RefItem>();
+    items.add(item);
+    return create(link, items);
+  }
+
+  public static OffsetReference create(Named link, RefItem item1, RefItem item2, RefItem item3) {
+    AstList<RefItem> items = new AstList<RefItem>();
+    items.add(item1);
+    items.add(item2);
+    items.add(item3);
+    return create(link, items);
+  }
+
+  public static OffsetReference create(Named link, RefItem item1, RefItem item2) {
+    AstList<RefItem> items = new AstList<RefItem>();
+    items.add(item1);
+    items.add(item2);
+    return create(link, items);
   }
 
 }

@@ -22,7 +22,7 @@ import ast.data.AstList;
 import ast.data.expression.ReferenceExpression;
 import ast.data.expression.value.AnyValue;
 import ast.data.reference.RefFactory;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.statement.MultiAssignment;
 import ast.data.statement.Statement;
@@ -92,16 +92,16 @@ class VarDefSplitterWorker extends DfsTraverser<AstList<Statement>, Void> {
       // assign initial value
       if (!(obj.initial instanceof AnyValue)) {
         if (firstVar == null) {
-          AstList<LinkedReferenceWithOffset_Implementation> al = new AstList<LinkedReferenceWithOffset_Implementation>();
-          al.add(RefFactory.oldFull(info, var));
+          AstList<Reference> al = new AstList<Reference>();
+          al.add(RefFactory.withOffset(info, var));
           MultiAssignment ass = new MultiAssignment(al, obj.initial);
           ass.metadata().add(var.metadata());
           ret.add(ass);
           firstVar = var;
         } else {
-          AstList<LinkedReferenceWithOffset_Implementation> al = new AstList<LinkedReferenceWithOffset_Implementation>();
-          al.add(RefFactory.oldFull(info, var));
-          ReferenceExpression right = new ReferenceExpression(RefFactory.oldFull(info, firstVar));
+          AstList<Reference> al = new AstList<Reference>();
+          al.add(RefFactory.withOffset(info, var));
+          ReferenceExpression right = new ReferenceExpression(RefFactory.withOffset(info, firstVar));
           right.metadata().add(info);
           MultiAssignment ass = new MultiAssignment(al, right);
           ass.metadata().add(var.metadata());

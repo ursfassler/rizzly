@@ -28,12 +28,11 @@ import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateContent;
 import ast.data.component.hfsm.StateSimple;
-import ast.data.function.FunctionReference;
 import ast.data.function.Function;
 import ast.data.function.header.Procedure;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.reference.RefFactory;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.Statement;
@@ -106,8 +105,8 @@ class EntryExitUpdaterWorker extends NullDispatcher<Void, EePar> {
     obj.exitFunc = makeFuncRef(exit);
   }
 
-  private FunctionReference makeFuncRef(Procedure entry) {
-    return new FunctionReference(RefFactory.oldCreate(entry));
+  private Reference makeFuncRef(Procedure entry) {
+    return RefFactory.create(entry);
   }
 
   public Procedure makeFunc(LinkedList<Function> list, String name) {
@@ -123,7 +122,7 @@ class EntryExitUpdaterWorker extends NullDispatcher<Void, EePar> {
 
   private CallStmt makeCall(Function func) {
     assert (func.param.isEmpty());
-    LinkedReferenceWithOffset_Implementation ref = RefFactory.oldCall(func);
+    Reference ref = RefFactory.call(func);
     return new CallStmt(ref);
   }
 
@@ -137,8 +136,8 @@ class EntryExitUpdaterWorker extends NullDispatcher<Void, EePar> {
   @Override
   protected Void visitState(State obj, EePar param) {
     param = new EePar(param);
-    param.entry.addLast(obj.entryFunc.getTarget());
-    param.exit.addFirst(obj.exitFunc.getTarget());
+    param.entry.addLast((Function) obj.entryFunc.getTarget());
+    param.exit.addFirst((Function) obj.exitFunc.getTarget());
     return super.visitState(obj, param);
   }
 

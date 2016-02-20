@@ -35,9 +35,8 @@ import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FuncReturnTuple;
 import ast.data.function.ret.FunctionReturnType;
 import ast.data.reference.RefFactory;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.Reference;
 import ast.data.statement.Block;
-import ast.data.type.TypeReference;
 import ast.data.type.special.AnyType;
 import ast.data.variable.Constant;
 import ast.data.variable.FunctionVariable;
@@ -133,11 +132,11 @@ public class BaseParser extends Parser {
 
     expect(TokenType.COLON);
 
-    TypeReference type = expr().parseRefType();
+    Reference type = expr().parseRefType();
 
     AstList<T> ret = new AstList<T>();
     for (int i = 0; i < names.size(); i++) {
-      TypeReference ntype = Copy.copy(type);
+      Reference ntype = Copy.copy(type);
       T variable = VariableFactory.create(kind, names.get(i).getData(), ntype);
       variable.metadata().add(names.get(i).getMetadata());
       ret.add(variable);
@@ -148,7 +147,7 @@ public class BaseParser extends Parser {
 
   // EBNF stateVardef: typeref "=" expr
   public StateVariable parseStateVardef(String name) {
-    TypeReference type = expr().parseRefType();
+    Reference type = expr().parseRefType();
     expect(TokenType.EQUAL);
     Expression init = expr().parse();
     StateVariable stateVariable = new StateVariable(name, type, init);
@@ -198,14 +197,11 @@ public class BaseParser extends Parser {
   // EBNF constdef: "const" [ typeref ] "=" expr
   public <T extends Constant> T parseConstDef(Class<T> kind, String name) {
     MetaList info = expect(TokenType.CONST).getMetadata();
-    TypeReference type;
+    Reference type;
     if (peek().getType() != TokenType.EQUAL) {
       type = expr().parseRefType();
     } else {
-      LinkedReferenceWithOffset_Implementation ref = RefFactory.oldCreate(AnyType.NAME);
-      ref.metadata().add(info);
-      type = new TypeReference(ref);
-      type.metadata().add(info);
+      type = RefFactory.create(info, AnyType.NAME);
     }
     expect(TokenType.EQUAL);
     ast.data.expression.Expression value = expr().parse();

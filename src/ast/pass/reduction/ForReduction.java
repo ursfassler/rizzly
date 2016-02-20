@@ -92,22 +92,22 @@ class ForReductionWorker extends StmtReplacer<Void> {
     FunctionVariable loopCond = new FunctionVariable(kun.get("run"), TypeRefFactory.create(kbi.getBooleanType()));
 
     block.statements.add(new VarDefStmt(loopCond));
-    block.statements.add(new AssignmentSingle(RefFactory.oldFull(loopCond), new BooleanValue(true)));
+    block.statements.add(new AssignmentSingle(RefFactory.withOffset(loopCond), new BooleanValue(true)));
 
     block.statements.add(new VarDefStmt(itr));
-    block.statements.add(new AssignmentSingle(RefFactory.oldFull(itr), new NumberValue(rt.range.low)));
+    block.statements.add(new AssignmentSingle(RefFactory.withOffset(itr), new NumberValue(rt.range.low)));
 
     Block body = new Block();
-    block.statements.add(new WhileStmt(new ReferenceExpression(RefFactory.oldFull(loopCond)), body));
+    block.statements.add(new WhileStmt(new ReferenceExpression(RefFactory.withOffset(loopCond)), body));
 
     body.statements.add(obj.block);
     AstList<IfOption> option = new AstList<IfOption>();
     Block defblock = new Block();
 
     Block inc = new Block();
-    option.add(new IfOption(new Less(new ReferenceExpression(RefFactory.oldFull(itr)), new NumberValue(rt.range.high)), inc));
-    inc.statements.add(new AssignmentSingle(RefFactory.oldFull(itr), new Plus(new ReferenceExpression(RefFactory.oldFull(itr)), new NumberValue(BigInteger.ONE))));
-    defblock.statements.add(new AssignmentSingle(RefFactory.oldFull(loopCond), new BooleanValue(false)));
+    option.add(new IfOption(new Less(new ReferenceExpression(RefFactory.withOffset(itr)), new NumberValue(rt.range.high)), inc));
+    inc.statements.add(new AssignmentSingle(RefFactory.withOffset(itr), new Plus(new ReferenceExpression(RefFactory.withOffset(itr)), new NumberValue(BigInteger.ONE))));
+    defblock.statements.add(new AssignmentSingle(RefFactory.withOffset(loopCond), new BooleanValue(false)));
 
     body.statements.add(new IfStatement(option, defblock));
 
