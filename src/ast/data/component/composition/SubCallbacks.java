@@ -20,22 +20,21 @@ package ast.data.component.composition;
 import ast.data.AstBase;
 import ast.data.AstList;
 import ast.data.function.Function;
+import ast.data.reference.Reference;
 import ast.meta.MetaList;
-import ast.visitor.Visitor;
 
 public class SubCallbacks extends AstBase {
   final public AstList<Function> func = new AstList<Function>();
-  final public CompUseRef compUse;
+  final public Reference compUse;
 
-  public SubCallbacks(CompUseRef compUse) {
+  public SubCallbacks(Reference compUse) {
     this.compUse = compUse;
   }
 
   @Deprecated
-  public SubCallbacks(MetaList info, CompUseRef compUse) {
+  public SubCallbacks(MetaList info, Reference compUse) {
     metadata().add(info);
     this.compUse = compUse;
   }
-
 
 }

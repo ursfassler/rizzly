@@ -31,7 +31,6 @@ import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.component.CompRefFactory;
 import ast.data.component.Component;
-import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.Direction;
 import ast.data.component.composition.SubCallbacks;
@@ -99,7 +98,7 @@ public class ElementaryInstantiation extends AstPass {
     env.component.add(item);
 
     for (ComponentUse compu : env.component) {
-      SubCallbacks suc = new SubCallbacks(compu.metadata(), new CompUseRef(RefFactory.oldCreate(compu)));
+      SubCallbacks suc = new SubCallbacks(compu.metadata(), RefFactory.create(compu));
       env.subCallback.add(suc);
       Component refComp = (Component) compu.compRef.getTarget();
       for (InterfaceFunction out : refComp.getIface(Direction.out)) {

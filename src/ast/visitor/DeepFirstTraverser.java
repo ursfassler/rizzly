@@ -24,7 +24,6 @@ import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.component.composition.AsynchroniusConnection;
-import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.EndpointRaw;
 import ast.data.component.composition.EndpointSelf;
@@ -951,12 +950,6 @@ public class DeepFirstTraverser implements Visitor {
   }
 
   public void visit(FunctionReference object) {
-    preorderVisit(object);
-    executeVisit(object.ref);
-    postorderVisit(object);
-  }
-
-  public void visit(CompUseRef object) {
     preorderVisit(object);
     executeVisit(object.ref);
     postorderVisit(object);

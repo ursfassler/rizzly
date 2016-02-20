@@ -20,7 +20,6 @@ package ast.dispatcher;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.component.composition.AsynchroniusConnection;
-import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.EndpointRaw;
 import ast.data.component.composition.EndpointSelf;
@@ -151,11 +150,6 @@ import ast.data.variable.TemplateParameter;
 abstract public class NullDispatcher<R, P> extends Dispatcher<R, P> {
 
   abstract protected R visitDefault(Ast obj, P param);
-
-  @Override
-  protected R visitCompUseRef(CompUseRef obj, P param) {
-    return visitDefault(obj, param);
-  }
 
   @Override
   protected R visitFuncRef(FunctionReference obj, P param) {

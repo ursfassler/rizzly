@@ -12,7 +12,6 @@ import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.component.Component;
 import ast.data.component.composition.ComponentUse;
-import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.Connection;
 import ast.data.component.composition.Endpoint;
 import ast.data.component.composition.EndpointRaw;
@@ -29,9 +28,9 @@ import ast.data.function.ret.FuncReturnNone;
 import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefName;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.type.Type;
 import ast.data.variable.Constant;
 import ast.data.variable.FunctionVariable;
@@ -188,7 +187,7 @@ class ReduceEndpoint extends NullDispatcher<Endpoint, Void> {
         Named link = ref.getLink();
         RError.ass(link instanceof ComponentUse, ref.metadata(), "expected compuse for: " + link.getName());
         String name = ((RefName) ref.getOffset().get(0)).name;
-        return new EndpointSub(ref.metadata(), new CompUseRef(obj.metadata(), RefFactory.oldCreate(obj.metadata(), link)), name);
+        return new EndpointSub(ref.metadata(), RefFactory.create(obj.metadata(), link), name);
       }
       default: {
         RError.err(ErrorType.Fatal, "Unknown connection endpoint", ref.metadata());

@@ -22,7 +22,6 @@ import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.component.composition.AsynchroniusConnection;
-import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.EndpointRaw;
 import ast.data.component.composition.EndpointSelf;
@@ -289,10 +288,6 @@ public class Write implements Visitor {
     executor.visit(this, object.metadata());
     executor.visit(this, object.compRef);
     writer.endNode();
-  }
-
-  public void visit(CompUseRef object) {
-    throw new RuntimeException("not yet implemented");
   }
 
   public void visit(GlobalConstant object) {

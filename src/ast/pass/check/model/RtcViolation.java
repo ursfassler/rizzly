@@ -81,8 +81,8 @@ public class RtcViolation extends AstPass {
       Endpoint src = con.getSrc();
       Endpoint dst = con.getDst();
       if ((src instanceof EndpointSub) && (dst instanceof EndpointSub)) {
-        ComponentUse srcComp = ((EndpointSub) src).component.getTarget();
-        ComponentUse dstComp = ((EndpointSub) dst).component.getTarget();
+        ComponentUse srcComp = (ComponentUse) ((EndpointSub) src).component.getTarget();
+        ComponentUse dstComp = (ComponentUse) ((EndpointSub) dst).component.getTarget();
         ret.addVertex(srcComp);
         ret.addVertex(dstComp);
         ret.addEdge(srcComp, dstComp);

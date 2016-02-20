@@ -26,7 +26,6 @@ import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.component.Component;
 import ast.data.component.composition.AsynchroniusConnection;
-import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.Connection;
 import ast.data.component.composition.Endpoint;
@@ -261,8 +260,6 @@ public abstract class Dispatcher<R, P> {
       return visitTypeRef((TypeReference) obj, param);
     } else if (obj instanceof FunctionReference) {
       return visitFuncRef((FunctionReference) obj, param);
-    } else if (obj instanceof CompUseRef) {
-      return visitCompUseRef((CompUseRef) obj, param);
     } else {
       throwUnknownObjectError(obj);
       return null;
@@ -772,8 +769,6 @@ public abstract class Dispatcher<R, P> {
   private void throwUnknownObjectError(Ast obj) {
     throw new RuntimeException("Unknow object: " + obj.getClass().getSimpleName());
   }
-
-  abstract protected R visitCompUseRef(CompUseRef obj, P param);
 
   abstract protected R visitFuncRef(FunctionReference obj, P param);
 

@@ -33,7 +33,6 @@ import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.component.Component;
 import ast.data.component.composition.AsynchroniusConnection;
-import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.Connection;
 import ast.data.component.composition.Direction;
@@ -165,7 +164,7 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
     Map<Pair<ComponentUse, Function>, Function> coca = new HashMap<Pair<ComponentUse, Function>, Function>();
 
     for (ComponentUse compu : obj.component) {
-      SubCallbacks suc = new SubCallbacks(new CompUseRef(info, RefFactory.oldCreate(info, compu)));
+      SubCallbacks suc = new SubCallbacks(RefFactory.create(info, compu));
       suc.metadata().add(compu.metadata());
       elem.subCallback.add(suc);
       Component usedComp = (Component) compu.compRef.getTarget();
@@ -196,7 +195,7 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
           RError.err(ErrorType.Fatal, "Unexpected function type: " + coniface.getClass().getSimpleName(), coniface.metadata());
         }
       } else {
-        ComponentUse srcCompRef = ((EndpointSub) src).component.getTarget();
+        ComponentUse srcCompRef = (ComponentUse) ((EndpointSub) src).component.getTarget();
         Component srcComp = (Component) srcCompRef.compRef.getTarget();
         InterfaceFunction funa = NameFilter.select(srcComp.iface, ((EndpointSub) src).function);
         Function coniface = funa;
@@ -293,8 +292,9 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
   private LinkedReferenceWithOffset_Implementation getQueue(Endpoint ep, Component comp) {
     LinkedReferenceWithOffset_Implementation ref;
     if (ep instanceof EndpointSub) {
-      ref = RefFactory.oldFull(ep.metadata(), ((EndpointSub) ep).component.getTarget());
-      Component refComp = (Component) ((EndpointSub) ep).component.getTarget().compRef.getTarget();
+      ComponentUse compUse = (ComponentUse) ((EndpointSub) ep).component.getTarget();
+      ref = RefFactory.oldFull(ep.metadata(), compUse);
+      Component refComp = (Component) compUse.compRef.getTarget();
       Queue queue = refComp.queue;
       ref.getOffset().add(new RefName(queue.getName()));
     } else {

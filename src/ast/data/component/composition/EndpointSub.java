@@ -19,20 +19,21 @@ package ast.data.component.composition;
 
 import ast.data.component.Component;
 import ast.data.function.Function;
+import ast.data.reference.Reference;
 import ast.meta.MetaList;
 import ast.repository.query.NameFilter;
 
 final public class EndpointSub extends Endpoint {
-  final public CompUseRef component;
+  final public Reference component;
   final public String function;
 
-  public EndpointSub(CompUseRef component, String function) {
+  public EndpointSub(Reference component, String function) {
     this.component = component;
     this.function = function;
   }
 
   @Deprecated
-  public EndpointSub(MetaList info, CompUseRef component, String function) {
+  public EndpointSub(MetaList info, Reference component, String function) {
     metadata().add(info);
     this.component = component;
     this.function = function;
@@ -40,7 +41,8 @@ final public class EndpointSub extends Endpoint {
 
   @Override
   public Function getFunc() {
-    Component comp = (Component) component.getTarget().compRef.getTarget();
+    ComponentUse compRef = (ComponentUse) component.getTarget();
+    Component comp = (Component) compRef.compRef.getTarget();
     return NameFilter.select(comp.iface, function);
   }
 

@@ -27,7 +27,6 @@ import ast.data.AstList;
 import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.component.composition.AsynchroniusConnection;
-import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.EndpointRaw;
 import ast.data.component.composition.Queue;
@@ -132,11 +131,6 @@ public class CopyAst extends NullDispatcher<Ast, Void> {
   @Override
   protected Ast visitFuncRef(FunctionReference obj, Void param) {
     return new FunctionReference(copy(obj.ref));
-  }
-
-  @Override
-  protected Ast visitCompUseRef(CompUseRef obj, Void param) {
-    return new CompUseRef(copy(obj.ref));
   }
 
   @Override

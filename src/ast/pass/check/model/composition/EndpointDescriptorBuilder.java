@@ -39,7 +39,7 @@ public class EndpointDescriptorBuilder implements Visitor {
   }
 
   public void visit(EndpointSub endpointSub) {
-    ComponentUse first = endpointSub.component.getTarget();
+    ComponentUse first = (ComponentUse) endpointSub.component.getTarget();
     Function second = endpointSub.getFunc();
     descriptor = new Pair<ComponentUse, Function>(first, second);
   }
