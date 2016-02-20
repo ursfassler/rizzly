@@ -15,18 +15,37 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.component.hfsm;
+package ast.data.reference;
 
-import ast.data.reference.RefFactory;
-import ast.meta.MetaList;
+import ast.data.AstBase;
+import ast.data.component.hfsm.State;
 
-public class StateRefFactory {
-  public static StateRef create(State comp) {
-    return new StateRef(RefFactory.create(comp));
+public class SimpleReference extends AstBase implements Reference {
+  private Anchor anchor;
+
+  public SimpleReference(Anchor anchor) {
+    this.anchor = anchor;
   }
 
+  @Override
+  public Anchor getAnchor() {
+    return anchor;
+  }
+
+  @Override
+  public void setAnchor(Anchor anchor) {
+    this.anchor = anchor;
+  }
+
+  @Override
+  public String toString() {
+    return ">" + anchor;
+  }
+
+  @Override
   @Deprecated
-  public static StateRef create(MetaList info, State comp) {
-    return new StateRef(info, RefFactory.create(info, comp));
+  public State getTarget() {
+    return (State) anchor.getTarget();
   }
+
 }

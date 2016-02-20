@@ -93,15 +93,15 @@ class VarDefSplitterWorker extends DfsTraverser<AstList<Statement>, Void> {
       if (!(obj.initial instanceof AnyValue)) {
         if (firstVar == null) {
           AstList<LinkedReferenceWithOffset_Implementation> al = new AstList<LinkedReferenceWithOffset_Implementation>();
-          al.add(RefFactory.full(info, var));
+          al.add(RefFactory.oldFull(info, var));
           MultiAssignment ass = new MultiAssignment(al, obj.initial);
           ass.metadata().add(var.metadata());
           ret.add(ass);
           firstVar = var;
         } else {
           AstList<LinkedReferenceWithOffset_Implementation> al = new AstList<LinkedReferenceWithOffset_Implementation>();
-          al.add(RefFactory.full(info, var));
-          ReferenceExpression right = new ReferenceExpression(RefFactory.full(info, firstVar));
+          al.add(RefFactory.oldFull(info, var));
+          ReferenceExpression right = new ReferenceExpression(RefFactory.oldFull(info, firstVar));
           right.metadata().add(info);
           MultiAssignment ass = new MultiAssignment(al, right);
           ass.metadata().add(var.metadata());

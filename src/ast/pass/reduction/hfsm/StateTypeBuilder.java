@@ -141,11 +141,12 @@ public class StateTypeBuilder extends NullDispatcher<NamedElement, AstList<Named
     param.add(subElem);
 
     NamedElement initStateElem = null;
+    State initialTarget = obj.initial.getTarget();
     for (State sub : TypeFilter.select(obj.item, State.class)) {
       NamedElement item = visit(sub, param);
       union.element.add(item);
 
-      if (sub == obj.initial.getTarget()) {
+      if (sub == initialTarget) {
         assert (initStateElem == null);
         initStateElem = item;
       }
@@ -156,9 +157,9 @@ public class StateTypeBuilder extends NullDispatcher<NamedElement, AstList<Named
 
     Constant initvalue = initVar.get(kt.get(initStateElem.typeref));
     assert (initvalue != null);
-    ReferenceExpression value2 = new ReferenceExpression(RefFactory.full(obj.metadata(), initvalue));
+    ReferenceExpression value2 = new ReferenceExpression(RefFactory.oldFull(obj.metadata(), initvalue));
     value2.metadata().add(obj.metadata());
-    NamedValue cont = new NamedValue(obj.metadata(), getName(obj.initial.getTarget()), value2);
+    NamedValue cont = new NamedValue(obj.metadata(), getName(initialTarget), value2);
     UnsafeUnionValue uninit = new UnsafeUnionValue(cont, TypeRefFactory.create(obj.metadata(), union));
     uninit.metadata().add(obj.metadata());
 

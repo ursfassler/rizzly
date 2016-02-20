@@ -45,8 +45,8 @@ public class TransitionStateLinker {
 
   private void visitState(State state) {
     for (Transition tr : TypeFilter.select(state.item, Transition.class)) {
-      linker.link(tr.src.ref, state);
-      linker.link(tr.dst.ref, state);
+      linker.link(tr.src, state);
+      linker.link(tr.dst, state);
     }
 
     for (State sub : TypeFilter.select(state.item, State.class)) {

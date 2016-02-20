@@ -165,7 +165,7 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
     Map<Pair<ComponentUse, Function>, Function> coca = new HashMap<Pair<ComponentUse, Function>, Function>();
 
     for (ComponentUse compu : obj.component) {
-      SubCallbacks suc = new SubCallbacks(new CompUseRef(info, RefFactory.create(info, compu)));
+      SubCallbacks suc = new SubCallbacks(new CompUseRef(info, RefFactory.oldCreate(info, compu)));
       suc.metadata().add(compu.metadata());
       elem.subCallback.add(suc);
       Component usedComp = compu.compRef.getTarget();
@@ -237,7 +237,7 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
 
     TupleValue actparam = new TupleValue(new AstList<Expression>());
     for (Variable var : func.param) {
-      actparam.value.add(new ReferenceExpression(RefFactory.full(func.metadata(), var)));
+      actparam.value.add(new ReferenceExpression(RefFactory.oldFull(func.metadata(), var)));
     }
 
     RefCall call = new RefCall(actparam);
@@ -252,7 +252,7 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
 
     List<Expression> actparam = new ArrayList<Expression>();
     for (Variable var : func.param) {
-      actparam.add(new ReferenceExpression(RefFactory.full(func.metadata(), var)));
+      actparam.add(new ReferenceExpression(RefFactory.oldFull(func.metadata(), var)));
     }
 
     LinkedReferenceWithOffset_Implementation queue = getQueue(ep, comp);
@@ -267,7 +267,7 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
 
     TupleValue actparam = new TupleValue(new AstList<Expression>());
     for (Variable var : func.param) {
-      actparam.value.add(new ReferenceExpression(RefFactory.full(func.metadata(), var)));
+      actparam.value.add(new ReferenceExpression(RefFactory.oldFull(func.metadata(), var)));
     }
 
     RefCall call = new RefCall(actparam);
@@ -281,10 +281,10 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
 
   static private LinkedReferenceWithOffset_Implementation epToRef(Endpoint ep) {
     if (ep instanceof EndpointSelf) {
-      return RefFactory.full(ep.metadata(), ((EndpointSelf) ep).getFunc());
+      return RefFactory.oldFull(ep.metadata(), ((EndpointSelf) ep).getFunc());
     } else {
       EndpointSub eps = (EndpointSub) ep;
-      LinkedReferenceWithOffset_Implementation ref = RefFactory.full(eps.metadata(), eps.component.getTarget());
+      LinkedReferenceWithOffset_Implementation ref = RefFactory.oldFull(eps.metadata(), eps.component.getTarget());
       ref.getOffset().add(new RefName(eps.metadata(), eps.function));
       return ref;
     }
@@ -293,12 +293,12 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
   private LinkedReferenceWithOffset_Implementation getQueue(Endpoint ep, Component comp) {
     LinkedReferenceWithOffset_Implementation ref;
     if (ep instanceof EndpointSub) {
-      ref = RefFactory.full(ep.metadata(), ((EndpointSub) ep).component.getTarget());
+      ref = RefFactory.oldFull(ep.metadata(), ((EndpointSub) ep).component.getTarget());
       Component refComp = ((EndpointSub) ep).component.getTarget().compRef.getTarget();
       Queue queue = refComp.queue;
       ref.getOffset().add(new RefName(queue.getName()));
     } else {
-      ref = RefFactory.full(ep.metadata(), comp.queue);
+      ref = RefFactory.oldFull(ep.metadata(), comp.queue);
     }
     return ref;
   }

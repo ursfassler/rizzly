@@ -32,7 +32,7 @@ import ast.data.AstList;
 import ast.data.reference.LinkTarget;
 import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.reference.RefItem;
-import ast.data.reference.Reference;
+import ast.data.reference.OldReference;
 import ast.repository.query.Referencees.ReferenceesReader;
 
 public class IdForReferenced_Test {
@@ -40,7 +40,7 @@ public class IdForReferenced_Test {
   final private IdGenerator idGenerator = mock(IdGenerator.class);
   final private IdForReferenced testee = new IdForReferenced(referenceesReader, idGenerator);
   final private Ast item = Mockito.mock(Ast.class);
-  final private static Set<Reference> SomeReference = new HashSet<Reference>();
+  final private static Set<OldReference> SomeReference = new HashSet<OldReference>();
 
   {
     SomeReference.add(new LinkedReferenceWithOffset_Implementation(new LinkTarget(""), new AstList<RefItem>()));

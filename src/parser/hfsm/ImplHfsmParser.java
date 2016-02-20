@@ -29,20 +29,20 @@ import ast.data.AstList;
 import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateContent;
-import ast.data.component.hfsm.StateRef;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.component.hfsm.Transition;
 import ast.data.expression.Expression;
 import ast.data.expression.value.BooleanValue;
-import ast.data.function.FunctionReference;
 import ast.data.function.FuncRefFactory;
 import ast.data.function.Function;
+import ast.data.function.FunctionReference;
 import ast.data.function.header.Procedure;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.raw.RawComponent;
 import ast.data.raw.RawHfsm;
-import ast.data.reference.RefFactory;
 import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.RefFactory;
+import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.template.Template;
 import ast.data.variable.ConstPrivate;
@@ -73,7 +73,7 @@ public class ImplHfsmParser extends ImplBaseParser {
     expect(TokenType.CLOSEPAREN);
     Procedure entry = makeProc("_entry"); // FIXME get names from outside
     Procedure exit = makeProc("_exit");// FIXME get names from outside
-    StateComposite top = new StateComposite("!top", FuncRefFactory.create(info, entry), FuncRefFactory.create(info, exit), new StateRef(info, RefFactory.create(info, initial)));
+    StateComposite top = new StateComposite("!top", FuncRefFactory.create(info, entry), FuncRefFactory.create(info, exit), RefFactory.create(info, initial));
     top.metadata().add(info);
     top.item.add(entry);
     top.item.add(exit);
@@ -192,10 +192,7 @@ public class ImplHfsmParser extends ImplBaseParser {
       if (consumeIfEqual(TokenType.OPENPAREN)) {
         String initial = expect(TokenType.IDENTIFIER).getData();
         expect(TokenType.CLOSEPAREN);
-        LinkedReferenceWithOffset_Implementation initialRef = RefFactory.create(initial);
-        initialRef.metadata().add(info);
-        StateRef initialState = new StateRef(initialRef);
-        initialState.metadata().add(info);
+        Reference initialState = RefFactory.create(info, initial);
         state = new StateComposite(name, entryRef, exitRef, initialState);
       } else {
         state = new StateSimple(name, entryRef, exitRef);
@@ -216,14 +213,14 @@ public class ImplHfsmParser extends ImplBaseParser {
   // EBNF transition: stateRef "to" stateRef "by" transitionEvent [ "if" expr ] (
   // ";" | "do" block "end" )
   private Transition parseTransition() {
-    StateRef src = stateRef.parse();
+    Reference src = stateRef.parse();
     MetaList info = expect(TokenType.TO).getMetadata();
-    StateRef dst = stateRef.parse();
+    Reference dst = stateRef.parse();
 
     expect(TokenType.BY);
 
     Token tok = expect(TokenType.IDENTIFIER);
-    LinkedReferenceWithOffset_Implementation name = RefFactory.full(tok.getMetadata(), tok.getData());
+    LinkedReferenceWithOffset_Implementation name = RefFactory.oldFull(tok.getMetadata(), tok.getData());
     FunctionReference eventFunc = new FunctionReference(name.metadata(), name);
 
     AstList<FunctionVariable> param = parseVardefList();

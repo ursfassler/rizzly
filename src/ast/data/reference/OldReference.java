@@ -15,21 +15,11 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.type;
+package ast.data.reference;
 
-import ast.data.reference.RefFactory;
-import ast.meta.MetaList;
+import ast.data.Ast;
 
-public class TypeRefFactory {
-  @Deprecated
-  public static TypeReference create(MetaList info, Type type) {
-    TypeReference reference = new TypeReference(RefFactory.oldCreate(info, type));
-    reference.metadata().add(info);
-    return reference;
-  }
+@Deprecated
+public interface OldReference extends Ast {
 
-  public static TypeReference create(Type type) {
-    TypeReference reference = new TypeReference(RefFactory.oldCreate(type));
-    return reference;
-  }
 }

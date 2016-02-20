@@ -15,21 +15,31 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.type;
+package ast.data.reference;
 
-import ast.data.reference.RefFactory;
-import ast.meta.MetaList;
+import ast.data.AstBase;
+import ast.data.Named;
 
-public class TypeRefFactory {
+public class UnlinkedAnchor extends AstBase implements Anchor {
+  private final String linkName;
+
+  public UnlinkedAnchor(String linkName) {
+    this.linkName = linkName;
+  }
+
+  public String getLinkName() {
+    return linkName;
+  }
+
+  @Override
+  public String targetName() {
+    return linkName;
+  }
+
+  @Override
   @Deprecated
-  public static TypeReference create(MetaList info, Type type) {
-    TypeReference reference = new TypeReference(RefFactory.oldCreate(info, type));
-    reference.metadata().add(info);
-    return reference;
+  public Named getTarget() {
+    throw new RuntimeException("never implemented");
   }
 
-  public static TypeReference create(Type type) {
-    TypeReference reference = new TypeReference(RefFactory.oldCreate(type));
-    return reference;
-  }
 }

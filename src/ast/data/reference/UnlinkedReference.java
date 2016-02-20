@@ -17,6 +17,6 @@
 
 package ast.data.reference;
 
-public interface UnlinkedReference extends Reference {
+public interface UnlinkedReference extends OldReference {
 
 }

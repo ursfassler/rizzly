@@ -122,7 +122,7 @@ class FuncInlinerWorker extends StmtReplacer<Void> {
 
       VarDefStmt def = new VarDefStmt(inner);
       def.metadata().add(inner.metadata());
-      AssignmentSingle ass = new AssignmentSingle(RefFactory.full(inner), arg);
+      AssignmentSingle ass = new AssignmentSingle(RefFactory.oldFull(inner), arg);
       ass.metadata().add(arg.metadata());
 
       ret.add(def);

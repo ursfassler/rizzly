@@ -118,7 +118,7 @@ class StmtTraverser extends DfsTraverser<Void, List<Statement>> {
   private CallStmt makeCall(Procedure func, int numFunc) {
     // Self._sendMsg( numFunc );
     NumberValue arg = new NumberValue(BigInteger.valueOf(numFunc));
-    LinkedReferenceWithOffset_Implementation call = RefFactory.call(func, arg);
+    LinkedReferenceWithOffset_Implementation call = RefFactory.oldCall(func, arg);
     return new CallStmt(call);
   }
 }

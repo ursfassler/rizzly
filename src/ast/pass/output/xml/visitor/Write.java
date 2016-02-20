@@ -35,7 +35,6 @@ import ast.data.component.composition.SynchroniusConnection;
 import ast.data.component.elementary.ImplElementary;
 import ast.data.component.hfsm.ImplHfsm;
 import ast.data.component.hfsm.StateComposite;
-import ast.data.component.hfsm.StateRef;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.component.hfsm.Transition;
 import ast.data.expression.ReferenceExpression;
@@ -708,10 +707,6 @@ public class Write implements Visitor {
   }
 
   public void visit(StateComposite stateComposite) {
-    throw new RuntimeException("not yet implemented");
-  }
-
-  public void visit(StateRef object) {
     throw new RuntimeException("not yet implemented");
   }
 

@@ -20,8 +20,8 @@ package ast.dispatcher;
 import ast.data.Namespace;
 import ast.data.component.ComponentReference;
 import ast.data.component.composition.AsynchroniusConnection;
-import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.CompUseRef;
+import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.EndpointRaw;
 import ast.data.component.composition.EndpointSelf;
 import ast.data.component.composition.EndpointSub;
@@ -32,7 +32,6 @@ import ast.data.component.composition.SynchroniusConnection;
 import ast.data.component.elementary.ImplElementary;
 import ast.data.component.hfsm.ImplHfsm;
 import ast.data.component.hfsm.StateComposite;
-import ast.data.component.hfsm.StateRef;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.component.hfsm.Transition;
 import ast.data.expression.ReferenceExpression;
@@ -74,14 +73,14 @@ import ast.data.expression.value.TupleValue;
 import ast.data.expression.value.UnionValue;
 import ast.data.expression.value.UnsafeUnionValue;
 import ast.data.file.RizzlyFile;
-import ast.data.function.FunctionReference;
 import ast.data.function.Function;
+import ast.data.function.FunctionReference;
 import ast.data.function.header.FuncFunction;
-import ast.data.function.header.Procedure;
 import ast.data.function.header.FuncQuery;
-import ast.data.function.header.Response;
 import ast.data.function.header.FuncSubHandlerEvent;
 import ast.data.function.header.FuncSubHandlerQuery;
+import ast.data.function.header.Procedure;
+import ast.data.function.header.Response;
 import ast.data.function.header.Signal;
 import ast.data.function.header.Slot;
 import ast.data.function.ret.FuncReturnNone;
@@ -92,11 +91,15 @@ import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
 import ast.data.reference.LinkTarget;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.SimpleReference;
+import ast.data.reference.UnlinkedAnchor;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
@@ -141,9 +144,9 @@ import ast.data.type.special.VoidType;
 import ast.data.type.template.ArrayTemplate;
 import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
-import ast.data.variable.GlobalConstant;
 import ast.data.variable.ConstPrivate;
 import ast.data.variable.FunctionVariable;
+import ast.data.variable.GlobalConstant;
 import ast.data.variable.StateVariable;
 import ast.data.variable.TemplateParameter;
 
@@ -953,12 +956,6 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
   }
 
   @Override
-  protected R visitStateRef(StateRef obj, P param) {
-    visit(obj.ref, param);
-    return null;
-  }
-
-  @Override
   protected R visitCompRef(ComponentReference obj, P param) {
     visit(obj.ref, param);
     return null;
@@ -967,6 +964,29 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
   @Override
   protected R visitCompUseRef(CompUseRef obj, P param) {
     visit(obj.ref, param);
+    return null;
+  }
+
+  @Override
+  protected R visitOffsetReference(OffsetReference obj, P param) {
+    visit(obj.getAnchor(), param);
+    visitList(obj.getOffset(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitSimpleReference(SimpleReference obj, P param) {
+    visit(obj.getAnchor(), param);
+    return null;
+  }
+
+  @Override
+  protected R visitUnlinkedAnchor(UnlinkedAnchor obj, P param) {
+    return null;
+  }
+
+  @Override
+  protected R visitLinkedAnchor(LinkedAnchor obj, P param) {
     return null;
   }
 

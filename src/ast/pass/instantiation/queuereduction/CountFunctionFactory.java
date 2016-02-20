@@ -33,7 +33,7 @@ import ast.meta.MetaList;
 class CountFunctionFactory {
   static public Function create(String prefix, MetaList info, QueueVariables queueVariables) {
     Block sfb = new Block();
-    sfb.statements.add(new ExpressionReturn(new ReferenceExpression(RefFactory.full(info, queueVariables.getCount()))));
+    sfb.statements.add(new ExpressionReturn(new ReferenceExpression(RefFactory.oldFull(info, queueVariables.getCount()))));
     Function sizefunc = new Response(prefix + "count", new AstList<FunctionVariable>(), new FunctionReturnType(info, Copy.copy(queueVariables.getCount().type)), sfb);
     sizefunc.metadata().add(info);
     sizefunc.property = FunctionProperty.Public;

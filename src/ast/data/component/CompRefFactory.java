@@ -23,16 +23,16 @@ import ast.meta.MetaList;
 
 public class CompRefFactory {
   public static ComponentReference create(Component comp) {
-    return new ComponentReference(RefFactory.create(comp));
+    return new ComponentReference(RefFactory.oldCreate(comp));
   }
 
   @Deprecated
   public static ComponentReference create(MetaList info, Component comp) {
-    return new ComponentReference(info, RefFactory.create(info, comp));
+    return new ComponentReference(info, RefFactory.oldCreate(info, comp));
   }
 
   public static ComponentReference create(RawComponent comp) {
-    return new ComponentReference(RefFactory.create(comp));
+    return new ComponentReference(RefFactory.oldCreate(comp));
   }
 
 }

@@ -34,7 +34,6 @@ import ast.data.component.hfsm.ImplHfsm;
 import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateContent;
-import ast.data.component.hfsm.StateRefFactory;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.component.hfsm.Transition;
 import ast.data.expression.Expression;
@@ -42,8 +41,8 @@ import ast.data.expression.ReferenceExpression;
 import ast.data.function.Function;
 import ast.data.function.header.Procedure;
 import ast.data.function.ret.FuncReturnNone;
-import ast.data.reference.RefFactory;
 import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.RefFactory;
 import ast.data.statement.Assignment;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
@@ -148,7 +147,7 @@ class TransitionDownPropagatorWorker extends NullDispatcher<Void, TransitionPara
       addTrans(obj, trans);
     }
     for (Transition trans : transList) {
-      trans.src = StateRefFactory.create(trans.src.metadata(), obj);
+      trans.src = RefFactory.create(trans.src.metadata(), obj);
       // obj.getItem().add(trans);
       addTrans(obj, trans);
     }
@@ -164,7 +163,7 @@ class TransitionDownPropagatorWorker extends NullDispatcher<Void, TransitionPara
     State dst = tdst.get(otrans);
     assert (dst != null);
     Transition trans = Copy.copy(otrans);
-    trans.src = StateRefFactory.create(trans.src.metadata(), src);
+    trans.src = RefFactory.create(trans.src.metadata(), src);
 
     makeExitCalls(src, os, trans.body.statements);
     {
@@ -173,11 +172,11 @@ class TransitionDownPropagatorWorker extends NullDispatcher<Void, TransitionPara
 
       AstList<Expression> arg = new AstList<Expression>();
       for (Variable acpar : trans.param) {
-        LinkedReferenceWithOffset_Implementation parref = RefFactory.full(acpar);
+        LinkedReferenceWithOffset_Implementation parref = RefFactory.oldFull(acpar);
         arg.add(new ReferenceExpression(parref));
       }
 
-      LinkedReferenceWithOffset_Implementation ref = RefFactory.call(func, arg);
+      LinkedReferenceWithOffset_Implementation ref = RefFactory.oldCall(func, arg);
       CallStmt call = new CallStmt(ref);
       trans.body.statements.add(call);
     }
@@ -197,7 +196,7 @@ class TransitionDownPropagatorWorker extends NullDispatcher<Void, TransitionPara
     makeVarInit(par, top, list);
 
     for (StateVariable var : TypeFilter.select(start.item, StateVariable.class)) {
-      Assignment init = new AssignmentSingle(RefFactory.full(var), Copy.copy(var.def));
+      Assignment init = new AssignmentSingle(RefFactory.oldFull(var), Copy.copy(var.def));
       init.metadata().add(var.def.metadata());
       list.add(init);
     }
@@ -235,7 +234,7 @@ class TransitionDownPropagatorWorker extends NullDispatcher<Void, TransitionPara
   }
 
   private CallStmt makeCall(Function func) {
-    LinkedReferenceWithOffset_Implementation ref = RefFactory.call(func);
+    LinkedReferenceWithOffset_Implementation ref = RefFactory.oldCall(func);
     return new CallStmt(ref);
   }
 
@@ -254,7 +253,7 @@ class TransitionDownPropagatorWorker extends NullDispatcher<Void, TransitionPara
     /*
      * for all states in obj.getItem() we want to know, which transitions are before and which ones are after the
      * specific state.
-     * 
+     *
      * the map spos contains the position of the state in the transition array
      */
 

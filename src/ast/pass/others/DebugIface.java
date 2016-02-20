@@ -91,7 +91,7 @@ public class DebugIface extends AstPass {
 
     AstList<CaseOpt> option = new AstList<CaseOpt>();
     Block otherwise = new Block();
-    CaseStmt cs = new CaseStmt(new ReferenceExpression(RefFactory.create(arg)), option, otherwise);
+    CaseStmt cs = new CaseStmt(new ReferenceExpression(RefFactory.oldCreate(arg)), option, otherwise);
     body.statements.add(cs);
 
     for (int i = 0; i < names.size(); i++) {

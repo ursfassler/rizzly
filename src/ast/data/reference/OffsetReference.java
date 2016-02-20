@@ -17,36 +17,27 @@
 
 package ast.data.reference;
 
-import ast.data.Ast;
 import ast.data.AstBase;
 import ast.data.AstList;
-import ast.data.Named;
+import ast.data.component.hfsm.State;
 
-@Deprecated
-public class LinkedReferenceWithOffset_Implementation extends AstBase implements OldReference, LinkedReferenceWithOffset {
-  private LinkedAnchor link;
+public class OffsetReference extends AstBase implements Reference, ReferenceOffset {
+  private Anchor anchor;
   private final AstList<RefItem> offset;
 
-  public LinkedReferenceWithOffset_Implementation(Named link, AstList<RefItem> offset) {
-    super();
-    this.link = new LinkedAnchor(link);
+  public OffsetReference(Anchor anchor, AstList<RefItem> offset) {
+    this.anchor = anchor;
     this.offset = offset;
   }
 
-  @Deprecated
-  public Ast getTarget() {
-    assert (getOffset().isEmpty()); // FIXME make it correct or remove function
-    return getLink();
+  @Override
+  public Anchor getAnchor() {
+    return anchor;
   }
 
   @Override
-  public Named getLink() {
-    return link.getLink();
-  }
-
-  @Override
-  public void setLink(Named value) {
-    link = new LinkedAnchor(value);
+  public void setAnchor(Anchor anchor) {
+    this.anchor = anchor;
   }
 
   @Override
@@ -56,11 +47,18 @@ public class LinkedReferenceWithOffset_Implementation extends AstBase implements
 
   @Override
   public String toString() {
-    String ret = "->" + getLink();
+    String ret = ">" + anchor;
     for (RefItem item : getOffset()) {
       ret += item.toString();
     }
     return ret;
+  }
+
+  @Override
+  @Deprecated
+  public State getTarget() {
+    assert (getOffset().isEmpty()); // FIXME make it correct or remove function
+    return (State) anchor.getTarget();
   }
 
 }

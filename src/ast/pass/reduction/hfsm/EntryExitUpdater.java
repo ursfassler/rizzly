@@ -107,7 +107,7 @@ class EntryExitUpdaterWorker extends NullDispatcher<Void, EePar> {
   }
 
   private FunctionReference makeFuncRef(Procedure entry) {
-    return new FunctionReference(RefFactory.create(entry));
+    return new FunctionReference(RefFactory.oldCreate(entry));
   }
 
   public Procedure makeFunc(LinkedList<Function> list, String name) {
@@ -123,7 +123,7 @@ class EntryExitUpdaterWorker extends NullDispatcher<Void, EePar> {
 
   private CallStmt makeCall(Function func) {
     assert (func.param.isEmpty());
-    LinkedReferenceWithOffset_Implementation ref = RefFactory.call(func);
+    LinkedReferenceWithOffset_Implementation ref = RefFactory.oldCall(func);
     return new CallStmt(ref);
   }
 

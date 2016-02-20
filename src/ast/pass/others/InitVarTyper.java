@@ -149,7 +149,7 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
       EnumType et = (EnumType) kt.get(((UnionType) type).tag.typeref);
       EnumElement value = (EnumElement) getChild(obj, et);
 
-      ReferenceExpression ref = new ReferenceExpression(RefFactory.full(obj.metadata(), value));
+      ReferenceExpression ref = new ReferenceExpression(RefFactory.oldFull(obj.metadata(), value));
       ref.metadata().add(obj.metadata());
       NamedValue tag = new NamedValue(obj.metadata(), ((UnionType) type).tag.getName(), ref);
 

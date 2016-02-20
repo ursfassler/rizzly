@@ -24,11 +24,11 @@ import ast.data.AstBase;
 import ast.data.AstList;
 import ast.data.Named;
 import ast.data.Namespace;
-import ast.data.component.ComponentReference;
 import ast.data.component.Component;
+import ast.data.component.ComponentReference;
 import ast.data.component.composition.AsynchroniusConnection;
-import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.CompUseRef;
+import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.Connection;
 import ast.data.component.composition.Endpoint;
 import ast.data.component.composition.EndpointRaw;
@@ -42,7 +42,6 @@ import ast.data.component.elementary.ImplElementary;
 import ast.data.component.hfsm.ImplHfsm;
 import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.StateComposite;
-import ast.data.component.hfsm.StateRef;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.component.hfsm.Transition;
 import ast.data.expression.Expression;
@@ -91,17 +90,17 @@ import ast.data.expression.value.UnionValue;
 import ast.data.expression.value.UnsafeUnionValue;
 import ast.data.expression.value.ValueExpr;
 import ast.data.file.RizzlyFile;
-import ast.data.function.FunctionReference;
 import ast.data.function.Function;
+import ast.data.function.FunctionReference;
 import ast.data.function.InterfaceFunction;
 import ast.data.function.header.FuncFunction;
-import ast.data.function.header.Procedure;
 import ast.data.function.header.FuncQuery;
+import ast.data.function.header.FuncSubHandlerEvent;
+import ast.data.function.header.FuncSubHandlerQuery;
+import ast.data.function.header.Procedure;
 import ast.data.function.header.Response;
 import ast.data.function.header.Signal;
 import ast.data.function.header.Slot;
-import ast.data.function.header.FuncSubHandlerEvent;
-import ast.data.function.header.FuncSubHandlerQuery;
 import ast.data.function.ret.FuncReturn;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FuncReturnTuple;
@@ -113,15 +112,18 @@ import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
 import ast.data.reference.LinkTarget;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefItem;
 import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.SimpleReference;
 import ast.data.reference.TypedReference;
+import ast.data.reference.UnlinkedAnchor;
 import ast.data.statement.Assignment;
-import ast.data.statement.MultiAssignment;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
@@ -130,16 +132,17 @@ import ast.data.statement.CaseOptEntry;
 import ast.data.statement.CaseOptRange;
 import ast.data.statement.CaseOptValue;
 import ast.data.statement.CaseStmt;
+import ast.data.statement.ExpressionReturn;
 import ast.data.statement.ForStmt;
 import ast.data.statement.IfOption;
 import ast.data.statement.IfStatement;
 import ast.data.statement.MsgPush;
+import ast.data.statement.MultiAssignment;
 import ast.data.statement.Return;
-import ast.data.statement.ExpressionReturn;
-import ast.data.statement.VoidReturn;
 import ast.data.statement.Statement;
 import ast.data.statement.VarDefInitStmt;
 import ast.data.statement.VarDefStmt;
+import ast.data.statement.VoidReturn;
 import ast.data.statement.WhileStmt;
 import ast.data.template.Template;
 import ast.data.type.Type;
@@ -172,11 +175,11 @@ import ast.data.type.template.ArrayTemplate;
 import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
-import ast.data.variable.GlobalConstant;
 import ast.data.variable.ConstPrivate;
 import ast.data.variable.Constant;
 import ast.data.variable.DefaultVariable;
 import ast.data.variable.FunctionVariable;
+import ast.data.variable.GlobalConstant;
 import ast.data.variable.StateVariable;
 import ast.data.variable.TemplateParameter;
 import ast.data.variable.Variable;
@@ -240,6 +243,14 @@ public abstract class Dispatcher<R, P> {
       return visitTypedRef((TypedReference) obj, param);
     } else if (obj instanceof LinkedReferenceWithOffset_Implementation) {
       return visitReference((LinkedReferenceWithOffset_Implementation) obj, param);
+    } else if (obj instanceof SimpleReference) {
+      return visitSimpleReference((SimpleReference) obj, param);
+    } else if (obj instanceof OffsetReference) {
+      return visitOffsetReference((OffsetReference) obj, param);
+    } else if (obj instanceof LinkedAnchor) {
+      return visitLinkedAnchor((LinkedAnchor) obj, param);
+    } else if (obj instanceof UnlinkedAnchor) {
+      return visitUnlinkedAnchor((UnlinkedAnchor) obj, param);
     } else {
       throwUnknownObjectError(obj);
       return null;
@@ -253,8 +264,6 @@ public abstract class Dispatcher<R, P> {
       return visitFuncRef((FunctionReference) obj, param);
     } else if (obj instanceof ComponentReference) {
       return visitCompRef((ComponentReference) obj, param);
-    } else if (obj instanceof StateRef) {
-      return visitStateRef((StateRef) obj, param);
     } else if (obj instanceof CompUseRef) {
       return visitCompUseRef((CompUseRef) obj, param);
     } else {
@@ -769,8 +778,6 @@ public abstract class Dispatcher<R, P> {
 
   abstract protected R visitCompUseRef(CompUseRef obj, P param);
 
-  abstract protected R visitStateRef(StateRef obj, P param);
-
   abstract protected R visitCompRef(ComponentReference obj, P param);
 
   abstract protected R visitFuncRef(FunctionReference obj, P param);
@@ -1020,5 +1027,13 @@ public abstract class Dispatcher<R, P> {
   abstract protected R visitVarDefInitStmt(VarDefInitStmt obj, P param);
 
   abstract protected R visitDummyLinkTarget(LinkTarget obj, P param);
+
+  abstract protected R visitOffsetReference(OffsetReference obj, P param);
+
+  abstract protected R visitSimpleReference(SimpleReference obj, P param);
+
+  abstract protected R visitUnlinkedAnchor(UnlinkedAnchor obj, P param);
+
+  abstract protected R visitLinkedAnchor(LinkedAnchor obj, P param);
 
 }

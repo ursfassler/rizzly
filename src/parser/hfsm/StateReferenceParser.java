@@ -20,10 +20,11 @@ package parser.hfsm;
 import parser.PeekNReader;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
-import ast.data.component.hfsm.StateRef;
+import ast.data.AstList;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefFactory;
+import ast.data.reference.RefItem;
 import ast.data.reference.RefName;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import error.ErrorType;
 import error.RizzlyError;
 
@@ -44,7 +45,7 @@ public class StateReferenceParser {
     this.error = error;
   }
 
-  public StateRef parse() {
+  public OffsetReference parse() {
     Token token = scanner.peek(0);
     switch (token.getType()) {
       case IDENTIFIER:
@@ -56,20 +57,19 @@ public class StateReferenceParser {
     }
   }
 
-  private StateRef identifier() {
+  private OffsetReference identifier() {
     Token token = scanner.next();
-    LinkedReferenceWithOffset_Implementation ref = RefFactory.create(token.getData());
-    ref.metadata().add(token.getMetadata());
 
+    AstList<RefItem> offset = new AstList<RefItem>();
     while (scanner.peek(0).getType() == TokenType.PERIOD) {
       scanner.next();
       Token sub = scanner.next();
       RefName item = new RefName(sub.getData());
       item.metadata().add(sub.getMetadata());
-      ref.getOffset().add(item);
+      offset.add(item);
     }
 
-    StateRef stateRef = new StateRef(ref);
+    OffsetReference stateRef = RefFactory.create(token.getMetadata(), token.getData(), offset);
     stateRef.metadata().add(token.getMetadata());
     return stateRef;
   }

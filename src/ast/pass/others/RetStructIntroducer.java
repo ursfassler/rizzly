@@ -168,7 +168,7 @@ class RetReplacer extends StmtReplacer<Void> {
   @Override
   protected List<Statement> visitReturnExpr(ExpressionReturn obj, Void param) {
     List<Statement> ret = new ArrayList<Statement>();
-    AssignmentSingle assignment = new AssignmentSingle(RefFactory.full(obj.metadata(), retVar), obj.expression);
+    AssignmentSingle assignment = new AssignmentSingle(RefFactory.oldFull(obj.metadata(), retVar), obj.expression);
     assignment.metadata().add(obj.expression.metadata());
     ret.add(assignment);
     ret.add(makeRet(obj.metadata()));
@@ -181,7 +181,7 @@ class RetReplacer extends StmtReplacer<Void> {
   }
 
   private ExpressionReturn makeRet(MetaList info) {
-    ReferenceExpression expr = new ReferenceExpression(RefFactory.create(info, retVar));
+    ReferenceExpression expr = new ReferenceExpression(RefFactory.oldCreate(info, retVar));
     expr.metadata().add(info);
     ExpressionReturn ret = new ExpressionReturn(expr);
     ret.metadata().add(info);

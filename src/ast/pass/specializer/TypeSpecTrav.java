@@ -42,7 +42,7 @@ public class TypeSpecTrav extends RefReplacer<Void> {
     if (types.containsKey(obj.getLink())) {
       assert (obj.getOffset().isEmpty());
       Type repl = types.get(obj.getLink());
-      return RefFactory.full(obj.metadata(), repl);
+      return RefFactory.oldFull(obj.metadata(), repl);
     }
 
     return obj;

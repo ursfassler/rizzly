@@ -29,7 +29,7 @@ public class ArrayTypeFactory {
   }
 
   private static TypeReference createRef(Type type) {
-    return new TypeReference(RefFactory.create(type));
+    return new TypeReference(RefFactory.oldCreate(type));
   }
 
   static public ArrayType create(int size, Type type) {

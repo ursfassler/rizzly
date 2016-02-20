@@ -37,7 +37,6 @@ import ast.data.component.composition.SynchroniusConnection;
 import ast.data.component.elementary.ImplElementary;
 import ast.data.component.hfsm.ImplHfsm;
 import ast.data.component.hfsm.StateComposite;
-import ast.data.component.hfsm.StateRef;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.component.hfsm.Transition;
 import ast.data.expression.ReferenceExpression;
@@ -949,12 +948,6 @@ public class DeepFirstTraverser implements Visitor {
   }
 
   public void visit(FunctionReference object) {
-    preorderVisit(object);
-    executeVisit(object.ref);
-    postorderVisit(object);
-  }
-
-  public void visit(StateRef object) {
     preorderVisit(object);
     executeVisit(object.ref);
     postorderVisit(object);

@@ -21,19 +21,19 @@ import ast.data.AstBase;
 import ast.data.AstList;
 import ast.data.expression.Expression;
 import ast.data.function.FunctionReference;
+import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.variable.FunctionVariable;
-import ast.visitor.Visitor;
 
 final public class Transition extends AstBase implements StateContent {
-  public StateRef src;
-  public StateRef dst;
+  public Reference src;
+  public Reference dst;
   public FunctionReference eventFunc;
   final public AstList<FunctionVariable> param = new AstList<FunctionVariable>();
   public Expression guard;
   public Block body;
 
-  public Transition(StateRef src, StateRef dst, FunctionReference eventFunc, Expression guard, AstList<FunctionVariable> param, Block body) {
+  public Transition(Reference src, Reference dst, FunctionReference eventFunc, Expression guard, AstList<FunctionVariable> param, Block body) {
     this.src = src;
     this.dst = dst;
     this.eventFunc = eventFunc;

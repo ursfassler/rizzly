@@ -127,7 +127,7 @@ class ReduceUnionWorker extends ExprReplacer<Void> {
     assert (ut instanceof UnionType);
 
     MetaList meta = left.metadata();
-    left = RefFactory.create(left.getLink(), new RefName(((UnionType) ut).tag.getName()));
+    left = RefFactory.oldCreate(left.getLink(), new RefName(((UnionType) ut).tag.getName()));
     left.metadata().add(meta);
 
     ReferenceExpression leftRef = new ReferenceExpression(left);

@@ -164,14 +164,14 @@ class MakeCompareFunction extends NullDispatcher<Expression, Pair<Expression, Ex
       AstList<Expression> acpar = new AstList<Expression>();
       acpar.addAll(((TupleValue) param.first).value);
       acpar.addAll(((TupleValue) param.second).value);
-      LinkedReferenceWithOffset_Implementation call = RefFactory.call(func, acpar);
+      LinkedReferenceWithOffset_Implementation call = RefFactory.oldCall(func, acpar);
       return new ReferenceExpression(call);
     } else if (rt instanceof RecordType) {
       FuncFunction func = makeCompare(lt.types, (RecordType) rt);
       AstList<Expression> acpar = new AstList<Expression>();
       acpar.addAll(((TupleValue) param.first).value);
       acpar.add(param.second);
-      LinkedReferenceWithOffset_Implementation call = RefFactory.call(func, acpar);
+      LinkedReferenceWithOffset_Implementation call = RefFactory.oldCall(func, acpar);
       return new ReferenceExpression(call);
     } else {
       throw new RuntimeException("not yet implemented: " + rt.getClass().getCanonicalName());
@@ -191,8 +191,8 @@ class MakeCompareFunction extends NullDispatcher<Expression, Pair<Expression, Ex
     Expression expr = new BooleanValue(true);
 
     for (int i = 0; i < rt.element.size(); i++) {
-      LinkedReferenceWithOffset_Implementation leftVal = RefFactory.full(left.get(i));
-      LinkedReferenceWithOffset_Implementation rightVal = RefFactory.create(right, new RefName(rt.element.get(i).getName()));
+      LinkedReferenceWithOffset_Implementation leftVal = RefFactory.oldFull(left.get(i));
+      LinkedReferenceWithOffset_Implementation rightVal = RefFactory.oldCreate(right, new RefName(rt.element.get(i).getName()));
       Expression ac = make(leftVal, rightVal);
       expr = new LogicAnd(expr, ac);
     }
@@ -216,8 +216,8 @@ class MakeCompareFunction extends NullDispatcher<Expression, Pair<Expression, Ex
     Expression expr = new BooleanValue(true);
 
     for (int i = 0; i < left.size(); i++) {
-      LinkedReferenceWithOffset_Implementation leftVal = RefFactory.full(left.get(i));
-      LinkedReferenceWithOffset_Implementation rightVal = RefFactory.full(right.get(i));
+      LinkedReferenceWithOffset_Implementation leftVal = RefFactory.oldFull(left.get(i));
+      LinkedReferenceWithOffset_Implementation rightVal = RefFactory.oldFull(right.get(i));
       Expression ac = make(leftVal, rightVal);
       expr = new LogicAnd(expr, ac);
     }
@@ -232,7 +232,7 @@ class MakeCompareFunction extends NullDispatcher<Expression, Pair<Expression, Ex
     if (rt instanceof RecordType) {
       assert (lt == rt);
       FuncFunction func = makeCompare(lt);
-      LinkedReferenceWithOffset_Implementation call = RefFactory.call(func, param.first, param.second);
+      LinkedReferenceWithOffset_Implementation call = RefFactory.oldCall(func, param.first, param.second);
       return new ReferenceExpression(call);
     } else if (rt instanceof TupleType) {
       assert (param.second instanceof TupleValue);
@@ -240,7 +240,7 @@ class MakeCompareFunction extends NullDispatcher<Expression, Pair<Expression, Ex
       AstList<Expression> acpar = new AstList<Expression>();
       acpar.add(param.first);
       acpar.addAll(((TupleValue) param.second).value);
-      LinkedReferenceWithOffset_Implementation call = RefFactory.call(func, acpar);
+      LinkedReferenceWithOffset_Implementation call = RefFactory.oldCall(func, acpar);
       return new ReferenceExpression(call);
     } else {
       throw new RuntimeException("not yet implemented: " + rt.getClass().getCanonicalName());
@@ -260,8 +260,8 @@ class MakeCompareFunction extends NullDispatcher<Expression, Pair<Expression, Ex
     Expression expr = new BooleanValue(true);
 
     for (int i = 0; i < lt.element.size(); i++) {
-      LinkedReferenceWithOffset_Implementation leftVal = RefFactory.create(left, new RefName(lt.element.get(i).getName()));
-      LinkedReferenceWithOffset_Implementation rightVal = RefFactory.full(right.get(i));
+      LinkedReferenceWithOffset_Implementation leftVal = RefFactory.oldCreate(left, new RefName(lt.element.get(i).getName()));
+      LinkedReferenceWithOffset_Implementation rightVal = RefFactory.oldFull(right.get(i));
       Expression ac = make(leftVal, rightVal);
       expr = new LogicAnd(expr, ac);
     }
@@ -279,8 +279,8 @@ class MakeCompareFunction extends NullDispatcher<Expression, Pair<Expression, Ex
     Expression expr = new BooleanValue(true);
     for (NamedElement itr : both.element) {
       String name = itr.getName();
-      LinkedReferenceWithOffset_Implementation lr = RefFactory.create(left, new RefName(name));
-      LinkedReferenceWithOffset_Implementation rr = RefFactory.create(right, new RefName(name));
+      LinkedReferenceWithOffset_Implementation lr = RefFactory.oldCreate(left, new RefName(name));
+      LinkedReferenceWithOffset_Implementation rr = RefFactory.oldCreate(right, new RefName(name));
       Expression ac = make(lr, rr);
       expr = new LogicAnd(expr, ac);
     }

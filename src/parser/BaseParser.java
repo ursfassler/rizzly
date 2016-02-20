@@ -202,7 +202,7 @@ public class BaseParser extends Parser {
     if (peek().getType() != TokenType.EQUAL) {
       type = expr().parseRefType();
     } else {
-      LinkedReferenceWithOffset_Implementation ref = RefFactory.create(AnyType.NAME);
+      LinkedReferenceWithOffset_Implementation ref = RefFactory.oldCreate(AnyType.NAME);
       ref.metadata().add(info);
       type = new TypeReference(ref);
       type.metadata().add(info);

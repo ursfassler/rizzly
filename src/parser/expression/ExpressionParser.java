@@ -23,7 +23,6 @@ import parser.scanner.Token;
 import parser.scanner.TokenType;
 import ast.data.AstList;
 import ast.data.component.ComponentReference;
-import ast.data.component.hfsm.StateRef;
 import ast.data.expression.Expression;
 import ast.data.expression.ReferenceExpression;
 import ast.data.expression.binop.Relation;
@@ -38,12 +37,12 @@ import ast.data.expression.value.TupleValue;
 import ast.data.function.FunctionReference;
 import ast.data.reference.LinkTarget;
 import ast.data.reference.LinkedReferenceWithOffset;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.template.ActualTemplateArgument;
 import ast.data.type.TypeReference;
 import ast.meta.MetaList;
@@ -144,7 +143,7 @@ public class ExpressionParser extends Parser {
   // EBNF ref: id { refName | refCall | refIndex | refGeneric }
   public LinkedReferenceWithOffset_Implementation parseRef() {
     Token head = expect(TokenType.IDENTIFIER);
-    LinkedReferenceWithOffset_Implementation res = RefFactory.full(head.getMetadata(), head.getData());
+    LinkedReferenceWithOffset_Implementation res = RefFactory.oldFull(head.getMetadata(), head.getData());
 
     while (true) {
       switch (peek().getType()) {
@@ -183,11 +182,6 @@ public class ExpressionParser extends Parser {
   public FunctionReference parseRefFunc() {
     LinkedReferenceWithOffset_Implementation ref = parseRef();
     return new FunctionReference(ref.metadata(), ref);
-  }
-
-  public StateRef parseRefState() {
-    LinkedReferenceWithOffset_Implementation ref = parseRef();
-    return new StateRef(ref.metadata(), ref);
   }
 
   public ComponentReference parseRefComp() {

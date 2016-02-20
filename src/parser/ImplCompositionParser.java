@@ -113,7 +113,7 @@ public class ImplCompositionParser extends ImplBaseParser {
       RError.err(ErrorType.Error, "Expected IDENTIFIER, got " + tok.getType(), tok.getMetadata());
       return null;
     }
-    LinkedReferenceWithOffset_Implementation ref = RefFactory.full(tok.getMetadata(), tok.getData());
+    LinkedReferenceWithOffset_Implementation ref = RefFactory.oldFull(tok.getMetadata(), tok.getData());
     if (consumeIfEqual(TokenType.PERIOD)) {
       tok = expect(TokenType.IDENTIFIER);
       ref.getOffset().add(new RefName(tok.getMetadata(), tok.getData()));

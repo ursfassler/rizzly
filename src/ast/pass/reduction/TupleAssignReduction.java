@@ -139,12 +139,12 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
 
       List<Statement> ret = new ArrayList<Statement>();
       ret.add(new VarDefStmt(var));
-      ret.add(new AssignmentSingle(RefFactory.full(var), right));
+      ret.add(new AssignmentSingle(RefFactory.oldFull(var), right));
 
       for (int i = 0; i < left.size(); i++) {
         LinkedReferenceWithOffset_Implementation lr = left.get(i);
         String elemName = ((RecordType) rt).element.get(i).getName();
-        LinkedReferenceWithOffset_Implementation rr = RefFactory.create(var, new RefName(elemName));
+        LinkedReferenceWithOffset_Implementation rr = RefFactory.oldCreate(var, new RefName(elemName));
         ret.add(new AssignmentSingle(lr, new ReferenceExpression(rr)));
       }
 

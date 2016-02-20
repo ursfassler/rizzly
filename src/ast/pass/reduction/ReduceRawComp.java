@@ -188,7 +188,7 @@ class ReduceEndpoint extends NullDispatcher<Endpoint, Void> {
         Named link = ref.getLink();
         RError.ass(link instanceof ComponentUse, ref.metadata(), "expected compuse for: " + link.getName());
         String name = ((RefName) ref.getOffset().get(0)).name;
-        return new EndpointSub(ref.metadata(), new CompUseRef(obj.metadata(), RefFactory.create(obj.metadata(), link)), name);
+        return new EndpointSub(ref.metadata(), new CompUseRef(obj.metadata(), RefFactory.oldCreate(obj.metadata(), link)), name);
       }
       default: {
         RError.err(ErrorType.Fatal, "Unknown connection endpoint", ref.metadata());

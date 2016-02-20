@@ -18,7 +18,15 @@
 package ast.data.reference;
 
 import ast.data.Ast;
+import ast.data.component.hfsm.State;
 
 public interface Reference extends Ast {
+
+  public Anchor getAnchor();
+
+  public void setAnchor(Anchor anchor);
+
+  @Deprecated
+  public State getTarget();
 
 }

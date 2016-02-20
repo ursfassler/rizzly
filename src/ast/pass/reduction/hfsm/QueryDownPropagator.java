@@ -110,9 +110,9 @@ class QueryDownPropagatorWorker extends NullDispatcher<Void, QueryParam> {
 
       AstList<Expression> acpar = new AstList<Expression>();
       for (Variable par : cfunc.param) {
-        acpar.add(new ReferenceExpression(RefFactory.full(par)));
+        acpar.add(new ReferenceExpression(RefFactory.oldFull(par)));
       }
-      LinkedReferenceWithOffset_Implementation call = RefFactory.call(map.get(func), acpar);
+      LinkedReferenceWithOffset_Implementation call = RefFactory.oldCall(map.get(func), acpar);
       cfunc.body.statements.add(new ExpressionReturn(new ReferenceExpression(call)));
 
       obj.item.add(cfunc); // TODO ok or copy?

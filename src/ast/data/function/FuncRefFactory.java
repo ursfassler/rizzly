@@ -22,11 +22,11 @@ import ast.meta.MetaList;
 
 public class FuncRefFactory {
   public static FunctionReference create(Function func) {
-    return new FunctionReference(RefFactory.create(func));
+    return new FunctionReference(RefFactory.oldCreate(func));
   }
 
   @Deprecated
   public static FunctionReference create(MetaList info, Function func) {
-    return new FunctionReference(info, RefFactory.create(info, func));
+    return new FunctionReference(info, RefFactory.oldCreate(info, func));
   }
 }

@@ -131,15 +131,15 @@ class IntroduceConvertWorker extends DfsTraverser<Void, Void> {
     AstList<IfOption> option = new AstList<IfOption>();
 
     { // test
-      Relation aboveLower = new LessEqual(new NumberValue(resType.range.low), new ReferenceExpression(RefFactory.full(value)));
-      Relation belowHigher = new LessEqual(new ReferenceExpression(RefFactory.full(value)), new NumberValue(resType.range.high));
+      Relation aboveLower = new LessEqual(new NumberValue(resType.range.low), new ReferenceExpression(RefFactory.oldFull(value)));
+      Relation belowHigher = new LessEqual(new ReferenceExpression(RefFactory.oldFull(value)), new NumberValue(resType.range.high));
       Expression cond = new LogicAnd(aboveLower, belowHigher);
       IfOption opt = new IfOption(cond, ok);
       option.add(opt);
     }
 
     { // ok, cast
-      TypeCast cast = new TypeCast(TypeRefFactory.create(resType), new ReferenceExpression(RefFactory.full(value)));
+      TypeCast cast = new TypeCast(TypeRefFactory.create(resType), new ReferenceExpression(RefFactory.oldFull(value)));
       ExpressionReturn ret = new ExpressionReturn(cast);
       ok.statements.add(ret);
     }
@@ -148,7 +148,7 @@ class IntroduceConvertWorker extends DfsTraverser<Void, Void> {
       // TODO how to trap or exception throwing?
       // TODO insert call to debug output with error message
       // TODO throw exception
-      LinkedReferenceWithOffset_Implementation call = RefFactory.call(kll.getTrap());
+      LinkedReferenceWithOffset_Implementation call = RefFactory.oldCall(kll.getTrap());
       ExpressionReturn trap = new ExpressionReturn(new NumberValue(resType.range.low));
 
       error.statements.add(new CallStmt(call));

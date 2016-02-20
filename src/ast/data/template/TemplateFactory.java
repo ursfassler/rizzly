@@ -25,6 +25,6 @@ import ast.data.variable.TemplateParameter;
 public abstract class TemplateFactory {
 
   static protected TemplateParameter makeParam(String name, Type type) {
-    return new TemplateParameter(name, new TypeReference(RefFactory.create(type)));
+    return new TemplateParameter(name, new TypeReference(RefFactory.oldCreate(type)));
   }
 }

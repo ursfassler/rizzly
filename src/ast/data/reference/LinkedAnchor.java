@@ -15,23 +15,35 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.component.hfsm;
+package ast.data.reference;
 
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
-import ast.data.reference.TypedReference;
-import ast.meta.MetaList;
-import ast.visitor.Visitor;
+import ast.data.AstBase;
+import ast.data.Named;
 
-final public class StateRef extends TypedReference<State> {
+public class LinkedAnchor extends AstBase implements Anchor {
+  private Named link;
 
-  public StateRef(LinkedReferenceWithOffset_Implementation ref) {
-    super(ref);
+  public LinkedAnchor(Named link) {
+    this.link = link;
   }
 
+  public Named getLink() {
+    return link;
+  }
+
+  public void setLink(Named link) {
+    this.link = link;
+  }
+
+  @Override
+  public String targetName() {
+    return link.getName();
+  }
+
+  @Override
   @Deprecated
-  public StateRef(MetaList info, LinkedReferenceWithOffset_Implementation ref) {
-    super(ref);
-    metadata().add(info);
+  public Named getTarget() {
+    return getLink();
   }
 
 }

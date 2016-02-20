@@ -203,14 +203,14 @@ class SystemIfaceCaller extends NullDispatcher<Void, Void> {
 
   private CallStmt makeCall(Function ref) {
     assert (ref.param.isEmpty());
-    LinkedReferenceWithOffset_Implementation call = RefFactory.call(ref.metadata(), ref);
+    LinkedReferenceWithOffset_Implementation call = RefFactory.oldCall(ref.metadata(), ref);
     return new CallStmt(call);
   }
 
   @Deprecated
   private CallStmt makeCall(ComponentUse self, Function func) {
     RError.ass(func.param.isEmpty(), func.metadata(), "expected (de)constructor to have no parameter");
-    LinkedReferenceWithOffset_Implementation fref = RefFactory.full(self);
+    LinkedReferenceWithOffset_Implementation fref = RefFactory.oldFull(self);
     fref.getOffset().add(new RefName(func.getName()));
     fref.getOffset().add(new RefCall(new TupleValue(new AstList<Expression>())));
     return new CallStmt(fref);

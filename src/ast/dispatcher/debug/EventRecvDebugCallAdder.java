@@ -74,7 +74,7 @@ public class EventRecvDebugCallAdder extends DfsTraverser<Void, Void> {
   private CallStmt makeCall(Function func, int numFunc) {
     // _sendMsg( numFunc );
     NumberValue arg = new NumberValue(BigInteger.valueOf(numFunc));
-    LinkedReferenceWithOffset_Implementation call = RefFactory.call(func, arg);
+    LinkedReferenceWithOffset_Implementation call = RefFactory.oldCall(func, arg);
     return new CallStmt(call);
   }
 }

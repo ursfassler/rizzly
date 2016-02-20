@@ -76,36 +76,36 @@ class DispatchFunctionFactory {
     UnionType ut = (UnionType) kt.get(dt.type);
 
     AstList<CaseOpt> opt = new AstList<CaseOpt>();
-    RefIndex idx = new RefIndex(new ReferenceExpression(RefFactory.full(queueVariables.getHead())));
+    RefIndex idx = new RefIndex(new ReferenceExpression(RefFactory.oldFull(queueVariables.getHead())));
     RefName tag = new RefName(ut.tag.getName());
-    LinkedReferenceWithOffset_Implementation ref = RefFactory.create(queueVariables.getQueue(), idx, tag);
+    LinkedReferenceWithOffset_Implementation ref = RefFactory.oldCreate(queueVariables.getQueue(), idx, tag);
     CaseStmt caseStmt = new CaseStmt(new ReferenceExpression(ref), opt, new Block());
 
     for (Function func : queueTypes.getFuncToMsgType().keySet()) {
       AstList<CaseOptEntry> value = new AstList<CaseOptEntry>();
-      value.add(new CaseOptValue(new ReferenceExpression(RefFactory.full(queueTypes.getFuncToMsgType().get(func)))));
+      value.add(new CaseOptValue(new ReferenceExpression(RefFactory.oldFull(queueTypes.getFuncToMsgType().get(func)))));
       CaseOpt copt = new CaseOpt(value, new Block());
 
       NamedElement un = queueTypes.getFuncToElem().get(func);
       RecordType rec = queueTypes.getFuncToRecord().get(func);
       AstList<Expression> acarg = new AstList<Expression>();
       for (NamedElement elem : rec.element) {
-        LinkedReferenceWithOffset_Implementation vref = RefFactory.create(queueVariables.getQueue(), Copy.copy(idx), new RefName(un.getName()), new RefName(elem.getName()));
+        LinkedReferenceWithOffset_Implementation vref = RefFactory.oldCreate(queueVariables.getQueue(), Copy.copy(idx), new RefName(un.getName()), new RefName(elem.getName()));
 
         acarg.add(new ReferenceExpression(vref));
       }
 
-      LinkedReferenceWithOffset_Implementation call = RefFactory.call(func, acarg);
+      LinkedReferenceWithOffset_Implementation call = RefFactory.oldCall(func, acarg);
       copt.code.statements.add(new CallStmt(call));
 
       caseStmt.option.add(copt);
     }
 
-    AssignmentSingle add = new AssignmentSingle(RefFactory.full(queueVariables.getHead()), new Plus(new ReferenceExpression(RefFactory.full(queueVariables.getHead())), new NumberValue(BigInteger.ONE)));
-    AssignmentSingle sub = new AssignmentSingle(RefFactory.full(queueVariables.getCount()), new Minus(new ReferenceExpression(RefFactory.full(queueVariables.getCount())), new NumberValue(BigInteger.ONE)));
+    AssignmentSingle add = new AssignmentSingle(RefFactory.oldFull(queueVariables.getHead()), new Plus(new ReferenceExpression(RefFactory.oldFull(queueVariables.getHead())), new NumberValue(BigInteger.ONE)));
+    AssignmentSingle sub = new AssignmentSingle(RefFactory.oldFull(queueVariables.getCount()), new Minus(new ReferenceExpression(RefFactory.oldFull(queueVariables.getCount())), new NumberValue(BigInteger.ONE)));
 
     AstList<IfOption> option = new AstList<IfOption>();
-    IfOption ifOption = new IfOption(new Greater(new ReferenceExpression(RefFactory.full(queueVariables.getCount())), new NumberValue(BigInteger.ZERO)), new Block());
+    IfOption ifOption = new IfOption(new Greater(new ReferenceExpression(RefFactory.oldFull(queueVariables.getCount())), new NumberValue(BigInteger.ZERO)), new Block());
     ifOption.code.statements.add(caseStmt);
     ifOption.code.statements.add(sub);
     ifOption.code.statements.add(add);

@@ -24,8 +24,8 @@ import ast.data.Namespace;
 import ast.data.component.hfsm.ImplHfsm;
 import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.StateContent;
-import ast.data.component.hfsm.StateRefFactory;
 import ast.data.component.hfsm.Transition;
+import ast.data.reference.RefFactory;
 import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
@@ -79,7 +79,7 @@ class TransitionRedirecterWorker extends NullDispatcher<Void, Void> {
   protected Void visitTransition(Transition obj, Void param) {
     State dst = obj.dst.getTarget();
     dst = initStateGetter.traverse(dst, null);
-    obj.dst = StateRefFactory.create(obj.dst.metadata(), dst);
+    obj.dst = RefFactory.create(obj.dst.metadata(), dst);
     return null;
   }
 

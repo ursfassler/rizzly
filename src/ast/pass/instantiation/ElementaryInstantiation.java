@@ -99,7 +99,7 @@ public class ElementaryInstantiation extends AstPass {
     env.component.add(item);
 
     for (ComponentUse compu : env.component) {
-      SubCallbacks suc = new SubCallbacks(compu.metadata(), new CompUseRef(RefFactory.create(compu)));
+      SubCallbacks suc = new SubCallbacks(compu.metadata(), new CompUseRef(RefFactory.oldCreate(compu)));
       env.subCallback.add(suc);
       Component refComp = compu.compRef.getTarget();
       for (InterfaceFunction out : refComp.getIface(Direction.out)) {

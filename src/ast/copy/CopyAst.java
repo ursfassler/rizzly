@@ -28,30 +28,33 @@ import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.component.ComponentReference;
 import ast.data.component.composition.AsynchroniusConnection;
-import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.CompUseRef;
+import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.EndpointRaw;
 import ast.data.component.composition.Queue;
 import ast.data.component.composition.SubCallbacks;
 import ast.data.component.composition.SynchroniusConnection;
 import ast.data.component.elementary.ImplElementary;
 import ast.data.component.hfsm.StateComposite;
-import ast.data.component.hfsm.StateRef;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.component.hfsm.Transition;
 import ast.data.expression.Expression;
 import ast.data.expression.ReferenceExpression;
 import ast.data.expression.value.NamedValue;
-import ast.data.function.FunctionReference;
 import ast.data.function.Function;
+import ast.data.function.FunctionReference;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FuncReturnTuple;
 import ast.data.function.ret.FunctionReturnType;
 import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
-import ast.data.reference.RefItem;
+import ast.data.reference.LinkedAnchor;
 import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.OffsetReference;
+import ast.data.reference.RefItem;
+import ast.data.reference.SimpleReference;
+import ast.data.reference.UnlinkedAnchor;
 import ast.data.statement.CaseOpt;
 import ast.data.statement.CaseOptRange;
 import ast.data.statement.CaseOptValue;
@@ -125,11 +128,6 @@ public class CopyAst extends NullDispatcher<Ast, Void> {
   protected Ast visitTypeRef(TypeReference obj, Void param) {
     TypeReference copy = new TypeReference(copy(obj.ref));
     return copy;
-  }
-
-  @Override
-  protected Ast visitStateRef(StateRef obj, Void param) {
-    return new StateRef(copy(obj.ref));
   }
 
   @Override
@@ -354,6 +352,26 @@ public class CopyAst extends NullDispatcher<Ast, Void> {
   @Override
   protected Ast visitRefExpr(ReferenceExpression obj, Void param) {
     throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Ast visitOffsetReference(OffsetReference obj, Void param) {
+    return new OffsetReference(copy(obj.getAnchor()), copy(obj.getOffset()));
+  }
+
+  @Override
+  protected Ast visitSimpleReference(SimpleReference obj, Void param) {
+    return new SimpleReference(copy(obj.getAnchor()));
+  }
+
+  @Override
+  protected Ast visitUnlinkedAnchor(UnlinkedAnchor obj, Void param) {
+    return new UnlinkedAnchor(obj.getLinkName());
+  }
+
+  @Override
+  protected Ast visitLinkedAnchor(LinkedAnchor obj, Void param) {
+    return new LinkedAnchor(obj.getLink());
   }
 
 }

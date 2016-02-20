@@ -22,10 +22,12 @@ import java.util.List;
 
 import ast.Designator;
 import ast.data.Named;
-import ast.data.reference.LinkTarget;
+import ast.data.reference.LinkedAnchor;
 import ast.data.reference.RefItem;
 import ast.data.reference.RefName;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.Reference;
+import ast.data.reference.ReferenceOffset;
+import ast.data.reference.UnlinkedAnchor;
 import ast.repository.query.ChildByName;
 
 public class SubLinker {
@@ -36,26 +38,28 @@ public class SubLinker {
     this.childByName = childByName;
   }
 
-  public void link(LinkedReferenceWithOffset_Implementation ref, Named root) {
-
-    if (ref.getLink() instanceof LinkTarget) {
+  public void link(Reference ref, Named root) {
+    if (ref.getAnchor() instanceof UnlinkedAnchor) {
       List<String> targetName = new ArrayList<String>();
 
-      String rootName = ((LinkTarget) ref.getLink()).getName();
+      String rootName = ((UnlinkedAnchor) ref.getAnchor()).getLinkName();
 
       if (!rootName.equals("self")) {
         targetName.add(rootName);
       }
 
-      for (RefItem itr : ref.getOffset()) {
-        String name = ((RefName) itr).name;
-        targetName.add(name);
+      if (ref instanceof ReferenceOffset) {
+        ReferenceOffset referenceOffset = (ReferenceOffset) ref;
+        for (RefItem itr : referenceOffset.getOffset()) {
+          String name = ((RefName) itr).name;
+          targetName.add(name);
+        }
+        referenceOffset.getOffset().clear();
       }
 
       Named target = childByName.get(root, new Designator(targetName), ref.metadata());
 
-      ref.setLink(target);
-      ref.getOffset().clear();
+      ref.setAnchor(new LinkedAnchor(target));
     }
 
   }

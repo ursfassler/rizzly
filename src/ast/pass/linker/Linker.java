@@ -38,7 +38,12 @@ import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
 import ast.data.reference.LinkTarget;
+import ast.data.reference.LinkedAnchor;
 import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.OffsetReference;
+import ast.data.reference.Reference;
+import ast.data.reference.SimpleReference;
+import ast.data.reference.UnlinkedAnchor;
 import ast.data.statement.Block;
 import ast.data.statement.VarDefInitStmt;
 import ast.data.template.Template;
@@ -155,6 +160,37 @@ class LinkerWorker extends DfsTraverser<Void, SymbolTable> {
   }
 
   @Override
+  protected Void visitOffsetReference(OffsetReference obj, SymbolTable param) {
+    handleReference(obj, param);
+    return super.visitOffsetReference(obj, param);
+  }
+
+  @Override
+  protected Void visitSimpleReference(SimpleReference obj, SymbolTable param) {
+    handleReference(obj, param);
+    return super.visitSimpleReference(obj, param);
+  }
+
+  private void handleReference(Reference obj, SymbolTable param) {
+    if (obj.getAnchor() instanceof UnlinkedAnchor) {
+      String name = ((UnlinkedAnchor) obj.getAnchor()).getLinkName();
+
+      Named link = param.find(name);
+      if (link == null) {
+        RError.err(ErrorType.Error, "Name not found: " + name, obj.metadata());
+      }
+      assert (!(link instanceof LinkTarget));
+
+      obj.setAnchor(new LinkedAnchor(link));
+    }
+  }
+
+  @Override
+  protected Void visitUnlinkedAnchor(UnlinkedAnchor obj, SymbolTable param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
   protected Void visitRawComponent(RawComponent obj, SymbolTable param) {
     param = new SymbolTable(param);
     param.addAll(obj.getIface());
@@ -241,7 +277,7 @@ class LinkerWorker extends DfsTraverser<Void, SymbolTable> {
     param.addAll(obj.param);
 
     // get context from src state and add event arguments
-    SymbolTable srcNames = stateNames.get(obj.src.ref.getLink());
+    SymbolTable srcNames = stateNames.get(((LinkedAnchor) obj.src.getAnchor()).getLink());  // TODO remove cast
     assert (srcNames != null);
     srcNames = new SymbolTable(srcNames);
     srcNames.addAll(obj.param);

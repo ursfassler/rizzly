@@ -219,7 +219,7 @@ class Reduction {
   private Block makeErrorBb() {
     Block bberror = new Block();
     Signal trap = kll.getTrap();
-    bberror.statements.add(new CallStmt(RefFactory.call(trap)));
+    bberror.statements.add(new CallStmt(RefFactory.oldCall(trap)));
     return bberror;
   }
 
@@ -234,7 +234,7 @@ class Reduction {
       option.add(opt);
     }
 
-    CaseStmt caseStmt = new CaseStmt(new ReferenceExpression(RefFactory.full(stateVariable)), option, makeErrorBb());
+    CaseStmt caseStmt = new CaseStmt(new ReferenceExpression(RefFactory.oldFull(stateVariable)), option, makeErrorBb());
 
     Block body = new Block();
     body.statements.add(caseStmt);
@@ -247,7 +247,7 @@ class Reduction {
 
   static private CallStmt makeCall(Function func) {
     assert (func.param.isEmpty());
-    LinkedReferenceWithOffset_Implementation call = RefFactory.call(func);
+    LinkedReferenceWithOffset_Implementation call = RefFactory.oldCall(func);
     return new CallStmt(call);
   }
 
@@ -284,7 +284,7 @@ class Reduction {
       copt.add(opt);
     }
 
-    CaseStmt caseStmt = new CaseStmt(new ReferenceExpression(RefFactory.full(stateVariable)), copt, makeErrorBb());
+    CaseStmt caseStmt = new CaseStmt(new ReferenceExpression(RefFactory.oldFull(stateVariable)), copt, makeErrorBb());
 
     return caseStmt;
   }
@@ -319,7 +319,7 @@ class Reduction {
 
     Block bberror = makeErrorBb();
 
-    CaseStmt caseStmt = new CaseStmt(new ReferenceExpression(RefFactory.full(stateVariable)), options, bberror);
+    CaseStmt caseStmt = new CaseStmt(new ReferenceExpression(RefFactory.oldFull(stateVariable)), options, bberror);
 
     return caseStmt;
   }
@@ -353,7 +353,7 @@ class Reduction {
     // EnumElement elem = type.find(enumElement);
 
     assert (elem != null);
-    LinkedReferenceWithOffset_Implementation eval = RefFactory.full(elem);
+    LinkedReferenceWithOffset_Implementation eval = RefFactory.oldFull(elem);
     return eval;
   }
 
@@ -377,7 +377,7 @@ class Reduction {
 
     EnumElement src = enumMap.get(trans.dst.getTarget());
     assert (src != null);
-    Assignment setState = new AssignmentSingle(RefFactory.full(stateVariable), new ReferenceExpression(RefFactory.full(src)));
+    Assignment setState = new AssignmentSingle(RefFactory.oldFull(stateVariable), new ReferenceExpression(RefFactory.oldFull(src)));
     transCode.statements.add(setState);
 
     return transCode;
