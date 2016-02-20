@@ -28,7 +28,6 @@ import org.mockito.Mockito;
 
 import ast.data.AstList;
 import ast.data.Named;
-import ast.data.component.ComponentReference;
 import ast.data.expression.value.TupleValue;
 import ast.data.function.FunctionReference;
 import ast.data.reference.LinkTarget;
@@ -85,19 +84,6 @@ public class Writer_Reference_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("FunctionReference"));
-    order.verify(executor).visit(idWriter, item);
-    order.verify(executor).visit(testee, item.metadata());
-    order.verify(executor).visit(eq(testee), eq(item.ref));
-    order.verify(stream).endNode();
-  }
-
-  @Test
-  public void write_ComponentReference() {
-    ComponentReference item = new ComponentReference(reference);
-
-    testee.visit(item);
-
-    order.verify(stream).beginNode(eq("ComponentReference"));
     order.verify(executor).visit(idWriter, item);
     order.verify(executor).visit(testee, item.metadata());
     order.verify(executor).visit(eq(testee), eq(item.ref));

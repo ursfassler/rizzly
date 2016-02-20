@@ -33,6 +33,7 @@ import ast.data.function.header.Signal;
 import ast.data.function.header.Slot;
 import ast.data.raw.RawComponent;
 import ast.data.raw.RawComposition;
+import ast.data.reference.LinkedAnchor;
 import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.doc.compgraph.Component;
 import ast.doc.compgraph.Interface;
@@ -76,7 +77,7 @@ public class CompositionGraphMaker {
     }
 
     for (ComponentUse use : TypeFilter.select(impl.getInstantiation(), ComponentUse.class)) {
-      ast.data.raw.RawComponent comptype = (RawComponent) use.compRef.ref.getLink();
+      ast.data.raw.RawComponent comptype = (RawComponent) ((LinkedAnchor) use.compRef.getAnchor()).getLink();
       Designator subpath = kp.get(comptype);
       SubComponent sub = new SubComponent(use.metadata(), use.getName(), subpath, comptype.getName(), filterMetadata(use.metadata(), METADATA_KEY));
 

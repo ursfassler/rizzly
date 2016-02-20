@@ -22,7 +22,6 @@ import parser.PeekNReader;
 import parser.scanner.Token;
 import parser.scanner.TokenType;
 import ast.data.AstList;
-import ast.data.component.ComponentReference;
 import ast.data.expression.Expression;
 import ast.data.expression.ReferenceExpression;
 import ast.data.expression.binop.Relation;
@@ -41,8 +40,10 @@ import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefIndex;
+import ast.data.reference.RefItem;
 import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
+import ast.data.reference.Reference;
 import ast.data.template.ActualTemplateArgument;
 import ast.data.type.TypeReference;
 import ast.meta.MetaList;
@@ -82,7 +83,7 @@ public class ExpressionParser extends Parser {
   }
 
   // EBNF parseNamedElementsValue: "[" [ assExpr { "," assExpr } ] "]"
-  protected ast.data.expression.value.NamedElementsValue parseNamedElementsValue() {
+  protected NamedElementsValue parseNamedElementsValue() {
     AstList<NamedValue> list = new AstList<NamedValue>();
 
     MetaList info = expect(TokenType.OPENBRACKETS).getMetadata();
@@ -141,7 +142,7 @@ public class ExpressionParser extends Parser {
   // actually it has to be: ref: id { refName } [ refGeneric ] { refName |
   // refCall }
   // EBNF ref: id { refName | refCall | refIndex | refGeneric }
-  public LinkedReferenceWithOffset_Implementation parseRef() {
+  public LinkedReferenceWithOffset_Implementation oldParseRef() {
     Token head = expect(TokenType.IDENTIFIER);
     LinkedReferenceWithOffset_Implementation res = RefFactory.oldFull(head.getMetadata(), head.getData());
 
@@ -165,28 +166,50 @@ public class ExpressionParser extends Parser {
     }
   }
 
+  // actually it has to be: ref: id { refName } [ refGeneric ] { refName |
+  // refCall }
+  // EBNF ref: id { refName | refCall | refIndex | refGeneric }
+  public Reference parseRef() {
+    Token head = expect(TokenType.IDENTIFIER);
+
+    AstList<RefItem> offset = new AstList<RefItem>();
+    while (true) {
+      switch (peek().getType()) {
+        case PERIOD:
+          offset.add(parseRefName());
+          break;
+        case OPENPAREN:
+          offset.add(parseRefCall());
+          break;
+        case OPENCURLY:
+          offset.add(parseRefGeneric());
+          break;
+        case OPENBRACKETS:
+          offset.add(parseRefIndex());
+          break;
+        default:
+          return RefFactory.create(head.getMetadata(), head.getData(), offset);
+      }
+    }
+  }
+
   public ReferenceExpression parseRefExpr() {
-    LinkedReferenceWithOffset_Implementation ref = parseRef();
+    LinkedReferenceWithOffset_Implementation ref = oldParseRef();
     ReferenceExpression ret = new ReferenceExpression(ref);
     ret.metadata().add(ref.metadata());
     return ret;
   }
 
   public TypeReference parseRefType() {
-    LinkedReferenceWithOffset_Implementation ref = parseRef();
+    LinkedReferenceWithOffset_Implementation ref = oldParseRef();
     TypeReference typeReference = new TypeReference(ref);
     typeReference.metadata().add(ref.metadata());
     return typeReference;
   }
 
   public FunctionReference parseRefFunc() {
-    LinkedReferenceWithOffset_Implementation ref = parseRef();
+    LinkedReferenceWithOffset_Implementation ref = oldParseRef();
     return new FunctionReference(ref.metadata(), ref);
-  }
-
-  public ComponentReference parseRefComp() {
-    LinkedReferenceWithOffset_Implementation ref = parseRef();
-    return new ComponentReference(ref.metadata(), ref);
   }
 
   // EBNF shiftOp: "shr" | "shl"

@@ -18,7 +18,7 @@
 package ast.data.reference;
 
 import ast.data.Ast;
-import ast.data.component.hfsm.State;
+import ast.data.Named;
 
 public interface Reference extends Ast {
 
@@ -27,6 +27,6 @@ public interface Reference extends Ast {
   public void setAnchor(Anchor anchor);
 
   @Deprecated
-  public State getTarget();
+  public Named getTarget();
 
 }

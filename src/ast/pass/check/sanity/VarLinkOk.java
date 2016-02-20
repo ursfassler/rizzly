@@ -147,7 +147,7 @@ class VarLinkOkWorker extends DfsTraverser<Void, Set<Ast>> {
     visit(obj.dst, param);
     visit(obj.eventFunc, param);
     visit(obj.body, param);
-    addAllToTop(obj.src.getTarget(), param);
+    addAllToTop((State) obj.src.getTarget(), param);
     visit(obj.guard, param);
     return null;
   }

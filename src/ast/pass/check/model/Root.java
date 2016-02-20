@@ -23,6 +23,7 @@ import ast.data.Namespace;
 import ast.data.component.Component;
 import ast.data.function.InterfaceFunction;
 import ast.data.function.header.FuncQuery;
+import ast.data.reference.Reference;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import error.ErrorType;
@@ -39,7 +40,8 @@ public class Root extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    Component root = kb.getRootComp().compRef.getTarget();
+    Reference reference = kb.getRootComp().compRef;
+    Component root = (Component) reference.getTarget();
 
     AstList<FuncQuery> queries = new AstList<FuncQuery>();
     for (InterfaceFunction itr : root.iface) {

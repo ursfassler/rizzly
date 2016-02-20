@@ -253,7 +253,7 @@ class TransitionDownPropagatorWorker extends NullDispatcher<Void, TransitionPara
     /*
      * for all states in obj.getItem() we want to know, which transitions are before and which ones are after the
      * specific state.
-     *
+     * 
      * the map spos contains the position of the state in the transition array
      */
 
@@ -346,8 +346,8 @@ class TransitionEndpointCollector extends NullDispatcher<Void, State> {
   @Override
   protected Void visitTransition(Transition obj, State param) {
     ttop.put(obj, param);
-    tsrc.put(obj, obj.src.getTarget());
-    tdst.put(obj, obj.dst.getTarget());
+    tsrc.put(obj, (State) obj.src.getTarget());
+    tdst.put(obj, (State) obj.dst.getTarget());
     return null;
   }
 

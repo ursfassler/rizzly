@@ -25,11 +25,11 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
-import ast.data.component.ComponentReference;
 import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.Queue;
 import ast.data.component.elementary.ImplElementary;
 import ast.data.function.FunctionReference;
+import ast.data.reference.Reference;
 import ast.pass.output.xml.IdReader;
 import ast.visitor.VisitExecutor;
 import ast.visitor.Visitor;
@@ -42,7 +42,7 @@ public class Writer_Component_Test {
   final private Write testee = new Write(stream, astId, idWriter, executor);
   final private FunctionReference entry = mock(FunctionReference.class);
   final private FunctionReference exit = mock(FunctionReference.class);
-  final private ComponentReference componentReference = mock(ComponentReference.class);
+  final private Reference componentReference = mock(Reference.class);
   final private InOrder order = Mockito.inOrder(stream, entry, exit, idWriter, componentReference, executor);
 
   @Test

@@ -17,22 +17,26 @@
 
 package ast.data.component;
 
+import ast.data.AstList;
 import ast.data.raw.RawComponent;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefFactory;
+import ast.data.reference.RefItem;
 import ast.meta.MetaList;
 
+//TODO inline calls, remove class
+@Deprecated
 public class CompRefFactory {
-  public static ComponentReference create(Component comp) {
-    return new ComponentReference(RefFactory.oldCreate(comp));
+  public static OffsetReference create(Component comp) {
+    return RefFactory.create(comp, new AstList<RefItem>());
   }
 
   @Deprecated
-  public static ComponentReference create(MetaList info, Component comp) {
-    return new ComponentReference(info, RefFactory.oldCreate(info, comp));
+  public static OffsetReference create(MetaList info, Component comp) {
+    return RefFactory.create(info, comp, new AstList<RefItem>());
   }
 
-  public static ComponentReference create(RawComponent comp) {
-    return new ComponentReference(RefFactory.oldCreate(comp));
+  public static OffsetReference create(RawComponent comp) {
+    return RefFactory.create(comp, new AstList<RefItem>());
   }
-
 }

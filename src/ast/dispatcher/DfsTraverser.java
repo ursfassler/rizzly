@@ -18,7 +18,6 @@
 package ast.dispatcher;
 
 import ast.data.Namespace;
-import ast.data.component.ComponentReference;
 import ast.data.component.composition.AsynchroniusConnection;
 import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.ComponentUse;
@@ -951,12 +950,6 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
 
   @Override
   protected R visitFuncRef(FunctionReference obj, P param) {
-    visit(obj.ref, param);
-    return null;
-  }
-
-  @Override
-  protected R visitCompRef(ComponentReference obj, P param) {
     visit(obj.ref, param);
     return null;
   }

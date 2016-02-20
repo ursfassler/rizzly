@@ -20,9 +20,14 @@ package ast.pass.specializer;
 import main.Configuration;
 import ast.data.AstList;
 import ast.data.Namespace;
+import ast.data.reference.Anchor;
+import ast.data.reference.LinkedAnchor;
 import ast.data.reference.LinkedReference;
-import ast.data.reference.RefTemplCall;
 import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.OffsetReference;
+import ast.data.reference.RefItem;
+import ast.data.reference.RefTemplCall;
+import ast.data.reference.Reference;
 import ast.data.reference.ReferenceWithOffset;
 import ast.data.template.ActualTemplateArgument;
 import ast.data.template.Template;
@@ -40,32 +45,58 @@ public class TemplCallAdder extends AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    AstList<LinkedReferenceWithOffset_Implementation> refList = listOfReferences(ast);
+    AstList<LinkedReferenceWithOffset_Implementation> refList = oldListOfReferences(ast);
     for (LinkedReferenceWithOffset_Implementation ref : refList) {
-      if (isTemplateCall(ref) && missingCall(ref)) {
-        insertTemplateCall(ref);
+      if (oldIsTemplateCall(ref) && oldMissingCall(ref)) {
+        oldInsertTemplateCall(ref);
+      }
+    }
+
+    for (Reference ref : listOfReferences(ast)) {
+      if (isTemplateCall(ref.getAnchor()) && missingCall((OffsetReference) ref)) {
+        insertTemplateCall((OffsetReference) ref);
       }
     }
   }
 
-  private boolean isTemplateCall(LinkedReference ref) {
+  private boolean oldIsTemplateCall(LinkedReference ref) {
     return ref.getLink() instanceof Template;
   }
 
-  private boolean missingCall(ReferenceWithOffset ref) {
+  private boolean oldMissingCall(ReferenceWithOffset ref) {
     return ref.getOffset().isEmpty() || !(ref.getOffset().get(0) instanceof RefTemplCall);
   }
 
-  private void insertTemplateCall(LinkedReferenceWithOffset_Implementation ref) {
+  private void oldInsertTemplateCall(LinkedReferenceWithOffset_Implementation ref) {
     if (!((Template) ref.getLink()).getTempl().isEmpty()) {
       RError.err(ErrorType.Error, "Missing template argument", ref.metadata());
     }
     ref.getOffset().add(0, new RefTemplCall(new AstList<ActualTemplateArgument>()));
   }
 
-  private AstList<LinkedReferenceWithOffset_Implementation> listOfReferences(Namespace ast) {
+  private AstList<LinkedReferenceWithOffset_Implementation> oldListOfReferences(Namespace ast) {
     AstList<LinkedReferenceWithOffset_Implementation> refList = Collector.select(ast, new IsClass(LinkedReferenceWithOffset_Implementation.class)).castTo(LinkedReferenceWithOffset_Implementation.class);
     return refList;
   }
 
+  private AstList<Reference> listOfReferences(Namespace ast) {
+    return Collector.select(ast, new IsClass(Reference.class)).castTo(Reference.class);
+  }
+
+  private boolean isTemplateCall(Anchor ref) {
+    return ((LinkedAnchor) ref).getLink() instanceof Template;
+  }
+
+  private boolean missingCall(OffsetReference ref) {
+    AstList<RefItem> offset = ref.getOffset();
+    return offset.isEmpty() || !(offset.get(0) instanceof RefTemplCall);
+  }
+
+  private void insertTemplateCall(OffsetReference ref) {
+    LinkedAnchor anchor = ((LinkedAnchor) ref.getAnchor());
+    if (!((Template) anchor.getLink()).getTempl().isEmpty()) {
+      RError.err(ErrorType.Error, "Missing template argument", ref.metadata());
+    }
+    ref.getOffset().add(0, new RefTemplCall(new AstList<ActualTemplateArgument>()));
+  }
 }

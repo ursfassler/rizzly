@@ -22,8 +22,11 @@ import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
 import ast.data.Namespace;
-import ast.data.reference.RefTemplCall;
+import ast.data.reference.LinkedAnchor;
 import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.OffsetReference;
+import ast.data.reference.RefTemplCall;
+import ast.data.reference.SimpleReference;
 import ast.data.template.ActualTemplateArgument;
 import ast.data.template.Template;
 import ast.data.variable.DefaultVariable;
@@ -91,6 +94,37 @@ class Evaluator extends DfsTraverser<Void, Void> {
     }
 
     return super.visitReference(obj, param);
+  }
+
+  @Override
+  protected Void visitSimpleReference(SimpleReference obj, Void param) {
+    // TODO can we all (following) instantiate like this?
+
+    LinkedAnchor anchor = (LinkedAnchor) obj.getAnchor();
+    if (anchor.getLink() instanceof Template) {
+      Template template = (Template) anchor.getLink();
+      AstList<ActualTemplateArgument> acarg = new AstList<ActualTemplateArgument>();
+      anchor.setLink(Specializer.specialize(template, acarg, kb));
+    }
+
+    return super.visitSimpleReference(obj, param);
+  }
+
+  @Override
+  protected Void visitOffsetReference(OffsetReference obj, Void param) {
+    // TODO can we all (following) instantiate like this?
+
+    LinkedAnchor anchor = (LinkedAnchor) obj.getAnchor();
+    if (anchor.getLink() instanceof Template) {
+      assert (!obj.getOffset().isEmpty() && (obj.getOffset().get(0) instanceof RefTemplCall));
+
+      Template template = (Template) anchor.getLink();
+      AstList<ActualTemplateArgument> acarg = ((RefTemplCall) obj.getOffset().get(0)).actualParameter;
+      obj.getOffset().remove(0);
+      anchor.setLink(Specializer.specialize(template, acarg, kb));
+    }
+
+    return super.visitOffsetReference(obj, param);
   }
 
   @Override

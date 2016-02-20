@@ -141,7 +141,7 @@ public class StateTypeBuilder extends NullDispatcher<NamedElement, AstList<Named
     param.add(subElem);
 
     NamedElement initStateElem = null;
-    State initialTarget = obj.initial.getTarget();
+    State initialTarget = (State) obj.initial.getTarget();
     for (State sub : TypeFilter.select(obj.item, State.class)) {
       NamedElement item = visit(sub, param);
       union.element.add(item);

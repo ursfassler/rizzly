@@ -19,7 +19,7 @@ package ast.data.reference;
 
 import ast.data.AstBase;
 import ast.data.AstList;
-import ast.data.component.hfsm.State;
+import ast.data.Named;
 
 public class OffsetReference extends AstBase implements Reference, ReferenceOffset {
   private Anchor anchor;
@@ -47,7 +47,7 @@ public class OffsetReference extends AstBase implements Reference, ReferenceOffs
 
   @Override
   public String toString() {
-    String ret = ">" + anchor;
+    String ret = anchor.toString();
     for (RefItem item : getOffset()) {
       ret += item.toString();
     }
@@ -56,9 +56,8 @@ public class OffsetReference extends AstBase implements Reference, ReferenceOffs
 
   @Override
   @Deprecated
-  public State getTarget() {
+  public Named getTarget() {
     assert (getOffset().isEmpty()); // FIXME make it correct or remove function
-    return (State) anchor.getTarget();
+    return anchor.getTarget();
   }
-
 }

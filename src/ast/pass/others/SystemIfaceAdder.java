@@ -36,10 +36,10 @@ import ast.data.expression.value.TupleValue;
 import ast.data.function.Function;
 import ast.data.function.header.Slot;
 import ast.data.function.ret.FuncReturnNone;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefName;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.Statement;
@@ -164,7 +164,7 @@ class SystemIfaceCaller extends NullDispatcher<Void, Void> {
     {
       ArrayList<Statement> code = new ArrayList<Statement>();
       for (ComponentUse cuse : compList) {
-        Function sctor = getCtor(cuse.compRef.getTarget());
+        Function sctor = getCtor((Component) cuse.compRef.getTarget());
         CallStmt call = makeCall(cuse, sctor);
         code.add(call);
       }
@@ -178,7 +178,7 @@ class SystemIfaceCaller extends NullDispatcher<Void, Void> {
       code.add(makeCall(obj.exitFunc.getTarget()));
       Collections.reverse(compList);
       for (ComponentUse cuse : compList) {
-        Function sdtor = getDtor(cuse.compRef.getTarget());
+        Function sdtor = getDtor((Component) cuse.compRef.getTarget());
         CallStmt call = makeCall(cuse, sdtor);
         code.add(call);
       }

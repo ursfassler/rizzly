@@ -21,7 +21,6 @@ import ast.data.component.Component;
 import ast.data.function.Function;
 import ast.meta.MetaList;
 import ast.repository.query.NameFilter;
-import ast.visitor.Visitor;
 
 final public class EndpointSub extends Endpoint {
   final public CompUseRef component;
@@ -41,7 +40,7 @@ final public class EndpointSub extends Endpoint {
 
   @Override
   public Function getFunc() {
-    Component comp = component.getTarget().compRef.getTarget();
+    Component comp = (Component) component.getTarget().compRef.getTarget();
     return NameFilter.select(comp.iface, function);
   }
 
@@ -49,6 +48,5 @@ final public class EndpointSub extends Endpoint {
   public String toString() {
     return component.getTarget().getName() + "." + function;
   }
-
 
 }

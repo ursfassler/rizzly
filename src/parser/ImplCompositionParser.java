@@ -19,7 +19,6 @@ package parser;
 
 import parser.scanner.Token;
 import parser.scanner.TokenType;
-import ast.data.component.ComponentReference;
 import ast.data.component.composition.AsynchroniusConnection;
 import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.Connection;
@@ -28,9 +27,10 @@ import ast.data.component.composition.EndpointRaw;
 import ast.data.component.composition.SynchroniusConnection;
 import ast.data.raw.RawComponent;
 import ast.data.raw.RawComposition;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefName;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.Reference;
 import ast.meta.MetaList;
 import error.ErrorType;
 import error.RError;
@@ -69,9 +69,9 @@ public class ImplCompositionParser extends ImplBaseParser {
   private void parseInstantiation(Token id, RawComposition comp) {
     switch (peek().getType()) {
       case IDENTIFIER:
-        ComponentReference type = expr().parseRefComp();
+        Reference type = expr().parseRef();
         expect(TokenType.SEMI);
-        ast.data.component.composition.ComponentUse compUse = new ComponentUse(id.getMetadata(), id.getData(), type);
+        ComponentUse compUse = new ComponentUse(id.getMetadata(), id.getData(), type);
         comp.getInstantiation().add(compUse);
         break;
       default: {

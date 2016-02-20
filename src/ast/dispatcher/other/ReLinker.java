@@ -21,9 +21,11 @@ import java.util.Map;
 
 import ast.data.Ast;
 import ast.data.Named;
+import ast.data.reference.LinkedAnchor;
 import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.dispatcher.DfsTraverser;
 
+//TODO merge with ast.copy.Relinker
 public class ReLinker extends DfsTraverser<Void, Map<Ast, Ast>> {
 
   public static void process(Ast classes, Map<Ast, Ast> map) {
@@ -38,6 +40,15 @@ public class ReLinker extends DfsTraverser<Void, Map<Ast, Ast>> {
       obj.setLink((Named) target);
     }
     return super.visitReference(obj, param);
+  }
+
+  @Override
+  protected Void visitLinkedAnchor(LinkedAnchor obj, Map<Ast, Ast> param) {
+    Ast target = param.get(obj.getLink());
+    if (target != null) {
+      obj.setLink((Named) target);
+    }
+    return super.visitLinkedAnchor(obj, param);
   }
 
 }

@@ -18,7 +18,7 @@
 package ast.data.reference;
 
 import ast.data.AstBase;
-import ast.data.component.hfsm.State;
+import ast.data.Named;
 
 public class SimpleReference extends AstBase implements Reference {
   private Anchor anchor;
@@ -39,13 +39,13 @@ public class SimpleReference extends AstBase implements Reference {
 
   @Override
   public String toString() {
-    return ">" + anchor;
+    return anchor.toString();
   }
 
   @Override
   @Deprecated
-  public State getTarget() {
-    return (State) anchor.getTarget();
+  public Named getTarget() {
+    return anchor.getTarget();
   }
 
 }

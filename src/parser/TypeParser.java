@@ -114,7 +114,7 @@ public class TypeParser extends BaseParser {
 
   // EBNF derivatetype: ref ";"
   private AliasType parseDerivateType(String name) {
-    LinkedReferenceWithOffset_Implementation ref = expr().parseRef();
+    LinkedReferenceWithOffset_Implementation ref = expr().oldParseRef();
     expect(TokenType.SEMI);
     TypeReference typeref = new TypeReference(ref);
     typeref.metadata().add(ref.metadata());

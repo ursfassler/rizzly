@@ -282,7 +282,7 @@ public class StatementParser extends BaseParser {
   private AstList<LinkedReferenceWithOffset_Implementation> parseLhs() {
     AstList<LinkedReferenceWithOffset_Implementation> lhs = new AstList<LinkedReferenceWithOffset_Implementation>();
     do {
-      lhs.add(expr().parseRef());
+      lhs.add(expr().oldParseRef());
     } while (consumeIfEqual(TokenType.COMMA));
     return lhs;
   }

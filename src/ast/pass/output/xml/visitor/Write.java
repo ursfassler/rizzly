@@ -21,7 +21,6 @@ import ast.Designator;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
-import ast.data.component.ComponentReference;
 import ast.data.component.composition.AsynchroniusConnection;
 import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.ComponentUse;
@@ -281,10 +280,6 @@ public class Write implements Visitor {
 
   public void visit(ComponentType object) {
     throw new RuntimeException("not yet implemented");
-  }
-
-  public void visit(ComponentReference object) {
-    visitTypedReference("ComponentReference", object);
   }
 
   public void visit(ComponentUse object) {

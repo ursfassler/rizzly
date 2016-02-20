@@ -164,7 +164,7 @@ class CompInterfaceTypeCheckerWorker extends NullDispatcher<Void, Void> {
   }
 
   private Component checkIface(ImplComposition obj, ComponentUse use, Direction dir) {
-    Component type = use.compRef.getTarget();
+    Component type = (Component) use.compRef.getTarget();
     for (InterfaceFunction ifaceuse : type.getIface(dir)) {
       if (!ifaceIsConnected(use, ifaceuse, dir.other(), obj.connection)) {
         ErrorType etype;

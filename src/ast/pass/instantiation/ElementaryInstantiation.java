@@ -64,7 +64,7 @@ public class ElementaryInstantiation extends AstPass {
     ComponentUse instComp = kb.getRootComp();
     ast.children.remove(instComp);
 
-    ImplElementary env = makeEnv(instComp.compRef.getTarget(), kb);
+    ImplElementary env = makeEnv((Component) instComp.compRef.getTarget(), kb);
     ast.children.add(env);
 
     CompInstantiatorWorker instantiator = new CompInstantiatorWorker();
@@ -78,7 +78,7 @@ public class ElementaryInstantiation extends AstPass {
     Set<Function> pubfunc = new HashSet<Function>();
     pubfunc.addAll(Collector.select(inst.subCallback, new IsClass(Function.class)).castTo(Function.class));
     RError.ass(inst.component.size() == 1, inst.metadata(), "Only expected one instance");
-    Component targetComp = inst.component.get(0).compRef.getTarget();
+    Component targetComp = (Component) inst.component.get(0).compRef.getTarget();
     pubfunc.addAll(targetComp.iface);
 
     for (Function nam : pubfunc) {
@@ -101,7 +101,7 @@ public class ElementaryInstantiation extends AstPass {
     for (ComponentUse compu : env.component) {
       SubCallbacks suc = new SubCallbacks(compu.metadata(), new CompUseRef(RefFactory.oldCreate(compu)));
       env.subCallback.add(suc);
-      Component refComp = compu.compRef.getTarget();
+      Component refComp = (Component) compu.compRef.getTarget();
       for (InterfaceFunction out : refComp.getIface(Direction.out)) {
         Function suha = CompositionReduction.makeHandler(out);
         suha.property = FunctionProperty.External;
@@ -140,7 +140,7 @@ class CompInstantiatorWorker extends NullDispatcher<ImplElementary, Namespace> {
     // ns.getChildren().removeAll(ns.getChildren().getItems(FuncCtrlOutDataOut.class));
 
     for (ComponentUse compUse : inst.component) {
-      Component comp = compUse.compRef.getTarget();
+      Component comp = (Component) compUse.compRef.getTarget();
 
       // copy / instantiate used component
       Namespace usens = new Namespace(compUse.metadata(), compUse.getName());

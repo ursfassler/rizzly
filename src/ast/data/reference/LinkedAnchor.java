@@ -46,4 +46,9 @@ public class LinkedAnchor extends AstBase implements Anchor {
     return getLink();
   }
 
+  @Override
+  public String toString() {
+    return "@" + link.getName() + "";
+  }
+
 }

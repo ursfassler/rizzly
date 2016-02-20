@@ -25,7 +25,6 @@ import ast.data.AstList;
 import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.component.Component;
-import ast.data.component.ComponentReference;
 import ast.data.component.composition.AsynchroniusConnection;
 import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.ComponentUse;
@@ -262,8 +261,6 @@ public abstract class Dispatcher<R, P> {
       return visitTypeRef((TypeReference) obj, param);
     } else if (obj instanceof FunctionReference) {
       return visitFuncRef((FunctionReference) obj, param);
-    } else if (obj instanceof ComponentReference) {
-      return visitCompRef((ComponentReference) obj, param);
     } else if (obj instanceof CompUseRef) {
       return visitCompUseRef((CompUseRef) obj, param);
     } else {
@@ -777,8 +774,6 @@ public abstract class Dispatcher<R, P> {
   }
 
   abstract protected R visitCompUseRef(CompUseRef obj, P param);
-
-  abstract protected R visitCompRef(ComponentReference obj, P param);
 
   abstract protected R visitFuncRef(FunctionReference obj, P param);
 

@@ -20,6 +20,7 @@ package ast.data.reference;
 import ast.data.Ast;
 import ast.data.AstBase;
 
+@Deprecated
 public abstract class TypedReference<T extends Ast> extends AstBase {
   public LinkedReferenceWithOffset_Implementation ref;
 

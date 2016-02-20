@@ -21,10 +21,12 @@ import main.Configuration;
 import ast.data.Ast;
 import ast.data.Named;
 import ast.data.Namespace;
+import ast.data.component.composition.ComponentUse;
 import ast.data.file.RizzlyFile;
 import ast.data.raw.RawComponent;
 import ast.data.raw.RawComposition;
-import ast.data.reference.LinkedReferenceWithOffset;
+import ast.data.reference.LinkedAnchor;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefTemplCall;
 import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowledgeBase;
@@ -73,9 +75,10 @@ class CompLinkReductionWorker extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitCompUse(ast.data.component.composition.ComponentUse obj, Void param) {
-    LinkedReferenceWithOffset compRef = obj.compRef.ref;
-    Named item = compRef.getLink();
+  protected Void visitCompUse(ComponentUse obj, Void param) {
+    OffsetReference compRef = (OffsetReference) obj.compRef;
+    LinkedAnchor anchor = (LinkedAnchor) compRef.getAnchor();
+    Named item = anchor.getLink();
 
     while (!compRef.getOffset().isEmpty()) {
       if (compRef.getOffset().get(0) instanceof RefTemplCall) {
@@ -94,7 +97,7 @@ class CompLinkReductionWorker extends NullDispatcher<Void, Void> {
     }
 
     assert (item instanceof RawComponent);
-    compRef.setLink(item);
+    anchor.setLink(item);
 
     return null;
   }

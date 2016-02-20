@@ -89,8 +89,8 @@ class HfsmTransScopeCheckWorker extends NullDispatcher<Set<State>, Void> {
   }
 
   private void checkTransition(Transition trans, Set<State> allowed) {
-    check(trans.src.getTarget(), allowed, trans.metadata(), "source");
-    check(trans.dst.getTarget(), allowed, trans.metadata(), "destination");
+    check((State) trans.src.getTarget(), allowed, trans.metadata(), "source");
+    check((State) trans.dst.getTarget(), allowed, trans.metadata(), "destination");
   }
 
   private void check(State state, Set<State> allowed, MetaList info, String end) {

@@ -42,4 +42,9 @@ public class UnlinkedAnchor extends AstBase implements Anchor {
     throw new RuntimeException("never implemented");
   }
 
+  @Override
+  public String toString() {
+    return "@\"" + linkName + "\"";
+  }
+
 }

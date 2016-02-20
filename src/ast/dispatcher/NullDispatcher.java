@@ -19,7 +19,6 @@ package ast.dispatcher;
 
 import ast.data.Ast;
 import ast.data.Namespace;
-import ast.data.component.ComponentReference;
 import ast.data.component.composition.AsynchroniusConnection;
 import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.ComponentUse;
@@ -155,11 +154,6 @@ abstract public class NullDispatcher<R, P> extends Dispatcher<R, P> {
 
   @Override
   protected R visitCompUseRef(CompUseRef obj, P param) {
-    return visitDefault(obj, param);
-  }
-
-  @Override
-  protected R visitCompRef(ComponentReference obj, P param) {
     return visitDefault(obj, param);
   }
 

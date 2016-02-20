@@ -23,7 +23,6 @@ import java.util.Collection;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
-import ast.data.component.ComponentReference;
 import ast.data.component.composition.AsynchroniusConnection;
 import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.ComponentUse;
@@ -97,11 +96,15 @@ import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
 import ast.data.reference.LinkTarget;
+import ast.data.reference.LinkedAnchor;
 import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefName;
 import ast.data.reference.RefTemplCall;
+import ast.data.reference.SimpleReference;
+import ast.data.reference.UnlinkedAnchor;
 import ast.data.reference.UnlinkedReferenceWithOffset_Implementation;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
@@ -953,12 +956,6 @@ public class DeepFirstTraverser implements Visitor {
     postorderVisit(object);
   }
 
-  public void visit(ComponentReference object) {
-    preorderVisit(object);
-    executeVisit(object.ref);
-    postorderVisit(object);
-  }
-
   public void visit(CompUseRef object) {
     preorderVisit(object);
     executeVisit(object.ref);
@@ -984,6 +981,29 @@ public class DeepFirstTraverser implements Visitor {
 
   public void visit(UnlinkedReferenceWithOffset_Implementation object) {
     throw new RuntimeException("not yet implemented");
+  }
+
+  public void visit(SimpleReference object) {
+    preorderVisit(object);
+    executeVisit(object.getAnchor());
+    postorderVisit(object);
+  }
+
+  public void visit(OffsetReference object) {
+    preorderVisit(object);
+    executeVisit(object.getAnchor());
+    executeVisit(object.getOffset());
+    postorderVisit(object);
+  }
+
+  public void visit(UnlinkedAnchor object) {
+    preorderVisit(object);
+    postorderVisit(object);
+  }
+
+  public void visit(LinkedAnchor object) {
+    preorderVisit(object);
+    postorderVisit(object);
   }
 
   private void visitFunction(Function object) {

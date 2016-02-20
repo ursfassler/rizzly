@@ -27,7 +27,6 @@ import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Range;
 import ast.data.component.Component;
-import ast.data.component.ComponentReference;
 import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.Direction;
 import ast.data.expression.Expression;
@@ -66,8 +65,12 @@ import ast.data.function.InterfaceFunction;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FuncReturnTuple;
 import ast.data.function.ret.FunctionReturnType;
+import ast.data.reference.LinkedAnchor;
 import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefItem;
+import ast.data.reference.SimpleReference;
+import ast.data.reference.UnlinkedAnchor;
 import ast.data.type.Type;
 import ast.data.type.TypeRefFactory;
 import ast.data.type.TypeReference;
@@ -147,11 +150,6 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
 
   @Override
   protected Type visitTypeRef(TypeReference obj, Void param) {
-    return visit(obj.ref, param);
-  }
-
-  @Override
-  protected Type visitCompRef(ComponentReference obj, Void param) {
     return visit(obj.ref, param);
   }
 
@@ -257,6 +255,30 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
       base = rtg.traverse(itm, base);
     }
     return base;
+  }
+
+  @Override
+  protected Type visitOffsetReference(OffsetReference obj, Void param) {
+    Type base = visit(obj.getAnchor(), param);
+    for (RefItem itm : obj.getOffset()) {
+      base = rtg.traverse(itm, base);
+    }
+    return base;
+  }
+
+  @Override
+  protected Type visitSimpleReference(SimpleReference obj, Void param) {
+    return visit(obj.getAnchor(), param);
+  }
+
+  @Override
+  protected Type visitUnlinkedAnchor(UnlinkedAnchor obj, Void param) {
+    throw new RuntimeException("not yet implemented");
+  }
+
+  @Override
+  protected Type visitLinkedAnchor(LinkedAnchor obj, Void param) {
+    return visit(obj.getLink(), param);
   }
 
   @Override

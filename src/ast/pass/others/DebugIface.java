@@ -78,7 +78,7 @@ public class DebugIface extends AstPass {
 
     Response func = makeNameGetter("DebugName", symNameSizeType, names, stringType);
     func.property = FunctionProperty.Public;
-    Component rootComp = kb.getRootComp().compRef.getTarget();
+    Component rootComp = (Component) kb.getRootComp().compRef.getTarget();
     rootComp.function.add(func);
   }
 

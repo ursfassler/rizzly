@@ -43,8 +43,8 @@ import ast.data.function.header.Response;
 import ast.data.function.header.Signal;
 import ast.data.function.header.Slot;
 import ast.data.function.ret.FuncReturnNone;
-import ast.data.reference.RefFactory;
 import ast.data.reference.LinkedReferenceWithOffset_Implementation;
+import ast.data.reference.RefFactory;
 import ast.data.statement.Assignment;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.Block;
@@ -194,7 +194,7 @@ class Reduction {
     }
 
     {
-      Procedure fEntry = makeEntryFunc(obj.topstate.initial.getTarget());
+      Procedure fEntry = makeEntryFunc((State) obj.topstate.initial.getTarget());
       elem.function.add(fEntry);
       elem.entryFunc = FuncRefFactory.create(fEntry.metadata(), fEntry);
 

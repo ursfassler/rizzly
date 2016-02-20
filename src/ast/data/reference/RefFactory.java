@@ -37,13 +37,6 @@ public class RefFactory {
     return reference;
   }
 
-  public static OffsetReference create(MetaList info, String name, AstList<RefItem> offset) {
-    UnlinkedAnchor anchor = new UnlinkedAnchor(name);
-    OffsetReference reference = new OffsetReference(anchor, offset);
-    reference.metadata().add(info);
-    return reference;
-  }
-
   public static SimpleReference create(Named link) {
     Anchor anchor = new LinkedAnchor(link);
     return new SimpleReference(anchor);
@@ -52,6 +45,26 @@ public class RefFactory {
   public static SimpleReference create(MetaList info, Named link) {
     SimpleReference reference = create(link);
     reference.metadata().add(info);
+    return reference;
+  }
+
+  public static OffsetReference create(MetaList info, String name, AstList<RefItem> offset) {
+    Anchor anchor = new UnlinkedAnchor(name);
+    OffsetReference reference = new OffsetReference(anchor, offset);
+    reference.metadata().add(info);
+    return reference;
+  }
+
+  public static OffsetReference create(MetaList info, Named link, AstList<RefItem> offset) {
+    Anchor anchor = new LinkedAnchor(link);
+    OffsetReference reference = new OffsetReference(anchor, offset);
+    reference.metadata().add(info);
+    return reference;
+  }
+
+  public static OffsetReference create(Named link, AstList<RefItem> offset) {
+    Anchor anchor = new LinkedAnchor(link);
+    OffsetReference reference = new OffsetReference(anchor, offset);
     return reference;
   }
 

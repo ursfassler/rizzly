@@ -26,7 +26,6 @@ import ast.data.AstList;
 import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.component.Component;
-import ast.data.component.ComponentReference;
 import ast.data.component.composition.AsynchroniusConnection;
 import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.Connection;
@@ -808,12 +807,6 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
     xw.wr("(");
     list(obj.value, ", ", null);
     xw.wr(")");
-    return null;
-  }
-
-  @Override
-  protected Void visitCompRef(ComponentReference obj, Void param) {
-    visit(obj.ref, param);
     return null;
   }
 

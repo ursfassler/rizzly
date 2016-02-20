@@ -26,7 +26,6 @@ import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
 import ast.data.Namespace;
-import ast.data.component.ComponentReference;
 import ast.data.component.composition.AsynchroniusConnection;
 import ast.data.component.composition.CompUseRef;
 import ast.data.component.composition.ComponentUse;
@@ -128,11 +127,6 @@ public class CopyAst extends NullDispatcher<Ast, Void> {
   protected Ast visitTypeRef(TypeReference obj, Void param) {
     TypeReference copy = new TypeReference(copy(obj.ref));
     return copy;
-  }
-
-  @Override
-  protected Ast visitCompRef(ComponentReference obj, Void param) {
-    return new ComponentReference(copy(obj.ref));
   }
 
   @Override

@@ -18,24 +18,22 @@
 package ast.data.component.composition;
 
 import ast.data.Named;
-import ast.data.component.ComponentReference;
+import ast.data.reference.Reference;
 import ast.meta.MetaList;
-import ast.visitor.Visitor;
 
 public class ComponentUse extends Named {
-  public ComponentReference compRef;
+  public Reference compRef;
 
-  public ComponentUse(String name, ComponentReference compRef) {
+  public ComponentUse(String name, Reference compRef) {
     setName(name);
     this.compRef = compRef;
   }
 
   @Deprecated
-  public ComponentUse(MetaList info, String name, ComponentReference compRef) {
+  public ComponentUse(MetaList info, String name, Reference compRef) {
     metadata().add(info);
     setName(name);
     this.compRef = compRef;
   }
-
 
 }

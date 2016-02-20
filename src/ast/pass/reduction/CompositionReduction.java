@@ -33,8 +33,8 @@ import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.component.Component;
 import ast.data.component.composition.AsynchroniusConnection;
-import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.CompUseRef;
+import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.Connection;
 import ast.data.component.composition.Direction;
 import ast.data.component.composition.Endpoint;
@@ -48,22 +48,22 @@ import ast.data.component.elementary.ImplElementary;
 import ast.data.expression.Expression;
 import ast.data.expression.ReferenceExpression;
 import ast.data.expression.value.TupleValue;
-import ast.data.function.FunctionReference;
 import ast.data.function.FuncRefFactory;
 import ast.data.function.Function;
+import ast.data.function.FunctionReference;
 import ast.data.function.InterfaceFunction;
-import ast.data.function.header.Procedure;
 import ast.data.function.header.FuncQuery;
-import ast.data.function.header.Response;
 import ast.data.function.header.FuncSubHandlerEvent;
 import ast.data.function.header.FuncSubHandlerQuery;
+import ast.data.function.header.Procedure;
+import ast.data.function.header.Response;
 import ast.data.function.header.Signal;
 import ast.data.function.header.Slot;
 import ast.data.function.ret.FuncReturnNone;
+import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefName;
-import ast.data.reference.LinkedReferenceWithOffset_Implementation;
 import ast.data.statement.Block;
 import ast.data.statement.CallStmt;
 import ast.data.statement.ExpressionReturn;
@@ -168,7 +168,7 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
       SubCallbacks suc = new SubCallbacks(new CompUseRef(info, RefFactory.oldCreate(info, compu)));
       suc.metadata().add(compu.metadata());
       elem.subCallback.add(suc);
-      Component usedComp = compu.compRef.getTarget();
+      Component usedComp = (Component) compu.compRef.getTarget();
       for (InterfaceFunction out : usedComp.getIface(Direction.out)) {
         Function suha = CompositionReduction.makeHandler(out);
         suc.func.add(suha);
@@ -197,7 +197,7 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
         }
       } else {
         ComponentUse srcCompRef = ((EndpointSub) src).component.getTarget();
-        Component srcComp = srcCompRef.compRef.getTarget();
+        Component srcComp = (Component) srcCompRef.compRef.getTarget();
         InterfaceFunction funa = NameFilter.select(srcComp.iface, ((EndpointSub) src).function);
         Function coniface = funa;
 
@@ -294,7 +294,7 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
     LinkedReferenceWithOffset_Implementation ref;
     if (ep instanceof EndpointSub) {
       ref = RefFactory.oldFull(ep.metadata(), ((EndpointSub) ep).component.getTarget());
-      Component refComp = ((EndpointSub) ep).component.getTarget().compRef.getTarget();
+      Component refComp = (Component) ((EndpointSub) ep).component.getTarget().compRef.getTarget();
       Queue queue = refComp.queue;
       ref.getOffset().add(new RefName(queue.getName()));
     } else {
