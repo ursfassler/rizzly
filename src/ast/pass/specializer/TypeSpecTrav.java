@@ -22,33 +22,28 @@ import java.util.Map;
 import ast.data.Named;
 import ast.data.reference.LinkedAnchor;
 import ast.data.reference.OffsetReference;
-import ast.data.reference.RefFactory;
-import ast.data.reference.Reference;
 import ast.data.type.Type;
 import ast.data.variable.TemplateParameter;
 import ast.dispatcher.other.RefReplacer;
 
-//TODO do not inherit from RefReplacer; change reference direct
-public class TypeSpecTrav extends RefReplacer<Void> {
+public class TypeSpecTrav extends RefReplacer {
   final private Map<TemplateParameter, Type> types;
 
   public TypeSpecTrav(Map<TemplateParameter, Type> types) {
-    super();
     this.types = types;
   }
 
   @Override
-  protected Reference visitOffsetReference(OffsetReference obj, Void param) {
-    Named link = ((LinkedAnchor) obj.getAnchor()).getLink();
-    super.visitOffsetReference(obj, param);
+  protected void replace(OffsetReference reference) {
+    LinkedAnchor anchor = (LinkedAnchor) reference.getAnchor();
+    Named link = anchor.getLink();
 
     if (types.containsKey(link)) {
-      assert (obj.getOffset().isEmpty());
+      assert (reference.getOffset().isEmpty());
       Type repl = types.get(link);
-      return RefFactory.withOffset(obj.metadata(), repl);
+      anchor.setLink(repl);
+      reference.getOffset().clear();
     }
-
-    return obj;
   }
 
 }

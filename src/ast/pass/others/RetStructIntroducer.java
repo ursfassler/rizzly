@@ -131,26 +131,23 @@ class RetStructIntroducerWorker extends DfsTraverser<Void, Void> {
  *
  * @author urs
  */
-class VarReplacer extends RefReplacer<Void> {
+class VarReplacer extends RefReplacer {
   final private FunctionVariable retVar;
   final private Map<FunctionVariable, NamedElement> varMap;
 
   public VarReplacer(FunctionVariable retVar, Map<FunctionVariable, NamedElement> varMap) {
-    super();
     this.retVar = retVar;
     this.varMap = varMap;
   }
 
   @Override
-  protected Reference visitOffsetReference(OffsetReference obj, Void param) {
-    super.visitOffsetReference(obj, param);
-    LinkedAnchor anchor = (LinkedAnchor) obj.getAnchor();
+  protected void replace(OffsetReference reference) {
+    LinkedAnchor anchor = (LinkedAnchor) reference.getAnchor();
     NamedElement elem = varMap.get(anchor.getLink());
     if (elem != null) {
       anchor.setLink(retVar);
-      obj.getOffset().add(0, new RefName(obj.metadata(), elem.getName()));
+      reference.getOffset().add(0, new RefName(reference.metadata(), elem.getName()));
     }
-    return obj;
   }
 
 }
