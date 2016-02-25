@@ -33,6 +33,7 @@ import ast.pass.AstPass;
 import ast.pass.input.xml.infrastructure.ParsersImplementation;
 import ast.pass.input.xml.infrastructure.XmlParserImplementation;
 import ast.pass.input.xml.parser.AnchorParser;
+import ast.pass.input.xml.parser.ExpressionParser;
 import ast.pass.input.xml.parser.GlobalConstantParser;
 import ast.pass.input.xml.parser.RefItemParser;
 import ast.pass.input.xml.parser.ReferenceParser;
@@ -72,6 +73,7 @@ public class XmlParserPass extends AstPass {
     xmlParser.add(new ReferenceParser(stream, xmlParser, error));
     xmlParser.add(new AnchorParser(stream, xmlParser, error));
     xmlParser.add(new RefItemParser(stream, xmlParser, error));
+    xmlParser.add(new ExpressionParser(stream, xmlParser, error));
   }
 
   private TokenReader<XmlToken> xmlReader(String filename) {
