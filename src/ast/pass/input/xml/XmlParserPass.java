@@ -32,10 +32,10 @@ import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.pass.input.xml.infrastructure.ParsersImplementation;
 import ast.pass.input.xml.infrastructure.XmlParserImplementation;
+import ast.pass.input.xml.parser.AnchorParser;
 import ast.pass.input.xml.parser.GlobalConstantParser;
 import ast.pass.input.xml.parser.ReferenceParser;
 import ast.pass.input.xml.parser.RizzlyFileParser;
-import ast.pass.input.xml.parser.UnlinkedAnchorParser;
 import ast.pass.input.xml.parser.XmlTopParser;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import ast.pass.input.xml.scanner.ExpectionParserImplementation;
@@ -69,7 +69,7 @@ public class XmlParserPass extends AstPass {
     xmlParser.add(new RizzlyFileParser(stream, error));
     xmlParser.add(new GlobalConstantParser(stream, xmlParser, error));
     xmlParser.add(new ReferenceParser(stream, xmlParser, error));
-    xmlParser.add(new UnlinkedAnchorParser(stream, xmlParser, error));
+    xmlParser.add(new AnchorParser(stream, xmlParser, error));
   }
 
   private TokenReader<XmlToken> xmlReader(String filename) {

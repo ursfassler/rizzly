@@ -17,31 +17,18 @@
 
 package ast.pass.input.xml.parser;
 
-import java.util.Collection;
-import java.util.HashSet;
+import ast.data.reference.Anchor;
+import ast.pass.input.xml.infrastructure.ParserDispatcher;
+import ast.pass.input.xml.infrastructure.ParsersImplementation;
+import ast.pass.input.xml.infrastructure.XmlParser;
+import ast.pass.input.xml.scanner.ExpectionParser;
+import error.RizzlyError;
 
-public class Names {
+public class AnchorParser extends ParserDispatcher {
 
-  public static Collection<String> list() {
-    return new HashSet<String>();
-  }
-
-  public static Collection<String> list(String name1) {
-    Collection<String> names = list();
-    names.add(name1);
-    return names;
-  }
-
-  public static Collection<String> list(String name1, String name2) {
-    Collection<String> names = list(name1);
-    names.add(name2);
-    return names;
-  }
-
-  public static Object list(String name1, String name2, String name3) {
-    Collection<String> names = list(name1, name2);
-    names.add(name3);
-    return names;
+  public AnchorParser(ExpectionParser stream, XmlParser parser, RizzlyError error) {
+    super(Anchor.class, new ParsersImplementation(error), stream, parser, error);
+    add(new UnlinkedAnchorParser(stream, parser, error));
   }
 
 }

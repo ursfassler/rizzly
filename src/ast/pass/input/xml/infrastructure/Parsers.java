@@ -17,11 +17,15 @@
 
 package ast.pass.input.xml.infrastructure;
 
+import java.util.Collection;
+
 import ast.data.Ast;
 
 public interface Parsers {
 
   void add(Parser parser);
+
+  public Collection<String> names();
 
   public Parser parserFor(String elementName);
 

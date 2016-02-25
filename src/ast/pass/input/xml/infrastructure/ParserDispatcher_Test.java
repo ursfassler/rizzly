@@ -26,6 +26,8 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.Collection;
+
 import org.junit.Test;
 
 import ast.data.reference.Anchor;
@@ -33,19 +35,24 @@ import ast.data.reference.LinkedAnchor;
 import ast.data.reference.UnlinkedAnchor;
 import ast.data.statement.Block;
 import ast.meta.MetaList;
+import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.ErrorType;
 import error.RizzlyError;
 
 public class ParserDispatcher_Test {
+  final private Parsers parsers = mock(Parsers.class);
   final private ExpectionParser stream = mock(ExpectionParser.class);
   final private XmlParser parser = mock(XmlParser.class);
   final private RizzlyError error = mock(RizzlyError.class);
-  final private ParserDispatcher testee = new ParserDispatcher(Anchor.class, stream, parser, error);
+  final private ParserDispatcher testee = new ParserDispatcher(Anchor.class, parsers, stream, parser, error);
 
   @Test
-  public void name_is_empty_when_no_parser_is_added() {
-    assertEquals(0, testee.names().size());
+  public void forwards_name_request_to_parsers() {
+    Collection<String> names = Names.list("one name", "another one");
+    when(parsers.names()).thenReturn(names);
+
+    assertEquals(names, testee.names());
   }
 
   @Test
@@ -61,6 +68,7 @@ public class ParserDispatcher_Test {
     testee.add(incompatibleParser);
 
     verify(error).err(eq(ErrorType.Fatal), eq("Can not add parser (type Block is not a subtype of Anchor)"), any(MetaList.class));
+    verify(parsers, never()).add(any(Parser.class));
   }
 
   @Test
@@ -74,24 +82,22 @@ public class ParserDispatcher_Test {
     testee.add(linkedParser);
 
     verify(error, never()).err(any(ErrorType.class), anyString(), any(MetaList.class));
+    verify(parsers).add(eq(unlinkedParser));
+    verify(parsers).add(eq(linkedParser));
   }
-  // @Test
-  // public void parse_global_constant() {
-  // when(stream.attribute(eq("name"))).thenReturn("the variable name");
-  // when(parser.itemOf(Reference.class)).thenReturn(reference);
-  // when(parser.itemOf(Expression.class)).thenReturn(expression);
-  //
-  // GlobalConstant globalConstant = testee.parse();
-  //
-  // assertEquals("the variable name", globalConstant.getName());
-  // assertEquals(reference, globalConstant.type);
-  // assertEquals(expression, globalConstant.def);
-  //
-  // order.verify(stream).elementStart(eq("GlobalConstant"));
-  // order.verify(stream).attribute(eq("name"));
-  // order.verify(parser).itemOf(eq(Reference.class));
-  // order.verify(parser).itemOf(eq(Expression.class));
-  // order.verify(stream).elementEnd();
-  // }
+
+  @Test
+  public void uses_parsers_to_parse_next_element() {
+    Parser parser = mock(Parser.class);
+    Anchor item = mock(Anchor.class);
+    when(stream.peekElement()).thenReturn("next element");
+    when(parsers.parserFor(anyString())).thenReturn(parser);
+    when(parser.parse()).thenReturn(item);
+
+    assertEquals(item, testee.parse());
+
+    verify(parsers).parserFor(eq("next element"));
+    verify(parser).parse();
+  }
 
 }

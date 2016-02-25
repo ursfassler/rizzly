@@ -28,6 +28,7 @@ import org.junit.Test;
 
 import ast.data.statement.Block;
 import ast.data.statement.IfStatement;
+import ast.data.statement.WhileStmt;
 import ast.data.variable.StateVariable;
 import ast.meta.MetaList;
 import ast.pass.input.xml.parser.Names;
@@ -77,6 +78,21 @@ public class ParsersImplementation_Test {
     Parser found = testee.parserFor("the parser name");
 
     assertEquals(parser, found);
+  }
+
+  @Test
+  public void can_request_all_names() {
+    Parser parser1 = mock(Parser.class);
+    when(parser1.names()).thenReturn(Names.list("name1", "name2"));
+    when(parser1.type()).thenReturn((Class) Block.class);
+    testee.add(parser1);
+
+    Parser parser2 = mock(Parser.class);
+    when(parser2.names()).thenReturn(Names.list("name3"));
+    when(parser2.type()).thenReturn((Class) WhileStmt.class);
+    testee.add(parser2);
+
+    assertEquals(Names.list("name1", "name2", "name3"), testee.names());
   }
 
   @Test

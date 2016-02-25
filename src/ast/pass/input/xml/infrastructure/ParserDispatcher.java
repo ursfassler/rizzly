@@ -17,10 +17,7 @@
 
 package ast.pass.input.xml.infrastructure;
 
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 
 import ast.data.Ast;
 import ast.meta.MetaListImplementation;
@@ -30,14 +27,14 @@ import error.RizzlyError;
 
 public class ParserDispatcher implements Parser {
   private final Class<? extends Ast> type;
+  private final Parsers parsers;
   private final ExpectionParser stream;
   private final XmlParser parser;
   private final RizzlyError error;
 
-  private final List<Parser> parsers = new ArrayList<Parser>();
-
-  public ParserDispatcher(Class<? extends Ast> type, ExpectionParser stream, XmlParser parser, RizzlyError error) {
+  public ParserDispatcher(Class<? extends Ast> type, Parsers parsers, ExpectionParser stream, XmlParser parser, RizzlyError error) {
     this.type = type;
+    this.parsers = parsers;
     this.stream = stream;
     this.parser = parser;
     this.error = error;
@@ -45,16 +42,14 @@ public class ParserDispatcher implements Parser {
 
   @Override
   public <T extends Ast> T parse() {
-    throw new RuntimeException("not yet implemented");
+    String next = stream.peekElement();
+    Parser parser = parsers.parserFor(next);
+    return parser.parse();
   }
 
   @Override
   public Collection<String> names() {
-    Collection<String> names = new HashSet<String>();
-    for (Parser parser : parsers) {
-      names.addAll(parser.names());
-    }
-    return names;
+    return parsers.names();
   }
 
   @Override

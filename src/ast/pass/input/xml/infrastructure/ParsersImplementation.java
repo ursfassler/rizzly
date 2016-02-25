@@ -37,6 +37,11 @@ public class ParsersImplementation implements Parsers {
   }
 
   @Override
+  public Collection<String> names() {
+    return parsersByName.keySet();
+  }
+
+  @Override
   public Parser parserFor(String elementName) {
     Parser parser = parsersByName.get(elementName);
 
