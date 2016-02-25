@@ -17,7 +17,7 @@
 
 package ast.repository.query.Referencees;
 
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedAnchor;
 import ast.visitor.Visitor;
 
 public class ReferenceesAdder implements Visitor {
@@ -27,7 +27,7 @@ public class ReferenceesAdder implements Visitor {
     this.referencees = referencees;
   }
 
-  public void visit(Reference object) {
+  public void visit(LinkedAnchor object) {
     referencees.addReferencee(object);
   }
 }

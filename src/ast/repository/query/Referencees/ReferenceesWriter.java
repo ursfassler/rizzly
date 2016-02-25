@@ -18,12 +18,12 @@
 package ast.repository.query.Referencees;
 
 import ast.data.Ast;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedAnchor;
 
 public interface ReferenceesWriter {
 
   public void addTarget(Ast target);
 
-  public void addReferencee(Reference referencee);
+  public void addReferencee(LinkedAnchor anchor);
 
 }

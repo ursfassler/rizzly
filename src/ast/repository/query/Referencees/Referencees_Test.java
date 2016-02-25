@@ -29,21 +29,18 @@ import org.junit.Test;
 import ast.data.Ast;
 import ast.data.Named;
 import ast.data.reference.LinkedAnchor;
-import ast.data.reference.Reference;
 
 public class Referencees_Test {
   final private Referencees testee = new Referencees();
   private static final Set<Ast> EmptySet = new HashSet<Ast>();
 
   final private Named target = mock(Named.class);
-  final private LinkedAnchor anchor = mock(LinkedAnchor.class);
-  final private Reference referencee1 = mock(Reference.class);
-  final private Reference referencee2 = mock(Reference.class);
+  final private LinkedAnchor anchor1 = mock(LinkedAnchor.class);
+  final private LinkedAnchor anchor2 = mock(LinkedAnchor.class);
 
   {
-    when(anchor.getLink()).thenReturn(target);
-    when(referencee1.getAnchor()).thenReturn(anchor);
-    when(referencee2.getAnchor()).thenReturn(anchor);
+    when(anchor1.getLink()).thenReturn(target);
+    when(anchor2.getLink()).thenReturn(target);
   }
 
   @Test
@@ -54,7 +51,7 @@ public class Referencees_Test {
   }
 
   @Test
-  public void returns_empty_when_no_referencees_are_added() {
+  public void returns_empty_when_no_anchors_are_added() {
     Named target = mock(Named.class);
 
     testee.addTarget(target);
@@ -63,37 +60,37 @@ public class Referencees_Test {
   }
 
   @Test
-  public void returns_added_reference() {
-    testee.addReferencee(referencee1);
+  public void returns_added_anchors() {
+    testee.addReferencee(anchor1);
 
-    Assert.assertEquals(set(referencee1), testee.getReferencees(target));
+    Assert.assertEquals(set(anchor1), testee.getReferencees(target));
   }
 
   @Test
-  public void returns_multiple_added_reference() {
-    testee.addReferencee(referencee1);
-    testee.addReferencee(referencee2);
+  public void returns_multiple_added_anchors() {
+    testee.addReferencee(anchor1);
+    testee.addReferencee(anchor2);
 
-    Assert.assertEquals(set(referencee1, referencee2), testee.getReferencees(target));
+    Assert.assertEquals(set(anchor1, anchor2), testee.getReferencees(target));
   }
 
   @Test
-  public void adding_a_target_does_not_clear_referencees_for_this_target() {
-    testee.addReferencee(referencee1);
+  public void adding_a_target_does_not_clear_anchors_for_this_target() {
+    testee.addReferencee(anchor1);
 
     testee.addTarget(target);
 
-    Assert.assertEquals(set(referencee1), testee.getReferencees(target));
+    Assert.assertEquals(set(anchor1), testee.getReferencees(target));
   }
 
-  private Set<Reference> set(Reference referencee1, Reference referencee2) {
-    Set<Reference> ret = set(referencee1);
+  private Set<LinkedAnchor> set(LinkedAnchor referencee1, LinkedAnchor referencee2) {
+    Set<LinkedAnchor> ret = set(referencee1);
     ret.add(referencee2);
     return ret;
   }
 
-  private Set<Reference> set(Reference reference) {
-    Set<Reference> ret = new HashSet<Reference>();
+  private Set<LinkedAnchor> set(LinkedAnchor reference) {
+    Set<LinkedAnchor> ret = new HashSet<LinkedAnchor>();
     ret.add(reference);
     return ret;
   }

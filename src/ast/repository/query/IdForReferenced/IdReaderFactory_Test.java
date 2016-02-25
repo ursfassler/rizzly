@@ -28,7 +28,6 @@ import org.junit.Test;
 
 import ast.data.Namespace;
 import ast.data.reference.LinkedAnchor;
-import ast.data.reference.Reference;
 import ast.pass.output.xml.IdReader;
 
 public class IdReaderFactory_Test {
@@ -39,26 +38,20 @@ public class IdReaderFactory_Test {
   final private Namespace item2 = new Namespace("item2");
   final private Namespace item3 = new Namespace("item3");
   final private LinkedAnchor anchor1 = mock(LinkedAnchor.class);
-  final private Reference reference1 = mock(Reference.class);
   final private LinkedAnchor anchor2 = mock(LinkedAnchor.class);
-  final private Reference reference2 = mock(Reference.class);
   final private LinkedAnchor anchor3 = mock(LinkedAnchor.class);
-  final private Reference reference3 = mock(Reference.class);
 
   {
     when(anchor1.getLink()).thenReturn(item1);
-    when(reference1.getAnchor()).thenReturn(anchor1);
     when(anchor2.getLink()).thenReturn(item3);
-    when(reference2.getAnchor()).thenReturn(anchor2);
     when(anchor3.getLink()).thenReturn(root);
-    when(reference3.getAnchor()).thenReturn(anchor3);
 
     root.children.add(item1);
-    root.children.add(reference1);
-    root.children.add(reference2);
+    root.children.add(anchor1);
+    root.children.add(anchor2);
     root.children.add(item2);
     root.children.add(item3);
-    root.children.add(reference3);
+    root.children.add(anchor3);
   }
 
   @Test
@@ -91,9 +84,9 @@ public class IdReaderFactory_Test {
     IdReader reader = testee.produce(root);
 
     assertFalse(reader.hasId(item2));
-    assertFalse(reader.hasId(reference1));
-    assertFalse(reader.hasId(reference2));
-    assertFalse(reader.hasId(reference3));
+    assertFalse(reader.hasId(anchor1));
+    assertFalse(reader.hasId(anchor2));
+    assertFalse(reader.hasId(anchor3));
   }
 
 }

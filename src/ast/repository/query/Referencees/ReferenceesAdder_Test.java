@@ -22,8 +22,7 @@ import static org.mockito.Mockito.verify;
 
 import org.junit.Test;
 
-import ast.data.reference.OffsetReference;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedAnchor;
 import ast.visitor.VisitExecutorImplementation;
 
 public class ReferenceesAdder_Test {
@@ -31,30 +30,21 @@ public class ReferenceesAdder_Test {
   final private ReferenceesAdder testee = new ReferenceesAdder(referencees);
 
   @Test
-  public void adds_visited_OffsetReference() {
-    OffsetReference reference = mock(OffsetReference.class);
+  public void adds_visited_LinkedAnchor() {
+    LinkedAnchor anchor = mock(LinkedAnchor.class);
 
-    testee.visit(reference);
+    testee.visit(anchor);
 
-    verify(referencees).addReferencee(reference);
-  }
-
-  @Test
-  public void adds_visited_Reference() {
-    Reference reference = mock(Reference.class);
-
-    testee.visit(reference);
-
-    verify(referencees).addReferencee(reference);
+    verify(referencees).addReferencee(anchor);
   }
 
   @Test
   public void works_with_a_visitor() {
     VisitExecutorImplementation executor = new VisitExecutorImplementation();
-    Reference reference = mock(Reference.class);
+    LinkedAnchor anchor = mock(LinkedAnchor.class);
 
-    executor.visit(testee, reference);
+    executor.visit(testee, anchor);
 
-    verify(referencees).addReferencee(reference);
+    verify(referencees).addReferencee(anchor);
   }
 }

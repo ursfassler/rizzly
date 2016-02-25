@@ -28,7 +28,7 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ast.data.Ast;
-import ast.data.reference.Reference;
+import ast.data.reference.LinkedAnchor;
 import ast.repository.query.Referencees.ReferenceesReader;
 
 public class IdForReferenced_Test {
@@ -36,10 +36,10 @@ public class IdForReferenced_Test {
   final private IdGenerator idGenerator = mock(IdGenerator.class);
   final private IdForReferenced testee = new IdForReferenced(referenceesReader, idGenerator);
   final private Ast item = Mockito.mock(Ast.class);
-  final private static Set<Reference> SomeReference = new HashSet<Reference>();
+  final private static Set<LinkedAnchor> SomeReference = new HashSet<LinkedAnchor>();
 
   {
-    SomeReference.add(mock(Reference.class));
+    SomeReference.add(mock(LinkedAnchor.class));
   }
 
   @Test

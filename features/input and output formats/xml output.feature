@@ -56,6 +56,36 @@ Scenario: write the AST of a elementary component to an xml file
 
     """
 
+Scenario: read in a simple xml and output it results in the same xml
+  Given we have a file "testee.xml" with the content:
+    """
+    <rizzly>
+      <GlobalConstant name="TheAnswer">
+        <Reference>
+          <UnlinkedAnchor target="Integer"/>
+        </Reference>
+        <NumberValue value="42"/>
+      </GlobalConstant>
+    </rizzly>
+
+    """
+
+  When I start rizzly with the file "testee.xml" and the xml backend
+  
+  Then I expect no error
+  And I expect an xml file "testee.xml" with the content:
+    """
+    <rizzly>
+      <GlobalConstant name="TheAnswer">
+        <Reference>
+          <UnlinkedAnchor target="Integer"/>
+        </Reference>
+        <NumberValue value="42"/>
+      </GlobalConstant>
+    </rizzly>
+
+    """
+
 #TODO read in xml, run link pass and test it then
 #TODO make sure x has an unique id and the id is referenced
 @wip
@@ -79,6 +109,14 @@ Scenario: references are unique
   Then I expect no error
   And I expect an xml file "testee.xml" with the content:
     """
+    <rizzly>
+      <GlobalConstant name="TheAnswer">
+        <Reference>
+          <UnlinkedAnchor target="Integer"/>
+        </Reference>
+        <NumberValue value="42"/>
+      </GlobalConstant>
+    </rizzly>
 
     """
 

@@ -40,19 +40,15 @@ public class ReferenceesFactory_Tests {
   final private Namespace item2 = new Namespace("item2");
   final private Namespace item3 = new Namespace("item3");
   final private LinkedAnchor anchor1 = mock(LinkedAnchor.class);
-  final private Reference reference1 = mock(Reference.class);
   final private LinkedAnchor anchor2 = mock(LinkedAnchor.class);
-  final private Reference reference2 = mock(Reference.class);
 
   {
     when(anchor1.getLink()).thenReturn(item1);
-    when(reference1.getAnchor()).thenReturn(anchor1);
     when(anchor2.getLink()).thenReturn(item3);
-    when(reference2.getAnchor()).thenReturn(anchor2);
 
     root.children.add(item1);
-    root.children.add(reference1);
-    root.children.add(reference2);
+    root.children.add(anchor1);
+    root.children.add(anchor2);
     root.children.add(item2);
     root.children.add(item3);
   }
@@ -72,16 +68,16 @@ public class ReferenceesFactory_Tests {
     Assert.assertNotEquals(null, reader.getReferencees(item1));
     Assert.assertNotEquals(null, reader.getReferencees(item2));
     Assert.assertNotEquals(null, reader.getReferencees(item3));
-    Assert.assertNotEquals(null, reader.getReferencees(reference1));
-    Assert.assertNotEquals(null, reader.getReferencees(reference2));
+    Assert.assertNotEquals(null, reader.getReferencees(anchor1));
+    Assert.assertNotEquals(null, reader.getReferencees(anchor2));
   }
 
   @Test
   public void has_references() {
     ReferenceesReader reader = testee.produce(root);
 
-    Assert.assertEquals(set(reference1), reader.getReferencees(item1));
-    Assert.assertEquals(set(reference2), reader.getReferencees(item3));
+    Assert.assertEquals(set(anchor1), reader.getReferencees(item1));
+    Assert.assertEquals(set(anchor2), reader.getReferencees(item3));
   }
 
   @Test
@@ -90,12 +86,12 @@ public class ReferenceesFactory_Tests {
 
     Assert.assertEquals(EmptySet, reader.getReferencees(root));
     Assert.assertEquals(EmptySet, reader.getReferencees(item2));
-    Assert.assertEquals(EmptySet, reader.getReferencees(reference1));
-    Assert.assertEquals(EmptySet, reader.getReferencees(reference2));
+    Assert.assertEquals(EmptySet, reader.getReferencees(anchor1));
+    Assert.assertEquals(EmptySet, reader.getReferencees(anchor2));
   }
 
-  private Set<Reference> set(Reference reference) {
-    Set<Reference> ret = new HashSet<Reference>();
+  private Set<LinkedAnchor> set(LinkedAnchor reference) {
+    Set<LinkedAnchor> ret = new HashSet<LinkedAnchor>();
     ret.add(reference);
     return ret;
   }

@@ -25,30 +25,29 @@ import java.util.Set;
 import ast.data.Ast;
 import ast.data.Named;
 import ast.data.reference.LinkedAnchor;
-import ast.data.reference.Reference;
 
 public class Referencees implements ReferenceesWriter, ReferenceesReader {
-  final private Map<Ast, Set<Reference>> referencees = new HashMap<Ast, Set<Reference>>();
+  final private Map<Ast, Set<LinkedAnchor>> referencees = new HashMap<Ast, Set<LinkedAnchor>>();
 
   @Override
-  public Set<Reference> getReferencees(Ast target) {
+  public Set<LinkedAnchor> getReferencees(Ast target) {
     return referencees.get(target);
   }
 
   @Override
   public void addTarget(Ast target) {
     if (!referencees.containsKey(target)) {
-      referencees.put(target, new HashSet<Reference>());
+      referencees.put(target, new HashSet<LinkedAnchor>());
     }
   }
 
   @Override
-  public void addReferencee(Reference referencee) {
+  public void addReferencee(LinkedAnchor anchor) {
     // TODO only add referencee and not the target
-    Named target = ((LinkedAnchor) referencee.getAnchor()).getLink();
+    Named target = anchor.getLink();
     assert (target != null);
     addTarget(target);
-    referencees.get(target).add(referencee);
+    referencees.get(target).add(anchor);
   }
 
 }

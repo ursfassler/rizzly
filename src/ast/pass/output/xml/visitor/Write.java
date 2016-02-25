@@ -94,6 +94,7 @@ import ast.data.raw.RawComposition;
 import ast.data.raw.RawElementary;
 import ast.data.raw.RawHfsm;
 import ast.data.reference.LinkedAnchor;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefIndex;
 import ast.data.reference.RefName;
@@ -583,16 +584,25 @@ public class Write implements Visitor {
     writer.endNode();
   }
 
-  public void visit(RawHfsm rawHfsm) {
+  public void visit(RawHfsm object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  public void visit(RecordType recordType) {
+  public void visit(RecordType object) {
     throw new RuntimeException("not yet implemented");
   }
 
-  public void visit(RecordValue recordValue) {
+  public void visit(RecordValue object) {
     throw new RuntimeException("not yet implemented");
+  }
+
+  public void visit(OffsetReference object) {
+    writer.beginNode("Reference");
+    executor.visit(idWriter, object);
+    executor.visit(this, object.metadata());
+    executor.visit(this, object.getAnchor());
+    executor.visit(this, object.getOffset());
+    writer.endNode();
   }
 
   public void visit(RefCall object) {
@@ -618,7 +628,7 @@ public class Write implements Visitor {
     writer.beginNode("UnlinkedAnchor");
     executor.visit(idWriter, object);
 
-    writer.attribute("link", object.getLinkName());
+    writer.attribute("target", object.getLinkName());
 
     executor.visit(this, object.metadata());
     writer.endNode();

@@ -28,7 +28,9 @@ import org.mockito.Mockito;
 import ast.data.AstList;
 import ast.data.Named;
 import ast.data.expression.value.TupleValue;
+import ast.data.reference.Anchor;
 import ast.data.reference.LinkedAnchor;
+import ast.data.reference.OffsetReference;
 import ast.data.reference.RefCall;
 import ast.data.reference.RefItem;
 import ast.data.reference.Reference;
@@ -47,7 +49,22 @@ public class Writer_Reference_Test {
   final private TupleValue tuple = mock(TupleValue.class);
   final private Reference reference = mock(Reference.class);
   final private InOrder order = Mockito.inOrder(stream, link, tuple, reference, astId, idWriter, executor);
+  final private Anchor anchor = mock(Anchor.class);
   final private AstList<RefItem> offset = mock(AstList.class);
+
+  @Test
+  public void write_Reference() {
+    OffsetReference item = new OffsetReference(anchor, offset);
+
+    testee.visit(item);
+
+    order.verify(stream).beginNode(eq("Reference"));
+    order.verify(executor).visit(idWriter, item);
+    order.verify(executor).visit(testee, item.metadata());
+    order.verify(executor).visit(eq(testee), eq(anchor));
+    order.verify(executor).visit(eq(testee), eq(offset));
+    order.verify(stream).endNode();
+  }
 
   @Test
   public void write_LinkedAnchor_with_id() {
@@ -74,7 +91,7 @@ public class Writer_Reference_Test {
 
     order.verify(stream).beginNode(eq("UnlinkedAnchor"));
     order.verify(executor).visit(idWriter, item);
-    order.verify(stream).attribute(eq("link"), eq("the link"));
+    order.verify(stream).attribute(eq("target"), eq("the link"));
     order.verify(executor).visit(testee, item.metadata());
     order.verify(stream).endNode();
   }
