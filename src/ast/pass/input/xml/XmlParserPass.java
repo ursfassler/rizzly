@@ -34,6 +34,7 @@ import ast.pass.input.xml.infrastructure.ParsersImplementation;
 import ast.pass.input.xml.infrastructure.XmlParserImplementation;
 import ast.pass.input.xml.parser.AnchorParser;
 import ast.pass.input.xml.parser.GlobalConstantParser;
+import ast.pass.input.xml.parser.RefItemParser;
 import ast.pass.input.xml.parser.ReferenceParser;
 import ast.pass.input.xml.parser.RizzlyFileParser;
 import ast.pass.input.xml.parser.XmlTopParser;
@@ -70,6 +71,7 @@ public class XmlParserPass extends AstPass {
     xmlParser.add(new GlobalConstantParser(stream, xmlParser, error));
     xmlParser.add(new ReferenceParser(stream, xmlParser, error));
     xmlParser.add(new AnchorParser(stream, xmlParser, error));
+    xmlParser.add(new RefItemParser(stream, xmlParser, error));
   }
 
   private TokenReader<XmlToken> xmlReader(String filename) {
