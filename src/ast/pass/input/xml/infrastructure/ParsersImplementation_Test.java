@@ -30,6 +30,7 @@ import ast.data.statement.Block;
 import ast.data.statement.IfStatement;
 import ast.data.variable.StateVariable;
 import ast.meta.MetaList;
+import ast.pass.input.xml.parser.Names;
 import error.ErrorType;
 import error.RizzlyError;
 
@@ -70,12 +71,25 @@ public class ParsersImplementation_Test {
   @Test
   public void return_parser_with_matching_name() {
     Parser parser = mock(Parser.class);
-    when(parser.name()).thenReturn("the parser name");
+    when(parser.names()).thenReturn(Names.list("the parser name"));
     testee.add(parser);
 
     Parser found = testee.parserFor("the parser name");
 
     assertEquals(parser, found);
+  }
+
+  @Test
+  public void same_parser_is_registered_with_multiple_names() {
+    Parser parser = mock(Parser.class);
+    when(parser.names()).thenReturn(Names.list("name1", "name2"));
+    testee.add(parser);
+
+    Parser name1 = testee.parserFor("name1");
+    Parser name2 = testee.parserFor("name2");
+
+    assertEquals(parser, name1);
+    assertEquals(parser, name2);
   }
 
   @Test
@@ -95,11 +109,11 @@ public class ParsersImplementation_Test {
   @Test
   public void can_not_add_parser_with_same_name_twice() {
     Parser parser1 = mock(Parser.class);
-    when(parser1.name()).thenReturn("the parser name");
+    when(parser1.names()).thenReturn(Names.list("the parser name"));
     when(parser1.type()).thenReturn((Class) Block.class);
     testee.add(parser1);
     Parser parser2 = mock(Parser.class);
-    when(parser2.name()).thenReturn("the parser name");
+    when(parser2.names()).thenReturn(Names.list("the parser name"));
     when(parser2.type()).thenReturn((Class) StateVariable.class);
 
     testee.add(parser2);
@@ -110,11 +124,11 @@ public class ParsersImplementation_Test {
   @Test
   public void can_not_add_parser_with_same_type_twice() {
     Parser parser1 = mock(Parser.class);
-    when(parser1.name()).thenReturn("the parser name 1");
+    when(parser1.names()).thenReturn(Names.list("the parser name 1"));
     when(parser1.type()).thenReturn((Class) Block.class);
     testee.add(parser1);
     Parser parser2 = mock(Parser.class);
-    when(parser2.name()).thenReturn("the parser name 2");
+    when(parser2.names()).thenReturn(Names.list("the parser name 2"));
     when(parser2.type()).thenReturn((Class) Block.class);
 
     testee.add(parser2);

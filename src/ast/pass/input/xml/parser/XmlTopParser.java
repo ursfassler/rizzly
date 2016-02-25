@@ -17,6 +17,8 @@
 
 package ast.pass.input.xml.parser;
 
+import java.util.Collection;
+
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -26,6 +28,7 @@ import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
 public class XmlTopParser implements Parser {
+  private static final String Name = "rizzly";
   private final ExpectionParser expect;
   private final XmlParser parser;
   private final RizzlyError error;
@@ -37,8 +40,8 @@ public class XmlTopParser implements Parser {
   }
 
   @Override
-  public String name() {
-    return "rizzly";
+  public Collection<String> names() {
+    return Names.list(Name);
   }
 
   @Override
@@ -48,7 +51,7 @@ public class XmlTopParser implements Parser {
 
   @Override
   public Namespace parse() {
-    expect.elementStart(name());
+    expect.elementStart(Name);
     AstList<Ast> children = parser.anyItems();
     expect.elementEnd();
 

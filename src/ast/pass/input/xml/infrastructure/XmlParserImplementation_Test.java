@@ -31,6 +31,7 @@ import org.mockito.Mockito;
 import ast.data.Ast;
 import ast.data.reference.Reference;
 import ast.data.statement.Block;
+import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 
 public class XmlParserImplementation_Test {
@@ -103,9 +104,9 @@ public class XmlParserImplementation_Test {
   public void parsing_for_specific_items_returns_all_until_the_first_non_matching_element() {
     Block block = mock(Block.class);
     when(stream.hasElement()).thenReturn(true);
-    when(stream.peekElement()).thenReturn("next element");
+    when(stream.peekElement()).thenReturn("next element").thenReturn("quixli");
     when(parsers.parserFor(Block.class)).thenReturn(parser);
-    when(parser.name()).thenReturn("next element").thenReturn("quixli");
+    when(parser.names()).thenReturn(Names.list("next element"));
     when(parser.parse()).thenReturn(block);
 
     assertEquals(1, testee.itemsOf(Block.class).size());
@@ -117,7 +118,7 @@ public class XmlParserImplementation_Test {
     when(stream.hasElement()).thenReturn(true).thenReturn(true).thenReturn(false);
     when(stream.peekElement()).thenReturn("next element");
     when(parsers.parserFor(Block.class)).thenReturn(parser);
-    when(parser.name()).thenReturn("next element");
+    when(parser.names()).thenReturn(Names.list("next element"));
     when(parser.parse()).thenReturn(block);
 
     assertEquals(2, testee.itemsOf(Block.class).size());

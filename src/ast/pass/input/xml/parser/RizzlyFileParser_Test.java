@@ -38,7 +38,7 @@ public class RizzlyFileParser_Test {
 
   @Test
   public void has_correct_name() {
-    assertEquals("RizzlyFile", testee.name());
+    assertEquals(Names.list("RizzlyFile"), testee.names());
   }
 
   @Test

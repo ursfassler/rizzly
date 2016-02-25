@@ -44,7 +44,7 @@ public class GlobalConstantParser_Test {
 
   @Test
   public void has_correct_name() {
-    assertEquals("GlobalConstant", testee.name());
+    assertEquals(Names.list("GlobalConstant"), testee.names());
   }
 
   @Test

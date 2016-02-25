@@ -18,6 +18,8 @@
 package ast.pass.input.xml.infrastructure;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 
 import ast.data.Ast;
@@ -47,8 +49,12 @@ public class ParserDispatcher implements Parser {
   }
 
   @Override
-  public String name() {
-    throw new RuntimeException("not yet implemented");
+  public Collection<String> names() {
+    Collection<String> names = new HashSet<String>();
+    for (Parser parser : parsers) {
+      names.addAll(parser.names());
+    }
+    return names;
   }
 
   @Override

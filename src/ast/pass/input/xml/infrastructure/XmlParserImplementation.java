@@ -49,7 +49,7 @@ public class XmlParserImplementation implements XmlParser {
     AstList<T> items = new AstList<T>();
     while (stream.hasElement()) {
       String name = stream.peekElement();
-      if (!parser.name().equals(name)) {
+      if (!parser.names().contains(name)) {
         break;
       }
       items.add((T) parser.parse());

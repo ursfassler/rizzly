@@ -42,7 +42,7 @@ public class XmlTopParser_Test {
 
   @Test
   public void has_correct_name() {
-    assertEquals("rizzly", testee.name());
+    assertEquals(Names.list("rizzly"), testee.names());
   }
 
   @Test

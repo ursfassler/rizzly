@@ -15,17 +15,24 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.input.xml.infrastructure;
+package ast.pass.input.xml.parser;
 
 import java.util.Collection;
+import java.util.HashSet;
 
-import ast.data.Ast;
+public class Names {
 
-public interface Parser {
+  public static Collection<String> list(String name) {
+    Collection<String> names = new HashSet<String>();
+    names.add(name);
+    return names;
+  }
 
-  public Collection<String> names();
+  public static Collection<String> list(String name1, String name2) {
+    Collection<String> names = new HashSet<String>();
+    names.add(name1);
+    names.add(name2);
+    return names;
+  }
 
-  public <T extends Ast> Class<T> type();
-
-  public <T extends Ast> T parse();
 }

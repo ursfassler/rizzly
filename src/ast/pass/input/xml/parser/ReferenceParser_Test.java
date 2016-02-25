@@ -44,7 +44,7 @@ public class ReferenceParser_Test {
 
   @Test
   public void has_correct_name() {
-    assertEquals("Reference", testee.name());
+    assertEquals(Names.list("Reference"), testee.names());
   }
 
   @Test

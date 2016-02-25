@@ -17,6 +17,8 @@
 
 package ast.pass.input.xml.parser;
 
+import java.util.Collection;
+
 import ast.data.reference.UnlinkedAnchor;
 import ast.pass.input.xml.infrastructure.Parser;
 import ast.pass.input.xml.infrastructure.XmlParser;
@@ -24,6 +26,7 @@ import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
 public class UnlinkedAnchorParser implements Parser {
+  private static final String Name = "UnlinkedAnchor";
   private final ExpectionParser stream;
   private final XmlParser parser;
   private final RizzlyError error;
@@ -35,8 +38,8 @@ public class UnlinkedAnchorParser implements Parser {
   }
 
   @Override
-  public String name() {
-    return "UnlinkedAnchor";
+  public Collection<String> names() {
+    return Names.list(Name);
   }
 
   @Override
@@ -46,7 +49,7 @@ public class UnlinkedAnchorParser implements Parser {
 
   @Override
   public UnlinkedAnchor parse() {
-    stream.elementStart(name());
+    stream.elementStart(Name);
     String link = stream.attribute("target");
     stream.elementEnd();
 

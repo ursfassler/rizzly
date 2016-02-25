@@ -1,5 +1,7 @@
 package ast.pass.input.xml.parser;
 
+import java.util.Collection;
+
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.reference.Anchor;
@@ -12,6 +14,7 @@ import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
 public class ReferenceParser implements Parser {
+  private static final String Name = "Reference";
   private final ExpectionParser stream;
   private final XmlParser parser;
   private final RizzlyError error;
@@ -23,8 +26,8 @@ public class ReferenceParser implements Parser {
   }
 
   @Override
-  public String name() {
-    return "Reference";
+  public Collection<String> names() {
+    return Names.list(Name);
   }
 
   @Override
@@ -34,7 +37,7 @@ public class ReferenceParser implements Parser {
 
   @Override
   public OffsetReference parse() {
-    stream.elementStart(name());
+    stream.elementStart(Name);
     Anchor anchor = parser.itemOf(Anchor.class);
     AstList<RefItem> offset = parser.itemsOf(RefItem.class);
     stream.elementEnd();

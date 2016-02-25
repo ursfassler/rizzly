@@ -17,6 +17,7 @@
 
 package ast.pass.input.xml.infrastructure;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -62,10 +63,12 @@ public class ParsersImplementation implements Parsers {
   @Override
   public void add(Parser parser) {
     // TODO simplify
-    String name = parser.name();
-    if (parsersByName.containsKey(name)) {
-      error.err(ErrorType.Fatal, "parser with name \"" + name + "\" already registered", new MetaListImplementation());
-    } else {
+    Collection<String> names = parser.names();
+    if (nameAlreadyRegistered(names)) {
+      return;
+    }
+
+    for (String name : names) {
       parsersByName.put(name, parser);
     }
 
@@ -75,6 +78,17 @@ public class ParsersImplementation implements Parsers {
     } else {
       parsersByType.put(type, parser);
     }
+  }
+
+  private boolean nameAlreadyRegistered(Collection<String> names) {
+    for (String name : names) {
+      if (parsersByName.containsKey(name)) {
+        error.err(ErrorType.Fatal, "parser with name \"" + name + "\" already registered", new MetaListImplementation());
+        return true;
+      }
+    }
+
+    return false;
   }
 
 }

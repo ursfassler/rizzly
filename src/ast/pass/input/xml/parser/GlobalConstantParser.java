@@ -17,6 +17,8 @@
 
 package ast.pass.input.xml.parser;
 
+import java.util.Collection;
+
 import ast.data.Ast;
 import ast.data.expression.Expression;
 import ast.data.reference.Reference;
@@ -27,6 +29,7 @@ import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
 public class GlobalConstantParser implements Parser {
+  private static final String Name = "GlobalConstant";
   private final ExpectionParser stream;
   private final XmlParser parser;
   private final RizzlyError error;
@@ -38,8 +41,8 @@ public class GlobalConstantParser implements Parser {
   }
 
   @Override
-  public String name() {
-    return "GlobalConstant";
+  public Collection<String> names() {
+    return Names.list(Name);
   }
 
   @Override
@@ -49,7 +52,7 @@ public class GlobalConstantParser implements Parser {
 
   @Override
   public GlobalConstant parse() {
-    expectElementStart(name());
+    expectElementStart(Name);
     String name = expectAttribute("name");
 
     Reference type = parser.itemOf(Reference.class);

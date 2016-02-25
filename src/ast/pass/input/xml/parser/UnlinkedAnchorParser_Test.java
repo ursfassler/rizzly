@@ -40,7 +40,7 @@ public class UnlinkedAnchorParser_Test {
 
   @Test
   public void has_correct_name() {
-    assertEquals("UnlinkedAnchor", testee.name());
+    assertEquals(Names.list("UnlinkedAnchor"), testee.names());
   }
 
   @Test

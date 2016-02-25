@@ -18,7 +18,6 @@
 package ast.pass.input.xml.infrastructure;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
@@ -27,7 +26,6 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import org.junit.Ignore;
 import org.junit.Test;
 
 import ast.data.reference.Anchor;
@@ -45,11 +43,9 @@ public class ParserDispatcher_Test {
   final private RizzlyError error = mock(RizzlyError.class);
   final private ParserDispatcher testee = new ParserDispatcher(Anchor.class, stream, parser, error);
 
-  @Ignore
   @Test
   public void name_is_empty_when_no_parser_is_added() {
-    assertTrue(false);
-    // TODO test for all names
+    assertEquals(0, testee.names().size());
   }
 
   @Test
@@ -79,7 +75,6 @@ public class ParserDispatcher_Test {
 
     verify(error, never()).err(any(ErrorType.class), anyString(), any(MetaList.class));
   }
-
   // @Test
   // public void parse_global_constant() {
   // when(stream.attribute(eq("name"))).thenReturn("the variable name");

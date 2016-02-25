@@ -17,12 +17,15 @@
 
 package ast.pass.input.xml.parser;
 
+import java.util.Collection;
+
 import ast.data.file.RizzlyFile;
 import ast.pass.input.xml.infrastructure.Parser;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
 public class RizzlyFileParser implements Parser {
+  private static final String Name = "RizzlyFile";
   private final ExpectionParser stream;
   private final RizzlyError error;
 
@@ -32,8 +35,8 @@ public class RizzlyFileParser implements Parser {
   }
 
   @Override
-  public String name() {
-    return "RizzlyFile";
+  public Collection<String> names() {
+    return Names.list(Name);
   }
 
   @Override
@@ -43,7 +46,7 @@ public class RizzlyFileParser implements Parser {
 
   @Override
   public RizzlyFile parse() {
-    expectElementStart(name());
+    expectElementStart(Name);
     String name = expectAttribute("name");
     expectElementEnd();
 
