@@ -49,6 +49,7 @@ public class Writer_BuiltinTemplate_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("RangeTemplate"));
+    order.verify(stream).attribute("name", item.getName());
     order.verify(executor).visit(idWriter, item);
     order.verify(stream).endNode();
   }
@@ -60,6 +61,7 @@ public class Writer_BuiltinTemplate_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("ArrayTemplate"));
+    order.verify(stream).attribute("name", item.getName());
     order.verify(executor).visit(idWriter, item);
     order.verify(stream).endNode();
   }
@@ -71,6 +73,7 @@ public class Writer_BuiltinTemplate_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("TypeTypeTemplate"));
+    order.verify(stream).attribute("name", item.getName());
     order.verify(executor).visit(idWriter, item);
     order.verify(stream).endNode();
   }
@@ -82,6 +85,7 @@ public class Writer_BuiltinTemplate_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("DefaultValueTemplate"));
+    order.verify(stream).attribute("name", item.getName());
     order.verify(executor).visit(idWriter, item);
     order.verify(stream).endNode();
   }

@@ -20,6 +20,7 @@ package ast.pass.output.xml.visitor;
 import ast.Designator;
 import ast.data.Ast;
 import ast.data.AstList;
+import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.component.composition.AsynchroniusConnection;
 import ast.data.component.composition.ComponentUse;
@@ -178,7 +179,10 @@ public class Write implements Visitor {
   }
 
   public void visit(AnyType object) {
-    node("AnyType", object);
+    writer.beginNode("AnyType");
+    writer.attribute("name", object.getName());
+    executor.visit(idWriter, object);
+    writer.endNode();
   }
 
   public void visit(AnyValue object) {
@@ -186,7 +190,7 @@ public class Write implements Visitor {
   }
 
   public void visit(ArrayTemplate object) {
-    node("ArrayTemplate", object);
+    namedNode(object);
   }
 
   public void visit(ArrayType object) {
@@ -239,7 +243,7 @@ public class Write implements Visitor {
   }
 
   public void visit(BooleanType object) {
-    node("Boolean", object);
+    namedNode(object);
   }
 
   public void visit(BooleanValue object) {
@@ -296,7 +300,7 @@ public class Write implements Visitor {
   }
 
   public void visit(DefaultValueTemplate object) {
-    node("DefaultValueTemplate", object);
+    namedNode(object);
   }
 
   public void visit(Division object) {
@@ -449,7 +453,7 @@ public class Write implements Visitor {
   }
 
   public void visit(IntegerType object) {
-    node("Integer", object);
+    namedNode(object);
   }
 
   public void visit(Is object) {
@@ -514,7 +518,7 @@ public class Write implements Visitor {
   }
 
   public void visit(NaturalType object) {
-    node("Natural", object);
+    namedNode(object);
   }
 
   public void visit(Not object) {
@@ -554,7 +558,7 @@ public class Write implements Visitor {
   }
 
   public void visit(RangeTemplate object) {
-    node("RangeTemplate", object);
+    namedNode(object);
   }
 
   public void visit(RangeType object) {
@@ -708,7 +712,7 @@ public class Write implements Visitor {
   }
 
   public void visit(StringType object) {
-    node("String", object);
+    namedNode(object);
   }
 
   public void visit(StringValue object) {
@@ -772,7 +776,7 @@ public class Write implements Visitor {
   }
 
   public void visit(TypeTypeTemplate object) {
-    node("TypeTypeTemplate", object);
+    namedNode(object);
   }
 
   public void visit(UIntType object) {
@@ -808,7 +812,7 @@ public class Write implements Visitor {
   }
 
   public void visit(VoidType object) {
-    node("Void", object);
+    namedNode(object);
   }
 
   public void visit(WhileStmt object) {
@@ -840,8 +844,9 @@ public class Write implements Visitor {
     writer.endNode();
   }
 
-  private void node(String name, Ast object) {
-    writer.beginNode(name);
+  private void namedNode(Named object) {
+    writer.beginNode(object.getName());
+    writer.attribute("name", object.getName());
     executor.visit(idWriter, object);
     writer.endNode();
   }

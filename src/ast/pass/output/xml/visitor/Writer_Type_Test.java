@@ -55,6 +55,7 @@ public class Writer_Type_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("Boolean"));
+    order.verify(stream).attribute("name", item.getName());
     order.verify(executor).visit(eq(idWriter), eq(item));
     order.verify(stream).endNode();
   }
@@ -66,6 +67,7 @@ public class Writer_Type_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("Integer"));
+    order.verify(stream).attribute("name", item.getName());
     order.verify(executor).visit(eq(idWriter), eq(item));
     order.verify(stream).endNode();
   }
@@ -77,6 +79,7 @@ public class Writer_Type_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("Natural"));
+    order.verify(stream).attribute("name", item.getName());
     order.verify(executor).visit(eq(idWriter), eq(item));
     order.verify(stream).endNode();
   }
@@ -88,6 +91,7 @@ public class Writer_Type_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("AnyType"));
+    order.verify(stream).attribute("name", "Any");
     order.verify(executor).visit(eq(idWriter), eq(item));
     order.verify(stream).endNode();
   }
@@ -114,6 +118,7 @@ public class Writer_Type_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("Void"));
+    order.verify(stream).attribute("name", item.getName());
     order.verify(executor).visit(eq(idWriter), eq(item));
     order.verify(stream).endNode();
   }
@@ -125,6 +130,7 @@ public class Writer_Type_Test {
     testee.visit(item);
 
     order.verify(stream).beginNode(eq("String"));
+    order.verify(stream).attribute("name", item.getName());
     order.verify(executor).visit(eq(idWriter), eq(item));
     order.verify(stream).endNode();
   }
