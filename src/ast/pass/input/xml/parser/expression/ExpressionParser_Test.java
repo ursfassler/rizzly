@@ -15,52 +15,33 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.input.xml.parser;
+package ast.pass.input.xml.parser.expression;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
-
-import java.math.BigInteger;
 
 import org.junit.Test;
-import org.mockito.InOrder;
-import org.mockito.Mockito;
 
-import ast.data.expression.value.NumberValue;
+import ast.data.expression.Expression;
 import ast.pass.input.xml.infrastructure.XmlParser;
+import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
-public class NumberValueParser_Test {
+public class ExpressionParser_Test {
   final private ExpectionParser stream = mock(ExpectionParser.class);
   final private XmlParser parser = mock(XmlParser.class);
   final private RizzlyError error = mock(RizzlyError.class);
-  final private NumberValueParser testee = new NumberValueParser(stream, parser, error);
-  final private InOrder order = Mockito.inOrder(stream, parser);
+  final private ExpressionParser testee = new ExpressionParser(stream, parser, error);
 
   @Test
-  public void has_correct_name() {
+  public void has_NumberValue() {
     assertEquals(Names.list("NumberValue"), testee.names());
   }
 
   @Test
   public void has_correct_type() {
-    assertEquals(NumberValue.class, testee.type());
-  }
-
-  @Test
-  public void parse_NumberValue() {
-    when(stream.attribute(eq("value"))).thenReturn("1234567890");
-
-    NumberValue value = testee.parse();
-
-    assertEquals(BigInteger.valueOf(1234567890), value.value);
-
-    order.verify(stream).elementStart(eq("NumberValue"));
-    order.verify(stream).attribute(eq("value"));
-    order.verify(stream).elementEnd();
+    assertEquals(Expression.class, testee.type());
   }
 
 }

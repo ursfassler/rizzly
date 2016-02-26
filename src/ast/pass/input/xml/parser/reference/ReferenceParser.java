@@ -1,4 +1,4 @@
-package ast.pass.input.xml.parser;
+package ast.pass.input.xml.parser.reference;
 
 import java.util.Collection;
 
@@ -10,6 +10,7 @@ import ast.data.reference.RefItem;
 import ast.data.reference.Reference;
 import ast.pass.input.xml.infrastructure.Parser;
 import ast.pass.input.xml.infrastructure.XmlParser;
+import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 

@@ -15,26 +15,24 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.input.xml.parser;
+package ast.pass.input.xml.parser.reference;
 
 import java.util.Collection;
 
-import ast.data.Ast;
-import ast.data.expression.Expression;
-import ast.data.reference.Reference;
-import ast.data.variable.GlobalConstant;
+import ast.data.reference.UnlinkedAnchor;
 import ast.pass.input.xml.infrastructure.Parser;
 import ast.pass.input.xml.infrastructure.XmlParser;
+import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
-public class GlobalConstantParser implements Parser {
-  private static final String Name = "GlobalConstant";
+public class UnlinkedAnchorParser implements Parser {
+  private static final String Name = "UnlinkedAnchor";
   private final ExpectionParser stream;
   private final XmlParser parser;
   private final RizzlyError error;
 
-  public GlobalConstantParser(ExpectionParser stream, XmlParser parser, RizzlyError error) {
+  public UnlinkedAnchorParser(ExpectionParser stream, XmlParser parser, RizzlyError error) {
     this.stream = stream;
     this.parser = parser;
     this.error = error;
@@ -46,33 +44,17 @@ public class GlobalConstantParser implements Parser {
   }
 
   @Override
-  public Class<? extends Ast> type() {
-    return GlobalConstant.class;
+  public Class<UnlinkedAnchor> type() {
+    return UnlinkedAnchor.class;
   }
 
   @Override
-  public GlobalConstant parse() {
-    expectElementStart(Name);
-    String name = expectAttribute("name");
-
-    Reference type = parser.itemOf(Reference.class);
-    Expression value = parser.itemOf(Expression.class);
-
-    expectElementEnd();
-
-    return new GlobalConstant(name, type, value);
-  }
-
-  private void expectElementEnd() {
+  public UnlinkedAnchor parse() {
+    stream.elementStart(Name);
+    String link = stream.attribute("target");
     stream.elementEnd();
-  }
 
-  private String expectAttribute(String value) {
-    return stream.attribute(value);
-  }
-
-  private void expectElementStart(String value) {
-    stream.elementStart(value);
+    return new UnlinkedAnchor(link);
   }
 
 }

@@ -15,20 +15,33 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.input.xml.parser;
+package ast.pass.input.xml.parser.reference;
 
-import ast.data.reference.Anchor;
-import ast.pass.input.xml.infrastructure.ParserDispatcher;
-import ast.pass.input.xml.infrastructure.ParsersImplementation;
+import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
+
+import org.junit.Test;
+
+import ast.data.reference.RefItem;
 import ast.pass.input.xml.infrastructure.XmlParser;
+import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
-public class AnchorParser extends ParserDispatcher {
+public class RefItemParser_Test {
+  final private ExpectionParser stream = mock(ExpectionParser.class);
+  final private XmlParser parser = mock(XmlParser.class);
+  final private RizzlyError error = mock(RizzlyError.class);
+  final private RefItemParser testee = new RefItemParser(stream, parser, error);
 
-  public AnchorParser(ExpectionParser stream, XmlParser parser, RizzlyError error) {
-    super(Anchor.class, new ParsersImplementation(error), stream, parser, error);
-    add(new UnlinkedAnchorParser(stream, parser, error));
+  @Test
+  public void has_no_parsers_yet() {
+    assertEquals(Names.list(), testee.names());
+  }
+
+  @Test
+  public void has_correct_type() {
+    assertEquals(RefItem.class, testee.type());
   }
 
 }

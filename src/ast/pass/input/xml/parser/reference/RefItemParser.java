@@ -15,20 +15,19 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.input.xml.parser;
+package ast.pass.input.xml.parser.reference;
 
-import ast.data.type.Type;
+import ast.data.reference.RefItem;
 import ast.pass.input.xml.infrastructure.ParserDispatcher;
 import ast.pass.input.xml.infrastructure.ParsersImplementation;
 import ast.pass.input.xml.infrastructure.XmlParser;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
-public class TypeParser extends ParserDispatcher {
+public class RefItemParser extends ParserDispatcher {
 
-  public TypeParser(ExpectionParser stream, XmlParser parser, RizzlyError error) {
-    super(Type.class, new ParsersImplementation(error), stream, parser, error);
-    add(new IntegerParser(stream, parser, error));
+  public RefItemParser(ExpectionParser stream, XmlParser parser, RizzlyError error) {
+    super(RefItem.class, new ParsersImplementation(error), stream, parser, error);
   }
 
 }

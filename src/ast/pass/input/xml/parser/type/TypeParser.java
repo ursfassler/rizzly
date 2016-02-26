@@ -15,32 +15,20 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.input.xml.parser;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.Mockito.mock;
-
-import org.junit.Test;
+package ast.pass.input.xml.parser.type;
 
 import ast.data.type.Type;
+import ast.pass.input.xml.infrastructure.ParserDispatcher;
+import ast.pass.input.xml.infrastructure.ParsersImplementation;
 import ast.pass.input.xml.infrastructure.XmlParser;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
-public class TypeParser_Test {
-  final private ExpectionParser stream = mock(ExpectionParser.class);
-  final private XmlParser parser = mock(XmlParser.class);
-  final private RizzlyError error = mock(RizzlyError.class);
-  final private TypeParser testee = new TypeParser(stream, parser, error);
+public class TypeParser extends ParserDispatcher {
 
-  @Test
-  public void has_Integer() {
-    assertEquals(Names.list("Integer"), testee.names());
-  }
-
-  @Test
-  public void has_correct_type() {
-    assertEquals(Type.class, testee.type());
+  public TypeParser(ExpectionParser stream, XmlParser parser, RizzlyError error) {
+    super(Type.class, new ParsersImplementation(error), stream, parser, error);
+    add(new IntegerParser(stream, parser, error));
   }
 
 }

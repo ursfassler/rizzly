@@ -15,32 +15,51 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.input.xml.parser;
+package ast.pass.input.xml.parser.type;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.junit.Test;
+import org.mockito.InOrder;
+import org.mockito.Mockito;
 
-import ast.data.reference.Anchor;
+import ast.data.type.special.IntegerType;
 import ast.pass.input.xml.infrastructure.XmlParser;
+import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
-public class AnchorParser_Test {
+public class IntegerParser_Test {
   final private ExpectionParser stream = mock(ExpectionParser.class);
   final private XmlParser parser = mock(XmlParser.class);
   final private RizzlyError error = mock(RizzlyError.class);
-  final private AnchorParser testee = new AnchorParser(stream, parser, error);
+  final private IntegerParser testee = new IntegerParser(stream, parser, error);
+  final private InOrder order = Mockito.inOrder(stream, parser);
 
   @Test
-  public void has_unlinked_anchor() {
-    assertEquals(Names.list("UnlinkedAnchor"), testee.names());
+  public void has_correct_name() {
+    assertEquals(Names.list("Integer"), testee.names());
   }
 
   @Test
   public void has_correct_type() {
-    assertEquals(Anchor.class, testee.type());
+    assertEquals(IntegerType.class, testee.type());
+  }
+
+  @Test
+  public void parse_NumberValue() {
+    when(stream.attribute(eq("name"))).thenReturn("the name");
+
+    IntegerType value = testee.parse();
+
+    assertEquals("the name", value.getName());
+
+    order.verify(stream).elementStart(eq("Integer"));
+    order.verify(stream).attribute(eq("name"));
+    order.verify(stream).elementEnd();
   }
 
 }

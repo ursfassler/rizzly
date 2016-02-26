@@ -15,32 +15,53 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.input.xml.parser;
+package ast.pass.input.xml.parser.expression;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
+import java.math.BigInteger;
 
 import org.junit.Test;
+import org.mockito.InOrder;
+import org.mockito.Mockito;
 
-import ast.data.reference.RefItem;
+import ast.data.expression.value.NumberValue;
 import ast.pass.input.xml.infrastructure.XmlParser;
+import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
-public class RefItemParser_Test {
+public class NumberValueParser_Test {
   final private ExpectionParser stream = mock(ExpectionParser.class);
   final private XmlParser parser = mock(XmlParser.class);
   final private RizzlyError error = mock(RizzlyError.class);
-  final private RefItemParser testee = new RefItemParser(stream, parser, error);
+  final private NumberValueParser testee = new NumberValueParser(stream, parser, error);
+  final private InOrder order = Mockito.inOrder(stream, parser);
 
   @Test
-  public void has_no_parsers_yet() {
-    assertEquals(Names.list(), testee.names());
+  public void has_correct_name() {
+    assertEquals(Names.list("NumberValue"), testee.names());
   }
 
   @Test
   public void has_correct_type() {
-    assertEquals(RefItem.class, testee.type());
+    assertEquals(NumberValue.class, testee.type());
+  }
+
+  @Test
+  public void parse_NumberValue() {
+    when(stream.attribute(eq("value"))).thenReturn("1234567890");
+
+    NumberValue value = testee.parse();
+
+    assertEquals(BigInteger.valueOf(1234567890), value.value);
+
+    order.verify(stream).elementStart(eq("NumberValue"));
+    order.verify(stream).attribute(eq("value"));
+    order.verify(stream).elementEnd();
   }
 
 }

@@ -15,23 +15,25 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.input.xml.parser;
+package ast.pass.input.xml.parser.expression;
 
+import java.math.BigInteger;
 import java.util.Collection;
 
-import ast.data.reference.UnlinkedAnchor;
+import ast.data.expression.value.NumberValue;
 import ast.pass.input.xml.infrastructure.Parser;
 import ast.pass.input.xml.infrastructure.XmlParser;
+import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
-public class UnlinkedAnchorParser implements Parser {
-  private static final String Name = "UnlinkedAnchor";
+public class NumberValueParser implements Parser {
+  private static final String Name = "NumberValue";
   private final ExpectionParser stream;
   private final XmlParser parser;
   private final RizzlyError error;
 
-  public UnlinkedAnchorParser(ExpectionParser stream, XmlParser parser, RizzlyError error) {
+  public NumberValueParser(ExpectionParser stream, XmlParser parser, RizzlyError error) {
     this.stream = stream;
     this.parser = parser;
     this.error = error;
@@ -43,17 +45,16 @@ public class UnlinkedAnchorParser implements Parser {
   }
 
   @Override
-  public Class<UnlinkedAnchor> type() {
-    return UnlinkedAnchor.class;
+  public Class<NumberValue> type() {
+    return NumberValue.class;
   }
 
   @Override
-  public UnlinkedAnchor parse() {
+  public NumberValue parse() {
     stream.elementStart(Name);
-    String link = stream.attribute("target");
+    String value = stream.attribute("value");
     stream.elementEnd();
 
-    return new UnlinkedAnchor(link);
+    return new NumberValue(new BigInteger(value));
   }
-
 }
