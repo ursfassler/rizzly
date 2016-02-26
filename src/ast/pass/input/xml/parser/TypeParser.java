@@ -15,22 +15,20 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.type.special;
+package ast.pass.input.xml.parser;
 
-import ast.data.type.base.BaseType;
+import ast.data.type.Type;
+import ast.pass.input.xml.infrastructure.ParserDispatcher;
+import ast.pass.input.xml.infrastructure.ParsersImplementation;
+import ast.pass.input.xml.infrastructure.XmlParser;
+import ast.pass.input.xml.scanner.ExpectionParser;
+import error.RizzlyError;
 
-/**
- * Use this type only for type checking and not for code production.
- */
-final public class IntegerType extends BaseType {
-  final static public String NAME = "Integer";
+public class TypeParser extends ParserDispatcher {
 
-  public IntegerType() {
-    super(NAME);
-  }
-
-  public IntegerType(String name) {
-    super(name);
+  public TypeParser(ExpectionParser stream, XmlParser parser, RizzlyError error) {
+    super(Type.class, new ParsersImplementation(error), stream, parser, error);
+    add(new IntegerParser(stream, parser, error));
   }
 
 }
