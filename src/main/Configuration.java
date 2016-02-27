@@ -17,6 +17,8 @@
 
 package main;
 
+import java.util.List;
+
 import ast.Designator;
 
 public interface Configuration {
@@ -38,5 +40,7 @@ public interface Configuration {
   public abstract boolean doXml();
 
   public abstract FileType parseAs();
+
+  public abstract List<String> passes();
 
 }

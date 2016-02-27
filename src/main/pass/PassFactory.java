@@ -85,6 +85,7 @@ import ast.pass.specializer.TemplCallAdder;
 import ast.pass.specializer.TypeCastAdder;
 import ast.pass.specializer.TypeEvalPass;
 
+//TODO combine CommandLineParser and PassFactory
 public class PassFactory {
   public static PassGroup makePasses(Configuration configuration) {
     switch (configuration.parseAs()) {

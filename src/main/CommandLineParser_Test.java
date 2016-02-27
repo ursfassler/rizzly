@@ -24,6 +24,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -88,6 +91,7 @@ public class CommandLineParser_Test {
     Assert.assertEquals(new Designator("test", "Test"), configuration.getRootComp());
     Assert.assertEquals("./", configuration.getRootPath());
     Assert.assertEquals(".rzy", configuration.getExtension());
+    Assert.assertEquals(null, configuration.passes());
   }
 
   @Test
@@ -184,5 +188,36 @@ public class CommandLineParser_Test {
     Configuration configuration = testee.parse(args);
 
     Assert.assertTrue(configuration.doXml());
+  }
+
+  @Test
+  public void specify_passes() {
+    String[] args = { "--passes", "a", "b", "c('the text')", "d" };
+
+    Configuration configuration = testee.parse(args);
+
+    Assert.assertEquals(list("a", "b", "c('the text')", "d"), configuration.passes());
+  }
+
+  @Test
+  public void no_other_option_is_allowed_when_passes_are_specified() {
+    String[] args = { "--passes", "a", "--xml", "--doc" };
+
+    Configuration configuration = testee.parse(args);
+
+    Assert.assertNull(configuration);
+    verify(error).err(eq(ErrorType.Error), eq("Invalid option found beside passes: --xml"), any(MetaList.class));
+    verify(error).err(eq(ErrorType.Error), eq("Invalid option found beside passes: --doc"), any(MetaList.class));
+  }
+
+  private List<String> list(String string1, String string2, String string3, String string4) {
+    List<String> list = new ArrayList<String>();
+
+    list.add(string1);
+    list.add(string2);
+    list.add(string3);
+    list.add(string4);
+
+    return list;
   }
 }

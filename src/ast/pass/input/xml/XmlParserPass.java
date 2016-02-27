@@ -49,14 +49,26 @@ import error.RizzlyError;
 
 public class XmlParserPass extends AstPass {
   private final RizzlyError error = RError.instance();
+  private final String filename;
 
+  @Deprecated
   public XmlParserPass(Configuration configuration) {
     super(configuration);
+    this.filename = configuration.getRootPath() + configuration.getNamespace() + configuration.getExtension();
+  }
+
+  public XmlParserPass(Configuration configuration, String filename) {
+    super(configuration);
+    this.filename = filename;
+  }
+
+  public String getFilename() {
+    return filename;
   }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    TokenReader<XmlToken> stream = xmlReader(configuration.getRootPath() + configuration.getNamespace() + configuration.getExtension());
+    TokenReader<XmlToken> stream = xmlReader(getFilename());
     PeekNReader<XmlToken> peekReader = new PeekNReader<XmlToken>(stream);
     ExpectionParser expect = new ExpectionParserImplementation(peekReader, error);
     XmlParserImplementation parser = new XmlParserImplementation(expect, new ParsersImplementation(error));

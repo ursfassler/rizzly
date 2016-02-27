@@ -17,6 +17,8 @@
 
 package main;
 
+import java.util.List;
+
 import ast.Designator;
 
 public class WritableConfiguration implements Configuration {
@@ -29,6 +31,7 @@ public class WritableConfiguration implements Configuration {
   private boolean lazyModelCheck;
   private boolean xml;
   private FileType fileType;
+  private List<String> passes;
 
   @Override
   public String getRootPath() {
@@ -123,4 +126,12 @@ public class WritableConfiguration implements Configuration {
     fileType = value;
   }
 
+  @Override
+  public List<String> passes() {
+    return passes;
+  }
+
+  public void setPasses(List<String> value) {
+    passes = value;
+  }
 }

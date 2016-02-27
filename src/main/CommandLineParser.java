@@ -19,6 +19,7 @@ package main;
 
 import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +37,7 @@ import ast.meta.MetaListImplementation;
 import error.ErrorType;
 import error.RizzlyError;
 
+//TODO combine CommandLineParser and PassFactory
 public class CommandLineParser {
   private final RizzlyOptions options = new RizzlyOptions();
   private final RizzlyError error;
@@ -60,6 +62,18 @@ public class CommandLineParser {
       return null;
     }
 
+    if (cmd.hasOption(options.passes.getLongOpt())) {
+      if (hasInvalidOptionsBesidePasses(cmd)) {
+        return null;
+      }
+
+      WritableConfiguration configuration = new WritableConfiguration();
+      @SuppressWarnings("unchecked")
+      List<String> passes = cmd.getArgList();
+      configuration.setPasses(passes);
+      return configuration;
+    }
+
     String inputFile = getInputFile(cmd);
     if (!isSane(inputFile, cmd)) {
       return null;
@@ -81,6 +95,19 @@ public class CommandLineParser {
     configuration.setFileType(getFileType(extension));
 
     return configuration;
+  }
+
+  private boolean hasInvalidOptionsBesidePasses(CommandLine cmd) {
+    boolean hasError = false;
+
+    for (Option option : Arrays.asList(cmd.getOptions())) {
+      if (!option.getLongOpt().equals(options.passes.getLongOpt())) {
+        error.err(ErrorType.Error, "Invalid option found beside passes: --" + option.getLongOpt(), new MetaListImplementation());
+        hasError = true;
+      }
+    }
+
+    return hasError;
   }
 
   private boolean knownFileType(String extension) {
@@ -221,6 +248,7 @@ class RizzlyOptions {
   public final Option debugEvent = new Option(null, "debugEvent", false, "produce code to get informed whenever a event is sent or received");
   public final Option documentation = new Option(null, "doc", false, "generate documentation");
   public final Option xml = new Option(null, "xml", false, "write AST to an xml file");
+  public final Option passes = new Option(null, "passes", false, "execute the specified passes");
   public final Option component = new Option("c", "component", true, "the component to instantiate");
   public final Option help = new Option("h", "help", false, "show help");
   public final Options all = new Options();
@@ -232,6 +260,7 @@ class RizzlyOptions {
     all.addOption(debugEvent);
     all.addOption(lazyModelCheck);
     all.addOption(xml);
+    all.addOption(passes);
   }
 
 }

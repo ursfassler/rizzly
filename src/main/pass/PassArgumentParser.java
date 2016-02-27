@@ -15,11 +15,14 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package main;
+package main.pass;
 
-//TODO not used when we only have a normal/automatic invokation and one with all passes explicit specified
-@Deprecated
-public enum FileType {
-  Rizzly, Xml
+import java.util.LinkedList;
+
+public class PassArgumentParser {
+
+  public LinkedList<String> parse(String string) {
+    throw new RuntimeException("not yet implemented");
+  }
 
 }
