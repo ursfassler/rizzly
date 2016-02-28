@@ -29,5 +29,8 @@ final public class NaturalType extends BaseType {
     super(NAME);
   }
 
+  public NaturalType(String name) {
+    super(name);
+  }
 
 }

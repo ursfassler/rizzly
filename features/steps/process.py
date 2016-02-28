@@ -3,11 +3,6 @@ from behave import *
 import subprocess
 
 
-@when('I start rizzly with the file "{filename}"')
-def do_compile(context, filename):
-    context.proc = subprocess.Popen(["rizzly", filename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-    context.proc.wait()
-
 @when('I succesfully compile "{filename}" with rizzly')
 def compile_ok(context, filename):
     do_compile(context, filename)
@@ -16,6 +11,19 @@ def compile_ok(context, filename):
 @when(u'I start rizzly with the file "{filename}" and the xml backend')
 def step_impl(context, filename):
     context.proc = subprocess.Popen(["rizzly", "--xml", filename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    context.proc.wait()
+
+@when(u'I start rizzly with the passes')
+def step_impl(context):
+    passes = []
+    for row in context.table:
+        passes += [row['pass']]
+    context.proc = subprocess.Popen(["rizzly", "--passes"] + passes, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+    context.proc.wait()
+
+@when(u'I start rizzly with the file "{filename}"')
+def do_compile(context, filename):
+    context.proc = subprocess.Popen(["rizzly", filename], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     context.proc.wait()
 
 @then('I expect the exit code {code:d}')

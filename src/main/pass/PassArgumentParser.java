@@ -21,8 +21,55 @@ import java.util.LinkedList;
 
 public class PassArgumentParser {
 
-  public LinkedList<String> parse(String string) {
-    throw new RuntimeException("not yet implemented");
+  public LinkedList<String> parse(String value) {
+    if (value.isEmpty()) {
+      return new LinkedList<String>();
+    }
+
+    int nameEnd = value.indexOf('(');
+    if (nameEnd < 0) {
+      return parseWithoutArguments(value);
+    } else {
+      return parseWithArguments(value, nameEnd);
+    }
   }
 
+  private LinkedList<String> parseWithArguments(String value, int nameEnd) {
+    LinkedList<String> list = new LinkedList<String>();
+    list.add(value.substring(0, nameEnd).trim());
+    int argEnd = value.indexOf(')', nameEnd);
+    String argString = value.substring(nameEnd + 1, argEnd);
+    list.addAll(parseArguments(argString.trim()));
+    return list;
+  }
+
+  private LinkedList<String> parseWithoutArguments(String value) {
+    LinkedList<String> list = new LinkedList<String>();
+    list.add(value.trim());
+    return list;
+  }
+
+  private LinkedList<String> parseArguments(String arguments) {
+    LinkedList<String> list = new LinkedList<String>();
+
+    if (!arguments.isEmpty()) {
+      String[] args = arguments.split(",");
+      for (String arg : args) {
+        String trimmed = arg.trim();
+        assert (!trimmed.isEmpty());
+        trimmed = decodeArgument(trimmed);
+        list.add(trimmed);
+      }
+    }
+
+    return list;
+  }
+
+  private String decodeArgument(String trimmed) {
+    if (trimmed.startsWith("'")) {
+      assert (trimmed.endsWith("'"));
+      trimmed = trimmed.substring(1, trimmed.length() - 1);
+    }
+    return trimmed;
+  }
 }

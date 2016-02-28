@@ -33,15 +33,19 @@ import ast.repository.query.IdForReferenced.IdReaderFactory;
 import ast.visitor.VisitExecutorImplementation;
 
 public class XmlWriterPass implements AstPass {
-  private final Configuration configuration;
+  private final String filename;
 
+  @Deprecated
   public XmlWriterPass(Configuration configuration) {
-    this.configuration = configuration;
+    filename = configuration.getRootPath() + configuration.getNamespace() + ".xml";
+  }
+
+  public XmlWriterPass(String filename) {
+    this.filename = filename;
   }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    String filename = configuration.getRootPath() + configuration.getNamespace() + ".xml";
     try {
       OutputStream stream = new PrintStream(filename);
       XmlFileWriter writer = new XmlFileWriter(stream);

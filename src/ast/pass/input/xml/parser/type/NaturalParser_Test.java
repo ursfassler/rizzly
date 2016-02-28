@@ -18,31 +18,48 @@
 package ast.pass.input.xml.parser.type;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import org.junit.Test;
+import org.mockito.InOrder;
+import org.mockito.Mockito;
 
-import ast.data.type.Type;
+import ast.data.type.special.NaturalType;
 import ast.pass.input.xml.infrastructure.XmlParser;
+import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
-public class TypeParser_Test {
+public class NaturalParser_Test {
   final private ExpectionParser stream = mock(ExpectionParser.class);
   final private XmlParser parser = mock(XmlParser.class);
   final private RizzlyError error = mock(RizzlyError.class);
-  final private TypeParser testee = new TypeParser(stream, parser, error);
+  final private NaturalParser testee = new NaturalParser(stream, parser, error);
+  final private InOrder order = Mockito.inOrder(stream, parser);
 
   @Test
-  public void has_all_types() {
-    assertTrue(testee.names().contains("Integer"));
-    assertTrue(testee.names().contains("Natural"));
+  public void has_correct_name() {
+    assertEquals(Names.list("Natural"), testee.names());
   }
 
   @Test
   public void has_correct_type() {
-    assertEquals(Type.class, testee.type());
+    assertEquals(NaturalType.class, testee.type());
+  }
+
+  @Test
+  public void parse_NumberValue() {
+    when(stream.attribute(eq("name"))).thenReturn("the name");
+
+    NaturalType value = testee.parse();
+
+    assertEquals("the name", value.getName());
+
+    order.verify(stream).elementStart(eq("Natural"));
+    order.verify(stream).attribute(eq("name"));
+    order.verify(stream).elementEnd();
   }
 
 }

@@ -26,6 +26,7 @@ import ast.meta.MetaListImplementation;
 import ast.pass.AstPass;
 import ast.pass.input.xml.XmlParserPass;
 import ast.pass.linker.Linker;
+import ast.pass.output.xml.XmlWriterPass;
 import error.ErrorType;
 import error.RizzlyError;
 
@@ -41,6 +42,7 @@ public class ExplicitPassesFactory {
 
     factories.put("linker", new LinkerFactory());
     factories.put("xmlreader", new XmlReaderFactory());
+    factories.put("xmlwriter", new XmlWriterFactory());
   }
 
   public AstPass produce(String call) {
@@ -85,6 +87,19 @@ class XmlReaderFactory implements SinglePassFactory {
   @Override
   public AstPass create(List<String> arguments) {
     return new XmlParserPass(arguments.get(0));
+  }
+
+  @Override
+  public int expectedArgumentCount() {
+    return 1;
+  }
+}
+
+class XmlWriterFactory implements SinglePassFactory {
+
+  @Override
+  public AstPass create(List<String> arguments) {
+    return new XmlWriterPass(arguments.get(0));
   }
 
   @Override

@@ -29,6 +29,7 @@ public class TypeParser extends ParserDispatcher {
   public TypeParser(ExpectionParser stream, XmlParser parser, RizzlyError error) {
     super(Type.class, new ParsersImplementation(error), stream, parser, error);
     add(new IntegerParser(stream, parser, error));
+    add(new NaturalParser(stream, parser, error));
   }
 
 }

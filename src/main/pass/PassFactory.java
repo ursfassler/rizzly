@@ -17,6 +17,8 @@
 
 package main.pass;
 
+import java.util.List;
+
 import main.Configuration;
 import ast.pass.check.model.Modelcheck;
 import ast.pass.check.sanity.Sanitycheck;
@@ -84,21 +86,41 @@ import ast.pass.specializer.StateVarInitExecutor;
 import ast.pass.specializer.TemplCallAdder;
 import ast.pass.specializer.TypeCastAdder;
 import ast.pass.specializer.TypeEvalPass;
+import error.RError;
 
 //TODO combine CommandLineParser and PassFactory
 public class PassFactory {
   public static PassGroup makePasses(Configuration configuration) {
-    switch (configuration.parseAs()) {
-      case Rizzly:
-        if (configuration.doXml()) {
-          return produceXmlPass(configuration);
-        } else {
-          return produceFullRizzlyPass(configuration);
-        }
-      case Xml:
-        return produceXml2xml(configuration);
+    List<String> passes = configuration.passes();
+    if (passes == null) {
+      switch (configuration.parseAs()) {
+        case Rizzly:
+          if (configuration.doXml()) {
+            return produceXmlPass(configuration);
+          } else {
+            return produceFullRizzlyPass(configuration);
+          }
+        case Xml:
+          return produceXml2xml(configuration);
+      }
+    } else {
+      return produce(passes);
     }
+
     return null;
+  }
+
+  private static PassGroup produce(List<String> passDescription) {
+    PassGroup passes = new PassGroup("by argument");
+
+    PassArgumentParser argumentParser = new PassArgumentParser();
+    ExplicitPassesFactory factory = new ExplicitPassesFactory(argumentParser, RError.instance());
+
+    for (String pass : passDescription) {
+      passes.add(factory.produce(pass));
+    }
+
+    return passes;
   }
 
   private static PassGroup produceXml2xml(Configuration configuration) {

@@ -86,36 +86,52 @@ Scenario: read in a simple xml and output it results in the same xml
 
     """
 
-#TODO read in xml, run link pass and test it then
-#TODO make sure x has an unique id and the id is referenced
-@wip
-@fixme
 Scenario: references are unique
-  Given we have a file "testee.xml" with the content:
+  Given we have a file "input.xml" with the content:
     """
     <rizzly>
+      <GlobalConstant name="TheOtherAnswer">
+        <Reference>
+          <UnlinkedAnchor target="Natural"/>
+        </Reference>
+        <NumberValue value="42"/>
+      </GlobalConstant>
       <GlobalConstant name="TheAnswer">
         <Reference>
           <UnlinkedAnchor target="Integer"/>
         </Reference>
         <NumberValue value="42"/>
       </GlobalConstant>
+      <Integer name="Integer"/>
+      <Natural name="Natural"/>
     </rizzly>
 
     """
 
-  When I start rizzly with the file "testee.xml" and the xml backend
+  When I start rizzly with the passes
+    | pass                    |
+    | xmlreader('input.xml')  |
+    | linker                  |
+    | xmlwriter('output.xml') |
   
   Then I expect no error
-  And I expect an xml file "testee.xml" with the content:
+  And I expect an xml file "output.xml" with the content:
     """
     <rizzly>
-      <GlobalConstant name="TheAnswer">
+      <GlobalConstant name="TheOtherAnswer">
         <Reference>
-          <UnlinkedAnchor target="Integer"/>
+          <LinkedAnchor link="1"/>
         </Reference>
         <NumberValue value="42"/>
       </GlobalConstant>
+      <GlobalConstant name="TheAnswer">
+        <Reference>
+          <LinkedAnchor link="0"/>
+        </Reference>
+        <NumberValue value="42"/>
+      </GlobalConstant>
+      <Integer name="Integer" id="0"/>
+      <Natural name="Natural" id="1"/>
     </rizzly>
 
     """
