@@ -39,34 +39,68 @@ public class ExplicitPassesFactory {
     this.argumentParser = argumentParser;
     this.error = error;
 
-    factories.put("linker", new SinglePassFactory() {
-      @Override
-      public AstPass create(List<String> arguments) {
-        return new Linker();
-      }
-    });
-    factories.put("xmlreader", new SinglePassFactory() {
-      @Override
-      public AstPass create(List<String> arguments) {
-        return new XmlParserPass(arguments.get(0));
-      }
-    });
+    factories.put("linker", new LinkerFactory());
+    factories.put("xmlreader", new XmlReaderFactory());
   }
 
   public AstPass produce(String call) {
     LinkedList<String> arguments = argumentParser.parse(call);
-
+    if (arguments.isEmpty()) {
+      error.err(ErrorType.Error, "could not parse pass definition: " + call, new MetaListImplementation());
+      throw new RuntimeException();
+    }
     String passName = arguments.pop();
 
     if (factories.containsKey(passName)) {
-      return factories.get(passName).create(arguments);
+      return createPass(passName, arguments);
     } else {
       error.err(ErrorType.Error, "pass not found: " + passName, new MetaListImplementation());
       throw new RuntimeException();
     }
   }
+
+  private AstPass createPass(String passName, LinkedList<String> arguments) {
+    SinglePassFactory factory = factories.get(passName);
+    verify(factory, arguments);
+    return factory.create(arguments);
+  }
+
+  private void verify(SinglePassFactory factory, LinkedList<String> arguments) {
+    if (factory.expectedArgumentCount() != arguments.size()) {
+      error.err(ErrorType.Error, "pass xmlreader expected " + factory.expectedArgumentCount() + " argument but " + arguments.size() + " provided", new MetaListImplementation());
+      throw new RuntimeException();
+    }
+  }
+
 }
 
 interface SinglePassFactory {
   public AstPass create(List<String> arguments);
+
+  public int expectedArgumentCount();
+}
+
+class XmlReaderFactory implements SinglePassFactory {
+
+  @Override
+  public AstPass create(List<String> arguments) {
+    return new XmlParserPass(arguments.get(0));
+  }
+
+  @Override
+  public int expectedArgumentCount() {
+    return 1;
+  }
+}
+
+class LinkerFactory implements SinglePassFactory {
+  @Override
+  public AstPass create(List<String> arguments) {
+    return new Linker();
+  }
+
+  @Override
+  public int expectedArgumentCount() {
+    return 0;
+  }
 }

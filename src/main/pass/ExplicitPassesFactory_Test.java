@@ -18,6 +18,7 @@
 package main.pass;
 
 import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -78,8 +79,50 @@ public class ExplicitPassesFactory_Test {
     Assert.assertEquals("the filename", ((XmlParserPass) pass).getFilename());
   }
 
+  @Test(expected = RuntimeException.class)
+  public void raises_exception_for_wrong_number_of_arguments() {
+    when(argumentParser.parse("xmlreader()")).thenReturn(list("xmlreader"));
+
+    testee.produce("xmlreader()");
+  }
+
+  @Test
+  public void reports_an_error_for_wrong_number_of_arguments() {
+    when(argumentParser.parse("xmlreader()")).thenReturn(list("xmlreader"));
+
+    try {
+      testee.produce("xmlreader()");
+    } catch (Exception e) {
+    }
+
+    verify(error).err(eq(ErrorType.Error), eq("pass xmlreader expected 1 argument but 0 provided"), any(MetaList.class));
+  }
+
+  @Test(expected = RuntimeException.class)
+  public void raises_exception_when_no_pass_name_is_returned() {
+    when(argumentParser.parse(anyString())).thenReturn(list());
+
+    testee.produce("xmlreader()");
+  }
+
+  @Test
+  public void reports_an_error_when_no_pass_name_is_returned() {
+    when(argumentParser.parse(anyString())).thenReturn(list());
+
+    try {
+      testee.produce("xmlreader()");
+    } catch (Exception e) {
+    }
+
+    verify(error).err(eq(ErrorType.Error), eq("could not parse pass definition: xmlreader()"), any(MetaList.class));
+  }
+
+  private LinkedList<String> list() {
+    return new LinkedList<String>();
+  }
+
   private LinkedList<String> list(String arg0) {
-    LinkedList<String> list = new LinkedList<String>();
+    LinkedList<String> list = list();
     list.add(arg0);
     return list;
   }
