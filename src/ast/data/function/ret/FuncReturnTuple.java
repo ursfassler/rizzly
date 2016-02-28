@@ -20,7 +20,6 @@ package ast.data.function.ret;
 import ast.data.AstList;
 import ast.data.variable.FunctionVariable;
 import ast.meta.MetaList;
-import ast.visitor.Visitor;
 
 final public class FuncReturnTuple extends FuncReturn {
   final public AstList<FunctionVariable> param;

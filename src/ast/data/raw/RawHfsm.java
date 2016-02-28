@@ -19,7 +19,6 @@ package ast.data.raw;
 
 import ast.data.component.hfsm.StateComposite;
 import ast.meta.MetaList;
-import ast.visitor.Visitor;
 
 final public class RawHfsm extends RawComponent {
   private StateComposite topstate;

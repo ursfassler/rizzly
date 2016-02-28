@@ -18,10 +18,7 @@
 package ast.pass.reduction;
 
 import java.math.BigInteger;
-import java.util.Collection;
-import java.util.HashSet;
 
-import main.Configuration;
 import ast.data.Namespace;
 import ast.data.Range;
 import ast.data.expression.Expression;
@@ -43,9 +40,6 @@ import ast.dispatcher.other.ExprReplacer;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import ast.specification.AndSpec;
-import ast.specification.IsClass;
-import ast.specification.Specification;
 import error.ErrorType;
 import error.RError;
 
@@ -56,19 +50,7 @@ import error.RError;
  * @author urs
  *
  */
-public class BitLogicCategorizer extends AstPass {
-  public BitLogicCategorizer(Configuration configuration) {
-    super(configuration);
-  }
-
-  @Override
-  public Specification getPostcondition() {
-    Collection<Specification> specset = new HashSet<Specification>();
-    specset.add(new IsClass(And.class).not());
-    specset.add(new IsClass(Or.class).not());
-    specset.add(new IsClass(Not.class).not());
-    return new AndSpec(specset);
-  }
+public class BitLogicCategorizer implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

@@ -19,7 +19,6 @@ package ast.pass.optimize;
 
 import java.util.Set;
 
-import main.Configuration;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -31,10 +30,7 @@ import ast.repository.query.Collector;
 import ast.specification.ExternalFunction;
 import ast.specification.PublicFunction;
 
-public class RemoveUnused extends AstPass {
-  public RemoveUnused(Configuration configuration) {
-    super(configuration);
-  }
+public class RemoveUnused implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

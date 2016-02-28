@@ -19,7 +19,6 @@ package ast.data.statement;
 
 import ast.data.expression.Expression;
 import ast.meta.MetaList;
-import ast.visitor.Visitor;
 
 final public class CaseOptValue extends CaseOptEntry {
   public Expression value;

@@ -20,7 +20,6 @@ package ast.pass.reduction;
 import java.math.BigInteger;
 import java.util.List;
 
-import main.Configuration;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.expression.ReferenceExpression;
@@ -54,10 +53,7 @@ import ast.repository.manipulator.TypeRepo;
  * @author urs
  *
  */
-public class ForReduction extends AstPass {
-  public ForReduction(Configuration configuration) {
-    super(configuration);
-  }
+public class ForReduction implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

@@ -19,7 +19,6 @@ package ast.pass.others;
 
 import java.math.BigInteger;
 
-import main.Configuration;
 import ast.data.Namespace;
 import ast.data.Range;
 import ast.data.expression.Expression;
@@ -39,11 +38,7 @@ import ast.pass.AstPass;
  * @author urs
  *
  */
-public class BitnotFixer extends AstPass {
-
-  public BitnotFixer(Configuration configuration) {
-    super(configuration);
-  }
+public class BitnotFixer implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

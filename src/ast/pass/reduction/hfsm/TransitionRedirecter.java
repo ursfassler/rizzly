@@ -17,7 +17,6 @@
 
 package ast.pass.reduction.hfsm;
 
-import main.Configuration;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -38,10 +37,7 @@ import ast.specification.IsClass;
  * @author urs
  *
  */
-public class TransitionRedirecter extends AstPass {
-  public TransitionRedirecter(Configuration configuration) {
-    super(configuration);
-  }
+public class TransitionRedirecter implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

@@ -17,7 +17,6 @@
 
 package ast.pass.reduction;
 
-import main.Configuration;
 import ast.data.Ast;
 import ast.data.Named;
 import ast.data.component.hfsm.State;
@@ -35,10 +34,7 @@ import ast.repository.query.ChildByName;
  * @author urs
  *
  */
-public class StateLinkReduction extends AstPass {
-  public StateLinkReduction(Configuration configuration) {
-    super(configuration);
-  }
+public class StateLinkReduction implements AstPass {
 
   @Override
   public void process(ast.data.Namespace root, KnowledgeBase kb) {

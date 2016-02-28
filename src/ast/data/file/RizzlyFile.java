@@ -25,7 +25,6 @@ import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
 import ast.meta.MetaList;
-import ast.visitor.Visitor;
 
 final public class RizzlyFile extends Named {
   final public List<Designator> imports = new ArrayList<Designator>();

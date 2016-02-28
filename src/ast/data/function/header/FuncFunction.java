@@ -23,7 +23,6 @@ import ast.data.function.Function;
 import ast.data.function.ret.FuncReturn;
 import ast.data.statement.Block;
 import ast.data.variable.FunctionVariable;
-import ast.visitor.Visitor;
 
 final public class FuncFunction extends Function implements StateContent {
 

@@ -32,10 +32,11 @@ import ast.pass.output.xml.visitor.Write;
 import ast.repository.query.IdForReferenced.IdReaderFactory;
 import ast.visitor.VisitExecutorImplementation;
 
-public class XmlWriterPass extends AstPass {
+public class XmlWriterPass implements AstPass {
+  private final Configuration configuration;
 
   public XmlWriterPass(Configuration configuration) {
-    super(configuration);
+    this.configuration = configuration;
   }
 
   @Override

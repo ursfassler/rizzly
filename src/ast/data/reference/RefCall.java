@@ -18,7 +18,6 @@
 package ast.data.reference;
 
 import ast.data.expression.value.TupleValue;
-import ast.visitor.Visitor;
 
 final public class RefCall extends RefItem {
   final public TupleValue actualParameter;

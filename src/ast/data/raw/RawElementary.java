@@ -22,7 +22,6 @@ import ast.data.AstList;
 import ast.data.statement.Block;
 import ast.data.template.Template;
 import ast.meta.MetaList;
-import ast.visitor.Visitor;
 
 final public class RawElementary extends RawComponent {
   final private AstList<Template> declaration = new AstList<Template>();

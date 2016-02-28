@@ -35,9 +35,11 @@ import ast.pass.AstPass;
 import ast.repository.query.List;
 import ast.specification.HasName;
 
-public class FileLoader extends AstPass {
+public class FileLoader implements AstPass {
+  private final Configuration configuration;
+
   public FileLoader(Configuration configuration) {
-    super(configuration);
+    this.configuration = configuration;
   }
 
   @Override

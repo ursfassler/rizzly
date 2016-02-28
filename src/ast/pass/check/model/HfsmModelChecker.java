@@ -17,7 +17,6 @@
 
 package ast.pass.check.model;
 
-import main.Configuration;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -42,10 +41,7 @@ import error.RError;
 //TODO check if a transition is never used
 //TODO check that all queries are defined
 //TODO check that no event is handled within a state
-public class HfsmModelChecker extends AstPass {
-  public HfsmModelChecker(Configuration configuration) {
-    super(configuration);
-  }
+public class HfsmModelChecker implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

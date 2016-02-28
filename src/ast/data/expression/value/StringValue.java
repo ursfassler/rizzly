@@ -17,7 +17,6 @@
 
 package ast.data.expression.value;
 
-import ast.visitor.Visitor;
 
 final public class StringValue extends ValueExpr {
 

@@ -18,7 +18,6 @@
 package ast.data.expression.value;
 
 import ast.data.AstList;
-import ast.visitor.Visitor;
 
 final public class NamedElementsValue extends ValueExpr {
   final public AstList<NamedValue> value;

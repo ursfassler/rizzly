@@ -22,7 +22,6 @@ import java.util.Set;
 
 import ast.data.AstList;
 import ast.data.type.Type;
-import ast.visitor.Visitor;
 
 final public class EnumType extends Type {
   final public AstList<EnumElement> element;

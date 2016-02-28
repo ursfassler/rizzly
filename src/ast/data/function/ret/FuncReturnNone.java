@@ -18,7 +18,6 @@
 package ast.data.function.ret;
 
 import ast.meta.MetaList;
-import ast.visitor.Visitor;
 
 final public class FuncReturnNone extends FuncReturn {
 

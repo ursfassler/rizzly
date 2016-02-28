@@ -18,7 +18,6 @@
 package ast.data.type.special;
 
 import ast.data.type.base.BaseType;
-import ast.visitor.Visitor;
 
 /**
  * Use this type only for type checking and not for code production.

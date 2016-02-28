@@ -24,7 +24,6 @@ import ast.data.Named;
 import ast.data.component.hfsm.StateContent;
 import ast.data.variable.TemplateParameter;
 import ast.meta.MetaList;
-import ast.visitor.Visitor;
 
 //TODO do we need anonymous templates? it is easier if they are named.
 public class Template extends Named implements StateContent {

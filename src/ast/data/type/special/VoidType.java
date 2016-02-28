@@ -18,7 +18,6 @@
 package ast.data.type.special;
 
 import ast.data.type.base.BaseType;
-import ast.visitor.Visitor;
 
 final public class VoidType extends BaseType {
   final static public String NAME = "Void";

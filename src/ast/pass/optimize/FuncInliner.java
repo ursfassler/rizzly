@@ -3,7 +3,6 @@ package ast.pass.optimize;
 import java.util.List;
 import java.util.Set;
 
-import main.Configuration;
 import util.Pair;
 import ast.copy.Copy;
 import ast.data.Ast;
@@ -36,10 +35,7 @@ import ast.repository.query.Referencees.ReferenceesReader;
 import ast.specification.IsClass;
 import error.RError;
 
-public class FuncInliner extends AstPass {
-  public FuncInliner(Configuration configuration) {
-    super(configuration);
-  }
+public class FuncInliner implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

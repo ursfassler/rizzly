@@ -3,7 +3,6 @@ package ast.pass.reduction;
 import java.util.HashMap;
 import java.util.Map;
 
-import main.Configuration;
 import ast.Designator;
 import ast.copy.Relinker;
 import ast.data.Ast;
@@ -44,10 +43,7 @@ import ast.pass.AstPass;
 import error.ErrorType;
 import error.RError;
 
-public class ReduceRawComp extends AstPass {
-  public ReduceRawComp(Configuration configuration) {
-    super(configuration);
-  }
+public class ReduceRawComp implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

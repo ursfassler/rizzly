@@ -17,7 +17,6 @@
 
 package ast.pass.others;
 
-import main.Configuration;
 import util.Pair;
 import ast.copy.Copy;
 import ast.data.Ast;
@@ -64,11 +63,7 @@ import ast.repository.manipulator.TypeRepo;
  * @author urs
  *
  */
-public class CompareReplacer extends AstPass {
-
-  public CompareReplacer(Configuration configuration) {
-    super(configuration);
-  }
+public class CompareReplacer implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

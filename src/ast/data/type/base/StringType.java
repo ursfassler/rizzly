@@ -17,7 +17,6 @@
 
 package ast.data.type.base;
 
-import ast.visitor.Visitor;
 
 final public class StringType extends BaseType {
   public static final String NAME = "String";

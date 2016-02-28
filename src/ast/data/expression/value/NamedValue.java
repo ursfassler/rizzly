@@ -20,7 +20,6 @@ package ast.data.expression.value;
 import ast.data.AstBase;
 import ast.data.expression.Expression;
 import ast.meta.MetaList;
-import ast.visitor.Visitor;
 
 final public class NamedValue extends AstBase {
   public final String name;

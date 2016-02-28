@@ -18,7 +18,6 @@
 package ast.data.component.hfsm;
 
 import ast.data.component.Component;
-import ast.visitor.Visitor;
 
 final public class ImplHfsm extends Component {
   public StateComposite topstate;

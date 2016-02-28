@@ -20,13 +20,13 @@ package ast.repository.query;
 import ast.data.Ast;
 import ast.data.function.Function;
 import ast.data.function.header.FuncFunction;
-import ast.data.function.header.Procedure;
 import ast.data.function.header.FuncQuery;
+import ast.data.function.header.FuncSubHandlerEvent;
+import ast.data.function.header.FuncSubHandlerQuery;
+import ast.data.function.header.Procedure;
 import ast.data.function.header.Response;
 import ast.data.function.header.Signal;
 import ast.data.function.header.Slot;
-import ast.data.function.header.FuncSubHandlerEvent;
-import ast.data.function.header.FuncSubHandlerQuery;
 import ast.dispatcher.NullDispatcher;
 
 public class FunctionTypeName {

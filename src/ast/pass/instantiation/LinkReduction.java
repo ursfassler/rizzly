@@ -17,7 +17,6 @@
 
 package ast.pass.instantiation;
 
-import main.Configuration;
 import ast.data.Ast;
 import ast.data.Named;
 import ast.data.Namespace;
@@ -41,10 +40,7 @@ import error.RError;
  * @author urs
  *
  */
-public class LinkReduction extends AstPass {
-  public LinkReduction(Configuration configuration) {
-    super(configuration);
-  }
+public class LinkReduction implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

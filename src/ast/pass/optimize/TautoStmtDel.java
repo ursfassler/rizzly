@@ -2,7 +2,6 @@ package ast.pass.optimize;
 
 import java.util.List;
 
-import main.Configuration;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.expression.value.BooleanValue;
@@ -14,10 +13,7 @@ import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.specification.ConstantExpression;
 
-public class TautoStmtDel extends AstPass {
-  public TautoStmtDel(Configuration configuration) {
-    super(configuration);
-  }
+public class TautoStmtDel implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

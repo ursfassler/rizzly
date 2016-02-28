@@ -17,32 +17,9 @@
 
 package ast.pass;
 
-import main.Configuration;
 import ast.data.Namespace;
 import ast.knowledge.KnowledgeBase;
-import ast.specification.AlwaysTrueSpec;
-import ast.specification.Specification;
 
-public abstract class AstPass {
-  protected final Configuration configuration;
-
-  public AstPass(Configuration configuration) {
-    super();
-    this.configuration = configuration;
-  }
-
-  public Specification getPrecondition() {
-    return new AlwaysTrueSpec();
-  }
-
-  public Specification getPostcondition() {
-    return new AlwaysTrueSpec();
-  }
-
-  public abstract void process(Namespace ast, KnowledgeBase kb);
-
-  @Deprecated
-  public String getName() {
-    return getClass().getName();
-  }
+public interface AstPass {
+  public void process(Namespace ast, KnowledgeBase kb);
 }

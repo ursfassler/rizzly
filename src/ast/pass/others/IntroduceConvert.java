@@ -17,7 +17,6 @@
 
 package ast.pass.others;
 
-import main.Configuration;
 import ast.Designator;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -63,10 +62,7 @@ import error.RError;
  * with function _convert_R( low, high, value: Integer );
  *
  */
-public class IntroduceConvert extends AstPass {
-  public IntroduceConvert(Configuration configuration) {
-    super(configuration);
-  }
+public class IntroduceConvert implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

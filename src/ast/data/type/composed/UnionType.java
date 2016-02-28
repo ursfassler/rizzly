@@ -18,7 +18,6 @@
 package ast.data.type.composed;
 
 import ast.data.AstList;
-import ast.visitor.Visitor;
 
 final public class UnionType extends NamedElementType {
   final public NamedElement tag;

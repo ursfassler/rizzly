@@ -20,7 +20,6 @@ package ast.data.reference;
 import ast.data.AstList;
 import ast.data.template.ActualTemplateArgument;
 import ast.meta.MetaList;
-import ast.visitor.Visitor;
 
 final public class RefTemplCall extends RefItem {
   final public AstList<ActualTemplateArgument> actualParameter;

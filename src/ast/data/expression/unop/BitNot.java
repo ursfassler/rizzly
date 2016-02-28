@@ -18,7 +18,6 @@
 package ast.data.expression.unop;
 
 import ast.data.expression.Expression;
-import ast.visitor.Visitor;
 
 final public class BitNot extends UnaryExp {
 

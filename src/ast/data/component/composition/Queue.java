@@ -19,7 +19,6 @@ package ast.data.component.composition;
 
 import ast.Designator;
 import ast.data.Named;
-import ast.visitor.Visitor;
 
 public class Queue extends Named {
   public static final String DEFAULT_NAME = Designator.NAME_SEP + "queue";

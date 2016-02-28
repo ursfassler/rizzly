@@ -4,7 +4,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import main.Configuration;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.function.Function;
@@ -18,10 +17,7 @@ import ast.pass.AstPass;
 import error.ErrorType;
 import error.RError;
 
-public class NoCallEmptyFunc extends AstPass {
-  public NoCallEmptyFunc(Configuration configuration) {
-    super(configuration);
-  }
+public class NoCallEmptyFunc implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

@@ -19,6 +19,7 @@ package main.pass;
 
 import ast.pass.AstPass;
 
+
 public class PassItem extends Pass {
   AstPass pass;
 

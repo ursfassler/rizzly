@@ -2,7 +2,6 @@ package ast.pass.reduction;
 
 import java.util.List;
 
-import main.Configuration;
 import ast.data.Namespace;
 import ast.data.statement.AssignmentSingle;
 import ast.data.statement.MultiAssignment;
@@ -13,10 +12,7 @@ import ast.pass.AstPass;
 import error.ErrorType;
 import error.RError;
 
-public class ReduceMultiAssignment extends AstPass {
-  public ReduceMultiAssignment(Configuration configuration) {
-    super(configuration);
-  }
+public class ReduceMultiAssignment implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

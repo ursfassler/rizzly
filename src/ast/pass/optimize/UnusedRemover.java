@@ -20,7 +20,6 @@ package ast.pass.optimize;
 import java.util.Collection;
 import java.util.Set;
 
-import main.Configuration;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -41,10 +40,7 @@ import error.ErrorType;
 import error.RError;
 
 // FIXME if we remove everything unused, we can not typecheck that in EVL
-public class UnusedRemover extends AstPass {
-  public UnusedRemover(Configuration configuration) {
-    super(configuration);
-  }
+public class UnusedRemover implements AstPass {
 
   @Override
   public void process(Namespace root, KnowledgeBase kb) {

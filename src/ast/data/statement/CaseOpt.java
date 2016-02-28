@@ -20,7 +20,6 @@ package ast.data.statement;
 import ast.data.AstBase;
 import ast.data.AstList;
 import ast.meta.SourcePosition;
-import ast.visitor.Visitor;
 
 final public class CaseOpt extends AstBase {
   final public AstList<CaseOptEntry> value;

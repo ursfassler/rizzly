@@ -18,9 +18,9 @@
 package ast.copy;
 
 import ast.data.Ast;
-import ast.data.variable.GlobalConstant;
 import ast.data.variable.ConstPrivate;
 import ast.data.variable.FunctionVariable;
+import ast.data.variable.GlobalConstant;
 import ast.data.variable.StateVariable;
 import ast.data.variable.Variable;
 import ast.dispatcher.NullDispatcher;

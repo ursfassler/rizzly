@@ -19,7 +19,6 @@ package ast.data.component.composition;
 
 import ast.data.AstList;
 import ast.data.component.Component;
-import ast.visitor.Visitor;
 
 public class ImplComposition extends Component {
   final public AstList<ComponentUse> component = new AstList<ComponentUse>();

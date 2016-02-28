@@ -18,7 +18,6 @@
 package ast.data.statement;
 
 import ast.data.AstList;
-import ast.visitor.Visitor;
 
 public class Block extends Statement {
   final public AstList<Statement> statements = new AstList<Statement>();

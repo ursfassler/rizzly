@@ -19,7 +19,6 @@ package ast.data.type.composed;
 
 import ast.data.AstList;
 import ast.meta.MetaList;
-import ast.visitor.Visitor;
 
 final public class RecordType extends NamedElementType {
 

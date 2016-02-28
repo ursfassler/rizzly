@@ -18,7 +18,6 @@
 package ast.data.statement;
 
 import ast.data.expression.Expression;
-import ast.visitor.Visitor;
 
 final public class WhileStmt extends Statement {
 

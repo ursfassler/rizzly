@@ -25,8 +25,6 @@ import static org.mockito.Mockito.when;
 
 import java.util.LinkedList;
 
-import main.Configuration;
-
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -39,9 +37,8 @@ import error.RizzlyError;
 
 public class ExplicitPassesFactory_Test {
   private final PassArgumentParser argumentParser = mock(PassArgumentParser.class);
-  private final Configuration configuration = mock(Configuration.class);
   private final RizzlyError error = mock(RizzlyError.class);
-  private final ExplicitPassesFactory testee = new ExplicitPassesFactory(argumentParser, configuration, error);
+  private final ExplicitPassesFactory testee = new ExplicitPassesFactory(argumentParser, error);
 
   @Test(expected = RuntimeException.class)
   public void raises_exception_for_unknown_pass() {

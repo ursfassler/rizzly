@@ -21,7 +21,6 @@ import ast.data.AstList;
 import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.Connection;
 import ast.meta.MetaList;
-import ast.visitor.Visitor;
 
 final public class RawComposition extends RawComponent {
   final private AstList<ComponentUse> instantiation = new AstList<ComponentUse>();

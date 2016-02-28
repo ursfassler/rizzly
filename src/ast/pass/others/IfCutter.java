@@ -17,7 +17,6 @@
 
 package ast.pass.others;
 
-import main.Configuration;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.statement.Block;
@@ -32,10 +31,7 @@ import ast.pass.AstPass;
  *
  */
 // TODO replace IfStmt with simple if stmt or remove simple if statement
-public class IfCutter extends AstPass {
-  public IfCutter(Configuration configuration) {
-    super(configuration);
-  }
+public class IfCutter implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

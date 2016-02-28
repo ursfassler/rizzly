@@ -17,7 +17,6 @@
 
 package ast.data.type.out;
 
-import ast.visitor.Visitor;
 
 final public class SIntType extends IntType {
 

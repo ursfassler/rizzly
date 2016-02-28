@@ -18,7 +18,6 @@
 package ast.data.statement;
 
 import ast.data.variable.FunctionVariable;
-import ast.visitor.Visitor;
 
 final public class VarDefStmt extends Statement {
   final public FunctionVariable variable;

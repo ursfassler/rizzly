@@ -19,8 +19,6 @@ package ast.data.expression.value;
 
 import java.math.BigInteger;
 
-import ast.visitor.Visitor;
-
 /**
  *
  * @author urs

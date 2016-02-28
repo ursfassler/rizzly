@@ -21,7 +21,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
 
-import main.Configuration;
 import ast.Designator;
 import ast.data.AstList;
 import ast.data.Named;
@@ -55,10 +54,7 @@ import ast.repository.query.TypeFilter;
 import error.ErrorType;
 import error.RError;
 
-public class Linker extends AstPass {
-  public Linker(Configuration configuration) {
-    super(configuration);
-  }
+public class Linker implements AstPass {
 
   @Override
   public void process(ast.data.Namespace root, KnowledgeBase kb) {
@@ -144,12 +140,12 @@ class LinkerWorker extends DfsTraverser<Void, SymbolTable> {
   protected Void visitOffsetReference(OffsetReference obj, SymbolTable param) {
     if (obj.getAnchor() instanceof UnlinkedAnchor) {
       String name = ((UnlinkedAnchor) obj.getAnchor()).getLinkName();
-    
+
       Named link = param.find(name);
       if (link == null) {
         RError.err(ErrorType.Error, "Name not found: " + name, obj.metadata());
       }
-    
+
       obj.setAnchor(new LinkedAnchor(link));
     }
     return super.visitOffsetReference(obj, param);

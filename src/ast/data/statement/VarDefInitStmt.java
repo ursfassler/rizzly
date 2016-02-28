@@ -20,7 +20,6 @@ package ast.data.statement;
 import ast.data.AstList;
 import ast.data.expression.Expression;
 import ast.data.variable.FunctionVariable;
-import ast.visitor.Visitor;
 
 final public class VarDefInitStmt extends Statement {
   final public AstList<FunctionVariable> variable;

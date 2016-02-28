@@ -20,7 +20,6 @@ package ast.pass.others;
 import java.io.FileNotFoundException;
 import java.io.PrintStream;
 
-import main.Configuration;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
@@ -101,12 +100,8 @@ import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.TypeFilter;
 
-public class CWriter extends AstPass {
+public class CWriter implements AstPass {
   public static final String ARRAY_DATA_NAME = "data";
-
-  public CWriter(Configuration configuration) {
-    super(configuration);
-  }
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
@@ -775,7 +770,7 @@ class CWriterWorker extends NullDispatcher<Void, Boolean> {
         case '\t':
           ret += "\\t";
           break;
-        // TODO more symbols to escape?
+          // TODO more symbols to escape?
         default:
           ret += c;
           break;

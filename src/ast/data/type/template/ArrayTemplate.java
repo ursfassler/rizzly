@@ -17,7 +17,6 @@
 
 package ast.data.type.template;
 
-import ast.visitor.Visitor;
 
 final public class ArrayTemplate extends TypeTemplate {
 

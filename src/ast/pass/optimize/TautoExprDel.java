@@ -1,6 +1,5 @@
 package ast.pass.optimize;
 
-import main.Configuration;
 import ast.data.Namespace;
 import ast.data.expression.Expression;
 import ast.data.expression.binop.LogicAnd;
@@ -11,10 +10,7 @@ import ast.dispatcher.other.ExprReplacer;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 
-public class TautoExprDel extends AstPass {
-  public TautoExprDel(Configuration configuration) {
-    super(configuration);
-  }
+public class TautoExprDel implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

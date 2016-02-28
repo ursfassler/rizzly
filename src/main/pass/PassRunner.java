@@ -26,7 +26,6 @@ import ast.data.Namespace;
 import ast.debug.DebugPrinter;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
-import error.RError;
 
 public class PassRunner {
   public static void process(Configuration opt, String outdir, String debugdir) {
@@ -53,13 +52,9 @@ public class PassRunner {
   }
 
   public static void process(PassItem item, Designator prefix, DebugPrinter dp, Namespace ast, KnowledgeBase kb) {
-    RError.ass(item.pass.getPrecondition().isSatisfiedBy(ast), item.getName() + ": precondition does not hold");
-
     prefix = new Designator(prefix, item.getName());
     item.pass.process(ast, kb);
     dp.print(prefix.toString("."));
-
-    RError.ass(item.pass.getPostcondition().isSatisfiedBy(ast), item.getName() + ": postcondition does not hold");
   }
 
   @SuppressWarnings("unused")

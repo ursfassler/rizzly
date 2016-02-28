@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import main.Configuration;
 import ast.copy.Relinker;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -41,10 +40,7 @@ import error.RError;
 /**
  * Find equal types with different names and merge them
  */
-public class TypeMerge extends AstPass {
-  public TypeMerge(Configuration configuration) {
-    super(configuration);
-  }
+public class TypeMerge implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

@@ -21,7 +21,6 @@ import java.math.BigInteger;
 import java.util.HashMap;
 import java.util.Map;
 
-import main.Configuration;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -47,10 +46,7 @@ import ast.repository.manipulator.TypeRepo;
  *
  */
 
-public class OpenReplace extends AstPass {
-  public OpenReplace(Configuration configuration) {
-    super(configuration);
-  }
+public class OpenReplace implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

@@ -21,7 +21,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import main.Configuration;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.component.hfsm.ImplHfsm;
@@ -42,10 +41,7 @@ import error.RError;
  *
  * @author urs
  */
-public class HfsmTransScopeCheck extends AstPass {
-  public HfsmTransScopeCheck(Configuration configuration) {
-    super(configuration);
-  }
+public class HfsmTransScopeCheck implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

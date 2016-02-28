@@ -22,7 +22,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import main.Configuration;
 import ast.meta.MetaListImplementation;
 import ast.pass.AstPass;
 import ast.pass.input.xml.XmlParserPass;
@@ -32,26 +31,24 @@ import error.RizzlyError;
 
 public class ExplicitPassesFactory {
   final private PassArgumentParser argumentParser;
-  final private Configuration configuration;
   final private RizzlyError error;
 
   final private Map<String, SinglePassFactory> factories = new HashMap<String, SinglePassFactory>();
 
-  public ExplicitPassesFactory(PassArgumentParser argumentParser, Configuration configuration, RizzlyError error) {
+  public ExplicitPassesFactory(PassArgumentParser argumentParser, RizzlyError error) {
     this.argumentParser = argumentParser;
-    this.configuration = configuration;
     this.error = error;
 
     factories.put("linker", new SinglePassFactory() {
       @Override
       public AstPass create(List<String> arguments) {
-        return new Linker(null);
+        return new Linker();
       }
     });
     factories.put("xmlreader", new SinglePassFactory() {
       @Override
       public AstPass create(List<String> arguments) {
-        return new XmlParserPass(null, arguments.get(0));
+        return new XmlParserPass(arguments.get(0));
       }
     });
   }

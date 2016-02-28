@@ -17,7 +17,6 @@
 
 package ast.pass.specializer;
 
-import main.Configuration;
 import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.expression.Expression;
@@ -34,10 +33,7 @@ import ast.dispatcher.other.ExprReplacer;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 
-public class TypeCastAdder extends AstPass {
-  public TypeCastAdder(Configuration configuration) {
-    super(configuration);
-  }
+public class TypeCastAdder implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

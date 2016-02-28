@@ -20,7 +20,6 @@ package ast.pass.reduction;
 import java.util.HashMap;
 import java.util.Map;
 
-import main.Configuration;
 import ast.Designator;
 import ast.data.Ast;
 import ast.data.Namespace;
@@ -55,10 +54,7 @@ import ast.specification.HasName;
 // TODO replace access to union instance u in ".. is .." and "case" with access to u.e
 // TODO replace also reference to element x of U to x' in E
 // DONE replace "is" with "=="
-public class ReduceUnion extends AstPass {
-  public ReduceUnion(Configuration configuration) {
-    super(configuration);
-  }
+public class ReduceUnion implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

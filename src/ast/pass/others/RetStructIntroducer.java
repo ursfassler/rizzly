@@ -22,7 +22,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import main.Configuration;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.expression.ReferenceExpression;
@@ -59,10 +58,7 @@ import ast.repository.manipulator.TypeRepo;
  * @author urs
  *
  */
-public class RetStructIntroducer extends AstPass {
-  public RetStructIntroducer(Configuration configuration) {
-    super(configuration);
-  }
+public class RetStructIntroducer implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

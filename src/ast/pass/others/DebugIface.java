@@ -21,7 +21,6 @@ import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collections;
 
-import main.Configuration;
 import ast.Designator;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -51,10 +50,7 @@ import ast.pass.debug.CompCascadeDepth;
 import ast.pass.debug.DebugIfaceAdder;
 import ast.repository.manipulator.TypeRepo;
 
-public class DebugIface extends AstPass {
-  public DebugIface(Configuration configuration) {
-    super(configuration);
-  }
+public class DebugIface implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

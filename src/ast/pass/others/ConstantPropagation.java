@@ -17,7 +17,6 @@
 
 package ast.pass.others;
 
-import main.Configuration;
 import ast.copy.Copy;
 import ast.data.Namespace;
 import ast.data.expression.Expression;
@@ -40,10 +39,7 @@ import ast.pass.AstPass;
  * Propagates (some) constant values where they are used
  *
  */
-public class ConstantPropagation extends AstPass {
-  public ConstantPropagation(Configuration configuration) {
-    super(configuration);
-  }
+public class ConstantPropagation implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

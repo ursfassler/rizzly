@@ -17,7 +17,6 @@
 
 package ast.pass.reduction;
 
-import main.Configuration;
 import ast.data.Ast;
 import ast.data.reference.LinkedAnchor;
 import ast.data.reference.OffsetReference;
@@ -37,10 +36,7 @@ import error.RError;
  * @author urs
  *
  */
-public class EnumLinkReduction extends AstPass {
-  public EnumLinkReduction(Configuration configuration) {
-    super(configuration);
-  }
+public class EnumLinkReduction implements AstPass {
 
   @Override
   public void process(ast.data.Namespace root, KnowledgeBase kb) {

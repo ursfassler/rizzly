@@ -17,7 +17,6 @@
 
 package ast.pass.check.type;
 
-import main.Configuration;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.component.composition.ImplComposition;
@@ -33,10 +32,7 @@ import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 
-public class Typecheck extends AstPass {
-  public Typecheck(Configuration configuration) {
-    super(configuration);
-  }
+public class Typecheck implements AstPass {
 
   static public void process(Ast ast, KnowledgeBase kb) {
     TypeCheckerWorker adder = new TypeCheckerWorker(kb);

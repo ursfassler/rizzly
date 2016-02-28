@@ -17,7 +17,6 @@
 
 package ast.pass.others;
 
-import main.Configuration;
 import ast.data.Namespace;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
@@ -25,11 +24,10 @@ import ast.visitor.DeepFirstTraverser;
 import ast.visitor.VisitExecutorImplementation;
 import ast.visitor.Visitor;
 
-public class DefaultVisitorPass extends AstPass {
+public class DefaultVisitorPass implements AstPass {
   final private Visitor visitor;
 
-  public DefaultVisitorPass(Visitor visitor, Configuration configuration) {
-    super(configuration);
+  public DefaultVisitorPass(Visitor visitor) {
     this.visitor = visitor;
   }
 

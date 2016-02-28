@@ -17,7 +17,6 @@
 
 package ast.data.type.base;
 
-import ast.visitor.Visitor;
 
 final public class BooleanType extends BaseType {
   public static final String NAME = "Boolean";

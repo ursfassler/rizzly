@@ -18,7 +18,6 @@
 package ast.data.statement;
 
 import ast.data.AstList;
-import ast.visitor.Visitor;
 
 final public class IfStatement extends Statement {
   final public AstList<IfOption> option;

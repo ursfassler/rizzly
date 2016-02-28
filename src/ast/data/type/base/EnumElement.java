@@ -19,7 +19,6 @@ package ast.data.type.base;
 
 import ast.data.Named;
 import ast.meta.MetaList;
-import ast.visitor.Visitor;
 
 final public class EnumElement extends Named {
   public EnumElement(String name) {

@@ -19,7 +19,6 @@ package ast.data.expression.value;
 
 import ast.data.AstList;
 import ast.data.expression.Expression;
-import ast.visitor.Visitor;
 
 final public class ArrayValue extends ValueExpr {
   final public AstList<Expression> value;   // TODO change to ValueExpr

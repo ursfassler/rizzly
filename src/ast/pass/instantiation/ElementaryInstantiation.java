@@ -22,7 +22,6 @@ import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-import main.Configuration;
 import ast.copy.CopyAst;
 import ast.copy.Relinker;
 import ast.data.Ast;
@@ -53,10 +52,7 @@ import ast.repository.query.NameFilter;
 import ast.specification.IsClass;
 import error.RError;
 
-public class ElementaryInstantiation extends AstPass {
-  public ElementaryInstantiation(Configuration configuration) {
-    super(configuration);
-  }
+public class ElementaryInstantiation implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

@@ -17,16 +17,14 @@
 
 package ast.pass.check.sanity;
 
-import main.Configuration;
 import ast.pass.others.GroupPass;
 
 public class Sanitycheck extends GroupPass {
 
-  public Sanitycheck(Configuration configuration) {
-    super(configuration);
-    append(new LinkTargetExists(configuration));
-    append(new VarLinkOk(configuration));
-    append(new SingleDefinition(configuration));
+  public Sanitycheck() {
+    append(new LinkTargetExists());
+    append(new VarLinkOk());
+    append(new SingleDefinition());
   }
 
 }

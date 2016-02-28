@@ -17,7 +17,6 @@
 
 package ast.pass.others;
 
-import main.Configuration;
 import ast.data.AstList;
 import ast.data.expression.ReferenceExpression;
 import ast.data.expression.value.AnyValue;
@@ -40,10 +39,7 @@ import ast.pass.AstPass;
  * @author urs
  *
  */
-public class VarDefSplitter extends AstPass {
-  public VarDefSplitter(Configuration configuration) {
-    super(configuration);
-  }
+public class VarDefSplitter implements AstPass {
 
   @Override
   public void process(ast.data.Namespace root, KnowledgeBase kb) {

@@ -19,7 +19,6 @@ package ast.data.reference;
 
 import ast.data.expression.Expression;
 import ast.meta.MetaList;
-import ast.visitor.Visitor;
 
 final public class RefIndex extends RefItem {
   public Expression index;

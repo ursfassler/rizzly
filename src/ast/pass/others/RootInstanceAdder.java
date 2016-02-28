@@ -17,7 +17,6 @@
 
 package ast.pass.others;
 
-import main.Configuration;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.component.composition.ComponentUse;
@@ -28,10 +27,7 @@ import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.ChildByName;
 
-public class RootInstanceAdder extends AstPass {
-  public RootInstanceAdder(Configuration configuration) {
-    super(configuration);
-  }
+public class RootInstanceAdder implements AstPass {
 
   @Override
   public void process(Namespace root, KnowledgeBase kb) {

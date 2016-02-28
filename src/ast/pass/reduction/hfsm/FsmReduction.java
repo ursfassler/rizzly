@@ -21,7 +21,6 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import main.Configuration;
 import ast.Designator;
 import ast.copy.Relinker;
 import ast.data.Ast;
@@ -73,10 +72,7 @@ import ast.repository.query.TypeFilter;
 import error.ErrorType;
 import error.RError;
 
-public class FsmReduction extends AstPass {
-  public FsmReduction(Configuration configuration) {
-    super(configuration);
-  }
+public class FsmReduction implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

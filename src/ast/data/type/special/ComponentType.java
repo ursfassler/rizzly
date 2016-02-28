@@ -21,7 +21,6 @@ import ast.data.AstList;
 import ast.data.type.Type;
 import ast.data.type.composed.NamedElement;
 import ast.meta.MetaList;
-import ast.visitor.Visitor;
 
 final public class ComponentType extends Type {
   final public AstList<NamedElement> input = new AstList<NamedElement>();

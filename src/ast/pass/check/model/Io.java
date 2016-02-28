@@ -17,7 +17,6 @@
 
 package ast.pass.check.model;
 
-import main.Configuration;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -36,10 +35,7 @@ import error.RError;
 /**
  * Checks that functions do not change state
  */
-public class Io extends AstPass {
-  public Io(Configuration configuration) {
-    super(configuration);
-  }
+public class Io implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

@@ -17,7 +17,6 @@
 
 package ast.pass.specializer;
 
-import main.Configuration;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.reference.Anchor;
@@ -35,10 +34,7 @@ import ast.specification.IsClass;
 import error.ErrorType;
 import error.RError;
 
-public class TemplCallAdder extends AstPass {
-  public TemplCallAdder(Configuration configuration) {
-    super(configuration);
-  }
+public class TemplCallAdder implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

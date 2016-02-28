@@ -17,7 +17,6 @@
 
 package ast.data.statement;
 
-import ast.visitor.Visitor;
 
 final public class VoidReturn extends Return {
 

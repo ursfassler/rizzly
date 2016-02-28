@@ -17,7 +17,6 @@
 
 package ast.pass.reduction;
 
-import main.Configuration;
 import ast.data.Ast;
 import ast.data.Named;
 import ast.data.Namespace;
@@ -42,10 +41,7 @@ import error.RError;
  * @author urs
  *
  */
-public class CompLinkReduction extends AstPass {
-  public CompLinkReduction(Configuration configuration) {
-    super(configuration);
-  }
+public class CompLinkReduction implements AstPass {
 
   @Override
   public void process(ast.data.Namespace root, KnowledgeBase kb) {

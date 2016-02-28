@@ -1,6 +1,5 @@
 package ast.pass.optimize;
 
-import main.Configuration;
 import ast.data.Namespace;
 import ast.data.Range;
 import ast.data.expression.Expression;
@@ -18,10 +17,7 @@ import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 
-public class AlwaysGreater extends AstPass {
-  public AlwaysGreater(Configuration configuration) {
-    super(configuration);
-  }
+public class AlwaysGreater implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

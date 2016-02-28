@@ -17,7 +17,6 @@
 
 package ast.pass.others;
 
-import main.Configuration;
 import ast.data.Namespace;
 import ast.data.Range;
 import ast.data.expression.Expression;
@@ -39,10 +38,7 @@ import ast.repository.manipulator.TypeRepo;
  * @author urs
  *
  */
-public class RangeConverter extends AstPass {
-  public RangeConverter(Configuration configuration) {
-    super(configuration);
-  }
+public class RangeConverter implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

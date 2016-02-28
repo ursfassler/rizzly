@@ -17,7 +17,6 @@
 
 package ast.pass.others;
 
-import main.Configuration;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.type.Type;
@@ -36,10 +35,7 @@ import ast.repository.manipulator.TypeRepo;
  * Sets and constrains types for all constants
  *
  */
-public class ConstTyper extends AstPass {
-  public ConstTyper(Configuration configuration) {
-    super(configuration);
-  }
+public class ConstTyper implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

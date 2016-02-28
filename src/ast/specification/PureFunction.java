@@ -21,8 +21,8 @@ import java.util.Collection;
 import java.util.HashSet;
 
 import ast.data.function.header.FuncFunction;
-import ast.data.function.header.Response;
 import ast.data.function.header.FuncSubHandlerQuery;
+import ast.data.function.header.Response;
 
 public class PureFunction extends OrSpec {
 

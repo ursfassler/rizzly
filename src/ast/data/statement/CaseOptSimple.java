@@ -19,7 +19,6 @@ package ast.data.statement;
 
 import ast.data.Range;
 import ast.meta.SourcePosition;
-import ast.visitor.Visitor;
 
 final public class CaseOptSimple extends CaseOptEntry {
   public Range value;

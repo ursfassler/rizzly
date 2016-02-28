@@ -17,7 +17,6 @@
 
 package ast.meta;
 
-import ast.visitor.Visitor;
 import ast.visitor.Visitee;
 
 public class SourcePosition implements Visitee, MetaInformation {

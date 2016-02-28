@@ -17,7 +17,6 @@
 
 package ast.pass.others;
 
-import main.Configuration;
 import ast.Designator;
 import ast.data.Ast;
 import ast.data.Named;
@@ -31,10 +30,7 @@ import ast.doc.CompositionGraphPrinter;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 
-public class DocWriter extends AstPass {
-  public DocWriter(Configuration configuration) {
-    super(configuration);
-  }
+public class DocWriter implements AstPass {
 
   @Override
   public void process(ast.data.Namespace root, KnowledgeBase kb) {

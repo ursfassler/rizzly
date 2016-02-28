@@ -20,7 +20,6 @@ package ast.pass.instantiation.queuereduction;
 import java.util.HashMap;
 import java.util.Map;
 
-import main.Configuration;
 import ast.Designator;
 import ast.copy.Relinker;
 import ast.data.Namespace;
@@ -34,10 +33,7 @@ import ast.repository.query.ChildByName;
 import ast.repository.query.Collector;
 import ast.specification.IsClass;
 
-public class QueueReduction extends AstPass {
-  public QueueReduction(Configuration configuration) {
-    super(configuration);
-  }
+public class QueueReduction implements AstPass {
 
   @Override
   public void process(Namespace classes, KnowledgeBase kb) {

@@ -19,7 +19,6 @@ package ast.pass.others;
 
 import java.util.LinkedList;
 
-import main.Configuration;
 import ast.data.Namespace;
 import ast.data.statement.Block;
 import ast.data.statement.Statement;
@@ -28,10 +27,7 @@ import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 
-public class VarDeclToTop extends AstPass {
-  public VarDeclToTop(Configuration configuration) {
-    super(configuration);
-  }
+public class VarDeclToTop implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

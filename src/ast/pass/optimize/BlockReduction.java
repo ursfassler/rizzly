@@ -20,7 +20,6 @@ package ast.pass.optimize;
 import java.util.ArrayList;
 import java.util.List;
 
-import main.Configuration;
 import ast.data.Namespace;
 import ast.data.statement.Block;
 import ast.data.statement.Statement;
@@ -28,10 +27,7 @@ import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 
-public class BlockReduction extends AstPass {
-  public BlockReduction(Configuration configuration) {
-    super(configuration);
-  }
+public class BlockReduction implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

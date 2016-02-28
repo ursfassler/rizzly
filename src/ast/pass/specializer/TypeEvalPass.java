@@ -17,7 +17,6 @@
 
 package ast.pass.specializer;
 
-import main.Configuration;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
@@ -43,10 +42,7 @@ import ast.specification.IsClass;
  * @author urs
  *
  */
-public class TypeEvalPass extends AstPass {
-  public TypeEvalPass(Configuration configuration) {
-    super(configuration);
-  }
+public class TypeEvalPass implements AstPass {
 
   @Override
   public void process(Namespace root, KnowledgeBase kb) {

@@ -18,7 +18,6 @@
 package ast.data.type.base;
 
 import ast.data.Range;
-import ast.visitor.Visitor;
 
 public class RangeType extends BaseType {
   final public Range range;

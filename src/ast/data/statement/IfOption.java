@@ -19,7 +19,6 @@ package ast.data.statement;
 
 import ast.data.AstBase;
 import ast.data.expression.Expression;
-import ast.visitor.Visitor;
 
 public class IfOption extends AstBase {
   public Expression condition;

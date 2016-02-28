@@ -19,7 +19,6 @@ package ast.data.statement;
 
 import ast.data.AstList;
 import ast.data.expression.Expression;
-import ast.visitor.Visitor;
 
 final public class CaseStmt extends Statement {
   public Expression condition;

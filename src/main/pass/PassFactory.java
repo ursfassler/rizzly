@@ -112,73 +112,73 @@ public class PassFactory {
     // TODO split up
 
     PassGroup passes = new PassGroup("ast");
-    passes.checks.add(new Sanitycheck(configuration));
+    passes.checks.add(new Sanitycheck());
 
     passes.passes.add(funPasses(configuration));
 
-    passes.add(new ConstTyper(configuration));
+    passes.add(new ConstTyper());
 
     if (!configuration.doLazyModelCheck()) {
       // TODO check that model check does not change AST
-      passes.add(new Modelcheck(configuration));
+      passes.add(new Modelcheck());
     }
 
     passes.passes.add(reduce(passes, configuration));
 
-    passes.add(new InitVarTyper(configuration));
-    passes.add(new BitLogicCategorizer(configuration));
-    passes.add(new Typecheck(configuration));
-    passes.add(new SystemIfaceAdder(configuration));
+    passes.add(new InitVarTyper());
+    passes.add(new BitLogicCategorizer());
+    passes.add(new Typecheck());
+    passes.add(new SystemIfaceAdder());
 
-    passes.add(new RetStructIntroducer(configuration));
-    passes.add(new TupleAssignReduction(configuration));
+    passes.add(new RetStructIntroducer());
+    passes.add(new TupleAssignReduction());
     // passes.add(new ExprCutter());
 
     if (configuration.doDebugEvent()) {
-      passes.add(new DebugIface(configuration));
+      passes.add(new DebugIface());
       // only for debugging
       // passes.add(TypeChecker.class);
     }
 
-    passes.add(new AlwaysGreater(configuration));
+    passes.add(new AlwaysGreater());
 
-    passes.add(new ForReduction(configuration));
+    passes.add(new ForReduction());
 
-    passes.add(new TypeUplift(configuration));
-    passes.add(new CompareReplacer(configuration));
-    passes.add(new RangeConverter(configuration));
+    passes.add(new TypeUplift());
+    passes.add(new CompareReplacer());
+    passes.add(new RangeConverter());
 
-    passes.add(new BitnotFixer(configuration));
+    passes.add(new BitnotFixer());
 
-    passes.add(new Instantiation(configuration));
+    passes.add(new Instantiation());
 
-    passes.add(new HeaderWriter(configuration));
+    passes.add(new HeaderWriter());
 
-    passes.add(new ConstantPropagation(configuration));
+    passes.add(new ConstantPropagation());
 
     // Have to do it here since queue reduction creates enums
-    passes.add(new EnumReduction(configuration));
-    passes.add(new ConstantPropagation(configuration));
+    passes.add(new EnumReduction());
+    passes.add(new ConstantPropagation());
 
-    passes.add(new RemoveUnused(configuration));
+    passes.add(new RemoveUnused());
 
-    passes.add(new IfCutter(configuration));
+    passes.add(new IfCutter());
 
-    passes.add(new RangeReplacer(configuration));
-    passes.add(new RemoveUnused(configuration));
+    passes.add(new RangeReplacer());
+    passes.add(new RemoveUnused());
 
     passes.passes.add(optimize(passes, configuration));
 
     passes.passes.add(prepareForC(passes, configuration));
 
-    passes.add(new CWriter(configuration));
+    passes.add(new CWriter());
     return passes;
   }
 
   private static PassGroup produceXmlPass(Configuration configuration) {
     PassGroup passes = new PassGroup("ast");
     passes.add(new FileLoader(configuration));
-    passes.add(new DefaultVisitorPass(new MetadataRemover(), configuration));
+    passes.add(new DefaultVisitorPass(new MetadataRemover()));
     passes.add(new XmlWriterPass(configuration));
     return passes;
   }
@@ -188,38 +188,38 @@ public class PassFactory {
 
     passes.add(new FileLoader(configuration));
 
-    passes.add(new InternsAdder(configuration));
+    passes.add(new InternsAdder());
 
-    passes.add(new CheckNames(configuration));
-    passes.add(new Linker(configuration));
+    passes.add(new CheckNames());
+    passes.add(new Linker());
     if (configuration.doDocOutput()) {
-      passes.add(new DocWriter(configuration));
+      passes.add(new DocWriter());
     }
-    passes.add(new FileReduction(configuration));
+    passes.add(new FileReduction());
 
-    passes.add(new NamespaceLinkReduction(configuration));
-    passes.add(new StateLinkReduction(configuration));
-    passes.add(new EnumLinkReduction(configuration));
-    passes.add(new CompLinkReduction(configuration));
+    passes.add(new NamespaceLinkReduction());
+    passes.add(new StateLinkReduction());
+    passes.add(new EnumLinkReduction());
+    passes.add(new CompLinkReduction());
 
-    passes.add(new RootInstanceAdder(configuration));
+    passes.add(new RootInstanceAdder());
 
     // passes.add(new GlobalConstEval());
-    passes.add(new TemplCallAdder(configuration));
-    passes.add(new TypeCastAdder(configuration));
-    passes.add(new TypeEvalPass(configuration));
+    passes.add(new TemplCallAdder());
+    passes.add(new TypeCastAdder());
+    passes.add(new TypeEvalPass());
 
-    passes.add(new VarDefSplitter(configuration));
-    passes.add(new UnusedRemover(configuration));
-    passes.add(new StateVarInitExecutor(configuration));
-    passes.add(new UnusedRemover(configuration));
+    passes.add(new VarDefSplitter());
+    passes.add(new UnusedRemover());
+    passes.add(new StateVarInitExecutor());
+    passes.add(new UnusedRemover());
 
     // what was in FunToEvl
-    passes.add(new ReduceMultiAssignment(configuration));
-    passes.add(new ReduceRawComp(configuration));
+    passes.add(new ReduceMultiAssignment());
+    passes.add(new ReduceRawComp());
     // passes.add(new SimplifyRef());
     // passes.add(new CheckSimpleTypeRef());
-    passes.add(new ReduceVarDefInit(configuration));
+    passes.add(new ReduceVarDefInit());
 
     return passes;
   }
@@ -228,11 +228,11 @@ public class PassFactory {
     PassGroup cprep = new PassGroup("cout");
     cprep.checks.addAll(passes.checks);
 
-    cprep.add(new VarDeclToTop(configuration));
-    cprep.add(new TypeMerge(configuration));
-    cprep.add(new CRenamer(configuration));
-    cprep.add(new TypeSort(configuration));
-    cprep.add(new VarSort(configuration));
+    cprep.add(new VarDeclToTop());
+    cprep.add(new TypeMerge());
+    cprep.add(new CRenamer());
+    cprep.add(new TypeSort());
+    cprep.add(new VarSort());
     return cprep;
   }
 
@@ -240,14 +240,14 @@ public class PassFactory {
     PassGroup optimize = new PassGroup("optimize");
     optimize.checks.addAll(passes.checks);
 
-    optimize.add(new BlockReduction(configuration));
-    optimize.add(new NoCallEmptyFunc(configuration));
-    optimize.add(new RemoveUnused(configuration));
-    optimize.add(new FuncInliner(configuration));
-    optimize.add(new TautoExprDel(configuration));
-    optimize.add(new TautoStmtDel(configuration));
-    optimize.add(new RemoveUnused(configuration));
-    optimize.add(new BlockReduction(configuration));
+    optimize.add(new BlockReduction());
+    optimize.add(new NoCallEmptyFunc());
+    optimize.add(new RemoveUnused());
+    optimize.add(new FuncInliner());
+    optimize.add(new TautoExprDel());
+    optimize.add(new TautoStmtDel());
+    optimize.add(new RemoveUnused());
+    optimize.add(new BlockReduction());
     return optimize;
   }
 
@@ -255,14 +255,14 @@ public class PassFactory {
   private static PassGroup reduce(PassGroup passes, Configuration configuration) {
     PassGroup reduction = new PassGroup("reduction");
     reduction.checks.addAll(passes.checks);
-    reduction.add(new IntroduceConvert(configuration));
-    reduction.add(new OpenReplace(configuration));
-    reduction.add(new ElementaryReduction(configuration));
-    reduction.add(new CompositionReduction(configuration));
-    reduction.add(new HfsmReduction(configuration));
-    reduction.add(new ReduceAliasType(configuration));
-    reduction.add(new ReduceUnion(configuration));
-    reduction.add(new ReduceTuple(configuration));
+    reduction.add(new IntroduceConvert());
+    reduction.add(new OpenReplace());
+    reduction.add(new ElementaryReduction());
+    reduction.add(new CompositionReduction());
+    reduction.add(new HfsmReduction());
+    reduction.add(new ReduceAliasType());
+    reduction.add(new ReduceUnion());
+    reduction.add(new ReduceTuple());
     return reduction;
   }
 

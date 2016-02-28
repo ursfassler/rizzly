@@ -17,7 +17,6 @@
 
 package ast.pass.check.model;
 
-import main.Configuration;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.component.Component;
@@ -33,10 +32,7 @@ import error.RError;
  * Throws an error if an interface in the top component contains a query. Because we have to be sure that queries are
  * implement correctly.
  */
-public class Root extends AstPass {
-  public Root(Configuration configuration) {
-    super(configuration);
-  }
+public class Root implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

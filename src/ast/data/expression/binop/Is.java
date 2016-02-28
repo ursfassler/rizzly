@@ -18,7 +18,6 @@
 package ast.data.expression.binop;
 
 import ast.data.expression.Expression;
-import ast.visitor.Visitor;
 
 /**
  *

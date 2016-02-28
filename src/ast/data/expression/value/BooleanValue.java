@@ -17,7 +17,6 @@
 
 package ast.data.expression.value;
 
-import ast.visitor.Visitor;
 
 final public class BooleanValue extends ValueExpr {
   public final boolean value;

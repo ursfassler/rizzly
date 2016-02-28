@@ -18,7 +18,6 @@
 package ast.data.reference;
 
 import ast.meta.MetaList;
-import ast.visitor.Visitor;
 
 final public class RefName extends RefItem {
   public String name;

@@ -47,18 +47,16 @@ import ast.pass.input.xml.scanner.XmlToken;
 import error.RError;
 import error.RizzlyError;
 
-public class XmlParserPass extends AstPass {
+public class XmlParserPass implements AstPass {
   private final RizzlyError error = RError.instance();
   private final String filename;
 
   @Deprecated
   public XmlParserPass(Configuration configuration) {
-    super(configuration);
     this.filename = configuration.getRootPath() + configuration.getNamespace() + configuration.getExtension();
   }
 
-  public XmlParserPass(Configuration configuration, String filename) {
-    super(configuration);
+  public XmlParserPass(String filename) {
     this.filename = filename;
   }
 

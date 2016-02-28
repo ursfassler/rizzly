@@ -17,7 +17,6 @@
 
 package ast.data.component.composition;
 
-import ast.visitor.Visitor;
 
 final public class AsynchroniusConnection extends Connection {
 

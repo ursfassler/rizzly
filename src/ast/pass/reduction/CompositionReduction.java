@@ -18,13 +18,10 @@
 package ast.pass.reduction;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
-import main.Configuration;
 import util.Pair;
 import ast.copy.Copy;
 import ast.copy.Relinker;
@@ -75,26 +72,10 @@ import ast.knowledge.KnowledgeBase;
 import ast.meta.MetaList;
 import ast.pass.AstPass;
 import ast.repository.query.NameFilter;
-import ast.specification.AndSpec;
-import ast.specification.IsClass;
-import ast.specification.Specification;
 import error.ErrorType;
 import error.RError;
 
-public class CompositionReduction extends AstPass {
-  public CompositionReduction(Configuration configuration) {
-    super(configuration);
-  }
-
-  @Override
-  public Specification getPostcondition() {
-    Collection<Specification> specset = new HashSet<Specification>();
-    specset.add(new IsClass(Connection.class).not());
-    specset.add(new IsClass(EndpointSelf.class).not());
-    specset.add(new IsClass(EndpointSub.class).not());
-    specset.add(new IsClass(ImplComposition.class).not());
-    return new AndSpec(specset);
-  }
+public class CompositionReduction implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {

@@ -17,7 +17,6 @@
 
 package ast.data.function.template;
 
-import ast.visitor.Visitor;
 
 final public class DefaultValueTemplate extends FunctionTemplate {
   public DefaultValueTemplate() {

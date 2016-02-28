@@ -20,7 +20,6 @@ package ast.pass.reduction.hfsm;
 import java.util.Collection;
 import java.util.HashSet;
 
-import main.Configuration;
 import ast.data.AstList;
 import ast.data.Namespace;
 import ast.data.component.hfsm.ImplHfsm;
@@ -46,15 +45,11 @@ import ast.specification.Specification;
  * @author urs
  *
  */
-public class StateItemUplifter extends AstPass {
+public class StateItemUplifter implements AstPass {
   private final static Specification contentSpec = makeContentSpec();
   private final static Specification leafStateSpec = new IsClass(StateSimple.class);
   private final static Specification compStateSpec = new IsClass(StateComposite.class);
   private final static Specification renameSpec = contentSpec.or(leafStateSpec);
-
-  public StateItemUplifter(Configuration configuration) {
-    super(configuration);
-  }
 
   static private Specification makeContentSpec() {
     Collection<Specification> orSpecs = new HashSet<Specification>();
