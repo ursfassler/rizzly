@@ -80,7 +80,7 @@ public class CompositionGraphMaker {
     }
 
     for (ComponentUse use : TypeFilter.select(impl.getInstantiation(), ComponentUse.class)) {
-      ast.data.raw.RawComponent comptype = (RawComponent) ((LinkedAnchor) use.compRef.getAnchor()).getLink();
+      ast.data.raw.RawComponent comptype = (RawComponent) ((LinkedAnchor) use.getCompRef().getAnchor()).getLink();
       Designator subpath = kp.get(comptype);
       SubComponent sub = new SubComponent(use.metadata(), use.getName(), subpath, comptype.getName(), filterMetadata(use.metadata(), METADATA_KEY));
 
@@ -107,8 +107,8 @@ public class CompositionGraphMaker {
     }
 
     for (Connection con : impl.getConnection()) {
-      Interface src = getIface(((EndpointRaw) (con.getSrc())).ref, ifacemap, kb);
-      Interface dst = getIface(((EndpointRaw) (con.getDst())).ref, ifacemap, kb);
+      Interface src = getIface(((EndpointRaw) (con.getSrc())).getRef(), ifacemap, kb);
+      Interface dst = getIface(((EndpointRaw) (con.getDst())).getRef(), ifacemap, kb);
       ast.doc.compgraph.Connection ncon = new ast.doc.compgraph.Connection(src, dst, filterMetadata(con.metadata(), METADATA_KEY));
       src.getConnection().add(ncon);
       dst.getConnection().add(ncon);

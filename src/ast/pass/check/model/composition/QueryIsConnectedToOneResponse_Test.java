@@ -27,12 +27,18 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import ast.data.AstList;
+import ast.data.component.Component;
+import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.Connection;
 import ast.data.component.composition.EndpointSelf;
+import ast.data.component.composition.EndpointSub;
 import ast.data.component.composition.SynchroniusConnection;
+import ast.data.function.InterfaceFunction;
 import ast.data.function.header.FuncFunction;
+import ast.data.function.ret.FuncReturnTuple;
 import ast.data.reference.RefFactory;
 import ast.data.reference.RefItem;
+import ast.data.reference.Reference;
 import ast.data.variable.FunctionVariable;
 import ast.meta.MetaList;
 import error.ErrorType;
@@ -68,7 +74,7 @@ public class QueryIsConnectedToOneResponse_Test {
   }
 
   @Test
-  public void reports_an_error_when_a_query_is_connected_to_more_than_one_response() {
+  public void reports_an_error_when_a_query_is_connected_to_more_than_one_response_for_self_endpoint() {
     FuncFunction srcFunc = new FuncFunction("", new AstList<FunctionVariable>(), null, null);
 
     Connection connection1 = mock(Connection.class);
@@ -79,6 +85,36 @@ public class QueryIsConnectedToOneResponse_Test {
 
     Connection connection2 = mock(Connection.class);
     EndpointSelf src2 = selfEp(srcFunc);
+    Mockito.when(connection2.getSrc()).thenReturn(src2);
+    MetaList info2 = mock(MetaList.class);
+    Mockito.when(connection2.metadata()).thenReturn(info2);
+
+    AstList<Connection> connections = new AstList<Connection>();
+    connections.add(connection1);
+    connections.add(connection2);
+
+    testee.check(connections);
+
+    verify(error).err(ErrorType.Hint, "previous connection was here", info1);
+    verify(error).err(ErrorType.Error, "query needs exactly one connection, got more", info2);
+  }
+
+  @Test
+  public void reports_an_error_when_a_query_is_connected_to_more_than_one_response_for_sub_component() {
+    InterfaceFunction srcFunc = new InterfaceFunction("foo", new AstList<FunctionVariable>(), mock(FuncReturnTuple.class), null) {
+    };
+    Component component = new Component("") {
+    };
+    component.iface.add(srcFunc);
+
+    Connection connection1 = mock(Connection.class);
+    EndpointSub src1 = subEp(component, srcFunc);
+    Mockito.when(connection1.getSrc()).thenReturn(src1);
+    MetaList info1 = mock(MetaList.class);
+    Mockito.when(connection1.metadata()).thenReturn(info1);
+
+    Connection connection2 = mock(Connection.class);
+    EndpointSub src2 = subEp(component, srcFunc);
     Mockito.when(connection2.getSrc()).thenReturn(src2);
     MetaList info2 = mock(MetaList.class);
     Mockito.when(connection2.metadata()).thenReturn(info2);
@@ -121,4 +157,12 @@ public class QueryIsConnectedToOneResponse_Test {
     return new EndpointSelf(RefFactory.create(function, new AstList<RefItem>()));
   }
 
+  private EndpointSub subEp(Component component, InterfaceFunction function) {
+    Reference useref = mock(Reference.class);
+    Reference compref = mock(Reference.class);
+    ComponentUse compuse = new ComponentUse("", compref);
+    Mockito.when(useref.getTarget()).thenReturn(compuse);
+    Mockito.when(compref.getTarget()).thenReturn(component);
+    return new EndpointSub(useref, function.getName());
+  }
 }

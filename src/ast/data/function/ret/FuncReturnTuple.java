@@ -21,7 +21,7 @@ import ast.data.AstList;
 import ast.data.variable.FunctionVariable;
 import ast.meta.MetaList;
 
-final public class FuncReturnTuple extends FuncReturn {
+public class FuncReturnTuple extends FuncReturn {
   final public AstList<FunctionVariable> param;
 
   public FuncReturnTuple(AstList<FunctionVariable> param) {

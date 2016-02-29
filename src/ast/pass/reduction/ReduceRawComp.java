@@ -172,7 +172,7 @@ class ReduceEndpoint extends NullDispatcher<Endpoint, Void> {
 
   @Override
   protected Endpoint visitEndpointRaw(EndpointRaw obj, Void param) {
-    OffsetReference ref = (OffsetReference) obj.ref;
+    OffsetReference ref = (OffsetReference) obj.getRef();
 
     switch (ref.getOffset().size()) {
       case 0: {

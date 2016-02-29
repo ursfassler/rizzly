@@ -48,7 +48,9 @@ import ast.meta.MetaList;
 import ast.pass.AstPass;
 import ast.pass.check.model.composition.QueryIsConnectedToOneResponse;
 import ast.repository.query.Collector;
+import ast.repository.query.EndpointFunctionQuery;
 import ast.specification.IsClass;
+import ast.visitor.VisitExecutorImplementation;
 import error.ErrorType;
 import error.RError;
 
@@ -160,7 +162,7 @@ class CompInterfaceTypeCheckerWorker extends NullDispatcher<Void, Void> {
   }
 
   private Component checkIface(ImplComposition obj, ComponentUse use, Direction dir) {
-    Component type = (Component) use.compRef.getTarget();
+    Component type = (Component) use.getCompRef().getTarget();
     for (InterfaceFunction ifaceuse : type.getIface(dir)) {
       if (!ifaceIsConnected(use, ifaceuse, dir.other(), obj.connection)) {
         ErrorType etype;
@@ -180,7 +182,10 @@ class CompInterfaceTypeCheckerWorker extends NullDispatcher<Void, Void> {
     for (Connection itr : connection) {
       if (getEndpoint(itr, dir) instanceof EndpointSub) {
         EndpointSub ep = (EndpointSub) getEndpoint(itr, dir);
-        if ((ep.component.getTarget() == use) && (ep.getFunc() == ifaceuse)) {
+        EndpointFunctionQuery query = new EndpointFunctionQuery();
+        VisitExecutorImplementation.instance().visit(query, ep);
+        Function func = query.getFunction();
+        if ((ep.getComponent().getTarget() == use) && (func == ifaceuse)) {
           return true;
         }
       }
@@ -192,7 +197,10 @@ class CompInterfaceTypeCheckerWorker extends NullDispatcher<Void, Void> {
     for (Connection itr : connection) {
       if (getEndpoint(itr, dir) instanceof EndpointSelf) {
         Endpoint ep = getEndpoint(itr, dir);
-        if (ep.getFunc() == ifaceuse) {
+        EndpointFunctionQuery query = new EndpointFunctionQuery();
+        VisitExecutorImplementation.instance().visit(query, ep);
+        Function func = query.getFunction();
+        if (func == ifaceuse) {
           return true;
         }
       }
@@ -246,7 +254,9 @@ class CompInterfaceTypeCheckerWorker extends NullDispatcher<Void, Void> {
   }
 
   private Function getIfaceFunc(Endpoint ep) {
-    Function func = ep.getFunc();
+    EndpointFunctionQuery query = new EndpointFunctionQuery();
+    VisitExecutorImplementation.instance().visit(query, ep);
+    Function func = query.getFunction();
     if (func == null) {
       RError.err(ErrorType.Error, "Interface not found: " + ep.toString(), ep.metadata());
     }

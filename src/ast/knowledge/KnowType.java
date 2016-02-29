@@ -261,7 +261,7 @@ class KnowTypeTraverser extends NullDispatcher<Type, Void> {
 
   @Override
   protected Type visitCompUse(ComponentUse obj, Void param) {
-    return visit(obj.compRef, param);
+    return visit(obj.getCompRef(), param);
   }
 
   @Override

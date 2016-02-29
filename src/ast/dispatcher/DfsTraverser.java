@@ -479,19 +479,19 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
 
   @Override
   protected R visitEndpointSelf(EndpointSelf obj, P param) {
-    visit(obj.funcRef, param);
+    visit(obj.getFuncRef(), param);
     return null;
   }
 
   @Override
   protected R visitEndpointSub(EndpointSub obj, P param) {
-    visit(obj.component, param);
+    visit(obj.getComponent(), param);
     return null;
   }
 
   @Override
   protected R visitEndpointRaw(EndpointRaw obj, P param) {
-    visit(obj.ref, param);
+    visit(obj.getRef(), param);
     return null;
   }
 
@@ -810,7 +810,7 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
 
   @Override
   protected R visitCompUse(ComponentUse obj, P param) {
-    visit(obj.compRef, param);
+    visit(obj.getCompRef(), param);
     return null;
   }
 

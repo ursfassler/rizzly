@@ -59,7 +59,7 @@ public class ElementaryInstantiation implements AstPass {
     ComponentUse instComp = kb.getRootComp();
     ast.children.remove(instComp);
 
-    ImplElementary env = makeEnv((Component) instComp.compRef.getTarget(), kb);
+    ImplElementary env = makeEnv((Component) instComp.getCompRef().getTarget(), kb);
     ast.children.add(env);
 
     CompInstantiatorWorker instantiator = new CompInstantiatorWorker();
@@ -73,7 +73,7 @@ public class ElementaryInstantiation implements AstPass {
     Set<Function> pubfunc = new HashSet<Function>();
     pubfunc.addAll(Collector.select(inst.subCallback, new IsClass(Function.class)).castTo(Function.class));
     RError.ass(inst.component.size() == 1, inst.metadata(), "Only expected one instance");
-    Component targetComp = (Component) inst.component.get(0).compRef.getTarget();
+    Component targetComp = (Component) inst.component.get(0).getCompRef().getTarget();
     pubfunc.addAll(targetComp.iface);
 
     for (Function nam : pubfunc) {
@@ -96,7 +96,7 @@ public class ElementaryInstantiation implements AstPass {
     for (ComponentUse compu : env.component) {
       SubCallbacks suc = new SubCallbacks(compu.metadata(), RefFactory.create(compu));
       env.subCallback.add(suc);
-      Component refComp = (Component) compu.compRef.getTarget();
+      Component refComp = (Component) compu.getCompRef().getTarget();
       for (InterfaceFunction out : refComp.getIface(Direction.out)) {
         Function suha = CompositionReduction.makeHandler(out);
         suha.property = FunctionProperty.External;
@@ -135,12 +135,12 @@ class CompInstantiatorWorker extends NullDispatcher<ImplElementary, Namespace> {
     // ns.getChildren().removeAll(ns.getChildren().getItems(FuncCtrlOutDataOut.class));
 
     for (ComponentUse compUse : inst.component) {
-      Component comp = (Component) compUse.compRef.getTarget();
+      Component comp = (Component) compUse.getCompRef().getTarget();
 
       // copy / instantiate used component
       Namespace usens = new Namespace(compUse.metadata(), compUse.getName());
       ImplElementary cpy = visit(comp, usens);
-      compUse.compRef = CompRefFactory.create(compUse.metadata(), cpy);
+      compUse.setCompRef(CompRefFactory.create(compUse.metadata(), cpy));
       ns.children.add(usens);
       linkmap.put(compUse, usens);
 

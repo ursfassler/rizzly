@@ -17,15 +17,13 @@
 
 package ast.data.component.composition;
 
-import ast.data.component.Component;
-import ast.data.function.Function;
+import ast.data.AstBase;
 import ast.data.reference.Reference;
 import ast.meta.MetaList;
-import ast.repository.query.NameFilter;
 
-final public class EndpointSub extends Endpoint {
-  final public Reference component;
-  final public String function;
+public class EndpointSub extends AstBase implements Endpoint {
+  private final Reference component;
+  private final String function;
 
   public EndpointSub(Reference component, String function) {
     this.component = component;
@@ -39,16 +37,17 @@ final public class EndpointSub extends Endpoint {
     this.function = function;
   }
 
-  @Override
-  public Function getFunc() {
-    ComponentUse compRef = (ComponentUse) component.getTarget();
-    Component comp = (Component) compRef.compRef.getTarget();
-    return NameFilter.select(comp.iface, function);
+  public Reference getComponent() {
+    return component;
+  }
+
+  public String getFunction() {
+    return function;
   }
 
   @Override
   public String toString() {
-    return component.getTarget().getName() + "." + function;
+    return getComponent().getTarget().getName() + "." + getFunction();
   }
 
 }

@@ -241,7 +241,7 @@ public class CopyAst extends NullDispatcher<Ast, Void> {
 
   @Override
   protected Ast visitCompUse(ComponentUse obj, Void param) {
-    return new ComponentUse(obj.getName(), copy(obj.compRef)); // we keep
+    return new ComponentUse(obj.getName(), copy(obj.getCompRef())); // we keep
     // link to
     // old type
   }
@@ -314,7 +314,7 @@ public class CopyAst extends NullDispatcher<Ast, Void> {
 
   @Override
   protected Ast visitEndpointRaw(EndpointRaw obj, Void param) {
-    return new EndpointRaw(copy(obj.ref));
+    return new EndpointRaw(copy(obj.getRef()));
   }
 
   @Override

@@ -58,7 +58,7 @@ public class CompCascadeDepth extends NullDispatcher<Integer, Void> {
   protected Integer visitImplElementary(ImplElementary obj, Void param) {
     int max = 0;
     for (ComponentUse itr : obj.component) {
-      max = Math.max(max, visit(itr.compRef.getTarget(), param));
+      max = Math.max(max, visit(itr.getCompRef().getTarget(), param));
     }
     return max + 1;
   }
@@ -67,7 +67,7 @@ public class CompCascadeDepth extends NullDispatcher<Integer, Void> {
   protected Integer visitImplComposition(ImplComposition obj, Void param) {
     int max = 0;
     for (ComponentUse itr : obj.component) {
-      max = Math.max(max, visit(itr.compRef.getTarget(), param));
+      max = Math.max(max, visit(itr.getCompRef().getTarget(), param));
     }
     return max + 1;
   }

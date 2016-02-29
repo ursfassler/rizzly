@@ -71,7 +71,9 @@ import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowledgeBase;
 import ast.meta.MetaList;
 import ast.pass.AstPass;
+import ast.repository.query.EndpointFunctionQuery;
 import ast.repository.query.NameFilter;
+import ast.visitor.VisitExecutorImplementation;
 import error.ErrorType;
 import error.RError;
 
@@ -149,7 +151,7 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
       SubCallbacks suc = new SubCallbacks(RefFactory.create(info, compu));
       suc.metadata().add(compu.metadata());
       elem.subCallback.add(suc);
-      Component usedComp = (Component) compu.compRef.getTarget();
+      Component usedComp = (Component) compu.getCompRef().getTarget();
       for (InterfaceFunction out : usedComp.getIface(Direction.out)) {
         Function suha = CompositionReduction.makeHandler(out);
         suc.func.add(suha);
@@ -161,7 +163,9 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
       Endpoint src = con.getSrc();
 
       if (src instanceof EndpointSelf) {
-        Function coniface = src.getFunc();
+        EndpointFunctionQuery query = new EndpointFunctionQuery();
+        VisitExecutorImplementation.instance().visit(query, src);
+        Function coniface = query.getFunction();
 
         if (coniface instanceof Response) {
           // assert (elem.getResponse().contains(coniface));
@@ -177,9 +181,9 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
           RError.err(ErrorType.Fatal, "Unexpected function type: " + coniface.getClass().getSimpleName(), coniface.metadata());
         }
       } else {
-        ComponentUse srcCompRef = (ComponentUse) ((EndpointSub) src).component.getTarget();
-        Component srcComp = (Component) srcCompRef.compRef.getTarget();
-        InterfaceFunction funa = NameFilter.select(srcComp.iface, ((EndpointSub) src).function);
+        ComponentUse srcCompRef = (ComponentUse) ((EndpointSub) src).getComponent().getTarget();
+        Component srcComp = (Component) srcCompRef.getCompRef().getTarget();
+        InterfaceFunction funa = NameFilter.select(srcComp.iface, ((EndpointSub) src).getFunction());
         Function coniface = funa;
 
         Function suha = coca.get(new Pair<ComponentUse, Function>(srcCompRef, coniface));
@@ -261,23 +265,31 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
   }
 
   static private Reference epToRef(Endpoint ep) {
+    EndpointFunctionQuery query = new EndpointFunctionQuery();
+    VisitExecutorImplementation.instance().visit(query, ep);
+    Function func = query.getFunction();
+
     if (ep instanceof EndpointSelf) {
-      return RefFactory.create(ep.metadata(), ((EndpointSelf) ep).getFunc());
+      return RefFactory.create(ep.metadata(), func);
     } else {
       EndpointSub eps = (EndpointSub) ep;
-      OffsetReference ref = RefFactory.create(eps.metadata(), eps.component.getTarget(), new AstList<RefItem>());
-      ref.getOffset().add(new RefName(eps.metadata(), eps.function));
+      OffsetReference ref = RefFactory.create(eps.metadata(), eps.getComponent().getTarget(), new AstList<RefItem>());
+      ref.getOffset().add(new RefName(eps.metadata(), eps.getFunction()));
       return ref;
     }
   }
 
   static private OffsetReference oldEpToRef(Endpoint ep) {
     if (ep instanceof EndpointSelf) {
-      return RefFactory.withOffset(ep.metadata(), ((EndpointSelf) ep).getFunc());
+      EndpointFunctionQuery query = new EndpointFunctionQuery();
+      VisitExecutorImplementation.instance().visit(query, ep);
+      Function func = query.getFunction();
+
+      return RefFactory.withOffset(ep.metadata(), func);
     } else {
       EndpointSub eps = (EndpointSub) ep;
-      OffsetReference ref = RefFactory.withOffset(eps.metadata(), eps.component.getTarget());
-      ref.getOffset().add(new RefName(eps.metadata(), eps.function));
+      OffsetReference ref = RefFactory.withOffset(eps.metadata(), eps.getComponent().getTarget());
+      ref.getOffset().add(new RefName(eps.metadata(), eps.getFunction()));
       return ref;
     }
   }
@@ -285,9 +297,9 @@ class CompositionReductionWorker extends NullDispatcher<Ast, Void> {
   private Reference getQueue(Endpoint ep, Component comp) {
     OffsetReference ref;
     if (ep instanceof EndpointSub) {
-      ComponentUse compUse = (ComponentUse) ((EndpointSub) ep).component.getTarget();
+      ComponentUse compUse = (ComponentUse) ((EndpointSub) ep).getComponent().getTarget();
       ref = RefFactory.withOffset(ep.metadata(), compUse);
-      Component refComp = (Component) compUse.compRef.getTarget();
+      Component refComp = (Component) compUse.getCompRef().getTarget();
       Queue queue = refComp.queue;
       ref.getOffset().add(new RefName(queue.getName()));
     } else {

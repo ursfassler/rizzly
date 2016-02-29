@@ -327,8 +327,6 @@ Scenario: Queries need to be connected
   And stderr should contain "dummy.rzy:8:3: Error: Interface testee.ask not connected"
 
 
-#TODO fix
-@fixme
 Scenario: Queries can not have more than one destination
   Given we have a file "dummy2.rzy" with the content:
     """
@@ -360,5 +358,5 @@ Scenario: Queries can not have more than one destination
   When I start rizzly with the file "dummy2.rzy"
 
   Then I expect an error code
-  And stderr should contain "dummy2.rzy:21:7: Error: TODO some nice error message"
+  And stderr should contain "dummy2.rzy:21:14: Error: query needs exactly one connection, got more"
 

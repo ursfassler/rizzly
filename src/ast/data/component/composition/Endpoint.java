@@ -17,10 +17,8 @@
 
 package ast.data.component.composition;
 
-import ast.data.AstBase;
-import ast.data.function.Function;
+import ast.data.Ast;
 
-abstract public class Endpoint extends AstBase {
+public interface Endpoint extends Ast {
 
-  abstract public Function getFunc();
 }

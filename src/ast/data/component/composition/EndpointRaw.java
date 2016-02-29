@@ -17,12 +17,12 @@
 
 package ast.data.component.composition;
 
-import ast.data.function.Function;
+import ast.data.AstBase;
 import ast.data.reference.Reference;
 import ast.meta.MetaList;
 
-final public class EndpointRaw extends Endpoint {
-  public Reference ref;
+public class EndpointRaw extends AstBase implements Endpoint {
+  private Reference ref;
 
   public EndpointRaw(Reference ref) {
     this.ref = ref;
@@ -34,9 +34,8 @@ final public class EndpointRaw extends Endpoint {
     this.ref = ref;
   }
 
-  @Override
-  public Function getFunc() {
-    return (Function) ref.getTarget();
+  public Reference getRef() {
+    return ref;
   }
 
 }

@@ -17,12 +17,12 @@
 
 package ast.data.component.composition;
 
-import ast.data.function.Function;
+import ast.data.AstBase;
 import ast.data.reference.Reference;
 import ast.meta.MetaList;
 
-final public class EndpointSelf extends Endpoint {
-  final public Reference funcRef;
+public class EndpointSelf extends AstBase implements Endpoint {
+  private final Reference funcRef;
 
   public EndpointSelf(Reference funcRef) {
     this.funcRef = funcRef;
@@ -34,14 +34,13 @@ final public class EndpointSelf extends Endpoint {
     this.funcRef = funcRef;
   }
 
-  @Override
-  public Function getFunc() {
-    return (Function) funcRef.getTarget();
+  public Reference getFuncRef() {
+    return funcRef;
   }
 
   @Override
   public String toString() {
-    return "self." + funcRef.getTarget().getName();
+    return "self." + getFuncRef().getTarget().getName();
   }
 
 }

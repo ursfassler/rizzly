@@ -252,7 +252,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   protected Void visitCompUse(ast.data.component.composition.ComponentUse obj, Void param) {
     xw.wa(obj.getName(), getId(obj));
     xw.wr(": ");
-    visit(obj.compRef, null);
+    visit(obj.getCompRef(), null);
     xw.wr(";");
     xw.nl();
     writeMeta(obj);
@@ -1411,21 +1411,21 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
 
   @Override
   protected Void visitEndpointRaw(EndpointRaw obj, Void param) {
-    visit(obj.ref, param);
+    visit(obj.getRef(), param);
     return null;
   }
 
   @Override
   protected Void visitEndpointSelf(EndpointSelf obj, Void param) {
-    visit(obj.funcRef, param);
+    visit(obj.getFuncRef(), param);
     return null;
   }
 
   @Override
   protected Void visitEndpointSub(EndpointSub obj, Void param) {
-    visit(obj.component, param);
+    visit(obj.getComponent(), param);
     xw.kw(".");
-    xw.wr(obj.function);
+    xw.wr(obj.getFunction());
     return null;
   }
 

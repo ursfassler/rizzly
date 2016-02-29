@@ -36,7 +36,7 @@ public class Root implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    Reference reference = kb.getRootComp().compRef;
+    Reference reference = kb.getRootComp().getCompRef();
     Component root = (Component) reference.getTarget();
 
     AstList<FuncQuery> queries = new AstList<FuncQuery>();

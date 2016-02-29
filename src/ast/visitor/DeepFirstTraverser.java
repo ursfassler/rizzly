@@ -495,19 +495,19 @@ public class DeepFirstTraverser implements Visitor {
 
   public void visit(EndpointSelf object) {
     preorderVisit(object);
-    executeVisit(object.funcRef);
+    executeVisit(object.getFuncRef());
     postorderVisit(object);
   }
 
   public void visit(EndpointSub object) {
     preorderVisit(object);
-    executeVisit(object.component);
+    executeVisit(object.getComponent());
     postorderVisit(object);
   }
 
   public void visit(EndpointRaw object) {
     preorderVisit(object);
-    executeVisit(object.ref);
+    executeVisit(object.getRef());
     postorderVisit(object);
   }
 
@@ -811,7 +811,7 @@ public class DeepFirstTraverser implements Visitor {
 
   public void visit(ComponentUse object) {
     preorderVisit(object);
-    executeVisit(object.compRef);
+    executeVisit(object.getCompRef());
     postorderVisit(object);
   }
 

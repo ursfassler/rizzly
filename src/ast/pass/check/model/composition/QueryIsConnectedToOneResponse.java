@@ -20,14 +20,12 @@ package ast.pass.check.model.composition;
 import java.util.HashMap;
 import java.util.Map;
 
-import util.Pair;
 import ast.data.AstList;
-import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.Connection;
 import ast.data.component.composition.Endpoint;
-import ast.data.function.Function;
 import ast.data.function.ret.FuncReturn;
 import ast.data.function.ret.FuncReturnNone;
+import ast.repository.query.EndpointFunctionQuery;
 import ast.visitor.VisitExecutorImplementation;
 import error.ErrorType;
 import error.RizzlyError;
@@ -42,18 +40,17 @@ public class QueryIsConnectedToOneResponse {
 
   // TODO this does not work since the endpoints can not be compared with equals
   public void check(AstList<Connection> connections) {
-    Map<Pair<ComponentUse, Function>, Connection> graph = new HashMap<Pair<ComponentUse, Function>, Connection>();
+    Map<EndpointDescriptor, Connection> graph = new HashMap<EndpointDescriptor, Connection>();
 
     for (Connection connection : connections) {
-      if (isQuery(connection)) {
-        Endpoint endpoint = connection.getSrc();
-        Pair<ComponentUse, Function> query = getDescriptor(endpoint);
+      Endpoint endpoint = connection.getSrc();
+      EndpointDescriptor query = getDescriptor(endpoint);
 
+      if (isQuery(query)) {
         if (graph.containsKey(query)) {
           Connection oldConnection = graph.get(query);
           error.err(ErrorType.Hint, "previous connection was here", oldConnection.metadata());
           error.err(ErrorType.Error, "query needs exactly one connection, got more", connection.metadata());
-
         } else {
           graph.put(query, connection);
         }
@@ -62,16 +59,15 @@ public class QueryIsConnectedToOneResponse {
 
   }
 
-  private boolean isQuery(Connection connection) {
-    Endpoint ep = connection.getSrc();
-    FuncReturn ret = ep.getFunc().ret;
+  private boolean isQuery(EndpointDescriptor descriptor) {
+    FuncReturn ret = descriptor.function.ret;
     return !(ret instanceof FuncReturnNone);
   }
 
-  private Pair<ComponentUse, Function> getDescriptor(Endpoint endpoint) {
-    EndpointDescriptorBuilder visitor = new EndpointDescriptorBuilder();
-    (new VisitExecutorImplementation()).visit(visitor, endpoint);
-    return visitor.descriptor;
+  private EndpointDescriptor getDescriptor(Endpoint endpoint) {
+    EndpointFunctionQuery visitor = new EndpointFunctionQuery();
+    VisitExecutorImplementation.instance().visit(visitor, endpoint);
+    return new EndpointDescriptor(visitor.getComponentType(), visitor.getInstanceName(), visitor.getFunction());
   }
 
 }

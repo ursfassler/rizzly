@@ -72,7 +72,7 @@ class CompLinkReductionWorker extends NullDispatcher<Void, Void> {
 
   @Override
   protected Void visitCompUse(ComponentUse obj, Void param) {
-    OffsetReference compRef = (OffsetReference) obj.compRef;
+    OffsetReference compRef = (OffsetReference) obj.getCompRef();
     LinkedAnchor anchor = (LinkedAnchor) compRef.getAnchor();
     Named item = anchor.getLink();
 

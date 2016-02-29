@@ -161,7 +161,7 @@ class SystemIfaceCaller extends NullDispatcher<Void, Void> {
     {
       ArrayList<Statement> code = new ArrayList<Statement>();
       for (ComponentUse cuse : compList) {
-        Function sctor = getCtor((Component) cuse.compRef.getTarget());
+        Function sctor = getCtor((Component) cuse.getCompRef().getTarget());
         CallStmt call = makeCall(cuse, sctor);
         code.add(call);
       }
@@ -175,7 +175,7 @@ class SystemIfaceCaller extends NullDispatcher<Void, Void> {
       code.add(makeCall((Function) obj.exitFunc.getTarget()));
       Collections.reverse(compList);
       for (ComponentUse cuse : compList) {
-        Function sdtor = getDtor((Component) cuse.compRef.getTarget());
+        Function sdtor = getDtor((Component) cuse.getCompRef().getTarget());
         CallStmt call = makeCall(cuse, sdtor);
         code.add(call);
       }

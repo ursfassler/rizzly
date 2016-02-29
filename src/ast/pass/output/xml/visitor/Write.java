@@ -287,7 +287,7 @@ public class Write implements Visitor {
     writer.attribute("name", object.getName());
     executor.visit(idWriter, object);
     executor.visit(this, object.metadata());
-    executor.visit(this, object.compRef);
+    executor.visit(this, object.getCompRef());
     writer.endNode();
   }
 

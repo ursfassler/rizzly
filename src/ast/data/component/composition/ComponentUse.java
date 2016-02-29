@@ -22,7 +22,7 @@ import ast.data.reference.Reference;
 import ast.meta.MetaList;
 
 public class ComponentUse extends Named {
-  public Reference compRef;
+  private Reference compRef;
 
   public ComponentUse(String name, Reference compRef) {
     setName(name);
@@ -33,6 +33,15 @@ public class ComponentUse extends Named {
   public ComponentUse(MetaList info, String name, Reference compRef) {
     metadata().add(info);
     setName(name);
+    this.compRef = compRef;
+  }
+
+  public Reference getCompRef() {
+    return compRef;
+  }
+
+  @Deprecated
+  public void setCompRef(Reference compRef) {
     this.compRef = compRef;
   }
 
