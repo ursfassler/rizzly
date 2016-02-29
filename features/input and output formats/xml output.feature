@@ -9,7 +9,11 @@ Scenario: write the AST of the simplest rizzly file to an xml file
 
     """
 
-  When I start rizzly with the file "testee.rzy" and the xml backend
+  When I start rizzly with the passes
+    | pass                     |
+    | rzyreader('.', 'testee') |
+    | metadataremover          |
+    | xmlwriter('testee.xml')  |
   
   Then I expect no error
   And I expect an xml file "testee.xml" with the content:
@@ -31,8 +35,12 @@ Scenario: write the AST of a elementary component to an xml file
 
     """
 
-  When I start rizzly with the file "testee.rzy" and the xml backend
-  
+  When I start rizzly with the passes
+    | pass                     |
+    | rzyreader('.', 'testee') |
+    | metadataremover          |
+    | xmlwriter('testee.xml')  |
+    
   Then I expect no error
   And I expect an xml file "testee.xml" with the content:
     """
@@ -70,7 +78,10 @@ Scenario: read in a simple xml and output it results in the same xml
 
     """
 
-  When I start rizzly with the file "testee.xml" and the xml backend
+  When I start rizzly with the passes
+    | pass                     |
+    | xmlreader('testee.xml')  |
+    | xmlwriter('testee.xml')  |
   
   Then I expect no error
   And I expect an xml file "testee.xml" with the content:

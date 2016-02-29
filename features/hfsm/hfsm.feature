@@ -52,7 +52,7 @@ Scenario: Unreachable states are detected
   When I start rizzly with the file "unusedState.rzy"
 
   Then I expect no error
-#  And stdout should contain "unusedState.rzy:7:3: Error: Unused state: C"
+  And stdout should contain "unusedState.rzy:7:3: Warning: Unused state: C"
 
 
 Scenario: a state can have a variable

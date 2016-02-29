@@ -22,15 +22,13 @@ import java.util.List;
 import ast.Designator;
 
 public class WritableConfiguration implements Configuration {
-  private String extension;
   private String rootPath;
   private String namespace;
   private Designator rootComp;
   private boolean debugEvent;
   private boolean docOutput;
   private boolean lazyModelCheck;
-  private boolean xml;
-  private FileType fileType;
+  private PassBuilding fileType;
   private List<String> passes;
 
   @Override
@@ -56,11 +54,6 @@ public class WritableConfiguration implements Configuration {
   @Override
   public boolean doDocOutput() {
     return isDocOutput();
-  }
-
-  @Override
-  public String getExtension() {
-    return extension;
   }
 
   public void setRootPath(String rootPath) {
@@ -95,19 +88,6 @@ public class WritableConfiguration implements Configuration {
     this.lazyModelCheck = lazyModelCheck;
   }
 
-  public void setExtension(String extension) {
-    this.extension = extension;
-  }
-
-  @Override
-  public boolean doXml() {
-    return xml;
-  }
-
-  public void setXml(boolean xml) {
-    this.xml = xml;
-  }
-
   @Override
   public String getNamespace() {
     return namespace;
@@ -118,11 +98,11 @@ public class WritableConfiguration implements Configuration {
   }
 
   @Override
-  public FileType parseAs() {
+  public PassBuilding passBuilding() {
     return fileType;
   }
 
-  public void setFileType(FileType value) {
+  public void setPassBuilding(PassBuilding value) {
     fileType = value;
   }
 

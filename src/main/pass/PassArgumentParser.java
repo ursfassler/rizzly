@@ -19,7 +19,16 @@ package main.pass;
 
 import java.util.LinkedList;
 
+import ast.meta.MetaListImplementation;
+import error.ErrorType;
+import error.RizzlyError;
+
 public class PassArgumentParser {
+  private final RizzlyError error;
+
+  public PassArgumentParser(RizzlyError error) {
+    this.error = error;
+  }
 
   public LinkedList<String> parse(String value) {
     if (value.isEmpty()) {
@@ -38,6 +47,9 @@ public class PassArgumentParser {
     LinkedList<String> list = new LinkedList<String>();
     list.add(value.substring(0, nameEnd).trim());
     int argEnd = value.indexOf(')', nameEnd);
+    if (argEnd < 0) {
+      error.err(ErrorType.Error, "Missing closing parentheses: " + value, new MetaListImplementation());
+    }
     String argString = value.substring(nameEnd + 1, argEnd);
     list.addAll(parseArguments(argString.trim()));
     return list;

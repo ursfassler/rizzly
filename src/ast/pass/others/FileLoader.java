@@ -36,10 +36,19 @@ import ast.repository.query.List;
 import ast.specification.HasName;
 
 public class FileLoader implements AstPass {
-  private final Configuration configuration;
+  private final String rootpath;
+  private final Designator rootfile;
 
-  public FileLoader(Configuration configuration) {
-    this.configuration = configuration;
+  @Deprecated
+  public static FileLoader create(Configuration configuration) {
+    String rootpath = configuration.getRootPath() + File.separator;
+    Designator rootfile = configuration.getRootComp().sub(0, configuration.getRootComp().size() - 1);
+    return new FileLoader(rootpath, rootfile);
+  }
+
+  public FileLoader(String rootpath, Designator rootfile) {
+    this.rootpath = rootpath + File.separator;
+    this.rootfile = rootfile;
   }
 
   @Override
@@ -47,7 +56,7 @@ public class FileLoader implements AstPass {
     Set<Designator> loaded = new HashSet<Designator>();
     Queue<Designator> loadQueue = new LinkedList<Designator>();
 
-    loadQueue.add(getRoot(kb));
+    loadQueue.add(rootfile);
 
     while (!loadQueue.isEmpty()) {
       Designator lname = loadQueue.poll();
@@ -64,10 +73,6 @@ public class FileLoader implements AstPass {
     }
   }
 
-  private Designator getRoot(KnowledgeBase kb) {
-    return kb.getOptions().getRootComp().sub(0, kb.getOptions().getRootComp().size() - 1);
-  }
-
   private RizzlyFile loadFile(KnowledgeBase kb, Designator lname) {
     String filename = getFilename(kb, lname);
 
@@ -80,7 +85,7 @@ public class FileLoader implements AstPass {
   }
 
   private String getFilename(KnowledgeBase kb, Designator lname) {
-    return kb.getOptions().getRootPath() + lname.toString(File.separator) + configuration.getExtension();
+    return rootpath + lname.toString(File.separator) + ".rzy";
   }
 
   private void addItem(Namespace root, Designator path, Ast item) {

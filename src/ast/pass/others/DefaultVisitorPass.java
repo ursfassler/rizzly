@@ -31,6 +31,10 @@ public class DefaultVisitorPass implements AstPass {
     this.visitor = visitor;
   }
 
+  public Visitor getVisitor() {
+    return visitor;
+  }
+
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
     DeepFirstTraverser allVisitor = new DeepFirstTraverser();

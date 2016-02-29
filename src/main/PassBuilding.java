@@ -17,9 +17,7 @@
 
 package main;
 
-//TODO not used when we only have a normal/automatic invokation and one with all passes explicit specified
-@Deprecated
-public enum FileType {
-  Rizzly, Xml
+public enum PassBuilding {
+  Automatic, Specified
 
 }

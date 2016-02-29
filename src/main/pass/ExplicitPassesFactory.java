@@ -17,16 +17,21 @@
 
 package main.pass;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import ast.Designator;
 import ast.meta.MetaListImplementation;
 import ast.pass.AstPass;
 import ast.pass.input.xml.XmlParserPass;
 import ast.pass.linker.Linker;
+import ast.pass.others.DefaultVisitorPass;
+import ast.pass.others.FileLoader;
 import ast.pass.output.xml.XmlWriterPass;
+import ast.pass.reduction.MetadataRemover;
 import error.ErrorType;
 import error.RizzlyError;
 
@@ -43,6 +48,8 @@ public class ExplicitPassesFactory {
     factories.put("linker", new LinkerFactory());
     factories.put("xmlreader", new XmlReaderFactory());
     factories.put("xmlwriter", new XmlWriterFactory());
+    factories.put("rzyreader", new RzyReaderFactory());
+    factories.put("metadataremover", new MetadataremoverFactory());
   }
 
   public AstPass produce(String call) {
@@ -63,23 +70,38 @@ public class ExplicitPassesFactory {
 
   private AstPass createPass(String passName, LinkedList<String> arguments) {
     SinglePassFactory factory = factories.get(passName);
-    verify(factory, arguments);
+    verify(passName, factory, arguments);
     return factory.create(arguments);
   }
 
-  private void verify(SinglePassFactory factory, LinkedList<String> arguments) {
+  private void verify(String passName, SinglePassFactory factory, LinkedList<String> arguments) {
     if (factory.expectedArgumentCount() != arguments.size()) {
-      error.err(ErrorType.Error, "pass xmlreader expected " + factory.expectedArgumentCount() + " argument but " + arguments.size() + " provided", new MetaListImplementation());
+      error.err(ErrorType.Error, "pass " + passName + " expected " + factory.expectedArgumentCount() + " argument but " + arguments.size() + " provided", new MetaListImplementation());
       throw new RuntimeException();
     }
   }
-
 }
 
 interface SinglePassFactory {
   public AstPass create(List<String> arguments);
 
   public int expectedArgumentCount();
+}
+
+class RzyReaderFactory implements SinglePassFactory {
+
+  @Override
+  public AstPass create(List<String> arguments) {
+    String rootpath = arguments.get(0);
+    String[] names = arguments.get(1).split("\\.");
+    Designator root = new Designator(Arrays.asList(names));
+    return new FileLoader(rootpath, root);
+  }
+
+  @Override
+  public int expectedArgumentCount() {
+    return 2;
+  }
 }
 
 class XmlReaderFactory implements SinglePassFactory {
@@ -112,6 +134,18 @@ class LinkerFactory implements SinglePassFactory {
   @Override
   public AstPass create(List<String> arguments) {
     return new Linker();
+  }
+
+  @Override
+  public int expectedArgumentCount() {
+    return 0;
+  }
+}
+
+class MetadataremoverFactory implements SinglePassFactory {
+  @Override
+  public AstPass create(List<String> arguments) {
+    return new DefaultVisitorPass(new MetadataRemover());
   }
 
   @Override

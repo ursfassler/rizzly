@@ -17,13 +17,23 @@
 
 package main.pass;
 
+import static org.mockito.Matchers.any;
+import static org.mockito.Matchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+
 import java.util.LinkedList;
 
 import org.junit.Assert;
 import org.junit.Test;
 
+import ast.meta.MetaList;
+import error.ErrorType;
+import error.RizzlyError;
+
 public class PassArgumentParser_Test {
-  private final PassArgumentParser testee = new PassArgumentParser();
+  private final RizzlyError error = mock(RizzlyError.class);
+  private final PassArgumentParser testee = new PassArgumentParser(error);
 
   @Test
   public void returns_nothing_when_nothing_is_passed() {
@@ -62,6 +72,16 @@ public class PassArgumentParser_Test {
     Assert.assertEquals(list("test", " x"), testee.parse("test(' x')"));
     Assert.assertEquals(list("test", "x "), testee.parse("test('x ')"));
     Assert.assertEquals(list("test", "x y"), testee.parse("test('x y')"));
+  }
+
+  @Test
+  public void sane_error_message_for_missing_closing_parentheses() {
+    try {
+      testee.parse("test(");
+    } catch (RuntimeException e) {
+    }
+
+    verify(error).err(eq(ErrorType.Error), eq("Missing closing parentheses: test("), any(MetaList.class));
   }
 
   private LinkedList<String> list() {

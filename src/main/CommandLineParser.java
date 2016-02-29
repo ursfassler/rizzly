@@ -20,9 +20,7 @@ package main;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
@@ -42,13 +40,6 @@ public class CommandLineParser {
   private final RizzlyOptions options = new RizzlyOptions();
   private final RizzlyError error;
   private static final String RizzlyExtension = ".rzy";
-  private static final String XmlExtension = ".xml";
-  private static final Map<String, FileType> extensionToType = new HashMap<String, FileType>();
-
-  {
-    extensionToType.put(RizzlyExtension, FileType.Rizzly);
-    extensionToType.put(XmlExtension, FileType.Xml);
-  }
 
   public CommandLineParser(RizzlyError error) {
     super();
@@ -71,6 +62,7 @@ public class CommandLineParser {
       @SuppressWarnings("unchecked")
       List<String> passes = cmd.getArgList();
       configuration.setPasses(passes);
+      configuration.setPassBuilding(PassBuilding.Specified);
       return configuration;
     }
 
@@ -79,20 +71,12 @@ public class CommandLineParser {
       return null;
     }
 
-    String extension = getFileExtension(inputFile);
-    if (!knownFileType(extension)) {
-      error.err(ErrorType.Error, "Unknown file type: " + inputFile, new MetaListImplementation());
-      return null;
-    }
-
     WritableConfiguration configuration = new WritableConfiguration();
     parsePathAndRoot(inputFile, cmd, configuration);
     configuration.setDebugEvent(cmd.hasOption(options.debugEvent.getLongOpt()));
     configuration.setLazyModelCheck(cmd.hasOption(options.lazyModelCheck.getLongOpt()));
     configuration.setDocOutput(cmd.hasOption(options.documentation.getLongOpt()));
-    configuration.setXml(cmd.hasOption(options.xml.getLongOpt()));
-    configuration.setExtension(extension);
-    configuration.setFileType(getFileType(extension));
+    configuration.setPassBuilding(PassBuilding.Automatic);
 
     return configuration;
   }
@@ -108,23 +92,6 @@ public class CommandLineParser {
     }
 
     return hasError;
-  }
-
-  private boolean knownFileType(String extension) {
-    return extensionToType.containsKey(extension);
-  }
-
-  private FileType getFileType(String extension) {
-    return extensionToType.get(extension);
-  }
-
-  private String getFileExtension(String file) {
-    int index = file.lastIndexOf('.');
-    if (index >= 0) {
-      return file.substring(index);
-    } else {
-      return "";
-    }
   }
 
   private String getInputFile(CommandLine cmd) {
@@ -153,6 +120,7 @@ public class CommandLineParser {
   private boolean isSane(String inputFile, CommandLine cmd) {
     boolean hasComponent = hasOption(cmd, options.component);
     boolean hasRizzlyFile = inputFile != null;  // TODO remove
+    boolean hasRizzlyExtension = hasRizzlyFile && inputFile.endsWith(RizzlyExtension);
 
     if (hasComponent && !hasRizzlyFile) {
       error.err(ErrorType.Error, "Option '" + options.component.getLongOpt() + "' needs file", Meta.empty());
@@ -162,6 +130,11 @@ public class CommandLineParser {
     if (!hasRizzlyFile) {
       error.err(ErrorType.Error, "Need a file", Meta.empty());
       printHelp();
+      return false;
+    }
+
+    if (!hasRizzlyExtension) {
+      error.err(ErrorType.Error, "Unknown file type: test.bla", new MetaListImplementation());
       return false;
     }
 
@@ -207,7 +180,6 @@ public class CommandLineParser {
 
   private String getNamespace(String inputFile) {
     String filename = getFilename(inputFile);
-
     String namespace = filename.substring(0, filename.length() - RizzlyExtension.length());
     return namespace;
   }
@@ -247,7 +219,6 @@ class RizzlyOptions {
   public final Option lazyModelCheck = new Option(null, "lazyModelCheck", false, "Do not check constraints of model. Very insecure!");
   public final Option debugEvent = new Option(null, "debugEvent", false, "produce code to get informed whenever a event is sent or received");
   public final Option documentation = new Option(null, "doc", false, "generate documentation");
-  public final Option xml = new Option(null, "xml", false, "write AST to an xml file");
   public final Option passes = new Option(null, "passes", false, "execute the specified passes");
   public final Option component = new Option("c", "component", true, "the component to instantiate");
   public final Option help = new Option("h", "help", false, "show help");
@@ -259,7 +230,6 @@ class RizzlyOptions {
     all.addOption(documentation);
     all.addOption(debugEvent);
     all.addOption(lazyModelCheck);
-    all.addOption(xml);
     all.addOption(passes);
   }
 

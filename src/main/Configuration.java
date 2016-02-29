@@ -35,11 +35,7 @@ public interface Configuration {
 
   public abstract boolean doDocOutput();
 
-  public abstract String getExtension();
-
-  public abstract boolean doXml();
-
-  public abstract FileType parseAs();
+  public abstract PassBuilding passBuilding();
 
   public abstract List<String> passes();
 

@@ -33,6 +33,10 @@ import ast.meta.MetaList;
 import ast.pass.AstPass;
 import ast.pass.input.xml.XmlParserPass;
 import ast.pass.linker.Linker;
+import ast.pass.others.DefaultVisitorPass;
+import ast.pass.others.FileLoader;
+import ast.pass.output.xml.XmlWriterPass;
+import ast.pass.reduction.MetadataRemover;
 import error.ErrorType;
 import error.RizzlyError;
 
@@ -117,6 +121,44 @@ public class ExplicitPassesFactory_Test {
     verify(error).err(eq(ErrorType.Error), eq("could not parse pass definition: xmlreader()"), any(MetaList.class));
   }
 
+  @Test
+  public void has_a_pass_xmlreader() {
+    when(argumentParser.parse("xmlreader('filename.xml')")).thenReturn(list("xmlreader", "filename.xml"));
+
+    Assert.assertTrue(testee.produce("xmlreader('filename.xml')") instanceof XmlParserPass);
+  }
+
+  @Test
+  public void has_a_pass_xmlwriter() {
+    when(argumentParser.parse("xmlwriter('filename.xml')")).thenReturn(list("xmlwriter", "filename.xml"));
+
+    Assert.assertTrue(testee.produce("xmlwriter('filename.xml')") instanceof XmlWriterPass);
+  }
+
+  @Test
+  public void has_a_pass_linker() {
+    when(argumentParser.parse("linker")).thenReturn(list("linker"));
+
+    Assert.assertTrue(testee.produce("linker") instanceof Linker);
+  }
+
+  @Test
+  public void has_a_pass_rzyreader() {
+    when(argumentParser.parse("rzyreader('path/to/project', 'root.module')")).thenReturn(list("rzyreader", "path/to/project", "root.module"));
+
+    Assert.assertTrue(testee.produce("rzyreader('path/to/project', 'root.module')") instanceof FileLoader);
+  }
+
+  @Test
+  public void has_a_pass_metadataremover() {
+    when(argumentParser.parse("metadataremover")).thenReturn(list("metadataremover"));
+
+    AstPass pass = testee.produce("metadataremover");
+
+    Assert.assertTrue(pass instanceof DefaultVisitorPass);
+    Assert.assertTrue(((DefaultVisitorPass) pass).getVisitor() instanceof MetadataRemover);
+  }
+
   private LinkedList<String> list() {
     return new LinkedList<String>();
   }
@@ -130,6 +172,12 @@ public class ExplicitPassesFactory_Test {
   private LinkedList<String> list(String arg0, String arg1) {
     LinkedList<String> list = list(arg0);
     list.add(arg1);
+    return list;
+  }
+
+  private LinkedList<String> list(String arg0, String arg1, String arg2) {
+    LinkedList<String> list = list(arg0, arg1);
+    list.add(arg2);
     return list;
   }
 }

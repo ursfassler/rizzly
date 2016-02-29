@@ -86,11 +86,9 @@ public class CommandLineParser_Test {
     Assert.assertEquals(false, configuration.doDebugEvent());
     Assert.assertEquals(false, configuration.doLazyModelCheck());
     Assert.assertEquals(false, configuration.doDocOutput());
-    Assert.assertEquals(false, configuration.doXml());
     Assert.assertEquals("test", configuration.getNamespace());
     Assert.assertEquals(new Designator("test", "Test"), configuration.getRootComp());
     Assert.assertEquals("./", configuration.getRootPath());
-    Assert.assertEquals(".rzy", configuration.getExtension());
     Assert.assertEquals(null, configuration.passes());
   }
 
@@ -100,19 +98,9 @@ public class CommandLineParser_Test {
 
     Configuration configuration = testee.parse(args);
 
-    Assert.assertEquals(FileType.Rizzly, configuration.parseAs());
-    Assert.assertEquals(".rzy", configuration.getExtension());
+    Assert.assertEquals(PassBuilding.Automatic, configuration.passBuilding());
   }
 
-  @Test
-  public void provide_a_xml_file_as_input() {
-    String[] args = { "test.xml" };
-
-    Configuration configuration = testee.parse(args);
-
-    Assert.assertEquals(FileType.Xml, configuration.parseAs());
-    Assert.assertEquals(".xml", configuration.getExtension());
-  }
 
   @Test
   public void raise_an_error_for_unknown_file_types() {
@@ -182,31 +170,23 @@ public class CommandLineParser_Test {
   }
 
   @Test
-  public void specify_xml_backend() {
-    String[] args = { "dir/test.rzy", "--xml" };
-
-    Configuration configuration = testee.parse(args);
-
-    Assert.assertTrue(configuration.doXml());
-  }
-
-  @Test
   public void specify_passes() {
     String[] args = { "--passes", "a", "b", "c('the text')", "d" };
 
     Configuration configuration = testee.parse(args);
 
+    Assert.assertEquals(PassBuilding.Specified, configuration.passBuilding());
     Assert.assertEquals(list("a", "b", "c('the text')", "d"), configuration.passes());
   }
 
   @Test
   public void no_other_option_is_allowed_when_passes_are_specified() {
-    String[] args = { "--passes", "a", "--xml", "--doc" };
+    String[] args = { "--passes", "a", "--lazyModelCheck", "--doc" };
 
     Configuration configuration = testee.parse(args);
 
     Assert.assertNull(configuration);
-    verify(error).err(eq(ErrorType.Error), eq("Invalid option found beside passes: --xml"), any(MetaList.class));
+    verify(error).err(eq(ErrorType.Error), eq("Invalid option found beside passes: --lazyModelCheck"), any(MetaList.class));
     verify(error).err(eq(ErrorType.Error), eq("Invalid option found beside passes: --doc"), any(MetaList.class));
   }
 

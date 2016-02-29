@@ -24,7 +24,6 @@ import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
-import main.Configuration;
 import parser.PeekNReader;
 import parser.TokenReader;
 import ast.data.Namespace;
@@ -50,11 +49,6 @@ import error.RizzlyError;
 public class XmlParserPass implements AstPass {
   private final RizzlyError error = RError.instance();
   private final String filename;
-
-  @Deprecated
-  public XmlParserPass(Configuration configuration) {
-    this.filename = configuration.getRootPath() + configuration.getNamespace() + configuration.getExtension();
-  }
 
   public XmlParserPass(String filename) {
     this.filename = filename;

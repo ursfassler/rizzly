@@ -14,7 +14,7 @@ jar:
 	zipmerge rizzly.jar javalib/*.jar
 	
 rizzly: Makefile
-	echo "#!/bin/sh\n\njava -ea -classpath ${instdir}/rizzly.jar main.Main $$""@\n\nreturn $$""?\n" > rizzly
+	echo "#!/bin/sh\n\njava -ea -classpath ${instdir}/rizzly.jar main.Main $$""{1+\"$$""@\"}\n\nreturn $$""?\n" > rizzly
 	chmod +x rizzly
 
 clean:

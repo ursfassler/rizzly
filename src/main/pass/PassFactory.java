@@ -23,7 +23,6 @@ import main.Configuration;
 import ast.pass.check.model.Modelcheck;
 import ast.pass.check.sanity.Sanitycheck;
 import ast.pass.check.type.Typecheck;
-import ast.pass.input.xml.XmlParserPass;
 import ast.pass.instantiation.Instantiation;
 import ast.pass.linker.Linker;
 import ast.pass.optimize.AlwaysGreater;
@@ -42,7 +41,6 @@ import ast.pass.others.CompareReplacer;
 import ast.pass.others.ConstTyper;
 import ast.pass.others.ConstantPropagation;
 import ast.pass.others.DebugIface;
-import ast.pass.others.DefaultVisitorPass;
 import ast.pass.others.DocWriter;
 import ast.pass.others.FileLoader;
 import ast.pass.others.HeaderWriter;
@@ -60,7 +58,6 @@ import ast.pass.others.TypeUplift;
 import ast.pass.others.VarDeclToTop;
 import ast.pass.others.VarDefSplitter;
 import ast.pass.others.VarSort;
-import ast.pass.output.xml.XmlWriterPass;
 import ast.pass.reduction.BitLogicCategorizer;
 import ast.pass.reduction.CompLinkReduction;
 import ast.pass.reduction.CompositionReduction;
@@ -69,7 +66,6 @@ import ast.pass.reduction.EnumLinkReduction;
 import ast.pass.reduction.EnumReduction;
 import ast.pass.reduction.FileReduction;
 import ast.pass.reduction.ForReduction;
-import ast.pass.reduction.MetadataRemover;
 import ast.pass.reduction.NamespaceLinkReduction;
 import ast.pass.reduction.OpenReplace;
 import ast.pass.reduction.RangeReplacer;
@@ -87,24 +83,16 @@ import ast.pass.specializer.TemplCallAdder;
 import ast.pass.specializer.TypeCastAdder;
 import ast.pass.specializer.TypeEvalPass;
 import error.RError;
+import error.RizzlyError;
 
 //TODO combine CommandLineParser and PassFactory
 public class PassFactory {
   public static PassGroup makePasses(Configuration configuration) {
-    List<String> passes = configuration.passes();
-    if (passes == null) {
-      switch (configuration.parseAs()) {
-        case Rizzly:
-          if (configuration.doXml()) {
-            return produceXmlPass(configuration);
-          } else {
-            return produceFullRizzlyPass(configuration);
-          }
-        case Xml:
-          return produceXml2xml(configuration);
-      }
-    } else {
-      return produce(passes);
+    switch (configuration.passBuilding()) {
+      case Automatic:
+        return produceFullRizzlyPass(configuration);
+      case Specified:
+        return produce(configuration.passes());
     }
 
     return null;
@@ -113,20 +101,14 @@ public class PassFactory {
   private static PassGroup produce(List<String> passDescription) {
     PassGroup passes = new PassGroup("by argument");
 
-    PassArgumentParser argumentParser = new PassArgumentParser();
-    ExplicitPassesFactory factory = new ExplicitPassesFactory(argumentParser, RError.instance());
+    RizzlyError error = RError.instance();
+    PassArgumentParser argumentParser = new PassArgumentParser(error);
+    ExplicitPassesFactory factory = new ExplicitPassesFactory(argumentParser, error);
 
     for (String pass : passDescription) {
       passes.add(factory.produce(pass));
     }
 
-    return passes;
-  }
-
-  private static PassGroup produceXml2xml(Configuration configuration) {
-    PassGroup passes = new PassGroup("xml2xml");
-    passes.add(new XmlParserPass(configuration));
-    passes.add(new XmlWriterPass(configuration));
     return passes;
   }
 
@@ -197,18 +179,10 @@ public class PassFactory {
     return passes;
   }
 
-  private static PassGroup produceXmlPass(Configuration configuration) {
-    PassGroup passes = new PassGroup("ast");
-    passes.add(new FileLoader(configuration));
-    passes.add(new DefaultVisitorPass(new MetadataRemover()));
-    passes.add(new XmlWriterPass(configuration));
-    return passes;
-  }
-
   private static PassGroup funPasses(Configuration configuration) {
     PassGroup passes = new PassGroup("fun");
 
-    passes.add(new FileLoader(configuration));
+    passes.add(FileLoader.create(configuration));
 
     passes.add(new InternsAdder());
 

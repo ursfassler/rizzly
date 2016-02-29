@@ -4,7 +4,7 @@ Feature: the compiler reads the AST from an xml file
   In order to study a compiler pass or use a backend for generation
 
 Scenario: read a simple AST from an xml file
-  Given we have a file "testee.xml" with the content:
+  Given we have a file "input.xml" with the content:
     """
     <rizzly>
       <RizzlyFile name="testee" />
@@ -12,10 +12,13 @@ Scenario: read a simple AST from an xml file
     
     """
 
-  When I start rizzly with the file "testee.xml" and the xml backend
+  When I start rizzly with the passes
+    | pass                    |
+    | xmlreader('input.xml')  |
+    | xmlwriter('output.xml') |
   
   Then I expect no error
-  And I expect an xml file "testee.xml" with the content:
+  And I expect an xml file "output.xml" with the content:
     """
     <rizzly>
       <RizzlyFile name="testee" />
