@@ -24,8 +24,6 @@ Scenario: declare a function in a unit
 
 
 #TODO remove component
-#TODO implement error
-@fixme
 Scenario: a function needs a return value
   Given we have a file "testee.rzy" with the content:
     """
@@ -42,7 +40,7 @@ Scenario: a function needs a return value
   When I start rizzly with the file "testee.rzy"
 
   Then I expect an error code
-  And stderr should contain "testee.rzy:1:11: Error: expected COLON got RETURN"
+  And stderr should contain "testee.rzy:2:3: Error: expected COLON got RETURN"
 
 
 #TODO remove component

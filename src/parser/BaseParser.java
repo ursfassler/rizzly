@@ -31,6 +31,7 @@ import ast.data.AstList;
 import ast.data.expression.Expression;
 import ast.data.function.Function;
 import ast.data.function.FunctionFactory;
+import ast.data.function.ret.FuncReturn;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.function.ret.FuncReturnTuple;
 import ast.data.function.ret.FunctionReturnType;
@@ -86,7 +87,7 @@ public class BaseParser extends Parser {
 
     AstList<FunctionVariable> varlist = parseVardefList();
 
-    ast.data.function.ret.FuncReturn retType;
+    FuncReturn retType;
     if (KnowFuncType.getWithRetval(cl)) {
       retType = parseFuncReturn();
     } else {
@@ -109,16 +110,12 @@ public class BaseParser extends Parser {
   }
 
   // EBNF: funcReturn: [ ":" ( typeref | vardeflist ) ]
-  protected ast.data.function.ret.FuncReturn parseFuncReturn() {
-    MetaList info = peek().getMetadata();
-    if (consumeIfEqual(TokenType.COLON)) {
-      if (peek().getType() == TokenType.OPENPAREN) {
-        return new FuncReturnTuple(info, parseVardefList());
-      } else {
-        return new FunctionReturnType(info, expr().parseRefType());
-      }
+  protected FuncReturn parseFuncReturn() {
+    MetaList info = expect(TokenType.COLON).getMetadata();
+    if (peek().getType() == TokenType.OPENPAREN) {
+      return new FuncReturnTuple(info, parseVardefList());
     } else {
-      return new FuncReturnNone();
+      return new FunctionReturnType(info, expr().parseRefType());
     }
   }
 

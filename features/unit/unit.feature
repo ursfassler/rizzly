@@ -4,14 +4,14 @@ Feature: Use units to split up the program
   In order to make the code cleaner and group related stuff together
 
 
-#TODO allow top unit without component (i.e. instanciation)
-@fixme
 Scenario: The simples unit does have nothing in it
   Given we have a file "testee.rzy" with the content:
     """
     """
 
-  When I start rizzly with the file "testee.rzy"
+  When I start rizzly with the passes
+    | pass                     |
+    | rzyreader('.', 'testee') |
 
   Then I expect no error
 
