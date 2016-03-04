@@ -125,6 +125,7 @@ import ast.data.variable.FunctionVariable;
 import ast.data.variable.StateVariable;
 import ast.data.variable.Variable;
 import ast.dispatcher.NullDispatcher;
+import ast.repository.query.Referencees.TargetResolver;
 
 /**
  * Prints formated FUN objects to a specific writer.
@@ -335,9 +336,9 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   private void printStateBody(ast.data.component.hfsm.State obj) {
     xw.incIndent();
 
-    Function entry = (Function) obj.entryFunc.getTarget();
+    Function entry = TargetResolver.staticTargetOf(obj.entryFunc, Function.class);
     printEntryExit("entry", entry.body);
-    Function exit = (Function) obj.exitFunc.getTarget();
+    Function exit = TargetResolver.staticTargetOf(obj.exitFunc, Function.class);
     printEntryExit("exit", exit.body);
 
     visitListNl(obj.item, null);

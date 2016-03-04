@@ -51,6 +51,7 @@ import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.NameFilter;
 import ast.repository.query.TypeFilter;
+import ast.repository.query.Referencees.TargetResolver;
 import error.ErrorType;
 import error.RError;
 
@@ -220,9 +221,9 @@ class LinkerWorker extends DfsTraverser<Void, SymbolTable> {
     stateNames.put(obj, param);
 
     // visitList(obj.getItemList(), param);
-    Function entry = (Function) obj.entryFunc.getTarget();
+    Function entry = TargetResolver.staticTargetOf(obj.entryFunc, Function.class);
     visit(entry.body, param);
-    Function exit = (Function) obj.exitFunc.getTarget();
+    Function exit = TargetResolver.staticTargetOf(obj.exitFunc, Function.class);
     visit(exit.body, param);
 
     super.visitState(obj, param);

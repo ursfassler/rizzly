@@ -38,6 +38,7 @@ import ast.meta.MetaList;
 import ast.pass.AstPass;
 import ast.pass.helper.GraphHelper;
 import ast.repository.query.Collector;
+import ast.repository.query.Referencees.TargetResolver;
 import ast.specification.IsClass;
 import error.ErrorType;
 import error.RError;
@@ -77,8 +78,8 @@ public class RtcViolation implements AstPass {
       Endpoint src = con.getSrc();
       Endpoint dst = con.getDst();
       if ((src instanceof EndpointSub) && (dst instanceof EndpointSub)) {
-        ComponentUse srcComp = (ComponentUse) ((EndpointSub) src).getComponent().getTarget();
-        ComponentUse dstComp = (ComponentUse) ((EndpointSub) dst).getComponent().getTarget();
+        ComponentUse srcComp = TargetResolver.staticTargetOf(((EndpointSub) src).getComponent(), ComponentUse.class);
+        ComponentUse dstComp = TargetResolver.staticTargetOf(((EndpointSub) dst).getComponent(), ComponentUse.class);
         ret.addVertex(srcComp);
         ret.addVertex(dstComp);
         ret.addEdge(srcComp, dstComp);

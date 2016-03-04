@@ -25,6 +25,7 @@ import ast.data.reference.Reference;
 import ast.data.type.Type;
 import ast.data.variable.Constant;
 import ast.data.variable.Variable;
+import ast.repository.query.Referencees.TargetResolver;
 
 final public class ImplElementary extends Component {
   final public AstList<Type> type = new AstList<Type>();
@@ -44,7 +45,7 @@ final public class ImplElementary extends Component {
   @Deprecated
   public SubCallbacks getSubCallback(ComponentUse use) {
     for (SubCallbacks itr : subCallback) {
-      if (itr.compUse.getTarget() == use) {
+      if (TargetResolver.staticTargetOf(itr.compUse, ComponentUse.class) == use) {
         return itr;
       }
     }

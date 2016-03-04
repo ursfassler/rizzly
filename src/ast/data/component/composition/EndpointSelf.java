@@ -18,8 +18,10 @@
 package ast.data.component.composition;
 
 import ast.data.AstBase;
+import ast.data.function.Function;
 import ast.data.reference.Reference;
 import ast.meta.MetaList;
+import ast.repository.query.Referencees.TargetResolver;
 
 public class EndpointSelf extends AstBase implements Endpoint {
   private final Reference funcRef;
@@ -40,7 +42,7 @@ public class EndpointSelf extends AstBase implements Endpoint {
 
   @Override
   public String toString() {
-    return "self." + getFuncRef().getTarget().getName();
+    return "self." + TargetResolver.staticTargetOf(getFuncRef(), Function.class).getName();
   }
 
 }

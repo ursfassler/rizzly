@@ -33,6 +33,7 @@ import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.repository.query.ChildByName;
+import ast.repository.query.Referencees.TargetResolver;
 import error.ErrorType;
 import error.RError;
 
@@ -61,7 +62,7 @@ public class RefTypeGetter extends NullDispatcher<Type, Type> {
 
   @Override
   protected Type visitOffsetReference(OffsetReference obj, Type param) {
-    return (Type) obj.getTarget();
+    return TargetResolver.staticTargetOf(obj, Type.class);
   }
 
   @Override

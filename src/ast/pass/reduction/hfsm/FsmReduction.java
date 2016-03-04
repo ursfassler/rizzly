@@ -69,6 +69,7 @@ import ast.knowledge.KnowLlvmLibrary;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.TypeFilter;
+import ast.repository.query.Referencees.TargetResolver;
 import error.ErrorType;
 import error.RError;
 
@@ -163,7 +164,7 @@ class Reduction {
     param.children.add(states);
     // String ena = (String)
     // enumMap.get(obj.getTopstate().getInitial()).properties().get(Property.NAME);
-    EnumElement ena = enumMap.get(obj.topstate.initial.getTarget());
+    EnumElement ena = enumMap.get(TargetResolver.staticTargetOf(obj.topstate.initial, StateSimple.class));
     Reference initState = makeEnumElemRef(states, ena);
     StateVariable stateVariable = new StateVariable("_statevar", TypeRefFactory.create(states), new ReferenceExpression(initState));
     stateVariable.metadata().add(obj.metadata());
@@ -190,7 +191,7 @@ class Reduction {
     }
 
     {
-      Procedure fEntry = makeEntryFunc((State) obj.topstate.initial.getTarget());
+      Procedure fEntry = makeEntryFunc(TargetResolver.staticTargetOf(obj.topstate.initial, State.class));
       elem.function.add(fEntry);
       elem.entryFunc = FuncRefFactory.create(fEntry.metadata(), fEntry);
 
@@ -206,7 +207,7 @@ class Reduction {
   private Procedure makeEntryFunc(State initial) {
     Block body = new Block();
 
-    body.statements.add(makeCall((Function) initial.entryFunc.getTarget()));
+    body.statements.add(makeCall(TargetResolver.staticTargetOf(initial.entryFunc, Function.class)));
 
     Procedure rfunc = new Procedure(Designator.NAME_SEP + "stateentry", new AstList<FunctionVariable>(), new FuncReturnNone(), body);
     return rfunc;
@@ -226,7 +227,7 @@ class Reduction {
       Reference eref = makeEnumElemRef(etype, enumMap.get(src));
       Block obb = new Block();
       CaseOpt opt = makeCaseOption(eref, obb);
-      obb.statements.add(makeCall((Function) src.exitFunc.getTarget()));
+      obb.statements.add(makeCall(TargetResolver.staticTargetOf(src.exitFunc, Function.class)));
       option.add(opt);
     }
 
@@ -371,7 +372,7 @@ class Reduction {
 
     transCode.statements.addAll(body.statements);
 
-    EnumElement src = enumMap.get(trans.dst.getTarget());
+    EnumElement src = enumMap.get(TargetResolver.staticTargetOf(trans.dst, StateSimple.class));
     assert (src != null);
     Assignment setState = new AssignmentSingle(RefFactory.withOffset(stateVariable), new ReferenceExpression(RefFactory.withOffset(src)));
     transCode.statements.add(setState);

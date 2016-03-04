@@ -18,15 +18,11 @@
 package ast.data.reference;
 
 import ast.data.Ast;
-import ast.data.Named;
 
 public interface Reference extends Ast {
 
   public Anchor getAnchor();
 
   public void setAnchor(Anchor anchor);
-
-  @Deprecated
-  public Named getTarget();
 
 }

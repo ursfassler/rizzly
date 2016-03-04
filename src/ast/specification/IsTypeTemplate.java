@@ -21,6 +21,7 @@ import ast.data.Ast;
 import ast.data.type.Type;
 import ast.data.type.special.TypeType;
 import ast.data.variable.TemplateParameter;
+import ast.repository.query.Referencees.TargetResolver;
 
 public class IsTypeTemplate extends Specification {
 
@@ -28,7 +29,7 @@ public class IsTypeTemplate extends Specification {
   public boolean isSatisfiedBy(Ast candidate) {
     if (candidate instanceof TemplateParameter) {
       TemplateParameter tmpl = (TemplateParameter) candidate;
-      Type type = (Type) tmpl.type.getTarget();
+      Type type = TargetResolver.staticTargetOf(tmpl.type, Type.class);
       return type instanceof TypeType;
     } else {
       return false;

@@ -44,6 +44,7 @@ import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.repository.query.TypeFilter;
+import ast.repository.query.Referencees.TargetResolver;
 
 /**
  * Creates a type with data of states for whole state machine
@@ -141,7 +142,7 @@ public class StateTypeBuilder extends NullDispatcher<NamedElement, AstList<Named
     param.add(subElem);
 
     NamedElement initStateElem = null;
-    State initialTarget = (State) obj.initial.getTarget();
+    State initialTarget = TargetResolver.staticTargetOf(obj.initial, State.class);
     for (State sub : TypeFilter.select(obj.item, State.class)) {
       NamedElement item = visit(sub, param);
       union.element.add(item);

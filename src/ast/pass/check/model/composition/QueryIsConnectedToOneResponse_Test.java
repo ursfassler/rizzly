@@ -33,20 +33,21 @@ import ast.data.component.composition.Connection;
 import ast.data.component.composition.EndpointSelf;
 import ast.data.component.composition.EndpointSub;
 import ast.data.component.composition.SynchroniusConnection;
+import ast.data.function.Function;
 import ast.data.function.InterfaceFunction;
 import ast.data.function.header.FuncFunction;
 import ast.data.function.ret.FuncReturnTuple;
-import ast.data.reference.RefFactory;
-import ast.data.reference.RefItem;
 import ast.data.reference.Reference;
 import ast.data.variable.FunctionVariable;
 import ast.meta.MetaList;
+import ast.repository.query.Referencees.TargetResolver;
 import error.ErrorType;
 import error.RizzlyError;
 
 public class QueryIsConnectedToOneResponse_Test {
+  private final TargetResolver targetResolver = mock(TargetResolver.class);
   private final RizzlyError error = mock(RizzlyError.class);
-  final private QueryIsConnectedToOneResponse testee = new QueryIsConnectedToOneResponse(error);
+  final private QueryIsConnectedToOneResponse testee = new QueryIsConnectedToOneResponse(targetResolver, error);
 
   @Test
   public void does_nothing_if_there_are_no_connections() {
@@ -154,15 +155,17 @@ public class QueryIsConnectedToOneResponse_Test {
   }
 
   private EndpointSelf selfEp(FuncFunction function) {
-    return new EndpointSelf(RefFactory.create(function, new AstList<RefItem>()));
+    Reference funcref = mock(Reference.class);
+    Mockito.when(targetResolver.targetOf(funcref, Function.class)).thenReturn(function);
+    return new EndpointSelf(funcref);
   }
 
   private EndpointSub subEp(Component component, InterfaceFunction function) {
     Reference useref = mock(Reference.class);
     Reference compref = mock(Reference.class);
     ComponentUse compuse = new ComponentUse("", compref);
-    Mockito.when(useref.getTarget()).thenReturn(compuse);
-    Mockito.when(compref.getTarget()).thenReturn(component);
+    Mockito.when(targetResolver.targetOf(useref, ComponentUse.class)).thenReturn(compuse);
+    Mockito.when(targetResolver.targetOf(compref, Component.class)).thenReturn(component);
     return new EndpointSub(useref, function.getName());
   }
 }

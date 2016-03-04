@@ -51,6 +51,7 @@ import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.ChildCollector;
 import ast.repository.query.Single;
+import ast.repository.query.Referencees.TargetResolver;
 import ast.specification.HasName;
 import error.ErrorType;
 import error.RError;
@@ -186,7 +187,7 @@ class InitVarTyperWorker extends ExprReplacer<Type> {
   @Override
   protected Expression visitRecordValue(RecordValue obj, Type param) {
     if (param instanceof RecordType) {
-      assert (obj.type.getTarget() == param);
+      assert (TargetResolver.staticTargetOf(obj.type, Type.class) == param);
       return obj; // we assume it is right
     } else {
       throw new RuntimeException("not yet implemented: " + param.getClass().getCanonicalName());

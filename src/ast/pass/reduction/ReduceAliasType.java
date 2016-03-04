@@ -29,6 +29,7 @@ import ast.data.type.out.AliasType;
 import ast.dispatcher.DfsTraverser;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.repository.query.Referencees.TargetResolver;
 import error.ErrorType;
 import error.RError;
 
@@ -57,7 +58,7 @@ class ReduceAliasTypeWorker extends DfsTraverser<Void, Void> {
     List<Named> checked = new ArrayList<Named>();
     while (link instanceof AliasType) {
       checked.add(link);
-      link = ((AliasType) link).ref.getTarget();
+      link = TargetResolver.staticTargetOf(((AliasType) link).ref, Named.class);
       if (checked.contains(link)) {
         for (Named itr : checked) {
           RError.err(ErrorType.Hint, "part of recursive type alias: " + itr.getName(), itr.metadata());

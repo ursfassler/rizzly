@@ -49,6 +49,7 @@ import ast.pass.AstPass;
 import ast.pass.debug.CompCascadeDepth;
 import ast.pass.debug.DebugIfaceAdder;
 import ast.repository.manipulator.TypeRepo;
+import ast.repository.query.Referencees.TargetResolver;
 
 public class DebugIface implements AstPass {
 
@@ -74,7 +75,7 @@ public class DebugIface implements AstPass {
 
     Response func = makeNameGetter("DebugName", symNameSizeType, names, stringType);
     func.property = FunctionProperty.Public;
-    Component rootComp = (Component) kb.getRootComp().getCompRef().getTarget();
+    Component rootComp = TargetResolver.staticTargetOf(kb.getRootComp().getCompRef(), Component.class);
     rootComp.function.add(func);
   }
 

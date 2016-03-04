@@ -19,6 +19,7 @@ package ast.pass.debug;
 
 import ast.data.Ast;
 import ast.data.Namespace;
+import ast.data.component.Component;
 import ast.data.component.composition.ComponentUse;
 import ast.data.component.composition.ImplComposition;
 import ast.data.component.elementary.ImplElementary;
@@ -27,6 +28,7 @@ import ast.data.reference.LinkedAnchor;
 import ast.data.reference.OffsetReference;
 import ast.data.type.Type;
 import ast.dispatcher.NullDispatcher;
+import ast.repository.query.Referencees.TargetResolver;
 
 public class CompCascadeDepth extends NullDispatcher<Integer, Void> {
 
@@ -58,7 +60,7 @@ public class CompCascadeDepth extends NullDispatcher<Integer, Void> {
   protected Integer visitImplElementary(ImplElementary obj, Void param) {
     int max = 0;
     for (ComponentUse itr : obj.component) {
-      max = Math.max(max, visit(itr.getCompRef().getTarget(), param));
+      max = Math.max(max, visit(TargetResolver.staticTargetOf(itr.getCompRef(), Component.class), param));
     }
     return max + 1;
   }
@@ -67,7 +69,7 @@ public class CompCascadeDepth extends NullDispatcher<Integer, Void> {
   protected Integer visitImplComposition(ImplComposition obj, Void param) {
     int max = 0;
     for (ComponentUse itr : obj.component) {
-      max = Math.max(max, visit(itr.getCompRef().getTarget(), param));
+      max = Math.max(max, visit(TargetResolver.staticTargetOf(itr.getCompRef(), Component.class), param));
     }
     return max + 1;
   }

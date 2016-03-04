@@ -26,15 +26,17 @@ import ast.data.component.composition.Endpoint;
 import ast.data.function.ret.FuncReturn;
 import ast.data.function.ret.FuncReturnNone;
 import ast.repository.query.EndpointFunctionQuery;
+import ast.repository.query.Referencees.TargetResolver;
 import ast.visitor.VisitExecutorImplementation;
 import error.ErrorType;
 import error.RizzlyError;
 
 public class QueryIsConnectedToOneResponse {
+  final private TargetResolver targetResolver;
   final private RizzlyError error;
 
-  public QueryIsConnectedToOneResponse(RizzlyError error) {
-    super();
+  public QueryIsConnectedToOneResponse(TargetResolver targetResolver, RizzlyError error) {
+    this.targetResolver = targetResolver;
     this.error = error;
   }
 
@@ -65,7 +67,7 @@ public class QueryIsConnectedToOneResponse {
   }
 
   private EndpointDescriptor getDescriptor(Endpoint endpoint) {
-    EndpointFunctionQuery visitor = new EndpointFunctionQuery();
+    EndpointFunctionQuery visitor = new EndpointFunctionQuery(targetResolver);
     VisitExecutorImplementation.instance().visit(visitor, endpoint);
     return new EndpointDescriptor(visitor.getComponentType(), visitor.getInstanceName(), visitor.getFunction());
   }

@@ -19,6 +19,7 @@ package ast.pass.check.model;
 
 import ast.data.Ast;
 import ast.data.AstList;
+import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.component.composition.SubCallbacks;
 import ast.data.component.hfsm.ImplHfsm;
@@ -33,6 +34,7 @@ import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.Collector;
+import ast.repository.query.Referencees.TargetResolver;
 import ast.specification.IsClass;
 import error.ErrorType;
 import error.RError;
@@ -79,7 +81,7 @@ class HfsmModelCheckerWorker extends NullDispatcher<Void, Void> {
   @Override
   protected Void visitTransition(Transition obj, Void param) {
     // TODO check that guard does not write state
-    if (!(obj.eventFunc.getTarget() instanceof Slot)) {
+    if (!(TargetResolver.staticTargetOf(obj.eventFunc, Named.class) instanceof Slot)) {
       RError.err(ErrorType.Error, "transition can only be triggered by slot", obj.metadata());
     }
     return null;

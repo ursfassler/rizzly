@@ -18,13 +18,9 @@
 package ast.data.reference;
 
 import ast.data.Ast;
-import ast.data.Named;
 
 public interface Anchor extends Ast {
 
   public String targetName();
-
-  @Deprecated
-  public Named getTarget();
 
 }

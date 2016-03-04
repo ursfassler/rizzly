@@ -32,6 +32,7 @@ import ast.meta.MetaList;
 import ast.pass.AstPass;
 import ast.repository.query.Collector;
 import ast.repository.query.TypeFilter;
+import ast.repository.query.Referencees.TargetResolver;
 import ast.specification.IsClass;
 import error.ErrorType;
 import error.RError;
@@ -85,8 +86,8 @@ class HfsmTransScopeCheckWorker extends NullDispatcher<Set<State>, Void> {
   }
 
   private void checkTransition(Transition trans, Set<State> allowed) {
-    check((State) trans.src.getTarget(), allowed, trans.metadata(), "source");
-    check((State) trans.dst.getTarget(), allowed, trans.metadata(), "destination");
+    check(TargetResolver.staticTargetOf(trans.src, State.class), allowed, trans.metadata(), "source");
+    check(TargetResolver.staticTargetOf(trans.dst, State.class), allowed, trans.metadata(), "destination");
   }
 
   private void check(State state, Set<State> allowed, MetaList info, String end) {

@@ -46,6 +46,7 @@ import ast.dispatcher.NullDispatcher;
 import ast.interpreter.Memory;
 import ast.knowledge.KnowEmptyValue;
 import ast.knowledge.KnowledgeBase;
+import ast.repository.query.Referencees.TargetResolver;
 import error.RError;
 
 /**
@@ -124,7 +125,7 @@ public class StmtExecutor extends NullDispatcher<Expression, Memory> {
     for (Variable var : obj.variable) {
       param.createVar(var);
       if (value instanceof AnyValue) {
-        Type type = (Type) var.type.getTarget();
+        Type type = TargetResolver.staticTargetOf(var.type, Type.class);
         ValueExpr empty = kb.getEntry(KnowEmptyValue.class).get(type);
         param.set(var, Copy.copy(empty));
       } else {

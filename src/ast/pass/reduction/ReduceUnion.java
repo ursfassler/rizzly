@@ -22,6 +22,7 @@ import java.util.Map;
 
 import ast.Designator;
 import ast.data.Ast;
+import ast.data.Named;
 import ast.data.Namespace;
 import ast.data.expression.Expression;
 import ast.data.expression.ReferenceExpression;
@@ -46,6 +47,7 @@ import ast.knowledge.KnowledgeBase;
 import ast.meta.MetaList;
 import ast.pass.AstPass;
 import ast.repository.query.Match;
+import ast.repository.query.Referencees.TargetResolver;
 import ast.specification.HasName;
 
 //TODO documentation
@@ -124,7 +126,7 @@ class ReduceUnionWorker extends ExprReplacer<Void> {
     assert (ut instanceof UnionType);
 
     MetaList meta = left.metadata();
-    left = RefFactory.create(left.getTarget(), new RefName(((UnionType) ut).tag.getName()));
+    left = RefFactory.create(TargetResolver.staticTargetOf(left, Named.class), new RefName(((UnionType) ut).tag.getName()));
     left.metadata().add(meta);
 
     ReferenceExpression leftRef = new ReferenceExpression(left);

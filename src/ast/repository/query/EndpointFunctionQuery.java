@@ -24,12 +24,20 @@ import ast.data.component.composition.EndpointSelf;
 import ast.data.component.composition.EndpointSub;
 import ast.data.function.Function;
 import ast.pass.check.model.composition.EndpointDescriptor;
+import ast.repository.query.Referencees.TargetResolver;
 import ast.visitor.Visitor;
 
 public class EndpointFunctionQuery implements Visitor {
+  final private TargetResolver targetResolver;
+
   private Component componentType = null;
   private String instanceName = null;
   private Function function = null;
+
+  public EndpointFunctionQuery(TargetResolver targetResolver) {
+    super();
+    this.targetResolver = targetResolver;
+  }
 
   public Function getFunction() {
     return function;
@@ -50,19 +58,19 @@ public class EndpointFunctionQuery implements Visitor {
   public void visit(EndpointSelf object) {
     instanceName = "";
     componentType = null;
-    function = (Function) object.getFuncRef().getTarget();
+    function = targetResolver.targetOf(object.getFuncRef(), Function.class);
   }
 
   public void visit(EndpointRaw object) {
     instanceName = "";
     componentType = null;
-    function = (Function) object.getRef().getTarget();
+    function = targetResolver.targetOf(object.getRef(), Function.class);
   }
 
   public void visit(EndpointSub object) {
-    ComponentUse compRef = (ComponentUse) object.getComponent().getTarget();
+    ComponentUse compRef = targetResolver.targetOf(object.getComponent(), ComponentUse.class);
     instanceName = compRef.getName();
-    componentType = (Component) compRef.getCompRef().getTarget();
+    componentType = targetResolver.targetOf(compRef.getCompRef(), Component.class);
     function = NameFilter.select(componentType.iface, object.getFunction());
   }
 }

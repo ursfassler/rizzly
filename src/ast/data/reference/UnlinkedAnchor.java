@@ -18,7 +18,6 @@
 package ast.data.reference;
 
 import ast.data.AstBase;
-import ast.data.Named;
 
 public class UnlinkedAnchor extends AstBase implements Anchor {
   private final String linkName;
@@ -34,12 +33,6 @@ public class UnlinkedAnchor extends AstBase implements Anchor {
   @Override
   public String targetName() {
     return linkName;
-  }
-
-  @Override
-  @Deprecated
-  public Named getTarget() {
-    throw new RuntimeException("never implemented");
   }
 
   @Override

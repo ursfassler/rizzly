@@ -21,6 +21,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import ast.data.Ast;
+import ast.data.Named;
 import ast.data.component.hfsm.Transition;
 import ast.data.function.Function;
 import ast.data.reference.LinkedAnchor;
@@ -40,6 +41,7 @@ import ast.doc.SimpleGraph;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.repository.query.ChildByName;
+import ast.repository.query.Referencees.TargetResolver;
 
 /**
  * Returns a callgraph of the entire (sub-) tree
@@ -141,14 +143,14 @@ class RefGetter extends NullDispatcher<Ast, Ast> {
 
     // FIXME remove this hack
     if (param instanceof Variable) {
-      param = (((Variable) param).type).getTarget();
+      param = TargetResolver.staticTargetOf((((Variable) param).type), Named.class);
     } else if (param instanceof NamedElement) {
-      param = (((NamedElement) param).typeref).getTarget();
+      param = TargetResolver.staticTargetOf((((NamedElement) param).typeref), Named.class);
     } else if (param instanceof Reference) {
-      param = ((Reference) param).getTarget();
+      param = TargetResolver.staticTargetOf(((Reference) param), Named.class);
     }
     if (param instanceof Reference) {
-      param = ((Reference) param).getTarget();  // TODO needed?
+      param = (TargetResolver.staticTargetOf((Reference) param, Named.class));  // TODO needed?
     }
 
     return ChildByName.get(param, obj.name, obj.metadata());

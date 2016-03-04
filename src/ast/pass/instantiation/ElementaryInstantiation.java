@@ -49,6 +49,7 @@ import ast.pass.AstPass;
 import ast.pass.reduction.CompositionReduction;
 import ast.repository.query.Collector;
 import ast.repository.query.NameFilter;
+import ast.repository.query.Referencees.TargetResolver;
 import ast.specification.IsClass;
 import error.RError;
 
@@ -59,7 +60,7 @@ public class ElementaryInstantiation implements AstPass {
     ComponentUse instComp = kb.getRootComp();
     ast.children.remove(instComp);
 
-    ImplElementary env = makeEnv((Component) instComp.getCompRef().getTarget(), kb);
+    ImplElementary env = makeEnv(TargetResolver.staticTargetOf(instComp.getCompRef(), Component.class), kb);
     ast.children.add(env);
 
     CompInstantiatorWorker instantiator = new CompInstantiatorWorker();
@@ -73,7 +74,7 @@ public class ElementaryInstantiation implements AstPass {
     Set<Function> pubfunc = new HashSet<Function>();
     pubfunc.addAll(Collector.select(inst.subCallback, new IsClass(Function.class)).castTo(Function.class));
     RError.ass(inst.component.size() == 1, inst.metadata(), "Only expected one instance");
-    Component targetComp = (Component) inst.component.get(0).getCompRef().getTarget();
+    Component targetComp = TargetResolver.staticTargetOf(inst.component.get(0).getCompRef(), Component.class);
     pubfunc.addAll(targetComp.iface);
 
     for (Function nam : pubfunc) {
@@ -96,7 +97,7 @@ public class ElementaryInstantiation implements AstPass {
     for (ComponentUse compu : env.component) {
       SubCallbacks suc = new SubCallbacks(compu.metadata(), RefFactory.create(compu));
       env.subCallback.add(suc);
-      Component refComp = (Component) compu.getCompRef().getTarget();
+      Component refComp = TargetResolver.staticTargetOf(compu.getCompRef(), Component.class);
       for (InterfaceFunction out : refComp.getIface(Direction.out)) {
         Function suha = CompositionReduction.makeHandler(out);
         suha.property = FunctionProperty.External;
@@ -135,7 +136,7 @@ class CompInstantiatorWorker extends NullDispatcher<ImplElementary, Namespace> {
     // ns.getChildren().removeAll(ns.getChildren().getItems(FuncCtrlOutDataOut.class));
 
     for (ComponentUse compUse : inst.component) {
-      Component comp = (Component) compUse.getCompRef().getTarget();
+      Component comp = TargetResolver.staticTargetOf(compUse.getCompRef(), Component.class);
 
       // copy / instantiate used component
       Namespace usens = new Namespace(compUse.metadata(), compUse.getName());
@@ -166,7 +167,7 @@ class CompInstantiatorWorker extends NullDispatcher<ImplElementary, Namespace> {
 
   private SubCallbacks getSubCallback(AstList<SubCallbacks> subCallback, ComponentUse compUse) {
     for (SubCallbacks suc : subCallback) {
-      if (suc.compUse.getTarget() == compUse) {
+      if (TargetResolver.staticTargetOf(suc.compUse, ComponentUse.class) == compUse) {
         return suc;
       }
     }

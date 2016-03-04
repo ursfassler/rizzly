@@ -28,6 +28,7 @@ import ast.data.component.hfsm.StateContent;
 import ast.data.component.hfsm.Transition;
 import ast.data.function.header.Slot;
 import ast.dispatcher.NullDispatcher;
+import ast.repository.query.Referencees.TargetResolver;
 
 public class TransitionDict extends NullDispatcher<Void, Void> {
   private Map<State, Map<Slot, AstList<Transition>>> transition = new HashMap<State, Map<Slot, AstList<Transition>>>();
@@ -63,8 +64,8 @@ public class TransitionDict extends NullDispatcher<Void, Void> {
 
   @Override
   protected Void visitTransition(Transition obj, Void param) {
-    State src = (State) obj.src.getTarget();
-    Slot func = (Slot) obj.eventFunc.getTarget();
+    State src = TargetResolver.staticTargetOf(obj.src, State.class);
+    Slot func = TargetResolver.staticTargetOf(obj.eventFunc, Slot.class);
     List<Transition> list = get(src, func);
     list.add(obj);
 

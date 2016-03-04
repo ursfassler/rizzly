@@ -19,7 +19,6 @@ package ast.data.reference;
 
 import ast.data.AstBase;
 import ast.data.AstList;
-import ast.data.Named;
 
 public class OffsetReference extends AstBase implements Reference, ReferenceOffset {
   private Anchor anchor;
@@ -54,13 +53,4 @@ public class OffsetReference extends AstBase implements Reference, ReferenceOffs
     return ret;
   }
 
-  @Override
-  @Deprecated
-  public Named getTarget() {
-    if (!getOffset().isEmpty()) {
-      assert (false);
-    }
-    assert (getOffset().isEmpty()); // FIXME make it correct or remove function
-    return anchor.getTarget();
-  }
 }

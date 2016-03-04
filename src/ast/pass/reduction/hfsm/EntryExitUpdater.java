@@ -41,6 +41,7 @@ import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.manipulator.TypeRepo;
 import ast.repository.query.Collector;
+import ast.repository.query.Referencees.TargetResolver;
 import ast.specification.IsClass;
 
 /**
@@ -132,8 +133,8 @@ class EntryExitUpdaterWorker extends NullDispatcher<Void, EePar> {
   @Override
   protected Void visitState(State obj, EePar param) {
     param = new EePar(param);
-    param.entry.addLast((Function) obj.entryFunc.getTarget());
-    param.exit.addFirst((Function) obj.exitFunc.getTarget());
+    param.entry.addLast(TargetResolver.staticTargetOf(obj.entryFunc, Function.class));
+    param.exit.addFirst(TargetResolver.staticTargetOf(obj.exitFunc, Function.class));
     return super.visitState(obj, param);
   }
 

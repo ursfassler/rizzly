@@ -18,12 +18,14 @@
 package ast.pass.reduction.hfsm;
 
 import ast.data.Ast;
+import ast.data.Named;
 import ast.data.component.hfsm.State;
 import ast.data.component.hfsm.StateComposite;
 import ast.data.component.hfsm.StateSimple;
 import ast.data.reference.LinkedAnchor;
 import ast.data.reference.OffsetReference;
 import ast.dispatcher.NullDispatcher;
+import ast.repository.query.Referencees.TargetResolver;
 
 /**
  *
@@ -50,7 +52,7 @@ public class InitStateGetter extends NullDispatcher<StateSimple, Void> {
 
   @Override
   protected StateSimple visitStateComposite(StateComposite obj, Void param) {
-    return visit(obj.initial.getTarget(), param);
+    return visit(TargetResolver.staticTargetOf(obj.initial, Named.class), param);
   }
 
   @Override

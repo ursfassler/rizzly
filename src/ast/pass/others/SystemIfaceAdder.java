@@ -48,6 +48,7 @@ import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowType;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.repository.query.Referencees.TargetResolver;
 import error.RError;
 
 public class SystemIfaceAdder implements AstPass {
@@ -161,21 +162,21 @@ class SystemIfaceCaller extends NullDispatcher<Void, Void> {
     {
       ArrayList<Statement> code = new ArrayList<Statement>();
       for (ComponentUse cuse : compList) {
-        Function sctor = getCtor((Component) cuse.getCompRef().getTarget());
+        Function sctor = getCtor(TargetResolver.staticTargetOf(cuse.getCompRef(), Component.class));
         CallStmt call = makeCall(cuse, sctor);
         code.add(call);
       }
-      code.add(makeCall((Function) obj.entryFunc.getTarget()));
+      code.add(makeCall(TargetResolver.staticTargetOf(obj.entryFunc, Function.class)));
 
       ctor.body.statements.addAll(code);
     }
 
     {
       ArrayList<Statement> code = new ArrayList<Statement>();
-      code.add(makeCall((Function) obj.exitFunc.getTarget()));
+      code.add(makeCall(TargetResolver.staticTargetOf(obj.exitFunc, Function.class)));
       Collections.reverse(compList);
       for (ComponentUse cuse : compList) {
-        Function sdtor = getDtor((Component) cuse.getCompRef().getTarget());
+        Function sdtor = getDtor(TargetResolver.staticTargetOf(cuse.getCompRef(), Component.class));
         CallStmt call = makeCall(cuse, sdtor);
         code.add(call);
       }

@@ -27,6 +27,7 @@ import ast.data.statement.CallStmt;
 import ast.data.statement.MsgPush;
 import ast.data.statement.Statement;
 import ast.dispatcher.DfsTraverser;
+import ast.repository.query.Referencees.TargetResolver;
 
 class PushReplacer extends DfsTraverser<Statement, Map<Function, Function>> {
 
@@ -43,7 +44,7 @@ class PushReplacer extends DfsTraverser<Statement, Map<Function, Function>> {
 
   @Override
   protected Statement visitMsgPush(MsgPush obj, Map<Function, Function> param) {
-    Function func = param.get(obj.func.getTarget());
+    Function func = param.get(TargetResolver.staticTargetOf(obj.func, Function.class));
     assert (func != null);
 
     Reference call = RefFactory.call(func, obj.data);

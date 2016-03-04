@@ -48,6 +48,7 @@ import ast.data.variable.ConstPrivate;
 import ast.data.variable.FunctionVariable;
 import ast.data.variable.TemplateParameter;
 import ast.meta.MetaList;
+import ast.repository.query.Referencees.TargetResolver;
 import error.ErrorType;
 import error.RError;
 
@@ -85,8 +86,8 @@ public class ImplHfsmParser extends ImplBaseParser {
   // EBNF stateBody: { entryCode | exitCode | varDeclBlock | funcDecl |
   // transitionDecl | state }
   private <T extends State> void parseStateBody(State state) {
-    Block entryBody = ((Function) state.entryFunc.getTarget()).body;
-    Block exitBody = ((Function) state.exitFunc.getTarget()).body;
+    Block entryBody = (TargetResolver.staticTargetOf(state.entryFunc, Function.class)).body;
+    Block exitBody = (TargetResolver.staticTargetOf(state.exitFunc, Function.class)).body;
 
     while (!consumeIfEqual(TokenType.END)) {
       switch (peek().getType()) {

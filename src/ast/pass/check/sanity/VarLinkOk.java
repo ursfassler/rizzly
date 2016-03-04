@@ -41,6 +41,7 @@ import ast.knowledge.KnowParent;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.TypeFilter;
+import ast.repository.query.Referencees.TargetResolver;
 import error.ErrorType;
 import error.RError;
 
@@ -143,7 +144,7 @@ class VarLinkOkWorker extends DfsTraverser<Void, Set<Ast>> {
     visit(obj.dst, param);
     visit(obj.eventFunc, param);
     visit(obj.body, param);
-    addAllToTop((State) obj.src.getTarget(), param);
+    addAllToTop(TargetResolver.staticTargetOf(obj.src, State.class), param);
     visit(obj.guard, param);
     return null;
   }

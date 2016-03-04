@@ -49,6 +49,7 @@ import ast.pass.AstPass;
 import ast.pass.check.model.composition.QueryIsConnectedToOneResponse;
 import ast.repository.query.Collector;
 import ast.repository.query.EndpointFunctionQuery;
+import ast.repository.query.Referencees.TargetResolver;
 import ast.specification.IsClass;
 import ast.visitor.VisitExecutorImplementation;
 import error.ErrorType;
@@ -58,19 +59,20 @@ public class CompInterfaceTypeChecker implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
-    CompInterfaceTypeCheckerWorker adder = new CompInterfaceTypeCheckerWorker(kb);
+    TargetResolver targetResolver = new TargetResolver();
+    CompInterfaceTypeCheckerWorker adder = new CompInterfaceTypeCheckerWorker(targetResolver, kb);
     adder.traverse(ast, null);
   }
 
 }
 
 class CompInterfaceTypeCheckerWorker extends NullDispatcher<Void, Void> {
-
+  final private TargetResolver targetResolver;
   final private KnowType kt;
   final private KnowLeftIsContainerOfRight kc;
 
-  public CompInterfaceTypeCheckerWorker(KnowledgeBase kb) {
-    super();
+  public CompInterfaceTypeCheckerWorker(TargetResolver targetResolver, KnowledgeBase kb) {
+    this.targetResolver = targetResolver;
     this.kt = kb.getEntry(KnowType.class);
     this.kc = kb.getEntry(KnowLeftIsContainerOfRight.class);
   }
@@ -142,7 +144,7 @@ class CompInterfaceTypeCheckerWorker extends NullDispatcher<Void, Void> {
     }
 
     // TODO move into own pass or in a common pass
-    (new QueryIsConnectedToOneResponse(RError.instance())).check(obj.connection);
+    (new QueryIsConnectedToOneResponse(targetResolver, RError.instance())).check(obj.connection);
 
     return null;
   }
@@ -162,7 +164,7 @@ class CompInterfaceTypeCheckerWorker extends NullDispatcher<Void, Void> {
   }
 
   private Component checkIface(ImplComposition obj, ComponentUse use, Direction dir) {
-    Component type = (Component) use.getCompRef().getTarget();
+    Component type = targetResolver.targetOf(use.getCompRef(), Component.class);
     for (InterfaceFunction ifaceuse : type.getIface(dir)) {
       if (!ifaceIsConnected(use, ifaceuse, dir.other(), obj.connection)) {
         ErrorType etype;
@@ -182,10 +184,10 @@ class CompInterfaceTypeCheckerWorker extends NullDispatcher<Void, Void> {
     for (Connection itr : connection) {
       if (getEndpoint(itr, dir) instanceof EndpointSub) {
         EndpointSub ep = (EndpointSub) getEndpoint(itr, dir);
-        EndpointFunctionQuery query = new EndpointFunctionQuery();
+        EndpointFunctionQuery query = new EndpointFunctionQuery(targetResolver);
         VisitExecutorImplementation.instance().visit(query, ep);
         Function func = query.getFunction();
-        if ((ep.getComponent().getTarget() == use) && (func == ifaceuse)) {
+        if ((targetResolver.targetOf(ep.getComponent(), ComponentUse.class) == use) && (func == ifaceuse)) {
           return true;
         }
       }
@@ -197,7 +199,7 @@ class CompInterfaceTypeCheckerWorker extends NullDispatcher<Void, Void> {
     for (Connection itr : connection) {
       if (getEndpoint(itr, dir) instanceof EndpointSelf) {
         Endpoint ep = getEndpoint(itr, dir);
-        EndpointFunctionQuery query = new EndpointFunctionQuery();
+        EndpointFunctionQuery query = new EndpointFunctionQuery(targetResolver);
         VisitExecutorImplementation.instance().visit(query, ep);
         Function func = query.getFunction();
         if (func == ifaceuse) {
@@ -254,7 +256,7 @@ class CompInterfaceTypeCheckerWorker extends NullDispatcher<Void, Void> {
   }
 
   private Function getIfaceFunc(Endpoint ep) {
-    EndpointFunctionQuery query = new EndpointFunctionQuery();
+    EndpointFunctionQuery query = new EndpointFunctionQuery(targetResolver);
     VisitExecutorImplementation.instance().visit(query, ep);
     Function func = query.getFunction();
     if (func == null) {

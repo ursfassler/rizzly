@@ -25,6 +25,7 @@ import ast.data.function.header.FuncQuery;
 import ast.data.reference.Reference;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
+import ast.repository.query.Referencees.TargetResolver;
 import error.ErrorType;
 import error.RError;
 
@@ -37,7 +38,7 @@ public class Root implements AstPass {
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
     Reference reference = kb.getRootComp().getCompRef();
-    Component root = (Component) reference.getTarget();
+    Component root = TargetResolver.staticTargetOf(reference, Component.class);
 
     AstList<FuncQuery> queries = new AstList<FuncQuery>();
     for (InterfaceFunction itr : root.iface) {

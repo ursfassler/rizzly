@@ -56,6 +56,7 @@ import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.Collector;
 import ast.repository.query.TypeFilter;
+import ast.repository.query.Referencees.TargetResolver;
 import ast.specification.IsClass;
 
 /**
@@ -206,7 +207,7 @@ class TransitionDownPropagatorWorker extends NullDispatcher<Void, TransitionPara
     assert (par != null);
 
     makeEntryCalls(par, top, list);
-    list.add(makeCall((Function) start.entryFunc.getTarget()));
+    list.add(makeCall(TargetResolver.staticTargetOf(start.entryFunc, Function.class)));
   }
 
   private StateComposite getParent(State start) {
@@ -225,7 +226,7 @@ class TransitionDownPropagatorWorker extends NullDispatcher<Void, TransitionPara
     StateComposite par = getParent(start);
     assert (par != null);
 
-    list.add(makeCall((Function) start.exitFunc.getTarget()));
+    list.add(makeCall(TargetResolver.staticTargetOf(start.exitFunc, Function.class)));
     makeExitCalls(par, top, list);
   }
 
@@ -342,8 +343,8 @@ class TransitionEndpointCollector extends NullDispatcher<Void, State> {
   @Override
   protected Void visitTransition(Transition obj, State param) {
     ttop.put(obj, param);
-    tsrc.put(obj, (State) obj.src.getTarget());
-    tdst.put(obj, (State) obj.dst.getTarget());
+    tsrc.put(obj, TargetResolver.staticTargetOf(obj.src, State.class));
+    tdst.put(obj, TargetResolver.staticTargetOf(obj.dst, State.class));
     return null;
   }
 

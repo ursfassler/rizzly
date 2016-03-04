@@ -30,6 +30,7 @@ import ast.data.type.composed.NamedElement;
 import ast.data.type.composed.RecordType;
 import ast.data.variable.FunctionVariable;
 import ast.dispatcher.DfsTraverser;
+import ast.repository.query.Referencees.TargetResolver;
 
 class CreateRecordFromFunc extends DfsTraverser<Void, Void> {
   final private Map<Function, RecordType> funcToRecord = new HashMap<Function, RecordType>();
@@ -47,7 +48,7 @@ class CreateRecordFromFunc extends DfsTraverser<Void, Void> {
 
   @Override
   protected Void visitMsgPush(MsgPush obj, Void param) {
-    Function func = (Function) obj.func.getTarget();
+    Function func = TargetResolver.staticTargetOf(obj.func, Function.class);
     // Designator path = kp.get(func);
     // assert (path.size() > 0);
     // String name = new Designator(path,

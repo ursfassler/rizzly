@@ -29,6 +29,7 @@ import ast.dispatcher.NullDispatcher;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.query.Collector;
+import ast.repository.query.Referencees.TargetResolver;
 import ast.specification.IsClass;
 
 /**
@@ -73,7 +74,7 @@ class TransitionRedirecterWorker extends NullDispatcher<Void, Void> {
 
   @Override
   protected Void visitTransition(Transition obj, Void param) {
-    State dst = (State) obj.dst.getTarget();
+    State dst = TargetResolver.staticTargetOf(obj.dst, State.class);
     dst = initStateGetter.traverse(dst, null);
     obj.dst = RefFactory.create(obj.dst.metadata(), dst);
     return null;

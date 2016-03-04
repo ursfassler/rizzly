@@ -23,6 +23,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import org.junit.Test;
+import org.mockito.Mockito;
 
 import ast.data.component.Component;
 import ast.data.component.composition.ComponentUse;
@@ -32,9 +33,11 @@ import ast.data.component.composition.EndpointSub;
 import ast.data.function.Function;
 import ast.data.function.InterfaceFunction;
 import ast.data.reference.Reference;
+import ast.repository.query.Referencees.TargetResolver;
 
 public class EndpointFunctionQuery_Test {
-  final private EndpointFunctionQuery testee = new EndpointFunctionQuery();
+  final private TargetResolver referenceTargetResolver = Mockito.mock(TargetResolver.class);
+  final private EndpointFunctionQuery testee = new EndpointFunctionQuery(referenceTargetResolver);
 
   @Test
   public void has_no_function_by_default() {
@@ -46,7 +49,7 @@ public class EndpointFunctionQuery_Test {
     Reference reference = mock(Reference.class);
     EndpointSelf endpoint = mock(EndpointSelf.class);
     Function function = mock(Function.class);
-    when(reference.getTarget()).thenReturn(function);
+    when(referenceTargetResolver.targetOf(reference, Function.class)).thenReturn(function);
     when(endpoint.getFuncRef()).thenReturn(reference);
 
     testee.visit(endpoint);
@@ -61,7 +64,7 @@ public class EndpointFunctionQuery_Test {
     Reference reference = mock(Reference.class);
     EndpointRaw endpoint = mock(EndpointRaw.class);
     Function function = mock(Function.class);
-    when(reference.getTarget()).thenReturn(function);
+    when(referenceTargetResolver.targetOf(reference, Function.class)).thenReturn(function);
     when(endpoint.getRef()).thenReturn(reference);
 
     testee.visit(endpoint);
@@ -82,11 +85,11 @@ public class EndpointFunctionQuery_Test {
     };
     component.iface.add(function);
     EndpointSub endpoint = mock(EndpointSub.class);
-    when(componentUseRef.getTarget()).thenReturn(componentUse);
+    when(referenceTargetResolver.targetOf(componentUseRef, ComponentUse.class)).thenReturn(componentUse);
     when(endpoint.getComponent()).thenReturn(componentUseRef);
     when(componentUse.getCompRef()).thenReturn(componentRef);
     when(componentUse.getName()).thenReturn("the component instance");
-    when(componentRef.getTarget()).thenReturn(component);
+    when(referenceTargetResolver.targetOf(componentRef, Component.class)).thenReturn(component);
     when(endpoint.getFunction()).thenReturn("functionName");
     when(function.getName()).thenReturn("functionName");
 
