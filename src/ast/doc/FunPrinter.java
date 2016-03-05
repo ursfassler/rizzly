@@ -126,6 +126,7 @@ import ast.data.variable.StateVariable;
 import ast.data.variable.Variable;
 import ast.dispatcher.NullDispatcher;
 import ast.repository.query.Referencees.TargetResolver;
+import util.SeparatorIterator;
 
 /**
  * Prints formated FUN objects to a specific writer.
@@ -154,16 +155,7 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
   }
 
   private void list(Iterable<? extends Ast> list, String sep, Void param) {
-    Iterator<? extends Ast> itr = list.iterator();
-    boolean first = true;
-    while (itr.hasNext()) {
-      if (first) {
-        first = false;
-      } else {
-        xw.wr(sep);
-      }
-      visit(itr.next(), param);
-    }
+    SeparatorIterator.iterate(list, () -> xw.wr(sep), (itr) -> visit(itr, param));
   }
 
   private void visitListNl(List<? extends Ast> list, Void param) {

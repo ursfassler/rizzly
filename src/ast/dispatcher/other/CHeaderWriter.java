@@ -52,6 +52,7 @@ import ast.doc.StreamWriter;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.check.type.ExpressionTypecheck;
 import ast.pass.others.CWriter;
+import util.SeparatorIterator;
 
 /**
  *
@@ -88,15 +89,7 @@ public class CHeaderWriter extends NullDispatcher<Void, StreamWriter> {
 
     if (!debugNames.isEmpty()) {
       param.wr("const char* DEBUG_NAMES[] = { ");
-      boolean first = true;
-      for (String name : debugNames) {
-        if (first) {
-          first = false;
-        } else {
-          param.wr(", ");
-        }
-        param.wr("\"" + name + "\"");
-      }
+      SeparatorIterator.iterate(debugNames, () -> param.wr(", "), (name) -> param.wr("\"" + name + "\""));
       param.wr(" };");
       param.nl();
       param.nl();
@@ -261,15 +254,7 @@ public class CHeaderWriter extends NullDispatcher<Void, StreamWriter> {
   }
 
   private void wrList(AstList<? extends Ast> list, String sep, StreamWriter param) {
-    boolean first = true;
-    for (Ast itr : list) {
-      if (first) {
-        first = false;
-      } else {
-        param.wr(sep);
-      }
-      visit(itr, param);
-    }
+    SeparatorIterator.iterate(list, () -> param.wr(sep), (itr) -> visit(itr, param));
   }
 
   @Override

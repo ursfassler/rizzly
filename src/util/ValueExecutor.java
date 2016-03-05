@@ -15,35 +15,9 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data;
+package util;
 
-import java.util.ArrayList;
-import java.util.Collection;
-
-import util.Join;
-
-public class AstList<T extends Ast> extends ArrayList<T> {
-  private static final long serialVersionUID = 2599344789209692487L;
-
-  public AstList() {
-  }
-
-  public AstList(Collection<? extends T> list) {
-    super(list);
-  }
-
-  @Override
-  public boolean add(T item) {
-    return super.add(item);
-  }
-
-  public <C extends Ast> AstList<C> castTo(Class<C> kind) {
-    return new AstList<C>((AstList<? extends C>) this);
-  }
-
-  @Override
-  public String toString() {
-    return Join.join(this, ",", (x) -> x.toString());
-  }
-
+@FunctionalInterface
+public interface ValueExecutor<T> {
+  public void execute(T value);
 }

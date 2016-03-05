@@ -23,6 +23,7 @@ import ast.data.template.ActualTemplateArgument;
 import ast.data.type.Type;
 import error.ErrorType;
 import error.RError;
+import util.Join;
 
 public class NameMangler {
   static public String name(String templateName, AstList<ActualTemplateArgument> argument) {
@@ -34,18 +35,7 @@ public class NameMangler {
   }
 
   private static String name(AstList<ActualTemplateArgument> argument) {
-    String ret = "";
-
-    boolean first = true;
-    for (ActualTemplateArgument arg : argument) {
-      if (first) {
-        first = false;
-      } else {
-        ret += ",";
-      }
-      ret += name(arg);
-    }
-    return ret;
+    return Join.join(argument, ",", (x) -> name(x));
   }
 
   private static String name(ActualTemplateArgument arg) {

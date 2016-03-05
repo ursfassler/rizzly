@@ -27,6 +27,7 @@ import ast.data.variable.FunctionVariable;
 import ast.dispatcher.NullDispatcher;
 import ast.doc.StreamWriter;
 import ast.specification.ExternalFunction;
+import util.SeparatorIterator;
 
 public class OutputWriter extends NullDispatcher<Void, Void> {
 
@@ -103,30 +104,22 @@ public class OutputWriter extends NullDispatcher<Void, Void> {
   }
 
   private void visitParamList(AstList<FunctionVariable> param) {
-    boolean first = true;
-    for (FunctionVariable var : param) {
-      if (first) {
-        first = false;
-      } else {
-        sw.wr("\", \" + ");
-      }
+    SeparatorIterator.iterate(param, () -> {
+      sw.wr("\", \" + ");
+    }, (var) -> {
       sw.wr("std::to_string(");
       sw.wr(var.getName());
       sw.wr(")");
       sw.wr(" + ");
-    }
+    });
   }
 
   private void visitArgList(AstList<FunctionVariable> param) {
-    boolean first = true;
-    for (FunctionVariable var : param) {
-      if (first) {
-        first = false;
-      } else {
-        sw.wr(", ");
-      }
+    SeparatorIterator.iterate(param, () -> {
+      sw.wr(", ");
+    }, (var) -> {
       visit(var, null);
-    }
+    });
   }
 
   @Override

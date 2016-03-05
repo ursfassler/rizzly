@@ -17,7 +17,6 @@
 
 package ast.data.function;
 
-import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Named;
 import ast.data.component.hfsm.StateContent;
@@ -25,6 +24,7 @@ import ast.data.function.ret.FuncReturn;
 import ast.data.function.ret.FuncReturnNone;
 import ast.data.statement.Block;
 import ast.data.variable.FunctionVariable;
+import util.Join;
 
 abstract public class Function extends Named implements StateContent {
   final public AstList<FunctionVariable> param;
@@ -44,23 +44,9 @@ abstract public class Function extends Named implements StateContent {
     String ret = getName();
 
     ret += "(";
-    ret += l2s(param);
+    ret += Join.join(param, "; ", (p) -> p.toString());
     ret += ")";
 
-    return ret;
-  }
-
-  static private String l2s(AstList<FunctionVariable> param) {
-    String ret = "";
-    boolean first = true;
-    for (Ast tp : param) {
-      if (first) {
-        first = false;
-      } else {
-        ret += "; ";
-      }
-      ret += tp.toString();
-    }
     return ret;
   }
 

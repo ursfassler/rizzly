@@ -20,6 +20,7 @@ package ast.data.reference;
 import ast.data.AstList;
 import ast.data.template.ActualTemplateArgument;
 import ast.meta.MetaList;
+import util.Join;
 
 final public class RefTemplCall extends RefItem {
   final public AstList<ActualTemplateArgument> actualParameter;
@@ -38,15 +39,7 @@ final public class RefTemplCall extends RefItem {
   public String toString() {
     String ret = "";
     ret += "{";
-    boolean first = true;
-    for (ActualTemplateArgument gen : actualParameter) {
-      if (first) {
-        first = false;
-      } else {
-        ret += ",";
-      }
-      ret += gen.toString();
-    }
+    ret += Join.join(actualParameter, ",", (p) -> p.toString());
     ret += "}";
     return ret;
   }

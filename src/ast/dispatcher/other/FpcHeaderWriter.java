@@ -57,6 +57,7 @@ import ast.specification.ExternalFunction;
 import ast.specification.PublicFunction;
 import error.ErrorType;
 import error.RError;
+import util.SeparatorIterator;
 
 public class FpcHeaderWriter extends NullDispatcher<Void, StreamWriter> {
   private final static String LibName = "LIB_NAME";
@@ -110,15 +111,7 @@ public class FpcHeaderWriter extends NullDispatcher<Void, StreamWriter> {
 
     if (!debugNames.isEmpty()) {
       param.wr("  DEBUG_NAMES : array[0.." + (debugNames.size() - 1) + "] of string = ( ");
-      boolean first = true;
-      for (String name : debugNames) {
-        if (first) {
-          first = false;
-        } else {
-          param.wr(", ");
-        }
-        param.wr("'" + name + "'");
-      }
+      SeparatorIterator.iterate(debugNames, () -> param.wr(", "), (name) -> param.wr("'" + name + "'"));
       param.wr(" );");
       param.nl();
       param.nl();

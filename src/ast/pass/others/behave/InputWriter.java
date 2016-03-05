@@ -30,6 +30,7 @@ import ast.data.variable.FunctionVariable;
 import ast.dispatcher.NullDispatcher;
 import ast.doc.StreamWriter;
 import ast.specification.PublicFunction;
+import util.SeparatorIterator;
 
 public class InputWriter extends NullDispatcher<Void, Function> {
   final private StreamWriter sw;
@@ -100,18 +101,15 @@ public class InputWriter extends NullDispatcher<Void, Function> {
 
   private void writeCall(Function obj) {
     sw.wr("self._inst." + obj.getName() + "(");
-    boolean first = true;
-    for (FunctionVariable var : obj.param) {
-      if (first) {
-        first = false;
-      } else {
-        sw.wr(", ");
-      }
-      // TODO use correct type
+
+    SeparatorIterator.iterate(obj.param, () -> {
+      sw.wr(", ");
+    }, (var) -> {
       sw.wr("c_int(");
       sw.wr(var.getName());
       sw.wr(")");
-    }
+    });
+
     sw.wr(")");
   }
 
