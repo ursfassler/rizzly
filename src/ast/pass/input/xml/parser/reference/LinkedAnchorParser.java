@@ -15,31 +15,29 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.input.xml.parser.variable;
+package ast.pass.input.xml.parser.reference;
 
 import java.util.Collection;
 
-import ast.data.Ast;
-import ast.data.expression.Expression;
-import ast.data.reference.Reference;
-import ast.data.variable.GlobalConstant;
+import ast.data.reference.LinkedAnchor;
 import ast.pass.input.xml.infrastructure.Parser;
 import ast.pass.input.xml.infrastructure.XmlParser;
-import ast.pass.input.xml.linker.ObjectRegistrar;
+import ast.pass.input.xml.linker.LinkDummy;
+import ast.pass.input.xml.linker.LinkDummyRecorder;
 import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
-public class GlobalConstantParser implements Parser {
-  private static final String Name = "GlobalConstant";
+public class LinkedAnchorParser implements Parser {
+  private static final String Name = "LinkedAnchor";
   private final ExpectionParser stream;
-  private final ObjectRegistrar objectRegistrar;
+  private final LinkDummyRecorder linkDummyRecorder;
   private final XmlParser parser;
   private final RizzlyError error;
 
-  public GlobalConstantParser(ExpectionParser stream, ObjectRegistrar objectRegistrar, XmlParser parser, RizzlyError error) {
+  public LinkedAnchorParser(ExpectionParser stream, LinkDummyRecorder linkDummyRecorder, XmlParser parser, RizzlyError error) {
     this.stream = stream;
-    this.objectRegistrar = objectRegistrar;
+    this.linkDummyRecorder = linkDummyRecorder;
     this.parser = parser;
     this.error = error;
   }
@@ -50,24 +48,22 @@ public class GlobalConstantParser implements Parser {
   }
 
   @Override
-  public Class<? extends Ast> type() {
-    return GlobalConstant.class;
+  public Class<LinkedAnchor> type() {
+    return LinkedAnchor.class;
   }
 
   @Override
-  public GlobalConstant parse() {
+  public LinkedAnchor parse() {
     stream.elementStart(Name);
-    String name = stream.attribute("name");
-    String id = parser.id();
-
-    Reference type = parser.itemOf(Reference.class);
-    Expression value = parser.itemOf(Expression.class);
-
+    String linkId = stream.attribute("link");
     stream.elementEnd();
 
-    GlobalConstant object = new GlobalConstant(name, type, value);
-    objectRegistrar.register(id, object);
-    return object;
+    LinkDummy link = new LinkDummy();
+    link.setName(linkId);
+
+    linkDummyRecorder.add(link);
+
+    return new LinkedAnchor(link);
   }
 
 }

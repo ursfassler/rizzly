@@ -167,7 +167,7 @@ import ast.data.type.template.ArrayTemplate;
 import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
-import ast.data.variable.ConstPrivate;
+import ast.data.variable.PrivateConstant;
 import ast.data.variable.Constant;
 import ast.data.variable.DefaultVariable;
 import ast.data.variable.FunctionVariable;
@@ -413,8 +413,8 @@ public abstract class Dispatcher<R, P> {
   }
 
   protected R visitConstant(Constant obj, P param) {
-    if (obj instanceof ConstPrivate) {
-      return visitConstPrivate((ConstPrivate) obj, param);
+    if (obj instanceof PrivateConstant) {
+      return visitConstPrivate((PrivateConstant) obj, param);
     } else if (obj instanceof GlobalConstant) {
       return visitConstGlobal((GlobalConstant) obj, param);
     } else {
@@ -821,7 +821,7 @@ public abstract class Dispatcher<R, P> {
 
   abstract protected R visitSubCallbacks(SubCallbacks obj, P param);
 
-  abstract protected R visitConstPrivate(ConstPrivate obj, P param);
+  abstract protected R visitConstPrivate(PrivateConstant obj, P param);
 
   abstract protected R visitConstGlobal(GlobalConstant obj, P param);
 

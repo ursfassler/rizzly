@@ -21,15 +21,16 @@ import ast.data.type.Type;
 import ast.pass.input.xml.infrastructure.ParserDispatcher;
 import ast.pass.input.xml.infrastructure.ParsersImplementation;
 import ast.pass.input.xml.infrastructure.XmlParser;
+import ast.pass.input.xml.linker.ObjectRegistrar;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
 public class TypeParser extends ParserDispatcher {
 
-  public TypeParser(ExpectionParser stream, XmlParser parser, RizzlyError error) {
+  public TypeParser(ExpectionParser stream, ObjectRegistrar objectRegistrar, XmlParser parser, RizzlyError error) {
     super(Type.class, new ParsersImplementation(error), stream, parser, error);
-    add(new IntegerParser(stream, parser, error));
-    add(new NaturalParser(stream, parser, error));
+    add(new IntegerParser(stream, objectRegistrar, parser, error));
+    add(new NaturalParser(stream, objectRegistrar, parser, error));
   }
 
 }

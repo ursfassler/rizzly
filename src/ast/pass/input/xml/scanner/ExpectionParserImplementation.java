@@ -17,11 +17,11 @@
 
 package ast.pass.input.xml.scanner;
 
-import parser.PeekNReader;
 import ast.meta.MetaListImplementation;
 import ast.pass.input.xml.infrastructure.XmlParseError;
 import error.ErrorType;
 import error.RizzlyError;
+import parser.PeekNReader;
 
 public class ExpectionParserImplementation implements ExpectionParser {
   private final PeekNReader<XmlToken> stream;
@@ -91,6 +91,17 @@ public class ExpectionParserImplementation implements ExpectionParser {
     }
 
     return current.getAttribute(name);
+  }
+
+  @Override
+  public String attribute(String name, String defaultValue) {
+    expectType(current, XmlType.ElementStart);
+
+    if (current.hasAttribute(name)) {
+      return current.getAttribute(name);
+    } else {
+      return defaultValue;
+    }
   }
 
 }

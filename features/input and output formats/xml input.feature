@@ -26,4 +26,3 @@ Scenario: read a simple AST from an xml file
     
     """
 
-

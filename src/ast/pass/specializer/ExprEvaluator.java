@@ -151,7 +151,7 @@ public class ExprEvaluator extends NullDispatcher<ValueExpr, Void> {
   }
 
   @Override
-  protected ValueExpr visitConstPrivate(ast.data.variable.ConstPrivate obj, Void param) {
+  protected ValueExpr visitConstPrivate(ast.data.variable.PrivateConstant obj, Void param) {
     return visit(obj.def, param);
   }
 

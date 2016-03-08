@@ -70,4 +70,9 @@ public class XmlParserImplementation implements XmlParser {
     return parser.parse();
   }
 
+  @Override
+  public String id() {
+    return stream.attribute("id", "");
+  }
+
 }

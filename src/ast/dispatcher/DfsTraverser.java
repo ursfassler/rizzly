@@ -137,7 +137,7 @@ import ast.data.type.special.VoidType;
 import ast.data.type.template.ArrayTemplate;
 import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
-import ast.data.variable.ConstPrivate;
+import ast.data.variable.PrivateConstant;
 import ast.data.variable.FunctionVariable;
 import ast.data.variable.GlobalConstant;
 import ast.data.variable.StateVariable;
@@ -334,7 +334,7 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
   }
 
   @Override
-  protected R visitConstPrivate(ConstPrivate obj, P param) {
+  protected R visitConstPrivate(PrivateConstant obj, P param) {
     visit(obj.type, param);
     visit(obj.def, param);
     return null;

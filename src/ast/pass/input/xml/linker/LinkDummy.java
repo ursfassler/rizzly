@@ -15,15 +15,10 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.data.variable;
+package ast.pass.input.xml.linker;
 
-import ast.data.component.hfsm.StateContent;
-import ast.data.expression.Expression;
-import ast.data.reference.Reference;
+import ast.data.Named;
 
-final public class ConstPrivate extends Constant implements StateContent {
-  public ConstPrivate(String name, Reference type, Expression def) {
-    super(name, type, def);
-  }
+public class LinkDummy extends Named {
 
 }

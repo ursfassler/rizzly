@@ -30,6 +30,7 @@ import ast.pass.input.xml.XmlParserPass;
 import ast.pass.linker.Linker;
 import ast.pass.others.DefaultVisitorPass;
 import ast.pass.others.FileLoader;
+import ast.pass.others.InternsAdder;
 import ast.pass.output.xml.XmlWriterPass;
 import ast.pass.reduction.MetadataRemover;
 import error.ErrorType;
@@ -46,6 +47,7 @@ public class ExplicitPassesFactory {
     this.error = error;
 
     factories.put("linker", new LinkerFactory());
+    factories.put("internsAdder", new InternsAdderFactory());
     factories.put("xmlreader", new XmlReaderFactory());
     factories.put("xmlwriter", new XmlWriterFactory());
     factories.put("rzyreader", new RzyReaderFactory());
@@ -134,6 +136,18 @@ class LinkerFactory implements SinglePassFactory {
   @Override
   public AstPass create(List<String> arguments) {
     return new Linker();
+  }
+
+  @Override
+  public int expectedArgumentCount() {
+    return 0;
+  }
+}
+
+class InternsAdderFactory implements SinglePassFactory {
+  @Override
+  public AstPass create(List<String> arguments) {
+    return new InternsAdder();
   }
 
   @Override

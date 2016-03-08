@@ -26,6 +26,7 @@ import org.mockito.Mockito;
 
 import ast.data.expression.Expression;
 import ast.data.reference.Reference;
+import ast.data.variable.PrivateConstant;
 import ast.data.variable.FunctionVariable;
 import ast.data.variable.GlobalConstant;
 import ast.data.variable.StateVariable;
@@ -85,5 +86,14 @@ public class Writer_Variable_Test {
     order.verify(executor).visit(eq(testee), eq(item.type));
     order.verify(executor).visit(eq(testee), eq(item.def));
     order.verify(stream).endNode();
+  }
+
+  @Test
+  public void write_PrivateConstant() {
+    PrivateConstant item = new PrivateConstant("the variable", type, defaultValue);
+
+    testee.visit(item);
+
+    order.verify(stream).beginNode(eq("PrivateConstant"));
   }
 }

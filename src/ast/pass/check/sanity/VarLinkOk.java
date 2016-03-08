@@ -33,7 +33,7 @@ import ast.data.statement.ForStmt;
 import ast.data.statement.VarDefStmt;
 import ast.data.template.Template;
 import ast.data.type.Type;
-import ast.data.variable.ConstPrivate;
+import ast.data.variable.PrivateConstant;
 import ast.data.variable.StateVariable;
 import ast.data.variable.Variable;
 import ast.dispatcher.DfsTraverser;
@@ -152,7 +152,7 @@ class VarLinkOkWorker extends DfsTraverser<Void, Set<Ast>> {
   private void addAllToTop(State state, Set<Ast> param) {
     while (true) {
       param.addAll(TypeFilter.select(state.item, StateVariable.class));
-      param.addAll(TypeFilter.select(state.item, ConstPrivate.class));
+      param.addAll(TypeFilter.select(state.item, PrivateConstant.class));
       Ast parent = kp.get(state);
       if (parent instanceof State) {
         state = (State) parent;

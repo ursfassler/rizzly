@@ -145,10 +145,10 @@ import ast.data.type.special.VoidType;
 import ast.data.type.template.ArrayTemplate;
 import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
-import ast.data.variable.ConstPrivate;
 import ast.data.variable.DefaultVariable;
 import ast.data.variable.FunctionVariable;
 import ast.data.variable.GlobalConstant;
+import ast.data.variable.PrivateConstant;
 import ast.data.variable.StateVariable;
 import ast.data.variable.TemplateParameter;
 import ast.meta.SourcePosition;
@@ -295,8 +295,8 @@ public class Write implements Visitor {
     visitDefaultVariable("GlobalConstant", object);
   }
 
-  public void visit(ConstPrivate object) {
-    throw new RuntimeException("not yet implemented");
+  public void visit(PrivateConstant object) {
+    visitDefaultVariable("PrivateConstant", object);
   }
 
   public void visit(DefaultValueTemplate object) {

@@ -147,3 +147,53 @@ Scenario: references are unique
 
     """
 
+
+Scenario: id's are not preserved when reading an xml and writing the same ast
+  Given we have a file "input.xml" with the content:
+    """
+    <rizzly>
+      <GlobalConstant name="TheOtherAnswer">
+        <Reference>
+          <LinkedAnchor link="the natural"/>
+        </Reference>
+        <NumberValue value="42"/>
+      </GlobalConstant>
+      <GlobalConstant name="TheAnswer">
+        <Reference>
+          <LinkedAnchor link="the integer"/>
+        </Reference>
+        <NumberValue value="42"/>
+      </GlobalConstant>
+      <Integer name="Integer" id="the integer"/>
+      <Natural name="Natural" id="the natural"/>
+    </rizzly>
+
+    """
+
+  When I start rizzly with the passes
+    | pass                    |
+    | xmlreader('input.xml')  |
+    | xmlwriter('output.xml') |
+  
+  Then I expect no error
+  And I expect an xml file "output.xml" with the content:
+    """
+    <rizzly>
+      <GlobalConstant name="TheOtherAnswer">
+        <Reference>
+          <LinkedAnchor link="1"/>
+        </Reference>
+        <NumberValue value="42"/>
+      </GlobalConstant>
+      <GlobalConstant name="TheAnswer">
+        <Reference>
+          <LinkedAnchor link="0"/>
+        </Reference>
+        <NumberValue value="42"/>
+      </GlobalConstant>
+      <Integer name="Integer" id="0"/>
+      <Natural name="Natural" id="1"/>
+    </rizzly>
+
+    """
+

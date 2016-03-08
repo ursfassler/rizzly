@@ -35,6 +35,7 @@ import ast.pass.input.xml.XmlParserPass;
 import ast.pass.linker.Linker;
 import ast.pass.others.DefaultVisitorPass;
 import ast.pass.others.FileLoader;
+import ast.pass.others.InternsAdder;
 import ast.pass.output.xml.XmlWriterPass;
 import ast.pass.reduction.MetadataRemover;
 import error.ErrorType;
@@ -133,6 +134,13 @@ public class ExplicitPassesFactory_Test {
     when(argumentParser.parse("xmlwriter('filename.xml')")).thenReturn(list("xmlwriter", "filename.xml"));
 
     Assert.assertTrue(testee.produce("xmlwriter('filename.xml')") instanceof XmlWriterPass);
+  }
+
+  @Test
+  public void has_a_pass_internsAdder() {
+    when(argumentParser.parse("internsAdder")).thenReturn(list("internsAdder"));
+
+    Assert.assertTrue(testee.produce("internsAdder") instanceof InternsAdder);
   }
 
   @Test

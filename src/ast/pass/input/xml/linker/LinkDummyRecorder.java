@@ -15,20 +15,10 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.input.xml.scanner;
+package ast.pass.input.xml.linker;
 
-public interface ExpectionParser {
+public interface LinkDummyRecorder {
 
-  public boolean hasElement();
-
-  public String peekElement();
-
-  public void elementStart(String value);
-
-  public void elementEnd();
-
-  public String attribute(String name);
-
-  public String attribute(String name, String defaultValue);
+  void add(LinkDummy link);
 
 }

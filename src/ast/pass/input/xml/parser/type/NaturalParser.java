@@ -22,6 +22,7 @@ import java.util.Collection;
 import ast.data.type.special.NaturalType;
 import ast.pass.input.xml.infrastructure.Parser;
 import ast.pass.input.xml.infrastructure.XmlParser;
+import ast.pass.input.xml.linker.ObjectRegistrar;
 import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
@@ -29,11 +30,13 @@ import error.RizzlyError;
 public class NaturalParser implements Parser {
   private static final String Name = "Natural";
   private final ExpectionParser stream;
+  private final ObjectRegistrar objectRegistrar;
   private final XmlParser parser;
   private final RizzlyError error;
 
-  public NaturalParser(ExpectionParser stream, XmlParser parser, RizzlyError error) {
+  public NaturalParser(ExpectionParser stream, ObjectRegistrar objectRegistrar, XmlParser parser, RizzlyError error) {
     this.stream = stream;
+    this.objectRegistrar = objectRegistrar;
     this.parser = parser;
     this.error = error;
   }
@@ -52,9 +55,12 @@ public class NaturalParser implements Parser {
   public NaturalType parse() {
     stream.elementStart(Name);
     String name = stream.attribute("name");
+    String id = parser.id();
     stream.elementEnd();
 
-    return new NaturalType(name);
+    NaturalType object = new NaturalType(name);
+    objectRegistrar.register(id, object);
+    return object;
   }
 
 }

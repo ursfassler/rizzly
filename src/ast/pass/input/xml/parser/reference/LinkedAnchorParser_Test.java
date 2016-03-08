@@ -15,56 +15,71 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.input.xml.parser.type;
+package ast.pass.input.xml.parser.reference;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
-import ast.data.type.special.NaturalType;
+import ast.data.reference.LinkedAnchor;
 import ast.pass.input.xml.infrastructure.XmlParser;
-import ast.pass.input.xml.linker.ObjectRegistrar;
+import ast.pass.input.xml.linker.LinkDummy;
+import ast.pass.input.xml.linker.LinkDummyRecorder;
 import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
-public class NaturalParser_Test {
+public class LinkedAnchorParser_Test {
   final private ExpectionParser stream = mock(ExpectionParser.class);
-  final private ObjectRegistrar objectRegistrar = mock(ObjectRegistrar.class);
+  final private LinkDummyRecorder linkDummyRecorder = mock(LinkDummyRecorder.class);
   final private XmlParser parser = mock(XmlParser.class);
   final private RizzlyError error = mock(RizzlyError.class);
-  final private NaturalParser testee = new NaturalParser(stream, objectRegistrar, parser, error);
-  final private InOrder order = Mockito.inOrder(stream, parser, objectRegistrar);
+  final private LinkedAnchorParser testee = new LinkedAnchorParser(stream, linkDummyRecorder, parser, error);
+  final private InOrder order = Mockito.inOrder(stream, parser);
 
   @Test
   public void has_correct_name() {
-    assertEquals(Names.list("Natural"), testee.names());
+    assertEquals(Names.list("LinkedAnchor"), testee.names());
   }
 
   @Test
   public void has_correct_type() {
-    assertEquals(NaturalType.class, testee.type());
+    assertEquals(LinkedAnchor.class, testee.type());
   }
 
   @Test
-  public void parse_NumberValue() {
-    when(stream.attribute(eq("name"))).thenReturn("the name");
-    when(parser.id()).thenReturn("the id");
+  public void parse_LinkedAnchorParser() {
+    when(stream.attribute(eq("link"))).thenReturn("the target");
 
-    NaturalType value = testee.parse();
+    LinkedAnchor anchor = testee.parse();
 
-    assertEquals("the name", value.getName());
+    assertEquals("the target", anchor.targetName());
 
-    order.verify(stream).elementStart(eq("Natural"));
-    order.verify(stream).attribute(eq("name"));
-    order.verify(parser).id();
+    order.verify(stream).elementStart(eq("LinkedAnchor"));
+    order.verify(stream).attribute(eq("link"));
     order.verify(stream).elementEnd();
-    order.verify(objectRegistrar).register(eq("the id"), eq(value));
   }
 
+  @Test
+  public void link_is_a_dummy() {
+    when(stream.attribute(eq("link"))).thenReturn("the target");
+    LinkedAnchor anchor = testee.parse();
+
+    assertTrue(anchor.getLink() instanceof LinkDummy);
+  }
+
+  @Test
+  public void records_creation_of_LinkDummies() {
+    when(stream.attribute(eq("link"))).thenReturn("the target");
+    LinkedAnchor anchor = testee.parse();
+
+    verify(linkDummyRecorder).add((LinkDummy) anchor.getLink());
+  }
 }

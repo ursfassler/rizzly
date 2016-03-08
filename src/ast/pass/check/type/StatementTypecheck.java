@@ -44,7 +44,7 @@ import ast.data.type.base.EnumElement;
 import ast.data.type.base.RangeType;
 import ast.data.type.base.TupleType;
 import ast.data.type.special.IntegerType;
-import ast.data.variable.ConstPrivate;
+import ast.data.variable.PrivateConstant;
 import ast.data.variable.Constant;
 import ast.data.variable.FunctionVariable;
 import ast.data.variable.GlobalConstant;
@@ -118,7 +118,7 @@ public class StatementTypecheck extends NullDispatcher<Void, Void> {
   }
 
   @Override
-  protected Void visitConstPrivate(ConstPrivate obj, Void param) {
+  protected Void visitConstPrivate(PrivateConstant obj, Void param) {
     checkConstant(obj);
     return null;
   }

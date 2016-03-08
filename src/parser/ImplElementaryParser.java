@@ -27,7 +27,7 @@ import ast.data.Named;
 import ast.data.raw.RawComponent;
 import ast.data.raw.RawElementary;
 import ast.data.template.Template;
-import ast.data.variable.ConstPrivate;
+import ast.data.variable.PrivateConstant;
 import ast.data.variable.StateVariable;
 import ast.data.variable.TemplateParameter;
 import ast.meta.MetaList;
@@ -101,7 +101,7 @@ public class ImplElementaryParser extends ImplBaseParser {
   private Ast parseInstantiation(String name) {
     switch (peek().getType()) {
       case CONST: {
-        ConstPrivate var = parseConstDef(ConstPrivate.class, name);
+        PrivateConstant var = parseConstDef(PrivateConstant.class, name);
         expect(TokenType.SEMI);
         return var;
       }

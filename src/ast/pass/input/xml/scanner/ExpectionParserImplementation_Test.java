@@ -30,11 +30,11 @@ import java.util.Map;
 
 import org.junit.Test;
 
-import parser.PeekNReader;
 import ast.meta.MetaList;
 import ast.pass.input.xml.infrastructure.XmlParseError;
 import error.ErrorType;
 import error.RizzlyError;
+import parser.PeekNReader;
 
 public class ExpectionParserImplementation_Test {
   final private PeekNReader<XmlToken> stream = mock(PeekNReader.class);
@@ -138,6 +138,22 @@ public class ExpectionParserImplementation_Test {
     testee.elementStart("the element");
 
     testee.attribute("expected attribute");
+  }
+
+  @Test
+  public void return_the_value_of_an_optional_attribute_when_available() {
+    when(stream.next()).thenReturn(XmlTokenFactory.elementStart("", attr("the attribute", "the attribute value")));
+    testee.elementStart("");
+
+    assertEquals("the attribute value", testee.attribute("the attribute", ""));
+  }
+
+  @Test
+  public void return_the_default_value_of_an_optional_attribute_when_not_available() {
+    when(stream.next()).thenReturn(XmlTokenFactory.elementStart(""));
+    testee.elementStart("");
+
+    assertEquals("the default value", testee.attribute("the attribute", "the default value"));
   }
 
   @Test

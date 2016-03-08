@@ -32,7 +32,7 @@ public class TypeParser_Test {
   final private ExpectionParser stream = mock(ExpectionParser.class);
   final private XmlParser parser = mock(XmlParser.class);
   final private RizzlyError error = mock(RizzlyError.class);
-  final private TypeParser testee = new TypeParser(stream, parser, error);
+  final private TypeParser testee = new TypeParser(stream, null, parser, error);
 
   @Test
   public void has_all_types() {

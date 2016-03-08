@@ -15,20 +15,15 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.input.xml.scanner;
+package ast.data.variable;
 
-public interface ExpectionParser {
+import ast.data.component.hfsm.StateContent;
+import ast.data.expression.Expression;
+import ast.data.reference.Reference;
 
-  public boolean hasElement();
-
-  public String peekElement();
-
-  public void elementStart(String value);
-
-  public void elementEnd();
-
-  public String attribute(String name);
-
-  public String attribute(String name, String defaultValue);
+final public class PrivateConstant extends Constant implements StateContent {
+  public PrivateConstant(String name, Reference type, Expression def) {
+    super(name, type, def);
+  }
 
 }

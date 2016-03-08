@@ -18,7 +18,7 @@
 package ast.copy;
 
 import ast.data.Ast;
-import ast.data.variable.ConstPrivate;
+import ast.data.variable.PrivateConstant;
 import ast.data.variable.FunctionVariable;
 import ast.data.variable.GlobalConstant;
 import ast.data.variable.StateVariable;
@@ -49,8 +49,8 @@ public class CopyVariable extends NullDispatcher<Variable, Void> {
   }
 
   @Override
-  protected Variable visitConstPrivate(ConstPrivate obj, Void param) {
-    return new ConstPrivate(obj.getName(), cast.copy(obj.type), cast.copy(obj.def));
+  protected Variable visitConstPrivate(PrivateConstant obj, Void param) {
+    return new PrivateConstant(obj.getName(), cast.copy(obj.type), cast.copy(obj.def));
   }
 
   @Override

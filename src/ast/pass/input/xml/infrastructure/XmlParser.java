@@ -30,4 +30,6 @@ public interface XmlParser {
 
   public <T extends Ast> AstList<T> itemsOf(Class<T> itemClass);
 
+  public String id();
+
 }

@@ -21,14 +21,16 @@ import ast.data.reference.Anchor;
 import ast.pass.input.xml.infrastructure.ParserDispatcher;
 import ast.pass.input.xml.infrastructure.ParsersImplementation;
 import ast.pass.input.xml.infrastructure.XmlParser;
+import ast.pass.input.xml.linker.LinkDummyRecorder;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
 public class AnchorParser extends ParserDispatcher {
 
-  public AnchorParser(ExpectionParser stream, XmlParser parser, RizzlyError error) {
+  public AnchorParser(ExpectionParser stream, LinkDummyRecorder linkDummyRecorder, XmlParser parser, RizzlyError error) {
     super(Anchor.class, new ParsersImplementation(error), stream, parser, error);
     add(new UnlinkedAnchorParser(stream, parser, error));
+    add(new LinkedAnchorParser(stream, linkDummyRecorder, parser, error));
   }
 
 }

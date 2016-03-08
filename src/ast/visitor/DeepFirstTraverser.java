@@ -145,7 +145,7 @@ import ast.data.type.special.VoidType;
 import ast.data.type.template.ArrayTemplate;
 import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
-import ast.data.variable.ConstPrivate;
+import ast.data.variable.PrivateConstant;
 import ast.data.variable.FunctionVariable;
 import ast.data.variable.GlobalConstant;
 import ast.data.variable.StateVariable;
@@ -353,7 +353,7 @@ public class DeepFirstTraverser implements Visitor {
     postorderVisit(object);
   }
 
-  public void visit(ConstPrivate object) {
+  public void visit(PrivateConstant object) {
     preorderVisit(object);
     executeVisit(object.type);
     executeVisit(object.def);

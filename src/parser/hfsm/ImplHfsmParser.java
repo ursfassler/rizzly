@@ -44,7 +44,7 @@ import ast.data.reference.RefItem;
 import ast.data.reference.Reference;
 import ast.data.statement.Block;
 import ast.data.template.Template;
-import ast.data.variable.ConstPrivate;
+import ast.data.variable.PrivateConstant;
 import ast.data.variable.FunctionVariable;
 import ast.data.variable.TemplateParameter;
 import ast.meta.MetaList;
@@ -144,7 +144,7 @@ public class ImplHfsmParser extends ImplBaseParser {
       case STATE:
         return parseState(name);
       case CONST:
-        ast.data.variable.ConstPrivate con = parseConstDef(ConstPrivate.class, name);
+        ast.data.variable.PrivateConstant con = parseConstDef(PrivateConstant.class, name);
         expect(TokenType.SEMI);
         return con;
       case RESPONSE:

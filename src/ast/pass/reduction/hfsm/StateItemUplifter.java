@@ -29,7 +29,7 @@ import ast.data.component.hfsm.StateSimple;
 import ast.data.function.header.FuncFunction;
 import ast.data.function.header.Procedure;
 import ast.data.type.Type;
-import ast.data.variable.ConstPrivate;
+import ast.data.variable.PrivateConstant;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.repository.manipulator.Manipulate;
@@ -56,7 +56,7 @@ public class StateItemUplifter implements AstPass {
     orSpecs.add(new IsClass(Procedure.class));
     orSpecs.add(new IsClass(FuncFunction.class));
     orSpecs.add(new IsClass(Type.class));
-    orSpecs.add(new IsClass(ConstPrivate.class));
+    orSpecs.add(new IsClass(PrivateConstant.class));
     return new OrSpec(orSpecs);
   }
 

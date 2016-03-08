@@ -28,16 +28,18 @@ import org.mockito.Mockito;
 
 import ast.data.type.special.IntegerType;
 import ast.pass.input.xml.infrastructure.XmlParser;
+import ast.pass.input.xml.linker.ObjectRegistrar;
 import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
 public class IntegerParser_Test {
   final private ExpectionParser stream = mock(ExpectionParser.class);
+  final private ObjectRegistrar objectRegistrar = mock(ObjectRegistrar.class);
   final private XmlParser parser = mock(XmlParser.class);
   final private RizzlyError error = mock(RizzlyError.class);
-  final private IntegerParser testee = new IntegerParser(stream, parser, error);
-  final private InOrder order = Mockito.inOrder(stream, parser);
+  final private IntegerParser testee = new IntegerParser(stream, objectRegistrar, parser, error);
+  final private InOrder order = Mockito.inOrder(stream, parser, objectRegistrar);
 
   @Test
   public void has_correct_name() {
@@ -52,6 +54,7 @@ public class IntegerParser_Test {
   @Test
   public void parse_NumberValue() {
     when(stream.attribute(eq("name"))).thenReturn("the name");
+    when(parser.id()).thenReturn("the id");
 
     IntegerType value = testee.parse();
 
@@ -59,7 +62,9 @@ public class IntegerParser_Test {
 
     order.verify(stream).elementStart(eq("Integer"));
     order.verify(stream).attribute(eq("name"));
+    order.verify(parser).id();
     order.verify(stream).elementEnd();
+    order.verify(objectRegistrar).register(eq("the id"), eq(value));
   }
 
 }

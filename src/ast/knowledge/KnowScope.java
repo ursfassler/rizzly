@@ -52,7 +52,7 @@ import ast.data.type.special.VoidType;
 import ast.data.type.template.ArrayTemplate;
 import ast.data.type.template.RangeTemplate;
 import ast.data.type.template.TypeTypeTemplate;
-import ast.data.variable.ConstPrivate;
+import ast.data.variable.PrivateConstant;
 import ast.data.variable.FunctionVariable;
 import ast.data.variable.GlobalConstant;
 import ast.data.variable.StateVariable;
@@ -98,7 +98,7 @@ public class KnowScope extends KnowledgeEntry {
 
     priv.add(ComponentUse.class);
     priv.add(StateVariable.class);
-    priv.add(ConstPrivate.class);
+    priv.add(PrivateConstant.class);
     priv.add(StateComposite.class);
     priv.add(StateSimple.class);
     priv.add(Transition.class);

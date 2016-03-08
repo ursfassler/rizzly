@@ -42,7 +42,7 @@ import ast.data.type.base.StringType;
 import ast.data.type.composed.NamedElement;
 import ast.data.type.composed.RecordType;
 import ast.data.type.special.VoidType;
-import ast.data.variable.ConstPrivate;
+import ast.data.variable.PrivateConstant;
 import ast.data.variable.FunctionVariable;
 import ast.data.variable.GlobalConstant;
 import ast.data.variable.Variable;
@@ -277,7 +277,7 @@ public class FpcHeaderWriter extends NullDispatcher<Void, StreamWriter> {
   }
 
   @Override
-  protected Void visitConstPrivate(ConstPrivate obj, StreamWriter param) {
+  protected Void visitConstPrivate(PrivateConstant obj, StreamWriter param) {
     throw new RuntimeException("not yet implemented");
   }
 

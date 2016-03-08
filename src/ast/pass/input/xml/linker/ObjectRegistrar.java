@@ -15,20 +15,12 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.input.xml.scanner;
+package ast.pass.input.xml.linker;
 
-public interface ExpectionParser {
+import ast.data.Named;
 
-  public boolean hasElement();
+public interface ObjectRegistrar {
 
-  public String peekElement();
-
-  public void elementStart(String value);
-
-  public void elementEnd();
-
-  public String attribute(String name);
-
-  public String attribute(String name, String defaultValue);
+  void register(String id, Named object);
 
 }

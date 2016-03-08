@@ -24,19 +24,21 @@ import org.junit.Test;
 
 import ast.data.reference.Anchor;
 import ast.pass.input.xml.infrastructure.XmlParser;
+import ast.pass.input.xml.linker.LinkDummyRecorder;
 import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
 public class AnchorParser_Test {
   final private ExpectionParser stream = mock(ExpectionParser.class);
+  final private LinkDummyRecorder linkDummyRecorder = mock(LinkDummyRecorder.class);
   final private XmlParser parser = mock(XmlParser.class);
   final private RizzlyError error = mock(RizzlyError.class);
-  final private AnchorParser testee = new AnchorParser(stream, parser, error);
+  final private AnchorParser testee = new AnchorParser(stream, linkDummyRecorder, parser, error);
 
   @Test
-  public void has_unlinked_anchor() {
-    assertEquals(Names.list("UnlinkedAnchor"), testee.names());
+  public void has_both_anchors() {
+    assertEquals(Names.list("UnlinkedAnchor", "LinkedAnchor"), testee.names());
   }
 
   @Test

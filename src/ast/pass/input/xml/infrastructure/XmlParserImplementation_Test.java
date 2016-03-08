@@ -18,6 +18,7 @@
 package ast.pass.input.xml.infrastructure;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
@@ -124,4 +125,17 @@ public class XmlParserImplementation_Test {
     assertEquals(2, testee.itemsOf(Block.class).size());
   }
 
+  @Test
+  public void id_returns_the_id_attribute_when_available() {
+    when(stream.attribute(eq("id"), any())).thenReturn("the id");
+
+    assertEquals("the id", testee.id());
+  }
+
+  @Test
+  public void id_returns_an_empty_string_when_id_is_not_available() {
+    testee.id();
+
+    verify(stream).attribute(eq("id"), eq(""));
+  }
 }
