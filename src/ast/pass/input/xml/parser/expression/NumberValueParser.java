@@ -18,14 +18,13 @@
 package ast.pass.input.xml.parser.expression;
 
 import java.math.BigInteger;
-import java.util.Collection;
 
+import ast.data.Ast;
 import ast.data.expression.value.NumberValue;
 import ast.meta.MetaListImplementation;
 import ast.pass.input.xml.infrastructure.Parser;
 import ast.pass.input.xml.infrastructure.XmlParseError;
 import ast.pass.input.xml.infrastructure.XmlParser;
-import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.ErrorType;
 import error.RizzlyError;
@@ -43,13 +42,21 @@ public class NumberValueParser implements Parser {
   }
 
   @Override
-  public Collection<String> names() {
-    return Names.list(Name);
+  public Parser parserFor(String name) {
+    if (Name.equals(name)) {
+      return this;
+    } else {
+      return null;
+    }
   }
 
   @Override
-  public Class<NumberValue> type() {
-    return NumberValue.class;
+  public Parser parserFor(Class<? extends Ast> type) {
+    if (type == NumberValue.class) {
+      return this;
+    } else {
+      return null;
+    }
   }
 
   @Override

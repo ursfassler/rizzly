@@ -17,83 +17,54 @@
 
 package ast.pass.input.xml.infrastructure;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
 import ast.data.Ast;
-import ast.meta.MetaListImplementation;
-import error.ErrorType;
 import error.RizzlyError;
 
 public class ParsersImplementation implements Parsers {
-  // TODO is parser by name and type needed?
   final private RizzlyError error;
-  final private Map<String, Parser> parsersByName = new HashMap<String, Parser>();
-  final private Map<Class<? extends Ast>, Parser> parsersByType = new HashMap<Class<? extends Ast>, Parser>();
+  final private List<Parser> parsers = new ArrayList<>();
 
   public ParsersImplementation(RizzlyError error) {
     this.error = error;
   }
 
   @Override
-  public Collection<String> names() {
-    return parsersByName.keySet();
-  }
-
-  @Override
   public Parser parserFor(String elementName) {
-    Parser parser = parsersByName.get(elementName);
-
-    if (parser == null) {
-      error.err(ErrorType.Error, "unknown element \"" + elementName + "\"", new MetaListImplementation());
-      throw new XmlParseError();
+    for (Parser itr : parsers) {
+      Parser parser = itr.parserFor(elementName);
+      if (parser != null) {
+        return parser;
+      }
     }
 
-    return parser;
+    return null;
   }
 
   @Override
   public Parser parserFor(Class<? extends Ast> itemType) {
-    Parser parser = parsersByType.get(itemType);
-
-    if (parser == null) {
-      error.err(ErrorType.Error, "unknown type \"" + itemType.getSimpleName() + "\"", new MetaListImplementation());
-      throw new XmlParseError();
+    for (Parser itr : parsers) {
+      Parser parser = itr.parserFor(itemType);
+      if (parser != null) {
+        return parser;
+      }
     }
 
-    return parser;
+    return null;
   }
 
   @Override
   public void add(Parser parser) {
-    // TODO simplify
-    Collection<String> names = parser.names();
-    if (nameAlreadyRegistered(names)) {
-      return;
-    }
-
-    for (String name : names) {
-      parsersByName.put(name, parser);
-    }
-
-    Class type = parser.type();
-    if (parsersByType.containsKey(type)) {
-      error.err(ErrorType.Fatal, "parser with type \"" + type.getSimpleName() + "\" already registered", new MetaListImplementation());
-    } else {
-      parsersByType.put(type, parser);
-    }
+    parsers.add(parser);
   }
 
-  private boolean nameAlreadyRegistered(Collection<String> names) {
-    for (String name : names) {
-      if (parsersByName.containsKey(name)) {
-        error.err(ErrorType.Fatal, "parser with name \"" + name + "\" already registered", new MetaListImplementation());
-        return true;
-      }
-    }
-
-    return false;
+  @Deprecated
+  @Override
+  public Collection<String> names() {
+    throw new RuntimeException("not yet implemented");
   }
 
 }

@@ -17,14 +17,12 @@
 
 package ast.pass.input.xml.parser.expression;
 
-import java.util.Collection;
-
+import ast.data.Ast;
 import ast.data.expression.value.BooleanValue;
 import ast.meta.MetaListImplementation;
 import ast.pass.input.xml.infrastructure.Parser;
 import ast.pass.input.xml.infrastructure.XmlParseError;
 import ast.pass.input.xml.infrastructure.XmlParser;
-import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.ErrorType;
 import error.RizzlyError;
@@ -42,13 +40,13 @@ public class BooleanValueParser implements Parser {
   }
 
   @Override
-  public Collection<String> names() {
-    return Names.list(Name);
+  public Parser parserFor(String name) {
+    return Name.equals(name) ? this : null;
   }
 
   @Override
-  public Class<BooleanValue> type() {
-    return BooleanValue.class;
+  public Parser parserFor(Class<? extends Ast> type) {
+    return type == BooleanValue.class ? this : null;
   }
 
   @Override

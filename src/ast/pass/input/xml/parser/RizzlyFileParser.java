@@ -17,8 +17,7 @@
 
 package ast.pass.input.xml.parser;
 
-import java.util.Collection;
-
+import ast.data.Ast;
 import ast.data.file.RizzlyFile;
 import ast.pass.input.xml.infrastructure.Parser;
 import ast.pass.input.xml.scanner.ExpectionParser;
@@ -35,13 +34,13 @@ public class RizzlyFileParser implements Parser {
   }
 
   @Override
-  public Collection<String> names() {
-    return Names.list(Name);
+  public Parser parserFor(String name) {
+    return Name.equals(name) ? this : null;
   }
 
   @Override
-  public Class type() {
-    return RizzlyFile.class;
+  public Parser parserFor(Class<? extends Ast> type) {
+    return type == RizzlyFile.class ? this : null;
   }
 
   @Override

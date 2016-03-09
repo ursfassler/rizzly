@@ -17,8 +17,7 @@
 
 package ast.pass.input.xml.parser.function;
 
-import java.util.Collection;
-
+import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.function.FunctionProperty;
 import ast.data.function.header.Procedure;
@@ -28,7 +27,6 @@ import ast.data.variable.FunctionVariable;
 import ast.pass.input.xml.infrastructure.Parser;
 import ast.pass.input.xml.infrastructure.XmlParser;
 import ast.pass.input.xml.linker.ObjectRegistrar;
-import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
@@ -47,13 +45,13 @@ public class ProcedureParser implements Parser {
   }
 
   @Override
-  public Collection<String> names() {
-    return Names.list(Name);
+  public Parser parserFor(String name) {
+    return Name.equals(name) ? this : null;
   }
 
   @Override
-  public Class<Procedure> type() {
-    return Procedure.class;
+  public Parser parserFor(Class<? extends Ast> type) {
+    return type == Procedure.class ? this : null;
   }
 
   @Override

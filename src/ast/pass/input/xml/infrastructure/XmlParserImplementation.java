@@ -19,15 +19,20 @@ package ast.pass.input.xml.infrastructure;
 
 import ast.data.Ast;
 import ast.data.AstList;
+import ast.meta.MetaListImplementation;
 import ast.pass.input.xml.scanner.ExpectionParser;
+import error.ErrorType;
+import error.RizzlyError;
 
 public class XmlParserImplementation implements XmlParser {
   final private ExpectionParser stream;
   final private Parsers parsers;
+  final private RizzlyError error;
 
-  public XmlParserImplementation(ExpectionParser stream, Parsers parsers) {
+  public XmlParserImplementation(ExpectionParser stream, Parsers parsers, RizzlyError error) {
     this.stream = stream;
     this.parsers = parsers;
+    this.error = error;
   }
 
   public void add(Parser parser) {
@@ -49,10 +54,11 @@ public class XmlParserImplementation implements XmlParser {
     AstList<T> items = new AstList<T>();
     while (stream.hasElement()) {
       String name = stream.peekElement();
-      if (!parser.names().contains(name)) {
+      Parser actualParser = parser.parserFor(name);
+      if (actualParser == null) {
         break;
       }
-      items.add((T) parser.parse());
+      items.add((T) actualParser.parse());
     }
     return items;
   }
@@ -67,6 +73,10 @@ public class XmlParserImplementation implements XmlParser {
   @Override
   public <T extends Ast> T itemOf(Class<T> itemClass) {
     Parser parser = parsers.parserFor(itemClass);
+    if (parser == null) {
+      error.err(ErrorType.Fatal, "parser not found for: " + itemClass.getSimpleName(), new MetaListImplementation());
+      throw new XmlParseError();
+    }
     return parser.parse();
   }
 

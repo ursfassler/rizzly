@@ -29,6 +29,7 @@ import org.mockito.Mockito;
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
+import ast.data.expression.Expression;
 import ast.pass.input.xml.infrastructure.XmlParser;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
@@ -41,13 +42,23 @@ public class XmlTopParser_Test {
   final private InOrder order = Mockito.inOrder(expected, parser);
 
   @Test
-  public void has_correct_name() {
-    assertEquals(Names.list("rizzly"), testee.names());
+  public void returns_itself_for_correct_name() {
+    assertEquals(testee, testee.parserFor("rizzly"));
   }
 
   @Test
-  public void has_correct_type() {
-    assertEquals(Namespace.class, testee.type());
+  public void returns_nothing_for_wrong_name() {
+    assertEquals(null, testee.parserFor(""));
+  }
+
+  @Test
+  public void returns_itself_for_correct_type() {
+    assertEquals(testee, testee.parserFor(Namespace.class));
+  }
+
+  @Test
+  public void returns_nothing_for_wrong_type() {
+    assertEquals(null, testee.parserFor(Expression.class));
   }
 
   @Test

@@ -18,6 +18,7 @@
 package ast.pass.input.xml.parser.reference;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 
 import org.junit.Test;
@@ -25,7 +26,6 @@ import org.junit.Test;
 import ast.data.reference.Anchor;
 import ast.pass.input.xml.infrastructure.XmlParser;
 import ast.pass.input.xml.linker.LinkDummyRecorder;
-import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
@@ -37,13 +37,14 @@ public class AnchorParser_Test {
   final private AnchorParser testee = new AnchorParser(stream, linkDummyRecorder, parser, error);
 
   @Test
-  public void has_both_anchors() {
-    assertEquals(Names.list("UnlinkedAnchor", "LinkedAnchor"), testee.names());
+  public void has_all_needed_value_parsers() {
+    assertNotNull(testee.parserFor("UnlinkedAnchor"));
+    assertNotNull(testee.parserFor("LinkedAnchor"));
   }
 
   @Test
   public void has_correct_type() {
-    assertEquals(Anchor.class, testee.type());
+    assertEquals(testee, testee.parserFor(Anchor.class));
   }
 
 }

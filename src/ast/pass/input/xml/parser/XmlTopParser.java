@@ -17,8 +17,6 @@
 
 package ast.pass.input.xml.parser;
 
-import java.util.Collection;
-
 import ast.data.Ast;
 import ast.data.AstList;
 import ast.data.Namespace;
@@ -40,13 +38,13 @@ public class XmlTopParser implements Parser {
   }
 
   @Override
-  public Collection<String> names() {
-    return Names.list(Name);
+  public Parser parserFor(String name) {
+    return Name.equals(name) ? this : null;
   }
 
   @Override
-  public Class type() {
-    return Namespace.class;
+  public Parser parserFor(Class<? extends Ast> type) {
+    return type == Namespace.class ? this : null;
   }
 
   @Override

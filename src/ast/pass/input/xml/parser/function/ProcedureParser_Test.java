@@ -28,6 +28,7 @@ import org.mockito.InOrder;
 import org.mockito.Mockito;
 
 import ast.data.AstList;
+import ast.data.expression.Expression;
 import ast.data.function.FunctionProperty;
 import ast.data.function.header.Procedure;
 import ast.data.function.ret.FuncReturnNone;
@@ -35,7 +36,6 @@ import ast.data.statement.Block;
 import ast.data.variable.FunctionVariable;
 import ast.pass.input.xml.infrastructure.XmlParser;
 import ast.pass.input.xml.linker.ObjectRegistrar;
-import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
@@ -50,13 +50,23 @@ public class ProcedureParser_Test {
   final private Block body = mock(Block.class);
 
   @Test
-  public void has_correct_name() {
-    assertEquals(Names.list("Procedure"), testee.names());
+  public void returns_itself_for_correct_name() {
+    assertEquals(testee, testee.parserFor("Procedure"));
   }
 
   @Test
-  public void has_correct_type() {
-    assertEquals(Procedure.class, testee.type());
+  public void returns_nothing_for_wrong_name() {
+    assertEquals(null, testee.parserFor(""));
+  }
+
+  @Test
+  public void returns_itself_for_correct_type() {
+    assertEquals(testee, testee.parserFor(Procedure.class));
+  }
+
+  @Test
+  public void returns_nothing_for_wrong_type() {
+    assertEquals(null, testee.parserFor(Expression.class));
   }
 
   @Test

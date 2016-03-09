@@ -25,6 +25,7 @@ public interface Parsers {
 
   void add(Parser parser);
 
+  @Deprecated
   public Collection<String> names();
 
   public Parser parserFor(String elementName);

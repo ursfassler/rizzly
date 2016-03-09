@@ -18,26 +18,17 @@
 package ast.pass.input.xml.infrastructure;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
-import java.util.Collection;
 
 import org.junit.Test;
 
 import ast.data.reference.Anchor;
-import ast.data.reference.LinkedAnchor;
-import ast.data.reference.UnlinkedAnchor;
 import ast.data.statement.Block;
-import ast.meta.MetaList;
-import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
-import error.ErrorType;
 import error.RizzlyError;
 
 public class ParserDispatcher_Test {
@@ -48,42 +39,24 @@ public class ParserDispatcher_Test {
   final private ParserDispatcher testee = new ParserDispatcher(Anchor.class, parsers, stream, parser, error);
 
   @Test
-  public void forwards_name_request_to_parsers() {
-    Collection<String> names = Names.list("one name", "another one");
-    when(parsers.names()).thenReturn(names);
+  public void forwards_request_for_parser_by_name_to_parsers() {
+    Parser parser = mock(Parser.class);
+    when(parsers.parserFor("another name")).thenReturn(parser);
 
-    assertEquals(names, testee.names());
+    assertEquals(parser, testee.parserFor("another name"));
   }
 
   @Test
-  public void returns_the_type_as_specified() {
-    assertEquals(Anchor.class, testee.type());
+  public void forwards_request_for_parser_by_type_to_parsers() {
+    Parser parser = mock(Parser.class);
+    when(parsers.parserFor(Block.class)).thenReturn(parser);
+
+    assertEquals(parser, testee.parserFor(Block.class));
   }
 
   @Test
-  public void can_not_add_parsers_with_incompatible_type() {
-    Parser incompatibleParser = mock(Parser.class);
-    when(incompatibleParser.type()).thenReturn((Class) Block.class);
-
-    testee.add(incompatibleParser);
-
-    verify(error).err(eq(ErrorType.Fatal), eq("Can not add parser (type Block is not a subtype of Anchor)"), any(MetaList.class));
-    verify(parsers, never()).add(any(Parser.class));
-  }
-
-  @Test
-  public void can_add_parsers_when_types_are_subtypes() {
-    Parser unlinkedParser = mock(Parser.class);
-    Parser linkedParser = mock(Parser.class);
-    when(unlinkedParser.type()).thenReturn((Class) UnlinkedAnchor.class);
-    when(linkedParser.type()).thenReturn((Class) LinkedAnchor.class);
-
-    testee.add(unlinkedParser);
-    testee.add(linkedParser);
-
-    verify(error, never()).err(any(ErrorType.class), anyString(), any(MetaList.class));
-    verify(parsers).add(eq(unlinkedParser));
-    verify(parsers).add(eq(linkedParser));
+  public void returns_itself_if_request_for_parser_with_type_that_handles_this_class() {
+    assertEquals(testee, testee.parserFor(Anchor.class));
   }
 
   @Test

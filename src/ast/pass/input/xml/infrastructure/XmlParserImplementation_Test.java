@@ -32,15 +32,17 @@ import org.mockito.Mockito;
 import ast.data.Ast;
 import ast.data.reference.Reference;
 import ast.data.statement.Block;
-import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
+import error.ErrorType;
+import error.RizzlyError;
 
 public class XmlParserImplementation_Test {
   final private ExpectionParser stream = mock(ExpectionParser.class);
   final private Parsers parsers = mock(Parsers.class);
+  final private RizzlyError error = mock(RizzlyError.class);
   final private Parser parser = mock(Parser.class);
   final private Ast ast = mock(Ast.class);
-  final private XmlParserImplementation testee = new XmlParserImplementation(stream, parsers);
+  final private XmlParserImplementation testee = new XmlParserImplementation(stream, parsers, error);
   final private InOrder order = Mockito.inOrder(stream, parsers, parser);
 
   @Test
@@ -95,6 +97,25 @@ public class XmlParserImplementation_Test {
   }
 
   @Test
+  public void reports_an_error_if_a_parser_is_missing() {
+    when(parsers.parserFor(any(Class.class))).thenReturn(null);
+
+    try {
+      testee.itemOf(Reference.class);
+    } catch (XmlParseError e) {
+    }
+
+    verify(error).err(eq(ErrorType.Fatal), eq("parser not found for: Reference"), any());
+  }
+
+  @Test(expected = XmlParseError.class)
+  public void throw_an_error_if_a_parser_is_missing() {
+    when(parsers.parserFor(any(Class.class))).thenReturn(null);
+
+    testee.itemOf(Reference.class);
+  }
+
+  @Test
   public void parsing_for_specific_items_return_zero_if_there_are_no_more_elements() {
     when(stream.hasElement()).thenReturn(false);
 
@@ -107,7 +128,7 @@ public class XmlParserImplementation_Test {
     when(stream.hasElement()).thenReturn(true);
     when(stream.peekElement()).thenReturn("next element").thenReturn("quixli");
     when(parsers.parserFor(Block.class)).thenReturn(parser);
-    when(parser.names()).thenReturn(Names.list("next element"));
+    when(parser.parserFor("next element")).thenReturn(parser);
     when(parser.parse()).thenReturn(block);
 
     assertEquals(1, testee.itemsOf(Block.class).size());
@@ -119,7 +140,7 @@ public class XmlParserImplementation_Test {
     when(stream.hasElement()).thenReturn(true).thenReturn(true).thenReturn(false);
     when(stream.peekElement()).thenReturn("next element");
     when(parsers.parserFor(Block.class)).thenReturn(parser);
-    when(parser.names()).thenReturn(Names.list("next element"));
+    when(parser.parserFor("next element")).thenReturn(parser);
     when(parser.parse()).thenReturn(block);
 
     assertEquals(2, testee.itemsOf(Block.class).size());

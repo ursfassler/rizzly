@@ -17,12 +17,8 @@
 
 package ast.pass.input.xml.infrastructure;
 
-import java.util.Collection;
-
 import ast.data.Ast;
-import ast.meta.MetaListImplementation;
 import ast.pass.input.xml.scanner.ExpectionParser;
-import error.ErrorType;
 import error.RizzlyError;
 
 public class ParserDispatcher implements Parser {
@@ -47,23 +43,18 @@ public class ParserDispatcher implements Parser {
     return parser.parse();
   }
 
-  @Override
-  public Collection<String> names() {
-    return parsers.names();
-  }
-
-  @Override
-  public Class<? extends Ast> type() {
-    return type;
-  }
-
   public void add(Parser parser) {
-    Class<? extends Ast> parserType = parser.type();
-    if (type.isAssignableFrom(parserType)) {
-      parsers.add(parser);
-    } else {
-      error.err(ErrorType.Fatal, "Can not add parser (type " + parserType.getSimpleName() + " is not a subtype of " + type.getSimpleName() + ")", new MetaListImplementation());
-    }
+    parsers.add(parser);
+  }
+
+  @Override
+  public Parser parserFor(String elementName) {
+    return parsers.parserFor(elementName);
+  }
+
+  @Override
+  public Parser parserFor(Class<? extends Ast> elementType) {
+    return type == elementType ? this : parsers.parserFor(elementType);
   }
 
 }

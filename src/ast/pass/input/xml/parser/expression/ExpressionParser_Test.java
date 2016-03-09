@@ -18,7 +18,7 @@
 package ast.pass.input.xml.parser.expression;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 
 import org.junit.Test;
@@ -36,13 +36,13 @@ public class ExpressionParser_Test {
 
   @Test
   public void has_all_needed_value_parsers() {
-    assertTrue(testee.names().contains("NumberValue"));
-    assertTrue(testee.names().contains("BooleanValue"));
+    assertNotNull(testee.parserFor("NumberValue"));
+    assertNotNull(testee.parserFor("BooleanValue"));
   }
 
   @Test
   public void has_correct_type() {
-    assertEquals(Expression.class, testee.type());
+    assertEquals(testee, testee.parserFor(Expression.class));
   }
 
 }

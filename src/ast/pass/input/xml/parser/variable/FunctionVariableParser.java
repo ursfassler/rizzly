@@ -17,15 +17,12 @@
 
 package ast.pass.input.xml.parser.variable;
 
-import java.util.Collection;
-
 import ast.data.Ast;
 import ast.data.reference.Reference;
 import ast.data.variable.FunctionVariable;
 import ast.pass.input.xml.infrastructure.Parser;
 import ast.pass.input.xml.infrastructure.XmlParser;
 import ast.pass.input.xml.linker.ObjectRegistrar;
-import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
@@ -44,13 +41,13 @@ public class FunctionVariableParser implements Parser {
   }
 
   @Override
-  public Collection<String> names() {
-    return Names.list(Name);
+  public Parser parserFor(String name) {
+    return Name.equals(name) ? this : null;
   }
 
   @Override
-  public Class<? extends Ast> type() {
-    return FunctionVariable.class;
+  public Parser parserFor(Class<? extends Ast> type) {
+    return type == FunctionVariable.class ? this : null;
   }
 
   @Override

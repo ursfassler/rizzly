@@ -17,14 +17,12 @@
 
 package ast.pass.input.xml.parser.reference;
 
-import java.util.Collection;
-
+import ast.data.Ast;
 import ast.data.reference.LinkedAnchor;
 import ast.pass.input.xml.infrastructure.Parser;
 import ast.pass.input.xml.infrastructure.XmlParser;
 import ast.pass.input.xml.linker.LinkDummy;
 import ast.pass.input.xml.linker.LinkDummyRecorder;
-import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
@@ -43,13 +41,13 @@ public class LinkedAnchorParser implements Parser {
   }
 
   @Override
-  public Collection<String> names() {
-    return Names.list(Name);
+  public Parser parserFor(String name) {
+    return Name.equals(name) ? this : null;
   }
 
   @Override
-  public Class<LinkedAnchor> type() {
-    return LinkedAnchor.class;
+  public Parser parserFor(Class<? extends Ast> type) {
+    return type == LinkedAnchor.class ? this : null;
   }
 
   @Override

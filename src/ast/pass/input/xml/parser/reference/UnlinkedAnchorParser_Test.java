@@ -26,9 +26,9 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
+import ast.data.expression.Expression;
 import ast.data.reference.UnlinkedAnchor;
 import ast.pass.input.xml.infrastructure.XmlParser;
-import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
@@ -40,13 +40,23 @@ public class UnlinkedAnchorParser_Test {
   final private InOrder order = Mockito.inOrder(stream, parser);
 
   @Test
-  public void has_correct_name() {
-    assertEquals(Names.list("UnlinkedAnchor"), testee.names());
+  public void returns_itself_for_correct_name() {
+    assertEquals(testee, testee.parserFor("UnlinkedAnchor"));
   }
 
   @Test
-  public void has_correct_type() {
-    assertEquals(UnlinkedAnchor.class, testee.type());
+  public void returns_nothing_for_wrong_name() {
+    assertEquals(null, testee.parserFor(""));
+  }
+
+  @Test
+  public void returns_itself_for_correct_type() {
+    assertEquals(testee, testee.parserFor(UnlinkedAnchor.class));
+  }
+
+  @Test
+  public void returns_nothing_for_wrong_type() {
+    assertEquals(null, testee.parserFor(Expression.class));
   }
 
   @Test

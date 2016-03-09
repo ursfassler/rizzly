@@ -26,10 +26,10 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
+import ast.data.expression.Expression;
 import ast.data.type.special.NaturalType;
 import ast.pass.input.xml.infrastructure.XmlParser;
 import ast.pass.input.xml.linker.ObjectRegistrar;
-import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
@@ -42,13 +42,23 @@ public class NaturalParser_Test {
   final private InOrder order = Mockito.inOrder(stream, parser, objectRegistrar);
 
   @Test
-  public void has_correct_name() {
-    assertEquals(Names.list("Natural"), testee.names());
+  public void returns_itself_for_correct_name() {
+    assertEquals(testee, testee.parserFor("Natural"));
   }
 
   @Test
-  public void has_correct_type() {
-    assertEquals(NaturalType.class, testee.type());
+  public void returns_nothing_for_wrong_name() {
+    assertEquals(null, testee.parserFor(""));
+  }
+
+  @Test
+  public void returns_itself_for_correct_type() {
+    assertEquals(testee, testee.parserFor(NaturalType.class));
+  }
+
+  @Test
+  public void returns_nothing_for_wrong_type() {
+    assertEquals(null, testee.parserFor(Expression.class));
   }
 
   @Test

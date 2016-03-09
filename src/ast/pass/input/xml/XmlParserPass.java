@@ -66,7 +66,7 @@ public class XmlParserPass implements AstPass {
     TokenReader<XmlToken> stream = xmlReader(getFilename());
     PeekNReader<XmlToken> peekReader = new PeekNReader<XmlToken>(stream);
     ExpectionParser expect = new ExpectionParserImplementation(peekReader, error);
-    XmlParserImplementation parser = new XmlParserImplementation(expect, new ParsersImplementation(error));
+    XmlParserImplementation parser = new XmlParserImplementation(expect, new ParsersImplementation(error), error);
     XmlIdMatcher matcher = new XmlIdMatcher(error);
     addParsers(parser, expect, matcher);
     XmlTopParser topParser = new XmlTopParser(expect, parser, error);

@@ -18,7 +18,7 @@
 package ast.pass.input.xml.parser.type;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 
 import org.junit.Test;
@@ -35,14 +35,14 @@ public class TypeParser_Test {
   final private TypeParser testee = new TypeParser(stream, null, parser, error);
 
   @Test
-  public void has_all_types() {
-    assertTrue(testee.names().contains("Integer"));
-    assertTrue(testee.names().contains("Natural"));
+  public void has_all_needed_value_parsers() {
+    assertNotNull(testee.parserFor("Integer"));
+    assertNotNull(testee.parserFor("Natural"));
   }
 
   @Test
   public void has_correct_type() {
-    assertEquals(Type.class, testee.type());
+    assertEquals(testee, testee.parserFor(Type.class));
   }
 
 }

@@ -18,7 +18,7 @@
 package ast.pass.input.xml.parser.variable;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.mock;
 
 import org.junit.Test;
@@ -37,14 +37,14 @@ public class VariableParser_Test {
   final private VariableParser testee = new VariableParser(stream, objectRegistrar, parser, error);
 
   @Test
-  public void has_all_variables() {
-    assertTrue(testee.names().contains("GlobalConstant"));
-    assertTrue(testee.names().contains("FunctionVariable"));
+  public void has_all_needed_value_parsers() {
+    assertNotNull(testee.parserFor("GlobalConstant"));
+    assertNotNull(testee.parserFor("FunctionVariable"));
   }
 
   @Test
   public void has_correct_type() {
-    assertEquals(Variable.class, testee.type());
+    assertEquals(testee, testee.parserFor(Variable.class));
   }
 
 }

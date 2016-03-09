@@ -24,7 +24,6 @@ import org.junit.Test;
 
 import ast.data.reference.RefItem;
 import ast.pass.input.xml.infrastructure.XmlParser;
-import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
@@ -36,12 +35,11 @@ public class RefItemParser_Test {
 
   @Test
   public void has_no_parsers_yet() {
-    assertEquals(Names.list(), testee.names());
   }
 
   @Test
   public void has_correct_type() {
-    assertEquals(RefItem.class, testee.type());
+    assertEquals(testee, testee.parserFor(RefItem.class));
   }
 
 }

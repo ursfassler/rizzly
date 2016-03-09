@@ -31,7 +31,6 @@ import ast.data.reference.Reference;
 import ast.data.variable.GlobalConstant;
 import ast.pass.input.xml.infrastructure.XmlParser;
 import ast.pass.input.xml.linker.ObjectRegistrar;
-import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
@@ -46,13 +45,23 @@ public class GlobalConstantParser_Test {
   final private Expression expression = mock(Expression.class);
 
   @Test
-  public void has_correct_name() {
-    assertEquals(Names.list("GlobalConstant"), testee.names());
+  public void returns_itself_for_correct_name() {
+    assertEquals(testee, testee.parserFor("GlobalConstant"));
   }
 
   @Test
-  public void has_correct_type() {
-    assertEquals(GlobalConstant.class, testee.type());
+  public void returns_nothing_for_wrong_name() {
+    assertEquals(null, testee.parserFor(""));
+  }
+
+  @Test
+  public void returns_itself_for_correct_type() {
+    assertEquals(testee, testee.parserFor(GlobalConstant.class));
+  }
+
+  @Test
+  public void returns_nothing_for_wrong_type() {
+    assertEquals(null, testee.parserFor(Expression.class));
   }
 
   @Test

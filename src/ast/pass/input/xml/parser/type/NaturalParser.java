@@ -17,13 +17,11 @@
 
 package ast.pass.input.xml.parser.type;
 
-import java.util.Collection;
-
+import ast.data.Ast;
 import ast.data.type.special.NaturalType;
 import ast.pass.input.xml.infrastructure.Parser;
 import ast.pass.input.xml.infrastructure.XmlParser;
 import ast.pass.input.xml.linker.ObjectRegistrar;
-import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
@@ -42,13 +40,13 @@ public class NaturalParser implements Parser {
   }
 
   @Override
-  public Collection<String> names() {
-    return Names.list(Name);
+  public Parser parserFor(String name) {
+    return Name.equals(name) ? this : null;
   }
 
   @Override
-  public Class<NaturalType> type() {
-    return NaturalType.class;
+  public Parser parserFor(Class<? extends Ast> type) {
+    return type == NaturalType.class ? this : null;
   }
 
   @Override
