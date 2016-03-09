@@ -872,18 +872,7 @@ public class Write implements Visitor {
   }
 
   private void visit(FunctionProperty property) {
-    String text = "";
-    switch (property) {
-      case External:
-        text = "extern";
-        break;
-      case Private:
-        text = "private";
-        break;
-      case Public:
-        text = "public";
-        break;
-    }
+    String text = property.toString();
     writer.attribute("scope", text);
   }
 

@@ -34,11 +34,12 @@ import ast.pass.input.xml.linker.XmlIdMatcher;
 import ast.pass.input.xml.parser.RizzlyFileParser;
 import ast.pass.input.xml.parser.XmlTopParser;
 import ast.pass.input.xml.parser.expression.ExpressionParser;
+import ast.pass.input.xml.parser.function.ProcedureParser;
 import ast.pass.input.xml.parser.reference.AnchorParser;
 import ast.pass.input.xml.parser.reference.RefItemParser;
 import ast.pass.input.xml.parser.reference.ReferenceParser;
 import ast.pass.input.xml.parser.type.TypeParser;
-import ast.pass.input.xml.parser.variable.GlobalConstantParser;
+import ast.pass.input.xml.parser.variable.VariableParser;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import ast.pass.input.xml.scanner.ExpectionParserImplementation;
 import ast.pass.input.xml.scanner.XmlFileReader;
@@ -78,12 +79,13 @@ public class XmlParserPass implements AstPass {
 
   private void addParsers(XmlParserImplementation xmlParser, ExpectionParser stream, XmlIdMatcher matcher) {
     xmlParser.add(new RizzlyFileParser(stream, error));
-    xmlParser.add(new GlobalConstantParser(stream, matcher, xmlParser, error));
+    xmlParser.add(new VariableParser(stream, matcher, xmlParser, error));
     xmlParser.add(new ReferenceParser(stream, xmlParser, error));
     xmlParser.add(new AnchorParser(stream, matcher, xmlParser, error));
     xmlParser.add(new RefItemParser(stream, xmlParser, error));
     xmlParser.add(new ExpressionParser(stream, xmlParser, error));
     xmlParser.add(new TypeParser(stream, matcher, xmlParser, error));
+    xmlParser.add(new ProcedureParser(stream, matcher, xmlParser, error));
   }
 
   private TokenReader<XmlToken> xmlReader(String filename) {

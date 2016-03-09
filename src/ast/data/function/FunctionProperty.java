@@ -18,5 +18,27 @@
 package ast.data.function;
 
 public enum FunctionProperty {
-  Private, Public, External
+  Private, Public, External;
+
+  @Override
+  public String toString() {
+    switch (this) {
+      case External:
+        return "extern";
+      case Private:
+        return "private";
+      case Public:
+        return "public";
+    }
+    return null;
+  }
+
+  public static FunctionProperty parse(String value) {
+    for (FunctionProperty itr : FunctionProperty.values()) {
+      if (itr.toString().equals(value)) {
+        return itr;
+      }
+    }
+    throw new IllegalArgumentException("Not a FunctionProperty: " + value);
+  }
 }

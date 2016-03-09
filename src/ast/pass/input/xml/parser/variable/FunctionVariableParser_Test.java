@@ -26,55 +26,50 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
-import ast.data.expression.Expression;
 import ast.data.reference.Reference;
-import ast.data.variable.GlobalConstant;
+import ast.data.variable.FunctionVariable;
 import ast.pass.input.xml.infrastructure.XmlParser;
 import ast.pass.input.xml.linker.ObjectRegistrar;
 import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
-public class GlobalConstantParser_Test {
+public class FunctionVariableParser_Test {
   final private ExpectionParser stream = mock(ExpectionParser.class);
   final private ObjectRegistrar objectRegistrar = mock(ObjectRegistrar.class);
   final private XmlParser parser = mock(XmlParser.class);
   final private RizzlyError error = mock(RizzlyError.class);
-  final private GlobalConstantParser testee = new GlobalConstantParser(stream, objectRegistrar, parser, error);
+  final private FunctionVariableParser testee = new FunctionVariableParser(stream, objectRegistrar, parser, error);
   final private InOrder order = Mockito.inOrder(stream, parser, objectRegistrar);
   final private Reference reference = mock(Reference.class);
-  final private Expression expression = mock(Expression.class);
 
   @Test
   public void has_correct_name() {
-    assertEquals(Names.list("GlobalConstant"), testee.names());
+    assertEquals(Names.list("FunctionVariable"), testee.names());
   }
 
   @Test
   public void has_correct_type() {
-    assertEquals(GlobalConstant.class, testee.type());
+    assertEquals(FunctionVariable.class, testee.type());
   }
 
   @Test
-  public void parse_GlobalConstant() {
+  public void parse_FunctionVariable() {
     when(stream.attribute(eq("name"))).thenReturn("the variable name");
     when(parser.itemOf(Reference.class)).thenReturn(reference);
-    when(parser.itemOf(Expression.class)).thenReturn(expression);
     when(parser.id()).thenReturn("the id");
 
-    GlobalConstant globalConstant = testee.parse();
+    FunctionVariable variable = testee.parse();
 
-    assertEquals("the variable name", globalConstant.getName());
-    assertEquals(reference, globalConstant.type);
-    assertEquals(expression, globalConstant.def);
+    assertEquals("the variable name", variable.getName());
+    assertEquals(reference, variable.type);
 
-    order.verify(stream).elementStart(eq("GlobalConstant"));
+    order.verify(stream).elementStart(eq("FunctionVariable"));
     order.verify(stream).attribute(eq("name"));
     order.verify(parser).id();
     order.verify(parser).itemOf(eq(Reference.class));
-    order.verify(parser).itemOf(eq(Expression.class));
     order.verify(stream).elementEnd();
-    order.verify(objectRegistrar).register(eq("the id"), eq(globalConstant)); // TODO add id to metadata
+    order.verify(objectRegistrar).register(eq("the id"), eq(variable));
   }
 
 }
