@@ -35,9 +35,12 @@ public class XmlFileReader implements TokenReader<XmlToken> {
   @Override
   public XmlToken next() {
     try {
-      if (streamReader.hasNext()) {
+      while (streamReader.hasNext()) {
         streamReader.nextTag();
-        return currentXmlToken();
+        String ns = streamReader.getNamespaceURI();
+        if (ns == null) {
+          return currentXmlToken();
+        }
       }
     } catch (XMLStreamException e) {
     }

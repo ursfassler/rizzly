@@ -26,3 +26,20 @@ Scenario: read a simple AST from an xml file
     
     """
 
+
+Scenario: unknown xml namespaces are ignored
+  Given we have a file "input.xml" with the content:
+    """
+    <rizzly xmlns:test="http://www.bitzgi.ch/2016/rizzly/test1234">
+      <test:Test />
+      <RizzlyFile name="testee" />
+    </rizzly>
+
+    """
+
+  When I start rizzly with the passes
+    | pass                    |
+    | xmlreader('input.xml')  |
+
+  Then I expect no error
+
