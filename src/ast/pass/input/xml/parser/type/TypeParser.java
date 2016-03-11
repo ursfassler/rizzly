@@ -31,6 +31,7 @@ public class TypeParser extends ParserDispatcher {
     super(Type.class, new ParsersImplementation(error), stream, parser, error);
     add(new IntegerParser(stream, objectRegistrar, parser, error));
     add(new NaturalParser(stream, objectRegistrar, parser, error));
+    add(new BooleanParser(stream, objectRegistrar, parser, error));
   }
 
 }

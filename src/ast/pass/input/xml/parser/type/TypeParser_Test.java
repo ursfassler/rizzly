@@ -38,6 +38,7 @@ public class TypeParser_Test {
   public void has_all_needed_value_parsers() {
     assertNotNull(testee.parserFor("Integer"));
     assertNotNull(testee.parserFor("Natural"));
+    assertNotNull(testee.parserFor("Boolean"));
   }
 
   @Test
