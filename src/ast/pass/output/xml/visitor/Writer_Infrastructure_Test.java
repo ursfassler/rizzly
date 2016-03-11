@@ -28,6 +28,9 @@ import ast.Designator;
 import ast.data.Ast;
 import ast.data.Namespace;
 import ast.data.file.RizzlyFile;
+import ast.meta.MetaInformation;
+import ast.meta.MetaList;
+import ast.meta.MetaListImplementation;
 import ast.meta.SourcePosition;
 import ast.pass.output.xml.IdReader;
 import ast.visitor.VisitExecutor;
@@ -67,6 +70,20 @@ public class Writer_Infrastructure_Test {
     order.verify(stream).attribute("line", "42");
     order.verify(stream).attribute("row", "57");
     order.verify(stream).endNode();
+  }
+
+  @Test
+  public void write_Metalist() {
+    MetaInformation item1 = mock(MetaInformation.class);
+    MetaInformation item2 = mock(MetaInformation.class);
+    MetaList list = new MetaListImplementation();
+    list.add(item1);
+    list.add(item2);
+
+    testee.visit(list);
+
+    order.verify(executor).visit(eq(testee), eq(item1));
+    order.verify(executor).visit(eq(testee), eq(item2));
   }
 
   @Test

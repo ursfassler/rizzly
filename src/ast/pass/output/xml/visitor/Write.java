@@ -151,6 +151,8 @@ import ast.data.variable.GlobalConstant;
 import ast.data.variable.PrivateConstant;
 import ast.data.variable.StateVariable;
 import ast.data.variable.TemplateParameter;
+import ast.meta.MetaInformation;
+import ast.meta.MetaList;
 import ast.meta.SourcePosition;
 import ast.pass.output.xml.IdReader;
 import ast.visitor.VisitExecutor;
@@ -819,11 +821,17 @@ public class Write implements Visitor {
     throw new RuntimeException("not yet implemented");
   }
 
-  public void visit(SourcePosition elementInfo) {
+  public void visit(MetaList list) {
+    for (MetaInformation info : list) {
+      executor.visit(this, info);
+    }
+  }
+
+  public void visit(SourcePosition object) {
     writer.beginNode("SourcePosition");
-    writer.attribute("filename", elementInfo.filename);
-    writer.attribute("line", String.valueOf(elementInfo.line));
-    writer.attribute("row", String.valueOf(elementInfo.row));
+    writer.attribute("filename", object.filename);
+    writer.attribute("line", String.valueOf(object.line));
+    writer.attribute("row", String.valueOf(object.row));
     writer.endNode();
   }
 
