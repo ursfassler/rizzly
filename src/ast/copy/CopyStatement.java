@@ -61,12 +61,12 @@ public class CopyStatement extends NullDispatcher<Statement, Void> {
 
   @Override
   protected Statement visitAssignmentMulti(MultiAssignment obj, Void param) {
-    return new MultiAssignment(cast.copy(obj.left), cast.copy(obj.right));
+    return new MultiAssignment(cast.copy(obj.getLeft()), cast.copy(obj.getRight()));
   }
 
   @Override
   protected Statement visitAssignmentSingle(AssignmentSingle obj, Void param) {
-    return new AssignmentSingle(cast.copy(obj.left), cast.copy(obj.right));
+    return new AssignmentSingle(cast.copy(obj.getLeft()), cast.copy(obj.getRight()));
   }
 
   @Override

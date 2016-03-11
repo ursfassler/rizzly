@@ -247,15 +247,15 @@ public class DeepFirstTraverser implements Visitor {
 
   public void visit(MultiAssignment object) {
     preorderVisit(object);
-    executeVisit(object.left);
-    executeVisit(object.right);
+    executeVisit(object.getLeft());
+    executeVisit(object.getRight());
     postorderVisit(object);
   }
 
   public void visit(AssignmentSingle object) {
     preorderVisit(object);
-    executeVisit(object.left);
-    executeVisit(object.right);
+    executeVisit(object.getLeft());
+    executeVisit(object.getRight());
     postorderVisit(object);
   }
 

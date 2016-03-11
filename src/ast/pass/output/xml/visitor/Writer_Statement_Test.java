@@ -84,8 +84,8 @@ public class Writer_Statement_Test {
     order.verify(stream).beginNode(eq("MultiAssignment"));
     order.verify(executor).visit(eq(idWriter), eq(item));
     order.verify(executor).visit(eq(testee), eq(item.metadata()));
-    order.verify(executor).visit(eq(testee), eq(item.left));
-    order.verify(executor).visit(eq(testee), eq(item.right));
+    order.verify(executor).visit(eq(testee), eq(item.getLeft()));
+    order.verify(executor).visit(eq(testee), eq(item.getRight()));
     order.verify(stream).endNode();
   }
 

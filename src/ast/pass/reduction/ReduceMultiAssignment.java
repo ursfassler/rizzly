@@ -26,13 +26,13 @@ class ReduceMultiAssignmentWorker extends StmtReplacer<Void> {
 
   @Override
   protected List<Statement> visitAssignmentMulti(MultiAssignment obj, Void param) {
-    switch (obj.left.size()) {
+    switch (obj.getLeft().size()) {
       case 0: {
         RError.err(ErrorType.Fatal, "assignment needs at least one item on the left side", obj.metadata());
         return null;
       }
       case 1: {
-        AssignmentSingle ass = new AssignmentSingle(obj.left.get(0), obj.right);
+        AssignmentSingle ass = new AssignmentSingle(obj.getLeft().get(0), obj.getRight());
         ass.metadata().add(obj.metadata());
         return list(ass);
       }

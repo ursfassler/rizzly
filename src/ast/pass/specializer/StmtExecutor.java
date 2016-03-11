@@ -138,11 +138,11 @@ public class StmtExecutor extends NullDispatcher<Expression, Memory> {
 
   @Override
   protected Expression visitAssignmentMulti(MultiAssignment obj, Memory param) {
-    Expression rhs = exeval(obj.right, param);
+    Expression rhs = exeval(obj.getRight(), param);
 
     AstList<Expression> value;
 
-    if (obj.left.size() > 1) {
+    if (obj.getLeft().size() > 1) {
       RError.ass(rhs instanceof TupleValue, obj.metadata(), "expected tuple on the right");
       value = ((TupleValue) rhs).value;
     } else {
@@ -151,10 +151,10 @@ public class StmtExecutor extends NullDispatcher<Expression, Memory> {
     }
 
     // FIXME what if a function call is on the rhs?
-    RError.ass(obj.left.size() == value.size(), obj.metadata(), "expect same number of elemnts on both sides, got " + obj.left.size() + " <-> " + value.size());
+    RError.ass(obj.getLeft().size() == value.size(), obj.metadata(), "expect same number of elemnts on both sides, got " + obj.getLeft().size() + " <-> " + value.size());
 
     for (int i = 0; i < value.size(); i++) {
-      assign((OffsetReference) obj.left.get(i), value.get(i), param);
+      assign((OffsetReference) obj.getLeft().get(i), value.get(i), param);
     }
 
     return null;

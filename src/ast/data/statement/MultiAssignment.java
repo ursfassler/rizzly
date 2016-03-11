@@ -21,9 +21,8 @@ import ast.data.AstList;
 import ast.data.expression.Expression;
 import ast.data.reference.Reference;
 
-final public class MultiAssignment extends Assignment {
-
-  final public AstList<Reference> left;
+public class MultiAssignment extends Assignment {
+  private final AstList<Reference> left;
 
   public MultiAssignment(AstList<Reference> left, Expression right) {
     super(right);
@@ -32,7 +31,11 @@ final public class MultiAssignment extends Assignment {
 
   @Override
   public String toString() {
-    return left + " := " + right;
+    return getLeft() + " := " + getRight();
+  }
+
+  public AstList<Reference> getLeft() {
+    return left;
   }
 
 }

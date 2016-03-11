@@ -350,15 +350,15 @@ abstract public class ExprReplacer<T> extends DfsTraverser<Expression, T> {
 
   @Override
   protected Expression visitAssignmentMulti(MultiAssignment obj, T param) {
-    visitList(obj.left, param);
-    obj.right = visit(obj.right, param);
+    visitList(obj.getLeft(), param);
+    obj.setRight(visit(obj.getRight(), param));
     return null;
   }
 
   @Override
   protected Expression visitAssignmentSingle(AssignmentSingle obj, T param) {
-    visit(obj.left, param);
-    obj.right = visit(obj.right, param);
+    visit(obj.getLeft(), param);
+    obj.setRight(visit(obj.getRight(), param));
     return null;
   }
 

@@ -207,8 +207,8 @@ public class Write implements Visitor {
     writer.beginNode("MultiAssignment");
     executor.visit(idWriter, object);
     executor.visit(this, object.metadata());
-    executor.visit(this, object.left);
-    executor.visit(this, object.right);
+    executor.visit(this, object.getLeft());
+    executor.visit(this, object.getRight());
     writer.endNode();
   }
 

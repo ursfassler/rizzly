@@ -227,15 +227,15 @@ public class DfsTraverser<R, P> extends Dispatcher<R, P> {
 
   @Override
   protected R visitAssignmentMulti(MultiAssignment obj, P param) {
-    visitList(obj.left, param);
-    visit(obj.right, param);
+    visitList(obj.getLeft(), param);
+    visit(obj.getRight(), param);
     return null;
   }
 
   @Override
   protected R visitAssignmentSingle(AssignmentSingle obj, P param) {
-    visit(obj.left, param);
-    visit(obj.right, param);
+    visit(obj.getLeft(), param);
+    visit(obj.getRight(), param);
     return null;
   }
 

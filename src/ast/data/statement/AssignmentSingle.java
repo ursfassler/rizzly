@@ -20,8 +20,8 @@ package ast.data.statement;
 import ast.data.expression.Expression;
 import ast.data.reference.Reference;
 
-final public class AssignmentSingle extends Assignment {
-  public Reference left;
+public class AssignmentSingle extends Assignment {
+  private Reference left;
 
   public AssignmentSingle(Reference left, Expression right) {
     super(right);
@@ -30,7 +30,11 @@ final public class AssignmentSingle extends Assignment {
 
   @Override
   public String toString() {
-    return left + " := " + right;
+    return getLeft() + " := " + getRight();
+  }
+
+  public Reference getLeft() {
+    return left;
   }
 
 }

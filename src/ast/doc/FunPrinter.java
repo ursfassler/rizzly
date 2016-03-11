@@ -571,9 +571,9 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
 
   @Override
   protected Void visitAssignmentMulti(MultiAssignment obj, Void param) {
-    visitList(obj.left, null);
+    visitList(obj.getLeft(), null);
     xw.wr(" := ");
-    visit(obj.right, null);
+    visit(obj.getRight(), null);
     xw.wr(";");
     xw.nl();
     return null;
@@ -1164,9 +1164,9 @@ public class FunPrinter extends NullDispatcher<Void, Void> {
 
   @Override
   protected Void visitAssignmentSingle(AssignmentSingle obj, Void param) {
-    visit(obj.left, param);
+    visit(obj.getLeft(), param);
     xw.kw(" := ");
-    visit(obj.right, param);
+    visit(obj.getRight(), param);
     xw.kw(";");
     xw.nl();
     return null;

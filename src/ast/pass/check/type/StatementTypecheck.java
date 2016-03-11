@@ -217,8 +217,8 @@ public class StatementTypecheck extends NullDispatcher<Void, Void> {
 
   @Override
   protected Void visitAssignmentSingle(AssignmentSingle obj, Void param) {
-    Type lhs = checkGetExpr(obj.left);
-    Type rhs = checkGetExpr(obj.right);
+    Type lhs = checkGetExpr(obj.getLeft());
+    Type rhs = checkGetExpr(obj.getRight());
     if (!kc.get(lhs, rhs)) {
       RError.err(ErrorType.Error, "Data type to big or incompatible in assignment: " + lhs.getName() + " := " + rhs.getName(), obj.metadata());
     }
@@ -228,7 +228,7 @@ public class StatementTypecheck extends NullDispatcher<Void, Void> {
   @Override
   protected Void visitAssignmentMulti(MultiAssignment obj, Void param) {
     AstList<Type> ll = new AstList<Type>();
-    for (Reference ref : obj.left) {
+    for (Reference ref : obj.getLeft()) {
       ll.add(checkGetExpr(ref));
     }
     Type lhs;
@@ -242,7 +242,7 @@ public class StatementTypecheck extends NullDispatcher<Void, Void> {
       lhs = new TupleType("", tl);
       lhs.metadata().add(obj.metadata());
     }
-    Type rhs = checkGetExpr(obj.right);
+    Type rhs = checkGetExpr(obj.getRight());
     if (!kc.get(lhs, rhs)) {
       RError.err(ErrorType.Error, "Data type to big or incompatible in assignment: " + lhs.getName() + " := " + rhs.getName(), obj.metadata());
     }

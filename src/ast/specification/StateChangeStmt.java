@@ -50,12 +50,12 @@ class StateChangeDispatcher extends NullDispatcher<Boolean, Void> {
 
   @Override
   protected Boolean visitAssignmentSingle(AssignmentSingle obj, Void param) {
-    return isStateVar(obj.left);
+    return isStateVar(obj.getLeft());
   }
 
   @Override
   protected Boolean visitAssignmentMulti(MultiAssignment obj, Void param) {
-    return containsStateVar(obj.left);
+    return containsStateVar(obj.getLeft());
   }
 
   @Override

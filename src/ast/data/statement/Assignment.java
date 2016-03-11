@@ -24,9 +24,17 @@ import ast.data.expression.Expression;
  * @author urs
  */
 public abstract class Assignment extends Statement {
-  public Expression right;
+  private Expression right;
 
   public Assignment(Expression right) {
+    this.right = right;
+  }
+
+  public Expression getRight() {
+    return right;
+  }
+
+  public void setRight(Expression right) {
     this.right = right;
   }
 

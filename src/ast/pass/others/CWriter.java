@@ -462,9 +462,9 @@ class CWriterWorker extends NullDispatcher<Void, Boolean> {
 
   @Override
   protected Void visitAssignmentSingle(AssignmentSingle obj, Boolean param) {
-    visit(obj.left, param);
+    visit(obj.getLeft(), param);
     sw.wr(" = ");
-    visit(obj.right, param);
+    visit(obj.getRight(), param);
     sw.wr(";");
     sw.nl();
     return null;

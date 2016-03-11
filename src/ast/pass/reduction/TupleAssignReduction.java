@@ -70,18 +70,18 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
   protected List<Statement> visitAssignmentSingle(AssignmentSingle obj, Void param) {
     int rightCount;
 
-    if (obj.right instanceof TupleValue) {
-      rightCount = ((TupleValue) obj.right).value.size();
-    } else if (obj.right instanceof NamedElementsValue) {
-      rightCount = ((NamedElementsValue) obj.right).value.size();
+    if (obj.getRight() instanceof TupleValue) {
+      rightCount = ((TupleValue) obj.getRight()).value.size();
+    } else if (obj.getRight() instanceof NamedElementsValue) {
+      rightCount = ((NamedElementsValue) obj.getRight()).value.size();
     } else {
       rightCount = 1;
     }
 
     if (rightCount > 1) {
       // FIXME do not use cast
-      OffsetReference left = (OffsetReference) obj.left;
-      return assignOneOne(left, obj.right);
+      OffsetReference left = (OffsetReference) obj.getLeft();
+      return assignOneOne(left, obj.getRight());
     } else {
       return null;
     }
@@ -91,12 +91,12 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
   protected List<Statement> visitAssignmentMulti(MultiAssignment obj, Void param) {
     int leftCount, rightCount;
 
-    leftCount = obj.left.size();
+    leftCount = obj.getLeft().size();
 
-    if (obj.right instanceof TupleValue) {
-      rightCount = ((TupleValue) obj.right).value.size();
-    } else if (obj.right instanceof NamedElementsValue) {
-      rightCount = ((NamedElementsValue) obj.right).value.size();
+    if (obj.getRight() instanceof TupleValue) {
+      rightCount = ((TupleValue) obj.getRight()).value.size();
+    } else if (obj.getRight() instanceof NamedElementsValue) {
+      rightCount = ((NamedElementsValue) obj.getRight()).value.size();
     } else {
       rightCount = 1;
     }
@@ -108,9 +108,9 @@ class TupleAssignReductionWorker extends StmtReplacer<Void> {
     if ((leftCount > 1) && (rightCount > 1)) {
       throw new RuntimeException("not yet implemented");
     } else if (leftCount > 1) {
-      return assignMulOne(obj.left, obj.right);
+      return assignMulOne(obj.getLeft(), obj.getRight());
     } else if (rightCount > 1) {
-      return assignOneOne((OffsetReference) obj.left.get(0), obj.right);
+      return assignOneOne((OffsetReference) obj.getLeft().get(0), obj.getRight());
     } else {
       return null;
     }
