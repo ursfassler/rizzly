@@ -52,7 +52,7 @@ public class NaturalParser_Test {
   }
 
   @Test
-  public void parse_NumberValue() {
+  public void parse_NaturalType() {
     when(stream.attribute(eq("name"))).thenReturn("the name");
     when(parser.id()).thenReturn("the id");
 

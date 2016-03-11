@@ -17,10 +17,9 @@
 
 package ast.pass.input.xml.parser.expression;
 
-import java.math.BigInteger;
 import java.util.Collection;
 
-import ast.data.expression.value.NumberValue;
+import ast.data.expression.value.BooleanValue;
 import ast.meta.MetaListImplementation;
 import ast.pass.input.xml.infrastructure.Parser;
 import ast.pass.input.xml.infrastructure.XmlParseError;
@@ -30,13 +29,13 @@ import ast.pass.input.xml.scanner.ExpectionParser;
 import error.ErrorType;
 import error.RizzlyError;
 
-public class NumberValueParser implements Parser {
-  private static final String Name = "NumberValue";
+public class BooleanValueParser implements Parser {
+  private static final String Name = "BooleanValue";
   private final ExpectionParser stream;
   private final XmlParser parser;
   private final RizzlyError error;
 
-  public NumberValueParser(ExpectionParser stream, XmlParser parser, RizzlyError error) {
+  public BooleanValueParser(ExpectionParser stream, XmlParser parser, RizzlyError error) {
     this.stream = stream;
     this.parser = parser;
     this.error = error;
@@ -48,25 +47,29 @@ public class NumberValueParser implements Parser {
   }
 
   @Override
-  public Class<NumberValue> type() {
-    return NumberValue.class;
+  public Class<BooleanValue> type() {
+    return BooleanValue.class;
   }
 
   @Override
-  public NumberValue parse() {
+  public BooleanValue parse() {
     stream.elementStart(Name);
     String value = stream.attribute("value");
     stream.elementEnd();
 
-    return new NumberValue(toNumber(value));
+    return new BooleanValue(parseBool(value));
   }
 
-  private BigInteger toNumber(String value) {
-    try {
-      return new BigInteger(value);
-    } catch (NumberFormatException e) {
-      error.err(ErrorType.Error, "attribute value does not contain a number: \"" + value + "\"", new MetaListImplementation());
-      throw new XmlParseError();
+  private boolean parseBool(String value) {
+    switch (value) {
+      case "True":
+        return true;
+      case "False":
+        return false;
+      default:
+        error.err(ErrorType.Error, "attribute value does not contain a boolean value: \"" + value + "\"", new MetaListImplementation());
+        throw new XmlParseError();
     }
   }
+
 }

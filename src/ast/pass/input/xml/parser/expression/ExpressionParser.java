@@ -29,6 +29,7 @@ public class ExpressionParser extends ParserDispatcher {
   public ExpressionParser(ExpectionParser stream, XmlParser parser, RizzlyError error) {
     super(Expression.class, new ParsersImplementation(error), stream, parser, error);
     add(new NumberValueParser(stream, parser, error));
+    add(new BooleanValueParser(stream, parser, error));
   }
 
 }

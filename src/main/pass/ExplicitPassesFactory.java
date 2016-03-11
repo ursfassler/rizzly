@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 
 import ast.Designator;
+import ast.data.variable.Constant;
 import ast.meta.MetaListImplementation;
 import ast.pass.AstPass;
 import ast.pass.input.xml.XmlParserPass;
@@ -33,7 +34,11 @@ import ast.pass.others.FileLoader;
 import ast.pass.others.InternsAdder;
 import ast.pass.output.xml.XmlWriterPass;
 import ast.pass.reduction.MetadataRemover;
+import ast.repository.query.Referencees.TargetResolver;
+import ast.specification.IsClass;
+import ast.specification.Specification;
 import error.ErrorType;
+import error.RError;
 import error.RizzlyError;
 
 public class ExplicitPassesFactory {

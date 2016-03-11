@@ -24,13 +24,11 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import java.math.BigInteger;
-
 import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
-import ast.data.expression.value.NumberValue;
+import ast.data.expression.value.BooleanValue;
 import ast.pass.input.xml.infrastructure.XmlParseError;
 import ast.pass.input.xml.infrastructure.XmlParser;
 import ast.pass.input.xml.parser.Names;
@@ -38,39 +36,47 @@ import ast.pass.input.xml.scanner.ExpectionParser;
 import error.ErrorType;
 import error.RizzlyError;
 
-public class NumberValueParser_Test {
+public class BooleanValueParser_Test {
   final private ExpectionParser stream = mock(ExpectionParser.class);
   final private XmlParser parser = mock(XmlParser.class);
   final private RizzlyError error = mock(RizzlyError.class);
-  final private NumberValueParser testee = new NumberValueParser(stream, parser, error);
+  final private BooleanValueParser testee = new BooleanValueParser(stream, parser, error);
   final private InOrder order = Mockito.inOrder(stream, parser);
 
   @Test
   public void has_correct_name() {
-    assertEquals(Names.list("NumberValue"), testee.names());
+    assertEquals(Names.list("BooleanValue"), testee.names());
   }
 
   @Test
   public void has_correct_type() {
-    assertEquals(NumberValue.class, testee.type());
+    assertEquals(BooleanValue.class, testee.type());
   }
 
   @Test
-  public void parse_NumberValue() {
-    when(stream.attribute(eq("value"))).thenReturn("1234567890");
+  public void parse_BooleanValue() {
+    when(stream.attribute(eq("value"))).thenReturn("True");
 
-    NumberValue value = testee.parse();
+    BooleanValue value = testee.parse();
 
-    assertEquals(BigInteger.valueOf(1234567890), value.value);
+    assertEquals(true, value.value);
 
-    order.verify(stream).elementStart(eq("NumberValue"));
+    order.verify(stream).elementStart(eq("BooleanValue"));
     order.verify(stream).attribute(eq("value"));
     order.verify(stream).elementEnd();
   }
 
   @Test
-  public void reports_an_error_when_the_value_is_not_a_number() {
-    when(stream.attribute(eq("value"))).thenReturn("hello world");
+  public void parse_valid_values() {
+    when(stream.attribute(eq("value"))).thenReturn("True").thenReturn("False");
+
+    assertEquals(true, testee.parse().value);
+    assertEquals(false, testee.parse().value);
+  }
+
+  @Test
+  public void reports_an_error_when_the_value_is_not_a_boolean_value() {
+    when(stream.attribute(eq("value"))).thenReturn("0");
 
     try {
       testee.parse();
@@ -78,13 +84,14 @@ public class NumberValueParser_Test {
     }
 
     // TODO emit xml position
-    verify(error).err(eq(ErrorType.Error), eq("attribute value does not contain a number: \"hello world\""), any());
+    verify(error).err(eq(ErrorType.Error), eq("attribute value does not contain a boolean value: \"0\""), any());
   }
 
   @Test(expected = XmlParseError.class)
   public void throws_an_exception_when_the_value_is_not_a_number() {
-    when(stream.attribute(eq("value"))).thenReturn("hello world");
+    when(stream.attribute(eq("value"))).thenReturn("yes");
 
     testee.parse();
   }
+
 }

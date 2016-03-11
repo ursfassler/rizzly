@@ -18,13 +18,13 @@
 package ast.pass.input.xml.parser.expression;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 
 import org.junit.Test;
 
 import ast.data.expression.Expression;
 import ast.pass.input.xml.infrastructure.XmlParser;
-import ast.pass.input.xml.parser.Names;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.RizzlyError;
 
@@ -35,8 +35,9 @@ public class ExpressionParser_Test {
   final private ExpressionParser testee = new ExpressionParser(stream, parser, error);
 
   @Test
-  public void has_NumberValue() {
-    assertEquals(Names.list("NumberValue"), testee.names());
+  public void has_all_needed_value_parsers() {
+    assertTrue(testee.names().contains("NumberValue"));
+    assertTrue(testee.names().contains("BooleanValue"));
   }
 
   @Test
