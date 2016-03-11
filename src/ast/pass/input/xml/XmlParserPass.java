@@ -38,6 +38,7 @@ import ast.pass.input.xml.parser.function.ProcedureParser;
 import ast.pass.input.xml.parser.reference.AnchorParser;
 import ast.pass.input.xml.parser.reference.RefItemParser;
 import ast.pass.input.xml.parser.reference.ReferenceParser;
+import ast.pass.input.xml.parser.statement.StatementParser;
 import ast.pass.input.xml.parser.type.TypeParser;
 import ast.pass.input.xml.parser.variable.VariableParser;
 import ast.pass.input.xml.scanner.ExpectionParser;
@@ -86,6 +87,7 @@ public class XmlParserPass implements AstPass {
     xmlParser.add(new ExpressionParser(stream, xmlParser, error));
     xmlParser.add(new TypeParser(stream, matcher, xmlParser, error));
     xmlParser.add(new ProcedureParser(stream, matcher, xmlParser, error));
+    xmlParser.add(new StatementParser(stream, xmlParser, error));
   }
 
   private TokenReader<XmlToken> xmlReader(String filename) {
@@ -93,7 +95,7 @@ public class XmlParserPass implements AstPass {
 
     try {
       XMLStreamReader streamReader = factory.createXMLStreamReader(new FileReader(filename));
-      return new XmlFileReader(streamReader);
+      return new XmlFileReader(streamReader, filename);
     } catch (FileNotFoundException e1) {
       e1.printStackTrace();
     } catch (XMLStreamException e1) {

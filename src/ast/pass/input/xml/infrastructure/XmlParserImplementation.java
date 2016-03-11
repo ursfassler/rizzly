@@ -50,7 +50,8 @@ public class XmlParserImplementation implements XmlParser {
 
   @Override
   public <T extends Ast> AstList<T> itemsOf(Class<T> itemClass) {
-    Parser parser = parsers.parserFor(itemClass);
+    Parser parser = getParser(itemClass);
+
     AstList<T> items = new AstList<T>();
     while (stream.hasElement()) {
       String name = stream.peekElement();
@@ -67,22 +68,32 @@ public class XmlParserImplementation implements XmlParser {
   public Ast anyItem() {
     String name = stream.peekElement();
     Parser parser = parsers.parserFor(name);
+    verifyNotNull(parser, name);
     return parser.parse();
+  }
+
+  private void verifyNotNull(Parser parser, String name) throws XmlParseError {
+    if (parser == null) {
+      error.err(ErrorType.Fatal, "parser not found for: " + name, new MetaListImplementation());
+      throw new XmlParseError();
+    }
   }
 
   @Override
   public <T extends Ast> T itemOf(Class<T> itemClass) {
-    Parser parser = parsers.parserFor(itemClass);
-    if (parser == null) {
-      error.err(ErrorType.Fatal, "parser not found for: " + itemClass.getSimpleName(), new MetaListImplementation());
-      throw new XmlParseError();
-    }
+    Parser parser = getParser(itemClass);
     return parser.parse();
   }
 
   @Override
   public String id() {
     return stream.attribute("id", "");
+  }
+
+  private <T extends Ast> Parser getParser(Class<T> itemClass) throws XmlParseError {
+    Parser parser = parsers.parserFor(itemClass);
+    verifyNotNull(parser, itemClass.getSimpleName());
+    return parser;
   }
 
 }

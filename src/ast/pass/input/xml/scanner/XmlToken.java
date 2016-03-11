@@ -19,21 +19,26 @@ package ast.pass.input.xml.scanner;
 
 import java.util.Map;
 
+import ast.meta.MetaList;
+
 public class XmlToken {
   public final XmlType type;  // TODO encapsulate
   public final String name;  // TODO encapsulate
   private final Map<String, String> attribute;
+  public final MetaList meta;
 
-  public XmlToken(XmlType type, String name, Map<String, String> attribute) {
+  public XmlToken(XmlType type, String name, Map<String, String> attribute, MetaList meta) {
     this.type = type;
     this.name = name;
     this.attribute = attribute;
+    this.meta = meta;
   }
 
-  public XmlToken(XmlType type) {
+  public XmlToken(XmlType type, MetaList meta) {
     this.type = type;
     this.name = null;
     this.attribute = null;
+    this.meta = meta;
   }
 
   public boolean hasAttribute(String name) {

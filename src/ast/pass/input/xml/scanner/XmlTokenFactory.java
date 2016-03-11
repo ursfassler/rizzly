@@ -20,26 +20,40 @@ package ast.pass.input.xml.scanner;
 import java.util.HashMap;
 import java.util.Map;
 
+import ast.meta.MetaInformation;
+import ast.meta.MetaList;
+import ast.meta.MetaListImplementation;
+
 public class XmlTokenFactory {
 
-  public static XmlToken elementStart(String name) {
-    return new XmlToken(XmlType.ElementStart, name, new HashMap<String, String>());
+  public static XmlToken elementStart(String name, MetaInformation meta) {
+    return new XmlToken(XmlType.ElementStart, name, new HashMap<String, String>(), metalist(meta));
   }
 
-  public static XmlToken elementStart(String name, Map<String, String> attribute) {
-    return new XmlToken(XmlType.ElementStart, name, attribute);
+  public static XmlToken elementStart(String name, Map<String, String> attribute, MetaInformation meta) {
+    return new XmlToken(XmlType.ElementStart, name, attribute, metalist(meta));
   }
 
-  public static XmlToken elementEnd() {
-    return new XmlToken(XmlType.ElementEnd);
+  public static XmlToken elementEnd(MetaInformation meta) {
+    return new XmlToken(XmlType.ElementEnd, metalist(meta));
   }
 
-  public static XmlToken documentStart() {
-    return new XmlToken(XmlType.DocumentStart);
+  public static XmlToken documentStart(MetaInformation meta) {
+    return new XmlToken(XmlType.DocumentStart, metalist(meta));
   }
 
-  public static XmlToken documentEnd() {
-    return new XmlToken(XmlType.DocumentEnd);
+  public static XmlToken documentEnd(MetaInformation meta) {
+    return new XmlToken(XmlType.DocumentEnd, metalist(meta));
+  }
+
+  public static XmlToken endOfFile(MetaInformation meta) {
+    return new XmlToken(XmlType.EndOfFile, metalist(meta));
+  }
+
+  private static MetaList metalist(MetaInformation meta) {
+    MetaList list = new MetaListImplementation();
+    list.add(meta);
+    return list;
   }
 
 }

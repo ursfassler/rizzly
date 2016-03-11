@@ -17,7 +17,6 @@
 
 package ast.pass.input.xml.scanner;
 
-import ast.meta.MetaListImplementation;
 import ast.pass.input.xml.infrastructure.XmlParseError;
 import error.ErrorType;
 import error.RizzlyError;
@@ -64,14 +63,14 @@ public class ExpectionParserImplementation implements ExpectionParser {
 
   private void expectType(XmlToken node, XmlType type) throws XmlParseError {
     if (node.type != type) {
-      error.err(ErrorType.Error, "expected " + type + ", got type " + node.type, new MetaListImplementation());
+      error.err(ErrorType.Error, "expected " + type + ", got type " + node.type, node.meta);
       throw new XmlParseError();
     }
   }
 
   private void expectName(XmlToken node, String value) throws XmlParseError {
     if (node.name != value) {
-      error.err(ErrorType.Error, "expected \"" + value + "\" for " + node.type + ", got \"" + node.name + "\"", new MetaListImplementation());
+      error.err(ErrorType.Error, "expected \"" + value + "\" for " + node.type + ", got \"" + node.name + "\"", node.meta);
       throw new XmlParseError();
     }
   }
@@ -86,7 +85,7 @@ public class ExpectionParserImplementation implements ExpectionParser {
     expectType(current, XmlType.ElementStart);
 
     if (!current.hasAttribute(name)) {
-      error.err(ErrorType.Error, "missing attribute \"" + name + "\" for element \"" + current.name + "\"", new MetaListImplementation());
+      error.err(ErrorType.Error, "missing attribute \"" + name + "\" for element \"" + current.name + "\"", current.meta);
       throw new XmlParseError();
     }
 

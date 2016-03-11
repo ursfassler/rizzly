@@ -70,6 +70,27 @@ public class XmlParserImplementation_Test {
   }
 
   @Test
+  public void reports_an_error_if_the_parser_for_the_next_item_is_missing() {
+    when(stream.peekElement()).thenReturn("the next element");
+    when(parsers.parserFor(eq("the next element"))).thenReturn(null);
+
+    try {
+      testee.anyItem();
+    } catch (XmlParseError e) {
+    }
+
+    verify(error).err(eq(ErrorType.Fatal), eq("parser not found for: the next element"), any());
+  }
+
+  @Test(expected = XmlParseError.class)
+  public void throw_an_error_if_the_parser_for_the_next_item_is_missing() {
+    when(stream.peekElement()).thenReturn("the next element");
+    when(parsers.parserFor(eq("the next element"))).thenReturn(null);
+
+    testee.anyItem();
+  }
+
+  @Test
   public void parsing_ast_items_return_zero_if_there_are_no_more_elements() {
     when(stream.hasElement()).thenReturn(false);
 
@@ -116,7 +137,27 @@ public class XmlParserImplementation_Test {
   }
 
   @Test
+  public void reports_an_error_if_a_parser_is_missing_for_multiple_items() {
+    when(parsers.parserFor(any(Class.class))).thenReturn(null);
+
+    try {
+      testee.itemsOf(Reference.class);
+    } catch (XmlParseError e) {
+    }
+
+    verify(error).err(eq(ErrorType.Fatal), eq("parser not found for: Reference"), any());
+  }
+
+  @Test(expected = XmlParseError.class)
+  public void throw_an_error_if_a_parser_is_missing_for_multiple_items() {
+    when(parsers.parserFor(any(Class.class))).thenReturn(null);
+
+    testee.itemsOf(Reference.class);
+  }
+
+  @Test
   public void parsing_for_specific_items_return_zero_if_there_are_no_more_elements() {
+    when(parsers.parserFor(Block.class)).thenReturn(parser);
     when(stream.hasElement()).thenReturn(false);
 
     assertEquals(0, testee.itemsOf(Block.class).size());

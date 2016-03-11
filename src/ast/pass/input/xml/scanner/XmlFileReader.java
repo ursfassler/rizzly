@@ -20,16 +20,20 @@ package ast.pass.input.xml.scanner;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
+import ast.meta.SourcePosition;
 import parser.TokenReader;
 
 public class XmlFileReader implements TokenReader<XmlToken> {
   private final XMLStreamReader streamReader;
+  private final String filename;
 
-  public XmlFileReader(XMLStreamReader streamReader) {
+  public XmlFileReader(XMLStreamReader streamReader, String filename) {
     this.streamReader = streamReader;
+    this.filename = filename;
   }
 
   @Override
@@ -44,23 +48,27 @@ public class XmlFileReader implements TokenReader<XmlToken> {
       }
     } catch (XMLStreamException e) {
     }
-    return new XmlToken(XmlType.EndOfFile);
+    SourcePosition position = new SourcePosition(filename, -1, -1);
+    return XmlTokenFactory.endOfFile(position);
   }
 
   private XmlToken currentXmlToken() {
+    Location location = streamReader.getLocation();
+    SourcePosition position = new SourcePosition(filename, location.getLineNumber(), location.getColumnNumber());
+
     switch (streamReader.getEventType()) {
       case XMLStreamReader.START_DOCUMENT:
-        return XmlTokenFactory.documentStart();
+        return XmlTokenFactory.documentStart(position);
       case XMLStreamReader.END_DOCUMENT:
-        return XmlTokenFactory.documentEnd();
+        return XmlTokenFactory.documentEnd(position);
       case XMLStreamReader.START_ELEMENT:
         Map<String, String> attribute = new HashMap<String, String>();
         for (int i = 0; i < streamReader.getAttributeCount(); i++) {
           attribute.put(streamReader.getAttributeLocalName(i), streamReader.getAttributeValue(i));
         }
-        return XmlTokenFactory.elementStart(streamReader.getLocalName(), attribute);
+        return XmlTokenFactory.elementStart(streamReader.getLocalName(), attribute, position);
       case XMLStreamReader.END_ELEMENT:
-        return XmlTokenFactory.elementEnd();
+        return XmlTokenFactory.elementEnd(position);
     }
     throw new RuntimeException("not yet implemented: " + streamReader.getEventType());
   }
