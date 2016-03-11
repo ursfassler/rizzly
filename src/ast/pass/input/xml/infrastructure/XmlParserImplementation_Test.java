@@ -32,6 +32,10 @@ import org.mockito.Mockito;
 import ast.data.Ast;
 import ast.data.reference.Reference;
 import ast.data.statement.Block;
+import ast.meta.MetaInformation;
+import ast.meta.MetaList;
+import ast.meta.MetaListImplementation;
+import ast.pass.input.xml.parser.meta.MetaParser;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.ErrorType;
 import error.RizzlyError;
@@ -42,7 +46,8 @@ public class XmlParserImplementation_Test {
   final private RizzlyError error = mock(RizzlyError.class);
   final private Parser parser = mock(Parser.class);
   final private Ast ast = mock(Ast.class);
-  final private XmlParserImplementation testee = new XmlParserImplementation(stream, parsers, error);
+  final private MetaParser sourcePositionParser = mock(MetaParser.class);
+  final private XmlParserImplementation testee = new XmlParserImplementation(stream, parsers, sourcePositionParser, error);
   final private InOrder order = Mockito.inOrder(stream, parsers, parser);
 
   @Test
@@ -199,5 +204,25 @@ public class XmlParserImplementation_Test {
     testee.id();
 
     verify(stream).attribute(eq("id"), eq(""));
+  }
+
+  @Test
+  public void returns_nothing_if_no_meta_data_are_available() {
+    assertEquals(new MetaListImplementation(), testee.meta());
+  }
+
+  @Test
+  public void returns_meta_information() {
+    MetaInformation position = mock(MetaInformation.class);
+    when(sourcePositionParser.getElementName()).thenReturn("SourcePosition");
+    when(sourcePositionParser.parse()).thenReturn(position);
+    when(stream.hasElement()).thenReturn(true).thenReturn(false);
+    when(stream.peekElement()).thenReturn("SourcePosition");
+
+    MetaList metalist = testee.meta();
+
+    MetaList expectedList = new MetaListImplementation();
+    expectedList.add(position);
+    assertEquals(expectedList, metalist);
   }
 }

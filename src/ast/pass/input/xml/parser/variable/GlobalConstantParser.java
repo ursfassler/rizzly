@@ -21,6 +21,7 @@ import ast.data.Ast;
 import ast.data.expression.Expression;
 import ast.data.reference.Reference;
 import ast.data.variable.GlobalConstant;
+import ast.meta.MetaList;
 import ast.pass.input.xml.infrastructure.Parser;
 import ast.pass.input.xml.infrastructure.XmlParser;
 import ast.pass.input.xml.linker.ObjectRegistrar;
@@ -56,6 +57,7 @@ public class GlobalConstantParser implements Parser {
     stream.elementStart(Name);
     String name = stream.attribute("name");
     String id = parser.id();
+    MetaList meta = parser.meta();
 
     Reference type = parser.itemOf(Reference.class);
     Expression value = parser.itemOf(Expression.class);
@@ -63,6 +65,7 @@ public class GlobalConstantParser implements Parser {
     stream.elementEnd();
 
     GlobalConstant object = new GlobalConstant(name, type, value);
+    object.metadata().add(meta);
     objectRegistrar.register(id, object);
     return object;
   }

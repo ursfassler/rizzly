@@ -18,7 +18,9 @@
 package ast.pass.input.xml.scanner;
 
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamException;
@@ -30,10 +32,14 @@ import parser.TokenReader;
 public class XmlFileReader implements TokenReader<XmlToken> {
   private final XMLStreamReader streamReader;
   private final String filename;
+  private final Set<String> allowedNamespaces = new HashSet<>();
 
   public XmlFileReader(XMLStreamReader streamReader, String filename) {
     this.streamReader = streamReader;
     this.filename = filename;
+
+    allowedNamespaces.add(null);
+    allowedNamespaces.add("http://www.bitzgi.ch/2016/rizzly/test/meta");
   }
 
   @Override
@@ -42,7 +48,7 @@ public class XmlFileReader implements TokenReader<XmlToken> {
       while (streamReader.hasNext()) {
         streamReader.nextTag();
         String ns = streamReader.getNamespaceURI();
-        if (ns == null) {
+        if (allowedNamespaces.contains(ns)) {
           return currentXmlToken();
         }
       }

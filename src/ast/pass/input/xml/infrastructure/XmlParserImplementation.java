@@ -19,7 +19,9 @@ package ast.pass.input.xml.infrastructure;
 
 import ast.data.Ast;
 import ast.data.AstList;
+import ast.meta.MetaList;
 import ast.meta.MetaListImplementation;
+import ast.pass.input.xml.parser.meta.MetaParser;
 import ast.pass.input.xml.scanner.ExpectionParser;
 import error.ErrorType;
 import error.RizzlyError;
@@ -27,11 +29,13 @@ import error.RizzlyError;
 public class XmlParserImplementation implements XmlParser {
   final private ExpectionParser stream;
   final private Parsers parsers;
+  final private MetaParser sourcePositionParser;
   final private RizzlyError error;
 
-  public XmlParserImplementation(ExpectionParser stream, Parsers parsers, RizzlyError error) {
+  public XmlParserImplementation(ExpectionParser stream, Parsers parsers, MetaParser sourcePositionParser, RizzlyError error) {
     this.stream = stream;
     this.parsers = parsers;
+    this.sourcePositionParser = sourcePositionParser;
     this.error = error;
   }
 
@@ -88,6 +92,17 @@ public class XmlParserImplementation implements XmlParser {
   @Override
   public String id() {
     return stream.attribute("id", "");
+  }
+
+  @Override
+  public MetaList meta() {
+    MetaList items = new MetaListImplementation();
+
+    while (stream.hasElement() && (stream.peekElement().equals(sourcePositionParser.getElementName()))) {
+      items.add(sourcePositionParser.parse());
+    }
+
+    return items;
   }
 
   private <T extends Ast> Parser getParser(Class<T> itemClass) throws XmlParseError {

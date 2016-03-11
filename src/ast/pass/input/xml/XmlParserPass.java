@@ -35,6 +35,8 @@ import ast.pass.input.xml.parser.RizzlyFileParser;
 import ast.pass.input.xml.parser.XmlTopParser;
 import ast.pass.input.xml.parser.expression.ExpressionParser;
 import ast.pass.input.xml.parser.function.ProcedureParser;
+import ast.pass.input.xml.parser.meta.MetaParser;
+import ast.pass.input.xml.parser.meta.SourcePositionParser;
 import ast.pass.input.xml.parser.reference.AnchorParser;
 import ast.pass.input.xml.parser.reference.RefItemParser;
 import ast.pass.input.xml.parser.reference.ReferenceParser;
@@ -67,7 +69,8 @@ public class XmlParserPass implements AstPass {
     TokenReader<XmlToken> stream = xmlReader(getFilename());
     PeekNReader<XmlToken> peekReader = new PeekNReader<XmlToken>(stream);
     ExpectionParser expect = new ExpectionParserImplementation(peekReader, error);
-    XmlParserImplementation parser = new XmlParserImplementation(expect, new ParsersImplementation(error), error);
+    MetaParser sourcePositionParser = new SourcePositionParser(expect, error);
+    XmlParserImplementation parser = new XmlParserImplementation(expect, new ParsersImplementation(error), sourcePositionParser, error);
     XmlIdMatcher matcher = new XmlIdMatcher(error);
     addParsers(parser, expect, matcher);
     XmlTopParser topParser = new XmlTopParser(expect, parser, error);

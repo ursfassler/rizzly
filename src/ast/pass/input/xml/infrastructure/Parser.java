@@ -20,7 +20,6 @@ package ast.pass.input.xml.infrastructure;
 import ast.data.Ast;
 
 public interface Parser {
-
   public <T extends Ast> T parse();
 
   public Parser parserFor(String elementName);

@@ -15,24 +15,14 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.input.xml.infrastructure;
+package ast.pass.input.xml.parser.meta;
 
-import ast.data.Ast;
-import ast.data.AstList;
-import ast.meta.MetaList;
+import ast.meta.MetaInformation;
 
-public interface XmlParser {
+public interface MetaParser {
 
-  public Ast anyItem();
+  public String getElementName();
 
-  public AstList<Ast> anyItems();
-
-  public <T extends Ast> T itemOf(Class<T> itemClass);
-
-  public <T extends Ast> AstList<T> itemsOf(Class<T> itemClass);
-
-  public String id();
-
-  public MetaList meta();
+  public MetaInformation parse();
 
 }
