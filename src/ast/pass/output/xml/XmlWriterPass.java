@@ -20,17 +20,21 @@ package ast.pass.output.xml;
 import java.io.FileNotFoundException;
 import java.io.OutputStream;
 import java.io.PrintStream;
+import java.util.Collection;
 
 import javax.xml.stream.XMLStreamException;
 
-import main.Configuration;
+import ast.data.Ast;
 import ast.data.Namespace;
 import ast.knowledge.KnowledgeBase;
 import ast.pass.AstPass;
 import ast.pass.output.xml.visitor.IdWriter;
 import ast.pass.output.xml.visitor.Write;
 import ast.repository.query.IdForReferenced.IdReaderFactory;
+import ast.visitor.VisitExecutor;
 import ast.visitor.VisitExecutorImplementation;
+import ast.visitor.Visitor;
+import main.Configuration;
 
 public class XmlWriterPass implements AstPass {
   private final String filename;
@@ -46,10 +50,12 @@ public class XmlWriterPass implements AstPass {
 
   @Override
   public void process(Namespace ast, KnowledgeBase kb) {
+    Collection<String> xmlNamespaces = getXmlNamespaces(ast);
+
     try {
       OutputStream stream = new PrintStream(filename);
       XmlFileWriter writer = new XmlFileWriter(stream);
-      write(ast, writer);
+      write(ast, writer, xmlNamespaces);
     } catch (FileNotFoundException e1) {
       e1.printStackTrace();
     } catch (XMLStreamException e) {
@@ -57,13 +63,47 @@ public class XmlWriterPass implements AstPass {
     }
   }
 
-  private void write(Namespace ast, XmlFileWriter writer) {
-    VisitExecutorImplementation executor = VisitExecutorImplementation.instance();
+  private void write(Namespace ast, XmlFileWriter writer, Collection<String> xmlNamespaces) {
+    VisitExecutor executor = VisitExecutorImplementation.instance();
     IdReader astId = (new IdReaderFactory()).produce(ast);
 
     writer.beginNode("rizzly");
+    writeXmlNamespaces(xmlNamespaces, writer);
+
     Write visitor = new Write(writer, astId, new IdWriter(writer, astId), executor);
     executor.visit(visitor, ast.children);
     writer.endNode();
+  }
+
+  private void writeXmlNamespaces(Collection<String> xmlNamespaces, XmlFileWriter writer) {
+    for (String namespace : xmlNamespaces) {
+      String prefix = NamespacePrefix.get(namespace);
+      writer.writeNamespacePrefix(prefix, namespace);
+    }
+  }
+
+  private Collection<String> getXmlNamespaces(Namespace ast) {
+    // TODO simplify
+    IdReader idReader = new IdReader() {
+      @Override
+      public boolean hasId(Ast item) {
+        return true;
+      }
+
+      @Override
+      public String getId(Ast item) {
+        return "";
+      }
+    };
+    Visitor idWriter = new Visitor() {
+    };
+    VisitExecutor executor = VisitExecutorImplementation.instance();
+
+    NamespaceCollector collector = new NamespaceCollector();
+
+    Write visitor = new Write(collector, idReader, idWriter, executor);
+    executor.visit(visitor, ast);
+
+    return collector.getNamespaces();
   }
 }

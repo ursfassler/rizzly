@@ -15,15 +15,14 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.output.xml.visitor;
+package ast.pass.output.xml;
 
-public interface XmlStreamWriter {
-  public void beginNode(String name);
+public class NamespacePrefix {
 
-  public void beginNode(String namespace, String localName);
-
-  public void endNode();
-
-  public void attribute(String name, String value);
+  public static String get(String namespace) {
+    int index = namespace.lastIndexOf('/');
+    int start = index + 1;
+    return namespace.substring(start, namespace.length());
+  }
 
 }

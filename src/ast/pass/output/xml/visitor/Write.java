@@ -828,7 +828,7 @@ public class Write implements Visitor {
   }
 
   public void visit(SourcePosition object) {
-    writer.beginNode("SourcePosition");
+    writer.beginNode("http://www.bitzgi.ch/2016/rizzly/test/meta", "SourcePosition");
     writer.attribute("filename", object.filename);
     writer.attribute("line", String.valueOf(object.line));
     writer.attribute("row", String.valueOf(object.row));

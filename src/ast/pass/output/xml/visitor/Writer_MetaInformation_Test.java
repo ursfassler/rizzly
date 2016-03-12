@@ -24,54 +24,48 @@ import org.junit.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 
-import ast.Designator;
-import ast.data.Namespace;
-import ast.data.file.RizzlyFile;
+import ast.meta.MetaInformation;
+import ast.meta.MetaList;
+import ast.meta.MetaListImplementation;
+import ast.meta.SourcePosition;
 import ast.pass.output.xml.IdReader;
 import ast.visitor.VisitExecutor;
 import ast.visitor.Visitor;
 
-public class Writer_Infrastructure_Test {
+public class Writer_MetaInformation_Test {
+  private static final String MetaNamespace = "http://www.bitzgi.ch/2016/rizzly/test/meta";
   final private XmlStreamWriter stream = mock(XmlStreamWriter.class);
   final private IdReader astId = mock(IdReader.class);
   final private Visitor idWriter = mock(Visitor.class);
   final private VisitExecutor executor = mock(VisitExecutor.class);
   final private Write testee = new Write(stream, astId, idWriter, executor);
-  final private InOrder order = Mockito.inOrder(stream, idWriter, executor);
+  final private InOrder order = Mockito.inOrder(stream, executor);
 
   @Test
-  public void write_namespace() {
-    Namespace item = new Namespace("ns");
+  public void write_SourcePosition() {
+    SourcePosition item = new SourcePosition("the file name", 42, 57);
 
     testee.visit(item);
 
-    order.verify(stream).beginNode(eq("Namespace"));
-    order.verify(stream).attribute("name", "ns");
-    order.verify(executor).visit(idWriter, item);
-    order.verify(executor).visit(testee, item.metadata());
-    order.verify(executor).visit(testee, item.children);
+    order.verify(stream).beginNode(eq(MetaNamespace), eq("SourcePosition"));
+    order.verify(stream).attribute("filename", "the file name");
+    order.verify(stream).attribute("line", "42");
+    order.verify(stream).attribute("row", "57");
     order.verify(stream).endNode();
   }
 
   @Test
-  public void write_RizzlyFile() {
-    RizzlyFile item = new RizzlyFile("the file name");
-    item.imports.add(new Designator("first", "second"));
+  public void write_Metalist() {
+    MetaInformation item1 = mock(MetaInformation.class);
+    MetaInformation item2 = mock(MetaInformation.class);
+    MetaList list = new MetaListImplementation();
+    list.add(item1);
+    list.add(item2);
 
-    testee.visit(item);
+    testee.visit(list);
 
-    order.verify(stream).beginNode(eq("RizzlyFile"));
-    order.verify(stream).attribute("name", "the file name");
-    order.verify(executor).visit(idWriter, item);
-    order.verify(executor).visit(testee, item.metadata());
-
-    order.verify(stream).beginNode(eq("import"));
-    order.verify(stream).attribute("file", "first.second");
-    order.verify(stream).endNode();
-
-    order.verify(executor).visit(testee, item.objects);
-
-    order.verify(stream).endNode();
+    order.verify(executor).visit(eq(testee), eq(item1));
+    order.verify(executor).visit(eq(testee), eq(item2));
   }
 
 }

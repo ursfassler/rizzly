@@ -43,6 +43,6 @@ def step_impl(context, filename):
     proc = subprocess.Popen(['xmldiff', '__expected.xml', filename], stdout=subprocess.PIPE)
     proc.wait()
     
-    assert proc.returncode == 0, 'returned error: ' + str(proc.returncode) + '\n' + context.proc.stderr.read()
+    assert proc.returncode == 0, 'returned error: ' + str(proc.returncode) + '\n' + proc.stdout.read()
 
 

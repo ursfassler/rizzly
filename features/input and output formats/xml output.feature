@@ -24,6 +24,41 @@ Scenario: write the AST of the simplest rizzly file to an xml file
     
     """
 
+
+Scenario: write the AST with meta data to xml
+  Given we have a file "testee.rzy" with the content:
+    """
+    x : const Integer = 0;
+
+    """
+
+  When I start rizzly with the passes
+    | pass                     |
+    | rzyreader('.', 'testee') |
+    | xmlwriter('testee.xml')  |
+  
+  Then I expect no error
+  And I expect an xml file "testee.xml" with the content:
+    """
+    <rizzly xmlns:meta="http://www.bitzgi.ch/2016/rizzly/test/meta">
+      <RizzlyFile name="testee">
+        <meta:SourcePosition filename="./testee.rzy" line="1" row="1"/>
+        <GlobalConstant name="x">
+          <meta:SourcePosition filename="./testee.rzy" line="1" row="5"/>
+          <Reference>
+            <meta:SourcePosition filename="./testee.rzy" line="1" row="11"/>
+            <UnlinkedAnchor target="Integer"/>
+          </Reference>
+          <NumberValue value="0">
+            <meta:SourcePosition filename="./testee.rzy" line="1" row="21"/>
+          </NumberValue>
+        </GlobalConstant>
+      </RizzlyFile>
+    </rizzly>
+
+    """
+
+
 #TODO do not start separate block for entry and exit
 #TODO do not write empty sub-items (interface, ...)
 Scenario: write the AST of a elementary component to an xml file

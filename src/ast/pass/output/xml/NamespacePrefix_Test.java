@@ -15,15 +15,17 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.output.xml.visitor;
+package ast.pass.output.xml;
 
-public interface XmlStreamWriter {
-  public void beginNode(String name);
+import org.junit.Assert;
+import org.junit.Test;
 
-  public void beginNode(String namespace, String localName);
+public class NamespacePrefix_Test {
 
-  public void endNode();
-
-  public void attribute(String name, String value);
-
+  @Test
+  public void returns_the_prefix_of_namepsaces() {
+    Assert.assertEquals("meta", NamespacePrefix.get("http://www.bitzgi.ch/2016/rizzly/test/meta"));
+    Assert.assertEquals("world", NamespacePrefix.get("hello/world"));
+    Assert.assertEquals("hello", NamespacePrefix.get("hello"));
+  }
 }

@@ -15,15 +15,35 @@
  *  along with Rizzly.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-package ast.pass.output.xml.visitor;
+package ast.pass.output.xml;
 
-public interface XmlStreamWriter {
-  public void beginNode(String name);
+import java.util.Collection;
+import java.util.HashSet;
 
-  public void beginNode(String namespace, String localName);
+import ast.pass.output.xml.visitor.XmlStreamWriter;
 
-  public void endNode();
+public class NamespaceCollector implements XmlStreamWriter {
+  private final Collection<String> namespaces = new HashSet<>();
 
-  public void attribute(String name, String value);
+  public Collection<String> getNamespaces() {
+    return namespaces;
+  }
+
+  @Override
+  public void beginNode(String namespace, String localName) {
+    namespaces.add(namespace);
+  }
+
+  @Override
+  public void beginNode(String name) {
+  }
+
+  @Override
+  public void endNode() {
+  }
+
+  @Override
+  public void attribute(String name, String value) {
+  }
 
 }

@@ -33,10 +33,28 @@ public class XmlFileWriter implements XmlStreamWriter {
     writer = xof.createXMLStreamWriter(outputStream);
   }
 
+  public void writeNamespacePrefix(String prefix, String uri) {
+    try {
+      writer.setPrefix(prefix, uri);
+      writer.writeNamespace(prefix, uri);
+    } catch (XMLStreamException e) {
+      e.printStackTrace();
+    }
+  }
+
   @Override
   public void beginNode(String name) {
     try {
       writer.writeStartElement(name);
+    } catch (XMLStreamException e) {
+      e.printStackTrace();
+    }
+  }
+
+  @Override
+  public void beginNode(String namespace, String localName) {
+    try {
+      writer.writeStartElement(namespace, localName);
     } catch (XMLStreamException e) {
       e.printStackTrace();
     }
