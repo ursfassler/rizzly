@@ -63,7 +63,7 @@ Scenario: use of reserved keyword (R) as template argument name
   When I start rizzly with the file "err3.rzy"
   
   Then I expect an error code
-  And stderr should contain "err3.rzy:1:6: Error: Expected name, got keyword R"
+  And stderr should contain "err3.rzy:1:5: Error: Expected name, got keyword R"
 
 
 Scenario: reference non existing state

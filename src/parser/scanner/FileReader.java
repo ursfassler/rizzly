@@ -26,9 +26,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-import parser.PeekReader;
 import error.ErrorType;
 import error.RError;
+import parser.PeekReader;
 
 /**
  *
@@ -38,7 +38,7 @@ public class FileReader implements PeekReader<Symbol> {
   final private String filename;
   private BufferedReader stream = null;
   private int lineNr = 1;
-  private int row = 1;
+  private int row = 0;
   private Symbol nextSym = null;
 
   public FileReader(String filename) {

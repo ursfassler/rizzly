@@ -65,7 +65,7 @@ Scenario: It is not allowed to declare a variable in a unit
   When I start rizzly with the file "testee.rzy"
 
   Then I expect an error code
-  And stderr should contain "testee.rzy:1:11: Error: expected CONST got IDENTIFIER(R)"
+  And stderr should contain "testee.rzy:1:10: Error: expected CONST got IDENTIFIER(R)"
 
 
 #TODO remove component
@@ -84,5 +84,5 @@ Scenario: it is not allowed to declare a procedure in a unit (because it does no
   When I start rizzly with the file "testee.rzy"
 
   Then I expect an error code
-  And stderr should contain "testee.rzy:1:10: Fatal: Expected record, union or type reference"
+  And stderr should contain "testee.rzy:1:9: Fatal: Expected record, union or type reference"
 

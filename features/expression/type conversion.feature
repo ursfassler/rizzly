@@ -102,5 +102,5 @@ Scenario: The type conversion throws an error during compile time for compile ti
   When I start rizzly with the file "testee.rzy"
 
   Then I expect an error code
-  And stderr should contain "testee.rzy:1:22: Error: Value not in range: 20 not in 0..10"
+  And stderr should contain "testee.rzy:1:21: Error: Value not in range: 20 not in 0..10"
 
